@@ -314,14 +314,15 @@ optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
 /// This creates a method symbol in the symtab, but doesn't actually perform
 /// method conversion just yet. The caller should call
 /// java_bytecode_convert_method later to give the symbol/method a body.
-/// \param class_symbol: The class this method belongs to
+/// \param class_symbol: The class this method belongs to. The method, if not
+///   static, will be added to the class' list of methods.
 /// \param method_identifier: The fully qualified method name, including type
 ///   descriptor (e.g. "x.y.z.f:(I)")
 /// \param m: The parsed method object to convert.
 /// \param symbol_table: The global symbol table (will be modified).
 /// \param message_handler: A message handler to collect warnings.
 void java_bytecode_convert_method_lazy(
-  const symbolt &class_symbol,
+  symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &m,
   symbol_tablet &symbol_table,
@@ -413,6 +414,20 @@ void java_bytecode_convert_method_lazy(
   }
 
   symbol_table.add(method_symbol);
+
+  if(!m.is_static)
+  {
+    class_typet::methodt new_method;
+    new_method.set_name(method_symbol.name);
+    new_method.set_base_name(method_symbol.base_name);
+    new_method.set_pretty_name(method_symbol.pretty_name);
+    new_method.set_access(member_type.get_access());
+    new_method.type() = method_symbol.type;
+
+    to_class_type(class_symbol.type)
+      .methods()
+      .emplace_back(std::move(new_method));
+  }
 }
 
 static irep_idt get_method_identifier(
