@@ -23,6 +23,9 @@ rm -f "${name}-mod.gb"
 $goto_instrument ${args} "${name}.gb" "${name}-mod.gb"
 if [ ! -e "${name}-mod.gb" ] ; then
   cp "$name.gb" "${name}-mod.gb"
+elif echo $args | grep -q -- "--dump-c-type-header" ; then
+  cat "${name}-mod.gb"
+  mv "${name}.gb" "${name}-mod.gb"
 elif echo $args | grep -q -- "--dump-c" ; then
   mv "${name}-mod.gb" "${name}-mod.c"
 
