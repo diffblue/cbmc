@@ -164,13 +164,13 @@ SRC = $(BOOLEFORCE_SRC) \
       strings/format_specifier.cpp \
       strings/string_builtin_function.cpp \
       strings/string_dependencies.cpp \
+      strings/string_concatenation_builtin_function.cpp \
       strings/string_format_builtin_function.cpp \
       strings/string_refinement.cpp \
       strings/string_refinement_util.cpp \
       strings/string_constraint.cpp \
       strings/string_constraint_generator_code_points.cpp \
       strings/string_constraint_generator_comparison.cpp \
-      strings/string_constraint_generator_concat.cpp \
       strings/string_constraint_generator_constants.cpp \
       strings/string_constraint_generator_indexof.cpp \
       strings/string_constraint_generator_insert.cpp \

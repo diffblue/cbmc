@@ -1,17 +1,32 @@
 /*******************************************************************\
 
-Module: Generates string constraints for functions adding content
-        add the end of strings
+Module: Builtin functions for string concatenations
 
-Author: Romain Brenguier, romain.brenguier@diffblue.com
+Author: Romain Brenguier, Joel Allred
 
 \*******************************************************************/
 
 /// \file
-/// Generates string constraints for functions adding content add the end of
-///   strings
+/// Builtin functions for string concatenations
 
-#include "string_constraint_generator.h"
+#include "string_concatenation_builtin_function.h"
+
+#include <algorithm>
+
+string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
+  const exprt &return_code,
+  const std::vector<exprt> &fun_args,
+  array_poolt &array_pool)
+  : string_insertion_builtin_functiont(return_code, array_pool)
+{
+  PRECONDITION(fun_args.size() >= 4 && fun_args.size() <= 6);
+  const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
+  input1 = array_pool.find(arg1.op1(), arg1.op0());
+  const auto arg2 = expr_checked_cast<struct_exprt>(fun_args[3]);
+  input2 = array_pool.find(arg2.op1(), arg2.op0());
+  result = array_pool.find(fun_args[1], fun_args[0]);
+  args.insert(args.end(), fun_args.begin() + 4, fun_args.end());
+}
 
 /// Add axioms enforcing that `res` is the concatenation of `s1` with
 /// the substring of `s2` starting at index `start_index'` and ending
@@ -184,4 +199,60 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   return combine_results(
     add_axioms_for_code_point(code_point, f.arguments()[3], array_pool),
     add_axioms_for_concat(fresh_symbol, res, s1, code_point, array_pool));
+}
+
+std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  const auto start_index =
+    args_value.size() > 0 && args_value[0] > 0 ? args_value[0] : mp_integer(0);
+  const mp_integer input2_size(input2_value.size());
+  const auto end_index =
+    args_value.size() > 1
+      ? std::max(std::min(args_value[1], input2_size), start_index)
+      : input2_size;
+
+  std::vector<mp_integer> eval_result(input1_value);
+  eval_result.insert(
+    eval_result.end(),
+    input2_value.begin() + numeric_cast_v<std::size_t>(start_index),
+    input2_value.begin() + numeric_cast_v<std::size_t>(end_index));
+  return eval_result;
+}
+
+string_constraintst string_concatenation_builtin_functiont::constraints(
+  string_constraint_generatort &generator) const
+
+{
+  auto pair = [&]() -> std::pair<exprt, string_constraintst> {
+    if(args.size() == 0)
+      return add_axioms_for_concat(
+        generator.fresh_symbol, result, input1, input2, array_pool);
+    if(args.size() == 2)
+    {
+      return add_axioms_for_concat_substr(
+        generator.fresh_symbol,
+        result,
+        input1,
+        input2,
+        args[0],
+        args[1],
+        array_pool);
+    }
+    UNREACHABLE;
+  }();
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
+}
+
+exprt string_concatenation_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 0)
+    return length_constraint_for_concat(result, input1, input2, array_pool);
+  if(args.size() == 2)
+    return length_constraint_for_concat_substr(
+      result, input1, input2, args[0], args[1], array_pool);
+  UNREACHABLE;
 }
