@@ -7,6 +7,13 @@ class My {
   float floatField;
   double doubleField;
 
+  static byte byteFieldStatic;
+  static short shortFieldStatic;
+  static int intFieldStatic;
+  static long longFieldStatic;
+  static float floatFieldStatic;
+  static double doubleFieldStatic;
+
   int[] intArrField;
 
   public static void numericalArg(byte byteArg, short shortArg, int intArg,
@@ -111,6 +118,36 @@ class My {
       assert false;
     }
   }
+
+  public void fieldStatic() {
+    if (byteFieldStatic > 3) {
+      assert false;
+    } else if (byteFieldStatic < 1) {
+      assert false;
+    } else if (shortFieldStatic > 3) {
+      assert false;
+    } else if (shortFieldStatic < 1) {
+      assert false;
+    } else if (intFieldStatic > 3) {
+      assert false;
+    } else if (intFieldStatic < 1) {
+      assert false;
+    } else if (longFieldStatic > 3) {
+      assert false;
+    } else if (longFieldStatic < 1) {
+      assert false;
+    } else if (floatFieldStatic > 3) {
+      assert false;
+    } else if (floatFieldStatic < 1) {
+      assert false;
+    } else if (doubleFieldStatic > 3) {
+      assert false;
+    } else if (doubleFieldStatic < 1) {
+      assert false;
+    } else {
+      assert false;
+    }
+    }
 
   public void classArrArg(Other other, int [] intArr) {
     if (other.intArrField.length > 3) {
