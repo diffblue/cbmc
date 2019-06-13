@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 
 #include <util/irep.h>
+#include <util/optional.h>
+#include "mp_arith.h"
 
 class cmdlinet;
 class optionst;
@@ -69,6 +71,14 @@ struct object_factory_parameterst
 
   /// Force string content to be ASCII printable characters when set to true.
   bool string_printable = false;
+
+  /// Force numerical primitive inputs to fall within the bounds
+  struct numeric_input_limitst
+  {
+    optionalt<mp_integer> lower;
+    optionalt<mp_integer> upper;
+  };
+  numeric_input_limitst assume_input_limits;
 
   /// Force one of finitely many explicitly given input strings
   std::list<std::string> string_input_values;

@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(disable-uncaught-exception-check)" \
   "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
+  "(java-assume-input-limits):" \
   "(throw-runtime-exceptions)" \
   "(max-nondet-array-length):" \
   "(max-nondet-tree-depth):" \
@@ -56,6 +57,11 @@ Author: Daniel Kroening, kroening@kroening.com
   " --java-assume-inputs-non-null\n" \
   "                              never initialize reference-typed parameter to the\n" /* NOLINT(*) */ \
   "                              entry point with null\n" /* NOLINT(*) */ \
+  " --java-assume-input-limits [L:U] or [L:] or [:U]\n" \
+  "                              never initialize numerical primitive-typed parameter\n" /* NOLINT(*) */ \
+  "                              (byte, short, int, long, float, double) to an entry\n" /* NOLINT(*) */ \
+  "                              point < L (if lower bound L is given) and > U (if\n"  /* NOLINT(*) */ \
+  "                              upper bound U is given)\n" /* NOLINT(*) */ \
   " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
   " --java-cp-include-files r    regexp or JSON list of files to load\n" \
   "                              (with '@' prefix)\n" \
