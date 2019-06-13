@@ -94,6 +94,35 @@ static void assign_parameter_names(
   }
 }
 
+void create_method_stub_symbol(
+  const irep_idt &identifier,
+  const irep_idt &base_name,
+  const irep_idt &pretty_name,
+  const typet &type,
+  const irep_idt &declaring_class,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
+{
+  messaget log(message_handler);
+
+  symbolt symbol;
+  symbol.name = identifier;
+  symbol.base_name = base_name;
+  symbol.pretty_name = pretty_name;
+  symbol.type = type;
+  symbol.type.set(ID_access, ID_private);
+  to_java_method_type(symbol.type).set_is_final(true);
+  symbol.value.make_nil();
+  symbol.mode = ID_java;
+  assign_parameter_names(
+    to_java_method_type(symbol.type), symbol.name, symbol_table);
+  set_declaring_class(symbol, declaring_class);
+
+  log.debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
+              << "'" << messaget::eom;
+  symbol_table.add(symbol);
+}
+
 static bool is_constructor(const irep_idt &method_name)
 {
   return id2string(method_name).find("<init>") != std::string::npos;
@@ -2224,23 +2253,15 @@ void java_bytecode_convert_methodt::convert_invoke(
     !(is_virtual &&
       is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
   {
-    symbolt symbol;
-    symbol.name = invoked_method_id;
-    symbol.base_name = arg0.get(ID_C_base_name);
-    symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
-                         id2string(symbol.base_name) + "()";
-    symbol.type = method_type;
-    symbol.type.set(ID_access, ID_private);
-    to_java_method_type(symbol.type).set_is_final(true);
-    symbol.value.make_nil();
-    symbol.mode = ID_java;
-    assign_parameter_names(
-      to_java_method_type(symbol.type), symbol.name, symbol_table);
-    set_declaring_class(symbol, arg0.get(ID_C_class));
-
-    debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
-            << "'" << eom;
-    symbol_table.add(symbol);
+    create_method_stub_symbol(
+      invoked_method_id,
+      arg0.get(ID_C_base_name),
+      id2string(arg0.get(ID_C_class)).substr(6) + "." +
+        id2string(arg0.get(ID_C_base_name)) + "()",
+      method_type,
+      arg0.get(ID_C_class),
+      symbol_table,
+      get_message_handler());
   }
 
   exprt function;
