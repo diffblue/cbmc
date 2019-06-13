@@ -175,7 +175,6 @@ SRC = $(BOOLEFORCE_SRC) \
       strings/string_constraint_generator_indexof.cpp \
       strings/string_constraint_generator_insert.cpp \
       strings/string_constraint_generator_float.cpp \
-      strings/string_constraint_generator_format.cpp \
       strings/string_constraint_generator_main.cpp \
       strings/string_constraint_generator_testing.cpp \
       strings/string_constraint_generator_transformation.cpp \
