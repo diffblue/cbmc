@@ -21,6 +21,7 @@ Author: Diffblue Ltd.
 #include <util/make_unique.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
+#include <util/unicode.h>
 
 bool is_char_type(const typet &type)
 {
@@ -49,6 +50,20 @@ bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
 {
   return has_subexpr(
     expr, [&](const exprt &e) { return is_char_array_type(e.type(), ns); });
+}
+
+std::string
+utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
+{
+  for(const auto &op : arr.operands())
+    PRECONDITION(op.id() == ID_constant);
+
+  std::wstring out(length, '?');
+
+  for(std::size_t i = 0; i < arr.operands().size() && i < length; i++)
+    out[i] = numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i]));
+
+  return utf16_native_endian_to_java(out);
 }
 
 sparse_arrayt::sparse_arrayt(const with_exprt &expr)

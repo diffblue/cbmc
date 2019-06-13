@@ -17,10 +17,10 @@ Date:   June 2019
 
 #include "format_specifier.h"
 #include "string_format_builtin_function.h"
+#include "string_refinement_util.h"
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
-#include <util/unicode.h>
 
 static exprt format_arg_from_string(
   const array_string_exprt &string,
@@ -432,25 +432,6 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
     fresh_symbol, res, str, intermediary_strings.back(), array_pool);
   merge(constraints, std::move(result.second));
   return {maximum(result.first, return_code), std::move(constraints)};
-}
-
-/// Construct a string from a constant array.
-/// \param arr: an array expression containing only constants
-/// \param length: an unsigned value representing the length of the array
-/// \return String of length `length` represented by the array assuming each
-///   field in `arr` represents a character.
-std::string
-utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
-{
-  for(const auto &op : arr.operands())
-    PRECONDITION(op.id() == ID_constant);
-
-  std::wstring out(length, '?');
-
-  for(std::size_t i = 0; i < arr.operands().size() && i < length; i++)
-    out[i] = numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i]));
-
-  return utf16_native_endian_to_java(out);
 }
 
 static std::vector<mp_integer> deserialize_constant_int_arg(
