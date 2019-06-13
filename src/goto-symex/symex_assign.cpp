@@ -470,7 +470,6 @@ void goto_symext::symex_assign_symbol(
     state.rename(add_to_lhs(full_lhs, l2_lhs), ns).get();
   state.record_events.pop();
 
-  // do the assignment
   const symbolt &symbol = ns.lookup(l2_lhs.get_object_name());
 
   if(symbol.is_auxiliary)
