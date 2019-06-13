@@ -470,9 +470,7 @@ void goto_symext::symex_assign_symbol(
     state.rename(add_to_lhs(full_lhs, l2_lhs), ns).get();
   state.record_events.pop();
 
-  const symbolt &symbol = ns.lookup(l2_lhs.get_object_name());
-
-  if(symbol.is_auxiliary)
+  if(ns.lookup(l2_lhs.get_object_name()).is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
 
   log.conditional_output(
