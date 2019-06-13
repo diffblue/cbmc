@@ -1,6 +1,6 @@
 CORE
 My.class
---function My.numericalArg --java-assume-input-limits [-1:3]
+--function My.numericalArg --java-assume-inputs-interval [-1:3]
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -26,5 +26,5 @@ My.class
 --
 ^warning: ignoring
 --
-Check that --java-assume-input-limits restricts numerical inputs and works well
-with negative limits too.
+Check that --java-assume-inputs-interval restricts numerical inputs and works
+well with negative limits too.

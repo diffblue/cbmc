@@ -1,6 +1,6 @@
 KNOWNBUG
 My.class
---function My.classArrArg --java-assume-input-limits [1:3]
+--function My.classArrArg --java-assume-inputs-interval [1:3]
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -18,5 +18,5 @@ My.class
 ^warning: ignoring
 --
 TG-5572
-Check that --java-assume-input-limits restricts numeric values in arrays (but
+Check that --java-assume-inputs-interval restricts numeric values in arrays (but
 not array length)

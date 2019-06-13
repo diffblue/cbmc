@@ -1,0 +1,11 @@
+CORE
+My.class
+--function My.numericalArg --java-assume-inputs-interval [3:1]
+^EXIT=1$
+^SIGNAL=0$
+^Invalid User Input
+^Reason: interval is empty
+--
+--
+Check that --java-assume-inputs-interval throws exception for malformed
+interval.

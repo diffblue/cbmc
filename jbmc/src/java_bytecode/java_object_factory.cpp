@@ -1011,20 +1011,25 @@ void java_object_factoryt::gen_nondet_init(
     assign.add_source_location() = location;
 
     assignments.add(assign);
-    // add assumes to obey numerical limits (given via java-assume-input-limits)
+    // add assumes to obey numerical limits (given via
+    // java-assume-inputs-interval)
     if(type != java_boolean_type() && type != java_char_type())
     {
-      if(
-        const auto &lower = object_factory_parameters.assume_input_limits.lower)
+      if(object_factory_parameters.assume_inputs_interval.lower_set)
       {
         assignments.add(code_assumet(binary_relation_exprt(
-          expr, ID_ge, from_integer(lower.value(), type))));
+          expr,
+          ID_ge,
+          from_integer(
+            object_factory_parameters.assume_inputs_interval.lower, type))));
       }
-      if(
-        const auto &upper = object_factory_parameters.assume_input_limits.upper)
+      if(object_factory_parameters.assume_inputs_interval.upper_set)
       {
         assignments.add(code_assumet(binary_relation_exprt(
-          expr, ID_le, from_integer(upper.value(), type))));
+          expr,
+          ID_le,
+          from_integer(
+            object_factory_parameters.assume_inputs_interval.upper, type))));
       }
     }
   }

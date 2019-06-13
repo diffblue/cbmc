@@ -1,6 +1,6 @@
 CORE
 My.class
---function My.classArg --java-assume-input-limits [1:]
+--function My.classArg --java-assume-inputs-interval [1:]
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -20,5 +20,5 @@ My.class
 --
 ^warning: ignoring
 --
-Check that --java-assume-input-limits restricts numerical fields to user-
+Check that --java-assume-inputs-interval restricts numerical fields to user-
 defined objects if only lower bound is given.

@@ -50,34 +50,31 @@ void object_factory_parameterst::set(const optionst &options)
     min_nondet_string_length =
       options.get_unsigned_int_option("min-nondet-string-length");
   }
-  if(options.is_set("java-assume-input-limits"))
+  if(options.is_set("java-assume-inputs-interval"))
   {
-    const auto &limits = options.get_option("java-assume-input-limits");
+    const auto &interval = options.get_option("java-assume-inputs-interval");
     const std::regex limits_regex("\\[(-\\d+|\\d*):(-\\d+|\\d*)\\]");
     std::smatch base_match;
-    if(
-      !std::regex_match(limits, base_match, limits_regex) ||
-      (base_match[1] == "" && base_match[2] == ""))
+    if(!std::regex_match(interval, base_match, limits_regex))
     {
       throw invalid_command_line_argument_exceptiont(
-        "limits must be of the form [int:int] and at least one of the limits "
-        "must be given",
-        "--java-assume-input-limits");
+        "interval must be of the form [int:int], [int:] or [:int]",
+        "--java-assume-inputs-interval");
     }
-    assume_input_limits = [&]() -> numeric_input_limitst {
-      numeric_input_limitst temp;
+    assume_inputs_interval = [&]() -> integer_intervalt {
+      integer_intervalt temp;
       if(base_match[1] != "")
-        temp.lower = string2integer(base_match[1]);
+        temp.make_ge_than(string2integer(base_match[1]));
       if(base_match[2] != "")
-        temp.upper = string2integer(base_match[2]);
-      if(
-        temp.lower.has_value() && temp.upper.has_value() &&
-        temp.lower.value() > temp.upper.value())
-      {
+        temp.make_le_than(string2integer(base_match[2]));
+      if(temp.is_top())
         throw invalid_command_line_argument_exceptiont(
-          "lower limit cannot be bigger than upper limit",
-          "--java-assume-input-limits");
-      }
+          "at least one of the interval bounds must be given",
+          "--java-assume-inputs-interval");
+      if(temp.empty())
+        throw invalid_command_line_argument_exceptiont(
+          "interval is empty, lower limit cannot be bigger than upper limit",
+          "--java-assume-inputs-interval");
       return temp;
     }();
   }
@@ -122,10 +119,10 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
     options.set_option(
       "string-input-value", cmdline.get_values("string-input-value"));
   }
-  if(cmdline.isset("java-assume-input-limits"))
+  if(cmdline.isset("java-assume-inputs-interval"))
   {
     options.set_option(
-      "java-assume-input-limits",
-      cmdline.get_value("java-assume-input-limits"));
+      "java-assume-inputs-interval",
+      cmdline.get_value("java-assume-inputs-interval"));
   }
 }

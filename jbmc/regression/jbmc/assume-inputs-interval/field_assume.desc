@@ -1,6 +1,6 @@
 CORE
 My.class
---function My.field --java-assume-input-limits [1:3]
+--function My.field --java-assume-inputs-interval [1:3]
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -20,5 +20,5 @@ My.class
 --
 ^warning: ignoring
 --
-Check that --java-assume-input-limits constrains the primitive fields of the
-containing object to within given bounds.
+Check that --java-assume-inputs-interval constrains the primitive fields of the
+containing object to given interval.
