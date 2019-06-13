@@ -122,9 +122,7 @@ void symex_target_equationt::assignment(
     original_full_lhs,
     ssa_rhs,
     equal_exprt(ssa_lhs, ssa_rhs),
-    assignment_type,
-    assignment_type != assignment_typet::STATE &&
-      assignment_type != assignment_typet::VISIBLE_ACTUAL_PARAMETER});
+    assignment_type});
 
   merge_ireps(SSA_steps.back());
 }

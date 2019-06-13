@@ -206,8 +206,7 @@ public:
     exprt original_full_lhs,
     exprt ssa_rhs,
     exprt cond_expr,
-    symex_targett::assignment_typet assignment_type,
-    bool hidden);
+    symex_targett::assignment_typet assignment_type);
 };
 
 #endif // CPROVER_GOTO_SYMEX_SSA_STEP_H
