@@ -399,21 +399,20 @@ void goto_symext::symex_assign_from_struct(
   const struct_union_typet::componentst &components = type.components();
   PRECONDITION(rhs.operands().size() == components.size());
 
-  for(std::size_t i = 0; i < components.size(); ++i)
+  for(const auto &comp_rhs : make_range(components).zip(rhs.operands()))
   {
-    const auto &comp = components[i];
+    const auto &comp = comp_rhs.first;
     const exprt lhs_field = state.field_sensitivity.apply(
       ns, state, member_exprt{lhs, comp.get_name(), comp.type()}, true);
     INVARIANT(
       lhs_field.id() == ID_symbol,
       "member of symbol should be susceptible to field-sensitivity");
 
-    const exprt &rhs_field = rhs.operands()[i];
     symex_assign_symbol(
       state,
       to_ssa_expr(lhs_field),
       full_lhs,
-      rhs_field,
+      comp_rhs.second,
       guard,
       assignment_type);
   }
