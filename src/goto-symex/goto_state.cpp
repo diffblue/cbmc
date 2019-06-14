@@ -31,19 +31,17 @@ std::size_t goto_statet::increase_generation(
   const ssa_exprt &lhs,
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
 {
-  std::size_t n = fresh_l2_name_provider(l1_identifier);
+  const std::size_t n = fresh_l2_name_provider(l1_identifier);
 
-  const auto r_opt = level2.current_names.find(l1_identifier);
-
-  if(!r_opt)
+  if(const auto r_opt = level2.current_names.find(l1_identifier))
   {
-    level2.current_names.insert(l1_identifier, std::make_pair(lhs, n));
+    std::pair<ssa_exprt, unsigned> copy = r_opt->get();
+    copy.second = narrow<unsigned>(n);
+    level2.current_names.replace(l1_identifier, std::move(copy));
   }
   else
   {
-    std::pair<ssa_exprt, unsigned> copy = r_opt->get();
-    copy.second = n;
-    level2.current_names.replace(l1_identifier, std::move(copy));
+    level2.current_names.insert(l1_identifier, std::make_pair(lhs, n));
   }
 
   return n;
