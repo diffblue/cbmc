@@ -738,7 +738,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 
   for(const exprt &lemma : generator.constraints.existential)
-    add_lemma(lemma);
+  {
+    add_lemma(substitute_array_access(lemma, generator.fresh_symbol, true));
+  }
 
   // All generated strings should have non-negative length
   for(const auto &pair : generator.array_pool.created_strings())
@@ -785,7 +787,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   const auto initial_instances =
     generate_instantiations(index_sets, axioms, not_contain_witnesses);
   for(const auto &instance : initial_instances)
-    add_lemma(instance);
+  {
+    add_lemma(substitute_array_access(instance, generator.fresh_symbol, true));
+  }
 
   while((loop_bound_--) > 0)
   {
