@@ -91,8 +91,7 @@ void goto_statet::apply_condition(
         previous_state.write_is_shared(ssa_lhs, ns) !=
           goto_symex_statet::write_is_shared_resultt::SHARED)
       {
-        ssa_exprt l1_lhs = ssa_lhs;
-        l1_lhs.remove_level_2();
+        const ssa_exprt l1_lhs = remove_level_2(ssa_lhs);
         const irep_idt &l1_identifier = l1_lhs.get_identifier();
 
         increase_generation(

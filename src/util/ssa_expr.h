@@ -138,4 +138,7 @@ inline ssa_exprt &to_ssa_expr(exprt &expr)
   return static_cast<ssa_exprt &>(expr);
 }
 
+/// \return copy of \p ssa where level2 identifiers have been removed
+ssa_exprt remove_level_2(ssa_exprt ssa);
+
 #endif // CPROVER_UTIL_SSA_EXPR_H
