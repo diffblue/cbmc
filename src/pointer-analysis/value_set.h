@@ -313,9 +313,11 @@ public:
     bool add_to_sets);
 
   /// Pretty-print this value-set
-  /// \param ns: global namespace
   /// \param [out] out: stream to write to
   /// \param indent: string to use for indentation of the output
+  void output(std::ostream &out, const std::string &indent = "") const;
+
+  DEPRECATED(SINCE(2019, 06, 11, "Use the version without ns argument"))
   void output(
     const namespacet &ns,
     std::ostream &out,
