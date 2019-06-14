@@ -433,6 +433,14 @@ public:
       zip_begin, zip_end);
   }
 
+  template <typename containert>
+  auto zip(containert &container)
+    -> ranget<zip_iteratort<iteratort, decltype(container.begin())>>
+  {
+    return zip(
+      ranget<decltype(container.begin())>{container.begin(), container.end()});
+  }
+
   bool empty() const
   {
     return begin_value == end_value;
