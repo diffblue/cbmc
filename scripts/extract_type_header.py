@@ -96,7 +96,7 @@ def make_header_file(goto_binary, c_file, header_out=None):
         subprocess.run(drop_header_cmd,
                        stdout=subprocess.PIPE,
                        stderr=subprocess.STDOUT,
-                       check=True,
+                       check=False,
                        universal_newlines=True,
                        cwd=tmpdir,
                        shell=False)

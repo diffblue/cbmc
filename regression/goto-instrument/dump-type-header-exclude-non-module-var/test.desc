@@ -15,5 +15,5 @@ Trying the macro: SUCCESS
 #include "data_structure.h"
 --
 ^warning: ignoring
-struct A default_config = {5, 6};
-struct A my_config={ .a=7, .b=8 };
+struct A default_config = \{5, 6\};
+struct A my_config=\{ .a=7, .b=8 \};
