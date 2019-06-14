@@ -17,6 +17,8 @@ Author: Romain Brenguier, Joel Allred
 #include <vector>
 
 // Format specifier describes how a value should be printed.
+/// Field names follow the OpenJDK implementation:
+/// http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/Formatter.java#l2569
 class format_specifiert
 {
 public:
@@ -49,6 +51,7 @@ public:
   std::string flag;
   int width;
   int precision;
+  // date/time
   bool dt = false;
   char conversion;
 
@@ -58,13 +61,13 @@ public:
     int _width,
     int _precision,
     bool _dt,
-    char c)
+    char conversion)
     : index(_index),
       flag(_flag),
       width(_width),
       precision(_precision),
       dt(_dt),
-      conversion(c)
+      conversion(conversion)
   {
   }
 };
