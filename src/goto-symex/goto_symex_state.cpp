@@ -219,9 +219,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     exprt l1_rhs(rhs);
     get_l1_name(l1_rhs);
 
-    ssa_exprt l1_lhs(lhs);
-    l1_lhs.remove_level_2();
-
+    const ssa_exprt l1_lhs = remove_level_2(lhs);
     if(run_validation_checks)
     {
       DATA_INVARIANT(!check_renaming_l1(l1_lhs), "lhs renaming failed on l1");
@@ -381,8 +379,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   if(field_sensitivityt::is_divisible(expr))
     return false;
 
-  ssa_exprt ssa_l1=expr;
-  ssa_l1.remove_level_2();
+  const ssa_exprt ssa_l1 = remove_level_2(expr);
   const irep_idt &l1_identifier=ssa_l1.get_identifier();
   const exprt guard_as_expr = guard.as_expr();
 
@@ -527,10 +524,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
   case write_is_shared_resultt::IN_ATOMIC_SECTION:
   {
-    ssa_exprt ssa_l1 = expr;
-    ssa_l1.remove_level_2();
-
-    written_in_atomic_section[ssa_l1].push_back(guard);
+    written_in_atomic_section[remove_level_2(expr)].push_back(guard);
     return false;
   }
   case write_is_shared_resultt::SHARED:

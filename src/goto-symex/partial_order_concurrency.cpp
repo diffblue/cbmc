@@ -62,8 +62,7 @@ void partial_order_concurrencyt::add_init_writes(
 
       SSA_step.guard=true_exprt();
       // no SSA L2 index, thus nondet value
-      SSA_step.ssa_lhs=e_it->ssa_lhs;
-      SSA_step.ssa_lhs.remove_level_2();
+      SSA_step.ssa_lhs = remove_level_2(e_it->ssa_lhs);
       SSA_step.atomic_section_id=0;
     }
 

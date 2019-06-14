@@ -92,9 +92,7 @@ protected:
   /// \return L1-renamed identifier
   irep_idt address(event_it event) const
   {
-    ssa_exprt tmp=event->ssa_lhs;
-    tmp.remove_level_2();
-    return tmp.get_identifier();
+    return remove_level_2(event->ssa_lhs).get_identifier();
   }
 
   typet clock_type;
