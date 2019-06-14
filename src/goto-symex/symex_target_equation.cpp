@@ -114,14 +114,13 @@ void symex_target_equationt::assignment(
 {
   PRECONDITION(ssa_lhs.is_not_nil());
 
-  SSA_steps.emplace_back(SSA_assignment_stept{
-    source,
-    guard,
-    ssa_lhs,
-    ssa_full_lhs,
-    original_full_lhs,
-    ssa_rhs,
-    assignment_type});
+  SSA_steps.emplace_back(SSA_assignment_stept{source,
+                                              guard,
+                                              ssa_lhs,
+                                              ssa_full_lhs,
+                                              original_full_lhs,
+                                              ssa_rhs,
+                                              assignment_type});
 
   merge_ireps(SSA_steps.back());
 }
