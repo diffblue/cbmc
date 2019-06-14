@@ -26,6 +26,11 @@ class symex_targett;
 /// Note that field sensitivity is not applied as a single pass over the
 /// whole goto program but instead applied as the symbolic execution unfolds.
 ///
+/// On a high level, field sensitivity replaces member operators with atomic
+/// symbols representing a field when possible. In cases where this is not
+/// immediately possible, like struct assignments, some things need to be added.
+/// The possible cases are described below.
+///
 /// ### Member access
 /// A member expression `struct_expr.field_name` is replaced by the
 /// symbol `struct_expr..field_name`; note the use of `..` to visually
