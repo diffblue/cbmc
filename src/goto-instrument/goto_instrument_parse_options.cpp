@@ -639,9 +639,12 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
+    if(
+      cmdline.isset("dump-c") || cmdline.isset("dump-cpp") ||
+      cmdline.isset("dump-c-type-header"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
+      const bool is_header = cmdline.isset("dump-c-type-header");
       const bool h_libc=!cmdline.isset("no-system-headers");
       const bool h_all=cmdline.isset("use-all-headers");
       const bool harness=cmdline.isset("harness");
@@ -663,22 +666,42 @@ int goto_instrument_parse_optionst::doit()
           log.error() << "failed to write to `" << cmdline.args[1] << "'";
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
-        (is_cpp ? dump_cpp : dump_c)(
-          goto_model.goto_functions,
-          h_libc,
-          h_all,
-          harness,
-          ns,
-          out);
+        if(is_header)
+        {
+          dump_c_type_header(
+            goto_model.goto_functions,
+            h_libc,
+            h_all,
+            harness,
+            ns,
+            cmdline.get_value("dump-c-type-header"),
+            out);
+        }
+        else
+        {
+          (is_cpp ? dump_cpp : dump_c)(
+            goto_model.goto_functions, h_libc, h_all, harness, ns, out);
+        }
       }
       else
-        (is_cpp ? dump_cpp : dump_c)(
-          goto_model.goto_functions,
-          h_libc,
-          h_all,
-          harness,
-          ns,
-          std::cout);
+      {
+        if(is_header)
+        {
+          dump_c_type_header(
+            goto_model.goto_functions,
+            h_libc,
+            h_all,
+            harness,
+            ns,
+            cmdline.get_value("dump-c-type-header"),
+            std::cout);
+        }
+        else
+        {
+          (is_cpp ? dump_cpp : dump_c)(
+            goto_model.goto_functions, h_libc, h_all, harness, ns, std::cout);
+        }
+      }
 
       return CPROVER_EXIT_SUCCESS;
     }
@@ -1555,6 +1578,7 @@ void goto_instrument_parse_optionst::help()
     " --document-properties-html   generate HTML property documentation\n"
     " --document-properties-latex  generate Latex property documentation\n"
     " --dump-c                     generate C source\n"
+    " --dump-c-type-header m       generate a C header for types local in m\n"
     " --dump-cpp                   generate C++ source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
