@@ -7,13 +7,14 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 
-#ifndef CPROVER_ANALYSES_INTERVAL_TEMPLATE_H
-#define CPROVER_ANALYSES_INTERVAL_TEMPLATE_H
+#ifndef CPROVER_UTIL_INTERVAL_TEMPLATE_H
+#define CPROVER_UTIL_INTERVAL_TEMPLATE_H
 
 #include <algorithm>
 #include <iosfwd>
+#include <ostream>
 
-#include <util/threeval.h>
+#include "threeval.h"
 
 template<class T> class interval_templatet
 {
@@ -243,4 +244,4 @@ std::ostream &operator << (std::ostream &out, const interval_templatet<T> &i)
   return out;
 }
 
-#endif // CPROVER_ANALYSES_INTERVAL_TEMPLATE_H
+#endif // CPROVER_UTIL_INTERVAL_TEMPLATE_H

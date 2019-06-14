@@ -12,15 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_INVARIANT_SET_H
 #define CPROVER_ANALYSES_INVARIANT_SET_H
 
-#include <util/std_code.h>
-#include <util/numbering.h>
-#include <util/union_find.h>
-#include <util/threeval.h>
+#include <util/interval_template.h>
 #include <util/mp_arith.h>
+#include <util/numbering.h>
+#include <util/std_code.h>
+#include <util/threeval.h>
+#include <util/union_find.h>
 
 #include <pointer-analysis/value_sets.h>
-
-#include "interval_template.h"
 
 class inv_object_storet
 {

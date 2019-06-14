@@ -13,12 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_INTERVAL_DOMAIN_H
 
 #include <util/ieee_float.h>
-#include <util/mp_arith.h>
+#include <util/integer_interval.h>
+#include <util/interval_template.h>
 
 #include "ai.h"
-#include "interval_template.h"
 
-typedef interval_templatet<mp_integer> integer_intervalt;
 typedef interval_templatet<ieee_floatt> ieee_float_intervalt;
 
 class interval_domaint:public ai_domain_baset
