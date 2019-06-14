@@ -93,7 +93,9 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
         to_array_type(t.type()).size(),
         to_array_type(f.type()).size()));
     // BEWARE: this expression is possibly type-inconsistent and must not be
-    // used for any purposes other than passing it to concretisation
+    // used for any purposes other than passing it to concretization.
+    // Array if-exprts must be replaced (using substitute_array_access) before
+    // passing the lemmas to the solver.
     return to_array_string_expr(if_exprt(if_expr.cond(), t, f, array_type));
   }
   const bool is_constant_array =
