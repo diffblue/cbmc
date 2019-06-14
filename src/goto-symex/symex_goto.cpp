@@ -100,8 +100,10 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const ssa_exprt *ssa_symbol_expr =
     expr_try_dynamic_cast<ssa_exprt>(symbol_expr);
 
+  ssa_exprt l1_expr{*ssa_symbol_expr};
+  l1_expr.remove_level_2();
   const std::vector<exprt> value_set_elements =
-    value_set.get_value_set(ssa_symbol_expr->get_l1_object(), ns);
+    value_set.get_value_set(l1_expr, ns);
 
   bool constant_found = false;
 
@@ -196,17 +198,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
     expr.id(), *symbol_expr_lhs, rhs, value_set, language_mode, ns);
 }
 
-/// Try to evaluate pointer comparisons where they can be trivially determined
-/// using the value-set. This is optional as all it does is allow symex to
-/// resolve some comparisons itself and therefore create a simpler formula for
-/// the SAT solver.
-/// \param [in,out] condition: An L2-renamed expression with boolean type
-/// \param value_set: The value-set for determining what pointer-typed symbols
-///   might possibly point to
-/// \param language_mode: The language mode
-/// \param ns: A namespace
-/// \return The possibly modified condition
-static renamedt<exprt, L2> try_evaluate_pointer_comparisons(
+renamedt<exprt, L2> try_evaluate_pointer_comparisons(
   renamedt<exprt, L2> condition,
   const value_sett &value_set,
   const irep_idt &language_mode,
