@@ -217,6 +217,34 @@ SCENARIO("range tests", "[core][util][range]")
       }
     }
   }
+  GIVEN("A constant vectors of int and a list of strings.")
+  {
+    const std::vector<int> int_vector{41, 27};
+    const std::list<std::string> string_list{"boo", "far"};
+    WHEN("We zip the vector and the list")
+    {
+      auto range = make_range(int_vector).zip(string_list);
+      REQUIRE(!range.empty());
+      THEN("First pair is (1, foo)")
+      {
+        const std::pair<int, std::string> first_pair = *range.begin();
+        REQUIRE(first_pair.first == 41);
+        REQUIRE(first_pair.second == "boo");
+      }
+      range = std::move(range).drop(1);
+      THEN("Second pair is (2, bar)")
+      {
+        const std::pair<int, std::string> second_pair = *range.begin();
+        REQUIRE(second_pair.first == 27);
+        REQUIRE(second_pair.second == "far");
+      }
+      range = std::move(range).drop(1);
+      THEN("Range is empty")
+      {
+        REQUIRE(range.empty());
+      }
+    }
+  }
 }
 
 class move_onlyt
