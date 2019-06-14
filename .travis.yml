@@ -88,6 +88,7 @@ jobs:
     # Ubuntu Linux with glibc using g++-5
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       os: linux
+      dist: trusty
       sudo: false
       compiler: gcc
       cache: ccache
@@ -127,6 +128,7 @@ jobs:
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
+      dist: trusty
       sudo: false
       compiler: gcc
       cache: ccache
@@ -154,6 +156,7 @@ jobs:
     # Ubuntu Linux with glibc using clang++-7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
+      dist: trusty
       sudo: false
       compiler: clang
       cache: ccache
@@ -186,6 +189,7 @@ jobs:
     # cmake build using g++-7, enable NAMED_SUB_IS_FORWARD_LIST
     - stage: Test different OS/CXX/Flags
       os: linux
+      dist: trusty
       sudo: false
       compiler: gcc
       cache: ccache
@@ -214,6 +218,7 @@ jobs:
     # cmake build using g++-7, enable CMAKE_USE_CUDD and BDD_GUARDS
     - stage: Test different OS/CXX/Flags
       os: linux
+      dist: trusty
       sudo: false
       compiler: gcc
       cache: ccache
@@ -242,6 +247,7 @@ jobs:
     # cmake build using clang++-6
     - stage: Test different OS/CXX/Flags
       os: linux
+      dist: trusty
       sudo: false
       compiler: clang
       cache: ccache
@@ -300,6 +306,7 @@ jobs:
     - stage: Test different OS/CXX/Flags
       if: type = cron
       os: linux
+      dist: trusty
       sudo: false
       compiler: gcc
       cache: ccache
