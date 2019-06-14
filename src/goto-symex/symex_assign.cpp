@@ -480,15 +480,11 @@ void goto_symext::symex_assign_symbol(
               << messaget::eom;
     });
 
-  const exprt assignment_guard =
-    make_and(state.guard.as_expr(), conjunction(guard));
-
-  const exprt original_lhs = get_original_name(l2_full_lhs);
   target.assignment(
-    assignment_guard,
+    make_and(state.guard.as_expr(), conjunction(guard)),
     l2_lhs,
     l2_full_lhs,
-    original_lhs,
+    get_original_name(l2_full_lhs),
     assignment.rhs,
     state.source,
     assignment_type);
