@@ -6,6 +6,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+#include <list>
 #include <vector>
 
 #include <testing-utils/use_catch.h>
@@ -186,6 +187,34 @@ SCENARIO("range tests", "[core][util][range]")
       std::vector<int> expected_result2{7, 8};
       REQUIRE(input1 == expected_result1);
       REQUIRE(input2 == expected_result2);
+    }
+  }
+  GIVEN("A vectors of int and a list of strings.")
+  {
+    std::vector<int> int_vector{1, 2};
+    std::list<std::string> string_list{"foo", "bar"};
+    WHEN("We zip the vector and the list")
+    {
+      auto range = make_range(int_vector).zip(string_list);
+      REQUIRE(!range.empty());
+      THEN("First pair is (1, foo)")
+      {
+        const std::pair<int, std::string> first_pair = *range.begin();
+        REQUIRE(first_pair.first == 1);
+        REQUIRE(first_pair.second == "foo");
+      }
+      range = std::move(range).drop(1);
+      THEN("Second pair is (2, bar)")
+      {
+        const std::pair<int, std::string> second_pair = *range.begin();
+        REQUIRE(second_pair.first == 2);
+        REQUIRE(second_pair.second == "bar");
+      }
+      range = std::move(range).drop(1);
+      THEN("Range is empty")
+      {
+        REQUIRE(range.empty());
+      }
     }
   }
 }
