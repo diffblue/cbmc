@@ -22,6 +22,11 @@ Date:   June 2019
 #include <util/symbol_table.h>
 #include <util/unicode.h>
 
+static exprt format_arg_from_string(
+  const array_string_exprt &string,
+  const irep_idt &id,
+  array_poolt &array_pool);
+
 string_format_builtin_functiont::string_format_builtin_functiont(
   const exprt &return_code,
   const std::vector<exprt> &fun_args,
@@ -87,7 +92,7 @@ static bool check_format_string(std::string s)
 #endif
 
 /// Expression which is true when the string is equal to the literal "null"
-exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
+static exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
 {
   return and_exprt{
     equal_exprt{array_pool.get_or_create_length(string),
@@ -261,7 +266,7 @@ add_axioms_for_format_specifier(
 /// \p id should be one of: string_expr, int, char, boolean, float.
 /// The primitive values are expected to all be encoded using 4 characters.
 /// The characters of `string` must be of type `unsignedbv_typet(16)`.
-exprt format_arg_from_string(
+static exprt format_arg_from_string(
   const array_string_exprt &string,
   const irep_idt &id,
   array_poolt &array_pool)
@@ -316,7 +321,7 @@ exprt format_arg_from_string(
 /// \param message: message handler for warnings
 /// \param ns: namespace
 /// \return code, 0 on success
-std::pair<exprt, string_constraintst> add_axioms_for_format(
+static std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
