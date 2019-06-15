@@ -940,7 +940,7 @@ void java_bytecode_parsert::rbytecode(
 
     u1 bytecode=read_u1();
 
-    if(bytecode==0xc4) // wide
+    if(bytecode == BC_wide)
     {
       wide_instruction=true;
       address++;

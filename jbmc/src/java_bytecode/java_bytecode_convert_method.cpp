@@ -995,16 +995,17 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     // a new maximal key
     assert(a_entry.first==--address_map.end());
 
+    const auto bytecode = i_it->bytecode;
     const std::string statement = bytecode_info[i_it->bytecode].mnemonic;
 
     // clang-format off
-    if(statement != "goto" &&
-       statement != "return" &&
+    if(bytecode != BC_goto &&
+       bytecode != BC_return &&
        statement != patternt("?return") &&
-       statement != "athrow" &&
-       statement != "jsr" &&
-       statement != "jsr_w" &&
-       statement != "ret")
+       bytecode != BC_athrow &&
+       bytecode != BC_jsr &&
+       bytecode != BC_jsr_w &&
+       bytecode != BC_ret)
     {
       // clang-format on
       instructionst::const_iterator next=i_it;
@@ -1013,24 +1014,24 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
 
     // clang-format off
-    if(statement == "athrow" ||
-       statement == "putfield" ||
-       statement == "getfield" ||
-       statement == "checkcast" ||
-       statement == "newarray" ||
-       statement == "anewarray" ||
-       statement == "idiv" ||
-       statement == "ldiv" ||
-       statement == "irem" ||
-       statement == "lrem" ||
+    if(bytecode == BC_athrow ||
+       bytecode == BC_putfield ||
+       bytecode == BC_getfield ||
+       bytecode == BC_checkcast ||
+       bytecode == BC_newarray ||
+       bytecode == BC_anewarray ||
+       bytecode == BC_idiv ||
+       bytecode == BC_ldiv ||
+       bytecode == BC_irem ||
+       bytecode == BC_lrem ||
        statement == patternt("?astore") ||
        statement == patternt("?aload") ||
-       statement == "invokestatic" ||
-       statement == "invokevirtual" ||
-       statement == "invokespecial" ||
-       statement == "invokeinterface" ||
+       bytecode == BC_invokestatic ||
+       bytecode == BC_invokevirtual ||
+       bytecode == BC_invokespecial ||
+       bytecode == BC_invokeinterface ||
        (threading_support &&
-        (statement == "monitorenter" || statement == "monitorexit")))
+        (bytecode == BC_monitorenter || bytecode == BC_monitorexit)))
     {
       // clang-format on
       const std::vector<method_offsett> handler =
@@ -1041,13 +1042,13 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
 
     // clang-format off
-    if(statement == "goto" ||
+    if(bytecode == BC_goto ||
        statement == patternt("if_?cmp??") ||
        statement == patternt("if??") ||
-       statement == "ifnonnull" ||
-       statement == "ifnull" ||
-       statement == "jsr" ||
-       statement == "jsr_w")
+       bytecode == BC_ifnonnull ||
+       bytecode == BC_ifnull ||
+       bytecode == BC_jsr ||
+       bytecode == BC_jsr_w)
     {
       // clang-format on
       PRECONDITION(!i_it->args.empty());
@@ -1057,7 +1058,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       a_entry.first->second.successors.push_back(target);
 
-      if(statement == "jsr" || statement == "jsr_w")
+      if(bytecode == BC_jsr || bytecode == BC_jsr_w)
       {
         auto next = std::next(i_it);
         DATA_INVARIANT(
@@ -1066,7 +1067,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         jsr_ret_targets.push_back(next->address);
       }
     }
-    else if(statement == "tableswitch" || statement == "lookupswitch")
+    else if(bytecode == BC_tableswitch || bytecode == BC_lookupswitch)
     {
       bool is_label=true;
       for(const auto &arg : i_it->args)
@@ -1080,7 +1081,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         is_label=!is_label;
       }
     }
-    else if(statement == "ret")
+    else if(bytecode == BC_ret)
     {
       // Finish these later, once we've seen all jsr instructions.
       ret_instructions.push_back(i_it);
@@ -1139,8 +1140,9 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
     exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
 
+    const auto bytecode = i_it->bytecode;
     const bytecode_infot &stmt_bytecode_info = bytecode_info[i_it->bytecode];
-    std::string statement = stmt_bytecode_info.mnemonic;
+    const std::string statement = stmt_bytecode_info.mnemonic;
 
     // deal with _idx suffixes
     if(statement.size()>=2 &&
@@ -1200,17 +1202,17 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     exprt::operandst results;
     results.resize(stmt_bytecode_info.push, nil_exprt());
 
-    if(statement=="aconst_null")
+    if(bytecode == BC_aconst_null)
     {
       assert(results.size()==1);
       results[0] = null_pointer_exprt(java_reference_type(java_void_type()));
     }
-    else if(statement=="athrow")
+    else if(bytecode == BC_athrow)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
       convert_athrow(i_it->source_location, op, c, results);
     }
-    else if(statement=="checkcast")
+    else if(bytecode == BC_checkcast)
     {
       // checkcast throws an exception in case a cast of object
       // on stack to given type fails.
@@ -1218,7 +1220,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.size() == 1 && results.size() == 1);
       convert_checkcast(arg0, op, c, results);
     }
-    else if(statement=="invokedynamic")
+    else if(bytecode == BC_invokedynamic)
     {
       // not used in Java
       if(
@@ -1229,9 +1231,9 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         results[0] = *res;
       }
     }
-    else if(statement=="invokestatic" &&
-            id2string(arg0.get(ID_identifier))==
-            "java::org.cprover.CProver.assume:(Z)V")
+    else if(
+      bytecode == BC_invokestatic && id2string(arg0.get(ID_identifier)) ==
+                                       "java::org.cprover.CProver.assume:(Z)V")
     {
       const java_method_typet &method_type = to_java_method_type(arg0.type());
       INVARIANT(
@@ -1240,27 +1242,26 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       c = replace_call_to_cprover_assume(i_it->source_location, c);
     }
     // replace calls to CProver.atomicBegin
-    else if(statement == "invokestatic" &&
-            arg0.get(ID_identifier) ==
-            "java::org.cprover.CProver.atomicBegin:()V")
+    else if(
+      bytecode == BC_invokestatic &&
+      arg0.get(ID_identifier) == "java::org.cprover.CProver.atomicBegin:()V")
     {
       c = codet(ID_atomic_begin);
     }
     // replace calls to CProver.atomicEnd
-    else if(statement == "invokestatic" &&
-            arg0.get(ID_identifier) ==
-            "java::org.cprover.CProver.atomicEnd:()V")
+    else if(
+      bytecode == BC_invokestatic &&
+      arg0.get(ID_identifier) == "java::org.cprover.CProver.atomicEnd:()V")
     {
       c = codet(ID_atomic_end);
     }
-    else if(statement=="invokeinterface" ||
-            statement=="invokespecial" ||
-            statement=="invokevirtual" ||
-            statement=="invokestatic")
+    else if(
+      bytecode == BC_invokeinterface || bytecode == BC_invokespecial ||
+      bytecode == BC_invokevirtual || bytecode == BC_invokestatic)
     {
       convert_invoke(i_it->source_location, statement, arg0, c, results);
     }
-    else if(statement=="return")
+    else if(bytecode == BC_return)
     {
       PRECONDITION(op.empty() && results.empty());
       c=code_returnt();
@@ -1298,8 +1299,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       results[0]=
         variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
     }
-    else if(statement=="ldc" || statement=="ldc_w" ||
-            statement=="ldc2" || statement=="ldc2_w")
+    else if(bytecode == BC_ldc || bytecode == BC_ldc_w || bytecode == BC_ldc2_w)
     {
       PRECONDITION(op.empty() && results.size() == 1);
 
@@ -1310,7 +1310,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       results[0] = arg0;
     }
-    else if(statement=="goto" || statement=="goto_w")
+    else if(bytecode == BC_goto || bytecode == BC_goto_w)
     {
       PRECONDITION(op.empty() && results.empty());
       const mp_integer number =
@@ -1318,7 +1318,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       code_gotot code_goto(label(integer2string(number)));
       c=code_goto;
     }
-    else if(statement=="jsr" || statement=="jsr_w")
+    else if(bytecode == BC_jsr || bytecode == BC_jsr_w)
     {
       // As 'goto', except we must also push the subroutine return address:
       PRECONDITION(op.empty() && results.size() == 1);
@@ -1332,7 +1332,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
           unsignedbv_typet(64));
       results[0].type() = pointer_type(java_void_type());
     }
-    else if(statement=="ret")
+    else if(bytecode == BC_ret)
     {
       // Since we have a bounded target set, make life easier on our analyses
       // and write something like:
@@ -1342,7 +1342,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       c = convert_ret(
         jsr_ret_targets, arg0, i_it->source_location, i_it->address);
     }
-    else if(statement=="iconst_m1")
+    else if(bytecode == BC_iconst_m1)
     {
       assert(results.size()==1);
       results[0]=from_integer(-1, java_int_type());
@@ -1370,14 +1370,16 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("if??"))
     {
+      // clang-format off
       const irep_idt id=
-        statement=="ifeq"?ID_equal:
-        statement=="ifne"?ID_notequal:
-        statement=="iflt"?ID_lt:
-        statement=="ifge"?ID_ge:
-        statement=="ifgt"?ID_gt:
-        statement=="ifle"?ID_le:
+        bytecode == BC_ifeq ? ID_equal :
+        bytecode == BC_ifne ? ID_notequal :
+        bytecode == BC_iflt ? ID_lt :
+        bytecode == BC_ifge ? ID_ge :
+        bytecode == BC_ifgt ? ID_gt :
+        bytecode == BC_ifle ? ID_le :
         irep_idt();
+      // clang-format on
 
       INVARIANT(!id.empty(), "unexpected bytecode-if");
       PRECONDITION(op.size() == 1 && results.empty());
@@ -1399,7 +1401,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         numeric_cast_v<mp_integer>(to_constant_expr(arg0));
       c = convert_ifnull(address_map, op, number, i_it->source_location);
     }
-    else if(statement=="iinc")
+    else if(bytecode == BC_iinc)
     {
       c = convert_iinc(arg0, arg1, i_it->source_location, i_it->address);
     }
@@ -1461,7 +1463,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?rem"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
-      if(statement=="frem" || statement=="drem")
+      if(bytecode == BC_frem || bytecode == BC_drem)
         results[0]=rem_exprt(op[0], op[1]);
       else
         results[0]=mod_exprt(op[0], op[1]);
@@ -1481,19 +1483,19 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=binary_relation_exprt(op[0], ID_lt, op[1]);
     }
-    else if(statement=="dup")
+    else if(bytecode == BC_dup)
     {
       PRECONDITION(op.size() == 1 && results.size() == 2);
       results[0]=results[1]=op[0];
     }
-    else if(statement=="dup_x1")
+    else if(bytecode == BC_dup_x1)
     {
       PRECONDITION(op.size() == 2 && results.size() == 3);
       results[0]=op[1];
       results[1]=op[0];
       results[2]=op[1];
     }
-    else if(statement=="dup_x2")
+    else if(bytecode == BC_dup_x2)
     {
       PRECONDITION(op.size() == 3 && results.size() == 4);
       results[0]=op[2];
@@ -1503,28 +1505,28 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
     // dup2* behaviour depends on the size of the operands on the
     // stack
-    else if(statement=="dup2")
+    else if(bytecode == BC_dup2)
     {
       PRECONDITION(!stack.empty() && results.empty());
       convert_dup2(op, results);
     }
-    else if(statement=="dup2_x1")
+    else if(bytecode == BC_dup2_x1)
     {
       PRECONDITION(!stack.empty() && results.empty());
       convert_dup2_x1(op, results);
     }
-    else if(statement=="dup2_x2")
+    else if(bytecode == BC_dup2_x2)
     {
       PRECONDITION(!stack.empty() && results.empty());
       convert_dup2_x2(op, results);
     }
-    else if(statement=="getfield")
+    else if(bytecode == BC_getfield)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
       results[0] = java_bytecode_promotion(
         to_member(op[0], expr_dynamic_cast<fieldref_exprt>(arg0), ns));
     }
-    else if(statement=="getstatic")
+    else if(bytecode == BC_getstatic)
     {
       PRECONDITION(op.empty() && results.size() == 1);
       const auto &field_name=arg0.get_string(ID_component_name);
@@ -1541,12 +1543,12 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       convert_getstatic(
         arg0, symbol_expr, is_assertions_disabled_field, c, results);
     }
-    else if(statement=="putfield")
+    else if(bytecode == BC_putfield)
     {
       PRECONDITION(op.size() == 2 && results.empty());
       c = convert_putfield(expr_dynamic_cast<fieldref_exprt>(arg0), op);
     }
-    else if(statement=="putstatic")
+    else if(bytecode == BC_putstatic)
     {
       PRECONDITION(op.size() == 1 && results.empty());
       const auto &field_name=arg0.get_string(ID_component_name);
@@ -1575,20 +1577,19 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         results[0] = typecast_exprt(results[0], java_int_type());
       }
     }
-    else if(statement=="new")
+    else if(bytecode == BC_new)
     {
       // use temporary since the stack symbol might get duplicated
       PRECONDITION(op.empty() && results.size() == 1);
       convert_new(i_it->source_location, arg0, c, results);
     }
-    else if(statement=="newarray" ||
-            statement=="anewarray")
+    else if(bytecode == BC_newarray || bytecode == BC_anewarray)
     {
       // the op is the array size
       PRECONDITION(op.size() == 1 && results.size() == 1);
       c = convert_newarray(i_it->source_location, statement, arg0, op, results);
     }
-    else if(statement=="multianewarray")
+    else if(bytecode == BC_multianewarray)
     {
       // The first argument is the type, the second argument is the number of
       // dimensions.  The size of each dimension is on the stack.
@@ -1599,7 +1600,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       assert(results.size()==1);
       c = convert_multianewarray(i_it->source_location, arg0, op, results);
     }
-    else if(statement=="arraylength")
+    else if(bytecode == BC_arraylength)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
 
@@ -1610,34 +1611,33 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       results[0] = member_exprt{std::move(array), "length", java_int_type()};
     }
-    else if(statement=="tableswitch" ||
-            statement=="lookupswitch")
+    else if(bytecode == BC_tableswitch || bytecode == BC_lookupswitch)
     {
       PRECONDITION(op.size() == 1 && results.empty());
       c = convert_switch(op, i_it->args, i_it->source_location);
     }
-    else if(statement=="pop" || statement=="pop2")
+    else if(bytecode == BC_pop || bytecode == BC_pop2)
     {
       c = convert_pop(statement, op);
     }
-    else if(statement=="instanceof")
+    else if(bytecode == BC_instanceof)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
 
       results[0]=
         binary_predicate_exprt(op[0], ID_java_instanceof, arg0);
     }
-    else if(statement == "monitorenter" || statement == "monitorexit")
+    else if(bytecode == BC_monitorenter || bytecode == BC_monitorexit)
     {
       c = convert_monitorenterexit(statement, op, i_it->source_location);
     }
-    else if(statement=="swap")
+    else if(bytecode == BC_swap)
     {
       PRECONDITION(op.size() == 2 && results.size() == 2);
       results[1]=op[0];
       results[0]=op[1];
     }
-    else if(statement=="nop")
+    else if(bytecode == BC_nop)
     {
       c=code_skipt();
     }
