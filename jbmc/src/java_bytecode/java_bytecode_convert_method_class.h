@@ -300,6 +300,10 @@ protected:
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);
 
+  code_blockt convert_parameter_annotations(
+    const methodt &method,
+    const java_method_typet &method_type);
+
   code_blockt convert_instructions(
     const methodt &,
     const java_class_typet::java_lambda_method_handlest &);

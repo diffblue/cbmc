@@ -1,0 +1,10 @@
+CORE
+Main.class
+--function Main.test1 --classpath `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[not-null-annotation-check\.1\] line \d+ Not null annotation check: SUCCESS
+\[not-null-annotation-check\.2\] line \d+ Not null annotation check: FAILURE
+--
+^warning: ignoring

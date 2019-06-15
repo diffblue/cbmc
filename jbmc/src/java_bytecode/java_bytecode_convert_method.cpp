@@ -585,9 +585,12 @@ void java_bytecode_convert_methodt::convert(
   current_method = method_symbol.name;
   method_has_this = method_type.has_this();
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value = convert_instructions(
-      m,
-      to_java_class_type(class_symbol.type).lambda_method_handles());
+  {
+    code_blockt code(convert_parameter_annotations(m, method_type));
+    code.append(convert_instructions(
+      m, to_java_class_type(class_symbol.type).lambda_method_handles()));
+    method_symbol.value = std::move(code);
+  }
 }
 
 static irep_idt get_if_cmp_operator(const irep_idt &stmt)
@@ -964,6 +967,54 @@ static std::size_t get_bytecode_type_width(const typet &ty)
   if(ty.id()==ID_pointer)
     return 32;
   return to_bitvector_type(ty).get_width();
+}
+
+code_blockt java_bytecode_convert_methodt::convert_parameter_annotations(
+  const methodt &method,
+  const java_method_typet &method_type)
+{
+  code_blockt code;
+
+  // Consider parameter annotations
+  const java_method_typet::parameterst &parameters(method_type.parameters());
+  std::size_t param_index = method_type.has_this() ? 1 : 0;
+  DATA_INVARIANT(
+    parameters.size() >= method.parameter_annotations.size() + param_index,
+    "parameters and parameter annotations mismatch");
+  for(const auto &param_annotations : method.parameter_annotations)
+  {
+    // NotNull annotations are not standardized. We support these:
+    if(
+      java_bytecode_parse_treet::find_annotation(
+        param_annotations, "java::javax.validation.constraints.NotNull") ||
+      java_bytecode_parse_treet::find_annotation(
+        param_annotations, "java::org.jetbrains.annotations.NotNull") ||
+      java_bytecode_parse_treet::find_annotation(
+        param_annotations, "org.eclipse.jdt.annotation.NonNull") ||
+      java_bytecode_parse_treet::find_annotation(
+        param_annotations, "java::edu.umd.cs.findbugs.annotations.NonNull"))
+    {
+      const irep_idt &param_identifier =
+        parameters[param_index].get_identifier();
+      const symbolt &param_symbol = symbol_table.lookup_ref(param_identifier);
+      const auto param_type =
+        type_try_dynamic_cast<pointer_typet>(param_symbol.type);
+      if(param_type)
+      {
+        code_assertt code_assert(notequal_exprt(
+          param_symbol.symbol_expr(), null_pointer_exprt(*param_type)));
+        source_locationt check_loc = method.source_location;
+        check_loc.set_comment("Not null annotation check");
+        check_loc.set_property_class("not-null-annotation-check");
+        code_assert.add_source_location() = check_loc;
+
+        code.add(std::move(code_assert));
+      }
+    }
+    ++param_index;
+  }
+
+  return code;
 }
 
 code_blockt java_bytecode_convert_methodt::convert_instructions(
