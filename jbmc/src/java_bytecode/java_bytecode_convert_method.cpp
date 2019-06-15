@@ -590,19 +590,19 @@ void java_bytecode_convert_methodt::convert(
       to_java_class_type(class_symbol.type).lambda_method_handles());
 }
 
-static irep_idt get_if_cmp_operator(const irep_idt &stmt)
+static irep_idt get_if_cmp_operator(const u1 bytecode)
 {
-  if(stmt==patternt("if_?cmplt"))
+  if(bytecode == patternt("if_?cmplt"))
     return ID_lt;
-  if(stmt==patternt("if_?cmple"))
+  if(bytecode == patternt("if_?cmple"))
     return ID_le;
-  if(stmt==patternt("if_?cmpgt"))
+  if(bytecode == patternt("if_?cmpgt"))
     return ID_gt;
-  if(stmt==patternt("if_?cmpge"))
+  if(bytecode == patternt("if_?cmpge"))
     return ID_ge;
-  if(stmt==patternt("if_?cmpeq"))
+  if(bytecode == patternt("if_?cmpeq"))
     return ID_equal;
-  if(stmt==patternt("if_?cmpne"))
+  if(bytecode == patternt("if_?cmpne"))
     return ID_notequal;
 
   throw "unhandled java comparison instruction";
@@ -1001,7 +1001,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     // clang-format off
     if(bytecode != BC_goto &&
        bytecode != BC_return &&
-       statement != patternt("?return") &&
+       bytecode != patternt("?return") &&
        bytecode != BC_athrow &&
        bytecode != BC_jsr &&
        bytecode != BC_jsr_w &&
@@ -1024,8 +1024,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
        bytecode == BC_ldiv ||
        bytecode == BC_irem ||
        bytecode == BC_lrem ||
-       statement == patternt("?astore") ||
-       statement == patternt("?aload") ||
+       bytecode == patternt("?astore") ||
+       bytecode == patternt("?aload") ||
        bytecode == BC_invokestatic ||
        bytecode == BC_invokevirtual ||
        bytecode == BC_invokespecial ||
@@ -1043,8 +1043,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
     // clang-format off
     if(bytecode == BC_goto ||
-       statement == patternt("if_?cmp??") ||
-       statement == patternt("if??") ||
+       bytecode == patternt("if_?cmp??") ||
+       bytecode == patternt("if??") ||
        bytecode == BC_ifnonnull ||
        bytecode == BC_ifnull ||
        bytecode == BC_jsr ||
@@ -1266,7 +1266,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.empty() && results.empty());
       c=code_returnt();
     }
-    else if(statement==patternt("?return"))
+    else if(bytecode == patternt("?return"))
     {
       // Return types are promoted in java, so this might need
       // conversion.
@@ -1275,25 +1275,24 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         typecast_exprt::conditional_cast(op[0], method_return_type);
       c=code_returnt(r);
     }
-    else if(statement==patternt("?astore"))
+    else if(bytecode == patternt("?astore"))
     {
       assert(op.size()==3 && results.empty());
       c = convert_astore(statement, op, i_it->source_location);
     }
-    else if(
-      statement == patternt("?store") || statement == patternt("?store_?"))
+    else if(bytecode == patternt("?store") || bytecode == patternt("?store_?"))
     {
       // store value into some local variable
       PRECONDITION(op.size() == 1 && results.empty());
       c = convert_store(
         statement, arg0, op, i_it->address, i_it->source_location);
     }
-    else if(statement==patternt("?aload"))
+    else if(bytecode == patternt("?aload"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0] = convert_aload(statement, op);
     }
-    else if(statement == patternt("?load") || statement == patternt("?load_?"))
+    else if(bytecode == patternt("?load") || bytecode == patternt("?load_?"))
     {
       // load a value from a local variable
       results[0]=
@@ -1347,12 +1346,12 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       assert(results.size()==1);
       results[0]=from_integer(-1, java_int_type());
     }
-    else if(statement == patternt("?const_?"))
+    else if(bytecode == patternt("?const_?"))
     {
       assert(results.size()==1);
       results = convert_const(statement, to_constant_expr(arg0), results);
     }
-    else if(statement==patternt("?ipush"))
+    else if(bytecode == patternt("?ipush"))
     {
       PRECONDITION(results.size()==1);
       DATA_INVARIANT(
@@ -1360,15 +1359,15 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         "ipush argument expected to be constant");
       results[0] = typecast_exprt::conditional_cast(arg0, java_int_type());
     }
-    else if(statement==patternt("if_?cmp??"))
+    else if(bytecode == patternt("if_?cmp??"))
     {
       PRECONDITION(op.size() == 2 && results.empty());
       const mp_integer number =
         numeric_cast_v<mp_integer>(to_constant_expr(arg0));
       c = convert_if_cmp(
-        address_map, statement, op, number, i_it->source_location);
+        address_map, bytecode, op, number, i_it->source_location);
     }
-    else if(statement==patternt("if??"))
+    else if(bytecode == patternt("if??"))
     {
       // clang-format off
       const irep_idt id=
@@ -1387,14 +1386,14 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         numeric_cast_v<mp_integer>(to_constant_expr(arg0));
       c = convert_if(address_map, op, id, number, i_it->source_location);
     }
-    else if(statement==patternt("ifnonnull"))
+    else if(bytecode == patternt("ifnonnull"))
     {
       PRECONDITION(op.size() == 1 && results.empty());
       const mp_integer number =
         numeric_cast_v<mp_integer>(to_constant_expr(arg0));
       c = convert_ifnonull(address_map, op, number, i_it->source_location);
     }
-    else if(statement==patternt("ifnull"))
+    else if(bytecode == patternt("ifnull"))
     {
       PRECONDITION(op.size() == 1 && results.empty());
       const mp_integer number =
@@ -1405,62 +1404,62 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     {
       c = convert_iinc(arg0, arg1, i_it->source_location, i_it->address);
     }
-    else if(statement==patternt("?xor"))
+    else if(bytecode == patternt("?xor"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitxor_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?or"))
+    else if(bytecode == patternt("?or"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitor_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?and"))
+    else if(bytecode == patternt("?and"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=bitand_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?shl"))
+    else if(bytecode == patternt("?shl"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=shl_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?shr"))
+    else if(bytecode == patternt("?shr"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=ashr_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?ushr"))
+    else if(bytecode == patternt("?ushr"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results = convert_ushr(statement, op, results);
     }
-    else if(statement==patternt("?add"))
+    else if(bytecode == patternt("?add"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=plus_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?sub"))
+    else if(bytecode == patternt("?sub"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=minus_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?div"))
+    else if(bytecode == patternt("?div"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=div_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?mul"))
+    else if(bytecode == patternt("?mul"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=mult_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?neg"))
+    else if(bytecode == patternt("?neg"))
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
       results[0]=unary_minus_exprt(op[0], op[0].type());
     }
-    else if(statement==patternt("?rem"))
+    else if(bytecode == patternt("?rem"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       if(bytecode == BC_frem || bytecode == BC_drem)
@@ -1468,17 +1467,17 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       else
         results[0]=mod_exprt(op[0], op[1]);
     }
-    else if(statement==patternt("?cmp"))
+    else if(bytecode == patternt("?cmp"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results = convert_cmp(op, results);
     }
-    else if(statement==patternt("?cmp?"))
+    else if(bytecode == patternt("?cmp?"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results = convert_cmp2(statement, op, results);
     }
-    else if(statement==patternt("?cmpl"))
+    else if(bytecode == patternt("?cmpl"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0]=binary_relation_exprt(op[0], ID_lt, op[1]);
@@ -1562,7 +1561,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       c = convert_putstatic(i_it->source_location, arg0, op, symbol_expr);
     }
-    else if(statement==patternt("?2?")) // i2c etc.
+    else if(bytecode == patternt("?2?")) // i2c etc.
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
       typet type=java_type_from_char(statement[2]);
@@ -2747,12 +2746,12 @@ code_ifthenelset java_bytecode_convert_methodt::convert_if(
 
 code_ifthenelset java_bytecode_convert_methodt::convert_if_cmp(
   const java_bytecode_convert_methodt::address_mapt &address_map,
-  const irep_idt &statement,
+  const u1 bytecode,
   const exprt::operandst &op,
   const mp_integer &number,
   const source_locationt &location) const
 {
-  const irep_idt cmp_op = get_if_cmp_operator(statement);
+  const irep_idt cmp_op = get_if_cmp_operator(bytecode);
   binary_relation_exprt condition(
     op[0], cmp_op, typecast_exprt::conditional_cast(op[1], op[0].type()));
   condition.add_source_location() = location;
