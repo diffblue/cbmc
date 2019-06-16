@@ -437,7 +437,7 @@ std::string expr2javat::convert_with_precedence(
   }
   else if(src.id() == ID_java_instanceof)
   {
-    precedence = 15;
+    precedence = 10; // same as <, <=, etc
     return convert_java_instanceof(src);
   }
   else if(src.id()==ID_side_effect &&
