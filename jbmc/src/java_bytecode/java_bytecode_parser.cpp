@@ -1276,7 +1276,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     attribute_name == "RuntimeVisibleParameterAnnotations")
   {
     u1 parameter_count = read_u1();
-    // There may be attributes for both runtime-visiible and rutime-invisible
+    // There may be attributes for both runtime-visible and runtime-invisible
     // annotations, the length of either array may be longer than the other as
     // trailing parameters without annotations are omitted.
     // Extend our parameter_annotations if this one is longer than the one
