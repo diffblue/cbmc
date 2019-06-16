@@ -208,7 +208,7 @@ struct bytecode_infot const bytecode_info[]=
 { "arraylength",    0xbe, ' ', 1, 1, 'i' }, // arrayref → length; get the length of an array  NOLINT(*)
 { "athrow",         0xbf, ' ', 1, 1, ' ' }, // objectref → [empty], objectref; throws an error or exception (notice that the rest of the stack is cleared, leaving only a reference to the Throwable)  NOLINT(*)
 { "checkcast",      0xc0, 'C', 1, 1, 'a' }, // objectref → objectref; checks whether an objectref is of a certain type, the class reference of which is in the constant pool at index (indexbyte1 << 8 + indexbyte2)  NOLINT(*)
-{ "instanceof",     0xc1, 'C', 1, 1, ' ' }, // objectref → result; determines if an object objectref is of a given type, identified by class reference index in constant pool (indexbyte1 << 8 + indexbyte2)  NOLINT(*)
+{ "instanceof",     0xc1, 'C', 1, 1, 'i' }, // objectref → result; determines if an object objectref is of a given type, identified by class reference index in constant pool (indexbyte1 << 8 + indexbyte2)  NOLINT(*)
 { "monitorenter",   0xc2, ' ', 1, 0, ' ' }, // objectref →; enter monitor for object ("grab the lock" - start of synchronized() section)  NOLINT(*)
 { "monitorexit",    0xc3, ' ', 1, 0, ' ' }, // objectref →; exit monitor for object ("release the lock" - end of synchronized() section)  NOLINT(*)
 { "wide",           0xc4, ' ', 0, 0, ' ' }, // modifier for others  NOLINT(*)
