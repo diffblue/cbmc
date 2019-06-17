@@ -185,8 +185,13 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
       bool has_false=false;
 
       forall_literals(it, assumptions)
+      {
         if(it->is_false())
-          has_false=true;
+        {
+          has_false = true;
+          break;
+        }
+      }
 
       if(has_false)
       {
