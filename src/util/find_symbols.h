@@ -39,6 +39,8 @@ void find_symbols(
   const exprt &src,
   std::set<symbol_exprt> &dest);
 
+std::set<symbol_exprt> find_symbols(const exprt &src);
+
 bool has_symbol(
   const exprt &src,
   const find_symbols_sett &symbols);

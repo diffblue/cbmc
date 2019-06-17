@@ -8,8 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "find_symbols.h"
 
-#include "std_types.h"
+#include "expr_iterator.h"
+#include "range.h"
 #include "std_expr.h"
+#include "std_types.h"
 
 enum class kindt { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH };
 
@@ -79,6 +81,13 @@ void find_symbols(
     if(e.id() == ID_symbol)
       dest.insert(to_symbol_expr(e));
   });
+}
+
+std::set<symbol_exprt> find_symbols(const exprt &src)
+{
+  return make_range(src.depth_begin(), src.depth_end())
+    .filter([](const exprt &e) { return e.id() == ID_symbol; })
+    .map([](const exprt &e) { return to_symbol_expr(e); });
 }
 
 void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest);
