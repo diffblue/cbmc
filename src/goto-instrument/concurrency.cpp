@@ -78,19 +78,10 @@ protected:
 
 void concurrency_instrumentationt::instrument(exprt &expr)
 {
-  std::set<symbol_exprt> symbols;
-
-  find_symbols(expr, symbols);
-
   replace_symbolt replace_symbol;
 
-  for(std::set<symbol_exprt>::const_iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
-      s_it++)
+  for(const symbol_exprt &s : find_symbols(expr))
   {
-    const symbol_exprt &s = *s_it;
-
     shared_varst::const_iterator v_it = shared_vars.find(s.get_identifier());
 
     if(v_it != shared_vars.end())
