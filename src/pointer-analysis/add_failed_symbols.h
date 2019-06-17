@@ -27,6 +27,11 @@ void add_failed_symbol_if_needed(
 
 irep_idt failed_symbol_id(const irep_idt &identifier);
 
+/// Get the failed-dereference symbol for the given symbol
+/// \param expr: symbol expression to get a failed symbol for
+/// \param ns: global namespace
+/// \return symbol expression for the failed-dereference symbol, or an empty
+///   optional if none exists.
 optionalt<symbol_exprt>
 get_failed_symbol(const symbol_exprt &expr, const namespacet &ns);
 
