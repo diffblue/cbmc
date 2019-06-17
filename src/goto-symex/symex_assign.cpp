@@ -395,8 +395,7 @@ void goto_symext::symex_assign_from_struct(
   const exprt::operandst &guard,
   assignment_typet assignment_type)
 {
-  const struct_typet &type = to_struct_type(ns.follow(lhs.type()));
-  const struct_union_typet::componentst &components = type.components();
+  const auto &components = to_struct_type(ns.follow(lhs.type())).components();
   PRECONDITION(rhs.operands().size() == components.size());
 
   for(std::size_t i = 0; i < components.size(); ++i)
@@ -435,16 +434,15 @@ void goto_symext::symex_assign_symbol(
     return;
   }
 
-  exprt l2_rhs = [&]() {
-    exprt guarded_rhs = rhs;
-    // put assignment guard into the rhs
-    if(!guard.empty())
-    {
-      guarded_rhs =
-        if_exprt{conjunction(guard), std::move(guarded_rhs), lhs, rhs.type()};
-    }
-    return state.rename(std::move(guarded_rhs), ns).get();
-  }();
+  exprt l2_rhs =
+    state
+      .rename(
+        // put assignment guard into the rhs
+        guard.empty()
+          ? rhs
+          : static_cast<exprt>(if_exprt{conjunction(guard), rhs, lhs}),
+        ns)
+      .get();
 
   // Note the following two calls are specifically required for
   // field-sensitivity. For example, with-expressions, which may have just been
@@ -457,7 +455,6 @@ void goto_symext::symex_assign_symbol(
 
   do_simplify(assignment.rhs);
 
-  const ssa_exprt &l1_lhs = assignment.lhs;
   const ssa_exprt l2_lhs = state
                              .assignment(
                                assignment.lhs,
@@ -468,15 +465,12 @@ void goto_symext::symex_assign_symbol(
                                symex_config.allow_pointer_unsoundness)
                              .get();
 
-  exprt ssa_full_lhs = add_to_lhs(full_lhs, l2_lhs);
   state.record_events.push(false);
-  const exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
+  const exprt l2_full_lhs =
+    state.rename(add_to_lhs(full_lhs, l2_lhs), ns).get();
   state.record_events.pop();
 
-  // do the assignment
-  const symbolt &symbol = ns.lookup(l2_lhs.get_object_name());
-
-  if(symbol.is_auxiliary)
+  if(ns.lookup(l2_lhs.get_object_name()).is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
 
   log.conditional_output(
@@ -486,19 +480,16 @@ void goto_symext::symex_assign_symbol(
               << messaget::eom;
     });
 
-  const exprt assignment_guard =
-    make_and(state.guard.as_expr(), conjunction(guard));
-
-  const exprt original_lhs = get_original_name(l2_full_lhs);
   target.assignment(
-    assignment_guard,
+    make_and(state.guard.as_expr(), conjunction(guard)),
     l2_lhs,
     l2_full_lhs,
-    original_lhs,
+    get_original_name(l2_full_lhs),
     assignment.rhs,
     state.source,
     assignment_type);
 
+  const ssa_exprt &l1_lhs = assignment.lhs;
   if(field_sensitivityt::is_divisible(l1_lhs))
   {
     // Split composite symbol lhs into its components

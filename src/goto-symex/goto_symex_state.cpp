@@ -514,6 +514,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
 }
 
 /// thread encoding
+/// \return true if \p expr is shared between threads
 bool goto_symex_statet::l2_thread_write_encoding(
   const ssa_exprt &expr,
   const namespacet &ns)

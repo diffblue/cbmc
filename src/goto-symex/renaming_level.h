@@ -29,7 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// This is extended by the different symex_level structures which are used
 /// during symex to ensure static single assignment (SSA) form.
 using symex_renaming_levelt =
-  sharing_mapt<irep_idt, std::pair<ssa_exprt, unsigned>>;
+  sharing_mapt<irep_idt, std::pair<ssa_exprt, std::size_t>>;
 
 /// Add the \c ssa_exprt of current_names to vars
 DEPRECATED(SINCE(2019, 6, 5, "Unused"))
@@ -44,7 +44,7 @@ void get_variables(
 /// a guard, a shared variable or a function. \p ns is queried to decide
 /// whether we are in one of these cases.
 renamedt<ssa_exprt, L0>
-symex_level0(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr);
+symex_level0(ssa_exprt ssa_expr, const namespacet &ns, std::size_t thread_nr);
 
 /// Functor to set the level 1 renaming of SSA expressions.
 /// Level 1 corresponds to function frames.
@@ -52,13 +52,13 @@ symex_level0(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr);
 struct symex_level1t
 {
   /// Assume \p ssa is not already known
-  void insert(const renamedt<ssa_exprt, L0> &ssa, unsigned index);
+  void insert(const renamedt<ssa_exprt, L0> &ssa, std::size_t index);
 
   /// Set the index for \p ssa to index.
   /// \return if an index for \p ssa was already know, returns it's previous
   ///   value.
-  optionalt<std::pair<ssa_exprt, unsigned>>
-  insert_or_replace(const renamedt<ssa_exprt, L0> &ssa, unsigned index);
+  optionalt<std::pair<ssa_exprt, std::size_t>>
+  insert_or_replace(const renamedt<ssa_exprt, L0> &ssa, std::size_t index);
 
   /// \return true if \p ssa has an associated index
   bool has(const renamedt<ssa_exprt, L0> &ssa) const;

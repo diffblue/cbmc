@@ -217,7 +217,7 @@ public:
   unsigned remaining_vccs = 0;
 
   /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
-  //  latest generation on this path.
+  /// latest generation on this path.
   std::size_t
   increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs)
   {
