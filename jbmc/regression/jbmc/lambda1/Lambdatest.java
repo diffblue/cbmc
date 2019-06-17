@@ -1,5 +1,3 @@
-import java.util.function.*;
-
 public class Lambdatest {
 
     class A {
