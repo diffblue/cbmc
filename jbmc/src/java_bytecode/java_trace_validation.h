@@ -20,6 +20,16 @@ class symbol_exprt;
 class member_exprt;
 class messaget;
 
+// clang-format off
+#define OPT_JAVA_TRACE_VALIDATION /*NOLINT*/ \
+  "(validate-trace)" \
+
+#define HELP_JAVA_TRACE_VALIDATION /*NOLINT*/ \
+    " --validate-trace             throw an error if the structure of the counterexample\n" /*NOLINT*/ \
+    "                              trace does not match certain assumptions\n" /*NOLINT*/ \
+    "                              (experimental, currently java only)\n" /*NOLINT*/ \
+// clang-format on
+
 /// Checks that the structure of each step of the trace matches certain
 /// criteria. If it does not, throw an error. Intended to be called by
 /// the caller of \ref build_goto_trace, for example
