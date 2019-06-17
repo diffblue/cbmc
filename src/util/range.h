@@ -265,6 +265,90 @@ private:
   second_iteratort second_begin;
 };
 
+/// Zip two ranges to make a range of pairs.
+/// On increment, both iterators are incremented.
+/// Ends when the two ranges reach their ends.
+/// Invariants are checking that one does not end before the other.
+template <typename first_iteratort, typename second_iteratort>
+struct zip_iteratort
+{
+public:
+  using difference_type = typename first_iteratort::difference_type;
+  using value_type = std::pair<
+    typename first_iteratort::value_type,
+    typename second_iteratort::value_type>;
+  using pointer = value_type *;
+  using reference = value_type &;
+  using iterator_category = std::forward_iterator_tag;
+
+  bool operator==(const zip_iteratort &other) const
+  {
+    return first_begin == other.first_begin && first_end == other.first_end &&
+           second_begin == other.second_begin && second_end == other.second_end;
+  }
+
+  bool operator!=(const zip_iteratort &other) const
+  {
+    return !(*this == other);
+  }
+
+  /// Preincrement operator
+  zip_iteratort &operator++()
+  {
+    PRECONDITION(first_begin != first_end && second_begin != second_end);
+    ++first_begin;
+    ++second_begin;
+    INVARIANT(
+      (first_begin == first_end) == (second_begin == second_end),
+      "Zipped ranges should have the same size");
+    current = first_begin != first_end
+                ? std::make_shared<value_type>(*first_begin, *second_begin)
+                : nullptr;
+    return *this;
+  }
+
+  /// Postincrement operator
+  const zip_iteratort operator++(int)
+  {
+    zip_iteratort tmp(first_begin, first_end, second_begin, second_end);
+    this->operator++();
+    return tmp;
+  }
+
+  reference operator*() const
+  {
+    PRECONDITION(current != nullptr);
+    return *current;
+  }
+
+  pointer operator->() const
+  {
+    return current.get();
+  }
+
+  zip_iteratort(
+    first_iteratort _first_begin,
+    first_iteratort _first_end,
+    second_iteratort _second_begin,
+    second_iteratort _second_end)
+    : first_begin(std::move(_first_begin)),
+      first_end(std::move(_first_end)),
+      second_begin(std::move(_second_begin)),
+      second_end(std::move(_second_end))
+  {
+    PRECONDITION((first_begin == first_end) == (second_begin == second_end));
+    if(first_begin != first_end)
+      current = util_make_unique<value_type>(*first_begin, *second_begin);
+  }
+
+private:
+  first_iteratort first_begin;
+  first_iteratort first_end;
+  second_iteratort second_begin;
+  second_iteratort second_end;
+  std::shared_ptr<value_type> current = nullptr;
+};
+
 /// A range is a pair of a begin and an end iterators.
 /// The class provides useful methods such as map, filter and concat which only
 /// manipulate iterators and thus don't have to create instances of heavy data
@@ -335,6 +419,26 @@ public:
       concat_iteratort<iteratort, other_iteratort>(end(), end(), other.end());
     return ranget<concat_iteratort<iteratort, other_iteratort>>(
       concat_begin, concat_end);
+  }
+
+  template <typename other_iteratort>
+  ranget<zip_iteratort<iteratort, other_iteratort>>
+  zip(ranget<other_iteratort> other)
+  {
+    auto zip_begin = zip_iteratort<iteratort, other_iteratort>(
+      begin(), end(), other.begin(), other.end());
+    auto zip_end = zip_iteratort<iteratort, other_iteratort>(
+      end(), end(), other.end(), other.end());
+    return ranget<zip_iteratort<iteratort, other_iteratort>>(
+      zip_begin, zip_end);
+  }
+
+  template <typename containert>
+  auto zip(containert &container)
+    -> ranget<zip_iteratort<iteratort, decltype(container.begin())>>
+  {
+    return zip(
+      ranget<decltype(container.begin())>{container.begin(), container.end()});
   }
 
   bool empty() const
