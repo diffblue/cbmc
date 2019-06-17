@@ -35,8 +35,8 @@ std::size_t goto_statet::increase_generation(
 
   if(const auto r_opt = level2.current_names.find(l1_identifier))
   {
-    std::pair<ssa_exprt, unsigned> copy = r_opt->get();
-    copy.second = narrow<unsigned>(n);
+    std::pair<ssa_exprt, std::size_t> copy = r_opt->get();
+    copy.second = n;
     level2.current_names.replace(l1_identifier, std::move(copy));
   }
   else

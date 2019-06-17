@@ -52,11 +52,11 @@ public:
     return o.get_identifier();
   }
 
-  void set_level_0(unsigned i);
+  void set_level_0(std::size_t i);
 
-  void set_level_1(unsigned i);
+  void set_level_1(std::size_t i);
 
-  void set_level_2(unsigned i);
+  void set_level_2(std::size_t i);
 
   void remove_level_2();
 

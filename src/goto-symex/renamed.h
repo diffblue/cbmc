@@ -50,7 +50,7 @@ private:
   };
 
   friend renamedt<ssa_exprt, L0>
-  symex_level0(ssa_exprt, const namespacet &, unsigned);
+  symex_level0(ssa_exprt, const namespacet &, std::size_t);
   friend struct symex_level1t;
   friend struct symex_level2t;
   friend class goto_symex_statet;

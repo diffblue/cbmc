@@ -31,7 +31,7 @@ void get_variables(
 }
 
 renamedt<ssa_exprt, L0>
-symex_level0(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr)
+symex_level0(ssa_exprt ssa_expr, const namespacet &ns, std::size_t thread_nr)
 {
   // already renamed?
   if(!ssa_expr.get_level_0().empty())
@@ -56,21 +56,23 @@ symex_level0(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr)
   return renamedt<ssa_exprt, L0>{ssa_expr};
 }
 
-void symex_level1t::insert(const renamedt<ssa_exprt, L0> &ssa, unsigned index)
+void symex_level1t::insert(
+  const renamedt<ssa_exprt, L0> &ssa,
+  std::size_t index)
 {
   current_names.insert(
     ssa.get().get_identifier(), std::make_pair(ssa.get(), index));
 }
 
-optionalt<std::pair<ssa_exprt, unsigned>> symex_level1t::insert_or_replace(
+optionalt<std::pair<ssa_exprt, std::size_t>> symex_level1t::insert_or_replace(
   const renamedt<ssa_exprt, L0> &ssa,
-  unsigned index)
+  std::size_t index)
 {
   const irep_idt &identifier = ssa.get().get_identifier();
   const auto old_value = current_names.find(identifier);
   if(old_value)
   {
-    std::pair<ssa_exprt, unsigned> result = *old_value;
+    std::pair<ssa_exprt, std::size_t> result = *old_value;
     current_names.replace(identifier, std::make_pair(ssa.get(), index));
     return result;
   }

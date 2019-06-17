@@ -178,19 +178,19 @@ const irep_idt ssa_exprt::get_l1_object_identifier() const
 #endif
 }
 
-void ssa_exprt::set_level_0(unsigned i)
+void ssa_exprt::set_level_0(std::size_t i)
 {
   set(ID_L0, i);
   ::update_identifier(*this);
 }
 
-void ssa_exprt::set_level_1(unsigned i)
+void ssa_exprt::set_level_1(std::size_t i)
 {
   set(ID_L1, i);
   ::update_identifier(*this);
 }
 
-void ssa_exprt::set_level_2(unsigned i)
+void ssa_exprt::set_level_2(std::size_t i)
 {
   set(ID_L2, i);
   ::update_identifier(*this);
