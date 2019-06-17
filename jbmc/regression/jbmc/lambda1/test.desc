@@ -1,0 +1,27 @@
+CORE
+Lambdatest.class
+--function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+line 80 assertion.*SUCCESS$
+line 82 assertion.*FAILURE$
+line 84 assertion.*SUCCESS$
+line 86 assertion.*FAILURE$
+line 88 assertion.*SUCCESS$
+line 90 assertion.*FAILURE$
+line 92 assertion.*SUCCESS$
+line 94 assertion.*FAILURE$
+line 96 assertion.*SUCCESS$
+line 98 assertion.*FAILURE$
+line 101 assertion.*SUCCESS$
+line 102 assertion.*SUCCESS$
+line 105 assertion.*FAILURE$
+line 108 assertion.*SUCCESS$
+line 109 assertion.*SUCCESS$
+line 112 assertion.*FAILURE$
+line 114 assertion.*SUCCESS$
+line 116 assertion.*FAILURE$
+line 118 assertion.*SUCCESS$
+line 120 assertion.*FAILURE$
+line 122 assertion.*SUCCESS$
+line 124 assertion.*FAILURE$
+^EXIT=10$
+^SIGNAL=0$

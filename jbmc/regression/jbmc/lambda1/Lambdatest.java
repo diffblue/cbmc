@@ -8,7 +8,7 @@ public class Lambdatest {
     BiFunction<Float, Integer, Integer> add = (x0, y0) -> x0.intValue() + y0;
     int z = 10;
 
-    A a;
+    A a = new A();
     B b = new B();
 
     public Integer g(Float x, Integer y, BiFunction<Float, Integer, Integer> fun) {
@@ -74,17 +74,54 @@ public class Lambdatest {
         return custom.is_ok(i);
     }
 
-    public static void main(String[] args) {
-        // Uses all of the above test functions, to ensure they are loaded under
-        // symex-driven loading:
-
-        Lambdatest lt = new Lambdatest();
-        lt.f(0.0f, 0, 0);
-        lt.i(0);
-        lt.j(0);
-        lt.k(0);
-        lt.l(0);
-        lt.m(0);
+  public static void main(String[] args, int unknown) {
+      Lambdatest lt = new Lambdatest();
+      if(unknown == 0)
+        assert lt.g(1.0f, 2, (x, y) -> x.intValue() + y) == 3; // should succeed
+      else if(unknown == 1)
+        assert lt.g(1.0f, 2, (x, y) -> x.intValue() + y) == 4; // should fail
+      else if(unknown == 2)
+        assert lt.f(1.0f, 2, 3) == 9; // should succeed
+      else if(unknown == 3)
+        assert lt.f(1.0f, 2, 3) == 10; // should fail
+      else if(unknown == 4)
+        assert lt.i(2) == 10; // should succeed
+      else if(unknown == 5)
+        assert lt.i(2) == 11; // should fail
+      else if(unknown == 6)
+        assert lt.j(3) == 30; // should succeed
+      else if(unknown == 7)
+        assert lt.j(3) == 31; // should fail
+      else if(unknown == 8)
+        assert lt.k(4) == 40; // should succeed
+      else if(unknown == 9)
+        assert lt.k(4) == 41; // should fail
+      else if(unknown == 10)
+      {
+        assert lt.l(5) == 70; // should succeed
+        assert lt.b.y == 70; // check side-effects of l method
+      }
+      else if(unknown == 11)
+        assert lt.l(5) == 51; // should fail
+      else if(unknown == 12)
+      {
+        assert lt.m(6) == 60; // should succeed
+        assert lt.b.y == 60; // check side-effects of m method
+      }
+      else if(unknown == 13)
+        assert lt.m(6) == 61; // should fail
+      else if(unknown == 14)
+        assert lt.d(7.0) == 10.5; // should succeed
+      else if(unknown == 15)
+        assert lt.d(7.0) == 12; // should fail
+      else if(unknown == 16)
+        assert lt.capture2(8.0f) == 9; // should succeed
+      else if(unknown == 17)
+        assert lt.capture2(8.0f) == 10; // should fail
+      else if(unknown == 18)
+        assert lt.custom(9); // should succeed
+      else if(unknown == 19)
+        assert !lt.custom(9); // should fail
     }
 }
 
