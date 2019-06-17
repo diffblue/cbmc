@@ -35,6 +35,7 @@ SRC = assignments_from_json.cpp \
       java_static_initializers.cpp \
       java_string_library_preprocess.cpp \
       java_string_literals.cpp \
+      java_trace_validation.cpp \
       java_types.cpp \
       java_utils.cpp \
       load_method_by_regex.cpp \
