@@ -45,6 +45,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/lowering/byte_operators.cpp \
        solvers/prop/bdd_expr.cpp \
+       solvers/sat/satcheck_minisat2.cpp \
        solvers/strings/array_pool/array_pool.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
