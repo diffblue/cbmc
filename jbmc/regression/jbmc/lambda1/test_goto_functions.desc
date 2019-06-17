@@ -12,8 +12,3 @@ lambda function reference lambda\$m\$7 in class \"Lambdatest\"
 lambda function reference lambda\$static\$0 in class \"B\"
 ^EXIT=0$
 ^SIGNAL=0$
---
---
-Incompatible with symex-driven lazy loading because this test wants to process
-everything in the given class, not the functions reachable from a particular
-entry point, which is required for symex-driven loading.
