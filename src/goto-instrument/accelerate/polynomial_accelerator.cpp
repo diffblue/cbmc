@@ -752,23 +752,13 @@ void polynomial_acceleratort::stash_variables(
   expr_sett modified,
   substitutiont &substitution)
 {
-  find_symbols_sett vars;
-
-  for(expr_sett::iterator it=modified.begin();
-      it!=modified.end();
-      ++it)
-  {
-    find_symbols(*it, vars);
-  }
-
+  find_symbols_sett vars = find_symbols(modified.begin(), modified.end());
   irep_idt loop_counter_name=to_symbol_expr(loop_counter).get_identifier();
   vars.erase(loop_counter_name);
 
-  for(find_symbols_sett::iterator it=vars.begin();
-      it!=vars.end();
-      ++it)
+  for(const irep_idt &id : vars)
   {
-    const symbolt &orig = symbol_table.lookup_ref(*it);
+    const symbolt &orig = symbol_table.lookup_ref(id);
     symbolt stashed_sym=utils.fresh_symbol("polynomial::stash", orig.type);
     substitution[orig.symbol_expr()]=stashed_sym.symbol_expr();
     program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());
