@@ -129,8 +129,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
 // Declaration required for unit-test:
 exprt substitute_array_access(
   exprt expr,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator,
+  symbol_generatort &symbol_generator,
   const bool left_propagate);
 
 #endif

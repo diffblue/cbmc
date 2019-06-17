@@ -113,8 +113,7 @@ static optionalt<exprt> get_array(
 
 static exprt substitute_array_access(
   const index_exprt &index_expr,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator,
+  symbol_generatort &symbol_generator,
   const bool left_propagate);
 
 /// Convert index-value map to a vector of values. If a value for an
@@ -1183,8 +1182,7 @@ static exprt substitute_array_access(
 static exprt substitute_array_access(
   const array_exprt &array_expr,
   const exprt &index,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator)
+  symbol_generatort &symbol_generator)
 {
   const typet &char_type = array_expr.type().subtype();
   const exprt default_val = symbol_generator("out_of_bound_access", char_type);
@@ -1195,8 +1193,7 @@ static exprt substitute_array_access(
 static exprt substitute_array_access(
   const if_exprt &if_expr,
   const exprt &index,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator,
+  symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
   // Substitute recursively in branches of conditional expressions
@@ -1210,8 +1207,7 @@ static exprt substitute_array_access(
 
 static exprt substitute_array_access(
   const index_exprt &index_expr,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator,
+  symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
   const exprt &array = index_expr.array();
@@ -1240,8 +1236,7 @@ static exprt substitute_array_access(
 /// the resulting expression.
 static void substitute_array_access_in_place(
   exprt &expr,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator,
+  symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
   if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
@@ -1269,15 +1264,13 @@ static void substitute_array_access_in_place(
 /// Note that if left_propagate is set to true, the `with` case will result in
 /// something like: `index <= 0 ? 24 : index <= 2 ? 42 : 12`
 /// \param expr: an expression containing array accesses
-/// \param symbol_generator: function which given a prefix and a type generates
-///   a fresh symbol of the given type
+/// \param symbol_generator: a symbol generator
 /// \param left_propagate: should values be propagated to the left in with
 ///   expressions
 /// \return an expression containing no array access
 exprt substitute_array_access(
   exprt expr,
-  const std::function<symbol_exprt(const irep_idt &, const typet &)>
-    &symbol_generator,
+  symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
   substitute_array_access_in_place(expr, symbol_generator, left_propagate);
@@ -1366,13 +1359,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &not_contain_witnesses)
 {
-  // clang-format off
-  const auto gen_symbol = [&](const irep_idt &id, const typet &type)
-  {
-    return generator.fresh_symbol(id, type);
-  };
-  // clang-format on
-
   stream << "string_refinementt::check_axioms:" << messaget::eom;
 
   stream << "symbol_resolve:" << messaget::eom;
@@ -1410,7 +1396,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     stream << std::string(2, ' ') << i << ".\n";
     const exprt with_concretized_arrays =
-      substitute_array_access(negaxiom, gen_symbol, true);
+      substitute_array_access(negaxiom, generator.fresh_symbol, true);
     debug_check_axioms_step(
       stream, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
