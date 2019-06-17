@@ -1,9 +1,8 @@
-#include <assert.h>
 #include <stdlib.h>
 
 int main()
 {
-  free();
-  assert(0);
+  int *ptr;
+  free(ptr);
   return 0;
 }

@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+--pointer-check --bounds-check --stop-on-fail
+free argument must be NULL or valid pointer
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring

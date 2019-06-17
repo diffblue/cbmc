@@ -184,6 +184,9 @@ inline void free(void *ptr)
 {
   __CPROVER_HIDE:;
   // If ptr is NULL, no operation is performed.
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_r_ok(ptr, 0),
+    "free argument must be NULL or valid pointer");
   __CPROVER_precondition(ptr==0 || __CPROVER_DYNAMIC_OBJECT(ptr),
                          "free argument must be dynamic object");
   __CPROVER_precondition(ptr==0 || __CPROVER_POINTER_OFFSET(ptr)==0,
