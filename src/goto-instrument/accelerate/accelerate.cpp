@@ -392,11 +392,11 @@ void acceleratet::add_dirty_checks()
     find_symbols_sett read;
 
     if(it->has_condition())
-      find_symbols(it->get_condition(), read);
+      find_symbols_or_nexts(it->get_condition(), read);
 
     if(it->is_assign())
     {
-      find_symbols(it->get_assign().rhs(), read);
+      find_symbols_or_nexts(it->get_assign().rhs(), read);
     }
 
     for(find_symbols_sett::iterator jt=read.begin();

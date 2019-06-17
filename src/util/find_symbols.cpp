@@ -15,9 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 enum class kindt { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH };
 
-void find_symbols(
-  const exprt &src,
-  find_symbols_sett &dest)
+void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest)
 {
   find_symbols(src, dest, true, true);
 }

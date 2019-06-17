@@ -211,7 +211,8 @@ void acceleration_utilst::stash_variables(
   expr_sett modified,
   substitutiont &substitution)
 {
-  find_symbols_sett vars = find_symbols(modified.begin(), modified.end());
+  find_symbols_sett vars =
+    find_symbols_or_nexts(modified.begin(), modified.end());
   const irep_idt &loop_counter_name =
     to_symbol_expr(loop_counter).get_identifier();
   vars.erase(loop_counter_name);

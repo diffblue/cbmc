@@ -165,7 +165,7 @@ bool postconditiont::is_used(
     const auto original_names = make_range(expr_set).map(
       [](const exprt &e) { return get_original_name(e); });
     const std::unordered_set<irep_idt> symbols =
-      find_symbols(original_names.begin(), original_names.end());
+      find_symbols_or_nexts(original_names.begin(), original_names.end());
     return symbols.find(identifier)!=symbols.end();
   }
   else

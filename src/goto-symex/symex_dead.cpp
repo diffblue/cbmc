@@ -32,7 +32,7 @@ void goto_symext::symex_dead(statet &state, const symbol_exprt &symbol_expr)
 
   const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
   find_symbols_sett fields_set;
-  find_symbols(fields, fields_set);
+  find_symbols_or_nexts(fields, fields_set);
 
   for(const irep_idt &l1_identifier : fields_set)
   {
