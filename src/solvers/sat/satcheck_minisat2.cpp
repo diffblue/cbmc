@@ -328,14 +328,16 @@ bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 template<typename T>
 void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
 {
-  assumptions=bv;
-
-  forall_literals(it, assumptions)
-    if(it->is_true())
+  // We filter out 'true' assumptions which cause an assertion violation
+  // in Minisat2.
+  assumptions.clear();
+  for(const auto &assumption : bv)
+  {
+    if(!assumption.is_true())
     {
-      assumptions.clear();
-      break;
+      assumptions.push_back(assumption);
     }
+  }
 }
 
 satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert(
