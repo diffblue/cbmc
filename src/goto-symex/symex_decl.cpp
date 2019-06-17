@@ -65,10 +65,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
 
   // L2 renaming
   const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
-  std::set<symbol_exprt> fields_set;
-  find_symbols(fields, fields_set);
-
-  for(const auto &l1_symbol : fields_set)
+  for(const auto &l1_symbol : find_symbols(fields))
   {
     ssa_exprt field_ssa = to_ssa_expr(l1_symbol);
     std::size_t field_generation =
