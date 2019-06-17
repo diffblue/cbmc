@@ -134,6 +134,17 @@ void create_invokedynamic_synthetic_classes(
                     << messaget::eom;
         continue;
       }
+      else if(implemented_interface_type.methods().size() != 1)
+      {
+        log.debug()
+          << "ignoring invokedynamic at " << method_identifier << " address "
+          << instruction.address << " which produces type "
+          << implemented_interface_tag.get_identifier()
+          << " which should have exactly one abstract method but actually has "
+          << implemented_interface_type.methods().size()
+          << ". Note default methods are not supported yet." << messaget::eom;
+        continue;
+      }
 
       log.debug() << "identified invokedynamic at " << method_identifier
                   << " address " << instruction.address
