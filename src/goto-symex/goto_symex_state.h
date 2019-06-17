@@ -161,6 +161,12 @@ public:
     std::function<std::size_t(const irep_idt &)> index_generator,
     const namespacet &ns);
 
+  /// Add `invalid` (or a failed symbol) to the value_set if ssa is a pointer,
+  /// ensure that level2 index of symbols in fields of ssa are at 1,
+  /// and rename ssa to level 2
+  /// \return ssa renamed to level 2
+  ssa_exprt declare(ssa_exprt ssa, const namespacet &ns);
+
   void print_backtrace(std::ostream &) const;
 
   // threads
