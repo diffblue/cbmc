@@ -18,7 +18,7 @@ void assert(_Bool assertion);
 The function **\_\_CPROVER\_assume** adds an expression as a constraint
 to the program. If the expression evaluates to false, the execution
 aborts without failure. More detail on the use of assumptions is in the
-section on [Assumptions](../modeling/assumptions/).
+section on [Assumptions](./modeling-assumptions.md).
 
 #### \_\_CPROVER\_r_ok, \_\_CPROVER\_w_ok
 
@@ -58,7 +58,7 @@ The functions **\_\_CPROVER\_input** and **\_\_CPROVER\_output** are
 used to report an input or output value. Note that they do not generate
 input or output values. The first argument is a string constant to
 distinguish multiple inputs and outputs (inputs are typically generated
-using nondeterminism, as described [here](../modeling/nondeterminism/)). The
+using nondeterminism, as described [here](./modeling-nondeterminism.md)). The
 string constant is followed by an arbitrary number of values of
 arbitrary types.
 
@@ -154,7 +154,7 @@ the array **dest** with the given value.
 
 #### Uninterpreted Functions
 
-Uninterpreted functions are documented [here](../modeling/nondeterminism/)).
+Uninterpreted functions are documented [here](./modeling-nondeterminism.md)).
 
 ### Predefined Types and Symbols
 
