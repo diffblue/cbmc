@@ -78,34 +78,31 @@ protected:
 
 void concurrency_instrumentationt::instrument(exprt &expr)
 {
-  std::set<exprt> symbols;
+  std::set<symbol_exprt> symbols;
 
   find_symbols(expr, symbols);
 
   replace_symbolt replace_symbol;
 
-  for(std::set<exprt>::const_iterator
+  for(std::set<symbol_exprt>::const_iterator
       s_it=symbols.begin();
       s_it!=symbols.end();
       s_it++)
   {
-    if(s_it->id()==ID_symbol)
+    const symbol_exprt &s = *s_it;
+
+    shared_varst::const_iterator v_it = shared_vars.find(s.get_identifier());
+
+    if(v_it != shared_vars.end())
     {
-      const symbol_exprt &s = to_symbol_expr(*s_it);
+      UNIMPLEMENTED;
+      // not yet done: neither array_symbol nor w_index_symbol are actually
+      // initialized anywhere
+      const shared_vart &shared_var = v_it->second;
+      const index_exprt new_expr(
+        *shared_var.array_symbol, *shared_var.w_index_symbol);
 
-      shared_varst::const_iterator v_it = shared_vars.find(s.get_identifier());
-
-      if(v_it!=shared_vars.end())
-      {
-        UNIMPLEMENTED;
-        // not yet done: neither array_symbol nor w_index_symbol are actually
-        // initialized anywhere
-        const shared_vart &shared_var = v_it->second;
-        const index_exprt new_expr(
-          *shared_var.array_symbol, *shared_var.w_index_symbol);
-
-        replace_symbol.insert(s, new_expr);
-      }
+      replace_symbol.insert(s, new_expr);
     }
   }
 }
@@ -148,26 +145,26 @@ void concurrency_instrumentationt::collect(const exprt &expr)
     const irep_idt &identifier = symbol_expr.get_identifier();
 
     namespacet ns(symbol_table);
-    const symbolt &symbol=ns.lookup(identifier);
+    const symbolt &symbol = ns.lookup(identifier);
 
     if(!symbol.is_state_var)
       continue;
 
     if(symbol.is_thread_local)
     {
-      if(thread_local_vars.find(identifier)!=thread_local_vars.end())
+      if(thread_local_vars.find(identifier) != thread_local_vars.end())
         continue;
 
-      thread_local_vart &thread_local_var=thread_local_vars[identifier];
-      thread_local_var.type=symbol.type;
+      thread_local_vart &thread_local_var = thread_local_vars[identifier];
+      thread_local_var.type = symbol.type;
     }
     else
     {
-      if(shared_vars.find(identifier)!=shared_vars.end())
+      if(shared_vars.find(identifier) != shared_vars.end())
         continue;
 
-      shared_vart &shared_var=shared_vars[identifier];
-      shared_var.type=symbol.type;
+      shared_vart &shared_var = shared_vars[identifier];
+      shared_var.type = symbol.type;
     }
   }
 }
