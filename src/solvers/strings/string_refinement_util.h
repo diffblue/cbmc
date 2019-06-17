@@ -49,6 +49,14 @@ bool has_char_pointer_subtype(const typet &type, const namespacet &ns);
 /// \return true if a subexpression of `expr` is an array of characters
 bool has_char_array_subexpr(const exprt &expr, const namespacet &ns);
 
+/// Construct a string from a constant array.
+/// \param arr: an array expression containing only constants
+/// \param length: an unsigned value representing the length of the array
+/// \return String of length `length` represented by the array assuming each
+///   field in `arr` represents a character.
+std::string
+utf16_constant_array_to_java(const array_exprt &arr, std::size_t length);
+
 struct index_set_pairt
 {
   std::map<exprt, std::set<exprt>> cumulative;
