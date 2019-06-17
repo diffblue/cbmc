@@ -10,7 +10,6 @@ jobs:
         apt:
           sources:
             - llvm-toolchain-trusty-7
-            - ubuntu-toolchain-r-test
           packages:
             - clang-format-7
       install:
@@ -94,8 +93,6 @@ jobs:
       cache: ccache
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - libwww-perl
             - g++-5
@@ -134,8 +131,6 @@ jobs:
       cache: ccache
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - libwww-perl
             - g++-5
@@ -163,7 +158,6 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-7
           packages:
             - libwww-perl
@@ -197,8 +191,6 @@ jobs:
         - BUILD_SYSTEM=cmake
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - g++-7
             - jq
@@ -226,8 +218,6 @@ jobs:
         - BUILD_SYSTEM=cmake
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - g++-7
             - jq
@@ -256,7 +246,6 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-7
           packages:
             - libwww-perl
@@ -312,8 +301,6 @@ jobs:
       cache: ccache
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - libwww-perl
             - g++-5
