@@ -245,6 +245,39 @@ SCENARIO("range tests", "[core][util][range]")
       }
     }
   }
+  GIVEN("Two vectors of different sizes.")
+  {
+    const std::vector<int> int_vector{814, 51};
+    const std::vector<std::string> string_vector{"foo", "bar", "baz", "bay"};
+    WHEN("We zip the vectors")
+    {
+      auto range = make_range(int_vector).zip<false>(string_vector);
+      REQUIRE(!range.empty());
+      THEN("First pair is (814, foo)")
+      {
+        const std::pair<int, std::string> first_pair = *range.begin();
+        REQUIRE(first_pair.first == 814);
+        REQUIRE(first_pair.second == "foo");
+      }
+      auto second_range = range.drop(1);
+      THEN("Begin iterator when first element is dropped is different")
+      {
+        REQUIRE(second_range.begin() != range.begin());
+      }
+      THEN("Second pair is (51, bar)")
+      {
+        const std::pair<int, std::string> second_pair = *second_range.begin();
+        REQUIRE(second_pair.first == 51);
+        REQUIRE(second_pair.second == "bar");
+      }
+      auto third_range = second_range.drop(1);
+      THEN("Range is empty")
+      {
+        REQUIRE(third_range.begin() != second_range.begin());
+        REQUIRE(third_range.empty());
+      }
+    }
+  }
 }
 
 class move_onlyt
