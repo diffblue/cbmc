@@ -88,6 +88,13 @@ struct symex_level2t
 
   /// Counter corresponding to an identifier
   unsigned latest_index(const irep_idt &identifier) const;
+
+  /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
+  ///  latest generation on this path.
+  std::size_t increase_generation(
+    const irep_idt &l1_identifier,
+    const ssa_exprt &lhs,
+    std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
 };
 
 /// Undo all levels of renaming

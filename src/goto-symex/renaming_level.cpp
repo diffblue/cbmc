@@ -145,6 +145,27 @@ unsigned symex_level2t::latest_index(const irep_idt &identifier) const
   return !r_opt ? 0 : r_opt->get().second;
 }
 
+std::size_t symex_level2t::increase_generation(
+  const irep_idt &l1_identifier,
+  const ssa_exprt &lhs,
+  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
+{
+  const std::size_t n = fresh_l2_name_provider(l1_identifier);
+
+  if(const auto r_opt = current_names.find(l1_identifier))
+  {
+    std::pair<ssa_exprt, std::size_t> copy = r_opt->get();
+    copy.second = n;
+    current_names.replace(l1_identifier, std::move(copy));
+  }
+  else
+  {
+    current_names.insert(l1_identifier, std::make_pair(lhs, n));
+  }
+
+  return n;
+}
+
 exprt get_original_name(exprt expr)
 {
   expr.type() = get_original_name(std::move(expr.type()));

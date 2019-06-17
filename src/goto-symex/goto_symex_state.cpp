@@ -184,7 +184,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 #endif
 
   // do the l2 renaming
-  increase_generation(l1_identifier, lhs);
+  level2.increase_generation(l1_identifier, lhs, fresh_l2_name_provider);
   renamedt<ssa_exprt, L2> l2_lhs = set_indices<L2>(std::move(lhs), ns);
   lhs = l2_lhs.get();
 
@@ -435,7 +435,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     if(a_s_read.second.empty())
     {
-      increase_generation(l1_identifier, ssa_l1);
+      level2.increase_generation(l1_identifier, ssa_l1, fresh_l2_name_provider);
       a_s_read.first = level2.latest_index(l1_identifier);
     }
     const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
@@ -477,7 +477,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // produce a fresh L2 name
-  increase_generation(l1_identifier, ssa_l1);
+  level2.increase_generation(l1_identifier, ssa_l1, fresh_l2_name_provider);
   expr = set_indices<L2>(std::move(ssa_l1), ns).get();
 
   // and record that
@@ -839,8 +839,8 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
   for(const auto &l1_symbol : find_symbols(fields))
   {
     const ssa_exprt &field_ssa = to_ssa_expr(l1_symbol);
-    std::size_t field_generation =
-      increase_generation(l1_symbol.get_identifier(), field_ssa);
+    const std::size_t field_generation = level2.increase_generation(
+      l1_symbol.get_identifier(), field_ssa, fresh_l2_name_provider);
     CHECK_RETURN(field_generation == 1);
   }
 

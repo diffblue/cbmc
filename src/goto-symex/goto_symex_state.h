@@ -222,15 +222,6 @@ public:
   unsigned total_vccs = 0;
   unsigned remaining_vccs = 0;
 
-  /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
-  /// latest generation on this path.
-  std::size_t
-  increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs)
-  {
-    return goto_statet::increase_generation(
-      l1_identifier, lhs, fresh_l2_name_provider);
-  }
-
   /// Drops an L1 name from the local L2 map
   void drop_existing_l1_name(const irep_idt &l1_identifier)
   {
