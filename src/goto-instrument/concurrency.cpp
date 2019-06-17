@@ -143,16 +143,9 @@ void concurrency_instrumentationt::instrument(
 
 void concurrency_instrumentationt::collect(const exprt &expr)
 {
-  std::set<symbol_exprt> symbols;
-
-  find_symbols(expr, symbols);
-
-  for(std::set<symbol_exprt>::const_iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
-      s_it++)
+  for(const auto &symbol_expr : find_symbols(expr))
   {
-    const irep_idt identifier = to_symbol_expr(*s_it).get_identifier();
+    const irep_idt &identifier = symbol_expr.get_identifier();
 
     namespacet ns(symbol_table);
     const symbolt &symbol=ns.lookup(identifier);
