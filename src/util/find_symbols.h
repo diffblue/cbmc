@@ -23,6 +23,8 @@ class typet;
 
 typedef std::unordered_set<irep_idt> find_symbols_sett;
 
+/// Add to the set \p dest the sub-expressions of \p src with id ID_symbol or
+/// ID_next_symbol
 void find_symbols(
   const exprt &src,
   find_symbols_sett &dest);
@@ -40,6 +42,8 @@ find_symbols_sett find_symbols(iteratort begin, iteratort end)
   return result;
 }
 
+/// Add to the set \p dest the sub-expressions of \p src with id ID_symbol if
+/// \p current is true, and ID_next_symbol if \p next is true
 void find_symbols(
   const exprt &src,
   find_symbols_sett &dest,
@@ -52,12 +56,15 @@ void find_symbols(
   const exprt &src,
   std::set<exprt> &dest);
 
+/// Find sub expressions with id ID_symbol
 void find_symbols(
   const exprt &src,
   std::set<symbol_exprt> &dest);
 
+/// Find sub expressions with id ID_symbol
 std::set<symbol_exprt> find_symbols(const exprt &src);
 
+/// \return true if one of the symbols in \p src is present in \p symbols
 bool has_symbol(
   const exprt &src,
   const find_symbols_sett &symbols);
