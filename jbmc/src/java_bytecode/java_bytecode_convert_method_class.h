@@ -377,7 +377,7 @@ protected:
 
   code_ifthenelset convert_if_cmp(
     const java_bytecode_convert_methodt::address_mapt &address_map,
-    const irep_idt &statement,
+    const u1 bytecode,
     const exprt::operandst &op,
     const mp_integer &number,
     const source_locationt &location) const;

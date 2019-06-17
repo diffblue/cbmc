@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_PATTERN_H
 #define CPROVER_JAVA_BYTECODE_PATTERN_H
 
-#include <util/irep.h>
+#include "bytecode_info.h"
 
 /// Given a string of the format '?blah?', will return true when compared
 /// against a string that matches appart from any characters that are '?'
@@ -25,47 +25,30 @@ public:
   }
 
   // match with '?'
-  bool operator==(const std::string &what) const
+  bool operator==(const u1 bytecode) const
   {
-    for(std::size_t i = 0; i < what.size(); i++)
+    const char *what = bytecode_info[bytecode].mnemonic;
+
+    std::size_t i;
+
+    for(i = 0; what[i] != 0; i++)
       if(p[i] == 0)
         return false;
       else if(p[i] != '?' && p[i] != what[i])
         return false;
 
-    return p[what.size()] == 0;
+    return p[i] == 0;
   }
 
-#ifndef USE_STD_STRING
-  bool operator==(const irep_idt &what) const
+  friend bool operator==(const u1 bytecode, const patternt &p)
   {
-    return (*this) == id2string(what);
-  }
-#endif
-
-  friend bool operator==(const std::string &what, const patternt &p)
-  {
-    return p == what;
+    return p == bytecode;
   }
 
-#ifndef USE_STD_STRING
-  friend bool operator==(const irep_idt &what, const patternt &p)
+  friend bool operator!=(const u1 bytecode, const patternt &p)
   {
-    return p == what;
+    return !(p == bytecode);
   }
-#endif
-
-  friend bool operator!=(const std::string &what, const patternt &p)
-  {
-    return !(p == what);
-  }
-
-#ifndef USE_STD_STRING
-  friend bool operator!=(const irep_idt &what, const patternt &p)
-  {
-    return !(p == what);
-  }
-#endif
 
 protected:
   const char *p;
