@@ -202,8 +202,8 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     else if(propagation_entry->get() != rhs)
       propagation.replace(l1_identifier, rhs);
   }
-  else if(propagation.has_key(l1_identifier))
-    propagation.erase(l1_identifier);
+  else
+    propagation.erase_if_exists(l1_identifier);
 
   {
     // update value sets
