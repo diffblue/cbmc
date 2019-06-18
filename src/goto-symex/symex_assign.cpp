@@ -26,6 +26,17 @@ Author: Daniel Kroening, kroening@kroening.com
 // update_exprt.
 // #define USE_UPDATE
 
+static ssa_exprt assign_non_struct_symbol(
+  goto_symex_statet &state,
+  const ssa_exprt &lhs, // L1
+  const exprt &full_lhs,
+  const exprt &rhs,
+  const exprt::operandst &guard,
+  symex_targett::assignment_typet assignment_type,
+  const namespacet &ns,
+  const symex_configt &symex_config,
+  symex_targett &target);
+
 void goto_symext::symex_assign(statet &state, const code_assignt &code)
 {
   exprt lhs = clean_expr(code.lhs(), state, true);
@@ -387,13 +398,16 @@ static assignmentt shift_indexed_access_to_lhs(
 /// \param guard: guard conjuncts that must hold for this assignment to be made
 /// \param assignment_type: assignment type (see
 ///   \ref symex_targett::assignment_typet)
-void goto_symext::symex_assign_from_struct(
-  statet &state,
+static void symex_assign_from_struct(
+  goto_symex_statet &state,
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const struct_exprt &rhs,
   const exprt::operandst &guard,
-  assignment_typet assignment_type)
+  symex_targett::assignment_typet assignment_type,
+  const namespacet &ns,
+  const symex_configt &symex_config,
+  symex_targett &target)
 {
   const auto &components = to_struct_type(ns.follow(lhs.type())).components();
   PRECONDITION(rhs.operands().size() == components.size());
@@ -407,13 +421,32 @@ void goto_symext::symex_assign_from_struct(
       lhs_field.id() == ID_symbol,
       "member of symbol should be susceptible to field-sensitivity");
 
-    symex_assign_symbol(
-      state,
-      to_ssa_expr(lhs_field),
-      full_lhs,
-      comp_rhs.second,
-      guard,
-      assignment_type);
+    if(comp_rhs.second.id() == ID_struct)
+    {
+      symex_assign_from_struct(
+        state,
+        to_ssa_expr(lhs_field),
+        full_lhs,
+        to_struct_expr(comp_rhs.second),
+        guard,
+        assignment_type,
+        ns,
+        symex_config,
+        target);
+    }
+    else
+    {
+      assign_non_struct_symbol(
+        state,
+        to_ssa_expr(lhs_field),
+        full_lhs,
+        comp_rhs.second,
+        guard,
+        assignment_type,
+        ns,
+        symex_config,
+        target);
+    }
   }
 }
 
@@ -506,7 +539,15 @@ void goto_symext::symex_assign_symbol(
   if(rhs.id() == ID_struct)
   {
     symex_assign_from_struct(
-      state, lhs, full_lhs, to_struct_expr(rhs), guard, assignment_type);
+      state,
+      lhs,
+      full_lhs,
+      to_struct_expr(rhs),
+      guard,
+      assignment_type,
+      ns,
+      symex_config,
+      target);
     return;
   }
 
