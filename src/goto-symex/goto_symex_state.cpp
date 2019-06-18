@@ -173,7 +173,6 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   {
     DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
   }
-  const ssa_exprt l1_lhs = lhs;
 
 #if 0
   PRECONDITION(l1_identifier != get_original_name(l1_identifier)
