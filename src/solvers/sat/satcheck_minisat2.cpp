@@ -178,94 +178,80 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
     {
       log.status() << "SAT checker inconsistent: instance is UNSATISFIABLE"
                    << messaget::eom;
+      status = statust::UNSAT;
+      return resultt::P_UNSATISFIABLE;
     }
-    else
+
+    // if assumptions contains false, we need this to be UNSAT
+    for(const auto &assumption : assumptions)
     {
-      // if assumptions contains false, we need this to be UNSAT
-      bool has_false=false;
-
-      forall_literals(it, assumptions)
-      {
-        if(it->is_false())
-        {
-          has_false = true;
-          break;
-        }
-      }
-
-      if(has_false)
+      if(assumption.is_false())
       {
         log.status() << "got FALSE as assumption: instance is UNSATISFIABLE"
                      << messaget::eom;
-      }
-      else
-      {
-        Minisat::vec<Minisat::Lit> solver_assumptions;
-        convert(assumptions, solver_assumptions);
-
-        using Minisat::lbool;
-
-#ifndef _WIN32
-
-        void (*old_handler)(int)=SIG_ERR;
-
-        if(time_limit_seconds!=0)
-        {
-          solver_to_interrupt=solver;
-          old_handler=signal(SIGALRM, interrupt_solver);
-          if(old_handler==SIG_ERR)
-            log.warning() << "Failed to set solver time limit" << messaget::eom;
-          else
-            alarm(time_limit_seconds);
-        }
-
-        lbool solver_result=solver->solveLimited(solver_assumptions);
-
-        if(old_handler!=SIG_ERR)
-        {
-          alarm(0);
-          signal(SIGALRM, old_handler);
-          solver_to_interrupt=solver;
-        }
-
-#else // _WIN32
-
-        if(time_limit_seconds!=0)
-        {
-          log.warning() << "Time limit ignored (not supported on Win32 yet)"
-                        << messaget::eom;
-        }
-
-        lbool solver_result=
-          solver->solve(solver_assumptions) ? l_True : l_False;
-
-#endif
-
-        if(solver_result==l_True)
-        {
-          log.status() << "SAT checker: instance is SATISFIABLE"
-                       << messaget::eom;
-          CHECK_RETURN(solver->model.size()>0);
-          status=statust::SAT;
-          return resultt::P_SATISFIABLE;
-        }
-        else if(solver_result==l_False)
-        {
-          log.status() << "SAT checker: instance is UNSATISFIABLE"
-                       << messaget::eom;
-        }
-        else
-        {
-          log.status() << "SAT checker: timed out or other error"
-                       << messaget::eom;
-          status=statust::ERROR;
-          return resultt::P_ERROR;
-        }
+        status = statust::UNSAT;
+        return resultt::P_UNSATISFIABLE;
       }
     }
 
-    status=statust::UNSAT;
-    return resultt::P_UNSATISFIABLE;
+    Minisat::vec<Minisat::Lit> solver_assumptions;
+    convert(assumptions, solver_assumptions);
+
+    using Minisat::lbool;
+
+#ifndef _WIN32
+
+    void (*old_handler)(int) = SIG_ERR;
+
+    if(time_limit_seconds != 0)
+    {
+      solver_to_interrupt = solver;
+      old_handler = signal(SIGALRM, interrupt_solver);
+      if(old_handler == SIG_ERR)
+        log.warning() << "Failed to set solver time limit" << messaget::eom;
+      else
+        alarm(time_limit_seconds);
+    }
+
+    lbool solver_result = solver->solveLimited(solver_assumptions);
+
+    if(old_handler != SIG_ERR)
+    {
+      alarm(0);
+      signal(SIGALRM, old_handler);
+      solver_to_interrupt = solver;
+    }
+
+#else // _WIN32
+
+    if(time_limit_seconds != 0)
+    {
+      log.warning() << "Time limit ignored (not supported on Win32 yet)"
+                    << messaget::eom;
+    }
+
+    lbool solver_result = solver->solve(solver_assumptions) ? l_True : l_False;
+
+#endif
+
+    if(solver_result == l_True)
+    {
+      log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
+      CHECK_RETURN(solver->model.size() > 0);
+      status = statust::SAT;
+      return resultt::P_SATISFIABLE;
+    }
+
+    if(solver_result == l_False)
+    {
+      log.status() << "SAT checker: instance is UNSATISFIABLE" << messaget::eom;
+      status = statust::UNSAT;
+      return resultt::P_UNSATISFIABLE;
+    }
+
+    log.status() << "SAT checker: timed out or other error" << messaget::eom;
+    status = statust::ERROR;
+    return resultt::P_ERROR;
   }
   catch(const Minisat::OutOfMemoryException &)
   {
