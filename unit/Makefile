@@ -34,6 +34,7 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/goto_symex_state.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
+       goto-symex/symex_assign.cpp \
        goto-symex/symex_level0.cpp \
        goto-symex/symex_level1.cpp \
        goto-symex/try_evaluate_pointer_comparisons.cpp \
