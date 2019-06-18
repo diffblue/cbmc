@@ -174,14 +174,6 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
   }
 
-#if 0
-  PRECONDITION(l1_identifier != get_original_name(l1_identifier)
-      || l1_identifier == guard_identifier()
-      || ns.lookup(l1_identifier).is_shared()
-      || has_prefix(id2string(l1_identifier), "symex::invalid_object")
-      || has_prefix(id2string(l1_identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"));
-#endif
-
   // do the l2 renaming
   level2.increase_generation(l1_identifier, lhs, fresh_l2_name_provider);
   renamedt<ssa_exprt, L2> l2_lhs = set_indices<L2>(std::move(lhs), ns);
