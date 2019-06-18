@@ -1,15 +1,13 @@
 /*******************************************************************\
 
-Module: Builtin functions for String.format
+Module: Built-in function for String.format
 
 Author: Romain Brenguier, Joel Allred
-
-Date:   June 2019
 
 \*******************************************************************/
 
 /// \file
-///  Builtin functions for String.format
+///  Built-in function for String.format
 
 #ifndef CPROVER_SOLVERS_STRINGS_STRING_FORMAT_BUILTIN_FUNCTION_H
 #define CPROVER_SOLVERS_STRINGS_STRING_FORMAT_BUILTIN_FUNCTION_H
