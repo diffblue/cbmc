@@ -274,7 +274,8 @@ public:
   /// operators (i.e. this is not a simple lookup in `valuest`).
   /// \param expr: query expression
   /// \param ns: global namespace
-  /// \return list of expressions that `expr` may point to
+  /// \return list of expressions that `expr` may point to. These expressions
+  ///   are object_descriptor_exprt or have id ID_invalid or ID_unknown.
   std::vector<exprt> get_value_set(exprt expr, const namespacet &ns) const;
 
   /// Appears to be unimplemented.
