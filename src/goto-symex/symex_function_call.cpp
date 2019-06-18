@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/range.h>
 
+#include "symex_assign.h"
+
 static void locality(
   const irep_idt &function_identifier,
   goto_symext::statet &state,

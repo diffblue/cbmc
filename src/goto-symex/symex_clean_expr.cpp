@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
+#include "symex_assign.h"
 #include "symex_dereference_state.h"
 
 #include <pointer-analysis/value_set_dereference.h>

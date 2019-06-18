@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "goto_symex.h"
+#include "symex_assign.h"
 
 #include <util/format_expr.h>
 #include <util/pointer_offset_size.h>

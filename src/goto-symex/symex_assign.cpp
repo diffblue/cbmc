@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "symex_assign.h"
+
 #include "goto_symex.h"
 #include "goto_symex_state.h"
 #include <util/byte_operators.h>

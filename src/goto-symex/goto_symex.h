@@ -685,26 +685,4 @@ renamedt<exprt, L2> try_evaluate_pointer_comparisons(
   const irep_idt &language_mode,
   const namespacet &ns);
 
-void symex_assign_symbol(
-  goto_symex_statet &state,
-  const ssa_exprt &lhs, // L1
-  const exprt &full_lhs,
-  const exprt &rhs,
-  const exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
-void symex_assign_rec(
-  goto_symex_statet &state,
-  const exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
