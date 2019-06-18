@@ -223,7 +223,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 
 #if 0
   std::cout << "Assigning " << l1_identifier << '\n';
-  value_set.output(ns, std::cout);
+  value_set.output(std::cout);
   std::cout << "**********************\n";
 #endif
 
