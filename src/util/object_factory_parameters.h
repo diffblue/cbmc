@@ -74,9 +74,6 @@ struct object_factory_parameterst
   /// Force string content to be ASCII printable characters when set to true.
   bool string_printable = false;
 
-  /// Force numerical primitive inputs to fall within the interval
-  integer_intervalt assume_inputs_interval;
-
   /// Force one of finitely many explicitly given input strings
   std::list<std::string> string_input_values;
 
