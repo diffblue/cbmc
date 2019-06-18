@@ -417,22 +417,18 @@ void goto_symext::symex_assign_from_struct(
   }
 }
 
-void goto_symext::symex_assign_symbol(
-  statet &state,
+/// \return l2_lhs
+static ssa_exprt assign_non_struct_symbol(
+  goto_symex_statet &state,
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
   const exprt::operandst &guard,
-  assignment_typet assignment_type)
+  symex_targett::assignment_typet assignment_type,
+  const namespacet &ns,
+  const symex_configt &symex_config,
+  symex_targett &target)
 {
-  // Shortcut the common case of a whole-struct initializer:
-  if(rhs.id() == ID_struct)
-  {
-    symex_assign_from_struct(
-      state, lhs, full_lhs, to_struct_expr(rhs), guard, assignment_type);
-    return;
-  }
-
   exprt l2_rhs =
     state
       .rename(
@@ -452,7 +448,8 @@ void goto_symext::symex_assign_symbol(
     state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
   assignment = rewrite_with_to_field_symbols(state, std::move(assignment), ns);
 
-  do_simplify(assignment.rhs);
+  if(symex_config.simplify_opt)
+    assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
 
   const ssa_exprt l2_lhs = state
                              .assignment(
@@ -471,13 +468,6 @@ void goto_symext::symex_assign_symbol(
 
   if(ns.lookup(l2_lhs.get_object_name()).is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
-
-  log.conditional_output(
-    log.debug(), [this, &l2_lhs](messaget::mstreamt &mstream) {
-      mstream << "Assignment to " << l2_lhs.get_identifier() << " ["
-              << pointer_offset_bits(l2_lhs.type(), ns).value_or(0) << " bits]"
-              << messaget::eom;
-    });
 
   target.assignment(
     make_and(state.guard.as_expr(), conjunction(guard)),
@@ -500,6 +490,43 @@ void goto_symext::symex_assign_symbol(
     state.propagation.erase_if_exists(l1_lhs.get_identifier());
     state.value_set.erase_symbol(l1_lhs, ns);
   }
+
+  return l2_lhs;
+}
+
+void goto_symext::symex_assign_symbol(
+  statet &state,
+  const ssa_exprt &lhs, // L1
+  const exprt &full_lhs,
+  const exprt &rhs,
+  const exprt::operandst &guard,
+  assignment_typet assignment_type)
+{
+  // Shortcut the common case of a whole-struct initializer:
+  if(rhs.id() == ID_struct)
+  {
+    symex_assign_from_struct(
+      state, lhs, full_lhs, to_struct_expr(rhs), guard, assignment_type);
+    return;
+  }
+
+  const ssa_exprt l2_lhs = assign_non_struct_symbol(
+    state,
+    lhs,
+    full_lhs,
+    rhs,
+    guard,
+    assignment_type,
+    ns,
+    symex_config,
+    target);
+
+  log.conditional_output(
+    log.debug(), [this, &l2_lhs](messaget::mstreamt &mstream) {
+      mstream << "Assignment to " << l2_lhs.get_identifier() << " ["
+              << pointer_offset_bits(l2_lhs.type(), ns).value_or(0) << " bits]"
+              << messaget::eom;
+    });
 }
 
 void goto_symext::symex_assign_typecast(
