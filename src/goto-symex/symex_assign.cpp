@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
+#include <util/format_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -26,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // update_exprt.
 // #define USE_UPDATE
 
-static ssa_exprt assign_non_struct_symbol(
+static void assign_non_struct_symbol(
   goto_symex_statet &state,
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
@@ -45,6 +46,12 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
   DATA_INVARIANT(
     lhs.type() == rhs.type(), "assignments must be type consistent");
 
+  log.conditional_output(
+    log.debug(), [this, &lhs](messaget::mstreamt &mstream) {
+      mstream << "Assignment to " << format(lhs) << " ["
+              << pointer_offset_bits(lhs.type(), ns).value_or(0) << " bits]"
+              << messaget::eom;
+    });
 
   if(rhs.id()==ID_side_effect)
   {
@@ -451,7 +458,7 @@ static void symex_assign_from_struct(
 }
 
 /// \return l2_lhs
-static ssa_exprt assign_non_struct_symbol(
+static void assign_non_struct_symbol(
   goto_symex_statet &state,
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
@@ -523,8 +530,6 @@ static ssa_exprt assign_non_struct_symbol(
     state.propagation.erase_if_exists(l1_lhs.get_identifier());
     state.value_set.erase_symbol(l1_lhs, ns);
   }
-
-  return l2_lhs;
 }
 
 void goto_symext::symex_assign_symbol(
@@ -551,7 +556,7 @@ void goto_symext::symex_assign_symbol(
     return;
   }
 
-  const ssa_exprt l2_lhs = assign_non_struct_symbol(
+  assign_non_struct_symbol(
     state,
     lhs,
     full_lhs,
@@ -561,13 +566,6 @@ void goto_symext::symex_assign_symbol(
     ns,
     symex_config,
     target);
-
-  log.conditional_output(
-    log.debug(), [this, &l2_lhs](messaget::mstreamt &mstream) {
-      mstream << "Assignment to " << l2_lhs.get_identifier() << " ["
-              << pointer_offset_bits(l2_lhs.type(), ns).value_or(0) << " bits]"
-              << messaget::eom;
-    });
 }
 
 void goto_symext::symex_assign_typecast(
