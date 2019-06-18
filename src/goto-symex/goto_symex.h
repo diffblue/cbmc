@@ -545,56 +545,6 @@ protected:
   /// meaning it will be killed when \ref symex_step concludes.
   void lift_let(statet &state, const let_exprt &let_expr);
 
-  void symex_assign_rec(
-    statet &,
-    const exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_symbol(
-    statet &,
-    const ssa_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    const exprt::operandst &,
-    assignment_typet);
-  void symex_assign_typecast(
-    statet &,
-    const typecast_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_array(
-    statet &,
-    const index_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_struct_member(
-    statet &,
-    const member_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_if(
-    statet &,
-    const if_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_byte_extract(
-    statet &,
-    const byte_extract_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-
   virtual void
   symex_va_start(statet &, const exprt &lhs, const side_effect_exprt &);
 
@@ -734,5 +684,27 @@ renamedt<exprt, L2> try_evaluate_pointer_comparisons(
   const value_sett &value_set,
   const irep_idt &language_mode,
   const namespacet &ns);
+
+void symex_assign_symbol(
+  goto_symex_statet &state,
+  const ssa_exprt &lhs, // L1
+  const exprt &full_lhs,
+  const exprt &rhs,
+  const exprt::operandst &guard,
+  symex_targett::assignment_typet assignment_type,
+  const namespacet &ns,
+  const symex_configt &symex_config,
+  symex_targett &target);
+
+void symex_assign_rec(
+  goto_symex_statet &state,
+  const exprt &lhs,
+  const exprt &full_lhs,
+  const exprt &rhs,
+  exprt::operandst &guard,
+  symex_targett::assignment_typet assignment_type,
+  const namespacet &ns,
+  const symex_configt &symex_config,
+  symex_targett &target);
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

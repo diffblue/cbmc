@@ -189,7 +189,10 @@ void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
     nil_exprt(),
     let_value,
     value_assignment_guard,
-    symex_targett::assignment_typet::HIDDEN);
+    symex_targett::assignment_typet::HIDDEN,
+    ns,
+    symex_config,
+    target);
 
   // Schedule the bound variable to be cleaned up at the end of symex_step:
   instruction_local_symbols.push_back(let_expr.symbol());
