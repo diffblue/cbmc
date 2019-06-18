@@ -221,7 +221,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
 
-#if 0
+#ifdef DEBUG
   std::cout << "Assigning " << l1_identifier << '\n';
   value_set.output(std::cout);
   std::cout << "**********************\n";
