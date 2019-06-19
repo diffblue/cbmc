@@ -112,8 +112,7 @@ static std::string clean_identifier(const irep_idt &id)
 
 void expr2ct::get_shorthands(const exprt &expr)
 {
-  find_symbols_sett symbols;
-  find_symbols_or_nexts(expr, symbols);
+  const std::unordered_set<irep_idt> symbols = find_symbol_identifiers(expr);
 
   // avoid renaming parameters, if possible
   for(const auto &symbol_id : symbols)
