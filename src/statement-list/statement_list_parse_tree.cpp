@@ -99,12 +99,14 @@ void statement_list_parse_treet::clear()
 {
   function_blocks.clear();
   functions.clear();
+  tags.clear();
 }
 
 void statement_list_parse_treet::swap(statement_list_parse_treet &other)
 {
   function_blocks.swap(other.function_blocks);
   functions.swap(other.functions);
+  tags.swap(other.tags);
 }
 
 statement_list_parse_treet::functiont::functiont(
@@ -121,8 +123,7 @@ void statement_list_parse_treet::instructiont::add_token(const codet &token)
 }
 
 statement_list_parse_treet::var_declarationt::var_declarationt(
-  const irep_idt &identifier,
-  const typet &type)
-  : variable(symbol_exprt(identifier, type))
+  const symbol_exprt &symbol)
+  : variable(symbol)
 {
 }

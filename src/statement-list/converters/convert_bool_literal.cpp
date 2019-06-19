@@ -20,9 +20,6 @@ constant_exprt convert_bool_literal(const std::string &src)
 {
   std::string copy;
   transform(begin(src), end(src), back_inserter(copy), ::tolower);
-
   bool_typet type;
-  type.set(ID_statement_list_type, ID_statement_list_bool);
-
   return constant_exprt(copy, type);
 }

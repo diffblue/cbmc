@@ -13,24 +13,15 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_parse_tree.h"
 #include "statement_list_parse_tree_io.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <iterator>
 #include <util/expr.h>
 
 statement_list_parsert statement_list_parser;
 
 extern char *yystatement_listtext;
-
-bool statement_list_parsert::parse()
-{
-  return yystatement_listparse() != 0;
-}
-
-int yystatement_listerror(const std::string &error)
-{
-  statement_list_parser.parse_error(error, yystatement_listtext);
-  return 0;
-}
 
 /// Searches for the name of the TIA module inside of its root
 /// expression.
@@ -45,6 +36,16 @@ static irep_idt find_name(const exprt &root)
       return op.get(ID_value);
   }
   UNREACHABLE; // Root expression should always have a name
+}
+
+void statement_list_parsert::add_tag_list(const exprt &tag_list)
+{
+  const exprt::operandst &ops = tag_list.operands();
+  transform(
+    begin(ops),
+    end(ops),
+    std::back_inserter(parse_tree.tags),
+    static_cast<const symbol_exprt &(*)(const exprt &)>(to_symbol_expr));
 }
 
 /// Searches for the version of the TIA module inside of its root
@@ -66,7 +67,7 @@ static std::string find_version(const exprt &root)
 /// expression.
 /// \param root: Expression that includes the function's return type as a
 ///   direct operand.
-/// \return The return value of the function.
+/// \return The return type of the function.
 static typet find_return_value(const exprt &root)
 {
   INVARIANT(
@@ -97,209 +98,60 @@ static exprt find_variable_list(const exprt &root)
   UNREACHABLE; // Root expression should always have a variable list
 }
 
-/// Adds all input variable declarations to the given element.
-/// \param module: The TIA element to which the variables belong.
-/// \param input_vars: The root expression of a input variable list.
-static void fill_input_vars(
-  statement_list_parse_treet::tia_modulet &module,
-  const exprt &input_vars)
+/// Adds all variable declarations (which can have a default value) to the
+/// given list.
+/// \param parse_tree_list: The list to fill with all declarations.
+/// \param var_list: The root expression of a variable list with optional
+///   default values.
+static void fill_vars_with_default_values(
+  statement_list_parse_treet::var_declarationst &parse_tree_list,
+  const exprt &var_list)
 {
-  for(const exprt &entry : input_vars.operands())
+  for(const exprt &entry : var_list.operands())
   {
-    std::vector<irep_idt> identifiers;
-    typet type;
+    std::vector<symbol_exprt> symbols;
     exprt default_value = nil_exprt();
     for(const exprt &part : entry.operands())
     {
       const symbol_exprt *const symbol =
         expr_try_dynamic_cast<symbol_exprt>(part);
       if(symbol)
-        identifiers.push_back(symbol->get_identifier());
-      else if(part.get(ID_statement_list_type) == ID_statement_list_type_name)
-        type = typet(part.id());
+        symbols.push_back(*symbol);
       else
         default_value = part;
     }
 
-    for(const irep_idt &identifier : identifiers)
+    for(const symbol_exprt &symbol : symbols)
     {
-      statement_list_parse_treet::var_declarationt declaration{identifier,
-                                                               type};
+      statement_list_parse_treet::var_declarationt declaration{symbol};
       if(default_value.is_not_nil())
         declaration.default_value = default_value;
-      module.add_var_input_entry(declaration);
+      parse_tree_list.push_back(declaration);
     }
   }
 }
 
-/// Adds all inout variable declarations to the given module.
-/// \param module: The TIA element to which the variables belong.
-/// \param inout_vars: The root expression of a inout variable list.
-static void fill_inout_vars(
-  statement_list_parse_treet::tia_modulet &module,
-  const exprt &inout_vars)
-{
-  for(const exprt &entry : inout_vars.operands())
-  {
-    std::vector<irep_idt> identifiers;
-    typet type;
-    exprt default_value = nil_exprt();
-    for(const exprt &part : entry.operands())
-    {
-      const symbol_exprt *const symbol =
-        expr_try_dynamic_cast<symbol_exprt>(part);
-      if(symbol)
-        identifiers.push_back(symbol->get_identifier());
-      else if(part.get(ID_statement_list_type) == ID_statement_list_type_name)
-        type = typet(part.id());
-      else
-        default_value = part;
-    }
-
-    for(const irep_idt &identifier : identifiers)
-    {
-      statement_list_parse_treet::var_declarationt declaration{identifier,
-                                                               type};
-      if(default_value.is_not_nil())
-        declaration.default_value = default_value;
-      module.add_var_inout_entry(declaration);
-    }
-  }
-}
-
-/// Adds all output variable declarations to the given module.
-/// \param module: The TIA element to which the variables belong.
-/// \param output_vars: The root expression of a output variable list.
-static void fill_output_vars(
-  statement_list_parse_treet::tia_modulet &module,
-  const exprt &output_vars)
-{
-  for(const exprt &entry : output_vars.operands())
-  {
-    std::vector<irep_idt> identifiers;
-    typet type;
-    exprt default_value = nil_exprt();
-    for(const exprt &part : entry.operands())
-    {
-      const symbol_exprt *const symbol =
-        expr_try_dynamic_cast<symbol_exprt>(part);
-      if(symbol)
-        identifiers.push_back(symbol->get_identifier());
-      else if(part.get(ID_statement_list_type) == ID_statement_list_type_name)
-        type = typet(part.id());
-      else
-        default_value = part;
-    }
-
-    for(const irep_idt &identifier : identifiers)
-    {
-      statement_list_parse_treet::var_declarationt declaration{identifier,
-                                                               type};
-      if(default_value.is_not_nil())
-        declaration.default_value = default_value;
-      module.add_var_output_entry(declaration);
-    }
-  }
-}
-
-/// Adds all temp variable declarations to the given module.
-/// \param module: The TIA element to which the variables belong.
+/// Adds all temp variable declarations (variable declarations which can't have
+/// a default value) to the given list.
+/// \param parse_tree_list: The list to fill with all declarations.
 /// \param temp_vars: The root expression of a temp variable list.
 static void fill_temp_vars(
-  statement_list_parse_treet::tia_modulet &module,
+  statement_list_parse_treet::var_declarationst &parse_tree_list,
   const exprt &temp_vars)
 {
   for(const exprt &entry : temp_vars.operands())
   {
-    std::vector<irep_idt> identifiers;
-    typet type;
     for(const exprt &part : entry.operands())
     {
       const symbol_exprt *const symbol =
         expr_try_dynamic_cast<symbol_exprt>(part);
       if(symbol)
-        identifiers.push_back(symbol->get_identifier());
-      else if(part.get(ID_statement_list_type) == ID_statement_list_type_name)
-        type = typet(part.id());
+      {
+        statement_list_parse_treet::var_declarationt declaration{*symbol};
+        parse_tree_list.push_back(declaration);
+      }
       else
-        UNREACHABLE; // Temp vars should have no initial value.
-    }
-
-    for(const irep_idt &identifier : identifiers)
-    {
-      statement_list_parse_treet::var_declarationt declaration{identifier,
-                                                               type};
-      module.add_var_temp_entry(declaration);
-    }
-  }
-}
-
-/// Adds all constant variable declarations to the given module.
-/// \param module: The TIA element to which the variables belong.
-/// \param constant_vars: The root expression of a constant variable list.
-static void fill_constant_vars(
-  statement_list_parse_treet::tia_modulet &module,
-  const exprt &constant_vars)
-{
-  for(const exprt &entry : constant_vars.operands())
-  {
-    std::vector<irep_idt> identifiers;
-    typet type;
-    exprt default_value = nil_exprt();
-    for(const exprt &part : entry.operands())
-    {
-      const symbol_exprt *const symbol =
-        expr_try_dynamic_cast<symbol_exprt>(part);
-      if(symbol)
-        identifiers.push_back(symbol->get_identifier());
-      else if(part.get(ID_statement_list_type) == ID_statement_list_type_name)
-        type = typet(part.id());
-      else
-        default_value = part;
-    }
-
-    for(const irep_idt &identifier : identifiers)
-    {
-      statement_list_parse_treet::var_declarationt declaration{identifier,
-                                                               type};
-      if(!default_value.is_nil())
-        declaration.default_value = default_value;
-      module.add_var_constant_entry(declaration);
-    }
-  }
-}
-
-/// Adds all static variable declarations to the given function block.
-/// \param block: The TIA element to which the variables belong.
-/// \param static_vars: The root expression of a static variable list.
-static void fill_static_vars(
-  statement_list_parse_treet::function_blockt &block,
-  const exprt &static_vars)
-{
-  for(const exprt &entry : static_vars.operands())
-  {
-    std::vector<irep_idt> identifiers;
-    typet type;
-    exprt default_value = nil_exprt();
-    for(const exprt &part : entry.operands())
-    {
-      const symbol_exprt *const symbol =
-        expr_try_dynamic_cast<symbol_exprt>(part);
-      if(symbol)
-        identifiers.push_back(symbol->get_identifier());
-      else if(part.get(ID_statement_list_type) == ID_statement_list_type_name)
-        type = typet(part.id());
-      else
-        default_value = part;
-    }
-
-    for(const irep_idt &identifier : identifiers)
-    {
-      statement_list_parse_treet::var_declarationt declaration{identifier,
-                                                               type};
-      if(default_value.is_not_nil())
-        declaration.default_value = default_value;
-      block.add_var_static_entry(declaration);
+        UNREACHABLE; // Temp variables should not have an initial value.
     }
   }
 }
@@ -314,15 +166,15 @@ static void find_variables(
   for(const exprt &decls : var_decls.operands())
   {
     if(decls.id() == ID_statement_list_var_input)
-      fill_input_vars(function, decls);
+      fill_vars_with_default_values(function.var_input, decls);
     else if(decls.id() == ID_statement_list_var_inout)
-      fill_inout_vars(function, decls);
+      fill_vars_with_default_values(function.var_inout, decls);
     else if(decls.id() == ID_statement_list_var_output)
-      fill_output_vars(function, decls);
+      fill_vars_with_default_values(function.var_output, decls);
     else if(decls.id() == ID_statement_list_var_constant)
-      fill_constant_vars(function, decls);
+      fill_vars_with_default_values(function.var_constant, decls);
     else if(decls.id() == ID_statement_list_var_temp)
-      fill_temp_vars(function, decls);
+      fill_temp_vars(function.var_temp, decls);
   }
 }
 
@@ -335,18 +187,18 @@ static void find_variables(
 {
   for(const exprt &decls : var_decls.operands())
   {
-    if(decls.id() == ID_statement_list_var_input)
-      fill_input_vars(block, decls);
-    else if(decls.id() == ID_statement_list_var_inout)
-      fill_inout_vars(block, decls);
-    else if(decls.id() == ID_statement_list_var_output)
-      fill_output_vars(block, decls);
-    else if(decls.id() == ID_statement_list_var_static)
-      fill_static_vars(block, decls);
-    else if(decls.id() == ID_statement_list_var_constant)
-      fill_constant_vars(block, decls);
-    else if(decls.id() == ID_statement_list_var_temp)
-      fill_temp_vars(block, decls);
+    if(ID_statement_list_var_input == decls.id())
+      fill_vars_with_default_values(block.var_input, decls);
+    else if(ID_statement_list_var_inout == decls.id())
+      fill_vars_with_default_values(block.var_inout, decls);
+    else if(ID_statement_list_var_output == decls.id())
+      fill_vars_with_default_values(block.var_output, decls);
+    else if(ID_statement_list_var_static == decls.id())
+      fill_vars_with_default_values(block.var_static, decls);
+    else if(ID_statement_list_var_constant == decls.id())
+      fill_vars_with_default_values(block.var_constant, decls);
+    else if(ID_statement_list_var_temp == decls.id())
+      fill_temp_vars(block.var_temp, decls);
   }
 }
 
@@ -425,15 +277,15 @@ static void find_networks(
 {
   for(const exprt &expr_network : network_list.operands())
   {
-    std::string title(find_network_title(expr_network));
+    const std::string title(find_network_title(expr_network));
     statement_list_parse_treet::networkt network(title);
-    exprt instructions = find_network_instructions(expr_network);
+    const exprt instructions = find_network_instructions(expr_network);
     find_instructions(network, instructions);
     module.add_network(network);
   }
 }
 
-void statement_list_parsert::add_function_block(exprt &block)
+void statement_list_parsert::add_function_block(const exprt &block)
 {
   INVARIANT(
     block.id() == ID_statement_list_function_block,
@@ -444,15 +296,13 @@ void statement_list_parsert::add_function_block(exprt &block)
                                                  find_version(block)};
 
   // Fill the block with networks and variables.
-  exprt var_list = find_variable_list(block);
-  find_variables(fb, var_list);
-  exprt network_list = find_network_list(block);
-  find_networks(fb, network_list);
+  find_variables(fb, find_variable_list(block));
+  find_networks(fb, find_network_list(block));
 
   parse_tree.add_function_block(fb);
 }
 
-void statement_list_parsert::add_function(exprt &function)
+void statement_list_parsert::add_function(const exprt &function)
 {
   INVARIANT(
     function.id() == ID_statement_list_function,
@@ -463,12 +313,21 @@ void statement_list_parsert::add_function(exprt &function)
     find_name(function), find_version(function), find_return_value(function)};
 
   // Fill the function with networks and variables.
-  exprt var_decls = find_variable_list(function);
-  find_variables(fn, var_decls);
-  exprt network_list = find_network_list(function);
-  find_networks(fn, network_list);
+  find_variables(fn, find_variable_list(function));
+  find_networks(fn, find_network_list(function));
 
   parse_tree.add_function(fn);
+}
+
+bool statement_list_parsert::parse()
+{
+  return yystatement_listparse() != 0;
+}
+
+int yystatement_listerror(const std::string &error)
+{
+  statement_list_parser.parse_error(error, yystatement_listtext);
+  return 0;
 }
 
 void statement_list_parsert::clear()

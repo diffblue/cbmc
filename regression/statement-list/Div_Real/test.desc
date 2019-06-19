@@ -5,7 +5,9 @@ main.awl
 ^SIGNAL=0$
 ^Name: "Div_Real"$
 ^Version: 0[.]1$
-^  \* type: statement_list_real$
+^  \* type: floatbv$
+^      \* width: 32$
+^      \* f: 23$
 ^  \* identifier: "I0[.]0"$
 ^  \* identifier: "I0[.]1"$
 ^  \* identifier: "O0[.]0"$

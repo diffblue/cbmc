@@ -21,14 +21,24 @@ void output_parse_tree(
   {
     out << "============== Function Block ==============\n";
     output_function_block(out, function_block);
-    out << "\n";
+    out << '\n';
   }
 
   for(const auto &function : parse_tree.functions)
   {
     out << "================= Function =================\n";
     output_function(out, function);
-    out << "\n";
+    out << '\n';
+  }
+
+  if(!parse_tree.tags.empty())
+  {
+    out << "================= Tag List =================\n";
+    for(const auto &tag : parse_tree.tags)
+    {
+      out << tag.pretty();
+      out << '\n';
+    }
   }
 }
 
@@ -133,7 +143,7 @@ void output_var_declaration(
   std::ostream &out,
   const statement_list_parse_treet::var_declarationt &declaration)
 {
-  out << declaration.variable.pretty() << "\n";
+  out << declaration.variable.pretty() << '\n';
   out << "  * default_value: ";
   if(declaration.default_value)
     out << declaration.default_value->get(ID_value);
@@ -149,7 +159,7 @@ void output_network_list(
   for(const auto &network : networks)
   {
     output_network(out, network);
-    out << "\n";
+    out << '\n';
   }
 }
 
@@ -157,15 +167,15 @@ void output_network(
   std::ostream &out,
   const statement_list_parse_treet::networkt &network)
 {
-  out << "Title: " << network.title.value_or(NO_VALUE) << "\n";
+  out << "Title: " << network.title.value_or(NO_VALUE) << '\n';
   out << "Instructions: ";
   if(network.instructions.empty())
     out << NO_VALUE;
-  out << "\n";
+  out << '\n';
   for(const auto &instruction : network.instructions)
   {
     output_instruction(out, instruction);
-    out << "\n";
+    out << '\n';
   }
 }
 
@@ -179,9 +189,9 @@ void output_instruction(
     for(const auto &expr : token.operands())
     {
       if(expr.id() == ID_symbol)
-        out << "\t" << expr.get(ID_identifier);
+        out << '\t' << expr.get(ID_identifier);
       else if(expr.id() == ID_constant)
-        out << "\t" << expr.get(ID_value);
+        out << '\t' << expr.get(ID_value);
       else if(can_cast_expr<equal_exprt>(expr))
       {
         const equal_exprt eq = to_equal_expr(expr);
@@ -189,7 +199,7 @@ void output_instruction(
             << " := " << eq.rhs().get(ID_identifier);
       }
       else
-        out << "\t" << expr.id();
+        out << '\t' << expr.id();
     }
   }
 }

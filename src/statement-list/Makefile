@@ -1,8 +1,10 @@
 SRC = converters/convert_bool_literal.cpp \
+      converters/convert_dint_literal.cpp \
       converters/convert_int_literal.cpp \
       converters/convert_real_literal.cpp \
       converters/convert_string_value.cpp \
       converters/expr2statement_list.cpp \
+      converters/statement_list_types.cpp \
       statement_list_language.cpp \
       statement_list_lex.yy.cpp \
       statement_list_parse_tree.cpp \

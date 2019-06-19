@@ -16,6 +16,7 @@
 
 #include "statement_list_parser.h"
 #include "converters/convert_string_value.h"
+#include "converters/statement_list_types.h"
 #include <util/std_expr.h>
 #include <iterator>
 
@@ -59,6 +60,8 @@ extern char *yystatement_listtext;
 %token TOK_END_VAR              "END_VAR"
 %token TOK_NETWORK              "NETWORK"
 %token TOK_TITLE                "TITLE"
+%token TOK_TAG                  "TAG"
+%token TOK_END_TAG              "END_TAG"
 
 /*** Siemens types ***********************************************************/
 %token TOK_INT                  "Int"
@@ -72,8 +75,10 @@ extern char *yystatement_listtext;
 %token TOK_TRANSFER             "T"
 %token TOK_CALL                 "CALL"
 %token TOK_NOP                  "NOP"
-%token TOK_SET                  "SET"
-%token TOK_CLR                  "CLR"
+%token TOK_SET_RLO              "SET"
+%token TOK_CLR_RLO              "CLR"
+%token TOK_SET                  "S"
+%token TOK_RESET                "R"
 %token TOK_NOT                  "NOT"
 %token TOK_AND                  "A"
 %token TOK_AND_NOT              "AN"
@@ -129,6 +134,7 @@ extern char *yystatement_listtext;
 init:
     init FB_Decl
     | init Func_Decl
+    | init Tag_Decl
     | /* nothing */
     ;
 
@@ -137,7 +143,8 @@ Var_Decl_Init:
     Variable_List ':' Simple_Spec_Init
     {
       $$ = $1;
-      parser_stack($$).add_to_operands(std::move(parser_stack($3)));
+      for(auto &sym : parser_stack($$).operands())
+        sym = symbol_exprt(sym.get(ID_identifier), parser_stack($3).type());
     }
     ;
 
@@ -178,11 +185,6 @@ Simple_Spec_Init:
     
 Simple_Spec:
     Elem_Type_Name
-    {
-      $$ = $1;
-      parser_stack($$).set(ID_statement_list_type, 
-        ID_statement_list_type_name);
-    }
     ;
 
 Elem_Type_Name:
@@ -204,7 +206,7 @@ Sign_Int_Type_Name:
     TOK_INT
     {
       $$ = $1;
-      parser_stack($$).id(ID_statement_list_int);
+      parser_stack($$).type() = get_int_type();
     }
     ;
 
@@ -216,7 +218,7 @@ Sign_DInt_Type_Name:
     TOK_DINT
     {
       $$ = $1;
-      parser_stack($$).id(ID_statement_list_dint);
+      parser_stack($$).type() = get_dint_type();
     }
     ;
 
@@ -224,7 +226,7 @@ Real_Type_Name:
     TOK_REAL
     {
       $$ = $1;
-      parser_stack($$).id(ID_statement_list_real);
+      parser_stack($$).type() = get_real_type();
     }
     ;
     
@@ -232,7 +234,7 @@ Bool_Type_Name:
     TOK_BOOL
     {
       $$ = $1;
-      parser_stack($$).id(ID_statement_list_bool);
+      parser_stack($$).type() = get_bool_type();
     }
     
 Opt_Assignment:
@@ -867,16 +869,26 @@ IL_Simple_Operator:
       $$ = $1;
       parser_stack($$).id(ID_statement_list_assign);
     }
+    | TOK_SET_RLO
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_set_rlo);
+    }
+    | TOK_CLR_RLO
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_clr_rlo);
+    } 
     | TOK_SET
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_set);
     }
-    | TOK_CLR
+    | TOK_RESET
     {
       $$ = $1;
-      parser_stack($$).id(ID_statement_list_clr);
-    }  
+      parser_stack($$).id(ID_statement_list_reset);
+    } 
     | TOK_NOT
     {
       $$ = $1;
@@ -934,12 +946,6 @@ Callee_Name:
       parser_stack($$) = 
         symbol_exprt::typeless(parser_stack($1).get(ID_value));
     }
-    | Derived_FB_Name
-    {
-      newstack($$);
-      parser_stack($$) = 
-        symbol_exprt::typeless(parser_stack($1).get(ID_value));
-    }
     ;
     
 Opt_Param_List:
@@ -970,8 +976,8 @@ Param_Assignment:
     Variable_Name TOK_ASSIGNMENT Variable_Access
     {
       newstack($$);
-      parser_stack($$) = equal_exprt(std::move(parser_stack($1)), 
-        std::move(parser_stack($3)));
+      parser_stack($$) = equal_exprt{std::move(parser_stack($1)), 
+        std::move(parser_stack($3))};
     }
     ;
 Opt_Data_Block:
@@ -984,6 +990,37 @@ Opt_Data_Block:
     | /* nothing */
     {
       newstack($$);
+    }
+    ;
+
+// Tag declaration
+Tag_Decl:
+    TOK_TAG Opt_Tag_List TOK_END_TAG
+    {
+      PARSER.add_tag_list(parser_stack($2));
+    }
+    ;
+    
+Opt_Tag_List:
+    Tag_List
+    | /* nothing */
+    {
+      newstack($$);
+    }
+    ;
+    
+Tag_List:
+    Tag_List Variable_Name Simple_Spec_Init
+    {
+      $$ = $1;
+      symbol_exprt sym{parser_stack($2).get(ID_identifier), parser_stack($3).type()};
+      parser_stack($$).add_to_operands(std::move(sym));
+    }
+    | Variable_Name Simple_Spec_Init
+    {
+      newstack($$);
+      symbol_exprt sym{parser_stack($1).get(ID_identifier), parser_stack($2).type()};
+      parser_stack($$).add_to_operands(std::move(sym));
     }
     ;
 %%
