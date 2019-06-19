@@ -479,11 +479,23 @@ static std::vector<mp_integer> eval_format_specifier(
     return deserialize_constant_int_arg(arg, 10);
   }
   case format_specifiert::HEXADECIMAL_INTEGER:
+  {
     if(eval_is_null(arg))
       return std::vector<mp_integer>{'n', 'u', 'l', 'l'};
-    UNIMPLEMENTED;
+    auto upper_case_hex = deserialize_constant_int_arg(arg, 16);
+    // convert to lower case
+    return make_range(upper_case_hex).map([](const mp_integer &c) {
+      if('A' <= c && c <= 'Z')
+        return c + 0x20;
+      return c;
+    });
+  }
   case format_specifiert::HEXADECIMAL_INTEGER_UPPER:
-    UNIMPLEMENTED;
+  {
+    if(eval_is_null(arg))
+      return std::vector<mp_integer>{'n', 'u', 'l', 'l'};
+    return deserialize_constant_int_arg(arg, 16);
+  }
   case format_specifiert::SCIENTIFIC:
     UNIMPLEMENTED;
   case format_specifiert::DECIMAL_FLOAT:
