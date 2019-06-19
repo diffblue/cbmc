@@ -108,6 +108,16 @@ SCENARIO(
           const symbol_exprt rhs_symbol = to_symbol_expr(rhs_if->false_case());
           REQUIRE(rhs_symbol.get_identifier() == "foo!0#0");
         }
+        THEN("ssa_full_lhs is foo!0#1")
+        {
+          REQUIRE(
+            to_symbol_expr(step.ssa_full_lhs).get_identifier() == "foo!0#1");
+        }
+        THEN("original_full_lhs is foo")
+        {
+          REQUIRE(
+            to_symbol_expr(step.original_full_lhs).get_identifier() == "foo");
+        }
       }
     }
   }
