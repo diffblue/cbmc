@@ -19,6 +19,9 @@ class goto_symex_statet;
 class ssa_exprt;
 struct symex_configt;
 
+/// Record the assignment of value \p rhs to variable \p lhs in \p state and add
+/// the equation to target: `lhs#{n+1} == guard ? rhs#{m} : lhs#{n}`
+/// where {n} and {m} denote the current L2 indexes of lhs and rhs respectively.
 void symex_assign_symbol(
   goto_symex_statet &state,
   const ssa_exprt &lhs, // L1
