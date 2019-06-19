@@ -716,7 +716,7 @@ void goto_programt::instructiont::validate(
   auto expr_symbol_finder = [&](const exprt &e) {
     find_symbols_sett typetags;
     find_type_symbols(e.type(), typetags);
-    find_symbols(e, typetags);
+    find_symbols_or_nexts(e, typetags);
     const symbolt *symbol;
     for(const auto &identifier : typetags)
     {

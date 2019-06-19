@@ -111,9 +111,7 @@ void bv_refinementt::freeze_lazy_constraints()
 
   for(const auto &constraint : lazy_array_constraints)
   {
-    std::set<symbol_exprt> symbols_in_constraint;
-    find_symbols(constraint.lazy, symbols_in_constraint);
-    for(const auto &symbol : symbols_in_constraint)
+    for(const auto &symbol : find_symbols(constraint.lazy))
     {
       const bvt bv=convert_bv(symbol);
       forall_literals(b_it, bv)
