@@ -65,6 +65,18 @@ TEST_CASE("Build subexpression to access element at offset into array")
                           from_integer(1, index_type()),
                           small_t));
   }
+
+  {
+    const signedbv_typet int16_t(16);
+    const auto result = get_subexpression_at_offset(a, 3, int16_t, ns);
+    // At offset 3 there are only 8 bits remaining in an element of type t so
+    // not enough to fill a 16 bit int, so this cannot be transformed in an
+    // index_exprt.
+    REQUIRE(
+      result.value() ==
+      byte_extract_exprt(
+        byte_extract_id(), a, from_integer(3, index_type()), int16_t));
+  }
 }
 
 TEST_CASE("Build subexpression to access element at offset into struct")
