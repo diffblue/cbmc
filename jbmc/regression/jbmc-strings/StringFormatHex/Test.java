@@ -19,4 +19,16 @@ public class Test {
     String u = String.format("di%xblue", 255);
     assert u.length() != 8;
   }
+
+  public static String testHexEval() {
+    String u = String.format("di%xblue", 255);
+    assert false;
+    return u;
+  }
+
+  public static String testHexEvalUpper() {
+    String u = String.format("di%Xblue", 255);
+    assert false;
+    return u;
+  }
 }
