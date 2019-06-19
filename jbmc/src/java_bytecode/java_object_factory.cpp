@@ -153,6 +153,13 @@ private:
     const exprt &max_length_expr,
     const source_locationt &location);
 
+  using element_generatort = std::function<code_blockt(
+    const exprt &element_at_counter,
+    const update_in_placet &update_in_place,
+    const typet &element_type,
+    const size_t depth,
+    const source_locationt &location)>;
+
   void array_loop_init_code(
     code_blockt &assignments,
     const exprt &init_array_expr,
@@ -161,7 +168,8 @@ private:
     const exprt &max_length_expr,
     size_t depth,
     update_in_placet update_in_place,
-    const source_locationt &location);
+    const source_locationt &location,
+    const element_generatort &element_generator);
 
   code_blockt assign_element(
     const exprt &element_at_counter,
@@ -1243,7 +1251,8 @@ void java_object_factoryt::array_loop_init_code(
   const exprt &max_length_expr,
   size_t depth,
   update_in_placet update_in_place,
-  const source_locationt &location)
+  const source_locationt &location,
+  const element_generatort &element_generator)
 {
   const symbol_exprt &array_init_symexpr =
     allocate_objects.allocate_automatic_local_object(
@@ -1290,7 +1299,7 @@ void java_object_factoryt::array_loop_init_code(
   const dereference_exprt element_at_counter =
     array_element_from_pointer(array_init_symexpr, counter_expr);
 
-  assignments.append(assign_element(
+  assignments.append(element_generator(
     element_at_counter, update_in_place, element_type, depth, location));
   exprt java_one = from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
@@ -1362,7 +1371,16 @@ void java_object_factoryt::gen_nondet_array_init(
       max_length_expr,
       depth,
       update_in_place,
-      location);
+      location,
+      [this](
+        const exprt &element_at_counter,
+        const update_in_placet &update_in_place,
+        const typet &element_type,
+        const size_t depth,
+        const source_locationt &location) -> code_blockt {
+        return assign_element(
+          element_at_counter, update_in_place, element_type, depth, location);
+      });
   }
   else
   {
