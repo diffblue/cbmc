@@ -15,6 +15,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "statement_list_parse_tree.h"
 #include <langapi/language.h>
 #include <util/make_unique.h>
+#include <util/object_factory_parameters.h>
 
 /// Implements the language interface for the Statement List language.
 /// Includes functions for parsing input streams and for converting the
@@ -109,6 +110,7 @@ public:
 private:
   statement_list_parse_treet parse_tree;
   std::string parse_path;
+  object_factory_parameterst params;
 };
 
 std::unique_ptr<languaget> new_statement_list_language();
