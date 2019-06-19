@@ -88,6 +88,16 @@ std::set<symbol_exprt> find_symbols(const exprt &src)
     .map([](const exprt &e) { return to_symbol_expr(e); });
 }
 
+std::unordered_set<irep_idt> find_symbol_identifiers(const exprt &src)
+{
+  std::unordered_set<irep_idt> result;
+  src.visit_pre([&](const exprt &e) {
+    if(e.id() == ID_symbol)
+      result.insert(to_symbol_expr(e).get_identifier());
+  });
+  return result;
+}
+
 void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest);
 
 void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)

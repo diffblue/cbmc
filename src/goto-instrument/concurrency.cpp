@@ -131,10 +131,8 @@ void concurrency_instrumentationt::instrument(
 
 void concurrency_instrumentationt::collect(const exprt &expr)
 {
-  for(const auto &symbol_expr : find_symbols(expr))
+  for(const auto &identifier : find_symbol_identifiers(expr))
   {
-    const irep_idt &identifier = symbol_expr.get_identifier();
-
     namespacet ns(symbol_table);
     const symbolt &symbol = ns.lookup(identifier);
 

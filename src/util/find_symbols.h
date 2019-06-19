@@ -63,6 +63,9 @@ void find_symbols(
 /// Find sub expressions with id ID_symbol
 std::set<symbol_exprt> find_symbols(const exprt &src);
 
+/// Find identifiers of the sub expressions with id ID_symbol
+std::unordered_set<irep_idt> find_symbol_identifiers(const exprt &src);
+
 /// \return true if one of the symbols in \p src is present in \p symbols
 bool has_symbol(
   const exprt &src,
