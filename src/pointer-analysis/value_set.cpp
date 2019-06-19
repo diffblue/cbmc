@@ -211,7 +211,7 @@ void value_sett::output(std::ostream &out, const std::string &indent) const
       {
         out << ", ";
         if(width >= 40)
-          out << "\n" << std::string(' ', indent.size()) << "      ";
+          out << "\n" << std::string(indent.size(), ' ') << "      ";
       }
     }
 
