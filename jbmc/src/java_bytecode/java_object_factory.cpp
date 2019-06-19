@@ -162,6 +162,13 @@ private:
     size_t depth,
     update_in_placet update_in_place,
     const source_locationt &location);
+
+  code_blockt assign_element(
+    const exprt &element_at_counter,
+    update_in_placet update_in_place,
+    const typet &element_type,
+    size_t depth,
+    const source_locationt &location);
 };
 
 /// Initializes the pointer-typed lvalue expression `expr` to point to an object
@@ -1133,6 +1140,66 @@ void java_object_factoryt::array_primitive_init_code(
   assignments.statements().back().add_source_location() = location;
 }
 
+/// Generate codet for assigning an individual element inside the array
+code_blockt java_object_factoryt::assign_element(
+  const exprt &element_at_counter,
+  const update_in_placet update_in_place,
+  const typet &element_type,
+  const size_t depth,
+  const source_locationt &location)
+{
+  code_blockt assignments;
+  bool new_item_is_primitive = element_at_counter.type().id() != ID_pointer;
+
+  // Use a temporary to initialise a new, or update an existing, non-primitive.
+  // This makes it clearer that in a sequence like
+  // `new_array_item->x = y; new_array_item->z = w;` that all the
+  // `new_array_item` references must alias, cf. the harder-to-analyse
+  // `some_expr[idx]->x = y; some_expr[idx]->z = w;`
+  exprt init_expr;
+  if(new_item_is_primitive)
+  {
+    init_expr = element_at_counter;
+  }
+  else
+  {
+    init_expr = allocate_objects.allocate_automatic_local_object(
+      element_at_counter.type(), "new_array_item");
+
+    // If we're updating an existing array item, read the existing object that
+    // we (may) alter:
+    if(update_in_place != update_in_placet::NO_UPDATE_IN_PLACE)
+      assignments.add(code_assignt(init_expr, element_at_counter));
+  }
+
+  // MUST_UPDATE_IN_PLACE only applies to this object.
+  // If this is a pointer to another object, offer the chance
+  // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
+  update_in_placet child_update_in_place=
+    update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE ?
+    update_in_placet::MAY_UPDATE_IN_PLACE :
+    update_in_place;
+  gen_nondet_init(
+    assignments,
+    init_expr,
+    false, // is_sub
+    false, // skip_classid
+    // These are variable in number, so use dynamic allocator:
+    lifetimet::DYNAMIC,
+    element_type, // override
+    depth,
+    child_update_in_place,
+    location);
+
+  if(!new_item_is_primitive)
+  {
+    // We used a temporary variable to update or initialise an array item;
+    // now write it into the array:
+    assignments.add(code_assignt(element_at_counter, init_expr));
+  }
+  return assignments;
+}
+
 /// Create code to nondeterministically initialize each element of an array in a
 /// loop.
 /// The code produced is of the form (supposing an array of type OBJ):
@@ -1223,56 +1290,9 @@ void java_object_factoryt::array_loop_init_code(
   const dereference_exprt element_at_counter =
     array_element_from_pointer(array_init_symexpr, counter_expr);
 
-  bool new_item_is_primitive = element_at_counter.type().id() != ID_pointer;
-
-  // Use a temporary to initialise a new, or update an existing, non-primitive.
-  // This makes it clearer that in a sequence like
-  // `new_array_item->x = y; new_array_item->z = w;` that all the
-  // `new_array_item` references must alias, cf. the harder-to-analyse
-  // `some_expr[idx]->x = y; some_expr[idx]->z = w;`
-  exprt init_expr;
-  if(new_item_is_primitive)
-  {
-    init_expr = element_at_counter;
-  }
-  else
-  {
-    init_expr = allocate_objects.allocate_automatic_local_object(
-      element_at_counter.type(), "new_array_item");
-
-    // If we're updating an existing array item, read the existing object that
-    // we (may) alter:
-    if(update_in_place != update_in_placet::NO_UPDATE_IN_PLACE)
-      assignments.add(code_assignt(init_expr, element_at_counter));
-  }
-
-  // MUST_UPDATE_IN_PLACE only applies to this object.
-  // If this is a pointer to another object, offer the chance
-  // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
-  update_in_placet child_update_in_place=
-    update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE ?
-    update_in_placet::MAY_UPDATE_IN_PLACE :
-    update_in_place;
-  gen_nondet_init(
-    assignments,
-    init_expr,
-    false, // is_sub
-    false, // skip_classid
-    // These are variable in number, so use dynamic allocator:
-    lifetimet::DYNAMIC,
-    element_type, // override
-    depth,
-    child_update_in_place,
-    location);
-
-  if(!new_item_is_primitive)
-  {
-    // We used a temporary variable to update or initialise an array item;
-    // now write it into the array:
-    assignments.add(code_assignt(element_at_counter, init_expr));
-  }
-
-  exprt java_one=from_integer(1, java_int_type());
+  assignments.append(assign_element(
+    element_at_counter, update_in_place, element_type, depth, location));
+  exprt java_one = from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
   assignments.add(std::move(incr));
