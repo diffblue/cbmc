@@ -89,13 +89,16 @@ public:
         symbol_table),
       log(log)
   {}
+  using element_generatort = std::function<
+    code_blockt(const exprt &element_at_counter, const typet &element_type)>;
 
   void gen_nondet_array_init(
     code_blockt &assignments,
     const exprt &expr,
     size_t depth,
-    update_in_placet,
-    const source_locationt &location);
+    update_in_placet update_in_place,
+    const source_locationt &location,
+    const element_generatort &element_generator);
 
   bool gen_nondet_enum_init(
     code_blockt &assignments,
@@ -153,8 +156,6 @@ private:
     const exprt &max_length_expr,
     const source_locationt &location);
 
-  using element_generatort = std::function<
-    code_blockt(const exprt &element_at_counter, const typet &element_type)>;
 
   void array_loop_init_code(
     code_blockt &assignments,
@@ -237,7 +238,21 @@ void java_object_factoryt::gen_pointer_target_init(
   if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
   {
     gen_nondet_array_init(
-      assignments, expr, depth + 1, update_in_place, location);
+      assignments,
+      expr,
+      depth + 1,
+      update_in_place,
+      location,
+      [this, update_in_place, depth, location](
+        const exprt &element_at_counter,
+        const typet &element_type) -> code_blockt {
+        return assign_element(
+          element_at_counter,
+          update_in_place,
+          element_type,
+          depth + 1,
+          location);
+      });
     return;
   }
   if(target_class_type.get_base("java::java.lang.Enum"))
@@ -1315,7 +1330,8 @@ void java_object_factoryt::gen_nondet_array_init(
   const exprt &expr,
   size_t depth,
   update_in_placet update_in_place,
-  const source_locationt &location)
+  const source_locationt &location,
+  const element_generatort &element_generator)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
@@ -1367,12 +1383,7 @@ void java_object_factoryt::gen_nondet_array_init(
       depth,
       update_in_place,
       location,
-      [this, update_in_place, depth, location](
-        const exprt &element_at_counter,
-        const typet &element_type) -> code_blockt {
-        return assign_element(
-          element_at_counter, update_in_place, element_type, depth, location);
-      });
+      element_generator);
   }
   else
   {
