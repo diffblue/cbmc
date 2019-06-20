@@ -445,6 +445,9 @@ public:
       concat_begin, concat_end);
   }
 
+  /// Combine two ranges to make a range over pairs
+  /// \tparam same_size: if true, cause an invariant violation in case the end
+  ///   is not reached simultaneously for both ranges
   template <bool same_size = true, typename other_iteratort>
   ranget<zip_iteratort<iteratort, other_iteratort, same_size>>
   zip(ranget<other_iteratort> other)
