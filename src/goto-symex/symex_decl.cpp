@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
-#include <pointer-analysis/add_failed_symbols.h>
-
 void goto_symext::symex_decl(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -44,42 +42,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
       return path_storage.get_unique_l1_index(l0_name, 1);
     },
     ns);
-  const irep_idt &l1_identifier = ssa.get_identifier();
 
-  // rename type to L2
-  state.rename(ssa.type(), l1_identifier, ns);
-  ssa.update_type();
-
-  // in case of pointers, put something into the value set
-  if(expr.type().id() == ID_pointer)
-  {
-    exprt rhs;
-    if(auto failed = get_failed_symbol(expr, ns))
-      rhs = address_of_exprt(*failed, to_pointer_type(expr.type()));
-    else
-      rhs=exprt(ID_invalid);
-
-    exprt l1_rhs = state.rename<L1>(std::move(rhs), ns).get();
-    state.value_set.assign(ssa, l1_rhs, ns, true, false);
-  }
-
-  // L2 renaming
-  const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
-  for(const auto &l1_symbol : find_symbols(fields))
-  {
-    ssa_exprt field_ssa = to_ssa_expr(l1_symbol);
-    std::size_t field_generation =
-      state.increase_generation(l1_symbol.get_identifier(), field_ssa);
-    CHECK_RETURN(field_generation == 1);
-  }
-
-  state.record_events.push(false);
-  exprt expr_l2 = state.rename(std::move(ssa), ns).get();
-  INVARIANT(
-    expr_l2.id() == ID_symbol && expr_l2.get_bool(ID_C_SSA_symbol),
-    "symbol to declare should not be replaced by constant propagation");
-  ssa = to_ssa_expr(expr_l2);
-  state.record_events.pop();
+  ssa = state.declare(std::move(ssa), ns);
 
   // we hide the declaration of auxiliary variables
   // and if the statement itself is hidden

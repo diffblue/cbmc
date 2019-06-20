@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
+#include <pointer-analysis/add_failed_symbols.h>
 
 static void get_l1_name(exprt &expr);
 
@@ -183,7 +184,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 #endif
 
   // do the l2 renaming
-  increase_generation(l1_identifier, lhs);
+  level2.increase_generation(l1_identifier, lhs, fresh_l2_name_provider);
   renamedt<ssa_exprt, L2> l2_lhs = set_indices<L2>(std::move(lhs), ns);
   lhs = l2_lhs.get();
 
@@ -434,7 +435,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     if(a_s_read.second.empty())
     {
-      increase_generation(l1_identifier, ssa_l1);
+      level2.increase_generation(l1_identifier, ssa_l1, fresh_l2_name_provider);
       a_s_read.first = level2.latest_index(l1_identifier);
     }
     const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
@@ -476,7 +477,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // produce a fresh L2 name
-  increase_generation(l1_identifier, ssa_l1);
+  level2.increase_generation(l1_identifier, ssa_l1, fresh_l2_name_provider);
   expr = set_indices<L2>(std::move(ssa_l1), ns).get();
 
   // and record that
@@ -806,6 +807,50 @@ ssa_exprt goto_symex_statet::add_object(
   const ssa_exprt ssa = rename_ssa<L1>(renamed.get(), ns).get();
   const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
   INVARIANT(inserted, "l1_name expected to be unique by construction");
+
+  return ssa;
+}
+
+ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
+{
+  const irep_idt &l1_identifier = ssa.get_identifier();
+
+  // rename type to L2
+  rename(ssa.type(), l1_identifier, ns);
+  ssa.update_type();
+
+  // in case of pointers, put something into the value set
+  if(ssa.type().id() == ID_pointer)
+  {
+    exprt rhs;
+    if(
+      auto failed =
+        get_failed_symbol(to_symbol_expr(ssa.get_original_expr()), ns))
+      rhs = address_of_exprt(*failed, to_pointer_type(ssa.type()));
+    else
+      rhs = exprt(ID_invalid);
+
+    exprt l1_rhs = rename<L1>(std::move(rhs), ns).get();
+    value_set.assign(ssa, l1_rhs, ns, true, false);
+  }
+
+  // L2 renaming
+  const exprt fields = field_sensitivity.get_fields(ns, *this, ssa);
+  for(const auto &l1_symbol : find_symbols(fields))
+  {
+    const ssa_exprt &field_ssa = to_ssa_expr(l1_symbol);
+    const std::size_t field_generation = level2.increase_generation(
+      l1_symbol.get_identifier(), field_ssa, fresh_l2_name_provider);
+    CHECK_RETURN(field_generation == 1);
+  }
+
+  record_events.push(false);
+  exprt expr_l2 = rename(std::move(ssa), ns).get();
+  INVARIANT(
+    expr_l2.id() == ID_symbol && expr_l2.get_bool(ID_C_SSA_symbol),
+    "symbol to declare should not be replaced by constant propagation");
+  ssa = to_ssa_expr(expr_l2);
+  record_events.pop();
 
   return ssa;
 }

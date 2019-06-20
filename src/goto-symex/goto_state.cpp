@@ -26,27 +26,6 @@ void goto_statet::output_propagation_map(std::ostream &out)
   }
 }
 
-std::size_t goto_statet::increase_generation(
-  const irep_idt l1_identifier,
-  const ssa_exprt &lhs,
-  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
-{
-  const std::size_t n = fresh_l2_name_provider(l1_identifier);
-
-  if(const auto r_opt = level2.current_names.find(l1_identifier))
-  {
-    std::pair<ssa_exprt, std::size_t> copy = r_opt->get();
-    copy.second = n;
-    level2.current_names.replace(l1_identifier, std::move(copy));
-  }
-  else
-  {
-    level2.current_names.insert(l1_identifier, std::make_pair(lhs, n));
-  }
-
-  return n;
-}
-
 /// Given a condition that must hold on this path, propagate as much knowledge
 /// as possible. For example, if the condition is (x == 5), whether that's an
 /// assumption or a GOTO condition that we just passed through, we can propagate
@@ -92,7 +71,7 @@ void goto_statet::apply_condition(
         const ssa_exprt l1_lhs = remove_level_2(ssa_lhs);
         const irep_idt &l1_identifier = l1_lhs.get_identifier();
 
-        increase_generation(
+        level2.increase_generation(
           l1_identifier, l1_lhs, previous_state.get_l2_name_provider());
 
         const auto propagation_entry = propagation.find(l1_identifier);

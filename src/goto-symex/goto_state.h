@@ -81,11 +81,6 @@ public:
     const exprt &condition, // L2
     const goto_symex_statet &previous_state,
     const namespacet &ns);
-
-  std::size_t increase_generation(
-    const irep_idt l1_identifier,
-    const ssa_exprt &lhs,
-    std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_STATE_H
