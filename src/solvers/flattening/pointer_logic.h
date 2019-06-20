@@ -40,12 +40,12 @@ public:
     }
   };
 
-  // converts an (object,offset) pair to an expression
+  /// converts an (object,offset) pair to an expression
   exprt pointer_expr(
     const pointert &pointer,
     const pointer_typet &type) const;
 
-  // converts an (object,0) pair to an expression
+  /// converts an (object,0) pair to an expression
   exprt pointer_expr(
     std::size_t object,
     const pointer_typet &type) const;
@@ -55,13 +55,13 @@ public:
 
   std::size_t add_object(const exprt &expr);
 
-  // number of NULL object
+  /// number of NULL object
   std::size_t get_null_object() const
   {
     return null_object;
   }
 
-  // number of INVALID object
+  /// number of INVALID object
   std::size_t get_invalid_object() const
   {
     return invalid_object;
