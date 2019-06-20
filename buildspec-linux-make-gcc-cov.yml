@@ -32,7 +32,8 @@ phases:
       - make -C jbmc/unit test
       - make -C jbmc/regression test
       - lcov --capture --directory . --output-file ./lcov.info
-      - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed 's/pr\///g')
+      # If $CODEBUILD_SOURCE_VERSION starts with 'pr/', filter out pr number, if not, return empty
+      - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed '/^pr\//!d;s/^pr\///')
       - COV_SCRIPT=/root/.cache/codecov.sh
       - if [ ! -f "$COV_SCRIPT" ]; then curl -s https://codecov.io/bash > "$COV_SCRIPT"; fi
       - echo "$CODEBUILD_INITIATOR" | grep GitHub && bash "$COV_SCRIPT" -t "$CODECOV_TOKEN" || true      
