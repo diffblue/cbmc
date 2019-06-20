@@ -153,12 +153,8 @@ private:
     const exprt &max_length_expr,
     const source_locationt &location);
 
-  using element_generatort = std::function<code_blockt(
-    const exprt &element_at_counter,
-    const update_in_placet &update_in_place,
-    const typet &element_type,
-    const size_t depth,
-    const source_locationt &location)>;
+  using element_generatort = std::function<
+    code_blockt(const exprt &element_at_counter, const typet &element_type)>;
 
   void array_loop_init_code(
     code_blockt &assignments,
@@ -1299,8 +1295,7 @@ void java_object_factoryt::array_loop_init_code(
   const dereference_exprt element_at_counter =
     array_element_from_pointer(array_init_symexpr, counter_expr);
 
-  assignments.append(element_generator(
-    element_at_counter, update_in_place, element_type, depth, location));
+  assignments.append(element_generator(element_at_counter, element_type));
   exprt java_one = from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
@@ -1372,12 +1367,9 @@ void java_object_factoryt::gen_nondet_array_init(
       depth,
       update_in_place,
       location,
-      [this](
+      [this, update_in_place, depth, location](
         const exprt &element_at_counter,
-        const update_in_placet &update_in_place,
-        const typet &element_type,
-        const size_t depth,
-        const source_locationt &location) -> code_blockt {
+        const typet &element_type) -> code_blockt {
         return assign_element(
           element_at_counter, update_in_place, element_type, depth, location);
       });
