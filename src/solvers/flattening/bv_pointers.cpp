@@ -734,10 +734,7 @@ void bv_pointerst::do_postponed(
 
     std::size_t number=0;
 
-    for(pointer_logict::objectst::const_iterator
-        it=objects.begin();
-        it!=objects.end();
-        it++, number++)
+    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
     {
       const exprt &expr=*it;
 
@@ -771,10 +768,7 @@ void bv_pointerst::do_postponed(
 
     std::size_t number=0;
 
-    for(pointer_logict::objectst::const_iterator
-        it=objects.begin();
-        it!=objects.end();
-        it++, number++)
+    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
     {
       const exprt &expr=*it;
 
