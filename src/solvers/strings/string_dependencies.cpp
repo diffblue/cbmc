@@ -7,6 +7,7 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "string_dependencies.h"
+#include "string_concatenation_builtin_function.h"
 #include "string_format_builtin_function.h"
 #include <unordered_set>
 #include <util/expr_iterator.h>
