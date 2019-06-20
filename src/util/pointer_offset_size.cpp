@@ -302,8 +302,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    // get size
-    const auto size = array_type.size();
+    const exprt &size = array_type.size();
 
     if(size.is_nil())
       return {};
@@ -333,8 +332,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    // get size
-    const auto size = to_vector_type(type).size();
+    const exprt &size = to_vector_type(type).size();
 
     if(size.is_nil())
       return {};
