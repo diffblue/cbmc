@@ -9,8 +9,9 @@ Author: Daniel Kroening
 /// \file
 /// Coverage Instrumentation for Branches
 
-#include "cover_instrument.h"
 #include "cover_basic_blocks.h"
+#include "cover_filter.h"
+#include "cover_instrument.h"
 
 void cover_branch_instrumentert::instrument(
   const irep_idt &function_id,
@@ -21,7 +22,16 @@ void cover_branch_instrumentert::instrument(
   if(is_non_cover_assertion(i_it))
     i_it->turn_into_skip();
 
-  if(i_it == goto_program.instructions.begin())
+  const bool is_function_entry_point =
+    i_it == goto_program.instructions.begin();
+  const bool is_conditional_goto = i_it->is_goto() && !i_it->guard.is_true();
+  if(!is_function_entry_point && !is_conditional_goto)
+    return;
+
+  if(!goal_filters(i_it->source_location))
+    return;
+
+  if(is_function_entry_point)
   {
     // we want branch coverage to imply 'entry point of function'
     // coverage
@@ -34,9 +44,7 @@ void cover_branch_instrumentert::instrument(
     initialize_source_location(t, comment, function_id);
   }
 
-  if(
-    i_it->is_goto() && !i_it->guard.is_true() &&
-    !i_it->source_location.is_built_in())
+  if(is_conditional_goto)
   {
     std::string b =
       std::to_string(basic_blocks.block_of(i_it) + 1); // start with 1
