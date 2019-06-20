@@ -729,9 +729,7 @@ void bv_pointerst::do_postponed(
 {
   if(postponed.expr.id() == ID_is_dynamic_object)
   {
-    const pointer_logict::objectst &objects=
-      pointer_logic.objects;
-
+    const auto &objects = pointer_logic.objects;
     std::size_t number=0;
 
     for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
@@ -763,9 +761,7 @@ void bv_pointerst::do_postponed(
   }
   else if(postponed.expr.id()==ID_object_size)
   {
-    const pointer_logict::objectst &objects=
-      pointer_logic.objects;
-
+    const auto &objects = pointer_logic.objects;
     std::size_t number=0;
 
     for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
