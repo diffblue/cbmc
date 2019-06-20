@@ -278,9 +278,7 @@ optionalt<exprt> member_offset_expr(
     }
   }
 
-  simplify(result, ns);
-
-  return result;
+  return simplify_expr(std::move(result), ns);
 }
 
 optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
@@ -311,9 +309,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       typecast_exprt::conditional_cast(size, sub.value().type());
 
     mult_exprt result(size_casted, sub.value());
-    simplify(result, ns);
-
-    return std::move(result);
+    return simplify_expr(std::move(result), ns);
   }
   else if(type.id()==ID_vector)
   {
@@ -341,9 +337,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       typecast_exprt::conditional_cast(size, sub.value().type());
 
     mult_exprt result(size_casted, sub.value());
-    simplify(result, ns);
-
-    return std::move(result);
+    return simplify_expr(std::move(result), ns);
   }
   else if(type.id()==ID_complex)
   {
@@ -354,9 +348,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const exprt size = from_integer(2, sub.value().type());
 
     mult_exprt result(size, sub.value());
-    simplify(result, ns);
-
-    return std::move(result);
+    return simplify_expr(std::move(result), ns);
   }
   else if(type.id()==ID_struct)
   {
@@ -397,9 +389,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       }
     }
 
-    simplify(result, ns);
-
-    return result;
+    return simplify_expr(std::move(result), ns);
   }
   else if(type.id()==ID_union)
   {
