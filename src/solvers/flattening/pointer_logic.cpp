@@ -35,10 +35,7 @@ void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
   o.clear();
   std::size_t nr=0;
 
-  for(pointer_logict::objectst::const_iterator
-      it=objects.begin();
-      it!=objects.end();
-      it++, nr++)
+  for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++nr)
     if(is_dynamic_object(*it))
       o.push_back(nr);
 }
