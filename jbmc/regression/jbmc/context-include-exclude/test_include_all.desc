@@ -1,0 +1,12 @@
+CORE
+Main.class
+
+^EXIT=0$
+^SIGNAL=0$
+.* line 10 assertion at file Main.java line 10 .*: SUCCESS
+.* line 11 assertion at file Main.java line 11 .*: SUCCESS
+.* line 12 assertion at file Main.java line 12 .*: SUCCESS
+--
+WARNING: no body for function .*
+--
+Tests that no methods are excluded.
