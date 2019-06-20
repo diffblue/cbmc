@@ -278,9 +278,7 @@ optionalt<exprt> member_offset_expr(
     }
   }
 
-  simplify(result, ns);
-
-  return result;
+  return simplify_expr(std::move(result), ns);
 }
 
 optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
@@ -302,8 +300,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    // get size
-    const auto size = array_type.size();
+    const exprt &size = array_type.size();
 
     if(size.is_nil())
       return {};
@@ -311,10 +308,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto size_casted =
       typecast_exprt::conditional_cast(size, sub.value().type());
 
-    mult_exprt result(size_casted, sub.value());
-    simplify(result, ns);
-
-    return std::move(result);
+    return simplify_expr(mult_exprt{size_casted, sub.value()}, ns);
   }
   else if(type.id()==ID_vector)
   {
@@ -333,8 +327,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    // get size
-    const auto size = to_vector_type(type).size();
+    const exprt &size = to_vector_type(type).size();
 
     if(size.is_nil())
       return {};
@@ -342,10 +335,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto size_casted =
       typecast_exprt::conditional_cast(size, sub.value().type());
 
-    mult_exprt result(size_casted, sub.value());
-    simplify(result, ns);
-
-    return std::move(result);
+    return simplify_expr(mult_exprt{size_casted, sub.value()}, ns);
   }
   else if(type.id()==ID_complex)
   {
@@ -353,12 +343,8 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    const exprt size = from_integer(2, sub.value().type());
-
-    mult_exprt result(size, sub.value());
-    simplify(result, ns);
-
-    return std::move(result);
+    exprt size = from_integer(2, sub.value().type());
+    return simplify_expr(mult_exprt{std::move(size), sub.value()}, ns);
   }
   else if(type.id()==ID_struct)
   {
@@ -399,9 +385,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       }
     }
 
-    simplify(result, ns);
-
-    return result;
+    return simplify_expr(std::move(result), ns);
   }
   else if(type.id()==ID_union)
   {
