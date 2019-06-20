@@ -211,6 +211,19 @@ public:
     set_identifier(identifier);
   }
 
+  /// \param identifier: name of symbol
+  /// \param type: type of symbol
+  /// \param location: location from which the symbol originate
+  nondet_symbol_exprt(
+    irep_idt identifier,
+    typet type,
+    source_locationt location)
+    : nullary_exprt(ID_nondet_symbol, std::move(type))
+  {
+    set_identifier(std::move(identifier));
+    add_source_location() = std::move(location);
+  }
+
   void set_identifier(const irep_idt &identifier)
   {
     set(ID_identifier, identifier);
