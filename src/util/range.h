@@ -303,7 +303,7 @@ public:
   /// Preincrement operator
   zip_iteratort &operator++()
   {
-    PRECONDITION(first_begin != first_end && second_begin != second_end);
+    PRECONDITION(!end_reached());
     ++first_begin;
     ++second_begin;
     INVARIANT(
