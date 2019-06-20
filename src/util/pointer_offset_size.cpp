@@ -308,8 +308,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto size_casted =
       typecast_exprt::conditional_cast(size, sub.value().type());
 
-    mult_exprt result(size_casted, sub.value());
-    return simplify_expr(std::move(result), ns);
+    return simplify_expr(mult_exprt{size_casted, sub.value()}, ns);
   }
   else if(type.id()==ID_vector)
   {
@@ -336,8 +335,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto size_casted =
       typecast_exprt::conditional_cast(size, sub.value().type());
 
-    mult_exprt result(size_casted, sub.value());
-    return simplify_expr(std::move(result), ns);
+    return simplify_expr(mult_exprt{size_casted, sub.value()}, ns);
   }
   else if(type.id()==ID_complex)
   {
@@ -345,10 +343,8 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    const exprt size = from_integer(2, sub.value().type());
-
-    mult_exprt result(size, sub.value());
-    return simplify_expr(std::move(result), ns);
+    exprt size = from_integer(2, sub.value().type());
+    return simplify_expr(mult_exprt{std::move(size), sub.value()}, ns);
   }
   else if(type.id()==ID_struct)
   {
