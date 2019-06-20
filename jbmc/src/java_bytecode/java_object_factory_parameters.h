@@ -18,9 +18,15 @@ struct java_object_factory_parameterst final : public object_factory_parameterst
   }
 
   explicit java_object_factory_parameterst(const optionst &options)
-    : object_factory_parameterst(options)
+    : object_factory_parameterst(options), assume_inputs_interval()
   {
   }
+
+  /// Force numerical primitive inputs to fall within the interval
+  integer_intervalt assume_inputs_interval;
+
+  /// Assigns the parameters from given options
+  void set(const optionst &);
 };
 
 /// Parse the java object factory parameters from a given command line
