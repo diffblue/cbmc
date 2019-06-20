@@ -130,4 +130,14 @@ void gen_nondet_init(
   update_in_placet update_in_place,
   message_handlert &log);
 
+using array_element_generatort = std::function<
+  code_blockt(const exprt &element_at_counter, const typet &element_type)>;
+
+std::pair<code_blockt, symbol_exprt> nondet_array(
+  const typet &array_type,
+  const symbol_exprt &array_symbol,
+  const array_element_generatort &element_generator,
+  size_t max_array_size,
+  symbol_table_baset &symbol_table);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

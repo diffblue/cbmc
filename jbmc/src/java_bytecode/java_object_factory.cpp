@@ -89,8 +89,6 @@ public:
         symbol_table),
       log(log)
   {}
-  using element_generatort = std::function<
-    code_blockt(const exprt &element_at_counter, const typet &element_type)>;
 
   void gen_nondet_array_init(
     code_blockt &assignments,
@@ -98,7 +96,7 @@ public:
     size_t depth,
     update_in_placet update_in_place,
     const source_locationt &location,
-    const element_generatort &element_generator);
+    const array_element_generatort &element_generator);
 
   bool gen_nondet_enum_init(
     code_blockt &assignments,
@@ -166,7 +164,7 @@ private:
     size_t depth,
     update_in_placet update_in_place,
     const source_locationt &location,
-    const element_generatort &element_generator);
+    const array_element_generatort &element_generator);
 
   code_blockt assign_element(
     const exprt &element_at_counter,
@@ -1263,7 +1261,7 @@ void java_object_factoryt::array_loop_init_code(
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
-  const element_generatort &element_generator)
+  const array_element_generatort &element_generator)
 {
   const symbol_exprt &array_init_symexpr =
     allocate_objects.allocate_automatic_local_object(
@@ -1331,7 +1329,7 @@ void java_object_factoryt::gen_nondet_array_init(
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
-  const element_generatort &element_generator)
+  const array_element_generatort &element_generator)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
@@ -1652,4 +1650,30 @@ void gen_nondet_init(
     pointer_type_selector,
     update_in_place,
     log);
+}
+std::pair<code_blockt, symbol_exprt> nondet_array(
+  const typet &array_type,
+  const symbol_exprt &array_symbol,
+  const array_element_generatort &element_generator,
+  size_t max_array_size,
+  symbol_table_baset &symbol_table)
+{
+  source_locationt loc;
+
+  java_object_factory_parameterst parameters;
+  parameters.max_nondet_array_length = max_array_size;
+
+  select_pointer_typet spt;
+  null_message_handlert nmh;
+
+  java_object_factoryt factory{loc, parameters, symbol_table, spt, nmh};
+  code_blockt assignments;
+  factory.gen_nondet_array_init(
+    assignments,
+    array_symbol,
+    0,
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    loc,
+    element_generator);
+  return std::make_pair(assignments, array_symbol);
 }
