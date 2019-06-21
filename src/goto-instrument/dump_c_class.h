@@ -30,13 +30,14 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    language_factoryt factory):
-    goto_functions(_goto_functions),
-    copied_symbol_table(_ns.get_symbol_table()),
-    ns(copied_symbol_table),
-    language(factory()),
-    harness(include_harness),
-    system_symbols(use_system_headers)
+    language_factoryt factory,
+    message_handlert &mh)
+    : goto_functions(_goto_functions),
+      copied_symbol_table(_ns.get_symbol_table()),
+      ns(copied_symbol_table),
+      language(factory(mh)),
+      harness(include_harness),
+      system_symbols(use_system_headers)
   {
     system_symbols.set_use_all_headers(use_all_headers);
   }

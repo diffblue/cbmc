@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/invariant.h>
 #include <util/namespace.h>
 
+null_message_handlert null_message_handler;
+
 struct language_entryt
 {
   language_factoryt factory;
@@ -38,7 +40,7 @@ languagest languages;
 void register_language(language_factoryt factory)
 {
   languages.push_back(language_entryt());
-  std::unique_ptr<languaget> l(factory());
+  std::unique_ptr<languaget> l(factory(null_message_handler));
   languages.back().factory=factory;
   languages.back().extensions=l->extensions();
   languages.back().mode=l->id();
@@ -49,9 +51,18 @@ void register_language(language_factoryt factory)
 /// \return the language or `nullptr` if the language has not been registered
 std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
 {
+  return get_language_from_mode(mode, null_message_handler);
+}
+
+/// Get the language corresponding to the given mode
+/// \param mode: the mode, e.g. `ID_C`
+/// \return the language or `nullptr` if the language has not been registered
+std::unique_ptr<languaget>
+get_language_from_mode(const irep_idt &mode, message_handlert &mh)
+{
   for(const auto &language : languages)
     if(mode == language.mode)
-      return language.factory();
+      return language.factory(mh);
 
   return nullptr;
 }
@@ -82,11 +93,26 @@ get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier)
 std::unique_ptr<languaget>
 get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
 {
+  return get_language_from_identifier(ns, identifier, null_message_handler);
+}
+
+/// Get the language corresponding to the mode of the given identifier's symbol
+/// \param ns: a namespace
+/// \param identifier: an identifier
+/// \return the corresponding language if the mode is not `ID_unknown`, or
+///   the default language otherwise;
+/// Note: It is assumed as an invariant that languages of symbols in the symbol
+///   table have been registered.
+std::unique_ptr<languaget> get_language_from_identifier(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  message_handlert &mh)
+{
   const irep_idt &mode = get_mode_from_identifier(ns, identifier);
   if(mode == ID_unknown)
-    return get_default_language();
+    return get_default_language(mh);
 
-  std::unique_ptr<languaget> language = get_language_from_mode(mode);
+  std::unique_ptr<languaget> language = get_language_from_mode(mode, mh);
   INVARIANT(
     language,
     "symbol `" + id2string(identifier) + "' has unknown mode '" +
@@ -100,6 +126,16 @@ get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
 ///   be resolved to any registered language
 std::unique_ptr<languaget> get_language_from_filename(
   const std::string &filename)
+{
+  return get_language_from_filename(filename, null_message_handler);
+}
+
+/// Get the language corresponding to the registered file name extensions
+/// \param filename: a filename
+/// \return the corresponding language or `nullptr` if the extension cannot
+///   be resolved to any registered language
+std::unique_ptr<languaget>
+get_language_from_filename(const std::string &filename, message_handlert &mh)
 {
   std::size_t ext_pos=filename.rfind('.');
 
@@ -126,8 +162,8 @@ std::unique_ptr<languaget> get_language_from_filename(
         return l_it->factory();
     #else
     if(l_it->extensions.find(extension)!=l_it->extensions.end())
-      return l_it->factory();
-    #endif
+      return l_it->factory(mh);
+#endif
   }
 
   return nullptr;
@@ -137,6 +173,13 @@ std::unique_ptr<languaget> get_language_from_filename(
 /// \return the first registered language
 std::unique_ptr<languaget> get_default_language()
 {
+  return get_default_language(null_message_handler);
+}
+
+/// Returns the default language
+/// \return the first registered language
+std::unique_ptr<languaget> get_default_language(message_handlert &mh)
+{
   PRECONDITION(!languages.empty());
-  return languages.front().factory();
+  return languages.front().factory(mh);
 }

@@ -42,7 +42,9 @@ public:
   virtual void show_parse(std::ostream &out) override;
 
   virtual ~jsil_languaget();
-  jsil_languaget() { }
+  jsil_languaget(message_handlert &mh) : languaget(mh)
+  {
+  }
 
   virtual bool from_expr(
     const exprt &expr,
@@ -61,7 +63,9 @@ public:
     const namespacet &ns) override;
 
   virtual std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<jsil_languaget>(); }
+  {
+    return util_make_unique<jsil_languaget>(get_message_handler());
+  }
 
   virtual std::string id() const override { return "jsil"; }
   virtual std::string description() const override
@@ -76,6 +80,6 @@ protected:
   std::string parse_path;
 };
 
-std::unique_ptr<languaget> new_jsil_language();
+std::unique_ptr<languaget> new_jsil_language(message_handlert &);
 
 #endif // CPROVER_JSIL_JSIL_LANGUAGE_H
