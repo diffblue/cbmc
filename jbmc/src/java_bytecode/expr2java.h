@@ -75,8 +75,13 @@ std::string floating_point_to_java_string(float_type value)
     std::ostringstream raw_stream;
     raw_stream << value;
     const auto raw_decimal = raw_stream.str();
-    if(raw_decimal.find('.') == std::string::npos)
+    const bool is_scientific = raw_decimal.find('e') != std::string::npos;
+    if(
+      raw_decimal.find('.') == std::string::npos &&
+      !is_scientific) // don't add trailing .0 if in scientific notation
+    {
       return raw_decimal + ".0";
+    }
     return raw_decimal;
   }();
   const bool is_lossless = [&] {
