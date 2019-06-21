@@ -39,7 +39,7 @@ SCENARIO(
     THEN("is_user_specified_clinit_function should return true.")
     {
       const std::string input =
-        "com.something.package.TestClass::user_specified_clinit";
+        "com.something.package.TestClass.<user_specified_clinit>";
       REQUIRE(is_user_specified_clinit_function(input));
     }
   }

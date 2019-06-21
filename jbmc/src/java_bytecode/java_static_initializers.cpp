@@ -52,8 +52,8 @@ static typet clinit_states_type()
 
 // Disable linter here to allow a std::string constant, since that holds
 // a length, whereas a cstr would require strlen every time.
-const std::string clinit_wrapper_suffix = "::clinit_wrapper"; // NOLINT(*)
-const std::string user_specified_clinit_suffix = "::user_specified_clinit"; // NOLINT(*)
+const std::string clinit_wrapper_suffix = ".<clinit_wrapper>"; // NOLINT(*)
+const std::string user_specified_clinit_suffix = ".<user_specified_clinit>"; // NOLINT(*)
 const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 
 /// Get the Java static initializer wrapper name for a given class (the wrapper
@@ -479,14 +479,14 @@ static void create_clinit_wrapper_symbols(
 ///   if(init_complete)
 ///     return;
 ///
-///   java::C'::clinit_wrapper();
-///   java::I1::clinit_wrapper();
-///   java::I2::clinit_wrapper();
+///   java::C'.<clinit_wrapper>();
+///   java::I1.<clinit_wrapper>();
+///   java::I2.<clinit_wrapper>();
 ///   // ...
-///   java::In::clinit_wrapper();
+///   java::In.<clinit_wrapper>();
 ///
-///   java::C::<clinit>();  // or nondet-initialization of all static
-///                         // variables of C if nondet-static is true
+///   java::C.<clinit>();  // or nondet-initialization of all static
+///                        // variables of C if nondet-static is true
 ///
 ///   // Setting this variable to INIT_COMPLETE will let other threads "cross"
 ///   // beyond the assume() statement above in this function.
@@ -551,7 +551,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   // the static initializer wrapper. Enable this for debugging the symex going
   // through the clinit_wrapper.
   //
-  // java::C::clinit_wrapper()
+  // java::C.<clinit_wrapper>()
   // You will additionally need to associate the `location` with the
   // `function_body` and then manually set lines of code for each of the
   // statements of the function, using something along the lines of:
@@ -654,14 +654,14 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   // This is achieved  by iterating through the base types and
   // adding recursive calls to the clinit_wrapper()
   //
-  //  java::C'::clinit_wrapper();
-  //  java::I1::clinit_wrapper();
-  //  java::I2::clinit_wrapper();
+  //  java::C'.<clinit_wrapper>();
+  //  java::I1.<clinit_wrapper>();
+  //  java::I2.<clinit_wrapper>();
   //  // ...
-  //  java::In::clinit_wrapper();
+  //  java::In.<clinit_wrapper>();
   //
-  //  java::C::<clinit>(); // or nondet-initialization of all static
-  //                       // variables of C if nondet-static is true
+  //  java::C.<clinit>(); // or nondet-initialization of all static
+  //                      // variables of C if nondet-static is true
   //
   {
     code_blockt init_body;
@@ -722,20 +722,20 @@ code_ifthenelset get_clinit_wrapper_body(
   // I1, ..., In. We now create the following function (possibly recursively
   // creating the clinit_wrapper functions for C' and I1, ..., In):
   //
-  // java::C::clinit_wrapper()
+  // java::C.<clinit_wrapper>()
   // {
   //   if (!java::C::clinit_already_run)
   //   {
   //     java::C::clinit_already_run = true; // before recursive calls!
   //
-  //     java::C'::clinit_wrapper();
-  //     java::I1::clinit_wrapper();
-  //     java::I2::clinit_wrapper();
+  //     java::C'.<clinit_wrapper>();
+  //     java::I1.<clinit_wrapper>();
+  //     java::I2.<clinit_wrapper>();
   //     // ...
-  //     java::In::clinit_wrapper();
+  //     java::In.<clinit_wrapper>();
   //
-  //     java::C::<clinit>(); // or nondet-initialization of all static
-  //                          // variables of C if nondet-static is true
+  //     java::C.<clinit>(); // or nondet-initialization of all static
+  //                         // variables of C if nondet-static is true
   //   }
   // }
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
@@ -834,7 +834,7 @@ code_blockt get_user_specified_clinit_body(
 /// Create static initializer wrappers and possibly user-specified functions for
 /// initial static field value assignments for all classes that need them.
 /// For each class that will require a static initializer wrapper, create a
-/// function named package.classname::clinit_wrapper, and a corresponding
+/// function named package.classname.\<clinit_wrapper\>, and a corresponding
 /// global tracking whether it has run or not. If a file containing initial
 /// static values is given, also create a function named
 /// package.classname::user_specified_clinit.

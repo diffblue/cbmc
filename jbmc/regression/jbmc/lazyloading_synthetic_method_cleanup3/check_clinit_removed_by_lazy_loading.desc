@@ -5,6 +5,6 @@ Test.class
 ^SIGNAL=0$
 --
 java::Opaque\.<clinit>:\(\)V
-java::Opaque::clinit_wrapper
+java::Opaque\.<clinit_wrapper>
 --
 This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)
