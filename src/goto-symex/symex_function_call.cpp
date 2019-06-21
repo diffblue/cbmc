@@ -140,16 +140,8 @@ void goto_symext::parameter_assignments(
       rhs = clean_expr(std::move(rhs), state, false);
 
       exprt::operandst lhs_conditions;
-      symex_assign_rec(
-        state,
-        lhs,
-        nil_exprt(),
-        rhs,
-        lhs_conditions,
-        assignment_type,
-        ns,
-        symex_config,
-        target);
+      symex_assignt{state, assignment_type, ns, symex_config, target}
+        .symex_assign_rec(lhs, nil_exprt(), rhs, lhs_conditions);
     }
 
     if(it1!=arguments.end())

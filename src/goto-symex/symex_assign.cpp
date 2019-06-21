@@ -22,72 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // update_exprt.
 // #define USE_UPDATE
 
-static void assign_non_struct_symbol(
-  goto_symex_statet &state,
-  const ssa_exprt &lhs, // L1
-  const exprt &full_lhs,
-  const exprt &rhs,
-  const exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
-static void symex_assign_array(
-  goto_symex_statet &state,
-  const index_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
-static void symex_assign_struct_member(
-  goto_symex_statet &state,
-  const member_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
-static void symex_assign_if(
-  goto_symex_statet &state,
-  const if_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
-static void symex_assign_typecast(
-  goto_symex_statet &state,
-  const typecast_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
-static void symex_assign_byte_extract(
-  goto_symex_statet &state,
-  const byte_extract_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target);
-
 /// Store the \p what expression by recursively descending into the operands
 /// of \p lhs until the first operand \c op0 is _nil_: this _nil_ operand
 /// is then replaced with \p what.
@@ -126,55 +60,23 @@ static exprt add_to_lhs(const exprt &lhs, const exprt &what)
   return new_lhs;
 }
 
-void symex_assign_rec(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_rec(
   const exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  exprt::operandst &guard)
 {
   if(lhs.id() == ID_symbol && lhs.get_bool(ID_C_SSA_symbol))
   {
-    symex_assign_symbol(
-      state,
-      to_ssa_expr(lhs),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
   }
   else if(lhs.id() == ID_index)
-    symex_assign_array(
-      state,
-      to_index_expr(lhs),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_array(to_index_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id()==ID_member)
   {
     const typet &type = to_member_expr(lhs).struct_op().type();
     if(type.id() == ID_struct || type.id() == ID_struct_tag)
-      symex_assign_struct_member(
-        state,
-        to_member_expr(lhs),
-        full_lhs,
-        rhs,
-        guard,
-        assignment_type,
-        ns,
-        symex_config,
-        target);
+      symex_assign_struct_member(to_member_expr(lhs), full_lhs, rhs, guard);
     else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
       // should have been replaced by byte_extract
@@ -187,27 +89,9 @@ void symex_assign_rec(
         type.id_string() + "'");
   }
   else if(lhs.id()==ID_if)
-    symex_assign_if(
-      state,
-      to_if_expr(lhs),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_if(to_if_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id()==ID_typecast)
-    symex_assign_typecast(
-      state,
-      to_typecast_expr(lhs),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_typecast(to_typecast_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id() == ID_string_constant ||
           lhs.id() == ID_null_object ||
           lhs.id() == "zero_string" ||
@@ -219,16 +103,7 @@ void symex_assign_rec(
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
   {
-    symex_assign_byte_extract(
-      state,
-      to_byte_extract_expr(lhs),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_byte_extract(to_byte_extract_expr(lhs), full_lhs, rhs, guard);
   }
   else if(lhs.id() == ID_complex_real)
   {
@@ -240,16 +115,7 @@ void symex_assign_rec(
     complex_exprt new_rhs(
       rhs, complex_imag_expr, to_complex_type(complex_real_expr.op().type()));
 
-    symex_assign_rec(
-      state,
-      complex_real_expr.op(),
-      full_lhs,
-      new_rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_rec(complex_real_expr.op(), full_lhs, new_rhs, guard);
   }
   else if(lhs.id() == ID_complex_imag)
   {
@@ -260,16 +126,7 @@ void symex_assign_rec(
     complex_exprt new_rhs(
       complex_real_expr, rhs, to_complex_type(complex_imag_expr.op().type()));
 
-    symex_assign_rec(
-      state,
-      complex_imag_expr.op(),
-      full_lhs,
-      new_rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_rec(complex_imag_expr.op(), full_lhs, new_rhs, guard);
   }
   else
     throw unsupported_operation_exceptiont(
@@ -455,24 +312,16 @@ static assignmentt shift_indexed_access_to_lhs(
 /// with results like `x = {1, 2}; x..field1 = x.field1; x..field2 = x.field2;`
 /// This abbreviates the process, directly producing
 /// `x..field1 = 1; x..field2 = 2;`
-/// \param state: goto-symex state
 /// \param lhs: symbol to assign (already renamed to L1)
 /// \param full_lhs: expression skeleton corresponding to \p lhs, to be included
 ///   in the result trace
 /// \param rhs: struct expression to assign to \p lhs
 /// \param guard: guard conjuncts that must hold for this assignment to be made
-/// \param assignment_type: assignment type (see
-///   \ref symex_targett::assignment_typet)
-static void symex_assign_from_struct(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_from_struct(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const struct_exprt &rhs,
-  const exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  const exprt::operandst &guard)
 {
   const auto &components = to_struct_type(ns.follow(lhs.type())).components();
   PRECONDITION(rhs.operands().size() == components.size());
@@ -489,43 +338,24 @@ static void symex_assign_from_struct(
     if(comp_rhs.second.id() == ID_struct)
     {
       symex_assign_from_struct(
-        state,
         to_ssa_expr(lhs_field),
         full_lhs,
         to_struct_expr(comp_rhs.second),
-        guard,
-        assignment_type,
-        ns,
-        symex_config,
-        target);
+        guard);
     }
     else
     {
       assign_non_struct_symbol(
-        state,
-        to_ssa_expr(lhs_field),
-        full_lhs,
-        comp_rhs.second,
-        guard,
-        assignment_type,
-        ns,
-        symex_config,
-        target);
+        to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
     }
   }
 }
 
-/// \return l2_lhs
-static void assign_non_struct_symbol(
-  goto_symex_statet &state,
+void symex_assignt::assign_non_struct_symbol(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
-  const exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  const exprt::operandst &guard)
 {
   exprt l2_rhs =
     state
@@ -564,8 +394,10 @@ static void assign_non_struct_symbol(
     state.rename(add_to_lhs(full_lhs, l2_lhs), ns).get();
   state.record_events.pop();
 
-  if(ns.lookup(l2_lhs.get_object_name()).is_auxiliary)
-    assignment_type=symex_targett::assignment_typet::HIDDEN;
+  auto current_assignment_type =
+    ns.lookup(l2_lhs.get_object_name()).is_auxiliary
+      ? symex_targett::assignment_typet::HIDDEN
+      : assignment_type;
 
   target.assignment(
     make_and(state.guard.as_expr(), conjunction(guard)),
@@ -574,7 +406,7 @@ static void assign_non_struct_symbol(
     get_original_name(l2_full_lhs),
     assignment.rhs,
     state.source,
-    assignment_type);
+    current_assignment_type);
 
   const ssa_exprt &l1_lhs = assignment.lhs;
   if(field_sensitivityt::is_divisible(l1_lhs))
@@ -590,84 +422,37 @@ static void assign_non_struct_symbol(
   }
 }
 
-void symex_assign_symbol(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_symbol(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
-  const exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  const exprt::operandst &guard)
 {
   // Shortcut the common case of a whole-struct initializer:
   if(rhs.id() == ID_struct)
-  {
-    symex_assign_from_struct(
-      state,
-      lhs,
-      full_lhs,
-      to_struct_expr(rhs),
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
-  }
+    symex_assign_from_struct(lhs, full_lhs, to_struct_expr(rhs), guard);
   else
-  {
-    assign_non_struct_symbol(
-      state,
-      lhs,
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
-  }
+    assign_non_struct_symbol(lhs, full_lhs, rhs, guard);
 }
 
-static void symex_assign_typecast(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_typecast(
   const typecast_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  exprt::operandst &guard)
 {
   // these may come from dereferencing on the lhs
   exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-
-  symex_assign_rec(
-    state,
-    lhs.op(),
-    new_full_lhs,
-    rhs_typecasted,
-    guard,
-    assignment_type,
-    ns,
-    symex_config,
-    target);
+  symex_assign_rec(lhs.op(), new_full_lhs, rhs_typecasted, guard);
 }
 
-static void symex_assign_array(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_array(
   const index_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  exprt::operandst &guard)
 {
   const exprt &lhs_array=lhs.array();
   const exprt &lhs_index=lhs.index();
@@ -701,29 +486,15 @@ static void symex_assign_array(
   const with_exprt new_rhs{lhs_array, lhs_index, rhs};
   const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
 
-  symex_assign_rec(
-    state,
-    lhs_array,
-    new_full_lhs,
-    new_rhs,
-    guard,
-    assignment_type,
-    ns,
-    symex_config,
-    target);
+  symex_assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
 #endif
 }
 
-static void symex_assign_struct_member(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_struct_member(
   const member_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  exprt::operandst &guard)
 {
   // Symbolic execution of a struct member assignment.
 
@@ -781,30 +552,15 @@ static void symex_assign_struct_member(
   new_rhs.where().set(ID_component_name, component_name);
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-
-  symex_assign_rec(
-    state,
-    lhs_struct,
-    new_full_lhs,
-    new_rhs,
-    guard,
-    assignment_type,
-    ns,
-    symex_config,
-    target);
+  symex_assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
 #endif
 }
 
-static void symex_assign_if(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_if(
   const if_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  exprt::operandst &guard)
 {
   // we have (c?a:b)=e;
   exprt renamed_guard = state.rename(lhs.cond(), ns).get();
@@ -814,46 +570,23 @@ static void symex_assign_if(
   if(!renamed_guard.is_false())
   {
     guard.push_back(renamed_guard);
-    symex_assign_rec(
-      state,
-      lhs.true_case(),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_rec(lhs.true_case(), full_lhs, rhs, guard);
     guard.pop_back();
   }
 
   if(!renamed_guard.is_true())
   {
     guard.push_back(not_exprt(renamed_guard));
-    symex_assign_rec(
-      state,
-      lhs.false_case(),
-      full_lhs,
-      rhs,
-      guard,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assign_rec(lhs.false_case(), full_lhs, rhs, guard);
     guard.pop_back();
   }
 }
 
-static void symex_assign_byte_extract(
-  goto_symex_statet &state,
+void symex_assignt::symex_assign_byte_extract(
   const byte_extract_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
-  symex_targett::assignment_typet assignment_type,
-  const namespacet &ns,
-  const symex_configt &symex_config,
-  symex_targett &target)
+  exprt::operandst &guard)
 {
   // we have byte_extract_X(object, offset)=value
   // turn into object=byte_update_X(object, offset, value)
@@ -868,15 +601,5 @@ static void symex_assign_byte_extract(
 
   const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-
-  symex_assign_rec(
-    state,
-    lhs.op(),
-    new_full_lhs,
-    new_rhs,
-    guard,
-    assignment_type,
-    ns,
-    symex_config,
-    target);
+  symex_assign_rec(lhs.op(), new_full_lhs, new_rhs, guard);
 }

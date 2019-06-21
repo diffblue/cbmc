@@ -80,16 +80,9 @@ SCENARIO(
       symex_target_equationt target{log};
       exprt full_lhs = nil_exprt{};
       full_lhs.type() = int_type;
-      symex_assign_symbol(
-        state,
-        ssa_foo,
-        full_lhs,
-        rhs1,
-        guard,
-        symex_targett::assignment_typet::STATE,
-        ns,
-        symex_config,
-        target);
+      symex_assignt{
+        state, symex_targett::assignment_typet::STATE, ns, symex_config, target}
+        .symex_assign_symbol(ssa_foo, full_lhs, rhs1, guard);
       THEN("An equation is added to the target")
       {
         REQUIRE(target.SSA_steps.size() == 1);

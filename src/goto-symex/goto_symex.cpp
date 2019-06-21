@@ -79,15 +79,7 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     exprt::operandst lhs_if_then_else_conditions;
-    symex_assign_rec(
-      state,
-      lhs,
-      nil_exprt(),
-      rhs,
-      lhs_if_then_else_conditions,
-      assignment_type,
-      ns,
-      symex_config,
-      target);
+    symex_assignt{state, assignment_type, ns, symex_config, target}
+      .symex_assign_rec(lhs, nil_exprt(), rhs, lhs_if_then_else_conditions);
   }
 }
