@@ -189,7 +189,7 @@ SCENARIO("range tests", "[core][util][range]")
       REQUIRE(input2 == expected_result2);
     }
   }
-  GIVEN("A vectors of int and a list of strings.")
+  GIVEN("A vectors of int and a list of strings of same sizes.")
   {
     std::vector<int> int_vector{1, 2};
     std::list<std::string> string_list{"foo", "bar"};
@@ -217,7 +217,7 @@ SCENARIO("range tests", "[core][util][range]")
       }
     }
   }
-  GIVEN("A constant vectors of int and a list of strings.")
+  GIVEN("A constant vectors of int and a list of strings of same sizes.")
   {
     const std::vector<int> int_vector{41, 27};
     const std::list<std::string> string_list{"boo", "far"};
@@ -242,6 +242,126 @@ SCENARIO("range tests", "[core][util][range]")
       THEN("Range is empty")
       {
         REQUIRE(range.empty());
+      }
+    }
+  }
+  GIVEN("Two vectors, where the first is shorter.")
+  {
+    const std::vector<int> int_vector{814, 51};
+    const std::vector<std::string> string_vector{"foo", "bar", "baz", "bay"};
+    WHEN("We zip the vectors with same_size=false")
+    {
+      auto range = make_range(int_vector).zip<false>(string_vector);
+      REQUIRE(!range.empty());
+      THEN("First pair is (814, foo)")
+      {
+        const std::pair<int, std::string> first_pair = *range.begin();
+        REQUIRE(first_pair.first == 814);
+        REQUIRE(first_pair.second == "foo");
+      }
+      auto second_range = range.drop(1);
+      THEN("Begin iterator when first element is dropped is different")
+      {
+        REQUIRE(second_range.begin() != range.begin());
+      }
+      THEN("Second pair is (51, bar)")
+      {
+        const std::pair<int, std::string> second_pair = *second_range.begin();
+        REQUIRE(second_pair.first == 51);
+        REQUIRE(second_pair.second == "bar");
+      }
+      auto third_range = second_range.drop(1);
+      THEN("Range is empty")
+      {
+        REQUIRE(third_range.begin() != second_range.begin());
+        REQUIRE(third_range.empty());
+      }
+    }
+    WHEN("We zip the vectors with same_size=true")
+    {
+      auto range = make_range(int_vector).zip<true>(string_vector);
+      REQUIRE(!range.empty());
+      THEN("First pair is (814, foo)")
+      {
+        const std::pair<int, std::string> first_pair = *range.begin();
+        REQUIRE(first_pair.first == 814);
+        REQUIRE(first_pair.second == "foo");
+      }
+      auto second_range = range.drop(1);
+      THEN("Begin iterator when first element is dropped is different")
+      {
+        REQUIRE(second_range.begin() != range.begin());
+      }
+      THEN("Second pair is (51, bar)")
+      {
+        const std::pair<int, std::string> second_pair = *second_range.begin();
+        REQUIRE(second_pair.first == 51);
+        REQUIRE(second_pair.second == "bar");
+      }
+      THEN("An invariant throw as we reach the end of the first range")
+      {
+        cbmc_invariants_should_throwt invariants_throw;
+        REQUIRE_THROWS_AS(second_range.drop(1), invariant_failedt);
+      }
+    }
+  }
+  GIVEN("Two vectors, where the second is shorter.")
+  {
+    const std::vector<std::string> string_vector{"foo", "bar", "baz", "bay"};
+    const std::vector<int> int_vector{814, 51};
+    WHEN("We zip the vectors with same_size=false")
+    {
+      auto range = make_range(string_vector).zip<false>(int_vector);
+      REQUIRE(!range.empty());
+      THEN("First pair is (foo, 814)")
+      {
+        const std::pair<std::string, int> first_pair = *range.begin();
+        REQUIRE(first_pair.first == "foo");
+        REQUIRE(first_pair.second == 814);
+      }
+      auto second_range = range.drop(1);
+      THEN("Begin iterator when first element is dropped is different")
+      {
+        REQUIRE(second_range.begin() != range.begin());
+      }
+      THEN("Second pair is (51, bar)")
+      {
+        const std::pair<std::string, int> second_pair = *second_range.begin();
+        REQUIRE(second_pair.first == "bar");
+        REQUIRE(second_pair.second == 51);
+      }
+      auto third_range = second_range.drop(1);
+      THEN("Range is empty")
+      {
+        REQUIRE(third_range.begin() != second_range.begin());
+        REQUIRE(third_range.empty());
+      }
+    }
+    WHEN("We zip the vectors with same_size=true")
+    {
+      auto range = make_range(string_vector).zip<true>(int_vector);
+      REQUIRE(!range.empty());
+      THEN("First pair is (foo, 814)")
+      {
+        const std::pair<std::string, int> first_pair = *range.begin();
+        REQUIRE(first_pair.first == "foo");
+        REQUIRE(first_pair.second == 814);
+      }
+      auto second_range = range.drop(1);
+      THEN("Begin iterator when first element is dropped is different")
+      {
+        REQUIRE(second_range.begin() != range.begin());
+      }
+      THEN("Second pair is (bar, 51)")
+      {
+        const std::pair<std::string, int> second_pair = *second_range.begin();
+        REQUIRE(second_pair.first == "bar");
+        REQUIRE(second_pair.second == 51);
+      }
+      THEN("An invariant throw as we reach the end of the first range")
+      {
+        cbmc_invariants_should_throwt invariants_throw;
+        REQUIRE_THROWS_AS(second_range.drop(1), invariant_failedt);
       }
     }
   }

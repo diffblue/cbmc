@@ -267,9 +267,14 @@ private:
 
 /// Zip two ranges to make a range of pairs.
 /// On increment, both iterators are incremented.
-/// Ends when the two ranges reach their ends.
-/// Invariants are checking that one does not end before the other.
-template <typename first_iteratort, typename second_iteratort>
+/// Ends when both of the two ranges reach their end if \p same_size is true,
+/// when one of the two ranges ends otherwise.
+/// \tparam same_size: if true invariants are checking that one range does not
+///     end before the other
+template <
+  typename first_iteratort,
+  typename second_iteratort,
+  bool same_size = true>
 struct zip_iteratort
 {
 public:
@@ -283,6 +288,9 @@ public:
 
   bool operator==(const zip_iteratort &other) const
   {
+    if(!same_size && end_reached() && other.end_reached())
+      return true;
+
     return first_begin == other.first_begin && first_end == other.first_end &&
            second_begin == other.second_begin && second_end == other.second_end;
   }
@@ -295,13 +303,14 @@ public:
   /// Preincrement operator
   zip_iteratort &operator++()
   {
-    PRECONDITION(first_begin != first_end && second_begin != second_end);
+    PRECONDITION(!end_reached());
     ++first_begin;
     ++second_begin;
     INVARIANT(
-      (first_begin == first_end) == (second_begin == second_end),
+      !same_size ||
+        ((first_begin == first_end) == (second_begin == second_end)),
       "Zipped ranges should have the same size");
-    current = first_begin != first_end
+    current = !end_reached()
                 ? std::make_shared<value_type>(*first_begin, *second_begin)
                 : nullptr;
     return *this;
@@ -336,7 +345,9 @@ public:
       second_begin(std::move(_second_begin)),
       second_end(std::move(_second_end))
   {
-    PRECONDITION((first_begin == first_end) == (second_begin == second_end));
+    PRECONDITION(
+      !same_size ||
+      ((first_begin == first_end) == (second_begin == second_end)));
     if(first_begin != first_end)
       current = util_make_unique<value_type>(*first_begin, *second_begin);
   }
@@ -347,6 +358,19 @@ private:
   second_iteratort second_begin;
   second_iteratort second_end;
   std::shared_ptr<value_type> current = nullptr;
+
+  bool end_reached() const
+  {
+    if(same_size)
+    {
+      INVARIANT(
+        (first_begin == first_end) == (second_begin == second_end),
+        "Zip ranges should have same size");
+      return first_begin == first_end;
+    }
+    else
+      return first_begin == first_end || second_begin == second_end;
+  }
 };
 
 /// A range is a pair of a begin and an end iterators.
@@ -421,23 +445,26 @@ public:
       concat_begin, concat_end);
   }
 
-  template <typename other_iteratort>
-  ranget<zip_iteratort<iteratort, other_iteratort>>
+  /// Combine two ranges to make a range over pairs
+  /// \tparam same_size: if true, cause an invariant violation in case the end
+  ///   is not reached simultaneously for both ranges
+  template <bool same_size = true, typename other_iteratort>
+  ranget<zip_iteratort<iteratort, other_iteratort, same_size>>
   zip(ranget<other_iteratort> other)
   {
-    auto zip_begin = zip_iteratort<iteratort, other_iteratort>(
+    auto zip_begin = zip_iteratort<iteratort, other_iteratort, same_size>(
       begin(), end(), other.begin(), other.end());
-    auto zip_end = zip_iteratort<iteratort, other_iteratort>(
+    auto zip_end = zip_iteratort<iteratort, other_iteratort, same_size>(
       end(), end(), other.end(), other.end());
-    return ranget<zip_iteratort<iteratort, other_iteratort>>(
+    return ranget<zip_iteratort<iteratort, other_iteratort, same_size>>(
       zip_begin, zip_end);
   }
 
-  template <typename containert>
+  template <bool same_size = true, typename containert>
   auto zip(containert &container)
-    -> ranget<zip_iteratort<iteratort, decltype(container.begin())>>
+    -> ranget<zip_iteratort<iteratort, decltype(container.begin()), same_size>>
   {
-    return zip(
+    return zip<same_size>(
       ranget<decltype(container.begin())>{container.begin(), container.end()});
   }
 
