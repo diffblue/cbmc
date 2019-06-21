@@ -22,6 +22,15 @@ Author: Daniel Kroening, kroening@kroening.com
 // update_exprt.
 // #define USE_UPDATE
 
+constexpr bool use_update()
+{
+#ifdef USE_UPDATE
+  return true;
+#else
+  return false;
+#endif
+}
+
 /// Store the \p what expression by recursively descending into the operands
 /// of \p lhs until the first operand \c op0 is _nil_: this _nil_ operand
 /// is then replaced with \p what.
@@ -151,6 +160,7 @@ struct assignmentt final
 /// \param assignment: an assignment to rewrite
 /// \param ns: namespace
 /// \return the updated assignment
+template <bool use_update>
 static assignmentt rewrite_with_to_field_symbols(
   goto_symext::statet &state,
   assignmentt assignment,
@@ -158,69 +168,73 @@ static assignmentt rewrite_with_to_field_symbols(
 {
   exprt &ssa_rhs = assignment.rhs;
   ssa_exprt &lhs_mod = assignment.lhs;
-#ifdef USE_UPDATE
-  while(ssa_rhs.id() == ID_update &&
-        to_update_expr(ssa_rhs).designator().size() == 1 &&
-        (lhs_mod.type().id() == ID_array || lhs_mod.type().id() == ID_struct ||
-         lhs_mod.type().id() == ID_struct_tag))
+  if(use_update)
   {
-    exprt field_sensitive_lhs;
-    const update_exprt &update = to_update_expr(ssa_rhs);
-    PRECONDITION(update.designator().size() == 1);
-    const exprt &designator = update.designator().front();
-
-    if(lhs_mod.type().id() == ID_array)
+    while(ssa_rhs.id() == ID_update &&
+          to_update_expr(ssa_rhs).designator().size() == 1 &&
+          (lhs_mod.type().id() == ID_array ||
+           lhs_mod.type().id() == ID_struct ||
+           lhs_mod.type().id() == ID_struct_tag))
     {
-      field_sensitive_lhs =
-        index_exprt(lhs_mod, to_index_designator(designator).index());
+      exprt field_sensitive_lhs;
+      const update_exprt &update = to_update_expr(ssa_rhs);
+      PRECONDITION(update.designator().size() == 1);
+      const exprt &designator = update.designator().front();
+
+      if(lhs_mod.type().id() == ID_array)
+      {
+        field_sensitive_lhs =
+          index_exprt(lhs_mod, to_index_designator(designator).index());
+      }
+      else
+      {
+        field_sensitive_lhs = member_exprt(
+          lhs_mod,
+          to_member_designator(designator).get_component_name(),
+          update.new_value().type());
+      }
+
+      state.field_sensitivity.apply(ns, state, field_sensitive_lhs, true);
+
+      if(field_sensitive_lhs.id() != ID_symbol)
+        break;
+
+      ssa_rhs = update.new_value();
+      lhs_mod = to_ssa_expr(field_sensitive_lhs);
     }
-    else
-    {
-      field_sensitive_lhs = member_exprt(
-        lhs_mod,
-        to_member_designator(designator).get_component_name(),
-        update.new_value().type());
-    }
-
-    state.field_sensitivity.apply(ns, state, field_sensitive_lhs, true);
-
-    if(field_sensitive_lhs.id() != ID_symbol)
-      break;
-
-    ssa_rhs = update.new_value();
-    lhs_mod = to_ssa_expr(field_sensitive_lhs);
   }
-#else
-  while(ssa_rhs.id() == ID_with &&
-        to_with_expr(ssa_rhs).operands().size() == 3 &&
-        (lhs_mod.type().id() == ID_array || lhs_mod.type().id() == ID_struct ||
-         lhs_mod.type().id() == ID_struct_tag))
+  else
   {
-    exprt field_sensitive_lhs;
-    const with_exprt &with_expr = to_with_expr(ssa_rhs);
-
-    if(lhs_mod.type().id() == ID_array)
+    while(
+      ssa_rhs.id() == ID_with && to_with_expr(ssa_rhs).operands().size() == 3 &&
+      (lhs_mod.type().id() == ID_array || lhs_mod.type().id() == ID_struct ||
+       lhs_mod.type().id() == ID_struct_tag))
     {
-      field_sensitive_lhs = index_exprt(lhs_mod, with_expr.where());
+      exprt field_sensitive_lhs;
+      const with_exprt &with_expr = to_with_expr(ssa_rhs);
+
+      if(lhs_mod.type().id() == ID_array)
+      {
+        field_sensitive_lhs = index_exprt(lhs_mod, with_expr.where());
+      }
+      else
+      {
+        field_sensitive_lhs = member_exprt(
+          lhs_mod,
+          with_expr.where().get(ID_component_name),
+          with_expr.new_value().type());
+      }
+
+      field_sensitive_lhs = state.field_sensitivity.apply(
+        ns, state, std::move(field_sensitive_lhs), true);
+
+      if(field_sensitive_lhs.id() != ID_symbol)
+        break;
+
+      ssa_rhs = with_expr.new_value();
+      lhs_mod = to_ssa_expr(field_sensitive_lhs);
     }
-    else
-    {
-      field_sensitive_lhs = member_exprt(
-        lhs_mod,
-        with_expr.where().get(ID_component_name),
-        with_expr.new_value().type());
-    }
-
-    field_sensitive_lhs = state.field_sensitivity.apply(
-      ns, state, std::move(field_sensitive_lhs), true);
-
-    if(field_sensitive_lhs.id() != ID_symbol)
-      break;
-
-    ssa_rhs = with_expr.new_value();
-    lhs_mod = to_ssa_expr(field_sensitive_lhs);
   }
-#endif
   return assignment;
 }
 
@@ -363,7 +377,8 @@ void symex_assignt::assign_non_struct_symbol(
   // in the future these should be omitted.
   auto assignment = shift_indexed_access_to_lhs(
     state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
-  assignment = rewrite_with_to_field_symbols(state, std::move(assignment), ns);
+  assignment = rewrite_with_to_field_symbols<use_update()>(
+    state, std::move(assignment), ns);
 
   if(symex_config.simplify_opt)
     assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
