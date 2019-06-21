@@ -31,6 +31,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/osx_fat_reader.cpp \
        goto-programs/remove_returns.cpp \
        goto-programs/xml_expr.cpp \
+       goto-symex/goto_symex_state.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
        goto-symex/symex_level0.cpp \

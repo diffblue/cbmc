@@ -173,15 +173,6 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   {
     DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
   }
-  const ssa_exprt l1_lhs = lhs;
-
-#if 0
-  PRECONDITION(l1_identifier != get_original_name(l1_identifier)
-      || l1_identifier == guard_identifier()
-      || ns.lookup(l1_identifier).is_shared()
-      || has_prefix(id2string(l1_identifier), "symex::invalid_object")
-      || has_prefix(id2string(l1_identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"));
-#endif
 
   // do the l2 renaming
   level2.increase_generation(l1_identifier, lhs, fresh_l2_name_provider);
@@ -202,8 +193,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     throw unsupported_operation_exceptiont(
       "pointer handling for concurrency is unsound");
 
-  // for value propagation -- the RHS is L2
-
+  // Update constant propagation map -- the RHS is L2
   if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
   {
     const auto propagation_entry = propagation.find(l1_identifier);
@@ -212,8 +202,8 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     else if(propagation_entry->get() != rhs)
       propagation.replace(l1_identifier, rhs);
   }
-  else if(propagation.has_key(l1_identifier))
-    propagation.erase(l1_identifier);
+  else
+    propagation.erase_if_exists(l1_identifier);
 
   {
     // update value sets
@@ -230,9 +220,9 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
 
-#if 0
+#ifdef DEBUG
   std::cout << "Assigning " << l1_identifier << '\n';
-  value_set.output(ns, std::cout);
+  value_set.output(std::cout);
   std::cout << "**********************\n";
 #endif
 
