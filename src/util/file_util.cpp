@@ -193,3 +193,13 @@ bool is_directory(const std::string &path)
 
 #endif
 }
+
+bool create_directory(const std::string &path)
+{
+#ifdef _WIN32
+  return _mkdir(path.c_str()) == 0;
+#else
+  // the umask matches what std::filesystem::create_directory does
+  return mkdir(path.c_str(), 0777) == 0;
+#endif
+}
