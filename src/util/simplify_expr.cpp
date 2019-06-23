@@ -848,29 +848,31 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_dereference(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_dereference(const dereference_exprt &expr)
 {
-  const exprt &pointer=to_dereference_expr(expr).pointer();
+  const exprt &pointer = expr.pointer();
 
   if(pointer.type().id()!=ID_pointer)
-    return true;
+    return unchanged(expr);
 
   if(pointer.id()==ID_if && pointer.operands().size()==3)
   {
     const if_exprt &if_expr=to_if_expr(pointer);
 
-    exprt tmp_op1=expr;
-    tmp_op1.op0()=if_expr.true_case();
-    simplify_dereference(tmp_op1);
-    exprt tmp_op2=expr;
-    tmp_op2.op0()=if_expr.false_case();
-    simplify_dereference(tmp_op2);
+    auto tmp_op1 = expr;
+    tmp_op1.op() = if_expr.true_case();
+    exprt tmp_op1_result = simplify_dereference(tmp_op1);
 
-    expr=if_exprt(if_expr.cond(), tmp_op1, tmp_op2);
+    auto tmp_op2 = expr;
+    tmp_op2.op() = if_expr.false_case();
+    exprt tmp_op2_result = simplify_dereference(tmp_op2);
 
-    simplify_if(to_if_expr(expr));
+    if_exprt tmp{if_expr.cond(), tmp_op1_result, tmp_op2_result};
 
-    return false;
+    simplify_if(tmp);
+
+    return tmp;
   }
 
   if(pointer.id()==ID_address_of)
@@ -878,8 +880,7 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
     exprt tmp=to_address_of_expr(pointer).object();
     // one address_of is gone, try again
     simplify_rec(tmp);
-    expr.swap(tmp);
-    return false;
+    return tmp;
   }
   // rewrite *(&a[0] + x) to a[x]
   else if(pointer.id()==ID_plus &&
@@ -898,13 +899,12 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
           pointer_offset_sum(old.index(), pointer.op1()),
           old.array().type().subtype());
         simplify_rec(idx);
-        expr.swap(idx);
-        return false;
+        return idx;
       }
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_if_implies(
@@ -2491,7 +2491,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_and)
     no_change = simplify_boolean(expr) && no_change;
   else if(expr.id()==ID_dereference)
-    no_change = simplify_dereference(expr) && no_change;
+  {
+    auto r = simplify_dereference(to_dereference_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_address_of)
     no_change = simplify_address_of(expr) && no_change;
   else if(expr.id()==ID_pointer_offset)

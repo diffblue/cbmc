@@ -30,6 +30,7 @@ class array_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
+class dereference_exprt;
 class exprt;
 class extractbits_exprt;
 class function_application_exprt;
@@ -154,7 +155,7 @@ public:
   bool simplify_object(exprt &expr);
   bool simplify_unary_minus(exprt &expr);
   bool simplify_unary_plus(exprt &expr);
-  bool simplify_dereference(exprt &expr);
+  resultt<> simplify_dereference(const dereference_exprt &);
   bool simplify_address_of(exprt &expr);
   bool simplify_pointer_offset(exprt &expr);
   bool simplify_bswap(bswap_exprt &expr);
