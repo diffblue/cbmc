@@ -32,6 +32,7 @@ class byte_extract_exprt;
 class byte_update_exprt;
 class exprt;
 class extractbits_exprt;
+class function_application_exprt;
 class if_exprt;
 class index_exprt;
 class member_exprt;
@@ -167,7 +168,7 @@ public:
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.
-  bool simplify_function_application(exprt &expr);
+  resultt<> simplify_function_application(const function_application_exprt &);
 
   // auxiliary
   bool simplify_if_implies(

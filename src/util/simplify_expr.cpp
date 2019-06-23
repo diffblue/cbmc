@@ -153,16 +153,13 @@ simplify_exprt::simplify_popcount(const popcount_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_function_application(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
+  const function_application_exprt &expr)
 {
-  const function_application_exprt &function_app =
-    to_function_application_expr(expr);
+  if(expr.function().id() != ID_symbol)
+    return unchanged(expr);
 
-  if(function_app.function().id() != ID_symbol)
-    return true;
-
-  const irep_idt func_id =
-    to_symbol_expr(function_app.function()).get_identifier();
+  const irep_idt &func_id = to_symbol_expr(expr.function()).get_identifier();
 
   // Starts-with is used for .equals.
   if(func_id == ID_cprover_string_startswith_func)
@@ -170,14 +167,14 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
     // We want to get both arguments of any starts-with comparison, and
     // trace them back to the actual string instance. All variables on the
     // way must be constant for us to be sure this will work.
-    auto &first_argument = to_string_expr(function_app.arguments().at(0));
-    auto &second_argument = to_string_expr(function_app.arguments().at(1));
+    auto &first_argument = to_string_expr(expr.arguments().at(0));
+    auto &second_argument = to_string_expr(expr.arguments().at(1));
 
     const auto first_value_opt = try_get_string_data_array(first_argument, ns);
 
     if(!first_value_opt)
     {
-      return true;
+      return unchanged(expr);
     }
 
     const array_exprt &first_value = first_value_opt->get();
@@ -187,17 +184,17 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
 
     if(!second_value_opt)
     {
-      return true;
+      return unchanged(expr);
     }
 
     const array_exprt &second_value = second_value_opt->get();
 
     mp_integer offset_int = 0;
-    if(function_app.arguments().size() == 3)
+    if(expr.arguments().size() == 3)
     {
-      auto &offset = function_app.arguments()[2];
+      auto &offset = expr.arguments()[2];
       if(offset.id() != ID_constant)
-        return true;
+        return unchanged(expr);
       offset_int = numeric_cast_v<mp_integer>(to_constant_expr(offset));
     }
 
@@ -224,26 +221,25 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
           ++second_it;
       }
     }
-    expr = from_integer(is_prefix ? 1 : 0, expr.type());
-    return false;
+
+    return from_integer(is_prefix ? 1 : 0, expr.type());
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
-    if(function_app.arguments().at(1).id() != ID_constant)
+    if(expr.arguments().at(1).id() != ID_constant)
     {
-      return true;
+      return unchanged(expr);
     }
 
-    const auto &index = to_constant_expr(function_app.arguments().at(1));
+    const auto &index = to_constant_expr(expr.arguments().at(1));
 
-    const refined_string_exprt &s =
-      to_string_expr(function_app.arguments().at(0));
+    const refined_string_exprt &s = to_string_expr(expr.arguments().at(0));
 
     const auto char_seq_opt = try_get_string_data_array(s, ns);
 
     if(!char_seq_opt)
     {
-      return true;
+      return unchanged(expr);
     }
 
     const array_exprt &char_seq = char_seq_opt->get();
@@ -252,22 +248,20 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
 
     if(!i_opt || *i_opt >= char_seq.operands().size())
     {
-      return true;
+      return unchanged(expr);
     }
 
     const auto &c = to_constant_expr(char_seq.operands().at(*i_opt));
 
     if(c.type() != expr.type())
     {
-      return true;
+      return unchanged(expr);
     }
 
-    expr = c;
-
-    return false;
+    return c;
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>
@@ -2540,7 +2534,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id() == ID_function_application)
-    no_change = simplify_function_application(expr) && no_change;
+  {
+    auto r = simplify_function_application(to_function_application_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
     no_change = simplify_complex(expr) && no_change;
 
