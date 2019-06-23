@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "replace_expr.h"
 #endif
 
+class abs_exprt;
 class array_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
@@ -159,7 +160,7 @@ public:
   bool simplify_isinf(exprt &expr);
   bool simplify_isnan(exprt &expr);
   bool simplify_isnormal(exprt &expr);
-  bool simplify_abs(exprt &expr);
+  resultt<> simplify_abs(const abs_exprt &);
   bool simplify_sign(exprt &expr);
   bool simplify_popcount(popcount_exprt &expr);
   bool simplify_complex(exprt &expr);

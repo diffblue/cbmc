@@ -63,12 +63,9 @@ public:
 simplify_expr_cachet simplify_expr_cache;
 #endif
 
-bool simplify_exprt::simplify_abs(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_abs(const abs_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
-
-  if(to_unary_expr(expr).op().is_constant())
+  if(expr.op().is_constant())
   {
     const typet &type = to_unary_expr(expr).op().type();
 
@@ -76,8 +73,7 @@ bool simplify_exprt::simplify_abs(exprt &expr)
     {
       ieee_floatt value(to_constant_expr(to_unary_expr(expr).op()));
       value.set_sign(false);
-      expr=value.to_expr();
-      return false;
+      return value.to_expr();
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
@@ -87,20 +83,18 @@ bool simplify_exprt::simplify_abs(exprt &expr)
       {
         if(*value >= 0)
         {
-          expr = to_unary_expr(expr).op();
-          return false;
+          return to_unary_expr(expr).op();
         }
         else
         {
           value->negate();
-          expr = from_integer(*value, type);
-          return false;
+          return from_integer(*value, type);
         }
       }
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_sign(exprt &expr)
@@ -2528,7 +2522,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_isnormal)
     no_change = simplify_isnormal(expr) && no_change;
   else if(expr.id()==ID_abs)
-    no_change = simplify_abs(expr) && no_change;
+  {
+    auto r = simplify_abs(to_abs_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_sign)
     no_change = simplify_sign(expr) && no_change;
   else if(expr.id() == ID_popcount)
