@@ -127,7 +127,8 @@ bool simplify_exprt::simplify_sign(exprt &expr)
   return true;
 }
 
-bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_popcount(const popcount_exprt &expr)
 {
   const exprt &op = expr.op();
 
@@ -145,14 +146,11 @@ bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
         if(get_bvrep_bit(value, width, i))
           result++;
 
-      auto result_expr = from_integer(result, expr.type());
-      expr.swap(result_expr);
-
-      return false;
+      return from_integer(result, expr.type());
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_function_application(exprt &expr)
@@ -2533,7 +2531,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_sign)
     no_change = simplify_sign(expr) && no_change;
   else if(expr.id() == ID_popcount)
-    no_change = simplify_popcount(to_popcount_expr(expr)) && no_change;
+  {
+    auto r = simplify_popcount(to_popcount_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id() == ID_function_application)
     no_change = simplify_function_application(expr) && no_change;
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)

@@ -162,7 +162,7 @@ public:
   bool simplify_isnormal(exprt &expr);
   resultt<> simplify_abs(const abs_exprt &);
   bool simplify_sign(exprt &expr);
-  bool simplify_popcount(popcount_exprt &expr);
+  resultt<> simplify_popcount(const popcount_exprt &);
   bool simplify_complex(exprt &expr);
 
   /// Attempt to simplify mathematical function applications if we have
