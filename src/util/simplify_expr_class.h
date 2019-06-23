@@ -140,8 +140,8 @@ public:
   bool simplify_update(exprt &expr);
   bool simplify_index(exprt &expr);
   bool simplify_member(exprt &expr);
-  bool simplify_byte_update(byte_update_exprt &expr);
-  bool simplify_byte_extract(byte_extract_exprt &expr);
+  resultt<> simplify_byte_update(const byte_update_exprt &);
+  resultt<> simplify_byte_extract(const byte_extract_exprt &);
   bool simplify_pointer_object(exprt &expr);
   bool simplify_object_size(exprt &expr);
   bool simplify_dynamic_size(exprt &expr);
