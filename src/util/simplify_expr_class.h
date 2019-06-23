@@ -25,12 +25,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "replace_expr.h"
 #endif
 
+class abs_exprt;
 class array_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
+class dereference_exprt;
 class exprt;
 class extractbits_exprt;
+class function_application_exprt;
 class if_exprt;
 class index_exprt;
 class member_exprt;
@@ -152,21 +155,21 @@ public:
   bool simplify_object(exprt &expr);
   bool simplify_unary_minus(exprt &expr);
   bool simplify_unary_plus(exprt &expr);
-  bool simplify_dereference(exprt &expr);
+  resultt<> simplify_dereference(const dereference_exprt &);
   bool simplify_address_of(exprt &expr);
   bool simplify_pointer_offset(exprt &expr);
   bool simplify_bswap(bswap_exprt &expr);
   bool simplify_isinf(exprt &expr);
   bool simplify_isnan(exprt &expr);
   bool simplify_isnormal(exprt &expr);
-  bool simplify_abs(exprt &expr);
+  resultt<> simplify_abs(const abs_exprt &);
   bool simplify_sign(exprt &expr);
-  bool simplify_popcount(popcount_exprt &expr);
+  resultt<> simplify_popcount(const popcount_exprt &);
   bool simplify_complex(exprt &expr);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.
-  bool simplify_function_application(exprt &expr);
+  resultt<> simplify_function_application(const function_application_exprt &);
 
   // auxiliary
   bool simplify_if_implies(
