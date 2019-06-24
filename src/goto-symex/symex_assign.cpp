@@ -335,19 +335,8 @@ void symex_assignt::symex_assign_from_struct(
       lhs_field.id() == ID_symbol,
       "member of symbol should be susceptible to field-sensitivity");
 
-    if(comp_rhs.second.id() == ID_struct)
-    {
-      symex_assign_from_struct(
-        to_ssa_expr(lhs_field),
-        full_lhs,
-        to_struct_expr(comp_rhs.second),
-        guard);
-    }
-    else
-    {
-      assign_non_struct_symbol(
-        to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
-    }
+    symex_assign_symbol(
+      to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
   }
 }
 
