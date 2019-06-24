@@ -1,0 +1,19 @@
+CORE
+main.c
+--dump-c-type-header main 
+^EXIT=10$
+^SIGNAL=0$
+struct B
+  // t
+  signed int t;
+  // g
+  signed int g;
+Should be valid: SUCCESS
+Should be nondet now: FAILURE
+Should not be null: SUCCESS
+Trying the macro: SUCCESS
+#include "data_structure.h"
+--
+^warning: ignoring
+struct A default_config = \{5, 6\};
+struct A my_config=\{ .a=7, .b=8 \};

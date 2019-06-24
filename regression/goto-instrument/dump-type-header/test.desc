@@ -1,0 +1,12 @@
+CORE
+main.c
+--dump-c-type-header main 
+^EXIT=0$
+^SIGNAL=0$
+struct A
+  // a
+  signed int a;
+  // b
+  signed int b;
+--
+^warning: ignoring

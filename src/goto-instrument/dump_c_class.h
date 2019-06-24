@@ -21,6 +21,92 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/system_library_symbols.h>
 
+/// Used for configuring the behaviour of dump_c
+struct dump_c_configurationt final
+{
+  /// Include the function declarations in the dump
+  bool include_function_decls = true;
+
+  /// Include the functions in the dump
+  bool include_function_bodies = true;
+
+  /// Include the global declarations in the dump
+  bool include_global_decls = true;
+
+  /// Include the typedefs in the dump
+  bool include_typedefs = true;
+
+  /// Include global variable definitions in the dump
+  bool include_global_vars = true;
+
+  /// Include struct definitions in the dump
+  bool include_compounds = true;
+
+  /// Define whether to follow compunds recursively
+  bool follow_compounds = true;
+
+  /// Include headers type declarations are borrowed from
+  bool include_headers = false;
+
+  dump_c_configurationt()
+  {
+  }
+
+  /// The default used for dump-c and dump-cpp
+  static dump_c_configurationt default_configuration;
+
+  /// The config used for dump-c-type-header
+  static dump_c_configurationt type_header_configuration;
+
+  dump_c_configurationt disable_include_function_decls()
+  {
+    this->include_function_decls = false;
+    return *this;
+  }
+
+  dump_c_configurationt disable_include_function_bodies()
+  {
+    this->include_function_bodies = false;
+    return *this;
+  }
+
+  dump_c_configurationt disable_include_global_decls()
+  {
+    this->include_global_decls = false;
+    return *this;
+  }
+
+  dump_c_configurationt disable_include_typedefs()
+  {
+    this->include_typedefs = false;
+    return *this;
+  }
+
+  dump_c_configurationt disable_include_global_vars()
+  {
+    this->include_global_vars = false;
+    return *this;
+  }
+
+  dump_c_configurationt disable_include_compunds()
+  {
+    this->include_compounds = false;
+    return *this;
+  }
+
+  dump_c_configurationt disable_follow_compounds()
+  {
+    this->follow_compounds = false;
+    return *this;
+  }
+
+  dump_c_configurationt enable_include_headers()
+  {
+    this->include_headers = true;
+    return *this;
+  }
+};
+
 class dump_ct
 {
 public:
@@ -30,15 +116,35 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    language_factoryt factory):
-    goto_functions(_goto_functions),
-    copied_symbol_table(_ns.get_symbol_table()),
-    ns(copied_symbol_table),
-    language(factory()),
-    harness(include_harness),
-    system_symbols(use_system_headers)
+    language_factoryt factory,
+    const dump_c_configurationt config)
+    : goto_functions(_goto_functions),
+      copied_symbol_table(_ns.get_symbol_table()),
+      ns(copied_symbol_table),
+      dump_c_config(config),
+      language(factory()),
+      harness(include_harness),
+      system_symbols(use_system_headers)
   {
     system_symbols.set_use_all_headers(use_all_headers);
+  }
+
+  dump_ct(
+    const goto_functionst &_goto_functions,
+    const bool use_system_headers,
+    const bool use_all_headers,
+    const bool include_harness,
+    const namespacet &_ns,
+    language_factoryt factory)
+    : dump_ct(
+        _goto_functions,
+        use_system_headers,
+        use_all_headers,
+        include_harness,
+        _ns,
+        factory,
+        dump_c_configurationt::default_configuration)
+  {
   }
 
   virtual ~dump_ct()=default;
@@ -49,6 +155,7 @@ protected:
   const goto_functionst &goto_functions;
   symbol_tablet copied_symbol_table;
   const namespacet ns;
+  const dump_c_configurationt dump_c_config;
   std::unique_ptr<languaget> language;
   const bool harness;
 

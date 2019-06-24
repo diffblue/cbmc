@@ -13,8 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/find_symbols.h>
+#include <util/get_base_name.h>
 #include <util/invariant.h>
 #include <util/replace_symbol.h>
+#include <util/string_utils.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
@@ -23,6 +25,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c_class.h"
 #include "goto_program2code.h"
+
+dump_c_configurationt dump_c_configurationt::default_configuration =
+  dump_c_configurationt();
+
+dump_c_configurationt dump_c_configurationt::type_header_configuration =
+  dump_c_configurationt()
+    .disable_include_function_decls()
+    .disable_include_function_bodies()
+    .disable_include_global_vars()
+    .enable_include_headers();
 
 inline std::ostream &operator << (std::ostream &out, dump_ct &src)
 {
@@ -36,6 +48,7 @@ void dump_ct::operator()(std::ostream &os)
   std::stringstream compound_body_stream;
   std::stringstream global_var_stream;
   std::stringstream global_decl_stream;
+  std::stringstream global_decl_header_stream;
   std::stringstream func_body_stream;
   local_static_declst local_static_decls;
 
@@ -159,6 +172,7 @@ void dump_ct::operator()(std::ostream &os)
 
   // collect all declarations we might need, include local static variables
   bool skip_function_main=false;
+  std::vector<std::string> header_files;
   for(std::set<std::string>::const_iterator
       it=symbols_sorted.begin();
       it!=symbols_sorted.end();
@@ -178,6 +192,24 @@ void dump_ct::operator()(std::ostream &os)
         global_decl_stream << "// " << symbol.name << '\n';
         global_decl_stream << "// " << symbol.location << '\n';
 
+        std::string location_file =
+          get_base_name(id2string(symbol.location.get_file()), false);
+        // collect header the types are borrowed from
+        // expect header files to end in .h
+        if(
+          location_file.length() > 1 &&
+          location_file[location_file.length() - 1] == 'h')
+        {
+          std::vector<std::string>::iterator it =
+            find(header_files.begin(), header_files.end(), location_file);
+          if(it == header_files.end())
+          {
+            header_files.push_back(location_file);
+            global_decl_header_stream << "#include \"" << location_file
+                                      << "\"\n";
+          }
+        }
+
         if(type_id==ID_c_enum)
           convert_compound_enum(symbol.type, global_decl_stream);
         else if(type_id == ID_struct)
@@ -192,7 +224,9 @@ void dump_ct::operator()(std::ostream &os)
         }
       }
     }
-    else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
+    else if(
+      symbol.is_static_lifetime && symbol.type.id() != ID_code &&
+      !symbol.type.get_bool(ID_C_do_not_dump))
       convert_global_variable(
           symbol,
           global_var_stream,
@@ -259,6 +293,9 @@ void dump_ct::operator()(std::ostream &os)
   if(!system_headers.empty())
     os << '\n';
 
+  if(!global_decl_header_stream.str().empty() && dump_c_config.include_headers)
+    os << global_decl_header_stream.str() << '\n';
+
   if(global_var_stream.str().find("NULL")!=std::string::npos ||
      func_body_stream.str().find("NULL")!=std::string::npos)
   {
@@ -282,18 +319,20 @@ void dump_ct::operator()(std::ostream &os)
        << "#endif\n\n";
   }
 
-  if(!global_decl_stream.str().empty())
+  if(!global_decl_stream.str().empty() && dump_c_config.include_global_decls)
     os << global_decl_stream.str() << '\n';
 
-  dump_typedefs(os);
+  if(dump_c_config.include_typedefs)
+    dump_typedefs(os);
 
-  if(!func_decl_stream.str().empty())
+  if(!func_decl_stream.str().empty() && dump_c_config.include_function_decls)
     os << func_decl_stream.str() << '\n';
-  if(!compound_body_stream.str().empty())
+  if(!compound_body_stream.str().empty() && dump_c_config.include_compounds)
     os << compound_body_stream.str() << '\n';
-  if(!global_var_stream.str().empty())
+  if(!global_var_stream.str().empty() && dump_c_config.include_global_vars)
     os << global_var_stream.str() << '\n';
-  os << func_body_stream.str();
+  if(dump_c_config.include_function_bodies)
+    os << func_body_stream.str();
 }
 
 /// declare compound types
@@ -301,16 +340,32 @@ void dump_ct::convert_compound_declaration(
     const symbolt &symbol,
     std::ostream &os_body)
 {
-  if(!symbol.location.get_function().empty())
+  if(
+    !symbol.location.get_function().empty() ||
+    symbol.type.get_bool(ID_C_do_not_dump))
+  {
     return;
+  }
 
   // do compound type body
   if(symbol.type.id() == ID_struct)
-    convert_compound(symbol.type, struct_tag_typet(symbol.name), true, os_body);
+    convert_compound(
+      symbol.type,
+      struct_tag_typet(symbol.name),
+      dump_c_config.follow_compounds,
+      os_body);
   else if(symbol.type.id() == ID_union)
-    convert_compound(symbol.type, union_tag_typet(symbol.name), true, os_body);
+    convert_compound(
+      symbol.type,
+      union_tag_typet(symbol.name),
+      dump_c_config.follow_compounds,
+      os_body);
   else if(symbol.type.id() == ID_c_enum)
-    convert_compound(symbol.type, c_enum_tag_typet(symbol.name), true, os_body);
+    convert_compound(
+      symbol.type,
+      c_enum_tag_typet(symbol.name),
+      dump_c_config.follow_compounds,
+      os_body);
 }
 
 void dump_ct::convert_compound(
@@ -372,7 +427,7 @@ void dump_ct::convert_compound(
 {
   const irep_idt &name=type.get(ID_tag);
 
-  if(!converted_compound.insert(name).second)
+  if(!converted_compound.insert(name).second || type.get_bool(ID_C_do_not_dump))
     return;
 
   // make sure typedef names used in the declaration are available
@@ -493,19 +548,23 @@ void dump_ct::convert_compound(
   }
 
   typet unresolved_clean=unresolved;
-  typedef_typest::const_iterator td_entry=
-    typedef_types.find(unresolved);
   irep_idt typedef_str;
-  if(td_entry!=typedef_types.end())
+  for(auto td_entry : typedef_types)
   {
-    unresolved_clean.remove(ID_C_typedef);
-    typedef_str=td_entry->second;
-    std::pair<typedef_mapt::iterator, bool> td_map_entry=
-      typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
-    PRECONDITION(!td_map_entry.second);
-    if(!td_map_entry.first->second.early)
-      td_map_entry.first->second.type_decl_str.clear();
-    os << "typedef ";
+    if(
+      td_entry.first.get(ID_identifier) == unresolved.get(ID_identifier) &&
+      (td_entry.first.source_location() == unresolved.source_location()))
+    {
+      unresolved_clean.remove(ID_C_typedef);
+      typedef_str = td_entry.second;
+      std::pair<typedef_mapt::iterator, bool> td_map_entry =
+        typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
+      PRECONDITION(!td_map_entry.second);
+      if(!td_map_entry.first->second.early)
+        td_map_entry.first->second.type_decl_str.clear();
+      os << "typedef ";
+      break;
+    }
   }
 
   os << type_to_string(unresolved_clean);
@@ -1431,4 +1490,50 @@ void dump_cpp(
     ns,
     new_cpp_language);
   out << goto2cpp;
+}
+
+static bool
+module_local_declaration(const symbolt &symbol, const std::string module)
+{
+  std::string base_name =
+    get_base_name(id2string(symbol.location.get_file()), true);
+  std::string symbol_module = strip_string(id2string(symbol.module));
+  return (base_name == module && symbol_module == module);
+}
+
+void dump_c_type_header(
+  const goto_functionst &src,
+  const bool use_system_headers,
+  const bool use_all_headers,
+  const bool include_harness,
+  const namespacet &ns,
+  const std::string module,
+  std::ostream &out)
+{
+  symbol_tablet symbol_table = ns.get_symbol_table();
+  for(symbol_tablet::iteratort it = symbol_table.begin();
+      it != symbol_table.end();
+      it++)
+  {
+    symbolt &new_symbol = it.get_writeable_symbol();
+    if(module_local_declaration(new_symbol, module))
+    {
+      new_symbol.type.set(ID_C_do_not_dump, 0);
+    }
+    else
+    {
+      new_symbol.type.set(ID_C_do_not_dump, 1);
+    }
+  }
+
+  namespacet new_ns(symbol_table);
+  dump_ct goto2c(
+    src,
+    use_system_headers,
+    use_all_headers,
+    include_harness,
+    new_ns,
+    new_ansi_c_language,
+    dump_c_configurationt::type_header_configuration);
+  out << goto2c;
 }
