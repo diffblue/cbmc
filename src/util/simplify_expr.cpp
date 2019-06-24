@@ -158,6 +158,37 @@ simplify_exprt::simplify_popcount(const popcount_exprt &expr)
   return unchanged(expr);
 }
 
+/// Simplify String.endsWith function when arguments are constant
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_endswith_func(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  const refined_string_exprt &s1 = to_string_expr(expr.arguments().at(0));
+  const auto s1_data_opt = try_get_string_data_array(s1, ns);
+
+  if(!s1_data_opt)
+    return simplify_exprt::unchanged(expr);
+
+  const array_exprt &s1_data = s1_data_opt->get();
+  const refined_string_exprt &s2 = to_string_expr(expr.arguments().at(1));
+  const auto s2_data_opt = try_get_string_data_array(s2, ns);
+
+  if(!s2_data_opt)
+    return simplify_exprt::unchanged(expr);
+
+  const array_exprt &s2_data = s2_data_opt->get();
+  const bool res = s2_data.operands().size() <= s1_data.operands().size() &&
+                   std::equal(
+                     s2_data.operands().rbegin(),
+                     s2_data.operands().rend(),
+                     s1_data.operands().rbegin());
+
+  return from_integer(res ? 1 : 0, expr.type());
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   const function_application_exprt &expr)
 {
@@ -228,6 +259,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
     }
 
     return from_integer(is_prefix ? 1 : 0, expr.type());
+  }
+  else if(func_id == ID_cprover_string_endswith_func)
+  {
+    return simplify_string_endswith_func(expr, ns);
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
