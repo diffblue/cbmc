@@ -182,7 +182,7 @@ static assignmentt rewrite_with_to_field_symbols(
         update.new_value().type());
     }
 
-    state.field_sensitivity.apply(state, field_sensitive_lhs, true);
+    state.field_sensitivity.apply(ns, state, field_sensitive_lhs, true);
 
     if(field_sensitive_lhs.id() != ID_symbol)
       break;
