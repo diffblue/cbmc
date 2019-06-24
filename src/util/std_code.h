@@ -631,6 +631,53 @@ inline code_assertt &to_code_assert(codet &code)
   return ret;
 }
 
+/// A `codet` representing the declaration that an input of a particular
+/// description has a value which corresponds to the value of a given expression
+/// (or expressions).
+/// When working with the C front end, calls to the `__CPROVER_input` intrinsic
+/// can be added to the input code in order add instructions of this type to the
+/// goto program.
+/// The first argument is expected to be a C string denoting the input
+/// identifier. The second argument is the expression for the input value.
+class code_inputt : public codet
+{
+public:
+  /// This constructor is for support of calls to `__CPROVER_input` in user
+  /// code. Where the first first argument is a description which may be any
+  /// `const char *` and one or more corresponding expression arguments follow.
+  explicit code_inputt(
+    std::vector<exprt> arguments,
+    optionalt<source_locationt> location = {});
+
+  /// This constructor is intended for generating input instructions as part of
+  /// synthetic entry point code, rather than as part of user code.
+  /// \param description: This is used to construct an expression for a pointer
+  ///   to a string constant containing the description text. This expression
+  ///   is then used as the first argument.
+  /// \param expression: This expression corresponds to a value which should be
+  ///   recorded as an input.
+  /// \param location: A location to associate with this instruction.
+  code_inputt(
+    const irep_idt &description,
+    exprt expression,
+    optionalt<source_locationt> location = {});
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT);
+};
+
+template <>
+inline bool can_cast_expr<code_inputt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_input);
+}
+
+inline void validate_expr(const code_inputt &input)
+{
+  code_inputt::check(input);
+}
+
 /// Create a fatal assertion, which checks a condition and then halts if it does
 /// not hold. Equivalent to `ASSERT(condition); ASSUME(condition)`.
 ///

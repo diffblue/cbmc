@@ -311,7 +311,7 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
 
   // we iterate through all the parameters of the function under test, allocate
   // an object for that parameter (recursively allocating other objects
-  // necessary to initialize it), and declare such object as an ID_input
+  // necessary to initialize it), and mark such object using `code_inputt`.
   for(std::size_t param_number=0;
       param_number<parameters.size();
       param_number++)
@@ -420,17 +420,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
     }
 
     // record as an input
-    codet input(ID_input);
-    input.operands().resize(2);
-    input.op0()=
-      address_of_exprt(
-        index_exprt(
-          string_constantt(base_name),
-          from_integer(0, index_type())));
-    input.op1()=main_arguments[param_number];
-    input.add_source_location()=function.location;
-
-    init_code.add(std::move(input));
+    init_code.add(
+      code_inputt{base_name, main_arguments[param_number], function.location});
   }
 
   return make_pair(init_code, main_arguments);
