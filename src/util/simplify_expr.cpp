@@ -189,6 +189,28 @@ static simplify_exprt::resultt<> simplify_string_endswith_func(
   return from_integer(res ? 1 : 0, expr.type());
 }
 
+/// Simplify String.isEmpty function when arguments are constant
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_is_empty(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  const function_application_exprt &function_app =
+    to_function_application_expr(expr);
+  const refined_string_exprt &s =
+    to_string_expr(function_app.arguments().at(0));
+
+  if(s.length().id() != ID_constant)
+    return simplify_exprt::unchanged(expr);
+
+  const auto numeric_length =
+    numeric_cast_v<mp_integer>(to_constant_expr(s.length()));
+
+  return from_integer(numeric_length == 0 ? 1 : 0, expr.type());
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   const function_application_exprt &expr)
 {
@@ -263,6 +285,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   else if(func_id == ID_cprover_string_endswith_func)
   {
     return simplify_string_endswith_func(expr, ns);
+  }
+  else if(func_id == ID_cprover_string_is_empty_func)
+  {
+    return simplify_string_is_empty(expr, ns);
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
