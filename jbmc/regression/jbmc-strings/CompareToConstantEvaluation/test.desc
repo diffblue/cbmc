@@ -1,0 +1,10 @@
+CORE
+Main.class
+--function Main.constantCompareToPass 
+^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Check that String.compareTo is correctly simplified when the arguments are constant.

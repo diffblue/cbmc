@@ -1,0 +1,10 @@
+CORE
+Main.class
+--function Main.constantCompareToFail4 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.constantCompareToFail4:()V.assertion.1" --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+\{1\} false
+--
+\{.*\}.* function_application\(cprover_string_compare_to_func
+--
+Check that String.compareTo is correctly simplified when the arguments are constant.

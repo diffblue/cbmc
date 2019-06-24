@@ -211,6 +211,56 @@ static simplify_exprt::resultt<> simplify_string_is_empty(
   return from_integer(numeric_length == 0 ? 1 : 0, expr.type());
 }
 
+/// Simplify String.compareTo function when arguments are constant
+///
+/// The behaviour is similar to the implementation in OpenJDK:
+/// http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/lang/String.java#l1140
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_compare_to(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  const refined_string_exprt &s1 = to_string_expr(expr.arguments().at(0));
+  const auto s1_data_opt = try_get_string_data_array(s1, ns);
+
+  if(!s1_data_opt)
+    return simplify_exprt::unchanged(expr);
+
+  const refined_string_exprt &s2 = to_string_expr(expr.arguments().at(1));
+  const auto s2_data_opt = try_get_string_data_array(s2, ns);
+
+  if(!s2_data_opt)
+    return simplify_exprt::unchanged(expr);
+
+  const array_exprt &s1_data = s1_data_opt->get();
+  const array_exprt &s2_data = s2_data_opt->get();
+
+  if(s1_data.operands() == s2_data.operands())
+    return from_integer(0, expr.type());
+
+  const mp_integer s1_size = s1_data.operands().size();
+  const mp_integer s2_size = s2_data.operands().size();
+  const bool first_shorter = s1_size < s2_size;
+  const exprt::operandst &ops1 =
+    first_shorter ? s1_data.operands() : s2_data.operands();
+  const exprt::operandst &ops2 =
+    first_shorter ? s2_data.operands() : s1_data.operands();
+  auto it_pair = std::mismatch(ops1.begin(), ops1.end(), ops2.begin());
+
+  if(it_pair.first == ops1.end())
+    return from_integer(s1_size - s2_size, expr.type());
+
+  const mp_integer char1 =
+    numeric_cast_v<mp_integer>(to_constant_expr(*it_pair.first));
+  const mp_integer char2 =
+    numeric_cast_v<mp_integer>(to_constant_expr(*it_pair.second));
+
+  return from_integer(
+    first_shorter ? char1 - char2 : char2 - char1, expr.type());
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   const function_application_exprt &expr)
 {
@@ -289,6 +339,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   else if(func_id == ID_cprover_string_is_empty_func)
   {
     return simplify_string_is_empty(expr, ns);
+  }
+  else if(func_id == ID_cprover_string_compare_to_func)
+  {
+    return simplify_string_compare_to(expr, ns);
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
