@@ -134,6 +134,11 @@ std::vector<unsigned> parse_number_range(const std::string &number_range)
     }
     else if(c == '-')
     {
+      if(!number.has_value())
+      {
+        throw deserialization_exceptiont(
+          "lower bound missing in number range '" + number_range + "'");
+      }
       begin_range = number;
       number = {};
     }

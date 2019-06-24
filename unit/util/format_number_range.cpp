@@ -65,6 +65,7 @@ TEST_CASE(
   REQUIRE_THROWS_AS(parse_number_range(""), deserialization_exceptiont);
   REQUIRE_THROWS_AS(parse_number_range(","), deserialization_exceptiont);
   REQUIRE_THROWS_AS(parse_number_range("1,"), deserialization_exceptiont);
+  REQUIRE_THROWS_AS(parse_number_range("-5"), deserialization_exceptiont);
   REQUIRE_THROWS_AS(parse_number_range("0,1-"), deserialization_exceptiont);
   REQUIRE_THROWS_AS(parse_number_range("1, 2"), deserialization_exceptiont);
   REQUIRE_THROWS_AS(parse_number_range("4-2"), deserialization_exceptiont);
