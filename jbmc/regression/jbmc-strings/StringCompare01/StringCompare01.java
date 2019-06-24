@@ -31,17 +31,5 @@ public class StringCompare01
       assert s3.compareTo(s4)==-32; //true
 
       assert s4.compareTo(s3)==32; //true
-
-      // test regionMatches (case sensitive)
-      if (!s3.regionMatches(0, s4, 0, 5)) //true
-         assert true;
-      else
-         assert false;
-
-      // test regionMatches (ignore case)
-      if (s3.regionMatches(true, 0, s4, 0, 5)) //true
-         assert true;
-      else
-         assert false;
    }
 }
