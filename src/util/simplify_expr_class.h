@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 #include "mp_arith.h"
+#include "nodiscard.h"
 #include "type.h"
 // #define USE_LOCAL_REPLACE_MAP
 #ifdef USE_LOCAL_REPLACE_MAP
@@ -104,12 +105,12 @@ public:
     }
   };
 
-  static resultt<> unchanged(exprt expr)
+  NODISCARD static resultt<> unchanged(exprt expr)
   {
     return resultt<>(resultt<>::UNCHANGED, std::move(expr));
   }
 
-  static resultt<> changed(resultt<> result)
+  NODISCARD static resultt<> changed(resultt<> result)
   {
     result.expr_changed = resultt<>::CHANGED;
     return result;
@@ -117,7 +118,7 @@ public:
 
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
-  resultt<> simplify_typecast(const typecast_exprt &);
+  NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
   bool simplify_extractbit(exprt &expr);
   bool simplify_extractbits(extractbits_exprt &expr);
   bool simplify_concatenation(exprt &expr);
@@ -143,8 +144,8 @@ public:
   bool simplify_update(exprt &expr);
   bool simplify_index(exprt &expr);
   bool simplify_member(exprt &expr);
-  resultt<> simplify_byte_update(const byte_update_exprt &);
-  resultt<> simplify_byte_extract(const byte_extract_exprt &);
+  NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
+  NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
   bool simplify_pointer_object(exprt &expr);
   bool simplify_object_size(exprt &expr);
   bool simplify_dynamic_size(exprt &expr);
@@ -155,21 +156,22 @@ public:
   bool simplify_object(exprt &expr);
   bool simplify_unary_minus(exprt &expr);
   bool simplify_unary_plus(exprt &expr);
-  resultt<> simplify_dereference(const dereference_exprt &);
+  NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
   bool simplify_address_of(exprt &expr);
   bool simplify_pointer_offset(exprt &expr);
   bool simplify_bswap(bswap_exprt &expr);
   bool simplify_isinf(exprt &expr);
   bool simplify_isnan(exprt &expr);
   bool simplify_isnormal(exprt &expr);
-  resultt<> simplify_abs(const abs_exprt &);
+  NODISCARD resultt<> simplify_abs(const abs_exprt &);
   bool simplify_sign(exprt &expr);
-  resultt<> simplify_popcount(const popcount_exprt &);
+  NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
   bool simplify_complex(exprt &expr);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.
-  resultt<> simplify_function_application(const function_application_exprt &);
+  NODISCARD resultt<>
+  simplify_function_application(const function_application_exprt &);
 
   // auxiliary
   bool simplify_if_implies(
