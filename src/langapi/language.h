@@ -158,6 +158,15 @@ public:
 
   // show parse tree
 
+  virtual bool preconditions_to_contracts()
+    {
+      INVARIANT(
+      false,
+      "preconditions_to_contracts should only be called for files written in C");
+    }
+  
+  // show parse tree
+
   virtual void show_parse(std::ostream &out)=0;
 
   // conversion of expressions

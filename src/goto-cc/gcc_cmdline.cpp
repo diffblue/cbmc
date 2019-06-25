@@ -52,6 +52,7 @@ const char *goto_cc_options_without_argument[]=
   "--partial-inlining",
   "--validate-goto-model",
   "-?",
+  "--turn-preconditions-to-contracts",
   "--export-function-local-symbols",
   nullptr
 };
