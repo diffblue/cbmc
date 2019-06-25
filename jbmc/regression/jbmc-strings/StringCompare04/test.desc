@@ -1,9 +1,0 @@
-CORE
-StringCompare04.class
---max-nondet-string-length 1000
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
-^\[.*assertion\.1\] .* line 7 .* FAILURE$
---
-^warning: ignoring

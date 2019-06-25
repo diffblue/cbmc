@@ -1,0 +1,10 @@
+CORE
+Main.class
+--function Main.constantIsEmptyFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --show-vcc --property "java::Main.constantIsEmptyFail:()V.assertion.1" 
+^EXIT=0$
+^SIGNAL=0$
+\{1\} false
+--
+\{.*\}.* function_application\(cprover_string_is_empty_func
+--
+Check that String.isEmpty is correctly simplified when the argument is a constant.

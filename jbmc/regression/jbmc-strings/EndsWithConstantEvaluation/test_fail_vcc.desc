@@ -1,0 +1,10 @@
+CORE
+Main.class
+--function Main.constantEndsWithFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.constantEndsWithFail:()V.assertion.1" --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+\{1\} false
+--
+\{.*\}.* function_application\(cprover_string_endswith_func
+--
+Check that String.endsWith is correctly simplified when the arguments are constant.

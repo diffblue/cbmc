@@ -1,0 +1,9 @@
+CORE
+Main.class
+--function Main.constantEndsWithFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.constantEndsWithFail:()V.assertion.1" 
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Check that String.endsWith is correct when the arguments are constant.
