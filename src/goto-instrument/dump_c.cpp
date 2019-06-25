@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c_class.h"
 #include "goto_program2code.h"
+#include "stub_function.h"
 
 dump_c_configurationt dump_c_configurationt::default_configuration =
   dump_c_configurationt();
@@ -285,11 +286,33 @@ void dump_ct::operator()(std::ostream &os)
 
   // Dump the code to the target stream;
   // the statements before to this point collect the code to dump!
-  for(std::set<std::string>::const_iterator
-      it=system_headers.begin();
-      it!=system_headers.end();
-      ++it)
-    os << "#include <" << *it << ">\n";
+  if(stub_name.has_value())
+  {
+    // When generating a stub, we should just generate a stub header,
+    // since the included header information is not present in the
+    // goto_model.
+    os << "#include <stub_header.h>\n\n";
+
+    // We should also generate a declaration of the internal stub
+    // function
+    INVARIANT(
+      !func_decl_stream.str().empty(),
+      "The declaration stream should contain the internal stub function "
+      "declaration.");
+    os << func_decl_stream.str() << '\n';
+
+    // And finally the body of the function to stub
+    INVARIANT(
+      !func_body_stream.str().empty(),
+      "The function definition stream should contain the definition of the "
+      "requested function stub.");
+    os << func_body_stream.str();
+    return;
+  }
+
+  for(const auto &system_header : system_headers)
+    os << "#include <" << system_header << ">\n";
+
   if(!system_headers.empty())
     os << '\n';
 
@@ -1019,6 +1042,17 @@ void dump_ct::cleanup_harness(code_blockt &b)
   replace(b);
 }
 
+// This function checks if dump-c is in `--contract-to-stub` mode, and
+// if so, checks if the given symbol is the internal stub
+// implementation of the function for which the stub is generated.
+static bool
+is_symbol_stub_impl(const symbolt &symbol, const optionalt<irep_idt> stub_name)
+{
+  return (
+    stub_name.has_value() &&
+    symbol.name == stub_name_of_function(stub_name.value()));
+}
+
 void dump_ct::convert_function_declaration(
     const symbolt &symbol,
     const bool skip_main,
@@ -1094,19 +1128,32 @@ void dump_ct::convert_function_declaration(
     declared_enum_constants.swap(enum_constants_bak);
   }
 
-  if(symbol.name!=goto_functionst::entry_point() &&
-     symbol.name!=ID_main)
+  // If we are in stub creation mode, then only the stub impl
+  // declaration is dumped
+  if(stub_name.has_value())
   {
-    os_decl << "// " << symbol.name << '\n';
-    os_decl << "// " << symbol.location << '\n';
-    os_decl << make_decl(symbol.name, symbol.type) << ";\n";
+    if(is_symbol_stub_impl(symbol, stub_name))
+    {
+      os_decl << "// " << symbol.name << '\n';
+      os_decl << "// " << symbol.location << '\n';
+      os_decl << make_decl(symbol.name, symbol.type) << ";\n";
+    }
   }
-  else if(harness && symbol.name==ID_main)
+  else
   {
-    os_decl << "// " << symbol.name << '\n';
-    os_decl << "// " << symbol.location << '\n';
-    os_decl << make_decl(CPROVER_PREFIX+id2string(symbol.name), symbol.type)
-            << ";\n";
+    if(symbol.name != goto_functionst::entry_point() && symbol.name != ID_main)
+    {
+      os_decl << "// " << symbol.name << '\n';
+      os_decl << "// " << symbol.location << '\n';
+      os_decl << make_decl(symbol.name, symbol.type) << ";\n";
+    }
+    else if(harness && symbol.name == ID_main)
+    {
+      os_decl << "// " << symbol.name << '\n';
+      os_decl << "// " << symbol.location << '\n';
+      os_decl << make_decl(CPROVER_PREFIX + id2string(symbol.name), symbol.type)
+              << ";\n";
+    }
   }
 
   // make sure typedef names used in the function declaration are
@@ -1462,6 +1509,7 @@ void dump_c(
   const bool use_all_headers,
   const bool include_harness,
   const namespacet &ns,
+  const optionalt<irep_idt> stub_name,
   std::ostream &out)
 {
   dump_ct goto2c(
@@ -1470,6 +1518,7 @@ void dump_c(
     use_all_headers,
     include_harness,
     ns,
+    stub_name,
     new_ansi_c_language);
   out << goto2c;
 }
@@ -1480,6 +1529,7 @@ void dump_cpp(
   const bool use_all_headers,
   const bool include_harness,
   const namespacet &ns,
+  const optionalt<irep_idt> stub_name,
   std::ostream &out)
 {
   dump_ct goto2cpp(
@@ -1488,6 +1538,7 @@ void dump_cpp(
     use_all_headers,
     include_harness,
     ns,
+    stub_name,
     new_cpp_language);
   out << goto2cpp;
 }
@@ -1533,6 +1584,7 @@ void dump_c_type_header(
     use_all_headers,
     include_harness,
     new_ns,
+    nullopt,
     new_ansi_c_language,
     dump_c_configurationt::type_header_configuration);
   out << goto2c;

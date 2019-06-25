@@ -116,6 +116,7 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
+    const optionalt<irep_idt> _stub_name,
     language_factoryt factory,
     const dump_c_configurationt config)
     : goto_functions(_goto_functions),
@@ -124,6 +125,7 @@ public:
       dump_c_config(config),
       language(factory()),
       harness(include_harness),
+      stub_name(_stub_name),
       system_symbols(use_system_headers)
   {
     system_symbols.set_use_all_headers(use_all_headers);
@@ -135,6 +137,7 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
+    const optionalt<irep_idt> _stub_name,
     language_factoryt factory)
     : dump_ct(
         _goto_functions,
@@ -142,6 +145,7 @@ public:
         use_all_headers,
         include_harness,
         _ns,
+        _stub_name,
         factory,
         dump_c_configurationt::default_configuration)
   {
@@ -158,6 +162,7 @@ protected:
   const dump_c_configurationt dump_c_config;
   std::unique_ptr<languaget> language;
   const bool harness;
+  const optionalt<irep_idt> stub_name;
 
   typedef std::unordered_set<irep_idt> convertedt;
   convertedt converted_compound, converted_global, converted_enum;

@@ -60,6 +60,7 @@ SRC = accelerate/accelerate.cpp \
       source_lines.cpp \
       splice_call.cpp \
       stack_depth.cpp \
+      stub_function.cpp \
       thread_instrumentation.cpp \
       undefined_functions.cpp \
       uninitialized.cpp \

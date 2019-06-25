@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
+#include <string>
 
 #include <util/config.h>
 #include <util/exception_utils.h>
@@ -101,6 +103,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "skip_loops.h"
 #include "splice_call.h"
 #include "stack_depth.h"
+#include "stub_function.h"
 #include "thread_instrumentation.h"
 #include "undefined_functions.h"
 #include "uninitialized.h"
@@ -641,14 +644,68 @@ int goto_instrument_parse_optionst::doit()
 
     if(
       cmdline.isset("dump-c") || cmdline.isset("dump-cpp") ||
-      cmdline.isset("dump-c-type-header"))
+      cmdline.isset("contract-to-stub") || cmdline.isset("dump-c-type-header"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
+      const bool c_stub = cmdline.isset("contract-to-stub");
       const bool is_header = cmdline.isset("dump-c-type-header");
       const bool h_libc=!cmdline.isset("no-system-headers");
       const bool h_all=cmdline.isset("use-all-headers");
       const bool harness=cmdline.isset("harness");
       namespacet ns(goto_model.symbol_table);
+
+      if(c_stub)
+      {
+        bool okay = true;
+        std::stringstream ss;
+        ss << "--contract-to-stub cannot be used together with ";
+        for(const char *flag : {"dump-c",
+                                "dump-cpp",
+                                "dump-c-type-header",
+                                "no-system-headers",
+                                "use-all-headers",
+                                "harness"})
+        {
+          if(cmdline.isset(flag))
+          {
+            if(!okay)
+              ss << "or ";
+            ss << "--" << flag << " ";
+            okay = false;
+          }
+        }
+
+        if(!okay)
+        {
+          std::string correct_input_string = ss.str();
+          throw invalid_command_line_argument_exceptiont(
+            "Invalid flag combination",
+            "--contract-to-stub",
+            correct_input_string);
+        }
+
+        // Modify the goto_model to only contain the body of the stub
+        // and the necessary declarations
+        std::string function_name = cmdline.get_value("contract-to-stub");
+        log.status() << "Creating stub from contract for: " << function_name
+                     << messaget::eom;
+        if(stub_function(goto_model, function_name, log))
+          return CPROVER_EXIT_CONVERSION_FAILED;
+
+        // Clear the rest of the goto functions and only keep the
+        // stubbed one. The function_name exists in the goto_model
+        // because stub_function suceeded.
+        goto_functiont function_stub;
+        function_stub.copy_from(goto_model.get_goto_function(function_name));
+        goto_model.goto_functions.clear();
+        goto_model.goto_functions.function_map[function_name].copy_from(
+          function_stub);
+        goto_model.goto_functions.update();
+      }
+
+      optionalt<irep_idt> stub_name = optionalt<irep_idt>();
+      if(c_stub)
+        stub_name.emplace(cmdline.get_value("contract-to-stub"));
 
       // restore RETURN instructions in case remove_returns had been
       // applied
@@ -680,7 +737,13 @@ int goto_instrument_parse_optionst::doit()
         else
         {
           (is_cpp ? dump_cpp : dump_c)(
-            goto_model.goto_functions, h_libc, h_all, harness, ns, out);
+            goto_model.goto_functions,
+            h_libc,
+            h_all,
+            harness,
+            ns,
+            stub_name,
+            out);
         }
       }
       else
@@ -699,7 +762,13 @@ int goto_instrument_parse_optionst::doit()
         else
         {
           (is_cpp ? dump_cpp : dump_c)(
-            goto_model.goto_functions, h_libc, h_all, harness, ns, std::cout);
+            goto_model.goto_functions,
+            h_libc,
+            h_all,
+            harness,
+            ns,
+            stub_name,
+            std::cout);
         }
       }
 
@@ -1591,6 +1660,7 @@ void goto_instrument_parse_optionst::help()
     " --dump-cpp                   generate C++ source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
+    " --contract-to-stub fun       generate a modular verification stub for [fun], using its contract\n" // NOLINT(*)
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
