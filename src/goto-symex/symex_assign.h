@@ -42,13 +42,13 @@ public:
   /// add the equation to target: `lhs#{n+1} == guard ? rhs#{m} : lhs#{n}`
   /// where {n} and {m} denote the current L2 indexes of lhs and rhs
   /// respectively.
-  void symex_assign_symbol(
+  void assign_symbol(
     const ssa_exprt &lhs, // L1
     const exprt &full_lhs,
     const exprt &rhs,
     const exprt::operandst &guard);
 
-  void symex_assign_rec(
+  void assign_rec(
     const exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
@@ -61,7 +61,7 @@ private:
   const symex_configt &symex_config;
   symex_targett &target;
 
-  void symex_assign_from_struct(
+  void assign_from_struct(
     const ssa_exprt &lhs, // L1
     const exprt &full_lhs,
     const struct_exprt &rhs,
@@ -73,31 +73,31 @@ private:
     const exprt &rhs,
     const exprt::operandst &guard);
 
-  void symex_assign_array(
+  void assign_array(
     const index_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
     exprt::operandst &guard);
 
-  void symex_assign_struct_member(
+  void assign_struct_member(
     const member_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
     exprt::operandst &guard);
 
-  void symex_assign_if(
+  void assign_if(
     const if_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
     exprt::operandst &guard);
 
-  void symex_assign_typecast(
+  void assign_typecast(
     const typecast_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
     exprt::operandst &guard);
 
-  void symex_assign_byte_extract(
+  void assign_byte_extract(
     const byte_extract_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,

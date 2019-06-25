@@ -33,7 +33,7 @@ static void add_to_symbol_table(
 }
 
 SCENARIO(
-  "symex_assign_symbol",
+  "symex_assignt::assign_symbol",
   "[core][goto-symex][symex-assign][symex-assign-symbol]")
 {
   // Note that the initialization part of this test is very similar to that of
@@ -84,7 +84,7 @@ SCENARIO(
                     ns,
                     symex_config,
                     target_equation}
-        .symex_assign_symbol(ssa_foo, full_lhs, rhs1, guard);
+        .assign_symbol(ssa_foo, full_lhs, rhs1, guard);
       THEN("An equation is added to the target")
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
@@ -140,7 +140,7 @@ SCENARIO(
                                  ns,
                                  symex_config,
                                  target_equation};
-      symex_assign.symex_assign_symbol(ssa_foo, full_lhs, rhs1, guard);
+      symex_assign.assign_symbol(ssa_foo, full_lhs, rhs1, guard);
       THEN("An equation with an empty guard is added to the target")
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
@@ -158,7 +158,7 @@ SCENARIO(
           const exprt rhs2 = from_integer(1841, int_type);
           exprt full_lhs2 = nil_exprt{};
           full_lhs.type() = int_type;
-          symex_assign.symex_assign_symbol(ssa_foo, full_lhs2, rhs2, guard);
+          symex_assign.assign_symbol(ssa_foo, full_lhs2, rhs2, guard);
           THEN("A second equation is added to the target")
           {
             REQUIRE(target_equation.SSA_steps.size() == 2);

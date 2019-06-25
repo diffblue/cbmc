@@ -141,7 +141,7 @@ void goto_symext::parameter_assignments(
 
       exprt::operandst lhs_conditions;
       symex_assignt{state, assignment_type, ns, symex_config, target}
-        .symex_assign_rec(lhs, nil_exprt(), rhs, lhs_conditions);
+        .assign_rec(lhs, nil_exprt(), rhs, lhs_conditions);
     }
 
     if(it1!=arguments.end())

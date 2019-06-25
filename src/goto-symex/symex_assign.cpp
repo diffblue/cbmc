@@ -60,7 +60,7 @@ static exprt add_to_lhs(const exprt &lhs, const exprt &what)
   return new_lhs;
 }
 
-void symex_assignt::symex_assign_rec(
+void symex_assignt::assign_rec(
   const exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
@@ -68,30 +68,30 @@ void symex_assignt::symex_assign_rec(
 {
   if(lhs.id() == ID_symbol && lhs.get_bool(ID_C_SSA_symbol))
   {
-    symex_assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
+    assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
   }
   else if(lhs.id() == ID_index)
-    symex_assign_array(to_index_expr(lhs), full_lhs, rhs, guard);
+    assign_array(to_index_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id()==ID_member)
   {
     const typet &type = to_member_expr(lhs).struct_op().type();
     if(type.id() == ID_struct || type.id() == ID_struct_tag)
-      symex_assign_struct_member(to_member_expr(lhs), full_lhs, rhs, guard);
+      assign_struct_member(to_member_expr(lhs), full_lhs, rhs, guard);
     else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
       // should have been replaced by byte_extract
       throw unsupported_operation_exceptiont(
-        "symex_assign_rec: unexpected assignment to union member");
+        "assign_rec: unexpected assignment to union member");
     }
     else
       throw unsupported_operation_exceptiont(
-        "symex_assign_rec: unexpected assignment to member of `" +
-        type.id_string() + "'");
+        "assign_rec: unexpected assignment to member of `" + type.id_string() +
+        "'");
   }
   else if(lhs.id()==ID_if)
-    symex_assign_if(to_if_expr(lhs), full_lhs, rhs, guard);
+    assign_if(to_if_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id()==ID_typecast)
-    symex_assign_typecast(to_typecast_expr(lhs), full_lhs, rhs, guard);
+    assign_typecast(to_typecast_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id() == ID_string_constant ||
           lhs.id() == ID_null_object ||
           lhs.id() == "zero_string" ||
@@ -103,7 +103,7 @@ void symex_assignt::symex_assign_rec(
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
   {
-    symex_assign_byte_extract(to_byte_extract_expr(lhs), full_lhs, rhs, guard);
+    assign_byte_extract(to_byte_extract_expr(lhs), full_lhs, rhs, guard);
   }
   else if(lhs.id() == ID_complex_real)
   {
@@ -115,7 +115,7 @@ void symex_assignt::symex_assign_rec(
     complex_exprt new_rhs(
       rhs, complex_imag_expr, to_complex_type(complex_real_expr.op().type()));
 
-    symex_assign_rec(complex_real_expr.op(), full_lhs, new_rhs, guard);
+    assign_rec(complex_real_expr.op(), full_lhs, new_rhs, guard);
   }
   else if(lhs.id() == ID_complex_imag)
   {
@@ -126,7 +126,7 @@ void symex_assignt::symex_assign_rec(
     complex_exprt new_rhs(
       complex_real_expr, rhs, to_complex_type(complex_imag_expr.op().type()));
 
-    symex_assign_rec(complex_imag_expr.op(), full_lhs, new_rhs, guard);
+    assign_rec(complex_imag_expr.op(), full_lhs, new_rhs, guard);
   }
   else
     throw unsupported_operation_exceptiont(
@@ -143,8 +143,8 @@ struct assignmentt final
 /// Replace "with" (or "update") expressions in the right-hand side of
 /// \p assignment by their update values and move the index or member to the
 /// left-hand side of \p assignment. This effectively undoes the work that
-/// \ref goto_symext::symex_assign_array and
-/// \ref goto_symext::symex_assign_struct_member have done, but now making use
+/// \ref symex_assignt::assign_array and
+/// \ref symex_assignt::assign_struct_member have done, but now making use
 /// of the index/member that may only be known after renaming to L2 has taken
 /// place.
 /// \param [in, out] state: symbolic execution state to perform renaming
@@ -307,9 +307,10 @@ static assignmentt shift_indexed_access_to_lhs(
   return assignment;
 }
 
-/// Assign a struct expression to a symbol. If \ref symex_assign_symbol was used
-/// then we would assign the whole symbol, before extracting its components,
-/// with results like `x = {1, 2}; x..field1 = x.field1; x..field2 = x.field2;`
+/// Assign a struct expression to a symbol. If \ref symex_assignt::assign_symbol
+/// was used then we would assign the whole symbol, before extracting its
+/// components, with results like
+/// `x = {1, 2}; x..field1 = x.field1; x..field2 = x.field2;`
 /// This abbreviates the process, directly producing
 /// `x..field1 = 1; x..field2 = 2;`
 /// \param lhs: symbol to assign (already renamed to L1)
@@ -317,7 +318,7 @@ static assignmentt shift_indexed_access_to_lhs(
 ///   in the result trace
 /// \param rhs: struct expression to assign to \p lhs
 /// \param guard: guard conjuncts that must hold for this assignment to be made
-void symex_assignt::symex_assign_from_struct(
+void symex_assignt::assign_from_struct(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const struct_exprt &rhs,
@@ -335,8 +336,7 @@ void symex_assignt::symex_assign_from_struct(
       lhs_field.id() == ID_symbol,
       "member of symbol should be susceptible to field-sensitivity");
 
-    symex_assign_symbol(
-      to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
+    assign_symbol(to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
   }
 }
 
@@ -358,7 +358,7 @@ void symex_assignt::assign_non_struct_symbol(
 
   // Note the following two calls are specifically required for
   // field-sensitivity. For example, with-expressions, which may have just been
-  // introduced by symex_assign_struct_member, are transformed into member
+  // introduced by assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
   auto assignment = shift_indexed_access_to_lhs(
@@ -411,7 +411,7 @@ void symex_assignt::assign_non_struct_symbol(
   }
 }
 
-void symex_assignt::symex_assign_symbol(
+void symex_assignt::assign_symbol(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
@@ -419,12 +419,12 @@ void symex_assignt::symex_assign_symbol(
 {
   // Shortcut the common case of a whole-struct initializer:
   if(rhs.id() == ID_struct)
-    symex_assign_from_struct(lhs, full_lhs, to_struct_expr(rhs), guard);
+    assign_from_struct(lhs, full_lhs, to_struct_expr(rhs), guard);
   else
     assign_non_struct_symbol(lhs, full_lhs, rhs, guard);
 }
 
-void symex_assignt::symex_assign_typecast(
+void symex_assignt::assign_typecast(
   const typecast_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
@@ -434,10 +434,10 @@ void symex_assignt::symex_assign_typecast(
   exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  symex_assign_rec(lhs.op(), new_full_lhs, rhs_typecasted, guard);
+  assign_rec(lhs.op(), new_full_lhs, rhs_typecasted, guard);
 }
 
-void symex_assignt::symex_assign_array(
+void symex_assignt::assign_array(
   const index_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
@@ -475,11 +475,11 @@ void symex_assignt::symex_assign_array(
   const with_exprt new_rhs{lhs_array, lhs_index, rhs};
   const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
 
-  symex_assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
+  assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
 #endif
 }
 
-void symex_assignt::symex_assign_struct_member(
+void symex_assignt::assign_struct_member(
   const member_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
@@ -541,11 +541,11 @@ void symex_assignt::symex_assign_struct_member(
   new_rhs.where().set(ID_component_name, component_name);
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  symex_assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
+  assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
 #endif
 }
 
-void symex_assignt::symex_assign_if(
+void symex_assignt::assign_if(
   const if_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
@@ -559,19 +559,19 @@ void symex_assignt::symex_assign_if(
   if(!renamed_guard.is_false())
   {
     guard.push_back(renamed_guard);
-    symex_assign_rec(lhs.true_case(), full_lhs, rhs, guard);
+    assign_rec(lhs.true_case(), full_lhs, rhs, guard);
     guard.pop_back();
   }
 
   if(!renamed_guard.is_true())
   {
     guard.push_back(not_exprt(renamed_guard));
-    symex_assign_rec(lhs.false_case(), full_lhs, rhs, guard);
+    assign_rec(lhs.false_case(), full_lhs, rhs, guard);
     guard.pop_back();
   }
 }
 
-void symex_assignt::symex_assign_byte_extract(
+void symex_assignt::assign_byte_extract(
   const byte_extract_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
@@ -590,5 +590,5 @@ void symex_assignt::symex_assign_byte_extract(
 
   const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  symex_assign_rec(lhs.op(), new_full_lhs, new_rhs, guard);
+  assign_rec(lhs.op(), new_full_lhs, new_rhs, guard);
 }

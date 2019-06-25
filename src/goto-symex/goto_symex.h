@@ -533,7 +533,8 @@ protected:
 
   typedef symex_targett::assignment_typet assignment_typet;
 
-  /// Execute any let expressions in \p expr using \ref symex_assign_symbol.
+  /// Execute any let expressions in \p expr using
+  /// \ref symex_assignt::assign_symbol.
   /// The assignments will be made in bottom-up topological but otherwise
   /// arbitrary order (i.e. in `(let x = let y = 0 in x + y) + (let z = 0 in z)
   /// we will define `y` before `x`, but `z` and `x` could come in either order)
