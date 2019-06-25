@@ -1,0 +1,11 @@
+CORE symex-driven-lazy-loading-expected-failure
+Main.class
+--function Main.nondetFail --max-nondet-string-length 1000 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.nondetFail:(ZLjava/lang/String;Ljava/lang/String;)V.assertion.3" 
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Checks that String.compareTo is implemented in the string solver.
+Nondeterministic strings are used  to make sure the operation is not replaced
+by constant propagation.
