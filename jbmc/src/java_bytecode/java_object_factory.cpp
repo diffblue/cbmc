@@ -23,16 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_utils.h"
 
-static code_blockt gen_nondet_array_init(
-  const exprt &expr,
-  size_t depth,
-  update_in_placet update_in_place,
-  const source_locationt &location,
-  const array_element_generatort &element_generator,
-  const allocate_localt &create_local_symbol,
-  const symbol_tablet &symbol_table,
-  const size_t max_nondet_array_length);
-
 class java_object_factoryt
 {
   const java_object_factory_parameterst object_factory_parameters;
@@ -1307,7 +1297,7 @@ static void array_loop_init_code(
 /// 1. non-deterministically choose a length for the array
 /// 2. assume that such length is >=0 and <= max_length
 /// 3. loop through all elements of the array and initialize them
-static code_blockt gen_nondet_array_init(
+code_blockt gen_nondet_array_init(
   const exprt &expr,
   size_t depth,
   update_in_placet update_in_place,
@@ -1647,25 +1637,4 @@ void gen_nondet_init(
     pointer_type_selector,
     update_in_place,
     log);
-}
-std::pair<code_blockt, symbol_exprt> nondet_array(
-  const typet &array_type,
-  const symbol_exprt &array_symbol,
-  const array_element_generatort &element_generator,
-  size_t max_array_size,
-  symbol_table_baset &symbol_table,
-  const std::function<symbol_exprt(const typet &type, std::string)> &create_local_symbol)
-{
-  source_locationt loc;
-
-  code_blockt assignments = gen_nondet_array_init(
-    array_symbol,
-    0,
-    update_in_placet::NO_UPDATE_IN_PLACE,
-    loc,
-    element_generator,
-    create_local_symbol,
-    symbol_table,
-    max_array_size);
-  return std::make_pair(assignments, array_symbol);
 }

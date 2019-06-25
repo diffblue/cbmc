@@ -134,12 +134,36 @@ void gen_nondet_init(
 using array_element_generatort = std::function<
   code_blockt(const exprt &element_at_counter, const typet &element_type)>;
 
-std::pair<code_blockt, symbol_exprt> nondet_array(
-  const typet &array_type,
-  const symbol_exprt &array_symbol,
+/// Synthesize GOTO for generating a array of nondet length to be stored in the
+/// \p expr.
+/// \param expr: The array expression to initialize.
+/// \param depth: The depth of the expression from a root object being created.
+/// \param update_in_place: Should the code allow the solver the freedom to
+/// leave the array as is.
+/// \param location: Source location to use for all synthesized code.
+/// \param element_generator: A function that creates a new element and assigns
+/// it to the provided expression.
+/// \param create_local_symbol: A function that creates a local symbol in the
+/// symbol table
+/// \param symbol_table: The symbol table.
+/// \param max_nondet_array_length: The maximum size the array can be.
+/// \return The GOTO that approximates:
+/// ```
+/// array_length = NONDET(int)
+/// ASSUME(array_length < max_nondet_array_length)
+/// expr = java_new_array(max_nondet_array_length)
+/// expr->length = array_length
+/// for (int i = 0; i < array_length; ++i)
+///   `element_generator()`
+/// ```
+code_blockt gen_nondet_array_init(
+  const exprt &expr,
+  size_t depth,
+  update_in_placet update_in_place,
+  const source_locationt &location,
   const array_element_generatort &element_generator,
-  size_t max_array_size,
-  symbol_table_baset &symbol_table,
-  const std::function<symbol_exprt(const typet &type, std::string)> &create_local_symbol);
+  const allocate_localt &create_local_symbol,
+  const symbol_tablet &symbol_table,
+  size_t max_nondet_array_length);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
