@@ -77,14 +77,12 @@ SCENARIO(
     WHEN("Symbol `foo` is assigned constant integer `475`")
     {
       const exprt rhs1 = from_integer(475, int_type);
-      exprt full_lhs = nil_exprt{};
-      full_lhs.type() = int_type;
       symex_assignt{state,
                     symex_targett::assignment_typet::STATE,
                     ns,
                     symex_config,
                     target_equation}
-        .assign_symbol(ssa_foo, full_lhs, rhs1, guard);
+        .assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
       THEN("An equation is added to the target")
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
@@ -133,14 +131,12 @@ SCENARIO(
     {
       const exprt rhs1 = from_integer(5721, int_type);
       symex_target_equationt target_equation{null_message_handler};
-      exprt full_lhs = nil_exprt{};
-      full_lhs.type() = int_type;
       symex_assignt symex_assign{state,
                                  symex_targett::assignment_typet::STATE,
                                  ns,
                                  symex_config,
                                  target_equation};
-      symex_assign.assign_symbol(ssa_foo, full_lhs, rhs1, guard);
+      symex_assign.assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
       THEN("An equation with an empty guard is added to the target")
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
@@ -156,9 +152,7 @@ SCENARIO(
         WHEN("foo is assigned a second time")
         {
           const exprt rhs2 = from_integer(1841, int_type);
-          exprt full_lhs2 = nil_exprt{};
-          full_lhs.type() = int_type;
-          symex_assign.assign_symbol(ssa_foo, full_lhs2, rhs2, guard);
+          symex_assign.assign_symbol(ssa_foo, expr_skeletont{}, rhs2, guard);
           THEN("A second equation is added to the target")
           {
             REQUIRE(target_equation.SSA_steps.size() == 2);
