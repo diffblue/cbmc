@@ -19,6 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
+/// Replace all uses of `char *` by a struct that carries that string, and also
+/// the underlying allocation and the C string length.
+/// This will become useful (with some modifications) for supporting strings in
+/// the C frontend, as the string solver expects a struct that bundles the
+/// string length and the underlying character array.
 class string_abstractiont:public messaget
 {
 public:
