@@ -23,8 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_utils.h"
 
-static void gen_nondet_array_init(
-  code_blockt &assignments,
+static code_blockt gen_nondet_array_init(
   const exprt &expr,
   size_t depth,
   update_in_placet update_in_place,
@@ -211,8 +210,7 @@ void java_object_factoryt::gen_pointer_target_init(
   const auto &target_class_type = to_java_class_type(followed_target_type);
   if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
   {
-    gen_nondet_array_init(
-      assignments,
+    assignments.append(gen_nondet_array_init(
       expr,
       depth + 1,
       update_in_place,
@@ -232,7 +230,7 @@ void java_object_factoryt::gen_pointer_target_init(
           type, basename_prefix);
       },
       symbol_table,
-      object_factory_parameters.max_nondet_array_length);
+      object_factory_parameters.max_nondet_array_length));
     return;
   }
   if(target_class_type.get_base("java::java.lang.Enum"))
@@ -1309,8 +1307,7 @@ static void array_loop_init_code(
 /// 1. non-deterministically choose a length for the array
 /// 2. assume that such length is >=0 and <= max_length
 /// 3. loop through all elements of the array and initialize them
-static void gen_nondet_array_init(
-  code_blockt &assignments,
+static code_blockt gen_nondet_array_init(
   const exprt &expr,
   size_t depth,
   update_in_placet update_in_place,
@@ -1323,6 +1320,8 @@ static void gen_nondet_array_init(
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
   PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
+
+  code_blockt statements;
 
   const namespacet ns(symbol_table);
   const typet &type = ns.follow(expr.type().subtype());
@@ -1338,7 +1337,7 @@ static void gen_nondet_array_init(
   if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
   {
     allocate_nondet_length_array(
-      assignments,
+      statements,
       expr,
       max_length_expr,
       element_type,
@@ -1367,7 +1366,7 @@ static void gen_nondet_array_init(
     // For arrays of non-primitive type, nondeterministically initialize each
     // element of the array
     array_loop_init_code(
-      assignments,
+      statements,
       init_array_expr,
       length_expr,
       element_type,
@@ -1386,13 +1385,14 @@ static void gen_nondet_array_init(
     // represented as unsigned bytes, so each cell must be initialized as
     // 0 or 1 (see gen_nondet_init).
     array_primitive_init_code(
-      assignments,
+      statements,
       init_array_expr,
       element_type,
       max_length_expr,
       location,
       create_local_symbol);
   }
+  return statements;
 }
 
 /// We nondet-initialize enums to be equal to one of the constants defined
@@ -1658,9 +1658,7 @@ std::pair<code_blockt, symbol_exprt> nondet_array(
 {
   source_locationt loc;
 
-  code_blockt assignments;
-  gen_nondet_array_init(
-    assignments,
+  code_blockt assignments = gen_nondet_array_init(
     array_symbol,
     0,
     update_in_placet::NO_UPDATE_IN_PLACE,
