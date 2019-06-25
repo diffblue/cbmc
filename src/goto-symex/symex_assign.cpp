@@ -61,84 +61,92 @@ static exprt add_to_lhs(const exprt &lhs, const exprt &what)
 }
 
 void symex_assignt::assign_rec(
-  const exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<exprt> &assignment,
   exprt::operandst &guard)
 {
-  if(lhs.id() == ID_symbol && lhs.get_bool(ID_C_SSA_symbol))
+  if(
+    assignment.lhs.id() == ID_symbol &&
+    assignment.lhs.get_bool(ID_C_SSA_symbol))
   {
-    assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
+    assign_symbol(replace_lhs(assignment, to_ssa_expr(assignment.lhs)), guard);
   }
-  else if(lhs.id() == ID_index)
-    assign_array(to_index_expr(lhs), full_lhs, rhs, guard);
-  else if(lhs.id()==ID_member)
+  else if(assignment.lhs.id() == ID_index)
+    assign_array(replace_lhs(assignment, to_index_expr(assignment.lhs)), guard);
+  else if(assignment.lhs.id() == ID_member)
   {
-    const typet &type = to_member_expr(lhs).struct_op().type();
+    const typet &type = to_member_expr(assignment.lhs).struct_op().type();
     if(type.id() == ID_struct || type.id() == ID_struct_tag)
-      assign_struct_member(to_member_expr(lhs), full_lhs, rhs, guard);
+    {
+      assign_struct_member(
+        replace_lhs(assignment, to_member_expr(assignment.lhs)), guard);
+    }
     else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
       // should have been replaced by byte_extract
       throw unsupported_operation_exceptiont(
-        "assign_rec: unexpected assignment to union member");
+        "symex_assign_rec: unexpected assignment to union member");
     }
     else
       throw unsupported_operation_exceptiont(
-        "assign_rec: unexpected assignment to member of `" + type.id_string() +
-        "'");
+        "symex_assign_rec: unexpected assignment to member of `" +
+        type.id_string() + "'");
   }
-  else if(lhs.id()==ID_if)
-    assign_if(to_if_expr(lhs), full_lhs, rhs, guard);
-  else if(lhs.id()==ID_typecast)
-    assign_typecast(to_typecast_expr(lhs), full_lhs, rhs, guard);
-  else if(lhs.id() == ID_string_constant ||
-          lhs.id() == ID_null_object ||
-          lhs.id() == "zero_string" ||
-          lhs.id() == "is_zero_string" ||
-          lhs.id() == "zero_string_length")
+  else if(assignment.lhs.id() == ID_if)
+    assign_if(replace_lhs(assignment, to_if_expr(assignment.lhs)), guard);
+  else if(assignment.lhs.id() == ID_typecast)
+    assign_typecast(
+      replace_lhs(assignment, to_typecast_expr(assignment.lhs)), guard);
+  else if(
+    assignment.lhs.id() == ID_string_constant ||
+    assignment.lhs.id() == ID_null_object ||
+    assignment.lhs.id() == "zero_string" ||
+    assignment.lhs.id() == "is_zero_string" ||
+    assignment.lhs.id() == "zero_string_length")
   {
     // ignore
   }
-  else if(lhs.id()==ID_byte_extract_little_endian ||
-          lhs.id()==ID_byte_extract_big_endian)
+  else if(
+    assignment.lhs.id() == ID_byte_extract_little_endian ||
+    assignment.lhs.id() == ID_byte_extract_big_endian)
   {
-    assign_byte_extract(to_byte_extract_expr(lhs), full_lhs, rhs, guard);
+    assign_byte_extract(
+      replace_lhs(assignment, to_byte_extract_expr(assignment.lhs)), guard);
   }
-  else if(lhs.id() == ID_complex_real)
+  else if(assignment.lhs.id() == ID_complex_real)
   {
     // this is stuff like __real__ x = 1;
-    const complex_real_exprt &complex_real_expr = to_complex_real_expr(lhs);
+    const complex_real_exprt &complex_real_expr =
+      to_complex_real_expr(assignment.lhs);
 
     const complex_imag_exprt complex_imag_expr(complex_real_expr.op());
-
-    complex_exprt new_rhs(
-      rhs, complex_imag_expr, to_complex_type(complex_real_expr.op().type()));
-
-    assign_rec(complex_real_expr.op(), full_lhs, new_rhs, guard);
+    assignmentt<exprt> new_assignment;
+    new_assignment.rhs =
+      complex_exprt{assignment.rhs,
+                    complex_imag_expr,
+                    to_complex_type(complex_real_expr.op().type())};
+    new_assignment.lhs = complex_real_expr.op();
+    new_assignment.original_lhs_skeleton = assignment.original_lhs_skeleton;
+    assign_rec(new_assignment, guard);
   }
-  else if(lhs.id() == ID_complex_imag)
+  else if(assignment.lhs.id() == ID_complex_imag)
   {
-    const complex_imag_exprt &complex_imag_expr = to_complex_imag_expr(lhs);
+    const complex_imag_exprt &complex_imag_expr =
+      to_complex_imag_expr(assignment.lhs);
 
     const complex_real_exprt complex_real_expr(complex_imag_expr.op());
-
-    complex_exprt new_rhs(
-      complex_real_expr, rhs, to_complex_type(complex_imag_expr.op().type()));
-
-    assign_rec(complex_imag_expr.op(), full_lhs, new_rhs, guard);
+    assignmentt<exprt> new_assignment;
+    new_assignment.rhs =
+      complex_exprt{complex_real_expr,
+                    assignment.rhs,
+                    to_complex_type(complex_imag_expr.op().type())};
+    new_assignment.lhs = complex_imag_expr.op();
+    new_assignment.original_lhs_skeleton = assignment.original_lhs_skeleton;
+    assign_rec(new_assignment, guard);
   }
   else
     throw unsupported_operation_exceptiont(
-      "assignment to `" + lhs.id_string() + "' not handled");
+      "assignment to `" + assignment.lhs.id_string() + "' not handled");
 }
-
-/// Assignment from the rhs value to the lhs variable
-struct assignmentt final
-{
-  ssa_exprt lhs;
-  exprt rhs;
-};
 
 /// Replace "with" (or "update") expressions in the right-hand side of
 /// \p assignment by their update values and move the index or member to the
@@ -151,9 +159,9 @@ struct assignmentt final
 /// \param assignment: an assignment to rewrite
 /// \param ns: namespace
 /// \return the updated assignment
-static assignmentt rewrite_with_to_field_symbols(
+static assignmentt<ssa_exprt> rewrite_with_to_field_symbols(
   goto_symext::statet &state,
-  assignmentt assignment,
+  assignmentt<ssa_exprt> assignment,
   const namespacet &ns)
 {
   exprt &ssa_rhs = assignment.rhs;
@@ -161,23 +169,24 @@ static assignmentt rewrite_with_to_field_symbols(
 #ifdef USE_UPDATE
   while(ssa_rhs.id() == ID_update &&
         to_update_expr(ssa_rhs).designator().size() == 1 &&
-        (lhs_mod.type().id() == ID_array || lhs_mod.type().id() == ID_struct ||
-         lhs_mod.type().id() == ID_struct_tag))
+        (assignment.lhs_mod.type().id() == ID_array ||
+         assignment.lhs_mod.type().id() == ID_struct ||
+         assignment.lhs_mod.type().id() == ID_struct_tag))
   {
     exprt field_sensitive_lhs;
     const update_exprt &update = to_update_expr(ssa_rhs);
     PRECONDITION(update.designator().size() == 1);
     const exprt &designator = update.designator().front();
 
-    if(lhs_mod.type().id() == ID_array)
+    if(assignment.lhs_mod.type().id() == ID_array)
     {
-      field_sensitive_lhs =
-        index_exprt(lhs_mod, to_index_designator(designator).index());
+      field_sensitive_lhs = index_exprt(
+        assignment.lhs_mod, to_index_designator(designator).index());
     }
     else
     {
       field_sensitive_lhs = member_exprt(
-        lhs_mod,
+        assignment.lhs_mod,
         to_member_designator(designator).get_component_name(),
         update.new_value().type());
     }
@@ -233,9 +242,9 @@ static assignmentt rewrite_with_to_field_symbols(
 /// \param ns: namespace
 /// \param do_simplify: set to true if, and only if, simplification is enabled
 /// \return updated assignment
-static assignmentt shift_indexed_access_to_lhs(
+static assignmentt<ssa_exprt> shift_indexed_access_to_lhs(
   goto_symext::statet &state,
-  assignmentt assignment,
+  assignmentt<ssa_exprt> assignment,
   const namespacet &ns,
   bool do_simplify)
 {
@@ -258,7 +267,9 @@ static assignmentt shift_indexed_access_to_lhs(
 
     if(byte_extract.id() == ID_symbol)
     {
-      return assignmentt{to_ssa_expr(byte_extract), byte_update.value()};
+      return assignmentt<ssa_exprt>{assignment.original_lhs_skeleton,
+                                    to_ssa_expr(byte_extract),
+                                    byte_update.value()};
     }
     else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
     {
@@ -300,8 +311,9 @@ static assignmentt shift_indexed_access_to_lhs(
 
       // We may have shifted the previous lhs into the rhs; as the lhs is only
       // L1-renamed, we need to rename again.
-      return assignmentt{to_ssa_expr(byte_extract),
-                         state.rename(std::move(ssa_rhs), ns).get()};
+      return assignmentt<ssa_exprt>{assignment.original_lhs_skeleton,
+                                    to_ssa_expr(byte_extract),
+                                    state.rename(std::move(ssa_rhs), ns).get()};
     }
   }
   return assignment;
@@ -336,34 +348,36 @@ void symex_assignt::assign_from_struct(
       lhs_field.id() == ID_symbol,
       "member of symbol should be susceptible to field-sensitivity");
 
-    assign_symbol(to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
+    assign_symbol(
+      assignmentt<ssa_exprt>{full_lhs, to_ssa_expr(lhs_field), comp_rhs.second},
+      guard);
   }
 }
 
 void symex_assignt::assign_non_struct_symbol(
-  const ssa_exprt &lhs, // L1
-  const exprt &full_lhs,
-  const exprt &rhs,
+  assignmentt<ssa_exprt> assignment, // L1
   const exprt::operandst &guard)
 {
-  exprt l2_rhs =
+  assignment.rhs =
     state
       .rename(
-        // put assignment guard into the rhs
-        guard.empty()
-          ? rhs
-          : static_cast<exprt>(if_exprt{conjunction(guard), rhs, lhs}),
+        // put assignment guard into the assignment.rhs
+        guard.empty() ? assignment.rhs
+                      : static_cast<exprt>(if_exprt{
+                          conjunction(guard), assignment.rhs, assignment.lhs}),
         ns)
       .get();
 
   // Note the following two calls are specifically required for
   // field-sensitivity. For example, with-expressions, which may have just been
-  // introduced by assign_struct_member, are transformed into member
-  // expressions on the LHS. If we add an option to disable field-sensitivity
+  // introduced by symex_assign_struct_member, are transformed into member
+  // expressions on the lhs. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  auto assignment = shift_indexed_access_to_lhs(
-    state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
-  assignment = rewrite_with_to_field_symbols(state, std::move(assignment), ns);
+  assignment = rewrite_with_to_field_symbols(
+    state,
+    shift_indexed_access_to_lhs(
+      state, std::move(assignment), ns, symex_config.simplify_opt),
+    ns);
 
   if(symex_config.simplify_opt)
     assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
@@ -380,7 +394,8 @@ void symex_assignt::assign_non_struct_symbol(
 
   state.record_events.push(false);
   const exprt l2_full_lhs =
-    state.rename(add_to_lhs(full_lhs, l2_lhs), ns).get();
+    state.rename(add_to_lhs(assignment.original_lhs_skeleton, l2_lhs), ns)
+      .get();
   state.record_events.pop();
 
   auto current_assignment_type =
@@ -400,7 +415,7 @@ void symex_assignt::assign_non_struct_symbol(
   const ssa_exprt &l1_lhs = assignment.lhs;
   if(field_sensitivityt::is_divisible(l1_lhs))
   {
-    // Split composite symbol lhs into its components
+    // Split composite symbol assignment.lhs into its components
     state.field_sensitivity.field_assignments(
       ns, state, l1_lhs, target, symex_config.allow_pointer_unsoundness);
     // Erase the composite symbol from our working state. Note that we need to
@@ -412,40 +427,42 @@ void symex_assignt::assign_non_struct_symbol(
 }
 
 void symex_assignt::assign_symbol(
-  const ssa_exprt &lhs, // L1
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<ssa_exprt> &assignment, // L1
   const exprt::operandst &guard)
 {
   // Shortcut the common case of a whole-struct initializer:
-  if(rhs.id() == ID_struct)
-    assign_from_struct(lhs, full_lhs, to_struct_expr(rhs), guard);
+  if(assignment.rhs.id() == ID_struct)
+    assign_from_struct(
+      assignment.lhs,
+      assignment.original_lhs_skeleton,
+      to_struct_expr(assignment.rhs),
+      guard);
   else
-    assign_non_struct_symbol(lhs, full_lhs, rhs, guard);
+    assign_non_struct_symbol(assignment, guard);
 }
 
 void symex_assignt::assign_typecast(
-  const typecast_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<typecast_exprt> &assignment,
   exprt::operandst &guard)
 {
-  // these may come from dereferencing on the lhs
-  exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
-
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  assign_rec(lhs.op(), new_full_lhs, rhs_typecasted, guard);
+  assignmentt<exprt> new_assignment;
+  // these may come from dereferencing on the assignment.lhs
+  new_assignment.rhs = typecast_exprt::conditional_cast(
+    assignment.rhs, assignment.lhs.op().type());
+  new_assignment.original_lhs_skeleton =
+    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+  new_assignment.lhs = assignment.lhs.op();
+  assign_rec(new_assignment, guard);
 }
 
 void symex_assignt::assign_array(
-  const index_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<index_exprt> &assignment,
   exprt::operandst &guard)
 {
-  const exprt &lhs_array=lhs.array();
-  const exprt &lhs_index=lhs.index();
-  const typet &lhs_index_type = lhs_array.type();
+  assignmentt<exprt> new_assignment;
+  new_assignment.lhs = assignment.lhs.array();
+  const exprt &lhs_index = assignment.lhs.index();
+  const typet &lhs_index_type = new_assignment.lhs.type();
 
   PRECONDITION(lhs_index_type.id() == ID_array);
 
@@ -456,46 +473,46 @@ void symex_assignt::assign_array(
   // into
   //   a'==UPDATE(a, [i], e)
 
-  update_exprt new_rhs(lhs_index_type);
-  new_rhs.old()=lhs_array;
+  update_exprt new_rhs(assignment.lhs_index_type);
+  new_rhs.old() = new_assignment.lhs;
   new_rhs.designator().push_back(index_designatort(lhs_index));
-  new_rhs.new_value()=rhs;
+  new_rhs.new_value() = assignment.rhs;
 
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+  exprt new_full_lhs =
+    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
 
-  symex_assign_rec(
-    state, lhs_array, new_full_lhs, new_rhs, guard, assignment_type);
+  rec(new_assignment, guard);
 
-  #else
+#else
   // turn
   //   a[i]=e
   // into
   //   a'==a WITH [i:=e]
 
-  const with_exprt new_rhs{lhs_array, lhs_index, rhs};
-  const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
-
-  assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
+  new_assignment.rhs =
+    with_exprt{new_assignment.lhs, lhs_index, assignment.rhs};
+  new_assignment.original_lhs_skeleton =
+    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+  assign_rec(new_assignment, guard);
 #endif
 }
 
 void symex_assignt::assign_struct_member(
-  const member_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<member_exprt> &assignment,
   exprt::operandst &guard)
 {
   // Symbolic execution of a struct member assignment.
+  assignmentt<exprt> new_assignment;
 
   // lhs must be member operand, which
   // takes one operand, which must be a structure.
 
-  exprt lhs_struct = lhs.op();
+  new_assignment.lhs = assignment.lhs.op();
 
   // typecasts involved? C++ does that for inheritance.
-  if(lhs_struct.id()==ID_typecast)
+  if(new_assignment.lhs.id() == ID_typecast)
   {
-    if(to_typecast_expr(lhs_struct).op().id() == ID_null_object)
+    if(to_typecast_expr(new_assignment.lhs).op().id() == ID_null_object)
     {
       // ignore, and give up
       return;
@@ -503,92 +520,98 @@ void symex_assignt::assign_struct_member(
     else
     {
       // remove the type cast, we assume that the member is there
-      exprt tmp = to_typecast_expr(lhs_struct).op();
+      exprt tmp = to_typecast_expr(new_assignment.lhs).op();
 
       if(tmp.type().id() == ID_struct || tmp.type().id() == ID_struct_tag)
-        lhs_struct=tmp;
+        new_assignment.lhs = tmp;
       else
         return; // ignore and give up
     }
   }
 
-  const irep_idt &component_name=lhs.get_component_name();
+  const irep_idt &component_name = assignment.lhs.get_component_name();
 
-  #ifdef USE_UPDATE
+#ifdef USE_UPDATE
 
   // turn
   //   a.c=e
   // into
   //   a'==UPDATE(a, .c, e)
 
-  update_exprt new_rhs(lhs_struct.type());
-  new_rhs.old()=lhs_struct;
+  update_exprt new_rhs(assignment.lhs_struct.type());
+  new_rhs.old() = assignment.lhs_struct;
   new_rhs.designator().push_back(member_designatort(component_name));
-  new_rhs.new_value()=rhs;
+  new_rhs.new_value() = assignment.rhs;
 
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+  exprt new_full_lhs =
+    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
 
-  symex_assign_rec(
-    state, lhs_struct, new_full_lhs, new_rhs, guard, assignment_type);
+  rec(new_assignment, guard);
 
-  #else
+#else
   // turn
   //   a.c=e
   // into
   //   a'==a WITH [c:=e]
 
-  with_exprt new_rhs(lhs_struct, exprt(ID_member_name), rhs);
-  new_rhs.where().set(ID_component_name, component_name);
+  new_assignment.rhs = [&] {
+    with_exprt tmp_rhs{
+      new_assignment.lhs, exprt(ID_member_name), assignment.rhs};
+    tmp_rhs.where().set(ID_component_name, component_name);
+    return tmp_rhs;
+  }();
 
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
+  new_assignment.original_lhs_skeleton =
+    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+  assign_rec(new_assignment, guard);
 #endif
 }
 
 void symex_assignt::assign_if(
-  const if_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<if_exprt> &assignment,
   exprt::operandst &guard)
 {
   // we have (c?a:b)=e;
-  exprt renamed_guard = state.rename(lhs.cond(), ns).get();
+  exprt renamed_guard = state.rename(assignment.lhs.cond(), ns).get();
   if(symex_config.simplify_opt)
     renamed_guard = simplify_expr(std::move(renamed_guard), ns);
 
   if(!renamed_guard.is_false())
   {
     guard.push_back(renamed_guard);
-    assign_rec(lhs.true_case(), full_lhs, rhs, guard);
+    assign_rec(replace_lhs(assignment, assignment.lhs.true_case()), guard);
     guard.pop_back();
   }
 
   if(!renamed_guard.is_true())
   {
     guard.push_back(not_exprt(renamed_guard));
-    assign_rec(lhs.false_case(), full_lhs, rhs, guard);
+    assign_rec(replace_lhs(assignment, assignment.lhs.false_case()), guard);
     guard.pop_back();
   }
 }
 
 void symex_assignt::assign_byte_extract(
-  const byte_extract_exprt &lhs,
-  const exprt &full_lhs,
-  const exprt &rhs,
+  const assignmentt<byte_extract_exprt> &assignment,
   exprt::operandst &guard)
 {
   // we have byte_extract_X(object, offset)=value
   // turn into object=byte_update_X(object, offset, value)
-
+  assignmentt<exprt> new_assignment;
   irep_idt byte_update_id;
-  if(lhs.id()==ID_byte_extract_little_endian)
+  if(assignment.lhs.id() == ID_byte_extract_little_endian)
     byte_update_id = ID_byte_update_little_endian;
-  else if(lhs.id()==ID_byte_extract_big_endian)
+  else if(assignment.lhs.id() == ID_byte_extract_big_endian)
     byte_update_id = ID_byte_update_big_endian;
   else
     UNREACHABLE;
 
-  const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  assign_rec(lhs.op(), new_full_lhs, new_rhs, guard);
+  new_assignment.lhs = assignment.lhs.op();
+  new_assignment.rhs = byte_update_exprt{byte_update_id,
+                                         new_assignment.lhs,
+                                         assignment.lhs.offset(),
+                                         assignment.rhs};
+  new_assignment.original_lhs_skeleton =
+    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+  assign_rec(new_assignment, guard);
 }

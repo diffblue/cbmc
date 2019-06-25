@@ -89,7 +89,8 @@ void goto_symext::symex_start_thread(statet &state)
     state.record_events.push(false);
     symex_assignt{
       state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
-      .assign_symbol(lhs_l1, nil_exprt(), rhs, lhs_conditions);
+      .assign_symbol(
+        assignmentt<ssa_exprt>{nil_exprt(), lhs_l1, rhs}, lhs_conditions);
     state.record_events.pop();
   }
 
@@ -122,6 +123,7 @@ void goto_symext::symex_start_thread(statet &state)
     exprt::operandst lhs_conditions;
     symex_assignt{
       state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
-      .assign_symbol(lhs, nil_exprt(), rhs, lhs_conditions);
+      .assign_symbol(
+        assignmentt<ssa_exprt>{nil_exprt(), lhs, rhs}, lhs_conditions);
   }
 }
