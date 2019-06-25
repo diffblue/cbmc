@@ -22,12 +22,35 @@ symbol_exprt generate_nondet_int(
   allocate_objectst &allocate_objects,
   code_blockt &instructions)
 {
+  const allocate_localt cls =
+    [&allocate_objects](
+      const typet &type, std::string basename_prefix) -> symbol_exprt {
+    return allocate_objects.allocate_automatic_local_object(
+      type, basename_prefix);
+  };
+  return generate_nondet_int(
+    min_value_expr,
+    max_value_expr,
+    basename_prefix,
+    source_location,
+    cls,
+    instructions);
+}
+
+symbol_exprt generate_nondet_int(
+  const exprt &min_value_expr,
+  const exprt &max_value_expr,
+  const std::string &basename_prefix,
+  const source_locationt &source_location,
+  const allocate_localt &create_local_symbol,
+  code_blockt &instructions)
+{
   PRECONDITION(min_value_expr.type() == max_value_expr.type());
   const typet &int_type = min_value_expr.type();
 
   // Declare a symbol for the non deterministic integer.
   const symbol_exprt &nondet_symbol =
-    allocate_objects.allocate_automatic_local_object(int_type, basename_prefix);
+    create_local_symbol(int_type, basename_prefix);
   instructions.add(code_declt(nondet_symbol));
 
   // Assign the symbol any non deterministic integer value.

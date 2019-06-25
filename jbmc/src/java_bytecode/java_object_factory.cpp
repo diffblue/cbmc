@@ -23,6 +23,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_utils.h"
 
+static void gen_nondet_array_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  size_t depth,
+  update_in_placet update_in_place,
+  const source_locationt &location,
+  const array_element_generatort &element_generator,
+  const allocate_localt &create_local_symbol,
+  const symbol_tablet &symbol_table,
+  const size_t max_nondet_array_length);
+
 class java_object_factoryt
 {
   const java_object_factory_parameterst object_factory_parameters;
@@ -64,14 +75,6 @@ class java_object_factoryt
     size_t depth,
     update_in_placet update_in_place,
     const source_locationt &location);
-
-  void allocate_nondet_length_array(
-    code_blockt &assignments,
-    const exprt &lhs,
-    const exprt &max_length_expr,
-    const typet &element_type,
-    const source_locationt &location);
-
 public:
   java_object_factoryt(
     const source_locationt &loc,
@@ -89,14 +92,6 @@ public:
         symbol_table),
       log(log)
   {}
-
-  void gen_nondet_array_init(
-    code_blockt &assignments,
-    const exprt &expr,
-    size_t depth,
-    update_in_placet update_in_place,
-    const source_locationt &location,
-    const array_element_generatort &element_generator);
 
   bool gen_nondet_enum_init(
     code_blockt &assignments,
@@ -146,25 +141,6 @@ private:
     const pointer_typet &substitute_pointer_type,
     size_t depth,
     const source_locationt &location);
-
-  void array_primitive_init_code(
-    code_blockt &assignments,
-    const exprt &init_array_expr,
-    const typet &element_type,
-    const exprt &max_length_expr,
-    const source_locationt &location);
-
-
-  void array_loop_init_code(
-    code_blockt &assignments,
-    const exprt &init_array_expr,
-    const exprt &length_expr,
-    const typet &element_type,
-    const exprt &max_length_expr,
-    size_t depth,
-    update_in_placet update_in_place,
-    const source_locationt &location,
-    const array_element_generatort &element_generator);
 
   code_blockt assign_element(
     const exprt &element_at_counter,
@@ -250,7 +226,13 @@ void java_object_factoryt::gen_pointer_target_init(
           element_type,
           depth + 1,
           location);
-      });
+      },
+      [this](const typet &type, std::string basename_prefix) -> symbol_exprt {
+        return allocate_objects.allocate_automatic_local_object(
+          type, basename_prefix);
+      },
+      symbol_table,
+      object_factory_parameters.max_nondet_array_length);
     return;
   }
   if(target_class_type.get_base("java::java.lang.Enum"))
@@ -1084,11 +1066,12 @@ void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
 /// \param location:
 ///   Source location associated with nondet-initialization.
 /// \return Appends instructions to `assignments`
-void java_object_factoryt::allocate_nondet_length_array(
+static void allocate_nondet_length_array(
   code_blockt &assignments,
   const exprt &lhs,
   const exprt &max_length_expr,
   const typet &element_type,
+  const allocate_localt &create_local_symbol,
   const source_locationt &location)
 {
   const auto &length_sym_expr = generate_nondet_int(
@@ -1096,7 +1079,7 @@ void java_object_factoryt::allocate_nondet_length_array(
     max_length_expr,
     "nondet_array_length",
     location,
-    allocate_objects,
+    create_local_symbol,
     assignments);
 
   side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), location);
@@ -1123,18 +1106,19 @@ void java_object_factoryt::allocate_nondet_length_array(
 /// \param element_type: type of array elements
 /// \param max_length_expr : the (constant) size to which initialise the array
 /// \param location: Source location associated with nondet-initialization.
-void java_object_factoryt::array_primitive_init_code(
+static void array_primitive_init_code(
   code_blockt &assignments,
   const exprt &init_array_expr,
   const typet &element_type,
   const exprt &max_length_expr,
-  const source_locationt &location)
+  const source_locationt &location,
+  const allocate_localt &allocate_local_symbol)
 {
   const array_typet array_type(element_type, max_length_expr);
 
   // TYPE (*array_data_init)[max_length_expr];
   const symbol_exprt &tmp_finite_array_pointer =
-    allocate_objects.allocate_automatic_local_object(
+    allocate_local_symbol(
       pointer_type(array_type), "array_data_init");
 
   // array_data_init = ALLOCATE(TYPE [max_length_expr], max_length_expr, false);
@@ -1252,7 +1236,7 @@ code_blockt java_object_factoryt::assign_element(
 ///   and MUST_ cases.
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 /// \param location: Source location associated with nondet-initialization.
-void java_object_factoryt::array_loop_init_code(
+static void array_loop_init_code(
   code_blockt &assignments,
   const exprt &init_array_expr,
   const exprt &length_expr,
@@ -1261,10 +1245,12 @@ void java_object_factoryt::array_loop_init_code(
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
-  const array_element_generatort &element_generator)
+  const array_element_generatort &element_generator,
+  const allocate_localt &allocate_local_symbol,
+  const symbol_tablet &symbol_table)
 {
   const symbol_exprt &array_init_symexpr =
-    allocate_objects.allocate_automatic_local_object(
+    allocate_local_symbol(
       init_array_expr.type(), "array_data_init");
 
   code_assignt data_assign(array_init_symexpr, init_array_expr);
@@ -1272,7 +1258,7 @@ void java_object_factoryt::array_loop_init_code(
   assignments.add(data_assign);
 
   const symbol_exprt &counter_expr =
-    allocate_objects.allocate_automatic_local_object(
+    allocate_local_symbol(
       length_expr.type(), "array_init_iter");
 
   const symbolt &counter =
@@ -1323,13 +1309,16 @@ void java_object_factoryt::array_loop_init_code(
 /// 1. non-deterministically choose a length for the array
 /// 2. assume that such length is >=0 and <= max_length
 /// 3. loop through all elements of the array and initialize them
-void java_object_factoryt::gen_nondet_array_init(
+static void gen_nondet_array_init(
   code_blockt &assignments,
   const exprt &expr,
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
-  const array_element_generatort &element_generator)
+  const array_element_generatort &element_generator,
+  const allocate_localt &create_local_symbol,
+  const symbol_tablet &symbol_table,
+  const size_t max_nondet_array_length)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
@@ -1342,14 +1331,19 @@ void java_object_factoryt::gen_nondet_array_init(
     static_cast<const typet &>(expr.type().subtype().find(ID_element_type));
 
   auto max_length_expr = from_integer(
-    object_factory_parameters.max_nondet_array_length, java_int_type());
+    max_nondet_array_length, java_int_type());
 
   // In NO_UPDATE_IN_PLACE mode we allocate a new array and recursively
   // initialize its elements
   if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
   {
     allocate_nondet_length_array(
-      assignments, expr, max_length_expr, element_type, location);
+      assignments,
+      expr,
+      max_length_expr,
+      element_type,
+      create_local_symbol,
+      location);
   }
 
   // Otherwise we're updating the array in place, and use the
@@ -1381,7 +1375,9 @@ void java_object_factoryt::gen_nondet_array_init(
       depth,
       update_in_place,
       location,
-      element_generator);
+      element_generator,
+      create_local_symbol,
+      symbol_table);
   }
   else
   {
@@ -1394,7 +1390,8 @@ void java_object_factoryt::gen_nondet_array_init(
       init_array_expr,
       element_type,
       max_length_expr,
-      location);
+      location,
+      create_local_symbol);
   }
 }
 
@@ -1656,24 +1653,21 @@ std::pair<code_blockt, symbol_exprt> nondet_array(
   const symbol_exprt &array_symbol,
   const array_element_generatort &element_generator,
   size_t max_array_size,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  const std::function<symbol_exprt(const typet &type, std::string)> &create_local_symbol)
 {
   source_locationt loc;
 
-  java_object_factory_parameterst parameters;
-  parameters.max_nondet_array_length = max_array_size;
-
-  select_pointer_typet spt;
-  null_message_handlert nmh;
-
-  java_object_factoryt factory{loc, parameters, symbol_table, spt, nmh};
   code_blockt assignments;
-  factory.gen_nondet_array_init(
+  gen_nondet_array_init(
     assignments,
     array_symbol,
     0,
     update_in_placet::NO_UPDATE_IN_PLACE,
     loc,
-    element_generator);
+    element_generator,
+    create_local_symbol,
+    symbol_table,
+    max_array_size);
   return std::make_pair(assignments, array_symbol);
 }

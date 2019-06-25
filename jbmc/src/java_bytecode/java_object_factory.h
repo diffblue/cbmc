@@ -76,6 +76,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/allocate_objects.h>
 #include <util/message.h>
+#include <util/nondet.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
@@ -138,6 +139,7 @@ std::pair<code_blockt, symbol_exprt> nondet_array(
   const symbol_exprt &array_symbol,
   const array_element_generatort &element_generator,
   size_t max_array_size,
-  symbol_table_baset &symbol_table);
+  symbol_table_baset &symbol_table,
+  const std::function<symbol_exprt(const typet &type, std::string)> &create_local_symbol);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
