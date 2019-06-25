@@ -63,6 +63,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
+  "(nondet-static-exclude):" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \

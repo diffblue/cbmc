@@ -20,6 +20,8 @@ Date: November 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_NONDET_STATIC_H
 #define CPROVER_GOTO_INSTRUMENT_NONDET_STATIC_H
 
+#include <util/options.h>
+
 class goto_modelt;
 class namespacet;
 class goto_functionst;
@@ -34,5 +36,7 @@ void nondet_static(
   goto_functionst &goto_functions);
 
 void nondet_static(goto_modelt &);
+
+void nondet_static(goto_modelt &, const optionst::value_listt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_NONDET_STATIC_H
