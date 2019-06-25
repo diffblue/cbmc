@@ -90,7 +90,7 @@ void goto_symext::symex_start_thread(statet &state)
     symex_assignt{
       state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
       .assign_symbol(
-        assignmentt<ssa_exprt>{nil_exprt(), lhs_l1, rhs}, lhs_conditions);
+        assignmentt<ssa_exprt>{expr_skeletont{}, lhs_l1, rhs}, lhs_conditions);
     state.record_events.pop();
   }
 
@@ -124,6 +124,6 @@ void goto_symext::symex_start_thread(statet &state)
     symex_assignt{
       state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
       .assign_symbol(
-        assignmentt<ssa_exprt>{nil_exprt(), lhs, rhs}, lhs_conditions);
+        assignmentt<ssa_exprt>{expr_skeletont{}, lhs, rhs}, lhs_conditions);
   }
 }

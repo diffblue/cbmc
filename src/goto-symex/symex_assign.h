@@ -20,7 +20,44 @@ class byte_extract_exprt;
 class ssa_exprt;
 struct symex_configt;
 
-/// Represents a assignment that has been transformed so that the lhs
+/// Expression in which some part is missing and can be substituted for another
+/// expression.
+class expr_skeletont final
+{
+public:
+  /// Empty skeleton. Applying it to an expression would give the same
+  /// expression unchanged
+  expr_skeletont() : skeleton(nil_exprt{})
+  {
+  }
+
+  /// Replace the missing part of the current skeleton by another skeleton,
+  /// ending in a bigger skeleton corresponding to the two combined.
+  expr_skeletont compose(expr_skeletont other) const;
+
+  /// Replace the missing part by the given expression, to end-up with a
+  /// complete expression
+  exprt apply(exprt expr) const;
+
+  /// Create a skeleton by removing the first operand of \p e. For instance,
+  /// remove_op0 on `array[index]` would give a skeleton in which `array` is
+  /// missing, and applying that skeleton to `array2` would give
+  /// `array2[index]`.
+  static expr_skeletont remove_op0(exprt e);
+
+private:
+  /// In \c skeleton, nil_exprt is used to mark the sub expression to be
+  /// substituted. The nil_exprt always appears recursively following the first
+  /// operands because the only way to get a skeleton is by removing the first
+  /// operand.
+  exprt skeleton;
+
+  explicit expr_skeletont(exprt e) : skeleton(std::move(e))
+  {
+  }
+};
+
+/// Represents an assignment that has been transformed so that the lhs
 /// represents the whole object that is modified, rather than a given subpart.
 /// For instance an assignment `array#2[i] = value` maybe transformed to
 /// `array#2 = array#1 with [i = value]` which will be represented by
@@ -34,7 +71,7 @@ struct assignmentt final
     std::is_base_of<exprt, lhst>::value,
     "LHS type should inherit from exprt");
 
-  exprt original_lhs_skeleton;
+  expr_skeletont original_lhs_skeleton;
   /// Left-hand-side, should be renamed to L1
   lhst lhs;
   /// Right-hand-side, should be renamed to L2
@@ -89,7 +126,7 @@ private:
 
   void assign_from_struct(
     const ssa_exprt &lhs, // L1
-    const exprt &full_lhs,
+    const expr_skeletont &full_lhs,
     const struct_exprt &rhs,
     const exprt::operandst &guard);
 

@@ -22,26 +22,19 @@ Author: Daniel Kroening, kroening@kroening.com
 // update_exprt.
 // #define USE_UPDATE
 
-/// Store the \p what expression by recursively descending into the operands
-/// of \p lhs until the first operand \c op0 is _nil_: this _nil_ operand
-/// is then replaced with \p what.
-/// \param lhs: Non-symbol pointed-to expression
-/// \param what: The expression to be added to the \p lhs
-/// \return The resulting expression
-static exprt add_to_lhs(const exprt &lhs, const exprt &what)
+expr_skeletont expr_skeletont::remove_op0(exprt e)
 {
-  PRECONDITION(lhs.id() != ID_symbol);
-  exprt tmp_what=what;
+  PRECONDITION(e.id() != ID_symbol);
+  PRECONDITION(e.operands().size() >= 1);
+  e.op0().make_nil();
+  return expr_skeletont{std::move(e)};
+}
 
-  if(tmp_what.id()!=ID_symbol)
-  {
-    PRECONDITION(tmp_what.operands().size() >= 1);
-    tmp_what.op0().make_nil();
-  }
-
-  exprt new_lhs=lhs;
-
-  exprt *p=&new_lhs;
+exprt expr_skeletont::apply(exprt expr) const
+{
+  PRECONDITION(skeleton.id() != ID_symbol);
+  exprt result = skeleton;
+  exprt *p = &result;
 
   while(p->is_not_nil())
   {
@@ -51,13 +44,18 @@ static exprt add_to_lhs(const exprt &lhs, const exprt &what)
     INVARIANT(
       p->operands().size() >= 1,
       "expected pointed-to expression to have at least one operand");
-    p=&p->op0();
+    p = &p->op0();
   }
 
   INVARIANT(p->is_nil(), "expected pointed-to expression to be nil");
 
-  *p=tmp_what;
-  return new_lhs;
+  *p = std::move(expr);
+  return result;
+}
+
+expr_skeletont expr_skeletont::compose(expr_skeletont other) const
+{
+  return expr_skeletont(apply(other.skeleton));
 }
 
 void symex_assignt::assign_rec(
@@ -332,7 +330,7 @@ static assignmentt<ssa_exprt> shift_indexed_access_to_lhs(
 /// \param guard: guard conjuncts that must hold for this assignment to be made
 void symex_assignt::assign_from_struct(
   const ssa_exprt &lhs, // L1
-  const exprt &full_lhs,
+  const expr_skeletont &full_lhs,
   const struct_exprt &rhs,
   const exprt::operandst &guard)
 {
@@ -394,8 +392,7 @@ void symex_assignt::assign_non_struct_symbol(
 
   state.record_events.push(false);
   const exprt l2_full_lhs =
-    state.rename(add_to_lhs(assignment.original_lhs_skeleton, l2_lhs), ns)
-      .get();
+    state.rename(assignment.original_lhs_skeleton.apply(l2_lhs), ns).get();
   state.record_events.pop();
 
   auto current_assignment_type =
@@ -450,7 +447,8 @@ void symex_assignt::assign_typecast(
   new_assignment.rhs = typecast_exprt::conditional_cast(
     assignment.rhs, assignment.lhs.op().type());
   new_assignment.original_lhs_skeleton =
-    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+    assignment.original_lhs_skeleton.compose(
+      expr_skeletont::remove_op0(assignment.lhs));
   new_assignment.lhs = assignment.lhs.op();
   assign_rec(new_assignment, guard);
 }
@@ -492,7 +490,8 @@ void symex_assignt::assign_array(
   new_assignment.rhs =
     with_exprt{new_assignment.lhs, lhs_index, assignment.rhs};
   new_assignment.original_lhs_skeleton =
-    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+    assignment.original_lhs_skeleton.compose(
+      expr_skeletont::remove_op0(assignment.lhs));
   assign_rec(new_assignment, guard);
 #endif
 }
@@ -562,7 +561,8 @@ void symex_assignt::assign_struct_member(
   }();
 
   new_assignment.original_lhs_skeleton =
-    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+    assignment.original_lhs_skeleton.compose(
+      expr_skeletont::remove_op0(assignment.lhs));
   assign_rec(new_assignment, guard);
 #endif
 }
@@ -612,6 +612,7 @@ void symex_assignt::assign_byte_extract(
                                          assignment.lhs.offset(),
                                          assignment.rhs};
   new_assignment.original_lhs_skeleton =
-    add_to_lhs(assignment.original_lhs_skeleton, assignment.lhs);
+    assignment.original_lhs_skeleton.compose(
+      expr_skeletont::remove_op0(assignment.lhs));
   assign_rec(new_assignment, guard);
 }
