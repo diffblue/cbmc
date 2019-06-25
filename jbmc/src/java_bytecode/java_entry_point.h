@@ -33,8 +33,8 @@ using build_argumentst =
 ///
 /// 1. Allocates and initializes the parameters of the method under test.
 /// 2. Call it and save its return variable in the variable 'return'.
-/// 3. Declare variable 'return' as an output variable (codet with id
-///    ID_output), together with other objects possibly altered by the execution
+/// 3. Declare variable 'return' as an output variable using a `code_outputt`,
+///    together with other objects possibly altered by the execution of
 ///    the method under test (in `java_record_outputs`)
 ///
 /// When \p assume_init_pointers_not_null is false, the generated parameter

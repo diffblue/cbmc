@@ -2870,7 +2870,7 @@ std::string expr2ct::convert_code(
   if(can_cast_expr<code_inputt>(src))
     return convert_code_input(src, indent);
 
-  if(statement==ID_output)
+  if(can_cast_expr<code_outputt>(src))
     return convert_code_output(src, indent);
 
   if(statement==ID_assume)

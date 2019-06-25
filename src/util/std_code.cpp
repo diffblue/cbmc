@@ -198,3 +198,31 @@ void code_inputt::check(const codet &code, const validation_modet vm)
   DATA_CHECK(
     vm, code.operands().size() >= 2, "input must have at least two operands");
 }
+
+code_outputt::code_outputt(
+  std::vector<exprt> arguments,
+  optionalt<source_locationt> location)
+  : codet{ID_output, std::move(arguments)}
+{
+  if(location)
+    add_source_location() = std::move(*location);
+  check(*this, validation_modet::INVARIANT);
+}
+
+code_outputt::code_outputt(
+  const irep_idt &description,
+  exprt expression,
+  optionalt<source_locationt> location)
+  : code_outputt{{address_of_exprt(index_exprt(
+                    string_constantt(description),
+                    from_integer(0, index_type()))),
+                  std::move(expression)},
+                 std::move(location)}
+{
+}
+
+void code_outputt::check(const codet &code, const validation_modet vm)
+{
+  DATA_CHECK(
+    vm, code.operands().size() >= 2, "output must have at least two operands");
+}

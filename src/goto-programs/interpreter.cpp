@@ -408,7 +408,7 @@ void interpretert::execute_other()
       assign(address, rhs);
     }
   }
-  else if(statement==ID_output)
+  else if(can_cast_expr<code_outputt>(pc->get_other()))
   {
     return;
   }

@@ -102,7 +102,7 @@ void goto_symext::symex_other(
     const codet clean_code = to_code(clean_expr(code, state, false));
     symex_input(state, clean_code);
   }
-  else if(statement==ID_output)
+  else if(can_cast_expr<code_outputt>(code))
   {
     const codet clean_code = to_code(clean_expr(code, state, false));
     symex_output(state, clean_code);

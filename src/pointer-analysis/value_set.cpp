@@ -1634,7 +1634,7 @@ void value_sett::apply_code_rec(
   else if(statement==ID_fence)
   {
   }
-  else if(can_cast_expr<code_inputt>(code) || statement == ID_output)
+  else if(can_cast_expr<code_inputt>(code) || can_cast_expr<code_outputt>(code))
   {
     // doesn't do anything
   }
