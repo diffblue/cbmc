@@ -533,7 +533,8 @@ protected:
 
   typedef symex_targett::assignment_typet assignment_typet;
 
-  /// Execute any let expressions in \p expr using \ref symex_assign_symbol.
+  /// Execute any let expressions in \p expr using
+  /// \ref symex_assignt::assign_symbol.
   /// The assignments will be made in bottom-up topological but otherwise
   /// arbitrary order (i.e. in `(let x = let y = 0 in x + y) + (let z = 0 in z)
   /// we will define `y` before `x`, but `z` and `x` could come in either order)
@@ -544,63 +545,6 @@ protected:
   /// Records the newly-defined variable in \ref instruction_local_symbols,
   /// meaning it will be killed when \ref symex_step concludes.
   void lift_let(statet &state, const let_exprt &let_expr);
-
-  void symex_assign_rec(
-    statet &,
-    const exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_from_struct(
-    statet &,
-    const ssa_exprt &lhs,
-    const exprt &full_lhs,
-    const struct_exprt &rhs,
-    const exprt::operandst &,
-    assignment_typet);
-  void symex_assign_symbol(
-    statet &,
-    const ssa_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    const exprt::operandst &,
-    assignment_typet);
-  void symex_assign_typecast(
-    statet &,
-    const typecast_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_array(
-    statet &,
-    const index_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_struct_member(
-    statet &,
-    const member_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_if(
-    statet &,
-    const if_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
-  void symex_assign_byte_extract(
-    statet &,
-    const byte_extract_exprt &lhs,
-    const exprt &full_lhs,
-    const exprt &rhs,
-    exprt::operandst &,
-    assignment_typet);
 
   virtual void
   symex_va_start(statet &, const exprt &lhs, const side_effect_exprt &);

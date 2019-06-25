@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/range.h>
 
+#include "symex_assign.h"
+
 static void locality(
   const irep_idt &function_identifier,
   goto_symext::statet &state,
@@ -138,8 +140,8 @@ void goto_symext::parameter_assignments(
       rhs = clean_expr(std::move(rhs), state, false);
 
       exprt::operandst lhs_conditions;
-      symex_assign_rec(
-        state, lhs, nil_exprt(), rhs, lhs_conditions, assignment_type);
+      symex_assignt{state, assignment_type, ns, symex_config, target}
+        .assign_rec(lhs, nil_exprt(), rhs, lhs_conditions);
     }
 
     if(it1!=arguments.end())

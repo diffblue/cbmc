@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_initializer.h>
 
+#include "symex_assign.h"
+
 void goto_symext::symex_start_thread(statet &state)
 {
   if(state.guard.is_false())
@@ -85,13 +87,9 @@ void goto_symext::symex_start_thread(statet &state)
 
     exprt::operandst lhs_conditions;
     state.record_events.push(false);
-    symex_assign_symbol(
-      state,
-      lhs_l1,
-      nil_exprt(),
-      rhs,
-      lhs_conditions,
-      symex_targett::assignment_typet::HIDDEN);
+    symex_assignt{
+      state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
+      .assign_symbol(lhs_l1, nil_exprt(), rhs, lhs_conditions);
     state.record_events.pop();
   }
 
@@ -122,12 +120,8 @@ void goto_symext::symex_start_thread(statet &state)
     }
 
     exprt::operandst lhs_conditions;
-    symex_assign_symbol(
-      state,
-      lhs,
-      nil_exprt(),
-      rhs,
-      lhs_conditions,
-      symex_targett::assignment_typet::HIDDEN);
+    symex_assignt{
+      state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
+      .assign_symbol(lhs, nil_exprt(), rhs, lhs_conditions);
   }
 }
