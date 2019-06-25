@@ -115,9 +115,6 @@ private:
   void convert(const classt &c, const overlay_classest &overlay_classes);
   void convert(symbolt &class_symbol, const fieldt &f);
 
-  // see definition below for more info
-  static void add_array_types(symbol_tablet &symbol_table);
-
   /// Check if a method is an overlay method by searching for
   /// `ID_overlay_method` in its list of annotations.
   ///
@@ -787,9 +784,7 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-/// Register in the \p symbol_table new symbols for the objects
-/// java::array[X] where X is byte, float, int, char...
-void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
+void add_array_types(symbol_tablet &symbol_table)
 {
   const std::string letters="ijsbcfdza";
 
