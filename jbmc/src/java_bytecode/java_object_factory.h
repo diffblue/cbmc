@@ -137,7 +137,6 @@ using array_element_generatort = std::function<
 /// Synthesize GOTO for generating a array of nondet length to be stored in the
 /// \p expr.
 /// \param expr: The array expression to initialize.
-/// \param depth: The depth of the expression from a root object being created.
 /// \param update_in_place: Should the code allow the solver the freedom to
 /// leave the array as is.
 /// \param location: Source location to use for all synthesized code.
@@ -159,7 +158,6 @@ using array_element_generatort = std::function<
 /// ```
 code_blockt gen_nondet_array_init(
   const exprt &expr,
-  size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
   const array_element_generatort &element_generator,

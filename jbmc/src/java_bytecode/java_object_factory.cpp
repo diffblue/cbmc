@@ -202,7 +202,6 @@ void java_object_factoryt::gen_pointer_target_init(
   {
     assignments.append(gen_nondet_array_init(
       expr,
-      depth + 1,
       update_in_place,
       location,
       [this, update_in_place, depth, location](
@@ -1228,8 +1227,6 @@ code_blockt java_object_factoryt::assign_element(
 /// \param length_expr : array length
 /// \param element_type: type of array elements
 /// \param max_length_expr : max length, as specified by max-nondet-array-length
-/// \param depth: Number of times that a pointer has been dereferenced from the
-///   root of the object tree that we are initializing.
 /// \param update_in_place:
 ///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
 ///   MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
@@ -1249,7 +1246,6 @@ static void array_loop_init_code(
   const exprt &length_expr,
   const typet &element_type,
   const exprt &max_length_expr,
-  size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
   const array_element_generatort &element_generator,
@@ -1312,7 +1308,6 @@ static void array_loop_init_code(
 
 code_blockt gen_nondet_array_init(
   const exprt &expr,
-  size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location,
   const array_element_generatort &element_generator,
@@ -1374,7 +1369,6 @@ code_blockt gen_nondet_array_init(
       length_expr,
       element_type,
       max_length_expr,
-      depth,
       update_in_place,
       location,
       element_generator,
