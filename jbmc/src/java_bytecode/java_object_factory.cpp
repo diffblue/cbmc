@@ -1302,12 +1302,6 @@ static void array_loop_init_code(
   assignments.add(std::move(init_done_label));
 }
 
-/// Create code to initialize a Java array whose size will be at most
-/// `max_nondet_array_length`. The code is emitted to \p assignments does as
-/// follows:
-/// 1. non-deterministically choose a length for the array
-/// 2. assume that such length is >=0 and <= max_length
-/// 3. loop through all elements of the array and initialize them
 code_blockt gen_nondet_array_init(
   const exprt &expr,
   size_t depth,
