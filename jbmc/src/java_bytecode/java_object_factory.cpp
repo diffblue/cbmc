@@ -1051,6 +1051,8 @@ void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
 /// \param element_type:
 ///   Actual element type of the array (the array for all reference types will
 ///   have void* type, but this will be annotated as the true member type).
+/// \param create_local_symbol:
+///   A function to generate a new local symbol and add it to the symbol table
 /// \param location:
 ///   Source location associated with nondet-initialization.
 /// \return Appends instructions to `assignments`
@@ -1094,6 +1096,8 @@ static void allocate_nondet_length_array(
 /// \param element_type: type of array elements
 /// \param max_length_expr : the (constant) size to which initialise the array
 /// \param location: Source location associated with nondet-initialization.
+/// \param allocate_local_symbol:
+///   A function to generate a new local symbol and add it to the symbol table
 static void array_primitive_init_code(
   code_blockt &assignments,
   const exprt &init_array_expr,
@@ -1224,6 +1228,13 @@ code_blockt java_object_factoryt::assign_element(
 ///   and MUST_ cases.
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 /// \param location: Source location associated with nondet-initialization.
+/// \param element_generator:
+///   A function for generating the body of the loop which creates and assigns
+///   the element at the position.
+/// \param allocate_local_symbol:
+///   A function to generate a new local symbol and add it to the symbol table
+/// \param symbol_table:
+///   The symbol table.
 static void array_loop_init_code(
   code_blockt &assignments,
   const exprt &init_array_expr,
