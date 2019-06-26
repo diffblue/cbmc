@@ -1051,7 +1051,7 @@ void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
 /// \param element_type:
 ///   Actual element type of the array (the array for all reference types will
 ///   have void* type, but this will be annotated as the true member type).
-/// \param create_local_symbol:
+/// \param allocate_local_symbol:
 ///   A function to generate a new local symbol and add it to the symbol table
 /// \param location:
 ///   Source location associated with nondet-initialization.
@@ -1061,7 +1061,7 @@ static void allocate_nondet_length_array(
   const exprt &lhs,
   const exprt &max_length_expr,
   const typet &element_type,
-  const allocate_localt &create_local_symbol,
+  const allocate_local_symbolt &allocate_local_symbol,
   const source_locationt &location)
 {
   const auto &length_sym_expr = generate_nondet_int(
@@ -1069,7 +1069,7 @@ static void allocate_nondet_length_array(
     max_length_expr,
     "nondet_array_length",
     location,
-    create_local_symbol,
+    allocate_local_symbol,
     assignments);
 
   side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), location);
@@ -1104,7 +1104,7 @@ static void array_primitive_init_code(
   const typet &element_type,
   const exprt &max_length_expr,
   const source_locationt &location,
-  const allocate_localt &allocate_local_symbol)
+  const allocate_local_symbolt &allocate_local_symbol)
 {
   const array_typet array_type(element_type, max_length_expr);
 
@@ -1245,7 +1245,7 @@ static void array_loop_init_code(
   update_in_placet update_in_place,
   const source_locationt &location,
   const array_element_generatort &element_generator,
-  const allocate_localt &allocate_local_symbol,
+  const allocate_local_symbolt &allocate_local_symbol,
   const symbol_tablet &symbol_table)
 {
   const symbol_exprt &array_init_symexpr =
@@ -1314,7 +1314,7 @@ code_blockt gen_nondet_array_init(
   update_in_placet update_in_place,
   const source_locationt &location,
   const array_element_generatort &element_generator,
-  const allocate_localt &create_local_symbol,
+  const allocate_local_symbolt &allocate_local_symbol,
   const symbol_tablet &symbol_table,
   const size_t max_nondet_array_length)
 {
@@ -1342,7 +1342,7 @@ code_blockt gen_nondet_array_init(
       expr,
       max_length_expr,
       element_type,
-      create_local_symbol,
+      allocate_local_symbol,
       location);
   }
 
@@ -1376,7 +1376,7 @@ code_blockt gen_nondet_array_init(
       update_in_place,
       location,
       element_generator,
-      create_local_symbol,
+      allocate_local_symbol,
       symbol_table);
   }
   else
@@ -1391,7 +1391,7 @@ code_blockt gen_nondet_array_init(
       element_type,
       max_length_expr,
       location,
-      create_local_symbol);
+      allocate_local_symbol);
   }
   return statements;
 }

@@ -143,7 +143,7 @@ using array_element_generatort = std::function<
 /// \param location: Source location to use for all synthesized code.
 /// \param element_generator: A function that creates a new element and assigns
 /// it to the provided expression.
-/// \param create_local_symbol: A function that creates a local symbol in the
+/// \param allocate_local_symbol: A function that creates a local symbol in the
 /// symbol table
 /// \param symbol_table: The symbol table.
 /// \param max_nondet_array_length: The maximum size the array can be.
@@ -162,7 +162,7 @@ code_blockt gen_nondet_array_init(
   update_in_placet update_in_place,
   const source_locationt &location,
   const array_element_generatort &element_generator,
-  const allocate_localt &create_local_symbol,
+  const allocate_local_symbolt &allocate_local_symbol,
   const symbol_tablet &symbol_table,
   size_t max_nondet_array_length);
 

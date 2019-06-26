@@ -15,7 +15,7 @@ Author: Diffblue Ltd.
 class allocate_objectst;
 class symbol_table_baset;
 
-using allocate_localt =
+using allocate_local_symbolt =
   std::function<symbol_exprt(const typet &type, std::string)>;
 
 /// Same as \ref generate_nondet_int(
@@ -41,7 +41,7 @@ symbol_exprt generate_nondet_int(
   const exprt &max_value_expr,
   const std::string &basename_prefix,
   const source_locationt &source_location,
-  const allocate_localt &create_local_symbol,
+  const allocate_local_symbolt &alocate_local_symbol,
   code_blockt &instructions);
 
 /// Gets a fresh nondet choice in range (min_value, max_value). GOTO generated
