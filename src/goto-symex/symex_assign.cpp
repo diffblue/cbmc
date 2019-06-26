@@ -80,7 +80,7 @@ void symex_assignt::assign_rec(
     assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
   }
   else if(lhs.id() == ID_index)
-    assign_array(to_index_expr(lhs), full_lhs, rhs, guard);
+    assign_array<use_update()>(to_index_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id()==ID_member)
   {
     const typet &type = to_member_expr(lhs).struct_op().type();
@@ -464,6 +464,7 @@ void symex_assignt::assign_typecast(
   assign_rec(lhs.op(), new_full_lhs, rhs_typecasted, guard);
 }
 
+template <bool use_update>
 void symex_assignt::assign_array(
   const index_exprt &lhs,
   const exprt &full_lhs,
@@ -476,34 +477,26 @@ void symex_assignt::assign_array(
 
   PRECONDITION(lhs_index_type.id() == ID_array);
 
-#ifdef USE_UPDATE
-
-  // turn
-  //   a[i]=e
-  // into
-  //   a'==UPDATE(a, [i], e)
-
-  update_exprt new_rhs(lhs_index_type);
-  new_rhs.old()=lhs_array;
-  new_rhs.designator().push_back(index_designatort(lhs_index));
-  new_rhs.new_value()=rhs;
-
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-
-  symex_assign_rec(
-    state, lhs_array, new_full_lhs, new_rhs, guard, assignment_type);
-
-  #else
-  // turn
-  //   a[i]=e
-  // into
-  //   a'==a WITH [i:=e]
-
-  const with_exprt new_rhs{lhs_array, lhs_index, rhs};
-  const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
-
-  assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
-#endif
+  if(use_update)
+  {
+    // turn
+    //   a[i]=e
+    // into
+    //   a'==UPDATE(a, [i], e)
+    const update_exprt new_rhs{lhs_array, index_designatort(lhs_index), rhs};
+    const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
+    assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
+  }
+  else
+  {
+    // turn
+    //   a[i]=e
+    // into
+    //   a'==a WITH [i:=e]
+    const with_exprt new_rhs{lhs_array, lhs_index, rhs};
+    const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
+    assign_rec(lhs_array, new_full_lhs, new_rhs, guard);
+  }
 }
 
 void symex_assignt::assign_struct_member(
