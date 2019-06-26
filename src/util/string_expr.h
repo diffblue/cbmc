@@ -173,7 +173,8 @@ inline const refined_string_exprt &to_string_expr(const exprt &expr)
 template <>
 inline bool can_cast_expr<refined_string_exprt>(const exprt &base)
 {
-  return base.id() == ID_struct && base.operands().size() == 2;
+  return base.id() == ID_struct && base.operands().size() == 2 &&
+    is_refined_string_type(base.type());
 }
 
 inline void validate_expr(const refined_string_exprt &x)
