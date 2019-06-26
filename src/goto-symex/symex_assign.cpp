@@ -244,11 +244,14 @@ static assignmentt rewrite_with_to_field_symbols(
 /// expression by assignments to just those fields. May generate "with" (or
 /// "update") expressions, which \ref rewrite_with_to_field_symbols will then
 /// take care of.
+/// \tparam use_update: use update_exprt instead of with_exprt when building
+///   expressions that modify components of an array or a struct
 /// \param [in, out] state: symbolic execution state to perform renaming
 /// \param assignment: assignment to transform
 /// \param ns: namespace
 /// \param do_simplify: set to true if, and only if, simplification is enabled
 /// \return updated assignment
+template <bool use_update>
 static assignmentt shift_indexed_access_to_lhs(
   goto_symext::statet &state,
   assignmentt assignment,
@@ -285,31 +288,38 @@ static assignmentt shift_indexed_access_to_lhs(
         if(byte_extract.id() == ID_index)
         {
           index_exprt &idx = to_index_expr(byte_extract);
-
-#ifdef USE_UPDATE
-          update_exprt new_rhs{idx.array(), exprt{}, ssa_rhs};
-          new_rhs.designator().push_back(index_designatort{idx.index()});
-#else
-          with_exprt new_rhs{idx.array(), idx.index(), ssa_rhs};
-#endif
-
-          ssa_rhs = new_rhs;
+          ssa_rhs = [&]() -> exprt {
+            if(use_update)
+            {
+              update_exprt new_rhs{idx.array(), exprt{}, ssa_rhs};
+              new_rhs.designator().push_back(index_designatort{idx.index()});
+              return std::move(new_rhs);
+            }
+            else
+              return with_exprt{idx.array(), idx.index(), ssa_rhs};
+          }();
           byte_extract = idx.array();
         }
         else
         {
           member_exprt &member = to_member_expr(byte_extract);
           const irep_idt &component_name = member.get_component_name();
-
-#ifdef USE_UPDATE
-          update_exprt new_rhs{member.compound(), exprt{}, ssa_rhs};
-          new_rhs.designator().push_back(member_designatort{component_name});
-#else
-          with_exprt new_rhs(member.compound(), exprt(ID_member_name), ssa_rhs);
-          new_rhs.where().set(ID_component_name, component_name);
-#endif
-
-          ssa_rhs = new_rhs;
+          ssa_rhs = [&]() -> exprt {
+            if(use_update)
+            {
+              update_exprt new_rhs{member.compound(), exprt{}, ssa_rhs};
+              new_rhs.designator().push_back(
+                member_designatort{component_name});
+              return std::move(new_rhs);
+            }
+            else
+            {
+              with_exprt new_rhs(
+                member.compound(), exprt(ID_member_name), ssa_rhs);
+              new_rhs.where().set(ID_component_name, component_name);
+              return std::move(new_rhs);
+            }
+          }();
           byte_extract = member.compound();
         }
       }
@@ -377,7 +387,7 @@ void symex_assignt::assign_non_struct_symbol(
   // introduced by assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  auto assignment = shift_indexed_access_to_lhs(
+  auto assignment = shift_indexed_access_to_lhs<use_update()>(
     state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
   assignment = rewrite_with_to_field_symbols<use_update()>(
     state, std::move(assignment), ns);
