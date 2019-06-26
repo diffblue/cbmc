@@ -156,6 +156,8 @@ struct assignmentt final
 /// \ref symex_assignt::assign_struct_member have done, but now making use
 /// of the index/member that may only be known after renaming to L2 has taken
 /// place.
+/// \tparam use_update: use update_exprt instead of with_exprt when building
+///   expressions that modify components of an array or a struct
 /// \param [in, out] state: symbolic execution state to perform renaming
 /// \param assignment: an assignment to rewrite
 /// \param ns: namespace
