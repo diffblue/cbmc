@@ -195,6 +195,8 @@ void symex_assignt::assign_rec(
 struct assignmentt final
 {
   ssa_exprt lhs;
+  /// Skeleton to reconstruct the original lhs in the assignment
+  expr_skeletont original_lhs_skeleton;
   exprt rhs;
 };
 
@@ -326,7 +328,9 @@ static assignmentt shift_indexed_access_to_lhs(
 
     if(byte_extract.id() == ID_symbol)
     {
-      return assignmentt{to_ssa_expr(byte_extract), byte_update.value()};
+      return assignmentt{to_ssa_expr(byte_extract),
+                         std::move(assignment.original_lhs_skeleton),
+                         byte_update.value()};
     }
     else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
     {
@@ -376,6 +380,7 @@ static assignmentt shift_indexed_access_to_lhs(
       // We may have shifted the previous lhs into the rhs; as the lhs is only
       // L1-renamed, we need to rename again.
       return assignmentt{to_ssa_expr(byte_extract),
+                         std::move(assignment.original_lhs_skeleton),
                          state.rename(std::move(ssa_rhs), ns).get()};
     }
   }
@@ -436,10 +441,11 @@ void symex_assignt::assign_non_struct_symbol(
   // introduced by assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  auto assignment = shift_indexed_access_to_lhs<use_update()>(
-    state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
-  assignment = rewrite_with_to_field_symbols<use_update()>(
-    state, std::move(assignment), ns);
+  assignmentt assignment = rewrite_with_to_field_symbols<use_update()>(
+    state,
+    shift_indexed_access_to_lhs<use_update()>(
+      state, {lhs, full_lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt),
+    ns);
 
   if(symex_config.simplify_opt)
     assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
