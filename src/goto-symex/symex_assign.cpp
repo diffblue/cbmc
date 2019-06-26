@@ -67,6 +67,54 @@ expr_skeletont expr_skeletont::compose(expr_skeletont other) const
   return expr_skeletont(apply(other.skeleton));
 }
 
+/// In the expression corresponding to a skeleton returns a pointer to the
+/// deepest subexpression before we encounter nil.
+static exprt *deepest_not_nil(exprt &e)
+{
+  exprt *ptr = &e;
+  while(!ptr->op0().is_nil())
+    ptr = &ptr->op0();
+  return ptr;
+}
+
+optionalt<expr_skeletont>
+expr_skeletont::clear_innermost_index_expr(expr_skeletont skeleton)
+{
+  exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(index_exprt *index_expr = expr_try_dynamic_cast<index_exprt>(*to_update))
+  {
+    index_expr->make_nil();
+    return expr_skeletont{std::move(skeleton)};
+  }
+  return {};
+}
+
+optionalt<expr_skeletont>
+expr_skeletont::clear_innermost_member_expr(expr_skeletont skeleton)
+{
+  exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(member_exprt *member = expr_try_dynamic_cast<member_exprt>(*to_update))
+  {
+    member->make_nil();
+    return expr_skeletont{std::move(skeleton)};
+  }
+  return {};
+}
+
+optionalt<expr_skeletont>
+expr_skeletont::clear_innermost_byte_extract_expr(expr_skeletont skeleton)
+{
+  exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(
+    to_update->id() != ID_byte_extract_big_endian &&
+    to_update->id() != ID_byte_extract_little_endian)
+  {
+    return {};
+  }
+  to_update->make_nil();
+  return expr_skeletont{std::move(skeleton.skeleton)};
+}
+
 void symex_assignt::assign_rec(
   const exprt &lhs,
   const expr_skeletont &full_lhs,

@@ -51,6 +51,24 @@ public:
   /// `array2[index]`.
   static expr_skeletont remove_op0(exprt e);
 
+  /// If the deepest subexpression in the skeleton is a member expression,
+  /// replace it with a nil expression and return the obtained skeleton.
+  static optionalt<expr_skeletont>
+  clear_innermost_index_expr(expr_skeletont skeleton);
+
+  /// If the deepest subexpression in the skeleton is a member expression,
+  /// replace it with a nil expression and return the obtained skeleton.
+  static optionalt<expr_skeletont>
+  clear_innermost_member_expr(expr_skeletont skeleton);
+
+  /// If the deepest subexpression in the skeleton is a byte-extract expression,
+  /// replace it with a nil expression and return the obtained skeleton.
+  /// For instance, for `(byte_extract(☐, 2, int)).field[index]`
+  /// `☐.field[index]` is returned, while for `byte_extract(☐.field, 2, int)`
+  /// an empty optional is returned.
+  static optionalt<expr_skeletont>
+  clear_innermost_byte_extract_expr(expr_skeletont skeleton);
+
 private:
   /// In \c skeleton, nil_exprt is used to mark the sub expression to be
   /// substituted. The nil_exprt always appears recursively following the first
