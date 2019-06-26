@@ -132,7 +132,7 @@ private:
     const source_locationt &location);
 
   code_blockt assign_element(
-    const exprt &element_at_counter,
+    const exprt &element,
     update_in_placet update_in_place,
     const typet &element_type,
     size_t depth,
@@ -206,10 +206,10 @@ void java_object_factoryt::gen_pointer_target_init(
       update_in_place,
       location,
       [this, update_in_place, depth, location](
-        const exprt &element_at_counter,
+        const exprt &element,
         const typet &element_type) -> code_blockt {
         return assign_element(
-          element_at_counter,
+          element,
           update_in_place,
           element_type,
           depth + 1,
@@ -1133,16 +1133,24 @@ static void array_primitive_init_code(
   assignments.statements().back().add_source_location() = location;
 }
 
-/// Generate codet for assigning an individual element inside the array
+/// Generate codet for assigning an individual element inside the array.
+/// \param element: The lhs expression that will be assigned the new element.
+/// \param update_in_place: Should the code allow for the object to updated in
+/// place.
+/// \param element_type: The type of the element to create.
+/// \param depth: The depth in the object tree.
+/// \param location: Source location to use for synthesized code
+/// \return Synthesized code using the object factory to create an element of
+/// the type and assign it into \p element.
 code_blockt java_object_factoryt::assign_element(
-  const exprt &element_at_counter,
+  const exprt &element,
   const update_in_placet update_in_place,
   const typet &element_type,
   const size_t depth,
   const source_locationt &location)
 {
   code_blockt assignments;
-  bool new_item_is_primitive = element_at_counter.type().id() != ID_pointer;
+  bool new_item_is_primitive = element.type().id() != ID_pointer;
 
   // Use a temporary to initialise a new, or update an existing, non-primitive.
   // This makes it clearer that in a sequence like
@@ -1152,17 +1160,17 @@ code_blockt java_object_factoryt::assign_element(
   exprt init_expr;
   if(new_item_is_primitive)
   {
-    init_expr = element_at_counter;
+    init_expr = element;
   }
   else
   {
     init_expr = allocate_objects.allocate_automatic_local_object(
-      element_at_counter.type(), "new_array_item");
+      element.type(), "new_array_item");
 
     // If we're updating an existing array item, read the existing object that
     // we (may) alter:
     if(update_in_place != update_in_placet::NO_UPDATE_IN_PLACE)
-      assignments.add(code_assignt(init_expr, element_at_counter));
+      assignments.add(code_assignt(init_expr, element));
   }
 
   // MUST_UPDATE_IN_PLACE only applies to this object.
@@ -1188,7 +1196,7 @@ code_blockt java_object_factoryt::assign_element(
   {
     // We used a temporary variable to update or initialise an array item;
     // now write it into the array:
-    assignments.add(code_assignt(element_at_counter, init_expr));
+    assignments.add(code_assignt(element, init_expr));
   }
   return assignments;
 }
