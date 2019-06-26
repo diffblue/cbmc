@@ -144,7 +144,8 @@ using array_element_generatort = std::function<
 /// \param element_generator: A function that creates a new element and assigns
 /// it to the provided expression.
 /// \param allocate_local_symbol: A function that creates a local symbol in the
-/// symbol table
+/// symbol table. See \ref java_object_factoryt::assign_element for an example
+/// implementation.
 /// \param symbol_table: The symbol table.
 /// \param max_nondet_array_length: The maximum size the array can be.
 /// \return The GOTO that approximates:
