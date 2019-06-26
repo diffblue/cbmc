@@ -73,12 +73,18 @@ private:
     const exprt &rhs,
     const exprt::operandst &guard);
 
+  /// \tparam use_update: use update_exprt instead of with_exprt when building
+  ///   expressions that modify components of an array or a struct
+  template <bool use_update>
   void assign_array(
     const index_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
     exprt::operandst &guard);
 
+  /// \tparam use_update: use update_exprt instead of with_exprt when building
+  ///   expressions that modify components of an array or a struct
+  template <bool use_update>
   void assign_struct_member(
     const member_exprt &lhs,
     const exprt &full_lhs,
