@@ -85,7 +85,10 @@ void symex_assignt::assign_rec(
   {
     const typet &type = to_member_expr(lhs).struct_op().type();
     if(type.id() == ID_struct || type.id() == ID_struct_tag)
-      assign_struct_member(to_member_expr(lhs), full_lhs, rhs, guard);
+    {
+      assign_struct_member<use_update()>(
+        to_member_expr(lhs), full_lhs, rhs, guard);
+    }
     else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
       // should have been replaced by byte_extract
@@ -499,6 +502,7 @@ void symex_assignt::assign_array(
   }
 }
 
+template <bool use_update>
 void symex_assignt::assign_struct_member(
   const member_exprt &lhs,
   const exprt &full_lhs,
@@ -534,35 +538,30 @@ void symex_assignt::assign_struct_member(
 
   const irep_idt &component_name=lhs.get_component_name();
 
-  #ifdef USE_UPDATE
+  if(use_update)
+  {
+    // turn
+    //   a.c=e
+    // into
+    //   a'==UPDATE(a, .c, e)
+    const update_exprt new_rhs{
+      lhs_struct, member_designatort(component_name), rhs};
+    const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
+    assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
+  }
+  else
+  {
+    // turn
+    //   a.c=e
+    // into
+    //   a'==a WITH [c:=e]
 
-  // turn
-  //   a.c=e
-  // into
-  //   a'==UPDATE(a, .c, e)
+    with_exprt new_rhs(lhs_struct, exprt(ID_member_name), rhs);
+    new_rhs.where().set(ID_component_name, component_name);
 
-  update_exprt new_rhs(lhs_struct.type());
-  new_rhs.old()=lhs_struct;
-  new_rhs.designator().push_back(member_designatort(component_name));
-  new_rhs.new_value()=rhs;
-
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-
-  symex_assign_rec(
-    state, lhs_struct, new_full_lhs, new_rhs, guard, assignment_type);
-
-  #else
-  // turn
-  //   a.c=e
-  // into
-  //   a'==a WITH [c:=e]
-
-  with_exprt new_rhs(lhs_struct, exprt(ID_member_name), rhs);
-  new_rhs.where().set(ID_component_name, component_name);
-
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
-#endif
+    exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
+    assign_rec(lhs_struct, new_full_lhs, new_rhs, guard);
+  }
 }
 
 void symex_assignt::assign_if(
