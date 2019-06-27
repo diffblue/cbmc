@@ -8,7 +8,7 @@
 TEST_CASE("Add array types", "[core]")
 {
   symbol_tablet symbol_table;
-  add_array_types(symbol_table);
+  add_java_array_types(symbol_table);
 
   const std::vector<std::string> array_types = {
     "byte", "short", "int", "long", "float", "double", "boolean", "reference"};

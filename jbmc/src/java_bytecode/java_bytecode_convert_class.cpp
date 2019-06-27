@@ -69,7 +69,7 @@ public:
     const java_bytecode_parse_treet &parse_tree = parse_trees.front();
 
     // Add array types to the symbol table
-    add_array_types(symbol_table);
+    add_java_array_types(symbol_table);
 
     const bool loading_success =
       parse_tree.loading_successful &&
@@ -784,7 +784,7 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-void add_array_types(symbol_tablet &symbol_table)
+void add_java_array_types(symbol_tablet &symbol_table)
 {
   const std::string letters="ijsbcfdza";
 
