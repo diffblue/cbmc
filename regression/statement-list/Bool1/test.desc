@@ -1,0 +1,20 @@
+CORE
+main.awl
+--show-parse-tree
+^EXIT=0$
+^SIGNAL=0$
+^Name: "Bool1"$
+^Version: 0[.]1$
+^  \* type: statement_list_bool$
+^  \* identifier: in1$
+^  \* identifier: in2$
+^  \* identifier: in3$
+^  \* identifier: out1$
+^statement_list_and	in1$
+^statement_list_or_nested$
+^statement_list_and	in2$
+^statement_list_and_not	in3$
+^statement_list_nesting_closed$
+^statement_list_assign	out1$
+--
+^warning: ignoring

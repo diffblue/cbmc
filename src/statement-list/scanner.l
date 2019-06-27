@@ -75,7 +75,7 @@ void statement_list_scanner_init()
 
 
 %%
-[\(\):\.,;#=]       { loc(); return yytext[0]; }
+[\(:\.,;#]          { loc(); return yytext[0]; }
 [\t\r\n ]           ;
 :=                  { loc(); return TOK_ASSIGNMENT; }
 BEGIN               { loc(); return TOK_BEGIN; }
@@ -86,6 +86,10 @@ FUNCTION            { loc(); return TOK_FUNCTION; }
 END_FUNCTION        { loc(); return TOK_END_FUNCTION; }
 VAR_INPUT           { loc(); return TOK_VAR_INPUT; }
 VAR_OUTPUT          { loc(); return TOK_VAR_OUTPUT; }
+VAR_IN_OUT          { loc(); return TOK_VAR_INOUT; }
+VAR                 { loc(); return TOK_VAR_STATIC; }
+VAR[ ]CONSTANT      { loc(); return TOK_VAR_CONSTANT; }
+VAR_TEMP            { loc(); return TOK_VAR_TEMP; }
 END_VAR             { loc(); return TOK_END_VAR; }
 NETWORK             { loc(); return TOK_NETWORK; }
 TITLE               { loc(); return TOK_TITLE; }
@@ -96,13 +100,23 @@ Real                { loc(); return TOK_REAL; }
 Void                { loc(); return TOK_VOID; }
 L                   { loc(); return TOK_LOAD; }
 T                   { loc(); return TOK_TRANSFER; }
+CALL                { loc(); return TOK_CALL; }
 NOP                 { loc(); return TOK_NOP; }
+SET                 { loc(); return TOK_SET; }
 A                   { loc(); return TOK_AND; }
 AN                  { loc(); return TOK_AND_NOT; }
 O                   { loc(); return TOK_OR; }
 ON                  { loc(); return TOK_OR_NOT; }
 X                   { loc(); return TOK_XOR; }
 XN                  { loc(); return TOK_XOR_NOT; }
+A\(                 { loc(); return TOK_AND_NESTED; }
+AN\(                { loc(); return TOK_AND_NOT_NESTED; }
+O\(                 { loc(); return TOK_OR_NESTED; }
+ON\(                { loc(); return TOK_OR_NOT_NESTED; }
+X\(                 { loc(); return TOK_XOR_NESTED; }
+XN\(                { loc(); return TOK_XOR_NOT_NESTED; }
+\)                  { loc(); return TOK_NESTING_CLOSED; }
+=                   { loc(); return TOK_ASSIGN; }
 \+                  { loc(); return TOK_CONST_ADD; }
 \+I                 { loc(); return TOK_ACCU_INT_ADD; }
 \-I                 { loc(); return TOK_ACCU_INT_SUB; }
@@ -144,7 +158,7 @@ XN                  { loc(); return TOK_XOR_NOT; }
                       return TOK_INT_LITERAL; 
                     }
                     
-TRUE|FALSE          { 
+([t|T][R|r][u|U][e|E])|([f|F][a|A][l|L][s|S][e|E])          { 
                       newstack(yystatement_listlval);
                       parser_stack(yystatement_listlval) = 
                         convert_bool_literal(yytext);
@@ -162,22 +176,13 @@ TRUE|FALSE          {
                       return TOK_REAL_LITERAL; 
                     }
 
-\"[a-zA-Z_\.][a-zA-Z0-9_\.]*\" {
+(\"[^\"\r\t\n]+\")|([a-zA-Z][a-zA-Z0-9]*) {
                       newstack(yystatement_listlval);
                       parser_stack(yystatement_listlval) = 
                         convert_identifier(yytext);
                       PARSER.set_source_location(
                         parser_stack(yystatement_listlval));
                       return TOK_IDENTIFIER; 
-                    }
-
-[a-zA-Z_\.][a-zA-Z0-9_\.]* {
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_title(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_TITLE_VALUE;
                     }
 
 [a-zA-Z_\.][a-zA-Z0-9_\.]*: {
