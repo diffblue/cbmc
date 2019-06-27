@@ -42,7 +42,10 @@ void mark_java_implicitly_generic_class_type(
   symbol_tablet &symbol_table);
 
 /// Register in the \p symbol_table new symbols for the objects
-/// java::array[X] where X is byte, float, int, char...
+/// java::array[X] where X is byte, short, int, long, char, boolean, float,
+/// double and reference.
+/// Also registers a java::array[X].clone():Ljava/lang/Object; method for each
+/// type.
 void add_java_array_types(symbol_tablet &symbol_table);
 
 /// An exception that is raised checking whether a class is implicitly
