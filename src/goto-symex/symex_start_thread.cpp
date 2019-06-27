@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_initializer.h>
 
+#include "expr_skeleton.h"
 #include "symex_assign.h"
 
 void goto_symext::symex_start_thread(statet &state)

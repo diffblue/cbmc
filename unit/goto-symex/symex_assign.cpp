@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <analyses/dirty.h>
 #include <analyses/guard.h>
+#include <goto-symex/expr_skeleton.h>
 #include <goto-symex/goto_symex.h>
 #include <goto-symex/goto_symex_state.h>
 #include <goto-symex/symex_assign.h>
