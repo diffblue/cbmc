@@ -474,7 +474,8 @@ void symex_assignt::assign_non_struct_symbol(
                              .get();
 
   state.record_events.push(false);
-  const exprt l2_full_lhs = state.rename(full_lhs.apply(l2_lhs), ns).get();
+  const exprt l2_full_lhs =
+    state.rename(assignment.original_lhs_skeleton.apply(l2_lhs), ns).get();
   state.record_events.pop();
 
   auto current_assignment_type =
