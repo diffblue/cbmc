@@ -848,7 +848,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       const auto instances =
         generate_instantiations(index_sets, axioms, not_contain_witnesses);
       for(const auto &instance : instances)
-        add_lemma(instance);
+        add_lemma(
+          substitute_array_access(instance, generator.fresh_symbol, true));
     }
     else
     {
