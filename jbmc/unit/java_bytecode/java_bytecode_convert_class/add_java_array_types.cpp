@@ -10,8 +10,20 @@ TEST_CASE("Add array types", "[core]")
   symbol_tablet symbol_table;
   add_java_array_types(symbol_table);
 
-  const std::vector<std::string> array_types = {
-    "byte", "short", "int", "long", "float", "double", "boolean", "reference"};
+  const std::vector<std::string> array_types = {"byte",
+                                                "short",
+                                                "int",
+                                                "long",
+                                                "char",
+                                                "float",
+                                                "double",
+                                                "boolean",
+                                                "reference"};
+
+  // type, clone method, local variables in clone method
+  size_t symbols_per_array = 1 + 1 + 3;
+  REQUIRE(
+    symbol_table.symbols.size() == array_types.size() * symbols_per_array);
 
   SECTION("Array class symbol exists")
   {
