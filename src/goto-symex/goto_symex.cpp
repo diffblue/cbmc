@@ -80,6 +80,6 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
 
     exprt::operandst lhs_if_then_else_conditions;
     symex_assignt{state, assignment_type, ns, symex_config, target}.assign_rec(
-      lhs, nil_exprt(), rhs, lhs_if_then_else_conditions);
+      lhs, expr_skeletont{}, rhs, lhs_if_then_else_conditions);
   }
 }
