@@ -170,7 +170,17 @@ protected:
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
-  void pointer_validity_check(const dereference_exprt &, const guardt &);
+
+  /// Generates VCCs for the validity of the given dereferencing operation.
+  /// \param expr the expression to be checked
+  /// \param src_expr The expression as found in the program,
+  ///  prior to any rewriting
+  /// \param guard the condition under which the operation happens
+  void pointer_validity_check(
+    const dereference_exprt &expr,
+    const exprt &src_expr,
+    const guardt &guard);
+
   conditionst address_check(const exprt &address, const exprt &size);
   void integer_overflow_check(const exprt &, const guardt &);
   void conversion_check(const exprt &, const guardt &);
@@ -1112,6 +1122,7 @@ void goto_checkt::pointer_overflow_check(
 
 void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
+  const exprt &src_expr,
   const guardt &guard)
 {
   if(!enable_pointer_check)
@@ -1130,8 +1141,8 @@ void goto_checkt::pointer_validity_check(
       c.assertion,
       "dereference failure: " + c.description,
       "pointer dereference",
-      expr.find_source_location(),
-      expr,
+      src_expr.find_source_location(),
+      src_expr,
       guard);
   }
 }
@@ -1606,7 +1617,7 @@ bool goto_checkt::check_rec_member(const member_exprt &member, guardt &guard)
 
     dereference_exprt new_deref{new_address_casted};
     new_deref.add_source_location() = deref.source_location();
-    pointer_validity_check(new_deref, guard);
+    pointer_validity_check(new_deref, member, guard);
 
     return true;
   }
@@ -1708,7 +1719,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
     pointer_rel_check(expr, guard);
   else if(expr.id()==ID_dereference)
   {
-    pointer_validity_check(to_dereference_expr(expr), guard);
+    pointer_validity_check(to_dereference_expr(expr), expr, guard);
   }
 }
 
