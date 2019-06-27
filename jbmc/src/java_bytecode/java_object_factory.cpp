@@ -205,14 +205,9 @@ void java_object_factoryt::gen_pointer_target_init(
       update_in_place,
       location,
       [this, update_in_place, depth, location](
-        const exprt &element,
-        const typet &element_type) -> code_blockt {
+        const exprt &element, const typet &element_type) -> code_blockt {
         return assign_element(
-          element,
-          update_in_place,
-          element_type,
-          depth + 1,
-          location);
+          element, update_in_place, element_type, depth + 1, location);
       },
       [this](const typet &type, std::string basename_prefix) -> symbol_exprt {
         return allocate_objects.allocate_automatic_local_object(
@@ -1109,8 +1104,7 @@ static void array_primitive_init_code(
 
   // TYPE (*array_data_init)[max_length_expr];
   const symbol_exprt &tmp_finite_array_pointer =
-    allocate_local_symbol(
-      pointer_type(array_type), "array_data_init");
+    allocate_local_symbol(pointer_type(array_type), "array_data_init");
 
   // array_data_init = ALLOCATE(TYPE [max_length_expr], max_length_expr, false);
   assignments.add(
@@ -1175,10 +1169,10 @@ code_blockt java_object_factoryt::assign_element(
   // MUST_UPDATE_IN_PLACE only applies to this object.
   // If this is a pointer to another object, offer the chance
   // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
-  update_in_placet child_update_in_place=
-    update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE ?
-    update_in_placet::MAY_UPDATE_IN_PLACE :
-    update_in_place;
+  update_in_placet child_update_in_place =
+    update_in_place == update_in_placet::MUST_UPDATE_IN_PLACE
+      ? update_in_placet::MAY_UPDATE_IN_PLACE
+      : update_in_place;
   gen_nondet_init(
     assignments,
     init_expr,
@@ -1253,16 +1247,14 @@ static void array_loop_init_code(
   const symbol_tablet &symbol_table)
 {
   const symbol_exprt &array_init_symexpr =
-    allocate_local_symbol(
-      init_array_expr.type(), "array_data_init");
+    allocate_local_symbol(init_array_expr.type(), "array_data_init");
 
   code_assignt data_assign(array_init_symexpr, init_array_expr);
   data_assign.add_source_location() = location;
   assignments.add(data_assign);
 
   const symbol_exprt &counter_expr =
-    allocate_local_symbol(
-      length_expr.type(), "array_init_iter");
+    allocate_local_symbol(length_expr.type(), "array_init_iter");
 
   const symbolt &counter =
     symbol_table.lookup_ref(counter_expr.get_identifier());
@@ -1327,8 +1319,7 @@ code_blockt gen_nondet_array_init(
   const typet &element_type =
     static_cast<const typet &>(expr.type().subtype().find(ID_element_type));
 
-  auto max_length_expr = from_integer(
-    max_nondet_array_length, java_int_type());
+  auto max_length_expr = from_integer(max_nondet_array_length, java_int_type());
 
   // In NO_UPDATE_IN_PLACE mode we allocate a new array and recursively
   // initialize its elements
