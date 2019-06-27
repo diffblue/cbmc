@@ -1,0 +1,19 @@
+KNOWNBUG symex-driven-lazy-loading-expected-failure
+My.class
+--function My.fieldStaticNoClinit --java-assume-inputs-interval [1:3] --nondet-static
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.1\].[^$]*SUCCESS
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.2\].[^$]*SUCCESS
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.3\].[^$]*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-interval constrains the primitive static fields
+of objects to given interval.
+
+This fails under symex-driven lazy loading because nondet-static cannot be used
+with it.
+
+Static fields do not work if there is no class initializer (static initializer).
