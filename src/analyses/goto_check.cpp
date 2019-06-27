@@ -1599,11 +1599,9 @@ bool goto_checkt::check_rec_member(const member_exprt &member, guardt &guard)
       deref.pointer(), pointer_type(char_type()));
 
     const exprt new_address_casted = typecast_exprt::conditional_cast(
-      typecast_exprt{
-        plus_exprt{char_pointer,
-                   typecast_exprt::conditional_cast(
-                     member_offset_opt.value(), pointer_diff_type())},
-        char_pointer.type()},
+      plus_exprt{char_pointer,
+                 typecast_exprt::conditional_cast(
+                   member_offset_opt.value(), pointer_diff_type())},
       new_pointer_type);
 
     dereference_exprt new_deref{new_address_casted};
