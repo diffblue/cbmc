@@ -401,6 +401,15 @@ which is not something that is true in general for C pointers for instance.
 Therefore for each transformation on a string, it is assumed the program
 allocates a new string before calling a primitive.
 
+\section builtin-functions Builtin functions
+
+String operations are handled as "builtin functions", which can operate in two
+modes:
+1. constraint generation
+2. model evaluation
+
+This is described in more detail \link string_builtin_functiont here. \endlink
+
 \section primitives String primitives
 
 \subsection basic-primitives Basic access:

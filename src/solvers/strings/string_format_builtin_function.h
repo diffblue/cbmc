@@ -1,15 +1,13 @@
 /*******************************************************************\
 
-Module: Builtin functions for String.format
+Module: Built-in function for String.format
 
 Author: Romain Brenguier, Joel Allred
-
-Date:   June 2019
 
 \*******************************************************************/
 
 /// \file
-///  Builtin functions for String.format
+///  Built-in function for String.format
 
 #ifndef CPROVER_SOLVERS_STRINGS_STRING_FORMAT_BUILTIN_FUNCTION_H
 #define CPROVER_SOLVERS_STRINGS_STRING_FORMAT_BUILTIN_FUNCTION_H
@@ -18,6 +16,49 @@ Date:   June 2019
 
 class format_specifiert;
 
+/// Built-in function for String.format().
+///
+/// The intent is to support all conversions described in:
+/// https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#syntax
+///
+/// This table indicates whether each conversion is supported in:
+/// 1. string content constraint generation (SCC)
+/// 2. string content evaluation (SCE)
+/// 3. string length constraint generation (SL)
+///
+/// For more information on what these mean, refer to
+/// \ref string_builtin_functiont.
+///
+///  c  | SCC | SCE | SL
+/// --- | --- | --- | ---
+/// \%b |  ✔  |  ?  |  ✔
+/// \%B |  ?  |  ?  |  ✔
+/// \%h |  ❌  |  ❌  |  ❌
+/// \%H |  ❌  |  ❌  |  ❌
+/// \%s |  ✔  |  ?  |  ✔
+/// \%S |  ?  |  ?  |  ✔
+/// \%c |  ?  |  ?  |  ✔
+/// \%C |  ?  |  ?  |  ✔
+/// \%d |  ✔  |  ?  |  ✔
+/// \%o |  ❌  |  ❌  |  ❌
+/// \%x |  ✔  |  ✔  |  ❌
+/// \%X |  ?  |  ✔  |  ❌
+/// \%e |  ?  |  ❌  |  ❌
+/// \%E |  ?  |  ❌  |  ❌
+/// \%f |  ?  |  ❌  |  ❌
+/// \%g |  ❌  |  ❌  |  ❌
+/// \%G |  ❌  |  ❌  |  ❌
+/// \%a |  ❌  |  ❌  |  ❌
+/// \%A |  ❌  |  ❌  |  ❌
+/// \%t |  ❌  |  ❌  |  ❌
+/// \%T |  ❌  |  ❌  |  ❌
+/// \%\% | ✔  |  ?  |  ✔
+/// \%n |  ✔  |  ?  |  ✔
+///
+/// ✓ = full support, ? = untested support , ❌ = no support
+///
+/// The `index` component of the formatter is supported, but the other
+/// components (flag, width, precision, dt) are ignored.
 class string_format_builtin_functiont final : public string_builtin_functiont
 {
 public:

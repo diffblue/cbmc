@@ -1,15 +1,13 @@
 /*******************************************************************\
 
-Module: Builtin functions for String.format
+Module: Built-in function for String.format
 
 Author: Romain Brenguier, Joel Allred
-
-Date:   June 2019
 
 \*******************************************************************/
 
 /// \file
-///  Builtin functions for String.format
+///  Built-in function for String.format
 
 #include <iterator>
 #include <math.h>
