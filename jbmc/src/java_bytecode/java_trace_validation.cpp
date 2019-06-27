@@ -32,7 +32,7 @@ static bool may_be_lvalue(const exprt &expr)
          can_cast_expr<address_of_exprt>(expr) ||
          can_cast_expr<typecast_exprt>(expr) ||
          can_cast_expr<symbol_exprt>(expr) ||
-         expr.id() == ID_byte_extract_little_endian;
+         can_cast_expr<byte_extract_exprt>(expr);
 }
 
 optionalt<symbol_exprt> get_inner_symbol_expr(exprt expr)
@@ -60,7 +60,7 @@ bool valid_lhs_expr_high_level(const exprt &lhs)
 {
   return can_cast_expr<member_exprt>(lhs) || can_cast_expr<symbol_exprt>(lhs) ||
          can_cast_expr<index_exprt>(lhs) ||
-         lhs.id() == ID_byte_extract_little_endian;
+         can_cast_expr<byte_extract_exprt>(lhs);
 }
 
 bool valid_rhs_expr_high_level(const exprt &rhs)
@@ -70,7 +70,7 @@ bool valid_rhs_expr_high_level(const exprt &rhs)
          can_cast_expr<address_of_exprt>(rhs) ||
          can_cast_expr<symbol_exprt>(rhs) ||
          can_cast_expr<array_list_exprt>(rhs) ||
-         rhs.id() == ID_byte_extract_little_endian;
+         can_cast_expr<byte_extract_exprt>(rhs);
 }
 
 bool can_evaluate_to_constant(const exprt &expression)
@@ -83,7 +83,7 @@ bool can_evaluate_to_constant(const exprt &expression)
 bool check_index_structure(const exprt &index_expr)
 {
   return (can_cast_expr<index_exprt>(index_expr) ||
-          index_expr.id() == ID_byte_extract_little_endian) &&
+          can_cast_expr<byte_extract_exprt>(index_expr)) &&
          index_expr.operands().size() == 2 &&
          check_symbol_structure(index_expr.op0()) &&
          can_evaluate_to_constant(index_expr.op1());
@@ -152,11 +152,11 @@ static void check_lhs_assumptions(
       "symbol index value.");
   }
   // check byte extract lhs structure
-  else if(lhs.id() == ID_byte_extract_little_endian)
+  else if(const auto byte = expr_try_dynamic_cast<byte_extract_exprt>(lhs))
   {
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      check_index_structure(lhs),
+      check_index_structure(*byte),
       "LHS",
       lhs.pretty(),
       "Expecting a byte extract expression with a symbol array and constant or "
@@ -251,23 +251,23 @@ static void check_rhs_assumptions(
     }
   }
   // check byte extract rhs structure
-  else if(rhs.id() == ID_byte_extract_little_endian)
+  else if(const auto byte = expr_try_dynamic_cast<byte_extract_exprt>(rhs))
   {
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      rhs.operands().size() == 2,
+      byte->operands().size() == 2,
       "RHS",
       rhs.pretty(),
       "Expecting a byte extract with two operands.");
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      can_cast_expr<constant_exprt>(simplify_expr(rhs.op0(), ns)),
+      can_cast_expr<constant_exprt>(simplify_expr(byte->op(), ns)),
       "RHS",
       rhs.pretty(),
       "Expecting a byte extract with constant value.");
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      can_cast_expr<constant_exprt>(simplify_expr(rhs.op1(), ns)),
+      can_cast_expr<constant_exprt>(simplify_expr(byte->offset(), ns)),
       "RHS",
       rhs.pretty(),
       "Expecting a byte extract with constant index.");
