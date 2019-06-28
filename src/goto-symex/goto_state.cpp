@@ -51,8 +51,8 @@ void goto_statet::apply_condition(
   }
   else if(condition.id() == ID_equal)
   {
-    exprt lhs = condition.op0();
-    exprt rhs = condition.op1();
+    exprt lhs = to_equal_expr(condition).lhs();
+    exprt rhs = to_equal_expr(condition).rhs();
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
