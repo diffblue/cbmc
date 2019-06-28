@@ -69,7 +69,7 @@ public:
     const java_bytecode_parse_treet &parse_tree = parse_trees.front();
 
     // Add array types to the symbol table
-    add_array_types(symbol_table);
+    add_java_array_types(symbol_table);
 
     const bool loading_success =
       parse_tree.loading_successful &&
@@ -114,9 +114,6 @@ private:
   typedef std::list<std::reference_wrapper<const classt>> overlay_classest;
   void convert(const classt &c, const overlay_classest &overlay_classes);
   void convert(symbolt &class_symbol, const fieldt &f);
-
-  // see definition below for more info
-  static void add_array_types(symbol_tablet &symbol_table);
 
   /// Check if a method is an overlay method by searching for
   /// `ID_overlay_method` in its list of annotations.
@@ -787,9 +784,7 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-/// Register in the \p symbol_table new symbols for the objects
-/// java::array[X] where X is byte, float, int, char...
-void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
+void add_java_array_types(symbol_tablet &symbol_table)
 {
   const std::string letters="ijsbcfdza";
 
