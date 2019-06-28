@@ -57,6 +57,13 @@ public:
   const exprt &offset() const { return op1(); }
 };
 
+template <>
+inline bool can_cast_expr<byte_extract_exprt>(const exprt &base)
+{
+  return base.id() == ID_byte_extract_little_endian ||
+         base.id() == ID_byte_extract_big_endian;
+}
+
 inline const byte_extract_exprt &to_byte_extract_expr(const exprt &expr)
 {
   PRECONDITION(expr.operands().size() == 2);
@@ -67,6 +74,11 @@ inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
 {
   PRECONDITION(expr.operands().size() == 2);
   return static_cast<byte_extract_exprt &>(expr);
+}
+
+inline void validate_expr(const byte_extract_exprt &value)
+{
+  validate_operands(value, 2, "Byte extract must have two operands");
 }
 
 irep_idt byte_extract_id();

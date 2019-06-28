@@ -11,6 +11,7 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 
 #include <testing-utils/use_catch.h>
 
+#include <util/byte_operators.h>
 #include <util/mathematical_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -139,6 +140,67 @@ SCENARIO("expr_dynamic_cast",
     {
       optionalt<transt> result = expr_try_dynamic_cast<transt>(std::move(expr));
       REQUIRE_FALSE(result.has_value());
+    }
+  }
+
+  GIVEN("A byte extract expression with little endianness")
+  {
+    auto byte = byte_extract_exprt(ID_byte_extract_little_endian);
+    byte.op() = symbol_exprt(typet());
+    byte.offset() = constant_exprt("0", typet());
+    THEN("try_expr_dynamic_cast<byte_extract_expr> returns non-empty")
+    {
+      REQUIRE(expr_try_dynamic_cast<byte_extract_exprt>(byte));
+    }
+  }
+  GIVEN("A byte extract expression with big endianness")
+  {
+    auto byte = byte_extract_exprt(ID_byte_extract_big_endian);
+    byte.op() = symbol_exprt(typet());
+    byte.offset() = constant_exprt("0", typet());
+    THEN("try_expr_dynamic_cast<byte_extract_expr> returns non-empty")
+    {
+      REQUIRE(expr_try_dynamic_cast<byte_extract_exprt>(byte));
+    }
+  }
+  GIVEN("An expression that is not a byte extract")
+  {
+    const exprt expr = exprt();
+    THEN("try_expr_dynamic_cast<byte_extract_expr> returns empty")
+    {
+      REQUIRE_FALSE(expr_try_dynamic_cast<byte_extract_exprt>(expr));
+    }
+  }
+}
+
+SCENARIO("can_cast_expr", "[core][utils][expr_cast][can_cast_expr]")
+{
+  GIVEN("A byte extract expression with little endianness")
+  {
+    auto byte = byte_extract_exprt(ID_byte_extract_little_endian);
+    byte.op() = symbol_exprt(typet());
+    byte.offset() = constant_exprt("0", typet());
+    THEN("can_expr_expr<byte_extract_expr> returns true")
+    {
+      REQUIRE(can_cast_expr<byte_extract_exprt>(byte));
+    }
+  }
+  GIVEN("A byte extract expression with big endianness")
+  {
+    auto byte = byte_extract_exprt(ID_byte_extract_big_endian);
+    byte.op() = symbol_exprt(typet());
+    byte.offset() = constant_exprt("0", typet());
+    THEN("can_expr_expr<byte_extract_expr> returns true")
+    {
+      REQUIRE(can_cast_expr<byte_extract_exprt>(byte));
+    }
+  }
+  GIVEN("An expression that is not a byte extract")
+  {
+    const exprt expr = exprt();
+    THEN("can_expr_expr<byte_extract_expr> returns false")
+    {
+      REQUIRE_FALSE(can_cast_expr<byte_extract_exprt>(expr));
     }
   }
 }
