@@ -17,22 +17,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "std_expr.h"
 
-bool simplify_exprt::simplify_boolean(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 {
   if(!expr.has_operands())
-    return true;
+    return unchanged(expr);
 
-  exprt::operandst &operands=expr.operands();
+  const exprt::operandst &operands=expr.operands();
 
   if(expr.type().id()!=ID_bool)
-    return true;
+    return unchanged(expr);
 
   if(expr.id()==ID_implies)
   {
     if(operands.size()!=2 ||
        operands.front().type().id()!=ID_bool ||
        operands.back().type().id()!=ID_bool)
-      return true;
+    {
+      return unchanged(expr);
+    }
 
     // turn a => b into !a || b
 
@@ -52,7 +54,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         it!=operands.end();)
     {
       if(it->type().id()!=ID_bool)
-        return true;
+        return unchanged(expr);
 
       bool erase;
 
@@ -75,16 +77,14 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
     if(operands.empty())
     {
-      expr = make_boolean_expr(negate);
-      return false;
+      return make_boolean_expr(negate);
     }
     else if(operands.size()==1)
     {
       exprt tmp(operands.front());
       if(negate)
         tmp = boolean_negate(operands.front());
-      expr.swap(tmp);
-      return false;
+      return std::move(tmp);
     }
 
     return no_change;
@@ -99,20 +99,18 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         it!=operands.end();)
     {
       if(it->type().id()!=ID_bool)
-        return true;
+        return unchanged(expr);
 
       bool is_true=it->is_true();
       bool is_false=it->is_false();
 
       if(expr.id()==ID_and && is_false)
       {
-        expr=false_exprt();
-        return false;
+        return false_exprt();
       }
       else if(expr.id()==ID_or && is_true)
       {
-        expr=true_exprt();
-        return false;
+        return true_exprt();
       }
 
       bool erase=
@@ -135,58 +133,49 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
          op.type().id()==ID_bool &&
          expr_set.find(op.op0())!=expr_set.end())
       {
-        expr = make_boolean_expr(expr.id() == ID_or);
-        return false;
+        return make_boolean_expr(expr.id() == ID_or);
       }
 
     if(operands.empty())
     {
-      expr = make_boolean_expr(expr.id() == ID_and);
-      return false;
+      return make_boolean_expr(expr.id() == ID_and);
     }
     else if(operands.size()==1)
     {
-      exprt tmp(operands.front());
-      expr.swap(tmp);
-      return false;
+      return operands.front();
     }
 
     return no_change;
   }
 
-  return true;
+  return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_not(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_not(const exprt &expr)
 {
   if(expr.operands().size()!=1)
-    return true;
+    return unchanged(expr);
 
-  exprt &op=expr.op0();
+  const exprt &op=expr.op0();
 
   if(expr.type().id()!=ID_bool ||
      op.type().id()!=ID_bool)
-    return true;
+  {
+    return unchanged(expr);
+  }
 
   if(op.id()==ID_not) // (not not a) == a
   {
     if(op.operands().size()==1)
-    {
-      exprt tmp;
-      tmp.swap(op.op0());
-      expr.swap(tmp);
-      return false;
-    }
+      return op.op0();
   }
   else if(op.is_false())
   {
-    expr=true_exprt();
-    return false;
+    return true_exprt();
   }
   else if(op.is_true())
   {
-    expr=false_exprt();
-    return false;
+    return false_exprt();
   }
   else if(op.id()==ID_and ||
           op.id()==ID_or)
@@ -219,8 +208,7 @@ bool simplify_exprt::simplify_not(exprt &expr)
     forall_exprt rewritten_op(
       op_as_exists.symbol(), not_exprt(op_as_exists.where()));
     simplify_node(rewritten_op.where());
-    expr = rewritten_op;
-    return false;
+    return std::move(rewritten_op);
   }
   else if(op.id() == ID_forall) // !(forall: a) <-> exists: not a
   {
@@ -228,9 +216,8 @@ bool simplify_exprt::simplify_not(exprt &expr)
     exists_exprt rewritten_op(
       op_as_forall.symbol(), not_exprt(op_as_forall.where()));
     simplify_node(rewritten_op.where());
-    expr = rewritten_op;
-    return false;
+    return std::move(rewritten_op);
   }
 
-  return true;
+  return unchanged(expr);
 }

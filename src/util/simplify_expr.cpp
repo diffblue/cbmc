@@ -102,10 +102,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_abs(const abs_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_sign(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_sign(const exprt &expr)
 {
   if(expr.operands().size()!=1)
-    return true;
+    return unchanged(expr);
 
   if(expr.op0().is_constant())
   {
@@ -114,22 +114,18 @@ bool simplify_exprt::simplify_sign(exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op0()));
-      expr = make_boolean_expr(value.get_sign());
-      return false;
+      return make_boolean_expr(value.get_sign());
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
     {
       const auto value = numeric_cast<mp_integer>(expr.op0());
       if(value.has_value())
-      {
-        expr = make_boolean_expr(*value >= 0);
-        return false;
-      }
+        return make_boolean_expr(*value >= 0);
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>
@@ -990,9 +986,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
 
     if_exprt tmp{if_expr.cond(), tmp_op1_result, tmp_op2_result};
 
-    simplify_if(tmp);
-
-    return tmp;
+    return changed(simplify_if(tmp));
   }
 
   if(pointer.id()==ID_address_of)
@@ -1310,11 +1304,11 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   return result;
 }
 
-bool simplify_exprt::simplify_if(if_exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
 {
-  exprt &cond=expr.cond();
-  exprt &truevalue=expr.true_case();
-  exprt &falsevalue=expr.false_case();
+  const exprt &cond=expr.cond();
+  const exprt &truevalue=expr.true_case();
+  const exprt &falsevalue=expr.false_case();
 
   bool result=true;
 
@@ -1332,26 +1326,17 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
       if(truevalue.is_true() && falsevalue.is_false())
       {
         // a?1:0 <-> a
-        exprt tmp;
-        tmp.swap(cond);
-        expr.swap(tmp);
-        return false;
+        return cond;
       }
       else if(truevalue.is_false() && falsevalue.is_true())
       {
         // a?0:1 <-> !a
-        exprt tmp = boolean_negate(cond);
-        simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return boolean_negate(cond);
       }
       else if(falsevalue.is_false())
       {
         // a?b:0 <-> a AND b
-        and_exprt tmp(cond, truevalue);
-        simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return and_exprt(cond, truevalue);
       }
       else if(falsevalue.is_true())
       {
@@ -1360,16 +1345,14 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
         simplify_node(tmp_not_cond);
         or_exprt tmp(tmp_not_cond, truevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
       else if(truevalue.is_true())
       {
         // a?1:b <-> a||(!a && b) <-> a OR b
         or_exprt tmp(cond, falsevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
       else if(truevalue.is_false())
       {
@@ -1378,19 +1361,13 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
         simplify_node(tmp_not_cond);
         and_exprt tmp(tmp_not_cond, falsevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
     }
   }
 
   if(truevalue==falsevalue)
-  {
-    exprt tmp;
-    tmp.swap(truevalue);
-    expr.swap(tmp);
-    return false;
-  }
+    return truevalue;
 
   if(((truevalue.id()==ID_struct && falsevalue.id()==ID_struct) ||
       (truevalue.id()==ID_array && falsevalue.id()==ID_array)) &&
@@ -1442,19 +1419,17 @@ bool simplify_exprt::get_values(
   return true;
 }
 
-bool simplify_exprt::simplify_lambda(exprt &)
+simplify_exprt::resultt<> simplify_exprt::simplify_lambda(const exprt &expr)
 {
-  bool result=true;
-
-  return result;
+  return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_with(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_with(const exprt &expr)
 {
   bool result=true;
 
   if((expr.operands().size()%2)!=1)
-    return true;
+    return unchanged(expr);
 
   auto &with_expr = to_with_expr(expr);
 
@@ -1516,20 +1491,15 @@ bool simplify_exprt::simplify_with(exprt &expr)
   }
 
   if(expr.operands().size()==1)
-  {
-    exprt tmp;
-    tmp.swap(expr.op0());
-    expr.swap(tmp);
-    result=false;
-  }
+    return expr.op0();
 
   return result;
 }
 
-bool simplify_exprt::simplify_update(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_update(const exprt &expr)
 {
   if(expr.operands().size()!=3)
-    return true;
+    return unchanged(expr);
 
   // this is to push updates into (possibly nested) constants
 
@@ -1548,10 +1518,10 @@ bool simplify_exprt::simplify_update(exprt &expr)
       const auto i = numeric_cast<mp_integer>(e.op0());
 
       if(!i.has_value())
-        return true;
+        return unchanged(expr);
 
       if(*i < 0 || *i >= value_ptr->operands().size())
-        return true;
+        return unchanged(expr);
 
       value_ptr = &value_ptr->operands()[numeric_cast_v<std::size_t>(*i)];
     }
@@ -1563,20 +1533,18 @@ bool simplify_exprt::simplify_update(exprt &expr)
       const struct_typet &value_ptr_struct_type =
         to_struct_type(value_ptr_type);
       if(!value_ptr_struct_type.has_component(component_name))
-        return true;
+        return unchanged(expr);
       auto &designator_as_struct_expr = to_struct_expr(*value_ptr);
       value_ptr = &designator_as_struct_expr.component(component_name, ns);
       CHECK_RETURN(value_ptr->is_not_nil());
     }
     else
-      return true; // give up, unknown designator
+      return unchanged(expr); // give up, unknown designator
   }
 
   // found, done
   *value_ptr=to_update_expr(expr).new_value();
-  expr.swap(updated_value);
-
-  return false;
+  return updated_value;
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
@@ -1988,8 +1956,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
     if_expr.false_case() =
       simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
-    simplify_if(if_expr);
-    return std::move(if_expr);
+    return changed(simplify_if(if_expr));
   }
 
   const auto el_size = pointer_offset_bits(expr.type(), ns);
@@ -2437,30 +2404,24 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_complex(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_complex(const exprt &expr)
 {
   if(expr.id() == ID_complex_real)
   {
-    complex_real_exprt &complex_real_expr = to_complex_real_expr(expr);
+    const auto &complex_real_expr = to_complex_real_expr(expr);
 
     if(complex_real_expr.op().id() == ID_complex)
-    {
-      expr = to_complex_expr(complex_real_expr.op()).real();
-      return false;
-    }
+      return to_complex_expr(complex_real_expr.op()).real();
   }
   else if(expr.id() == ID_complex_imag)
   {
-    complex_imag_exprt &complex_imag_expr = to_complex_imag_expr(expr);
+    const auto &complex_imag_expr = to_complex_imag_expr(expr);
 
     if(complex_imag_expr.op().id() == ID_complex)
-    {
-      expr = to_complex_expr(complex_imag_expr.op()).imag();
-      return false;
-    }
+      return to_complex_expr(complex_imag_expr.op()).imag();
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_node_preorder(exprt &expr)
@@ -2515,19 +2476,68 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_equal || expr.id()==ID_notequal ||
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
-    no_change = simplify_inequality(expr) && no_change;
+  {
+    auto r = simplify_inequality(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_if)
-    no_change = simplify_if(to_if_expr(expr)) && no_change;
+  {
+    auto r = simplify_if(to_if_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_lambda)
-    no_change = simplify_lambda(expr) && no_change;
+  {
+    auto r = simplify_lambda(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_with)
-    no_change = simplify_with(expr) && no_change;
+  {
+    auto r = simplify_with(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_update)
-    no_change = simplify_update(expr) && no_change;
+  {
+    auto r = simplify_update(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_index)
-    no_change = simplify_index(expr) && no_change;
+  {
+    auto r = simplify_index(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_member)
-    no_change = simplify_member(expr) && no_change;
+  {
+    auto r = simplify_member(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
   {
@@ -2612,7 +2622,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id()==ID_bitnot)
-    no_change = simplify_bitnot(expr) && no_change;
+  {
+    auto r = simplify_bitnot(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
@@ -2673,19 +2690,56 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
           expr.id()==ID_floatbv_div)
-    no_change = simplify_floatbv_op(expr) && no_change;
+  {
+    auto r = simplify_floatbv_op(to_ieee_float_op_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_floatbv_typecast)
-    no_change = simplify_floatbv_typecast(expr) && no_change;
+  {
+    auto r = simplify_floatbv_typecast(to_floatbv_typecast_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_unary_minus)
-    no_change = simplify_unary_minus(expr) && no_change;
+  {
+    auto r = simplify_unary_minus(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_unary_plus)
-    no_change = simplify_unary_plus(expr) && no_change;
+  {
+    auto r = simplify_unary_plus(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_not)
-    no_change = simplify_not(expr) && no_change;
+  {
+    auto r = simplify_not(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||
           expr.id()==ID_and)
-    no_change = simplify_boolean(expr) && no_change;
+  {
+    auto r = simplify_boolean(expr);
+  }
   else if(expr.id()==ID_dereference)
   {
     auto r = simplify_dereference(to_dereference_expr(expr));
@@ -2714,22 +2768,78 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id()==ID_extractbit)
-    no_change = simplify_extractbit(expr) && no_change;
+  {
+    auto r = simplify_extractbit(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_concatenation)
-    no_change = simplify_concatenation(expr) && no_change;
+  {
+    auto r = simplify_concatenation(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_extractbits)
-    no_change = simplify_extractbits(to_extractbits_expr(expr)) && no_change;
+  {
+    auto r = simplify_extractbits(to_extractbits_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
-    no_change = simplify_ieee_float_relation(expr) && no_change;
+  {
+    auto r = simplify_ieee_float_relation(to_binary_relation_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id() == ID_bswap)
-    no_change = simplify_bswap(to_bswap_expr(expr)) && no_change;
+  {
+    auto r = simplify_bswap(to_bswap_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_isinf)
-    no_change = simplify_isinf(expr) && no_change;
+  {
+    auto r = simplify_isinf(to_unary_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_isnan)
-    no_change = simplify_isnan(expr) && no_change;
+  {
+    auto r = simplify_isnan(to_unary_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_isnormal)
-    no_change = simplify_isnormal(expr) && no_change;
+  {
+    auto r = simplify_isnormal(to_unary_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_abs)
   {
     auto r = simplify_abs(to_abs_expr(expr));
@@ -2740,7 +2850,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id()==ID_sign)
-    no_change = simplify_sign(expr) && no_change;
+  {
+    auto r = simplify_sign(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id() == ID_popcount)
   {
     auto r = simplify_popcount(to_popcount_expr(expr));
@@ -2760,7 +2877,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
-    no_change = simplify_complex(expr) && no_change;
+  {
+    auto r = simplify_complex(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
 
 #ifdef DEBUGX
   if(

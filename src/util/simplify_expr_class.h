@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class abs_exprt;
 class address_of_exprt;
 class array_exprt;
+class binary_relation_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -36,7 +37,9 @@ class dereference_exprt;
 class div_exprt;
 class exprt;
 class extractbits_exprt;
+class floatbv_typecast_exprt;
 class function_application_exprt;
+class ieee_float_op_exprt;
 class if_exprt;
 class index_exprt;
 class member_exprt;
@@ -49,6 +52,7 @@ class popcount_exprt;
 class refined_string_exprt;
 class tvt;
 class typecast_exprt;
+class unary_exprt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
@@ -125,54 +129,55 @@ public:
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
   NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
-  bool simplify_extractbit(exprt &expr);
-  bool simplify_extractbits(extractbits_exprt &expr);
-  bool simplify_concatenation(exprt &expr);
+  NODISCARD resultt<> simplify_extractbit(const exprt &);
+  NODISCARD resultt<> simplify_extractbits(const extractbits_exprt &);
+  NODISCARD resultt<> simplify_concatenation(const exprt &);
   NODISCARD resultt<> simplify_mult(const mult_exprt &);
   NODISCARD resultt<> simplify_div(const div_exprt &);
   NODISCARD resultt<> simplify_mod(const mod_exprt &);
   NODISCARD resultt<> simplify_plus(const plus_exprt &);
   NODISCARD resultt<> simplify_minus(const minus_exprt &);
-  bool simplify_floatbv_op(exprt &expr);
-  bool simplify_floatbv_typecast(exprt &expr);
+  NODISCARD resultt<> simplify_floatbv_op(const ieee_float_op_exprt &);
+  NODISCARD resultt<> simplify_floatbv_typecast(const floatbv_typecast_exprt &);
   NODISCARD resultt<> simplify_shifts(const exprt &);
   NODISCARD resultt<> simplify_power(const exprt &);
   NODISCARD resultt<> simplify_bitwise(const exprt &);
   bool simplify_if_preorder(if_exprt &expr);
-  bool simplify_if(if_exprt &expr);
-  bool simplify_bitnot(exprt &expr);
-  bool simplify_not(exprt &expr);
-  bool simplify_boolean(exprt &expr);
-  bool simplify_inequality(exprt &expr);
-  bool simplify_ieee_float_relation(exprt &expr);
-  bool simplify_lambda(exprt &expr);
-  bool simplify_with(exprt &expr);
-  bool simplify_update(exprt &expr);
-  bool simplify_index(exprt &expr);
-  bool simplify_member(exprt &expr);
+  NODISCARD resultt<> simplify_if(const if_exprt &);
+  NODISCARD resultt<> simplify_bitnot(const exprt &);
+  NODISCARD resultt<> simplify_not(const exprt &);
+  NODISCARD resultt<> simplify_boolean(const exprt &);
+  NODISCARD resultt<> simplify_inequality(const exprt &);
+  NODISCARD resultt<>
+  simplify_ieee_float_relation(const binary_relation_exprt &);
+  NODISCARD resultt<> simplify_lambda(const exprt &);
+  NODISCARD resultt<> simplify_with(const exprt &);
+  NODISCARD resultt<> simplify_update(const exprt &);
+  NODISCARD resultt<> simplify_index(const exprt &);
+  NODISCARD resultt<> simplify_member(const exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
   NODISCARD resultt<> simplify_pointer_object(const exprt &);
   NODISCARD resultt<> simplify_object_size(const exprt &);
-  bool simplify_dynamic_size(exprt &expr);
-  NODISCARD resultt<> simplify_is_dynamic_object(const exprt &expr);
-  NODISCARD resultt<> simplify_is_invalid_pointer(const exprt &expr);
+  NODISCARD resultt<> simplify_dynamic_size(const exprt &);
+  NODISCARD resultt<> simplify_is_dynamic_object(const exprt &);
+  NODISCARD resultt<> simplify_is_invalid_pointer(const exprt &);
   NODISCARD resultt<> simplify_same_object(const exprt &);
   NODISCARD resultt<> simplify_good_pointer(const exprt &);
   NODISCARD resultt<> simplify_object(const exprt &);
-  bool simplify_unary_minus(exprt &expr);
-  bool simplify_unary_plus(exprt &expr);
+  NODISCARD resultt<> simplify_unary_minus(const exprt &);
+  NODISCARD resultt<> simplify_unary_plus(const exprt &);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
   NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
   NODISCARD resultt<> simplify_pointer_offset(const exprt &);
-  bool simplify_bswap(bswap_exprt &expr);
-  bool simplify_isinf(exprt &expr);
-  bool simplify_isnan(exprt &expr);
-  bool simplify_isnormal(exprt &expr);
+  NODISCARD resultt<> simplify_bswap(const bswap_exprt &);
+  NODISCARD resultt<> simplify_isinf(const unary_exprt &);
+  NODISCARD resultt<> simplify_isnan(const unary_exprt &);
+  NODISCARD resultt<> simplify_isnormal(const unary_exprt &);
   NODISCARD resultt<> simplify_abs(const abs_exprt &);
-  bool simplify_sign(exprt &expr);
+  NODISCARD resultt<> simplify_sign(const exprt &);
   NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
-  bool simplify_complex(exprt &expr);
+  NODISCARD resultt<> simplify_complex(const exprt &);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.

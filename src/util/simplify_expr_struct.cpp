@@ -15,15 +15,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "std_expr.h"
 
-bool simplify_exprt::simplify_member(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
 {
   if(expr.operands().size()!=1)
-    return true;
+    return unchanged(expr);
 
   const irep_idt &component_name=
     to_member_expr(expr).get_component_name();
 
-  exprt &op=expr.op0();
+  const exprt &op=expr.op0();
   const typet &op_type=ns.follow(op.type());
 
   if(op.id()==ID_with)
@@ -175,12 +175,11 @@ bool simplify_exprt::simplify_member(exprt &expr)
       plus_exprt final_offset(struct_offset, member_offset);
       simplify_node(final_offset);
 
-      byte_extract_exprt result(op.id(), op.op0(), final_offset, expr.type());
-      expr.swap(result);
+      auto result = byte_extract_exprt(op.id(), op.op0(), final_offset, expr.type());
 
-      simplify_rec(expr);
+      simplify_rec(result);
 
-      return false;
+      return std::move(result);
     }
     else if(op_type.id() == ID_union)
     {
@@ -193,12 +192,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         const typet &subtype = union_type.component_type(component_name);
 
         if(subtype == byte_extract_expr.op().type())
-        {
-          exprt tmp = byte_extract_expr.op();
-          expr.swap(tmp);
-
-          return false;
-        }
+          return byte_extract_expr.op();
       }
     }
   }
@@ -206,11 +200,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   {
     // trivial?
     if(to_union_expr(op).op().type() == expr.type())
-    {
-      exprt tmp=to_union_expr(op).op();
-      expr.swap(tmp);
-      return false;
-    }
+      return to_union_expr(op).op();
 
     // need to convert!
     auto target_size = pointer_offset_size(expr.type(), ns);
@@ -229,10 +219,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         auto tmp = bits2expr(bits_cut, expr.type(), true);
 
         if(tmp.has_value())
-        {
-          expr = *tmp;
-          return false;
-        }
+          return *tmp;
       }
     }
   }
@@ -267,9 +254,9 @@ bool simplify_exprt::simplify_member(exprt &expr)
           equivalent_member.value().id() != ID_byte_extract_little_endian &&
           equivalent_member.value().id() != ID_byte_extract_big_endian)
         {
-          expr = equivalent_member.value();
-          simplify_rec(expr);
-          return false;
+          auto new_expr = equivalent_member.value();
+          simplify_rec(new_expr);
+          return std::move(new_expr);
         }
       }
     }
@@ -284,10 +271,10 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
     to_member_expr(expr).compound()=if_expr.true_case();
 
-    expr=if_exprt(cond, expr, member_false, expr.type());
-    simplify_rec(expr);
+    auto new_expr=if_exprt(cond, expr, member_false, expr.type());
+    simplify_rec(new_expr);
 
-    return false;
+    return std::move(new_expr);
   }
   else if(op.id() == ID_let)
   {
@@ -305,5 +292,5 @@ bool simplify_exprt::simplify_member(exprt &expr)
     return false;
   }
 
-  return true;
+  return unchanged(expr);
 }

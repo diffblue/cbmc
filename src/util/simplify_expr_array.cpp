@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string_constant.h"
 
-bool simplify_exprt::simplify_index(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
 {
   bool no_change = true;
 
@@ -104,9 +104,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       if_exprt if_expr(equality_expr, with_expr.new_value(), new_index_expr);
       simplify_if(if_expr);
 
-      expr.swap(if_expr);
-
-      return false;
+      return if_expr;
     }
   }
   else if(
@@ -125,9 +123,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     else
     {
       // ok
-      exprt tmp = array.operands()[numeric_cast_v<std::size_t>(*i)];
-      expr.swap(tmp);
-      return false;
+      return array.operands()[numeric_cast_v<std::size_t>(*i)];
     }
   }
   else if(array.id()==ID_string_constant)
@@ -148,19 +144,13 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // terminating zero?
       const char v =
         (*i == value.size()) ? 0 : value[numeric_cast_v<std::size_t>(*i)];
-      exprt tmp=from_integer(v, expr.type());
-      expr.swap(tmp);
-      return false;
+      return from_integer(v, expr.type());
     }
   }
   else if(array.id()==ID_array_of)
   {
     if(array.operands().size()==1)
-    {
-      exprt tmp=array.op0();
-      expr.swap(tmp);
-      return false;
-    }
+      return array.op0();
   }
   else if(array.id() == ID_array_list)
   {
@@ -170,11 +160,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       exprt tmp_index = typecast_exprt(array.operands()[i * 2], index.type());
       simplify(tmp_index);
       if(tmp_index==index)
-      {
-        exprt tmp=array.operands()[i*2+1];
-        expr.swap(tmp);
-        return false;
-      }
+        return array.operands()[i*2+1];
     }
   }
   else if(array.id()==ID_byte_extract_little_endian ||
@@ -193,7 +179,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
       auto sub_size = pointer_offset_size(*subtype, ns);
       if(!sub_size.has_value())
-        return true;
+        return unchanged(expr);
 
       // add offset to index
       mult_exprt offset(from_integer(*sub_size, array.op1().type()), index);
