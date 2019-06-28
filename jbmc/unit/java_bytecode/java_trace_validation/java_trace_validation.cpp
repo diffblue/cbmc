@@ -29,6 +29,8 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
   const index_exprt index_plain = index_exprt(exprt(), exprt());
   const byte_extract_exprt byte_little_endian =
     byte_extract_exprt(ID_byte_extract_little_endian);
+  const byte_extract_exprt byte_big_endian =
+    byte_extract_exprt(ID_byte_extract_big_endian);
   const address_of_exprt valid_address =
     address_of_exprt(constant_exprt("0", java_int_type()));
   const address_of_exprt invalid_address = address_of_exprt(exprt());
@@ -118,6 +120,8 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     REQUIRE(valid_lhs_expr_high_level(index_plain));
     INFO("byte_extract_exprts little endian are valid lhs expressions")
     REQUIRE(valid_lhs_expr_high_level(byte_little_endian));
+    INFO("byte_extract_exprts big endian are valid lhs expressions")
+    REQUIRE(valid_lhs_expr_high_level(byte_big_endian));
     INFO("address_of_exprts are not valid lhs expressions, for example")
     REQUIRE_FALSE(valid_lhs_expr_high_level(valid_address));
   }
@@ -138,6 +142,8 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     REQUIRE(valid_rhs_expr_high_level(valid_constant));
     INFO("byte_extract_exprts are valid rhs expressions")
     REQUIRE(valid_rhs_expr_high_level(byte_little_endian));
+    INFO("byte_extract_exprts are valid rhs expressions")
+    REQUIRE(valid_rhs_expr_high_level(byte_big_endian));
     INFO("member_exprts are not valid rhs expressions, for example")
     REQUIRE_FALSE(valid_rhs_expr_high_level(valid_member));
     INFO("index_exprts are not are valid rhs expressions, for example")
