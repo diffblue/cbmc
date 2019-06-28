@@ -31,8 +31,7 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     byte_extract_exprt(ID_byte_extract_little_endian);
   const byte_extract_exprt byte_big_endian =
     byte_extract_exprt(ID_byte_extract_big_endian);
-  const address_of_exprt valid_address =
-    address_of_exprt(constant_exprt("0", java_int_type()));
+  const address_of_exprt valid_address = address_of_exprt(valid_symbol_expr);
   const address_of_exprt invalid_address = address_of_exprt(exprt());
   const struct_exprt struct_plain =
     struct_exprt(std::vector<exprt>(), java_int_type());
@@ -108,6 +107,12 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     REQUIRE_FALSE(check_struct_structure(struct_plain));
     REQUIRE(check_struct_structure(valid_struct));
     REQUIRE(check_struct_structure(valid_nested_struct));
+  }
+
+  SECTION("check_address_structure")
+  {
+    REQUIRE_FALSE(check_address_structure(invalid_address));
+    REQUIRE(check_address_structure(valid_address));
   }
 
   SECTION("valid_lhs_expr_high_level")
