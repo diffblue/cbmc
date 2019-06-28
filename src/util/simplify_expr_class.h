@@ -28,13 +28,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class abs_exprt;
 class array_exprt;
+class binary_relation_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
 class dereference_exprt;
 class exprt;
 class extractbits_exprt;
+class floatbv_typecast_exprt;
 class function_application_exprt;
+class ieee_float_op_exprt;
 class if_exprt;
 class index_exprt;
 class member_exprt;
@@ -43,6 +46,7 @@ class popcount_exprt;
 class refined_string_exprt;
 class tvt;
 class typecast_exprt;
+class unary_exprt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
@@ -127,8 +131,8 @@ public:
   bool simplify_mod(exprt &expr);
   bool simplify_plus(exprt &expr);
   bool simplify_minus(exprt &expr);
-  bool simplify_floatbv_op(exprt &expr);
-  bool simplify_floatbv_typecast(exprt &expr);
+  NODISCARD resultt<> simplify_floatbv_op(const ieee_float_op_exprt &);
+  NODISCARD resultt<> simplify_floatbv_typecast(const floatbv_typecast_exprt &);
   bool simplify_shifts(exprt &expr);
   bool simplify_power(exprt &expr);
   bool simplify_bitwise(exprt &expr);
@@ -138,7 +142,8 @@ public:
   bool simplify_not(exprt &expr);
   bool simplify_boolean(exprt &expr);
   bool simplify_inequality(exprt &expr);
-  bool simplify_ieee_float_relation(exprt &expr);
+  NODISCARD resultt<>
+  simplify_ieee_float_relation(const binary_relation_exprt &);
   bool simplify_lambda(exprt &expr);
   bool simplify_with(exprt &expr);
   bool simplify_update(exprt &expr);
@@ -160,9 +165,9 @@ public:
   bool simplify_address_of(exprt &expr);
   bool simplify_pointer_offset(exprt &expr);
   bool simplify_bswap(bswap_exprt &expr);
-  bool simplify_isinf(exprt &expr);
-  bool simplify_isnan(exprt &expr);
-  bool simplify_isnormal(exprt &expr);
+  NODISCARD resultt<> simplify_isinf(const unary_exprt &);
+  NODISCARD resultt<> simplify_isnan(const unary_exprt &);
+  NODISCARD resultt<> simplify_isnormal(const unary_exprt &);
   NODISCARD resultt<> simplify_abs(const abs_exprt &);
   bool simplify_sign(exprt &expr);
   NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
