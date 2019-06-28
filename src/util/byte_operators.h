@@ -76,6 +76,11 @@ inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
   return static_cast<byte_extract_exprt &>(expr);
 }
 
+inline void validate_expr(const byte_extract_exprt &value)
+{
+  validate_operands(value, 2, "Byte extract must have two operands");
+}
+
 irep_idt byte_extract_id();
 irep_idt byte_update_id();
 
