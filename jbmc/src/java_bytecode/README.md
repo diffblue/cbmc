@@ -877,6 +877,11 @@ Setting the member of symex_dynamic::dynamic_object1, referenceField. Note that 
 Finally, the actual assignment to globalReferenceTypeReferenceField is done by reference to the object we built symex_dynamic::dynamic_object1
 - \ref symbol_exprt `java::ObjectReference.globalReferenceTypeReferenceField` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object1`
 
+\subsection java-trace-validation Java trace validation
+
+Using the flag "--validate-trace" will call the function \ref check_trace_assumptions,
+which will throw an error when these assumptions are not met.
+
 \subsection java-trace-array-assignments Array assignments
 
 To be documented.

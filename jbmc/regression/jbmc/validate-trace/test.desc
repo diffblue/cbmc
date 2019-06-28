@@ -1,0 +1,10 @@
+CORE
+TestClass.class
+--validate-trace --function TestClass.test
+^EXIT=10$
+^SIGNAL=0$
+Trace validation successful
+--
+--
+Tests that when --validate-trace is used and successful, the message
+"Trace validation successful" is printed
