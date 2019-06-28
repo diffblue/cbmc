@@ -2000,11 +2000,10 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   {
     auto tmp = expr;
 
-    tmp.offset() =
-      plus_exprt(to_byte_extract_expr(expr.op()).offset(), expr.offset());
-    simplify_plus(tmp.offset());
-
+    tmp.offset() = simplify_plus(
+      plus_exprt(to_byte_extract_expr(expr.op()).offset(), expr.offset()));
     tmp.op() = to_byte_extract_expr(expr.op()).op();
+
     return changed(simplify_byte_extract(tmp)); // recursive call
   }
 
@@ -2595,25 +2594,81 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id()==ID_div)
-    no_change = simplify_div(expr) && no_change;
+  {
+    auto r = simplify_div(to_div_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_mod)
-    no_change = simplify_mod(expr) && no_change;
+  {
+    auto r = simplify_mod(to_mod_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_bitnot)
     no_change = simplify_bitnot(expr) && no_change;
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
-    no_change = simplify_bitwise(expr) && no_change;
+  {
+    auto r = simplify_bitwise(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
-    no_change = simplify_shifts(expr) && no_change;
+  {
+    auto r = simplify_shifts(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_power)
-    no_change = simplify_power(expr) && no_change;
+  {
+    auto r = simplify_power(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_plus)
-    no_change = simplify_plus(expr) && no_change;
+  {
+    auto r = simplify_plus(to_plus_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_minus)
-    no_change = simplify_minus(expr) && no_change;
+  {
+    auto r = simplify_minus(to_minus_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_mult)
-    no_change = simplify_mult(expr) && no_change;
+  {
+    auto r = simplify_mult(to_mult_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_floatbv_plus ||
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
