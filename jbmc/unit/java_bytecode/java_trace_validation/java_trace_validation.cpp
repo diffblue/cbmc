@@ -23,6 +23,7 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     member_exprt(valid_symbol_expr, "member", java_int_type());
   const member_exprt invalid_member =
     member_exprt(plain_expr, "member", java_int_type());
+  const constant_exprt invalid_constant = constant_exprt("", java_int_type());
   const constant_exprt valid_constant = constant_exprt("0", java_int_type());
   const index_exprt valid_index =
     index_exprt(valid_symbol_expr, valid_constant);
@@ -113,6 +114,12 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
   {
     REQUIRE_FALSE(check_address_structure(invalid_address));
     REQUIRE(check_address_structure(valid_address));
+  }
+
+  SECTION("check_constant_structure")
+  {
+    REQUIRE_FALSE(check_constant_structure(invalid_constant));
+    REQUIRE(check_constant_structure(valid_constant));
   }
 
   SECTION("valid_lhs_expr_high_level")

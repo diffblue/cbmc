@@ -16,6 +16,7 @@ class goto_tracet;
 class namespacet;
 class exprt;
 class address_of_exprt;
+class constant_exprt;
 class struct_exprt;
 class symbol_exprt;
 class member_exprt;
@@ -75,5 +76,8 @@ bool check_struct_structure(const struct_exprt &expr);
 
 /// \return true iff the address_of_exprt has a valid symbol operand
 bool check_address_structure(const address_of_exprt &address);
+
+/// \return true iff the constant_exprt has valid operands and value
+bool check_constant_structure(const constant_exprt &constant_expr);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TRACE_VALIDATION_H
