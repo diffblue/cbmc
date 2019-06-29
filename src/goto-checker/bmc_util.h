@@ -186,6 +186,8 @@ void run_property_decider(
   "(show-symex-strategies)" \
   "(depth):" \
   "(unwind):" \
+  "(unwind-loops):" \
+  "(unwind-recursion):" \
   "(unwindset):" \
   "(graphml-witness):" \
   "(unwindset):"

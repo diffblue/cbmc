@@ -290,7 +290,7 @@ void goto_unwindt::unwind(
     PRECONDITION(!function_id.empty());
     const irep_idt loop_id = goto_programt::loop_id(function_id, *i_it);
 
-    auto limit=unwindset.get_limit(loop_id, 0);
+    auto limit = unwindset.get_limit(loop_id, 0, true);
 
     if(!limit.has_value())
     {

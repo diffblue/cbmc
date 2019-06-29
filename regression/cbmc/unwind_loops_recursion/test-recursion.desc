@@ -1,0 +1,7 @@
+CORE
+main.c
+--unwind-recursion 3 --unwind 5
+Not unwinding loop main\.0 iteration 5 file main\.c line 9 function main thread 0
+Not unwinding recursion recurse_down_from iteration 4
+^EXIT=0$
+^SIGNAL=0$
