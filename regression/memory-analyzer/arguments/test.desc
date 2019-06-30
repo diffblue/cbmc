@@ -1,0 +1,6 @@
+CORE
+main.gb abc xyz
+--breakpoint checkpoint --symbols x
+x = 1;
+^EXIT=0$
+^SIGNAL=0$

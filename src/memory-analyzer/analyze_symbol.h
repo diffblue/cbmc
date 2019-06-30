@@ -34,7 +34,9 @@ class source_locationt;
 class gdb_value_extractort
 {
 public:
-  gdb_value_extractort(const symbol_tablet &symbol_table, const char *binary);
+  gdb_value_extractort(
+    const symbol_tablet &symbol_table,
+    const std::vector<std::string> &args);
 
   /// For each input symbol in \p symbols: map its value address to its
   ///   \ref symbol_exprt (via the `values` map) and then call
