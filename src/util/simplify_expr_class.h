@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 class abs_exprt;
+class address_of_exprt;
 class array_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
@@ -146,19 +147,19 @@ public:
   bool simplify_member(exprt &expr);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
-  bool simplify_pointer_object(exprt &expr);
-  bool simplify_object_size(exprt &expr);
+  NODISCARD resultt<> simplify_pointer_object(const exprt &);
+  NODISCARD resultt<> simplify_object_size(const exprt &);
   bool simplify_dynamic_size(exprt &expr);
-  bool simplify_is_dynamic_object(exprt &expr);
-  bool simplify_is_invalid_pointer(exprt &expr);
-  bool simplify_same_object(exprt &expr);
-  bool simplify_good_pointer(exprt &expr);
-  bool simplify_object(exprt &expr);
+  NODISCARD resultt<> simplify_is_dynamic_object(const exprt &expr);
+  NODISCARD resultt<> simplify_is_invalid_pointer(const exprt &expr);
+  NODISCARD resultt<> simplify_same_object(const exprt &);
+  NODISCARD resultt<> simplify_good_pointer(const exprt &);
+  NODISCARD resultt<> simplify_object(const exprt &);
   bool simplify_unary_minus(exprt &expr);
   bool simplify_unary_plus(exprt &expr);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
-  bool simplify_address_of(exprt &expr);
-  bool simplify_pointer_offset(exprt &expr);
+  NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
+  NODISCARD resultt<> simplify_pointer_offset(const exprt &);
   bool simplify_bswap(bswap_exprt &expr);
   bool simplify_isinf(exprt &expr);
   bool simplify_isnan(exprt &expr);
@@ -184,7 +185,7 @@ public:
   bool eliminate_common_addends(exprt &op0, exprt &op1);
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
-  bool simplify_address_of_arg(exprt &expr);
+  NODISCARD resultt<> simplify_address_of_arg(const exprt &);
   bool simplify_inequality_both_constant(exprt &);
   bool simplify_inequality_no_constant(exprt &);
   bool simplify_inequality_rhs_is_constant(exprt &);
