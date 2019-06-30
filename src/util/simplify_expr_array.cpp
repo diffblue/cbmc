@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool simplify_exprt::simplify_index(exprt &expr)
 {
-  bool result=true;
+  bool no_change = true;
 
   // extra arithmetic optimizations
   const exprt &index=to_index_expr(expr).index();
@@ -32,7 +32,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     {
       exprt tmp=index.op0().op0();
       expr.op1()=tmp;
-      result=false;
+      no_change = false;
     }
     else if(index.op0().id()==ID_mult &&
             index.op0().operands().size()==2 &&
@@ -40,7 +40,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     {
       exprt tmp=index.op0().op1();
       expr.op1()=tmp;
-      result=false;
+      no_change = false;
     }
   }
 
@@ -225,5 +225,5 @@ bool simplify_exprt::simplify_index(exprt &expr)
     return false;
   }
 
-  return result;
+  return no_change;
 }

@@ -58,11 +58,11 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
   {
     if(expr.operands().size()==2)
     {
-      bool result=true;
+      bool no_change = true;
       if(!simplify_address_of_arg(expr.op0()))
-        result=false;
+        no_change = false;
       if(!simplify_rec(expr.op1()))
-        result=false;
+        no_change = false;
 
       // rewrite (*(type *)int) [index] by
       // pushing the index inside
@@ -88,21 +88,21 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
               pointer_type);
 
             expr = dereference_exprt{typecast_expr};
-            result = true;
+            no_change = true;
           }
         }
       }
 
-      return result;
+      return no_change;
     }
   }
   else if(expr.id()==ID_member)
   {
     if(expr.operands().size()==1)
     {
-      bool result=true;
+      bool no_change = true;
       if(!simplify_address_of_arg(expr.op0()))
-        result=false;
+        no_change = false;
 
       const typet &op_type=ns.follow(expr.op0().type());
 
@@ -125,12 +125,12 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
             typecast_exprt typecast_expr(
               from_integer(address + *offset, index_type()), pointer_type);
             expr = dereference_exprt{typecast_expr};
-            result=true;
+            no_change = true;
           }
         }
       }
 
-      return result;
+      return no_change;
     }
   }
   else if(expr.id()==ID_dereference)
@@ -142,33 +142,33 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
   {
     if(expr.operands().size()==3)
     {
-      bool result=true;
+      bool no_change = true;
       auto &if_expr = to_if_expr(expr);
 
       if(!simplify_rec(if_expr.cond()))
-        result=false;
+        no_change = false;
       if(!simplify_address_of_arg(if_expr.true_case()))
-        result=false;
+        no_change = false;
       if(!simplify_address_of_arg(if_expr.false_case()))
-        result=false;
+        no_change = false;
 
       // condition is a constant?
       if(if_expr.cond().is_true())
       {
-        result=false;
+        no_change = false;
         exprt tmp;
         tmp.swap(if_expr.true_case());
         expr.swap(tmp);
       }
       else if(if_expr.cond().is_false())
       {
-        result=false;
+        no_change = false;
         exprt tmp;
         tmp.swap(if_expr.false_case());
         expr.swap(tmp);
       }
 
-      return result;
+      return no_change;
     }
   }
 
@@ -185,7 +185,7 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
 
   exprt &object=expr.op0();
 
-  bool result=simplify_address_of_arg(object);
+  bool no_change = simplify_address_of_arg(object);
 
   if(object.id()==ID_index)
   {
@@ -210,7 +210,7 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
     return false;
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_pointer_offset(exprt &expr)
@@ -521,7 +521,7 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
 
   exprt &op=expr.op0();
 
-  bool result=simplify_object(op);
+  bool no_change = simplify_object(op);
 
   if(op.id()==ID_if)
   {
@@ -539,12 +539,12 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
     return false;
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
 {
-  // This should hold as a result of the expr ID being is_dynamic_object.
+  // This should hold as a no_change of the expr ID being is_dynamic_object.
   PRECONDITION(expr.operands().size() == 1);
 
   exprt &op=expr.op0();
@@ -560,10 +560,10 @@ bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
     return false;
   }
 
-  bool result=true;
+  bool no_change = true;
 
   if(!simplify_object(op))
-    result=false;
+    no_change = false;
 
   // NULL is not dynamic
   if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
@@ -596,7 +596,7 @@ bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
     }
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_is_invalid_pointer(exprt &expr)
@@ -606,10 +606,10 @@ bool simplify_exprt::simplify_is_invalid_pointer(exprt &expr)
 
   exprt &op=expr.op0();
 
-  bool result=true;
+  bool no_change = true;
 
   if(!simplify_object(op))
-    result=false;
+    no_change = false;
 
   // NULL is not invalid
   if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
@@ -625,7 +625,7 @@ bool simplify_exprt::simplify_is_invalid_pointer(exprt &expr)
     return false;
   }
 
-  return result;
+  return no_change;
 }
 
 tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
@@ -683,10 +683,10 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
 
   exprt &op=expr.op0();
 
-  bool result=true;
+  bool no_change = true;
 
   if(!simplify_object(op))
-    result=false;
+    no_change = false;
 
   if(op.id()==ID_address_of && op.operands().size()==1)
   {
@@ -719,7 +719,7 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
     }
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_good_pointer(exprt &expr)

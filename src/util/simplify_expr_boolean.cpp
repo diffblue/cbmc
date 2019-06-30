@@ -44,7 +44,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
   }
   else if(expr.id()==ID_xor)
   {
-    bool result=true;
+    bool no_change = true;
 
     bool negate=false;
 
@@ -67,7 +67,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       if(erase)
       {
         it=operands.erase(it);
-        result=false;
+        no_change = false;
       }
       else
         it++;
@@ -87,13 +87,13 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       return false;
     }
 
-    return result;
+    return no_change;
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
   {
     std::unordered_set<exprt, irep_hash> expr_set;
 
-    bool result=true;
+    bool no_change = true;
 
     for(exprt::operandst::const_iterator it=operands.begin();
         it!=operands.end();)
@@ -122,7 +122,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       if(erase)
       {
         it=operands.erase(it);
-        result=false;
+        no_change = false;
       }
       else
         it++;
@@ -151,7 +151,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       return false;
     }
 
-    return result;
+    return no_change;
   }
 
   return true;

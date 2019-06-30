@@ -166,7 +166,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
   exprt::operandst &operands=expr.operands();
 
   // result of the simplification
-  bool result = true;
+  bool no_change = true;
 
   // position of the constant
   exprt::operandst::iterator constant;
@@ -226,7 +226,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     if(do_erase)
     {
       it=operands.erase(it);
-      result = false;
+      no_change = false;
     }
     else
       it++; // move to the next operand
@@ -246,7 +246,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     exprt product(operands.front());
     expr.swap(product);
 
-    result = false;
+    no_change = false;
   }
   else
   {
@@ -255,7 +255,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     {
       // just delete it
       operands.erase(constant);
-      result=false;
+      no_change = false;
 
       if(operands.size()==1)
       {
@@ -265,7 +265,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     }
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_div(exprt &expr)
@@ -428,7 +428,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   if(!is_number(plus_expr.type()) && plus_expr.type().id() != ID_pointer)
     return true;
 
-  bool result=true;
+  bool no_change = true;
 
   exprt::operandst &operands=expr.operands();
 
@@ -506,7 +506,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
                          to_constant_expr(*it)))
             {
               *it=from_integer(0, it->type());
-              result=false;
+              no_change = false;
             }
           }
         }
@@ -539,7 +539,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
         *(itm->second)=from_integer(0, expr.type());
         *it=from_integer(0, expr.type());
         expr_map.erase(itm);
-        result=false;
+        no_change = false;
       }
     }
 
@@ -554,7 +554,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       if(is_number(it->type()) && it->is_zero())
       {
         it=operands.erase(it);
-        result=false;
+        no_change = false;
       }
       else
         it++;
@@ -573,7 +573,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     return false;
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_minus(exprt &expr)
@@ -694,7 +694,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     }
   }
 
-  bool result=true;
+  bool no_change = true;
 
   // try to merge constants
 
@@ -740,7 +740,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     expr.operands().erase(expr.operands().begin());
     expr.op0().swap(new_op);
 
-    result=false;
+    no_change = false;
   }
 
   // now erase 'all zeros' out of bitor, bitxor
@@ -755,7 +755,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       if(it->is_zero() && expr.operands().size()>1)
       {
         it=expr.operands().erase(it);
-        result=false;
+        no_change = false;
       }
       else
         it++;
@@ -779,7 +779,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         expr.operands().size() > 1)
       {
         it=expr.operands().erase(it);
-        result=false;
+        no_change = false;
       }
       else
         it++;
@@ -814,7 +814,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     return false;
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_extractbit(exprt &expr)
@@ -853,7 +853,7 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
 
 bool simplify_exprt::simplify_concatenation(exprt &expr)
 {
-  bool result=true;
+  bool no_change = true;
 
   if(is_bitvector_type(expr.type()))
   {
@@ -865,7 +865,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
       {
         const bool value = op.is_true();
         op = from_integer(value, unsignedbv_typet(1));
-        result = false;
+        no_change = false;
       }
     }
 
@@ -899,7 +899,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         to_bitvector_type(opi.type()).set_width(new_width);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
-        result = false;
+        no_change = false;
       }
       else
         i++;
@@ -930,7 +930,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         opi.type().id(ID_verilog_unsignedbv);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
-        result = false;
+        no_change = false;
       }
       else
         i++;
@@ -943,10 +943,10 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
     exprt tmp;
     tmp.swap(expr.op0());
     expr.swap(tmp);
-    result=false;
+    no_change = false;
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_shifts(exprt &expr)
@@ -1530,23 +1530,23 @@ bool simplify_exprt::eliminate_common_addends(
 
   if(op0.id()==ID_plus)
   {
-    bool result=true;
+    bool no_change = true;
 
     Forall_operands(it, op0)
       if(!eliminate_common_addends(*it, op1))
-        result=false;
+        no_change = false;
 
-    return result;
+    return no_change;
   }
   else if(op1.id()==ID_plus)
   {
-    bool result=true;
+    bool no_change = true;
 
     Forall_operands(it, op1)
       if(!eliminate_common_addends(op0, *it))
-        result=false;
+        no_change = false;
 
-    return result;
+    return no_change;
   }
   else if(op0==op1)
   {
