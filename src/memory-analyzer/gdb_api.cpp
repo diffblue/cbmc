@@ -135,8 +135,10 @@ void gdb_apit::create_gdb_process()
     // get stream for writing to gdb
     command_stream = fdopen(pipe_input[1], "w");
 
-    bool has_done_tag = most_recent_line_has_tag(R"(~"done)");
-    CHECK_RETURN(has_done_tag);
+    std::string line = read_most_recent_line();
+    CHECK_RETURN(
+      has_prefix(line, R"(~"done)") ||
+      has_prefix(line, R"(~"Reading)"));
 
     if(log)
     {
