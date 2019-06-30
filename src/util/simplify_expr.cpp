@@ -1579,21 +1579,16 @@ bool simplify_exprt::simplify_update(exprt &expr)
   return false;
 }
 
-bool simplify_exprt::simplify_object(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
 {
   if(expr.id()==ID_plus)
   {
     if(expr.type().id()==ID_pointer)
     {
       // kill integers from sum
-      Forall_operands(it, expr)
-        if(it->type().id() == ID_pointer)
-        {
-          exprt tmp=*it;
-          expr.swap(tmp);
-          simplify_object(expr);
-          return false;
-        }
+      for(auto &op : expr.operands())
+        if(op.type().id() == ID_pointer)
+          return changed(simplify_object(op)); // recursive call
     }
   }
   else if(expr.id()==ID_typecast)
@@ -1604,9 +1599,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
     if(op_type.id()==ID_pointer)
     {
       // cast from pointer to pointer
-      expr = typecast_expr.op();
-      simplify_object(expr);
-      return false;
+      return changed(simplify_object(typecast_expr.op())); // recursive call
     }
     else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
     {
@@ -1626,8 +1619,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
            cand.operands().size()==1 &&
            cand.op0().id()==ID_address_of)
         {
-          expr=cand.op0();
-          return false;
+          return cand.op0();
         }
         else if(cand.id()==ID_typecast &&
                 cand.operands().size()==1 &&
@@ -1637,8 +1629,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
                 cand.op0().op0().operands().size()==1 &&
                 cand.op0().op0().op0().id()==ID_address_of)
         {
-          expr=cand.op0().op0().op0();
-          return false;
+          return cand.op0().op0().op0();
         }
       }
     }
@@ -1651,22 +1642,18 @@ bool simplify_exprt::simplify_object(exprt &expr)
       {
         // &some[i] -> &some
         address_of_exprt new_expr(expr.op0().op0());
-        expr.swap(new_expr);
-        simplify_object(expr); // recursion
-        return false;
+        return changed(simplify_object(new_expr)); // recursion
       }
       else if(expr.op0().id()==ID_member && expr.op0().operands().size()==1)
       {
         // &some.f -> &some
         address_of_exprt new_expr(expr.op0().op0());
-        expr.swap(new_expr);
-        simplify_object(expr); // recursion
-        return false;
+        return changed(simplify_object(new_expr)); // recursion
       }
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 optionalt<exprt> simplify_exprt::bits2expr(
@@ -2563,17 +2550,50 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id()==ID_pointer_object)
-    no_change = simplify_pointer_object(expr) && no_change;
+  {
+    auto r = simplify_pointer_object(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id() == ID_is_dynamic_object)
   {
-    no_change = simplify_is_dynamic_object(expr) && no_change;
+    auto r = simplify_is_dynamic_object(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
   }
   else if(expr.id() == ID_is_invalid_pointer)
-    no_change = simplify_is_invalid_pointer(expr) && no_change;
+  {
+    auto r = simplify_is_invalid_pointer(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_object_size)
-    no_change = simplify_object_size(expr) && no_change;
+  {
+    auto r = simplify_object_size(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_good_pointer)
-    no_change = simplify_good_pointer(expr) && no_change;
+  {
+    auto r = simplify_good_pointer(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_div)
     no_change = simplify_div(expr) && no_change;
   else if(expr.id()==ID_mod)
@@ -2621,9 +2641,23 @@ bool simplify_exprt::simplify_node(exprt &expr)
     }
   }
   else if(expr.id()==ID_address_of)
-    no_change = simplify_address_of(expr) && no_change;
+  {
+    auto r = simplify_address_of(to_address_of_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_pointer_offset)
-    no_change = simplify_pointer_offset(expr) && no_change;
+  {
+    auto r = simplify_pointer_offset(expr);
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_extractbit)
     no_change = simplify_extractbit(expr) && no_change;
   else if(expr.id()==ID_concatenation)
