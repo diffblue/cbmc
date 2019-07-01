@@ -121,7 +121,7 @@ static const struct saj_tablet &sort_and_join(
 
 bool sort_and_join(exprt &expr)
 {
-  bool result=true;
+  bool no_change = true;
 
   if(!expr.has_operands())
     return true;
@@ -151,7 +151,7 @@ bool sort_and_join(exprt &expr)
       forall_operands(it2, *it)
         new_ops.push_back(*it2);
 
-      result=false;
+      no_change = false;
     }
     else
       new_ops.push_back(*it);
@@ -159,8 +159,8 @@ bool sort_and_join(exprt &expr)
 
   // sort it
 
-  result=sort_operands(new_ops) && result;
+  no_change = sort_operands(new_ops) && no_change;
   expr.operands().swap(new_ops);
 
-  return result;
+  return no_change;
 }
