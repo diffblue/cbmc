@@ -162,7 +162,7 @@ simplify_exprt::simplify_popcount(const popcount_exprt &expr)
 /// \param expr: the expression to simplify
 /// \param ns: namespace
 /// \return: the modified expression or an unchanged expression
-static simplify_exprt::resultt<> simplify_string_endswith_func(
+static simplify_exprt::resultt<> simplify_string_endswith(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
@@ -334,7 +334,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   }
   else if(func_id == ID_cprover_string_endswith_func)
   {
-    return simplify_string_endswith_func(expr, ns);
+    return simplify_string_endswith(expr, ns);
   }
   else if(func_id == ID_cprover_string_is_empty_func)
   {
