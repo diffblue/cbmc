@@ -889,10 +889,54 @@ void java_object_factoryt::gen_nondet_struct_init(
       code_function_callt{init_func->symbol_expr(), {address_of_exprt{expr}}});
 }
 
+/// Generate code block that verifies that an expression of type float or
+/// double has integral value. For example, for a float expression floatVal we
+/// generate:
+/// int assume_integral_tmp;
+/// assume_integral_tmp = NONDET(int);
+/// ASSUME FLOAT_TYPECAST(assume_integral_tmp, float, __CPROVER_rounding_mode)
+///   == floatVal
+/// \param expr The expression we want to make an assumption on
+/// \param type The type of the expression
+/// \param location Source location associated with the expression
+/// \param [out] symbol_table Symbol table, a new auxiliary symbol will be added
+/// \return Code block constructing the auxiliary nondet integer and an
+///   assume statement that the integer is equal to the value of the expression
+static code_blockt assume_expr_integral(
+  const exprt &expr,
+  const typet &type,
+  const source_locationt &location,
+  symbol_table_baset &symbol_table)
+{
+  PRECONDITION(type == java_float_type() || type == java_double_type());
+
+  code_blockt assignments;
+
+  const symbolt &aux_int_symbol = fresh_java_symbol(
+    java_int_type(),
+    "assume_integral_tmp",
+    location,
+    "assume_integral_tmp",
+    symbol_table);
+  const auto &aux_int = aux_int_symbol.symbol_expr();
+  assignments.add(code_declt(aux_int), location);
+  exprt nondet_rhs = side_effect_expr_nondett(java_int_type(), location);
+  code_assignt aux_assign(aux_int, nondet_rhs);
+  aux_assign.add_source_location() = location;
+  assignments.add(aux_assign);
+  assignments.add(
+    code_assumet(equal_exprt(typecast_exprt(aux_int, type), expr)));
+
+  return assignments;
+}
+
 /// Initializes a primitive-typed or reference-typed object tree rooted at
 /// `expr`, allocating child objects as necessary and nondet-initializing their
 /// members, or if MUST_UPDATE_IN_PLACE is set, re-initializing
 /// already-allocated objects.
+///
+/// Extra constraints might be added to initialized objects, based on options
+/// recorded in `object_factory_parameters`.
 ///
 /// \param assignments:
 ///   A code block where the initializing assignments will be appended to.
@@ -999,8 +1043,7 @@ void java_object_factoryt::gen_nondet_init(
     assign.add_source_location() = location;
 
     assignments.add(assign);
-    // add assumes to obey numerical limits (given via
-    // java-assume-inputs-interval)
+    // add assumes to obey numerical restrictions
     if(type != java_boolean_type() && type != java_char_type())
     {
       if(object_factory_parameters.assume_inputs_interval.lower_set)
@@ -1018,6 +1061,13 @@ void java_object_factoryt::gen_nondet_init(
           ID_le,
           from_integer(
             object_factory_parameters.assume_inputs_interval.upper, type))));
+      }
+      if(
+        object_factory_parameters.assume_inputs_integral &&
+        (type == java_float_type() || type == java_double_type()))
+      {
+        assignments.add(
+          assume_expr_integral(expr, type, location, symbol_table));
       }
     }
   }

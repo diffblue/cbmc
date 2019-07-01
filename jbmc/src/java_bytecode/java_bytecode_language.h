@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(throw-assertion-error)" \
   "(java-assume-inputs-non-null)" \
   "(java-assume-inputs-interval):" \
+  "(java-assume-inputs-integral)" \
   "(throw-runtime-exceptions)" \
   "(max-nondet-array-length):" \
   "(max-nondet-tree-depth):" \
@@ -62,6 +63,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              (byte, short, int, long, float, double) to be\n" /* NOLINT(*) */ \
   "                              initialized within the given range; lower bound\n" /* NOLINT(*) */ \
   "                              L and upper bound U must be integers;\n" /* NOLINT(*) */ \
+  "                              does not work for arrays;\n" /* NOLINT(*) */ \
+  " --java-assume-inputs-integral\n" \
+  "                              force float and double inputs to have integer values;\n" /* NOLINT(*) */ \
   "                              does not work for arrays;\n" /* NOLINT(*) */ \
   " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
   " --java-cp-include-files r    regexp or JSON list of files to load\n" \
