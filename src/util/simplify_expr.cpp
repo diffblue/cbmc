@@ -161,7 +161,7 @@ simplify_exprt::simplify_popcount(const popcount_exprt &expr)
 /// Simplify String.endsWith function when arguments are constant
 /// \param expr: the expression to simplify
 /// \param ns: namespace
-/// \return: the modified expression or an unchanged expression
+/// \return the modified expression or an unchanged expression
 static simplify_exprt::resultt<> simplify_string_endswith(
   const function_application_exprt &expr,
   const namespacet &ns)
@@ -192,7 +192,7 @@ static simplify_exprt::resultt<> simplify_string_endswith(
 /// Simplify String.isEmpty function when arguments are constant
 /// \param expr: the expression to simplify
 /// \param ns: namespace
-/// \return: the modified expression or an unchanged expression
+/// \return the modified expression or an unchanged expression
 static simplify_exprt::resultt<> simplify_string_is_empty(
   const function_application_exprt &expr,
   const namespacet &ns)
@@ -217,7 +217,7 @@ static simplify_exprt::resultt<> simplify_string_is_empty(
 /// http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/lang/String.java#l1140
 /// \param expr: the expression to simplify
 /// \param ns: namespace
-/// \return: the modified expression or an unchanged expression
+/// \return the modified expression or an unchanged expression
 static simplify_exprt::resultt<> simplify_string_compare_to(
   const function_application_exprt &expr,
   const namespacet &ns)
