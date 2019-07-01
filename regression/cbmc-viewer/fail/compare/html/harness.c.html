@@ -1,0 +1,17 @@
+<html>
+<head><title>harness.c</title></head>
+<body><pre>
+<span id="1">    1 #include &lt;assert.h&gt;</span>
+<span id="2">    2 </span>
+<span id="3">    3 int <a href="./harness.c.html#3">g</a> = 1;</span>
+<span id="4">    4 </span>
+<span id="5">    5 void <a href="./harness.c.html#5">harness</a>()</span>
+<span id="6">    6 {</span>
+<span id="7" style="color:green">    7   for(int i = 0; i &lt; 4; ++i){</span>
+<span id="8" style="color:green">    8     int* x;</span>
+<span id="9">    9     x = &amp;<a href="./harness.c.html#3">g</a>;</span>
+<span id="10">   10     assert(*x != 1);</span>
+<span id="11" style="color:red">   11   }</span>
+<span id="12">   12 }</span>
+</pre></body>
+</html>

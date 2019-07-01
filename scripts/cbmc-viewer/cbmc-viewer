@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import report
+
+if __name__ == "__main__":
+    report.main()

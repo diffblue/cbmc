@@ -9,7 +9,7 @@ jobs:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-7
+            - llvm-toolchain-xenial-7
             - ubuntu-toolchain-r-test
           packages:
             - clang-format-7
@@ -54,7 +54,7 @@ jobs:
       addons:
         apt:
           sources:
-            - sourceline: 'deb http://packages.cloud.google.com/apt cloud-sdk-trusty main'
+            - sourceline: 'deb http://packages.cloud.google.com/apt cloud-sdk-xenial main'
               key_url: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
           packages:
             - cmake
@@ -89,7 +89,7 @@ jobs:
     # Ubuntu Linux with glibc using g++-5
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: gcc
       cache: ccache
@@ -104,6 +104,8 @@ jobs:
             - parallel
             - jq
             - gdb
+            - python3
+            - python3-pip
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -120,7 +122,7 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel gdb
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel gdb python
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env:
         - COMPILER="ccache clang++"
@@ -129,7 +131,7 @@ jobs:
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: gcc
       cache: ccache
@@ -143,6 +145,8 @@ jobs:
             - libubsan0
             - jq
             - gdb
+            - python3
+            - python3-pip
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -157,7 +161,7 @@ jobs:
     # Ubuntu Linux with glibc using clang++-7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: clang
       cache: ccache
@@ -165,7 +169,7 @@ jobs:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-7
+            - llvm-toolchain-xenial-7
           packages:
             - libwww-perl
             - g++-5
@@ -174,6 +178,8 @@ jobs:
             - libubsan0
             - jq
             - gdb
+            - python3
+            - python3-pip
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -190,7 +196,7 @@ jobs:
     # cmake build using g++-7, enable NAMED_SUB_IS_FORWARD_LIST
     - stage: Test different OS/CXX/Flags
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: gcc
       cache: ccache
@@ -204,6 +210,8 @@ jobs:
             - g++-7
             - jq
             - gdb
+            - python3
+            - python3-pip
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-7 bin/gcc
@@ -219,7 +227,7 @@ jobs:
     # cmake build using g++-7, enable CMAKE_USE_CUDD and BDD_GUARDS
     - stage: Test different OS/CXX/Flags
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: gcc
       cache: ccache
@@ -233,11 +241,14 @@ jobs:
             - g++-7
             - jq
             - gdb
+            - python3
+            - python3-pip
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-7 bin/gcc
         - ln -s /usr/bin/g++-7 bin/g++
       install:
+        - pip3 install lxml
         - ccache -z
         - ccache --max-size=1G
         - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_USE_CUDD=true' -DCMAKE_CXX_FLAGS="-DBDD_GUARDS" '-DWITH_MEMORY_ANALYZER=On'
@@ -245,10 +256,11 @@ jobs:
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2; ctest -V -R unit-xfail -j2)
 
+
     # cmake build using clang++-6
     - stage: Test different OS/CXX/Flags
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: clang
       cache: ccache
@@ -258,7 +270,7 @@ jobs:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-7
+            - llvm-toolchain-xenial-7
           packages:
             - libwww-perl
             - g++-5
@@ -268,6 +280,8 @@ jobs:
             - parallel
             - jq
             - gdb
+            - python3
+            - python3-pip
       before_install:
         - mkdir bin
         # Use gcc/g++ 5 for tests, as Clang doesn't work yet
@@ -275,6 +289,7 @@ jobs:
         - ln -s /usr/bin/gcc-5 bin/gcc-5
         - ln -s /usr/bin/g++-5 bin/g++-5
       install:
+        - pip3 install lxml
         - ccache -z
         - ccache --max-size=1G
         - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-7' '-DCMAKE_CXX_FLAGS=-Qunused-arguments' '-DWITH_MEMORY_ANALYZER=On'
@@ -289,12 +304,13 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache gdb
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache gdb python
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env:
         - BUILD_SYSTEM=cmake
         - CCACHE_CPP2=yes
       install:
+        - pip3 install lxml
         - ccache -z
         - ccache --max-size=1G
         - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
@@ -307,7 +323,7 @@ jobs:
     - stage: Test different OS/CXX/Flags
       if: type = cron
       os: linux
-      dist: trusty
+      dist: xenial
       sudo: false
       compiler: gcc
       cache: ccache
@@ -318,6 +334,8 @@ jobs:
           packages:
             - libwww-perl
             - g++-5
+            - python3
+            - python3-pip
         coverity_scan:
           project:
             name: "diffblue/cbmc"
@@ -339,6 +357,7 @@ jobs:
       script: echo "This is coverity build. No need for tests."
 
 install:
+  - pip3 install lxml
   - ccache -z
   - ccache --max-size=1G
   - make -C jbmc/src setup-submodules

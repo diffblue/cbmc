@@ -1,0 +1,32 @@
+<html><head><title>harness.assertion.1</title></head><body><h1>harness.assertion.1</h1>
+Trace for <a href="../harness.c.html#10">harness.assertion.1</a> at line 10 in file harness.c:
+<pre>
+
+State 20 <a href="../harness.c.html" target="code">file harness.c</a> <a href="../harness.c.html#5" target="code">function harness</a> <a href="../harness.c.html#7" target="code">line 7</a> thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 21 <a href="../harness.c.html" target="code">file harness.c</a> <a href="../harness.c.html#5" target="code">function harness</a> <a href="../harness.c.html#7" target="code">line 7</a> thread 0
+----------------------------------------------------
+  i=0 (00000000 00000000 00000000 00000000)
+
+State 23 <a href="../harness.c.html" target="code">file harness.c</a> <a href="../harness.c.html#5" target="code">function harness</a> <a href="../harness.c.html#8" target="code">line 8</a> thread 0
+----------------------------------------------------
+  x=((signed int *)NULL) (00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+State 24 <a href="../harness.c.html" target="code">file harness.c</a> <a href="../harness.c.html#5" target="code">function harness</a> <a href="../harness.c.html#9" target="code">line 9</a> thread 0
+----------------------------------------------------
+  x=&g (00000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+
+Violated property:
+  <a href="../harness.c.html" target="code">file harness.c</a> <a href="../harness.c.html#5" target="code">function harness</a> <a href="../harness.c.html#10" target="code">line 10</a> thread 0
+  assertion *x != 1
+  !((signed long int)!(*x != 1) != 0l)
+
+
+
+** 1 of 3 failed (2 iterations)
+VERIFICATION FAILED
+
+</pre>
+</body></html>
