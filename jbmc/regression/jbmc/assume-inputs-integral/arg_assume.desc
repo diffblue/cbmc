@@ -1,0 +1,25 @@
+CORE
+My.class
+--function My.numericalArg --java-assume-inputs-integral
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My\.numericalArg:\(FD\)V\.assertion\.1\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.2\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.3\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.4\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.5\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.6\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.7\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.8\].[^$]*SUCCESS
+\[java::My\.numericalArg:\(FD\)V\.assertion\.9\].[^$]*FAILURE
+\[java::My\.numericalArg:\(FD\)V\.assertion\.10\].[^$]*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-integral restricts double and float inputs to
+integral values.
+
+There is also a check for the two input arguments not necessarily having the
+same integral value - this is just to show that using temporary variables with
+the same name when making the assumption on integral value in goto works well.

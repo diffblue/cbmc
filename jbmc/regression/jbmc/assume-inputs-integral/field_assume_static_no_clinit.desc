@@ -1,0 +1,22 @@
+KNOWNBUG symex-driven-lazy-loading-expected-failure
+My.class
+--function My.fieldStaticNoClinit --java-assume-inputs-integral --nondet-static
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.1\].[^$]*SUCCESS
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.2\].[^$]*SUCCESS
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.3\].[^$]*SUCCESS
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.4\].[^$]*SUCCESS
+\[java::My\.fieldStaticNoClinit:\(LOtherNoClinit;\)V\.assertion\.5\].[^$]*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-integral constrains the double and float static
+fields of the containing object to integral values.
+
+This fails under symex-driven lazy loading because nondet-static cannot be used
+with it.
+
+Static fields are not supported yet if there is no class initializer (static
+initializer).
