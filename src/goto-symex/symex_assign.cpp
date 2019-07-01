@@ -67,6 +67,54 @@ expr_skeletont expr_skeletont::compose(expr_skeletont other) const
   return expr_skeletont(apply(other.skeleton));
 }
 
+/// In the expression corresponding to a skeleton returns a pointer to the
+/// deepest subexpression before we encounter nil.
+static exprt *deepest_not_nil(exprt &e)
+{
+  exprt *ptr = &e;
+  while(!ptr->op0().is_nil())
+    ptr = &ptr->op0();
+  return ptr;
+}
+
+optionalt<expr_skeletont>
+expr_skeletont::clear_innermost_index_expr(expr_skeletont skeleton)
+{
+  exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(index_exprt *index_expr = expr_try_dynamic_cast<index_exprt>(*to_update))
+  {
+    index_expr->make_nil();
+    return expr_skeletont{std::move(skeleton)};
+  }
+  return {};
+}
+
+optionalt<expr_skeletont>
+expr_skeletont::clear_innermost_member_expr(expr_skeletont skeleton)
+{
+  exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(member_exprt *member = expr_try_dynamic_cast<member_exprt>(*to_update))
+  {
+    member->make_nil();
+    return expr_skeletont{std::move(skeleton)};
+  }
+  return {};
+}
+
+optionalt<expr_skeletont>
+expr_skeletont::clear_innermost_byte_extract_expr(expr_skeletont skeleton)
+{
+  exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(
+    to_update->id() != ID_byte_extract_big_endian &&
+    to_update->id() != ID_byte_extract_little_endian)
+  {
+    return {};
+  }
+  to_update->make_nil();
+  return expr_skeletont{std::move(skeleton.skeleton)};
+}
+
 void symex_assignt::assign_rec(
   const exprt &lhs,
   const expr_skeletont &full_lhs,
@@ -147,6 +195,8 @@ void symex_assignt::assign_rec(
 struct assignmentt final
 {
   ssa_exprt lhs;
+  /// Skeleton to reconstruct the original lhs in the assignment
+  expr_skeletont original_lhs_skeleton;
   exprt rhs;
 };
 
@@ -214,11 +264,20 @@ static assignmentt rewrite_with_to_field_symbols(
        lhs_mod.type().id() == ID_struct_tag))
     {
       exprt field_sensitive_lhs;
+      expr_skeletont lhs_skeleton;
       const with_exprt &with_expr = to_with_expr(ssa_rhs);
 
       if(lhs_mod.type().id() == ID_array)
       {
         field_sensitive_lhs = index_exprt(lhs_mod, with_expr.where());
+        // Access in an array can appear as an index_exprt or a byte_extract
+        auto index_reverted = expr_skeletont::clear_innermost_index_expr(
+          assignment.original_lhs_skeleton);
+        lhs_skeleton = index_reverted
+                         ? *index_reverted
+                         : get_value_or_abort(
+                             expr_skeletont::clear_innermost_byte_extract_expr(
+                               assignment.original_lhs_skeleton));
       }
       else
       {
@@ -226,6 +285,9 @@ static assignmentt rewrite_with_to_field_symbols(
           lhs_mod,
           with_expr.where().get(ID_component_name),
           with_expr.new_value().type());
+        lhs_skeleton =
+          get_value_or_abort(expr_skeletont::clear_innermost_member_expr(
+            assignment.original_lhs_skeleton));
       }
 
       field_sensitive_lhs = state.field_sensitivity.apply(
@@ -236,6 +298,7 @@ static assignmentt rewrite_with_to_field_symbols(
 
       ssa_rhs = with_expr.new_value();
       lhs_mod = to_ssa_expr(field_sensitive_lhs);
+      assignment.original_lhs_skeleton = lhs_skeleton;
     }
   }
   return assignment;
@@ -278,7 +341,9 @@ static assignmentt shift_indexed_access_to_lhs(
 
     if(byte_extract.id() == ID_symbol)
     {
-      return assignmentt{to_ssa_expr(byte_extract), byte_update.value()};
+      return assignmentt{to_ssa_expr(byte_extract),
+                         std::move(assignment.original_lhs_skeleton),
+                         byte_update.value()};
     }
     else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
     {
@@ -328,6 +393,7 @@ static assignmentt shift_indexed_access_to_lhs(
       // We may have shifted the previous lhs into the rhs; as the lhs is only
       // L1-renamed, we need to rename again.
       return assignmentt{to_ssa_expr(byte_extract),
+                         std::move(assignment.original_lhs_skeleton),
                          state.rename(std::move(ssa_rhs), ns).get()};
     }
   }
@@ -388,10 +454,11 @@ void symex_assignt::assign_non_struct_symbol(
   // introduced by assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  auto assignment = shift_indexed_access_to_lhs<use_update()>(
-    state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
-  assignment = rewrite_with_to_field_symbols<use_update()>(
-    state, std::move(assignment), ns);
+  assignmentt assignment = rewrite_with_to_field_symbols<use_update()>(
+    state,
+    shift_indexed_access_to_lhs<use_update()>(
+      state, {lhs, full_lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt),
+    ns);
 
   if(symex_config.simplify_opt)
     assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
@@ -407,7 +474,8 @@ void symex_assignt::assign_non_struct_symbol(
                              .get();
 
   state.record_events.push(false);
-  const exprt l2_full_lhs = state.rename(full_lhs.apply(l2_lhs), ns).get();
+  const exprt l2_full_lhs =
+    state.rename(assignment.original_lhs_skeleton.apply(l2_lhs), ns).get();
   state.record_events.pop();
 
   auto current_assignment_type =

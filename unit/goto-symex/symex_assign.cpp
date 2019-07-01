@@ -192,4 +192,61 @@ SCENARIO(
       }
     }
   }
+  GIVEN(
+    "A symbol `struct1` a with_exprt `struct1 with [field1 <- 234]` and "
+    "a skeleton `☐.field_1`")
+  {
+    struct_union_typet::componentst components;
+    components.emplace_back("field1", int_type);
+    const struct_typet struct_type{components};
+    const symbol_exprt struct1_sym{"struct1", struct_type};
+    add_to_symbol_table(symbol_table, struct1_sym);
+    const with_exprt rhs{
+      struct1_sym, member_designatort{"field1"}, from_integer(234, int_type)};
+    expr_skeletont skeleton =
+      expr_skeletont::remove_op0(member_exprt{struct1_sym, components.back()});
+    const ssa_exprt struct1_ssa{struct1_sym};
+
+    exprt::operandst guard;
+    symex_target_equationt target_equation{null_message_handler};
+
+    WHEN("Symbol `struct1` is assigned `struct1 with [field1 <- 234]`")
+    {
+      symex_assignt{state,
+                    symex_targett::assignment_typet::STATE,
+                    ns,
+                    symex_config,
+                    target_equation}
+        .assign_symbol(struct1_ssa, skeleton, rhs, guard);
+      THEN("An equation is added to the target")
+      {
+        REQUIRE(target_equation.SSA_steps.size() == 1);
+        SSA_stept step = target_equation.SSA_steps.back();
+        THEN("LHS is `struct1!0#2..field1`")
+        {
+          REQUIRE(step.ssa_lhs.get_identifier() == "struct1!0#1..field1");
+        }
+        THEN("Original full LHS is `struct1.field1`")
+        {
+          REQUIRE(
+            step.original_full_lhs ==
+            member_exprt{struct1_sym, "field1", int_type});
+        }
+        THEN("SSA full LHS is `struct1!0#1..field1`")
+        {
+          const auto as_symbol =
+            expr_try_dynamic_cast<symbol_exprt>(step.ssa_lhs);
+          REQUIRE(as_symbol);
+          REQUIRE(as_symbol->get_identifier() == "struct1!0#1..field1");
+        }
+        THEN("RHS is 234")
+        {
+          const auto as_constant =
+            expr_try_dynamic_cast<constant_exprt>(step.ssa_rhs);
+          REQUIRE(as_constant);
+          REQUIRE(numeric_cast_v<mp_integer>(*as_constant) == 234);
+        }
+      }
+    }
+  }
 }
