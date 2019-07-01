@@ -1188,7 +1188,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       else
       {
         error().source_location=v.source_location();
-        error() << "enum is not a constant";
+        error() << "enum is not a constant" << eom;
         throw 0;
       }
     }
