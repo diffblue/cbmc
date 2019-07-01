@@ -1,8 +1,0 @@
-FUTURE
-test.class
---max-nondet-string-length 1000
-^EXIT=10$
-^SIGNAL=0$
-\[.*assertion\.1\] .* line 8 .* FAILURE
-^VERIFICATION FAILED$
---

@@ -1,0 +1,10 @@
+CORE symex-driven-lazy-loading-expected-failure
+test.class
+--function test.nondet --max-nondet-string-length 1000 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::test.nondet:(Ljava/lang/String;)V.assertion.3"
+^EXIT=0$
+^SIGNAL=0$
+\[.*assertion\.3\] .* line 13.* SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Check that StringBuilder.append() is correct when the base String is an input.
