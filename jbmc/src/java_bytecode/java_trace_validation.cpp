@@ -109,6 +109,24 @@ bool check_struct_structure(const struct_exprt &expr)
   return true;
 }
 
+bool check_address_structure(const address_of_exprt &address)
+{
+  const auto symbol_expr = get_inner_symbol_expr(address);
+  return symbol_expr && check_symbol_structure(*symbol_expr);
+}
+
+bool check_constant_structure(const constant_exprt &constant_expr)
+{
+  if(constant_expr.has_operands())
+  {
+    const auto &operand = skip_typecast(constant_expr.operands()[0]);
+    return can_cast_expr<constant_exprt>(operand) ||
+           can_cast_expr<address_of_exprt>(operand) ||
+           can_cast_expr<plus_exprt>(operand);
+  }
+  return !constant_expr.get_value().empty();
+}
+
 static void check_lhs_assumptions(
   const exprt &lhs,
   const namespacet &ns,
@@ -187,10 +205,9 @@ static void check_rhs_assumptions(
   // check address_of rhs structure (String only)
   if(const auto address = expr_try_dynamic_cast<address_of_exprt>(rhs))
   {
-    const auto symbol_expr = get_inner_symbol_expr(*address);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      symbol_expr,
+      check_address_structure(*address),
       "RHS",
       rhs.pretty(),
       "Expecting an address of with nested symbol.");
@@ -228,27 +245,13 @@ static void check_rhs_assumptions(
   // check constant rhs structure
   else if(const auto constant_expr = expr_try_dynamic_cast<constant_exprt>(rhs))
   {
-    if(constant_expr->has_operands())
-    {
-      const auto operand = skip_typecast(constant_expr->operands()[0]);
-      DATA_CHECK_WITH_DIAGNOSTICS(
-        vm,
-        operand.id() == ID_constant || operand.id() == ID_address_of ||
-          operand.id() == ID_plus,
-        "RHS",
-        rhs.pretty(),
-        "Expecting the first operand of a constant expression to be a "
-        "constant, address_of or plus expression.");
-    }
-    else if(constant_expr->get_value().empty())
-    {
-      DATA_CHECK_WITH_DIAGNOSTICS(
-        vm,
-        !constant_expr->get_value().empty(),
-        "RHS",
-        rhs.pretty(),
-        "Expecting a non-empty value.");
-    }
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      check_constant_structure(*constant_expr),
+      "RHS",
+      rhs.pretty(),
+      "Expecting the first operand of a constant expression to be a constant, "
+      "address_of or plus expression, or no operands and a non-empty value.");
   }
   // check byte extract rhs structure
   else if(const auto byte = expr_try_dynamic_cast<byte_extract_exprt>(rhs))
