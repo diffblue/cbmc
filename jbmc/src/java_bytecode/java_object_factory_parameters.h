@@ -25,6 +25,9 @@ struct java_object_factory_parameterst final : public object_factory_parameterst
   /// Force numerical primitive inputs to fall within the interval
   integer_intervalt assume_inputs_interval;
 
+  /// Force double and float inputs to be integral
+  bool assume_inputs_integral;
+
   /// Assigns the parameters from given options
   void set(const optionst &);
 };

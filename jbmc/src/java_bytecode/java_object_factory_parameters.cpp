@@ -47,6 +47,7 @@ void java_object_factory_parameterst::set(const optionst &options)
       return interval;
     }();
   }
+  assume_inputs_integral = options.is_set("java-assume-inputs-integral");
 }
 
 void parse_java_object_factory_options(
@@ -60,5 +61,9 @@ void parse_java_object_factory_options(
     options.set_option(
       "java-assume-inputs-interval",
       cmdline.get_value("java-assume-inputs-interval"));
+  }
+  if(cmdline.isset("java-assume-inputs-integral"))
+  {
+    options.set_option("java-assume-inputs-integral", true);
   }
 }

@@ -1,0 +1,29 @@
+KNOWNBUG
+My.class
+--function My.arrayArg --java-assume-inputs-integral
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.1\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.2\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.3\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.4\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.5\].[^$]*FAILURE
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.6\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.7\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.8\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.9\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.10\].[^$]*FAILURE
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.11\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.12\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.13\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.14\].[^$]*SUCCESS
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.15\].[^$]*FAILURE
+\[java::My\.arrayArg:\(\[LOther;\[I\)V\.assertion\.16\].[^$]*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-integral restricts double and float arrays to
+integral values.
+
+Arrays are not supported yet.
