@@ -17,6 +17,7 @@ My.class
 --
 ^warning: ignoring
 --
-TG-5572
 Check that --java-assume-inputs-interval restricts numeric values in arrays (but
 not array length)
+
+Arrays are not supported yet

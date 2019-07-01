@@ -147,7 +147,17 @@ class My {
     } else {
       assert false;
     }
+  }
+
+  public static void fieldStaticNoClinit() {
+    if (OtherNoClinit.intFieldStatic > 3) {
+      assert false;
+    } else if (OtherNoClinit.intFieldStatic < 1) {
+      assert false;
+    } else {
+      assert false;
     }
+  }
 
   public void classArrArg(Other other, int [] intArr) {
     if (other.intArrField.length > 3) {

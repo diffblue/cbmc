@@ -58,10 +58,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              never initialize reference-typed parameter to the\n" /* NOLINT(*) */ \
   "                              entry point with null\n" /* NOLINT(*) */ \
   " --java-assume-inputs-interval [L:U] or [L:] or [:U]\n" \
-  "                              only initialize numerical primitive-typed parameter\n" /* NOLINT(*) */ \
-  "                              (byte, short, int, long, float, double) to an entry\n" /* NOLINT(*) */ \
-  "                              point within the given range; lower bound L\n" /* NOLINT(*) */ \
-  "                              and upper bound U must be integers\n" /* NOLINT(*) */ \
+  "                              force numerical primitive-typed inputs\n" /* NOLINT(*) */ \
+  "                              (byte, short, int, long, float, double) to be\n" /* NOLINT(*) */ \
+  "                              initialized within the given range; lower bound\n" /* NOLINT(*) */ \
+  "                              L and upper bound U must be integers;\n" /* NOLINT(*) */ \
+  "                              does not work for arrays;\n" /* NOLINT(*) */ \
   " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
   " --java-cp-include-files r    regexp or JSON list of files to load\n" \
   "                              (with '@' prefix)\n" \
