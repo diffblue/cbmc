@@ -1673,12 +1673,22 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
 
-      // any array type is fine here, so we go for a reference array
-      dereference_exprt array{typecast_exprt{op[0], java_array_type('a')}};
-      PRECONDITION(array.type().id() == ID_struct_tag);
-      array.set(ID_java_member_access, true);
+      if(can_cast_type<java_reference_typet>(op[0].type())) // && is_array
+      {
+        dereference_exprt array{op[0]};
+        array.set(ID_java_member_access, true);
+        results[0] = member_exprt{std::move(array), "length", java_int_type()};
+      }
+      else
+      {
+        UNREACHABLE;
+        // any array type is fine here, so we go for a reference array
+        dereference_exprt array{typecast_exprt{op[0], java_array_type('a')}};
+        PRECONDITION(array.type().id() == ID_struct_tag);
+        array.set(ID_java_member_access, true);
 
-      results[0] = member_exprt{std::move(array), "length", java_int_type()};
+        results[0] = member_exprt{std::move(array), "length", java_int_type()};
+      }
     }
     else if(bytecode == BC_tableswitch || bytecode == BC_lookupswitch)
     {
