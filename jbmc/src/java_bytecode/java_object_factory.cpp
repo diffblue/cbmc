@@ -899,26 +899,22 @@ void java_object_factoryt::gen_nondet_struct_init(
 /// \param expr The expression we want to make an assumption on
 /// \param type The type of the expression
 /// \param location Source location associated with the expression
-/// \param [out] symbol_table Symbol table, a new auxiliary symbol will be added
+/// \param allocate_local_symbol A function to generate a new local symbol
+///   and add it to the symbol table
 /// \return Code block constructing the auxiliary nondet integer and an
 ///   assume statement that the integer is equal to the value of the expression
 static code_blockt assume_expr_integral(
   const exprt &expr,
   const typet &type,
   const source_locationt &location,
-  symbol_table_baset &symbol_table)
+  const allocate_local_symbolt &allocate_local_symbol)
 {
   PRECONDITION(type == java_float_type() || type == java_double_type());
 
   code_blockt assignments;
 
-  const symbolt &aux_int_symbol = fresh_java_symbol(
-    java_int_type(),
-    "assume_integral_tmp",
-    location,
-    "assume_integral_tmp",
-    symbol_table);
-  const auto &aux_int = aux_int_symbol.symbol_expr();
+  const auto &aux_int =
+    allocate_local_symbol(java_int_type(), "assume_integral_tmp");
   assignments.add(code_declt(aux_int), location);
   exprt nondet_rhs = side_effect_expr_nondett(java_int_type(), location);
   code_assignt aux_assign(aux_int, nondet_rhs);
@@ -1066,8 +1062,15 @@ void java_object_factoryt::gen_nondet_init(
         object_factory_parameters.assume_inputs_integral &&
         (type == java_float_type() || type == java_double_type()))
       {
-        assignments.add(
-          assume_expr_integral(expr, type, location, symbol_table));
+        assignments.add(assume_expr_integral(
+          expr,
+          type,
+          location,
+          [this](
+            const typet &type, std::string basename_prefix) -> symbol_exprt {
+            return allocate_objects.allocate_automatic_local_object(
+              type, basename_prefix);
+          }));
       }
     }
   }
