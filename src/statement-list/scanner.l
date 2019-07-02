@@ -135,14 +135,32 @@ void statement_list_scanner_init()
   \-I                 { loc(); return TOK_ACCU_INT_SUB; }
   \*I                 { loc(); return TOK_ACCU_INT_MUL; }
   \/I                 { loc(); return TOK_ACCU_INT_DIV; }
+  ==I                 { loc(); return TOK_ACCU_INT_EQ; }
+  \<\>I               { loc(); return TOK_ACCU_INT_NEQ; }
+  \>I                 { loc(); return TOK_ACCU_INT_GT; }
+  \<I                 { loc(); return TOK_ACCU_INT_LT; }
+  \>=I                { loc(); return TOK_ACCU_INT_GTE; }
+  \<=I                { loc(); return TOK_ACCU_INT_LTE; }
   \+R                 { loc(); return TOK_ACCU_REAL_ADD; }
   \-R                 { loc(); return TOK_ACCU_REAL_SUB; }
   \*R                 { loc(); return TOK_ACCU_REAL_MUL; }
   \/R                 { loc(); return TOK_ACCU_REAL_DIV; }
+  ==R                 { loc(); return TOK_ACCU_REAL_EQ; }
+  \<\>R               { loc(); return TOK_ACCU_REAL_NEQ; }
+  \>R                 { loc(); return TOK_ACCU_REAL_GT; }
+  \<R                 { loc(); return TOK_ACCU_REAL_LT; }
+  \>=R                { loc(); return TOK_ACCU_REAL_GTE; }
+  \<=R                { loc(); return TOK_ACCU_REAL_LTE; }
   \+D                 { loc(); return TOK_ACCU_DINT_ADD; }
   \-D                 { loc(); return TOK_ACCU_DINT_SUB; }
   \*D                 { loc(); return TOK_ACCU_DINT_MUL; }
   \/D                 { loc(); return TOK_ACCU_DINT_DIV; }
+  ==D                 { loc(); return TOK_ACCU_DINT_EQ; }
+  \<\>D               { loc(); return TOK_ACCU_DINT_NEQ; }
+  \>D                 { loc(); return TOK_ACCU_DINT_GT; }
+  \<D                 { loc(); return TOK_ACCU_DINT_LT; }
+  \>=D                { loc(); return TOK_ACCU_DINT_GTE; }
+  \<=D                { loc(); return TOK_ACCU_DINT_LTE; }
 
   (10#)?[\+-]?[0-9]+ { 
                         newstack(yystatement_listlval);

@@ -305,6 +305,18 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_int_mul(op_code);
   else if(ID_statement_list_accu_int_div == statement)
     typecheck_statement_list_accu_int_div(op_code);
+  else if(ID_statement_list_accu_int_eq == statement)
+    typecheck_statement_list_accu_int_eq(op_code);
+  else if(ID_statement_list_accu_int_neq == statement)
+    typecheck_statement_list_accu_int_neq(op_code);
+  else if(ID_statement_list_accu_int_lt == statement)
+    typecheck_statement_list_accu_int_lt(op_code);
+  else if(ID_statement_list_accu_int_gt == statement)
+    typecheck_statement_list_accu_int_gt(op_code);
+  else if(ID_statement_list_accu_int_lte == statement)
+    typecheck_statement_list_accu_int_lte(op_code);
+  else if(ID_statement_list_accu_int_gte == statement)
+    typecheck_statement_list_accu_int_gte(op_code);
   else if(ID_statement_list_accu_dint_add == statement)
     typecheck_statement_list_accu_dint_add(op_code);
   else if(ID_statement_list_accu_dint_sub == statement)
@@ -313,6 +325,18 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_dint_mul(op_code);
   else if(ID_statement_list_accu_dint_div == statement)
     typecheck_statement_list_accu_dint_div(op_code);
+  else if(ID_statement_list_accu_dint_eq == statement)
+    typecheck_statement_list_accu_dint_eq(op_code);
+  else if(ID_statement_list_accu_dint_neq == statement)
+    typecheck_statement_list_accu_dint_neq(op_code);
+  else if(ID_statement_list_accu_dint_lt == statement)
+    typecheck_statement_list_accu_dint_lt(op_code);
+  else if(ID_statement_list_accu_dint_gt == statement)
+    typecheck_statement_list_accu_dint_gt(op_code);
+  else if(ID_statement_list_accu_dint_lte == statement)
+    typecheck_statement_list_accu_dint_lte(op_code);
+  else if(ID_statement_list_accu_dint_gte == statement)
+    typecheck_statement_list_accu_dint_gte(op_code);
   else if(ID_statement_list_accu_real_add == statement)
     typecheck_statement_list_accu_real_add(op_code);
   else if(ID_statement_list_accu_real_sub == statement)
@@ -321,6 +345,18 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_real_mul(op_code);
   else if(ID_statement_list_accu_real_div == statement)
     typecheck_statement_list_accu_real_div(op_code);
+  else if(ID_statement_list_accu_real_eq == statement)
+    typecheck_statement_list_accu_real_eq(op_code);
+  else if(ID_statement_list_accu_real_neq == statement)
+    typecheck_statement_list_accu_real_neq(op_code);
+  else if(ID_statement_list_accu_real_lt == statement)
+    typecheck_statement_list_accu_real_lt(op_code);
+  else if(ID_statement_list_accu_real_gt == statement)
+    typecheck_statement_list_accu_real_gt(op_code);
+  else if(ID_statement_list_accu_real_lte == statement)
+    typecheck_statement_list_accu_real_lte(op_code);
+  else if(ID_statement_list_accu_real_gte == statement)
+    typecheck_statement_list_accu_real_gte(op_code);
   else if(ID_statement_list_and == statement)
     typecheck_statement_list_and(op_code, tia_element);
   else if(ID_statement_list_and_not == statement)
@@ -449,6 +485,48 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_div(
   accumulator.push_back(operation);
 }
 
+void statement_list_typecheckt::typecheck_statement_list_accu_int_eq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_equal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_neq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_notequal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_lt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_lt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_gt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_gt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_lte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_le);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_gte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_ge);
+}
+
 void statement_list_typecheckt::typecheck_statement_list_accu_dint_add(
   const codet &op_code)
 {
@@ -501,6 +579,48 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_div(
   accumulator.push_back(operation);
 }
 
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_eq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_equal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_neq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_notequal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_lt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_lt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_gt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_gt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_lte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_le);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_gte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_ge);
+}
+
 void statement_list_typecheckt::typecheck_statement_list_accu_real_add(
   const codet &op_code)
 {
@@ -551,6 +671,48 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_div(
   const exprt &accu2{accumulator.back()};
   const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_eq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_equal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_neq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_notequal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_lt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_lt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_gt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_gt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_lte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_le);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_gte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_ge);
 }
 
 void statement_list_typecheckt::typecheck_statement_list_and(
@@ -907,6 +1069,16 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_arith(
     error() << "Operands of Real addition do not have the type Real" << eom;
     throw TYPECHECK_ERROR;
   }
+}
+
+void statement_list_typecheckt::typecheck_accumulator_compare_instruction(
+  const irep_idt &comparison)
+{
+  const exprt &accu1{accumulator.back()};
+  const exprt &accu2{accumulator.at(accumulator.size() - 2)};
+  // STL behaviour: ACCU2 is lhs, ACCU1 is rhs.
+  const binary_relation_exprt operation{accu2, comparison, accu1};
+  rlo_bit = operation;
 }
 
 const symbol_exprt &

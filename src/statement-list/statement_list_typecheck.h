@@ -220,6 +220,36 @@ private:
   /// \param op_code: OP code of the instruction.
   void typecheck_statement_list_accu_int_mul(const codet &op_code);
 
+  /// Performs a typecheck on a STL accumulator equality comparison instruction
+  /// for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_int_eq(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator inequality comparison
+  /// instruction for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_int_neq(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator greater than comparison
+  /// instruction for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_int_gt(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator less than comparison
+  /// instruction for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_int_lt(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator greater than or equal
+  /// comparison instruction for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_int_gte(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator less than or equal comparison
+  /// instruction for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_int_lte(const codet &op_code);
+
   // Arithmetic accumulator instructions (dint)
 
   /// Performs a typecheck on a STL accumulator add instruction for double
@@ -242,6 +272,36 @@ private:
   /// \param op_code: OP code of the instruction.
   void typecheck_statement_list_accu_dint_mul(const codet &op_code);
 
+  /// Performs a typecheck on a STL accumulator equality comparison instruction
+  /// for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_dint_eq(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator inequality comparison
+  /// instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_dint_neq(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator greater than comparison
+  /// instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_dint_gt(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator less than comparison
+  /// instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_dint_lt(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator greater than or equal
+  /// comparison instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_dint_gte(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator less than or equal
+  /// comparison instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_dint_lte(const codet &op_code);
+
   // Arithmetic accumulator instructions (real)
 
   /// Performs a typecheck on a STL accumulator add instruction for reals.
@@ -263,6 +323,36 @@ private:
   /// Modifies the accumulator.
   /// \param op_code: OP code of the instruction.
   void typecheck_statement_list_accu_real_mul(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator equality comparison instruction
+  /// for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_real_eq(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator inequality comparison
+  /// instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_real_neq(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator greater than comparison
+  /// instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_real_gt(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator less than comparison
+  /// instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_real_lt(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator greater than or equal
+  /// comparison instruction for double integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_real_gte(const codet &op_code);
+
+  /// Performs a typecheck on a STL accumulator less than or equal comparison
+  /// instruction for integers. Modifies the RLO.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_accu_real_lte(const codet &op_code);
 
   // Bit Logic instructions
 
@@ -396,6 +486,11 @@ private:
   /// entries.
   /// \param op_code: OP code of the instruction.
   void typecheck_binary_accumulator_instruction(const codet &op_code);
+
+  /// Performs a typecheck on an STL comparison instruction. Modifies the RLO.
+  /// \param comparison: ID of the compare expression that should be pushed to
+  ///   the RLO.
+  void typecheck_accumulator_compare_instruction(const irep_idt &comparison);
 
   /// Performs a typecheck on the given identifier and returns its symbol.
   /// \param identifier: Identifier that should be checked.
