@@ -303,6 +303,11 @@ public:
   }
 };
 
+/// A range of the form [low_char]-[high-char] that represents the set of
+/// printable characters for the string-printable option. The printable
+/// characters are in the range U+0020-U+007E, i.e. ' ' to '~'
+const char printable_char_range[] = " -~";
+
 /// Initialise length and data fields for a nondeterministic String structure.
 ///
 /// If the structure is not a nondeterministic structure, the call results in
@@ -417,7 +422,13 @@ void initialize_nondet_string_fields(
   if(printable)
   {
     add_character_set_constraint(
-      array_pointer, length_expr, " -~", symbol_table, loc, function_id, code);
+      array_pointer,
+      length_expr,
+      printable_char_range,
+      symbol_table,
+      loc,
+      function_id,
+      code);
   }
 }
 
