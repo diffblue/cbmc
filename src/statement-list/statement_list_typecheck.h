@@ -381,9 +381,12 @@ private:
   /// \param op_code: OP code of the instruction.
   void typecheck_statement_list_accu_real_arith(const codet &op_code);
 
-  /// Performs a typecheck on a STL instruction with an additional operand.
+  /// Performs a typecheck on a STL instruction with an additional operand that
+  /// should be no constant.
   /// \param op_code: OP code of the instruction.
-  void typecheck_instruction_with_operand(const codet &op_code);
+  /// \return Reference to the operand.
+  const symbol_exprt &
+  typecheck_instruction_with_non_const_operand(const codet &op_code);
 
   /// Performs a typecheck on an operand-less STL instruction.
   /// \param op_code: OP code of the instruction.
