@@ -336,9 +336,6 @@ static void populate_predecessor_map(
     // Find the last instruction within the live range:
     const auto end_pc = var_with_holes.var.start_pc + var_with_holes.var.length;
     auto amapit=amap.find(end_pc);
-    INVARIANT(
-      amapit!=amap.begin(),
-      "current bytecode shall not be the first");
     auto old_amapit=amapit;
     --amapit;
     if(old_amapit==amap.end())
