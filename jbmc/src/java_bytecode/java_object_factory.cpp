@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
+#include <solvers/strings/string_constraint_generator.h>
 
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_root_class.h"
@@ -1050,6 +1051,11 @@ void java_object_factoryt::gen_nondet_init(
     assign.add_source_location() = location;
 
     assignments.add(assign);
+    if(type == java_char_type() && object_factory_parameters.string_printable)
+    {
+      assignments.add(
+        code_assumet(char_range_constraints(expr, printable_char_range)));
+    }
     // add assumes to obey numerical restrictions
     if(type != java_boolean_type() && type != java_char_type())
     {
