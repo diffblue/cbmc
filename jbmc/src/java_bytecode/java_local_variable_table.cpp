@@ -334,18 +334,9 @@ static void populate_predecessor_map(
                 << it->var.start_pc << " len " << it->var.length
                 << "; holes " << it->holes.size() << messaget::eom;
 #endif
-
-    // Find the last instruction within the live range:
-    const auto end_pc = var_with_holes.var.start_pc + var_with_holes.var.length;
-    auto amapit=amap.find(end_pc);
-    auto old_amapit=amapit;
-    --amapit;
-    if(old_amapit==amap.end())
-    {
-      INVARIANT(
-        end_pc>amapit->first,
-        "Instruction live range doesn't align to instruction boundary?");
-    }
+    auto var_live_range = make_range(
+      amap.lower_bound(var_with_holes.var.start_pc),
+      amap.upper_bound(var_with_holes.var.start_pc + var_with_holes.var.length));
 
     // Find vartable entries that flow into this one. For unknown reasons this
     // loop iterates backwards, walking back from the last bytecode in the live
@@ -353,15 +344,15 @@ static void populate_predecessor_map(
     // "amapit" we search for instructions that jump into amapit's address
     // (predecessors)
     auto new_start_pc = var_with_holes.var.start_pc;
-    for(; amapit->first>=var_with_holes.var.start_pc; --amapit)
+    for(auto pair : var_live_range)
     {
-      for(auto pred : amapit->second.predecessors)
+      for(auto pred : pair.second.predecessors)
       {
         // pred is the address (byecode offset) of a instruction that jumps into
-        // amapit. Compute now a pointer to the variable-with-holes whose index
-        // equals that of amapit and which was alive on instruction pred, or a
-        // null pointer if no such variable exists (e.g., because no live range
-        // covers that instruction)
+        // pair.first. Compute now a pointer to the variable-with-holes whose
+        // index equals that of pair.first and which was alive on instruction
+        // pred, or a null pointer if no such variable exists (e.g., because no
+        // live range covers that instruction)
         auto pred_var=
           (pred<live_variable_at_address.size() ?
            live_variable_at_address[pred] :
@@ -375,35 +366,34 @@ static void populate_predecessor_map(
           continue;
         }
         // 2. The predecessor instruction is in no live range among those for
-        // variable slot it->var.index
+        // variable slot pair.var.index
         else if(!pred_var)
         {
           // Check if this is an initializer, and if so expand the live range
           // to include it, but don't check its predecessors:
-          auto inst_before_this=amapit;
+          auto inst_before_this = amap.lower_bound(pair.first);
           INVARIANT(
             inst_before_this!=amap.begin(),
             "we shall not be on the first bytecode of the method");
           --inst_before_this;
-          if(amapit->first!=var_with_holes.var.start_pc || inst_before_this->first!=pred)
+          if(pair.first != var_with_holes.var.start_pc ||
+             inst_before_this->first!=pred)
           {
             // These sorts of infeasible edges can occur because jsr
             // handling is presently vague (any subroutine is assumed to
             // be able to return to any callsite)
             msg.warning() << "Local variable table: ignoring flow from "
                           << "out of range for " << var_with_holes.var.name << ' '
-                          << pred << " -> " << amapit->first
+                          << pred << " -> " << pair.first
                           << messaget::eom;
-            continue;
           }
-          if(!is_store_to_slot(
-               *(inst_before_this->second.source),
-               var_with_holes.var.index))
+          else if(!is_store_to_slot(
+            *(pair.second.source), var_with_holes.var.index))
           {
             msg.warning() << "Local variable table: didn't find initializing "
                           << "store for predecessor of bytecode at address "
-                          << amapit->first << " ("
-                          << amapit->second.predecessors.size()
+                          << pair.first << " ("
+                          << pair.second.predecessors.size()
                           << " predecessors)" << msg.eom;
             throw "local variable table: unexpected live ranges";
           }
@@ -422,8 +412,8 @@ static void populate_predecessor_map(
             msg.warning() << "Local variable table: ignoring flow from "
                           << "clashing variable for "
                           << var_with_holes.var.name << ' ' << pred << " -> "
-                          << amapit->first << messaget::eom;
             continue;
+                          << pair.first << messaget::eom;
           }
           // OK, this is a flow from a similar but
           // distinct entry in the local var table.
