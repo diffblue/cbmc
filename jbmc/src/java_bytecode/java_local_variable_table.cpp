@@ -310,7 +310,7 @@ static void populate_predecessor_map(
   message_handlert &msg_handler)
 {
   messaget msg(msg_handler);
-  for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
+  for(auto it=firstvar; it!=varlimit; ++it)
   {
     // All entries of the "local_variable_table_with_holest" processed in this
     // function concern the same Java Local Variable Table slot/register. This
