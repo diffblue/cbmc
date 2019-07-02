@@ -17,7 +17,9 @@ Author: Diffblue Limited.
 
 #include <java_bytecode/java_bytecode_convert_method_class.h>
 #include <java_bytecode/java_utils.h>
+#include <java_bytecode/java_bytecode_parse_tree.h>
 #include <testing-utils/message.h>
+#include <iostream>
 
 SCENARIO(
   "java_bytecode_convert_bridge_method",
@@ -868,5 +870,80 @@ SCENARIO(
         }
       }
     }
+  }
+}
+
+class java_bytecode_convert_method_unit_testt
+{
+public:
+  static code_blockt convert_instructions(
+    java_bytecode_convert_methodt &converter,
+    const java_bytecode_parse_treet::methodt & method,
+    const java_class_typet::java_lambda_method_handlest &handle)
+  {
+    return converter.convert_instructions(method, handle);
+  }
+
+  static void set_current_method(
+    java_bytecode_convert_methodt &converter,
+    const irep_idt method_name)
+  {
+    converter.current_method = method_name;
+  }
+};
+
+SCENARIO(
+  "java_bytecode_convert_methodt::convert_instructions",
+  "[core][java_bytecode][java_bytecode_convert_method]")
+{
+  symbol_tablet symbol_table;
+  symbol_table.insert([&]{
+    symbolt symbol;
+    symbol.name = "java::array[boolean]";
+    symbol.is_type = true;
+    symbol.type = struct_typet{[&]{
+      struct_union_typet::componentst components;
+      components.emplace_back("length", java_int_type());
+      components.emplace_back("data", pointer_type(java_boolean_type()));
+      return components;
+    }()};
+    return symbol;
+  }());
+  java_string_library_preprocesst string_preprocessing;
+  const class_hierarchyt hierarchy;
+  java_bytecode_convert_methodt converter{
+    symbol_table,
+    null_message_handler,
+    10,
+    true,
+    {},
+    string_preprocessing,
+    hierarchy,
+    true};
+  java_bytecode_parse_treet::methodt method;
+  java_class_typet::java_lambda_method_handlest handle;
+
+  GIVEN("Some bytecode instructions")
+  {
+    method.local_variable_table.emplace_back(
+      java_bytecode_parse_treet::methodt::local_variablet{
+        "a", "description", {}, 0, 1, 1});
+    java_bytecode_convert_method_unit_testt::set_current_method(
+      converter, "java::testMethod");
+    method.add_instruction() =
+      {source_locationt{}, 1, BC_aload_0, std::vector<exprt>{}};
+    method.add_instruction() =
+      {source_locationt{}, 2, BC_arraylength, std::vector<exprt>{}};
+    WHEN("Convert the aload instruction")
+    {
+      const code_blockt result =
+        java_bytecode_convert_method_unit_testt::convert_instructions(
+          converter, method, handle);
+      std::cerr << "result = " << result.pretty() << std::endl;
+    }
+    const code_blockt result =
+      java_bytecode_convert_method_unit_testt::convert_instructions(
+        converter, method, handle);
+    REQUIRE(result.operands().size() == 1);
   }
 }
