@@ -1592,6 +1592,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     else if(bytecode == BC_getfield)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
+      PRECONDITION(can_cast_expr<fieldref_exprt>(arg0));
       results[0] = java_bytecode_promotion(
         to_member(op[0], expr_dynamic_cast<fieldref_exprt>(arg0), ns));
     }
