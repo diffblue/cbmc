@@ -310,8 +310,17 @@ static void populate_predecessor_map(
   message_handlert &msg_handler)
 {
   messaget msg(msg_handler);
-  auto non_parameter_variables = make_range(firstvar, varlimit).filter(
-    [&](const local_variable_with_holest &var_with_holes){
+  auto non_parameter_variables = make_range(firstvar, varlimit)
+    .filter([&](const local_variable_with_holest &var_with_holes){
+      // Check that all entries of the "local_variable_table_with_holest" processed in this
+      // function concern the same Java Local Variable Table slot/register. This
+      // is because "find_initializers()" has already sorted them.
+      INVARIANT(
+        var_with_holes.var.index==firstvar->var.index,
+        "all entries are for the same local variable slot");
+      return true;
+    })
+    .filter([&](const local_variable_with_holest &var_with_holes){
       // Parameters are irrelevant to us and shouldn't be changed. This is because
       // they cannot have live predecessor ranges: they are initialized by the JVM
       // and no other live variable range can flow into them.
@@ -319,14 +328,6 @@ static void populate_predecessor_map(
     });
   for(local_variable_with_holest &var_with_holes : non_parameter_variables)
   {
-    // All entries of the "local_variable_table_with_holest" processed in this
-    // function concern the same Java Local Variable Table slot/register. This
-    // is because "find_initializers()" has already sorted them.
-    INVARIANT(
-      var_with_holes.var.index==firstvar->var.index,
-      "all entries are for the same local variable slot");
-
-
 #ifdef DEBUG
     msg.debug() << "jcm: ppm: processing var idx " << it->var.index
                 << " name '" << it->var.name << "' start-pc "
