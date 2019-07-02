@@ -41,7 +41,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define HELP_STRING_REFINEMENT \
   " --no-refine-strings          turn off string refinement\n" \
-  " --string-printable           restrict to printable strings (experimental)\n" /* NOLINT(*) */ \
+  " --string-printable           restrict to printable strings and characters\n" /* NOLINT(*) */ \
   " --string-non-empty           restrict to non-empty strings (experimental)\n" /* NOLINT(*) */ \
   " --string-input-value st      restrict non-null strings to a fixed value st;\n" /* NOLINT(*) */ \
   "                              the switch can be used multiple times to give\n" /* NOLINT(*) */ \
