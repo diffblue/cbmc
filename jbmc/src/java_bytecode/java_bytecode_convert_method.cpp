@@ -2870,7 +2870,7 @@ static exprt conditional_array_cast(const exprt &expr, char type_char)
 
 exprt java_bytecode_convert_methodt::convert_aload(
   const irep_idt &statement,
-  const exprt::operandst &op) const
+  const exprt::operandst &op)
 {
   const char type_char = statement[0];
   const exprt op_with_right_type = conditional_array_cast(op[0], type_char);
