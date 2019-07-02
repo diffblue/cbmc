@@ -73,7 +73,7 @@ public class JsonGenerator {
 
   public static StaticFieldMap<Object> staticFieldMap(Class<?> clazz) {
     StaticFieldMap<Object> staticFields = new StaticFieldMap<>();
-    for (Field field : getAllStaticFields(clazz)) {
+    for (Field field : getDeclaredStaticFields(clazz)) {
       field.setAccessible(true);
       try {
         if (!field.getName().equals("$assertionsDisabled")) {
@@ -88,19 +88,12 @@ public class JsonGenerator {
     return staticFields;
   }
 
-  public static List<Field> getAllStaticFields(Class<?> clazz) {
+  public static List<Field> getDeclaredStaticFields(Class<?> clazz) {
     List<Field> fields = new ArrayList<>();
-    if (clazz == null) {
-      return fields;
-    }
     for (Field field : clazz.getDeclaredFields()) {
       if ((field.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
         fields.add(field);
       }
-    }
-    fields.addAll(getAllStaticFields(clazz.getSuperclass()));
-    for (Class<?> interfaze : clazz.getInterfaces()) {
-      fields.addAll(getAllStaticFields(interfaze));
     }
     return fields;
   }
