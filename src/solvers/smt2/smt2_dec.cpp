@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2irep.h"
 
+#include <iostream>
+
 std::string smt2_dect::decision_procedure_text() const
 {
   // clang-format off
@@ -120,7 +122,40 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   int res =
     run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
 
-  if(res<0)
+  if(true)
+  {
+    std::string line;
+    std::string lines;
+
+    lines = "result: " + std::to_string(res) + "\n";
+    lines += "------------------------------\n";
+    for(const auto &arg : argv)
+    {
+      lines += arg + " ";
+    }
+    lines += stdin_filename + "\n";
+    lines += "------------------------------\n";
+    std::ifstream stdin_stream(stdin_filename);
+    while(std::getline(stdin_stream, line))
+    {
+      lines += line + "\n";
+    }
+    lines += "------------------------------\n";
+    std::ifstream stdout_stream(temp_file_stdout());
+    while(std::getline(stdout_stream, line))
+    {
+      lines += line + "\n";
+    }
+    lines += "------------------------------\n";
+    std::ifstream stderr_stream(temp_file_stderr());
+    while(std::getline(stderr_stream, line))
+    {
+      lines += line + "\n";
+    }
+    lines += "------------------------------\n";
+    std::cerr << lines;
+  }
+  if(res < 0)
   {
     error() << "error running SMT2 solver" << eom;
     return decision_proceduret::resultt::D_ERROR;
