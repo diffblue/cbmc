@@ -2877,7 +2877,10 @@ exprt java_bytecode_convert_methodt::convert_aload(
   dereference_exprt deref{op_with_right_type};
   deref.set(ID_java_member_access, true);
 
-  member_exprt data_ptr(deref, "data", pointer_type(op_with_right_type.type()));
+  auto java_array_type = type_try_dynamic_cast<struct_tag_typet>(deref.type());
+  INVARIANT(java_array_type, "Java array type should be a struct_tag_typet");
+  member_exprt data_ptr{
+    deref, "data", pointer_type(java_array_element_type(*java_array_type))};
   plus_exprt data_plus_offset{std::move(data_ptr), op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
@@ -2921,7 +2924,10 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   dereference_exprt deref{op_with_right_type};
   deref.set(ID_java_member_access, true);
 
-  member_exprt data_ptr(deref, "data", pointer_type(op_with_right_type.type()));
+  auto java_array_type = type_try_dynamic_cast<struct_tag_typet>(deref.type());
+  INVARIANT(java_array_type, "Java array type should be a struct_tag_typet");
+  member_exprt data_ptr{
+    deref, "data", pointer_type(java_array_element_type(*java_array_type))};
   plus_exprt data_plus_offset{std::move(data_ptr), op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
