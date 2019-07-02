@@ -111,6 +111,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   const namespacet &ns,
   array_poolt &array_pool);
 
+/// Given an exprt and a string representing a character range of the form
+/// [low_char]-[high_char], return an and_exprt that represents restricting
+/// the selection of the character to the range.
+exprt char_range_constraints(const exprt &expr, const std::string &char_range);
+
 string_constraintst add_constraint_on_characters(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &s,
