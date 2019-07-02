@@ -18,4 +18,19 @@ public class Test {
         assert(b);
         return b;
     }
+
+    public static boolean printable_char(char c) {
+      boolean b = c >= ' ' && c <= '~';
+      assert(b);
+      return b;
+    }
+
+    public char charField;
+
+    public boolean test_char_field() {
+      boolean b = charField >= ' ' && charField <= '~';
+      assert(b);
+      return b;
+    }
+
 }
