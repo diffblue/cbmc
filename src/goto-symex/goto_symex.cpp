@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "goto_symex.h"
+
+#include "expr_skeleton.h"
 #include "symex_assign.h"
 
 #include <util/format_expr.h>

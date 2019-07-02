@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/range.h>
 
+#include "expr_skeleton.h"
 #include "symex_assign.h"
 
 static void locality(
