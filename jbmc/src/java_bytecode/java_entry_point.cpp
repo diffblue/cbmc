@@ -351,7 +351,7 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
         init_code,
         symbol_table,
         factory_parameters,
-        lifetimet::AUTOMATIC_LOCAL,
+        lifetimet::DYNAMIC,
         function.location,
         pointer_type_selector,
         message_handler);
