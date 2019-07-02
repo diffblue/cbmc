@@ -1,0 +1,145 @@
+﻿FUNCTION_BLOCK "Arithmetic"
+VERSION : 0.1
+   VAR_TEMP 
+      compResult : Bool;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+      L INT#1000;
+      L INT#500;
+      -I;
+      <>I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      +I;
+      L INT#1500;
+      ==I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L INT#2;
+      *I;
+      L INT#3000;
+      <=I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L INT#3001;
+      <I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L INT#2;
+      /I;
+      L INT#1500;
+      >=I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L INT#1499;
+      >I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+NETWORK
+TITLE = 
+      L DINT#1000;
+      L DINT#500;
+      -D;
+      <>D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      +D;
+      L DINT#1500;
+      ==D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L DINT#2;
+      *D;
+      L DINT#3000;
+      <=D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L DINT#3001;
+      <D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L DINT#2;
+      /D;
+      L DINT#1500;
+      >=D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L DINT#1499;
+      >D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+NETWORK
+TITLE = 
+      L 1000.0;
+      L 500.0;
+      -R;
+      <>R;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      +R;
+      L 1500.0;
+      ==R;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L 2.0;
+      *R;
+      L 3000.0;
+      <=R;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L 3001.0;
+      <R;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L 2.0;
+      /R;
+      L 1500.0;
+      >=R;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+      L 1499.0;
+      >R;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+END_FUNCTION_BLOCK
+

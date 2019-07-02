@@ -1,0 +1,30 @@
+﻿FUNCTION_BLOCK "Sub_DInt"
+VERSION : 0.1
+   VAR_INPUT 
+      in1 : DInt;
+      in2 : DInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      out1 : DInt;
+   END_VAR
+
+   VAR_TEMP 
+      compResult : Bool;
+   END_VAR
+
+BEGIN
+NETWORK
+TITLE = 
+      L #in1;
+      L #in2;
+      -D;
+      T #out1;
+      L DINT#3000;
+      <>D;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+END_FUNCTION_BLOCK
+
