@@ -129,7 +129,9 @@ struct java_bytecode_parse_treet
       std::string descriptor;
       optionalt<std::string> signature;
       std::size_t index;
+      /// First instruction where the variable is live
       std::size_t start_pc;
+      /// Length of the live range
       std::size_t length;
     };
 
