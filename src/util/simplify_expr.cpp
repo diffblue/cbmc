@@ -2598,9 +2598,23 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
           expr.id()==ID_floatbv_div)
-    no_change = simplify_floatbv_op(expr) && no_change;
+  {
+    auto r = simplify_floatbv_op(to_ieee_float_op_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_floatbv_typecast)
-    no_change = simplify_floatbv_typecast(expr) && no_change;
+  {
+    auto r = simplify_floatbv_typecast(to_floatbv_typecast_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_unary_minus)
     no_change = simplify_unary_minus(expr) && no_change;
   else if(expr.id()==ID_unary_plus)
@@ -2632,15 +2646,43 @@ bool simplify_exprt::simplify_node(exprt &expr)
     no_change = simplify_extractbits(to_extractbits_expr(expr)) && no_change;
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
-    no_change = simplify_ieee_float_relation(expr) && no_change;
+  {
+    auto r = simplify_ieee_float_relation(to_binary_relation_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id() == ID_bswap)
     no_change = simplify_bswap(to_bswap_expr(expr)) && no_change;
   else if(expr.id()==ID_isinf)
-    no_change = simplify_isinf(expr) && no_change;
+  {
+    auto r = simplify_isinf(to_unary_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_isnan)
-    no_change = simplify_isnan(expr) && no_change;
+  {
+    auto r = simplify_isnan(to_unary_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_isnormal)
-    no_change = simplify_isnormal(expr) && no_change;
+  {
+    auto r = simplify_isnormal(to_unary_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_abs)
   {
     auto r = simplify_abs(to_abs_expr(expr));
