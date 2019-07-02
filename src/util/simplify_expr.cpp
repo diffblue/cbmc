@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "pointer_offset_sum.h"
+#include "range.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "simplify_utils.h"
@@ -1392,23 +1393,28 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
     return false;
   }
 
+  // this pushes the if-then-else into struct and array constructors
   if(((truevalue.id()==ID_struct && falsevalue.id()==ID_struct) ||
       (truevalue.id()==ID_array && falsevalue.id()==ID_array)) &&
      truevalue.operands().size()==falsevalue.operands().size())
   {
     exprt cond_copy=cond;
     exprt falsevalue_copy=falsevalue;
-    expr.swap(truevalue);
+    exprt truevalue_copy = truevalue;
 
-    exprt::operandst::const_iterator f_it=
-      falsevalue_copy.operands().begin();
-    Forall_operands(it, expr)
+    auto range_false = make_range(falsevalue_copy.operands());
+    auto range_true = make_range(truevalue_copy.operands());
+    auto new_expr = truevalue;
+    new_expr.operands().clear();
+
+    for(const auto &pair : range_true.zip(range_false))
     {
-      if_exprt if_expr(cond_copy, *it, *f_it);
-      it->swap(if_expr);
-      simplify_if(to_if_expr(*it));
-      ++f_it;
+      if_exprt if_expr(cond_copy, pair.first, pair.second);
+      simplify_if(if_expr);
+      new_expr.operands().push_back(std::move(if_expr));
     }
+
+    expr.swap(new_expr);
 
     return false;
   }
