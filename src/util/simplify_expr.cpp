@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "pointer_offset_sum.h"
+#include "range.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "simplify_utils.h"
@@ -990,9 +991,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
 
     if_exprt tmp{if_expr.cond(), tmp_op1_result, tmp_op2_result};
 
-    simplify_if(tmp);
-
-    return tmp;
+    return changed(simplify_if(tmp));
   }
 
   if(pointer.id()==ID_address_of)
@@ -1310,13 +1309,12 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   return result;
 }
 
-bool simplify_exprt::simplify_if(if_exprt &expr)
+NODISCARD simplify_exprt::resultt<>
+simplify_exprt::simplify_if(const if_exprt &expr)
 {
-  exprt &cond=expr.cond();
-  exprt &truevalue=expr.true_case();
-  exprt &falsevalue=expr.false_case();
-
-  bool result=true;
+  const exprt &cond = expr.cond();
+  const exprt &truevalue = expr.true_case();
+  const exprt &falsevalue = expr.false_case();
 
   if(do_simplify_if)
   {
@@ -1332,26 +1330,21 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
       if(truevalue.is_true() && falsevalue.is_false())
       {
         // a?1:0 <-> a
-        exprt tmp;
-        tmp.swap(cond);
-        expr.swap(tmp);
-        return false;
+        return cond;
       }
       else if(truevalue.is_false() && falsevalue.is_true())
       {
         // a?0:1 <-> !a
         exprt tmp = boolean_negate(cond);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
       else if(falsevalue.is_false())
       {
         // a?b:0 <-> a AND b
         and_exprt tmp(cond, truevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
       else if(falsevalue.is_true())
       {
@@ -1360,16 +1353,14 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
         simplify_node(tmp_not_cond);
         or_exprt tmp(tmp_not_cond, truevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
       else if(truevalue.is_true())
       {
         // a?1:b <-> a||(!a && b) <-> a OR b
         or_exprt tmp(cond, falsevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
       else if(truevalue.is_false())
       {
@@ -1378,42 +1369,38 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
         simplify_node(tmp_not_cond);
         and_exprt tmp(tmp_not_cond, falsevalue);
         simplify_node(tmp);
-        expr.swap(tmp);
-        return false;
+        return std::move(tmp);
       }
     }
   }
 
   if(truevalue==falsevalue)
-  {
-    exprt tmp;
-    tmp.swap(truevalue);
-    expr.swap(tmp);
-    return false;
-  }
+    return truevalue;
 
+  // this pushes the if-then-else into struct and array constructors
   if(((truevalue.id()==ID_struct && falsevalue.id()==ID_struct) ||
       (truevalue.id()==ID_array && falsevalue.id()==ID_array)) &&
      truevalue.operands().size()==falsevalue.operands().size())
   {
     exprt cond_copy=cond;
     exprt falsevalue_copy=falsevalue;
-    expr.swap(truevalue);
+    exprt truevalue_copy = truevalue;
 
-    exprt::operandst::const_iterator f_it=
-      falsevalue_copy.operands().begin();
-    Forall_operands(it, expr)
+    auto range_false = make_range(falsevalue_copy.operands());
+    auto range_true = make_range(truevalue_copy.operands());
+    auto new_expr = truevalue;
+    new_expr.operands().clear();
+
+    for(const auto &pair : range_true.zip(range_false))
     {
-      if_exprt if_expr(cond_copy, *it, *f_it);
-      it->swap(if_expr);
-      simplify_if(to_if_expr(*it));
-      ++f_it;
+      new_expr.operands().push_back(
+        simplify_if(if_exprt(cond_copy, pair.first, pair.second)));
     }
 
-    return false;
+    return std::move(new_expr);
   }
 
-  return result;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::get_values(
@@ -1988,8 +1975,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
     if_expr.false_case() =
       simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
-    simplify_if(if_expr);
-    return std::move(if_expr);
+    return simplify_if(if_expr);
   }
 
   const auto el_size = pointer_offset_bits(expr.type(), ns);
@@ -2517,7 +2503,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_ge    || expr.id()==ID_le)
     no_change = simplify_inequality(expr) && no_change;
   else if(expr.id()==ID_if)
-    no_change = simplify_if(to_if_expr(expr)) && no_change;
+  {
+    auto r = simplify_if(to_if_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_lambda)
     no_change = simplify_lambda(expr) && no_change;
   else if(expr.id()==ID_with)

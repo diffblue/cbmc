@@ -243,8 +243,7 @@ simplify_exprt::simplify_pointer_offset(const exprt &expr)
     if_exprt if_expr=lift_if(expr, 0);
     if_expr.true_case() = simplify_pointer_offset(if_expr.true_case());
     if_expr.false_case() = simplify_pointer_offset(if_expr.false_case());
-    simplify_if(if_expr);
-    return if_expr;
+    return changed(simplify_if(if_expr));
   }
 
   if(ptr.type().id()!=ID_pointer)
@@ -577,8 +576,7 @@ simplify_exprt::simplify_is_dynamic_object(const exprt &expr)
     if_exprt if_expr=lift_if(expr, 0);
     if_expr.true_case() = simplify_is_dynamic_object(if_expr.true_case());
     if_expr.false_case() = simplify_is_dynamic_object(if_expr.false_case());
-    simplify_if(if_expr);
-    return std::move(if_expr);
+    return changed(simplify_if(if_expr));
   }
 
   bool no_change = true;

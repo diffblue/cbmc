@@ -102,10 +102,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       }
 
       if_exprt if_expr(equality_expr, with_expr.new_value(), new_index_expr);
-      simplify_if(if_expr);
-
-      expr.swap(if_expr);
-
+      expr = simplify_if(if_expr).expr;
       return false;
     }
   }
