@@ -406,7 +406,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_add(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const plus_exprt operation{accu1, accu2};
+  const plus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -419,7 +419,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_sub(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const minus_exprt operation{accu1, accu2};
+  const minus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -432,7 +432,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_mul(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const mult_exprt operation{accu1, accu2};
+  const mult_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -445,7 +445,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_div(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const div_exprt operation{accu1, accu2};
+  const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -458,7 +458,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_add(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const plus_exprt operation{accu1, accu2};
+  const plus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -471,7 +471,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_sub(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const minus_exprt operation{accu1, accu2};
+  const minus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -484,7 +484,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_mul(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const mult_exprt operation{accu1, accu2};
+  const mult_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -497,7 +497,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_div(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const div_exprt operation{accu1, accu2};
+  const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -510,7 +510,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_add(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const plus_exprt operation{accu1, accu2};
+  const plus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -523,7 +523,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_sub(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const minus_exprt operation{accu1, accu2};
+  const minus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -536,7 +536,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_mul(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const mult_exprt operation{accu1, accu2};
+  const mult_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -549,7 +549,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_div(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const div_exprt operation{accu1, accu2};
+  const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
