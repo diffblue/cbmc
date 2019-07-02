@@ -310,19 +310,20 @@ static void populate_predecessor_map(
   message_handlert &msg_handler)
 {
   messaget msg(msg_handler);
-  for(auto it=firstvar; it!=varlimit; ++it)
+  for(local_variable_with_holest &var_with_holes :
+    make_range(firstvar, varlimit))
   {
     // All entries of the "local_variable_table_with_holest" processed in this
     // function concern the same Java Local Variable Table slot/register. This
     // is because "find_initializers()" has already sorted them.
     INVARIANT(
-      it->var.index==firstvar->var.index,
+      var_with_holes.var.index==firstvar->var.index,
       "all entries are for the same local variable slot");
 
     // Parameters are irrelevant to us and shouldn't be changed. This is because
     // they cannot have live predecessor ranges: they are initialized by the JVM
     // and no other live variable range can flow into them.
-    if(it->is_parameter)
+    if(var_with_holes.is_parameter)
       continue;
 
 #ifdef DEBUG
@@ -333,7 +334,7 @@ static void populate_predecessor_map(
 #endif
 
     // Find the last instruction within the live range:
-    const auto end_pc = it->var.start_pc + it->var.length;
+    const auto end_pc = var_with_holes.var.start_pc + var_with_holes.var.length;
     auto amapit=amap.find(end_pc);
     INVARIANT(
       amapit!=amap.begin(),
@@ -352,8 +353,8 @@ static void populate_predecessor_map(
     // range of variable it to the first one. For each value of the iterator
     // "amapit" we search for instructions that jump into amapit's address
     // (predecessors)
-    auto new_start_pc = it->var.start_pc;
-    for(; amapit->first>=it->var.start_pc; --amapit)
+    auto new_start_pc = var_with_holes.var.start_pc;
+    for(; amapit->first>=var_with_holes.var.start_pc; --amapit)
     {
       for(auto pred : amapit->second.predecessors)
       {
@@ -370,7 +371,7 @@ static void populate_predecessor_map(
         // Three cases are now possible:
         // 1. The predecessor instruction is in the same live range: nothing to
         // do.
-        if(pred_var==&*it)
+        if(pred_var==&var_with_holes)
         {
           continue;
         }
@@ -385,20 +386,20 @@ static void populate_predecessor_map(
             inst_before_this!=amap.begin(),
             "we shall not be on the first bytecode of the method");
           --inst_before_this;
-          if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
+          if(amapit->first!=var_with_holes.var.start_pc || inst_before_this->first!=pred)
           {
             // These sorts of infeasible edges can occur because jsr
             // handling is presently vague (any subroutine is assumed to
             // be able to return to any callsite)
             msg.warning() << "Local variable table: ignoring flow from "
-                          << "out of range for " << it->var.name << ' '
+                          << "out of range for " << var_with_holes.var.name << ' '
                           << pred << " -> " << amapit->first
                           << messaget::eom;
             continue;
           }
           if(!is_store_to_slot(
                *(inst_before_this->second.source),
-               it->var.index))
+               var_with_holes.var.index))
           {
             msg.warning() << "Local variable table: didn't find initializing "
                           << "store for predecessor of bytecode at address "
@@ -413,29 +414,29 @@ static void populate_predecessor_map(
         // same variable slot
         else
         {
-          if(pred_var->var.name!=it->var.name ||
-             pred_var->var.descriptor!=it->var.descriptor)
+          if(pred_var->var.name!=var_with_holes.var.name ||
+             pred_var->var.descriptor!=var_with_holes.var.descriptor)
           {
             // These sorts of infeasible edges can occur because
             // jsr handling is presently vague (any subroutine is
             // assumed to be able to return to any callsite)
             msg.warning() << "Local variable table: ignoring flow from "
                           << "clashing variable for "
-                          << it->var.name << ' ' << pred << " -> "
+                          << var_with_holes.var.name << ' ' << pred << " -> "
                           << amapit->first << messaget::eom;
             continue;
           }
           // OK, this is a flow from a similar but
           // distinct entry in the local var table.
-          predecessor_map[&*it].insert(pred_var);
+          predecessor_map[&var_with_holes].insert(pred_var);
         }
       }
     }
 
     // If a simple pre-block initializer was found,
     // add it to the live range now:
-    it->var.length+=(it->var.start_pc-new_start_pc);
-    it->var.start_pc=new_start_pc;
+    var_with_holes.var.length += (var_with_holes.var.start_pc-new_start_pc);
+    var_with_holes.var.start_pc = new_start_pc;
   }
 }
 
