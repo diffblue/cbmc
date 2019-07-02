@@ -76,6 +76,7 @@ void statement_list_scanner_init()
 %x GRAMMAR
 %x TAG_NAME
 %x TAG_ATTRIBUTES
+%x VERSION_ANNOTATION
 
 %%
 
@@ -88,7 +89,7 @@ void statement_list_scanner_init()
   :=                  { loc(); return TOK_ASSIGNMENT; }
   TAG                 { loc(); BEGIN(TAG_NAME); return TOK_TAG; }
   BEGIN               { loc(); return TOK_BEGIN; }
-  VERSION             { loc(); return TOK_VERSION; }
+  VERSION             { loc(); BEGIN(VERSION_ANNOTATION); return TOK_VERSION; }
   FUNCTION_BLOCK      { loc(); return TOK_FUNCTION_BLOCK; }
   END_FUNCTION_BLOCK  { loc(); return TOK_END_FUNCTION_BLOCK; }
   FUNCTION            { loc(); return TOK_FUNCTION; }
@@ -281,5 +282,19 @@ void statement_list_scanner_init()
   Bool                { loc(); return TOK_BOOL; }
   Real                { loc(); return TOK_REAL; }
   \n                  { BEGIN(TAG_NAME); } 
+}
+
+<VERSION_ANNOTATION>{
+  [\t\r, ]            ;
+  :                   { loc(); return yytext[0]; }
+  [0-9][0-9]?[.][0-9][0-9]? {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) =
+                          convert_version(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_VERSION_VALUE;
+                      }
+  \n                  { BEGIN(GRAMMAR); }
 }
 %%

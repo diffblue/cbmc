@@ -15,6 +15,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <algorithm>
 #include <stdexcept>
+#include <util/arith_tools.h>
 #include <util/std_types.h>
 
 /// Maximum value of integer literals.
@@ -37,6 +38,8 @@ static long long get_literal_value(const std::string &src, unsigned int base)
   std::string::size_type offset = src.find_last_of(PREFIX_SEPARATOR);
   if(offset == std::string::npos)
     offset = 0u;
+  else
+    ++offset;
   const std::string literal{src.substr(offset)};
   return std::stoll(literal, nullptr, base);
 }
@@ -70,7 +73,7 @@ constant_exprt convert_int_dec_literal_value(const std::string &src)
     throw std::out_of_range{OUT_OF_RANGE_MSG};
   }
   if(STL_INT_MIN_VALUE <= literal_value && STL_INT_MAX_VALUE >= literal_value)
-    return constant_exprt(std::to_string(literal_value), get_int_type());
+    return from_integer(literal_value, get_int_type());
   else
     throw std::out_of_range{OUT_OF_RANGE_MSG};
 }
@@ -104,7 +107,7 @@ constant_exprt convert_int_hex_literal_value(const std::string &src)
     throw std::out_of_range{OUT_OF_RANGE_MSG};
   }
   if(STL_INT_MIN_VALUE <= literal_value && STL_INT_MAX_VALUE >= literal_value)
-    return constant_exprt(std::to_string(literal_value), get_int_type());
+    return from_integer(literal_value, get_int_type());
   else
     throw std::out_of_range{OUT_OF_RANGE_MSG};
 }
@@ -138,7 +141,7 @@ constant_exprt convert_int_bit_literal_value(const std::string &src)
     throw std::out_of_range{OUT_OF_RANGE_MSG};
   }
   if(STL_INT_MIN_VALUE <= literal_value && STL_INT_MAX_VALUE >= literal_value)
-    return constant_exprt(std::to_string(literal_value), get_int_type());
+    return from_integer(literal_value, get_int_type());
   else
     throw std::out_of_range{OUT_OF_RANGE_MSG};
 }

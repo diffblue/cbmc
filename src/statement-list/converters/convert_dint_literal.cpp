@@ -14,6 +14,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <algorithm>
 #include <stdexcept>
+#include <util/arith_tools.h>
 #include <util/std_types.h>
 
 /// Minimum value of double integer literals.
@@ -37,7 +38,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 static constant_exprt convert_dint_literal_value(const long long literal_value)
 {
   if(STL_DINT_MIN_VALUE <= literal_value && STL_DINT_MAX_VALUE >= literal_value)
-    return constant_exprt(std::to_string(literal_value), get_dint_type());
+    return from_integer(literal_value, get_dint_type());
   else
     throw std::out_of_range{OUT_OF_RANGE_MSG};
 }
@@ -52,6 +53,8 @@ static long long get_literal_value(const std::string &src, unsigned int base)
   std::string::size_type offset = src.find_last_of(PREFIX_SEPARATOR);
   if(offset == std::string::npos)
     offset = 0u;
+  else
+    ++offset;
   const std::string literal{src.substr(offset)};
   return std::stoll(literal, nullptr, base);
 }

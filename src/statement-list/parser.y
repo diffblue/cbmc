@@ -115,6 +115,7 @@ extern char *yystatement_listtext;
 %token TOK_REAL_LITERAL
 %token TOK_IDENTIFIER
 %token TOK_TITLE_VALUE
+%token TOK_VERSION_VALUE
 %token TOK_LABEL
 
 /*** Priority, associativity, etc. definitions *******************************/
@@ -267,10 +268,9 @@ FB_Decl:
     ;
 
 Version_Label:
-    TOK_VERSION ':' TOK_REAL_LITERAL 
+    TOK_VERSION ':' TOK_VERSION_VALUE
     {
       $$ = $3;
-      parser_stack($$).type().id(ID_statement_list_version);
     }
     ;
 
