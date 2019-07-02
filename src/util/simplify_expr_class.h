@@ -143,7 +143,7 @@ public:
   NODISCARD resultt<> simplify_power(const exprt &);
   NODISCARD resultt<> simplify_bitwise(const exprt &);
   bool simplify_if_preorder(if_exprt &expr);
-  bool simplify_if(if_exprt &expr);
+  NODISCARD resultt<> simplify_if(const if_exprt &);
   bool simplify_bitnot(exprt &expr);
   bool simplify_not(exprt &expr);
   bool simplify_boolean(exprt &expr);

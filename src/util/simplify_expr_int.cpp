@@ -1261,9 +1261,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     if_exprt if_expr=lift_if(expr, 0);
     simplify_inequality(if_expr.true_case());
     simplify_inequality(if_expr.false_case());
-    simplify_if(if_expr);
-    expr.swap(if_expr);
-
+    expr = simplify_if(if_expr).expr;
     return false;
   }
 
@@ -1640,9 +1638,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
     if_exprt if_expr=lift_if(expr, 0);
     simplify_inequality_rhs_is_constant(if_expr.true_case());
     simplify_inequality_rhs_is_constant(if_expr.false_case());
-    simplify_if(if_expr);
-    expr.swap(if_expr);
-
+    expr = simplify_if(if_expr);
     return false;
   }
 
