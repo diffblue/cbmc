@@ -314,87 +314,121 @@ VERIFICATION SUCCESSFUL
 
 ### The memory snapshot harness
 
-The `function-call` harness is used in situations in which we want the analysed
-function to work in arbitrary environment. If we want to analyse a function
-starting from a _real_ program state, we can call the `memory-snapshot` harness
-instead.
+The `function-call` harness is used in situations in which we want to analyze a
+function in an arbitrary environment. If we want to analyze a function starting
+from a _real_ program state, we can use the `memory-snapshot` harness instead.
 
-Furthermore, the program state of interest may be taken at a particular location
-within a function. In that case we do not want the harness to instrument the
-whole function but rather to allow starting the execution from a specific
-initial location (specified via `--initial-location func[:<n>]`). Note that the
-initial location does not have to be the first instruction of a function: we can
-also specify the _location number_ `n` to set the initial location inside our
-function. The _location numbers_ do not have to coincide with the lines of the
-program code. To find the _location number_ run CBMC with
-`--show-goto-functions`. Most commonly, the _location number_ is the instruction
-of the break-point used to extract the program state for the memory snapshot.
+The snapshot of the program state of interest may be taken at a particular
+program location within a function (using the `memory-analyzer` tool). In that
+case we want to generate a harness that behaves as if execution starts at a
+particular program location. The initial program location can be specified via
+the options `--initial-goto-location <function>[:<location-number>]` or
+`--initial-source-location <file>:<line-number>`.
 
 Say we want to check the assertion in the following code:
 
 ```C
 // main.c
 #include <assert.h>
+#include <stdlib.h>
 
-unsigned int x;
-unsigned int y;
+int x;
+int y;
+int z;
 
-unsigned int nondet_int() {
-  unsigned int z;
-  return z;
-}
+// complex function which returns 1
+int get_one()
+{
+  int i;
 
-void checkpoint() {}
-
-unsigned int complex_function_which_returns_one() {
-  unsigned int i = 0;
-  while(++i < 1000001) {
-    if(nondet_int() && ((i & 1) == 1))
+  for(i = 0; i < 100001; i++)
+  {
+    if(rand() && ((i & 1) == 1))
       break;
   }
+
   return i & 1;
 }
 
-void fill_array(unsigned int* arr, unsigned int size) {
-  for (unsigned int i = 0; i < size; i++)
-    arr[i]=nondet_int();
+// return a random value (!= 0)
+int get_random_value()
+{
+  int r;
+  while((r = rand()) == 0) {}
+  return r;
 }
 
-unsigned int array_sum(unsigned int* arr, unsigned int size) {
-  unsigned int sum = 0;
-  for (unsigned int i = 0; i < size; i++)
-    sum += arr[i];
-  return sum;
+int clip(int i)
+{
+  if(i > 99)
+  {
+    i = 99;
+  }
+
+  return i;
 }
 
-const unsigned int array_size = 100000;
+int main()
+{
+  x = get_random_value();
+  y = get_one();
 
-int main() {
-  x = complex_function_which_returns_one();
-  unsigned int large_array[array_size];
-  fill_array(large_array, array_size);
-  y = array_sum(large_array, array_size);
-  checkpoint();
-  assert(y + 2 > x);
+  // snapshot taken here (line 46)
+
+  z = clip(x);
+
+  assert(y + z <= 100);
+
   return 0;
 }
 ```
 
-But are not particularly interested in analysing the complex function, since we
-trust that its implementation is correct. Hence we run the above program
-stopping after the assignments to `x` and `x` and storing the program state,
-e.g. using the `memory-analyzer`, in a JSON file `snapshot.json`. Then run the
-harness and verify the assertion with:
+Assume we are interested in the code represented by the `clip()` function and
+its effect on the assertion below. To that end, we want to take a memory
+snapshot after the calls to `get_random_value()` and `get_one()`.
 
+In order to take the snapshot with `memory-analyzer`, we need to first compile
+the program which `goto-gcc`, which produces a binary containing both native
+machine code and the corresponding goto program:
+
+```sh
+$ goto-gcc -g -o main.gb main.c
 ```
+
+Then we can execute the program with `memory-analyzer` and take a snapshot at
+the specified breakpoint. The variables to be included in the snapshot need to
+be specified via the `--symbols` option.
+
+```sh
+$ memory-analyzer \
+  --breakpoint 46 \
+  --symbols 'x, y, z' \
+  --symtab-snapshot \
+  --json-ui \
+  main.gb \
+  > snapshot.json
+```
+
+We then generate a harness with `goto-harness` that behaves as if execution
+started from the state given by the memory snapshot at the specified program
+location. We further overapproximate the value returned by `get_random_value()`
+by havocking the variable `x`.
+
+```sh
 $ goto-cc -o main.gb main.c
+
 $ goto-harness \
   --harness-function-name harness \
   --harness-type initialise-with-memory-snapshot \
   --memory-snapshot snapshot.json \
-  --initial-location checkpoint \
+  --initial-source-location main.c:46 \
   --havoc-variables x \
   main.gb main-mod.gb
+```
+
+We can now verify the resulting goto program with `cbmc`:
+
+```sh
 $ cbmc --function harness main-mod.gb
 ```
 
@@ -405,7 +439,7 @@ This will result in:
 
 ** Results:
 main.c function main
-[main.assertion.1] line 42 assertion y + 2 > x: SUCCESS
+[main.assertion.1] line 50 assertion y + z <= 100: SUCCESS
 
 ** 0 of 1 failed (1 iterations)
 VERIFICATION SUCCESSFUL

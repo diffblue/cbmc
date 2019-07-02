@@ -2,40 +2,36 @@
 
 ## Memory Analyzer
 
-The memory analyzer is a front-end for running and querying GDB in order to
-obtain a state of the input program. The GDB is not needed to be executed
-directly but is rather used as a back-end for the memory analysis. A common
-application would be to obtain a snapshot of a program under analysis at a
-particular state of execution. Such a snapshot could be useful on its own: to
-query about values of particular variables. Furthermore, since that snapshot is
-a state of a valid concrete execution, it can also be used for subsequent
-analyses.
+The memory analyzer is a front-end that runs and queries GDB in order to obtain
+a snapshot of the state of the input program at a particular program location.
+Such a snapshot could be useful on its own: to check the values of variables at
+a particular program location. Furthermore, since the snapshot is a state of a
+valid concrete execution, it can also be used for subsequent analyses.
 
 ## Usage
 
-We assume that the user wants to inspect a binary executable compiled with
-debugging symbols and a symbol table information understandable by CBMC, e.g.
-(having `goto-gcc` on the `PATH`):
+In order to analyze a program with `memory-analyzer` it needs to be compiled
+with `goto-gcc` (assuming `goto-gcc` is on the `PATH`):
 
 ```sh
 $ goto-gcc -g input_program.c -o input_program_exe
 ```
 
-Calling `goto-gcc` instead of simply compiling with `gcc` produces an ELF binary
-with a goto section that contains the goto model (goto program + symbol table)
-[goto-cc-variants](../goto-cc/variants/).
+Calling `goto-gcc` instead of simply compiling with `gcc` or `goto-cc` produces
+an ELF binary with a goto section that contains the goto model (goto program +
+symbol table) [goto-cc-variants](../goto-cc/variants/).
 
-The memory analyzer supports two workflows to initiate the GDB with user code:
-either to run the code from a core-file or up to a break-point. If the user
-already has a core-file, they can specify it with the option `--core-file cf`.
-If the user knows the point of their program from where they want to run the
-analysis, they can specify it with the option `--breakpoint bp`. Only one of
+The memory analyzer supports two ways of running GDB on the user code: either to
+run the code from a core-file or up to a break-point. If the user already has a
+core-file, they can specify it with the option `--core-file cf`. If the user
+knows the point of their program from where they want to run the analysis, they
+can specify it with the option `--breakpoint bp`. Only one of
 core-file/break-point option can be used.
 
 The tool also expects a comma-separated list of symbols to be analysed
-`--symbols s1, s2, ..`. Given its dependence on GDB, `memory-analyzer` is a
+`--symbols s1, s2, ...`. Given its dependence on GDB, `memory-analyzer` is a
 Unix-only tool. The tool calls `gdb` to obtain the snapshot which is why the
-`-g` option is necessary for the program symbols to be visible.
+`-g` option is necessary when compiling for the program symbols to be visible.
 
 Take for example the following program:
 
@@ -77,11 +73,11 @@ to obtain as output the human readable list of values for each requested symbol:
 ```
 
 The above option is useful for the user and their preliminary analysis but does
-not contain enough information for further computer-based analyses. To that end,
-memory analyzer has an option to request the result to be a snapshot of the
-whole symbol table `--symtab-snapshot`. Finally, to obtain an output in JSON
-format, e.g. for further analyses by `goto-harness` pass the additional option
-`--json-ui`.
+not contain enough information for further automated analyses. To that end,
+memory analyzer has an option for the snapshot to be represented in the format
+of a symbol table (with `--symtab-snapshot`). Finally, to obtain an output in
+JSON format, e.g., for further analyses by `goto-harness` the additional option
+`--json-ui` needs to be passed to `memory-analyzer`.
 
 ```sh
 $ memory-analyzer --symtab-snapshot --json-ui \
