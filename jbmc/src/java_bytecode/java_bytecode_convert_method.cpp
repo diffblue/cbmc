@@ -1328,7 +1328,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
     else if(bytecode == patternt("?astore"))
     {
-      assert(op.size()==3 && results.empty());
+      PRECONDITION(results.empty());
       c = convert_astore(statement, op, i_it->source_location);
     }
     else if(bytecode == patternt("?store") || bytecode == patternt("?store_?"))
@@ -2920,6 +2920,7 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   const exprt::operandst &op,
   const source_locationt &location)
 {
+  PRECONDITION(op.size() == 3);
   const char type_char = statement[0];
   const exprt op_with_right_type = conditional_array_cast(op[0], type_char);
   dereference_exprt deref{op_with_right_type};
