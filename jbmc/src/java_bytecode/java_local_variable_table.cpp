@@ -353,7 +353,7 @@ static void populate_predecessor_map(
         // index equals that of pair.first and which was alive on instruction
         // pred, or a null pointer if no such variable exists (e.g., because no
         // live range covers that instruction)
-        auto pred_var=
+        auto var_with_same_index_and_alive_at_pred =
           (pred<live_variable_at_address.size() ?
            live_variable_at_address[pred] :
            nullptr);
@@ -361,13 +361,13 @@ static void populate_predecessor_map(
         // Three cases are now possible:
         // 1. The predecessor instruction is in the same live range: nothing to
         // do.
-        if(pred_var==&var_with_holes)
+        if(var_with_same_index_and_alive_at_pred==&var_with_holes)
         {
           continue;
         }
         // 2. The predecessor instruction is in no live range among those for
         // variable slot pair.var.index
-        else if(!pred_var)
+        else if(!var_with_same_index_and_alive_at_pred)
         {
           // Check if this is an initializer, and if so expand the live range
           // to include it, but don't check its predecessors:
@@ -404,8 +404,8 @@ static void populate_predecessor_map(
         // same variable slot
         else
         {
-          if(pred_var->var.name!=var_with_holes.var.name ||
-             pred_var->var.descriptor!=var_with_holes.var.descriptor)
+          if(var_with_same_index_and_alive_at_pred->var.name!=var_with_holes.var.name ||
+             var_with_same_index_and_alive_at_pred->var.descriptor!=var_with_holes.var.descriptor)
           {
             // These sorts of infeasible edges can occur because
             // jsr handling is presently vague (any subroutine is
@@ -419,7 +419,7 @@ static void populate_predecessor_map(
           {
             // OK, this is a flow from a similar but
             // distinct entry in the local var table.
-            predecessor_map[&var_with_holes].insert(pred_var);
+            predecessor_map[&var_with_holes].insert(var_with_same_index_and_alive_at_pred);
           }
         }
       }
