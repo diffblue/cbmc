@@ -397,7 +397,8 @@ static void populate_predecessor_map(
                           << " predecessors)" << msg.eom;
             throw "local variable table: unexpected live ranges";
           }
-          new_start_pc=pred;
+          else
+            new_start_pc=pred;
         }
         // 3. Predecessor instruction is a different range associated to the
         // same variable slot
@@ -412,12 +413,14 @@ static void populate_predecessor_map(
             msg.warning() << "Local variable table: ignoring flow from "
                           << "clashing variable for "
                           << var_with_holes.var.name << ' ' << pred << " -> "
-            continue;
                           << pair.first << messaget::eom;
           }
-          // OK, this is a flow from a similar but
-          // distinct entry in the local var table.
-          predecessor_map[&var_with_holes].insert(pred_var);
+          else
+          {
+            // OK, this is a flow from a similar but
+            // distinct entry in the local var table.
+            predecessor_map[&var_with_holes].insert(pred_var);
+          }
         }
       }
     }
