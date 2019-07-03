@@ -1,0 +1,12 @@
+FUTURE
+Test.class
+--function Test.printable_char_array --max-nondet-string-length 100 --string-printable
+^EXIT=10$
+^SIGNAL=0$
+--
+assertion.* file Test.java line 42 .* FAILURE
+--
+Shows that the assertion can be violated when string-printable is not enabled
+for character arrays
+
+The constraint has not been implemented for char arrays.

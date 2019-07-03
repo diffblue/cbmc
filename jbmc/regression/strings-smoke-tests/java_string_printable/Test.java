@@ -33,4 +33,14 @@ public class Test {
       return b;
     }
 
+    public static boolean printable_char_array(char[] c) {
+      if(c.length != 3 || c == null)
+        return false;
+      boolean b0 = c[0] >= ' ' && c[0] <= '~';
+      boolean b1 = c[1] >= ' ' && c[1] <= '~';
+      boolean b2 = c[2] >= ' ' && c[2] <= '~';
+      assert(b0 || b1 || b2);
+      return b0 || b1 || b2;
+    }
+
 }
