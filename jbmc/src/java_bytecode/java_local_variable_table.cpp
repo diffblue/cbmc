@@ -353,10 +353,9 @@ static void populate_predecessor_map(
         // index equals that of pair.first and which was alive on instruction
         // pred, or a null pointer if no such variable exists (e.g., because no
         // live range covers that instruction)
-        auto var_with_same_index_and_alive_at_pred =
-          (pred<live_variable_at_address.size() ?
-           live_variable_at_address[pred] :
-           nullptr);
+        local_variable_with_holest *var_with_same_index_and_alive_at_pred =
+          pred<live_variable_at_address.size() ? live_variable_at_address[pred]
+                                               : nullptr;
 
         // Three cases are now possible:
         // 1. The predecessor instruction is in the same live range: nothing to
