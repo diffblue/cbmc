@@ -43,4 +43,14 @@ public class Test {
       return b0 || b1 || b2;
     }
 
+    public static char charStaticField = 'a';
+
+     public boolean test_char_field_static() {
+      if(charStaticField == 'a')
+        return false;
+      boolean b = charStaticField >= ' ' && charStaticField <= '~';
+      assert(b);
+      return b;
+    }
+
 }
