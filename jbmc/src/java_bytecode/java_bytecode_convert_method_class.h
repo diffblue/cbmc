@@ -504,5 +504,7 @@ protected:
     const source_locationt &location);
 
   codet convert_pop(const irep_idt &statement, const exprt::operandst &op);
+
+  friend class java_bytecode_convert_method_unit_testt;
 };
 #endif

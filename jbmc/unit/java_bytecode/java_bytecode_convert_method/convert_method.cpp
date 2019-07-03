@@ -6,6 +6,7 @@ Author: Diffblue Limited.
 
 \*******************************************************************/
 
+#include <testing-utils/expr_query.h>
 #include <testing-utils/use_catch.h>
 
 #include <util/irep.h>
@@ -14,6 +15,7 @@ Author: Diffblue Limited.
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
 
+#include <java_bytecode/java_bytecode_convert_method_class.h>
 #include <java_bytecode/java_utils.h>
 
 SCENARIO(
@@ -282,6 +284,115 @@ SCENARIO(
       THEN("The method should not be marked as synthetic.")
       {
         REQUIRE(!non_synthetic_method->is_synthetic());
+      }
+    }
+  }
+}
+
+/// Allow access to private methods so that they can be unit tested
+class java_bytecode_convert_method_unit_testt
+{
+public:
+  static exprt
+  convert_aload(const irep_idt &statement, const exprt::operandst &op)
+  {
+    return java_bytecode_convert_methodt::convert_aload(statement, op);
+  }
+};
+
+SCENARIO(
+  "baload byte array",
+  "[core][java_bytecode][java_bytecode_convert_method][convert_aload]")
+{
+  GIVEN("A byte array")
+  {
+    const typet byte_array_type = java_array_type('b');
+    const symbol_exprt byte_array{"byte_array", byte_array_type};
+    const exprt offset = from_integer(1, java_int_type());
+    WHEN("baload is called on the byte array")
+    {
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_aload(
+          "baload", {byte_array, offset});
+      THEN("The Result is of the form `(int)(*(byte_array->data + offset))`")
+      // See \ref java_bytecode_promotion on why we need a typecast to int.
+      {
+        const auto query = make_query(result)
+                             .as<typecast_exprt>()[0]
+                             .as<dereference_exprt>()[0]
+                             .as<plus_exprt>();
+        REQUIRE(query[1].get() == offset);
+        auto member = query[0].as<member_exprt>();
+        REQUIRE(member.get().get_component_name() == "data");
+        REQUIRE(member[0].as<dereference_exprt>()[0].get() == byte_array);
+        REQUIRE(result.type() == java_int_type());
+        // byte_array->data has type *byte
+        REQUIRE(member.get().type() == pointer_type(java_byte_type()));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "baload boolean array",
+  "[core][java_bytecode][java_bytecode_convert_method][convert_aload]")
+{
+  GIVEN("A boolean array")
+  {
+    const typet boolean_array_type = java_array_type('z');
+    const symbol_exprt boolean_array{"boolean_array", boolean_array_type};
+    const exprt offset = from_integer(2, java_int_type());
+    WHEN("baload is called on the byte array")
+    {
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_aload(
+          "baload", {boolean_array, offset});
+      THEN("The result is of the form `(int)(*(boolean_array->data + offset))`")
+      // See \ref java_bytecode_promotion on why we need a typecast to int.
+      {
+        const auto query = make_query(result)
+                             .as<typecast_exprt>()[0]
+                             .as<dereference_exprt>()[0]
+                             .as<plus_exprt>();
+        REQUIRE(query[1].get() == offset);
+        REQUIRE(
+          query[0].as<member_exprt>()[0].as<dereference_exprt>()[0].get() ==
+          boolean_array);
+        // boolean_array->data has type *boolean
+        REQUIRE(
+          query[0].as<member_exprt>().get().type() ==
+          pointer_type(java_boolean_type()));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "iaload int array",
+  "[core][java_bytecode][java_bytecode_convert_method][convert_aload]")
+{
+  GIVEN("An int array")
+  {
+    const typet int_array_type = java_array_type('i');
+    const symbol_exprt int_array{"int_array", int_array_type};
+    const exprt offset = from_integer(2, java_int_type());
+    WHEN("iaload is called on the int array")
+    {
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_aload(
+          "iaload", {int_array, offset});
+      THEN("The result is of the form `*(int_array->data + offset)`")
+      {
+        const auto query =
+          make_query(result).as<dereference_exprt>()[0].as<plus_exprt>();
+        REQUIRE(query[1].get() == offset);
+        REQUIRE(
+          query[0].as<member_exprt>()[0].as<dereference_exprt>()[0].get() ==
+          int_array);
+        // int_array->data has type *int
+        REQUIRE(
+          query[0].as<member_exprt>().get().type() ==
+          pointer_type(java_int_type()));
       }
     }
   }
