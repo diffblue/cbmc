@@ -462,10 +462,10 @@ require_goto_statements::require_entry_point_argument_assignment(
 {
   // Trace the creation of the object that is being supplied as the input
   // argument to the function under test
-  const pointer_assignment_locationt &argument_assignments =
+  const pointer_assignment_locationt argument_assignments =
     find_pointer_assignments(
-      id2string(goto_functionst::entry_point()) + "::" +
-        id2string(argument_name),
+      id2string(goto_functionst::entry_point()) +
+        "::" + id2string(argument_name),
       entry_point_statements);
 
   // There should be at most one assignment to it
