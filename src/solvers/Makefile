@@ -186,6 +186,7 @@ SRC = $(BOOLEFORCE_SRC) \
       sat/pbs_dimacs_cnf.cpp \
       sat/resolution_proof.cpp \
       smt2/letify.cpp \
+      smt2/smt2_ast.cpp \
       smt2/smt2_conv.cpp \
       smt2/smt2_dec.cpp \
       smt2/smt2_format.cpp \
