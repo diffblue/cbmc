@@ -133,7 +133,7 @@ bool ansi_c_entry_point(
     if(matches.empty())
     {
       messaget message(message_handler);
-      message.error() << "main symbol `" << config.main.value() << "' not found"
+      message.error() << "main symbol '" << config.main.value() << "' not found"
                       << messaget::eom;
       return true; // give up
     }
@@ -141,7 +141,7 @@ bool ansi_c_entry_point(
     if(matches.size()>=2)
     {
       messaget message(message_handler);
-      message.error() << "main symbol `" << config.main.value()
+      message.error() << "main symbol '" << config.main.value()
                       << "' is ambiguous" << messaget::eom;
       return true;
     }
@@ -164,7 +164,7 @@ bool ansi_c_entry_point(
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error() << "main symbol `" << id2string(main_symbol)
+    message.error() << "main symbol '" << id2string(main_symbol)
                     << "' has no body" << messaget::eom;
     return false; // give up
   }

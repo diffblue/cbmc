@@ -379,13 +379,12 @@ void linkingt::link_error(
 {
   error().source_location=new_symbol.location;
 
-  error() << "error: " << msg << " `"
-          << old_symbol.display_name()
-          << "'" << '\n';
-  error() << "old definition in module `" << old_symbol.module << "' "
+  error() << "error: " << msg << " '" << old_symbol.display_name() << "'"
+          << '\n';
+  error() << "old definition in module '" << old_symbol.module << "' "
           << old_symbol.location << '\n'
           << type_to_string_verbose(old_symbol) << '\n';
-  error() << "new definition in module `" << new_symbol.module << "' "
+  error() << "new definition in module '" << new_symbol.module << "' "
           << new_symbol.location << '\n'
           << type_to_string_verbose(new_symbol) << eom;
 }
@@ -774,9 +773,10 @@ void linkingt::duplicate_code_symbol(
       // keep the one in old_symbol -- libraries come last!
       warning().source_location=new_symbol.location;
 
-      warning() << "function `" << old_symbol.name << "' in module `"
-        << new_symbol.module << "' is shadowed by a definition in module `"
-        << old_symbol.module << "'" << eom;
+      warning() << "function '" << old_symbol.name << "' in module '"
+                << new_symbol.module
+                << "' is shadowed by a definition in module '"
+                << old_symbol.module << "'" << eom;
     }
     else
       link_error(

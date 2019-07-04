@@ -496,7 +496,7 @@ int jbmc_parse_optionst::doit()
 
     if(!infile)
     {
-      log.error() << "failed to open input file `" << filename << "'"
+      log.error() << "failed to open input file '" << filename << "'"
                   << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
@@ -506,7 +506,7 @@ int jbmc_parse_optionst::doit()
 
     if(language==nullptr)
     {
-      log.error() << "failed to figure out type of file `" << filename << "'"
+      log.error() << "failed to figure out type of file '" << filename << "'"
                   << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }

@@ -353,7 +353,7 @@ void bv_refinementt::check_SAT(approximationt &a)
     UNREACHABLE;
   }
 
-  log.status() << "Found spurious `" << a.as_string() << "' (state "
+  log.status() << "Found spurious '" << a.as_string() << "' (state "
                << a.over_state << ")" << messaget::eom;
 
   progress=true;
@@ -369,7 +369,7 @@ void bv_refinementt::check_UNSAT(approximationt &a)
   if(!this->conflicts_with(a))
     return;
 
-  log.status() << "Found assumption for `" << a.as_string()
+  log.status() << "Found assumption for '" << a.as_string()
                << "' in proof (state " << a.under_state << ")" << messaget::eom;
 
   PRECONDITION(!a.under_assumptions.empty());

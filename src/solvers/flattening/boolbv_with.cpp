@@ -203,7 +203,7 @@ void boolbvt::convert_with_struct(
     {
       DATA_INVARIANT_WITH_DIAGNOSTICS(
         subtype == op2.type(),
-        "with/struct: component `" + id2string(component_name) +
+        "with/struct: component '" + id2string(component_name) +
           "' type does not match",
         irep_pretty_diagnosticst{subtype},
         irep_pretty_diagnosticst{op2.type()});

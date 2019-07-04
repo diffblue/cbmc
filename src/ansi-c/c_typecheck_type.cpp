@@ -297,8 +297,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
     else
     {
       error().source_location=type.source_location();
-      error() << "attribute mode `" << gcc_attr_mode
-              << "' applied to inappropriate type `" << to_string(type) << "'"
+      error() << "attribute mode '" << gcc_attr_mode
+              << "' applied to inappropriate type '" << to_string(type) << "'"
               << eom;
       throw 0;
     }
@@ -613,8 +613,8 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       if(current_symbol.is_static_lifetime)
       {
         error().source_location=current_symbol.location;
-        error() << "array size of static symbol `"
-                << current_symbol.base_name << "' is not constant" << eom;
+        error() << "array size of static symbol '" << current_symbol.base_name
+                << "' is not constant" << eom;
         throw 0;
       }
 
@@ -701,7 +701,7 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   if(!sub_size_expr_opt.has_value())
   {
     error().source_location = source_location;
-    error() << "failed to determine size of vector base type `"
+    error() << "failed to determine size of vector base type '"
             << to_string(subtype) << "'" << eom;
     throw 0;
   }
@@ -713,7 +713,7 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   if(!sub_size.has_value())
   {
     error().source_location=source_location;
-    error() << "failed to determine size of vector base type `"
+    error() << "failed to determine size of vector base type '"
             << to_string(subtype) << "'" << eom;
     throw 0;
   }
@@ -721,7 +721,7 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   if(*sub_size == 0)
   {
     error().source_location=source_location;
-    error() << "type had size 0: `" << to_string(subtype) << "'" << eom;
+    error() << "type had size 0: '" << to_string(subtype) << "'" << eom;
     throw 0;
   }
 
@@ -847,8 +847,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       else if(have_body)
       {
         error().source_location=type.source_location();
-        error() << "redefinition of body of `"
-                << s_it->second.pretty_name << "'" << eom;
+        error() << "redefinition of body of '" << s_it->second.pretty_name
+                << "'" << eom;
         throw 0;
       }
     }
@@ -1507,7 +1507,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   if(s_it == symbol_table.symbols.end())
   {
     error().source_location = type.source_location();
-    error() << "typedef symbol `" << identifier << "' not found" << eom;
+    error() << "typedef symbol '" << identifier << "' not found" << eom;
     throw 0;
   }
 

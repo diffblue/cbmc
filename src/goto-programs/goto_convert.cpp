@@ -162,14 +162,14 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         if(not_prefix)
         {
           debug().source_location = i.source_location;
-          debug() << "encountered goto `" << goto_label
+          debug() << "encountered goto '" << goto_label
                   << "' that enters one or more lexical blocks; "
                   << "omitting constructors and destructors" << eom;
         }
         else
         {
           debug().source_location = i.source_location;
-          debug() << "adding goto-destructor code on jump to `" << goto_label
+          debug() << "adding goto-destructor code on jump to '" << goto_label
                   << "'" << eom;
 
           node_indext end_destruct = intersection_result.common_ancestor;

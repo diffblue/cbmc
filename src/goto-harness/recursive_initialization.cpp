@@ -37,7 +37,7 @@ bool recursive_initialization_configt::handle_option(
     else
     {
       throw invalid_command_line_argument_exceptiont{
-        "failed to convert `" + value + "' to integer",
+        "failed to convert '" + value + "' to integer",
         "--" COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT};
     }
     return true;
@@ -55,7 +55,7 @@ bool recursive_initialization_configt::handle_option(
     else
     {
       throw invalid_command_line_argument_exceptiont{
-        "failed to convert `" + value + "' to integer",
+        "failed to convert '" + value + "' to integer",
         "--" COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT};
     }
     return true;

@@ -62,7 +62,7 @@ exprt c_typecheck_baset::do_initializer_rec(
     to_struct_union_type(full_type).is_incomplete())
   {
     error().source_location = value.source_location();
-    error() << "type `" << to_string(type)
+    error() << "type '" << to_string(type)
             << "' is still incomplete -- cannot initialize" << eom;
     throw 0;
   }
@@ -122,7 +122,7 @@ exprt c_typecheck_baset::do_initializer_rec(
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
-          error() << "cannot zero-initialize array with subtype `"
+          error() << "cannot zero-initialize array with subtype '"
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
         }
@@ -184,7 +184,7 @@ exprt c_typecheck_baset::do_initializer_rec(
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
-          error() << "cannot zero-initialize array with subtype `"
+          error() << "cannot zero-initialize array with subtype '"
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
         }
@@ -199,18 +199,17 @@ exprt c_typecheck_baset::do_initializer_rec(
      to_array_type(full_type).size().is_nil())
   {
     error().source_location = value.source_location();
-    error() << "type `" << to_string(full_type)
-            << "' cannot be initialized with `" << to_string(value)
-            << "'" << eom;
+    error() << "type '" << to_string(full_type)
+            << "' cannot be initialized with '" << to_string(value) << "'"
+            << eom;
     throw 0;
   }
 
   if(value.id()==ID_designated_initializer)
   {
     error().source_location = value.source_location();
-    error() << "type `" << to_string(full_type)
-            << "' cannot be initialized with designated initializer"
-            << eom;
+    error() << "type '" << to_string(full_type)
+            << "' cannot be initialized with designated initializer" << eom;
     throw 0;
   }
 
@@ -324,7 +323,7 @@ void c_typecheck_baset::designator_enter(
       if(!array_size.has_value())
       {
         error().source_location = array_type.size().source_location();
-        error() << "array has non-constant size `"
+        error() << "array has non-constant size '"
                 << to_string(array_type.size()) << "'" << eom;
         throw 0;
       }
@@ -342,7 +341,7 @@ void c_typecheck_baset::designator_enter(
     if(!vector_size.has_value())
     {
       error().source_location = vector_type.size().source_location();
-      error() << "vector has non-constant size `"
+      error() << "vector has non-constant size '"
               << to_string(vector_type.size()) << "'" << eom;
       throw 0;
     }
@@ -410,7 +409,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
           if(!zero.has_value())
           {
             error().source_location = value.source_location();
-            error() << "cannot zero-initialize array with subtype `"
+            error() << "cannot zero-initialize array with subtype '"
                     << to_string(full_type.subtype()) << "'" << eom;
             throw 0;
           }
@@ -480,7 +479,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
-          error() << "cannot zero-initialize union component of type `"
+          error() << "cannot zero-initialize union component of type '"
                   << to_string(component.type()) << "'" << eom;
           throw 0;
         }
@@ -544,7 +543,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
-          error() << "cannot zero-initialize union component of type `"
+          error() << "cannot zero-initialize union component of type '"
                   << to_string(component.type()) << "'" << eom;
           throw 0;
         }
@@ -626,9 +625,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       else
       {
         error().source_location = value.source_location();
-        error() << "cannot initialize type `"
-          << to_string(dest_type) << "' using value `"
-          << to_string(value) << "'" << eom;
+        error() << "cannot initialize type '" << to_string(dest_type)
+                << "' using value '" << to_string(value) << "'" << eom;
         throw 0;
       }
     }
@@ -820,9 +818,9 @@ designatort c_typecheck_baset::make_designator(
         if(!found)
         {
           error().source_location = d_op.source_location();
-          error() << "failed to find struct component `"
-                  << component_name << "' in initialization of `"
-                  << to_string(struct_union_type) << "'" << eom;
+          error() << "failed to find struct component '" << component_name
+                  << "' in initialization of '" << to_string(struct_union_type)
+                  << "'" << eom;
           throw 0;
         }
       }
@@ -830,7 +828,7 @@ designatort c_typecheck_baset::make_designator(
     else
     {
       error().source_location = d_op.source_location();
-      error() << "designated initializers cannot initialize `"
+      error() << "designated initializers cannot initialize '"
               << to_string(full_type) << "'" << eom;
       throw 0;
     }
@@ -863,7 +861,7 @@ exprt c_typecheck_baset::do_initializer_list(
     if(!zero.has_value())
     {
       error().source_location = value.source_location();
-      error() << "cannot zero-initialize `" << to_string(full_type) << "'"
+      error() << "cannot zero-initialize '" << to_string(full_type) << "'"
               << eom;
       throw 0;
     }
@@ -884,7 +882,7 @@ exprt c_typecheck_baset::do_initializer_list(
       if(!zero.has_value())
       {
         error().source_location = value.source_location();
-        error() << "cannot zero-initialize `" << to_string(full_type) << "'"
+        error() << "cannot zero-initialize '" << to_string(full_type) << "'"
                 << eom;
         throw 0;
       }
@@ -918,7 +916,7 @@ exprt c_typecheck_baset::do_initializer_list(
       return do_initializer_rec(value.op0(), type, force_constant);
 
     error().source_location = value.source_location();
-    error() << "cannot initialize `" << to_string(full_type)
+    error() << "cannot initialize '" << to_string(full_type)
             << "' with an initializer list" << eom;
     throw 0;
   }

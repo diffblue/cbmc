@@ -1866,7 +1866,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_constraint_select_one)
   {
     UNEXPECTEDCASE(
-      "smt2_convt::convert_expr: `"+expr.id_string()+
+      "smt2_convt::convert_expr: '" + expr.id_string() +
       "' is not yet supported");
   }
   else if(expr.id() == ID_bswap)

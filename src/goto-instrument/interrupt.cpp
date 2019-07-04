@@ -164,16 +164,17 @@ get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
   }
 
   if(matches.empty())
-    throw "interrupt handler `"+id2string(interrupt_handler)+"' not found";
+    throw "interrupt handler '" + id2string(interrupt_handler) + "' not found";
 
   if(matches.size()>=2)
-    throw "interrupt handler `"+id2string(interrupt_handler)+"' is ambiguous";
+    throw "interrupt handler '" + id2string(interrupt_handler) +
+      "' is ambiguous";
 
   symbol_exprt isr=matches.front();
 
   if(!to_code_type(isr.type()).parameters().empty())
-    throw "interrupt handler `"+id2string(interrupt_handler)+
-          "' must not have parameters";
+    throw "interrupt handler '" + id2string(interrupt_handler) +
+      "' must not have parameters";
 
   return isr;
 }

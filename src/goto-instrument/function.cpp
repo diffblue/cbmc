@@ -53,7 +53,7 @@ code_function_callt function_to_call(
      to_code_type(s_it->second.type).parameters().size()!=1 ||
      to_code_type(s_it->second.type).parameters()[0].type().id()!=ID_pointer)
   {
-    std::string error="function `"+id2string(id)+"' has wrong signature";
+    std::string error = "function '" + id2string(id) + "' has wrong signature";
     throw error;
   }
 

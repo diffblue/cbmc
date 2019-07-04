@@ -36,12 +36,12 @@ void cover_condition_instrumentert::instrument(
     {
       const std::string c_string = from_expr(ns, function_id, c);
 
-      const std::string comment_t = "condition `" + c_string + "' true";
+      const std::string comment_t = "condition '" + c_string + "' true";
       goto_program.insert_before_swap(i_it);
       *i_it = goto_programt::make_assertion(c, source_location);
       initialize_source_location(i_it, comment_t, function_id);
 
-      const std::string comment_f = "condition `" + c_string + "' false";
+      const std::string comment_f = "condition '" + c_string + "' false";
       goto_program.insert_before_swap(i_it);
       *i_it = goto_programt::make_assertion(not_exprt(c), source_location);
       initialize_source_location(i_it, comment_f, function_id);

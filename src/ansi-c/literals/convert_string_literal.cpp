@@ -94,7 +94,7 @@ exprt convert_string_literal(const std::string &src)
     // find start of sequence
     std::size_t j=src.find('"', i);
     if(j==std::string::npos)
-      throw "invalid string constant `"+src+"'";
+      throw "invalid string constant '" + src + "'";
 
     // find end of sequence, considering escaping
     for(++j; j<src.size() && src[j]!='"'; ++j)
@@ -103,7 +103,7 @@ exprt convert_string_literal(const std::string &src)
 
     assert(j<=src.size());
     if(j==src.size())
-      throw "non-terminated string constant `"+src+"'";
+      throw "non-terminated string constant '" + src + "'";
 
     std::string tmp_src=std::string(src, i, j-i+1);
     std::basic_string<unsigned int> tmp_value=

@@ -60,7 +60,7 @@ void symex_assignt::assign_rec(
     }
     else
       throw unsupported_operation_exceptiont(
-        "assign_rec: unexpected assignment to member of `" + type.id_string() +
+        "assign_rec: unexpected assignment to member of '" + type.id_string() +
         "'");
   }
   else if(lhs.id()==ID_if)
@@ -105,7 +105,7 @@ void symex_assignt::assign_rec(
   }
   else
     throw unsupported_operation_exceptiont(
-      "assignment to `" + lhs.id_string() + "' not handled");
+      "assignment to '" + lhs.id_string() + "' not handled");
 }
 
 /// Assignment from the rhs value to the lhs variable

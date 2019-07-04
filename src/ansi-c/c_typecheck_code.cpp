@@ -273,7 +273,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     if(s_it==symbol_table.symbols.end())
     {
       error().source_location = code.source_location();
-      error() << "failed to find decl symbol `" << identifier
+      error() << "failed to find decl symbol '" << identifier
               << "' in symbol table" << eom;
       throw 0;
     }

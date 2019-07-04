@@ -3,9 +3,9 @@ main.c
 --cover mcdc
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 8 function main MC/DC independence condition `!\(x > \(unsigned int\)3\) && !\(y < \(unsigned int\)5\).*: SATISFIED$
-^\[main.coverage.2\] file main.c line 8 function main MC/DC independence condition `y < \(unsigned int\)5 && !\(x > \(unsigned int\)3\).*: SATISFIED$
-^\[main.coverage.3\] file main.c line 8 function main MC/DC independence condition `y < \(unsigned int\)5 && x > \(unsigned int\)3.*: SATISFIED$
+^\[main.coverage.1\] file main.c line 8 function main MC/DC independence condition '!\(x > \(unsigned int\)3\) && !\(y < \(unsigned int\)5\).*: SATISFIED$
+^\[main.coverage.2\] file main.c line 8 function main MC/DC independence condition 'y < \(unsigned int\)5 && !\(x > \(unsigned int\)3\).*: SATISFIED$
+^\[main.coverage.3\] file main.c line 8 function main MC/DC independence condition 'y < \(unsigned int\)5 && x > \(unsigned int\)3.*: SATISFIED$
 ^\*\* .* of .* covered \(100.0%\)$
 --
 ^warning: ignoring

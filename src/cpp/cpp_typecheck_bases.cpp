@@ -56,7 +56,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     if(base_symbol.type.id() != ID_struct)
     {
       error().source_location=name.source_location();
-      error() << "expected struct or class as base, but got `"
+      error() << "expected struct or class as base, but got '"
               << to_string(base_symbol.type) << "'" << eom;
       throw 0;
     }

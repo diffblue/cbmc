@@ -112,7 +112,7 @@ void interpretert::show_state()
 
   if(pc==function->second.body.instructions.end())
   {
-    status() << "End of function `" << function->first << "'\n";
+    status() << "End of function '" << function->first << "'\n";
   }
   else
     function->second.body.output_instruction(

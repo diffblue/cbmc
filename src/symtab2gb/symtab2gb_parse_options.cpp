@@ -45,7 +45,7 @@ static void run_symtab2gb(
   std::ofstream out_file{gb_filename, std::ios::binary};
   if(!out_file.is_open())
   {
-    throw system_exceptiont{"couldn't open output file `" + gb_filename + "'"};
+    throw system_exceptiont{"couldn't open output file '" + gb_filename + "'"};
   }
   std::vector<std::ifstream> symtab_files;
   for(auto const &symtab_filename : symtab_filenames)
@@ -53,7 +53,7 @@ static void run_symtab2gb(
     std::ifstream symtab_file{symtab_filename};
     if(!symtab_file.is_open())
     {
-      throw system_exceptiont{"couldn't open input file `" + symtab_filename +
+      throw system_exceptiont{"couldn't open input file '" + symtab_filename +
                               "'"};
     }
     symtab_files.emplace_back(std::move(symtab_file));
@@ -73,13 +73,13 @@ static void run_symtab2gb(
     if(failed(symtab_language->parse(symtab_file, symtab_filename)))
     {
       throw invalid_source_file_exceptiont{
-        "failed to parse symbol table from file `" + symtab_filename + "'"};
+        "failed to parse symbol table from file '" + symtab_filename + "'"};
     }
     symbol_tablet symtab{};
     if(failed(symtab_language->typecheck(symtab, "<unused>")))
     {
       throw invalid_source_file_exceptiont{
-        "failed to typecheck symbol table from file `" + symtab_filename + "'"};
+        "failed to typecheck symbol table from file '" + symtab_filename + "'"};
     }
     goto_modelt goto_model{};
     goto_model.symbol_table = symtab;

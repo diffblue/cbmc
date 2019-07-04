@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-recursion.*ignored.*[`]f
-recursion.*ignored.*[`]g
+recursion.*ignored.*'f
+recursion.*ignored.*'g
 --
 ^warning: ignoring

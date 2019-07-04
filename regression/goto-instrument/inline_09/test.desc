@@ -7,7 +7,7 @@ main.c
 ^\s*x;$
 ^\s*c;$
 ^\s*a;$
-no body.*[`]f
+no body.*'f
 --
 f\(\)
 ^warning: ignoring

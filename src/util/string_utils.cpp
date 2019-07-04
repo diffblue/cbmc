@@ -112,7 +112,7 @@ void split_string(
   split_string(s, delim, result, strip);
   if(result.size() != 2)
   {
-    throw deserialization_exceptiont{"expected string `" + s +
+    throw deserialization_exceptiont{"expected string '" + s +
                                      "' to contain two substrings "
                                      "delimited by " +
                                      delim + " but has " +

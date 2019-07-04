@@ -40,7 +40,7 @@ void parse_flags(
         curtok.flags.push_back(format_tokent::flag_typet::SIGN); break;
       default:
         throw unsupported_operation_exceptiont(
-          std::string("unsupported format specifier flag: `") + *it + "'");
+          std::string("unsupported format specifier flag: '") + *it + "'");
     }
     it++;
   }
@@ -179,7 +179,7 @@ void parse_conversion_specifier(
 
     default:
       throw unsupported_operation_exceptiont(
-        std::string("unsupported format conversion specifier: `") + *it + "'");
+        std::string("unsupported format conversion specifier: '") + *it + "'");
   }
   it++;
 }

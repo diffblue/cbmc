@@ -268,7 +268,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   {
     INVARIANT(
       !op.empty(),
-      "operator `" + expr.id_string() + "' takes at least one operand");
+      "operator '" + expr.id_string() + "' takes at least one operand");
 
     bvt bv;
 

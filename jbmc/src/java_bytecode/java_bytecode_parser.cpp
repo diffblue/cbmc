@@ -1889,8 +1889,8 @@ java_bytecode_parse(
   if(!in)
   {
     messaget message(message_handler);
-    message.error() << "failed to open input file `"
-                    << file << '\'' << messaget::eom;
+    message.error() << "failed to open input file '" << file << '\''
+                    << messaget::eom;
     return {};
   }
 

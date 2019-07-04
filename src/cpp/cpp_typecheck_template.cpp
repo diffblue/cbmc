@@ -95,7 +95,7 @@ void cpp_typecheckt::typecheck_class_template(
       if(previous.name!=symbol_name || id_set.size()>1)
       {
         error().source_location=cpp_name.source_location();
-        str << "template declaration of `" << base_name.c_str()
+        str << "template declaration of '" << base_name.c_str()
             << " does not match previous declaration\n";
         str << "location of previous definition: " << previous.location;
         throw 0;
@@ -120,10 +120,9 @@ void cpp_typecheckt::typecheck_class_template(
     if(has_body && previous_has_body)
     {
       error().source_location=cpp_name.source_location();
-      error() << "template struct `" << base_name
-              << "' defined previously\n"
-              << "location of previous definition: "
-              << previous_symbol.location << eom;
+      error() << "template struct '" << base_name << "' defined previously\n"
+              << "location of previous definition: " << previous_symbol.location
+              << eom;
       throw 0;
     }
 
@@ -257,7 +256,7 @@ void cpp_typecheckt::typecheck_function_template(
     if(has_value && previous_has_value)
     {
       error().source_location=cpp_name.source_location();
-      error() << "function template symbol `" << base_name
+      error() << "function template symbol '" << base_name
               << "' declared previously\n"
               << "location of previous definition: "
               << previous_symbol->second.location << eom;
@@ -358,24 +357,24 @@ void cpp_typecheckt::typecheck_class_template_member(
   {
     error() << cpp_scopes.current_scope();
     error().source_location=cpp_name.source_location();
-    error() << "class template `"
-            << cpp_name.get_sub().front().get(ID_identifier)
-            << "' not found" << eom;
+    error() << "class template '"
+            << cpp_name.get_sub().front().get(ID_identifier) << "' not found"
+            << eom;
     throw 0;
   }
   else if(id_set.size()>1)
   {
     error().source_location=cpp_name.source_location();
-    error() << "class template `"
-            << cpp_name.get_sub().front().get(ID_identifier)
-            << "' is ambiguous" << eom;
+    error() << "class template '"
+            << cpp_name.get_sub().front().get(ID_identifier) << "' is ambiguous"
+            << eom;
     throw 0;
   }
   else if((*(id_set.begin()))->id_class!=cpp_idt::id_classt::TEMPLATE)
   {
     // std::cerr << *(*id_set.begin()) << '\n';
     error().source_location=cpp_name.source_location();
-    error() << "class template `"
+    error() << "class template '"
             << cpp_name.get_sub().front().get(ID_identifier)
             << "' is not a template" << eom;
     throw 0;
@@ -561,14 +560,13 @@ void cpp_typecheckt::convert_class_template_specialization(
   if(id_set.empty())
   {
     error().source_location=type.source_location();
-    error() << "class template `" << base_name << "' not found" << eom;
+    error() << "class template '" << base_name << "' not found" << eom;
     throw 0;
   }
   else if(id_set.size()>1)
   {
     error().source_location=type.source_location();
-    error() << "class template `" << base_name << "' is ambiguous"
-            << eom;
+    error() << "class template '" << base_name << "' is ambiguous" << eom;
     throw 0;
   }
 
@@ -661,15 +659,13 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     if(id_set.empty())
     {
       error().source_location=cpp_name.source_location();
-      error() << "template function `" << base_name << "' not found"
-              << eom;
+      error() << "template function '" << base_name << "' not found" << eom;
       throw 0;
     }
     else if(id_set.size()>1)
     {
       error().source_location=cpp_name.source_location();
-      error() << "template function `" << base_name
-              << "' is ambiguous" << eom;
+      error() << "template function '" << base_name << "' is ambiguous" << eom;
       throw 0;
     }
 

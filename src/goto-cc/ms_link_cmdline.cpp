@@ -116,7 +116,7 @@ void ms_link_cmdlinet::process_response_file(const std::string &file)
 
   if(!infile)
   {
-    std::cerr << "failed to open response file `" << file << "'\n";
+    std::cerr << "failed to open response file '" << file << "'\n";
     return;
   }
 
@@ -219,7 +219,7 @@ void ms_link_cmdlinet::process_non_link_option(const std::string &s)
       return;
 
   // unrecognized option
-  std::cout << "Warning: uninterpreted non-LINK option `" << s << "'\n";
+  std::cout << "Warning: uninterpreted non-LINK option '" << s << "'\n";
 }
 
 const char *ms_link_options[] = {
@@ -364,5 +364,5 @@ void ms_link_cmdlinet::process_link_option(const std::string &s)
   }
 
   // unrecognized option
-  std::cout << "Warning: uninterpreted LINK option `" << s << "'\n";
+  std::cout << "Warning: uninterpreted LINK option '" << s << "'\n";
 }

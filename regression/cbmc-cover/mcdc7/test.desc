@@ -3,10 +3,10 @@ main.c
 --cover mcdc
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 8 function main decision/condition `x \* 123 > 100.* false: SATISFIED$
-^\[main.coverage.2\] file main.c line 8 function main decision/condition `x \* 123 > 100.* true: SATISFIED$
-^\[main.coverage.3\] file main.c line 8 function main decision/condition `x \* 123 < 0.* false: SATISFIED$
-^\[main.coverage.4\] file main.c line 8 function main decision/condition `x \* 123 < 0.* true: SATISFIED$
+^\[main.coverage.1\] file main.c line 8 function main decision/condition 'x \* 123 > 100.* false: SATISFIED$
+^\[main.coverage.2\] file main.c line 8 function main decision/condition 'x \* 123 > 100.* true: SATISFIED$
+^\[main.coverage.3\] file main.c line 8 function main decision/condition 'x \* 123 < 0.* false: SATISFIED$
+^\[main.coverage.4\] file main.c line 8 function main decision/condition 'x \* 123 < 0.* true: SATISFIED$
 ^\*\* .* of .* covered \(100.0%\)$
 --
 ^warning: ignoring

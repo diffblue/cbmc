@@ -923,17 +923,16 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         {
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
           cpp_typecheck.error().source_location=source_location;
-          cpp_typecheck.error() << "scope `" << final_base_name
-                                << "' not found" << messaget::eom;
+          cpp_typecheck.error()
+            << "scope '" << final_base_name << "' not found" << messaget::eom;
           throw 0;
         }
         else if(id_set.size()>=2)
         {
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
           cpp_typecheck.error().source_location=source_location;
-          cpp_typecheck.error() << "scope `"
-                                << final_base_name << "' is ambiguous"
-                                << messaget::eom;
+          cpp_typecheck.error() << "scope '" << final_base_name
+                                << "' is ambiguous" << messaget::eom;
           throw 0;
         }
 
@@ -995,8 +994,8 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
     cpp_typecheck.error().source_location=source_location;
-    cpp_typecheck.error() << "template scope `" << base_name
-                          << "' not found" << messaget::eom;
+    cpp_typecheck.error() << "template scope '" << base_name << "' not found"
+                          << messaget::eom;
     throw 0;
   }
 
@@ -1024,8 +1023,8 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
     cpp_typecheck.error().source_location=source_location;
-    cpp_typecheck.error() << "template scope `" << base_name
-                          << "' is ambiguous" << messaget::eom;
+    cpp_typecheck.error() << "template scope '" << base_name << "' is ambiguous"
+                          << messaget::eom;
     throw 0;
   }
 
@@ -1197,7 +1196,7 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   if(instance.type.id()!=ID_struct)
   {
     cpp_typecheck.error().source_location=source_location;
-    cpp_typecheck.error() << "template `"
+    cpp_typecheck.error() << "template '"
                       << base_name << "' is not a class" << messaget::eom;
     throw 0;
   }
@@ -1243,9 +1242,8 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   if(id_set.empty())
   {
     cpp_typecheck.error().source_location=source_location;
-    cpp_typecheck.error()
-      << "namespace `"
-      << base_name << "' not found" << messaget::eom;
+    cpp_typecheck.error() << "namespace '" << base_name << "' not found"
+                          << messaget::eom;
     throw 0;
   }
   else if(id_set.size()==1)
@@ -1256,9 +1254,8 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   else
   {
     cpp_typecheck.error().source_location=source_location;
-    cpp_typecheck.error()
-      << "namespace `"
-      << base_name << "' is ambiguous" << messaget::eom;
+    cpp_typecheck.error() << "namespace '" << base_name << "' is ambiguous"
+                          << messaget::eom;
     throw 0;
   }
 }
@@ -1444,22 +1441,18 @@ exprt cpp_typecheck_resolvet::resolve(
 
     if(qualified)
     {
-      cpp_typecheck.error()
-        << "symbol `"
-        << base_name << "' not found";
+      cpp_typecheck.error() << "symbol '" << base_name << "' not found";
 
       if(cpp_typecheck.cpp_scopes.current_scope().is_root_scope())
         cpp_typecheck.error() << " in root scope";
       else
-        cpp_typecheck.error() << " in scope `"
-                              << cpp_typecheck.cpp_scopes.current_scope().prefix
-                              << "'";
+        cpp_typecheck.error()
+          << " in scope '" << cpp_typecheck.cpp_scopes.current_scope().prefix
+          << "'";
     }
     else
     {
-      cpp_typecheck.error()
-        << "symbol `"
-        << base_name << "' is unknown";
+      cpp_typecheck.error() << "symbol '" << base_name << "' is unknown";
     }
 
     cpp_typecheck.error() << messaget::eom;
@@ -1494,9 +1487,8 @@ exprt cpp_typecheck_resolvet::resolve(
 
       cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
       cpp_typecheck.error().source_location=source_location;
-      cpp_typecheck.error()
-        << "template symbol `"
-        << base_name << "' is ambiguous" << messaget::eom;
+      cpp_typecheck.error() << "template symbol '" << base_name
+                            << "' is ambiguous" << messaget::eom;
       throw 0;
     }
 
@@ -1603,16 +1595,14 @@ exprt cpp_typecheck_resolvet::resolve(
     {
       cpp_typecheck.error().source_location=source_location;
       cpp_typecheck.error()
-        << "found no match for symbol `" << base_name
-        << "', candidates are:\n";
+        << "found no match for symbol '" << base_name << "', candidates are:\n";
       show_identifiers(base_name, identifiers, cpp_typecheck.error());
     }
     else
     {
       cpp_typecheck.error().source_location=source_location;
       cpp_typecheck.error()
-        << "symbol `" << base_name
-        << "' does not uniquely resolve:\n";
+        << "symbol '" << base_name << "' does not uniquely resolve:\n";
       show_identifiers(base_name, new_identifiers, cpp_typecheck.error());
 
 #ifdef DEBUG
@@ -1660,7 +1650,7 @@ exprt cpp_typecheck_resolvet::resolve(
 
     cpp_typecheck.error().source_location=result.source_location());
     cpp_typecheck.str
-      << "error: member `" << result.get(ID_component_name)
+      << "error: member '" << result.get(ID_component_name)
       << "' is not accessible";
     throw 0;
     #endif
@@ -1677,9 +1667,8 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.error().source_location=source_location;
 
       cpp_typecheck.error()
-        << "error: expected expression, but got type `"
-        << cpp_typecheck.to_string(result.type()) << "'"
-        << messaget::eom;
+        << "error: expected expression, but got type '"
+        << cpp_typecheck.to_string(result.type()) << "'" << messaget::eom;
 
       throw 0;
     }
@@ -1694,7 +1683,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.error().source_location=source_location;
 
       cpp_typecheck.error()
-        << "error: expected type, but got expression `"
+        << "error: expected type, but got expression '"
         << cpp_typecheck.to_string(result) << "'" << messaget::eom;
 
       throw 0;

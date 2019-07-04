@@ -51,7 +51,7 @@ std::size_t require_one_size_value(
   else
   {
     throw invalid_command_line_argument_exceptiont{
-      "failed to parse `" + string_value + "' as integer", "--" + option};
+      "failed to parse '" + string_value + "' as integer", "--" + option};
   }
 }
 // NOLINTNEXTLINE(readability/namespace)

@@ -663,7 +663,7 @@ int goto_instrument_parse_optionst::doit()
         #endif
         if(!out)
         {
-          log.error() << "failed to write to `" << cmdline.args[1] << "'";
+          log.error() << "failed to write to '" << cmdline.args[1] << "'";
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
         if(is_header)
@@ -840,7 +840,7 @@ int goto_instrument_parse_optionst::doit()
     // write new binary?
     if(cmdline.args.size()==2)
     {
-      log.status() << "Writing GOTO program to `" << cmdline.args[1] << "'"
+      log.status() << "Writing GOTO program to '" << cmdline.args[1] << "'"
                    << messaget::eom;
 
       if(write_goto_binary(cmdline.args[1], goto_model, ui_message_handler))
@@ -927,7 +927,7 @@ void goto_instrument_parse_optionst::do_remove_returns()
 
 void goto_instrument_parse_optionst::get_goto_program()
 {
-  log.status() << "Reading GOTO program from `" << cmdline.args[0] << "'"
+  log.status() << "Reading GOTO program from '" << cmdline.args[0] << "'"
                << messaget::eom;
 
   config.set(cmdline);
@@ -1115,7 +1115,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     do_indirect_call_and_rtti_removal();
 
-    log.status() << "Inlining calls of function `" << function << "'"
+    log.status() << "Inlining calls of function '" << function << "'"
                  << messaget::eom;
 
     if(!cmdline.isset("log"))
@@ -1342,7 +1342,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       }
       else
       {
-        log.error() << "Unknown weak memory model `" << mm << "'"
+        log.error() << "Unknown weak memory model '" << mm << "'"
                     << messaget::eom;
         model=Unknown;
       }

@@ -41,20 +41,18 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     if(namespace_spec.alias().is_not_nil())
     {
       error().source_location=namespace_spec.source_location();
-      error() << "namespace alias `" << final_name
-              << "' previously declared\n"
-              << "location of previous declaration: "
-              << it->second.location << eom;
+      error() << "namespace alias '" << final_name << "' previously declared\n"
+              << "location of previous declaration: " << it->second.location
+              << eom;
       throw 0;
     }
 
     if(it->second.type.id()!=ID_namespace)
     {
       error().source_location=namespace_spec.source_location();
-      error() << "namespace `" << final_name
-              << "' previously declared\n"
-              << "location of previous declaration: "
-              << it->second.location << eom;
+      error() << "namespace '" << final_name << "' previously declared\n"
+              << "location of previous declaration: " << it->second.location
+              << eom;
       throw 0;
     }
 

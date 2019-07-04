@@ -179,8 +179,7 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
 
   if(!infile)
   {
-    std::cerr << "failed to open response file `"
-              << file << "'\n";
+    std::cerr << "failed to open response file '" << file << "'\n";
     return;
   }
 
@@ -285,8 +284,7 @@ void ms_cl_cmdlinet::process_non_cl_option(
       return;
 
   // unrecognized option
-  std::cout << "Warning: uninterpreted non-CL option `"
-            << s << "'\n";
+  std::cout << "Warning: uninterpreted non-CL option '" << s << "'\n";
 }
 
 /// \return none
@@ -501,6 +499,5 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
   }
 
   // unrecognized option
-  std::cout << "Warning: uninterpreted CL option `"
-            << s << "'\n";
+  std::cout << "Warning: uninterpreted CL option '" << s << "'\n";
 }

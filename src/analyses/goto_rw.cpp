@@ -478,7 +478,7 @@ void rw_range_sett::get_objects_address_of(const exprt &object)
     get_objects_rec(get_modet::READ, address_of_exprt(tc.op()));
   }
   else
-    throw "rw_range_sett: address_of `"+object.id_string()+"' not handled";
+    throw "rw_range_sett: address_of '" + object.id_string() + "' not handled";
 }
 
 void rw_range_sett::add(
@@ -595,7 +595,7 @@ void rw_range_sett::get_objects_rec(
       get_objects_rec(mode, *it);
   }
   else
-    throw "rw_range_sett: assignment to `"+expr.id_string()+"' not handled";
+    throw "rw_range_sett: assignment to '" + expr.id_string() + "' not handled";
 }
 
 void rw_range_sett::get_objects_rec(get_modet mode, const exprt &expr)

@@ -1037,7 +1037,7 @@ void value_set_fivrnst::assign_rec(
     assign_rec(lhs.op0(), values_rhs, suffix, ns, true);
   }
   else
-    throw "assign NYI: `"+lhs.id_string()+"'";
+    throw "assign NYI: '" + lhs.id_string() + "'";
 }
 
 void value_set_fivrnst::do_function_call(

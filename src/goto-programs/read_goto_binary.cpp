@@ -72,8 +72,7 @@ static bool read_goto_binary(
 
   if(!in)
   {
-    message.error() << "Failed to open `" << filename << "'"
-                    << messaget::eom;
+    message.error() << "Failed to open '" << filename << "'" << messaget::eom;
     return true;
   }
 
@@ -81,7 +80,7 @@ static bool read_goto_binary(
   in.read(hdr, 8);
   if(!in)
   {
-    message.error() << "Failed to read header from `" << filename << "'"
+    message.error() << "Failed to read header from '" << filename << "'"
                     << messaget::eom;
     return true;
   }

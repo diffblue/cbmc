@@ -39,8 +39,8 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
   if(symbol_table.move(symbol, new_symbol))
   {
     error().source_location=symbol.location;
-    error() << "failed to move symbol `" << symbol.name
-            << "' into symbol table" << eom;
+    error() << "failed to move symbol '" << symbol.name << "' into symbol table"
+            << eom;
     throw 0;
   }
 }
@@ -120,7 +120,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     if(old_it->second.is_type!=symbol.is_type)
     {
       error().source_location=symbol.location;
-      error() << "redeclaration of `" << symbol.display_name()
+      error() << "redeclaration of '" << symbol.display_name()
               << "' as a different kind of symbol" << eom;
       throw 0;
     }
@@ -196,9 +196,8 @@ void c_typecheck_baset::typecheck_redefinition_type(
     else
     {
       error().source_location=new_symbol.location;
-      error() << "conflicting definition of type symbol `"
-              << new_symbol.display_name()
-              << '\'' << eom;
+      error() << "conflicting definition of type symbol '"
+              << new_symbol.display_name() << '\'' << eom;
       throw 0;
     }
   }
@@ -221,9 +220,8 @@ void c_typecheck_baset::typecheck_redefinition_type(
       {
         // arg! new tag type
         error().source_location=new_symbol.location;
-        error() << "conflicting definition of tag symbol `"
-                << new_symbol.display_name()
-                << '\'' << eom;
+        error() << "conflicting definition of tag symbol '"
+                << new_symbol.display_name() << '\'' << eom;
         throw 0;
       }
     }
@@ -247,8 +245,8 @@ void c_typecheck_baset::typecheck_redefinition_type(
       if(follow(new_symbol.type)!=follow(old_symbol.type))
       {
         error().source_location=new_symbol.location;
-        error() << "type symbol `"
-                << new_symbol.display_name() << "' defined twice:\n"
+        error() << "type symbol '" << new_symbol.display_name()
+                << "' defined twice:\n"
                 << "Original: " << to_string(old_symbol.type) << "\n"
                 << "     New: " << to_string(new_symbol.type) << eom;
         throw 0;
@@ -312,8 +310,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_old.id()!=ID_code)
     {
       error().source_location=new_symbol.location;
-      error() << "error: function symbol `"
-              << new_symbol.display_name()
+      error() << "error: function symbol '" << new_symbol.display_name()
               << "' redefined with a different type:\n"
               << "Original: " << to_string(old_symbol.type) << "\n"
               << "     New: " << to_string(new_symbol.type) << eom;
@@ -370,7 +367,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         else
         {
           error().source_location=new_symbol.location;
-          error() << "function body `" << new_symbol.display_name()
+          error() << "function body '" << new_symbol.display_name()
                   << "' defined twice" << eom;
           throw 0;
         }
@@ -437,7 +434,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     else
     {
       error().source_location=new_symbol.location;
-      error() << "symbol `" << new_symbol.display_name()
+      error() << "symbol '" << new_symbol.display_name()
               << "' redefined with a different type:\n"
               << "Original: " << to_string(old_symbol.type) << "\n"
               << "     New: " << to_string(new_symbol.type) << eom;
@@ -475,7 +472,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         else
         {
           warning().source_location=new_symbol.value.find_source_location();
-          warning() << "symbol `" << new_symbol.display_name()
+          warning() << "symbol '" << new_symbol.display_name()
                     << "' already has an initial value" << eom;
         }
       }
@@ -553,7 +550,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     if(labels_defined.find(label.first) == labels_defined.end())
     {
       error().source_location = label.second;
-      error() << "branching label `" << label.first
+      error() << "branching label '" << label.first
               << "' is not defined in function" << eom;
       throw 0;
     }

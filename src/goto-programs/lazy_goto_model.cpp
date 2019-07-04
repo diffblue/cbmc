@@ -147,7 +147,7 @@ void lazy_goto_modelt::initialize(
       if(!infile)
       {
         throw system_exceptiont(
-          "failed to open input file `" + filename + '\'');
+          "failed to open input file '" + filename + '\'');
       }
 
       language_filet &lf=add_language_file(filename);
@@ -156,7 +156,7 @@ void lazy_goto_modelt::initialize(
       if(lf.language==nullptr)
       {
         throw invalid_source_file_exceptiont(
-          "failed to figure out type of file `" + filename + '\'');
+          "failed to figure out type of file '" + filename + '\'');
       }
 
       languaget &language=*lf.language;

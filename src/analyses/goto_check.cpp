@@ -1527,7 +1527,7 @@ void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
 {
   INVARIANT(
     expr.is_boolean(),
-    "`" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
+    "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
 
   guardt old_guard = guard;
 
@@ -1535,7 +1535,7 @@ void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
   {
     INVARIANT(
       op.is_boolean(),
-      "`" + expr.id_string() + "' takes Boolean operands only, but got " +
+      "'" + expr.id_string() + "' takes Boolean operands only, but got " +
         op.pretty());
 
     check_rec(op, guard);

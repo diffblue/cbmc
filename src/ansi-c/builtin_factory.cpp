@@ -81,8 +81,8 @@ static bool convert(
   if(s_it==new_symbol_table.symbols.end())
   {
     messaget message(message_handler);
-    message.error() << "failed to produce built-in symbol `"
-                    << identifier << '\'' << messaget::eom;
+    message.error() << "failed to produce built-in symbol '" << identifier
+                    << '\'' << messaget::eom;
     return true;
   }
 

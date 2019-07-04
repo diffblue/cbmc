@@ -189,7 +189,7 @@ void arrayst::collect_arrays(const exprt &a)
     DATA_INVARIANT(
       to_member_expr(a).struct_op().id() == ID_symbol ||
         to_member_expr(a).struct_op().id() == ID_nondet_symbol,
-      ("unexpected array expression: member with `" + a.op0().id_string() + "'")
+      ("unexpected array expression: member with '" + a.op0().id_string() + "'")
         .c_str());
   }
   else if(a.id()==ID_constant ||
@@ -235,8 +235,8 @@ void arrayst::collect_arrays(const exprt &a)
   {
     DATA_INVARIANT(
       false,
-      ("unexpected array expression (collect_arrays): `"+
-       a.id_string()+"'").c_str());
+      ("unexpected array expression (collect_arrays): '" + a.id_string() + "'")
+        .c_str());
   }
 }
 
@@ -524,8 +524,9 @@ void arrayst::add_array_constraints(
   {
     DATA_INVARIANT(
       false,
-      ("unexpected array expression (add_array_constraints): `"+
-       expr.id_string()+"'").c_str());
+      ("unexpected array expression (add_array_constraints): '" +
+       expr.id_string() + "'")
+        .c_str());
   }
 }
 

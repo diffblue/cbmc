@@ -173,18 +173,18 @@ bool compilet::add_input_file(const std::string &file_name)
   switch(detect_file_type(file_name, get_message_handler()))
   {
   case file_typet::FAILED_TO_OPEN_FILE:
-    warning() << "failed to open file `" << file_name
+    warning() << "failed to open file '" << file_name
               << "': " << std::strerror(errno) << eom;
     return warning_is_fatal; // generously ignore unless -Werror
 
   case file_typet::UNKNOWN:
     // unknown extension, not a goto binary, will silently ignore
-    debug() << "unknown file type in `" << file_name << "'" << eom;
+    debug() << "unknown file type in '" << file_name << "'" << eom;
     return false;
 
   case file_typet::ELF_OBJECT:
     // ELF file without goto-cc section, silently ignore
-    debug() << "ELF object without goto-cc section: `" << file_name << "'"
+    debug() << "ELF object without goto-cc section: '" << file_name << "'"
             << eom;
     return false;
 
@@ -449,7 +449,7 @@ bool compilet::parse(
 
   if(languagep==nullptr)
   {
-    error() << "failed to figure out type of file `" << file_name << "'" << eom;
+    error() << "failed to figure out type of file '" << file_name << "'" << eom;
     return true;
   }
 
@@ -466,7 +466,7 @@ bool compilet::parse(
 
   if(!infile)
   {
-    error() << "failed to open input file `" << file_name << "'" << eom;
+    error() << "failed to open input file '" << file_name << "'" << eom;
     return true;
   }
 
@@ -487,8 +487,8 @@ bool compilet::parse(
 
       if(!ofs.is_open())
       {
-        error() << "failed to open output file `"
-                << cmdline.get_value('o') << "'" << eom;
+        error() << "failed to open output file '" << cmdline.get_value('o')
+                << "'" << eom;
         return true;
       }
     }
@@ -529,8 +529,8 @@ bool compilet::parse_stdin(languaget &language)
 
       if(!ofs.is_open())
       {
-        error() << "failed to open output file `"
-                << cmdline.get_value('o') << "'" << eom;
+        error() << "failed to open output file '" << cmdline.get_value('o')
+                << "'" << eom;
         return true;
       }
     }
@@ -564,8 +564,7 @@ bool compilet::write_bin_object_file(
     src_goto_model.validate();
   }
 
-  statistics() << "Writing binary format object `"
-               << file_name << "'" << eom;
+  statistics() << "Writing binary format object '" << file_name << "'" << eom;
 
   // symbols
   statistics() << "Symbols in table: "
@@ -575,7 +574,7 @@ bool compilet::write_bin_object_file(
 
   if(!outfile.is_open())
   {
-    error() << "Error opening file `" << file_name << "'" << eom;
+    error() << "Error opening file '" << file_name << "'" << eom;
     return true;
   }
 

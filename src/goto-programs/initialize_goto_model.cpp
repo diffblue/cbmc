@@ -43,7 +43,7 @@ static bool generate_entry_point_for_function(
   {
     throw invalid_command_line_argument_exceptiont{
       // NOLINTNEXTLINE(whitespace/braces)
-      std::string{"couldn't find function with name `"} +
+      std::string{"couldn't find function with name '"} +
         id2string(entry_function_name) + "' in symbol table",
       "--function"};
   }
@@ -99,7 +99,7 @@ goto_modelt initialize_goto_model(
       if(!infile)
       {
         throw system_exceptiont(
-          "Failed to open input file `" + filename + '\'');
+          "Failed to open input file '" + filename + '\'');
       }
 
       language_filet &lf=language_files.add_file(filename);
@@ -108,7 +108,7 @@ goto_modelt initialize_goto_model(
       if(lf.language==nullptr)
       {
         throw invalid_source_file_exceptiont(
-          "Failed to figure out type of file `" + filename + '\'');
+          "Failed to figure out type of file '" + filename + '\'');
       }
 
       languaget &language=*lf.language;
@@ -140,7 +140,7 @@ goto_modelt initialize_goto_model(
     if(read_object_and_link(file, goto_model, message_handler))
     {
       throw invalid_source_file_exceptiont(
-        "failed to read object or link in file `" + file + '\'');
+        "failed to read object or link in file '" + file + '\'');
     }
   }
 

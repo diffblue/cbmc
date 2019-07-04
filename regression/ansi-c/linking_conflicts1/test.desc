@@ -4,7 +4,7 @@ other.c
 ^EXIT=(64|1)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
-error: conflicting function declarations `bar'
-error: conflicting function declarations `bar2'
+error: conflicting function declarations 'bar'
+error: conflicting function declarations 'bar2'
 --
 ^warning: ignoring

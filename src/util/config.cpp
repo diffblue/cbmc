@@ -1140,7 +1140,7 @@ static irep_idt string_from_ns(
       to_address_of_expr(tmp).object().id() == ID_index &&
       to_index_expr(to_address_of_expr(tmp).object()).array().id() ==
         ID_string_constant,
-    "symbol table configuration entry `" + id2string(id) +
+    "symbol table configuration entry '" + id2string(id) +
       "' must be a string constant");
 
   return to_index_expr(to_address_of_expr(tmp).object()).array().get(ID_value);
@@ -1161,7 +1161,7 @@ static unsigned unsigned_from_ns(
 
   INVARIANT(
     tmp.id() == ID_constant,
-    "symbol table configuration entry `" + id2string(id) +
+    "symbol table configuration entry '" + id2string(id) +
       "' must be a constant");
 
   mp_integer int_value;
@@ -1169,7 +1169,7 @@ static unsigned unsigned_from_ns(
   const bool error = to_integer(to_constant_expr(tmp), int_value);
   INVARIANT(
     !error,
-    "symbol table configuration entry `" + id2string(id) +
+    "symbol table configuration entry '" + id2string(id) +
       "' must be convertible to mp_integer");
 
   return numeric_cast_v<unsigned>(int_value);

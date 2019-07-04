@@ -354,8 +354,8 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
     if(op[i].type() != op[0].type())
     {
       throw error() << "expression must have operands with matching types,"
-                       " but got `"
-                    << smt2_format(op[0].type()) << "' and `"
+                       " but got '"
+                    << smt2_format(op[0].type()) << "' and '"
                     << smt2_format(op[i].type()) << '\'';
     }
   }
@@ -373,8 +373,8 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
   if(op[0].type() != op[1].type())
   {
     throw error() << "expression must have operands with matching types,"
-                     " but got `"
-                  << smt2_format(op[0].type()) << "' and `"
+                     " but got '"
+                  << smt2_format(op[0].type()) << "' and '"
                   << smt2_format(op[1].type()) << '\'';
   }
 
@@ -829,7 +829,7 @@ exprt smt2_parsert::function_application()
             return symbol_exprt(final_id, id_it->second.type);
         }
 
-        throw error() << "unknown function symbol `" << id << '\'';
+        throw error() << "unknown function symbol '" << id << '\'';
       }
     }
     break;
@@ -935,7 +935,7 @@ exprt smt2_parsert::function_application()
         }
         else
         {
-          throw error() << "unknown indexed identifier `"
+          throw error() << "unknown indexed identifier '"
                         << smt2_tokenizer.get_buffer() << '\'';
         }
       }
@@ -1038,7 +1038,7 @@ exprt smt2_parsert::expression()
         return std::move(symbol_expr);
       }
 
-      throw error() << "unknown expression `" << identifier << '\'';
+      throw error() << "unknown expression '" << identifier << '\'';
     }
   }
 
@@ -1100,7 +1100,7 @@ typet smt2_parsert::sort()
     else if(buffer=="Real")
       return real_typet();
     else
-      throw error() << "unexpected sort: `" << buffer << '\'';
+      throw error() << "unexpected sort: '" << buffer << '\'';
   }
 
   case smt2_tokenizert::OPEN:
@@ -1145,7 +1145,7 @@ typet smt2_parsert::sort()
         return ieee_float_spect(width_f - 1, width_e).to_type();
       }
       else
-        throw error() << "unexpected sort: `" << smt2_tokenizer.get_buffer()
+        throw error() << "unexpected sort: '" << smt2_tokenizer.get_buffer()
                       << '\'';
     }
     else if(smt2_tokenizer.get_buffer() == "Array")
@@ -1166,7 +1166,7 @@ typet smt2_parsert::sort()
         throw error("unsupported array sort");
     }
     else
-      throw error() << "unexpected sort: `" << smt2_tokenizer.get_buffer()
+      throw error() << "unexpected sort: '" << smt2_tokenizer.get_buffer()
                     << '\'';
 
   case smt2_tokenizert::CLOSE:
@@ -1175,7 +1175,7 @@ typet smt2_parsert::sort()
   case smt2_tokenizert::END_OF_FILE:
   case smt2_tokenizert::NONE:
   case smt2_tokenizert::KEYWORD:
-    throw error() << "unexpected token in a sort: `"
+    throw error() << "unexpected token in a sort: '"
                   << smt2_tokenizer.get_buffer() << '\'';
   }
 
@@ -1264,13 +1264,13 @@ void smt2_parsert::command(const std::string &c)
     // declare-var appears to be a synonym for declare-const that is
     // accepted by Z3 and CVC4
     if(next_token() != smt2_tokenizert::SYMBOL)
-      throw error() << "expected a symbol after `" << c << '\'';
+      throw error() << "expected a symbol after '" << c << '\'';
 
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = sort();
 
     if(add_fresh_id(id, exprt(ID_nil, type)) != id)
-      throw error() << "identifier `" << id << "' defined twice";
+      throw error() << "identifier '" << id << "' defined twice";
   }
   else if(c=="declare-fun")
   {
@@ -1281,7 +1281,7 @@ void smt2_parsert::command(const std::string &c)
     auto type = function_signature_declaration();
 
     if(add_fresh_id(id, exprt(ID_nil, type)) != id)
-      throw error() << "identifier `" << id << "' defined twice";
+      throw error() << "identifier '" << id << "' defined twice";
   }
   else if(c == "define-const")
   {
@@ -1296,14 +1296,14 @@ void smt2_parsert::command(const std::string &c)
     // check type of value
     if(value.type() != type)
     {
-      throw error() << "type mismatch in constant definition: expected `"
-                    << smt2_format(type) << "' but got `"
+      throw error() << "type mismatch in constant definition: expected '"
+                    << smt2_format(type) << "' but got '"
                     << smt2_format(value.type()) << '\'';
     }
 
     // create the entry
     if(add_fresh_id(id, value) != id)
-      throw error() << "identifier `" << id << "' defined twice";
+      throw error() << "identifier '" << id << "' defined twice";
   }
   else if(c=="define-fun")
   {
@@ -1327,21 +1327,21 @@ void smt2_parsert::command(const std::string &c)
       const auto &f_signature = to_mathematical_function_type(signature.type);
       if(body.type() != f_signature.codomain())
       {
-        throw error() << "type mismatch in function definition: expected `"
-                      << smt2_format(f_signature.codomain()) << "' but got `"
+        throw error() << "type mismatch in function definition: expected '"
+                      << smt2_format(f_signature.codomain()) << "' but got '"
                       << smt2_format(body.type()) << '\'';
       }
     }
     else if(body.type() != signature.type)
     {
-      throw error() << "type mismatch in function definition: expected `"
-                    << smt2_format(signature.type) << "' but got `"
+      throw error() << "type mismatch in function definition: expected '"
+                    << smt2_format(signature.type) << "' but got '"
                     << smt2_format(body.type()) << '\'';
     }
 
     // create the entry
     if(add_fresh_id(id, body) != id)
-      throw error() << "identifier `" << id << "' defined twice";
+      throw error() << "identifier '" << id << "' defined twice";
 
     id_map.at(id).type = signature.type;
     id_map.at(id).parameters = signature.parameters;

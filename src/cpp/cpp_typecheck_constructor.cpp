@@ -453,8 +453,8 @@ void cpp_typecheckt::check_member_initializers(
       if(!ok)
       {
         error().source_location=member_name.source_location();
-        error() << "invalid initializer `" << member_name.to_string()
-                << "'" << eom;
+        error() << "invalid initializer '" << member_name.to_string() << "'"
+                << eom;
         throw 0;
       }
       return;
@@ -527,7 +527,7 @@ void cpp_typecheckt::check_member_initializers(
     if(!ok)
     {
       error().source_location=member_name.source_location();
-      error() << "invalid initializer `" << base_name << "'" << eom;
+      error() << "invalid initializer '" << base_name << "'" << eom;
       throw 0;
     }
   }

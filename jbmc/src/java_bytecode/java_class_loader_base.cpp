@@ -142,7 +142,7 @@ java_class_loader_baset::get_class_from_jar(
     if(!data.has_value())
       return {};
 
-    debug() << "Getting class `" << class_name << "' from JAR " << jar_file
+    debug() << "Getting class '" << class_name << "' from JAR " << jar_file
             << eom;
 
     std::istringstream istream(*data);
@@ -150,7 +150,7 @@ java_class_loader_baset::get_class_from_jar(
   }
   catch(const std::runtime_error &)
   {
-    error() << "failed to open JAR file `" << jar_file << "'" << eom;
+    error() << "failed to open JAR file '" << jar_file << "'" << eom;
     return {};
   }
 }
@@ -170,7 +170,7 @@ java_class_loader_baset::get_class_from_directory(
 
   if(std::ifstream(full_path))
   {
-    debug() << "Getting class `" << class_name << "' from file " << full_path
+    debug() << "Getting class '" << class_name << "' from file " << full_path
             << eom;
     return java_bytecode_parse(full_path, get_message_handler());
   }

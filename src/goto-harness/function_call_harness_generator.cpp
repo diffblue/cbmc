@@ -136,7 +136,7 @@ void function_call_harness_generatort::handle_option(
       catch(const deserialization_exceptiont &)
       {
         throw invalid_command_line_argument_exceptiont{
-          "`" + array_size_pair +
+          "'" + array_size_pair +
             "' is in an invalid format for array size pair",
           "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT,
           "array_name:size_name, where both are the names of function "
