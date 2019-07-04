@@ -103,10 +103,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_abs(const abs_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_sign(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_sign(const exprt &expr)
 {
   if(expr.operands().size()!=1)
-    return true;
+    return unchanged(expr);
 
   if(expr.op0().is_constant())
   {
@@ -115,8 +115,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op0()));
-      expr = make_boolean_expr(value.get_sign());
-      return false;
+      return make_boolean_expr(value.get_sign());
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
@@ -124,13 +123,12 @@ bool simplify_exprt::simplify_sign(exprt &expr)
       const auto value = numeric_cast<mp_integer>(expr.op0());
       if(value.has_value())
       {
-        expr = make_boolean_expr(*value >= 0);
-        return false;
+        return make_boolean_expr(*value >= 0);
       }
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>
@@ -1546,14 +1544,15 @@ simplify_exprt::resultt<> simplify_exprt::simplify_lambda(const exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_with(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_with(const exprt &expr)
 {
-  bool result=true;
+  bool no_change = true;
 
   if((expr.operands().size()%2)!=1)
-    return true;
+    return unchanged(expr);
 
-  auto &with_expr = to_with_expr(expr);
+  // copy
+  auto with_expr = to_with_expr(expr);
 
   const typet old_type_followed = ns.follow(with_expr.old().type());
 
@@ -1569,17 +1568,20 @@ bool simplify_exprt::simplify_with(exprt &expr)
           with_expr.where().get(ID_component_name);
 
         if(!to_struct_type(old_type_followed).has_component(component_name))
-          return result;
+          return unchanged(expr);
 
         std::size_t number =
           to_struct_type(old_type_followed).component_number(component_name);
+
+        if(number >= with_expr.old().operands().size())
+          return unchanged(expr);
 
         with_expr.old().operands()[number].swap(with_expr.new_value());
 
         with_expr.operands().erase(++with_expr.operands().begin());
         with_expr.operands().erase(++with_expr.operands().begin());
 
-        result=false;
+        no_change = false;
       }
     }
   }
@@ -1588,10 +1590,10 @@ bool simplify_exprt::simplify_with(exprt &expr)
     with_expr.old().type().id() == ID_vector)
   {
     if(
-      expr.op0().id() == ID_array || expr.op0().id() == ID_constant ||
-      expr.op0().id() == ID_vector)
+      with_expr.old().id() == ID_array || with_expr.old().id() == ID_constant ||
+      with_expr.old().id() == ID_vector)
     {
-      while(expr.operands().size()>1)
+      while(with_expr.operands().size() > 1)
       {
         const auto i = numeric_cast<mp_integer>(with_expr.where());
 
@@ -1607,26 +1609,24 @@ bool simplify_exprt::simplify_with(exprt &expr)
         with_expr.operands().erase(++with_expr.operands().begin());
         with_expr.operands().erase(++with_expr.operands().begin());
 
-        result=false;
+        no_change = false;
       }
     }
   }
 
-  if(expr.operands().size()==1)
-  {
-    exprt tmp;
-    tmp.swap(expr.op0());
-    expr.swap(tmp);
-    result=false;
-  }
+  if(with_expr.operands().size() == 1)
+    return with_expr.old();
 
-  return result;
+  if(no_change)
+    return unchanged(expr);
+  else
+    return std::move(with_expr);
 }
 
-bool simplify_exprt::simplify_update(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_update(const exprt &expr)
 {
   if(expr.operands().size()!=3)
-    return true;
+    return unchanged(expr);
 
   // this is to push updates into (possibly nested) constants
 
@@ -1645,10 +1645,10 @@ bool simplify_exprt::simplify_update(exprt &expr)
       const auto i = numeric_cast<mp_integer>(e.op0());
 
       if(!i.has_value())
-        return true;
+        return unchanged(expr);
 
       if(*i < 0 || *i >= value_ptr->operands().size())
-        return true;
+        return unchanged(expr);
 
       value_ptr = &value_ptr->operands()[numeric_cast_v<std::size_t>(*i)];
     }
@@ -1660,20 +1660,18 @@ bool simplify_exprt::simplify_update(exprt &expr)
       const struct_typet &value_ptr_struct_type =
         to_struct_type(value_ptr_type);
       if(!value_ptr_struct_type.has_component(component_name))
-        return true;
+        return unchanged(expr);
       auto &designator_as_struct_expr = to_struct_expr(*value_ptr);
       value_ptr = &designator_as_struct_expr.component(component_name, ns);
       CHECK_RETURN(value_ptr->is_not_nil());
     }
     else
-      return true; // give up, unknown designator
+      return unchanged(expr); // give up, unknown designator
   }
 
   // found, done
   *value_ptr=to_update_expr(expr).new_value();
-  expr.swap(updated_value);
-
-  return false;
+  return updated_value;
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
@@ -2603,8 +2601,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
   {
-    if(!simplify_inequality(expr))
-      r = changed(expr);
+    r = simplify_inequality(expr);
   }
   else if(expr.id()==ID_if)
   {
@@ -2616,23 +2613,19 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_with)
   {
-    if(!simplify_with(expr))
-      r = changed(expr);
+    r = simplify_with(expr);
   }
   else if(expr.id()==ID_update)
   {
-    if(!simplify_update(expr))
-      r = changed(expr);
+    r = simplify_update(expr);
   }
   else if(expr.id()==ID_index)
   {
-    if(!simplify_index(expr))
-      r = changed(expr);
+    r = simplify_index(expr);
   }
   else if(expr.id()==ID_member)
   {
-    if(!simplify_member(expr))
-      r = changed(expr);
+    r = simplify_member(expr);
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
@@ -2782,8 +2775,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_sign)
   {
-    if(!simplify_sign(expr))
-      r = changed(expr);
+    r = simplify_sign(expr);
   }
   else if(expr.id() == ID_popcount)
   {

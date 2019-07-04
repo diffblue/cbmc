@@ -147,19 +147,19 @@ public:
   NODISCARD resultt<> simplify_bitnot(const exprt &);
   NODISCARD resultt<> simplify_not(const exprt &);
   NODISCARD resultt<> simplify_boolean(const exprt &);
-  bool simplify_inequality(exprt &expr);
+  NODISCARD resultt<> simplify_inequality(const exprt &);
   NODISCARD resultt<>
   simplify_ieee_float_relation(const binary_relation_exprt &);
   NODISCARD resultt<> simplify_lambda(const exprt &);
-  bool simplify_with(exprt &expr);
-  bool simplify_update(exprt &expr);
-  bool simplify_index(exprt &expr);
-  bool simplify_member(exprt &expr);
+  NODISCARD resultt<> simplify_with(const exprt &);
+  NODISCARD resultt<> simplify_update(const exprt &);
+  NODISCARD resultt<> simplify_index(const exprt &);
+  NODISCARD resultt<> simplify_member(const exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
   NODISCARD resultt<> simplify_pointer_object(const exprt &);
   NODISCARD resultt<> simplify_object_size(const exprt &);
-  bool simplify_dynamic_size(exprt &expr);
+  NODISCARD resultt<> simplify_dynamic_size(const exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const exprt &expr);
   NODISCARD resultt<> simplify_is_invalid_pointer(const exprt &expr);
   NODISCARD resultt<> simplify_same_object(const exprt &);
@@ -175,7 +175,7 @@ public:
   NODISCARD resultt<> simplify_isnan(const unary_exprt &);
   NODISCARD resultt<> simplify_isnormal(const unary_exprt &);
   NODISCARD resultt<> simplify_abs(const abs_exprt &);
-  bool simplify_sign(exprt &expr);
+  NODISCARD resultt<> simplify_sign(const exprt &);
   NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
   NODISCARD resultt<> simplify_complex(const exprt &);
 

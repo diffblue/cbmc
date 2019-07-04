@@ -521,7 +521,7 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
   }
 
   expr.operands() = std::move(new_inequality_ops);
-  simplify_inequality(expr);
+  expr = simplify_inequality(expr);
   return false;
 }
 

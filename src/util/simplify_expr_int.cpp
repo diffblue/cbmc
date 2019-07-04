@@ -1220,39 +1220,39 @@ simplify_exprt::resultt<> simplify_exprt::simplify_bitnot(const exprt &expr)
 }
 
 /// simplifies inequalities !=, <=, <, >=, >, and also ==
-bool simplify_exprt::simplify_inequality(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality(const exprt &expr)
 {
-  exprt::operandst &operands=expr.operands();
+  const exprt::operandst &operands = expr.operands();
 
   if(expr.type().id()!=ID_bool)
-    return true;
+    return unchanged(expr);
 
   if(operands.size()!=2)
-    return true;
+    return unchanged(expr);
 
   exprt tmp0=expr.op0();
   exprt tmp1=expr.op1();
 
   // types must match
   if(tmp0.type() != tmp1.type())
-    return true;
+    return unchanged(expr);
 
   // if rhs is ID_if (and lhs is not), swap operands for == and !=
   if((expr.id()==ID_equal || expr.id()==ID_notequal) &&
      tmp0.id()!=ID_if &&
      tmp1.id()==ID_if)
   {
-    expr.op0().swap(expr.op1());
-    return simplify_inequality(expr);
+    auto new_expr = expr;
+    new_expr.op0().swap(new_expr.op1());
+    return simplify_inequality(new_expr); // recursive call
   }
 
   if(tmp0.id()==ID_if && tmp0.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    simplify_inequality(if_expr.true_case());
-    simplify_inequality(if_expr.false_case());
-    expr = simplify_if(if_expr).expr;
-    return false;
+    if_expr.true_case() = simplify_inequality(if_expr.true_case());
+    if_expr.false_case() = simplify_inequality(if_expr.false_case());
+    return changed(simplify_if(if_expr));
   }
 
   // see if we are comparing pointers that are address_of
@@ -1261,12 +1261,24 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       (tmp1.id()==ID_address_of ||
        (tmp1.id()==ID_typecast && tmp1.op0().id()==ID_address_of)) &&
       (expr.id()==ID_equal || expr.id()==ID_notequal))
-    return simplify_inequality_address_of(expr);
+  {
+    exprt tmp = expr;
+    if(simplify_inequality_address_of(tmp))
+      return unchanged(expr);
+    else
+      return std::move(tmp);
+  }
 
   if(tmp0.id()==ID_pointer_object &&
      tmp1.id()==ID_pointer_object &&
      (expr.id()==ID_equal || expr.id()==ID_notequal))
-    return simplify_inequality_pointer_object(expr);
+  {
+    exprt tmp = expr;
+    if(simplify_inequality_pointer_object(tmp))
+      return unchanged(expr);
+    else
+      return std::move(tmp);
+  }
 
   if(tmp0.type().id()==ID_c_enum_tag)
     tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
@@ -1280,36 +1292,50 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   // are _both_ constant?
   if(tmp0_const && tmp1_const)
   {
-    return simplify_inequality_both_constant(expr);
+    exprt tmp = expr;
+    if(simplify_inequality_both_constant(tmp))
+      return unchanged(expr);
+    else
+      return std::move(tmp);
   }
   else if(tmp0_const)
   {
     // we want the constant on the RHS
 
-    if(expr.id()==ID_ge)
-      expr.id(ID_le);
-    else if(expr.id()==ID_le)
-      expr.id(ID_ge);
-    else if(expr.id()==ID_gt)
-      expr.id(ID_lt);
-    else if(expr.id()==ID_lt)
-      expr.id(ID_gt);
+    exprt new_expr = expr;
 
-    expr.op0().swap(expr.op1());
+    if(expr.id()==ID_ge)
+      new_expr.id(ID_le);
+    else if(expr.id()==ID_le)
+      new_expr.id(ID_ge);
+    else if(expr.id()==ID_gt)
+      new_expr.id(ID_lt);
+    else if(expr.id()==ID_lt)
+      new_expr.id(ID_gt);
+
+    new_expr.op0().swap(new_expr.op1());
 
     // RHS is constant, LHS is not
-    simplify_inequality_rhs_is_constant(expr);
-    return false;
+    simplify_inequality_rhs_is_constant(new_expr);
+    return std::move(new_expr);
   }
   else if(tmp1_const)
   {
     // RHS is constant, LHS is not
-    return simplify_inequality_rhs_is_constant(expr);
+    exprt tmp = expr;
+    if(simplify_inequality_rhs_is_constant(tmp))
+      return unchanged(expr);
+    else
+      return std::move(tmp);
   }
   else
   {
     // both are not constant
-    return simplify_inequality_no_constant(expr);
+    exprt tmp = expr;
+    if(simplify_inequality_no_constant(tmp))
+      return unchanged(expr);
+    else
+      return std::move(tmp);
   }
 }
 
@@ -1608,7 +1634,7 @@ bool simplify_exprt::simplify_inequality_no_constant(exprt &expr)
       // remove zeros
       simplify_node(expr.op0());
       simplify_node(expr.op1());
-      simplify_inequality(expr); // recursive call
+      expr = simplify_inequality(expr); // recursive call
       return false;
     }
   }
@@ -1696,7 +1722,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
           expr.op1()=from_integer(0, expr.op0().type());
         else
           expr.op1().type()=expr.op0().type();
-        simplify_inequality(expr); // do again!
+        expr = simplify_inequality(expr); // do again!
         return false;
       }
     }
@@ -1738,7 +1764,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
         expr.op1()=from_integer(i, expr.op1().type());
 
         expr.op0() = simplify_plus(to_plus_expr(expr.op0()));
-        simplify_inequality(expr);
+        expr = simplify_inequality(expr);
         return false;
       }
     }

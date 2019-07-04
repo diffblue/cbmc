@@ -15,13 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string_constant.h"
 
-bool simplify_exprt::simplify_index(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
 {
   bool no_change = true;
 
+  // copy
+  auto index_expr = to_index_expr(expr);
+
+  // references
+  auto &index = index_expr.index();
+  auto &array = index_expr.array();
+
   // extra arithmetic optimizations
-  const exprt &index=to_index_expr(expr).index();
-  const exprt &array=to_index_expr(expr).array();
 
   if(index.id()==ID_div &&
      index.operands().size()==2)
@@ -31,7 +36,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
        index.op0().op1()==index.op1())
     {
       exprt tmp=index.op0().op0();
-      expr.op1()=tmp;
+      index = tmp;
       no_change = false;
     }
     else if(index.op0().id()==ID_mult &&
@@ -39,24 +44,23 @@ bool simplify_exprt::simplify_index(exprt &expr)
             index.op0().op0()==index.op1())
     {
       exprt tmp=index.op0().op1();
-      expr.op1()=tmp;
+      index = tmp;
       no_change = false;
     }
   }
 
-  if(array.id()==ID_lambda)
+  if(array.id() == ID_lambda)
   {
     // simplify (lambda i: e)(x) to e[i/x]
 
     const auto &comprehension = to_array_comprehension_expr(array);
 
-    if(expr.op1().type() == comprehension.arg().type())
+    if(index.type() == comprehension.arg().type())
     {
       exprt tmp = comprehension.body();
-      replace_expr(comprehension.arg(), expr.op1(), tmp);
-      expr.swap(tmp);
-      simplify_rec(expr);
-      return false;
+      replace_expr(comprehension.arg(), index, tmp);
+      simplify_rec(tmp);
+      return std::move(tmp);
     }
   }
   else if(array.id()==ID_with)
@@ -64,53 +68,45 @@ bool simplify_exprt::simplify_index(exprt &expr)
     // we have (a WITH [i:=e])[j]
 
     if(array.operands().size() != 3)
-      return true;
+      return unchanged(expr);
 
     const auto &with_expr = to_with_expr(array);
 
-    if(with_expr.where() == expr.op1())
+    if(with_expr.where() == index)
     {
       // simplify (e with [i:=v])[i] to v
-      exprt tmp = with_expr.new_value();
-      expr.swap(tmp);
-      return false;
+      return with_expr.new_value();
     }
     else
     {
       // Turn (a with i:=x)[j] into (i==j)?x:a[j].
       // watch out that the type of i and j might be different.
       const exprt rhs_casted =
-        typecast_exprt::conditional_cast(with_expr.where(), expr.op1().type());
+        typecast_exprt::conditional_cast(with_expr.where(), index.type());
 
-      equal_exprt equality_expr(expr.op1(), rhs_casted);
+      exprt equality_expr = simplify_inequality(equal_exprt(index, rhs_casted));
 
-      simplify_inequality(equality_expr);
-
-      index_exprt new_index_expr(with_expr.old(), expr.op1(), expr.type());
-
-      simplify_index(new_index_expr); // recursive call
+      exprt new_index_expr = simplify_index(index_exprt(
+        with_expr.old(), index, index_expr.type())); // recursive call
 
       if(equality_expr.is_true())
       {
-        expr = with_expr.new_value();
-        return false;
+        return with_expr.new_value();
       }
       else if(equality_expr.is_false())
       {
-        expr.swap(new_index_expr);
-        return false;
+        return new_index_expr;
       }
 
       if_exprt if_expr(equality_expr, with_expr.new_value(), new_index_expr);
-      expr = simplify_if(if_expr).expr;
-      return false;
+      return simplify_if(if_expr).expr;
     }
   }
   else if(
     array.id() == ID_constant || array.id() == ID_array ||
     array.id() == ID_vector)
   {
-    const auto i = numeric_cast<mp_integer>(expr.op1());
+    const auto i = numeric_cast<mp_integer>(index);
 
     if(!i.has_value())
     {
@@ -122,14 +118,12 @@ bool simplify_exprt::simplify_index(exprt &expr)
     else
     {
       // ok
-      exprt tmp = array.operands()[numeric_cast_v<std::size_t>(*i)];
-      expr.swap(tmp);
-      return false;
+      return array.operands()[numeric_cast_v<std::size_t>(*i)];
     }
   }
   else if(array.id()==ID_string_constant)
   {
-    const auto i = numeric_cast<mp_integer>(expr.op1());
+    const auto i = numeric_cast<mp_integer>(index);
 
     const std::string &value = id2string(to_string_constant(array).get_value());
 
@@ -145,18 +139,14 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // terminating zero?
       const char v =
         (*i == value.size()) ? 0 : value[numeric_cast_v<std::size_t>(*i)];
-      exprt tmp=from_integer(v, expr.type());
-      expr.swap(tmp);
-      return false;
+      return from_integer(v, index_expr.type());
     }
   }
   else if(array.id()==ID_array_of)
   {
     if(array.operands().size()==1)
     {
-      exprt tmp=array.op0();
-      expr.swap(tmp);
-      return false;
+      return array.op0();
     }
   }
   else if(array.id() == ID_array_list)
@@ -168,9 +158,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       simplify(tmp_index);
       if(tmp_index==index)
       {
-        exprt tmp=array.operands()[i*2+1];
-        expr.swap(tmp);
-        return false;
+        return array.operands()[i * 2 + 1];
       }
     }
   }
@@ -190,7 +178,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
       auto sub_size = pointer_offset_size(*subtype, ns);
       if(!sub_size.has_value())
-        return true;
+        return unchanged(expr);
 
       // add offset to index
       mult_exprt offset(from_integer(*sub_size, array.op1().type()), index);
@@ -199,11 +187,10 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
       exprt result_expr(array.id(), expr.type());
       result_expr.add_to_operands(array.op0(), final_offset);
-      expr.swap(result_expr);
 
-      simplify_rec(expr);
+      simplify_rec(result_expr);
 
-      return false;
+      return std::move(result_expr);
     }
   }
   else if(array.id()==ID_if)
@@ -214,13 +201,16 @@ bool simplify_exprt::simplify_index(exprt &expr)
     index_exprt idx_false=to_index_expr(expr);
     idx_false.array()=if_expr.false_case();
 
-    to_index_expr(expr).array()=if_expr.true_case();
+    index_expr.array() = if_expr.true_case();
 
-    expr=if_exprt(cond, expr, idx_false, expr.type());
-    simplify_rec(expr);
+    exprt result = if_exprt(cond, index_expr, idx_false, expr.type());
+    simplify_rec(result);
 
-    return false;
+    return std::move(result);
   }
 
-  return no_change;
+  if(no_change)
+    return unchanged(expr);
+  else
+    return std::move(index_expr);
 }
