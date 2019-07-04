@@ -339,6 +339,17 @@ public:
   {
     return converter.convert_load(index, type_char, address);
   }
+
+  static code_blockt convert_store(
+    java_bytecode_convert_methodt &converter,
+    const irep_idt &statement,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    const java_bytecode_convert_methodt::method_offsett address,
+    const source_locationt &location)
+  {
+    return converter.convert_store(statement, arg0, op, address, location);
+  }
 };
 
 SCENARIO(
@@ -792,6 +803,69 @@ SCENARIO(
         REQUIRE(result.type() == java_int_type());
         REQUIRE(
           make_query(result).as<typecast_exprt>()[0].get() == boolean_var);
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "convert store",
+  "[core][java_bytecode][java_bytecode_convert_method][convert_store]")
+{
+  symbol_tablet symbol_table;
+  java_string_library_preprocesst string_preprocess;
+  const class_hierarchyt class_hierarchy{};
+  const std::size_t max_array_length = 10;
+  const bool throw_assertion_error = true;
+  const bool threading_support = false;
+  java_bytecode_convert_methodt converter{symbol_table,
+                                          null_message_handler,
+                                          max_array_length,
+                                          throw_assertion_error,
+                                          {},
+                                          string_preprocess,
+                                          class_hierarchy,
+                                          threading_support};
+
+  GIVEN("An int_array variable")
+  {
+    const source_locationt location;
+    const typet int_array_type = java_array_type('i');
+    const symbol_exprt int_array{"int_array", int_array_type};
+    const symbol_exprt int_array_copy{"int_array_copy", int_array_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter,
+      variable_index,
+      int_array_copy,
+      start_pc,
+      length,
+      is_parameter,
+      {});
+    WHEN("astore is called on the int array")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const code_blockt result_code =
+        java_bytecode_convert_method_unit_testt::convert_store(
+          converter, "astore", index_expr, {int_array}, 0, location);
+
+      THEN(
+        "The result is one assignment of the form "
+        "`int_array_copy = int_array`")
+      {
+        REQUIRE(result_code.statements().size() == 1);
+        auto assign_query =
+          make_query(result_code.statements()[0]).as<code_assignt>();
+        REQUIRE(can_cast_expr<symbol_exprt>(assign_query[0].get()));
+        REQUIRE(assign_query[1].get() == int_array);
+        THEN("Left-hand-side has type int array")
+        {
+          REQUIRE(assign_query[0].get().type() == int_array_type);
+        }
       }
     }
   }
