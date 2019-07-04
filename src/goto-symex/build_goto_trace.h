@@ -17,6 +17,41 @@ Date: July 2005
 #include "symex_target_equation.h"
 #include "goto_symex_state.h"
 
+typedef std::function<bool(
+  symex_target_equationt::SSA_stepst::const_iterator,
+  const decision_proceduret &)>
+  ssa_step_predicatet;
+
+struct goto_tracert
+{
+  goto_tracert(
+    const symex_target_equationt &target,
+    const decision_proceduret &decision_procedure,
+    const namespacet &ns)
+    : target(target), decision_procedure(decision_procedure), ns(ns)
+  {
+  }
+
+  goto_tracet build_trace(const ssa_step_predicatet &is_last_step_to_keep);
+
+private:
+  const symex_target_equationt &target;
+  const decision_proceduret &decision_procedure;
+  const namespacet &ns;
+
+  typedef symex_target_equationt::SSA_stepst::const_iterator ssa_step_iteratort;
+  typedef std::map<mp_integer, std::vector<ssa_step_iteratort>> time_mapt;
+  time_mapt time_map;
+  ssa_step_iteratort last_step_to_keep = target.SSA_steps.end();
+  bool last_step_was_kept = false;
+
+  void
+  fill_trace_step(const SSA_stept &SSA_step, goto_trace_stept &goto_trace_step);
+  void sort_steps(const ssa_step_predicatet &is_last_step_to_keep);
+
+  void step_shared(mp_integer &current_time, const ssa_step_iteratort &it);
+};
+
 /// Build a trace by going through the steps of \p target and stopping at the
 /// first failing assertion
 /// \param target: SSA form of the program
@@ -42,11 +77,6 @@ void build_goto_trace(
   const decision_proceduret &decision_procedure,
   const namespacet &ns,
   goto_tracet &goto_trace);
-
-typedef std::function<bool(
-  symex_target_equationt::SSA_stepst::const_iterator,
-  const decision_proceduret &)>
-  ssa_step_predicatet;
 
 /// Build a trace by going through the steps of \p target and stopping after
 /// the step matching a given condition

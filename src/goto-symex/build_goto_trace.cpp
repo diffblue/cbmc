@@ -201,28 +201,114 @@ replace_nondet_in_type(exprt &expr, const decision_proceduret &solver)
     replace_nondet_in_type(sub, solver);
 }
 
-void build_goto_trace(
-  const symex_target_equationt &target,
-  ssa_step_predicatet is_last_step_to_keep,
-  const decision_proceduret &decision_procedure,
-  const namespacet &ns,
-  goto_tracet &goto_trace)
+goto_tracet
+goto_tracert::build_trace(const ssa_step_predicatet &is_last_step_to_keep)
 {
-  // We need to re-sort the steps according to their clock.
-  // Furthermore, read-events need to occur before write
-  // events with the same clock.
+  last_step_to_keep = target.SSA_steps.end();
+  last_step_was_kept = false;
 
-  typedef symex_target_equationt::SSA_stepst::const_iterator ssa_step_iteratort;
-  typedef std::map<mp_integer, std::vector<ssa_step_iteratort>> time_mapt;
-  time_mapt time_map;
+  sort_steps(is_last_step_to_keep);
 
-  mp_integer current_time=0;
+  INVARIANT(
+    last_step_to_keep == target.SSA_steps.end() || last_step_was_kept,
+    "last step in SSA trace to keep must not be filtered out as a sync "
+    "instruction, not-taken branch, PHI node, or similar");
 
-  ssa_step_iteratort last_step_to_keep = target.SSA_steps.end();
-  bool last_step_was_kept = false;
+  goto_tracet goto_trace{};
+  for(const auto &time_and_ssa_step : time_map)
+  {
+    unsigned step_nr = 0;
+    for(const auto ssa_step_it : time_and_ssa_step.second)
+    {
+      goto_trace.steps.push_back(goto_trace_stept{});
+      goto_trace_stept &goto_trace_step = goto_trace.steps.back();
+      fill_trace_step(*ssa_step_it, goto_trace_step);
+      goto_trace_step.step_nr = ++step_nr;
+      if(ssa_step_it == last_step_to_keep)
+        return goto_trace;
+    }
+  }
+  return goto_trace;
+}
 
-  // First sort the SSA steps by time, in the process dropping steps
-  // we definitely don't want to retain in the final trace:
+void goto_tracert::fill_trace_step(
+  const SSA_stept &SSA_step,
+  goto_trace_stept &goto_trace_step)
+{
+  goto_trace_step.thread_nr = SSA_step.source.thread_nr;
+  goto_trace_step.pc = SSA_step.source.pc;
+  goto_trace_step.function_id = SSA_step.source.function_id;
+  if(SSA_step.is_assert())
+  {
+    goto_trace_step.comment = SSA_step.comment;
+    goto_trace_step.property_id = SSA_step.get_property_id();
+  }
+  goto_trace_step.type = SSA_step.type;
+  goto_trace_step.hidden = SSA_step.hidden;
+  goto_trace_step.format_string = SSA_step.format_string;
+  goto_trace_step.io_id = SSA_step.io_id;
+  goto_trace_step.formatted = SSA_step.formatted;
+  goto_trace_step.called_function = SSA_step.called_function;
+  goto_trace_step.function_arguments = SSA_step.converted_function_arguments;
+
+  for(auto &arg : goto_trace_step.function_arguments)
+    arg = decision_procedure.get(arg);
+
+  // update internal field for specific variables in the counterexample
+  update_internal_field(SSA_step, goto_trace_step, ns);
+
+  goto_trace_step.assignment_type =
+    (SSA_step.is_assignment() &&
+     (SSA_step.assignment_type ==
+        symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER ||
+      SSA_step.assignment_type ==
+        symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER))
+      ? goto_trace_stept::assignment_typet::ACTUAL_PARAMETER
+      : goto_trace_stept::assignment_typet::STATE;
+
+  if(SSA_step.original_full_lhs.is_not_nil())
+  {
+    goto_trace_step.full_lhs = build_full_lhs_rec(
+      decision_procedure,
+      ns,
+      SSA_step.original_full_lhs,
+      SSA_step.ssa_full_lhs);
+    replace_nondet_in_type(goto_trace_step.full_lhs, decision_procedure);
+  }
+
+  if(SSA_step.ssa_full_lhs.is_not_nil())
+  {
+    goto_trace_step.full_lhs_value =
+      decision_procedure.get(SSA_step.ssa_full_lhs);
+    simplify(goto_trace_step.full_lhs_value, ns);
+    replace_nondet_in_type(goto_trace_step.full_lhs_value, decision_procedure);
+  }
+
+  for(const auto &j : SSA_step.converted_io_args)
+  {
+    if(j.is_constant() || j.id() == ID_string_constant)
+    {
+      goto_trace_step.io_args.push_back(j);
+    }
+    else
+    {
+      exprt tmp = decision_procedure.get(j);
+      goto_trace_step.io_args.push_back(tmp);
+    }
+  }
+
+  if(SSA_step.is_assert() || SSA_step.is_assume() || SSA_step.is_goto())
+  {
+    goto_trace_step.cond_expr = SSA_step.cond_expr;
+
+    goto_trace_step.cond_value =
+      decision_procedure.get(SSA_step.cond_handle).is_true();
+  }
+}
+
+void goto_tracert::sort_steps(const ssa_step_predicatet &is_last_step_to_keep)
+{
+  mp_integer current_time = 0;
 
   for(ssa_step_iteratort it = target.SSA_steps.begin();
       it != target.SSA_steps.end();
@@ -240,8 +326,7 @@ void build_goto_trace(
     if(!decision_procedure.get(SSA_step.guard_handle).is_true())
       continue;
 
-    if(it->is_constraint() ||
-       it->is_spawn())
+    if(it->is_constraint() || it->is_spawn())
       continue;
     else if(it->is_atomic_begin())
     {
@@ -249,62 +334,23 @@ void build_goto_trace(
       // a shared read or write (if there is none, the time will be
       // reverted to the time before entering the atomic section); we thus
       // use a temporary negative time slot to gather all events
-      current_time*=-1;
+      current_time *= -1;
       continue;
     }
-    else if(it->is_shared_read() || it->is_shared_write() ||
-            it->is_atomic_end())
+    else if(
+      it->is_shared_read() || it->is_shared_write() || it->is_atomic_end())
     {
-      mp_integer time_before=current_time;
-
-      if(it->is_shared_read() || it->is_shared_write())
-      {
-        // these are just used to get the time stamp -- the clock type is
-        // computed to be of the minimal necessary size, but we don't need to
-        // know it to get the value so just use typeless
-        exprt clock_value = decision_procedure.get(
-          symbol_exprt::typeless(partial_order_concurrencyt::rw_clock_id(it)));
-
-        const auto cv = numeric_cast<mp_integer>(clock_value);
-        if(cv.has_value())
-          current_time = *cv;
-        else
-          current_time = 0;
-      }
-      else if(it->is_atomic_end() && current_time<0)
-        current_time*=-1;
-
-      INVARIANT(current_time >= 0, "time keeping inconsistency");
-      // move any steps gathered in an atomic section
-
-      if(time_before<0)
-      {
-        time_mapt::const_iterator time_before_steps_it =
-          time_map.find(time_before);
-
-        if(time_before_steps_it != time_map.end())
-        {
-          std::vector<ssa_step_iteratort> &current_time_steps =
-            time_map[current_time];
-
-          current_time_steps.insert(
-            current_time_steps.end(),
-            time_before_steps_it->second.begin(),
-            time_before_steps_it->second.end());
-
-          time_map.erase(time_before_steps_it);
-        }
-      }
-
+      step_shared(current_time, it);
       continue;
     }
 
     // drop PHI and GUARD assignments altogether
-    if(it->is_assignment() &&
-       (SSA_step.assignment_type==
-          symex_target_equationt::assignment_typet::PHI ||
-        SSA_step.assignment_type==
-          symex_target_equationt::assignment_typet::GUARD))
+    if(
+      it->is_assignment() &&
+      (SSA_step.assignment_type ==
+         symex_target_equationt::assignment_typet::PHI ||
+       SSA_step.assignment_type ==
+         symex_target_equationt::assignment_typet::GUARD))
     {
       continue;
     }
@@ -316,102 +362,68 @@ void build_goto_trace(
 
     time_map[current_time].push_back(it);
   }
+}
 
-  INVARIANT(
-    last_step_to_keep == target.SSA_steps.end() || last_step_was_kept,
-    "last step in SSA trace to keep must not be filtered out as a sync "
-    "instruction, not-taken branch, PHI node, or similar");
+void goto_tracert::step_shared(
+  mp_integer &current_time,
+  const ssa_step_iteratort &it)
+{
+  mp_integer time_before = current_time;
 
-  // Now build the GOTO trace, ordered by time, then by SSA trace order.
-
-  // produce the step numbers
-  unsigned step_nr = 0;
-
-  for(const auto &time_and_ssa_steps : time_map)
+  if(it->is_shared_read() || it->is_shared_write())
   {
-    for(const auto ssa_step_it : time_and_ssa_steps.second)
+    // these are just used to get the time stamp -- the clock type is
+    // computed to be of the minimal necessary size, but we don't need to
+    // know it to get the value so just use typeless
+    exprt clock_value = decision_procedure.get(
+      symbol_exprt::typeless(partial_order_concurrencyt::rw_clock_id(it)));
+
+    const auto cv = numeric_cast<mp_integer>(clock_value);
+    if(cv.has_value())
+      current_time = *cv;
+    else
+      current_time = 0;
+  }
+  else if(it->is_atomic_end() && current_time < 0)
+    current_time *= -1;
+
+  INVARIANT(current_time >= 0, "time keeping inconsistency");
+  // move any steps gathered in an atomic section
+
+  if(time_before < 0)
+  {
+    time_mapt::const_iterator time_before_steps_it = time_map.find(time_before);
+
+    if(time_before_steps_it != time_map.end())
     {
-      const auto &SSA_step = *ssa_step_it;
-      goto_trace.steps.push_back(goto_trace_stept());
-      goto_trace_stept &goto_trace_step = goto_trace.steps.back();
+      std::vector<ssa_step_iteratort> &current_time_steps =
+        time_map[current_time];
 
-      goto_trace_step.step_nr = ++step_nr;
+      current_time_steps.insert(
+        current_time_steps.end(),
+        time_before_steps_it->second.begin(),
+        time_before_steps_it->second.end());
 
-      goto_trace_step.thread_nr = SSA_step.source.thread_nr;
-      goto_trace_step.pc = SSA_step.source.pc;
-      goto_trace_step.function_id = SSA_step.source.function_id;
-      if(SSA_step.is_assert())
-      {
-        goto_trace_step.comment = SSA_step.comment;
-        goto_trace_step.property_id = SSA_step.get_property_id();
-      }
-      goto_trace_step.type = SSA_step.type;
-      goto_trace_step.hidden = SSA_step.hidden;
-      goto_trace_step.format_string = SSA_step.format_string;
-      goto_trace_step.io_id = SSA_step.io_id;
-      goto_trace_step.formatted = SSA_step.formatted;
-      goto_trace_step.called_function = SSA_step.called_function;
-      goto_trace_step.function_arguments = SSA_step.converted_function_arguments;
-
-      for(auto &arg : goto_trace_step.function_arguments)
-        arg = decision_procedure.get(arg);
-
-      // update internal field for specific variables in the counterexample
-      update_internal_field(SSA_step, goto_trace_step, ns);
-
-      goto_trace_step.assignment_type =
-        (SSA_step.is_assignment() &&
-         (SSA_step.assignment_type ==
-            symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER ||
-          SSA_step.assignment_type ==
-            symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER))
-          ? goto_trace_stept::assignment_typet::ACTUAL_PARAMETER
-          : goto_trace_stept::assignment_typet::STATE;
-
-      if(SSA_step.original_full_lhs.is_not_nil())
-      {
-        goto_trace_step.full_lhs = build_full_lhs_rec(
-          decision_procedure,
-          ns,
-          SSA_step.original_full_lhs,
-          SSA_step.ssa_full_lhs);
-        replace_nondet_in_type(goto_trace_step.full_lhs, decision_procedure);
-      }
-
-      if(SSA_step.ssa_full_lhs.is_not_nil())
-      {
-        goto_trace_step.full_lhs_value =
-          decision_procedure.get(SSA_step.ssa_full_lhs);
-        simplify(goto_trace_step.full_lhs_value, ns);
-        replace_nondet_in_type(
-          goto_trace_step.full_lhs_value, decision_procedure);
-      }
-
-      for(const auto &j : SSA_step.converted_io_args)
-      {
-        if(j.is_constant() || j.id() == ID_string_constant)
-        {
-          goto_trace_step.io_args.push_back(j);
-        }
-        else
-        {
-          exprt tmp = decision_procedure.get(j);
-          goto_trace_step.io_args.push_back(tmp);
-        }
-      }
-
-      if(SSA_step.is_assert() || SSA_step.is_assume() || SSA_step.is_goto())
-      {
-        goto_trace_step.cond_expr = SSA_step.cond_expr;
-
-        goto_trace_step.cond_value =
-          decision_procedure.get(SSA_step.cond_handle).is_true();
-      }
-
-      if(ssa_step_it == last_step_to_keep)
-        return;
+      time_map.erase(time_before_steps_it);
     }
   }
+}
+
+void build_goto_trace(
+  const symex_target_equationt &target,
+  const decision_proceduret &decision_procedure,
+  const namespacet &ns,
+  goto_tracet &goto_trace)
+{
+  const auto is_failed_assertion_step =
+    [](
+      symex_target_equationt::SSA_stepst::const_iterator step,
+      const decision_proceduret &dp) {
+      return step->is_assert() && dp.get(step->cond_handle).is_false();
+    };
+
+  goto_tracert goto_tracer{target, decision_procedure, ns};
+  goto_trace = goto_tracer.build_trace(is_failed_assertion_step);
 }
 
 void build_goto_trace(
@@ -426,24 +438,17 @@ void build_goto_trace(
       symex_target_equationt::SSA_stepst::const_iterator it,
       const decision_proceduret &) { return last_step_to_keep == it; };
 
-  return build_goto_trace(
-    target, is_last_step_to_keep, decision_procedure, ns, goto_trace);
-}
-
-static bool is_failed_assertion_step(
-  symex_target_equationt::SSA_stepst::const_iterator step,
-  const decision_proceduret &decision_procedure)
-{
-  return step->is_assert() &&
-         decision_procedure.get(step->cond_handle).is_false();
+  goto_tracert goto_tracer{target, decision_procedure, ns};
+  goto_trace = goto_tracer.build_trace(is_last_step_to_keep);
 }
 
 void build_goto_trace(
   const symex_target_equationt &target,
+  ssa_step_predicatet stop_after_predicate,
   const decision_proceduret &decision_procedure,
   const namespacet &ns,
   goto_tracet &goto_trace)
 {
-  build_goto_trace(
-    target, is_failed_assertion_step, decision_procedure, ns, goto_trace);
+  goto_tracert goto_tracer{target, decision_procedure, ns};
+  goto_trace = goto_tracer.build_trace(stop_after_predicate);
 }
