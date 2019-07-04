@@ -2911,10 +2911,6 @@ code_blockt java_bytecode_convert_methodt::convert_store(
   const exprt var = variable(arg0, statement[0], address);
   const irep_idt &var_name = to_symbol_expr(var).get_identifier();
 
-  exprt toassign = op[0];
-  if('a' == statement[0])
-    toassign = typecast_exprt::conditional_cast(toassign, var.type());
-
   code_blockt block;
   block.add_source_location() = location;
 
@@ -2924,7 +2920,9 @@ code_blockt java_bytecode_convert_methodt::convert_store(
     bytecode_write_typet::VARIABLE,
     var_name);
 
-  block.add(code_assignt{var, toassign}, location);
+  block.add(
+    code_assignt{var, typecast_exprt::conditional_cast(op[0], var.type())},
+    location);
   return block;
 }
 
