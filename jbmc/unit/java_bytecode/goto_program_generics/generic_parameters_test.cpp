@@ -21,6 +21,8 @@ SCENARIO(
   "Instantiate generic parameters to methods or fields used within",
   "[core][goto_program_generics][generic_parameters_test]")
 {
+  config.ansi_c.set_LP64();
+
   GIVEN("A class with a generic field")
   {
     const symbol_tablet &symbol_table = load_java_class(
@@ -316,8 +318,8 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct_tag =
-          to_struct_tag_type(tmp_object_declaration.symbol().type());
+        const auto &tmp_object_struct_tag = to_struct_tag_type(
+          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
         REQUIRE(tmp_object_struct_tag.get_identifier() == "java::Wrapper");
 
         THEN("Object 'v' has field 'field' of type IWrapper")
@@ -366,8 +368,8 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct_tag =
-          to_struct_tag_type(tmp_object_declaration.symbol().type());
+        const auto &tmp_object_struct_tag = to_struct_tag_type(
+          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
         REQUIRE(tmp_object_struct_tag.get_identifier() == "java::Wrapper");
 
         THEN(
@@ -416,8 +418,8 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct_tag =
-          to_struct_tag_type(tmp_object_declaration.symbol().type());
+        const auto &tmp_object_struct_tag = to_struct_tag_type(
+          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
         REQUIRE(
           tmp_object_struct_tag.get_identifier() ==
           "java::GenericFields$GenericInnerOuter$Outer");
@@ -481,8 +483,8 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct_tag =
-          to_struct_tag_type(tmp_object_declaration.symbol().type());
+        const auto &tmp_object_struct_tag = to_struct_tag_type(
+          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
         REQUIRE(
           tmp_object_struct_tag.get_identifier() ==
           "java::GenericFields$GenericRewriteParameter$A");

@@ -442,6 +442,8 @@ SCENARIO(
   "Ignore generics for incomplete and non-generic bases",
   "[core][goto_program_generics][generic_bases_test]")
 {
+  config.ansi_c.set_LP64();
+
   GIVEN(
     "A class extending a generic class with unsupported class signature (thus"
     " not marked as generic)")
@@ -469,17 +471,16 @@ SCENARIO(
       // We trace the creation of the object that is being supplied as
       // the input to the method under test. There must be one non-null
       // assignment only, and usually looks like this:
-      //   this = &tmp_object_factory$1;
+      //   this = malloc_site;
       const irep_idt &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
           ID_this, entry_point_code);
 
       THEN("Object 'this' created has unspecialized inherited field")
       {
-        //   tmp_object_factory$1.@UnsupportedWrapper1.field =
-        // &tmp_object_factory$2;
-        // struct java.lang.Object { __CPROVER_string @class_identifier; }
-        // tmp_object_factory$2;
+        // Check that entry_point_code contains an instruction of the form
+        //   malloc_site->@UnsupportedWrapper1.field = <symbol>;
+        // where <symbol> has type `struct java.lang.Object *`
         require_goto_statements::require_struct_component_assignment(
           this_tmp_name,
           {"UnsupportedWrapper1"},
