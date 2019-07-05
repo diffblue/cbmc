@@ -16,8 +16,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <goto-symex/goto_symex_state.h>
 #include <goto-symex/symex_assign.h>
 #include <goto-symex/symex_target.h>
+#include <iostream>
+#include <testing-utils/expr_query.h>
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
@@ -248,6 +252,246 @@ SCENARIO(
             expr_try_dynamic_cast<constant_exprt>(step.ssa_rhs);
           REQUIRE(as_constant);
           REQUIRE(numeric_cast_v<mp_integer>(*as_constant) == 234);
+        }
+      }
+    }
+  }
+  GIVEN("A RHS expression byte_update(foo, 0, 84523) where foo is an int")
+  {
+    config.ansi_c.endianness = configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+    config.ansi_c.pointer_width = config.ansi_c.int_width = 32;
+    exprt::operandst guard;
+    symex_target_equationt target_equation{null_message_handler};
+    const constant_exprt offset = from_integer(0, index_type());
+    const constant_exprt value = from_integer(84523, int_type);
+    const exprt rhs =
+      byte_update_exprt{ID_byte_update_little_endian, foo, offset, value};
+
+    WHEN("Symbol `foo` is assigned the byte_update expression")
+    {
+      symex_config.simplify_opt = true;
+      symex_assignt{state,
+                    symex_targett::assignment_typet::STATE,
+                    ns,
+                    symex_config,
+                    target_equation}
+        .assign_symbol(ssa_foo, expr_skeletont{ssa_foo.type()}, rhs, guard);
+      THEN("An equation is added to the target")
+      {
+        REQUIRE(target_equation.SSA_steps.size() == 1);
+        SSA_stept step = target_equation.SSA_steps.back();
+        THEN("LHS is 'foo!0#1'")
+        {
+          REQUIRE(step.ssa_lhs.get_identifier() == "foo!0#1");
+        }
+        THEN("Original LHS is 'foo'")
+        {
+          REQUIRE(
+            make_query(step.original_full_lhs)
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "foo");
+        }
+        THEN("RHS is '84523")
+        {
+          REQUIRE(step.ssa_rhs == value);
+        }
+      }
+    }
+  }
+  // TODO: Should have one of each:
+  //   - byte_update which simplifies to symbol
+  //   - byte_update which simplifies to index
+  //   - byte_update which simplifies to index with use_update
+  //   - byte_update which simplifies to member
+  //   - byte_update which simplifies to member with use_update
+  ///  - byte_update of if_expr
+  //
+  config.ansi_c.endianness = configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+  config.ansi_c.pointer_width = config.ansi_c.int_width = 32;
+  GIVEN(
+    "A RHS expression byte_update(array, 0, 84523) and a skeleton "
+    "`☐[0]` which corresponds to an original assignment array[0] = 84523")
+  {
+    exprt::operandst guard;
+    symex_target_equationt target_equation{null_message_handler};
+    const constant_exprt offset = from_integer(0, index_type());
+    const constant_exprt value = from_integer(84523, int_type);
+    const array_typet array_type{int_type, from_integer(2, int_type)};
+    const symbol_exprt array{"array", array_type};
+    add_to_symbol_table(symbol_table, array);
+    const byte_update_exprt rhs{
+      ID_byte_update_little_endian, array, offset, value};
+    const index_exprt original_lhs{array, from_integer(0, index_type())};
+    const expr_skeletont skeleton = expr_skeletont::remove_op0(original_lhs);
+    const ssa_exprt ssa_array{array};
+
+    WHEN("Symbol `array` is assigned the byte_update expression")
+    {
+      symex_config.simplify_opt = true;
+      symex_assignt{state,
+                    symex_targett::assignment_typet::STATE,
+                    ns,
+                    symex_config,
+                    target_equation}
+        .assign_symbol(ssa_array, skeleton, rhs, guard);
+      THEN("An equation is added to the target")
+      {
+        REQUIRE(target_equation.SSA_steps.size() == 1);
+        SSA_stept step = target_equation.SSA_steps.back();
+        THEN("LHS is 'array!0#1'")
+        {
+          REQUIRE(step.ssa_lhs.get_identifier() == "array!0#1");
+        }
+        THEN("Original LHS is 'array[0]'")
+        {
+          REQUIRE(step.original_full_lhs == original_lhs);
+        }
+        THEN("RHS is 'with(array!0#0, 0, 84523)")
+        {
+          auto with_expr = make_query(step.ssa_rhs).as<with_exprt>().get();
+          REQUIRE(
+            make_query(with_expr.old())
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "array!0#0");
+          REQUIRE(with_expr.where() == offset);
+          REQUIRE(with_expr.new_value() == value);
+        }
+      }
+    }
+  }
+  GIVEN(
+    "A RHS expression byte_update(array2d, 0, 53721) and a skeleton "
+    "`☐[0][0]` which corresponds to an original assignment "
+    "array2d[0][0] = 84523")
+  {
+    exprt::operandst guard;
+    symex_target_equationt target_equation{null_message_handler};
+    const constant_exprt offset = from_integer(0, index_type());
+    const constant_exprt value = from_integer(53721, int_type);
+    const array_typet array_type{int_type, from_integer(2, int_type)};
+    const array_typet array2d_type{array_type, from_integer(2, int_type)};
+    const symbol_exprt array2d{"array2d", array2d_type};
+    add_to_symbol_table(symbol_table, array2d);
+    const ssa_exprt ssa_array{array2d};
+    const byte_update_exprt rhs{
+      ID_byte_update_little_endian, array2d, offset, value};
+    const index_exprt original_lhs{
+      index_exprt{array2d, from_integer(0, index_type())},
+      from_integer(0, index_type())};
+    const expr_skeletont skeleton =
+      expr_skeletont::remove_op0(original_lhs)
+        .compose(expr_skeletont::remove_op0(original_lhs.array()));
+
+    WHEN("Symbol `array` is assigned the byte_update expression")
+    {
+      symex_config.simplify_opt = true;
+      symex_assignt{state,
+                    symex_targett::assignment_typet::STATE,
+                    ns,
+                    symex_config,
+                    target_equation}
+        .assign_symbol(ssa_array, skeleton, rhs, guard);
+      THEN("An equation is added to the target")
+      {
+        REQUIRE(target_equation.SSA_steps.size() == 1);
+        SSA_stept step = target_equation.SSA_steps.back();
+        THEN("LHS is 'array!0#1'")
+        {
+          REQUIRE(step.ssa_lhs.get_identifier() == "array2d!0#1");
+        }
+        THEN("Original LHS is 'array[0][0]'")
+        {
+          REQUIRE(step.original_full_lhs == original_lhs);
+        }
+        THEN("RHS is 'with(array!0#0, 0, with(array2d!0#0[0], 0, 84523)")
+        {
+          auto with_expr = make_query(step.ssa_rhs).as<with_exprt>().get();
+          REQUIRE(
+            make_query(with_expr.old())
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "array2d!0#0");
+          REQUIRE(with_expr.where() == offset);
+          REQUIRE(
+            make_query(with_expr.new_value())
+              .as<with_exprt>()[0]
+              .as<index_exprt>()[0]
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "array2d!0#0");
+        }
+      }
+    }
+  }
+  GIVEN(
+    "A RHS byte_update({array[0], array[1]}, 0, 53721), "
+    "a LHS array and a "
+    "skeleton `☐[0]` which corresponds to an original assignment "
+    "{array[0], array[1]}[0] = 84523")
+  {
+    exprt::operandst guard;
+    symex_target_equationt target_equation{null_message_handler};
+    const constant_exprt offset = from_integer(0, index_type());
+    const constant_exprt value = from_integer(53721, int_type);
+    const array_typet array_type{int_type, from_integer(2, int_type)};
+    const symbol_exprt array{"array", array_type};
+    add_to_symbol_table(symbol_table, array);
+    const array_exprt lhs{
+      exprt::operandst{index_exprt{array, from_integer(0, index_type())},
+                       index_exprt{array, from_integer(1, index_type())}},
+      array_type};
+    const ssa_exprt ssa_lhs{array};
+    const byte_update_exprt rhs{
+      ID_byte_update_little_endian, lhs, offset, value};
+    const index_exprt original_lhs{
+      lhs, from_integer(0, index_type()), int_type};
+    const expr_skeletont skeleton = expr_skeletont::remove_op0(original_lhs);
+
+    WHEN("`array` is assigned the byte_update expression")
+    {
+      symex_config.simplify_opt = true;
+      symex_assignt{state,
+                    symex_targett::assignment_typet::STATE,
+                    ns,
+                    symex_config,
+                    target_equation}
+        .assign_symbol(ssa_lhs, skeleton, rhs, guard);
+      THEN("An equation is added to the target")
+      {
+        REQUIRE(target_equation.SSA_steps.size() == 1);
+        SSA_stept step = target_equation.SSA_steps.back();
+        THEN("LHS is 'array!0#1'")
+        {
+          REQUIRE(step.ssa_lhs.get_identifier() == "array!0#1");
+        }
+        THEN("Original LHS is 'array[0][0]'")
+        {
+          REQUIRE(
+            make_query(step.original_full_lhs)
+              .as<index_exprt>()[0]
+              .as<index_exprt>()[0]
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "array");
+        }
+        THEN("RHS is 'with(array!0#0, 0, with(array!0#0[0], 0, 84523)")
+        {
+          auto with_expr = make_query(step.ssa_rhs).as<with_exprt>().get();
+          REQUIRE(
+            make_query(with_expr.old())
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "array!0#0");
+          REQUIRE(with_expr.where() == offset);
+          REQUIRE(
+            make_query(with_expr.new_value())
+              .as<with_exprt>()[0]
+              .as<index_exprt>()[0]
+              .as<symbol_exprt>()
+              .get()
+              .get_identifier() == "array!0#0");
         }
       }
     }
