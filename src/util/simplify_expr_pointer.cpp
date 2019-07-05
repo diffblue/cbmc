@@ -69,8 +69,13 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
       new_index_expr.array() = array_result.expr;
     }
 
-    if(!simplify_rec(new_index_expr.index()))
+    auto index_result = simplify_rec(new_index_expr.index());
+
+    if(index_result.has_changed())
+    {
       no_change = false;
+      new_index_expr.index() = index_result.expr;
+    }
 
     // rewrite (*(type *)int) [index] by
     // pushing the index inside
@@ -148,8 +153,12 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
   else if(expr.id()==ID_dereference)
   {
     auto new_expr = to_dereference_expr(expr);
-    if(!simplify_rec(new_expr.pointer()))
+    auto r_pointer = simplify_rec(new_expr.pointer());
+    if(r_pointer.has_changed())
+    {
+      new_expr.pointer() = r_pointer.expr;
       return std::move(new_expr);
+    }
   }
   else if(expr.id()==ID_if)
   {
@@ -157,8 +166,12 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
 
     bool no_change = true;
 
-    if(!simplify_rec(new_if_expr.cond()))
+    auto r_cond = simplify_rec(new_if_expr.cond());
+    if(r_cond.has_changed())
+    {
+      new_if_expr.cond() = r_cond.expr;
       no_change = false;
+    }
 
     auto true_result = simplify_address_of_arg(new_if_expr.true_case());
     if(true_result.has_changed())
@@ -547,9 +560,7 @@ simplify_exprt::simplify_pointer_object(const exprt &expr)
     p_o_true.op0() = if_expr.true_case();
 
     auto new_expr = if_exprt(cond, p_o_true, p_o_false, expr.type());
-    simplify_rec(new_expr);
-
-    return new_expr;
+    return changed(simplify_rec(new_expr));
   }
 
   if(op_result.has_changed())

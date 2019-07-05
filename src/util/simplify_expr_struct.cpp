@@ -51,9 +51,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
           tmp.swap(op2);
 
           // do this recursively
-          simplify_rec(tmp);
-
-          return std::move(tmp);
+          return changed(simplify_rec(tmp));
         }
         else // something else, get rid of it
           new_operands.resize(new_operands.size() - 2);
@@ -76,9 +74,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
         auto tmp = with_expr.new_value();
 
         // do this recursively
-        simplify_rec(tmp);
-
-        return std::move(tmp);
+        return changed(simplify_rec(tmp));
       }
     }
   }
@@ -100,9 +96,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
           exprt tmp=update_expr.new_value();
 
           // do this recursively
-          simplify_rec(tmp);
-
-          return std::move(tmp);
+          return changed(simplify_rec(tmp));
         }
         // the following optimization only works on structs,
         // and not on unions
@@ -113,9 +107,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
           new_expr.op0() = update_expr.old();
 
           // do this recursively
-          simplify_rec(new_expr);
-
-          return std::move(new_expr);
+          return changed(simplify_rec(new_expr));
         }
       }
     }
@@ -168,9 +160,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
 
       byte_extract_exprt result(op.id(), op.op0(), final_offset, expr.type());
 
-      simplify_rec(result);
-
-      return std::move(result);
+      return changed(simplify_rec(result)); // recursive call
     }
     else if(op_type.id() == ID_union)
     {
@@ -246,8 +236,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
           equivalent_member.value().id() != ID_byte_extract_big_endian)
         {
           auto tmp = equivalent_member.value();
-          simplify_rec(tmp);
-          return std::move(tmp);
+          return changed(simplify_rec(tmp));
         }
       }
     }
@@ -264,9 +253,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
     member_true.compound() = if_expr.true_case();
 
     auto tmp = if_exprt(cond, member_true, member_false, expr.type());
-    simplify_rec(tmp);
-
-    return std::move(tmp);
+    return changed(simplify_rec(tmp));
   }
   else if(op.id() == ID_let)
   {
@@ -280,8 +267,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
     to_let_expr(new_expr).where() = pushed_in_member;
     to_let_expr(new_expr).type() = to_let_expr(new_expr).where().type();
 
-    simplify_rec(new_expr);
-    return std::move(new_expr);
+    return changed(simplify_rec(new_expr));
   }
 
   return unchanged(expr);

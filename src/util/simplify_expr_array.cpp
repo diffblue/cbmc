@@ -59,8 +59,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
     {
       exprt tmp = comprehension.body();
       replace_expr(comprehension.arg(), index, tmp);
-      simplify_rec(tmp);
-      return std::move(tmp);
+      return changed(simplify_rec(tmp));
     }
   }
   else if(array.id()==ID_with)
@@ -188,9 +187,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
       exprt result_expr(array.id(), expr.type());
       result_expr.add_to_operands(array.op0(), final_offset);
 
-      simplify_rec(result_expr);
-
-      return std::move(result_expr);
+      return changed(simplify_rec(result_expr));
     }
   }
   else if(array.id()==ID_if)
@@ -204,9 +201,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
     index_expr.array() = if_expr.true_case();
 
     exprt result = if_exprt(cond, index_expr, idx_false, expr.type());
-    simplify_rec(result);
-
-    return std::move(result);
+    return changed(simplify_rec(result));
   }
 
   if(no_change)

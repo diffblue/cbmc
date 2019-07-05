@@ -648,7 +648,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
           from_integer(*sub_size, size_type()),
           typecast_exprt(expr.op().op1(), size_type()));
 
-      simplify_rec(new_expr.op()); // rec. call
+      new_expr.op() = simplify_rec(new_expr.op()); // rec. call
 
       return changed(simplify_typecast(new_expr)); // rec. call
     }
@@ -732,8 +732,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         }
       }
 
-      simplify_rec(new_expr);
-      return std::move(new_expr);
+      return changed(simplify_rec(new_expr)); // recursive call
     }
   }
 
@@ -1072,8 +1071,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       auto result =
         address_of_exprt(index_exprt(o, from_integer(0, size_type())));
 
-      simplify_rec(result);
-      return std::move(result);
+      return changed(simplify_rec(result)); // recursive call
     }
   }
 
@@ -1109,8 +1107,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
   {
     exprt tmp=to_address_of_expr(pointer).object();
     // one address_of is gone, try again
-    simplify_rec(tmp);
-    return tmp;
+    return changed(simplify_rec(tmp));
   }
   // rewrite *(&a[0] + x) to a[x]
   else if(pointer.id()==ID_plus &&
@@ -1128,8 +1125,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
           old.array(),
           pointer_offset_sum(old.index(), pointer.op1()),
           old.array().type().subtype());
-        simplify_rec(idx);
-        return idx;
+        return changed(simplify_rec(idx));
       }
     }
   }
@@ -1292,9 +1288,9 @@ bool simplify_exprt::simplify_if_branch(
   }
 
   if(!tresult)
-    simplify_rec(trueexpr);
+    trueexpr = simplify_rec(trueexpr); // recursive call
   if(!fresult)
-    simplify_rec(falseexpr);
+    falseexpr = simplify_rec(falseexpr); // recursive call
 
   return tresult && fresult;
 }
@@ -1327,7 +1323,7 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
     }
 
     if(!tmp)
-      simplify_rec(expr);
+      expr = simplify_rec(expr); // recursive call
 
     result=tmp && result;
   }
@@ -1341,14 +1337,21 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   exprt &truevalue=expr.true_case();
   exprt &falsevalue=expr.false_case();
 
+  bool result = true;
+
   // we first want to look at the condition
-  bool result=simplify_rec(cond);
+  auto r_cond = simplify_rec(cond);
+  if(r_cond.has_changed())
+  {
+    cond = r_cond.expr;
+    result = false;
+  }
 
   // 1 ? a : b -> a  and  0 ? a : b -> b
   if(cond.is_constant())
   {
     exprt tmp=cond.is_true()?truevalue:falsevalue;
-    simplify_rec(tmp);
+    tmp = simplify_rec(tmp);
     expr.swap(tmp);
     return false;
   }
@@ -1383,7 +1386,12 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     else
       local_replace_map.insert(std::make_pair(cond, true_exprt()));
 
-    result=simplify_rec(truevalue) && result;
+    auto r_truevalue = simplify_rec(truevalue);
+    if(r_truevalue.has_changed())
+    {
+      truevalue = r_truevalue.expr;
+      result = false;
+    }
 
     local_replace_map=map_before;
 
@@ -1403,18 +1411,43 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     else
       local_replace_map.insert(std::make_pair(cond, false_exprt()));
 
-    result=simplify_rec(falsevalue) && result;
+    auto r_falsevalue = simplify_rec(falsevalue);
+    if(r_falsevalue.has_changed())
+    {
+      falsevalue = r_falsevalue.expr;
+      result = false;
+    }
 
     local_replace_map.swap(map_before);
 #else
-    result=simplify_rec(truevalue) && result;
-    result=simplify_rec(falsevalue) && result;
+    auto r_truevalue = simplify_rec(truevalue);
+    if(r_truevalue.has_changed())
+    {
+      truevalue = r_truevalue.expr;
+      result = false;
+    }
+    auto r_falsevalue = simplify_rec(falsevalue);
+    if(r_falsevalue.has_changed())
+    {
+      falsevalue = r_falsevalue.expr;
+      result = false;
+    }
 #endif
   }
   else
   {
-    result=simplify_rec(truevalue) && result;
-    result=simplify_rec(falsevalue) && result;
+    auto r_truevalue = simplify_rec(truevalue);
+    if(r_truevalue.has_changed())
+    {
+      truevalue = r_truevalue.expr;
+      result = false;
+    }
+    auto r_falsevalue = simplify_rec(falsevalue);
+    if(r_falsevalue.has_changed())
+    {
+      falsevalue = r_falsevalue.expr;
+      result = false;
+    }
   }
 
   return result;
@@ -2192,9 +2225,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     auto tmp = expr;
     tmp.op() = index_exprt(expr.op(), expr.offset());
     tmp.offset() = from_integer(0, expr.offset().type());
-    simplify_rec(tmp);
-
-    return std::move(tmp);
+    return changed(simplify_rec(tmp));
   }
 
   // extract bits of a constant
@@ -2240,8 +2271,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   if(!subexpr.has_value() || subexpr.value() == expr)
     return unchanged(expr);
 
-  simplify_rec(subexpr.value());
-  return subexpr.value();
+  return changed(simplify_rec(subexpr.value())); // recursive call
 }
 
 simplify_exprt::resultt<>
@@ -2464,16 +2494,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
     }
 
     if(result_expr.is_not_nil())
-    {
-      simplify_rec(result_expr);
-      return result_expr;
-    }
-
-    if(result_expr.is_not_nil())
-    {
-      simplify_rec(result_expr);
-      return result_expr;
-    }
+      return changed(simplify_rec(result_expr));
   }
 
   // replace elements of array or struct expressions, possibly using
@@ -2517,7 +2538,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
             *offset_int + val_offset - m_offset_bits / 8, offset.type()),
           new_val);
 
-        simplify_rec(*it);
+        *it = simplify_rec(*it); // recursive call
 
         val_offset+=bytes_req;
       }
@@ -2568,8 +2589,14 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
     if(expr.has_operands())
     {
       Forall_operands(it, expr)
-        if(!simplify_rec(*it)) // recursive call
+      {
+        auto r_it = simplify_rec(*it); // recursive call
+        if(r_it.has_changed())
+        {
+          *it = r_it.expr;
           result=false;
+        }
+      }
     }
   }
 
@@ -2812,8 +2839,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   return no_change;
 }
 
-/// \return returns true if expression unchanged; returns false if changed
-bool simplify_exprt::simplify_rec(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
 {
   // look up in cache
 
@@ -2859,34 +2885,45 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   #endif
 #endif
 
-  if(!result)
+  if(result) // no change
   {
-    POSTCONDITION(tmp.type() == expr.type());
-    expr.swap(tmp);
-
-    #ifdef USE_CACHE
-    // save in cache
-    cache_result.first->second=expr;
-    #endif
+    return unchanged(expr);
   }
+  else // change, new expression is 'tmp'
+  {
+    POSTCONDITION(as_const(tmp).type() == expr.type());
 
-  return result;
+#ifdef USE_CACHE
+    // save in cache
+    cache_result.first->second = tmp;
+#endif
+
+    return std::move(tmp);
+  }
 }
 
+/// \return returns true if expression unchanged; returns false if changed
 bool simplify_exprt::simplify(exprt &expr)
 {
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
     std::cout << "TO-SIMP " << format(expr) << "\n";
 #endif
-  bool res=simplify_rec(expr);
+  auto result = simplify_rec(expr);
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
-    std::cout << "FULLSIMP " << format(expr) << "\n";
+    std::cout << "FULLSIMP " << format(result.expr) << "\n";
 #endif
-  return res;
+  if(result.has_changed())
+  {
+    expr = result.expr;
+    return false; // change
+  }
+  else
+    return true; // no change
 }
 
+/// \return returns true if expression unchanged; returns false if changed
 bool simplify(exprt &expr, const namespacet &ns)
 {
   return simplify_exprt(ns).simplify(expr);
