@@ -30,8 +30,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <sys/wait.h>
 
-gdb_apit::gdb_apit(const char *binary, const bool log)
-  : binary(binary), log(log), gdb_state(gdb_statet::NOT_CREATED)
+gdb_apit::gdb_apit(const std::vector<std::string> &args, const bool log)
+  : args(args), log(log), gdb_state(gdb_statet::NOT_CREATED)
 {
 }
 
@@ -107,15 +107,28 @@ void gdb_apit::create_gdb_process()
     dup2(pipe_output[1], STDOUT_FILENO);
     dup2(pipe_output[1], STDERR_FILENO);
 
-    dprintf(pipe_output[1], "binary name: %s\n", binary);
+    dprintf(pipe_output[1], "binary name: %s\n", args.front().c_str());
 
-    char *const arg[] = {const_cast<char *>("gdb"),
-                         const_cast<char *>("--interpreter=mi"),
-                         const_cast<char *>(binary),
-                         NULL};
+    std::vector<std::string> exec_cmd;
+    exec_cmd.reserve(args.size() + 3);
+    exec_cmd.push_back("gdb");
+    exec_cmd.push_back("--interpreter=mi");
+    exec_cmd.push_back("--args");
+    exec_cmd.insert(exec_cmd.end(), args.begin(), args.end());
+
+    char **exec_cmd_ptr = static_cast<char **>(malloc(
+      sizeof(char *) * (exec_cmd.size() + 1)));
+    exec_cmd_ptr[exec_cmd.size()] = NULL;
+
+    for(std::size_t i = 0; i < exec_cmd.size(); i++)
+    {
+      exec_cmd_ptr[i] = static_cast<char *>(malloc(
+        sizeof(char) * (exec_cmd[i].length() + 1)));
+      strcpy(exec_cmd_ptr[i], exec_cmd[i].c_str()); // NOLINT(runtime/printf)
+    }
 
     dprintf(pipe_output[1], "Loading gdb...\n");
-    execvp("gdb", arg);
+    execvp("gdb", exec_cmd_ptr);
 
     // Only reachable, if execvp failed
     int errno_value = errno;
@@ -135,8 +148,10 @@ void gdb_apit::create_gdb_process()
     // get stream for writing to gdb
     command_stream = fdopen(pipe_input[1], "w");
 
-    bool has_done_tag = most_recent_line_has_tag(R"(~"done)");
-    CHECK_RETURN(has_done_tag);
+    std::string line = read_most_recent_line();
+    CHECK_RETURN(
+      has_prefix(line, R"(~"done)") ||
+      has_prefix(line, R"(~"Reading)"));
 
     if(log)
     {

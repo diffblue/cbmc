@@ -12,6 +12,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <cstdio>
 #include <regex>
 #include <string>
+#include <vector>
 
 #include <fstream>
 #include <iostream>
@@ -33,7 +34,7 @@ void check_for_gdb()
 class gdb_api_testt : public gdb_apit
 {
 public:
-  explicit gdb_api_testt(const char *binary) : gdb_apit(binary)
+  explicit gdb_api_testt(const std::vector<std::string> &args) : gdb_apit(args)
   {
   }
 
@@ -47,9 +48,12 @@ void gdb_api_internals_test()
   check_for_gdb();
   compile_test_file();
 
+  std::vector<std::string> args;
+  args.push_back("test");
+
   SECTION("parse gdb output record")
   {
-    gdb_api_testt gdb_api("test");
+    gdb_api_testt gdb_api(args);
 
     gdb_api_testt::gdb_output_recordt gor = gdb_api.parse_gdb_output_record(
       "a = \"1\", b = \"2\", c = {1, 2}, d = [3, 4], e=\"0x0\"");
@@ -63,7 +67,7 @@ void gdb_api_internals_test()
 
   SECTION("read a line from an input stream")
   {
-    gdb_api_testt gdb_api("test");
+    gdb_api_testt gdb_api(args);
 
     FILE *f = fopen("memory-analyzer/input.txt", "r");
     gdb_api.response_stream = f;
@@ -80,7 +84,7 @@ void gdb_api_internals_test()
 
   SECTION("start and exit gdb")
   {
-    gdb_api_testt gdb_api("test");
+    gdb_api_testt gdb_api(args);
 
     gdb_api.create_gdb_process();
 
@@ -100,8 +104,11 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
   check_for_gdb();
   compile_test_file();
 
+  std::vector<std::string> args;
+  args.push_back("test");
+
   {
-    gdb_apit gdb_api("test", true);
+    gdb_apit gdb_api(args, true);
     gdb_api.create_gdb_process();
 
     try
@@ -138,7 +145,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
     }
   }
 
-  gdb_api_testt gdb_api("test");
+  gdb_api_testt gdb_api(args);
 
   std::regex hex_addr(gdb_api.r_hex_addr);
 

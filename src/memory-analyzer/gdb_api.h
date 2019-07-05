@@ -61,10 +61,12 @@ public:
   };
 
   /// Create a \ref gdb_apit object
-  /// \param binary: the binary to run with gdb
+  /// \param args: arguments to pass to gdb, the first argument is the command
+  ///   to execute
   /// \param log: boolean indicating whether gdb input and output should be
   ///   logged
-  explicit gdb_apit(const char *binary, const bool log = false);
+  explicit gdb_apit(
+    const std::vector<std::string> &args, const bool log = false);
 
   /// Terminate the gdb process and close open streams (for reading from and
   /// writing to gdb)
@@ -108,8 +110,8 @@ public:
   ///   the number of allocated bytes
   size_t query_malloc_size(const std::string &pointer_expr);
 
-  /// Create a new gdb process for analysing the binary indicated by the member
-  /// variable `binary`
+  /// Create a new gdb process for analysing the binary indicated by the first
+  /// element in `args`
   void create_gdb_process();
 
   /// Run gdb to the given breakpoint
@@ -138,7 +140,8 @@ public:
   const commandst &get_command_log();
 
 protected:
-  const char *binary;
+  // arguments passed to gdb, first argument is the command to execute
+  std::vector<std::string> args;
 
   FILE *response_stream;
   FILE *command_stream;

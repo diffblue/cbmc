@@ -22,8 +22,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 gdb_value_extractort::gdb_value_extractort(
   const symbol_tablet &symbol_table,
-  const char *binary)
-  : gdb_api(binary),
+  const std::vector<std::string> &args)
+  : gdb_api(args),
     symbol_table(symbol_table),
     ns(symbol_table),
     c_converter(ns, expr2c_configurationt::clean_configuration),

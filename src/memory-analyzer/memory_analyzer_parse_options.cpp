@@ -53,10 +53,10 @@ int memory_analyzer_parse_optionst::doit()
 
   config.set(cmdline);
 
-  if(cmdline.args.size() != 1)
+  if(cmdline.args.size() < 1)
   {
     throw invalid_command_line_argument_exceptiont(
-      "no binary provided for analysis", "<binary>");
+      "no binary provided for analysis", "<binary> <args>");
   }
 
   if(!cmdline.isset("symbols"))
@@ -111,7 +111,7 @@ int memory_analyzer_parse_optionst::doit()
   const goto_modelt goto_model(std::move(opt.value()));
 
   gdb_value_extractort gdb_value_extractor(
-    goto_model.symbol_table, binary.c_str());
+    goto_model.symbol_table, cmdline.args);
   gdb_value_extractor.create_gdb_process();
 
   if(core_file)
