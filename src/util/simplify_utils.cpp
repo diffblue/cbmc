@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "simplify_utils.h"
+#include "as_const.h"
 
 #include <algorithm>
 
@@ -126,8 +127,8 @@ bool sort_and_join(exprt &expr)
   if(!expr.has_operands())
     return true;
 
-  const struct saj_tablet &saj_entry=
-    sort_and_join(expr.id(), expr.type().id());
+  const struct saj_tablet &saj_entry =
+    sort_and_join(expr.id(), as_const(expr).type().id());
   if(saj_entry.id.empty())
     return true;
 
