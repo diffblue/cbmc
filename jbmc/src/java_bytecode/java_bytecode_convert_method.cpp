@@ -1328,7 +1328,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
     else if(bytecode == patternt("?astore"))
     {
-      assert(op.size()==3 && results.empty());
+      PRECONDITION(results.empty());
       c = convert_astore(statement, op, i_it->source_location);
     }
     else if(bytecode == patternt("?store") || bytecode == patternt("?store_?"))
@@ -1340,7 +1340,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
     else if(bytecode == patternt("?aload"))
     {
-      PRECONDITION(op.size() == 2 && results.size() == 1);
+      PRECONDITION(results.size() == 1);
       results[0] = convert_aload(statement, op);
     }
     else if(bytecode == patternt("?load") || bytecode == patternt("?load_?"))
@@ -2851,16 +2851,37 @@ code_blockt java_bytecode_convert_methodt::convert_ret(
   return c;
 }
 
+/// Add typecast if necessary to \p expr to make it compatible with array type
+/// corresponding to \p type_char (see \ref java_array_type(const char)).
+/// Character 'b' is used both for `byte` and `boolean` arrays, so if \p expr
+/// is a boolean array and we are using a `b` operation we can skip the
+/// typecast.
+static exprt conditional_array_cast(const exprt &expr, char type_char)
+{
+  const auto ref_type =
+    type_try_dynamic_cast<java_reference_typet>(expr.type());
+  const bool typecast_not_needed =
+    ref_type && ((type_char == 'b' && ref_type->subtype().get_identifier() ==
+                                        "java::array[boolean]") ||
+                 *ref_type == java_array_type(type_char));
+  return typecast_not_needed ? expr
+                             : typecast_exprt(expr, java_array_type(type_char));
+}
+
 exprt java_bytecode_convert_methodt::convert_aload(
   const irep_idt &statement,
-  const exprt::operandst &op) const
+  const exprt::operandst &op)
 {
+  PRECONDITION(op.size() == 2);
   const char type_char = statement[0];
-  dereference_exprt deref{typecast_exprt{op[0], java_array_type(type_char)}};
+  const exprt op_with_right_type = conditional_array_cast(op[0], type_char);
+  dereference_exprt deref{op_with_right_type};
   deref.set(ID_java_member_access, true);
 
-  member_exprt data_ptr(
-    deref, "data", pointer_type(java_type_from_char(type_char)));
+  auto java_array_type = type_try_dynamic_cast<struct_tag_typet>(deref.type());
+  INVARIANT(java_array_type, "Java array type should be a struct_tag_typet");
+  member_exprt data_ptr{
+    deref, "data", pointer_type(java_array_element_type(*java_array_type))};
   plus_exprt data_plus_offset{std::move(data_ptr), op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
@@ -2899,12 +2920,16 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   const exprt::operandst &op,
   const source_locationt &location)
 {
+  PRECONDITION(op.size() == 3);
   const char type_char = statement[0];
-  dereference_exprt deref{typecast_exprt{op[0], java_array_type(type_char)}};
+  const exprt op_with_right_type = conditional_array_cast(op[0], type_char);
+  dereference_exprt deref{op_with_right_type};
   deref.set(ID_java_member_access, true);
 
-  member_exprt data_ptr(
-    deref, "data", pointer_type(java_type_from_char(type_char)));
+  auto java_array_type = type_try_dynamic_cast<struct_tag_typet>(deref.type());
+  INVARIANT(java_array_type, "Java array type should be a struct_tag_typet");
+  member_exprt data_ptr{
+    deref, "data", pointer_type(java_array_element_type(*java_array_type))};
   plus_exprt data_plus_offset{std::move(data_ptr), op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);

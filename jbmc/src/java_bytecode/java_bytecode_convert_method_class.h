@@ -366,8 +366,8 @@ protected:
     const method_offsett address,
     const source_locationt &location);
 
-  exprt
-  convert_aload(const irep_idt &statement, const exprt::operandst &op) const;
+  static exprt
+  convert_aload(const irep_idt &statement, const exprt::operandst &op);
 
   code_blockt convert_ret(
     const std::vector<method_offsett> &jsr_ret_targets,
@@ -504,5 +504,7 @@ protected:
     const source_locationt &location);
 
   codet convert_pop(const irep_idt &statement, const exprt::operandst &op);
+
+  friend class java_bytecode_convert_method_unit_testt;
 };
 #endif
