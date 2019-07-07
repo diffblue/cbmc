@@ -50,6 +50,7 @@ class namespacet;
 class plus_exprt;
 class popcount_exprt;
 class refined_string_exprt;
+class sign_exprt;
 class tvt;
 class typecast_exprt;
 class unary_exprt;
@@ -175,7 +176,7 @@ public:
   NODISCARD resultt<> simplify_isnan(const unary_exprt &);
   NODISCARD resultt<> simplify_isnormal(const unary_exprt &);
   NODISCARD resultt<> simplify_abs(const abs_exprt &);
-  NODISCARD resultt<> simplify_sign(const exprt &);
+  NODISCARD resultt<> simplify_sign(const sign_exprt &);
   NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
   NODISCARD resultt<> simplify_complex(const exprt &);
 

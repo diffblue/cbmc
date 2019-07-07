@@ -103,24 +103,21 @@ simplify_exprt::resultt<> simplify_exprt::simplify_abs(const abs_exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_sign(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
-  if(expr.op0().is_constant())
+  if(expr.op().is_constant())
   {
-    const typet &type = expr.op0().type();
+    const typet &type = expr.op().type();
 
     if(type.id()==ID_floatbv)
     {
-      ieee_floatt value(to_constant_expr(expr.op0()));
+      ieee_floatt value(to_constant_expr(expr.op()));
       return make_boolean_expr(value.get_sign());
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
     {
-      const auto value = numeric_cast<mp_integer>(expr.op0());
+      const auto value = numeric_cast<mp_integer>(expr.op());
       if(value.has_value())
       {
         return make_boolean_expr(*value >= 0);
@@ -2389,7 +2386,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_sign)
   {
-    r = simplify_sign(expr);
+    r = simplify_sign(to_sign_expr(expr));
   }
   else if(expr.id() == ID_popcount)
   {
