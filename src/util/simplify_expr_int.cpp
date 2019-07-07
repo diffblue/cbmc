@@ -771,20 +771,17 @@ simplify_exprt::resultt<> simplify_exprt::simplify_bitwise(const exprt &expr)
     return std::move(new_expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_extractbit(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_extractbit(const extractbit_exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_extractbit);
-  const auto &extractbit_expr = to_extractbit_expr(expr);
-
-  const typet &src_type = extractbit_expr.src().type();
+  const typet &src_type = expr.src().type();
 
   if(!is_bitvector_type(src_type))
     return unchanged(expr);
 
   const std::size_t src_bit_width = to_bitvector_type(src_type).get_width();
 
-  const auto index_converted_to_int =
-    numeric_cast<mp_integer>(extractbit_expr.index());
+  const auto index_converted_to_int = numeric_cast<mp_integer>(expr.index());
   if(
     !index_converted_to_int.has_value() || *index_converted_to_int < 0 ||
     *index_converted_to_int >= src_bit_width)
@@ -792,11 +789,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_extractbit(const exprt &expr)
     return unchanged(expr);
   }
 
-  if(!extractbit_expr.src().is_constant())
+  if(!expr.src().is_constant())
     return unchanged(expr);
 
   const bool bit = get_bvrep_bit(
-    to_constant_expr(extractbit_expr.src()).get_value(),
+    to_constant_expr(expr.src()).get_value(),
     src_bit_width,
     numeric_cast_v<std::size_t>(*index_converted_to_int));
 

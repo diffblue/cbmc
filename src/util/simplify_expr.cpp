@@ -2349,7 +2349,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_extractbit)
   {
-    r = simplify_extractbit(expr);
+    r = simplify_extractbit(to_extractbit_expr(expr));
   }
   else if(expr.id()==ID_concatenation)
   {

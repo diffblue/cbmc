@@ -36,6 +36,7 @@ class byte_update_exprt;
 class dereference_exprt;
 class div_exprt;
 class exprt;
+class extractbit_exprt;
 class extractbits_exprt;
 class floatbv_typecast_exprt;
 class function_application_exprt;
@@ -130,7 +131,7 @@ public:
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
   NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
-  NODISCARD resultt<> simplify_extractbit(const exprt &);
+  NODISCARD resultt<> simplify_extractbit(const extractbit_exprt &);
   NODISCARD resultt<> simplify_extractbits(const extractbits_exprt &);
   NODISCARD resultt<> simplify_concatenation(const exprt &);
   NODISCARD resultt<> simplify_mult(const mult_exprt &);
