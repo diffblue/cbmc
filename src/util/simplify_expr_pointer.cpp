@@ -244,18 +244,17 @@ simplify_exprt::simplify_address_of(const address_of_exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_pointer_offset(const exprt &expr)
+simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
-  const exprt &ptr = expr.op0();
+  const exprt &ptr = expr.op();
 
   if(ptr.id()==ID_if && ptr.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() = simplify_pointer_offset(if_expr.true_case());
-    if_expr.false_case() = simplify_pointer_offset(if_expr.false_case());
+    if_expr.true_case() =
+      simplify_pointer_offset(to_unary_expr(if_expr.true_case()));
+    if_expr.false_case() =
+      simplify_pointer_offset(to_unary_expr(if_expr.false_case()));
     return changed(simplify_if(if_expr));
   }
 
@@ -284,7 +283,7 @@ simplify_exprt::simplify_pointer_offset(const exprt &expr)
       // Cast from pointer to pointer.
       // This just passes through, remove typecast.
       auto new_expr = expr;
-      new_expr.op0() = ptr.op0();
+      new_expr.op() = ptr.op0();
 
       simplify_node(new_expr); // recursive call
       return new_expr;
@@ -537,12 +536,9 @@ simplify_exprt::simplify_inequality_pointer_object(const exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_pointer_object(const exprt &expr)
+simplify_exprt::simplify_pointer_object(const unary_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
-  const exprt &op = expr.op0();
+  const exprt &op = expr.op();
 
   auto op_result = simplify_object(op);
 
@@ -564,7 +560,7 @@ simplify_exprt::simplify_pointer_object(const exprt &expr)
   if(op_result.has_changed())
   {
     auto new_expr = expr;
-    new_expr.op0() = op_result;
+    new_expr.op() = op_result;
     return std::move(new_expr);
   }
   else
@@ -714,14 +710,11 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_object_size(const exprt &expr)
+simplify_exprt::simplify_object_size(const unary_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
   auto new_expr = expr;
   bool no_change = true;
-  exprt &op = new_expr.op0();
+  exprt &op = new_expr.op();
   auto op_result = simplify_object(op);
 
   if(op_result.has_changed())
@@ -766,13 +759,10 @@ simplify_exprt::simplify_object_size(const exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_good_pointer(const exprt &expr)
+simplify_exprt::simplify_good_pointer(const unary_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
   // we expand the definition
-  exprt def=good_pointer_def(expr.op0(), ns);
+  exprt def = good_pointer_def(expr.op(), ns);
 
   // recursive call
   simplify_node(def);

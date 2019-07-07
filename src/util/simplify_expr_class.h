@@ -162,19 +162,19 @@ public:
   NODISCARD resultt<> simplify_member(const member_exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
-  NODISCARD resultt<> simplify_pointer_object(const exprt &);
-  NODISCARD resultt<> simplify_object_size(const exprt &);
-  NODISCARD resultt<> simplify_dynamic_size(const exprt &);
+  NODISCARD resultt<> simplify_pointer_object(const unary_exprt &);
+  NODISCARD resultt<> simplify_object_size(const unary_exprt &);
+  NODISCARD resultt<> simplify_dynamic_size(const unary_exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const exprt &expr);
   NODISCARD resultt<> simplify_is_invalid_pointer(const exprt &expr);
-  NODISCARD resultt<> simplify_same_object(const exprt &);
-  NODISCARD resultt<> simplify_good_pointer(const exprt &);
+  NODISCARD resultt<> simplify_same_object(const unary_exprt &);
+  NODISCARD resultt<> simplify_good_pointer(const unary_exprt &);
   NODISCARD resultt<> simplify_object(const exprt &);
   NODISCARD resultt<> simplify_unary_minus(const unary_minus_exprt &);
-  NODISCARD resultt<> simplify_unary_plus(const exprt &);
+  NODISCARD resultt<> simplify_unary_plus(const unary_exprt &);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
   NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
-  NODISCARD resultt<> simplify_pointer_offset(const exprt &);
+  NODISCARD resultt<> simplify_pointer_offset(const unary_exprt &);
   NODISCARD resultt<> simplify_bswap(const bswap_exprt &);
   NODISCARD resultt<> simplify_isinf(const unary_exprt &);
   NODISCARD resultt<> simplify_isnan(const unary_exprt &);
@@ -182,7 +182,7 @@ public:
   NODISCARD resultt<> simplify_abs(const abs_exprt &);
   NODISCARD resultt<> simplify_sign(const sign_exprt &);
   NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
-  NODISCARD resultt<> simplify_complex(const exprt &);
+  NODISCARD resultt<> simplify_complex(const unary_exprt &);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.

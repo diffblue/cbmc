@@ -2136,7 +2136,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_complex(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_complex(const unary_exprt &expr)
 {
   if(expr.id() == ID_complex_real)
   {
@@ -2250,7 +2251,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_pointer_object)
   {
-    r = simplify_pointer_object(expr);
+    r = simplify_pointer_object(to_unary_expr(expr));
   }
   else if(expr.id() == ID_is_dynamic_object)
   {
@@ -2262,11 +2263,11 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_object_size)
   {
-    r = simplify_object_size(expr);
+    r = simplify_object_size(to_unary_expr(expr));
   }
   else if(expr.id()==ID_good_pointer)
   {
-    r = simplify_good_pointer(expr);
+    r = simplify_good_pointer(to_unary_expr(expr));
   }
   else if(expr.id()==ID_div)
   {
@@ -2323,7 +2324,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_unary_plus)
   {
-    r = simplify_unary_plus(expr);
+    r = simplify_unary_plus(to_unary_expr(expr));
   }
   else if(expr.id()==ID_not)
   {
@@ -2345,7 +2346,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_pointer_offset)
   {
-    r = simplify_pointer_offset(expr);
+    r = simplify_pointer_offset(to_unary_expr(expr));
   }
   else if(expr.id()==ID_extractbit)
   {
@@ -2398,7 +2399,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
   {
-    r = simplify_complex(expr);
+    r = simplify_complex(to_unary_expr(expr));
   }
 
   if(r.has_changed())

@@ -1108,13 +1108,11 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_unary_plus(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_unary_plus(const unary_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
   // simply remove, this is always 'nop'
-  return expr.op0();
+  return expr.op();
 }
 
 simplify_exprt::resultt<>
