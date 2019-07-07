@@ -30,6 +30,7 @@ class abs_exprt;
 class address_of_exprt;
 class array_exprt;
 class binary_relation_exprt;
+class bitnot_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -146,7 +147,7 @@ public:
   NODISCARD resultt<> simplify_bitwise(const exprt &);
   bool simplify_if_preorder(if_exprt &expr);
   NODISCARD resultt<> simplify_if(const if_exprt &);
-  NODISCARD resultt<> simplify_bitnot(const exprt &);
+  NODISCARD resultt<> simplify_bitnot(const bitnot_exprt &);
   NODISCARD resultt<> simplify_not(const exprt &);
   NODISCARD resultt<> simplify_boolean(const exprt &);
   NODISCARD resultt<> simplify_inequality(const exprt &);

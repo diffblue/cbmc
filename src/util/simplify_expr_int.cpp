@@ -1182,14 +1182,10 @@ simplify_exprt::simplify_unary_minus(const exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_bitnot(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_bitnot(const bitnot_exprt &expr)
 {
-  const exprt::operandst &operands = expr.operands();
-
-  if(operands.size()!=1)
-    return unchanged(expr);
-
-  const exprt &op = operands.front();
+  const exprt &op = expr.op();
 
   const auto &type = expr.type();
 

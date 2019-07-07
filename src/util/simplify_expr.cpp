@@ -2278,7 +2278,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_bitnot)
   {
-    r = simplify_bitnot(expr);
+    r = simplify_bitnot(to_bitnot_expr(expr));
   }
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
