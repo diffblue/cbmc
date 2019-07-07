@@ -2327,7 +2327,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_not)
   {
-    r = simplify_not(expr);
+    r = simplify_not(to_not_expr(expr));
   }
   else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||

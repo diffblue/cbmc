@@ -49,6 +49,7 @@ class minus_exprt;
 class mod_exprt;
 class mult_exprt;
 class namespacet;
+class not_exprt;
 class plus_exprt;
 class popcount_exprt;
 class refined_string_exprt;
@@ -148,7 +149,7 @@ public:
   bool simplify_if_preorder(if_exprt &expr);
   NODISCARD resultt<> simplify_if(const if_exprt &);
   NODISCARD resultt<> simplify_bitnot(const bitnot_exprt &);
-  NODISCARD resultt<> simplify_not(const exprt &);
+  NODISCARD resultt<> simplify_not(const not_exprt &);
   NODISCARD resultt<> simplify_boolean(const exprt &);
   NODISCARD resultt<> simplify_inequality(const exprt &);
   NODISCARD resultt<>

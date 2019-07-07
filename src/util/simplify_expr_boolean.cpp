@@ -164,12 +164,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_not(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
-  const exprt &op = expr.op0();
+  const exprt &op = expr.op();
 
   if(expr.type().id()!=ID_bool ||
      op.type().id()!=ID_bool)
