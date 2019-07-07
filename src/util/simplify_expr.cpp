@@ -2236,7 +2236,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_member)
   {
-    r = simplify_member(expr);
+    r = simplify_member(to_member_expr(expr));
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)

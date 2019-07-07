@@ -158,7 +158,7 @@ public:
   NODISCARD resultt<> simplify_with(const exprt &);
   NODISCARD resultt<> simplify_update(const exprt &);
   NODISCARD resultt<> simplify_index(const index_exprt &);
-  NODISCARD resultt<> simplify_member(const exprt &);
+  NODISCARD resultt<> simplify_member(const member_exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
   NODISCARD resultt<> simplify_pointer_object(const exprt &);

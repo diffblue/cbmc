@@ -15,15 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "std_expr.h"
 
-simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_member(const member_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
   const irep_idt &component_name=
     to_member_expr(expr).get_component_name();
 
-  const exprt &op = expr.op0();
+  const exprt &op = expr.compound();
   const typet &op_type=ns.follow(op.type());
 
   if(op.id()==ID_with)
@@ -60,9 +58,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
       DATA_INVARIANT(new_operands.size() == 1, "post-condition of loop");
 
       auto new_member_expr = expr;
-      new_member_expr.op0() = new_operands.front();
+      new_member_expr.struct_op() = new_operands.front();
       // do this recursively
-      return simplify_member(new_member_expr);
+      return changed(simplify_member(new_member_expr));
     }
     else if(op_type.id()==ID_union)
     {
@@ -104,7 +102,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
         {
           // UPDATE(s, .m1, v).m2 -> s.m2
           auto new_expr = expr;
-          new_expr.op0() = update_expr.old();
+          new_expr.struct_op() = update_expr.old();
 
           // do this recursively
           return changed(simplify_rec(new_expr));
@@ -211,8 +209,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_member(const exprt &expr)
     if(op_type == op.op0().type())
     {
       auto new_expr = expr;
-      new_expr.op0() = op.op0();
-      return simplify_member(new_expr);
+      new_expr.struct_op() = op.op0();
+      return changed(simplify_member(new_expr));
     }
 
     // Try to translate into an equivalent member (perhaps nested) of the type
