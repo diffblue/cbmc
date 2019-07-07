@@ -15,16 +15,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string_constant.h"
 
-simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_index(const index_exprt &expr)
 {
   bool no_change = true;
 
   // copy
-  auto index_expr = to_index_expr(expr);
+  auto new_expr = expr;
 
   // references
-  auto &index = index_expr.index();
-  auto &array = index_expr.array();
+  auto &index = new_expr.index();
+  auto &array = new_expr.array();
 
   // extra arithmetic optimizations
 
@@ -35,16 +36,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
        index.op0().operands().size()==2 &&
        index.op0().op1()==index.op1())
     {
-      exprt tmp=index.op0().op0();
-      index = tmp;
+      index = index.op0().op0();
       no_change = false;
     }
     else if(index.op0().id()==ID_mult &&
             index.op0().operands().size()==2 &&
             index.op0().op0()==index.op1())
     {
-      exprt tmp=index.op0().op1();
-      index = tmp;
+      index = index.op0().op1();
       no_change = false;
     }
   }
@@ -85,8 +84,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
 
       exprt equality_expr = simplify_inequality(equal_exprt(index, rhs_casted));
 
-      exprt new_index_expr = simplify_index(index_exprt(
-        with_expr.old(), index, index_expr.type())); // recursive call
+      exprt new_index_expr = simplify_index(
+        index_exprt(with_expr.old(), index, new_expr.type())); // recursive call
 
       if(equality_expr.is_true())
       {
@@ -98,7 +97,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
       }
 
       if_exprt if_expr(equality_expr, with_expr.new_value(), new_index_expr);
-      return simplify_if(if_expr).expr;
+      return changed(simplify_if(if_expr));
     }
   }
   else if(
@@ -138,7 +137,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
       // terminating zero?
       const char v =
         (*i == value.size()) ? 0 : value[numeric_cast_v<std::size_t>(*i)];
-      return from_integer(v, index_expr.type());
+      return from_integer(v, new_expr.type());
     }
   }
   else if(array.id()==ID_array_of)
@@ -198,14 +197,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_index(const exprt &expr)
     index_exprt idx_false=to_index_expr(expr);
     idx_false.array()=if_expr.false_case();
 
-    index_expr.array() = if_expr.true_case();
+    new_expr.array() = if_expr.true_case();
 
-    exprt result = if_exprt(cond, index_expr, idx_false, expr.type());
+    exprt result = if_exprt(cond, new_expr, idx_false, expr.type());
     return changed(simplify_rec(result));
   }
 
   if(no_change)
     return unchanged(expr);
   else
-    return std::move(index_expr);
+    return std::move(new_expr);
 }

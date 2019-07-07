@@ -2232,7 +2232,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_index)
   {
-    r = simplify_index(expr);
+    r = simplify_index(to_index_expr(expr));
   }
   else if(expr.id()==ID_member)
   {
