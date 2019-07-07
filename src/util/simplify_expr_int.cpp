@@ -1118,15 +1118,12 @@ simplify_exprt::resultt<> simplify_exprt::simplify_unary_plus(const exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_unary_minus(const exprt &expr)
+simplify_exprt::simplify_unary_minus(const unary_minus_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
   if(!is_number(expr.type()))
     return unchanged(expr);
 
-  const exprt &operand = expr.op0();
+  const exprt &operand = expr.op();
 
   if(expr.type()!=operand.type())
     return unchanged(expr);
@@ -1134,23 +1131,21 @@ simplify_exprt::simplify_unary_minus(const exprt &expr)
   if(operand.id()==ID_unary_minus)
   {
     // cancel out "-(-x)" to "x"
-    if(operand.operands().size()!=1)
+    if(!is_number(to_unary_minus_expr(operand).op().type()))
       return unchanged(expr);
 
-    if(!is_number(operand.op0().type()))
-      return unchanged(expr);
-
-    return expr.op0().op0();
+    return to_unary_minus_expr(operand).op();
   }
   else if(operand.id()==ID_constant)
   {
     const irep_idt &type_id=expr.type().id();
+    const auto &constant_expr = to_constant_expr(operand);
 
     if(type_id==ID_integer ||
        type_id==ID_signedbv ||
        type_id==ID_unsignedbv)
     {
-      const auto int_value = numeric_cast<mp_integer>(expr.op0());
+      const auto int_value = numeric_cast<mp_integer>(constant_expr);
 
       if(!int_value.has_value())
         return unchanged(expr);
@@ -1160,20 +1155,20 @@ simplify_exprt::simplify_unary_minus(const exprt &expr)
     else if(type_id==ID_rational)
     {
       rationalt r;
-      if(to_rational(expr.op0(), r))
+      if(to_rational(constant_expr, r))
         return unchanged(expr);
 
       return from_rational(-r);
     }
     else if(type_id==ID_fixedbv)
     {
-      fixedbvt f(to_constant_expr(expr.op0()));
+      fixedbvt f(constant_expr);
       f.negate();
       return f.to_expr();
     }
     else if(type_id==ID_floatbv)
     {
-      ieee_floatt f(to_constant_expr(expr.op0()));
+      ieee_floatt f(constant_expr);
       f.negate();
       return f.to_expr();
     }
