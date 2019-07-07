@@ -1975,7 +1975,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
     if_expr.false_case() =
       simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
-    return simplify_if(if_expr);
+    return changed(simplify_if(if_expr));
   }
 
   const auto el_size = pointer_offset_bits(expr.type(), ns);
