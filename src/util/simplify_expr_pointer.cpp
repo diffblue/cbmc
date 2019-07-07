@@ -434,7 +434,8 @@ simplify_exprt::simplify_pointer_offset(const exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_inequality_address_of(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
   PRECONDITION(expr.type().id() == ID_bool);
@@ -457,9 +458,9 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   INVARIANT(tmp1.id() == ID_address_of, "id must be ID_address_of");
 
   if(tmp0.operands().size()!=1)
-    return true;
+    return unchanged(expr);
   if(tmp1.operands().size()!=1)
-    return true;
+    return unchanged(expr);
 
   if(tmp0.op0().id()==ID_symbol &&
      tmp1.op0().id()==ID_symbol)
@@ -467,9 +468,7 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
     bool equal = to_symbol_expr(tmp0.op0()).get_identifier() ==
                  to_symbol_expr(tmp1.op0()).get_identifier();
 
-    expr = make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
-
-    return false;
+    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
   }
   else if(
     tmp0.op0().id() == ID_dynamic_object &&
@@ -478,23 +477,20 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
     bool equal = to_dynamic_object_expr(tmp0.op0()).get_instance() ==
                  to_dynamic_object_expr(tmp1.op0()).get_instance();
 
-    expr = make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
-
-    return false;
+    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
   }
   else if(
     (tmp0.op0().id() == ID_symbol && tmp1.op0().id() == ID_dynamic_object) ||
     (tmp0.op0().id() == ID_dynamic_object && tmp1.op0().id() == ID_symbol))
   {
-    expr = make_boolean_expr(expr.id() != ID_equal);
-
-    return false;
+    return make_boolean_expr(expr.id() != ID_equal);
   }
 
-  return true;
+  return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_inequality_pointer_object(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
   PRECONDITION(expr.type().id() == ID_bool);
@@ -515,12 +511,12 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
         (op.op0().id() != ID_symbol && op.op0().id() != ID_dynamic_object &&
          op.op0().id() != ID_string_constant))
       {
-        return true;
+        return unchanged(expr);
       }
     }
     else if(op.id() != ID_constant || !op.is_zero())
     {
-      return true;
+      return unchanged(expr);
     }
 
     if(new_inequality_ops.empty())
@@ -533,9 +529,11 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
     }
   }
 
-  expr.operands() = std::move(new_inequality_ops);
-  expr = simplify_inequality(expr);
-  return false;
+  auto new_expr = expr;
+
+  new_expr.operands() = std::move(new_inequality_ops);
+
+  return changed(simplify_inequality(new_expr));
 }
 
 simplify_exprt::resultt<>

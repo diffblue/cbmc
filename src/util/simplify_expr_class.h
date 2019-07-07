@@ -196,11 +196,11 @@ public:
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
   NODISCARD resultt<> simplify_address_of_arg(const exprt &);
-  bool simplify_inequality_both_constant(exprt &);
-  bool simplify_inequality_no_constant(exprt &);
-  bool simplify_inequality_rhs_is_constant(exprt &);
-  bool simplify_inequality_address_of(exprt &expr);
-  bool simplify_inequality_pointer_object(exprt &expr);
+  NODISCARD resultt<> simplify_inequality_both_constant(const exprt &);
+  NODISCARD resultt<> simplify_inequality_no_constant(const exprt &);
+  NODISCARD resultt<> simplify_inequality_rhs_is_constant(const exprt &);
+  NODISCARD resultt<> simplify_inequality_address_of(const exprt &);
+  NODISCARD resultt<> simplify_inequality_pointer_object(const exprt &);
 
   // main recursion
   bool simplify_node(exprt &expr);
