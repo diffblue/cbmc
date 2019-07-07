@@ -91,12 +91,12 @@ bool simplify_exprt::simplify_if_recursive(
     }
   }
 
-  bool result = true;
+  bool no_change = true;
 
   Forall_operands(it, expr)
-    result = simplify_if_recursive(*it, cond, truth) && result;
+    no_change = simplify_if_recursive(*it, cond, truth) && no_change;
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_if_conj(exprt &expr, const exprt &cond)
@@ -110,12 +110,12 @@ bool simplify_exprt::simplify_if_conj(exprt &expr, const exprt &cond)
     }
   }
 
-  bool result = true;
+  bool no_change = true;
 
   Forall_operands(it, expr)
-    result = simplify_if_conj(*it, cond) && result;
+    no_change = simplify_if_conj(*it, cond) && no_change;
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_if_disj(exprt &expr, const exprt &cond)
@@ -129,12 +129,12 @@ bool simplify_exprt::simplify_if_disj(exprt &expr, const exprt &cond)
     }
   }
 
-  bool result = true;
+  bool no_change = true;
 
   Forall_operands(it, expr)
-    result = simplify_if_disj(*it, cond) && result;
+    no_change = simplify_if_disj(*it, cond) && no_change;
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_if_branch(
@@ -142,36 +142,36 @@ bool simplify_exprt::simplify_if_branch(
   exprt &falseexpr,
   const exprt &cond)
 {
-  bool tresult = true;
-  bool fresult = true;
+  bool tno_change = true;
+  bool fno_change = true;
 
   if(cond.id() == ID_and)
   {
-    tresult = simplify_if_conj(trueexpr, cond) && tresult;
-    fresult = simplify_if_recursive(falseexpr, cond, false) && fresult;
+    tno_change = simplify_if_conj(trueexpr, cond) && tno_change;
+    fno_change = simplify_if_recursive(falseexpr, cond, false) && fno_change;
   }
   else if(cond.id() == ID_or)
   {
-    tresult = simplify_if_recursive(trueexpr, cond, true) && tresult;
-    fresult = simplify_if_disj(falseexpr, cond) && fresult;
+    tno_change = simplify_if_recursive(trueexpr, cond, true) && tno_change;
+    fno_change = simplify_if_disj(falseexpr, cond) && fno_change;
   }
   else
   {
-    tresult = simplify_if_recursive(trueexpr, cond, true) && tresult;
-    fresult = simplify_if_recursive(falseexpr, cond, false) && fresult;
+    tno_change = simplify_if_recursive(trueexpr, cond, true) && tno_change;
+    fno_change = simplify_if_recursive(falseexpr, cond, false) && fno_change;
   }
 
-  if(!tresult)
+  if(!tno_change)
     trueexpr = simplify_rec(trueexpr); // recursive call
-  if(!fresult)
+  if(!fno_change)
     falseexpr = simplify_rec(falseexpr); // recursive call
 
-  return tresult && fresult;
+  return tno_change && fno_change;
 }
 
 bool simplify_exprt::simplify_if_cond(exprt &expr)
 {
-  bool result = true;
+  bool no_change = true;
   bool tmp = false;
 
   while(!tmp)
@@ -201,10 +201,10 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
     if(!tmp)
       expr = simplify_rec(expr); // recursive call
 
-    result = tmp && result;
+    no_change = tmp && no_change;
   }
 
-  return result;
+  return no_change;
 }
 
 bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
@@ -213,14 +213,14 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   exprt &truevalue = expr.true_case();
   exprt &falsevalue = expr.false_case();
 
-  bool result = true;
+  bool no_change = true;
 
   // we first want to look at the condition
   auto r_cond = simplify_rec(cond);
   if(r_cond.has_changed())
   {
     cond = r_cond.expr;
-    result = false;
+    no_change = false;
   }
 
   // 1 ? a : b -> a  and  0 ? a : b -> b
@@ -240,7 +240,7 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
       tmp.swap(cond.op0());
       cond.swap(tmp);
       truevalue.swap(falsevalue);
-      result = false;
+      no_change = false;
     }
 
 #ifdef USE_LOCAL_REPLACE_MAP
@@ -264,7 +264,7 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     if(r_truevalue.has_changed())
     {
       truevalue = r_truevalue.expr;
-      result = false;
+      no_change = false;
     }
 
     local_replace_map = map_before;
@@ -287,7 +287,7 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     if(r_falsevalue.has_changed())
     {
       falsevalue = r_falsevalue.expr;
-      result = false;
+      no_change = false;
     }
 
     local_replace_map.swap(map_before);
@@ -296,13 +296,13 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     if(r_truevalue.has_changed())
     {
       truevalue = r_truevalue.expr;
-      result = false;
+      no_change = false;
     }
     auto r_falsevalue = simplify_rec(falsevalue);
     if(r_falsevalue.has_changed())
     {
       falsevalue = r_falsevalue.expr;
-      result = false;
+      no_change = false;
     }
 #endif
   }
@@ -312,17 +312,17 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     if(r_truevalue.has_changed())
     {
       truevalue = r_truevalue.expr;
-      result = false;
+      no_change = false;
     }
     auto r_falsevalue = simplify_rec(falsevalue);
     if(r_falsevalue.has_changed())
     {
       falsevalue = r_falsevalue.expr;
-      result = false;
+      no_change = false;
     }
   }
 
-  return result;
+  return no_change;
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
@@ -334,8 +334,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
   if(do_simplify_if)
   {
 #if 0
-    result = simplify_if_cond(cond) && result;
-    result = simplify_if_branch(truevalue, falsevalue, cond) && result;
+    no_change = simplify_if_cond(cond) && no_change;
+    no_change = simplify_if_branch(truevalue, falsevalue, cond) && no_change;
 #endif
 
     if(expr.type() == bool_typet())
