@@ -100,6 +100,17 @@ static void add_to_xml(
   return;
 }
 
+static optionalt<std::string>
+file_name_string_opt(const source_locationt &source_location)
+{
+  if(source_location.get_file().empty())
+    return nullopt;
+
+  return concat_dir_file(
+    id2string(source_location.get_working_directory()),
+    id2string(source_location.get_file()));
+}
+
 static void add_to_json(
   const namespacet &ns,
   const irep_idt &function_identifier,
@@ -114,12 +125,9 @@ static void add_to_json(
   DATA_INVARIANT(end_function->is_end_function(),
                  "The last instruction in a goto-program must be END_FUNCTION");
 
-  json_objectt entry{
-    {"function", json_stringt(function_identifier)},
-    {"fileName",
-     json_stringt(concat_dir_file(
-       id2string(end_function->source_location.get_working_directory()),
-       id2string(end_function->source_location.get_file())))}};
+  json_objectt entry{{"function", json_stringt(function_identifier)}};
+  if(auto file_name_opt = file_name_string_opt(end_function->source_location))
+    entry["fileName"] = json_stringt{*file_name_opt};
 
   json_arrayt &dead_ins=entry["unreachableInstructions"].make_array();
 
@@ -243,7 +251,16 @@ bool static_unreachable_instructions(
   return false;
 }
 
+static optionalt<std::string>
+line_string_opt(const source_locationt &source_location)
+{
+  const irep_idt &line = source_location.get_line();
 
+  if(line.empty())
+    return nullopt;
+  else
+    return id2string(line);
+}
 
 static void json_output_function(
   const irep_idt &function,
@@ -251,14 +268,13 @@ static void json_output_function(
   const source_locationt &last_location,
   json_arrayt &dest)
 {
-  json_objectt entry{
-    {"function", json_stringt(function)},
-    {"file name",
-     json_stringt(concat_dir_file(
-       id2string(first_location.get_working_directory()),
-       id2string(first_location.get_file())))},
-    {"first line", json_numbert(id2string(first_location.get_line()))},
-    {"last line", json_numbert(id2string(last_location.get_line()))}};
+  json_objectt entry{{"function", json_stringt(function)}};
+  if(auto file_name_opt = file_name_string_opt(first_location))
+    entry["file name"] = json_stringt{*file_name_opt};
+  if(auto line_opt = line_string_opt(first_location))
+    entry["first line"] = json_numbert{*line_opt};
+  if(auto line_opt = line_string_opt(last_location))
+    entry["last line"] = json_numbert{*line_opt};
 
   dest.push_back(std::move(entry));
 }
@@ -272,12 +288,12 @@ static void xml_output_function(
   xmlt &x=dest.new_element("function");
 
   x.set_attribute("name", id2string(function));
-  x.set_attribute("file name",
-                  concat_dir_file(
-                    id2string(first_location.get_working_directory()),
-                    id2string(first_location.get_file())));
-  x.set_attribute("first line", id2string(first_location.get_line()));
-  x.set_attribute("last line", id2string(last_location.get_line()));
+  if(auto file_name_opt = file_name_string_opt(first_location))
+    x.set_attribute("file name", *file_name_opt);
+  if(auto line_opt = line_string_opt(first_location))
+    x.set_attribute("first line", *line_opt);
+  if(auto line_opt = line_string_opt(last_location))
+    x.set_attribute("last line", *line_opt);
 }
 
 static void list_functions(
@@ -357,12 +373,14 @@ static void list_functions(
     else
     {
       // text or console
-      os << concat_dir_file(
-              id2string(first_location.get_working_directory()),
-              id2string(first_location.get_file())) << " "
-         << decl.base_name << " "
-         << first_location.get_line() << " "
-         << last_location.get_line() << "\n";
+      if(auto file_name_opt = file_name_string_opt(first_location))
+        os << *file_name_opt << ' ';
+      os << decl.base_name;
+      if(auto line_opt = line_string_opt(first_location))
+        os << ' ' << *line_opt;
+      if(auto line_opt = line_string_opt(last_location))
+        os << ' ' << *line_opt;
+      os << '\n';
     }
   }
 
