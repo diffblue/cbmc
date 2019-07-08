@@ -374,7 +374,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_cast_operator && is_static)
   {
     error().source_location=cpp_name.source_location();
-    error() << "cast operators cannot be static`" << eom;
+    error() << "cast operators cannot be static" << eom;
     throw 0;
   }
 
