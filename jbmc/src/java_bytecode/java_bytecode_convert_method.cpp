@@ -164,13 +164,12 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
 /// from a bytecode at address `address` a value of type `type_char` stored in
 /// the JVM's slot `arg`.
 /// \param arg: The local variable slot
-/// \param type_char: The type of the value stored in the slot pointed by `arg`
+/// \param type_char: The type of the value stored in the slot pointed to by
+///   `arg`, this is only used in the case where a new unnamed local variable
+///   is created
 /// \param address: Bytecode address used to find a variable that the LVT
 ///   declares to be live and living in the slot pointed by `arg` for this
 ///   bytecode
-/// \param do_cast: Indicates whether we should return the original symbol_exprt
-///   or a typecast_exprt if the type of the symbol_exprt does not equal that
-///   represented by `type_char`
 /// \return symbol_exprt or type-cast symbol_exprt
 exprt java_bytecode_convert_methodt::variable(
   const exprt &arg,
@@ -1338,9 +1337,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(bytecode == patternt("?load") || bytecode == patternt("?load_?"))
     {
       // load a value from a local variable
-      results[0] = typecast_exprt::conditional_cast(
-        variable(arg0, statement[0], i_it->address),
-        java_type_from_char(statement[0]));
+      results[0] = convert_load(arg0, statement[0], i_it->address);
     }
     else if(bytecode == BC_ldc || bytecode == BC_ldc_w || bytecode == BC_ldc2_w)
     {
@@ -2882,6 +2879,15 @@ exprt java_bytecode_convert_methodt::convert_aload(
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
   return java_bytecode_promotion(dereference_exprt{data_plus_offset});
+}
+
+exprt java_bytecode_convert_methodt::convert_load(
+  const exprt &index,
+  char type_char,
+  size_t address)
+{
+  return typecast_exprt::conditional_cast(
+    variable(index, type_char, address), java_type_from_char(type_char));
 }
 
 code_blockt java_bytecode_convert_methodt::convert_store(
