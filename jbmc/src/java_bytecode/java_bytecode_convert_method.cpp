@@ -2886,8 +2886,20 @@ exprt java_bytecode_convert_methodt::convert_load(
   char type_char,
   size_t address)
 {
-  return typecast_exprt::conditional_cast(
-    variable(index, type_char, address), java_type_from_char(type_char));
+  const exprt var = variable(index, type_char, address);
+  if(type_char == 'i')
+  {
+    INVARIANT(
+      can_cast_type<bitvector_typet>(var.type()) &&
+        type_try_dynamic_cast<bitvector_typet>(var.type())->get_width() <= 32,
+      "iload can be used for boolean, byte, short, int and char");
+    return typecast_exprt::conditional_cast(var, java_int_type());
+  }
+  INVARIANT(
+    (type_char == 'a' && can_cast_type<reference_typet>(var.type())) ||
+      var.type() == java_type_from_char(type_char),
+    "Variable type must match [adflv]load return type");
+  return var;
 }
 
 code_blockt java_bytecode_convert_methodt::convert_store(
