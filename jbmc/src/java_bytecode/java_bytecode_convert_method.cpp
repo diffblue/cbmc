@@ -176,7 +176,6 @@ exprt java_bytecode_convert_methodt::variable(
   char type_char,
   size_t address)
 {
-  typet t=java_type_from_char(type_char);
   const std::size_t number_int =
     numeric_cast_v<std::size_t>(to_constant_expr(arg));
   variablest &var_list=variables[number_int];
@@ -192,7 +191,7 @@ exprt java_bytecode_convert_methodt::variable(
   irep_idt base_name = "anonlocal::" + std::to_string(number_int) + type_char;
   irep_idt identifier = id2string(current_method) + "::" + id2string(base_name);
 
-  symbol_exprt result(identifier, t);
+  symbol_exprt result(identifier, java_type_from_char(type_char));
   result.set(ID_C_base_name, base_name);
   used_local_names.insert(result);
   return std::move(result);
