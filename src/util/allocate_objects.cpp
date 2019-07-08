@@ -247,13 +247,8 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
   //   INPUT("<identifier>", <identifier>);
   for(symbolt const *symbol_ptr : symbols_created)
   {
-    codet input_code(ID_input);
-    input_code.operands().resize(2);
-    input_code.op0() = address_of_exprt(index_exprt(
-      string_constantt(symbol_ptr->base_name), from_integer(0, index_type())));
-    input_code.op1() = symbol_ptr->symbol_expr();
-    input_code.add_source_location() = source_location;
-    init_code.add(std::move(input_code));
+    init_code.add(code_inputt{
+      symbol_ptr->base_name, symbol_ptr->symbol_expr(), source_location});
   }
 }
 

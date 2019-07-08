@@ -311,7 +311,7 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
 
   // we iterate through all the parameters of the function under test, allocate
   // an object for that parameter (recursively allocating other objects
-  // necessary to initialize it), and declare such object as an ID_input
+  // necessary to initialize it), and mark such object using `code_inputt`.
   for(std::size_t param_number=0;
       param_number<parameters.size();
       param_number++)
@@ -420,17 +420,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
     }
 
     // record as an input
-    codet input(ID_input);
-    input.operands().resize(2);
-    input.op0()=
-      address_of_exprt(
-        index_exprt(
-          string_constantt(base_name),
-          from_integer(0, index_type())));
-    input.op1()=main_arguments[param_number];
-    input.add_source_location()=function.location;
-
-    init_code.add(std::move(input));
+    init_code.add(
+      code_inputt{base_name, main_arguments[param_number], function.location});
   }
 
   return make_pair(init_code, main_arguments);
@@ -467,13 +458,8 @@ static optionalt<codet> record_return_value(
   const symbolt &return_symbol =
     symbol_table.lookup_ref(JAVA_ENTRY_POINT_RETURN_SYMBOL);
 
-  codet output(ID_output);
-  output.operands().resize(2);
-  output.op0() = address_of_exprt(index_exprt(
-    string_constantt(return_symbol.base_name), from_integer(0, index_type())));
-  output.op1() = return_symbol.symbol_expr();
-  output.add_source_location() = function.location;
-  return output;
+  return code_outputt{
+    return_symbol.base_name, return_symbol.symbol_expr(), function.location};
 }
 
 static code_blockt record_pointer_parameters(
@@ -495,14 +481,8 @@ static code_blockt record_pointer_parameters(
     if(!can_cast_type<pointer_typet>(p_symbol.type))
       continue;
 
-    codet output(ID_output);
-    output.operands().resize(2);
-    output.op0() = address_of_exprt(index_exprt(
-      string_constantt(p_symbol.base_name), from_integer(0, index_type())));
-    output.op1() = arguments[param_number];
-    output.add_source_location() = function.location;
-
-    init_code.add(std::move(output));
+    init_code.add(code_outputt{
+      p_symbol.base_name, arguments[param_number], function.location});
   }
   return init_code;
 }
@@ -511,20 +491,13 @@ static codet record_exception(
   const symbolt &function,
   const symbol_table_baset &symbol_table)
 {
-  // record exceptional return variable as output
-  codet output(ID_output);
-  output.operands().resize(2);
-
   // retrieve the exception variable
   const symbolt &exc_symbol =
     symbol_table.lookup_ref(JAVA_ENTRY_POINT_EXCEPTION_SYMBOL);
 
-  output.op0()=address_of_exprt(
-    index_exprt(string_constantt(exc_symbol.base_name),
-                from_integer(0, index_type())));
-  output.op1()=exc_symbol.symbol_expr();
-  output.add_source_location()=function.location;
-  return output;
+  // record exceptional return variable as output
+  return code_outputt{
+    exc_symbol.base_name, exc_symbol.symbol_expr(), function.location};
 }
 
 main_function_resultt get_main_symbol(

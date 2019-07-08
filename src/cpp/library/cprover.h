@@ -22,8 +22,10 @@ void __CPROVER_assume(__CPROVER_bool assumption) __attribute__((__noreturn__));
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
 void __CPROVER_precondition(__CPROVER_bool assertion, const char *description);
 
-void __CPROVER_input(const char *id, ...);
-void __CPROVER_output(const char *id, ...);
+// NOLINTNEXTLINE(build/deprecated)
+void __CPROVER_input(const char *description, ...);
+// NOLINTNEXTLINE(build/deprecated)
+void __CPROVER_output(const char *description, ...);
 
 // concurrency-related
 void __CPROVER_atomic_begin();

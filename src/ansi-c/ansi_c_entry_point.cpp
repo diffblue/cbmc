@@ -59,22 +59,11 @@ void record_function_outputs(
 
   if(has_return_value)
   {
-    // record return value
-    codet output(ID_output);
-    output.operands().resize(2);
-
     const symbolt &return_symbol = symbol_table.lookup_ref("return'");
 
-    output.op0()=
-      address_of_exprt(
-        index_exprt(
-          string_constantt(return_symbol.base_name),
-          from_integer(0, index_type())));
-
-    output.op1()=return_symbol.symbol_expr();
-    output.add_source_location()=function.location;
-
-    init_code.add(std::move(output));
+    // record return value
+    init_code.add(code_outputt{
+      return_symbol.base_name, return_symbol.symbol_expr(), function.location});
   }
 
   #if 0
@@ -333,15 +322,8 @@ bool generate_ansi_c_start_function(
         init_code.add(code_assumet(std::move(le)));
       }
 
-      {
-        // record argc as an input
-        codet input(ID_input);
-        input.operands().resize(2);
-        input.op0()=address_of_exprt(
-          index_exprt(string_constantt("argc"), from_integer(0, index_type())));
-        input.op1()=argc_symbol.symbol_expr();
-        init_code.add(std::move(input));
-      }
+      // record argc as an input
+      init_code.add(code_inputt{"argc", argc_symbol.symbol_expr()});
 
       if(parameters.size()==3)
       {

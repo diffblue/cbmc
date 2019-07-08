@@ -316,10 +316,6 @@ void goto_convertt::do_input(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  codet input_code(ID_input);
-  input_code.operands()=arguments;
-  input_code.add_source_location()=function.source_location();
-
   if(arguments.size()<2)
   {
     error().source_location=function.find_source_location();
@@ -327,7 +323,7 @@ void goto_convertt::do_input(
     throw 0;
   }
 
-  copy(input_code, OTHER, dest);
+  copy(code_inputt{arguments, function.source_location()}, OTHER, dest);
 }
 
 void goto_convertt::do_output(
@@ -335,10 +331,6 @@ void goto_convertt::do_output(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  codet output_code(ID_output);
-  output_code.operands()=arguments;
-  output_code.add_source_location()=function.source_location();
-
   if(arguments.size()<2)
   {
     error().source_location=function.find_source_location();
@@ -346,7 +338,7 @@ void goto_convertt::do_output(
     throw 0;
   }
 
-  copy(output_code, OTHER, dest);
+  copy(code_outputt{arguments, function.source_location()}, OTHER, dest);
 }
 
 void goto_convertt::do_atomic_begin(
