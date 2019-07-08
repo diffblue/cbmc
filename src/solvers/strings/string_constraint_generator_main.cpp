@@ -29,6 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
+#include <util/interval_constraint.h>
 
 string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
   : array_pool(fresh_symbol), ns(ns)
@@ -114,23 +115,6 @@ void merge(string_constraintst &result, string_constraintst other)
     std::back_inserter(result.not_contains));
 }
 
-exprt char_range_constraints(const exprt &expr, const std::string &char_range)
-{
-  // Parse char_set
-  PRECONDITION(char_range.length() == 3);
-  PRECONDITION(char_range[1] == '-');
-  const char &low_char = char_range[0];
-  const char &high_char = char_range[2];
-  INVARIANT(
-    low_char <= high_char,
-    "The lower character must be smaller or equal to the high character.");
-
-  // expr >= low_char && expr <= high_char
-  return and_exprt(
-    binary_relation_exprt(expr, ID_ge, from_integer(low_char, expr.type())),
-    binary_relation_exprt(expr, ID_le, from_integer(high_char, expr.type())));
-}
-
 /// Add constraint on characters of a string.
 ///
 /// This constraint is
@@ -153,6 +137,11 @@ string_constraintst add_constraint_on_characters(
   const std::string &char_set,
   array_poolt &array_pool)
 {
+  // Parse char_set
+  PRECONDITION(char_set.length() == 3);
+  PRECONDITION(char_set[1] == '-');
+  const integer_intervalt char_range(char_set[0], char_set[2]);
+
   // Add constraint
   const symbol_exprt qvar = fresh_symbol("char_constr", s.length_type());
   const exprt chr = s[qvar];
@@ -160,7 +149,7 @@ string_constraintst add_constraint_on_characters(
     qvar,
     zero_if_negative(start),
     zero_if_negative(end),
-    char_range_constraints(chr, char_set));
+    interval_constraint(chr, char_range));
   return {{}, {sc}, {}};
 }
 

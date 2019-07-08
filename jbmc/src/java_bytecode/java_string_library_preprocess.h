@@ -334,7 +334,7 @@ void add_array_to_length_association(
 void add_character_set_constraint(
   const exprt &pointer,
   const exprt &length,
-  const irep_idt &char_set,
+  const irep_idt &char_range,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
   const irep_idt &function_id,

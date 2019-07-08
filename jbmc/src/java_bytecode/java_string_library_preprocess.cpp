@@ -669,7 +669,7 @@ void add_array_to_length_association(
 /// belong to the character set.
 /// \param pointer: a character pointer expression
 /// \param length: length of the character sequence pointed by `pointer`
-/// \param char_set: character set given by a range expression consisting of
+/// \param char_range: character set given by a range expression consisting of
 ///   two characters separated by an hyphen. For instance "a-z" denotes all
 ///   lower case ascii letters.
 /// \param symbol_table: the symbol table
@@ -679,7 +679,7 @@ void add_array_to_length_association(
 void add_character_set_constraint(
   const exprt &pointer,
   const exprt &length,
-  const irep_idt &char_set,
+  const irep_idt &char_range,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
   const irep_idt &function_id,
@@ -690,7 +690,7 @@ void add_character_set_constraint(
     java_int_type(), "cnstr_added", loc, function_id, symbol_table);
   const auto return_expr = return_sym.symbol_expr();
   code.add(code_declt(return_expr), loc);
-  const constant_exprt char_set_expr(char_set, string_typet());
+  const constant_exprt char_set_expr(char_range, string_typet());
   code.add(
     code_assign_function_application(
       return_expr,

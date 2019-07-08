@@ -50,7 +50,6 @@ SRC += analyses/ai/ai.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/strings/array_pool/array_pool.cpp \
-       solvers/strings/string_constraint_generator_main/char_range_constraints.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/strings/string_constraint_generator_valueof/is_digit_with_radix.cpp \
@@ -69,6 +68,7 @@ SRC += analyses/ai/ai.cpp \
        util/format_number_range.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
+       util/interval_constraint.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/json_array.cpp \
