@@ -414,7 +414,7 @@ SCENARIO(
 {
   symbol_tablet symbol_table;
   java_string_library_preprocesst string_preprocess;
-  const class_hierarchyt class_hierarchy;
+  const class_hierarchyt class_hierarchy{};
   java_bytecode_convert_methodt converter{symbol_table,
                                           null_message_handler,
                                           10,
