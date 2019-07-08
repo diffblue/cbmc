@@ -183,11 +183,7 @@ protected:
     NO_CAST
   };
 
-  exprt variable(
-    const exprt &arg,
-    char type_char,
-    size_t address,
-    variable_cast_argumentt do_cast);
+  exprt variable(const exprt &arg, char type_char, size_t address);
 
   // temporary variables
   std::list<symbol_exprt> tmp_vars;
