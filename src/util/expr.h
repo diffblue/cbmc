@@ -84,6 +84,10 @@ public:
     return static_cast<const typet &>(find(ID_type));
   }
 
+  /// Amount of nodes this expression tree contains. This is the size of the
+  /// actual tree, ignoring memory/sub-tree sharing.
+  std::size_t size() const;
+
   /// Return true if there is at least one operand.
   bool has_operands() const
   { return !operands().empty(); }

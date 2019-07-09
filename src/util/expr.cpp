@@ -23,6 +23,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
+std::size_t exprt::size() const
+{
+  // Initial size of 1 to count self.
+  std::size_t size = 1;
+  for(const auto &op : operands())
+  {
+    size += op.size();
+  }
+
+  return size;
+}
+
 /// Move the given argument to the end of `exprt`'s operands.
 /// The argument is destroyed and mutated to a reference to a nil `irept`.
 /// \param expr: `exprt` to append to the operands
