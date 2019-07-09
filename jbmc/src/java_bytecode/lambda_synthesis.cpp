@@ -206,6 +206,55 @@ static symbolt create_constructor_symbol(
   return constructor_symbol;
 }
 
+symbolt create_implemented_method_symbol(
+  synthetic_methods_mapt &synthetic_methods,
+  const symbolt &interface_method_symbol,
+  const struct_tag_typet &implemented_interface_tag,
+  const irep_idt &synthetic_class_name)
+{
+  const std::string implemented_method_name = [&] {
+    std::string implemented_method_name =
+      id2string(interface_method_symbol.name);
+    const std::string &implemented_interface_tag_str =
+      id2string(implemented_interface_tag.get_identifier());
+    INVARIANT(
+      has_prefix(implemented_method_name, implemented_interface_tag_str),
+      "method names should be prefixed by their defining type");
+    implemented_method_name.replace(
+      0,
+      implemented_interface_tag_str.length(),
+      id2string(synthetic_class_name));
+    return implemented_method_name;
+  }();
+
+  symbolt implemented_method_symbol;
+  implemented_method_symbol.name = implemented_method_name;
+  synthetic_methods[implemented_method_symbol.name] =
+    synthetic_method_typet::INVOKEDYNAMIC_METHOD;
+  implemented_method_symbol.pretty_name = implemented_method_symbol.name;
+  implemented_method_symbol.base_name = interface_method_symbol.base_name;
+  implemented_method_symbol.mode = ID_java;
+  implemented_method_symbol.type = interface_method_symbol.type;
+  auto &implemented_method_type = to_code_type(implemented_method_symbol.type);
+  implemented_method_type.parameters()[0].type() =
+    java_reference_type(struct_tag_typet(synthetic_class_name));
+
+  size_t field_idx = 0;
+  for(auto &param : implemented_method_type.parameters())
+  {
+    irep_idt param_basename =
+      field_idx == 0 ? "this" : "param_" + std::to_string(field_idx);
+    param.set_base_name(param_basename);
+    param.set_identifier(
+      id2string(implemented_method_name) + "::" + id2string(param_basename));
+
+    ++field_idx;
+  }
+
+  set_declaring_class(implemented_method_symbol, synthetic_class_name);
+  return implemented_method_symbol;
+}
+
 void create_invokedynamic_synthetic_classes(
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
@@ -285,56 +334,11 @@ void create_invokedynamic_synthetic_classes(
       symbol_table.add(create_constructor_symbol(
         synthetic_methods, synthetic_class_name, dynamic_method_type));
 
-      // Create implemented method symbol:
-
-      symbol_table.add([&] {
-        const symbolt &interface_method_symbol =
-          ns.lookup(*interface_method_id);
-
-        const std::string implemented_method_name = [&] {
-          std::string implemented_method_name =
-            id2string(interface_method_symbol.name);
-          const std::string &implemented_interface_tag_str =
-            id2string(implemented_interface_tag.get_identifier());
-          INVARIANT(
-            has_prefix(implemented_method_name, implemented_interface_tag_str),
-            "method names should be prefixed by their defining type");
-          implemented_method_name.replace(
-            0,
-            implemented_interface_tag_str.length(),
-            id2string(synthetic_class_name));
-          return implemented_method_name;
-        }();
-
-        symbolt implemented_method_symbol;
-        implemented_method_symbol.name = implemented_method_name;
-        synthetic_methods[implemented_method_symbol.name] =
-          synthetic_method_typet::INVOKEDYNAMIC_METHOD;
-        implemented_method_symbol.pretty_name = implemented_method_symbol.name;
-        implemented_method_symbol.base_name = interface_method_symbol.base_name;
-        implemented_method_symbol.mode = ID_java;
-        implemented_method_symbol.type = interface_method_symbol.type;
-        auto &implemented_method_type =
-          to_code_type(implemented_method_symbol.type);
-        implemented_method_type.parameters()[0].type() =
-          java_reference_type(struct_tag_typet(synthetic_class_name));
-
-        size_t field_idx = 0;
-        for(auto &param : implemented_method_type.parameters())
-        {
-          irep_idt param_basename =
-            field_idx == 0 ? "this" : "param_" + std::to_string(field_idx);
-          param.set_base_name(param_basename);
-          param.set_identifier(
-            id2string(implemented_method_name) +
-            "::" + id2string(param_basename));
-
-          ++field_idx;
-        }
-
-        set_declaring_class(implemented_method_symbol, synthetic_class_name);
-        return implemented_method_symbol;
-      }());
+      symbol_table.add(create_implemented_method_symbol(
+        synthetic_methods,
+        ns.lookup(*interface_method_id),
+        implemented_interface_tag,
+        synthetic_class_name));
 
       // Register class symbol:
 
