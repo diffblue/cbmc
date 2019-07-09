@@ -8,4 +8,4 @@ assertion.* file Test.java line 42 .* FAILURE
 Shows that the assertion can be violated when string-printable is not enabled
 for character arrays
 
-The constraint has not been implemented for char arrays.
+The constraint has not been implemented for char arrays. TG-8355
