@@ -1,0 +1,10 @@
+CORE symex-driven-lazy-loading-expected-failure
+Foo.class
+--trace --depth 1024 --java-max-vla-length 16 --max-nondet-string-length 20 --string-printable --unwind 10 --function "Foo.foo" --java-unwind-enum-static
+assertion at file Foo.java line 6 .*: FAILURE
+assertion at file Foo.java line 9 .*: FAILURE
+assertion at file Foo.java line 12 .*: FAILURE
+assertion at file Foo.java line 15 .*: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
