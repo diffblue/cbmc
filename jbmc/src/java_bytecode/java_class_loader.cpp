@@ -176,7 +176,7 @@ java_class_loadert::get_parse_tree(
     return parse_trees;
 
   // Not found or failed to load
-  warning() << "failed to load class \'" << class_name << '\'' << eom;
+  warning() << "failed to load class " << class_name << eom;
   parse_trees.emplace_back(class_name);
   return parse_trees;
 }
