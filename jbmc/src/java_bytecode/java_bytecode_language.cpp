@@ -747,7 +747,7 @@ bool java_bytecode_languaget::typecheck(
   {
     const auto &id = id_and_symbol.first;
     const auto &symbol = id_and_symbol.second;
-    if(symbol.type.id() == ID_code && method_bytecode.get(id))
+    if(can_cast_type<code_typet>(symbol.type) && method_bytecode.get(id))
     {
       create_invokedynamic_synthetic_classes(
         id,
