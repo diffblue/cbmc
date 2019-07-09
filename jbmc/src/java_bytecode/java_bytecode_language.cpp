@@ -1211,11 +1211,11 @@ bool java_bytecode_languaget::convert_single_method(
           get_message_handler());
       break;
     case synthetic_method_typet::INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR:
-      writable_symbol.value = get_invokedynamic_synthetic_constructor(
+      writable_symbol.value = invokedynamic_synthetic_constructor(
         function_id, symbol_table, get_message_handler());
       break;
     case synthetic_method_typet::INVOKEDYNAMIC_METHOD:
-      writable_symbol.value = get_invokedynamic_synthetic_method(
+      writable_symbol.value = invokedynamic_synthetic_method(
         function_id, symbol_table, get_message_handler());
       break;
     }

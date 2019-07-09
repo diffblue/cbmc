@@ -30,12 +30,14 @@ void create_invokedynamic_synthetic_classes(
   synthetic_methods_mapt &synthetic_methods,
   message_handlert &message_handler);
 
-codet get_invokedynamic_synthetic_constructor(
+/// Create invokedynamic synthetic constructor
+codet invokedynamic_synthetic_constructor(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 
-codet get_invokedynamic_synthetic_method(
+/// Create invokedynamic synthetic method
+codet invokedynamic_synthetic_method(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler);

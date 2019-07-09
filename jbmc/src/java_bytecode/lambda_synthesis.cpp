@@ -359,7 +359,7 @@ static const symbolt &get_or_create_method_symbol(
   return symbol_table.lookup_ref(identifier);
 }
 
-codet get_invokedynamic_synthetic_constructor(
+codet invokedynamic_synthetic_constructor(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
@@ -425,7 +425,7 @@ codet get_invokedynamic_synthetic_constructor(
   return std::move(result);
 }
 
-codet get_invokedynamic_synthetic_method(
+codet invokedynamic_synthetic_method(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
