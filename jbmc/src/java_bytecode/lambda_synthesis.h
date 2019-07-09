@@ -14,10 +14,12 @@ Author: Diffblue Ltd.
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/synthetic_methods_map.h>
+#include <util/irep.h>
 
-#include <util/message.h>
-#include <util/std_code.h>
-#include <util/symbol_table_base.h>
+class message_handlert;
+class codet;
+class symbol_table_baset;
+class symbol_tablet;
 
 irep_idt lambda_synthetic_class_name(
   const irep_idt &method_identifier,
