@@ -1,0 +1,9 @@
+CORE
+Enum1.class
+--java-unwind-enum-static --unwind 3
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+^Unwinding loop java::Enum1.<clinit>:\(\)V.0 iteration 5 \(6 max\) file Enum1.java line 6 function java::Enum1.<clinit>:\(\)V bytecode-index 78 thread 0$
+--
+^warning: ignoring

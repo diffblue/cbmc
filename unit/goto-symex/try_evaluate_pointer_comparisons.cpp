@@ -78,6 +78,26 @@ SCENARIO(
       }
     }
 
+    WHEN("Evaluating ptr1 == (long*)(short*)&value1")
+    {
+      const signedbv_typet long_type{64};
+      const signedbv_typet short_type{16};
+      const pointer_typet ptr_long_type = pointer_type(long_type);
+      const pointer_typet ptr_short_type = pointer_type(short_type);
+      const equal_exprt comparison{
+        ptr1,
+        typecast_exprt{typecast_exprt{address1, ptr_short_type},
+                       ptr_long_type}};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation succeeds")
+      {
+        REQUIRE(result.get() == true_exprt{});
+      }
+    }
+
     WHEN("Evaluating ptr1 != &value1")
     {
       const notequal_exprt comparison{ptr1, address1};

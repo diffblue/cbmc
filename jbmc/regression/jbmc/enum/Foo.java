@@ -1,5 +1,3 @@
-package com.diffblue.regression;
-
 public class Foo {
   public int foo(MyEnum e) {
     if (e == null) return 0;

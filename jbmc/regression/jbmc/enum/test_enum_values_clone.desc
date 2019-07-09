@@ -1,0 +1,6 @@
+CORE symex-driven-lazy-loading-expected-failure
+EnumIter.class
+--java-max-vla-length 16 --max-nondet-string-length 20 --string-printable --unwind 2 --function "EnumIter.f" --java-unwind-enum-static --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+--
