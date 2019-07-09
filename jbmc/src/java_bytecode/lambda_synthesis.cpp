@@ -59,6 +59,63 @@ static optionalt<symbolt> get_lambda_method_symbol(
   return {};
 }
 
+static optionalt<irep_idt> lambda_method_name(
+  const symbol_tablet &symbol_table,
+  const irep_idt &method_identifier,
+  const java_method_typet &dynamic_method_type)
+{
+  const namespacet ns{symbol_table};
+  const auto &method_symbol = ns.lookup(method_identifier);
+  const auto &declaring_class_symbol =
+    ns.lookup(*declaring_class(method_symbol));
+
+  const auto &class_type = to_java_class_type(declaring_class_symbol.type);
+  const auto &lambda_method_handles = class_type.lambda_method_handles();
+  auto lambda_handle_index =
+    dynamic_method_type.get_int(ID_java_lambda_method_handle_index);
+  const auto lambda_method_symbol = get_lambda_method_symbol(
+    symbol_table, lambda_method_handles, lambda_handle_index);
+  if(lambda_method_symbol)
+    return lambda_method_symbol->name;
+  return {};
+}
+
+static optionalt<irep_idt> interface_method_id(
+  const symbol_tablet &symbol_table,
+  const struct_tag_typet &implemented_interface_tag,
+  const irep_idt &method_identifier,
+  const int instruction_address,
+  const messaget &log)
+{
+  const namespacet ns{symbol_table};
+  const java_class_typet &implemented_interface_type = [&] {
+    const symbolt &implemented_interface_symbol =
+      ns.lookup(implemented_interface_tag.get_identifier());
+    return to_java_class_type(implemented_interface_symbol.type);
+  }();
+
+  if(implemented_interface_type.get_is_stub())
+  {
+    log.debug() << "ignoring invokedynamic at " << method_identifier
+                << " address " << instruction_address
+                << " which produces a stub type "
+                << implemented_interface_tag.get_identifier() << messaget::eom;
+    return {};
+  }
+  else if(implemented_interface_type.methods().size() != 1)
+  {
+    log.debug()
+      << "ignoring invokedynamic at " << method_identifier << " address "
+      << instruction_address << " which produces type "
+      << implemented_interface_tag.get_identifier()
+      << " which should have exactly one abstract method but actually has "
+      << implemented_interface_type.methods().size()
+      << ". Note default methods are not supported yet." << messaget::eom;
+    return {};
+  }
+  return implemented_interface_type.methods().at(0).get_name();
+}
+
 void create_invokedynamic_synthetic_classes(
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
@@ -99,23 +156,8 @@ void create_invokedynamic_synthetic_classes(
       const auto &dynamic_method_type =
         to_java_method_type(instruction.args.at(0).type());
 
-      const auto lambda_method_name = [&]() -> optionalt<irep_idt> {
-        const auto &method_symbol = ns.lookup(method_identifier);
-        const auto &declaring_class_symbol =
-          ns.lookup(*declaring_class(method_symbol));
-
-        const auto &class_type =
-          to_java_class_type(declaring_class_symbol.type);
-        const auto &lambda_method_handles = class_type.lambda_method_handles();
-        auto lambda_handle_index =
-          dynamic_method_type.get_int(ID_java_lambda_method_handle_index);
-        const auto lambda_method_symbol = get_lambda_method_symbol(
-          symbol_table, lambda_method_handles, lambda_handle_index);
-        if(lambda_method_symbol)
-          return lambda_method_symbol->name;
-        return {};
-      }();
-
+      const auto lambda_method_name = ::lambda_method_name(
+        symbol_table, method_identifier, dynamic_method_type);
       if(!lambda_method_name)
       {
         log.debug() << "ignoring invokedynamic at " << method_identifier
@@ -126,37 +168,12 @@ void create_invokedynamic_synthetic_classes(
 
       const auto &implemented_interface_tag = to_struct_tag_type(
         to_java_reference_type(dynamic_method_type.return_type()).subtype());
-      const auto interface_method_id = [&]() -> optionalt<irep_idt> {
-        const java_class_typet &implemented_interface_type = [&] {
-          const symbolt &implemented_interface_symbol =
-            ns.lookup(implemented_interface_tag.get_identifier());
-          return to_java_class_type(implemented_interface_symbol.type);
-        }();
-
-        if(implemented_interface_type.get_is_stub())
-        {
-          log.debug() << "ignoring invokedynamic at " << method_identifier
-                      << " address " << instruction.address
-                      << " which produces a stub type "
-                      << implemented_interface_tag.get_identifier()
-                      << messaget::eom;
-          return {};
-        }
-        else if(implemented_interface_type.methods().size() != 1)
-        {
-          log.debug() << "ignoring invokedynamic at " << method_identifier
-                      << " address " << instruction.address
-                      << " which produces type "
-                      << implemented_interface_tag.get_identifier()
-                      << " which should have exactly one abstract method but "
-                         "actually has "
-                      << implemented_interface_type.methods().size()
-                      << ". Note default methods are not supported yet."
-                      << messaget::eom;
-          return {};
-        }
-        return implemented_interface_type.methods().at(0).get_name();
-      }();
+      const auto interface_method_id = ::interface_method_id(
+        symbol_table,
+        implemented_interface_tag,
+        method_identifier,
+        instruction.address,
+        log);
       if(!interface_method_id)
         continue;
 
