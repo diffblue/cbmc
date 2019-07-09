@@ -66,8 +66,8 @@ void create_invokedynamic_synthetic_classes(
   synthetic_methods_mapt &synthetic_methods,
   message_handlert &message_handler)
 {
-  messaget log(message_handler);
-  namespacet ns(symbol_table);
+  messaget log{message_handler};
+  namespacet ns{symbol_table};
 
   for(const auto &instruction : instructions)
   {
@@ -96,19 +96,22 @@ void create_invokedynamic_synthetic_classes(
       // invoke instruction will return null when eventually converted by
       // java_bytecode_convert_method.
 
-      const auto &method_symbol = ns.lookup(method_identifier);
-      const auto &declaring_class_symbol =
-        ns.lookup(*declaring_class(method_symbol));
-      const auto &class_type = to_java_class_type(declaring_class_symbol.type);
-
-      const auto &lambda_method_handles = class_type.lambda_method_handles();
       const auto &dynamic_method_type =
         to_java_method_type(instruction.args.at(0).type());
 
-      auto lambda_handle_index =
-        dynamic_method_type.get_int(ID_java_lambda_method_handle_index);
-      const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
-        symbol_table, lambda_method_handles, lambda_handle_index);
+      const optionalt<symbolt> &lambda_method_symbol = [&] {
+        const auto &method_symbol = ns.lookup(method_identifier);
+        const auto &declaring_class_symbol =
+          ns.lookup(*declaring_class(method_symbol));
+
+        const auto &class_type =
+          to_java_class_type(declaring_class_symbol.type);
+        const auto &lambda_method_handles = class_type.lambda_method_handles();
+        auto lambda_handle_index =
+          dynamic_method_type.get_int(ID_java_lambda_method_handle_index);
+        return get_lambda_method_symbol(
+          symbol_table, lambda_method_handles, lambda_handle_index);
+      }();
 
       if(!lambda_method_symbol)
       {
@@ -120,10 +123,11 @@ void create_invokedynamic_synthetic_classes(
 
       const auto &implemented_interface_tag = to_struct_tag_type(
         to_java_reference_type(dynamic_method_type.return_type()).subtype());
-      const symbolt &implemented_interface_symbol =
-        ns.lookup(implemented_interface_tag.get_identifier());
-      const java_class_typet &implemented_interface_type =
-        to_java_class_type(implemented_interface_symbol.type);
+      const java_class_typet &implemented_interface_type = [&] {
+        const symbolt &implemented_interface_symbol =
+          ns.lookup(implemented_interface_tag.get_identifier());
+        return to_java_class_type(implemented_interface_symbol.type);
+      }();
 
       if(implemented_interface_type.get_is_stub())
       {
@@ -153,143 +157,157 @@ void create_invokedynamic_synthetic_classes(
 
       // Create the class symbol:
 
-      irep_idt synthetic_class_name =
+      const irep_idt synthetic_class_name =
         lambda_synthetic_class_name(method_identifier, instruction.address);
 
-      java_class_typet synthetic_class_type;
-      // Tag = name without 'java::' prefix, matching the convention used by
-      // java_bytecode_convert_class.cpp
-      synthetic_class_type.set_tag(
-        strip_java_namespace_prefix(synthetic_class_name));
-      synthetic_class_type.set_name(synthetic_class_name);
-      synthetic_class_type.set_synthetic(true);
-      synthetic_class_type.set(
-        ID_java_lambda_method_identifier, lambda_method_symbol.value().name);
-      struct_tag_typet base_tag("java::java.lang.Object");
-      synthetic_class_type.add_base(base_tag);
-      synthetic_class_type.add_base(implemented_interface_tag);
+      const java_class_typet synthetic_class_type = [&] {
+        java_class_typet synthetic_class_type;
+        // Tag = name without 'java::' prefix, matching the convention used by
+        // java_bytecode_convert_class.cpp
+        synthetic_class_type.set_tag(
+          strip_java_namespace_prefix(synthetic_class_name));
+        synthetic_class_type.set_name(synthetic_class_name);
+        synthetic_class_type.set_synthetic(true);
+        synthetic_class_type.set(
+          ID_java_lambda_method_identifier, lambda_method_symbol.value().name);
+        struct_tag_typet base_tag("java::java.lang.Object");
+        synthetic_class_type.add_base(base_tag);
+        synthetic_class_type.add_base(implemented_interface_tag);
 
-      // Add the class fields:
+        // Add the class fields:
 
-      java_class_typet::componentt base_field;
-      const irep_idt base_field_name("@java.lang.Object");
-      base_field.set_name(base_field_name);
-      base_field.set_base_name(base_field_name);
-      base_field.set_pretty_name(base_field_name);
-      base_field.set_access(ID_private);
-      base_field.type() = base_tag;
-      synthetic_class_type.components().emplace_back(std::move(base_field));
+        {
+          java_class_typet::componentt base_field;
+          const irep_idt base_field_name("@java.lang.Object");
+          base_field.set_name(base_field_name);
+          base_field.set_base_name(base_field_name);
+          base_field.set_pretty_name(base_field_name);
+          base_field.set_access(ID_private);
+          base_field.type() = base_tag;
+          synthetic_class_type.components().emplace_back(std::move(base_field));
 
-      std::size_t field_idx = 0;
-      for(const auto &param : dynamic_method_type.parameters())
-      {
-        irep_idt field_basename = "capture_" + std::to_string(field_idx++);
+          std::size_t field_idx = 0;
+          for(const auto &param : dynamic_method_type.parameters())
+          {
+            irep_idt field_basename = "capture_" + std::to_string(field_idx++);
 
-        java_class_typet::componentt new_field;
-        new_field.set_name(field_basename);
-        new_field.set_base_name(field_basename);
-        new_field.set_pretty_name(field_basename);
-        new_field.set_access(ID_private);
-        new_field.type() = param.type();
-        synthetic_class_type.components().emplace_back(std::move(new_field));
-      }
+            java_class_typet::componentt new_field;
+            new_field.set_name(field_basename);
+            new_field.set_base_name(field_basename);
+            new_field.set_pretty_name(field_basename);
+            new_field.set_access(ID_private);
+            new_field.type() = param.type();
+            synthetic_class_type.components().emplace_back(
+              std::move(new_field));
+          }
+        }
+        return synthetic_class_type;
+      }();
 
       // Create constructor symbol:
 
-      symbolt constructor_symbol;
-      irep_idt constructor_name = id2string(synthetic_class_name) + ".<init>";
-      constructor_symbol.name = constructor_name;
-      constructor_symbol.pretty_name = constructor_symbol.name;
-      constructor_symbol.base_name = "<init>";
-      constructor_symbol.mode = ID_java;
+      symbol_table.add([&] {
+        symbolt constructor_symbol;
+        irep_idt constructor_name = id2string(synthetic_class_name) + ".<init>";
+        constructor_symbol.name = constructor_name;
+        constructor_symbol.pretty_name = constructor_symbol.name;
+        constructor_symbol.base_name = "<init>";
+        constructor_symbol.mode = ID_java;
 
-      synthetic_methods[constructor_name] =
-        synthetic_method_typet::INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR;
+        synthetic_methods[constructor_name] =
+          synthetic_method_typet::INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR;
 
-      java_method_typet constructor_type = dynamic_method_type;
-      constructor_type.set_is_constructor();
-      constructor_type.return_type() = empty_typet();
+        java_method_typet constructor_type = dynamic_method_type;
+        constructor_type.set_is_constructor();
+        constructor_type.return_type() = empty_typet();
 
-      field_idx = 0;
-      for(auto &param : constructor_type.parameters())
-      {
-        irep_idt param_basename = "param_" + std::to_string(field_idx++);
-        param.set_base_name(param_basename);
-        param.set_identifier(
-          id2string(constructor_name) + "::" + id2string(param_basename));
-      }
+        size_t field_idx = 0;
+        for(auto &param : constructor_type.parameters())
+        {
+          irep_idt param_basename = "param_" + std::to_string(field_idx++);
+          param.set_base_name(param_basename);
+          param.set_identifier(
+            id2string(constructor_name) + "::" + id2string(param_basename));
+        }
 
-      java_method_typet::parametert constructor_this_param;
-      constructor_this_param.set_this();
-      constructor_this_param.set_base_name("this");
-      constructor_this_param.set_identifier(
-        id2string(constructor_name) + "::this");
-      constructor_this_param.type() =
-        java_reference_type(struct_tag_typet(synthetic_class_name));
+        java_method_typet::parametert constructor_this_param;
+        constructor_this_param.set_this();
+        constructor_this_param.set_base_name("this");
+        constructor_this_param.set_identifier(
+          id2string(constructor_name) + "::this");
+        constructor_this_param.type() =
+          java_reference_type(struct_tag_typet(synthetic_class_name));
 
-      constructor_type.parameters().insert(
-        constructor_type.parameters().begin(), constructor_this_param);
+        constructor_type.parameters().insert(
+          constructor_type.parameters().begin(), constructor_this_param);
 
-      constructor_symbol.type = constructor_type;
-      set_declaring_class(constructor_symbol, synthetic_class_name);
-      symbol_table.add(constructor_symbol);
+        constructor_symbol.type = constructor_type;
+        set_declaring_class(constructor_symbol, synthetic_class_name);
+        return constructor_symbol;
+      }());
 
       // Create implemented method symbol:
 
-      INVARIANT(
-        implemented_interface_type.methods().size() == 1,
-        "lambdas must only convert to single-method interfaces");
-      const symbolt &interface_method_symbol =
-        ns.lookup(implemented_interface_type.methods().at(0).get_name());
+      symbol_table.add([&] {
+        INVARIANT(
+          implemented_interface_type.methods().size() == 1,
+          "lambdas must only convert to single-method interfaces");
+        const symbolt &interface_method_symbol =
+          ns.lookup(implemented_interface_type.methods().at(0).get_name());
 
-      symbolt implemented_method_symbol;
+        const std::string implemented_method_name = [&] {
+          std::string implemented_method_name =
+            id2string(interface_method_symbol.name);
+          const std::string &implemented_interface_tag_str =
+            id2string(implemented_interface_tag.get_identifier());
+          INVARIANT(
+            has_prefix(implemented_method_name, implemented_interface_tag_str),
+            "method names should be prefixed by their defining type");
+          implemented_method_name.replace(
+            0,
+            implemented_interface_tag_str.length(),
+            id2string(synthetic_class_name));
+          return implemented_method_name;
+        }();
 
-      std::string implemented_method_name =
-        id2string(interface_method_symbol.name);
-      const std::string &implemented_interface_tag_str =
-        id2string(implemented_interface_tag.get_identifier());
-      INVARIANT(
-        has_prefix(implemented_method_name, implemented_interface_tag_str),
-        "method names should be prefixed by their defining type");
-      implemented_method_name.replace(
-        0,
-        implemented_interface_tag_str.length(),
-        id2string(synthetic_class_name));
+        symbolt implemented_method_symbol;
+        implemented_method_symbol.name = implemented_method_name;
+        synthetic_methods[implemented_method_symbol.name] =
+          synthetic_method_typet::INVOKEDYNAMIC_METHOD;
+        implemented_method_symbol.pretty_name = implemented_method_symbol.name;
+        implemented_method_symbol.base_name = interface_method_symbol.base_name;
+        implemented_method_symbol.mode = ID_java;
+        implemented_method_symbol.type = interface_method_symbol.type;
+        auto &implemented_method_type =
+          to_code_type(implemented_method_symbol.type);
+        implemented_method_type.parameters()[0].type() =
+          java_reference_type(struct_tag_typet(synthetic_class_name));
 
-      implemented_method_symbol.name = implemented_method_name;
-      synthetic_methods[implemented_method_symbol.name] =
-        synthetic_method_typet::INVOKEDYNAMIC_METHOD;
-      implemented_method_symbol.pretty_name = implemented_method_symbol.name;
-      implemented_method_symbol.base_name = interface_method_symbol.base_name;
-      implemented_method_symbol.mode = ID_java;
-      implemented_method_symbol.type = interface_method_symbol.type;
-      auto &implemented_method_type =
-        to_code_type(implemented_method_symbol.type);
-      implemented_method_type.parameters()[0].type() =
-        java_reference_type(struct_tag_typet(synthetic_class_name));
+        size_t field_idx = 0;
+        for(auto &param : implemented_method_type.parameters())
+        {
+          irep_idt param_basename =
+            field_idx == 0 ? "this" : "param_" + std::to_string(field_idx);
+          param.set_base_name(param_basename);
+          param.set_identifier(
+            id2string(implemented_method_name) +
+            "::" + id2string(param_basename));
 
-      field_idx = 0;
-      for(auto &param : implemented_method_type.parameters())
-      {
-        irep_idt param_basename =
-          field_idx == 0 ? "this" : "param_" + std::to_string(field_idx);
-        param.set_base_name(param_basename);
-        param.set_identifier(
-          id2string(implemented_method_name) +
-          "::" + id2string(param_basename));
+          ++field_idx;
+        }
 
-        ++field_idx;
-      }
-
-      set_declaring_class(implemented_method_symbol, synthetic_class_name);
-      symbol_table.add(implemented_method_symbol);
+        set_declaring_class(implemented_method_symbol, synthetic_class_name);
+        return implemented_method_symbol;
+      }());
 
       // Register class symbol:
 
-      type_symbolt synthetic_class_symbol(synthetic_class_type);
-      synthetic_class_symbol.name = synthetic_class_name;
-      synthetic_class_symbol.mode = ID_java;
-      symbol_table.add(synthetic_class_symbol);
+      symbol_table.add([&] {
+        type_symbolt synthetic_class_symbol(synthetic_class_type);
+        synthetic_class_symbol.name = synthetic_class_name;
+        synthetic_class_symbol.mode = ID_java;
+        return synthetic_class_symbol;
+      }());
     }
   }
 }
