@@ -743,20 +743,11 @@ bool java_bytecode_languaget::typecheck(
   // Now add synthetic classes for every invokedynamic instruction found (it
   // makes this easier that all interface types and their methods have been
   // created above):
+  for(const auto &id_and_symbol : symbol_table)
   {
-    std::vector<irep_idt> function_symbols;
-
-    for(const auto &id_and_symbol : symbol_table)
-    {
-      if(id_and_symbol.second.type.id() != ID_code)
-        continue;
-      auto cmb = method_bytecode.get(id_and_symbol.first);
-      if(!cmb)
-        continue;
-      function_symbols.push_back(id_and_symbol.first);
-    }
-
-    for(const auto &id : function_symbols)
+    const auto &id = id_and_symbol.first;
+    const auto &symbol = id_and_symbol.second;
+    if(symbol.type.id() == ID_code && method_bytecode.get(id))
     {
       create_invokedynamic_synthetic_classes(
         id,
