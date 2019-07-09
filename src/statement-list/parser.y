@@ -99,14 +99,32 @@ extern char *yystatement_listtext;
 %token TOK_ACCU_INT_SUB         "-I"
 %token TOK_ACCU_INT_MUL         "*I"
 %token TOK_ACCU_INT_DIV         "/I"
+%token TOK_ACCU_INT_EQ          "==I"
+%token TOK_ACCU_INT_NEQ         "<>I"
+%token TOK_ACCU_INT_GT          ">I"
+%token TOK_ACCU_INT_LT          "<I"
+%token TOK_ACCU_INT_GTE         ">=I"
+%token TOK_ACCU_INT_LTE         "<=I"
 %token TOK_ACCU_REAL_ADD        "+R"
 %token TOK_ACCU_REAL_SUB        "-R"
 %token TOK_ACCU_REAL_MUL        "*R"
 %token TOK_ACCU_REAL_DIV        "/R"
+%token TOK_ACCU_REAL_EQ         "==R"
+%token TOK_ACCU_REAL_NEQ        "<>R"
+%token TOK_ACCU_REAL_GT         ">R"
+%token TOK_ACCU_REAL_LT         "<R"
+%token TOK_ACCU_REAL_GTE        ">=R"
+%token TOK_ACCU_REAL_LTE        "<=R"
 %token TOK_ACCU_DINT_ADD        "+D"
 %token TOK_ACCU_DINT_SUB        "-D"
 %token TOK_ACCU_DINT_MUL        "*D"
 %token TOK_ACCU_DINT_DIV        "/D"
+%token TOK_ACCU_DINT_EQ         "==D"
+%token TOK_ACCU_DINT_NEQ        "<>D"
+%token TOK_ACCU_DINT_GT         ">D"
+%token TOK_ACCU_DINT_LT         "<D"
+%token TOK_ACCU_DINT_GTE        ">=D"
+%token TOK_ACCU_DINT_LTE        "<=D"
 %token TOK_ASSIGNMENT           ":="
 
 /*** Value tokens ***/
@@ -115,6 +133,7 @@ extern char *yystatement_listtext;
 %token TOK_REAL_LITERAL
 %token TOK_IDENTIFIER
 %token TOK_TITLE_VALUE
+%token TOK_VERSION_VALUE
 %token TOK_LABEL
 
 /*** Priority, associativity, etc. definitions *******************************/
@@ -267,10 +286,9 @@ FB_Decl:
     ;
 
 Version_Label:
-    TOK_VERSION ':' TOK_REAL_LITERAL 
+    TOK_VERSION ':' TOK_VERSION_VALUE
     {
       $$ = $3;
-      parser_stack($$).type().id(ID_statement_list_version);
     }
     ;
 
@@ -759,6 +777,36 @@ IL_Simple_Operator:
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_div);
     }
+    | TOK_ACCU_INT_EQ
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_int_eq);
+    }
+    | TOK_ACCU_INT_NEQ
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_int_neq);
+    }
+    | TOK_ACCU_INT_GT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_int_gt);
+    }
+    | TOK_ACCU_INT_LT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_int_lt);
+    }
+    | TOK_ACCU_INT_GTE
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_int_gte);
+    }
+    | TOK_ACCU_INT_LTE
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_int_lte);
+    }
     | TOK_ACCU_REAL_ADD
     {
       $$ = $1;
@@ -779,6 +827,36 @@ IL_Simple_Operator:
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_div);
     }
+    | TOK_ACCU_REAL_EQ
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_real_eq);
+    }
+    | TOK_ACCU_REAL_NEQ
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_real_neq);
+    }
+    | TOK_ACCU_REAL_GT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_real_gt);
+    }
+    | TOK_ACCU_REAL_LT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_real_lt);
+    }
+    | TOK_ACCU_REAL_GTE
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_real_gte);
+    }
+    | TOK_ACCU_REAL_LTE
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_real_lte);
+    }
     | TOK_ACCU_DINT_ADD
     {
       $$ = $1;
@@ -798,6 +876,36 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_div);
+    }
+    | TOK_ACCU_DINT_EQ
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_dint_eq);
+    }
+    | TOK_ACCU_DINT_NEQ
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_dint_neq);
+    }
+    | TOK_ACCU_DINT_GT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_dint_gt);
+    }
+    | TOK_ACCU_DINT_LT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_dint_lt);
+    }
+    | TOK_ACCU_DINT_GTE
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_dint_gte);
+    }
+    | TOK_ACCU_DINT_LTE
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_accu_dint_lte);
     }
     | TOK_AND 
     {

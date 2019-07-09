@@ -10,8 +10,30 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Statement List Language Parse Tree Output
 
 #include "statement_list_parse_tree_io.h"
+#include "converters/statement_list_types.h"
+
+#include <util/arith_tools.h>
+#include <util/ieee_float.h>
 
 #define NO_VALUE "(none)"
+
+/// Prints a constant to the given output stream.
+/// \param [out] out: Stream that should receive the result.
+/// \param constant: Constant that shall be printed.
+static void output_constant(std::ostream &out, const constant_exprt &constant)
+{
+  mp_integer ivalue;
+  if(!to_integer(constant, ivalue))
+    out << ivalue;
+  else if(can_cast_type<floatbv_typet>(constant.type()))
+  {
+    ieee_floatt real{get_real_type()};
+    real.from_expr(constant);
+    out << real.to_float();
+  }
+  else
+    out << constant.get_value();
+}
 
 void output_parse_tree(
   std::ostream &out,
@@ -146,7 +168,11 @@ void output_var_declaration(
   out << declaration.variable.pretty() << '\n';
   out << "  * default_value: ";
   if(declaration.default_value)
-    out << declaration.default_value->get(ID_value);
+  {
+    const constant_exprt &constant =
+      to_constant_expr(declaration.default_value.value());
+    output_constant(out, constant);
+  }
   else
     out << NO_VALUE;
 }
@@ -189,14 +215,23 @@ void output_instruction(
     for(const auto &expr : token.operands())
     {
       if(expr.id() == ID_symbol)
-        out << '\t' << expr.get(ID_identifier);
-      else if(expr.id() == ID_constant)
-        out << '\t' << expr.get(ID_value);
-      else if(can_cast_expr<equal_exprt>(expr))
       {
-        const equal_exprt eq = to_equal_expr(expr);
-        out << "\n\t" << eq.lhs().get(ID_identifier)
-            << " := " << eq.rhs().get(ID_identifier);
+        out << '\t' << expr.get(ID_identifier);
+        continue;
+      }
+      const constant_exprt *const constant =
+        expr_try_dynamic_cast<constant_exprt>(expr);
+      if(constant)
+      {
+        out << '\t';
+        output_constant(out, *constant);
+        continue;
+      }
+      const equal_exprt *const eq = expr_try_dynamic_cast<equal_exprt>(expr);
+      if(eq)
+      {
+        out << "\n\t" << eq->lhs().get(ID_identifier)
+            << " := " << eq->rhs().get(ID_identifier);
       }
       else
         out << '\t' << expr.id();

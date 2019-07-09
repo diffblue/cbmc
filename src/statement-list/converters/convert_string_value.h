@@ -25,6 +25,11 @@ string_constantt convert_identifier(const std::string &src);
 /// \return Constant string expression representing the title.
 string_constantt convert_title(const std::string &src);
 
+/// Converts a string into a Statement List version.
+/// \param src: String returned by the parser.
+/// \return Constant string expression representing the version.
+string_constantt convert_version(const std::string &src);
+
 /// Converts a string into a Statement List label.
 /// \param src: String returned by the parser.
 /// \return Code label expression representing the label.

@@ -1,0 +1,65 @@
+﻿FUNCTION_BLOCK "Add_Int2"
+VERSION : 0.1
+   VAR_INPUT 
+      in1 : Int;
+      in2 : Int;
+   END_VAR
+
+   VAR_OUTPUT 
+      out1 : Int;
+   END_VAR
+
+   VAR_TEMP 
+      compResult : Bool;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+
+      L #in1;
+      L INT#1000;
+      <=I;
+      = #compResult;
+      CALL "__CPROVER_assume"
+      (  condition                   := #compResult
+      );
+
+      L #in1;
+      L INT#-1000;
+      >=I;
+      = #compResult;
+      CALL "__CPROVER_assume"
+      (  condition                   := #compResult
+      );
+
+      L #in2;
+      L INT#1000;
+      <=I;
+      = #compResult;
+      CALL "__CPROVER_assume"
+      (  condition                   := #compResult
+      );
+
+      L #in2;
+      L INT#-1000;
+      >=I;
+      = #compResult;
+      CALL "__CPROVER_assume"
+      (  condition                   := #compResult
+      );
+
+      L #in1;
+      L #in2;
+      +I;
+      T #out1;
+      L INT#3000;
+      <I;
+      = #compResult;
+      CALL "__CPROVER_assert"
+      (  condition                   := #compResult
+      );
+
+END_FUNCTION_BLOCK
+

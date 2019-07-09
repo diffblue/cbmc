@@ -13,10 +13,21 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "statement_list_typecheck.h"
 
 #include <goto-programs/goto_functions.h>
+#include <util/c_types.h>
 #include <util/config.h>
+#include <util/std_code.h>
 
+/// Name of the CPROVER-specific function that initializes static variables.
 #define INITIALIZE_FUNCTION CPROVER_PREFIX "initialize"
+
+/// Name of the CPROVER-specific variable that specifies the rounding mode.
+#define ROUNDING_MODE_NAME CPROVER_PREFIX "rounding_mode"
+
+/// Postfix for the artificial data block that is created when calling a main
+/// symbol that is a function block.
 #define DB_ENTRY_POINT_POSTFIX "_entry_point"
+
+/// Name of the CPROVER-specific hide label.
 #define CPROVER_HIDE CPROVER_PREFIX "HIDE"
 
 /// Creates a call to __CPROVER_initialize and adds it to the start function's
@@ -75,8 +86,31 @@ static void generate_statement_list_init_function(symbol_tablet &symbol_table)
 
   code_blockt dest;
   dest.add(code_labelt(CPROVER_HIDE, code_skipt()));
-  init.value = dest;
+
+  for(const std::pair<const irep_idt, symbolt> &pair : symbol_table)
+  {
+    const symbolt &symbol = pair.second;
+    if(symbol.is_static_lifetime && symbol.value.is_not_nil())
+      dest.add(code_assignt{pair.second.symbol_expr(), pair.second.value});
+  }
+  init.value = std::move(dest);
   symbol_table.add(init);
+}
+
+/// Creates __CPROVER_rounding_mode and adds it to the symbol table.
+/// \param [out] symbol_table: Symbol table that should contain the symbol.
+static void generate_rounding_mode(symbol_tablet &symbol_table)
+{
+  symbolt rounding_mode;
+  rounding_mode.name = ROUNDING_MODE_NAME;
+  rounding_mode.type = signed_int_type();
+  rounding_mode.is_thread_local = true;
+  rounding_mode.is_static_lifetime = true;
+  const constant_exprt rounding_val{
+    std::to_string(ieee_floatt::rounding_modet::ROUND_TO_EVEN),
+    signed_int_type()};
+  rounding_mode.value = rounding_val;
+  symbol_table.add(rounding_mode);
 }
 
 /// Creates a start function and adds it to the symbol table. This start
@@ -133,18 +167,9 @@ bool statement_list_entry_point(
   {
     std::list<irep_idt> matches;
 
-    forall_symbol_base_map(
-      it, symbol_table.symbol_base_map, config.main.value())
-    {
-      symbol_tablet::symbolst::const_iterator s_it =
-        symbol_table.symbols.find(it->second);
-
-      if(s_it == symbol_table.symbols.end())
-        continue;
-
-      if(s_it->second.type.id() == ID_code)
-        matches.push_back(it->second);
-    }
+    for(const std::pair<const irep_idt, symbolt> &pair : symbol_table)
+      if(pair.first == config.main.value() && pair.second.type.id() == ID_code)
+        matches.push_back(pair.first);
 
     if(matches.empty())
     {
@@ -184,6 +209,7 @@ bool statement_list_entry_point(
     return true;
   }
 
+  generate_rounding_mode(symbol_table);
   generate_statement_list_init_function(symbol_table);
   return generate_statement_list_start_function(
     main, symbol_table, message_handler);

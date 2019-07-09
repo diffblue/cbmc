@@ -25,6 +25,13 @@ string_constantt convert_title(const std::string &src)
   return result;
 }
 
+string_constantt convert_version(const std::string &src)
+{
+  string_constantt result{src};
+  result.set(ID_statement_list_type, ID_statement_list_version);
+  return result;
+}
+
 code_labelt convert_label(const std::string &src)
 {
   // Cut the trailing colon

@@ -305,6 +305,18 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_int_mul(op_code);
   else if(ID_statement_list_accu_int_div == statement)
     typecheck_statement_list_accu_int_div(op_code);
+  else if(ID_statement_list_accu_int_eq == statement)
+    typecheck_statement_list_accu_int_eq(op_code);
+  else if(ID_statement_list_accu_int_neq == statement)
+    typecheck_statement_list_accu_int_neq(op_code);
+  else if(ID_statement_list_accu_int_lt == statement)
+    typecheck_statement_list_accu_int_lt(op_code);
+  else if(ID_statement_list_accu_int_gt == statement)
+    typecheck_statement_list_accu_int_gt(op_code);
+  else if(ID_statement_list_accu_int_lte == statement)
+    typecheck_statement_list_accu_int_lte(op_code);
+  else if(ID_statement_list_accu_int_gte == statement)
+    typecheck_statement_list_accu_int_gte(op_code);
   else if(ID_statement_list_accu_dint_add == statement)
     typecheck_statement_list_accu_dint_add(op_code);
   else if(ID_statement_list_accu_dint_sub == statement)
@@ -313,6 +325,18 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_dint_mul(op_code);
   else if(ID_statement_list_accu_dint_div == statement)
     typecheck_statement_list_accu_dint_div(op_code);
+  else if(ID_statement_list_accu_dint_eq == statement)
+    typecheck_statement_list_accu_dint_eq(op_code);
+  else if(ID_statement_list_accu_dint_neq == statement)
+    typecheck_statement_list_accu_dint_neq(op_code);
+  else if(ID_statement_list_accu_dint_lt == statement)
+    typecheck_statement_list_accu_dint_lt(op_code);
+  else if(ID_statement_list_accu_dint_gt == statement)
+    typecheck_statement_list_accu_dint_gt(op_code);
+  else if(ID_statement_list_accu_dint_lte == statement)
+    typecheck_statement_list_accu_dint_lte(op_code);
+  else if(ID_statement_list_accu_dint_gte == statement)
+    typecheck_statement_list_accu_dint_gte(op_code);
   else if(ID_statement_list_accu_real_add == statement)
     typecheck_statement_list_accu_real_add(op_code);
   else if(ID_statement_list_accu_real_sub == statement)
@@ -321,6 +345,18 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_real_mul(op_code);
   else if(ID_statement_list_accu_real_div == statement)
     typecheck_statement_list_accu_real_div(op_code);
+  else if(ID_statement_list_accu_real_eq == statement)
+    typecheck_statement_list_accu_real_eq(op_code);
+  else if(ID_statement_list_accu_real_neq == statement)
+    typecheck_statement_list_accu_real_neq(op_code);
+  else if(ID_statement_list_accu_real_lt == statement)
+    typecheck_statement_list_accu_real_lt(op_code);
+  else if(ID_statement_list_accu_real_gt == statement)
+    typecheck_statement_list_accu_real_gt(op_code);
+  else if(ID_statement_list_accu_real_lte == statement)
+    typecheck_statement_list_accu_real_lte(op_code);
+  else if(ID_statement_list_accu_real_gte == statement)
+    typecheck_statement_list_accu_real_gte(op_code);
   else if(ID_statement_list_and == statement)
     typecheck_statement_list_and(op_code, tia_element);
   else if(ID_statement_list_and_not == statement)
@@ -365,24 +401,29 @@ void statement_list_typecheckt::typecheck_statement_list_load(
   const codet &op_code,
   const symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-
-  // Check if identifier is present and add it to the accumulator.
-  const exprt val{typecheck_identifier(tia_element, identifier)};
-  accumulator.push_back(val);
+  const symbol_exprt *const symbol =
+    expr_try_dynamic_cast<symbol_exprt>(op_code.op0());
+  if(symbol)
+  {
+    const irep_idt &identifier{symbol->get_identifier()};
+    const exprt val{typecheck_identifier(tia_element, identifier)};
+    accumulator.push_back(val);
+  }
+  else if(can_cast_expr<constant_exprt>(op_code.op0()))
+    accumulator.push_back(op_code.op0());
+  else
+  {
+    error() << "Instruction is not followed by symbol or constant" << eom;
+    throw TYPECHECK_ERROR;
+  }
 }
 
 void statement_list_typecheckt::typecheck_statement_list_transfer(
   const codet &op_code,
   symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-
-  // Check if identifier is present, create code assignment and add it to the
-  // function body.
-  const exprt lhs{typecheck_identifier(tia_element, identifier)};
+  const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt lhs{typecheck_identifier(tia_element, op.get_identifier())};
   if(lhs.type() != accumulator.back().type())
   {
     error() << "Types of transfer assignment do not match" << eom;
@@ -401,7 +442,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_add(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const plus_exprt operation{accu1, accu2};
+  const plus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -414,7 +455,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_sub(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const minus_exprt operation{accu1, accu2};
+  const minus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -427,7 +468,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_mul(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const mult_exprt operation{accu1, accu2};
+  const mult_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -440,8 +481,50 @@ void statement_list_typecheckt::typecheck_statement_list_accu_int_div(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const div_exprt operation{accu1, accu2};
+  const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_eq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_equal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_neq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_notequal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_lt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_lt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_gt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_gt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_lte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_le);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_int_gte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_int_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_ge);
 }
 
 void statement_list_typecheckt::typecheck_statement_list_accu_dint_add(
@@ -453,7 +536,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_add(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const plus_exprt operation{accu1, accu2};
+  const plus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -466,7 +549,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_sub(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const minus_exprt operation{accu1, accu2};
+  const minus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -479,7 +562,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_mul(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const mult_exprt operation{accu1, accu2};
+  const mult_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -492,8 +575,50 @@ void statement_list_typecheckt::typecheck_statement_list_accu_dint_div(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const div_exprt operation{accu1, accu2};
+  const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_eq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_equal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_neq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_notequal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_lt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_lt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_gt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_gt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_lte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_le);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_dint_gte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_dint_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_ge);
 }
 
 void statement_list_typecheckt::typecheck_statement_list_accu_real_add(
@@ -505,7 +630,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_add(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const plus_exprt operation{accu1, accu2};
+  const plus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -518,7 +643,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_sub(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const minus_exprt operation{accu1, accu2};
+  const minus_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -531,7 +656,7 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_mul(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const mult_exprt operation{accu1, accu2};
+  const mult_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
 }
 
@@ -544,17 +669,59 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_div(
   const exprt accu1{accumulator.back()};
   accumulator.pop_back();
   const exprt &accu2{accumulator.back()};
-  const div_exprt operation{accu1, accu2};
+  const div_exprt operation{accu2, accu1};
   accumulator.push_back(operation);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_eq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_equal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_neq(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_notequal);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_lt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_lt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_gt(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_gt);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_lte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_le);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_accu_real_gte(
+  const codet &op_code)
+{
+  typecheck_statement_list_accu_real_arith(op_code);
+  typecheck_accumulator_compare_instruction(ID_ge);
 }
 
 void statement_list_typecheckt::typecheck_statement_list_and(
   const codet &op_code,
   const symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-  const exprt op{typecheck_identifier(tia_element, identifier)};
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
 
   // If inside of a bit string and if the OR bit is not set, create an 'and'
   // expression with the operand and the current contents of the rlo bit. If
@@ -575,9 +742,9 @@ void statement_list_typecheckt::typecheck_statement_list_and_not(
   const codet &op_code,
   const symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-  const exprt op{typecheck_identifier(tia_element, identifier)};
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
   const not_exprt not_op{op};
 
   // If inside of a bit string and if the OR bit is not set, create an 'and'
@@ -604,9 +771,9 @@ void statement_list_typecheckt::typecheck_statement_list_or(
     typecheck_statement_list_and_before_or();
     return;
   }
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-  const exprt op{typecheck_identifier(tia_element, identifier)};
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
 
   // If inside of a bit string, create an 'or' expression with the operand and
   // the current contents of the rlo bit.
@@ -624,9 +791,9 @@ void statement_list_typecheckt::typecheck_statement_list_or_not(
   const codet &op_code,
   const symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-  const exprt op{typecheck_identifier(tia_element, identifier)};
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
   const not_exprt not_op{op};
 
   // If inside of a bit string, create an 'or' expression with the operand and
@@ -764,9 +931,8 @@ void statement_list_typecheckt::typecheck_statement_list_assign(
   const codet &op_code,
   symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
-  const exprt lhs{typecheck_identifier(tia_element, identifier)};
+  const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt lhs{typecheck_identifier(tia_element, op.get_identifier())};
 
   if(lhs.type() != rlo_bit.type())
   {
@@ -801,8 +967,8 @@ void statement_list_typecheckt::typecheck_statement_list_set(
   const codet &op_code,
   symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
+  const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
+  const irep_idt &identifier{op.get_identifier()};
   const exprt lhs{typecheck_identifier(tia_element, identifier)};
   const code_assignt assignment{lhs, true_exprt()};
   const code_ifthenelset ifthen{rlo_bit, assignment};
@@ -815,8 +981,8 @@ void statement_list_typecheckt::typecheck_statement_list_reset(
   const codet &op_code,
   symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const irep_idt &identifier{to_symbol_expr(op_code.op0()).get_identifier()};
+  const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
+  const irep_idt &identifier{op.get_identifier()};
   const exprt lhs{typecheck_identifier(tia_element, identifier)};
   const code_assignt assignment{lhs, false_exprt()};
   const code_ifthenelset ifthen{rlo_bit, assignment};
@@ -829,13 +995,13 @@ void statement_list_typecheckt::typecheck_statement_list_call(
   const codet &op_code,
   symbolt &tia_element)
 {
-  typecheck_instruction_with_operand(op_code);
-  const symbol_exprt &call_operand{to_symbol_expr(op_code.op0())};
-  if(symbol_table.has_symbol(call_operand.get_identifier()))
+  const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
+  const irep_idt &identifier{op.get_identifier()};
+  if(symbol_table.has_symbol(identifier))
     typecheck_called_tia_element(op_code, tia_element);
-  else if(call_operand.get_identifier() == CPROVER_ASSUME)
+  else if(identifier == CPROVER_ASSUME)
     typecheck_CPROVER_assume(op_code, tia_element);
-  else if(call_operand.get_identifier() == CPROVER_ASSERT)
+  else if(identifier == CPROVER_ASSERT)
     typecheck_CPROVER_assert(op_code, tia_element);
   else
   {
@@ -905,14 +1071,28 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_arith(
   }
 }
 
-void statement_list_typecheckt::typecheck_instruction_with_operand(
+void statement_list_typecheckt::typecheck_accumulator_compare_instruction(
+  const irep_idt &comparison)
+{
+  const exprt &accu1{accumulator.back()};
+  const exprt &accu2{accumulator.at(accumulator.size() - 2)};
+  // STL behaviour: ACCU2 is lhs, ACCU1 is rhs.
+  const binary_relation_exprt operation{accu2, comparison, accu1};
+  rlo_bit = operation;
+}
+
+const symbol_exprt &
+statement_list_typecheckt::typecheck_instruction_with_non_const_operand(
   const codet &op_code)
 {
-  if(!can_cast_expr<symbol_exprt>(op_code.op0()))
-  {
-    error() << "Instruction is not followed by symbol" << eom;
-    throw TYPECHECK_ERROR;
-  }
+  const symbol_exprt *const symbol =
+    expr_try_dynamic_cast<symbol_exprt>(op_code.op0());
+
+  if(symbol)
+    return *symbol;
+
+  error() << "Instruction is not followed by symbol" << eom;
+  throw TYPECHECK_ERROR;
 }
 
 void statement_list_typecheckt::typecheck_instruction_without_operand(

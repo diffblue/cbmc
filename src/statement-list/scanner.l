@@ -76,6 +76,7 @@ void statement_list_scanner_init()
 %x GRAMMAR
 %x TAG_NAME
 %x TAG_ATTRIBUTES
+%x VERSION_ANNOTATION
 
 %%
 
@@ -88,7 +89,7 @@ void statement_list_scanner_init()
   :=                  { loc(); return TOK_ASSIGNMENT; }
   TAG                 { loc(); BEGIN(TAG_NAME); return TOK_TAG; }
   BEGIN               { loc(); return TOK_BEGIN; }
-  VERSION             { loc(); return TOK_VERSION; }
+  VERSION             { loc(); BEGIN(VERSION_ANNOTATION); return TOK_VERSION; }
   FUNCTION_BLOCK      { loc(); return TOK_FUNCTION_BLOCK; }
   END_FUNCTION_BLOCK  { loc(); return TOK_END_FUNCTION_BLOCK; }
   FUNCTION            { loc(); return TOK_FUNCTION; }
@@ -134,14 +135,32 @@ void statement_list_scanner_init()
   \-I                 { loc(); return TOK_ACCU_INT_SUB; }
   \*I                 { loc(); return TOK_ACCU_INT_MUL; }
   \/I                 { loc(); return TOK_ACCU_INT_DIV; }
+  ==I                 { loc(); return TOK_ACCU_INT_EQ; }
+  \<\>I               { loc(); return TOK_ACCU_INT_NEQ; }
+  \>I                 { loc(); return TOK_ACCU_INT_GT; }
+  \<I                 { loc(); return TOK_ACCU_INT_LT; }
+  \>=I                { loc(); return TOK_ACCU_INT_GTE; }
+  \<=I                { loc(); return TOK_ACCU_INT_LTE; }
   \+R                 { loc(); return TOK_ACCU_REAL_ADD; }
   \-R                 { loc(); return TOK_ACCU_REAL_SUB; }
   \*R                 { loc(); return TOK_ACCU_REAL_MUL; }
   \/R                 { loc(); return TOK_ACCU_REAL_DIV; }
+  ==R                 { loc(); return TOK_ACCU_REAL_EQ; }
+  \<\>R               { loc(); return TOK_ACCU_REAL_NEQ; }
+  \>R                 { loc(); return TOK_ACCU_REAL_GT; }
+  \<R                 { loc(); return TOK_ACCU_REAL_LT; }
+  \>=R                { loc(); return TOK_ACCU_REAL_GTE; }
+  \<=R                { loc(); return TOK_ACCU_REAL_LTE; }
   \+D                 { loc(); return TOK_ACCU_DINT_ADD; }
   \-D                 { loc(); return TOK_ACCU_DINT_SUB; }
   \*D                 { loc(); return TOK_ACCU_DINT_MUL; }
   \/D                 { loc(); return TOK_ACCU_DINT_DIV; }
+  ==D                 { loc(); return TOK_ACCU_DINT_EQ; }
+  \<\>D               { loc(); return TOK_ACCU_DINT_NEQ; }
+  \>D                 { loc(); return TOK_ACCU_DINT_GT; }
+  \<D                 { loc(); return TOK_ACCU_DINT_LT; }
+  \>=D                { loc(); return TOK_ACCU_DINT_GTE; }
+  \<=D                { loc(); return TOK_ACCU_DINT_LTE; }
 
   (10#)?[\+-]?[0-9]+ { 
                         newstack(yystatement_listlval);
@@ -281,5 +300,19 @@ void statement_list_scanner_init()
   Bool                { loc(); return TOK_BOOL; }
   Real                { loc(); return TOK_REAL; }
   \n                  { BEGIN(TAG_NAME); } 
+}
+
+<VERSION_ANNOTATION>{
+  [\t\r, ]            ;
+  :                   { loc(); return yytext[0]; }
+  [0-9][0-9]?[.][0-9][0-9]? {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) =
+                          convert_version(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_VERSION_VALUE;
+                      }
+  \n                  { BEGIN(GRAMMAR); }
 }
 %%
