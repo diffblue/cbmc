@@ -168,7 +168,7 @@ symbolt synthetic_class_symbol(
   return synthetic_class_symbol;
 }
 
-static symbolt create_constructor_symbol(
+static symbolt constructor_symbol(
   synthetic_methods_mapt &synthetic_methods,
   const irep_idt &synthetic_class_name,
   java_method_typet constructor_type) // dynamic_method_type
@@ -210,7 +210,7 @@ static symbolt create_constructor_symbol(
   return constructor_symbol;
 }
 
-symbolt create_implemented_method_symbol(
+symbolt implemented_method_symbol(
   synthetic_methods_mapt &synthetic_methods,
   const symbolt &interface_method_symbol,
   const struct_tag_typet &implemented_interface_tag,
@@ -266,84 +266,72 @@ void create_invokedynamic_synthetic_classes(
   synthetic_methods_mapt &synthetic_methods,
   message_handlert &message_handler)
 {
-  messaget log{message_handler};
-  namespacet ns{symbol_table};
+  const messaget log{message_handler};
 
   for(const auto &instruction : instructions)
   {
-    if(!strcmp(bytecode_info[instruction.bytecode].mnemonic, "invokedynamic"))
+    if(strcmp(bytecode_info[instruction.bytecode].mnemonic, "invokedynamic"))
+      continue;
+    // invokedynamic will be called with operands that should be stored in a
+    // synthetic object implementing the interface type that it returns. For
+    // example, "invokedynamic f(a, b, c) -> MyInterface" should result in the
+    // creation of the synthetic class:
+    // public class SyntheticCapture implements MyInterface {
+    //   private int a;
+    //   private float b;
+    //   private Other c;
+    //   public SyntheticCapture(int a, float b, Other c) {
+    //     this.a = a; this.b = b; this.c = c;
+    //   }
+    //   public void myInterfaceMethod(int d) {
+    //     f(a, b, c, d);
+    //   }
+    // }
+    // This method just creates the outline; the methods will be populated on
+    // demand via java_bytecode_languaget::convert_lazy_method.
+
+    // Check that we understand the lambda method handle; if we don't then
+    // we will not create a synthetic class at all, and the corresponding
+    // invoke instruction will return null when eventually converted by
+    // java_bytecode_convert_method.
+    const auto &dynamic_method_type =
+      to_java_method_type(instruction.args.at(0).type());
+    const auto lambda_method_name = ::lambda_method_name(
+      symbol_table, method_identifier, dynamic_method_type);
+    if(!lambda_method_name)
     {
-      // invokedynamic will be called with operands that should be stored in a
-      // synthetic object implementing the interface type that it returns. For
-      // example, "invokedynamic f(a, b, c) -> MyInterface" should result in the
-      // creation of the synthetic class:
-      // public class SyntheticCapture implements MyInterface {
-      //   private int a;
-      //   private float b;
-      //   private Other c;
-      //   public SyntheticCapture(int a, float b, Other c) {
-      //     this.a = a; this.b = b; this.c = c;
-      //   }
-      //   public void myInterfaceMethod(int d) {
-      //     f(a, b, c, d);
-      //   }
-      // }
-      // This method just creates the outline; the methods will be populated on
-      // demand via java_bytecode_languaget::convert_lazy_method.
-
-      // Check that we understand the lambda method handle; if we don't then
-      // we will not create a synthetic class at all, and the corresponding
-      // invoke instruction will return null when eventually converted by
-      // java_bytecode_convert_method.
-
-      const auto &dynamic_method_type =
-        to_java_method_type(instruction.args.at(0).type());
-
-      const auto lambda_method_name = ::lambda_method_name(
-        symbol_table, method_identifier, dynamic_method_type);
-      if(!lambda_method_name)
-      {
-        log.debug() << "ignoring invokedynamic at " << method_identifier
-                    << " address " << instruction.address
-                    << " with unknown handle type" << messaget::eom;
-        continue;
-      }
-
-      const auto &implemented_interface_tag = to_struct_tag_type(
-        to_java_reference_type(dynamic_method_type.return_type()).subtype());
-      const auto interface_method_id = ::interface_method_id(
-        symbol_table,
-        implemented_interface_tag,
-        method_identifier,
-        instruction.address,
-        log);
-      if(!interface_method_id)
-        continue;
-
-      log.debug() << "identified invokedynamic at " << method_identifier
+      log.debug() << "ignoring invokedynamic at " << method_identifier
                   << " address " << instruction.address
-                  << " for lambda: " << *lambda_method_name << messaget::eom;
-
-      // Create the class symbol:
-
-      const irep_idt synthetic_class_name =
-        lambda_synthetic_class_name(method_identifier, instruction.address);
-
-      symbol_table.add(create_constructor_symbol(
-        synthetic_methods, synthetic_class_name, dynamic_method_type));
-
-      symbol_table.add(create_implemented_method_symbol(
-        synthetic_methods,
-        ns.lookup(*interface_method_id),
-        implemented_interface_tag,
-        synthetic_class_name));
-
-      symbol_table.add(synthetic_class_symbol(
-        synthetic_class_name,
-        *lambda_method_name,
-        implemented_interface_tag,
-        dynamic_method_type));
+                  << " with unknown handle type" << messaget::eom;
+      continue;
     }
+    const auto &implemented_interface_tag = to_struct_tag_type(
+      to_java_reference_type(dynamic_method_type.return_type()).subtype());
+    const auto interface_method_id = ::interface_method_id(
+      symbol_table,
+      implemented_interface_tag,
+      method_identifier,
+      instruction.address,
+      log);
+    if(!interface_method_id)
+      continue;
+    log.debug() << "identified invokedynamic at " << method_identifier
+                << " address " << instruction.address
+                << " for lambda: " << *lambda_method_name << messaget::eom;
+    const irep_idt synthetic_class_name =
+      lambda_synthetic_class_name(method_identifier, instruction.address);
+    symbol_table.add(constructor_symbol(
+      synthetic_methods, synthetic_class_name, dynamic_method_type));
+    symbol_table.add(implemented_method_symbol(
+      synthetic_methods,
+      symbol_table.lookup_ref(*interface_method_id),
+      implemented_interface_tag,
+      synthetic_class_name));
+    symbol_table.add(synthetic_class_symbol(
+      synthetic_class_name,
+      *lambda_method_name,
+      implemented_interface_tag,
+      dynamic_method_type));
   }
 }
 
