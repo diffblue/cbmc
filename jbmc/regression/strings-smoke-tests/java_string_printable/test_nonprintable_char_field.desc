@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.test_char_field --max-nondet-string-length 100
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+Shows that the assertion can be violated when string-printable is not enabled
+for character field

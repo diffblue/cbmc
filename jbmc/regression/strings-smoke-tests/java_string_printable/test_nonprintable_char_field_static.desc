@@ -1,0 +1,9 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--function Test.test_char_field_static --max-nondet-string-length 100 --nondet-static
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+Shows that the assertion can be violated when string-printable is not enabled
+for character static field

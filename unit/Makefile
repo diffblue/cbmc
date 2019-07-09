@@ -68,6 +68,7 @@ SRC += analyses/ai/ai.cpp \
        util/format_number_range.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
+       util/interval_constraint.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/json_array.cpp \

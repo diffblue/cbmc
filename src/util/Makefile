@@ -34,6 +34,7 @@ SRC = allocate_objects.cpp \
       irep_hash_container.cpp \
       irep_ids.cpp \
       irep_serialization.cpp \
+      interval_constraint.cpp \
       invariant_utils.cpp \
       json.cpp \
       json_irep.cpp \

@@ -18,4 +18,39 @@ public class Test {
         assert(b);
         return b;
     }
+
+    public static boolean printable_char(char c) {
+      boolean b = c >= ' ' && c <= '~';
+      assert(b);
+      return b;
+    }
+
+    public char charField;
+
+    public boolean test_char_field() {
+      boolean b = charField >= ' ' && charField <= '~';
+      assert(b);
+      return b;
+    }
+
+    public static boolean printable_char_array(char[] c) {
+      if(c.length != 3 || c == null)
+        return false;
+      boolean b0 = c[0] >= ' ' && c[0] <= '~';
+      boolean b1 = c[1] >= ' ' && c[1] <= '~';
+      boolean b2 = c[2] >= ' ' && c[2] <= '~';
+      assert(b0 || b1 || b2);
+      return b0 || b1 || b2;
+    }
+
+    public static char charStaticField = 'a';
+
+     public boolean test_char_field_static() {
+      if(charStaticField == 'a')
+        return false;
+      boolean b = charStaticField >= ' ' && charStaticField <= '~';
+      assert(b);
+      return b;
+    }
+
 }

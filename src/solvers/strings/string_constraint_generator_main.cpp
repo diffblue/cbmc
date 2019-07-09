@@ -29,6 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
+#include <util/interval_constraint.h>
 
 string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
   : array_pool(fresh_symbol), ns(ns)
@@ -139,17 +140,16 @@ string_constraintst add_constraint_on_characters(
   // Parse char_set
   PRECONDITION(char_set.length() == 3);
   PRECONDITION(char_set[1] == '-');
-  const char &low_char = char_set[0];
-  const char &high_char = char_set[2];
+  const integer_intervalt char_range(char_set[0], char_set[2]);
 
   // Add constraint
   const symbol_exprt qvar = fresh_symbol("char_constr", s.length_type());
   const exprt chr = s[qvar];
-  const and_exprt char_in_set(
-    binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
-    binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
   const string_constraintt sc(
-    qvar, zero_if_negative(start), zero_if_negative(end), char_in_set);
+    qvar,
+    zero_if_negative(start),
+    zero_if_negative(end),
+    interval_constraint(chr, char_range));
   return {{}, {sc}, {}};
 }
 

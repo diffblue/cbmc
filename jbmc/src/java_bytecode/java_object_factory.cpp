@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
+#include <util/interval_constraint.h>
 
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_root_class.h"
@@ -303,6 +304,20 @@ public:
   }
 };
 
+/// Interval that represents the printable character range
+/// range U+0020-U+007E, i.e. ' ' to '~'
+const integer_intervalt printable_char_range(' ', '~');
+
+/// Converts and \ref integer_intervalt to a a string of the for [lower]-[upper]
+static irep_idt integer_interval_to_string(const integer_intervalt &interval)
+{
+  std::string result;
+  result += numeric_cast_v<char>(interval.lower);
+  result += "-";
+  result += numeric_cast_v<char>(interval.upper);
+  return result;
+}
+
 /// Initialise length and data fields for a nondeterministic String structure.
 ///
 /// If the structure is not a nondeterministic structure, the call results in
@@ -417,7 +432,13 @@ void initialize_nondet_string_fields(
   if(printable)
   {
     add_character_set_constraint(
-      array_pointer, length_expr, " -~", symbol_table, loc, function_id, code);
+      array_pointer,
+      length_expr,
+      integer_interval_to_string(printable_char_range),
+      symbol_table,
+      loc,
+      function_id,
+      code);
   }
 }
 
@@ -1039,6 +1060,11 @@ void java_object_factoryt::gen_nondet_init(
     assign.add_source_location() = location;
 
     assignments.add(assign);
+    if(type == java_char_type() && object_factory_parameters.string_printable)
+    {
+      assignments.add(
+        code_assumet(interval_constraint(expr, printable_char_range)));
+    }
     // add assumes to obey numerical restrictions
     if(type != java_boolean_type() && type != java_char_type())
     {
