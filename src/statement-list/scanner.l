@@ -12,6 +12,7 @@
 // Conversion from yytext to expressions.
 #include "converters/convert_bool_literal.h"
 #include "converters/convert_int_literal.h"
+#include "converters/convert_dint_literal.h"
 #include "converters/convert_real_literal.h"
 #include "converters/convert_string_value.h"
 
@@ -59,7 +60,6 @@ static int isatty(int) { return 0; }
 #ifdef STATEMENT_LIST_DEBUG
 extern int yystatement_listdebug;
 #endif
-
 void statement_list_scanner_init()
 {
 #ifdef STATEMENT_LIST_DEBUG
@@ -73,124 +73,213 @@ void statement_list_scanner_init()
 %option noinput
 %option nounput
 
+%x GRAMMAR
+%x TAG_NAME
+%x TAG_ATTRIBUTES
 
 %%
-[\(:\.,;#]          { loc(); return yytext[0]; }
-[\t\r\n ]           ;
-:=                  { loc(); return TOK_ASSIGNMENT; }
-BEGIN               { loc(); return TOK_BEGIN; }
-VERSION             { loc(); return TOK_VERSION; }
-FUNCTION_BLOCK      { loc(); return TOK_FUNCTION_BLOCK; }
-END_FUNCTION_BLOCK  { loc(); return TOK_END_FUNCTION_BLOCK; }
-FUNCTION            { loc(); return TOK_FUNCTION; }
-END_FUNCTION        { loc(); return TOK_END_FUNCTION; }
-VAR_INPUT           { loc(); return TOK_VAR_INPUT; }
-VAR_OUTPUT          { loc(); return TOK_VAR_OUTPUT; }
-VAR_IN_OUT          { loc(); return TOK_VAR_INOUT; }
-VAR                 { loc(); return TOK_VAR_STATIC; }
-VAR[ ]CONSTANT      { loc(); return TOK_VAR_CONSTANT; }
-VAR_TEMP            { loc(); return TOK_VAR_TEMP; }
-END_VAR             { loc(); return TOK_END_VAR; }
-NETWORK             { loc(); return TOK_NETWORK; }
-TITLE               { loc(); return TOK_TITLE; }
-Int                 { loc(); return TOK_INT; }
-DInt                { loc(); return TOK_DINT; }
-Bool                { loc(); return TOK_BOOL; }
-Real                { loc(); return TOK_REAL; }
-Void                { loc(); return TOK_VOID; }
-L                   { loc(); return TOK_LOAD; }
-T                   { loc(); return TOK_TRANSFER; }
-CALL                { loc(); return TOK_CALL; }
-NOP                 { loc(); return TOK_NOP; }
-SET                 { loc(); return TOK_SET; }
-A                   { loc(); return TOK_AND; }
-AN                  { loc(); return TOK_AND_NOT; }
-O                   { loc(); return TOK_OR; }
-ON                  { loc(); return TOK_OR_NOT; }
-X                   { loc(); return TOK_XOR; }
-XN                  { loc(); return TOK_XOR_NOT; }
-A\(                 { loc(); return TOK_AND_NESTED; }
-AN\(                { loc(); return TOK_AND_NOT_NESTED; }
-O\(                 { loc(); return TOK_OR_NESTED; }
-ON\(                { loc(); return TOK_OR_NOT_NESTED; }
-X\(                 { loc(); return TOK_XOR_NESTED; }
-XN\(                { loc(); return TOK_XOR_NOT_NESTED; }
-\)                  { loc(); return TOK_NESTING_CLOSED; }
-=                   { loc(); return TOK_ASSIGN; }
-\+                  { loc(); return TOK_CONST_ADD; }
-\+I                 { loc(); return TOK_ACCU_INT_ADD; }
-\-I                 { loc(); return TOK_ACCU_INT_SUB; }
-\*I                 { loc(); return TOK_ACCU_INT_MUL; }
-\/I                 { loc(); return TOK_ACCU_INT_DIV; }
-\+R                 { loc(); return TOK_ACCU_REAL_ADD; }
-\-R                 { loc(); return TOK_ACCU_REAL_SUB; }
-\*R                 { loc(); return TOK_ACCU_REAL_MUL; }
-\/R                 { loc(); return TOK_ACCU_REAL_DIV; }
-\+D                 { loc(); return TOK_ACCU_DINT_ADD; }
-\-D                 { loc(); return TOK_ACCU_DINT_SUB; }
-\*D                 { loc(); return TOK_ACCU_DINT_MUL; }
-\/D                 { loc(); return TOK_ACCU_DINT_DIV; }
 
-[\+-]?[0-9]+        { 
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_int_dec_literal(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_INT_LITERAL; 
-                    }
+<INITIAL>.|\n   { BEGIN(GRAMMAR);
+                  yyless(0); /* start again with this character */
+                }
+<GRAMMAR>{
+  [\(:\.,;#]          { loc(); return yytext[0]; }
+  [\t\r\n ]           ;
+  :=                  { loc(); return TOK_ASSIGNMENT; }
+  TAG                 { loc(); BEGIN(TAG_NAME); return TOK_TAG; }
+  BEGIN               { loc(); return TOK_BEGIN; }
+  VERSION             { loc(); return TOK_VERSION; }
+  FUNCTION_BLOCK      { loc(); return TOK_FUNCTION_BLOCK; }
+  END_FUNCTION_BLOCK  { loc(); return TOK_END_FUNCTION_BLOCK; }
+  FUNCTION            { loc(); return TOK_FUNCTION; }
+  END_FUNCTION        { loc(); return TOK_END_FUNCTION; }
+  VAR_INPUT           { loc(); return TOK_VAR_INPUT; }
+  VAR_OUTPUT          { loc(); return TOK_VAR_OUTPUT; }
+  VAR_IN_OUT          { loc(); return TOK_VAR_INOUT; }
+  VAR                 { loc(); return TOK_VAR_STATIC; }
+  VAR[ ]CONSTANT      { loc(); return TOK_VAR_CONSTANT; }
+  VAR_TEMP            { loc(); return TOK_VAR_TEMP; }
+  END_VAR             { loc(); return TOK_END_VAR; }
+  NETWORK             { loc(); return TOK_NETWORK; }
+  TITLE               { loc(); return TOK_TITLE; }
+  Int                 { loc(); return TOK_INT; }
+  DInt                { loc(); return TOK_DINT; }
+  Bool                { loc(); return TOK_BOOL; }
+  Real                { loc(); return TOK_REAL; }
+  Void                { loc(); return TOK_VOID; }
+  L                   { loc(); return TOK_LOAD; }
+  T                   { loc(); return TOK_TRANSFER; }
+  CALL                { loc(); return TOK_CALL; }
+  NOP                 { loc(); return TOK_NOP; }
+  SET                 { loc(); return TOK_SET_RLO; }
+  CLR                 { loc(); return TOK_CLR_RLO; }
+  S                   { loc(); return TOK_SET; }
+  R                   { loc(); return TOK_RESET; }
+  A                   { loc(); return TOK_AND; }
+  AN                  { loc(); return TOK_AND_NOT; }
+  O                   { loc(); return TOK_OR; }
+  ON                  { loc(); return TOK_OR_NOT; }
+  X                   { loc(); return TOK_XOR; }
+  XN                  { loc(); return TOK_XOR_NOT; }
+  A\(                 { loc(); return TOK_AND_NESTED; }
+  AN\(                { loc(); return TOK_AND_NOT_NESTED; }
+  O\(                 { loc(); return TOK_OR_NESTED; }
+  ON\(                { loc(); return TOK_OR_NOT_NESTED; }
+  X\(                 { loc(); return TOK_XOR_NESTED; }
+  XN\(                { loc(); return TOK_XOR_NOT_NESTED; }
+  \)                  { loc(); return TOK_NESTING_CLOSED; }
+  =                   { loc(); return TOK_ASSIGN; }
+  \+                  { loc(); return TOK_CONST_ADD; }
+  \+I                 { loc(); return TOK_ACCU_INT_ADD; }
+  \-I                 { loc(); return TOK_ACCU_INT_SUB; }
+  \*I                 { loc(); return TOK_ACCU_INT_MUL; }
+  \/I                 { loc(); return TOK_ACCU_INT_DIV; }
+  \+R                 { loc(); return TOK_ACCU_REAL_ADD; }
+  \-R                 { loc(); return TOK_ACCU_REAL_SUB; }
+  \*R                 { loc(); return TOK_ACCU_REAL_MUL; }
+  \/R                 { loc(); return TOK_ACCU_REAL_DIV; }
+  \+D                 { loc(); return TOK_ACCU_DINT_ADD; }
+  \-D                 { loc(); return TOK_ACCU_DINT_SUB; }
+  \*D                 { loc(); return TOK_ACCU_DINT_MUL; }
+  \/D                 { loc(); return TOK_ACCU_DINT_DIV; }
+
+  (10#)?[\+-]?[0-9]+ { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_int_dec_literal(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+  INT#(10#)?[\+-]?[0-9]+ { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_int_dec_literal_value(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+                      
+  ((DINT#(10#)?)|(L#))[\+-]?[0-9]+ { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_dint_dec_literal_value(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
                     
-16#[0-9A-Fa-f]+     { 
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_int_hex_literal(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_INT_LITERAL; 
-                    }
+  16#[0-9A-Fa-f]+     { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_int_hex_literal(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+  INT#16#[0-9A-Fa-f]+ { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_int_hex_literal_value(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+                      
+  DINT#16#[0-9A-Fa-f]+ { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_dint_hex_literal_value(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
                     
-2#[0-9A-Fa-f]+      { 
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_int_bit_literal(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_INT_LITERAL; 
-                    }
-                    
-([t|T][R|r][u|U][e|E])|([f|F][a|A][l|L][s|S][e|E])          { 
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_bool_literal(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_BOOL_LITERAL; 
-                    }
+  2#[0|1]+            { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_int_bit_literal(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+                        
+  INT#2#[0|1]+        {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_int_bit_literal_value(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+                      
+  DINT#2#[0|1]+       {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_dint_bit_literal_value(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_INT_LITERAL; 
+                      }
+                      
+  ([Tt][Rr][Uu][Ee])|([Ff][Aa][Ll][Ss][Ee]) { 
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_bool_literal(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_BOOL_LITERAL; 
+                      }
 
-(\+|-)?[0-9]+\.[0-9]+ {
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_real_literal(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_REAL_LITERAL; 
-                    }
+  (\+|-)?[0-9]+\.[0-9]+ {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_real_literal(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_REAL_LITERAL; 
+                      }
 
-(\"[^\"\r\t\n]+\")|([a-zA-Z][a-zA-Z0-9]*) {
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_identifier(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_IDENTIFIER; 
-                    }
+  (\"[^\"\r\t\n]+\")|([a-zA-Z][a-zA-Z0-9]*) {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_identifier(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_IDENTIFIER; 
+                      }
 
-[a-zA-Z_\.][a-zA-Z0-9_\.]*: {
-                      newstack(yystatement_listlval);
-                      parser_stack(yystatement_listlval) = 
-                        convert_label(yytext);
-                      PARSER.set_source_location(
-                        parser_stack(yystatement_listlval));
-                      return TOK_LABEL;
-                    }
+  [a-zA-Z_\.][a-zA-Z0-9_\.]*: {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_label(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        return TOK_LABEL;
+                      }
+}
+
+<TAG_NAME>{
+  [\t\r\n ]           ;
+  \"[^\"\r\t\n]+\"    {
+                        newstack(yystatement_listlval);
+                        parser_stack(yystatement_listlval) = 
+                          convert_identifier(yytext);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        BEGIN(TAG_ATTRIBUTES);
+                        return TOK_IDENTIFIER; 
+                      }
+  END_TAG             { loc(); BEGIN(GRAMMAR); return TOK_END_TAG; }
+}
+<TAG_ATTRIBUTES>{
+  [\t\r," ]           ;
+  ([t|T][R|r][u|U][e|E])|([f|F][a|A][l|L][s|S][e|E]) ;
+  %[A-Za-z][0-9\.]+   ;
+  Int                 { loc(); return TOK_INT; }
+  DInt                { loc(); return TOK_DINT; }
+  Bool                { loc(); return TOK_BOOL; }
+  Real                { loc(); return TOK_REAL; }
+  \n                  { BEGIN(TAG_NAME); } 
+}
 %%

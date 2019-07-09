@@ -1,0 +1,106 @@
+﻿FUNCTION_BLOCK "Bool4"
+VERSION : 0.1
+   VAR_TEMP 
+      temp1 : Bool;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+      AN "Tag_11";
+      AN "Tag_19";
+      A "Tag_13";
+      A "Tag_2";
+      = "Tag_14";
+      S "Tag_15";
+NETWORK
+TITLE = 
+      AN "Tag_11";
+      AN "Tag_19";
+      A "Tag_16";
+      A "Tag_17";
+      = "Tag_18";
+      S "Tag_15";
+NETWORK
+TITLE = 
+      AN "Tag_11";
+      A "Tag_20";
+      A "Tag_21";
+      = "Tag_22";
+NETWORK
+TITLE = 
+      AN "Tag_11";
+      A "Tag_24";
+      A "Tag_19";
+      = "Tag_25";
+NETWORK
+TITLE = 
+      A(;
+      ON "Tag_17";
+      ON "Tag_26";
+      ON "Tag_27";
+      ON "Tag_28";
+      ON "Tag_29";
+      ON "Tag_30";
+      ON "Tag_31";
+      ON "Tag_32";
+      ON "Tag_1";
+      ON "Tag_2";
+      );
+      = #temp1;
+      A #temp1;
+      A "Tag_33";
+      A "Tag_3";
+      = "Tag_34";
+      A #temp1;
+      A "Tag_35";
+      A "Tag_36";
+      = "Tag_37";
+END_FUNCTION_BLOCK
+
+TAG
+"Tag_1","%I0.0","Bool","True","True","False","","","True"
+"Tag_2","%I0.1","Bool","True","True","False","","","True"
+"Tag_3","%I0.2","Bool","True","True","False","","","True"
+"Tag_5","%I5.0","Bool","True","True","False","","","True"
+"Tag_6","%I5.1","Bool","True","True","False","","","True"
+"Tag_7","%Q0.1","Bool","True","True","False","","","True"
+"Tag_8","%I2.1","Bool","True","True","False","","","True"
+"Tag_11","%I0.3","Bool","True","True","False","","","True"
+"Tag_12","%I3.0","Bool","True","True","False","","","True"
+"Tag_13","%I5.5","Bool","True","True","False","","","True"
+"Tag_14","%Q1.0","Bool","True","True","False","","","True"
+"Tag_15","%Q1.2","Bool","True","True","False","","","True"
+"Tag_16","%I5.4","Bool","True","True","False","","","True"
+"Tag_17","%I1.0","Bool","True","True","False","","","True"
+"Tag_18","%Q1.1","Bool","True","True","False","","","True"
+"Tag_19","%I3.6","Bool","True","True","False","","","True"
+"Tag_20","%I5.3","Bool","True","True","False","","","True"
+"Tag_21","%I0.5","Bool","True","True","False","","","True"
+"Tag_22","%Q1.5","Bool","True","True","False","","","True"
+"Tag_23","%I3.3","Bool","True","True","False","","","True"
+"Tag_24","%I5.6","Bool","True","True","False","","","True"
+"Tag_25","%Q1.6","Bool","True","True","False","","","True"
+"Tag_26","%I1.1","Bool","True","True","False","","","True"
+"Tag_27","%I1.2","Bool","True","True","False","","","True"
+"Tag_28","%I1.3","Bool","True","True","False","","","True"
+"Tag_29","%I1.4","Bool","True","True","False","","","True"
+"Tag_30","%I1.5","Bool","True","True","False","","","True"
+"Tag_31","%I1.6","Bool","True","True","False","","","True"
+"Tag_32","%I1.7","Bool","True","True","False","","","True"
+"Tag_33","%I5.7","Bool","True","True","False","","","True"
+"Tag_34","%Q1.3","Bool","True","True","False","","","True"
+"Tag_35","%I4.0","Bool","True","True","False","","","True"
+"Tag_36","%I0.4","Bool","True","True","False","","","True"
+"Tag_37","%Q1.4","Bool","True","True","False","","","True"
+"Tag_38","%I2.0","Bool","True","True","False","","","True"
+"Tag_39","%I3.7","Bool","True","True","False","","","True"
+"Tag_40","%I2.3","Bool","True","True","False","","","True"
+"Tag_41","%Q0.3","Bool","True","True","False","","","True"
+"Tag_42","%Q0.0","Bool","True","True","False","","","True"
+"Tag_43","%I2.2","Bool","True","True","False","","","True"
+"Tag_44","%I3.5","Bool","True","True","False","","","True"
+"Tag_45","%I5.2","Bool","True","True","False","","","True"
+"Tag_46","%M1.0","Bool","True","True","False","","","True"
+END_TAG

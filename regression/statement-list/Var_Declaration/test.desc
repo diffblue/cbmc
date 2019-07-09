@@ -6,8 +6,12 @@ main.awl
 ^Name: "Var_assign_FB"$
 ^Name: "Var_assign_FC"$
 ^Version: 0[.]1$
-^  \* type: statement_list_bool$
-^  \* type: statement_list_real$
+^  \* type: bool$
+^  \* type: floatbv$
+^  \* type: signedbv$
+^      \* width: 32$
+^      \* width: 16$
+^      \* f: 23$
 ^  \* identifier: "! #\$%&'\(\)\*\+,\-\./0123456789:;<=>\?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\\\]\^_`abcdefghijklmnopqrstuvwxyz\{|\}~"$
 ^  \* identifier: inout$
 ^  \* identifier: out$

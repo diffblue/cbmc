@@ -11,6 +11,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_language.h"
 #include "converters/expr2statement_list.h"
+#include "statement_list_entry_point.h"
 #include "statement_list_parse_tree_io.h"
 #include "statement_list_parser.h"
 #include "statement_list_typecheck.h"
@@ -19,14 +20,15 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <linking/remove_internal_symbols.h>
 #include <util/get_base_name.h>
 
-void statement_list_languaget::set_language_options(const optionst &)
+void statement_list_languaget::set_language_options(const optionst &options)
 {
-  return;
+  params = object_factory_parameterst{options};
 }
 
-bool statement_list_languaget::generate_support_functions(symbol_tablet &)
+bool statement_list_languaget::generate_support_functions(
+  symbol_tablet &symbol_table)
 {
-  return false;
+  return statement_list_entry_point(symbol_table, get_message_handler());
 }
 
 bool statement_list_languaget::typecheck(
@@ -41,7 +43,7 @@ bool statement_list_languaget::typecheck(
     return true;
 
   remove_internal_symbols(
-    new_symbol_table, this->get_message_handler(), keep_file_local);
+    new_symbol_table, get_message_handler(), keep_file_local);
 
   if(linking(symbol_table, new_symbol_table, get_message_handler()))
     return true;
@@ -87,18 +89,18 @@ bool statement_list_languaget::typecheck(
 bool statement_list_languaget::from_expr(
   const exprt &expr,
   std::string &code,
-  const namespacet &)
+  const namespacet &ns)
 {
-  code = expr2stl(expr);
+  code = expr2stl(expr, ns);
   return false;
 }
 
 bool statement_list_languaget::from_type(
   const typet &type,
   std::string &code,
-  const namespacet &)
+  const namespacet &ns)
 {
-  code = type2stl(type);
+  code = type2stl(type, ns);
   return false;
 }
 

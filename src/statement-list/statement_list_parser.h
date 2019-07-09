@@ -42,12 +42,17 @@ public:
   /// Adds a function block to the parse tree by converting the \p block
   /// expression tree.
   /// \param block: Root of a function block expression tree.
-  void add_function_block(exprt &block);
+  void add_function_block(const exprt &block);
 
   /// Adds a function to the parse tree by converting the \p function
   /// expression tree.
   /// \param function: Root of a function expression tree.
-  void add_function(exprt &function);
+  void add_function(const exprt &function);
+
+  /// Adds a tag list to the parse tree by converting the \p tag_list
+  /// expression tree.
+  /// \param tag_list: Root of a tag list expression tree.
+  void add_tag_list(const exprt &tag_list);
 
   /// Prints the parse tree of this instance to the given output stream.
   /// \param out: Stream that should receive the result.

@@ -5,7 +5,7 @@ main.awl
 ^SIGNAL=0$
 ^Name: "Bool1"$
 ^Version: 0[.]1$
-^  \* type: statement_list_bool$
+^  \* type: bool$
 ^  \* identifier: in1$
 ^  \* identifier: in2$
 ^  \* identifier: in3$

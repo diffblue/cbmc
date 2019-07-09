@@ -34,9 +34,8 @@ public:
     optionalt<exprt> default_value;
 
     /// Creates a new. variable declaration.
-    /// \param identifier: Name of the variable.
-    /// \param type: Type of the variable.
-    var_declarationt(const irep_idt &identifier, const typet &type);
+    /// \param symbol: The variable, including type and name.
+    explicit var_declarationt(const symbol_exprt &symbol);
   };
   using var_declarationst = std::list<var_declarationt>;
 
@@ -175,6 +174,8 @@ public:
   function_blockst function_blocks;
   /// List of functions this parse tree includes.
   functionst functions;
+  /// List of tags that were included in the source.
+  std::vector<symbol_exprt> tags;
 };
 
 #endif // CPROVER_STATEMENT_LIST_STATEMENT_LIST_PARSE_TREE_H
