@@ -259,6 +259,28 @@ symbolt implemented_method_symbol(
   return implemented_method_symbol;
 }
 
+// invokedynamic will be called with operands that should be stored in a
+// synthetic object implementing the interface type that it returns. For
+// example, "invokedynamic f(a, b, c) -> MyInterface" should result in the
+// creation of the synthetic class:
+// public class SyntheticCapture implements MyInterface {
+//   private int a;
+//   private float b;
+//   private Other c;
+//   public SyntheticCapture(int a, float b, Other c) {
+//     this.a = a; this.b = b; this.c = c;
+//   }
+//   public void myInterfaceMethod(int d) {
+//     f(a, b, c, d);
+//   }
+// }
+// This method just creates the outline; the methods will be populated on
+// demand via java_bytecode_languaget::convert_lazy_method.
+
+// Check that we understand the lambda method handle; if we don't then
+// we will not create a synthetic class at all, and the corresponding
+// invoke instruction will return null when eventually converted by
+// java_bytecode_convert_method.
 void create_invokedynamic_synthetic_classes(
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
@@ -272,28 +294,6 @@ void create_invokedynamic_synthetic_classes(
   {
     if(strcmp(bytecode_info[instruction.bytecode].mnemonic, "invokedynamic"))
       continue;
-    // invokedynamic will be called with operands that should be stored in a
-    // synthetic object implementing the interface type that it returns. For
-    // example, "invokedynamic f(a, b, c) -> MyInterface" should result in the
-    // creation of the synthetic class:
-    // public class SyntheticCapture implements MyInterface {
-    //   private int a;
-    //   private float b;
-    //   private Other c;
-    //   public SyntheticCapture(int a, float b, Other c) {
-    //     this.a = a; this.b = b; this.c = c;
-    //   }
-    //   public void myInterfaceMethod(int d) {
-    //     f(a, b, c, d);
-    //   }
-    // }
-    // This method just creates the outline; the methods will be populated on
-    // demand via java_bytecode_languaget::convert_lazy_method.
-
-    // Check that we understand the lambda method handle; if we don't then
-    // we will not create a synthetic class at all, and the corresponding
-    // invoke instruction will return null when eventually converted by
-    // java_bytecode_convert_method.
     const auto &dynamic_method_type =
       to_java_method_type(instruction.args.at(0).type());
     const auto lambda_method_name = ::lambda_method_name(
