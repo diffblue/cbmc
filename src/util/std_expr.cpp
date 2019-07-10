@@ -218,11 +218,14 @@ const exprt &object_descriptor_exprt::root_object() const
 {
   const exprt *p = &object();
 
-  while(p->id() == ID_member || p->id() == ID_index)
+  while(true)
   {
-    DATA_INVARIANT(
-      p->has_operands(), "member and index expressions have operands");
-    p = &p->op0();
+    if(p->id() == ID_member)
+      p = &to_member_expr(*p).compound();
+    else if(p->id() == ID_index)
+      p = &to_index_expr(*p).array();
+    else
+      break;
   }
 
   return *p;
