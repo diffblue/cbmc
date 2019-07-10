@@ -173,7 +173,7 @@ symbolt synthetic_class_symbol(
     }
   }
 
-  type_symbolt synthetic_class_symbol(synthetic_class_type);
+  symbolt synthetic_class_symbol = type_symbolt{synthetic_class_type};
   synthetic_class_symbol.name = synthetic_class_name;
   synthetic_class_symbol.mode = ID_java;
   return synthetic_class_symbol;
