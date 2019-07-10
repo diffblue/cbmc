@@ -1,7 +1,7 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test.class
 --no-lazy-methods --show-goto-functions --function Test.main
-java::Unused::clinit_wrapper
+java::Unused\.<clinit_wrapper>
 Unused\.<clinit>\(\)
 ^EXIT=0$
 ^SIGNAL=0$

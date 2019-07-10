@@ -4,5 +4,5 @@ old.jar
 ^EXIT=0$
 ^SIGNAL=0$
 --
-java::java\.nio\.charset\.StandardCharsets::clinit_wrapper$
-java::org\.apache\.tika\.mime\.MediaType::clinit_wrapper$
+java::java\.nio\.charset\.StandardCharsets\.<clinit_wrapper>$
+java::org\.apache\.tika\.mime\.MediaType\.<clinit_wrapper>$

@@ -68,6 +68,12 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   options.set_option(
     "symex-driven-lazy-loading", cmd.isset("symex-driven-lazy-loading"));
 
+  if(cmd.isset("context-include"))
+    options.set_option("context-include", cmd.get_values("context-include"));
+
+  if(cmd.isset("context-exclude"))
+    options.set_option("context-exclude", cmd.get_values("context-exclude"));
+
   if(cmd.isset("java-load-class"))
     options.set_option("java-load-class", cmd.get_values("java-load-class"));
 
@@ -91,6 +97,17 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   {
     options.set_option("static-values", cmd.get_value("static-values"));
   }
+}
+
+static prefix_filtert get_context(const optionst &options)
+{
+  std::vector<std::string> context_include;
+  std::vector<std::string> context_exclude;
+  for(const auto &include : options.get_list_option("context-include"))
+    context_include.push_back("java::" + include);
+  for(const auto &exclude : options.get_list_option("context-exclude"))
+    context_exclude.push_back("java::" + exclude);
+  return prefix_filtert(std::move(context_include), std::move(context_exclude));
 }
 
 /// Consume options that are java bytecode specific.
@@ -182,6 +199,9 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
 
   nondet_static = options.get_bool_option("nondet-static");
   static_values_file = options.get_option("static-values");
+
+  if(options.is_set("context-include") || options.is_set("context-exclude"))
+    method_in_context = get_context(options);
 
   language_options_initialized=true;
 }
@@ -1049,6 +1069,12 @@ bool java_bytecode_languaget::convert_single_method(
   symbol_table_baset &symbol_table,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods)
 {
+  // Do not convert if method is not in context
+  if(method_in_context && !(*method_in_context)(id2string(function_id)))
+  {
+    return false;
+  }
+
   const symbolt &symbol = symbol_table.lookup_ref(function_id);
 
   // Nothing to do if body is already loaded
