@@ -214,7 +214,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   {
     return mp_integer(0);
   }
-  else if(type.id()==ID_string)
+  else if(type.id() == ID_string || type.id() == ID_mathematical_function)
   {
     return mp_integer(32);
   }
@@ -495,7 +495,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
   {
     return from_integer(0, size_type());
   }
-  else if(type.id()==ID_string)
+  else if(type.id() == ID_string || type.id() == ID_mathematical_function)
   {
     return from_integer(32/8, size_type());
   }
