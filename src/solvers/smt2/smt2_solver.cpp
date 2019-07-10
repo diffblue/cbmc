@@ -95,6 +95,8 @@ void smt2_solvert::expand_function_applications(exprt &expr)
           f.type.id() == ID_mathematical_function,
           "type of function symbol must be mathematical_function_type");
 
+        const auto f_type = to_mathematical_function_type(f.type);
+
         const auto &domain = to_mathematical_function_type(f.type).domain();
 
         DATA_INVARIANT(
