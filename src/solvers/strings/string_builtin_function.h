@@ -484,7 +484,9 @@ public:
 
   std::string name() const override
   {
-    return id2string(function_application.function().get_identifier());
+    PRECONDITION(function_application.function().id() == ID_symbol);
+    return id2string(
+      to_symbol_expr(function_application.function()).get_identifier());
   }
   std::vector<array_string_exprt> string_arguments() const override
   {
