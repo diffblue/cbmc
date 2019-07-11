@@ -4,7 +4,7 @@ Main.class
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-\[not-null-annotation-check\.1\] line \d+ Not null annotation check: SUCCESS
-\[not-null-annotation-check\.2\] line \d+ Not null annotation check: SUCCESS
+\[java::Main\.foo:\(Ljava/lang/Integer;ZLjava/lang/Object;\[Ljava/lang/String;\)Ljava/lang/Integer;\.not-null-annotation-check\.1\] line \d+ Not null annotation check: SUCCESS
+\[java::Main\.foo:\(Ljava/lang/Integer;ZLjava/lang/Object;\[Ljava/lang/String;\)Ljava/lang/Integer;\.not-null-annotation-check\.2\] line \d+ Not null annotation check: SUCCESS
 --
 ^warning: ignoring
