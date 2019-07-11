@@ -174,11 +174,11 @@ private:
 
   /// Performs a typecheck on the networks of a TIA module and saves the
   /// result to the given symbol.
-  /// \param networks: Network list that should be checked.
-  /// \param [out] tia_element: Symbol representation of the TIA module.
+  /// \param tia_module: Module containing the networks that shall be checked.
+  /// \param [out] tia_symbol: Symbol representation of the given TIA module.
   void typecheck_statement_list_networks(
-    const statement_list_parse_treet::networkst &networks,
-    symbolt &tia_element);
+    const statement_list_parse_treet::tia_modulet &tia_module,
+    symbolt &tia_symbol);
 
   /// Performs a typecheck on a single instruction and saves the result to the
   /// given symbol body if necessary.

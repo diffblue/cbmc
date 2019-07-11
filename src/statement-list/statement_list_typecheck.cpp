@@ -100,12 +100,12 @@ void statement_list_typecheckt::typecheck()
       parse_tree.function_blocks)
   {
     symbolt &fb_sym{symbol_table.get_writeable_ref(fb.name)};
-    typecheck_statement_list_networks(fb.networks, fb_sym);
+    typecheck_statement_list_networks(fb, fb_sym);
   }
   for(const statement_list_parse_treet::functiont &fc : parse_tree.functions)
   {
     symbolt &function_sym{symbol_table.get_writeable_ref(fc.name)};
-    typecheck_statement_list_networks(fc.networks, function_sym);
+    typecheck_statement_list_networks(fc, function_sym);
   }
 }
 
@@ -149,14 +149,12 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   param_sym.mode = STATEMENT_LIST_MODE;
   symbol_table.add(param_sym);
 
-  // Setup FB symbol type and value and add it to the symbol table.
+  // Setup FB symbol type and value.
   code_typet::parameterst params;
   params.push_back(param);
   code_typet fb_type{params, empty_typet()};
   fb_type.set(ID_statement_list_type, ID_statement_list_function_block);
   function_block_sym.type = fb_type;
-  function_block_sym.value = code_blockt{};
-  typecheck_temp_var_decls(function_block, function_block_sym);
   symbol_table.add(function_block_sym);
 }
 
@@ -180,10 +178,6 @@ void statement_list_typecheckt::typecheck_function_declaration(
   code_typet fc_type{params, function.return_type};
   fc_type.set(ID_statement_list_type, ID_statement_list_function);
   function_sym.type = fc_type;
-  function_sym.value = code_blockt{};
-
-  typecheck_temp_var_decls(function, function_sym);
-
   symbol_table.add(function_sym);
 }
 
@@ -285,15 +279,23 @@ void statement_list_typecheckt::typecheck_temp_var_decls(
 }
 
 void statement_list_typecheckt::typecheck_statement_list_networks(
-  const statement_list_parse_treet::networkst &networks,
-  symbolt &tia_element)
+  const statement_list_parse_treet::tia_modulet &tia_module,
+  symbolt &tia_symbol)
 {
-  for(const auto &network : networks)
+  // Leave value empty if there are no networks to iterate through.
+  if(tia_module.networks.empty())
+    return;
+  if(tia_symbol.value.is_nil())
+    tia_symbol.value = code_blockt{};
+
+  typecheck_temp_var_decls(tia_module, tia_symbol);
+
+  for(const auto &network : tia_module.networks)
   {
     // Set RLO to true each time a new network is entered (TIA behaviour).
     rlo_bit = true_exprt();
     for(const auto &instruction : network.instructions)
-      typecheck_statement_list_instruction(instruction, tia_element);
+      typecheck_statement_list_instruction(instruction, tia_symbol);
   }
 }
 
