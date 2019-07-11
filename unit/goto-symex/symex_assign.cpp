@@ -83,7 +83,7 @@ SCENARIO(
                     ns,
                     symex_config,
                     target_equation}
-        .assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
+        .assign_symbol(ssa_foo, expr_skeletont{ssa_foo.type()}, rhs1, guard);
       THEN("An equation is added to the target")
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
@@ -137,7 +137,8 @@ SCENARIO(
                                  ns,
                                  symex_config,
                                  target_equation};
-      symex_assign.assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
+      symex_assign.assign_symbol(
+        ssa_foo, expr_skeletont{ssa_foo.type()}, rhs1, guard);
       THEN("An equation with an empty guard is added to the target")
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
@@ -153,7 +154,8 @@ SCENARIO(
         WHEN("foo is assigned a second time")
         {
           const exprt rhs2 = from_integer(1841, int_type);
-          symex_assign.assign_symbol(ssa_foo, expr_skeletont{}, rhs2, guard);
+          symex_assign.assign_symbol(
+            ssa_foo, expr_skeletont{ssa_foo.type()}, rhs2, guard);
           THEN("A second equation is added to the target")
           {
             REQUIRE(target_equation.SSA_steps.size() == 2);

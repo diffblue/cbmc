@@ -182,7 +182,7 @@ static assignmentt rewrite_with_to_field_symbols(
        lhs_mod.type().id() == ID_struct_tag))
     {
       exprt field_sensitive_lhs;
-      expr_skeletont lhs_skeleton;
+      expr_skeletont lhs_skeleton{lhs_mod.type()};
       const with_exprt &with_expr = to_with_expr(ssa_rhs);
 
       if(lhs_mod.type().id() == ID_array)

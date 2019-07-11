@@ -142,7 +142,7 @@ void goto_symext::parameter_assignments(
 
       exprt::operandst lhs_conditions;
       symex_assignt{state, assignment_type, ns, symex_config, target}
-        .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
+        .assign_rec(lhs, expr_skeletont{lhs.type()}, rhs, lhs_conditions);
     }
 
     if(it1!=arguments.end())

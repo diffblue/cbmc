@@ -185,11 +185,13 @@ void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
   do_simplify(let_value);
 
   exprt::operandst value_assignment_guard;
+  const ssa_exprt l1_symbol =
+    to_ssa_expr(state.rename<L1>(let_expr.symbol(), ns).get());
   symex_assignt{
     state, symex_targett::assignment_typet::HIDDEN, ns, symex_config, target}
     .assign_symbol(
-      to_ssa_expr(state.rename<L1>(let_expr.symbol(), ns).get()),
-      expr_skeletont{},
+      l1_symbol,
+      expr_skeletont{l1_symbol.type()},
       let_value,
       value_assignment_guard);
 

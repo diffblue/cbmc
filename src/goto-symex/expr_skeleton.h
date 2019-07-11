@@ -27,7 +27,7 @@ class expr_skeletont final
 public:
   /// Empty skeleton. Applying it to an expression would give the same
   /// expression unchanged
-  expr_skeletont();
+  explicit expr_skeletont(typet missing_type);
 
   /// Replace the missing part of the current skeleton by another skeleton,
   /// ending in a bigger skeleton corresponding to the two combined.
@@ -67,8 +67,10 @@ private:
   /// operands because the only way to get a skeleton is by removing the first
   /// operand.
   exprt skeleton;
+  typet type_of_missing_part;
 
-  explicit expr_skeletont(exprt e) : skeleton(std::move(e))
+  expr_skeletont(exprt e, typet missing)
+    : skeleton(std::move(e)), type_of_missing_part(std::move(missing))
   {
   }
 };

@@ -19,7 +19,7 @@ SCENARIO("expr skeleton", "[core][goto-symex][symex-assign][expr-skeleton]")
   const symbol_exprt foo{"foo", typet{}};
   GIVEN("Skeletons `☐`, `☐[index]` and `☐.field1`")
   {
-    const expr_skeletont empty_skeleton;
+    const expr_skeletont empty_skeleton{foo.type()};
     const signedbv_typet int_type{32};
     const expr_skeletont index_skeleton =
       expr_skeletont::remove_op0(index_exprt{
