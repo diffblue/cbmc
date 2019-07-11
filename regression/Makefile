@@ -29,6 +29,7 @@ DIRS = cbmc \
        goto-cc-file-local \
        linking-goto-binaries \
        symtab2gb \
+       rust \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

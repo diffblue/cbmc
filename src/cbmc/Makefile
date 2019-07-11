@@ -9,6 +9,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../json-symtab-language/json-symtab-language$(LIBEXT) \
       ../statement-list/statement-list$(LIBEXT) \
+      ../rust/rust$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-checker/goto-checker$(LIBEXT) \

@@ -19,3 +19,6 @@
 /cbmc/doc/architectural/howto.md:260: warning: found </div> at different nesting level (6) than expected (3)
 /cbmc/doc/architectural/howto.md:261: warning: end of comment block while expecting command </div>
 /cbmc/src/solvers/README.md:434: warning: Invalid list item found
+# warning below caused by function declaration existing in generated header file which doxygen doesn't have access to
+/cbmc/src/rust/rust_parser.cpp:19: warning: no uniquely matching class member found for 
+  void yyrust::parser::error(const std::string &msg)

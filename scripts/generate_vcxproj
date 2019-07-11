@@ -53,7 +53,7 @@ function doit {
   echo "</Project>" >> $dest/$1.vcxproj.filters
 }
 
-dirs="big-int langapi util ansi-c assembler cpp json json-symtab-language xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-checker goto-instrument cbmc"
+dirs="big-int langapi util ansi-c assembler cpp json json-symtab-language xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-checker goto-instrument cbmc rust statement-list"
 doit cbmc
 
 dirs="big-int langapi util ansi-c assembler cpp json xmllang goto-programs linking goto-cc"

@@ -159,6 +159,7 @@ CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
               ../src/cpp/cpp$(LIBEXT) \
               ../src/json/json$(LIBEXT) \
               ../src/json-symtab-language/json-symtab-language$(LIBEXT) \
+              ../src/rust/rust$(LIBEXT) \
               ../src/linking/linking$(LIBEXT) \
               ../src/util/util$(LIBEXT) \
               ../src/big-int/big-int$(LIBEXT) \

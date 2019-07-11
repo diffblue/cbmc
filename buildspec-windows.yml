@@ -20,6 +20,7 @@ phases:
 
       - |
         $env:Path = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$env:Path"
+        $env:INCLUDE = "C:\tools\cygwin\usr\include;$env:INCLUDE"
         $env:CLCACHE_DIR = "C:\clcache"
         $env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make CXX=clcache.exe -j4 -C src BUILD_ENV=MSVC" '

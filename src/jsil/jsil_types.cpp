@@ -122,7 +122,7 @@ typet jsil_union(const typet &type1, const typet &type2)
     .union_with(jsil_union_typet(type2)).to_type();
 }
 
-bool compare_components(
+static bool compare_components(
   const union_typet::componentt &comp1,
   const union_typet::componentt &comp2)
 {

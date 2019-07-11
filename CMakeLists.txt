@@ -164,6 +164,7 @@ cprover_default_properties(
     langapi
     linking
     pointer-analysis
+    rust
     solvers
     statement-list
     symtab2gb

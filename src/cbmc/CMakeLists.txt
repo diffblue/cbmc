@@ -22,6 +22,7 @@ target_link_libraries(cbmc-lib
     langapi
     linking
     pointer-analysis
+    rust
     solvers
     statement-list
     util

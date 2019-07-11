@@ -119,8 +119,8 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel gdb
-        - export PATH=$PATH:/usr/local/opt/ccache/libexec
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel gdb bison
+        - export PATH=/usr/local/opt/ccache/libexec:/usr/local/opt/bison/bin:$PATH
       env:
         - COMPILER="ccache clang++"
         - WITH_MEMORY_ANALYZER=0
@@ -288,8 +288,8 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache gdb
-        - export PATH=$PATH:/usr/local/opt/ccache/libexec
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache gdb bison
+        - export PATH=/usr/local/opt/ccache/libexec:/usr/local/opt/bison/bin:$PATH
       env:
         - BUILD_SYSTEM=cmake
         - CCACHE_CPP2=yes
