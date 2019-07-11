@@ -143,9 +143,12 @@ private:
   /// to the given component element.
   /// \param var_decls: List of declarations which should be typechecked.
   /// \param [out] components: List of typechecked and converted declarations.
+  /// \param var_property: Type of variable declaration list (for example
+  ///   input, output, ...).
   void typecheck_function_block_var_decls(
     const statement_list_parse_treet::var_declarationst &var_decls,
-    struct_union_typet::componentst &components);
+    struct_union_typet::componentst &components,
+    const irep_idt &var_property);
 
   /// Performs a typecheck on a variable declaration list and saves the result
   /// to the given component element.
@@ -153,10 +156,13 @@ private:
   /// \param [out] params: List of typechecked and converted declarations.
   /// \param function_name: Function to which the variable list belongs (used
   ///   for naming).
+  /// \param var_property: Type of variable declaration list (for example
+  ///   input, output, ...).
   void typecheck_function_var_decls(
     const statement_list_parse_treet::var_declarationst &var_decls,
     code_typet::parameterst &params,
-    const irep_idt &function_name);
+    const irep_idt &function_name,
+    const irep_idt &var_property);
 
   /// Performs a typecheck on the temp variables of a TIA module and saves the
   /// result to the given symbol value.

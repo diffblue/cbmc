@@ -170,9 +170,12 @@ void statement_list_typecheckt::typecheck_function_declaration(
   function_sym.pretty_name = function_sym.name;
   function_sym.mode = STATEMENT_LIST_MODE;
   code_typet::parameterst params;
-  typecheck_function_var_decls(function.var_input, params, function.name);
-  typecheck_function_var_decls(function.var_inout, params, function.name);
-  typecheck_function_var_decls(function.var_output, params, function.name);
+  typecheck_function_var_decls(
+    function.var_input, params, function.name, ID_statement_list_var_input);
+  typecheck_function_var_decls(
+    function.var_inout, params, function.name, ID_statement_list_var_inout);
+  typecheck_function_var_decls(
+    function.var_output, params, function.name, ID_statement_list_var_output);
 
   code_typet fc_type{params, function.return_type};
   fc_type.set(ID_statement_list_type, ID_statement_list_function);
@@ -204,17 +207,22 @@ struct_typet statement_list_typecheckt::create_instance_data_block_type(
   const statement_list_parse_treet::function_blockt &function_block)
 {
   struct_union_typet::componentst components;
-  typecheck_function_block_var_decls(function_block.var_input, components);
-  typecheck_function_block_var_decls(function_block.var_inout, components);
-  typecheck_function_block_var_decls(function_block.var_output, components);
-  typecheck_function_block_var_decls(function_block.var_static, components);
+  typecheck_function_block_var_decls(
+    function_block.var_input, components, ID_statement_list_var_input);
+  typecheck_function_block_var_decls(
+    function_block.var_inout, components, ID_statement_list_var_inout);
+  typecheck_function_block_var_decls(
+    function_block.var_output, components, ID_statement_list_var_output);
+  typecheck_function_block_var_decls(
+    function_block.var_static, components, ID_statement_list_var_static);
 
   return struct_typet{components};
 }
 
 void statement_list_typecheckt::typecheck_function_block_var_decls(
   const statement_list_parse_treet::var_declarationst &var_decls,
-  struct_union_typet::componentst &components)
+  struct_union_typet::componentst &components,
+  const irep_idt &var_property)
 {
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
@@ -222,6 +230,7 @@ void statement_list_typecheckt::typecheck_function_block_var_decls(
     const irep_idt &var_name{declaration.variable.get_identifier()};
     const typet &var_type{declaration.variable.type()};
     struct_union_typet::componentt component{var_name, var_type};
+    component.set(ID_statement_list_type, var_property);
     components.push_back(component);
   }
 }
@@ -229,7 +238,8 @@ void statement_list_typecheckt::typecheck_function_block_var_decls(
 void statement_list_typecheckt::typecheck_function_var_decls(
   const statement_list_parse_treet::var_declarationst &var_decls,
   code_typet::parameterst &params,
-  const irep_idt &function_name)
+  const irep_idt &function_name,
+  const irep_idt &var_property)
 {
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
@@ -247,6 +257,7 @@ void statement_list_typecheckt::typecheck_function_var_decls(
     code_typet::parametert param{declaration.variable.type()};
     param.set_identifier(param_sym.name);
     param.set_base_name(declaration.variable.get_identifier());
+    param.set(ID_statement_list_type, var_property);
     params.push_back(param);
   }
 }
