@@ -55,8 +55,11 @@ expr_skeletont expr_skeletont::compose(expr_skeletont other) const
 
 /// In the expression corresponding to a skeleton returns a pointer to the
 /// deepest subexpression before we encounter nil.
+/// Returns nullptr if \p e is nil
 static exprt *deepest_not_nil(exprt &e)
 {
+  if(e.is_nil())
+    return nullptr;
   exprt *ptr = &e;
   while(!ptr->op0().is_nil())
     ptr = &ptr->op0();
@@ -67,6 +70,8 @@ optionalt<expr_skeletont>
 expr_skeletont::clear_innermost_index_expr(expr_skeletont skeleton)
 {
   exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(to_update == nullptr)
+    return {};
   if(index_exprt *index_expr = expr_try_dynamic_cast<index_exprt>(*to_update))
   {
     index_expr->make_nil();
@@ -79,6 +84,8 @@ optionalt<expr_skeletont>
 expr_skeletont::clear_innermost_member_expr(expr_skeletont skeleton)
 {
   exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(to_update == nullptr)
+    return {};
   if(member_exprt *member = expr_try_dynamic_cast<member_exprt>(*to_update))
   {
     member->make_nil();
@@ -91,6 +98,8 @@ optionalt<expr_skeletont>
 expr_skeletont::clear_innermost_byte_extract_expr(expr_skeletont skeleton)
 {
   exprt *to_update = deepest_not_nil(skeleton.skeleton);
+  if(to_update == nullptr)
+    return {};
   if(
     to_update->id() != ID_byte_extract_big_endian &&
     to_update->id() != ID_byte_extract_little_endian)
