@@ -4,6 +4,8 @@
 
 #include <iterator>
 
+#include <util/range.h>
+
 /// \param type: Source type
 /// \return The vector of implicitly generic and (explicitly) generic type
 ///   parameters of the given type.
@@ -44,22 +46,8 @@ void generic_parameter_specialization_map_keyst::insert_pairs(
   const std::vector<reference_typet> &types)
 {
   INVARIANT(erase_keys.empty(), "insert_pairs should only be called once");
-  PRECONDITION(parameters.size() == types.size());
 
-  // Pair up the parameters and types for easier manipulation later
-  std::vector<std::pair<java_generic_parametert, reference_typet>> pairs;
-  pairs.reserve(parameters.size());
-  std::transform(
-    parameters.begin(),
-    parameters.end(),
-    types.begin(),
-    std::back_inserter(pairs),
-    [&](java_generic_parametert param, reference_typet type)
-    {
-      return std::make_pair(param, type);
-    });
-
-  for(const auto &pair : pairs)
+  for(const auto &pair : make_range(parameters).zip(types))
   {
     // Only add the pair if the type is not the parameter itself, e.g.,
     // pair.first = pair.second = java::A::T. This can happen for example
