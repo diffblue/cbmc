@@ -308,6 +308,48 @@ public:
   {
     return converter.convert_astore(statement, op, location);
   }
+
+  static exprt variable(
+    java_bytecode_convert_methodt &converter,
+    const exprt &arg,
+    char type_char,
+    size_t address)
+  {
+    return converter.variable(arg, type_char, address);
+  }
+
+  static void add_variable(
+    java_bytecode_convert_methodt &converter,
+    std::size_t index,
+    symbol_exprt symbol_expr,
+    std::size_t start_pc,
+    std::size_t length,
+    bool is_parameter,
+    std::vector<java_bytecode_convert_methodt::holet> holes)
+  {
+    converter.variables[index].emplace_back(
+      std::move(symbol_expr), start_pc, length, is_parameter, std::move(holes));
+  }
+
+  static exprt convert_load(
+    java_bytecode_convert_methodt &converter,
+    const exprt &index,
+    char type_char,
+    size_t address)
+  {
+    return converter.convert_load(index, type_char, address);
+  }
+
+  static code_blockt convert_store(
+    java_bytecode_convert_methodt &converter,
+    const irep_idt &statement,
+    const exprt &arg0,
+    const exprt::operandst &op,
+    const java_bytecode_convert_methodt::method_offsett address,
+    const source_locationt &location)
+  {
+    return converter.convert_store(statement, arg0, op, address, location);
+  }
 };
 
 SCENARIO(
@@ -514,6 +556,316 @@ SCENARIO(
             .as<typecast_exprt>()
             .get()
             .type() == java_array_type('i'));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "java convert method variable",
+  "[core][java_bytecode][java_bytecode_convert_method][variable]")
+{
+  symbol_tablet symbol_table;
+  java_string_library_preprocesst string_preprocess;
+  const class_hierarchyt class_hierarchy{};
+  const std::size_t max_array_length = 10;
+  const bool throw_assertion_error = true;
+  const bool threading_support = false;
+  java_bytecode_convert_methodt converter{symbol_table,
+                                          null_message_handler,
+                                          max_array_length,
+                                          throw_assertion_error,
+                                          {},
+                                          string_preprocess,
+                                          class_hierarchy,
+                                          threading_support};
+
+  GIVEN("An int_array variable")
+  {
+    const source_locationt location;
+    const typet int_array_type = java_array_type('i');
+    const symbol_exprt int_array{"int_array", int_array_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter, variable_index, int_array, start_pc, length, is_parameter, {});
+    const std::size_t address = 0;
+    WHEN("The variable is retrieved via its index with type_char a")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result = java_bytecode_convert_method_unit_testt::variable(
+        converter, index_expr, 'a', address);
+      THEN("the result is int_array")
+      {
+        REQUIRE(result == int_array);
+      }
+    }
+    WHEN("There is no variable at the given index")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index + 1, java_int_type());
+      const exprt result = java_bytecode_convert_method_unit_testt::variable(
+        converter, index_expr, 'a', address);
+      THEN("A new reference variable is created")
+      {
+        REQUIRE(result != int_array);
+        REQUIRE(can_cast_expr<symbol_exprt>(result));
+        REQUIRE(result.type() == java_type_from_char('a'));
+      }
+    }
+  }
+  GIVEN("An Object variable")
+  {
+    const source_locationt location;
+    const typet object_type = java_lang_object_type();
+    const symbol_exprt obj{"obj", object_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter, variable_index, obj, start_pc, length, is_parameter, {});
+    const std::size_t address = 0;
+    WHEN("The variable is retrieved via its index with type_char a")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result = java_bytecode_convert_method_unit_testt::variable(
+        converter, index_expr, 'a', address);
+      THEN("the result is obj")
+      {
+        REQUIRE(result == obj);
+      }
+    }
+  }
+  GIVEN("An long variable")
+  {
+    const source_locationt location;
+    const typet long_type = java_long_type();
+    const symbol_exprt long_var{"long_var", long_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter, variable_index, long_var, start_pc, length, is_parameter, {});
+    const std::size_t address = 0;
+    WHEN("The variable is retrieved via its index with type_char l")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result = java_bytecode_convert_method_unit_testt::variable(
+        converter, index_expr, 'l', address);
+      THEN("the result is long_var")
+      {
+        REQUIRE(result == long_var);
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "java convert load",
+  "[core][java_bytecode][java_bytecode_convert_method][convert_load]")
+{
+  symbol_tablet symbol_table;
+  java_string_library_preprocesst string_preprocess;
+  const class_hierarchyt class_hierarchy{};
+  const std::size_t max_array_length = 10;
+  const bool throw_assertion_error = true;
+  const bool threading_support = false;
+  java_bytecode_convert_methodt converter{symbol_table,
+                                          null_message_handler,
+                                          max_array_length,
+                                          throw_assertion_error,
+                                          {},
+                                          string_preprocess,
+                                          class_hierarchy,
+                                          threading_support};
+
+  GIVEN("An int_array variable")
+  {
+    const source_locationt location;
+    const typet int_array_type = java_array_type('i');
+    const symbol_exprt int_array{"int_array", int_array_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter, variable_index, int_array, start_pc, length, is_parameter, {});
+    const std::size_t address = 0;
+    WHEN("The variable is loaded with aload")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_load(
+          converter, index_expr, 'a', address);
+      THEN("the result is int_array")
+      {
+        REQUIRE(result == int_array);
+      }
+    }
+    WHEN("There is no variable at the given index")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index + 1, java_int_type());
+      const exprt result = java_bytecode_convert_method_unit_testt::variable(
+        converter, index_expr, 'a', address);
+      THEN("A new reference variable is created")
+      {
+        REQUIRE(result != int_array);
+        REQUIRE(can_cast_expr<symbol_exprt>(result));
+        REQUIRE(result.type() == java_type_from_char('a'));
+      }
+    }
+  }
+  GIVEN("An Object variable")
+  {
+    const source_locationt location;
+    const typet object_type = java_lang_object_type();
+    const symbol_exprt obj{"obj", object_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter, variable_index, obj, start_pc, length, is_parameter, {});
+    const std::size_t address = 0;
+    WHEN("The variable is loaded with aload")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_load(
+          converter, index_expr, 'a', address);
+      THEN("the result is obj")
+      {
+        REQUIRE(result == obj);
+      }
+    }
+  }
+  GIVEN("A long variable")
+  {
+    const source_locationt location;
+    const typet long_type = java_long_type();
+    const symbol_exprt long_var{"long_var", long_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter, variable_index, long_var, start_pc, length, is_parameter, {});
+    const std::size_t address = 0;
+    WHEN("The variable is loaded with lload")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_load(
+          converter, index_expr, 'l', address);
+      THEN("the result is long_var")
+      {
+        REQUIRE(result == long_var);
+      }
+    }
+  }
+  GIVEN("A boolean variable")
+  {
+    const source_locationt location;
+    const symbol_exprt boolean_var{"boolean_var", java_boolean_type()};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter,
+      variable_index,
+      boolean_var,
+      start_pc,
+      length,
+      is_parameter,
+      {});
+    const std::size_t address = 0;
+    WHEN("The variable is loaded with iload")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const exprt result =
+        java_bytecode_convert_method_unit_testt::convert_load(
+          converter, index_expr, 'i', address);
+      THEN("the result is (int)boolean_var")
+      {
+        REQUIRE(result.type() == java_int_type());
+        REQUIRE(
+          make_query(result).as<typecast_exprt>()[0].get() == boolean_var);
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "convert store",
+  "[core][java_bytecode][java_bytecode_convert_method][convert_store]")
+{
+  symbol_tablet symbol_table;
+  java_string_library_preprocesst string_preprocess;
+  const class_hierarchyt class_hierarchy{};
+  const std::size_t max_array_length = 10;
+  const bool throw_assertion_error = true;
+  const bool threading_support = false;
+  java_bytecode_convert_methodt converter{symbol_table,
+                                          null_message_handler,
+                                          max_array_length,
+                                          throw_assertion_error,
+                                          {},
+                                          string_preprocess,
+                                          class_hierarchy,
+                                          threading_support};
+
+  GIVEN("An int_array variable")
+  {
+    const source_locationt location;
+    const typet int_array_type = java_array_type('i');
+    const symbol_exprt int_array{"int_array", int_array_type};
+    const symbol_exprt int_array_copy{"int_array_copy", int_array_type};
+    const std::size_t variable_index = 0;
+    const std::size_t start_pc = 0;
+    const std::size_t length = 1;
+    const bool is_parameter = false;
+    java_bytecode_convert_method_unit_testt::add_variable(
+      converter,
+      variable_index,
+      int_array_copy,
+      start_pc,
+      length,
+      is_parameter,
+      {});
+    WHEN("astore is called on the int array")
+    {
+      const constant_exprt index_expr =
+        from_integer(variable_index, java_int_type());
+      const code_blockt result_code =
+        java_bytecode_convert_method_unit_testt::convert_store(
+          converter, "astore", index_expr, {int_array}, 0, location);
+
+      THEN(
+        "The result is one assignment of the form "
+        "`int_array_copy = int_array`")
+      {
+        REQUIRE(result_code.statements().size() == 1);
+        auto assign_query =
+          make_query(result_code.statements()[0]).as<code_assignt>();
+        REQUIRE(can_cast_expr<symbol_exprt>(assign_query[0].get()));
+        REQUIRE(assign_query[1].get() == int_array);
+        THEN("Left-hand-side has type int array")
+        {
+          REQUIRE(assign_query[0].get().type() == int_array_type);
+        }
       }
     }
   }

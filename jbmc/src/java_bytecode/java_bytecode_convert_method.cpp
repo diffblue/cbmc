@@ -164,21 +164,18 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
 /// from a bytecode at address `address` a value of type `type_char` stored in
 /// the JVM's slot `arg`.
 /// \param arg: The local variable slot
-/// \param type_char: The type of the value stored in the slot pointed by `arg`
+/// \param type_char: The type of the value stored in the slot pointed to by
+///   `arg`, this is only used in the case where a new unnamed local variable
+///   is created
 /// \param address: Bytecode address used to find a variable that the LVT
 ///   declares to be live and living in the slot pointed by `arg` for this
 ///   bytecode
-/// \param do_cast: Indicates whether we should return the original symbol_exprt
-///   or a typecast_exprt if the type of the symbol_exprt does not equal that
-///   represented by `type_char`
 /// \return symbol_exprt or type-cast symbol_exprt
 exprt java_bytecode_convert_methodt::variable(
   const exprt &arg,
   char type_char,
-  size_t address,
-  java_bytecode_convert_methodt::variable_cast_argumentt do_cast)
+  size_t address)
 {
-  typet t=java_type_from_char(type_char);
   const std::size_t number_int =
     numeric_cast_v<std::size_t>(to_constant_expr(arg));
   variablest &var_list=variables[number_int];
@@ -187,24 +184,17 @@ exprt java_bytecode_convert_methodt::variable(
   const variablet &var=
     find_variable_for_slot(address, var_list);
 
-  if(var.symbol_expr.get_identifier().empty())
-  {
-    // an unnamed local variable
-    irep_idt base_name="anonlocal::"+std::to_string(number_int)+type_char;
-    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+  if(!var.symbol_expr.get_identifier().empty())
+    return var.symbol_expr;
 
-    symbol_exprt result(identifier, t);
-    result.set(ID_C_base_name, base_name);
-    used_local_names.insert(result);
-    return std::move(result);
-  }
-  else
-  {
-    exprt result=var.symbol_expr;
-    if(do_cast == CAST_AS_NEEDED)
-      result = typecast_exprt::conditional_cast(result, t);
-    return result;
-  }
+  // an unnamed local variable
+  irep_idt base_name = "anonlocal::" + std::to_string(number_int) + type_char;
+  irep_idt identifier = id2string(current_method) + "::" + id2string(base_name);
+
+  symbol_exprt result(identifier, java_type_from_char(type_char));
+  result.set(ID_C_base_name, base_name);
+  used_local_names.insert(result);
+  return std::move(result);
 }
 
 /// Returns the member type for a method, based on signature or descriptor
@@ -1346,8 +1336,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(bytecode == patternt("?load") || bytecode == patternt("?load_?"))
     {
       // load a value from a local variable
-      results[0]=
-        variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
+      results[0] = convert_load(arg0, statement[0], i_it->address);
     }
     else if(bytecode == BC_ldc || bytecode == BC_ldc_w || bytecode == BC_ldc2_w)
     {
@@ -2710,7 +2699,7 @@ code_blockt java_bytecode_convert_methodt::convert_iinc(
   code_blockt block;
   block.add_source_location() = location;
   // search variable on stack
-  const exprt &locvar = variable(arg0, 'i', address, NO_CAST);
+  const exprt &locvar = variable(arg0, 'i', address);
   save_stack_entries(
     "stack_iinc",
     block,
@@ -2720,8 +2709,11 @@ code_blockt java_bytecode_convert_methodt::convert_iinc(
   const exprt arg1_int_type =
     typecast_exprt::conditional_cast(arg1, java_int_type());
   code_assignt code_assign(
-    variable(arg0, 'i', address, NO_CAST),
-    plus_exprt(variable(arg0, 'i', address, CAST_AS_NEEDED), arg1_int_type));
+    variable(arg0, 'i', address),
+    plus_exprt(
+      typecast_exprt::conditional_cast(
+        variable(arg0, 'i', address), java_int_type()),
+      arg1_int_type));
   block.add(std::move(code_assign));
 
   return block;
@@ -2826,7 +2818,7 @@ code_blockt java_bytecode_convert_methodt::convert_ret(
   const method_offsett address)
 {
   code_blockt c;
-  auto retvar = variable(arg0, 'a', address, NO_CAST);
+  auto retvar = variable(arg0, 'a', address);
   for(size_t idx = 0, idxlim = jsr_ret_targets.size(); idx != idxlim; ++idx)
   {
     irep_idt number = std::to_string(jsr_ret_targets[idx]);
@@ -2888,6 +2880,27 @@ exprt java_bytecode_convert_methodt::convert_aload(
   return java_bytecode_promotion(dereference_exprt{data_plus_offset});
 }
 
+exprt java_bytecode_convert_methodt::convert_load(
+  const exprt &index,
+  char type_char,
+  size_t address)
+{
+  const exprt var = variable(index, type_char, address);
+  if(type_char == 'i')
+  {
+    INVARIANT(
+      can_cast_type<bitvector_typet>(var.type()) &&
+        type_try_dynamic_cast<bitvector_typet>(var.type())->get_width() <= 32,
+      "iload can be used for boolean, byte, short, int and char");
+    return typecast_exprt::conditional_cast(var, java_int_type());
+  }
+  INVARIANT(
+    (type_char == 'a' && can_cast_type<reference_typet>(var.type())) ||
+      var.type() == java_type_from_char(type_char),
+    "Variable type must match [adflv]load return type");
+  return var;
+}
+
 code_blockt java_bytecode_convert_methodt::convert_store(
   const irep_idt &statement,
   const exprt &arg0,
@@ -2895,12 +2908,8 @@ code_blockt java_bytecode_convert_methodt::convert_store(
   const method_offsett address,
   const source_locationt &location)
 {
-  const exprt var = variable(arg0, statement[0], address, NO_CAST);
+  const exprt var = variable(arg0, statement[0], address);
   const irep_idt &var_name = to_symbol_expr(var).get_identifier();
-
-  exprt toassign = op[0];
-  if('a' == statement[0])
-    toassign = typecast_exprt::conditional_cast(toassign, var.type());
 
   code_blockt block;
   block.add_source_location() = location;
@@ -2911,7 +2920,9 @@ code_blockt java_bytecode_convert_methodt::convert_store(
     bytecode_write_typet::VARIABLE,
     var_name);
 
-  block.add(code_assignt{var, toassign}, location);
+  block.add(
+    code_assignt{var, typecast_exprt::conditional_cast(op[0], var.type())},
+    location);
   return block;
 }
 
