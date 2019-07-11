@@ -55,13 +55,9 @@ class namespacet;
 class select_pointer_typet
 {
   optionalt<pointer_typet> get_recursively_instantiated_type(
-    const irep_idt &,
-    const generic_parameter_specialization_mapt &,
-    generic_parameter_recursion_trackingt &,
-    const size_t) const;
-  optionalt<pointer_typet> get_recursively_instantiated_type(
-    const irep_idt &parameter_name,
-    const generic_parameter_specialization_mapt &visited) const;
+    irep_idt parameter_name,
+    generic_parameter_specialization_mapt
+      generic_parameter_specialization_map) const;
 
 public:
   virtual ~select_pointer_typet() = default;
