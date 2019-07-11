@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 /// \file
 /// Handle selection of correct pointer type (for example changing abstract
 /// classes to concrete versions).
+#include "generic_parameter_specialization_map.h"
 #include "java_types.h"
 
 #include <vector>
@@ -19,23 +20,10 @@ Author: Diffblue Ltd.
 #include <util/optional.h>
 #include <util/std_types.h>
 
-typedef std::unordered_map<irep_idt, std::vector<reference_typet>>
-  generic_parameter_specialization_mapt;
-typedef std::set<irep_idt> generic_parameter_recursion_trackingt;
-
 class namespacet;
 
 class select_pointer_typet
 {
-  optionalt<pointer_typet> get_recursively_instantiated_type(
-    const irep_idt &,
-    const generic_parameter_specialization_mapt &,
-    generic_parameter_recursion_trackingt &,
-    const size_t) const;
-  optionalt<pointer_typet> get_recursively_instantiated_type(
-    const irep_idt &parameter_name,
-    const generic_parameter_specialization_mapt &visited) const;
-
 public:
   virtual ~select_pointer_typet() = default;
 
@@ -78,18 +66,24 @@ public:
   /// - generic type: T[]
   /// - map: T -> U; U -> String
   /// - result: String[]
+  /// Example 2:
+  /// `class MyGeneric<T,U> { MyGeneric<U,T> gen; T t;}`
+  /// When instantiating `MyGeneric<Integer,String> my` we need to resolve the
+  /// type of `my.gen.t`. The map would in this context contain
+  /// - T -> (Integer, U)
+  /// - U -> (String, T)
+  ///
+  /// Note that the top of the stacks for T and U create a recursion T -> U,
+  /// U-> T. We break it and specialize `T my.gen.t` to `String my.gen.t`.
   /// \param pointer_type: The pointer to be specialized
   /// \param generic_parameter_specialization_map: Map of types for all
   ///   generic parameters in the current scope
-  /// \param visited_nodes: Set of parameter names already considered in
-  ///   recursion, used to avoid infinite recursion
   /// \return Pointer type where generic parameters are replaced with
   ///   specialized types (if set in the current scope)
   pointer_typet specialize_generics(
     const pointer_typet &pointer_type,
     const generic_parameter_specialization_mapt
-      &generic_parameter_specialization_map,
-    generic_parameter_recursion_trackingt &visited_nodes) const;
+      &generic_parameter_specialization_map) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H

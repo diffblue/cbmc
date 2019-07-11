@@ -35,51 +35,18 @@ get_all_generic_parameters(const typet &type)
   return generic_parameters;
 }
 
-/// Add pairs to the controlled map. Own the keys and pop from their stack
-/// on destruction; otherwise do nothing.
-/// \param parameters: generic parameters that are the keys of the pairs to add
-/// \param types: a type to add for each parameter
-void generic_parameter_specialization_map_keyst::insert_pairs(
-  const std::vector<java_generic_parametert> &parameters,
-  const std::vector<reference_typet> &types)
-{
-  INVARIANT(erase_keys.empty(), "insert_pairs should only be called once");
-
-  for(const auto &pair : make_range(parameters).zip(types))
-  {
-    // Only add the pair if the type is not the parameter itself, e.g.,
-    // pair.first = pair.second = java::A::T. This can happen for example
-    // when initializing a pointer to an implicitly generic Java class type
-    // in gen_nondet_init and would result in a loop when the map is used
-    // to look up the type of the parameter.
-    if(
-      !(is_java_generic_parameter(pair.second) &&
-        to_java_generic_parameter(pair.second).get_name() ==
-          pair.first.get_name()))
-    {
-      const irep_idt &key = pair.first.get_name();
-      const auto map_it = generic_parameter_specialization_map
-                            .emplace(key, std::vector<reference_typet>{})
-                            .first;
-      map_it->second.push_back(pair.second);
-
-      // We added something; pop it when this
-      // generic_parameter_specialization_map_keyst is destroyed
-      erase_keys.push_back(key);
-    }
-  }
-}
-
-/// Add a pair of a parameter and its types for each generic parameter of the
-/// given generic pointer type to the controlled map. Own the keys and pop
-/// from their stack on destruction; otherwise do nothing.
+/// Add the parameters and their types for each generic parameter of the
+/// given generic pointer type to the map.
+/// Own the keys and pop from their stack on destruction.
 /// \param pointer_type: pointer type to get the specialized generic types from
 /// \param pointer_subtype_struct: struct type to which the generic pointer
 ///   points, must be generic if the pointer is generic
-void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
+void generic_parameter_specialization_map_keyst::insert(
   const pointer_typet &pointer_type,
   const typet &pointer_subtype_struct)
 {
+  // Use a fresh generic_parameter_specialization_map_keyst for each scope
+  PRECONDITION(!container_id);
   if(!is_java_generic_type(pointer_type))
     return;
   // The supplied type must be the full type of the pointer's subtype
@@ -91,7 +58,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
   // - an incomplete class or
   // - a class that is neither generic nor implicitly generic (this
   //   may be due to unsupported class signature)
-  // then ignore the generic types in the pointer and do not add any pairs.
+  // then ignore the generic types in the pointer and do not add an entry.
   // TODO TG-1996 should decide how mocking and generics should work
   //   together. Currently an incomplete class is never marked as generic. If
   //   this changes in TG-1996 then the condition below should be updated.
@@ -115,34 +82,39 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
     type_args.size() == generic_parameters.size(),
     "All generic parameters of the pointer type need to be specified");
 
-  insert_pairs(generic_parameters, type_args);
+  container_id =
+    generic_parameter_specialization_map.insert(generic_parameters, type_args);
 }
 
-/// Add a pair of a parameter and its types for each generic parameter of the
-/// given generic symbol type to the controlled map. This function is used
-/// for generic bases (superclass or interfaces) where the reference to it is
-/// in the form of a symbol rather than a pointer (as opposed to the function
-/// insert_pairs_for_pointer). Own the keys and pop from their stack
-/// on destruction; otherwise do nothing.
+/// Add the parameters and their types for each generic parameter of the
+/// given generic symbol type to the map.
+/// This function is used for generic bases (superclass or interfaces) where
+/// the reference to it is in the form of a symbol rather than a pointer.
+/// Own the keys and pop from their stack on destruction.
 /// \param struct_tag_type: symbol type to get the specialized generic types
 ///   from
 /// \param symbol_struct: struct type of the symbol type, must be generic if
 ///   the symbol is generic
-void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
+void generic_parameter_specialization_map_keyst::insert(
   const struct_tag_typet &struct_tag_type,
   const typet &symbol_struct)
 {
+  // Use a fresh generic_parameter_specialization_map_keyst for each scope
+  PRECONDITION(!container_id);
+  if(!is_java_generic_struct_tag_type(struct_tag_type))
+    return;
+  // The supplied type must be the full type of the pointer's subtype
+  PRECONDITION(
+    struct_tag_type.get(ID_identifier) == symbol_struct.get(ID_name));
+
   // If the struct is:
   // - an incomplete class or
   // - a class that is neither generic nor implicitly generic (this
   //  may be due to unsupported class signature)
-  // then ignore the generic types in the struct_tag_type and do not add any
-  // pairs.
+  // then ignore the generic types in the struct and do not add an entry.
   // TODO TG-1996 should decide how mocking and generics should work
   //   together. Currently an incomplete class is never marked as generic. If
   //   this changes in TG-1996 then the condition below should be updated.
-  if(!is_java_generic_struct_tag_type(struct_tag_type))
-    return;
   if(to_java_class_type(symbol_struct).get_is_stub())
     return;
   if(
@@ -163,5 +135,6 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
     type_args.size() == generic_parameters.size(),
     "All generic parameters of the superclass need to be concretized");
 
-  insert_pairs(generic_parameters, type_args);
+  container_id =
+    generic_parameter_specialization_map.insert(generic_parameters, type_args);
 }

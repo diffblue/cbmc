@@ -20,10 +20,18 @@ class KeyValue<K, V> {
     K key;
     V value;
 }
+class Foo<T> {
+  Bar<T> bar;
+  T t;
+}
+class Bar<U> {
+  Foo<U> foo;
+}
 class MutuallyRecursiveGenerics {
   KeyValue<String, Integer> example1;
   Three<Byte, Character, Integer> example2;
   Outer<Boolean, Byte, Short> example3;
+  Foo<Long> testFoo;
   void f() {
   }
 }
