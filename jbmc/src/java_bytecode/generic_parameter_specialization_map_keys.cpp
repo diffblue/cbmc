@@ -80,40 +80,42 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
   const pointer_typet &pointer_type,
   const typet &pointer_subtype_struct)
 {
-  if(is_java_generic_type(pointer_type))
+  if(!is_java_generic_type(pointer_type))
+    return;
+  // The supplied type must be the full type of the pointer's subtype
+  PRECONDITION(
+    pointer_type.subtype().get(ID_identifier) ==
+    pointer_subtype_struct.get(ID_name));
+
+  // If the pointer points to:
+  // - an incomplete class or
+  // - a class that is neither generic nor implicitly generic (this
+  //   may be due to unsupported class signature)
+  // then ignore the generic types in the pointer and do not add any pairs.
+  // TODO TG-1996 should decide how mocking and generics should work
+  //   together. Currently an incomplete class is never marked as generic. If
+  //   this changes in TG-1996 then the condition below should be updated.
+  if(to_java_class_type(pointer_subtype_struct).get_is_stub())
+    return;
+  if(
+    !is_java_generic_class_type(pointer_subtype_struct) &&
+    !is_java_implicitly_generic_class_type(pointer_subtype_struct))
   {
-    // The supplied type must be the full type of the pointer's subtype
-    PRECONDITION(
-      pointer_type.subtype().get(ID_identifier) ==
-      pointer_subtype_struct.get(ID_name));
-
-    // If the pointer points to:
-    // - an incomplete class or
-    // - a class that is neither generic nor implicitly generic (this
-    //  may be due to unsupported class signature)
-    // then ignore the generic types in the pointer and do not add any pairs.
-    // TODO TG-1996 should decide how mocking and generics should work
-    // together. Currently an incomplete class is never marked as generic. If
-    // this changes in TG-1996 then the condition below should be updated.
-    if(
-      !to_java_class_type(pointer_subtype_struct).get_is_stub() &&
-      (is_java_generic_class_type(pointer_subtype_struct) ||
-       is_java_implicitly_generic_class_type(pointer_subtype_struct)))
-    {
-      const java_generic_typet &generic_pointer =
-        to_java_generic_type(pointer_type);
-      const std::vector<java_generic_parametert> &generic_parameters =
-        get_all_generic_parameters(pointer_subtype_struct);
-
-      INVARIANT(
-        generic_pointer.generic_type_arguments().size() ==
-          generic_parameters.size(),
-        "All generic parameters of the pointer type need to be specified");
-
-      insert_pairs(
-        generic_parameters, generic_pointer.generic_type_arguments());
-    }
+    return;
   }
+
+  const java_generic_typet &generic_pointer =
+    to_java_generic_type(pointer_type);
+
+  const std::vector<java_generic_parametert> &generic_parameters =
+    get_all_generic_parameters(pointer_subtype_struct);
+  const java_generic_typet::generic_type_argumentst &type_args =
+    generic_pointer.generic_type_arguments();
+  INVARIANT(
+    type_args.size() == generic_parameters.size(),
+    "All generic parameters of the pointer type need to be specified");
+
+  insert_pairs(generic_parameters, type_args);
 }
 
 /// Add a pair of a parameter and its types for each generic parameter of the
@@ -137,24 +139,29 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   // then ignore the generic types in the struct_tag_type and do not add any
   // pairs.
   // TODO TG-1996 should decide how mocking and generics should work
-  // together. Currently an incomplete class is never marked as generic. If
-  // this changes in TG-1996 then the condition below should be updated.
+  //   together. Currently an incomplete class is never marked as generic. If
+  //   this changes in TG-1996 then the condition below should be updated.
+  if(!is_java_generic_struct_tag_type(struct_tag_type))
+    return;
+  if(to_java_class_type(symbol_struct).get_is_stub())
+    return;
   if(
-    is_java_generic_struct_tag_type(struct_tag_type) &&
-    !to_java_class_type(symbol_struct).get_is_stub() &&
-    (is_java_generic_class_type(symbol_struct) ||
-     is_java_implicitly_generic_class_type(symbol_struct)))
+    !is_java_generic_class_type(symbol_struct) &&
+    !is_java_implicitly_generic_class_type(symbol_struct))
   {
-    const java_generic_struct_tag_typet &generic_symbol =
-      to_java_generic_struct_tag_type(struct_tag_type);
-
-    const std::vector<java_generic_parametert> &generic_parameters =
-      get_all_generic_parameters(symbol_struct);
-
-    INVARIANT(
-      generic_symbol.generic_types().size() == generic_parameters.size(),
-      "All generic parameters of the superclass need to be concretized");
-
-    insert_pairs(generic_parameters, generic_symbol.generic_types());
+    return;
   }
+  const java_generic_struct_tag_typet &generic_symbol =
+    to_java_generic_struct_tag_type(struct_tag_type);
+
+  const std::vector<java_generic_parametert> &generic_parameters =
+    get_all_generic_parameters(symbol_struct);
+  const java_generic_typet::generic_type_argumentst &type_args =
+    generic_symbol.generic_types();
+
+  INVARIANT(
+    type_args.size() == generic_parameters.size(),
+    "All generic parameters of the superclass need to be concretized");
+
+  insert_pairs(generic_parameters, type_args);
 }
