@@ -241,14 +241,13 @@ static assignmentt shift_indexed_access_to_lhs(
   if(!can_cast_expr<byte_update_exprt>(assignment.rhs))
     return assignment;
   exprt &ssa_rhs = assignment.rhs;
-  ssa_exprt &lhs_mod = assignment.lhs;
   const byte_update_exprt &byte_update = to_byte_update_expr(ssa_rhs);
   exprt byte_extract = simplify_exprt{ns}
                          .simplify_byte_extract(byte_extract_exprt{
                            byte_update.id() == ID_byte_update_big_endian
                              ? ID_byte_extract_big_endian
                              : ID_byte_extract_little_endian,
-                           lhs_mod,
+                           assignment.lhs,
                            byte_update.offset(),
                            byte_update.value().type()})
                          .expr;
