@@ -33,11 +33,12 @@ public:
   {
     for(const auto key : erase_keys)
     {
-      PRECONDITION(generic_parameter_specialization_map.count(key) != 0);
-      auto &val = generic_parameter_specialization_map.find(key)->second;
+      const auto map_it = generic_parameter_specialization_map.find(key);
+      PRECONDITION(map_it != generic_parameter_specialization_map.end());
+      std::vector<reference_typet> &val = map_it->second;
       val.pop_back();
       if(val.empty())
-        generic_parameter_specialization_map.erase(key);
+        generic_parameter_specialization_map.erase(map_it);
     }
   }
 

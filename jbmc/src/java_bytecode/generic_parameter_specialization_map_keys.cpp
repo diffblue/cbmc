@@ -49,7 +49,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs(
   {
     // Only add the pair if the type is not the parameter itself, e.g.,
     // pair.first = pair.second = java::A::T. This can happen for example
-    // when initiating a pointer to an implicitly java generic class type
+    // when initializing a pointer to an implicitly generic Java class type
     // in gen_nondet_init and would result in a loop when the map is used
     // to look up the type of the parameter.
     if(
@@ -58,13 +58,13 @@ void generic_parameter_specialization_map_keyst::insert_pairs(
           pair.first.get_name()))
     {
       const irep_idt &key = pair.first.get_name();
-      if(generic_parameter_specialization_map.count(key) == 0)
-        generic_parameter_specialization_map.emplace(
-          key, std::vector<reference_typet>());
-      (*generic_parameter_specialization_map.find(key))
-        .second.push_back(pair.second);
+      const auto map_it = generic_parameter_specialization_map
+                            .emplace(key, std::vector<reference_typet>{})
+                            .first;
+      map_it->second.push_back(pair.second);
 
-      // We added something, so pop it when this is destroyed:
+      // We added something; pop it when this
+      // generic_parameter_specialization_map_keyst is destroyed
       erase_keys.push_back(key);
     }
   }

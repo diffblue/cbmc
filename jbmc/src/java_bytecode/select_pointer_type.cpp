@@ -58,7 +58,9 @@ pointer_typet select_pointer_typet::specialize_generics(
       return result.has_value() ? result.value() : pointer_type;
     }
 
-    if(generic_parameter_specialization_map.count(parameter_name) == 0)
+    const auto specialization =
+      generic_parameter_specialization_map.find(parameter_name);
+    if(specialization == generic_parameter_specialization_map.end())
     {
       // this means that the generic pointer_type has not been specialized
       // in the current context (e.g., the method under test is generic);
@@ -66,8 +68,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       // its upper bound
       return pointer_type;
     }
-    const pointer_typet &type =
-      generic_parameter_specialization_map.find(parameter_name)->second.back();
+    const pointer_typet &type = specialization->second.back();
 
     // generic parameters can be adopted from outer classes or superclasses so
     // we may need to search for the concrete type recursively
