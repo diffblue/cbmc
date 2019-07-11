@@ -259,7 +259,7 @@ void statement_list_scanner_init()
                         return TOK_REAL_LITERAL; 
                       }
 
-  (\"[^\"\r\t\n]+\")|([a-zA-Z][a-zA-Z0-9]*) {
+  (\"[^\"\r\t\n]+\")|([a-zA-Z][a-zA-Z0-9_]*) {
                         newstack(yystatement_listlval);
                         parser_stack(yystatement_listlval) = 
                           convert_identifier(yytext);
