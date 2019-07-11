@@ -136,4 +136,11 @@ inline byte_update_exprt &to_byte_update_expr(exprt &expr)
   return static_cast<byte_update_exprt &>(expr);
 }
 
+template <>
+inline bool can_cast_expr<byte_update_exprt>(const exprt &base)
+{
+  return base.id() == ID_byte_update_little_endian ||
+         base.id() == ID_byte_update_big_endian;
+}
+
 #endif // CPROVER_UTIL_BYTE_OPERATORS_H

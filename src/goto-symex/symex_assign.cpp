@@ -238,80 +238,76 @@ static assignmentt shift_indexed_access_to_lhs(
   assignmentt assignment,
   const namespacet &ns)
 {
+  if(!can_cast_expr<byte_update_exprt>(assignment.rhs))
+    return assignment;
   exprt &ssa_rhs = assignment.rhs;
   ssa_exprt &lhs_mod = assignment.lhs;
-  if(
-    ssa_rhs.id() == ID_byte_update_little_endian ||
-    ssa_rhs.id() == ID_byte_update_big_endian)
+  const byte_update_exprt &byte_update = to_byte_update_expr(ssa_rhs);
+  exprt byte_extract = simplify_exprt{ns}
+                         .simplify_byte_extract(byte_extract_exprt{
+                           byte_update.id() == ID_byte_update_big_endian
+                             ? ID_byte_extract_big_endian
+                             : ID_byte_extract_little_endian,
+                           lhs_mod,
+                           byte_update.offset(),
+                           byte_update.value().type()})
+                         .expr;
+
+  if(byte_extract.id() == ID_symbol)
   {
-    const byte_update_exprt &byte_update = to_byte_update_expr(ssa_rhs);
-    exprt byte_extract = simplify_exprt{ns}
-                           .simplify_byte_extract(byte_extract_exprt{
-                             byte_update.id() == ID_byte_update_big_endian
-                               ? ID_byte_extract_big_endian
-                               : ID_byte_extract_little_endian,
-                             lhs_mod,
-                             byte_update.offset(),
-                             byte_update.value().type()})
-                           .expr;
+    return assignmentt{to_ssa_expr(byte_extract),
+                       std::move(assignment.original_lhs_skeleton),
+                       byte_update.value()};
+  }
+  else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
+  {
+    ssa_rhs = byte_update.value();
 
-    if(byte_extract.id() == ID_symbol)
+    while(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
     {
-      return assignmentt{to_ssa_expr(byte_extract),
-                         std::move(assignment.original_lhs_skeleton),
-                         byte_update.value()};
-    }
-    else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
-    {
-      ssa_rhs = byte_update.value();
-
-      while(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
+      if(byte_extract.id() == ID_index)
       {
-        if(byte_extract.id() == ID_index)
-        {
-          index_exprt &idx = to_index_expr(byte_extract);
-          ssa_rhs = [&]() -> exprt {
-            if(use_update)
-            {
-              update_exprt new_rhs{idx.array(), exprt{}, ssa_rhs};
-              new_rhs.designator().push_back(index_designatort{idx.index()});
-              return std::move(new_rhs);
-            }
-            else
-              return with_exprt{idx.array(), idx.index(), ssa_rhs};
-          }();
-          byte_extract = idx.array();
-        }
-        else
-        {
-          member_exprt &member = to_member_expr(byte_extract);
-          const irep_idt &component_name = member.get_component_name();
-          ssa_rhs = [&]() -> exprt {
-            if(use_update)
-            {
-              update_exprt new_rhs{member.compound(), exprt{}, ssa_rhs};
-              new_rhs.designator().push_back(
-                member_designatort{component_name});
-              return std::move(new_rhs);
-            }
-            else
-            {
-              with_exprt new_rhs(
-                member.compound(), exprt(ID_member_name), ssa_rhs);
-              new_rhs.where().set(ID_component_name, component_name);
-              return std::move(new_rhs);
-            }
-          }();
-          byte_extract = member.compound();
-        }
+        index_exprt &idx = to_index_expr(byte_extract);
+        ssa_rhs = [&]() -> exprt {
+          if(use_update)
+          {
+            update_exprt new_rhs{idx.array(), exprt{}, ssa_rhs};
+            new_rhs.designator().push_back(index_designatort{idx.index()});
+            return std::move(new_rhs);
+          }
+          else
+            return with_exprt{idx.array(), idx.index(), ssa_rhs};
+        }();
+        byte_extract = idx.array();
       }
-
-      // We may have shifted the previous lhs into the rhs; as the lhs is only
-      // L1-renamed, we need to rename again.
-      return assignmentt{to_ssa_expr(byte_extract),
-                         std::move(assignment.original_lhs_skeleton),
-                         state.rename(std::move(ssa_rhs), ns).get()};
+      else
+      {
+        member_exprt &member = to_member_expr(byte_extract);
+        const irep_idt &component_name = member.get_component_name();
+        ssa_rhs = [&]() -> exprt {
+          if(use_update)
+          {
+            update_exprt new_rhs{member.compound(), exprt{}, ssa_rhs};
+            new_rhs.designator().push_back(member_designatort{component_name});
+            return std::move(new_rhs);
+          }
+          else
+          {
+            with_exprt new_rhs(
+              member.compound(), exprt(ID_member_name), ssa_rhs);
+            new_rhs.where().set(ID_component_name, component_name);
+            return std::move(new_rhs);
+          }
+        }();
+        byte_extract = member.compound();
+      }
     }
+
+    // We may have shifted the previous lhs into the rhs; as the lhs is only
+    // L1-renamed, we need to rename again.
+    return assignmentt{to_ssa_expr(byte_extract),
+                       std::move(assignment.original_lhs_skeleton),
+                       state.rename(std::move(ssa_rhs), ns).get()};
   }
   return assignment;
 }
