@@ -2,8 +2,6 @@
 
 #include "generic_parameter_specialization_map_keys.h"
 
-#include <iterator>
-
 #include <util/range.h>
 
 /// \param type: Source type
