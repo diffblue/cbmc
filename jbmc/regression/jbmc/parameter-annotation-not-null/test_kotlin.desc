@@ -1,0 +1,12 @@
+CORE
+MainKotlin.class
+--function "MainKotlin.<init>" --show-properties
+^EXIT=0$
+^SIGNAL=0$
+Property java::MainKotlin.<init>:\(Ljava/lang/String;Ljava/lang/String;\)V.not-null-annotation-check.1:
+Property java::MainKotlin.<init>:\(Ljava/lang/String;Ljava/lang/String;\)V.not-null-annotation-check.2:
+file MainKotlin.kt line 1 function java::MainKotlin.<init>:\(Ljava/lang/String;Ljava/lang/String;\)V$
+--
+--
+Test that the not-null-annotation-check property name is correctly prefixed with
+the method name and has line number assigned
