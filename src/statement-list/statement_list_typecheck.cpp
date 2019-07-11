@@ -1262,9 +1262,10 @@ void statement_list_typecheckt::typecheck_called_function(
   symbolt &tia_element)
 {
   const symbol_exprt call_operand{to_symbol_expr(op_code.op0())};
-  const symbolt &called_function{
+  const symbolt &called_function_sym{
     symbol_table.lookup_ref(call_operand.get_identifier())};
-  const code_typet &called_type{to_code_type(called_function.type)};
+  const symbol_exprt called_function_expr{called_function_sym.symbol_expr()};
+  const code_typet &called_type{to_code_type(called_function_sym.type)};
 
   // Check if function name is followed by data block.
   if(!can_cast_expr<equal_exprt>(op_code.op1()))
@@ -1288,11 +1289,22 @@ void statement_list_typecheckt::typecheck_called_function(
 
   for(const code_typet::parametert &param : params)
   {
-    const exprt &arg{typecheck_function_call_arguments(assignments, param)};
+    const exprt &arg{
+      typecheck_function_call_arguments(assignments, param, tia_element)};
     args.push_back(arg);
   }
-  const code_function_callt call{call_operand, args};
-  tia_element.value.add_to_operands(call);
+
+  // Check the return value if present.
+  if(called_type.return_type().is_nil())
+    tia_element.value.add_to_operands(
+      code_function_callt{called_function_expr, args});
+  else
+  {
+    const exprt lhs{typecheck_return_value_assignment(
+      assignments, called_type.return_type(), tia_element)};
+    tia_element.value.add_to_operands(
+      code_function_callt{lhs, called_function_expr, args});
+  }
 }
 
 void statement_list_typecheckt::typecheck_called_function_block(
@@ -1309,23 +1321,60 @@ void statement_list_typecheckt::typecheck_called_function_block(
 
 exprt statement_list_typecheckt::typecheck_function_call_arguments(
   const std::vector<equal_exprt> &assignments,
-  const code_typet::parametert &param)
+  const code_typet::parametert &param,
+  const symbolt &tia_element)
 {
+  const irep_idt &param_name = param.get_base_name();
+  const typet &param_type = param.type();
   for(const equal_exprt &assignment : assignments)
   {
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
-    if(param.get_identifier() == lhs.get_identifier())
+    if(param_name == lhs.get_identifier())
     {
-      if(param.type() == assignment.rhs().type())
-        return assignment.rhs();
+      const symbol_exprt &rhs{to_symbol_expr(assignment.rhs())};
+      const exprt assigned_variable{
+        typecheck_identifier(tia_element, rhs.get_identifier())};
+      if(param_type == assigned_variable.type())
+        return assigned_variable;
       else
       {
-        error() << "Types of parameter assignment do not match" << eom;
+        error() << "Types of parameter assignment do not match: "
+                << param.type().id() << " != " << assigned_variable.type().id()
+                << eom;
         throw TYPECHECK_ERROR;
       }
     }
   }
-  error() << "No assignment found for function parameter" << eom;
+  error() << "No assignment found for function parameter "
+          << param.get_identifier() << eom;
+  throw TYPECHECK_ERROR;
+}
+
+exprt statement_list_typecheckt::typecheck_return_value_assignment(
+  const std::vector<equal_exprt> &assignments,
+  const typet &return_type,
+  const symbolt &tia_element)
+{
+  for(const equal_exprt &assignment : assignments)
+  {
+    const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
+    if(ID_statement_list_return_value_id == lhs.get_identifier())
+    {
+      const symbol_exprt &rhs{to_symbol_expr(assignment.rhs())};
+      const exprt assigned_variable{
+        typecheck_identifier(tia_element, rhs.get_identifier())};
+      if(return_type == assigned_variable.type())
+        return assigned_variable;
+      else
+      {
+        error() << "Types of return value assignment do not match: "
+                << return_type.id() << " != " << assigned_variable.type().id()
+                << eom;
+        throw TYPECHECK_ERROR;
+      }
+    }
+  }
+  error() << "No assignment found for function return value" << eom;
   throw TYPECHECK_ERROR;
 }
 

@@ -81,7 +81,7 @@ static typet find_return_value(const exprt &root)
   for(const exprt &op : root.operands())
   {
     if(op.get(ID_statement_list_type) == ID_statement_list_return)
-      return typet(op.id());
+      return op.type();
   }
 
   UNREACHABLE; // Root expression of FC should always have a return value

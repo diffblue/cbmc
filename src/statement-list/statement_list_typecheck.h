@@ -540,10 +540,24 @@ private:
   /// function call and returns the expression of the assigned variable.
   /// \param assignments: Assignment list of the function call.
   /// \param param: Parameter that should be checked.
+  /// \param tia_element: Symbol representation of the TIA element.
   /// \return: Expression including the assigned symbol's name and type.
   exprt typecheck_function_call_arguments(
     const std::vector<equal_exprt> &assignments,
-    const code_typet::parametert &param);
+    const code_typet::parametert &param,
+    const symbolt &tia_element);
+
+  /// Checks if there is a return value assignment inside of the assignment
+  /// list of a function call and returns the expression of the assigned
+  /// variable.
+  /// \param assignments: Assignment list of the function call.
+  /// \param return_type: Type of the return value.
+  /// \param tia_element: Symbol representation of the TIA element.
+  /// \return: Expression including the assigned symbol's name and type.
+  exprt typecheck_return_value_assignment(
+    const std::vector<equal_exprt> &assignments,
+    const typet &return_type,
+    const symbolt &tia_element);
 
   // Helper functions
 
