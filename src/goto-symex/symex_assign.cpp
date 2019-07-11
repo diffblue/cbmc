@@ -230,14 +230,12 @@ static assignmentt rewrite_with_to_field_symbols(
 /// \param [in, out] state: symbolic execution state to perform renaming
 /// \param assignment: assignment to transform
 /// \param ns: namespace
-/// \param do_simplify: set to true if, and only if, simplification is enabled
 /// \return updated assignment
 template <bool use_update>
 static assignmentt shift_indexed_access_to_lhs(
   goto_symext::statet &state,
   assignmentt assignment,
-  const namespacet &ns,
-  bool do_simplify)
+  const namespacet &ns)
 {
   exprt &ssa_rhs = assignment.rhs;
   ssa_exprt &lhs_mod = assignment.lhs;
@@ -246,15 +244,14 @@ static assignmentt shift_indexed_access_to_lhs(
     ssa_rhs.id() == ID_byte_update_big_endian)
   {
     const byte_update_exprt &byte_update = to_byte_update_expr(ssa_rhs);
-    exprt byte_extract = byte_extract_exprt(
-      byte_update.id() == ID_byte_update_big_endian
-        ? ID_byte_extract_big_endian
-        : ID_byte_extract_little_endian,
-      lhs_mod,
-      byte_update.offset(),
-      byte_update.value().type());
-    if(do_simplify)
-      simplify(byte_extract, ns);
+    exprt byte_extract = simplify_expr(
+      byte_extract_exprt{byte_update.id() == ID_byte_update_big_endian
+                           ? ID_byte_extract_big_endian
+                           : ID_byte_extract_little_endian,
+                         lhs_mod,
+                         byte_update.offset(),
+                         byte_update.value().type()},
+      ns);
 
     if(byte_extract.id() == ID_symbol)
     {
@@ -371,11 +368,14 @@ void symex_assignt::assign_non_struct_symbol(
   // introduced by assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  assignmentt assignment = rewrite_with_to_field_symbols<use_update()>(
-    state,
-    shift_indexed_access_to_lhs<use_update()>(
-      state, {lhs, full_lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt),
-    ns);
+  assignmentt assignment = {lhs, full_lhs, std::move(l2_rhs)};
+  if(symex_config.simplify_opt)
+  {
+    assignment = shift_indexed_access_to_lhs<use_update()>(
+      state, std::move(assignment), ns);
+  }
+  assignment = rewrite_with_to_field_symbols<use_update()>(
+    state, std::move(assignment), ns);
 
   if(symex_config.simplify_opt)
     assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
