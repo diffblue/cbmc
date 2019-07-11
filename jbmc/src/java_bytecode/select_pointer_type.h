@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 
 #include <vector>
 
+#include "expr2java.h"
 #include "java_types.h"
 #include <util/optional.h>
 #include <util/std_types.h>
@@ -22,6 +23,32 @@ Author: Diffblue Ltd.
 typedef std::unordered_map<irep_idt, std::vector<reference_typet>>
   generic_parameter_specialization_mapt;
 typedef std::set<irep_idt> generic_parameter_recursion_trackingt;
+
+struct print_generic_parameter_specialization_map
+{
+  const generic_parameter_specialization_mapt &map;
+  const namespacet &ns;
+};
+
+template <typename ostream>
+ostream &
+operator<<(ostream &stm, const print_generic_parameter_specialization_map &map)
+{
+  stm << "Size: " << map.map.size() << "\n";
+  for(const auto &elt : map.map)
+  {
+    stm << elt.first << ": { ";
+    for(const auto &pointer_type : elt.second)
+    {
+      if(is_java_generic_parameter(pointer_type))
+        stm << to_java_generic_parameter(pointer_type).get_name() << "; ";
+      else
+        stm << type2java(pointer_type, map.ns) << "; ";
+    }
+    stm << "}\n";
+  }
+  return stm;
+}
 
 class namespacet;
 
