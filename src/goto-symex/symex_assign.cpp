@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
+#include <util/simplify_expr_class.h>
 
 // We can either use with_exprt or update_exprt when building expressions that
 // modify components of an array or a struct. Set USE_UPDATE to use
@@ -244,14 +245,15 @@ static assignmentt shift_indexed_access_to_lhs(
     ssa_rhs.id() == ID_byte_update_big_endian)
   {
     const byte_update_exprt &byte_update = to_byte_update_expr(ssa_rhs);
-    exprt byte_extract = simplify_expr(
-      byte_extract_exprt{byte_update.id() == ID_byte_update_big_endian
-                           ? ID_byte_extract_big_endian
-                           : ID_byte_extract_little_endian,
-                         lhs_mod,
-                         byte_update.offset(),
-                         byte_update.value().type()},
-      ns);
+    exprt byte_extract = simplify_exprt{ns}
+                           .simplify_byte_extract(byte_extract_exprt{
+                             byte_update.id() == ID_byte_update_big_endian
+                               ? ID_byte_extract_big_endian
+                               : ID_byte_extract_little_endian,
+                             lhs_mod,
+                             byte_update.offset(),
+                             byte_update.value().type()})
+                           .expr;
 
     if(byte_extract.id() == ID_symbol)
     {
