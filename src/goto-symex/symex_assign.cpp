@@ -252,11 +252,15 @@ static assignmentt shift_indexed_access_to_lhs(
                            byte_update.value().type()})
                          .expr;
 
+  expr_skeletont new_skeleton = expr_skeletont::revert_byte_extract(
+    assignment.original_lhs_skeleton,
+    byte_update.offset(),
+    byte_update.value().type(),
+    ns);
   if(byte_extract.id() == ID_symbol)
   {
-    return assignmentt{to_ssa_expr(byte_extract),
-                       std::move(assignment.original_lhs_skeleton),
-                       byte_update.value()};
+    return assignmentt{
+      to_ssa_expr(byte_extract), std::move(new_skeleton), byte_update.value()};
   }
   else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
   {
@@ -305,7 +309,7 @@ static assignmentt shift_indexed_access_to_lhs(
     // We may have shifted the previous lhs into the rhs; as the lhs is only
     // L1-renamed, we need to rename again.
     return assignmentt{to_ssa_expr(byte_extract),
-                       std::move(assignment.original_lhs_skeleton),
+                       std::move(new_skeleton),
                        state.rename(std::move(ssa_rhs), ns).get()};
   }
   return assignment;
