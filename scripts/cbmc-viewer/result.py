@@ -1,7 +1,5 @@
 """CBMC results."""
-from __future__ import print_function
 
-from builtins import object
 import re
 
 
@@ -10,7 +8,7 @@ def clean(s):
     return re.sub('\b+', ' ', s).strip()
 
 
-class Result(object):
+class Result:
     """CBMC results."""
 
     def __init__(self):
@@ -39,6 +37,7 @@ class ResultCBMC(Result):
 
     def __init__(self, log=""):
         """Initialize results from log file produced by CBMC."""
+        # pylint: disable=too-many-locals
         super(ResultCBMC, self).__init__()
 
         if log == "":
@@ -47,9 +46,9 @@ class ResultCBMC(Result):
         try:
             logfh = open(log, "r")
         except IOError as e:
-            print (("Can't read cbmc results: "
-                    "Unable to open {} for reading: {}")
-                   .format(log, e.strerror))
+            print(("Can't read cbmc results: "
+                   "Unable to open {} for reading: {}")
+                  .format(log, e.strerror))
             return
 
         # Regular expressions used to parse the results output by cbmc

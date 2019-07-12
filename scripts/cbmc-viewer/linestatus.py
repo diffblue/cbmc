@@ -22,7 +22,7 @@ def combine(status1, status2):
     if status2 is None:
         return status1
 
-    if status1 == PARTIAL or status2 == PARTIAL:
+    if PARTIAL in [status1, status2]:
         return PARTIAL
 
     if status1 == status2:

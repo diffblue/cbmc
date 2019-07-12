@@ -1,12 +1,11 @@
 """The properties tested for by a run of cbmc."""
 
-from builtins import object
 import srcloc as SrcLoc
 
 # pylint: disable=too-few-public-methods
 
 
-class Property(object):
+class Property:
     """The properties checked by cbmc."""
 
     def __init__(self):

@@ -1,14 +1,12 @@
 """Format report on loops in cbmc program."""
-from __future__ import print_function
 
-from builtins import object
 import os
 import sys
 import subprocess
 
 import srcloc as SrcLoc
 
-class Loop(object):
+class Loop:
     """The loops reported by cbmc with --show-loops."""
 
     def __init__(self, goto_pgm="", srcloc=None):
@@ -29,8 +27,8 @@ class Loop(object):
             cmd = ["cbmc", "--show-loops", "--xml-ui", goto_pgm]
             output = subprocess.check_output(cmd)
         except subprocess.CalledProcessError:
-            print ("Can't find loops: "
-                   'Unable to run command "{}"'.format(" ".join(cmd)))
+            print("Can't find loops: "
+                  'Unable to run command "{}"'.format(" ".join(cmd)))
             return
 
         root = SrcLoc.parse_xml_string(output)
@@ -65,10 +63,10 @@ class Loop(object):
                 html.append('<li>{}'.format(func))
                 html.append('<ul>')
                 for line in sorted(self.index[src][func]):
-                    html.append(('<li> <a href="{}.html#{}">{}</a> at '
-                                 'line {}</li>')
-                                .format(src, line,
-                                        self.index[src][func][line], line))
+                    html.append('<li> <a href="{src}.html#{line}">{idx}</a> '
+                                'at line {line}</li>'
+                                .format(src=src, line=line,
+                                        idx=self.index[src][func][line]))
                 html.append('</ul>')
                 html.append('</li>')
             html.append('</ul>')
@@ -91,8 +89,9 @@ class Loop(object):
             return None
         src = self.loop[ident]["file"]
         line = self.loop[ident]["line"]
-        return ('<a href="{}.html#{}">{}</a> at line {} in file {}'
-                .format(src, line, ident, line, src))
+        return ('<a href="{src}.html#{line}">{ident}</a> '
+                'at line {line} in file {src}'
+                .format(src=src, line=line, ident=ident))
 
     def html_report(self, outfile):
         """Format the loop report."""
@@ -106,8 +105,8 @@ class Loop(object):
         try:
             fp = open(outfile, "w")
         except IOError as e:
-            print ("Unable to open {} for writing: {}"
-                   .format(outfile, e.strerror))
+            print("Unable to open {} for writing: {}"
+                  .format(outfile, e.strerror))
             sys.exit()
 
         html = []

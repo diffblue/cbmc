@@ -8,20 +8,16 @@ Warning: In source with conditional compilation or otherwise one
 symbol declared in multiple namespaces (eg type vs function) this
 simple trick may fail.  And it does fail a lot.
 """
-from __future__ import print_function
 
-from builtins import chr
-from builtins import object
 import os
 import re
 import sys
 import errno
-from past.builtins import cmp
 
 ################################################################
 
 
-class Tags(object):
+class Tags:
     """Link a symbol to a line of code defining the symbol."""
 
     def __init__(self, srcdir=".", tagscmd="etags", tagsfile="TAGS",
@@ -42,9 +38,9 @@ class Tags(object):
         try:
             os.chdir(srcdir)
         except OSError as e:
-            print (("Can't construct symbol table: "
-                    "Can't change to directory {}: {}")
-                   .format(srcdir, e.strerror))
+            print(("Can't construct symbol table: "
+                   "Can't change to directory {}: {}")
+                  .format(srcdir, e.strerror))
             return
 
         # Remove TAGS file before running etags --append
@@ -64,33 +60,35 @@ class Tags(object):
             if os.system(cmd):
                 raise OSError
         except OSError as e:
-            print (("Can't construct symbol table: "
-                    "Can't run command '{}' in directory {}: {}")
-                   .format(cmd, srcdir, e.strerror or ""))
+            print(("Can't construct symbol table: "
+                   "Can't run command '{}' in directory {}: {}")
+                  .format(cmd, srcdir, e.strerror or ""))
             return
         try:
             os.chdir(cwd)
         except OSError as e:
-            print (("Can't construct symbol table: "
-                    "Can't change to directory {}: {}")
-                   .format(cwd, e.strerror))
+            print(("Can't construct symbol table: "
+                   "Can't change to directory {}: {}")
+                  .format(cwd, e.strerror))
             sys.exit()  # don't just return
         try:
             os.rename(srcdir+'/'+tagsfile, './'+tagsfile)
         except OSError as e:
-            print (("Can't construct symbol table: "
-                    "Can't move file {} to {}: {}")
-                   .format(srcdir+'/'+tagsfile, './'+tagsfile, e.strerror))
+            print(("Can't construct symbol table: "
+                   "Can't move file {} to {}: {}")
+                  .format(srcdir+'/'+tagsfile, './'+tagsfile, e.strerror))
             return
 
     def parse_tags_file(self, tagsfile="TAGS"):
         """Parse a tags file for a source tree."""
+        # pylint: disable=too-many-locals
+
         try:
             tagsfh = open(tagsfile, "r")
         except IOError as e:
-            print (("Can't parse symbol table: "
-                    "Can't open file {}: {}")
-                   .format(tagsfile, e.strerror))
+            print(("Can't parse symbol table: "
+                   "Can't open file {}: {}")
+                  .format(tagsfile, e.strerror))
             return
 
         section_finished = False

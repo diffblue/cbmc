@@ -1,5 +1,4 @@
 """Format report of property violations found by cbmc."""
-from __future__ import print_function
 
 import re
 

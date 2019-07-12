@@ -1,9 +1,7 @@
 """The statically reachable functions."""
-from __future__ import print_function
 
 # pylint: disable=too-few-public-methods
 
-from builtins import object
 import re
 import subprocess
 import json
@@ -14,7 +12,7 @@ def clean(s):
     return re.sub('\b+', ' ', s).strip()
 
 
-class Reachable(object):
+class Reachable:
     """The statically reachable functions.
 
     The statically reachable functions in a goto program as reported in the
@@ -32,15 +30,15 @@ class Reachable(object):
                    pgm]
             output = subprocess.check_output(cmd).decode('utf-8')
         except subprocess.CalledProcessError as err:
-            print ("Can't find reachable functions: "
-                   'Unable to run command "{}": "{}"'
-                   .format(" ".join(cmd), str(err)))
+            print("Can't find reachable functions: "
+                  'Unable to run command "{}": "{}"'
+                  .format(" ".join(cmd), str(err)))
             return
         except OSError as err:
-            print ("Can't find goto-analyzer, "
-                   "it must be installed and in your PATH: "
-                   'Unable to run command "{}": "{}"'
-                   .format(" ".join(cmd), str(err)))
+            print("Can't find goto-analyzer, "
+                  "it must be installed and in your PATH: "
+                  'Unable to run command "{}": "{}"'
+                  .format(" ".join(cmd), str(err)))
             exit()
 
         # strip the noise sent to stdout before the actual json

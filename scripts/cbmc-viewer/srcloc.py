@@ -1,8 +1,5 @@
 """Methods for maniuplating source locations found in cbmc output."""
-from __future__ import print_function
 
-from builtins import str
-from builtins import object
 import re
 import os
 import tempfile
@@ -76,7 +73,7 @@ def make_linux_normpath(path):
     """Turn a path into a normalized Linux path."""
     return os.path.normpath(make_linux_path(path))
 
-class SourceLocation(object):
+class SourceLocation:
     """Methods for maniuplating source locations found in cbmc output."""
 
     def __init__(self, root):
@@ -132,8 +129,8 @@ class SourceLocation(object):
                              self.path_from_root.get(src_file_normpath)]:
                 if old_path is None or old_path == path:
                     continue
-                print ("Warning: file {} found in directories {} and {}"
-                       .format(src_file, path, old_path))
+                print("Warning: file {} found in directories {} and {}"
+                      .format(src_file, path, old_path))
 
             self.path_from_root[src_file] = path
             self.path_from_root[src_file_linux] = path

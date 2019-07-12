@@ -1,13 +1,8 @@
 """Mark up the source tree and links into the source tree."""
-from __future__ import print_function
 
-# pylint: disable=too-many-arguments
-
-from builtins import range
-from builtins import object
 import subprocess
 import sys
-import cgi
+import html
 import os
 import re
 import errno
@@ -15,12 +10,13 @@ import errno
 import linestatus
 
 
-class Markup(object):
+class Markup:
     """Mark up the source tree and links into the source tree."""
 
     def __init__(self, tags, coverage,
                  srcdir=".", htmldir="html", srcfilter=""):
         """Initialize marking up the source tree."""
+        # pylint: disable=too-many-arguments
         self.tags = tags
         self.coverage = coverage
         self.srcdir = srcdir.rstrip('/')
@@ -35,6 +31,7 @@ class Markup(object):
     def link_to_line(self, text, src, line, depth=0,
                      color=None, target=None):
         """Link text to a line in a source file."""
+        # pylint: disable=too-many-arguments
         color = None if color == 'black' else color
         color = None if not color else color
         style = ' style="color:{}"'.format(color) if color else ''
@@ -45,10 +42,12 @@ class Markup(object):
 
     def link_to_file(self, text, src, depth=0, color=None, target=None):
         """Link text to a source file."""
+        # pylint: disable=too-many-arguments
         return self.link_to_line(text, src, 0, depth, color, target)
 
     def link_symbol(self, symbol, depth=0, color=None, target=None, text=None):
         """Link a symbol to its definition."""
+        # pylint: disable=too-many-arguments
         val = self.tags.lookup(symbol)
         if not val:
             return symbol
@@ -96,7 +95,7 @@ class Markup(object):
                                       depth, color, target)
 
         if file_name[0] == '<' and file_name[-1] == '>':
-            return cgi.escape(loc)
+            return html.escape(loc)
 
         return (loc[:file_text_start] + file_link +
                 loc[file_text_end:func_text_start] + func_link +
@@ -107,7 +106,7 @@ class Markup(object):
         """Mark up a source line with links to symbol definitions."""
         line = line.rstrip()
         line = untabify(line)
-        line = cgi.escape(line)
+        line = html.escape(line)
         tokens = re.split('([_a-zA-Z][_a-zA-Z0-9]*)', line)
         links = [self.link_symbol(tkn, depth, color) for tkn in tokens]
         newline = "".join(links)
@@ -115,6 +114,7 @@ class Markup(object):
 
     def markup_file(self, indir, infile, outfile, depth, coverage):
         """Mark up a source file with links to symbol definitions."""
+        # pylint: disable=too-many-arguments
         try:
             # Some files on Windows appear to use an encoding
             # incompatible with the Python 3 default utf-8.  Python 2
@@ -305,7 +305,7 @@ def html_line(fp, line, lineno, color=None):
     color = None if not color else color
     color = None if color == 'black' else color
     style = ' style="color:{}"'.format(color) if color else ''
-    fp.write('<span id="{}"{}>{:5} {}</span>\n'.
-             format(lineno, style, lineno, line))
+    fp.write('<span id="{lineno}"{style}>{lineno:5} {line}</span>\n'.
+             format(lineno=lineno, style=style, line=line))
 
 ################################################################

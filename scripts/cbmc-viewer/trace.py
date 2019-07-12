@@ -1,13 +1,11 @@
 """The error traces from CBMC."""
-from __future__ import print_function
 
-from builtins import object
 import os
 import re
 import sys
 
 
-class Trace(object):
+class Trace:
     """Parse, markup, and manage error traces."""
 
     def __init__(self, markup):
@@ -63,8 +61,8 @@ class Trace(object):
             sys.exit()
 
         html = []
-        html.append('<html><head><title>{}</title></head><body><h1>{}</h1>'
-                    .format(error, error))
+        html.append('<html><head><title>{e}</title></head><body><h1>{e}</h1>'
+                    .format(e=error))
         html.append('Trace for {}:'
                     .format(self.markup_error_description(error, properties)))
         html.append('<pre>')
@@ -97,8 +95,9 @@ class Trace(object):
             return error
         srcfile = properties.property[error]["file"]
         line = properties.property[error]["line"]
-        return ('<a href="../{}.html#{}">{}</a> at line {} in file {}'
-                .format(srcfile, line, error, line, srcfile))
+        return ('<a href="../{src}.html#{line}">{error}</a> '
+                'at line {line} in file {src}'
+                .format(src=srcfile, line=line, error=error))
 
 
 class TraceCBMC(Trace):
@@ -114,9 +113,9 @@ class TraceCBMC(Trace):
         try:
             fp = open(log, "r")
         except IOError as e:
-            print (("Can't read cbmc traces: "
-                    "Unable to open {} for reading: {}")
-                   .format(log, e.strerror))
+            print(("Can't read cbmc traces: "
+                   "Unable to open {} for reading: {}")
+                  .format(log, e.strerror))
             return
 
         name = ""

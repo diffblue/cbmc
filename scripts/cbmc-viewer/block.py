@@ -1,6 +1,5 @@
 """Basic block coverage reporting for CBMC."""
 
-from builtins import object
 import re
 import os
 from pprint import pprint
@@ -8,7 +7,7 @@ from pprint import pprint
 import linestatus
 import srcloc as SrcLoc
 
-class Block(object):
+class Block:
     """Basic block coverage for CBMC.
 
     The Block class parses the basic block coverage information in the

@@ -1,7 +1,5 @@
 """The results of cbmc-storm."""
-from __future__ import print_function
 
-from builtins import object
 import re
 
 # pylint: disable=line-too-long
@@ -24,7 +22,7 @@ def clean(s):
     return re.sub(r'\s+', ' ', s).strip()
 
 
-class Storm(object):
+class Storm:
     """The results reported by cbmc-storm."""
 
     def __init__(self, log):

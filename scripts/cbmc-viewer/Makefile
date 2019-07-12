@@ -12,7 +12,7 @@ veryclean: clean
 lint: pylint pycodestyle pydocstyle
 
 pylint:
-	-pylint *.py --disable=duplicate-code,invalid-name
+	-pylint *.py --disable=duplicate-code,invalid-name --extension-pkg-whitelist=lxml
 
 pycodestyle:
 	-pycodestyle *.py
