@@ -13,6 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_GOTO_SYMEX_EXPR_SKELETON_H
 
 #include <util/expr.h>
+#include <util/mp_arith.h>
 
 /// Expression in which some part is missing and can be substituted for another
 /// expression.
@@ -61,6 +62,21 @@ public:
   static optionalt<expr_skeletont>
   clear_innermost_byte_extract_expr(expr_skeletont skeleton);
 
+  /// Attempt to return a skeleton `s` such that for all expression \c x,
+  /// `s.apply(byte_extract(x, offset, type))` would be semantically equivalent
+  /// to `skeleton.apply(x)`.
+  /// If offset + type size exceeds the size (in bytes) of the skeleton then
+  /// an empty optional is returned.
+  /// This is done by removing operations of the skeleton (starting by the
+  /// deepest ones), until the accumulated offset match or exceed \p offset.
+  /// If it does not exactly match then one of the operation will be replaced
+  /// by a byte_extract.
+  static expr_skeletont revert_byte_extract(
+    expr_skeletont skeleton,
+    exprt offset,
+    const typet &type,
+    const namespacet &ns);
+
 private:
   /// In \c skeleton, nil_exprt is used to mark the sub expression to be
   /// substituted. The nil_exprt always appears recursively following the first
@@ -73,6 +89,16 @@ private:
     : skeleton(std::move(e)), type_of_missing_part(std::move(missing))
   {
   }
+
+  /// Auxiliary function for revert_byte_extract.
+  /// It is recursive and has an extra argument for keeping track of the offset
+  /// that has been removed by the recursive calls.
+  static expr_skeletont revert_byte_extract_aux(
+    expr_skeletont skeleton,
+    exprt offset,
+    const typet &type,
+    const namespacet &ns,
+    exprt offset_already_removed);
 };
 
 #endif // CPROVER_GOTO_SYMEX_EXPR_SKELETON_H
