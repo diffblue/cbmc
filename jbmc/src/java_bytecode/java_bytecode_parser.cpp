@@ -1238,6 +1238,11 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     for(std::size_t j=0; j<attributes_count; j++)
       rcode_attribute(method);
 
+    // method name
+    method.source_location.set_function(
+      "java::" + id2string(parse_tree.parsed_class.name) + "." +
+      id2string(method.name) + ":" + method.descriptor);
+
     irep_idt line_number;
 
     // add missing line numbers
@@ -1250,10 +1255,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
         line_number=it->source_location.get_line();
       else if(!line_number.empty())
         it->source_location.set_line(line_number);
-      it->source_location
-        .set_function(
-          "java::"+id2string(parse_tree.parsed_class.name)+"."+
-          id2string(method.name)+":"+method.descriptor);
+      it->source_location.set_function(method.source_location.get_function());
     }
 
     // line number of method (the first line number available)
@@ -1265,11 +1267,6 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
       });
     if(it != method.instructions.end())
       method.source_location.set_line(it->source_location.get_line());
-
-    // method name
-    method.source_location.set_function(
-      "java::" + id2string(parse_tree.parsed_class.name) + "." +
-      id2string(method.name) + ":" + method.descriptor);
   }
   else if(attribute_name=="Signature")
   {
