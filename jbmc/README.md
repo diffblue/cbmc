@@ -1,7 +1,3 @@
-[![Build Status][travis_img]][travis]
-![Build Status][codebuild_img]
-![Build Status][codebuild_windows_img]
-
 About
 =====
 
@@ -55,8 +51,3 @@ See [CBMC](https://github.com/diffblue/cbmc/blob/develop/README.md))
 License
 =======
 4-clause BSD license, see `LICENSE` file.
-
-[travis]: https://travis-ci.org/diffblue/cbmc
-[travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=develop
-[codebuild_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoieVl4UDBKaVU2NEZIeE9GKzhMVWJUQ1RORXRZeGFEdm9LZnhvbWt4Q3oxb29uOTdWZDhZUkUvK2Z0eTBndU5pWkcyUXFZb1pDRVpBNXVob3R0R2tYZkdFPSIsIml2UGFyYW1ldGVyU3BlYyI6IkZ0TzR2a21XbHFkWnlYMkwiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
-[codebuild_windows_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTFQ4Q0lCSEc1Rk5NcmlzaFZDdU44Vk8zY0c1VCtIVWMwWnJMRitmVFI5bE94Q3dhekVPMWRobFU2Q0xTTlpDSWZUQ3J1eksrWW1rSll1OExXdll2bExZPSIsIml2UGFyYW1ldGVyU3BlYyI6InpqcloyaEdxbjBiQUtvNysiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
