@@ -768,7 +768,7 @@ void bv_pointerst::do_postponed(
     {
       const exprt &expr=*it;
 
-      if(expr.id() != ID_symbol)
+      if(expr.id() != ID_symbol && expr.id() != ID_string_constant)
         continue;
 
       const auto size_expr = size_of_expr(expr.type(), ns);
