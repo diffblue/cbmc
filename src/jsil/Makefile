@@ -28,11 +28,9 @@ jsil$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
 jsil_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyyjsil -d parser.y -o $@
+	$(YACC) $(YFLAGS) $$flags -pyyjsil parser.y --defines=jsil_y.tab.h -o $@
 
 jsil_y.tab.h: jsil_y.tab.cpp
-	if [ -e jsil_y.tab.hpp ] ; then mv jsil_y.tab.hpp jsil_y.tab.h ; else \
-        mv jsil_y.tab.cpp.h jsil_y.tab.h ; fi
 
 jsil_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyjsil -o$@ scanner.l

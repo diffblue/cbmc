@@ -30,12 +30,9 @@ all: statement-list$(LIBEXT)
 ###############################################################################
 
 statement_list_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyystatement_list -d parser.y -o $@
+	$(YACC) $(YFLAGS) $$flags -pyystatement_list parser.y --defines=statement_list_y.tab.h -o $@
 
 statement_list_y.tab.h: statement_list_y.tab.cpp
-	if [ -e statement_list_y.tab.hpp ] ; then mv statement_list_y.tab.hpp \
-	statement_list_y.tab.h ; else mv statement_list_y.tab.cpp.h \
-	statement_list_y.tab.h ; fi
 
 statement_list_lex.yy.cpp: scanner.l
 	$(LEX) -Pyystatement_list -o$@ scanner.l

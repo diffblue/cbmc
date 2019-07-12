@@ -21,11 +21,9 @@ xmllang$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
 xml_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyyxml -d parser.y -o $@
+	$(YACC) $(YFLAGS) $$flags -pyyxml parser.y --defines=xml_y.tab.h -o $@
 
 xml_y.tab.h: xml_y.tab.cpp
-	if [ -e xml_y.tab.hpp ] ; then mv xml_y.tab.hpp $@ ; else \
-        mv xml_y.tab.cpp.h $@ ; fi
 
 xml_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyxml -o$@ scanner.l
