@@ -476,6 +476,9 @@ public:
   {
     return op1();
   }
+
+  // apply the function to the given arguments
+  exprt application(const exprt::operandst &) const;
 };
 
 /// \brief Cast an exprt to a \ref lambda_exprt

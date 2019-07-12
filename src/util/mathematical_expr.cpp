@@ -43,3 +43,39 @@ lambda_exprt::lambda_exprt(const variablest &_variables, exprt _where)
       lambda_type(_variables, _where))
 {
 }
+
+exprt lambda_exprt::application(const exprt::operandst &arguments) const
+{
+  // number of arguments must match function signature
+  auto &variables = this->variables();
+  PRECONDITION(variables.size() == arguments.size());
+
+  std::map<symbol_exprt, exprt> value_map;
+
+  for(std::size_t i = 0; i < variables.size(); i++)
+  {
+    // types must match
+    PRECONDITION(variables[i].type() == arguments[i].type());
+    value_map[variables[i]] = arguments[i];
+  }
+
+  // now recurse downwards and substitute in 'where'
+  auto result =
+    where().transform_pre([&value_map](exprt e) -> optionalt<exprt> {
+      if(e.id() == ID_symbol)
+      {
+        const auto v_it = value_map.find(to_symbol_expr(e));
+        if(v_it != value_map.end())
+          return v_it->second;
+        else
+          return {};
+      }
+      else
+        return {};
+    });
+
+  if(result.has_value())
+    return std::move(result.value());
+  else
+    return where(); // trivial case, parameter is not used
+}
