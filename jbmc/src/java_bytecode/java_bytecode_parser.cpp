@@ -1257,17 +1257,14 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     }
 
     // line number of method (the first line number available)
-    if(!method.instructions.empty())
-    {
-      const auto it = std::find_if(
-        method.instructions.begin(),
-        method.instructions.end(),
-        [&](const instructiont &instruction) {
-          return !instruction.source_location.get_line().empty();
-        });
-      if(it != method.instructions.end())
-        method.source_location.set_line(it->source_location.get_line());
-    }
+    const auto it = std::find_if(
+      method.instructions.begin(),
+      method.instructions.end(),
+      [&](const instructiont &instruction) {
+        return !instruction.source_location.get_line().empty();
+      });
+    if(it != method.instructions.end())
+      method.source_location.set_line(it->source_location.get_line());
 
     // method name
     method.source_location.set_function(
