@@ -1422,8 +1422,7 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   return result;
 }
 
-NODISCARD simplify_exprt::resultt<>
-simplify_exprt::simplify_if(const if_exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
 {
   const exprt &cond = expr.cond();
   const exprt &truevalue = expr.true_case();
@@ -1542,11 +1541,9 @@ bool simplify_exprt::get_values(
   return true;
 }
 
-bool simplify_exprt::simplify_lambda(exprt &)
+simplify_exprt::resultt<> simplify_exprt::simplify_lambda(const exprt &expr)
 {
-  bool result=true;
-
-  return result;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_with(exprt &expr)
@@ -2536,30 +2533,24 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_complex(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_complex(const exprt &expr)
 {
   if(expr.id() == ID_complex_real)
   {
-    complex_real_exprt &complex_real_expr = to_complex_real_expr(expr);
+    auto &complex_real_expr = to_complex_real_expr(expr);
 
     if(complex_real_expr.op().id() == ID_complex)
-    {
-      expr = to_complex_expr(complex_real_expr.op()).real();
-      return false;
-    }
+      return to_complex_expr(complex_real_expr.op()).real();
   }
   else if(expr.id() == ID_complex_imag)
   {
-    complex_imag_exprt &complex_imag_expr = to_complex_imag_expr(expr);
+    auto &complex_imag_expr = to_complex_imag_expr(expr);
 
     if(complex_imag_expr.op().id() == ID_complex)
-    {
-      expr = to_complex_expr(complex_imag_expr.op()).imag();
-      return false;
-    }
+      return to_complex_expr(complex_imag_expr.op()).imag();
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_node_preorder(exprt &expr)
@@ -2602,313 +2593,216 @@ bool simplify_exprt::simplify_node(exprt &expr)
 
   no_change = sort_and_join(expr) && no_change;
 
+  resultt<> r = unchanged(expr);
+
   if(expr.id()==ID_typecast)
   {
-    auto r = simplify_typecast(to_typecast_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_typecast(to_typecast_expr(expr));
   }
   else if(expr.id()==ID_equal || expr.id()==ID_notequal ||
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
-    no_change = simplify_inequality(expr) && no_change;
+  {
+    if(!simplify_inequality(expr))
+      r = changed(expr);
+  }
   else if(expr.id()==ID_if)
   {
-    auto r = simplify_if(to_if_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_if(to_if_expr(expr));
   }
   else if(expr.id()==ID_lambda)
-    no_change = simplify_lambda(expr) && no_change;
+  {
+    r = simplify_lambda(expr);
+  }
   else if(expr.id()==ID_with)
-    no_change = simplify_with(expr) && no_change;
+  {
+    if(!simplify_with(expr))
+      r = changed(expr);
+  }
   else if(expr.id()==ID_update)
-    no_change = simplify_update(expr) && no_change;
+  {
+    if(!simplify_update(expr))
+      r = changed(expr);
+  }
   else if(expr.id()==ID_index)
-    no_change = simplify_index(expr) && no_change;
+  {
+    if(!simplify_index(expr))
+      r = changed(expr);
+  }
   else if(expr.id()==ID_member)
-    no_change = simplify_member(expr) && no_change;
+  {
+    if(!simplify_member(expr))
+      r = changed(expr);
+  }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
   {
-    auto r = simplify_byte_update(to_byte_update_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_byte_update(to_byte_update_expr(expr));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    auto r = simplify_byte_extract(to_byte_extract_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_byte_extract(to_byte_extract_expr(expr));
   }
   else if(expr.id()==ID_pointer_object)
   {
-    auto r = simplify_pointer_object(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_pointer_object(expr);
   }
   else if(expr.id() == ID_is_dynamic_object)
   {
-    auto r = simplify_is_dynamic_object(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_is_dynamic_object(expr);
   }
   else if(expr.id() == ID_is_invalid_pointer)
   {
-    auto r = simplify_is_invalid_pointer(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_is_invalid_pointer(expr);
   }
   else if(expr.id()==ID_object_size)
   {
-    auto r = simplify_object_size(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_object_size(expr);
   }
   else if(expr.id()==ID_good_pointer)
   {
-    auto r = simplify_good_pointer(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_good_pointer(expr);
   }
   else if(expr.id()==ID_div)
   {
-    auto r = simplify_div(to_div_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_div(to_div_expr(expr));
   }
   else if(expr.id()==ID_mod)
   {
-    auto r = simplify_mod(to_mod_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_mod(to_mod_expr(expr));
   }
   else if(expr.id()==ID_bitnot)
-    no_change = simplify_bitnot(expr) && no_change;
+  {
+    r = simplify_bitnot(expr);
+  }
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
   {
-    auto r = simplify_bitwise(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_bitwise(expr);
   }
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
   {
-    auto r = simplify_shifts(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_shifts(expr);
   }
   else if(expr.id()==ID_power)
   {
-    auto r = simplify_power(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_power(expr);
   }
   else if(expr.id()==ID_plus)
   {
-    auto r = simplify_plus(to_plus_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_plus(to_plus_expr(expr));
   }
   else if(expr.id()==ID_minus)
   {
-    auto r = simplify_minus(to_minus_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_minus(to_minus_expr(expr));
   }
   else if(expr.id()==ID_mult)
   {
-    auto r = simplify_mult(to_mult_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_mult(to_mult_expr(expr));
   }
   else if(expr.id()==ID_floatbv_plus ||
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
           expr.id()==ID_floatbv_div)
   {
-    auto r = simplify_floatbv_op(to_ieee_float_op_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_floatbv_op(to_ieee_float_op_expr(expr));
   }
   else if(expr.id()==ID_floatbv_typecast)
   {
-    auto r = simplify_floatbv_typecast(to_floatbv_typecast_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_floatbv_typecast(to_floatbv_typecast_expr(expr));
   }
   else if(expr.id()==ID_unary_minus)
-    no_change = simplify_unary_minus(expr) && no_change;
+  {
+    r = simplify_unary_minus(expr);
+  }
   else if(expr.id()==ID_unary_plus)
-    no_change = simplify_unary_plus(expr) && no_change;
+  {
+    r = simplify_unary_plus(expr);
+  }
   else if(expr.id()==ID_not)
-    no_change = simplify_not(expr) && no_change;
+  {
+    r = simplify_not(expr);
+  }
   else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||
           expr.id()==ID_and)
-    no_change = simplify_boolean(expr) && no_change;
+  {
+    r = simplify_boolean(expr);
+  }
   else if(expr.id()==ID_dereference)
   {
-    auto r = simplify_dereference(to_dereference_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_dereference(to_dereference_expr(expr));
   }
   else if(expr.id()==ID_address_of)
   {
-    auto r = simplify_address_of(to_address_of_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_address_of(to_address_of_expr(expr));
   }
   else if(expr.id()==ID_pointer_offset)
   {
-    auto r = simplify_pointer_offset(expr);
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_pointer_offset(expr);
   }
   else if(expr.id()==ID_extractbit)
-    no_change = simplify_extractbit(expr) && no_change;
+  {
+    r = simplify_extractbit(expr);
+  }
   else if(expr.id()==ID_concatenation)
-    no_change = simplify_concatenation(expr) && no_change;
+  {
+    r = simplify_concatenation(expr);
+  }
   else if(expr.id()==ID_extractbits)
-    no_change = simplify_extractbits(to_extractbits_expr(expr)) && no_change;
+  {
+    r = simplify_extractbits(to_extractbits_expr(expr));
+  }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
   {
-    auto r = simplify_ieee_float_relation(to_binary_relation_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_ieee_float_relation(to_binary_relation_expr(expr));
   }
   else if(expr.id() == ID_bswap)
-    no_change = simplify_bswap(to_bswap_expr(expr)) && no_change;
+  {
+    r = simplify_bswap(to_bswap_expr(expr));
+  }
   else if(expr.id()==ID_isinf)
   {
-    auto r = simplify_isinf(to_unary_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_isinf(to_unary_expr(expr));
   }
   else if(expr.id()==ID_isnan)
   {
-    auto r = simplify_isnan(to_unary_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_isnan(to_unary_expr(expr));
   }
   else if(expr.id()==ID_isnormal)
   {
-    auto r = simplify_isnormal(to_unary_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_isnormal(to_unary_expr(expr));
   }
   else if(expr.id()==ID_abs)
   {
-    auto r = simplify_abs(to_abs_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_abs(to_abs_expr(expr));
   }
   else if(expr.id()==ID_sign)
-    no_change = simplify_sign(expr) && no_change;
+  {
+    if(!simplify_sign(expr))
+      r = changed(expr);
+  }
   else if(expr.id() == ID_popcount)
   {
-    auto r = simplify_popcount(to_popcount_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_popcount(to_popcount_expr(expr));
   }
   else if(expr.id() == ID_function_application)
   {
-    auto r = simplify_function_application(to_function_application_expr(expr));
-    if(r.has_changed())
-    {
-      no_change = false;
-      expr = r.expr;
-    }
+    r = simplify_function_application(to_function_application_expr(expr));
   }
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
-    no_change = simplify_complex(expr) && no_change;
+  {
+    r = simplify_complex(expr);
+  }
+
+  if(r.has_changed())
+  {
+    expr = r.expr;
+    no_change = false;
+  }
 
 #ifdef DEBUGX
   if(
