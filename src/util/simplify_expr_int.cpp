@@ -801,7 +801,7 @@ simplify_exprt::simplify_extractbit(const extractbit_exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_concatenation(const exprt &expr)
+simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
 {
   bool no_change = true;
 

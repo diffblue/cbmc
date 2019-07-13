@@ -34,6 +34,7 @@ class bitnot_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
+class concatenation_exprt;
 class dereference_exprt;
 class div_exprt;
 class exprt;
@@ -136,7 +137,7 @@ public:
   NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
   NODISCARD resultt<> simplify_extractbit(const extractbit_exprt &);
   NODISCARD resultt<> simplify_extractbits(const extractbits_exprt &);
-  NODISCARD resultt<> simplify_concatenation(const exprt &);
+  NODISCARD resultt<> simplify_concatenation(const concatenation_exprt &);
   NODISCARD resultt<> simplify_mult(const mult_exprt &);
   NODISCARD resultt<> simplify_div(const div_exprt &);
   NODISCARD resultt<> simplify_mod(const mod_exprt &);

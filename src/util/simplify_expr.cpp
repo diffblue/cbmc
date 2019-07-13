@@ -2354,7 +2354,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_concatenation)
   {
-    r = simplify_concatenation(expr);
+    r = simplify_concatenation(to_concatenation_expr(expr));
   }
   else if(expr.id()==ID_extractbits)
   {
