@@ -47,6 +47,17 @@ void test_unnecessary_cast(const typet &type)
       REQUIRE(simplified.type()==java_int_type());
     }
 
+    // casts from boolean get rewritten to ?:
+    if(type == java_boolean_type())
+    {
+      const exprt simplified = simplify_expr(
+        typecast_exprt(symbol_exprt("foo", java_int_type()), type),
+        namespacet(symbol_tablet()));
+
+      REQUIRE(simplified.id() == ID_if);
+      REQUIRE(simplified.type() == type);
+    }
+    else
     {
       const exprt simplified=simplify_expr(
         typecast_exprt(symbol_exprt("foo", java_int_type()), type),

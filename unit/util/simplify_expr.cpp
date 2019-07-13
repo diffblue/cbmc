@@ -244,3 +244,57 @@ TEST_CASE("Simplify pointer_object equality", "[core][util]")
 
   REQUIRE(simp.is_true());
 }
+
+TEST_CASE("Simplify cast from bool", "[core][util]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  {
+    // this checks that ((int)B)==1 turns into B
+    exprt B = symbol_exprt("B", bool_typet());
+    exprt comparison = equal_exprt(
+      typecast_exprt(B, signedbv_typet(32)),
+      from_integer(1, signedbv_typet(32)));
+
+    exprt simp = simplify_expr(comparison, ns);
+
+    REQUIRE(simp == B);
+  }
+
+  {
+    // this checks that ((int)B)==0 turns into !B
+    exprt B = symbol_exprt("B", bool_typet());
+    exprt comparison = equal_exprt(
+      typecast_exprt(B, signedbv_typet(32)),
+      from_integer(0, signedbv_typet(32)));
+
+    exprt simp = simplify_expr(comparison, ns);
+
+    REQUIRE(simp == not_exprt(B));
+  }
+
+  {
+    // this checks that ((int)B)!=1 turns into !B
+    exprt B = symbol_exprt("B", bool_typet());
+    exprt comparison = notequal_exprt(
+      typecast_exprt(B, signedbv_typet(32)),
+      from_integer(1, signedbv_typet(32)));
+
+    exprt simp = simplify_expr(comparison, ns);
+
+    REQUIRE(simp == not_exprt(B));
+  }
+
+  {
+    // this checks that ((int)B)!=0 turns into B
+    exprt B = symbol_exprt("B", bool_typet());
+    exprt comparison = notequal_exprt(
+      typecast_exprt(B, signedbv_typet(32)),
+      from_integer(0, signedbv_typet(32)));
+
+    exprt simp = simplify_expr(comparison, ns);
+
+    REQUIRE(simp == B);
+  }
+}
