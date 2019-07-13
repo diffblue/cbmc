@@ -59,6 +59,7 @@ class tvt;
 class typecast_exprt;
 class unary_exprt;
 class unary_minus_exprt;
+class unary_plus_exprt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
@@ -172,7 +173,7 @@ public:
   NODISCARD resultt<> simplify_good_pointer(const unary_exprt &);
   NODISCARD resultt<> simplify_object(const exprt &);
   NODISCARD resultt<> simplify_unary_minus(const unary_minus_exprt &);
-  NODISCARD resultt<> simplify_unary_plus(const unary_exprt &);
+  NODISCARD resultt<> simplify_unary_plus(const unary_plus_exprt &);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
   NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
   NODISCARD resultt<> simplify_pointer_offset(const unary_exprt &);

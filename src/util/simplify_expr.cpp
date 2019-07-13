@@ -2324,7 +2324,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_unary_plus)
   {
-    r = simplify_unary_plus(to_unary_expr(expr));
+    r = simplify_unary_plus(to_unary_plus_expr(expr));
   }
   else if(expr.id()==ID_not)
   {
