@@ -15,15 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "std_expr.h"
 
-bool simplify_exprt::simplify_member(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_member(const member_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
-
   const irep_idt &component_name=
     to_member_expr(expr).get_component_name();
 
-  exprt &op=expr.op0();
+  const exprt &op = expr.compound();
   const typet &op_type=ns.follow(op.type());
 
   if(op.id()==ID_with)
@@ -34,12 +32,12 @@ bool simplify_exprt::simplify_member(exprt &expr)
     if(op.operands().size()>=3 &&
        op_type.id()==ID_struct)
     {
-      exprt::operandst &operands=op.operands();
+      exprt::operandst new_operands = op.operands();
 
-      while(operands.size()>1)
+      while(new_operands.size() > 1)
       {
-        exprt &op1=operands[operands.size()-2];
-        exprt &op2=operands[operands.size()-1];
+        exprt &op1 = new_operands[new_operands.size() - 2];
+        exprt &op2 = new_operands[new_operands.size() - 1];
 
         if(op1.get(ID_component_name)==component_name)
         {
@@ -49,27 +47,20 @@ bool simplify_exprt::simplify_member(exprt &expr)
             "member expression type must match component type");
           exprt tmp;
           tmp.swap(op2);
-          expr.swap(tmp);
 
           // do this recursively
-          simplify_rec(expr);
-
-          return false;
+          return changed(simplify_rec(tmp));
         }
         else // something else, get rid of it
-          operands.resize(operands.size()-2);
+          new_operands.resize(new_operands.size() - 2);
       }
 
-      if(op.operands().size()==1)
-      {
-        exprt tmp;
-        tmp.swap(op.op0());
-        op.swap(tmp);
-        // do this recursively
-        simplify_member(expr);
-      }
+      DATA_INVARIANT(new_operands.size() == 1, "post-condition of loop");
 
-      return false;
+      auto new_member_expr = expr;
+      new_member_expr.struct_op() = new_operands.front();
+      // do this recursively
+      return changed(simplify_member(new_member_expr));
     }
     else if(op_type.id()==ID_union)
     {
@@ -78,12 +69,10 @@ bool simplify_exprt::simplify_member(exprt &expr)
       if(with_expr.where().get(ID_component_name)==component_name)
       {
         // WITH(s, .m, v).m -> v
-        expr=with_expr.new_value();
+        auto tmp = with_expr.new_value();
 
         // do this recursively
-        simplify_rec(expr);
-
-        return false;
+        return changed(simplify_rec(tmp));
       }
     }
   }
@@ -103,25 +92,20 @@ bool simplify_exprt::simplify_member(exprt &expr)
         {
           // UPDATE(s, .m, v).m -> v
           exprt tmp=update_expr.new_value();
-          expr.swap(tmp);
 
           // do this recursively
-          simplify_rec(expr);
-
-          return false;
+          return changed(simplify_rec(tmp));
         }
         // the following optimization only works on structs,
         // and not on unions
         else if(op_type.id()==ID_struct)
         {
           // UPDATE(s, .m1, v).m2 -> s.m2
-          exprt tmp=update_expr.old();
-          op.swap(tmp);
+          auto new_expr = expr;
+          new_expr.struct_op() = update_expr.old();
 
           // do this recursively
-          simplify_rec(expr);
-
-          return false;
+          return changed(simplify_rec(new_expr));
         }
       }
     }
@@ -139,10 +123,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         DATA_INVARIANT(
           op.operands()[number].type() == expr.type(),
           "member expression type must match component type");
-        exprt tmp;
-        tmp.swap(op.operands()[number]);
-        expr.swap(tmp);
-        return false;
+        return op.operands()[number];
       }
     }
   }
@@ -162,13 +143,13 @@ bool simplify_exprt::simplify_member(exprt &expr)
         component.is_nil() || component.type().id() == ID_c_bit_field ||
         component.type().id() == ID_bool)
       {
-        return true;
+        return unchanged(expr);
       }
 
       // add member offset to index
       auto offset_int = member_offset(struct_type, component_name, ns);
       if(!offset_int.has_value())
-        return true;
+        return unchanged(expr);
 
       const exprt &struct_offset=op.op1();
       exprt member_offset = from_integer(*offset_int, struct_offset.type());
@@ -176,11 +157,8 @@ bool simplify_exprt::simplify_member(exprt &expr)
       simplify_node(final_offset);
 
       byte_extract_exprt result(op.id(), op.op0(), final_offset, expr.type());
-      expr.swap(result);
 
-      simplify_rec(expr);
-
-      return false;
+      return changed(simplify_rec(result)); // recursive call
     }
     else if(op_type.id() == ID_union)
     {
@@ -193,12 +171,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         const typet &subtype = union_type.component_type(component_name);
 
         if(subtype == byte_extract_expr.op().type())
-        {
-          exprt tmp = byte_extract_expr.op();
-          expr.swap(tmp);
-
-          return false;
-        }
+          return byte_extract_expr.op();
       }
     }
   }
@@ -206,11 +179,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   {
     // trivial?
     if(to_union_expr(op).op().type() == expr.type())
-    {
-      exprt tmp=to_union_expr(op).op();
-      expr.swap(tmp);
-      return false;
-    }
+      return to_union_expr(op).op();
 
     // need to convert!
     auto target_size = pointer_offset_size(expr.type(), ns);
@@ -229,10 +198,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         auto tmp = bits2expr(bits_cut, expr.type(), true);
 
         if(tmp.has_value())
-        {
-          expr = *tmp;
-          return false;
-        }
+          return std::move(*tmp);
       }
     }
   }
@@ -242,9 +208,9 @@ bool simplify_exprt::simplify_member(exprt &expr)
     // identical types:
     if(op_type == op.op0().type())
     {
-      expr.op0() = op.op0();
-      simplify_member(expr);
-      return false;
+      auto new_expr = expr;
+      new_expr.struct_op() = op.op0();
+      return changed(simplify_member(new_expr));
     }
 
     // Try to translate into an equivalent member (perhaps nested) of the type
@@ -267,9 +233,8 @@ bool simplify_exprt::simplify_member(exprt &expr)
           equivalent_member.value().id() != ID_byte_extract_little_endian &&
           equivalent_member.value().id() != ID_byte_extract_big_endian)
         {
-          expr = equivalent_member.value();
-          simplify_rec(expr);
-          return false;
+          auto tmp = equivalent_member.value();
+          return changed(simplify_rec(tmp));
         }
       }
     }
@@ -282,12 +247,11 @@ bool simplify_exprt::simplify_member(exprt &expr)
     member_exprt member_false=to_member_expr(expr);
     member_false.compound()=if_expr.false_case();
 
-    to_member_expr(expr).compound()=if_expr.true_case();
+    member_exprt member_true = to_member_expr(expr);
+    member_true.compound() = if_expr.true_case();
 
-    expr=if_exprt(cond, expr, member_false, expr.type());
-    simplify_rec(expr);
-
-    return false;
+    auto tmp = if_exprt(cond, member_true, member_false, expr.type());
+    return changed(simplify_rec(tmp));
   }
   else if(op.id() == ID_let)
   {
@@ -297,13 +261,12 @@ bool simplify_exprt::simplify_member(exprt &expr)
     // let x = 1 in x
     member_exprt pushed_in_member = to_member_expr(expr);
     pushed_in_member.op() = to_let_expr(op).where();
-    expr = op;
-    to_let_expr(expr).where() = pushed_in_member;
-    to_let_expr(expr).type() = to_let_expr(expr).where().type();
+    auto new_expr = op;
+    to_let_expr(new_expr).where() = pushed_in_member;
+    to_let_expr(new_expr).type() = to_let_expr(new_expr).where().type();
 
-    simplify_rec(expr);
-    return false;
+    return changed(simplify_rec(new_expr));
   }
 
-  return true;
+  return unchanged(expr);
 }

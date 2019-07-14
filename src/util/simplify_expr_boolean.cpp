@@ -27,20 +27,20 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
   if(expr.id()==ID_implies)
   {
+    const auto &implies_expr = to_implies_expr(expr);
+
     if(
-      expr.operands().size() != 2 ||
-      expr.operands().front().type().id() != ID_bool ||
-      expr.operands().back().type().id() != ID_bool)
+      implies_expr.op0().type().id() != ID_bool ||
+      implies_expr.op1().type().id() != ID_bool)
     {
       return unchanged(expr);
     }
 
     // turn a => b into !a || b
 
-    auto new_expr = expr;
+    binary_exprt new_expr = implies_expr;
     new_expr.id(ID_or);
     new_expr.op0() = boolean_negate(new_expr.op0());
-    simplify_node(new_expr.op0());
     simplify_node(new_expr);
     return std::move(new_expr);
   }
@@ -164,12 +164,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_not(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return unchanged(expr);
-
-  const exprt &op = expr.op0();
+  const exprt &op = expr.op();
 
   if(expr.type().id()!=ID_bool ||
      op.type().id()!=ID_bool)

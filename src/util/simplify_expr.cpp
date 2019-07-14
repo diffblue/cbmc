@@ -103,34 +103,29 @@ simplify_exprt::resultt<> simplify_exprt::simplify_abs(const abs_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_sign(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
-
-  if(expr.op0().is_constant())
+  if(expr.op().is_constant())
   {
-    const typet &type = expr.op0().type();
+    const typet &type = expr.op().type();
 
     if(type.id()==ID_floatbv)
     {
-      ieee_floatt value(to_constant_expr(expr.op0()));
-      expr = make_boolean_expr(value.get_sign());
-      return false;
+      ieee_floatt value(to_constant_expr(expr.op()));
+      return make_boolean_expr(value.get_sign());
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
     {
-      const auto value = numeric_cast<mp_integer>(expr.op0());
+      const auto value = numeric_cast<mp_integer>(expr.op());
       if(value.has_value())
       {
-        expr = make_boolean_expr(*value >= 0);
-        return false;
+        return make_boolean_expr(*value >= 0);
       }
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>
@@ -650,7 +645,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
           from_integer(*sub_size, size_type()),
           typecast_exprt(expr.op().op1(), size_type()));
 
-      simplify_rec(new_expr.op()); // rec. call
+      new_expr.op() = simplify_rec(new_expr.op()); // rec. call
 
       return changed(simplify_typecast(new_expr)); // rec. call
     }
@@ -734,8 +729,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         }
       }
 
-      simplify_rec(new_expr);
-      return std::move(new_expr);
+      return changed(simplify_rec(new_expr)); // recursive call
     }
   }
 
@@ -1074,8 +1068,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       auto result =
         address_of_exprt(index_exprt(o, from_integer(0, size_type())));
 
-      simplify_rec(result);
-      return std::move(result);
+      return changed(simplify_rec(result)); // recursive call
     }
   }
 
@@ -1111,8 +1104,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
   {
     exprt tmp=to_address_of_expr(pointer).object();
     // one address_of is gone, try again
-    simplify_rec(tmp);
-    return tmp;
+    return changed(simplify_rec(tmp));
   }
   // rewrite *(&a[0] + x) to a[x]
   else if(pointer.id()==ID_plus &&
@@ -1130,386 +1122,9 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
           old.array(),
           pointer_offset_sum(old.index(), pointer.op1()),
           old.array().type().subtype());
-        simplify_rec(idx);
-        return idx;
+        return changed(simplify_rec(idx));
       }
     }
-  }
-
-  return unchanged(expr);
-}
-
-bool simplify_exprt::simplify_if_implies(
-  exprt &expr,
-  const exprt &cond,
-  bool truth,
-  bool &new_truth)
-{
-  if(expr==cond)
-  {
-    new_truth = truth;
-    return false;
-  }
-
-  if(truth && cond.id()==ID_lt && expr.id()==ID_lt)
-  {
-    if(cond.op0()==expr.op0() &&
-       cond.op1().is_constant() &&
-       expr.op1().is_constant() &&
-       cond.op1().type()==expr.op1().type())
-    {
-      mp_integer i1, i2;
-
-      if(
-        !to_integer(to_constant_expr(cond.op1()), i1) &&
-        !to_integer(to_constant_expr(expr.op1()), i2))
-      {
-        if(i1 >= i2)
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-    }
-
-    if(cond.op1()==expr.op1() &&
-       cond.op0().is_constant() &&
-       expr.op0().is_constant() &&
-       cond.op0().type()==expr.op0().type())
-    {
-      mp_integer i1, i2;
-
-      if(
-        !to_integer(to_constant_expr(cond.op0()), i1) &&
-        !to_integer(to_constant_expr(expr.op0()), i2))
-      {
-        if(i1 <= i2)
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-    }
-  }
-
-  return true;
-}
-
-bool simplify_exprt::simplify_if_recursive(
-  exprt &expr,
-  const exprt &cond,
-  bool truth)
-{
-  if(expr.type().id()==ID_bool)
-  {
-    bool new_truth;
-
-    if(!simplify_if_implies(expr, cond, truth, new_truth))
-    {
-      if(new_truth)
-      {
-        expr=true_exprt();
-        return false;
-      }
-      else
-      {
-        expr=false_exprt();
-        return false;
-      }
-    }
-  }
-
-  bool result = true;
-
-  Forall_operands(it, expr)
-    result = simplify_if_recursive(*it, cond, truth) && result;
-
-  return result;
-}
-
-bool simplify_exprt::simplify_if_conj(
-  exprt &expr,
-  const exprt &cond)
-{
-  forall_operands(it, cond)
-  {
-    if(expr==*it)
-    {
-      expr=true_exprt();
-      return false;
-    }
-  }
-
-  bool result=true;
-
-  Forall_operands(it, expr)
-    result=simplify_if_conj(*it, cond) && result;
-
-  return result;
-}
-
-bool simplify_exprt::simplify_if_disj(
-  exprt &expr,
-  const exprt &cond)
-{
-  forall_operands(it, cond)
-  {
-    if(expr==*it)
-    {
-      expr=false_exprt();
-      return false;
-    }
-  }
-
-  bool result=true;
-
-  Forall_operands(it, expr)
-    result=simplify_if_disj(*it, cond) && result;
-
-  return result;
-}
-
-bool simplify_exprt::simplify_if_branch(
-  exprt &trueexpr,
-  exprt &falseexpr,
-  const exprt &cond)
-{
-  bool tresult = true;
-  bool fresult = true;
-
-  if(cond.id()==ID_and)
-  {
-    tresult = simplify_if_conj(trueexpr, cond) && tresult;
-    fresult = simplify_if_recursive(falseexpr, cond, false) && fresult;
-  }
-  else if(cond.id()==ID_or)
-  {
-    tresult = simplify_if_recursive(trueexpr, cond, true) && tresult;
-    fresult = simplify_if_disj(falseexpr, cond) && fresult;
-  }
-  else
-  {
-    tresult = simplify_if_recursive(trueexpr, cond, true) && tresult;
-    fresult = simplify_if_recursive(falseexpr, cond, false) && fresult;
-  }
-
-  if(!tresult)
-    simplify_rec(trueexpr);
-  if(!fresult)
-    simplify_rec(falseexpr);
-
-  return tresult && fresult;
-}
-
-bool simplify_exprt::simplify_if_cond(exprt &expr)
-{
-  bool result=true;
-  bool tmp=false;
-
-  while(!tmp)
-  {
-    tmp=true;
-
-    if(expr.id()==ID_and)
-    {
-      if(expr.has_operands())
-      {
-        exprt::operandst &operands = expr.operands();
-        for(exprt::operandst::iterator it1=operands.begin();
-            it1!=operands.end(); it1++)
-        {
-          for(exprt::operandst::iterator it2=operands.begin();
-              it2!=operands.end(); it2++)
-          {
-            if(it1!=it2)
-              tmp=simplify_if_recursive(*it1, *it2, true) && tmp;
-          }
-        }
-      }
-    }
-
-    if(!tmp)
-      simplify_rec(expr);
-
-    result=tmp && result;
-  }
-
-  return result;
-}
-
-bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
-{
-  exprt &cond=expr.cond();
-  exprt &truevalue=expr.true_case();
-  exprt &falsevalue=expr.false_case();
-
-  // we first want to look at the condition
-  bool result=simplify_rec(cond);
-
-  // 1 ? a : b -> a  and  0 ? a : b -> b
-  if(cond.is_constant())
-  {
-    exprt tmp=cond.is_true()?truevalue:falsevalue;
-    simplify_rec(tmp);
-    expr.swap(tmp);
-    return false;
-  }
-
-  if(do_simplify_if)
-  {
-    if(cond.id()==ID_not)
-    {
-      exprt tmp;
-      tmp.swap(cond.op0());
-      cond.swap(tmp);
-      truevalue.swap(falsevalue);
-      result=false;
-    }
-
-#ifdef USE_LOCAL_REPLACE_MAP
-    replace_mapt map_before(local_replace_map);
-
-    // a ? b : c  --> a ? b[a/true] : c
-    if(cond.id()==ID_and)
-    {
-      forall_operands(it, cond)
-      {
-        if(it->id()==ID_not)
-          local_replace_map.insert(
-            std::make_pair(it->op0(), false_exprt()));
-        else
-          local_replace_map.insert(
-            std::make_pair(*it, true_exprt()));
-      }
-    }
-    else
-      local_replace_map.insert(std::make_pair(cond, true_exprt()));
-
-    result=simplify_rec(truevalue) && result;
-
-    local_replace_map=map_before;
-
-    // a ? b : c  --> a ? b : c[a/false]
-    if(cond.id()==ID_or)
-    {
-      forall_operands(it, cond)
-      {
-        if(it->id()==ID_not)
-          local_replace_map.insert(
-            std::make_pair(it->op0(), true_exprt()));
-        else
-          local_replace_map.insert(
-            std::make_pair(*it, false_exprt()));
-      }
-    }
-    else
-      local_replace_map.insert(std::make_pair(cond, false_exprt()));
-
-    result=simplify_rec(falsevalue) && result;
-
-    local_replace_map.swap(map_before);
-#else
-    result=simplify_rec(truevalue) && result;
-    result=simplify_rec(falsevalue) && result;
-#endif
-  }
-  else
-  {
-    result=simplify_rec(truevalue) && result;
-    result=simplify_rec(falsevalue) && result;
-  }
-
-  return result;
-}
-
-simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
-{
-  const exprt &cond = expr.cond();
-  const exprt &truevalue = expr.true_case();
-  const exprt &falsevalue = expr.false_case();
-
-  if(do_simplify_if)
-  {
-    #if 0
-    result = simplify_if_cond(cond) && result;
-    result = simplify_if_branch(truevalue, falsevalue, cond) && result;
-    #endif
-
-    if(expr.type()==bool_typet())
-    {
-      // a?b:c <-> (a && b) || (!a && c)
-
-      if(truevalue.is_true() && falsevalue.is_false())
-      {
-        // a?1:0 <-> a
-        return cond;
-      }
-      else if(truevalue.is_false() && falsevalue.is_true())
-      {
-        // a?0:1 <-> !a
-        exprt tmp = boolean_negate(cond);
-        simplify_node(tmp);
-        return std::move(tmp);
-      }
-      else if(falsevalue.is_false())
-      {
-        // a?b:0 <-> a AND b
-        and_exprt tmp(cond, truevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
-      }
-      else if(falsevalue.is_true())
-      {
-        // a?b:1 <-> !a OR b
-        exprt tmp_not_cond = boolean_negate(cond);
-        simplify_node(tmp_not_cond);
-        or_exprt tmp(tmp_not_cond, truevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
-      }
-      else if(truevalue.is_true())
-      {
-        // a?1:b <-> a||(!a && b) <-> a OR b
-        or_exprt tmp(cond, falsevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
-      }
-      else if(truevalue.is_false())
-      {
-        // a?0:b <-> !a && b
-        exprt tmp_not_cond = boolean_negate(cond);
-        simplify_node(tmp_not_cond);
-        and_exprt tmp(tmp_not_cond, falsevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
-      }
-    }
-  }
-
-  if(truevalue==falsevalue)
-    return truevalue;
-
-  // this pushes the if-then-else into struct and array constructors
-  if(((truevalue.id()==ID_struct && falsevalue.id()==ID_struct) ||
-      (truevalue.id()==ID_array && falsevalue.id()==ID_array)) &&
-     truevalue.operands().size()==falsevalue.operands().size())
-  {
-    exprt cond_copy=cond;
-    exprt falsevalue_copy=falsevalue;
-    exprt truevalue_copy = truevalue;
-
-    auto range_false = make_range(falsevalue_copy.operands());
-    auto range_true = make_range(truevalue_copy.operands());
-    auto new_expr = truevalue;
-    new_expr.operands().clear();
-
-    for(const auto &pair : range_true.zip(range_false))
-    {
-      new_expr.operands().push_back(
-        simplify_if(if_exprt(cond_copy, pair.first, pair.second)));
-    }
-
-    return std::move(new_expr);
   }
 
   return unchanged(expr);
@@ -1546,14 +1161,15 @@ simplify_exprt::resultt<> simplify_exprt::simplify_lambda(const exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_with(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_with(const exprt &expr)
 {
-  bool result=true;
+  bool no_change = true;
 
   if((expr.operands().size()%2)!=1)
-    return true;
+    return unchanged(expr);
 
-  auto &with_expr = to_with_expr(expr);
+  // copy
+  auto with_expr = to_with_expr(expr);
 
   const typet old_type_followed = ns.follow(with_expr.old().type());
 
@@ -1569,17 +1185,20 @@ bool simplify_exprt::simplify_with(exprt &expr)
           with_expr.where().get(ID_component_name);
 
         if(!to_struct_type(old_type_followed).has_component(component_name))
-          return result;
+          return unchanged(expr);
 
         std::size_t number =
           to_struct_type(old_type_followed).component_number(component_name);
+
+        if(number >= with_expr.old().operands().size())
+          return unchanged(expr);
 
         with_expr.old().operands()[number].swap(with_expr.new_value());
 
         with_expr.operands().erase(++with_expr.operands().begin());
         with_expr.operands().erase(++with_expr.operands().begin());
 
-        result=false;
+        no_change = false;
       }
     }
   }
@@ -1588,10 +1207,10 @@ bool simplify_exprt::simplify_with(exprt &expr)
     with_expr.old().type().id() == ID_vector)
   {
     if(
-      expr.op0().id() == ID_array || expr.op0().id() == ID_constant ||
-      expr.op0().id() == ID_vector)
+      with_expr.old().id() == ID_array || with_expr.old().id() == ID_constant ||
+      with_expr.old().id() == ID_vector)
     {
-      while(expr.operands().size()>1)
+      while(with_expr.operands().size() > 1)
       {
         const auto i = numeric_cast<mp_integer>(with_expr.where());
 
@@ -1607,26 +1226,24 @@ bool simplify_exprt::simplify_with(exprt &expr)
         with_expr.operands().erase(++with_expr.operands().begin());
         with_expr.operands().erase(++with_expr.operands().begin());
 
-        result=false;
+        no_change = false;
       }
     }
   }
 
-  if(expr.operands().size()==1)
-  {
-    exprt tmp;
-    tmp.swap(expr.op0());
-    expr.swap(tmp);
-    result=false;
-  }
+  if(with_expr.operands().size() == 1)
+    return with_expr.old();
 
-  return result;
+  if(no_change)
+    return unchanged(expr);
+  else
+    return std::move(with_expr);
 }
 
-bool simplify_exprt::simplify_update(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_update(const exprt &expr)
 {
   if(expr.operands().size()!=3)
-    return true;
+    return unchanged(expr);
 
   // this is to push updates into (possibly nested) constants
 
@@ -1645,10 +1262,10 @@ bool simplify_exprt::simplify_update(exprt &expr)
       const auto i = numeric_cast<mp_integer>(e.op0());
 
       if(!i.has_value())
-        return true;
+        return unchanged(expr);
 
       if(*i < 0 || *i >= value_ptr->operands().size())
-        return true;
+        return unchanged(expr);
 
       value_ptr = &value_ptr->operands()[numeric_cast_v<std::size_t>(*i)];
     }
@@ -1660,20 +1277,18 @@ bool simplify_exprt::simplify_update(exprt &expr)
       const struct_typet &value_ptr_struct_type =
         to_struct_type(value_ptr_type);
       if(!value_ptr_struct_type.has_component(component_name))
-        return true;
+        return unchanged(expr);
       auto &designator_as_struct_expr = to_struct_expr(*value_ptr);
       value_ptr = &designator_as_struct_expr.component(component_name, ns);
       CHECK_RETURN(value_ptr->is_not_nil());
     }
     else
-      return true; // give up, unknown designator
+      return unchanged(expr); // give up, unknown designator
   }
 
   // found, done
   *value_ptr=to_update_expr(expr).new_value();
-  expr.swap(updated_value);
-
-  return false;
+  return updated_value;
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
@@ -2194,9 +1809,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     auto tmp = expr;
     tmp.op() = index_exprt(expr.op(), expr.offset());
     tmp.offset() = from_integer(0, expr.offset().type());
-    simplify_rec(tmp);
-
-    return std::move(tmp);
+    return changed(simplify_rec(tmp));
   }
 
   // extract bits of a constant
@@ -2242,8 +1855,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   if(!subexpr.has_value() || subexpr.value() == expr)
     return unchanged(expr);
 
-  simplify_rec(subexpr.value());
-  return subexpr.value();
+  return changed(simplify_rec(subexpr.value())); // recursive call
 }
 
 simplify_exprt::resultt<>
@@ -2466,16 +2078,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
     }
 
     if(result_expr.is_not_nil())
-    {
-      simplify_rec(result_expr);
-      return result_expr;
-    }
-
-    if(result_expr.is_not_nil())
-    {
-      simplify_rec(result_expr);
-      return result_expr;
-    }
+      return changed(simplify_rec(result_expr));
   }
 
   // replace elements of array or struct expressions, possibly using
@@ -2519,7 +2122,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
             *offset_int + val_offset - m_offset_bits / 8, offset.type()),
           new_val);
 
-        simplify_rec(*it);
+        *it = simplify_rec(*it); // recursive call
 
         val_offset+=bytes_req;
       }
@@ -2533,7 +2136,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_complex(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_complex(const unary_exprt &expr)
 {
   if(expr.id() == ID_complex_real)
   {
@@ -2570,8 +2174,14 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
     if(expr.has_operands())
     {
       Forall_operands(it, expr)
-        if(!simplify_rec(*it)) // recursive call
+      {
+        auto r_it = simplify_rec(*it); // recursive call
+        if(r_it.has_changed())
+        {
+          *it = r_it.expr;
           result=false;
+        }
+      }
     }
   }
 
@@ -2603,8 +2213,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
   {
-    if(!simplify_inequality(expr))
-      r = changed(expr);
+    r = simplify_inequality(expr);
   }
   else if(expr.id()==ID_if)
   {
@@ -2616,23 +2225,19 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_with)
   {
-    if(!simplify_with(expr))
-      r = changed(expr);
+    r = simplify_with(expr);
   }
   else if(expr.id()==ID_update)
   {
-    if(!simplify_update(expr))
-      r = changed(expr);
+    r = simplify_update(expr);
   }
   else if(expr.id()==ID_index)
   {
-    if(!simplify_index(expr))
-      r = changed(expr);
+    r = simplify_index(to_index_expr(expr));
   }
   else if(expr.id()==ID_member)
   {
-    if(!simplify_member(expr))
-      r = changed(expr);
+    r = simplify_member(to_member_expr(expr));
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
@@ -2646,7 +2251,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_pointer_object)
   {
-    r = simplify_pointer_object(expr);
+    r = simplify_pointer_object(to_unary_expr(expr));
   }
   else if(expr.id() == ID_is_dynamic_object)
   {
@@ -2658,11 +2263,11 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_object_size)
   {
-    r = simplify_object_size(expr);
+    r = simplify_object_size(to_unary_expr(expr));
   }
   else if(expr.id()==ID_good_pointer)
   {
-    r = simplify_good_pointer(expr);
+    r = simplify_good_pointer(to_unary_expr(expr));
   }
   else if(expr.id()==ID_div)
   {
@@ -2674,7 +2279,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_bitnot)
   {
-    r = simplify_bitnot(expr);
+    r = simplify_bitnot(to_bitnot_expr(expr));
   }
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
@@ -2715,15 +2320,15 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_unary_minus)
   {
-    r = simplify_unary_minus(expr);
+    r = simplify_unary_minus(to_unary_minus_expr(expr));
   }
   else if(expr.id()==ID_unary_plus)
   {
-    r = simplify_unary_plus(expr);
+    r = simplify_unary_plus(to_unary_plus_expr(expr));
   }
   else if(expr.id()==ID_not)
   {
-    r = simplify_not(expr);
+    r = simplify_not(to_not_expr(expr));
   }
   else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||
@@ -2741,15 +2346,15 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_pointer_offset)
   {
-    r = simplify_pointer_offset(expr);
+    r = simplify_pointer_offset(to_unary_expr(expr));
   }
   else if(expr.id()==ID_extractbit)
   {
-    r = simplify_extractbit(expr);
+    r = simplify_extractbit(to_extractbit_expr(expr));
   }
   else if(expr.id()==ID_concatenation)
   {
-    r = simplify_concatenation(expr);
+    r = simplify_concatenation(to_concatenation_expr(expr));
   }
   else if(expr.id()==ID_extractbits)
   {
@@ -2782,8 +2387,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id()==ID_sign)
   {
-    if(!simplify_sign(expr))
-      r = changed(expr);
+    r = simplify_sign(to_sign_expr(expr));
   }
   else if(expr.id() == ID_popcount)
   {
@@ -2795,7 +2399,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
   {
-    r = simplify_complex(expr);
+    r = simplify_complex(to_unary_expr(expr));
   }
 
   if(r.has_changed())
@@ -2820,8 +2424,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   return no_change;
 }
 
-/// \return returns true if expression unchanged; returns false if changed
-bool simplify_exprt::simplify_rec(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
 {
   // look up in cache
 
@@ -2867,34 +2470,45 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   #endif
 #endif
 
-  if(!result)
+  if(result) // no change
   {
-    POSTCONDITION(tmp.type() == expr.type());
-    expr.swap(tmp);
-
-    #ifdef USE_CACHE
-    // save in cache
-    cache_result.first->second=expr;
-    #endif
+    return unchanged(expr);
   }
+  else // change, new expression is 'tmp'
+  {
+    POSTCONDITION(as_const(tmp).type() == expr.type());
 
-  return result;
+#ifdef USE_CACHE
+    // save in cache
+    cache_result.first->second = tmp;
+#endif
+
+    return std::move(tmp);
+  }
 }
 
+/// \return returns true if expression unchanged; returns false if changed
 bool simplify_exprt::simplify(exprt &expr)
 {
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
     std::cout << "TO-SIMP " << format(expr) << "\n";
 #endif
-  bool res=simplify_rec(expr);
+  auto result = simplify_rec(expr);
 #ifdef DEBUG_ON_DEMAND
   if(debug_on)
-    std::cout << "FULLSIMP " << format(expr) << "\n";
+    std::cout << "FULLSIMP " << format(result.expr) << "\n";
 #endif
-  return res;
+  if(result.has_changed())
+  {
+    expr = result.expr;
+    return false; // change
+  }
+  else
+    return true; // no change
 }
 
+/// \return returns true if expression unchanged; returns false if changed
 bool simplify(exprt &expr, const namespacet &ns)
 {
   return simplify_exprt(ns).simplify(expr);

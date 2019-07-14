@@ -71,6 +71,7 @@ SRC = allocate_objects.cpp \
       simplify_expr_array.cpp \
       simplify_expr_boolean.cpp \
       simplify_expr_floatbv.cpp \
+      simplify_expr_if.cpp \
       simplify_expr_int.cpp \
       simplify_expr_pointer.cpp \
       simplify_expr_struct.cpp \
