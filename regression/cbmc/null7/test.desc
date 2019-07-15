@@ -1,0 +1,11 @@
+CORE broken-smt-backend
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The value set may contain the constants with unknown offsets. Such cases cannot
+be conclusively filtered out as the offset may be zero.

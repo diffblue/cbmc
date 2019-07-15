@@ -114,7 +114,8 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
       value_set_element.id() == ID_unknown ||
       value_set_element.id() == ID_invalid ||
       is_failed_symbol(
-        to_object_descriptor_expr(value_set_element).root_object()))
+        to_object_descriptor_expr(value_set_element).root_object()) ||
+      to_object_descriptor_expr(value_set_element).offset().id() == ID_unknown)
     {
       // We can't conclude anything about the value-set
       return {};
