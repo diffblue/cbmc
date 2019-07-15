@@ -53,7 +53,7 @@ public:
   }
 
   /// Postincrement operator
-  const map_iteratort operator++(int)
+  map_iteratort operator++(int)
   {
     map_iteratort tmp(*this);
     this->operator++();
@@ -136,7 +136,7 @@ public:
   }
 
   /// Postincrement operator
-  const filter_iteratort operator++(int)
+  filter_iteratort operator++(int)
   {
     filter_iteratort tmp(*this);
     this->operator++();
@@ -228,7 +228,7 @@ public:
   }
 
   /// Postincrement operator
-  const concat_iteratort operator++(int)
+  concat_iteratort operator++(int)
   {
     concat_iteratort tmp(first_begin, first_end, second_begin);
     this->operator++();
@@ -317,7 +317,7 @@ public:
   }
 
   /// Postincrement operator
-  const zip_iteratort operator++(int)
+  zip_iteratort operator++(int)
   {
     zip_iteratort tmp(first_begin, first_end, second_begin, second_end);
     this->operator++();
