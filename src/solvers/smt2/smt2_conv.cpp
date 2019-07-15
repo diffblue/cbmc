@@ -220,7 +220,8 @@ void smt2_convt::define_object_size(
       numeric_cast<mp_integer>(size_expr.value_or(nil_exprt()));
 
     if(
-      o.id() != ID_symbol || !size_expr.has_value() || !object_size.has_value())
+      (o.id() != ID_symbol && o.id() != ID_string_constant) ||
+      !size_expr.has_value() || !object_size.has_value())
     {
       ++number;
       continue;
