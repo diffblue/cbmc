@@ -22,7 +22,6 @@ Author: Diffblue Ltd.
 
 typedef std::unordered_map<irep_idt, std::vector<reference_typet>>
   generic_parameter_specialization_mapt;
-typedef std::set<irep_idt> generic_parameter_recursion_trackingt;
 
 struct print_generic_parameter_specialization_map
 {
@@ -54,11 +53,6 @@ class namespacet;
 
 class select_pointer_typet
 {
-  optionalt<pointer_typet> get_recursively_instantiated_type(
-    irep_idt parameter_name,
-    generic_parameter_specialization_mapt
-      generic_parameter_specialization_map) const;
-
 public:
   virtual ~select_pointer_typet() = default;
 
@@ -111,8 +105,7 @@ public:
   pointer_typet specialize_generics(
     const pointer_typet &pointer_type,
     const generic_parameter_specialization_mapt
-      &generic_parameter_specialization_map,
-    generic_parameter_recursion_trackingt &visited_nodes) const;
+      &generic_parameter_specialization_map) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H
