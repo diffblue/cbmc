@@ -42,11 +42,10 @@ pointer_typet select_pointer_typet::specialize_generics(
     &generic_parameter_specialization_map,
   generic_parameter_recursion_trackingt &visited_nodes) const
 {
-  if(is_java_generic_parameter(pointer_type))
+  auto parameter = type_try_dynamic_cast<java_generic_parametert>(pointer_type);
+  if(parameter != nullptr)
   {
-    const java_generic_parametert &parameter =
-      to_java_generic_parameter(pointer_type);
-    const irep_idt &parameter_name = parameter.get_name();
+    const irep_idt &parameter_name = parameter->get_name();
 
     // avoid infinite recursion by looking at each generic argument from
     // previous assignments
@@ -82,26 +81,27 @@ pointer_typet select_pointer_typet::specialize_generics(
     visited_nodes.erase(parameter_name);
     return returned_type;
   }
-  else if(pointer_type.subtype().id() == ID_struct_tag)
+
+  auto subtype =
+    type_try_dynamic_cast<struct_tag_typet>(pointer_type.subtype());
+  if(subtype != nullptr && is_java_array_tag(subtype->get_identifier()))
   {
     // if the pointer is an array, recursively specialize its element type
-    const auto &array_subtype = to_struct_tag_type(pointer_type.subtype());
-    if(is_java_array_tag(array_subtype.get_identifier()))
+    const auto *array_element_type =
+      type_try_dynamic_cast<pointer_typet>(java_array_element_type(*subtype));
+    if(array_element_type != nullptr)
     {
-      const typet &array_element_type = java_array_element_type(array_subtype);
-      if(array_element_type.id() == ID_pointer)
-      {
-        const pointer_typet &new_array_type = specialize_generics(
-          to_pointer_type(array_element_type),
-          generic_parameter_specialization_map,
-          visited_nodes);
+      const pointer_typet &new_array_type = specialize_generics(
+        *array_element_type,
+        generic_parameter_specialization_map,
+        visited_nodes);
 
-        pointer_typet replacement_array_type = java_array_type('a');
-        replacement_array_type.subtype().set(ID_element_type, new_array_type);
-        return replacement_array_type;
-      }
+      pointer_typet replacement_array_type = java_array_type('a');
+      replacement_array_type.subtype().set(ID_element_type, new_array_type);
+      return replacement_array_type;
     }
   }
+
   return pointer_type;
 }
 

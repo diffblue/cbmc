@@ -735,13 +735,23 @@ public:
   }
 };
 
+/// Check whether a reference to a typet is a Java generic parameter/variable,
+/// e.g., `T` in `List<T>`.
+/// \param base: Source type.
+/// \return True if \p type is a generic Java parameter type
+template <>
+inline bool can_cast_type<java_generic_parametert>(const typet &base)
+{
+  return is_reference(base) && is_java_generic_parameter_tag(base.subtype());
+}
+
 /// Checks whether the type is a java generic parameter/variable, e.g., `T` in
 /// `List<T>`.
 /// \param type: the type to check
 /// \return true if type is a generic Java parameter type
 inline bool is_java_generic_parameter(const typet &type)
 {
-  return is_reference(type) && is_java_generic_parameter_tag(type.subtype());
+  return can_cast_type<java_generic_parametert>(type);
 }
 
 /// \param type: source type
