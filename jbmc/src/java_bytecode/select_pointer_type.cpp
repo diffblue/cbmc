@@ -21,17 +21,8 @@ pointer_typet select_pointer_typet::convert_pointer_type(
   const namespacet &ns) const
 {
   (void)ns; // unused parameter
-  // if we have a map of generic parameters -> types and the pointer is
-  // a generic parameter, specialize it with concrete types
-  if(!generic_parameter_specialization_map.empty())
-  {
-    return specialize_generics(
-      pointer_type, generic_parameter_specialization_map);
-  }
-  else
-  {
-    return pointer_type;
-  }
+  return specialize_generics(
+    pointer_type, generic_parameter_specialization_map);
 }
 
 /// Return the first concrete type instantiation if any such exists.
