@@ -2,6 +2,7 @@ void __CPROVER_assume(__CPROVER_bool assumption);
 void __VERIFIER_assume(__CPROVER_bool assumption);
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
 void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);
+void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 void __CPROVER_havoc_object(void *);
 __CPROVER_bool __CPROVER_equal();
 __CPROVER_bool __CPROVER_same_object(const void *, const void *);
