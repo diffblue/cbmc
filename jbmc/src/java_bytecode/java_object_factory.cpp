@@ -487,8 +487,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // If we are changing the pointer, we generate code for creating a pointer
   // to the substituted type instead
   // TODO if we are comparing array types we need to compare their element
-  // types. this is for now done by implementing equality function especially
-  // for java types, technical debt TG-2707
+  //   types. this is for now done by implementing equality function especially
+  //   for java types, technical debt TG-2707
   if(!equal_java_types(replacement_pointer_type, pointer_type))
   {
     // update generic_parameter_specialization_map for the new pointer

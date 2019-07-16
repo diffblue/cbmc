@@ -18,9 +18,8 @@ pointer_typet select_pointer_typet::convert_pointer_type(
   const pointer_typet &pointer_type,
   const generic_parameter_specialization_mapt
     &generic_parameter_specialization_map,
-  const namespacet &ns) const
+  const namespacet &) const
 {
-  (void)ns; // unused parameter
   // if we have a map of generic parameters -> types and the pointer is
   // a generic parameter, specialize it with concrete types
   if(!generic_parameter_specialization_map.empty())
@@ -51,14 +50,16 @@ pointer_typet select_pointer_typet::specialize_generics(
 
     // avoid infinite recursion by looking at each generic argument from
     // previous assignments
-    if(visited_nodes.find(parameter_name) != visited_nodes.end())
+    if(visited_nodes.count(parameter_name) != 0)
     {
       const optionalt<pointer_typet> result = get_recursively_instantiated_type(
         parameter_name, generic_parameter_specialization_map);
       return result.has_value() ? result.value() : pointer_type;
     }
 
-    if(generic_parameter_specialization_map.count(parameter_name) == 0)
+    const auto specialization =
+      generic_parameter_specialization_map.find(parameter_name);
+    if(specialization == generic_parameter_specialization_map.end())
     {
       // this means that the generic pointer_type has not been specialized
       // in the current context (e.g., the method under test is generic);
@@ -66,8 +67,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       // its upper bound
       return pointer_type;
     }
-    const pointer_typet &type =
-      generic_parameter_specialization_map.find(parameter_name)->second.back();
+    const pointer_typet &type = specialization->second.back();
 
     // generic parameters can be adopted from outer classes or superclasses so
     // we may need to search for the concrete type recursively
@@ -111,7 +111,7 @@ pointer_typet select_pointer_typet::specialize_generics(
 ///
 /// Example:
 /// `class MyGeneric<T,U> { MyGeneric<U,T> gen; T t;}`
-/// When instantiating `MyGeneric<Integer,String> my` we need to for example
+/// For example, when instantiating `MyGeneric<Integer,String> my` we need to
 /// resolve the type of `my.gen.t`. The map would in this context contain
 /// - T -> (Integer, U)
 /// - U -> (String, T)
