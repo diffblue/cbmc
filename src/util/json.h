@@ -361,6 +361,11 @@ public:
     return object.find(key);
   }
 
+  std::size_t size() const
+  {
+    return object.size();
+  }
+
   iterator begin()
   {
     return object.begin();
