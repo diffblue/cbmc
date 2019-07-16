@@ -366,6 +366,119 @@ static simplify_exprt::resultt<> simplify_string_index_of(
   }
 }
 
+/// Simplify String.charAt function when arguments are constant
+///
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_char_at(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  if(expr.arguments().at(1).id() != ID_constant)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const auto &index = to_constant_expr(expr.arguments().at(1));
+
+  const refined_string_exprt &s = to_string_expr(expr.arguments().at(0));
+
+  const auto char_seq_opt = try_get_string_data_array(s, ns);
+
+  if(!char_seq_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const array_exprt &char_seq = char_seq_opt->get();
+
+  const auto i_opt = numeric_cast<std::size_t>(index);
+
+  if(!i_opt || *i_opt >= char_seq.operands().size())
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const auto &c = to_constant_expr(char_seq.operands().at(*i_opt));
+
+  if(c.type() != expr.type())
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  return c;
+}
+
+/// Simplify String.startsWith function when arguments are constant
+///
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_startswith(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  // We want to get both arguments of any starts-with comparison, and
+  // trace them back to the actual string instance. All variables on the
+  // way must be constant for us to be sure this will work.
+  auto &first_argument = to_string_expr(expr.arguments().at(0));
+  auto &second_argument = to_string_expr(expr.arguments().at(1));
+
+  const auto first_value_opt = try_get_string_data_array(first_argument, ns);
+
+  if(!first_value_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const array_exprt &first_value = first_value_opt->get();
+
+  const auto second_value_opt = try_get_string_data_array(second_argument, ns);
+
+  if(!second_value_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const array_exprt &second_value = second_value_opt->get();
+
+  mp_integer offset_int = 0;
+  if(expr.arguments().size() == 3)
+  {
+    auto &offset = expr.arguments()[2];
+    if(offset.id() != ID_constant)
+      return simplify_exprt::unchanged(expr);
+    offset_int = numeric_cast_v<mp_integer>(to_constant_expr(offset));
+  }
+
+  // test whether second_value is a prefix of first_value
+  bool is_prefix =
+    offset_int >= 0 && mp_integer(first_value.operands().size()) >=
+                         offset_int + second_value.operands().size();
+  if(is_prefix)
+  {
+    exprt::operandst::const_iterator second_it =
+      second_value.operands().begin();
+    for(const auto &first_op : first_value.operands())
+    {
+      if(offset_int > 0)
+        --offset_int;
+      else if(second_it == second_value.operands().end())
+        break;
+      else if(first_op != *second_it)
+      {
+        is_prefix = false;
+        break;
+      }
+      else
+        ++second_it;
+    }
+  }
+
+  return from_integer(is_prefix ? 1 : 0, expr.type());
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   const function_application_exprt &expr)
 {
@@ -374,68 +487,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
 
   const irep_idt &func_id = to_symbol_expr(expr.function()).get_identifier();
 
-  // Starts-with is used for .equals.
+  // String.startsWith() is used to implement String.equals() in the models
+  // library
   if(func_id == ID_cprover_string_startswith_func)
   {
-    // We want to get both arguments of any starts-with comparison, and
-    // trace them back to the actual string instance. All variables on the
-    // way must be constant for us to be sure this will work.
-    auto &first_argument = to_string_expr(expr.arguments().at(0));
-    auto &second_argument = to_string_expr(expr.arguments().at(1));
-
-    const auto first_value_opt = try_get_string_data_array(first_argument, ns);
-
-    if(!first_value_opt)
-    {
-      return unchanged(expr);
-    }
-
-    const array_exprt &first_value = first_value_opt->get();
-
-    const auto second_value_opt =
-      try_get_string_data_array(second_argument, ns);
-
-    if(!second_value_opt)
-    {
-      return unchanged(expr);
-    }
-
-    const array_exprt &second_value = second_value_opt->get();
-
-    mp_integer offset_int = 0;
-    if(expr.arguments().size() == 3)
-    {
-      auto &offset = expr.arguments()[2];
-      if(offset.id() != ID_constant)
-        return unchanged(expr);
-      offset_int = numeric_cast_v<mp_integer>(to_constant_expr(offset));
-    }
-
-    // test whether second_value is a prefix of first_value
-    bool is_prefix =
-      offset_int >= 0 && mp_integer(first_value.operands().size()) >=
-                           offset_int + second_value.operands().size();
-    if(is_prefix)
-    {
-      exprt::operandst::const_iterator second_it =
-        second_value.operands().begin();
-      for(const auto &first_op : first_value.operands())
-      {
-        if(offset_int > 0)
-          --offset_int;
-        else if(second_it == second_value.operands().end())
-          break;
-        else if(first_op != *second_it)
-        {
-          is_prefix = false;
-          break;
-        }
-        else
-          ++second_it;
-      }
-    }
-
-    return from_integer(is_prefix ? 1 : 0, expr.type());
+    return simplify_string_startswith(expr, ns);
   }
   else if(func_id == ID_cprover_string_endswith_func)
   {
@@ -455,39 +511,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
-    if(expr.arguments().at(1).id() != ID_constant)
-    {
-      return unchanged(expr);
-    }
-
-    const auto &index = to_constant_expr(expr.arguments().at(1));
-
-    const refined_string_exprt &s = to_string_expr(expr.arguments().at(0));
-
-    const auto char_seq_opt = try_get_string_data_array(s, ns);
-
-    if(!char_seq_opt)
-    {
-      return unchanged(expr);
-    }
-
-    const array_exprt &char_seq = char_seq_opt->get();
-
-    const auto i_opt = numeric_cast<std::size_t>(index);
-
-    if(!i_opt || *i_opt >= char_seq.operands().size())
-    {
-      return unchanged(expr);
-    }
-
-    const auto &c = to_constant_expr(char_seq.operands().at(*i_opt));
-
-    if(c.type() != expr.type())
-    {
-      return unchanged(expr);
-    }
-
-    return c;
+    return simplify_string_char_at(expr, ns);
   }
 
   return unchanged(expr);
