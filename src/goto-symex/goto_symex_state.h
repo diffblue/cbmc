@@ -239,6 +239,14 @@ public:
     return fresh_l2_name_provider;
   }
 
+  /// Returns true if \p lvalue is a read-only object, such as the null object
+  static bool is_read_only_object(const exprt &lvalue)
+  {
+    return lvalue.id() == ID_string_constant || lvalue.id() == ID_null_object ||
+           lvalue.id() == "zero_string" || lvalue.id() == "is_zero_string" ||
+           lvalue.id() == "zero_string_length";
+  }
+
 private:
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
 

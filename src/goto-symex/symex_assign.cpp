@@ -67,11 +67,7 @@ void symex_assignt::assign_rec(
     assign_if(to_if_expr(lhs), full_lhs, rhs, guard);
   else if(lhs.id()==ID_typecast)
     assign_typecast(to_typecast_expr(lhs), full_lhs, rhs, guard);
-  else if(lhs.id() == ID_string_constant ||
-          lhs.id() == ID_null_object ||
-          lhs.id() == "zero_string" ||
-          lhs.id() == "is_zero_string" ||
-          lhs.id() == "zero_string_length")
+  else if(goto_symex_statet::is_read_only_object(lhs))
   {
     // ignore
   }
