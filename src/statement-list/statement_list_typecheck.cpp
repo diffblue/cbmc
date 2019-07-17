@@ -1272,11 +1272,8 @@ void statement_list_typecheckt::typecheck_CPROVER_assert(
     expr_try_dynamic_cast<equal_exprt>(op_code.op1());
   if(assignment)
   {
-    const symbol_exprt &rhs{to_symbol_expr(assignment->rhs())};
-    // Check if identifier is present, create assertion and add it to the
-    // function body.
-    const exprt op{typecheck_identifier(tia_element, rhs.get_identifier())};
-    const code_assertt assertion{op};
+    const code_assertt assertion{
+      typecheck_function_call_argument_rhs(tia_element, assignment->rhs())};
     tia_element.value.add_to_operands(assertion);
   }
   else
@@ -1294,11 +1291,8 @@ void statement_list_typecheckt::typecheck_CPROVER_assume(
     expr_try_dynamic_cast<equal_exprt>(op_code.op1());
   if(assignment)
   {
-    const symbol_exprt &rhs{to_symbol_expr(assignment->rhs())};
-    // Check if identifier is present, create assumption and add it to the
-    // function body.
-    const exprt op{typecheck_identifier(tia_element, rhs.get_identifier())};
-    const code_assumet assumption{op};
+    const code_assumet assumption{
+      typecheck_function_call_argument_rhs(tia_element, assignment->rhs())};
     tia_element.value.add_to_operands(assumption);
   }
   else
@@ -1354,18 +1348,12 @@ void statement_list_typecheckt::typecheck_called_function(
   for(const auto &expr : op_code.operands())
   {
     if(can_cast_expr<equal_exprt>(expr))
-    {
-      const equal_exprt &assignment{to_equal_expr(expr)};
-      assignments.push_back(assignment);
-    }
+      assignments.push_back(to_equal_expr(expr));
   }
 
   for(const code_typet::parametert &param : params)
-  {
-    const exprt &arg{
-      typecheck_function_call_arguments(assignments, param, tia_element)};
-    args.push_back(arg);
-  }
+    args.emplace_back(
+      typecheck_function_call_arguments(assignments, param, tia_element));
 
   // Check the return value if present.
   if(called_type.return_type().is_nil())
@@ -1404,9 +1392,9 @@ exprt statement_list_typecheckt::typecheck_function_call_arguments(
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
     if(param_name == lhs.get_identifier())
     {
-      const symbol_exprt &rhs{to_symbol_expr(assignment.rhs())};
-      const exprt assigned_variable{
-        typecheck_identifier(tia_element, rhs.get_identifier())};
+      exprt assigned_variable{
+        typecheck_function_call_argument_rhs(tia_element, assignment.rhs())};
+
       if(param_type == assigned_variable.type())
         return assigned_variable;
       else
@@ -1421,6 +1409,21 @@ exprt statement_list_typecheckt::typecheck_function_call_arguments(
   error() << "No assignment found for function parameter "
           << param.get_identifier() << eom;
   throw TYPECHECK_ERROR;
+}
+
+exprt statement_list_typecheckt::typecheck_function_call_argument_rhs(
+  const symbolt &tia_element,
+  const exprt &rhs)
+{
+  exprt assigned_operand;
+  const symbol_exprt *const symbol_rhs =
+    expr_try_dynamic_cast<symbol_exprt>(rhs);
+  if(symbol_rhs)
+    assigned_operand =
+      typecheck_identifier(tia_element, symbol_rhs->get_identifier());
+  else // constant_exprt.
+    assigned_operand = rhs;
+  return assigned_operand;
 }
 
 exprt statement_list_typecheckt::typecheck_return_value_assignment(

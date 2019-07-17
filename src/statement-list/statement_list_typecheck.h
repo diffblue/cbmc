@@ -592,6 +592,15 @@ private:
     const code_typet::parametert &param,
     const symbolt &tia_element);
 
+  /// Checks if the given assigned expression is a variable or a constant and
+  /// returns the typechecked version.
+  /// \param tia_element: Symbol representation of the TIA element.
+  /// \param rhs: Expression that the function parameter got assigned to.
+  /// \return: Expression of either a symbol or a constant.
+  exprt typecheck_function_call_argument_rhs(
+    const symbolt &tia_element,
+    const exprt &rhs);
+
   /// Checks if there is a return value assignment inside of the assignment
   /// list of a function call and returns the expression of the assigned
   /// variable.

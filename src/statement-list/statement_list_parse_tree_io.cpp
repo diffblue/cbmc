@@ -15,6 +15,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 
+/// String to indicate that there is no value.
 #define NO_VALUE "(none)"
 
 /// Prints a constant to the given output stream.
@@ -33,6 +34,21 @@ static void output_constant(std::ostream &out, const constant_exprt &constant)
   }
   else
     out << constant.get_value();
+}
+
+/// Prints the assignment of a module parameter to the given output stream.
+/// \param [out] out: Stream that should receive the result.
+/// \param assignment: Assignment that shall be printed.
+static void
+output_parameter_assignment(std::ostream &out, const equal_exprt &assignment)
+{
+  out << assignment.lhs().get(ID_identifier) << " := ";
+  const constant_exprt *const constant =
+    expr_try_dynamic_cast<constant_exprt>(assignment.rhs());
+  if(constant)
+    output_constant(out, *constant);
+  else
+    out << assignment.rhs().get(ID_identifier);
 }
 
 void output_parse_tree(
@@ -214,9 +230,11 @@ void output_instruction(
     out << token.get_statement();
     for(const auto &expr : token.operands())
     {
-      if(expr.id() == ID_symbol)
+      const symbol_exprt *const symbol =
+        expr_try_dynamic_cast<symbol_exprt>(expr);
+      if(symbol)
       {
-        out << '\t' << expr.get(ID_identifier);
+        out << '\t' << symbol->get_identifier();
         continue;
       }
       const constant_exprt *const constant =
@@ -227,14 +245,14 @@ void output_instruction(
         output_constant(out, *constant);
         continue;
       }
-      const equal_exprt *const eq = expr_try_dynamic_cast<equal_exprt>(expr);
-      if(eq)
+      const equal_exprt *const equal = expr_try_dynamic_cast<equal_exprt>(expr);
+      if(equal)
       {
-        out << "\n\t" << eq->lhs().get(ID_identifier)
-            << " := " << eq->rhs().get(ID_identifier);
+        out << "\n\t";
+        output_parameter_assignment(out, *equal);
+        continue;
       }
-      else
-        out << '\t' << expr.id();
+      out << '\t' << expr.id();
     }
   }
 }
