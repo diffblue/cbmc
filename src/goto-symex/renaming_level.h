@@ -103,4 +103,16 @@ exprt get_original_name(exprt expr);
 /// Undo all levels of renaming
 typet get_original_name(typet type);
 
+/// Check that \p expr is correctly renamed to level 2 and return true in case
+/// an error is detected.
+bool check_renaming(const exprt &expr);
+
+/// Check that \p expr is correctly renamed to level 1 and return true in case
+/// an error is detected.
+bool check_renaming_l1(const exprt &expr);
+
+/// Check that \p type is correctly renamed to level 2 and return true in case
+/// an error is detected.
+bool check_renaming(const typet &type);
+
 #endif // CPROVER_GOTO_SYMEX_RENAMING_LEVEL_H

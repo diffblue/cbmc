@@ -205,3 +205,83 @@ typet get_original_name(typet type)
   }
   return type;
 }
+
+bool check_renaming(const typet &type)
+{
+  if(type.id() == ID_array)
+    return check_renaming(to_array_type(type).size());
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    for(const auto &c : to_struct_union_type(type).components())
+      if(check_renaming(c.type()))
+        return true;
+  }
+  else if(type.has_subtype())
+    return check_renaming(to_type_with_subtype(type).subtype());
+
+  return false;
+}
+
+bool check_renaming_l1(const exprt &expr)
+{
+  if(check_renaming(expr.type()))
+    return true;
+
+  if(expr.id() == ID_symbol)
+  {
+    const auto &type = expr.type();
+    if(!expr.get_bool(ID_C_SSA_symbol))
+      return type.id() != ID_code && type.id() != ID_mathematical_function;
+    if(!to_ssa_expr(expr).get_level_2().empty())
+      return true;
+    if(to_ssa_expr(expr).get_original_expr().type() != type)
+      return true;
+  }
+  else
+  {
+    forall_operands(it, expr)
+      if(check_renaming_l1(*it))
+        return true;
+  }
+
+  return false;
+}
+
+bool check_renaming(const exprt &expr)
+{
+  if(check_renaming(expr.type()))
+    return true;
+
+  if(
+    expr.id() == ID_address_of &&
+    to_address_of_expr(expr).object().id() == ID_symbol)
+  {
+    return check_renaming_l1(to_address_of_expr(expr).object());
+  }
+  else if(
+    expr.id() == ID_address_of &&
+    to_address_of_expr(expr).object().id() == ID_index)
+  {
+    const auto index_expr = to_index_expr(to_address_of_expr(expr).object());
+    return check_renaming_l1(index_expr.array()) ||
+           check_renaming(index_expr.index());
+  }
+  else if(expr.id() == ID_symbol)
+  {
+    const auto &type = expr.type();
+    if(!expr.get_bool(ID_C_SSA_symbol))
+      return type.id() != ID_code && type.id() != ID_mathematical_function;
+    if(to_ssa_expr(expr).get_level_2().empty())
+      return true;
+    if(to_ssa_expr(expr).get_original_expr().type() != type)
+      return true;
+  }
+  else
+  {
+    forall_operands(it, expr)
+      if(check_renaming(*it))
+        return true;
+  }
+
+  return false;
+}
