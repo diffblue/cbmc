@@ -24,13 +24,24 @@ Author: Diffblue Ltd.
 
 #include <string.h>
 
+static std::string escape_symbol_special_chars(std::string input)
+{
+  for(auto &c : input)
+  {
+    if(c == '$' || c == ':' || c == '.')
+      c = '_';
+  }
+  return input;
+}
+
 irep_idt lambda_synthetic_class_name(
   const irep_idt &method_identifier,
   std::size_t instruction_address)
 {
   return "java::lambda_synthetic_class$" +
-         id2string(strip_java_namespace_prefix(method_identifier)) + "$" +
-         std::to_string(instruction_address);
+         escape_symbol_special_chars(
+           id2string(strip_java_namespace_prefix(method_identifier))) +
+         "$" + std::to_string(instruction_address);
 }
 
 /// Retrieves the symbol of the lambda method associated with the given
