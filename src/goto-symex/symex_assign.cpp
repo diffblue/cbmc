@@ -362,16 +362,7 @@ void symex_assignt::assign_non_struct_symbol(
         ns)
       .get();
 
-  // Note the following two calls are specifically required for
-  // field-sensitivity. For example, with-expressions, which may have just been
-  // introduced by assign_struct_member, are transformed into member
-  // expressions on the LHS. If we add an option to disable field-sensitivity
-  // in the future these should be omitted.
-  assignmentt assignment = rewrite_with_to_field_symbols<use_update()>(
-    state,
-    shift_indexed_access_to_lhs<use_update()>(
-      state, {lhs, full_lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt),
-    ns);
+  assignmentt assignment{lhs, full_lhs, l2_rhs};
 
   if(symex_config.simplify_opt)
     assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
@@ -387,8 +378,15 @@ void symex_assignt::assign_non_struct_symbol(
                              .get();
 
   state.record_events.push(false);
-  const exprt l2_full_lhs =
-    state.rename(assignment.original_lhs_skeleton.apply(l2_lhs), ns).get();
+  // Note any other symbols mentioned in the skeleton are rvalues -- for example
+  // array indices -- and were renamed to L2 at the start of
+  // goto_symext::symex_assign.
+  const exprt l2_full_lhs = assignment.original_lhs_skeleton.apply(l2_lhs);
+  if(symex_config.run_validation_checks)
+  {
+    INVARIANT(
+      !check_renaming(l2_full_lhs), "l2_full_lhs should be renamed to L2");
+  }
   state.record_events.pop();
 
   auto current_assignment_type =
@@ -552,23 +550,14 @@ void symex_assignt::assign_if(
   exprt::operandst &guard)
 {
   // we have (c?a:b)=e;
-  exprt renamed_guard = state.rename(lhs.cond(), ns).get();
-  if(symex_config.simplify_opt)
-    renamed_guard = simplify_expr(std::move(renamed_guard), ns);
 
-  if(!renamed_guard.is_false())
-  {
-    guard.push_back(renamed_guard);
-    assign_rec(lhs.true_case(), full_lhs, rhs, guard);
-    guard.pop_back();
-  }
+  guard.push_back(lhs.cond());
+  assign_rec(lhs.true_case(), full_lhs, rhs, guard);
+  guard.pop_back();
 
-  if(!renamed_guard.is_true())
-  {
-    guard.push_back(not_exprt(renamed_guard));
-    assign_rec(lhs.false_case(), full_lhs, rhs, guard);
-    guard.pop_back();
-  }
+  guard.push_back(not_exprt(lhs.cond()));
+  assign_rec(lhs.false_case(), full_lhs, rhs, guard);
+  guard.pop_back();
 }
 
 void symex_assignt::assign_byte_extract(

@@ -41,6 +41,13 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
               << messaget::eom;
     });
 
+  // rvalues present within the lhs (for example, "some_array[this_rvalue]" or
+  // "byte_extract <type> from an_lvalue offset this_rvalue") can affect whether
+  // we use field-sensitive symbols or not, so L2-rename them up front:
+  lhs = state.l2_rename_rvalues(lhs, ns);
+  do_simplify(lhs);
+  lhs = state.field_sensitivity.apply(ns, state, std::move(lhs), true);
+
   if(rhs.id() == ID_side_effect)
   {
     const side_effect_exprt &side_effect_expr = to_side_effect_expr(rhs);
