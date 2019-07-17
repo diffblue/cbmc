@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "json.h"
 
-#include <ostream>
 #include <algorithm>
+#include <ostream>
 
 const jsont jsont::null_json_object(jsont::kindt::J_NULL);
 
