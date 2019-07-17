@@ -1,0 +1,40 @@
+﻿﻿FUNCTION "Called_Function" : Void
+VERSION : 0.1
+   VAR_INPUT 
+      Input : Bool;
+   END_VAR
+
+BEGIN
+NETWORK
+TITLE = 
+
+END_FUNCTION
+
+
+FUNCTION_BLOCK "Function_Call2"
+VERSION : 0.1
+   VAR_INPUT 
+      In1 : Bool;
+   END_VAR
+
+BEGIN
+NETWORK
+TITLE = 
+      CALL "__CPROVER_assert"
+      (  condition             := TRUE
+      );
+
+      CALL "__CPROVER_assume"
+      (  condition             := #In1
+      );
+
+      CALL "__CPROVER_assert"
+      (  condition             := #In1
+      );
+
+      CALL "Called_Function"
+      (  Input                 := #In1
+      );
+
+END_FUNCTION_BLOCK
+
