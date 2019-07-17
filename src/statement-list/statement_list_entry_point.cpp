@@ -30,6 +30,48 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Name of the CPROVER-specific hide label.
 #define CPROVER_HIDE CPROVER_PREFIX "HIDE"
 
+/// Searches for symbols with the given name (which is considered to be the
+/// name of the main symbol) and returns false if there is exactly one symbol
+/// with that name in the given symbol table. Prints an error message and
+/// returns true if there are multiple or no matches.
+/// \param symbol_table: Symbol table to search through.
+/// \param message_handler: Used for printing error messages.
+/// \param main_symbol_name: Name of the symbol to look for.
+/// \return False if there is exactly one match, true otherwise.
+static bool is_main_symbol_invalid(
+  const symbol_tablet &symbol_table,
+  message_handlert &message_handler,
+  const irep_idt &main_symbol_name)
+{
+  bool found = false;
+
+  for(const std::pair<const irep_idt, symbolt> &pair : symbol_table)
+  {
+    if(pair.first == main_symbol_name && pair.second.type.id() == ID_code)
+    {
+      if(found)
+      {
+        messaget message(message_handler);
+        message.error() << "main symbol `" << main_symbol_name
+                        << "' is ambiguous" << messaget::eom;
+        return true;
+      }
+      else
+        found = true;
+    }
+  }
+
+  if(found)
+    return false;
+  else
+  {
+    messaget message(message_handler);
+    message.error() << "main symbol `" << main_symbol_name << "' not found"
+                    << messaget::eom;
+    return true;
+  }
+}
+
 /// Creates a call to __CPROVER_initialize and adds it to the start function's
 /// body.
 /// \param [out] function_body: Body of the start function.
@@ -162,40 +204,23 @@ bool statement_list_entry_point(
 
   irep_idt main_symbol_name;
 
-  // Find main symbol, if any is given.
+  // Find main symbol given by the user.
   if(config.main.has_value())
   {
-    std::list<irep_idt> matches;
-
-    for(const std::pair<const irep_idt, symbolt> &pair : symbol_table)
-      if(pair.first == config.main.value() && pair.second.type.id() == ID_code)
-        matches.push_back(pair.first);
-
-    if(matches.empty())
-    {
-      messaget message(message_handler);
-      message.error() << "main symbol `" << config.main.value() << "' not found"
-                      << messaget::eom;
+    if(is_main_symbol_invalid(
+         symbol_table, message_handler, config.main.value()))
       return true;
-    }
-
-    if(matches.size() > 1)
-    {
-      messaget message(message_handler);
-      message.error() << "main symbol `" << config.main.value()
-                      << "' is ambiguous" << messaget::eom;
-      return true;
-    }
-
-    main_symbol_name = matches.front();
+    main_symbol_name = config.main.value();
   }
+  // Fallback: Search for block with TIA main standard name.
+  // TODO: Support the standard entry point of STL (organisation blocks).
+  // This also requires to expand the grammar and typecheck.
   else
   {
-    // TODO: Support the standard entry point of STL (organisation blocks).
-    // This also requires to expand the grammar and typecheck.
-    // For now, return false to let the typecheck itself pass (vital for
-    // --show-symbol-table). The missing entry symbol will be caught later.
-    return false;
+    if(is_main_symbol_invalid(
+         symbol_table, message_handler, ID_statement_list_main_function))
+      return true;
+    main_symbol_name = ID_statement_list_main_function;
   }
 
   const symbolt &main = symbol_table.lookup_ref(main_symbol_name);
