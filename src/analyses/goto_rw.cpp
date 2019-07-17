@@ -427,10 +427,9 @@ void rw_range_sett::get_objects_typecast(
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
-  if(object.id() == ID_string_constant ||
-     object.id() == ID_label ||
-     object.id() == ID_array ||
-     object.id() == ID_null_object)
+  if(
+    object.id() == ID_string_constant || object.id() == ID_label ||
+    object.id() == ID_array || object.id() == ID_null_object)
   {
     // constant, nothing to do
     return;

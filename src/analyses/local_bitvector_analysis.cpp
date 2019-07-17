@@ -78,7 +78,7 @@ void local_bitvector_analysist::assign_lhs(
     if(is_tracked(identifier))
     {
       unsigned dest_pointer=pointers.number(identifier);
-      flagst rhs_flags=get_rec(rhs, loc_info_src);
+      flagst rhs_flags = get_rec(rhs, loc_info_src);
       loc_info_dest[dest_pointer]=rhs_flags;
     }
   }
@@ -87,7 +87,8 @@ void local_bitvector_analysist::assign_lhs(
   }
   else if(lhs.id()==ID_index)
   {
-    assign_lhs(to_index_expr(lhs).array(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_index_expr(lhs).array(), rhs, loc_info_src, loc_info_dest);
   }
   else if(lhs.id()==ID_member)
   {
@@ -96,12 +97,15 @@ void local_bitvector_analysist::assign_lhs(
   }
   else if(lhs.id()==ID_typecast)
   {
-    assign_lhs(to_typecast_expr(lhs).op(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_typecast_expr(lhs).op(), rhs, loc_info_src, loc_info_dest);
   }
   else if(lhs.id()==ID_if)
   {
-    assign_lhs(to_if_expr(lhs).true_case(), rhs, loc_info_src, loc_info_dest);
-    assign_lhs(to_if_expr(lhs).false_case(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_if_expr(lhs).true_case(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_if_expr(lhs).false_case(), rhs, loc_info_src, loc_info_dest);
   }
 }
 
@@ -179,21 +183,18 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     if(rhs.operands().size()>=3)
     {
       assert(rhs.op0().type().id()==ID_pointer);
-      return get_rec(rhs.op0(), loc_info_src) |
-             flagst::mk_uses_offset();
+      return get_rec(rhs.op0(), loc_info_src) | flagst::mk_uses_offset();
     }
     else if(rhs.operands().size()==2)
     {
       // one must be pointer, one an integer
       if(rhs.op0().type().id()==ID_pointer)
       {
-        return get_rec(rhs.op0(), loc_info_src) |
-               flagst::mk_uses_offset();
+        return get_rec(rhs.op0(), loc_info_src) | flagst::mk_uses_offset();
       }
       else if(rhs.op1().type().id()==ID_pointer)
       {
-        return get_rec(rhs.op1(), loc_info_src) |
-               flagst::mk_uses_offset();
+        return get_rec(rhs.op1(), loc_info_src) | flagst::mk_uses_offset();
       }
       else
         return flagst::mk_unknown();
@@ -205,8 +206,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   {
     if(rhs.op0().type().id()==ID_pointer)
     {
-      return get_rec(rhs.op0(), loc_info_src) |
-             flagst::mk_uses_offset();
+      return get_rec(rhs.op0(), loc_info_src) | flagst::mk_uses_offset();
     }
     else
       return flagst::mk_unknown();
@@ -304,7 +304,10 @@ void local_bitvector_analysist::build()
         to_code_function_call(instruction.code);
       if(code_function_call.lhs().is_not_nil())
         assign_lhs(
-          code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
+          code_function_call.lhs(),
+          nil_exprt(),
+          loc_info_src,
+          loc_info_dest);
       break;
     }
 

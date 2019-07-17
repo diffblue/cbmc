@@ -331,10 +331,10 @@ void rd_range_domaint::transform_assign(
 
     const range_domaint &ranges=rw_set.get_ranges(it);
 
-    if(is_must_alias &&
-       (!rd.get_is_threaded()(from) ||
-        (!symbol_ptr->is_shared() &&
-         !rd.get_is_dirty()(identifier))))
+    if(
+      is_must_alias && (!rd.get_is_threaded()(from) ||
+                        (!symbol_ptr->is_shared() &&
+                         !rd.get_is_dirty()(identifier))))
       for(const auto &range : ranges)
         kill(identifier, range.first, range.second);
 

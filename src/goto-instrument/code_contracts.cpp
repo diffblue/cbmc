@@ -168,10 +168,8 @@ void code_contractst::apply_contract(
   const symbolt &f_sym=ns.lookup(function);
   const code_typet &type=to_code_type(f_sym.type);
 
-  exprt requires=
-    static_cast<const exprt&>(type.find(ID_C_spec_requires));
-  exprt ensures=
-    static_cast<const exprt&>(type.find(ID_C_spec_ensures));
+  exprt requires = static_cast<const exprt &>(type.find(ID_C_spec_requires));
+  exprt ensures = static_cast<const exprt &>(type.find(ID_C_spec_ensures));
 
   // is there a contract?
   if(ensures.is_nil())
@@ -304,14 +302,11 @@ void code_contractst::add_contract_check(
   replace_symbolt replace;
 
   // decl ret
-  if(gf.type.return_type()!=empty_typet())
+  if(gf.type.return_type() != empty_typet())
   {
-    symbol_exprt r = new_tmp_symbol(
-                       gf.type.return_type(),
-                       skip->source_location,
-                       function,
-                       function_symbol.mode)
-                       .symbol_expr();
+    symbol_exprt r =
+      new_tmp_symbol(gf.type.return_type(), skip->source_location, function, function_symbol.mode)
+        .symbol_expr();
     check.add(goto_programt::make_decl(r, skip->source_location));
 
     call.lhs()=r;
@@ -326,12 +321,9 @@ void code_contractst::add_contract_check(
     PRECONDITION(!parameter.empty());
     const symbolt &parameter_symbol = ns.lookup(parameter);
 
-    symbol_exprt p = new_tmp_symbol(
-                       parameter_symbol.type,
-                       skip->source_location,
-                       function,
-                       parameter_symbol.mode)
-                       .symbol_expr();
+    symbol_exprt p =
+      new_tmp_symbol(parameter_symbol.type, skip->source_location, function, parameter_symbol.mode)
+        .symbol_expr();
     check.add(goto_programt::make_decl(p, skip->source_location));
 
     call.arguments().push_back(p);
