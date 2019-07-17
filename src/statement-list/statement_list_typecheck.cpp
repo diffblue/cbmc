@@ -118,7 +118,7 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   function_block_sym.name = function_block.name;
   function_block_sym.base_name = function_block_sym.name;
   function_block_sym.pretty_name = function_block_sym.name;
-  function_block_sym.mode = STATEMENT_LIST_MODE;
+  function_block_sym.mode = ID_statement_list;
 
   // When calling function blocks, the passed parameters are value-copied to a
   // corresponding instance data block. This block contains all input, inout,
@@ -134,7 +134,7 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   data_block.name =
     id2string(function_block_sym.name) + DATA_BLOCK_TYPE_POSTFIX;
   data_block.base_name = data_block.name;
-  data_block.mode = STATEMENT_LIST_MODE;
+  data_block.mode = ID_statement_list;
   symbol_table.add(data_block);
 
   // Create and add parameter symbol.
@@ -146,7 +146,7 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   param_sym.name = param.get_identifier();
   param_sym.base_name = DATA_BLOCK_PARAMETER_NAME;
   param_sym.pretty_name = param_sym.base_name;
-  param_sym.mode = STATEMENT_LIST_MODE;
+  param_sym.mode = ID_statement_list;
   symbol_table.add(param_sym);
 
   // Setup FB symbol type and value and add it to the symbol table.
@@ -168,7 +168,7 @@ void statement_list_typecheckt::typecheck_function_declaration(
   function_sym.name = function.name;
   function_sym.base_name = function_sym.name;
   function_sym.pretty_name = function_sym.name;
-  function_sym.mode = STATEMENT_LIST_MODE;
+  function_sym.mode = ID_statement_list;
   code_typet::parameterst params;
   typecheck_function_var_decls(function.var_input, params, function.name);
   typecheck_function_var_decls(function.var_inout, params, function.name);
@@ -195,7 +195,7 @@ void statement_list_typecheckt::typecheck_tag_list()
     tag_sym.base_name = tag_sym.name;
     tag_sym.pretty_name = tag_sym.name;
     tag_sym.type = tag.type();
-    tag_sym.mode = STATEMENT_LIST_MODE;
+    tag_sym.mode = ID_statement_list;
     symbol_table.add(tag_sym);
   }
 }
@@ -241,7 +241,7 @@ void statement_list_typecheckt::typecheck_function_var_decls(
                      "::" + id2string(declaration.variable.get_identifier());
     param_sym.base_name = declaration.variable.get_identifier();
     param_sym.pretty_name = param_sym.base_name;
-    param_sym.mode = STATEMENT_LIST_MODE;
+    param_sym.mode = ID_statement_list;
     symbol_table.add(param_sym);
 
     code_typet::parametert param{declaration.variable.type()};
@@ -264,7 +264,7 @@ void statement_list_typecheckt::typecheck_temp_var_decls(
     temp_sym.base_name = declaration.variable.get_identifier();
     temp_sym.pretty_name = temp_sym.base_name;
     temp_sym.type = declaration.variable.type();
-    temp_sym.mode = STATEMENT_LIST_MODE;
+    temp_sym.mode = ID_statement_list;
     temp_sym.module = module;
     symbol_table.add(temp_sym);
 

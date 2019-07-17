@@ -44,7 +44,9 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
       !symbol_pair.second.is_type && !symbol_pair.second.is_macro &&
       symbol_pair.second.type.id() == ID_code &&
       (symbol_pair.second.mode == ID_C || symbol_pair.second.mode == ID_cpp ||
-       symbol_pair.second.mode == ID_java || symbol_pair.second.mode == "jsil"))
+       symbol_pair.second.mode == ID_java ||
+       symbol_pair.second.mode == "jsil" ||
+       symbol_pair.second.mode == ID_statement_list))
     {
       symbol_list.push_back(symbol_pair.first);
     }
