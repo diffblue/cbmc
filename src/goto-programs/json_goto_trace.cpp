@@ -14,8 +14,10 @@ Author: Daniel Kroening
 #include "json_goto_trace.h"
 
 #include <langapi/language_util.h>
+
 #include <util/arith_tools.h>
 #include <util/config.h>
+#include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
 
@@ -154,6 +156,19 @@ void convert_decl(
     step.assignment_type == goto_trace_stept::assignment_typet::ACTUAL_PARAMETER
       ? "actual-parameter"
       : "variable");
+
+  if(trace_options.json_full_lhs)
+  {
+    std::ostringstream oss;
+    oss << format(step.ssa_lhs);
+    json_assignment["ssaLhs"] = json_stringt(oss.str());
+  }
+  if(trace_options.json_full_lhs && step.ssa_rhs.is_not_nil())
+  {
+    std::ostringstream oss;
+    oss << format(step.ssa_rhs);
+    json_assignment["ssaRhs"] = json_stringt(oss.str());
+  }
 }
 
 /// Convert an OUTPUT goto_trace step.

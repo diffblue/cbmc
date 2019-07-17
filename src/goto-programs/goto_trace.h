@@ -118,6 +118,9 @@ public:
   bool cond_value;
   exprt cond_expr;
 
+  // for assignments and declarations (ssa_lhs only)
+  exprt ssa_lhs, ssa_rhs;
+
   // for assert
   irep_idt property_id;
   std::string comment;
@@ -161,6 +164,8 @@ public:
     full_lhs.make_nil();
     full_lhs_value.make_nil();
     cond_expr.make_nil();
+    ssa_lhs.make_nil();
+    ssa_rhs.make_nil();
   }
 };
 
