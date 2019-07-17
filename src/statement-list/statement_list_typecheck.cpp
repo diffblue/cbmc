@@ -378,6 +378,10 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_or(op_code, tia_element);
   else if(ID_statement_list_or_not == statement)
     typecheck_statement_list_or_not(op_code, tia_element);
+  else if(ID_statement_list_xor == statement)
+    typecheck_statement_list_xor(op_code, tia_element);
+  else if(ID_statement_list_xor_not == statement)
+    typecheck_statement_list_xor_not(op_code, tia_element);
   else if(ID_statement_list_and_nested == statement)
     typecheck_statement_list_nested_and(op_code);
   else if(ID_statement_list_and_not_nested == statement)
@@ -386,6 +390,10 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_nested_or(op_code);
   else if(ID_statement_list_or_not_nested == statement)
     typecheck_statement_list_nested_or_not(op_code);
+  else if(ID_statement_list_xor_nested == statement)
+    typecheck_statement_list_nested_xor(op_code);
+  else if(ID_statement_list_xor_not_nested == statement)
+    typecheck_statement_list_nested_xor_not(op_code);
   else if(ID_statement_list_nesting_closed == statement)
     typecheck_statement_list_nesting_closed(op_code);
   else if(ID_statement_list_assign == statement)
@@ -732,9 +740,8 @@ void statement_list_typecheckt::typecheck_statement_list_and(
   const codet &op_code,
   const symbolt &tia_element)
 {
-  const symbol_exprt &sym{
-    typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  exprt op{
+    typecheck_simple_boolean_instruction_operand(op_code, tia_element, false)};
 
   // If inside of a bit string and if the OR bit is not set, create an 'and'
   // expression with the operand and the current contents of the rlo bit. If
@@ -755,24 +762,22 @@ void statement_list_typecheckt::typecheck_statement_list_and_not(
   const codet &op_code,
   const symbolt &tia_element)
 {
-  const symbol_exprt &sym{
-    typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
-  const not_exprt not_op{op};
+  exprt op{
+    typecheck_simple_boolean_instruction_operand(op_code, tia_element, true)};
 
   // If inside of a bit string and if the OR bit is not set, create an 'and'
   // expression with the operand and the current contents of the rlo bit. If
   // the OR bit is set then this instruction is part of an 'and-before-or'
   // block and needs to be added to the rlo in a special way.
   if(or_bit && fc_bit)
-    add_to_or_rlo_wrapper(not_op);
+    add_to_or_rlo_wrapper(op);
   else if(fc_bit)
   {
-    const and_exprt unsimplified{rlo_bit, not_op};
+    const and_exprt unsimplified{rlo_bit, op};
     rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
   }
   else
-    initialize_bit_expression(not_op);
+    initialize_bit_expression(op);
 }
 
 void statement_list_typecheckt::typecheck_statement_list_or(
@@ -821,6 +826,47 @@ void statement_list_typecheckt::typecheck_statement_list_or_not(
     initialize_bit_expression(not_op);
 }
 
+void statement_list_typecheckt::typecheck_statement_list_xor(
+  const codet &op_code,
+  const symbolt &tia_element)
+{
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+
+  // If inside of a bit string, create an 'xor' expression with the operand and
+  // the current contents of the rlo bit.
+  if(fc_bit)
+  {
+    const xor_exprt unsimplified{rlo_bit, op};
+    rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
+    or_bit = false;
+  }
+  else
+    initialize_bit_expression(op);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_xor_not(
+  const codet &op_code,
+  const symbolt &tia_element)
+{
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const not_exprt not_op{op};
+
+  // If inside of a bit string, create an 'xor not' expression with the
+  // operand and the current contents of the rlo bit.
+  if(fc_bit)
+  {
+    const xor_exprt unsimplified{rlo_bit, not_op};
+    rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
+    or_bit = false;
+  }
+  else
+    initialize_bit_expression(not_op);
+}
+
 void statement_list_typecheckt::typecheck_statement_list_and_before_or()
 {
   if(fc_bit)
@@ -835,61 +881,49 @@ void statement_list_typecheckt::typecheck_statement_list_and_before_or()
 void statement_list_typecheckt::typecheck_statement_list_nested_and(
   const codet &op_code)
 {
-  typecheck_instruction_without_operand(op_code);
-  // If inside of a bit string use the value of the rlo. If this is the first
-  // expression of a bit string, load the value of the nested operation by
-  // implicitly setting the rlo to true.
-  if(!fc_bit)
-    rlo_bit = true_exprt{};
-  const nesting_stack_entryt stack_entry{rlo_bit, or_bit, op_code};
-  nesting_stack.push_back(stack_entry);
-  fc_bit = false;
-  or_bit = false;
+  // Set the rlo to true implicitly so that the value of the AND instruction
+  // is being loaded in case of a new bit string.
+  typecheck_nested_boolean_instruction(op_code, true_exprt{});
 }
 
 void statement_list_typecheckt::typecheck_statement_list_nested_and_not(
   const codet &op_code)
 {
-  typecheck_instruction_without_operand(op_code);
-  // If inside of a bit string use the value of the rlo. If this is the first
-  // expression of a bit string, load the value of the nested operation by
-  // implicitly setting the rlo to true.
-  if(!fc_bit)
-    rlo_bit = true_exprt{};
-  const nesting_stack_entryt stack_entry{rlo_bit, or_bit, op_code};
-  nesting_stack.push_back(stack_entry);
-  fc_bit = false;
-  or_bit = false;
+  // Set the rlo to true implicitly so that the value of the AND instruction
+  // is being loaded in case of a new bit string.
+  typecheck_nested_boolean_instruction(op_code, true_exprt{});
 }
 
 void statement_list_typecheckt::typecheck_statement_list_nested_or(
   const codet &op_code)
 {
-  typecheck_instruction_without_operand(op_code);
-  // If inside of a bit string use the value of the rlo. If this is the first
-  // expression of a bit string, load the value of the nested operation by
-  // implicitly setting the rlo to false.
-  if(!fc_bit)
-    rlo_bit = false_exprt{};
-  const nesting_stack_entryt stack_entry{rlo_bit, or_bit, op_code};
-  nesting_stack.push_back(stack_entry);
-  fc_bit = false;
-  or_bit = false;
+  // Set the rlo to false implicitly so that the value of the OR instruction
+  // is being loaded in case of a new bit string.
+  typecheck_nested_boolean_instruction(op_code, false_exprt{});
 }
 
 void statement_list_typecheckt::typecheck_statement_list_nested_or_not(
   const codet &op_code)
 {
-  typecheck_instruction_without_operand(op_code);
-  // If inside of a bit string use the value of the rlo. If this is the first
-  // expression of a bit string, load the value of the nested operation by
-  // implicitly setting the rlo to false.
-  if(!fc_bit)
-    rlo_bit = false_exprt{};
-  const nesting_stack_entryt stack_entry{rlo_bit, or_bit, op_code};
-  nesting_stack.push_back(stack_entry);
-  fc_bit = false;
-  or_bit = false;
+  // Set the rlo to false implicitly so that the value of the OR instruction
+  // is being loaded in case of a new bit string.
+  typecheck_nested_boolean_instruction(op_code, false_exprt{});
+}
+
+void statement_list_typecheckt::typecheck_statement_list_nested_xor(
+  const codet &op_code)
+{
+  // Set the rlo to false implicitly so that the value of the XOR instruction
+  // is being loaded in case of a new bit string.
+  typecheck_nested_boolean_instruction(op_code, false_exprt{});
+}
+
+void statement_list_typecheckt::typecheck_statement_list_nested_xor_not(
+  const codet &op_code)
+{
+  // Set the rlo to false implicitly so that the value of the XOR instruction
+  // is being loaded in case of a new bit string.
+  typecheck_nested_boolean_instruction(op_code, false_exprt{});
 }
 
 void statement_list_typecheckt::typecheck_statement_list_nesting_closed(
@@ -938,6 +972,17 @@ void statement_list_typecheckt::typecheck_statement_list_nesting_closed(
     or_bit = false;
     rlo_bit = or_exprt{nesting_stack.back().rlo_bit, not_exprt{rlo_bit}};
   }
+  else if(ID_statement_list_xor_nested == statement)
+  {
+    or_bit = false;
+    rlo_bit = xor_exprt{nesting_stack.back().rlo_bit, rlo_bit};
+  }
+  else if(ID_statement_list_xor_not_nested == statement)
+  {
+    or_bit = false;
+    rlo_bit = xor_exprt{nesting_stack.back().rlo_bit, not_exprt{rlo_bit}};
+  }
+  nesting_stack.pop_back();
 }
 
 void statement_list_typecheckt::typecheck_statement_list_assign(
@@ -1127,6 +1172,34 @@ void statement_list_typecheckt::typecheck_binary_accumulator_instruction(
     error() << "Not enough operands in the accumulator" << eom;
     throw TYPECHECK_ERROR;
   }
+}
+
+void statement_list_typecheckt::typecheck_nested_boolean_instruction(
+  const codet &op_code,
+  const exprt &rlo_value)
+{
+  typecheck_instruction_without_operand(op_code);
+  // If inside of a bit string use the value of the rlo. If this is the first
+  // expression of a bit string, load the value of the nested operation by
+  // implicitly setting the rlo to the specified value.
+  if(!fc_bit)
+    rlo_bit = rlo_value;
+  const nesting_stack_entryt stack_entry{rlo_bit, or_bit, op_code};
+  nesting_stack.push_back(stack_entry);
+  fc_bit = false;
+  or_bit = false;
+}
+
+exprt statement_list_typecheckt::typecheck_simple_boolean_instruction_operand(
+  const codet &op_code,
+  const symbolt &tia_element,
+  bool negate)
+{
+  const symbol_exprt &sym{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const not_exprt not_op{op};
+  return negate ? not_op : op;
 }
 
 exprt statement_list_typecheckt::typecheck_identifier(
