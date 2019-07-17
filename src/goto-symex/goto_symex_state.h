@@ -107,6 +107,8 @@ public:
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
+  exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
+
   /// \return lhs renamed to level 2
   renamedt<ssa_exprt, L2> assignment(
     ssa_exprt lhs,    // L0/L1
