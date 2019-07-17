@@ -133,3 +133,110 @@ SCENARIO("Loading JSON files")
     }
   }
 }
+
+TEST_CASE("json equality", "[core][util][json]")
+{
+  SECTION("null")
+  {
+    REQUIRE(jsont::null_json_object == jsont::null_json_object);
+  }
+
+  SECTION("boolean")
+  {
+    REQUIRE(jsont::json_boolean(false) == jsont::json_boolean(false));
+    REQUIRE(jsont::json_boolean(true) == jsont::json_boolean(true));
+    REQUIRE_FALSE(jsont::json_boolean(true) == jsont::json_boolean(false));
+    REQUIRE_FALSE(jsont::json_boolean(false) == jsont::null_json_object);
+  }
+
+  SECTION("number")
+  {
+    REQUIRE(json_numbert("0") == json_numbert("0"));
+    REQUIRE(json_numbert("1") == json_numbert("1"));
+    REQUIRE(json_numbert("-1") == json_numbert("-1"));
+    REQUIRE(json_numbert("1.578") == json_numbert("1.578"));
+    REQUIRE_FALSE(json_numbert("0") == json_numbert("1"));
+    REQUIRE_FALSE(json_numbert("1") == json_numbert("-1"));
+    REQUIRE_FALSE(json_numbert("-1") == json_numbert("1"));
+    REQUIRE_FALSE(json_numbert("1.578") == json_numbert("1.5789"));
+    REQUIRE_FALSE(json_numbert("0") == jsont::json_boolean(false));
+    REQUIRE_FALSE(jsont::json_boolean(false) == json_numbert("0"));
+    REQUIRE_FALSE(json_numbert("0") == jsont::null_json_object);
+    REQUIRE_FALSE(jsont::null_json_object == json_numbert("0"));
+  }
+
+  SECTION("string")
+  {
+    REQUIRE(json_stringt("") == json_stringt(""));
+    REQUIRE(json_stringt("foo") == json_stringt("foo"));
+    REQUIRE(json_stringt("bar") == json_stringt("bar"));
+    REQUIRE_FALSE(json_stringt("foo") == json_stringt("bar"));
+    REQUIRE_FALSE(json_stringt("bar") == json_stringt("baz"));
+    REQUIRE_FALSE(json_stringt("foo") == json_stringt("food"));
+    REQUIRE_FALSE(json_stringt("1") == json_numbert("1"));
+    REQUIRE_FALSE(json_stringt("true") == jsont::json_boolean("true"));
+    REQUIRE_FALSE(json_stringt("") == jsont::json_boolean("false"));
+    REQUIRE_FALSE(json_stringt("") == jsont::null_json_object);
+  }
+
+  SECTION("array")
+  {
+    REQUIRE(json_arrayt{} == json_arrayt{});
+    REQUIRE(
+      json_arrayt{jsont::null_json_object} ==
+      json_arrayt{jsont::null_json_object});
+    REQUIRE(
+      json_arrayt{json_numbert{"9"}, json_numbert{"6"}} ==
+      json_arrayt{json_numbert{"9"}, json_numbert{"6"}});
+    REQUIRE(
+      json_arrayt{
+        json_stringt{"foo"}, json_stringt{"bar"}, json_stringt{"baz"}} ==
+      json_arrayt{
+        json_stringt{"foo"}, json_stringt{"bar"}, json_stringt{"baz"}});
+
+    // different lengths
+    REQUIRE_FALSE(
+      json_arrayt{json_stringt{"foo"}, json_stringt{"bar"}} ==
+      json_arrayt{
+        json_stringt{"foo"}, json_stringt{"bar"}, json_stringt{"baz"}});
+    // different elements
+    REQUIRE_FALSE(
+      json_arrayt{
+        json_stringt{"foo"}, json_stringt{"bar"}, json_stringt{"foo"}} ==
+      json_arrayt{
+        json_stringt{"foo"}, json_stringt{"bar"}, json_stringt{"baz"}});
+    // different kind
+    REQUIRE_FALSE(json_arrayt{} == jsont::json_boolean(false));
+    REQUIRE_FALSE(json_arrayt{} == jsont::null_json_object);
+  }
+
+  SECTION("object")
+  {
+    REQUIRE(json_objectt{} == json_objectt{});
+    REQUIRE(
+      json_objectt{{"key", json_stringt{"value"}}} ==
+      json_objectt{{"key", json_stringt{"value"}}});
+    REQUIRE(
+      json_objectt{{"key1", json_stringt{"value1"}},
+                   {"key2", json_stringt{"value2"}}} ==
+      json_objectt{{"key1", json_stringt{"value1"}},
+                   {"key2", json_stringt{"value2"}}});
+
+    // Extra property
+    REQUIRE_FALSE(
+      json_objectt{{"key1", json_stringt{"value1"}},
+                   {"key2", json_stringt{"value2"}},
+                   {"key3", json_stringt{"value3"}}} ==
+      json_objectt{{"key1", json_stringt{"value1"}},
+                   {"key2", json_stringt{"value2"}}});
+    // different field values
+    REQUIRE_FALSE(
+      json_objectt{{"key1", json_stringt{"foo"}},
+                   {"key2", json_stringt{"bar"}}} ==
+      json_objectt{{"key1", json_stringt{"foo"}},
+                   {"key2", json_stringt{"baz"}}});
+    // different kind
+    REQUIRE_FALSE(json_objectt{} == json_arrayt{});
+    REQUIRE_FALSE(json_objectt{} == jsont::null_json_object);
+  }
+}

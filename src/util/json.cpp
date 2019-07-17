@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "json.h"
 
 #include <ostream>
+#include <algorithm>
 
 const jsont jsont::null_json_object(jsont::kindt::J_NULL);
 
@@ -161,4 +162,45 @@ void jsont::swap(jsont &other)
   other.array.swap(array);
   other.object.swap(object);
   other.value.swap(value);
+}
+
+bool operator==(const jsont &left, const jsont &right)
+{
+  if(left.kind != right.kind)
+    return false;
+  switch(left.kind)
+  {
+  case jsont::kindt::J_NULL:
+    return true;
+  case jsont::kindt::J_TRUE:
+    return true;
+  case jsont::kindt::J_FALSE:
+    return true;
+  case jsont::kindt::J_NUMBER:
+    return left.value == right.value;
+  case jsont::kindt::J_STRING:
+    return left.value == right.value;
+  case jsont::kindt::J_ARRAY:
+  {
+    const auto &left_array = static_cast<const json_arrayt &>(left);
+    const auto &right_array = static_cast<const json_arrayt &>(right);
+    return left_array.size() == right_array.size() &&
+           std::equal(
+             left_array.begin(), left_array.end(), right_array.begin());
+  }
+  case jsont::kindt::J_OBJECT:
+  {
+    const auto &left_object = static_cast<const json_objectt &>(left);
+    const auto &right_object = static_cast<const json_objectt &>(right);
+    if(left_object.size() != left_object.size())
+      return false;
+    return std::all_of(
+      left_object.begin(),
+      left_object.end(),
+      [&](const std::pair<std::string, jsont> &pair) {
+        return right_object[pair.first] == pair.second;
+      });
+  }
+  }
+  UNREACHABLE;
 }

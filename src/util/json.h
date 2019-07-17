@@ -361,6 +361,11 @@ public:
     return object.find(key);
   }
 
+  std::size_t size() const
+  {
+    return object.size();
+  }
+
   iterator begin()
   {
     return object.begin();
@@ -457,5 +462,7 @@ inline const json_stringt &to_json_string(const jsont &json)
   PRECONDITION(json.kind == jsont::kindt::J_STRING);
   return static_cast<const json_stringt &>(json);
 }
+
+bool operator==(const jsont &left, const jsont &right);
 
 #endif // CPROVER_UTIL_JSON_H
