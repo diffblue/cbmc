@@ -33,6 +33,8 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #define CPROVER_ASSERT "\"" CPROVER_PREFIX "assert\""
 /// Name of the CBMC assume function.
 #define CPROVER_ASSUME "\"" CPROVER_PREFIX "assume\""
+/// Name of the RLO symbol used in some operations.
+#define CPROVER_TEMP_RLO CPROVER_PREFIX "temp_rlo"
 
 /// Creates the artificial data block parameter with a generic name and the
 /// specified type.
@@ -94,6 +96,8 @@ void statement_list_typecheckt::typecheck()
       parse_tree.function_blocks)
     typecheck_function_block_declaration(fb);
   typecheck_tag_list();
+  // Temporary RLO symbol for certain operations.
+  add_temp_rlo();
 
   // Iterate through all networks to generate the function bodies.
   for(const statement_list_parse_treet::function_blockt &fb :
@@ -195,6 +199,19 @@ void statement_list_typecheckt::typecheck_tag_list()
     tag_sym.mode = ID_statement_list;
     symbol_table.add(tag_sym);
   }
+}
+
+void statement_list_typecheckt::add_temp_rlo()
+{
+  symbolt temp_rlo;
+  temp_rlo.is_static_lifetime = true;
+  temp_rlo.module = module;
+  temp_rlo.name = CPROVER_TEMP_RLO;
+  temp_rlo.base_name = temp_rlo.name;
+  temp_rlo.pretty_name = temp_rlo.name;
+  temp_rlo.type = get_bool_type();
+  temp_rlo.mode = ID_statement_list;
+  symbol_table.add(temp_rlo);
 }
 
 struct_typet statement_list_typecheckt::create_instance_data_block_type(
@@ -1001,6 +1018,9 @@ void statement_list_typecheckt::typecheck_statement_list_assign(
   tia_element.value.add_to_operands(assignment);
   fc_bit = false;
   or_bit = false;
+  // Set RLO to assigned operand in order to prevent false results if a symbol
+  // that's implicitly part of the RLO was changed by the assignment.
+  rlo_bit = lhs;
 }
 
 void statement_list_typecheckt::typecheck_statement_list_set_rlo(
@@ -1027,6 +1047,9 @@ void statement_list_typecheckt::typecheck_statement_list_set(
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
   const irep_idt &identifier{op.get_identifier()};
+
+  save_rlo_state(tia_element);
+
   const exprt lhs{typecheck_identifier(tia_element, identifier)};
   const code_assignt assignment{lhs, true_exprt()};
   const code_ifthenelset ifthen{rlo_bit, assignment};
@@ -1041,6 +1064,9 @@ void statement_list_typecheckt::typecheck_statement_list_reset(
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
   const irep_idt &identifier{op.get_identifier()};
+
+  save_rlo_state(tia_element);
+
   const exprt lhs{typecheck_identifier(tia_element, identifier)};
   const code_assignt assignment{lhs, false_exprt()};
   const code_ifthenelset ifthen{rlo_bit, assignment};
@@ -1479,4 +1505,13 @@ void statement_list_typecheckt::initialize_bit_expression(const exprt &op)
   fc_bit = true;
   or_bit = false;
   rlo_bit = op;
+}
+
+void statement_list_typecheckt::save_rlo_state(symbolt &tia_element)
+{
+  symbol_exprt temp_rlo{
+    symbol_table.lookup_ref(CPROVER_TEMP_RLO).symbol_expr()};
+  const code_assignt rlo_assignment{temp_rlo, rlo_bit};
+  tia_element.value.add_to_operands(rlo_assignment);
+  rlo_bit = std::move(temp_rlo);
 }

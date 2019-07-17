@@ -129,6 +129,10 @@ private:
   /// adds symbols for its contents to the symbol table.
   void typecheck_tag_list();
 
+  /// Adds a symbol for the RLO to the symbol table. This symbol is used by
+  /// other operations to save intermediate results of the rlo expression.
+  void add_temp_rlo();
+
   /// Creates a data block type for the given function block.
   /// \param function_block: Function block with an interface that should be
   /// converted to a data block.
@@ -624,6 +628,11 @@ private:
   /// instruction was encontered.
   /// \param op: Operand of the encountered instruction.
   void initialize_bit_expression(const exprt &op);
+
+  /// Saves the current RLO bit to a temporary variable to prevent false
+  /// overrides when modifying boolean variables.
+  /// \param tia_element: Symbol representation of the TIA element.
+  void save_rlo_state(symbolt &tia_element);
 };
 
 #endif // CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
