@@ -128,6 +128,7 @@ void symex_target_equationt::assignment(
 void symex_target_equationt::decl(
   const exprt &guard,
   const ssa_exprt &ssa_lhs,
+  const exprt &initializer,
   const sourcet &source,
   assignment_typet assignment_type)
 {
@@ -138,7 +139,7 @@ void symex_target_equationt::decl(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
-  SSA_step.ssa_full_lhs=ssa_lhs;
+  SSA_step.ssa_full_lhs = initializer;
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
   SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
 
