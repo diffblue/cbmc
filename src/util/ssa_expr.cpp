@@ -160,8 +160,10 @@ const ssa_exprt ssa_exprt::get_l1_object() const
   object_descriptor_exprt ode(get_original_expr());
 
   ssa_exprt root(ode.root_object());
-  root.set(ID_L0, get(ID_L0));
-  root.set(ID_L1, get(ID_L1));
+  if(!get_level_0().empty())
+    root.set(ID_L0, get(ID_L0));
+  if(!get_level_1().empty())
+    root.set(ID_L1, get(ID_L1));
   ::update_identifier(root);
 
   return root;

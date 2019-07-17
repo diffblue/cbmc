@@ -211,4 +211,20 @@ TEST_CASE("ssa_exprt::get_l1_object", "[unit][util][ssa_expr]")
       }
     }
   }
+
+  GIVEN("An ssa_exprt with its L2 index set")
+  {
+    const symbol_exprt symbol{"sym", int_type};
+    ssa_exprt ssa{symbol};
+    ssa.set_level_2(7);
+
+    WHEN("Its L1 object is taken")
+    {
+      const ssa_exprt l1_object = ssa.get_l1_object();
+      THEN("It should compare equal to the base symbol")
+      {
+        REQUIRE(l1_object == ssa_exprt{symbol});
+      }
+    }
+  }
 }
