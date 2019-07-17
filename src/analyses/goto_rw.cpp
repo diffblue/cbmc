@@ -138,8 +138,6 @@ void rw_range_sett::get_objects_dereference(
 {
   const exprt &pointer=deref.pointer();
   get_objects_rec(get_modet::READ, pointer);
-  if(mode!=get_modet::READ)
-    get_objects_rec(mode, pointer);
 }
 
 void rw_range_sett::get_objects_byte_extract(
@@ -429,14 +427,11 @@ void rw_range_sett::get_objects_address_of(const exprt &object)
 {
   if(
     object.id() == ID_string_constant || object.id() == ID_label ||
-    object.id() == ID_array || object.id() == ID_null_object)
+    object.id() == ID_array || object.id() == ID_null_object ||
+    object.id() == ID_symbol)
   {
     // constant, nothing to do
     return;
-  }
-  else if(object.id()==ID_symbol)
-  {
-    get_objects_rec(get_modet::READ, object);
   }
   else if(object.id()==ID_dereference)
   {
@@ -545,6 +540,11 @@ void rw_range_sett::get_objects_rec(
     get_objects_array(mode, to_array_expr(expr), range_start, size);
   else if(expr.id()==ID_struct)
     get_objects_struct(mode, to_struct_expr(expr), range_start, size);
+  else if(expr.id() == ID_dynamic_object)
+  {
+    const auto obj_instance = to_dynamic_object_expr(expr).get_instance();
+    add(mode, "goto_rw::dynamic_object-" + std::to_string(obj_instance), 0, -1);
+  }
   else if(expr.id()==ID_symbol)
   {
     const symbol_exprt &symbol=to_symbol_expr(expr);
@@ -588,11 +588,6 @@ void rw_range_sett::get_objects_rec(
   {
     // dereferencing may yield some weird ones, ignore these
   }
-  else if(mode==get_modet::LHS_W)
-  {
-    forall_operands(it, expr)
-      get_objects_rec(mode, *it);
-  }
   else
     throw "rw_range_sett: assignment to `"+expr.id_string()+"' not handled";
 }
@@ -631,6 +626,8 @@ void rw_range_set_value_sett::get_objects_dereference(
 
   exprt object=deref;
   dereference(function, target, object, ns, value_sets);
+
+  PRECONDITION(object.is_not_nil());
 
   auto type_bits = pointer_offset_bits(object.type(), ns);
 
