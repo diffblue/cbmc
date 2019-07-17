@@ -82,6 +82,7 @@ static void generate_statement_list_init_function(symbol_tablet &symbol_table)
 {
   symbolt init;
   init.name = INITIALIZE_FUNCTION;
+  init.mode = ID_statement_list;
   init.type = code_typet({}, empty_typet{});
 
   code_blockt dest;
