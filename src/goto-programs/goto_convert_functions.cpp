@@ -22,8 +22,8 @@ Date: June 2003
 
 goto_convert_functionst::goto_convert_functionst(
   symbol_table_baset &_symbol_table,
-  message_handlert &_message_handler):
-  goto_convertt(_symbol_table, _message_handler)
+  message_handlert &_message_handler)
+  : goto_convertt(_symbol_table, _message_handler)
 {
 }
 
@@ -44,7 +44,9 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
       !symbol_pair.second.is_type && !symbol_pair.second.is_macro &&
       symbol_pair.second.type.id() == ID_code &&
       (symbol_pair.second.mode == ID_C || symbol_pair.second.mode == ID_cpp ||
-       symbol_pair.second.mode == ID_java || symbol_pair.second.mode == "jsil"))
+       symbol_pair.second.mode == ID_java ||
+       symbol_pair.second.mode == "jsil" ||
+       symbol_pair.second.mode == ID_statement_list))
     {
       symbol_list.push_back(symbol_pair.first);
     }
@@ -57,8 +59,8 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
 
   functions.compute_location_numbers();
 
-  // this removes the parse tree of the bodies from memory
-  #if 0
+// this removes the parse tree of the bodies from memory
+#if 0
   for(const auto &symbol_pair, symbol_table.symbols)
   {
     if(!symbol_pair.second.is_type &&
@@ -68,7 +70,7 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
       symbol_pair.second.value=codet();
     }
   }
-  #endif
+#endif
 }
 
 bool goto_convert_functionst::hide(const goto_programt &goto_program)
@@ -87,7 +89,7 @@ void goto_convert_functionst::add_return(
   goto_functionst::goto_functiont &f,
   const source_locationt &source_location)
 {
-  #if 0
+#if 0
   if(!f.body.instructions.empty() &&
      f.body.instructions.back().is_return())
     return; // not needed, we have one already
@@ -97,12 +99,11 @@ void goto_convert_functionst::add_return(
      f.body.instructions.back().is_goto() &&
      f.body.instructions.back().guard.is_true())
     return;
-  #else
+#else
 
   if(!f.body.instructions.empty())
   {
-    goto_programt::const_targett last_instruction=
-      f.body.instructions.end();
+    goto_programt::const_targett last_instruction = f.body.instructions.end();
     last_instruction--;
 
     while(true)
@@ -120,16 +121,17 @@ void goto_convert_functionst::add_return(
         return;
 
       // advance if it's a 'dead' without branch target
-      if(last_instruction->is_dead() &&
-         last_instruction!=f.body.instructions.begin() &&
-         !last_instruction->is_target())
+      if(
+        last_instruction->is_dead() &&
+        last_instruction != f.body.instructions.begin() &&
+        !last_instruction->is_target())
         last_instruction--;
       else
         break; // give up
     }
   }
 
-  #endif
+#endif
 
   side_effect_expr_nondett rhs(f.type.return_type(), source_location);
 
@@ -141,22 +143,23 @@ void goto_convert_functionst::convert_function(
   const irep_idt &identifier,
   goto_functionst::goto_functiont &f)
 {
-  const symbolt &symbol=ns.lookup(identifier);
+  const symbolt &symbol = ns.lookup(identifier);
   const irep_idt mode = symbol.mode;
 
   if(f.body_available())
     return; // already converted
 
   // make tmp variables local to function
-  tmp_symbol_prefix=id2string(symbol.name)+"::$tmp";
+  tmp_symbol_prefix = id2string(symbol.name) + "::$tmp";
 
   // store the parameter identifiers in the goto functions
   const code_typet &code_type = to_code_type(symbol.type);
   f.type = code_type;
   f.set_parameter_identifiers(code_type);
 
-  if(symbol.value.is_nil() ||
-     symbol.is_compiled()) /* goto_inline may have removed the body */
+  if(
+    symbol.value.is_nil() ||
+    symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
 
   // we have a body, make sure all parameter names are valid
@@ -172,12 +175,12 @@ void goto_convert_functionst::convert_function(
   lifetime = identifier == INITIALIZE_FUNCTION ? lifetimet::STATIC_GLOBAL
                                                : lifetimet::AUTOMATIC_LOCAL;
 
-  const codet &code=to_code(symbol.value);
+  const codet &code = to_code(symbol.value);
 
   source_locationt end_location;
 
-  if(code.get_statement()==ID_block)
-    end_location=to_code_block(code).end_location();
+  if(code.get_statement() == ID_block)
+    end_location = to_code_block(code).end_location();
   else
     end_location.make_nil();
 
@@ -185,12 +188,11 @@ void goto_convert_functionst::convert_function(
   goto_programt::targett end_function =
     tmp_end_function.add(goto_programt::make_end_function(end_location));
 
-  targets=targetst();
+  targets = targetst();
   targets.set_return(end_function);
-  targets.has_return_value=
-    f.type.return_type().id()!=ID_empty &&
-    f.type.return_type().id()!=ID_constructor &&
-    f.type.return_type().id()!=ID_destructor;
+  targets.has_return_value = f.type.return_type().id() != ID_empty &&
+                             f.type.return_type().id() != ID_constructor &&
+                             f.type.return_type().id() != ID_destructor;
 
   goto_convert_rec(code, f.body, mode);
 
@@ -199,12 +201,13 @@ void goto_convert_functionst::convert_function(
     add_return(f, end_location);
 
   // handle SV-COMP's __VERIFIER_atomic_
-  if(!f.body.instructions.empty() &&
-      has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
+  if(
+    !f.body.instructions.empty() &&
+    has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
   {
     goto_programt::instructiont a_begin;
     a_begin = goto_programt::make_atomic_begin();
-    a_begin.source_location=f.body.instructions.front().source_location;
+    a_begin.source_location = f.body.instructions.front().source_location;
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
     goto_programt::targett a_end =
@@ -231,9 +234,7 @@ void goto_convert_functionst::convert_function(
   lifetime = parent_lifetime;
 }
 
-void goto_convert(
-  goto_modelt &goto_model,
-  message_handlert &message_handler)
+void goto_convert(goto_modelt &goto_model, message_handlert &message_handler)
 {
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(goto_model.symbol_table);

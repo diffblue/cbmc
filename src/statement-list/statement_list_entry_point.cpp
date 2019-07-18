@@ -108,7 +108,7 @@ static void add_main_function_block_call(
     id2string(data_block_interface.get_base_name()) + DB_ENTRY_POINT_POSTFIX;
   instance_data_block.type = data_block_interface.type().subtype();
   instance_data_block.is_static_lifetime = true;
-  instance_data_block.mode = STATEMENT_LIST_MODE;
+  instance_data_block.mode = ID_statement_list;
   symbol_table.add(instance_data_block);
   const address_of_exprt data_block_ref{instance_data_block.symbol_expr()};
 
@@ -124,6 +124,7 @@ static void generate_statement_list_init_function(symbol_tablet &symbol_table)
 {
   symbolt init;
   init.name = INITIALIZE_FUNCTION;
+  init.mode = ID_statement_list;
   init.type = code_typet({}, empty_typet{});
 
   code_blockt dest;
