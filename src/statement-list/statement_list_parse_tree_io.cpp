@@ -19,36 +19,36 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #define NO_VALUE "(none)"
 
 /// Prints a constant to the given output stream.
-/// \param [out] out: Stream that should receive the result.
+/// \param [out] os: Stream that should receive the result.
 /// \param constant: Constant that shall be printed.
-static void output_constant(std::ostream &out, const constant_exprt &constant)
+static void output_constant(std::ostream &os, const constant_exprt &constant)
 {
   mp_integer ivalue;
   if(!to_integer(constant, ivalue))
-    out << ivalue;
+    os << ivalue;
   else if(can_cast_type<floatbv_typet>(constant.type()))
   {
     ieee_floatt real{get_real_type()};
     real.from_expr(constant);
-    out << real.to_float();
+    os << real.to_float();
   }
   else
-    out << constant.get_value();
+    os << constant.get_value();
 }
 
 /// Prints the assignment of a module parameter to the given output stream.
-/// \param [out] out: Stream that should receive the result.
+/// \param [out] os: Stream that should receive the result.
 /// \param assignment: Assignment that shall be printed.
 static void
-output_parameter_assignment(std::ostream &out, const equal_exprt &assignment)
+output_parameter_assignment(std::ostream &os, const equal_exprt &assignment)
 {
-  out << assignment.lhs().get(ID_identifier) << " := ";
+  os << assignment.lhs().get(ID_identifier) << " := ";
   const constant_exprt *const constant =
     expr_try_dynamic_cast<constant_exprt>(assignment.rhs());
   if(constant)
-    output_constant(out, *constant);
+    output_constant(os, *constant);
   else
-    out << assignment.rhs().get(ID_identifier);
+    os << assignment.rhs().get(ID_identifier);
 }
 
 void output_parse_tree(
@@ -81,178 +81,178 @@ void output_parse_tree(
 }
 
 void output_function_block(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::function_blockt &function_block)
 {
-  output_tia_module_properties(function_block, out);
-  output_common_var_declarations(out, function_block);
-  output_static_var_declarations(out, function_block);
-  output_network_list(out, function_block.networks);
+  output_tia_module_properties(function_block, os);
+  output_common_var_declarations(os, function_block);
+  output_static_var_declarations(os, function_block);
+  output_network_list(os, function_block.networks);
 }
 
 void output_function(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::functiont &function)
 {
-  output_tia_module_properties(function, out);
-  output_return_value(function, out);
-  output_common_var_declarations(out, function);
-  output_network_list(out, function.networks);
+  output_tia_module_properties(function, os);
+  output_return_value(function, os);
+  output_common_var_declarations(os, function);
+  output_network_list(os, function.networks);
 }
 
 void output_tia_module_properties(
   const statement_list_parse_treet::tia_modulet &module,
-  std::ostream &out)
+  std::ostream &os)
 {
-  out << "Name: " << module.name << '\n';
-  out << "Version: " << module.version << "\n\n";
+  os << "Name: " << module.name << '\n';
+  os << "Version: " << module.version << "\n\n";
 }
 
 void output_return_value(
   const statement_list_parse_treet::functiont &function,
-  std::ostream &out)
+  std::ostream &os)
 {
-  out << "Return type: ";
+  os << "Return type: ";
   if(function.return_type.is_nil())
-    out << "Void";
+    os << "Void";
   else
-    out << function.return_type.id();
-  out << "\n\n";
+    os << function.return_type.id();
+  os << "\n\n";
 }
 
 void output_common_var_declarations(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::tia_modulet &module)
 {
   if(!module.var_input.empty())
   {
-    out << "--------- Input Variables ----------\n\n";
-    output_var_declaration_list(out, module.var_input);
+    os << "--------- Input Variables ----------\n\n";
+    output_var_declaration_list(os, module.var_input);
   }
 
   if(!module.var_inout.empty())
   {
-    out << "--------- In/Out Variables ---------\n\n";
-    output_var_declaration_list(out, module.var_inout);
+    os << "--------- In/Out Variables ---------\n\n";
+    output_var_declaration_list(os, module.var_inout);
   }
 
   if(!module.var_output.empty())
   {
-    out << "--------- Output Variables ---------\n\n";
-    output_var_declaration_list(out, module.var_output);
+    os << "--------- Output Variables ---------\n\n";
+    output_var_declaration_list(os, module.var_output);
   }
 
   if(!module.var_constant.empty())
   {
-    out << "-------- Constant Variables --------\n\n";
-    output_var_declaration_list(out, module.var_constant);
+    os << "-------- Constant Variables --------\n\n";
+    output_var_declaration_list(os, module.var_constant);
   }
 
   if(!module.var_temp.empty())
   {
-    out << "---------- Temp Variables ----------\n\n";
-    output_var_declaration_list(out, module.var_temp);
+    os << "---------- Temp Variables ----------\n\n";
+    output_var_declaration_list(os, module.var_temp);
   }
 }
 
 void output_static_var_declarations(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::function_blockt &block)
 {
   if(!block.var_static.empty())
   {
-    out << "--------- Static Variables ---------\n\n";
-    output_var_declaration_list(out, block.var_static);
+    os << "--------- Static Variables ---------\n\n";
+    output_var_declaration_list(os, block.var_static);
   }
 }
 
 void output_var_declaration_list(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::var_declarationst &declarations)
 {
   for(const auto &declaration : declarations)
   {
-    output_var_declaration(out, declaration);
-    out << "\n\n";
+    output_var_declaration(os, declaration);
+    os << "\n\n";
   }
 }
 
 void output_var_declaration(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::var_declarationt &declaration)
 {
-  out << declaration.variable.pretty() << '\n';
-  out << "  * default_value: ";
+  os << declaration.variable.pretty() << '\n';
+  os << "  * default_value: ";
   if(declaration.default_value)
   {
     const constant_exprt &constant =
       to_constant_expr(declaration.default_value.value());
-    output_constant(out, constant);
+    output_constant(os, constant);
   }
   else
-    out << NO_VALUE;
+    os << NO_VALUE;
 }
 
 void output_network_list(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::networkst &networks)
 {
-  out << "-------------- Networks --------------\n\n";
+  os << "-------------- Networks --------------\n\n";
   for(const auto &network : networks)
   {
-    output_network(out, network);
-    out << '\n';
+    output_network(os, network);
+    os << '\n';
   }
 }
 
 void output_network(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::networkt &network)
 {
-  out << "Title: " << network.title.value_or(NO_VALUE) << '\n';
-  out << "Instructions: ";
+  os << "Title: " << network.title.value_or(NO_VALUE) << '\n';
+  os << "Instructions: ";
   if(network.instructions.empty())
-    out << NO_VALUE;
-  out << '\n';
+    os << NO_VALUE;
+  os << '\n';
   for(const auto &instruction : network.instructions)
   {
-    output_instruction(out, instruction);
-    out << '\n';
+    output_instruction(os, instruction);
+    os << '\n';
   }
 }
 
 void output_instruction(
-  std::ostream &out,
+  std::ostream &os,
   const statement_list_parse_treet::instructiont &instruction)
 {
   for(const codet &token : instruction.tokens)
   {
-    out << token.get_statement();
+    os << token.get_statement();
     for(const auto &expr : token.operands())
     {
       const symbol_exprt *const symbol =
         expr_try_dynamic_cast<symbol_exprt>(expr);
       if(symbol)
       {
-        out << '\t' << symbol->get_identifier();
+        os << '\t' << symbol->get_identifier();
         continue;
       }
       const constant_exprt *const constant =
         expr_try_dynamic_cast<constant_exprt>(expr);
       if(constant)
       {
-        out << '\t';
-        output_constant(out, *constant);
+        os << '\t';
+        output_constant(os, *constant);
         continue;
       }
       const equal_exprt *const equal = expr_try_dynamic_cast<equal_exprt>(expr);
       if(equal)
       {
-        out << "\n\t";
-        output_parameter_assignment(out, *equal);
+        os << "\n\t";
+        output_parameter_assignment(os, *equal);
         continue;
       }
-      out << '\t' << expr.id();
+      os << '\t' << expr.id();
     }
   }
 }
