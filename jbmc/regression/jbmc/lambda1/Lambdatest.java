@@ -11,35 +11,35 @@ public class Lambdatest {
   A a = new A();
   B b = new B();
 
-  public Integer g(Float x, Integer y, BiFunction<Float, Integer, Integer> fun) {
+  public Integer captureNone(Float x, Integer y, BiFunction<Float, Integer, Integer> fun) {
     return fun.apply(x, y);
   }
 
-  public int f(Float x, Integer y, Integer z) {
+  public int captureReference(Float x, Integer y, Integer z) {
     Integer tmp = add.apply(x, y);
     Function<Integer, Integer> mul = (a) -> a * tmp;
     return mul.apply(z);
   }
 
-  public int i(int x) {
+  public int captureInt(int x) {
     int z = 5;
     Function<Integer, Integer> foo = (a) -> a * z;
     return foo.apply(x);
   }
 
-  public int j(int x) {
+  public int captureThisPrimitive(int x) {
     Function<Integer, Integer> foo = (a) -> a * z;
     return foo.apply(x);
   }
 
-  public int k(int x) {
+  public int captureThisReference(int x) {
     a.x = 10;
 
     Function<Integer, Integer> foo = (y) -> y * a.x;
     return foo.apply(x);
   }
 
-  public int l(int x) {
+  public int captureAndCall(int x) {
     b.y = 10;
     Function<Integer, Integer> foo = (y) -> {
       int r = y * b.y;
@@ -51,7 +51,7 @@ public class Lambdatest {
     return foo.apply(x);
   }
 
-  public int m(int x) {
+  public int captureAndAssign(int x) {
     b.y = 10;
     Function<Integer, Integer> foo = (y) -> {
       int r = y * b.y;
@@ -62,7 +62,7 @@ public class Lambdatest {
   }
 
   // test static field of different class
-  public double d(Double x) {
+  public double callStatic(Double x) {
     return B.dmul.apply(x);
   }
 
@@ -77,43 +77,43 @@ public class Lambdatest {
   public static void main(String[] args, int unknown) {
     Lambdatest lt = new Lambdatest();
     if(unknown == 0)
-      assert lt.g(1.0f, 2, (x, y) -> x.intValue() + y) == 3; // should succeed
+      assert lt.captureNone(1.0f, 2, (x, y) -> x.intValue() + y) == 3; // should succeed
     else if(unknown == 1)
-      assert lt.g(1.0f, 2, (x, y) -> x.intValue() + y) == 4; // should fail
+      assert lt.captureNone(1.0f, 2, (x, y) -> x.intValue() + y) == 4; // should fail
     else if(unknown == 2)
-      assert lt.f(1.0f, 2, 3) == 9; // should succeed
+      assert lt.captureReference(1.0f, 2, 3) == 9; // should succeed
     else if(unknown == 3)
-      assert lt.f(1.0f, 2, 3) == 10; // should fail
+      assert lt.captureReference(1.0f, 2, 3) == 10; // should fail
     else if(unknown == 4)
-      assert lt.i(2) == 10; // should succeed
+      assert lt.captureInt(2) == 10; // should succeed
     else if(unknown == 5)
-      assert lt.i(2) == 11; // should fail
+      assert lt.captureInt(2) == 11; // should fail
     else if(unknown == 6)
-      assert lt.j(3) == 30; // should succeed
+      assert lt.captureThisPrimitive(3) == 30; // should succeed
     else if(unknown == 7)
-      assert lt.j(3) == 31; // should fail
+      assert lt.captureThisPrimitive(3) == 31; // should fail
     else if(unknown == 8)
-      assert lt.k(4) == 40; // should succeed
+      assert lt.captureThisReference(4) == 40; // should succeed
     else if(unknown == 9)
-      assert lt.k(4) == 41; // should fail
+      assert lt.captureThisReference(4) == 41; // should fail
     else if(unknown == 10)
     {
-      assert lt.l(5) == 70; // should succeed
+      assert lt.captureAndCall(5) == 70; // should succeed
       assert lt.b.y == 70; // check side-effects of l method
     }
     else if(unknown == 11)
-      assert lt.l(5) == 51; // should fail
+      assert lt.captureAndCall(5) == 51; // should fail
     else if(unknown == 12)
     {
-      assert lt.m(6) == 60; // should succeed
+      assert lt.captureAndAssign(6) == 60; // should succeed
       assert lt.b.y == 60; // check side-effects of m method
     }
     else if(unknown == 13)
-      assert lt.m(6) == 61; // should fail
+      assert lt.captureAndAssign(6) == 61; // should fail
     else if(unknown == 14)
-      assert lt.d(7.0) == 10.5; // should succeed
+      assert lt.callStatic(7.0) == 10.5; // should succeed
     else if(unknown == 15)
-      assert lt.d(7.0) == 12; // should fail
+      assert lt.callStatic(7.0) == 12; // should fail
     else if(unknown == 16)
       assert lt.capture2(8.0f) == 9; // should succeed
     else if(unknown == 17)
