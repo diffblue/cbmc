@@ -84,5 +84,7 @@ SpacesInSquareBrackets: 'false'
 Standard: Cpp11
 TabWidth: '2'
 UseTab: Never
-
+---
+Language: Java
+ColumnLimit: '80'
 ...
