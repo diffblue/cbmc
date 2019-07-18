@@ -93,7 +93,7 @@ static optionalt<irep_idt> lambda_method_name(
 
 static optionalt<irep_idt> interface_method_id(
   const symbol_tablet &symbol_table,
-  const struct_tag_typet &implemented_interface_tag,
+  const struct_tag_typet &functional_interface_tag,
   const irep_idt &method_identifier,
   const int instruction_address,
   const messaget &log)
@@ -101,7 +101,7 @@ static optionalt<irep_idt> interface_method_id(
   const namespacet ns{symbol_table};
   const java_class_typet &implemented_interface_type = [&] {
     const symbolt &implemented_interface_symbol =
-      ns.lookup(implemented_interface_tag.get_identifier());
+      ns.lookup(functional_interface_tag.get_identifier());
     return to_java_class_type(implemented_interface_symbol.type);
   }();
 
@@ -110,7 +110,7 @@ static optionalt<irep_idt> interface_method_id(
     log.debug() << "ignoring invokedynamic at " << method_identifier
                 << " address " << instruction_address
                 << " which produces a stub type "
-                << implemented_interface_tag.get_identifier() << messaget::eom;
+                << functional_interface_tag.get_identifier() << messaget::eom;
     return {};
   }
   else if(implemented_interface_type.methods().size() != 1)
@@ -118,7 +118,7 @@ static optionalt<irep_idt> interface_method_id(
     log.debug()
       << "ignoring invokedynamic at " << method_identifier << " address "
       << instruction_address << " which produces type "
-      << implemented_interface_tag.get_identifier()
+      << functional_interface_tag.get_identifier()
       << " which should have exactly one abstract method but actually has "
       << implemented_interface_type.methods().size()
       << ". Note default methods are not supported yet." << messaget::eom;
@@ -130,7 +130,7 @@ static optionalt<irep_idt> interface_method_id(
 symbolt synthetic_class_symbol(
   const irep_idt &synthetic_class_name,
   const irep_idt &lambda_method_name,
-  const struct_tag_typet &implemented_interface_tag,
+  const struct_tag_typet &functional_interface_tag,
   const java_method_typet &dynamic_method_type)
 {
   java_class_typet synthetic_class_type;
@@ -144,7 +144,7 @@ symbolt synthetic_class_symbol(
     ID_java_lambda_method_identifier, lambda_method_name);
   struct_tag_typet base_tag("java::java.lang.Object");
   synthetic_class_type.add_base(base_tag);
-  synthetic_class_type.add_base(implemented_interface_tag);
+  synthetic_class_type.add_base(functional_interface_tag);
 
   // Add the class fields:
 
@@ -224,20 +224,20 @@ static symbolt constructor_symbol(
 symbolt implemented_method_symbol(
   synthetic_methods_mapt &synthetic_methods,
   const symbolt &interface_method_symbol,
-  const struct_tag_typet &implemented_interface_tag,
+  const struct_tag_typet &functional_interface_tag,
   const irep_idt &synthetic_class_name)
 {
   const std::string implemented_method_name = [&] {
     std::string implemented_method_name =
       id2string(interface_method_symbol.name);
-    const std::string &implemented_interface_tag_str =
-      id2string(implemented_interface_tag.get_identifier());
+    const std::string &functional_interface_tag_str =
+      id2string(functional_interface_tag.get_identifier());
     INVARIANT(
-      has_prefix(implemented_method_name, implemented_interface_tag_str),
+      has_prefix(implemented_method_name, functional_interface_tag_str),
       "method names should be prefixed by their defining type");
     implemented_method_name.replace(
       0,
-      implemented_interface_tag_str.length(),
+      functional_interface_tag_str.length(),
       id2string(synthetic_class_name));
     return implemented_method_name;
   }();
@@ -316,11 +316,11 @@ void create_invokedynamic_synthetic_classes(
                   << " with unknown handle type" << messaget::eom;
       continue;
     }
-    const auto &implemented_interface_tag = to_struct_tag_type(
+    const auto &functional_interface_tag = to_struct_tag_type(
       to_java_reference_type(dynamic_method_type.return_type()).subtype());
     const auto interface_method_id = ::interface_method_id(
       symbol_table,
-      implemented_interface_tag,
+      functional_interface_tag,
       method_identifier,
       instruction.address,
       log);
@@ -336,12 +336,12 @@ void create_invokedynamic_synthetic_classes(
     symbol_table.add(implemented_method_symbol(
       synthetic_methods,
       symbol_table.lookup_ref(*interface_method_id),
-      implemented_interface_tag,
+      functional_interface_tag,
       synthetic_class_name));
     symbol_table.add(synthetic_class_symbol(
       synthetic_class_name,
       *lambda_method_name,
-      implemented_interface_tag,
+      functional_interface_tag,
       dynamic_method_type));
   }
 }
