@@ -1,0 +1,16 @@
+CORE
+Test.class
+--function Test.test --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+--
+java::Test\$B\.getInteger
+^warning: ignoring
+--
+Symex should have the values of all class_identifier fields in its constant
+propagation map, so that it can run efficiently and create a simpler equation.
+If an argument to the entrypoint is nondet-initialised using automatic local
+initialisation then symex thinks its class identifier might be uninitialised,
+and hence could be anything, because that's what happens in the null case (but
+we never access the class identifier in this case). Hence we have switched to
+dynamic allocation for this situation.

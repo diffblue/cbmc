@@ -72,7 +72,7 @@ require_goto_statements::find_struct_component_assignments(
   const irep_idt &component_name,
   const symbol_tablet &symbol_table)
 {
-  pointer_assignment_locationt locations;
+  pointer_assignment_locationt locations{};
 
   for(const auto &assignment : statements)
   {
@@ -106,8 +106,8 @@ require_goto_statements::find_struct_component_assignments(
             ode.build(superclass_expr, ns);
             if(
               superclass_expr.get_component_name() == supercomponent_name &&
-              to_symbol_expr(ode.root_object()).get_identifier() ==
-                structure_name)
+              to_symbol_expr(to_dereference_expr(ode.root_object()).pointer())
+                  .get_identifier() == structure_name)
             {
               if(
                 code_assign.rhs() ==
@@ -133,10 +133,9 @@ require_goto_statements::find_struct_component_assignments(
           const namespacet ns(symbol_table);
           ode.build(member_expr, ns);
           if(
-            ode.root_object().id() == ID_symbol &&
-            to_symbol_expr(ode.root_object()).get_identifier() ==
-              structure_name &&
-            member_expr.get_component_name() == component_name)
+            member_expr.get_component_name() == component_name &&
+            to_symbol_expr(to_dereference_expr(ode.root_object()).pointer())
+                .get_identifier() == structure_name)
           {
             if(
               code_assign.rhs() ==
@@ -295,6 +294,73 @@ const code_declt &require_goto_statements::require_declaration_of_name(
   throw no_decl_found_exceptiont(variable_name.c_str());
 }
 
+/// Get the unique non-null expression assigned to a symbol. The symbol may have
+/// many null assignments, but only one non-null assignment.
+/// \param entry_point_instructions: A vector of instructions
+/// \param symbol_identifier: The identifier of the symbol we are considering
+/// \return The unique non-null expression assigned to the symbol
+const exprt &get_unique_non_null_expression_assigned_to_symbol(
+  const std::vector<codet> &entry_point_instructions,
+  const irep_idt &symbol_identifier)
+{
+  const auto &assignments = require_goto_statements::find_pointer_assignments(
+                              symbol_identifier, entry_point_instructions)
+                              .non_null_assignments;
+  REQUIRE(assignments.size() == 1);
+  return assignments[0].rhs();
+}
+
+/// Get the unique symbol assigned to a symbol, if one exists. There must be
+/// a unique non-null assignment to the symbol, and it is either another symbol,
+/// in which case we return that symbol expression, or something else, which
+/// case we return a null pointer.
+/// \param entry_point_instructions: A vector of instructions
+/// \param symbol_identifier: The identifier of the symbol
+/// \return The unique symbol assigned to \p input_symbol_identifier, or a null
+///   pointer if no symbols are assigned to it
+const symbol_exprt *try_get_unique_symbol_assigned_to_symbol(
+  const std::vector<codet> &entry_point_instructions,
+  const irep_idt &symbol_identifier)
+{
+  const auto &expr = get_unique_non_null_expression_assigned_to_symbol(
+    entry_point_instructions, symbol_identifier);
+
+  return expr_try_dynamic_cast<symbol_exprt>(skip_typecast(expr));
+}
+
+/// Follow the chain of non-null assignments until we find a symbol that
+/// hasn't ever had another symbol assigned to it. For example, if this code is
+/// ```
+/// a = 5 + g(7)
+/// b = a
+/// c = b
+/// ```
+/// then given input c we return a.
+/// \param entry_point_instructions: A vector of instructions
+/// \param input_symbol_identifier: The identifier of the symbol we are
+///   currently considering
+/// \return The identifier of the symbol which is (possibly indirectly) assigned
+///   to \p input_symbol_identifier and which does not have any symbol assigned
+///   to it
+static const irep_idt &
+get_ultimate_source_symbol(
+  const std::vector<codet> &entry_point_instructions,
+  const irep_idt &input_symbol_identifier)
+{
+  const symbol_exprt *symbol_assigned_to_input_symbol =
+    try_get_unique_symbol_assigned_to_symbol(
+      entry_point_instructions, input_symbol_identifier);
+
+  if(symbol_assigned_to_input_symbol)
+  {
+    return get_ultimate_source_symbol(
+      entry_point_instructions,
+      symbol_assigned_to_input_symbol->get_identifier());
+  }
+
+  return input_symbol_identifier;
+}
+
 /// Checks that the component of the structure (possibly inherited from
 /// the superclass) is assigned an object of the given type.
 /// \param structure_name: The name the variable
@@ -305,7 +371,9 @@ const code_declt &require_goto_statements::require_declaration_of_name(
 ///   there is a typecast)
 /// \param entry_point_instructions: The statements to look through
 /// \param symbol_table: A symbol table to enable type lookups
-/// \return The identifier of the variable assigned to the field
+/// \return The identifier of the ultimate source symbol assigned to the field,
+///   which will be used for future calls to
+///   `require_struct_component_assignment`.
 const irep_idt &require_goto_statements::require_struct_component_assignment(
   const irep_idt &structure_name,
   const optionalt<irep_idt> &superclass_name,
@@ -331,48 +399,31 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
                                         << structure_name);
   REQUIRE(component_assignments.non_null_assignments.size() == 1);
 
-  // We are expecting that the resulting statement can be of the form:
-  // 1. structure_name.(@superclass_name if given).component =
-  //     (optional type cast *) tmp_object_factory$1;
-  //   followed by a direct assignment like this:
-  //     tmp_object_factory$1 = &tmp_object_factory$2;
-  // 2. structure_name.component = (optional cast *)&tmp_object_factory$1
-  exprt component_assignment_rhs_expr =
-    skip_typecast(component_assignments.non_null_assignments[0].rhs());
+  // We are expecting the non-null assignment to be of the form:
+  //   malloc_site->(@superclass_name if given.)field =
+  //     (possible typecast) malloc_site$0;
+  const symbol_exprt *rhs_symbol_expr = expr_try_dynamic_cast<symbol_exprt>(
+    skip_typecast(component_assignments.non_null_assignments[0].rhs()));
+  REQUIRE(rhs_symbol_expr);
 
-  // If the rhs is not an address of must be in case 1
-  if(!can_cast_expr<address_of_exprt>(component_assignment_rhs_expr))
-  {
-    const auto &component_reference_tmp_name =
-      to_symbol_expr(component_assignment_rhs_expr).get_identifier();
-    const auto &component_reference_assignments =
-      require_goto_statements::find_pointer_assignments(
-        component_reference_tmp_name, entry_point_instructions)
-        .non_null_assignments;
-    REQUIRE(component_reference_assignments.size() == 1);
-    component_assignment_rhs_expr =
-      skip_typecast(component_reference_assignments[0].rhs());
-  }
-
-  // The rhs assigns an address of a variable, get its name
-  const auto &component_reference_assignment_rhs =
-    to_address_of_expr(component_assignment_rhs_expr);
-  const auto &component_tmp_name =
-    to_symbol_expr(component_reference_assignment_rhs.op()).get_identifier();
+  const irep_idt &symbol_identifier = get_ultimate_source_symbol(
+    entry_point_instructions, rhs_symbol_expr->get_identifier());
 
   // After we have found the declaration of the final assignment's
   // right hand side, then we want to identify that the type
   // is the one we expect, e.g.:
-  // struct java.lang.Integer tmp_object_factory$2;
+  // struct java.lang.Integer *malloc_site$0;
   const auto &component_declaration =
     require_goto_statements::require_declaration_of_name(
-      component_tmp_name, entry_point_instructions);
-  REQUIRE(component_declaration.symbol().type().id() == ID_struct_tag);
+      symbol_identifier, entry_point_instructions);
+  const typet &component_type =
+    to_pointer_type(component_declaration.symbol().type()).subtype();
+  REQUIRE(component_type.id() == ID_struct_tag);
   const auto &component_struct =
-    ns.follow_tag(to_struct_tag_type(component_declaration.symbol().type()));
+    ns.follow_tag(to_struct_tag_type(component_type));
   REQUIRE(component_struct.get(ID_name) == component_type_name);
 
-  return component_tmp_name;
+  return symbol_identifier;
 }
 
 /// Checks that the array component of the structure (possibly inherited from
@@ -462,10 +513,10 @@ require_goto_statements::require_entry_point_argument_assignment(
 {
   // Trace the creation of the object that is being supplied as the input
   // argument to the function under test
-  const pointer_assignment_locationt &argument_assignments =
+  const pointer_assignment_locationt argument_assignments =
     find_pointer_assignments(
-      id2string(goto_functionst::entry_point()) + "::" +
-        id2string(argument_name),
+      id2string(goto_functionst::entry_point()) +
+        "::" + id2string(argument_name),
       entry_point_statements);
 
   // There should be at most one assignment to it
@@ -473,15 +524,13 @@ require_goto_statements::require_entry_point_argument_assignment(
 
   // The following finds the name of the tmp object that gets assigned
   // to the input argument. There must be one such assignment only,
-  // and usually looks like this:
-  //   argument_name = &tmp_object_factory$1;
+  // and it usually looks like this:
+  //   argument_name = tmp_object_factory$1;
   const auto &argument_assignment =
     argument_assignments.non_null_assignments[0];
-  const auto &argument_tmp_name =
-    to_symbol_expr(
-      to_address_of_expr(skip_typecast(argument_assignment.rhs())).object())
-      .get_identifier();
-  return argument_tmp_name;
+  const symbol_exprt &argument_symbol =
+    to_symbol_expr(skip_typecast(argument_assignment.rhs()));
+  return argument_symbol.get_identifier();
 }
 
 /// Verify that a collection of statements contains a function call to a
@@ -512,6 +561,6 @@ std::vector<code_function_callt> require_goto_statements::find_function_calls(
         }
       }
     }
-  }
+    }
   return function_calls;
 }

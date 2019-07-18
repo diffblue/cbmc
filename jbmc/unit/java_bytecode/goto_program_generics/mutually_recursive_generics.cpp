@@ -10,11 +10,14 @@ Author: Diffblue Ltd.
 #include <java-testing-utils/require_goto_statements.h>
 #include <java-testing-utils/require_type.h>
 #include <testing-utils/use_catch.h>
+#include <util/config.h>
 
 SCENARIO(
   "Generics class with mutually recursive_generic parameters",
   "[core][java_bytecode][goto_programs_generics]")
 {
+  config.ansi_c.set_LP64();
+
   const symbol_tablet &symbol_table = load_java_class(
     "MutuallyRecursiveGenerics",
     "./java_bytecode/goto_program_generics",
