@@ -431,7 +431,7 @@ FB_Static_Decl:
     ;
 
 FB_Body:
-    TOK_BEGIN Oom_IL_Network
+    TOK_BEGIN Zom_IL_Network
     {
       $$ = $2;
     }
@@ -617,24 +617,23 @@ Constant_Decl:
     ;
     
 Func_Body:
-    TOK_BEGIN Oom_IL_Network
+    TOK_BEGIN Zom_IL_Network
     {
       $$ = $2;
     }
     ;
     
 // Network declaration
-Oom_IL_Network:
-    Oom_IL_Network IL_Network 
+Zom_IL_Network:
+    Zom_IL_Network IL_Network
     {
       $$ = $1;
       parser_stack($$).add_to_operands(std::move(parser_stack($2)));
     }
-    | IL_Network 
+    | /* nothing */
     {
       newstack($$);
       parser_stack($$).id(ID_statement_list_networks);
-      parser_stack($$).add_to_operands(std::move(parser_stack($1)));
     }
     ;
 

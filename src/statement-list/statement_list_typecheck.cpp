@@ -100,12 +100,12 @@ void statement_list_typecheckt::typecheck()
       parse_tree.function_blocks)
   {
     symbolt &fb_sym{symbol_table.get_writeable_ref(fb.name)};
-    typecheck_statement_list_networks(fb.networks, fb_sym);
+    typecheck_statement_list_networks(fb, fb_sym);
   }
   for(const statement_list_parse_treet::functiont &fc : parse_tree.functions)
   {
     symbolt &function_sym{symbol_table.get_writeable_ref(fc.name)};
-    typecheck_statement_list_networks(fc.networks, function_sym);
+    typecheck_statement_list_networks(fc, function_sym);
   }
 }
 
@@ -149,14 +149,12 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   param_sym.mode = STATEMENT_LIST_MODE;
   symbol_table.add(param_sym);
 
-  // Setup FB symbol type and value and add it to the symbol table.
+  // Setup FB symbol type and value.
   code_typet::parameterst params;
   params.push_back(param);
   code_typet fb_type{params, empty_typet()};
   fb_type.set(ID_statement_list_type, ID_statement_list_function_block);
   function_block_sym.type = fb_type;
-  function_block_sym.value = code_blockt{};
-  typecheck_temp_var_decls(function_block, function_block_sym);
   symbol_table.add(function_block_sym);
 }
 
@@ -170,17 +168,16 @@ void statement_list_typecheckt::typecheck_function_declaration(
   function_sym.pretty_name = function_sym.name;
   function_sym.mode = STATEMENT_LIST_MODE;
   code_typet::parameterst params;
-  typecheck_function_var_decls(function.var_input, params, function.name);
-  typecheck_function_var_decls(function.var_inout, params, function.name);
-  typecheck_function_var_decls(function.var_output, params, function.name);
+  typecheck_function_var_decls(
+    function.var_input, params, function.name, ID_statement_list_var_input);
+  typecheck_function_var_decls(
+    function.var_inout, params, function.name, ID_statement_list_var_inout);
+  typecheck_function_var_decls(
+    function.var_output, params, function.name, ID_statement_list_var_output);
 
   code_typet fc_type{params, function.return_type};
   fc_type.set(ID_statement_list_type, ID_statement_list_function);
   function_sym.type = fc_type;
-  function_sym.value = code_blockt{};
-
-  typecheck_temp_var_decls(function, function_sym);
-
   symbol_table.add(function_sym);
 }
 
@@ -204,17 +201,22 @@ struct_typet statement_list_typecheckt::create_instance_data_block_type(
   const statement_list_parse_treet::function_blockt &function_block)
 {
   struct_union_typet::componentst components;
-  typecheck_function_block_var_decls(function_block.var_input, components);
-  typecheck_function_block_var_decls(function_block.var_inout, components);
-  typecheck_function_block_var_decls(function_block.var_output, components);
-  typecheck_function_block_var_decls(function_block.var_static, components);
+  typecheck_function_block_var_decls(
+    function_block.var_input, components, ID_statement_list_var_input);
+  typecheck_function_block_var_decls(
+    function_block.var_inout, components, ID_statement_list_var_inout);
+  typecheck_function_block_var_decls(
+    function_block.var_output, components, ID_statement_list_var_output);
+  typecheck_function_block_var_decls(
+    function_block.var_static, components, ID_statement_list_var_static);
 
   return struct_typet{components};
 }
 
 void statement_list_typecheckt::typecheck_function_block_var_decls(
   const statement_list_parse_treet::var_declarationst &var_decls,
-  struct_union_typet::componentst &components)
+  struct_union_typet::componentst &components,
+  const irep_idt &var_property)
 {
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
@@ -222,6 +224,7 @@ void statement_list_typecheckt::typecheck_function_block_var_decls(
     const irep_idt &var_name{declaration.variable.get_identifier()};
     const typet &var_type{declaration.variable.type()};
     struct_union_typet::componentt component{var_name, var_type};
+    component.set(ID_statement_list_type, var_property);
     components.push_back(component);
   }
 }
@@ -229,7 +232,8 @@ void statement_list_typecheckt::typecheck_function_block_var_decls(
 void statement_list_typecheckt::typecheck_function_var_decls(
   const statement_list_parse_treet::var_declarationst &var_decls,
   code_typet::parameterst &params,
-  const irep_idt &function_name)
+  const irep_idt &function_name,
+  const irep_idt &var_property)
 {
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
@@ -247,6 +251,7 @@ void statement_list_typecheckt::typecheck_function_var_decls(
     code_typet::parametert param{declaration.variable.type()};
     param.set_identifier(param_sym.name);
     param.set_base_name(declaration.variable.get_identifier());
+    param.set(ID_statement_list_type, var_property);
     params.push_back(param);
   }
 }
@@ -274,15 +279,23 @@ void statement_list_typecheckt::typecheck_temp_var_decls(
 }
 
 void statement_list_typecheckt::typecheck_statement_list_networks(
-  const statement_list_parse_treet::networkst &networks,
-  symbolt &tia_element)
+  const statement_list_parse_treet::tia_modulet &tia_module,
+  symbolt &tia_symbol)
 {
-  for(const auto &network : networks)
+  // Leave value empty if there are no networks to iterate through.
+  if(tia_module.networks.empty())
+    return;
+  if(tia_symbol.value.is_nil())
+    tia_symbol.value = code_blockt{};
+
+  typecheck_temp_var_decls(tia_module, tia_symbol);
+
+  for(const auto &network : tia_module.networks)
   {
     // Set RLO to true each time a new network is entered (TIA behaviour).
     rlo_bit = true_exprt();
     for(const auto &instruction : network.instructions)
-      typecheck_statement_list_instruction(instruction, tia_element);
+      typecheck_statement_list_instruction(instruction, tia_symbol);
   }
 }
 
@@ -1249,9 +1262,10 @@ void statement_list_typecheckt::typecheck_called_function(
   symbolt &tia_element)
 {
   const symbol_exprt call_operand{to_symbol_expr(op_code.op0())};
-  const symbolt &called_function{
+  const symbolt &called_function_sym{
     symbol_table.lookup_ref(call_operand.get_identifier())};
-  const code_typet &called_type{to_code_type(called_function.type)};
+  const symbol_exprt called_function_expr{called_function_sym.symbol_expr()};
+  const code_typet &called_type{to_code_type(called_function_sym.type)};
 
   // Check if function name is followed by data block.
   if(!can_cast_expr<equal_exprt>(op_code.op1()))
@@ -1275,11 +1289,22 @@ void statement_list_typecheckt::typecheck_called_function(
 
   for(const code_typet::parametert &param : params)
   {
-    const exprt &arg{typecheck_function_call_arguments(assignments, param)};
+    const exprt &arg{
+      typecheck_function_call_arguments(assignments, param, tia_element)};
     args.push_back(arg);
   }
-  const code_function_callt call{call_operand, args};
-  tia_element.value.add_to_operands(call);
+
+  // Check the return value if present.
+  if(called_type.return_type().is_nil())
+    tia_element.value.add_to_operands(
+      code_function_callt{called_function_expr, args});
+  else
+  {
+    const exprt lhs{typecheck_return_value_assignment(
+      assignments, called_type.return_type(), tia_element)};
+    tia_element.value.add_to_operands(
+      code_function_callt{lhs, called_function_expr, args});
+  }
 }
 
 void statement_list_typecheckt::typecheck_called_function_block(
@@ -1296,23 +1321,60 @@ void statement_list_typecheckt::typecheck_called_function_block(
 
 exprt statement_list_typecheckt::typecheck_function_call_arguments(
   const std::vector<equal_exprt> &assignments,
-  const code_typet::parametert &param)
+  const code_typet::parametert &param,
+  const symbolt &tia_element)
 {
+  const irep_idt &param_name = param.get_base_name();
+  const typet &param_type = param.type();
   for(const equal_exprt &assignment : assignments)
   {
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
-    if(param.get_identifier() == lhs.get_identifier())
+    if(param_name == lhs.get_identifier())
     {
-      if(param.type() == assignment.rhs().type())
-        return assignment.rhs();
+      const symbol_exprt &rhs{to_symbol_expr(assignment.rhs())};
+      const exprt assigned_variable{
+        typecheck_identifier(tia_element, rhs.get_identifier())};
+      if(param_type == assigned_variable.type())
+        return assigned_variable;
       else
       {
-        error() << "Types of parameter assignment do not match" << eom;
+        error() << "Types of parameter assignment do not match: "
+                << param.type().id() << " != " << assigned_variable.type().id()
+                << eom;
         throw TYPECHECK_ERROR;
       }
     }
   }
-  error() << "No assignment found for function parameter" << eom;
+  error() << "No assignment found for function parameter "
+          << param.get_identifier() << eom;
+  throw TYPECHECK_ERROR;
+}
+
+exprt statement_list_typecheckt::typecheck_return_value_assignment(
+  const std::vector<equal_exprt> &assignments,
+  const typet &return_type,
+  const symbolt &tia_element)
+{
+  for(const equal_exprt &assignment : assignments)
+  {
+    const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
+    if(ID_statement_list_return_value_id == lhs.get_identifier())
+    {
+      const symbol_exprt &rhs{to_symbol_expr(assignment.rhs())};
+      const exprt assigned_variable{
+        typecheck_identifier(tia_element, rhs.get_identifier())};
+      if(return_type == assigned_variable.type())
+        return assigned_variable;
+      else
+      {
+        error() << "Types of return value assignment do not match: "
+                << return_type.id() << " != " << assigned_variable.type().id()
+                << eom;
+        throw TYPECHECK_ERROR;
+      }
+    }
+  }
+  error() << "No assignment found for function return value" << eom;
   throw TYPECHECK_ERROR;
 }
 

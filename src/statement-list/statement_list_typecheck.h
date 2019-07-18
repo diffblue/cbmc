@@ -143,9 +143,12 @@ private:
   /// to the given component element.
   /// \param var_decls: List of declarations which should be typechecked.
   /// \param [out] components: List of typechecked and converted declarations.
+  /// \param var_property: Type of variable declaration list (for example
+  ///   input, output, ...).
   void typecheck_function_block_var_decls(
     const statement_list_parse_treet::var_declarationst &var_decls,
-    struct_union_typet::componentst &components);
+    struct_union_typet::componentst &components,
+    const irep_idt &var_property);
 
   /// Performs a typecheck on a variable declaration list and saves the result
   /// to the given component element.
@@ -153,10 +156,13 @@ private:
   /// \param [out] params: List of typechecked and converted declarations.
   /// \param function_name: Function to which the variable list belongs (used
   ///   for naming).
+  /// \param var_property: Type of variable declaration list (for example
+  ///   input, output, ...).
   void typecheck_function_var_decls(
     const statement_list_parse_treet::var_declarationst &var_decls,
     code_typet::parameterst &params,
-    const irep_idt &function_name);
+    const irep_idt &function_name,
+    const irep_idt &var_property);
 
   /// Performs a typecheck on the temp variables of a TIA module and saves the
   /// result to the given symbol value.
@@ -168,11 +174,11 @@ private:
 
   /// Performs a typecheck on the networks of a TIA module and saves the
   /// result to the given symbol.
-  /// \param networks: Network list that should be checked.
-  /// \param [out] tia_element: Symbol representation of the TIA module.
+  /// \param tia_module: Module containing the networks that shall be checked.
+  /// \param [out] tia_symbol: Symbol representation of the given TIA module.
   void typecheck_statement_list_networks(
-    const statement_list_parse_treet::networkst &networks,
-    symbolt &tia_element);
+    const statement_list_parse_treet::tia_modulet &tia_module,
+    symbolt &tia_symbol);
 
   /// Performs a typecheck on a single instruction and saves the result to the
   /// given symbol body if necessary.
@@ -534,10 +540,24 @@ private:
   /// function call and returns the expression of the assigned variable.
   /// \param assignments: Assignment list of the function call.
   /// \param param: Parameter that should be checked.
+  /// \param tia_element: Symbol representation of the TIA element.
   /// \return: Expression including the assigned symbol's name and type.
   exprt typecheck_function_call_arguments(
     const std::vector<equal_exprt> &assignments,
-    const code_typet::parametert &param);
+    const code_typet::parametert &param,
+    const symbolt &tia_element);
+
+  /// Checks if there is a return value assignment inside of the assignment
+  /// list of a function call and returns the expression of the assigned
+  /// variable.
+  /// \param assignments: Assignment list of the function call.
+  /// \param return_type: Type of the return value.
+  /// \param tia_element: Symbol representation of the TIA element.
+  /// \return: Expression including the assigned symbol's name and type.
+  exprt typecheck_return_value_assignment(
+    const std::vector<equal_exprt> &assignments,
+    const typet &return_type,
+    const symbolt &tia_element);
 
   // Helper functions
 
