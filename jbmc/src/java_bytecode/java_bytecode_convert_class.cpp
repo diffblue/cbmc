@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
+#include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/suffix.h>
 
@@ -1037,12 +1038,10 @@ static void find_and_replace_parameter(
   const std::string &replacement_parameter_full_name =
     id2string(replacement_parameter_it->type_variable().get_identifier());
 
-  // the replacement parameter is a viable one, i.e., it comes from an outer
-  // class
-  PRECONDITION(
-    get_without_final_name_component(parameter_full_name)
-      .compare(
-        get_without_final_name_component(replacement_parameter_full_name)) > 0);
+  // Check the replacement parameter comes from an outer class
+  PRECONDITION(has_prefix(
+    replacement_parameter_full_name,
+    get_without_final_name_component(parameter_full_name)));
 
   parameter.type_variable_ref().set_identifier(replacement_parameter_full_name);
 }
@@ -1176,12 +1175,19 @@ void mark_java_implicitly_generic_class_type(
         to_java_class_type(outer_class_symbol.type);
       if(is_java_generic_class_type(outer_class_type))
       {
-        const auto &outer_generic_type_parameters =
-          to_java_generic_class_type(outer_class_type).generic_types();
-        implicit_generic_type_parameters.insert(
-          implicit_generic_type_parameters.begin(),
-          outer_generic_type_parameters.begin(),
-          outer_generic_type_parameters.end());
+        for(const java_generic_parametert &outer_generic_type_parameter :
+            to_java_generic_class_type(outer_class_type).generic_types())
+        {
+          // Create a new generic type parameter with name in the form:
+          // java::Outer$Inner::Outer::T
+          irep_idt identifier = qualified_class_name + "::" +
+                                id2string(strip_java_namespace_prefix(
+                                  outer_generic_type_parameter.get_name()));
+          java_generic_parameter_tagt bound = to_java_generic_parameter_tag(
+            outer_generic_type_parameter.subtype());
+          bound.type_variable_ref().set_identifier(identifier);
+          implicit_generic_type_parameters.emplace_back(identifier, bound);
+        }
       }
       outer_class_delimiter = outer_class_name.rfind('$');
     }

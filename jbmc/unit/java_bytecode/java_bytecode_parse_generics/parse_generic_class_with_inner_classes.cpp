@@ -18,7 +18,8 @@ SCENARIO(
     "GenericClassWithInnerClasses",
     "./java_bytecode/java_bytecode_parse_generics");
 
-  std::string outer_class_prefix = "java::GenericClassWithInnerClasses";
+  std::string outer_class_name = "GenericClassWithInnerClasses";
+  std::string outer_class_prefix = "java::" + outer_class_name;
 
   WHEN("Generic outer class has fields which are objects of the inner classes")
   {
@@ -69,7 +70,8 @@ SCENARIO(
     {
       const java_implicitly_generic_class_typet &java_class =
         require_type::require_complete_java_implicitly_generic_class(
-          class_symbol.type, {outer_class_prefix + "::T"});
+          class_symbol.type,
+          {inner_class_prefix + "::" + outer_class_name + "::T"});
 
       THEN(
         "There is a field t1 which is the generic parameter of the outer "
@@ -77,7 +79,7 @@ SCENARIO(
       {
         const auto &field = require_type::require_component(java_class, "t1");
         require_type::require_java_generic_parameter(
-          field.type(), outer_class_prefix + "::T");
+          field.type(), inner_class_prefix + "::" + outer_class_name + "::T");
       }
       THEN(
         "There is a field t2 of generic type with the generic "
@@ -88,7 +90,7 @@ SCENARIO(
         require_type::require_java_generic_type(
           field.type(),
           {{require_type::type_argument_kindt::Var,
-            outer_class_prefix + "::T"}});
+            inner_class_prefix + "::" + outer_class_name + "::T"}});
       }
     }
   }
@@ -105,7 +107,8 @@ SCENARIO(
     {
       const java_implicitly_generic_class_typet &java_class =
         require_type::require_complete_java_implicitly_generic_class(
-          class_symbol.type, {outer_class_prefix + "::T"});
+          class_symbol.type,
+          {inner_inner_class_prefix + "::" + outer_class_name + "::T"});
 
       THEN(
         "There is a field tt1 which is the generic parameter of the outer "
@@ -113,7 +116,8 @@ SCENARIO(
       {
         const auto &field = require_type::require_component(java_class, "tt1");
         require_type::require_java_generic_parameter(
-          field.type(), outer_class_prefix + "::T");
+          field.type(),
+          inner_inner_class_prefix + "::" + outer_class_name + "::T");
       }
       THEN(
         "There is a field tt2 of nested generic type with the generic "
@@ -132,7 +136,7 @@ SCENARIO(
           require_type::require_java_generic_type(
             type_argument,
             {{require_type::type_argument_kindt::Var,
-              outer_class_prefix + "::T"}});
+              inner_inner_class_prefix + "::" + outer_class_name + "::T"}});
       }
     }
   }
@@ -148,7 +152,8 @@ SCENARIO(
     THEN("It has correct generic types and implicit generic types")
     {
       require_type::require_complete_java_implicitly_generic_class(
-        class_symbol.type, {outer_class_prefix + "::T"});
+        class_symbol.type,
+        {generic_inner_class_prefix + "::" + outer_class_name + "::T"});
       const java_generic_class_typet &generic_class =
         require_type::require_complete_java_generic_class(
           class_symbol.type, {generic_inner_class_prefix + "::U"});
@@ -160,7 +165,8 @@ SCENARIO(
         const auto &field =
           require_type::require_component(generic_class, "gt1");
         require_type::require_java_generic_parameter(
-          field.type(), outer_class_prefix + "::T");
+          field.type(),
+          generic_inner_class_prefix + "::" + outer_class_name + "::T");
       }
       THEN(
         "There is a field gt2 of generic type with the generic "
@@ -173,9 +179,9 @@ SCENARIO(
         require_type::require_java_generic_type(
           field.type(),
           {{require_type::type_argument_kindt::Var,
-             outer_class_prefix + "::T"},
+            generic_inner_class_prefix + "::" + outer_class_name + "::T"},
            {require_type::type_argument_kindt::Var,
-             generic_inner_class_prefix + "::U"}});
+            generic_inner_class_prefix + "::U"}});
       }
     }
   }
@@ -194,7 +200,9 @@ SCENARIO(
     {
       require_type::require_complete_java_implicitly_generic_class(
         class_symbol.type,
-        {outer_class_prefix + "::T", outer_class_prefix + "$GenericInner::U"});
+        {generic_inner_inner_class_prefix + "::" + outer_class_name +
+           "$GenericInner::U",
+         generic_inner_inner_class_prefix + "::" + outer_class_name + "::T"});
       require_type::require_complete_java_generic_class(
         class_symbol.type, {generic_inner_inner_class_prefix + "::V"});
     }

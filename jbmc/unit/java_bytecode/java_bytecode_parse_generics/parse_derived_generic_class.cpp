@@ -187,7 +187,9 @@ SCENARIO(
 
     const class_typet &derived_class_type =
       require_type::require_complete_java_implicitly_generic_class(
-        derived_symbol.type, {"java::ContainsInnerClassGeneric::T"});
+        derived_symbol.type,
+        {"java::ContainsInnerClassGeneric$InnerClass::"
+         "ContainsInnerClassGeneric::T"});
 
     THEN("The base for superclass has the correct generic type information")
     {
@@ -197,7 +199,8 @@ SCENARIO(
         base_type,
         "java::Generic",
         {{require_type::type_argument_kindt::Var,
-          "java::ContainsInnerClassGeneric::T"}});
+          "java::ContainsInnerClassGeneric$InnerClass::"
+          "ContainsInnerClassGeneric::T"}});
     }
   }
 
@@ -552,7 +555,8 @@ SCENARIO(
       require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericBase$ImplicitGeneric",
-        {{require_type::type_argument_kindt::Var, "java::GenericBase::T"}});
+        {{require_type::type_argument_kindt::Var,
+          "java::GenericBase$ExtendImplicit::GenericBase::T"}});
     }
   }
 
@@ -573,7 +577,8 @@ SCENARIO(
       require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericBase$ImplicitAndExplicitGeneric",
-        {{require_type::type_argument_kindt::Var, "java::GenericBase::T"},
+        {{require_type::type_argument_kindt::Var,
+          "java::GenericBase$ExtendImplicitAndExplicit::GenericBase::T"},
          {require_type::type_argument_kindt::Var,
           "java::GenericBase$ExtendImplicitAndExplicit::S"}});
     }
@@ -596,9 +601,12 @@ SCENARIO(
       require_type::require_java_generic_struct_tag_type(
         base_type,
         "java::GenericBase2$ImplicitAndExplicitGeneric",
-        {{require_type::type_argument_kindt::Var, "java::GenericBase2::T"},
-         {require_type::type_argument_kindt::Var, "java::GenericBase2::S"},
-         {require_type::type_argument_kindt::Var, "java::GenericBase2::S"}});
+        {{require_type::type_argument_kindt::Var,
+          "java::GenericBase2$ExtendImplicitAndExplicit::GenericBase2::T"},
+         {require_type::type_argument_kindt::Var,
+          "java::GenericBase2$ExtendImplicitAndExplicit::GenericBase2::S"},
+         {require_type::type_argument_kindt::Var,
+          "java::GenericBase2$ExtendImplicitAndExplicit::GenericBase2::S"}});
     }
   }
 }
