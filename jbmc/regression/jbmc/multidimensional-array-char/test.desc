@@ -1,0 +1,15 @@
+KNOWNBUG
+My.class
+--function My.check2DCharArray --unwind 5 --max-nondet-array-length 10
+line 8 assertion at file My.java.*: FAILURE
+line 9 assertion at file My.java.*: SUCCESS
+line 12 assertion at file My.java.*: FAILURE
+line 13 assertion at file My.java.*: SUCCESS
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Multidimentional char array used to cause a performance issue which is reported
+in TG-5076. The issue is no longer reproducible.
+It currently core-dump jbmc by generating invalid trace: TG-8466
