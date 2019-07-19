@@ -392,18 +392,13 @@ require_type::require_java_implicitly_generic_class(
     &implicit_generic_type_vars =
       java_implicitly_generic_class_type.implicit_generic_types();
   REQUIRE(implicit_generic_type_vars.size() == implicit_type_variables.size());
-  REQUIRE(
-    std::equal(
-      implicit_type_variables.begin(),
-      implicit_type_variables.end(),
-      implicit_generic_type_vars.begin(),
-      [](
-        const irep_idt &type_var_name,
-        const java_generic_parametert &param) { //NOLINT
-        REQUIRE(is_java_generic_parameter(param));
-        return param.type_variable().get_identifier() == type_var_name;
-      }));
-
+  auto param = implicit_generic_type_vars.begin();
+  auto type_var_name = implicit_type_variables.begin();
+  for(; param != implicit_generic_type_vars.end(); ++param, ++type_var_name)
+  {
+    REQUIRE(is_java_generic_parameter(*param));
+    REQUIRE(param->type_variable().get_identifier() == *type_var_name);
+  }
   return java_implicitly_generic_class_type;
 }
 
