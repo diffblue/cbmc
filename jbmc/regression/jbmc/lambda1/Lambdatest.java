@@ -153,6 +153,20 @@ public class Lambdatest {
       Outer.Inner inner = outer.new Inner();
       Function<Integer, Integer> getter = inner.getOuterGetter();
       assert(getter.apply(0) != 42); // should fail
+    // Static intialized lambda
+    } else if(unknown == 26) {
+      assert StaticLambdas.id.apply(96) == 96; // should succeed
+    } else if(unknown == 27) {
+      assert StaticLambdas.id.apply(96) != 96; // should fail
+    // Reference equality of the captured object
+    } else if(unknown == 28) {
+      Object object = new Object();
+      Function<Integer, Object> lambda = (x) -> object;
+      assert(lambda.apply(0) == object); // should succeed
+    } else if(unknown == 29) {
+      Object object = new Object();
+      Function<Integer, Object> lambda = (x) -> object;
+      assert(lambda.apply(0) != object); // should fail
     }
   }
 
@@ -160,6 +174,10 @@ public class Lambdatest {
     Function<Integer, Integer> func = (x) -> value;
     assert func.apply(0) == 42;
   }
+}
+
+class StaticLambdas {
+  final static Function<Integer, Integer> id = x -> x;
 }
 
 class Outer {
