@@ -1080,7 +1080,7 @@ Oom_Param_Assignment:
     ;
     
 Param_Assignment:
-    Variable_Name TOK_ASSIGNMENT Variable_Access
+    Variable_Name TOK_ASSIGNMENT IL_Operand
     {
       newstack($$);
       parser_stack($$) = equal_exprt{std::move(parser_stack($1)), 

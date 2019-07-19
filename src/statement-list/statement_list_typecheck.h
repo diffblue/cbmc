@@ -129,6 +129,10 @@ private:
   /// adds symbols for its contents to the symbol table.
   void typecheck_tag_list();
 
+  /// Adds a symbol for the RLO to the symbol table. This symbol is used by
+  /// other operations to save intermediate results of the rlo expression.
+  void add_temp_rlo();
+
   /// Creates a data block type for the given function block.
   /// \param function_block: Function block with an interface that should be
   /// converted to a data block.
@@ -368,15 +372,23 @@ private:
     const codet &op_code,
     const symbolt &tia_element);
 
-  /// Performs a typecheck on a STL boolean And Not instruction. Reads and
+  /// Performs a typecheck on a STL boolean Or instruction. Reads and
   /// modifies the RLO, OR and FC bit.
   /// \param op_code: OP code of the instruction.
   /// \param tia_element: Symbol representation of the TIA element.
   void
   typecheck_statement_list_or(const codet &op_code, const symbolt &tia_element);
 
-  /// Performs a typecheck on a STL boolean Or instruction. Reads and modifies
-  /// the RLO, OR and FC bit.
+  /// Performs a typecheck on a STL boolean XOR instruction. Reads and
+  /// modifies the RLO, OR and FC bit.
+  /// \param op_code: OP code of the instruction.
+  /// \param tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_xor(
+    const codet &op_code,
+    const symbolt &tia_element);
+
+  /// Performs a typecheck on a STL boolean And Not instruction. Reads and
+  /// modifies the RLO, OR and FC bit.
   /// \param op_code: OP code of the instruction.
   /// \param tia_element: Symbol representation of the TIA element.
   void typecheck_statement_list_and_not(
@@ -388,6 +400,14 @@ private:
   /// \param op_code: OP code of the instruction.
   /// \param tia_element: Symbol representation of the TIA element.
   void typecheck_statement_list_or_not(
+    const codet &op_code,
+    const symbolt &tia_element);
+
+  /// Performs a typecheck on a STL boolean XOR Not instruction. Reads and
+  /// modifies the RLO, OR and FC bit.
+  /// \param op_code: OP code of the instruction.
+  /// \param tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_xor_not(
     const codet &op_code,
     const symbolt &tia_element);
 
@@ -405,6 +425,11 @@ private:
   /// \param op_code: OP code of the instruction.
   void typecheck_statement_list_nested_or(const codet &op_code);
 
+  /// Performs a typecheck on a nested XOR instruction. Pushes the current
+  /// program state to the nesting stack and cleans the RLO, OR and FC bit.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_nested_xor(const codet &op_code);
+
   /// Performs a typecheck on a nested And Not instruction. Pushes the current
   /// program state to the nesting stack and cleans the RLO, OR and FC bit.
   /// \param op_code: OP code of the instruction.
@@ -414,6 +439,11 @@ private:
   /// program state to the nesting stack and cleans the RLO, OR and FC bit.
   /// \param op_code: OP code of the instruction.
   void typecheck_statement_list_nested_or_not(const codet &op_code);
+
+  /// Performs a typecheck on a nested XOR Not instruction. Pushes the current
+  /// program state to the nesting stack and cleans the RLO, OR and FC bit.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_nested_xor_not(const codet &op_code);
 
   /// Performs a typecheck on a Nesting Closed instruction. Uses the latest
   /// entry on the nesting stack and modifies the RLO, OR and FC bit according
@@ -478,7 +508,7 @@ private:
   /// Performs a typecheck on a STL instruction with an additional operand that
   /// should be no constant.
   /// \param op_code: OP code of the instruction.
-  /// \return Reference to the operand.
+  /// \return: Reference to the operand.
   const symbol_exprt &
   typecheck_instruction_with_non_const_operand(const codet &op_code);
 
@@ -486,10 +516,31 @@ private:
   /// \param op_code: OP code of the instruction.
   void typecheck_instruction_without_operand(const codet &op_code);
 
-  /// Performs a typecheck on an STL instruction that uses two accumulator
+  /// Performs a typecheck on a STL instruction that uses two accumulator
   /// entries.
   /// \param op_code: OP code of the instruction.
   void typecheck_binary_accumulator_instruction(const codet &op_code);
+
+  /// Performs a typecheck on a STL instruction that initializes a new boolean
+  /// nesting.
+  /// \param op_code: OP code of the instruction.
+  /// \param rlo_value: Value of the RLO that is pushed on the nesting stack
+  ///   for the case that this is the first instruction of a new bit string.
+  void typecheck_nested_boolean_instruction(
+    const codet &op_code,
+    const exprt &rlo_value);
+
+  /// Performs a typecheck on the operand of a not nested boolean instruction
+  /// and returns the result.
+  /// \param op_code: OP code of the instruction.
+  /// \param tia_element: Symbol representation of the TIA element.
+  /// \param negate: Whether the operand should be negated (e.g. for the
+  ///   `AND NOT` expression).
+  /// \return: Typechecked operand.
+  exprt typecheck_simple_boolean_instruction_operand(
+    const codet &op_code,
+    const symbolt &tia_element,
+    bool negate);
 
   /// Performs a typecheck on an STL comparison instruction. Modifies the RLO.
   /// \param comparison: ID of the compare expression that should be pushed to
@@ -545,6 +596,15 @@ private:
     const code_typet::parametert &param,
     const symbolt &tia_element);
 
+  /// Checks if the given assigned expression is a variable or a constant and
+  /// returns the typechecked version.
+  /// \param tia_element: Symbol representation of the TIA element.
+  /// \param rhs: Expression that the function parameter got assigned to.
+  /// \return: Expression of either a symbol or a constant.
+  exprt typecheck_function_call_argument_rhs(
+    const symbolt &tia_element,
+    const exprt &rhs);
+
   /// Checks if there is a return value assignment inside of the assignment
   /// list of a function call and returns the expression of the assigned
   /// variable.
@@ -568,6 +628,11 @@ private:
   /// instruction was encontered.
   /// \param op: Operand of the encountered instruction.
   void initialize_bit_expression(const exprt &op);
+
+  /// Saves the current RLO bit to a temporary variable to prevent false
+  /// overrides when modifying boolean variables.
+  /// \param tia_element: Symbol representation of the TIA element.
+  void save_rlo_state(symbolt &tia_element);
 };
 
 #endif // CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
