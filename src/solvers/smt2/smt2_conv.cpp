@@ -1807,7 +1807,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     else if(quantifier_expr.id() == ID_exists)
       out << "(exists ";
 
-    exprt bound=expr.op0();
+    exprt bound = quantifier_expr.symbol();
 
     out << "((";
     convert_expr(bound);
