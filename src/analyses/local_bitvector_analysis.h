@@ -28,10 +28,7 @@ public:
   local_bitvector_analysist(
     const goto_functiont &_goto_function,
     const namespacet &ns)
-    : dirty(_goto_function),
-      locals(_goto_function),
-      cfg(_goto_function.body),
-      ns(ns)
+    : dirty(_goto_function), locals(_goto_function), cfg(_goto_function.body), ns(ns)
   {
     build();
   }
@@ -200,9 +197,8 @@ protected:
     points_tot &loc_info_src,
     points_tot &loc_info_dest);
 
-  flagst get_rec(
-    const exprt &rhs,
-    points_tot &loc_info_src);
+  flagst
+  get_rec(const exprt &rhs, points_tot &loc_info_src);
 
   bool is_tracked(const irep_idt &identifier);
 };

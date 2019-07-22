@@ -127,7 +127,6 @@ void goto_symext::symex_allocate(
 
     // we introduce a fresh symbol for the size
     // to prevent any issues of the size getting ever changed
-
     if(
       object_type->id() == ID_array &&
       !to_array_type(*object_type).size().is_constant())
@@ -136,8 +135,8 @@ void goto_symext::symex_allocate(
 
       auxiliary_symbolt size_symbol;
 
-      size_symbol.base_name=
-        "dynamic_object_size"+std::to_string(dynamic_counter);
+      size_symbol.base_name =
+        "dynamic_object_size" + std::to_string(dynamic_counter);
       size_symbol.name =
         SYMEX_DYNAMIC_PREFIX + id2string(size_symbol.base_name);
       size_symbol.type=tmp_size.type();
