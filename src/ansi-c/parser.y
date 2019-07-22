@@ -472,16 +472,6 @@ quantifier_expression:
           mto($$, $5);
           PARSER.pop_scope();
         }
-        | TOK_ACSL_FORALL compound_scope declaration primary_expression
-        {
-          // The precedence of this operator is too high; it is meant
-          // to bind only very weakly.
-          $$=$1;
-          set($$, ID_forall);
-          mto($$, $3);
-          mto($$, $4);
-          PARSER.pop_scope();
-        }
         | TOK_EXISTS compound_scope '{' declaration comma_expression '}'
         {
           $$=$1;
@@ -490,36 +480,26 @@ quantifier_expression:
           mto($$, $5);
           PARSER.pop_scope();
         }
-        | TOK_ACSL_EXISTS compound_scope declaration primary_expression
-        {
-          // The precedence of this operator is too high; it is meant
-          // to bind only very weakly.
-          $$=$1;
-          set($$, ID_exists);
-          mto($$, $3);
-          mto($$, $4);
-          PARSER.pop_scope();
-        }
         ;
 
 loop_invariant_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_LOOP_INVARIANT '(' conditional_expression ')'
+        | TOK_CPROVER_LOOP_INVARIANT '(' ACSL_binding_expression ')'
         { $$=$3; }
         ;
 
 requires_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_REQUIRES '(' conditional_expression ')'
+        | TOK_CPROVER_REQUIRES '(' ACSL_binding_expression ')'
         { $$=$3; }
         ;
 
 ensures_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_ENSURES '(' conditional_expression ')'
+        | TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
         { $$=$3; }
         ;
 
@@ -819,6 +799,27 @@ logical_equivalence_expression:
         { binary($$, $1, $2, ID_equal, $3); }
         ;
 
+/* Non-standard, defined by ACSL. Lowest precedence of all operators. */
+ACSL_binding_expression:
+          conditional_expression
+        | TOK_ACSL_FORALL compound_scope declaration ACSL_binding_expression
+        {
+          $$=$1;
+          set($$, ID_forall);
+          mto($$, $3);
+          mto($$, $4);
+          PARSER.pop_scope();
+        }
+        | TOK_ACSL_EXISTS compound_scope declaration ACSL_binding_expression
+        {
+          $$=$1;
+          set($$, ID_exists);
+          mto($$, $3);
+          mto($$, $4);
+          PARSER.pop_scope();
+        }
+        ;
+
 conditional_expression:
           logical_equivalence_expression
         | logical_equivalence_expression '?' comma_expression ':' conditional_expression
@@ -838,7 +839,7 @@ conditional_expression:
         ;
 
 assignment_expression:
-          conditional_expression
+          ACSL_binding_expression /* usually conditional_expression */
         | cast_expression '=' assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign); }
         | cast_expression TOK_MULTASSIGN assignment_expression
