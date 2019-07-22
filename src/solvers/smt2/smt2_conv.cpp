@@ -2214,6 +2214,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_typecast(tmp);
       }
     }
+    else if(src_type.id() == ID_empty)
+    {
+      convert_expr(src);
+    }
     else
     {
       std::ostringstream e_str;
@@ -4625,6 +4629,11 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id()==ID_c_bit_field)
   {
     convert_type(c_bit_field_replacement_type(to_c_bit_field_type(type), ns));
+  }
+  else if(type.id() == ID_empty)
+  {
+    // the NONDET(void) is in fact of type char
+    out << "(_ BitVec " << boolbv_width(char_type()) << " )";
   }
   else
   {
