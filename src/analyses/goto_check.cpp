@@ -1113,7 +1113,8 @@ void goto_checkt::pointer_validity_check(
   const exprt &pointer=expr.pointer();
 
   auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-  CHECK_RETURN(size_of_expr_opt.has_value());
+  if(!size_of_expr_opt.has_value())
+    return; // in the case of `void*`
 
   auto conditions = address_check(pointer, size_of_expr_opt.value());
 

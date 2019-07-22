@@ -1,0 +1,9 @@
+CORE
+main.c
+--function foo --pointer-check
+^\[foo.assertion.1\] line \d+ assertion \*\(unsigned \*\)\(arg\) == 5: FAILURE$
+^\[foo.pointer_dereference.4\] line \d+ dereference failure: dead object in \*\(\(unsigned int \*\)arg\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
