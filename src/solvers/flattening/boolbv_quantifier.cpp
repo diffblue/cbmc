@@ -24,12 +24,9 @@ static bool expr_eq(const exprt &expr1, const exprt &expr2)
 /// To obtain the min value for the quantifier variable of the specified
 /// forall/exists operator. The min variable is in the form of "!(var_expr >
 /// constant)".
-static exprt
+static optionalt<constant_exprt>
 get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
 {
-  PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
-
-  exprt res = false_exprt();
   if(quantifier_expr.id()==ID_or)
   {
     /**
@@ -45,11 +42,11 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
         continue;
       if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
       {
-        return y.op1();
+        return to_constant_expr(y.op1());
       }
     }
   }
-  else
+  else if(quantifier_expr.id() == ID_and)
   {
     /**
      * The min variable
@@ -61,20 +58,19 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
         continue;
       if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
       {
-        return x.op1();
+        return to_constant_expr(x.op1());
       }
     }
   }
-  return res;
+
+  return {};
 }
 
 /// To obtain the max value for the quantifier variable of the specified
 /// forall/exists operator.
-static exprt
+static optionalt<constant_exprt>
 get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
 {
-  PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
-  exprt res = false_exprt();
   if(quantifier_expr.id()==ID_or)
   {
     /**
@@ -97,8 +93,7 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
          * maximum index as specified in the original code.
          **/
         over_i-=1;
-        res=from_integer(over_i, x.op1().type());
-        return res;
+        return from_integer(over_i, x.op1().type());
       }
     }
   }
@@ -120,12 +115,12 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
         const constant_exprt &over_expr = to_constant_expr(y.op1());
         mp_integer over_i = numeric_cast_v<mp_integer>(over_expr);
         over_i-=1;
-        res=from_integer(over_i, y.op1().type());
-        return res;
+        return from_integer(over_i, y.op1().type());
       }
     }
   }
-  return res;
+
+  return {};
 }
 
 static optionalt<exprt>
@@ -145,14 +140,14 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
     return re;
   }
 
-  const exprt min_i = get_quantifier_var_min(var_expr, re);
-  const exprt max_i = get_quantifier_var_max(var_expr, re);
+  const auto min_i = get_quantifier_var_min(var_expr, re);
+  const auto max_i = get_quantifier_var_max(var_expr, re);
 
-  if(min_i.is_false() || max_i.is_false())
+  if(!min_i.has_value() || !max_i.has_value())
     return nullopt;
 
-  mp_integer lb = numeric_cast_v<mp_integer>(to_constant_expr(min_i));
-  mp_integer ub = numeric_cast_v<mp_integer>(to_constant_expr(max_i));
+  mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
+  mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
   if(lb>ub)
     return nullopt;
