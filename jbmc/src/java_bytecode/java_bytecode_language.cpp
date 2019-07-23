@@ -899,6 +899,17 @@ bool java_bytecode_languaget::generate_support_functions(
   // parameter names
   convert_lazy_method(res.main_function.name, symbol_table_builder);
 
+  const symbolt &symbol =
+    symbol_table_builder.lookup_ref(res.main_function.name);
+  if(symbol.value.is_nil())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "the program has no entry point",
+      "function",
+      "Check that the specified entry point is included by your "
+      "--context-include or --context-exclude options");
+  }
+
   // generate the test harness in __CPROVER__start and a call the entry point
   return java_entry_point(
     symbol_table_builder,

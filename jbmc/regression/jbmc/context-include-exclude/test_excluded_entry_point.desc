@@ -1,0 +1,11 @@
+CORE
+Main.class
+--context-exclude 'org.cprover.MyClass$Inner.' --function 'org.cprover.MyClass$Inner.doIt:(I)I'
+^EXIT=1$
+^SIGNAL=0$
+the program has no entry point
+--
+_Map_base::at
+unordered_map::at: key not found
+--
+Tests that a proper error message is printed.
