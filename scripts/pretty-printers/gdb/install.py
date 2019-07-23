@@ -12,8 +12,8 @@ import os
 pretty_printer_folder = '{0}'
 if os.path.exists(pretty_printer_folder):
     sys.path.insert(1, pretty_printer_folder)
-    import auto_load
-    auto_load.load_pretty_printers()
+    from pretty_printers import load_cbmc_printers
+    load_cbmc_printers()
 end
 """
 
