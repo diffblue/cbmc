@@ -1,11 +1,17 @@
 import gdb
 
 
+# Class for pretty-printing dstringt
 class DStringPrettyPrinter:
+    "Print a dstringt"
+
     def __init__(self, val):
         self.val = val
 
     def to_string(self):
+        # ideally, we want to access the memory where the string
+        # is stored directly instead of calling a function. However,
+        # this is simpler.
         try:
             raw_address = str(self.val.address)
 
