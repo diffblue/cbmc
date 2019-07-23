@@ -54,8 +54,7 @@ def load_cbmc_printers():
 
     # First argument is the name of the pretty-printer, second is a regex match for which type
     # it should be applied too, third is the class that should be called to pretty-print that type.
-    printers.add_printer('irep_idt', '^irep_idt', DStringPrettyPrinter)
-    printers.add_printer('dstringt', '^dstringt', DStringPrettyPrinter)
+    printers.add_printer('dstringt', '^(?:dstringt|irep_idt)', DStringPrettyPrinter)
     printers.add_printer('instructiont', '^goto_programt::instructiont', InstructionPrettyPrinter)
     # We aren't associating with a particular object file, so pass in None instead of gdb.current_objfile()
     gdb.printing.register_pretty_printer(None, printers, replace=True)
