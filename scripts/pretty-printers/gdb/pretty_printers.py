@@ -23,23 +23,30 @@ class DStringPrettyPrinter:
             # Addresses are usually {address} {optional type_name}
             typed_pointer = "((const {} *){})".format(self.val.type, raw_address.split(None, 1)[0])
 
+            string_no = self.val["no"]
+
             # Check that the pointer is not null.
             null_ptr = gdb.parse_and_eval("{} == 0".format(typed_pointer))
             if null_ptr.is_optimized_out:
-                return "<Ptr optimized out>"
+                return "{}: <Ptr optimized out>".format(string_no)
             if null_ptr:
                 return ""
 
-            # If it isn't attempt to find the string.
+            table_len = gdb.parse_and_eval("get_string_container().string_vector.size()")
+            if table_len.is_optimized_out:
+                return "{}: <Table len optimized out>".format(string_no)
+            if string_no >= table_len:
+                return "{} index ({}) out of range".format(self.val.type, string_no)
+
             value = gdb.parse_and_eval("{}->c_str()".format(typed_pointer))
             if value.is_optimized_out:
-                return "<Optimized out>"
-            return value
+                return "{}: <Optimized out>".format(string_no)
+            return "{}: \"{}\"".format(string_no, value.string().replace("\0", "").replace("\"", "\\\""))
         except:
             return ""
 
     def display_hint(self):
-        return "string"
+        return None
 
 
 class InstructionPrettyPrinter:
