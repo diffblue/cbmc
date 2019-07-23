@@ -1,0 +1,9 @@
+CORE symex-driven-lazy-loading-expected-failure
+Main.class
+--function Main.test3 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.test3:(Ljava/lang/StringBuilder;I)V.assertion.1"
+^Generated 1 VCC\(s\), 1 remaining after simplification$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
