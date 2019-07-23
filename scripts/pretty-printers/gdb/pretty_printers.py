@@ -24,12 +24,17 @@ class DStringPrettyPrinter:
             typed_pointer = "((const {} *){})".format(self.val.type, raw_address.split(None, 1)[0])
 
             # Check that the pointer is not null.
-            if gdb.parse_and_eval(typed_pointer + " == 0"):
+            null_ptr = gdb.parse_and_eval("{} == 0".format(typed_pointer))
+            if null_ptr.is_optimized_out:
+                return "<Ptr optimized out>"
+            if null_ptr:
                 return ""
 
             # If it isn't attempt to find the string.
-            value = "(*{})".format(typed_pointer)
-            return gdb.parse_and_eval(value + ".c_str()")
+            value = gdb.parse_and_eval("{}->c_str()".format(typed_pointer))
+            if value.is_optimized_out:
+                return "<Optimized out>"
+            return value
         except:
             return ""
 
