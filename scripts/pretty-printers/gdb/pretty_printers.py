@@ -21,7 +21,7 @@ class DStringPrettyPrinter:
 
             # Split the address on the first space, return that value
             # Addresses are usually {address} {optional type_name}
-            typed_pointer = "({}*){}".format(self.val.type, raw_address.split(None, 1)[0])
+            typed_pointer = "((const {} *){})".format(self.val.type, raw_address.split(None, 1)[0])
 
             # Check that the pointer is not null.
             if gdb.parse_and_eval(typed_pointer + " == 0"):
