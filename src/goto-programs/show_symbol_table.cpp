@@ -31,16 +31,9 @@ void show_symbol_table_brief_plain(
   std::ostream &out)
 {
   // we want to sort alphabetically
-  std::set<std::string> symbols;
-
-  for(const auto &symbol_pair : symbol_table.symbols)
-  {
-    symbols.insert(id2string(symbol_pair.first));
-  }
-
   const namespacet ns(symbol_table);
 
-  for(const std::string &id : symbols)
+  for(const auto &id : symbol_table.sorted_symbol_names())
   {
     const symbolt &symbol=ns.lookup(id);
 
