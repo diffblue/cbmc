@@ -1158,7 +1158,7 @@ void mark_java_implicitly_generic_class_type(
   // the order from the outer-most inwards
   std::vector<java_generic_parametert> implicit_generic_type_parameters;
   std::string::size_type outer_class_delimiter =
-    qualified_class_name.rfind("$");
+    qualified_class_name.rfind('$');
   while(outer_class_delimiter != std::string::npos)
   {
     std::string outer_class_name =
@@ -1178,7 +1178,7 @@ void mark_java_implicitly_generic_class_type(
           outer_generic_type_parameters.begin(),
           outer_generic_type_parameters.end());
       }
-      outer_class_delimiter = outer_class_name.rfind("$");
+      outer_class_delimiter = outer_class_name.rfind('$');
     }
     else
     {
