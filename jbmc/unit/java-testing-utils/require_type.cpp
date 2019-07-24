@@ -477,7 +477,7 @@ require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
   return result;
 }
 
-const pointer_typet
+pointer_typet
 require_type::require_pointer_to_tag(const typet &type, const irep_idt &tag)
 {
   const auto pointer_type = require_type::require_pointer(type, {});

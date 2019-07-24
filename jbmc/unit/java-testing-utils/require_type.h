@@ -28,7 +28,7 @@ require_pointer(const typet &type, const optionalt<typet> &subtype);
 const struct_tag_typet &
 require_struct_tag(const typet &type, const irep_idt &identifier = "");
 
-const pointer_typet require_pointer_to_tag(
+pointer_typet require_pointer_to_tag(
   const typet &type,
   const irep_idt &identifier = irep_idt());
 
