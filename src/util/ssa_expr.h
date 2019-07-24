@@ -91,6 +91,27 @@ public:
     DATA_CHECK(
       vm, expr.id() == ID_symbol, "SSA expression symbols are symbols");
     DATA_CHECK(vm, expr.get_bool(ID_C_SSA_symbol), "wrong SSA expression ID");
+    // Check that each of the L0, L1 and L2 indices are either absent or are
+    // set to a non-empty value -- otherwise we could have two ssa_exprts that
+    // represent the same value (since get(ID_L0/1/2) will yield an empty string
+    // in both cases), but which do not compare equal (since irept::compare
+    // does not regard a missing key and an empty value as equivalent)
+    const auto &expr_sub = expr.get_named_sub();
+    const auto expr_l0 = expr_sub.find(ID_L0);
+    const auto expr_l1 = expr_sub.find(ID_L1);
+    const auto expr_l2 = expr_sub.find(ID_L2);
+    DATA_CHECK(
+      vm,
+      expr_l0 == expr_sub.end() || !expr_l0->second.id().empty(),
+      "L0 must not be an empty string");
+    DATA_CHECK(
+      vm,
+      expr_l1 == expr_sub.end() || !expr_l1->second.id().empty(),
+      "L1 must not be an empty string");
+    DATA_CHECK(
+      vm,
+      expr_l2 == expr_sub.end() || !expr_l2->second.id().empty(),
+      "L2 must not be an empty string");
   }
 
   static void validate(
