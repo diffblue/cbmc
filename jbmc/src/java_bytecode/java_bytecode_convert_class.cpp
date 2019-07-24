@@ -1142,8 +1142,9 @@ void mark_java_implicitly_generic_class_type(
 {
   const std::string qualified_class_name = "java::" + id2string(class_name);
   PRECONDITION(symbol_table.has_symbol(qualified_class_name));
+  // This will have its type changed
   symbolt &class_symbol = symbol_table.get_writeable_ref(qualified_class_name);
-  java_class_typet &class_type = to_java_class_type(class_symbol.type);
+  const java_class_typet &class_type = to_java_class_type(class_symbol.type);
 
   // the class must be an inner non-static class, i.e., have a field this$*
   // TODO this should be simplified once static inner classes are marked
@@ -1197,19 +1198,21 @@ void mark_java_implicitly_generic_class_type(
   // implicitly generic and update identifiers of type parameters used in fields
   if(!implicit_generic_type_parameters.empty())
   {
-    class_symbol.type = java_implicitly_generic_class_typet(
+    java_implicitly_generic_class_typet new_class_type(
       class_type, implicit_generic_type_parameters);
 
-    for(auto &field : class_type.components())
+    for(auto &field : new_class_type.components())
     {
       find_and_replace_parameters(
         field.type(), implicit_generic_type_parameters);
     }
 
-    for(auto &base : class_type.bases())
+    for(auto &base : new_class_type.bases())
     {
       find_and_replace_parameters(
         base.type(), implicit_generic_type_parameters);
     }
+
+    class_symbol.type = new_class_type;
   }
 }
