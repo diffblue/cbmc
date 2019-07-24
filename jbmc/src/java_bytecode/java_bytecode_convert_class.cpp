@@ -989,6 +989,16 @@ bool java_bytecode_convert_class(
   return true;
 }
 
+static std::string get_final_name_component(const std::string &name)
+{
+  return name.substr(name.rfind("::") + 2);
+}
+
+static std::string get_without_final_name_component(const std::string &name)
+{
+  return name.substr(0, name.rfind("::"));
+}
+
 /// For a given generic type parameter, check if there is a parameter in the
 /// given vector of replacement parameters with a matching name. If yes,
 /// replace the identifier of the parameter at hand by the identifier of
@@ -1008,19 +1018,17 @@ static void find_and_replace_parameter(
   // get the name of the parameter, e.g., `T` from `java::Class::T`
   const std::string &parameter_full_name =
     id2string(parameter.type_variable_ref().get_identifier());
-  const std::string &parameter_name =
-    parameter_full_name.substr(parameter_full_name.rfind("::") + 2);
+  const std::string parameter_name =
+    get_final_name_component(parameter_full_name);
 
   // check if there is a replacement parameter with the same name
   const auto replacement_parameter_it = std::find_if(
     replacement_parameters.begin(),
     replacement_parameters.end(),
     [&parameter_name](const java_generic_parametert &replacement_param) {
-      const std::string &replacement_parameter_full_name =
-        id2string(replacement_param.type_variable().get_identifier());
       return parameter_name ==
-             replacement_parameter_full_name.substr(
-               replacement_parameter_full_name.rfind("::") + 2);
+             get_final_name_component(
+               id2string(replacement_param.type_variable().get_identifier()));
     });
 
   // if a replacement parameter was found, update the identifier
@@ -1032,10 +1040,9 @@ static void find_and_replace_parameter(
     // the replacement parameter is a viable one, i.e., it comes from an outer
     // class
     PRECONDITION(
-      parameter_full_name.substr(0, parameter_full_name.rfind("::"))
-        .compare(
-          replacement_parameter_full_name.substr(
-            0, replacement_parameter_full_name.rfind("::"))) > 0);
+      get_without_final_name_component(parameter_full_name)
+        .compare(get_without_final_name_component(
+          replacement_parameter_full_name)) > 0);
 
     parameter.type_variable_ref().set_identifier(
       replacement_parameter_full_name);
