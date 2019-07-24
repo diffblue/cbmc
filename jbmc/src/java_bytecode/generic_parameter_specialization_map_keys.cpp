@@ -151,6 +151,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   {
     return;
   }
+
   const java_generic_struct_tag_typet &generic_symbol =
     to_java_generic_struct_tag_type(struct_tag_type);
 
@@ -158,7 +159,6 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
     get_all_generic_parameters(symbol_struct);
   const java_generic_typet::generic_type_argumentst &type_args =
     generic_symbol.generic_types();
-
   INVARIANT(
     type_args.size() == generic_parameters.size(),
     "All generic parameters of the superclass need to be concretized");
