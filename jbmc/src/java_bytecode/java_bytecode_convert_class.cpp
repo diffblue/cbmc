@@ -1012,11 +1012,10 @@ static void find_and_replace_parameter(
     parameter_full_name.substr(parameter_full_name.rfind("::") + 2);
 
   // check if there is a replacement parameter with the same name
-  const auto replacement_parameter_p = std::find_if(
+  const auto replacement_parameter_it = std::find_if(
     replacement_parameters.begin(),
     replacement_parameters.end(),
-    [&parameter_name](const java_generic_parametert &replacement_param)
-    {
+    [&parameter_name](const java_generic_parametert &replacement_param) {
       const std::string &replacement_parameter_full_name =
         id2string(replacement_param.type_variable().get_identifier());
       return parameter_name.compare(
@@ -1025,10 +1024,10 @@ static void find_and_replace_parameter(
     });
 
   // if a replacement parameter was found, update the identifier
-  if(replacement_parameter_p != replacement_parameters.end())
+  if(replacement_parameter_it != replacement_parameters.end())
   {
     const std::string &replacement_parameter_full_name =
-      id2string(replacement_parameter_p->type_variable().get_identifier());
+      id2string(replacement_parameter_it->type_variable().get_identifier());
 
     // the replacement parameter is a viable one, i.e., it comes from an outer
     // class
