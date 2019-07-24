@@ -415,8 +415,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
     // we only merge neighboring constants!
     Forall_expr(it, new_operands)
     {
-      exprt::operandst::iterator next=it;
-      next++;
+      const exprt::operandst::iterator next = std::next(it);
 
       if(next != new_operands.end())
       {
