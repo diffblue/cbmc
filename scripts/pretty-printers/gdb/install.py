@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from shutil import copyfile
 
 
 def create_gdbinit_file():
@@ -48,6 +49,14 @@ def create_gdbinit_file():
 
     lines = [ "python" ] + list(map("import {}".format, sorted(imports))) + [ "", "" ] + code_block + [ "", "" ] + lines + [ "" ]
 
+    backup_file = os.path.join(home_folder, "backup.gdbinit")
+    if os.path.exists(backup_file):
+        print("backup.gdbinit file already exists. Type 'y' if you would like to overwrite it or any other key to exit.")
+        choice = input().lower()
+        if choice != 'y':
+            return
+    print("Backing up {0}".format(gdbinit_file))
+    copyfile(gdbinit_file, backup_file)
     print("Adding pretty-print commands to {0}.".format(gdbinit_file))
     try:
         with open(gdbinit_file, 'w+') as file:
