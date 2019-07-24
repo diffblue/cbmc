@@ -1141,7 +1141,7 @@ void mark_java_implicitly_generic_class_type(
 
   // the class must be an inner non-static class, i.e., have a field this$*
   // TODO this should be simplified once static inner classes are marked
-  // during parsing
+  //   during parsing
   bool no_this_field = std::none_of(
     class_type.components().begin(),
     class_type.components().end(),
