@@ -147,7 +147,7 @@ bool require_java_generic_type_argument_expectation(
   {
   case require_type::type_argument_kindt::Var:
   {
-    REQUIRE(is_java_generic_parameter((type_argument)));
+    REQUIRE(is_java_generic_parameter(type_argument));
     java_generic_parametert parameter =
       to_java_generic_parameter(type_argument);
     REQUIRE(parameter.type_variable().get_identifier() == expected.description);
