@@ -17,6 +17,7 @@ SCENARIO(
   const symbol_tablet &new_symbol_table = load_java_class(
     "GenericClassWithInnerClasses",
     "./java_bytecode/java_bytecode_parse_generics");
+  namespacet ns{new_symbol_table};
 
   std::string outer_class_name = "GenericClassWithInnerClasses";
   std::string outer_class_prefix = "java::" + outer_class_name;
@@ -49,13 +50,59 @@ SCENARIO(
     }
     THEN("There is a field f3 of generic type with correct arguments")
     {
+      std::string inner_class_prefix = outer_class_prefix + "$GenericInner";
       const auto &field = require_type::require_component(generic_class, "f3");
-      require_type::require_pointer_to_tag(
-        field.type(), outer_class_prefix + "$GenericInner");
-      require_type::require_java_generic_type(
-        field.type(),
-        {{require_type::type_argument_kindt::Var, outer_class_prefix + "::T"},
-         {require_type::type_argument_kindt::Inst, "java::java.lang.Integer"}});
+      const auto &field_type =
+        require_type::require_pointer_to_tag(field.type(), inner_class_prefix);
+      java_generic_struct_tag_typet inner_class_tag =
+        require_type::require_java_generic_struct_tag_type(
+          field_type.subtype(),
+          inner_class_prefix,
+          {
+            {require_type::type_argument_kindt::Var,
+             outer_class_prefix + "::T"},
+            {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"},
+          });
+      const java_generic_class_typet &inner_class =
+        require_type::require_complete_java_generic_class(
+          ns.follow_tag(inner_class_tag), {inner_class_prefix + "::U"});
+      THEN(
+        "There is a field shadowingField of generic type with correct "
+        "arguments")
+      {
+        std::string shadowing_inner_class_prefix =
+          inner_class_prefix + "$ShadowingGenericInner";
+        const auto &shadowing_field =
+          require_type::require_component(inner_class, "shadowingField");
+        const auto &shadowing_field_type = require_type::require_pointer_to_tag(
+          shadowing_field.type(), shadowing_inner_class_prefix);
+        java_generic_struct_tag_typet shadowing_inner_class_tag =
+          require_type::require_java_generic_struct_tag_type(
+            shadowing_field_type.subtype(),
+            shadowing_inner_class_prefix,
+            {
+              {require_type::type_argument_kindt::Var,
+               inner_class_prefix + "::" + outer_class_name + "::T"},
+              {require_type::type_argument_kindt::Var,
+               inner_class_prefix + "::U"},
+              {require_type::type_argument_kindt::Inst,
+               "java::java.lang.String"},
+            });
+        const java_generic_class_typet &shadowing_inner_class =
+          require_type::require_complete_java_generic_class(
+            ns.follow_tag(shadowing_inner_class_tag),
+            {shadowing_inner_class_prefix + "::U"});
+        THEN(
+          "There is a field shadowedField which is the generic parameter of "
+          "the inner class")
+        {
+          const auto &shadowed_field = require_type::require_component(
+            shadowing_inner_class, "shadowedField");
+          require_type::require_java_generic_parameter(
+            shadowed_field.type(), shadowing_inner_class_prefix + "::U");
+        }
+      }
     }
   }
 
@@ -182,6 +229,26 @@ SCENARIO(
             generic_inner_class_prefix + "::" + outer_class_name + "::T"},
            {require_type::type_argument_kindt::Var,
             generic_inner_class_prefix + "::U"}});
+      }
+      THEN(
+        "There is a field shadowingField of generic type with a generic "
+        "type argument of String")
+      {
+        std::string shadowing_inner_class_prefix =
+          generic_inner_class_prefix + "$ShadowingGenericInner";
+        const auto &field =
+          require_type::require_component(generic_class, "shadowingField");
+        require_type::require_pointer_to_tag(
+          field.type(), shadowing_inner_class_prefix);
+        require_type::require_java_generic_type(
+          field.type(),
+          {
+            {require_type::type_argument_kindt::Var,
+             generic_inner_class_prefix + "::" + outer_class_name + "::T"},
+            {require_type::type_argument_kindt::Var,
+             generic_inner_class_prefix + "::U"},
+            {require_type::type_argument_kindt::Inst, "java::java.lang.String"},
+          });
       }
     }
   }

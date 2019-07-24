@@ -298,6 +298,45 @@ SCENARIO(
       }
     }
 
+    THEN(
+      "The Object has a field `example3` of type `Outer<Boolean, Byte, Short>`")
+    {
+      const auto &example3_field =
+        require_goto_statements::require_struct_component_assignment(
+          tmp_object_name,
+          {},
+          "example3",
+          "java::Outer",
+          {},
+          entry_point_code,
+          symbol_table);
+
+      THEN("`example3` has field `inner` of type `Inner<Byte>`")
+      {
+        const auto &inner_field =
+          require_goto_statements::require_struct_component_assignment(
+            example3_field,
+            {},
+            "inner",
+            "java::Outer$Inner",
+            {},
+            entry_point_code,
+            symbol_table);
+
+        THEN("`inner` has a field `u` of type `Byte`")
+        {
+          require_goto_statements::require_struct_component_assignment(
+            inner_field,
+            {},
+            "u",
+            "java::java.lang.Byte",
+            {},
+            entry_point_code,
+            symbol_table);
+        }
+      }
+    }
+
     THEN("The Object has a field `testFoo` of type `Foo<Long>`")
     {
       const auto &testFoo_field =

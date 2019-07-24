@@ -3,7 +3,7 @@ class Outer<K, V, U> {
     Outer<V, K, U> o;
     U u;
   }
-  Inner<U> inner;
+  Inner<V> inner;
   K key;
   V value;
 }

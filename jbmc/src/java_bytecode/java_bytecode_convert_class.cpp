@@ -1205,6 +1205,17 @@ void mark_java_implicitly_generic_class_type(
     java_implicitly_generic_class_typet new_class_type(
       class_type, implicit_generic_type_parameters);
 
+    // Prepend existing parameters so choose those above any inherited
+    if(is_java_generic_class_type(class_type))
+    {
+      const java_generic_class_typet::generic_typest &class_type_params =
+        to_java_generic_class_type(class_type).generic_types();
+      implicit_generic_type_parameters.insert(
+        implicit_generic_type_parameters.begin(),
+        class_type_params.begin(),
+        class_type_params.end());
+    }
+
     for(auto &field : new_class_type.components())
     {
       find_and_replace_parameters(
