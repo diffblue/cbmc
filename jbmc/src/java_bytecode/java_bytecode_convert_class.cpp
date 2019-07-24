@@ -1018,9 +1018,9 @@ static void find_and_replace_parameter(
     [&parameter_name](const java_generic_parametert &replacement_param) {
       const std::string &replacement_parameter_full_name =
         id2string(replacement_param.type_variable().get_identifier());
-      return parameter_name.compare(
-               replacement_parameter_full_name.substr(
-                 replacement_parameter_full_name.rfind("::") + 2)) == 0;
+      return parameter_name ==
+             replacement_parameter_full_name.substr(
+               replacement_parameter_full_name.rfind("::") + 2);
     });
 
   // if a replacement parameter was found, update the identifier
