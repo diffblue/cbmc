@@ -1,0 +1,18 @@
+CORE
+test.c
+--show-vcc
+main::1::a1!0@1#2\.\.x =
+main::1::a1!0@1#2\.\.y =
+main::1::a2!0@1#2\.\.x =
+main::1::a2!0@1#2\.\.y =
+main::1::a3!0@1#2\.\.x =
+main::1::a3!0@1#2\.\.y =
+main::1::a4!0@1#2\.\.x =
+main::1::a4!0@1#2\.\.y =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::a[1234]!\d+@\d+#\d+\.[xy]
+--
+Fields A::x and A::y should be referred to as atomic symbols (a[1234]..x and a[1234]..y) but not using
+member operators (a[1234].x and a[1234].y).

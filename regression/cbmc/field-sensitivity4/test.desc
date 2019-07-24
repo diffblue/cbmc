@@ -1,0 +1,16 @@
+FUTURE
+test.c
+--show-vcc
+main::1::a!0@1#2\.\.x =
+main::1::a!0@1#2\.\.y =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::a!\d+@\d+#\d+\.x
+main::1::a!\d+@\d+#\d+\.y
+--
+Fields A::x and A::y should be referred to as atomic symbols (a..x and a..y) but not using
+member operators (a.x and a.y).
+Currently this generates a byte_update operation followed by field expansion; could be improved
+if value_sett kept track of a finite set of constant offsets rather than degrading to unknown-offset
+whenever multiple offsets into the same allocation are merged.

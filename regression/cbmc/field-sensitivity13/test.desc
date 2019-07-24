@@ -1,0 +1,18 @@
+CORE
+test.c
+--show-vcc
+main::1::b1!0@1#2\.\.a\.\.x = main::argc!0@1#1
+main::1::b1!0@1#2\.\.a\.\.y = 1 \+ main::argc!0@1#1
+main::1::b1!0@1#3\.\.a\.\.x = main::1::b1!0@1#2\.\.a\.\.x
+main::1::b1!0@1#3\.\.a\.\.y = main::1::b1!0@1#2\.\.a\.\.y
+main::1::b2!0@1#2\.\.a\.\.x =
+main::1::b2!0@1#2\.\.a\.\.y =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::b[12]!\d+@\d+#\d+\.a
+--
+Fields A::x and A::y should be referred to as atomic symbols (b[12]..a..x and b[12]..a..y) but not using
+member operators (b[12].a.x and b[12].a.y).
+This test looks at the particular case of whole-struct assignment when the target of the assignment
+is uncertain due to pointer indirection.

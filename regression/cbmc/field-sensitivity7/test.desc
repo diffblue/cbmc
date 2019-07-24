@@ -1,0 +1,15 @@
+CORE
+test.c
+--show-vcc
+main::1::a1!0@1#2\.\.y =
+main::1::a2!0@1#2\.\.z =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::a[12]!\d+@\d+#\d+\.[xyz]
+--
+Fields A::y and A::z should be referred to as atomic symbols (a[12]..y and a[12]..z) but not using
+member operators (a[12].[xyz]).
+Note the contrast with field-sensitivity4, where the fields the pointer may address are part of the
+same allocated object resulting in inability to resolve them, contrasting against this test where
+the fields belong to different objects.

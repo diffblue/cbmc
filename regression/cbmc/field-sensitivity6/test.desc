@@ -1,0 +1,13 @@
+CORE
+test.c
+--show-vcc
+main::1::b1!0@1#2\.\.a\.\.x =
+main::1::b2!0@1#2\.\.a\.\.x =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::b1!\d+@\d+#\d+\.a
+main::1::b2!\d+@\d+#\d+\.a
+--
+Field A::x should be referred to as atomic symbols (b[12]..x) but not using
+member operators (b[12].a)
