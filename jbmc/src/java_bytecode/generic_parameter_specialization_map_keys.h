@@ -18,12 +18,10 @@ class generic_parameter_specialization_map_keyst
 public:
   /// Initialize a generic-parameter-specialization-map entry owner operating
   /// on a given map. Initially it does not own any map entry.
-  /// \param _generic_parameter_specialization_map: map to operate on.
+  /// \param generic_parameter_specialization_map: map to operate on.
   explicit generic_parameter_specialization_map_keyst(
-    generic_parameter_specialization_mapt
-      &_generic_parameter_specialization_map)
-    : generic_parameter_specialization_map(
-        _generic_parameter_specialization_map)
+    generic_parameter_specialization_mapt &generic_parameter_specialization_map)
+    : generic_parameter_specialization_map(generic_parameter_specialization_map)
   {
   }
 
