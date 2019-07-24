@@ -1030,23 +1030,21 @@ static void find_and_replace_parameter(
              get_final_name_component(
                id2string(replacement_param.type_variable().get_identifier()));
     });
+  if(replacement_parameter_it == replacement_parameters.end())
+    return;
 
-  // if a replacement parameter was found, update the identifier
-  if(replacement_parameter_it != replacement_parameters.end())
-  {
-    const std::string &replacement_parameter_full_name =
-      id2string(replacement_parameter_it->type_variable().get_identifier());
+  // A replacement parameter was found, update the identifier
+  const std::string &replacement_parameter_full_name =
+    id2string(replacement_parameter_it->type_variable().get_identifier());
 
-    // the replacement parameter is a viable one, i.e., it comes from an outer
-    // class
-    PRECONDITION(
-      get_without_final_name_component(parameter_full_name)
-        .compare(get_without_final_name_component(
-          replacement_parameter_full_name)) > 0);
+  // the replacement parameter is a viable one, i.e., it comes from an outer
+  // class
+  PRECONDITION(
+    get_without_final_name_component(parameter_full_name)
+      .compare(
+        get_without_final_name_component(replacement_parameter_full_name)) > 0);
 
-    parameter.type_variable_ref().set_identifier(
-      replacement_parameter_full_name);
-  }
+  parameter.type_variable_ref().set_identifier(replacement_parameter_full_name);
 }
 
 /// Recursively find all generic type parameters of a given type and replace

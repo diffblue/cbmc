@@ -89,17 +89,15 @@ pointer_typet select_pointer_typet::specialize_generics(
     // if the pointer is an array, recursively specialize its element type
     const auto *array_element_type =
       type_try_dynamic_cast<pointer_typet>(java_array_element_type(*subtype));
-    if(array_element_type != nullptr)
-    {
-      const pointer_typet &new_array_type = specialize_generics(
-        *array_element_type,
-        generic_parameter_specialization_map,
-        visited_nodes);
+    if(array_element_type == nullptr)
+      return pointer_type;
 
-      pointer_typet replacement_array_type = java_array_type('a');
-      replacement_array_type.subtype().set(ID_element_type, new_array_type);
-      return replacement_array_type;
-    }
+    const pointer_typet &new_array_type = specialize_generics(
+      *array_element_type, generic_parameter_specialization_map, visited_nodes);
+
+    pointer_typet replacement_array_type = java_array_type('a');
+    replacement_array_type.subtype().set(ID_element_type, new_array_type);
+    return replacement_array_type;
   }
 
   return pointer_type;
