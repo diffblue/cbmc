@@ -1,0 +1,15 @@
+FUTURE
+test.c
+--show-vcc
+main::1::array!0@1#2\[\[0\]\]..x =
+main::1::array!0@1#2\[\[0\]\]..y =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::array!0@1#[2-9]\[\[[1-9]\]\]
+main::1::array!0@1#[3-9]\[\[[0-9]\]\]
+--
+Ideally we should handle accesses to a pointer with a finite set of possible
+referents precisely, but because value_sett regards &array[0].x and &array[0].y
+as two different offsets into the same allocation and discards the precise offsets
+they point to, this is currently handled imprecisely with a byte_update operation.

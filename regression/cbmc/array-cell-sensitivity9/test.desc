@@ -1,0 +1,32 @@
+CORE
+test.c
+--show-vcc
+main::1::array!0@1#2\[\[0\]\]..x = main::1::array!0@1#1\[0\].x
+main::1::array!0@1#2\[\[1\]\]..x = main::1::array!0@1#1\[1\].x
+main::1::array!0@1#2\[\[2\]\]..x = main::1::array!0@1#1\[2\].x
+main::1::array!0@1#2\[\[3\]\]..x = main::1::array!0@1#1\[3\].x
+main::1::array!0@1#2\[\[4\]\]..x = main::1::array!0@1#1\[4\].x
+main::1::array!0@1#2\[\[5\]\]..x = main::1::array!0@1#1\[5\].x
+main::1::array!0@1#2\[\[6\]\]..x = main::1::array!0@1#1\[6\].x
+main::1::array!0@1#2\[\[7\]\]..x = main::1::array!0@1#1\[7\].x
+main::1::array!0@1#2\[\[8\]\]..x = main::1::array!0@1#1\[8\].x
+main::1::array!0@1#2\[\[9\]\]..x = main::1::array!0@1#1\[9\].x
+main::1::array!0@1#3\[\[1\]\]..x =
+main::1::array!0@1#2\[\[0\]\]..y = main::1::array!0@1#1\[0\].y
+main::1::array!0@1#2\[\[1\]\]..y = main::1::array!0@1#1\[1\].y
+main::1::array!0@1#2\[\[2\]\]..y = main::1::array!0@1#1\[2\].y
+main::1::array!0@1#2\[\[3\]\]..y = main::1::array!0@1#1\[3\].y
+main::1::array!0@1#2\[\[4\]\]..y = main::1::array!0@1#1\[4\].y
+main::1::array!0@1#2\[\[5\]\]..y = main::1::array!0@1#1\[5\].y
+main::1::array!0@1#2\[\[6\]\]..y = main::1::array!0@1#1\[6\].y
+main::1::array!0@1#2\[\[7\]\]..y = main::1::array!0@1#1\[7\].y
+main::1::array!0@1#2\[\[8\]\]..y = main::1::array!0@1#1\[8\].y
+main::1::array!0@1#2\[\[9\]\]..y = main::1::array!0@1#1\[9\].y
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This checks that a write with a non-constant index leads to a whole-array
+operation followed by expansion into individual array cells, while a write with
+a constant index leads to direct use of a single cell symbol, for the case where
+the array element is struct-typed.
