@@ -68,10 +68,8 @@ class dep_graph_domaint:public ai_domain_baset
 public:
   typedef grapht<dep_nodet>::node_indext node_indext;
 
-  dep_graph_domaint()
-    : has_values(false),
-      node_id(std::numeric_limits<node_indext>::max()),
-      has_changed(false)
+  explicit dep_graph_domaint(node_indext id)
+    : has_values(false), node_id(id), has_changed(false)
   {
   }
 
@@ -163,11 +161,6 @@ public:
     return has_values.is_false();
   }
 
-  void set_node_id(node_indext id)
-  {
-    node_id=id;
-  }
-
   node_indext get_node_id() const
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
@@ -216,6 +209,8 @@ private:
     const namespacet &ns);
 };
 
+class dep_graph_domain_factoryt;
+
 class dependence_grapht:
   public ait<dep_graph_domaint>,
   public grapht<dep_nodet>
@@ -226,11 +221,7 @@ public:
 
   typedef std::map<irep_idt, cfg_post_dominatorst> post_dominators_mapt;
 
-  explicit dependence_grapht(const namespacet &_ns):
-    ns(_ns),
-    rd(ns)
-  {
-  }
+  explicit dependence_grapht(const namespacet &_ns);
 
   void initialize(const goto_functionst &goto_functions)
   {
@@ -277,26 +268,9 @@ public:
     return rd;
   }
 
-  virtual statet &get_state(goto_programt::const_targett l)
-  {
-    typename state_mapt::const_iterator it = state_map.find(l);
-    if(it == state_map.end())
-    {
-      auto d = std::make_shared<dep_graph_domaint>();
-      auto entry = state_map.insert(std::make_pair(l, d));
-      CHECK_RETURN(entry.second);
-
-      const node_indext node_id=add_node();
-      d->set_node_id(node_id);
-      nodes[node_id].PC=l;
-
-      it = entry.first;
-    }
-
-    return *(it->second);
-  }
-
 protected:
+  friend dep_graph_domain_factoryt;
+  friend dep_graph_domaint;
   const namespacet &ns;
 
   post_dominators_mapt post_dominators;
