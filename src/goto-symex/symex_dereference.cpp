@@ -223,6 +223,26 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
     // first make sure there are no dereferences in there
     dereference_rec(tmp1, state, false);
 
+    // Depending on the nature of the pointer expression, the recursive deref
+    // operation might have introduced a construct such as
+    // (x == &o1 ? o1 : o2).field, in which case we should simplify to push the
+    // member operator inside the if, then apply field-sensitivity to yield
+    // (x == &o1 ? o1..field : o2..field). value_set_dereferencet can then
+    // apply the dereference operation to each of o1..field and o2..field
+    // independently, as it special-cases the ternary conditional operator.
+    do_simplify(tmp1);
+
+    if(symex_config.run_validation_checks)
+    {
+      // make sure simplify has not re-introduced any dereferencing that
+      // had previously been cleaned away
+      INVARIANT(
+        !has_subexpr(tmp1, ID_dereference),
+        "simplify re-introduced dereferencing");
+    }
+
+    tmp1 = state.field_sensitivity.apply(ns, state, std::move(tmp1), write);
+
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(state, ns);
 
@@ -241,10 +261,6 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
 
     // this may yield a new auto-object
     trigger_auto_object(expr, state);
-
-    // ...and may have introduced a member-of-symbol construct with a
-    // corresponding SSA symbol:
-    expr = state.field_sensitivity.apply(ns, state, std::move(expr), write);
   }
   else if(
     expr.id() == ID_index && to_index_expr(expr).array().id() == ID_member &&
