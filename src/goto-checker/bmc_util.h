@@ -189,7 +189,9 @@ void run_property_decider(
   "(max-field-sensitivity-array-size):" \
   "(no-array-field-sensitivity)" \
   "(graphml-witness):" \
-  "(unwindset):"
+  "(unwindset):" \
+  "(symex-complexity-limit):" \
+  "(symex-complexity-failed-child-loops-limit):"
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -219,6 +221,15 @@ void run_property_decider(
   " --no-self-loops-to-assumptions\n" \
   "                              do not simplify while(1){} to assume(0)\n" \
   " --no-pretty-names            do not simplify identifiers\n" \
+  " --symex-complexity-limit N" \
+  "                              how complex (N) a path can become before\n" \
+  "                              symex abandons it. Currently uses guard\n" \
+  "                              size to calculate complexity. \n" \
+  " --symex-complexity-failed-child-loops-limit N\n" \
+  "                              how many child branches (N) in an\n" \
+  "                              iteration are allowed to fail due to\n" \
+  "                              complexity violations before the loop\n" \
+  "                              gets blacklisted\n" \
   " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
 // clang-format on
 
