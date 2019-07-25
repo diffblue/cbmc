@@ -256,14 +256,13 @@ static void json_output_function(
   first_line = first_line.empty() ? "0" : first_line;
   last_line = last_line.empty() ? "0" : last_line;
 
-  json_objectt entry{
-    {"function", json_stringt(function)},
-    {"file name",
-     json_stringt(concat_dir_file(
-       id2string(first_location.get_working_directory()),
-       id2string(first_location.get_file())))},
-    {"first line", json_numbert(first_line)},
-    {"last line", json_numbert(last_line)}};
+  json_objectt entry{{"function", json_stringt(function)},
+                     {"file name",
+                      json_stringt(concat_dir_file(
+                        id2string(first_location.get_working_directory()),
+                        id2string(first_location.get_file())))},
+                     {"first line", json_numbert(first_line)},
+                     {"last line", json_numbert(last_line)}};
 
   dest.push_back(std::move(entry));
 }
