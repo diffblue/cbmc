@@ -576,6 +576,19 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     return std::move(inequality);
   }
 
+  // eliminate casts from proper bool
+  if(
+    op_type.id() == ID_bool &&
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv ||
+     expr_type.id() == ID_c_bool || expr_type.id() == ID_c_bit_field))
+  {
+    // rewrite (T)(bool) to bool?1:0
+    auto one = from_integer(1, expr_type);
+    auto zero = from_integer(0, expr_type);
+    exprt new_expr = if_exprt(expr.op(), std::move(one), std::move(zero));
+    return changed(simplify_rec(new_expr)); // recursive call
+  }
+
   // circular casts through types shorter than `int`
   if(op_type == signedbv_typet(32) && expr.op().id() == ID_typecast)
   {
