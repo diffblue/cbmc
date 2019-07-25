@@ -416,5 +416,5 @@ string_constraint_generatort::combine_results(
 {
   const exprt return_code = maximum(result1.first, result2.first);
   merge(result2.second, std::move(result1.second));
-  return {return_code, std::move(result2.second)};
+  return {simplify_expr(return_code, ns), std::move(result2.second)};
 }
