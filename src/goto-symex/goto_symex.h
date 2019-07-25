@@ -17,7 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/abstract_goto_model.h>
 
+#include "complexity_limiter.h"
 #include "path_storage.h"
+#include "symex_config.h"
 
 class byte_extract_exprt;
 class function_application_exprt;
@@ -75,7 +77,8 @@ public:
       path_storage(path_storage),
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
-      _remaining_vccs(std::numeric_limits<unsigned>::max())
+      _remaining_vccs(std::numeric_limits<unsigned>::max()),
+      complexity_module(mh, options)
   {
   }
 
@@ -807,6 +810,8 @@ protected:
 
   unsigned _total_vccs, _remaining_vccs;
   ///@}
+
+  complexity_limitert complexity_module;
 
 public:
   unsigned get_total_vccs() const

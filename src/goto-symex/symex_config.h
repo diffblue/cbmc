@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_CONFIG_H
 #define CPROVER_GOTO_SYMEX_SYMEX_CONFIG_H
 
-/// \file Configuration used for a symbolic execution
+/// Configuration used for a symbolic execution
 struct symex_configt final
 {
   /// \brief The maximum depth to take the execution to.
@@ -47,6 +47,10 @@ struct symex_configt final
 
   /// Maximum sizes for which field sensitivity will be applied to array cells
   std::size_t max_field_sensitivity_array_size;
+
+  /// \brief Whether this run of symex is under complexity limits. This
+  /// enables certain analyses that otherwise aren't run.
+  bool complexity_limits_active;
 
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst

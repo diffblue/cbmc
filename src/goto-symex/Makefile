@@ -35,6 +35,7 @@ SRC = auto_objects.cpp \
       symex_target.cpp \
       symex_target_equation.cpp \
       symex_throw.cpp \
+      complexity_limiter.cpp \
       # Empty last line
 
 INCLUDES= -I ..

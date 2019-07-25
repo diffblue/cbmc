@@ -51,8 +51,26 @@ symex_configt::symex_configt(const optionst &options)
         : options.is_set("max-field-sensitivity-array-size")
             ? options.get_unsigned_int_option(
                 "max-field-sensitivity-array-size")
-            : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+            : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
+    complexity_limits_active(
+      options.get_signed_int_option("symex-complexity-limit") > 0)
 {
+}
+
+/// If 'to' is not an instruction in our currently top-most active loop,
+/// pop and re-check until we find an loop we're still active in, or empty
+/// the stack.
+static void pop_exited_loops(
+  const goto_programt::const_targett &to,
+  std::vector<framet::active_loop_infot> &active_loops)
+{
+  while(!active_loops.empty())
+  {
+    if(!active_loops.back().loop.contains(to))
+      active_loops.pop_back();
+    else
+      break;
+  }
 }
 
 void symex_transition(
@@ -67,17 +85,60 @@ void symex_transition(
     // 1. the transition from state.source.pc to "to" is not a backwards goto
     // or
     // 2. we are arriving from an outer loop
+
+    // TODO: This should all be replaced by natural loop analysis.
+    // This is because the way we detect loops is pretty imprecise.
+
     framet &frame = state.call_stack().top();
     const goto_programt::instructiont &instruction=*to;
     for(const auto &i_e : instruction.incoming_edges)
-      if(i_e->is_goto() && i_e->is_backwards_goto() &&
-         (!is_backwards_goto ||
-          state.source.pc->location_number>i_e->location_number))
+    {
+      if(
+        i_e->is_goto() && i_e->is_backwards_goto() &&
+        (!is_backwards_goto ||
+         state.source.pc->location_number > i_e->location_number))
       {
         const auto loop_id =
           goto_programt::loop_id(state.source.function_id, *i_e);
-        frame.loop_iterations[loop_id].count = 0;
+        auto &current_loop_info = frame.loop_iterations[loop_id];
+        current_loop_info.count = 0;
+
+        // We've found a loop, put it on the stack and say it's our current
+        // active loop.
+        if(
+          frame.loops_info && frame.loops_info->loop_map.find(to) !=
+                                frame.loops_info->loop_map.end())
+        {
+          frame.active_loops.emplace_back(frame.loops_info->loop_map[to]);
+        }
       }
+    }
+
+    // Only do this if we have active loop analysis going.
+    if(!frame.active_loops.empty())
+    {
+      // Otherwise if we find we're transitioning out of a loop, make sure
+      // to remove any loops we're not currently iterating over.
+
+      // Match the do-while pattern.
+      if(
+        state.source.pc->is_backwards_goto() &&
+        state.source.pc->location_number < to->location_number)
+      {
+        pop_exited_loops(to, frame.active_loops);
+      }
+
+      // Match for-each or while.
+      for(const auto &incoming_edge : state.source.pc->incoming_edges)
+      {
+        if(
+          incoming_edge->is_backwards_goto() &&
+          incoming_edge->location_number < to->location_number)
+        {
+          pop_exited_loops(to, frame.active_loops);
+        }
+      }
+    }
   }
 
   state.source.pc=to;
@@ -388,6 +449,15 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
     entry_point_id, *start_function);
   state->dirty = &path_storage.dirty;
 
+  // Only enable loop analysis when complexity is enabled.
+  if(symex_config.complexity_limits_active)
+  {
+    // Set initial loop analysis.
+    path_storage.add_function_loops(entry_point_id, start_function->body);
+    state->call_stack().top().loops_info =
+      path_storage.get_loop_analysis(entry_point_id);
+  }
+
   // make the first step onto the instruction pointed to by the initial program
   // counter
   symex_transition(*state, state->source.pc, false);
@@ -665,6 +735,11 @@ void goto_symext::execute_next_instruction(
   case INCOMPLETE_GOTO:
     DATA_INVARIANT(false, "symex got unexpected instruction type");
   }
+
+  complexity_violationt complexity_result =
+    complexity_module.check_complexity(state);
+  if(complexity_result != complexity_violationt::NONE)
+    complexity_module.run_transformations(complexity_result, state);
 }
 
 void goto_symext::kill_instruction_local_symbols(statet &state)
