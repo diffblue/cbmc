@@ -228,8 +228,9 @@ protected:
   typet enum_constant_type(
     const mp_integer &min, const mp_integer &max) const;
 
-  typet enum_underlying_type(
-    const mp_integer &min, const mp_integer &max,
+  bitvector_typet enum_underlying_type(
+    const mp_integer &min,
+    const mp_integer &max,
     bool is_packed) const;
 
   // this cleans expressions in array types
