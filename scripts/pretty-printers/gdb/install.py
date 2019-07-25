@@ -1,58 +1,66 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
-
-# This is the code that should be copied if you're applying the changes by hand.
-# Replace {0} with the path to this folder.
-file_contents = """
-python
-import sys
-import os
-
-pretty_printer_folder = '{0}'
-if os.path.exists(pretty_printer_folder):
-    sys.path.insert(1, pretty_printer_folder)
-    import auto_load
-    auto_load.load_pretty_printers()
-end
-"""
+from shutil import copyfile
 
 
 def create_gdbinit_file():
     """
-    Add or append to a .gdbinit file the python code to set-up cbmc pretty-printers.
+    Create and insert into a .gdbinit file the python code to set-up cbmc pretty-printers.
     """
 
     print("Attempting to enable cbmc-specific pretty-printers.")
 
     home_folder = os.path.expanduser("~")
     if not home_folder:
-        print(home_folder + " is an invalid home folder, please manually create a .gdbinit file and apply the code.")
+        print(home_folder + " is an invalid home folder, can't auto-configure .gdbinit.")
         return
 
+    # This is the code that should be copied if you're applying the changes by hand.
+    gdb_directory = os.path.dirname(os.path.abspath(__file__))
+    code_block_start = "cbmc_printers_folder = "
+    code_block = \
+        [
+            "{0}'{1}'".format(code_block_start, gdb_directory),
+            "if os.path.exists(cbmc_printers_folder):",
+            "    sys.path.insert(1, cbmc_printers_folder)",
+            "    from pretty_printers import load_cbmc_printers",
+            "    load_cbmc_printers()",
+        ]
+
     gdbinit_file = os.path.join(home_folder, ".gdbinit")
-    file_write_mode = 'w'
+    lines = []
     if os.path.exists(gdbinit_file):
-        print(".gdbinit file exists at " + gdbinit_file + "."
-              " Please type 'y' if you want to append the pretty-printer commands to it. Press any other key to exit.")
-        while True:
-            choice = input().lower()
-            if choice == 'y':
-                file_write_mode = 'a'
-                break
-            else:
-                print("Not appending to file. Exiting.")
+        with open(gdbinit_file, 'r') as file:
+            lines = [ line.rstrip() for line in file ]
+    line_no = 0
+    imports = { "os", "sys" }
+    while line_no < len(lines):
+        if lines[line_no].startswith('import '):
+            imports.add(lines[line_no][len("import "):].strip())
+            lines.pop(line_no)
+        else:
+            if lines[line_no].startswith(code_block_start):
+                print(".gdbinit already contains our pretty printers, not changing it")
                 return
+            line_no += 1
+    while len(lines) != 0 and (lines[0] == "" or lines[0] == "python"):
+        lines.pop(0)
 
-    if file_write_mode == 'w':
-        print("Creating .gdbinit file.")
+    lines = [ "python" ] + list(map("import {}".format, sorted(imports))) + [ "", "" ] + code_block + [ "", "" ] + lines + [ "" ]
 
+    backup_file = os.path.join(home_folder, "backup.gdbinit")
+    if os.path.exists(backup_file):
+        print("backup.gdbinit file already exists. Type 'y' if you would like to overwrite it or any other key to exit.")
+        choice = input().lower()
+        if choice != 'y':
+            return
+    print("Backing up {0}".format(gdbinit_file))
+    copyfile(gdbinit_file, backup_file)
     print("Adding pretty-print commands to {0}.".format(gdbinit_file))
-    parent_directory = os.path.dirname(os.path.abspath(__file__))
     try:
-        file = open(gdbinit_file, file_write_mode)
-        file.write(file_contents.format(parent_directory))
-        file.close()
+        with open(gdbinit_file, 'w+') as file:
+            file.write('\n'.join(lines))
         print("Commands added.")
     except:
         print("Exception occured writing to file. Please apply changes manually.")
@@ -60,4 +68,3 @@ def create_gdbinit_file():
 
 if __name__ == "__main__":
     create_gdbinit_file()
-
