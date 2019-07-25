@@ -30,33 +30,33 @@ def create_gdbinit_file():
 
     gdbinit_file = os.path.join(home_folder, ".gdbinit")
     lines = []
+    imports = { "os", "sys" }
     if os.path.exists(gdbinit_file):
         with open(gdbinit_file, 'r') as file:
             lines = [ line.rstrip() for line in file ]
-    line_no = 0
-    imports = { "os", "sys" }
-    while line_no < len(lines):
-        if lines[line_no].startswith('import '):
-            imports.add(lines[line_no][len("import "):].strip())
-            lines.pop(line_no)
-        else:
-            if lines[line_no].startswith(code_block_start):
-                print(".gdbinit already contains our pretty printers, not changing it")
+        line_no = 0
+        while line_no < len(lines):
+            if lines[line_no].startswith('import '):
+                imports.add(lines[line_no][len("import "):].strip())
+                lines.pop(line_no)
+            else:
+                if lines[line_no].startswith(code_block_start):
+                    print(".gdbinit already contains our pretty printers, not changing it")
+                    return
+                line_no += 1
+        while len(lines) != 0 and (lines[0] == "" or lines[0] == "python"):
+            lines.pop(0)
+
+        backup_file = os.path.join(home_folder, "backup.gdbinit")
+        if os.path.exists(backup_file):
+            print("backup.gdbinit file already exists. Type 'y' if you would like to overwrite it or any other key to exit.")
+            choice = input().lower()
+            if choice != 'y':
                 return
-            line_no += 1
-    while len(lines) != 0 and (lines[0] == "" or lines[0] == "python"):
-        lines.pop(0)
+        print("Backing up {0}".format(gdbinit_file))
+        copyfile(gdbinit_file, backup_file)
 
     lines = [ "python" ] + list(map("import {}".format, sorted(imports))) + [ "", "" ] + code_block + [ "", "" ] + lines + [ "" ]
-
-    backup_file = os.path.join(home_folder, "backup.gdbinit")
-    if os.path.exists(backup_file):
-        print("backup.gdbinit file already exists. Type 'y' if you would like to overwrite it or any other key to exit.")
-        choice = input().lower()
-        if choice != 'y':
-            return
-    print("Backing up {0}".format(gdbinit_file))
-    copyfile(gdbinit_file, backup_file)
     print("Adding pretty-print commands to {0}.".format(gdbinit_file))
     try:
         with open(gdbinit_file, 'w+') as file:
