@@ -1,0 +1,18 @@
+CORE
+test.c
+--show-vcc
+main::1::a1!0@1#1 =
+main::1::a2!0@1#1 =
+main::1::a1!0@1#2\.\.x = main::1::a1!0@1#1\.x
+main::1::a1!0@1#2\.\.y = main::1::a1!0@1#1\.y
+main::1::a1!0@1#2\.\.z = main::1::a1!0@1#1\.z
+main::1::a2!0@1#2\.\.x = main::1::a2!0@1#1\.x
+main::1::a2!0@1#2\.\.y = main::1::a2!0@1#1\.y
+main::1::a2!0@1#2\.\.z = main::1::a2!0@1#1\.z
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+In this case because struct fields are addressed via a pointer cast to a larger type,
+we expect to have to use a whole-struct byte-update operation and then to re-expand the
+individual field symbols.

@@ -1,0 +1,15 @@
+CORE
+test.c
+--show-vcc
+main::1::a1!0@1#2\.\.y =
+main::1::a2!0@1#2\.\.z =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::a[12]!\d+@\d+#\d+\.[xyz]
+--
+Fields A::y and A::z should be referred to as atomic symbols (a[12]..y and a[12]..z) but not using
+member operators (a[12].[xyz]).
+While the field is aliased with a different type, the typecast is successfully reduced to address just
+one field, rather than using a byte-update operation against the whole structure.
+This is like field-sensitivity8 except the pointer leads into the middle of a field.

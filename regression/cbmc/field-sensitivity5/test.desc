@@ -1,0 +1,14 @@
+CORE
+test.c
+--show-vcc
+main::1::node1!0@1#2\.\.head =
+main::1::node2!0@1#2\.\.head =
+main::1::node3!0@1#2\.\.head =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::node[123]!\d+@\d+#\d+\.head
+main::1::node[123]!\d+@\d+#\d+\.tail
+--
+Fields A::head and A::tail should be referred to as atomic symbols (node[123]..head and node[123]..tail)
+but not using member operators (node[123].(head)|(tail))
