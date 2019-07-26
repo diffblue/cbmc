@@ -53,22 +53,23 @@ public:
   java_bytecode_parse_treet parse_tree;
 
 private:
-  typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::classt::fieldst fieldst;
-  typedef java_bytecode_parse_treet::classt::methodst methodst;
-  typedef java_bytecode_parse_treet::methodt methodt;
-  typedef java_bytecode_parse_treet::fieldt fieldt;
-  typedef java_bytecode_parse_treet::methodt::instructionst instructionst;
-  typedef java_bytecode_parse_treet::instructiont instructiont;
-  typedef java_bytecode_parse_treet::annotationt annotationt;
-  typedef java_bytecode_parse_treet::annotationst annotationst;
-  typedef java_bytecode_parse_treet::classt::method_handle_typet
-    method_handle_typet;
-  typedef java_bytecode_parse_treet::classt::lambda_method_handlet
-    lambda_method_handlet;
-  typedef java_bytecode_parse_treet::classt::u2_valuest u2_valuest;
+  using classt = java_bytecode_parse_treet::classt;
+  using fieldst = java_bytecode_parse_treet::classt::fieldst;
+  using methodst = java_bytecode_parse_treet::classt::methodst;
+  using methodt = java_bytecode_parse_treet::methodt;
+  using fieldt = java_bytecode_parse_treet::fieldt;
+  using instructionst = java_bytecode_parse_treet::methodt::instructionst;
+  using instructiont = java_bytecode_parse_treet::instructiont;
+  using annotationt = java_bytecode_parse_treet::annotationt;
+  using annotationst = java_bytecode_parse_treet::annotationst;
+  using method_handle_typet =
+    java_bytecode_parse_treet::classt::method_handle_typet;
+  using lambda_method_handlet =
+    java_bytecode_parse_treet::classt::lambda_method_handlet;
+  using u2_valuest = java_bytecode_parse_treet::classt::u2_valuest;
 
-  typedef std::vector<pool_entryt> constant_poolt;
+  using constant_poolt = std::vector<pool_entryt>;
+
   constant_poolt constant_pool;
 
   const bool skip_instructions = false;
@@ -201,9 +202,9 @@ public:
     return tag;
   }
 
-  typedef std::function<java_bytecode_parsert::pool_entryt &(u2)>
-    pool_entry_lookupt;
-  typedef java_bytecode_parsert::pool_entryt pool_entryt;
+  using pool_entry_lookupt =
+    std::function<java_bytecode_parsert::pool_entryt &(u2)>;
+  using pool_entryt = java_bytecode_parsert::pool_entryt;
 
 protected:
   static std::string read_utf8_constant(const pool_entryt &entry)
@@ -1329,8 +1330,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
   if(attribute_name=="LineNumberTable")
   {
     // address -> instructiont
-    typedef std::map<unsigned,
-                     methodt::instructionst::iterator> instruction_mapt;
+    using instruction_mapt =
+      std::map<unsigned, methodt::instructionst::iterator>;
     instruction_mapt instruction_map;
 
     for(methodt::instructionst::iterator
