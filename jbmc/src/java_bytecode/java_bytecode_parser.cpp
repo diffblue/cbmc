@@ -718,8 +718,8 @@ void java_bytecode_parsert::rconstant_pool()
         const u2 bytes = read<u2>();
         std::string s;
         s.resize(bytes);
-        for(std::string::iterator s_it=s.begin(); s_it!=s.end(); s_it++)
-          *s_it = read<u1>();
+        for(auto &ch : s)
+          ch = read<u1>();
         it->s=s; // hashes
       }
       break;
@@ -1244,16 +1244,14 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     irep_idt line_number;
 
     // add missing line numbers
-    for(methodt::instructionst::iterator
-        it=method.instructions.begin();
-        it!=method.instructions.end();
-        it++)
+    for(auto &instruction : method.instructions)
     {
-      if(!it->source_location.get_line().empty())
-        line_number=it->source_location.get_line();
+      if(!instruction.source_location.get_line().empty())
+        line_number = instruction.source_location.get_line();
       else if(!line_number.empty())
-        it->source_location.set_line(line_number);
-      it->source_location.set_function(method.source_location.get_function());
+        instruction.source_location.set_line(line_number);
+      instruction.source_location.set_function(
+        method.source_location.get_function());
     }
 
     // line number of method (the first line number available)
@@ -1746,17 +1744,13 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
       sourcefile_name=full_file_name;
     }
 
-    for(methodst::iterator m_it=parsed_class.methods.begin();
-        m_it!=parsed_class.methods.end();
-        m_it++)
+    for(auto &method : parsed_class.methods)
     {
-      m_it->source_location.set_file(sourcefile_name);
-      for(instructionst::iterator i_it=m_it->instructions.begin();
-          i_it!=m_it->instructions.end();
-          i_it++)
+      method.source_location.set_file(sourcefile_name);
+      for(auto &instruction : method.instructions)
       {
-        if(!i_it->source_location.get_line().empty())
-          i_it->source_location.set_file(sourcefile_name);
+        if(!instruction.source_location.get_line().empty())
+          instruction.source_location.set_file(sourcefile_name);
       }
     }
   }
