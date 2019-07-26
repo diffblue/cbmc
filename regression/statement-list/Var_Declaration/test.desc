@@ -3,8 +3,8 @@ main.awl
 --show-parse-tree
 ^EXIT=0$
 ^SIGNAL=0$
-^Name: "Var_assign_FB"$
-^Name: "Var_assign_FC"$
+^Name: Var_assign_FB$
+^Name: Var_assign_FC$
 ^Version: 0[.]1$
 ^  \* type: bool$
 ^  \* type: floatbv$

@@ -3,9 +3,9 @@ main.awl
 --show-parse-tree
 ^EXIT=0$
 ^SIGNAL=0$
-^Name: "Function_Call1"$
+^Name: Function_Call1$
 ^Version: 0[.]1$
-^statement_list_call	"__Function"$
+^statement_list_call	__Function$
 ^	param := In1$
 --
 ^warning: ignoring
