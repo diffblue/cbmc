@@ -1327,13 +1327,9 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
   if(attribute_name=="LineNumberTable")
   {
-    std::map<unsigned, methodt::instructionst::iterator> instruction_map;
-
-    for(auto it = method.instructions.begin(); it != method.instructions.end();
-        it++)
-    {
-      instruction_map[it->address]=it;
-    }
+    std::map<unsigned, std::reference_wrapper<instructiont>> instruction_map;
+    for(auto &instruction : method.instructions)
+      instruction_map.emplace(instruction.address, instruction);
 
     const u2 line_number_table_length = read<u2>();
 
@@ -1346,7 +1342,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       auto it = instruction_map.find(start_pc);
 
       if(it!=instruction_map.end())
-        it->second->source_location.set_line(line_number);
+        it->second.get().source_location.set_line(line_number);
     }
   }
   else if(attribute_name=="LocalVariableTable")
