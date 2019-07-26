@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-class java_bytecode_parsert:public parsert
+class java_bytecode_parsert final : public parsert
 {
 public:
   explicit java_bytecode_parsert(bool skip_instructions)
