@@ -523,8 +523,5 @@ void escape_analysist::instrument(
         }
       }
     }
-
-    Forall_goto_program_instructions(i_it, f_it->second.body)
-      get_state(i_it);
   }
 }
