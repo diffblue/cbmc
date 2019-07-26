@@ -26,10 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literal_expr.h"
 #include "java_types.h"
 
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 class java_bytecode_parsert final : public parsert
 {
 public:
