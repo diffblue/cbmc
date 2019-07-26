@@ -56,7 +56,6 @@ private:
   using classt = java_bytecode_parse_treet::classt;
   using methodt = java_bytecode_parse_treet::methodt;
   using fieldt = java_bytecode_parse_treet::fieldt;
-  using instructionst = java_bytecode_parse_treet::methodt::instructionst;
   using instructiont = java_bytecode_parse_treet::instructiont;
   using annotationt = java_bytecode_parse_treet::annotationt;
   using method_handle_typet =
@@ -110,7 +109,7 @@ private:
   void rfield_attribute(fieldt &);
   void rcode_attribute(methodt &method);
   void read_verification_type_info(methodt::verification_type_infot &);
-  void rbytecode(methodt::instructionst &);
+  void rbytecode(std::vector<instructiont> &);
   void get_class_refs();
   void get_class_refs_rec(const typet &);
   void get_annotation_class_refs(const std::vector<annotationt> &annotations);
@@ -910,8 +909,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 #define T_INT    10
 #define T_LONG   11
 
-void java_bytecode_parsert::rbytecode(
-  methodt::instructionst &instructions)
+void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
 {
   const u4 code_length = read<u4>();
 
