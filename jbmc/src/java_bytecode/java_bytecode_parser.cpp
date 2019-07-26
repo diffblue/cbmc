@@ -653,15 +653,9 @@ void java_bytecode_parsert::rconstant_pool()
 
   constant_pool.resize(constant_pool_count);
 
-  for(constant_poolt::iterator
-      it=constant_pool.begin();
-      it!=constant_pool.end();
+  for(auto it = std::next(constant_pool.begin()); it != constant_pool.end();
       it++)
   {
-    // the first entry isn't used
-    if(it==constant_pool.begin())
-      continue;
-
     it->tag = read<u1>();
 
     switch(it->tag)
