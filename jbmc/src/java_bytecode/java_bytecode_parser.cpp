@@ -38,7 +38,7 @@ public:
   {
   }
 
-  virtual bool parse();
+  bool parse() override;
 
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::classt::fieldst fieldst;
