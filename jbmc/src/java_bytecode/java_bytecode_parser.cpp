@@ -40,6 +40,19 @@ public:
 
   bool parse() override;
 
+  struct pool_entryt
+  {
+    u1 tag = 0;
+    u2 ref1 = 0;
+    u2 ref2 = 0;
+    irep_idt s;
+    u8 number = 0;
+    exprt expr;
+  };
+
+  java_bytecode_parse_treet parse_tree;
+
+private:
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::classt::fieldst fieldst;
   typedef java_bytecode_parse_treet::classt::methodst methodst;
@@ -55,22 +68,9 @@ public:
     lambda_method_handlet;
   typedef java_bytecode_parse_treet::classt::u2_valuest u2_valuest;
 
-  java_bytecode_parse_treet parse_tree;
-
-  struct pool_entryt
-  {
-    u1 tag = 0;
-    u2 ref1 = 0;
-    u2 ref2 = 0;
-    irep_idt s;
-    u8 number = 0;
-    exprt expr;
-  };
-
   typedef std::vector<pool_entryt> constant_poolt;
   constant_poolt constant_pool;
 
-private:
   const bool skip_instructions = false;
 
   pool_entryt &pool_entry(u2 index)
