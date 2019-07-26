@@ -61,7 +61,6 @@ private:
   using instructionst = java_bytecode_parse_treet::methodt::instructionst;
   using instructiont = java_bytecode_parse_treet::instructiont;
   using annotationt = java_bytecode_parse_treet::annotationt;
-  using annotationst = java_bytecode_parse_treet::annotationst;
   using method_handle_typet =
     java_bytecode_parse_treet::classt::method_handle_typet;
   using lambda_method_handlet =
@@ -105,7 +104,7 @@ private:
   rinner_classes_attribute(classt &parsed_class, const u4 &attribute_length);
   std::vector<irep_idt> rexceptions_attribute();
   void rclass_attribute(classt &parsed_class);
-  void rRuntimeAnnotation_attribute(annotationst &);
+  void rRuntimeAnnotation_attribute(std::vector<annotationt> &);
   void rRuntimeAnnotation(annotationt &);
   void relement_value_pairs(annotationt::element_value_pairst &);
   exprt get_relement_value();
@@ -116,8 +115,7 @@ private:
   void rbytecode(methodt::instructionst &);
   void get_class_refs();
   void get_class_refs_rec(const typet &);
-  void get_annotation_class_refs(
-    const java_bytecode_parse_treet::annotationst &annotations);
+  void get_annotation_class_refs(const std::vector<annotationt> &annotations);
   void get_annotation_value_class_refs(const exprt &value);
   void parse_local_variable_type_table(methodt &method);
   optionalt<lambda_method_handlet>
@@ -620,7 +618,7 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
 /// For each of the given annotations, get a reference to its class and
 /// recursively get class references of the values it stores.
 void java_bytecode_parsert::get_annotation_class_refs(
-  const java_bytecode_parse_treet::annotationst &annotations)
+  const std::vector<annotationt> &annotations)
 {
   for(const auto &annotation : annotations)
   {
@@ -1516,7 +1514,7 @@ void java_bytecode_parsert::read_verification_type_info(
 }
 
 void java_bytecode_parsert::rRuntimeAnnotation_attribute(
-  annotationst &annotations)
+  std::vector<annotationt> &annotations)
 {
   const u2 num_annotations = read<u2>();
 
