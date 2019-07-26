@@ -1,3 +1,1 @@
-interface StubSuperinterface extends StubInterface {
-
-}
+interface StubSuperinterface extends StubInterface {}

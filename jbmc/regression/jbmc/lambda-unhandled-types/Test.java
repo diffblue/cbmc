@@ -6,7 +6,5 @@ public class Test {
     StubSuperinterface stubSuperinterface = (x -> x);
     InterfaceDeclaringEquals interfaceDeclaringEquals = (x -> x);
     InterfaceWithDefaults interfaceWithDefaults = (x -> x);
-
   }
-
 }
