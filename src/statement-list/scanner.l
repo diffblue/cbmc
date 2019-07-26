@@ -116,6 +116,7 @@ void statement_list_scanner_init()
   CLR                 { loc(); return TOK_CLR_RLO; }
   S                   { loc(); return TOK_SET; }
   R                   { loc(); return TOK_RESET; }
+  NOT                 { loc(); return TOK_NOT; }
   A                   { loc(); return TOK_AND; }
   AN                  { loc(); return TOK_AND_NOT; }
   O                   { loc(); return TOK_OR; }

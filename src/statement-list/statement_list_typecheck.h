@@ -364,6 +364,11 @@ private:
 
   // Bit Logic instructions
 
+  /// Performs a typecheck on a STL boolean NOT instruction. Reads and modifies
+  /// the RLO, OR and FC bit.
+  /// \param op_code: OP code of the instruction.
+  void typecheck_statement_list_not(const codet &op_code);
+
   /// Performs a typecheck on a STL boolean And instruction. Reads and modifies
   /// the RLO, OR and FC bit.
   /// \param op_code: OP code of the instruction.
