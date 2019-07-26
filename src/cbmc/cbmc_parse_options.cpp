@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
+#include <util/run.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -360,6 +361,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("boolector"))
   {
     options.set_option("boolector", true), solver_set=true;
+    check_smt2("boolector");
     options.set_option("smt2", true);
   }
 
@@ -372,24 +374,28 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("mathsat"))
   {
     options.set_option("mathsat", true), solver_set=true;
+    check_smt2("mathsat");
     options.set_option("smt2", true);
   }
 
   if(cmdline.isset("cvc4"))
   {
     options.set_option("cvc4", true), solver_set=true;
+    check_smt2("cvc4");
     options.set_option("smt2", true);
   }
 
   if(cmdline.isset("yices"))
   {
     options.set_option("yices", true), solver_set=true;
+    check_smt2("yices");
     options.set_option("smt2", true);
   }
 
   if(cmdline.isset("z3"))
   {
     options.set_option("z3", true), solver_set=true;
+    check_smt2("z3");
     options.set_option("smt2", true);
   }
 
@@ -404,6 +410,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     {
       // the default smt2 solver
       options.set_option("z3", true);
+      check_smt2("z3", "Default ");
     }
   }
 
@@ -448,6 +455,27 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-goto-symex-steps", true);
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
+}
+
+void cbmc_parse_optionst::check_smt2(
+  const std::string &name,
+  const std::string &pre_message)
+{
+  int exit_code;
+#ifdef _WIN32
+  {
+    std::string where_string = "%%windir%%\\system32\\where.exe";
+    exit_code = run(where_string, {where_string, name}, "", "", "");
+  }
+#else
+  exit_code = run("which", {"which", name}, "", "", "");
+#endif
+  if(exit_code != 0)
+  {
+    log.error() << pre_message << "SMT2 solver \'" << name
+                << "\' is not on the PATH" << messaget::eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
 }
 
 /// invoke main modules
