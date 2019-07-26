@@ -59,12 +59,12 @@ public:
 
   struct pool_entryt
   {
-    u1 tag;
-    u2 ref1, ref2;
+    u1 tag = 0;
+    u2 ref1 = 0;
+    u2 ref2 = 0;
     irep_idt s;
-    u8 number;
+    u8 number = 0;
     exprt expr;
-    pool_entryt():tag(0), ref1(0), ref2(0), number(0) { }
   };
 
   typedef std::vector<pool_entryt> constant_poolt;
