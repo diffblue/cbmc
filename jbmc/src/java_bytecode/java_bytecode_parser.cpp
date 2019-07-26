@@ -1329,14 +1329,9 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
   if(attribute_name=="LineNumberTable")
   {
-    // address -> instructiont
-    using instruction_mapt =
-      std::map<unsigned, methodt::instructionst::iterator>;
-    instruction_mapt instruction_map;
+    std::map<unsigned, methodt::instructionst::iterator> instruction_map;
 
-    for(methodt::instructionst::iterator
-        it=method.instructions.begin();
-        it!=method.instructions.end();
+    for(auto it = method.instructions.begin(); it != method.instructions.end();
         it++)
     {
       instruction_map[it->address]=it;
@@ -1350,8 +1345,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       const u2 line_number = read<u2>();
 
       // annotate the bytecode program
-      instruction_mapt::const_iterator it=
-        instruction_map.find(start_pc);
+      auto it = instruction_map.find(start_pc);
 
       if(it!=instruction_map.end())
         it->second->source_location.set_line(line_number);
