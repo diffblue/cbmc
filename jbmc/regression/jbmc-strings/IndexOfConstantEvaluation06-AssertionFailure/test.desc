@@ -1,0 +1,9 @@
+CORE symex-driven-lazy-loading-expected-failure
+Main.class
+--function Main.constantIndexOf --property "java::Main.constantIndexOf:()V.assertion.1"
+^Generated [0-9]+ VCC\(s\), 1 remaining after simplification$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
