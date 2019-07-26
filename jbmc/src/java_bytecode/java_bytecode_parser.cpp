@@ -727,29 +727,24 @@ void java_bytecode_parsert::rconstant_pool()
   }
 
   // we do a bit of post-processing after we have them all
-  for(constant_poolt::iterator
-      it=constant_pool.begin();
-      it!=constant_pool.end();
-      it++)
-  {
-    // the first entry isn't used
-    if(it==constant_pool.begin())
-      continue;
-
-    switch(it->tag)
-    {
-    case CONSTANT_Class:
+  std::for_each(
+    std::next(constant_pool.begin()),
+    constant_pool.end(),
+    [&](constant_poolt::value_type &entry) {
+      switch(entry.tag)
       {
-        const std::string &s=id2string(pool_entry(it->ref1).s);
-        it->expr=type_exprt(java_classname(s));
+      case CONSTANT_Class:
+      {
+        const std::string &s = id2string(pool_entry(entry.ref1).s);
+        entry.expr = type_exprt(java_classname(s));
       }
       break;
 
-    case CONSTANT_Fieldref:
+      case CONSTANT_Fieldref:
       {
-        const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
+        const pool_entryt &nameandtype_entry = pool_entry(entry.ref2);
         const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
-        const pool_entryt &class_entry=pool_entry(it->ref1);
+        const pool_entryt &class_entry = pool_entry(entry.ref1);
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
         typet type=type_entry(nameandtype_entry.ref2);
 
@@ -757,16 +752,16 @@ void java_bytecode_parsert::rconstant_pool()
 
         fieldref_exprt fieldref(type, name_entry.s, class_tag.get_identifier());
 
-        it->expr=fieldref;
+        entry.expr = fieldref;
       }
       break;
 
-    case CONSTANT_Methodref:
-    case CONSTANT_InterfaceMethodref:
+      case CONSTANT_Methodref:
+      case CONSTANT_InterfaceMethodref:
       {
-        const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
+        const pool_entryt &nameandtype_entry = pool_entry(entry.ref2);
         const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
-        const pool_entryt &class_entry=pool_entry(it->ref1);
+        const pool_entryt &class_entry = pool_entry(entry.ref1);
         const pool_entryt &class_name_entry=pool_entry(class_entry.ref1);
         typet type=type_entry(nameandtype_entry.ref2);
 
@@ -787,72 +782,74 @@ void java_bytecode_parsert::rconstant_pool()
         virtual_function.set(ID_C_base_name, name_entry.s);
         virtual_function.set(ID_identifier, identifier);
 
-        it->expr=virtual_function;
+        entry.expr = virtual_function;
       }
       break;
 
-    case CONSTANT_String:
+      case CONSTANT_String:
       {
         // ldc turns these into references to java.lang.String
-        it->expr = java_string_literal_exprt{pool_entry(it->ref1).s};
+        entry.expr = java_string_literal_exprt{pool_entry(entry.ref1).s};
       }
       break;
 
-    case CONSTANT_Integer:
-      it->expr=from_integer(it->number, java_int_type());
-      break;
+      case CONSTANT_Integer:
+        entry.expr = from_integer(entry.number, java_int_type());
+        break;
 
-    case CONSTANT_Float:
+      case CONSTANT_Float:
       {
         ieee_floatt value(ieee_float_spect::single_precision());
-        value.unpack(it->number);
-        it->expr=value.to_expr();
+        value.unpack(entry.number);
+        entry.expr = value.to_expr();
       }
       break;
 
-    case CONSTANT_Long:
-      it->expr=from_integer(it->number, java_long_type());
-      break;
+      case CONSTANT_Long:
+        entry.expr = from_integer(entry.number, java_long_type());
+        break;
 
-    case CONSTANT_Double:
+      case CONSTANT_Double:
       {
         ieee_floatt value(ieee_float_spect::double_precision());
-        value.unpack(it->number);
-        it->expr=value.to_expr();
+        value.unpack(entry.number);
+        entry.expr = value.to_expr();
       }
       break;
 
-    case CONSTANT_NameAndType:
+      case CONSTANT_NameAndType:
       {
-        it->expr.id("nameandtype");
+        entry.expr.id("nameandtype");
       }
       break;
 
-    case CONSTANT_MethodHandle:
+      case CONSTANT_MethodHandle:
       {
-        it->expr.id("methodhandle");
+        entry.expr.id("methodhandle");
       }
       break;
 
-    case CONSTANT_MethodType:
+      case CONSTANT_MethodType:
       {
-        it->expr.id("methodtype");
+        entry.expr.id("methodtype");
       }
       break;
 
-    case CONSTANT_InvokeDynamic:
+      case CONSTANT_InvokeDynamic:
       {
-        it->expr.id("invokedynamic");
-        const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
+        entry.expr.id("invokedynamic");
+        const pool_entryt &nameandtype_entry = pool_entry(entry.ref2);
         typet type=type_entry(nameandtype_entry.ref2);
-        type.set(ID_java_lambda_method_handle_index, it->ref1);
-        it->expr.type()=type;
+        type.set(ID_java_lambda_method_handle_index, entry.ref1);
+        entry.expr.type() = type;
       }
       break;
 
-    default:{};
-    }
-  }
+      default:
+      {
+      };
+      }
+    });
 }
 
 void java_bytecode_parsert::rinterfaces(classt &parsed_class)
