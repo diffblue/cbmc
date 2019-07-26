@@ -70,7 +70,7 @@ public:
   typedef std::vector<pool_entryt> constant_poolt;
   constant_poolt constant_pool;
 
-protected:
+private:
   const bool skip_instructions = false;
 
   pool_entryt &pool_entry(u2 index)
