@@ -107,6 +107,8 @@ public:
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
+  exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
+
   /// \return lhs renamed to level 2
   renamedt<ssa_exprt, L2> assignment(
     ssa_exprt lhs,    // L0/L1
@@ -237,6 +239,14 @@ public:
   std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const
   {
     return fresh_l2_name_provider;
+  }
+
+  /// Returns true if \p lvalue is a read-only object, such as the null object
+  static bool is_read_only_object(const exprt &lvalue)
+  {
+    return lvalue.id() == ID_string_constant || lvalue.id() == ID_null_object ||
+           lvalue.id() == "zero_string" || lvalue.id() == "is_zero_string" ||
+           lvalue.id() == "zero_string_length";
   }
 
 private:

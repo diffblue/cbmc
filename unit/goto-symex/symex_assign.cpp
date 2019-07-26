@@ -219,33 +219,66 @@ SCENARIO(
                     symex_config,
                     target_equation}
         .assign_symbol(struct1_ssa, skeleton, rhs, guard);
-      THEN("An equation is added to the target")
+      THEN("Two equations are added to the target")
       {
-        REQUIRE(target_equation.SSA_steps.size() == 1);
-        SSA_stept step = target_equation.SSA_steps.back();
-        THEN("LHS is `struct1!0#2..field1`")
+        REQUIRE(target_equation.SSA_steps.size() == 2);
+        SSA_stept assign_step = target_equation.SSA_steps.front();
+        SSA_stept expand_step = target_equation.SSA_steps.back();
+        THEN("Assign step LHS is `struct1!0#1`")
         {
-          REQUIRE(step.ssa_lhs.get_identifier() == "struct1!0#1..field1");
+          REQUIRE(assign_step.ssa_lhs.get_identifier() == "struct1!0#1");
         }
-        THEN("Original full LHS is `struct1.field1`")
+        THEN("Assign step original full LHS is `struct1.field1`")
         {
           REQUIRE(
-            step.original_full_lhs ==
+            assign_step.original_full_lhs ==
             member_exprt{struct1_sym, "field1", int_type});
         }
-        THEN("SSA full LHS is `struct1!0#1..field1`")
+        THEN("Assign step SSA full LHS is `struct1!0#1`")
         {
           const auto as_symbol =
-            expr_try_dynamic_cast<symbol_exprt>(step.ssa_lhs);
+            expr_try_dynamic_cast<symbol_exprt>(assign_step.ssa_lhs);
           REQUIRE(as_symbol);
-          REQUIRE(as_symbol->get_identifier() == "struct1!0#1..field1");
+          REQUIRE(as_symbol->get_identifier() == "struct1!0#1");
         }
-        THEN("RHS is 234")
+        THEN("Assign step RHS is { struct1!0#0..field1 } with field1 = 234")
         {
-          const auto as_constant =
-            expr_try_dynamic_cast<constant_exprt>(step.ssa_rhs);
-          REQUIRE(as_constant);
-          REQUIRE(numeric_cast_v<mp_integer>(*as_constant) == 234);
+          ssa_exprt struct1_v0_field1{
+            member_exprt{struct1_sym, "field1", int_type}};
+          struct1_v0_field1.set_level_0(0);
+          struct1_v0_field1.set_level_2(0);
+          struct_exprt struct_expr(struct_type);
+          struct_expr.add_to_operands(struct1_v0_field1);
+          with_exprt struct1_v0_with_field_set = rhs;
+          struct1_v0_with_field_set.old() = struct_expr;
+          REQUIRE(assign_step.ssa_rhs == struct1_v0_with_field_set);
+        }
+        THEN("Expand step LHS is `struct1!0#2..field1`")
+        {
+          REQUIRE(
+            expand_step.ssa_lhs.get_identifier() == "struct1!0#2..field1");
+        }
+        THEN("Expand step original full LHS is `struct1.field1`")
+        {
+          REQUIRE(
+            expand_step.original_full_lhs ==
+            member_exprt{struct1_sym, "field1", int_type});
+        }
+        THEN("Expand step SSA full LHS is `struct1!0#2..field1`")
+        {
+          const auto as_symbol =
+            expr_try_dynamic_cast<symbol_exprt>(expand_step.ssa_lhs);
+          REQUIRE(as_symbol);
+          REQUIRE(as_symbol->get_identifier() == "struct1!0#2..field1");
+        }
+        THEN("Expand step RHS is struct1!0#1.field1")
+        {
+          ssa_exprt struct1_v1{struct1_sym};
+          struct1_v1.set_level_0(0);
+          struct1_v1.set_level_2(1);
+          REQUIRE(
+            expand_step.ssa_rhs ==
+            member_exprt{struct1_v1, "field1", int_type});
         }
       }
     }

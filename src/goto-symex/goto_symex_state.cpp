@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/as_const.h>
 #include <util/base_exceptions.h>
+#include <util/byte_operators.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/format.h>
@@ -47,90 +48,6 @@ goto_symex_statet::goto_symex_statet(
 }
 
 goto_symex_statet::~goto_symex_statet()=default;
-
-/// Check that \p expr is correctly renamed to level 2 and return true in case
-/// an error is detected.
-static bool check_renaming(const exprt &expr);
-
-static bool check_renaming(const typet &type)
-{
-  if(type.id()==ID_array)
-    return check_renaming(to_array_type(type).size());
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    for(const auto &c : to_struct_union_type(type).components())
-      if(check_renaming(c.type()))
-        return true;
-  }
-  else if(type.has_subtype())
-    return check_renaming(to_type_with_subtype(type).subtype());
-
-  return false;
-}
-
-static bool check_renaming_l1(const exprt &expr)
-{
-  if(check_renaming(expr.type()))
-    return true;
-
-  if(expr.id()==ID_symbol)
-  {
-    const auto &type = expr.type();
-    if(!expr.get_bool(ID_C_SSA_symbol))
-      return type.id() != ID_code && type.id() != ID_mathematical_function;
-    if(!to_ssa_expr(expr).get_level_2().empty())
-      return true;
-    if(to_ssa_expr(expr).get_original_expr().type() != type)
-      return true;
-  }
-  else
-  {
-    forall_operands(it, expr)
-      if(check_renaming_l1(*it))
-        return true;
-  }
-
-  return false;
-}
-
-static bool check_renaming(const exprt &expr)
-{
-  if(check_renaming(expr.type()))
-    return true;
-
-  if(
-    expr.id() == ID_address_of &&
-    to_address_of_expr(expr).object().id() == ID_symbol)
-  {
-    return check_renaming_l1(to_address_of_expr(expr).object());
-  }
-  else if(
-    expr.id() == ID_address_of &&
-    to_address_of_expr(expr).object().id() == ID_index)
-  {
-    const auto index_expr = to_index_expr(to_address_of_expr(expr).object());
-    return check_renaming_l1(index_expr.array()) ||
-           check_renaming(index_expr.index());
-  }
-  else if(expr.id()==ID_symbol)
-  {
-    const auto &type = expr.type();
-    if(!expr.get_bool(ID_C_SSA_symbol))
-      return type.id() != ID_code && type.id() != ID_mathematical_function;
-    if(to_ssa_expr(expr).get_level_2().empty())
-      return true;
-    if(to_ssa_expr(expr).get_original_expr().type() != type)
-      return true;
-  }
-  else
-  {
-    forall_operands(it, expr)
-      if(check_renaming(*it))
-        return true;
-  }
-
-  return false;
-}
 
 template <>
 renamedt<ssa_exprt, L0>
@@ -342,6 +259,73 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
 
     return renamedt<exprt, level>{std::move(expr)};
   }
+}
+
+exprt goto_symex_statet::l2_rename_rvalues(exprt lvalue, const namespacet &ns)
+{
+  rename(lvalue.type(), irep_idt(), ns);
+
+  if(lvalue.id() == ID_symbol)
+  {
+    // Nothing to do
+  }
+  else if(is_read_only_object(lvalue))
+  {
+    // Ignore apparent writes to 'NULL-object' and similar read-only objects
+  }
+  else if(lvalue.id() == ID_typecast)
+  {
+    auto &typecast_lvalue = to_typecast_expr(lvalue);
+    typecast_lvalue.op() = l2_rename_rvalues(typecast_lvalue.op(), ns);
+  }
+  else if(lvalue.id() == ID_member)
+  {
+    auto &member_lvalue = to_member_expr(lvalue);
+    member_lvalue.compound() = l2_rename_rvalues(member_lvalue.compound(), ns);
+  }
+  else if(lvalue.id() == ID_index)
+  {
+    // The index is an rvalue:
+    auto &index_lvalue = to_index_expr(lvalue);
+    index_lvalue.array() = l2_rename_rvalues(index_lvalue.array(), ns);
+    index_lvalue.index() = rename(index_lvalue.index(), ns).get();
+  }
+  else if(
+    lvalue.id() == ID_byte_extract_little_endian ||
+    lvalue.id() == ID_byte_extract_big_endian)
+  {
+    // The offset is an rvalue:
+    auto &byte_extract_lvalue = to_byte_extract_expr(lvalue);
+    byte_extract_lvalue.op() = l2_rename_rvalues(byte_extract_lvalue.op(), ns);
+    byte_extract_lvalue.offset() = rename(byte_extract_lvalue.offset(), ns);
+  }
+  else if(lvalue.id() == ID_if)
+  {
+    // The condition is an rvalue:
+    auto &if_lvalue = to_if_expr(lvalue);
+    if_lvalue.cond() = rename(if_lvalue.cond(), ns);
+    if(!if_lvalue.cond().is_false())
+      if_lvalue.true_case() = l2_rename_rvalues(if_lvalue.true_case(), ns);
+    if(!if_lvalue.cond().is_true())
+      if_lvalue.false_case() = l2_rename_rvalues(if_lvalue.false_case(), ns);
+  }
+  else if(lvalue.id() == ID_complex_real)
+  {
+    auto &complex_real_lvalue = to_complex_real_expr(lvalue);
+    complex_real_lvalue.op() = l2_rename_rvalues(complex_real_lvalue.op(), ns);
+  }
+  else if(lvalue.id() == ID_complex_imag)
+  {
+    auto &complex_imag_lvalue = to_complex_imag_expr(lvalue);
+    complex_imag_lvalue.op() = l2_rename_rvalues(complex_imag_lvalue.op(), ns);
+  }
+  else
+  {
+    throw unsupported_operation_exceptiont(
+      "l2_rename_rvalues case `" + lvalue.id_string() + "' not handled");
+  }
+
+  return lvalue;
 }
 
 template renamedt<exprt, L1>
