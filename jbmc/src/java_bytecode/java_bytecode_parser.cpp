@@ -54,8 +54,6 @@ public:
 
 private:
   using classt = java_bytecode_parse_treet::classt;
-  using fieldst = java_bytecode_parse_treet::classt::fieldst;
-  using methodst = java_bytecode_parse_treet::classt::methodst;
   using methodt = java_bytecode_parse_treet::methodt;
   using fieldt = java_bytecode_parse_treet::fieldt;
   using instructionst = java_bytecode_parse_treet::methodt::instructionst;
