@@ -137,8 +137,12 @@ protected:
     }
   }
 
-  u8 read_bytes(size_t bytes)
+  template <typename T>
+  T read_bytes()
   {
+    static_assert(
+      std::is_unsigned<T>::value, "T should be an unsigned integer");
+    const constexpr size_t bytes = sizeof(T);
     u8 result = 0;
     for(size_t i = 0; i < bytes; i++)
     {
@@ -150,27 +154,27 @@ protected:
       result <<= 8;
       result |= in->get();
     }
-    return result;
+    return narrow_cast<T>(result);
   }
 
   u1 read_u1()
   {
-    return (u1)read_bytes(1);
+    return read_bytes<u1>();
   }
 
   inline u2 read_u2()
   {
-    return (u2)read_bytes(2);
+    return read_bytes<u2>();
   }
 
   u4 read_u4()
   {
-    return (u4)read_bytes(4);
+    return read_bytes<u4>();
   }
 
   u8 read_u8()
   {
-    return read_bytes(8);
+    return read_bytes<u8>();
   }
 
   void store_unknown_method_handle(
