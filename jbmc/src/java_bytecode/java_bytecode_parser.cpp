@@ -66,7 +66,6 @@ private:
     java_bytecode_parse_treet::classt::method_handle_typet;
   using lambda_method_handlet =
     java_bytecode_parse_treet::classt::lambda_method_handlet;
-  using u2_valuest = java_bytecode_parse_treet::classt::u2_valuest;
 
   using constant_poolt = std::vector<pool_entryt>;
 
@@ -161,7 +160,7 @@ private:
   void store_unknown_method_handle(
     classt &parsed_class,
     size_t bootstrap_method_index,
-    u2_valuest u2_values) const;
+    std::vector<u2> u2_values) const;
 };
 
 #define CONSTANT_Class                7
@@ -1984,7 +1983,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
             << " #args" << eom;
 
     // read u2 values of entry into vector
-    u2_valuest u2_values(num_bootstrap_arguments);
+    std::vector<u2> u2_values(num_bootstrap_arguments);
     for(size_t i = 0; i < num_bootstrap_arguments; i++)
       u2_values[i] = read<u2>();
 
@@ -2113,7 +2112,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 void java_bytecode_parsert::store_unknown_method_handle(
   java_bytecode_parsert::classt &parsed_class,
   size_t bootstrap_method_index,
-  java_bytecode_parsert::u2_valuest u2_values) const
+  std::vector<u2> u2_values) const
 {
   const lambda_method_handlet lambda_method_handle(std::move(u2_values));
   parsed_class.add_method_handle(bootstrap_method_index, lambda_method_handle);
