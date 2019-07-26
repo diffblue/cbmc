@@ -111,7 +111,7 @@ static optionalt<exprt> get_array(
   const array_string_exprt &arr,
   const array_poolt &array_pool);
 
-static exprt substitute_array_access(
+static optionalt<exprt> substitute_array_access(
   const index_exprt &index_expr,
   symbol_generatort &symbol_generator,
   const bool left_propagate);
@@ -1155,16 +1155,22 @@ static exprt substitute_array_access(
   symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
-  // Substitute recursively in branches of conditional expressions
-  const exprt true_case = substitute_array_access(
-    index_exprt(if_expr.true_case(), index), symbol_generator, left_propagate);
-  const exprt false_case = substitute_array_access(
-    index_exprt(if_expr.false_case(), index), symbol_generator, left_propagate);
+  exprt true_index = index_exprt(if_expr.true_case(), index);
+  exprt false_index = index_exprt(if_expr.false_case(), index);
 
-  return if_exprt(if_expr.cond(), true_case, false_case);
+  // Substitute recursively in branches of conditional expressions
+  optionalt<exprt> substituted_true_case =
+    substitute_array_access(true_index, symbol_generator, left_propagate);
+  optionalt<exprt> substituted_false_case =
+    substitute_array_access(false_index, symbol_generator, left_propagate);
+
+  return if_exprt(
+    if_expr.cond(),
+    substituted_true_case ? *substituted_true_case : true_index,
+    substituted_false_case ? *substituted_false_case : false_index);
 }
 
-static exprt substitute_array_access(
+static optionalt<exprt> substitute_array_access(
   const index_exprt &index_expr,
   symbol_generatort &symbol_generator,
   const bool left_propagate)
@@ -1187,7 +1193,7 @@ static exprt substitute_array_access(
     std::string(
       "in case the array is unknown, it should be a symbol or nil, id: ") +
       id2string(array.id()));
-  return index_expr;
+  return {};
 }
 
 /// Auxiliary function for substitute_array_access
@@ -1198,14 +1204,19 @@ static void substitute_array_access_in_place(
   symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
-  if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
+  // Recurse down structure and modify on the way.
+  for(auto it = expr.depth_begin(), itend = expr.depth_end(); it != itend; ++it)
   {
-    expr =
-      substitute_array_access(*index_expr, symbol_generator, left_propagate);
-  }
+    if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(*it))
+    {
+      optionalt<exprt> result =
+        substitute_array_access(*index_expr, symbol_generator, left_propagate);
 
-  for(auto &op : expr.operands())
-    substitute_array_access_in_place(op, symbol_generator, left_propagate);
+      // Only perform a write when we have something changed.
+      if(result)
+        it.mutate() = *result;
+    }
+  }
 }
 
 /// Create an equivalent expression where array accesses and 'with' expressions
