@@ -139,16 +139,16 @@ protected:
 
   u8 read_bytes(size_t bytes)
   {
-    u8 result=0;
-    for(size_t i=0; i<bytes; i++)
+    u8 result = 0;
+    for(size_t i = 0; i < bytes; i++)
     {
       if(!*in)
       {
         error() << "unexpected end of bytecode file" << eom;
         throw 0;
       }
-      result<<=8;
-      result|=in->get();
+      result <<= 8;
+      result |= in->get();
     }
     return result;
   }
