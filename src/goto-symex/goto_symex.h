@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 
 class byte_extract_exprt;
+class function_application_exprt;
 class typet;
 class code_typet;
 class symbol_tablet;
@@ -33,6 +34,7 @@ class symbol_exprt;
 class member_exprt;
 class namespacet;
 class side_effect_exprt;
+class symex_assignt;
 class typecast_exprt;
 
 /// Configuration used for a symbolic execution
@@ -527,6 +529,103 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   /// \param code: The assignment to execute
   void symex_assign(statet &state, const code_assignt &code);
+
+  /// Attempt to constant propagate side effects of the assignment (if any)
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param lhs: lhs of the assignment
+  /// \param rhs: rhs of the assignment
+  /// \return true if the operation could be evaluated to a constant string,
+  ///   false otherwise
+  bool constant_propagate_assignment_with_side_effects(
+    statet &state,
+    symex_assignt &symex_assign,
+    const exprt &lhs,
+    const exprt &rhs);
+
+  /// Create an empty string constant
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param f_l1: application of function ID_cprover_string_empty_string_func
+  ///   with l1 renaming applied
+  void constant_propagate_empty_string(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1);
+
+  /// Attempt to constant propagate string concatenation
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param f_l1: application of function ID_cprover_string_concat_func with
+  ///   l1 renaming applied
+  /// \return true if the operation could be evaluated to a constant string,
+  ///   false otherwise
+  bool constant_propagate_string_concat(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1);
+
+  /// Assign constant string length and string data given by a char array to
+  /// given ssa variables
+  ///
+  /// A new symbol is created (if not yet existing) in the symbol table to hold
+  /// the string data given by `new_char_array`. The name of the symbol is
+  /// derived from the contents of `new_char_array` (e.g., if the array contains
+  /// "abc", the symbol will be named "abc_constant_char_array"). Then, the
+  /// expression `&sym[0]` is assigned to `char_array` (assuming `sym` denotes
+  /// the symbol holding the string data given by `new_char_array`.
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param length: ssa variable to assign the constant string length to
+  /// \param new_length: value to assign to `length`
+  /// \param char_array: ssa variable to assign the constant string data to
+  /// \param new_char_array: constant char array which gives the string data to
+  ///   assign to `char_array`
+  void assign_string_constant(
+    statet &state,
+    symex_assignt &symex_assign,
+    const ssa_exprt &length,
+    const constant_exprt &new_length,
+    const ssa_exprt &char_array,
+    const array_exprt &new_char_array);
+
+  /// Installs a new symbol in the symbol table to represent the given
+  /// character array, and assigns the character array to the symbol
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param aux_symbol_name: name of the symbol to create
+  /// \param char_array: ssa variable to which to assign a pointer to the symbol
+  /// \param new_char_array: new character array to assign to the symbol
+  const symbolt &get_new_string_data_symbol(
+    statet &state,
+    symex_assignt &symex_assign,
+    const std::string &aux_symbol_name,
+    const ssa_exprt &char_array,
+    const array_exprt &new_char_array);
+
+  /// Generate array to pointer association primitive
+  ///
+  /// Executes an assignment `return_value = f(new_char_array, string_data)`,
+  /// with `new_char_array` being the character array to associate with pointer
+  /// `string_data`
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param new_char_array: character array to associate with pointer
+  /// \param string_data: pointer to associate with character array
+  void associate_array_to_pointer(
+    statet &state,
+    symex_assignt &symex_assign,
+    const array_exprt &new_char_array,
+    const address_of_exprt &string_data);
+
+  optionalt<std::reference_wrapper<const array_exprt>>
+  try_evaluate_constant_string(const statet &state, const exprt &content);
 
   // havocs the given object
   void havoc_rec(statet &state, const guardt &guard, const exprt &dest);
