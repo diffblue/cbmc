@@ -795,7 +795,7 @@ bool c_preprocess_none(
   if(!infile)
   {
     messaget message(message_handler);
-    message.error() << "failed to open `" << file << "'" << messaget::eom;
+    message.error() << "failed to open '" << file << "'" << messaget::eom;
     return true;
   }
 

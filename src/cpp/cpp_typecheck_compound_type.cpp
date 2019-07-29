@@ -205,10 +205,10 @@ void cpp_typecheckt::typecheck_compound_type(
       else
       {
         error().source_location=type.source_location();
-        error() << "error: compound tag `" << base_name
+        error() << "error: compound tag '" << base_name
                 << "' declared previously\n"
-                << "location of previous definition: "
-                << symbol.location << eom;
+                << "location of previous definition: " << symbol.location
+                << eom;
         throw 0;
       }
     }
@@ -374,7 +374,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_cast_operator && is_static)
   {
     error().source_location=cpp_name.source_location();
-    error() << "cast operators cannot be static`" << eom;
+    error() << "cast operators cannot be static" << eom;
     throw 0;
   }
 
@@ -721,8 +721,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(symbol_table.move(static_symbol, new_symbol))
     {
       error().source_location=cpp_name.source_location();
-      error() << "redeclaration of static member `"
-              << static_symbol.base_name
+      error() << "redeclaration of static member '" << static_symbol.base_name
               << "'" << eom;
       throw 0;
     }
@@ -836,8 +835,7 @@ void cpp_typecheckt::put_compound_into_scope(
       if(!id.is_class() && !id.is_enum())
       {
         error().source_location=compound.source_location();
-        error() << "`" << base_name
-                << "' already in compound scope" << eom;
+        error() << "'" << base_name << "' already in compound scope" << eom;
         throw 0;
       }
     }
@@ -1382,7 +1380,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
     if(comp.type().id()==ID_code)
     {
       error().source_location=struct_union_symbol.type.source_location();
-      error() << "anonymous struct/union member `"
+      error() << "anonymous struct/union member '"
               << struct_union_symbol.base_name
               << "' shall not have function members" << eom;
       throw 0;
@@ -1401,7 +1399,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
       if(cpp_scopes.current_scope().contains(base_name))
       {
         error().source_location=comp.source_location();
-        error() << "`" << base_name << "' already in scope" << eom;
+        error() << "'" << base_name << "' already in scope" << eom;
         throw 0;
       }
 
@@ -1504,7 +1502,7 @@ bool cpp_typecheckt::get_component(
         else
         {
           error().source_location=source_location;
-          error() << "error: member `" << component_name
+          error() << "error: member '" << component_name
                   << "' is not accessible (" << component.get(ID_access) << ")"
                   << eom;
           throw 0;
@@ -1540,7 +1538,7 @@ bool cpp_typecheckt::get_component(
           if(check_component_access(component, final_type))
           {
             error().source_location=source_location;
-            error() << "error: member `" << component_name
+            error() << "error: member '" << component_name
                     << "' is not accessible" << eom;
             throw 0;
           }

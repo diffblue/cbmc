@@ -269,9 +269,8 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     {
       error().source_location=expr.find_source_location();
       error() << "error: types are incompatible.\n"
-              << "I got `" << type2cpp(expr.op1().type(), *this)
-              << "' and `" << type2cpp(expr.op2().type(), *this)
-              << "'." << eom;
+              << "I got '" << type2cpp(expr.op1().type(), *this) << "' and '"
+              << type2cpp(expr.op2().type(), *this) << "'." << eom;
       throw 0;
     }
   }
@@ -850,7 +849,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     if(!new_expr.has_value())
     {
       error().source_location = expr.find_source_location();
-      error() << "cannot zero-initialize `" << to_string(expr.type()) << "'"
+      error() << "cannot zero-initialize '" << to_string(expr.type()) << "'"
               << eom;
       throw 0;
     }
@@ -930,10 +929,8 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     {
       error().source_location=expr.find_source_location();
       error() << "invalid explicit cast:\n"
-              << "operand type: `" << to_string(expr.op0().type())
-              << "'\n"
-              << "casting to: `" << to_string(expr.type()) << "'"
-              << eom;
+              << "operand type: '" << to_string(expr.op0().type()) << "'\n"
+              << "casting to: '" << to_string(expr.type()) << "'" << eom;
       throw 0;
     }
   }
@@ -1010,7 +1007,7 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   if(pointer_type.id()!=ID_pointer)
   {
     error().source_location=expr.find_source_location();
-    error() << "delete takes a pointer type operand, but got `"
+    error() << "delete takes a pointer type operand, but got '"
             << to_string(pointer_type) << "'" << eom;
     throw 0;
   }
@@ -1091,8 +1088,8 @@ void cpp_typecheckt::typecheck_expr_member(
   {
     error().source_location=expr.find_source_location();
     error() << "error: member operator requires struct/union type "
-            << "on left hand side but got `"
-            << to_string(followed_op0_type) << "'" << eom;
+            << "on left hand side but got '" << to_string(followed_op0_type)
+            << "'" << eom;
     throw 0;
   }
 
@@ -1149,7 +1146,7 @@ void cpp_typecheckt::typecheck_expr_member(
         to_code_type(symbol_expr.type()).return_type().id() == ID_constructor)
       {
         error().source_location=expr.find_source_location();
-        error() << "error: member `"
+        error() << "error: member '"
                 << lookup(symbol_expr.get(ID_identifier)).base_name
                 << "' is a constructor" << eom;
         throw 0;
@@ -1163,9 +1160,9 @@ void cpp_typecheckt::typecheck_expr_member(
         if(pcomp.is_nil())
         {
           error().source_location=expr.find_source_location();
-          error() << "error: `" << symbol_expr.get(ID_identifier)
+          error() << "error: '" << symbol_expr.get(ID_identifier)
                   << "' is not static member "
-                  << "of class `" << to_string(op0.type()) << "'" << eom;
+                  << "of class '" << to_string(op0.type()) << "'" << eom;
           throw 0;
         }
       }
@@ -1209,9 +1206,8 @@ void cpp_typecheckt::typecheck_expr_member(
   else
   {
     error().source_location=expr.find_source_location();
-    error() << "error: member `" << component_name
-            << "' of `" << to_string(type)
-            << "' not found" << eom;
+    error() << "error: member '" << component_name << "' of '"
+            << to_string(type) << "' not found" << eom;
     throw 0;
   }
 
@@ -1250,8 +1246,8 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
   {
     error().source_location=expr.find_source_location();
     error() << "error: ptrmember operator requires pointer type "
-            << "on left hand side, but got `"
-            << to_string(expr.op0().type()) << "'" << eom;
+            << "on left hand side, but got '" << to_string(expr.op0().type())
+            << "'" << eom;
     throw 0;
   }
 
@@ -1329,9 +1325,8 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
     {
       error().source_location=cast_op.find_source_location();
       error() << "type mismatch on const_cast:\n"
-              << "operand type: `" << to_string(cast_op.type())
-              << "'\n"
-              << "cast type: `" << to_string(type) << "'" << eom;
+              << "operand type: '" << to_string(cast_op.type()) << "'\n"
+              << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
@@ -1341,9 +1336,8 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
     {
       error().source_location=cast_op.find_source_location();
       error() << "type mismatch on dynamic_cast:\n"
-              << "operand type: `" << to_string(cast_op.type())
-              << "'\n"
-              << "cast type: `" << to_string(type) << "'" << eom;
+              << "operand type: '" << to_string(cast_op.type()) << "'\n"
+              << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
@@ -1353,9 +1347,8 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
     {
       error().source_location=cast_op.find_source_location();
       error() << "type mismatch on reinterpret_cast:\n"
-              << "operand type: `" << to_string(cast_op.type())
-              << "'\n"
-              << "cast type: `" << to_string(type) << "'" << eom;
+              << "operand type: '" << to_string(cast_op.type()) << "'\n"
+              << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
@@ -1365,9 +1358,8 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
     {
       error().source_location=cast_op.find_source_location();
       error() << "type mismatch on static_cast:\n"
-              << "operand type: `" << to_string(cast_op.type())
-              << "'\n"
-              << "cast type: `" << to_string(type) << "'" << eom;
+              << "operand type: '" << to_string(cast_op.type()) << "'\n"
+              << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
@@ -1705,8 +1697,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     error().source_location=expr.function().find_source_location();
     error() << "function call expects function or function "
-            << "pointer as argument, but got `"
-            << to_string(expr.op0().type()) << "'" << eom;
+            << "pointer as argument, but got '" << to_string(expr.op0().type())
+            << "'" << eom;
     throw 0;
   }
 
@@ -2060,7 +2052,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   else
   {
     error().source_location=expr.find_source_location();
-    error() << "bad assignment operator `" << statement << "'" << eom;
+    error() << "bad assignment operator '" << statement << "'" << eom;
     throw 0;
   }
 
@@ -2127,9 +2119,8 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   else
   {
     error().source_location=expr.find_source_location();
-    error() << "bad assignment operator `"
-            << expr.get_statement()
-            << "'" << eom;
+    error() << "bad assignment operator '" << expr.get_statement() << "'"
+            << eom;
     throw 0;
   }
 
@@ -2333,8 +2324,7 @@ void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
   if(expr.operands().size()!=2)
   {
     error().source_location=expr.find_source_location();
-    error() << "operator `" << expr.id() << "' expects two operands"
-            << eom;
+    error() << "operator '" << expr.id() << "' expects two operands" << eom;
     throw 0;
   }
 

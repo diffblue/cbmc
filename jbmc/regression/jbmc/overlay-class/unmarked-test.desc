@@ -1,8 +1,8 @@
 CORE
 Test.class
 --classpath `../../../../scripts/format_classpath.sh . annotations unmarked-overlay` --verbosity 10
-^Getting class `Test' from file \.[\\/]Test\.class$
-^Getting class `Test' from file unmarked-overlay[\\/]Test\.class$
+^Getting class 'Test' from file \.[\\/]Test\.class$
+^Getting class 'Test' from file unmarked-overlay[\\/]Test\.class$
 ^Skipping duplicate definition of class Test not marked with OverlayClassImplementation$
 ^Adding symbol:  field 'x'$
 ^Adding symbol:  method 'java::Test\.main:\(\[Ljava/lang/String;\)V'$

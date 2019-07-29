@@ -231,7 +231,7 @@ bool taint_analysist::operator()(
     json_arrayt json_result;
     bool use_json = json_file_name.has_value();
 
-    log.status() << "Reading taint file `" << taint_file_name << "'"
+    log.status() << "Reading taint file '" << taint_file_name << "'"
                  << messaget::eom;
 
     if(taint_parser(taint_file_name, taint, log.get_message_handler()))
@@ -382,12 +382,12 @@ bool taint_analysist::operator()(
 
       if(!json_out)
       {
-        log.error() << "Failed to open json output `" << json_file_name.value()
+        log.error() << "Failed to open json output '" << json_file_name.value()
                     << "'" << messaget::eom;
         return true;
       }
 
-      log.status() << "Analysis result is written to `"
+      log.status() << "Analysis result is written to '"
                    << json_file_name.value() << "'" << messaget::eom;
 
       json_out << json_result << '\n';

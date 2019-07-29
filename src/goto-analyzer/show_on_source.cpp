@@ -82,7 +82,7 @@ void show_on_source(
 
   if(!in)
   {
-    message.warning() << "Failed to open `" << source_file << "'"
+    message.warning() << "Failed to open '" << source_file << "'"
                       << messaget::eom;
     return;
   }

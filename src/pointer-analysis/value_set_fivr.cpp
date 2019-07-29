@@ -1376,7 +1376,7 @@ void value_set_fivrt::assign_rec(
     assign_rec(lhs.op0(), values_rhs, suffix, ns, recursion_set, true);
   }
   else
-    throw "assign NYI: `"+lhs.id_string()+"'";
+    throw "assign NYI: '" + lhs.id_string() + "'";
 }
 
 void value_set_fivrt::do_function_call(

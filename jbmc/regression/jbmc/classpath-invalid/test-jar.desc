@@ -4,7 +4,7 @@ Test.class
 ^EXIT=6$
 ^SIGNAL=0$
 ^the program has no entry point$
-^failed to load class `Test'$
+^failed to load class Test$
 --
 --
 symex-driven lazy loading should emit "the program has no entry point" but currently doesn't

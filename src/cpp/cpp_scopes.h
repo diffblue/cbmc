@@ -74,7 +74,7 @@ public:
   {
     id_mapt::const_iterator it=id_map.find(identifier);
     if(it==id_map.end())
-      throw "id `"+id2string(identifier)+"' not found";
+      throw "id '" + id2string(identifier) + "' not found";
     return *(it->second);
   }
 

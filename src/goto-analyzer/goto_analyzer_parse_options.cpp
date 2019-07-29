@@ -469,7 +469,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       std::ofstream ofs(json_file);
       if(!ofs)
       {
-        log.error() << "Failed to open json output `" << json_file << "'"
+        log.error() << "Failed to open json output '" << json_file << "'"
                     << messaget::eom;
         return CPROVER_EXIT_INTERNAL_ERROR;
       }
@@ -494,7 +494,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       std::ofstream ofs(json_file);
       if(!ofs)
       {
-        log.error() << "Failed to open json output `" << json_file << "'"
+        log.error() << "Failed to open json output '" << json_file << "'"
                     << messaget::eom;
         return CPROVER_EXIT_INTERNAL_ERROR;
       }
@@ -519,7 +519,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       std::ofstream ofs(json_file);
       if(!ofs)
       {
-        log.error() << "Failed to open json output `" << json_file << "'"
+        log.error() << "Failed to open json output '" << json_file << "'"
                     << messaget::eom;
         return CPROVER_EXIT_INTERNAL_ERROR;
       }
@@ -572,7 +572,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(!out)
     {
-      log.error() << "Failed to open output file `" << outfile << "'"
+      log.error() << "Failed to open output file '" << outfile << "'"
                   << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }

@@ -1491,13 +1491,12 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
   {
     show_instantiation_stack(error());
     error().source_location=e.find_source_location();
-    error() << "invalid implicit conversion from `"
-            << to_string(e.type()) << "' to `"
-            << to_string(type) << "'" << eom;
-    #if 0
+    error() << "invalid implicit conversion from '" << to_string(e.type())
+            << "' to '" << to_string(type) << "'" << eom;
+#if 0
     str << "\n " << follow(e.type()).pretty() << '\n';
     str << "\n " << type.pretty() << '\n';
-    #endif
+#endif
     throw 0;
   }
 }

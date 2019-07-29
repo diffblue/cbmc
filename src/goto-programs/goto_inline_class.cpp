@@ -65,7 +65,7 @@ void goto_inlinet::parameter_assignments(
     if(it1==arguments.end())
     {
       warning().source_location=source_location;
-      warning() << "call to `" << function_name << "': "
+      warning() << "call to '" << function_name << "': "
                 << "not enough arguments, "
                 << "inserting non-deterministic value" << eom;
 
@@ -356,7 +356,7 @@ void goto_inlinet::expand_function_call(
     // it's recursive.
     // Uh. Buh. Give up.
     warning().source_location=function.find_source_location();
-    warning() << "recursion is ignored on call to `" << identifier << "'"
+    warning() << "recursion is ignored on call to '" << identifier << "'"
               << eom;
 
     if(force_full)
@@ -371,7 +371,7 @@ void goto_inlinet::expand_function_call(
   if(f_it==goto_functions.function_map.end())
   {
     warning().source_location=function.find_source_location();
-    warning() << "missing function `" << identifier << "' is ignored" << eom;
+    warning() << "missing function '" << identifier << "' is ignored" << eom;
 
     if(force_full)
       target->turn_into_skip();
@@ -439,7 +439,7 @@ void goto_inlinet::expand_function_call(
     if(no_body_set.insert(identifier).second) // newly inserted
     {
       warning().source_location = function.find_source_location();
-      warning() << "no body for function `" << identifier << "'" << eom;
+      warning() << "no body for function '" << identifier << "'" << eom;
     }
   }
 }

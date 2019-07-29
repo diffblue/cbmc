@@ -89,7 +89,7 @@ get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
   std::unique_ptr<languaget> language = get_language_from_mode(mode);
   INVARIANT(
     language,
-    "symbol `" + id2string(identifier) + "' has unknown mode '" +
+    "symbol '" + id2string(identifier) + "' has unknown mode '" +
       id2string(mode) + "'");
   return language;
 }

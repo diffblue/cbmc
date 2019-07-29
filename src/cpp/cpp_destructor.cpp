@@ -45,8 +45,8 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     if(to_integer(to_constant_expr(tmp_size), s))
     {
       error().source_location=source_location;
-      error() << "array size `" << to_string(size_expr)
-              << "' is not a constant" << eom;
+      error() << "array size '" << to_string(size_expr) << "' is not a constant"
+              << eom;
       throw 0;
     }
 

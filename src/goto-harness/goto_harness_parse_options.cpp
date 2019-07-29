@@ -58,7 +58,7 @@ int goto_harness_parse_optionst::doit()
     read_goto_binary(got_harness_config.in_file, ui_message_handler);
   if(!read_goto_binary_result.has_value())
   {
-    throw deserialization_exceptiont{"failed to read goto program from file `" +
+    throw deserialization_exceptiont{"failed to read goto program from file '" +
                                      got_harness_config.in_file + "'"};
   }
   auto goto_model = std::move(read_goto_binary_result.value());
@@ -91,7 +91,7 @@ int goto_harness_parse_optionst::doit()
   if(write_goto_binary(
        got_harness_config.out_file, goto_model, ui_message_handler))
   {
-    throw system_exceptiont{"failed to write goto program from file `" +
+    throw system_exceptiont{"failed to write goto program from file '" +
                             got_harness_config.out_file + "'"};
   }
 

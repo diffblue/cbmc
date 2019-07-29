@@ -1470,7 +1470,7 @@ void value_sett::assign_rec(
     // which we don't track
   }
   else
-    throw "assign NYI: `"+lhs.id_string()+"'";
+    throw "assign NYI: '" + lhs.id_string() + "'";
 }
 
 void value_sett::do_function_call(

@@ -4,6 +4,6 @@ main.c
 ^EXIT=(64|1)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
-array size of static symbol `B' is not constant$
+array size of static symbol 'B' is not constant$
 --
 ^warning: ignoring

@@ -3,12 +3,12 @@ main.c
 --cover mcdc
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition `C && D && !E && A && !B.*: SATISFIED$
-^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition `C && !D && E && A && !B.*: SATISFIED$
-^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition `!C && D && E && A && !B.*: SATISFIED$
-^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition `C && D && E && A && !B.*: SATISFIED$
-^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition `C && D && E && !A && B.*: SATISFIED$
-^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition `C && D && E && !A && !B.*: SATISFIED$
+^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition 'C && D && !E && A && !B.*: SATISFIED$
+^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition 'C && !D && E && A && !B.*: SATISFIED$
+^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition '!C && D && E && A && !B.*: SATISFIED$
+^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition 'C && D && E && A && !B.*: SATISFIED$
+^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition 'C && D && E && !A && B.*: SATISFIED$
+^\[main.coverage.\d+\] file main.c line 14 function main MC/DC independence condition 'C && D && E && !A && !B.*: SATISFIED$
 ^\*\* .* of .* covered \(100.0%\)$
 --
 ^warning: ignoring

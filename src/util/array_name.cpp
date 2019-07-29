@@ -29,12 +29,12 @@ std::string array_name(
   {
     const symbolt &symbol=
       ns.lookup(to_ssa_expr(expr).get_object_name());
-    return "array `"+id2string(symbol.base_name)+"'";
+    return "array '" + id2string(symbol.base_name) + "'";
   }
   else if(expr.id()==ID_symbol)
   {
     const symbolt &symbol = ns.lookup(to_symbol_expr(expr));
-    return "array `"+id2string(symbol.base_name)+"'";
+    return "array '" + id2string(symbol.base_name) + "'";
   }
   else if(expr.id()==ID_string_constant)
   {

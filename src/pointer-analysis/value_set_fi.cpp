@@ -1258,7 +1258,7 @@ void value_set_fit::assign_rec(
     assign_rec(lhs.op0(), values_rhs, suffix, ns, recursion_set);
   }
   else
-    throw "assign NYI: `"+lhs.id_string()+"'";
+    throw "assign NYI: '" + lhs.id_string() + "'";
 }
 
 void value_set_fit::do_function_call(

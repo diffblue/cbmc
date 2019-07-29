@@ -5,7 +5,7 @@ test.jar
 ^SIGNAL=0$
 --
 Java main class: Test
-failed to open input file `Test.class'
+failed to open input file 'Test.class'
 --
 Test.class is not in the right directory corresponding to its package.
 Issue: 2864

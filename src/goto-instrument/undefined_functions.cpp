@@ -60,6 +60,6 @@ void undefined_function_abort_path(goto_modelt &goto_model)
 
       ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
       ins.source_location.set_comment(
-        "`"+id2string(function)+"' is undefined");
+        "'" + id2string(function) + "' is undefined");
     }
 }

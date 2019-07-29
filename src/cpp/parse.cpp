@@ -499,7 +499,7 @@ bool Parser::SyntaxError()
     source_location.set_file(t[0].filename);
     source_location.set_line(std::to_string(t[0].line_no));
 
-    std::string message="parse error before `";
+    std::string message = "parse error before '";
 
     for(std::size_t i=0; i<ERROR_TOKENS; i++)
       if(t[i].kind!='\0')

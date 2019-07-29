@@ -66,7 +66,7 @@ void goto_symext::parameter_assignments(
     {
       log.warning() << state.source.pc->source_location.as_string()
                     << ": "
-                       "call to `"
+                       "call to '"
                     << id2string(function_identifier)
                     << "': "
                        "not enough arguments, inserting non-deterministic value"

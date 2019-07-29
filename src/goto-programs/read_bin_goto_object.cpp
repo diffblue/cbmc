@@ -208,8 +208,8 @@ bool read_bin_goto_object(
       else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
       {
         if(!filename.empty())
-          message.error() << "Sorry, but I can't read ELF binary `"
-                          << filename << "'" << messaget::eom;
+          message.error() << "Sorry, but I can't read ELF binary '" << filename
+                          << "'" << messaget::eom;
         else
           message.error() << "Sorry, but I can't read ELF binaries"
                           << messaget::eom;
@@ -218,7 +218,7 @@ bool read_bin_goto_object(
       }
       else
       {
-        message.error() << "`" << filename << "' is not a goto-binary"
+        message.error() << "'" << filename << "' is not a goto-binary"
                         << messaget::eom;
         return true;
       }

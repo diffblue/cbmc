@@ -135,10 +135,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     if(has_body)
     {
       error().source_location=type.source_location();
-      error() << "error: enum symbol `" << base_name
+      error() << "error: enum symbol '" << base_name
               << "' declared previously\n"
-              << "location of previous definition: "
-              << symbol.location << eom;
+              << "location of previous definition: " << symbol.location << eom;
       throw 0;
     }
   }
@@ -209,8 +208,8 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   else
   {
     error().source_location=type.source_location();
-    error() << "use of enum `" << base_name
-            << "' without previous declaration" << eom;
+    error() << "use of enum '" << base_name << "' without previous declaration"
+            << eom;
     throw 0;
   }
 

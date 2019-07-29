@@ -147,10 +147,9 @@ symbolt &cpp_declarator_convertert::convert(
       {
         cpp_typecheck.error().source_location=
           declarator.name().source_location();
-        cpp_typecheck.error() << "member `" << base_name
-                              << "' not found in scope `"
-                              << scope->identifier << "'"
-                              << messaget::eom;
+        cpp_typecheck.error()
+          << "member '" << base_name << "' not found in scope '"
+          << scope->identifier << "'" << messaget::eom;
         throw 0;
       }
     }
@@ -285,16 +284,14 @@ void cpp_declarator_convertert::combine_types(
           if(i != 0 || !symbol_code_type.get_bool(ID_C_is_virtual))
           {
             cpp_typecheck.error().source_location=source_location;
-            cpp_typecheck.error() << "symbol `" << symbol.display_name()
-                                  << "': parameter " << (i+1)
-                                  << " type mismatch\n"
-                                  << "previous type: "
-                                  << cpp_typecheck.to_string(
-                                       symbol_parameter.type())
-                                  << "\nnew type: "
-                                  << cpp_typecheck.to_string(
-                                       decl_parameter.type())
-                                  << messaget::eom;
+            cpp_typecheck.error()
+              << "symbol '" << symbol.display_name() << "': parameter "
+              << (i + 1) << " type mismatch\n"
+              << "previous type: "
+              << cpp_typecheck.to_string(symbol_parameter.type())
+              << "\nnew type: "
+              << cpp_typecheck.to_string(decl_parameter.type())
+              << messaget::eom;
             throw 0;
           }
         }
@@ -325,12 +322,10 @@ void cpp_declarator_convertert::combine_types(
   }
 
   cpp_typecheck.error().source_location=source_location;
-  cpp_typecheck.error() << "symbol `" << symbol.display_name()
+  cpp_typecheck.error() << "symbol '" << symbol.display_name()
                         << "' already declared with different type:\n"
-                        << "original: "
-                        << cpp_typecheck.to_string(symbol.type)
-                        << "\n     new: "
-                        << cpp_typecheck.to_string(final_type)
+                        << "original: " << cpp_typecheck.to_string(symbol.type)
+                        << "\n     new: " << cpp_typecheck.to_string(final_type)
                         << messaget::eom;
   throw 0;
 }
@@ -380,13 +375,13 @@ void cpp_declarator_convertert::handle_initializer(
 
     if(is_code)
     {
-      cpp_typecheck.error() << "body of function `"
+      cpp_typecheck.error() << "body of function '"
                         << symbol.display_name()
                         << "' has already been defined" << messaget::eom;
     }
     else
     {
-      cpp_typecheck.error() << "symbol `"
+      cpp_typecheck.error() << "symbol '"
                         << symbol.display_name()
                         << "' already has an initializer" << messaget::eom;
     }
@@ -533,9 +528,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       if(!id.is_class() && !id.is_enum())
       {
         cpp_typecheck.error().source_location=new_symbol->location;
-        cpp_typecheck.error() << "`" << base_name
-                              << "' already in scope"
-                              << messaget::eom;
+        cpp_typecheck.error()
+          << "'" << base_name << "' already in scope" << messaget::eom;
         throw 0;
       }
     }

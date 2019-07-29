@@ -77,8 +77,7 @@ std::string cpp_typecheckt::template_suffix(
       {
         error().source_location = expr.find_source_location();
         error() << "template argument expression expected to be "
-                << "scalar constant, but got `"
-                << to_string(e) << "'" << eom;
+                << "scalar constant, but got '" << to_string(e) << "'" << eom;
         throw 0;
       }
 
@@ -96,7 +95,7 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
   for(const auto &e : instantiation_stack)
   {
     const symbolt &symbol = lookup(e.identifier);
-    out << "instantiating `" << symbol.pretty_name << "' with <";
+    out << "instantiating '" << symbol.pretty_name << "' with <";
 
     forall_expr(a_it, e.full_template_args.arguments())
     {
@@ -160,9 +159,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   if(full_template_args.arguments().empty())
   {
     error().source_location=source_location;
-    error() << "`" << template_symbol.base_name
-            << "' is a template; thus, expected template arguments"
-            << eom;
+    error() << "'" << template_symbol.base_name
+            << "' is a template; thus, expected template arguments" << eom;
     throw 0;
   }
 
@@ -307,9 +305,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   if(full_template_args.arguments().empty())
   {
     error().source_location=source_location;
-    error() << "`" << template_symbol.base_name
-            << "' is a template; thus, expected template arguments"
-            << eom;
+    error() << "'" << template_symbol.base_name
+            << "' is a template; thus, expected template arguments" << eom;
     throw 0;
   }
 

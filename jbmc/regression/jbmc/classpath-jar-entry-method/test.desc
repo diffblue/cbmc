@@ -4,10 +4,10 @@ jar_file.jar
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED
-Getting class `RelevantClass' from JAR jar_file.jar
-Getting class `RelatedClass' from JAR jar_file.jar
+Getting class 'RelevantClass' from JAR jar_file.jar
+Getting class 'RelatedClass' from JAR jar_file.jar
 --
-Getting class `IrrelevantClass' from JAR jar_file.jar
+Getting class 'IrrelevantClass' from JAR jar_file.jar
 --
 This test checks that when JBMC is given a jar file as an argument and an entry
 method is specified with --function, only classes that are (possibly

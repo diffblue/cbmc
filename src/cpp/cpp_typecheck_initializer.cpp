@@ -31,8 +31,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(symbol.value.id()!=ID_type)
     {
       error().source_location=symbol.location;
-      error() << "expected type as initializer for `"
-              << symbol.base_name << "'" << eom;
+      error() << "expected type as initializer for '" << symbol.base_name << "'"
+              << eom;
       throw 0;
     }
 
@@ -48,9 +48,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(is_reference(symbol.type))
     {
       error().source_location=symbol.location;
-      error() << "`" << symbol.base_name
-              << "' is declared as reference but is not initialized"
-              << eom;
+      error() << "'" << symbol.base_name
+              << "' is declared as reference but is not initialized" << eom;
       throw 0;
     }
 
@@ -128,9 +127,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       if(symbol.type != symbol.value.type())
       {
         error().source_location=symbol.location;
-        error() << "conversion from `"
-                << to_string(symbol.value.type()) << "' to `"
-                << to_string(symbol.type) << "' " << eom;
+        error() << "conversion from '" << to_string(symbol.value.type())
+                << "' to '" << to_string(symbol.type) << "' " << eom;
         throw 0;
       }
 
@@ -317,7 +315,7 @@ void cpp_typecheckt::zero_initializer(
     if(!value.has_value())
     {
       error().source_location = source_location;
-      error() << "cannot zero-initialize `" << to_string(final_type) << "'"
+      error() << "cannot zero-initialize '" << to_string(final_type) << "'"
               << eom;
       throw 0;
     }

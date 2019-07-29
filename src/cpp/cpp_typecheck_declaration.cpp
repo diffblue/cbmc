@@ -65,7 +65,7 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
     if(c.type().id() == ID_code)
     {
       error().source_location=union_symbol.type.source_location();
-      error() << "anonymous union `" << union_symbol.base_name
+      error() << "anonymous union '" << union_symbol.base_name
               << "' shall not have function members" << eom;
       throw 0;
     }
@@ -75,8 +75,7 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
     if(cpp_scopes.current_scope().contains(base_name))
     {
       error().source_location=union_symbol.type.source_location();
-      error() << "identifier `" << base_name << "' already in scope"
-              << eom;
+      error() << "identifier '" << base_name << "' already in scope" << eom;
       throw 0;
     }
 

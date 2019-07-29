@@ -171,8 +171,7 @@ bool write_goto_binary(
   if(!out)
   {
     messaget message(message_handler);
-    message.error() <<
-      "Failed to open `" << filename << "'";
+    message.error() << "Failed to open '" << filename << "'";
     return true;
   }
 

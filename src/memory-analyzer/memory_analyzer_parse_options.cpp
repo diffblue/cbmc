@@ -105,7 +105,7 @@ int memory_analyzer_parse_optionst::doit()
   if(!opt.has_value())
   {
     throw deserialization_exceptiont(
-      "cannot read goto binary `" + binary + "'");
+      "cannot read goto binary '" + binary + "'");
   }
 
   const goto_modelt goto_model(std::move(opt.value()));

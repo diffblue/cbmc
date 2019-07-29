@@ -176,7 +176,7 @@ java_class_loadert::get_parse_tree(
     return parse_trees;
 
   // Not found or failed to load
-  warning() << "failed to load class `" << class_name << '\'' << eom;
+  warning() << "failed to load class " << class_name << eom;
   parse_trees.emplace_back(class_name);
   return parse_trees;
 }
@@ -211,10 +211,10 @@ java_class_loadert::read_jar_file(const std::string &jar_path)
   }
   catch(const std::runtime_error &)
   {
-    error() << "failed to open JAR file `" << jar_path << "'" << eom;
+    error() << "failed to open JAR file '" << jar_path << "'" << eom;
     return {};
   }
-  debug() << "Adding JAR file `" << jar_path << "'" << eom;
+  debug() << "Adding JAR file '" << jar_path << "'" << eom;
 
   // Create a new entry in the map and initialize using the list of file names
   // that are in jar_filet
@@ -223,9 +223,8 @@ java_class_loadert::read_jar_file(const std::string &jar_path)
   {
     if(has_suffix(file_name, ".class"))
     {
-      debug()
-        << "Found class file " << file_name << " in JAR `" << jar_path << "'"
-        << eom;
+      debug() << "Found class file " << file_name << " in JAR '" << jar_path
+              << "'" << eom;
       irep_idt class_name=file_to_class_name(file_name);
       classes.push_back(class_name);
     }

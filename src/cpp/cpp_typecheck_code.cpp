@@ -270,7 +270,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       {
         #if 0
         error().source_location=code.source_location());
-        str << "error: constructor of `"
+        str << "error: constructor of '"
             << to_string(symbol_expr)
             << "' is not accessible";
         throw 0;
@@ -335,7 +335,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         if(code.operands().size()!= 1)
         {
           error().source_location=code.find_source_location();
-          error() << " reference `" << to_string(symbol_expr)
+          error() << " reference '" << to_string(symbol_expr)
                   << "' expects one initializer" << eom;
           throw 0;
         }
@@ -377,8 +377,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     else
     {
       error().source_location=code.find_source_location();
-      error() << "invalid member initializer `"
-              << to_string(symbol_expr) << "'" << eom;
+      error() << "invalid member initializer '" << to_string(symbol_expr) << "'"
+              << eom;
       throw 0;
     }
   }

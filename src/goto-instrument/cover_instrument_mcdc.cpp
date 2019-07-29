@@ -659,7 +659,7 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string p_string = from_expr(ns, function_id, p);
 
-      std::string comment_t = description + " `" + p_string + "' true";
+      std::string comment_t = description + " '" + p_string + "' true";
       goto_program.insert_before_swap(i_it);
       *i_it = goto_programt::make_assertion(not_exprt(p), source_location);
       i_it->source_location.set_comment(comment_t);
@@ -667,7 +667,7 @@ void cover_mcdc_instrumentert::instrument(
       i_it->source_location.set_property_class(property_class);
       i_it->source_location.set_function(function_id);
 
-      std::string comment_f = description + " `" + p_string + "' false";
+      std::string comment_f = description + " '" + p_string + "' false";
       goto_program.insert_before_swap(i_it);
       *i_it = goto_programt::make_assertion(p, source_location);
       i_it->source_location.set_comment(comment_f);
@@ -691,7 +691,7 @@ void cover_mcdc_instrumentert::instrument(
       std::string p_string = from_expr(ns, function_id, p);
 
       std::string description =
-        "MC/DC independence condition `" + p_string + "'";
+        "MC/DC independence condition '" + p_string + "'";
 
       goto_program.insert_before_swap(i_it);
       *i_it = goto_programt::make_assertion(not_exprt(p), source_location);
