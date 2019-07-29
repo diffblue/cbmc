@@ -466,8 +466,7 @@ protected:
   bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);
-    return static_cast<domainT &>(dest).merge(
-      static_cast<const domainT &>(src), from, to);
+    return domain_factory->merge(dest, src, from, to);
   }
 
   /// Make a copy of \p s.
