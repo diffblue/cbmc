@@ -18,11 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/guard.h>
 
-#include <util/invariant.h>
-#include <util/std_expr.h>
-#include <util/ssa_expr.h>
-#include <util/make_unique.h>
 #include <goto-programs/goto_function.h>
+#include <util/invariant.h>
+#include <util/make_unique.h>
+#include <util/nodiscard.h>
+#include <util/ssa_expr.h>
+#include <util/std_expr.h>
 
 #include "call_stack.h"
 #include "field_sensitivity.h"
@@ -97,20 +98,21 @@ public:
   /// A full explanation of SSA (which is why we do this renaming) is in
   /// the SSA section of background-concepts.md.
   template <levelt level = L2>
-  renamedt<exprt, level> rename(exprt expr, const namespacet &ns);
+  NODISCARD renamedt<exprt, level> rename(exprt expr, const namespacet &ns);
 
   /// Version of rename which is specialized for SSA exprt.
   /// Implementation only exists for level L0 and L1.
   template <levelt level>
-  renamedt<ssa_exprt, level> rename_ssa(ssa_exprt ssa, const namespacet &ns);
+  NODISCARD renamedt<ssa_exprt, level>
+  rename_ssa(ssa_exprt ssa, const namespacet &ns);
 
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
-  exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
+  NODISCARD exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
 
   /// \return lhs renamed to level 2
-  renamedt<ssa_exprt, L2> assignment(
+  NODISCARD renamedt<ssa_exprt, L2> assignment(
     ssa_exprt lhs,    // L0/L1
     const exprt &rhs, // L2
     const namespacet &ns,
@@ -126,7 +128,8 @@ protected:
 
   /// Update values up to \c level.
   template <levelt level>
-  renamedt<ssa_exprt, level> set_indices(ssa_exprt expr, const namespacet &ns);
+  NODISCARD renamedt<ssa_exprt, level>
+  set_indices(ssa_exprt expr, const namespacet &ns);
 
   // this maps L1 names to (L2) types
   typedef std::unordered_map<irep_idt, typet> l1_typest;
