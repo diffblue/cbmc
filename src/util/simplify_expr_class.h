@@ -210,7 +210,7 @@ public:
   NODISCARD resultt<> simplify_inequality_pointer_object(const exprt &);
 
   // main recursion
-  bool simplify_node(exprt &expr);
+  NODISCARD resultt<> simplify_node(exprt);
   bool simplify_node_preorder(exprt &expr);
   NODISCARD resultt<> simplify_rec(const exprt &);
 

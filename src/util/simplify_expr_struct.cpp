@@ -155,8 +155,8 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
       const exprt &struct_offset = byte_extract_expr.offset();
       exprt member_offset = from_integer(*offset_int, struct_offset.type());
-      plus_exprt final_offset(struct_offset, member_offset);
-      simplify_node(final_offset);
+      exprt final_offset =
+        simplify_node(plus_exprt(struct_offset, member_offset));
 
       byte_extract_exprt result(
         op.id(), byte_extract_expr.op(), final_offset, expr.type());

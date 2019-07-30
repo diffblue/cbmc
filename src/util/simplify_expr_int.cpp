@@ -568,9 +568,7 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     // rewrite "a-b" to "a+(-b)"
     unary_minus_exprt rhs_negated(operands[1]);
     plus_exprt plus_expr(operands[0], simplify_unary_minus(rhs_negated));
-    simplify_node(plus_expr);
-
-    return std::move(plus_expr);
+    return changed(simplify_node(plus_expr));
   }
   else if(
     minus_expr.type().id() == ID_pointer &&
@@ -649,12 +647,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_bitwise(const exprt &expr)
       }
 
       new_expr.type()=bool_typet();
-      simplify_node(new_expr);
+      new_expr = simplify_node(new_expr);
 
       new_expr = typecast_exprt(new_expr, expr.type());
-      simplify_node(new_expr);
-
-      return std::move(new_expr);
+      return changed(simplify_node(new_expr));
     }
   }
 
@@ -1486,8 +1482,7 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
     new_expr.id(ID_equal);
     new_expr = simplify_inequality_no_constant(new_expr);
     new_expr = boolean_negate(new_expr);
-    simplify_node(new_expr);
-    return std::move(new_expr);
+    return changed(simplify_node(new_expr));
   }
   else if(expr.id()==ID_gt)
   {
@@ -1497,8 +1492,7 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
     new_expr.op0().swap(new_expr.op1());
     new_expr = simplify_inequality_no_constant(new_expr);
     new_expr = boolean_negate(new_expr);
-    simplify_node(new_expr);
-    return std::move(new_expr);
+    return changed(simplify_node(new_expr));
   }
   else if(expr.id()==ID_lt)
   {
@@ -1506,8 +1500,7 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
     new_expr.id(ID_ge);
     new_expr = simplify_inequality_no_constant(new_expr);
     new_expr = boolean_negate(new_expr);
-    simplify_node(new_expr);
-    return std::move(new_expr);
+    return changed(simplify_node(new_expr));
   }
   else if(expr.id()==ID_le)
   {
@@ -1588,10 +1581,9 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
     if(!eliminate_common_addends(new_expr.op0(), new_expr.op1()))
     {
       // remove zeros
-      simplify_node(new_expr.op0());
-      simplify_node(new_expr.op1());
-      new_expr = simplify_inequality(new_expr); // recursive call
-      return std::move(new_expr);
+      new_expr.op0() = simplify_node(new_expr.op0());
+      new_expr.op1() = simplify_node(new_expr.op1());
+      return changed(simplify_inequality(new_expr)); // recursive call
     }
   }
 
@@ -1625,8 +1617,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       new_expr.id(ID_equal);
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
       new_expr = boolean_negate(new_expr);
-      simplify_node(new_expr);
-      return std::move(new_expr);
+      return changed(simplify_node(new_expr));
     }
 
     // very special case for pointers
@@ -1839,8 +1830,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       new_expr.id(ID_equal);
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
       new_expr = boolean_negate(new_expr);
-      simplify_node(new_expr);
-      return std::move(new_expr);
+      return changed(simplify_node(new_expr));
     }
     else if(expr.id()==ID_gt)
     {
@@ -1863,8 +1853,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       new_expr.id(ID_ge);
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
       new_expr = boolean_negate(new_expr);
-      simplify_node(new_expr);
-      return std::move(new_expr);
+      return changed(simplify_node(new_expr));
     }
     else if(expr.id()==ID_le)
     {
@@ -1881,8 +1870,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       new_expr.op1() = from_integer(i, new_expr.op1().type());
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
       new_expr = boolean_negate(new_expr);
-      simplify_node(new_expr);
-      return std::move(new_expr);
+      return changed(simplify_node(new_expr));
     }
   }
 #endif

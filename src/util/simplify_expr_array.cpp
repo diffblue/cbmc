@@ -184,8 +184,8 @@ simplify_exprt::simplify_index(const index_exprt &expr)
       // add offset to index
       mult_exprt offset(
         from_integer(*sub_size, byte_extract_expr.offset().type()), index);
-      plus_exprt final_offset(byte_extract_expr.offset(), offset);
-      simplify_node(final_offset);
+      exprt final_offset =
+        simplify_node(plus_exprt(byte_extract_expr.offset(), offset));
 
       exprt result_expr(array.id(), expr.type());
       result_expr.add_to_operands(byte_extract_expr.op(), final_offset);
