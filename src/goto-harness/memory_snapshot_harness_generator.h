@@ -97,8 +97,10 @@ protected:
     /// Returns the first \ref goto_programt::instructiont represented by this
     ///   source location, i.e. one with the same file name and line number
     /// \param instructions: list of instructions to be searched
-    /// \return iterator to the right instruction (or `end()`)
-    goto_programt::const_targett find_first_corresponding_instruction(
+    /// \return <iterator to the right instruction (or `end()`), distance to
+    ///   `line_number`>
+    std::pair<goto_programt::const_targett, size_t>
+    find_first_corresponding_instruction(
       const goto_programt::instructionst &instructions) const;
   };
 
@@ -121,6 +123,35 @@ protected:
       goto_programt::const_targett start_instruction)
       : function_name(function_name), start_instruction(start_instruction)
     {
+    }
+  };
+
+  /// Wraps the information for source location match candidates. Keeps track of
+  /// the distance between user specified source code line and goto-program
+  /// instruction line.
+  struct source_location_matcht
+  {
+    size_t distance;
+    irep_idt function_name;
+    goto_programt::const_targett instruction;
+    bool match_found;
+
+    source_location_matcht() : distance(0), match_found(false)
+    {
+    }
+
+    void match_up(
+      const size_t &candidate_distance,
+      const irep_idt &candidate_function_name,
+      const goto_programt::const_targett &candidate_instruction)
+    {
+      if(match_found && distance <= candidate_distance)
+        return;
+
+      match_found = true;
+      distance = candidate_distance;
+      function_name = candidate_function_name;
+      instruction = candidate_instruction;
     }
   };
 
