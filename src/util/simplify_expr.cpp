@@ -547,13 +547,12 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   // (void*)(intX)expr -> (void*)expr
   if(
     expr_type.id() == ID_pointer && expr.op().id() == ID_typecast &&
-    expr.op().operands().size() == 1 &&
     (op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv) &&
     to_bitvector_type(op_type).get_width() >=
       to_bitvector_type(expr_type).get_width())
   {
     auto new_expr = expr;
-    new_expr.op() = expr.op().op0();
+    new_expr.op() = to_typecast_expr(expr.op()).op();
     return changed(simplify_typecast(new_expr)); // rec. call
   }
 
@@ -634,10 +633,10 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   // (T1 *)(T2 *)x -> (T1 *)x
   if(
     expr_type.id() == ID_pointer && expr.op().id() == ID_typecast &&
-    op_type.id() == ID_pointer && expr.op().operands().size() == 1)
+    op_type.id() == ID_pointer)
   {
     auto new_expr = expr;
-    new_expr.op() = expr.op().op0();
+    new_expr.op() = to_typecast_expr(expr.op()).op();
     return changed(simplify_typecast(new_expr)); // recursive call
   }
 
@@ -1360,25 +1359,27 @@ simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
       const exprt &casted_expr = typecast_expr.op();
       if(casted_expr.id() == ID_plus && casted_expr.operands().size() == 2)
       {
-        const exprt &cand = casted_expr.op0().id() == ID_typecast
-                              ? casted_expr.op0()
-                              : casted_expr.op1();
+        const auto &plus_expr = to_plus_expr(casted_expr);
 
-        if(cand.id()==ID_typecast &&
-           cand.operands().size()==1 &&
-           cand.op0().id()==ID_address_of)
+        const exprt &cand = plus_expr.op0().id() == ID_typecast
+                              ? plus_expr.op0()
+                              : plus_expr.op1();
+
+        if(cand.id() == ID_typecast)
         {
-          return cand.op0();
-        }
-        else if(cand.id()==ID_typecast &&
-                cand.operands().size()==1 &&
-                cand.op0().id()==ID_plus &&
-                cand.op0().operands().size()==2 &&
-                cand.op0().op0().id()==ID_typecast &&
-                cand.op0().op0().operands().size()==1 &&
-                cand.op0().op0().op0().id()==ID_address_of)
-        {
-          return cand.op0().op0().op0();
+          const auto &typecast_op = to_typecast_expr(cand).op();
+
+          if(typecast_op.id() == ID_address_of)
+          {
+            return typecast_op;
+          }
+          else if(
+            typecast_op.id() == ID_plus && typecast_op.operands().size() == 2 &&
+            typecast_op.op0().id() == ID_typecast &&
+            to_typecast_expr(typecast_op.op0()).op().id() == ID_address_of)
+          {
+            return cand.op0().op0().op0();
+          }
         }
       }
     }

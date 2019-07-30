@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
+#include "byte_operators.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "replace_expr.h"
@@ -163,6 +164,8 @@ simplify_exprt::simplify_index(const index_exprt &expr)
   else if(array.id()==ID_byte_extract_little_endian ||
           array.id()==ID_byte_extract_big_endian)
   {
+    const auto &byte_extract_expr = to_byte_extract_expr(array);
+
     if(array.type().id() == ID_array || array.type().id() == ID_vector)
     {
       optionalt<typet> subtype;
@@ -179,12 +182,13 @@ simplify_exprt::simplify_index(const index_exprt &expr)
         return unchanged(expr);
 
       // add offset to index
-      mult_exprt offset(from_integer(*sub_size, array.op1().type()), index);
-      plus_exprt final_offset(array.op1(), offset);
+      mult_exprt offset(
+        from_integer(*sub_size, byte_extract_expr.offset().type()), index);
+      plus_exprt final_offset(byte_extract_expr.offset(), offset);
       simplify_node(final_offset);
 
       exprt result_expr(array.id(), expr.type());
-      result_expr.add_to_operands(array.op0(), final_offset);
+      result_expr.add_to_operands(byte_extract_expr.op(), final_offset);
 
       return changed(simplify_rec(result_expr));
     }

@@ -136,10 +136,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
     // search for a and !a
     for(const exprt &op : new_operands)
-      if(op.id()==ID_not &&
-         op.operands().size()==1 &&
-         op.type().id()==ID_bool &&
-         expr_set.find(op.op0())!=expr_set.end())
+      if(
+        op.id() == ID_not && op.type().id() == ID_bool &&
+        expr_set.find(to_not_expr(op).op()) != expr_set.end())
       {
         return make_boolean_expr(expr.id() == ID_or);
       }
