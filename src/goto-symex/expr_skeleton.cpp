@@ -21,7 +21,7 @@ expr_skeletont expr_skeletont::remove_op0(exprt e)
 {
   PRECONDITION(e.id() != ID_symbol);
   PRECONDITION(e.operands().size() >= 1);
-  e.op0().make_nil();
+  to_multi_ary_expr(e).op0().make_nil();
   return expr_skeletont{std::move(e)};
 }
 
@@ -39,7 +39,7 @@ exprt expr_skeletont::apply(exprt expr) const
     INVARIANT(
       p->operands().size() >= 1,
       "expected pointed-to expression to have at least one operand");
-    p = &p->op0();
+    p = &to_multi_ary_expr(*p).op0();
   }
 
   INVARIANT(p->is_nil(), "expected pointed-to expression to be nil");
