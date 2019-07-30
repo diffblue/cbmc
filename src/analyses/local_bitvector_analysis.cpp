@@ -264,7 +264,7 @@ void local_bitvector_analysist::build()
     work_queue.pop();
 
     auto &loc_info_src=loc_infos[loc_nr];
-    auto loc_info_dest=loc_infos[loc_nr];
+    auto loc_info_dest=points_tot();
 
     switch(instruction.type)
     {
