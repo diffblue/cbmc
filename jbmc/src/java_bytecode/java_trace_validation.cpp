@@ -85,8 +85,8 @@ bool check_index_structure(const exprt &index_expr)
   return (can_cast_expr<index_exprt>(index_expr) ||
           can_cast_expr<byte_extract_exprt>(index_expr)) &&
          index_expr.operands().size() == 2 &&
-         check_symbol_structure(index_expr.op0()) &&
-         can_evaluate_to_constant(index_expr.op1());
+         check_symbol_structure(to_binary_expr(index_expr).op0()) &&
+         can_evaluate_to_constant(to_binary_expr(index_expr).op1());
 }
 
 bool check_struct_structure(const struct_exprt &expr)

@@ -326,7 +326,10 @@ std::string expr2javat::convert_java_instanceof(const exprt &src)
     return convert_norep(src, precedence);
   }
 
-  return convert(src.op0())+" instanceof "+convert(src.op1().type());
+  const auto &binary_expr = to_binary_expr(src);
+
+  return convert(binary_expr.op0()) + " instanceof " +
+         convert(binary_expr.op1().type());
 }
 
 std::string expr2javat::convert_code_java_new(const exprt &src, unsigned indent)
@@ -370,7 +373,7 @@ std::string expr2javat::convert_code_java_delete(
     return convert_norep(src, precedence);
   }
 
-  std::string tmp=convert(src.op0());
+  std::string tmp = convert(to_unary_expr(src).op());
 
   dest+=tmp+";\n";
 

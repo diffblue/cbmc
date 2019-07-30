@@ -176,7 +176,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     struct_type.components()[1].type());
   dest.insert_before(
     next,
-    goto_programt::make_assignment(code_assignt(length, rhs.op0()), location));
+    goto_programt::make_assignment(
+      code_assignt(length, to_multi_ary_expr(rhs).op0()), location));
 
   // we also need to allocate space for the data
   member_exprt data(
@@ -205,7 +206,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   // backend.
   const irept size_bound = rhs.find(ID_length_upper_bound);
   if(size_bound.is_nil())
-    data_java_new_expr.set(ID_size, rhs.op0());
+    data_java_new_expr.set(ID_size, to_multi_ary_expr(rhs).op0());
   else
     data_java_new_expr.set(ID_size, size_bound);
 
@@ -276,8 +277,9 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 
     side_effect_exprt inc(ID_assign, typet(), location);
     inc.operands().resize(2);
-    inc.op0() = tmp_i;
-    inc.op1() = plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
+    to_binary_expr(inc).op0() = tmp_i;
+    to_binary_expr(inc).op1() =
+      plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
 
     dereference_exprt deref_expr(
       plus_exprt(data, tmp_i), data.type().subtype());
@@ -299,7 +301,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 
     const code_fort for_loop(
       code_assignt(tmp_i, from_integer(0, tmp_i.type())),
-      binary_relation_exprt(tmp_i, ID_lt, rhs.op0()),
+      binary_relation_exprt(tmp_i, ID_lt, to_multi_ary_expr(rhs).op0()),
       std::move(inc),
       std::move(for_body));
 

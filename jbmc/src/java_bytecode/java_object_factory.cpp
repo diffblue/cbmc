@@ -239,7 +239,7 @@ void java_object_factoryt::gen_pointer_target_init(
   else
   {
     if(expr.id() == ID_address_of)
-      init_expr = expr.op0();
+      init_expr = to_address_of_expr(expr).object();
     else
     {
       init_expr = dereference_exprt(expr);
