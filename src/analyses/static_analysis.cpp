@@ -370,7 +370,7 @@ void static_analysis_baset::do_function_call_rec(
       calling_function,
       l_call,
       l_return,
-      function.op1(),
+      to_if_expr(function).true_case(),
       arguments,
       new_state,
       goto_functions);
@@ -379,7 +379,7 @@ void static_analysis_baset::do_function_call_rec(
       calling_function,
       l_call,
       l_return,
-      function.op2(),
+      to_if_expr(function).false_case(),
       arguments,
       *n2,
       goto_functions);

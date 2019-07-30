@@ -176,23 +176,26 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   }
   else if(rhs.id()==ID_plus)
   {
-    if(rhs.operands().size()>=3)
+    const auto &plus_expr = to_plus_expr(rhs);
+
+    if(plus_expr.operands().size() >= 3)
     {
-      assert(rhs.op0().type().id()==ID_pointer);
-      return get_rec(rhs.op0(), loc_info_src) |
-             flagst::mk_uses_offset();
+      DATA_INVARIANT(
+        plus_expr.op0().type().id() == ID_pointer,
+        "pointer in pointer-typed sum must be op0");
+      return get_rec(plus_expr.op0(), loc_info_src) | flagst::mk_uses_offset();
     }
-    else if(rhs.operands().size()==2)
+    else if(plus_expr.operands().size() == 2)
     {
       // one must be pointer, one an integer
-      if(rhs.op0().type().id()==ID_pointer)
+      if(plus_expr.op0().type().id() == ID_pointer)
       {
-        return get_rec(rhs.op0(), loc_info_src) |
+        return get_rec(plus_expr.op0(), loc_info_src) |
                flagst::mk_uses_offset();
       }
-      else if(rhs.op1().type().id()==ID_pointer)
+      else if(plus_expr.op1().type().id() == ID_pointer)
       {
-        return get_rec(rhs.op1(), loc_info_src) |
+        return get_rec(plus_expr.op1(), loc_info_src) |
                flagst::mk_uses_offset();
       }
       else
@@ -203,10 +206,11 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   }
   else if(rhs.id()==ID_minus)
   {
-    if(rhs.op0().type().id()==ID_pointer)
+    const auto &op0 = to_minus_expr(rhs).op0();
+
+    if(op0.type().id() == ID_pointer)
     {
-      return get_rec(rhs.op0(), loc_info_src) |
-             flagst::mk_uses_offset();
+      return get_rec(op0, loc_info_src) | flagst::mk_uses_offset();
     }
     else
       return flagst::mk_unknown();

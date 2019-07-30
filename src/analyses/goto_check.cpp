@@ -790,7 +790,7 @@ void goto_checkt::integer_overflow_check(
       exprt tmp;
 
       if(i==1)
-        tmp=expr.op0();
+        tmp = to_multi_ary_expr(expr).op0();
       else
       {
         tmp=expr;
@@ -1732,7 +1732,8 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
     DATA_INVARIANT(
       expr.operands().size() == 2, "r/w_ok must have two operands");
 
-    const auto conditions = address_check(expr.op0(), expr.op1());
+    const auto conditions =
+      address_check(to_binary_expr(expr).op0(), to_binary_expr(expr).op1());
 
     exprt::operandst conjuncts;
 
@@ -1964,7 +1965,7 @@ void goto_checkt::goto_check(
       {
         // must not throw NULL
 
-        exprt pointer=i.code.op0().op0();
+        exprt pointer = to_unary_expr(i.code.op0()).op();
 
         const notequal_exprt not_eq_null(
           pointer, null_pointer_exprt(to_pointer_type(pointer.type())));

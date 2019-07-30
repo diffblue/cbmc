@@ -704,10 +704,10 @@ exprt custom_bitvector_domaint::eval(
   {
     if(src.operands().size()==2)
     {
-      unsigned bit_nr=
-        custom_bitvector_analysis.get_bit_nr(src.op1());
+      unsigned bit_nr =
+        custom_bitvector_analysis.get_bit_nr(to_binary_expr(src).op1());
 
-      exprt pointer=src.op0();
+      exprt pointer = to_binary_expr(src).op0();
 
       if(pointer.type().id()!=ID_pointer)
         return src;

@@ -43,7 +43,7 @@ static optionalt<goto_null_checkt> get_null_checked_expr(const exprt &expr)
   // Reduce some roundabout ways of saying "x != null", e.g. "!(x == null)".
   while(normalized_expr.id() == ID_not)
   {
-    normalized_expr = normalized_expr.op0();
+    normalized_expr = to_not_expr(normalized_expr).op();
     checked_when_taken = !checked_when_taken;
   }
 
@@ -55,8 +55,8 @@ static optionalt<goto_null_checkt> get_null_checked_expr(const exprt &expr)
 
   if(normalized_expr.id() == ID_notequal)
   {
-    const exprt &op0 = skip_typecast(normalized_expr.op0());
-    const exprt &op1 = skip_typecast(normalized_expr.op1());
+    const exprt &op0 = skip_typecast(to_notequal_expr(normalized_expr).op0());
+    const exprt &op1 = skip_typecast(to_notequal_expr(normalized_expr).op1());
 
     if(op0.type().id() == ID_pointer &&
        op0 == null_pointer_exprt(to_pointer_type(op0.type())))
