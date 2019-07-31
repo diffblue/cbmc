@@ -155,7 +155,10 @@ void recursive_initializationt::initialize_struct_tag(
   auto const &ns = namespacet{goto_model.symbol_table};
   for(auto const &component : ns.follow_tag(type).components())
   {
-    initialize(member_exprt{lhs, component}, depth, new_known_tags, body);
+    if(!component.get_is_padding())
+    {
+      initialize(member_exprt{lhs, component}, depth, new_known_tags, body);
+    }
   }
 }
 
