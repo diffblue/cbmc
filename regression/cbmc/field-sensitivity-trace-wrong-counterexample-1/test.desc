@@ -1,0 +1,13 @@
+CORE
+test.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+x=\{ \.x=0 \}
+^warning: ignoring
+--
+This tests for the counterexample shown in the trace having sensible values.
+In this case, we are asserting that x.x == 0, so x.x should have a value other
+than 0 if the assertion fails.

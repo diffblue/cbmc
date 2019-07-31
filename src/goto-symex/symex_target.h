@@ -127,6 +127,7 @@ public:
   /// Declare a fresh variable. The `cond_expr` is _lhs==lhs_.
   /// \param guard: Precondition for a declaration of this variable
   /// \param ssa_lhs: Variable to be declared, must be symbol (and not nil)
+  /// \param initializer: Initial value
   /// \param source: Pointer to location in the input GOTO program of this
   ///  declaration
   /// \param assignment_type: To distinguish between different types of
@@ -134,8 +135,9 @@ public:
   virtual void decl(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
+    const exprt &initializer,
     const sourcet &source,
-    assignment_typet assignment_type)=0;
+    assignment_typet assignment_type) = 0;
 
   /// Remove a variable from the scope.
   /// \param guard: Precondition for removal of this variable

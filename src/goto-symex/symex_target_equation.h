@@ -73,6 +73,7 @@ public:
   virtual void decl(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
+    const exprt &initializer,
     const sourcet &source,
     assignment_typet assignment_type);
 

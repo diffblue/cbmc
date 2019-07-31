@@ -54,10 +54,10 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   target.decl(
     state.guard.as_expr(),
     ssa,
+    state.field_sensitivity.apply(ns, state, ssa, false),
     state.source,
-    hidden?
-      symex_targett::assignment_typet::HIDDEN:
-      symex_targett::assignment_typet::STATE);
+    hidden ? symex_targett::assignment_typet::HIDDEN
+           : symex_targett::assignment_typet::STATE);
 
   if(path_storage.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
     target.shared_write(
