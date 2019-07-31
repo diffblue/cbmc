@@ -113,26 +113,26 @@ public:
   void location(const guardt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::output()
-  virtual void output(
+  void output(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<renamedt<exprt, L2>> &args);
+    const std::list<renamedt<exprt, L2>> &args) override;
 
   /// \copydoc symex_targett::output_fmt()
-  virtual void output_fmt(
+  void output_fmt(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
     const irep_idt &fmt,
-    const std::list<exprt> &args);
+    const std::list<exprt> &args) override;
 
   /// \copydoc symex_targett::input()
-  virtual void input(
+  void input(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
-    const std::list<exprt> &args);
+    const std::list<exprt> &args) override;
 
   /// \copydoc symex_targett::assumption()
   void assumption(const guardt &guard, const exprt &cond, const sourcet &source)
@@ -152,32 +152,28 @@ public:
     const sourcet &source) override;
 
   /// \copydoc symex_targett::constraint()
-  virtual void constraint(
+  void constraint(
     const exprt &cond,
     const std::string &msg,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::spawn()
-  virtual void spawn(
-    const exprt &guard,
-    const sourcet &source);
+  void spawn(const exprt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::memory_barrier()
-  virtual void memory_barrier(
-    const exprt &guard,
-    const sourcet &source);
+  void memory_barrier(const exprt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::atomic_begin()
-  virtual void atomic_begin(
+  void atomic_begin(
     const exprt &guard,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::atomic_end()
-  virtual void atomic_end(
+  void atomic_end(
     const exprt &guard,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
