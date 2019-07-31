@@ -1088,6 +1088,22 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     code_contracts(goto_model);
   }
 
+  // assert the ensures part of the contract for the given functions
+  if(cmdline.isset("assert-ensures"))
+  {
+    log.status() << "Asserting code contract" << messaget::eom;
+    std::list<std::string> functions_to_assert_ensures =
+      cmdline.get_values("assert-ensures");
+    if(functions_to_assert_ensures.empty())
+    {
+      log.error()
+        << "At least one function name has to be given with --assert-ensures"
+        << messaget::eom;
+      throw 0;
+    }
+    assert_ensures(goto_model, functions_to_assert_ensures);
+  }
+
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
   {
@@ -1643,6 +1659,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
+    " --assert-ensures function    checks that function satisfies its contract ensures after each call\n" // NOLINT(*)
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
     " --undefined-function-is-assume-false\n"
