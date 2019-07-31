@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
+#include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/suffix.h>
 
@@ -989,6 +990,16 @@ bool java_bytecode_convert_class(
   return true;
 }
 
+static std::string get_final_name_component(const std::string &name)
+{
+  return name.substr(name.rfind("::") + 2);
+}
+
+static std::string get_without_final_name_component(const std::string &name)
+{
+  return name.substr(0, name.rfind("::"));
+}
+
 /// For a given generic type parameter, check if there is a parameter in the
 /// given vector of replacement parameters with a matching name. If yes,
 /// replace the identifier of the parameter at hand by the identifier of
@@ -1008,39 +1019,31 @@ static void find_and_replace_parameter(
   // get the name of the parameter, e.g., `T` from `java::Class::T`
   const std::string &parameter_full_name =
     id2string(parameter.type_variable_ref().get_identifier());
-  const std::string &parameter_name =
-    parameter_full_name.substr(parameter_full_name.rfind("::") + 2);
+  const std::string parameter_name =
+    get_final_name_component(parameter_full_name);
 
   // check if there is a replacement parameter with the same name
-  const auto replacement_parameter_p = std::find_if(
+  const auto replacement_parameter_it = std::find_if(
     replacement_parameters.begin(),
     replacement_parameters.end(),
-    [&parameter_name](const java_generic_parametert &replacement_param)
-    {
-      const std::string &replacement_parameter_full_name =
-        id2string(replacement_param.type_variable().get_identifier());
-      return parameter_name.compare(
-               replacement_parameter_full_name.substr(
-                 replacement_parameter_full_name.rfind("::") + 2)) == 0;
+    [&parameter_name](const java_generic_parametert &replacement_param) {
+      return parameter_name ==
+             get_final_name_component(
+               id2string(replacement_param.type_variable().get_identifier()));
     });
+  if(replacement_parameter_it == replacement_parameters.end())
+    return;
 
-  // if a replacement parameter was found, update the identifier
-  if(replacement_parameter_p != replacement_parameters.end())
-  {
-    const std::string &replacement_parameter_full_name =
-      id2string(replacement_parameter_p->type_variable().get_identifier());
+  // A replacement parameter was found, update the identifier
+  const std::string &replacement_parameter_full_name =
+    id2string(replacement_parameter_it->type_variable().get_identifier());
 
-    // the replacement parameter is a viable one, i.e., it comes from an outer
-    // class
-    PRECONDITION(
-      parameter_full_name.substr(0, parameter_full_name.rfind("::"))
-        .compare(
-          replacement_parameter_full_name.substr(
-            0, replacement_parameter_full_name.rfind("::"))) > 0);
+  // Check the replacement parameter comes from an outer class
+  PRECONDITION(has_prefix(
+    replacement_parameter_full_name,
+    get_without_final_name_component(parameter_full_name)));
 
-    parameter.type_variable_ref().set_identifier(
-      replacement_parameter_full_name);
-  }
+  parameter.type_variable_ref().set_identifier(replacement_parameter_full_name);
 }
 
 /// Recursively find all generic type parameters of a given type and replace
@@ -1136,12 +1139,13 @@ void mark_java_implicitly_generic_class_type(
 {
   const std::string qualified_class_name = "java::" + id2string(class_name);
   PRECONDITION(symbol_table.has_symbol(qualified_class_name));
+  // This will have its type changed
   symbolt &class_symbol = symbol_table.get_writeable_ref(qualified_class_name);
-  java_class_typet &class_type = to_java_class_type(class_symbol.type);
+  const java_class_typet &class_type = to_java_class_type(class_symbol.type);
 
   // the class must be an inner non-static class, i.e., have a field this$*
   // TODO this should be simplified once static inner classes are marked
-  // during parsing
+  //   during parsing
   bool no_this_field = std::none_of(
     class_type.components().begin(),
     class_type.components().end(),
@@ -1158,7 +1162,7 @@ void mark_java_implicitly_generic_class_type(
   // the order from the outer-most inwards
   std::vector<java_generic_parametert> implicit_generic_type_parameters;
   std::string::size_type outer_class_delimiter =
-    qualified_class_name.rfind("$");
+    qualified_class_name.rfind('$');
   while(outer_class_delimiter != std::string::npos)
   {
     std::string outer_class_name =
@@ -1171,14 +1175,21 @@ void mark_java_implicitly_generic_class_type(
         to_java_class_type(outer_class_symbol.type);
       if(is_java_generic_class_type(outer_class_type))
       {
-        const auto &outer_generic_type_parameters =
-          to_java_generic_class_type(outer_class_type).generic_types();
-        implicit_generic_type_parameters.insert(
-          implicit_generic_type_parameters.begin(),
-          outer_generic_type_parameters.begin(),
-          outer_generic_type_parameters.end());
+        for(const java_generic_parametert &outer_generic_type_parameter :
+            to_java_generic_class_type(outer_class_type).generic_types())
+        {
+          // Create a new generic type parameter with name in the form:
+          // java::Outer$Inner::Outer::T
+          irep_idt identifier = qualified_class_name + "::" +
+                                id2string(strip_java_namespace_prefix(
+                                  outer_generic_type_parameter.get_name()));
+          java_generic_parameter_tagt bound = to_java_generic_parameter_tag(
+            outer_generic_type_parameter.subtype());
+          bound.type_variable_ref().set_identifier(identifier);
+          implicit_generic_type_parameters.emplace_back(identifier, bound);
+        }
       }
-      outer_class_delimiter = outer_class_name.rfind("$");
+      outer_class_delimiter = outer_class_name.rfind('$');
     }
     else
     {
@@ -1191,19 +1202,32 @@ void mark_java_implicitly_generic_class_type(
   // implicitly generic and update identifiers of type parameters used in fields
   if(!implicit_generic_type_parameters.empty())
   {
-    class_symbol.type = java_implicitly_generic_class_typet(
+    java_implicitly_generic_class_typet new_class_type(
       class_type, implicit_generic_type_parameters);
 
-    for(auto &field : class_type.components())
+    // Prepend existing parameters so choose those above any inherited
+    if(is_java_generic_class_type(class_type))
+    {
+      const java_generic_class_typet::generic_typest &class_type_params =
+        to_java_generic_class_type(class_type).generic_types();
+      implicit_generic_type_parameters.insert(
+        implicit_generic_type_parameters.begin(),
+        class_type_params.begin(),
+        class_type_params.end());
+    }
+
+    for(auto &field : new_class_type.components())
     {
       find_and_replace_parameters(
         field.type(), implicit_generic_type_parameters);
     }
 
-    for(auto &base : class_type.bases())
+    for(auto &base : new_class_type.bases())
     {
       find_and_replace_parameters(
         base.type(), implicit_generic_type_parameters);
     }
+
+    class_symbol.type = new_class_type;
   }
 }

@@ -15,9 +15,9 @@ public class DerivedGenerics {
     ExtendsAndImplementsSameInterface new14;
     ExtendsAndImplementsSameInterface2 new15;
     ExtendsAndImplementsSameInterfaceGeneric new16;
-  GenericBase<?>.ExtendImplicit new17;
-  GenericBase<?>.ExtendImplicitAndExplicit<?> new18;
-  GenericBase2<?, ?>.ExtendImplicitAndExplicit new19;
+    GenericBase<?>.ExtendImplicit new17;
+    GenericBase<?>.ExtendImplicitAndExplicit<?> new18;
+    GenericBase2<?, ?>.ExtendImplicitAndExplicit new19;
 }
 
 class DerivedGenericInst extends Generic<Interface_Implementation>

@@ -147,7 +147,7 @@ bool require_java_generic_type_argument_expectation(
   {
   case require_type::type_argument_kindt::Var:
   {
-    REQUIRE(is_java_generic_parameter((type_argument)));
+    REQUIRE(is_java_generic_parameter(type_argument));
     java_generic_parametert parameter =
       to_java_generic_parameter(type_argument);
     REQUIRE(parameter.type_variable().get_identifier() == expected.description);
@@ -392,18 +392,13 @@ require_type::require_java_implicitly_generic_class(
     &implicit_generic_type_vars =
       java_implicitly_generic_class_type.implicit_generic_types();
   REQUIRE(implicit_generic_type_vars.size() == implicit_type_variables.size());
-  REQUIRE(
-    std::equal(
-      implicit_type_variables.begin(),
-      implicit_type_variables.end(),
-      implicit_generic_type_vars.begin(),
-      [](
-        const irep_idt &type_var_name,
-        const java_generic_parametert &param) { //NOLINT
-        REQUIRE(is_java_generic_parameter(param));
-        return param.type_variable().get_identifier() == type_var_name;
-      }));
-
+  auto param = implicit_generic_type_vars.begin();
+  auto type_var_name = implicit_type_variables.begin();
+  for(; param != implicit_generic_type_vars.end(); ++param, ++type_var_name)
+  {
+    REQUIRE(is_java_generic_parameter(*param));
+    REQUIRE(param->type_variable().get_identifier() == *type_var_name);
+  }
   return java_implicitly_generic_class_type;
 }
 
@@ -477,7 +472,7 @@ require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
   return result;
 }
 
-const pointer_typet
+pointer_typet
 require_type::require_pointer_to_tag(const typet &type, const irep_idt &tag)
 {
   const auto pointer_type = require_type::require_pointer(type, {});

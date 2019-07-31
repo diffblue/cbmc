@@ -495,7 +495,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     generic_parameter_specialization_map_keyst
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
-    generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
+    generic_parameter_specialization_map_keys.insert(
       replacement_pointer_type, ns.follow(replacement_pointer_type.subtype()));
 
     const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
@@ -1007,7 +1007,7 @@ void java_object_factoryt::gen_nondet_init(
     generic_parameter_specialization_map_keyst
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
-    generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
+    generic_parameter_specialization_map_keys.insert(
       pointer_type, ns.follow(pointer_type.subtype()));
 
     gen_nondet_pointer_init(
@@ -1034,7 +1034,7 @@ void java_object_factoryt::gen_nondet_init(
       const typet &symbol =
         override_type.has_value() ? *override_type : expr.type();
       PRECONDITION(symbol.id() == ID_struct_tag);
-      generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
+      generic_parameter_specialization_map_keys.insert(
         to_struct_tag_type(symbol), struct_type);
     }
 

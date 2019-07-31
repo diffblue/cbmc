@@ -297,6 +297,106 @@ SCENARIO(
         }
       }
     }
+
+    THEN(
+      "The Object has a field `example3` of type `Outer<Boolean, Byte, Short>`")
+    {
+      const auto &example3_field =
+        require_goto_statements::require_struct_component_assignment(
+          tmp_object_name,
+          {},
+          "example3",
+          "java::Outer",
+          {},
+          entry_point_code,
+          symbol_table);
+
+      THEN("`example3` has field `inner` of type `Inner<Byte>`")
+      {
+        const auto &inner_field =
+          require_goto_statements::require_struct_component_assignment(
+            example3_field,
+            {},
+            "inner",
+            "java::Outer$Inner",
+            {},
+            entry_point_code,
+            symbol_table);
+
+        THEN("`inner` has a field `u` of type `Byte`")
+        {
+          require_goto_statements::require_struct_component_assignment(
+            inner_field,
+            {},
+            "u",
+            "java::java.lang.Byte",
+            {},
+            entry_point_code,
+            symbol_table);
+        }
+      }
+    }
+
+    THEN("The Object has a field `testFoo` of type `Foo<Long>`")
+    {
+      const auto &testFoo_field =
+        require_goto_statements::require_struct_component_assignment(
+          tmp_object_name,
+          {},
+          "testFoo",
+          "java::Foo",
+          {},
+          entry_point_code,
+          symbol_table);
+
+      THEN("Object 'testFoo' has field 't' of type `Long`")
+      {
+        require_goto_statements::require_struct_component_assignment(
+          testFoo_field,
+          {},
+          "t",
+          "java::java.lang.Long",
+          {},
+          entry_point_code,
+          symbol_table);
+      }
+
+      THEN("`testFoo` has field bar")
+      {
+        const auto &bar_field =
+          require_goto_statements::require_struct_component_assignment(
+            testFoo_field,
+            {},
+            "bar",
+            "java::Bar",
+            {},
+            entry_point_code,
+            symbol_table);
+        THEN("`bar` has field foo")
+        {
+          const auto &foo_field =
+            require_goto_statements::require_struct_component_assignment(
+              bar_field,
+              {},
+              "foo",
+              "java::Foo",
+              {},
+              entry_point_code,
+              symbol_table);
+          THEN("'foo' has field 't' of type `Long`")
+          {
+            require_goto_statements::require_struct_component_assignment(
+              foo_field,
+              {},
+              "t",
+              "java::java.lang.Long",
+              {},
+              entry_point_code,
+              symbol_table);
+          }
+        }
+      }
+    }
   }
 
   // TODO: add test for TG-3828

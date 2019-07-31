@@ -241,6 +241,7 @@ optionalt<exprt> member_offset_expr(
   const irep_idt &member,
   const namespacet &ns)
 {
+  PRECONDITION(size_type().get_width() != 0);
   exprt result=from_integer(0, size_type());
   std::size_t bit_field_bits=0;
 

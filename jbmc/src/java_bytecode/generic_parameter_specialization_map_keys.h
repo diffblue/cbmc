@@ -1,4 +1,3 @@
-
 /// Author: Diffblue Ltd.
 
 #ifndef CPROVER_JAVA_BYTECODE_GENERIC_PARAMETER_SPECIALIZATION_MAP_KEYS_H
@@ -15,15 +14,19 @@
 /// on leaving that scope.
 class generic_parameter_specialization_map_keyst
 {
+private:
+  /// Generic parameter specialization map to modify
+  generic_parameter_specialization_mapt &generic_parameter_specialization_map;
+  /// Key of the container to pop on destruction
+  optionalt<std::size_t> container_id;
+
 public:
   /// Initialize a generic-parameter-specialization-map entry owner operating
   /// on a given map. Initially it does not own any map entry.
-  /// \param _generic_parameter_specialization_map: map to operate on.
+  /// \param generic_parameter_specialization_map: map to operate on.
   explicit generic_parameter_specialization_map_keyst(
-    generic_parameter_specialization_mapt
-      &_generic_parameter_specialization_map)
-    : generic_parameter_specialization_map(
-        _generic_parameter_specialization_map)
+    generic_parameter_specialization_mapt &generic_parameter_specialization_map)
+    : generic_parameter_specialization_map(generic_parameter_specialization_map)
   {
   }
 
@@ -31,15 +34,8 @@ public:
   /// controlled map.
   ~generic_parameter_specialization_map_keyst()
   {
-    for(const auto key : erase_keys)
-    {
-      const auto map_it = generic_parameter_specialization_map.find(key);
-      PRECONDITION(map_it != generic_parameter_specialization_map.end());
-      std::vector<reference_typet> &val = map_it->second;
-      val.pop_back();
-      if(val.empty())
-        generic_parameter_specialization_map.erase(map_it);
-    }
+    if(container_id)
+      generic_parameter_specialization_map.pop(*container_id);
   }
 
   // Objects of these class cannot be copied in any way - delete the copy
@@ -49,21 +45,11 @@ public:
   generic_parameter_specialization_map_keyst &
   operator=(const generic_parameter_specialization_map_keyst &) = delete;
 
-  void insert_pairs_for_pointer(
+  void insert(
     const pointer_typet &pointer_type,
     const typet &pointer_subtype_struct);
-  void
-  insert_pairs_for_symbol(const struct_tag_typet &, const typet &symbol_struct);
 
-private:
-  /// Generic parameter specialization map to modify
-  generic_parameter_specialization_mapt &generic_parameter_specialization_map;
-  /// Keys of the entries to pop on destruction
-  std::vector<irep_idt> erase_keys;
-
-  void insert_pairs(
-    const std::vector<java_generic_parametert> &parameters,
-    const std::vector<reference_typet> &types);
+  void insert(const struct_tag_typet &, const typet &symbol_struct);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GENERIC_PARAMETER_SPECIALIZATION_MAP_KEYS_H

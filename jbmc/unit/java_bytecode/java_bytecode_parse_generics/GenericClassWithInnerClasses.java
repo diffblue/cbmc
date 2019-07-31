@@ -17,6 +17,12 @@ class GenericClassWithInnerClasses<T>
     class GenericInnerInner<V>{
 
     }
+
+    class ShadowingGenericInner<U> {
+      U shadowedField;
+    }
+
+    ShadowingGenericInner<String> shadowingField;
   }
 
   static class StaticInner<U>{

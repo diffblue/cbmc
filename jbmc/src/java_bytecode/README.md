@@ -76,11 +76,7 @@ types so we keep a stack of types for each parameter.
 
 We use the map in \ref select_pointer_typet::specialize_generics to
 retrieve the concrete type of generic parameters such as `MyGeneric::T` and of
-arrays of generic parameters such as `MyGeneric::T[]`. Special attention
-is paid to breaking infinite recursion when searching the map, e.g.,
-`MyGeneric::T` being specialized with `MyGeneric::U` and vice versa, for an
-example of such a recursion see
-\ref select_pointer_typet::get_recursively_instantiated_type. More complicated
+arrays of generic parameters such as `MyGeneric::T[]`. More complicated
 generic types such as `MyGeneric<T>` are specialized indirectly within \ref
 java_object_factoryt. Their concrete types are already stored in the map and are
 retrieved when needed, e.g., to initialize their fields.
