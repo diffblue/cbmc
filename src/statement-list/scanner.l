@@ -21,6 +21,8 @@
 #include <util/pragma_wnull_conversion.def>
 #include <util/pragma_wdeprecated_register.def>
 
+#include <algorithm>
+
 // Visual Studio
 #if defined _MSC_VER
 // Disable warning for signed/unsigned mismatch.
@@ -75,6 +77,7 @@ void statement_list_scanner_init()
 
 %x GRAMMAR
 %x TAG_NAME
+%x MODULE_NAME
 %x TAG_ATTRIBUTES
 %x VERSION_ANNOTATION
 
@@ -90,9 +93,9 @@ void statement_list_scanner_init()
   TAG                 { loc(); BEGIN(TAG_NAME); return TOK_TAG; }
   BEGIN               { loc(); return TOK_BEGIN; }
   VERSION             { loc(); BEGIN(VERSION_ANNOTATION); return TOK_VERSION; }
-  FUNCTION_BLOCK      { loc(); return TOK_FUNCTION_BLOCK; }
+  FUNCTION_BLOCK      { loc(); BEGIN(MODULE_NAME); return TOK_FUNCTION_BLOCK; }
   END_FUNCTION_BLOCK  { loc(); return TOK_END_FUNCTION_BLOCK; }
-  FUNCTION            { loc(); return TOK_FUNCTION; }
+  FUNCTION            { loc(); BEGIN(MODULE_NAME); return TOK_FUNCTION; }
   END_FUNCTION        { loc(); return TOK_END_FUNCTION; }
   VAR_INPUT           { loc(); return TOK_VAR_INPUT; }
   VAR_OUTPUT          { loc(); return TOK_VAR_OUTPUT; }
@@ -110,7 +113,7 @@ void statement_list_scanner_init()
   Void                { loc(); return TOK_VOID; }
   L                   { loc(); return TOK_LOAD; }
   T                   { loc(); return TOK_TRANSFER; }
-  CALL                { loc(); return TOK_CALL; }
+  CALL                { loc(); BEGIN(MODULE_NAME); return TOK_CALL; }
   NOP                 { loc(); return TOK_NOP; }
   SET                 { loc(); return TOK_SET_RLO; }
   CLR                 { loc(); return TOK_CLR_RLO; }
@@ -292,6 +295,24 @@ void statement_list_scanner_init()
                       }
   END_TAG             { loc(); BEGIN(GRAMMAR); return TOK_END_TAG; }
 }
+
+<MODULE_NAME>{
+  [\t\r\n ]           ;
+  \"[^\"\r\t\n]+\"    {
+                        newstack(yystatement_listlval);
+                        std::string str{yytext};
+                        str.erase(
+                          std::remove(begin(str), end(str), '\"' ), 
+                          end(str));
+                        parser_stack(yystatement_listlval) = 
+                          convert_identifier(str);
+                        PARSER.set_source_location(
+                          parser_stack(yystatement_listlval));
+                        BEGIN(GRAMMAR);
+                        return TOK_IDENTIFIER; 
+                      }
+}
+
 <TAG_ATTRIBUTES>{
   [\t\r," ]           ;
   ([t|T][R|r][u|U][e|E])|([f|F][a|A][l|L][s|S][e|E]) ;

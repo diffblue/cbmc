@@ -30,9 +30,9 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Postfix for the type of a data block.
 #define DATA_BLOCK_TYPE_POSTFIX "_db"
 /// Name of the CBMC assert function.
-#define CPROVER_ASSERT "\"" CPROVER_PREFIX "assert\""
+#define CPROVER_ASSERT CPROVER_PREFIX "assert"
 /// Name of the CBMC assume function.
-#define CPROVER_ASSUME "\"" CPROVER_PREFIX "assume\""
+#define CPROVER_ASSUME CPROVER_PREFIX "assume"
 /// Name of the RLO symbol used in some operations.
 #define CPROVER_TEMP_RLO CPROVER_PREFIX "temp_rlo"
 

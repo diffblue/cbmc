@@ -3,7 +3,7 @@ main.awl
 --show-parse-tree
 ^EXIT=0$
 ^SIGNAL=0$
-^Name: "Mul_DInt"$
+^Name: Mul_DInt$
 ^Version: 0[.]1$
 ^  \* type: signedbv$
 ^      \* width: 32$

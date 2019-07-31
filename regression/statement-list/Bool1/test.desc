@@ -3,7 +3,7 @@ main.awl
 --show-parse-tree
 ^EXIT=0$
 ^SIGNAL=0$
-^Name: "Bool1"$
+^Name: Bool1$
 ^Version: 0[.]1$
 ^  \* type: bool$
 ^  \* identifier: in1$
