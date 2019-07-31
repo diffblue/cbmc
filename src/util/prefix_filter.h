@@ -27,7 +27,7 @@ public:
   /// but doesn't match a prefix in `excluded_prefixes`.
   /// An empty vector of `included_prefixes` is treated as 'match all'.
   /// An empty vector of `excluded_prefixes` is treated as 'match nothing'.
-  bool operator()(const std::string &value);
+  bool operator()(const std::string &value) const;
 
 protected:
   std::vector<std::string> included_prefixes;

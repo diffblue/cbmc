@@ -23,7 +23,7 @@ prefix_filtert::prefix_filtert(
 {
 }
 
-bool prefix_filtert::operator()(const std::string &value)
+bool prefix_filtert::operator()(const std::string &value) const
 {
   if(!included_prefixes.empty())
   {
