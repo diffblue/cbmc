@@ -23,6 +23,7 @@ phases:
   post_build:
     commands:
       - lcov --capture --directory build --output-file lcov.info
+      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
       # If $CODEBUILD_SOURCE_VERSION starts with 'pr/', filter out pr number, if not, return empty
       - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed '/^pr\//!d;s/^pr\///')
       # If $CODEBUILD_SOURCE_VERSION is commit id, set $VCS_COMMIT_ID
