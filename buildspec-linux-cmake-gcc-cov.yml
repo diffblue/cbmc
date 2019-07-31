@@ -23,7 +23,10 @@ phases:
   post_build:
     commands:
       - lcov --capture --directory build --output-file lcov.info
-      - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed 's/pr\///g')
+      # If $CODEBUILD_SOURCE_VERSION starts with 'pr/', filter out pr number, if not, return empty
+      - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed '/^pr\//!d;s/^pr\///')
+      # If $CODEBUILD_SOURCE_VERSION is commit id, set $VCS_COMMIT_ID
+      - VCS_COMMIT_ID=$(echo $CODEBUILD_SOURCE_VERSION | sed -r '/^[a-z0-9]{40}$/!d')
       - COV_SCRIPT=/root/.cache/codecov.sh
       - if [ ! -f "$COV_SCRIPT" ]; then curl -s https://codecov.io/bash > "$COV_SCRIPT"; fi
       - bash "$COV_SCRIPT" -t "$CODECOV_TOKEN" || true
