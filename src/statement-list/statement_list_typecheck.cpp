@@ -387,6 +387,8 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
     typecheck_statement_list_accu_real_lte(op_code);
   else if(ID_statement_list_accu_real_gte == statement)
     typecheck_statement_list_accu_real_gte(op_code);
+  else if(ID_statement_list_not == statement)
+    typecheck_statement_list_not(op_code);
   else if(ID_statement_list_and == statement)
     typecheck_statement_list_and(op_code, tia_element);
   else if(ID_statement_list_and_not == statement)
@@ -751,6 +753,20 @@ void statement_list_typecheckt::typecheck_statement_list_accu_real_gte(
 {
   typecheck_statement_list_accu_real_arith(op_code);
   typecheck_accumulator_compare_instruction(ID_ge);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_not(
+  const codet &op_code)
+{
+  typecheck_instruction_without_operand(op_code);
+  if(fc_bit)
+  {
+    const not_exprt unsimplified{rlo_bit};
+    rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
+    or_bit = false;
+  }
+  else
+    initialize_bit_expression(false_exprt{});
 }
 
 void statement_list_typecheckt::typecheck_statement_list_and(
