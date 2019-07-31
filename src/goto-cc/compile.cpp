@@ -511,16 +511,18 @@ bool compilet::parse(
     // transformed contracts are correct
     if(cmdline.isset("turn-preconditions-to-contracts"))
     {
-      statistics() << "Turning pre and postconditions to function contracts" << eom;
-      
-      if (lf.language->preconditions_to_contracts())
+      statistics() << "Turning pre and postconditions to function contracts"
+                   << eom;
+
+      if(lf.language->preconditions_to_contracts())
       {
-        error() << "ERROR WHEN TURNING PRE AND POSTCONDITIONS TO CONTRACTS" << eom;
+        error() << "ERROR WHEN TURNING PRE AND POSTCONDITIONS TO CONTRACTS"
+                << eom;
         return true;
       }
     }
   }
-  
+
   lf.get_modules();
   return false;
 }

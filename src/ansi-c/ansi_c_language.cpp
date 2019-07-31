@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_language.h"
 
 #include <cstring>
-#include <sstream>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include <util/config.h>
 #include <util/expr_iterator.h>
@@ -138,13 +138,14 @@ bool ansi_c_languaget::generate_support_functions(
     symbol_table, get_message_handler(), object_factory_params);
 }
 
-// Question: Are those [is_*] functions correct? Are they sound/complete?
-bool is_call_to_function(irep_idt function_name, exprt expr) {
+bool is_call_to_function(irep_idt function_name, exprt expr)
+{
   if(can_cast_expr<side_effect_expr_function_callt>(expr))
   {
-    const side_effect_expr_function_callt function_call = to_side_effect_expr_function_call(expr);
+    const side_effect_expr_function_callt function_call =
+      to_side_effect_expr_function_call(expr);
     const exprt function = function_call.function();
-    
+
     if(can_cast_expr<symbol_exprt>(function))
     {
       const symbol_exprt function_symbol = to_symbol_expr(function);
@@ -154,49 +155,35 @@ bool is_call_to_function(irep_idt function_name, exprt expr) {
   return false;
 }
 
-
-exprt::operandst filter_preconditions(irep_idt target_function_name, code_blockt function_body) {
-  // TODO: I probably have to add some check that inside the
-  // code in the precondition there is nothing funky going on?
-  exprt::operandst conditions;
-  for (depth_iteratort it = function_body.depth_begin(); it != function_body.depth_end(); ++it) {
-    // std::cout << it->id() << " -- " << it->find(ID_statement).id() << "\n";
-    if (is_call_to_function(target_function_name, *it)) {
-      const side_effect_expr_function_callt function_call = to_side_effect_expr_function_call(*it);
-      exprt condition = function_call.arguments().front();
-      // std::cout << "Precondition:\n" << precondition.pretty() << "\n";
-      // std::cout << "Precondition type:\n" << precondition.type().id() << "\n";
-      
-      conditions.push_back(condition);
-
-      // TODO: I should probably go to the next sibling or parent
-      // after finding a function call to the target name and not just
-      // iterate it once
-    }
-  }
-  return conditions;
-}
-
 // Question: Is there a way to optimize this (Returning a balanced
 // tree instead of a chain tree)? Is there a standard function that I
 // can call for this?
 //
-// If this function returns nil expression, it means that no (pre/post)condition was aggregated.
+// If this function returns nil expression, it means that no
+// (pre/post)condition was aggregated.
 exprt condition_conjunction(const exprt::operandst &nil_op)
 {
   exprt::operandst op;
-  
+
   // filter non nil expressions
-  std::copy_if (nil_op.begin(), nil_op.end(), std::back_inserter(op), [](exprt e){return e.is_not_nil();} );
-  
-  if(op.empty()) {
+  std::copy_if(
+    nil_op.begin(), nil_op.end(), std::back_inserter(op), [](exprt e) {
+      return e.is_not_nil();
+    });
+
+  if(op.empty())
+  {
     // Question: What is a better way to do this?
     exprt expr = exprt(ID_nil);
-    INVARIANT(expr.is_nil(), "Postcondition conjunction should be nil if no postcondition group was found.");
+    INVARIANT(
+      expr.is_nil(),
+      "Postcondition conjunction should be nil if no postcondition group was "
+      "found.");
     return expr;
     // return make_boolean_expr(true);
   }
-  else if(op.size()==1) {
+  else if(op.size() == 1)
+  {
     return op.front();
   }
   else
@@ -209,75 +196,84 @@ exprt condition_conjunction(const exprt::operandst &nil_op)
     ++it;
     exprt acc = and_exprt(op0, op1);
 
-    for ( ; it != op.end(); ++it) {
+    for(; it != op.end(); ++it)
+    {
       // Is this invariant correct?
-      INVARIANT(it->is_not_nil(), "Conjunction of conditions should never be called with nil arguments");
+      INVARIANT(
+        it->is_not_nil(),
+        "Conjunction of conditions should never be called with nil arguments");
       acc = and_exprt(acc, *it);
     }
 
     // This means that we didn't see any non-nil postcondition group
-    INVARIANT(!acc.is_true(), "Assuming that the invariant in the loop holds this should never be the case.");
+    INVARIANT(
+      !acc.is_true(),
+      "Assuming that the invariant in the loop holds this should never be the "
+      "case.");
 
     return acc;
   }
 }
 
-// TODO: Remove the filter_pre_post_conditions, as it is only used for
-// preconditions and add its code here.
-//
-// QUESTION: Should I make that static or define it somewhere else?
-exprt aggregate_function_preconditions(ansi_c_declaratort function) {
-  code_blockt function_body = to_code_block(to_code(function.value()));
-  
-  exprt::operandst preconditions = filter_preconditions("__CPROVER_precondition", function_body);
-  
+exprt aggregate_function_preconditions(code_blockt function_body)
+{
+  exprt::operandst preconditions;
+  for(depth_iteratort it = function_body.depth_begin();
+      it != function_body.depth_end();
+      ++it)
+  {
+    if(is_call_to_function(CPROVER_PREFIX "precondition", *it))
+    {
+      const side_effect_expr_function_callt function_call =
+        to_side_effect_expr_function_call(*it);
+      exprt condition = function_call.arguments().front();
+      // std::cout << "Precondition:\n" << precondition.pretty() << "\n";
+
+      preconditions.push_back(condition);
+    }
+  }
   // WARNING: In order for it to make sense to return the conjunction
   // of the preconditions, they have to be in the beginning of the
   // function body before anythinf else.
   //
   // TODO: Maybe I should add a check to ensure that
-  
+
   return condition_conjunction(preconditions);
 }
 
-// Extends the specified contract (requires/ensures) of the function declaration with the given condition.
-//
-// TODO: What is a way to add as a precondition to [extend_contract]
-// that [declaration] should be a function definition, and that
-// [condition] should be boolean, etc...
-void extend_contract(const irep_namet &contract_name,
-                     const exprt condition,
-                     ansi_c_declarationt* declaration) {
-  exprt old_contract = static_cast<const exprt&>(declaration->find(contract_name));
+// Extends the specified contract (requires/ensures) of the function
+// declaration with the given condition.
+void extend_contract(
+  const irep_namet &contract_name,
+  const exprt condition,
+  ansi_c_declarationt *declaration)
+{
+  exprt old_contract =
+    static_cast<const exprt &>(declaration->find(contract_name));
   exprt new_contract;
-  if (old_contract.is_nil()) {
+  if(old_contract.is_nil())
     new_contract = condition;
-  } else {
+  else
     new_contract = and_exprt(old_contract, condition);
-  }
   declaration->add(contract_name, new_contract);
 }
 
-bool ansi_c_languaget::preconditions_to_contracts() {
-
-  // QUESTION: What is the canonical way to find function definitions?  
-  for (std::list<ansi_c_declarationt>::iterator it = parse_tree.items.begin(); it != parse_tree.items.end(); ++it){
-    std::cout << "Declaration:\n";
-
-    // Question: Does it always hold that a declaration either has 0 or 1 declarator?
-    if (!it->declarators().empty()) {
+bool ansi_c_languaget::preconditions_to_contracts()
+{
+  for(std::list<ansi_c_declarationt>::iterator it = parse_tree.items.begin();
+      it != parse_tree.items.end();
+      ++it)
+  {
+    if(!it->declarators().empty())
+    {
       ansi_c_declaratort decl = it->declarator();
-      std::cout << "  " << decl.get_name() << "\n";
-      
-      exprt precondition = aggregate_function_preconditions(decl);
+      if(can_cast_expr<code_blockt>(decl.value()))
+      {
+        code_blockt function_body = to_code_block(to_code(decl.value()));
+        exprt precondition = aggregate_function_preconditions(function_body);
 
-      // std::cout << "Folded precondition:\n" << precondition.pretty() << "\n";
-      if (precondition.is_not_nil()) {
-        std::cout << "  -- Successfully turned precondition into contract\n";
-        // std::cout << "Previous declaration\n" << it->pretty() << "\n";
-        // Question: Is there any better way of passing a pointer to that declaration?
-        extend_contract(ID_C_spec_requires, precondition, &(*it));
-        // std::cout << "New declaration\n" << it->pretty() << "\n";
+        if(precondition.is_not_nil())
+          extend_contract(ID_C_spec_requires, precondition, &(*it));
       }
     }
   }
@@ -285,8 +281,7 @@ bool ansi_c_languaget::preconditions_to_contracts() {
   // TODO: Make a check for preconditions and ensure that they happen
   // before anything else in the code. Should this check just be that
   // the preconditions are a prefix of the function body?
-  
-  // show_parse(std::cout);
+
   return false;
 }
 
