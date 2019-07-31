@@ -278,7 +278,7 @@ void local_may_aliast::get_rec(
   }
   else if(rhs.id()==ID_minus)
   {
-    const auto &op0 = to_minus_expr(rhs);
+    const auto &op0 = to_minus_expr(rhs).op0();
 
     if(op0.type().id() == ID_pointer)
     {
