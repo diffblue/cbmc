@@ -35,6 +35,11 @@ public class Test {
     (nondet == 30 ? c1 : c3).t.field++;
     (nondet == 40 ? c2.t : tarray[3]).field--;
 
+    // Check that we produce a clean deref when a cast restricts the possible
+    // targets of a field access:
+    Object o = nondet % 2 == 0 ? new Object() : new Container(new Test(10));
+    int field = ((Container)o).t.field;
+
     assert false;
 
   }

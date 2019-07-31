@@ -110,70 +110,34 @@ bool remove_instanceoft::lower_instanceof(
       return a.compare(b) < 0;
     });
 
-  // Make temporaries to store the class identifier (avoids repeated derefs) and
-  // the instanceof result:
-
   auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
   exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
 
-  symbolt &clsid_tmp_sym = fresh_java_symbol(
-    object_clsid.type(),
-    "class_identifier_tmp",
-    this_inst->source_location,
-    function_identifier,
-    symbol_table);
+  // Replace the instanceof operation with (check_ptr != null &&
+  //  (check_ptr->@class_identifier == "A" ||
+  //   check_ptr->@class_identifier == "B" || ...
 
-  symbolt &instanceof_result_sym = fresh_java_symbol(
-    bool_typet(),
-    "instanceof_result_tmp",
-    this_inst->source_location,
-    function_identifier,
-    symbol_table);
-
-  // Create
-  // if(expr == null)
-  //   instanceof_result = false;
-  // else
-  //   string clsid = expr->@class_identifier
-  //   instanceof_result = clsid == "A" || clsid == "B" || ...
-
-  // According to the Java specification, null instanceof T is false for all
-  // possible values of T.
-  // (http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.20.2)
-
-  code_blockt else_block;
-  else_block.add(code_declt(clsid_tmp_sym.symbol_expr()));
-  else_block.add(code_assignt(clsid_tmp_sym.symbol_expr(), object_clsid));
+  // By operating directly on a pointer rather than using a temporary
+  // (x->@clsid == "A" rather than id = x->@clsid; id == "A") we enable symex's
+  // value-set filtering to discard no-longer-viable candidates for "x" (in the
+  // case where 'x' is a symbol, not a general expression like x->y->@clsid).
+  // This means there are more clean dereference operations (ones where there
+  // is no possibility of reading a null, invalid or incorrectly-typed object),
+  // and less pessimistic aliasing assumptions possibly causing goto-symex to
+  // explore in-fact-unreachable paths.
 
   exprt::operandst or_ops;
   for(const auto &clsname : children)
   {
     constant_exprt clsexpr(clsname, string_typet());
-    equal_exprt test(clsid_tmp_sym.symbol_expr(), clsexpr);
+    equal_exprt test(object_clsid, clsexpr);
     or_ops.push_back(test);
   }
-  else_block.add(
-    code_assignt(instanceof_result_sym.symbol_expr(), disjunction(or_ops)));
 
-  const code_ifthenelset is_null_branch(
-    equal_exprt(
-      check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type()))),
-    code_assignt(instanceof_result_sym.symbol_expr(), false_exprt()),
-    std::move(else_block));
+  notequal_exprt not_null(
+    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
 
-  // Replace the instanceof construct with instanceof_result:
-  expr = instanceof_result_sym.symbol_expr();
-
-  // Insert the new test block before it:
-  goto_programt new_check_program;
-  goto_convert(
-    is_null_branch,
-    symbol_table,
-    new_check_program,
-    message_handler,
-    ID_java);
-
-  goto_program.destructive_insert(this_inst, new_check_program);
+  expr = and_exprt(not_null, disjunction(or_ops));
 
   return true;
 }
