@@ -58,7 +58,7 @@ void goto_symext::symex_allocate(
 
   dynamic_counter++;
 
-  exprt size=code.op0();
+  exprt size = to_binary_expr(code).op0();
   optionalt<typet> object_type;
   auto function_symbol = outer_symbol_table.lookup(state.source.function_id);
   INVARIANT(function_symbol, "function associated with allocation not found");
@@ -93,16 +93,19 @@ void goto_symext::symex_allocate(
         else if(
           !alloc_size.has_value() && tmp_size.id() == ID_mult &&
           tmp_size.operands().size() == 2 &&
-          (tmp_size.op0().is_constant() || tmp_size.op1().is_constant()))
+          (to_mult_expr(tmp_size).op0().is_constant() ||
+           to_mult_expr(tmp_size).op1().is_constant()))
         {
-          exprt s=tmp_size.op0();
+          exprt s = to_mult_expr(tmp_size).op0();
           if(s.is_constant())
           {
-            s=tmp_size.op1();
-            PRECONDITION(*c_sizeof_type_rec(tmp_size.op0()) == *tmp_type);
+            s = to_mult_expr(tmp_size).op1();
+            PRECONDITION(
+              *c_sizeof_type_rec(to_mult_expr(tmp_size).op0()) == *tmp_type);
           }
           else
-            PRECONDITION(*c_sizeof_type_rec(tmp_size.op1()) == *tmp_type);
+            PRECONDITION(
+              *c_sizeof_type_rec(to_mult_expr(tmp_size).op1()) == *tmp_type);
 
           object_type = array_typet(*tmp_type, s);
         }
@@ -167,7 +170,7 @@ void goto_symext::symex_allocate(
   state.symbol_table.add(value_symbol);
 
   // to allow constant propagation
-  exprt zero_init = state.rename(code.op1(), ns).get();
+  exprt zero_init = state.rename(to_binary_expr(code).op1(), ns).get();
   simplify(zero_init, ns);
 
   INVARIANT(
@@ -258,7 +261,7 @@ void goto_symext::symex_va_start(
 
   // create an array holding pointers to the parameters, starting after the
   // parameter that the operand points to
-  const exprt &op = skip_typecast(code.op0());
+  const exprt &op = skip_typecast(to_unary_expr(code).op());
   // this must be the address of a symbol
   const irep_idt start_parameter =
     to_ssa_expr(to_address_of_expr(op).object()).get_object_name();

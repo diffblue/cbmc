@@ -60,11 +60,15 @@ void goto_symext::apply_goto_condition(
   // Could use not_exprt + simplify, but let's avoid paying that cost on quite
   // a hot path:
   if(new_guard.id() == ID_not)
-    jump_not_taken_state.apply_condition(new_guard.op0(), current_state, ns);
+    jump_not_taken_state.apply_condition(
+      to_not_expr(new_guard).op(), current_state, ns);
   else if(new_guard.id() == ID_notequal)
   {
+    auto &not_equal_expr = to_notequal_expr(new_guard);
     jump_not_taken_state.apply_condition(
-      equal_exprt(new_guard.op0(), new_guard.op1()), current_state, ns);
+      equal_exprt(not_equal_expr.lhs(), not_equal_expr.rhs()),
+      current_state,
+      ns);
   }
 }
 
@@ -180,10 +184,10 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   if(expr.id() != ID_equal && expr.id() != ID_notequal)
     return {};
 
-  if(!can_cast_type<pointer_typet>(expr.op0().type()))
+  if(!can_cast_type<pointer_typet>(to_binary_expr(expr).op0().type()))
     return {};
 
-  exprt lhs = expr.op0(), rhs = expr.op1();
+  exprt lhs = to_binary_expr(expr).op0(), rhs = to_binary_expr(expr).op1();
   if(can_cast_expr<symbol_exprt>(rhs))
     std::swap(lhs, rhs);
 
