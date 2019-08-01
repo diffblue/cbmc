@@ -532,7 +532,16 @@ static void assign_struct_components_from_json(
       assign_struct_components_from_json(member_expr, json, info);
     else // component is class field (pointer to struct)
     {
-      const jsont member_json = json[id2string(component_name)];
+      const auto member_json = [&]() -> jsont {
+        if(
+          is_primitive_wrapper_type_name(id2string(
+            strip_java_namespace_prefix(java_class_type.get_name()))) &&
+          id2string(component_name) == "value")
+        {
+          return get_untyped_primitive(json);
+        }
+        return json[id2string(component_name)];
+      }();
       assign_from_json_rec(member_expr, member_json, {}, info);
     }
   }

@@ -38,6 +38,20 @@ bool is_java_string_type(const struct_typet &struct_type)
          struct_type.has_component("data");
 }
 
+bool is_primitive_wrapper_type_name(const std::string &type_name)
+{
+  static const std::unordered_set<std::string> primitive_wrapper_type_names = {
+    "java.lang.Boolean",
+    "java.lang.Byte",
+    "java.lang.Character",
+    "java.lang.Double",
+    "java.lang.Float",
+    "java.lang.Integer",
+    "java.lang.Long",
+    "java.lang.Short"};
+  return primitive_wrapper_type_names.count(type_name) > 0;
+}
+
 unsigned java_local_variable_slots(const typet &t)
 {
 
