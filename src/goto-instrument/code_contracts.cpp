@@ -465,7 +465,9 @@ void code_contractst::operator()()
 
     goto_functionst::function_mapt::iterator i_it =
       goto_functions.function_map.find(INITIALIZE_FUNCTION);
-    assert(i_it != goto_functions.function_map.end());
+    INVARIANT(
+      i_it != goto_functions.function_map.end(),
+      "There must exist an INITIALIZE_FUNCTION");
 
     for(const auto &contract : summarized)
       add_contract_check(contract, i_it->second.body);
