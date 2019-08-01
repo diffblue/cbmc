@@ -412,6 +412,38 @@
         "@type":"java.lang.Boolean",
         "value":true
       }
+    },
+    "booleanWrapperField":{
+      "@type":"java.lang.Boolean",
+      "value":true
+    },
+    "byteWrapperField":{
+      "@type":"java.lang.Byte",
+      "value":50
+    },
+    "characterWrapperField":{
+      "@type":"java.lang.Character",
+      "value":"!"
+    },
+    "doubleWrapperField":{
+      "@type":"java.lang.Double",
+      "value":24.56
+    },
+    "floatWrapperField":{
+      "@type":"java.lang.Float",
+      "value":13.13
+    },
+    "integerWrapperField":{
+      "@type":"java.lang.Integer",
+      "value":1000
+    },
+    "longWrapperField":{
+      "@type":"java.lang.Long",
+      "value":"21000000000"
+    },
+    "shortWrapperField":{
+      "@type":"java.lang.Short",
+      "value":200
     }
   },
   "OtherClass":{

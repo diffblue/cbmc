@@ -199,6 +199,67 @@ public class StaticValues extends StaticParent {
     assert referenceToReferenceArray != referenceArrayField;
   }
 
+  // Primitive wrapper types as static field types
+  public static Boolean booleanWrapperField = true;
+  public static void testBooleanWrapperPass() { assert booleanWrapperField; }
+  public static void testBooleanWrapperFail() { assert !booleanWrapperField; }
+
+  public static Byte byteWrapperField = (byte)50;
+  public static void testByteWrapperPass() {
+    assert byteWrapperField == (byte)50;
+  }
+  public static void testByteWrapperFail() {
+    assert byteWrapperField != (byte)50;
+  }
+
+  public static Character characterWrapperField = '!';
+  public static void testCharacterWrapperPass() {
+    assert characterWrapperField == '!';
+  }
+  public static void testCharacterWrapperFail() {
+    assert characterWrapperField != '!';
+  }
+
+  public static Double doubleWrapperField = 24.56;
+  public static void testDoubleWrapperPass() {
+    assert doubleWrapperField == 24.56;
+  }
+  public static void testDoubleWrapperFail() {
+    assert doubleWrapperField != 24.56;
+  }
+
+  public static Float floatWrapperField = 13.13f;
+  public static void testFloatWrapperPass() {
+    assert floatWrapperField == 13.13f;
+  }
+  public static void testFloatWrapperFail() {
+    assert floatWrapperField != 13.13f;
+  }
+
+  public static Integer integerWrapperField = Util.setTo(1000);
+  public static void testIntegerWrapperPass() {
+    assert integerWrapperField == 1000;
+  }
+  public static void testIntegerWrapperFail() {
+    assert integerWrapperField != 1000;
+  }
+
+  public static Long longWrapperField = 21000000000L;
+  public static void testLongWrapperPass() {
+    assert longWrapperField == 21000000000L;
+  }
+  public static void testLongWrapperFail() {
+    assert longWrapperField != 21000000000L;
+  }
+
+  public static Short shortWrapperField = (short)200;
+  public static void testShortWrapperPass() {
+    assert shortWrapperField == (short)200;
+  }
+  public static void testShortWrapperFail() {
+    assert shortWrapperField != (short)200;
+  }
+
   // Strings
   public static String stringField = Util.repeat("hello! ", 6);
   public static void testStringPass() {
