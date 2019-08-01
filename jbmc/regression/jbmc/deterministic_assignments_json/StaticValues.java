@@ -333,6 +333,14 @@ public class StaticValues extends StaticParent {
     assert shortWrapperContainer.shortField != (short)200;
   }
 
+  public static Integer[] integerWrapperArray = {1111};
+  public static void testIntegerWrapperArrayPass() {
+    assert integerWrapperArray.length == 1 && integerWrapperArray[0] == 1111;
+  }
+  public static void testIntegerWrapperArrayFail() {
+    assert integerWrapperArray.length != 1 || integerWrapperArray[0] != 1111;
+  }
+
   // Strings
   public static String stringField = Util.repeat("hello! ", 6);
   public static void testStringPass() {

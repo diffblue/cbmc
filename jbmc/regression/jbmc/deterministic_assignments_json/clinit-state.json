@@ -476,6 +476,12 @@
     "shortWrapperContainer":{
       "@type":"ContainerForShort",
       "shortField":200
+    },
+    "integerWrapperArray":{
+      "@type":"[Ljava.lang.Integer;",
+      "@items":[
+        1111
+      ]
     }
   },
   "OtherClass":{
