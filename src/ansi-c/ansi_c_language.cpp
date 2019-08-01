@@ -138,7 +138,10 @@ bool ansi_c_languaget::generate_support_functions(
     symbol_table, get_message_handler(), object_factory_params);
 }
 
-bool is_call_to_function(irep_idt function_name, exprt expr)
+// This returns true if the expression [expr] is a call to the
+// function with name [function_name]. Note that this doesn't handle
+// function pointers.
+bool is_call_to_function_with_name(irep_idt function_name, exprt expr)
 {
   if(can_cast_expr<side_effect_expr_function_callt>(expr))
   {
@@ -222,13 +225,11 @@ exprt aggregate_function_preconditions(code_blockt function_body)
       it != function_body.depth_end();
       ++it)
   {
-    if(is_call_to_function(CPROVER_PREFIX "precondition", *it))
+    if(is_call_to_function_with_name(CPROVER_PREFIX "precondition", *it))
     {
       const side_effect_expr_function_callt function_call =
         to_side_effect_expr_function_call(*it);
       exprt condition = function_call.arguments().front();
-      // std::cout << "Precondition:\n" << precondition.pretty() << "\n";
-
       preconditions.push_back(condition);
     }
   }
