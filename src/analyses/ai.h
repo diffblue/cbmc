@@ -36,7 +36,8 @@ public:
   typedef ai_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  ai_baset()
+  explicit ai_baset(std::unique_ptr<ai_domain_factory_baset> &&df)
+    : domain_factory(std::move(df))
   {
   }
 
@@ -333,16 +334,28 @@ protected:
     const exprt::operandst &arguments,
     const namespacet &ns);
 
-  // abstract methods
+  /// For creating domain objects
+  std::unique_ptr<ai_domain_factory_baset> domain_factory;
 
-  virtual bool merge(const statet &src, locationt from, locationt to)=0;
+  /// Merge the state \p src, flowing from location \p from to
+  /// location \p to, into the state currently stored for location \p to.
+  virtual bool merge(const statet &src, locationt from, locationt to)
+  {
+    statet &dest = get_state(to);
+    return domain_factory->merge(dest, src, from, to);
+  }
+
+  /// Make a copy of a state
+  virtual std::unique_ptr<statet> make_temporary_state(const statet &s)
+  {
+    return domain_factory->copy(s);
+  }
+
+  // abstract methods
 
   /// Get the state for the given location, creating it in a default way if it
   /// doesn't exist
   virtual statet &get_state(locationt l)=0;
-
-  /// Make a copy of a state
-  virtual std::unique_ptr<statet> make_temporary_state(const statet &s)=0;
 };
 
 /// Base class for abstract interpretation. An actual analysis
@@ -400,7 +413,7 @@ public:
   }
 
   explicit ait(std::unique_ptr<ai_domain_factory_baset> &&df)
-    : ai_baset(), domain_factory(std::move(df))
+    : ai_baset(std::move(df))
   {
   }
 
@@ -422,7 +435,7 @@ public:
   {
     typename state_mapt::const_iterator it = state_map.find(t);
     if(it == state_map.end())
-      return domain_factory->make_domain(t);
+      return domain_factory->make(t);
 
     return it->second;
   }
@@ -443,8 +456,6 @@ protected:
       state_mapt;
   state_mapt state_map;
 
-  std::unique_ptr<ai_domain_factory_baset> domain_factory;
-
   /// Look up the analysis state for a given location, instantiating a new state
   /// if required. Used internally by the analysis.
   virtual statet &get_state(locationt l) override
@@ -452,27 +463,13 @@ protected:
     typename state_mapt::const_iterator it = state_map.find(l);
     if(it == state_map.end())
     {
-      std::shared_ptr<statet> d(domain_factory->make_domain(l));
+      std::shared_ptr<statet> d(domain_factory->make(l));
       auto p = state_map.insert(std::make_pair(l, d));
       CHECK_RETURN(p.second);
       it = p.first;
     }
 
     return *(it->second);
-  }
-
-  /// Merge the state \p src, flowing from location \p from to
-  /// location \p to, into the state currently stored for location \p to.
-  bool merge(const statet &src, locationt from, locationt to) override
-  {
-    statet &dest=get_state(to);
-    return domain_factory->merge(dest, src, from, to);
-  }
-
-  /// Make a copy of \p s.
-  std::unique_ptr<statet> make_temporary_state(const statet &s) override
-  {
-    return domain_factory->copy(s);
   }
 
 private:
