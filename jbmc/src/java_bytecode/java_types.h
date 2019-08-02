@@ -1051,6 +1051,12 @@ to_java_implicitly_generic_class_type(java_class_typet &type)
   return static_cast<java_implicitly_generic_class_typet &>(type);
 }
 
+/// \param type: Source type
+/// \return The vector of implicitly generic and (explicitly) generic type
+///   parameters of the given type.
+std::vector<java_generic_parametert>
+get_all_generic_parameters(const typet &type);
+
 /// An exception that is raised for unsupported class signature.
 /// Currently we do not parse multiple bounds.
 class unsupported_java_class_signature_exceptiont:public std::logic_error

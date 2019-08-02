@@ -4,37 +4,6 @@
 
 #include <util/range.h>
 
-/// \param type: Source type
-/// \return The vector of implicitly generic and (explicitly) generic type
-///   parameters of the given type.
-const std::vector<java_generic_parametert>
-get_all_generic_parameters(const typet &type)
-{
-  PRECONDITION(
-    is_java_generic_class_type(type) ||
-    is_java_implicitly_generic_class_type(type));
-  std::vector<java_generic_parametert> generic_parameters;
-  if(is_java_implicitly_generic_class_type(type))
-  {
-    const java_implicitly_generic_class_typet &implicitly_generic_class =
-      to_java_implicitly_generic_class_type(to_java_class_type(type));
-    generic_parameters.insert(
-      generic_parameters.end(),
-      implicitly_generic_class.implicit_generic_types().begin(),
-      implicitly_generic_class.implicit_generic_types().end());
-  }
-  if(is_java_generic_class_type(type))
-  {
-    const java_generic_class_typet &generic_class =
-      to_java_generic_class_type(to_java_class_type(type));
-    generic_parameters.insert(
-      generic_parameters.end(),
-      generic_class.generic_types().begin(),
-      generic_class.generic_types().end());
-  }
-  return generic_parameters;
-}
-
 /// Add the parameters and their types for each generic parameter of the
 /// given generic pointer type to the map.
 /// Own the keys and pop from their stack on destruction.
