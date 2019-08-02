@@ -1,0 +1,12 @@
+CORE
+main.c
+--insert-final-assert-false main
+^EXIT=10$
+^SIGNAL=0$
+insert-final-assert-false \(should fail\) : FAILURE
+^VERIFICATION FAILED$
+--
+--
+This test does not have a false assumption. A sign that this is the case is
+that verification fails with a false assert inserted automatically by the
+--insert-final-assert-false flag.
