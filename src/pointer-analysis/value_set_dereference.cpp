@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/range.h>
+#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
@@ -60,18 +61,191 @@ static bool should_use_local_definition_for(const exprt &expr)
   return false;
 }
 
+/// Allocate a fresh derefd_pointer temporary variable
+static symbol_exprt create_temporary_for(
+  const exprt &pointer,
+  irep_idt language_mode,
+  symbol_tablet &symbol_table)
+{
+  return get_fresh_aux_symbol(
+           pointer.type(),
+           "derefd_pointer",
+           "derefd_pointer",
+           source_locationt(),
+           language_mode,
+           symbol_table)
+    .symbol_expr();
+}
+
+typedef value_set_dereferencet::value_set_mappingt value_set_mappingt;
+typedef value_set_dereferencet::value_set_resultt value_set_resultt;
+typedef value_set_dereferencet::valuet valuet;
+
+/// Returns true if the passed value-sets have any overlapping members, or if
+/// more than one of them may result in a dereference failure.
+static bool
+value_sets_overlap(const std::vector<value_set_mappingt> &value_sets)
+{
+  PRECONDITION(!value_sets.empty());
+  if(value_sets.size() == 1)
+    return false;
+
+  // If more than one value-set has the may-fail flag set then we consider that
+  // they overlap:
+  if(
+    std::count_if(
+      value_sets.begin(),
+      value_sets.end(),
+      [](const value_set_mappingt &value_set) {
+        return value_set.values.may_fail;
+      }) >= 2)
+  {
+    return true;
+  }
+
+  std::unordered_set<exprt, irep_hash> values_seen;
+  for(const auto &value_set : value_sets)
+    for(const auto &value : value_set.values.values)
+      if(!values_seen.insert(value.value).second)
+        return true;
+
+  return false;
+}
+
+static value_set_resultt combine_value_sets(
+  const std::vector<value_set_mappingt> &value_sets,
+  const exprt &pointer)
+{
+  value_set_resultt result = {pointer,
+                              {},
+                              std::any_of(
+                                value_sets.begin(),
+                                value_sets.end(),
+                                [](const value_set_mappingt &value_set) {
+                                  return value_set.values.may_fail;
+                                })};
+
+  std::unordered_set<exprt, irep_hash> values_seen;
+  std::vector<valuet> unchecked_values;
+
+  for(const auto &value_set : value_sets)
+  {
+    for(const auto &value : value_set.values.values)
+    {
+      if(values_seen.insert(value.value).second)
+      {
+        if(value.pointer_guard.is_nil() || value.pointer_guard == true_exprt())
+          unchecked_values.push_back(value);
+        else
+          result.values.push_back(value);
+      }
+    }
+  }
+
+  // value-set -> if-expression conversion currently relies on aliases without
+  // a check appearing first in the list of possible aliases. If there are
+  // several distinct such aliases then the result is unsound.
+  result.values.insert(
+    result.values.begin(), unchecked_values.begin(), unchecked_values.end());
+
+  return result;
+}
+
 exprt value_set_dereferencet::dereference(const exprt &pointer)
 {
-  if(pointer.type().id()!=ID_pointer)
-    throw "dereference expected pointer type, but got "+
-          pointer.type().pretty();
+  std::vector<value_set_mappingt> value_set_mappings;
+  exprt derefd_pointer_with_placeholders =
+    gather_value_sets(pointer, value_set_mappings);
+
+  // derefd_pointer_with_placeholders is a copy of `pointer` with placeholder
+  // symbols, e.g. "x ? placeholder1 : typecast(placeholder2, A*)"
+  // (or in the simplest case just "placeholder1")
+  // value_set_mappings maps each placeholder onto a set of values that
+  // subexpression may point to.
+  // We should now choose between two possible strategies:
+  // 1. Keep the structure of derefd_pointer_with_placeholders and dereference
+  //    each subexpression in place. We do this when the subexpressions'
+  //    referents do not overlap; it doesn't require a temporary expresssion
+  //    and produces a simpler result.
+  // 2. Create a temporary for 'pointer' and handle the dereference as one
+  //    large value-set. We do this when the referents overlap because it
+  //    results in less redundancy.
+  //
+  // Example of case 1:
+  // *(x ? y : z) ==>
+  // *(x ? placeholder1 / {a,b} : placeholder2 / {c,d}) ==>
+  // x ? (y == &a ? a : b) : (z == &c ? c : d)
+  //
+  // Introducing a temporary for (x ? y : z) would have had no benefit here.
+  //
+  // Example of case 2:
+  // *(x ? y : z) ==>
+  // *(x ? placeholder1 / {a,b,c} : placeholder2 / {a,b,c}) ==>
+  // let derefd = (x ? y : z) in derefd == &a ? a : derefd == &b ? b : c
+  //
+  // Dereferencing y and z in-place would have led to a redundant construction
+  // like (x ? (y == &a ? a : y == &b ? b : c) : (z == &a ? a ...
+  // which leads to a larger formula, and in the case where goto-symex handles
+  // such an if-expression on the LHS of an assignment, more write operations.
+
+  if(!value_sets_overlap(value_set_mappings))
+  {
+    replace_symbolt replace_symbols;
+    for(const auto &mapping : value_set_mappings)
+    {
+      replace_symbols.set(
+        mapping.placeholder, value_set_to_conditional_expr(mapping.values));
+    }
+    replace_symbols(derefd_pointer_with_placeholders);
+    return derefd_pointer_with_placeholders;
+  }
+  else
+  {
+    symbol_exprt pointer_temporary =
+      create_temporary_for(pointer, language_mode, new_symbol_table);
+    value_set_resultt combined_value_set =
+      combine_value_sets(value_set_mappings, pointer_temporary);
+    exprt result = value_set_to_conditional_expr(combined_value_set);
+    return let_exprt(pointer_temporary, pointer, result);
+  }
+}
+
+/// Produces a fresh placeholder variable name. We don't add these to the symbol
+/// table, as they will be replaced before value_set_dereferencet::dereference
+/// ends.
+static symbol_exprt get_fresh_result_placeholder(const typet &type)
+{
+  static std::size_t i = 0;
+  return symbol_exprt(
+    "value_set_dereference::result_placeholder" + std::to_string(++i), type);
+}
+
+/// A placeholder value for the pointer being dereferenced. We only create one
+/// of these as it is always replaced before
+/// value_set_dereferencet::dereference ends.
+static symbol_exprt get_pointer_placeholder(const typet &type)
+{
+  return symbol_exprt("value_set_dereference::pointer_placeholder", type);
+}
+
+exprt value_set_dereferencet::gather_value_sets(
+  const exprt &pointer,
+  std::vector<value_set_mappingt> &value_set_accumulator) const
+{
+  if(pointer.type().id() != ID_pointer)
+  {
+    throw "gather_value_sets expected pointer type, but got " +
+      pointer.type().pretty();
+  }
 
   // we may get ifs due to recursive calls
   if(pointer.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(pointer);
-    exprt true_case = dereference(if_expr.true_case());
-    exprt false_case = dereference(if_expr.false_case());
+    exprt true_case =
+      gather_value_sets(if_expr.true_case(), value_set_accumulator);
+    exprt false_case =
+      gather_value_sets(if_expr.false_case(), value_set_accumulator);
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
   else if(pointer.id() == ID_typecast)
@@ -90,17 +264,32 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       const auto &if_expr = to_if_expr(*underlying);
       return if_exprt(
         if_expr.cond(),
-        dereference(typecast_exprt(if_expr.true_case(), pointer.type())),
-        dereference(typecast_exprt(if_expr.false_case(), pointer.type())));
+        gather_value_sets(
+          typecast_exprt(if_expr.true_case(), pointer.type()),
+          value_set_accumulator),
+        gather_value_sets(
+          typecast_exprt(if_expr.false_case(), pointer.type()),
+          value_set_accumulator));
     }
   }
 
-  // type of the object
-  const typet &type=pointer.type().subtype();
+  // Create a fresh placeholder symbol, find this pointer's value-set, record
+  // the placeholder -> value-set mapping, and return the new symbol:
+  symbol_exprt result_placeholder =
+    get_fresh_result_placeholder(to_pointer_type(pointer.type()).subtype());
 
+  value_set_accumulator.emplace_back(
+    value_set_mappingt{result_placeholder, get_value_set(pointer)});
+
+  return value_set_accumulator.back().placeholder;
+}
+
+value_set_resultt
+value_set_dereferencet::get_value_set(const exprt &pointer) const
+{
 #ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference pointer=" << format(pointer)
-            << '\n';
+  std::cout << "value_set_dereferencet::get_value_set pointer="
+            << format(pointer) << '\n';
 #endif
 
   // collect objects the pointer may point to
@@ -108,7 +297,7 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     dereference_callback.get_value_set(pointer);
 
 #ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference points_to_set={";
+  std::cout << "value_set_dereferencet::get_value_set points_to_set={";
   for(auto p : points_to_set)
     std::cout << format(p) << "; ";
   std::cout << "}\n" << std::flush;
@@ -120,117 +309,138 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       return !should_ignore_value(value, exclude_null_derefs, language_mode);
     });
 
-  exprt compare_against_pointer = pointer;
-
-  if(retained_values.size() >= 2 && should_use_local_definition_for(pointer))
-  {
-    symbolt fresh_binder = get_fresh_aux_symbol(
-      pointer.type(),
-      "derefd_pointer",
-      "derefd_pointer",
-      source_locationt(),
-      language_mode,
-      new_symbol_table);
-
-    compare_against_pointer = fresh_binder.symbol_expr();
-  }
-
 #ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference retained_values={";
+  std::cout << "value_set_dereferencet::get_value_set retained_values={";
   for(const auto &value : retained_values)
     std::cout << format(value) << "; ";
   std::cout << "}\n" << std::flush;
 #endif
 
-  std::list<valuet> values =
-    make_range(retained_values).map([&](const exprt &value) {
-      return build_reference_to(value, compare_against_pointer, ns);
-    });
+  // We use a placeholder symbol instead of the actual pointer when generating
+  // value expressions because at this point we're unsure whether the values
+  // will be output referring directly to `pointer` or to a parent expression.
+  // For example, if `pointer` is `y` in the context `x ? y : z` then we might
+  // end up outputting `y == &o1 ? o1 : ...` or we might go for
+  // `tmp = x ? y : z; tmp == &o1 ? o1 : ...`. By using a standard placeholder
+  // symbol we allow `value_set_dereferencet::dereference` to decide which
+  // option to use. The placeholder will be replaced by the pointer expression
+  // it selected in `value_set_to_conditional_expr`.
+  symbol_exprt compare_against_pointer =
+    get_pointer_placeholder(pointer.type());
 
-  // can this fail?
-  bool may_fail;
+  bool may_fail = false;
+  std::vector<valuet> values =
+    make_range(retained_values)
+      .map([&](const exprt &value) {
+        return build_reference_to(value, compare_against_pointer, ns);
+      })
+      .filter([&](const valuet &value) {
+        if(value.value.is_nil())
+          may_fail = true;
+        return value.value.is_not_nil();
+      });
 
-  if(values.empty())
-  {
-    may_fail=true;
-  }
-  else
-  {
-    may_fail=false;
-    for(std::list<valuet>::const_iterator
-        it=values.begin();
-        it!=values.end();
-        it++)
-      if(it->value.is_nil())
-        may_fail=true;
-  }
+  if(values.size() == 0)
+    may_fail = true;
 
-  if(may_fail)
+  return value_set_resultt{pointer, std::move(values), may_fail};
+}
+
+exprt value_set_dereferencet::value_set_to_conditional_expr(
+  const value_set_resultt &value_set) const
+{
+  exprt result = nil_exprt();
+
+  if(value_set.may_fail)
   {
+    // Dereferencing this pointer may fail -- create a fallback option to
+    // access some special symbol denoting an unknown or invalid object:
+
     // first see if we have a "failed object" for this pointer
-
-    exprt failure_value;
 
     if(
       const symbolt *failed_symbol =
-        dereference_callback.get_or_create_failed_symbol(pointer))
+        dereference_callback.get_or_create_failed_symbol(value_set.pointer))
     {
       // yes!
-      failure_value=failed_symbol->symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
+      result = failed_symbol->symbol_expr();
+      result.set(ID_C_invalid_object, true);
     }
     else
     {
       // else: produce new symbol
       symbolt &symbol = get_fresh_aux_symbol(
-        type,
+        to_pointer_type(value_set.pointer.type()).subtype(),
         "symex",
         "invalid_object",
-        pointer.source_location(),
+        value_set.pointer.source_location(),
         language_mode,
         new_symbol_table);
 
       // make it a lvalue, so we can assign to it
       symbol.is_lvalue=true;
 
-      failure_value=symbol.symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
+      result = symbol.symbol_expr();
+      result.set(ID_C_invalid_object, true);
     }
-
-    valuet value;
-    value.value=failure_value;
-    value.pointer_guard=true_exprt();
-    values.push_front(value);
   }
 
-  // now build big case split, but we only do "good" objects
+  std::size_t result_size = value_set.values.size();
+  if(!result.is_nil())
+    ++result_size;
 
-  exprt value=nil_exprt();
+  // now build big case split:
 
-  for(std::list<valuet>::const_iterator
-      it=values.begin();
-      it!=values.end();
-      it++)
+  for(const auto &value : value_set.values)
   {
-    if(it->value.is_not_nil())
-    {
-      if(value.is_nil()) // first?
-        value=it->value;
-      else
-        value=if_exprt(it->pointer_guard, it->value, value);
-    }
+    INVARIANT(
+      value.value.is_not_nil(),
+      "failed deref values should have been filtered already");
+
+    if(result.is_nil()) // first?
+      result = value.value;
+    else
+      result = if_exprt(value.pointer_guard, value.value, result);
   }
 
-  if(compare_against_pointer != pointer)
-    value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
+  // The expression built so far uses
+  // value_set_dereferencet::pointer_placeholder in place of the actual
+  // pointer. Choose whether to directly insert the pointer value, or if it is
+  // complicated enough that we should declare a temporary to hold it:
+
+  exprt compare_against_pointer;
+
+  // We check for 3 values here because that is the smallest value-set size
+  // that duplicates the pointer exprt (e.g. p == &a ? a : p == &b ? b : c)
+  if(result_size >= 3 && should_use_local_definition_for(value_set.pointer))
+  {
+    compare_against_pointer =
+      create_temporary_for(value_set.pointer, language_mode, new_symbol_table);
+  }
+  else
+    compare_against_pointer = value_set.pointer;
+
+  replace_symbolt replace_placeholder;
+  replace_placeholder.set(
+    get_pointer_placeholder(value_set.pointer.type()), compare_against_pointer);
+
+  // Replace the pointer placeholder with its actual value:
+  replace_placeholder(result);
+
+  // Enclose in a let-expression if we used a temporary for the pointer:
+  if(compare_against_pointer != value_set.pointer)
+  {
+    result = let_exprt(
+      to_symbol_expr(compare_against_pointer), value_set.pointer, result);
+  }
 
 #ifdef DEBUG
-  std::cout << "value_set_derefencet::dereference value=" << format(value)
-            << '\n'
+  std::cout << "value_set_derefencet::value_set_to_conditional_expr result="
+            << format(result) << '\n'
             << std::flush;
 #endif
 
-  return value;
+  return result;
 }
 
 /// Check if the two types have matching number of ID_pointer levels, with
