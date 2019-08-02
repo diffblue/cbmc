@@ -839,6 +839,31 @@ bool equal_java_types(const typet &type1, const typet &type2)
   return (type1 == type2 && arrays_with_same_element_type);
 }
 
+std::vector<java_generic_parametert>
+get_all_generic_parameters(const typet &type)
+{
+  std::vector<java_generic_parametert> generic_parameters;
+  if(is_java_implicitly_generic_class_type(type))
+  {
+    const java_implicitly_generic_class_typet &implicitly_generic_class =
+      to_java_implicitly_generic_class_type(to_java_class_type(type));
+    generic_parameters.insert(
+      generic_parameters.end(),
+      implicitly_generic_class.implicit_generic_types().begin(),
+      implicitly_generic_class.implicit_generic_types().end());
+  }
+  if(is_java_generic_class_type(type))
+  {
+    const java_generic_class_typet &generic_class =
+      to_java_generic_class_type(to_java_class_type(type));
+    generic_parameters.insert(
+      generic_parameters.end(),
+      generic_class.generic_types().begin(),
+      generic_class.generic_types().end());
+  }
+  return generic_parameters;
+}
+
 void get_dependencies_from_generic_parameters_rec(
   const typet &t,
   std::set<irep_idt> &refs)
