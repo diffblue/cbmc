@@ -211,18 +211,16 @@ public:
   {
   }
 
-  function_application_exprt(
-    const symbol_exprt &_function,
-    argumentst _arguments);
+  function_application_exprt(const exprt &_function, argumentst _arguments);
 
-  symbol_exprt &function()
+  exprt &function()
   {
-    return static_cast<symbol_exprt &>(op0());
+    return op0();
   }
 
-  const symbol_exprt &function() const
+  const exprt &function() const
   {
-    return static_cast<const symbol_exprt &>(op0());
+    return op0();
   }
 
   argumentst &arguments()

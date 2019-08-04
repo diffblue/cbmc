@@ -81,39 +81,39 @@ void smt2_solvert::expand_function_applications(exprt &expr)
   {
     auto &app=to_function_application_expr(expr);
 
-    // look it up
-    irep_idt identifier=app.function().get_identifier();
-    auto f_it=id_map.find(identifier);
-
-    if(f_it!=id_map.end())
+    if(app.function().id() == ID_symbol)
     {
-      const auto &f=f_it->second;
+      // look up the symbol
+      auto identifier = to_symbol_expr(app.function()).get_identifier();
+      auto f_it = id_map.find(identifier);
 
-      DATA_INVARIANT(f.type.id()==ID_mathematical_function,
-        "type of function symbol must be mathematical_function_type");
-
-      const auto f_type=
-        to_mathematical_function_type(f.type);
-
-      const auto &domain = f_type.domain();
-
-      DATA_INVARIANT(
-        domain.size() == app.arguments().size(),
-        "number of function parameters");
-
-      replace_symbolt replace_symbol;
-
-      std::map<irep_idt, exprt> parameter_map;
-      for(std::size_t i = 0; i < domain.size(); i++)
+      if(f_it != id_map.end())
       {
-        const symbol_exprt s(f.parameters[i], domain[i]);
-        replace_symbol.insert(s, app.arguments()[i]);
-      }
+        const auto &f = f_it->second;
 
-      exprt body=f.definition;
-      replace_symbol(body);
-      expand_function_applications(body);
-      expr=body;
+        DATA_INVARIANT(
+          f.type.id() == ID_mathematical_function,
+          "type of function symbol must be mathematical_function_type");
+
+        const auto &domain = to_mathematical_function_type(f.type).domain();
+
+        DATA_INVARIANT(
+          domain.size() == app.arguments().size(),
+          "number of parameters must match number of arguments");
+
+        replace_symbolt replace_symbol;
+
+        for(std::size_t i = 0; i < domain.size(); i++)
+        {
+          replace_symbol.insert(
+            symbol_exprt(f.parameters[i], domain[i]), app.arguments()[i]);
+        }
+
+        exprt body = f.definition;
+        replace_symbol(body);
+        expand_function_applications(body);
+        expr = body;
+      }
     }
   }
 }

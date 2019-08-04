@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_types.h"
 
 function_application_exprt::function_application_exprt(
-  const symbol_exprt &_function,
+  const exprt &_function,
   argumentst _arguments)
   : binary_exprt(
       _function,
