@@ -21,8 +21,15 @@ void relations()
   __CPROVER_assert((− a) == (-a), "−");
 }
 
+void quantifiers()
+{
+  __CPROVER_assert((∀ int i; 1) == 1, "∀");
+  __CPROVER_assert((∃ int i; 1) == 1, "∃");
+}
+
 int main()
 {
   boolean();
   relations();
+  quantifiers();
 }
