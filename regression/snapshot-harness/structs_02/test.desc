@@ -1,0 +1,12 @@
+CORE
+main.c
+st,p --harness-type initialise-with-memory-snapshot --initial-source-location main.c:27
+^EXIT=0$
+^SIGNAL=0$
+\[foo.assertion.1\] line [0-9]+ assertion st.c1 \+ 2 == st.c2: SUCCESS
+\[foo.assertion.2\] line [0-9]+ assertion st.c1 \+ 2 == \*p: SUCCESS
+\[foo.assertion.3\] line [0-9]+ assertion \*p == st.c2: SUCCESS
+\[foo.assertion.4\] line [0-9]+ assertion \*p == st.c2: SUCCESS
+VERIFICATION SUCCESSFUL
+--
+^warning: ignoring

@@ -504,6 +504,7 @@ memory_snapshot_harness_generatort::initialize_entry_via_source(
 {
   PRECONDITION(!entry_source_location.file_name.empty());
 
+  source_location_matcht best_match;
   // by line: iterate over all instructions until source location match
   for(const auto &entry : goto_functions.function_map)
   {
@@ -511,15 +512,22 @@ memory_snapshot_harness_generatort::initialize_entry_via_source(
     // if !body_available() then body.instruction.empty() and that's fine
     const auto &goto_program = goto_function.body;
 
-    const auto corresponding_instruction =
+    const auto candidate_instruction =
       entry_source_location.find_first_corresponding_instruction(
         goto_program.instructions);
 
-    if(corresponding_instruction != goto_program.instructions.end())
-      return entry_locationt{entry.first, corresponding_instruction};
+    if(candidate_instruction.first != goto_program.instructions.end())
+    {
+      best_match.match_up(
+        candidate_instruction.second, entry.first, candidate_instruction.first);
+    }
   }
-  throw invalid_command_line_argument_exceptiont(
-    "could not find the specified entry point", "--initial-source-location");
+
+  if(best_match.match_found)
+    return entry_locationt{best_match.function_name, best_match.instruction};
+  else
+    throw invalid_command_line_argument_exceptiont(
+      "could not find the specified entry point", "--initial-source-location");
 }
 
 goto_programt::const_targett memory_snapshot_harness_generatort::
@@ -537,11 +545,12 @@ goto_programt::const_targett memory_snapshot_harness_generatort::
     });
 }
 
-goto_programt::const_targett memory_snapshot_harness_generatort::
-  entry_source_locationt::find_first_corresponding_instruction(
+std::pair<goto_programt::const_targett, size_t>
+memory_snapshot_harness_generatort::entry_source_locationt::
+  find_first_corresponding_instruction(
     const goto_programt::instructionst &instructions) const
 {
-  return std::find_if(
+  auto it = std::find_if(
     instructions.begin(),
     instructions.end(),
     [this](const goto_programt::instructiont &instruction) {
@@ -549,4 +558,11 @@ goto_programt::const_targett memory_snapshot_harness_generatort::
              safe_string2unsigned(id2string(
                instruction.source_location.get_line())) >= line_number;
     });
+
+  if(it == instructions.end())
+    return {it, 0};
+  else
+    return {it,
+            safe_string2unsigned(id2string(it->source_location.get_line())) -
+              line_number};
 }
