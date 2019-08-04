@@ -130,6 +130,8 @@ simplify_exprt::simplify_member(const member_exprt &expr)
   else if(op.id()==ID_byte_extract_little_endian ||
           op.id()==ID_byte_extract_big_endian)
   {
+    const auto &byte_extract_expr = to_byte_extract_expr(op);
+
     if(op_type.id()==ID_struct)
     {
       // This rewrites byte_extract(s, o, struct_type).member
@@ -151,12 +153,13 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       if(!offset_int.has_value())
         return unchanged(expr);
 
-      const exprt &struct_offset=op.op1();
+      const exprt &struct_offset = byte_extract_expr.offset();
       exprt member_offset = from_integer(*offset_int, struct_offset.type());
       plus_exprt final_offset(struct_offset, member_offset);
       simplify_node(final_offset);
 
-      byte_extract_exprt result(op.id(), op.op0(), final_offset, expr.type());
+      byte_extract_exprt result(
+        op.id(), byte_extract_expr.op(), final_offset, expr.type());
 
       return changed(simplify_rec(result)); // recursive call
     }
@@ -164,7 +167,6 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     {
       // rewrite byte_extract(X, 0).member to X
       // if the type of X is that of the member
-      const auto &byte_extract_expr = to_byte_extract_expr(op);
       if(byte_extract_expr.offset().is_zero())
       {
         const union_typet &union_type = to_union_type(op_type);
@@ -204,12 +206,14 @@ simplify_exprt::simplify_member(const member_exprt &expr)
   }
   else if(op.id() == ID_typecast)
   {
+    const auto &typecast_expr = to_typecast_expr(op);
+
     // Try to look through member(cast(x)) if the cast is between structurally
     // identical types:
-    if(op_type == op.op0().type())
+    if(op_type == typecast_expr.op().type())
     {
       auto new_expr = expr;
-      new_expr.struct_op() = op.op0();
+      new_expr.struct_op() = typecast_expr.op();
       return changed(simplify_member(new_expr));
     }
 
@@ -224,7 +228,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       if(requested_offset.has_value())
       {
         auto equivalent_member = get_subexpression_at_offset(
-          op.op0(), *requested_offset, expr.type(), ns);
+          typecast_expr.op(), *requested_offset, expr.type(), ns);
 
         // Guess: turning this into a byte-extract operation is not really an
         // optimisation.

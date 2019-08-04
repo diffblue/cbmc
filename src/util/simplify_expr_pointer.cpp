@@ -313,7 +313,8 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
              tmp.op0().operands().size()==1 &&
              tmp.op0().op0().id()==ID_address_of)
           {
-            auto new_expr = typecast_exprt::conditional_cast(tmp.op1(), type);
+            auto new_expr =
+              typecast_exprt::conditional_cast(to_plus_expr(tmp).op1(), type);
 
             simplify_node(new_expr);
             return new_expr;
