@@ -28,8 +28,8 @@ irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 /// Returns the symbol corresponding to an exception
 exprt uncaught_exceptions_domaint::get_exception_symbol(const exprt &expr)
 {
-  if(expr.id()!=ID_symbol && expr.has_operands())
-    return get_exception_symbol(expr.op0());
+  if(expr.id() != ID_symbol && expr.operands().size() >= 1)
+    return get_exception_symbol(to_multi_ary_expr(expr).op0());
 
   return expr;
 }

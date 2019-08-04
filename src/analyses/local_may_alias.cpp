@@ -250,21 +250,25 @@ void local_may_aliast::get_rec(
   }
   else if(rhs.id()==ID_plus)
   {
-    if(rhs.operands().size()>=3)
+    const auto &plus_expr = to_plus_expr(rhs);
+
+    if(plus_expr.operands().size() >= 3)
     {
-      assert(rhs.op0().type().id()==ID_pointer);
-      get_rec(dest, rhs.op0(), loc_info_src);
+      DATA_INVARIANT(
+        plus_expr.op0().type().id() == ID_pointer,
+        "pointer in pointer-typed sum must be op0");
+      get_rec(dest, plus_expr.op0(), loc_info_src);
     }
-    else if(rhs.operands().size()==2)
+    else if(plus_expr.operands().size() == 2)
     {
       // one must be pointer, one an integer
-      if(rhs.op0().type().id()==ID_pointer)
+      if(plus_expr.op0().type().id() == ID_pointer)
       {
-        get_rec(dest, rhs.op0(), loc_info_src);
+        get_rec(dest, plus_expr.op0(), loc_info_src);
       }
-      else if(rhs.op1().type().id()==ID_pointer)
+      else if(plus_expr.op1().type().id() == ID_pointer)
       {
-        get_rec(dest, rhs.op1(), loc_info_src);
+        get_rec(dest, plus_expr.op1(), loc_info_src);
       }
       else
         dest.insert(unknown_object);
@@ -274,9 +278,11 @@ void local_may_aliast::get_rec(
   }
   else if(rhs.id()==ID_minus)
   {
-    if(rhs.op0().type().id()==ID_pointer)
+    const auto &op0 = to_minus_expr(rhs).op0();
+
+    if(op0.type().id() == ID_pointer)
     {
-      get_rec(dest, rhs.op0(), loc_info_src);
+      get_rec(dest, op0, loc_info_src);
     }
     else
       dest.insert(unknown_object);
