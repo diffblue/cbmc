@@ -107,8 +107,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     const exprt &as_expr=
       static_cast<const exprt &>(static_cast<const irept &>(type));
-    assert(as_expr.operands().size()==1);
-    msc_based=as_expr.op0();
+    msc_based = to_unary_expr(as_expr).op();
   }
   else if(type.id()==ID_custom_bv)
   {
@@ -215,9 +214,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
         c_storage_spec.is_thread_local=true;
       else if(id=="align")
       {
-        assert(it->operands().size()==1);
         aligned=true;
-        alignment=it->op0();
+        alignment = to_unary_expr(*it).op();
       }
     }
   }

@@ -125,6 +125,11 @@ public:
   {
     check_code(code, vm);
   }
+
+  using exprt::op0;
+  using exprt::op1;
+  using exprt::op2;
+  using exprt::op3;
 };
 
 namespace detail // NOLINT

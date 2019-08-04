@@ -900,14 +900,9 @@ std::string expr2ct::convert_let(
   return dest;
 }
 
-std::string expr2ct::convert_update(
-  const exprt &src,
-  unsigned precedence)
+std::string
+expr2ct::convert_update(const update_exprt &src, unsigned precedence)
 {
-  // needs exactly 3 operands
-  if(src.operands().size()!=3)
-    return convert_norep(src, precedence);
-
   std::string dest;
 
   dest+="UPDATE(";
@@ -915,8 +910,8 @@ std::string expr2ct::convert_update(
   std::string op0, op1, op2;
   unsigned p0, p2;
 
-  op0=convert_with_precedence(src.op0(), p0);
-  op2=convert_with_precedence(src.op2(), p2);
+  op0 = convert_with_precedence(src.op0(), p0);
+  op2 = convert_with_precedence(src.op2(), p2);
 
   if(precedence>p0)
     dest+='(';
@@ -926,7 +921,7 @@ std::string expr2ct::convert_update(
 
   dest+=", ";
 
-  const exprt &designator=src.op1();
+  const exprt &designator = src.op1();
 
   forall_operands(it, designator)
     dest+=convert(*it);
@@ -1083,15 +1078,12 @@ std::string expr2ct::convert_multi_ary(
 }
 
 std::string expr2ct::convert_unary(
-  const exprt &src,
+  const unary_exprt &src,
   const std::string &symbol,
   unsigned precedence)
 {
-  if(src.operands().size()!=1)
-    return convert_norep(src, precedence);
-
   unsigned p;
-  std::string op=convert_with_precedence(src.op0(), p);
+  std::string op = convert_with_precedence(src.op(), p);
 
   std::string dest=symbol;
   if(precedence>=p ||
@@ -1150,7 +1142,8 @@ std::string expr2ct::convert_statement_expression(
      to_code(src.op0()).get_statement()!=ID_block)
     return convert_norep(src, precedence);
 
-  return "("+convert_code(to_code_block(to_code(src.op0())), 0)+")";
+  return "(" +
+         convert_code(to_code_block(to_code(to_unary_expr(src).op())), 0) + ")";
 }
 
 std::string expr2ct::convert_prob_coin(
@@ -1158,7 +1151,7 @@ std::string expr2ct::convert_prob_coin(
   unsigned &precedence)
 {
   if(src.operands().size()==1)
-    return "COIN("+convert(src.op0())+")";
+    return "COIN(" + convert(to_unary_expr(src).op()) + ")";
   else
     return convert_norep(src, precedence);
 }
@@ -1173,7 +1166,8 @@ std::string expr2ct::convert_prob_uniform(
   unsigned &precedence)
 {
   if(src.operands().size()==1)
-    return "PROB_UNIFORM("+convert(src.type())+","+convert(src.op0())+")";
+    return "PROB_UNIFORM(" + convert(src.type()) + "," +
+           convert(to_unary_expr(src).op()) + ")";
   else
     return convert_norep(src, precedence);
 }
@@ -1207,12 +1201,12 @@ std::string expr2ct::convert_comma(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert_with_precedence(src.op0(), p0);
+  std::string op0 = convert_with_precedence(to_binary_expr(src).op0(), p0);
   if(*op0.rbegin()==';')
     op0.resize(op0.size()-1);
 
   unsigned p1;
-  std::string op1=convert_with_precedence(src.op1(), p1);
+  std::string op1 = convert_with_precedence(to_binary_expr(src).op1(), p1);
   if(*op1.rbegin()==';')
     op1.resize(op1.size()-1);
 
@@ -1227,9 +1221,9 @@ std::string expr2ct::convert_complex(
   const exprt &src,
   unsigned precedence)
 {
-  if(src.operands().size()==2 &&
-     src.op0().is_zero() &&
-     src.op1().id()==ID_constant)
+  if(
+    src.operands().size() == 2 && to_binary_expr(src).op0().is_zero() &&
+    to_binary_expr(src).op1().id() == ID_constant)
   {
     // This is believed to be gcc only; check if this is sensible
     // in MSC mode.
@@ -1280,21 +1274,21 @@ std::string expr2ct::convert_array_of(
   if(src.operands().size()!=1)
     return convert_norep(src, precedence);
 
-  return "ARRAY_OF("+convert(src.op0())+')';
+  return "ARRAY_OF(" + convert(to_unary_expr(src).op()) + ')';
 }
 
 std::string expr2ct::convert_byte_extract(
-  const exprt &src,
+  const byte_extract_exprt &src,
   unsigned precedence)
 {
   if(src.operands().size()!=2)
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert_with_precedence(src.op0(), p0);
+  std::string op0 = convert_with_precedence(src.op0(), p0);
 
   unsigned p1;
-  std::string op1=convert_with_precedence(src.op1(), p1);
+  std::string op1 = convert_with_precedence(src.op1(), p1);
 
   std::string dest=src.id_string();
   dest+='(';
@@ -1347,7 +1341,7 @@ std::string expr2ct::convert_unary_post(
     return convert_norep(src, precedence);
 
   unsigned p;
-  std::string op=convert_with_precedence(src.op0(), p);
+  std::string op = convert_with_precedence(to_unary_expr(src).op(), p);
 
   std::string dest;
   if(precedence>p)
@@ -1395,12 +1389,12 @@ std::string expr2ct::convert_pointer_arithmetic(
   unsigned p;
   std::string op;
 
-  op=convert(src.op0().type());
+  op = convert(to_binary_expr(src).op0().type());
   dest+=op;
 
   dest+=", ";
 
-  op=convert_with_precedence(src.op0(), p);
+  op = convert_with_precedence(to_binary_expr(src).op0(), p);
   if(precedence>p)
     dest+='(';
   dest+=op;
@@ -1409,7 +1403,7 @@ std::string expr2ct::convert_pointer_arithmetic(
 
   dest+=", ";
 
-  op=convert_with_precedence(src.op1(), p);
+  op = convert_with_precedence(to_binary_expr(src).op1(), p);
   if(precedence>p)
     dest+='(';
   dest+=op;
@@ -1475,7 +1469,7 @@ std::string expr2ct::convert_index_designator(const exprt &src)
   if(src.operands().size()!=1)
     return convert_norep(src, precedence);
 
-  return "["+convert(src.op0())+"]";
+  return "[" + convert(to_unary_expr(src).op()) + "]";
 }
 
 std::string expr2ct::convert_member(
@@ -3358,10 +3352,10 @@ std::string expr2ct::convert_with_precedence(
     return convert_binary(src, "-", precedence=12, true);
 
   else if(src.id()==ID_unary_minus)
-    return convert_unary(src, "-", precedence=15);
+    return convert_unary(to_unary_expr(src), "-", precedence = 15);
 
   else if(src.id()==ID_unary_plus)
-    return convert_unary(src, "+", precedence=15);
+    return convert_unary(to_unary_expr(src), "+", precedence = 15);
 
   else if(src.id()==ID_floatbv_plus)
     return convert_function(src, "FLOAT+");
@@ -3537,7 +3531,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(src, "alignof");
 
   else if(has_prefix(src.id_string(), "byte_extract"))
-    return convert_byte_extract(src, precedence=16);
+    return convert_byte_extract(to_byte_extract_expr(src), precedence = 16);
 
   else if(has_prefix(src.id_string(), "byte_update"))
     return convert_byte_update(src, precedence=16);
@@ -3552,9 +3546,9 @@ std::string expr2ct::convert_with_precedence(
             to_index_expr(src.op0()).index().is_zero())
       return convert(to_index_expr(src.op0()).array());
     else if(src.type().subtype().id()==ID_code)
-      return convert_unary(src, "", precedence=15);
+      return convert_unary(to_unary_expr(src), "", precedence = 15);
     else
-      return convert_unary(src, "&", precedence=15);
+      return convert_unary(to_unary_expr(src), "&", precedence = 15);
   }
 
   else if(src.id()==ID_dereference)
@@ -3562,7 +3556,7 @@ std::string expr2ct::convert_with_precedence(
     if(src.operands().size()!=1)
       return convert_norep(src, precedence);
     else if(src.type().id()==ID_code)
-      return convert_unary(src, "", precedence=15);
+      return convert_unary(to_unary_expr(src), "", precedence = 15);
     else if(
       src.op0().id() == ID_plus && src.op0().operands().size() == 2 &&
       src.op0().op0().type().id() == ID_pointer)
@@ -3571,7 +3565,7 @@ std::string expr2ct::convert_with_precedence(
       return convert(index_exprt(src.op0().op0(), src.op0().op1()));
     }
     else
-      return convert_unary(src, "*", precedence=15);
+      return convert_unary(to_unary_expr(src), "*", precedence = 15);
   }
 
   else if(src.id()==ID_index)
@@ -3593,13 +3587,13 @@ std::string expr2ct::convert_with_precedence(
   {
     const irep_idt &statement=src.get(ID_statement);
     if(statement==ID_preincrement)
-      return convert_unary(src, "++", precedence=15);
+      return convert_unary(to_unary_expr(src), "++", precedence = 15);
     else if(statement==ID_predecrement)
-      return convert_unary(src, "--", precedence=15);
+      return convert_unary(to_unary_expr(src), "--", precedence = 15);
     else if(statement==ID_postincrement)
-      return convert_unary_post(src, "++", precedence=16);
+      return convert_unary_post(to_unary_expr(src), "++", precedence = 16);
     else if(statement==ID_postdecrement)
-      return convert_unary_post(src, "--", precedence=16);
+      return convert_unary_post(to_unary_expr(src), "--", precedence = 16);
     else if(statement==ID_assign_plus)
       return convert_binary(src, "+=", precedence=2, true);
     else if(statement==ID_assign_minus)
@@ -3647,10 +3641,10 @@ std::string expr2ct::convert_with_precedence(
     return convert_literal(src);
 
   else if(src.id()==ID_not)
-    return convert_unary(src, "!", precedence=15);
+    return convert_unary(to_unary_expr(src), "!", precedence = 15);
 
   else if(src.id()==ID_bitnot)
-    return convert_unary(src, "~", precedence=15);
+    return convert_unary(to_unary_expr(src), "~", precedence = 15);
 
   else if(src.id()==ID_mult)
     return convert_multi_ary(src, "*", precedence=13, false);
@@ -3738,7 +3732,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_with(src, precedence=16);
 
   else if(src.id()==ID_update)
-    return convert_update(src, precedence=16);
+    return convert_update(to_update_expr(src), precedence = 16);
 
   else if(src.id()==ID_member_designator)
     return precedence=16, convert_member_designator(src);
@@ -3793,7 +3787,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_vector(src, precedence);
 
   else if(src.id()==ID_union)
-    return convert_union(src, precedence);
+    return convert_union(to_unary_expr(src), precedence);
 
   else if(src.id()==ID_array)
     return convert_array(src);

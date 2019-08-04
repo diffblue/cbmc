@@ -488,7 +488,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         *dest=union_expr;
       }
 
-      dest=&(dest->op0());
+      dest = &(to_union_expr(*dest).op());
     }
     else
       UNREACHABLE;
@@ -515,7 +515,10 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       if(value.id()==ID_initializer_list &&
          value.operands().size()==1)
-        *dest=do_initializer_rec(value.op0(), type, force_constant);
+      {
+        *dest =
+          do_initializer_rec(to_unary_expr(value).op(), type, force_constant);
+      }
       else
         *dest=do_initializer_rec(value, type, force_constant);
 
@@ -631,7 +634,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       }
     }
 
-    dest=&(dest->op0());
+    dest = &(to_multi_ary_expr(*dest).op0());
 
     // we run into another loop iteration
   }
@@ -717,15 +720,14 @@ designatort c_typecheck_baset::make_designator(
         throw 0;
       }
 
-      assert(d_op.operands().size()==1);
-      exprt tmp_index=d_op.op0();
+      exprt tmp_index = to_unary_expr(d_op).op();
       make_constant_index(tmp_index);
 
       mp_integer index, size;
 
       if(to_integer(to_constant_expr(tmp_index), index))
       {
-        error().source_location = d_op.op0().source_location();
+        error().source_location = to_unary_expr(d_op).op().source_location();
         error() << "expected constant array index designator" << eom;
         throw 0;
       }
@@ -738,7 +740,7 @@ designatort c_typecheck_baset::make_designator(
         size = *size_opt;
       else
       {
-        error().source_location = d_op.op0().source_location();
+        error().source_location = to_unary_expr(d_op).op().source_location();
         error() << "expected constant array size" << eom;
         throw 0;
       }
@@ -892,7 +894,8 @@ exprt c_typecheck_baset::do_initializer_list(
     // 6.7.9, 14: An array of character type may be initialized by a character
     // string literal or UTF-8 string literal, optionally enclosed in braces.
     if(
-      value.operands().size() >= 1 && value.op0().id() == ID_string_constant &&
+      value.operands().size() >= 1 &&
+      to_multi_ary_expr(value).op0().id() == ID_string_constant &&
       (full_type.subtype().id() == ID_signedbv ||
        full_type.subtype().id() == ID_unsignedbv) &&
       to_bitvector_type(full_type.subtype()).get_width() ==
@@ -904,7 +907,8 @@ exprt c_typecheck_baset::do_initializer_list(
         warning() << "ignoring excess initializers" << eom;
       }
 
-      return do_initializer_rec(value.op0(), type, force_constant);
+      return do_initializer_rec(
+        to_multi_ary_expr(value).op0(), type, force_constant);
     }
   }
   else
@@ -913,7 +917,8 @@ exprt c_typecheck_baset::do_initializer_list(
     // * optionally enclosed in braces. *
 
     if(value.operands().size()==1)
-      return do_initializer_rec(value.op0(), type, force_constant);
+      return do_initializer_rec(
+        to_unary_expr(value).op(), type, force_constant);
 
     error().source_location = value.source_location();
     error() << "cannot initialize '" << to_string(full_type)

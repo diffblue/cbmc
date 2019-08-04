@@ -1021,10 +1021,9 @@ void c_typecheck_baset::typecheck_compound_body(
   {
     if(it->id()==ID_static_assert)
     {
-      assert(it->operands().size()==2);
-      exprt &assertion=it->op0();
+      exprt &assertion = to_binary_expr(*it).op0();
       typecheck_expr(assertion);
-      typecheck_expr(it->op1());
+      typecheck_expr(to_binary_expr(*it).op1());
       assertion = typecast_exprt(assertion, bool_typet());
       make_constant(assertion);
 
@@ -1469,7 +1468,9 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   c_qualifierst c_qualifiers;
   c_qualifiers.read(type);
 
-  if(!((const exprt &)type).has_operands())
+  const auto &as_expr = (const exprt &)type;
+
+  if(!as_expr.has_operands())
   {
     typet t=static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(t);
@@ -1477,17 +1478,14 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   }
   else
   {
-    exprt expr=((const exprt &)type).op0();
+    exprt expr = to_unary_expr(as_expr).op();
     typecheck_expr(expr);
 
     // undo an implicit address-of
     if(expr.id()==ID_address_of &&
        expr.get_bool(ID_C_implicit))
     {
-      assert(expr.operands().size()==1);
-      exprt tmp;
-      tmp.swap(expr.op0());
-      expr.swap(tmp);
+      expr = to_address_of_expr(expr).object();
     }
 
     type.swap(expr.type());
