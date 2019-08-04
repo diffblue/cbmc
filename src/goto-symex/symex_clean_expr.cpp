@@ -214,6 +214,12 @@ void goto_symext::lift_lets(statet &state, exprt &rhs)
 
       it.next_sibling_or_parent();
     }
+    else if(it->id() == ID_exists || it->id() == ID_forall)
+    {
+      // expressions within exists/forall may depend on bound variables, we
+      // cannot safely lift let expressions out of those, just skip
+      it.next_sibling_or_parent();
+    }
     else
       ++it;
   }
