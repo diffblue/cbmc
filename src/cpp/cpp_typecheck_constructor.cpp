@@ -68,10 +68,8 @@ static void copy_member(
   op1.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
   op1.add_source_location()=source_location;
 
-  side_effect_exprt assign(ID_assign, typet(), source_location);
-  assign.copy_to_operands(op0.as_expr());
-  assign.op0().add_source_location() = source_location;
-  assign.copy_to_operands(op1);
+  side_effect_expr_assignt assign(op0.as_expr(), op1, typet(), source_location);
+  assign.lhs().add_source_location() = source_location;
 
   code_expressiont code(assign);
   code.add_source_location() = source_location;
@@ -102,13 +100,14 @@ static void copy_array(
     ID_component_cpp_name, cpp_namet(member_base_name, source_location));
   member.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
 
-  side_effect_exprt assign(ID_assign, typet(), source_location);
+  side_effect_expr_assignt assign(
+    index_exprt(array.as_expr(), constant),
+    index_exprt(member, constant),
+    typet(),
+    source_location);
 
-  assign.copy_to_operands(index_exprt(array.as_expr(), constant));
-  assign.op0().add_source_location() = source_location;
-
-  assign.copy_to_operands(index_exprt(member, constant));
-  assign.op1().add_source_location() = source_location;
+  assign.lhs().add_source_location() = source_location;
+  assign.rhs().add_source_location() = source_location;
 
   code_expressiont code(assign);
   code.add_source_location() = source_location;
@@ -186,7 +185,8 @@ void cpp_typecheckt::default_cpctor(
   irept &initializers=decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
-  cpp_declaratort &declarator=static_cast<cpp_declaratort &>(cpctor.op0());
+  cpp_declaratort &declarator =
+    static_cast<cpp_declaratort &>(to_multi_ary_expr(cpctor).op0());
   exprt &block=declarator.value();
 
   // First, we need to call the parent copy constructors
@@ -295,7 +295,8 @@ void cpp_typecheckt::default_assignop(
   cpctor.operands().push_back(exprt(ID_cpp_declarator));
   cpctor.add_source_location()=source_location;
 
-  cpp_declaratort &declarator=(cpp_declaratort&) cpctor.op0();
+  cpp_declaratort &declarator =
+    static_cast<cpp_declaratort &>(to_multi_ary_expr(cpctor).op0());
   declarator.add_source_location()=source_location;
 
   cpp_namet &declarator_name=declarator.name();

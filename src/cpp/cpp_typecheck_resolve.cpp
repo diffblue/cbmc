@@ -2154,7 +2154,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
         }
 
         cpp_typecheck_fargst new_fargs(fargs);
-        new_fargs.add_object(expr.op0());
+        new_fargs.add_object(to_member_expr(expr).compound());
 
         return new_fargs.match(type, args_distance, cpp_typecheck);
       }

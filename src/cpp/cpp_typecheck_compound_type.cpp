@@ -1278,7 +1278,10 @@ void cpp_typecheckt::typecheck_member_function(
   }
 
   if(value.id() == ID_cpp_not_typechecked && value.has_operands())
-    move_member_initializers(initializers, type, value.op0());
+  {
+    move_member_initializers(
+      initializers, type, to_multi_ary_expr(value).op0());
+  }
   else
     move_member_initializers(initializers, type, value);
 

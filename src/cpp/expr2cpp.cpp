@@ -404,7 +404,7 @@ std::string expr2cppt::convert_code_cpp_delete(
     return convert_norep(src, precedence);
   }
 
-  std::string tmp=convert(src.op0());
+  std::string tmp = convert(to_unary_expr(src).op());
 
   dest+=tmp+";\n";
 
@@ -476,16 +476,17 @@ std::string expr2cppt::convert_code(
 
 std::string expr2cppt::convert_extractbit(const exprt &src)
 {
-  assert(src.operands().size()==2);
-  return convert(src.op0())+"["+convert(src.op1())+"]";
+  const auto &extractbit_expr = to_extractbit_expr(src);
+  return convert(extractbit_expr.op0()) + "[" + convert(extractbit_expr.op1()) +
+         "]";
 }
 
 std::string expr2cppt::convert_extractbits(const exprt &src)
 {
-  assert(src.operands().size()==3);
-  return
-    convert(src.op0())+".range("+convert(src.op1())+ ","+
-    convert(src.op2())+")";
+  const auto &extractbits_expr = to_extractbits_expr(src);
+  return convert(extractbits_expr.src()) + ".range(" +
+         convert(extractbits_expr.upper()) + "," +
+         convert(extractbits_expr.lower()) + ")";
 }
 
 std::string expr2cpp(const exprt &expr, const namespacet &ns)
