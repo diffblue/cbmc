@@ -127,7 +127,7 @@ static void add_to_json(
 
   json_objectt entry{{"function", json_stringt(function_identifier)}};
   if(auto file_name_opt = file_name_string_opt(end_function->source_location))
-    entry["fileName"] = json_stringt{*file_name_opt};
+    entry["file"] = json_stringt{*file_name_opt};
 
   json_arrayt &dead_ins=entry["unreachableInstructions"].make_array();
 
@@ -270,11 +270,11 @@ static void json_output_function(
 {
   json_objectt entry{{"function", json_stringt(function)}};
   if(auto file_name_opt = file_name_string_opt(first_location))
-    entry["file name"] = json_stringt{*file_name_opt};
+    entry["file"] = json_stringt{*file_name_opt};
   if(auto line_opt = line_string_opt(first_location))
-    entry["first line"] = json_numbert{*line_opt};
+    entry["firstLine"] = json_numbert{*line_opt};
   if(auto line_opt = line_string_opt(last_location))
-    entry["last line"] = json_numbert{*line_opt};
+    entry["lastLine"] = json_numbert{*line_opt};
 
   dest.push_back(std::move(entry));
 }
@@ -289,11 +289,11 @@ static void xml_output_function(
 
   x.set_attribute("name", id2string(function));
   if(auto file_name_opt = file_name_string_opt(first_location))
-    x.set_attribute("file name", *file_name_opt);
+    x.set_attribute("file", *file_name_opt);
   if(auto line_opt = line_string_opt(first_location))
-    x.set_attribute("first line", *line_opt);
+    x.set_attribute("first_line", *line_opt);
   if(auto line_opt = line_string_opt(last_location))
-    x.set_attribute("last line", *line_opt);
+    x.set_attribute("last_line", *line_opt);
 }
 
 static void list_functions(
