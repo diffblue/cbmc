@@ -13,8 +13,7 @@ phases:
       - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
       - add-apt-repository ppa:ubuntu-toolchain-r/test
       - apt-get update -y
-      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq lcov cmake curl gdb python-pip
-      - pip install codecov
+      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq lcov cmake curl gdb
   build:
     commands:
       - echo Build started on `date`
@@ -23,11 +22,11 @@ phases:
       - cmake --build build --target coverage -- -j2
   post_build:
     commands:
-      - lcov --capture --directory build --output-file ./lcov.info
+      - lcov --capture --directory build --output-file lcov.info
       - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed 's/pr\///g')
       - COV_SCRIPT=/root/.cache/codecov.sh
       - if [ ! -f "$COV_SCRIPT" ]; then curl -s https://codecov.io/bash > "$COV_SCRIPT"; fi
-      - echo "$CODEBUILD_INITIATOR" | grep GitHub && bash "$COV_SCRIPT" -t "$CODECOV_TOKEN" || true
+      - bash "$COV_SCRIPT" -t "$CODECOV_TOKEN" || true
       - echo Build completed on `date`
 cache:
   paths:
