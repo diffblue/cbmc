@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 
 #include "ai_domain.h"
+#include "ai_storage.h"
 #include "is_threaded.h"
 
 /// The basic interface of an abstract interpreter. This should be enough
@@ -36,8 +37,10 @@ public:
   typedef ai_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  explicit ai_baset(std::unique_ptr<ai_domain_factory_baset> &&df)
-    : domain_factory(std::move(df))
+  ai_baset(
+    std::unique_ptr<ai_domain_factory_baset> &&df,
+    std::unique_ptr<ai_storage_baset> &&st)
+    : domain_factory(std::move(df)), storage(std::move(st))
   {
   }
 
@@ -101,8 +104,10 @@ public:
   /// \return The abstract state before `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual std::shared_ptr<const statet>
-  abstract_state_before(locationt l) const = 0;
+  virtual std::shared_ptr<const statet> abstract_state_before(locationt l) const
+  {
+    return storage->abstract_state_before(l, *domain_factory);
+  }
 
   /// Get a copy of the abstract state after the given instruction, without
   /// needing to know what kind of domain or history is used. Note: intended
@@ -123,6 +128,7 @@ public:
   /// Reset the abstract state
   virtual void clear()
   {
+    storage->clear();
   }
 
   /// Output the abstract states for a single function
@@ -351,11 +357,15 @@ protected:
     return domain_factory->copy(s);
   }
 
-  // abstract methods
+  // Domain storage
+  std::unique_ptr<ai_storage_baset> storage;
 
-  /// Get the state for the given location, creating it in a default way if it
+  /// Get the state for the given location, creating it with the factory if it
   /// doesn't exist
-  virtual statet &get_state(locationt l)=0;
+  virtual statet &get_state(locationt l)
+  {
+    return storage->get_state(l, *domain_factory);
+  }
 };
 
 /// Base class for abstract interpretation. An actual analysis
@@ -406,70 +416,36 @@ class ait:public ai_baset
 public:
   // constructor
   ait()
-    : ai_baset(),
-      domain_factory(
-        util_make_unique<ai_domain_factory_default_constructort<domainT>>())
+    : ai_baset(
+        util_make_unique<ai_domain_factory_default_constructort<domainT>>(),
+        util_make_unique<location_sensitive_storaget>())
   {
   }
 
   explicit ait(std::unique_ptr<ai_domain_factory_baset> &&df)
-    : ai_baset(std::move(df))
+    : ai_baset(std::move(df), util_make_unique<location_sensitive_storaget>())
   {
   }
 
   typedef goto_programt::const_targett locationt;
 
   /// Find the analysis result for a given location.
+  // The older interface for non-modifying access
+  // Not recommended as it will throw an exception if a location has not
+  // been reached in an analysis and there is no (other) way of telling
+  // if a location has been reached.
+  DEPRECATED(SINCE(2019, 08, 01, "use abstract_state_{before,after} instead"))
   const domainT &operator[](locationt l) const
   {
-    typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end())
-      throw std::out_of_range("failed to find state");
+    auto p = storage->abstract_state_before(l, *domain_factory);
 
-    return static_cast<const domainT &>(*(it->second));
-  }
-
-  /// Used internally by the analysis.
-  std::shared_ptr<const statet>
-  abstract_state_before(locationt t) const override
-  {
-    typename state_mapt::const_iterator it = state_map.find(t);
-    if(it == state_map.end())
-      return domain_factory->make(t);
-
-    return it->second;
-  }
-
-  /// Remove all analysis results.
-  void clear() override
-  {
-    state_map.clear();
-    ai_baset::clear();
-  }
-
-protected:
-  /// Map from locations to domain elements, for the results of a static
-  /// analysis.
-  typedef std::shared_ptr<statet> s_ptrt;
-  typedef std::
-    unordered_map<locationt, s_ptrt, const_target_hash, pointee_address_equalt>
-      state_mapt;
-  state_mapt state_map;
-
-  /// Look up the analysis state for a given location, instantiating a new state
-  /// if required. Used internally by the analysis.
-  virtual statet &get_state(locationt l) override
-  {
-    typename state_mapt::const_iterator it = state_map.find(l);
-    if(it == state_map.end())
+    if(p.use_count() == 1)
     {
-      std::shared_ptr<statet> d(domain_factory->make(l));
-      auto p = state_map.insert(std::make_pair(l, d));
-      CHECK_RETURN(p.second);
-      it = p.first;
+      // Would be unsafe to return the dereferenced object
+      throw std::out_of_range("failed to find state");
     }
 
-    return *(it->second);
+    return static_cast<const domainT &>(*p);
   }
 
 private:
