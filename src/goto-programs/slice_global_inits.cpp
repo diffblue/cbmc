@@ -48,7 +48,7 @@ void slice_global_inits(goto_modelt &goto_model)
 
   // gather all symbols used by reachable functions
 
-  find_symbols_sett symbols;
+  find_symbols_sett symbols_to_keep;
 
   for(std::size_t node_idx = 0; node_idx < directed_graph.size(); ++node_idx)
   {
@@ -63,8 +63,8 @@ void slice_global_inits(goto_modelt &goto_model)
 
     for(const auto &i : it->second.body.instructions)
     {
-      i.apply([&symbols](const exprt &expr) {
-        find_symbols(expr, symbols, true, false);
+      i.apply([&symbols_to_keep](const exprt &expr) {
+        find_symbols(expr, symbols_to_keep, true, false);
       });
     }
   }
@@ -87,8 +87,9 @@ void slice_global_inits(goto_modelt &goto_model)
       const symbol_exprt &symbol_expr=to_symbol_expr(code_assign.lhs());
       const irep_idt id=symbol_expr.get_identifier();
 
-      if(!has_prefix(id2string(id), CPROVER_PREFIX) &&
-         symbols.find(id)==symbols.end())
+      if(
+        !has_prefix(id2string(id), CPROVER_PREFIX) &&
+        symbols_to_keep.find(id) == symbols_to_keep.end())
       {
         i_it->turn_into_skip();
       }
