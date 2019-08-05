@@ -25,6 +25,8 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <unordered_map>
 
+class symbol_exprt;
+
 /// Conversion between \c exprt and \c bbdt
 /// This encapsulate a bdd_managert, thus BDDs created with this class should
 /// only be combined with BDDs created using the same instance of
@@ -51,7 +53,8 @@ protected:
   exprt as_expr(
     const bdd_nodet &r,
     bool complement,
-    std::unordered_map<bdd_nodet::idt, exprt> &cache) const;
+    std::unordered_map<bdd_nodet::idt, symbol_exprt> &cache,
+    std::vector<std::pair<symbol_exprt, exprt>> &bindings) const;
 };
 
 #endif // CPROVER_SOLVERS_PROP_BDD_EXPR_H

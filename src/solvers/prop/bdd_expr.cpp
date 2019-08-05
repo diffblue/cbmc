@@ -103,15 +103,24 @@ static exprt make_or(exprt a, exprt b)
   return or_exprt{std::move(a), std::move(b)};
 }
 
-/// Helper function for \c bddt to \c exprt conversion
+/// Helper function for \c bddt to \c exprt conversion.
+/// Uses a cache which maps nodes of the BDD to symbols. The meaning of this
+/// symbols is defined in the \p bindings vector.
+/// and an associated expression.
 /// \param r: node to convert
 /// \param complement: whether we want the negation of the expression
 ///        represented by r
-/// \param cache: map of already computed values
+/// \param cache: map nodes to symbols
+/// \param bindings: associate expressions to symbols which correspond to nodes
+/// \return expr: an expression equivalent to the Boolean formula represented
+///         by the the BDD node \p r (or its complement if complement is true).
+///         The expression may contain symbols whose definition should be
+///         recovered from the cache.
 exprt bdd_exprt::as_expr(
   const bdd_nodet &r,
   bool complement,
-  std::unordered_map<bdd_nodet::idt, exprt> &cache) const
+  std::unordered_map<bdd_nodet::idt, symbol_exprt> &cache,
+  std::vector<std::pair<symbol_exprt, exprt>> &bindings) const
 {
   if(r.is_constant())
   {
@@ -125,11 +134,12 @@ exprt bdd_exprt::as_expr(
   INVARIANT(index < node_map.size(), "Index should be in node_map");
   const exprt &n_expr = node_map[index];
 
+  symbol_exprt symbol{"bdd_node" + std::to_string(index), bool_typet{}};
   // Look-up cache for already computed value
-  auto insert_result = cache.emplace(r.id(), nil_exprt());
+  auto insert_result = cache.emplace(r.id(), symbol);
   if(insert_result.second)
   {
-    insert_result.first->second = [&]() -> exprt {
+    const exprt value = [&]() -> exprt {
       if(r.else_branch().is_constant())
       {
         if(r.then_branch().is_constant())
@@ -147,14 +157,16 @@ exprt bdd_exprt::as_expr(
               as_expr(
                 r.then_branch(),
                 complement != r.then_branch().is_complement(),
-                cache));
+                cache,
+                bindings));
           }
           return make_or(
             not_exprt(n_expr),
             as_expr(
               r.then_branch(),
               complement != r.then_branch().is_complement(),
-              cache));
+              cache,
+              bindings));
         }
       }
       else if(r.then_branch().is_constant())
@@ -166,33 +178,43 @@ exprt bdd_exprt::as_expr(
             as_expr(
               r.else_branch(),
               complement != r.else_branch().is_complement(),
-              cache));
+              cache,
+              bindings));
         }
         return make_or(
           n_expr,
           as_expr(
             r.else_branch(),
             complement != r.else_branch().is_complement(),
-            cache));
+            cache,
+            bindings));
       }
       return if_exprt(
         n_expr,
         as_expr(
           r.then_branch(),
           r.then_branch().is_complement() != complement,
-          cache),
+          cache,
+          bindings),
         as_expr(
           r.else_branch(),
           r.else_branch().is_complement() != complement,
-          cache));
+          cache,
+          bindings));
     }();
+
+    bindings.emplace_back(insert_result.first->second, value);
   }
   return insert_result.first->second;
 }
 
 exprt bdd_exprt::as_expr(const bddt &root) const
 {
-  std::unordered_map<bdd_nodet::idt, exprt> cache;
-  bdd_nodet node = bdd_mgr.bdd_node(root);
-  return as_expr(node, node.is_complement(), cache);
+  std::unordered_map<bdd_nodet::idt, symbol_exprt> cache;
+  std::vector<std::pair<symbol_exprt, exprt>> bindings;
+  const bdd_nodet node = bdd_mgr.bdd_node(root);
+  exprt body = as_expr(node, node.is_complement(), cache, bindings);
+  for(const auto &pair : bindings)
+    body = let_exprt{pair.first, pair.second, body};
+  return body;
 }
