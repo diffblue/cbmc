@@ -69,8 +69,6 @@ void slice_global_inits(goto_modelt &goto_model)
     }
   }
 
-  // now remove unnecessary initializations
-
   goto_functionst::function_mapt::iterator f_it;
   f_it=goto_functions.function_map.find(INITIALIZE_FUNCTION);
 
@@ -79,6 +77,44 @@ void slice_global_inits(goto_modelt &goto_model)
 
   goto_programt &goto_program=f_it->second.body;
 
+  // add all symbols from right-hand sides of required symbols
+  bool fixed_point_reached = false;
+  // markers for each instruction to avoid repeatedly searching the same
+  // instruction for new symbols; initialized to false, and set to true whenever
+  // an instruction is determined to be irrelevant (not an assignment) or
+  // symbols have been collected from it
+  std::vector<bool> seen(goto_program.instructions.size(), false);
+  while(!fixed_point_reached)
+  {
+    fixed_point_reached = true;
+
+    std::vector<bool>::iterator seen_it = seen.begin();
+    forall_goto_program_instructions(i_it, goto_program)
+    {
+      if(!*seen_it && i_it->is_assign())
+      {
+        const code_assignt &code_assign = i_it->get_assign();
+        const irep_idt id = to_symbol_expr(code_assign.lhs()).get_identifier();
+
+        // if we are to keep the left-hand side, then we also need to keep all
+        // symbols occurring in the right-hand side
+        if(
+          has_prefix(id2string(id), CPROVER_PREFIX) ||
+          symbols_to_keep.find(id) != symbols_to_keep.end())
+        {
+          fixed_point_reached = false;
+          find_symbols(code_assign.rhs(), symbols_to_keep, true, false);
+          *seen_it = true;
+        }
+      }
+      else if(!*seen_it)
+        *seen_it = true;
+
+      ++seen_it;
+    }
+  }
+
+  // now remove unnecessary initializations
   Forall_goto_program_instructions(i_it, goto_program)
   {
     if(i_it->is_assign())
