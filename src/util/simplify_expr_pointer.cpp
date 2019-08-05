@@ -376,12 +376,11 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
 
     exprt size_expr = from_integer(*element_size, expr.type());
 
-    exprt product = binary_exprt(sum, ID_mult, size_expr, expr.type());
+    exprt product = mult_exprt(sum, size_expr);
 
     product = simplify_node(product);
 
-    auto new_expr =
-      binary_exprt(pointer_offset_expr, ID_plus, product, expr.type());
+    auto new_expr = plus_exprt(pointer_offset_expr, product);
 
     return changed(simplify_node(new_expr));
   }
