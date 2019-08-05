@@ -140,8 +140,8 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
     return re;
   }
 
-  const auto min_i = get_quantifier_var_min(var_expr, re);
-  const auto max_i = get_quantifier_var_max(var_expr, re);
+  const optionalt<constant_exprt> min_i = get_quantifier_var_min(var_expr, re);
+  const optionalt<constant_exprt> max_i = get_quantifier_var_max(var_expr, re);
 
   if(!min_i.has_value() || !max_i.has_value())
     return nullopt;
