@@ -136,26 +136,6 @@ public:
     add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
   }
 
-  bool get_is_final() const
-  {
-    return get_bool(ID_final);
-  }
-
-  void set_is_final(bool is_final)
-  {
-    set(ID_final, is_final);
-  }
-
-  bool get_native() const
-  {
-    return get_bool(ID_is_native_method);
-  }
-
-  void set_native(bool is_native)
-  {
-    set(ID_is_native_method, is_native);
-  }
-
   bool get_is_varargs() const
   {
     return get_bool(ID_is_varargs_method);

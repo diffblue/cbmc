@@ -89,10 +89,6 @@ SCENARIO(
       {
         REQUIRE(function_type.get_bool(ID_C_java_method_type));
       }
-      THEN("And the method should be marked as a native method")
-      {
-        REQUIRE(to_java_method_type(function_type).get_native());
-      }
       THEN("The method should be marked as declared by its class")
       {
         REQUIRE(
@@ -104,13 +100,6 @@ SCENARIO(
     {
       const symbolt function_symbol =
         symbol_table.lookup_ref(method_name + ":(I)Z");
-
-      const java_method_typet &function_type =
-        require_type::require_java_method(function_symbol.type);
-      THEN("The method should not be marked as a native method.")
-      {
-        REQUIRE_FALSE(to_java_method_type(function_type).get_native());
-      }
       THEN("The method should be marked as declared by its class")
       {
         REQUIRE(
@@ -134,12 +123,6 @@ SCENARIO(
     {
       const symbolt function_symbol =
         symbol_table.lookup_ref("java::ClassWithFinalMethod.finalFunc:()I");
-      const java_method_typet &function_type =
-        require_type::require_java_method(function_symbol.type);
-      THEN("The method should be marked as final")
-      {
-        REQUIRE(function_type.get_is_final());
-      }
       THEN("The method should be marked as declared by its class")
       {
         REQUIRE(
@@ -151,12 +134,6 @@ SCENARIO(
     {
       const symbolt function_symbol =
         symbol_table.lookup_ref("java::ClassWithFinalMethod.nonFinalFunc:()I");
-      const java_method_typet &function_type =
-        require_type::require_java_method(function_symbol.type);
-      THEN("The method should not be marked as final")
-      {
-        REQUIRE(!function_type.get_is_final());
-      }
       THEN("The method should be marked as declared by its class")
       {
         REQUIRE(
@@ -168,12 +145,6 @@ SCENARIO(
     {
       const symbolt function_symbol =
         symbol_table.lookup_ref("java::OpaqueClass.staticFunc:()I");
-      const java_method_typet &function_type =
-        require_type::require_java_method(function_symbol.type);
-      THEN("The method should be marked as final")
-      {
-        REQUIRE(function_type.get_is_final());
-      }
       THEN("The method should be marked as declared by its class")
       {
         REQUIRE(
