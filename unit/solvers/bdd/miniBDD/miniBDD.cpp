@@ -325,29 +325,31 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     REQUIRE(oss.str() == dot_string);
   }
 
-  GIVEN("A bdd for (a&b)|!a")
+  GIVEN("A bdd for (a&b)|!a, !a|b and a&b")
   {
-    symbol_exprt a("a", bool_typet());
-    symbol_exprt b("b", bool_typet());
+    const symbol_exprt a("a", bool_typet());
+    const symbol_exprt b("b", bool_typet());
 
-    or_exprt o(and_exprt(a, b), not_exprt(a));
-
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
-
-    {
-      std::ostringstream oss;
-      oss << format(o);
-      REQUIRE(oss.str() == "(a ∧ b) ∨ ¬a");
-    }
+    const or_exprt expr1{and_exprt{a, b}, not_exprt{a}};
+    const or_exprt expr2{not_exprt{a}, b};
+    const and_exprt expr3{a, b};
 
     bdd_exprt bdd_expr_converter;
-    bddt t = bdd_expr_converter.from_expr(o);
+    const bddt bdd1 = bdd_expr_converter.from_expr(expr1);
+    const bddt bdd2 = bdd_expr_converter.from_expr(expr2);
+    const bddt bdd3 = bdd_expr_converter.from_expr(expr3);
 
+    THEN("The first two BDDs are equal but not the last")
     {
-      std::ostringstream oss;
-      oss << format(bdd_expr_converter.as_expr(t));
-      REQUIRE(oss.str() == "¬a ∨ b");
+      REQUIRE(bdd1.equals(bdd2));
+      REQUIRE_FALSE(bdd1.equals(bdd3));
+    }
+    THEN("bdd1 ^ bdd2 is false")
+    {
+      const bddt result = bdd1.bdd_xor(bdd2);
+      REQUIRE(result.is_false());
+      const exprt as_expr = bdd_expr_converter.as_expr(result);
+      REQUIRE(as_expr == false_exprt{});
     }
   }
 }

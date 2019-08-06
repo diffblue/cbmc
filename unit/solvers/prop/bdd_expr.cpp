@@ -46,23 +46,20 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     }
   }
 
-  GIVEN("A bdd for (a&!b)")
+  GIVEN("A bdd for (a&!b) and a bdd for !(b|!a)")
   {
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
 
     const bddt bdd = bdd_expr_converter.from_expr(and_exprt(a, not_exprt(b)));
+    const bddt bdd2 =
+      bdd_expr_converter.from_expr(not_exprt{or_exprt{b, not_exprt{a}}});
 
-    WHEN("It is converted to an exprt")
+    THEN("The expressions corresponding to the BDDs are identical")
     {
       const exprt result = bdd_expr_converter.as_expr(bdd);
-      THEN("It is equal to the expression (a & !b) or (!b & a)")
-      {
-        REQUIRE(result.id() == ID_and);
-        REQUIRE(result.operands().size() == 2);
-        REQUIRE((result.op0() == a || result.op1() == a));
-        REQUIRE((result.op0() == not_exprt(b) || result.op1() == not_exprt(b)));
-      }
+      const exprt result2 = bdd_expr_converter.as_expr(bdd2);
+      REQUIRE(result == result2);
     }
   }
 }
