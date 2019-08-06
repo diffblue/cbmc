@@ -4481,8 +4481,6 @@ inline cond_exprt &to_cond_expr(exprt &expr)
 /// function, respectively. The range is given by the type of the expression,
 /// which has to be an \ref array_typet (which includes a value for
 /// `array_size`).
-/// For legacy reasons, the ID of an array_comprehension_exprt is ID_lambda,
-/// even though it cannot be used to represent arbitrary lambda functions.
 class array_comprehension_exprt : public binary_exprt
 {
 public:
@@ -4490,7 +4488,11 @@ public:
     symbol_exprt arg,
     exprt body,
     array_typet _type)
-    : binary_exprt(std::move(arg), ID_lambda, std::move(body), std::move(_type))
+    : binary_exprt(
+        std::move(arg),
+        ID_array_comprehension,
+        std::move(body),
+        std::move(_type))
   {
   }
 
@@ -4528,7 +4530,7 @@ public:
 template <>
 inline bool can_cast_expr<array_comprehension_exprt>(const exprt &base)
 {
-  return base.id() == ID_lambda;
+  return base.id() == ID_array_comprehension;
 }
 
 inline void validate_expr(const array_comprehension_exprt &value)
@@ -4545,7 +4547,7 @@ inline void validate_expr(const array_comprehension_exprt &value)
 inline const array_comprehension_exprt &
 to_array_comprehension_expr(const exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_lambda);
+  PRECONDITION(expr.id() == ID_array_comprehension);
   const array_comprehension_exprt &ret =
     static_cast<const array_comprehension_exprt &>(expr);
   validate_expr(ret);
@@ -4555,7 +4557,7 @@ to_array_comprehension_expr(const exprt &expr)
 /// \copydoc to_array_comprehension_expr(const exprt &)
 inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_lambda);
+  PRECONDITION(expr.id() == ID_array_comprehension);
   array_comprehension_exprt &ret =
     static_cast<array_comprehension_exprt &>(expr);
   validate_expr(ret);

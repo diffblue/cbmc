@@ -290,8 +290,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_complex_real(to_complex_real_expr(expr));
   else if(expr.id()==ID_complex_imag)
     return convert_complex_imag(to_complex_imag_expr(expr));
-  else if(expr.id()==ID_lambda)
-    return convert_lambda(to_array_comprehension_expr(expr));
+  else if(expr.id() == ID_array_comprehension)
+    return convert_array_comprehension(to_array_comprehension_expr(expr));
   else if(expr.id()==ID_array_of)
     return convert_array_of(to_array_of_expr(expr));
   else if(expr.id()==ID_let)
@@ -313,7 +313,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   return conversion_failed(expr);
 }
 
-bvt boolbvt::convert_lambda(const array_comprehension_exprt &expr)
+bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 

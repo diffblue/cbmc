@@ -49,7 +49,7 @@ simplify_exprt::simplify_index(const index_exprt &expr)
     }
   }
 
-  if(array.id() == ID_lambda)
+  if(array.id() == ID_array_comprehension)
   {
     // simplify (lambda i: e)(x) to e[i/x]
 

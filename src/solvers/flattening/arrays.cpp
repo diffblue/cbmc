@@ -83,7 +83,7 @@ void arrayst::collect_indices(const exprt &expr)
 {
   if(expr.id()!=ID_index)
   {
-    if(expr.id() == ID_lambda)
+    if(expr.id() == ID_array_comprehension)
       array_comprehension_args.insert(
         to_array_comprehension_expr(expr).arg().get_identifier());
 
@@ -228,7 +228,7 @@ void arrayst::collect_arrays(const exprt &a)
     arrays.make_union(a, a.op0());
     collect_arrays(a.op0());
   }
-  else if(a.id() == ID_lambda)
+  else if(a.id() == ID_array_comprehension)
   {
   }
   else
@@ -470,7 +470,7 @@ void arrayst::add_array_constraints(
     return add_array_constraints_array_of(index_set, to_array_of_expr(expr));
   else if(expr.id() == ID_array)
     return add_array_constraints_array_constant(index_set, to_array_expr(expr));
-  else if(expr.id() == ID_lambda)
+  else if(expr.id() == ID_array_comprehension)
   {
     return add_array_constraints_comprehension(
       index_set, to_array_comprehension_expr(expr));
