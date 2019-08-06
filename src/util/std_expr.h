@@ -4327,48 +4327,112 @@ public:
 };
 
 /// \brief A let expression
-class let_exprt : public ternary_exprt
+class let_exprt : public binary_exprt
 {
 public:
-  let_exprt(symbol_exprt symbol, exprt value, const exprt &where)
-    : ternary_exprt(
+  let_exprt(
+    binding_exprt::variablest variables,
+    operandst values,
+    const exprt &where)
+    : binary_exprt(
+        binding_exprt(
+          ID_let_binding,
+          std::move(variables),
+          where,
+          where.type()),
         ID_let,
-        std::move(symbol),
-        std::move(value),
-        where,
+        multi_ary_exprt(irep_idt(), std::move(values), typet(ID_tuple)),
         where.type())
   {
+    PRECONDITION(this->variables().size() == this->values().size());
   }
 
+  /// convenience constructor for the case of a single binding
+  let_exprt(symbol_exprt symbol, exprt value, const exprt &where)
+    : let_exprt(
+        binding_exprt::variablest{std::move(symbol)},
+        operandst{std::move(value)},
+        where)
+  {
+  }
+
+  binding_exprt &binding()
+  {
+    return static_cast<binding_exprt &>(op0());
+  }
+
+  const binding_exprt &binding() const
+  {
+    return static_cast<const binding_exprt &>(op0());
+  }
+
+  /// convenience accessor for the symbol of a single binding
   symbol_exprt &symbol()
   {
-    return static_cast<symbol_exprt &>(op0());
+    auto &variables = binding().variables();
+    PRECONDITION(variables.size() == 1);
+    return variables.front();
   }
 
+  /// convenience accessor for the symbol of a single binding
   const symbol_exprt &symbol() const
   {
-    return static_cast<const symbol_exprt &>(op0());
+    const auto &variables = binding().variables();
+    PRECONDITION(variables.size() == 1);
+    return variables.front();
   }
 
+  /// convenience accessor for the value of a single binding
   exprt &value()
   {
-    return op1();
+    auto &values = this->values();
+    PRECONDITION(values.size() == 1);
+    return values.front();
   }
 
+  /// convenience accessor for the value of a single binding
   const exprt &value() const
   {
-    return op1();
+    const auto &values = this->values();
+    PRECONDITION(values.size() == 1);
+    return values.front();
   }
 
+  operandst &values()
+  {
+    return static_cast<multi_ary_exprt &>(op1()).operands();
+  }
+
+  const operandst &values() const
+  {
+    return static_cast<const multi_ary_exprt &>(op1()).operands();
+  }
+
+  /// convenience accessor for binding().variables()
+  binding_exprt::variablest &variables()
+  {
+    return binding().variables();
+  }
+
+  /// convenience accessor for binding().variables()
+  const binding_exprt::variablest &variables() const
+  {
+    return binding().variables();
+  }
+
+  /// convenience accessor for binding().where()
   exprt &where()
   {
-    return op2();
+    return binding().where();
   }
 
+  /// convenience accessor for binding().where()
   const exprt &where() const
   {
-    return op2();
+    return binding().where();
   }
+
+  static void validate(const exprt &, validation_modet);
 };
 
 template <>
@@ -4377,9 +4441,9 @@ inline bool can_cast_expr<let_exprt>(const exprt &base)
   return base.id() == ID_let;
 }
 
-inline void validate_expr(const let_exprt &value)
+inline void validate_expr(const let_exprt &let_expr)
 {
-  validate_operands(value, 3, "Let must have three operands");
+  validate_operands(let_expr, 2, "Let must have two operands");
 }
 
 /// \brief Cast an exprt to a \ref let_exprt

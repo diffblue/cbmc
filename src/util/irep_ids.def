@@ -4,6 +4,7 @@
 
 IREP_ID_TWO(empty_string, )
 IREP_ID_ONE(let)
+IREP_ID_ONE(let_binding)
 IREP_ID_ONE(nil)
 IREP_ID_ONE(type)
 IREP_ID_ONE(bool)

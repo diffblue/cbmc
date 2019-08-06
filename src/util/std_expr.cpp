@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_types.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
+#include "range.h"
 #include "simplify_expr.h"
 
 bool constant_exprt::value_is_zero_string() const
@@ -302,4 +303,30 @@ void dereference_exprt::validate(
     dereference_expr.type() == pointer_type->subtype(),
     "dereference expression's type must match the subtype of the type of its "
     "operand");
+}
+
+void let_exprt::validate(const exprt &expr, const validation_modet vm)
+{
+  check(expr, vm);
+
+  const auto &let_expr = to_let_expr(expr);
+
+  DATA_CHECK(
+    vm,
+    let_expr.values().size() == let_expr.variables().size(),
+    "number of variables must match number of values");
+
+  for(const auto &binding :
+      make_range(let_expr.variables()).zip(let_expr.values()))
+  {
+    DATA_CHECK(
+      vm,
+      binding.first.id() == ID_symbol,
+      "let binding symbols must be symbols");
+
+    DATA_CHECK(
+      vm,
+      binding.first.type() == binding.second.type(),
+      "let bindings must be type consistent");
+  }
 }
