@@ -171,9 +171,15 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
 
+  static_assert(
+    level == L0 || level == L1 || level == L1_WITH_CONSTANT_PROPAGATION ||
+      level == L2,
+    "must handle all renaming levels");
+
   if(expr.id()==ID_symbol &&
      expr.get_bool(ID_C_SSA_symbol))
   {
+    exprt original_expr = expr;
     ssa_exprt &ssa=to_ssa_expr(expr);
 
     if(level == L0)
@@ -186,7 +192,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       return renamedt<exprt, level>{
         std::move(rename_ssa<L1>(std::move(ssa), ns).value())};
     }
-    else if(level==L2)
+    else
     {
       ssa = set_indices<L1>(std::move(ssa), ns).get();
       rename<level>(expr.type(), ssa.get_identifier(), ns);
@@ -195,7 +201,14 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       // renaming taken care of by l2_thread_encoding, or already at L2
       if(l2_thread_read_encoding(ssa, ns) || !ssa.get_level_2().empty())
       {
-        return renamedt<exprt, level>(std::move(ssa));
+        if(level == L1_WITH_CONSTANT_PROPAGATION)
+        {
+          // Don't actually rename to L2 -- we just used `ssa` to check whether
+          // constant-propagation was applicable
+          return renamedt<exprt, level>(std::move(original_expr));
+        }
+        else
+          return renamedt<exprt, level>(std::move(ssa));
       }
       else
       {
@@ -209,7 +222,8 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
         }
         else
         {
-          ssa = set_indices<L2>(std::move(ssa), ns).get();
+          if(level == L2)
+            ssa = set_indices<L2>(std::move(ssa), ns).get();
           return renamedt<exprt, level>(std::move(ssa));
         }
       }
@@ -260,6 +274,11 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     return renamedt<exprt, level>{std::move(expr)};
   }
 }
+
+// Explicitly instantiate the one version of this function without an explicit
+// caller in this file:
+template renamedt<exprt, L1_WITH_CONSTANT_PROPAGATION>
+goto_symex_statet::rename(exprt expr, const namespacet &ns);
 
 exprt goto_symex_statet::l2_rename_rvalues(exprt lvalue, const namespacet &ns)
 {

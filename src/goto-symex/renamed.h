@@ -16,7 +16,8 @@ enum levelt
 {
   L0 = 0,
   L1 = 1,
-  L2 = 2
+  L1_WITH_CONSTANT_PROPAGATION = 2,
+  L2 = 3
 };
 
 /// Wrapper for expressions or types which have been renamed up to a given
