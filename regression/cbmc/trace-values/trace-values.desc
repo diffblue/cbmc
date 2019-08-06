@@ -9,10 +9,13 @@ trace-values.c
 ^  local_var=3 .*$
 ^  my_nested\[0.*\].array\[1.*\]=4 .*$
 ^  my_nested\[1.*\].f=5 .*$
-^  null\$object=6 .*$
 ^  junk\$object=7 .*$
 ^  dynamic_object1\[1.*\]=8 .*$
 ^  my_nested\[1.*\]=\{ .f=0, .array=\{ 0, 4, 0 \} \} .*$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
+--
+Note the assignment to "null" is not included because an assignment direct to
+a certainly-null pointer goes to symex::invalid_object, not null$object, and is
+hidden from the --trace output.
