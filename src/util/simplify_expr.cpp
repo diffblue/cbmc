@@ -571,8 +571,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
       from_integer(0, op_type));
     inequality.add_source_location()=expr.source_location();
-    simplify_node(inequality);
-    return std::move(inequality);
+    return changed(simplify_node(inequality));
   }
 
   // eliminate casts from proper bool
@@ -611,9 +610,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   {
     // rewrite (_Bool)x to (_Bool)(x!=0)
     exprt inequality = is_not_zero(expr.op(), ns);
-    simplify_node(inequality);
     auto new_expr = expr;
-    new_expr.op() = std::move(inequality);
+    new_expr.op() = simplify_node(std::move(inequality));
     return changed(simplify_typecast(new_expr)); // recursive call
   }
 
@@ -724,9 +722,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
             *it = simplify_typecast(new_operand); // recursive call
           }
 
-          simplify_node(result); // possibly recursive call
-
-          return std::move(result);
+          return changed(simplify_node(result)); // possibly recursive call
         }
       }
       else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
@@ -1978,10 +1974,9 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           {
             exprt compo_offset = from_integer(*i, offset.type());
             plus_exprt new_offset(offset, compo_offset);
-            simplify_node(new_offset);
             exprt new_value(with.new_value());
             auto tmp = expr;
-            tmp.set_offset(std::move(new_offset));
+            tmp.set_offset(simplify_node(std::move(new_offset)));
             tmp.set_value(std::move(new_value));
             return changed(simplify_byte_update(tmp)); // recursive call
           }
@@ -1993,22 +1988,20 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
         if(i.has_value())
         {
           const exprt &index=with.where();
-          mult_exprt index_offset(index, from_integer(*i, index.type()));
-          simplify_node(index_offset);
+          exprt index_offset =
+            simplify_node(mult_exprt(index, from_integer(*i, index.type())));
 
           // index_offset may need a typecast
           if(offset.type() != index.type())
           {
-            typecast_exprt tmp(index_offset, offset.type());
-            simplify_node(tmp);
-            index_offset.swap(tmp);
+            index_offset =
+              simplify_node(typecast_exprt(index_offset, offset.type()));
           }
 
           plus_exprt new_offset(offset, index_offset);
-          simplify_node(new_offset);
           exprt new_value(with.new_value());
           auto tmp = expr;
-          tmp.set_offset(std::move(new_offset));
+          tmp.set_offset(simplify_node(std::move(new_offset)));
           tmp.set_value(std::move(new_value));
           return changed(simplify_byte_update(tmp)); // recursive call
         }
@@ -2226,20 +2219,19 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
   return result;
 }
 
-bool simplify_exprt::simplify_node(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
 {
-  if(!expr.has_operands())
-    return true; // no change
+  if(!node.has_operands())
+    return unchanged(node); // no change
 
     // #define DEBUGX
 
 #ifdef DEBUGX
-  exprt old(expr);
+  exprt old(node);
 #endif
 
-  bool no_change = true;
-
-  no_change = sort_and_join(expr) && no_change;
+  exprt expr = node;
+  bool no_change_sort_and_join = sort_and_join(expr);
 
   resultt<> r = unchanged(expr);
 
@@ -2440,26 +2432,23 @@ bool simplify_exprt::simplify_node(exprt &expr)
     r = simplify_complex(to_unary_expr(expr));
   }
 
-  if(r.has_changed())
-  {
-    expr = r.expr;
-    no_change = false;
-  }
+  if(!no_change_sort_and_join)
+    r = changed(r);
 
 #ifdef DEBUGX
   if(
-    !no_change
+    r.has_changed()
 #  ifdef DEBUG_ON_DEMAND
     && debug_on
 #  endif
   )
   {
-    std::cout << "===== " << old.id() << ": " << format(old) << '\n'
-              << " ---> " << format(expr) << '\n';
+    std::cout << "===== " << node.id() << ": " << format(node) << '\n'
+              << " ---> " << format(r.expr) << '\n';
   }
 #endif
 
-  return no_change;
+  return r;
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
@@ -2485,10 +2474,15 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
 
   // We work on a copy to prevent unnecessary destruction of sharing.
   exprt tmp=expr;
-  bool result = simplify_node_preorder(tmp);
+  bool no_change = simplify_node_preorder(tmp);
 
-  if(!simplify_node(tmp))
-    result=false;
+  auto simplify_node_result = simplify_node(tmp);
+
+  if(simplify_node_result.has_changed())
+  {
+    no_change = false;
+    tmp = simplify_node_result.expr;
+  }
 
 #ifdef USE_LOCAL_REPLACE_MAP
   #if 1
@@ -2496,19 +2490,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
   if(it!=local_replace_map.end())
   {
     tmp=it->second;
-    result=false;
+    no_change = false;
   }
   #else
   if(!local_replace_map.empty() &&
      !replace_expr(local_replace_map, tmp))
   {
     simplify_rec(tmp);
-    result=false;
+    no_change = false;
   }
   #endif
 #endif
 
-  if(result) // no change
+  if(no_change) // no change
   {
     return unchanged(expr);
   }

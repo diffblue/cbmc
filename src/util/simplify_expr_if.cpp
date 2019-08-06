@@ -350,41 +350,29 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
       else if(truevalue.is_false() && falsevalue.is_true())
       {
         // a?0:1 <-> !a
-        exprt tmp = boolean_negate(cond);
-        simplify_node(tmp);
-        return std::move(tmp);
+        return changed(simplify_node(boolean_negate(cond)));
       }
       else if(falsevalue.is_false())
       {
         // a?b:0 <-> a AND b
-        and_exprt tmp(cond, truevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
+        return changed(simplify_node(and_exprt(cond, truevalue)));
       }
       else if(falsevalue.is_true())
       {
         // a?b:1 <-> !a OR b
-        exprt tmp_not_cond = boolean_negate(cond);
-        simplify_node(tmp_not_cond);
-        or_exprt tmp(tmp_not_cond, truevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
+        return changed(simplify_node(
+          or_exprt(simplify_node(boolean_negate(cond)), truevalue)));
       }
       else if(truevalue.is_true())
       {
         // a?1:b <-> a||(!a && b) <-> a OR b
-        or_exprt tmp(cond, falsevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
+        return changed(simplify_node(or_exprt(cond, falsevalue)));
       }
       else if(truevalue.is_false())
       {
         // a?0:b <-> !a && b
-        exprt tmp_not_cond = boolean_negate(cond);
-        simplify_node(tmp_not_cond);
-        and_exprt tmp(tmp_not_cond, falsevalue);
-        simplify_node(tmp);
-        return std::move(tmp);
+        return changed(simplify_node(
+          and_exprt(simplify_node(boolean_negate(cond)), falsevalue)));
       }
     }
   }
