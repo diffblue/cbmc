@@ -661,8 +661,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     op_type.id() == ID_pointer && expr.op().id() == ID_plus &&
     expr.op().operands().size() == 2 &&
     ((expr.op().op0().id() == ID_typecast &&
-      expr.op().op0().operands().size() == 1 &&
-      expr.op().op0().op0().is_zero()) ||
+      to_typecast_expr(expr.op().op0()).op().is_zero()) ||
      (expr.op().op0().is_constant() &&
       to_constant_expr(expr.op().op0()).get_value() == ID_NULL)))
   {
@@ -1076,14 +1075,14 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   {
     // (T1)(T2)x ---> (T1)
     // where T1 has fewer bits than T2
-    if(operand.operands().size()==1 &&
-       op_type_id==expr_type_id &&
-       (expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv) &&
-       to_bitvector_type(expr_type).get_width()<=
-         to_bitvector_type(operand.type()).get_width())
+    if(
+      op_type_id == expr_type_id &&
+      (expr_type_id == ID_unsignedbv || expr_type_id == ID_signedbv) &&
+      to_bitvector_type(expr_type).get_width() <=
+        to_bitvector_type(operand.type()).get_width())
     {
       auto new_expr = expr;
-      new_expr.op() = expr.op().op0();
+      new_expr.op() = to_typecast_expr(operand).op();
       // might enable further simplification
       return changed(simplify_typecast(new_expr)); // recursive call
     }
@@ -1139,9 +1138,9 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
     return changed(simplify_rec(tmp));
   }
   // rewrite *(&a[0] + x) to a[x]
-  else if(pointer.id()==ID_plus &&
-          pointer.operands().size()==2 &&
-          pointer.op0().id()==ID_address_of)
+  else if(
+    pointer.id() == ID_plus && pointer.operands().size() == 2 &&
+    to_plus_expr(pointer).op0().id() == ID_address_of)
   {
     const address_of_exprt &address_of=
       to_address_of_expr(pointer.op0());
