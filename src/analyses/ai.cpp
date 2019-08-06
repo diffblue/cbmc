@@ -248,30 +248,18 @@ bool ai_baset::visit(
   bool new_data=false;
 
   // Function call and end are special cases
-  if(l->is_function_call() && !goto_functions.function_map.empty())
+  if(l->is_function_call())
   {
     DATA_INVARIANT(
       goto_program.get_successors(l).size() == 1,
       "function calls only have one successor");
+
     DATA_INVARIANT(
       *(goto_program.get_successors(l).begin()) == std::next(l),
       "function call successor / return location must be the next instruction");
 
-    const code_function_callt &code = to_code_function_call(l->code);
-
-    locationt to_l = std::next(l);
-    if(do_function_call_rec(
-         function_id,
-         l,
-         to_l,
-         code.function(),
-         code.arguments(),
-         goto_functions,
-         ns))
-    {
-      new_data = true;
-      put_in_working_set(working_set, to_l);
-    }
+    new_data = visit_function_call(
+      function_id, l, working_set, goto_program, goto_functions, ns);
   }
   else if(l->is_end_function())
   {
@@ -279,7 +267,8 @@ bool ai_baset::visit(
       goto_program.get_successors(l).empty(),
       "The end function instruction should have no successors.");
 
-    // Do nothing
+    new_data = visit_end_function(
+      function_id, l, working_set, goto_program, goto_functions, ns);
   }
   else
   {
@@ -327,108 +316,110 @@ bool ai_baset::visit_edge(
   return false;
 }
 
-bool ai_baset::do_function_call(
+bool ai_baset::visit_edge_function_call(
   const irep_idt &calling_function_id,
   locationt l_call,
   locationt l_return,
+  const irep_idt &,
+  working_sett &working_set,
+  const goto_programt &,
+  const goto_functionst &,
+  const namespacet &ns)
+{
+  // The default implementation is not interprocedural
+  // so the effects of the call are approximated but nothing else
+  return visit_edge(
+    calling_function_id,
+    l_call,
+    calling_function_id,
+    l_return,
+    ns,
+    working_set);
+}
+
+bool ai_baset::visit_function_call(
+  const irep_idt &calling_function_id,
+  locationt l_call,
+  working_sett &working_set,
+  const goto_programt &caller,
   const goto_functionst &goto_functions,
-  const goto_functionst::function_mapt::const_iterator f_it,
-  const exprt::operandst &,
   const namespacet &ns)
 {
   PRECONDITION(l_call->is_function_call());
 
-  const goto_functionst::goto_functiont &goto_function=
-    f_it->second;
+  locationt l_return = std::next(l_call);
 
-  // This branch is for legacy support only and is deprecated
-
-  if(!goto_function.body_available())
+  // operator() allows analysis of a single goto_program independently
+  // it generates a synthetic goto_functions object for this
+  if(!goto_functions.function_map.empty())
   {
-    working_sett working_set; // Redundant; visit will add l_return
+    const code_function_callt &code = to_code_function_call(l_call->code);
+    const exprt &callee_expression = code.function();
 
-    // If we don't have a body, we just do an edge call -> return
-    return visit_edge(
-      calling_function_id,
-      l_call,
-      calling_function_id,
-      l_return,
-      ns,
-      working_set);
+    if(callee_expression.id() == ID_symbol)
+    {
+      const irep_idt &callee_function_id =
+        to_symbol_expr(callee_expression).get_identifier();
+
+      goto_functionst::function_mapt::const_iterator it =
+        goto_functions.function_map.find(callee_function_id);
+
+      DATA_INVARIANT(
+        it != goto_functions.function_map.end(),
+        "Function " + id2string(callee_function_id) + "not in function map");
+
+      const goto_functionst::goto_functiont &callee_fun = it->second;
+
+      if(callee_fun.body_available())
+      {
+        return visit_edge_function_call(
+          calling_function_id,
+          l_call,
+          l_return,
+          callee_function_id,
+          working_set,
+          callee_fun.body,
+          goto_functions,
+          ns);
+      }
+      else
+      {
+        // Fall through to the default, body not available, case
+      }
+    }
+    else
+    {
+      // Function pointers are not currently supported and must be removed
+      DATA_INVARIANT(
+        callee_expression.id() == ID_symbol,
+        "Function pointers and indirect calls must be removed before "
+        "analysis.");
+    }
   }
 
-  DATA_INVARIANT(
-    !goto_function.body.instructions.empty(),
-    "By analysis time, all functions should have bodies");
-
-  // This is the edge from call site to function head.
-
-  {
-    locationt l_begin=goto_function.body.instructions.begin();
-
-    working_sett working_set; // Redundant; fixpoint will add l_begin
-
-    // Do the edge from the call site to the beginning of the function
-    bool new_data = visit_edge(
-      calling_function_id, l_call, f_it->first, l_begin, ns, working_set);
-
-    // do we need to do/re-do the fixedpoint of the body?
-    if(new_data)
-      fixedpoint(f_it->first, goto_function.body, goto_functions, ns);
-  }
-
-  // This is the edge from function end to return site.
-
-  {
-    // get location at end of the procedure we have called
-    locationt l_end=--goto_function.body.instructions.end();
-    assert(l_end->is_end_function());
-
-    // do edge from end of function to instruction after call
-    const statet &end_state=get_state(l_end);
-
-    if(end_state.is_bottom())
-      return false; // function exit point not reachable
-
-    working_sett working_set; // Redundant; visit will add l_return
-
-    return visit_edge(
-      f_it->first, l_end, calling_function_id, l_return, ns, working_set);
-  }
+  // If the body is not available then we just do the edge from call to return
+  // in the caller.  Domains should over-approximate what the function might do.
+  return visit_edge(
+    calling_function_id,
+    l_call,
+    calling_function_id,
+    l_return,
+    ns,
+    working_set);
 }
 
-bool ai_baset::do_function_call_rec(
-  const irep_idt &calling_function_id,
-  locationt l_call,
-  locationt l_return,
-  const exprt &function,
-  const exprt::operandst &arguments,
+bool ai_baset::visit_end_function(
+  const irep_idt &function_id,
+  locationt l,
+  working_sett &working_set,
+  const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  PRECONDITION(!goto_functions.function_map.empty());
+  PRECONDITION(l->is_end_function());
 
-  // This is quite a strong assumption on the well-formedness of the program.
-  // It means function pointers must be removed before use.
-  DATA_INVARIANT(
-    function.id() == ID_symbol,
-    "Function pointers and indirect calls must be removed before analysis.");
-
-  bool new_data=false;
-
-  const irep_idt &identifier = to_symbol_expr(function).get_identifier();
-
-  goto_functionst::function_mapt::const_iterator it =
-    goto_functions.function_map.find(identifier);
-
-  DATA_INVARIANT(
-    it != goto_functions.function_map.end(),
-    "Function " + id2string(identifier) + "not in function map");
-
-  new_data = do_function_call(
-    calling_function_id, l_call, l_return, goto_functions, it, arguments, ns);
-
-  return new_data;
+  // Do nothing
+  return false;
 }
 
 void ai_baset::fixedpoint(
@@ -442,3 +433,57 @@ void ai_baset::fixedpoint(
     fixedpoint(f_it->first, f_it->second.body, goto_functions, ns);
 }
 
+bool ai_recursive_interproceduralt::visit_edge_function_call(
+  const irep_idt &calling_function_id,
+  locationt l_call,
+  locationt l_return,
+  const irep_idt &callee_function_id,
+  working_sett &working_set,
+  const goto_programt &callee,
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  // This is the edge from call site to function head.
+  {
+    locationt l_begin = callee.instructions.begin();
+
+    working_sett ignore_working_set; // Redundant; fixpoint will add l_begin
+
+    // Do the edge from the call site to the beginning of the function
+    bool new_data = visit_edge(
+      calling_function_id,
+      l_call,
+      callee_function_id,
+      l_begin,
+      ns,
+      ignore_working_set);
+
+    // do we need to do/re-do the fixedpoint of the body?
+    if(new_data)
+      fixedpoint(callee_function_id, callee, goto_functions, ns);
+  }
+
+  // This is the edge from function end to return site.
+
+  {
+    // get location at end of the procedure we have called
+    locationt l_end = --callee.instructions.end();
+    DATA_INVARIANT(
+      l_end->is_end_function(),
+      "The last instruction of a goto_program must be END_FUNCTION");
+
+    // do edge from end of function to instruction after call
+    const statet &end_state = get_state(l_end);
+
+    if(end_state.is_bottom())
+      return false; // function exit point not reachable
+
+    return visit_edge(
+      callee_function_id,
+      l_end,
+      calling_function_id,
+      l_return,
+      ns,
+      working_set);
+  }
+}

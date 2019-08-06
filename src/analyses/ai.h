@@ -312,6 +312,26 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
+  // function calls and return are special cases
+  // different kinds of analysis handle these differently so these are virtual
+  // visit_function_call handles which function(s) to call,
+  // while visit_edge_function_call handles a single call
+  virtual bool visit_function_call(
+    const irep_idt &function_id,
+    locationt l,
+    working_sett &working_set,
+    const goto_programt &goto_program,
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
+
+  virtual bool visit_end_function(
+    const irep_idt &function_id,
+    locationt l,
+    working_sett &working_set,
+    const goto_programt &goto_program,
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
+
   // The most basic step, computing one edge / transformer application.
   bool visit_edge(
     const irep_idt &function_id,
@@ -321,23 +341,14 @@ protected:
     const namespacet &ns,
     working_sett &working_set);
 
-  // function calls
-  bool do_function_call_rec(
+  virtual bool visit_edge_function_call(
     const irep_idt &calling_function_id,
     locationt l_call,
     locationt l_return,
-    const exprt &function,
-    const exprt::operandst &arguments,
+    const irep_idt &callee_function_id,
+    working_sett &working_set,
+    const goto_programt &callee,
     const goto_functionst &goto_functions,
-    const namespacet &ns);
-
-  bool do_function_call(
-    const irep_idt &calling_function_id,
-    locationt l_call,
-    locationt l_return,
-    const goto_functionst &goto_functions,
-    const goto_functionst::function_mapt::const_iterator f_it,
-    const exprt::operandst &arguments,
     const namespacet &ns);
 
   /// For creating domain objects
@@ -366,6 +377,31 @@ protected:
   {
     return storage->get_state(l, *domain_factory);
   }
+};
+
+// Perform interprocedural analysis by simply recursing in the interpreter
+// This can lead to a call stack overflow if the domain has a large height
+class ai_recursive_interproceduralt : public ai_baset
+{
+public:
+  ai_recursive_interproceduralt(
+    std::unique_ptr<ai_domain_factory_baset> &&df,
+    std::unique_ptr<ai_storage_baset> &&st)
+    : ai_baset(std::move(df), std::move(st))
+  {
+  }
+
+protected:
+  // Override the function that handles a single function call edge
+  bool visit_edge_function_call(
+    const irep_idt &calling_function_id,
+    locationt l_call,
+    locationt l_return,
+    const irep_idt &callee_function_id,
+    working_sett &working_set,
+    const goto_programt &callee,
+    const goto_functionst &goto_functions,
+    const namespacet &ns) override;
 };
 
 /// Base class for abstract interpretation. An actual analysis
@@ -410,20 +446,22 @@ protected:
 ///
 /// \tparam domainT A type derived from ai_domain_baset that represents the
 ///     values in the AI domain
-template<typename domainT>
-class ait:public ai_baset
+template <typename domainT>
+class ait : public ai_recursive_interproceduralt
 {
 public:
   // constructor
   ait()
-    : ai_baset(
+    : ai_recursive_interproceduralt(
         util_make_unique<ai_domain_factory_default_constructort<domainT>>(),
         util_make_unique<location_sensitive_storaget>())
   {
   }
 
   explicit ait(std::unique_ptr<ai_domain_factory_baset> &&df)
-    : ai_baset(std::move(df), util_make_unique<location_sensitive_storaget>())
+    : ai_recursive_interproceduralt(
+        std::move(df),
+        util_make_unique<location_sensitive_storaget>())
   {
   }
 
