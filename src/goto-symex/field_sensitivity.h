@@ -28,9 +28,10 @@ class symex_targett;
 /// Note that field sensitivity is not applied as a single pass over the
 /// whole goto program but instead applied as the symbolic execution unfolds.
 ///
-/// On a high level, field sensitivity replaces member operators with atomic
-/// symbols representing a field when possible. In cases where this is not
-/// immediately possible, like struct assignments, some things need to be added.
+/// On a high level, field sensitivity replaces member operators, and array
+/// accesses with atomic symbols representing a field when possible.
+/// In cases where this is not immediately possible, like struct assignments,
+/// some things need to be added.
 /// The possible cases are described below.
 ///
 /// ### Member access
@@ -51,6 +52,30 @@ class symex_targett;
 /// of assignments:
 /// `struct_expr..field_name1 = other_struct..field_name1;`
 /// `struct_expr..field_name2 = other_struct..field_name2;` etc.
+/// See \ref field_sensitivityt::field_assignments.
+///
+/// ### Array access
+/// An index expression `array[index]` when index is constant and array has
+/// constant size is replaced by the symbol `array[[index]]`; note the use
+/// of `[[` and `]]` to visually distinguish the symbol from the index
+/// expression.
+/// When `index` is not a constant, `array[index]` is replaced by
+///  `{array[[0]]; array[[1]]; …index]`.
+/// Note that this process does not apply to arrays whose size is not constant,
+/// and arrays whose size exceed the bound \ref MAX_FIELD_SENSITIVITY_ARRAY_SIZE
+/// See \ref field_sensitivityt::apply.
+///
+/// ### Symbols representing arrays
+/// In an rvalue, a symbol `array` which has array type will be replaced by
+/// `{array[[0]]; array[[1]]; …}[index]`.
+/// See \ref field_sensitivityt::get_fields.
+///
+/// ### Assignment to an array
+/// When the array symbol is on the left-hand-side, for instance for
+/// an assignment `array = other_array`, the assignment is replaced by a
+/// sequence of assignments:
+/// `array[[0]] = other_array[[0]]`;
+/// `array[[1]] = other_array[[1]]`; etc.
 /// See \ref field_sensitivityt::field_assignments.
 class field_sensitivityt
 {
