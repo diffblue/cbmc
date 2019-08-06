@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 #include <unordered_set>
 
+#include <util/byte_operators.h>
 #include <util/mathematical_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -133,8 +134,7 @@ protected:
   std::string convert_with(
     const exprt &src, unsigned precedence);
 
-  std::string convert_update(
-    const exprt &src, unsigned precedence);
+  std::string convert_update(const update_exprt &, unsigned precedence);
 
   std::string convert_member_designator(
     const exprt &src);
@@ -145,9 +145,8 @@ protected:
   std::string convert_index(
     const exprt &src, unsigned precedence);
 
-  std::string convert_byte_extract(
-    const exprt &src,
-    unsigned precedence);
+  std::string
+  convert_byte_extract(const byte_extract_exprt &, unsigned precedence);
 
   std::string convert_byte_update(
     const exprt &src,
@@ -161,7 +160,8 @@ protected:
   convert_extractbits(const extractbits_exprt &src, unsigned precedence);
 
   std::string convert_unary(
-    const exprt &src, const std::string &symbol,
+    const unary_exprt &,
+    const std::string &symbol,
     unsigned precedence);
 
   std::string convert_unary_post(

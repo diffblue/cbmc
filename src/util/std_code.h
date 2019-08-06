@@ -125,6 +125,11 @@ public:
   {
     check_code(code, vm);
   }
+
+  using exprt::op0;
+  using exprt::op1;
+  using exprt::op2;
+  using exprt::op3;
 };
 
 namespace detail // NOLINT
@@ -2071,6 +2076,63 @@ to_side_effect_expr_assign(const exprt &expr)
   const auto &side_effect_expr_assign = to_side_effect_expr(expr);
   PRECONDITION(side_effect_expr_assign.get_statement() == ID_assign);
   return static_cast<const side_effect_expr_assignt &>(side_effect_expr_assign);
+}
+
+/// A \ref side_effect_exprt that contains a statement
+class side_effect_expr_statement_expressiont : public side_effect_exprt
+{
+public:
+  /// construct an assignment side-effect, given lhs, rhs and the type
+  side_effect_expr_statement_expressiont(
+    codet _code,
+    typet _type,
+    source_locationt loc)
+    : side_effect_exprt(
+        ID_statement_expression,
+        {std::move(_code)},
+        std::move(_type),
+        std::move(loc))
+  {
+  }
+
+  codet &statement()
+  {
+    return to_code(op0());
+  }
+
+  const codet &statement() const
+  {
+    return to_code(op0());
+  }
+};
+
+template <>
+inline bool
+can_cast_expr<side_effect_expr_statement_expressiont>(const exprt &base)
+{
+  return detail::can_cast_side_effect_expr_impl(base, ID_statement_expression);
+}
+
+inline side_effect_expr_statement_expressiont &
+to_side_effect_expr_statement_expression(exprt &expr)
+{
+  auto &side_effect_expr_statement_expression = to_side_effect_expr(expr);
+  PRECONDITION(
+    side_effect_expr_statement_expression.get_statement() ==
+    ID_statement_expression);
+  return static_cast<side_effect_expr_statement_expressiont &>(
+    side_effect_expr_statement_expression);
+}
+
+inline const side_effect_expr_statement_expressiont &
+to_side_effect_expr_statement_expression(const exprt &expr)
+{
+  const auto &side_effect_expr_statement_expression = to_side_effect_expr(expr);
+  PRECONDITION(
+    side_effect_expr_statement_expression.get_statement() ==
+    ID_statement_expression);
+  return static_cast<const side_effect_expr_statement_expressiont &>(
+    side_effect_expr_statement_expression);
 }
 
 /// A \ref side_effect_exprt representation of a function call side effect.

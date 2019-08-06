@@ -177,7 +177,7 @@ protected:
   virtual void typecheck_expr_ptrmember(exprt &expr);
   virtual void typecheck_expr_rel(binary_relation_exprt &expr);
   virtual void typecheck_expr_rel_vector(binary_relation_exprt &expr);
-  virtual void adjust_float_rel(exprt &expr);
+  virtual void adjust_float_rel(binary_relation_exprt &);
   static void add_rounding_mode(exprt &);
   virtual void typecheck_expr_index(exprt &expr);
   virtual void typecheck_expr_typecast(exprt &expr);

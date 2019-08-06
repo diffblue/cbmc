@@ -567,9 +567,7 @@ void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
     throw 0;
   }
 
-  assert(dest.operands().size()==1);
-
-  typecheck_expr(dest.op0());
+  typecheck_expr(to_unary_expr(dest).op());
   dest.type() = void_type();
 }
 

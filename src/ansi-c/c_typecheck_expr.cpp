@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/ieee_float.h>
+#include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -256,7 +257,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // This has one operand and a type, and acts like a typecast
     DATA_INVARIANT(expr.operands().size()==1, "clang_builtin_convertvector has one operand");
     typecheck_type(expr.type());
-    typecast_exprt tmp(expr.op0(), expr.type());
+    typecast_exprt tmp(to_unary_expr(expr).op(), expr.type());
     tmp.add_source_location()=expr.source_location();
     expr.swap(tmp);
   }
@@ -278,10 +279,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     Forall_operands(it, designator)
     {
       if(it->id()==ID_index)
-      {
-        assert(it->operands().size()==1);
-        typecheck_expr(it->op0()); // still needs typechecking
-      }
+        typecheck_expr(to_unary_expr(*it).op()); // still needs typechecking
     }
   }
   else if(expr.id()==ID_initializer_list)
@@ -294,17 +292,17 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // op0 is a declaration,
     // op1 the bound expression
-    assert(expr.operands().size()==2);
     expr.type()=bool_typet();
+    auto &binary_expr = to_binary_expr(expr);
 
-    if(expr.op0().get(ID_statement)!=ID_decl)
+    if(binary_expr.op0().get(ID_statement) != ID_decl)
     {
       error().source_location = expr.source_location();
       error() << "expected declaration as operand of quantifier" << eom;
       throw 0;
     }
 
-    if(has_subexpr(expr.op1(), ID_side_effect))
+    if(has_subexpr(binary_expr.op1(), ID_side_effect))
     {
       error().source_location = expr.source_location();
       error() << "quantifier must not contain side effects" << eom;
@@ -312,10 +310,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     }
 
     // replace declaration by symbol expression
-    symbol_exprt bound=to_symbol_expr(expr.op0().op0());
-    expr.op0().swap(bound);
+    symbol_exprt bound = to_code_decl(to_code(binary_expr.op0())).symbol();
+    binary_expr.op0().swap(bound);
 
-    implicit_typecast_bool(expr.op1());
+    implicit_typecast_bool(binary_expr.op1());
   }
   else if(expr.id()==ID_label)
   {
@@ -332,11 +330,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_complex_real)
   {
-    INVARIANT(
-      expr.operands().size() == 1,
-      "real part retrieval operation should have one operand");
-
-    const exprt &op = expr.op0();
+    const exprt &op = to_unary_expr(expr).op();
 
     if(op.type().id() != ID_complex)
     {
@@ -369,11 +363,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_complex_imag)
   {
-    INVARIANT(
-      expr.operands().size() == 1,
-      "imaginary part retrieval operation should have one operand");
-
-    const exprt &op = expr.op0();
+    const exprt &op = to_unary_expr(expr).op();
 
     if(op.type().id() != ID_complex)
     {
@@ -409,19 +399,13 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // This is C11.
     // The operand is already typechecked. Depending
     // on its type, we return one of the generic associations.
-
-    if(expr.operands().size()!=1)
-    {
-      error().source_location = expr.source_location();
-      error() << "_Generic expects one operand" << eom;
-      throw 0;
-    }
+    auto &op = to_unary_expr(expr).op();
 
     // This is one of the few places where it's detectable
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
-    if(expr.op0().type().id() == ID_bool)
-      expr.op0() = typecast_exprt(expr.op0(), signed_int_type());
+    if(op.type().id() == ID_bool)
+      op = typecast_exprt(op, signed_int_type());
 
     irept::subt &generic_associations=
       expr.add(ID_generic_associations).get_sub();
@@ -438,7 +422,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     exprt default_match=nil_exprt();
     exprt assoc_match=nil_exprt();
 
-    const typet &op_type=follow(expr.op0().type());
+    const typet &op_type = follow(op.type());
 
     forall_irep(it, generic_associations)
     {
@@ -456,8 +440,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       else
       {
         error().source_location = expr.source_location();
-        error() << "unmatched generic selection: "
-                << to_string(expr.op0().type()) << eom;
+        error() << "unmatched generic selection: " << to_string(op.type())
+                << eom;
         throw 0;
       }
     }
@@ -487,17 +471,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_comma(exprt &expr)
 {
-  if(expr.operands().size()!=2)
-  {
-    error().source_location = expr.source_location();
-    error() << "comma operator expects two operands" << eom;
-    throw 0;
-  }
-
-  expr.type()=expr.op1().type();
+  expr.type() = to_binary_expr(expr).op1().type();
 
   // make this an l-value if the last operand is one
-  if(expr.op1().get_bool(ID_C_lvalue))
+  if(to_binary_expr(expr).op1().get_bool(ID_C_lvalue))
     expr.set(ID_C_lvalue, true);
 }
 
@@ -513,8 +490,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   const code_typet new_type(
     {code_typet::parametert(pointer_type(void_type()))}, std::move(arg_type));
 
-  assert(expr.operands().size()==1);
-  exprt arg=expr.op0();
+  exprt arg = to_unary_expr(expr).op();
 
   implicit_typecast(arg, pointer_type(void_type()));
 
@@ -681,8 +657,6 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
     }
     else if(m_it->id()==ID_index)
     {
-      assert(m_it->operands().size()==1);
-
       if(type.id()!=ID_array)
       {
         error().source_location = expr.source_location();
@@ -690,7 +664,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         throw 0;
       }
 
-      exprt index=m_it->op0();
+      exprt index = to_unary_expr(*m_it).op();
 
       // still need to typecheck index
       typecheck_expr(index);
@@ -727,21 +701,18 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
      expr.get(ID_statement)==ID_function_call)
   {
     // don't do function operand
-    assert(expr.operands().size()==2);
-
-    typecheck_expr(expr.op1()); // arguments
+    typecheck_expr(to_binary_expr(expr).op1()); // arguments
   }
   else if(expr.id()==ID_side_effect &&
           expr.get(ID_statement)==ID_statement_expression)
   {
-    typecheck_code(to_code(expr.op0()));
+    typecheck_code(to_side_effect_expr_statement_expression(expr).statement());
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
-    assert(expr.operands().size()==2);
+    auto &binary_expr = to_binary_expr(expr);
 
-    ansi_c_declarationt &declaration=
-      to_ansi_c_declaration(expr.op0());
+    ansi_c_declarationt &declaration = to_ansi_c_declaration(binary_expr.op0());
 
     typecheck_declaration(declaration);
 
@@ -780,9 +751,9 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
     code_declt decl(symbol.symbol_expr());
     decl.add_source_location()=declaration.source_location();
 
-    expr.op0()=decl;
+    binary_expr.op0() = decl;
 
-    typecheck_expr(expr.op1());
+    typecheck_expr(binary_expr.op1());
   }
   else
   {
@@ -897,14 +868,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 void c_typecheck_baset::typecheck_side_effect_statement_expression(
   side_effect_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "statement expression expects one operand" << eom;
-    throw 0;
-  }
-
-  codet &code=to_code(expr.op0());
+  codet &code = to_code(to_unary_expr(expr).op());
 
   // the type is the type of the last statement in the
   // block, but do worry about labels!
@@ -937,21 +901,18 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
 {
   typet type;
 
+  // these come in two flavors: with zero operands, for a type,
+  // and with one operand, for an expression.
+  PRECONDITION(expr.operands().size() <= 1);
+
   if(expr.operands().empty())
   {
     type.swap(static_cast<typet &>(expr.add(ID_type_arg)));
     typecheck_type(type);
   }
-  else if(expr.operands().size()==1)
-  {
-    type.swap(expr.op0().type());
-  }
   else
   {
-    error().source_location = expr.source_location();
-    error() << "sizeof operator expects zero or one operand, "
-               "but got " << expr.operands().size() << eom;
-    throw 0;
+    type.swap(to_unary_expr(expr).op().type());
   }
 
   exprt new_expr;
@@ -1019,7 +980,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   typet argument_type;
 
   if(expr.operands().size()==1)
-    argument_type=expr.op0().type();
+    argument_type = to_unary_expr(expr).op().type();
   else
   {
     typet &op_type=static_cast<typet &>(expr.add(ID_type_arg));
@@ -1038,14 +999,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "typecast operator expects one operand" << eom;
-    throw 0;
-  }
-
-  exprt &op=expr.op0();
+  exprt &op = to_unary_expr(expr).op();
 
   typecheck_type(expr.type());
 
@@ -1218,7 +1172,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   // Current versions of gcc in fact refuse to do this! Yay!
 
-  if(expr.op0().get_bool(ID_C_lvalue))
+  if(op.get_bool(ID_C_lvalue))
   {
     if(expr_type.id()==ID_pointer)
       expr.set(ID_C_lvalue, true);
@@ -1232,15 +1186,8 @@ void c_typecheck_baset::make_index_type(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_index(exprt &expr)
 {
-  if(expr.operands().size()!=2)
-  {
-    error().source_location = expr.source_location();
-    error() << "operator '" << expr.id() << "' expects two operands" << eom;
-    throw 0;
-  }
-
-  exprt &array_expr=expr.op0();
-  exprt &index_expr=expr.op1();
+  exprt &array_expr = to_binary_expr(expr).op0();
+  exprt &index_expr = to_binary_expr(expr).op1();
 
   // we might have to swap them
 
@@ -1278,7 +1225,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   {
     // p[i] is syntactic sugar for *(p+i)
 
-    typecheck_arithmetic_pointer(expr.op0());
+    typecheck_arithmetic_pointer(to_binary_expr(expr).op0());
     exprt::operandst summands;
     std::swap(summands, expr.operands());
     expr.add_to_operands(plus_exprt(std::move(summands), array_expr.type()));
@@ -1295,11 +1242,9 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   }
 }
 
-void c_typecheck_baset::adjust_float_rel(exprt &expr)
+void c_typecheck_baset::adjust_float_rel(binary_relation_exprt &expr)
 {
   // equality and disequality on float is not mathematical equality!
-  assert(expr.operands().size()==2);
-
   if(expr.op0().type().id() == ID_floatbv)
   {
     if(expr.id()==ID_equal)
@@ -1438,37 +1383,31 @@ void c_typecheck_baset::typecheck_expr_rel_vector(
 
 void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "ptrmember operator expects one operand" << eom;
-    throw 0;
-  }
-
-  const typet &op0_type = expr.op0().type();
+  auto &op = to_unary_expr(expr).op();
+  const typet &op0_type = op.type();
 
   if(op0_type.id() == ID_array)
   {
     // a->f is the same as a[0].f
     exprt zero=from_integer(0, index_type());
-    index_exprt index_expr(expr.op0(), zero, op0_type.subtype());
+    index_exprt index_expr(op, zero, op0_type.subtype());
     index_expr.set(ID_C_lvalue, true);
-    expr.op0().swap(index_expr);
+    op.swap(index_expr);
   }
   else if(op0_type.id() == ID_pointer)
   {
     // turn x->y into (*x).y
-    dereference_exprt deref_expr(expr.op0());
+    dereference_exprt deref_expr(op);
     deref_expr.add_source_location()=expr.source_location();
     typecheck_expr_dereference(deref_expr);
-    expr.op0().swap(deref_expr);
+    op.swap(deref_expr);
   }
   else
   {
     error().source_location = expr.source_location();
     error() << "ptrmember operator requires pointer or array type "
                "on left hand side, but got '"
-            << to_string(expr.op0().type()) << "'" << eom;
+            << to_string(op0_type) << "'" << eom;
     throw 0;
   }
 
@@ -1478,14 +1417,7 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_member(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "member operator expects one operand" << eom;
-    throw 0;
-  }
-
-  exprt &op0=expr.op0();
+  exprt &op0 = to_unary_expr(expr).op();
   typet type=op0.type();
 
   type = follow(type);
@@ -1676,21 +1608,14 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
   typecheck_expr_trinary(if_expr);
 
   // copy the result
-  expr.op0() = if_expr.true_case();
-  expr.op1() = if_expr.false_case();
+  operands[0] = if_expr.true_case();
+  operands[1] = if_expr.false_case();
   expr.type()=if_expr.type();
 }
 
 void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "unary operator & expects one operand" << eom;
-    throw 0;
-  }
-
-  exprt &op=expr.op0();
+  exprt &op = to_unary_expr(expr).op();
 
   if(op.type().id()==ID_c_bit_field)
   {
@@ -1719,10 +1644,9 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   // special case: address of function designator
   // ANSI-C 99 section 6.3.2.1 paragraph 4
 
-  if(op.id()==ID_address_of &&
-     op.get_bool(ID_C_implicit) &&
-     op.operands().size()==1 &&
-     op.op0().type().id()==ID_code)
+  if(
+    op.id() == ID_address_of && op.get_bool(ID_C_implicit) &&
+    to_address_of_expr(op).object().type().id() == ID_code)
   {
     // make the implicit address_of an explicit address_of
     exprt tmp;
@@ -1760,14 +1684,7 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "unary operator * expects one operand" << eom;
-    throw 0;
-  }
-
-  exprt &op=expr.op0();
+  exprt &op = to_unary_expr(expr).op();
 
   const typet op_type = op.type();
 
@@ -1821,13 +1738,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
      statement==ID_postincrement ||
      statement==ID_postdecrement)
   {
-    if(expr.operands().size()!=1)
-    {
-      error().source_location = expr.source_location();
-      error() << statement << "operator expects one operand" << eom;
-    }
-
-    const exprt &op0=expr.op0();
+    const exprt &op0 = to_unary_expr(expr).op();
     const typet &type0=op0.type();
 
     if(!op0.get_bool(ID_C_lvalue))
@@ -1857,20 +1768,20 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       }
 
       // increment/decrement on underlying type
-      expr.op0() = typecast_exprt(expr.op0(), enum_type.subtype());
+      to_unary_expr(expr).op() = typecast_exprt(op0, enum_type.subtype());
       expr.type() = enum_type.subtype();
     }
     else if(type0.id() == ID_c_bit_field)
     {
       // promote to underlying type
       typet underlying_type = to_c_bit_field_type(type0).subtype();
-      expr.op0() = typecast_exprt(expr.op0(), underlying_type);
+      to_unary_expr(expr).op() = typecast_exprt(op0, underlying_type);
       expr.type()=underlying_type;
     }
     else if(type0.id() == ID_bool || type0.id() == ID_c_bool)
     {
-      implicit_typecast_arithmetic(expr.op0());
-      expr.type() = expr.op0().type();
+      implicit_typecast_arithmetic(to_unary_expr(expr).op());
+      expr.type() = op0.type();
     }
     else if(is_numeric_type(type0))
     {
@@ -2054,13 +1965,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   }
 
   // do implicit dereference
-  if(f_op.id()==ID_address_of &&
-     f_op.get_bool(ID_C_implicit) &&
-     f_op.operands().size()==1)
+  if(f_op.id() == ID_address_of && f_op.get_bool(ID_C_implicit))
   {
-    exprt tmp;
-    tmp.swap(f_op.op0());
-    f_op.swap(tmp);
+    f_op = to_address_of_expr(f_op).object();
   }
   else
   {
@@ -2747,13 +2654,13 @@ exprt c_typecheck_baset::do_special_functions(
 
     // Need to do some special treatment for string literals,
     // which are (void *)&("lit"[0])
-    if(tmp1.id()==ID_typecast &&
-       tmp1.operands().size()==1 &&
-       tmp1.op0().id()==ID_address_of &&
-       tmp1.op0().operands().size()==1 &&
-       tmp1.op0().op0().id()==ID_index &&
-       tmp1.op0().op0().operands().size()==2 &&
-       tmp1.op0().op0().op0().id()==ID_string_constant)
+    if(
+      tmp1.id() == ID_typecast &&
+      to_typecast_expr(tmp1).op().id() == ID_address_of &&
+      to_typecast_expr(tmp1).op().operands().size() == 1 &&
+      to_typecast_expr(tmp1).op().op0().id() == ID_index &&
+      to_typecast_expr(tmp1).op().op0().operands().size() == 2 &&
+      to_typecast_expr(tmp1).op().op0().op0().id() == ID_string_constant)
     {
       is_constant=true;
     }
@@ -2957,14 +2864,7 @@ void c_typecheck_baset::typecheck_expr_constant(exprt &)
 
 void c_typecheck_baset::typecheck_expr_unary_arithmetic(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "operator '" << expr.id() << "' expects one operand" << eom;
-    throw 0;
-  }
-
-  exprt &operand=expr.op0();
+  exprt &operand = to_unary_expr(expr).op();
 
   const typet &o_type = operand.type();
 
@@ -2994,16 +2894,7 @@ void c_typecheck_baset::typecheck_expr_unary_arithmetic(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_unary_boolean(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    error().source_location = expr.source_location();
-    error() << "operator '" << expr.id() << "' expects one operand" << eom;
-    throw 0;
-  }
-
-  exprt &operand=expr.op0();
-
-  implicit_typecast_bool(operand);
+  implicit_typecast_bool(to_unary_expr(expr).op());
 
   // This is not quite accurate: the standard says the result
   // should be of type 'int'.
@@ -3043,15 +2934,9 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
 
 void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
 {
-  if(expr.operands().size()!=2)
-  {
-    error().source_location = expr.source_location();
-    error() << "operator '" << expr.id() << "' expects two operands" << eom;
-    throw 0;
-  }
-
-  exprt &op0=expr.op0();
-  exprt &op1=expr.op1();
+  auto &binary_expr = to_binary_expr(expr);
+  exprt &op0 = binary_expr.op0();
+  exprt &op1 = binary_expr.op1();
 
   const typet o_type0 = op0.type();
   const typet o_type1 = op1.type();
@@ -3254,10 +3139,9 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
 {
-  assert(expr.operands().size()==2);
-
-  exprt &op0=expr.op0();
-  exprt &op1=expr.op1();
+  auto &binary_expr = to_binary_expr(expr);
+  exprt &op0 = binary_expr.op0();
+  exprt &op1 = binary_expr.op1();
 
   const typet &type0 = op0.type();
   const typet &type1 = op1.type();
@@ -3342,15 +3226,9 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_binary_boolean(exprt &expr)
 {
-  if(expr.operands().size()!=2)
-  {
-    error().source_location = expr.source_location();
-    error() << "operator '" << expr.id() << "' expects two operands" << eom;
-    throw 0;
-  }
-
-  implicit_typecast_bool(expr.op0());
-  implicit_typecast_bool(expr.op1());
+  auto &binary_expr = to_binary_expr(expr);
+  implicit_typecast_bool(binary_expr.op0());
+  implicit_typecast_bool(binary_expr.op1());
 
   // This is not quite accurate: the standard says the result
   // should be of type 'int'.
@@ -3363,18 +3241,11 @@ void c_typecheck_baset::typecheck_expr_binary_boolean(exprt &expr)
 void c_typecheck_baset::typecheck_side_effect_assignment(
   side_effect_exprt &expr)
 {
-  if(expr.operands().size()!=2)
-  {
-    error().source_location = expr.source_location();
-    error() << "operator '" << expr.get_statement() << "' expects two operands"
-            << eom;
-    throw 0;
-  }
-
   const irep_idt &statement=expr.get_statement();
 
-  exprt &op0=expr.op0();
-  exprt &op1=expr.op1();
+  auto &binary_expr = to_binary_expr(expr);
+  exprt &op0 = binary_expr.op0();
+  exprt &op1 = binary_expr.op1();
 
   {
     const typet &type0=op0.type();

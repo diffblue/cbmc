@@ -627,9 +627,9 @@ void c_typecheck_baset::typecheck_declaration(
 {
   if(declaration.get_is_static_assert())
   {
-    assert(declaration.operands().size()==2);
-    typecheck_expr(declaration.op0());
-    typecheck_expr(declaration.op1());
+    auto &static_assert_expr = to_binary_expr(declaration);
+    typecheck_expr(static_assert_expr.op0());
+    typecheck_expr(static_assert_expr.op1());
   }
   else
   {

@@ -433,9 +433,10 @@ offsetof_member_designator:
         {
           init($$, ID_designated_initializer);
           parser_stack($$).operands().resize(1);
-          parser_stack($$).op0().id(ID_member);
-          parser_stack($$).op0().add_source_location()=parser_stack($1).source_location();
-          parser_stack($$).op0().set(ID_component_name, parser_stack($1).get(ID_C_base_name));
+          auto &op = to_unary_expr(parser_stack($$)).op();
+          op.id(ID_member);
+          op.add_source_location()=parser_stack($1).source_location();
+          op.set(ID_component_name, parser_stack($1).get(ID_C_base_name));
         }
         | offsetof_member_designator '.' member_name
         {
@@ -519,20 +520,22 @@ postfix_expression:
         | postfix_expression '(' ')'
         { $$=$2;
           set($$, ID_side_effect);
-          parser_stack($$).set(ID_statement, ID_function_call);
-          parser_stack($$).operands().resize(2);
-          parser_stack($$).op0().swap(parser_stack($1));
-          parser_stack($$).op1().clear();
-          parser_stack($$).op1().id(ID_arguments);
+          auto &side_effect = to_side_effect_expr(parser_stack($$));
+          side_effect.set_statement(ID_function_call);
+          side_effect.operands().resize(2);
+          to_binary_expr(side_effect).op0().swap(parser_stack($1));
+          to_binary_expr(side_effect).op1().clear();
+          to_binary_expr(side_effect).op1().id(ID_arguments);
         }
         | postfix_expression '(' argument_expression_list ')'
         { $$=$2;
           set($$, ID_side_effect);
-          parser_stack($$).set(ID_statement, ID_function_call);
-          parser_stack($$).operands().resize(2);
-          parser_stack($$).op0().swap(parser_stack($1));
-          parser_stack($$).op1().swap(parser_stack($3));
-          parser_stack($$).op1().id(ID_arguments);
+          auto &side_effect = to_side_effect_expr(parser_stack($$));
+          side_effect.set_statement(ID_function_call);
+          side_effect.operands().resize(2);
+          to_binary_expr(side_effect).op0().swap(parser_stack($1));
+          to_binary_expr(side_effect).op1().swap(parser_stack($3));
+          to_binary_expr(side_effect).op1().id(ID_arguments);
         }
         | postfix_expression '.' member_name
         { $$=$2;
@@ -625,9 +628,10 @@ unary_expression:
           irep_idt identifier=PARSER.lookup_label(parser_stack($2).get(ID_C_base_name));
           set($$, ID_address_of);
           parser_stack($$).operands().resize(1);
-          parser_stack($$).op0()=parser_stack($2);
-          parser_stack($$).op0().id(ID_label);
-          parser_stack($$).op0().set(ID_identifier, identifier);
+          auto &op = to_unary_expr(parser_stack($$)).op();
+          op=parser_stack($2);
+          op.id(ID_label);
+          op.set(ID_identifier, identifier);
         }
         | '*' cast_expression
         { $$=$1;
@@ -2500,7 +2504,7 @@ gcc_asm_statement:
           statement($$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).operands().resize(5);
-          parser_stack($$).op0()=parser_stack($4);
+          to_multi_ary_expr(parser_stack($$)).op0()=parser_stack($4);
         }
         ;
 

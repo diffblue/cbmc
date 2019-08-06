@@ -214,7 +214,9 @@ bool ansi_c_languaget::to_expr(
   if(expr.id()==ID_typecast &&
      expr.type().id()==ID_empty &&
      expr.operands().size()==1)
-    expr=expr.op0();
+  {
+    expr = to_typecast_expr(expr).op();
+  }
 
   return result;
 }
