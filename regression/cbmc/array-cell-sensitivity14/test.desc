@@ -1,0 +1,14 @@
+CORE
+test.c
+--show-vcc
+main::1::node1!0@1#2\.\.data =
+main::1::node2!0@1#2\.\.data =
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::node1!0@1#[3-9]\.\.children\[\[[01]\]\] =
+--
+This checks that mixed array and field accesses are executed using a field-sensitive
+symbol (main::1::node1!0@1#2..data) rather than by assigning the whole struct and
+expanding into field symbols (which would assign main::1::node1!0@1#3..children\[\[[01]\]\]),
+for the case where the array indices only become constant after propagation.
