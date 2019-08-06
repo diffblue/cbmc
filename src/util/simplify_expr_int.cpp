@@ -1481,8 +1481,7 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
     auto new_expr = expr;
     new_expr.id(ID_equal);
     new_expr = simplify_inequality_no_constant(new_expr);
-    new_expr = boolean_negate(new_expr);
-    return changed(simplify_node(new_expr));
+    return changed(simplify_not(not_exprt(new_expr)));
   }
   else if(expr.id()==ID_gt)
   {
@@ -1491,16 +1490,14 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
     // swap operands
     new_expr.op0().swap(new_expr.op1());
     new_expr = simplify_inequality_no_constant(new_expr);
-    new_expr = boolean_negate(new_expr);
-    return changed(simplify_node(new_expr));
+    return changed(simplify_not(not_exprt(new_expr)));
   }
   else if(expr.id()==ID_lt)
   {
     auto new_expr = expr;
     new_expr.id(ID_ge);
     new_expr = simplify_inequality_no_constant(new_expr);
-    new_expr = boolean_negate(new_expr);
-    return changed(simplify_node(new_expr));
+    return changed(simplify_not(not_exprt(new_expr)));
   }
   else if(expr.id()==ID_le)
   {
@@ -1616,8 +1613,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       auto new_expr = expr;
       new_expr.id(ID_equal);
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
-      new_expr = boolean_negate(new_expr);
-      return changed(simplify_node(new_expr));
+      return changed(simplify_not(not_exprt(new_expr)));
     }
 
     // very special case for pointers
@@ -1806,7 +1802,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
     // we re-write (TYPE)boolean == 0 -> !boolean
     if(expr.op1().is_zero() && expr.id()==ID_equal)
     {
-      return boolean_negate(expr.op0().op0());
+      return changed(simplify_not(not_exprt(expr.op0().op0())));
     }
 
     // we re-write (TYPE)boolean != 0 -> boolean
@@ -1829,8 +1825,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       auto new_expr = expr;
       new_expr.id(ID_equal);
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
-      new_expr = boolean_negate(new_expr);
-      return changed(simplify_node(new_expr));
+      return changed(simplify_not(not_exprt(new_expr)));
     }
     else if(expr.id()==ID_gt)
     {
@@ -1852,8 +1847,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       auto new_expr = expr;
       new_expr.id(ID_ge);
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
-      new_expr = boolean_negate(new_expr);
-      return changed(simplify_node(new_expr));
+      return changed(simplify_not(not_exprt(new_expr)));
     }
     else if(expr.id()==ID_le)
     {
@@ -1869,8 +1863,7 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
       ++i;
       new_expr.op1() = from_integer(i, new_expr.op1().type());
       new_expr = simplify_inequality_rhs_is_constant(new_expr);
-      new_expr = boolean_negate(new_expr);
-      return changed(simplify_node(new_expr));
+      return changed(simplify_not(not_exprt(new_expr)));
     }
   }
 #endif

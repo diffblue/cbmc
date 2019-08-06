@@ -40,7 +40,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
     binary_exprt new_expr = implies_expr;
     new_expr.id(ID_or);
-    new_expr.op0() = boolean_negate(new_expr.op0());
+    new_expr.op0() = simplify_not(not_exprt(new_expr.op0()));
     return changed(simplify_node(new_expr));
   }
   else if(expr.id()==ID_xor)
@@ -82,7 +82,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
     else if(new_operands.size() == 1)
     {
       if(negate)
-        return boolean_negate(new_operands.front());
+        return changed(simplify_not(not_exprt(new_operands.front())));
       else
         return std::move(new_operands.front());
     }
@@ -191,7 +191,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
 
     Forall_operands(it, tmp)
     {
-      *it = simplify_node(boolean_negate(*it));
+      *it = simplify_not(not_exprt(*it));
     }
 
     tmp.id(tmp.id() == ID_and ? ID_or : ID_and);

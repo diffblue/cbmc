@@ -350,7 +350,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
       else if(truevalue.is_false() && falsevalue.is_true())
       {
         // a?0:1 <-> !a
-        return changed(simplify_node(boolean_negate(cond)));
+        return changed(simplify_not(not_exprt(cond)));
       }
       else if(falsevalue.is_false())
       {
@@ -360,8 +360,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
       else if(falsevalue.is_true())
       {
         // a?b:1 <-> !a OR b
-        return changed(simplify_node(
-          or_exprt(simplify_node(boolean_negate(cond)), truevalue)));
+        return changed(
+          simplify_node(or_exprt(simplify_not(not_exprt(cond)), truevalue)));
       }
       else if(truevalue.is_true())
       {
@@ -371,8 +371,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
       else if(truevalue.is_false())
       {
         // a?0:b <-> !a && b
-        return changed(simplify_node(
-          and_exprt(simplify_node(boolean_negate(cond)), falsevalue)));
+        return changed(
+          simplify_node(and_exprt(simplify_not(not_exprt(cond)), falsevalue)));
       }
     }
   }
