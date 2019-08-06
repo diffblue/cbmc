@@ -9,6 +9,8 @@ Author: Michael Tautschnig
 #ifndef CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
+#include <util/magic.h>
+
 class exprt;
 class ssa_exprt;
 class namespacet;

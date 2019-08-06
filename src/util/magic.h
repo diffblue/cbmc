@@ -16,4 +16,8 @@ const std::size_t MAX_CONCRETE_STRING_SIZE = 1 << 26;
 // The top end of the range of integers for which dstrings are precomputed
 constexpr std::size_t DSTRING_NUMBERS_MAX = 64;
 
+/// Limit the size of arrays for which field_sensitivity gets applied.
+/// Necessary because large constant arrays slow-down the process.
+constexpr std::size_t MAX_FIELD_SENSITIVITY_ARRAY_SIZE = 64;
+
 #endif

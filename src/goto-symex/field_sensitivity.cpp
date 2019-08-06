@@ -97,14 +97,19 @@ exprt field_sensitivityt::apply(
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
       bool was_l2 = !tmp.get_level_2().empty();
-
-      tmp.remove_level_2();
-      index.array() = tmp.get_original_expr();
-      tmp.set_expression(index);
-      if(was_l2)
-        return state.rename(std::move(tmp), ns).get();
-      else
-        return std::move(tmp);
+      if(
+        l2_size.id() == ID_constant &&
+        numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
+          MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+      {
+        tmp.remove_level_2();
+        index.array() = tmp.get_original_expr();
+        tmp.set_expression(index);
+        if(was_l2)
+          return state.rename(std::move(tmp), ns).get();
+        else
+          return std::move(tmp);
+      }
     }
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
@@ -147,7 +152,10 @@ exprt field_sensitivityt::get_fields(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     ssa_expr.type().id() == ID_array &&
-    to_array_type(ssa_expr.type()).size().id() == ID_constant)
+    to_array_type(ssa_expr.type()).size().id() == ID_constant &&
+    numeric_cast_v<mp_integer>(
+      to_constant_expr(to_array_type(ssa_expr.type()).size())) <=
+      MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
   {
     const array_typet &type = to_array_type(ssa_expr.type());
     const std::size_t array_size =
@@ -269,6 +277,9 @@ void field_sensitivityt::field_assignments_rec(
       numeric_cast_v<std::size_t>(to_constant_expr(type->size()));
     PRECONDITION(lhs_fs.operands().size() == array_size);
 
+    if(array_size > MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+      return;
+
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(std::size_t i = 0; i < array_size; ++i)
     {
@@ -308,7 +319,9 @@ bool field_sensitivityt::is_divisible(const ssa_exprt &expr)
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   if(
     expr.type().id() == ID_array &&
-    to_array_type(expr.type()).size().id() == ID_constant)
+    to_array_type(expr.type()).size().id() == ID_constant &&
+    numeric_cast_v<mp_integer>(to_constant_expr(
+      to_array_type(expr.type()).size())) <= MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
   {
     return true;
   }
