@@ -97,10 +97,23 @@ exprt field_sensitivityt::apply(
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
       bool was_l2 = !tmp.get_level_2().empty();
+
+      exprt array_size_expr = to_array_type(l2_array.get().type()).size();
+      if(array_size_expr.is_nil() && index.array().id() == ID_symbol)
+      {
+        // In case the array type was incomplete, attempt to retrieve it from
+        // the symbol table.
+        const symbolt *array_from_symbol_table = ns.get_symbol_table().lookup(
+          to_symbol_expr(index.array()).get_identifier());
+        if(array_from_symbol_table != nullptr)
+          array_size_expr = to_array_type(array_from_symbol_table->type).size();
+      }
+
       if(
-        l2_size.id() == ID_constant &&
-        numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
-          MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+        array_size_expr.id() == ID_constant &&
+        numeric_cast_v<mp_integer>(to_constant_expr(array_size_expr)) <=
+          MAX_FIELD_SENSITIVITY_ARRAY_SIZE &&
+        index.id() == ID_constant)
       {
         tmp.remove_level_2();
         index.array() = tmp.get_original_expr();
