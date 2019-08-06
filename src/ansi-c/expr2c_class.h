@@ -128,7 +128,8 @@ protected:
     const exprt &src, unsigned &precedence);
 
   std::string convert_quantifier(
-    const exprt &src, const std::string &symbol,
+    const quantifier_exprt &,
+    const std::string &symbol,
     unsigned precedence);
 
   std::string convert_with(

@@ -271,26 +271,34 @@ inline function_application_exprt &to_function_application_expr(exprt &expr)
   return ret;
 }
 
-/// \brief A base class for quantifier expressions
-class quantifier_exprt : public binary_predicate_exprt
+/// \brief A base class for variable bindings (quantifiers, let, lambda)
+class binding_exprt : public binary_exprt
 {
 public:
-  quantifier_exprt(
-    const irep_idt &_id,
-    const symbol_exprt &_symbol,
-    const exprt &_where)
-    : binary_predicate_exprt(_symbol, _id, _where)
+  using variablest = std::vector<symbol_exprt>;
+
+  /// construct the binding expression
+  binding_exprt(
+    irep_idt _id,
+    const variablest &_variables,
+    exprt _where,
+    typet _type)
+    : binary_exprt(
+        tuple_exprt((const operandst &)_variables),
+        _id,
+        std::move(_where),
+        std::move(_type))
   {
   }
 
-  symbol_exprt &symbol()
+  variablest &variables()
   {
-    return static_cast<symbol_exprt &>(op0());
+    return (variablest &)static_cast<tuple_exprt &>(op0()).operands();
   }
 
-  const symbol_exprt &symbol() const
+  const variablest &variables() const
   {
-    return static_cast<const symbol_exprt &>(op0());
+    return (variablest &)static_cast<const tuple_exprt &>(op0()).operands();
   }
 
   exprt &where()
@@ -304,6 +312,39 @@ public:
   }
 };
 
+/// \brief A base class for quantifier expressions
+class quantifier_exprt : public binding_exprt
+{
+public:
+  /// constructor for single variable
+  quantifier_exprt(irep_idt _id, symbol_exprt _symbol, exprt _where)
+    : binding_exprt(_id, {std::move(_symbol)}, std::move(_where), bool_typet())
+  {
+  }
+
+  /// constructor for multiple variables
+  quantifier_exprt(irep_idt _id, const variablest &_variables, exprt _where)
+    : binding_exprt(_id, _variables, std::move(_where), bool_typet())
+  {
+  }
+
+  // for the special case of one variable
+  symbol_exprt &symbol()
+  {
+    auto &variables = this->variables();
+    PRECONDITION(variables.size() == 1);
+    return variables.front();
+  }
+
+  // for the special case of one variable
+  const symbol_exprt &symbol() const
+  {
+    auto &variables = this->variables();
+    PRECONDITION(variables.size() == 1);
+    return variables.front();
+  }
+};
+
 template <>
 inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
 {
@@ -313,8 +354,9 @@ inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
 inline void validate_expr(const quantifier_exprt &value)
 {
   validate_operands(value, 2, "quantifier expressions must have two operands");
-  DATA_INVARIANT(
-    value.op0().id() == ID_symbol, "quantified variable shall be a symbol");
+  for(auto &op : value.variables())
+    DATA_INVARIANT(
+      op.id() == ID_symbol, "quantified variable shall be a symbol");
 }
 
 /// \brief Cast an exprt to a \ref quantifier_exprt

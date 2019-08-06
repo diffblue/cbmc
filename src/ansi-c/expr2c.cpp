@@ -791,20 +791,21 @@ std::string expr2ct::convert_trinary(
 }
 
 std::string expr2ct::convert_quantifier(
-  const exprt &src,
+  const quantifier_exprt &src,
   const std::string &symbol,
   unsigned precedence)
 {
-  if(src.operands().size()!=2)
+  // our made-up syntax can only do one symbol
+  if(src.op0().operands().size() != 1)
     return convert_norep(src, precedence);
 
   unsigned p0, p1;
 
-  std::string op0=convert_with_precedence(src.op0(), p0);
-  std::string op1=convert_with_precedence(src.op1(), p1);
+  std::string op0 = convert_with_precedence(src.symbol(), p0);
+  std::string op1 = convert_with_precedence(src.where(), p1);
 
   std::string dest=symbol+" { ";
-  dest+=convert(src.op0().type());
+  dest += convert(src.symbol().type());
   dest+=" "+op0+"; ";
   dest+=op1;
   dest+=" }";
@@ -3720,13 +3721,16 @@ std::string expr2ct::convert_with_precedence(
     return convert_trinary(to_if_expr(src), "?", ":", precedence = 3);
 
   else if(src.id()==ID_forall)
-    return convert_quantifier(src, "forall", precedence=2);
+    return convert_quantifier(
+      to_quantifier_expr(src), "forall", precedence = 2);
 
   else if(src.id()==ID_exists)
-    return convert_quantifier(src, "exists", precedence=2);
+    return convert_quantifier(
+      to_quantifier_expr(src), "exists", precedence = 2);
 
   else if(src.id()==ID_lambda)
-    return convert_quantifier(src, "LAMBDA", precedence=2);
+    return convert_quantifier(
+      to_quantifier_expr(src), "LAMBDA", precedence = 2);
 
   else if(src.id()==ID_with)
     return convert_with(src, precedence=16);

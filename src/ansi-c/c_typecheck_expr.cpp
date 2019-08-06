@@ -290,30 +290,37 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   else if(expr.id()==ID_forall ||
           expr.id()==ID_exists)
   {
-    // op0 is a declaration,
-    // op1 the bound expression
-    expr.type()=bool_typet();
+    // These have two operands.
+    // op0 is a tuple with declarations,
+    // op1 is the bound expression
     auto &binary_expr = to_binary_expr(expr);
+    auto &bindings = binary_expr.op0().operands();
+    auto &where = binary_expr.op1();
 
-    if(binary_expr.op0().get(ID_statement) != ID_decl)
+    for(const auto &binding : bindings)
     {
-      error().source_location = expr.source_location();
-      error() << "expected declaration as operand of quantifier" << eom;
-      throw 0;
+      if(binding.get(ID_statement) != ID_decl)
+      {
+        error().source_location = expr.source_location();
+        error() << "expected declaration as operand of quantifier" << eom;
+        throw 0;
+      }
     }
 
-    if(has_subexpr(binary_expr.op1(), ID_side_effect))
+    if(has_subexpr(where, ID_side_effect))
     {
       error().source_location = expr.source_location();
       error() << "quantifier must not contain side effects" << eom;
       throw 0;
     }
 
-    // replace declaration by symbol expression
-    symbol_exprt bound = to_code_decl(to_code(binary_expr.op0())).symbol();
-    binary_expr.op0().swap(bound);
+    expr.type() = bool_typet();
 
-    implicit_typecast_bool(binary_expr.op1());
+    // replace declarations by symbol expressions
+    for(auto &binding : bindings)
+      binding = to_code_decl(to_code(binding)).symbol();
+
+    implicit_typecast_bool(where);
   }
   else if(expr.id()==ID_label)
   {
@@ -710,48 +717,55 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
+    // These introduce new symbols, which need to be added to the symbol table
+    // before the second operand is typechecked.
+
     auto &binary_expr = to_binary_expr(expr);
+    auto &bindings = binary_expr.op0().operands();
 
-    ansi_c_declarationt &declaration = to_ansi_c_declaration(binary_expr.op0());
-
-    typecheck_declaration(declaration);
-
-    if(declaration.declarators().size()!=1)
+    for(auto &binding : bindings)
     {
-      error().source_location = expr.source_location();
-      error() << "expected one declarator exactly" << eom;
-      throw 0;
+      ansi_c_declarationt &declaration = to_ansi_c_declaration(binding);
+
+      typecheck_declaration(declaration);
+
+      if(declaration.declarators().size() != 1)
+      {
+        error().source_location = expr.source_location();
+        error() << "forall/exists expects one declarator exactly" << eom;
+        throw 0;
+      }
+
+      irep_idt identifier = declaration.declarators().front().get_name();
+
+      // look it up
+      symbol_tablet::symbolst::const_iterator s_it =
+        symbol_table.symbols.find(identifier);
+
+      if(s_it == symbol_table.symbols.end())
+      {
+        error().source_location = expr.source_location();
+        error() << "failed to find bound symbol `" << identifier
+                << "' in symbol table" << eom;
+        throw 0;
+      }
+
+      const symbolt &symbol = s_it->second;
+
+      if(
+        symbol.is_type || symbol.is_extern || symbol.is_static_lifetime ||
+        !is_complete_type(symbol.type) || symbol.type.id() == ID_code)
+      {
+        error().source_location = expr.source_location();
+        error() << "unexpected quantified symbol" << eom;
+        throw 0;
+      }
+
+      code_declt decl(symbol.symbol_expr());
+      decl.add_source_location() = declaration.source_location();
+
+      binding = decl;
     }
-
-    irep_idt identifier=
-      declaration.declarators().front().get_name();
-
-    // look it up
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(identifier);
-
-    if(s_it==symbol_table.symbols.end())
-    {
-      error().source_location = expr.source_location();
-      error() << "failed to find decl symbol '" << identifier
-              << "' in symbol table" << eom;
-      throw 0;
-    }
-
-    const symbolt &symbol=s_it->second;
-
-    if(symbol.is_type || symbol.is_extern || symbol.is_static_lifetime ||
-       !is_complete_type(symbol.type) || symbol.type.id()==ID_code)
-    {
-      error().source_location = expr.source_location();
-      error() << "unexpected quantified symbol" << eom;
-      throw 0;
-    }
-
-    code_declt decl(symbol.symbol_expr());
-    decl.add_source_location()=declaration.source_location();
-
-    binary_expr.op0() = decl;
 
     typecheck_expr(binary_expr.op1());
   }

@@ -26,6 +26,8 @@ extern char *yyansi_ctext;
 
 #include "ansi_c_y.tab.h"
 
+#include <util/mathematical_expr.h>
+
 #ifdef _MSC_VER
 // possible loss of data
 #pragma warning(disable:4242)
@@ -469,7 +471,7 @@ quantifier_expression:
         {
           $$=$1;
           set($$, ID_forall);
-          mto($$, $4);
+          parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($4)) } ));
           mto($$, $5);
           PARSER.pop_scope();
         }
@@ -477,7 +479,7 @@ quantifier_expression:
         {
           $$=$1;
           set($$, ID_exists);
-          mto($$, $4);
+          parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($4)) } ));
           mto($$, $5);
           PARSER.pop_scope();
         }
@@ -810,7 +812,7 @@ ACSL_binding_expression:
         {
           $$=$1;
           set($$, ID_forall);
-          mto($$, $3);
+          parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($3)) } ));
           mto($$, $4);
           PARSER.pop_scope();
         }
@@ -818,7 +820,7 @@ ACSL_binding_expression:
         {
           $$=$1;
           set($$, ID_exists);
-          mto($$, $3);
+          parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($3)) } ));
           mto($$, $4);
           PARSER.pop_scope();
         }
