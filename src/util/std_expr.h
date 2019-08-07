@@ -4282,6 +4282,50 @@ public:
   }
 };
 
+/// \brief A base class for variable bindings (quantifiers, let, lambda)
+class binding_exprt : public binary_exprt
+{
+public:
+  using variablest = std::vector<symbol_exprt>;
+
+  /// construct the binding expression
+  binding_exprt(
+    irep_idt _id,
+    const variablest &_variables,
+    exprt _where,
+    typet _type)
+    : binary_exprt(
+        multi_ary_exprt(
+          ID_tuple,
+          (const operandst &)_variables,
+          typet(ID_tuple)),
+        _id,
+        std::move(_where),
+        std::move(_type))
+  {
+  }
+
+  variablest &variables()
+  {
+    return (variablest &)to_multi_ary_expr(op0()).operands();
+  }
+
+  const variablest &variables() const
+  {
+    return (variablest &)to_multi_ary_expr(op0()).operands();
+  }
+
+  exprt &where()
+  {
+    return op1();
+  }
+
+  const exprt &where() const
+  {
+    return op1();
+  }
+};
+
 /// \brief A let expression
 class let_exprt : public ternary_exprt
 {

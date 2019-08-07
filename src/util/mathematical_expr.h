@@ -271,47 +271,6 @@ inline function_application_exprt &to_function_application_expr(exprt &expr)
   return ret;
 }
 
-/// \brief A base class for variable bindings (quantifiers, let, lambda)
-class binding_exprt : public binary_exprt
-{
-public:
-  using variablest = std::vector<symbol_exprt>;
-
-  /// construct the binding expression
-  binding_exprt(
-    irep_idt _id,
-    const variablest &_variables,
-    exprt _where,
-    typet _type)
-    : binary_exprt(
-        tuple_exprt((const operandst &)_variables),
-        _id,
-        std::move(_where),
-        std::move(_type))
-  {
-  }
-
-  variablest &variables()
-  {
-    return (variablest &)static_cast<tuple_exprt &>(op0()).operands();
-  }
-
-  const variablest &variables() const
-  {
-    return (variablest &)static_cast<const tuple_exprt &>(op0()).operands();
-  }
-
-  exprt &where()
-  {
-    return op1();
-  }
-
-  const exprt &where() const
-  {
-    return op1();
-  }
-};
-
 /// \brief A base class for quantifier expressions
 class quantifier_exprt : public binding_exprt
 {
