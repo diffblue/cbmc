@@ -9,13 +9,15 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \file
 /// Context-insensitive lazy methods container
 
-#include "ci_lazy_methods.h"
-#include "java_static_initializers.h"
+#include "ci_lazy_methods_needed.h"
 
-#include <java_bytecode/select_pointer_type.h>
-#include <string>
 #include <util/namespace.h>
 #include <util/std_types.h>
+
+#include <string>
+
+#include "java_static_initializers.h"
+#include "select_pointer_type.h"
 
 /// Notes `method_symbol_name` is referenced from some reachable function, and
 /// should therefore be elaborated.
