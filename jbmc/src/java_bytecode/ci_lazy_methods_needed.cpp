@@ -9,7 +9,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \file
 /// Context-insensitive lazy methods container
 
-#include "ci_lazy_methods.h"
+#include "ci_lazy_methods_needed.h"
 #include "java_static_initializers.h"
 
 #include <java_bytecode/select_pointer_type.h>
