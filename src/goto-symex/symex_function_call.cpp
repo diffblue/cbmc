@@ -116,15 +116,16 @@ void goto_symext::parameter_assignments(
               from_integer(0, index_type()),
               parameter_type);
         }
+        // clang-format on
         else
         {
           std::ostringstream error;
-          error << "function call: parameter \"" << identifier
-                << "\" type mismatch: got " << rhs.type().pretty()
-                << ", expected " << parameter_type.pretty();
+          error << state.source.pc->source_location.as_string() << ": "
+                << "function call: parameter \"" << identifier
+                << "\" type mismatch:\ngot " << rhs.type().pretty()
+                << "\nexpected " << parameter_type.pretty();
           throw unsupported_operation_exceptiont(error.str());
         }
-        // clang-format on
       }
 
       assignment_typet assignment_type;
