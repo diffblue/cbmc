@@ -703,9 +703,13 @@ int goto_instrument_parse_optionst::doit()
         goto_model.goto_functions.update();
       }
 
-      optionalt<irep_idt> stub_name = optionalt<irep_idt>();
-      if(c_stub)
-        stub_name.emplace(cmdline.get_value("contract-to-stub"));
+      // Note: this assignment is convoluted to please GCC
+      auto stub_name = [&]() -> optionalt<irep_idt> {
+        if(c_stub)
+          return {cmdline.get_value("contract-to-stub")};
+        else
+          return {};
+      }();
 
       // restore RETURN instructions in case remove_returns had been
       // applied
