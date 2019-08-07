@@ -72,6 +72,9 @@ protected:
   void
   assert_ensures(goto_programt &goto_program, goto_programt::targett target);
 
+  goto_programt
+  make_ensures_assertion_for_call(const code_function_callt &call);
+
   void add_contract_check(
     const irep_idt &function,
     goto_programt &dest);
@@ -259,15 +262,14 @@ void code_contractst::code_contracts(
       apply_contract(goto_function.body, it);
 }
 
-void code_contractst::assert_ensures(
-  goto_programt &goto_program,
-  goto_programt::targett target)
+goto_programt code_contractst::make_ensures_assertion_for_call(
+  const code_function_callt &call)
 {
-  const code_function_callt &call = target->get_function_call();
+  goto_programt goto_assertion;
 
   // we don't handle function pointers
   if(call.function().id() != ID_symbol)
-    return;
+    return goto_assertion;
 
   const irep_idt &function = to_symbol_expr(call.function()).get_identifier();
   const symbolt &f_sym = ns.lookup(function);
@@ -277,7 +279,7 @@ void code_contractst::assert_ensures(
 
   // is there a contract?
   if(ensures.is_nil())
-    return;
+    return goto_assertion;
 
   // replace formal parameters by arguments, replace return
   replace_symbolt replace;
@@ -295,23 +297,36 @@ void code_contractst::assert_ensures(
   for(code_typet::parameterst::const_iterator p_it = type.parameters().begin();
       p_it != type.parameters().end() && a_it != call.arguments().end();
       ++p_it, ++a_it)
+  {
     if(!p_it->get_identifier().empty())
     {
       symbol_exprt p(p_it->get_identifier(), p_it->type());
       replace.insert(p, *a_it);
     }
+  }
 
   replace(ensures);
 
-  // assert the ensures part of the contract after the call
-  ++target;
-  code_assertt a(ensures);
-  goto_programt new_goto_program;
+  code_assertt assertion(ensures);
   null_message_handlert message_handler;
   // We first need to convert the expression to a goto_program
-  goto_convert(a, symbol_table, new_goto_program, message_handler, ID_C);
+  goto_convert(assertion, symbol_table, goto_assertion, message_handler, ID_C);
 
-  goto_program.insert_before_swap(target, new_goto_program);
+  return goto_assertion;
+}
+
+void code_contractst::assert_ensures(
+  goto_programt &goto_program,
+  goto_programt::targett target)
+{
+  const code_function_callt &call = target->get_function_call();
+
+  // Create the goto program for the assertion
+  goto_programt goto_assertion = make_ensures_assertion_for_call(call);
+
+  // assert the ensures part of the contract after the call
+  ++target;
+  goto_program.insert_before_swap(target, goto_assertion);
 }
 
 void code_contractst::assert_ensures_after_calls(
