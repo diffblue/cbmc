@@ -251,8 +251,13 @@ static void make_char_array_pointer_associations(
       const auto fun_app =
         expr_try_dynamic_cast<function_application_exprt>(eq.rhs()))
     {
-      if(const auto result = generator.make_array_pointer_association(*fun_app))
-        eq.rhs() = *result;
+      const auto new_equation =
+        generator.make_array_pointer_association(eq.lhs(), *fun_app);
+      if(new_equation)
+      {
+        eq =
+          equal_exprt{from_integer(true, new_equation->type()), *new_equation};
+      }
     }
   }
 }
@@ -645,9 +650,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     }
   }
 
-  // Generator is also used by get, so we have to use it as a class member
-  // but we make sure it is cleared at each `dec_solve` call.
-  generator.constraints.clear();
+  // Constraints start clear at each `dec_solve` call.
+  string_constraintst constraints;
   make_char_array_pointer_associations(generator, equations);
 
 #ifdef DEBUG
@@ -677,7 +681,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   log.debug() << "dec_solve: add constraints" << messaget::eom;
-  dependencies.add_constraints(generator);
+  merge(constraints, dependencies.add_constraints(generator));
 
 #ifdef DEBUG
   output_equations(log.debug(), equations);
@@ -702,8 +706,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 
   std::transform(
-    generator.constraints.universal.begin(),
-    generator.constraints.universal.end(),
+    constraints.universal.begin(),
+    constraints.universal.end(),
     std::back_inserter(axioms.universal),
     [&](string_constraintt constraint) {
       constraint.replace_expr(symbol_resolve);
@@ -715,8 +719,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     });
 
   std::transform(
-    generator.constraints.not_contains.begin(),
-    generator.constraints.not_contains.end(),
+    constraints.not_contains.begin(),
+    constraints.not_contains.end(),
     std::back_inserter(axioms.not_contains),
     [&](string_not_contains_constraintt axiom) {
       replace(symbol_resolve, axiom);
@@ -737,7 +741,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       nc_axiom, generator.fresh_symbol("not_contains_witness", witness_type));
   }
 
-  for(const exprt &lemma : generator.constraints.existential)
+  for(const exprt &lemma : constraints.existential)
   {
     add_lemma(substitute_array_access(lemma, generator.fresh_symbol, true));
   }

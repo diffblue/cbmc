@@ -55,9 +55,12 @@ exprt sum_overflows(const plus_exprt &sum)
 /// Insert in `array_pool` a binding from `ptr` to `arr`. If the length of `arr`
 /// is infinite, a new integer symbol is created and stored in `array_pool`.
 /// This also adds the default axioms for `arr`.
+/// \param return_code: expression which is assigned the result of the function
 /// \param f: a function application with argument a character array `arr` and
 ///   a character pointer `ptr`.
+/// \return a constraint
 exprt string_constraint_generatort::associate_array_to_pointer(
+  const exprt &return_code,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
@@ -71,15 +74,17 @@ exprt string_constraint_generatort::associate_array_to_pointer(
   const exprt &pointer_expr = f.arguments()[1];
   array_pool.insert(simplify_expr(pointer_expr, ns), array_expr);
   // created_strings.emplace(to_array_string_expr(array_expr));
-  return from_integer(0, f.type());
+  return equal_exprt{return_code, from_integer(0, f.type())};
 }
 
 /// Associate an integer length to a char array.
 /// This adds an axiom ensuring that `arr.length` and `length` are equal.
+/// \param return_code: expression which is assigned the result of the function
 /// \param f: a function application with argument a character array `arr` and
 ///   an integer `length`.
-/// \return integer expression equal to 0
+/// \return a constraint
 exprt string_constraint_generatort::associate_length_to_array(
+  const exprt &return_code,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
@@ -87,8 +92,8 @@ exprt string_constraint_generatort::associate_length_to_array(
   const exprt &new_length = f.arguments()[1];
 
   const auto &length = array_pool.get_or_create_length(array_expr);
-  constraints.existential.push_back(equal_exprt(length, new_length));
-  return from_integer(0, f.type());
+  return and_exprt{equal_exprt{return_code, from_integer(0, f.type())},
+                   equal_exprt(length, new_length)};
 }
 
 void string_constraintst::clear()
@@ -200,13 +205,14 @@ static irep_idt get_function_name(const function_application_exprt &expr)
 }
 
 optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
+  const exprt &return_code,
   const function_application_exprt &expr)
 {
   const irep_idt &id = get_function_name(expr);
   if(id == ID_cprover_associate_array_to_pointer_func)
-    return associate_array_to_pointer(expr);
+    return associate_array_to_pointer(return_code, expr);
   else if(id == ID_cprover_associate_length_to_array_func)
-    return associate_length_to_array(expr);
+    return associate_length_to_array(return_code, expr);
   return {};
 }
 
