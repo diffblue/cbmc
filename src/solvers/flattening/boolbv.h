@@ -149,7 +149,7 @@ protected:
   virtual bvt convert_complex(const complex_exprt &expr);
   virtual bvt convert_complex_real(const complex_real_exprt &expr);
   virtual bvt convert_complex_imag(const complex_imag_exprt &expr);
-  virtual bvt convert_lambda(const array_comprehension_exprt &expr);
+  virtual bvt convert_array_comprehension(const array_comprehension_exprt &);
   virtual bvt convert_let(const let_exprt &);
   virtual bvt convert_array_of(const array_of_exprt &expr);
   virtual bvt convert_union(const union_exprt &expr);
