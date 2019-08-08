@@ -164,8 +164,8 @@ void symex_target_equationt::decl(
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
   SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
 
-  // the condition is trivially true, and only
-  // there so we see the symbols
+  // the condition is trivially true, and only given to the solver so that
+  // it knows about the declared symbol
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_lhs);
 
   merge_ireps(SSA_step);
