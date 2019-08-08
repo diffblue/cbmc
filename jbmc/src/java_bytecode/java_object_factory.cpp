@@ -431,8 +431,7 @@ void initialize_nondet_string_fields(
   // Printable ASCII characters are between ' ' and '~'.
   if(printable)
   {
-    add_character_set_constraint(
-      array_pointer,
+    add_character_set_constraint(array_pointer,
       length_expr,
       integer_interval_to_string(printable_char_range),
       symbol_table,
