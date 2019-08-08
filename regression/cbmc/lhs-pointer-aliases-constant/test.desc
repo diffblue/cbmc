@@ -1,0 +1,10 @@
+CORE
+test.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This checks that we tolerate an apparent write to a string constant, which of course
+can't happen in reality but may appear to happen due to over-approximate alias analysis.

@@ -247,9 +247,12 @@ public:
   /// Returns true if \p lvalue is a read-only object, such as the null object
   static bool is_read_only_object(const exprt &lvalue)
   {
+    // Note ID_constant can occur due to a partial write to a string constant,
+    // (i.e. something like byte_extract int from "hello" offset 2), which
+    // simplifies to a plain constant.
     return lvalue.id() == ID_string_constant || lvalue.id() == ID_null_object ||
            lvalue.id() == "zero_string" || lvalue.id() == "is_zero_string" ||
-           lvalue.id() == "zero_string_length";
+           lvalue.id() == "zero_string_length" || lvalue.id() == ID_constant;
   }
 
 private:
