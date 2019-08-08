@@ -199,6 +199,148 @@ public class StaticValues extends StaticParent {
     assert referenceToReferenceArray != referenceArrayField;
   }
 
+  // Primitive wrapper types as static field types
+  public static Boolean booleanWrapperField = true;
+  public static void testBooleanWrapperPass() { assert booleanWrapperField; }
+  public static void testBooleanWrapperFail() { assert !booleanWrapperField; }
+
+  public static Byte byteWrapperField = (byte)50;
+  public static void testByteWrapperPass() {
+    assert byteWrapperField == (byte)50;
+  }
+  public static void testByteWrapperFail() {
+    assert byteWrapperField != (byte)50;
+  }
+
+  public static Character characterWrapperField = '!';
+  public static void testCharacterWrapperPass() {
+    assert characterWrapperField == '!';
+  }
+  public static void testCharacterWrapperFail() {
+    assert characterWrapperField != '!';
+  }
+
+  public static Double doubleWrapperField = 24.56;
+  public static void testDoubleWrapperPass() {
+    assert doubleWrapperField == 24.56;
+  }
+  public static void testDoubleWrapperFail() {
+    assert doubleWrapperField != 24.56;
+  }
+
+  public static Float floatWrapperField = 13.13f;
+  public static void testFloatWrapperPass() {
+    assert floatWrapperField == 13.13f;
+  }
+  public static void testFloatWrapperFail() {
+    assert floatWrapperField != 13.13f;
+  }
+
+  public static Integer integerWrapperField = Util.setTo(1000);
+  public static void testIntegerWrapperPass() {
+    assert integerWrapperField == 1000;
+  }
+  public static void testIntegerWrapperFail() {
+    assert integerWrapperField != 1000;
+  }
+
+  public static Long longWrapperField = 21000000000L;
+  public static void testLongWrapperPass() {
+    assert longWrapperField == 21000000000L;
+  }
+  public static void testLongWrapperFail() {
+    assert longWrapperField != 21000000000L;
+  }
+
+  public static Short shortWrapperField = (short)200;
+  public static void testShortWrapperPass() {
+    assert shortWrapperField == (short)200;
+  }
+  public static void testShortWrapperFail() {
+    assert shortWrapperField != (short)200;
+  }
+
+  // Primitive wrapper types as fields of static field types
+  public static ContainerForBoolean booleanWrapperContainer =
+      new ContainerForBoolean(true);
+  public static void testBooleanWrapperContainerPass() {
+    assert booleanWrapperContainer.booleanField;
+  }
+  public static void testBooleanWrapperContainerFail() {
+    assert !booleanWrapperContainer.booleanField;
+  }
+
+  public static ContainerForByte byteWrapperContainer =
+      new ContainerForByte((byte)50);
+  public static void testByteWrapperContainerPass() {
+    assert byteWrapperContainer.byteField == (byte)50;
+  }
+  public static void testByteWrapperContainerFail() {
+    assert byteWrapperContainer.byteField != (byte)50;
+  }
+
+  public static ContainerForCharacter characterWrapperContainer =
+      new ContainerForCharacter('!');
+  public static void testCharacterWrapperContainerPass() {
+    assert characterWrapperContainer.characterField == '!';
+  }
+  public static void testCharacterWrapperContainerFail() {
+    assert characterWrapperContainer.characterField != '!';
+  }
+
+  public static ContainerForDouble doubleWrapperContainer =
+      new ContainerForDouble(24.56);
+  public static void testDoubleWrapperContainerPass() {
+    assert doubleWrapperContainer.doubleField == 24.56;
+  }
+  public static void testDoubleWrapperContainerFail() {
+    assert doubleWrapperContainer.doubleField != 24.56;
+  }
+
+  public static ContainerForFloat floatWrapperContainer =
+      new ContainerForFloat(13.13f);
+  public static void testFloatWrapperContainerPass() {
+    assert floatWrapperContainer.floatField == 13.13f;
+  }
+  public static void testFloatWrapperContainerFail() {
+    assert floatWrapperContainer.floatField != 13.13f;
+  }
+
+  public static ContainerForInteger integerWrapperContainer =
+      new ContainerForInteger(1000);
+  public static void testIntegerWrapperContainerPass() {
+    assert integerWrapperContainer.integerField == 1000;
+  }
+  public static void testIntegerWrapperContainerFail() {
+    assert integerWrapperContainer.integerField != 1000;
+  }
+
+  public static ContainerForLong longWrapperContainer =
+      new ContainerForLong(21000000000L);
+  public static void testLongWrapperContainerPass() {
+    assert longWrapperContainer.longField == 21000000000L;
+  }
+  public static void testLongWrapperContainerFail() {
+    assert longWrapperContainer.longField != 21000000000L;
+  }
+
+  public static ContainerForShort shortWrapperContainer =
+      new ContainerForShort((short)200);
+  public static void testShortWrapperContainerPass() {
+    assert shortWrapperContainer.shortField == (short)200;
+  }
+  public static void testShortWrapperContainerFail() {
+    assert shortWrapperContainer.shortField != (short)200;
+  }
+
+  public static Integer[] integerWrapperArray = {1111};
+  public static void testIntegerWrapperArrayPass() {
+    assert integerWrapperArray.length == 1 && integerWrapperArray[0] == 1111;
+  }
+  public static void testIntegerWrapperArrayFail() {
+    assert integerWrapperArray.length != 1 || integerWrapperArray[0] != 1111;
+  }
+
   // Strings
   public static String stringField = Util.repeat("hello! ", 6);
   public static void testStringPass() {

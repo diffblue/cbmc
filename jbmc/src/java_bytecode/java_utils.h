@@ -31,6 +31,10 @@ bool java_is_array_type(const typet &type);
 /// and in particular may not have length and data fields.
 bool is_java_string_type(const struct_typet &struct_type);
 
+/// Returns true iff the argument is the fully qualified name of a Java
+/// primitive wrapper type.
+bool is_primitive_wrapper_type_name(const std::string &type_name);
+
 void generate_class_stub(
   const irep_idt &class_name,
   symbol_table_baset &symbol_table,

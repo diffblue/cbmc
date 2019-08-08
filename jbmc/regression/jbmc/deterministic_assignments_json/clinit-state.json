@@ -412,6 +412,76 @@
         "@type":"java.lang.Boolean",
         "value":true
       }
+    },
+    "booleanWrapperField":{
+      "@type":"java.lang.Boolean",
+      "value":true
+    },
+    "byteWrapperField":{
+      "@type":"java.lang.Byte",
+      "value":50
+    },
+    "characterWrapperField":{
+      "@type":"java.lang.Character",
+      "value":"!"
+    },
+    "doubleWrapperField":{
+      "@type":"java.lang.Double",
+      "value":24.56
+    },
+    "floatWrapperField":{
+      "@type":"java.lang.Float",
+      "value":13.13
+    },
+    "integerWrapperField":{
+      "@type":"java.lang.Integer",
+      "value":1000
+    },
+    "longWrapperField":{
+      "@type":"java.lang.Long",
+      "value":"21000000000"
+    },
+    "shortWrapperField":{
+      "@type":"java.lang.Short",
+      "value":200
+    },
+    "booleanWrapperContainer":{
+      "@type":"ContainerForBoolean",
+      "booleanField":true
+    },
+    "byteWrapperContainer":{
+      "@type":"ContainerForByte",
+      "byteField":50
+    },
+    "characterWrapperContainer":{
+      "@type":"ContainerForCharacter",
+      "characterField":"!"
+    },
+    "doubleWrapperContainer":{
+      "@type":"ContainerForDouble",
+      "doubleField":24.56
+    },
+    "floatWrapperContainer":{
+      "@type":"ContainerForFloat",
+      "floatField":13.13
+    },
+    "integerWrapperContainer":{
+      "@type":"ContainerForInteger",
+      "integerField":1000
+    },
+    "longWrapperContainer":{
+      "@type":"ContainerForLong",
+      "longField":"21000000000"
+    },
+    "shortWrapperContainer":{
+      "@type":"ContainerForShort",
+      "shortField":200
+    },
+    "integerWrapperArray":{
+      "@type":"[Ljava.lang.Integer;",
+      "@items":[
+        1111
+      ]
     }
   },
   "OtherClass":{
