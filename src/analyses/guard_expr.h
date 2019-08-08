@@ -55,8 +55,7 @@ public:
   /// This can vary according to the guard implementation.
   static constexpr bool is_always_simplified = false;
 
-  /// Return `guard => dest` or a simplified variant thereof if either guard or
-  /// dest are trivial.
+  DEPRECATED(SINCE(2019, 08, 21, "use implies instead"))
   exprt guard_expr(exprt expr) const;
 
   /// Return `guard => other` or a simplified variant thereof if either guard or
