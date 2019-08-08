@@ -72,6 +72,13 @@ public:
   friend guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2);
   friend guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2);
 
+  /// Underlying representation of the guard. The type can vary for each guard
+  /// implementation.
+  const exprt &underlying() const
+  {
+    return expr;
+  }
+
 private:
   exprt expr;
 };

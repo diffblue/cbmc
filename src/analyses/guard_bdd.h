@@ -65,6 +65,13 @@ public:
     return guard_bddt(manager, bdd.bdd_not());
   }
 
+  /// Underlying representation of the guard. The type can vary for each guard
+  /// implementation.
+  const bddt &underlying() const
+  {
+    return bdd;
+  }
+
 private:
   bdd_exprt &manager;
   bddt bdd;
