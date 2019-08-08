@@ -1,0 +1,11 @@
+CORE symex-driven-lazy-loading-expected-failure
+Main.class
+--function Main.test3 --property "java::Main.test3:(Ljava/lang/String;)V.assertion.1"
+^Generated [0-9]+ VCC\(s\), 1 remaining after simplification$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that constant propagation does not happen, since a constant
+result cannot be determined from the arguments to `+`.

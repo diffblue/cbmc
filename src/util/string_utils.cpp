@@ -10,9 +10,10 @@ Author: Daniel Poetzl
 #include "exception_utils.h"
 #include "invariant.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
-#include <algorithm>
+#include <iomanip>
 
 /// Remove all whitespace characters from either end of a string. Whitespace
 /// in the middle of the string is left unchanged
@@ -158,4 +159,20 @@ std::string escape(const std::string &s)
   }
 
   return result;
+}
+
+std::string escape_non_alnum(const std::string &to_escape)
+{
+  std::ostringstream escaped;
+  for(auto &ch : to_escape)
+  {
+    if(ch == '_')
+      escaped << "__";
+    else if(isalnum(ch))
+      escaped << ch;
+    else
+      escaped << '_' << std::hex << std::setfill('0') << std::setw(2)
+              << (unsigned int)ch;
+  }
+  return escaped.str();
 }

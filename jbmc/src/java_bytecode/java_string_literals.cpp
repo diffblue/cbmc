@@ -15,33 +15,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/arith_tools.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
+#include <util/string_utils.h>
 #include <util/unicode.h>
 
 #include <iomanip>
 #include <sstream>
-
-/// Replace non-alphanumeric characters with `_xx` escapes, where xx are hex
-/// digits. Underscores are replaced by `__`.
-/// \param to_escape: string to escape
-/// \return string with non-alphanumeric characters escaped
-static std::string escape_non_alnum(const std::string &to_escape)
-{
-  std::ostringstream escaped;
-  for(auto &ch : to_escape)
-  {
-    if(ch=='_')
-      escaped << "__";
-    else if(isalnum(ch))
-      escaped << ch;
-    else
-      escaped << '_'
-              << std::hex
-              << std::setfill('0')
-              << std::setw(2)
-              << (unsigned int)ch;
-  }
-  return escaped.str();
-}
 
 /// Convert UCS-2 or UTF-16 to an array expression.
 /// \par parameters: `in`: wide string to convert

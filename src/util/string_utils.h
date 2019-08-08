@@ -96,4 +96,10 @@ join_strings(Stream &&os, const It b, const It e, const Delimiter &delimiter)
 /// programming language.
 std::string escape(const std::string &);
 
+/// Replace non-alphanumeric characters with `_xx` escapes, where xx are hex
+/// digits. Underscores are replaced by `__`.
+/// \param to_escape: string to escape
+/// \return string with non-alphanumeric characters escaped
+std::string escape_non_alnum(const std::string &to_escape);
+
 #endif

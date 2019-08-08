@@ -162,7 +162,10 @@ void array_poolt::insert(
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
 
-  attempt_assign_length_from_type(array_expr, length_of_array, fresh_symbol);
+  if(length_of_array.find(array_expr) == length_of_array.end())
+  {
+    attempt_assign_length_from_type(array_expr, length_of_array, fresh_symbol);
+  }
 }
 
 /// Return a map mapping all array_string_exprt of the array_pool to their
