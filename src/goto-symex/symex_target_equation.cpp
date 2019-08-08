@@ -290,7 +290,8 @@ void symex_target_equationt::assumption(
   SSA_step.guard = guard;
   SSA_step.cond_expr=cond;
 
-  merge_ireps(SSA_step);
+  if(!guardt::is_always_simplified)
+    merge_ireps(SSA_step);
 }
 
 void symex_target_equationt::assertion(
@@ -306,7 +307,8 @@ void symex_target_equationt::assertion(
   SSA_step.cond_expr=cond;
   SSA_step.comment=msg;
 
-  merge_ireps(SSA_step);
+  if(!guardt::is_always_simplified)
+    merge_ireps(SSA_step);
 }
 
 void symex_target_equationt::goto_instruction(
