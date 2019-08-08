@@ -39,8 +39,17 @@ void java_bytecode_convert_method(
   const class_hierarchyt &class_hierarchy,
   bool threading_support);
 
+void create_method_stub_symbol(
+  const irep_idt &identifier,
+  const irep_idt &base_name,
+  const irep_idt &pretty_name,
+  const typet &type,
+  const irep_idt &declaring_class,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler);
+
 void java_bytecode_convert_method_lazy(
-  const symbolt &class_symbol,
+  symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &,
   symbol_tablet &symbol_table,

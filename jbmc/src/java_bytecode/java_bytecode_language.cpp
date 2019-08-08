@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literal_expr.h"
 #include "java_string_literals.h"
 #include "java_utils.h"
+#include "lambda_synthesis.h"
 
 #include "expr2java.h"
 #include "load_method_by_regex.h"
@@ -739,6 +740,24 @@ bool java_bytecode_languaget::typecheck(
     }
   }
 
+  // Now add synthetic classes for every invokedynamic instruction found (it
+  // makes this easier that all interface types and their methods have been
+  // created above):
+  for(const auto &id_and_symbol : symbol_table)
+  {
+    const auto &symbol = id_and_symbol.second;
+    const auto &id = symbol.name;
+    if(can_cast_type<code_typet>(symbol.type) && method_bytecode.get(id))
+    {
+      create_invokedynamic_synthetic_classes(
+        id,
+        method_bytecode.get(id)->get().method.instructions,
+        symbol_table,
+        synthetic_methods,
+        get_message_handler());
+    }
+  }
+
   // Now that all classes have been created in the symbol table we can populate
   // the class hierarchy:
   class_hierarchy(symbol_table);
@@ -1062,6 +1081,15 @@ static void notify_static_method_calls(
           expr_dynamic_cast<symbol_exprt>(fn_call->function());
         needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
       }
+      else if(
+        it->id() == ID_side_effect &&
+        to_side_effect_expr(*it).get_statement() == ID_function_call)
+      {
+        const auto &call_expr = to_side_effect_expr_function_call(*it);
+        const symbol_exprt &fn_sym =
+          expr_dynamic_cast<symbol_exprt>(call_expr.function());
+        needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+      }
     }
   }
 }
@@ -1172,6 +1200,14 @@ bool java_bytecode_languaget::convert_single_method(
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
+      break;
+    case synthetic_method_typet::INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR:
+      writable_symbol.value = invokedynamic_synthetic_constructor(
+        function_id, symbol_table, get_message_handler());
+      break;
+    case synthetic_method_typet::INVOKEDYNAMIC_METHOD:
+      writable_symbol.value = invokedynamic_synthetic_method(
+        function_id, symbol_table, get_message_handler());
       break;
     }
     // Notify lazy methods of static calls made from the newly generated

@@ -1,0 +1,10 @@
+CORE
+Nondet.class
+--function Nondet.testReferenceArray --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+line 14 assertion.*FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Check that reference arrays created by the object factory can be
+captured by a lambda

@@ -1,19 +1,37 @@
 CORE
 Lambdatest.class
---verbosity 10 --show-goto-functions --function Lambdatest.main
-lambda function reference lambda\$new\$0 in class \"Lambdatest\"
-lambda function reference lambda\$new\$1 in class \"Lambdatest\"
-lambda function reference lambda\$f\$2 in class \"Lambdatest\"
-lambda function reference lambda\$i\$3 in class \"Lambdatest\"
-lambda function reference lambda\$j\$4 in class \"Lambdatest\"
-lambda function reference lambda\$k\$5 in class \"Lambdatest\"
-lambda function reference lambda\$l\$6 in class \"Lambdatest\"
-lambda function reference lambda\$m\$7 in class \"Lambdatest\"
-lambda function reference lambda\$static\$0 in class \"B\"
-^EXIT=0$
+--function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+line 76 assertion.*SUCCESS$
+line 79 assertion.*FAILURE$
+line 81 assertion.*SUCCESS$
+line 83 assertion.*FAILURE$
+line 85 assertion.*SUCCESS$
+line 87 assertion.*FAILURE$
+line 89 assertion.*SUCCESS$
+line 91 assertion.*FAILURE$
+line 93 assertion.*SUCCESS$
+line 95 assertion.*FAILURE$
+line 97 assertion.*SUCCESS$
+line 98 assertion.*SUCCESS$
+line 100 assertion.*FAILURE$
+line 102 assertion.*SUCCESS$
+line 103 assertion.*SUCCESS$
+line 105 assertion.*FAILURE$
+line 107 assertion.*SUCCESS$
+line 109 assertion.*FAILURE$
+line 111 assertion.*SUCCESS$
+line 113 assertion.*FAILURE$
+line 115 assertion.*SUCCESS$
+line 117 assertion.*FAILURE$
+line 122 assertion.*SUCCESS$
+line 126 assertion.*FAILURE$
+line 131 assertion.*SUCCESS$
+line 135 assertion.*FAILURE$
+line 142 assertion.*SUCCESS$
+line 148 assertion.*FAILURE$
+line 151 assertion.*SUCCESS$
+line 153 assertion.*FAILURE$
+line 158 assertion.*SUCCESS$
+line 162 assertion.*FAILURE$
+^EXIT=10$
 ^SIGNAL=0$
---
---
-Incompatible with symex-driven lazy loading because this test wants to process
-everything in the given class, not the functions reachable from a particular
-entry point, which is required for symex-driven loading.

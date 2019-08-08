@@ -1,9 +1,7 @@
 public class B {
-    public int y;
+  public int y;
 
-    public static java.util.function.Function<Double, Double> dmul = x -> x * 3.1415;
+  public static Function<Double, Double> dmul = x -> x * 1.5;
 
-    public void set(int x) {
-        y = x;
-    }
+  public void set(int x) { y = x; }
 }

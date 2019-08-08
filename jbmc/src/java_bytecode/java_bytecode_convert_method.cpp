@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literal_expr.h"
 #include "java_types.h"
 #include "java_utils.h"
+#include "lambda_synthesis.h"
 #include "pattern.h"
 #include "remove_exceptions.h"
 
@@ -92,6 +93,35 @@ static void assign_parameter_names(
     parameter_symbol.type=parameters[i].type();
     symbol_table.add(parameter_symbol);
   }
+}
+
+void create_method_stub_symbol(
+  const irep_idt &identifier,
+  const irep_idt &base_name,
+  const irep_idt &pretty_name,
+  const typet &type,
+  const irep_idt &declaring_class,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
+{
+  messaget log(message_handler);
+
+  symbolt symbol;
+  symbol.name = identifier;
+  symbol.base_name = base_name;
+  symbol.pretty_name = pretty_name;
+  symbol.type = type;
+  symbol.type.set(ID_access, ID_private);
+  to_java_method_type(symbol.type).set_is_final(true);
+  symbol.value.make_nil();
+  symbol.mode = ID_java;
+  assign_parameter_names(
+    to_java_method_type(symbol.type), symbol.name, symbol_table);
+  set_declaring_class(symbol, declaring_class);
+
+  log.debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
+              << "'" << messaget::eom;
+  symbol_table.add(symbol);
 }
 
 static bool is_constructor(const irep_idt &method_name)
@@ -264,35 +294,18 @@ java_method_typet member_type_lazy(
   return to_java_method_type(*member_type_from_descriptor);
 }
 
-/// Retrieves the symbol of the lambda method associated with the given
-/// lambda method handle (bootstrap method).
-/// \param lambda_method_handles: Vector of lambda method handles (bootstrap
-///   methods) of the class where the lambda is called
-/// \param index: Index of the lambda method handle in the vector
-/// \return Symbol of the lambda method if the method handle has a known type
-optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
-  const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
-  const size_t index)
-{
-  const irept &lambda_method_handle = lambda_method_handles.at(index);
-  // If the lambda method handle has an unknown type, it does not refer to
-  // any symbol (it has an empty identifier)
-  if(!lambda_method_handle.id().empty())
-    return symbol_table.lookup_ref(lambda_method_handle.id());
-  return {};
-}
-
 /// This creates a method symbol in the symtab, but doesn't actually perform
 /// method conversion just yet. The caller should call
 /// java_bytecode_convert_method later to give the symbol/method a body.
-/// \param class_symbol: The class this method belongs to
+/// \param class_symbol: The class this method belongs to. The method, if not
+///   static, will be added to the class' list of methods.
 /// \param method_identifier: The fully qualified method name, including type
 ///   descriptor (e.g. "x.y.z.f:(I)")
 /// \param m: The parsed method object to convert.
 /// \param symbol_table: The global symbol table (will be modified).
 /// \param message_handler: A message handler to collect warnings.
 void java_bytecode_convert_method_lazy(
-  const symbolt &class_symbol,
+  symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &m,
   symbol_tablet &symbol_table,
@@ -384,6 +397,20 @@ void java_bytecode_convert_method_lazy(
   }
 
   symbol_table.add(method_symbol);
+
+  if(!m.is_static)
+  {
+    class_typet::methodt new_method;
+    new_method.set_name(method_symbol.name);
+    new_method.set_base_name(method_symbol.base_name);
+    new_method.set_pretty_name(method_symbol.pretty_name);
+    new_method.set_access(member_type.get_access());
+    new_method.type() = method_symbol.type;
+
+    to_class_type(class_symbol.type)
+      .methods()
+      .emplace_back(std::move(new_method));
+  }
 }
 
 static irep_idt get_method_identifier(
@@ -577,8 +604,7 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
   {
     code_blockt code(convert_parameter_annotations(m, method_type));
-    code.append(convert_instructions(
-      m, to_java_class_type(class_symbol.type).lambda_method_handles()));
+    code.append(convert_instructions(m));
     method_symbol.value = std::move(code);
   }
 }
@@ -1007,9 +1033,8 @@ code_blockt java_bytecode_convert_methodt::convert_parameter_annotations(
   return code;
 }
 
-code_blockt java_bytecode_convert_methodt::convert_instructions(
-  const methodt &method,
-  const java_class_typet::java_lambda_method_handlest &lambda_method_handles)
+code_blockt
+java_bytecode_convert_methodt::convert_instructions(const methodt &method)
 {
   const instructionst &instructions=method.instructions;
 
@@ -1263,10 +1288,9 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     }
     else if(bytecode == BC_invokedynamic)
     {
-      // not used in Java
       if(
-        const auto res = convert_invoke_dynamic(
-          lambda_method_handles, i_it->source_location, arg0))
+        const auto res =
+          convert_invoke_dynamic(i_it->source_location, i_it->address, arg0, c))
       {
         results.resize(1);
         results[0] = *res;
@@ -2096,6 +2120,30 @@ exprt::operandst &java_bytecode_convert_methodt::convert_const(
   return results;
 }
 
+static void adjust_invoke_argument_types(
+  const java_method_typet::parameterst &parameters,
+  code_function_callt::argumentst &arguments)
+{
+  // do some type adjustment for the arguments,
+  // as Java promotes arguments
+  // Also cast pointers since intermediate locals
+  // can be void*.
+  INVARIANT(
+    parameters.size() == arguments.size(),
+    "for each parameter there must be exactly one argument");
+  for(std::size_t i = 0; i < parameters.size(); i++)
+  {
+    const typet &type = parameters[i].type();
+    if(
+      type == java_boolean_type() || type == java_char_type() ||
+      type == java_byte_type() || type == java_short_type() ||
+      type.id() == ID_pointer)
+    {
+      arguments[i] = typecast_exprt::conditional_cast(arguments[i], type);
+    }
+  }
+}
+
 void java_bytecode_convert_methodt::convert_invoke(
   source_locationt location,
   const irep_idt &statement,
@@ -2173,24 +2221,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     !use_this || arguments.front().type().id() == ID_pointer,
     "first argument must be a pointer");
 
-  // do some type adjustment for the arguments,
-  // as Java promotes arguments
-  // Also cast pointers since intermediate locals
-  // can be void*.
-  INVARIANT(
-    parameters.size() == arguments.size(),
-    "for each parameter there must be exactly one argument");
-  for(std::size_t i = 0; i < parameters.size(); i++)
-  {
-    const typet &type = parameters[i].type();
-    if(
-      type == java_boolean_type() || type == java_char_type() ||
-      type == java_byte_type() || type == java_short_type() ||
-      type.id() == ID_pointer)
-    {
-      arguments[i] = typecast_exprt::conditional_cast(arguments[i], type);
-    }
-  }
+  adjust_invoke_argument_types(parameters, arguments);
 
   // do some type adjustment for return values
   exprt lhs = nil_exprt();
@@ -2224,23 +2255,15 @@ void java_bytecode_convert_methodt::convert_invoke(
     !(is_virtual &&
       is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
   {
-    symbolt symbol;
-    symbol.name = invoked_method_id;
-    symbol.base_name = arg0.get(ID_C_base_name);
-    symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
-                         id2string(symbol.base_name) + "()";
-    symbol.type = method_type;
-    symbol.type.set(ID_access, ID_private);
-    to_java_method_type(symbol.type).set_is_final(true);
-    symbol.value.make_nil();
-    symbol.mode = ID_java;
-    assign_parameter_names(
-      to_java_method_type(symbol.type), symbol.name, symbol_table);
-    set_declaring_class(symbol, arg0.get(ID_C_class));
-
-    debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
-            << "'" << eom;
-    symbol_table.add(symbol);
+    create_method_stub_symbol(
+      invoked_method_id,
+      arg0.get(ID_C_base_name),
+      id2string(arg0.get(ID_C_class)).substr(6) + "." +
+        id2string(arg0.get(ID_C_base_name)) + "()",
+      method_type,
+      arg0.get(ID_C_class),
+      symbol_table,
+      get_message_handler());
   }
 
   exprt function;
@@ -2957,40 +2980,74 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
 }
 
 optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
-  const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
   const source_locationt &location,
-  const exprt &arg0)
+  std::size_t instruction_address,
+  const exprt &arg0,
+  codet &result_code)
 {
   const java_method_typet &method_type = to_java_method_type(arg0.type());
-
-  const optionalt<symbolt> &lambda_method_symbol = get_lambda_method_symbol(
-    lambda_method_handles,
-    method_type.get_int(ID_java_lambda_method_handle_index));
-  if(lambda_method_symbol.has_value())
-    debug() << "Converting invokedynamic for lambda: "
-            << lambda_method_symbol.value().name << eom;
-  else
-    debug() << "Converting invokedynamic for lambda with unknown handle "
-               "type"
-            << eom;
-
   const java_method_typet::parameterst &parameters(method_type.parameters());
-
-  pop(parameters.size());
-
   const typet &return_type = method_type.return_type();
+
+  // Note these must be popped regardless of whether we understand the lambda
+  // method or not
+  code_function_callt::argumentst arguments = pop(parameters.size());
+
+  irep_idt synthetic_class_name =
+    lambda_synthetic_class_name(method_id, instruction_address);
+
+  if(!symbol_table.has_symbol(synthetic_class_name))
+  {
+    // We failed to parse the invokedynamic handle as a Java 8+ lambda;
+    // give up and return null.
+    const auto value = zero_initializer(return_type, location, ns);
+    if(!value.has_value())
+    {
+      error().source_location = location;
+      error() << "failed to zero-initialize return type" << eom;
+      throw 0;
+    }
+    return value;
+  }
+
+  // Construct an instance of the synthetic class created for this invokedynamic
+  // site:
+
+  irep_idt constructor_name = id2string(synthetic_class_name) + ".<init>";
+
+  const symbolt &constructor_symbol = ns.lookup(constructor_name);
+
+  code_blockt result;
+
+  // SyntheticType lambda_new = new SyntheticType;
+  const reference_typet ref_type =
+    java_reference_type(struct_tag_typet(synthetic_class_name));
+  side_effect_exprt java_new_expr(ID_java_new, ref_type, location);
+  const exprt new_instance = tmp_variable("lambda_new", ref_type);
+  result.add(code_assignt(new_instance, java_new_expr, location));
+
+  // lambda_new.<init>(capture_1, capture_2, ...);
+  // Add the implicit 'this' parameter:
+  arguments.insert(arguments.begin(), new_instance);
+  adjust_invoke_argument_types(
+    to_code_type(constructor_symbol.type).parameters(), arguments);
+
+  code_function_callt constructor_call(
+    constructor_symbol.symbol_expr(), arguments);
+  constructor_call.add_source_location() = location;
+  result.add(constructor_call);
+  if(needed_lazy_methods)
+  {
+    needed_lazy_methods->add_needed_method(constructor_symbol.name);
+    needed_lazy_methods->add_needed_class(synthetic_class_name);
+  }
+
+  result_code = std::move(result);
 
   if(return_type.id() == ID_empty)
     return {};
-
-  const auto value = zero_initializer(return_type, location, ns);
-  if(!value.has_value())
-  {
-    error().source_location = location;
-    error() << "failed to zero-initialize return type" << eom;
-    throw 0;
-  }
-  return value;
+  else
+    return new_instance;
 }
 
 void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(
