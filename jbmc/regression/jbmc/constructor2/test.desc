@@ -1,0 +1,11 @@
+CORE
+Constructor2.class
+--function 'Constructor2.<init>'
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Test that a field of a class being constructed is zero initialised before the
+constructor is called, where the function being checked is a constructor.
