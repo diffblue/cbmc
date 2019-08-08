@@ -354,6 +354,27 @@ void symex_target_equationt::convert(decision_proceduret &decision_procedure)
   convert_constraints(decision_procedure);
 }
 
+/// Convert a guard to a solver handle.
+/// Version for the case the guard is represented as an exprt.
+/// \p manager is unused but is kept for uniformity with the BDD version.
+inline exprt convert_guard(
+  const guard_expr_managert &manager,
+  const exprt &guard,
+  decision_proceduret &decision_procedure)
+{
+  return decision_procedure.handle(guard);
+}
+
+/// Convert a guard to a solver handle.
+/// Version for the case the guard is represented as a BDD.
+inline exprt convert_guard(
+  const bdd_exprt &manager,
+  const bddt &guard,
+  decision_proceduret &decision_procedure)
+{
+  return manager.as_solver_literal(decision_procedure, guard);
+}
+
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure)
 {
@@ -385,27 +406,6 @@ void symex_target_equationt::convert_decls(
       step.converted = true;
     }
   }
-}
-
-/// Convert a guard to a solver handle.
-/// Version for the case the guard is represented as an exprt.
-/// \p manager is unused but is kept for uniformity with the BDD version.
-inline exprt convert_guard(
-  const guard_expr_managert &manager,
-  const exprt &guard,
-  decision_proceduret &decision_procedure)
-{
-  return decision_procedure.handle(guard);
-}
-
-/// Convert a guard to a solver handle.
-/// Version for the case the guard is represented as a BDD.
-inline exprt convert_guard(
-  const bdd_exprt &manager,
-  const bddt &guard,
-  decision_proceduret &decision_procedure)
-{
-  return manager.as_solver_literal(decision_procedure, guard);
 }
 
 void symex_target_equationt::convert_guards(
