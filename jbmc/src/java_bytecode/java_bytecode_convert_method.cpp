@@ -2120,6 +2120,30 @@ exprt::operandst &java_bytecode_convert_methodt::convert_const(
   return results;
 }
 
+static void adjust_invoke_argument_types(
+  const java_method_typet::parameterst &parameters,
+  code_function_callt::argumentst &arguments)
+{
+  // do some type adjustment for the arguments,
+  // as Java promotes arguments
+  // Also cast pointers since intermediate locals
+  // can be void*.
+  INVARIANT(
+    parameters.size() == arguments.size(),
+    "for each parameter there must be exactly one argument");
+  for(std::size_t i = 0; i < parameters.size(); i++)
+  {
+    const typet &type = parameters[i].type();
+    if(
+      type == java_boolean_type() || type == java_char_type() ||
+      type == java_byte_type() || type == java_short_type() ||
+      type.id() == ID_pointer)
+    {
+      arguments[i] = typecast_exprt::conditional_cast(arguments[i], type);
+    }
+  }
+}
+
 void java_bytecode_convert_methodt::convert_invoke(
   source_locationt location,
   const irep_idt &statement,
@@ -2197,24 +2221,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     !use_this || arguments.front().type().id() == ID_pointer,
     "first argument must be a pointer");
 
-  // do some type adjustment for the arguments,
-  // as Java promotes arguments
-  // Also cast pointers since intermediate locals
-  // can be void*.
-  INVARIANT(
-    parameters.size() == arguments.size(),
-    "for each parameter there must be exactly one argument");
-  for(std::size_t i = 0; i < parameters.size(); i++)
-  {
-    const typet &type = parameters[i].type();
-    if(
-      type == java_boolean_type() || type == java_char_type() ||
-      type == java_byte_type() || type == java_short_type() ||
-      type.id() == ID_pointer)
-    {
-      arguments[i] = typecast_exprt::conditional_cast(arguments[i], type);
-    }
-  }
+  adjust_invoke_argument_types(parameters, arguments);
 
   // do some type adjustment for return values
   exprt lhs = nil_exprt();
@@ -3022,6 +3029,9 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
   // lambda_new.<init>(capture_1, capture_2, ...);
   // Add the implicit 'this' parameter:
   arguments.insert(arguments.begin(), new_instance);
+  adjust_invoke_argument_types(
+    to_code_type(constructor_symbol.type).parameters(), arguments);
+
   code_function_callt constructor_call(
     constructor_symbol.symbol_expr(), arguments);
   constructor_call.add_source_location() = location;
