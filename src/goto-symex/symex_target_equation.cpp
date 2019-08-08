@@ -479,7 +479,9 @@ void symex_target_equationt::convert_goto_instructions(
             mstream << messaget::eom;
           });
 
-        step.cond_handle = decision_procedure.handle(step.cond_expr->as_expr());
+        INVARIANT(step.cond_expr, "goto_instructions should have cond_expr");
+        step.cond_handle = decision_procedure.handle(convert_guard(
+          guard_manager, step.cond_expr->underlying(), decision_procedure));
       }
     }
   }
@@ -497,6 +499,7 @@ void symex_target_equationt::convert_constraints(
         mstream << messaget::eom;
       });
 
+      INVARIANT(step.cond_expr, "goto_instructions should have cond_expr");
       decision_procedure.set_to_true(step.cond_expr->as_expr());
       step.converted = true;
     }
@@ -525,12 +528,17 @@ void symex_target_equationt::convert_assertions(
       if(step.is_assert() && !step.ignore && !step.converted)
       {
         step.converted = true;
+
+        INVARIANT(step.cond_expr, "assertion should have cond_expr");
         decision_procedure.set_to_false(step.cond_expr->as_expr());
         step.cond_handle = false_exprt();
         return; // prevent further assumptions!
       }
       else if(step.is_assume())
+      {
+        INVARIANT(step.cond_expr, "assume should have cond_expr");
         decision_procedure.set_to_true(step.cond_expr->as_expr());
+      }
     }
 
     UNREACHABLE; // unreachable
@@ -558,6 +566,8 @@ void symex_target_equationt::convert_assertions(
         mstream << messaget::eom;
       });
 
+      INVARIANT(step.cond_expr, "assert should have cond_expr");
+      // TODO: handle cond_expr directly to solver
       implies_exprt implication(assumption, step.cond_expr->as_expr());
 
       // do the conversion
