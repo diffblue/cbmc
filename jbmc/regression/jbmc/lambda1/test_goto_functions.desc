@@ -1,6 +1,6 @@
 CORE
 Lambdatest.class
---verbosity 10 --show-goto-functions --function Lambdatest.main
+--verbosity 10 --show-goto-functions --function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 lambda function reference lambda\$new\$0 in class \"Lambdatest\"
 lambda function reference lambda\$new\$1 in class \"Lambdatest\"
 lambda function reference lambda\$captureReference\$2 in class \"Lambdatest\"
