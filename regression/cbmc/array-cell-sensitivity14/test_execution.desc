@@ -1,0 +1,12 @@
+CORE
+test.c
+
+^VERIFICATION FAILED$
+^\[main.assertion\.1\] line 21.*SUCCESS$
+^\[main.assertion\.2\] line 24.*FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+The real test is in test.desc; this is a companion to check that the program under
+test actually behaves as expected.

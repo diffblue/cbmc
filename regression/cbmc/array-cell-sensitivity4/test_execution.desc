@@ -1,0 +1,10 @@
+CORE
+test.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The real test is in test.desc; this is a companion to check that the program under
+test actually behaves as expected.

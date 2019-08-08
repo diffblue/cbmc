@@ -17,5 +17,6 @@ int main(int argc, char **argv)
   node2.children[0] = argc % 11 ? &node1 : &node2;
   node2.children[1] = argc % 13 ? &node1 : &node2;
   root.children[0]->children[1]->children[1]->children[0]->data = 1;
+  assert(root.children[0]->children[1]->children[1]->children[0]->data == 1);
   assert(node1.data == argc);
 }

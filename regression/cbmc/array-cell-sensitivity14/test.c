@@ -18,5 +18,8 @@ int main(int argc, char **argv)
   node2.children[1] = argc % 13 ? &node1 : &node2;
   int idx1 = 0, idx2 = 1, idx3 = 1, idx4 = 0;
   root.children[idx1]->children[idx2]->children[idx3]->children[idx4]->data = 1;
+  assert(
+    root.children[idx1]->children[idx2]->children[idx3]->children[idx4]->data ==
+    1);
   assert(node1.data == argc);
 }

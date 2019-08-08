@@ -7,5 +7,6 @@ int main(int argc, char **argv)
   char *ptr = argc % 2 ? (char *)&array[0] : (char *)&argc;
   ptr[argc] = 'a';
   ptr[1] = (char)argc;
-  assert(array[1] == argc);
+  assert(ptr[1] == (char)argc);
+  assert(array[1] == (char)argc);
 }
