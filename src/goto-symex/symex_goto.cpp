@@ -682,7 +682,7 @@ static void merge_names(
   else
   {
     rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-    if(do_simplify)
+    if(do_simplify && !guardt::is_always_simplified)
       simplify(rhs, ns);
   }
 
