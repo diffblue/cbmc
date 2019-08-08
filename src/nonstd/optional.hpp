@@ -221,9 +221,7 @@ inline in_place_t in_place( detail::in_place_type_tag<T> = detail::in_place_type
 }
 
 template< std::size_t I >
-inline in_place_t in_place( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() )
-{
-    return in_place_t();
+inline in_place_t in_place( detail::in_place_index_tag<I> = detail::in_place_index_tag<I>() ) {   return in_place_t();
 }
 
 // mimic templated typedef:
