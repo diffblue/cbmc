@@ -454,7 +454,9 @@ void symex_target_equationt::convert_assumptions(
             mstream << messaget::eom;
           });
 
-        step.cond_handle = decision_procedure.handle(step.cond_expr->as_expr());
+        INVARIANT(step.cond_expr, "assumptions should have cond_expr");
+        step.cond_handle = convert_guard(
+          guard_manager, step.cond_expr->underlying(), decision_procedure);
       }
     }
   }
