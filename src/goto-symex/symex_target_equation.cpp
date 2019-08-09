@@ -405,7 +405,10 @@ void symex_target_equationt::convert_decls(
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
       if(step.cond_expr.has_value())
-        decision_procedure.handle(step.cond_expr->as_expr());
+      {
+        const exprt converted_cond = convert_guard(
+          guard_manager, step.cond_expr->underlying(), decision_procedure);
+      }
       step.converted = true;
     }
   }
