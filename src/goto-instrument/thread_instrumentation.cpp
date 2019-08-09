@@ -46,7 +46,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
     ID_get_may,
     address_of_exprt(mutex_locked_string)};
 
-  *end = goto_programt::make_assertion(not_exprt(get_may), source_location);
+  *end = goto_programt::make_assertion(not_expr(get_may), source_location);
 
   end->source_location.set_comment("mutexes must not be locked on thread exit");
 }

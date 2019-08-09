@@ -2994,12 +2994,22 @@ inline address_of_exprt &to_address_of_expr(exprt &expr)
 /// \brief Boolean negation
 class not_exprt:public unary_exprt
 {
-public:
-  explicit not_exprt(exprt _op) : unary_exprt(ID_not, std::move(_op))
+private:
+  /// This constructor is private to avoid ambiguity with the copy constructor.
+  /// Use \ref not_expr to construct a \c not_exprt object.
+  explicit not_exprt(exprt op) : unary_exprt{ID_not, std::move(op)}
   {
-    PRECONDITION(as_const(*this).op().type().id() == ID_bool);
   }
+
+  friend not_exprt not_expr(exprt e);
 };
+
+/// Constructor for \ref not_exprt objects.
+inline not_exprt not_expr(exprt e)
+{
+  PRECONDITION(as_const(e).type().id() == ID_bool);
+  return not_exprt{std::move(e)};
+}
 
 template <>
 inline bool can_cast_expr<not_exprt>(const exprt &base)

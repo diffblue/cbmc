@@ -355,7 +355,7 @@ void symex_assignt::assign_if(
   assign_rec(lhs.true_case(), full_lhs, rhs, guard);
   guard.pop_back();
 
-  guard.push_back(not_exprt(lhs.cond()));
+  guard.push_back(not_expr(lhs.cond()));
   assign_rec(lhs.false_case(), full_lhs, rhs, guard);
   guard.pop_back();
 }

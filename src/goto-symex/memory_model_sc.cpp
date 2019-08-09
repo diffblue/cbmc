@@ -237,7 +237,7 @@ void memory_model_sct::write_serialization_external(
 
         add_constraint(
           equation,
-          implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
+          implies_exprt(not_expr(s), before(*w_it2, *w_it1)),
           "ws-ext",
           (*w_it1)->source);
       }

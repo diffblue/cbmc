@@ -42,7 +42,7 @@ void cover_decision_instrumentert::instrument(
 
       const std::string comment_f = "decision '" + d_string + "' false";
       goto_program.insert_before_swap(i_it);
-      *i_it = goto_programt::make_assertion(not_exprt(d), source_location);
+      *i_it = goto_programt::make_assertion(not_expr(d), source_location);
       initialize_source_location(i_it, comment_f, function_id);
     }
 

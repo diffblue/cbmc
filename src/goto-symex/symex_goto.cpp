@@ -259,7 +259,7 @@ void goto_symext::symex_goto(statet &state)
       if(new_guard.is_true())
         symex_assume_l2(state, false_exprt());
       else
-        symex_assume_l2(state, not_exprt(new_guard));
+        symex_assume_l2(state, not_expr(new_guard));
 
       // next instruction
       symex_transition(state);
@@ -773,7 +773,7 @@ void goto_symext::loop_bound_exceeded(
   if(guard.is_true())
     negated_cond=false_exprt();
   else
-    negated_cond=not_exprt(guard);
+    negated_cond = not_expr(guard);
 
   if(!symex_config.partial_loops)
   {

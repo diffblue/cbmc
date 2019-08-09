@@ -284,7 +284,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
   PRECONDITION(expr.type().id() == ID_bool);
   PRECONDITION(equality_propagation);
   if(!value)
-    equations.push_back(not_exprt{expr});
+    equations.push_back(not_expr(expr));
   else
     equations.push_back(expr);
 }

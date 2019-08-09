@@ -305,7 +305,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
       #endif
 
       if(l.sign())
-        return not_exprt(it->second);
+        return not_expr(it->second);
       else
         return it->second;
     }
@@ -379,7 +379,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     function_cache[l.var_no()]=final;
 
     if(l.sign())
-      return not_exprt(final);
+      return not_expr(final);
     else
       return final;
   }

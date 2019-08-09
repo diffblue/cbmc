@@ -179,7 +179,7 @@ void constant_propagator_domaint::transform(
     if(from->get_target()==to)
       g = from->get_condition();
     else
-      g = not_exprt(from->get_condition());
+      g = not_expr(from->get_condition());
     partial_evaluate(values, g, ns);
     if(g.is_false())
      values.set_to_bottom();

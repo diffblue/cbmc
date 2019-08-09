@@ -133,7 +133,7 @@ exprt bdd_exprt::as_expr(
         {
           if(r.else_branch().is_complement()) // else is false
             return n_expr;
-          return not_exprt(n_expr); // else is true
+          return not_expr(n_expr); // else is true
         }
         else
         {
@@ -143,7 +143,7 @@ exprt bdd_exprt::as_expr(
             return make_and(n_expr, then_case);
           }
           exprt then_case = as_expr(r.then_branch(), cache);
-          return make_or(not_exprt(n_expr), then_case);
+          return make_or(not_expr(n_expr), then_case);
         }
       }
       else if(r.then_branch().is_constant())
@@ -151,7 +151,7 @@ exprt bdd_exprt::as_expr(
         if(r.then_branch().is_complement()) // then is false
         {
           exprt else_case = as_expr(r.else_branch(), cache);
-          return make_and(not_exprt(n_expr), else_case);
+          return make_and(not_expr(n_expr), else_case);
         }
         exprt else_case = as_expr(r.else_branch(), cache);
         return make_or(n_expr, else_case);

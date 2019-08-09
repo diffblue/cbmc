@@ -180,9 +180,7 @@ codet java_bytecode_instrumentt::check_array_access(
 
   if(throw_runtime_exceptions)
     return throw_exception(
-      not_exprt(cond),
-      original_loc,
-      "java.lang.ArrayIndexOutOfBoundsException");
+      not_expr(cond), original_loc, "java.lang.ArrayIndexOutOfBoundsException");
 
   code_blockt bounds_checks;
 
@@ -223,11 +221,8 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   optionalt<codet> check_code;
   if(throw_runtime_exceptions)
   {
-    check_code=
-      throw_exception(
-        not_exprt(class_cast_check),
-        original_loc,
-        "java.lang.ClassCastException");
+    check_code = throw_exception(
+      not_expr(class_cast_check), original_loc, "java.lang.ClassCastException");
   }
   else
   {
@@ -271,7 +266,7 @@ codet java_bytecode_instrumentt::check_null_dereference(
   check_loc.set_comment("Null pointer check");
   check_loc.set_property_class("null-pointer-exception");
 
-  return create_fatal_assertion(not_exprt(equal_expr), check_loc);
+  return create_fatal_assertion(not_expr(equal_expr), check_loc);
 }
 
 /// Checks whether \p length >= 0 and throws NegativeArraySizeException/
@@ -292,9 +287,7 @@ codet java_bytecode_instrumentt::check_array_length(
 
   if(throw_runtime_exceptions)
     return throw_exception(
-      not_exprt(ge_zero),
-      original_loc,
-      "java.lang.NegativeArraySizeException");
+      not_expr(ge_zero), original_loc, "java.lang.NegativeArraySizeException");
 
   source_locationt check_loc;
   check_loc.set_comment("Array size should be >= 0");

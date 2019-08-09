@@ -326,7 +326,7 @@ string_constraint_generatort::add_axioms_for_replace(
     implies_exprt case1(
       equal_exprt(str[qvar], old_char), equal_exprt(res[qvar], new_char));
     implies_exprt case2(
-      not_exprt(equal_exprt(str[qvar], old_char)),
+      not_expr(equal_exprt(str[qvar], old_char)),
       equal_exprt(res[qvar], str[qvar]));
     string_constraintt a2(
       qvar,

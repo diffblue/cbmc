@@ -75,12 +75,12 @@ string_constraint_generatort::add_axioms_for_is_prefix(
       greater_than(array_pool.get_or_create_length(prefix), witness),
       notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness]));
     const exprt s1_does_not_start_with_s0 = or_exprt(
-      not_exprt(offset_within_bounds),
-      not_exprt(greater_or_equal_to(
+      not_expr(offset_within_bounds),
+      not_expr(greater_or_equal_to(
         array_pool.get_or_create_length(str),
         plus_exprt(array_pool.get_or_create_length(prefix), offset))),
       strings_differ_at_witness);
-    return implies_exprt(not_exprt(isprefix), s1_does_not_start_with_s0);
+    return implies_exprt(not_expr(isprefix), s1_does_not_start_with_s0);
   }());
 
   return {isprefix, std::move(constraints)};
@@ -220,7 +220,7 @@ string_constraint_generatort::add_axioms_for_is_suffix(
       and_exprt(
         greater_than(array_pool.get_or_create_length(s0), witness),
         is_positive(witness))));
-  implies_exprt a3(not_exprt(issuffix), constr3);
+  implies_exprt a3(not_expr(issuffix), constr3);
 
   constraints.existential.push_back(a3);
   return {tc_issuffix, std::move(constraints)};
@@ -272,7 +272,7 @@ string_constraint_generatort::add_axioms_for_contains(
   constraints.existential.push_back(a2);
 
   implies_exprt a3(
-    not_exprt(contains), equal_exprt(startpos, from_integer(-1, index_type)));
+    not_expr(contains), equal_exprt(startpos, from_integer(-1, index_type)));
   constraints.existential.push_back(a3);
 
   symbol_exprt qvar = fresh_symbol("QA_contains", index_type);
@@ -287,7 +287,7 @@ string_constraint_generatort::add_axioms_for_contains(
     from_integer(0, index_type),
     plus_exprt(from_integer(1, index_type), length_diff),
     and_exprt(
-      not_exprt(contains),
+      not_expr(contains),
       greater_or_equal_to(
         array_pool.get_or_create_length(s0),
         array_pool.get_or_create_length(s1))),

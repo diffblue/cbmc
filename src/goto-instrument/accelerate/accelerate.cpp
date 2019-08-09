@@ -261,7 +261,7 @@ void acceleratet::make_overflow_loc(
   loop.insert_instruction(overflow_loc);
 
   goto_programt::targett t2 = program.insert_after(
-    loop_end, goto_programt::make_goto(overflow_loc, not_exprt(overflow_var)));
+    loop_end, goto_programt::make_goto(overflow_loc, not_expr(overflow_var)));
   t2->swap(*loop_end);
   overflow_locs[overflow_loc].push_back(t2);
   loop.insert_instruction(t2);
@@ -403,7 +403,7 @@ void acceleratet::add_dirty_checks()
       }
 
       goto_programt::instructiont not_dirty =
-        goto_programt::make_assumption(not_exprt(dirty_var->second));
+        goto_programt::make_assumption(not_expr(dirty_var->second));
       program.insert_before_swap(it, not_dirty);
     }
   }
@@ -603,7 +603,7 @@ void acceleratet::build_state_machine(
       ++it)
   {
     state_machine.assume(
-      not_exprt(equal_exprt(state, from_integer(*it, state.type()))));
+      not_expr(equal_exprt(state, from_integer(*it, state.type()))));
   }
 }
 

@@ -133,7 +133,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
                       code_declt(c_bool_local.symbol_expr())});
 
     code_ifthenelset bool_cond_block(
-      not_exprt(bool_local.symbol_expr()),
+      not_expr(bool_local.symbol_expr()),
       code_assignt(bool_local.symbol_expr(), true_exprt()));
 
     const exprt c_bool_true = from_integer(1, c_bool_typet(8));
@@ -233,7 +233,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 
     const exprt bool_tests[] = {
       bool_locals.at(0).symbol_expr(),
-      not_exprt(bool_locals.at(1).symbol_expr()),
+      not_expr(bool_locals.at(1).symbol_expr()),
       and_exprt(
         bool_locals.at(2).symbol_expr(), bool_locals.at(3).symbol_expr()),
       equal_exprt(bool_locals.at(4).symbol_expr(), true_exprt()),

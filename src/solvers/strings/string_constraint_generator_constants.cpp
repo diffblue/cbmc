@@ -88,7 +88,7 @@ string_constraint_generatort::add_axioms_for_cprover_string(
   if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(arg))
   {
     const and_exprt guard_true(guard, if_expr->cond());
-    const and_exprt guard_false(guard, not_exprt(if_expr->cond()));
+    const and_exprt guard_false(guard, not_expr(if_expr->cond()));
     return combine_results(
       add_axioms_for_cprover_string(res, if_expr->true_case(), guard_true),
       add_axioms_for_cprover_string(res, if_expr->false_case(), guard_false));

@@ -67,7 +67,7 @@ SCENARIO(
 
   WHEN("Applying the condition '!b'")
   {
-    const exprt condition = not_exprt{renamed_b};
+    const exprt condition = not_expr(renamed_b);
     goto_state.apply_condition(condition, state, ns);
 
     THEN("b should be in the constant propagator with value 'false'")
@@ -109,7 +109,7 @@ SCENARIO(
 
   WHEN("Applying the condition '!(b == true)'")
   {
-    const exprt condition = not_exprt{equal_exprt{renamed_b, true_exprt{}}};
+    const exprt condition = not_expr(equal_exprt{renamed_b, true_exprt{}});
     goto_state.apply_condition(condition, state, ns);
 
     THEN("b should be in the constant propagator with value 'false'")
@@ -123,7 +123,7 @@ SCENARIO(
 
   WHEN("Applying the condition '!(b == false)'")
   {
-    const exprt condition = not_exprt{equal_exprt{renamed_b, false_exprt{}}};
+    const exprt condition = not_expr(equal_exprt{renamed_b, false_exprt{}});
     goto_state.apply_condition(condition, state, ns);
 
     THEN("b should be in the constant propagator with value 'true'")
@@ -165,7 +165,7 @@ SCENARIO(
 
   WHEN("Applying the condition '!(b != true)'")
   {
-    const exprt condition = not_exprt{notequal_exprt{renamed_b, true_exprt{}}};
+    const exprt condition = not_expr(notequal_exprt{renamed_b, true_exprt{}});
     goto_state.apply_condition(condition, state, ns);
 
     THEN("b should be in the constant propagator with value 'true'")
@@ -179,7 +179,7 @@ SCENARIO(
 
   WHEN("Applying the condition '!(b != false)'")
   {
-    const exprt condition = not_exprt{notequal_exprt{renamed_b, false_exprt{}}};
+    const exprt condition = not_expr(notequal_exprt{renamed_b, false_exprt{}});
     goto_state.apply_condition(condition, state, ns);
 
     THEN("b should be in the constant propagator with value 'false'")

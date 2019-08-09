@@ -180,7 +180,7 @@ void taint_analysist::instrument(
                 address_of_exprt(string_constantt(rule.taint))};
               goto_programt::targett t =
                 insert_before.add(goto_programt::make_assertion(
-                  not_exprt(get_may), instruction.source_location));
+                  not_expr(get_may), instruction.source_location));
               t->source_location.set_property_class(
                 "taint rule " + id2string(rule.id));
               t->source_location.set_comment(rule.message);

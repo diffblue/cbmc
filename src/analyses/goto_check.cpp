@@ -676,7 +676,7 @@ void goto_checkt::integer_overflow_check(
       equal_exprt minus_one_eq(div_expr.divisor(), from_integer(-1, type));
 
       add_guarded_property(
-        not_exprt(and_exprt(int_min_eq, minus_one_eq)),
+        not_expr(and_exprt(int_min_eq, minus_one_eq)),
         "arithmetic overflow on signed division",
         "overflow",
         expr.find_source_location(),
@@ -697,7 +697,7 @@ void goto_checkt::integer_overflow_check(
         to_unary_minus_expr(expr).op(), to_signedbv_type(type).smallest_expr());
 
       add_guarded_property(
-        not_exprt(int_min_eq),
+        not_expr(int_min_eq),
         "arithmetic overflow on signed unary minus",
         "overflow",
         expr.find_source_location(),
@@ -839,7 +839,7 @@ void goto_checkt::integer_overflow_check(
         type.id()==ID_unsignedbv?"unsigned":"signed";
 
       add_guarded_property(
-        not_exprt(overflow),
+        not_expr(overflow),
         "arithmetic overflow on " + kind + " " + expr.id_string(),
         "overflow",
         expr.find_source_location(),
@@ -853,7 +853,7 @@ void goto_checkt::integer_overflow_check(
       type.id()==ID_unsignedbv?"unsigned":"signed";
 
     add_guarded_property(
-      not_exprt(overflow),
+      not_expr(overflow),
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
       expr.find_source_location(),
@@ -885,7 +885,7 @@ void goto_checkt::float_overflow_check(
     if(op.type().id() == ID_floatbv)
     {
       // float-to-float
-      or_exprt overflow_check{isinf_exprt(op), not_exprt(isinf_exprt(expr))};
+      or_exprt overflow_check{isinf_exprt(op), not_expr(isinf_exprt(expr))};
 
       add_guarded_property(
         std::move(overflow_check),
@@ -899,7 +899,7 @@ void goto_checkt::float_overflow_check(
     {
       // non-float-to-float
       add_guarded_property(
-        not_exprt(isinf_exprt(expr)),
+        not_expr(isinf_exprt(expr)),
         "arithmetic overflow on floating-point typecast",
         "overflow",
         expr.find_source_location(),
@@ -913,7 +913,7 @@ void goto_checkt::float_overflow_check(
   {
     // Can overflow if dividing by something small
     or_exprt overflow_check(
-      isinf_exprt(to_div_expr(expr).dividend()), not_exprt(isinf_exprt(expr)));
+      isinf_exprt(to_div_expr(expr).dividend()), not_expr(isinf_exprt(expr)));
 
     add_guarded_property(
       std::move(overflow_check),
@@ -944,7 +944,7 @@ void goto_checkt::float_overflow_check(
       or_exprt overflow_check(
         isinf_exprt(to_binary_expr(expr).op0()),
         isinf_exprt(to_binary_expr(expr).op1()),
-        not_exprt(isinf_exprt(expr)));
+        not_expr(isinf_exprt(expr)));
 
       std::string kind=
         expr.id()==ID_plus?"addition":
@@ -1128,7 +1128,7 @@ void goto_checkt::pointer_overflow_check(
   overflow.operands() = expr.operands();
 
   add_guarded_property(
-    not_exprt(overflow),
+    not_expr(overflow),
     "pointer arithmetic overflow on " + expr.id_string(),
     "overflow",
     expr.find_source_location(),
@@ -1211,21 +1211,21 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
       conditions.push_back(conditiont(
         or_exprt(
           in_bounds_of_some_explicit_allocation,
-          not_exprt(null_pointer(address))),
+          not_expr(null_pointer(address))),
         "pointer NULL"));
     }
 
     if(flags.is_unknown())
     {
       conditions.push_back(conditiont{
-        not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
+        not_expr(is_invalid_pointer_exprt{address}), "pointer invalid"});
     }
 
     if(flags.is_uninitialized())
     {
       conditions.push_back(
         conditiont{or_exprt{in_bounds_of_some_explicit_allocation,
-                            not_exprt{is_invalid_pointer_exprt{address}}},
+                            not_expr(is_invalid_pointer_exprt{address})},
                    "pointer uninitialized"});
     }
 
@@ -1234,7 +1234,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
       conditions.push_back(conditiont(
         or_exprt(
           in_bounds_of_some_explicit_allocation,
-          not_exprt(deallocated(address, ns))),
+          not_expr(deallocated(address, ns))),
         "deallocated dynamic object"));
     }
 
@@ -1243,7 +1243,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
       conditions.push_back(conditiont(
         or_exprt(
           in_bounds_of_some_explicit_allocation,
-          not_exprt(dead_object(address, ns))),
+          not_expr(dead_object(address, ns))),
         "dead object"));
     }
 
@@ -1257,7 +1257,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         or_exprt(
           in_bounds_of_some_explicit_allocation,
           implies_exprt(
-            malloc_object(address, ns), not_exprt(dynamic_bounds_violation))),
+            malloc_object(address, ns), not_expr(dynamic_bounds_violation))),
         "pointer outside dynamic object bounds"));
     }
 
@@ -1273,8 +1273,8 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         or_exprt(
           in_bounds_of_some_explicit_allocation,
           implies_exprt(
-            not_exprt(dynamic_object(address)),
-            not_exprt(object_bounds_violation))),
+            not_expr(dynamic_object(address)),
+            not_expr(object_bounds_violation))),
         "pointer outside object bounds"));
     }
 
@@ -1406,7 +1406,7 @@ void goto_checkt::bounds_check(
 
     or_exprt precond(
       std::move(in_bounds_of_some_explicit_allocation),
-      and_exprt(dynamic_object(pointer), not_exprt(malloc_object(pointer, ns))),
+      and_exprt(dynamic_object(pointer), not_expr(malloc_object(pointer, ns))),
       inequality);
 
     add_guarded_property(
@@ -1596,7 +1596,7 @@ void goto_checkt::check_rec_if(const if_exprt &if_expr, guardt &guard)
 
   {
     guardt old_guard = guard;
-    guard.add(not_exprt{if_expr.cond()});
+    guard.add(not_expr(if_expr.cond()));
     check_rec(if_expr.false_case(), guard);
     guard = std::move(old_guard);
   }

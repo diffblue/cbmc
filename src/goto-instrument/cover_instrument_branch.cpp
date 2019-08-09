@@ -55,7 +55,7 @@ void cover_branch_instrumentert::instrument(
     source_locationt source_location = i_it->source_location;
 
     goto_program.insert_before_swap(i_it);
-    *i_it = goto_programt::make_assertion(not_exprt(guard), source_location);
+    *i_it = goto_programt::make_assertion(not_expr(guard), source_location);
     initialize_source_location(i_it, true_comment, function_id);
 
     goto_program.insert_before_swap(i_it);

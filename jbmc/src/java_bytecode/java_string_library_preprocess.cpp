@@ -940,7 +940,7 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
 
   // Case of Infinity
   extractbit_exprt is_neg(arg, float_spec.width()-1);
-  condition_list.push_back(and_exprt(isinf_exprt(arg), not_exprt(is_neg)));
+  condition_list.push_back(and_exprt(isinf_exprt(arg), not_expr(is_neg)));
   const refined_string_exprt infinity =
     string_literal_to_string_expr("Infinity", loc, symbol_table, code);
   string_expr_list.push_back(infinity);

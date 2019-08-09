@@ -443,7 +443,7 @@ exprt character_refine_preprocesst::expr_of_is_defined(
   intervals.push_back(
     binary_relation_exprt(chr, ID_ge, from_integer(0x1D800, chr.type())));
 
-  return not_exprt(disjunction(intervals));
+  return not_expr(disjunction(intervals));
 }
 
 /// Converts function call to an assignment of an expression corresponding to

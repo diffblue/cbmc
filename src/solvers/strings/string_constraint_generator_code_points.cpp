@@ -46,7 +46,7 @@ string_constraint_generatort::add_axioms_for_code_point(
   constraints.existential.push_back(a1);
 
   implies_exprt a2(
-    not_exprt(small), equal_to(array_pool.get_or_create_length(res), 2));
+    not_expr(small), equal_to(array_pool.get_or_create_length(res), 2));
   constraints.existential.push_back(a2);
 
   typecast_exprt code_point_as_char(code_point, char_type);
@@ -56,13 +56,13 @@ string_constraint_generatort::add_axioms_for_code_point(
   plus_exprt first_char(
     hexD800, div_exprt(minus_exprt(code_point, hex010000), hex0400));
   implies_exprt a4(
-    not_exprt(small),
+    not_expr(small),
     equal_exprt(res[0], typecast_exprt(first_char, char_type)));
   constraints.existential.push_back(a4);
 
   plus_exprt second_char(hexDC00, mod_exprt(code_point, hex0400));
   implies_exprt a5(
-    not_exprt(small),
+    not_expr(small),
     equal_exprt(res[1], typecast_exprt(second_char, char_type)));
   constraints.existential.push_back(a5);
 
@@ -142,7 +142,7 @@ string_constraint_generatort::add_axioms_for_code_point_at(
   constraints.existential.push_back(
     implies_exprt(return_pair, equal_exprt(result, pair)));
   constraints.existential.push_back(
-    implies_exprt(not_exprt(return_pair), equal_exprt(result, char1_as_int)));
+    implies_exprt(not_expr(return_pair), equal_exprt(result, char1_as_int)));
   return {result, constraints};
 }
 
@@ -176,7 +176,7 @@ string_constraint_generatort::add_axioms_for_code_point_before(
   constraints.existential.push_back(
     implies_exprt(return_pair, equal_exprt(result, pair)));
   constraints.existential.push_back(
-    implies_exprt(not_exprt(return_pair), equal_exprt(result, char2_as_int)));
+    implies_exprt(not_expr(return_pair), equal_exprt(result, char2_as_int)));
   return {result, constraints};
 }
 

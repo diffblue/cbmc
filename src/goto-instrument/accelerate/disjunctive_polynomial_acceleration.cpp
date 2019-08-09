@@ -359,7 +359,7 @@ bool disjunctive_polynomial_accelerationt::find_path(patht &path)
 
       if(taken)
       {
-        not_exprt negated(distinguisher);
+        exprt negated = not_expr(distinguisher);
         distinguisher.swap(negated);
       }
 
@@ -600,7 +600,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
       if(taken)
       {
-        not_exprt negated(distinguisher);
+        exprt negated = not_expr(distinguisher);
         distinguisher.swap(negated);
       }
 
@@ -826,7 +826,7 @@ void disjunctive_polynomial_accelerationt::build_path(
       // If this was a conditional branch (it probably was), figure out
       // if we hit the "taken" or "not taken" branch & accumulate the
       // appropriate guard.
-      cond = not_exprt(t->get_condition());
+      cond = not_expr(t->get_condition());
 
       for(goto_programt::targetst::iterator it=t->targets.begin();
           it!=t->targets.end();

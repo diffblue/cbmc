@@ -57,7 +57,7 @@ bool ensure_one_backedge_per_target(
       goto_program.insert_after(last_backedge, goto_programt::make_goto(it));
     // Turn the existing `if(x) goto head; succ: ...`
     // into `if(!x) goto succ; goto head; succ: ...`
-    last_backedge->guard = not_exprt(last_backedge->guard);
+    last_backedge->guard = not_expr(last_backedge->guard);
     last_backedge->set_target(std::next(new_goto));
     // Use the new backedge as the one true way to the header:
     last_backedge = new_goto;

@@ -100,7 +100,7 @@ public:
 
   exprt negation() const
   {
-    return and_exprt(univ_within_bounds(), not_exprt(body));
+    return and_exprt(univ_within_bounds(), not_expr(body));
   }
 };
 

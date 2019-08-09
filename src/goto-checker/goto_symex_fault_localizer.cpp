@@ -84,12 +84,12 @@ bool goto_symex_fault_localizert::check(
     if(v_it->is_true())
       assumptions.push_back(l.first);
     else if(v_it->is_false())
-      assumptions.push_back(solver.handle(not_exprt(l.first)));
+      assumptions.push_back(solver.handle(not_expr(l.first)));
     ++v_it;
   }
 
   // lock the failed assertion
-  assumptions.push_back(solver.handle(not_exprt(failed_step.cond_handle)));
+  assumptions.push_back(solver.handle(not_expr(failed_step.cond_handle)));
 
   solver.push(assumptions);
 

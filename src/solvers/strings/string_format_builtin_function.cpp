@@ -166,7 +166,7 @@ add_axioms_for_format_specifier(
                 equal_exprt{res[2], from_integer('l', char_type)},
                 equal_exprt{res[3], from_integer('l', char_type)}}});
     constraints.existential.push_back(implies_exprt{
-      not_exprt{is_null_literal},
+      not_expr(is_null_literal),
       equal_exprt{res[0], typecast_exprt{string_expr[3], char_type}}});
     return {res, constraints};
   }

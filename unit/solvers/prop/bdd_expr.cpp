@@ -26,7 +26,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
   {
     const symbol_exprt var("x", bool_typet());
     const bddt bdd =
-      bdd_expr_converter.from_expr(and_exprt(var, not_exprt(var)));
+      bdd_expr_converter.from_expr(and_exprt(var, not_expr(var)));
     REQUIRE(bdd_expr_converter.as_expr(bdd) == false_exprt());
   }
 
@@ -36,11 +36,11 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt b("b", bool_typet());
 
     const bddt bdd =
-      bdd_expr_converter.from_expr(or_exprt(and_exprt(a, b), not_exprt(a)));
+      bdd_expr_converter.from_expr(or_exprt(and_exprt(a, b), not_expr(a)));
 
     THEN("It is equal to the BDD for (!a|b)")
     {
-      const bddt bdd2 = bdd_expr_converter.from_expr(or_exprt(not_exprt(a), b));
+      const bddt bdd2 = bdd_expr_converter.from_expr(or_exprt(not_expr(a), b));
       REQUIRE(
         bdd_expr_converter.as_expr(bdd) == bdd_expr_converter.as_expr(bdd2));
     }
@@ -51,7 +51,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
 
-    const bddt bdd = bdd_expr_converter.from_expr(and_exprt(a, not_exprt(b)));
+    const bddt bdd = bdd_expr_converter.from_expr(and_exprt(a, not_expr(b)));
 
     WHEN("It is converted to an exprt")
     {
@@ -59,7 +59,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
       THEN("It is equivalent to the expression !(!a || b)")
       {
         const bddt to_compare =
-          bdd_expr_converter.from_expr(not_exprt{or_exprt{not_exprt{a}, b}});
+          bdd_expr_converter.from_expr(not_expr(or_exprt{not_expr(a), b}));
         REQUIRE(bdd.bdd_xor(to_compare).is_false());
         REQUIRE(bdd.bdd_xor(to_compare.bdd_not()).is_true());
       }
@@ -71,7 +71,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
     const bddt bdd = bdd_expr_converter.from_expr(
-      xor_exprt{or_exprt{not_exprt{a}, b}, implies_exprt{a, b}});
+      xor_exprt{or_exprt{not_expr(a), b}, implies_exprt{a, b}});
     THEN("It reduces to false")
     {
       REQUIRE(bdd.is_false());
@@ -96,7 +96,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     THEN("e xor !e is true")
     {
       REQUIRE(
-        bdd.bdd_xor(bdd_expr_converter.from_expr(not_exprt{expr})).is_true());
+        bdd.bdd_xor(bdd_expr_converter.from_expr(not_expr(expr))).is_true());
     }
 
     THEN("Converting to expr and back to BDD gives the same BDD")

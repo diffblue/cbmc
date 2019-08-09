@@ -68,7 +68,7 @@ bool sat_path_enumeratort::next(patht &path)
 
       if(taken)
       {
-        not_exprt negated(distinguisher);
+        exprt negated = not_expr(distinguisher);
         distinguisher.swap(negated);
       }
 
@@ -184,7 +184,7 @@ void sat_path_enumeratort::build_path(
       // If this was a conditional branch (it probably was), figure out
       // if we hit the "taken" or "not taken" branch & accumulate the
       // appropriate guard.
-      cond = not_exprt(t->get_condition());
+      cond = not_expr(t->get_condition());
 
       for(goto_programt::targetst::iterator it=t->targets.begin();
           it!=t->targets.end();

@@ -22,7 +22,7 @@ exprt float_bvt::convert(const exprt &expr) const
   else if(expr.id()==ID_ieee_float_equal)
     return is_equal(expr.op0(), expr.op1(), get_spec(expr.op0()));
   else if(expr.id()==ID_ieee_float_notequal)
-    return not_exprt(is_equal(expr.op0(), expr.op1(), get_spec(expr.op0())));
+    return not_expr(is_equal(expr.op0(), expr.op1(), get_spec(expr.op0())));
   else if(expr.id()==ID_floatbv_typecast)
   {
     const typet &src_type=expr.op0().type();
@@ -63,7 +63,7 @@ exprt float_bvt::convert(const exprt &expr) const
   else if(expr.id()==ID_typecast &&
           expr.type().id()==ID_bool &&
           expr.op0().type().id()==ID_floatbv)  // float -> bool
-    return not_exprt(is_zero(expr.op0()));
+    return not_expr(is_zero(expr.op0()));
   else if(expr.id()==ID_floatbv_plus)
     return add_sub(false, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
   else if(expr.id()==ID_floatbv_minus)
@@ -137,9 +137,7 @@ exprt float_bvt::is_equal(
 
   const equal_exprt bitwise_equal(src0, src1);
 
-  return and_exprt(
-    or_exprt(bitwise_equal, both_zero),
-    not_exprt(nan));
+  return and_exprt(or_exprt(bitwise_equal, both_zero), not_expr(nan));
 }
 
 exprt float_bvt::is_zero(const exprt &src)
@@ -392,8 +390,8 @@ exprt float_bvt::isnormal(
   const ieee_float_spect &spec)
 {
   return and_exprt(
-           not_exprt(exponent_all_zeros(src, spec)),
-           not_exprt(exponent_all_ones(src, spec)));
+    not_expr(exponent_all_zeros(src, spec)),
+    not_expr(exponent_all_ones(src, spec)));
 }
 
 /// Subtracts the exponents
@@ -428,7 +426,7 @@ exprt float_bvt::add_sub(
 
   // subtract?
   if(subtract)
-    unpacked2.sign=not_exprt(unpacked2.sign);
+    unpacked2.sign = not_expr(unpacked2.sign);
 
   // figure out which operand has the bigger exponent
   const exprt exponent_difference=subtract_exponents(unpacked1, unpacked2);
@@ -512,9 +510,8 @@ exprt float_bvt::add_sub(
       or_exprt(unpacked1.NaN, unpacked2.NaN));
 
   // infinity?
-  result.infinity=and_exprt(
-      not_exprt(result.NaN),
-      or_exprt(unpacked1.infinity, unpacked2.infinity));
+  result.infinity = and_exprt(
+    not_expr(result.NaN), or_exprt(unpacked1.infinity, unpacked2.infinity));
 
   // zero?
   // Note that:
@@ -523,12 +520,9 @@ exprt float_bvt::add_sub(
   //  2. Subnormals mean that addition or subtraction can't round to 0,
   //     thus we can perform this test now
   //  3. The rules for sign are different for zero
-  result.zero=
-    and_exprt(
-      not_exprt(or_exprt(result.infinity, result.NaN)),
-      equal_exprt(
-        result.fraction,
-        from_integer(0, result.fraction.type())));
+  result.zero = and_exprt(
+    not_expr(or_exprt(result.infinity, result.NaN)),
+    equal_exprt(result.fraction, from_integer(0, result.fraction.type())));
 
   // sign
   const notequal_exprt add_sub_sign(
@@ -697,14 +691,13 @@ exprt float_bvt::div(
   // 1) dividing a non-nan/non-zero by zero, or
   // 2) first operand is inf and second is non-nan and non-zero
   // In particular, inf/0=inf.
-  result.infinity=
-    or_exprt(
-      and_exprt(not_exprt(unpacked1.zero),
-      and_exprt(not_exprt(unpacked1.NaN),
-                unpacked2.zero)),
-      and_exprt(unpacked1.infinity,
-      and_exprt(not_exprt(unpacked2.NaN),
-                not_exprt(unpacked2.zero))));
+  result.infinity = or_exprt(
+    and_exprt(
+      not_expr(unpacked1.zero),
+      and_exprt(not_expr(unpacked1.NaN), unpacked2.zero)),
+    and_exprt(
+      unpacked1.infinity,
+      and_exprt(not_expr(unpacked2.NaN), not_expr(unpacked2.zero))));
 
   // NaN?
   result.NaN=or_exprt(unpacked1.NaN,
@@ -713,7 +706,7 @@ exprt float_bvt::div(
                       and_exprt(unpacked1.infinity, unpacked2.infinity))));
 
   // Division by infinity produces zero, unless we have NaN
-  const and_exprt force_zero(not_exprt(unpacked1.NaN), unpacked2.infinity);
+  const and_exprt force_zero(not_expr(unpacked1.NaN), unpacked2.infinity);
 
   result.fraction=
     if_exprt(
@@ -779,9 +772,9 @@ exprt float_bvt::relation(
     {
       and_exprt and_bv{{less_than3,
                         // for the case of two negative numbers
-                        not_exprt(bitwise_equal),
-                        not_exprt(both_zero),
-                        not_exprt(nan)}};
+                        not_expr(bitwise_equal),
+                        not_expr(both_zero),
+                        not_expr(nan)}};
 
       return std::move(and_bv);
     }
@@ -789,7 +782,7 @@ exprt float_bvt::relation(
     {
       or_exprt or_bv{{less_than3, both_zero, bitwise_equal}};
 
-      return and_exprt(or_bv, not_exprt(nan));
+      return and_exprt(or_bv, not_expr(nan));
     }
     else
       UNREACHABLE;
@@ -798,9 +791,7 @@ exprt float_bvt::relation(
   {
     const equal_exprt bitwise_equal(src1, src2);
 
-    return and_exprt(
-      or_exprt(bitwise_equal, both_zero),
-      not_exprt(nan));
+    return and_exprt(or_exprt(bitwise_equal, both_zero), not_expr(nan));
   }
 
   UNREACHABLE;
@@ -820,7 +811,7 @@ exprt float_bvt::isfinite(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return not_exprt(or_exprt(isinf(src, spec), isnan(src, spec)));
+  return not_expr(or_exprt(isinf(src, spec), isnan(src, spec)));
 }
 
 /// Gets the unbiased exponent in a floating-point bit-vector
@@ -847,8 +838,8 @@ exprt float_bvt::isnan(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return and_exprt(exponent_all_ones(src, spec),
-                   not_exprt(fraction_all_zeros(src, spec)));
+  return and_exprt(
+    exponent_all_ones(src, spec), not_expr(fraction_all_zeros(src, spec)));
 }
 
 /// normalize fraction/exponent pair returns 'zero' if fraction is zero
@@ -937,7 +928,7 @@ void float_bvt::denormalization_shift(
 
   // use sign bit
   const and_exprt denormal(
-    not_exprt(sign_exprt(distance)),
+    not_expr(sign_exprt(distance)),
     notequal_exprt(distance, from_integer(0, distance.type())));
 
 #if 1
@@ -1069,7 +1060,7 @@ exprt float_bvt::fraction_rounding_decision(
 
   // round up
   const and_exprt round_to_plus_inf(
-    not_exprt(sign), or_exprt(rounding_bit, sticky_bit));
+    not_expr(sign), or_exprt(rounding_bit, sticky_bit));
 
   // round down
   const and_exprt round_to_minus_inf(sign, or_exprt(rounding_bit, sticky_bit));
@@ -1165,10 +1156,10 @@ void float_bvt::round_fraction(
 
     // Normal overflow when old MSB == 1 and new MSB == 0
     const extractbit_exprt new_msb(result.fraction, fraction_size - 1);
-    const and_exprt overflow(old_msb, not_exprt(new_msb));
+    const and_exprt overflow(old_msb, not_expr(new_msb));
 
     // Subnormal to normal transition when old MSB == 0 and new MSB == 1
-    const and_exprt subnormal_to_normal(not_exprt(old_msb), new_msb);
+    const and_exprt subnormal_to_normal(not_expr(old_msb), new_msb);
 
     // In case of an overflow or subnormal to normal conversion,
     // the exponent has to be incremented.
@@ -1231,10 +1222,10 @@ void float_bvt::round_exponent(
     const or_exprt overflow_to_inf(
       rounding_mode_bits.round_to_even,
       or_exprt(
-        and_exprt(rounding_mode_bits.round_to_plus_inf, not_exprt(result.sign)),
+        and_exprt(rounding_mode_bits.round_to_plus_inf, not_expr(result.sign)),
         and_exprt(rounding_mode_bits.round_to_minus_inf, result.sign)));
 
-    const and_exprt set_to_max(exponent_too_large, not_exprt(overflow_to_inf));
+    const and_exprt set_to_max(exponent_too_large, not_expr(overflow_to_inf));
 
     exprt largest_normal_exponent=
       from_integer(
@@ -1276,7 +1267,7 @@ float_bvt::biased_floatt float_bvt::bias(
     to_unsignedbv_type(src.fraction.type()).get_width() == spec.f + 1);
 
   const extractbit_exprt hidden_bit(src.fraction, spec.f);
-  const not_exprt denormal(hidden_bit);
+  const exprt denormal = not_expr(hidden_bit);
 
   result.fraction=
     extractbits_exprt(

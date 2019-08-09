@@ -227,7 +227,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
 
       solver.set_to(
         and_exprt{
-          equal_exprt{length1, from_integer(10, int_type)}, not_exprt{g1}, g2},
+          equal_exprt{length1, from_integer(10, int_type)}, not_expr(g1), g2},
         true);
       THEN("The model for array1 has length 10 and contains 'c' at position 9")
       {
