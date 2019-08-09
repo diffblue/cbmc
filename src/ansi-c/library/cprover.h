@@ -38,7 +38,6 @@ void __CPROVER_initialize(void);
 void __CPROVER_cover(__CPROVER_bool condition);
 #endif
 
-// NOLINTNEXTLINE(build/deprecated)
 void __CPROVER_printf(const char *format, ...);
 void __CPROVER_input(const char *id, ...);
 void __CPROVER_output(const char *id, ...);
@@ -153,15 +152,10 @@ __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 #define __CPROVER_danger_number_of_consts 1
 
 // detect overflow
-// NOLINTNEXTLINE(build/deprecated)
 __CPROVER_bool __CPROVER_overflow_minus();
-// NOLINTNEXTLINE(build/deprecated)
 __CPROVER_bool __CPROVER_overflow_mult();
-// NOLINTNEXTLINE(build/deprecated)
 __CPROVER_bool __CPROVER_overflow_plus();
-// NOLINTNEXTLINE(build/deprecated)
 __CPROVER_bool __CPROVER_overflow_shl();
-// NOLINTNEXTLINE(build/deprecated)
 __CPROVER_bool __CPROVER_overflow_unary_minus();
 
 #endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H

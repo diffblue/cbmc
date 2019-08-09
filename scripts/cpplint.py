@@ -4605,7 +4605,7 @@ def CheckAssert(filename, clean_lines, linenum, error):
 
 
 def Check__CPROVER_(filename, clean_lines, linenum, error):
-  """Check for uses of __CPROVER_.
+  """Check for uses of __CPROVER_ in strings.
 
   Args:
     filename: The name of the current file.
@@ -4614,7 +4614,7 @@ def Check__CPROVER_(filename, clean_lines, linenum, error):
     error: The function to call with any errors found.
   """
   line = clean_lines.lines[linenum]
-  match = Match(r'.*__CPROVER_.*', line)
+  match = Match(r'.*"([^"\\]|\\.)*__CPROVER_([^"\\]|\\.)*".*', line)
   if match:
     error(filename, linenum, 'build/deprecated', 4,
           'use CPROVER_PREFIX instead of __CPROVER_')
