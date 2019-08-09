@@ -1077,7 +1077,7 @@ typet c_typecheck_baset::enum_constant_type(
   }
 }
 
-typet c_typecheck_baset::enum_underlying_type(
+bitvector_typet c_typecheck_baset::enum_underlying_type(
   const mp_integer &min_value,
   const mp_integer &max_value,
   bool is_packed) const
@@ -1215,6 +1215,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     c_enum_typet::c_enum_membert member;
     member.set_identifier(identifier);
     member.set_base_name(base_name);
+    // Note: The value will be correctly set to a bv type when we know
+    // the width of the bitvector
     member.set_value(integer2string(value));
     enum_members.push_back(member);
 
@@ -1227,6 +1229,20 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   as_expr.operands().clear();
 
   bool is_packed=type.get_bool(ID_C_packed);
+
+  // We use a subtype to store the underlying type.
+  bitvector_typet underlying_type =
+    enum_underlying_type(min_value, max_value, is_packed);
+
+  // Get the width to make the values have a bitvector type
+  std::size_t width = underlying_type.get_width();
+  for(auto &member : enum_members)
+  {
+    // Note: This is inefficient as it first turns integers to strings
+    // and then turns them back to bvrep
+    auto value = string2integer(id2string(member.get_value()));
+    member.set_value(integer2bvrep(value, width));
+  }
 
   // tag?
   if(type.find(ID_tag).is_nil())
@@ -1267,10 +1283,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
   for(const auto &member : enum_members)
     body.push_back(member);
-
-  // We use a subtype to store the underlying type.
-  typet underlying_type=
-    enum_underlying_type(min_value, max_value, is_packed);
 
   enum_tag_symbol.type.subtype()=underlying_type;
 

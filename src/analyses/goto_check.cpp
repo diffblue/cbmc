@@ -47,10 +47,12 @@ public:
     ns(_ns),
     local_bitvector_analysis(nullptr)
   {
+    no_enum_check = false;
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
     enable_memory_leak_check=_options.get_bool_option("memory-leak-check");
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
+    enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check=
       _options.get_bool_option("signed-overflow-check");
     enable_unsigned_overflow_check=
@@ -90,6 +92,7 @@ protected:
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
   guard_managert guard_manager;
+  bool no_enum_check;
 
   /// Check an address-of expression:
   ///  if it is a dereference then check the pointer
@@ -167,6 +170,7 @@ protected:
   void div_by_zero_check(const div_exprt &, const guardt &);
   void mod_by_zero_check(const mod_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
+  void enum_range_check(const exprt &, const guardt &);
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const binary_relation_exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
@@ -220,6 +224,7 @@ protected:
   bool enable_pointer_check;
   bool enable_memory_leak_check;
   bool enable_div_by_zero_check;
+  bool enable_enum_range_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
   bool enable_pointer_overflow_check;
@@ -320,6 +325,35 @@ void goto_checkt::div_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
+    expr.find_source_location(),
+    expr,
+    guard);
+}
+
+void goto_checkt::enum_range_check(const exprt &expr, const guardt &guard)
+{
+  if(!enable_enum_range_check || no_enum_check)
+    return;
+
+  const c_enum_tag_typet &c_enum_tag_type = to_c_enum_tag_type(expr.type());
+  symbolt enum_type = ns.lookup(c_enum_tag_type.get_identifier());
+  const c_enum_typet &c_enum_type = to_c_enum_type(enum_type.type);
+
+  const c_enum_typet::memberst enum_values = c_enum_type.members();
+
+  std::vector<exprt> disjuncts;
+  for(const auto &enum_value : enum_values)
+  {
+    const constant_exprt val{enum_value.get_value(), c_enum_tag_type};
+    disjuncts.push_back(equal_exprt(expr, val));
+  }
+
+  const exprt check = disjunction(disjuncts);
+
+  add_guarded_property(
+    check,
+    "enum range check",
+    "enum-range-check",
     expr.find_source_location(),
     expr,
     guard);
@@ -1668,6 +1702,9 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   forall_operands(it, expr)
     check_rec(*it, guard);
 
+  if(expr.type().id() == ID_c_enum_tag)
+    enum_range_check(expr, guard);
+
   if(expr.id()==ID_index)
   {
     bounds_check(to_index_expr(expr), guard);
@@ -1807,6 +1844,8 @@ void goto_checkt::goto_check(
         flag_resetter.set_flag(enable_memory_leak_check, false);
       else if(d.first == "disable:div-by-zero-check")
         flag_resetter.set_flag(enable_div_by_zero_check, false);
+      else if(d.first == "disable:enum-range-check")
+        flag_resetter.set_flag(enable_enum_range_check, false);
       else if(d.first == "disable:signed-overflow-check")
         flag_resetter.set_flag(enable_signed_overflow_check, false);
       else if(d.first == "disable:unsigned-overflow-check")
@@ -1881,7 +1920,13 @@ void goto_checkt::goto_check(
     {
       const code_assignt &code_assign=to_code_assign(i.code);
 
-      check(code_assign.lhs());
+      // Reset the no_enum_check with the flag reset for exception
+      // safety
+      {
+        flag_resett no_enum_check_flag_resetter;
+        no_enum_check_flag_resetter.set_flag(no_enum_check, true);
+        check(code_assign.lhs());
+      }
       check(code_assign.rhs());
 
       // the LHS might invalidate any assertion

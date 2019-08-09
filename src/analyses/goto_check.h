@@ -33,10 +33,11 @@ void goto_check(
   const optionst &options,
   goto_modelt &goto_model);
 
-#define OPT_GOTO_CHECK \
-  "(bounds-check)(pointer-check)(memory-leak-check)" \
-  "(div-by-zero-check)(signed-overflow-check)(unsigned-overflow-check)" \
-  "(pointer-overflow-check)(conversion-check)(undefined-shift-check)" \
+#define OPT_GOTO_CHECK                                                         \
+  "(bounds-check)(pointer-check)(memory-leak-check)"                           \
+  "(div-by-zero-check)(enum-range-check)(signed-overflow-check)(unsigned-"     \
+  "overflow-check)"                                                            \
+  "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"
 
 // clang-format off
@@ -53,6 +54,7 @@ void goto_check(
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
   " --no-built-in-assertions     ignore assertions in built-in library\n" \
+  " --enum-range-check           checks that all enum type expressions have values in the enum range\n" /* NOLINT(whitespace/line_length) */ \
 // clang-format on
 
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
@@ -60,6 +62,7 @@ void goto_check(
   options.set_option("pointer-check", cmdline.isset("pointer-check")); \
   options.set_option("memory-leak-check", cmdline.isset("memory-leak-check")); \
   options.set_option("div-by-zero-check", cmdline.isset("div-by-zero-check")); \
+  options.set_option("enum-range-check", cmdline.isset("enum-range-check")); \
   options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("unsigned-overflow-check", cmdline.isset("unsigned-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("pointer-overflow-check", cmdline.isset("pointer-overflow-check")); /* NOLINT(whitespace/line_length) */  \

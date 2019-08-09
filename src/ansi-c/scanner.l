@@ -235,9 +235,10 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 CPROVER_PREFIX  "__CPROVER_"
 
 arith_check     ("conversion"|"undefined-shift"|"nan"|"div-by-zero")
+enum_check      "enum-range"
 memory_check    ("bounds"|"pointer"|"memory_leak")
 overflow_check  ("signed"|"unsigned"|"pointer"|"float")"-overflow"
-named_check     ["]({arith_check}|{memory_check}|{overflow_check})["]
+named_check     ["]({arith_check}|{enum_check}|{memory_check}|{overflow_check})["]
 
 %x GRAMMAR
 %x COMMENT1
