@@ -1,0 +1,11 @@
+CORE
+test.c
+
+^\[main\.assertion\.[0-9]+\] line [0-9]+ assertion argc == 1: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+The main test is in test.desc; this just checks that the test is executable and
+the assertion fails as expected.

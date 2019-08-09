@@ -1,0 +1,12 @@
+CORE paths-lifo-expected-failure
+test.c
+--show-vcc
+^\{1\} main::argc!0@1#1 = 1$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This checks that the assertion, argc == 1, is unguarded (i.e. is not of the form 
+'guard => condition'). Such a guard is redundant, but could be added before goto-symex
+made sure to restore guards to their state at function entry.
+--paths mode is excluded as it currently always accrues large guards as it proceeds through execution
