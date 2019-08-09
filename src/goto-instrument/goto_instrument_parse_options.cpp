@@ -1624,7 +1624,6 @@ void goto_instrument_parse_optionst::help()
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
     HELP_GOTO_CHECK
-    " --enum-range-check           checks that all enum type expressions have values in the enum range\n" // NOLINT(*)
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
     " --error-label label          check that label is unreachable\n"
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)

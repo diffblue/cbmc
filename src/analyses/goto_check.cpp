@@ -1843,6 +1843,8 @@ void goto_checkt::goto_check(
         flag_resetter.set_flag(enable_memory_leak_check, false);
       else if(d.first == "disable:div-by-zero-check")
         flag_resetter.set_flag(enable_div_by_zero_check, false);
+      else if(d.first == "disable:enum-range-check")
+        flag_resetter.set_flag(enable_enum_range_check, false);
       else if(d.first == "disable:signed-overflow-check")
         flag_resetter.set_flag(enable_signed_overflow_check, false);
       else if(d.first == "disable:unsigned-overflow-check")

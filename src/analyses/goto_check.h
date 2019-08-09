@@ -54,6 +54,7 @@ void goto_check(
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
   " --no-built-in-assertions     ignore assertions in built-in library\n" \
+  " --enum-range-check           checks that all enum type expressions have values in the enum range\n" /* NOLINT(whitespace/line_length) */ \
 // clang-format on
 
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
