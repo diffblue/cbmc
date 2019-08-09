@@ -2997,10 +2997,14 @@ inline address_of_exprt &to_address_of_expr(exprt &expr)
   return ret;
 }
 
-
 /// \brief Boolean negation
 class not_exprt:public unary_exprt
 {
+private:
+  // This is dangerous because it's not clear whether we want a copy or
+  // the negation of the expression. That's why it is private.
+  not_exprt(const not_exprt &op) = default;
+
 public:
   explicit not_exprt(exprt _op) : unary_exprt(ID_not, std::move(_op))
   {
