@@ -1,0 +1,16 @@
+CORE
+main.c
+--show-dependence-graph
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^Data dependencies: \d+$
+--
+^warning: ignoring
+^Data dependencies: \d+,\s*\d+$
+--
+This tests that the write-set of a pointer contains only the pointed-to
+object when the pointer is dereferenced and written to.
+
+There should therefore be no data dependence between the pointer itself
+and the write to the pointed-to object.
