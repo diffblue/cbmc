@@ -50,7 +50,6 @@ protected:
   bddt from_expr_rec(const exprt &expr);
   exprt as_expr(
     const bdd_nodet &r,
-    bool complement,
     std::unordered_map<bdd_nodet::idt, exprt> &cache) const;
 };
 

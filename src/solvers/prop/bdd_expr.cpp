@@ -105,17 +105,14 @@ static exprt make_or(exprt a, exprt b)
 
 /// Helper function for \c bddt to \c exprt conversion
 /// \param r: node to convert
-/// \param complement: whether we want the negation of the expression
-///        represented by r
 /// \param cache: map of already computed values
 exprt bdd_exprt::as_expr(
   const bdd_nodet &r,
-  bool complement,
   std::unordered_map<bdd_nodet::idt, exprt> &cache) const
 {
   if(r.is_constant())
   {
-    if(complement)
+    if(r.is_complement())
       return false_exprt();
     else
       return true_exprt();
@@ -129,63 +126,46 @@ exprt bdd_exprt::as_expr(
   auto insert_result = cache.emplace(r.id(), nil_exprt());
   if(insert_result.second)
   {
-    insert_result.first->second = [&]() -> exprt {
+    auto result_ignoring_complementation = [&]() -> exprt {
       if(r.else_branch().is_constant())
       {
         if(r.then_branch().is_constant())
         {
-          if(r.else_branch().is_complement() != complement)
+          if(r.else_branch().is_complement()) // else is false
             return n_expr;
-          return not_exprt(n_expr);
+          return not_exprt(n_expr); // else is true
         }
         else
         {
-          if(r.else_branch().is_complement() != complement)
+          if(r.else_branch().is_complement()) // else is false
           {
-            return make_and(
-              n_expr,
-              as_expr(
-                r.then_branch(),
-                complement != r.then_branch().is_complement(),
-                cache));
+            exprt then_case = as_expr(r.then_branch(), cache);
+            return make_and(n_expr, then_case);
           }
-          return make_or(
-            not_exprt(n_expr),
-            as_expr(
-              r.then_branch(),
-              complement != r.then_branch().is_complement(),
-              cache));
+          exprt then_case = as_expr(r.then_branch(), cache);
+          return make_or(not_exprt(n_expr), then_case);
         }
       }
       else if(r.then_branch().is_constant())
       {
-        if(r.then_branch().is_complement() != complement)
+        if(r.then_branch().is_complement()) // then is false
         {
-          return make_and(
-            not_exprt(n_expr),
-            as_expr(
-              r.else_branch(),
-              complement != r.else_branch().is_complement(),
-              cache));
+          exprt else_case = as_expr(r.else_branch(), cache);
+          return make_and(not_exprt(n_expr), else_case);
         }
-        return make_or(
-          n_expr,
-          as_expr(
-            r.else_branch(),
-            complement != r.else_branch().is_complement(),
-            cache));
+        exprt else_case = as_expr(r.else_branch(), cache);
+        return make_or(n_expr, else_case);
       }
-      return if_exprt(
-        n_expr,
-        as_expr(
-          r.then_branch(),
-          r.then_branch().is_complement() != complement,
-          cache),
-        as_expr(
-          r.else_branch(),
-          r.else_branch().is_complement() != complement,
-          cache));
+
+      exprt then_branch = as_expr(r.then_branch(), cache);
+      exprt else_branch = as_expr(r.else_branch(), cache);
+      return if_exprt(n_expr, then_branch, else_branch);
     }();
+
+    insert_result.first->second =
+      r.is_complement()
+        ? boolean_negate(std::move(result_ignoring_complementation))
+        : result_ignoring_complementation;
   }
   return insert_result.first->second;
 }
@@ -194,5 +174,5 @@ exprt bdd_exprt::as_expr(const bddt &root) const
 {
   std::unordered_map<bdd_nodet::idt, exprt> cache;
   bdd_nodet node = bdd_mgr.bdd_node(root);
-  return as_expr(node, node.is_complement(), cache);
+  return as_expr(node, cache);
 }
