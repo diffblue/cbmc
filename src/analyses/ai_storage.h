@@ -36,12 +36,13 @@ public:
   }
 
   typedef ai_domain_baset statet;
+  typedef std::shared_ptr<const statet> state_ptrt;
   typedef goto_programt::const_targett locationt;
 
   /// Non-modifying access to the stored domains,
   /// used in the ai_baset public interface.
   /// In the case of un-analysed locals this should create a domain
-  virtual std::shared_ptr<const statet> abstract_state_before(
+  virtual statet_ptr abstract_state_before(
     locationt l,
     const ai_domain_factory_baset &fac) const = 0;
 
@@ -74,12 +75,13 @@ class dependence_grapht;
 class location_sensitive_storaget : public ai_storage_baset
 {
 protected:
-  typedef std::shared_ptr<statet> s_ptrt;
-
   /// This is location sensitive so we store one domain per location
-  typedef std::
-    unordered_map<locationt, s_ptrt, const_target_hash, pointee_address_equalt>
-      state_mapt;
+  typedef std::unordered_map<
+    locationt,
+    state_ptrt,
+    const_target_hash,
+    pointee_address_equalt>
+    state_mapt;
   state_mapt state_map;
 
   // Support some older domains that explicitly iterate across the state map
@@ -91,7 +93,7 @@ protected:
   }
 
 public:
-  std::shared_ptr<const statet> abstract_state_before(
+  state_ptrt abstract_state_before(
     locationt l,
     const ai_domain_factory_baset &fac) const override
   {

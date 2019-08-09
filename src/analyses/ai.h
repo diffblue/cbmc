@@ -35,6 +35,7 @@ class ai_baset
 {
 public:
   typedef ai_domain_baset statet;
+  typedef ai_storage_baset::state_ptrt state_ptrt;
   typedef goto_programt::const_targett locationt;
 
   ai_baset(
@@ -104,7 +105,7 @@ public:
   /// \return The abstract state before `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual std::shared_ptr<const statet> abstract_state_before(locationt l) const
+  virtual state_ptr abstract_state_before(locationt l) const
   {
     return storage->abstract_state_before(l, *domain_factory);
   }
@@ -117,7 +118,7 @@ public:
   /// \return The abstract state after `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual std::shared_ptr<const statet> abstract_state_after(locationt l) const
+  virtual state_ptr abstract_state_after(locationt l) const
   {
     /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
     /// Check relies on a DATA_INVARIANT of goto_programs
