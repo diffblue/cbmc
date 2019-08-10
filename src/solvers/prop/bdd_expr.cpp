@@ -163,6 +163,11 @@ exprt bdd_exprt::as_expr(
 
       exprt then_branch = as_expr(r.then_branch(), cache);
       exprt else_branch = as_expr(r.else_branch(), cache);
+
+      // Special case of `then == not else`
+      if(then_branch == boolean_negate(else_branch))
+        return equal_exprt{n_expr, then_branch};
+
       return if_exprt(n_expr, then_branch, else_branch);
     }();
 
