@@ -242,7 +242,8 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard, renamed_guard, state.source);
+  target.goto_instruction(
+    state.guard, guardt{renamed_guard.get(), guard_manager}, state.source);
 
   DATA_INVARIANT(
     !instruction.targets.empty(), "goto should have at least one target");

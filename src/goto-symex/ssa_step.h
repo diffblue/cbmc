@@ -145,7 +145,7 @@ public:
   symex_targett::assignment_typet assignment_type;
 
   // for ASSUME/ASSERT/GOTO/CONSTRAINT
-  exprt cond_expr;
+  optionalt<guardt> cond_expr;
   exprt cond_handle;
   std::string comment;
 
@@ -182,7 +182,6 @@ public:
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
       assignment_type(symex_targett::assignment_typet::STATE),
-      cond_expr(static_cast<const exprt &>(get_nil_irep())),
       cond_handle(false_exprt()),
       formatted(false),
       atomic_section_id(0),
@@ -205,6 +204,7 @@ public:
     exprt ssa_full_lhs,
     exprt original_full_lhs,
     exprt ssa_rhs,
+    guardt cond,
     symex_targett::assignment_typet assignment_type);
 };
 

@@ -135,21 +135,19 @@ public:
     const std::list<exprt> &args) override;
 
   /// \copydoc symex_targett::assumption()
-  void assumption(const guardt &guard, const exprt &cond, const sourcet &source)
-    override;
+  void
+  assumption(const guardt &guard, guardt cond, const sourcet &source) override;
 
   /// \copydoc symex_targett::assertion()
   void assertion(
     const guardt &guard,
-    const exprt &cond,
+    guardt cond,
     const std::string &msg,
     const sourcet &source) override;
 
   /// \copydoc symex_targett::goto_instruction()
-  void goto_instruction(
-    const guardt &guard,
-    const renamedt<exprt, L2> &cond,
-    const sourcet &source) override;
+  void goto_instruction(const guardt &guard, guardt cond, const sourcet &source)
+    override;
 
   /// \copydoc symex_targett::constraint()
   void constraint(

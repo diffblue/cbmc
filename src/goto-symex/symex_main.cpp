@@ -133,7 +133,7 @@ void goto_symext::vcc(
     state.guard.implies(guardt{condition, guard_manager});
 
   state.remaining_vccs++;
-  target.assertion(state.guard, guarded_condition.as_expr(), msg, state.source);
+  target.assertion(state.guard, guarded_condition, msg, state.source);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
@@ -168,9 +168,9 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
 
   if(state.threads.size()==1)
   {
-    const guardt condition =
+    guardt condition =
       state.guard.implies(guardt{rewritten_cond, guard_manager});
-    target.assumption(state.guard, condition.as_expr(), state.source);
+    target.assumption(state.guard, std::move(condition), state.source);
   }
   // symex_target_equationt::convert_assertions would fail to
   // consider assumptions of threads that have a thread-id above that

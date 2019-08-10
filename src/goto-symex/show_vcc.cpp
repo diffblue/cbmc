@@ -61,10 +61,10 @@ show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
     for(std::size_t count = 1; p_it != last_it; p_it++)
       if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
       {
-        if(!p_it->ignore)
+        if(!p_it->ignore && p_it->cond_expr.has_value())
         {
           out << messaget::faint << "{-" << count << "} " << messaget::reset
-              << format(p_it->cond_expr) << '\n';
+              << format(p_it->cond_expr->as_expr()) << '\n';
 
 #ifdef DEBUG
           out << "GUARD: " << format(p_it->guard->as_expr()) << '\n';
@@ -84,10 +84,14 @@ show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
     // split property into multiple disjunts, if applicable
     exprt::operandst disjuncts;
 
-    if(s_it->cond_expr.id() == ID_or)
-      disjuncts = to_or_expr(s_it->cond_expr).operands();
-    else
-      disjuncts.push_back(s_it->cond_expr);
+    if(s_it->cond_expr.has_value())
+    {
+      const exprt cond = s_it->cond_expr->as_expr();
+      if(cond.id() == ID_or)
+        disjuncts = to_or_expr(cond).operands();
+      else
+        disjuncts.push_back(cond);
+    }
 
     std::size_t count = 1;
     for(const auto &disjunct : disjuncts)
@@ -150,17 +154,20 @@ show_vcc_json(std::ostream &out, const symex_target_equationt &equation)
     {
       if(
         (p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint()) &&
-        !p_it->ignore)
+        !p_it->ignore && p_it->cond_expr.has_value())
       {
         std::ostringstream string_value;
-        string_value << format(p_it->cond_expr);
+        string_value << format(p_it->cond_expr->as_expr());
         json_constraints.push_back(json_stringt(string_value.str()));
       }
     }
 
-    std::ostringstream string_value;
-    string_value << format(s_it->cond_expr);
-    object["expression"] = json_stringt(string_value.str());
+    if(s_it->cond_expr.has_value())
+    {
+      std::ostringstream string_value;
+      string_value << format(s_it->cond_expr->as_expr());
+      object["expression"] = json_stringt(string_value.str());
+    }
   }
 
   out << ",\n" << json_result;

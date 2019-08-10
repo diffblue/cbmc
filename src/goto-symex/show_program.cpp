@@ -30,9 +30,10 @@ static void show_step(
 {
   const irep_idt &function_id = step.source.function_id;
 
-  std::string string_value = (step.is_shared_read() || step.is_shared_write())
-                               ? from_expr(ns, function_id, step.ssa_lhs)
-                               : from_expr(ns, function_id, step.cond_expr);
+  std::string string_value =
+    (step.is_shared_read() || step.is_shared_write())
+      ? from_expr(ns, function_id, step.ssa_lhs)
+      : from_expr(ns, function_id, step.cond_expr->as_expr());
   std::cout << '(' << count << ") ";
   if(annotation.empty())
     std::cout << string_value;

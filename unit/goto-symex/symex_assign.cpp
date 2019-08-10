@@ -91,7 +91,8 @@ SCENARIO(
         SSA_stept step = target_equation.SSA_steps.back();
         REQUIRE(step.type == goto_trace_stept::typet::ASSIGNMENT);
         REQUIRE(step.assignment_type == symex_targett::assignment_typet::STATE);
-        REQUIRE(step.cond_expr == equal_exprt{step.ssa_lhs, step.ssa_rhs});
+        REQUIRE(
+          step.cond_expr->as_expr() == equal_exprt{step.ssa_lhs, step.ssa_rhs});
         REQUIRE(step.guard.has_value());
         REQUIRE(step.guard->as_expr() == g);
 
@@ -164,8 +165,10 @@ SCENARIO(
             REQUIRE(step.type == goto_trace_stept::typet::ASSIGNMENT);
             REQUIRE(
               step.assignment_type == symex_targett::assignment_typet::STATE);
-            REQUIRE(step.cond_expr.id() == ID_equal);
-            REQUIRE(step.cond_expr == equal_exprt{step.ssa_lhs, step.ssa_rhs});
+            // REQUIRE(step.cond_expr.id() == ID_equal);
+            REQUIRE(
+              step.cond_expr->as_expr() ==
+              equal_exprt{step.ssa_lhs, step.ssa_rhs});
             REQUIRE(step.guard.has_value());
             REQUIRE(step.guard->is_true());
 

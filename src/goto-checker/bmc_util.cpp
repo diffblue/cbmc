@@ -252,8 +252,9 @@ void update_properties_status_from_symex_target_equation(
 
     // Don't update status of properties that are constant 'false';
     // we wouldn't have traces for them.
-    const auto status = step.cond_expr.is_true() ? property_statust::PASS
-                                                 : property_statust::UNKNOWN;
+    INVARIANT(step.cond_expr, "assert should have cond_expr");
+    const auto status = step.cond_expr->is_true() ? property_statust::PASS
+                                                  : property_statust::UNKNOWN;
     auto emplace_result = properties.emplace(
       property_id, property_infot{step.source.pc, step.comment, status});
 

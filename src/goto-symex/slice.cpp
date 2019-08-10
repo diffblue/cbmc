@@ -59,15 +59,15 @@ void symex_slicet::slice(SSA_stept &SSA_step)
   switch(SSA_step.type)
   {
   case goto_trace_stept::typet::ASSERT:
-    get_symbols(SSA_step.cond_expr);
+    get_symbols(SSA_step.cond_expr->as_expr());
     break;
 
   case goto_trace_stept::typet::ASSUME:
-    get_symbols(SSA_step.cond_expr);
+    get_symbols(SSA_step.cond_expr->as_expr());
     break;
 
   case goto_trace_stept::typet::GOTO:
-    get_symbols(SSA_step.cond_expr);
+    get_symbols(SSA_step.cond_expr->as_expr());
     break;
 
   case goto_trace_stept::typet::LOCATION:
@@ -159,11 +159,11 @@ void symex_slicet::collect_open_variables(
     switch(SSA_step.type)
     {
     case goto_trace_stept::typet::ASSERT:
-      get_symbols(SSA_step.cond_expr);
+      get_symbols(SSA_step.cond_expr->as_expr());
       break;
 
     case goto_trace_stept::typet::ASSUME:
-      get_symbols(SSA_step.cond_expr);
+      get_symbols(SSA_step.cond_expr->as_expr());
       break;
 
     case goto_trace_stept::typet::LOCATION:

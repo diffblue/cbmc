@@ -235,7 +235,7 @@ public:
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assumption
   virtual void
-  assumption(const guardt &guard, const exprt &cond, const sourcet &source) = 0;
+  assumption(const guardt &guard, guardt cond, const sourcet &source) = 0;
 
   /// Record an assertion.
   /// \param guard: Precondition for reaching this assertion
@@ -245,7 +245,7 @@ public:
   ///  assertion
   virtual void assertion(
     const guardt &guard,
-    const exprt &cond,
+    guardt cond,
     const std::string &msg,
     const sourcet &source) = 0;
 
@@ -254,10 +254,8 @@ public:
   /// \param cond: Condition under which this goto should be taken
   /// \param source: Pointer to location in the input GOTO program of this
   ///  goto instruction
-  virtual void goto_instruction(
-    const guardt &guard,
-    const renamedt<exprt, L2> &cond,
-    const sourcet &source) = 0;
+  virtual void
+  goto_instruction(const guardt &guard, guardt cond, const sourcet &source) = 0;
 
   /// Record a _global_ constraint: there is no guard limiting its scope.
   /// \param cond: Condition represented by this constraint
