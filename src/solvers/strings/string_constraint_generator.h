@@ -74,9 +74,6 @@ private:
   exprt associate_array_to_pointer(const function_application_exprt &f);
 
   exprt associate_length_to_array(const function_application_exprt &f);
-
-  // MEMBERS
-  const messaget message;
 };
 
 // Type used by primitives to signal errors
