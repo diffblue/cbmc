@@ -59,6 +59,34 @@ for(i=0; i<100; i++)
   assert(a[i]==0);
 ```
 
+CPROVER also supports writing function pre and postconditions, using
+the built-in functions `__CPROVER_precondition` and
+`__CPROVER_postcondition`. They can be used to express intent, and at
+the moment they are just transformed to assertions in the goto
+program. As such, they can be used as simple assertions in
+code. However, it is advised to use `__CPROVER_precondition` at the
+beginning of a function's body, and `__CPROVER_postcondition` before
+the exit points in a function (either the return statements, or the
+end of the body if the function returns void). The following is an
+example usage:
+
+```C
+int foo(int a, int b) {
+  __CPROVER_precondition(a >= 0);
+  __CPROVER_precondition(b > 0);
+
+  int rval = a / b;
+
+  __CPROVER_postcondition(rval >= 0);
+  return rval;
+}
+```
+
+A future release of CPROVER will support using these pre and
+postconditions to create a function contract, which can be used for
+modular verification.
+
+
 Future CPROVER releases will support explicit quantifiers with a syntax
 that resembles Spec\#:
 
