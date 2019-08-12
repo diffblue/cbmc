@@ -37,9 +37,6 @@ struct string_constraintst final
   std::vector<exprt> existential;
   std::vector<string_constraintt> universal;
   std::vector<string_not_contains_constraintt> not_contains;
-
-  /// Clear all constraints
-  void clear();
 };
 
 void merge(string_constraintst &result, string_constraintst other);
@@ -60,23 +57,23 @@ public:
 
   array_poolt array_pool;
 
-  string_constraintst constraints;
-
   const namespacet ns;
 
   /// Associate array to pointer, and array to length
   /// \return an expression if the given function application is one of
   ///   associate pointer and associate length
-  optionalt<exprt>
-  make_array_pointer_association(const function_application_exprt &expr);
+  optionalt<exprt> make_array_pointer_association(
+    const exprt &return_code,
+    const function_application_exprt &expr);
 
 private:
-  exprt associate_array_to_pointer(const function_application_exprt &f);
+  exprt associate_array_to_pointer(
+    const exprt &return_code,
+    const function_application_exprt &f);
 
-  exprt associate_length_to_array(const function_application_exprt &f);
-
-  // MEMBERS
-  const messaget message;
+  exprt associate_length_to_array(
+    const exprt &return_code,
+    const function_application_exprt &f);
 };
 
 // Type used by primitives to signal errors
