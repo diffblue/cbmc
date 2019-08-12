@@ -122,10 +122,10 @@ private:
 
   void gather_virtual_callsites(
     const exprt &e,
-    std::unordered_set<exprt, irep_hash> &result);
+    std::unordered_set<class_method_descriptor_exprt, irep_hash> &result);
 
   void get_virtual_method_targets(
-    const exprt &called_function,
+    const class_method_descriptor_exprt &called_function,
     const std::unordered_set<irep_idt> &instantiated_classes,
     std::unordered_set<irep_idt> &callable_methods,
     symbol_tablet &symbol_table);
@@ -171,12 +171,14 @@ private:
     symbol_tablet &symbol_table,
     std::unordered_set<irep_idt> &methods_to_convert_later,
     std::unordered_set<irep_idt> &instantiated_classes,
-    std::unordered_set<exprt, irep_hash> &virtual_function_calls);
+    std::unordered_set<class_method_descriptor_exprt, irep_hash>
+      &called_virtual_functions);
 
   bool handle_virtual_methods_with_no_callees(
     std::unordered_set<irep_idt> &methods_to_convert_later,
     std::unordered_set<irep_idt> &instantiated_classes,
-    const std::unordered_set<exprt, irep_hash> &virtual_function_calls,
+    const std::unordered_set<class_method_descriptor_exprt, irep_hash>
+      &virtual_functions,
     symbol_tablet &symbol_table);
 };
 

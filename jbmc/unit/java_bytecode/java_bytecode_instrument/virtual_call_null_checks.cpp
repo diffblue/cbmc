@@ -24,7 +24,7 @@ static bool is_expected_virtualmethod_call(
     return false;
   const auto &virtual_call = to_code_function_call(instruction.code);
   const auto &called_function = virtual_call.function();
-  if(called_function.id() != ID_virtual_function)
+  if(!can_cast_expr<class_method_descriptor_exprt>(called_function))
     return false;
   if(called_function.get(ID_identifier) != "java::B.virtualmethod:()V")
     return false;

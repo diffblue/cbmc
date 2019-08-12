@@ -763,13 +763,8 @@ void java_bytecode_parsert::rconstant_pool()
         irep_idt identifier=
           id2string(class_name)+"."+id2string(component_name);
 
-        exprt virtual_function(ID_virtual_function, type);
-        virtual_function.set(ID_component_name, component_name);
-        virtual_function.set(ID_C_class, class_name);
-        virtual_function.set(ID_C_base_name, name_entry.s);
-        virtual_function.set(ID_identifier, identifier);
-
-        entry.expr = virtual_function;
+        entry.expr = class_method_descriptor_exprt{
+          type, component_name, class_name, name_entry.s, identifier};
       }
       break;
 

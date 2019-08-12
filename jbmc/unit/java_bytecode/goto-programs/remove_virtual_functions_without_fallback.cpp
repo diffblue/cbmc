@@ -133,10 +133,11 @@ SCENARIO(
   const symbolt &callee_symbol =
     symbol_table.lookup_ref("java::VirtualFunctionsTestParent.f:()V");
 
-  exprt callee(ID_virtual_function, callee_symbol.type);
-  callee.set(ID_identifier, callee_symbol.name);
-  callee.set(ID_C_class, "java::VirtualFunctionsTestParent");
-  callee.set(ID_component_name, "f:()V");
+  class_method_descriptor_exprt callee{callee_symbol.type,
+                                       "f:()V",
+                                       "java::VirtualFunctionsTestParent",
+                                       "f",
+                                       callee_symbol.name};
 
   const code_function_callt call(
     callee,
