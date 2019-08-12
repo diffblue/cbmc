@@ -239,23 +239,24 @@ static std::vector<exprt> generate_instantiations(
   return lemmas;
 }
 
-/// Fill the array_pointer correspondence and replace the right hand sides of
-/// the corresponding equations
+/// If \p expr is an equation whose right-hand-side is a
+/// associate_array_to_pointer call, add the correspondence and replace the call
+/// by an expression representing its result.
 static void make_char_array_pointer_associations(
   string_constraint_generatort &generator,
-  std::vector<equal_exprt> &equations)
+  exprt &expr)
 {
-  for(equal_exprt &eq : equations)
+  if(const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr))
   {
     if(
-      const auto fun_app =
-        expr_try_dynamic_cast<function_application_exprt>(eq.rhs()))
+      const auto fun_app = expr_try_dynamic_cast<function_application_exprt>(
+        as_const(equal_expr->rhs())))
     {
       const auto new_equation =
-        generator.make_array_pointer_association(eq.lhs(), *fun_app);
+        generator.make_array_pointer_association(equal_expr->lhs(), *fun_app);
       if(new_equation)
       {
-        eq =
+        expr =
           equal_exprt{from_integer(true, new_equation->type()), *new_equation};
       }
     }
@@ -652,7 +653,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   // Constraints start clear at each `dec_solve` call.
   string_constraintst constraints;
-  make_char_array_pointer_associations(generator, equations);
+  for(auto &expr : equations)
+    make_char_array_pointer_associations(generator, expr);
 
 #ifdef DEBUG
   output_equations(log.debug(), equations);
