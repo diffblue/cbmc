@@ -56,12 +56,12 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     WHEN("It is converted to an exprt")
     {
       const exprt result = bdd_expr_converter.as_expr(bdd);
-      THEN("It is equal to the expression (a & !b) or (!b & a)")
+      THEN("It is equivalent to the expression !(!a || b)")
       {
-        REQUIRE(result.id() == ID_and);
-        REQUIRE(result.operands().size() == 2);
-        REQUIRE((result.op0() == a || result.op1() == a));
-        REQUIRE((result.op0() == not_exprt(b) || result.op1() == not_exprt(b)));
+        const bddt to_compare =
+          bdd_expr_converter.from_expr(not_exprt{or_exprt{not_exprt{a}, b}});
+        REQUIRE(bdd.bdd_xor(to_compare).is_false());
+        REQUIRE(bdd.bdd_xor(to_compare.bdd_not()).is_true());
       }
     }
   }
