@@ -464,7 +464,7 @@ static void add_string_equation_to_symbol_resolution(
 /// \param stream: output stream
 /// \return union_find_replacet structure containing the correspondences.
 union_find_replacet string_identifiers_resolution_from_equations(
-  std::vector<equal_exprt> &equations,
+  const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
