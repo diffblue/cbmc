@@ -90,7 +90,7 @@ string_dependenciest::node_at(const array_string_exprt &e) const
 }
 
 string_dependenciest::builtin_function_nodet &string_dependenciest::make_node(
-  std::unique_ptr<string_builtin_functiont> &builtin_function)
+  std::unique_ptr<string_builtin_functiont> builtin_function)
 {
   builtin_function_nodes.emplace_back(
     std::move(builtin_function), builtin_function_nodes.size());
@@ -209,8 +209,8 @@ bool add_node(
     to_string_builtin_function(*fun_app, equation.lhs(), array_pool);
 
   CHECK_RETURN(builtin_function != nullptr);
-  const auto &builtin_function_node = dependencies.make_node(builtin_function);
-  // Warning: `builtin_function` has been emptied and should not be used anymore
+  const auto &builtin_function_node =
+    dependencies.make_node(std::move(builtin_function));
 
   if(
     const auto &string_result =

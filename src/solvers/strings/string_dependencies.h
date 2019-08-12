@@ -79,9 +79,8 @@ public:
   std::unique_ptr<const string_nodet>
   node_at(const array_string_exprt &e) const;
 
-  /// `builtin_function` is reset to an empty pointer after the node is created
   builtin_function_nodet &
-  make_node(std::unique_ptr<string_builtin_functiont> &builtin_function);
+  make_node(std::unique_ptr<string_builtin_functiont> builtin_function);
   const string_builtin_functiont &
   get_builtin_function(const builtin_function_nodet &node) const;
 
