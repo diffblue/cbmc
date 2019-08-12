@@ -640,14 +640,26 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 #endif
 
-  log.debug() << "dec_solve: Replacing string ids in function applications"
+  log.debug() << "dec_solve: Replacing string ids and simplifying arguments"
+                 " in function applications"
               << messaget::eom;
-  for(equal_exprt &eq : equations)
+  for(equal_exprt &expr : equations)
   {
-    if(can_cast_expr<function_application_exprt>(eq.rhs()))
+    auto it = expr.depth_begin();
+    while(it != expr.depth_end())
     {
-      simplify(eq.rhs(), ns);
-      string_id_symbol_resolve.replace_expr(eq.rhs());
+      if(can_cast_expr<function_application_exprt>(*it))
+      {
+        // Simplification is required because the array pool may not realize
+        // that an expression like
+        // `(unsignedbv[16]*)((signedbv[8]*)&constarray[0] + 0)` is the
+        // same pointer as `&constarray[0]
+        simplify(it.mutate(), ns);
+        string_id_symbol_resolve.replace_expr(it.mutate());
+        it.next_sibling_or_parent();
+      }
+      else
+        ++it;
     }
   }
 
