@@ -111,7 +111,7 @@ private:
   index_set_pairt index_sets;
   union_find_replacet symbol_resolve;
 
-  std::vector<equal_exprt> equations;
+  std::vector<exprt> equations;
 
   string_dependenciest dependencies;
 

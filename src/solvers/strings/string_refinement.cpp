@@ -27,6 +27,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/magic.h>
+#include <util/range.h>
 #include <util/simplify_expr.h>
 
 #include "equation_symbol_mapping.h"
@@ -306,16 +307,19 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 ///   by an equation are associated to the same element
 static void add_equations_for_symbol_resolution(
   union_find_replacet &symbol_solver,
-  const std::vector<equal_exprt> &equations,
+  const std::vector<exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
   const std::string log_message =
     "WARNING string_refinement.cpp generate_symbol_resolution_from_equations:";
-  for(const equal_exprt &eq : equations)
+  auto equalities = make_range(equations).filter(
+    [&](const exprt &e) { return can_cast_expr<equal_exprt>(e); });
+  for(const exprt &e : equalities)
   {
-    const exprt &lhs = eq.lhs();
-    const exprt &rhs = eq.rhs();
+    const equal_exprt &eq = to_equal_expr(e);
+    const exprt &lhs = to_equal_expr(eq).lhs();
+    const exprt &rhs = to_equal_expr(eq).rhs();
     if(lhs.id() != ID_symbol)
     {
       stream << log_message << "non symbol lhs: " << format(lhs)
@@ -535,13 +539,11 @@ union_find_replacet string_identifiers_resolution_from_equations(
 
 #ifdef DEBUG
 /// Output a vector of equations to the given stream, used for debugging.
-static void output_equations(
-  std::ostream &output,
-  const std::vector<equal_exprt> &equations)
+static void
+output_equations(std::ostream &output, const std::vector<exprt> &equations)
 {
   for(std::size_t i = 0; i < equations.size(); ++i)
-    output << "  [" << i << "] " << format(equations[i].lhs())
-           << " == " << format(equations[i].rhs()) << std::endl;
+    output << "  [" << i << "] " << format(equations[i]) << std::endl;
 }
 #endif
 
@@ -630,7 +632,18 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   const union_find_replacet string_id_symbol_resolve =
-    string_identifiers_resolution_from_equations(equations, ns, log.debug());
+    string_identifiers_resolution_from_equations(
+      [&] {
+        std::vector<equal_exprt> equalities;
+        for(const auto &eq : equations)
+        {
+          if(auto equal_expr = expr_try_dynamic_cast<equal_exprt>(eq))
+            equalities.push_back(*equal_expr);
+        }
+        return equalities;
+      }(),
+      ns,
+      log.debug());
 #ifdef DEBUG
   log.debug() << "symbol resolve string:" << messaget::eom;
   for(const auto &pair : string_id_symbol_resolve.to_vector())
@@ -643,7 +656,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   log.debug() << "dec_solve: Replacing string ids and simplifying arguments"
                  " in function applications"
               << messaget::eom;
-  for(equal_exprt &expr : equations)
+  for(exprt &expr : equations)
   {
     auto it = expr.depth_begin();
     while(it != expr.depth_end())
@@ -675,12 +688,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   log.debug() << "dec_solve: compute dependency graph and remove function "
               << "applications captured by the dependencies:" << messaget::eom;
   std::vector<exprt> local_equations;
-  for(const equal_exprt &eq : equations)
+  for(const exprt &eq : equations)
   {
     // Ensures that arrays that are equal, are associated to the same nodes
     // in the graph.
-    const equal_exprt eq_with_char_array_replaced_with_representative_elements =
-      to_equal_expr(replace_expr_copy(symbol_resolve, eq));
+    const exprt eq_with_char_array_replaced_with_representative_elements =
+      replace_expr_copy(symbol_resolve, eq);
     const optionalt<exprt> new_equation = add_node(
       dependencies,
       eq_with_char_array_replaced_with_representative_elements,
