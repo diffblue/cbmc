@@ -4588,4 +4588,65 @@ inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
   return ret;
 }
 
+/// An expression describing a method on a class
+class class_method_descriptor_exprt : public nullary_exprt
+{
+public:
+  explicit class_method_descriptor_exprt(
+    typet _type,
+    irep_idt component_name,
+    irep_idt class_name,
+    irep_idt base_name,
+    irep_idt identifier)
+    : nullary_exprt(ID_virtual_function, std::move(_type))
+  {
+    set(ID_component_name, std::move(component_name));
+    set(ID_C_class, std::move(class_name));
+    set(ID_C_base_name, std::move(base_name));
+    set(ID_identifier, std::move(identifier));
+  }
+
+  const irep_idt &get_component_name() const
+  {
+    return get(ID_component_name);
+  }
+
+  const irep_idt &get_class_name() const
+  {
+    return get(ID_C_class);
+  }
+
+  const irep_idt &get_base_name() const
+  {
+    return get(ID_C_base_name);
+  }
+
+  const irep_idt &get_identifier() const
+  {
+    return get(ID_identifier);
+  }
+};
+
+/// \brief Cast an exprt to a \ref class_method_descriptor_exprt
+///
+/// \a expr must be known to be \ref class_method_descriptor_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref class_method_descriptor_exprt
+inline const class_method_descriptor_exprt &
+to_class_method_descriptor_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_virtual_function);
+  const class_method_descriptor_exprt &ret =
+    static_cast<const class_method_descriptor_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+template <>
+inline bool can_cast_expr<class_method_descriptor_exprt>(const exprt &base)
+{
+  return base.id() == ID_virtual_function;
+}
+
 #endif // CPROVER_UTIL_STD_EXPR_H
