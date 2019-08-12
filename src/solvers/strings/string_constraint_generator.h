@@ -37,9 +37,6 @@ struct string_constraintst final
   std::vector<exprt> existential;
   std::vector<string_constraintt> universal;
   std::vector<string_not_contains_constraintt> not_contains;
-
-  /// Clear all constraints
-  void clear();
 };
 
 void merge(string_constraintst &result, string_constraintst other);

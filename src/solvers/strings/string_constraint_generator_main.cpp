@@ -96,13 +96,6 @@ exprt string_constraint_generatort::associate_length_to_array(
                    equal_exprt(length, new_length)};
 }
 
-void string_constraintst::clear()
-{
-  existential.clear();
-  universal.clear();
-  not_contains.clear();
-}
-
 /// Merge two sets of constraints by appending to the first one
 void merge(string_constraintst &result, string_constraintst other)
 {
