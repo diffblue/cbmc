@@ -660,18 +660,21 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   log.debug() << "dec_solve: compute dependency graph and remove function "
               << "applications captured by the dependencies:" << messaget::eom;
-  std::vector<equal_exprt> local_equations;
+  std::vector<exprt> local_equations;
   for(const equal_exprt &eq : equations)
   {
     // Ensures that arrays that are equal, are associated to the same nodes
     // in the graph.
     const equal_exprt eq_with_char_array_replaced_with_representative_elements =
       to_equal_expr(replace_expr_copy(symbol_resolve, eq));
-    const bool node_added = add_node(
+    const optionalt<exprt> new_equation = add_node(
       dependencies,
       eq_with_char_array_replaced_with_representative_elements,
-      generator.array_pool);
-    if(!node_added)
+      generator.array_pool,
+      generator.fresh_symbol);
+    if(new_equation)
+      local_equations.push_back(*new_equation);
+    else
       local_equations.push_back(eq);
   }
   equations.clear();

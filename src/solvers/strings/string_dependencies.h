@@ -182,22 +182,27 @@ private:
     const std::function<void(const nodet &)> &f) const;
 };
 
-/// When right hand side of equation is a builtin_function add
+/// When a sub-expression of \p expr is a builtin_function, add
 /// a "string_builtin_function" node to the graph and connect it to the strings
 /// on which it depends and which depends on it.
 /// If the string builtin_function is not a supported one, mark all the string
 /// arguments as depending on an unknown builtin_function.
 /// \param dependencies: graph to which we add the node
-/// \param equation: an equation whose right hand side is possibly a call to a
+/// \param expr: an expression which may contain a call to a
 ///   string builtin_function.
 /// \param array_pool: array pool containing arrays corresponding to the string
 ///   exprt arguments of the builtin_function call
-/// \return true if a node was added, if false is returned it either means that
-///   the right hand side is not a function application
+/// \param fresh_symbol: used to create new symbols for the return values of
+///   builtin functions
+/// \return An expression in which function applications have been replaced
+///   by symbols corresponding to the `return_value` field of the associated
+///   builtin function. Or an empty optional when no function applications has
+///   been encountered
 /// \todo there should be a class with just the three functions we require here
-bool add_node(
+optionalt<exprt> add_node(
   string_dependenciest &dependencies,
-  const equal_exprt &equation,
-  array_poolt &array_pool);
+  const exprt &expr,
+  array_poolt &array_pool,
+  symbol_generatort &fresh_symbol);
 
 #endif // CPROVER_SOLVERS_STRINGS_STRING_DEPENDENCIES_H
