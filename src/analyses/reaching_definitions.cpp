@@ -744,6 +744,16 @@ const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
     return entry->second;
 }
 
+const void *rd_range_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<rd_range_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}
+
 void reaching_definitions_analysist::initialize(
   const goto_functionst &goto_functions)
 {

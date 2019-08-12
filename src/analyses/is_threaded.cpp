@@ -18,6 +18,16 @@ Date: October 2012
 class is_threaded_domaint:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override
+  {
+    if(identifier == type_identifiert::get<is_threaded_domaint>())
+    {
+      return this;
+    }
+    return nullptr;
+  }
+
   bool reachable;
   bool is_threaded;
 

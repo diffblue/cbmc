@@ -20,9 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class custom_bitvector_analysist;
 
-class custom_bitvector_domaint:public ai_domain_baset
+class custom_bitvector_domaint : public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifiert) const override;
+
   void transform(
     const irep_idt &function_from,
     locationt from,

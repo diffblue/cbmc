@@ -24,6 +24,10 @@ class global_may_alias_analysist;
 class global_may_alias_domaint:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
+public:
   global_may_alias_domaint():has_values(false)
   {
   }

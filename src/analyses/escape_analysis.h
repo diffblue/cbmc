@@ -24,6 +24,10 @@ class escape_analysist;
 class escape_domaint:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
+public:
   escape_domaint():has_values(false)
   {
   }

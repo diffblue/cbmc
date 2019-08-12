@@ -93,3 +93,13 @@ void invariant_set_domaint::transform(
     break;
   }
 }
+
+const void *invariant_set_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<invariant_set_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}

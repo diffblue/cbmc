@@ -95,6 +95,7 @@ SRC += analyses/ai/ai.cpp \
        util/string_utils/strip_string.cpp \
        util/symbol_table.cpp \
        util/symbol.cpp \
+       util/type_identifier.cpp \
        util/unicode.cpp \
        # Empty last line
 

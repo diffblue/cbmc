@@ -33,6 +33,15 @@ Author: Diffblue Ltd.
 class instruction_counter_domaint : public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifiert) const override
+  {
+    if(identifiert == type_identifiert::get<instruction_counter_domaint>())
+    {
+      return this;
+    }
+    return nullptr;
+  }
 
   optionalt<unsigned> path_length;
 

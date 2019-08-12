@@ -26,6 +26,9 @@ Author: Diffblue Ltd.
 class constant_simplification_mockt:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
   void transform(
     const irep_idt &,
     locationt,
@@ -66,6 +69,16 @@ bool constant_simplification_mockt::ai_simplify(
   // a simplification has occurred
   condition=simplified_expr;
   return false;
+}
+
+const void *constant_simplification_mockt::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<constant_simplification_mockt>())
+  {
+    return this;
+  }
+  return nullptr;
 }
 
 SCENARIO("ai_domain_baset::ai_simplify_lhs",

@@ -761,6 +761,16 @@ exprt custom_bitvector_domaint::eval(
   }
 }
 
+const void *custom_bitvector_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<custom_bitvector_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}
+
 void custom_bitvector_analysist::instrument(goto_functionst &)
 {
 }

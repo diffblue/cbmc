@@ -230,3 +230,13 @@ bool global_may_alias_domaint::merge(
 
   return changed;
 }
+
+const void *global_may_alias_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<global_may_alias_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}

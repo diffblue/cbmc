@@ -94,3 +94,13 @@ bool uninitialized_domaint::merge(
 
   return changed;
 }
+
+const void *uninitialized_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<uninitialized_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}

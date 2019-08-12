@@ -23,6 +23,8 @@ typedef interval_templatet<ieee_floatt> ieee_float_intervalt;
 class interval_domaint:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
   // Trivial, conjunctive interval domain for both float
   // and integers. The categorization 'float' and 'integers'
   // is done by is_int and is_float.

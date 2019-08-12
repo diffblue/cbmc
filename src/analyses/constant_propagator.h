@@ -30,7 +30,7 @@ Author: Peter Schrammel
 
 class constant_propagator_ait;
 
-class constant_propagator_domaint:public ai_domain_baset
+class constant_propagator_domaint : public ai_domain_baset
 {
 public:
   virtual void transform(
@@ -134,6 +134,9 @@ public:
 
     void output(std::ostream &out, const namespacet &ns) const;
   };
+
+  const void *
+  match_type_identifier(const type_identifiert &identifiert) const override;
 
   valuest values;
 

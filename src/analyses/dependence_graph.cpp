@@ -334,3 +334,13 @@ void dep_graph_domaint::populate_dep_graph(
   for(const auto &d_dep : data_deps)
     dep_graph.add_dep(dep_edget::kindt::DATA, d_dep, this_loc);
 }
+
+const void *dep_graph_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<dep_graph_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}

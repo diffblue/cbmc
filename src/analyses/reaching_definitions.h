@@ -245,6 +245,9 @@ public:
     export_cache[identifier].clear();
   }
 
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
 private:
   /// This (three value logic) flag determines, whether the instance represents
   /// `top`, `bottom`, or any other element of the lattice, by values `TRUE`,
@@ -355,7 +358,7 @@ public:
   {
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
-    rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
+    rd_range_domaint *rd_state = fake_dynamic_cast<rd_range_domaint *>(&s);
     INVARIANT_STRUCTURED(
       rd_state!=nullptr,
       bad_cast_exceptiont,

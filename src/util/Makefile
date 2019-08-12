@@ -86,6 +86,7 @@ SRC = allocate_objects.cpp \
       string_container.cpp \
       string_hash.cpp \
       string_utils.cpp \
+      type_identifier.cpp \
       symbol.cpp \
       symbol_table_base.cpp \
       symbol_table.cpp \

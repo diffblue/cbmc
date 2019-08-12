@@ -734,6 +734,19 @@ bool constant_propagator_domaint::replace_constants_and_simplify(
   return did_not_change_anything;
 }
 
+const void *constant_propagator_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<constant_propagator_domaint>())
+  {
+    return this;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
 void constant_propagator_ait::replace(
   goto_functionst &goto_functions,
   const namespacet &ns)

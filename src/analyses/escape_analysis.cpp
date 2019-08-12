@@ -420,6 +420,16 @@ void escape_domaint::check_lhs(
   }
 }
 
+const void *
+escape_domaint::match_type_identifier(const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<escape_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}
+
 void escape_analysist::insert_cleanup(
   goto_functionst::goto_functiont &goto_function,
   goto_programt::targett location,

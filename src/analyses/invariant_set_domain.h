@@ -24,6 +24,9 @@ public:
   {
   }
 
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
   tvt has_values;
   invariant_sett invariant_set;
 

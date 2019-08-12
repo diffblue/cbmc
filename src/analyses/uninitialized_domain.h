@@ -21,6 +21,9 @@ Date: January 2010
 class uninitialized_domaint:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
   uninitialized_domaint():has_values(false)
   {
   }

@@ -515,3 +515,13 @@ bool interval_domaint::ai_simplify(
 
   return unchanged;
 }
+
+const void *interval_domaint::match_type_identifier(
+  const type_identifiert &identifier) const
+{
+  if(identifier == type_identifiert::get<interval_domaint>())
+  {
+    return this;
+  }
+  return nullptr;
+}

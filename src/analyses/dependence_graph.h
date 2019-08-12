@@ -66,6 +66,10 @@ struct dep_nodet:public graph_nodet<dep_edget>
 class dep_graph_domaint:public ai_domain_baset
 {
 public:
+  const void *
+  match_type_identifier(const type_identifiert &identifier) const override;
+
+public:
   typedef grapht<dep_nodet>::node_indext node_indext;
 
   dep_graph_domaint()

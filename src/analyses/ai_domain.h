@@ -18,13 +18,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 
 #include <goto-programs/goto_model.h>
+#include <util/type_identifier.h>
 
 // forward reference the abstract interpreter interface
 class ai_baset;
 
 /// The interface offered by a domain, allows code to manipulate domains without
 /// knowing their exact type.  Derive from this to implement domains.
-class ai_domain_baset
+class ai_domain_baset : public virtual has_type_indext
 {
 protected:
   /// The constructor is expected to produce 'false' or 'bottom'
