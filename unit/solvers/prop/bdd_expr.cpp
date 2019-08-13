@@ -56,13 +56,54 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     WHEN("It is converted to an exprt")
     {
       const exprt result = bdd_expr_converter.as_expr(bdd);
-      THEN("It is equal to the expression (a & !b) or (!b & a)")
+      THEN("It is equivalent to the expression !(!a || b)")
       {
-        REQUIRE(result.id() == ID_and);
-        REQUIRE(result.operands().size() == 2);
-        REQUIRE((result.op0() == a || result.op1() == a));
-        REQUIRE((result.op0() == not_exprt(b) || result.op1() == not_exprt(b)));
+        const bddt to_compare =
+          bdd_expr_converter.from_expr(not_exprt{or_exprt{not_exprt{a}, b}});
+        REQUIRE(bdd.bdd_xor(to_compare).is_false());
+        REQUIRE(bdd.bdd_xor(to_compare.bdd_not()).is_true());
       }
+    }
+  }
+
+  GIVEN("(!a | b) xor (a => b) ")
+  {
+    const symbol_exprt a("a", bool_typet());
+    const symbol_exprt b("b", bool_typet());
+    const bddt bdd = bdd_expr_converter.from_expr(
+      xor_exprt{or_exprt{not_exprt{a}, b}, implies_exprt{a, b}});
+    THEN("It reduces to false")
+    {
+      REQUIRE(bdd.is_false());
+    }
+  }
+
+  GIVEN("e = (a | b) xor (c | d)")
+  {
+    const symbol_exprt a("a", bool_typet());
+    const symbol_exprt b("b", bool_typet());
+    const symbol_exprt c("c", bool_typet());
+    const symbol_exprt d("d", bool_typet());
+
+    const xor_exprt expr{or_exprt{a, b}, or_exprt{c, d}};
+    const bddt bdd = bdd_expr_converter.from_expr(expr);
+
+    THEN("e xor e is false")
+    {
+      REQUIRE(bdd.bdd_xor(bdd_expr_converter.from_expr(expr)).is_false());
+    }
+
+    THEN("e xor !e is true")
+    {
+      REQUIRE(
+        bdd.bdd_xor(bdd_expr_converter.from_expr(not_exprt{expr})).is_true());
+    }
+
+    THEN("Converting to expr and back to BDD gives the same BDD")
+    {
+      const exprt expr_of_bdd = bdd_expr_converter.as_expr(bdd);
+      const bddt bdd_of_expr = bdd_expr_converter.from_expr(expr_of_bdd);
+      REQUIRE(bdd_of_expr.equals(bdd));
     }
   }
 }
