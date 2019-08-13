@@ -1201,14 +1201,10 @@ simplify_exprt::simplify_bitnot(const bitnot_exprt &expr)
 }
 
 /// simplifies inequalities !=, <=, <, >=, >, and also ==
-simplify_exprt::resultt<> simplify_exprt::simplify_inequality(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
 {
-  const exprt::operandst &operands = expr.operands();
-
   if(expr.type().id()!=ID_bool)
-    return unchanged(expr);
-
-  if(operands.size()!=2)
     return unchanged(expr);
 
   exprt tmp0=expr.op0();
@@ -1231,8 +1227,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality(const exprt &expr)
   if(tmp0.id()==ID_if && tmp0.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() = simplify_inequality(if_expr.true_case());
-    if_expr.false_case() = simplify_inequality(if_expr.false_case());
+    if_expr.true_case() =
+      simplify_inequality(to_binary_relation_expr(if_expr.true_case()));
+    if_expr.false_case() =
+      simplify_inequality(to_binary_relation_expr(if_expr.false_case()));
     return changed(simplify_if(if_expr));
   }
 
@@ -1271,7 +1269,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality(const exprt &expr)
   {
     // we want the constant on the RHS
 
-    exprt new_expr = expr;
+    binary_relation_exprt new_expr = expr;
 
     if(expr.id()==ID_ge)
       new_expr.id(ID_le);
@@ -1301,11 +1299,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality(const exprt &expr)
 
 /// simplifies inequalities for the case in which both sides
 /// of the inequality are constants
-simplify_exprt::resultt<>
-simplify_exprt::simplify_inequality_both_constant(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
+  const binary_relation_exprt &expr)
 {
-  PRECONDITION(expr.operands().size() == 2);
-
   exprt tmp0 = expr.op0();
   exprt tmp1 = expr.op1();
 
@@ -1466,8 +1462,8 @@ bool simplify_exprt::eliminate_common_addends(
   return true;
 }
 
-simplify_exprt::resultt<>
-simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
+  const binary_relation_exprt &expr)
 {
   // pretty much all of the simplifications below are unsound
   // for IEEE float because of NaN!
@@ -1478,35 +1474,34 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
   // eliminate strict inequalities
   if(expr.id()==ID_notequal)
   {
-    auto new_expr = expr;
-    new_expr.id(ID_equal);
-    new_expr = simplify_inequality_no_constant(new_expr);
+    auto new_rel_expr = expr;
+    new_rel_expr.id(ID_equal);
+    auto new_expr = simplify_inequality_no_constant(new_rel_expr);
     return changed(simplify_not(not_exprt(new_expr)));
   }
   else if(expr.id()==ID_gt)
   {
-    auto new_expr = expr;
-    new_expr.id(ID_ge);
+    auto new_rel_expr = expr;
+    new_rel_expr.id(ID_ge);
     // swap operands
-    new_expr.op0().swap(new_expr.op1());
-    new_expr = simplify_inequality_no_constant(new_expr);
+    new_rel_expr.lhs().swap(new_rel_expr.rhs());
+    auto new_expr = simplify_inequality_no_constant(new_rel_expr);
     return changed(simplify_not(not_exprt(new_expr)));
   }
   else if(expr.id()==ID_lt)
   {
-    auto new_expr = expr;
-    new_expr.id(ID_ge);
-    new_expr = simplify_inequality_no_constant(new_expr);
+    auto new_rel_expr = expr;
+    new_rel_expr.id(ID_ge);
+    auto new_expr = simplify_inequality_no_constant(new_rel_expr);
     return changed(simplify_not(not_exprt(new_expr)));
   }
   else if(expr.id()==ID_le)
   {
-    auto new_expr = expr;
-    new_expr.id(ID_ge);
+    auto new_rel_expr = expr;
+    new_rel_expr.id(ID_ge);
     // swap operands
-    new_expr.op0().swap(new_expr.op1());
-    new_expr = simplify_inequality_no_constant(new_expr);
-    return std::move(new_expr);
+    new_rel_expr.lhs().swap(new_rel_expr.rhs());
+    return changed(simplify_inequality_no_constant(new_rel_expr));
   }
 
   // now we only have >=, =
@@ -1574,12 +1569,12 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
   // On bit-vectors, this is only sound on '='.
   if(expr.id()==ID_equal)
   {
-    auto new_expr = expr;
-    if(!eliminate_common_addends(new_expr.op0(), new_expr.op1()))
+    auto new_expr = to_equal_expr(expr);
+    if(!eliminate_common_addends(new_expr.lhs(), new_expr.rhs()))
     {
       // remove zeros
-      new_expr.op0() = simplify_node(new_expr.op0());
-      new_expr.op1() = simplify_node(new_expr.op1());
+      new_expr.lhs() = simplify_node(new_expr.lhs());
+      new_expr.rhs() = simplify_node(new_expr.rhs());
       return changed(simplify_inequality(new_expr)); // recursive call
     }
   }
@@ -1589,8 +1584,8 @@ simplify_exprt::simplify_inequality_no_constant(const exprt &expr)
 
 /// \par expr: an inequality where the RHS is a constant
 /// and the LHS is not
-simplify_exprt::resultt<>
-simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
+  const binary_relation_exprt &expr)
 {
   // the constant is always on the RHS
   PRECONDITION(expr.op1().is_constant());
@@ -1598,10 +1593,10 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
   if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() =
-      simplify_inequality_rhs_is_constant(if_expr.true_case());
-    if_expr.false_case() =
-      simplify_inequality_rhs_is_constant(if_expr.false_case());
+    if_expr.true_case() = simplify_inequality_rhs_is_constant(
+      to_binary_relation_expr(if_expr.true_case()));
+    if_expr.false_case() = simplify_inequality_rhs_is_constant(
+      to_binary_relation_expr(if_expr.false_case()));
     return changed(simplify_if(if_expr));
   }
 
@@ -1610,9 +1605,9 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
   {
     if(expr.id()==ID_notequal)
     {
-      auto new_expr = expr;
-      new_expr.id(ID_equal);
-      new_expr = simplify_inequality_rhs_is_constant(new_expr);
+      auto new_rel_expr = expr;
+      new_rel_expr.id(ID_equal);
+      auto new_expr = simplify_inequality_rhs_is_constant(new_rel_expr);
       return changed(simplify_not(not_exprt(new_expr)));
     }
 
@@ -1822,9 +1817,9 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
 
     if(expr.id()==ID_notequal)
     {
-      auto new_expr = expr;
-      new_expr.id(ID_equal);
-      new_expr = simplify_inequality_rhs_is_constant(new_expr);
+      auto new_rel_expr = expr;
+      new_rel_expr.id(ID_equal);
+      auto new_expr = simplify_inequality_rhs_is_constant(new_rel_expr);
       return changed(simplify_not(not_exprt(new_expr)));
     }
     else if(expr.id()==ID_gt)
@@ -1844,9 +1839,9 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
     }
     else if(expr.id()==ID_lt)
     {
-      auto new_expr = expr;
-      new_expr.id(ID_ge);
-      new_expr = simplify_inequality_rhs_is_constant(new_expr);
+      auto new_rel_expr = expr;
+      new_rel_expr.id(ID_ge);
+      auto new_expr = simplify_inequality_rhs_is_constant(new_rel_expr);
       return changed(simplify_not(not_exprt(new_expr)));
     }
     else if(expr.id()==ID_le)
@@ -1858,11 +1853,11 @@ simplify_exprt::simplify_inequality_rhs_is_constant(const exprt &expr)
         return true_exprt();
       }
 
-      auto new_expr = expr;
-      new_expr.id(ID_ge);
+      auto new_rel_expr = expr;
+      new_rel_expr.id(ID_ge);
       ++i;
-      new_expr.op1() = from_integer(i, new_expr.op1().type());
-      new_expr = simplify_inequality_rhs_is_constant(new_expr);
+      new_rel_expr.op1() = from_integer(i, new_rel_expr.op1().type());
+      auto new_expr = simplify_inequality_rhs_is_constant(new_rel_expr);
       return changed(simplify_not(not_exprt(new_expr)));
     }
   }

@@ -2225,7 +2225,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
   {
-    r = simplify_inequality(expr);
+    r = simplify_inequality(to_binary_relation_expr(expr));
   }
   else if(expr.id()==ID_if)
   {

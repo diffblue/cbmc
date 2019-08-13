@@ -418,13 +418,10 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<>
-simplify_exprt::simplify_inequality_address_of(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
+  const binary_relation_exprt &expr)
 {
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
-  PRECONDITION(expr.type().id() == ID_bool);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "(in)equalities have two operands");
 
   exprt tmp0=expr.op0();
   if(tmp0.id()==ID_typecast)
@@ -473,13 +470,11 @@ simplify_exprt::simplify_inequality_address_of(const exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<>
-simplify_exprt::simplify_inequality_pointer_object(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
+  const binary_relation_exprt &expr)
 {
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
   PRECONDITION(expr.type().id() == ID_bool);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "(in)equalities have two operands");
 
   exprt::operandst new_inequality_ops;
   forall_operands(it, expr)
