@@ -27,7 +27,7 @@ public:
   ci_lazy_methods_neededt(
     std::unordered_set<irep_idt> &_callable_methods,
     std::unordered_set<irep_idt> &_instantiated_classes,
-    symbol_tablet &_symbol_table,
+    const symbol_tablet &_symbol_table,
     const select_pointer_typet &pointer_type_selector)
     : callable_methods(_callable_methods),
       instantiated_classes(_instantiated_classes),
@@ -52,7 +52,7 @@ private:
   // found so far, so we can use a membership test to avoid
   // repeatedly exploring a class hierarchy.
   std::unordered_set<irep_idt> &instantiated_classes;
-  symbol_tablet &symbol_table;
+  const symbol_tablet &symbol_table;
 
   const select_pointer_typet &pointer_type_selector;
 
