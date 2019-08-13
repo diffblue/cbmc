@@ -795,14 +795,15 @@ void goto_symext::loop_bound_exceeded(
         negated_cond,
         "unwinding assertion loop " + std::to_string(loop_number),
         state);
+    }
 
+    // generate unwinding assumption, unless we permit partial loops
+    symex_assume_l2(state, negated_cond);
+
+    if(symex_config.unwinding_assertions)
+    {
       // add to state guard to prevent further assignments
       state.guard.add(negated_cond);
-    }
-    else
-    {
-      // generate unwinding assumption, unless we permit partial loops
-      symex_assume_l2(state, negated_cond);
     }
   }
 }
