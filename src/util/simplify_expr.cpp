@@ -656,28 +656,33 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     config.ansi_c.NULL_is_zero &&
     (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
     op_type.id() == ID_pointer && expr.op().id() == ID_plus &&
-    expr.op().operands().size() == 2 &&
-    ((expr.op().op0().id() == ID_typecast &&
-      to_typecast_expr(expr.op().op0()).op().is_zero()) ||
-     (expr.op().op0().is_constant() &&
-      to_constant_expr(expr.op().op0()).get_value() == ID_NULL)))
+    expr.op().operands().size() == 2)
   {
-    auto sub_size = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
-    if(sub_size.has_value())
+    const auto &op_plus_expr = to_plus_expr(expr.op());
+
+    if(((op_plus_expr.op0().id() == ID_typecast &&
+         to_typecast_expr(op_plus_expr.op0()).op().is_zero()) ||
+        (op_plus_expr.op0().is_constant() &&
+         to_constant_expr(op_plus_expr.op0()).get_value() == ID_NULL)))
     {
-      auto new_expr = expr;
+      auto sub_size =
+        pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
+      if(sub_size.has_value())
+      {
+        auto new_expr = expr;
 
-      // void*
-      if(*sub_size == 0 || *sub_size == 1)
-        new_expr.op() = typecast_exprt(expr.op().op1(), size_type());
-      else
-        new_expr.op() = mult_exprt(
-          from_integer(*sub_size, size_type()),
-          typecast_exprt(expr.op().op1(), size_type()));
+        // void*
+        if(*sub_size == 0 || *sub_size == 1)
+          new_expr.op() = typecast_exprt(op_plus_expr.op1(), size_type());
+        else
+          new_expr.op() = mult_exprt(
+            from_integer(*sub_size, size_type()),
+            typecast_exprt(op_plus_expr.op1(), size_type()));
 
-      new_expr.op() = simplify_rec(new_expr.op()); // rec. call
+        new_expr.op() = simplify_rec(new_expr.op()); // rec. call
 
-      return changed(simplify_typecast(new_expr)); // rec. call
+        return changed(simplify_typecast(new_expr)); // rec. call
+      }
     }
   }
 
@@ -708,7 +713,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         exprt result = expr.op();
 
         if(
-          result.operands().size() >= 1 && result.op0().type() == result.type())
+          result.operands().size() >= 1 &&
+          to_multi_ary_expr(result).op0().type() == result.type())
         {
           result.type()=expr.type();
 
@@ -1139,8 +1145,11 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
     pointer.id() == ID_plus && pointer.operands().size() == 2 &&
     to_plus_expr(pointer).op0().id() == ID_address_of)
   {
-    const address_of_exprt &address_of=
-      to_address_of_expr(pointer.op0());
+    const auto &pointer_plus_expr = to_plus_expr(pointer);
+
+    const address_of_exprt &address_of =
+      to_address_of_expr(pointer_plus_expr.op0());
+
     if(address_of.object().id()==ID_index)
     {
       const index_exprt &old=to_index_expr(address_of.object());
@@ -1148,7 +1157,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
       {
         index_exprt idx(
           old.array(),
-          pointer_offset_sum(old.index(), pointer.op1()),
+          pointer_offset_sum(old.index(), pointer_plus_expr.op1()),
           old.array().type().subtype());
         return changed(simplify_rec(idx));
       }
@@ -1174,11 +1183,10 @@ bool simplify_exprt::get_values(
   }
   else if(expr.id()==ID_if)
   {
-    if(expr.operands().size()!=3)
-      return true;
+    const auto &if_expr = to_if_expr(expr);
 
-    return get_values(expr.op1(), value_list) ||
-           get_values(expr.operands().back(), value_list);
+    return get_values(if_expr.true_case(), value_list) ||
+           get_values(if_expr.false_case(), value_list);
   }
 
   return true;
@@ -1189,7 +1197,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_lambda(const exprt &expr)
   return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_with(const exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
 {
   bool no_change = true;
 
@@ -1197,7 +1205,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const exprt &expr)
     return unchanged(expr);
 
   // copy
-  auto with_expr = to_with_expr(expr);
+  auto with_expr = expr;
 
   const typet old_type_followed = ns.follow(with_expr.old().type());
 
@@ -1268,16 +1276,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const exprt &expr)
     return std::move(with_expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_update(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_update(const update_exprt &expr)
 {
-  if(expr.operands().size()!=3)
-    return unchanged(expr);
-
   // this is to push updates into (possibly nested) constants
 
-  const exprt::operandst &designator=to_update_expr(expr).designator();
+  const exprt::operandst &designator = expr.designator();
 
-  exprt updated_value=to_update_expr(expr).old();
+  exprt updated_value = expr.old();
   exprt *value_ptr=&updated_value;
 
   for(const auto &e : designator)
@@ -1287,7 +1293,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_update(const exprt &expr)
     if(e.id()==ID_index_designator &&
        value_ptr->id()==ID_array)
     {
-      const auto i = numeric_cast<mp_integer>(e.op0());
+      const auto i = numeric_cast<mp_integer>(to_index_designator(e).index());
 
       if(!i.has_value())
         return unchanged(expr);
@@ -1315,7 +1321,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_update(const exprt &expr)
   }
 
   // found, done
-  *value_ptr=to_update_expr(expr).new_value();
+  *value_ptr = expr.new_value();
   return updated_value;
 }
 
@@ -1367,10 +1373,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
           }
           else if(
             typecast_op.id() == ID_plus && typecast_op.operands().size() == 2 &&
-            typecast_op.op0().id() == ID_typecast &&
-            to_typecast_expr(typecast_op.op0()).op().id() == ID_address_of)
+            to_plus_expr(typecast_op).op0().id() == ID_typecast &&
+            to_typecast_expr(to_plus_expr(typecast_op).op0()).op().id() ==
+              ID_address_of)
           {
-            return cand.op0().op0().op0();
+            return to_typecast_expr(to_plus_expr(typecast_op).op0()).op();
           }
         }
       }
@@ -1378,20 +1385,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
   }
   else if(expr.id()==ID_address_of)
   {
-    if(expr.operands().size()==1)
+    const auto &object = to_address_of_expr(expr).object();
+
+    if(object.id() == ID_index)
     {
-      if(expr.op0().id()==ID_index && expr.op0().operands().size()==2)
-      {
-        // &some[i] -> &some
-        address_of_exprt new_expr(expr.op0().op0());
-        return changed(simplify_object(new_expr)); // recursion
-      }
-      else if(expr.op0().id()==ID_member && expr.op0().operands().size()==1)
-      {
-        // &some.f -> &some
-        address_of_exprt new_expr(expr.op0().op0());
-        return changed(simplify_object(new_expr)); // recursion
-      }
+      // &some[i] -> &some
+      address_of_exprt new_expr(to_index_expr(object).array());
+      return changed(simplify_object(new_expr)); // recursion
+    }
+    else if(object.id() == ID_member)
+    {
+      // &some.f -> &some
+      address_of_exprt new_expr(to_member_expr(object).compound());
+      return changed(simplify_object(new_expr)); // recursion
     }
   }
 
@@ -1820,7 +1826,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   // in some cases we even handle non-const array_of
   if(
     expr.op().id() == ID_array_of && (*offset * 8) % (*el_size) == 0 &&
-    *el_size <= pointer_offset_bits(expr.op().op0().type(), ns))
+    *el_size <=
+      pointer_offset_bits(to_array_of_expr(expr.op()).what().type(), ns))
   {
     auto tmp = expr;
     tmp.op() = index_exprt(expr.op(), expr.offset());
@@ -1885,7 +1892,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
     expr.value().type() == to_byte_update_expr(expr.op()).value().type())
   {
     auto tmp = expr;
-    tmp.set_op(expr.op().op0());
+    tmp.set_op(to_byte_update_expr(expr.op()).op());
     return std::move(tmp);
   }
 
@@ -2237,11 +2244,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   }
   else if(expr.id()==ID_with)
   {
-    r = simplify_with(expr);
+    r = simplify_with(to_with_expr(expr));
   }
   else if(expr.id()==ID_update)
   {
-    r = simplify_update(expr);
+    r = simplify_update(to_update_expr(expr));
   }
   else if(expr.id()==ID_index)
   {
@@ -2267,11 +2274,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   }
   else if(expr.id() == ID_is_dynamic_object)
   {
-    r = simplify_is_dynamic_object(expr);
+    r = simplify_is_dynamic_object(to_unary_expr(expr));
   }
   else if(expr.id() == ID_is_invalid_pointer)
   {
-    r = simplify_is_invalid_pointer(expr);
+    r = simplify_is_invalid_pointer(to_unary_expr(expr));
   }
   else if(expr.id()==ID_object_size)
   {
@@ -2297,15 +2304,15 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
   {
-    r = simplify_bitwise(expr);
+    r = simplify_bitwise(to_multi_ary_expr(expr));
   }
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
   {
-    r = simplify_shifts(expr);
+    r = simplify_shifts(to_shift_expr(expr));
   }
   else if(expr.id()==ID_power)
   {
-    r = simplify_power(expr);
+    r = simplify_power(to_binary_expr(expr));
   }
   else if(expr.id()==ID_plus)
   {

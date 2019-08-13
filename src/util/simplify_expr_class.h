@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class abs_exprt;
 class address_of_exprt;
 class array_exprt;
+class binary_exprt;
 class binary_relation_exprt;
 class bitnot_exprt;
 class bswap_exprt;
@@ -48,18 +49,22 @@ class index_exprt;
 class member_exprt;
 class minus_exprt;
 class mod_exprt;
+class multi_ary_exprt;
 class mult_exprt;
 class namespacet;
 class not_exprt;
 class plus_exprt;
 class popcount_exprt;
 class refined_string_exprt;
+class shift_exprt;
 class sign_exprt;
 class tvt;
 class typecast_exprt;
 class unary_exprt;
 class unary_minus_exprt;
 class unary_plus_exprt;
+class update_exprt;
+class with_exprt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
@@ -146,9 +151,9 @@ public:
   NODISCARD resultt<> simplify_minus(const minus_exprt &);
   NODISCARD resultt<> simplify_floatbv_op(const ieee_float_op_exprt &);
   NODISCARD resultt<> simplify_floatbv_typecast(const floatbv_typecast_exprt &);
-  NODISCARD resultt<> simplify_shifts(const exprt &);
-  NODISCARD resultt<> simplify_power(const exprt &);
-  NODISCARD resultt<> simplify_bitwise(const exprt &);
+  NODISCARD resultt<> simplify_shifts(const shift_exprt &);
+  NODISCARD resultt<> simplify_power(const binary_exprt &);
+  NODISCARD resultt<> simplify_bitwise(const multi_ary_exprt &);
   bool simplify_if_preorder(if_exprt &expr);
   NODISCARD resultt<> simplify_if(const if_exprt &);
   NODISCARD resultt<> simplify_bitnot(const bitnot_exprt &);
@@ -158,8 +163,8 @@ public:
   NODISCARD resultt<>
   simplify_ieee_float_relation(const binary_relation_exprt &);
   NODISCARD resultt<> simplify_lambda(const exprt &);
-  NODISCARD resultt<> simplify_with(const exprt &);
-  NODISCARD resultt<> simplify_update(const exprt &);
+  NODISCARD resultt<> simplify_with(const with_exprt &);
+  NODISCARD resultt<> simplify_update(const update_exprt &);
   NODISCARD resultt<> simplify_index(const index_exprt &);
   NODISCARD resultt<> simplify_member(const member_exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
@@ -167,8 +172,8 @@ public:
   NODISCARD resultt<> simplify_pointer_object(const unary_exprt &);
   NODISCARD resultt<> simplify_object_size(const unary_exprt &);
   NODISCARD resultt<> simplify_dynamic_size(const unary_exprt &);
-  NODISCARD resultt<> simplify_is_dynamic_object(const exprt &expr);
-  NODISCARD resultt<> simplify_is_invalid_pointer(const exprt &expr);
+  NODISCARD resultt<> simplify_is_dynamic_object(const unary_exprt &);
+  NODISCARD resultt<> simplify_is_invalid_pointer(const unary_exprt &);
   NODISCARD resultt<> simplify_same_object(const unary_exprt &);
   NODISCARD resultt<> simplify_good_pointer(const unary_exprt &);
   NODISCARD resultt<> simplify_object(const exprt &);

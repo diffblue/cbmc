@@ -30,21 +30,26 @@ simplify_exprt::simplify_index(const index_exprt &expr)
 
   // extra arithmetic optimizations
 
-  if(index.id()==ID_div &&
-     index.operands().size()==2)
+  if(index.id() == ID_div)
   {
-    if(index.op0().id()==ID_mult &&
-       index.op0().operands().size()==2 &&
-       index.op0().op1()==index.op1())
+    const auto &index_div_expr = to_div_expr(index);
+
+    if(
+      index_div_expr.dividend().id() == ID_mult &&
+      index_div_expr.dividend().operands().size() == 2 &&
+      to_mult_expr(index_div_expr.dividend()).op1() == index_div_expr.divisor())
     {
-      index = index.op0().op0();
+      // this rewrites (a*b)/b to a
+      index = to_mult_expr(index_div_expr.dividend()).op0();
       no_change = false;
     }
-    else if(index.op0().id()==ID_mult &&
-            index.op0().operands().size()==2 &&
-            index.op0().op0()==index.op1())
+    else if(
+      index_div_expr.dividend().id() == ID_mult &&
+      index_div_expr.dividend().operands().size() == 2 &&
+      to_mult_expr(index_div_expr.dividend()).op0() == index_div_expr.divisor())
     {
-      index = index.op0().op1();
+      // this rewrites (a*b)/a to b
+      index = to_mult_expr(index_div_expr.dividend()).op1();
       no_change = false;
     }
   }
@@ -143,10 +148,7 @@ simplify_exprt::simplify_index(const index_exprt &expr)
   }
   else if(array.id()==ID_array_of)
   {
-    if(array.operands().size()==1)
-    {
-      return array.op0();
-    }
+    return to_array_of_expr(array).what();
   }
   else if(array.id() == ID_array_list)
   {
