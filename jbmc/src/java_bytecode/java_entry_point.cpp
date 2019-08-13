@@ -297,8 +297,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
 {
-  const java_method_typet::parameterst &parameters =
-    to_java_method_type(function.type).parameters();
+  const java_method_typet &function_type = to_java_method_type(function.type);
+  const java_method_typet::parameterst &parameters = function_type.parameters();
 
   code_blockt init_code;
   exprt::operandst main_arguments;
@@ -323,6 +323,22 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
     // true iff this parameter is the `this` pointer of the method, which cannot
     // be null
     bool is_this=(param_number==0) && parameters[param_number].get_this();
+
+    if(is_this && function_type.get_is_constructor())
+    {
+      const symbol_exprt result = fresh_java_symbol(
+                                    p.type(),
+                                    "this_parameter",
+                                    function.location,
+                                    function.name,
+                                    symbol_table)
+                                    .symbol_expr();
+      main_arguments[param_number] = result;
+      init_code.add(code_declt{result});
+      init_code.add(
+        code_assignt{result, side_effect_exprt(ID_java_new, p.type())});
+      continue;
+    }
 
     java_object_factory_parameterst factory_parameters =
       object_factory_parameters;
