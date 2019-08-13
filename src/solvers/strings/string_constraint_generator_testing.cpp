@@ -30,18 +30,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// where offset_within_bounds is:
 ///     offset >= 0 && offset <= |str| && |str| - offset >= |prefix|
 ///
-/// \param fresh_symbol: generator of fresh symbols
 /// \param prefix: an array of characters
 /// \param str: an array of characters
 /// \param offset: an integer
-/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `isprefix`
-std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_is_prefix(
   const array_string_exprt &prefix,
   const array_string_exprt &str,
-  const exprt &offset,
-  array_poolt &array_pool)
+  const exprt &offset)
 {
   string_constraintst constraints;
   const symbol_exprt isprefix = fresh_symbol("isprefix");
@@ -98,19 +95,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// string_constraint_generatort::add_axioms_for_is_prefix(const array_string_exprt &prefix, const array_string_exprt &str, const exprt &offset)
 /// \todo The primitive should be renamed to `starts_with`.
 /// \todo Get rid of the boolean flag.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `s0`,
 ///   refined string `s1` and optional integer argument `offset`whose default
 ///   value is 0
 /// \param swap_arguments: a Boolean telling whether the prefix is the second
 ///   argument or the first argument
-/// \param array_pool: pool of arrays representing strings
 /// \return boolean expression `isprefix`
-std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_is_prefix(
   const function_application_exprt &f,
-  bool swap_arguments,
-  array_poolt &array_pool)
+  bool swap_arguments)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
@@ -121,23 +115,19 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
     get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length_type()) : args[2];
-  auto pair =
-    add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset, array_pool);
+  auto pair = add_axioms_for_is_prefix(s0, s1, offset);
   return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
 }
 
 /// Add axioms stating that the returned value is true exactly when the argument
 /// string is empty.
 /// \deprecated should use `string_length(s)==0` instead
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with a string argument
-/// \param array_pool: pool of arrays representing strings
 /// \return a Boolean expression
 DEPRECATED(SINCE(2017, 10, 5, "should use `string_length s == 0` instead"))
-std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_is_empty(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 1);
@@ -169,20 +159,17 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
 ///       \land s_1[{witness}] \ne s_0[{witness} + |s_0| - |s_1|] \f$
 ///
 /// \todo The primitive should be renamed `ends_with`.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `s0`
 ///   and refined_string  `s1`
 /// \param swap_arguments: boolean flag telling whether the suffix is the second
 ///   argument or the first argument
-/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `issuffix`
 /// \deprecated Should use `strings_startwith(s0, s1, s1.length - s0.length)`.
 DEPRECATED(SINCE(2018, 6, 6, "should use strings_startwith"))
-std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_is_suffix(
   const function_application_exprt &f,
-  bool swap_arguments,
-  array_poolt &array_pool)
+  bool swap_arguments)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2); // bad args to string issuffix?
@@ -254,15 +241,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
 ///          \Rightarrow \exists witness < |s_1|.
 ///          \ s_1[witness] \ne s_0[startpos+witness] \f$
 /// \warning slow for target longer than one character
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s0`
 ///           refined_string `s1`
-/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `contains`
-std::pair<exprt, string_constraintst> add_axioms_for_contains(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_contains(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);

@@ -407,8 +407,8 @@ optionalt<exprt> string_of_int_builtin_functiont::eval(
 string_constraintst string_of_int_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
-  auto pair = add_axioms_for_string_of_int_with_radix(
-    result, arg, radix, 0, generator.ns, array_pool);
+  auto pair =
+    generator.add_axioms_for_string_of_int_with_radix(result, arg, radix, 0);
   pair.second.existential.push_back(equal_exprt(pair.first, return_code));
   return pair.second;
 }

@@ -30,18 +30,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   5. \f$ \forall m, n \in [{\tt from\_index}, |{\tt haystack}|)
 ///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}
 ///      \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
-/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index`
-std::pair<exprt, string_constraintst> add_axioms_for_index_of(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_index_of(
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index,
-  array_poolt &array_pool)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = str.length_type();
@@ -104,19 +101,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 ///          .\ \lnot contains \Rightarrow (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
 ///   6. \f$ |{\tt needle}| = 0 \Rightarrow \tt{index} = from_index \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
-/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index` representing the first index of `needle`
 ///   in `haystack`
-std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index,
-  array_poolt &array_pool)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length_type();
@@ -207,19 +201,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
 ///          (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
 ///   6. \f$ |{\tt needle}| = 0 \Rightarrow index = from_index \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
-/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or -1 if there is none
-std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_last_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index,
-  array_poolt &array_pool)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length_type();
@@ -293,9 +284,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
+/// \copybrief add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
+/// \link add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
 /// (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -303,16 +294,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 /// \link add_axioms_for_index_of_string (More...)
 /// \endlink
 /// \warning slow for string targets
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `haystack`,
 ///   refined_string or character `needle`, and optional integer `from_index`
 ///   with default value `0`
-/// \param array_pool: pool of arrays representing strings
 /// \return integer expression
-std::pair<exprt, string_constraintst> add_axioms_for_index_of(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_index_of(
+  const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -327,7 +315,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_index_of(
-      fresh_symbol, str, typecast_exprt(c, char_type), from_index, array_pool);
+      str, typecast_exprt(c, char_type), from_index);
   }
   else
   {
@@ -337,8 +325,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
         "c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
     array_string_exprt sub = get_string_expr(array_pool, c);
-    return add_axioms_for_index_of_string(
-      fresh_symbol, str, sub, from_index, array_pool);
+    return add_axioms_for_index_of_string(str, sub, from_index);
   }
 }
 
@@ -360,19 +347,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 ///   5. \f$ \forall m \in [0,
 ///          min({\tt from\_index}+1, |{\tt haystack}|))
 ///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}\f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
-/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index` representing the last index of `needle`
 ///   in `haystack` before or at `from_index`, or `-1` if there is none
-std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_last_index_of(
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index,
-  array_poolt &array_pool)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = str.length_type();
@@ -422,9 +406,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
+/// \copybrief add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
+/// \link add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
 ///   (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -432,16 +416,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 /// \link add_axioms_for_last_index_of_string
 ///   (More...) \endlink
 /// \warning slow for string targets
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `haystack`,
 ///   refined_string or character `needle`, and optional integer
 ///   `from_index` with default value `|haystack|-1`
-/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression
-std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_last_index_of(
+  const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -457,12 +438,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_last_index_of(
-      fresh_symbol, str, typecast_exprt(c, char_type), from_index, array_pool);
+      str, typecast_exprt(c, char_type), from_index);
   }
   else
   {
     const array_string_exprt sub = get_string_expr(array_pool, c);
-    return add_axioms_for_last_index_of_string(
-      fresh_symbol, str, sub, from_index, array_pool);
+    return add_axioms_for_last_index_of_string(str, sub, from_index);
   }
 }
