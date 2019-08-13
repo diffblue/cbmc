@@ -22,17 +22,11 @@ phases:
       - make -C unit CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
       - make -C jbmc/src CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
       - make -C jbmc/unit CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
+      - echo Build completed on `date`
   post_build:
     commands:
-      - make -C unit test 
-      # Also enable compilation with coverage/profiling flags when running the
-      # regression tests, to also get results for the driver program in
-      # regression/invariants
-      - make -C regression test CPROVER_WITH_PROFILING=1
-      - make -C regression/cbmc test-paths-lifo
-      - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
-      - make -C jbmc/unit test
-      - make -C jbmc/regression test
+      # Run unit test
+      - make -C unit test
       - lcov --capture --directory . --output-file lcov.info
       - lcov --remove lcov.info '/usr/*' --output-file lcov.info
       # If $CODEBUILD_SOURCE_VERSION starts with 'pr/', filter out pr number, if not, return empty
@@ -41,8 +35,43 @@ phases:
       - VCS_COMMIT_ID=$(echo $CODEBUILD_SOURCE_VERSION | sed -r '/^[a-z0-9]{40}$/!d') 
       - COV_SCRIPT=/root/.cache/codecov.sh
       - if [ ! -f "$COV_SCRIPT" ]; then curl -s https://codecov.io/bash > "$COV_SCRIPT"; fi
-      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" || true
-      - echo Build completed on `date`
+      # -f lcov.info is needed to avoid codecov.sh deleting gcno files includeing word 'coverage'. 
+      # -F is flag associate with the coverage report.
+      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" -f lcov.info -c -F reg || true
+      # reset all execution counts to
+      - lcov --zerocounters --directory . 
+      # Run regression tests
+      # Also enable compilation with coverage/profiling flags when running the
+      # regression tests, to also get results for the driver program in
+      # regression/invariants
+      - make -C regression test CPROVER_WITH_PROFILING=1
+      - lcov --capture --directory . --output-file lcov.info
+      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" -f lcov.info -c -F unit || true
+      # Run regression/cbmc tests with test-paths lifo option
+      - lcov --zerocounters --directory .
+      - make -C regression/cbmc test-paths-lifo
+      - lcov --capture --directory . --output-file lcov.info
+      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" -f lcov.info -c -F cbmcreglifo || true
+      # Run regression/cbmc tests with test-cprover-smt2
+      - lcov --zerocounters
+      - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+      - lcov --capture --directory . --output-file lcov.info
+      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" -f lcov.info -c -F cbmcregsmt2 || true
+      # Run jbmc unit tests
+      - lcov --zerocounters --directory .
+      - make -C jbmc/unit test
+      - lcov --capture --directory . --output-file lcov.info
+      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" -f lcov.info -c -F jbmcunit || true
+      # Run jbmc regression tests
+      - lcov --zerocounters --directory .
+      - make -C jbmc/regression test
+      - lcov --capture --directory . --output-file lcov.info
+      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" -f lcov.info -c -F jbmcreg|| true
 cache:
   paths:
     - '/var/cache/apt/**/*'
