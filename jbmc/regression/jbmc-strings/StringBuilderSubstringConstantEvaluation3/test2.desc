@@ -1,0 +1,13 @@
+FUTURE
+Main.class
+--function Main.test2 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^Generated [1-9][0-9]* VCC\(s\), 1 remaining after simplification$
+^EXIT=10$
+^SIGNAL=0$
+no uncaught exception: FAILURE
+^VERIFICATION FAILED$
+--
+--
+This test will pass once a model for StringBuilder.substring() exists that
+throws an exception when the index is greater or equal to the length of the
+string.
