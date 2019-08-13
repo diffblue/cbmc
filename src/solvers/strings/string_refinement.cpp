@@ -283,18 +283,10 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
   PRECONDITION(equality_propagation);
-
-  if(expr.id() == ID_equal && value)
-  {
-    const equal_exprt &eq_expr = to_equal_expr(expr);
-    equations.push_back(eq_expr);
-  }
+  if(!value)
+    equations.push_back(not_exprt{expr});
   else
-  {
-    INVARIANT(
-      !has_char_array_subexpr(expr, ns), "char array only appear in equations");
-    supert::set_to(expr, value);
-  }
+    equations.push_back(expr);
 }
 
 /// Add association for each char pointer in the equation
