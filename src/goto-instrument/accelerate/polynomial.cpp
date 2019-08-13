@@ -117,10 +117,11 @@ void polynomialt::from_expr(const exprt &expr)
           expr.id()==ID_minus ||
           expr.id()==ID_mult)
   {
+    const auto &multi_ary_expr = to_multi_ary_expr(expr);
     polynomialt poly2;
 
-    from_expr(expr.op0());
-    poly2.from_expr(expr.op1());
+    from_expr(multi_ary_expr.op0());
+    poly2.from_expr(multi_ary_expr.op1());
 
     if(expr.id()==ID_minus)
     {
@@ -148,7 +149,7 @@ void polynomialt::from_expr(const exprt &expr)
     // Pretty shady...  We just throw away the typecast...  Pretty sure this
     // isn't sound.
     // XXX - probably not sound.
-    from_expr(expr.op0());
+    from_expr(to_typecast_expr(expr).op());
   }
   else
   {

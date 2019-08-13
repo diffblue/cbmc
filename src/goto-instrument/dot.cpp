@@ -41,7 +41,7 @@ protected:
 
   unsigned subgraphscount;
 
-  std::list<exprt> function_calls;
+  std::list<std::pair<std::string, exprt>> function_calls;
   std::list<exprt> clusters;
 
   void
@@ -145,17 +145,16 @@ void dott::write_dot_subgraph(
         tmp.str("Atomic End");
       else if(it->is_function_call())
       {
-        std::string t = from_expr(ns, function_id, it->code);
+        const auto &function_call = it->get_function_call();
+        std::string t = from_expr(ns, function_id, function_call);
         while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp.str(escape(t));
 
-        exprt fc;
         std::stringstream ss;
         ss << "Node_" << subgraphscount << "_" << it->location_number;
-        fc.operands().push_back(exprt(ss.str()));
-        fc.operands().push_back(it->code.op1());
-        function_calls.push_back(fc);
+        function_calls.push_back(
+          std::pair<std::string, exprt>(ss.str(), function_call.function()));
       }
       else if(it->is_assign() ||
               it->is_decl() ||
@@ -224,36 +223,40 @@ void dott::write_dot_subgraph(
 void dott::do_dot_function_calls(
   std::ostream &out)
 {
-  for(const auto &expr : function_calls)
+  for(const auto &call : function_calls)
   {
     std::list<exprt>::const_iterator cit=clusters.begin();
     for( ; cit!=clusters.end(); cit++)
-      if(cit->get("name")==expr.op1().get(ID_identifier))
+      if(cit->get("name") == call.second.get(ID_identifier))
         break;
 
     if(cit!=clusters.end())
     {
-      out << expr.op0().id() <<
-        " -> " "Node_" << cit->get("nr") << "_0" <<
-        " [lhead=\"cluster_" << expr.op1().get(ID_identifier) << "\"," <<
-        "color=blue];\n";
+      out << call.first
+          << " -> "
+             "Node_"
+          << cit->get("nr") << "_0"
+          << " [lhead=\"cluster_" << call.second.get(ID_identifier) << "\","
+          << "color=blue];\n";
     }
     else
     {
-      out << "subgraph \"cluster_" << expr.op1().get(ID_identifier) <<
-        "\" {\n";
+      out << "subgraph \"cluster_" << call.second.get(ID_identifier)
+          << "\" {\n";
       out << "rank=sink;\n";
-      out << "label=\"" << expr.op1().get(ID_identifier) << "\";\n";
+      out << "label=\"" << call.second.get(ID_identifier) << "\";\n";
       out << "Node_" << subgraphscount << "_0 " <<
         "[shape=Mrecord,fontsize=22,label=\"?\"];\n";
       out << "}\n";
       clusters.push_back(exprt("cluster"));
-      clusters.back().set("name", expr.op1().get(ID_identifier));
+      clusters.back().set("name", call.second.get(ID_identifier));
       clusters.back().set("nr", subgraphscount);
-      out << expr.op0().id() <<
-        " -> " "Node_" << subgraphscount << "_0" <<
-        " [lhead=\"cluster_" << expr.op1().get("identifier") << "\"," <<
-        "color=blue];\n";
+      out << call.first
+          << " -> "
+             "Node_"
+          << subgraphscount << "_0"
+          << " [lhead=\"cluster_" << call.second.get("identifier") << "\","
+          << "color=blue];\n";
       subgraphscount++;
     }
   }
