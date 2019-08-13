@@ -33,9 +33,6 @@ void __CPROVER_atomic_begin();
 void __CPROVER_atomic_end();
 void __CPROVER_fence(const char *kind, ...);
 
-// traces
-void CBMC_trace(int lvl, const char *event, ...);
-
 // pointers
 __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);
 __CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);

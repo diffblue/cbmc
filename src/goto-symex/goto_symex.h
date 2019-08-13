@@ -468,8 +468,7 @@ protected:
   virtual void symex_end_of_function(statet &);
 
   /// Symbolic execution of a call to a function call.
-  /// For functions \c CBMC_trace and functions starting with \c __CPROVER_fkt
-  /// see \ref goto_symext::symex_trace and
+  /// For functions starting with \c __CPROVER_fkt
   /// \ref goto_symext::symex_fkt
   /// For non-special functions see
   /// \ref goto_symext::symex_function_call_code
@@ -678,11 +677,6 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   /// \param code: The function call instruction
   virtual void symex_fkt(statet &state, const code_function_callt &code);
-  /// Symbolically execute a FUNCTION_CALL instruction for the `CBMC_trace`
-  /// function
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
-  virtual void symex_trace(statet &state, const code_function_callt &code);
   /// Symbolically execute an OTHER instruction that does a CPP `printf`
   /// \param state: Symbolic execution state for current instruction
   /// \param rhs: The cleaned up CPP `printf` instruction
