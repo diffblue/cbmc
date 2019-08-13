@@ -57,6 +57,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_format_builtin_function/length_of_decimal_int.cpp \
        solvers/strings/string_refinement/concretize_array.cpp \
        solvers/strings/string_refinement/sparse_array.cpp \
+       solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
        util/allocate_objects.cpp \
