@@ -201,7 +201,14 @@ void linkingt::detailed_conflict_report_rec(
                 e.id()==ID_index)
           {
             parent_types.insert(e.type());
-            e=e.op0();
+            if(e.id() == ID_dereference)
+              e = to_dereference_expr(e).pointer();
+            else if(e.id() == ID_member)
+              e = to_member_expr(e).compound();
+            else if(e.id() == ID_index)
+              e = to_index_expr(e).array();
+            else
+              UNREACHABLE;
           }
 
           conflict_path=conflict_path_before;
