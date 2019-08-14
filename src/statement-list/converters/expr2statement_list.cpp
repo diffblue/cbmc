@@ -73,18 +73,18 @@ instrument_equal_operands(const exprt &lhs, const exprt &rhs)
   {
     // lhs == !rhs is equivalent to X lhs; X rhs;
     result.push_back(lhs);
-    result.push_back(rhs.op0());
+    result.push_back(to_not_expr(rhs).op());
   }
   else if(ID_not == lhs.id() && ID_not != rhs.id())
   {
     // !lhs == rhs is equivalent to X lhs; X rhs;
-    result.push_back(lhs.op0());
+    result.push_back(to_not_expr(lhs).op());
     result.push_back(rhs);
   }
   else // ID_not == lhs.id() && ID_not == rhs.id()
   {
     // !lhs == !rhs is equivalent to X lhs; XN rhs;
-    result.push_back(lhs.op0());
+    result.push_back(to_not_expr(lhs).op());
     result.push_back(rhs);
   }
   return result;
@@ -142,7 +142,7 @@ std::string expr2stlt::convert(const exprt &expr)
     convert(to_equal_expr(expr));
   else if(ID_symbol == expr.id())
     convert(to_symbol_expr(expr));
-  else if(ID_not == expr.id() && expr.op0().type().id() == ID_bool)
+  else if(ID_not == expr.id() && to_not_expr(expr).op().type().id() == ID_bool)
     convert(to_not_expr(expr));
   else // TODO: support more instructions in expr2stl.
     return expr2c(expr, ns);
@@ -235,7 +235,7 @@ void expr2stlt::convert_multiary_bool_operands(
     if(ID_not == op.id())
     {
       result << operation << NOT_POSTFIX;
-      convert_bool_operand(op.op0());
+      convert_bool_operand(to_not_expr(op).op());
     }
     else
     {
@@ -270,7 +270,7 @@ void expr2stlt::convert_first_non_trivial_operand(std::vector<exprt> &operands)
   {
     if(
       (ID_symbol == it->id()) ||
-      (ID_not == it->id() && ID_symbol == it->op0().id()))
+      (ID_not == it->id() && ID_symbol == to_not_expr(*it).op().id()))
       continue;
     else
     {
