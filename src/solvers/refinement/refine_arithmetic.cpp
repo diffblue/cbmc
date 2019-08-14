@@ -33,12 +33,12 @@ void bv_refinementt::approximationt::add_under_assumption(literalt l)
     under_assumptions.push_back(literal_exprt(l));
 }
 
-bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
+bvt bv_refinementt::convert_floatbv_op(const ieee_float_op_exprt &expr)
 {
   if(!config_.refine_arithmetic)
     return SUB::convert_floatbv_op(expr);
 
-  if(expr.type().id() != ID_floatbv || expr.operands().size() != 3)
+  if(expr.type().id() != ID_floatbv)
     return SUB::convert_floatbv_op(expr);
 
   bvt bv;
@@ -497,21 +497,21 @@ bv_refinementt::add_approximation(
 
   if(a.no_operands==1)
   {
-    a.op0_bv=convert_bv(expr.op0());
+    a.op0_bv = convert_bv(to_unary_expr(expr).op());
     set_frozen(a.op0_bv);
   }
   else if(a.no_operands==2)
   {
-    a.op0_bv=convert_bv(expr.op0());
-    a.op1_bv=convert_bv(expr.op1());
+    a.op0_bv = convert_bv(to_binary_expr(expr).op0());
+    a.op1_bv = convert_bv(to_binary_expr(expr).op1());
     set_frozen(a.op0_bv);
     set_frozen(a.op1_bv);
   }
   else if(a.no_operands==3)
   {
-    a.op0_bv=convert_bv(expr.op0());
-    a.op1_bv=convert_bv(expr.op1());
-    a.op2_bv=convert_bv(expr.op2());
+    a.op0_bv = convert_bv(to_multi_ary_expr(expr).op0());
+    a.op1_bv = convert_bv(to_multi_ary_expr(expr).op1());
+    a.op2_bv = convert_bv(to_multi_ary_expr(expr).op2());
     set_frozen(a.op0_bv);
     set_frozen(a.op1_bv);
     set_frozen(a.op2_bv);

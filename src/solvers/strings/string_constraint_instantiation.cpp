@@ -74,12 +74,12 @@ linear_functiont::linear_functiont(const exprt &f)
     }
     else if(cur.id() == ID_minus)
     {
-      to_process.emplace_back(cur.op1(), !positive);
-      to_process.emplace_back(cur.op0(), positive);
+      to_process.emplace_back(to_minus_expr(cur).op1(), !positive);
+      to_process.emplace_back(to_minus_expr(cur).op0(), positive);
     }
     else if(cur.id() == ID_unary_minus)
     {
-      to_process.emplace_back(cur.op0(), !positive);
+      to_process.emplace_back(to_unary_minus_expr(cur).op(), !positive);
     }
     else
     {
