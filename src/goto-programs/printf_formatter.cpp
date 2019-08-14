@@ -134,12 +134,15 @@ void printf_formattert::process_format(std::ostream &out)
         break;
       // this is the address of a string
       const exprt &op=*(next_operand++);
-      if(op.id()==ID_address_of &&
-         op.operands().size()==1 &&
-         op.op0().id()==ID_index &&
-         op.op0().operands().size()==2 &&
-         op.op0().op0().id()==ID_string_constant)
-        out << format_constant(op.op0().op0());
+      if(
+        op.id() == ID_address_of &&
+        to_address_of_expr(op).object().id() == ID_index &&
+        to_index_expr(to_address_of_expr(op).object()).array().id() ==
+          ID_string_constant)
+      {
+        out << format_constant(
+          to_index_expr(to_address_of_expr(op).object()).array());
+      }
     }
     break;
 

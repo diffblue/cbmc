@@ -456,7 +456,9 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           (!it->full_lhs_value.is_constant() ||
            !it->full_lhs_value.has_operands() ||
            !has_prefix(
-             id2string(it->full_lhs_value.op0().get(ID_value)), "INVALID-")))
+             id2string(
+               to_multi_ary_expr(it->full_lhs_value).op0().get(ID_value)),
+             "INVALID-")))
         {
           xmlt &val = edge.new_element("data");
           val.set_attribute("key", "assumption");

@@ -417,7 +417,8 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
          ? build_unknown(whatt::SIZE, false)
          : to_array_type(source_type).size()},
       string_struct);
-    make_type(new_symbol.value.op2(), build_type(whatt::SIZE));
+
+    make_type(to_struct_expr(new_symbol.value).op2(), build_type(whatt::SIZE));
   }
   else
     new_symbol.value=
@@ -599,19 +600,22 @@ void string_abstractiont::replace_string_macros(
   if(expr.id()=="is_zero_string")
   {
     PRECONDITION(expr.operands().size() == 1);
-    exprt tmp=build(expr.op0(), whatt::IS_ZERO, lhs, source_location);
+    exprt tmp =
+      build(to_unary_expr(expr).op(), whatt::IS_ZERO, lhs, source_location);
     expr.swap(tmp);
   }
   else if(expr.id()=="zero_string_length")
   {
     PRECONDITION(expr.operands().size() == 1);
-    exprt tmp=build(expr.op0(), whatt::LENGTH, lhs, source_location);
+    exprt tmp =
+      build(to_unary_expr(expr).op(), whatt::LENGTH, lhs, source_location);
     expr.swap(tmp);
   }
   else if(expr.id()=="buffer_size")
   {
     PRECONDITION(expr.operands().size() == 1);
-    exprt tmp=build(expr.op0(), whatt::SIZE, false, source_location);
+    exprt tmp =
+      build(to_unary_expr(expr).op(), whatt::SIZE, false, source_location);
     expr.swap(tmp);
   }
   else
@@ -629,14 +633,11 @@ exprt string_abstractiont::build(
   if(pointer.id()==ID_typecast)
   {
     // cast from another pointer type?
-    INVARIANT(
-      pointer.operands().size() == 1,
-      "pointer typecast takes exactly 1 argument");
-    if(pointer.op0().type().id() != ID_pointer)
+    if(to_typecast_expr(pointer).op().type().id() != ID_pointer)
       return build_unknown(what, write);
 
     // recursive call
-    return build(pointer.op0(), what, write, source_location);
+    return build(to_typecast_expr(pointer).op(), what, write, source_location);
   }
 
   exprt str_struct;
@@ -781,21 +782,23 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
   {
     const member_exprt &o_mem=to_member_expr(object);
     dest=member_exprt(exprt(), o_mem.get_component_name(), abstract_type);
-    return build_wrap(o_mem.struct_op(), dest.op0(), write);
+    return build_wrap(
+      o_mem.struct_op(), to_member_expr(dest).compound(), write);
   }
 
   if(object.id()==ID_dereference)
   {
     const dereference_exprt &o_deref=to_dereference_expr(object);
     dest=dereference_exprt(exprt(), abstract_type);
-    return build_wrap(o_deref.pointer(), dest.op0(), write);
+    return build_wrap(
+      o_deref.pointer(), to_dereference_expr(dest).pointer(), write);
   }
 
   if(object.id()==ID_index)
   {
     const index_exprt &o_index=to_index_expr(object);
     dest=index_exprt(exprt(), o_index.index(), abstract_type);
-    return build_wrap(o_index.array(), dest.op0(), write);
+    return build_wrap(o_index.array(), to_index_expr(dest).array(), write);
   }
 
   // handle pointer stuff
@@ -1049,8 +1052,8 @@ void string_abstractiont::move_lhs_arithmetic(exprt &lhs, exprt &rhs)
   if(lhs.id()==ID_minus)
   {
     // move op1 to rhs
-    exprt rest=lhs.op0();
-    rhs=plus_exprt(rhs, lhs.op1());
+    exprt rest = to_minus_expr(lhs).op0();
+    rhs = plus_exprt(rhs, to_minus_expr(lhs).op1());
     rhs.type()=lhs.type();
     lhs=rest;
   }
@@ -1067,7 +1070,7 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
   const exprt *rhsp = &(assign.rhs());
 
   while(rhsp->id()==ID_typecast)
-    rhsp=&(rhsp->op0());
+    rhsp = &(to_typecast_expr(*rhsp).op());
 
   const typet &abstract_type=build_abstraction_type(lhs.type());
   if(abstract_type.is_nil())
@@ -1108,7 +1111,7 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
   const exprt *rhsp = &(assign.rhs());
 
   while(rhsp->id()==ID_typecast)
-    rhsp=&(rhsp->op0());
+    rhsp = &(to_typecast_expr(*rhsp).op());
 
   // we only care if the constant zero is assigned
   if(!rhsp->is_zero())
