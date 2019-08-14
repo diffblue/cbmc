@@ -106,12 +106,13 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
     if(array.id() == ID_constant || array.id() == ID_array)
     {
-      is_uniform =
-        array.operands().size() <= 1 ||
-        std::all_of(
-          ++array.operands().begin(),
-          array.operands().end(),
-          [&array](const exprt &expr) { return expr == array.op0(); });
+      is_uniform = array.operands().size() <= 1 ||
+                   std::all_of(
+                     ++array.operands().begin(),
+                     array.operands().end(),
+                     [&array](const exprt &expr) {
+                       return expr == to_multi_ary_expr(array).op0();
+                     });
     }
 
     if(is_uniform && prop.has_set_to())
@@ -129,7 +130,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       if(!array.has_operands())
         return bv;
 
-      equal_exprt value_equality(result, array.op0());
+      equal_exprt value_equality(result, to_multi_ary_expr(array).op0());
 
       binary_relation_exprt lower_bound(
         from_integer(0, index.type()), ID_le, index);

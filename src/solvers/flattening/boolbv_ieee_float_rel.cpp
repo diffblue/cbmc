@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/floatbv/float_utils.h>
 
-literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
+literalt boolbvt::convert_ieee_float_rel(const binary_relation_exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
   const irep_idt &rel=expr.id();

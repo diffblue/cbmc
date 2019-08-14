@@ -124,7 +124,7 @@ protected:
     const typet &src_type, const bvt &src,
     const typet &dest_type, bvt &dest);
 
-  virtual literalt convert_bv_rel(const exprt &expr);
+  virtual literalt convert_bv_rel(const binary_relation_exprt &);
   virtual literalt convert_typecast(const typecast_exprt &expr);
   virtual literalt convert_reduction(const unary_exprt &expr);
   virtual literalt convert_onehot(const unary_exprt &expr);
@@ -133,7 +133,7 @@ protected:
   virtual literalt convert_equality(const equal_exprt &expr);
   virtual literalt convert_verilog_case_equality(
     const binary_relation_exprt &expr);
-  virtual literalt convert_ieee_float_rel(const exprt &expr);
+  virtual literalt convert_ieee_float_rel(const binary_relation_exprt &);
   virtual literalt convert_quantifier(const quantifier_exprt &expr);
 
   virtual bvt convert_index(const exprt &array, const mp_integer &index);
@@ -158,11 +158,11 @@ protected:
   virtual bvt convert_mult(const mult_exprt &expr);
   virtual bvt convert_div(const div_exprt &expr);
   virtual bvt convert_mod(const mod_exprt &expr);
-  virtual bvt convert_floatbv_op(const exprt &expr);
+  virtual bvt convert_floatbv_op(const ieee_float_op_exprt &);
   virtual bvt convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
   virtual bvt convert_member(const member_exprt &expr);
   virtual bvt convert_with(const with_exprt &expr);
-  virtual bvt convert_update(const exprt &expr);
+  virtual bvt convert_update(const update_exprt &);
   virtual bvt convert_case(const exprt &expr);
   virtual bvt convert_cond(const cond_exprt &);
   virtual bvt convert_shift(const binary_exprt &expr);

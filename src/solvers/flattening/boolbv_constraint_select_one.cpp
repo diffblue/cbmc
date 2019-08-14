@@ -17,9 +17,9 @@ bvt boolbvt::convert_constraint_select_one(const exprt &expr)
     throw "expected constraint_select_one expression";
 
   if(operands.empty())
-    throw "constraint_select_one takes at one operand";
+    throw "constraint_select_one takes at least one operand";
 
-  if(expr.type()!=expr.op0().type())
+  if(expr.type() != to_multi_ary_expr(expr).op0().type())
     throw "constraint_select_one expects matching types";
 
   bvt bv;

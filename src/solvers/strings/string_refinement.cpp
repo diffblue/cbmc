@@ -1661,8 +1661,8 @@ static void initial_index_set(
   {
     if(it->id() == ID_index && is_char_type(it->type()))
     {
-      const exprt &s = it->op0();
-      const exprt &i = it->op1();
+      const exprt &s = to_index_expr(*it).array();
+      const exprt &i = to_index_expr(*it).index();
 
       // cur is of the form s[i] and no quantified variable appears in i
       add_to_index_set(index_set, ns, s, i);
@@ -1696,8 +1696,8 @@ static void update_index_set(
     to_process.pop_back();
     if(cur.id() == ID_index && is_char_type(cur.type()))
     {
-      const exprt &s = cur.op0();
-      const exprt &i = cur.op1();
+      const exprt &s = to_index_expr(cur).array();
+      const exprt &i = to_index_expr(cur).index();
       DATA_INVARIANT(
         s.type().id() == ID_array,
         string_refinement_invariantt("index expressions must index on arrays"));

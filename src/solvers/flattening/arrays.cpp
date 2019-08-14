@@ -186,10 +186,12 @@ void arrayst::collect_arrays(const exprt &a)
   }
   else if(a.id()==ID_member)
   {
+    const auto &struct_op = to_member_expr(a).struct_op();
+
     DATA_INVARIANT(
-      to_member_expr(a).struct_op().id() == ID_symbol ||
-        to_member_expr(a).struct_op().id() == ID_nondet_symbol,
-      ("unexpected array expression: member with '" + a.op0().id_string() + "'")
+      struct_op.id() == ID_symbol || struct_op.id() == ID_nondet_symbol,
+      ("unexpected array expression: member with '" + struct_op.id_string() +
+       "'")
         .c_str());
   }
   else if(a.id()==ID_constant ||
@@ -209,24 +211,23 @@ void arrayst::collect_arrays(const exprt &a)
   }
   else if(a.id()==ID_typecast)
   {
+    const auto &typecast_op = to_typecast_expr(a).op();
+
     // cast between array types?
     DATA_INVARIANT(
-      a.operands().size()==1,
-      "typecast must have one operand");
+      typecast_op.type().id() == ID_array,
+      ("unexpected array type cast from " + typecast_op.type().id_string())
+        .c_str());
 
-    DATA_INVARIANT(
-      a.op0().type().id()==ID_array,
-      ("unexpected array type cast from "+
-       a.op0().type().id_string()).c_str());
-
-    arrays.make_union(a, a.op0());
-    collect_arrays(a.op0());
+    arrays.make_union(a, typecast_op);
+    collect_arrays(typecast_op);
   }
   else if(a.id()==ID_index)
   {
     // nested unbounded arrays
-    arrays.make_union(a, a.op0());
-    collect_arrays(a.op0());
+    const auto &array_op = to_index_expr(a).array();
+    arrays.make_union(a, array_op);
+    collect_arrays(array_op);
   }
   else if(a.id() == ID_array_comprehension)
   {
@@ -496,16 +497,14 @@ void arrayst::add_array_constraints(
   else if(expr.id()==ID_typecast)
   {
     // we got a=(type[])b
-    DATA_INVARIANT(
-      expr.operands().size()==1,
-      "typecast should have one operand");
+    const auto &expr_typecast_op = to_typecast_expr(expr).op();
 
     // add a[i]=b[i]
     for(const auto &index : index_set)
     {
       const typet &subtype = expr.type().subtype();
       index_exprt index_expr1(expr, index, subtype);
-      index_exprt index_expr2(expr.op0(), index, subtype);
+      index_exprt index_expr2(expr_typecast_op, index, subtype);
 
       DATA_INVARIANT(
         index_expr1.type()==index_expr2.type(),

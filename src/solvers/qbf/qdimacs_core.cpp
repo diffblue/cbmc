@@ -20,14 +20,17 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
 
     forall_operands(it, expr)
     {
-      if(it->id()==ID_extractbit && it->op1().is_constant())
+      if(it->id() == ID_extractbit)
       {
-        used_bits_map[it->op0()].insert(it->op1());
+        const auto &extractbit_expr = to_extractbit_expr(*it);
+        if(extractbit_expr.op1().is_constant())
+          used_bits_map[extractbit_expr.src()].insert(extractbit_expr.index());
       }
-      else if(it->id()==ID_not &&
-              it->op0().id()==ID_extractbit && it->op0().op1().is_constant())
+      else if(it->id() == ID_not && to_not_expr(*it).op().id() == ID_extractbit)
       {
-        used_bits_map[it->op0().op0()].insert(it->op0().op1());
+        const auto &extractbit_expr = to_extractbit_expr(to_not_expr(*it).op());
+        if(extractbit_expr.op1().is_constant())
+          used_bits_map[extractbit_expr.src()].insert(extractbit_expr.index());
       }
     }
 
