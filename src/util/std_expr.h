@@ -775,7 +775,8 @@ public:
   }
 };
 
-/// \brief A base class for relations, i.e., binary predicates
+/// \brief A base class for relations, i.e., binary predicates whose
+/// two operands have the same type
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
@@ -811,10 +812,13 @@ public:
   {
     binary_predicate_exprt::validate(expr, ns, vm);
 
-    // check types
+    // we now can safely assume that 'expr' is a binary predicate
+    const auto &expr_binary = static_cast<const binary_predicate_exprt &>(expr);
+
+    // check that the types of the operands are the same
     DATA_CHECK(
       vm,
-      expr.op0().type() == expr.op1().type(),
+      expr_binary.op0().type() == expr_binary.op1().type(),
       "lhs and rhs of binary relation expression should have same type");
   }
 
