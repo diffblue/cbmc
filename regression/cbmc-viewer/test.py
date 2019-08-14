@@ -3,7 +3,7 @@
 Regession testing of CBMC-viewer.
 """
 
-from __future__ import print_function     # get print function from Python 3
+#pylint: disable=missing-docstring,invalid-name
 
 from   glob    import glob                # file name expansion
 import logging                            # setup log files
@@ -114,11 +114,11 @@ def main():
     failed_results = 0
     duration = 0
 
-    print ('Loading')
-    print (total_tests, ('test' if total_tests == 1 else 'tests') + ' found\n')
+    print('Loading')
+    print(total_tests, ('test' if total_tests == 1 else 'tests') + ' found\n')
 
     for test in glob(testdir + '*/'):      # for all test cases
-        print ('  Running ', os.path.basename(test), end='')
+        print('  Running ', os.path.basename(test), end='')
 
         options = open(test + '/test.desc', 'r').read()    # get CBMC flags
         options = options.replace("\n", "")
@@ -127,7 +127,7 @@ def main():
         start_time = time()
         generateReport(options)
         if treeDiff():
-            print (' [' + bcolors.OKGREEN + 'OK' + bcolors.ENDC + ']', end='')
+            print(' [' + bcolors.OKGREEN + 'OK' + bcolors.ENDC + ']', end='')
         else:
             print(' [' + bcolors.FAIL + 'FAILED' + bcolors.ENDC + ']', end='')
             failed_results += 1
@@ -135,15 +135,15 @@ def main():
         duration += round(time() - start_time, 2)
         os.chdir('../.')
 
-    print ('\n  Duration: %s seconds\n' % duration)
+    print('\n  Duration: %s seconds\n' % duration)
 
     if failed_results == 0:
-        print (bcolors.OKGREEN + 'All tests were successful' + bcolors.ENDC)
+        print(bcolors.OKGREEN + 'All tests were successful' + bcolors.ENDC)
         exit(0)
-    
-    print ('Tests failed')
-    print ('  %d of %d ' % (failed_results, total_tests) +
-           ('test' if total_tests == 1 else 'tests') + ' failed')
+
+    print('Tests failed')
+    print('  %d of %d ' % (failed_results, total_tests) +
+          ('test' if total_tests == 1 else 'tests') + ' failed')
     exit(1)
 
 if __name__ == '__main__':
