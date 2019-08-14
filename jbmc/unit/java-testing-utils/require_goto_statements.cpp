@@ -179,21 +179,25 @@ require_goto_statements::find_this_component_assignment(
         const member_exprt &member_expr = to_member_expr(code_assign.lhs());
         if(
           member_expr.get_component_name() == component_name &&
-          member_expr.op().id() == ID_dereference &&
-          member_expr.op().op0().id() == ID_symbol &&
-          has_suffix(
-            id2string(to_symbol_expr(member_expr.op().op0()).get_identifier()),
-            id2string(ID_this)))
+          member_expr.op().id() == ID_dereference)
         {
+          const auto &pointer = to_dereference_expr(member_expr.op()).pointer();
           if(
-            code_assign.rhs() ==
-            null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+            pointer.id() == ID_symbol &&
+            has_suffix(
+              id2string(to_symbol_expr(pointer).get_identifier()),
+              id2string(ID_this)))
           {
-            locations.null_assignment = code_assign;
-          }
-          else
-          {
-            locations.non_null_assignments.push_back(code_assign);
+            if(
+              code_assign.rhs() ==
+              null_pointer_exprt(to_pointer_type(code_assign.lhs().type())))
+            {
+              locations.null_assignment = code_assign;
+            }
+            else
+            {
+              locations.non_null_assignments.push_back(code_assign);
+            }
           }
         }
       }

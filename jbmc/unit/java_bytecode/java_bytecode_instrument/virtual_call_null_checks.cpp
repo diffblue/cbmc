@@ -33,7 +33,7 @@ static bool is_expected_virtualmethod_call(
   const auto &this_argument = virtual_call.arguments()[0];
   if(this_argument.id() != ID_member)
     return false;
-  if(this_argument.op0().id() != ID_dereference)
+  if(to_member_expr(this_argument).compound().id() != ID_dereference)
     return false;
 
   return true;

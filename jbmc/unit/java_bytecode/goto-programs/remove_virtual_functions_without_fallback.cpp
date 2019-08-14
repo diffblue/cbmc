@@ -29,22 +29,28 @@ exprt resolve_classid_test(
     return resolved;
   }
 
-  if(expr.op0().id() == ID_constant && expr.op1().id() != ID_constant)
+  const auto &expr_binary = to_binary_expr(expr);
+
+  if(
+    expr_binary.op0().id() == ID_constant &&
+    expr_binary.op1().id() != ID_constant)
   {
-    exprt swapped = expr;
+    binary_exprt swapped = expr_binary;
     std::swap(swapped.op0(), swapped.op1());
     return resolve_classid_test(swapped, actual_class_id, ns);
   }
 
-  if(expr.op0().id() == ID_member &&
-     to_member_expr(expr.op0()).get_component_name() == "@class_identifier" &&
-     expr.op1().id() == ID_constant &&
-     expr.op1().type().id() == ID_string)
+  if(
+    expr_binary.op0().id() == ID_member &&
+    to_member_expr(expr_binary.op0()).get_component_name() ==
+      "@class_identifier" &&
+    expr_binary.op1().id() == ID_constant &&
+    expr_binary.op1().type().id() == ID_string)
   {
-    exprt resolved = expr;
-    resolved.op0() = constant_exprt(actual_class_id, expr.op1().type());
+    binary_exprt resolved = expr_binary;
+    resolved.op0() = constant_exprt(actual_class_id, expr_binary.op1().type());
     simplify(resolved, ns);
-    return resolved;
+    return std::move(resolved);
   }
 
   return expr;

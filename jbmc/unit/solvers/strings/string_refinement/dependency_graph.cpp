@@ -46,12 +46,12 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
     string_dependenciest dependencies;
     const typet string_type =
       refined_string_typet(java_int_type(), pointer_type(java_char_type()));
-    const exprt string1 = make_string_argument("string1");
-    const exprt string2 = make_string_argument("string2");
-    const exprt string3 = make_string_argument("string3");
-    const exprt string4 = make_string_argument("string4");
-    const exprt string5 = make_string_argument("string5");
-    const exprt string6 = make_string_argument("string6");
+    const auto string1 = make_string_argument("string1");
+    const auto string2 = make_string_argument("string2");
+    const auto string3 = make_string_argument("string3");
+    const auto string4 = make_string_argument("string4");
+    const auto string5 = make_string_argument("string5");
+    const auto string6 = make_string_argument("string6");
     const symbol_exprt lhs("lhs", unsignedbv_typet(32));
     const symbol_exprt lhs2("lhs2", unsignedbv_typet(32));
     const symbol_exprt lhs3("lhs3", unsignedbv_typet(32));

@@ -87,7 +87,7 @@ static const std::string get_thread_block_identifier(
   PRECONDITION(f_code.arguments().size() == 1);
   const exprt &expr = f_code.arguments()[0];
   const mp_integer lbl_id =
-    numeric_cast_v<mp_integer>(to_constant_expr(expr.op0()));
+    numeric_cast_v<mp_integer>(to_constant_expr(to_multi_ary_expr(expr).op0()));
   return integer2string(lbl_id);
 }
 
