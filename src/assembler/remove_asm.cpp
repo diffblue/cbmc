@@ -85,8 +85,8 @@ void remove_asmt::gcc_asm_function_call(
   {
     if(it->operands().size() == 2)
     {
-      arguments.push_back(
-        typecast_exprt(address_of_exprt(it->op1()), void_pointer));
+      arguments.push_back(typecast_exprt(
+        address_of_exprt(to_binary_expr(*it).op1()), void_pointer));
     }
   }
 
@@ -95,8 +95,8 @@ void remove_asmt::gcc_asm_function_call(
   {
     if(it->operands().size() == 2)
     {
-      arguments.push_back(
-        typecast_exprt(address_of_exprt(it->op1()), void_pointer));
+      arguments.push_back(typecast_exprt(
+        address_of_exprt(to_binary_expr(*it).op1()), void_pointer));
     }
   }
 
