@@ -583,11 +583,24 @@ static exprt unpack_array_vector(
 
     // recursively unpack each element so that we eventually just have an array
     // of bytes left
-    exprt sub = unpack_rec(element, little_endian, {}, max_bytes, ns, true);
+
+    const optionalt<mp_integer> element_max_bytes =
+      max_bytes
+        ? std::min(mp_integer{el_bytes}, *max_bytes - byte_operands.size())
+        : optionalt<mp_integer>{};
+    const std::size_t element_max_bytes_int =
+      element_max_bytes ? numeric_cast_v<std::size_t>(*element_max_bytes)
+                        : el_bytes;
+
+    exprt sub =
+      unpack_rec(element, little_endian, {}, element_max_bytes, ns, true);
     exprt::operandst sub_operands =
-      instantiate_byte_array(sub, 0, el_bytes, ns);
+      instantiate_byte_array(sub, 0, element_max_bytes_int, ns);
     byte_operands.insert(
       byte_operands.end(), sub_operands.begin(), sub_operands.end());
+
+    if(max_bytes && byte_operands.size() >= *max_bytes)
+      break;
   }
 
   const std::size_t size = byte_operands.size();
@@ -926,10 +939,21 @@ static exprt unpack_rec(
     // endianness
     auto bits_opt = pointer_offset_bits(src.type(), ns);
     DATA_INVARIANT(bits_opt.has_value(), "basic type should have a fixed size");
+
     mp_integer bits = *bits_opt;
+    mp_integer i = 0;
+
+    if(max_bytes.has_value())
+    {
+      const auto max_bits = *max_bytes * 8;
+      if(little_endian)
+        bits = std::min(bits, max_bits);
+      else
+        i = std::max(mp_integer{0}, bits - max_bits);
+    }
 
     exprt::operandst byte_operands;
-    for(mp_integer i=0; i<bits; i+=8)
+    for(; i < bits; i += 8)
     {
       extractbits_exprt extractbits(
         typecast_exprt::conditional_cast(
