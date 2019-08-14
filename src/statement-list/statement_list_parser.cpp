@@ -260,7 +260,7 @@ static void find_instructions(
   for(const exprt &instruction_expr : instructions.operands())
   {
     statement_list_parse_treet::instructiont instruction;
-    codet code_token(instruction_expr.op0().id());
+    codet code_token(to_multi_ary_expr(instruction_expr).op0().id());
     for(const exprt &operand : instruction_expr.operands())
     {
       if(operand.is_not_nil() && operand.id() != code_token.get_statement())
