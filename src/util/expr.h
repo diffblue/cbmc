@@ -98,6 +98,7 @@ public:
   const operandst &operands() const
   { return (const operandst &)get_sub(); }
 
+protected:
   exprt &op0()
   { return operands().front(); }
 
@@ -122,6 +123,7 @@ public:
   const exprt &op3() const
   { return operands()[3]; }
 
+public:
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
 
