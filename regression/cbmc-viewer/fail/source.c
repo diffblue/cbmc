@@ -1,5 +1,6 @@
 #include "harness.h"
 
-int main(void){
+int main(void)
+{
   harness();
 }
