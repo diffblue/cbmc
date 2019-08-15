@@ -109,8 +109,7 @@ void goto_program2codet::scan_for_varargs()
         r.id() == ID_side_effect &&
         to_side_effect_expr(r).get_statement() == ID_va_start)
       {
-        assert(r.has_operands());
-        va_list_expr.insert(r.op0());
+        va_list_expr.insert(to_unary_expr(r).op());
       }
       // try our modelling of va_start
       else if(l.type().id()==ID_pointer &&
@@ -315,7 +314,8 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   {
     code_function_callt f(
       symbol_exprt(ID_va_start, code_typet({}, empty_typet())),
-      {this_va_list_expr, to_address_of_expr(skip_typecast(r.op0())).object()});
+      {this_va_list_expr,
+       to_address_of_expr(skip_typecast(to_unary_expr(r).op())).object()});
 
     dest.add(std::move(f));
   }
@@ -865,7 +865,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   // try to figure out whether this was a switch/case
   exprt eq_cand=target->guard;
   if(eq_cand.id()==ID_or)
-    eq_cand=eq_cand.op0();
+    eq_cand = to_or_expr(eq_cand).op0();
 
   if(target->is_backwards_goto() ||
      eq_cand.id()!=ID_equal ||

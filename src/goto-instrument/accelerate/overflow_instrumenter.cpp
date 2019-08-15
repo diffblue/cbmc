@@ -211,7 +211,7 @@ void overflow_instrumentert::overflow_expr(
           expr.id()==ID_mult)
   {
     // A generic arithmetic operation.
-    exprt overflow("overflow-" + expr.id_string(), bool_typet());
+    multi_ary_exprt overflow("overflow-" + expr.id_string(), bool_typet());
     overflow.operands()=expr.operands();
 
     if(expr.operands().size()>=3)
@@ -223,7 +223,7 @@ void overflow_instrumentert::overflow_expr(
 
         if(i==1)
         {
-          tmp=expr.op0();
+          tmp = to_multi_ary_expr(expr).op0();
         }
         else
         {
