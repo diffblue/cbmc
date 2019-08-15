@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <memory>
 #include <sstream>
+#include <type_traits>
 
 #include <util/invariant.h>
 #include <util/std_code.h>
@@ -170,7 +171,8 @@ void ai_baset::entry_state(const goto_functionst &goto_functions)
 void ai_baset::entry_state(const goto_programt &goto_program)
 {
   // The first instruction of 'goto_program' is the entry point
-  get_state(goto_program.instructions.begin()).make_entry();
+  trace_ptrt p = history_factory->epoch(goto_program.instructions.begin());
+  get_state(p).make_entry();
 }
 
 void ai_baset::initialize(
@@ -197,16 +199,22 @@ void ai_baset::finalize()
   // Nothing to do per default
 }
 
-ai_baset::locationt ai_baset::get_next(
-  working_sett &working_set)
+ai_baset::trace_ptrt ai_baset::get_next(working_sett &working_set)
 {
   PRECONDITION(!working_set.empty());
 
-  working_sett::iterator i=working_set.begin();
-  locationt l=i->second;
-  working_set.erase(i);
+  static_assert(
+    std::is_same<
+      working_sett,
+      std::set<trace_ptrt, ai_history_baset::compare_historyt>>::value,
+    "begin must return the minimal entry");
+  auto first = working_set.begin();
 
-  return l;
+  trace_ptrt t = *first;
+
+  working_set.erase(first);
+
+  return t;
 }
 
 bool ai_baset::fixedpoint(
@@ -219,18 +227,19 @@ bool ai_baset::fixedpoint(
 
   // Put the first location in the working set
   if(!goto_program.empty())
+  {
     put_in_working_set(
-      working_set,
-      goto_program.instructions.begin());
+      working_set, history_factory->bang(goto_program.instructions.begin()));
+  }
 
   bool new_data=false;
 
   while(!working_set.empty())
   {
-    locationt l=get_next(working_set);
+    trace_ptrt p = get_next(working_set);
 
     // goto_program is really only needed for iterator manipulation
-    if(visit(function_id, l, working_set, goto_program, goto_functions, ns))
+    if(visit(function_id, p, working_set, goto_program, goto_functions, ns))
       new_data=true;
   }
 
@@ -239,13 +248,14 @@ bool ai_baset::fixedpoint(
 
 bool ai_baset::visit(
   const irep_idt &function_id,
-  locationt l,
+  trace_ptrt p,
   working_sett &working_set,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
   bool new_data=false;
+  locationt l = p->current_location();
 
   // Function call and end are special cases
   if(l->is_function_call())
@@ -259,7 +269,7 @@ bool ai_baset::visit(
       "function call successor / return location must be the next instruction");
 
     new_data = visit_function_call(
-      function_id, l, working_set, goto_program, goto_functions, ns);
+      function_id, p, working_set, goto_program, goto_functions, ns);
   }
   else if(l->is_end_function())
   {
@@ -268,7 +278,7 @@ bool ai_baset::visit(
       "The end function instruction should have no successors.");
 
     new_data = visit_end_function(
-      function_id, l, working_set, goto_program, goto_functions, ns);
+      function_id, p, working_set, goto_program, goto_functions, ns);
   }
   else
   {
@@ -280,7 +290,7 @@ bool ai_baset::visit(
         continue;
 
       new_data |=
-        visit_edge(function_id, l, function_id, to_l, ns, working_set);
+        visit_edge(function_id, p, function_id, to_l, ns, working_set);
     }
   }
 
@@ -289,27 +299,36 @@ bool ai_baset::visit(
 
 bool ai_baset::visit_edge(
   const irep_idt &function_id,
-  locationt l,
+  trace_ptrt p,
   const irep_idt &to_function_id,
-  const locationt &to_l,
+  locationt to_l,
   const namespacet &ns,
   working_sett &working_set)
 {
+  // Has history taught us not to step here...
+  auto next = p->step(to_l, *(storage->abstract_traces_before(to_l)));
+  if(next.first == ai_history_baset::step_statust::BLOCKED)
+    return false;
+  trace_ptrt to_p = next.second;
+
   // Abstract domains are mutable so we must copy before we transform
-  statet &current = get_state(l);
+  statet &current = get_state(p);
 
   std::unique_ptr<statet> tmp_state(make_temporary_state(current));
   statet &new_values = *tmp_state;
 
   // Apply transformer
-  new_values.transform(function_id, l, to_function_id, to_l, *this, ns);
+  new_values.transform(function_id, p, to_function_id, to_p, *this, ns);
 
-  // Initialize state(s), if necessary
-  get_state(to_l);
-
-  if(merge(new_values, l, to_l))
+  // Expanding a domain means that it has to be analysed again
+  // Likewise if the history insists that it is a new trace
+  // (assuming it is actually reachable).
+  if(
+    merge(new_values, p, to_p) ||
+    (next.first == ai_history_baset::step_statust::NEW &&
+     !new_values.is_bottom()))
   {
-    put_in_working_set(working_set, to_l);
+    put_in_working_set(working_set, to_p);
     return true;
   }
 
@@ -318,7 +337,7 @@ bool ai_baset::visit_edge(
 
 bool ai_baset::visit_edge_function_call(
   const irep_idt &calling_function_id,
-  locationt l_call,
+  trace_ptrt p_call,
   locationt l_return,
   const irep_idt &,
   working_sett &working_set,
@@ -330,7 +349,7 @@ bool ai_baset::visit_edge_function_call(
   // so the effects of the call are approximated but nothing else
   return visit_edge(
     calling_function_id,
-    l_call,
+    p_call,
     calling_function_id,
     l_return,
     ns,
@@ -339,12 +358,14 @@ bool ai_baset::visit_edge_function_call(
 
 bool ai_baset::visit_function_call(
   const irep_idt &calling_function_id,
-  locationt l_call,
+  trace_ptrt p_call,
   working_sett &working_set,
   const goto_programt &caller,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
+  locationt l_call = p_call->current_location();
+
   PRECONDITION(l_call->is_function_call());
 
   locationt l_return = std::next(l_call);
@@ -374,7 +395,7 @@ bool ai_baset::visit_function_call(
       {
         return visit_edge_function_call(
           calling_function_id,
-          l_call,
+          p_call,
           l_return,
           callee_function_id,
           working_set,
@@ -401,7 +422,7 @@ bool ai_baset::visit_function_call(
   // in the caller.  Domains should over-approximate what the function might do.
   return visit_edge(
     calling_function_id,
-    l_call,
+    p_call,
     calling_function_id,
     l_return,
     ns,
@@ -410,12 +431,13 @@ bool ai_baset::visit_function_call(
 
 bool ai_baset::visit_end_function(
   const irep_idt &function_id,
-  locationt l,
+  trace_ptrt p,
   working_sett &working_set,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
+  locationt l = p->current_location();
   PRECONDITION(l->is_end_function());
 
   // Do nothing
@@ -435,7 +457,7 @@ void ai_baset::fixedpoint(
 
 bool ai_recursive_interproceduralt::visit_edge_function_call(
   const irep_idt &calling_function_id,
-  locationt l_call,
+  trace_ptrt p_call,
   locationt l_return,
   const irep_idt &callee_function_id,
   working_sett &working_set,
@@ -452,7 +474,7 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
     // Do the edge from the call site to the beginning of the function
     bool new_data = visit_edge(
       calling_function_id,
-      l_call,
+      p_call,
       callee_function_id,
       l_begin,
       ns,
@@ -464,7 +486,6 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
   }
 
   // This is the edge from function end to return site.
-
   {
     // get location at end of the procedure we have called
     locationt l_end = --callee.instructions.end();
@@ -472,18 +493,35 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
       l_end->is_end_function(),
       "The last instruction of a goto_program must be END_FUNCTION");
 
-    // do edge from end of function to instruction after call
-    const statet &end_state = get_state(l_end);
+    // Construct a history from a location
+    auto traces = storage->abstract_traces_before(l_end);
 
-    if(end_state.is_bottom())
-      return false; // function exit point not reachable
+    bool new_data = false;
 
-    return visit_edge(
-      callee_function_id,
-      l_end,
-      calling_function_id,
-      l_return,
-      ns,
-      working_set);
+    // The history used may mean there are multiple histories at the end of the
+    // function.  Some of these can be progressed (for example, if the history
+    // tracks paths within functions), some can't be (for example, not all
+    // calling contexts will be appropriate).  We rely on the history's step,
+    // called from visit_edge to prune as applicable.
+    for(auto p_end : *traces)
+    {
+      // do edge from end of function to instruction after call
+      const statet &end_state = get_state(p_end);
+
+      if(!end_state.is_bottom())
+      {
+        // function exit point reachable in that history
+
+        new_data |= visit_edge(
+          callee_function_id,
+          p_end,
+          calling_function_id,
+          l_return,
+          ns,
+          working_set);
+      }
+    }
+
+    return new_data;
   }
 }

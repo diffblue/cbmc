@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 
 #include "ai_domain.h"
+#include "ai_history.h"
 #include "ai_storage.h"
 #include "is_threaded.h"
 
@@ -35,13 +36,19 @@ class ai_baset
 {
 public:
   typedef ai_domain_baset statet;
-  typedef ai_storage_baset::state_ptrt state_ptrt;
+  typedef ai_storage_baset::cstate_ptrt cstate_ptrt;
+  typedef ai_history_baset::trace_ptrt trace_ptrt;
+  typedef ai_history_baset::trace_sett trace_sett;
+  typedef ai_storage_baset::ctrace_set_ptrt ctrace_set_ptrt;
   typedef goto_programt::const_targett locationt;
 
   ai_baset(
+    std::unique_ptr<ai_history_factory_baset> &&hf,
     std::unique_ptr<ai_domain_factory_baset> &&df,
     std::unique_ptr<ai_storage_baset> &&st)
-    : domain_factory(std::move(df)), storage(std::move(st))
+    : history_factory(std::move(hf)),
+      domain_factory(std::move(df)),
+      storage(std::move(st))
   {
   }
 
@@ -96,6 +103,29 @@ public:
     finalize();
   }
 
+  /// Returns all of the histories that have reached
+  /// the start of the instruction.
+  /// PRECONDITION(l is dereferenceable)
+  /// \param l: The location before which we want the set of histories
+  /// \return The set of histories before `l`.
+  virtual ctrace_set_ptrt abstract_traces_before(locationt l) const
+  {
+    return storage->abstract_traces_before(l);
+  }
+
+  /// Returns all of the histories that have reached
+  /// the end of the instruction.
+  /// PRECONDITION(l is dereferenceable)
+  /// \param l: The location before which we want the set of histories
+  /// \return The set of histories before `l`.
+  virtual ctrace_set_ptrt abstract_traces_after(locationt l) const
+  {
+    /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
+    /// Check relies on a DATA_INVARIANT of goto_programs
+    INVARIANT(!l->is_end_function(), "No state after the last instruction");
+    return storage->abstract_traces_before(std::next(l));
+  }
+
   /// Get a copy of the abstract state before the given instruction, without
   /// needing to know what kind of domain or history is used. Note: intended
   /// for users of the abstract interpreter; derived classes should
@@ -105,7 +135,7 @@ public:
   /// \return The abstract state before `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual state_ptr abstract_state_before(locationt l) const
+  virtual cstate_ptrt abstract_state_before(locationt l) const
   {
     return storage->abstract_state_before(l, *domain_factory);
   }
@@ -118,12 +148,30 @@ public:
   /// \return The abstract state after `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual state_ptr abstract_state_after(locationt l) const
+  virtual cstate_ptrt abstract_state_after(locationt l) const
   {
     /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
     /// Check relies on a DATA_INVARIANT of goto_programs
     INVARIANT(!l->is_end_function(), "No state after the last instruction");
     return abstract_state_before(std::next(l));
+  }
+
+  /// The same interfaces but with histories
+  virtual cstate_ptrt abstract_state_before(const trace_ptrt &p) const
+  {
+    return storage->abstract_state_before(p, *domain_factory);
+  }
+
+  virtual cstate_ptrt abstract_state_after(const trace_ptrt &p) const
+  {
+    locationt l = p->current_location();
+    INVARIANT(!l->is_end_function(), "No state after the last instruction");
+
+    locationt n = std::next(l);
+
+    auto step_return = p->step(n, *(storage->abstract_traces_before(n)));
+
+    return storage->abstract_state_before(step_return.second, *domain_factory);
   }
 
   /// Reset the abstract state
@@ -275,18 +323,15 @@ protected:
     const irep_idt &function_id,
     const goto_programt &goto_program) const;
 
-  /// The work queue, sorted by location number
-  typedef std::map<unsigned, locationt> working_sett;
+  /// The work queue, sorted using the history's ordering operator
+  typedef trace_sett working_sett;
 
   /// Get the next location from the work queue
-  locationt get_next(working_sett &working_set);
+  trace_ptrt get_next(working_sett &working_set);
 
-  void put_in_working_set(
-    working_sett &working_set,
-    locationt l)
+  void put_in_working_set(working_sett &working_set, trace_ptrt t)
   {
-    working_set.insert(
-      std::pair<unsigned, locationt>(l->location_number, l));
+    working_set.insert(t);
   }
 
   /// Run the fixedpoint algorithm until it reaches a fixed point
@@ -297,17 +342,16 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
-  virtual void fixedpoint(
-    const goto_functionst &goto_functions,
-    const namespacet &ns);
+  virtual void
+  fixedpoint(const goto_functionst &goto_functions, const namespacet &ns);
 
-  /// Perform one step of abstract interpretation from location l
+  /// Perform one step of abstract interpretation from trace t
   /// Depending on the instruction type it may compute a number of "edges"
   /// or applications of the abstract transformer
   /// \return True if the state was changed
   bool visit(
     const irep_idt &function_id,
-    locationt l,
+    trace_ptrt p,
     working_sett &working_set,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
@@ -319,7 +363,7 @@ protected:
   // while visit_edge_function_call handles a single call
   virtual bool visit_function_call(
     const irep_idt &function_id,
-    locationt l,
+    trace_ptrt p_call,
     working_sett &working_set,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
@@ -327,7 +371,7 @@ protected:
 
   virtual bool visit_end_function(
     const irep_idt &function_id,
-    locationt l,
+    trace_ptrt p,
     working_sett &working_set,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
@@ -336,15 +380,15 @@ protected:
   // The most basic step, computing one edge / transformer application.
   bool visit_edge(
     const irep_idt &function_id,
-    locationt l,
+    trace_ptrt p,
     const irep_idt &to_function_id,
-    const locationt &to_l,
+    locationt to_l,
     const namespacet &ns,
     working_sett &working_set);
 
   virtual bool visit_edge_function_call(
     const irep_idt &calling_function_id,
-    locationt l_call,
+    trace_ptrt p_call,
     locationt l_return,
     const irep_idt &callee_function_id,
     working_sett &working_set,
@@ -352,12 +396,15 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
+  /// For creating history objects
+  std::unique_ptr<ai_history_factory_baset> history_factory;
+
   /// For creating domain objects
   std::unique_ptr<ai_domain_factory_baset> domain_factory;
 
-  /// Merge the state \p src, flowing from location \p from to
-  /// location \p to, into the state currently stored for location \p to.
-  virtual bool merge(const statet &src, locationt from, locationt to)
+  /// Merge the state \p src, flowing from tracet \p from to
+  /// tracet \p to, into the state currently stored for tracet \p to.
+  virtual bool merge(const statet &src, trace_ptrt from, trace_ptrt to)
   {
     statet &dest = get_state(to);
     return domain_factory->merge(dest, src, from, to);
@@ -369,14 +416,14 @@ protected:
     return domain_factory->copy(s);
   }
 
-  // Domain storage
+  // Domain and history storage
   std::unique_ptr<ai_storage_baset> storage;
 
-  /// Get the state for the given location, creating it with the factory if it
+  /// Get the state for the given history, creating it with the factory if it
   /// doesn't exist
-  virtual statet &get_state(locationt l)
+  virtual statet &get_state(trace_ptrt p)
   {
-    return storage->get_state(l, *domain_factory);
+    return storage->get_state(p, *domain_factory);
   }
 };
 
@@ -386,9 +433,10 @@ class ai_recursive_interproceduralt : public ai_baset
 {
 public:
   ai_recursive_interproceduralt(
+    std::unique_ptr<ai_history_factory_baset> &&hf,
     std::unique_ptr<ai_domain_factory_baset> &&df,
     std::unique_ptr<ai_storage_baset> &&st)
-    : ai_baset(std::move(df), std::move(st))
+    : ai_baset(std::move(hf), std::move(df), std::move(st))
   {
   }
 
@@ -396,7 +444,7 @@ protected:
   // Override the function that handles a single function call edge
   bool visit_edge_function_call(
     const irep_idt &calling_function_id,
-    locationt l_call,
+    trace_ptrt p_call,
     locationt l_return,
     const irep_idt &callee_function_id,
     working_sett &working_set,
@@ -419,14 +467,14 @@ protected:
 ///    and \ref ai_baset#operator()(const abstract_goto_modelt&)
 /// 2. Accessing the results of an analysis, by looking up the result
 ///    for a given location \p l using
-///    \ref ait#operator[](goto_programt::const_targett).
+///    \ref ait#abstract_state_before(goto_programt::const_targett).
 /// 3. Outputting the results of the analysis; see
 ///    \ref ai_baset#output(const namespacet&, const irep_idt&,
 ///    const goto_programt&, std::ostream&)const et cetera.
 ///
 /// A typical usage pattern would be to call the analysis first,
-/// and use `operator[]` afterwards to retrieve the results. The fixed
-/// point algorithm used is a standard worklist algorithm; the current
+/// and use `abstract_state_before` to retrieve the results. The fixed
+/// point algorithm used is a standard worklist algorithm; ait
 /// implementation is flow- and path-sensitive, but not context-sensitive.
 ///
 /// From an analysis developer's perspective, an analysis is implemented by
@@ -454,6 +502,8 @@ public:
   // constructor
   ait()
     : ai_recursive_interproceduralt(
+        util_make_unique<
+          ai_history_factory_default_constructort<ahistoricalt>>(),
         util_make_unique<ai_domain_factory_default_constructort<domainT>>(),
         util_make_unique<location_sensitive_storaget>())
   {
@@ -461,6 +511,8 @@ public:
 
   explicit ait(std::unique_ptr<ai_domain_factory_baset> &&df)
     : ai_recursive_interproceduralt(
+        util_make_unique<
+          ai_history_factory_default_constructort<ahistoricalt>>(),
         std::move(df),
         util_make_unique<location_sensitive_storaget>())
   {
@@ -486,6 +538,19 @@ public:
 
     return static_cast<const domainT &>(*p);
   }
+
+protected:
+  // Support the legacy get_state interface which is needed for a few domains
+  // This is one of the few users of the legacy get_state(locationt) method
+  // in location_sensitive_storaget.
+  DEPRECATED(SINCE(2019, 08, 01, "use get_state(trace_ptrt p) instead"))
+  virtual statet &get_state(locationt l)
+  {
+    auto &s = dynamic_cast<location_sensitive_storaget &>(*storage);
+    return s.get_state(l, *domain_factory);
+  }
+
+  using ai_baset::get_state;
 
 private:
   /// This function exists to enforce that `domainT` is derived from
@@ -550,6 +615,8 @@ protected:
     goto_programt tmp;
     tmp.add_instruction();
     goto_programt::const_targett sh_target = tmp.instructions.begin();
+    ai_baset::trace_ptrt target_hist =
+      ai_baset::history_factory->epoch(sh_target);
     statet &shared_state = ait<domainT>::get_state(sh_target);
 
     struct wl_entryt
@@ -597,18 +664,21 @@ protected:
       for(const auto &wl_entry : thread_wl)
       {
         working_sett working_set;
-        ai_baset::put_in_working_set(working_set, wl_entry.location);
+        ai_baset::trace_ptrt t(
+          ai_baset::history_factory->epoch(wl_entry.location));
+        ai_baset::put_in_working_set(working_set, t);
 
         statet &begin_state = ait<domainT>::get_state(wl_entry.location);
-        ait<domainT>::merge(begin_state, sh_target, wl_entry.location);
+        ait<domainT>::merge(begin_state, target_hist, t);
 
         while(!working_set.empty())
         {
-          goto_programt::const_targett l = ai_baset::get_next(working_set);
+          ai_baset::trace_ptrt p = ai_baset::get_next(working_set);
+          goto_programt::const_targett l = p->current_location();
 
           ai_baset::visit(
             wl_entry.function_id,
-            l,
+            p,
             working_set,
             *(wl_entry.goto_program),
             goto_functions,

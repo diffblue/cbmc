@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 
+#include "ai_history.h"
+
 // forward reference the abstract interpreter interface
 class ai_baset;
 
@@ -44,6 +46,7 @@ public:
   }
 
   typedef goto_programt::const_targett locationt;
+  typedef ai_history_baset::trace_ptrt trace_ptrt;
 
   /// how function calls are treated:
   /// a) there is an edge from each call site to the function head
@@ -59,7 +62,27 @@ public:
   /// PRECONDITION(to.is_dereferenceable(), "Must not be _::end()")
   /// PRECONDITION(are_comparable(from,to) ||
   ///              (from->is_function_call() || from->is_end_function())
+  ///
+  /// The history aware version is used by the abstract interpreter
+  /// for backwards compatability it calls the older signature
+  virtual void transform(
+    const irep_idt &function_from,
+    trace_ptrt from,
+    const irep_idt &function_to,
+    trace_ptrt to,
+    ai_baset &ai,
+    const namespacet &ns)
+  {
+    return transform(
+      function_from,
+      from->current_location(),
+      function_to,
+      to->current_location(),
+      ai,
+      ns);
+  }
 
+  DEPRECATED(SINCE(2019, 08, 01, "use the history signature instead"))
   virtual void transform(
     const irep_idt &function_from,
     locationt from,
@@ -94,6 +117,8 @@ public:
   /// also add
   ///
   ///   bool merge(const T &b, locationt from, locationt to);
+  ///    or
+  ///   bool merge(const T &b, trace_ptrt from, trace_ptrt to);
   ///
   /// This computes the join between "this" and "b".
   /// Return true if "this" has changed.
@@ -134,6 +159,7 @@ class ai_domain_factory_baset
 public:
   typedef ai_domain_baset statet;
   typedef ai_domain_baset::locationt locationt;
+  typedef ai_domain_baset::trace_ptrt trace_ptrt;
 
   virtual ~ai_domain_factory_baset()
   {
@@ -144,9 +170,13 @@ public:
 
   // Not domain construction but requires knowing the precise type of statet
   virtual bool
-  merge(statet &dest, const statet &src, locationt from, locationt to)
+  merge(statet &dest, const statet &src, trace_ptrt from, trace_ptrt to)
     const = 0;
 };
+// Converting make to take a trace_ptr instead of a location would
+// require removing the backwards-compatible
+//  location_sensitive_storaget::get_state(locationt l)
+// function which is used by some of the older domains
 
 // It would be great to have a single (templated) default implementation.
 // However, a default constructor is not part of the ai_domain_baset interface
@@ -158,17 +188,21 @@ class ai_domain_factoryt : public ai_domain_factory_baset
 public:
   typedef ai_domain_factory_baset::statet statet;
   typedef ai_domain_factory_baset::locationt locationt;
+  typedef ai_domain_factory_baset::trace_ptrt trace_ptrt;
 
   std::unique_ptr<statet> copy(const statet &s) const override
   {
     return util_make_unique<domainT>(static_cast<const domainT &>(s));
   }
 
-  bool merge(statet &dest, const statet &src, locationt from, locationt to)
+  bool merge(statet &dest, const statet &src, trace_ptrt from, trace_ptrt to)
     const override
   {
+    // For backwards compatability, use the location version
     return static_cast<domainT &>(dest).merge(
-      static_cast<const domainT &>(src), from, to);
+      static_cast<const domainT &>(src),
+      from->current_location(),
+      to->current_location());
   }
 };
 
@@ -179,12 +213,13 @@ class ai_domain_factory_default_constructort
 public:
   typedef ai_domain_factory_baset::statet statet;
   typedef ai_domain_factory_baset::locationt locationt;
+  typedef ai_domain_factory_baset::trace_ptrt trace_ptrt;
 
   std::unique_ptr<statet> make(locationt l) const override
   {
-    auto p = util_make_unique<domainT>();
-    CHECK_RETURN(p->is_bottom());
-    return p;
+    auto d = util_make_unique<domainT>();
+    CHECK_RETURN(d->is_bottom());
+    return std::unique_ptr<statet>(d.release());
   }
 };
 
