@@ -1,4 +1,21 @@
 import gdb
+import json
+import os
+from json import JSONDecodeError
+
+script_directory = os.path.dirname(os.path.abspath(__file__))
+
+options_path = os.path.join(script_directory, "options.json")
+pretty_printer_options = {}
+try:
+    with open(os.path.join(script_directory, "options.json"), "r") as json_file:
+        pretty_printer_options = json.load(json_file)
+except JSONDecodeError as e:
+    print("Options file at {0} failed to load. Exception: {1}".format(options_path, e.msg))
+
+
+def get_option(value):
+    return pretty_printer_options.get(value, None)
 
 
 def deconstruct_dstring(val):
@@ -38,6 +55,37 @@ def deconstruct_dstring(val):
     except:
         return -1, ""
 
+
+def has_children_nodes(data_ref):
+    has_subs = data_ref["sub"]["_M_impl"]["_M_start"] != data_ref["sub"]["_M_impl"]["_M_finish"]
+    has_named_subs = data_ref["named_sub"]["_M_t"]["_M_impl"]["_M_node_count"] > 0
+    return has_subs or has_named_subs
+
+
+def get_node_value(data_ref):
+    """ If the item has children, wrap it in [...], if it's just a
+        value wrap it in quotes to help differentiate. """
+    has_children = has_children_nodes(data_ref)
+    id_value = get_id(data_ref)
+    if id_value:
+        if has_children:
+            return "[{0}]".format(id_value)
+        else:
+            return "\"{0}\"".format(id_value)
+    elif has_children:
+        return "[...]"
+
+    return "\"\""
+
+
+def get_id(data_ref):
+    _, nested_value = deconstruct_dstring(data_ref["data"])
+    if nested_value:
+        return nested_value.replace("\"", "\\\"")
+
+    return ""
+
+
 # Class for pretty-printing dstringt
 class DStringPrettyPrinter:
     "Print a dstringt"
@@ -70,43 +118,85 @@ def find_type(type, name):
 
 
 class IrepPrettyPrinter:
-    "Print an irept"
+    """
+    Print an irept.
+
+    This is an array GDB type as everything in the tree is key->value, so it
+    works better than doing a map type with individual key/value entries.
+    """
 
     def __init__(self, val):
         self.val = val["data"].referenced_value()
+        self.clion_representation = get_option("clion_pretty_printers")
 
     def to_string(self):
         try:
-            return "\"{}\"".format(deconstruct_dstring(self.val["data"])[1].replace("\"", "\\\""))
+            return "\"{}\"".format(get_id(self.val))
         except:
             return "Exception pretty printing irept"
 
     def children(self):
+        """
+        This method tells the pretty-printer what children this object can
+        return. Because we've stated this is a array then we've also stated that
+        irept is a container that holds other values.
+
+        This makes things awkward because some ireps are not actually containers
+        of children but values themselves. It's hard to represent that, so instead
+        we return a single child with the value of the node.
+        """
+
         sub = self.val["sub"]
-        count = 0
+        sub_count = 0
         item = sub["_M_impl"]["_M_start"]
         finish = sub["_M_impl"]["_M_finish"]
         while item != finish:
-            yield "sub %d key" % count, "sub[%d]" % count
-            yield "sub %d value" % count, item.dereference()
-            count += 1
+            # The original key is just the index, as that's all we have.
+            node_key = "{}".format(sub_count)
+            iter_item = item.dereference()
+
+            if self.clion_representation:
+                nested_id = get_node_value(iter_item["data"].referenced_value())
+                if nested_id:
+                    node_key = "{0}: {1}".format(node_key, nested_id)
+
+                yield node_key, iter_item
+            else:
+                yield "sub %d key" % sub_count, node_key
+                yield "sub %d value" % sub_count, item.dereference()
+
+            sub_count += 1
             item += 1
 
         named_sub = self.val["named_sub"]
         size = named_sub["_M_t"]["_M_impl"]["_M_node_count"]
         node = named_sub["_M_t"]["_M_impl"]["_M_header"]["_M_left"]
-        count = 0
-        while count != size:
+        named_sub_count = 0
+        while named_sub_count != size:
             rep_type = find_type(named_sub.type, "_Rep_type")
             link_type = find_type(rep_type, "_Link_type")
             node_type = link_type.strip_typedefs()
             current = node.cast(node_type).dereference()
             addr_type = current.type.template_argument(0).pointer()
             result = current["_M_storage"]["_M_storage"].address.cast(addr_type).dereference()
-            yield "named_sub %d key" % count, "named_sub[\"%s\"]" % deconstruct_dstring(result["first"])[1].replace("\"", "\\\"")
-            yield "named_sub %d value" % count, result["second"]
-            count += 1
-            if count < size:
+
+            # Get the name of the named_sub.
+            _, sub_name = deconstruct_dstring(result["first"])
+            node_key = sub_name.replace("\"", "\\\"")
+
+            iter_item = result["second"]
+            if self.clion_representation:
+                nested_id = get_node_value(iter_item["data"].referenced_value())
+                if nested_id:
+                    node_key = "{0}: {1}".format(node_key, nested_id)
+
+                yield node_key, iter_item
+            else:
+                yield "named_sub %d key" % named_sub_count, node_key
+                yield "named_sub %d value" % named_sub_count, iter_item
+
+            named_sub_count += 1
+            if named_sub_count < size:
                 # Get the next node
                 right = node.dereference()["_M_right"]
                 if right:
@@ -126,7 +216,7 @@ class IrepPrettyPrinter:
                         node = parent
 
     def display_hint(self):
-        return "map"
+        return "array" if self.clion_representation else "map"
 
 
 class InstructionPrettyPrinter:
@@ -153,6 +243,8 @@ def load_cbmc_printers():
     # First argument is the name of the pretty-printer, second is a regex match for which type
     # it should be applied too, third is the class that should be called to pretty-print that type.
     printers.add_printer("dstringt", "^(?:dstringt|irep_idt)", DStringPrettyPrinter)
+    printers.add_printer("irept", "^irept", IrepPrettyPrinter)
     printers.add_printer("instructiont", "^goto_programt::instructiont", InstructionPrettyPrinter)
+
     # We aren't associating with a particular object file, so pass in None instead of gdb.current_objfile()
     gdb.printing.register_pretty_printer(None, printers, replace=True)
