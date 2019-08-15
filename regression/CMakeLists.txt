@@ -20,6 +20,20 @@ macro(add_test_pl_tests cmdline)
     add_test_pl_profile("${TEST_DIR_NAME}" "${cmdline}" -K KNOWNBUG ${ARGN})
 endmacro(add_test_pl_tests)
 
+# Standalone regression tests that do not need test.pl
+macro(add_standalone_test cmdline)
+  add_test(
+    NAME "${name}-CORE"
+    COMMAND "${cmdline}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  )
+
+  set_tests_properties(
+    "${name}-CORE" PROPERTIES
+    LABELS "CORE;CBMC"
+  )
+endmacro
+
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
