@@ -1094,6 +1094,23 @@ public:
     return static_cast<codet &>(op3());
   }
 
+  /// Produce a code_fort representing:
+  /// ```
+  /// for(loop_index = start_index; loop_index < end_index; ++loop_index)
+  ///    body
+  /// ```
+  /// \param start_index: The expression to start the counter at
+  /// \param end_index: The exclusive limit of the loop
+  /// \param loop_index: The pre-declared symbol to use as the counter
+  /// \param body: The code that should be put in the body of the loop
+  /// \param location: The source location using for the increment instruction
+  static code_fort from_index_bounds(
+    exprt start_index,
+    exprt end_index,
+    symbol_exprt loop_index,
+    codet body,
+    source_locationt location);
+
 protected:
   using codet::op0;
   using codet::op1;
