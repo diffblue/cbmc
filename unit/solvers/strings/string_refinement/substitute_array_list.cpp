@@ -37,19 +37,19 @@ SCENARIO("substitute_array_list", "[core][solvers][strings][string_refinement]")
   // Check that `subst = e1 WITH [1:='y']`
   REQUIRE(subst.id() == ID_with);
   REQUIRE(subst.operands().size() == 3);
-  const exprt &e1 = subst.op0();
-  REQUIRE(subst.op1() == index1);
-  REQUIRE(subst.op2() == chary);
+  const exprt &e1 = to_with_expr(subst).old();
+  REQUIRE(to_with_expr(subst).where() == index1);
+  REQUIRE(to_with_expr(subst).new_value() == chary);
 
   // Check that `e1 = e2 WITH [0:='x']`
   REQUIRE(e1.id() == ID_with);
   REQUIRE(e1.operands().size() == 3);
-  const exprt &e2 = e1.op0();
-  REQUIRE(e1.op1() == index0);
-  REQUIRE(e1.op2() == charx);
+  const exprt &e2 = to_with_expr(e1).old();
+  REQUIRE(to_with_expr(e1).where() == index0);
+  REQUIRE(to_with_expr(e1).new_value() == charx);
 
   // Check that `e1 = ARRAY_OF 0`
   REQUIRE(e2.id() == ID_array_of);
   REQUIRE(e2.operands().size() == 1);
-  REQUIRE(e2.op0() == from_integer(0, char_type));
+  REQUIRE(to_array_of_expr(e2).op() == from_integer(0, char_type));
 }

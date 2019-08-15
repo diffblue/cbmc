@@ -16,9 +16,7 @@ TEST_CASE("Replace all symbols in expression", "[core][util][replace_symbol]")
   symbol_exprt s1("a", typet("some_type"));
   symbol_exprt s2("b", typet("some_type"));
 
-  exprt binary("binary", typet("some_type"));
-  binary.copy_to_operands(s1);
-  binary.copy_to_operands(s2);
+  binary_exprt binary(s1, "binary", s2, typet("some_type"));
 
   array_typet array_type(typet("sub-type"), s1);
   REQUIRE(array_type.size() == s1);
@@ -55,9 +53,11 @@ TEST_CASE("Lvalue only", "[core][util][replace_symbol]")
   symbol_exprt array("b", array_type);
   index_exprt index(array, s1);
 
-  exprt binary("binary", typet("some_type"));
-  binary.copy_to_operands(address_of_exprt(s1));
-  binary.copy_to_operands(address_of_exprt(index));
+  binary_exprt binary(
+    address_of_exprt(s1),
+    "binary",
+    address_of_exprt(index),
+    typet("some_type"));
 
   constant_exprt c("some_value", typet("some_type"));
 
@@ -86,9 +86,11 @@ TEST_CASE("Replace always", "[core][util][replace_symbol]")
   symbol_exprt array("b", array_type);
   index_exprt index(array, s1);
 
-  exprt binary("binary", typet("some_type"));
-  binary.copy_to_operands(address_of_exprt(s1));
-  binary.copy_to_operands(address_of_exprt(index));
+  binary_exprt binary(
+    address_of_exprt(s1),
+    "binary",
+    address_of_exprt(index),
+    typet("some_type"));
 
   constant_exprt c("some_value", typet("some_type"));
 
