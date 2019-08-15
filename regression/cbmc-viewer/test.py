@@ -51,11 +51,17 @@ def compareElements(e1, e2):
 def treeDiff():
     """Perform a structural diff to validate the generated HTML report."""
 
-    parser = etree.HTMLParser()
-    generateReportTree = etree.parse('html/index.html', parser)
-    correctReportTree = etree.parse('compare/html/index.html', parser)
-    return compareElements(generateReportTree.getroot(), correctReportTree.getroot())
-
+    try:
+        parser = etree.HTMLParser()
+        generateReportTree = etree.parse('html/index.html', parser)
+        correctReportTree = etree.parse('compare/html/index.html', parser)
+        return compareElements(generateReportTree.getroot(), correctReportTree.getroot())
+    except OSError:
+        print(os.getcwd())
+        for root, _, files in os.walk("."):
+            for name in files:
+                print(os.path.join(root, name))
+        raise
 
 def textualDiff():
     """Perform a textual diff to validate the generated HTML report."""
@@ -118,7 +124,7 @@ def main():
     print(total_tests, ('test' if total_tests == 1 else 'tests') + ' found\n')
 
     for test in glob(testdir + '*/'):      # for all test cases
-        print('  Running ', os.path.basename(test), end='')
+        print('  Running ' + os.path.basename(test.rstrip('/')), end='')
 
         options = open(test + '/test.desc', 'r').read()    # get CBMC flags
         options = options.replace("\n", "")
