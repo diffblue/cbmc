@@ -378,11 +378,10 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
         code_assert.assertion().operands().size()==2,
         "Instanceof should have 2 operands");
 
-      code=
-        check_class_cast(
-          code_assert.assertion().op0(),
-          code_assert.assertion().op1(),
-          code_assert.source_location());
+      const auto & instanceof = to_binary_expr(code_assert.assertion());
+
+      code = check_class_cast(
+        instanceof.op0(), instanceof.op1(), code_assert.source_location());
     }
   }
   else if(statement==ID_block)
@@ -494,20 +493,23 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
     {
       // this corresponds to a throw and so we check that
       // we don't throw null
-      result.add(check_null_dereference(expr.op0(), expr.source_location()));
+      result.add(check_null_dereference(
+        to_unary_expr(expr).op(), expr.source_location()));
     }
     else if(statement==ID_java_new_array)
     {
       // this corresponds to new array so we check that
       // length is >=0
-      result.add(check_array_length(expr.op0(), expr.source_location()));
+      result.add(check_array_length(
+        to_multi_ary_expr(expr).op0(), expr.source_location()));
     }
   }
   else if((expr.id()==ID_div || expr.id()==ID_mod) &&
           expr.type().id()==ID_signedbv)
   {
     // check division by zero (for integer types only)
-    result.add(check_arithmetic_exception(expr.op1(), expr.source_location()));
+    result.add(check_arithmetic_exception(
+      to_binary_expr(expr).op1(), expr.source_location()));
   }
   else if(expr.id()==ID_dereference &&
           expr.get_bool(ID_java_member_access))

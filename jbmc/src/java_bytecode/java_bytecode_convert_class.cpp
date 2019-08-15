@@ -914,10 +914,10 @@ void add_java_array_types(symbol_tablet &symbol_table)
 
     code_declt declare_index(index_symexpr);
 
-    side_effect_exprt inc(ID_assign, typet(), location);
-    inc.operands().resize(2);
-    inc.op0()=index_symexpr;
-    inc.op1()=plus_exprt(index_symexpr, from_integer(1, index_symexpr.type()));
+    side_effect_expr_assignt inc(
+      index_symexpr,
+      plus_exprt(index_symexpr, from_integer(1, index_symexpr.type())),
+      location);
 
     dereference_exprt old_cell(
       plus_exprt(old_data, index_symexpr), old_data.type().subtype());

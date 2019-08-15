@@ -83,12 +83,12 @@ bool remove_instanceoft::lower_instanceof(
     expr.operands().size()==2,
     "java_instanceof should have two operands");
 
-  const exprt &check_ptr=expr.op0();
+  const exprt &check_ptr = to_binary_expr(expr).op0();
   INVARIANT(
     check_ptr.type().id()==ID_pointer,
     "instanceof first operand should be a pointer");
 
-  const exprt &target_arg=expr.op1();
+  const exprt &target_arg = to_binary_expr(expr).op1();
   INVARIANT(
     target_arg.id()==ID_type,
     "instanceof second operand should be a type");

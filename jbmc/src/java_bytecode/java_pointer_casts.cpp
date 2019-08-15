@@ -21,7 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \return dereferenced pointer
 static exprt clean_deref(const exprt &ptr)
 {
-  return ptr.id() == ID_address_of ? ptr.op0() : dereference_exprt{ptr};
+  return ptr.id() == ID_address_of ? to_address_of_expr(ptr).object()
+                                   : dereference_exprt{ptr};
 }
 
 /// \par parameters: pointer
@@ -71,7 +72,7 @@ static const exprt &look_through_casts(const exprt &in)
   if(in.id()==ID_typecast)
   {
     assert(in.type().id()==ID_pointer);
-    return look_through_casts(in.op0());
+    return look_through_casts(to_typecast_expr(in).op());
   }
   else
     return in;
@@ -108,7 +109,7 @@ exprt make_clean_pointer_cast(
       bare_ptr.type().id()==ID_pointer &&
       "Non-pointer in make_clean_pointer_cast?");
     if(bare_ptr.type().subtype() == java_void_type())
-      bare_ptr=bare_ptr.op0();
+      bare_ptr = to_typecast_expr(bare_ptr).op();
   }
 
   assert(
