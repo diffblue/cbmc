@@ -181,6 +181,10 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
         constant_propagate_empty_string(state, symex_assign, f_l1);
         return true;
       }
+      else if(func_id == ID_cprover_string_substring_func)
+      {
+        return constant_propagate_string_substring(state, symex_assign, f_l1);
+      }
     }
   }
 
@@ -310,6 +314,26 @@ goto_symext::try_evaluate_constant_string(
   return try_get_string_data_array(s_pointer_opt->get(), ns);
 }
 
+optionalt<std::reference_wrapper<const constant_exprt>>
+goto_symext::try_evaluate_constant(const statet &state, const exprt &expr)
+{
+  if(expr.id() != ID_symbol)
+  {
+    return {};
+  }
+
+  const auto constant_expr_opt =
+    state.propagation.find(to_symbol_expr(expr).get_identifier());
+
+  if(!constant_expr_opt || constant_expr_opt->get().id() != ID_constant)
+  {
+    return {};
+  }
+
+  return optionalt<std::reference_wrapper<const constant_exprt>>(
+    to_constant_expr(constant_expr_opt->get()));
+}
+
 void goto_symext::constant_propagate_empty_string(
   statet &state,
   symex_assignt &symex_assign,
@@ -374,6 +398,93 @@ bool goto_symext::constant_propagate_string_concat(
   exprt::operandst operands(s1_data.operands());
   operands.insert(
     operands.end(), s2_data.operands().begin(), s2_data.operands().end());
+
+  const array_exprt new_char_array(std::move(operands), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_string_substring(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  const std::size_t num_operands = f_l1.arguments().size();
+
+  PRECONDITION(num_operands >= 4);
+  PRECONDITION(num_operands <= 5);
+
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
+  const auto s_data_opt = try_evaluate_constant_string(state, s.content());
+
+  if(!s_data_opt)
+    return false;
+
+  const array_exprt &s_data = s_data_opt->get();
+
+  mp_integer end_index;
+
+  if(num_operands == 5)
+  {
+    const auto end_index_expr_opt =
+      try_evaluate_constant(state, f_l1.arguments().at(4));
+
+    if(!end_index_expr_opt)
+    {
+      return false;
+    }
+
+    end_index =
+      numeric_cast_v<mp_integer>(to_constant_expr(*end_index_expr_opt));
+
+    if(end_index < 0 || end_index > s_data.operands().size())
+    {
+      return false;
+    }
+  }
+  else
+  {
+    end_index = s_data.operands().size();
+  }
+
+  const auto start_index_expr_opt =
+    try_evaluate_constant(state, f_l1.arguments().at(3));
+
+  if(!start_index_expr_opt)
+  {
+    return false;
+  }
+
+  const mp_integer start_index =
+    numeric_cast_v<mp_integer>(to_constant_expr(*start_index_expr_opt));
+
+  if(start_index < 0 || start_index > end_index)
+  {
+    return false;
+  }
+
+  const constant_exprt new_char_array_length =
+    from_integer(end_index - start_index, length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+
+  exprt::operandst operands(
+    std::next(
+      s_data.operands().begin(), numeric_cast_v<std::size_t>(start_index)),
+    std::next(
+      s_data.operands().begin(), numeric_cast_v<std::size_t>(end_index)));
 
   const array_exprt new_char_array(std::move(operands), new_char_array_type);
 
