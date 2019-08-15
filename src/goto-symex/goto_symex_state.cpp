@@ -44,7 +44,7 @@ goto_symex_statet::goto_symex_statet(
     fresh_l2_name_provider(fresh_l2_name_provider)
 {
   threads.emplace_back(guard_manager);
-  call_stack().new_frame(source);
+  call_stack().new_frame(source, guardt(true_exprt(), manager));
 }
 
 goto_symex_statet::~goto_symex_statet()=default;

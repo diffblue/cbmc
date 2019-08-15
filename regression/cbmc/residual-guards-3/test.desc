@@ -1,0 +1,14 @@
+CORE paths-lifo-expected-failure
+test.c
+--show-vcc --depth 1000
+^\{1\} main::argc!0@1#1 = 1$
+^EXIT=0$
+^SIGNAL=0$
+--
+^\{-[0-9]+\} f::y!0@1#[0-9]+ = 10$
+--
+This checks that the assertion, argc == 1, is unguarded (i.e. is not of the form 
+'guard => condition'). Such a guard is redundant, but could be added before goto-symex
+made sure to restore guards to their state at function entry.
+We also check that no VCC is created for the unreachable code 'y = 10;'
+--paths mode is excluded as it currently always accrues large guards as it proceeds through execution

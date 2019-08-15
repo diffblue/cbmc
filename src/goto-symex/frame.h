@@ -27,7 +27,7 @@ struct framet
   std::map<goto_programt::const_targett, goto_state_listt> goto_state_map;
   symex_targett::sourcet calling_location;
   std::vector<irep_idt> parameter_names;
-
+  guardt guard_at_function_start;
   goto_programt::const_targett end_of_function;
   exprt return_value = nil_exprt();
   bool hidden_function = false;
@@ -48,8 +48,9 @@ struct framet
 
   std::unordered_map<irep_idt, loop_infot> loop_iterations;
 
-  explicit framet(symex_targett::sourcet _calling_location)
-    : calling_location(std::move(_calling_location))
+  framet(symex_targett::sourcet _calling_location, const guardt &state_guard)
+    : calling_location(std::move(_calling_location)),
+      guard_at_function_start(state_guard)
   {
   }
 };

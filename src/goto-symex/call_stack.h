@@ -26,9 +26,10 @@ public:
     return back();
   }
 
-  framet &new_frame(symex_targett::sourcet calling_location)
+  framet &
+  new_frame(symex_targett::sourcet calling_location, const guardt &guard)
   {
-    emplace_back(calling_location);
+    emplace_back(calling_location, guard);
     return back();
   }
 

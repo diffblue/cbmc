@@ -528,7 +528,13 @@ void goto_symext::execute_next_instruction(
 
   // depth exceeded?
   if(symex_config.max_depth != 0 && state.depth > symex_config.max_depth)
+  {
+    // Rule out this path:
+    symex_assume_l2(state, false_exprt());
+    // Disable processing instructions until we next encounter one reachable
+    // without passing this instruction:
     state.guard.add(false_exprt());
+  }
   state.depth++;
 
   // actually do instruction

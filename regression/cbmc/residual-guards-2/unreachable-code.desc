@@ -1,0 +1,9 @@
+FUTURE
+test.c
+--show-vcc --unwind 10
+^EXIT=0$
+^SIGNAL=0$
+--
+^\{-[0-9]+\} f::y!0@1#[0-9]+ = 10$
+--
+We also check that no VCC is created for the unreachable code 'y = 10;'

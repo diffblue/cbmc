@@ -258,7 +258,10 @@ void goto_symext::symex_function_call_code(
       if(symex_config.unwinding_assertions)
         vcc(false_exprt(), "recursion unwinding assertion", state);
 
-      // add to state guard to prevent further assignments
+      // Rule out this path:
+      symex_assume_l2(state, false_exprt());
+      // Disable processing instructions until we next encounter one reachable
+      // without passing this instruction:
       state.guard.add(false_exprt());
     }
 
@@ -303,7 +306,7 @@ void goto_symext::symex_function_call_code(
 
   // produce a new frame
   PRECONDITION(!state.call_stack().empty());
-  framet &frame = state.call_stack().new_frame(state.source);
+  framet &frame = state.call_stack().new_frame(state.source, state.guard);
 
   // preserve locality of local variables
   locality(identifier, state, path_storage, goto_function, ns);
@@ -332,8 +335,10 @@ void goto_symext::symex_function_call_code(
 }
 
 /// pop one call frame
-static void
-pop_frame(goto_symext::statet &state, const path_storaget &path_storage)
+static void pop_frame(
+  goto_symext::statet &state,
+  const path_storaget &path_storage,
+  bool doing_path_exploration)
 {
   PRECONDITION(!state.call_stack().empty());
 
@@ -346,6 +351,26 @@ pop_frame(goto_symext::statet &state, const path_storaget &path_storage)
 
     // restore L1 renaming
     state.level1.restore_from(frame.old_level1);
+
+    // If the program is multi-threaded then the state guard is used to
+    // accumulate assumptions (in symex_assume_l2) and must be left alone.
+    // If however it is single-threaded then we should restore the guard, as the
+    // guard coming out of the function may be more complex (e.g. if the callee
+    // was { if(x) __CPROVER_assume(false); } then the guard may still be `!x`),
+    // but at this point all control-flow paths have either converged or been
+    // proven unviable, so we can stop specifying the callee's constraints when
+    // we generate an assumption or VCC.
+
+    // If the guard is false, *this* path is unviable and we shouldn't discard
+    // that knowledge. If we're doing path exploration then we do
+    // tail-duplication, and we actually *are* in a more-restricted context
+    // than we were when the function began.
+    if(
+      state.threads.size() == 1 && !state.guard.is_false() &&
+      !doing_path_exploration)
+    {
+      state.guard = frame.guard_at_function_start;
+    }
 
     symex_renaming_levelt::viewt view;
     state.get_level2().current_names.get_view(view);
@@ -387,7 +412,7 @@ void goto_symext::symex_end_of_function(statet &state)
     state.guard.as_expr(), state.source.function_id, state.source, hidden);
 
   // then get rid of the frame
-  pop_frame(state, path_storage);
+  pop_frame(state, path_storage, symex_config.doing_path_exploration);
 }
 
 /// Preserves locality of parameters of a given function by applying L1
