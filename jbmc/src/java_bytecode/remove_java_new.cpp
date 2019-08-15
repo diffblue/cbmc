@@ -275,12 +275,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     CHECK_RETURN(sub_type.id() == ID_pointer);
     sub_java_new.type() = sub_type;
 
-    side_effect_exprt inc(ID_assign, typet(), location);
-    inc.operands().resize(2);
-    to_binary_expr(inc).op0() = tmp_i;
-    to_binary_expr(inc).op1() =
       plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
-
     dereference_exprt deref_expr(
       plus_exprt(data, tmp_i), data.type().subtype());
 
@@ -299,11 +294,12 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
       deref_expr, typecast_exprt(init_sym, deref_expr.type()));
     for_body.add(std::move(assign_subarray));
 
-    const code_fort for_loop(
-      code_assignt(tmp_i, from_integer(0, tmp_i.type())),
-      binary_relation_exprt(tmp_i, ID_lt, to_multi_ary_expr(rhs).op0()),
-      std::move(inc),
-      std::move(for_body));
+    const code_fort for_loop = code_fort::from_index_bounds(
+      from_integer(0, tmp_i.type()),
+      to_multi_ary_expr(rhs).op0(),
+      tmp_i,
+      std::move(for_body),
+      location);
 
     goto_convert(for_loop, symbol_table, tmp, get_message_handler(), ID_java);
 
