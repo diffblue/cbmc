@@ -68,7 +68,11 @@ def textualDiff():
 
     diff_file = open("diff.log", "w")
     cmd = "diff -r compare/html html/"
-    subprocess.Popen(cmd, stdout=diff_file, shell=True)
+    res = subprocess.Popen(cmd, stdout=diff_file, shell=True)
+    _, error = res.communicate()
+    if error:
+        print(cmd + " failed")
+
     return os.stat("diff.log").st_size == 0
 
 
@@ -77,28 +81,50 @@ def generateReport(options):
 
     try:
         cmd = "goto-cc *.c -o source.goto"
-        subprocess.call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        subprocess.call(cmd,
+                        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                        shell=True)
 
         cmd = "goto-instrument source.goto proofs.goto"
-        subprocess.call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        subprocess.call(cmd,
+                        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                        shell=True)
 
         output_file = open("cbmc.log", "w")
         cmd = "cbmc proofs.goto " + options + " --trace"
-        subprocess.Popen(cmd, stdout=output_file, stderr=subprocess.PIPE, shell=True)
+        res = subprocess.Popen(cmd,
+                               stdout=output_file, stderr=subprocess.PIPE,
+                               shell=True)
+        _, error = res.communicate()
+        if error:
+            print(cmd + " failed")
 
         property_file = open("property.xml", "w")
         cmd = cmd.replace('--trace', '--show-properties --xml-ui')
-        subprocess.Popen(cmd, stdout=property_file, stderr=subprocess.PIPE, shell=True)
+        res = subprocess.Popen(cmd,
+                               stdout=property_file, stderr=subprocess.PIPE,
+                               shell=True)
+        _, error = res.communicate()
+        if error:
+            print(cmd + " failed")
 
         options.replace('--unwinding-assertions', '')
         coverage_file = open("coverage.xml", "w")
         cmd = cmd.replace("--unwinding-assertions --show-properties", "--cover location")
-        subprocess.Popen(cmd, stdout=coverage_file, stderr=subprocess.PIPE, shell=True)
+        res = subprocess.Popen(cmd,
+                               stdout=coverage_file, stderr=subprocess.PIPE,
+                               shell=True)
+        _, error = res.communicate()
+        if error:
+            print(cmd + " failed")
 
         cmd = "cbmc-viewer --goto proofs.goto --srcdir $PWD --blddir $PWD --htmldir html "
         cmd += "--result cbmc.log --property property.xml --block coverage.xml "
         cmd += "--json-summary summary.json > /dev/null 2>&1"
-        subprocess.call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        subprocess.call(cmd,
+                        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                        shell=True)
+
     except OSError as err:
         logging.error("Can't run command '%s': %s", cmd, str(err))
         return
