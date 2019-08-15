@@ -121,7 +121,9 @@ static optionalt<irep_idt> interface_method_id(
       << functional_interface_tag.get_identifier()
       << " which should have exactly one abstract method but actually has "
       << implemented_interface_type.methods().size()
-      << ". Note default methods are not supported yet." << messaget::eom;
+      << ". Note default methods are not supported yet."
+      << "Also note methods declared in an inherited interface are not "
+      << "supported either." << messaget::eom;
     return {};
   }
   return implemented_interface_type.methods().at(0).get_name();
