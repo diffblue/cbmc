@@ -264,18 +264,6 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_concat_code_point(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_insert_func)
     return add_axioms_for_insert(fresh_symbol, expr, array_pool);
-  else if(id == ID_cprover_string_insert_int_func)
-    return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
-  else if(id == ID_cprover_string_insert_long_func)
-    return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
-  else if(id == ID_cprover_string_insert_bool_func)
-    return add_axioms_for_insert_bool(fresh_symbol, expr, array_pool);
-  else if(id == ID_cprover_string_insert_char_func)
-    return add_axioms_for_insert_char(fresh_symbol, expr, array_pool);
-  else if(id == ID_cprover_string_insert_double_func)
-    return add_axioms_for_insert_double(fresh_symbol, expr, array_pool, ns);
-  else if(id == ID_cprover_string_insert_float_func)
-    return add_axioms_for_insert_float(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_substring_func)
     return add_axioms_for_substring(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_trim_func)
