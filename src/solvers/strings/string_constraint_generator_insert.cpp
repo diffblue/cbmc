@@ -118,27 +118,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  PRECONDITION(f.arguments().size() == 5 || f.arguments().size() == 7);
-  array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
-  array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[4]);
-  array_string_exprt res = array_pool.find(f.arguments()[1], f.arguments()[0]);
+  PRECONDITION(f.arguments().size() == 5);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
+  const array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[4]);
+  const array_string_exprt res =
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
-  if(f.arguments().size() == 7)
-  {
-    const exprt &start = f.arguments()[5];
-    const exprt &end = f.arguments()[6];
-    const typet &char_type = s1.content().type().subtype();
-    const typet &index_type = s1.length_type();
-    const array_string_exprt substring =
-      array_pool.fresh_string(index_type, char_type);
-    return combine_results(
-      add_axioms_for_substring(
-        fresh_symbol, substring, s2, start, end, array_pool),
-      add_axioms_for_insert(
-        fresh_symbol, res, s1, substring, offset, array_pool));
-  }
-  else // 5 arguments
-  {
-    return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool);
-  }
+  return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool);
 }
