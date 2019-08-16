@@ -2490,11 +2490,11 @@ code_blockt java_bytecode_convert_methodt::convert_newarray(
   exprt::operandst &results)
 {
   java_reference_typet ref_type = [&]() {
-    char element_type;
     if(statement == "newarray")
     {
       irep_idt id = arg0.type().id();
 
+      char element_type;
       if(id == ID_bool)
         element_type = 'z';
       else if(id == ID_char)
@@ -2513,12 +2513,12 @@ code_blockt java_bytecode_convert_methodt::convert_newarray(
         element_type = 'j';
       else
         element_type = '?';
+      return java_array_type(element_type);
     }
     else
     {
-      element_type = 'a';
+      return java_reference_array_type(to_struct_tag_type(arg0.type()));
     }
-    return java_array_type(element_type);
   }();
 
   side_effect_exprt java_new_array(ID_java_new_array, ref_type, location);

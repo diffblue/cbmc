@@ -18,6 +18,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <java_bytecode/java_types.h>
 
+#include <util/arith_tools.h>
+
 #include <sstream>
 
 class remove_instanceoft
@@ -81,10 +83,10 @@ static exprt subtype_expr(
     });
 
   exprt::operandst or_ops;
-  for(const auto &clsname : children)
+  for(const auto &class_name : children)
   {
-    constant_exprt clsexpr(clsname, string_typet());
-    equal_exprt test(classid_field, clsexpr);
+    constant_exprt class_expr(class_name, string_typet());
+    equal_exprt test(classid_field, class_expr);
     or_ops.push_back(test);
   }
 
@@ -127,22 +129,35 @@ bool remove_instanceoft::lower_instanceof(
   INVARIANT(
     target_arg.id()==ID_type,
     "instanceof second operand should be a type");
-  const typet &target_type=target_arg.type();
 
   INVARIANT(
-    target_type.id() == ID_struct_tag,
+    target_arg.type().id() == ID_struct_tag,
     "instanceof second operand should have a simple type");
-  const irep_idt &target_name =
-    to_struct_tag_type(target_type).get_identifier();
 
-  auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
-  exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
+  const auto &target_type = to_struct_tag_type(target_arg.type());
 
-  // Replace the instanceof operation with (check_ptr != null &&
-  //  (check_ptr->@class_identifier == "A" ||
-  //   check_ptr->@class_identifier == "B" || ...
+  const auto underlying_type_and_dimension =
+    java_array_dimension_and_element_type(target_type);
 
-  // By operating directly on a pointer rather than using a temporary
+  bool target_type_is_reference_array =
+    underlying_type_and_dimension.second >= 1 &&
+    can_cast_type<java_reference_typet>(underlying_type_and_dimension.first);
+
+  // If we're casting to a reference array type, check
+  //   @class_identifier == "java::array[reference]" &&
+  //   @array_dimension == target_array_dimension &&
+  //   @array_element_type (subtype of) target_array_element_type
+  // Otherwise just check
+  //   @class_identifier (subtype of) target_type
+
+  // Exception: when the target type is Object, nothing needs checking; when
+  // it is Object[], Object[][] etc, then we check that
+  // @array_dimension >= target_array_dimension (because
+  // String[][] (subtype of) Object[] for example) and don't check the element
+  // type.
+
+  // All tests are made directly against a pointer to the object whose type is
+  // queried. By operating directly on a pointer rather than using a temporary
   // (x->@clsid == "A" rather than id = x->@clsid; id == "A") we enable symex's
   // value-set filtering to discard no-longer-viable candidates for "x" (in the
   // case where 'x' is a symbol, not a general expression like x->y->@clsid).
@@ -151,13 +166,54 @@ bool remove_instanceoft::lower_instanceof(
   // and less pessimistic aliasing assumptions possibly causing goto-symex to
   // explore in-fact-unreachable paths.
 
-  exprt subtype_check =
-    subtype_expr(object_clsid, target_name, class_hierarchy);
+  // In all cases require the input pointer is not null for any cast to succeed:
 
-  notequal_exprt not_null(
-    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
+  std::vector<exprt> test_conjuncts;
+  test_conjuncts.push_back(notequal_exprt(
+    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type()))));
 
-  expr = and_exprt(not_null, subtype_check);
+  auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
+
+  exprt object_class_identifier_field =
+    get_class_identifier_field(check_ptr, jlo, ns);
+
+  if(target_type_is_reference_array)
+  {
+    const auto &underlying_type =
+      to_struct_tag_type(underlying_type_and_dimension.first.subtype());
+
+    test_conjuncts.push_back(equal_exprt(
+      object_class_identifier_field,
+      constant_exprt(JAVA_REFERENCE_ARRAY_CLASSID, string_typet())));
+
+    exprt object_array_dimension = get_array_dimension_field(check_ptr);
+    constant_exprt target_array_dimension = from_integer(
+      underlying_type_and_dimension.second, object_array_dimension.type());
+
+    if(underlying_type == jlo)
+    {
+      test_conjuncts.push_back(binary_relation_exprt(
+        object_array_dimension, ID_ge, target_array_dimension));
+    }
+    else
+    {
+      test_conjuncts.push_back(
+        equal_exprt(object_array_dimension, target_array_dimension));
+      test_conjuncts.push_back(subtype_expr(
+        get_array_element_type_field(check_ptr),
+        underlying_type.get_identifier(),
+        class_hierarchy));
+    }
+  }
+  else if(target_type != jlo)
+  {
+    test_conjuncts.push_back(subtype_expr(
+      get_class_identifier_field(check_ptr, jlo, ns),
+      target_type.get_identifier(),
+      class_hierarchy));
+  }
+
+  expr = conjunction(test_conjuncts);
 
   return true;
 }

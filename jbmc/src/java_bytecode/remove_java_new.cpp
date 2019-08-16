@@ -134,7 +134,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   PRECONDITION(rhs.type().id() == ID_pointer);
 
   source_locationt location = rhs.source_location();
-  typet object_type = rhs.type().subtype();
+  struct_tag_typet object_type = to_struct_tag_type(rhs.type().subtype());
   PRECONDITION(ns.follow(object_type).id() == ID_struct);
 
   // build size expression
@@ -153,21 +153,52 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 
   const struct_typet &struct_type = to_struct_type(ns.follow(object_type));
 
-  // Ideally we would have a check for `is_valid_java_array(struct_type)` but
-  // `is_valid_java_array is part of the java_bytecode module and we cannot
-  // introduce such dependencies. We do this simple check instead:
-  PRECONDITION(struct_type.components().size() == 3);
+  PRECONDITION(is_valid_java_array(struct_type));
 
   // Init base class:
   dereference_exprt deref(lhs, object_type);
   auto zero_object = zero_initializer(object_type, location, ns);
   CHECK_RETURN(zero_object.has_value());
-  set_class_identifier(
-    to_struct_expr(*zero_object), ns, to_struct_tag_type(object_type));
+  set_class_identifier(to_struct_expr(*zero_object), ns, object_type);
   dest.insert_before(
     next,
     goto_programt::make_assignment(
       code_assignt(deref, *zero_object), location));
+
+  // If it's a reference array we need to set the dimension and element type
+  // fields. Primitive array types don't have these fields; if the element type
+  // is a void pointer then the element type is statically unknown and the
+  // caller must set these up itself. This happens in array[reference].clone(),
+  // where the type info must be copied over from the input array)
+  const auto underlying_type_and_dimension =
+    java_array_dimension_and_element_type(object_type);
+
+  bool target_type_is_reference_array =
+    underlying_type_and_dimension.second >= 1 &&
+    can_cast_type<java_reference_typet>(underlying_type_and_dimension.first);
+
+  if(target_type_is_reference_array)
+  {
+    exprt object_array_dimension = get_array_dimension_field(lhs);
+    dest.insert_before(
+      next,
+      goto_programt::make_assignment(code_assignt(
+        object_array_dimension,
+        from_integer(
+          underlying_type_and_dimension.second, object_array_dimension.type()),
+        location)));
+
+    exprt object_array_element_type = get_array_element_type_field(lhs);
+    dest.insert_before(
+      next,
+      goto_programt::make_assignment(code_assignt(
+        object_array_element_type,
+        constant_exprt(
+          to_struct_tag_type(underlying_type_and_dimension.first.subtype())
+            .get_identifier(),
+          string_typet()),
+        location)));
+  }
 
   // if it's an array, we need to set the length field
   member_exprt length(

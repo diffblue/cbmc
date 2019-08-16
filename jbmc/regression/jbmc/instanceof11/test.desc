@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.test
+^\[java::Test\.test:\(Z\)V.assertion\.1\] line 7 assertion.*: SUCCESS$
+^\[java::Test\.test:\(Z\)V.assertion\.2\] line 8 assertion.*: SUCCESS$
+^\[java::Test\.test:\(Z\)V.assertion\.3\] line 10 assertion.*: FAILURE$
+^\[java::Test\.test:\(Z\)V.assertion\.4\] line 12 assertion.*: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$

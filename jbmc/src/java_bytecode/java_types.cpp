@@ -200,6 +200,31 @@ java_array_dimension_and_element_type(const struct_tag_typet &type)
   return {underlying_type, array_dimensions};
 }
 
+/// \param pointer: pointer to an array[reference] object
+/// \return member expression to access its array dimension field
+exprt get_array_dimension_field(const exprt &pointer)
+{
+  PRECONDITION(pointer.type().id() == ID_pointer);
+
+  struct_tag_typet java_reference_array_type(JAVA_REFERENCE_ARRAY_CLASSID);
+  exprt deref = dereference_exprt(typecast_exprt::conditional_cast(
+    pointer, java_reference_type(java_reference_array_type)));
+  return member_exprt(deref, JAVA_ARRAY_DIMENSION_FIELD_NAME, java_int_type());
+}
+
+/// \param pointer: pointer to an array[reference] object
+/// \return member expression to access its array element_type field
+exprt get_array_element_type_field(const exprt &pointer)
+{
+  PRECONDITION(pointer.type().id() == ID_pointer);
+
+  struct_tag_typet java_reference_array_type(JAVA_REFERENCE_ARRAY_CLASSID);
+  exprt deref = dereference_exprt(typecast_exprt::conditional_cast(
+    pointer, java_reference_type(java_reference_array_type)));
+  return member_exprt(
+    deref, JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME, string_typet());
+}
+
 /// See above
 /// \param tag: Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix
@@ -512,6 +537,13 @@ size_t find_closing_semi_colon_for_reference_type(
   return next_semi_colon;
 }
 
+java_reference_typet java_reference_array_type(const struct_tag_typet &subtype)
+{
+  java_reference_typet result = java_array_type('a');
+  result.subtype().set(ID_element_type, java_reference_type(subtype));
+  return result;
+}
+
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
@@ -623,9 +655,14 @@ optionalt<typet> java_type_from_string(
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
-      typet tmp=java_array_type(std::tolower(subtype_letter));
-      tmp.subtype().set(ID_element_type, std::move(*subtype));
-      return std::move(tmp);
+      subtype_letter = std::tolower(subtype_letter);
+      if(subtype_letter == 'a')
+      {
+        return java_reference_array_type(
+          to_struct_tag_type(subtype->subtype()));
+      }
+      else
+        return java_array_type(subtype_letter);
     }
 
   case 'B': return java_byte_type();
@@ -796,7 +833,9 @@ struct_tag_typet java_classname(const std::string &id)
 /// \return True if it is a Java array type, false otherwise
 bool is_valid_java_array(const struct_typet &type)
 {
-  bool correct_num_components=type.components().size()==3;
+  bool correct_num_components =
+    type.components().size() ==
+    (type.get_tag() == JAVA_REFERENCE_ARRAY_CLASSID ? 5 : 3);
   if(!correct_num_components)
     return false;
 
@@ -804,25 +843,43 @@ bool is_valid_java_array(const struct_typet &type)
   const struct_union_typet::componentt base_class_component=
     type.components()[0];
 
-  bool base_component_valid=true;
-  base_component_valid&=base_class_component.get_name()=="@java.lang.Object";
+  if(base_class_component.get_name() != "@java.lang.Object")
+    return false;
 
-  bool length_component_valid=true;
   const struct_union_typet::componentt length_component=
     type.components()[1];
-  length_component_valid&=length_component.get_name()=="length";
-  length_component_valid&=length_component.type()==java_int_type();
+  if(length_component.get_name() != "length")
+    return false;
+  if(length_component.type() != java_int_type())
+    return false;
 
-  bool data_component_valid=true;
   const struct_union_typet::componentt data_component=
     type.components()[2];
-  data_component_valid&=data_component.get_name()=="data";
-  data_component_valid&=data_component.type().id()==ID_pointer;
+  if(data_component.get_name() != "data")
+    return false;
+  if(data_component.type().id() != ID_pointer)
+    return false;
 
-  return correct_num_components &&
-    base_component_valid &&
-    length_component_valid &&
-    data_component_valid;
+  if(type.get_tag() == JAVA_REFERENCE_ARRAY_CLASSID)
+  {
+    const struct_union_typet::componentt array_element_type_component =
+      type.components()[3];
+    if(
+      array_element_type_component.get_name() !=
+      JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME)
+      return false;
+    if(array_element_type_component.type() != string_typet())
+      return false;
+
+    const struct_union_typet::componentt array_dimension_component =
+      type.components()[4];
+    if(array_dimension_component.get_name() != JAVA_ARRAY_DIMENSION_FIELD_NAME)
+      return false;
+    if(array_dimension_component.type() != java_int_type())
+      return false;
+  }
+
+  return true;
 }
 
 /// Compares the types, including checking element types if both types are

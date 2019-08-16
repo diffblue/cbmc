@@ -829,6 +829,26 @@ void add_java_array_types(symbol_tablet &symbol_table)
     data_component.set_base_name("data");
     class_type.components().push_back(data_component);
 
+    if(l == 'a')
+    {
+      // This is a reference array (java::array[reference]). Add extra fields to
+      // carry the innermost element type and array dimension.
+      java_class_typet::componentt array_element_classid_component(
+        JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME, string_typet());
+      array_element_classid_component.set_pretty_name(
+        JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME);
+      array_element_classid_component.set_base_name(
+        JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME);
+      class_type.components().push_back(array_element_classid_component);
+
+      java_class_typet::componentt array_dimension_component(
+        JAVA_ARRAY_DIMENSION_FIELD_NAME, java_int_type());
+      array_dimension_component.set_pretty_name(
+        JAVA_ARRAY_DIMENSION_FIELD_NAME);
+      array_dimension_component.set_base_name(JAVA_ARRAY_DIMENSION_FIELD_NAME);
+      class_type.components().push_back(array_dimension_component);
+    }
+
     class_type.add_base(struct_tag_typet("java::java.lang.Object"));
 
     INVARIANT(
@@ -888,6 +908,29 @@ void add_java_array_types(symbol_tablet &symbol_table)
     java_new_array.copy_to_operands(old_length);
     code_assignt create_blank(local_symexpr, java_new_array);
 
+    codet copy_type_information = code_skipt();
+    if(l == 'a')
+    {
+      // Reference arrays carry additional type information in their classids
+      // which should be copied:
+      const auto &array_dimension_component =
+        class_type.get_component(JAVA_ARRAY_DIMENSION_FIELD_NAME);
+      const auto &array_element_classid_component =
+        class_type.get_component(JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME);
+
+      member_exprt old_array_dimension(old_array, array_dimension_component);
+      member_exprt old_array_element_classid(
+        old_array, array_element_classid_component);
+
+      member_exprt new_array_dimension(new_array, array_dimension_component);
+      member_exprt new_array_element_classid(
+        new_array, array_element_classid_component);
+
+      copy_type_information = code_blockt{
+        {code_assignt(new_array_dimension, old_array_dimension),
+         code_assignt(new_array_element_classid, old_array_element_classid)}};
+    }
+
     member_exprt old_data(
       old_array, data_component.get_name(), data_component.type());
     member_exprt new_data(
@@ -933,8 +976,12 @@ void add_java_array_types(symbol_tablet &symbol_table)
     address_of_exprt retval(new_base_class);
     code_returnt return_inst(retval);
 
-    const code_blockt clone_body(
-      {declare_cloned, create_blank, declare_index, copy_loop, return_inst});
+    const code_blockt clone_body({declare_cloned,
+                                  create_blank,
+                                  copy_type_information,
+                                  declare_index,
+                                  copy_loop,
+                                  return_inst});
 
     symbolt clone_symbol;
     clone_symbol.name=clone_name;

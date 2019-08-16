@@ -598,7 +598,11 @@ reference_typet java_reference_type(const typet &subtype);
 java_reference_typet java_lang_object_type();
 struct_tag_typet java_classname(const std::string &);
 
+#define JAVA_REFERENCE_ARRAY_CLASSID "java::array[reference]"
+
 java_reference_typet java_array_type(const char subtype);
+java_reference_typet
+java_reference_array_type(const struct_tag_typet &element_type);
 const typet &java_array_element_type(const struct_tag_typet &array_symbol);
 typet &java_array_element_type(struct_tag_typet &array_symbol);
 bool is_java_array_type(const typet &type);
@@ -606,6 +610,11 @@ bool is_multidim_java_array_type(const typet &type);
 
 std::pair<typet, std::size_t>
 java_array_dimension_and_element_type(const struct_tag_typet &type);
+
+#define JAVA_ARRAY_DIMENSION_FIELD_NAME "@array_dimensions"
+exprt get_array_dimension_field(const exprt &pointer);
+#define JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME "@element_class_identifier"
+exprt get_array_element_type_field(const exprt &pointer);
 
 typet java_type_from_char(char t);
 optionalt<typet> java_type_from_string(
