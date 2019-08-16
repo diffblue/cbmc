@@ -212,4 +212,82 @@ public:
   }
 };
 
+// The most precise form of storage
+class history_sensitive_storaget : public trace_map_storaget
+{
+protected:
+  typedef std::map<trace_ptrt, state_ptrt, ai_history_baset::compare_historyt>
+    domain_mapt;
+  domain_mapt domain_map;
+
+public:
+  cstate_ptrt abstract_state_before(
+    trace_ptrt p,
+    const ai_domain_factory_baset &fac) const override
+  {
+    auto it = domain_map.find(p);
+    if(it == domain_map.end())
+      return fac.make(p->current_location());
+
+    return it->second;
+  }
+
+  cstate_ptrt abstract_state_before(
+    locationt t,
+    const ai_domain_factory_baset &fac) const override
+  {
+    auto traces = abstract_traces_before(t);
+
+    if(traces->size() == 0)
+    {
+      return fac.make(t);
+    }
+    else if(traces->size() == 1)
+    {
+      auto it = domain_map.find(*(traces->begin()));
+      DATA_INVARIANT(
+        it != domain_map.end(), "domain_map must be in sync with trace_map");
+      return it->second;
+    }
+    else
+    {
+      // Need to merge all of the traces that reach this location
+      auto res = fac.make(t);
+
+      for(auto p : *traces)
+      {
+        auto it = domain_map.find(p);
+        DATA_INVARIANT(
+          it != domain_map.end(), "domain_map must be in sync with trace_map");
+        fac.merge(*res, *(it->second), p, p);
+      }
+
+      return cstate_ptrt(res.release());
+    }
+  }
+
+  statet &get_state(trace_ptrt p, const ai_domain_factory_baset &fac) override
+  {
+    register_trace(p);
+
+    auto it = domain_map.find(p);
+    if(it == domain_map.end())
+    {
+      std::shared_ptr<statet> d(fac.make(p->current_location()));
+      auto jt = domain_map.emplace(p, d);
+      CHECK_RETURN(jt.second);
+      it = jt.first;
+    }
+
+    return *(it->second);
+  }
+
+  void clear() override
+  {
+    trace_map_storaget::clear();
+    domain_map.clear();
+    return;
+  }
+};
+
 #endif
