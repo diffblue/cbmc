@@ -3,5 +3,5 @@ IntegerTests.class
 --max-nondet-string-length 100 --function IntegerTests.testMySet
 ^EXIT=10$
 ^SIGNAL=0$
-assertion at file IntegerTests.java line 20 .*: FAILURE
-assertion at file IntegerTests.java line 23 .*: FAILURE
+assertion at file IntegerTests.java line 21 .*: FAILURE
+assertion at file IntegerTests.java line 24 .*: FAILURE

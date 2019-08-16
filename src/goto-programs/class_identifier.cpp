@@ -71,18 +71,10 @@ exprt get_class_identifier_field(
   return build_class_identifier(deref, ns);
 }
 
-/// If expr has its components filled in then sets the `@class_identifier`
-/// member of the struct
-/// \remarks Follows through base class members until it gets to the object
-///   type that contains the `@class_identifier` member
-/// \param expr: An expression that represents a struct
-/// \param ns: The namespace used to resolve symbol references in the type of
-///   the struct
-/// \param class_type: A symbol whose identifier is the name of the class
 void set_class_identifier(
   struct_exprt &expr,
   const namespacet &ns,
-  const struct_tag_typet &class_type)
+  const irep_idt &class_id)
 {
   const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));
   const struct_typet::componentst &components=struct_type.components();
@@ -96,13 +88,29 @@ void set_class_identifier(
   {
     INVARIANT(
       expr.op0().id()==ID_constant, "@class_identifier must be a constant");
-    expr.op0()=constant_exprt(class_type.get_identifier(), string_typet());
+    expr.op0() = constant_exprt(class_id, string_typet());
   }
   else
   {
     // The first member must be the base class
     INVARIANT(
       expr.op0().id()==ID_struct, "Non @class_identifier must be a structure");
-    set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
+    set_class_identifier(to_struct_expr(expr.op0()), ns, class_id);
   }
+}
+
+/// If expr has its components filled in then sets the `@class_identifier`
+/// member of the struct
+/// \remarks Follows through base class members until it gets to the object
+///   type that contains the `@class_identifier` member
+/// \param expr: An expression that represents a struct
+/// \param ns: The namespace used to resolve symbol references in the type of
+///   the struct
+/// \param class_type: A symbol whose identifier is the name of the class
+void set_class_identifier(
+  struct_exprt &expr,
+  const namespacet &ns,
+  const struct_tag_typet &class_type)
+{
+  set_class_identifier(expr, ns, class_type.get_identifier());
 }

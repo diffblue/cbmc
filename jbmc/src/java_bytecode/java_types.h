@@ -599,6 +599,9 @@ java_reference_typet java_lang_object_type();
 struct_tag_typet java_classname(const std::string &);
 
 java_reference_typet java_array_type(const char subtype);
+java_reference_typet
+java_reference_array_type(const struct_tag_typet &element_type);
+irep_idt java_classid_for_type(const struct_tag_typet &tag);
 const typet &java_array_element_type(const struct_tag_typet &array_symbol);
 typet &java_array_element_type(struct_tag_typet &array_symbol);
 bool is_java_array_type(const typet &type);

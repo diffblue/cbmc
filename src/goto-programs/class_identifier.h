@@ -12,6 +12,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_GOTO_PROGRAMS_CLASS_IDENTIFIER_H
 #define CPROVER_GOTO_PROGRAMS_CLASS_IDENTIFIER_H
 
+#include <util/irep.h>
+
 class exprt;
 class namespacet;
 class struct_tag_typet;
@@ -26,5 +28,10 @@ void set_class_identifier(
   struct_exprt &expr,
   const namespacet &ns,
   const struct_tag_typet &class_type);
+
+void set_class_identifier(
+  struct_exprt &expr,
+  const namespacet &ns,
+  const irep_idt &class_id);
 
 #endif

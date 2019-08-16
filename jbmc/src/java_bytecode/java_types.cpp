@@ -140,6 +140,24 @@ java_reference_typet java_array_type(const char subtype)
   return java_reference_type(struct_tag_type);
 }
 
+irep_idt java_classid_for_type(const struct_tag_typet &tag)
+{
+  if(tag.get_identifier() == "java::array[reference]")
+  {
+    const auto &element_type =
+      to_pointer_type(java_array_element_type(tag)).subtype();
+    if(can_cast_type<struct_tag_typet>(element_type))
+    {
+      irep_idt subtype_classid =
+        java_classid_for_type(to_struct_tag_type(element_type));
+      return "java::array[reference(" +
+             id2string(strip_java_namespace_prefix(subtype_classid)) + ")]";
+    }
+  }
+
+  return tag.get_identifier();
+}
+
 /// Return a const reference to the element type of a given java array type
 /// \param array_symbol: The java array type
 const typet &java_array_element_type(const struct_tag_typet &array_symbol)
@@ -494,6 +512,13 @@ size_t find_closing_semi_colon_for_reference_type(
   return next_semi_colon;
 }
 
+java_reference_typet java_reference_array_type(const struct_tag_typet &subtype)
+{
+  java_reference_typet result = java_array_type('a');
+  result.subtype().set(ID_element_type, java_reference_type(subtype));
+  return result;
+}
+
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
@@ -605,9 +630,14 @@ optionalt<typet> java_type_from_string(
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
-      typet tmp=java_array_type(std::tolower(subtype_letter));
-      tmp.subtype().set(ID_element_type, std::move(*subtype));
-      return std::move(tmp);
+      subtype_letter = std::tolower(subtype_letter);
+      if(subtype_letter == 'a')
+      {
+        return java_reference_array_type(
+          to_struct_tag_type(subtype->subtype()));
+      }
+      else
+        return java_array_type(subtype_letter);
     }
 
   case 'B': return java_byte_type();

@@ -788,6 +788,7 @@ void java_bytecode_convert_classt::convert(
 void add_java_array_types(symbol_tablet &symbol_table)
 {
   const std::string letters="ijsbcfdza";
+  namespacet ns(symbol_table);
 
   for(const char l : letters)
   {
@@ -881,10 +882,35 @@ void add_java_array_types(symbol_tablet &symbol_table)
       ID_java_new_array, java_reference_type(struct_tag_type), location);
     dereference_exprt old_array{this_symbol.symbol_expr()};
     dereference_exprt new_array{local_symexpr};
+
     member_exprt old_length(
       old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
     code_assignt create_blank(local_symexpr, java_new_array);
+
+    codet copy_class_id = code_skipt();
+    if(l == 'a')
+    {
+      // Reference arrays carry additional type information in their classids
+      // which should be copied:
+      // Note we can't use `get_class_identifier_field` as at the time this
+      // method is called java.lang.Object hasn't actually been defined yet.
+
+      member_exprt old_base_class(
+        old_array,
+        base_class_component.get_name(),
+        base_class_component.type());
+      member_exprt old_classid(
+        old_base_class, "@class_identifier", string_typet());
+      member_exprt new_base_class(
+        new_array,
+        base_class_component.get_name(),
+        base_class_component.type());
+      member_exprt new_classid(
+        new_base_class, "@class_identifier", string_typet());
+
+      copy_class_id = code_assignt(new_classid, old_classid);
+    }
 
     member_exprt old_data(
       old_array, data_component.get_name(), data_component.type());
@@ -935,8 +961,12 @@ void add_java_array_types(symbol_tablet &symbol_table)
     address_of_exprt retval(new_base_class);
     code_returnt return_inst(retval);
 
-    const code_blockt clone_body(
-      {declare_cloned, create_blank, declare_index, copy_loop, return_inst});
+    const code_blockt clone_body({declare_cloned,
+                                  create_blank,
+                                  copy_class_id,
+                                  declare_index,
+                                  copy_loop,
+                                  return_inst});
 
     symbolt clone_symbol;
     clone_symbol.name=clone_name;

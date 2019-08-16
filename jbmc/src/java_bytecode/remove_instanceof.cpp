@@ -56,6 +56,29 @@ protected:
     goto_programt::targett);
 };
 
+/// Converts a classid into the classid of an n-dimensional array of that type.
+/// Makes "java::array[reference(array[reference(A)])]" for example, for "A[][]"
+/// \param underlying_type_name: classid of the innermost element type
+/// \param array_dimensions: dimensionality of the array \p underlying_type_name
+///   is contained within; can be zero for a non-array type.
+/// \return array classid
+static irep_idt add_array_qualifiers(
+  const irep_idt &underlying_type_name,
+  std::size_t array_dimensions)
+{
+  if(array_dimensions == 0)
+    return underlying_type_name;
+
+  std::ostringstream result;
+  result << "java::";
+  for(std::size_t i = 0; i < array_dimensions; ++i)
+    result << "array[reference(";
+  result << strip_java_namespace_prefix(underlying_type_name);
+  for(std::size_t i = 0; i < array_dimensions; ++i)
+    result << ")]";
+  return result.str();
+}
+
 /// Replaces an expression like e instanceof A with e.\@class_identifier == "A"
 /// or a big-or of similar expressions if we know of subtypes that also satisfy
 /// the given test.
@@ -98,11 +121,29 @@ bool remove_instanceoft::lower_instanceof(
   INVARIANT(
     target_type.id() == ID_struct_tag,
     "instanceof second operand should have a simple type");
-  const irep_idt &target_name =
-    to_struct_tag_type(target_type).get_identifier();
-  std::vector<irep_idt> children=
-    class_hierarchy.get_children_trans(target_name);
-  children.push_back(target_name);
+
+  if(
+    to_struct_tag_type(target_type).get_identifier() ==
+    "java::java.lang.Object")
+  {
+    // Everything derives from Object, and special-casing this particular check
+    // means we don't need to check all array dimensionalities, which also
+    // derive from Object, but finding the highest-dimensioned array in the
+    // program under test is not trivial.
+    expr = true_exprt();
+    return true;
+  }
+
+  // If checking for an array type, the target type must have the same
+  // dimension:
+  const auto underlying_type_and_dimension =
+    java_array_dimension_and_element_type(to_struct_tag_type(target_type));
+
+  const irep_idt &underlying_name =
+    underlying_type_and_dimension.first.get_identifier();
+  std::vector<irep_idt> children =
+    class_hierarchy.get_children_trans(underlying_name);
+  children.push_back(underlying_name);
   // Sort alphabetically to make order of generated disjuncts
   // independent of class loading order
   std::sort(
@@ -129,7 +170,9 @@ bool remove_instanceoft::lower_instanceof(
   exprt::operandst or_ops;
   for(const auto &clsname : children)
   {
-    constant_exprt clsexpr(clsname, string_typet());
+    irep_idt full_type_name =
+      add_array_qualifiers(clsname, underlying_type_and_dimension.second);
+    constant_exprt clsexpr(full_type_name, string_typet());
     equal_exprt test(object_clsid, clsexpr);
     or_ops.push_back(test);
   }

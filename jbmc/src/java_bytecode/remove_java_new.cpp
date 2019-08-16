@@ -134,7 +134,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   PRECONDITION(rhs.type().id() == ID_pointer);
 
   source_locationt location = rhs.source_location();
-  typet object_type = rhs.type().subtype();
+  struct_tag_typet object_type = to_struct_tag_type(rhs.type().subtype());
   PRECONDITION(ns.follow(object_type).id() == ID_struct);
 
   // build size expression
@@ -163,7 +163,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   auto zero_object = zero_initializer(object_type, location, ns);
   CHECK_RETURN(zero_object.has_value());
   set_class_identifier(
-    to_struct_expr(*zero_object), ns, to_struct_tag_type(object_type));
+    to_struct_expr(*zero_object), ns, java_classid_for_type(object_type));
   dest.insert_before(
     next,
     goto_programt::make_assignment(
