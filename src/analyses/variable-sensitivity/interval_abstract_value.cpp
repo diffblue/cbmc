@@ -441,9 +441,12 @@ interval_abstract_valuet::interval_abstract_valuet(
   const abstract_environmentt &environment,
   const namespacet &ns)
   : interval_abstract_valuet(
-      represents_interval(e) ? make_interval_expr(e)
-                             : interval_from_relation(e))
-{}
+      represents_interval(e)
+        ? make_interval_expr(e)
+        : (e.operands().size() == 2 ? interval_from_relation(e)
+                                    : constant_interval_exprt(e.type())))
+{
+}
 
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt e,
