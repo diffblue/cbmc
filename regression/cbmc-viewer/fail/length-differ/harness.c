@@ -6,7 +6,7 @@ void harness()
 {
   for(int i = 0; i < 4; ++i)
   {
-    int* x;
+    int *x;
     x = &g;
     assert(*x != 1);
   }
