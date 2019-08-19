@@ -394,7 +394,7 @@ void goto_symext::symex_printf(
   else
   {
     clean_expr(*va_args, state, false);
-    *va_args = field_sensitivityt{}.apply(ns, state, *va_args, false);
+    *va_args = state.field_sensitivity.apply(ns, state, *va_args, false);
     *va_args = state.rename(*va_args, ns).get();
     if(va_args->id() != ID_array)
     {

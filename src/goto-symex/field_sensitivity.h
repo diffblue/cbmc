@@ -62,7 +62,7 @@ class symex_targett;
 /// When `index` is not a constant, `array[index]` is replaced by
 ///  `{array[[0]]; array[[1]]; …index]`.
 /// Note that this process does not apply to arrays whose size is not constant,
-/// and arrays whose size exceed the bound \ref MAX_FIELD_SENSITIVITY_ARRAY_SIZE
+/// and arrays whose size exceed the bound \c max_field_sensitivity_array_size.
 /// See \ref field_sensitivityt::apply.
 ///
 /// ### Symbols representing arrays
@@ -80,6 +80,13 @@ class symex_targett;
 class field_sensitivityt
 {
 public:
+  /// \param max_array_size: maximum size for which field sensitivity will be
+  ///   applied to array cells
+  explicit field_sensitivityt(std::size_t max_array_size)
+    : max_field_sensitivity_array_size(max_array_size)
+  {
+  }
+
   /// Assign to the individual fields of a non-expanded symbol \p lhs. This is
   /// required whenever prior steps have updated the full object rather than
   /// individual fields, e.g., in case of assignments to an array at an unknown
@@ -133,11 +140,13 @@ public:
   /// \param expr: the expression to evaluate
   /// \return False, if and only if, \p expr would be a single field-sensitive
   /// SSA expression.
-  static bool is_divisible(const ssa_exprt &expr);
+  bool is_divisible(const ssa_exprt &expr) const;
 
 private:
   /// whether or not to invoke \ref field_sensitivityt::apply
   bool run_apply = true;
+
+  const std::size_t max_field_sensitivity_array_size;
 
   void field_assignments_rec(
     const namespacet &ns,

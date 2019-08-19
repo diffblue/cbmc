@@ -18,6 +18,6 @@ constexpr std::size_t DSTRING_NUMBERS_MAX = 64;
 
 /// Limit the size of arrays for which field_sensitivity gets applied.
 /// Necessary because large constant arrays slow-down the process.
-constexpr std::size_t MAX_FIELD_SENSITIVITY_ARRAY_SIZE = 64;
+constexpr std::size_t DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE = 64;
 
 #endif

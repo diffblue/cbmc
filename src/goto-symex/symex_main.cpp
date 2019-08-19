@@ -44,7 +44,9 @@ symex_configt::symex_configt(const optionst &options)
     partial_loops(options.get_bool_option("partial-loops")),
     debug_level(unsafe_string2int(options.get_option("debug-level"))),
     run_validation_checks(options.get_bool_option("validate-ssa-equation")),
-    show_symex_steps(options.get_bool_option("show-goto-symex-steps"))
+    show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
+    max_field_sensitivity_array_size(
+      options.get_unsigned_int_option("max-field-sensitivity-array-size"))
 {
 }
 
@@ -347,6 +349,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   // create and prepare the state
   auto state = util_make_unique<statet>(
     symex_targett::sourcet(entry_point_id, start_function->body),
+    symex_config.max_field_sensitivity_array_size,
     guard_manager,
     [storage](const irep_idt &id) { return storage->get_unique_l2_index(id); });
 

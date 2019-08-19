@@ -114,7 +114,7 @@ exprt field_sensitivityt::apply(
       if(
         l2_size.id() == ID_constant &&
         numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
-          MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+          max_field_sensitivity_array_size)
       {
         if(l2_index.get().id() == ID_constant)
         {
@@ -183,7 +183,7 @@ exprt field_sensitivityt::get_fields(
     to_array_type(ssa_expr.type()).size().id() == ID_constant &&
     numeric_cast_v<mp_integer>(
       to_constant_expr(to_array_type(ssa_expr.type()).size())) <=
-      MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+      max_field_sensitivity_array_size)
   {
     const array_typet &type = to_array_type(ssa_expr.type());
     const std::size_t array_size =
@@ -305,7 +305,7 @@ void field_sensitivityt::field_assignments_rec(
       numeric_cast_v<std::size_t>(to_constant_expr(type->size()));
     PRECONDITION(lhs_fs.operands().size() == array_size);
 
-    if(array_size > MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+    if(array_size > max_field_sensitivity_array_size)
       return;
 
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
@@ -339,7 +339,7 @@ void field_sensitivityt::field_assignments_rec(
   }
 }
 
-bool field_sensitivityt::is_divisible(const ssa_exprt &expr)
+bool field_sensitivityt::is_divisible(const ssa_exprt &expr) const
 {
   if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
     return true;
@@ -349,7 +349,7 @@ bool field_sensitivityt::is_divisible(const ssa_exprt &expr)
     expr.type().id() == ID_array &&
     to_array_type(expr.type()).size().id() == ID_constant &&
     numeric_cast_v<mp_integer>(to_constant_expr(
-      to_array_type(expr.type()).size())) <= MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
+      to_array_type(expr.type()).size())) <= max_field_sensitivity_array_size)
   {
     return true;
   }
