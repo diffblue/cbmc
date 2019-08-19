@@ -8,6 +8,34 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// \file
 /// Abstract Interpretation Domain
+///
+/// An abstract domain is an over-approximation of a set of possible valuations
+/// that the variables in a program may take at a given point in the program.
+/// For example if you have two variables, x and y and at a given point they
+/// can take the following values:
+///
+///  (x = 1, y = -1),   (x = -1, y = -1),   (x = 1, y = 0)
+///
+/// then you could represent this with a pair of intervals:
+///
+///   x in [-1,1],  y in [-1,0]
+///
+/// this is an over-approximation as it also describes valuations, like,
+/// (x = 0, y = 0) which are not in the set.  It also omits things like the
+/// link between the variables, such as knowning x >= y.
+/// However, in return for some imprecision (in a known direction), it gains
+/// scalability.  A pair of intervals can represent sets of valuations that
+/// might contain millions or billions of pairs.
+///
+/// The abstract interpretation framework is modular in terms of the domain
+/// used.  Inherit from ai_domain_baset, implement the pure virtual functions
+/// and add a merge method and your domain can be plugged in to the analysis.
+/// The actual "glue" is a factory so that you can have domains with non-trivial
+/// constructors.  These inherit from ai_domain_factory_baset, but
+/// ai_domain_factory_default_constructort<your_domain> will be fine if the
+/// default constructor is fine and inheriting from
+/// ai_domain_factoryt<your_domain> will be fine if non-trivial constructors
+/// are needed.
 
 #ifndef CPROVER_ANALYSES_AI_DOMAIN_H
 #define CPROVER_ANALYSES_AI_DOMAIN_H
@@ -53,6 +81,9 @@ public:
   /// b) there is an edge from the last instruction (END_FUNCTION)
   ///    of the function to the instruction _following_ the call site
   ///    (this also needs to set the LHS, if applicable)
+  ///
+  /// in some cases, function calls are skipped, in which case:
+  /// c) there is an edge from the call instruction to the instruction after
   ///
   /// "this" is the domain before the instruction "from"
   /// "from" is the instruction to be interpreted

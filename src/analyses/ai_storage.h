@@ -7,12 +7,18 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 \*******************************************************************/
 
 /// \file
+/// Abstract Interpretation Storage
+///
 /// An interface for the storage of domains in the abstract interpreter.
-/// Conceptually this is a map from location -> domain.
+/// Conceptually this is a map from history -> domain.
 /// However in some cases we may wish to share domains between locations
 /// so a simple map interface is not sufficient.
 /// Also any domain that has not been previously accessed or stored is
 /// automatically bottom.
+/// There is a constant interface which returns shared pointers to const
+/// domains, allowing these to either be stored domains, or things created
+/// on-the-fly.  The non-constant interace returns a reference as it can
+/// create and initialise the domains as needed.
 
 #ifndef CPROVER_ANALYSES_AI_STORAGE_H
 #define CPROVER_ANALYSES_AI_STORAGE_H

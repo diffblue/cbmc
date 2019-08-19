@@ -8,6 +8,39 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// \file
 /// Abstract Interpretation
+///
+/// This is the core of the abstract interpretation framework.
+/// To run an analysis you need four components:
+///
+///  1. An abstract interpreter, derived from ai_baset.
+///     This performs that actual analysis.  There are a number of alternative
+///     to choose from, primarily giving different ways of handling function
+///     calls / interprocedural analysis.
+///     More information is given in this file.
+///
+///  2. A history factory, derived from ai_history_factory_baset.
+///     This generates history objects (derived from ai_history_baset) which
+///     control the number of steps that the analysis performs.  These can be
+///     simple, just tracking location, or they can be complex, tracking
+///     location, function calls, branches (forwards and backwards), even
+///     threading.
+///     See ai_history.h for more information.
+///
+///  3. A domain factory, derived from ai_domain_factory_baset.
+///     This generates domain objects (derived from ai_domain_baset) which
+///     represent the sets of possible valuations that the variables can take at
+///     a given point (given history).  These can be very simple, just tracking
+///     whether a location is reachable or not, or they can be very
+///     sophisticated tracking relations between variables, pointers, etc.
+///     See ai_domain.h for more information.
+///
+///  4. A storage object, derived from ai_storage_baset.
+///     This stores the history and domain objects and manages the link.
+///     The simplest case is to store one domain per history
+///     (see history_sensitive_storaget).  However this can require a large
+///     amount of memory being used, so there are options to share / merge
+///     domains between different histories, reducing precision in return for
+///     better performance.
 
 #ifndef CPROVER_ANALYSES_AI_H
 #define CPROVER_ANALYSES_AI_H
@@ -28,10 +61,60 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ai_storage.h"
 #include "is_threaded.h"
 
-/// The basic interface of an abstract interpreter. This should be enough
-/// to create, run and query an abstract interpreter.
+/// This is the basic interface of the abstract interpreter with default
+/// implementations of the core functionality.
 ///
-/// Note: this is just a base class. \ref ait should be used instead.
+/// Users of abstract interpreters should use the interface given by this class.
+/// It breaks into three categories:
+///
+/// 1. Running an analysis, via
+///    \ref ai_baset#operator()(const irep_idt&,const goto_programt&, <!--
+///    --> const namespacet&),
+///    \ref ai_baset#operator()(const goto_functionst&,const namespacet&)
+///    and \ref ai_baset#operator()(const abstract_goto_modelt&)
+/// 2. Accessing the results of an analysis, by looking up the history objects
+///    for a given location \p l using
+///    \ref ai_baset#abstract_traces_before(locationt)const
+///    or the domains using
+///    \ref ai_baset#abstract_state_before(locationt)const
+/// 3. Outputting the results of the analysis; see
+///    \ref ai_baset#output(const namespacet&, const irep_idt&,
+///    const goto_programt&, std::ostream&)const et cetera.
+///
+/// Where possible, uses should be agnostic of the particular configuration of
+/// the abstract interpreter.  The "tasks" that goto-analyze uses are good
+/// examples of how to do this.
+///
+/// From a development point of view, there are several directions in which
+/// this can be extended by inheriting from ai_baset or one of its children:
+///
+/// A. To change how single edges are computed
+///    \ref ait#visit_edge and \ref ait#visit_edge_function_call
+///    ai_recursive_interproceduralt uses this to recurse to evaluate
+///    function calls rather than approximating them as ai_baset does.
+///
+/// B. To change how individual instructions are handled
+///    \ref ait#visit() and related functions.
+///
+/// C. To change the way that the fixed point is computed
+///    \ref ait#fixedpoint()
+///    concurrency_aware_ait does this to compute a fixed point over threads.
+///
+/// D. For pre-analysis initialization
+///    \ref ait#initialize(const irep_idt&, const goto_programt&),
+///    \ref ait#initialize(const irep_idt&,
+///    const goto_functionst::goto_functiont&) and
+///    \ref ait#initialize(const goto_functionst&),
+///
+/// E. For post-analysis cleanup
+///    \ref ait#finalize(),
+///
+/// Historically, uses of abstract interpretation inherited from ait<domainT>
+/// and added the necessary functionality.  This works (although care must be
+/// taken to respect the APIs of the various components -- there are some hacks
+/// to support older analyses that didn't) but is discouraged in favour of
+/// having an object for the abstract interpreter and using its public API.
+
 class ai_baset
 {
 public:
@@ -336,7 +419,7 @@ protected:
 
   /// Run the fixedpoint algorithm until it reaches a fixed point
   /// \return True if we found something new
-  bool fixedpoint(
+  virtual bool fixedpoint(
     const irep_idt &function_id,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
@@ -349,7 +432,7 @@ protected:
   /// Depending on the instruction type it may compute a number of "edges"
   /// or applications of the abstract transformer
   /// \return True if the state was changed
-  bool visit(
+  virtual bool visit(
     const irep_idt &function_id,
     trace_ptrt p,
     working_sett &working_set,
@@ -453,45 +536,12 @@ protected:
     const namespacet &ns) override;
 };
 
-/// Base class for abstract interpretation. An actual analysis
-/// must (a) inherit from this class and (b) provide a domain class as a
-/// type argument, which must, in turn, inherit from \ref ai_domain_baset.
-///
-/// From a user's perspective, this class provides three main groups of
-/// functions:
-///
-/// 1. Running an analysis, via
-///    \ref ai_baset#operator()(const irep_idt&,const goto_programt&, <!--
-///    --> const namespacet&),
-///    \ref ai_baset#operator()(const goto_functionst&,const namespacet&)
-///    and \ref ai_baset#operator()(const abstract_goto_modelt&)
-/// 2. Accessing the results of an analysis, by looking up the result
-///    for a given location \p l using
-///    \ref ait#abstract_state_before(goto_programt::const_targett).
-/// 3. Outputting the results of the analysis; see
-///    \ref ai_baset#output(const namespacet&, const irep_idt&,
-///    const goto_programt&, std::ostream&)const et cetera.
-///
-/// A typical usage pattern would be to call the analysis first,
-/// and use `abstract_state_before` to retrieve the results. The fixed
-/// point algorithm used is a standard worklist algorithm; ait
-/// implementation is flow- and path-sensitive, but not context-sensitive.
-///
-/// From an analysis developer's perspective, an analysis is implemented by
-/// inheriting from this class (or, if a concurrency-sensitive analysis is
-/// required, from \ref concurrency_aware_ait), providing a class implementing
-/// the abstract domain as the type for the \p domainT parameter. Most of the
-/// actual analysis functions (in particular, the minimal element, the lattice
-/// join, and the state transformer) are supplied using \p domainT.
-///
-/// To control the analysis in more detail, you can also override the following
-/// methods:
-/// - \ref ait#initialize(const irep_idt&, const goto_programt&),
-///   \ref ait#initialize(const irep_idt&,
-///   const goto_functionst::goto_functiont&) and
-///   \ref ait#initialize(const goto_functionst&), for pre-analysis
-///   initialization
-/// - \ref ait#finalize(), for post-analysis cleanup.
+/// ait supplies three of the four components needed: an abstract interpreter
+/// (in this case handling function calls via recursion), a history factory
+/// (using the simplest possible history objects) and storage (one domain per
+/// location).  The fourth component, the domain, is provided by the template
+/// parameter.  This is gives a "classical" abstract interpreter and is
+/// backwards compatible with older code.
 ///
 /// \tparam domainT A type derived from ai_domain_baset that represents the
 ///     values in the AI domain
@@ -572,6 +622,13 @@ private:
 ///
 /// \tparam domainT A type derived from ai_domain_baset that represents the
 ///     values in the AI domain
+///
+/// It is important to note that the domains used by this need an extra merge
+/// method, but, far more critically, they need the property that it is not
+/// possible to "undo" changes to the domain.  Tracking last modified location
+/// has this property, numerical domains such as constants and intervals do not
+/// and using this kind of concurrent analysis for these domains may miss
+/// significant behaviours.
 template<typename domainT>
 class concurrency_aware_ait:public ait<domainT>
 {
