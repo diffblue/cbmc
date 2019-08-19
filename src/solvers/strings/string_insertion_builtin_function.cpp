@@ -141,23 +141,15 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
 string_constraintst string_insertion_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
-  if(args.size() == 1)
-  {
-    auto pair = add_axioms_for_insert(
-      generator.fresh_symbol, result, input1, input2, args[0], array_pool);
-    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-    return pair.second;
-  }
-  if(args.size() == 3)
-    UNIMPLEMENTED;
-  UNREACHABLE;
+  PRECONDITION(args.size() == 1);
+  auto pair = add_axioms_for_insert(
+    generator.fresh_symbol, result, input1, input2, args[0], array_pool);
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
 }
 
 exprt string_insertion_builtin_functiont::length_constraint() const
 {
-  if(args.size() == 1)
-    return length_constraint_for_insert(result, input1, input2, array_pool);
-  if(args.size() == 3)
-    UNIMPLEMENTED;
-  UNREACHABLE;
+  PRECONDITION(args.size() == 1);
+  return length_constraint_for_insert(result, input1, input2, array_pool);
 }
