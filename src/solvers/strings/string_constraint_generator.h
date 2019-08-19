@@ -207,11 +207,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
   const function_application_exprt &expr,
   array_poolt &array_pool);
 
-std::pair<exprt, string_constraintst> add_axioms_for_insert(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
-
 std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
@@ -453,11 +448,6 @@ exprt length_constraint_for_concat_substr(
   const array_string_exprt &s2,
   const exprt &start,
   const exprt &end,
-  array_poolt &array_pool);
-exprt length_constraint_for_insert(
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const array_string_exprt &s2,
   array_poolt &array_pool);
 
 exprt zero_if_negative(const exprt &expr);
