@@ -95,34 +95,3 @@ exprt length_constraint_for_insert(
       array_pool.get_or_create_length(s1),
       array_pool.get_or_create_length(s2)));
 }
-
-/// Insertion of a string in another at a specific index
-///
-// NOLINTNEXTLINE
-/// \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt &, const array_string_exprt &, const array_string_exprt &, const exprt &, array_poolt &)
-// NOLINTNEXTLINE
-/// \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&,array_poolt &)
-///   (More...) \endlink
-///
-/// If `start` and `end` arguments are given then `substring(s2, start, end)`
-/// is considered instead of `s2`.
-/// \param fresh_symbol: generator of fresh symbols
-/// \param f: function application with arguments integer `|res|`, character
-///   pointer `&res[0]`, refined_string `s1`, refined_string`s2`, integer
-///   `offset`, optional integer `start` and optional integer `end`
-/// \param array_pool: pool of arrays representing strings
-/// \return an integer expression which is different from zero if there is an
-///   exception to signal
-std::pair<exprt, string_constraintst> add_axioms_for_insert(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
-{
-  PRECONDITION(f.arguments().size() == 5);
-  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
-  const array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[4]);
-  const array_string_exprt res =
-    array_pool.find(f.arguments()[1], f.arguments()[0]);
-  const exprt &offset = f.arguments()[3];
-  return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool);
-}
