@@ -54,6 +54,18 @@ public:
     return "insert";
   }
 
+  /// Constraints ensuring the \c result corresponds to \c input1 where we
+  /// inserted \c input2 at position \c offset given by the first argument.
+  /// We write offset' for `max(0, min(input1.length, offset))`.
+  /// These axioms are:
+  /// 1. result.length = input1.length + input2.length
+  /// 2. forall i < offset' . result[i] = input1[i]
+  /// 3. forall i < input2.length. res[i + offset'] = input2[i]
+  /// 4. forall i in [offset', input1.length).
+  ///      res[i + input2.length] = input1[i]
+  /// This is equivalent to
+  /// `res=concat(substring(input1, 0, offset'),
+  ///             concat(input2, substring(input1, offset')))`.
   string_constraintst
   constraints(string_constraint_generatort &generator) const override;
 
@@ -72,29 +84,6 @@ protected:
   {
   }
 };
-
-/// Add axioms ensuring the result `res` corresponds to `s1` where we
-/// inserted `s2` at position `offset`.
-/// We write offset' for `max(0, min(res.length, offset))`.
-/// These axioms are:
-/// 1. res.length = s1.length + s2.length
-/// 2. forall i < offset' . res[i] = s1[i]
-/// 3. forall i < s2.length. res[i + offset'] = s2[i]
-/// 4. forall i in [offset', s1.length). res[i + s2.length] = s1[i]
-/// This is equivalent to
-/// `res=concat(substring(s1, 0, offset'), concat(s2, substring(s1, offset')))`.
-/// \param fresh_symbol: generator of fresh symbols
-/// \param res: array of characters expression
-/// \param s1: array of characters expression
-/// \param s2: array of characters expression
-/// \param offset: integer expression
-/// \param array_pool: pool of arrays representing strings
-/// \return an expression expression which is different from zero if there is
-///   an exception to signal
-std::pair<exprt, string_constraintst> add_axioms_for_insert(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool);
 
 /// Add axioms ensuring the length of `res` corresponds to that of `s1` where we
 /// inserted `s2`.

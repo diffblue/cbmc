@@ -10,55 +10,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <algorithm>
 #include <iterator>
 
-std::pair<exprt, string_constraintst> add_axioms_for_insert(
-  symbol_generatort &fresh_symbol,
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  const exprt &offset,
-  array_poolt &array_pool)
-{
-  PRECONDITION(offset.type() == s1.length_type());
-
-  string_constraintst constraints;
-  const typet &index_type = s1.length_type();
-  const exprt offset1 = maximum(
-    from_integer(0, index_type),
-    minimum(array_pool.get_or_create_length(s1), offset));
-
-  // Axiom 1.
-  constraints.existential.push_back(
-    length_constraint_for_insert(res, s1, s2, array_pool));
-
-  // Axiom 2.
-  constraints.universal.push_back([&] { // NOLINT
-    const symbol_exprt i = fresh_symbol("QA_insert1", index_type);
-    return string_constraintt(i, offset1, equal_exprt(res[i], s1[i]));
-  }());
-
-  // Axiom 3.
-  constraints.universal.push_back([&] { // NOLINT
-    const symbol_exprt i = fresh_symbol("QA_insert2", index_type);
-    return string_constraintt(
-      i,
-      zero_if_negative(array_pool.get_or_create_length(s2)),
-      equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
-  }());
-
-  // Axiom 4.
-  constraints.universal.push_back([&] { // NOLINT
-    const symbol_exprt i = fresh_symbol("QA_insert3", index_type);
-    return string_constraintt(
-      i,
-      offset1,
-      zero_if_negative(array_pool.get_or_create_length(s1)),
-      equal_exprt(
-        res[plus_exprt(i, array_pool.get_or_create_length(s2))], s1[i]));
-  }());
-
-  return {from_integer(0, get_return_code_type()), std::move(constraints)};
-}
-
 exprt length_constraint_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -142,10 +93,51 @@ string_constraintst string_insertion_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
   PRECONDITION(args.size() == 1);
-  auto pair = add_axioms_for_insert(
-    generator.fresh_symbol, result, input1, input2, args[0], array_pool);
-  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
-  return pair.second;
+  const exprt &offset = args[0];
+  PRECONDITION(offset.type() == input1.length_type());
+  const typet &index_type = input1.length_type();
+  const exprt offset1 = maximum(
+    from_integer(0, index_type),
+    minimum(array_pool.get_or_create_length(input1), offset));
+
+  string_constraintst constraints;
+
+  // Axiom 1.
+  constraints.existential.push_back(
+    length_constraint_for_insert(result, input1, input2, array_pool));
+
+  // Axiom 2.
+  constraints.universal.push_back([&] { // NOLINT
+    const symbol_exprt i = generator.fresh_symbol("QA_insert1", index_type);
+    return string_constraintt(i, offset1, equal_exprt(result[i], input1[i]));
+  }());
+
+  // Axiom 3.
+  constraints.universal.push_back([&] { // NOLINT
+    const symbol_exprt i = generator.fresh_symbol("QA_insert2", index_type);
+    return string_constraintt(
+      i,
+      zero_if_negative(array_pool.get_or_create_length(input2)),
+      equal_exprt(result[plus_exprt(i, offset1)], input2[i]));
+  }());
+
+  // Axiom 4.
+  constraints.universal.push_back([&] { // NOLINT
+    const symbol_exprt i = generator.fresh_symbol("QA_insert3", index_type);
+    return string_constraintt(
+      i,
+      offset1,
+      zero_if_negative(array_pool.get_or_create_length(input1)),
+      equal_exprt(
+        result[plus_exprt(i, array_pool.get_or_create_length(input2))],
+        input1[i]));
+  }());
+
+  // return_code = 0
+  constraints.existential.push_back(
+    equal_exprt(return_code, from_integer(0, get_return_code_type())));
+
+  return constraints;
 }
 
 exprt string_insertion_builtin_functiont::length_constraint() const
