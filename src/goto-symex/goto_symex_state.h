@@ -47,6 +47,7 @@ class goto_symex_statet final : public goto_statet
 public:
   goto_symex_statet(
     const symex_targett::sourcet &,
+    field_sensitivityt &field_sensitivity,
     guard_managert &manager,
     std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
   ~goto_symex_statet();
@@ -66,6 +67,9 @@ public:
   /// dynamically created objects etc. The names in this table are needed
   /// for error traces even after symbolic execution has finished.
   symbol_tablet symbol_table;
+
+  /// Reference to the functor, owned by goto_symext, used for renaming.
+  field_sensitivityt &field_sensitivity;
 
   // Manager is required to be able to resize the thread vector
   guard_managert &guard_manager;
@@ -119,8 +123,6 @@ public:
     bool rhs_is_simplified,
     bool record_value,
     bool allow_pointer_unsoundness = false);
-
-  field_sensitivityt field_sensitivity;
 
 protected:
   template <levelt>

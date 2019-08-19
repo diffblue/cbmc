@@ -38,6 +38,7 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
 
   symex_state = util_make_unique<goto_symex_statet>(
     symex_targett::sourcet(goto_functionst::entry_point(), *this),
+    symex.field_sensitivity,
     guard_manager,
     [this](const irep_idt &id) {
       return path_storage.get_unique_l2_index(id);

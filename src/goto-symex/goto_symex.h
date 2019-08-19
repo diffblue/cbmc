@@ -70,6 +70,9 @@ struct symex_configt final
   /// includes diagnostic information about call stack and guard size.
   bool show_symex_steps;
 
+  /// Maximum sizes for which field sensitivity will be applied to array cells
+  std::size_t max_field_sensitivity_array_size;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);
@@ -104,6 +107,7 @@ public:
     guard_managert &guard_manager)
     : should_pause_symex(false),
       symex_config(options),
+      field_sensitivity(symex_config.max_field_sensitivity_array_size),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
       guard_manager(guard_manager),
@@ -258,6 +262,9 @@ public:
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
   irep_idt language_mode;
+
+  /// Functor controling granularity of object accesses
+  field_sensitivityt field_sensitivity;
 
 protected:
   /// The symbol table associated with the goto-program being executed.

@@ -204,7 +204,7 @@ void symex_assignt::assign_non_struct_symbol(
     current_assignment_type);
 
   const ssa_exprt &l1_lhs = assignment.lhs;
-  if(field_sensitivityt::is_divisible(l1_lhs))
+  if(state.field_sensitivity.is_divisible(l1_lhs))
   {
     // Split composite symbol lhs into its components
     state.field_sensitivity.field_assignments(

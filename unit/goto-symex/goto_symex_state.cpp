@@ -35,12 +35,14 @@ SCENARIO(
   // Initialize goto state
   std::list<goto_programt::instructiont> target;
   symex_targett::sourcet source{"fun", target.begin()};
+  field_sensitivityt field_sensitivity{
+    DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE};
   guard_managert manager;
   std::size_t fresh_name_count = 1;
   auto fresh_name = [&fresh_name_count](const irep_idt &) {
     return fresh_name_count++;
   };
-  goto_symex_statet state{source, manager, fresh_name};
+  goto_symex_statet state{source, field_sensitivity, manager, fresh_name};
 
   // Initialize dirty field of state
   incremental_dirtyt dirty;
