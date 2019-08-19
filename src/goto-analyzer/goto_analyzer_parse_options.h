@@ -115,7 +115,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/ai.h>
 #include <analyses/goto_check.h>
 
-class bmct;
 class goto_functionst;
 class optionst;
 
