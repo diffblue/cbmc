@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "aggressive_slicer.h"
 #include "generate_function_bodies.h"
+#include "insert_final_assert_false.h"
 
 #include "count_eloc.h"
 
@@ -59,6 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(max-var):(max-po-trans):(ignore-arrays)" \
   "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)(reachable-call-graph)" \
+  OPT_INSERT_FINAL_ASSERT_FALSE \
   OPT_SHOW_CLASS_HIERARCHY \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \

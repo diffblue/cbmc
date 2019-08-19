@@ -86,6 +86,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "function.h"
 #include "havoc_loops.h"
 #include "horn_encoding.h"
+#include "insert_final_assert_false.h"
 #include "interrupt.h"
 #include "k_induction.h"
 #include "mmio.h"
@@ -255,6 +256,20 @@ int goto_instrument_parse_optionst::doit()
       }
 
       return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("insert-final-assert-false"))
+    {
+      log.status() << "Inserting final assert false" << messaget::eom;
+      bool fail = insert_final_assert_false(
+        goto_model,
+        cmdline.get_value("insert-final-assert-false"),
+        ui_message_handler);
+      if(fail)
+      {
+        return CPROVER_EXIT_INTERNAL_ERROR;
+      }
+      // otherwise, fall-through to write new binary
     }
 
     if(cmdline.isset("show-value-sets"))
@@ -1648,6 +1663,7 @@ void goto_instrument_parse_optionst::help()
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
+    HELP_INSERT_FINAL_ASSERT_FALSE
     HELP_REPLACE_FUNCTION_BODY
     HELP_ANSI_C_LANGUAGE
     "\n"

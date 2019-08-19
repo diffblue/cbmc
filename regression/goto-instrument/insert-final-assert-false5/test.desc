@@ -1,0 +1,10 @@
+CORE
+main.c
+--insert-final-assert-false function_that_does_not_exist
+^EXIT=6$
+^SIGNAL=0$
+insert-final-assert-false: could not find function
+--
+--
+This test tries to use --insert-final-assert-false on a function that does not
+exist in the program.

@@ -1,0 +1,12 @@
+CORE
+main.c
+--insert-final-assert-false main
+^EXIT=10$
+^SIGNAL=0$
+insert-final-assert-false \(should fail\) : FAILURE
+^VERIFICATION FAILED$
+--
+--
+This test has a false assumption on one of its return paths (but not both).
+This shows a limitation of the --insert-final-assert-false pass since the
+verification still fails with the inserted assert.
