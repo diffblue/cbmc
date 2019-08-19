@@ -4,7 +4,7 @@ public class test_insert_char_array
     {
         assert(arr.length<5);
         for(int i=0; i<arr.length && i<5; i++)
-            org.cprover.CProverString.insert(sb, offset+i, arr[i]);
+          sb.insert(offset + i, arr[i]);
     }
 
     public static void main(int i)
