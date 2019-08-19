@@ -10,17 +10,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <algorithm>
 #include <iterator>
 
-exprt length_constraint_for_insert(
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  array_poolt &array_pool)
+exprt string_insertion_builtin_functiont::length_constraint() const
 {
+  PRECONDITION(args.size() == 1);
   return equal_exprt(
-    array_pool.get_or_create_length(res),
+    array_pool.get_or_create_length(result),
     plus_exprt(
-      array_pool.get_or_create_length(s1),
-      array_pool.get_or_create_length(s2)));
+      array_pool.get_or_create_length(input1),
+      array_pool.get_or_create_length(input2)));
 }
 
 string_insertion_builtin_functiont::string_insertion_builtin_functiont(
@@ -103,8 +100,7 @@ string_constraintst string_insertion_builtin_functiont::constraints(
   string_constraintst constraints;
 
   // Axiom 1.
-  constraints.existential.push_back(
-    length_constraint_for_insert(result, input1, input2, array_pool));
+  constraints.existential.push_back(length_constraint());
 
   // Axiom 2.
   constraints.universal.push_back([&] { // NOLINT
@@ -138,10 +134,4 @@ string_constraintst string_insertion_builtin_functiont::constraints(
     equal_exprt(return_code, from_integer(0, get_return_code_type())));
 
   return constraints;
-}
-
-exprt string_insertion_builtin_functiont::length_constraint() const
-{
-  PRECONDITION(args.size() == 1);
-  return length_constraint_for_insert(result, input1, input2, array_pool);
 }

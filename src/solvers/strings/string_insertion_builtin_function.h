@@ -69,6 +69,9 @@ public:
   string_constraintst
   constraints(string_constraint_generatort &generator) const override;
 
+  /// \return a constraint ensuring the length of \c result corresponds to that
+  ///   of \c input1 where we inserted \c input2. That is:
+  ///   `result.length = input1.length + input2.length`
   exprt length_constraint() const override;
 
   bool maybe_testing_function() const override
@@ -84,13 +87,5 @@ protected:
   {
   }
 };
-
-/// Add axioms ensuring the length of `res` corresponds to that of `s1` where we
-/// inserted `s2`.
-exprt length_constraint_for_insert(
-  const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  array_poolt &array_pool);
 
 #endif // CPROVER_SOLVERS_STRINGS_STRING_INSERTION_BUILTIN_FUNCTION_H
