@@ -70,10 +70,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR
    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
 )
-    set(enable_coverage off CACHE BOOL "Build with coverage recording")
+    option(enable_coverage "Build with coverage recording")
     set(parallel_tests "1" CACHE STRING "Number of tests to run in parallel")
-    if(${enable_coverage})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g")
+    if(enable_coverage)
+        add_compile_options(--coverage -g)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -g")
         if (NOT DEFINED CODE_COVERAGE_OUTPUT_DIR)
             set(CODE_COVERAGE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/html)
