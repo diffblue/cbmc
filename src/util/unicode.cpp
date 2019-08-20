@@ -352,17 +352,6 @@ std::string utf16_native_endian_to_java_string(const std::wstring &in)
   return result.str();
 }
 
-/// \param in: String in UTF-16 (native endianness) format
-/// \return String in US-ASCII format, with \\uxxxx escapes for other characters
-std::string utf16_native_endian_to_java(const std::wstring &in)
-{
-  std::ostringstream result;
-  const std::locale loc;
-  for(const auto ch : in)
-    utf16_native_endian_to_java(ch, result, loc);
-  return result.str();
-}
-
 std::string utf16_native_endian_to_utf8(const char16_t utf16_char)
 {
   return utf16_native_endian_to_utf8(std::u16string(1, utf16_char));
