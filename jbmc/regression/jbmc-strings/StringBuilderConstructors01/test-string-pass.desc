@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 StringBuilderConstructors01.class
---max-nondet-string-length 1000
+--function StringBuilderConstructors01.stringPass --max-nondet-string-length 1000
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,0 +1,8 @@
+CORE
+StringBuilderConstructors01.class
+--function StringBuilderConstructors01.noArgFail --max-nondet-string-length 1000
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
