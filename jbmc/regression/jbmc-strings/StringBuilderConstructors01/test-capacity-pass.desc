@@ -1,0 +1,11 @@
+KNOWNBUG
+StringBuilderConstructors01.class
+--function StringBuilderConstructors01.capacityPass --max-nondet-string-length 1000
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This is not working currently because the StringBuilder constructor with
+capacity argument is not modelled.

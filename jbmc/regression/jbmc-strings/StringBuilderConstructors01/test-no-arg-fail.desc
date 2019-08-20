@@ -1,0 +1,12 @@
+CORE
+StringBuilderConstructors01.class
+--function StringBuilderConstructors01.noArgFail --max-nondet-string-length 1000 --trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+dynamic_object2=\{\s*\}
+--
+^warning: ignoring
+--
+The check for dynamic_object2 is to make sure the array is created empty and
+is not given arbitrary content before its final assignment.

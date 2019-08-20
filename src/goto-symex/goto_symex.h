@@ -590,6 +590,9 @@ protected:
   /// "abc", the symbol will be named "abc_constant_char_array"). Then, the
   /// expression `&sym[0]` is assigned to `char_array` (assuming `sym` denotes
   /// the symbol holding the string data given by `new_char_array`.
+  /// The assignment is preceeded by an assume statement ensuring `length`
+  /// before this call was zero, this is to avoid leaving the previous array
+  /// unconstrained.
   ///
   /// \param state: goto symex state
   /// \param symex_assign: object handling symbol assignments
