@@ -107,6 +107,18 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
     endif()
 endif()
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
+        "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR
+        "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+)
+    option(enable_profiling "Build with profiling data")
+    if(enable_profiling)
+        add_compile_options(-g -pg)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+    endif()
+endif()
+
 function(cprover_default_properties)
     set(CBMC_CXX_STANDARD 11)
     set(CBMC_CXX_STANDARD_REQUIRED true)
