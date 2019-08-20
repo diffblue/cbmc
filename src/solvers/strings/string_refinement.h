@@ -111,7 +111,7 @@ private:
   index_set_pairt index_sets;
   union_find_replacet symbol_resolve;
 
-  std::vector<equal_exprt> equations;
+  std::vector<exprt> equations;
 
   string_dependenciest dependencies;
 
@@ -122,7 +122,7 @@ exprt substitute_array_lists(exprt expr, std::size_t string_max_length);
 
 // Declaration required for unit-test:
 union_find_replacet string_identifiers_resolution_from_equations(
-  std::vector<equal_exprt> &equations,
+  const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream);
 

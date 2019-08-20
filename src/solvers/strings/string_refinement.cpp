@@ -27,6 +27,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/magic.h>
+#include <util/range.h>
 #include <util/simplify_expr.h>
 
 #include "equation_symbol_mapping.h"
@@ -239,23 +240,24 @@ static std::vector<exprt> generate_instantiations(
   return lemmas;
 }
 
-/// Fill the array_pointer correspondence and replace the right hand sides of
-/// the corresponding equations
+/// If \p expr is an equation whose right-hand-side is a
+/// associate_array_to_pointer call, add the correspondence and replace the call
+/// by an expression representing its result.
 static void make_char_array_pointer_associations(
   string_constraint_generatort &generator,
-  std::vector<equal_exprt> &equations)
+  exprt &expr)
 {
-  for(equal_exprt &eq : equations)
+  if(const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr))
   {
     if(
-      const auto fun_app =
-        expr_try_dynamic_cast<function_application_exprt>(eq.rhs()))
+      const auto fun_app = expr_try_dynamic_cast<function_application_exprt>(
+        as_const(equal_expr->rhs())))
     {
       const auto new_equation =
-        generator.make_array_pointer_association(eq.lhs(), *fun_app);
+        generator.make_array_pointer_association(equal_expr->lhs(), *fun_app);
       if(new_equation)
       {
-        eq =
+        expr =
           equal_exprt{from_integer(true, new_equation->type()), *new_equation};
       }
     }
@@ -281,18 +283,10 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
   PRECONDITION(equality_propagation);
-
-  if(expr.id() == ID_equal && value)
-  {
-    const equal_exprt &eq_expr = to_equal_expr(expr);
-    equations.push_back(eq_expr);
-  }
+  if(!value)
+    equations.push_back(not_exprt{expr});
   else
-  {
-    INVARIANT(
-      !has_char_array_subexpr(expr, ns), "char array only appear in equations");
-    supert::set_to(expr, value);
-  }
+    equations.push_back(expr);
 }
 
 /// Add association for each char pointer in the equation
@@ -305,16 +299,19 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 ///   by an equation are associated to the same element
 static void add_equations_for_symbol_resolution(
   union_find_replacet &symbol_solver,
-  const std::vector<equal_exprt> &equations,
+  const std::vector<exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
   const std::string log_message =
     "WARNING string_refinement.cpp generate_symbol_resolution_from_equations:";
-  for(const equal_exprt &eq : equations)
+  auto equalities = make_range(equations).filter(
+    [&](const exprt &e) { return can_cast_expr<equal_exprt>(e); });
+  for(const exprt &e : equalities)
   {
-    const exprt &lhs = eq.lhs();
-    const exprt &rhs = eq.rhs();
+    const equal_exprt &eq = to_equal_expr(e);
+    const exprt &lhs = to_equal_expr(eq).lhs();
+    const exprt &rhs = to_equal_expr(eq).rhs();
     if(lhs.id() != ID_symbol)
     {
       stream << log_message << "non symbol lhs: " << format(lhs)
@@ -463,7 +460,7 @@ static void add_string_equation_to_symbol_resolution(
 /// \param stream: output stream
 /// \return union_find_replacet structure containing the correspondences.
 union_find_replacet string_identifiers_resolution_from_equations(
-  std::vector<equal_exprt> &equations,
+  const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
@@ -534,13 +531,11 @@ union_find_replacet string_identifiers_resolution_from_equations(
 
 #ifdef DEBUG
 /// Output a vector of equations to the given stream, used for debugging.
-static void output_equations(
-  std::ostream &output,
-  const std::vector<equal_exprt> &equations)
+static void
+output_equations(std::ostream &output, const std::vector<exprt> &equations)
 {
   for(std::size_t i = 0; i < equations.size(); ++i)
-    output << "  [" << i << "] " << format(equations[i].lhs())
-           << " == " << format(equations[i].rhs()) << std::endl;
+    output << "  [" << i << "] " << format(equations[i]) << std::endl;
 }
 #endif
 
@@ -629,7 +624,18 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   const union_find_replacet string_id_symbol_resolve =
-    string_identifiers_resolution_from_equations(equations, ns, log.debug());
+    string_identifiers_resolution_from_equations(
+      [&] {
+        std::vector<equal_exprt> equalities;
+        for(const auto &eq : equations)
+        {
+          if(auto equal_expr = expr_try_dynamic_cast<equal_exprt>(eq))
+            equalities.push_back(*equal_expr);
+        }
+        return equalities;
+      }(),
+      ns,
+      log.debug());
 #ifdef DEBUG
   log.debug() << "symbol resolve string:" << messaget::eom;
   for(const auto &pair : string_id_symbol_resolve.to_vector())
@@ -639,20 +645,33 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 #endif
 
-  log.debug() << "dec_solve: Replacing string ids in function applications"
+  log.debug() << "dec_solve: Replacing string ids and simplifying arguments"
+                 " in function applications"
               << messaget::eom;
-  for(equal_exprt &eq : equations)
+  for(exprt &expr : equations)
   {
-    if(can_cast_expr<function_application_exprt>(eq.rhs()))
+    auto it = expr.depth_begin();
+    while(it != expr.depth_end())
     {
-      simplify(eq.rhs(), ns);
-      string_id_symbol_resolve.replace_expr(eq.rhs());
+      if(can_cast_expr<function_application_exprt>(*it))
+      {
+        // Simplification is required because the array pool may not realize
+        // that an expression like
+        // `(unsignedbv[16]*)((signedbv[8]*)&constarray[0] + 0)` is the
+        // same pointer as `&constarray[0]
+        simplify(it.mutate(), ns);
+        string_id_symbol_resolve.replace_expr(it.mutate());
+        it.next_sibling_or_parent();
+      }
+      else
+        ++it;
     }
   }
 
   // Constraints start clear at each `dec_solve` call.
   string_constraintst constraints;
-  make_char_array_pointer_associations(generator, equations);
+  for(auto &expr : equations)
+    make_char_array_pointer_associations(generator, expr);
 
 #ifdef DEBUG
   output_equations(log.debug(), equations);
@@ -660,18 +679,21 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   log.debug() << "dec_solve: compute dependency graph and remove function "
               << "applications captured by the dependencies:" << messaget::eom;
-  std::vector<equal_exprt> local_equations;
-  for(const equal_exprt &eq : equations)
+  std::vector<exprt> local_equations;
+  for(const exprt &eq : equations)
   {
     // Ensures that arrays that are equal, are associated to the same nodes
     // in the graph.
-    const equal_exprt eq_with_char_array_replaced_with_representative_elements =
-      to_equal_expr(replace_expr_copy(symbol_resolve, eq));
-    const bool node_added = add_node(
+    const exprt eq_with_char_array_replaced_with_representative_elements =
+      replace_expr_copy(symbol_resolve, eq);
+    const optionalt<exprt> new_equation = add_node(
       dependencies,
       eq_with_char_array_replaced_with_representative_elements,
-      generator.array_pool);
-    if(!node_added)
+      generator.array_pool,
+      generator.fresh_symbol);
+    if(new_equation)
+      local_equations.push_back(*new_equation);
+    else
       local_equations.push_back(eq);
   }
   equations.clear();

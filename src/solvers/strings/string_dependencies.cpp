@@ -90,7 +90,7 @@ string_dependenciest::node_at(const array_string_exprt &e) const
 }
 
 string_dependenciest::builtin_function_nodet &string_dependenciest::make_node(
-  std::unique_ptr<string_builtin_functiont> &builtin_function)
+  std::unique_ptr<string_builtin_functiont> builtin_function)
 {
   builtin_function_nodes.emplace_back(
     std::move(builtin_function), builtin_function_nodes.size());
@@ -195,22 +195,39 @@ void string_dependenciest::clean_cache()
     e.reset();
 }
 
-bool add_node(
+optionalt<exprt> add_node(
   string_dependenciest &dependencies,
-  const equal_exprt &equation,
-  array_poolt &array_pool)
+  const exprt &expr,
+  array_poolt &array_pool,
+  symbol_generatort &fresh_symbol)
 {
-  const auto fun_app =
-    expr_try_dynamic_cast<function_application_exprt>(equation.rhs());
+  const auto fun_app = expr_try_dynamic_cast<function_application_exprt>(expr);
   if(!fun_app)
-    return false;
+  {
+    exprt copy = expr;
+    bool copy_differs_from_expr = false;
+    for(std::size_t i = 0; i < expr.operands().size(); ++i)
+    {
+      auto new_op =
+        add_node(dependencies, expr.operands()[i], array_pool, fresh_symbol);
+      if(new_op)
+      {
+        copy.operands()[i] = *new_op;
+        copy_differs_from_expr = true;
+      }
+    }
+    if(copy_differs_from_expr)
+      return copy;
+    return {};
+  }
 
+  const exprt return_code = fresh_symbol("string_builtin_return", expr.type());
   auto builtin_function =
-    to_string_builtin_function(*fun_app, equation.lhs(), array_pool);
+    to_string_builtin_function(*fun_app, return_code, array_pool);
 
   CHECK_RETURN(builtin_function != nullptr);
-  const auto &builtin_function_node = dependencies.make_node(builtin_function);
-  // Warning: `builtin_function` has been emptied and should not be used anymore
+  const auto &builtin_function_node =
+    dependencies.make_node(std::move(builtin_function));
 
   if(
     const auto &string_result =
@@ -233,7 +250,7 @@ bool add_node(
     add_dependency_to_string_subexprs(
       dependencies, *fun_app, builtin_function_node, array_pool);
 
-  return true;
+  return return_code;
 }
 
 void string_dependenciest::for_each_dependency(

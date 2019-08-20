@@ -89,12 +89,15 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
       symbol_generatort generator;
       array_poolt array_pool(generator);
 
-      bool success = add_node(dependencies, equation1, array_pool);
-      REQUIRE(success);
-      success = add_node(dependencies, equation2, array_pool);
-      REQUIRE(success);
-      success = add_node(dependencies, equation3, array_pool);
-      REQUIRE(success);
+      optionalt<exprt> new_equation1 =
+        add_node(dependencies, equation1, array_pool, generator);
+      REQUIRE(new_equation1.has_value());
+      optionalt<exprt> new_equation2 =
+        add_node(dependencies, equation2, array_pool, generator);
+      REQUIRE(new_equation2.has_value());
+      optionalt<exprt> new_equation3 =
+        add_node(dependencies, equation3, array_pool, generator);
+      REQUIRE(new_equation3.has_value());
 
 #ifdef DEBUG // useful output for visualizing the graph
       {
