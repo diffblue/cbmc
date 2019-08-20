@@ -147,6 +147,25 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("max-field-sensitivity-array-size"))
+  {
+    options.set_option(
+      "max-field-sensitivity-array-size",
+      cmdline.get_value("max-field-sensitivity-array-size"));
+  }
+
+  if(cmdline.isset("no-array-field-sensitivity"))
+  {
+    if(cmdline.isset("max-field-sensitivity-array-size"))
+    {
+      log.error()
+        << "--no-array-field-sensitivity and --max-field-sensitivity-array-size"
+        << " must not be given together" << messaget::eom;
+      exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+    options.set_option("no-array-field-sensitivity", true);
+  }
+
   if(cmdline.isset("partial-loops") && cmdline.isset("unwinding-assertions"))
   {
     log.error()

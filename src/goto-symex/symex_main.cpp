@@ -46,7 +46,12 @@ symex_configt::symex_configt(const optionst &options)
     run_validation_checks(options.get_bool_option("validate-ssa-equation")),
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
     max_field_sensitivity_array_size(
-      options.get_unsigned_int_option("max-field-sensitivity-array-size"))
+      options.is_set("no-array-field-sensitivity")
+        ? 0
+        : options.is_set("max-field-sensitivity-array-size")
+            ? options.get_unsigned_int_option(
+                "max-field-sensitivity-array-size")
+            : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE)
 {
 }
 

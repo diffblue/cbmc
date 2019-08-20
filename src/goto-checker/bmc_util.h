@@ -186,7 +186,8 @@ void run_property_decider(
   "(show-symex-strategies)" \
   "(depth):" \
   "(unwind):" \
-  "(unwindset):" \
+  "(max-field-sensitivity-array-size):" \
+  "(no-array-field-sensitivity)" \
   "(graphml-witness):" \
   "(unwindset):"
 
@@ -198,6 +199,15 @@ void run_property_decider(
   " --program-only               only show program expression\n" \
   " --show-loops                 show the loops in the program\n" \
   " --depth nr                   limit search depth\n" \
+  " --max-field-sensitivity-array-size M\n" \
+  "                              maximum size M of arrays for which field\n" \
+  "                              sensitivity will be applied to array,\n" \
+  "                              the default is 64\n" \
+  " --no-array-field-sensitivity\n" \
+  "                              deactivate field sensitivity for arrays, " \
+  "this is\n" \
+  "                              equivalent to setting the maximum field \n" \
+  "                              sensitivity size for arrays to 0\n" \
   " --unwind nr                  unwind nr times\n" \
   " --unwindset L:B,...          unwind loop L with a bound of B\n" \
   "                              (use --show-loops to get the loop IDs)\n" \
