@@ -32,6 +32,7 @@ Date:   December 2016
 
 #include <linking/static_lifetime_init.h>
 
+#include "java_expr.h"
 #include "java_types.h"
 
 /// Lowers high-level exception descriptions into low-level operations suitable
@@ -366,9 +367,8 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 
         // use instanceof to check that this is the correct handler
         struct_tag_typet type(stack_catch[i][j].first);
-        type_exprt expr(type);
 
-        binary_predicate_exprt check(exc_thrown, ID_java_instanceof, expr);
+        java_instanceof_exprt check(exc_thrown, type);
         t_exc->guard=check;
 
         if(remove_added_instanceof)

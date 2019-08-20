@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_misc.h>
 #include <ansi-c/expr2c_class.h>
 
+#include "java_expr.h"
 #include "java_qualifiers.h"
 #include "java_string_literal_expr.h"
 #include "java_types.h"
@@ -320,16 +321,10 @@ std::string expr2javat::convert_java_this()
 
 std::string expr2javat::convert_java_instanceof(const exprt &src)
 {
-  if(src.operands().size()!=2)
-  {
-    unsigned precedence;
-    return convert_norep(src, precedence);
-  }
+  const auto &instanceof_expr = to_java_instanceof_expr(src);
 
-  const auto &binary_expr = to_binary_expr(src);
-
-  return convert(binary_expr.op0()) + " instanceof " +
-         convert(binary_expr.op1().type());
+  return convert(instanceof_expr.tested_expr()) + " instanceof " +
+         convert(instanceof_expr.target_type());
 }
 
 std::string expr2javat::convert_code_java_new(const exprt &src, unsigned indent)
