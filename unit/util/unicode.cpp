@@ -93,3 +93,10 @@ TEST_CASE("unicode4", "[core][util][unicode]")
   const std::string s = u8"дȚȨɌṡʒʸͼἨѶݔݺ→⅒⅀▤▞╢◍⛳⻥龍ンㄗㄸ";
   REQUIRE(compare_utf8_to_utf16(s));
 }
+
+TEST_CASE("utf16_native_endian_to_java_string", "[core][util][unicode]")
+{
+  const std::wstring in = L"abc \" ' \\ub374 \\";
+  REQUIRE(
+    utf16_native_endian_to_java_string(in) == "abc \\\" \' \\\\ub374 \\\\");
+}
