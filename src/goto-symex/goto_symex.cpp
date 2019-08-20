@@ -199,6 +199,11 @@ void goto_symext::assign_string_constant(
   const ssa_exprt &char_array,
   const array_exprt &new_char_array)
 {
+  // We need to make sure that the length of the previous array isn't
+  // unconstrained, otherwise it could be arbitrarily large which causes
+  // invalid traces
+  symex_assume(state, equal_exprt{length, from_integer(0, length.type())});
+
   // assign length of string
   symex_assign.assign_symbol(length, expr_skeletont{}, new_length, {});
 
