@@ -1,0 +1,11 @@
+CORE
+Test.class
+--function Test.main --show-vcc --no-array-field-sensitivity
+^EXIT=0$
+^SIGNAL=0$
+symex_dynamic::dynamic_2_array#[0-9]\[1\]
+--
+symex_dynamic::dynamic_2_array#[0-9]\[\[[0-9]\]\]
+--
+This checks that field sensitvity is not applied to arrays when
+no-array-field-sensitivity is used.
