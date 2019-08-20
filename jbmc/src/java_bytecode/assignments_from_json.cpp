@@ -199,9 +199,14 @@ static bool has_nondet_length(const jsont &json)
 /// (typed vs. untyped).
 static jsont get_untyped(const jsont &json, const std::string &object_key)
 {
-  if(get_type(json) || has_nondet_length(json))
-    return json[object_key];
-  return json;
+  if(!json.is_object())
+    return json;
+
+  const auto &json_object = to_json_object(json);
+  PRECONDITION(
+    get_type(json) || json_object.find("@nondetLength") != json_object.end());
+
+  return json[object_key];
 }
 
 /// \ref get_untyped for primitive types.
