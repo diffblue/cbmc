@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bytecode_info.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
+#include "java_expr.h"
 #include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
 #include "java_string_literal_expr.h"
@@ -1687,8 +1688,8 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
 
-      results[0]=
-        binary_predicate_exprt(op[0], ID_java_instanceof, arg0);
+      results[0] =
+        java_instanceof_exprt(op[0], to_struct_tag_type(arg0.type()));
     }
     else if(bytecode == BC_monitorenter || bytecode == BC_monitorexit)
     {
@@ -2326,7 +2327,7 @@ void java_bytecode_convert_methodt::convert_checkcast(
   codet &c,
   exprt::operandst &results) const
 {
-  binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
+  java_instanceof_exprt check(op[0], to_struct_tag_type(arg0.type()));
   code_assertt assert_class(check);
   assert_class.add_source_location().set_comment("Dynamic cast check");
   assert_class.add_source_location().set_property_class("bad-dynamic-cast");

@@ -4071,6 +4071,33 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<type_exprt>(const exprt &base)
+{
+  return base.id() == ID_type;
+}
+
+/// \brief Cast an exprt to an \ref type_exprt
+///
+/// \a expr must be known to be \ref type_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref type_exprt
+inline const type_exprt &to_type_expr(const exprt &expr)
+{
+  PRECONDITION(can_cast_expr<type_exprt>(expr));
+  const type_exprt &ret = static_cast<const type_exprt &>(expr);
+  return ret;
+}
+
+/// \copydoc to_type_expr(const exprt &)
+inline type_exprt &to_type_expr(exprt &expr)
+{
+  PRECONDITION(can_cast_expr<type_exprt>(expr));
+  type_exprt &ret = static_cast<type_exprt &>(expr);
+  return ret;
+}
+
 /// \brief A constant literal expression
 class constant_exprt : public expr_protectedt
 {

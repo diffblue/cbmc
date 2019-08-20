@@ -19,6 +19,7 @@ Date:   June 2017
 
 #include "java_bytecode_convert_class.h"
 #include "java_entry_point.h"
+#include "java_expr.h"
 #include "java_utils.h"
 
 class java_bytecode_instrumentt:public messaget
@@ -61,8 +62,8 @@ protected:
     const source_locationt &original_loc);
 
   code_ifthenelset check_class_cast(
-    const exprt &class1,
-    const exprt &class2,
+    const exprt &tested_expr,
+    const struct_tag_typet &target_type,
     const source_locationt &original_loc);
 
   codet check_array_length(
@@ -203,22 +204,21 @@ codet java_bytecode_instrumentt::check_array_access(
 /// ClassCastException/generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \param class1: the subclass
-/// \param class2: the super class
+/// \param tested_expr: expression to test
+/// \param target_type: type to test for
 /// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 ///   it returns code that either throws an ClassCastException or emits an
 ///   assertion checking the subtype relation
 code_ifthenelset java_bytecode_instrumentt::check_class_cast(
-  const exprt &class1,
-  const exprt &class2,
+  const exprt &tested_expr,
+  const struct_tag_typet &target_type,
   const source_locationt &original_loc)
 {
-  binary_predicate_exprt class_cast_check(
-    class1, ID_java_instanceof, class2);
+  java_instanceof_exprt class_cast_check(tested_expr, target_type);
 
   pointer_typet voidptr = pointer_type(java_void_type());
-  exprt null_check_op = typecast_exprt::conditional_cast(class1, voidptr);
+  exprt null_check_op = typecast_exprt::conditional_cast(tested_expr, voidptr);
 
   optionalt<codet> check_code;
   if(throw_runtime_exceptions)
@@ -373,15 +373,12 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
     if(code_assert.assertion().id()==ID_java_instanceof)
     {
       code_blockt block;
+      const auto & instanceof
+        = to_java_instanceof_expr(code_assert.assertion());
 
-      INVARIANT(
-        code_assert.assertion().operands().size()==2,
-        "Instanceof should have 2 operands");
-
-      const auto & instanceof = to_binary_expr(code_assert.assertion());
-
-      code = check_class_cast(
-        instanceof.op0(), instanceof.op1(), code_assert.source_location());
+      code = check_class_cast(instanceof.tested_expr(),
+                              instanceof
+                                .target_type(), code_assert.source_location());
     }
   }
   else if(statement==ID_block)
