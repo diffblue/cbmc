@@ -208,11 +208,80 @@ public:
   // Use default widening
   // without history there is no reason to say any location is better than
   // another to widen.
+  bool should_widen(const ai_history_baset &other) const override
+  {
+    return ai_history_baset::should_widen(other);
+  }
 
   void output(std::ostream &out) const override
   {
     out << "ahistorical : location " << current_location()->location_number;
   }
+};
+
+/// Records the call stack
+/// Care must be taken when using this on recursive code; it will need the
+/// domain to be capable of limiting the recursion.
+class call_stack_historyt : public ai_history_baset
+{
+protected:
+  class call_stack_entryt;
+  typedef std::shared_ptr<const call_stack_entryt> cse_ptrt;
+  class call_stack_entryt
+  {
+  public:
+    locationt current_location;
+    cse_ptrt caller;
+
+    call_stack_entryt(locationt l, cse_ptrt p) : current_location(l), caller(p)
+    {
+    }
+
+    bool operator<(const call_stack_entryt &op) const;
+    bool operator==(const call_stack_entryt &op) const;
+  };
+
+  cse_ptrt current_stack;
+  // DATA_INVARIANT(current_stack != nullptr, "current_stack must exist");
+  // DATA_INVARIANT(current_stack->current.is_dereferenceable(),
+  //                "Must not be _::end()")
+
+  explicit call_stack_historyt(cse_ptrt p)
+    : ai_history_baset(p->current_location), current_stack(p)
+  {
+    PRECONDITION(p != nullptr); // A little late by now but worth documenting
+  }
+
+public:
+  explicit call_stack_historyt(locationt l)
+    : ai_history_baset(l), current_stack(new call_stack_entryt(l, nullptr))
+  {
+  }
+
+  call_stack_historyt(const call_stack_historyt &old)
+    : ai_history_baset(old), current_stack(old.current_stack)
+  {
+  }
+
+  step_returnt step(locationt to, const trace_sett &others) const override;
+
+  bool operator<(const ai_history_baset &op) const override;
+  bool operator==(const ai_history_baset &op) const override;
+
+  const locationt &current_location(void) const override
+  {
+    return current_stack->current_location;
+  }
+
+  // Use default widening
+  // Typically this would be used for loops, which are not tracked
+  // it would be possible to use this to improve the handling of recursion
+  bool should_widen(const ai_history_baset &other) const override
+  {
+    return ai_history_baset::should_widen(other);
+  }
+
+  void output(std::ostream &out) const override;
 };
 
 /// As more detailed histories can get complex (for example, nested loops
