@@ -1684,22 +1684,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
      "StringBuilder;I)Ljava/lang/StringBuilder;"] =
       ID_cprover_string_delete_char_at_func;
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/"
-     "StringBuilder;IC)Ljava/lang/StringBuilder;"] =
-      ID_cprover_string_insert_char_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/"
-     "StringBuilder;IZ)Ljava/lang/StringBuilder;"] =
-      ID_cprover_string_insert_bool_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/"
-     "StringBuilder;II)Ljava/lang/StringBuilder;"] =
-      ID_cprover_string_insert_int_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/"
-     "StringBuilder;IJ)Ljava/lang/StringBuilder;"] =
-      ID_cprover_string_insert_long_func;
-  cprover_equivalent_to_java_assign_and_return_function
     ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuilder;ILjava/"
      "lang/String;)Ljava/lang/StringBuilder;"] = ID_cprover_string_insert_func;
   conversion_table["java::java.lang.StringBuilder.length:()I"] = std::bind(
@@ -1779,21 +1763,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::org.cprover.CProverString.deleteCharAt:(Ljava/lang/"
      "StringBufferI)Ljava/lang/StringBuffer;"] =
       ID_cprover_string_delete_char_at_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuffer;IC)Ljava/"
-     "lang/StringBuffer;"] = ID_cprover_string_insert_char_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuffer;II)Ljava/"
-     "lang/StringBuffer;"] = ID_cprover_string_insert_int_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuffer;IJ)Ljava/"
-     "lang/StringBuffer;"] = ID_cprover_string_insert_long_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuffer;ILjava/"
-     "lang/String;)Ljava/lang/StringBuffer;"] = ID_cprover_string_insert_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuffer;IZ)Ljava/"
-     "lang/StringBuffer;"] = ID_cprover_string_insert_bool_func;
   conversion_table
     ["java::java.lang.StringBuffer.length:()I"]=
       conversion_table["java::java.lang.String.length:()I"];

@@ -514,10 +514,7 @@ This is described in more detail \link string_builtin_functiont here. \endlink
   * `cprover_string_offset_by_code_point`, `cprover_string_concat_char`,
     `cprover_string_concat_int`, `cprover_string_concat_long`,
     `cprover_string_concat_bool`, `cprover_string_concat_double`,
-    `cprover_string_concat_float`, `cprover_string_insert_int`,
-    `cprover_string_insert_long`, `cprover_string_insert_bool`,
-    `cprover_string_insert_char`, `cprover_string_insert_double`,
-     `cprover_string_insert_float` :
+    `cprover_string_concat_float` :
     Should be done in two steps: conversion from primitive type and call
     to the string primitive.
   * `cprover_string_array_of_char_pointer`, `cprover_string_to_char_array` :
