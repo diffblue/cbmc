@@ -1065,11 +1065,11 @@ void goto_checkt::nan_check(
 
     isnan = or_exprt(
       and_exprt(
-        equal_exprt(minus_expr.op0(), plus_inf),
-        equal_exprt(minus_expr.op1(), plus_inf)),
+        equal_exprt(minus_expr.lhs(), plus_inf),
+        equal_exprt(minus_expr.rhs(), plus_inf)),
       and_exprt(
-        equal_exprt(minus_expr.op0(), minus_inf),
-        equal_exprt(minus_expr.op1(), minus_inf)));
+        equal_exprt(minus_expr.lhs(), minus_inf),
+        equal_exprt(minus_expr.rhs(), minus_inf)));
   }
   else
     UNREACHABLE;

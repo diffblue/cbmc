@@ -691,6 +691,26 @@ public:
     check(expr, vm);
   }
 
+  exprt &lhs()
+  {
+    return exprt::op0();
+  }
+
+  const exprt &lhs() const
+  {
+    return exprt::op0();
+  }
+
+  exprt &rhs()
+  {
+    return exprt::op1();
+  }
+
+  const exprt &rhs() const
+  {
+    return exprt::op1();
+  }
+
   // make op0 and op1 public
   using exprt::op0;
   using exprt::op1;
@@ -820,26 +840,6 @@ public:
       vm,
       expr_binary.op0().type() == expr_binary.op1().type(),
       "lhs and rhs of binary relation expression should have same type");
-  }
-
-  exprt &lhs()
-  {
-    return op0();
-  }
-
-  const exprt &lhs() const
-  {
-    return op0();
-  }
-
-  exprt &rhs()
-  {
-    return op1();
-  }
-
-  const exprt &rhs() const
-  {
-    return op1();
   }
 };
 
