@@ -4,31 +4,17 @@ import srcloc as SrcLoc
 
 # pylint: disable=too-few-public-methods
 
+################################################################
 
 class Property:
     """The properties checked by cbmc."""
 
-    def __init__(self):
-        """Initialize properties."""
-        self.property = {}
-
-    def lookup(self, name):
-        """Look up a property by property name."""
-        return self.property.get(name, None)
-
-
-class PropertyCBMC(Property):
-    """ The properties checked by cbmc.
-
-    This subclass of Property assumes the properties are described in an xml
-    file produced by a run of cbmc with 'cbmc --show-properties --xml-ui'.
-    """
-
     def __init__(self, xml="", srcloc=None):
-        """Initialize properties with output of
-        'cbmc --show-properties --xml-ui'.
         """
-        super(PropertyCBMC, self).__init__()
+        Initialize properties with output of 'cbmc --show-properties --xml-ui'.
+        """
+
+        self.property = {}
 
         if xml == "":
             return
@@ -60,26 +46,8 @@ class PropertyCBMC(Property):
                                    "description": desc,
                                    "expression": expr}
 
-
-class PropertyStorm(Property):
-    """ The properties checked by cbmc.
-
-    This subclass of Property assumes the properties are described in a log
-    file produced by a run of cbmc-storm.
-    """
-
-    def __init__(self, storm):
-        """Initialize properties with output of cbmc-storm."""
-        super(PropertyStorm, self).__init__()
-
-        for name in storm.property:
-            prop = storm.property[name]
-            self.property[name] = {"name":  name,
-                                   "class": "",
-                                   "file": prop['file'],
-                                   "line": prop['line'],
-                                   "function": prop['func'],
-                                   "description": prop['desc'],
-                                   "expression": prop['expr']}
+    def lookup(self, name):
+        """Look up a property by property name."""
+        return self.property.get(name, None)
 
 ################################################################

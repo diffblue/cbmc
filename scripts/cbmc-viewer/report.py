@@ -9,16 +9,15 @@ import json
 import os
 import argparse
 
-from trace import TraceCBMC, TraceStorm
-from property import PropertyCBMC, PropertyStorm
-from result import ResultCBMC, ResultStorm
+from trace import Trace
+from property import Property
+from result import Result
 from tags import Tags
 from loop import Loop
 from reachable import Reachable
 import errors
 from block import Block
 from markup import Markup
-from storm import Storm
 from srcloc import SourceLocation
 
 ################################################################
@@ -88,15 +87,6 @@ def command_line_parser():
         help=(
             'File containing xml property definitions from '
             '--show-properties (default: "")'
-        )
-    )
-    parser.add_argument(
-        '--storm',
-        metavar='log.txt',
-        help=(
-            'File containing the output of cbmc-storm containing the results, '
-            'properties, and traces. '
-            '(default: "")'
         )
     )
     parser.add_argument(
@@ -186,38 +176,8 @@ def error_section(result, properties, loops, traces, markup):
     return html
 
 
-def storm_section(storm, markup):
-    """Section for reporting CBMC Storm results"""
-
-    if not storm:
-        return []
-
-    html = []
-
-    if storm.no_errors:
-        html.append('<li>CBMC found no errors:<ul>')
-        for func in storm.no_errors:
-            html.append('<li>{}</li>'.format(markup.link_function(func)))
-        html.append('</ul></il>')
-
-    if storm.cbmc_failed:
-        html.append('<li>CBMC failed:<ul>')
-        for func in storm.cbmc_failed:
-            html.append('<li>{}</li>'.format(markup.link_function(func)))
-        html.append('</ul></il>')
-
-    if storm.cbmc_timed_out:
-        html.append('<li>CBMC timed out:<ul>')
-        for func in storm.cbmc_timed_out:
-            html.append('<li>{}</li>'.format(markup.link_function(func)))
-        html.append('</ul></il>')
-
-    return html
-
-
 def cbmc_report(result, coverage, properties, markup,
-                htmldir="", loops=None, traces=None, storm=None,
-                json_summary=None):
+                htmldir="", loops=None, traces=None, json_summary=None):
     """Full cbmc report."""
 
     # pylint: disable=too-many-arguments,too-many-locals
@@ -254,11 +214,6 @@ def cbmc_report(result, coverage, properties, markup,
     stats = {'properties': len(properties.property)}
     summary_data['CBMC-stats'] = stats
 
-    stm = storm_section(storm, markup)
-    if stm:
-        html.append('<h2 style="text-align:center">Other results</h2>')
-        html += stm
-
     html.append("</body></html>")
 
     index = open(htmldir+'index.html', 'w')
@@ -270,7 +225,6 @@ def cbmc_report(result, coverage, properties, markup,
             json.dump(summary_data, f)
 
 ################################################################
-
 
 def main():
     """Construct the cbmc report."""
@@ -297,19 +251,9 @@ def main():
 
     markup = Markup(tags, block, args.srcdir, args.htmldir, args.srcexclude)
 
-#   properties = Property(args.property)
-#   result = Result(args.result)
-#   trace = Trace(args.result, markup)
-    if args.storm:
-        storm = Storm(args.storm)
-        properties = PropertyStorm(storm)
-        result = ResultStorm(storm)
-        trace = TraceStorm(storm, markup)
-    else:
-        storm = None
-        properties = PropertyCBMC(args.property, srcloc)
-        result = ResultCBMC(args.result)
-        trace = TraceCBMC(args.result, markup, srcloc)
+    properties = Property(args.property, srcloc)
+    result = Result(args.result)
+    trace = Trace(args.result, markup, srcloc)
 
     loop.html_report("{}/loop.html".format(args.htmldir))
     trace.generate_traces(htmldir=args.htmldir, properties=properties)
@@ -321,7 +265,6 @@ def main():
                 htmldir=args.htmldir,
                 loops=loop,
                 traces=trace,
-                storm=storm,
                 json_summary=args.json_summary)
 
     markup.markup_directory()

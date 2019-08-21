@@ -8,10 +8,39 @@ import sys
 class Trace:
     """Parse, markup, and manage error traces."""
 
-    def __init__(self, markup):
-        """Initialize error traces."""
+    def __init__(self, log, markup, srcloc):
+        """Initialize error traces from cbmc output."""
         self.trace = {}
         self.markup = markup
+
+        if not log:
+            return
+
+        try:
+            fp = open(log, "r")
+        except IOError as e:
+            print(("Can't read cbmc traces: "
+                   "Unable to open {} for reading: {}")
+                  .format(log, e.strerror))
+            return
+
+        name = ""
+        trace = ""
+        for line in fp:
+            match = re.match('^Trace for (.*):', line)
+            if match:
+                if name:
+                    self.trace[name] = trace
+                name = match.group(1)
+                trace = ""
+                continue
+            if name:
+                trace += srcloc.clean_source_location(line)
+        if name:
+            self.trace[name] = trace
+
+        self.markup = markup
+
 
     def lookup(self, error):
         """Look up trace by error name."""
@@ -98,50 +127,3 @@ class Trace:
         return ('<a href="../{src}.html#{line}">{error}</a> '
                 'at line {line} in file {src}'
                 .format(src=srcfile, line=line, error=error))
-
-
-class TraceCBMC(Trace):
-    """Parse, markup, and manage error traces produced by 'cbmc --trace'."""
-
-    def __init__(self, log, markup, srcloc):
-        """Initialize error traces from cbmc output."""
-        super(TraceCBMC, self).__init__(markup)
-
-        if not log:
-            return
-
-        try:
-            fp = open(log, "r")
-        except IOError as e:
-            print(("Can't read cbmc traces: "
-                   "Unable to open {} for reading: {}")
-                  .format(log, e.strerror))
-            return
-
-        name = ""
-        trace = ""
-        for line in fp:
-            match = re.match('^Trace for (.*):', line)
-            if match:
-                if name:
-                    self.trace[name] = trace
-                name = match.group(1)
-                trace = ""
-                continue
-            if name:
-                trace += srcloc.clean_source_location(line)
-        if name:
-            self.trace[name] = trace
-
-        self.markup = markup
-
-
-class TraceStorm(Trace):
-    """Parse, markup, and manage error traces produced by cbmc-storm."""
-
-    def __init__(self, storm, markup):
-        """Initialize error traces from cbmc-storm output."""
-        super(TraceStorm, self).__init__(markup)
-
-        for name in storm.property:
-            self.trace[name] = storm.property[name]['trace']

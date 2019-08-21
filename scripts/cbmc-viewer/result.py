@@ -7,38 +7,21 @@ def clean(s):
     """Replace whitespace with a space and strip whitespace from ends."""
     return re.sub('\b+', ' ', s).strip()
 
+################################################################
 
 class Result:
     """CBMC results."""
 
-    def __init__(self):
+    def __init__(self, log=""):
         """Initialize with results from output of cbmc."""
+
+        # pylint: disable=too-many-locals
+
         self.result = {}
         self.success = []
         self.failure = []
         self.error = {}
         self.warning = {}
-
-    def lookup(self, name):
-        """Lookup result by name."""
-        return self.result.get(name)
-
-    def failures(self):
-        """Return failed properties."""
-        return self.failure
-
-    def successes(self):
-        """Return successful properties."""
-        return self.success
-
-
-class ResultCBMC(Result):
-    """CBMC results from the output of CBMC."""
-
-    def __init__(self, log=""):
-        """Initialize results from log file produced by CBMC."""
-        # pylint: disable=too-many-locals
-        super(ResultCBMC, self).__init__()
 
         if log == "":
             return
@@ -85,16 +68,16 @@ class ResultCBMC(Result):
                 self.failure.append(name)
                 self.error[name] = True
 
+    def lookup(self, name):
+        """Lookup result by name."""
+        return self.result.get(name)
 
-class ResultStorm(Result):
-    """CBMC results from the output of cbmc-storm."""
+    def failures(self):
+        """Return failed properties."""
+        return self.failure
 
-    def __init__(self, storm):
-        """Initialize results from log file produced by cbmc-storm."""
-        super(ResultStorm, self).__init__()
+    def successes(self):
+        """Return successful properties."""
+        return self.success
 
-        for name in storm.property:
-            self.result[name] = "FAILURE"
-            self.failure.append(name)
-            self.error[name] = bool(storm.property[name]['error'])
-            self.warning[name] = not bool(storm.property[name]['error'])
+################################################################
