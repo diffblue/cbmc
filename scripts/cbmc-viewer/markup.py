@@ -95,7 +95,7 @@ class Markup:
                                       depth, color, target)
 
         if file_name[0] == '<' and file_name[-1] == '>':
-            return html.escape(loc)
+            return html.escape(loc, quote=False)
 
         return (loc[:file_text_start] + file_link +
                 loc[file_text_end:func_text_start] + func_link +
@@ -106,7 +106,7 @@ class Markup:
         """Mark up a source line with links to symbol definitions."""
         line = line.rstrip()
         line = untabify(line)
-        line = html.escape(line)
+        line = html.escape(line, quote=False)
         tokens = re.split('([_a-zA-Z][_a-zA-Z0-9]*)', line)
         links = [self.link_symbol(tkn, depth, color) for tkn in tokens]
         newline = "".join(links)
