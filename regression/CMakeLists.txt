@@ -32,7 +32,7 @@ macro(add_standalone_test cmdline)
     "${name}-CORE" PROPERTIES
     LABELS "CORE;CBMC"
   )
-endmacro
+endmacro(add_standalone_test)
 
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
