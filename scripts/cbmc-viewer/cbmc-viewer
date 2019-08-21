@@ -4,7 +4,22 @@
 Summarize CBMC output: Make it easy to understand results and debug traces.
 """
 
+import traceback
+import textwrap
+
 import report
 
 if __name__ == "__main__":
-    report.main()
+    try:
+        report.main()
+    # pylint: disable=bare-except
+    except:
+        print('\ncbmc-viewer has encountered an error.\n')
+        print(textwrap.fill(textwrap.dedent("""\
+            If the stack trace
+            below does not explain the error, please create a new issue
+            at https://github.com/diffblue/cbmc/issues and cut-and-paste
+            this stack trace into that issue report.
+            """)))
+        print()
+        traceback.print_exc()

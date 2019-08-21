@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-"""
-Regession testing of CBMC-viewer.
+"""Regession testing of CBMC-viewer.
+
+This script runs cbmc-viewer on examples in the pass and fail
+directories, and compares the results with expected results.  These
+tests are implemented as a python script to guard against reasonable
+changes to cbmc that would cause a simple textual diff of the html
+output to fail.  An example is a change to cbmc that causes cbmc to
+generate a different trace.  This script parses the html and compares
+just the shape of the html.
 """
 
 #pylint: disable=missing-docstring,invalid-name
