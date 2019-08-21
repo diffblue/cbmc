@@ -1,29 +1,15 @@
-default:
-	@Nothing to do
+################################################################
+
+pylint:
+	-pylint cbmc-viewer *.py \
+		--disable=duplicate-code,invalid-name
+
+################################################################
 
 clean:
 	$(RM) *.pyc
 	$(RM) *~ .*~ \#* .\#*
 
-veryclean: clean
-
 ################################################################
 
-lint: pylint pycodestyle pydocstyle
-
-pylint:
-	-pylint *.py --disable=duplicate-code,invalid-name --extension-pkg-whitelist=lxml
-
-pycodestyle:
-	-pycodestyle *.py
-
-pydocstyle:
-	-pydocstyle *.py
-
-test:
-	./test.sh
-
-################################################################
-
-.PHONY: default clean veryclean
-.PHONY: line pylint pycodestyle pydocstyle test
+.PHONY: pylint clean
