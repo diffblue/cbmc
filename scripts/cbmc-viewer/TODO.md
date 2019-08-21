@@ -22,11 +22,9 @@
 	  into a simple representation, and the json output does not include
 	  the ascii string produced by the text output.
 
-* Consider make regression tests run as ordinary regressions.  The
-  remaining question is how to compare directories for equality on
-  Windows like "diff -r" on Linux and MacOS.
-
 * Use CSS files for markup instead of hardcoded, inlined style attributes.
+
+* Use a template engine or markup generator to produce html output.
 
 * Cleanup error handling in tags.py and block.py.
 

@@ -14,16 +14,10 @@ PARTIAL = 2
 
 def combine(status1, status2):
     """Combine line status.  A HIT and a MISS combine to PARTIAL."""
-    if status1 is None and status2 is None:
-        return None
-
     if status1 is None:
         return status2
     if status2 is None:
         return status1
-
-    if PARTIAL in [status1, status2]:
-        return PARTIAL
 
     if status1 == status2:
         return status1
