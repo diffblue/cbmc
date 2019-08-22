@@ -248,9 +248,9 @@ inline void dominators_pretty_print_node(
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
-  for(const auto &node : cfg.entries())
+  for(const auto &n : cfg.keys())
   {
-    auto n=node.first;
+    const auto &node = cfg.get_node(n);
 
     dominators_pretty_print_node(n, out);
     if(post_dom)
@@ -258,7 +258,7 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
     else
       out << " dominated by ";
     bool first=true;
-    for(const auto &d : cfg[node.second].dominators)
+    for(const auto &d : node.dominators)
     {
       if(!first)
         out << ", ";

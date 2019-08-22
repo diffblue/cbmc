@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_CFG_H
 #define CPROVER_GOTO_PROGRAMS_CFG_H
 
-#include <util/std_expr.h>
+#include <util/dense_integer_map.h>
 #include <util/graph.h>
+#include <util/std_expr.h>
 
 #include "goto_functions.h"
 
@@ -29,6 +30,29 @@ struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
   typedef typename graph_nodet<empty_edget>::edgest edgest;
 
   I PC;
+};
+
+/// Functor to convert cfg nodes into dense integers, used by \ref cfg_baset.
+/// Default implementation: the identity function.
+template <class T>
+class cfg_instruction_to_dense_integert
+{
+public:
+  std::size_t operator()(T &&t) const
+  {
+    return std::forward<T>(identity_functort<T>{}(t));
+  }
+};
+
+/// GOTO-instruction to location number functor.
+template <>
+class cfg_instruction_to_dense_integert<goto_programt::const_targett>
+{
+public:
+  std::size_t operator()(const goto_programt::const_targett &t) const
+  {
+    return t->location_number;
+  }
 };
 
 /// A multi-procedural control flow graph (CFG) whose nodes store references to
@@ -69,27 +93,15 @@ public:
 
   class entry_mapt final
   {
-    typedef std::map<goto_programt::const_targett, entryt> data_typet;
+    typedef dense_integer_mapt<
+      goto_programt::const_targett,
+      entryt,
+      cfg_instruction_to_dense_integert<goto_programt::const_targett>>
+      data_typet;
     data_typet data;
 
   public:
     grapht< cfg_base_nodet<T, I> > &container;
-
-    // NOLINTNEXTLINE(readability/identifiers)
-    typedef typename data_typet::iterator iterator;
-    // NOLINTNEXTLINE(readability/identifiers)
-    typedef typename data_typet::const_iterator const_iterator;
-
-    template <typename U>
-    const_iterator find(U &&u) const { return data.find(std::forward<U>(u)); }
-
-    iterator begin() { return data.begin(); }
-    const_iterator begin() const { return data.begin(); }
-    const_iterator cbegin() const { return data.cbegin(); }
-
-    iterator end() { return data.end(); }
-    const_iterator end() const { return data.end(); }
-    const_iterator cend() const { return data.cend(); }
 
     explicit entry_mapt(grapht< cfg_base_nodet<T, I> > &_container):
       container(_container)
@@ -100,10 +112,10 @@ public:
     {
       auto e=data.insert(std::make_pair(t, 0));
 
-      if(e.second)
-        e.first->second=container.add_node();
+      if(e)
+        data.at(t) = container.add_node();
 
-      return e.first->second;
+      return data.at(t);
     }
 
     entryt &at(const goto_programt::const_targett &t)
@@ -113,6 +125,25 @@ public:
     const entryt &at(const goto_programt::const_targett &t) const
     {
       return data.at(t);
+    }
+
+    std::size_t count(const goto_programt::const_targett &t) const
+    {
+      return data.count(t);
+    }
+
+    typedef typename data_typet::possible_keyst keyst;
+    const keyst &keys() const
+    {
+      // We always define exactly the keys the entry map was set up for, so
+      // data's possible key set is exactly our key set
+      return data.possible_keys();
+    }
+
+    template <class Iter>
+    void setup_for_keys(Iter begin, Iter end)
+    {
+      data.setup_for_keys(begin, end);
     }
   };
   entry_mapt entry_map;
@@ -173,12 +204,30 @@ public:
   void operator()(
     const goto_functionst &goto_functions)
   {
+    std::vector<goto_programt::const_targett> possible_keys;
+    for(const auto &id_and_function : goto_functions.function_map)
+    {
+      const auto &instructions = id_and_function.second.body.instructions;
+      possible_keys.reserve(
+        possible_keys.size() +
+        std::distance(instructions.begin(), instructions.end()));
+      for(auto it = instructions.begin(); it != instructions.end(); ++it)
+        possible_keys.push_back(it);
+    }
+    entry_map.setup_for_keys(possible_keys.begin(), possible_keys.end());
     compute_edges(goto_functions);
   }
 
   void operator()(P &goto_program)
   {
     goto_functionst goto_functions;
+    std::vector<goto_programt::const_targett> possible_keys;
+    const auto &instructions = goto_program.instructions;
+    possible_keys.reserve(
+      std::distance(instructions.begin(), instructions.end()));
+    for(auto it = instructions.begin(); it != instructions.end(); ++it)
+      possible_keys.push_back(it);
+    entry_map.setup_for_keys(possible_keys.begin(), possible_keys.end());
     compute_edges(goto_functions, goto_program);
   }
 
@@ -204,12 +253,11 @@ public:
     return (*this)[get_node_index(program_point)];
   }
 
-  /// Get a map from program points to their corresponding node indices. Use
-  /// the indices with `operator[]` similar to those returned by
-  /// \ref get_node_index.
-  const entry_mapt &entries() const
+  /// Get a vector of keys present in this cfg. Use these with \ref get_node or
+  /// \ref get_node_index to get the corresponding CFG nodes.
+  const typename entry_mapt::keyst &keys() const
   {
-    return entry_map;
+    return entry_map.keys();
   }
 
   static I get_first_node(P &program)

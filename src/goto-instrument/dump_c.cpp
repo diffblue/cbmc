@@ -663,6 +663,9 @@ void dump_ct::cleanup_decl(
 
   tmp.add(goto_programt::make_end_function());
 
+  // goto_program2codet requires valid location numbers:
+  tmp.update();
+
   std::unordered_set<irep_idt> typedef_names;
   for(const auto &td : typedef_map)
     typedef_names.insert(td.first);

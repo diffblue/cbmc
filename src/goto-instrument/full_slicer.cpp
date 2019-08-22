@@ -271,10 +271,9 @@ void full_slicert::operator()(
   // declarations or dead instructions may be necessary as well
   decl_deadt decl_dead;
 
-  for(const auto &instruction_and_index : cfg.entries())
+  for(const auto &instruction : cfg.keys())
   {
-    const auto &instruction = instruction_and_index.first;
-    const auto instruction_node_index = instruction_and_index.second;
+    const auto instruction_node_index = cfg.get_node_index(instruction);
     if(criterion(cfg[instruction_node_index].function_id, instruction))
       add_to_queue(queue, instruction_node_index, instruction);
     else if(implicit(instruction))
