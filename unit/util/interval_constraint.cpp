@@ -31,16 +31,20 @@ SCENARIO(
         "expressions representing a <= expr && expr <= z")
       {
         REQUIRE(can_cast_expr<and_exprt>(result));
+        REQUIRE(result.operands().size() == 2);
+        const auto &result_binary = to_binary_expr(result);
 
-        REQUIRE(result.op0().id() == ID_ge);
-        REQUIRE(result.op0().op0().type() == unsignedbv_typet(16));
-        REQUIRE(can_cast_expr<constant_exprt>(result.op0().op1()));
-        REQUIRE(to_constant_expr(result.op0().op1()).get_value() == "61"); // a
+        REQUIRE(result_binary.op0().id() == ID_ge);
+        const auto &op0_binary = to_binary_expr(result_binary.op0());
+        REQUIRE(op0_binary.op0().type() == unsignedbv_typet(16));
+        REQUIRE(can_cast_expr<constant_exprt>(op0_binary.op1()));
+        REQUIRE(to_constant_expr(op0_binary.op1()).get_value() == "61"); // a
 
-        REQUIRE(result.op1().id() == ID_le);
-        REQUIRE(result.op1().op0().type() == unsignedbv_typet(16));
-        REQUIRE(can_cast_expr<constant_exprt>(result.op1().op1()));
-        REQUIRE(to_constant_expr(result.op1().op1()).get_value() == "7A"); // b
+        REQUIRE(result_binary.op1().id() == ID_le);
+        const auto &op1_binary = to_binary_expr(result_binary.op1());
+        REQUIRE(op1_binary.op0().type() == unsignedbv_typet(16));
+        REQUIRE(can_cast_expr<constant_exprt>(op1_binary.op1()));
+        REQUIRE(to_constant_expr(op1_binary.op1()).get_value() == "7A"); // b
       }
     }
   }
@@ -64,16 +68,20 @@ SCENARIO(
         "expressions representing 6 <= expr && expr <= 9")
       {
         REQUIRE(can_cast_expr<and_exprt>(result));
+        REQUIRE(result.operands().size() == 2);
+        const auto &result_binary = to_binary_expr(result);
 
-        REQUIRE(result.op0().id() == ID_ge);
-        REQUIRE(result.op0().op0().type() == unsignedbv_typet(32));
-        REQUIRE(can_cast_expr<constant_exprt>(result.op0().op1()));
-        REQUIRE(to_constant_expr(result.op0().op1()).get_value() == "6");
+        REQUIRE(result_binary.op0().id() == ID_ge);
+        const auto &op0_binary = to_binary_expr(result_binary.op0());
+        REQUIRE(op0_binary.op0().type() == unsignedbv_typet(32));
+        REQUIRE(can_cast_expr<constant_exprt>(op0_binary.op1()));
+        REQUIRE(to_constant_expr(op0_binary.op1()).get_value() == "6");
 
-        REQUIRE(result.op1().id() == ID_le);
-        REQUIRE(result.op1().op0().type() == unsignedbv_typet(32));
-        REQUIRE(can_cast_expr<constant_exprt>(result.op1().op1()));
-        REQUIRE(to_constant_expr(result.op1().op1()).get_value() == "9");
+        REQUIRE(result_binary.op1().id() == ID_le);
+        const auto &op1_binary = to_binary_expr(result_binary.op1());
+        REQUIRE(op1_binary.op0().type() == unsignedbv_typet(32));
+        REQUIRE(can_cast_expr<constant_exprt>(op1_binary.op1()));
+        REQUIRE(to_constant_expr(op1_binary.op1()).get_value() == "9");
       }
     }
   }

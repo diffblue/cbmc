@@ -3,7 +3,9 @@
 /// \file Tests that irep sharing works correctly
 
 #include <testing-utils/use_catch.h>
+
 #include <util/irep.h>
+#include <util/std_expr.h>
 
 #ifdef SHARING
 
@@ -118,7 +120,7 @@ SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
 {
   GIVEN("An expression created with add_to_operands(std::move(...))")
   {
-    exprt test_expr(ID_1);
+    multi_ary_exprt test_expr(ID_1);
     exprt test_subexpr(ID_1);
     exprt test_subsubexpr(ID_1);
     test_subexpr.add_to_operands(std::move(test_subsubexpr));
@@ -132,7 +134,7 @@ SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
       "copying should not change them in the copy")
     {
       exprt &operand = test_expr.op0();
-      exprt expr = test_expr;
+      multi_ary_exprt expr = test_expr;
       operand.id(ID_0);
       REQUIRE(test_expr.op0().id() == ID_0);
       REQUIRE(expr.op0().id() == ID_1);
@@ -140,7 +142,7 @@ SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
     THEN("Holding a reference to an operand should not prevent sharing")
     {
       exprt &operand = test_expr.op0();
-      exprt expr = test_expr;
+      multi_ary_exprt expr = test_expr;
       REQUIRE(&expr.read() == &test_expr.read());
       operand = exprt(ID_0);
       REQUIRE(expr.op0().id() == test_expr.op0().id());
@@ -152,7 +154,7 @@ SCENARIO("exprt_sharing", "[core][utils][exprt]")
 {
   GIVEN("An expression created with add_to_operands(std::move(...))")
   {
-    exprt test_expr(ID_1);
+    multi_ary_exprt test_expr(ID_1);
     exprt test_subexpr(ID_1);
     exprt test_subsubexpr(ID_1);
     test_subexpr.add_to_operands(std::move(test_subsubexpr));
@@ -165,20 +167,20 @@ SCENARIO("exprt_sharing", "[core][utils][exprt]")
     }
     THEN("Changing operands in the original should not change them in a copy")
     {
-      exprt expr = test_expr;
+      multi_ary_exprt expr = test_expr;
       test_expr.op0().id(ID_0);
       REQUIRE(expr.op0().id() == ID_1);
     }
     THEN("Changing operands in a copy should not change them in the original")
     {
-      exprt expr = test_expr;
+      multi_ary_exprt expr = test_expr;
       expr.op0().id(ID_0);
       REQUIRE(test_expr.op0().id() == ID_1);
       REQUIRE(expr.op0().id() == ID_0);
     }
     THEN("Getting a reference to an operand in a copy should break sharing")
     {
-      exprt expr = test_expr;
+      multi_ary_exprt expr = test_expr;
       exprt &operand = expr.op0();
       REQUIRE(&expr.read() != &test_expr.read());
       operand = exprt(ID_0);
@@ -187,7 +189,7 @@ SCENARIO("exprt_sharing", "[core][utils][exprt]")
     THEN(
       "Getting a reference to an operand in the original should break sharing")
     {
-      exprt expr = test_expr;
+      multi_ary_exprt expr = test_expr;
       exprt &operand = test_expr.op0();
       REQUIRE(&expr.read() != &test_expr.read());
       operand = exprt(ID_0);
