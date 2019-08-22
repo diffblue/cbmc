@@ -393,23 +393,23 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const minus_exprt &minus_expr = to_minus_expr(expr);
 
     INVARIANT(
-      minus_expr.op0().type().id() == ID_pointer,
+      minus_expr.lhs().type().id() == ID_pointer,
       "first operand should be of pointer type");
 
     if(
-      minus_expr.op1().type().id() != ID_unsignedbv &&
-      minus_expr.op1().type().id() != ID_signedbv)
+      minus_expr.rhs().type().id() != ID_unsignedbv &&
+      minus_expr.rhs().type().id() != ID_signedbv)
     {
       bvt bv;
       conversion_failed(minus_expr, bv);
       return bv;
     }
 
-    const unary_minus_exprt neg_op1(minus_expr.op1());
+    const unary_minus_exprt neg_op1(minus_expr.rhs());
 
-    bvt bv = convert_bv(minus_expr.op0());
+    bvt bv = convert_bv(minus_expr.lhs());
 
-    typet pointer_sub_type = minus_expr.op0().type().subtype();
+    typet pointer_sub_type = minus_expr.rhs().type().subtype();
     mp_integer element_size;
 
     if(pointer_sub_type.id()==ID_empty)
