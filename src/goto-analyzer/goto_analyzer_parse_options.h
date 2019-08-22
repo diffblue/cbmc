@@ -119,7 +119,8 @@ class optionst;
   "(legacy-concurrent)"
 
 #define GOTO_ANALYSER_OPTIONS_HISTORY \
-  "(ahistorical)"
+  "(ahistorical)" \
+  "(call-stack):"
 
 #define GOTO_ANALYSER_OPTIONS_DOMAIN \
   "(intervals)" \

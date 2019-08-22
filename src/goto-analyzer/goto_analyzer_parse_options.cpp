@@ -287,6 +287,13 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("ahistorical", true);
       options.set_option("history set", true);
     }
+    else if(cmdline.isset("call-stack"))
+    {
+      options.set_option("call-stack", true);
+      options.set_option(
+        "call-stack-recursion-limit", cmdline.get_value("call-stack"));
+      options.set_option("history set", true);
+    }
 
     if(!options.get_bool_option("history set"))
     {
@@ -386,6 +393,11 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     {
       hf = util_make_unique<
         ai_history_factory_default_constructort<ahistoricalt>>();
+    }
+    else if(options.get_bool_option("call-stack"))
+    {
+      hf = util_make_unique<call_stack_history_factoryt>(
+        options.get_unsigned_int_option("call-stack-recursion-limit"));
     }
 
     // Build the domain factory
@@ -838,6 +850,10 @@ void goto_analyzer_parse_optionst::help()
     "History options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --ahistorical                the most basic history, tracks locations only\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --call-stack n               track the calling location stack for each function\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                              limiting to at most n recursive loops, 0 to disable\n"
     "\n"
     "Domain options:\n"
     " --constants                  a constant for each variable if possible\n"
