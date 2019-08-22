@@ -113,6 +113,66 @@ private:
   /// occurs and popped upon returning.
   nesting_stackt nesting_stack;
 
+  /// Holds information about the instruction and the nesting depth to which a
+  /// label points.
+  struct stl_label_locationt
+  {
+    /// The size of the nesting stack at the label location, used for checking
+    /// scope violations.
+    const size_t nesting_depth;
+
+    /// States if jumps to this location are permitted or if the location is
+    /// invalid.
+    const bool jumps_permitted;
+
+    /// States if jump instructions to this location need to set the /FC bit to
+    /// false.
+    const bool fc_false_required;
+
+    /// Constructs a new location with the specified properties.
+    /// \param nesting_depth: Scope of the label.
+    /// \param jumps_permitted: States whether jumps to the label are possible
+    ///   in general.
+    /// \param fc_false_required: States whether a jump instruction to this
+    ///   label needs to set the /FC bit.
+    stl_label_locationt(
+      size_t nesting_depth,
+      bool jumps_permitted,
+      bool fc_false_required);
+  };
+  using stl_labelst = std::unordered_map<irep_idt, stl_label_locationt>;
+
+  /// Data structure that contains data about the labels of the current module.
+  stl_labelst stl_labels;
+
+  /// Holds information about the properties of a jump instruction.
+  struct stl_jump_locationt
+  {
+    // TODO: Add source location to the structure.
+    // Requires the source location to be added to the parser in general.
+
+    /// The size of the nesting stack at the label location, used for checking
+    /// scope violations.
+    const size_t nesting_depth;
+
+    /// States if the jump instruction sets the /FC bit to false.
+    const bool sets_fc_false;
+
+    /// Constructs a new location with the specified properties.
+    /// \param nesting_depth: Scope of the jump instruction.
+    /// \param sets_fc_false: States whether the jump instruction modifies the
+    ///   /FC bit.
+    stl_jump_locationt(size_t nesting_depth, bool sets_fc_false);
+  };
+  using label_referencest =
+    std::unordered_map<irep_idt, std::vector<stl_jump_locationt>>;
+
+  /// Holds associations between labels and jumps that are referencing it.
+  /// This list should be empty after a successful typecheck. A new entry is
+  /// added only if a jump is encountered that references an unknown label. It
+  /// is removed once the label is encountered and the jump is valid.
+  label_referencest label_references;
+
   // High level checks
 
   /// Performs a typecheck on a function declaration inside of the parse tree
@@ -184,6 +244,9 @@ private:
     const statement_list_parse_treet::tia_modulet &tia_module,
     symbolt &tia_symbol);
 
+  /// Checks if all jumps reference labels that exist.
+  void typecheck_label_references();
+
   /// Performs a typecheck on a single instruction and saves the result to the
   /// given symbol body if necessary.
   /// \param instruction: Instruction that should be checked.
@@ -191,6 +254,16 @@ private:
   void typecheck_statement_list_instruction(
     const statement_list_parse_treet::instructiont &instruction,
     symbolt &tia_element);
+
+  /// Performs a typecheck for the specified instruction in code form.
+  /// \param instruction: Code to check.
+  /// \param [out] tia_element: Symbol representation of the TIA module.
+  void typecheck_code(const codet &instruction, symbolt &tia_element);
+
+  /// Performs a typecheck for the given label in code form.
+  /// \param instruction: Label to check.
+  /// \param [out] tia_element: Symbol representation of the TIA module.
+  void typecheck_label(const codet &instruction, symbolt &tia_element);
 
   // Load and Transfer instructions
 
@@ -488,16 +561,55 @@ private:
   void
   typecheck_statement_list_reset(const codet &op_code, symbolt &tia_element);
 
-  // Control instructions
+  // Program Control instructions
 
   /// Performs a typecheck on a STL Call instruction and saves the result
-  /// to the given symbol. Modifies the OR and FC bit.
+  /// to the given symbol. Modifies the OR and /FC bit.
   /// \param op_code: OP code of the instruction.
   /// \param [out] tia_element: Symbol representation of the TIA element.
   void
   typecheck_statement_list_call(const codet &op_code, symbolt &tia_element);
 
+  // Logic Control instructions
+
+  /// Performs a typecheck on an unconditional jump instruction (JU) and adds
+  /// the jump to the given symbol.
+  /// \param op_code: OP code of the instruction.
+  /// \param [out] tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_jump_unconditional(
+    const codet &op_code,
+    symbolt &tia_element);
+
+  /// Performs a typecheck on a conditional jump instruction (JC) and adds it
+  /// to the given symbol. Modifies the /FC, RLO and OR bits.
+  /// \param op_code: OP code of the instruction.
+  /// \param [out] tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_jump_conditional(
+    const codet &op_code,
+    symbolt &tia_element);
+
+  /// Performs a typecheck on a inverted conditional jump instruction (JCN) and
+  /// adds it to the given symbol. Modifies the /FC, RLO and OR bits.
+  /// \param op_code: OP code of the instruction.
+  /// \param [out] tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_jump_conditional_not(
+    const codet &op_code,
+    symbolt &tia_element);
+
   // Low level checks
+
+  /// Converts the properties of the current typecheck state to a label
+  /// location.
+  /// \param label: Label to check the properties for.
+  /// \return Encoded location information for the given label.
+  stl_label_locationt typecheck_label_location(const code_labelt &label);
+
+  /// Performs a typecheck on all references for the given label.
+  /// \param label: Label to check.
+  /// \param location: Data about the location of the label.
+  void typecheck_jump_locations(
+    const code_labelt &label,
+    const stl_label_locationt &location);
 
   /// Performs a typecheck on a STL Accumulator instruction for integers.
   /// \param op_code: OP code of the instruction.
@@ -553,6 +665,14 @@ private:
   /// \param comparison: ID of the compare expression that should be pushed to
   ///   the RLO.
   void typecheck_accumulator_compare_instruction(const irep_idt &comparison);
+
+  /// Checks if the given label is already present and compares the current
+  /// state with it. If there is no entry for the label, a new jump location
+  /// is added to the typecheck for later verification.
+  /// \param label: Label to check.
+  /// \param sets_fc_false: Whether the encountered jump instruction sets the
+  ///   /FC bit to false.
+  void typecheck_label_reference(const irep_idt &label, bool sets_fc_false);
 
   /// Performs a typecheck on the given identifier and returns its symbol.
   /// \param identifier: Identifier that should be checked.
