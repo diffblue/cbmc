@@ -53,6 +53,7 @@ class WarningsList(object):
                 current = DoxygenWarning(line.strip(), filename, warning)
                 self.warnings_list.append(current)
             elif line.startswith('  '):
+                print('appending ' + line.strip())
                 current.otherlines.append(line.strip())
             else:
                 # Warnings are usually of the form [path:line: warning:...]
