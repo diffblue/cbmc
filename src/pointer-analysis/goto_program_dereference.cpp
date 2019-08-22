@@ -69,27 +69,25 @@ void goto_program_dereferencet::dereference_rec(exprt &expr)
   }
   else if(expr.id()==ID_if)
   {
-    if(expr.operands().size()!=3)
-      throw "if takes three arguments";
+    auto &if_expr = to_if_expr(expr);
 
-    if(!expr.op0().is_boolean())
+    if(!if_expr.cond().is_boolean())
     {
-      std::string msg=
-        "first argument of if must be boolean, but got "
-        +expr.op0().pretty();
+      std::string msg = "first argument of if must be boolean, but got " +
+                        if_expr.cond().pretty();
       throw msg;
     }
 
-    dereference_rec(expr.op0());
+    dereference_rec(if_expr.cond());
 
-    bool o1 = has_subexpr(expr.op1(), ID_dereference);
-    bool o2 = has_subexpr(expr.op2(), ID_dereference);
+    bool o1 = has_subexpr(if_expr.true_case(), ID_dereference);
+    bool o2 = has_subexpr(if_expr.false_case(), ID_dereference);
 
     if(o1)
-      dereference_rec(expr.op1());
+      dereference_rec(if_expr.true_case());
 
     if(o2)
-      dereference_rec(expr.op2());
+      dereference_rec(if_expr.false_case());
 
     return;
   }
@@ -99,11 +97,10 @@ void goto_program_dereferencet::dereference_rec(exprt &expr)
     // turn &*p to p
     // this has *no* side effect!
 
-    assert(expr.operands().size()==1);
-
-    if(expr.op0().id()==ID_dereference)
+    if(to_address_of_expr(expr).object().id() == ID_dereference)
       expr = typecast_exprt::conditional_cast(
-        to_dereference_expr(expr.op0()).pointer(), expr.type());
+        to_dereference_expr(to_address_of_expr(expr).object()).pointer(),
+        expr.type());
   }
 
   Forall_operands(it, expr)
@@ -111,23 +108,15 @@ void goto_program_dereferencet::dereference_rec(exprt &expr)
 
   if(expr.id()==ID_dereference)
   {
-    if(expr.operands().size()!=1)
-      throw "dereference expects one operand";
-
-    exprt tmp = dereference.dereference(expr.op0());
-
-    expr.swap(tmp);
+    expr = dereference.dereference(to_dereference_expr(expr).pointer());
   }
   else if(expr.id()==ID_index)
   {
     // this is old stuff and will go away
 
-    if(expr.operands().size()!=2)
-      throw "index expects two operands";
-
-    if(expr.op0().type().id()==ID_pointer)
+    if(to_index_expr(expr).array().type().id() == ID_pointer)
     {
-      exprt tmp1(ID_plus, expr.op0().type());
+      exprt tmp1(ID_plus, to_index_expr(expr).array().type());
       tmp1.operands().swap(expr.operands());
 
       exprt tmp2 = dereference.dereference(tmp1);

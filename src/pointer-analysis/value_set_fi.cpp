@@ -15,12 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iterator>
 #include <ostream>
 
-#include <util/symbol_table.h>
-#include <util/simplify_expr.h>
-#include <util/std_expr.h>
-#include <util/prefix.h>
-#include <util/std_code.h>
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
+#include <util/prefix.h>
+#include <util/simplify_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
 #include <util/c_types.h>
@@ -418,36 +419,44 @@ void value_set_fit::get_value_set_rec(
   }
   else if(expr.id()==ID_index)
   {
-    assert(expr.operands().size()==2);
-
-    const typet &type = expr.op0().type();
+    const typet &type = to_index_expr(expr).array().type();
 
     DATA_INVARIANT(type.id()==ID_array ||
                    type.id()=="#REF#",
                    "operand 0 of index expression must be an array");
 
-    get_value_set_rec(expr.op0(), dest, "[]"+suffix,
-                      original_type, ns, recursion_set);
+    get_value_set_rec(
+      to_index_expr(expr).array(),
+      dest,
+      "[]" + suffix,
+      original_type,
+      ns,
+      recursion_set);
 
     return;
   }
   else if(expr.id()==ID_member)
   {
-    assert(expr.operands().size()==1);
+    const auto &compound = to_member_expr(expr).compound();
 
-    if(expr.op0().is_not_nil())
+    if(compound.is_not_nil())
     {
-      const typet &type=ns.follow(expr.op0().type());
+      const typet &type = ns.follow(compound.type());
 
       DATA_INVARIANT(
         type.id() == ID_struct || type.id() == ID_union,
         "operand 0 of member expression must be struct or union");
 
-      const std::string &component_name=
-        expr.get_string(ID_component_name);
+      const std::string &component_name =
+        id2string(to_member_expr(expr).get_component_name());
 
-      get_value_set_rec(expr.op0(), dest, "."+component_name+suffix,
-                        original_type, ns, recursion_set);
+      get_value_set_rec(
+        compound,
+        dest,
+        "." + component_name + suffix,
+        original_type,
+        ns,
+        recursion_set);
 
       return;
     }
@@ -475,22 +484,26 @@ void value_set_fit::get_value_set_rec(
   }
   else if(expr.id()==ID_if)
   {
-    if(expr.operands().size()!=3)
-      throw "if takes three operands";
-
-    get_value_set_rec(expr.op1(), dest, suffix,
-                      original_type, ns, recursion_set);
-    get_value_set_rec(expr.op2(), dest, suffix,
-                      original_type, ns, recursion_set);
+    get_value_set_rec(
+      to_if_expr(expr).true_case(),
+      dest,
+      suffix,
+      original_type,
+      ns,
+      recursion_set);
+    get_value_set_rec(
+      to_if_expr(expr).false_case(),
+      dest,
+      suffix,
+      original_type,
+      ns,
+      recursion_set);
 
     return;
   }
   else if(expr.id()==ID_address_of)
   {
-    if(expr.operands().size()!=1)
-      throw expr.id_string()+" expected to have one operand";
-
-    get_reference_set_sharing(expr.op0(), dest, ns);
+    get_reference_set_sharing(to_address_of_expr(expr).object(), dest, ns);
 
     return;
   }
@@ -524,11 +537,13 @@ void value_set_fit::get_value_set_rec(
   }
   else if(expr.id()==ID_typecast)
   {
-    if(expr.operands().size()!=1)
-      throw "typecast takes one operand";
-
-    get_value_set_rec(expr.op0(), dest, suffix,
-                      original_type, ns, recursion_set);
+    get_value_set_rec(
+      to_typecast_expr(expr).op(),
+      dest,
+      suffix,
+      original_type,
+      ns,
+      recursion_set);
 
     return;
   }
@@ -564,9 +579,9 @@ void value_set_fit::get_value_set_rec(
 
         if(offset_is_zero(offset) && expr.operands().size() == 2)
         {
-          if(expr.op0().type().id()!=ID_pointer)
+          if(to_binary_expr(expr).op0().type().id() != ID_pointer)
           {
-            const auto i = numeric_cast<mp_integer>(expr.op0());
+            const auto i = numeric_cast<mp_integer>(to_binary_expr(expr).op0());
             if(!i.has_value())
               offset.reset();
             else
@@ -574,7 +589,7 @@ void value_set_fit::get_value_set_rec(
           }
           else
           {
-            const auto i = numeric_cast<mp_integer>(expr.op1());
+            const auto i = numeric_cast<mp_integer>(to_binary_expr(expr).op1());
             if(!i.has_value())
               offset.reset();
             else
@@ -592,7 +607,7 @@ void value_set_fit::get_value_set_rec(
   }
   else if(expr.id()==ID_side_effect)
   {
-    const irep_idt &statement=expr.get(ID_statement);
+    const irep_idt &statement = to_side_effect_expr(expr).get_statement();
 
     if(statement==ID_function_call)
     {
@@ -683,10 +698,7 @@ void value_set_fit::dereference_rec(
   {
     assert(src.type().id()==ID_pointer);
 
-    if(src.operands().size()!=1)
-      throw "typecast expects one operand";
-
-    dereference_rec(src.op0(), dest);
+    dereference_rec(to_typecast_expr(src).op(), dest);
   }
   else
     dest=src;
@@ -786,12 +798,15 @@ void value_set_fit::get_reference_set_sharing_rec(
   }
   else if(expr.id()==ID_dereference)
   {
-    if(expr.operands().size()!=1)
-      throw expr.id_string()+" expected to have one operand";
-
     gvs_recursion_sett recset;
     object_mapt temp;
-    get_value_set_rec(expr.op0(), temp, "", expr.op0().type(), ns, recset);
+    get_value_set_rec(
+      to_dereference_expr(expr).pointer(),
+      temp,
+      "",
+      to_dereference_expr(expr).pointer().type(),
+      ns,
+      recset);
 
     // REF's need to be dereferenced manually!
     forall_objects(it, temp.read())
@@ -840,11 +855,8 @@ void value_set_fit::get_reference_set_sharing_rec(
   }
   else if(expr.id()==ID_index)
   {
-    if(expr.operands().size()!=2)
-      throw "index expected to have two operands";
-
-    const exprt &array=expr.op0();
-    const exprt &offset=expr.op1();
+    const exprt &array = to_index_expr(expr).array();
+    const exprt &offset = to_index_expr(expr).index();
     const typet &array_type = array.type();
 
     DATA_INVARIANT(
@@ -895,10 +907,7 @@ void value_set_fit::get_reference_set_sharing_rec(
   {
     const irep_idt &component_name=expr.get(ID_component_name);
 
-    if(expr.operands().size()!=1)
-      throw "member expected to have one operand";
-
-    const exprt &struct_op=expr.op0();
+    const exprt &struct_op = to_member_expr(expr).compound();
 
     object_mapt struct_references;
     get_reference_set_sharing(struct_op, struct_references, ns);
@@ -940,11 +949,8 @@ void value_set_fit::get_reference_set_sharing_rec(
   }
   else if(expr.id()==ID_if)
   {
-    if(expr.operands().size()!=3)
-      throw "if takes three operands";
-
-    get_reference_set_sharing_rec(expr.op1(), dest, ns);
-    get_reference_set_sharing_rec(expr.op2(), dest, ns);
+    get_reference_set_sharing_rec(to_if_expr(expr).true_case(), dest, ns);
+    get_reference_set_sharing_rec(to_if_expr(expr).false_case(), dest, ns);
     return;
   }
 
@@ -963,11 +969,8 @@ void value_set_fit::assign(
 
   if(rhs.id()==ID_if)
   {
-    if(rhs.operands().size()!=3)
-      throw "if takes three operands";
-
-    assign(lhs, rhs.op1(), ns);
-    assign(lhs, rhs.op2(), ns);
+    assign(lhs, to_if_expr(rhs).true_case(), ns);
+    assign(lhs, to_if_expr(rhs).false_case(), ns);
     return;
   }
 
@@ -1016,10 +1019,9 @@ void value_set_fit::assign(
         }
         else if(rhs.id()==ID_with)
         {
-          assert(rhs.operands().size()==3);
-
-          // see if op1 is the member we want
-          const exprt &member_operand=rhs.op1();
+          // see if this is the member we want
+          const auto &rhs_with = to_with_expr(rhs);
+          const exprt &member_operand = rhs_with.where();
 
           const irep_idt &component_name=
             member_operand.get(ID_component_name);
@@ -1027,13 +1029,13 @@ void value_set_fit::assign(
           if(component_name==name)
           {
             // yes! just take op2
-            rhs_member=rhs.op2();
+            rhs_member = rhs_with.new_value();
           }
           else
           {
             // no! do op0
             rhs_member=exprt(ID_member, subtype);
-            rhs_member.copy_to_operands(rhs.op0());
+            rhs_member.copy_to_operands(rhs_with.old());
             rhs_member.set(ID_component_name, name);
           }
         }
@@ -1071,8 +1073,7 @@ void value_set_fit::assign(
 
       if(rhs.id()==ID_array_of)
       {
-        assert(rhs.operands().size()==1);
-        assign(lhs_index, rhs.op0(), ns);
+        assign(lhs_index, to_array_of_expr(rhs).what(), ns);
       }
       else if(rhs.id()==ID_array ||
               rhs.id()==ID_constant)
@@ -1084,13 +1085,13 @@ void value_set_fit::assign(
       }
       else if(rhs.id()==ID_with)
       {
-        assert(rhs.operands().size()==3);
-
         const index_exprt op0_index(
-          rhs.op0(), exprt(ID_unknown, index_type()), type.subtype());
+          to_with_expr(rhs).old(),
+          exprt(ID_unknown, index_type()),
+          type.subtype());
 
         assign(lhs_index, op0_index, ns);
-        assign(lhs_index, rhs.op2(), ns);
+        assign(lhs_index, to_with_expr(rhs).new_value(), ns);
       }
       else
       {
@@ -1194,35 +1195,34 @@ void value_set_fit::assign_rec(
   }
   else if(lhs.id()==ID_index)
   {
-    if(lhs.operands().size()!=2)
-      throw "index expected to have two operands";
-
-    const typet &type = lhs.op0().type();
+    const typet &type = to_index_expr(lhs).array().type();
 
     DATA_INVARIANT(type.id()==ID_array ||
                    type.id()=="#REF#",
                    "operand 0 of index expression must be an array");
 
-    assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
+    assign_rec(
+      to_index_expr(lhs).array(), values_rhs, "[]" + suffix, ns, recursion_set);
   }
   else if(lhs.id()==ID_member)
   {
-    if(lhs.operands().size()!=1)
-      throw "member expected to have one operand";
-
-    if(lhs.op0().is_nil())
+    if(to_member_expr(lhs).compound().is_nil())
       return;
 
     const std::string &component_name=lhs.get_string(ID_component_name);
 
-    const typet &type=ns.follow(lhs.op0().type());
+    const typet &type = ns.follow(to_member_expr(lhs).compound().type());
 
     DATA_INVARIANT(
       type.id() == ID_struct || type.id() == ID_union,
       "operand 0 of member expression must be struct or union");
 
-    assign_rec(lhs.op0(), values_rhs, "."+component_name+suffix,
-               ns, recursion_set);
+    assign_rec(
+      to_member_expr(lhs).compound(),
+      values_rhs,
+      "." + component_name + suffix,
+      ns,
+      recursion_set);
   }
   else if(lhs.id()=="valid_object" ||
           lhs.id()=="dynamic_size" ||
@@ -1254,8 +1254,8 @@ void value_set_fit::assign_rec(
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
   {
-    assert(lhs.operands().size()==2);
-    assign_rec(lhs.op0(), values_rhs, suffix, ns, recursion_set);
+    assign_rec(
+      to_byte_extract_expr(lhs).op(), values_rhs, suffix, ns, recursion_set);
   }
   else
     throw "assign NYI: '" + lhs.id_string() + "'";
