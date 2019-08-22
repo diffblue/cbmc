@@ -756,6 +756,16 @@ private:
   /// \param op: Operand of the encountered instruction.
   void initialize_bit_expression(const exprt &op);
 
+  /// Modifies the state of the typecheck to resemble the beginning of a new
+  /// module. All changes to the implicit typecheck fields are close to the
+  /// original TIA behaviour.
+  void clear_module_state();
+
+  /// Modifies the state of the typecheck to resemble the beginning of a new
+  /// network. All changes to the implicit typecheck fields are close to the
+  /// original TIA behaviour.
+  void clear_network_state();
+
   /// Saves the current RLO bit to a temporary variable to prevent false
   /// overrides when modifying boolean variables.
   /// \param tia_element: Symbol representation of the TIA element.

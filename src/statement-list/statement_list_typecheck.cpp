@@ -343,12 +343,12 @@ void statement_list_typecheckt::typecheck_statement_list_networks(
   if(tia_symbol.value.is_nil())
     tia_symbol.value = code_blockt{};
 
+  clear_module_state();
   typecheck_temp_var_decls(tia_module, tia_symbol);
 
   for(const auto &network : tia_module.networks)
   {
-    // Set RLO to true each time a new network is entered (TIA behaviour).
-    rlo_bit = true_exprt();
+    clear_network_state();
     for(const auto &instruction : network.instructions)
       typecheck_statement_list_instruction(instruction, tia_symbol);
   }
@@ -1802,6 +1802,21 @@ void statement_list_typecheckt::initialize_bit_expression(const exprt &op)
   fc_bit = true;
   or_bit = false;
   rlo_bit = op;
+}
+
+void statement_list_typecheckt::clear_network_state()
+{
+  rlo_bit = true_exprt{};
+  fc_bit = false;
+  or_bit = false;
+  nesting_stack.clear();
+}
+
+void statement_list_typecheckt::clear_module_state()
+{
+  clear_network_state();
+  label_references.clear();
+  stl_labels.clear();
 }
 
 void statement_list_typecheckt::save_rlo_state(symbolt &tia_element)
