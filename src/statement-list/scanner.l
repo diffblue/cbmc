@@ -272,7 +272,7 @@ void statement_list_scanner_init()
                         return TOK_IDENTIFIER; 
                       }
 
-  [a-zA-Z_\.][a-zA-Z0-9_\.]*: {
+  [a-zA-Z_][a-zA-Z0-9_]*: {
                         newstack(yystatement_listlval);
                         parser_stack(yystatement_listlval) = 
                           convert_label(yytext);

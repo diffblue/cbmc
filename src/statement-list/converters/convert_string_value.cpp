@@ -32,10 +32,12 @@ string_constantt convert_version(const std::string &src)
   return result;
 }
 
-code_labelt convert_label(const std::string &src)
+string_constantt convert_label(const std::string &src)
 {
   // Cut the trailing colon
   std::string value = src.substr(0, src.length() - 1);
 
-  return code_labelt{value, codet(ID_label)};
+  string_constantt result{value};
+  result.set(ID_statement_list_type, ID_label);
+  return result;
 }

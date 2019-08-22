@@ -688,7 +688,7 @@ Oom_IL_Instruction:
     ;
 
 IL_Instruction: 
-    Opt_Label Opt_Instruction ';'
+    Opt_Label Instruction ';'
     {
       $$ = $2;
       parser_stack($$).add_to_operands(std::move(parser_stack($1)));
@@ -708,14 +708,9 @@ IL_Label:
     TOK_LABEL
     ;
 
-Opt_Instruction:
+Instruction:
     IL_Simple_Operation
     | IL_Invocation
-    | /* nothing */
-    {
-      newstack($$);
-      parser_stack($$).id(ID_statement_list_instruction);
-    }
     ;
 
 IL_Simple_Operation: 
