@@ -147,8 +147,8 @@ public:
   {
     goto_functionst goto_functions;
     initialize(function_id, goto_program);
-    entry_state(goto_program);
-    fixedpoint(function_id, goto_program, goto_functions, ns);
+    trace_ptrt p = entry_state(goto_program);
+    fixedpoint(p, function_id, goto_program, goto_functions, ns);
     finalize();
   }
 
@@ -158,8 +158,8 @@ public:
     const namespacet &ns)
   {
     initialize(goto_functions);
-    entry_state(goto_functions);
-    fixedpoint(goto_functions, ns);
+    trace_ptrt p = entry_state(goto_functions);
+    fixedpoint(p, goto_functions, ns);
     finalize();
   }
 
@@ -168,8 +168,8 @@ public:
   {
     const namespacet ns(goto_model.get_symbol_table());
     initialize(goto_model.get_goto_functions());
-    entry_state(goto_model.get_goto_functions());
-    fixedpoint(goto_model.get_goto_functions(), ns);
+    trace_ptrt p = entry_state(goto_model.get_goto_functions());
+    fixedpoint(p, goto_model.get_goto_functions(), ns);
     finalize();
   }
 
@@ -181,8 +181,8 @@ public:
   {
     goto_functionst goto_functions;
     initialize(function_id, goto_function);
-    entry_state(goto_function.body);
-    fixedpoint(function_id, goto_function.body, goto_functions, ns);
+    trace_ptrt p = entry_state(goto_function.body);
+    fixedpoint(p, function_id, goto_function.body, goto_functions, ns);
     finalize();
   }
 
@@ -378,11 +378,11 @@ protected:
 
   /// Set the abstract state of the entry location of a single function to the
   /// entry state required by the analysis
-  void entry_state(const goto_programt &goto_program);
+  trace_ptrt entry_state(const goto_programt &goto_program);
 
   /// Set the abstract state of the entry location of a whole program to the
   /// entry state required by the analysis
-  void entry_state(const goto_functionst &goto_functions);
+  trace_ptrt entry_state(const goto_functionst &goto_functions);
 
   /// Output the abstract states for a single function as JSON
   /// \param ns: The namespace
@@ -420,13 +420,16 @@ protected:
   /// Run the fixedpoint algorithm until it reaches a fixed point
   /// \return True if we found something new
   virtual bool fixedpoint(
+    trace_ptrt starting_trace,
     const irep_idt &function_id,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
-  virtual void
-  fixedpoint(const goto_functionst &goto_functions, const namespacet &ns);
+  virtual void fixedpoint(
+    trace_ptrt starting_trace,
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
 
   /// Perform one step of abstract interpretation from trace t
   /// Depending on the instruction type it may compute a number of "edges"
@@ -660,10 +663,11 @@ protected:
   using working_sett = ai_baset::working_sett;
 
   void fixedpoint(
+    ai_baset::trace_ptrt start_trace,
     const goto_functionst &goto_functions,
     const namespacet &ns) override
   {
-    ai_baset::fixedpoint(goto_functions, ns);
+    ai_baset::fixedpoint(start_trace, goto_functions, ns);
 
     is_threadedt is_threaded(goto_functions);
 

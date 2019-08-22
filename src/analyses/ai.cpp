@@ -157,7 +157,8 @@ xmlt ai_baset::output_xml(
   return function_body;
 }
 
-void ai_baset::entry_state(const goto_functionst &goto_functions)
+ai_baset::trace_ptrt
+ai_baset::entry_state(const goto_functionst &goto_functions)
 {
   // find the 'entry function'
 
@@ -165,14 +166,18 @@ void ai_baset::entry_state(const goto_functionst &goto_functions)
     f_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(f_it!=goto_functions.function_map.end())
-    entry_state(f_it->second.body);
+    return entry_state(f_it->second.body);
+
+  // It is not clear if this is even a well-structured goto_functionst object
+  return nullptr;
 }
 
-void ai_baset::entry_state(const goto_programt &goto_program)
+ai_baset::trace_ptrt ai_baset::entry_state(const goto_programt &goto_program)
 {
   // The first instruction of 'goto_program' is the entry point
   trace_ptrt p = history_factory->epoch(goto_program.instructions.begin());
   get_state(p).make_entry();
+  return p;
 }
 
 void ai_baset::initialize(
@@ -218,19 +223,16 @@ ai_baset::trace_ptrt ai_baset::get_next(working_sett &working_set)
 }
 
 bool ai_baset::fixedpoint(
+  trace_ptrt start_trace,
   const irep_idt &function_id,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  working_sett working_set;
+  PRECONDITION(start_trace != nullptr);
 
-  // Put the first location in the working set
-  if(!goto_program.empty())
-  {
-    put_in_working_set(
-      working_set, history_factory->bang(goto_program.instructions.begin()));
-  }
+  working_sett working_set;
+  put_in_working_set(working_set, start_trace);
 
   bool new_data=false;
 
@@ -247,14 +249,15 @@ bool ai_baset::fixedpoint(
 }
 
 void ai_baset::fixedpoint(
+  trace_ptrt start_trace,
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  goto_functionst::function_mapt::const_iterator
-    f_it=goto_functions.function_map.find(goto_functions.entry_point());
+  goto_functionst::function_mapt::const_iterator f_it =
+    goto_functions.function_map.find(goto_functions.entry_point());
 
-  if(f_it!=goto_functions.function_map.end())
-    fixedpoint(f_it->first, f_it->second.body, goto_functions, ns);
+  if(f_it != goto_functions.function_map.end())
+    fixedpoint(start_trace, f_it->first, f_it->second.body, goto_functions, ns);
 }
 
 bool ai_baset::visit(
@@ -469,7 +472,7 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
   {
     locationt l_begin = callee.instructions.begin();
 
-    working_sett ignore_working_set; // Redundant; fixpoint will add l_begin
+    working_sett catch_working_set; // The trace from the next fixpoint
 
     // Do the edge from the call site to the beginning of the function
     bool new_data = visit_edge(
@@ -478,11 +481,16 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
       callee_function_id,
       l_begin,
       ns,
-      ignore_working_set);
+      catch_working_set);
 
     // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
-      fixedpoint(callee_function_id, callee, goto_functions, ns);
+      fixedpoint(
+        get_next(catch_working_set),
+        callee_function_id,
+        callee,
+        goto_functions,
+        ns);
   }
 
   // This is the edge from function end to return site.
@@ -493,7 +501,7 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
       l_end->is_end_function(),
       "The last instruction of a goto_program must be END_FUNCTION");
 
-    // Construct a history from a location
+    // Find the histories for a location
     auto traces = storage->abstract_traces_before(l_end);
 
     bool new_data = false;
