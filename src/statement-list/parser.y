@@ -671,7 +671,7 @@ Opt_Instruction_List:
     }
     ;
     
-// Structured Text grammar
+// Statement List grammar
 Instruction_List: 
     Oom_IL_Instruction
     ;
@@ -930,12 +930,12 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor);
-    }  
+    }
     | TOK_XOR_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_not);
-    } 
+    }
     | TOK_AND_NESTED 
     {
       $$ = $1;
@@ -945,22 +945,22 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_and_not_nested);
-    } 
+    }
     | TOK_OR_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_nested);
-    } 
+    }
     | TOK_OR_NOT_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_not_nested);
-    }  
+    }
     | TOK_XOR_NESTED 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_nested);
-    }  
+    }
     | TOK_XOR_NOT_NESTED
     {
       $$ = $1;
@@ -970,7 +970,7 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_nesting_closed);
-    }  
+    }
     | TOK_ASSIGN
     {
       $$ = $1;
@@ -985,7 +985,7 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_clr_rlo);
-    } 
+    }
     | TOK_SET
     {
       $$ = $1;
@@ -995,7 +995,7 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_reset);
-    } 
+    }
     | TOK_NOT
     {
       $$ = $1;
