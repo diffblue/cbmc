@@ -246,6 +246,17 @@ bool ai_baset::fixedpoint(
   return new_data;
 }
 
+void ai_baset::fixedpoint(
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  goto_functionst::function_mapt::const_iterator
+    f_it=goto_functions.function_map.find(goto_functions.entry_point());
+
+  if(f_it!=goto_functions.function_map.end())
+    fixedpoint(f_it->first, f_it->second.body, goto_functions, ns);
+}
+
 bool ai_baset::visit(
   const irep_idt &function_id,
   trace_ptrt p,
@@ -442,17 +453,6 @@ bool ai_baset::visit_end_function(
 
   // Do nothing
   return false;
-}
-
-void ai_baset::fixedpoint(
-  const goto_functionst &goto_functions,
-  const namespacet &ns)
-{
-  goto_functionst::function_mapt::const_iterator
-    f_it=goto_functions.function_map.find(goto_functions.entry_point());
-
-  if(f_it!=goto_functions.function_map.end())
-    fixedpoint(f_it->first, f_it->second.body, goto_functions, ns);
 }
 
 bool ai_recursive_interproceduralt::visit_edge_function_call(
