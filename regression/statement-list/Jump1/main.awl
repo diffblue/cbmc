@@ -1,0 +1,37 @@
+﻿FUNCTION_BLOCK "Main"
+VERSION : 0.1
+   VAR_TEMP 
+      temp1 : Bool;
+      temp2 : Bool;
+   END_VAR
+BEGIN
+NETWORK
+TITLE =
+      SET;
+      = temp1;
+      = temp2;
+      JU lab0;
+      CALL "__CPROVER_assert"
+      (  condition := FALSE
+      );
+lab0: SET;
+lab1: A temp1;
+      A temp2;
+      NOT;
+      = temp2;
+      A temp2;
+
+      JCN lab1;
+      CALL "__CPROVER_assert"
+      (  condition := #temp2
+      );
+
+      JC lab2;
+      CALL "__CPROVER_assert"
+      (  condition := FALSE
+      );
+
+lab2: NOP 0;
+
+END_FUNCTION_BLOCK
+
