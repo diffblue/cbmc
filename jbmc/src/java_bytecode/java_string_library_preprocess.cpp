@@ -1483,7 +1483,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
   // CProverString.charAt differs from the Java String.charAt in that no
   // exception is raised for the out of bounds case.
   cprover_equivalent_to_java_function
-    ["java::org.cprover.CProverString.charAt:(Ljava/lang/String;I)C"]=
+    ["java::org.cprover.CProverString.charAt:(Ljava/lang/String;I)C"] =
       ID_cprover_string_char_at_func;
   cprover_equivalent_to_java_function
     ["java::org.cprover.CProverString.charAt:(Ljava/lang/StringBuffer;I)C"] =
@@ -1518,7 +1518,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
     format_signature += "Ljava/lang/String;";
   format_signature += ")Ljava/lang/String;";
   cprover_equivalent_to_java_string_returning_function[format_signature] =
-      ID_cprover_string_format_func;
+    ID_cprover_string_format_func;
 
   cprover_equivalent_to_java_assign_and_return_function
     ["java::org.cprover.CProverString.insert:(Ljava/lang/StringBuilder;ILjava/"
@@ -1539,15 +1539,28 @@ void java_string_library_preprocesst::initialize_conversion_table()
   // exception is raised for the out of bounds case.
   cprover_equivalent_to_java_string_returning_function
     ["java::org.cprover.CProverString.substring:(Ljava/lang/String;I)"
-    "Ljava/lang/String;"]=
-      ID_cprover_string_substring_func;
+     "Ljava/lang/String;"] = ID_cprover_string_substring_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::org.cprover.CProverString.substring:(Ljava/lang/String;II)"
-    "Ljava/lang/String;"]=
-      ID_cprover_string_substring_func;
+     "Ljava/lang/String;"] = ID_cprover_string_substring_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::org.cprover.CProverString.substring:(Ljava/Lang/"
      "StringBuffer;II)Ljava/lang/String;"] = ID_cprover_string_substring_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::org.cprover.CProverString.toString:(I)Ljava/lang/String;"] =
+      ID_cprover_string_of_int_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::org.cprover.CProverString.toString:(J)Ljava/lang/String;"] =
+      ID_cprover_string_of_long_func;
+  conversion_table
+    ["java::org.cprover.CProverString.toString:(F)Ljava/lang/String;"] =
+      std::bind(
+        &java_string_library_preprocesst::make_float_to_string_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3,
+        std::placeholders::_4);
 
   // String library
   conversion_table["java::java.lang.String.<init>:(Ljava/lang/String;)V"] =
