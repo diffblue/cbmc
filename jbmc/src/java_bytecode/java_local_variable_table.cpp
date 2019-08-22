@@ -85,19 +85,19 @@ struct procedure_local_cfg_baset<
     }
   }
 
-  java_bytecode_convert_methodt::method_offsett
-  get_first_node(const method_with_amapt &args) const
+  static java_bytecode_convert_methodt::method_offsett
+  get_first_node(const method_with_amapt &args)
   {
     return args.second.begin()->first;
   }
 
-  java_bytecode_convert_methodt::method_offsett
-  get_last_node(const method_with_amapt &args) const
+  static java_bytecode_convert_methodt::method_offsett
+  get_last_node(const method_with_amapt &args)
   {
     return (--args.second.end())->first;
   }
 
-  bool nodes_empty(const method_with_amapt &args) const
+  static bool nodes_empty(const method_with_amapt &args)
   {
     return args.second.empty();
   }
