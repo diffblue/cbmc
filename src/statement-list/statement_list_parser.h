@@ -36,7 +36,7 @@ class statement_list_parsert : public parsert
 public:
   /// Starts the parsing process and saves the result inside of this instance's
   /// parse tree.
-  /// \return: False if successful.
+  /// \return False if successful.
   bool parse() override;
 
   /// Adds a function block to the parse tree by converting the \p block

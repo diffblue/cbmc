@@ -28,7 +28,7 @@ class symbolt;
 /// \param module: Name of the file that has been parsed.
 /// \param message_handler: Used to provide debug information and error
 ///   messages.
-/// \return: False if no errors occurred, true otherwise.
+/// \return False if no errors occurred, true otherwise.
 bool statement_list_typecheck(
   const statement_list_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
@@ -198,7 +198,7 @@ private:
   /// Creates a data block type for the given function block.
   /// \param function_block: Function block with an interface that should be
   /// converted to a data block.
-  /// \return: A type representation of an instance data block for the
+  /// \return A type representation of an instance data block for the
   ///   function block.
   struct_typet create_instance_data_block_type(
     const statement_list_parse_treet::function_blockt &function_block);
@@ -627,7 +627,7 @@ private:
   /// Performs a typecheck on a STL instruction with an additional operand that
   /// should be no constant.
   /// \param op_code: OP code of the instruction.
-  /// \return: Reference to the operand.
+  /// \return Reference to the operand.
   const symbol_exprt &
   typecheck_instruction_with_non_const_operand(const codet &op_code);
 
@@ -655,7 +655,7 @@ private:
   /// \param tia_element: Symbol representation of the TIA element.
   /// \param negate: Whether the operand should be negated (e.g. for the
   ///   `AND NOT` expression).
-  /// \return: Typechecked operand.
+  /// \return Typechecked operand.
   exprt typecheck_simple_boolean_instruction_operand(
     const codet &op_code,
     const symbolt &tia_element,
@@ -677,7 +677,7 @@ private:
   /// Performs a typecheck on the given identifier and returns its symbol.
   /// \param identifier: Identifier that should be checked.
   /// \param tia_element: Symbol representation of the current TIA module.
-  /// \return: Expression including the symbol's name and type.
+  /// \return Expression including the symbol's name and type.
   exprt
   typecheck_identifier(const symbolt &tia_element, const irep_idt &identifier);
 
@@ -717,7 +717,7 @@ private:
   /// \param assignments: Assignment list of the function call.
   /// \param param: Parameter that should be checked.
   /// \param tia_element: Symbol representation of the TIA element.
-  /// \return: Expression including the assigned symbol's name and type.
+  /// \return Expression including the assigned symbol's name and type.
   exprt typecheck_function_call_arguments(
     const std::vector<equal_exprt> &assignments,
     const code_typet::parametert &param,
@@ -727,7 +727,7 @@ private:
   /// returns the typechecked version.
   /// \param tia_element: Symbol representation of the TIA element.
   /// \param rhs: Expression that the function parameter got assigned to.
-  /// \return: Expression of either a symbol or a constant.
+  /// \return Expression of either a symbol or a constant.
   exprt typecheck_function_call_argument_rhs(
     const symbolt &tia_element,
     const exprt &rhs);
@@ -738,7 +738,7 @@ private:
   /// \param assignments: Assignment list of the function call.
   /// \param return_type: Type of the return value.
   /// \param tia_element: Symbol representation of the TIA element.
-  /// \return: Expression including the assigned symbol's name and type.
+  /// \return Expression including the assigned symbol's name and type.
   exprt typecheck_return_value_assignment(
     const std::vector<equal_exprt> &assignments,
     const typet &return_type,

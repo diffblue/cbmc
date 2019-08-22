@@ -59,7 +59,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// such. This can reduce complexity in some cases.
 /// \param lhs: Left side of the binary expression.
 /// \param rhs: Right side of the binary expression.
-/// \return: List of instrumented operands.
+/// \return List of instrumented operands.
 static std::vector<exprt>
 instrument_equal_operands(const exprt &lhs, const exprt &rhs)
 {
@@ -93,7 +93,7 @@ instrument_equal_operands(const exprt &lhs, const exprt &rhs)
 
 /// Checks if the expression or one of its parameters is not of type bool.
 /// \param expr: Expression to verify.
-/// \return: True if the expression and its operands are not or only partially
+/// \return True if the expression and its operands are not or only partially
 ///   of type bool, false otherwise.
 static bool is_not_bool(const exprt &expr)
 {

@@ -32,7 +32,7 @@ public:
   /// instance's parse tree.
   /// \param instream: Input to parse.
   /// \param path: Path of the input.
-  /// \return: False if successful.
+  /// \return False if successful.
   bool parse(std::istream &instream, const std::string &path) override;
 
   /// Currently unused.
@@ -45,7 +45,7 @@ public:
   /// \param module: Name of the file that has been parsed.
   /// \param keep_file_local: Set to true if local variables of this module
   ///   should be included in the table.
-  /// \return: False if no errors occurred, true otherwise.
+  /// \return False if no errors occurred, true otherwise.
   bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module,
