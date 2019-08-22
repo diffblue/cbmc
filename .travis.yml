@@ -49,7 +49,7 @@ jobs:
     - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       env:
         NAME: "DOXYGEN-CHECK"
-        DOXYGEN_VERSION: "1.8.14"
+        DOXYGEN_VERSION: "1.8.16"
       addons:
         apt:
           sources:
