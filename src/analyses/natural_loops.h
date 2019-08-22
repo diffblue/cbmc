@@ -122,16 +122,13 @@ void natural_loops_templatet<P, T>::compute(P &program)
 
       if(target->location_number<=m_it->location_number)
       {
-        const nodet &node=
-          cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
-
         #ifdef DEBUG
         std::cout << "Computing loop for "
                   << m_it->location_number << " -> "
                   << target->location_number << "\n";
         #endif
 
-        if(node.dominators.find(target)!=node.dominators.end())
+        if(cfg_dominators.dominates(target, m_it))
           compute_natural_loop(m_it, target);
       }
     }
@@ -159,8 +156,7 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
     T p=stack.top();
     stack.pop();
 
-    const nodet &node=
-      cfg_dominators.cfg[cfg_dominators.cfg.entry_map[p]];
+    const nodet &node = cfg_dominators.get_node(p);
 
     for(const auto &edge : node.in)
     {
