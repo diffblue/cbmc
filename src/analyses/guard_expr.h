@@ -59,6 +59,10 @@ public:
   /// dest are trivial.
   exprt guard_expr(exprt expr) const;
 
+  /// Return `guard => other` or a simplified variant thereof if either guard or
+  /// dest are trivial.
+  guard_exprt implies(const guard_exprt &other) const;
+
   bool is_true() const
   {
     return expr.is_true();

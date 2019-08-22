@@ -18,22 +18,29 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
 
-exprt guard_exprt::guard_expr(exprt expr) const
+exprt guard_exprt::guard_expr(exprt e) const
+{
+  guard_expr_managert manager{};
+  return implies(guard_exprt{e, manager}).as_expr();
+}
+
+guard_exprt guard_exprt::implies(const guard_exprt &other) const
 {
   if(is_true())
   {
     // do nothing
-    return expr;
+    return other;
   }
   else
   {
-    if(expr.is_false())
+    guard_expr_managert manager{};
+    if(other.is_false())
     {
-      return boolean_negate(as_expr());
+      return guard_exprt{boolean_negate(as_expr()), manager};
     }
     else
     {
-      return implies_exprt{as_expr(), expr};
+      return guard_exprt{implies_exprt{as_expr(), other.as_expr()}, manager};
     }
   }
 }

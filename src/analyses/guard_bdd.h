@@ -44,6 +44,9 @@ public:
   /// dest are trivial.
   exprt guard_expr(exprt expr) const;
 
+  /// \return guard for `guard => other`
+  guard_bddt implies(const guard_bddt &other) const;
+
   bool is_true() const
   {
     return bdd.is_true();
