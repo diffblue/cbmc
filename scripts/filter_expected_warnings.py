@@ -27,6 +27,8 @@ class DoxygenWarning(object):
         for line in self.otherlines:
             print(prefix + '  ' + line)
 
+    def print_all(self):
+        return 'self.firstline: ' + self.firstline + 'self.filename: ' + self.filename + 'self.warning: ' + self.warning + 'self.otherlines: ' + str(self.otherlines)
 
 class WarningsList(object):
     """List of Doxygen warnings."""
@@ -65,6 +67,7 @@ class WarningsList(object):
     def contains(self, warning):
         """Check if a similar warning is in this list."""
         for other in self.warnings_list:
+            print('Comparing\n' + other.print_all() + '\nand\n' + warning.print_all())
             if warning.equals_ignoring_path_and_line_number(other):
                 return True
         return False
