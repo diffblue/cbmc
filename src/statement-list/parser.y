@@ -128,6 +128,9 @@ extern char *yystatement_listtext;
 %token TOK_ACCU_DINT_GTE        ">=D"
 %token TOK_ACCU_DINT_LTE        "<=D"
 %token TOK_ASSIGNMENT           ":="
+%token TOK_JUMP_UNCONDITIONAL   "JU"
+%token TOK_JUMP_CONDITIONAL     "JC"
+%token TOK_JUMP_CONDITIONAL_NOT "JCN"
 
 /*** Value tokens ***/
 %token TOK_INT_LITERAL
@@ -997,7 +1000,22 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_not);
-    }  
+    }
+    | TOK_JUMP_UNCONDITIONAL
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_jump_unconditional);
+    }
+    | TOK_JUMP_CONDITIONAL
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_jump_conditional);
+    }
+    | TOK_JUMP_CONDITIONAL_NOT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_jump_conditional_not);
+    }
     ;
 
 IL_Operand:

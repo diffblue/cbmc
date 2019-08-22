@@ -165,6 +165,9 @@ void statement_list_scanner_init()
   \<D                 { loc(); return TOK_ACCU_DINT_LT; }
   \>=D                { loc(); return TOK_ACCU_DINT_GTE; }
   \<=D                { loc(); return TOK_ACCU_DINT_LTE; }
+  JU                  { loc(); return TOK_JUMP_UNCONDITIONAL; }
+  JC                  { loc(); return TOK_JUMP_CONDITIONAL; }
+  JCN                 { loc(); return TOK_JUMP_CONDITIONAL_NOT; }
 
   (10#)?[\+-]?[0-9]+ { 
                         newstack(yystatement_listlval);
