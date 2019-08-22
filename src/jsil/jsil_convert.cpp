@@ -80,13 +80,13 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 
     if(a.rhs().id()==ID_with)
     {
-      exprt to_try=a.rhs().op0();
+      exprt to_try = to_with_expr(a.rhs()).old();
       codet t(code_assignt(a.lhs(), to_try));
       if(convert_code(symbol, t))
         return true;
 
-      irep_idt c_target=
-        to_symbol_expr(a.rhs().op1()).get_identifier();
+      irep_idt c_target =
+        to_symbol_expr(to_with_expr(a.rhs()).where()).get_identifier();
       code_gotot g(c_target);
 
       code_try_catcht t_c(std::move(t));

@@ -294,8 +294,8 @@ void jsil_typecheckt::typecheck_expr_proto_field(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_object_type(), true);
-  make_type_compatible(expr.op1(), string_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), jsil_object_type(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), string_typet(), true);
 
   expr.type()=jsil_value_or_empty_type();
 }
@@ -309,8 +309,8 @@ void jsil_typecheckt::typecheck_expr_proto_obj(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_object_type(), true);
-  make_type_compatible(expr.op1(), jsil_object_type(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), jsil_object_type(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), jsil_object_type(), true);
 
   expr.type()=bool_typet();
 }
@@ -324,8 +324,8 @@ void jsil_typecheckt::typecheck_expr_delete(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_object_type(), true);
-  make_type_compatible(expr.op1(), string_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), jsil_object_type(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), string_typet(), true);
 
   expr.type()=bool_typet();
 }
@@ -339,11 +339,13 @@ void jsil_typecheckt::typecheck_expr_index(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_object_type(), true);
-  make_type_compatible(expr.op1(), string_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), jsil_object_type(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), string_typet(), true);
 
   // special case for function identifiers
-  if(expr.op1().id()=="fid" || expr.op1().id()=="constructid")
+  if(
+    to_binary_expr(expr).op1().id() == "fid" ||
+    to_binary_expr(expr).op1().id() == "constructid")
     expr.type() = code_typet({}, typet());
   else
     expr.type()=jsil_value_type();
@@ -358,8 +360,8 @@ void jsil_typecheckt::typecheck_expr_has_field(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_object_type(), true);
-  make_type_compatible(expr.op1(), string_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), jsil_object_type(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), string_typet(), true);
 
   expr.type()=bool_typet();
 }
@@ -373,7 +375,7 @@ void jsil_typecheckt::typecheck_expr_field(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_reference_type(), true);
+  make_type_compatible(to_unary_expr(expr).op(), jsil_reference_type(), true);
 
   expr.type()=string_typet();
 }
@@ -387,7 +389,7 @@ void jsil_typecheckt::typecheck_expr_base(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_reference_type(), true);
+  make_type_compatible(to_unary_expr(expr).op(), jsil_reference_type(), true);
 
   expr.type()=jsil_value_type();
 }
@@ -401,10 +403,10 @@ void jsil_typecheckt::typecheck_expr_ref(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_value_type(), true);
-  make_type_compatible(expr.op1(), string_typet(), true);
+  make_type_compatible(to_multi_ary_expr(expr).op0(), jsil_value_type(), true);
+  make_type_compatible(to_multi_ary_expr(expr).op1(), string_typet(), true);
 
-  exprt &operand3=expr.op2();
+  exprt &operand3 = to_multi_ary_expr(expr).op2();
   make_type_compatible(operand3, jsil_kind(), true);
 
   if(operand3.id()==ID_member)
@@ -430,8 +432,8 @@ void jsil_typecheckt::typecheck_expr_concatenation(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), string_typet(), true);
-  make_type_compatible(expr.op1(), string_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), string_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), string_typet(), true);
 
   expr.type()=string_typet();
 }
@@ -445,8 +447,8 @@ void jsil_typecheckt::typecheck_expr_subtype(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), jsil_kind(), true);
-  make_type_compatible(expr.op1(), jsil_kind(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), jsil_kind(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), jsil_kind(), true);
 
   expr.type()=bool_typet();
 }
@@ -460,8 +462,8 @@ void jsil_typecheckt::typecheck_expr_binary_boolean(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), bool_typet(), true);
-  make_type_compatible(expr.op1(), bool_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), bool_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), bool_typet(), true);
 
   expr.type()=bool_typet();
 }
@@ -475,9 +477,8 @@ void jsil_typecheckt::typecheck_expr_binary_arith(exprt &expr)
     throw 0;
   }
 
-
-  make_type_compatible(expr.op0(), floatbv_typet(), true);
-  make_type_compatible(expr.op1(), floatbv_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), floatbv_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), floatbv_typet(), true);
 
   expr.type()=floatbv_typet();
 }
@@ -505,8 +506,8 @@ void jsil_typecheckt::typecheck_expr_binary_compare(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), floatbv_typet(), true);
-  make_type_compatible(expr.op1(), floatbv_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op0(), floatbv_typet(), true);
+  make_type_compatible(to_binary_expr(expr).op1(), floatbv_typet(), true);
 
   expr.type()=bool_typet();
 }
@@ -520,7 +521,7 @@ void jsil_typecheckt::typecheck_expr_unary_boolean(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), bool_typet(), true);
+  make_type_compatible(to_unary_expr(expr).op(), bool_typet(), true);
 
   expr.type()=bool_typet();
 }
@@ -534,7 +535,7 @@ void jsil_typecheckt::typecheck_expr_unary_string(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), string_typet(), true);
+  make_type_compatible(to_unary_expr(expr).op(), string_typet(), true);
 
   expr.type()=floatbv_typet();
 }
@@ -548,7 +549,7 @@ void jsil_typecheckt::typecheck_expr_unary_num(exprt &expr)
     throw 0;
   }
 
-  make_type_compatible(expr.op0(), floatbv_typet(), true);
+  make_type_compatible(to_unary_expr(expr).op(), floatbv_typet(), true);
 }
 
 void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
