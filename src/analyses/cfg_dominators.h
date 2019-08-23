@@ -78,13 +78,13 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 {
   std::list<T> worklist;
 
-  if(cfg.nodes_empty(program))
+  if(cfgt::nodes_empty(program))
     return;
 
   if(post_dom)
-    entry_node=cfg.get_last_node(program);
+    entry_node = cfgt::get_last_node(program);
   else
-    entry_node=cfg.get_first_node(program);
+    entry_node = cfgt::get_first_node(program);
   typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
   n.dominators.insert(entry_node);
 
