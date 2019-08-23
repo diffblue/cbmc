@@ -69,11 +69,10 @@ jobs:
           then
             scripts/build_doxygen.sh ${DOXYGEN_VERSION}
           fi
-        - export PATH="$PATH:${TRAVIS_BUILD_DIR}/doxygen/build/bin"
       script:
         - echo $PATH
-        - doxygen --version
-        - scripts/run_doxygen.sh
+        - ${TRAVIS_BUILD_DIR}/doxygen/build/bin/doxygen --version
+        - scripts/run_doxygen.sh ${TRAVIS_BUILD_DIR}/doxygen/build/bin/doxygen
       before_cache:
       after_success:
         # Google Cloud Integration
