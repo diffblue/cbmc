@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Check doxygen version
-EXPECTED_VERSION="1.8.14"
-doxygen --version | grep -x $EXPECTED_VERSION > /dev/null
+EXPECTED_VERSION="1.8.16"
+doxygen --version | grep ^$EXPECTED_VERSION > /dev/null
 if [ $? -ne 0 ]
 then
   echo "WARNING: Using wrong version of doxygen.\

@@ -1,4 +1,3 @@
-/cbmc/src/solvers/miniBDD/miniBDD.cpp:402: warning: documented symbol `mini_bddt mini_bddt::operator &' was not declared or defined.
 /cbmc/src/solvers/sat/satcheck_glucose.cpp:228: warning: no matching class member found for 
   template <>
   satcheck_glucose_baset< Glucose::Solver >::~satcheck_glucose_baset()
@@ -15,7 +14,57 @@
   template <>
   satcheck_minisat2_baset< Minisat::SimpSolver >::~satcheck_minisat2_baset()
 
-/cbmc/src/solvers/refinement/string_refinement.cpp:239: warning: Invalid list item found
-/cbmc/doc/architectural/howto.md:260: warning: found </div> at different nesting level (6) than expected (3)
+/cbmc/src/analyses/reaching_definitions.h:216: warning: end of comment block while expecting command </code>
+/cbmc/jbmc/src/java_bytecode/java_bytecode_convert_method.cpp:67: warning: documented empty return type of  assign_parameter_names
+/cbmc/jbmc/src/java_bytecode/java_object_factory.cpp:1132: warning: documented empty return type of  allocate_nondet_length_array
+/cbmc/jbmc/src/java_bytecode/java_object_factory.cpp:1637: warning: documented empty return type of  gen_nondet_init
+/cbmc/jbmc/src/java_bytecode/java_object_factory.h:111: warning: documented empty return type of  gen_nondet_init
+/cbmc/src/goto-programs/link_to_library.cpp:18: warning: argument 'library' of command @param is not found in the argument list of link_to_library(goto_modelt &goto_model, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
+/cbmc/src/goto-programs/link_to_library.cpp:90: warning: argument 'library' of command @param is not found in the argument list of link_to_library(symbol_tablet &symbol_table, goto_functionst &goto_functions, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
+/cbmc/src/goto-programs/link_to_library.cpp:18: warning: argument 'library' of command @param is not found in the argument list of link_to_library(goto_modelt &goto_model, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
+/cbmc/src/goto-programs/link_to_library.cpp:90: warning: argument 'library' of command @param is not found in the argument list of link_to_library(symbol_tablet &symbol_table, goto_functionst &goto_functions, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
+/cbmc/src/goto-programs/remove_unreachable.cpp:64: warning: documented empty return type of  remove_unreachable
+/cbmc/src/goto-programs/remove_unreachable.h:19: warning: documented empty return type of  remove_unreachable
+/cbmc/src/goto-symex/slice.cpp:217: warning: documented empty return type of  collect_open_variables
+/cbmc/src/goto-symex/slice.cpp:229: warning: documented empty return type of  slice
+/cbmc/src/goto-symex/slice.h:37: warning: documented empty return type of  collect_open_variables
+/cbmc/src/goto-symex/slice.h:29: warning: documented empty return type of  slice
+/cbmc/src/solvers/strings/string_constraint_instantiation.h:27: warning: argument 'axiom' from the argument list of instantiate has multiple @param documentation sections
+/cbmc/src/solvers/strings/string_constraint_instantiation.h:27: warning: argument 'str' from the argument list of instantiate has multiple @param documentation sections
+/cbmc/src/solvers/strings/string_constraint_instantiation.h:27: warning: argument 'val' from the argument list of instantiate has multiple @param documentation sections
+/cbmc/src/solvers/strings/string_refinement.cpp:300: warning: documented empty return type of  add_equations_for_symbol_resolution
+/cbmc/src/solvers/strings/string_refinement.cpp:229: warning: Invalid list item found
+/cbmc/src/util/c_types_util.h:120: warning: argument 'type' from the argument list of from_c_boolean_value has multiple @param documentation sections
+/cbmc/src/util/graph.h:562: warning: argument 'for_each_successor' of command @param is not found in the argument list of get_reachable(Container &set, const std::function< void(const typename Container::value_type &, const std::function< void(const typename Container::value_type &)> &) &
+/cbmc/src/util/rename.cpp:27: warning: documented empty return type of  get_new_name
+/cbmc/src/util/rename.cpp:19: warning: documented empty return type of  get_new_name
+/cbmc/src/util/rename.h:26: warning: documented empty return type of  get_new_name
+/cbmc/src/util/rename.h:23: warning: documented empty return type of  get_new_name
+/cbmc/doc/architectural/howto.md:260: warning: found </div> at different nesting level (8) than expected (5)
 /cbmc/doc/architectural/howto.md:261: warning: end of comment block while expecting command </div>
-/cbmc/src/solvers/README.md:434: warning: Invalid list item found
+/cbmc/src/solvers/README.md:631: warning: Invalid list item found
+/cbmc/src/solvers/sat/cnf.h:46: warning: documented empty return type of  cnft::gate_and
+/cbmc/src/goto-cc/compile.h:60: warning: documented empty return type of  compilet::compilet
+/cbmc/src/goto-cc/compile.h:62: warning: documented empty return type of  compilet::~compilet
+/cbmc/src/goto-cc/compile.h:86: warning: documented empty return type of  compilet::cprover_macro_arities
+/cbmc/src/util/config.h:102: warning: documented empty return type of  configt::ansi_ct::set_arch_spec_v850
+/cbmc/src/cpp/cpp_typecheck.h:266: warning: documented empty return type of  cpp_typecheckt::check_member_initializers
+/cbmc/src/cpp/cpp_typecheck.h:275: warning: documented empty return type of  cpp_typecheckt::full_member_initialization
+/cbmc/src/goto-instrument/dot.cpp:59: warning: documented empty return type of  dott::find_next
+/cbmc/src/goto-instrument/dot.cpp:48: warning: documented empty return type of  dott::write_dot_subgraph
+/cbmc/src/goto-instrument/dot.cpp:54: warning: documented empty return type of  dott::write_edge
+/cbmc/src/goto-cc/goto_cc_mode.h:28: warning: documented empty return type of  goto_cc_modet::usage_error
+/cbmc/src/goto-symex/goto_symex.h:693: warning: argument 'state' from the argument list of goto_symext::symex_cpp_new has multiple @param documentation sections
+/cbmc/src/goto-symex/goto_symex.h:693: warning: argument 'lhs' from the argument list of goto_symext::symex_cpp_new has multiple @param documentation sections
+/cbmc/src/goto-symex/goto_symex.h:693: warning: argument 'code' from the argument list of goto_symext::symex_cpp_new has multiple @param documentation sections
+/cbmc/jbmc/src/java_bytecode/java_bytecode_language.h:194: warning: documented empty return type of  java_bytecode_languaget::methods_provided
+/cbmc/src/analyses/reaching_definitions.h:216: warning: end of comment block while expecting command </code>
+/cbmc/src/analyses/reaching_definitions.h:216: warning: end of comment block while expecting command </code>
+/cbmc/src/analyses/reaching_definitions.cpp:647: warning: found </c> tag without matching <c>
+/cbmc/src/analyses/reaching_definitions.cpp:648: warning: found </c> tag without matching <c>
+/cbmc/src/analyses/reaching_definitions.cpp:649: warning: found </c> tag without matching <c>
+/cbmc/src/analyses/reaching_definitions.cpp:651: warning: found </c> tag without matching <c>
+/cbmc/src/analyses/reaching_definitions.h:227: warning: The following parameters of rd_range_domaint::merge(const rd_range_domaint &other, locationt from, locationt to) are not documented:
+  parameter 'other'
+/cbmc/src/solvers/smt2/smt2_conv.h:113: warning: documented empty return type of  smt2_convt::convert_rounding_mode_FPA
+/cbmc/src/goto-symex/symex_slice_class.h:25: warning: documented empty return type of  symex_slicet::collect_open_variables
