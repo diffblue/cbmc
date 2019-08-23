@@ -61,8 +61,11 @@ template<class T,
          typename I=goto_programt::const_targett>
 class cfg_baset:public grapht< cfg_base_nodet<T, I> >
 {
+  typedef grapht<cfg_base_nodet<T, I>> base_grapht;
+
 public:
-  typedef std::size_t entryt;
+  typedef typename base_grapht::node_indext entryt;
+  typedef typename base_grapht::nodet nodet;
 
   class entry_mapt final
   {
@@ -73,9 +76,9 @@ public:
     grapht< cfg_base_nodet<T, I> > &container;
 
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::iterator iterator;
+    typedef typename data_typet::iterator iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::const_iterator const_iterator;
+    typedef typename data_typet::const_iterator const_iterator;
 
     template <typename U>
     const_iterator find(U &&u) const { return data.find(std::forward<U>(u)); }
@@ -177,6 +180,36 @@ public:
   {
     goto_functionst goto_functions;
     compute_edges(goto_functions, goto_program);
+  }
+
+  /// Get the graph node index for \p program_point. Use this with operator[]
+  /// to get the related graph node (e.g. `cfg[cfg.get_node_index(i)]`, though
+  /// in that particular case you should just use `cfg.get_node(i)`). Storing
+  /// node indices saves a map lookup, so it can be worthwhile when you expect
+  /// to repeatedly look up the same program point.
+  entryt get_node_index(const I &program_point) const
+  {
+    return entry_map.at(program_point);
+  }
+
+  /// Get the CFG graph node relating to \p program_point.
+  nodet &get_node(const I &program_point)
+  {
+    return (*this)[get_node_index(program_point)];
+  }
+
+  /// Get the CFG graph node relating to \p program_point.
+  const nodet &get_node(const I &program_point) const
+  {
+    return (*this)[get_node_index(program_point)];
+  }
+
+  /// Get a map from program points to their corresponding node indices. Use
+  /// the indices with `operator[]` similar to those returned by
+  /// \ref get_node_index.
+  const entry_mapt &entries() const
+  {
+    return entry_map;
   }
 
   static I get_first_node(P &program)

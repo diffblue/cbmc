@@ -39,7 +39,7 @@ reachability_slicert::get_sources(
   const slicing_criteriont &criterion)
 {
   std::vector<cfgt::node_indext> sources;
-  for(const auto &e_it : cfg.entry_map)
+  for(const auto &e_it : cfg.entries())
   {
     if(
       criterion(cfg[e_it.second].function_id, e_it.first) ||
@@ -64,12 +64,9 @@ bool reachability_slicert::is_same_target(
 {
   // Avoid comparing iterators belonging to different functions, and therefore
   // different std::lists.
-  cfgt::entry_mapt::const_iterator it1_entry = cfg.entry_map.find(it1);
-  cfgt::entry_mapt::const_iterator it2_entry = cfg.entry_map.find(it2);
-  return it1_entry != cfg.entry_map.end() && it2_entry != cfg.entry_map.end() &&
-         cfg[it1_entry->second].function_id ==
-           cfg[it2_entry->second].function_id &&
-         it1 == it2;
+  const auto &node1 = cfg.get_node(it1);
+  const auto &node2 = cfg.get_node(it2);
+  return node1.function_id == node2.function_id && it1 == it2;
 }
 
 /// Perform backward depth-first search of the control-flow graph of the
@@ -108,7 +105,7 @@ reachability_slicert::backward_outwards_walk_from(
           "all function return edges should point to the successor of a "
           "FUNCTION_CALL instruction");
 
-        stack.push_back(cfg.entry_map[std::prev(node.PC)]);
+        stack.push_back(cfg.get_node_index(std::prev(node.PC)));
       }
       else
       {
@@ -157,7 +154,7 @@ void reachability_slicert::backward_inwards_walk_from(
           "all function return edges should point to the successor of a "
           "FUNCTION_CALL instruction");
 
-        stack.push_back(cfg.entry_map[std::prev(node.PC)]);
+        stack.push_back(cfg.get_node_index(std::prev(node.PC)));
       }
       else if(pred_node.PC->is_function_call())
       {
@@ -223,8 +220,9 @@ void reachability_slicert::forward_walk_call_instruction(
     while(!successor_pc->is_end_function())
       ++successor_pc;
 
-    if(!cfg[cfg.entry_map[successor_pc]].out.empty())
-      callsite_successor_stack.push_back(cfg.entry_map[callsite_successor_pc]);
+    if(!cfg.get_node(successor_pc).out.empty())
+      callsite_successor_stack.push_back(
+        cfg.get_node_index(callsite_successor_pc));
   }
   else
   {
@@ -343,7 +341,7 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
     {
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
-        cfgt::nodet &e = cfg[cfg.entry_map[i_it]];
+        cfgt::nodet &e = cfg.get_node(i_it);
         if(
           !e.reaches_assertion && !e.reachable_from_assertion &&
           !i_it->is_end_function())

@@ -53,14 +53,14 @@ public:
   /// for \p program_point
   const typename cfgt::nodet &get_node(const T &program_point) const
   {
-    return cfg[cfg.entry_map.at(program_point)];
+    return cfg.get_node(program_point);
   }
 
   /// Get the graph node (which gives dominators, predecessors and successors)
   /// for \p program_point
   typename cfgt::nodet &get_node(const T &program_point)
   {
-    return cfg[cfg.entry_map.at(program_point)];
+    return cfg.get_node(program_point);
   }
 
   /// Returns true if the program point corresponding to \p rhs_node is
@@ -149,7 +149,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     entry_node = cfgt::get_last_node(program);
   else
     entry_node = cfgt::get_first_node(program);
-  typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
+  typename cfgt::nodet &n = cfg.get_node(entry_node);
   n.dominators.insert(entry_node);
 
   for(typename cfgt::edgest::const_iterator
@@ -165,7 +165,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     worklist.pop_front();
 
     bool changed=false;
-    typename cfgt::nodet &node=cfg[cfg.entry_map[current]];
+    typename cfgt::nodet &node = cfg.get_node(current);
     if(node.dominators.empty())
     {
       for(const auto &edge : (post_dom ? node.out : node.in))
@@ -248,7 +248,7 @@ inline void dominators_pretty_print_node(
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
-  for(const auto &node : cfg.entry_map)
+  for(const auto &node : cfg.entries())
   {
     auto n=node.first;
 

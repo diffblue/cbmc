@@ -32,6 +32,10 @@ struct procedure_local_cfg_baset<
   : public grapht<
       cfg_base_nodet<T, java_bytecode_convert_methodt::method_offsett>>
 {
+  typedef grapht<
+    cfg_base_nodet<T, java_bytecode_convert_methodt::method_offsett>>
+    base_grapht;
+  typedef typename base_grapht::nodet nodet;
   typedef java_bytecode_convert_methodt::method_with_amapt method_with_amapt;
   typedef std::map<java_bytecode_convert_methodt::method_offsett,
                    java_bytecode_convert_methodt::method_offsett>
@@ -83,6 +87,23 @@ struct procedure_local_cfg_baset<
         }
       }
     }
+  }
+
+  java_bytecode_convert_methodt::method_offsett get_node_index(
+    const java_bytecode_convert_methodt::method_offsett &instruction) const
+  {
+    return entry_map.at(instruction);
+  }
+
+  nodet &
+  get_node(const java_bytecode_convert_methodt::method_offsett &instruction)
+  {
+    return (*this)[get_node_index(instruction)];
+  }
+  const nodet &get_node(
+    const java_bytecode_convert_methodt::method_offsett &instruction) const
+  {
+    return (*this)[get_node_index(instruction)];
   }
 
   static java_bytecode_convert_methodt::method_offsett
