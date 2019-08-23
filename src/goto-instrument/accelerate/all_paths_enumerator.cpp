@@ -109,7 +109,7 @@ void all_paths_enumeratort::complete_path(patht &path, int succ)
 
   goto_programt::targett end=path.back().loc;
 
-  if(end==loop_header || loop.find(end)==loop.end())
+  if(end == loop_header || !loop.contains(end))
     return;
 
   complete_path(path, 0);
