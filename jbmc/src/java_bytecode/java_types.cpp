@@ -182,6 +182,24 @@ bool is_multidim_java_array_type(const typet &type)
                                        to_struct_tag_type(type.subtype())));
 }
 
+/// Returns the underlying element type and array dimensionality of Java struct
+/// \p type. If this is not an array type the return value will be `{type, 0}`.
+std::pair<typet, std::size_t>
+java_array_dimension_and_element_type(const struct_tag_typet &type)
+{
+  std::size_t array_dimensions = 0;
+  typet underlying_type;
+  for(underlying_type = java_reference_type(type);
+      is_java_array_type(underlying_type);
+      underlying_type =
+        java_array_element_type(to_struct_tag_type(underlying_type.subtype())))
+  {
+    ++array_dimensions;
+  }
+
+  return {underlying_type, array_dimensions};
+}
+
 /// See above
 /// \param tag: Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix

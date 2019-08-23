@@ -604,6 +604,9 @@ typet &java_array_element_type(struct_tag_typet &array_symbol);
 bool is_java_array_type(const typet &type);
 bool is_multidim_java_array_type(const typet &type);
 
+std::pair<typet, std::size_t>
+java_array_dimension_and_element_type(const struct_tag_typet &type);
+
 typet java_type_from_char(char t);
 optionalt<typet> java_type_from_string(
   const std::string &,
