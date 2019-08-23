@@ -21,12 +21,9 @@ void points_tot::fixedpoint()
   {
     added=false;
 
-    for(cfgt::entry_mapt::iterator
-        e_it=cfg.entry_map.begin();
-        e_it!=cfg.entry_map.end();
-        e_it++)
+    for(const auto &instruction_and_entry : cfg.entries())
     {
-      if(transform(cfg[e_it->second]))
+      if(transform(cfg[instruction_and_entry.second]))
         added=true;
     }
   }

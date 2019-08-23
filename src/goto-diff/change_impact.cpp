@@ -66,27 +66,26 @@ void full_slicert::operator()(
   // declarations or dead instructions may be necessary as well
   decl_deadt decl_dead;
 
-  for(cfgt::entry_mapt::iterator
-      e_it=cfg.entry_map.begin();
-      e_it!=cfg.entry_map.end();
-      e_it++)
+  for(const auto &entry : cfg.entries())
   {
-    if(criterion(e_it->first))
-      add_to_queue(queue, e_it->second, e_it->first);
-    else if(implicit(e_it->first))
-      add_to_queue(queue, e_it->second, e_it->first);
-    else if((e_it->first->is_goto() && e_it->first->guard.is_true()) ||
-            e_it->first->is_throw())
-      jumps.push_back(e_it->second);
-    else if(e_it->first->is_decl())
+    const auto &instruction = instruction_and_index.first;
+    const auto instruction_node_index = instruction_and_index.second;
+    if(criterion(instruction))
+      add_to_queue(queue, instruction_node_index, instruction);
+    else if(implicit(instruction))
+      add_to_queue(queue, instruction_node_index, instruction);
+    else if((instruction->is_goto() && instruction->guard.is_true()) ||
+            instruction->is_throw())
+      jumps.push_back(instruction_node_index);
+    else if(instruction->is_decl())
     {
-      const auto &s=to_code_decl(e_it->first->code).symbol();
-      decl_dead[s.get_identifier()].push(e_it->second);
+      const auto &s=to_code_decl(instruction->code).symbol();
+      decl_dead[s.get_identifier()].push(instruction_node_index);
     }
-    else if(e_it->first->is_dead())
+    else if(instruction->is_dead())
     {
-      const auto &s=to_code_dead(e_it->first->code).symbol();
-      decl_dead[s.get_identifier()].push(e_it->second);
+      const auto &s=to_code_dead(instruction->code).symbol();
+      decl_dead[s.get_identifier()].push(instruction_node_index);
     }
   }
 
@@ -105,9 +104,9 @@ void full_slicert::operator()(
     {
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
-        const cfgt::entryt &e=cfg.entry_map[i_it];
+        const auto &node = cfg.get_node(i_it);
         if(!i_it->is_end_function() && // always retained
-           !cfg[e].node_required)
+           !node.node_required)
           i_it->make_skip();
 #ifdef DEBUG_FULL_SLICERT
         else
@@ -115,11 +114,11 @@ void full_slicert::operator()(
           std::string c="ins:"+std::to_string(i_it->location_number);
           c+=" req by:";
           for(std::set<unsigned>::const_iterator
-              req_it=cfg[e].required_by.begin();
-              req_it!=cfg[e].required_by.end();
+              req_it=node.required_by.begin();
+              req_it!=node.required_by.end();
               ++req_it)
           {
-            if(req_it!=cfg[e].required_by.begin())
+            if(req_it!=node.required_by.begin())
               c+=",";
             c+=std::to_string(*req_it);
           }
@@ -144,13 +143,10 @@ void full_slicert::fixedpoint(
 {
   std::vector<cfgt::entryt> dep_node_to_cfg;
   dep_node_to_cfg.reserve(dep_graph.size());
+
   for(unsigned i=0; i<dep_graph.size(); ++i)
   {
-    cfgt::entry_mapt::const_iterator entry=
-      cfg.entry_map.find(dep_graph[i].PC);
-    assert(entry!=cfg.entry_map.end());
-
-    dep_node_to_cfg.push_back(entry->second);
+    dep_node_to_cfg.push_back(cfg.get_node_index(dep_graph[i].PC));
   }
 
   // process queue until empty
