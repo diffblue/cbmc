@@ -16,6 +16,7 @@ Date:   April 2017
 ///   java standard library. In particular methods from java.lang.String,
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
+#include <goto-programs/class_identifier.h>
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -1145,7 +1146,7 @@ code_blockt java_string_library_preprocesst::make_class_identifier_code(
 
   // class_identifier is obj->@class_identifier
   const member_exprt class_identifier{
-    checked_dereference(obj), "@class_identifier", string_typet()};
+    checked_dereference(obj), JAVA_CLASS_IDENTIFIER_FIELD_NAME, string_typet()};
 
   // string_expr = cprover_string_literal(this->@class_identifier)
   const refined_string_exprt string_expr = string_expr_of_function(

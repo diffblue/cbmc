@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_root_class.h"
 
+#include <goto-programs/class_identifier.h>
 #include <util/arith_tools.h>
 #include <util/symbol.h>
 
@@ -25,8 +26,9 @@ void java_root_class(symbolt &class_symbol)
 
   {
     // the class identifier is used for stuff such as 'instanceof'
-    struct_typet::componentt component("@class_identifier", string_typet());
-    component.set_pretty_name("@class_identifier");
+    struct_typet::componentt component(
+      JAVA_CLASS_IDENTIFIER_FIELD_NAME, string_typet());
+    component.set_pretty_name(JAVA_CLASS_IDENTIFIER_FIELD_NAME);
 
     // add at the beginning
     components.insert(components.begin(), component);
@@ -45,7 +47,8 @@ void java_root_class_init(
 {
   jlo.operands().resize(root_type.components().size());
 
-  const std::size_t clsid_nb=root_type.component_number("@class_identifier");
+  const std::size_t clsid_nb =
+    root_type.component_number(JAVA_CLASS_IDENTIFIER_FIELD_NAME);
   const typet &clsid_type=root_type.components()[clsid_nb].type();
   constant_exprt clsid(class_identifier, clsid_type);
   jlo.operands()[clsid_nb]=clsid;

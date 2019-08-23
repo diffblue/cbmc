@@ -849,7 +849,7 @@ void java_object_factoryt::gen_nondet_struct_init(
 
     member_exprt me(expr, name, component_type);
 
-    if(name=="@class_identifier")
+    if(name == JAVA_CLASS_IDENTIFIER_FIELD_NAME)
     {
       continue;
     }

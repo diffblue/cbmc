@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_language.h"
 #include "java_utils.h"
 
+#include <goto-programs/class_identifier.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
