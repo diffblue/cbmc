@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_language.h"
 #include "java_utils.h"
 
+#include <goto-programs/class_identifier.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
@@ -882,7 +884,6 @@ void add_java_array_types(symbol_tablet &symbol_table)
       ID_java_new_array, java_reference_type(struct_tag_type), location);
     dereference_exprt old_array{this_symbol.symbol_expr()};
     dereference_exprt new_array{local_symexpr};
-
     member_exprt old_length(
       old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
@@ -901,13 +902,13 @@ void add_java_array_types(symbol_tablet &symbol_table)
         base_class_component.get_name(),
         base_class_component.type());
       member_exprt old_classid(
-        old_base_class, "@class_identifier", string_typet());
+        old_base_class, JAVA_CLASS_IDENTIFIER_FIELD_NAME, string_typet());
       member_exprt new_base_class(
         new_array,
         base_class_component.get_name(),
         base_class_component.type());
       member_exprt new_classid(
-        new_base_class, "@class_identifier", string_typet());
+        new_base_class, JAVA_CLASS_IDENTIFIER_FIELD_NAME, string_typet());
 
       copy_class_id = code_assignt(new_classid, old_classid);
     }
