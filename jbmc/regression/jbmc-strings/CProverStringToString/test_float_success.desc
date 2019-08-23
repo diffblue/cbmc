@@ -1,0 +1,8 @@
+KNOWNBUG
+Main.class
+--function Main.testFloatSuccess --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
