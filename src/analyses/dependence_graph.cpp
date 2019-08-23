@@ -97,18 +97,15 @@ void dep_graph_domaint::control_dependencies(
 
     // we could hard-code assume and goto handling here to improve
     // performance
-    cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e =
-      pd.cfg.entry_map.find(control_dep_candidate);
-
-    INVARIANT(
-      e != pd.cfg.entry_map.end(), "cfg must have an entry for every location");
-
-    const cfg_post_dominatorst::cfgt::nodet &m=
-      pd.cfg[e->second];
+    const cfg_post_dominatorst::cfgt::nodet &m =
+      pd.get_node(control_dep_candidate);
 
     // successors of M
     for(const auto &edge : m.out)
     {
+      // Could use pd.dominates(to, control_dep_candidate) but this would impose
+      // another dominator node lookup per call to this function, which is too
+      // expensive.
       const cfg_post_dominatorst::cfgt::nodet &m_s=
         pd.cfg[edge.first];
 

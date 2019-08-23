@@ -151,16 +151,10 @@ void full_slicert::add_jumps(
     const irep_idt &id = j.function_id;
     const cfg_post_dominatorst &pd=post_dominators.at(id);
 
-    cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
-      pd.cfg.entry_map.find(j.PC);
-
-    assert(e!=pd.cfg.entry_map.end());
-
-    const cfg_post_dominatorst::cfgt::nodet &n=
-      pd.cfg[e->second];
+    const auto &j_PC_node = pd.get_node(j.PC);
 
     // find the nearest post-dominator in slice
-    if(n.dominators.find(lex_succ)==n.dominators.end())
+    if(!pd.dominates(lex_succ, j_PC_node))
     {
       add_to_queue(queue, *it, lex_succ);
       jumps.erase(it);
@@ -171,9 +165,9 @@ void full_slicert::add_jumps(
       // lex_succ
       goto_programt::const_targett nearest=lex_succ;
       std::size_t post_dom_size=0;
-      for(cfg_dominatorst::target_sett::const_iterator
-          d_it=n.dominators.begin();
-          d_it!=n.dominators.end();
+      for(cfg_dominatorst::target_sett::const_iterator d_it =
+            j_PC_node.dominators.begin();
+          d_it != j_PC_node.dominators.end();
           ++d_it)
       {
         cfgt::entry_mapt::const_iterator entry=
@@ -186,18 +180,12 @@ void full_slicert::add_jumps(
           INVARIANT(id==id2,
                     "goto/jump expected to be within a single function");
 
-          cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e2=
-            pd.cfg.entry_map.find(*d_it);
+          const auto &postdom_node = pd.get_node(*d_it);
 
-          assert(e2!=pd.cfg.entry_map.end());
-
-          const cfg_post_dominatorst::cfgt::nodet &n2=
-            pd.cfg[e2->second];
-
-          if(n2.dominators.size()>post_dom_size)
+          if(postdom_node.dominators.size() > post_dom_size)
           {
             nearest=*d_it;
-            post_dom_size=n2.dominators.size();
+            post_dom_size = postdom_node.dominators.size();
           }
         }
       }

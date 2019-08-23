@@ -22,6 +22,17 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <goto-programs/goto_program.h>
 #include <goto-programs/cfg.h>
 
+/// Dominator graph. This computes a control-flow graph (see \ref cfgt) and
+/// decorates it with dominator sets per program point, following
+/// "A Simple, Fast Dominance Algorithm" by Cooper et al.
+/// Templated over the program type (P) and program point type (T), which need
+/// to be supported by \ref cfgt. Can compute either dominators or
+/// postdominators depending on template parameter `post_dom`.
+/// Use \ref cfg_dominators_templatet::dominates to directly query dominance,
+/// or \ref cfg_dominators_templatet::get_node to get the \ref cfgt graph node
+/// corresponding to a program point, including the in- and out-edges provided
+/// by \ref cfgt as well as the dominator set computed by this class.
+/// See also https://en.wikipedia.org/wiki/Dominator_(graph_theory)
 template <class P, class T, bool post_dom>
 class cfg_dominators_templatet
 {
@@ -37,6 +48,59 @@ public:
   cfgt cfg;
 
   void operator()(P &program);
+
+  /// Get the graph node (which gives dominators, predecessors and successors)
+  /// for \p program_point
+  const typename cfgt::nodet &get_node(const T &program_point) const
+  {
+    return cfg[cfg.entry_map.at(program_point)];
+  }
+
+  /// Get the graph node (which gives dominators, predecessors and successors)
+  /// for \p program_point
+  typename cfgt::nodet &get_node(const T &program_point)
+  {
+    return cfg[cfg.entry_map.at(program_point)];
+  }
+
+  /// Returns true if the program point corresponding to \p rhs_node is
+  /// dominated by program point \p lhs. Saves node lookup compared to the
+  /// dominates overload that takes two program points, so this version is
+  /// preferable if you intend to check more than one potential dominator.
+  /// Note by definition all program points dominate themselves.
+  bool dominates(T lhs, const nodet &rhs_node) const
+  {
+    return rhs_node.dominators.count(lhs);
+  }
+
+  /// Returns true if program point \p lhs dominates \p rhs.
+  /// Note by definition all program points dominate themselves.
+  bool dominates(T lhs, T rhs) const
+  {
+    return dominates(lhs, get_node(rhs));
+  }
+
+  /// Returns true if the program point for \p program_point_node is reachable
+  /// from the entry point. Saves a lookup compared to the overload taking a
+  /// program point, so use this overload if you already have the node.
+  bool program_point_reachable(const nodet &program_point_node) const
+  {
+    // Dominator analysis walks from the entry point, so a side-effect is to
+    // identify unreachable program points (those which don't dominate even
+    // themselves).
+    return !program_point_node.dominators.empty();
+  }
+
+  /// Returns true if the program point for \p program_point_node is reachable
+  /// from the entry point. Saves a lookup compared to the overload taking a
+  /// program point, so use this overload if you already have the node.
+  bool program_point_reachable(T program_point) const
+  {
+    // Dominator analysis walks from the entry point, so a side-effect is to
+    // identify unreachable program points (those which don't dominate even
+    // themselves).
+    return program_point_reachable(get_node(program_point));
+  }
 
   T entry_node;
 

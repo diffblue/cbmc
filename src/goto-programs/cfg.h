@@ -102,6 +102,15 @@ public:
 
       return e.first->second;
     }
+
+    entryt &at(const goto_programt::const_targett &t)
+    {
+      return data.at(t);
+    }
+    const entryt &at(const goto_programt::const_targett &t) const
+    {
+      return data.at(t);
+    }
   };
   entry_mapt entry_map;
 
