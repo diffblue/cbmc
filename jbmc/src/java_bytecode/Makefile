@@ -4,6 +4,7 @@ SRC = assignments_from_json.cpp \
       ci_lazy_methods.cpp \
       ci_lazy_methods_needed.cpp \
       convert_java_nondet.cpp \
+      create_array_with_type_intrinsic.cpp \
       expr2java.cpp \
       generic_parameter_specialization_map.cpp \
       generic_parameter_specialization_map_keys.cpp \
