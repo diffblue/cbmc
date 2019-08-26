@@ -28,12 +28,9 @@ public:
   local_bitvector_analysist(
     const goto_functiont &_goto_function,
     const namespacet &ns)
-    : dirty(_goto_function),
-      locals(_goto_function),
-      cfg(_goto_function.body),
-      ns(ns)
+    : dirty(_goto_function), locals(_goto_function), cfg(_goto_function.body)
   {
-    build();
+    build(ns);
   }
 
   void output(
@@ -175,11 +172,11 @@ public:
 
   flagst get(
     const goto_programt::const_targett t,
-    const exprt &src);
+    const exprt &src,
+    const namespacet &);
 
 protected:
-  const namespacet &ns;
-  void build();
+  void build(const namespacet &ns);
 
   typedef std::stack<unsigned> work_queuet;
 
@@ -198,13 +195,13 @@ protected:
     const exprt &lhs,
     const exprt &rhs,
     points_tot &loc_info_src,
-    points_tot &loc_info_dest);
+    points_tot &loc_info_dest,
+    const namespacet &ns);
 
-  flagst get_rec(
-    const exprt &rhs,
-    points_tot &loc_info_src);
+  flagst
+  get_rec(const exprt &rhs, points_tot &loc_info_src, const namespacet &ns);
 
-  bool is_tracked(const irep_idt &identifier);
+  bool is_tracked(const irep_idt &identifier, const namespacet &ns);
 };
 
 inline std::ostream &operator<<(
