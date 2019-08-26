@@ -82,6 +82,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "document_properties.h"
 #include "dot.h"
 #include "dump_c.h"
+#include "expand_pointer_predicates.h"
 #include "full_slicer.h"
 #include "function.h"
 #include "havoc_loops.h"
@@ -1096,11 +1097,21 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  // verify and set invariants and pre/post-condition pairs
   if(cmdline.isset("apply-code-contracts"))
   {
     log.status() << "Applying Code Contracts" << messaget::eom;
-    code_contracts(goto_model);
+    apply_code_contracts(goto_model);
+  }
+
+  if(cmdline.isset("check-code-contracts"))
+  {
+    log.status() << "Checking Code Contracts" << messaget::eom;
+    check_code_contracts(goto_model);
+  }
+
+  if(cmdline.isset("expand-pointer-predicates"))
+  {
+    expand_pointer_predicates(goto_model);
   }
 
   // replace function pointers, if explicitly requested
@@ -1664,6 +1675,8 @@ void goto_instrument_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
     HELP_INSERT_FINAL_ASSERT_FALSE
+    HELP_APPLY_CODE_CONTRACTS
+    HELP_CHECK_CODE_CONTRACTS
     HELP_REPLACE_FUNCTION_BODY
     HELP_ANSI_C_LANGUAGE
     "\n"
@@ -1713,6 +1726,7 @@ void goto_instrument_parse_optionst::help()
     " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    " --expand-pointer-predicates  Expands predicates about pointers (e.g. __CPROVER_points_to_valid_memory) into a form useable by CBMC\n" // NOLINT(*)
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"

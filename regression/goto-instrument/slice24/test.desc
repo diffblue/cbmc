@@ -1,0 +1,8 @@
+KNOWNBUG
+main.c
+--full-slice --add-library
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Data dependencies across function calls are still not working correctly.

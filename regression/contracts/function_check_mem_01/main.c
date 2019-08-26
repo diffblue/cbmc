@@ -9,7 +9,7 @@
 
 #define __CPROVER_VALID_MEM(ptr, size) \
   __CPROVER_POINTER_OBJECT((ptr)) != __CPROVER_POINTER_OBJECT(NULL) && \
-  !__CPROVER_invalid_pointer((ptr)) && \
+  !__CPROVER_is_invalid_pointer((ptr)) && \
   __CPROVER_POINTER_OBJECT((ptr)) != \
   __CPROVER_POINTER_OBJECT(__CPROVER_deallocated) && \
   __CPROVER_POINTER_OBJECT((ptr)) != \
@@ -21,7 +21,7 @@
    __CPROVER_malloc_size >= (size) + __CPROVER_POINTER_OFFSET((ptr)) || \
    __CPROVER_POINTER_OBJECT((ptr)) != \
    __CPROVER_POINTER_OBJECT(__CPROVER_malloc_object))
-    
+
 typedef struct bar
 {
   int x;
@@ -33,7 +33,7 @@ void foo(bar *x)
   __CPROVER_requires(__CPROVER_VALID_MEM(x, sizeof(bar)))
 {
   x->x += 1;
-  return
+  return;
 }
 
 int main()

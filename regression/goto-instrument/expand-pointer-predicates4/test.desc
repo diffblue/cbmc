@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-code-contracts
+--pointer-check --expand-pointer-predicates
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

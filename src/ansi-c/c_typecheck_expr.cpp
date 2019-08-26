@@ -36,6 +36,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "padding.h"
 #include "type2name.h"
 
+bool is_lvalue(const exprt &expr);
+
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
   if(expr.id()==ID_already_typechecked)
