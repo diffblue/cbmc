@@ -487,7 +487,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
     {
       if(
         op.operands().size() != 1 ||
-        (op.op0().id() != ID_symbol && op.op0().id() != ID_dynamic_object &&
+        (op.op0().id() != ID_symbol && op.op0().id() != ID_is_dynamic_object &&
          op.op0().id() != ID_string_constant))
       {
         return unchanged(expr);
@@ -550,8 +550,10 @@ simplify_exprt::simplify_pointer_object(const unary_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_is_dynamic_object(const exprt &expr)
 {
-  // This should hold as a no_change of the expr ID being is_dynamic_object.
-  PRECONDITION(expr.operands().size() == 1);
+  DATA_INVARIANT(
+    expr.operands().size() == 1 && expr.op0().type().id() == ID_pointer,
+    "is_dynamic_object_exprt should have one operand, which should have "
+    "pointer type, because the expr ID is is_dynamic_object");
 
   auto new_expr = expr;
   exprt &op = new_expr.op0();

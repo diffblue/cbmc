@@ -2134,6 +2134,14 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref is_dynamic_object_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * is_dynamic_object_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref is_dynamic_object_exprt
+*/
 inline const is_dynamic_object_exprt &
 to_is_dynamic_object_expr(const exprt &expr)
 {
@@ -2143,8 +2151,9 @@ to_is_dynamic_object_expr(const exprt &expr)
   return static_cast<const is_dynamic_object_exprt &>(expr);
 }
 
-/// \copydoc to_is_dynamic_object_expr(const exprt &)
-/// \ingroup gr_std_expr
+/*! \copydoc to_is_dynamic_object_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 inline is_dynamic_object_exprt &to_is_dynamic_object_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_is_dynamic_object);
@@ -2153,7 +2162,8 @@ inline is_dynamic_object_exprt &to_is_dynamic_object_expr(exprt &expr)
   return static_cast<is_dynamic_object_exprt &>(expr);
 }
 
-/// \brief Semantic type conversion
+/*! \brief semantic type conversion
+*/
 class typecast_exprt:public unary_exprt
 {
 public:

@@ -1623,7 +1623,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
       {
         if(
           expr.op0().op0().id() == ID_symbol ||
-          expr.op0().op0().id() == ID_dynamic_object ||
+          expr.op0().op0().id() == ID_is_dynamic_object ||
           expr.op0().op0().id() == ID_member ||
           expr.op0().op0().id() == ID_index ||
           expr.op0().op0().id() == ID_string_constant)
@@ -1639,7 +1639,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
       {
         if(
           expr.op0().op0().op0().id() == ID_symbol ||
-          expr.op0().op0().op0().id() == ID_dynamic_object ||
+          expr.op0().op0().op0().id() == ID_is_dynamic_object ||
           expr.op0().op0().op0().id() == ID_member ||
           expr.op0().op0().op0().id() == ID_index ||
           expr.op0().op0().op0().id() == ID_string_constant)

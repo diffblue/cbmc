@@ -40,7 +40,7 @@ exprt dynamic_object_lower_bound(
   const exprt &offset);
 exprt dynamic_object_upper_bound(
   const exprt &pointer,
-  const namespacet &,
+  const namespacet &ns,
   const exprt &access_size);
 exprt object_lower_bound(
   const exprt &pointer,
