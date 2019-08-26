@@ -2089,6 +2089,62 @@ exprt c_typecheck_baset::do_special_functions(
 
     return same_object_expr;
   }
+  else if(identifier == CPROVER_PREFIX "points_to_valid_memory")
+  {
+    if(expr.arguments().size() != 2 && expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "points_to_valid_memory expects one or two operands" << eom;
+      throw 0;
+    }
+    if(!is_lvalue(expr.arguments().front()))
+    {
+      error().source_location = f_op.source_location();
+      error() << "ptr argument to points_to_valid_memory"
+              << " must be an lvalue" << eom;
+      throw 0;
+    }
+
+    exprt same_object_expr;
+    if(expr.arguments().size() == 2)
+    {
+// TODO: We should add some way to enforce that the second argument
+// has a reasonable type (coercible to __CPROVER_size_t).
+#if 0
+      if(expr.arguments()[1].type() <[cannot be coerced to size_t]>)
+      {
+        err_location(f_op);
+        error() << "size argument to points_to_valid_memory"
+                << " must be coercible to size_t" << eom;
+        throw 0;
+      }
+#endif
+      same_object_expr =
+        points_to_valid_memory(expr.arguments()[0], expr.arguments()[1]);
+    }
+    else if(expr.arguments().size() == 1)
+    {
+      PRECONDITION(expr.arguments()[0].type().id() == ID_pointer);
+
+      const typet &base_type = expr.arguments()[0].type().subtype();
+      optionalt<exprt> sizeof_expr = size_of_expr(base_type, *this);
+      DATA_INVARIANT(
+        sizeof_expr,
+        "The size of a pointer should be a valid size_t expression");
+
+      sizeof_expr->add(ID_C_c_sizeof_type) = base_type;
+
+      same_object_expr =
+        points_to_valid_memory(expr.arguments()[0], *sizeof_expr);
+    }
+    else
+    {
+      UNREACHABLE;
+    }
+    same_object_expr.add_source_location() = source_location;
+
+    return same_object_expr;
+  }
   else if(identifier==CPROVER_PREFIX "buffer_size")
   {
     if(expr.arguments().size()!=1)
