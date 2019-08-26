@@ -9,6 +9,8 @@ Author: Michael Tautschnig
 #ifndef CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
+#include <util/magic.h>
+
 class exprt;
 class ssa_exprt;
 class namespacet;
@@ -26,9 +28,10 @@ class symex_targett;
 /// Note that field sensitivity is not applied as a single pass over the
 /// whole goto program but instead applied as the symbolic execution unfolds.
 ///
-/// On a high level, field sensitivity replaces member operators with atomic
-/// symbols representing a field when possible. In cases where this is not
-/// immediately possible, like struct assignments, some things need to be added.
+/// On a high level, field sensitivity replaces member operators, and array
+/// accesses with atomic symbols representing a field when possible.
+/// In cases where this is not immediately possible, like struct assignments,
+/// some things need to be added.
 /// The possible cases are described below.
 ///
 /// ### Member access
@@ -50,9 +53,40 @@ class symex_targett;
 /// `struct_expr..field_name1 = other_struct..field_name1;`
 /// `struct_expr..field_name2 = other_struct..field_name2;` etc.
 /// See \ref field_sensitivityt::field_assignments.
+///
+/// ### Array access
+/// An index expression `array[index]` when index is constant and array has
+/// constant size is replaced by the symbol `array[[index]]`; note the use
+/// of `[[` and `]]` to visually distinguish the symbol from the index
+/// expression.
+/// When `index` is not a constant, `array[index]` is replaced by
+///  `{array[[0]]; array[[1]]; …index]`.
+/// Note that this process does not apply to arrays whose size is not constant,
+/// and arrays whose size exceed the bound \c max_field_sensitivity_array_size.
+/// See \ref field_sensitivityt::apply.
+///
+/// ### Symbols representing arrays
+/// In an rvalue, a symbol `array` which has array type will be replaced by
+/// `{array[[0]]; array[[1]]; …}[index]`.
+/// See \ref field_sensitivityt::get_fields.
+///
+/// ### Assignment to an array
+/// When the array symbol is on the left-hand-side, for instance for
+/// an assignment `array = other_array`, the assignment is replaced by a
+/// sequence of assignments:
+/// `array[[0]] = other_array[[0]]`;
+/// `array[[1]] = other_array[[1]]`; etc.
+/// See \ref field_sensitivityt::field_assignments.
 class field_sensitivityt
 {
 public:
+  /// \param max_array_size: maximum size for which field sensitivity will be
+  ///   applied to array cells
+  explicit field_sensitivityt(std::size_t max_array_size)
+    : max_field_sensitivity_array_size(max_array_size)
+  {
+  }
+
   /// Assign to the individual fields of a non-expanded symbol \p lhs. This is
   /// required whenever prior steps have updated the full object rather than
   /// individual fields, e.g., in case of assignments to an array at an unknown
@@ -106,11 +140,13 @@ public:
   /// \param expr: the expression to evaluate
   /// \return False, if and only if, \p expr would be a single field-sensitive
   /// SSA expression.
-  static bool is_divisible(const ssa_exprt &expr);
+  bool is_divisible(const ssa_exprt &expr) const;
 
 private:
   /// whether or not to invoke \ref field_sensitivityt::apply
   bool run_apply = true;
+
+  const std::size_t max_field_sensitivity_array_size;
 
   void field_assignments_rec(
     const namespacet &ns,

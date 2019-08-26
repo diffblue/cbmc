@@ -70,6 +70,9 @@ struct symex_configt final
   /// includes diagnostic information about call stack and guard size.
   bool show_symex_steps;
 
+  /// Maximum sizes for which field sensitivity will be applied to array cells
+  std::size_t max_field_sensitivity_array_size;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);

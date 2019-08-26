@@ -34,12 +34,14 @@ static void get_l1_name(exprt &expr);
 
 goto_symex_statet::goto_symex_statet(
   const symex_targett::sourcet &_source,
+  std::size_t max_field_sensitive_array_size,
   guard_managert &manager,
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
   : goto_statet(manager),
     source(_source),
     guard_manager(manager),
     symex_target(nullptr),
+    field_sensitivity(max_field_sensitive_array_size),
     record_events({true}),
     fresh_l2_name_provider(fresh_l2_name_provider)
 {
@@ -171,9 +173,15 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
 
+  static_assert(
+    level == L0 || level == L1 || level == L1_WITH_CONSTANT_PROPAGATION ||
+      level == L2,
+    "must handle all renaming levels");
+
   if(expr.id()==ID_symbol &&
      expr.get_bool(ID_C_SSA_symbol))
   {
+    exprt original_expr = expr;
     ssa_exprt &ssa=to_ssa_expr(expr);
 
     if(level == L0)
@@ -186,7 +194,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       return renamedt<exprt, level>{
         std::move(rename_ssa<L1>(std::move(ssa), ns).value())};
     }
-    else if(level==L2)
+    else
     {
       ssa = set_indices<L1>(std::move(ssa), ns).get();
       rename<level>(expr.type(), ssa.get_identifier(), ns);
@@ -195,7 +203,14 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       // renaming taken care of by l2_thread_encoding, or already at L2
       if(l2_thread_read_encoding(ssa, ns) || !ssa.get_level_2().empty())
       {
-        return renamedt<exprt, level>(std::move(ssa));
+        if(level == L1_WITH_CONSTANT_PROPAGATION)
+        {
+          // Don't actually rename to L2 -- we just used `ssa` to check whether
+          // constant-propagation was applicable
+          return renamedt<exprt, level>(std::move(original_expr));
+        }
+        else
+          return renamedt<exprt, level>(std::move(ssa));
       }
       else
       {
@@ -209,7 +224,8 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
         }
         else
         {
-          ssa = set_indices<L2>(std::move(ssa), ns).get();
+          if(level == L2)
+            ssa = set_indices<L2>(std::move(ssa), ns).get();
           return renamedt<exprt, level>(std::move(ssa));
         }
       }
@@ -260,6 +276,11 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     return renamedt<exprt, level>{std::move(expr)};
   }
 }
+
+// Explicitly instantiate the one version of this function without an explicit
+// caller in this file:
+template renamedt<exprt, L1_WITH_CONSTANT_PROPAGATION>
+goto_symex_statet::rename(exprt expr, const namespacet &ns);
 
 exprt goto_symex_statet::l2_rename_rvalues(exprt lvalue, const namespacet &ns)
 {
@@ -351,7 +372,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivityt::is_divisible(expr))
+  if(field_sensitivity.is_divisible(expr))
     return false;
 
   const ssa_exprt ssa_l1 = remove_level_2(expr);
@@ -479,7 +500,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivityt::is_divisible(expr))
+  if(field_sensitivity.is_divisible(expr))
     return write_is_shared_resultt::NOT_SHARED;
 
   if(atomic_section_id != 0)

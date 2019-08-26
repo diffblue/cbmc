@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
@@ -230,6 +231,18 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
     // (x == &o1 ? o1..field : o2..field). value_set_dereferencet can then
     // apply the dereference operation to each of o1..field and o2..field
     // independently, as it special-cases the ternary conditional operator.
+    // There may also be index operators in tmp1 which can now be resolved to
+    // constant array cell references, so we replace symbols with constants
+    // first, hoping for a transformation such as
+    // (x == &o1 ? o1 : o2)[idx] =>
+    // (x == &o1 ? o1 : o2)[2] =>
+    // (x == &o1 ? o1[[2]] : o2[[2]])
+    // Note we don't L2 rename non-constant symbols at this point, because the
+    // value-set works in terms of L1 names and we don't want to ask it to
+    // dereference an L2 pointer, which it would not have an entry for.
+
+    tmp1 = state.rename<L1_WITH_CONSTANT_PROPAGATION>(tmp1, ns).get();
+
     do_simplify(tmp1);
 
     if(symex_config.run_validation_checks)
@@ -241,7 +254,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
         "simplify re-introduced dereferencing");
     }
 
-    tmp1 = state.field_sensitivity.apply(ns, state, std::move(tmp1), write);
+    tmp1 = state.field_sensitivity.apply(ns, state, std::move(tmp1), false);
 
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(state, ns);
@@ -331,6 +344,20 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
   }
 }
 
+static exprt
+apply_to_objects_in_dereference(exprt e, const std::function<exprt(exprt)> &f)
+{
+  if(auto deref = expr_try_dynamic_cast<dereference_exprt>(e))
+  {
+    deref->op() = f(std::move(deref->op()));
+    return *deref;
+  }
+
+  for(auto &sub : e.operands())
+    sub = apply_to_objects_in_dereference(std::move(sub), f);
+  return e;
+}
+
 /// Replace all dereference operations within \p expr with explicit references
 /// to the objects they may refer to. For example, the expression `*p1 + *p2`
 /// might be rewritten to `obj1 + (p2 == &obj2 ? obj2 : obj3)` in the case where
@@ -370,19 +397,21 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
 ///    See \ref auto_objects.cpp for details.
 void goto_symext::dereference(exprt &expr, statet &state, bool write)
 {
-  // The expression needs to be renamed to level 1
-  // in order to distinguish addresses of local variables
-  // from different frames. Would be enough to rename
-  // symbols whose address is taken.
   PRECONDITION(!state.call_stack().empty());
-  exprt l1_expr = state.field_sensitivity.apply(
-    ns, state, state.rename<L1>(expr, ns).get(), write);
+
+  // Symbols whose address is taken need to be renamed to level 1
+  // in order to distinguish addresses of local variables
+  // from different frames.
+  expr = apply_to_objects_in_dereference(std::move(expr), [&](exprt e) {
+    return state.field_sensitivity.apply(
+      ns, state, state.rename<L1>(std::move(e), ns).get(), false);
+  });
 
   // start the recursion!
-  dereference_rec(l1_expr, state, write);
+  dereference_rec(expr, state, write);
   // dereferencing may introduce new symbol_exprt
   // (like __CPROVER_memory)
-  expr = state.rename<L1>(std::move(l1_expr), ns).get();
+  expr = state.rename<L1>(std::move(expr), ns).get();
 
   // Dereferencing is likely to introduce new member-of-if constructs --
   // for example, "x->field" may have become "(x == &o1 ? o1 : o2).field."

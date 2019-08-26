@@ -16,7 +16,7 @@ Author: Michael Tautschnig
 #include "goto_symex_state.h"
 #include "symex_target.h"
 
-// #define ENABLE_ARRAY_FIELD_SENSITIVITY
+#define ENABLE_ARRAY_FIELD_SENSITIVITY
 
 exprt field_sensitivityt::apply(
   const namespacet &ns,
@@ -96,15 +96,48 @@ exprt field_sensitivityt::apply(
       // place the entire index expression, not just the array operand, in an
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
+      auto l2_index = state.rename(index.index(), ns);
+      l2_index.simplify(ns);
       bool was_l2 = !tmp.get_level_2().empty();
+      exprt l2_size =
+        state.rename(to_array_type(index.array().type()).size(), ns).get();
+      if(l2_size.is_nil() && index.array().id() == ID_symbol)
+      {
+        // In case the array type was incomplete, attempt to retrieve it from
+        // the symbol table.
+        const symbolt *array_from_symbol_table = ns.get_symbol_table().lookup(
+          to_symbol_expr(index.array()).get_identifier());
+        if(array_from_symbol_table != nullptr)
+          l2_size = to_array_type(array_from_symbol_table->type).size();
+      }
 
-      tmp.remove_level_2();
-      index.array() = tmp.get_original_expr();
-      tmp.set_expression(index);
-      if(was_l2)
-        return state.rename(std::move(tmp), ns).get();
-      else
-        return std::move(tmp);
+      if(
+        l2_size.id() == ID_constant &&
+        numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
+          max_field_sensitivity_array_size)
+      {
+        if(l2_index.get().id() == ID_constant)
+        {
+          // place the entire index expression, not just the array operand,
+          // in an SSA expression
+          ssa_exprt ssa_array = to_ssa_expr(index.array());
+          ssa_array.remove_level_2();
+          index.array() = ssa_array.get_original_expr();
+          index.index() = l2_index.get();
+          tmp.set_expression(index);
+          if(was_l2)
+            return state.rename(std::move(tmp), ns).get();
+          else
+            return std::move(tmp);
+        }
+        else if(!write)
+        {
+          // Expand the array and return `{array[0]; array[1]; ...}[index]`
+          exprt expanded_array =
+            get_fields(ns, state, to_ssa_expr(index.array()));
+          return index_exprt{std::move(expanded_array), index.index()};
+        }
+      }
     }
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
@@ -147,7 +180,10 @@ exprt field_sensitivityt::get_fields(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     ssa_expr.type().id() == ID_array &&
-    to_array_type(ssa_expr.type()).size().id() == ID_constant)
+    to_array_type(ssa_expr.type()).size().id() == ID_constant &&
+    numeric_cast_v<mp_integer>(
+      to_constant_expr(to_array_type(ssa_expr.type()).size())) <=
+      max_field_sensitivity_array_size)
   {
     const array_typet &type = to_array_type(ssa_expr.type());
     const std::size_t array_size =
@@ -267,8 +303,10 @@ void field_sensitivityt::field_assignments_rec(
   {
     const std::size_t array_size =
       numeric_cast_v<std::size_t>(to_constant_expr(type->size()));
-    PRECONDITION(
-      lhs_fs.has_operands() && lhs_fs.operands().size() == array_size);
+    PRECONDITION(lhs_fs.operands().size() == array_size);
+
+    if(array_size > max_field_sensitivity_array_size)
+      return;
 
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(std::size_t i = 0; i < array_size; ++i)
@@ -301,7 +339,7 @@ void field_sensitivityt::field_assignments_rec(
   }
 }
 
-bool field_sensitivityt::is_divisible(const ssa_exprt &expr)
+bool field_sensitivityt::is_divisible(const ssa_exprt &expr) const
 {
   if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
     return true;
@@ -309,7 +347,9 @@ bool field_sensitivityt::is_divisible(const ssa_exprt &expr)
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   if(
     expr.type().id() == ID_array &&
-    to_array_type(expr.type()).size().id() == ID_constant)
+    to_array_type(expr.type()).size().id() == ID_constant &&
+    numeric_cast_v<mp_integer>(to_constant_expr(
+      to_array_type(expr.type()).size())) <= max_field_sensitivity_array_size)
   {
     return true;
   }

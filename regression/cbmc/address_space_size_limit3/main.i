@@ -92,6 +92,11 @@ void f__L_0x3c6_0()
 
 int main()
 {
+  int unknown;
+  // Avoid constant propagation solving for pointer-offsets of esp,
+  // which prevent demonstrating the object-size limitation this test
+  // intends to exhibit:
+  esp -= (unknown & 1);
   L_0x3fe_0: esp-=0x4;
   L_0x3fe_1: *(uint32_t*)(esp)=ebp;
   L_0x3ff_0: ebp=esp;

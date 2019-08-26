@@ -1,0 +1,22 @@
+CORE
+test.c
+--show-vcc
+symex_dynamic::dynamic_object1#2\[\[1\]\] = symex_dynamic::dynamic_object1#2\[1\]
+symex_dynamic::dynamic_object1#2\[\[2\]\] = symex_dynamic::dynamic_object1#2\[2\]
+symex_dynamic::dynamic_object1#2\[\[3\]\] = symex_dynamic::dynamic_object1#2\[3\]
+symex_dynamic::dynamic_object1#2\[\[4\]\] = symex_dynamic::dynamic_object1#2\[4\]
+symex_dynamic::dynamic_object1#2\[\[5\]\] = symex_dynamic::dynamic_object1#2\[5\]
+symex_dynamic::dynamic_object1#2\[\[6\]\] = symex_dynamic::dynamic_object1#2\[6\]
+symex_dynamic::dynamic_object1#2\[\[7\]\] = symex_dynamic::dynamic_object1#2\[7\]
+symex_dynamic::dynamic_object1#2\[\[8\]\] = symex_dynamic::dynamic_object1#2\[8\]
+symex_dynamic::dynamic_object1#2\[\[9\]\] = symex_dynamic::dynamic_object1#2\[9\]
+symex_dynamic::dynamic_object1#3\[\[1\]\] =
+^EXIT=0$
+^SIGNAL=0$
+--
+symex_dynamic::dynamic_object1#[3-9]\[[0-9]+\]
+--
+This checks that a write with a non-constant index leads to a whole-array
+operation followed by expansion into individual array cells, while a write with
+a constant index leads to direct use of a single cell symbol, even when the array
+in question is dynamically allocated.

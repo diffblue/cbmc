@@ -135,6 +135,25 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   parse_java_language_options(cmdline, options);
   parse_java_object_factory_options(cmdline, options);
 
+  if(cmdline.isset("max-field-sensitivity-array-size"))
+  {
+    options.set_option(
+      "max-field-sensitivity-array-size",
+      cmdline.get_value("max-field-sensitivity-array-size"));
+  }
+
+  if(cmdline.isset("no-array-field-sensitivity"))
+  {
+    if(cmdline.isset("max-field-sensitivity-array-size"))
+    {
+      log.error()
+        << "--no-array-field-sensitivity and --max-field-sensitivity-array-size"
+        << " must not be given together" << messaget::eom;
+      exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+    options.set_option("no-array-field-sensitivity", true);
+  }
+
   if(cmdline.isset("show-symex-strategies"))
   {
     log.status() << show_path_strategies() << messaget::eom;

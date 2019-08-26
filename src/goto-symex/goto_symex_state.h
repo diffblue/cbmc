@@ -47,6 +47,7 @@ class goto_symex_statet final : public goto_statet
 public:
   goto_symex_statet(
     const symex_targett::sourcet &,
+    std::size_t max_field_sensitive_array_size,
     guard_managert &manager,
     std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
   ~goto_symex_statet();

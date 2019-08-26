@@ -370,11 +370,13 @@ void build_goto_trace(
 
       if(SSA_step.original_full_lhs.is_not_nil())
       {
-        goto_trace_step.full_lhs = build_full_lhs_rec(
-          decision_procedure,
-          ns,
-          SSA_step.original_full_lhs,
-          SSA_step.ssa_full_lhs);
+        goto_trace_step.full_lhs = simplify_expr(
+          build_full_lhs_rec(
+            decision_procedure,
+            ns,
+            SSA_step.original_full_lhs,
+            SSA_step.ssa_full_lhs),
+          ns);
         replace_nondet_in_type(goto_trace_step.full_lhs, decision_procedure);
       }
 
