@@ -19,11 +19,11 @@ Author: Diffblue Ltd
 #include <util/invariant.h>
 
 /// Identity functor. When we use C++20 this can be replaced with std::identity.
-template <typename T>
 class identity_functort
 {
 public:
-  constexpr T &&operator()(T &&t) const
+  template <typename T>
+  constexpr auto operator()(T &&t) const -> decltype(std::forward<T>(t))
   {
     return std::forward<T>(t);
   }
@@ -40,7 +40,7 @@ public:
 /// cfg_basic_blockst. Due to the vector storage the precise interface of
 /// std::map is hard to achieve, but something close is practically achievable
 /// for the interested developer.
-template <class K, class V, class KeyToDenseInteger = identity_functort<K>>
+template <class K, class V, class KeyToDenseInteger = identity_functort>
 class dense_integer_mapt
 {
 public:

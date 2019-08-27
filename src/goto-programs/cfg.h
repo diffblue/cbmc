@@ -38,9 +38,10 @@ template <class T>
 class cfg_instruction_to_dense_integert
 {
 public:
-  std::size_t operator()(T &&t) const
+  template <class U>
+  std::size_t operator()(U &&u) const
   {
-    return std::forward<T>(identity_functort<T>{}(t));
+    return std::forward<U>(identity_functort{}(u));
   }
 };
 
