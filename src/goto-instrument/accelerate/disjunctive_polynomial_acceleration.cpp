@@ -62,7 +62,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       it!=goto_program.instructions.end();
       ++it)
   {
-    if(loop.find(it)!=loop.end())
+    if(loop.contains(it))
     {
       goto_program.output_instruction(ns, "scratch", std::cout, *it);
     }
@@ -752,11 +752,9 @@ void disjunctive_polynomial_accelerationt::cone_of_influence(
 
 void disjunctive_polynomial_accelerationt::find_distinguishing_points()
 {
-  for(natural_loops_mutablet::natural_loopt::iterator it=loop.begin();
-      it!=loop.end();
-      ++it)
+  for(const auto &loop_instruction : loop)
   {
-    const auto succs=goto_program.get_successors(*it);
+    const auto succs = goto_program.get_successors(loop_instruction);
 
     if(succs.size() > 1)
     {
@@ -845,8 +843,7 @@ void disjunctive_polynomial_accelerationt::build_path(
     path.push_back(path_nodet(t, cond));
 
     t=next;
-  }
-  while(t!=loop_header && (loop.find(t)!=loop.end()));
+  } while(t != loop_header && loop.contains(t));
 }
 
 /*
@@ -912,7 +909,7 @@ void disjunctive_polynomial_accelerationt::build_fixed()
   {
     distinguish_mapt::iterator d=distinguishing_points.find(t);
 
-    if(loop.find(t)==loop.end())
+    if(!loop.contains(t))
     {
       // This instruction isn't part of the loop...  Just remove it.
       fixedt->turn_into_skip();
@@ -951,7 +948,7 @@ void disjunctive_polynomial_accelerationt::build_fixed()
         if(target->location_number > t->location_number)
         {
           // A forward jump...
-          if(loop.find(target)!=loop.end())
+          if(loop.contains(target))
           {
             // Case 1: a forward jump within the loop.  Do nothing.
             continue;

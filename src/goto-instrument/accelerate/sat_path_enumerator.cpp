@@ -108,8 +108,8 @@ bool sat_path_enumeratort::next(patht &path)
 
 void sat_path_enumeratort::find_distinguishing_points()
 {
-  for(natural_loops_mutablet::natural_loopt::iterator it=loop.begin();
-      it!=loop.end();
+  for(natural_loops_mutablet::natural_loopt::const_iterator it = loop.begin();
+      it != loop.end();
       ++it)
   {
     const auto succs=goto_program.get_successors(*it);
@@ -201,8 +201,7 @@ void sat_path_enumeratort::build_path(
     path.push_back(path_nodet(t, cond));
 
     t=next;
-  }
-  while(t!=loop_header && (loop.find(t)!=loop.end()));
+  } while(t != loop_header && loop.contains(t));
 }
 
 /*
@@ -266,7 +265,7 @@ void sat_path_enumeratort::build_fixed()
   {
     distinguish_mapt::iterator d=distinguishing_points.find(t);
 
-    if(loop.find(t)==loop.end())
+    if(!loop.contains(t))
     {
       // This instruction isn't part of the loop...  Just remove it.
       fixedt->turn_into_skip();
@@ -305,7 +304,7 @@ void sat_path_enumeratort::build_fixed()
         if(target->location_number > t->location_number)
         {
           // A forward jump...
-          if(loop.find(target)!=loop.end())
+          if(!loop.contains(target))
           {
             // Case 1: a forward jump within the loop.  Do nothing.
             continue;

@@ -34,15 +34,12 @@ Author: Matt Lewis
 goto_programt::targett acceleratet::find_back_jump(
   goto_programt::targett loop_header)
 {
-  natural_loops_mutablet::natural_loopt &loop=
-    natural_loops.loop_map[loop_header];
+  natural_loops_mutablet::natural_loopt &loop =
+    natural_loops.loop_map.at(loop_header);
   goto_programt::targett back_jump=loop_header;
 
-  for(natural_loops_mutablet::natural_loopt::iterator it=loop.begin();
-      it!=loop.end();
-      ++it)
+  for(const auto &t : loop)
   {
-    goto_programt::targett t=*it;
     if(
       t->is_goto() && t->get_condition().is_true() && t->targets.size() == 1 &&
       t->targets.front() == loop_header &&
@@ -57,15 +54,11 @@ goto_programt::targett acceleratet::find_back_jump(
 
 bool acceleratet::contains_nested_loops(goto_programt::targett &loop_header)
 {
-  natural_loops_mutablet::natural_loopt &loop=
-    natural_loops.loop_map[loop_header];
+  natural_loops_mutablet::natural_loopt &loop =
+    natural_loops.loop_map.at(loop_header);
 
-  for(natural_loops_mutablet::natural_loopt::iterator it=loop.begin();
-      it!=loop.end();
-      ++it)
+  for(const auto &t : loop)
   {
-    const goto_programt::targett &t=*it;
-
     if(t->is_backwards_goto())
     {
       if(t->targets.size()!=1 ||
@@ -75,8 +68,8 @@ bool acceleratet::contains_nested_loops(goto_programt::targett &loop_header)
       }
     }
 
-    if(t!=loop_header &&
-       natural_loops.loop_map.find(t)!=natural_loops.loop_map.end())
+    // Header of some other loop?
+    if(t != loop_header && natural_loops.is_loop_header(t))
     {
       return true;
     }
@@ -92,7 +85,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
   int num_accelerated=0;
   std::list<path_acceleratort> accelerators;
   natural_loops_mutablet::natural_loopt &loop =
-    natural_loops.loop_map[loop_header];
+    natural_loops.loop_map.at(loop_header);
 
   if(contains_nested_loops(loop_header))
   {
@@ -159,8 +152,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
   goto_programt::targett new_inst=loop_header;
   ++new_inst;
 
-  loop.insert(new_inst);
-
+  loop.insert_instruction(new_inst);
 
   std::cout << "Overflow loc is " << overflow_loc->location_number << '\n';
   std::cout << "Back jump is " << back_jump->location_number << '\n';
@@ -244,36 +236,35 @@ void acceleratet::make_overflow_loc(
   symbolt overflow_sym=utils.fresh_symbol("accelerate::overflow", bool_typet());
   const exprt &overflow_var=overflow_sym.symbol_expr();
   natural_loops_mutablet::natural_loopt &loop =
-    natural_loops.loop_map[loop_header];
+    natural_loops.loop_map.at(loop_header);
   overflow_instrumentert instrumenter(program, overflow_var, symbol_table);
 
-  for(natural_loops_mutablet::natural_loopt::iterator it=loop.begin();
-      it!=loop.end();
-      ++it)
+  for(const auto &loop_instruction : loop)
   {
-    overflow_locs[*it]=goto_programt::targetst();
-    goto_programt::targetst &added=overflow_locs[*it];
+    overflow_locs[loop_instruction] = goto_programt::targetst();
+    goto_programt::targetst &added = overflow_locs[loop_instruction];
 
-    instrumenter.add_overflow_checks(*it, added);
-    loop.insert(added.begin(), added.end());
+    instrumenter.add_overflow_checks(loop_instruction, added);
+    for(const auto &new_instruction : added)
+      loop.insert_instruction(new_instruction);
   }
 
   goto_programt::targett t = program.insert_after(
     loop_header,
     goto_programt::make_assignment(code_assignt(overflow_var, false_exprt())));
   t->swap(*loop_header);
-  loop.insert(t);
+  loop.insert_instruction(t);
   overflow_locs[loop_header].push_back(t);
 
   overflow_loc = program.insert_after(loop_end, goto_programt::make_skip());
   overflow_loc->swap(*loop_end);
-  loop.insert(overflow_loc);
+  loop.insert_instruction(overflow_loc);
 
   goto_programt::targett t2 = program.insert_after(
     loop_end, goto_programt::make_goto(overflow_loc, not_exprt(overflow_var)));
   t2->swap(*loop_end);
   overflow_locs[overflow_loc].push_back(t2);
-  loop.insert(t2);
+  loop.insert_instruction(t2);
 
   goto_programt::targett tmp=overflow_loc;
   overflow_loc=loop_end;
