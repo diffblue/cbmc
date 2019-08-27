@@ -1,0 +1,13 @@
+CORE
+LambdaBasic.class
+--function LambdaBasic.testThis --property 'java::LambdaBasic.testThis:(I)V.assertion.1' --property 'java::LambdaBasic.testThis:(I)V.assertion.2' --property 'java::LambdaBasic.testThis:(I)V.assertion.3' --property 'java::LambdaBasic.testThis:(I)V.assertion.4'
+line 19 assertion.*SUCCESS$
+line 21 assertion.*SUCCESS$
+line 26 assertion.*FAILURE$
+line 28 assertion.*FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test is a minimised example reported in TG-2479 and fixed during lambda
+development.
