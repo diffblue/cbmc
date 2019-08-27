@@ -21,9 +21,11 @@ class Main {
     case 3:
       i = Integer.MIN_VALUE;
       r = "-2147483648";
+      break;
     case 4:
       i = Integer.MAX_VALUE;
       r = "2147483647";
+      break;
     default:
       return;
     }
@@ -37,26 +39,109 @@ class Main {
     assert s.equals("0");
   }
 
+  public void testIntWithRadixTwoSuccess(int choice) {
+    int i;
+    String r;
+
+    switch (choice) {
+    case 0:
+      i = 0;
+      r = "0";
+      break;
+    case 1:
+      i = 1;
+      r = "1";
+      break;
+    case 2:
+      i = -1;
+      r = "-1";
+      break;
+    case 3:
+      i = 12;
+      r = "1100";
+      break;
+    case 4:
+      i = Integer.MIN_VALUE;
+      r = "-10000000000000000000000000000000";
+      break;
+    case 5:
+      i = Integer.MAX_VALUE;
+      r = "1111111111111111111111111111111";
+      break;
+    default:
+      return;
+    }
+
+    String s = CProverString.toString(i, 2);
+    assert s.equals(r);
+  }
+
+  public void testIntWithRadixTwoFailure() {
+    String s = CProverString.toString(123, 2);
+    assert s.equals("0");
+  }
+
+  public void testIntWithRadixSixteenSuccess(int choice) {
+    int i;
+    String r;
+
+    switch (choice) {
+    case 0:
+      i = 0;
+      r = "0";
+      break;
+    case 1:
+      i = 1;
+      r = "1";
+      break;
+    case 2:
+      i = -1;
+      r = "-1";
+      break;
+    case 3:
+      i = 56564;
+      r = "dcf4";
+      break;
+    case 4:
+      i = Integer.MIN_VALUE;
+      r = "-80000000";
+      break;
+    case 5:
+      i = Integer.MAX_VALUE;
+      r = "7fffffff";
+      break;
+    default:
+      return;
+    }
+
+    String s = CProverString.toString(i, 16);
+    assert s.equals(r);
+  }
+
+  public void testIntWithRadixSixteenFailure() {
+    String s = CProverString.toString(123, 16);
+    assert s.equals("0");
+  }
+
   public void testLongSuccess(int choice) {
     long l;
     String r;
 
     switch (choice) {
     case 0:
-      l = 0L;
+      l = 0;
       r = "0";
       break;
     case 1:
-      l = 1L;
+      l = 1;
       r = "1";
       break;
     case 2:
-      l = -1L;
+      l = -1;
       r = "-1";
       break;
     case 3:
       l = Long.MIN_VALUE;
-      ;
       r = "-9223372036854775808";
       break;
     case 4:
@@ -73,6 +158,90 @@ class Main {
 
   public void testLongFailure() {
     String s = CProverString.toString(9223372036854775807L);
+    assert s.equals("0");
+  }
+
+  public void testLongWithRadixTwoSuccess(int choice) {
+    long l;
+    String r;
+
+    switch (choice) {
+    case 0:
+      l = 0;
+      r = "0";
+      break;
+    case 1:
+      l = 1;
+      r = "1";
+      break;
+    case 2:
+      l = -1;
+      r = "-1";
+      break;
+    case 3:
+      l = 12;
+      r = "1100";
+      break;
+    case 4:
+      l = Long.MIN_VALUE;
+      r = "-1000000000000000000000000000000000000000000000000000000000000000";
+      break;
+    case 5:
+      l = Long.MAX_VALUE;
+      r = "111111111111111111111111111111111111111111111111111111111111111";
+      break;
+    default:
+      return;
+    }
+
+    String s = CProverString.toString(l, 2);
+    assert s.equals(r);
+  }
+
+  public void testLongWithRadixTwoFailure() {
+    String s = CProverString.toString(9223372036854775807L, 2);
+    assert s.equals("0");
+  }
+
+  public void testLongWithRadixSixteenSuccess(int choice) {
+    long l;
+    String r;
+
+    switch (choice) {
+    case 0:
+      l = 0;
+      r = "0";
+      break;
+    case 1:
+      l = 1;
+      r = "1";
+      break;
+    case 2:
+      l = -1;
+      r = "-1";
+      break;
+    case 3:
+      l = 56564;
+      r = "dcf4";
+      break;
+    case 4:
+      l = Long.MIN_VALUE;
+      r = "-8000000000000000";
+      break;
+    case 5:
+      l = Long.MAX_VALUE;
+      r = "7fffffffffffffff";
+      break;
+    default:
+      return;
+    }
+
+    String s = CProverString.toString(l, 16);
+    assert s.equals(r);
+  }
+
+  public void testLongWithRadixSixteenFailure() {
+    String s = CProverString.toString(9223372036854775807L, 16);
     assert s.equals("0");
   }
 

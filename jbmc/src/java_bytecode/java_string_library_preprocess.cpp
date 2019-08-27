@@ -1550,7 +1550,13 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::org.cprover.CProverString.toString:(I)Ljava/lang/String;"] =
       ID_cprover_string_of_int_func;
   cprover_equivalent_to_java_string_returning_function
+    ["java::org.cprover.CProverString.toString:(II)Ljava/lang/String;"] =
+      ID_cprover_string_of_int_func;
+  cprover_equivalent_to_java_string_returning_function
     ["java::org.cprover.CProverString.toString:(J)Ljava/lang/String;"] =
+      ID_cprover_string_of_long_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::org.cprover.CProverString.toString:(JI)Ljava/lang/String;"] =
       ID_cprover_string_of_long_func;
   conversion_table
     ["java::org.cprover.CProverString.toString:(F)Ljava/lang/String;"] =
