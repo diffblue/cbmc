@@ -21,9 +21,11 @@ class Main {
     case 3:
       i = Integer.MIN_VALUE;
       r = "-2147483648";
+      break;
     case 4:
       i = Integer.MAX_VALUE;
       r = "2147483647";
+      break;
     default:
       return;
     }
