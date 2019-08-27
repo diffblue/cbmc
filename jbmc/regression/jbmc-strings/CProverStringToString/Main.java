@@ -129,15 +129,15 @@ class Main {
 
     switch (choice) {
     case 0:
-      l = 0L;
+      l = 0;
       r = "0";
       break;
     case 1:
-      l = 1L;
+      l = 1;
       r = "1";
       break;
     case 2:
-      l = -1L;
+      l = -1;
       r = "-1";
       break;
     case 3:
@@ -167,15 +167,15 @@ class Main {
 
     switch (choice) {
     case 0:
-      l = 0L;
+      l = 0;
       r = "0";
       break;
     case 1:
-      l = 1L;
+      l = 1;
       r = "1";
       break;
     case 2:
-      l = -1L;
+      l = -1;
       r = "-1";
       break;
     case 3:
@@ -209,15 +209,15 @@ class Main {
 
     switch (choice) {
     case 0:
-      l = 0L;
+      l = 0;
       r = "0";
       break;
     case 1:
-      l = 1L;
+      l = 1;
       r = "1";
       break;
     case 2:
-      l = -1L;
+      l = -1;
       r = "-1";
       break;
     case 3:
