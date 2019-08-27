@@ -141,38 +141,57 @@ void full_slicert::add_jumps(
     const irep_idt &id = j.function_id;
     const cfg_post_dominatorst &pd=post_dominators.at(id);
 
-    const auto &j_PC_node = pd.get_node(j.PC);
-
     // find the nearest post-dominator in slice
-    if(!pd.dominates(lex_succ, j_PC_node))
+    if(!pd.dominates(lex_succ, j.PC))
     {
       add_to_queue(queue, *it, lex_succ);
       jumps.erase(it);
     }
     else
     {
+      const auto pc_basic_block_index = pd.cfg.entry_map.at(j.PC);
+
       // check whether the nearest post-dominator is different from
       // lex_succ
       goto_programt::const_targett nearest=lex_succ;
       std::size_t post_dom_size=0;
-      for(cfg_dominatorst::target_sett::const_iterator d_it =
-            j_PC_node.dominators.begin();
-          d_it != j_PC_node.dominators.end();
-          ++d_it)
+      for(const auto postdom_block_index :
+          pd.basic_block_dominators(pc_basic_block_index))
       {
-        const auto &node = cfg.get_node(*d_it);
-        if(node.node_required)
+        const auto &postdom_node = pd.cfg[postdom_block_index];
+        const auto &postdom_block = postdom_node.block;
+        auto instruction_it = postdom_block.begin();
+
+        // If this is the same block as j.PC, only consider instructions that
+        // come after it:
+        if(postdom_block_index == pc_basic_block_index)
         {
-          const irep_idt &id2 = node.function_id;
-          INVARIANT(id==id2,
-                    "goto/jump expected to be within a single function");
-
-          const auto &postdom_node = pd.get_node(*d_it);
-
-          if(postdom_node.dominators.size() > post_dom_size)
+          while(*instruction_it != j.PC)
           {
-            nearest=*d_it;
-            post_dom_size = postdom_node.dominators.size();
+            INVARIANT(
+              instruction_it != postdom_block.end(),
+              "entry map and basic block members should be consistent");
+            ++instruction_it;
+          }
+        }
+
+        for(; instruction_it != postdom_block.end(); ++instruction_it)
+        {
+          const auto &node = cfg.get_node(*instruction_it);
+          if(node.node_required)
+          {
+            const irep_idt &id2 = node.function_id;
+            INVARIANT(
+              id == id2, "goto/jump expected to be within a single function");
+
+            if(postdom_node.dominators.size() > post_dom_size)
+            {
+              nearest = *instruction_it;
+              post_dom_size = postdom_node.dominators.size();
+            }
+
+            // Later instructions in the same block can only be worse:
+            break;
           }
         }
       }

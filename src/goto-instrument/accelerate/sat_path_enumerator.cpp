@@ -112,7 +112,8 @@ void sat_path_enumeratort::find_distinguishing_points()
       it != loop.end();
       ++it)
   {
-    const auto succs=goto_program.get_successors(*it);
+    const auto tail = loop.get_basic_block(*it).back();
+    const auto succs = goto_program.get_successors(tail);
 
     if(succs.size()>1)
     {

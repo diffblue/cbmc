@@ -38,8 +38,9 @@ goto_programt::targett acceleratet::find_back_jump(
     natural_loops.loop_map.at(loop_header);
   goto_programt::targett back_jump=loop_header;
 
-  for(const auto &t : loop)
+  for(const auto loop_block : loop)
   {
+    goto_programt::targett t = loop.get_basic_block(loop_block).back();
     if(
       t->is_goto() && t->get_condition().is_true() && t->targets.size() == 1 &&
       t->targets.front() == loop_header &&
@@ -57,19 +58,26 @@ bool acceleratet::contains_nested_loops(goto_programt::targett &loop_header)
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map.at(loop_header);
 
-  for(const auto &t : loop)
+  for(const auto loop_block : loop)
   {
-    if(t->is_backwards_goto())
+    const auto &block = loop.get_basic_block(loop_block);
+
+    const auto block_header = block.front();
+    const auto block_tail = block.back();
+
+    if(block_tail->is_backwards_goto())
     {
-      if(t->targets.size()!=1 ||
-         t->get_target()!=loop_header)
+      if(
+        block_tail->targets.size() != 1 ||
+        block_tail->get_target() != loop_header)
       {
         return true;
       }
     }
 
     // Header of some other loop?
-    if(t != loop_header && natural_loops.is_loop_header(t))
+    if(
+      block_header != loop_header && natural_loops.is_loop_header(block_header))
     {
       return true;
     }
@@ -152,7 +160,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
   goto_programt::targett new_inst=loop_header;
   ++new_inst;
 
-  loop.insert_instruction(new_inst);
+  natural_loops.insert_instruction_after(new_inst, loop_header);
 
   std::cout << "Overflow loc is " << overflow_loc->location_number << '\n';
   std::cout << "Back jump is " << back_jump->location_number << '\n';
@@ -239,32 +247,52 @@ void acceleratet::make_overflow_loc(
     natural_loops.loop_map.at(loop_header);
   overflow_instrumentert instrumenter(program, overflow_var, symbol_table);
 
-  for(const auto &loop_instruction : loop)
+  for(const auto block_index : loop)
   {
-    overflow_locs[loop_instruction] = goto_programt::targetst();
-    goto_programt::targetst &added = overflow_locs[loop_instruction];
+    const auto &basic_block = natural_loops.get_basic_block(block_index);
+    std::vector<goto_programt::targett> all_added;
+    for(const auto instruction : basic_block)
+    {
+      overflow_locs[instruction] = goto_programt::targetst();
+      goto_programt::targetst &added = overflow_locs[instruction];
 
-    instrumenter.add_overflow_checks(loop_instruction, added);
-    for(const auto &new_instruction : added)
-      loop.insert_instruction(new_instruction);
+      instrumenter.add_overflow_checks(instruction, added);
+      all_added.insert(all_added.end(), added.begin(), added.end());
+    }
+    // Insert newly-added instructions into the basic block representation.
+    // The block header must not have been replaced.
+    for(const auto new_instruction : all_added)
+    {
+      auto predecessor = std::prev(new_instruction);
+      INVARIANT(
+        std::find(basic_block.begin(), basic_block.end(), predecessor) !=
+          basic_block.end(),
+        "newly added instructions should not come at the start of a block");
+      // Note this will add to basic_block
+      natural_loops.insert_instruction_after(new_instruction, predecessor);
+    }
   }
 
   goto_programt::targett t = program.insert_after(
     loop_header,
     goto_programt::make_assignment(code_assignt(overflow_var, false_exprt())));
   t->swap(*loop_header);
-  loop.insert_instruction(t);
+  natural_loops.insert_instruction_after(t, loop_header);
   overflow_locs[loop_header].push_back(t);
 
   overflow_loc = program.insert_after(loop_end, goto_programt::make_skip());
   overflow_loc->swap(*loop_end);
-  loop.insert_instruction(overflow_loc);
+  natural_loops.insert_instruction_after(overflow_loc, loop_end);
 
   goto_programt::targett t2 = program.insert_after(
     loop_end, goto_programt::make_goto(overflow_loc, not_exprt(overflow_var)));
   t2->swap(*loop_end);
   overflow_locs[overflow_loc].push_back(t2);
-  loop.insert_instruction(t2);
+  natural_loops.insert_instruction_after(t2, loop_end);
+
+  natural_loops.split_basic_block_after(loop_end);
+  natural_loops.split_basic_block_after(t2);
+  natural_loops.add_basic_block_graph_edge(loop_end, overflow_loc);
 
   goto_programt::targett tmp=overflow_loc;
   overflow_loc=loop_end;

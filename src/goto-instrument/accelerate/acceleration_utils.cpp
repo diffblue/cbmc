@@ -95,8 +95,11 @@ void acceleration_utilst::find_modified(
   const natural_loops_mutablet::natural_loopt &loop,
   expr_sett &modified)
 {
-  for(const auto &step : loop)
-    find_modified(step, modified);
+  for(const auto block_index : loop)
+  {
+    for(const auto instruction : loop.get_basic_block(block_index))
+      find_modified(instruction, modified);
+  }
 }
 
 void acceleration_utilst::find_modified(

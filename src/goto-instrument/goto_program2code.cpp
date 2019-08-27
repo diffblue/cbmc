@@ -68,16 +68,21 @@ void goto_program2codet::build_loop_map()
     // edge -- we also ignore such code
     goto_programt::const_targett loop_start=l_it->first;
     goto_programt::const_targett loop_end=loop_start;
-    for(natural_loopst::natural_loopt::const_iterator
-        it=l_it->second.begin();
-        it!=l_it->second.end();
-        ++it)
-      if((*it)->is_goto())
+    for(const auto block_index : l_it->second.blocks())
+    {
+      for(const auto instruction : loops.get_basic_block(block_index))
       {
-        if((*it)->get_target()==loop_start &&
-            (*it)->location_number>loop_end->location_number)
-          loop_end=*it;
+        if(instruction->is_goto())
+        {
+          if(
+            instruction->get_target() == loop_start &&
+            instruction->location_number > loop_end->location_number)
+          {
+            loop_end = instruction;
+          }
+        }
       }
+    }
 
     if(!loop_map.insert(std::make_pair(loop_start, loop_end)).second)
       UNREACHABLE;
@@ -763,10 +768,8 @@ bool goto_program2codet::set_block_end_points(
         case_end!=upper_bound;
         ++case_end)
     {
-      const auto &case_end_node = dominators.get_node(case_end);
-
       // ignore dead instructions for the following checks
-      if(!dominators.program_point_reachable(case_end_node))
+      if(!dominators.program_point_reachable(case_end))
       {
         // simplification may have figured out that a case is unreachable
         // this is possibly getting too weird, abort to be safe
@@ -777,7 +780,7 @@ bool goto_program2codet::set_block_end_points(
       }
 
       // find the last instruction dominated by the case start
-      if(!dominators.dominates(it->case_start, case_end_node))
+      if(!dominators.dominates(it->case_start, case_end))
         break;
 
       if(!processed_locations.insert(case_end->location_number).second)

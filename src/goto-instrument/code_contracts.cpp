@@ -80,10 +80,14 @@ static void check_apply_invariants(
       it=loop.begin();
       it!=loop.end();
       ++it)
-    if((*it)->is_goto() &&
-       (*it)->get_target()==loop_head &&
-       (*it)->location_number>loop_end->location_number)
-      loop_end=*it;
+  {
+    const auto &basic_block = loop.get_basic_block(*it);
+    const auto block_tail = basic_block.back();
+    if(
+      block_tail->is_goto() && block_tail->get_target() == loop_head &&
+      block_tail->location_number > loop_end->location_number)
+      loop_end = block_tail;
+  }
 
   // see whether we have an invariant
   exprt invariant = static_cast<const exprt &>(

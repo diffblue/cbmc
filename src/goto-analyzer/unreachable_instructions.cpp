@@ -32,7 +32,9 @@ static void unreachable_instructions(
   cfg_dominatorst dominators;
   dominators(goto_program);
 
-  for(const auto instruction : dominators.cfg.keys())
+  for(auto instruction = goto_program.instructions.begin();
+      instruction != goto_program.instructions.end();
+      ++instruction)
   {
     const cfg_dominatorst::cfgt::nodet &n = dominators.get_node(instruction);
     if(n.dominators.empty())

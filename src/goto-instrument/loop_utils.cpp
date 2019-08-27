@@ -26,7 +26,12 @@ goto_programt::targett get_loop_exit(const loopt &loop)
   for(loopt::const_iterator l_it=loop.begin();
       l_it!=loop.end();
       l_it++)
-    loop_map[(*l_it)->location_number]=*l_it;
+  {
+    for(const auto &instruction : loop.get_basic_block(*l_it))
+    {
+      loop_map[instruction->location_number] = instruction;
+    }
+  }
 
   // get the one with the highest number
   goto_programt::targett last=(--loop_map.end())->second;
@@ -92,17 +97,21 @@ void get_modifies(
   for(loopt::const_iterator
       i_it=loop.begin(); i_it!=loop.end(); i_it++)
   {
-    const goto_programt::instructiont &instruction=**i_it;
+    const auto basic_block = *i_it;
+    for(const auto instruction_it : loop.get_basic_block(basic_block))
+    {
+      const goto_programt::instructiont &instruction = *instruction_it;
 
-    if(instruction.is_assign())
-    {
-      const exprt &lhs=to_code_assign(instruction.code).lhs();
-      get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
-    }
-    else if(instruction.is_function_call())
-    {
-      const exprt &lhs=to_code_function_call(instruction.code).lhs();
-      get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
+      if(instruction.is_assign())
+      {
+        const exprt &lhs = to_code_assign(instruction.code).lhs();
+        get_modifies_lhs(local_may_alias, instruction_it, lhs, modifies);
+      }
+      else if(instruction.is_function_call())
+      {
+        const exprt &lhs = to_code_function_call(instruction.code).lhs();
+        get_modifies_lhs(local_may_alias, instruction_it, lhs, modifies);
+      }
     }
   }
 }

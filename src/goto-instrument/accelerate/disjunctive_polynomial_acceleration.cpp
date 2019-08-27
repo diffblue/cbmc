@@ -752,9 +752,10 @@ void disjunctive_polynomial_accelerationt::cone_of_influence(
 
 void disjunctive_polynomial_accelerationt::find_distinguishing_points()
 {
-  for(const auto &loop_instruction : loop)
+  for(const auto basic_block_index : loop)
   {
-    const auto succs = goto_program.get_successors(loop_instruction);
+    const auto &basic_block = loop.get_basic_block(basic_block_index);
+    const auto succs = goto_program.get_successors(basic_block.back());
 
     if(succs.size() > 1)
     {
