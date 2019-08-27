@@ -187,19 +187,19 @@ public:
   /// in that particular case you should just use `cfg.get_node(i)`). Storing
   /// node indices saves a map lookup, so it can be worthwhile when you expect
   /// to repeatedly look up the same program point.
-  entryt get_node_index(const I &program_point) const
+  entryt get_node_index(const goto_programt::const_targett &program_point) const
   {
     return entry_map.at(program_point);
   }
 
   /// Get the CFG graph node relating to \p program_point.
-  nodet &get_node(const I &program_point)
+  nodet &get_node(const goto_programt::const_targett &program_point)
   {
     return (*this)[get_node_index(program_point)];
   }
 
   /// Get the CFG graph node relating to \p program_point.
-  const nodet &get_node(const I &program_point) const
+  const nodet &get_node(const goto_programt::const_targett &program_point) const
   {
     return (*this)[get_node_index(program_point)];
   }
