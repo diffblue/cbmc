@@ -1669,26 +1669,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.trim:()Ljava/lang/String;"]=
       ID_cprover_string_trim_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.valueOf:(Z)Ljava/lang/String;"]=
-      ID_cprover_string_of_bool_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.valueOf:(C)Ljava/lang/String;"]=
-      ID_cprover_string_of_char_func;
-  conversion_table["java::java.lang.String.valueOf:(F)Ljava/lang/String;"] =
-    std::bind(
-      &java_string_library_preprocesst::make_float_to_string_code,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3,
-      std::placeholders::_4);
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.valueOf:(I)Ljava/lang/String;"]=
-      ID_cprover_string_of_int_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.valueOf:(J)Ljava/lang/String;"]=
-      ID_cprover_string_of_long_func;
 
   // StringBuilder library
   conversion_table
@@ -1827,14 +1807,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       conversion_table["java::java.lang.String.length:()I"];
 
   // Other libraries
-  conversion_table["java::java.lang.Float.toString:(F)Ljava/lang/String;"] =
-    std::bind(
-      &java_string_library_preprocesst::make_float_to_string_code,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3,
-      std::placeholders::_4);
   cprover_equivalent_to_java_function
     ["java::java.lang.Integer.parseInt:(Ljava/lang/String;)I"]=
       ID_cprover_string_parse_int_func;
@@ -1850,18 +1822,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Integer.toHexString:(I)Ljava/lang/String;"]=
       ID_cprover_string_of_int_hex_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.Integer.toString:(I)Ljava/lang/String;"]=
-      ID_cprover_string_of_int_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.Integer.toString:(II)Ljava/lang/String;"]=
-      ID_cprover_string_of_int_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.Long.toString:(J)Ljava/lang/String;"]=
-      ID_cprover_string_of_int_func;
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.Long.toString:(JI)Ljava/lang/String;"]=
-      ID_cprover_string_of_int_func;
   conversion_table["java::org.cprover.CProver.classIdentifier:("
                    "Ljava/lang/Object;)Ljava/lang/String;"] =
     std::bind(
