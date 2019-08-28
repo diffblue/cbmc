@@ -499,9 +499,6 @@ This is described in more detail \link string_builtin_functiont here. \endlink
   * `cprover_string_of_float_scientific_notation` :
     \copybrief string_constraint_generatort::add_axioms_from_float_scientific_notation
     \link string_constraint_generatort::add_axioms_from_float_scientific_notation More... \endlink
-  * `cprover_string_of_char` :
-    \copybrief string_constraint_generatort::add_axioms_from_char(const function_application_exprt &f)
-    \link string_constraint_generatort::add_axioms_from_char(const function_application_exprt &f) More... \endlink
   * `cprover_string_parse_int` :
     \copybrief string_constraint_generatort::add_axioms_for_parse_int
     \link string_constraint_generatort::add_axioms_for_parse_int More... \endlink
@@ -530,8 +527,6 @@ This is described in more detail \link string_builtin_functiont here. \endlink
   * `cprover_string_delete_char_at` : A call to
     `cprover_string_delete_char_at(s, i)` would be the same thing as
     `cprover_string_delete(s, i, i+1)`.
-  * `cprover_string_of_bool` :
-    Language dependent, should be implemented in the models.
   * `cprover_string_copy` : Same as `cprover_string_substring(s, 0)`.
   * `cprover_string_of_int_hex` : Same as `cprover_string_of_int(s, 16)`.
   * `cprover_string_of_double` : Same as `cprover_string_of_float`.
