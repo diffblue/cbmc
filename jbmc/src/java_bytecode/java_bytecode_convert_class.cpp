@@ -914,21 +914,17 @@ void add_java_array_types(symbol_tablet &symbol_table)
 
     code_declt declare_index(index_symexpr);
 
-    side_effect_expr_assignt inc(
-      index_symexpr,
-      plus_exprt(index_symexpr, from_integer(1, index_symexpr.type())),
-      location);
-
     dereference_exprt old_cell(
       plus_exprt(old_data, index_symexpr), old_data.type().subtype());
     dereference_exprt new_cell(
       plus_exprt(new_data, index_symexpr), new_data.type().subtype());
 
-    const code_fort copy_loop(
-      code_assignt(index_symexpr, from_integer(0, index_symexpr.type())),
-      binary_relation_exprt(index_symexpr, ID_lt, old_length),
-      std::move(inc),
-      code_assignt(std::move(new_cell), std::move(old_cell)));
+    const code_fort copy_loop = code_fort::from_index_bounds(
+      from_integer(0, index_symexpr.type()),
+      old_length,
+      index_symexpr,
+      code_assignt(std::move(new_cell), std::move(old_cell)),
+      location);
 
     member_exprt new_base_class(
       new_array, base_class_component.get_name(), base_class_component.type());

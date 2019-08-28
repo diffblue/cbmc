@@ -226,3 +226,24 @@ void code_outputt::check(const codet &code, const validation_modet vm)
   DATA_CHECK(
     vm, code.operands().size() >= 2, "output must have at least two operands");
 }
+
+code_fort code_fort::from_index_bounds(
+  exprt start_index,
+  exprt end_index,
+  symbol_exprt loop_index,
+  codet body,
+  source_locationt location)
+{
+  PRECONDITION(start_index.type() == loop_index.type());
+  PRECONDITION(end_index.type() == loop_index.type());
+  side_effect_expr_assignt inc(
+    loop_index,
+    plus_exprt(loop_index, from_integer(1, loop_index.type())),
+    location);
+
+  return code_fort{
+    code_assignt{loop_index, std::move(start_index)},
+    binary_relation_exprt{loop_index, ID_lt, std::move(end_index)},
+    std::move(inc),
+    std::move(body)};
+}

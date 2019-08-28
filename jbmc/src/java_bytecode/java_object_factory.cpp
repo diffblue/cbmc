@@ -1335,46 +1335,28 @@ static void array_loop_init_code(
   const symbol_exprt &counter_expr =
     allocate_local_symbol(length_expr.type(), "array_init_iter");
 
-  const symbolt &counter =
-    symbol_table.lookup_ref(counter_expr.get_identifier());
-
-  exprt java_zero=from_integer(0, java_int_type());
-  assignments.add(code_assignt(counter_expr, java_zero));
-
-  std::string head_name = id2string(counter.base_name) + "_header";
-  code_labelt init_head_label(head_name, code_skipt());
-  code_gotot goto_head(head_name);
-
-  assignments.add(std::move(init_head_label));
-
-  std::string done_name = id2string(counter.base_name) + "_done";
-  code_labelt init_done_label(done_name, code_skipt());
-  code_gotot goto_done(done_name);
-
-  code_ifthenelset done_test(equal_exprt(counter_expr, length_expr), goto_done);
-
-  assignments.add(std::move(done_test));
-
-  if(update_in_place!=update_in_placet::MUST_UPDATE_IN_PLACE)
+  code_blockt loop_body;
+  if(update_in_place != update_in_placet::MUST_UPDATE_IN_PLACE)
   {
     // Add a redundant if(counter == max_length) break
     // that is easier for the unwinder to understand.
     code_ifthenelset max_test(
-      equal_exprt(counter_expr, max_length_expr), std::move(goto_done));
+      equal_exprt(counter_expr, max_length_expr), code_breakt{});
 
-    assignments.add(std::move(max_test));
+    loop_body.add(std::move(max_test));
   }
 
   const dereference_exprt element_at_counter =
     array_element_from_pointer(array_init_symexpr, counter_expr);
 
-  assignments.append(element_generator(element_at_counter, element_type));
-  exprt java_one = from_integer(1, java_int_type());
-  code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
+  loop_body.append(element_generator(element_at_counter, element_type));
 
-  assignments.add(std::move(incr));
-  assignments.add(std::move(goto_head));
-  assignments.add(std::move(init_done_label));
+  assignments.add(code_fort::from_index_bounds(
+    from_integer(0, java_int_type()),
+    length_expr,
+    counter_expr,
+    std::move(loop_body),
+    location));
 }
 
 code_blockt gen_nondet_array_init(
