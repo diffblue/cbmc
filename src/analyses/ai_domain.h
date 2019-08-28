@@ -27,7 +27,7 @@ class ai_baset;
 class ai_domain_baset
 {
 protected:
-  /// The constructor is expected to produce 'false' or 'bottom'
+  /// The default constructor is expected to produce 'false' or 'bottom'
   ai_domain_baset()
   {
   }

@@ -403,6 +403,8 @@ protected:
 ///   initialization
 /// - \ref ait#finalize(), for post-analysis cleanup.
 ///
+/// \tparam domainT A type derived from ai_domain_baset that represents the
+///     values in the AI domain
 template<typename domainT>
 class ait:public ai_baset
 {
@@ -531,6 +533,9 @@ private:
 /// [Martin Rinard, "Analysis of Multi-Threaded Programs", SAS 2001](
 /// http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.28.4747&<!--
 /// -->rep=rep1&type=pdf).
+///
+/// \tparam domainT A type derived from ai_domain_baset that represents the
+///     values in the AI domain
 template<typename domainT>
 class concurrency_aware_ait:public ait<domainT>
 {
