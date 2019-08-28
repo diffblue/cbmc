@@ -13,6 +13,7 @@ Author: Romain Brenguier, Joel Allred
 #define CPROVER_SOLVERS_STRINGS_STRING_CONCATENATION_BUILTIN_FUNCTION_H
 
 #include "string_builtin_function.h"
+#include "string_insertion_builtin_function.h"
 
 class string_concatenation_builtin_functiont final
   : public string_insertion_builtin_functiont

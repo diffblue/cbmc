@@ -262,8 +262,6 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_from_literal(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_concat_code_point_func)
     return add_axioms_for_concat_code_point(fresh_symbol, expr, array_pool);
-  else if(id == ID_cprover_string_insert_func)
-    return add_axioms_for_insert(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_substring_func)
     return add_axioms_for_substring(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_trim_func)
