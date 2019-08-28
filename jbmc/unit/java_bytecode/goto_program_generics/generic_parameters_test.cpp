@@ -72,7 +72,7 @@ SCENARIO(
             field_input_name,
             {},
             "array_field",
-            "java::array[reference]",
+            JAVA_REFERENCE_ARRAY_CLASSID,
             entry_point_code,
             symbol_table);
         }
