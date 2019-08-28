@@ -56,6 +56,41 @@ protected:
     goto_programt::targett);
 };
 
+/// Produce an expression of the form
+/// `classid_field == "A" || classid_field == "B" || ...`
+/// where A, B, ... are the possible subtypes of \p target_type.
+/// \param classid_field: field to compare, usually a `@class_identifier` field
+///   denoting an object's runtime type
+/// \param target_type: the type all of whose subtypes (including itself) should
+///   be accepted
+/// \param class_hierarchy: class hierarchy
+/// \return disjunction of the possible matched subtypes
+static exprt subtype_expr(
+  const exprt &classid_field,
+  const irep_idt &target_type,
+  const class_hierarchyt &class_hierarchy)
+{
+  std::vector<irep_idt> children =
+    class_hierarchy.get_children_trans(target_type);
+  children.push_back(target_type);
+  // Sort alphabetically to make order of generated disjuncts
+  // independent of class loading order
+  std::sort(
+    children.begin(), children.end(), [](const irep_idt &a, const irep_idt &b) {
+      return a.compare(b) < 0;
+    });
+
+  exprt::operandst or_ops;
+  for(const auto &clsname : children)
+  {
+    constant_exprt clsexpr(clsname, string_typet());
+    equal_exprt test(classid_field, clsexpr);
+    or_ops.push_back(test);
+  }
+
+  return disjunction(or_ops);
+}
+
 /// Replaces an expression like e instanceof A with e.\@class_identifier == "A"
 /// or a big-or of similar expressions if we know of subtypes that also satisfy
 /// the given test.
@@ -94,21 +129,11 @@ bool remove_instanceoft::lower_instanceof(
     "instanceof second operand should be a type");
   const typet &target_type=target_arg.type();
 
-  // Find all types we know about that satisfy the given requirement:
   INVARIANT(
     target_type.id() == ID_struct_tag,
     "instanceof second operand should have a simple type");
   const irep_idt &target_name =
     to_struct_tag_type(target_type).get_identifier();
-  std::vector<irep_idt> children=
-    class_hierarchy.get_children_trans(target_name);
-  children.push_back(target_name);
-  // Sort alphabetically to make order of generated disjuncts
-  // independent of class loading order
-  std::sort(
-    children.begin(), children.end(), [](const irep_idt &a, const irep_idt &b) {
-      return a.compare(b) < 0;
-    });
 
   auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
   exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
@@ -126,18 +151,13 @@ bool remove_instanceoft::lower_instanceof(
   // and less pessimistic aliasing assumptions possibly causing goto-symex to
   // explore in-fact-unreachable paths.
 
-  exprt::operandst or_ops;
-  for(const auto &clsname : children)
-  {
-    constant_exprt clsexpr(clsname, string_typet());
-    equal_exprt test(object_clsid, clsexpr);
-    or_ops.push_back(test);
-  }
+  exprt subtype_check =
+    subtype_expr(object_clsid, target_name, class_hierarchy);
 
   notequal_exprt not_null(
     check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
 
-  expr = and_exprt(not_null, disjunction(or_ops));
+  expr = and_exprt(not_null, subtype_check);
 
   return true;
 }
