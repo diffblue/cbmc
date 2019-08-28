@@ -2489,35 +2489,37 @@ code_blockt java_bytecode_convert_methodt::convert_newarray(
   const exprt::operandst &op,
   exprt::operandst &results)
 {
-  char element_type;
+  java_reference_typet ref_type = [&]() {
+    char element_type;
+    if(statement == "newarray")
+    {
+      irep_idt id = arg0.type().id();
 
-  if(statement == "newarray")
-  {
-    irep_idt id = arg0.type().id();
-
-    if(id == ID_bool)
-      element_type = 'z';
-    else if(id == ID_char)
-      element_type = 'c';
-    else if(id == ID_float)
-      element_type = 'f';
-    else if(id == ID_double)
-      element_type = 'd';
-    else if(id == ID_byte)
-      element_type = 'b';
-    else if(id == ID_short)
-      element_type = 's';
-    else if(id == ID_int)
-      element_type = 'i';
-    else if(id == ID_long)
-      element_type = 'j';
+      if(id == ID_bool)
+        element_type = 'z';
+      else if(id == ID_char)
+        element_type = 'c';
+      else if(id == ID_float)
+        element_type = 'f';
+      else if(id == ID_double)
+        element_type = 'd';
+      else if(id == ID_byte)
+        element_type = 'b';
+      else if(id == ID_short)
+        element_type = 's';
+      else if(id == ID_int)
+        element_type = 'i';
+      else if(id == ID_long)
+        element_type = 'j';
+      else
+        element_type = '?';
+    }
     else
-      element_type = '?';
-  }
-  else
-    element_type = 'a';
-
-  const reference_typet ref_type = java_array_type(element_type);
+    {
+      element_type = 'a';
+    }
+    return java_array_type(element_type);
+  }();
 
   side_effect_exprt java_new_array(ID_java_new_array, ref_type, location);
   java_new_array.copy_to_operands(op[0]);
