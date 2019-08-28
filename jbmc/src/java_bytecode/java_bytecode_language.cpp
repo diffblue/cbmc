@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
+#include <linking/static_lifetime_init.h>
+
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/expr_iterator.h>
@@ -757,6 +759,7 @@ bool java_bytecode_languaget::typecheck(
     "the Java front-end should only be used with an empty symbol table");
 
   java_internal_additions(symbol_table);
+  create_java_initialize(symbol_table);
 
   if(language_options->string_refinement_enabled)
     string_preprocess.initialize_conversion_table();
@@ -942,6 +945,8 @@ bool java_bytecode_languaget::typecheck(
       convert_single_method(
         method_sig.first, journalling_symbol_table, class_to_declared_symbols);
     }
+    convert_single_method(
+      INITIALIZE_FUNCTION, journalling_symbol_table, class_to_declared_symbols);
     // Now convert all newly added string methods
     for(const auto &fn_name : journalling_symbol_table.get_inserted())
     {
@@ -1095,6 +1100,7 @@ void java_bytecode_languaget::methods_provided(
   // Add all synthetic methods to map
   for(const auto &kv : synthetic_methods)
     methods.insert(kv.first);
+  methods.insert(INITIALIZE_FUNCTION);
 }
 
 /// \brief Promote a lazy-converted method (one whose type is known but whose
@@ -1120,7 +1126,7 @@ void java_bytecode_languaget::convert_lazy_method(
   convert_single_method(function_id, symbol_table, class_to_declared_symbols);
 
   // Instrument runtime exceptions (unless symbol is a stub)
-  if(symbol.value.is_not_nil())
+  if(symbol.value.is_not_nil() && function_id != INITIALIZE_FUNCTION)
   {
     java_bytecode_instrument_symbol(
       symbol_table,
@@ -1201,6 +1207,20 @@ bool java_bytecode_languaget::convert_single_method(
   // Nothing to do if body is already loaded
   if(symbol.value.is_not_nil())
     return false;
+
+  if(function_id == INITIALIZE_FUNCTION)
+  {
+    java_static_lifetime_init(
+      symbol_table,
+      symbol.location,
+      language_options->assume_inputs_non_null,
+      object_factory_parameters,
+      *pointer_type_selector,
+      language_options->string_refinement_enabled,
+      get_message_handler());
+    return false;
+  }
+
   INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
 
   bool ret = convert_single_method_code(

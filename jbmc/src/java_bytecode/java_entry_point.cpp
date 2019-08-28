@@ -53,7 +53,6 @@ void create_java_initialize(symbol_table_baset &symbol_table)
   initialize.mode=ID_java;
 
   initialize.type = java_method_typet({}, java_void_type());
-
   symbol_table.add(initialize);
 }
 
@@ -104,7 +103,7 @@ static constant_exprt constant_bool(bool val)
   return from_integer(val ? 1 : 0, java_boolean_type());
 }
 
-static void java_static_lifetime_init(
+void java_static_lifetime_init(
   symbol_table_baset &symbol_table,
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
@@ -115,6 +114,7 @@ static void java_static_lifetime_init(
 {
   symbolt &initialize_symbol =
     symbol_table.get_writeable_ref(INITIALIZE_FUNCTION);
+  PRECONDITION(initialize_symbol.value.is_nil());
   code_blockt code_block;
 
   const symbol_exprt rounding_mode =
@@ -589,17 +589,6 @@ bool java_entry_point(
   symbolt symbol=res.main_function;
 
   assert(symbol.type.id()==ID_code);
-
-  create_java_initialize(symbol_table);
-
-  java_static_lifetime_init(
-    symbol_table,
-    symbol.location,
-    assume_init_pointers_not_null,
-    object_factory_parameters,
-    pointer_type_selector,
-    string_refinement_enabled,
-    message_handler);
 
   return generate_java_start_function(
     symbol,
