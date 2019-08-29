@@ -1,0 +1,10 @@
+CORE
+main.c
+--verify --recursive-interprocedural --call-stack 0 --constants --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion x == nnx: SUCCESS$
+--
+^warning: ignoring
+--
+A simple test of call stacks and context sensitivity.  Merging calling context with contexts will give a failure.

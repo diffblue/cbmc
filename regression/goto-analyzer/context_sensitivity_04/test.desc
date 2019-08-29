@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --recursive-interprocedural --call-stack 10 --constants --one-domain-per-history
+^\[main.assertion.1\] .* assertion res == 0: SUCCESS$
+^\[step.assertion.1\] .* assertion x == 0: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests the interaction of call stacks and recursion.
+

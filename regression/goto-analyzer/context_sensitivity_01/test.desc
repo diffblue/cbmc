@@ -1,0 +1,12 @@
+FUTURE
+main.c
+--verify --recursive-interprocedural --call-stack 10 --constants --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion v == 13: SUCCESS$
+^\[main.assertion.2\] .* assertion w == 24: SUCCESS$
+--
+^warning: ignoring
+--
+This should be possible just tracking constants and calling stacks.
+At the moment the --constants domain can't do it due to the way it proactively merges to handle recursion.
