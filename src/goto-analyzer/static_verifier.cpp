@@ -307,7 +307,12 @@ bool static_verifier(
       results.push_back(static_verifier_resultt());
       auto &result = results.back();
 
-      if(e.is_true())
+      if(domain.is_bottom())
+      {
+        result.status = static_verifier_resultt::BOTTOM;
+        ++pass;
+      }
+      else if(e.is_true())
       {
         result.status = static_verifier_resultt::TRUE;
         ++pass;
@@ -316,11 +321,6 @@ bool static_verifier(
       {
         result.status = static_verifier_resultt::FALSE;
         ++fail;
-      }
-      else if(domain.is_bottom())
-      {
-        result.status = static_verifier_resultt::BOTTOM;
-        ++pass;
       }
       else
       {

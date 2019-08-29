@@ -6,7 +6,7 @@ main.c
 ^\[main.assertion.1\] line 7 assertion i\s*>=\s*10: SUCCESS$
 ^\[main.assertion.2\] line 10 assertion i\s*!=\s*30: SUCCESS$
 ^\[main.assertion.3\] line 13 assertion i\s*!=\s*15: UNKNOWN$
-^\[main.assertion.4\] line 16 assertion 0: SUCCESS$
+^\[main.assertion.4\] line 16 assertion 0: SUCCESS \(unreachable\)$
 ^\[main.assertion.5\] line 19 assertion j\s*>=\s*10: SUCCESS$
 ^\[main.assertion.6\] line 22 assertion i\s*>=\s*j: UNKNOWN$
 ^\[main.assertion.7\] line 25 assertion i\s*>=\s*11: SUCCESS$
