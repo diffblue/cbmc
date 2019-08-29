@@ -241,7 +241,12 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
   std::stack<T> stack;
 
   auto insert_result = loop_map.emplace(n, natural_loopt{*this});
-  INVARIANT(insert_result.second, "each loop head should only be visited once");
+  // Note the emplace *may* access a loop that already exists: this happens when
+  // a given header has more than one incoming edge, such as
+  // head: if(x) goto head; else goto head;
+  // In this case this compute routine is run twice, one for each backedge, with
+  // each adding whatever instructions can reach this 'm' (the program point
+  // that branches to the loop header, 'n').
   natural_loopt &loop = insert_result.first->second;
 
   loop.insert_instruction(n);
