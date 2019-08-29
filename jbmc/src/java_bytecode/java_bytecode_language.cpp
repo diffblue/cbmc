@@ -70,6 +70,9 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   options.set_option(
     "symex-driven-lazy-loading", cmd.isset("symex-driven-lazy-loading"));
 
+  options.set_option(
+    "ignore-manifest-main-class", cmd.isset("ignore-manifest-main-class"));
+
   if(cmd.isset("context-include"))
     options.set_option("context-include", cmd.get_values("context-include"));
 
@@ -202,6 +205,9 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
   nondet_static = options.get_bool_option("nondet-static");
   static_values_file = options.get_option("static-values");
 
+  ignore_manifest_main_class =
+    options.get_bool_option("ignore-manifest-main-class");
+
   if(options.is_set("context-include") || options.is_set("context-exclude"))
     method_in_context = get_context(options);
 
@@ -289,7 +295,7 @@ bool java_bytecode_languaget::parse(
         std::string manifest_main_class = manifest["Main-Class"];
 
         // if the manifest declares a Main-Class line, we got a main class
-        if(!manifest_main_class.empty())
+        if(!manifest_main_class.empty() && !ignore_manifest_main_class)
           main_class = manifest_main_class;
       }
     }

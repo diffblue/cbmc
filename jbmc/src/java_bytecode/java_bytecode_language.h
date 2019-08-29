@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
   "(java-cp-include-files):" \
+  "(ignore-manifest-main-class)" \
   "(context-include):" \
   "(context-exclude):" \
   "(no-lazy-methods)" \
@@ -73,6 +74,11 @@ Author: Daniel Kroening, kroening@kroening.com
   " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
   " --java-cp-include-files r    regexp or JSON list of files to load\n" \
   "                              (with '@' prefix)\n" \
+  " --ignore-manifest-main-class ignore Main-Class entries in JAR manifest files.\n" /* NOLINT(*) */ \
+  "                              If this option is specified and the options\n" /* NOLINT(*) */ \
+  "                              --function and --main-class are not, we can be\n" /* NOLINT(*) */ \
+  "                              certain that all classes in the JAR file are\n" /* NOLINT(*) */ \
+  "                              loaded.\n" \
   " --context-include i          only analyze code matching specification i that\n" /* NOLINT(*) */ \
   " --context-exclude e          does not match specification e.\n" \
   "                              A specification is any prefix of a package, class\n" /* NOLINT(*) */ \
@@ -215,6 +221,7 @@ protected:
   bool language_options_initialized;
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
+  bool ignore_manifest_main_class;
   java_class_loadert java_class_loader;
   bool threading_support;
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
