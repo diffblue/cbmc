@@ -1,6 +1,6 @@
 CORE
 Main.class
---function Main.main
+--function Main.main --max-nondet-string-length 10000
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
