@@ -1,0 +1,1 @@
+interface ChildInterface extends ParentInterface {}
