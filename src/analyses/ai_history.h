@@ -246,20 +246,42 @@ protected:
   // DATA_INVARIANT(current_stack->current.is_dereferenceable(),
   //                "Must not be _::end()")
 
-  explicit call_stack_historyt(cse_ptrt p)
-    : ai_history_baset(p->current_location), current_stack(p)
+  // At what point to merge with a previous call stack when handling recursion
+  // Setting to 0 disables completely
+  unsigned int recursion_limit;
+
+  bool has_recursion_limit(void) const
+  {
+    return recursion_limit != 0;
+  }
+
+  call_stack_historyt(cse_ptrt p, unsigned int rl)
+    : ai_history_baset(p->current_location),
+      current_stack(p),
+      recursion_limit(rl)
   {
     PRECONDITION(p != nullptr); // A little late by now but worth documenting
   }
 
 public:
   explicit call_stack_historyt(locationt l)
-    : ai_history_baset(l), current_stack(new call_stack_entryt(l, nullptr))
+    : ai_history_baset(l),
+      current_stack(new call_stack_entryt(l, nullptr)),
+      recursion_limit(0)
+  {
+  }
+
+  call_stack_historyt(locationt l, unsigned int rl)
+    : ai_history_baset(l),
+      current_stack(new call_stack_entryt(l, nullptr)),
+      recursion_limit(rl)
   {
   }
 
   call_stack_historyt(const call_stack_historyt &old)
-    : ai_history_baset(old), current_stack(old.current_stack)
+    : ai_history_baset(old),
+      current_stack(old.current_stack),
+      recursion_limit(old.recursion_limit)
   {
   }
 
@@ -309,6 +331,28 @@ public:
   {
     ai_history_baset::trace_ptrt p(new traceT(l));
     return p;
+  }
+};
+
+// Allows passing a recursion limit
+class call_stack_history_factoryt : public ai_history_factory_baset
+{
+protected:
+  unsigned int recursion_limit;
+
+public:
+  explicit call_stack_history_factoryt(unsigned int rl) : recursion_limit(rl)
+  {
+  }
+
+  ai_history_baset::trace_ptrt epoch(ai_history_baset::locationt l) override
+  {
+    ai_history_baset::trace_ptrt p(new call_stack_historyt(l, recursion_limit));
+    return p;
+  }
+
+  virtual ~call_stack_history_factoryt()
+  {
   }
 };
 

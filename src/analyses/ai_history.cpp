@@ -50,7 +50,40 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
     else
     {
       // An interprocedural (call) edge; add to the current stack
-      next_stack = cse_ptrt(new call_stack_entryt(to, current_stack));
+
+      // If the recursion limit has been reached
+      // shorten the stack / merge with the most recent invocation
+      // before we extend
+      cse_ptrt shorten = current_stack;
+
+      if(has_recursion_limit())
+      {
+        unsigned int number_of_recursive_calls = 0;
+        cse_ptrt first_found = nullptr; // The most recent recursive call
+
+        // Iterate back through the call stack
+        for(cse_ptrt i = current_stack->caller; i != nullptr; i = i->caller)
+        {
+          if(
+            i->current_location->location_number ==
+            current_stack->current_location->location_number)
+          {
+            // Found a recursive instance
+            if(first_found == nullptr)
+            {
+              first_found = i;
+            }
+            ++number_of_recursive_calls;
+            if(number_of_recursive_calls == recursion_limit)
+            {
+              shorten = first_found;
+              break;
+            }
+          }
+        }
+      }
+
+      next_stack = cse_ptrt(new call_stack_entryt(to, shorten));
     }
   }
   else if(current_stack->current_location->is_end_function())
@@ -88,7 +121,7 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
   INVARIANT(next_stack != nullptr, "All branches should initialise next_stack");
 
   // Create the potential next history
-  trace_ptrt next(new call_stack_historyt(next_stack));
+  trace_ptrt next(new call_stack_historyt(next_stack, recursion_limit));
 
   // If there is already an equivalent history, merge with that instead
   auto it = others.find(next);
