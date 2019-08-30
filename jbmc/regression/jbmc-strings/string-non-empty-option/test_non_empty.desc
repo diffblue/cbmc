@@ -1,6 +1,6 @@
 CORE
 Test.class
---function Test.checkMinLength --string-non-empty
+--function Test.checkMinLength --string-non-empty --max-nondet-string-length 2147483647
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* line 11 function java::Test.checkMinLength.*: SUCCESS
@@ -9,3 +9,6 @@ assertion.* line 17 function java::Test.checkMinLength.*: FAILURE
 assertion.* line 19 function java::Test.checkMinLength.*: FAILURE
 --
 ^Building error trace
+--
+The max-nondet-string-length permits strings long enough that they might overflow an
+int32, as tested here.
