@@ -262,6 +262,31 @@ static void static_verifier_console(
     m.result() << '\n';
 }
 
+static static_verifier_resultt::statust
+check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
+{
+  if(domain.is_bottom())
+  {
+    return static_verifier_resultt::BOTTOM;
+  }
+
+  domain.ai_simplify(e, ns);
+  if(e.is_true())
+  {
+    return static_verifier_resultt::TRUE;
+  }
+  else if(e.is_false())
+  {
+    return static_verifier_resultt::FALSE;
+  }
+  else
+  {
+    return static_verifier_resultt::UNKNOWN;
+  }
+
+  UNREACHABLE;
+}
+
 /// Runs the analyzer and then prints out the domain
 /// \param goto_model: the program analyzed
 /// \param ai: the abstract interpreter after it has been run to fix point
@@ -300,32 +325,129 @@ bool static_verifier(
         continue;
 
       exprt e(i_it->get_condition());
-      auto dp = ai.abstract_state_before(i_it);
-      const ai_domain_baset &domain(*dp);
-      domain.ai_simplify(e, ns);
 
       results.push_back(static_verifier_resultt());
       auto &result = results.back();
 
-      if(domain.is_bottom())
+      // If there are multiple, distinct histories that reach the same location
+      // we can get better results by checking with each individually rather
+      // than merging all of them and doing one check.
+      const auto trace_set_pointer =
+        ai.abstract_traces_before(i_it); // Keep a pointer so refcount > 0
+      const auto &trace_set = *trace_set_pointer;
+
+      if(trace_set.size() == 0) // i.e. unreachable
       {
         result.status = static_verifier_resultt::BOTTOM;
         ++pass;
       }
-      else if(e.is_true())
+      else if(trace_set.size() == 1)
       {
-        result.status = static_verifier_resultt::TRUE;
-        ++pass;
-      }
-      else if(e.is_false())
-      {
-        result.status = static_verifier_resultt::FALSE;
-        ++fail;
+        auto dp = ai.abstract_state_before(i_it);
+
+        result.status = check_assertion(*dp, e, ns);
+        switch(result.status)
+        {
+        case static_verifier_resultt::BOTTOM:
+          ++pass;
+          break;
+        case static_verifier_resultt::TRUE:
+          ++pass;
+          break;
+        case static_verifier_resultt::FALSE:
+          ++fail;
+          break;
+        case static_verifier_resultt::UNKNOWN:
+          ++unknown;
+          break;
+        default:
+          UNREACHABLE;
+        }
       }
       else
       {
-        result.status = static_verifier_resultt::UNKNOWN;
-        ++unknown;
+        // Multiple traces, verify against each one
+        std::size_t unreachable_traces = 0;
+        std::size_t true_traces = 0;
+        std::size_t false_traces = 0;
+        std::size_t unknown_traces = 0;
+
+        for(const auto &trace_ptr : trace_set)
+        {
+          auto dp = ai.abstract_state_before(trace_ptr);
+
+          result.status = check_assertion(*dp, e, ns);
+          switch(result.status)
+          {
+          case static_verifier_resultt::BOTTOM:
+            ++unreachable_traces;
+            break;
+          case static_verifier_resultt::TRUE:
+            ++true_traces;
+            break;
+          case static_verifier_resultt::FALSE:
+            ++false_traces;
+            break;
+          case static_verifier_resultt::UNKNOWN:
+            ++unknown_traces;
+            break;
+          default:
+            UNREACHABLE;
+          }
+        }
+
+        // Join the results
+        if(unknown_traces != 0)
+        {
+          // If any trace is unknown, the final result must be unknown
+          result.status = static_verifier_resultt::UNKNOWN;
+          ++unknown;
+        }
+        else
+        {
+          if(false_traces == 0)
+          {
+            // Definitely true; the only question is how
+            ++pass;
+            if(true_traces == 0)
+            {
+              // Definitely not reachable
+              INVARIANT(
+                unreachable_traces == trace_set.size(),
+                "All traces must not reach the assertion");
+              result.status = static_verifier_resultt::BOTTOM;
+            }
+            else
+            {
+              // At least one trace (may) reach it.
+              // All traces that reach it are safe.
+              result.status = static_verifier_resultt::TRUE;
+            }
+          }
+          else
+          {
+            // At lease one trace (may) reach it and it is false on that trace
+            if(true_traces == 0)
+            {
+              // All traces that (may) reach it are false
+              ++fail;
+              result.status = static_verifier_resultt::FALSE;
+            }
+            else
+            {
+              // The awkward case, there are traces that (may) reach it and
+              // some are true, some are false.  It is not entirely fair to say
+              // "FAILURE (if reachable)" because it's a bit more complex than
+              // that, "FAILURE (if reachable via a particular trace)" would be
+              // more accurate summary of what we know at this point.
+              // Given that all results of FAILURE from this analysis are
+              // caveated with some reachability questions, the following is not
+              // entirely unreasonable.
+              ++fail;
+              result.status = static_verifier_resultt::FALSE;
+            }
+          }
+        }
       }
 
       result.source_location = i_it->source_location;
