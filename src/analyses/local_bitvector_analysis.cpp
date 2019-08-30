@@ -58,7 +58,9 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
 }
 
 /// \return return 'true' iff we track the object with given identifier
-bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
+bool local_bitvector_analysist::is_tracked(
+  const irep_idt &identifier,
+  const namespacet &ns)
 {
   localst::locals_sett::const_iterator it = locals.locals.find(identifier);
   return it != locals.locals.end() && ns.lookup(*it).type.id() == ID_pointer &&
@@ -69,16 +71,17 @@ void local_bitvector_analysist::assign_lhs(
   const exprt &lhs,
   const exprt &rhs,
   points_tot &loc_info_src,
-  points_tot &loc_info_dest)
+  points_tot &loc_info_dest,
+  const namespacet &ns)
 {
   if(lhs.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
 
-    if(is_tracked(identifier))
+    if(is_tracked(identifier, ns))
     {
       unsigned dest_pointer=pointers.number(identifier);
-      flagst rhs_flags=get_rec(rhs, loc_info_src);
+      flagst rhs_flags = get_rec(rhs, loc_info_src, ns);
       loc_info_dest[dest_pointer]=rhs_flags;
     }
   }
@@ -87,38 +90,44 @@ void local_bitvector_analysist::assign_lhs(
   }
   else if(lhs.id()==ID_index)
   {
-    assign_lhs(to_index_expr(lhs).array(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_index_expr(lhs).array(), rhs, loc_info_src, loc_info_dest, ns);
   }
   else if(lhs.id()==ID_member)
   {
     assign_lhs(
-      to_member_expr(lhs).struct_op(), rhs, loc_info_src, loc_info_dest);
+      to_member_expr(lhs).struct_op(), rhs, loc_info_src, loc_info_dest, ns);
   }
   else if(lhs.id()==ID_typecast)
   {
-    assign_lhs(to_typecast_expr(lhs).op(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_typecast_expr(lhs).op(), rhs, loc_info_src, loc_info_dest, ns);
   }
   else if(lhs.id()==ID_if)
   {
-    assign_lhs(to_if_expr(lhs).true_case(), rhs, loc_info_src, loc_info_dest);
-    assign_lhs(to_if_expr(lhs).false_case(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_if_expr(lhs).true_case(), rhs, loc_info_src, loc_info_dest, ns);
+    assign_lhs(
+      to_if_expr(lhs).false_case(), rhs, loc_info_src, loc_info_dest, ns);
   }
 }
 
 local_bitvector_analysist::flagst local_bitvector_analysist::get(
   const goto_programt::const_targett t,
-  const exprt &rhs)
+  const exprt &rhs,
+  const namespacet &ns)
 {
   local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
 
   assert(loc_it!=cfg.loc_map.end());
 
-  return get_rec(rhs, loc_infos[loc_it->second]);
+  return get_rec(rhs, loc_infos[loc_it->second], ns);
 }
 
 local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   const exprt &rhs,
-  points_tot &loc_info_src)
+  points_tot &loc_info_src,
+  const namespacet &ns)
 {
   if(rhs.id()==ID_constant)
   {
@@ -130,7 +139,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   else if(rhs.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
-    if(is_tracked(identifier))
+    if(is_tracked(identifier, ns))
     {
       unsigned src_pointer=pointers.number(identifier);
       return loc_info_src[src_pointer];
@@ -168,7 +177,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   }
   else if(rhs.id()==ID_typecast)
   {
-    return get_rec(to_typecast_expr(rhs).op(), loc_info_src);
+    return get_rec(to_typecast_expr(rhs).op(), loc_info_src, ns);
   }
   else if(rhs.id()==ID_uninitialized)
   {
@@ -183,19 +192,20 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
       DATA_INVARIANT(
         plus_expr.op0().type().id() == ID_pointer,
         "pointer in pointer-typed sum must be op0");
-      return get_rec(plus_expr.op0(), loc_info_src) | flagst::mk_uses_offset();
+      return get_rec(plus_expr.op0(), loc_info_src, ns) |
+             flagst::mk_uses_offset();
     }
     else if(plus_expr.operands().size() == 2)
     {
       // one must be pointer, one an integer
       if(plus_expr.op0().type().id() == ID_pointer)
       {
-        return get_rec(plus_expr.op0(), loc_info_src) |
+        return get_rec(plus_expr.op0(), loc_info_src, ns) |
                flagst::mk_uses_offset();
       }
       else if(plus_expr.op1().type().id() == ID_pointer)
       {
-        return get_rec(plus_expr.op1(), loc_info_src) |
+        return get_rec(plus_expr.op1(), loc_info_src, ns) |
                flagst::mk_uses_offset();
       }
       else
@@ -210,7 +220,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
 
     if(op0.type().id() == ID_pointer)
     {
-      return get_rec(op0, loc_info_src) | flagst::mk_uses_offset();
+      return get_rec(op0, loc_info_src, ns) | flagst::mk_uses_offset();
     }
     else
       return flagst::mk_unknown();
@@ -241,7 +251,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     return flagst::mk_unknown();
 }
 
-void local_bitvector_analysist::build()
+void local_bitvector_analysist::build(const namespacet &ns)
 {
   if(cfg.nodes.empty())
     return;
@@ -256,7 +266,7 @@ void local_bitvector_analysist::build()
   // in the entry location.
   for(const auto &local : locals.locals)
   {
-    if(is_tracked(local))
+    if(is_tracked(local, ns))
       loc_infos[0][pointers.number(local)] = flagst::mk_unknown();
   }
 
@@ -276,7 +286,7 @@ void local_bitvector_analysist::build()
     {
       const code_assignt &code_assign = to_code_assign(instruction.code);
       assign_lhs(
-        code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
+        code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest, ns);
       break;
     }
 
@@ -287,7 +297,8 @@ void local_bitvector_analysist::build()
         code_decl.symbol(),
         exprt(ID_uninitialized),
         loc_info_src,
-        loc_info_dest);
+        loc_info_dest,
+        ns);
       break;
     }
 
@@ -298,7 +309,8 @@ void local_bitvector_analysist::build()
         code_dead.symbol(),
         exprt(ID_uninitialized),
         loc_info_src,
-        loc_info_dest);
+        loc_info_dest,
+        ns);
       break;
     }
 
@@ -308,7 +320,11 @@ void local_bitvector_analysist::build()
         to_code_function_call(instruction.code);
       if(code_function_call.lhs().is_not_nil())
         assign_lhs(
-          code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
+          code_function_call.lhs(),
+          nil_exprt(),
+          loc_info_src,
+          loc_info_dest,
+          ns);
       break;
     }
 

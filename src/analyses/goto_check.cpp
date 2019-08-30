@@ -1171,7 +1171,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
   const auto &pointer_type = to_pointer_type(address.type());
 
   local_bitvector_analysist::flagst flags =
-    local_bitvector_analysis->get(current_target, address);
+    local_bitvector_analysis->get(current_target, address, ns);
 
   // For Java, we only need to check for null
   if(mode == ID_java)
@@ -1958,7 +1958,7 @@ void goto_checkt::goto_check(
         exprt pointer=code_function_call.arguments()[0];
 
         local_bitvector_analysist::flagst flags =
-          local_bitvector_analysis->get(current_target, pointer);
+          local_bitvector_analysis->get(current_target, pointer, ns);
 
         if(flags.is_unknown() || flags.is_null())
         {

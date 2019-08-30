@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-code-contracts
+--check-code-contracts
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* assertion x == 0: SUCCESS$
@@ -8,6 +8,3 @@ main.c
 ^VERIFICATION FAILED$
 --
 --
---check-code-contracts not implemented yet.
---apply-code-contracts is the current name for the flag. This should be
-updated as the flag changes.

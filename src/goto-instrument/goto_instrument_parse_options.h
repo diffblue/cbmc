@@ -96,8 +96,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "(interpreter)(show-reaching-definitions)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
-  "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
-  "(show-threaded)(list-calls-args)" \
+  "(horn)(skip-loops):(apply-code-contracts)(check-code-contracts)" \
+  "(expand-pointer-predicates)" \
+  "(model-argc-argv):(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
   OPT_AGGRESSIVE_SLICER \
