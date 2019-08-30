@@ -270,3 +270,35 @@ branch, e.g. to run it on lines that have been changed from `develop`:
 
 There are also instructions for adding this as a git pre-commit hook in
 [CODING_STANDARD.md](https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#pre-commit-hook-to-run-cpplint-locally).
+
+
+\section compilation-and-development-section-time-profiling Time profiling
+
+To do time profiling with a tool like `gprof`, the flags `-g` (build with debug
+symbols) and `-pg` (enable profiling information) must be
+used when compiling, and `-pg` must be used when linking. If you are building
+with cmake you can just add "-Denable_profiling=1" to your cmake invocation, and
+reload cmake before building your desired binary. Note that these flags require
+everything to be rebuilt, so it will take a long time even if you are using
+ccache.
+
+Run your binary as normal. A file called gmon.out will be created in the
+working directory of the binary at the end of execution. In most instances this
+will be the same as the working directory at the beginning of execution. It is
+also possible to choose the output location by setting the environment variable
+GMON_OUT_PREFIX - the output file location is then whatever you set it to with
+the process id appended to the end.
+
+Make sure gprof is installed by running `gprof -v`. If it is not installed then
+run `sudo apt install binutils`.
+
+Run `gprof <path-to-binary> <path-to-gmon.out>` and redirect the output to a
+file. This will take a while to run - e.g. 12 minutes for test-gen run on a
+trivial function.
+
+The output file will now be a large text file. There are two sections: the "flat
+profile", which ignores context, and just tells you how much time was spent in
+each function; and the "call graph", which includes context, and tells you how
+much time was spent within each call stack. For more information see online
+tutorials, like
+https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_chapter/gprof_5.html
