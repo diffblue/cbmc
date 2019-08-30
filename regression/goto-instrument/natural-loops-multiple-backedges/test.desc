@@ -1,8 +1,11 @@
 CORE
 main.c
 --show-natural-loops
-0 is head of \{ 0, 1, 2, 4 \}
+0 is head of \{ [0124], [0124], [0124], [0124] \}
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
+--
+In the line beginning "0 is head of" we expect to get 0, 1, 2 and 4 in some
+order
