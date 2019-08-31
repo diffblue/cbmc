@@ -18,6 +18,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <java_bytecode/java_types.h>
 
+#include <util/arith_tools.h>
+
 #include <sstream>
 
 class remove_instanceoft
@@ -56,6 +58,41 @@ protected:
     goto_programt::targett);
 };
 
+/// Produce an expression of the form
+/// `classid_field == "A" || classid_field == "B" || ...`
+/// where A, B, ... are the possible subtypes of \p target_type.
+/// \param classid_field: field to compare, usually a `@class_identifier` field
+///   denoting an object's runtime type
+/// \param target_type: the type all of whose subtypes (including itself) should
+///   be accepted
+/// \param class_hierarchy: class hierarchy
+/// \return disjunction of the possible matched subtypes
+static exprt subtype_expr(
+  const exprt &classid_field,
+  const irep_idt &target_type,
+  const class_hierarchyt &class_hierarchy)
+{
+  std::vector<irep_idt> children =
+    class_hierarchy.get_children_trans(target_type);
+  children.push_back(target_type);
+  // Sort alphabetically to make order of generated disjuncts
+  // independent of class loading order
+  std::sort(
+    children.begin(), children.end(), [](const irep_idt &a, const irep_idt &b) {
+      return a.compare(b) < 0;
+    });
+
+  exprt::operandst or_ops;
+  for(const auto &class_name : children)
+  {
+    constant_exprt class_expr(class_name, string_typet());
+    equal_exprt test(classid_field, class_expr);
+    or_ops.push_back(test);
+  }
+
+  return disjunction(or_ops);
+}
+
 /// Replaces an expression like e instanceof A with e.\@class_identifier == "A"
 /// or a big-or of similar expressions if we know of subtypes that also satisfy
 /// the given test.
@@ -92,32 +129,35 @@ bool remove_instanceoft::lower_instanceof(
   INVARIANT(
     target_arg.id()==ID_type,
     "instanceof second operand should be a type");
-  const typet &target_type=target_arg.type();
 
-  // Find all types we know about that satisfy the given requirement:
   INVARIANT(
-    target_type.id() == ID_struct_tag,
+    target_arg.type().id() == ID_struct_tag,
     "instanceof second operand should have a simple type");
-  const irep_idt &target_name =
-    to_struct_tag_type(target_type).get_identifier();
-  std::vector<irep_idt> children=
-    class_hierarchy.get_children_trans(target_name);
-  children.push_back(target_name);
-  // Sort alphabetically to make order of generated disjuncts
-  // independent of class loading order
-  std::sort(
-    children.begin(), children.end(), [](const irep_idt &a, const irep_idt &b) {
-      return a.compare(b) < 0;
-    });
 
-  auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
-  exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
+  const auto &target_type = to_struct_tag_type(target_arg.type());
 
-  // Replace the instanceof operation with (check_ptr != null &&
-  //  (check_ptr->@class_identifier == "A" ||
-  //   check_ptr->@class_identifier == "B" || ...
+  const auto underlying_type_and_dimension =
+    java_array_dimension_and_element_type(target_type);
 
-  // By operating directly on a pointer rather than using a temporary
+  bool target_type_is_reference_array =
+    underlying_type_and_dimension.second >= 1 &&
+    can_cast_type<java_reference_typet>(underlying_type_and_dimension.first);
+
+  // If we're casting to a reference array type, check
+  //   @class_identifier == "java::array[reference]" &&
+  //   @array_dimension == target_array_dimension &&
+  //   @array_element_type (subtype of) target_array_element_type
+  // Otherwise just check
+  //   @class_identifier (subtype of) target_type
+
+  // Exception: when the target type is Object, nothing needs checking; when
+  // it is Object[], Object[][] etc, then we check that
+  // @array_dimension >= target_array_dimension (because
+  // String[][] (subtype of) Object[] for example) and don't check the element
+  // type.
+
+  // All tests are made directly against a pointer to the object whose type is
+  // queried. By operating directly on a pointer rather than using a temporary
   // (x->@clsid == "A" rather than id = x->@clsid; id == "A") we enable symex's
   // value-set filtering to discard no-longer-viable candidates for "x" (in the
   // case where 'x' is a symbol, not a general expression like x->y->@clsid).
@@ -126,18 +166,54 @@ bool remove_instanceoft::lower_instanceof(
   // and less pessimistic aliasing assumptions possibly causing goto-symex to
   // explore in-fact-unreachable paths.
 
-  exprt::operandst or_ops;
-  for(const auto &clsname : children)
+  // In all cases require the input pointer is not null for any cast to succeed:
+
+  std::vector<exprt> test_conjuncts;
+  test_conjuncts.push_back(notequal_exprt(
+    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type()))));
+
+  auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
+
+  exprt object_class_identifier_field =
+    get_class_identifier_field(check_ptr, jlo, ns);
+
+  if(target_type_is_reference_array)
   {
-    constant_exprt clsexpr(clsname, string_typet());
-    equal_exprt test(object_clsid, clsexpr);
-    or_ops.push_back(test);
+    const auto &underlying_type =
+      to_struct_tag_type(underlying_type_and_dimension.first.subtype());
+
+    test_conjuncts.push_back(equal_exprt(
+      object_class_identifier_field,
+      constant_exprt(JAVA_REFERENCE_ARRAY_CLASSID, string_typet())));
+
+    exprt object_array_dimension = get_array_dimension_field(check_ptr);
+    constant_exprt target_array_dimension = from_integer(
+      underlying_type_and_dimension.second, object_array_dimension.type());
+
+    if(underlying_type == jlo)
+    {
+      test_conjuncts.push_back(binary_relation_exprt(
+        object_array_dimension, ID_ge, target_array_dimension));
+    }
+    else
+    {
+      test_conjuncts.push_back(
+        equal_exprt(object_array_dimension, target_array_dimension));
+      test_conjuncts.push_back(subtype_expr(
+        get_array_element_type_field(check_ptr),
+        underlying_type.get_identifier(),
+        class_hierarchy));
+    }
+  }
+  else if(target_type != jlo)
+  {
+    test_conjuncts.push_back(subtype_expr(
+      get_class_identifier_field(check_ptr, jlo, ns),
+      target_type.get_identifier(),
+      class_hierarchy));
   }
 
-  notequal_exprt not_null(
-    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
-
-  expr = and_exprt(not_null, disjunction(or_ops));
+  expr = conjunction(test_conjuncts);
 
   return true;
 }

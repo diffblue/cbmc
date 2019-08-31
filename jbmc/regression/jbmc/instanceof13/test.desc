@@ -1,0 +1,16 @@
+CORE
+Test.class
+--function Test.test
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.1\] line 7 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.2\] line 8 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.3\] line 9 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.4\] line 10 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.5\] line 11 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.6\] line 12 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.7\] line 13 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.8\] line 14 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.9\] line 15 assertion.*: SUCCESS$
+^\[java::Test\.test:\(\[Ljava/lang/String;\)V.assertion\.10\] line 16 assertion.*: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$

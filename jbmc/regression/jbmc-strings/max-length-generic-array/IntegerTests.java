@@ -3,6 +3,7 @@ public class IntegerTests {
     public static Boolean testMyGenSet(Integer key) {
         if (key == null) return null;
         MyGenSet<Integer> ms = new MyGenSet<>();
+        ms.array = new Integer[1];
         ms.array[0] = 101;
         if (ms.contains(key)) {
           assert false;
@@ -28,9 +29,9 @@ public class IntegerTests {
 
 class MyGenSet<E> {
     E[] array;
-    @SuppressWarnings("unchecked")
     MyGenSet() {
-        array = (E[]) new Object[1];
+      // Note the caller must instantiate the array as generic array creation
+      // is illegal (the compiler doesn't statically know the type to allocate)
     }
     boolean contains(E o) {
         if (o.equals(array[0]))

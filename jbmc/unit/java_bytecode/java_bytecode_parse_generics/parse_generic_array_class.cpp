@@ -34,7 +34,7 @@ SCENARIO(
     {
       const pointer_typet &field_t_pointer =
         require_type::require_pointer_to_tag(
-          field_t.type(), "java::array[reference]");
+          field_t.type(), JAVA_REFERENCE_ARRAY_CLASSID);
 
       const struct_tag_typet &field_t_subtype =
         to_struct_tag_type(field_t_pointer.subtype());
@@ -60,7 +60,7 @@ SCENARIO(
     {
       const pointer_typet &field_t2_pointer =
         require_type::require_pointer_to_tag(
-          field_t2.type(), "java::array[reference]");
+          field_t2.type(), JAVA_REFERENCE_ARRAY_CLASSID);
 
       const struct_tag_typet &field_t2_subtype =
         to_struct_tag_type(field_t2_pointer.subtype());
@@ -88,7 +88,7 @@ SCENARIO(
     {
       const pointer_typet &field_t3_pointer =
         require_type::require_pointer_to_tag(
-          field_t3.type(), "java::array[reference]");
+          field_t3.type(), JAVA_REFERENCE_ARRAY_CLASSID);
 
       const struct_tag_typet &field_t3_subtype =
         to_struct_tag_type(field_t3_pointer.subtype());

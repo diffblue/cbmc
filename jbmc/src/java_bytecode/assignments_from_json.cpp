@@ -527,7 +527,7 @@ static void assign_struct_components_from_json(
   {
     const irep_idt &component_name = component.get_name();
     if(
-      component_name == "@class_identifier" ||
+      component_name == JAVA_CLASS_IDENTIFIER_FIELD_NAME ||
       component_name == "cproverMonitorCount")
     {
       continue;

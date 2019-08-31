@@ -17,6 +17,8 @@ class namespacet;
 class struct_tag_typet;
 class struct_exprt;
 
+#define JAVA_CLASS_IDENTIFIER_FIELD_NAME "@class_identifier"
+
 exprt get_class_identifier_field(
   const exprt &this_expr,
   const struct_tag_typet &suggested_type,

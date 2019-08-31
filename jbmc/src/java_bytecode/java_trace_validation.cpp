@@ -124,7 +124,9 @@ bool check_constant_structure(const constant_exprt &constant_expr)
            can_cast_expr<address_of_exprt>(operand) ||
            can_cast_expr<plus_exprt>(operand);
   }
-  return !constant_expr.get_value().empty();
+  // All value types used in Java must be non-empty except string_typet:
+  return !constant_expr.get_value().empty() ||
+         constant_expr.type() == string_typet();
 }
 
 static void check_lhs_assumptions(
