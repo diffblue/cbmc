@@ -185,6 +185,12 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
       {
         return constant_propagate_string_substring(state, symex_assign, f_l1);
       }
+      else if(
+        func_id == ID_cprover_string_of_int_func ||
+        func_id == ID_cprover_string_of_long_func)
+      {
+        return constant_propagate_integer_to_string(state, symex_assign, f_l1);
+      }
     }
   }
 
@@ -490,6 +496,85 @@ bool goto_symext::constant_propagate_string_substring(
       s_data.operands().begin(), numeric_cast_v<std::size_t>(start_index)),
     std::next(
       s_data.operands().begin(), numeric_cast_v<std::size_t>(end_index)));
+
+  const array_exprt new_char_array(std::move(operands), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_integer_to_string(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  // The function application expression f_l1 takes the following arguments:
+  // - result string length (output parameter)
+  // - result string data array (output parameter)
+  // - integer to convert to a string
+  // - radix (optional, default 10)
+  const std::size_t num_operands = f_l1.arguments().size();
+
+  PRECONDITION(num_operands >= 3);
+  PRECONDITION(num_operands <= 4);
+
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const auto &integer_opt =
+    try_evaluate_constant(state, f_l1.arguments().at(2));
+
+  if(!integer_opt)
+  {
+    return false;
+  }
+
+  const mp_integer integer = numeric_cast_v<mp_integer>(integer_opt->get());
+
+  unsigned base = 10;
+
+  if(num_operands == 4)
+  {
+    const auto &base_constant_opt =
+      try_evaluate_constant(state, f_l1.arguments().at(3));
+
+    if(!base_constant_opt)
+    {
+      return false;
+    }
+
+    const auto base_opt = numeric_cast<unsigned>(base_constant_opt->get());
+
+    if(!base_opt)
+    {
+      return false;
+    }
+
+    base = *base_opt;
+  }
+
+  std::string s = integer2string(integer, base);
+
+  const constant_exprt new_char_array_length =
+    from_integer(s.length(), length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+
+  exprt::operandst operands;
+
+  std::transform(
+    s.begin(),
+    s.end(),
+    std::back_inserter(operands),
+    [&char_type](const char c) { return from_integer(tolower(c), char_type); });
 
   const array_exprt new_char_array(std::move(operands), new_char_array_type);
 
