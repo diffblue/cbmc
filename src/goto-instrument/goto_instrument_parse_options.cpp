@@ -64,6 +64,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_safe_pointers.h>
 #include <analyses/natural_loops.h>
 #include <analyses/reaching_definitions.h>
+#include <analyses/sese_regions.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
@@ -349,6 +350,27 @@ int goto_instrument_parse_optionst::doit()
           local_safe_pointers.output_safe_dereferences(
             std::cout, it->second.body, ns);
         }
+        std::cout << '\n';
+      }
+
+      return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("show-sese-regions"))
+    {
+      // Ensure location numbering is unique:
+      goto_model.goto_functions.update();
+
+      namespacet ns(goto_model.symbol_table);
+
+      forall_goto_functions(it, goto_model.goto_functions)
+      {
+        sese_region_analysist sese_region_analysis;
+        sese_region_analysis(it->second.body);
+        std::cout << ">>>>\n";
+        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>>\n";
+        sese_region_analysis.output(std::cout, it->second.body, ns);
         std::cout << '\n';
       }
 

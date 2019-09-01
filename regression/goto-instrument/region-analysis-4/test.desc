@@ -1,0 +1,8 @@
+CORE
+test.c
+--show-sese-regions
+^Function contains 2 single-entry, single-exit regions:$
+^Region starting at \(2, [0-9]+\) x = 0; ends at \(7, [0-9]+\) 2: SKIP$
+^Region starting at \(0, [0-9]+\) IF !\(argc % 5 != 0\) THEN GOTO 3 ends at \(11, [0-9]+\) 4: SKIP$
+^EXIT=0$
+^SIGNAL=0$

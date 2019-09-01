@@ -107,6 +107,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REPLACE_FUNCTION_BODY \
   OPT_GOTO_PROGRAM_STATS \
   "(show-local-safe-pointers)(show-safe-dereferences)" \
+  "(show-sese-regions)" \
   OPT_REPLACE_CALLS \
   "(validate-goto-binary)" \
   OPT_VALIDATE \

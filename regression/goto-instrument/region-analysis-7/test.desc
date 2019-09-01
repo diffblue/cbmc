@@ -1,0 +1,7 @@
+CORE
+test.c
+--show-sese-regions
+^Function contains 1 single-entry, single-exit regions:$
+^Region starting at \(0, [0-9]+\) IF !\(argc % 5 != 0\) THEN GOTO 4 ends at \(19, [0-9]+\) 6: END_FUNCTION$
+^EXIT=0$
+^SIGNAL=0$
