@@ -182,8 +182,10 @@ private:
 class structured_pool_entryt
 {
 public:
-  explicit structured_pool_entryt(java_bytecode_parsert::pool_entryt entry)
-    : tag(entry.tag)
+  using pool_entryt = java_bytecode_parsert::pool_entryt;
+  using pool_entry_lookupt = std::function<pool_entryt &(u2)>;
+
+  explicit structured_pool_entryt(pool_entryt entry) : tag(entry.tag)
   {
   }
 
@@ -191,10 +193,6 @@ public:
   {
     return tag;
   }
-
-  using pool_entry_lookupt =
-    std::function<java_bytecode_parsert::pool_entryt &(u2)>;
-  using pool_entryt = java_bytecode_parsert::pool_entryt;
 
 protected:
   static std::string read_utf8_constant(const pool_entryt &entry)
@@ -234,7 +232,7 @@ private:
 class name_and_type_infot : public structured_pool_entryt
 {
 public:
-  explicit name_and_type_infot(java_bytecode_parsert::pool_entryt entry)
+  explicit name_and_type_infot(pool_entryt entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_NameAndType);
@@ -323,7 +321,7 @@ public:
     REF_invokeInterface = 9
   };
 
-  explicit method_handle_infot(java_bytecode_parsert::pool_entryt entry)
+  explicit method_handle_infot(pool_entryt entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_MethodHandle);
@@ -588,15 +586,11 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
   }
   else if(src.id() == ID_struct_tag)
   {
-    irep_idt name=src.get(ID_C_base_name);
-    if(has_prefix(id2string(name), "array["))
-    {
-      const typet &element_type =
-        static_cast<const typet &>(src.find(ID_element_type));
-      get_class_refs_rec(element_type);
-    }
+    const struct_tag_typet &struct_tag_type = to_struct_tag_type(src);
+    if(is_java_array_tag(struct_tag_type.get_identifier()))
+      get_class_refs_rec(java_array_element_type(struct_tag_type));
     else
-      parse_tree.class_refs.insert(name);
+      parse_tree.class_refs.insert(src.get(ID_C_base_name));
   }
   else if(src.id()==ID_struct)
   {
@@ -1643,10 +1637,9 @@ void java_bytecode_parsert::rinner_classes_attribute(
     // access information and mark it as an inner class.
     bool is_inner_class = remove_separator_char(id2string(parsed_class.name), '.') ==
       remove_separator_char(inner_class_info_name, '/');
-    if(is_inner_class)
-      parsed_class.is_inner_class = is_inner_class;
     if(!is_inner_class)
       continue;
+    parsed_class.is_inner_class = is_inner_class;
     parsed_class.is_static_class = is_static;
     // This is a marker that a class is anonymous.
     if(inner_name_index == 0)
