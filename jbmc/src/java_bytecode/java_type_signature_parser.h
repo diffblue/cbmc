@@ -202,13 +202,17 @@ public:
   std::string class_name;
   /// Generic type arguments
   java_type_signature_listt type_arguments;
+  /// If not nullptr then the reference is to this inner class within the
+  /// current class reference
+  std::shared_ptr<java_ref_type_signaturet> inner_class;
 
   java_ref_type_signaturet(const java_ref_type_signaturet &) = delete;
   java_ref_type_signaturet(java_ref_type_signaturet &&) = default;
 
   java_ref_type_signaturet(
     std::string class_name,
-    java_type_signature_listt type_arguments);
+    java_type_signature_listt type_arguments,
+    std::shared_ptr<java_ref_type_signaturet> inner_class);
 
   /// \copydoc java_type_signaturet::collect_class_dependencies
   void collect_class_dependencies(std::set<irep_idt> &deps) const override;

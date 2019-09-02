@@ -75,22 +75,32 @@ static std::shared_ptr<java_ref_type_signaturet> parse_class_type(
   parsable_stringt &type_string,
   const java_generic_type_parameter_mapt &parameters)
 {
-  // Check if a < occurs before a ;
+  // Check if a < or a . occurs before a ;
   std::pair<parsable_stringt, char> class_name_and_next =
     type_string.split_at_first_of(
-      "<;", "Class type doesn't have closing semicolon");
+      "<.;", "Class type doesn't have closing semicolon");
   java_type_signature_listt type_arguments;
+  std::shared_ptr<java_ref_type_signaturet> inner_class;
   if(class_name_and_next.second == '<')
   {
     do
     {
       type_arguments.push_back(parse_type(type_string, parameters));
     } while(!type_string.try_skip('>'));
-    type_string.skip(
-      ';', "Class type with type arguments doesn't have closing semicolon");
+    if(type_string.try_skip(('.')))
+      inner_class = parse_class_type(type_string, parameters);
+    else
+    {
+      type_string.skip(
+        ';', "Class type with type arguments doesn't have closing semicolon");
+    }
+  }
+  else if(class_name_and_next.second == '.')
+  {
+    inner_class = parse_class_type(type_string, parameters);
   }
   return std::make_shared<java_ref_type_signaturet>(
-    class_name_and_next.first, std::move(type_arguments));
+    class_name_and_next.first, std::move(type_arguments), inner_class);
 }
 
 /// Parse a reference to a generic type parameter
@@ -314,10 +324,12 @@ void java_array_type_signaturet::output(std::ostream &stm) const
 
 java_ref_type_signaturet::java_ref_type_signaturet(
   std::string class_name,
-  java_type_signature_listt type_arguments)
-  : type_arguments(std::move(type_arguments))
+  java_type_signature_listt type_arguments,
+  std::shared_ptr<java_ref_type_signaturet> inner_class)
+  : type_arguments(std::move(type_arguments)),
+    inner_class(std::move(inner_class))
 {
-  std::replace(class_name.begin(), class_name.end(), '.', '$');
+  PRECONDITION(class_name.find('.') == std::string::npos);
   std::replace(class_name.begin(), class_name.end(), '/', '.');
   this->class_name = std::move(class_name);
 }
@@ -336,6 +348,8 @@ void java_ref_type_signaturet::collect_class_dependencies(
 typet java_ref_type_signaturet::get_type(
   const std::string &class_name_prefix) const
 {
+  PRECONDITION(!inner_class); // Currently not supported
+
   std::string identifier = "java::" + class_name;
   struct_tag_typet struct_tag_type(identifier);
   struct_tag_type.set(ID_C_base_name, class_name);
@@ -367,6 +381,8 @@ void java_ref_type_signaturet::output(std::ostream &stm) const
   stm << class_name;
   if(!type_arguments.empty())
     stm << "<" << type_arguments << ">";
+  if(inner_class)
+    stm << "." << *inner_class;
 }
 
 std::ostream &operator<<(
