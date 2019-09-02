@@ -27,15 +27,19 @@ bool simplify_exprt::simplify_if_implies(
 
   if(truth && cond.id() == ID_lt && expr.id() == ID_lt)
   {
+    const auto &cond_lt = to_binary_relation_expr(cond);
+    const auto &expr_lt = to_binary_relation_expr(expr);
+
     if(
-      cond.op0() == expr.op0() && cond.op1().is_constant() &&
-      expr.op1().is_constant() && cond.op1().type() == expr.op1().type())
+      cond_lt.op0() == expr_lt.op0() && cond_lt.op1().is_constant() &&
+      expr_lt.op1().is_constant() &&
+      cond_lt.op1().type() == expr_lt.op1().type())
     {
       mp_integer i1, i2;
 
       if(
-        !to_integer(to_constant_expr(cond.op1()), i1) &&
-        !to_integer(to_constant_expr(expr.op1()), i2))
+        !to_integer(to_constant_expr(cond_lt.op1()), i1) &&
+        !to_integer(to_constant_expr(expr_lt.op1()), i2))
       {
         if(i1 >= i2)
         {
@@ -46,14 +50,15 @@ bool simplify_exprt::simplify_if_implies(
     }
 
     if(
-      cond.op1() == expr.op1() && cond.op0().is_constant() &&
-      expr.op0().is_constant() && cond.op0().type() == expr.op0().type())
+      cond_lt.op1() == expr_lt.op1() && cond_lt.op0().is_constant() &&
+      expr_lt.op0().is_constant() &&
+      cond_lt.op0().type() == expr_lt.op0().type())
     {
       mp_integer i1, i2;
 
       if(
-        !to_integer(to_constant_expr(cond.op0()), i1) &&
-        !to_integer(to_constant_expr(expr.op0()), i2))
+        !to_integer(to_constant_expr(cond_lt.op0()), i1) &&
+        !to_integer(to_constant_expr(expr_lt.op0()), i2))
       {
         if(i1 <= i2)
         {
@@ -236,9 +241,7 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   {
     if(cond.id() == ID_not)
     {
-      exprt tmp;
-      tmp.swap(cond.op0());
-      cond.swap(tmp);
+      cond = to_not_expr(cond).op();
       truevalue.swap(falsevalue);
       no_change = false;
     }
