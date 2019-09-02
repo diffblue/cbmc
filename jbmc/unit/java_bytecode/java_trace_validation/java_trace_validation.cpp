@@ -71,7 +71,7 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
   {
     const exprt inner_symbol = exprt(exprt(valid_symbol_expr));
     const exprt inner_nonsymbol = exprt(exprt(exprt()));
-    INFO("expression does not have an inner symbol")
+    INFO("expression has an inner symbol")
     REQUIRE(get_inner_symbol_expr(inner_symbol).has_value());
     INFO("expression does not have an inner symbol")
     REQUIRE_FALSE(get_inner_symbol_expr(inner_nonsymbol).has_value());
