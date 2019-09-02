@@ -32,7 +32,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
   namespacet ns{symbol_table};
   info.ns = &ns;
 
-  satcheck_minisat_simplifiert sat_solver{log};
+  satcheckt sat_solver{log};
   info.prop = &sat_solver;
 
   string_refinementt solver{info};
