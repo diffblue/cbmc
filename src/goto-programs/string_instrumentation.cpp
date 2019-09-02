@@ -375,12 +375,16 @@ void string_instrumentationt::do_format_string_read(
 {
   const exprt &format_arg=arguments[format_string_inx];
 
-  if(format_arg.id()==ID_address_of &&
-     format_arg.op0().id()==ID_index &&
-     format_arg.op0().op0().id()==ID_string_constant)
+  if(
+    format_arg.id() == ID_address_of &&
+    to_address_of_expr(format_arg).object().id() == ID_index &&
+    to_index_expr(to_address_of_expr(format_arg).object()).array().id() ==
+      ID_string_constant)
   {
-    format_token_listt token_list = parse_format_string(
-      id2string(to_string_constant(format_arg.op0().op0()).get_value()));
+    format_token_listt token_list = parse_format_string(id2string(
+      to_string_constant(
+        to_index_expr(to_address_of_expr(format_arg).object()).array())
+        .get_value()));
 
     std::size_t args=0;
 
@@ -464,12 +468,16 @@ void string_instrumentationt::do_format_string_write(
 {
   const exprt &format_arg=arguments[format_string_inx];
 
-  if(format_arg.id()==ID_address_of &&
-     format_arg.op0().id()==ID_index &&
-     format_arg.op0().op0().id()==ID_string_constant) // constant format
+  if(
+    format_arg.id() == ID_address_of &&
+    to_address_of_expr(format_arg).object().id() == ID_index &&
+    to_index_expr(to_address_of_expr(format_arg).object()).array().id() ==
+      ID_string_constant) // constant format
   {
-    format_token_listt token_list = parse_format_string(
-      id2string(to_string_constant(format_arg.op0().op0()).get_value()));
+    format_token_listt token_list = parse_format_string(id2string(
+      to_string_constant(
+        to_index_expr(to_address_of_expr(format_arg).object()).array())
+        .get_value()));
 
     std::size_t args=0;
 

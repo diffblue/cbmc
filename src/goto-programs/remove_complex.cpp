@@ -24,9 +24,9 @@ static exprt complex_member(const exprt &expr, irep_idt id)
   if(expr.id()==ID_struct && expr.operands().size()==2)
   {
     if(id==ID_real)
-      return expr.op0();
+      return to_binary_expr(expr).op0();
     else if(id==ID_imag)
-      return expr.op1();
+      return to_binary_expr(expr).op1();
     else
       UNREACHABLE;
   }
@@ -138,13 +138,13 @@ static void remove_complex(exprt &expr)
       // x+y -> complex(x.r+y.r,x.i+y.i)
       struct_exprt struct_expr(
         {binary_exprt(
-           complex_member(expr.op0(), ID_real),
+           complex_member(to_binary_expr(expr).op0(), ID_real),
            expr.id(),
-           complex_member(expr.op1(), ID_real)),
+           complex_member(to_binary_expr(expr).op1(), ID_real)),
          binary_exprt(
-           complex_member(expr.op0(), ID_imag),
+           complex_member(to_binary_expr(expr).op0(), ID_imag),
            expr.id(),
-           complex_member(expr.op1(), ID_imag))},
+           complex_member(to_binary_expr(expr).op1(), ID_imag))},
         expr.type());
 
       struct_expr.op0().add_source_location() = expr.source_location();

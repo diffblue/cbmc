@@ -505,22 +505,22 @@ void goto_convertt::remove_gcc_conditional_expression(
   goto_programt &dest,
   const irep_idt &mode)
 {
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "gcc conditional expressions must have two operands");
+  {
+    auto &binary_expr = to_binary_expr(expr);
 
-  // first remove side-effects from condition
-  clean_expr(expr.op0(), dest, mode);
+    // first remove side-effects from condition
+    clean_expr(to_binary_expr(expr).op0(), dest, mode);
 
-  // now we can copy op0 safely
-  if_exprt if_expr(
-    typecast_exprt::conditional_cast(expr.op0(), bool_typet()),
-    expr.op0(),
-    expr.op1(),
-    expr.type());
-  if_expr.add_source_location()=expr.source_location();
+    // now we can copy op0 safely
+    if_exprt if_expr(
+      typecast_exprt::conditional_cast(binary_expr.op0(), bool_typet()),
+      binary_expr.op0(),
+      binary_expr.op1(),
+      expr.type());
+    if_expr.add_source_location() = expr.source_location();
 
-  expr.swap(if_expr);
+    expr.swap(if_expr);
+  }
 
   // there might still be junk in expr.op2()
   clean_expr(expr, dest, mode);

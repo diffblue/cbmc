@@ -682,6 +682,8 @@ void goto_convertt::convert_assign(
   if(rhs.id()==ID_side_effect &&
      rhs.get(ID_statement)==ID_function_call)
   {
+    const auto &rhs_function_call = to_side_effect_expr_function_call(rhs);
+
     INVARIANT_WITH_DIAGNOSTICS(
       rhs.operands().size() == 2,
       "function_call sideeffect takes two operands",
@@ -690,7 +692,12 @@ void goto_convertt::convert_assign(
     Forall_operands(it, rhs)
       clean_expr(*it, dest, mode);
 
-    do_function_call(lhs, rhs.op0(), rhs.op1().operands(), dest, mode);
+    do_function_call(
+      lhs,
+      rhs_function_call.function(),
+      rhs_function_call.arguments(),
+      dest,
+      mode);
   }
   else if(rhs.id()==ID_side_effect &&
           (rhs.get(ID_statement)==ID_cpp_new ||
@@ -1381,15 +1388,18 @@ void goto_convertt::convert_ifthenelse(
 
   // We do a bit of special treatment for && in the condition
   // in case cleaning would be needed otherwise.
-  if(code.cond().id()==ID_and &&
-     code.cond().operands().size()==2 &&
-     (needs_cleaning(code.cond().op0()) || needs_cleaning(code.cond().op1())) &&
-     !has_else)
+  if(
+    code.cond().id() == ID_and && code.cond().operands().size() == 2 &&
+    (needs_cleaning(to_binary_expr(code.cond()).op0()) ||
+     needs_cleaning(to_binary_expr(code.cond()).op1())) &&
+    !has_else)
   {
     // if(a && b) XX --> if(a) if(b) XX
-    code_ifthenelset new_if1(code.cond().op1(), code.then_case());
+    code_ifthenelset new_if1(
+      to_binary_expr(code.cond()).op1(), code.then_case());
     new_if1.add_source_location() = source_location;
-    code_ifthenelset new_if0(code.cond().op0(), std::move(new_if1));
+    code_ifthenelset new_if0(
+      to_binary_expr(code.cond()).op0(), std::move(new_if1));
     new_if0.add_source_location() = source_location;
     return convert_ifthenelse(new_if0, dest, mode);
   }
@@ -1706,16 +1716,15 @@ bool goto_convertt::get_string_constant(
   const exprt &expr,
   irep_idt &value)
 {
-  if(expr.id()==ID_typecast &&
-     expr.operands().size()==1)
-    return get_string_constant(expr.op0(), value);
+  if(expr.id() == ID_typecast)
+    return get_string_constant(to_typecast_expr(expr).op(), value);
 
-  if(expr.id()==ID_address_of &&
-     expr.operands().size()==1 &&
-     expr.op0().id()==ID_index &&
-     expr.op0().operands().size()==2)
+  if(
+    expr.id() == ID_address_of &&
+    to_address_of_expr(expr).object().id() == ID_index)
   {
-    exprt index_op=get_constant(expr.op0().op0());
+    exprt index_op =
+      get_constant(to_index_expr(to_address_of_expr(expr).object()).array());
     simplify(index_op, ns);
 
     if(index_op.id()==ID_string_constant)
@@ -1775,16 +1784,16 @@ exprt goto_convertt::get_constant(const exprt &expr)
   }
   else if(expr.id()==ID_member)
   {
-    exprt tmp=expr;
-    tmp.op0()=get_constant(expr.op0());
-    return tmp;
+    auto tmp = to_member_expr(expr);
+    tmp.compound() = get_constant(tmp.compound());
+    return std::move(tmp);
   }
   else if(expr.id()==ID_index)
   {
-    exprt tmp=expr;
-    tmp.op0()=get_constant(expr.op0());
-    tmp.op1()=get_constant(expr.op1());
-    return tmp;
+    auto tmp = to_index_expr(expr);
+    tmp.op0() = get_constant(tmp.op0());
+    tmp.op1() = get_constant(tmp.op1());
+    return std::move(tmp);
   }
   else
     return expr;

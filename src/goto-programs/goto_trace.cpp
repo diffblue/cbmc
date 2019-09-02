@@ -256,8 +256,7 @@ std::string trace_numeric_value(
   }
   else if(expr.id()==ID_union)
   {
-    PRECONDITION(expr.operands().size()==1);
-    return trace_numeric_value(expr.op0(), ns, options);
+    return trace_numeric_value(to_union_expr(expr).op(), ns, options);
   }
 
   return "?";
@@ -351,9 +350,9 @@ void show_state_header(
 bool is_index_member_symbol(const exprt &src)
 {
   if(src.id()==ID_index)
-    return is_index_member_symbol(src.op0());
+    return is_index_member_symbol(to_index_expr(src).array());
   else if(src.id()==ID_member)
-    return is_index_member_symbol(src.op0());
+    return is_index_member_symbol(to_member_expr(src).compound());
   else if(src.id()==ID_symbol)
     return true;
   else

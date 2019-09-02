@@ -52,7 +52,7 @@ void pointer_arithmetict::read(const exprt &src)
         add_to_offset(index_expr.index());
         // produce &x[0] + i instead of &x[i]
         auto new_address_of_src = address_of_src;
-        new_address_of_src.op().op1() =
+        to_index_expr(new_address_of_src.op()).index() =
           from_integer(0, index_expr.index().type());
         make_pointer(new_address_of_src);
       }
