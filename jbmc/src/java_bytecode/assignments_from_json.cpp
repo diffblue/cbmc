@@ -838,7 +838,9 @@ void assign_from_json(
   location.set_function(function_id);
   allocate_objectst allocate(ID_java, location, function_id, symbol_table);
   code_blockt body_rec;
-  const auto class_name = declaring_class(symbol_table.lookup_ref(function_id));
+  const symbolt *function_symbol = symbol_table.lookup(function_id);
+  INVARIANT(function_symbol, "Function must appear in symbol table");
+  const auto class_name = declaring_class(*function_symbol);
   INVARIANT(
     class_name,
     "Function " + id2string(function_id) + " must be declared by a class.");
