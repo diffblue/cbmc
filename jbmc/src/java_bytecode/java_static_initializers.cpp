@@ -792,6 +792,14 @@ code_blockt get_user_specified_clinit_body(
     &class_to_declared_symbols_map)
 {
   const irep_idt &real_clinit_name = clinit_function_name(class_id);
+  const auto clinit_func = symbol_table.lookup(real_clinit_name);
+  if(clinit_func == nullptr)
+  {
+    // Case where the real clinit doesn't appear in the symbol table, even
+    // though their is user specifed one. This may occur when some class
+    // substitution happened after compilation.
+    return code_blockt{};
+  }
   const auto class_entry =
     static_values_json.find(id2string(strip_java_namespace_prefix(class_id)));
   if(class_entry != static_values_json.end())
@@ -833,9 +841,7 @@ code_blockt get_user_specified_clinit_body(
       return body;
     }
   }
-  if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
-    return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
-  return code_blockt{};
+  return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
 }
 
 /// Create static initializer wrappers and possibly user-specified functions for
