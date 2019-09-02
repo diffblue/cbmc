@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/class_hierarchy.h>
 
 #include "ci_lazy_methods.h"
+#include "create_array_with_type_intrinsic.h"
 #include "java_bytecode_concurrency_instrumentation.h"
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
@@ -740,6 +741,14 @@ bool java_bytecode_languaget::typecheck(
     }
   }
 
+  // Register synthetic method that replaces a real definition if one is
+  // available:
+  if(symbol_table.has_symbol(get_create_array_with_type_name()))
+  {
+    synthetic_methods[get_create_array_with_type_name()] =
+      synthetic_method_typet::CREATE_ARRAY_WITH_TYPE;
+  }
+
   // Now add synthetic classes for every invokedynamic instruction found (it
   // makes this easier that all interface types and their methods have been
   // created above):
@@ -1209,6 +1218,18 @@ bool java_bytecode_languaget::convert_single_method(
       writable_symbol.value = invokedynamic_synthetic_method(
         function_id, symbol_table, get_message_handler());
       break;
+    case synthetic_method_typet::CREATE_ARRAY_WITH_TYPE:
+    {
+      INVARIANT(
+        cmb,
+        "CProver.createArrayWithType should only be registered if "
+        "we have a real implementation available");
+      java_bytecode_initialize_parameter_names(
+        writable_symbol, cmb->get().method.local_variable_table, symbol_table);
+      writable_symbol.value = create_array_with_type_body(
+        function_id, symbol_table, get_message_handler());
+      break;
+    }
     }
     // Notify lazy methods of static calls made from the newly generated
     // function:

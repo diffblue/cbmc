@@ -42,7 +42,10 @@ enum class synthetic_method_typet
   INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR,
   /// A generated method for a class capturing the parameters of an
   /// invokedynamic instruction
-  INVOKEDYNAMIC_METHOD
+  INVOKEDYNAMIC_METHOD,
+  /// Our internal implementation of CProver.createArrayWithType, which needs to
+  /// access internal type-id fields
+  CREATE_ARRAY_WITH_TYPE
 };
 
 /// Maps method names on to a synthetic method kind.
