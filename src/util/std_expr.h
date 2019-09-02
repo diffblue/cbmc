@@ -2999,11 +2999,6 @@ public:
   {
     PRECONDITION(as_const(*this).op().type().id() == ID_bool);
   }
-
-  DEPRECATED(SINCE(2019, 1, 12, "use not_exprt(op) instead"))
-  not_exprt():unary_exprt(ID_not, bool_typet())
-  {
-  }
 };
 
 template <>
