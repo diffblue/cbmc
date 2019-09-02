@@ -85,7 +85,7 @@ operator<<(std::ostream &stm, const java_type_signature_listt &types);
 class java_generic_type_parametert : public java_value_type_signaturet
 {
 public:
-  /// The name of the parameter
+  /// The name of the parameter, empty for a wildcard type
   const std::string name;
   /// Bound on the type parameter that is a class
   /// \remarks
@@ -97,16 +97,37 @@ public:
   /// If there aren't any then there must be a class bound
   java_type_signature_listt interface_bounds;
 
+  /// Whether the bounds are upper bounds rather than lower bounds
+  bool bounds_are_upper;
+
   // Delete the copy constructor - the declaration and the usage should share
   // the same object
   java_generic_type_parametert(const java_generic_type_parametert &) = delete;
   java_generic_type_parametert(java_generic_type_parametert &&) = default;
 
+  /// Create a wildcard type parameter
+  java_generic_type_parametert();
+
+  /// Create a wildcard type parameter with bounds
+  /// \param bounds_are_upper Whether the bounds to be added will be upper
+  ///   bounds
+  explicit java_generic_type_parametert(bool bounds_are_upper)
+    : bounds_are_upper(bounds_are_upper)
+  {
+  }
+
   /// Create a named type parameter
   /// \param name The name of the type parameter to create
   explicit java_generic_type_parametert(std::string name)
-    : name(std::move(name))
+    : name(std::move(name)), bounds_are_upper(true)
   {
+  }
+
+  /// Get whether this is a wildcard type parameter
+  /// \return Whether this is a wildcard type parameter
+  bool is_wild() const
+  {
+    return name.empty();
   }
 
   /// Gather the names of classes referred to by this parameter at the point
@@ -115,13 +136,23 @@ public:
   ///   by this type
   void collect_class_dependencies(std::set<irep_idt> &deps) const override
   {
+    // Bounds are collected from type parameter declarations except in the case
+    // of wildcard bounds
+    if(name.empty())
+      collect_class_dependencies_from_bounds(deps);
   }
+
   /// Gather the names of classes referred to by this parameter at the point
   ///   where it is declared
   /// \param deps A set into which to gether the names of classes referred to
   ///   by this type
   void
-  collect_class_dependencies_from_declaration(std::set<irep_idt> &deps) const;
+  collect_class_dependencies_from_declaration(std::set<irep_idt> &deps) const
+  {
+    // This should only be called on type parameter declarations, not wildcards
+    PRECONDITION(!name.empty());
+    collect_class_dependencies_from_bounds(deps);
+  }
 
   /// \copydoc java_type_signaturet::get_type
   typet get_type(const std::string &class_name_prefix) const override;
@@ -135,6 +166,12 @@ public:
   /// \param stm The stream to which to output
   /// \param show_bounds Whether to include the list of bounds in the output
   void full_output(std::ostream &stm, bool show_bounds = false) const;
+
+private:
+  /// Gather the names of classes referred to by this parameter
+  /// \param deps A set into which to gether the names of classes referred to
+  ///   by this type
+  void collect_class_dependencies_from_bounds(std::set<irep_idt> &deps) const;
 };
 
 /// A vector of type parameters

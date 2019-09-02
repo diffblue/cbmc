@@ -16,6 +16,10 @@ static std::shared_ptr<java_ref_type_signaturet> parse_class_type(
   parsable_stringt &type_string,
   const java_generic_type_parameter_mapt &parameters);
 
+static void parse_type_parameter_bounds(
+  parsable_stringt &parameter_string,
+  const std::shared_ptr<java_generic_type_parametert> &result);
+
 /// Parse a java_value_type_signaturet from a parsable_stringt pointing at an
 /// appropriate part of a type signature
 /// \param type_string A parsable_stringt pointing at an appropriate part of a
@@ -56,10 +60,22 @@ static std::shared_ptr<java_value_type_signaturet> parse_type(
           std::string(parameter_name));
     return parameter->second;
   }
-  case '*':
-  case '+':
-  case '-':
-    throw unsupported_java_class_signature_exceptiont("Wild card generic");
+  case '*': // Wildcard
+    return std::make_shared<java_generic_type_parametert>();
+  case '+': // Wildcard extends
+  {
+    std::shared_ptr<java_generic_type_parametert> result =
+      std::make_shared<java_generic_type_parametert>(true);
+    parse_type_parameter_bounds(type_string, result);
+    return result;
+  }
+  case '-': // Wildcard super
+  {
+    std::shared_ptr<java_generic_type_parametert> result =
+      std::make_shared<java_generic_type_parametert>(false);
+    parse_type_parameter_bounds(type_string, result);
+    return result;
+  }
   default:
     throw unsupported_java_class_signature_exceptiont(
       std::string("Unknown type signature starting with ") + first);
@@ -113,6 +129,18 @@ parse_type_parameter(parsable_stringt &parameter_string)
   std::shared_ptr<java_generic_type_parametert> result =
     std::make_shared<java_generic_type_parametert>(
       parameter_string.split_at_first(':', "No colon in type parameter bound"));
+  parse_type_parameter_bounds(parameter_string, result);
+  return result;
+}
+
+/// Parse the bounds of a generic type parameter
+/// \param parameter_string A parsable_stringt starting at the type signature
+///   of a type parameter's bounds
+/// \param result The parsed type parameter to add bounds to
+static void parse_type_parameter_bounds(
+  parsable_stringt &parameter_string,
+  const std::shared_ptr<java_generic_type_parametert> &result)
+{
   java_generic_type_parameter_mapt parameter_map;
   // Allow recursive definitions where the bound refers to the parameter itself
   parameter_map.emplace(result->name, result);
@@ -126,7 +154,6 @@ parse_type_parameter(parsable_stringt &parameter_string)
   INVARIANT(
     result->class_bound != nullptr || !result->interface_bounds.empty(),
     "All type parameters have at least one bound");
-  return result;
 }
 
 /// Parse an optional collection of formal type parameters (e.g. on generic
@@ -183,9 +210,20 @@ operator<<(std::ostream &stm, const java_type_signature_listt &types)
   return stm;
 }
 
+java_generic_type_parametert::java_generic_type_parametert()
+  : java_generic_type_parametert(false)
+{
+  class_bound = std::make_shared<java_ref_type_signaturet>(
+    "java/lang/Object",
+    java_type_signature_listt {},
+    nullptr);
+}
+
 typet java_generic_type_parametert::get_type(
   const std::string &class_name_prefix) const
 {
+  if(name.empty())
+    throw unsupported_java_class_signature_exceptiont("Wild card generic");
   return java_generic_parametert(
     class_name_prefix + "::" + name,
     to_struct_tag_type(
@@ -199,10 +237,10 @@ void java_generic_type_parametert::full_output(
   std::ostream &stm,
   bool show_bounds) const
 {
-  stm << name;
+  stm << (name.empty() ? "?" : name);
   if(show_bounds)
   {
-    stm << " extends ";
+    stm << (bounds_are_upper ? " extends " : " super ");
     bool first = true;
     if(class_bound != nullptr)
     {
@@ -221,7 +259,7 @@ void java_generic_type_parametert::full_output(
   }
 }
 
-void java_generic_type_parametert::collect_class_dependencies_from_declaration(
+void java_generic_type_parametert::collect_class_dependencies_from_bounds(
   std::set<irep_idt> &deps) const
 {
   if(class_bound != nullptr)
