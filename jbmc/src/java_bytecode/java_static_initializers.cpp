@@ -988,21 +988,21 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   // class. Note this is the same invocation used in
   // java_static_lifetime_init.
 
-  auto class_globals = stub_globals_by_class.equal_range(*class_id);
+  auto class_globals = equal_range(stub_globals_by_class, *class_id);
   INVARIANT(
-    class_globals.first != class_globals.second,
+    !class_globals.empty(),
     "class with synthetic clinit should have at least one global to init");
 
   java_object_factory_parameterst parameters = object_factory_parameters;
   parameters.function_id = function_id;
 
-  for(auto it = class_globals.first; it != class_globals.second; ++it)
+  for(const auto &pair : class_globals)
   {
     const symbol_exprt new_global_symbol =
-      symbol_table.lookup_ref(it->second).symbol_expr();
+      symbol_table.lookup_ref(pair.second).symbol_expr();
 
     parameters.min_null_tree_depth =
-      is_non_null_library_global(it->second)
+      is_non_null_library_global(pair.second)
         ? object_factory_parameters.min_null_tree_depth + 1
         : object_factory_parameters.min_null_tree_depth;
 
