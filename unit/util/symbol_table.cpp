@@ -350,3 +350,28 @@ SCENARIO("journalling_symbol_table_writer",
     }
   }
 }
+
+TEST_CASE("symbol_tablet::lookup_ref invariant", "[core][utils][symbol_tablet]")
+{
+  symbolt foo_symbol;
+  foo_symbol.name = "foo";
+  symbol_tablet symbol_table;
+  symbol_table.insert(foo_symbol);
+  const cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_NOTHROW(symbol_table.lookup_ref("foo"));
+  try
+  {
+    symbol_table.lookup_ref("bar");
+    FAIL("Expected invariant failure.");
+  }
+  catch(const invariant_failedt &exception)
+  {
+    REQUIRE_THAT(
+      exception.what(),
+      Catch::Matchers::Contains("`bar' must exist in the symbol table."));
+  }
+  catch(...)
+  {
+    FAIL("Incorrect exception type thrown.");
+  }
+}
