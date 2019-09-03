@@ -769,7 +769,7 @@ code_ifthenelset get_clinit_wrapper_body(
 
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
-  const optionalt<jsont> &static_values_json,
+  const optionalt<json_objectt> &static_values_json,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
@@ -777,12 +777,11 @@ code_blockt get_user_specified_clinit_body(
   std::unordered_map<std::string, object_creation_referencet> &references)
 {
   const irep_idt &real_clinit_name = clinit_function_name(class_id);
-  if(static_values_json.has_value() && static_values_json->is_object())
+  if(static_values_json.has_value())
   {
-    const auto &json_object = to_json_object(*static_values_json);
-    const auto class_entry =
-      json_object.find(id2string(strip_java_namespace_prefix(class_id)));
-    if(class_entry != json_object.end())
+    const auto class_entry = static_values_json->find(
+      id2string(strip_java_namespace_prefix(class_id)));
+    if(class_entry != static_values_json->end())
     {
       const auto &class_json_value = class_entry->second;
       if(class_json_value.is_object())

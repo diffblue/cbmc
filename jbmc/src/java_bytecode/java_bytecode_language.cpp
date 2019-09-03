@@ -207,8 +207,21 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
   {
     const std::string filename = options.get_option("static-values");
     jsont tmp_json;
-    if(!parse_json(filename, *message_handler, tmp_json))
-      static_values_json = std::move(tmp_json);
+    if(parse_json(filename, *message_handler, tmp_json))
+    {
+      warning() << "Provided JSON file for static-values cannot be parsed; it"
+                << " will be ignored." << messaget::eom;
+    }
+    else
+    {
+      if(!tmp_json.is_object())
+      {
+        warning() << "Provided JSON file for static-values is not a JSON "
+                  << "object; it will be ignored." << messaget::eom;
+      }
+      else
+        static_values_json = std::move(to_json_object(tmp_json));
+    }
   }
 
   ignore_manifest_main_class =

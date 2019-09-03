@@ -239,7 +239,7 @@ protected:
   /// JSON which contains initial values of static fields (right
   /// after the static initializer of the class was run). This is read from the
   /// file specified by the --static-values command-line option.
-  optionalt<jsont> static_values_json;
+  optionalt<json_objectt> static_values_json;
 
   // list of classes to force load even without reference from the entry point
   std::vector<irep_idt> java_load_classes;
