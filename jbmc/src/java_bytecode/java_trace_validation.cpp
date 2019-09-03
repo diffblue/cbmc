@@ -39,7 +39,7 @@ optionalt<symbol_exprt> get_inner_symbol_expr(exprt expr)
 {
   while(expr.has_operands())
   {
-    expr = expr.op0();
+    expr = to_multi_ary_expr(expr).op0();
     if(!may_be_lvalue(expr))
       return {};
   }

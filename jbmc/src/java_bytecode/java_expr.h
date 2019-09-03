@@ -53,13 +53,15 @@ public:
   {
     binary_predicate_exprt::validate(expr, ns, vm);
 
+    const auto &expr_binary = static_cast<const binary_predicate_exprt &>(expr);
+
     DATA_CHECK(
       vm,
-      can_cast_expr<type_exprt>(expr.op1()),
+      can_cast_expr<type_exprt>(expr_binary.rhs()),
       "java_instanceof_exprt rhs should be a type_exprt");
     DATA_CHECK(
       vm,
-      can_cast_type<struct_tag_typet>(expr.op1().type()),
+      can_cast_type<struct_tag_typet>(expr_binary.rhs().type()),
       "java_instanceof_exprt rhs should denote a struct_tag_typet");
   }
 };
