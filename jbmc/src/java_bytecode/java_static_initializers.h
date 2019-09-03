@@ -52,6 +52,10 @@ code_ifthenelset get_clinit_wrapper_body(
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler);
 
+/// \return map associating classes to the symbols they declare
+std::unordered_multimap<irep_idt, symbolt>
+class_to_declared_symbols(const symbol_tablet &symbol_table);
+
 /// Create the body of a user_specified_clinit function for a given class, which
 /// includes assignments for all static fields of the class to values read from
 /// an input file. If the file could not be parsed or an entry for this class
@@ -72,6 +76,8 @@ code_ifthenelset get_clinit_wrapper_body(
 ///   arrays. Any arrays that were specified to be of nondeterministic length in
 ///   the input file will be limited by this value.
 /// \param references: map to keep track of reference-equal objets.
+/// \param class_to_declared_symbols_map: map classes to the symbols that
+///   they declare.
 /// \return the body of the user_specified_clinit function as a code block.
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
@@ -79,7 +85,9 @@ code_blockt get_user_specified_clinit_body(
   symbol_table_baset &symbol_table,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   size_t max_user_array_length,
-  std::unordered_map<std::string, object_creation_referencet> &references);
+  std::unordered_map<std::string, object_creation_referencet> &references,
+  const std::unordered_multimap<irep_idt, symbolt>
+    &class_to_declared_symbols_map);
 
 class stub_global_initializer_factoryt
 {

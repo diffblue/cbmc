@@ -768,7 +768,7 @@ code_ifthenelset get_clinit_wrapper_body(
 }
 
 /// \return map associating classes to the symbols they declare
-static std::unordered_multimap<irep_idt, symbolt>
+std::unordered_multimap<irep_idt, symbolt>
 class_to_declared_symbols(const symbol_tablet &symbol_table)
 {
   std::unordered_multimap<irep_idt, symbolt> result;
@@ -787,7 +787,9 @@ code_blockt get_user_specified_clinit_body(
   symbol_table_baset &symbol_table,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   size_t max_user_array_length,
-  std::unordered_map<std::string, object_creation_referencet> &references)
+  std::unordered_map<std::string, object_creation_referencet> &references,
+  const std::unordered_multimap<irep_idt, symbolt>
+    &class_to_declared_symbols_map)
 {
   const irep_idt &real_clinit_name = clinit_function_name(class_id);
   const auto class_entry =
@@ -799,8 +801,6 @@ code_blockt get_user_specified_clinit_body(
     {
       const auto &class_json_object = to_json_object(class_json_value);
       std::map<symbol_exprt, jsont> static_field_values;
-      const auto class_to_declared_symbols_map =
-        class_to_declared_symbols(symbol_table);
       for(const auto &class_symbol_pair :
           equal_range(class_to_declared_symbols_map, class_id))
       {

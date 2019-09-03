@@ -1218,13 +1218,16 @@ bool java_bytecode_languaget::convert_single_method(
         class_name, "user_specified_clinit must be declared by a class.");
       INVARIANT(
         static_values_json.has_value(), "static-values JSON must be available");
+      const auto class_to_declared_symbols_map =
+        class_to_declared_symbols(symbol_table);
       writable_symbol.value = get_user_specified_clinit_body(
         *class_name,
         *static_values_json,
         symbol_table,
         needed_lazy_methods,
         max_user_array_length,
-        references);
+        references,
+        class_to_declared_symbols_map);
       break;
     }
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
