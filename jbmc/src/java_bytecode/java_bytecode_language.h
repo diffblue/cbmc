@@ -236,10 +236,10 @@ protected:
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
   bool nondet_static;
-  /// Path to a JSON file which contains initial values of static fields (right
+  /// JSON which contains initial values of static fields (right
   /// after the static initializer of the class was run). This is read from the
-  /// --static-values command-line option.
-  std::string static_values_file;
+  /// file specified by the --static-values command-line option.
+  optionalt<jsont> static_values_json;
 
   // list of classes to force load even without reference from the entry point
   std::vector<irep_idt> java_load_classes;

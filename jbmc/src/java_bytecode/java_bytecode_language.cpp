@@ -203,7 +203,13 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
     java_cp_include_files=".*";
 
   nondet_static = options.get_bool_option("nondet-static");
-  static_values_file = options.get_option("static-values");
+  if(options.is_set("static-values"))
+  {
+    const std::string filename = options.get_option("static-values");
+    jsont tmp_json;
+    if(!parse_json(filename, *message_handler, tmp_json))
+      static_values_json = std::move(tmp_json);
+  }
 
   ignore_manifest_main_class =
     options.get_bool_option("ignore-manifest-main-class");
@@ -853,7 +859,7 @@ bool java_bytecode_languaget::typecheck(
     symbol_table,
     synthetic_methods,
     threading_support,
-    !static_values_file.empty());
+    static_values_json.has_value());
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
@@ -1177,7 +1183,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
-          !static_values_file.empty(),
+          static_values_json.has_value(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
@@ -1186,7 +1192,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
-          !static_values_file.empty(),
+          static_values_json.has_value(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
@@ -1199,7 +1205,7 @@ bool java_bytecode_languaget::convert_single_method(
         class_name, "user_specified_clinit must be declared by a class.");
       writable_symbol.value = get_user_specified_clinit_body(
         *class_name,
-        static_values_file,
+        static_values_json,
         symbol_table,
         get_message_handler(),
         needed_lazy_methods,
