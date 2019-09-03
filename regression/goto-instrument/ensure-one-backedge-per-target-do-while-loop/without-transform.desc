@@ -1,0 +1,6 @@
+CORE
+test.c
+--show-natural-loops
+^2 is head of \{ 2, 3, 4, 5, 6, 7 \(backedge\) \}$
+^EXIT=0$
+^SIGNAL=0$
