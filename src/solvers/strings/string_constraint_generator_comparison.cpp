@@ -24,15 +24,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   2. \f$ \forall i<|s_1|.\ eq \Rightarrow s_1[i]=s_2[i] \f$
 ///   3. \f$ \lnot eq \Rightarrow (|s_1| \ne |s_2| \land witness=-1)
 ///          \lor (0 \le witness<|s_1| \land s_1[witness] \ne s_2[witness]) \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
-/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
-std::pair<exprt, string_constraintst> add_axioms_for_equals(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_equals(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
@@ -131,15 +128,12 @@ static exprt character_equals_ignore_case(
 ///          \ eq \Rightarrow {\tt equal\_ignore\_case}(s_1[i],s_2[i]) \f$
 ///   3. \f$ \lnot eq \Rightarrow |s_1| \ne |s_2| \lor (0 \le witness<|s_1|
 ///          \land\lnot {\tt equal\_ignore\_case}(s_1[witness],s_2[witness]) \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
-/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
-std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_equals_ignore_case(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
@@ -206,15 +200,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
 ///         (|s1|<|s2| \land x=|s1|) \lor (|s1| > |s2| \land x=|s2|)
 ///         \land res=|s1|-|s2|) \f$
 ///   * \f$ \forall i'<x. res\ne 0 \Rightarrow s1[i]=s2[i] \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
-/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `res`
-std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_compare_to(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
   const typet &return_type = f.type();

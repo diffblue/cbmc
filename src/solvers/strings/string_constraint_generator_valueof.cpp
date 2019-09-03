@@ -39,40 +39,35 @@ static unsigned long to_integer_or_default(
 /// Add axioms corresponding to the String.valueOf(J) java function.
 /// \deprecated should use add_axioms_from_int instead
 /// \param f: function application with one long argument
-/// \param array_pool: pool of arrays representing strings
-/// \param ns: namespace
 /// \return a new string expression
 DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int instead"))
-std::pair<exprt, string_constraintst> add_axioms_from_long(
-  const function_application_exprt &f,
-  array_poolt &array_pool,
-  const namespacet &ns)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_long(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
-      res, f.arguments()[2], f.arguments()[3], 0, ns, array_pool);
+      res, f.arguments()[2], f.arguments()[3], 0);
   else
-    return add_axioms_for_string_of_int(
-      res, f.arguments()[2], 0, ns, array_pool);
+    return add_axioms_for_string_of_int(res, f.arguments()[2], 0);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
 /// \deprecated This is Java specific and should be implemented in Java instead
 /// \param f: function application with a Boolean argument
-/// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
-std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_bool(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_bool(res, f.arguments()[2], array_pool);
+  return add_axioms_from_bool(res, f.arguments()[2]);
 }
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
@@ -80,13 +75,12 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// \deprecated This is Java specific and should be implemented in Java instead
 /// \param res: string expression for the result
 /// \param b: Boolean expression
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
-std::pair<exprt, string_constraintst> add_axioms_from_bool(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_bool(
   const array_string_exprt &res,
-  const exprt &b,
-  array_poolt &array_pool)
+  const exprt &b)
 {
   const typet &char_type = res.content().type().subtype();
   PRECONDITION(b.type() == bool_typet() || b.type().id() == ID_c_bool);
@@ -134,19 +128,16 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// \param input_int: a signed integer expression
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
-/// \param ns: namespace
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_string_of_int(
   const array_string_exprt &res,
   const exprt &input_int,
-  size_t max_size,
-  const namespacet &ns,
-  array_poolt &array_pool)
+  size_t max_size)
 {
   const constant_exprt radix = from_integer(10, input_int.type());
   return add_axioms_for_string_of_int_with_radix(
-    res, input_int, radix, max_size, ns, array_pool);
+    res, input_int, radix, max_size);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
@@ -157,16 +148,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
 /// \param radix: the radix to use
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
-/// \param ns: namespace
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
   const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
-  size_t max_size,
-  const namespacet &ns,
-  array_poolt &array_pool)
+  size_t max_size)
 {
   PRECONDITION(max_size < std::numeric_limits<size_t>::max());
   const typet &type = input_int.type();
@@ -189,7 +177,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   const bool strict_formatting = true;
 
   auto result1 = add_axioms_for_correct_number_format(
-    res, radix_as_char, radix_ul, max_size, strict_formatting, array_pool);
+    res, radix_as_char, radix_ul, max_size, strict_formatting);
   auto result2 = add_axioms_for_characters_in_integer_string(
     input_int,
     type,
@@ -197,8 +185,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
     res,
     max_size,
     radix_input_type,
-    radix_ul,
-    array_pool);
+    radix_ul);
   merge(result2, std::move(result1));
   return {from_integer(0, get_return_code_type()), std::move(result2)};
 }
@@ -223,13 +210,12 @@ static exprt int_of_hex_char(const exprt &chr)
 /// \deprecated use add_axioms_from_int_with_radix instead
 /// \param res: string expression for the result
 /// \param i: an integer argument
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int_with_radix"))
-std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_int_hex(
   const array_string_exprt &res,
-  const exprt &i,
-  array_poolt &array_pool)
+  const exprt &i)
 {
   const typet &type = i.type();
   PRECONDITION(type.id() == ID_signedbv);
@@ -284,37 +270,35 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 
 /// Add axioms corresponding to the Integer.toHexString(I) java function
 /// \param f: function application with an integer argument
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_int_hex(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_int_hex(res, f.arguments()[2], array_pool);
+  return add_axioms_from_int_hex(res, f.arguments()[2]);
 }
 
 /// Conversion from char to string
 ///
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_from_char(const array_string_exprt &res, const exprt &c, array_poolt &)
+/// \copybrief add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 // NOLINTNEXTLINE
-/// \link add_axioms_from_char(const array_string_exprt &res, const exprt &c, array_poolt &)
+/// \link add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 ///   (More...) \endlink
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]` and character `c`
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_from_char(
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_char(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_char(res, f.arguments()[2], array_pool);
+  return add_axioms_from_char(res, f.arguments()[2]);
 }
 
 /// Add axiom stating that string `res` has length 1 and the character
@@ -323,12 +307,11 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
 /// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
 /// \param res: array of characters expression
 /// \param c: character expression
-/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_from_char(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_char(
   const array_string_exprt &res,
-  const exprt &c,
-  array_poolt &array_pool)
+  const exprt &c)
 {
   string_constraintst constraints;
   constraints.existential = {and_exprt(
@@ -346,14 +329,13 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
 /// \param max_size: maximum number of characters
 /// \param strict_formatting: if true, don't allow a leading plus, redundant
 ///   zeros or upper case letters
-/// \param array_pool: pool of arrays representing strings
-string_constraintst add_axioms_for_correct_number_format(
+string_constraintst
+string_constraint_generatort::add_axioms_for_correct_number_format(
   const array_string_exprt &str,
   const exprt &radix_as_char,
   const unsigned long radix_ul,
   const std::size_t max_size,
-  const bool strict_formatting,
-  array_poolt &array_pool)
+  const bool strict_formatting)
 {
   string_constraintst constraints;
   const typet &char_type = str.content().type().subtype();
@@ -441,16 +423,15 @@ string_constraintst add_axioms_for_correct_number_format(
 /// \param radix: the radix, with the same type as input_int
 /// \param radix_ul: the radix as an unsigned long, or 0 if that can't be
 ///   determined
-/// \param array_pool: pool of arrays representing strings
-string_constraintst add_axioms_for_characters_in_integer_string(
+string_constraintst
+string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   const exprt &input_int,
   const typet &type,
   const bool strict_formatting,
   const array_string_exprt &str,
   const std::size_t max_string_length,
   const exprt &radix,
-  const unsigned long radix_ul,
-  array_poolt &array_pool)
+  const unsigned long radix_ul)
 {
   string_constraintst constraints;
   const typet &char_type = str.content().type().subtype();
@@ -531,17 +512,12 @@ string_constraintst add_axioms_for_characters_in_integer_string(
 ///
 /// Add axioms ensuring the value of the returned integer corresponds
 /// to the value represented by `str`
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `str` and
 ///   an optional integer for the radix
-/// \param array_pool: pool of arrays representing strings
-/// \param ns: namespace
 /// \return integer expression equal to the value represented by `str`
-std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool,
-  const namespacet &ns)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_parse_int(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1 || f.arguments().size() == 2);
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
@@ -569,12 +545,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
   /// \note the only thing stopping us from taking longer strings with many
   /// leading zeros is the axioms for correct number format
   auto constraints1 = add_axioms_for_correct_number_format(
-    str,
-    radix_as_char,
-    radix_ul,
-    max_string_length,
-    strict_formatting,
-    array_pool);
+    str, radix_as_char, radix_ul, max_string_length, strict_formatting);
 
   auto constraints2 = add_axioms_for_characters_in_integer_string(
     input_int,
@@ -583,8 +554,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
     str,
     max_string_length,
     radix,
-    radix_ul,
-    array_pool);
+    radix_ul);
   merge(constraints2, std::move(constraints1));
 
   return {input_int, std::move(constraints2)};

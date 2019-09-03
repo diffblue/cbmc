@@ -106,63 +106,46 @@ static exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
 /// string expr, int, float, char, boolean, hashcode, date_time.
 /// The correct type will be retrieved by calling get_arg with an id depending
 /// on the format specifier.
-/// \param fresh_symbol: generator of fresh symbols
+/// \param generator: constraint generator
 /// \param fs: a format specifier
 /// \param string_arg: format string from argument
 /// \param index_type: type for indexes in strings
 /// \param char_type: type of characters
-/// \param array_pool: pool of arrays representing strings
 /// \param message: message handler for warnings
-/// \param ns: namespace
 /// \return String expression representing the output of String.format.
 static std::pair<array_string_exprt, string_constraintst>
 add_axioms_for_format_specifier(
-  symbol_generatort &fresh_symbol,
+  string_constraint_generatort &generator,
   const format_specifiert &fs,
   const array_string_exprt &string_arg,
   const typet &index_type,
   const typet &char_type,
-  array_poolt &array_pool,
-  const messaget &message,
-  const namespacet &ns)
+  const messaget &message)
 {
   string_constraintst constraints;
+  array_poolt &array_pool = generator.array_pool;
   const array_string_exprt res = array_pool.fresh_string(index_type, char_type);
   std::pair<exprt, string_constraintst> return_code;
   switch(fs.conversion)
   {
   case format_specifiert::DECIMAL_INTEGER:
-    return_code = add_axioms_for_string_of_int(
-      res,
-      format_arg_from_string(string_arg, ID_int, array_pool),
-      0,
-      ns,
-      array_pool);
+    return_code = generator.add_axioms_for_string_of_int(
+      res, format_arg_from_string(string_arg, ID_int, array_pool), 0);
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
-    return_code = add_axioms_for_string_of_int_with_radix(
+    return_code = generator.add_axioms_for_string_of_int_with_radix(
       res,
       format_arg_from_string(string_arg, ID_int, array_pool),
       from_integer(16, index_type),
-      16,
-      ns,
-      array_pool);
+      16);
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
-    return_code = add_axioms_from_float_scientific_notation(
-      fresh_symbol,
-      res,
-      format_arg_from_string(string_arg, ID_float, array_pool),
-      array_pool,
-      ns);
+    return_code = generator.add_axioms_from_float_scientific_notation(
+      res, format_arg_from_string(string_arg, ID_float, array_pool));
     return {res, std::move(return_code.second)};
   case format_specifiert::DECIMAL_FLOAT:
-    return_code = add_axioms_for_string_of_float(
-      fresh_symbol,
-      res,
-      format_arg_from_string(string_arg, ID_float, array_pool),
-      array_pool,
-      ns);
+    return_code = generator.add_axioms_for_string_of_float(
+      res, format_arg_from_string(string_arg, ID_float, array_pool));
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
   {
@@ -188,10 +171,8 @@ add_axioms_for_format_specifier(
     return {res, constraints};
   }
   case format_specifiert::BOOLEAN:
-    return_code = add_axioms_from_bool(
-      res,
-      format_arg_from_string(string_arg, ID_boolean, array_pool),
-      array_pool);
+    return_code = generator.add_axioms_from_bool(
+      res, format_arg_from_string(string_arg, ID_boolean, array_pool));
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
   {
@@ -200,19 +181,15 @@ add_axioms_for_format_specifier(
     return {std::move(string_expr), {}};
   }
   case format_specifiert::HASHCODE:
-    return_code = add_axioms_for_string_of_int(
-      res,
-      format_arg_from_string(string_arg, "hashcode", array_pool),
-      0,
-      ns,
-      array_pool);
+    return_code = generator.add_axioms_for_string_of_int(
+      res, format_arg_from_string(string_arg, "hashcode", array_pool), 0);
     return {res, std::move(return_code.second)};
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
-    return_code = add_axioms_for_constant(res, "\n", array_pool);
+    return_code = generator.add_axioms_for_constant(res, "\n");
     return {res, std::move(return_code.second)};
   case format_specifiert::PERCENT_SIGN:
-    return_code = add_axioms_for_constant(res, "%", array_pool);
+    return_code = generator.add_axioms_for_constant(res, "%");
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC_UPPER:
   case format_specifiert::GENERAL_UPPER:
@@ -226,20 +203,14 @@ add_axioms_for_format_specifier(
     format_specifiert fs_lower = fs;
     fs_lower.conversion = tolower(fs.conversion);
     auto format_specifier_result = add_axioms_for_format_specifier(
-      fresh_symbol,
-      fs_lower,
-      string_arg,
-      index_type,
-      char_type,
-      array_pool,
-      message,
-      ns);
+      generator, fs_lower, string_arg, index_type, char_type, message);
 
     const exprt return_code_upper_case =
-      fresh_symbol("return_code_upper_case", get_return_code_type());
+      generator.fresh_symbol("return_code_upper_case", get_return_code_type());
     const string_to_upper_case_builtin_functiont upper_case_function(
       return_code_upper_case, res, format_specifier_result.first, array_pool);
-    auto upper_case_constraints = upper_case_function.constraints(fresh_symbol);
+    auto upper_case_constraints =
+      upper_case_function.constraints(generator.fresh_symbol);
     merge(upper_case_constraints, std::move(format_specifier_result.second));
     return {res, std::move(upper_case_constraints)};
   }
@@ -311,24 +282,21 @@ static exprt format_arg_from_string(
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format.
-/// \param fresh_symbol: generator of fresh symbols
+/// \param generator: constraint generator
 /// \param res: string expression for the result of the format function
 /// \param s: a format string
 /// \param args: a vector of arguments
-/// \param array_pool: pool of arrays representing strings
 /// \param message: message handler for warnings
-/// \param ns: namespace
 /// \return code, 0 on success
 static std::pair<exprt, string_constraintst> add_axioms_for_format(
-  symbol_generatort &fresh_symbol,
+  string_constraint_generatort &generator,
   const array_string_exprt &res,
   const std::string &s,
   const std::vector<array_string_exprt> &args,
-  array_poolt &array_pool,
-  const messaget &message,
-  const namespacet &ns)
+  const messaget &message)
 {
   string_constraintst constraints;
+  array_poolt &array_pool = generator.array_pool;
   const std::vector<format_elementt> format_strings = parse_format_string(s);
   std::vector<array_string_exprt> intermediary_strings;
   std::size_t arg_count = 0;
@@ -366,14 +334,7 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
       }
 
       auto result = add_axioms_for_format_specifier(
-        fresh_symbol,
-        fs,
-        string_arg,
-        index_type,
-        char_type,
-        array_pool,
-        message,
-        ns);
+        generator, fs, string_arg, index_type, char_type, message);
       merge(constraints, std::move(result.second));
       intermediary_strings.push_back(result.first);
     }
@@ -381,8 +342,8 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
     {
       const array_string_exprt str =
         array_pool.fresh_string(index_type, char_type);
-      auto result = add_axioms_for_constant(
-        str, fe.get_format_text().get_content(), array_pool);
+      auto result = generator.add_axioms_for_constant(
+        str, fe.get_format_text().get_content());
       merge(constraints, result.second);
       intermediary_strings.push_back(str);
     }
@@ -402,13 +363,11 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
   if(intermediary_strings.size() == 1)
   {
     // Copy the first string
-    auto result = add_axioms_for_substring(
-      fresh_symbol,
+    auto result = generator.add_axioms_for_substring(
       res,
       str,
       from_integer(0, index_type),
-      array_pool.get_or_create_length(str),
-      array_pool);
+      generator.array_pool.get_or_create_length(str));
     merge(constraints, std::move(result.second));
     return {result.first, std::move(constraints)};
   }
@@ -419,15 +378,14 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
     const array_string_exprt &intermediary = intermediary_strings[i];
     const array_string_exprt fresh =
       array_pool.fresh_string(index_type, char_type);
-    auto result =
-      add_axioms_for_concat(fresh_symbol, fresh, str, intermediary, array_pool);
+    auto result = generator.add_axioms_for_concat(fresh, str, intermediary);
     return_code = maximum(return_code, result.first);
     merge(constraints, std::move(result.second));
     str = fresh;
   }
 
-  auto result = add_axioms_for_concat(
-    fresh_symbol, res, str, intermediary_strings.back(), array_pool);
+  auto result =
+    generator.add_axioms_for_concat(res, str, intermediary_strings.back());
   merge(constraints, std::move(result.second));
   return {maximum(result.first, return_code), std::move(constraints)};
 }
@@ -631,14 +589,12 @@ string_constraintst string_format_builtin_functiont::constraints(
 
   null_message_handlert message_handler;
   auto result_constraint_pair = add_axioms_for_format(
-    generator.fresh_symbol,
+    generator,
     result,
     format_string.value(),
     inputs,
-    generator.array_pool,
     // TODO: get rid of this argument
-    messaget{message_handler},
-    generator.ns);
+    messaget{message_handler});
   INVARIANT(
     simplify_expr(result_constraint_pair.first, generator.ns).is_zero(),
     "add_axioms_for_format should return 0, meaning that formatting was"

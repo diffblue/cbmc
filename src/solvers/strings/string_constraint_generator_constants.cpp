@@ -18,13 +18,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// equal.
 /// \param res: array of characters for the result
 /// \param sval: a string constant
-/// \param array_pool: pool of arrays representing strings
 /// \param guard: condition under which the axiom should apply, true by default
 /// \return integer expression equal to zero
-std::pair<exprt, string_constraintst> add_axioms_for_constant(
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_constant(
   const array_string_exprt &res,
   irep_idt sval,
-  array_poolt &array_pool,
   const exprt &guard)
 {
   string_constraintst constraints;
@@ -62,7 +61,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
 ///   pointer `ptr`.
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst>
-add_axioms_for_empty_string(const function_application_exprt &f)
+string_constraint_generatort::add_axioms_for_empty_string(
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
   string_constraintst constraints;
@@ -73,34 +73,28 @@ add_axioms_for_empty_string(const function_application_exprt &f)
 }
 
 /// Convert an expression of type string_typet to a string_exprt
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param arg: expression of type string typet
 /// \param guard: condition under which `res` should be equal to arg
-/// \param array_pool: pool of arrays representing strings
 /// \return 0 if constraints were added, 1 if expression could not be handled
 ///   and no constraint was added. Expression we can handle are of the form
 ///   \f$ e := "<string constant>" | (expr)? e : e \f$
-std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
-  symbol_generatort &fresh_symbol,
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_cprover_string(
   const array_string_exprt &res,
   const exprt &arg,
-  const exprt &guard,
-  array_poolt &array_pool)
+  const exprt &guard)
 {
   if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(arg))
   {
     const and_exprt guard_true(guard, if_expr->cond());
     const and_exprt guard_false(guard, not_exprt(if_expr->cond()));
     return combine_results(
-      add_axioms_for_cprover_string(
-        fresh_symbol, res, if_expr->true_case(), guard_true, array_pool),
-      add_axioms_for_cprover_string(
-        fresh_symbol, res, if_expr->false_case(), guard_false, array_pool));
+      add_axioms_for_cprover_string(res, if_expr->true_case(), guard_true),
+      add_axioms_for_cprover_string(res, if_expr->false_case(), guard_false));
   }
   else if(const auto constant_expr = expr_try_dynamic_cast<constant_exprt>(arg))
-    return add_axioms_for_constant(
-      res, constant_expr->get_value(), array_pool, guard);
+    return add_axioms_for_constant(res, constant_expr->get_value(), guard);
   else
     return {from_integer(1, get_return_code_type()), {}};
 }
@@ -110,19 +104,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
 /// Add axioms ensuring that the returned string expression is equal to the
 /// string literal.
 /// \todo The name of the function should be changed to reflect what it does.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with an argument which is a string literal
 ///   that is a constant with a string value.
-/// \param array_pool: pool of arrays representing strings
 /// \return string expression
-std::pair<exprt, string_constraintst> add_axioms_from_literal(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool)
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_from_literal(
+  const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 3); // Bad args to string literal?
   const array_string_exprt res = array_pool.find(args[1], args[0]);
-  return add_axioms_for_cprover_string(
-    fresh_symbol, res, args[2], true_exprt(), array_pool);
+  return add_axioms_for_cprover_string(res, args[2], true_exprt());
 }
