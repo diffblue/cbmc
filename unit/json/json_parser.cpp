@@ -132,6 +132,65 @@ SCENARIO("Loading JSON files")
       }
     }
   }
+  GIVEN("A JSON file containing escaped characters")
+  {
+    temporary_filet unicode_json_file("cbmc_unit_json_parser_escaped", ".json");
+    const std::string unicode_json_path = unicode_json_file();
+    {
+      std::ofstream unicode_json_out(unicode_json_path);
+      unicode_json_out << "{\n"
+                       << "  \"doublequote\": \"\\\"\",\n"
+                       << "  \"backslash\": \"\\\\\",\n"
+                       << "  \"slash\": \"\\/\",\n"
+                       << "  \"backspace\": \"\\b\",\n"
+                       << "  \"formfeed\": \"\\f\",\n"
+                       << "  \"newline\": \"\\n\",\n"
+                       << "  \"return\": \"\\r\",\n"
+                       << "  \"tab\": \"\\t\",\n"
+                       << "  \"several\": \"\\\"\\\\\\/\\b\\f\\n\\r\\t\"\n"
+                       << "}\n";
+    }
+    WHEN("Loading the JSON file with the escaped characters")
+    {
+      jsont unicode_json;
+      const auto unicode_parse_error =
+        parse_json(unicode_json_path, null_message_handler, unicode_json);
+      THEN("The JSON file should be parsed correctly")
+      {
+        REQUIRE_FALSE(unicode_parse_error);
+        REQUIRE(unicode_json.is_object());
+
+        const json_objectt &json_object = to_json_object(unicode_json);
+
+        REQUIRE(json_object.find("doublequote") != json_object.end());
+        REQUIRE(json_object["doublequote"].value == "\"");
+
+        REQUIRE(json_object.find("backslash") != json_object.end());
+        REQUIRE(json_object["backslash"].value == "\\");
+
+        REQUIRE(json_object.find("slash") != json_object.end());
+        REQUIRE(json_object["slash"].value == "/");
+
+        REQUIRE(json_object.find("backspace") != json_object.end());
+        REQUIRE(json_object["backspace"].value == "\b");
+
+        REQUIRE(json_object.find("formfeed") != json_object.end());
+        REQUIRE(json_object["formfeed"].value == "\f");
+
+        REQUIRE(json_object.find("newline") != json_object.end());
+        REQUIRE(json_object["newline"].value == "\n");
+
+        REQUIRE(json_object.find("return") != json_object.end());
+        REQUIRE(json_object["return"].value == "\r");
+
+        REQUIRE(json_object.find("tab") != json_object.end());
+        REQUIRE(json_object["tab"].value == "\t");
+
+        REQUIRE(json_object.find("several") != json_object.end());
+        REQUIRE(json_object["several"].value == "\"\\/\b\f\n\r\t");
+      }
+    }
+  }
 }
 
 TEST_CASE("json equality", "[core][util][json]")

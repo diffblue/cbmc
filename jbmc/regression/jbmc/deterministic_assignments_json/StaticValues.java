@@ -12,7 +12,8 @@ public class StaticValues extends StaticParent {
   public static char asciiCharField = 'a';
   public static char hexCharField = '\u0001';
   public static char chineseCharField = '字';
-  public static char specialCharField = '\n';
+  public static char newLineCharField = '\n';
+  public static char specialCharField = '\\';
   public static char fibCharField = (char) Util.fib(15);
   public static void testAsciiCharPass() {
     assert asciiCharField == 'a';
@@ -32,12 +33,10 @@ public class StaticValues extends StaticParent {
   public static void testChineseCharFail() {
     assert chineseCharField != '字';
   }
-  public static void testSpecialCharPass() {
-    assert specialCharField == '\n';
-  }
-  public static void testSpecialCharFail() {
-    assert specialCharField != '\n';
-  }
+  public static void testNewLineCharPass() { assert newLineCharField == '\n'; }
+  public static void testNewLineCharFail() { assert newLineCharField != '\n'; }
+  public static void testSpecialCharPass() { assert specialCharField == '\\'; }
+  public static void testSpecialCharFail() { assert specialCharField != '\\'; }
   public static void testFibCharPass() {
     assert fibCharField == 'ɢ';
   }
