@@ -1222,7 +1222,6 @@ bool java_bytecode_languaget::convert_single_method(
         *class_name,
         *static_values_json,
         symbol_table,
-        get_message_handler(),
         needed_lazy_methods,
         max_user_array_length,
         references);

@@ -66,7 +66,6 @@ code_ifthenelset get_clinit_wrapper_body(
 ///   The format is expected to be a map whose keys are class names, and whose
 ///   values are maps from static field names to values.
 /// \param symbol_table: used to look up and create new symbols
-/// \param message_handler: used to log any errors with parsing the input file
 /// \param needed_lazy_methods: used to mark any runtime types given in the
 ///   input file as needed
 /// \param max_user_array_length: maximum value for constant or variable length
@@ -78,7 +77,6 @@ code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
   const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   size_t max_user_array_length,
   std::unordered_map<std::string, object_creation_referencet> &references);
