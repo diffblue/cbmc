@@ -76,7 +76,7 @@ code_ifthenelset get_clinit_wrapper_body(
 /// \return the body of the user_specified_clinit function as a code block.
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
-  const optionalt<json_objectt> &static_values_json,
+  const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,

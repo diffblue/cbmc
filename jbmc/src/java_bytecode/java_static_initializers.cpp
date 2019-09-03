@@ -769,7 +769,7 @@ code_ifthenelset get_clinit_wrapper_body(
 
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
-  const optionalt<json_objectt> &static_values_json,
+  const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
@@ -777,49 +777,46 @@ code_blockt get_user_specified_clinit_body(
   std::unordered_map<std::string, object_creation_referencet> &references)
 {
   const irep_idt &real_clinit_name = clinit_function_name(class_id);
-  if(static_values_json.has_value())
+  const auto class_entry =
+    static_values_json.find(id2string(strip_java_namespace_prefix(class_id)));
+  if(class_entry != static_values_json.end())
   {
-    const auto class_entry = static_values_json->find(
-      id2string(strip_java_namespace_prefix(class_id)));
-    if(class_entry != static_values_json->end())
+    const auto &class_json_value = class_entry->second;
+    if(class_json_value.is_object())
     {
-      const auto &class_json_value = class_entry->second;
-      if(class_json_value.is_object())
+      const auto &class_json_object = to_json_object(class_json_value);
+      std::map<symbol_exprt, jsont> static_field_values;
+      for(const auto &symbol_pair : symbol_table)
       {
-        const auto &class_json_object = to_json_object(class_json_value);
-        std::map<symbol_exprt, jsont> static_field_values;
-        for(const auto &symbol_pair : symbol_table)
+        const symbolt &symbol = symbol_pair.second;
+        if(
+          declaring_class(symbol) && *declaring_class(symbol) == class_id &&
+          symbol.is_static_lifetime)
         {
-          const symbolt &symbol = symbol_pair.second;
-          if(
-            declaring_class(symbol) && *declaring_class(symbol) == class_id &&
-            symbol.is_static_lifetime)
+          const symbol_exprt &static_field_expr = symbol.symbol_expr();
+          const auto &static_field_entry =
+            class_json_object.find(id2string(symbol.base_name));
+          if(static_field_entry != class_json_object.end())
           {
-            const symbol_exprt &static_field_expr = symbol.symbol_expr();
-            const auto &static_field_entry =
-              class_json_object.find(id2string(symbol.base_name));
-            if(static_field_entry != class_json_object.end())
-            {
-              static_field_values.insert(
-                {static_field_expr, static_field_entry->second});
-            }
+            static_field_values.insert(
+              {static_field_expr, static_field_entry->second});
           }
         }
-        code_blockt body;
-        for(const auto &value_pair : static_field_values)
-        {
-          assign_from_json(
-            value_pair.first,
-            value_pair.second,
-            real_clinit_name,
-            body,
-            symbol_table,
-            needed_lazy_methods,
-            max_user_array_length,
-            references);
-        }
-        return body;
       }
+      code_blockt body;
+      for(const auto &value_pair : static_field_values)
+      {
+        assign_from_json(
+          value_pair.first,
+          value_pair.second,
+          real_clinit_name,
+          body,
+          symbol_table,
+          needed_lazy_methods,
+          max_user_array_length,
+          references);
+      }
+      return body;
     }
   }
   if(const auto clinit_func = symbol_table.lookup(real_clinit_name))

@@ -1216,9 +1216,11 @@ bool java_bytecode_languaget::convert_single_method(
         declaring_class(symbol_table.lookup_ref(function_id));
       INVARIANT(
         class_name, "user_specified_clinit must be declared by a class.");
+      INVARIANT(
+        static_values_json.has_value(), "static-values JSON must be available");
       writable_symbol.value = get_user_specified_clinit_body(
         *class_name,
-        static_values_json,
+        *static_values_json,
         symbol_table,
         get_message_handler(),
         needed_lazy_methods,
