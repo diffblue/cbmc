@@ -41,7 +41,7 @@ static codet record_exception(
   const symbolt &function,
   const symbol_table_baset &symbol_table);
 
-static void create_initialize(symbol_table_baset &symbol_table)
+void create_java_initialize(symbol_table_baset &symbol_table)
 {
   // If __CPROVER_initialize already exists, replace it. It may already exist
   // if a GOTO binary provided it. This behaviour mirrors the ANSI-C frontend.
@@ -590,7 +590,7 @@ bool java_entry_point(
 
   assert(symbol.type.id()==ID_code);
 
-  create_initialize(symbol_table);
+  create_java_initialize(symbol_table);
 
   java_static_lifetime_init(
     symbol_table,
