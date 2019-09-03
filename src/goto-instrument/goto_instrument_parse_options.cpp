@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/version.h>
 
 #include <goto-programs/class_hierarchy.h>
+#include <goto-programs/ensure_one_backedge_per_target.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/interpreter.h>
@@ -1577,6 +1578,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       reachability_slicer(goto_model, cmdline.get_values("property"));
     else
       reachability_slicer(goto_model);
+  }
+
+  if(cmdline.isset("ensure-one-backedge-per-target"))
+  {
+    log.status() << "Trying to force one backedge per target" << messaget::eom;
+    ensure_one_backedge_per_target(goto_model);
   }
 
   // recalculate numbers, etc.
