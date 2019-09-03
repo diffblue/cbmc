@@ -767,6 +767,20 @@ code_ifthenelset get_clinit_wrapper_body(
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
+/// \return map associating classes to the symbols they declare
+static std::unordered_multimap<irep_idt, symbolt>
+class_to_declared_symbols(const symbol_tablet &symbol_table)
+{
+  std::unordered_multimap<irep_idt, symbolt> result;
+  for(const auto &symbol_pair : symbol_table)
+  {
+    const symbolt &symbol = symbol_pair.second;
+    if(optionalt<irep_idt> declaring = declaring_class(symbol))
+      result.emplace(*declaring, symbol);
+  }
+  return result;
+}
+
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
   const json_objectt &static_values_json,
@@ -785,12 +799,13 @@ code_blockt get_user_specified_clinit_body(
     {
       const auto &class_json_object = to_json_object(class_json_value);
       std::map<symbol_exprt, jsont> static_field_values;
-      for(const auto &symbol_pair : symbol_table)
+      const auto class_to_declared_symbols_map =
+        class_to_declared_symbols(symbol_table);
+      for(const auto &class_symbol_pair :
+          equal_range(class_to_declared_symbols_map, class_id))
       {
-        const symbolt &symbol = symbol_pair.second;
-        if(
-          declaring_class(symbol) && *declaring_class(symbol) == class_id &&
-          symbol.is_static_lifetime)
+        const symbolt &symbol = class_symbol_pair.second;
+        if(symbol.is_static_lifetime)
         {
           const symbol_exprt &static_field_expr = symbol.symbol_expr();
           const auto &static_field_entry =
