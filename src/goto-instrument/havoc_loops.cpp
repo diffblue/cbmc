@@ -80,10 +80,10 @@ void havoc_loopst::havoc_loop(
     get_loop_exit(loop);
 
   // divert all gotos to the loop head to the loop exit
-  for(loopt::const_iterator
-      l_it=loop.begin(); l_it!=loop.end(); l_it++)
+  for(const auto loop_block : loop.blocks())
   {
-    goto_programt::instructiont &instruction=**l_it;
+    goto_programt::instructiont &instruction =
+      *natural_loops.get_basic_block(loop_block).back();
     if(instruction.is_goto())
     {
       for(goto_programt::targetst::iterator
@@ -105,8 +105,9 @@ void havoc_loopst::get_modifies(
   const loopt &loop,
   modifiest &modifies)
 {
-  for(const auto &instruction_it : loop)
-    function_modifies.get_modifies(local_may_alias, instruction_it, modifies);
+  for(const auto basic_block : loop)
+    for(const auto instruction_it : loop.get_basic_block(basic_block))
+      function_modifies.get_modifies(local_may_alias, instruction_it, modifies);
 }
 
 void havoc_loopst::havoc_loops()

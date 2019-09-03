@@ -600,6 +600,10 @@ public:
   template <typename Target>
   std::list<Target> get_successors(Target target) const;
 
+  template <typename Target>
+  static std::list<Target>
+  get_well_formed_instruction_successors(Target target);
+
   void compute_incoming_edges();
 
   /// Insertion that preserves jumps to "target".
@@ -1068,34 +1072,24 @@ public:
   }
 };
 
-/// Get control-flow successors of a given instruction. The instruction is
-/// represented by a pointer `target` of type `Target`. An instruction has
-/// either 0, 1, or 2 successors (more than two successors is deprecated). For
-/// example, an `ASSUME` instruction with the `guard` being a `false_exprt` has
-/// 0 successors, and `ASSIGN` instruction has 1 successor, and a `GOTO`
-/// instruction with the `guard` not being a `true_exprt` has 2 successors.
-///
-/// \tparam Target: type used to represent a pointer to an instruction in a goto
-///   program
-/// \param target: pointer to the instruction of which to get the successors of
-/// \return List of control-flow successors of the pointed-to goto program
-///   instruction
 template <typename Target>
-std::list<Target> goto_programt::get_successors(
-  Target target) const
+std::list<Target> get_successors(
+  Target target,
+  std::function<bool(const Target &)> is_instruction_out_of_range)
 {
-  if(target==instructions.end())
+  if(is_instruction_out_of_range(target))
     return std::list<Target>();
 
   const auto next=std::next(target);
+  const auto next_out_of_range = is_instruction_out_of_range(next);
 
-  const instructiont &i=*target;
+  const goto_programt::instructiont &i = *target;
 
   if(i.is_goto())
   {
     std::list<Target> successors(i.targets.begin(), i.targets.end());
 
-    if(!i.get_condition().is_true() && next != instructions.end())
+    if(!i.get_condition().is_true() && !next_out_of_range)
       successors.push_back(next);
 
     return successors;
@@ -1105,7 +1099,7 @@ std::list<Target> goto_programt::get_successors(
   {
     std::list<Target> successors(i.targets.begin(), i.targets.end());
 
-    if(next!=instructions.end())
+    if(!next_out_of_range)
       successors.push_back(next);
 
     return successors;
@@ -1125,17 +1119,54 @@ std::list<Target> goto_programt::get_successors(
 
   if(i.is_assume())
   {
-    return !i.get_condition().is_false() && next != instructions.end()
+    return !i.get_condition().is_false() && !next_out_of_range
              ? std::list<Target>{next}
              : std::list<Target>();
   }
 
-  if(next!=instructions.end())
+  if(i.is_end_function())
+    return std::list<Target>();
+
+  if(!next_out_of_range)
   {
     return std::list<Target>{next};
   }
 
   return std::list<Target>();
+}
+
+/// Get control-flow successors of a given instruction. The instruction is
+/// represented by a pointer `target` of type `Target`. An instruction has
+/// either 0, 1, or 2 successors (more than two successors is deprecated). For
+/// example, an `ASSUME` instruction with the `guard` being a `false_exprt` has
+/// 0 successors, and `ASSIGN` instruction has 1 successor, and a `GOTO`
+/// instruction with the `guard` not being a `true_exprt` has 2 successors.
+///
+/// \tparam Target: type used to represent a pointer to an instruction in a goto
+///   program
+/// \param target: pointer to the instruction of which to get the successors of
+/// \return List of control-flow successors of the pointed-to goto program
+///   instruction
+template <typename Target>
+std::list<Target> goto_programt::get_successors(Target target) const
+{
+  const std::function<bool(const Target &)> instruction_out_of_range =
+    [this](const Target &target) { return target == instructions.end(); };
+  return ::get_successors(target, instruction_out_of_range);
+}
+
+/// Like \ref get_successors, except we assume that neither \p target nor its
+/// successor is out of range (i.e., equal to instructions.end()). This holds
+/// so long as \p target is a valid iterator and its containing function is
+/// complete (it has an END_OF_FUNCTION terminator, and all its instruction
+/// targets are valid iterators).
+template <typename Target>
+std::list<Target>
+goto_programt::get_well_formed_instruction_successors(Target target)
+{
+  const std::function<bool(const Target &)> instructions_never_out_of_range =
+    [](const Target &) { return false; };
+  return ::get_successors(target, instructions_never_out_of_range);
 }
 
 inline bool order_const_target(

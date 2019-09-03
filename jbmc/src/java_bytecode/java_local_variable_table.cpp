@@ -41,6 +41,7 @@ struct procedure_local_cfg_baset<
                    java_bytecode_convert_methodt::method_offsett>
     entry_mapt;
   entry_mapt entry_map;
+  std::vector<java_bytecode_convert_methodt::method_offsett> possible_keys;
 
   procedure_local_cfg_baset() {}
 
@@ -52,6 +53,7 @@ struct procedure_local_cfg_baset<
     {
       // Map instruction PCs onto node indices:
       entry_map[inst.first]=this->add_node();
+      possible_keys.push_back(inst.first);
       // Map back:
       (*this)[entry_map[inst.first]].PC=inst.first;
     }
@@ -121,6 +123,11 @@ struct procedure_local_cfg_baset<
   static bool nodes_empty(const method_with_amapt &args)
   {
     return args.second.empty();
+  }
+
+  const std::vector<java_bytecode_convert_methodt::method_offsett> &keys()
+  {
+    return possible_keys;
   }
 };
 
@@ -463,13 +470,19 @@ static java_bytecode_convert_methodt::method_offsett get_common_dominator(
     candidate_dominators;
   for(auto v : merge_vars)
   {
-    const auto &dominator_nodeidx=
+    const auto &var_start_basic_block =
       dominator_analysis.cfg.entry_map.at(v->var.start_pc);
-    const auto &this_var_doms=
-      dominator_analysis.cfg[dominator_nodeidx].dominators;
-    for(const auto this_var_dom : this_var_doms)
-      if(this_var_dom<=first_pc)
-        candidate_dominators.push_back(this_var_dom);
+    const auto &this_var_dom_blocks =
+      dominator_analysis.cfg[var_start_basic_block].dominators;
+    for(const auto this_var_dom_block_index : this_var_dom_blocks)
+    {
+      const auto &this_var_dom_block =
+        dominator_analysis.cfg[this_var_dom_block_index].block;
+      // Only consider placing variable declarations at the head of
+      // a basic block (which conveniently is always a safe choice, even
+      // for a live range starting midway through a block)
+      candidate_dominators.push_back(this_var_dom_block.front());
+    }
   }
   std::sort(candidate_dominators.begin(), candidate_dominators.end());
 

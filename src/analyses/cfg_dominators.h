@@ -37,14 +37,14 @@ template <class P, class T, bool post_dom>
 class cfg_dominators_templatet
 {
 public:
-  typedef std::set<T> target_sett;
+  typedef std::set<std::size_t> target_sett;
 
   struct nodet
   {
     target_sett dominators;
   };
 
-  typedef procedure_local_cfg_baset<nodet, P, T> cfgt;
+  typedef cfg_basic_blockst<procedure_local_cfg_baset, nodet, P, T> cfgt;
   cfgt cfg;
 
   void operator()(P &program);
@@ -63,43 +63,71 @@ public:
     return cfg.get_node(program_point);
   }
 
-  /// Returns true if the program point corresponding to \p rhs_node is
-  /// dominated by program point \p lhs. Saves node lookup compared to the
-  /// dominates overload that takes two program points, so this version is
-  /// preferable if you intend to check more than one potential dominator.
-  /// Note by definition all program points dominate themselves.
-  bool dominates(T lhs, const nodet &rhs_node) const
+  /// Get the basic-block graph node index for \p program_point
+  std::size_t get_node_index(const T &program_point) const
   {
-    return rhs_node.dominators.count(lhs);
+    return cfg.get_node_index(program_point);
   }
+
+  /// Returns true if basic block \p lhs [post]dominates \p rhs
+  bool basic_block_dominates(std::size_t lhs, std::size_t rhs) const
+  {
+    return cfg[rhs].dominators.count(lhs);
+  }
+
+  /// Returns true if program point \p lhs [post]dominates \p rhs
+  bool dominates_same_block(T lhs, T rhs, std::size_t block) const;
 
   /// Returns true if program point \p lhs dominates \p rhs.
   /// Note by definition all program points dominate themselves.
   bool dominates(T lhs, T rhs) const
   {
-    return dominates(lhs, get_node(rhs));
+    const auto lhs_block = cfg.entry_map.at(lhs);
+    const auto rhs_block = cfg.entry_map.at(rhs);
+
+    if(lhs == rhs)
+      return true;
+
+    if(lhs_block != rhs_block)
+      return basic_block_dominates(lhs_block, rhs_block);
+    else
+      return dominates_same_block(lhs, rhs, lhs_block);
   }
 
-  /// Returns true if the program point for \p program_point_node is reachable
+  /// Returns true if the basic block \p basic_block_node is reachable
   /// from the entry point. Saves a lookup compared to the overload taking a
   /// program point, so use this overload if you already have the node.
-  bool program_point_reachable(const nodet &program_point_node) const
+  bool basic_block_reachable(const nodet &basic_block_node) const
   {
     // Dominator analysis walks from the entry point, so a side-effect is to
     // identify unreachable program points (those which don't dominate even
     // themselves).
-    return !program_point_node.dominators.empty();
+    return !basic_block_node.dominators.empty();
+  }
+
+  /// Returns true if the basic block \p basic_block_node is reachable
+  /// from the entry point. Saves a lookup compared to the overload taking a
+  /// program point, so use this overload if you already have the node index.
+  bool basic_block_reachable(std::size_t block) const
+  {
+    return basic_block_reachable(cfg[block]);
   }
 
   /// Returns true if the program point for \p program_point_node is reachable
-  /// from the entry point. Saves a lookup compared to the overload taking a
-  /// program point, so use this overload if you already have the node.
+  /// from the entry point.
   bool program_point_reachable(T program_point) const
   {
     // Dominator analysis walks from the entry point, so a side-effect is to
     // identify unreachable program points (those which don't dominate even
     // themselves).
-    return program_point_reachable(get_node(program_point));
+    return basic_block_reachable(get_node_index(program_point));
+  }
+
+  /// Returns the set of dominator blocks for a given basic block, including
+  /// itself. The result is a set of indices usable with this class' operator[].
+  const target_sett &basic_block_dominators(std::size_t block) const
+  {
+    return cfg[block].dominators;
   }
 
   T entry_node;
@@ -140,7 +168,7 @@ void cfg_dominators_templatet<P, T, post_dom>::initialise(P &program)
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 {
-  std::list<T> worklist;
+  std::list<typename cfgt::node_indext> worklist;
 
   if(cfgt::nodes_empty(program))
     return;
@@ -149,23 +177,24 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     entry_node = cfgt::get_last_node(program);
   else
     entry_node = cfgt::get_first_node(program);
-  typename cfgt::nodet &n = cfg.get_node(entry_node);
-  n.dominators.insert(entry_node);
+  const auto entry_node_index = cfg.get_node_index(entry_node);
+  typename cfgt::nodet &n = cfg[entry_node_index];
+  n.dominators.insert(entry_node_index);
 
   for(typename cfgt::edgest::const_iterator
       s_it=(post_dom?n.in:n.out).begin();
       s_it!=(post_dom?n.in:n.out).end();
       ++s_it)
-    worklist.push_back(cfg[s_it->first].PC);
+    worklist.push_back(s_it->first);
 
   while(!worklist.empty())
   {
     // get node from worklist
-    T current=worklist.front();
+    const auto current = worklist.front();
     worklist.pop_front();
 
     bool changed=false;
-    typename cfgt::nodet &node = cfg.get_node(current);
+    typename cfgt::nodet &node = cfg[current];
     if(node.dominators.empty())
     {
       for(const auto &edge : (post_dom ? node.out : node.in))
@@ -222,10 +251,31 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     {
       for(const auto &edge : (post_dom ? node.in : node.out))
       {
-        worklist.push_back(cfg[edge.first].PC);
+        worklist.push_back(edge.first);
       }
     }
   }
+}
+
+template <class P, class T, bool post_dom>
+bool cfg_dominators_templatet<P, T, post_dom>::dominates_same_block(
+  T lhs,
+  T rhs,
+  std::size_t block) const
+{
+  // Special case when the program points belong to the same block: lhs
+  // dominates rhs iff it is <= rhs in program order (or the reverse if we're
+  // a postdominator analysis)
+
+  for(const auto &instruction : cfg[block].block)
+  {
+    if(instruction == lhs)
+      return !post_dom;
+    else if(instruction == rhs)
+      return post_dom;
+  }
+
+  UNREACHABLE; // Entry map is inconsistent with block members?
 }
 
 /// Pretty-print a single node in the dominator tree. Supply a specialisation if
@@ -248,22 +298,20 @@ inline void dominators_pretty_print_node(
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
-  for(const auto &node : cfg.entries())
+  for(typename cfgt::node_indext i = 0; i < cfg.size(); ++i)
   {
-    auto n=node.first;
-
-    dominators_pretty_print_node(n, out);
+    out << "Block " << dominators_pretty_print_node(cfg[i].block.at(0), out);
     if(post_dom)
       out << " post-dominated by ";
     else
       out << " dominated by ";
     bool first=true;
-    for(const auto &d : cfg[node.second].dominators)
+    for(const auto &d : cfg[i].dominators)
     {
       if(!first)
         out << ", ";
       first=false;
-      dominators_pretty_print_node(d, out);
+      dominators_pretty_print_node(cfg[d].block.at(0), out);
     }
     out << "\n";
   }

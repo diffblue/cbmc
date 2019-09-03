@@ -39,12 +39,13 @@ reachability_slicert::get_sources(
   const slicing_criteriont &criterion)
 {
   std::vector<cfgt::node_indext> sources;
-  for(const auto &e_it : cfg.entries())
+  for(const auto &instruction : cfg.keys())
   {
+    const auto cfg_node_index = cfg.get_node_index(instruction);
     if(
-      criterion(cfg[e_it.second].function_id, e_it.first) ||
-      is_threaded(e_it.first))
-      sources.push_back(e_it.second);
+      criterion(cfg[cfg_node_index].function_id, instruction) ||
+      is_threaded(instruction))
+      sources.push_back(cfg_node_index);
   }
 
   if(sources.empty())

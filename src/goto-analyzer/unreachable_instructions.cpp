@@ -32,15 +32,13 @@ static void unreachable_instructions(
   cfg_dominatorst dominators;
   dominators(goto_program);
 
-  for(cfg_dominatorst::cfgt::entry_mapt::const_iterator
-      it=dominators.cfg.entry_map.begin();
-      it!=dominators.cfg.entry_map.end();
-      ++it)
+  for(auto instruction = goto_program.instructions.begin();
+      instruction != goto_program.instructions.end();
+      ++instruction)
   {
-    const cfg_dominatorst::cfgt::nodet &n=dominators.cfg[it->second];
+    const cfg_dominatorst::cfgt::nodet &n = dominators.get_node(instruction);
     if(n.dominators.empty())
-      dest.insert(std::make_pair(it->first->location_number,
-                                 it->first));
+      dest.insert(std::make_pair(instruction->location_number, instruction));
   }
 }
 

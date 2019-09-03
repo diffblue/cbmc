@@ -97,19 +97,11 @@ void dep_graph_domaint::control_dependencies(
 
     // we could hard-code assume and goto handling here to improve
     // performance
-    const cfg_post_dominatorst::cfgt::nodet &m =
-      pd.get_node(control_dep_candidate);
-
-    // successors of M
-    for(const auto &edge : m.out)
+    for(const auto &candidate_successor :
+        goto_programt::get_well_formed_instruction_successors(
+          control_dep_candidate))
     {
-      // Could use pd.dominates(to, control_dep_candidate) but this would impose
-      // another dominator node lookup per call to this function, which is too
-      // expensive.
-      const cfg_post_dominatorst::cfgt::nodet &m_s=
-        pd.cfg[edge.first];
-
-      if(m_s.dominators.find(to)!=m_s.dominators.end())
+      if(pd.dominates(to, candidate_successor))
         post_dom_one=true;
       else
         post_dom_all=false;

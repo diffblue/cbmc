@@ -21,9 +21,9 @@ void points_tot::fixedpoint()
   {
     added=false;
 
-    for(const auto &instruction_and_entry : cfg.entries())
+    for(const auto &key : cfg.keys())
     {
-      if(transform(cfg[instruction_and_entry.second]))
+      if(transform(cfg.get_node(key)))
         added=true;
     }
   }
