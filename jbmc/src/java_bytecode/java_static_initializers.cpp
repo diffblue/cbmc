@@ -777,6 +777,7 @@ code_blockt get_user_specified_clinit_body(
   std::unordered_map<std::string, object_creation_referencet> &references)
 {
   jsont json;
+  const irep_idt &real_clinit_name = clinit_function_name(class_id);
   if(
     !static_values_file.empty() &&
     !parse_json(static_values_file, message_handler, json) && json.is_object())
@@ -814,7 +815,7 @@ code_blockt get_user_specified_clinit_body(
           assign_from_json(
             value_pair.first,
             value_pair.second,
-            clinit_function_name(class_id),
+            real_clinit_name,
             body,
             symbol_table,
             needed_lazy_methods,
@@ -825,7 +826,6 @@ code_blockt get_user_specified_clinit_body(
       }
     }
   }
-  const irep_idt &real_clinit_name = clinit_function_name(class_id);
   if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
     return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
   return code_blockt{};
