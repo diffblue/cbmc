@@ -1,0 +1,6 @@
+CORE
+test.c
+--ensure-one-backedge-per-target --show-natural-loops
+^2 is head of \{ 2, 3, 4, 5, 6, 10, 11, 12 \(backedge\) \}$
+^EXIT=0$
+^SIGNAL=0$

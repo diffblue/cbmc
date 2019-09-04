@@ -111,6 +111,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(validate-goto-binary)" \
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \
+  "(ensure-one-backedge-per-target)" \
   // empty last line
 
 // clang-format on

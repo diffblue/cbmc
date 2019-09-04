@@ -1,0 +1,7 @@
+CORE
+test.c
+--show-natural-loops
+^2 is head of \{ 2, 3 \(backedge\), 4, 5, 6, 7 \(backedge\) \}
+^11 is head of \{ 11, 12 \(backedge\), 13, 14, 15, 16 \(backedge\) \}
+^EXIT=0$
+^SIGNAL=0$

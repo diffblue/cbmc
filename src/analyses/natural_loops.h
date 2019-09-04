@@ -281,13 +281,24 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
   {
     unsigned n=loop.first->location_number;
 
+    std::unordered_set<std::size_t> backedge_location_numbers;
+    for(const auto &backedge : loop.first->incoming_edges)
+      backedge_location_numbers.insert(backedge->location_number);
+
     out << n << " is head of { ";
-    for(typename natural_loopt::const_iterator l_it=loop.second.begin();
-        l_it!=loop.second.end(); ++l_it)
+
+    std::vector<std::size_t> loop_location_numbers;
+    for(const auto &loop_instruction_it : loop.second)
+      loop_location_numbers.push_back(loop_instruction_it->location_number);
+    std::sort(loop_location_numbers.begin(), loop_location_numbers.end());
+
+    for(const auto location_number : loop_location_numbers)
     {
-      if(l_it!=loop.second.begin())
+      if(location_number != loop_location_numbers.at(0))
         out << ", ";
-      out << (*l_it)->location_number;
+      out << location_number;
+      if(backedge_location_numbers.count(location_number))
+        out << " (backedge)";
     }
     out << " }\n";
   }

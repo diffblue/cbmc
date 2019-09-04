@@ -1,7 +1,7 @@
 CORE
 main.c
 --show-natural-loops
-0 is head of \{ [0124], [0124], [0124], [0124] \}
+0 is head of \{ 0, 1, 2 \(backedge\), 4 \(backedge\) \}
 ^EXIT=0$
 ^SIGNAL=0$
 --

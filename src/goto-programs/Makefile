@@ -6,6 +6,7 @@ SRC = adjust_float_expressions.cpp \
       destructor.cpp \
       destructor_tree.cpp \
       elf_reader.cpp \
+      ensure_one_backedge_per_target.cpp \
       format_strings.cpp \
       goto_asm.cpp \
       goto_clean_expr.cpp \
