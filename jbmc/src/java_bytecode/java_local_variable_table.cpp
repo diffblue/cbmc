@@ -40,6 +40,7 @@ struct procedure_local_cfg_baset<
   typedef std::map<java_bytecode_convert_methodt::method_offsett,
                    java_bytecode_convert_methodt::method_offsett>
     entry_mapt;
+  typedef std::size_t entryt;
   entry_mapt entry_map;
 
   procedure_local_cfg_baset() {}

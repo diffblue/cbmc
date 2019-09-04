@@ -1,0 +1,14 @@
+FUTURE
+test.c
+--show-sese-regions
+^Function contains 2 single-entry, single-exit regions:$
+^Region starting at \(2, [0-9]+\) x = 0; ends at \(10, [0-9]+\) 3: SKIP$
+^Region starting at \(0, [0-9]+\) IF !\(argc % 5 != 0\) THEN GOTO 4 ends at \(14, [0-9]+\) 5: SKIP$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The program test.c produces what is effectively two nested loops, but natural-loop
+analysis conflates the two. This would risk identifying a region that straddles the
+boundary between those two loops, and so SESE analysis currently conservatively refrains
+from identifying the regions.

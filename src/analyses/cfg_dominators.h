@@ -63,6 +63,12 @@ public:
     return cfg.get_node(program_point);
   }
 
+  /// Get the graph node index for \p program_point
+  typename cfgt::entryt get_node_index(const T &program_point) const
+  {
+    return cfg.get_node_index(program_point);
+  }
+
   /// Returns true if the program point corresponding to \p rhs_node is
   /// dominated by program point \p lhs. Saves node lookup compared to the
   /// dominates overload that takes two program points, so this version is
