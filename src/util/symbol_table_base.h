@@ -92,10 +92,12 @@ public:
   /// Find a symbol in the symbol table for read-only access.
   /// \param name: The name of the symbol to look for
   /// \return A reference to the symbol
-  /// \throw `std::out_of_range` if no such symbol exists
   const symbolt &lookup_ref(const irep_idt &name) const
   {
-    return symbols.at(name);
+    const symbolt *const symbol = lookup(name);
+    INVARIANT(
+      symbol, "`" + id2string(name) + "' must exist in the symbol table.");
+    return *symbol;
   }
 
   /// Find a symbol in the symbol table for read-write access.

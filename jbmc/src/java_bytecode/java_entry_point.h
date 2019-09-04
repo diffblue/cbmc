@@ -186,4 +186,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler);
 
+/// Adds `__cprover_initialize` to the \p symbol_table but does not generate
+/// code for it yet.
+void create_java_initialize(symbol_table_baset &symbol_table);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

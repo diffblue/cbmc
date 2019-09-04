@@ -8,6 +8,7 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
+#include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_returns.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
@@ -38,4 +39,34 @@ TEST_CASE("Return-value removal", "[core][goto-programs][remove_returns]")
   symbol_exprt other_symbol("a::local", signedbv_typet(8));
   REQUIRE(!is_return_value_symbol(other_symbol));
   REQUIRE(!is_return_value_identifier(other_symbol.get_identifier()));
+}
+
+TEST_CASE(
+  "remove_returns missing function invariant",
+  "[core][goto-programs][remove_returns]")
+{
+  symbol_tablet symbol_table;
+  goto_functionst goto_functions;
+  *goto_functions.function_map["foo_function"].body.add_instruction() =
+    goto_programt::make_function_call(code_function_callt{
+      symbol_exprt{"local_variable", signedbv_typet{32}},
+      symbol_exprt{"bar_function", code_typet{{}, signedbv_typet{32}}},
+      {}});
+  try
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    remove_returns(symbol_table, goto_functions);
+    FAIL("Expected invariant failure.");
+  }
+  catch(const invariant_failedt &exception)
+  {
+    REQUIRE_THAT(
+      exception.what(),
+      Catch::Matchers::Contains("called function `bar_function' should have an "
+                                "entry in the function map"));
+  }
+  catch(...)
+  {
+    FAIL("Incorrect exception type thrown.");
+  }
 }

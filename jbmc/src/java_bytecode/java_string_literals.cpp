@@ -12,6 +12,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_types.h"
 #include "java_utils.h"
 
+#include <linking/static_lifetime_init.h>
 #include <util/arith_tools.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
@@ -49,6 +50,13 @@ symbol_exprt get_or_create_string_literal_symbol(
   auto findit = symbol_table.symbols.find(escaped_symbol_name_with_prefix);
   if(findit != symbol_table.symbols.end())
     return findit->second.symbol_expr();
+
+#ifndef CPROVER_INVARIANT_DO_NOT_CHECK
+  const auto initialize_function = symbol_table.lookup(INITIALIZE_FUNCTION);
+  INVARIANT(
+    !initialize_function || initialize_function->value.is_nil(),
+    "Cannot create more string literals after making " INITIALIZE_FUNCTION);
+#endif
 
   // Create a new symbol:
   symbolt new_symbol;

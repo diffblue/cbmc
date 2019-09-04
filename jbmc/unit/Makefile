@@ -55,6 +55,7 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_types/generic_type_index.cpp \
        java_bytecode/java_types/java_generic_symbol_type.cpp \
        java_bytecode/java_types/java_type_from_string.cpp \
+       java_bytecode/java_string_literals.cpp \
        java_bytecode/java_utils_test.cpp \
        java_bytecode/java_virtual_functions/virtual_functions.cpp \
        java_bytecode/load_method_by_regex.cpp \

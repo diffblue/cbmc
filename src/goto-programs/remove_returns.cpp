@@ -224,7 +224,8 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
       auto findit = goto_functions.function_map.find(function_id);
       INVARIANT(
         findit != goto_functions.function_map.end(),
-        "called function should have some entry in the function map");
+        "called function `" + id2string(function_id) +
+          "' should have an entry in the function map");
       return !findit->second.body_available();
     };
 
