@@ -25,4 +25,8 @@ private:
 invariant_failure_containingt
 invariant_failure_containing(std::string expected);
 
+/// Printing of `invariant_failedt` for test failure messages.
+std::ostream &
+operator<<(std::ostream &out, const invariant_failedt &invariant_failed);
+
 #endif // CPROVER_TESTING_UTILS_INVARIANT_H
