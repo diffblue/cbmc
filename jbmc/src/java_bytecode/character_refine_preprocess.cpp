@@ -1155,34 +1155,6 @@ codet character_refine_preprocesst::convert_reverse_bytes(
     &character_refine_preprocesst::expr_of_reverse_bytes, target);
 }
 
-/// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.toCodePoint:(CC)I
-/// \param target: a position in a goto program
-codet character_refine_preprocesst::convert_to_code_point(
-  conversion_inputt &target)
-{
-  const code_function_callt &function_call=target;
-  assert(function_call.arguments().size()==2);
-  const exprt &arg0=function_call.arguments()[0];
-  const exprt &arg1=function_call.arguments()[1];
-  const exprt &result=function_call.lhs();
-  const typet &type=result.type();
-
-  // These operations implement the decoding of a unicode symbol encoded
-  // in UTF16 for the supplementary planes (above U+10000).
-  // The low ten bits of the first character give the bits 10 to 19 of
-  // code point and the low ten bits of the second give the bits 0 to 9,
-  // then 0x10000 is added to the result. For more explenations see:
-  //   https://en.wikipedia.org/wiki/UTF-16
-
-  exprt u010000=from_integer(0x010000, type);
-  exprt mask10bit=from_integer(0x03FF, type);
-  shl_exprt m1(bitand_exprt(arg0, mask10bit), from_integer(10, type));
-  bitand_exprt m2(arg1, mask10bit);
-  bitor_exprt pair_value(u010000, bitor_exprt(m1, m2));
-  return code_assignt(result, pair_value);
-}
-
 /// Converts the character argument to lowercase.
 ///
 ///    TODO: For now we only consider ASCII characters but ultimately
@@ -1481,8 +1453,6 @@ void character_refine_preprocesst::initialize_conversion_table()
 
   // Not supported "java::java.lang.Character.toChars:(I[CI)I"
 
-  conversion_table["java::java.lang.Character.toCodePoint:(CC)I"]=
-      &character_refine_preprocesst::convert_to_code_point;
   conversion_table["java::java.lang.Character.toLowerCase:(C)C"]=
       &character_refine_preprocesst::convert_to_lower_case_char;
   conversion_table["java::java.lang.Character.toLowerCase:(I)I"]=
