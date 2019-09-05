@@ -1072,9 +1072,8 @@ optionalt<size_t> java_generic_struct_tag_typet::generic_type_index(
   const auto &generics = generic_types();
   for(std::size_t i = 0; i < generics.size(); ++i)
   {
-    if(
-      is_java_generic_parameter(generics[i]) &&
-      to_java_generic_parameter(generics[i]).get_name() == type_variable)
+    auto param = type_try_dynamic_cast<java_generic_parametert>(generics[i]);
+    if(param && param->get_name() == type_variable)
       return i;
   }
   return {};
