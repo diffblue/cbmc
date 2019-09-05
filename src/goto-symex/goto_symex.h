@@ -30,6 +30,7 @@ class code_assignt;
 class code_function_callt;
 class exprt;
 class goto_symex_statet;
+class ieee_floatt;
 class if_exprt;
 class index_exprt;
 class symbol_exprt;
@@ -651,6 +652,18 @@ protected:
     symex_assignt &symex_assign,
     const function_application_exprt &f_l1);
 
+  /// Attempt to constant propagate converting a float to a string
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param f_l1: application of function ID_cprover_string_of_float_func
+  /// \return true if the operation could be evaluated to a constant string,
+  ///   false otherwise
+  bool constant_propagate_float_to_string(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1);
+
   /// Assign constant string length and string data given by a char array to
   /// given ssa variables
   ///
@@ -719,6 +732,50 @@ protected:
     const statet &state,
     const exprt &expr);
   // clang-format on
+
+  /// Get minimum precision such that value differs from adjacent values after
+  /// rounding
+  ///
+  /// Let `f` be the given floating-point number, and let `f_prev` and `f_next`
+  /// be the adjacent floating point numbers. Then the function determines the
+  /// minimum precision necessary such that if `f`, `f_prev`, and `f_next` are
+  /// represented in decimal format and rounded to that precision, the
+  /// representation of `f` is not equal to those of `f_prev` or `f_next`.
+  ///
+  /// \param f: floating-point number
+  static std::size_t get_min_precision_decimal(ieee_floatt f);
+
+  /// Get minimum precision such that value differs from adjacent values after
+  /// rounding
+  ///
+  /// Let `f` be the given floating-point number, and let `f_prev` and `f_next`
+  /// be the adjacent floating point numbers. Then the function determines the
+  /// minimum precision necessary such that if `f`, `f_prev`, and `f_next` are
+  /// represented in decimal scientific notation with the mantissa rounded to
+  /// that precision, the representation of `f` is not equal to those of
+  /// `f_prev` or `f_next`.
+  ///
+  /// \param f: floating-point number
+  static std::size_t get_min_precision_scientific(ieee_floatt f);
+
+  /// Get minimum precision such that the values differ after rounding
+  ///
+  /// Given two decimal numbers, determines the minimum precision necessary such
+  /// that if both numbers are rounded to that precision, their decimal
+  /// representations are not equal
+  ///
+  /// \param f1: decimal-formatted number
+  /// \param f2: decimal-formatted number
+  static int get_min_precision(const std::string &f1, const std::string &f2);
+
+  /// Convert float to Java format
+  ///
+  /// Format float in decimal or scientific notation according to the
+  /// specification given in:
+  /// https://docs.oracle.com/javase/7/docs/api/java/lang/Float.html
+  ///
+  /// \param f: the float to format, must be in single-precision format
+  static std::string float_to_java_string(const ieee_floatt f);
 
   // havocs the given object
   void havoc_rec(statet &state, const guardt &guard, const exprt &dest);

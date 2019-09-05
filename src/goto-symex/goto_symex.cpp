@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
+#include <util/ieee_float.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
@@ -26,6 +27,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_utils.h>
 
 #include <climits>
+#include <cmath>
+
+#include <iostream>
 
 unsigned goto_symext::dynamic_counter=0;
 
@@ -222,6 +226,10 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
       else if(func_id == ID_cprover_string_replace_func)
       {
         return constant_propagate_replace(state, symex_assign, f_l1);
+      }
+      else if(func_id == ID_cprover_string_of_float_func)
+      {
+        return constant_propagate_float_to_string(state, symex_assign, f_l1);
       }
     }
   }
@@ -1149,6 +1157,289 @@ bool goto_symext::constant_propagate_trim(
   const array_typet new_char_array_type(char_type, new_char_array_length);
   const array_exprt new_char_array(
     std::move(new_operands), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+int goto_symext::get_min_precision(const std::string &f1, const std::string &f2)
+{
+  PRECONDITION(f1 != f2);
+  PRECONDITION(!f1.empty());
+  PRECONDITION(!f2.empty());
+  PRECONDITION(f1[0] != '-');
+  PRECONDITION(f2[0] != '-');
+
+  const auto round_up = [](const char d) {
+    PRECONDITION(d >= '0');
+    PRECONDITION(d <= '9');
+
+    return d >= '5';
+  };
+
+  // pad with zeros to the left and right, skip over decimal point
+  const auto get_next_digit = [](const std::string &s, int &i) {
+    if(i < 0 || (std::size_t)i >= s.length())
+    {
+      i++;
+      return '0';
+    }
+
+    if(s[i] == '.')
+    {
+      const char c = (std::size_t)i + 1 < s.length() ? s[i + 1] : '0';
+      i += 2;
+      return c;
+    }
+
+    return s[i++];
+  };
+
+  const auto get_relative_index = [](int i, int dp, const std::string &f) {
+    return i - dp - ((i > dp) & ((std::size_t)dp != f.length()));
+  };
+
+  // get decimal point indices
+  int dp1 = std::min(f1.find('.'), f1.length());
+  int dp2 = std::min(f2.find('.'), f2.length());
+
+  int dp_max = std::max(dp1, dp2);
+
+  // compute starting indices for both numbers, aligns them at the decimal point
+  int i1 = dp1 - dp_max;
+  int i2 = dp2 - dp_max;
+
+  char c1 = '0';
+  char c2 = '0';
+
+  while((std::size_t)i1 < f1.length() || (std::size_t)i2 < f2.length())
+  {
+    c1 = get_next_digit(f1, i1);
+    c2 = get_next_digit(f2, i2);
+    CHECK_RETURN(c1 <= c2);
+
+    if(c1 != c2)
+      break;
+  }
+
+  // previous digit rounded in different directions
+  if(round_up(c1) != round_up(c2))
+  {
+    return get_relative_index(i1, dp1, f1) - 1;
+  }
+
+  // digits can't be made equal by rounding
+  if(c2 - c1 >= 2)
+  {
+    return get_relative_index(i1, dp1, f1);
+  }
+
+  INVARIANT(
+    c2 - c1 == 1,
+    "distance between digits must be one as they are non-equal and the "
+    "distance is >= 2");
+
+  do
+  {
+    c1 = get_next_digit(f1, i1);
+    c2 = get_next_digit(f2, i2);
+  } while(c1 == '9' && c2 == '0');
+
+  if(!round_up(c1) || round_up(c2))
+  {
+    return get_relative_index(i1, dp1, f1) - 1;
+  }
+
+  return get_relative_index(i1, dp1, f1);
+}
+
+std::size_t goto_symext::get_min_precision_decimal(ieee_floatt f)
+{
+  PRECONDITION(!f.is_NaN());
+  PRECONDITION(!f.is_zero());
+
+  f.set_sign(false);
+  const std::string f_decimal = f.to_string_decimal();
+
+  ieee_floatt f_prev(f);
+  f_prev.decrement();
+  const std::string f_prev_decimal = f_prev.to_string_decimal();
+
+  ieee_floatt f_next(f);
+  f_next.increment();
+
+  const int p1 = std::max(0, get_min_precision(f_prev_decimal, f_decimal));
+
+  if(f_next.is_infinity())
+  {
+    return p1;
+  }
+
+  const std::string f_next_decimal = f_next.to_string_decimal();
+
+  return std::max(p1, get_min_precision(f_decimal, f_next_decimal));
+}
+
+std::size_t goto_symext::get_min_precision_scientific(ieee_floatt f)
+{
+  PRECONDITION(!f.is_NaN());
+  PRECONDITION(!f.is_zero());
+
+  // extract exponent and mantissa
+  const auto extract_parts =
+    [](const std::string &s, std::string &e, std::string &m) {
+      split_string(s, 'e', m, e);
+      CHECK_RETURN(e[0] == '+' || e[0] == '-' || e == "0");
+    };
+
+  f.set_sign(false);
+
+  std::string f_e;
+  std::string f_m;
+  extract_parts(f.to_string_scientific(), f_e, f_m);
+
+  ieee_floatt f_prev(f);
+  f_prev.decrement();
+  std::string f_prev_e;
+  std::string f_prev_m;
+  extract_parts(f_prev.to_string_scientific(), f_prev_e, f_prev_m);
+
+  ieee_floatt f_next(f);
+  f_next.increment();
+
+  const int p1 = f_prev_e != f_e ? 0 : get_min_precision(f_prev_m, f_m);
+  CHECK_RETURN(p1 >= 0);
+
+  if(f_next.is_infinity())
+  {
+    return p1;
+  }
+
+  std::string f_next_e;
+  std::string f_next_m;
+  extract_parts(f_next.to_string_scientific(), f_next_e, f_next_m);
+
+  return std::max(p1, f_next_e != f_e ? 0 : get_min_precision(f_m, f_next_m));
+}
+
+std::string goto_symext::float_to_java_string(const ieee_floatt f)
+{
+  INVARIANT(
+    f.spec == ieee_float_spect::single_precision(),
+    "floats in float to string conversion are single precision, as doubles "
+    "are converted to floats by the models");
+
+  if(f.is_NaN())
+  {
+    return "NaN";
+  }
+  else if(f.is_zero())
+  {
+    return f.get_sign() ? "-0.0" : "0.0";
+  }
+  else if(f.is_infinity())
+  {
+    return f.get_sign() ? "-Infinity" : "Infinity";
+  }
+
+  float f_abs = fabsf(f.to_float());
+
+  // remove trailing zeros, except a zero following the decimal point
+  // the input string should always contain a decimal point
+  const auto remove_trailing_zeros = [](std::string &s)
+  {
+    std::size_t i = s.find_last_not_of('0');
+    s = s.substr(0, s[i] == '.' ? i + 2 : i + 1);
+  };
+
+  if(f_abs > powf(10, -3) && f_abs < powf(10, 7))
+  {
+    const std::size_t min_precision = get_min_precision_decimal(f);
+    std::string s =
+      f.to_string_decimal(std::max((std::size_t)1, min_precision));
+
+    remove_trailing_zeros(s);
+
+    return s;
+  }
+  else
+  {
+    const std::size_t min_precision = get_min_precision_scientific(f);
+    std::string s =
+      f.to_string_scientific(std::max((std::size_t)1, min_precision));
+
+    std::string m;
+    std::string e;
+    split_string(s, 'e', m, e);
+
+    if(e[0] == '+')
+    {
+      e = e.substr(1);
+    }
+
+    remove_trailing_zeros(m);
+
+    return m + "E" + e;
+  }
+}
+
+bool goto_symext::constant_propagate_float_to_string(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  // The function application expression f_l1 takes the following arguments:
+  // - result string length (output parameter)
+  // - result string data array (output parameter)
+  // - float to convert to a string
+  PRECONDITION(f_l1.arguments().size() == 3);
+
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const exprt &float_arg = f_l1.arguments().at(2);
+  const auto &float_opt = try_evaluate_constant(state, float_arg);
+
+  if(!float_opt)
+  {
+    return false;
+  }
+
+  INVARIANT(
+    float_arg.id() == ID_symbol,
+    "the float argument is a symbol expression if try_evaluate_constant() "
+    "succeeded");
+
+  ieee_floatt ieee_float(float_opt->get());
+
+  const irep_idt float_mode =
+    ns.lookup(to_symbol_expr(to_ssa_expr(float_arg).get_original_expr())).mode;
+
+  const std::string s = float_mode == ID_java ? float_to_java_string(ieee_float)
+                                              : ieee_float.to_string_decimal();
+
+  const constant_exprt new_char_array_length =
+    from_integer(s.length(), length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+
+  exprt::operandst operands;
+
+  std::transform(
+    s.begin(),
+    s.end(),
+    std::back_inserter(operands),
+    [&char_type](const char c) { return from_integer(c, char_type); });
+
+  const array_exprt new_char_array(std::move(operands), new_char_array_type);
 
   assign_string_constant(
     state,

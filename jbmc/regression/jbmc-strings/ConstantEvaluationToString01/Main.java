@@ -78,4 +78,19 @@ public class Main {
     CProver.assume(radix == 2 || radix == 8 || radix == 10 || radix == 16);
     assert CProverString.toString(0L, radix).equals("0");
   }
+
+  public void testFloatToString() {
+    assert CProverString.toString(0F).equals("0.0");
+    assert CProverString.toString(1F).equals("1.0");
+    assert CProverString.toString(1.1F).equals("1.1");
+    assert CProverString.toString(Float.MAX_VALUE).equals("3.4028235E38");
+    assert CProverString.toString(Float.MIN_VALUE).equals("1.4E-45");
+    assert CProverString.toString(Float.POSITIVE_INFINITY).equals("Infinity");
+    assert CProverString.toString(Float.NEGATIVE_INFINITY).equals("-Infinity");
+    assert CProverString.toString(Float.NaN).equals("NaN");
+  }
+
+  public void testFloatToStringNoPropagation(float f) {
+    assert CProverString.toString(f).equals("0.0");
+  }
 }

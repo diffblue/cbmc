@@ -41,6 +41,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/apply_condition.cpp \
        goto-symex/expr_skeleton.cpp \
+       goto-symex/goto_symex.cpp \
        goto-symex/goto_symex_state.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
