@@ -46,11 +46,72 @@ void goto_statet::apply_condition(
 {
   if(condition.id() == ID_and)
   {
+    // A == B && C == D && E == F ...
+    // -->
+    // Apply each condition individually
     for(const auto &op : condition.operands())
       apply_condition(op, previous_state, ns);
   }
+  else if(condition.id() == ID_notequal &&
+          to_notequal_expr(condition).lhs().type() == bool_typet())
+  {
+    // A != (true|false)
+    // -->
+    // A == (false|true)
+    exprt lhs = to_notequal_expr(condition).lhs();
+    exprt rhs = to_notequal_expr(condition).rhs();
+    if(is_ssa_expr(rhs))
+      std::swap(lhs, rhs);
+
+    if(rhs.is_true())
+      apply_condition(equal_exprt(lhs, false_exprt()), previous_state, ns);
+    else if(rhs.is_false())
+      apply_condition(equal_exprt(lhs, true_exprt()), previous_state, ns);
+  }
+  else if(condition.id() == ID_not &&
+          to_not_expr(condition).op().id() == ID_notequal)
+  {
+    // !(A != B)
+    // -->
+    // A == B
+    const auto &notequal_expr = to_notequal_expr(to_not_expr(condition).op());
+    apply_condition(
+      equal_exprt(notequal_expr.lhs(), notequal_expr.rhs()),
+      previous_state,
+      ns);
+  }
+  else if(condition.id() == ID_not &&
+          to_not_expr(condition).op().id() == ID_equal)
+  {
+    // !(A == B)
+    // -->
+    // A != B
+    const auto &equal_expr = to_equal_expr(to_not_expr(condition).op());
+    apply_condition(
+      notequal_exprt(equal_expr.lhs(), equal_expr.rhs()),
+      previous_state,
+      ns);
+  }
+  else if(condition.id() == ID_not)
+  {
+    // !A
+    // -->
+    // A == false
+    apply_condition(
+      equal_exprt(to_not_expr(condition).op(), false_exprt()),
+      previous_state,
+      ns);
+  }
+  else if(condition.id() == ID_symbol && condition.type() == bool_typet())
+  {
+    // A
+    // -->
+    // A == true
+    apply_condition(equal_exprt(condition, true_exprt()), previous_state, ns);
+  }
   else if(condition.id() == ID_equal)
   {
+    // Base case: try to apply a single equality constraint
     exprt lhs = to_equal_expr(condition).lhs();
     exprt rhs = to_equal_expr(condition).rhs();
     if(is_ssa_expr(rhs))
