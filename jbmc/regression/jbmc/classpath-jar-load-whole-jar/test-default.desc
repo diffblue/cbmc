@@ -1,0 +1,16 @@
+CORE
+target/jar-file.jar
+--verbosity 10
+^EXIT=6$
+^SIGNAL=0$
+Getting class 'org\.cprover\.first\.RelevantClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.first\.RelatedClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.second\.RelatedClassOtherPkg' from JAR target\/jar-file.jar
+no entry point
+--
+Getting class 'org\.cprover\.first\.IrrelevantClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.second\.IrrelevantClassOtherPkg' from JAR target\/jar-file.jar
+--
+This test checks that without the --ignore-manifest-main-class method, we only
+load those classes that are referenced by the main class specified in the
+manifest file of a jar file.

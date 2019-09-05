@@ -1,0 +1,18 @@
+CORE
+target/jar-file.jar
+--verbosity 10 --ignore-manifest-main-class
+^EXIT=6$
+^SIGNAL=0$
+Getting class 'org\.cprover\.first\.RelevantClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.first\.RelatedClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.first\.IrrelevantClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.second\.RelatedClassOtherPkg' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.second\.IrrelevantClassOtherPkg' from JAR target\/jar-file.jar
+no entry point
+--
+--
+This test checks that when JBMC is given a JAR file whose manifest specifies a
+main class, we can ignore this main class and instead load all classes of the
+JAR file with the option --ignore-manifest-main-class.
+Without this option, IrrelevantClass and IrrelevantClassOtherPkg would not be
+loaded as they are not reachable from RelevantClass (the main class).

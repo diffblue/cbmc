@@ -1,0 +1,15 @@
+CORE
+target/jar-file.jar
+--verbosity 10 --ignore-manifest-main-class --function org.cprover.first.RelevantClass.entry
+^EXIT=10$
+^SIGNAL=0$
+Getting class 'org\.cprover\.first\.RelevantClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.first\.RelatedClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.second\.RelatedClassOtherPkg' from JAR target\/jar-file.jar
+--
+Getting class 'org\.cprover\.first\.IrrelevantClass' from JAR target\/jar-file.jar
+Getting class 'org\.cprover\.second\.IrrelevantClassOtherPkg' from JAR target\/jar-file.jar
+--
+This test checks that when both --ignore-manifest-main-class and --function are
+specified, we use the declaring class of the argument of --function as the main
+class from where to start loading other classes.
