@@ -121,6 +121,31 @@ enum lazy_methods_modet
   LAZY_METHODS_MODE_EXTERNAL_DRIVER
 };
 
+/// Map classes to the symbols they declare but is only computed once it is
+/// needed and the map is then kept.
+/// Note that it only includes function and field symbols (and not for example,
+/// local variables), these are produced in the convert-class phase.
+/// Calling `get` before the symbol table is properly filled with these symbols,
+/// would make later calls return an outdated map. The
+/// lazy_class_to_declared_symbols_mapt would then need to be reinitialized.
+/// Similarly if some transformation creates or deletes function or field
+/// symbols in the symbol table, then the map would get out of date and would
+/// need to be reinitialized.
+class lazy_class_to_declared_symbols_mapt
+{
+public:
+  lazy_class_to_declared_symbols_mapt() = default;
+
+  std::unordered_multimap<irep_idt, symbolt> &
+  get(const symbol_tablet &symbol_table);
+
+  void reinitialize();
+
+private:
+  bool initialized = false;
+  std::unordered_multimap<irep_idt, symbolt> map;
+};
+
 #define JAVA_CLASS_MODEL_SUFFIX "@class_model"
 
 class java_bytecode_languaget:public languaget
@@ -205,15 +230,20 @@ public:
 protected:
   void convert_single_method(
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table)
+    symbol_table_baset &symbol_table,
+    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
   {
     convert_single_method(
-      function_id, symbol_table, optionalt<ci_lazy_methods_neededt>());
+      function_id,
+      symbol_table,
+      optionalt<ci_lazy_methods_neededt>(),
+      class_to_declared_symbols);
   }
   bool convert_single_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
-    optionalt<ci_lazy_methods_neededt> needed_lazy_methods);
+    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
 
   bool do_ci_lazy_method_conversion(symbol_tablet &);
   const select_pointer_typet &get_pointer_type_selector() const;
@@ -236,10 +266,10 @@ protected:
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
   bool nondet_static;
-  /// Path to a JSON file which contains initial values of static fields (right
+  /// JSON which contains initial values of static fields (right
   /// after the static initializer of the class was run). This is read from the
-  /// --static-values command-line option.
-  std::string static_values_file;
+  /// file specified by the --static-values command-line option.
+  optionalt<json_objectt> static_values_json;
 
   // list of classes to force load even without reference from the entry point
   std::vector<irep_idt> java_load_classes;

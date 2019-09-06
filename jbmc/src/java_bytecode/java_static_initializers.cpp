@@ -767,65 +767,72 @@ code_ifthenelset get_clinit_wrapper_body(
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
+/// \return map associating classes to the symbols they declare
+std::unordered_multimap<irep_idt, symbolt>
+class_to_declared_symbols(const symbol_tablet &symbol_table)
+{
+  std::unordered_multimap<irep_idt, symbolt> result;
+  for(const auto &symbol_pair : symbol_table)
+  {
+    const symbolt &symbol = symbol_pair.second;
+    if(optionalt<irep_idt> declaring = declaring_class(symbol))
+      result.emplace(*declaring, symbol);
+  }
+  return result;
+}
+
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
-  const std::string &static_values_file,
+  const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   size_t max_user_array_length,
-  std::unordered_map<std::string, object_creation_referencet> &references)
+  std::unordered_map<std::string, object_creation_referencet> &references,
+  const std::unordered_multimap<irep_idt, symbolt>
+    &class_to_declared_symbols_map)
 {
-  jsont json;
-  if(
-    !static_values_file.empty() &&
-    !parse_json(static_values_file, message_handler, json) && json.is_object())
+  const irep_idt &real_clinit_name = clinit_function_name(class_id);
+  const auto class_entry =
+    static_values_json.find(id2string(strip_java_namespace_prefix(class_id)));
+  if(class_entry != static_values_json.end())
   {
-    const auto &json_object = to_json_object(json);
-    const auto class_entry =
-      json_object.find(id2string(strip_java_namespace_prefix(class_id)));
-    if(class_entry != json_object.end())
+    const auto &class_json_value = class_entry->second;
+    if(class_json_value.is_object())
     {
-      const auto &class_json_value = class_entry->second;
-      if(class_json_value.is_object())
+      const auto &class_json_object = to_json_object(class_json_value);
+      std::map<symbol_exprt, jsont> static_field_values;
+      for(const auto &class_symbol_pair :
+          equal_range(class_to_declared_symbols_map, class_id))
       {
-        const auto &class_json_object = to_json_object(class_json_value);
-        std::map<symbol_exprt, jsont> static_field_values;
-        for(const auto &symbol_pair : symbol_table)
+        const symbolt &symbol = class_symbol_pair.second;
+        if(symbol.is_static_lifetime)
         {
-          const symbolt &symbol = symbol_pair.second;
-          if(
-            declaring_class(symbol) && *declaring_class(symbol) == class_id &&
-            symbol.is_static_lifetime)
+          const symbol_exprt &static_field_expr = symbol.symbol_expr();
+          const auto &static_field_entry =
+            class_json_object.find(id2string(symbol.base_name));
+          if(static_field_entry != class_json_object.end())
           {
-            const symbol_exprt &static_field_expr = symbol.symbol_expr();
-            const auto &static_field_entry =
-              class_json_object.find(id2string(symbol.base_name));
-            if(static_field_entry != class_json_object.end())
-            {
-              static_field_values.insert(
-                {static_field_expr, static_field_entry->second});
-            }
+            static_field_values.insert(
+              {static_field_expr, static_field_entry->second});
           }
         }
-        code_blockt body;
-        for(const auto &value_pair : static_field_values)
-        {
-          assign_from_json(
-            value_pair.first,
-            value_pair.second,
-            clinit_function_name(class_id),
-            body,
-            symbol_table,
-            needed_lazy_methods,
-            max_user_array_length,
-            references);
-        }
-        return body;
       }
+      code_blockt body;
+      for(const auto &value_pair : static_field_values)
+      {
+        assign_from_json(
+          value_pair.first,
+          value_pair.second,
+          real_clinit_name,
+          body,
+          symbol_table,
+          needed_lazy_methods,
+          max_user_array_length,
+          references);
+      }
+      return body;
     }
   }
-  const irep_idt &real_clinit_name = clinit_function_name(class_id);
   if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
     return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
   return code_blockt{};
@@ -996,21 +1003,21 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   // class. Note this is the same invocation used in
   // java_static_lifetime_init.
 
-  auto class_globals = stub_globals_by_class.equal_range(*class_id);
+  auto class_globals = equal_range(stub_globals_by_class, *class_id);
   INVARIANT(
-    class_globals.first != class_globals.second,
+    !class_globals.empty(),
     "class with synthetic clinit should have at least one global to init");
 
   java_object_factory_parameterst parameters = object_factory_parameters;
   parameters.function_id = function_id;
 
-  for(auto it = class_globals.first; it != class_globals.second; ++it)
+  for(const auto &pair : class_globals)
   {
     const symbol_exprt new_global_symbol =
-      symbol_table.lookup_ref(it->second).symbol_expr();
+      symbol_table.lookup_ref(pair.second).symbol_expr();
 
     parameters.min_null_tree_depth =
-      is_non_null_library_global(it->second)
+      is_non_null_library_global(pair.second)
         ? object_factory_parameters.min_null_tree_depth + 1
         : object_factory_parameters.min_null_tree_depth;
 

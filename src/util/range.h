@@ -533,4 +533,15 @@ auto make_range(containert &container) -> ranget<decltype(container.begin())>
     container.begin(), container.end());
 }
 
+/// Utility function to make equal_range method of multimap easier to use by
+/// returning a ranget object. For instance, we can write:
+/// `for(auto value : equal_range(map, key).filter(...).map(...)) {...}`.
+template <typename multimapt>
+ranget<typename multimapt::const_iterator>
+equal_range(const multimapt &multimap, const typename multimapt::key_type &key)
+{
+  auto iterator_pair = multimap.equal_range(key);
+  return make_range(iterator_pair.first, iterator_pair.second);
+}
+
 #endif // CPROVER_UTIL_RANGE_H

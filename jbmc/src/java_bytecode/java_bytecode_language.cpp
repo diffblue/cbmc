@@ -115,6 +115,23 @@ static prefix_filtert get_context(const optionst &options)
   return prefix_filtert(std::move(context_include), std::move(context_exclude));
 }
 
+std::unordered_multimap<irep_idt, symbolt> &
+lazy_class_to_declared_symbols_mapt::get(const symbol_tablet &symbol_table)
+{
+  if(!initialized)
+  {
+    map = class_to_declared_symbols(symbol_table);
+    initialized = true;
+  }
+  return map;
+}
+
+void lazy_class_to_declared_symbols_mapt::reinitialize()
+{
+  initialized = false;
+  map.clear();
+}
+
 /// Consume options that are java bytecode specific.
 void java_bytecode_languaget::set_language_options(const optionst &options)
 {
@@ -203,7 +220,26 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
     java_cp_include_files=".*";
 
   nondet_static = options.get_bool_option("nondet-static");
-  static_values_file = options.get_option("static-values");
+  if(options.is_set("static-values"))
+  {
+    const std::string filename = options.get_option("static-values");
+    jsont tmp_json;
+    if(parse_json(filename, *message_handler, tmp_json))
+    {
+      warning() << "Provided JSON file for static-values cannot be parsed; it"
+                << " will be ignored." << messaget::eom;
+    }
+    else
+    {
+      if(!tmp_json.is_object())
+      {
+        warning() << "Provided JSON file for static-values is not a JSON "
+                  << "object; it will be ignored." << messaget::eom;
+      }
+      else
+        static_values_json = std::move(to_json_object(tmp_json));
+    }
+  }
 
   ignore_manifest_main_class =
     options.get_bool_option("ignore-manifest-main-class");
@@ -853,7 +889,9 @@ bool java_bytecode_languaget::typecheck(
     symbol_table,
     synthetic_methods,
     threading_support,
-    !static_values_file.empty());
+    static_values_json.has_value());
+
+  lazy_class_to_declared_symbols_mapt class_to_declared_symbols;
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
@@ -876,18 +914,21 @@ bool java_bytecode_languaget::typecheck(
     for(const auto &function_id_and_type : synthetic_methods)
     {
       convert_single_method(
-        function_id_and_type.first, journalling_symbol_table);
+        function_id_and_type.first,
+        journalling_symbol_table,
+        class_to_declared_symbols);
     }
     // Convert all methods for which we have bytecode now
     for(const auto &method_sig : method_bytecode)
     {
-      convert_single_method(method_sig.first, journalling_symbol_table);
+      convert_single_method(
+        method_sig.first, journalling_symbol_table, class_to_declared_symbols);
     }
     // Now convert all newly added string methods
     for(const auto &fn_name : journalling_symbol_table.get_inserted())
     {
       if(string_preprocess.implements_function(fn_name))
-        convert_single_method(fn_name, symbol_table);
+        convert_single_method(fn_name, symbol_table, class_to_declared_symbols);
     }
   }
   break;
@@ -982,12 +1023,17 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(symbol_table);
 
+  lazy_class_to_declared_symbols_mapt class_to_declared_symbols;
+
   const method_convertert method_converter =
-    [this, &symbol_table_builder](
+    [this, &symbol_table_builder, &class_to_declared_symbols](
       const irep_idt &function_id,
       ci_lazy_methods_neededt lazy_methods_needed) {
       return convert_single_method(
-        function_id, symbol_table_builder, std::move(lazy_methods_needed));
+        function_id,
+        symbol_table_builder,
+        std::move(lazy_methods_needed),
+        class_to_declared_symbols);
     };
 
   ci_lazy_methodst method_gather(
@@ -1050,7 +1096,8 @@ void java_bytecode_languaget::convert_lazy_method(
   journalling_symbol_tablet symbol_table=
     journalling_symbol_tablet::wrap(symtab);
 
-  convert_single_method(function_id, symbol_table);
+  lazy_class_to_declared_symbols_mapt class_to_declared_symbols;
+  convert_single_method(function_id, symbol_table, class_to_declared_symbols);
 
   // Instrument runtime exceptions (unless symbol is a stub)
   if(symbol.value.is_not_nil())
@@ -1118,10 +1165,13 @@ static void notify_static_method_calls(
 /// \param symbol_table: global symbol table
 /// \param needed_lazy_methods: optionally a collection of needed methods to
 ///   update with any methods touched during the conversion
+/// \param class_to_declared_symbols: maps classes to the symbols that
+///   they declare.
 bool java_bytecode_languaget::convert_single_method(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods)
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
 {
   // Do not convert if method is not in context
   if(method_in_context && !(*method_in_context)(id2string(function_id)))
@@ -1177,7 +1227,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
-          !static_values_file.empty(),
+          static_values_json.has_value(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
@@ -1186,7 +1236,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
-          !static_values_file.empty(),
+          static_values_json.has_value(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
@@ -1197,14 +1247,16 @@ bool java_bytecode_languaget::convert_single_method(
         declaring_class(symbol_table.lookup_ref(function_id));
       INVARIANT(
         class_name, "user_specified_clinit must be declared by a class.");
+      INVARIANT(
+        static_values_json.has_value(), "static-values JSON must be available");
       writable_symbol.value = get_user_specified_clinit_body(
         *class_name,
-        static_values_file,
+        *static_values_json,
         symbol_table,
-        get_message_handler(),
         needed_lazy_methods,
         max_user_array_length,
-        references);
+        references,
+        class_to_declared_symbols.get(symbol_table));
       break;
     }
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:

@@ -52,6 +52,10 @@ code_ifthenelset get_clinit_wrapper_body(
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler);
 
+/// \return map associating classes to the symbols they declare
+std::unordered_multimap<irep_idt, symbolt>
+class_to_declared_symbols(const symbol_tablet &symbol_table);
+
 /// Create the body of a user_specified_clinit function for a given class, which
 /// includes assignments for all static fields of the class to values read from
 /// an input file. If the file could not be parsed or an entry for this class
@@ -62,27 +66,28 @@ code_ifthenelset get_clinit_wrapper_body(
 /// assigned default values (zero or null).
 /// \param class_id: the id of the class to create a user_specified_clinit
 ///   function body for.
-/// \param static_values_file: input file containing values of static fields.
+/// \param static_values_json: JSON object containing values of static fields.
 ///   The format is expected to be a map whose keys are class names, and whose
-///   values are maps from static field names to values. Currently only JSON
-///   is supported as a file format.
+///   values are maps from static field names to values.
 /// \param symbol_table: used to look up and create new symbols
-/// \param message_handler: used to log any errors with parsing the input file
 /// \param needed_lazy_methods: used to mark any runtime types given in the
 ///   input file as needed
 /// \param max_user_array_length: maximum value for constant or variable length
 ///   arrays. Any arrays that were specified to be of nondeterministic length in
 ///   the input file will be limited by this value.
 /// \param references: map to keep track of reference-equal objets.
+/// \param class_to_declared_symbols_map: map classes to the symbols that
+///   they declare.
 /// \return the body of the user_specified_clinit function as a code block.
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
-  const std::string &static_values_file,
+  const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   size_t max_user_array_length,
-  std::unordered_map<std::string, object_creation_referencet> &references);
+  std::unordered_map<std::string, object_creation_referencet> &references,
+  const std::unordered_multimap<irep_idt, symbolt>
+    &class_to_declared_symbols_map);
 
 class stub_global_initializer_factoryt
 {
