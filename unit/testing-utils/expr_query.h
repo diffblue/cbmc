@@ -54,7 +54,7 @@ private:
   T value;
 };
 
-expr_queryt<exprt> make_query(exprt e)
+inline expr_queryt<exprt> make_query(exprt e)
 {
   return expr_queryt<exprt>(std::move(e));
 }
