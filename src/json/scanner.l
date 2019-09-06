@@ -1,5 +1,9 @@
 %{
 // Strictly follows http://www.json.org/
+//
+// The rule for char and its dependencies is based on
+//   https://gist.github.com/justjkk/436828
+// which is MIT-licensed (retrieved on 2019-09-03)
 %}
 
 %option 8bit nodefault
@@ -33,7 +37,11 @@
 
 string  \"\"|\"{chars}\"
 chars   {char}+
-char    [^\"]|\\\"
+unescapedchar [^"\\]
+escapedchar   \\["\\/bfnrt]
+hexdigit      [0-9a-fA-F]
+unicodechar   \\u{hexdigit}{hexdigit}{hexdigit}{hexdigit}
+char          {unescapedchar}|{escapedchar}|{unicodechar}
 
 number  {int}|{int}{frac}|{int}{exp}|{int}{frac}{exp}
 int     {digit}|{digit19}{digits}|-{digit}|-{digit19}{digits}

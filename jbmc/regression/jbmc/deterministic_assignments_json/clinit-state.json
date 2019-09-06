@@ -343,9 +343,13 @@
         "x":4
       }
     },
-    "specialCharField":{
+    "newLineCharField":{
       "@type":"java.lang.Character",
       "value":"\n"
+    },
+    "specialCharField":{
+      "@type":"java.lang.Character",
+      "value":"\\"
     },
     "hexCharField":{
       "@type":"java.lang.Character",
