@@ -108,6 +108,30 @@ SCENARIO("get_user_specified_clinit_body", "[core][java_static_initializers]")
       REQUIRE(clinit_body == code_blockt{});
     }
   }
+  GIVEN(
+    "A class which has an entry in the JSON object but no clinit defined "
+    "in the symbol table")
+  {
+    static_values_json["TestClass"] = [] {
+      json_objectt entry{};
+      entry["field_name"] = json_numbert{"42"};
+      return entry;
+    }();
+
+    const code_blockt clinit_body = get_user_specified_clinit_body(
+      "java::TestClass",
+      static_values_json,
+      symbol_table,
+      {},
+      max_user_array_length,
+      references,
+      class_to_declared_symbols);
+
+    THEN("User provided clinit body is empty")
+    {
+      REQUIRE(clinit_body == code_blockt{});
+    }
+  }
   GIVEN("A class which has a static number in the provided JSON")
   {
     static_values_json["TestClass"] = [] {

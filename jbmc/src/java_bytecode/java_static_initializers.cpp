@@ -792,50 +792,52 @@ code_blockt get_user_specified_clinit_body(
     &class_to_declared_symbols_map)
 {
   const irep_idt &real_clinit_name = clinit_function_name(class_id);
+  const auto clinit_func = symbol_table.lookup(real_clinit_name);
+  if(clinit_func == nullptr)
+  {
+    // Case where the real clinit doesn't appear in the symbol table, even
+    // though their is user specifed one. This may occur when some class
+    // substitution happened after compilation.
+    return code_blockt{};
+  }
   const auto class_entry =
     static_values_json.find(id2string(strip_java_namespace_prefix(class_id)));
-  if(class_entry != static_values_json.end())
+  if(class_entry != static_values_json.end() && class_entry->second.is_object())
   {
-    const auto &class_json_value = class_entry->second;
-    if(class_json_value.is_object())
+    const auto &class_json_object = to_json_object(class_entry->second);
+    std::map<symbol_exprt, jsont> static_field_values;
+    for(const auto &symbol_pair :
+        equal_range(class_to_declared_symbols_map, class_id))
     {
-      const auto &class_json_object = to_json_object(class_json_value);
-      std::map<symbol_exprt, jsont> static_field_values;
-      for(const auto &class_symbol_pair :
-          equal_range(class_to_declared_symbols_map, class_id))
+      const symbolt &symbol = symbol_pair.second;
+      if(symbol.is_static_lifetime)
       {
-        const symbolt &symbol = class_symbol_pair.second;
-        if(symbol.is_static_lifetime)
+        const symbol_exprt &static_field_expr = symbol.symbol_expr();
+        const auto &static_field_entry =
+          class_json_object.find(id2string(symbol.base_name));
+        if(static_field_entry != class_json_object.end())
         {
-          const symbol_exprt &static_field_expr = symbol.symbol_expr();
-          const auto &static_field_entry =
-            class_json_object.find(id2string(symbol.base_name));
-          if(static_field_entry != class_json_object.end())
-          {
-            static_field_values.insert(
-              {static_field_expr, static_field_entry->second});
-          }
+          static_field_values.insert(
+            {static_field_expr, static_field_entry->second});
         }
       }
-      code_blockt body;
-      for(const auto &value_pair : static_field_values)
-      {
-        assign_from_json(
-          value_pair.first,
-          value_pair.second,
-          real_clinit_name,
-          body,
-          symbol_table,
-          needed_lazy_methods,
-          max_user_array_length,
-          references);
-      }
-      return body;
     }
+    code_blockt body;
+    for(const auto &value_pair : static_field_values)
+    {
+      assign_from_json(
+        value_pair.first,
+        value_pair.second,
+        real_clinit_name,
+        body,
+        symbol_table,
+        needed_lazy_methods,
+        max_user_array_length,
+        references);
+    }
+    return body;
   }
-  if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
-    return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
-  return code_blockt{};
+  return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
 }
 
 /// Create static initializer wrappers and possibly user-specified functions for
