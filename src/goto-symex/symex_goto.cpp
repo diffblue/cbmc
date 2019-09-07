@@ -211,6 +211,8 @@ renamedt<exprt, L2> try_evaluate_pointer_comparisons(
 
 void goto_symext::symex_goto(statet &state)
 {
+  PRECONDITION(state.reachable);
+
   const goto_programt::instructiont &instruction=*state.source.pc;
 
   exprt new_guard = clean_expr(instruction.get_condition(), state, false);
@@ -413,6 +415,7 @@ void goto_symext::symex_goto(statet &state)
     symex_transition(state, state_pc, backward);
 
     state.guard = guardt(false_exprt(), guard_manager);
+    state.reachable = false;
   }
   else
   {
@@ -502,6 +505,79 @@ void goto_symext::symex_goto(statet &state)
   }
 }
 
+void goto_symext::symex_unreachable_goto(statet &state)
+{
+  PRECONDITION(!state.reachable);
+  // This is like symex_goto, except the state is unreachable. We try to take
+  // some arbitrary choice that maintains the state guard in a reasonable state
+  // in order that it simplifies properly when states are merged (in
+  // merge_gotos). Note we can't try to evaluate the actual GOTO guard because
+  // our constant propagator might be out of date, since we haven't been
+  // executing assign instructions.
+
+  // If the guard is already false then there's no value in this state; just
+  // carry on and check the next instruction.
+  if(state.guard.is_false())
+  {
+    symex_transition(state);
+    return;
+  }
+
+  const goto_programt::instructiont &instruction = *state.source.pc;
+  PRECONDITION(instruction.is_goto());
+  goto_programt::const_targett goto_target = instruction.get_target();
+
+  auto queue_unreachable_state_at_target = [&]() {
+    framet::goto_state_listt &goto_state_list =
+      state.call_stack().top().goto_state_map[goto_target];
+    goto_statet new_state(state.guard_manager);
+    new_state.guard = state.guard;
+    new_state.reachable = false;
+    goto_state_list.emplace_back(state.source, std::move(new_state));
+  };
+
+  if(instruction.get_condition().is_true())
+  {
+    if(instruction.is_backwards_goto())
+    {
+      // Give up trying to salvage the guard
+      // (this state's guard is squashed, without queueing it at the target)
+    }
+    else
+    {
+      // Take the branch:
+      queue_unreachable_state_at_target();
+    }
+
+    state.guard.add(false_exprt());
+  }
+  else
+  {
+    // Arbitrarily assume a conditional branch is not-taken, except for when
+    // there's an incoming backedge, when we guess that the taken case is less
+    // likely to lead to that backedge than the not-taken case.
+    bool maybe_loop_head = std::any_of(
+      instruction.incoming_edges.begin(),
+      instruction.incoming_edges.end(),
+      [&instruction](const goto_programt::const_targett predecessor) {
+        return predecessor->location_number > instruction.location_number;
+      });
+
+    if(instruction.is_backwards_goto() || !maybe_loop_head)
+    {
+      // Assume branch not taken (fall through)
+    }
+    else
+    {
+      // Assume branch taken:
+      queue_unreachable_state_at_target();
+      state.guard.add(false_exprt());
+    }
+  }
+
+  symex_transition(state);
+}
+
 void goto_symext::merge_gotos(statet &state)
 {
   framet &frame = state.call_stack().top();
@@ -536,11 +612,19 @@ void goto_symext::merge_goto(
       "atomic sections differ across branches",
       state.source.pc->source_location);
 
-  if(!goto_state.guard.is_false())
+  // adjust guard, even using guards from unreachable states. This helps to
+  // shrink the state guard if the incoming edge is from a path that was
+  // truncated by config.unwind, config.depth or an assume-false instruction.
+
+  auto new_guard = std::move(state.guard);
+  new_guard |= goto_state.guard;
+
+  if(goto_state.reachable)
   {
-    if(state.guard.is_false())
+    if(!state.reachable)
     {
       // Important to note that we're moving into our base class here.
+      // Note this overwrites state.guard, but we restore it below.
       static_cast<goto_statet &>(state) = std::move(goto_state);
     }
     else
@@ -551,13 +635,13 @@ void goto_symext::merge_goto(
       // merge value sets
       state.value_set.make_union(goto_state.value_set);
 
-      // adjust guard
-      state.guard |= goto_state.guard;
-
       // adjust depth
       state.depth = std::min(state.depth, goto_state.depth);
     }
   }
+
+  // Save the new state guard
+  state.guard = std::move(new_guard);
 }
 
 /// Helper function for \c phi_function which merges the names of an identifier
@@ -600,8 +684,8 @@ static void merge_names(
   // changed - but only on a branch that is now dead, and the other branch is
   // uninitialized/invalid
   if(
-    (dest_state.guard.is_false() && goto_count == 0) ||
-    (goto_state.guard.is_false() && dest_count == 0))
+    (!dest_state.reachable && goto_count == 0) ||
+    (!goto_state.reachable && dest_count == 0))
   {
     return;
   }
@@ -658,9 +742,9 @@ static void merge_names(
   //     initialized and therefore an invalid target.
 
   // These rules only apply to dynamic objects and locals.
-  if(dest_state.guard.is_false())
+  if(!dest_state.reachable)
     rhs = goto_state_rhs;
-  else if(goto_state.guard.is_false())
+  else if(!goto_state.reachable)
     rhs = dest_state_rhs;
   else if(goto_count == 0)
     rhs = dest_state_rhs;

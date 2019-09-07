@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_symext::symex_atomic_begin(statet &state)
 {
-  if(state.guard.is_false())
+  if(!state.reachable)
     return;
 
   if(state.atomic_section_id != 0)
@@ -35,7 +35,7 @@ void goto_symext::symex_atomic_begin(statet &state)
 
 void goto_symext::symex_atomic_end(statet &state)
 {
-  if(state.guard.is_false())
+  if(!state.reachable)
     return;
 
   if(state.atomic_section_id == 0)

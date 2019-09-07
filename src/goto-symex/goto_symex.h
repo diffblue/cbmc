@@ -332,6 +332,9 @@ protected:
   /// Symbolically execute a GOTO instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_goto(statet &state);
+  /// Symbolically execute a GOTO instruction in the context of unreachable code
+  /// \param state: Symbolic execution state for current instruction
+  void symex_unreachable_goto(statet &state);
   /// Symbolically execute a START_THREAD instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_start_thread(statet &state);

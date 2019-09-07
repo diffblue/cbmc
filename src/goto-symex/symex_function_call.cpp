@@ -260,9 +260,6 @@ void goto_symext::symex_function_call_code(
 
       // Rule out this path:
       symex_assume_l2(state, false_exprt());
-      // Disable processing instructions until we next encounter one reachable
-      // without passing this instruction:
-      state.guard.add(false_exprt());
     }
 
     symex_transition(state);
@@ -356,18 +353,15 @@ static void pop_frame(
     // accumulate assumptions (in symex_assume_l2) and must be left alone.
     // If however it is single-threaded then we should restore the guard, as the
     // guard coming out of the function may be more complex (e.g. if the callee
-    // was { if(x) __CPROVER_assume(false); } then the guard may still be `!x`),
+    // was { if(x) while(true) { } } then the guard may still be `!x`),
     // but at this point all control-flow paths have either converged or been
     // proven unviable, so we can stop specifying the callee's constraints when
     // we generate an assumption or VCC.
 
-    // If the guard is false, *this* path is unviable and we shouldn't discard
-    // that knowledge. If we're doing path exploration then we do
-    // tail-duplication, and we actually *are* in a more-restricted context
-    // than we were when the function began.
-    if(
-      state.threads.size() == 1 && !state.guard.is_false() &&
-      !doing_path_exploration)
+    // If we're doing path exploration then we do tail-duplication, and we
+    // actually *are* in a more-restricted context than we were when the
+    // function began.
+    if(state.threads.size() == 1 && !doing_path_exploration)
     {
       state.guard = frame.guard_at_function_start;
     }

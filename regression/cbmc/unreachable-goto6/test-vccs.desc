@@ -1,0 +1,13 @@
+CORE paths-lifo-expected-failure
+test.c
+--show-vcc
+^Generated 1 VCC\(s\), 1 remaining after simplification$
+^\{1\} false$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Note: disabled for paths-lifo mode, which never merges state guards
+This checks that an assume(false) prior to a branch correctly results
+in symex picking some arbitrary path through the unreachable CFG, and so
+it returns the state guard to true when control flow converges.

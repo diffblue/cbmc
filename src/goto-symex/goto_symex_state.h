@@ -277,6 +277,7 @@ inline goto_statet::goto_statet(const class goto_symex_statet &s)
     level2(s.level2),
     value_set(s.value_set),
     guard(s.guard),
+    reachable(s.reachable),
     propagation(s.propagation),
     atomic_section_id(s.atomic_section_id)
 {

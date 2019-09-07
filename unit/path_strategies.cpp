@@ -202,10 +202,9 @@ SCENARIO("path strategies")
         symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
         symex_eventt::result(symex_eventt::enumt::FAILURE),
 
-        // The path where we enter the loop body twice. Successful because
-        // infeasible.
+        // The path where we enter the loop body twice. No result because
+        // this path hits an unwind bound.
         symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
-        symex_eventt::result(symex_eventt::enumt::SUCCESS),
 
         // Overall we fail.
         symex_eventt::result(symex_eventt::enumt::FAILURE),
@@ -235,9 +234,8 @@ SCENARIO("path strategies")
         symex_eventt::result(symex_eventt::enumt::SUCCESS),
 
         // Pop line 7 that we saved from above, and execute the loop a second
-        // time. Successful, since this path is infeasible.
+        // time. No result, since this path exceeds an unwind bound
         symex_eventt::resume(symex_eventt::enumt::NEXT, 7),
-        symex_eventt::result(symex_eventt::enumt::SUCCESS),
 
         // Pop line 7 that we saved from above and bail out. That corresponds to
         // executing the loop once, decrementing x to 0; assert(x) should fail.

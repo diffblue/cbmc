@@ -160,6 +160,9 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(cond.is_true())
     return;
 
+  if(cond.is_false())
+    state.reachable = false;
+
   // we are willing to re-write some quantified expressions
   exprt rewritten_cond = cond;
   if(has_subexpr(rewritten_cond, ID_exists))
@@ -227,6 +230,8 @@ switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
   state.source.pc = state.threads[thread_nb].pc;
 
   state.guard = state.threads[thread_nb].guard;
+  // A thread's initial state is certainly reachable:
+  state.reachable = true;
 }
 
 void goto_symext::symex_threaded_step(
@@ -438,7 +443,7 @@ void goto_symext::print_symex_step(statet &state)
   // We also skip dead instructions as they don't add much to step-based
   // debugging and if there's no code block at this point.
   if(
-    !symex_config.show_symex_steps || state.guard.is_false() ||
+    !symex_config.show_symex_steps || !state.reachable ||
     state.source.pc->type == DEAD ||
     (state.source.pc->code.is_nil() && state.source.pc->type != END_FUNCTION))
   {
@@ -539,9 +544,6 @@ void goto_symext::execute_next_instruction(
   {
     // Rule out this path:
     symex_assume_l2(state, false_exprt());
-    // Disable processing instructions until we next encounter one reachable
-    // without passing this instruction:
-    state.guard.add(false_exprt());
   }
   state.depth++;
 
@@ -549,39 +551,39 @@ void goto_symext::execute_next_instruction(
   switch(instruction.type)
   {
   case SKIP:
-    if(!state.guard.is_false())
+    if(state.reachable)
       target.location(state.guard.as_expr(), state.source);
     symex_transition(state);
     break;
 
   case END_FUNCTION:
-    // do even if state.guard.is_false() to clear out frame created
+    // do even if !state.reachable to clear out frame created
     // in symex_start_thread
     symex_end_of_function(state);
     symex_transition(state);
     break;
 
   case LOCATION:
-    if(!state.guard.is_false())
+    if(state.reachable)
       target.location(state.guard.as_expr(), state.source);
     symex_transition(state);
     break;
 
   case GOTO:
-    if(!state.guard.is_false())
+    if(state.reachable)
       symex_goto(state);
     else
-      symex_transition(state);
+      symex_unreachable_goto(state);
     break;
 
   case ASSUME:
-    if(!state.guard.is_false())
+    if(state.reachable)
       symex_assume(state, instruction.get_condition());
     symex_transition(state);
     break;
 
   case ASSERT:
-    if(!state.guard.is_false())
+    if(state.reachable)
       symex_assert(instruction, state);
     symex_transition(state);
     break;
@@ -592,14 +594,14 @@ void goto_symext::execute_next_instruction(
     break;
 
   case ASSIGN:
-    if(!state.guard.is_false())
+    if(state.reachable)
       symex_assign(state, instruction.get_assign());
 
     symex_transition(state);
     break;
 
   case FUNCTION_CALL:
-    if(!state.guard.is_false())
+    if(state.reachable)
     {
       symex_function_call(
         get_goto_function, state, instruction.get_function_call());
@@ -609,13 +611,13 @@ void goto_symext::execute_next_instruction(
     break;
 
   case OTHER:
-    if(!state.guard.is_false())
+    if(state.reachable)
       symex_other(state);
     symex_transition(state);
     break;
 
   case DECL:
-    if(!state.guard.is_false())
+    if(state.reachable)
       symex_decl(state);
     symex_transition(state);
     break;
@@ -632,8 +634,8 @@ void goto_symext::execute_next_instruction(
 
   case END_THREAD:
     // behaves like assume(0);
-    if(!state.guard.is_false())
-      state.guard.add(false_exprt());
+    if(state.reachable)
+      state.reachable = false;
     symex_transition(state);
     break;
 

@@ -1,0 +1,13 @@
+CORE paths-lifo-expected-failure
+test.c
+--show-vcc
+^Generated 1 VCC\(s\), 1 remaining after simplification$
+^\{1\} goto_symex::\\guard#1$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Note: disabled for paths-lifo mode, which never merges state guards
+This checks that the guard from a loop containing an assume(false), and with
+an unconditional backedge, is discarded as expected, resulting in a non-trivial
+guard at the assertion.

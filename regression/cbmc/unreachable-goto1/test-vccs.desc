@@ -1,0 +1,12 @@
+CORE paths-lifo-expected-failure
+test.c
+--show-vcc
+^Generated 1 VCC\(s\), 1 remaining after simplification$
+^\{1\} false$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Note: disabled for paths-lifo mode, which never merges state guards
+This checks that despite being unreachable due to an assume(false), the state guard
+is returned to TRUE by the time the assertion is executed.

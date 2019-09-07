@@ -1,0 +1,10 @@
+CORE
+test.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This tests that a __CPROVER_assume(0) prompts symex to assume that a conditional
+backward branch is not taken.
