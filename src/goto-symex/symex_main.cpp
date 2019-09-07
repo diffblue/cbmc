@@ -379,6 +379,11 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(start_function->body);
 
+  auto emplace_sese_regions_result =
+    path_storage.sese_region_analysis.emplace(entry_point_id, sese_region_analysist{});
+  if(emplace_sese_regions_result.second)
+    emplace_sese_regions_result.first->second(start_function->body);
+
   path_storage.dirty.populate_dirty_for_function(
     entry_point_id, *start_function);
   state->dirty = &path_storage.dirty;
@@ -533,6 +538,38 @@ void goto_symext::execute_next_instruction(
 
   if(!symex_config.doing_path_exploration)
     merge_gotos(state);
+
+  auto &top_frame = state.call_stack().top();
+
+  if(!state.guard.is_false() && !top_frame.function_identifier.empty())
+  {
+    // If another instruction saved a state guard for us to use, retrieve it:
+
+    auto saved_guard_it = top_frame.instruction_guards.find(state.source.pc);
+    if(saved_guard_it != top_frame.instruction_guards.end())
+    {
+      if(log.get_message_handler().get_verbosity() >= messaget::M_DEBUG)
+      {
+        log.debug() << "Restored guard from " << format(state.guard.as_expr()) << " to " <<
+          format(saved_guard_it->second.as_expr()) << messaget::eom;
+      }
+
+      state.guard = std::move(saved_guard_it->second);
+      top_frame.instruction_guards.erase(saved_guard_it);
+    }
+
+    // If this instruction is the start of a single-entry, single-exit region,
+    // save the guard for use by the exit node:
+    
+    const auto &sese_regions = path_storage.sese_region_analysis.at(top_frame.function_identifier);
+    if(auto region_exit = sese_regions.get_region_exit(state.source.pc))
+    {
+      // Would just use `operator[]` here, but `guardt` can't be no-arg constructed.
+      auto emplace_result = top_frame.instruction_guards.emplace(*region_exit, state.guard);
+      if(!emplace_result.second)
+        emplace_result.first->second = state.guard;
+    }
+  }
 
   // depth exceeded?
   if(symex_config.max_depth != 0 && state.depth > symex_config.max_depth)

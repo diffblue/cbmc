@@ -48,6 +48,9 @@ struct framet
 
   std::unordered_map<irep_idt, loop_infot> loop_iterations;
 
+  std::unordered_map<goto_programt::const_targett, guardt, const_target_hash>
+    instruction_guards;
+
   framet(symex_targett::sourcet _calling_location, const guardt &state_guard)
     : calling_location(std::move(_calling_location)),
       guard_at_function_start(state_guard)
