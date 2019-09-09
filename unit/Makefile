@@ -74,6 +74,7 @@ SRC += analyses/ai/ai.cpp \
        util/irep_sharing.cpp \
        util/json_array.cpp \
        util/json_object.cpp \
+       util/lazy.cpp \
        util/memory_info.cpp \
        util/message.cpp \
        util/optional.cpp \
