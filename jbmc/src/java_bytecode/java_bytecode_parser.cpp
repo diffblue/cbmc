@@ -89,14 +89,13 @@ private:
 
   void rClassFile();
   void rconstant_pool();
-  void rinterfaces(classt &parsed_class);
-  void rfields(classt &parsed_class);
-  void rmethods(classt &parsed_class);
-  void rmethod(classt &parsed_class);
-  void
-  rinner_classes_attribute(classt &parsed_class, const u4 &attribute_length);
+  void rinterfaces();
+  void rfields();
+  void rmethods();
+  void rmethod();
+  void rinner_classes_attribute(const u4 &attribute_length);
   std::vector<irep_idt> rexceptions_attribute();
-  void rclass_attribute(classt &parsed_class);
+  void rclass_attribute();
   void rRuntimeAnnotation_attribute(std::vector<annotationt> &);
   void rRuntimeAnnotation(annotationt &);
   void relement_value_pairs(annotationt::element_value_pairst &);
@@ -113,7 +112,7 @@ private:
   void parse_local_variable_type_table(methodt &method);
   optionalt<lambda_method_handlet>
   parse_method_handle(const class method_handle_infot &entry);
-  void read_bootstrapmethods_entry(classt &);
+  void read_bootstrapmethods_entry();
 
   void skip_bytes(std::size_t bytes)
   {
@@ -149,9 +148,8 @@ private:
   }
 
   void store_unknown_method_handle(
-    classt &parsed_class,
     size_t bootstrap_method_index,
-    std::vector<u2> u2_values) const;
+    std::vector<u2> u2_values);
 };
 
 #define CONSTANT_Class                7
@@ -470,9 +468,9 @@ void java_bytecode_parsert::rClassFile()
   if(super_class!=0)
     parsed_class.super_class = constant(super_class).type().get(ID_C_base_name);
 
-  rinterfaces(parsed_class);
-  rfields(parsed_class);
-  rmethods(parsed_class);
+  rinterfaces();
+  rfields();
+  rmethods();
 
   // count elements of enum
   if(parsed_class.is_enum)
@@ -483,7 +481,7 @@ void java_bytecode_parsert::rClassFile()
   const u2 attributes_count = read<u2>();
 
   for(std::size_t j=0; j<attributes_count; j++)
-    rclass_attribute(parsed_class);
+    rclass_attribute();
 
   get_class_refs();
 
@@ -837,22 +835,22 @@ void java_bytecode_parsert::rconstant_pool()
     });
 }
 
-void java_bytecode_parsert::rinterfaces(classt &parsed_class)
+void java_bytecode_parsert::rinterfaces()
 {
   const u2 interfaces_count = read<u2>();
 
   for(std::size_t i=0; i<interfaces_count; i++)
-    parsed_class.implements.push_back(
+    parse_tree.parsed_class.implements.push_back(
       constant(read<u2>()).type().get(ID_C_base_name));
 }
 
-void java_bytecode_parsert::rfields(classt &parsed_class)
+void java_bytecode_parsert::rfields()
 {
   const u2 fields_count = read<u2>();
 
   for(std::size_t i=0; i<fields_count; i++)
   {
-    fieldt &field=parsed_class.add_field();
+    fieldt &field = parse_tree.parsed_class.add_field();
 
     const u2 access_flags = read<u2>();
     const u2 name_index = read<u2>();
@@ -1595,9 +1593,9 @@ exprt java_bytecode_parsert::get_relement_value()
 /// information for the parsed class is overwritten, and the parsed class is
 /// marked as an inner class.
 void java_bytecode_parsert::rinner_classes_attribute(
-  classt &parsed_class,
   const u4 &attribute_length)
 {
+  classt &parsed_class = parse_tree.parsed_class;
   std::string name = parsed_class.name.c_str();
   const u2 number_of_classes = read<u2>();
   const u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
@@ -1685,8 +1683,10 @@ std::vector<irep_idt> java_bytecode_parsert::rexceptions_attribute()
   return exceptions;
 }
 
-void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
+void java_bytecode_parsert::rclass_attribute()
 {
+  classt &parsed_class = parse_tree.parsed_class;
+
   const u2 attribute_name_index = read<u2>();
   const u4 attribute_length = read<u4>();
 
@@ -1743,23 +1743,22 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
 
     // mark as read in parsed class
     parsed_class.attribute_bootstrapmethods_read = true;
-    read_bootstrapmethods_entry(parsed_class);
+    read_bootstrapmethods_entry();
   }
   else if(attribute_name == "InnerClasses")
   {
-    java_bytecode_parsert::rinner_classes_attribute(
-      parsed_class, attribute_length);
+    java_bytecode_parsert::rinner_classes_attribute(attribute_length);
   }
   else
     skip_bytes(attribute_length);
 }
 
-void java_bytecode_parsert::rmethods(classt &parsed_class)
+void java_bytecode_parsert::rmethods()
 {
   const u2 methods_count = read<u2>();
 
   for(std::size_t j=0; j<methods_count; j++)
-    rmethod(parsed_class);
+    rmethod();
 }
 
 #define ACC_PUBLIC 0x0001u
@@ -1777,9 +1776,9 @@ void java_bytecode_parsert::rmethods(classt &parsed_class)
 #define ACC_ANNOTATION 0x2000u
 #define ACC_ENUM 0x4000u
 
-void java_bytecode_parsert::rmethod(classt &parsed_class)
+void java_bytecode_parsert::rmethod()
 {
-  methodt &method=parsed_class.add_method();
+  methodt &method = parse_tree.parsed_class.add_method();
 
   const u2 access_flags = read<u2>();
   const u2 name_index = read<u2>();
@@ -1935,9 +1934,7 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 }
 
 /// Read all entries of the `BootstrapMethods` attribute of a class file.
-/// \param parsed_class: the class representation of the class file that is
-///   currently parsed
-void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
+void java_bytecode_parsert::read_bootstrapmethods_entry()
 {
   const u2 num_bootstrap_methods = read<u2>();
   for(size_t bootstrap_method_index = 0;
@@ -1990,8 +1987,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     // understand
     if(num_bootstrap_arguments < 3)
     {
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       debug()
         << "format of BootstrapMethods entry not recognized: too few arguments"
         << eom;
@@ -2018,8 +2014,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       debug() << "format of BootstrapMethods entry not recognized: extra "
                  "arguments of wrong type"
               << eom;
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -2036,8 +2031,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       debug() << "format of BootstrapMethods entry not recognized: arguments "
                  "wrong type"
               << eom;
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -2050,8 +2044,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       debug() << "format of BootstrapMethods entry not recognized: method "
                  "handle not recognised"
               << eom;
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -2065,26 +2058,25 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     lambda_method_handle->u2_values = std::move(u2_values);
     debug() << "lambda function reference "
             << id2string(lambda_method_handle->lambda_method_name)
-            << " in class \"" << parsed_class.name << "\""
+            << " in class \"" << parse_tree.parsed_class.name << "\""
             << "\n  interface type is "
             << id2string(pool_entry(interface_type_argument.ref1).s)
             << "\n  method type is "
             << id2string(pool_entry(method_type_argument.ref1).s) << eom;
-    parsed_class.add_method_handle(
+    parse_tree.parsed_class.add_method_handle(
       bootstrap_method_index, *lambda_method_handle);
   }
 }
 
 /// Creates an unknown method handle and puts it into the parsed_class
-/// \param parsed_class: The class whose bootstrap method handles we are using
 /// \param bootstrap_method_index: The current index in the bootstrap entry
 ///   table
 /// \param u2_values: The indices of the arguments for the call
 void java_bytecode_parsert::store_unknown_method_handle(
-  java_bytecode_parsert::classt &parsed_class,
   size_t bootstrap_method_index,
-  std::vector<u2> u2_values) const
+  std::vector<u2> u2_values)
 {
   const lambda_method_handlet lambda_method_handle(std::move(u2_values));
-  parsed_class.add_method_handle(bootstrap_method_index, lambda_method_handle);
+  parse_tree.parsed_class.add_method_handle(
+    bootstrap_method_index, lambda_method_handle);
 }
