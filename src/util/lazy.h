@@ -43,4 +43,12 @@ private:
   }
 };
 
+/// Delay the computation of \p fun to the next time the \c force method
+/// is called.
+template <typename funt>
+auto lazy(funt fun) -> lazyt<decltype(fun())>
+{
+  return lazyt<decltype(fun())>::from_fun(std::move(fun));
+}
+
 #endif // CPROVER_UTIL_LAZY_H
