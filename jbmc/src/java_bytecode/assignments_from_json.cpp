@@ -437,6 +437,25 @@ static void allocate_array(
   info.block.add(assign);
 }
 
+/// Declare a non-deterministic length expression
+/// \param[out] allocate: allocation functor
+/// \param[out] code: code block to which code will get appended
+/// \param loc: location for the created code
+/// \return the length expression that has been non-deterministically created
+static symbol_exprt nondet_length(
+  allocate_objectst &allocate,
+  code_blockt &code,
+  source_locationt loc)
+{
+  const symbol_exprt length_expr = allocate.allocate_automatic_local_object(
+    java_int_type(), "user_specified_array_length");
+  code.add(code_assignt{
+    length_expr, side_effect_expr_nondett{java_int_type(), std::move(loc)}});
+  code.add(code_assumet{binary_predicate_exprt{
+    length_expr, ID_ge, from_integer(0, java_int_type())}});
+  return length_expr;
+}
+
 /// One of the cases in the recursive algorithm: the case where \p expr
 /// represents an array.
 /// The length of the array is given by a symbol: \p given_length_expr if it is
@@ -464,19 +483,14 @@ static void assign_array_from_json(
   const auto &element_type =
     java_array_element_type(to_struct_tag_type(expr.type().subtype()));
 
-  exprt length_expr;
-  if(given_length_expr)
-    length_expr = *given_length_expr;
-  else
-  {
-    length_expr = info.allocate_objects.allocate_automatic_local_object(
-      java_int_type(), "user_specified_array_length");
-    info.block.add(code_assignt{
-      length_expr, side_effect_expr_nondett{java_int_type(), info.loc}});
-    info.block.add(code_assumet{binary_predicate_exprt{
-      length_expr, ID_ge, from_integer(0, java_int_type())}});
-    allocate_array(expr, length_expr, info);
-  }
+  const exprt length_expr = [&] {
+    if(given_length_expr)
+      return *given_length_expr;
+    const symbol_exprt length =
+      nondet_length(info.allocate_objects, info.block, info.loc);
+    allocate_array(expr, length, info);
+    return length;
+  }();
   const json_arrayt json_array = get_untyped_array(json, element_type);
   const auto number_of_elements =
     from_integer(json_array.size(), java_int_type());
