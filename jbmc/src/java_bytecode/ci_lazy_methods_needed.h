@@ -57,6 +57,7 @@ private:
   const select_pointer_typet &pointer_type_selector;
 
   void add_clinit_call(const irep_idt &class_id);
+  void add_cprover_nondet_initialize_if_it_exists(const irep_idt &class_id);
 
   void initialize_instantiated_classes_from_pointer(
     const pointer_typet &pointer_type,

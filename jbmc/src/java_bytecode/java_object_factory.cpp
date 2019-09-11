@@ -897,17 +897,25 @@ void java_object_factoryt::gen_nondet_struct_init(
     }
   }
 
-  // If <class_identifier>.cproverNondetInitialize() can be found in the
-  // symbol table, we add a call:
+  // If cproverNondetInitialize() can be found in the symbol table as a method
+  // on this class or any parent, we add a call:
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // expr.cproverNondetInitialize();
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  const irep_idt init_method_name =
-    "java::" + id2string(struct_tag) + ".cproverNondetInitialize:()V";
-  if(const auto init_func = symbol_table.lookup(init_method_name))
+  resolve_inherited_componentt resolve_inherited_component{symbol_table};
+  optionalt<resolve_inherited_componentt::inherited_componentt>
+    cprover_nondet_initialize = resolve_inherited_component(
+      "java::" + id2string(struct_tag), "cproverNondetInitialize:()V", true);
+
+  if(cprover_nondet_initialize)
+  {
+    const symbolt &cprover_nondet_initialize_symbol =
+      ns.lookup(cprover_nondet_initialize->get_full_component_identifier());
     assignments.add(
-      code_function_callt{init_func->symbol_expr(), {address_of_exprt{expr}}});
+      code_function_callt{cprover_nondet_initialize_symbol.symbol_expr(),
+                          {address_of_exprt{expr}}});
+  }
 }
 
 /// Generate code block that verifies that an expression of type float or
