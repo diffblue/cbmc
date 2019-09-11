@@ -1,0 +1,12 @@
+CORE
+Test.class
+--function Test.alsoImplementsInterface --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Check that if J extends A and implements the interface I,
+J.cproverNondetInitialize doesn't exist and A.cproverNondetInitialize does then
+a nondet J gets the constraints specified in A.cproverNondetInitialize.
