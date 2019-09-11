@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
   "(disable-uncaught-exception-check)" \
   "(throw-assertion-error)" \
+  "(assert-no-exceptions-thrown)" \
   "(java-assume-inputs-non-null)" \
   "(java-assume-inputs-interval):" \
   "(java-assume-inputs-integral)" \
@@ -57,6 +58,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              assert statements instead of failing\n" \
   "                              at the location of the assert statement\n" \
   " --throw-runtime-exceptions   make implicit runtime exceptions explicit\n" \
+  " --assert-no-exceptions-thrown\n"\
+  "                              transform `throw` instructions into `assert FALSE`\n"/* NOLINT(*) */ \
+  "                              followed by `assume FALSE`.\n" \
   " --max-nondet-array-length N  limit nondet (e.g. input) array size to <= N\n" /* NOLINT(*) */ \
   " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */ \
   "                              at level N references are set to null\n" /* NOLINT(*) */ \
@@ -165,6 +169,10 @@ struct java_bytecode_language_optionst
   bool threading_support = false;
   bool nondet_static = false;
   bool ignore_manifest_main_class = false;
+
+  /// Transform `athrow` bytecode instructions into `assert FALSE` followed
+  /// by `assume FALSE`.
+  bool assert_no_exceptions_thrown = false;
 
   /// max size for user code created arrays
   size_t max_user_array_length = 0;

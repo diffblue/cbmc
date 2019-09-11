@@ -2349,9 +2349,10 @@ void java_bytecode_convert_methodt::convert_athrow(
   exprt::operandst &results) const
 {
   if(
-    !throw_assertion_error &&
-    uncaught_exceptions_domaint::get_exception_type(op[0].type()) ==
-      "java::java.lang.AssertionError")
+    assert_no_exceptions_thrown ||
+    ((uncaught_exceptions_domaint::get_exception_type(op[0].type()) ==
+      "java::java.lang.AssertionError") &&
+     !throw_assertion_error))
   {
     // we translate athrow into
     // ASSERT false;
@@ -3190,7 +3191,8 @@ void java_bytecode_convert_method(
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy,
   bool threading_support,
-  const optionalt<prefix_filtert> &method_context)
+  const optionalt<prefix_filtert> &method_context,
+  bool assert_no_exceptions_thrown)
 
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
@@ -3201,7 +3203,8 @@ void java_bytecode_convert_method(
     needed_lazy_methods,
     string_preprocess,
     class_hierarchy,
-    threading_support);
+    threading_support,
+    assert_no_exceptions_thrown);
 
   java_bytecode_convert_method(class_symbol, method, method_context);
 }

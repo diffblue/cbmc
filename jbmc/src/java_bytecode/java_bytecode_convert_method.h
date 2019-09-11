@@ -39,7 +39,8 @@ void java_bytecode_convert_method(
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy,
   bool threading_support,
-  const optionalt<prefix_filtert> &method_context);
+  const optionalt<prefix_filtert> &method_context,
+  bool assert_no_exceptions_thrown);
 
 void create_method_stub_symbol(
   const irep_idt &identifier,

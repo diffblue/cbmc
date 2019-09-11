@@ -59,6 +59,8 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
     "uncaught-exception-check", !cmd.isset("disable-uncaught-exception-check"));
   options.set_option(
     "throw-assertion-error", cmd.isset("throw-assertion-error"));
+  options.set_option(
+    "assert-no-exceptions-thrown", cmd.isset("assert-no-exceptions-thrown"));
   options.set_option("java-threading", cmd.isset("java-threading"));
 
   if(cmd.isset("java-max-vla-length"))
@@ -144,6 +146,8 @@ java_bytecode_language_optionst::java_bytecode_language_optionst(
   assert_uncaught_exceptions =
     options.get_bool_option("uncaught-exception-check");
   throw_assertion_error = options.get_bool_option("throw-assertion-error");
+  assert_no_exceptions_thrown =
+    options.get_bool_option("assert-no-exceptions-thrown");
   threading_support = options.get_bool_option("java-threading");
   max_user_array_length =
     options.get_unsigned_int_option("java-max-vla-length");
@@ -1321,7 +1325,8 @@ bool java_bytecode_languaget::convert_single_method(
       string_preprocess,
       class_hierarchy,
       language_options->threading_support,
-      language_options->method_context);
+      language_options->method_context,
+      language_options->assert_no_exceptions_thrown);
     INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
     return false;
   }
@@ -1355,7 +1360,7 @@ bool java_bytecode_languaget::convert_single_method(
 
 bool java_bytecode_languaget::final(symbol_table_baset &)
 {
-  PRECONDITION(language_options_initialized);
+  PRECONDITION(language_options.has_value());
   return false;
 }
 
