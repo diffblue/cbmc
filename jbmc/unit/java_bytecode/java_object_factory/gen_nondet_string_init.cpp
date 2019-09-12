@@ -30,9 +30,12 @@ SCENARIO(
     register_language(new_java_bytecode_language);
 
     // Add java.lang.Object to symbol table
+    java_class_typet jlo_class_type;
+    jlo_class_type.set_tag("java.lang.Object");
+    jlo_class_type.set_name("java::java.lang.Object");
     symbolt jlo_sym;
     jlo_sym.name = "java::java.lang.Object";
-    jlo_sym.type = struct_typet();
+    jlo_sym.type = jlo_class_type;
     jlo_sym.is_type = true;
     java_root_class(jlo_sym);
     bool failed = symbol_table.add(jlo_sym);
