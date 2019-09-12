@@ -142,8 +142,8 @@ private:
         error() << "unexpected end of bytecode file" << eom;
         throw 0;
       }
-      result <<= 8;
-      result |= in->get();
+      result <<= 8u;
+      result |= static_cast<u1>(in->get());
     }
     return narrow_cast<T>(result);
   }
@@ -185,7 +185,7 @@ public:
   using pool_entryt = java_bytecode_parsert::pool_entryt;
   using pool_entry_lookupt = std::function<pool_entryt &(u2)>;
 
-  explicit structured_pool_entryt(pool_entryt entry) : tag(entry.tag)
+  explicit structured_pool_entryt(const pool_entryt &entry) : tag(entry.tag)
   {
   }
 
@@ -217,7 +217,7 @@ public:
     name_index = entry.ref1;
   }
 
-  std::string get_name(pool_entry_lookupt pool_entry) const
+  std::string get_name(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &name_entry = pool_entry(name_index);
     return read_utf8_constant(name_entry);
@@ -232,7 +232,7 @@ private:
 class name_and_type_infot : public structured_pool_entryt
 {
 public:
-  explicit name_and_type_infot(pool_entryt entry)
+  explicit name_and_type_infot(const pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_NameAndType);
@@ -240,13 +240,13 @@ public:
     descriptor_index = entry.ref2;
   }
 
-  std::string get_name(pool_entry_lookupt pool_entry) const
+  std::string get_name(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &name_entry = pool_entry(name_index);
     return read_utf8_constant(name_entry);
   }
 
-  std::string get_descriptor(pool_entry_lookupt pool_entry) const
+  std::string get_descriptor(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &descriptor_entry = pool_entry(descriptor_index);
     return read_utf8_constant(descriptor_entry);
@@ -260,7 +260,8 @@ private:
 class base_ref_infot : public structured_pool_entryt
 {
 public:
-  explicit base_ref_infot(pool_entryt entry) : structured_pool_entryt(entry)
+  explicit base_ref_infot(const pool_entryt &entry)
+    : structured_pool_entryt(entry)
   {
     PRECONDITION(
       entry.tag == CONSTANT_Fieldref || entry.tag == CONSTANT_Methodref ||
@@ -278,7 +279,8 @@ public:
     return name_and_type_index;
   }
 
-  name_and_type_infot get_name_and_type(pool_entry_lookupt pool_entry) const
+  name_and_type_infot
+  get_name_and_type(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &name_and_type_entry = pool_entry(name_and_type_index);
 
@@ -290,7 +292,7 @@ public:
     return name_and_type_infot{name_and_type_entry};
   }
 
-  class_infot get_class(pool_entry_lookupt pool_entry) const
+  class_infot get_class(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &class_entry = pool_entry(class_index);
 
@@ -321,7 +323,7 @@ public:
     REF_invokeInterface = 9
   };
 
-  explicit method_handle_infot(pool_entryt entry)
+  explicit method_handle_infot(const pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_MethodHandle);
@@ -330,7 +332,7 @@ public:
     reference_index = entry.ref2;
   }
 
-  base_ref_infot get_reference(pool_entry_lookupt pool_entry) const
+  base_ref_infot get_reference(const pool_entry_lookupt &pool_entry) const
   {
     const base_ref_infot ref_entry{pool_entry(reference_index)};
 
@@ -403,20 +405,20 @@ bool java_bytecode_parsert::parse()
   return false;
 }
 
-#define ACC_PUBLIC       0x0001
-#define ACC_PRIVATE      0x0002
-#define ACC_PROTECTED    0x0004
-#define ACC_STATIC       0x0008
-#define ACC_FINAL        0x0010
-#define ACC_SYNCHRONIZED 0x0020
-#define ACC_BRIDGE       0x0040
-#define ACC_NATIVE       0x0100
-#define ACC_INTERFACE    0x0200
-#define ACC_ABSTRACT     0x0400
-#define ACC_STRICT       0x0800
-#define ACC_SYNTHETIC    0x1000
-#define ACC_ANNOTATION   0x2000
-#define ACC_ENUM         0x4000
+#define ACC_PUBLIC 0x0001u
+#define ACC_PRIVATE 0x0002u
+#define ACC_PROTECTED 0x0004u
+#define ACC_STATIC 0x0008u
+#define ACC_FINAL 0x0010u
+#define ACC_SYNCHRONIZED 0x0020u
+#define ACC_BRIDGE 0x0040u
+#define ACC_NATIVE 0x0100u
+#define ACC_INTERFACE 0x0200u
+#define ACC_ABSTRACT 0x0400u
+#define ACC_STRICT 0x0800u
+#define ACC_SYNTHETIC 0x1000u
+#define ACC_ANNOTATION 0x2000u
+#define ACC_ENUM 0x4000u
 
 #define UNUSED_u2(x)                                                           \
   {                                                                            \
@@ -831,10 +833,6 @@ void java_bytecode_parsert::rconstant_pool()
         entry.expr.type() = type;
       }
       break;
-
-      default:
-      {
-      };
       }
     });
 }
@@ -918,7 +916,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
           bytecode_info[bytecode].mnemonic);
     }
 
-    instructions.push_back(instructiont());
+    instructions.emplace_back();
     instructiont &instruction=instructions.back();
     instruction.bytecode = bytecode;
     instruction.address=start_of_instruction;
@@ -1033,7 +1031,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         u4 base_offset=address;
 
         // first a pad to 32-bit align
-        while(((address + 1) & 3) != 0)
+        while(((address + 1u) & 3u) != 0)
         {
           read<u1>();
           address++;
@@ -1071,7 +1069,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         size_t base_offset=address;
 
         // first a pad to 32-bit align
-        while(((address + 1) & 3) != 0)
+        while(((address + 1u) & 3u) != 0)
         {
           read<u1>();
           address++;
@@ -1400,7 +1398,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       }
       else if(252<=frame_type && frame_type<=254)
       {
-        size_t new_locals=(size_t) (frame_type-251);
+        size_t new_locals = frame_type - 251;
         method.stack_map_table[i].type=methodt::stack_map_table_entryt::APPEND;
         method.stack_map_table[i].locals.resize(new_locals);
         method.stack_map_table[i].stack.resize(0);
@@ -1699,8 +1697,8 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     const u2 sourcefile_index = read<u2>();
     irep_idt sourcefile_name;
 
-    std::string fqn(id2string(parsed_class.name));
-    size_t last_index=fqn.find_last_of(".");
+    const std::string &fqn(id2string(parsed_class.name));
+    size_t last_index = fqn.find_last_of('.');
     if(last_index==std::string::npos)
       sourcefile_name=pool_entry(sourcefile_index).s;
     else
@@ -1764,20 +1762,20 @@ void java_bytecode_parsert::rmethods(classt &parsed_class)
     rmethod(parsed_class);
 }
 
-#define ACC_PUBLIC     0x0001
-#define ACC_PRIVATE    0x0002
-#define ACC_PROTECTED  0x0004
-#define ACC_STATIC     0x0008
-#define ACC_FINAL      0x0010
-#define ACC_VARARGS    0x0080
-#define ACC_SUPER      0x0020
-#define ACC_VOLATILE   0x0040
-#define ACC_TRANSIENT  0x0080
-#define ACC_INTERFACE  0x0200
-#define ACC_ABSTRACT   0x0400
-#define ACC_SYNTHETIC  0x1000
-#define ACC_ANNOTATION 0x2000
-#define ACC_ENUM       0x4000
+#define ACC_PUBLIC 0x0001u
+#define ACC_PRIVATE 0x0002u
+#define ACC_PROTECTED 0x0004u
+#define ACC_STATIC 0x0008u
+#define ACC_FINAL 0x0010u
+#define ACC_VARARGS 0x0080u
+#define ACC_SUPER 0x0020u
+#define ACC_VOLATILE 0x0040u
+#define ACC_TRANSIENT 0x0080u
+#define ACC_INTERFACE 0x0200u
+#define ACC_ABSTRACT 0x0400u
+#define ACC_SYNTHETIC 0x1000u
+#define ACC_ANNOTATION 0x2000u
+#define ACC_ENUM 0x4000u
 
 void java_bytecode_parsert::rmethod(classt &parsed_class)
 {
