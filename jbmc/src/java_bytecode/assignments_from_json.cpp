@@ -188,9 +188,8 @@ static bool has_nondet_length(const jsont &json)
   if(!json.is_object())
     return false;
   const auto &json_object = to_json_object(json);
-  if(json_object.find("@nondetLength") != json_object.end())
-    return (json["@nondetLength"].is_true());
-  return false;
+  auto nondet_it = json_object.find("@nondetLength");
+  return nondet_it != json_object.end() && nondet_it->second.is_true();
 }
 
 /// For typed versions of primitive, string or array types, looks up their
