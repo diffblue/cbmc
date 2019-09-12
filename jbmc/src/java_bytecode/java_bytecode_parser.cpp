@@ -680,8 +680,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Long:
     case CONSTANT_Double:
       it->number = read<u8>();
-      // Eight-byte constants take up two entries
-      // in the constant_pool table, for annoying this programmer.
+      // Eight-byte constants take up two entries in the constant_pool table.
       if(it==constant_pool.end())
       {
         error() << "invalid double entry" << eom;
@@ -698,7 +697,7 @@ void java_bytecode_parsert::rconstant_pool()
         s.resize(bytes);
         for(auto &ch : s)
           ch = read<u1>();
-        it->s=s; // hashes
+        it->s = s; // Add to string table
       }
       break;
 
