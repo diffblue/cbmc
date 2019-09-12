@@ -55,21 +55,6 @@ string_constraint_generatort::add_axioms_from_long(
     return add_axioms_for_string_of_int(res, f.arguments()[2], 0);
 }
 
-/// Add axioms corresponding to the String.valueOf(Z) java function.
-/// \deprecated This is Java specific and should be implemented in Java instead
-/// \param f: function application with a Boolean argument
-/// \return a new string expression
-DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_bool(
-  const function_application_exprt &f)
-{
-  PRECONDITION(f.arguments().size() == 3);
-  const array_string_exprt res =
-    array_pool.find(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_bool(res, f.arguments()[2]);
-}
-
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
 /// \deprecated This is Java specific and should be implemented in Java instead
@@ -279,44 +264,6 @@ string_constraint_generatort::add_axioms_from_int_hex(
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   return add_axioms_from_int_hex(res, f.arguments()[2]);
-}
-
-/// Conversion from char to string
-///
-// NOLINTNEXTLINE
-/// \copybrief add_axioms_from_char(const array_string_exprt &res, const exprt &c)
-// NOLINTNEXTLINE
-/// \link add_axioms_from_char(const array_string_exprt &res, const exprt &c)
-///   (More...) \endlink
-/// \param f: function application with arguments integer `|res|`, character
-///   pointer `&res[0]` and character `c`
-/// \return code 0 on success
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_char(
-  const function_application_exprt &f)
-{
-  PRECONDITION(f.arguments().size() == 3);
-  const array_string_exprt res =
-    array_pool.find(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_char(res, f.arguments()[2]);
-}
-
-/// Add axiom stating that string `res` has length 1 and the character
-/// it contains equals `c`.
-///
-/// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
-/// \param res: array of characters expression
-/// \param c: character expression
-/// \return code 0 on success
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_char(
-  const array_string_exprt &res,
-  const exprt &c)
-{
-  string_constraintst constraints;
-  constraints.existential = {and_exprt(
-    equal_exprt(res[0], c), equal_to(array_pool.get_or_create_length(res), 1))};
-  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms making the return value true if the given string is a correct

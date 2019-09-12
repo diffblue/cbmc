@@ -273,10 +273,6 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_from_double(expr);
   else if(id == ID_cprover_string_of_long_func)
     return add_axioms_from_long(expr);
-  else if(id == ID_cprover_string_of_bool_func)
-    return add_axioms_from_bool(expr);
-  else if(id == ID_cprover_string_of_char_func)
-    return add_axioms_from_char(expr);
   else if(id == ID_cprover_string_set_length_func)
     return add_axioms_for_set_length(expr);
   else if(id == ID_cprover_string_delete_func)
