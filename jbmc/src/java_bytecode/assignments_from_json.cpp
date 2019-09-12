@@ -839,18 +839,23 @@ void assign_from_json_rec(
     }
     else if(is_java_array_type(expr.type()))
     {
-      const exprt length =
-        nondet_length(info.allocate_objects, info.block, info.loc);
-      allocate_array(expr, length, info);
       if(has_nondet_length(json))
       {
+        const exprt length =
+          nondet_length(info.allocate_objects, info.block, info.loc);
+        allocate_array(expr, length, info);
         assign_nondet_length_array_from_json(
           expr, json, length, type_from_array, info);
       }
       else
       {
-        assign_det_length_array_from_json(
-          expr, json, length, type_from_array, info);
+        PRECONDITION(is_java_array_type(expr.type()));
+        const auto &element_type =
+          java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+        const std::size_t length = get_untyped_array(json, element_type).size();
+        allocate_array(expr, from_integer(length, java_int_type()), info);
+        assign_array_data_component_from_json(
+          expr, json, type_from_array, info);
       }
     }
     else if(
