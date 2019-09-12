@@ -481,20 +481,18 @@ static void assign_array_from_json(
   const json_arrayt json_array = get_untyped_array(json, element_type);
   const auto number_of_elements =
     from_integer(json_array.size(), java_int_type());
-  info.block.add(code_assumet{
-    binary_predicate_exprt{given_length_expr, ID_ge, number_of_elements}});
-  if(has_nondet_length(json))
-  {
-    info.block.add(code_assumet{binary_predicate_exprt{
-      given_length_expr,
-      ID_le,
-      from_integer(info.max_user_array_length, java_int_type())}});
-  }
-  else
-  {
-    info.block.add(code_assumet{
-      binary_predicate_exprt{given_length_expr, ID_le, number_of_elements}});
-  }
+  info.block.add(code_assumet{[&]() -> exprt {
+    if(has_nondet_length(json))
+    {
+      return and_exprt{
+        binary_predicate_exprt{given_length_expr, ID_ge, number_of_elements},
+        binary_predicate_exprt{
+          given_length_expr,
+          ID_le,
+          from_integer(info.max_user_array_length, java_int_type())}};
+    }
+    return equal_exprt{given_length_expr, number_of_elements};
+  }()});
   assign_array_data_component_from_json(expr, json, type_from_array, info);
 }
 
