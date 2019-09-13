@@ -55,21 +55,10 @@ void goto_symext::apply_goto_condition(
 
   jump_taken_state.apply_condition(new_guard, current_state, ns);
 
-  // Try to find a negative condition that implies an equality constraint on
-  // the branch-not-taken path.
   // Could use not_exprt + simplify, but let's avoid paying that cost on quite
   // a hot path:
-  if(new_guard.id() == ID_not)
-    jump_not_taken_state.apply_condition(
-      to_not_expr(new_guard).op(), current_state, ns);
-  else if(new_guard.id() == ID_notequal)
-  {
-    auto &not_equal_expr = to_notequal_expr(new_guard);
-    jump_not_taken_state.apply_condition(
-      equal_exprt(not_equal_expr.lhs(), not_equal_expr.rhs()),
-      current_state,
-      ns);
-  }
+  const exprt negated_new_guard = boolean_negate(new_guard);
+  jump_not_taken_state.apply_condition(negated_new_guard, current_state, ns);
 }
 
 /// Try to evaluate a simple pointer comparison.

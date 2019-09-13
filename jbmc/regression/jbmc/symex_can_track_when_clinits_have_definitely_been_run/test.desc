@@ -1,0 +1,13 @@
+CORE
+Test.class
+--function Test.test --verbosity 10
+^EXIT=10$
+^SIGNAL=0$
+--
+^BMC at file ClassWithStaticInit.java line .* function java::ClassWithStaticInit.<clinit>:\(\)V bytecode-index .* \(depth [1-9][0-9][0-9]\)$
+^warning: ignoring
+--
+If symex isn't able to determine that the static initialiser has already been
+run after the second call to getStaticValue() then it will keep on entering the
+static initialiser, and it will eventually do so with a depth greater than or
+equal to 100.

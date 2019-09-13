@@ -44,15 +44,50 @@ void goto_statet::apply_condition(
   const goto_symex_statet &previous_state,
   const namespacet &ns)
 {
-  if(condition.id() == ID_and)
+  if(auto and_expr = expr_try_dynamic_cast<and_exprt>(condition))
   {
-    for(const auto &op : condition.operands())
+    // A == B && C == D && E == F ...
+    // -->
+    // Apply each condition individually
+    for(const auto &op : and_expr->operands())
       apply_condition(op, previous_state, ns);
   }
-  else if(condition.id() == ID_equal)
+  else if(auto not_expr = expr_try_dynamic_cast<not_exprt>(condition))
   {
-    exprt lhs = to_equal_expr(condition).lhs();
-    exprt rhs = to_equal_expr(condition).rhs();
+    const exprt &operand = not_expr->op();
+    if(auto notequal_expr = expr_try_dynamic_cast<notequal_exprt>(operand))
+    {
+      // !(A != B)
+      // -->
+      // A == B
+      apply_condition(
+        equal_exprt{notequal_expr->lhs(), notequal_expr->rhs()},
+        previous_state,
+        ns);
+    }
+    else if(auto equal_expr = expr_try_dynamic_cast<equal_exprt>(operand))
+    {
+      // !(A == B)
+      // -->
+      // A != B
+      apply_condition(
+        notequal_exprt{equal_expr->lhs(), equal_expr->rhs()},
+        previous_state,
+        ns);
+    }
+    else
+    {
+      // !A
+      // -->
+      // A == false
+      apply_condition(equal_exprt{operand, false_exprt{}}, previous_state, ns);
+    }
+  }
+  else if(auto equal_expr = expr_try_dynamic_cast<equal_exprt>(condition))
+  {
+    // Base case: try to apply a single equality constraint
+    exprt lhs = equal_expr->lhs();
+    exprt rhs = equal_expr->rhs();
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
@@ -83,5 +118,34 @@ void goto_statet::apply_condition(
         value_set.assign(l1_lhs, rhs, ns, true, false);
       }
     }
+  }
+  else if(
+    can_cast_expr<symbol_exprt>(condition) && condition.type() == bool_typet())
+  {
+    // A
+    // -->
+    // A == true
+    apply_condition(equal_exprt{condition, true_exprt()}, previous_state, ns);
+  }
+  else if(
+    can_cast_expr<notequal_exprt>(condition) &&
+    expr_checked_cast<notequal_exprt>(condition).lhs().type() == bool_typet{})
+  {
+    // A != (true|false)
+    // -->
+    // A == (false|true)
+    const notequal_exprt &notequal_expr =
+      expr_dynamic_cast<notequal_exprt>(condition);
+    exprt lhs = notequal_expr.lhs();
+    exprt rhs = notequal_expr.rhs();
+    if(is_ssa_expr(rhs))
+      std::swap(lhs, rhs);
+
+    if(rhs.is_true())
+      apply_condition(equal_exprt{lhs, false_exprt{}}, previous_state, ns);
+    else if(rhs.is_false())
+      apply_condition(equal_exprt{lhs, true_exprt{}}, previous_state, ns);
+    else
+      UNREACHABLE;
   }
 }
