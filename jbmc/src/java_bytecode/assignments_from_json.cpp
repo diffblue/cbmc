@@ -445,10 +445,11 @@ nondet_length(allocate_objectst &allocate, source_locationt loc)
 /// For the assignment of the array elements, see
 /// \ref assign_array_data_component_from_json.
 /// For the overall algorithm, see \ref assign_from_json_rec.
-static code_with_references_listt assign_det_length_array_from_json(
+/// \return code for the assignment and length of the created array.
+static std::pair<code_with_references_listt, exprt>
+assign_det_length_array_from_json(
   const exprt &expr,
   const jsont &json,
-  const exprt &given_length_expr,
   const optionalt<std::string> &type_from_array,
   object_creation_infot &info)
 {
@@ -458,11 +459,9 @@ static code_with_references_listt assign_det_length_array_from_json(
   const json_arrayt json_array = get_untyped_array(json, element_type);
   const auto number_of_elements =
     from_integer(json_array.size(), java_int_type());
-  code_with_references_listt result;
-  result.add(code_assumet{equal_exprt{given_length_expr, number_of_elements}});
-  result.append(
-    assign_array_data_component_from_json(expr, json, type_from_array, info));
-  return result;
+  return {
+    assign_array_data_component_from_json(expr, json, type_from_array, info),
+    number_of_elements};
 }
 
 /// One of the cases in the recursive algorithm: the case where \p expr
@@ -475,6 +474,7 @@ static code_with_references_listt assign_det_length_array_from_json(
 /// For the assignment of the array elements, see
 /// \ref assign_array_data_component_from_json.
 /// For the overall algorithm, see \ref assign_from_json_rec.
+/// \return code for the assignment and length of the created array.
 static code_with_references_listt assign_nondet_length_array_from_json(
   const exprt &array,
   const jsont &json,
@@ -487,8 +487,7 @@ static code_with_references_listt assign_nondet_length_array_from_json(
     java_array_element_type(to_struct_tag_type(array.type().subtype()));
   const json_arrayt json_array = get_untyped_array(json, element_type);
   code_with_references_listt result;
-  const auto number_of_elements =
-    from_integer(json_array.size(), java_int_type());
+  exprt number_of_elements = from_integer(json_array.size(), java_int_type());
   result.add(code_assumet{and_exprt{
     binary_predicate_exprt{given_length_expr, ID_ge, number_of_elements},
     binary_predicate_exprt{
@@ -814,12 +813,10 @@ static code_with_references_listt assign_reference_from_json(
       }
       else
       {
-        result.append(assign_det_length_array_from_json(
-          reference.expr,
-          json,
-          *reference.array_length,
-          type_from_array,
-          info));
+        auto code_length_pair = assign_det_length_array_from_json(
+          reference.expr, json, type_from_array, info);
+        result.append(std::move(code_length_pair.first));
+        reference.array_length = std::move(code_length_pair.second);
       }
     }
     else
