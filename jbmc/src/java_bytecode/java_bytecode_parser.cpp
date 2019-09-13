@@ -89,14 +89,13 @@ private:
 
   void rClassFile();
   void rconstant_pool();
-  void rinterfaces(classt &parsed_class);
-  void rfields(classt &parsed_class);
-  void rmethods(classt &parsed_class);
-  void rmethod(classt &parsed_class);
-  void
-  rinner_classes_attribute(classt &parsed_class, const u4 &attribute_length);
+  void rinterfaces();
+  void rfields();
+  void rmethods();
+  void rmethod();
+  void rinner_classes_attribute(const u4 &attribute_length);
   std::vector<irep_idt> rexceptions_attribute();
-  void rclass_attribute(classt &parsed_class);
+  void rclass_attribute();
   void rRuntimeAnnotation_attribute(std::vector<annotationt> &);
   void rRuntimeAnnotation(annotationt &);
   void relement_value_pairs(annotationt::element_value_pairst &);
@@ -113,7 +112,7 @@ private:
   void parse_local_variable_type_table(methodt &method);
   optionalt<lambda_method_handlet>
   parse_method_handle(const class method_handle_infot &entry);
-  void read_bootstrapmethods_entry(classt &);
+  void read_bootstrapmethods_entry();
 
   void skip_bytes(std::size_t bytes)
   {
@@ -142,16 +141,15 @@ private:
         error() << "unexpected end of bytecode file" << eom;
         throw 0;
       }
-      result <<= 8;
-      result |= in->get();
+      result <<= 8u;
+      result |= static_cast<u1>(in->get());
     }
     return narrow_cast<T>(result);
   }
 
   void store_unknown_method_handle(
-    classt &parsed_class,
     size_t bootstrap_method_index,
-    std::vector<u2> u2_values) const;
+    std::vector<u2> u2_values);
 };
 
 #define CONSTANT_Class                7
@@ -182,8 +180,10 @@ private:
 class structured_pool_entryt
 {
 public:
-  explicit structured_pool_entryt(java_bytecode_parsert::pool_entryt entry)
-    : tag(entry.tag)
+  using pool_entryt = java_bytecode_parsert::pool_entryt;
+  using pool_entry_lookupt = std::function<pool_entryt &(u2)>;
+
+  explicit structured_pool_entryt(const pool_entryt &entry) : tag(entry.tag)
   {
   }
 
@@ -191,10 +191,6 @@ public:
   {
     return tag;
   }
-
-  using pool_entry_lookupt =
-    std::function<java_bytecode_parsert::pool_entryt &(u2)>;
-  using pool_entryt = java_bytecode_parsert::pool_entryt;
 
 protected:
   static std::string read_utf8_constant(const pool_entryt &entry)
@@ -219,7 +215,7 @@ public:
     name_index = entry.ref1;
   }
 
-  std::string get_name(pool_entry_lookupt pool_entry) const
+  std::string get_name(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &name_entry = pool_entry(name_index);
     return read_utf8_constant(name_entry);
@@ -234,7 +230,7 @@ private:
 class name_and_type_infot : public structured_pool_entryt
 {
 public:
-  explicit name_and_type_infot(java_bytecode_parsert::pool_entryt entry)
+  explicit name_and_type_infot(const pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_NameAndType);
@@ -242,13 +238,13 @@ public:
     descriptor_index = entry.ref2;
   }
 
-  std::string get_name(pool_entry_lookupt pool_entry) const
+  std::string get_name(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &name_entry = pool_entry(name_index);
     return read_utf8_constant(name_entry);
   }
 
-  std::string get_descriptor(pool_entry_lookupt pool_entry) const
+  std::string get_descriptor(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &descriptor_entry = pool_entry(descriptor_index);
     return read_utf8_constant(descriptor_entry);
@@ -262,7 +258,8 @@ private:
 class base_ref_infot : public structured_pool_entryt
 {
 public:
-  explicit base_ref_infot(pool_entryt entry) : structured_pool_entryt(entry)
+  explicit base_ref_infot(const pool_entryt &entry)
+    : structured_pool_entryt(entry)
   {
     PRECONDITION(
       entry.tag == CONSTANT_Fieldref || entry.tag == CONSTANT_Methodref ||
@@ -280,7 +277,8 @@ public:
     return name_and_type_index;
   }
 
-  name_and_type_infot get_name_and_type(pool_entry_lookupt pool_entry) const
+  name_and_type_infot
+  get_name_and_type(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &name_and_type_entry = pool_entry(name_and_type_index);
 
@@ -292,7 +290,7 @@ public:
     return name_and_type_infot{name_and_type_entry};
   }
 
-  class_infot get_class(pool_entry_lookupt pool_entry) const
+  class_infot get_class(const pool_entry_lookupt &pool_entry) const
   {
     const pool_entryt &class_entry = pool_entry(class_index);
 
@@ -323,7 +321,7 @@ public:
     REF_invokeInterface = 9
   };
 
-  explicit method_handle_infot(java_bytecode_parsert::pool_entryt entry)
+  explicit method_handle_infot(const pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_MethodHandle);
@@ -332,7 +330,7 @@ public:
     reference_index = entry.ref2;
   }
 
-  base_ref_infot get_reference(pool_entry_lookupt pool_entry) const
+  base_ref_infot get_reference(const pool_entry_lookupt &pool_entry) const
   {
     const base_ref_infot ref_entry{pool_entry(reference_index)};
 
@@ -405,20 +403,20 @@ bool java_bytecode_parsert::parse()
   return false;
 }
 
-#define ACC_PUBLIC       0x0001
-#define ACC_PRIVATE      0x0002
-#define ACC_PROTECTED    0x0004
-#define ACC_STATIC       0x0008
-#define ACC_FINAL        0x0010
-#define ACC_SYNCHRONIZED 0x0020
-#define ACC_BRIDGE       0x0040
-#define ACC_NATIVE       0x0100
-#define ACC_INTERFACE    0x0200
-#define ACC_ABSTRACT     0x0400
-#define ACC_STRICT       0x0800
-#define ACC_SYNTHETIC    0x1000
-#define ACC_ANNOTATION   0x2000
-#define ACC_ENUM         0x4000
+#define ACC_PUBLIC 0x0001u
+#define ACC_PRIVATE 0x0002u
+#define ACC_PROTECTED 0x0004u
+#define ACC_STATIC 0x0008u
+#define ACC_FINAL 0x0010u
+#define ACC_SYNCHRONIZED 0x0020u
+#define ACC_BRIDGE 0x0040u
+#define ACC_NATIVE 0x0100u
+#define ACC_INTERFACE 0x0200u
+#define ACC_ABSTRACT 0x0400u
+#define ACC_STRICT 0x0800u
+#define ACC_SYNTHETIC 0x1000u
+#define ACC_ANNOTATION 0x2000u
+#define ACC_ENUM 0x4000u
 
 #define UNUSED_u2(x)                                                           \
   {                                                                            \
@@ -470,9 +468,9 @@ void java_bytecode_parsert::rClassFile()
   if(super_class!=0)
     parsed_class.super_class = constant(super_class).type().get(ID_C_base_name);
 
-  rinterfaces(parsed_class);
-  rfields(parsed_class);
-  rmethods(parsed_class);
+  rinterfaces();
+  rfields();
+  rmethods();
 
   // count elements of enum
   if(parsed_class.is_enum)
@@ -483,7 +481,7 @@ void java_bytecode_parsert::rClassFile()
   const u2 attributes_count = read<u2>();
 
   for(std::size_t j=0; j<attributes_count; j++)
-    rclass_attribute(parsed_class);
+    rclass_attribute();
 
   get_class_refs();
 
@@ -588,15 +586,11 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
   }
   else if(src.id() == ID_struct_tag)
   {
-    irep_idt name=src.get(ID_C_base_name);
-    if(has_prefix(id2string(name), "array["))
-    {
-      const typet &element_type =
-        static_cast<const typet &>(src.find(ID_element_type));
-      get_class_refs_rec(element_type);
-    }
+    const struct_tag_typet &struct_tag_type = to_struct_tag_type(src);
+    if(is_java_array_tag(struct_tag_type.get_identifier()))
+      get_class_refs_rec(java_array_element_type(struct_tag_type));
     else
-      parse_tree.class_refs.insert(name);
+      parse_tree.class_refs.insert(src.get(ID_C_base_name));
   }
   else if(src.id()==ID_struct)
   {
@@ -686,8 +680,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Long:
     case CONSTANT_Double:
       it->number = read<u8>();
-      // Eight-byte constants take up two entries
-      // in the constant_pool table, for annoying this programmer.
+      // Eight-byte constants take up two entries in the constant_pool table.
       if(it==constant_pool.end())
       {
         error() << "invalid double entry" << eom;
@@ -704,7 +697,7 @@ void java_bytecode_parsert::rconstant_pool()
         s.resize(bytes);
         for(auto &ch : s)
           ch = read<u1>();
-        it->s=s; // hashes
+        it->s = s; // Add to string table
       }
       break;
 
@@ -838,30 +831,26 @@ void java_bytecode_parsert::rconstant_pool()
         entry.expr.type() = type;
       }
       break;
-
-      default:
-      {
-      };
       }
     });
 }
 
-void java_bytecode_parsert::rinterfaces(classt &parsed_class)
+void java_bytecode_parsert::rinterfaces()
 {
   const u2 interfaces_count = read<u2>();
 
   for(std::size_t i=0; i<interfaces_count; i++)
-    parsed_class.implements.push_back(
+    parse_tree.parsed_class.implements.push_back(
       constant(read<u2>()).type().get(ID_C_base_name));
 }
 
-void java_bytecode_parsert::rfields(classt &parsed_class)
+void java_bytecode_parsert::rfields()
 {
   const u2 fields_count = read<u2>();
 
   for(std::size_t i=0; i<fields_count; i++)
   {
-    fieldt &field=parsed_class.add_field();
+    fieldt &field = parse_tree.parsed_class.add_field();
 
     const u2 access_flags = read<u2>();
     const u2 name_index = read<u2>();
@@ -925,7 +914,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
           bytecode_info[bytecode].mnemonic);
     }
 
-    instructions.push_back(instructiont());
+    instructions.emplace_back();
     instructiont &instruction=instructions.back();
     instruction.bytecode = bytecode;
     instruction.address=start_of_instruction;
@@ -1040,7 +1029,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         u4 base_offset=address;
 
         // first a pad to 32-bit align
-        while(((address + 1) & 3) != 0)
+        while(((address + 1u) & 3u) != 0)
         {
           read<u1>();
           address++;
@@ -1078,7 +1067,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         size_t base_offset=address;
 
         // first a pad to 32-bit align
-        while(((address + 1) & 3) != 0)
+        while(((address + 1u) & 3u) != 0)
         {
           read<u1>();
           address++;
@@ -1407,7 +1396,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       }
       else if(252<=frame_type && frame_type<=254)
       {
-        size_t new_locals=(size_t) (frame_type-251);
+        size_t new_locals = frame_type - 251;
         method.stack_map_table[i].type=methodt::stack_map_table_entryt::APPEND;
         method.stack_map_table[i].locals.resize(new_locals);
         method.stack_map_table[i].stack.resize(0);
@@ -1604,9 +1593,9 @@ exprt java_bytecode_parsert::get_relement_value()
 /// information for the parsed class is overwritten, and the parsed class is
 /// marked as an inner class.
 void java_bytecode_parsert::rinner_classes_attribute(
-  classt &parsed_class,
   const u4 &attribute_length)
 {
+  classt &parsed_class = parse_tree.parsed_class;
   std::string name = parsed_class.name.c_str();
   const u2 number_of_classes = read<u2>();
   const u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
@@ -1643,10 +1632,9 @@ void java_bytecode_parsert::rinner_classes_attribute(
     // access information and mark it as an inner class.
     bool is_inner_class = remove_separator_char(id2string(parsed_class.name), '.') ==
       remove_separator_char(inner_class_info_name, '/');
-    if(is_inner_class)
-      parsed_class.is_inner_class = is_inner_class;
     if(!is_inner_class)
       continue;
+    parsed_class.is_inner_class = is_inner_class;
     parsed_class.is_static_class = is_static;
     // This is a marker that a class is anonymous.
     if(inner_name_index == 0)
@@ -1695,8 +1683,10 @@ std::vector<irep_idt> java_bytecode_parsert::rexceptions_attribute()
   return exceptions;
 }
 
-void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
+void java_bytecode_parsert::rclass_attribute()
 {
+  classt &parsed_class = parse_tree.parsed_class;
+
   const u2 attribute_name_index = read<u2>();
   const u4 attribute_length = read<u4>();
 
@@ -1707,8 +1697,8 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     const u2 sourcefile_index = read<u2>();
     irep_idt sourcefile_name;
 
-    std::string fqn(id2string(parsed_class.name));
-    size_t last_index=fqn.find_last_of(".");
+    const std::string &fqn(id2string(parsed_class.name));
+    size_t last_index = fqn.find_last_of('.');
     if(last_index==std::string::npos)
       sourcefile_name=pool_entry(sourcefile_index).s;
     else
@@ -1753,43 +1743,42 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
 
     // mark as read in parsed class
     parsed_class.attribute_bootstrapmethods_read = true;
-    read_bootstrapmethods_entry(parsed_class);
+    read_bootstrapmethods_entry();
   }
   else if(attribute_name == "InnerClasses")
   {
-    java_bytecode_parsert::rinner_classes_attribute(
-      parsed_class, attribute_length);
+    java_bytecode_parsert::rinner_classes_attribute(attribute_length);
   }
   else
     skip_bytes(attribute_length);
 }
 
-void java_bytecode_parsert::rmethods(classt &parsed_class)
+void java_bytecode_parsert::rmethods()
 {
   const u2 methods_count = read<u2>();
 
   for(std::size_t j=0; j<methods_count; j++)
-    rmethod(parsed_class);
+    rmethod();
 }
 
-#define ACC_PUBLIC     0x0001
-#define ACC_PRIVATE    0x0002
-#define ACC_PROTECTED  0x0004
-#define ACC_STATIC     0x0008
-#define ACC_FINAL      0x0010
-#define ACC_VARARGS    0x0080
-#define ACC_SUPER      0x0020
-#define ACC_VOLATILE   0x0040
-#define ACC_TRANSIENT  0x0080
-#define ACC_INTERFACE  0x0200
-#define ACC_ABSTRACT   0x0400
-#define ACC_SYNTHETIC  0x1000
-#define ACC_ANNOTATION 0x2000
-#define ACC_ENUM       0x4000
+#define ACC_PUBLIC 0x0001u
+#define ACC_PRIVATE 0x0002u
+#define ACC_PROTECTED 0x0004u
+#define ACC_STATIC 0x0008u
+#define ACC_FINAL 0x0010u
+#define ACC_VARARGS 0x0080u
+#define ACC_SUPER 0x0020u
+#define ACC_VOLATILE 0x0040u
+#define ACC_TRANSIENT 0x0080u
+#define ACC_INTERFACE 0x0200u
+#define ACC_ABSTRACT 0x0400u
+#define ACC_SYNTHETIC 0x1000u
+#define ACC_ANNOTATION 0x2000u
+#define ACC_ENUM 0x4000u
 
-void java_bytecode_parsert::rmethod(classt &parsed_class)
+void java_bytecode_parsert::rmethod()
 {
-  methodt &method=parsed_class.add_method();
+  methodt &method = parse_tree.parsed_class.add_method();
 
   const u2 access_flags = read<u2>();
   const u2 name_index = read<u2>();
@@ -1945,9 +1934,7 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 }
 
 /// Read all entries of the `BootstrapMethods` attribute of a class file.
-/// \param parsed_class: the class representation of the class file that is
-///   currently parsed
-void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
+void java_bytecode_parsert::read_bootstrapmethods_entry()
 {
   const u2 num_bootstrap_methods = read<u2>();
   for(size_t bootstrap_method_index = 0;
@@ -2000,8 +1987,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     // understand
     if(num_bootstrap_arguments < 3)
     {
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       debug()
         << "format of BootstrapMethods entry not recognized: too few arguments"
         << eom;
@@ -2028,8 +2014,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       debug() << "format of BootstrapMethods entry not recognized: extra "
                  "arguments of wrong type"
               << eom;
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -2046,8 +2031,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       debug() << "format of BootstrapMethods entry not recognized: arguments "
                  "wrong type"
               << eom;
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -2060,8 +2044,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
       debug() << "format of BootstrapMethods entry not recognized: method "
                  "handle not recognised"
               << eom;
-      store_unknown_method_handle(
-        parsed_class, bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
       continue;
     }
 
@@ -2075,26 +2058,25 @@ void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
     lambda_method_handle->u2_values = std::move(u2_values);
     debug() << "lambda function reference "
             << id2string(lambda_method_handle->lambda_method_name)
-            << " in class \"" << parsed_class.name << "\""
+            << " in class \"" << parse_tree.parsed_class.name << "\""
             << "\n  interface type is "
             << id2string(pool_entry(interface_type_argument.ref1).s)
             << "\n  method type is "
             << id2string(pool_entry(method_type_argument.ref1).s) << eom;
-    parsed_class.add_method_handle(
+    parse_tree.parsed_class.add_method_handle(
       bootstrap_method_index, *lambda_method_handle);
   }
 }
 
 /// Creates an unknown method handle and puts it into the parsed_class
-/// \param parsed_class: The class whose bootstrap method handles we are using
 /// \param bootstrap_method_index: The current index in the bootstrap entry
 ///   table
 /// \param u2_values: The indices of the arguments for the call
 void java_bytecode_parsert::store_unknown_method_handle(
-  java_bytecode_parsert::classt &parsed_class,
   size_t bootstrap_method_index,
-  std::vector<u2> u2_values) const
+  std::vector<u2> u2_values)
 {
   const lambda_method_handlet lambda_method_handle(std::move(u2_values));
-  parsed_class.add_method_handle(bootstrap_method_index, lambda_method_handle);
+  parse_tree.parsed_class.add_method_handle(
+    bootstrap_method_index, lambda_method_handle);
 }
