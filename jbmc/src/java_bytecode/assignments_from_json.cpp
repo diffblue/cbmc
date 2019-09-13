@@ -457,18 +457,16 @@ static symbol_exprt nondet_length(
 }
 
 /// One of the cases in the recursive algorithm: the case where \p expr
-/// represents an array.
+/// represents an array which is not flagged with `@nondetLength`.
 /// The length of the array is given by symbol \p given_length_expr.
 /// We assume that an array with this symbol as its length has already been
 /// allocated and that \p expr has been assigned to it.
-/// We add constraints on the length: if "nondetLength" is specified in \p json,
-/// then the number of elements specified in \p json should be less than or
-/// equal to the length of the array. Otherwise the number of elements should be
-/// the exact length of the array.
+/// We constraint the length of the array to be the number of elements, which
+/// is known and constant.
 /// For the assignment of the array elements, see
 /// \ref assign_array_data_component_from_json.
 /// For the overall algorithm, see \ref assign_from_json_rec.
-static void assign_array_from_json(
+static void assign_det_length_array_from_json(
   const exprt &expr,
   const jsont &json,
   const exprt &given_length_expr,
@@ -481,18 +479,40 @@ static void assign_array_from_json(
   const json_arrayt json_array = get_untyped_array(json, element_type);
   const auto number_of_elements =
     from_integer(json_array.size(), java_int_type());
-  info.block.add(code_assumet{[&]() -> exprt {
-    if(has_nondet_length(json))
-    {
-      return and_exprt{
-        binary_predicate_exprt{given_length_expr, ID_ge, number_of_elements},
-        binary_predicate_exprt{
-          given_length_expr,
-          ID_le,
-          from_integer(info.max_user_array_length, java_int_type())}};
-    }
-    return equal_exprt{given_length_expr, number_of_elements};
-  }()});
+  info.block.add(
+    code_assumet{equal_exprt{given_length_expr, number_of_elements}});
+  assign_array_data_component_from_json(expr, json, type_from_array, info);
+}
+
+/// One of the cases in the recursive algorithm: the case where \p expr
+/// represents an array which is flagged with @nondetLength.
+/// The length of the array is given by symbol \p given_length_expr.
+/// We assume that an array with this symbol as its length has already been
+/// allocated and that \p expr has been assigned to it.
+/// We constrain the length of the array to be greater or equal to the number
+/// of elements specified in \p json.
+/// For the assignment of the array elements, see
+/// \ref assign_array_data_component_from_json.
+/// For the overall algorithm, see \ref assign_from_json_rec.
+static void assign_nondet_length_array_from_json(
+  const exprt &expr,
+  const jsont &json,
+  const exprt &given_length_expr,
+  const optionalt<std::string> &type_from_array,
+  object_creation_infot &info)
+{
+  PRECONDITION(is_java_array_type(expr.type()));
+  const auto &element_type =
+    java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+  const json_arrayt json_array = get_untyped_array(json, element_type);
+  const auto number_of_elements =
+    from_integer(json_array.size(), java_int_type());
+  info.block.add(code_assumet{and_exprt{
+    binary_predicate_exprt{given_length_expr, ID_ge, number_of_elements},
+    binary_predicate_exprt{
+      given_length_expr,
+      ID_le,
+      from_integer(info.max_user_array_length, java_int_type())}}});
   assign_array_data_component_from_json(expr, json, type_from_array, info);
 }
 
@@ -771,8 +791,16 @@ static void assign_reference_from_json(
     {
       INVARIANT(
         reference.array_length, "an array reference should store its length");
-      assign_array_from_json(
-        reference.expr, json, *reference.array_length, type_from_array, info);
+      if(has_nondet_length(json))
+      {
+        assign_nondet_length_array_from_json(
+          reference.expr, json, *reference.array_length, type_from_array, info);
+      }
+      else
+      {
+        assign_det_length_array_from_json(
+          reference.expr, json, *reference.array_length, type_from_array, info);
+      }
     }
     else
       assign_struct_from_json(dereference_exprt(reference.expr), json, info);
@@ -814,7 +842,16 @@ void assign_from_json_rec(
       const exprt length =
         nondet_length(info.allocate_objects, info.block, info.loc);
       allocate_array(expr, length, info);
-      assign_array_from_json(expr, json, length, type_from_array, info);
+      if(has_nondet_length(json))
+      {
+        assign_nondet_length_array_from_json(
+          expr, json, length, type_from_array, info);
+      }
+      else
+      {
+        assign_det_length_array_from_json(
+          expr, json, length, type_from_array, info);
+      }
     }
     else if(
       const auto runtime_type =
