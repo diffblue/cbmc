@@ -99,7 +99,7 @@ has_enum_type(const exprt &expr, const symbol_table_baset &symbol_table)
 /// \param declaring_class_type: type of the class where \p expr is declared.
 /// \return `true` if \p expr has an enum type and is declared within the
 ///   definition of that same type, `false` otherwise.
-bool is_enum_with_type_equal_to_declaring_type(
+static bool is_enum_with_type_equal_to_declaring_type(
   const exprt &expr,
   const symbol_table_baset &symbol_table,
   const java_class_typet &declaring_class_type)
