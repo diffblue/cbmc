@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/make_unique.h>
 #include <util/optional.h>
 #include <util/parsable_string.h>
 #include <util/parser.h>
@@ -28,77 +29,254 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literal_expr.h"
 #include "java_types.h"
 
-class java_bytecode_parsert final : public parsert
+struct raw_pool_entryt
+{
+  u1 tag = 0;
+  u2 ref1 = 0;
+  u2 ref2 = 0;
+  irep_idt s;
+  u8 number = 0;
+};
+
+struct pool_entryt : public raw_pool_entryt
+{
+  explicit pool_entryt(const raw_pool_entryt &raw_entry)
+    : raw_pool_entryt(raw_entry)
+  {
+  }
+
+  exprt expr;
+};
+
+struct java_bytecodet
+{
+  u2 access_flags;
+  u2 this_class_index;
+  u2 super_class_index;
+  u2 sourcefile_name_index = 0;
+  u2 signature_index = 0;
+
+  std::vector<u2> implements_indices;
+
+  using constant_poolt = std::vector<raw_pool_entryt>;
+  constant_poolt constant_pool;
+
+  struct inner_classt
+  {
+    u2 class_info_index;
+    u2 outer_class_info_index;
+    u2 name_index;
+    u2 class_access_flags;
+  };
+  optionalt<inner_classt> inner_class_info;
+
+  struct bootstrap_methodt
+  {
+    u2 method_handle_ref;
+    std::vector<u2> arguments;
+  };
+  std::vector<bootstrap_methodt> bootstrap_methods;
+
+  /// Base class for element values in annotations
+  struct element_valuet
+  {
+    virtual ~element_valuet() = default;
+
+    virtual exprt
+    get_expr(const std::function<const pool_entryt &(u2)> &pool_entry) = 0;
+  };
+  struct annotationt
+  {
+    u2 type_index;
+
+    struct element_value_pairt
+    {
+      u2 element_name_index;
+      std::unique_ptr<element_valuet> value;
+    };
+
+    using element_value_pairst = std::vector<element_value_pairt>;
+
+    element_value_pairst element_value_pairs;
+  };
+  using annotationst = std::vector<annotationt>;
+
+  struct fieldt
+  {
+    u2 access_flags;
+    u2 name_index;
+    u2 descriptor_index;
+    u2 signature_index = 0;
+    annotationst annotations;
+  };
+  std::vector<fieldt> fields;
+
+  struct methodt
+  {
+    u2 access_flags;
+    u2 name_index;
+    u2 descriptor_index;
+    u2 signature_index = 0;
+
+    struct instructiont
+    {
+      u1 bytecode;
+      bool wide_instruction;
+      u4 address;
+      std::size_t bytecode_index;
+
+      std::vector<u4> operands;
+    };
+    std::vector<instructiont> instructions;
+
+    struct line_number_entryt
+    {
+      u2 start_pc;
+      u2 line_number;
+    };
+    std::vector<line_number_entryt> line_number_table;
+
+    java_bytecode_parse_treet::methodt::local_variable_tablet
+      local_variable_table;
+    java_bytecode_parse_treet::methodt::stack_map_tablet stack_map_table;
+
+    struct exceptiont
+    {
+      exceptiont(u2 start_pc, u2 end_pc, u2 handler_pc, u2 catch_type_index)
+        : start_pc(start_pc),
+          end_pc(end_pc),
+          handler_pc(handler_pc),
+          catch_type_index(catch_type_index)
+      {
+      }
+
+      u2 start_pc;
+      std::size_t end_pc;
+      std::size_t handler_pc;
+      u2 catch_type_index;
+    };
+    using exception_tablet = std::vector<exceptiont>;
+    exception_tablet exception_table;
+
+    std::vector<u2> throws_exception_table;
+
+    annotationst annotations;
+
+    /// Java annotations that were applied to parameters of this method
+    /// \remarks Each element in the vector corresponds to the annotations on
+    /// the parameter of this method with the matching index. A parameter that
+    /// does not have annotations can have an entry in this vector that is an
+    /// empty annotationst. Trailing parameters that have no annotations may be
+    /// entirely omitted from this vector.
+    std::vector<annotationst> parameter_annotations;
+  };
+  std::vector<methodt> methods;
+
+  annotationst class_annotations;
+};
+
+java_bytecode_reft::java_bytecode_reft() noexcept = default;
+java_bytecode_reft::java_bytecode_reft(java_bytecodet &&bytecode) noexcept
+  : bytecode { util_make_unique<java_bytecodet>(std::move(bytecode)) }
+{
+}
+java_bytecode_reft::java_bytecode_reft(java_bytecode_reft &&) noexcept =
+  default;
+java_bytecode_reft::~java_bytecode_reft() = default;
+
+// An element_valuet for constant values looked up from the constant pool
+struct const_element_valuet : public java_bytecodet::element_valuet
+{
+  bool is_string;
+  u2 const_value_index;
+
+  exprt
+  get_expr(const std::function<const pool_entryt &(u2)> &pool_entry) override
+  {
+    if(is_string)
+      return string_constantt(pool_entry(const_value_index).s);
+    return pool_entry(const_value_index).expr;
+  }
+};
+
+// An element_valuet containing an enum value
+struct enum_const_element_valuet : public java_bytecodet::element_valuet
+{
+  u2 type_name_index;
+  u2 const_name_index;
+
+  exprt
+  get_expr(const std::function<const pool_entryt &(u2)> &pool_entry) override
+  {
+    // TODO: enum
+    return {};
+  }
+};
+
+// An element_valuet containing a class type
+struct class_info_element_valuet : public java_bytecodet::element_valuet
+{
+  u2 class_info_index;
+
+  exprt
+  get_expr(const std::function<const pool_entryt &(u2)> &pool_entry) override
+  {
+    return symbol_exprt::typeless(pool_entry(class_info_index).s);
+  }
+};
+
+// An element_valuet containing an array of other element_valuet's
+struct array_element_valuet : public java_bytecodet::element_valuet
+{
+  using element_valuest = std::vector<std::unique_ptr<element_valuet>>;
+  element_valuest values;
+
+  exprt
+  get_expr(const std::function<const pool_entryt &(u2)> &pool_entry) override
+  {
+    exprt::operandst ops;
+    ops.reserve(values.size());
+    for(std::unique_ptr<element_valuet> &value : values)
+      ops.push_back(value->get_expr(pool_entry));
+    return array_exprt(std::move(ops), array_typet(typet(), exprt()));
+  }
+};
+
+/// An element_valuet containing another annotation recursively
+struct annotation_element_valuet : public java_bytecodet::element_valuet
+{
+  java_bytecodet::annotationt annotation_value;
+
+  exprt
+  get_expr(const std::function<const pool_entryt &(u2)> &pool_entry) override
+  {
+    // TODO: return this wrapped in an exprt
+    return {};
+  }
+};
+
+class java_bytecode_loadert final : public parsert
 {
 public:
-  explicit java_bytecode_parsert(bool skip_instructions)
+  explicit java_bytecode_loadert(bool skip_instructions)
     : skip_instructions(skip_instructions)
   {
   }
 
   bool parse() override;
-  optionalt<java_class_type_signaturet> class_sig;
 
-  struct pool_entryt
+  java_bytecodet java_bytecode;
+
+  raw_pool_entryt &pool_entry(u2 index)
   {
-    u1 tag = 0;
-    u2 ref1 = 0;
-    u2 ref2 = 0;
-    irep_idt s;
-    u8 number = 0;
-    exprt expr;
-  };
-
-  java_bytecode_parse_treet parse_tree;
-
-private:
-  using classt = java_bytecode_parse_treet::classt;
-  using methodt = java_bytecode_parse_treet::methodt;
-  using fieldt = java_bytecode_parse_treet::fieldt;
-  using instructiont = java_bytecode_parse_treet::instructiont;
-  using annotationt = java_bytecode_parse_treet::annotationt;
-  using method_handle_typet =
-    java_bytecode_parse_treet::classt::method_handle_typet;
-  using lambda_method_handlet =
-    java_bytecode_parse_treet::classt::lambda_method_handlet;
-
-  using constant_poolt = std::vector<pool_entryt>;
-
-  constant_poolt constant_pool;
-
-  const bool skip_instructions = false;
-
-  pool_entryt &pool_entry(u2 index)
-  {
-    if(index==0 || index>=constant_pool.size())
+    if(index == 0 || index >= java_bytecode.constant_pool.size())
     {
-      error() << "invalid constant pool index (" << index << ")" << eom;
-      error() << "constant pool size: " << constant_pool.size() << eom;
+      error()
+        << "invalid constant pool index (" << index << ")" << eom
+        << "constant pool size: " << java_bytecode.constant_pool.size() << eom;
       throw 0;
     }
-
-    return constant_pool[index];
-  }
-
-  exprt &constant(u2 index)
-  {
-    return pool_entry(index).expr;
-  }
-
-  typet value_type_entry(u2 index)
-  {
-    PRECONDITION(class_sig);
-    return java_value_type_signaturet::parse_single_value_type(
-        id2string(pool_entry(index).s), class_sig->type_parameter_map)
-      ->get_type("java::" + id2string(parse_tree.parsed_class.name));
-  }
-
-  typet method_type_entry(u2 index)
-  {
-    PRECONDITION(class_sig);
-    return java_method_type_signaturet(
-        id2string(pool_entry(index).s), class_sig->type_parameter_map)
-      .get_type("java::" + id2string(parse_tree.parsed_class.name));
+    return java_bytecode.constant_pool[index];
   }
 
   void rClassFile();
@@ -107,25 +285,24 @@ private:
   void rfields();
   void rmethods();
   void rmethod();
-  void rinner_classes_attribute(const u4 &attribute_length);
-  std::vector<irep_idt> rexceptions_attribute();
-  void rclass_attribute();
-  void rRuntimeAnnotation_attribute(std::vector<annotationt> &);
-  void rRuntimeAnnotation(annotationt &);
-  void relement_value_pairs(annotationt::element_value_pairst &);
-  exprt get_relement_value();
-  void rmethod_attribute(methodt &method);
-  void rfield_attribute(fieldt &);
-  void rcode_attribute(methodt &method);
-  void read_verification_type_info(methodt::verification_type_infot &);
-  void rbytecode(std::vector<instructiont> &);
-  void get_class_refs();
-  void get_class_refs_rec(const typet &);
-  void get_annotation_class_refs(const std::vector<annotationt> &annotations);
-  void get_annotation_value_class_refs(const exprt &value);
-  void parse_local_variable_type_table(methodt &method);
-  optionalt<lambda_method_handlet>
-  parse_method_handle(const class method_handle_infot &entry);
+  void rinner_classes_attribute(
+    const u4 attribute_length,
+    const u2 class_info_index);
+  std::vector<u2> rexceptions_attribute();
+  void rclass_attribute(const u2 class_info_index);
+  void rRuntimeAnnotation_attribute(java_bytecodet::annotationst &);
+  void rRuntimeAnnotation(java_bytecodet::annotationt &);
+  void
+  relement_value_pairs(java_bytecodet::annotationt::element_value_pairst &);
+  std::unique_ptr<java_bytecodet::element_valuet> get_relement_value();
+  void rmethod_attribute(java_bytecodet::methodt &method);
+  void rfield_attribute(java_bytecodet::fieldt &);
+  void rcode_attribute(java_bytecodet::methodt &method);
+  void read_verification_type_info(
+    java_bytecode_parse_treet::methodt::verification_type_infot &);
+  void
+  rbytecode(std::vector<java_bytecodet::methodt::instructiont> &instructions);
+  void parse_local_variable_type_table(java_bytecodet::methodt &method);
   void read_bootstrapmethods_entry();
 
   void skip_bytes(std::size_t bytes)
@@ -161,6 +338,104 @@ private:
     return narrow_cast<T>(result);
   }
 
+private:
+  const bool skip_instructions;
+  bool attribute_bootstrapmethods_read = false;
+};
+
+class java_bytecode_parsert : public messaget
+{
+public:
+  bool parse(const java_bytecodet &java_bytecode);
+  optionalt<java_class_type_signaturet> class_sig;
+  java_bytecode_parse_treet parse_tree;
+
+private:
+  using classt = java_bytecode_parse_treet::classt;
+  using methodt = java_bytecode_parse_treet::methodt;
+  using fieldt = java_bytecode_parse_treet::fieldt;
+  using instructiont = java_bytecode_parse_treet::instructiont;
+  using annotationt = java_bytecode_parse_treet::annotationt;
+  using method_handle_typet =
+    java_bytecode_parse_treet::classt::method_handle_typet;
+  using lambda_method_handlet =
+    java_bytecode_parse_treet::classt::lambda_method_handlet;
+
+  using constant_poolt = std::vector<pool_entryt>;
+
+  constant_poolt constant_pool;
+
+  pool_entryt &pool_entry(u2 index)
+  {
+    if(index == 0 || index >= constant_pool.size())
+    {
+      error() << "invalid constant pool index (" << index << ")" << eom;
+      error() << "constant pool size: " << constant_pool.size() << eom;
+      throw 0;
+    }
+
+    return constant_pool[index];
+  }
+
+  exprt &constant(u2 index)
+  {
+    return pool_entry(index).expr;
+  }
+
+  typet value_type_entry(u2 index)
+  {
+    PRECONDITION(class_sig);
+    return java_value_type_signaturet::parse_single_value_type(
+        id2string(pool_entry(index).s), class_sig->type_parameter_map)
+      ->get_type("java::" + id2string(parse_tree.parsed_class.name));
+  }
+
+  typet method_type_entry(u2 index)
+  {
+    PRECONDITION(class_sig);
+    return java_method_type_signaturet(
+        id2string(pool_entry(index).s), class_sig->type_parameter_map)
+      .get_type("java::" + id2string(parse_tree.parsed_class.name));
+  }
+
+  void rClassFile(const java_bytecodet &java_bytecode);
+  void rconstant_pool(const java_bytecodet::constant_poolt &raw_constant_pool);
+  void rinterfaces(const std::vector<u2> &implements_indices);
+  void rfields(const std::vector<java_bytecodet::fieldt> &fields);
+  void rmethods(const std::vector<java_bytecodet::methodt> &methods);
+  void rmethod(const java_bytecodet::methodt &raw_method);
+  void rinner_classes_attribute(
+    const optionalt<java_bytecodet::inner_classt> &inner_class_info);
+  std::vector<irep_idt>
+  rexceptions_attribute(const std::vector<u2> &raw_exceptions);
+  void rclass_attributes(const java_bytecodet &java_bytecode);
+  void rRuntimeAnnotation_attribute(
+    std::vector<annotationt> &annotations,
+    const java_bytecodet::annotationst &raw_annotations);
+  void rRuntimeAnnotation(
+    annotationt &annotation,
+    const java_bytecodet::annotationt &raw_annotation);
+  void relement_value_pairs(
+    annotationt::element_value_pairst &element_value_pairs,
+    const java_bytecodet::annotationt::element_value_pairst
+      &raw_element_value_pairs);
+  void
+  rmethod_attribute(methodt &method, const java_bytecodet::methodt &raw_method);
+  void rfield_attribute(fieldt &, const java_bytecodet::fieldt &raw_field);
+  void
+  rcode_attribute(methodt &method, const java_bytecodet::methodt &raw_method);
+  void rbytecode(
+    std::vector<instructiont> &instructions,
+    const std::vector<java_bytecodet::methodt::instructiont> &raw_instructions);
+  void get_class_refs();
+  void get_class_refs_rec(const typet &);
+  void get_annotation_class_refs(const std::vector<annotationt> &annotations);
+  void get_annotation_value_class_refs(const exprt &value);
+  optionalt<lambda_method_handlet>
+  parse_method_handle(const class method_handle_infot &entry);
+  void read_bootstrapmethods_entry(
+    const std::vector<java_bytecodet::bootstrap_methodt> &bootstrap_methods);
+
   void store_unknown_method_handle(
     size_t bootstrap_method_index,
     std::vector<u2> u2_values);
@@ -194,10 +469,9 @@ private:
 class structured_pool_entryt
 {
 public:
-  using pool_entryt = java_bytecode_parsert::pool_entryt;
-  using pool_entry_lookupt = std::function<pool_entryt &(u2)>;
+  using pool_entry_lookupt = std::function<raw_pool_entryt &(u2)>;
 
-  explicit structured_pool_entryt(const pool_entryt &entry) : tag(entry.tag)
+  explicit structured_pool_entryt(const raw_pool_entryt &entry) : tag(entry.tag)
   {
   }
 
@@ -207,7 +481,7 @@ public:
   }
 
 protected:
-  static std::string read_utf8_constant(const pool_entryt &entry)
+  static std::string read_utf8_constant(const raw_pool_entryt &entry)
   {
     INVARIANT(
       entry.tag == CONSTANT_Utf8, "Name entry must be a constant UTF-8");
@@ -223,7 +497,8 @@ private:
 class class_infot : public structured_pool_entryt
 {
 public:
-  explicit class_infot(const pool_entryt &entry) : structured_pool_entryt(entry)
+  explicit class_infot(const raw_pool_entryt &entry)
+    : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_Class);
     name_index = entry.ref1;
@@ -231,7 +506,7 @@ public:
 
   std::string get_name(const pool_entry_lookupt &pool_entry) const
   {
-    const pool_entryt &name_entry = pool_entry(name_index);
+    const raw_pool_entryt &name_entry = pool_entry(name_index);
     return read_utf8_constant(name_entry);
   }
 
@@ -244,7 +519,7 @@ private:
 class name_and_type_infot : public structured_pool_entryt
 {
 public:
-  explicit name_and_type_infot(const pool_entryt &entry)
+  explicit name_and_type_infot(const raw_pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_NameAndType);
@@ -254,13 +529,13 @@ public:
 
   std::string get_name(const pool_entry_lookupt &pool_entry) const
   {
-    const pool_entryt &name_entry = pool_entry(name_index);
+    const raw_pool_entryt &name_entry = pool_entry(name_index);
     return read_utf8_constant(name_entry);
   }
 
   std::string get_descriptor(const pool_entry_lookupt &pool_entry) const
   {
-    const pool_entryt &descriptor_entry = pool_entry(descriptor_index);
+    const raw_pool_entryt &descriptor_entry = pool_entry(descriptor_index);
     return read_utf8_constant(descriptor_entry);
   }
 
@@ -272,7 +547,7 @@ private:
 class base_ref_infot : public structured_pool_entryt
 {
 public:
-  explicit base_ref_infot(const pool_entryt &entry)
+  explicit base_ref_infot(const raw_pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(
@@ -294,7 +569,8 @@ public:
   name_and_type_infot
   get_name_and_type(const pool_entry_lookupt &pool_entry) const
   {
-    const pool_entryt &name_and_type_entry = pool_entry(name_and_type_index);
+    const raw_pool_entryt &name_and_type_entry =
+      pool_entry(name_and_type_index);
 
     INVARIANT(
       name_and_type_entry.tag == CONSTANT_NameAndType,
@@ -306,7 +582,7 @@ public:
 
   class_infot get_class(const pool_entry_lookupt &pool_entry) const
   {
-    const pool_entryt &class_entry = pool_entry(class_index);
+    const raw_pool_entryt &class_entry = pool_entry(class_index);
 
     return class_infot{class_entry};
   }
@@ -335,7 +611,7 @@ public:
     REF_invokeInterface = 9
   };
 
-  explicit method_handle_infot(const pool_entryt &entry)
+  explicit method_handle_infot(const raw_pool_entryt &entry)
     : structured_pool_entryt(entry)
   {
     PRECONDITION(entry.tag == CONSTANT_MethodHandle);
@@ -389,11 +665,39 @@ private:
   u2 reference_index;
 };
 
-bool java_bytecode_parsert::parse()
+bool java_bytecode_loadert::parse()
 {
   try
   {
     rClassFile();
+  }
+
+  catch(const char *message)
+  {
+    error() << message << eom;
+    return true;
+  }
+
+  catch(const std::string &message)
+  {
+    error() << message << eom;
+    return true;
+  }
+
+  catch(...)
+  {
+    error() << "parsing error" << eom;
+    return true;
+  }
+
+  return false;
+}
+
+bool java_bytecode_parsert::parse(const java_bytecodet &java_bytecode)
+{
+  try
+  {
+    rClassFile(java_bytecode);
   }
 
   catch(const char *message)
@@ -445,10 +749,8 @@ bool java_bytecode_parsert::parse()
   }                                                                            \
   (void)0
 
-void java_bytecode_parsert::rClassFile()
+void java_bytecode_loadert::rClassFile()
 {
-  parse_tree.loading_successful=false;
-
   const u4 magic = read<u4>();
   UNUSED_u2(minor_version);
   const u2 major_version = read<u2>();
@@ -467,12 +769,62 @@ void java_bytecode_parsert::rClassFile()
 
   rconstant_pool();
 
-  classt &parsed_class=parse_tree.parsed_class;
+  java_bytecode.access_flags = read<u2>();
+  java_bytecode.this_class_index = read<u2>();
+  java_bytecode.super_class_index = read<u2>();
 
-  const u2 access_flags = read<u2>();
-  const u2 this_class = read<u2>();
-  const u2 super_class = read<u2>();
+  rinterfaces();
+  rfields();
+  rmethods();
 
+  const u2 attributes_count = read<u2>();
+
+  for(std::size_t j = 0; j < attributes_count; j++)
+    rclass_attribute(java_bytecode.this_class_index);
+}
+
+void java_bytecode_parsert::rClassFile(const java_bytecodet &java_bytecode)
+{
+  parse_tree.loading_successful = false;
+
+  classt &parsed_class = parse_tree.parsed_class;
+
+  std::transform(
+    java_bytecode.constant_pool.begin(),
+    java_bytecode.constant_pool.end(),
+    std::back_inserter(constant_pool),
+    [](const raw_pool_entryt &raw_entry) { return pool_entryt(raw_entry); });
+
+  std::string signature;
+  if(java_bytecode.signature_index == 0)
+  {
+    // Signature not provided for non-generic types, fake-up a signature
+    signature =
+      "L" +
+      id2string(
+        pool_entry(pool_entry(java_bytecode.super_class_index).ref1).s) +
+      ";";
+    for(u2 implements_index : java_bytecode.implements_indices)
+      signature +=
+        "L" + id2string(pool_entry(pool_entry(implements_index).ref1).s) + ";";
+  }
+  else
+  {
+    parsed_class.signature = signature =
+      id2string(pool_entry(java_bytecode.signature_index).s);
+  }
+  try
+  {
+    // TODO: Load the parameter map of the outer class first
+    class_sig = java_class_type_signaturet(signature, {});
+  }
+  catch(unsupported_java_class_signature_exceptiont &)
+  {
+  }
+
+  rconstant_pool(java_bytecode.constant_pool);
+
+  const u2 &access_flags = java_bytecode.access_flags;
   parsed_class.is_abstract=(access_flags&ACC_ABSTRACT)!=0;
   parsed_class.is_enum=(access_flags&ACC_ENUM)!=0;
   parsed_class.is_public=(access_flags&ACC_PUBLIC)!=0;
@@ -482,44 +834,26 @@ void java_bytecode_parsert::rClassFile()
   parsed_class.is_interface = (access_flags & ACC_INTERFACE) != 0;
   parsed_class.is_synthetic = (access_flags & ACC_SYNTHETIC) != 0;
   parsed_class.is_annotation = (access_flags & ACC_ANNOTATION) != 0;
-  parsed_class.name=
-    constant(this_class).type().get(ID_C_base_name);
+  parsed_class.name =
+    constant(java_bytecode.this_class_index).type().get(ID_C_base_name);
 
-  if(super_class!=0)
-    parsed_class.super_class = constant(super_class).type().get(ID_C_base_name);
+  if(java_bytecode.super_class_index != 0)
+  {
+    parsed_class.super_class =
+      constant(java_bytecode.super_class_index).type().get(ID_C_base_name);
+  }
 
-  rinterfaces();
-  rfields();
-  rmethods();
+  rinterfaces(java_bytecode.implements_indices);
+  rfields(java_bytecode.fields);
+  rmethods(java_bytecode.methods);
 
   // count elements of enum
   if(parsed_class.is_enum)
-    for(fieldt &field : parsed_class.fields)
+    for(fieldt &field : parse_tree.parsed_class.fields)
       if(field.is_enum)
-        parsed_class.enum_elements++;
+        parse_tree.parsed_class.enum_elements++;
 
-  const u2 attributes_count = read<u2>();
-
-  for(std::size_t j=0; j<attributes_count; j++)
-    rclass_attribute();
-
-  try
-  {
-    std::string signature;
-    if(parsed_class.signature)
-      signature = *parsed_class.signature;
-    else
-    {
-      signature = "L" + id2string(parsed_class.super_class) + ";";
-      for(irep_idt implements : parsed_class.implements)
-        signature += "L" + id2string(implements) + ";";
-    }
-    // TODO: Load the parameter map of the outer class first
-    class_sig = java_class_type_signaturet(signature, {});
-  }
-  catch(unsupported_java_class_signature_exceptiont &)
-  {
-  }
+  rclass_attributes(java_bytecode);
 
   get_class_refs();
 
@@ -668,7 +1002,7 @@ void java_bytecode_parsert::get_annotation_class_refs(
 
 /// See \ref java_bytecode_parsert::get_annotation_class_refs.
 /// For the different cases of `exprt`, see \ref
-/// java_bytecode_parsert::get_relement_value.
+/// java_bytecode_loadert::get_relement_value.
 void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
 {
   if(const auto &symbol_expr = expr_try_dynamic_cast<symbol_exprt>(value))
@@ -682,12 +1016,12 @@ void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
       get_annotation_value_class_refs(operand);
   }
   // TODO: enum and nested annotation cases (once these are correctly parsed by
-  // get_relement_value).
+  //   get_relement_value).
   // Note that in the cases where expr is a string or primitive type, no
   // additional class references are needed.
 }
 
-void java_bytecode_parsert::rconstant_pool()
+void java_bytecode_loadert::rconstant_pool()
 {
   const u2 constant_pool_count = read<u2>();
   if(constant_pool_count==0)
@@ -696,10 +1030,11 @@ void java_bytecode_parsert::rconstant_pool()
     throw 0;
   }
 
-  constant_pool.resize(constant_pool_count);
+  java_bytecode.constant_pool.resize(constant_pool_count);
 
-  for(auto it = std::next(constant_pool.begin()); it != constant_pool.end();
-      it++)
+  for(auto it = std::next(java_bytecode.constant_pool.begin());
+      it != java_bytecode.constant_pool.end();
+      ++it)
   {
     it->tag = read<u1>();
 
@@ -732,7 +1067,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Double:
       it->number = read<u8>();
       // Eight-byte constants take up two entries in the constant_pool table.
-      if(it==constant_pool.end())
+      if(it == java_bytecode.constant_pool.end())
       {
         error() << "invalid double entry" << eom;
         throw 0;
@@ -763,12 +1098,16 @@ void java_bytecode_parsert::rconstant_pool()
       throw 0;
     }
   }
+}
 
-  // we do a bit of post-processing after we have them all
+void java_bytecode_parsert::rconstant_pool(
+  const java_bytecodet::constant_poolt &raw_constant_pool)
+{
   std::for_each(
     std::next(constant_pool.begin()),
     constant_pool.end(),
-    [&](constant_poolt::value_type &entry) {
+    [&](pool_entryt &entry)
+    {
       switch(entry.tag)
       {
       case CONSTANT_Class:
@@ -805,9 +1144,9 @@ void java_bytecode_parsert::rconstant_pool()
 
         auto class_tag = java_classname(id2string(class_name_entry.s));
 
-        irep_idt component_name=
-          id2string(name_entry.s)+
-          ":"+id2string(pool_entry(nameandtype_entry.ref2).s);
+        irep_idt component_name =
+          id2string(name_entry.s) + ":" +
+          id2string(pool_entry(nameandtype_entry.ref2).s);
 
         irep_idt class_name = class_tag.get_identifier();
 
@@ -886,34 +1225,51 @@ void java_bytecode_parsert::rconstant_pool()
     });
 }
 
-void java_bytecode_parsert::rinterfaces()
+void java_bytecode_loadert::rinterfaces()
 {
   const u2 interfaces_count = read<u2>();
-
   for(std::size_t i=0; i<interfaces_count; i++)
-    parse_tree.parsed_class.implements.push_back(
-      constant(read<u2>()).type().get(ID_C_base_name));
+    java_bytecode.implements_indices.push_back(read<u2>());
 }
 
-void java_bytecode_parsert::rfields()
+void java_bytecode_parsert::rinterfaces(
+  const std::vector<u2> &implements_indices)
+{
+  for(u2 implements_index : implements_indices)
+    parse_tree.parsed_class.implements.push_back(
+      constant(implements_index).type().get(ID_C_base_name));
+}
+
+void java_bytecode_loadert::rfields()
 {
   const u2 fields_count = read<u2>();
-
   for(std::size_t i=0; i<fields_count; i++)
+  {
+    java_bytecodet::fieldt field;
+    field.access_flags = read<u2>();
+    field.name_index = read<u2>();
+    field.descriptor_index = read<u2>();
+    const u2 attributes_count = read<u2>();
+    for(std::size_t j = 0; j < attributes_count; j++)
+      rfield_attribute(field);
+    java_bytecode.fields.push_back(std::move(field));
+  }
+}
+
+void java_bytecode_parsert::rfields(
+  const std::vector<java_bytecodet::fieldt> &fields)
+{
+  for(const java_bytecodet::fieldt &raw_field : fields)
   {
     fieldt &field = parse_tree.parsed_class.add_field();
 
-    const u2 access_flags = read<u2>();
-    const u2 name_index = read<u2>();
-    const u2 descriptor_index = read<u2>();
-    const u2 attributes_count = read<u2>();
-
-    field.name=pool_entry(name_index).s;
+    field.name = pool_entry(raw_field.name_index).s;
+    const u2 access_flags = raw_field.access_flags;
     field.is_static=(access_flags&ACC_STATIC)!=0;
     field.is_final=(access_flags&ACC_FINAL)!=0;
     field.is_enum=(access_flags&ACC_ENUM)!=0;
 
-    field.descriptor=id2string(pool_entry(descriptor_index).s);
+    field.descriptor = id2string(pool_entry(raw_field.descriptor_index).s);
     field.is_public=(access_flags&ACC_PUBLIC)!=0;
     field.is_protected=(access_flags&ACC_PROTECTED)!=0;
     field.is_private=(access_flags&ACC_PRIVATE)!=0;
@@ -922,8 +1278,7 @@ void java_bytecode_parsert::rfields()
       (field.is_private?1:0);
     DATA_INVARIANT(flags<=1, "at most one of public, protected, private");
 
-    for(std::size_t j=0; j<attributes_count; j++)
-      rfield_attribute(field);
+    rfield_attribute(field, raw_field);
   }
 }
 
@@ -936,23 +1291,26 @@ void java_bytecode_parsert::rfields()
 #define T_INT    10
 #define T_LONG   11
 
-void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
+void java_bytecode_loadert::rbytecode(
+  std::vector<java_bytecodet::methodt::instructiont> &instructions)
 {
   const u4 code_length = read<u4>();
 
   u4 address;
-  size_t bytecode_index=0; // index of bytecode instruction
+  size_t bytecode_index = 0; // Index of bytecode instruction
 
-  for(address=0; address<code_length; address++)
+  for(address = 0; address < code_length; address++)
   {
-    bool wide_instruction=false;
-    u4 start_of_instruction=address;
+    instructions.emplace_back();
+    java_bytecodet::methodt::instructiont &instruction = instructions.back();
+    instruction.address = address;
+    instruction.bytecode_index = bytecode_index;
 
     u1 bytecode = read<u1>();
-
-    if(bytecode == BC_wide)
+    const bool wide_instruction = instruction.wide_instruction =
+      bytecode == BC_wide;
+    if(wide_instruction)
     {
-      wide_instruction=true;
       address++;
       bytecode = read<u1>();
       // The only valid instructions following a wide byte are
@@ -964,41 +1322,31 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         std::string("Unexpected wide instruction: ") +
           bytecode_info[bytecode].mnemonic);
     }
-
-    instructions.emplace_back();
-    instructiont &instruction=instructions.back();
     instruction.bytecode = bytecode;
-    instruction.address=start_of_instruction;
-    instruction.source_location
-      .set_java_bytecode_index(std::to_string(bytecode_index));
 
     switch(bytecode_info[bytecode].format)
     {
-    case ' ': // no further bytes
+    case ' ': // No further bytes
       break;
 
-    case 'c': // a constant_pool index (one byte)
-      if(wide_instruction)
+    case 'c': // A constant_pool index
+    case 'C': // A constant_pool index (two bytes)
+      if(wide_instruction || bytecode_info[bytecode].format == 'C')
       {
-        instruction.args.push_back(constant(read<u2>()));
+        instruction.operands.push_back(read<u2>());
         address+=2;
       }
       else
       {
-        instruction.args.push_back(constant(read<u1>()));
+        instruction.operands.push_back(read<u1>());
         address+=1;
       }
-      break;
-
-    case 'C': // a constant_pool index (two bytes)
-      instruction.args.push_back(constant(read<u2>()));
-      address+=2;
       break;
 
     case 'b': // a signed byte
       {
         const s1 c = read<u1>();
-        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
+        instruction.operands.push_back(c);
       }
       address+=1;
       break;
@@ -1008,8 +1356,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         const s2 offset = read<u2>();
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(address+offset, unsignedbv_typet(16)));
+        instruction.operands.push_back(address + offset);
       }
       address+=2;
       break;
@@ -1019,8 +1366,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         const s4 offset = read<u4>();
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(address+offset, unsignedbv_typet(32)));
+        instruction.operands.push_back(address + offset);
       }
       address+=4;
       break;
@@ -1030,13 +1376,13 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         if(wide_instruction)
         {
           const u2 v = read<u2>();
-          instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
+          instruction.operands.push_back(v);
           address += 2;
         }
         else
         {
           const u1 v = read<u1>();
-          instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
+          instruction.operands.push_back(v);
           address += 1;
         }
       }
@@ -1048,17 +1394,17 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
       if(wide_instruction)
       {
         const u2 v = read<u2>();
-        instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
+        instruction.operands.push_back(v);
         const s2 c = read<u2>();
-        instruction.args.push_back(from_integer(c, signedbv_typet(16)));
+        instruction.operands.push_back(c);
         address+=4;
       }
       else // local variable index (one byte) plus one signed byte
       {
         const u1 v = read<u1>();
-        instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
+        instruction.operands.push_back(v);
         const s1 c = read<u1>();
-        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
+        instruction.operands.push_back(c);
         address+=2;
       }
       break;
@@ -1066,11 +1412,11 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
     case 'I': // two byte constant_pool index plus two bytes
       {
         const u2 c = read<u2>();
-        instruction.args.push_back(constant(c));
+        instruction.operands.push_back(c);
         const u1 b1 = read<u1>();
-        instruction.args.push_back(from_integer(b1, unsignedbv_typet(8)));
+        instruction.operands.push_back(b1);
         const u1 b2 = read<u1>();
-        instruction.args.push_back(from_integer(b2, unsignedbv_typet(8)));
+        instruction.operands.push_back(b2);
       }
       address+=4;
       break;
@@ -1090,8 +1436,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         const s4 default_value = read<u4>();
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(base_offset+default_value, unsignedbv_typet(32)));
+        instruction.operands.push_back(base_offset + default_value);
         address+=4;
 
         // number of pairs
@@ -1102,12 +1447,10 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         {
           const s4 match = read<u4>();
           const s4 offset = read<u4>();
-          instruction.args.push_back(
-            from_integer(match, signedbv_typet(32)));
+          instruction.operands.push_back(match);
           // By converting the signed offset into an absolute address (by adding
           // the current address) the number represented becomes unsigned.
-          instruction.args.push_back(
-            from_integer(base_offset+offset, unsignedbv_typet(32)));
+          instruction.operands.push_back(base_offset + offset);
           address+=8;
         }
       }
@@ -1126,8 +1469,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
 
         // now default value
         const s4 default_value = read<u4>();
-        instruction.args.push_back(
-          from_integer(base_offset+default_value, signedbv_typet(32)));
+        instruction.operands.push_back(base_offset + default_value);
         address+=4;
 
         // now low value
@@ -1142,11 +1484,10 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         for(s4 i=low_value; i<=high_value; i++)
         {
           s4 offset = read<u4>();
-          instruction.args.push_back(from_integer(i, signedbv_typet(32)));
+          instruction.operands.push_back(i);
           // By converting the signed offset into an absolute address (by adding
           // the current address) the number represented becomes unsigned.
-          instruction.args.push_back(
-            from_integer(base_offset+offset, unsignedbv_typet(32)));
+          instruction.operands.push_back(base_offset + offset);
           address+=4;
         }
       }
@@ -1155,62 +1496,192 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
     case 'm': // multianewarray: constant-pool index plus one unsigned byte
       {
         const u2 c = read<u2>(); // constant-pool index
-        instruction.args.push_back(constant(c));
+        instruction.operands.push_back(c);
         const u1 dimensions = read<u1>(); // number of dimensions
-        instruction.args.push_back(
-          from_integer(dimensions, unsignedbv_typet(8)));
+        instruction.operands.push_back(dimensions);
         address+=3;
       }
       break;
 
     case 't': // array subtype, one byte
-      {
-        typet t;
-        switch(read<u1>())
-        {
-        case T_BOOLEAN: t.id(ID_bool); break;
-        case T_CHAR: t.id(ID_char); break;
-        case T_FLOAT: t.id(ID_float); break;
-        case T_DOUBLE: t.id(ID_double); break;
-        case T_BYTE: t.id(ID_byte); break;
-        case T_SHORT: t.id(ID_short); break;
-        case T_INT: t.id(ID_int); break;
-        case T_LONG: t.id(ID_long); break;
-        default:{};
-        }
-        instruction.args.push_back(type_exprt(t));
-      }
+      instruction.operands.push_back(read<u1>());
       address+=1;
       break;
 
     case 's': // a signed short
       {
         const s2 s = read<u2>();
-        instruction.args.push_back(from_integer(s, signedbv_typet(16)));
+        instruction.operands.push_back(s);
       }
       address+=2;
       break;
 
     default:
-      throw "unknown JVM bytecode instruction";
+      throw "unknown JVM bytecode operand format";
     }
     bytecode_index++;
   }
 
-  if(address!=code_length)
+  if(address != code_length)
   {
-    error() << "bytecode length mismatch" << eom;
+    error()
+      << "bytecode length mismatch (final multi-byte instruction went over "
+         "boundary)"
+      << eom;
     throw 0;
   }
 }
 
-void java_bytecode_parsert::rmethod_attribute(methodt &method)
+void java_bytecode_parsert::rbytecode(
+  std::vector<instructiont> &instructions,
+  const std::vector<java_bytecodet::methodt::instructiont> &raw_instructions)
+{
+  for(const java_bytecodet::methodt::instructiont &raw_instruction :
+      raw_instructions)
+  {
+    instructions.emplace_back();
+    instructiont &instruction = instructions.back();
+    instruction.bytecode = raw_instruction.bytecode;
+    instruction.address = raw_instruction.address;
+    instruction.source_location.set_java_bytecode_index(
+      std::to_string(raw_instruction.bytecode_index));
+
+    switch(bytecode_info[raw_instruction.bytecode].format)
+    {
+    case ' ': // no further bytes
+      break;
+
+    case 'c': // a constant_pool index (one byte)
+    case 'C': // a constant_pool index (two bytes)
+      instruction.args.push_back(constant(raw_instruction.operands[0]));
+      break;
+
+    case 'b': // a signed byte
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[0], signedbv_typet(8)));
+      break;
+
+    case 'o': // two byte branch offset, signed
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[0], unsignedbv_typet(16)));
+      break;
+
+    case 'O': // four byte branch offset, signed
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[0], unsignedbv_typet(32)));
+      break;
+
+    case 'v': // local variable index (one byte)
+      if(raw_instruction.wide_instruction)
+      {
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[0], unsignedbv_typet(16)));
+      }
+      else
+      {
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[0], unsignedbv_typet(8)));
+      }
+      break;
+
+    case 'V':
+      // local variable index (two bytes) plus two signed bytes
+      if(raw_instruction.wide_instruction)
+      {
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[0], unsignedbv_typet(16)));
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[1], signedbv_typet(16)));
+      }
+      else // local variable index (one byte) plus one signed byte
+      {
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[0], unsignedbv_typet(8)));
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[1], signedbv_typet(8)));
+      }
+      break;
+
+    case 'I': // two byte constant_pool index plus two bytes
+      instruction.args.push_back(constant(raw_instruction.operands[0]));
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[1], unsignedbv_typet(8)));
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[0], unsignedbv_typet(8)));
+      break;
+
+    case 'L': // lookupswitch
+    case 'T': // tableswitch
+      // now default value
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[0], unsignedbv_typet(32)));
+
+      for(std::size_t i = 1; i < raw_instruction.operands.size(); i += 2)
+      {
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[i], signedbv_typet(32)));
+        instruction.args.push_back(
+          from_integer(raw_instruction.operands[i + 1], unsignedbv_typet(32)));
+      }
+      break;
+
+    case 'm': // multianewarray: constant-pool index plus one unsigned byte
+      instruction.args.push_back(constant(raw_instruction.operands[0]));
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[1], unsignedbv_typet(8)));
+      break;
+
+    case 't': // array subtype, one byte
+    {
+      typet t;
+      switch(raw_instruction.operands[0])
+      {
+      case T_BOOLEAN:
+        t.id(ID_bool);
+        break;
+      case T_CHAR:
+        t.id(ID_char);
+        break;
+      case T_FLOAT:
+        t.id(ID_float);
+        break;
+      case T_DOUBLE:
+        t.id(ID_double);
+        break;
+      case T_BYTE:
+        t.id(ID_byte);
+        break;
+      case T_SHORT:
+        t.id(ID_short);
+        break;
+      case T_INT:
+        t.id(ID_int);
+        break;
+      case T_LONG:
+        t.id(ID_long);
+        break;
+      }
+      instruction.args.push_back(type_exprt(std::move(t)));
+      break;
+    }
+
+    case 's': // a signed short
+      instruction.args.push_back(
+        from_integer(raw_instruction.operands[0], signedbv_typet(16)));
+      break;
+
+    default:
+      throw "unknown JVM bytecode instruction";
+    }
+  }
+}
+
+void java_bytecode_loadert::rmethod_attribute(java_bytecodet::methodt &method)
 {
   const u2 attribute_name_index = read<u2>();
   const u4 attribute_length = read<u4>();
 
-  irep_idt attribute_name=pool_entry(attribute_name_index).s;
-
+  irep_idt attribute_name = pool_entry(attribute_name_index).s;
   if(attribute_name == "Code")
   {
     UNUSED_u2(max_stack);
@@ -1226,68 +1697,32 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
       skip_bytes(exception_table_length * 8u);
     else
     {
-      method.exception_table.resize(exception_table_length);
+      method.exception_table.reserve(exception_table_length);
 
       for(std::size_t e = 0; e < exception_table_length; e++)
       {
-        const u2 start_pc = read<u2>();
-        const u2 end_pc = read<u2>();
-
         // From the class file format spec ("4.7.3. The Code Attribute" for
         // Java8)
+        const u2 start_pc = read<u2>();
+        const u2 end_pc = read<u2>();
+        const u2 handler_pc = read<u2>();
+        const u2 catch_type_index = read<u2>();
         INVARIANT(
           start_pc < end_pc,
           "The start_pc must be less than the end_pc as this is the range the "
           "exception is active");
-
-        const u2 handler_pc = read<u2>();
-        const u2 catch_type = read<u2>();
-        method.exception_table[e].start_pc = start_pc;
-        method.exception_table[e].end_pc = end_pc;
-        method.exception_table[e].handler_pc = handler_pc;
-        if(catch_type != 0)
-          method.exception_table[e].catch_type =
-            to_struct_tag_type(pool_entry(catch_type).expr.type());
+        method.exception_table.emplace_back(
+          start_pc, end_pc, handler_pc, catch_type_index);
       }
     }
 
     u2 attributes_count = read<u2>();
-
     for(std::size_t j=0; j<attributes_count; j++)
       rcode_attribute(method);
-
-    // method name
-    method.source_location.set_function(
-      "java::" + id2string(parse_tree.parsed_class.name) + "." +
-      id2string(method.name) + ":" + method.descriptor);
-
-    irep_idt line_number;
-
-    // add missing line numbers
-    for(auto &instruction : method.instructions)
-    {
-      if(!instruction.source_location.get_line().empty())
-        line_number = instruction.source_location.get_line();
-      else if(!line_number.empty())
-        instruction.source_location.set_line(line_number);
-      instruction.source_location.set_function(
-        method.source_location.get_function());
-    }
-
-    // line number of method (the first line number available)
-    const auto it = std::find_if(
-      method.instructions.begin(),
-      method.instructions.end(),
-      [&](const instructiont &instruction) {
-        return !instruction.source_location.get_line().empty();
-      });
-    if(it != method.instructions.end())
-      method.source_location.set_line(it->source_location.get_line());
   }
   else if(attribute_name=="Signature")
   {
-    const u2 signature_index = read<u2>();
-    method.signature=id2string(pool_entry(signature_index).s);
+    method.signature_index = read<u2>();
   }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
           attribute_name=="RuntimeVisibleAnnotations")
@@ -1317,7 +1752,79 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     skip_bytes(attribute_length);
 }
 
-void java_bytecode_parsert::rfield_attribute(fieldt &field)
+void java_bytecode_parsert::rmethod_attribute(
+  methodt &method,
+  const java_bytecodet::methodt &raw_method)
+{
+  if(!raw_method.instructions.empty())
+  {
+    rbytecode(method.instructions, raw_method.instructions);
+
+    method.exception_table.resize(raw_method.exception_table.size());
+    std::size_t e = 0;
+    for(java_bytecodet::methodt::exceptiont raw_exception :
+        raw_method.exception_table)
+    {
+      methodt::exceptiont &exception = method.exception_table[e];
+      exception.start_pc = raw_exception.start_pc;
+      exception.end_pc = raw_exception.end_pc;
+      exception.handler_pc = raw_exception.handler_pc;
+      if(raw_exception.catch_type_index != 0)
+        exception.catch_type = to_struct_tag_type(
+          pool_entry(raw_exception.catch_type_index).expr.type());
+      ++e;
+    }
+  }
+
+  rcode_attribute(method, raw_method);
+
+  if(!raw_method.instructions.empty())
+  {
+    irep_idt method_name =
+      "java::" + id2string(parse_tree.parsed_class.name) + "." +
+        id2string(method.name) + ":" + method.descriptor;
+    method.source_location.set_function(method_name);
+
+    irep_idt line_number;
+    // add missing line numbers
+    for(auto &instruction : method.instructions)
+    {
+      if(!instruction.source_location.get_line().empty())
+        line_number = instruction.source_location.get_line();
+      else if(!line_number.empty())
+        instruction.source_location.set_line(line_number);
+      instruction.source_location.set_function(method_name);
+    }
+
+    // line number of method (the first line number available)
+    const auto it = std::find_if(
+      method.instructions.begin(),
+      method.instructions.end(),
+      [&](const instructiont &instruction) {
+        return !instruction.source_location.get_line().empty();
+      });
+    if(it != method.instructions.end())
+      method.source_location.set_line(it->source_location.get_line());
+  }
+
+  if(raw_method.signature_index != 0)
+    method.signature = id2string(pool_entry(raw_method.signature_index).s);
+
+  rRuntimeAnnotation_attribute(method.annotations, raw_method.annotations);
+
+  for(const java_bytecodet::annotationst &raw_parameter_annotations :
+      raw_method.parameter_annotations)
+  {
+    method.parameter_annotations.emplace_back();
+    rRuntimeAnnotation_attribute(
+      method.parameter_annotations.back(), raw_parameter_annotations);
+  }
+
+  method.throws_exception_table =
+    rexceptions_attribute(raw_method.throws_exception_table);
+}
+
+void java_bytecode_loadert::rfield_attribute(java_bytecodet::fieldt &field)
 {
   const u2 attribute_name_index = read<u2>();
   const u4 attribute_length = read<u4>();
@@ -1326,8 +1833,7 @@ void java_bytecode_parsert::rfield_attribute(fieldt &field)
 
   if(attribute_name=="Signature")
   {
-    const u2 signature_index = read<u2>();
-    field.signature=id2string(pool_entry(signature_index).s);
+    field.signature_index = read<u2>();
   }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
      attribute_name=="RuntimeVisibleAnnotations")
@@ -1338,31 +1844,30 @@ void java_bytecode_parsert::rfield_attribute(fieldt &field)
     skip_bytes(attribute_length);
 }
 
-void java_bytecode_parsert::rcode_attribute(methodt &method)
+void java_bytecode_parsert::rfield_attribute(
+  fieldt &field,
+  const java_bytecodet::fieldt &raw_field)
+{
+  if(raw_field.signature_index != 0)
+    field.signature = id2string(pool_entry(raw_field.signature_index).s);
+  rRuntimeAnnotation_attribute(field.annotations, raw_field.annotations);
+}
+
+void java_bytecode_loadert::rcode_attribute(java_bytecodet::methodt &method)
 {
   const u2 attribute_name_index = read<u2>();
   const u4 attribute_length = read<u4>();
 
   irep_idt attribute_name=pool_entry(attribute_name_index).s;
 
-  if(attribute_name=="LineNumberTable")
+  if(!skip_instructions && attribute_name == "LineNumberTable")
   {
-    std::map<unsigned, std::reference_wrapper<instructiont>> instruction_map;
-    for(auto &instruction : method.instructions)
-      instruction_map.emplace(instruction.address, instruction);
-
     const u2 line_number_table_length = read<u2>();
-
     for(std::size_t i=0; i<line_number_table_length; i++)
     {
       const u2 start_pc = read<u2>();
       const u2 line_number = read<u2>();
-
-      // annotate the bytecode program
-      auto it = instruction_map.find(start_pc);
-
-      if(it!=instruction_map.end())
-        it->second.get().source_location.set_line(line_number);
+      method.line_number_table.push_back({ start_pc, line_number });
     }
   }
   else if(attribute_name=="LocalVariableTable")
@@ -1402,27 +1907,30 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       const u1 frame_type = read<u1>();
       if(frame_type<=63)
       {
-        method.stack_map_table[i].type=methodt::stack_map_table_entryt::SAME;
+        method.stack_map_table[i].type =
+          java_bytecode_parse_treet::methodt::stack_map_table_entryt::SAME;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(0);
       }
       else if(64<=frame_type && frame_type<=127)
       {
-        method.stack_map_table[i].type=
-          methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
+        method.stack_map_table[i].type = java_bytecode_parse_treet::methodt::
+          stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(1);
-        methodt::verification_type_infot verification_type_info;
+        java_bytecode_parse_treet::methodt::verification_type_infot
+          verification_type_info;
         read_verification_type_info(verification_type_info);
         method.stack_map_table[i].stack[0]=verification_type_info;
       }
       else if(frame_type==247)
       {
-        method.stack_map_table[i].type=
-          methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
+        method.stack_map_table[i].type = java_bytecode_parse_treet::methodt::
+          stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(1);
-        methodt::verification_type_infot verification_type_info;
+        java_bytecode_parse_treet::methodt::verification_type_infot
+          verification_type_info;
         const u2 offset_delta = read<u2>();
         read_verification_type_info(verification_type_info);
         method.stack_map_table[i].stack[0]=verification_type_info;
@@ -1430,7 +1938,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       }
       else if(248<=frame_type && frame_type<=250)
       {
-        method.stack_map_table[i].type=methodt::stack_map_table_entryt::CHOP;
+        method.stack_map_table[i].type =
+          java_bytecode_parse_treet::methodt::stack_map_table_entryt::CHOP;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(0);
         const u2 offset_delta = read<u2>();
@@ -1438,8 +1947,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       }
       else if(frame_type==251)
       {
-        method.stack_map_table[i].type
-          =methodt::stack_map_table_entryt::SAME_EXTENDED;
+        method.stack_map_table[i].type = java_bytecode_parse_treet::methodt::
+          stack_map_table_entryt::SAME_EXTENDED;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(0);
         const u2 offset_delta = read<u2>();
@@ -1448,32 +1957,32 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
       else if(252<=frame_type && frame_type<=254)
       {
         size_t new_locals = frame_type - 251;
-        method.stack_map_table[i].type=methodt::stack_map_table_entryt::APPEND;
+        method.stack_map_table[i].type =
+          java_bytecode_parse_treet::methodt::stack_map_table_entryt::APPEND;
         method.stack_map_table[i].locals.resize(new_locals);
         method.stack_map_table[i].stack.resize(0);
         const u2 offset_delta = read<u2>();
         method.stack_map_table[i].offset_delta=offset_delta;
         for(size_t k=0; k<new_locals; k++)
         {
-          method.stack_map_table[i].locals
-            .push_back(methodt::verification_type_infot());
-          methodt::verification_type_infot &v=
+          method.stack_map_table[i].locals.push_back({});
+          java_bytecode_parse_treet::methodt::verification_type_infot &v =
             method.stack_map_table[i].locals.back();
           read_verification_type_info(v);
         }
       }
       else if(frame_type==255)
       {
-        method.stack_map_table[i].type=methodt::stack_map_table_entryt::FULL;
+        method.stack_map_table[i].type =
+          java_bytecode_parse_treet::methodt::stack_map_table_entryt::FULL;
         const u2 offset_delta = read<u2>();
         method.stack_map_table[i].offset_delta=offset_delta;
         const u2 number_locals = read<u2>();
         method.stack_map_table[i].locals.resize(number_locals);
         for(size_t k=0; k<(size_t) number_locals; k++)
         {
-          method.stack_map_table[i].locals
-            .push_back(methodt::verification_type_infot());
-          methodt::verification_type_infot &v=
+          method.stack_map_table[i].locals.push_back({});
+          java_bytecode_parse_treet::methodt::verification_type_infot &v =
             method.stack_map_table[i].locals.back();
           read_verification_type_info(v);
         }
@@ -1481,9 +1990,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
         method.stack_map_table[i].stack.resize(number_stack_items);
         for(size_t k=0; k<(size_t) number_stack_items; k++)
         {
-          method.stack_map_table[i].stack
-            .push_back(methodt::verification_type_infot());
-          methodt::verification_type_infot &v=
+          method.stack_map_table[i].stack.push_back({});
+          java_bytecode_parse_treet::methodt::verification_type_infot &v =
             method.stack_map_table[i].stack.back();
           read_verification_type_info(v);
         }
@@ -1496,39 +2004,67 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     skip_bytes(attribute_length);
 }
 
-void java_bytecode_parsert::read_verification_type_info(
-  methodt::verification_type_infot &v)
+void java_bytecode_parsert::rcode_attribute(
+  methodt &method,
+  const java_bytecodet::methodt &raw_method)
+{
+  std::map<unsigned, std::reference_wrapper<instructiont>> instruction_map;
+  for(auto &instruction : method.instructions)
+    instruction_map.emplace(instruction.address, instruction);
+
+  for(const java_bytecodet::methodt::line_number_entryt &line_number_entry :
+      raw_method.line_number_table)
+  {
+    // annotate the bytecode program
+    auto it = instruction_map.find(line_number_entry.start_pc);
+
+    if(it != instruction_map.end())
+      it->second.get().source_location.set_line(line_number_entry.line_number);
+  }
+
+  method.local_variable_table = std::move(raw_method.local_variable_table);
+  method.stack_map_table = std::move(raw_method.stack_map_table);
+}
+
+void java_bytecode_loadert::read_verification_type_info(
+  java_bytecode_parse_treet::methodt::verification_type_infot &v)
 {
   const u1 tag = read<u1>();
   switch(tag)
   {
   case VTYPE_INFO_TOP:
-    v.type=methodt::verification_type_infot::TOP;
+    v.type = java_bytecode_parse_treet::methodt::verification_type_infot::TOP;
     break;
   case VTYPE_INFO_INTEGER:
-    v.type=methodt::verification_type_infot::INTEGER;
+    v.type =
+      java_bytecode_parse_treet::methodt::verification_type_infot::INTEGER;
     break;
   case VTYPE_INFO_FLOAT:
-    v.type=methodt::verification_type_infot::FLOAT;
+    v.type = java_bytecode_parse_treet::methodt::verification_type_infot::FLOAT;
     break;
   case VTYPE_INFO_LONG:
-    v.type=methodt::verification_type_infot::LONG;
+    v.type = java_bytecode_parse_treet::methodt::verification_type_infot::LONG;
     break;
   case VTYPE_INFO_DOUBLE:
-    v.type=methodt::verification_type_infot::DOUBLE;
+    v.type =
+      java_bytecode_parse_treet::methodt::verification_type_infot::DOUBLE;
     break;
   case VTYPE_INFO_ITEM_NULL:
-    v.type=methodt::verification_type_infot::ITEM_NULL;
+    v.type =
+      java_bytecode_parse_treet::methodt::verification_type_infot::ITEM_NULL;
     break;
   case VTYPE_INFO_UNINIT_THIS:
-    v.type=methodt::verification_type_infot::UNINITIALIZED_THIS;
+    v.type = java_bytecode_parse_treet::methodt::verification_type_infot::
+      UNINITIALIZED_THIS;
     break;
   case VTYPE_INFO_OBJECT:
-    v.type=methodt::verification_type_infot::OBJECT;
+    v.type =
+      java_bytecode_parse_treet::methodt::verification_type_infot::OBJECT;
     v.cpool_index = read<u2>();
     break;
   case VTYPE_INFO_UNINIT:
-    v.type=methodt::verification_type_infot::UNINITIALIZED;
+    v.type = java_bytecode_parse_treet::methodt::verification_type_infot::
+      UNINITIALIZED;
     v.offset = read<u2>();
     break;
   default:
@@ -1536,48 +2072,89 @@ void java_bytecode_parsert::read_verification_type_info(
   }
 }
 
-void java_bytecode_parsert::rRuntimeAnnotation_attribute(
-  std::vector<annotationt> &annotations)
+void java_bytecode_loadert::rRuntimeAnnotation_attribute(
+  java_bytecodet::annotationst &annotations)
 {
   const u2 num_annotations = read<u2>();
 
   for(u2 number=0; number<num_annotations; number++)
   {
-    annotationt annotation;
+    java_bytecodet::annotationt annotation;
     rRuntimeAnnotation(annotation);
-    annotations.push_back(annotation);
+    annotations.push_back(std::move(annotation));
   }
 }
 
-void java_bytecode_parsert::rRuntimeAnnotation(
-  annotationt &annotation)
+void java_bytecode_parsert::rRuntimeAnnotation_attribute(
+  std::vector<annotationt> &annotations,
+  const java_bytecodet::annotationst &raw_annotations)
 {
-  const u2 type_index = read<u2>();
-  annotation.type = value_type_entry(type_index);
+  for(const java_bytecodet::annotationt &raw_annotation : raw_annotations)
+  {
+    annotationt annotation;
+    rRuntimeAnnotation(annotation, raw_annotation);
+    annotations.push_back(std::move(annotation));
+  }
+}
+
+void java_bytecode_loadert::rRuntimeAnnotation(
+  java_bytecodet::annotationt &annotation)
+{
+  annotation.type_index = read<u2>();
   relement_value_pairs(annotation.element_value_pairs);
 }
 
-void java_bytecode_parsert::relement_value_pairs(
-  annotationt::element_value_pairst &element_value_pairs)
+void java_bytecode_parsert::rRuntimeAnnotation(
+  annotationt &annotation,
+  const java_bytecodet::annotationt &raw_annotation)
+{
+  annotation.type = value_type_entry(raw_annotation.type_index);
+  relement_value_pairs(
+    annotation.element_value_pairs, raw_annotation.element_value_pairs);
+}
+
+void java_bytecode_loadert::relement_value_pairs(
+  java_bytecodet::annotationt::element_value_pairst &element_value_pairs)
 {
   const u2 num_element_value_pairs = read<u2>();
-  element_value_pairs.resize(num_element_value_pairs);
+  element_value_pairs.reserve(num_element_value_pairs);
 
-  for(auto &element_value_pair : element_value_pairs)
+  for(u2 i = 0; i < num_element_value_pairs; ++i)
   {
-    const u2 element_name_index = read<u2>();
-    element_value_pair.element_name=pool_entry(element_name_index).s;
-    element_value_pair.value = get_relement_value();
+    u2 element_name_index = read<u2>();
+    element_value_pairs.push_back({
+      element_name_index,
+      get_relement_value(),
+    });
+  }
+}
+
+void java_bytecode_parsert::relement_value_pairs(
+  annotationt::element_value_pairst &element_value_pairs,
+  const java_bytecodet::annotationt::element_value_pairst
+    &raw_element_value_pairs)
+{
+  element_value_pairs.reserve(raw_element_value_pairs.size());
+  for(const java_bytecodet::annotationt::element_value_pairt
+        &element_value_pair : raw_element_value_pairs)
+  {
+    element_value_pairs.push_back({
+      pool_entry(element_value_pair.element_name_index).s,
+      element_value_pair.value->get_expr(
+        [this](u2 index) -> const pool_entryt & { return pool_entry(index); }),
+    });
   }
 }
 
 /// Corresponds to the element_value structure
 /// Described in Java 8 specification 4.7.16.1
 /// https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.16.1
-/// \return An exprt that represents the particular value of annotations field.
+/// \return An element_valuet that represents the particular value of
+///   annotations field.
 ///   This is usually one of: a byte, number of some sort, string, character,
 ///   enum, Class type, array or another annotation.
-exprt java_bytecode_parsert::get_relement_value()
+std::unique_ptr<java_bytecodet::element_valuet>
+java_bytecode_loadert::get_relement_value()
 {
   const u1 tag = read<u1>();
 
@@ -1585,49 +2162,43 @@ exprt java_bytecode_parsert::get_relement_value()
   {
   case 'e':
     {
-      UNUSED_u2(type_name_index);
-      UNUSED_u2(const_name_index);
-      // todo: enum
-      return exprt();
+      auto elt = util_make_unique<enum_const_element_valuet>();
+      elt->type_name_index = read<u2>();
+      elt->const_name_index = read<u2>();
+      return std::move(elt);
     }
 
   case 'c':
     {
-      const u2 class_info_index = read<u2>();
-      return symbol_exprt::typeless(pool_entry(class_info_index).s);
+      auto elt = util_make_unique<class_info_element_valuet>();
+      elt->class_info_index = read<u2>();
+      return std::move(elt);
     }
 
   case '@':
     {
-      // TODO: return this wrapped in an exprt
-      // another annotation, recursively
-      annotationt annotation;
-      rRuntimeAnnotation(annotation);
-      return exprt();
+      // Another annotation, recursively
+      auto elt = util_make_unique<annotation_element_valuet>();
+      rRuntimeAnnotation(elt->annotation_value);
+      return std::move(elt);
     }
 
   case '[':
     {
+      auto elt = util_make_unique<array_element_valuet>();
       const u2 num_values = read<u2>();
-      exprt::operandst values;
-      values.reserve(num_values);
-      for(std::size_t i=0; i<num_values; i++)
-      {
-        values.push_back(get_relement_value());
-      }
-      return array_exprt(std::move(values), array_typet(typet(), exprt()));
-    }
-
-  case 's':
-    {
-      const u2 const_value_index = read<u2>();
-      return string_constantt(pool_entry(const_value_index).s);
+      elt->values.reserve(num_values);
+      for(std::size_t i = 0; i < num_values; ++i)
+        elt->values.push_back(get_relement_value());
+      return std::move(elt);
     }
 
   default:
     {
-      const u2 const_value_index = read<u2>();
-      return constant(const_value_index);
+      auto elt = util_make_unique<const_element_valuet>();
+      elt->is_string = tag == 's';
+      elt->const_value_index = read<u2>();
+      return std::move(elt);
     }
   }
 }
@@ -1640,14 +2211,12 @@ exprt java_bytecode_parsert::get_relement_value()
 /// interested in getting information only for inner classes, which is
 /// determined by checking if the parsed class matches any of the inner classes
 /// in its inner class array. If the parsed class is not an inner class, then it
-/// is ignored. When a parsed class is an inner class, the accessibility
-/// information for the parsed class is overwritten, and the parsed class is
-/// marked as an inner class.
-void java_bytecode_parsert::rinner_classes_attribute(
-  const u4 &attribute_length)
+/// is ignored. When a parsed class is an inner class, the information for the
+/// inner and outer classes is stored.
+void java_bytecode_loadert::rinner_classes_attribute(
+  const u4 attribute_length,
+  const u2 class_info_index)
 {
-  classt &parsed_class = parse_tree.parsed_class;
-  std::string name = parsed_class.name.c_str();
   const u2 number_of_classes = read<u2>();
   const u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
   INVARIANT(
@@ -1655,62 +2224,80 @@ void java_bytecode_parsert::rinner_classes_attribute(
     "The number of bytes to be read for the InnerClasses attribute does not "
     "match the attribute length.");
 
-  const auto pool_entry_lambda = [this](u2 index) -> pool_entryt & {
+  const auto get_pool_entry = [this](u2 index) -> raw_pool_entryt & {
     return pool_entry(index);
   };
-  const auto remove_separator_char = [](std::string str, char ch) {
-    str.erase(std::remove(str.begin(), str.end(), ch), str.end());
-    return str;
-  };
+
+  std::string my_class_info_name =
+    class_infot(pool_entry(class_info_index)).get_name(get_pool_entry);
 
   for(int i = 0; i < number_of_classes; i++)
   {
-    const u2 inner_class_info_index = read<u2>();
-    const u2 outer_class_info_index = read<u2>();
-    const u2 inner_name_index = read<u2>();
-    const u2 inner_class_access_flags = read<u2>();
-
-    std::string inner_class_info_name =
-      class_infot(pool_entry(inner_class_info_index))
-        .get_name(pool_entry_lambda);
-    bool is_private = (inner_class_access_flags & ACC_PRIVATE) != 0;
-    bool is_public = (inner_class_access_flags & ACC_PUBLIC) != 0;
-    bool is_protected = (inner_class_access_flags & ACC_PROTECTED) != 0;
-    bool is_static = (inner_class_access_flags & ACC_STATIC) != 0;
+    u2 inner_class_info_index = read<u2>();
+    u2 outer_class_info_index = read<u2>();
+    u2 inner_name_index = read<u2>();
+    u2 inner_class_access_flags = read<u2>();
 
     // If the original parsed class name matches the inner class name,
     // the parsed class is an inner class, so overwrite the parsed class'
     // access information and mark it as an inner class.
-    bool is_inner_class = remove_separator_char(id2string(parsed_class.name), '.') ==
-      remove_separator_char(inner_class_info_name, '/');
-    if(!is_inner_class)
+    std::string inner_class_info_name =
+      class_infot(pool_entry(inner_class_info_index)).get_name(get_pool_entry);
+    if(my_class_info_name != inner_class_info_name)
       continue;
-    parsed_class.is_inner_class = is_inner_class;
-    parsed_class.is_static_class = is_static;
-    // This is a marker that a class is anonymous.
-    if(inner_name_index == 0)
-      parsed_class.is_anonymous_class = true;
-    else
-      parsed_class.inner_name = pool_entry_lambda(inner_name_index).s;
-    // Note that if outer_class_info_index == 0, the inner class is an anonymous
-    // or local class, and is treated as private.
-    if(outer_class_info_index == 0)
-    {
-      parsed_class.is_private = true;
-      parsed_class.is_protected = false;
-      parsed_class.is_public = false;
-    }
-    else
-    {
-      std::string outer_class_info_name =
-        class_infot(pool_entry(outer_class_info_index))
-          .get_name(pool_entry_lambda);
-      parsed_class.outer_class =
-        constant(outer_class_info_index).type().get(ID_C_base_name);
-      parsed_class.is_private = is_private;
-      parsed_class.is_protected = is_protected;
-      parsed_class.is_public = is_public;
-    }
+    INVARIANT(
+      !java_bytecode.inner_class_info.has_value(),
+      "There must only be one matching inner class record");
+    java_bytecode.inner_class_info =
+      java_bytecodet::inner_classt
+      {
+        inner_class_info_index,
+        outer_class_info_index,
+        inner_name_index,
+        inner_class_access_flags,
+      };
+    // Loop around to read the rest of the information even though we won't use
+    // it
+  }
+}
+
+/// When a parsed class is an inner class, the accessibility
+/// information for the parsed class is overwritten, and the parsed class is
+/// marked as an inner class.
+void java_bytecode_parsert::rinner_classes_attribute(
+  const optionalt<java_bytecodet::inner_classt> &inner_class_info)
+{
+  if(!inner_class_info)
+    return;
+  java_bytecodet::inner_classt inner_class = *inner_class_info;
+  classt &parsed_class = parse_tree.parsed_class;
+
+  parsed_class.is_inner_class = true;
+  parsed_class.is_static_class =
+    (inner_class.class_access_flags & ACC_STATIC) != 0;
+
+  // This is a marker that a class is anonymous.
+  if(inner_class.name_index == 0)
+    parsed_class.is_anonymous_class = true;
+  else
+    parsed_class.inner_name = pool_entry(inner_class.name_index).s;
+  // Note that if outer_class_info_index == 0, the inner class is an anonymous
+  // or local class, and is treated as private.
+  if(inner_class.outer_class_info_index == 0)
+  {
+    parsed_class.is_private = true;
+    parsed_class.is_protected = false;
+    parsed_class.is_public = false;
+  }
+  else
+  {
+    parsed_class.outer_class =
+      constant(inner_class.outer_class_info_index).type().get(ID_C_base_name);
+    parsed_class.is_private =
+      (inner_class.class_access_flags & ACC_PRIVATE) != 0;
+    parsed_class.is_protected =
+      (inner_class.class_access_flags & ACC_PROTECTED) != 0;
+    parsed_class.is_public = (inner_class.class_access_flags & ACC_PUBLIC) != 0;
   }
 }
 
@@ -1718,15 +2305,23 @@ void java_bytecode_parsert::rinner_classes_attribute(
 /// Described in Java 8 specification 4.7.5
 /// https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.5
 /// Parses the Exceptions attribute for the current method,
-/// and returns a vector of exceptions.
-std::vector<irep_idt> java_bytecode_parsert::rexceptions_attribute()
+/// and returns a vector of exception pool indices.
+std::vector<u2> java_bytecode_loadert::rexceptions_attribute()
 {
+  std::vector<u2> exceptions;
   const u2 number_of_exceptions = read<u2>();
-
-  std::vector<irep_idt> exceptions;
   for(size_t i = 0; i < number_of_exceptions; i++)
+    exceptions.push_back(read<u2>());
+  return exceptions;
+}
+
+/// Parses the loaded exceptions and returns a vector of exception classes.
+std::vector<irep_idt> java_bytecode_parsert::rexceptions_attribute(
+  const std::vector<u2> &raw_exceptions)
+{
+  std::vector<irep_idt> exceptions;
+  for(u2 exception_index_table : raw_exceptions)
   {
-    const u2 exception_index_table = read<u2>();
     const irep_idt exception_name =
       constant(exception_index_table).type().get(ID_C_base_name);
     exceptions.push_back(exception_name);
@@ -1734,10 +2329,8 @@ std::vector<irep_idt> java_bytecode_parsert::rexceptions_attribute()
   return exceptions;
 }
 
-void java_bytecode_parsert::rclass_attribute()
+void java_bytecode_loadert::rclass_attribute(const u2 class_info_index)
 {
-  classt &parsed_class = parse_tree.parsed_class;
-
   const u2 attribute_name_index = read<u2>();
   const u4 attribute_length = read<u4>();
 
@@ -1745,20 +2338,55 @@ void java_bytecode_parsert::rclass_attribute()
 
   if(attribute_name=="SourceFile")
   {
-    const u2 sourcefile_index = read<u2>();
-    irep_idt sourcefile_name;
+    java_bytecode.sourcefile_name_index = read<u2>();
+  }
+  else if(attribute_name == "Signature")
+  {
+    java_bytecode.signature_index = read<u2>();
+  }
+  else if(
+    attribute_name == "RuntimeInvisibleAnnotations" ||
+    attribute_name == "RuntimeVisibleAnnotations")
+  {
+    rRuntimeAnnotation_attribute(java_bytecode.class_annotations);
+  }
+  else if(attribute_name == "BootstrapMethods")
+  {
+    // for this attribute
+    // cf. https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23
+    INVARIANT(
+      !attribute_bootstrapmethods_read,
+      "only one BootstrapMethods argument is allowed in a class file");
+
+    // Mark as read
+    attribute_bootstrapmethods_read = true;
+    read_bootstrapmethods_entry();
+  }
+  else if(attribute_name == "InnerClasses")
+  {
+    rinner_classes_attribute(attribute_length, class_info_index);
+  }
+  else
+    skip_bytes(attribute_length);
+}
+
+void java_bytecode_parsert::rclass_attributes(
+  const java_bytecodet &java_bytecode)
+{
+  classt &parsed_class = parse_tree.parsed_class;
+
+  if(java_bytecode.sourcefile_name_index != 0)
+  {
+    irep_idt sourcefile_name =
+      pool_entry(java_bytecode.sourcefile_name_index).s;
 
     const std::string &fqn(id2string(parsed_class.name));
     size_t last_index = fqn.find_last_of('.');
-    if(last_index==std::string::npos)
-      sourcefile_name=pool_entry(sourcefile_index).s;
-    else
+    if(last_index != std::string::npos)
     {
-      std::string package_name=fqn.substr(0, last_index+1);
+      std::string package_name = fqn.substr(0, last_index + 1);
       std::replace(package_name.begin(), package_name.end(), '.', '/');
-      const std::string &full_file_name=
-        package_name+id2string(pool_entry(sourcefile_index).s);
-      sourcefile_name=full_file_name;
+      sourcefile_name = package_name + id2string(sourcefile_name);
     }
 
     for(auto &method : parsed_class.methods)
@@ -1771,42 +2399,41 @@ void java_bytecode_parsert::rclass_attribute()
       }
     }
   }
-  else if(attribute_name=="Signature")
-  {
-    const u2 signature_index = read<u2>();
-    parsed_class.signature = id2string(pool_entry(signature_index).s);
-  }
-  else if(attribute_name=="RuntimeInvisibleAnnotations" ||
-          attribute_name=="RuntimeVisibleAnnotations")
-  {
-    rRuntimeAnnotation_attribute(parsed_class.annotations);
-  }
-  else if(attribute_name == "BootstrapMethods")
-  {
-    // for this attribute
-    // cf. https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23
-    INVARIANT(
-      !parsed_class.attribute_bootstrapmethods_read,
-      "only one BootstrapMethods argument is allowed in a class file");
 
-    // mark as read in parsed class
-    parsed_class.attribute_bootstrapmethods_read = true;
-    read_bootstrapmethods_entry();
-  }
-  else if(attribute_name == "InnerClasses")
-  {
-    java_bytecode_parsert::rinner_classes_attribute(attribute_length);
-  }
-  else
-    skip_bytes(attribute_length);
+  rRuntimeAnnotation_attribute(
+    parsed_class.annotations, java_bytecode.class_annotations);
+
+  read_bootstrapmethods_entry(java_bytecode.bootstrap_methods);
+
+  rinner_classes_attribute(java_bytecode.inner_class_info);
 }
 
-void java_bytecode_parsert::rmethods()
+void java_bytecode_loadert::rmethods()
 {
   const u2 methods_count = read<u2>();
-
   for(std::size_t j=0; j<methods_count; j++)
     rmethod();
+}
+
+void java_bytecode_parsert::rmethods(
+  const std::vector<java_bytecodet::methodt> &methods)
+{
+  for(const java_bytecodet::methodt &method : methods)
+    rmethod(method);
+}
+
+void java_bytecode_loadert::rmethod()
+{
+  java_bytecodet::methodt method;
+  method.access_flags = read<u2>();
+  method.name_index = read<u2>();
+  method.descriptor_index = read<u2>();
+
+  const u2 attributes_count = read<u2>();
+  for(std::size_t j = 0; j < attributes_count; j++)
+    rmethod_attribute(method);
+
+  java_bytecode.methods.push_back(std::move(method));
 }
 
 #define ACC_PUBLIC 0x0001u
@@ -1824,13 +2451,11 @@ void java_bytecode_parsert::rmethods()
 #define ACC_ANNOTATION 0x2000u
 #define ACC_ENUM 0x4000u
 
-void java_bytecode_parsert::rmethod()
+void java_bytecode_parsert::rmethod(const java_bytecodet::methodt &raw_method)
 {
   methodt &method = parse_tree.parsed_class.add_method();
 
-  const u2 access_flags = read<u2>();
-  const u2 name_index = read<u2>();
-  const u2 descriptor_index = read<u2>();
+  const u2 access_flags = raw_method.access_flags;
 
   method.is_final=(access_flags&ACC_FINAL)!=0;
   method.is_static=(access_flags&ACC_STATIC)!=0;
@@ -1843,42 +2468,31 @@ void java_bytecode_parsert::rmethod()
   method.is_bridge = (access_flags & ACC_BRIDGE) != 0;
   method.is_varargs = (access_flags & ACC_VARARGS) != 0;
   method.is_synthetic = (access_flags & ACC_SYNTHETIC) != 0;
-  method.name=pool_entry(name_index).s;
-  method.base_name=pool_entry(name_index).s;
-  method.descriptor=id2string(pool_entry(descriptor_index).s);
+  method.base_name = method.name = pool_entry(raw_method.name_index).s;
+  method.descriptor = id2string(pool_entry(raw_method.descriptor_index).s);
 
   const auto flags = (method.is_public ? 1 : 0) +
     (method.is_protected?1:0)+
     (method.is_private?1:0);
   DATA_INVARIANT(flags<=1, "at most one of public, protected, private");
-  const u2 attributes_count = read<u2>();
 
-  for(std::size_t j=0; j<attributes_count; j++)
-    rmethod_attribute(method);
+  rmethod_attribute(method, raw_method);
 }
 
-optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(
+java_bytecode_reft java_bytecode_load(
   std::istream &istream,
   message_handlert &message_handler,
   bool skip_instructions)
 {
-  java_bytecode_parsert java_bytecode_parser(skip_instructions);
-  java_bytecode_parser.in=&istream;
-  java_bytecode_parser.set_message_handler(message_handler);
-
-  bool parser_result=java_bytecode_parser.parse();
-
-  if(parser_result)
-  {
+  java_bytecode_loadert java_bytecode_loader { skip_instructions };
+  java_bytecode_loader.in = &istream;
+  java_bytecode_loader.set_message_handler(message_handler);
+  if(java_bytecode_loader.parse())
     return {};
-  }
-
-  return std::move(java_bytecode_parser.parse_tree);
+  return java_bytecode_reft { std::move(java_bytecode_loader.java_bytecode) };
 }
 
-optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(
+java_bytecode_reft java_bytecode_load(
   const std::string &file,
   message_handlert &message_handler,
   bool skip_instructions)
@@ -1893,13 +2507,27 @@ java_bytecode_parse(
     return {};
   }
 
-  return java_bytecode_parse(in, message_handler, skip_instructions);
+  return java_bytecode_load(in, message_handler, skip_instructions);
+}
+
+optionalt<java_bytecode_parse_treet> java_bytecode_parse(
+  java_bytecode_reft &bytecode,
+  class message_handlert &message_handler)
+{
+  java_bytecode_parsert java_bytecode_parser;
+  java_bytecode_parser.set_message_handler(message_handler);
+
+  if(java_bytecode_parser.parse(*bytecode))
+    return {};
+
+  return std::move(java_bytecode_parser.parse_tree);
 }
 
 /// Parses the local variable type table of a method. The LVTT holds generic
 /// type information for variables in the local variable table (LVT). At most as
 /// many variables as present in the LVT can be in the LVTT.
-void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
+void java_bytecode_loadert::parse_local_variable_type_table(
+  java_bytecodet::methodt &method)
 {
   const u2 local_variable_type_table_length = read<u2>();
 
@@ -1912,7 +2540,7 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
     const u2 start_pc = read<u2>();
     const u2 length = read<u2>();
     const u2 name_index = read<u2>();
-    const u2 signature_index = read<u2>();
+    const u2 var_signature_index = read<u2>();
     const u2 index = read<u2>();
 
     bool found=false;
@@ -1925,7 +2553,7 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
          lvar.length==length)
       {
         found=true;
-        lvar.signature=id2string(pool_entry(signature_index).s);
+        lvar.signature = id2string(pool_entry(var_signature_index).s);
         break;
       }
     }
@@ -1982,26 +2610,39 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 }
 
 /// Read all entries of the `BootstrapMethods` attribute of a class file.
-void java_bytecode_parsert::read_bootstrapmethods_entry()
+void java_bytecode_loadert::read_bootstrapmethods_entry()
 {
   const u2 num_bootstrap_methods = read<u2>();
   for(size_t bootstrap_method_index = 0;
       bootstrap_method_index < num_bootstrap_methods;
       ++bootstrap_method_index)
   {
-    const u2 bootstrap_methodhandle_ref = read<u2>();
-    const pool_entryt &entry = pool_entry(bootstrap_methodhandle_ref);
-
-    method_handle_infot method_handle{entry};
-
+    java_bytecodet::bootstrap_methodt method;
+    method.method_handle_ref = read<u2>();
     const u2 num_bootstrap_arguments = read<u2>();
     debug() << "INFO: parse BootstrapMethod handle " << num_bootstrap_arguments
             << " #args" << eom;
-
     // read u2 values of entry into vector
-    std::vector<u2> u2_values(num_bootstrap_arguments);
+    method.arguments.reserve(num_bootstrap_arguments);
     for(size_t i = 0; i < num_bootstrap_arguments; i++)
-      u2_values[i] = read<u2>();
+      method.arguments.push_back(read<u2>());
+    java_bytecode.bootstrap_methods.push_back(std::move(method));
+  }
+}
+
+/// Parse all bootstrap methods
+/// \param bootstrap_methods The vector of methods to fill with the results
+void java_bytecode_parsert::read_bootstrapmethods_entry(
+  const std::vector<java_bytecodet::bootstrap_methodt> &bootstrap_methods)
+{
+  for(size_t bootstrap_method_index = 0;
+      bootstrap_method_index < bootstrap_methods.size();
+      ++bootstrap_method_index)
+  {
+    const java_bytecodet::bootstrap_methodt &method =
+      bootstrap_methods[bootstrap_method_index];
+    const pool_entryt &entry = pool_entry(method.method_handle_ref);
+    method_handle_infot method_handle{entry};
 
     // try parsing bootstrap method handle
     // each entry contains a MethodHandle structure
@@ -2033,36 +2674,39 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     // Need at least 3 arguments, the interface type, the method hanlde
     // and the method_type, otherwise it doesn't look like a call that we
     // understand
-    if(num_bootstrap_arguments < 3)
+    if(method.arguments.size() < 3)
     {
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(
+        bootstrap_method_index, std::move(method.arguments));
       debug()
         << "format of BootstrapMethods entry not recognized: too few arguments"
         << eom;
       continue;
     }
 
-    u2 interface_type_index = u2_values[0];
-    u2 method_handle_index = u2_values[1];
-    u2 method_type_index = u2_values[2];
+    u2 interface_type_index = method.arguments[0];
+    u2 method_handle_index = method.arguments[1];
+    u2 method_type_index = method.arguments[2];
 
     // The additional arguments for the altmetafactory call are skipped,
     // as they are currently not used. We verify though that they are of
     // CONSTANT_Integer type, cases where this does not hold will be
     // analyzed further.
     bool recognized = true;
-    for(size_t i = 3; i < num_bootstrap_arguments; i++)
+    for(size_t i = 3; i < method.arguments.size(); i++)
     {
-      u2 skipped_argument = u2_values[i];
+      u2 skipped_argument = method.arguments[i];
       recognized &= pool_entry(skipped_argument).tag == CONSTANT_Integer;
     }
 
     if(!recognized)
     {
-      debug() << "format of BootstrapMethods entry not recognized: extra "
-                 "arguments of wrong type"
-              << eom;
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      debug()
+        << "format of BootstrapMethods entry not recognized: extra arguments "
+           "of wrong type"
+        << eom;
+      store_unknown_method_handle(
+        bootstrap_method_index, std::move(method.arguments));
       continue;
     }
 
@@ -2076,10 +2720,12 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
       method_handle_argument.tag != CONSTANT_MethodHandle ||
       method_type_argument.tag != CONSTANT_MethodType)
     {
-      debug() << "format of BootstrapMethods entry not recognized: arguments "
-                 "wrong type"
-              << eom;
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      debug()
+        << "format of BootstrapMethods entry not recognized: arguments wrong "
+           "type"
+        << eom;
+      store_unknown_method_handle(
+        bootstrap_method_index, std::move(method.arguments));
       continue;
     }
 
@@ -2089,10 +2735,12 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
 
     if(!lambda_method_handle.has_value())
     {
-      debug() << "format of BootstrapMethods entry not recognized: method "
-                 "handle not recognised"
-              << eom;
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      debug()
+        << "format of BootstrapMethods entry not recognized: method handle not "
+           "recognised"
+        << eom;
+      store_unknown_method_handle(
+        bootstrap_method_index, std::move(method.arguments));
       continue;
     }
 
@@ -2103,7 +2751,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     lambda_method_handle->interface_type =
       pool_entry(interface_type_argument.ref1).s;
     lambda_method_handle->method_type = pool_entry(method_type_argument.ref1).s;
-    lambda_method_handle->u2_values = std::move(u2_values);
+    lambda_method_handle->u2_values = std::move(method.arguments);
     debug() << "lambda function reference "
             << id2string(lambda_method_handle->lambda_method_name)
             << " in class \"" << parse_tree.parsed_class.name << "\""
