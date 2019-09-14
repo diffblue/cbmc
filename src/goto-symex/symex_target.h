@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 
+#include <analyses/guard.h>
 #include <goto-programs/goto_program.h>
 
 #include "renaming_level.h"
@@ -86,7 +87,7 @@ public:
   ///  takes place (if any)
   /// \param source: Pointer to location in the input GOTO program of this read
   virtual void shared_read(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source) = 0;
@@ -99,7 +100,7 @@ public:
   ///  takes place (if any)
   /// \param source: Pointer to location in the input GOTO program of this write
   virtual void shared_write(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source) = 0;
@@ -124,6 +125,15 @@ public:
     const sourcet &source,
     assignment_typet assignment_type)=0;
 
+  virtual void assignment(
+    const guardt &guard,
+    const ssa_exprt &ssa_lhs,
+    const exprt &ssa_full_lhs,
+    const exprt &original_full_lhs,
+    const exprt &ssa_rhs,
+    const sourcet &source,
+    assignment_typet assignment_type) = 0;
+
   /// Declare a fresh variable. The `cond_expr` is _lhs==lhs_.
   /// \param guard: Precondition for a declaration of this variable
   /// \param ssa_lhs: Variable to be declared, must be symbol (and not nil)
@@ -133,7 +143,7 @@ public:
   /// \param assignment_type: To distinguish between different types of
   ///  assignments (some may be hidden for the further analysis)
   virtual void decl(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
     const exprt &initializer,
     const sourcet &source,
@@ -145,9 +155,9 @@ public:
   /// \param source: Pointer to location in the input GOTO program of this
   ///  removal
   virtual void dead(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
-    const sourcet &source)=0;
+    const sourcet &source) = 0;
 
   /// Record a function call.
   /// \param guard: Precondition for calling a function
@@ -157,7 +167,7 @@ public:
   /// \param hidden: Should this step be recorded as hidden?
   ///  function call
   virtual void function_call(
-    const exprt &guard,
+    const guardt &guard,
     const irep_idt &function_id,
     const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
@@ -170,7 +180,7 @@ public:
   /// \param hidden: Should this step be recorded as hidden?
   ///  function return
   virtual void function_return(
-    const exprt &guard,
+    const guardt &guard,
     const irep_idt &function_id,
     const sourcet &source,
     bool hidden) = 0;
@@ -179,9 +189,7 @@ public:
   /// \param guard: Precondition for reaching this location
   /// \param source: Pointer to location in the input GOTO program to be
   ///  recorded
-  virtual void location(
-    const exprt &guard,
-    const sourcet &source)=0;
+  virtual void location(const guardt &guard, const sourcet &source) = 0;
 
   /// Record an output.
   /// \param guard: Precondition for writing to the output
@@ -226,10 +234,8 @@ public:
   /// \param cond: Condition this assumption represents
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assumption
-  virtual void assumption(
-    const exprt &guard,
-    const exprt &cond,
-    const sourcet &source)=0;
+  virtual void
+  assumption(const guardt &guard, guardt cond, const sourcet &source) = 0;
 
   /// Record an assertion.
   /// \param guard: Precondition for reaching this assertion
@@ -238,20 +244,18 @@ public:
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assertion
   virtual void assertion(
-    const exprt &guard,
-    const exprt &cond,
+    const guardt &guard,
+    guardt cond,
     const std::string &msg,
-    const sourcet &source)=0;
+    const sourcet &source) = 0;
 
   /// Record a goto instruction.
   /// \param guard: Precondition for reaching this goto instruction
   /// \param cond: Condition under which this goto should be taken
   /// \param source: Pointer to location in the input GOTO program of this
   ///  goto instruction
-  virtual void goto_instruction(
-    const exprt &guard,
-    const renamedt<exprt, L2> &cond,
-    const sourcet &source) = 0;
+  virtual void
+  goto_instruction(const guardt &guard, guardt cond, const sourcet &source) = 0;
 
   /// Record a _global_ constraint: there is no guard limiting its scope.
   /// \param cond: Condition represented by this constraint

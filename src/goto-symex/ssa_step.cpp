@@ -22,10 +22,12 @@ void SSA_stept::output(std::ostream &out) const
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << format(cond_expr) << '\n';
+    if(cond_expr.has_value())
+      out << "ASSERT " << format(cond_expr->as_expr()) << '\n';
     break;
   case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << format(cond_expr) << '\n';
+    if(cond_expr.has_value())
+      out << "ASSUME " << format(cond_expr->as_expr()) << '\n';
     break;
   case goto_trace_stept::typet::LOCATION:
     out << "LOCATION" << '\n';
@@ -103,15 +105,20 @@ void SSA_stept::output(std::ostream &out) const
     out << "MEMORY_BARRIER\n";
     break;
   case goto_trace_stept::typet::GOTO:
-    out << "IF " << format(cond_expr) << " GOTO\n";
+    INVARIANT(cond_expr, "GOTO step should have cond_expr field");
+    out << "IF " << format(cond_expr->as_expr()) << " GOTO\n";
     break;
 
   case goto_trace_stept::typet::NONE:
     UNREACHABLE;
   }
 
-  if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << format(cond_expr) << '\n';
+  if(
+    (is_assert() || is_assume() || is_assignment() || is_constraint()) &&
+    cond_expr.has_value())
+  {
+    out << format(cond_expr->as_expr()) << '\n';
+  }
 
   if(is_assert() || is_constraint())
     out << comment << '\n';
@@ -119,7 +126,8 @@ void SSA_stept::output(std::ostream &out) const
   if(is_shared_read() || is_shared_write())
     out << format(ssa_lhs) << '\n';
 
-  out << "Guard: " << format(guard) << '\n';
+  if(guard.has_value())
+    out << "Guard: " << format(guard->as_expr()) << '\n';
 }
 
 /// Check that the SSA step is well-formed
@@ -127,7 +135,8 @@ void SSA_stept::output(std::ostream &out) const
 /// \param vm: validation mode to be used for reporting failures
 void SSA_stept::validate(const namespacet &ns, const validation_modet vm) const
 {
-  validate_full_expr(guard, ns, vm);
+  if(guard.has_value())
+    validate_full_expr(guard->as_expr(), ns, vm);
 
   switch(type)
   {
@@ -135,7 +144,7 @@ void SSA_stept::validate(const namespacet &ns, const validation_modet vm) const
   case goto_trace_stept::typet::ASSUME:
   case goto_trace_stept::typet::GOTO:
   case goto_trace_stept::typet::CONSTRAINT:
-    validate_full_expr(cond_expr, ns, vm);
+    validate_full_expr(cond_expr->as_expr(), ns, vm);
     break;
   case goto_trace_stept::typet::DECL:
     validate_full_expr(ssa_lhs, ns, vm);
@@ -216,11 +225,12 @@ irep_idt SSA_stept::get_property_id() const
 
 SSA_assignment_stept::SSA_assignment_stept(
   symex_targett::sourcet source,
-  exprt _guard,
+  guardt _guard,
   ssa_exprt _ssa_lhs,
   exprt _ssa_full_lhs,
   exprt _original_full_lhs,
   exprt _ssa_rhs,
+  guardt cond,
   symex_targett::assignment_typet _assignment_type)
   : SSA_stept(source, goto_trace_stept::typet::ASSIGNMENT)
 {
@@ -230,7 +240,7 @@ SSA_assignment_stept::SSA_assignment_stept(
   original_full_lhs = std::move(_original_full_lhs);
   ssa_rhs = std::move(_ssa_rhs);
   assignment_type = _assignment_type;
-  cond_expr = equal_exprt{ssa_lhs, ssa_rhs};
+  cond_expr = std::move(cond);
   hidden = assignment_type != symex_targett::assignment_typet::STATE &&
            assignment_type !=
              symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER;

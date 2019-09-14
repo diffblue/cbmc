@@ -26,7 +26,8 @@ partial_order_concurrencyt::~partial_order_concurrencyt()
 }
 
 void partial_order_concurrencyt::add_init_writes(
-  symex_target_equationt &equation)
+  symex_target_equationt &equation,
+  guard_managert &guard_manager)
 {
   std::unordered_set<irep_idt> init_done;
   bool spawn_seen=false;
@@ -52,15 +53,15 @@ void partial_order_concurrencyt::add_init_writes(
     if(init_done.find(a)!=init_done.end())
       continue;
 
-    if(spawn_seen ||
-       e_it->is_shared_read() ||
-       !e_it->guard.is_true())
+    if(
+      spawn_seen || e_it->is_shared_read() ||
+      !(e_it->guard && e_it->guard->is_true()))
     {
       init_steps.emplace_back(
         e_it->source, goto_trace_stept::typet::SHARED_WRITE);
       SSA_stept &SSA_step = init_steps.back();
 
-      SSA_step.guard=true_exprt();
+      SSA_step.guard = guardt{true_exprt{}, guard_manager};
       // no SSA L2 index, thus nondet value
       SSA_step.ssa_lhs = remove_level_2(e_it->ssa_lhs);
       SSA_step.atomic_section_id=0;
@@ -73,9 +74,10 @@ void partial_order_concurrencyt::add_init_writes(
 }
 
 void partial_order_concurrencyt::build_event_lists(
-  symex_target_equationt &equation)
+  symex_target_equationt &equation,
+  guard_managert &guard_manager)
 {
-  add_init_writes(equation);
+  add_init_writes(equation, guard_manager);
 
   // a per-thread counter
   std::map<unsigned, unsigned> counter;

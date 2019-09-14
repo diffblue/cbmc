@@ -17,8 +17,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_sct:public memory_model_baset
 {
 public:
-  explicit memory_model_sct(const namespacet &_ns):
-    memory_model_baset(_ns)
+  memory_model_sct(const namespacet &_ns, guard_managert &guard_manager)
+    : memory_model_baset(_ns), guard_manager(guard_manager)
   {
   }
 
@@ -39,6 +39,9 @@ protected:
   void program_order(symex_target_equationt &equation);
   void from_read(symex_target_equationt &equation);
   void write_serialization_external(symex_target_equationt &equation);
+
+  /// Used for creating guards in SSA steps
+  guard_managert &guard_manager;
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_SC_H

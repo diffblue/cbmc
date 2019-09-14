@@ -224,14 +224,15 @@ void goto_symext::symex_goto(statet &state)
 
   if(new_guard.is_false())
   {
-    target.location(state.guard.as_expr(), state.source);
+    target.location(state.guard, state.source);
 
     // next instruction
     symex_transition(state);
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard.as_expr(), renamed_guard, state.source);
+  target.goto_instruction(
+    state.guard, guardt{renamed_guard.get(), guard_manager}, state.source);
 
   DATA_INVARIANT(
     !instruction.targets.empty(), "goto should have at least one target");
@@ -469,8 +470,10 @@ void goto_symext::symex_goto(statet &state)
         });
 
       target.assignment(
-        guard.as_expr(),
-        new_lhs, new_lhs, guard_symbol_expr,
+        guard,
+        new_lhs,
+        new_lhs,
+        guard_symbol_expr,
         new_rhs,
         original_source,
         symex_targett::assignment_typet::GUARD);
@@ -669,7 +672,7 @@ static void merge_names(
   else
   {
     rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-    if(do_simplify)
+    if(do_simplify && !guardt::is_always_simplified)
       simplify(rhs, ns);
   }
 

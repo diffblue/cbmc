@@ -67,13 +67,16 @@ protected:
   /// 2) the _numbering_ map (with per-thread unique number of every event)
   /// \param equation: the target equation (containing the events to be
   ///   processed)
-  void build_event_lists(symex_target_equationt &);
+  /// \param guard_manager: manager used to create new guards
+  void
+  build_event_lists(symex_target_equationt &, guard_managert &guard_manager);
 
   /// For each shared read event and for each shared write event that appears
   /// after spawn or has false _guard_ prepend a shared write SSA step with
   /// non-deterministic value.
   /// \param equation: the target equation to be modified
-  void add_init_writes(symex_target_equationt &);
+  /// \param guard_manager: manager used to create new guards
+  void add_init_writes(symex_target_equationt &, guard_managert &guard_manager);
 
   // a per-thread numbering of the events
   typedef std::map<event_it, unsigned> numberingt;

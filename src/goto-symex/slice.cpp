@@ -53,20 +53,21 @@ void symex_slicet::slice(symex_target_equationt &equation)
 
 void symex_slicet::slice(SSA_stept &SSA_step)
 {
-  get_symbols(SSA_step.guard);
+  if(SSA_step.guard.has_value())
+    get_symbols(SSA_step.guard->as_expr());
 
   switch(SSA_step.type)
   {
   case goto_trace_stept::typet::ASSERT:
-    get_symbols(SSA_step.cond_expr);
+    get_symbols(SSA_step.cond_expr->as_expr());
     break;
 
   case goto_trace_stept::typet::ASSUME:
-    get_symbols(SSA_step.cond_expr);
+    get_symbols(SSA_step.cond_expr->as_expr());
     break;
 
   case goto_trace_stept::typet::GOTO:
-    get_symbols(SSA_step.cond_expr);
+    get_symbols(SSA_step.cond_expr->as_expr());
     break;
 
   case goto_trace_stept::typet::LOCATION:
@@ -152,16 +153,17 @@ void symex_slicet::collect_open_variables(
   {
     const SSA_stept &SSA_step = *it;
 
-    get_symbols(SSA_step.guard);
+    if(SSA_step.guard.has_value())
+      get_symbols(SSA_step.guard->as_expr());
 
     switch(SSA_step.type)
     {
     case goto_trace_stept::typet::ASSERT:
-      get_symbols(SSA_step.cond_expr);
+      get_symbols(SSA_step.cond_expr->as_expr());
       break;
 
     case goto_trace_stept::typet::ASSUME:
-      get_symbols(SSA_step.cond_expr);
+      get_symbols(SSA_step.cond_expr->as_expr());
       break;
 
     case goto_trace_stept::typet::LOCATION:

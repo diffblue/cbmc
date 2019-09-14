@@ -30,9 +30,10 @@ static void show_step(
 {
   const irep_idt &function_id = step.source.function_id;
 
-  std::string string_value = (step.is_shared_read() || step.is_shared_write())
-                               ? from_expr(ns, function_id, step.ssa_lhs)
-                               : from_expr(ns, function_id, step.cond_expr);
+  std::string string_value =
+    (step.is_shared_read() || step.is_shared_write())
+      ? from_expr(ns, function_id, step.ssa_lhs)
+      : from_expr(ns, function_id, step.cond_expr->as_expr());
   std::cout << '(' << count << ") ";
   if(annotation.empty())
     std::cout << string_value;
@@ -40,9 +41,10 @@ static void show_step(
     std::cout << annotation << '(' << string_value << ')';
   std::cout << '\n';
 
-  if(!step.guard.is_true())
+  if(step.guard.has_value() && !step.guard->is_true())
   {
-    const std::string guard_string = from_expr(ns, function_id, step.guard);
+    const std::string guard_string =
+      from_expr(ns, function_id, step.guard->as_expr());
     std::cout << std::string(std::to_string(count).size() + 3, ' ');
     std::cout << "guard: " << guard_string << '\n';
   }
@@ -69,7 +71,7 @@ void show_program(const namespacet &ns, const symex_target_equationt &equation)
       show_step(ns, step, "ASSUME", count);
     else if(step.is_constraint())
     {
-      PRECONDITION(step.guard.is_true());
+      PRECONDITION(step.guard.has_value() && step.guard->is_true());
       show_step(ns, step, "CONSTRAINT", count);
     }
     else if(step.is_shared_read())

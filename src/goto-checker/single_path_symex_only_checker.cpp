@@ -58,7 +58,7 @@ operator()(propertiest &properties)
 void single_path_symex_only_checkert::initialize_worklist()
 {
   // Put initial state into the work list
-  symex_target_equationt equation(ui_message_handler);
+  symex_target_equationt equation{ui_message_handler, guard_manager};
   symex_bmct symex(
     ui_message_handler,
     goto_model.get_symbol_table(),
@@ -96,7 +96,8 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
     path.state,
     &path.equation,
     symex_symbol_table);
-  postprocess_equation(symex, path.equation, options, ns, ui_message_handler);
+  postprocess_equation(
+    symex, path.equation, options, ns, ui_message_handler, guard_manager);
 
   equation_output(symex, path.equation);
 

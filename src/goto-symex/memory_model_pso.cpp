@@ -15,7 +15,7 @@ void memory_model_psot::operator()(symex_target_equationt &equation)
 {
   statistics() << "Adding PSO constraints" << eom;
 
-  build_event_lists(equation);
+  build_event_lists(equation, guard_manager);
   build_clock_type();
 
   read_from(equation);

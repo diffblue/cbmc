@@ -270,7 +270,7 @@ void field_sensitivityt::field_assignments_rec(
 
     // do the assignment
     target.assignment(
-      state.guard.as_expr(),
+      state.guard,
       ssa_lhs,
       ssa_lhs,
       ssa_lhs.get_original_expr(),

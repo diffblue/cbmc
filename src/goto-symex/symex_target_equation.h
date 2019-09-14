@@ -38,139 +38,140 @@ class decision_proceduret;
 class symex_target_equationt:public symex_targett
 {
 public:
-  explicit symex_target_equationt(message_handlert &message_handler)
-    : log(message_handler)
+  symex_target_equationt(
+    message_handlert &message_handler,
+    guard_managert &guard_manager)
+    : log(message_handler), guard_manager(guard_manager)
   {
   }
 
   virtual ~symex_target_equationt() = default;
 
   /// \copydoc symex_targett::shared_read()
-  virtual void shared_read(
-    const exprt &guard,
+  void shared_read(
+    const guardt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::shared_write()
-  virtual void shared_write(
-    const exprt &guard,
+  void shared_write(
+    const guardt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::assignment()
-  virtual void assignment(
+  void assignment(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
     const exprt &ssa_full_lhs,
     const exprt &original_full_lhs,
     const exprt &ssa_rhs,
     const sourcet &source,
-    assignment_typet assignment_type);
+    assignment_typet assignment_type) override;
+
+  void assignment(
+    const guardt &guard,
+    const ssa_exprt &ssa_lhs,
+    const exprt &ssa_full_lhs,
+    const exprt &original_full_lhs,
+    const exprt &ssa_rhs,
+    const sourcet &source,
+    assignment_typet assignment_type) override;
 
   /// \copydoc symex_targett::decl()
-  virtual void decl(
-    const exprt &guard,
+  void decl(
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
     const exprt &initializer,
     const sourcet &source,
-    assignment_typet assignment_type);
+    assignment_typet assignment_type) override;
 
   /// \copydoc symex_targett::dead()
-  virtual void dead(
-    const exprt &guard,
+  void dead(
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::function_call()
-  virtual void function_call(
-    const exprt &guard,
+  void function_call(
+    const guardt &guard,
     const irep_idt &function_id,
     const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
-    bool hidden);
+    bool hidden) override;
 
   /// \copydoc symex_targett::function_return()
-  virtual void function_return(
-    const exprt &guard,
+  void function_return(
+    const guardt &guard,
     const irep_idt &function_id,
     const sourcet &source,
-    bool hidden);
+    bool hidden) override;
 
   /// \copydoc symex_targett::location()
-  virtual void location(
-    const exprt &guard,
-    const sourcet &source);
+  void location(const guardt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::output()
-  virtual void output(
+  void output(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<renamedt<exprt, L2>> &args);
+    const std::list<renamedt<exprt, L2>> &args) override;
 
   /// \copydoc symex_targett::output_fmt()
-  virtual void output_fmt(
+  void output_fmt(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
     const irep_idt &fmt,
-    const std::list<exprt> &args);
+    const std::list<exprt> &args) override;
 
   /// \copydoc symex_targett::input()
-  virtual void input(
+  void input(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
-    const std::list<exprt> &args);
+    const std::list<exprt> &args) override;
 
   /// \copydoc symex_targett::assumption()
-  virtual void assumption(
-    const exprt &guard,
-    const exprt &cond,
-    const sourcet &source);
+  void
+  assumption(const guardt &guard, guardt cond, const sourcet &source) override;
 
   /// \copydoc symex_targett::assertion()
-  virtual void assertion(
-    const exprt &guard,
-    const exprt &cond,
+  void assertion(
+    const guardt &guard,
+    guardt cond,
     const std::string &msg,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::goto_instruction()
-  virtual void goto_instruction(
-    const exprt &guard,
-    const renamedt<exprt, L2> &cond,
-    const sourcet &source);
+  void goto_instruction(const guardt &guard, guardt cond, const sourcet &source)
+    override;
 
   /// \copydoc symex_targett::constraint()
-  virtual void constraint(
+  void constraint(
     const exprt &cond,
     const std::string &msg,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::spawn()
-  virtual void spawn(
-    const exprt &guard,
-    const sourcet &source);
+  void spawn(const exprt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::memory_barrier()
-  virtual void memory_barrier(
-    const exprt &guard,
-    const sourcet &source);
+  void memory_barrier(const exprt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::atomic_begin()
-  virtual void atomic_begin(
+  void atomic_begin(
     const exprt &guard,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::atomic_end()
-  virtual void atomic_end(
+  void atomic_end(
     const exprt &guard,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
@@ -285,6 +286,9 @@ protected:
 
   // for unique function call argument identifiers
   std::size_t argument_count = 0;
+
+private:
+  guard_managert &guard_manager;
 };
 
 inline bool operator<(

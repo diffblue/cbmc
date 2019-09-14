@@ -204,7 +204,7 @@ void goto_symext::symex_function_call_symbol(
   Forall_expr(it, code.arguments())
     *it = clean_expr(std::move(*it), state, false);
 
-  target.location(state.guard.as_expr(), state.source);
+  target.location(state.guard, state.source);
 
   PRECONDITION(code.function().id() == ID_symbol);
 
@@ -282,15 +282,14 @@ void goto_symext::symex_function_call_code(
 
   // record the call
   target.function_call(
-    state.guard.as_expr(), identifier, renamed_arguments, state.source, hidden);
+    state.guard, identifier, renamed_arguments, state.source, hidden);
 
   if(!goto_function.body_available())
   {
     no_body(identifier);
 
     // record the return
-    target.function_return(
-      state.guard.as_expr(), identifier, state.source, hidden);
+    target.function_return(state.guard, identifier, state.source, hidden);
 
     if(call.lhs().is_not_nil())
     {
@@ -409,7 +408,7 @@ void goto_symext::symex_end_of_function(statet &state)
 
   // first record the return
   target.function_return(
-    state.guard.as_expr(), state.source.function_id, state.source, hidden);
+    state.guard, state.source.function_id, state.source, hidden);
 
   // then get rid of the frame
   pop_frame(state, path_storage, symex_config.doing_path_exploration);

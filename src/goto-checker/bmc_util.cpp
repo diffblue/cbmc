@@ -159,17 +159,19 @@ void convert_symex_target_equation(
   equation.convert(decision_procedure);
 }
 
-std::unique_ptr<memory_model_baset>
-get_memory_model(const optionst &options, const namespacet &ns)
+std::unique_ptr<memory_model_baset> get_memory_model(
+  const optionst &options,
+  const namespacet &ns,
+  guard_managert &guard_manager)
 {
   const std::string mm = options.get_option("mm");
 
   if(mm.empty() || mm == "sc")
-    return util_make_unique<memory_model_sct>(ns);
+    return util_make_unique<memory_model_sct>(ns, guard_manager);
   else if(mm == "tso")
-    return util_make_unique<memory_model_tsot>(ns);
+    return util_make_unique<memory_model_tsot>(ns, guard_manager);
   else if(mm == "pso")
-    return util_make_unique<memory_model_psot>(ns);
+    return util_make_unique<memory_model_psot>(ns, guard_manager);
   else
   {
     throw "invalid memory model '" + mm + "': use one of sc, tso, pso";
@@ -250,8 +252,9 @@ void update_properties_status_from_symex_target_equation(
 
     // Don't update status of properties that are constant 'false';
     // we wouldn't have traces for them.
-    const auto status = step.cond_expr.is_true() ? property_statust::PASS
-                                                 : property_statust::UNKNOWN;
+    INVARIANT(step.cond_expr, "assert should have cond_expr");
+    const auto status = step.cond_expr->is_true() ? property_statust::PASS
+                                                  : property_statust::UNKNOWN;
     auto emplace_result = properties.emplace(
       property_id, property_infot{step.source.pc, step.comment, status});
 
@@ -324,13 +327,14 @@ void postprocess_equation(
   symex_target_equationt &equation,
   const optionst &options,
   const namespacet &ns,
-  ui_message_handlert &ui_message_handler)
+  ui_message_handlert &ui_message_handler,
+  guard_managert &guard_manager)
 {
   // add a partial ordering, if required
   if(equation.has_threads())
   {
     std::unique_ptr<memory_model_baset> memory_model =
-      get_memory_model(options, ns);
+      get_memory_model(options, ns, guard_manager);
     memory_model->set_message_handler(ui_message_handler);
     (*memory_model)(equation);
   }

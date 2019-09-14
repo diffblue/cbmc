@@ -404,7 +404,8 @@ void build_goto_trace(
 
       if(SSA_step.is_assert() || SSA_step.is_assume() || SSA_step.is_goto())
       {
-        goto_trace_step.cond_expr = SSA_step.cond_expr;
+        if(SSA_step.cond_expr.has_value())
+          goto_trace_step.cond_expr = SSA_step.cond_expr->as_expr();
 
         goto_trace_step.cond_value =
           decision_procedure.get(SSA_step.cond_handle).is_true();

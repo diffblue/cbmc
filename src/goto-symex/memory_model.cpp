@@ -70,11 +70,12 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       {
         // Add the read's guard, each of the writes' guards is implied
         // by each entry in rf_some
-        add_constraint(
-          equation,
-          implies_exprt{read_event->guard, disjunction(rf_choice_symbols)},
-          "rf-some",
-          read_event->source);
+        const exprt condition =
+          read_event->guard.has_value()
+            ? (exprt)implies_exprt{read_event->guard->as_expr(),
+                                   disjunction(rf_choice_symbols)}
+            : (exprt)true_exprt{};
+        add_constraint(equation, condition, "rf-some", read_event->source);
       }
     }
   }
@@ -91,15 +92,16 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
   choice_symbols.emplace(std::make_pair(r, w), s);
 
   bool is_rfi = w->source.thread_nr == r->source.thread_nr;
+  // We rely on the fact that there is at least
+  // one write event that has guard 'true'.
+  const exprt condition = implies_exprt{
+    s,
+    w->guard.has_value() ? (exprt)and_exprt{w->guard->as_expr(),
+                                            equal_exprt{r->ssa_lhs, w->ssa_lhs}}
+                         : equal_exprt{r->ssa_lhs, w->ssa_lhs}};
   // Uses only the write's guard as precondition, read's guard
   // follows from rf_some
-  add_constraint(
-    equation,
-    // We rely on the fact that there is at least
-    // one write event that has guard 'true'.
-    implies_exprt{s, and_exprt{w->guard, equal_exprt{r->ssa_lhs, w->ssa_lhs}}},
-    is_rfi ? "rfi" : "rf",
-    r->source);
+  add_constraint(equation, condition, is_rfi ? "rfi" : "rf", r->source);
 
   if(!is_rfi)
   {

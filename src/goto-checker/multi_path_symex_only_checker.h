@@ -30,8 +30,8 @@ protected:
   abstract_goto_modelt &goto_model;
   symbol_tablet symex_symbol_table;
   namespacet ns;
-  symex_target_equationt equation;
   guard_managert guard_manager;
+  symex_target_equationt equation;
   path_fifot path_storage; // should go away
   symex_bmct symex;
 

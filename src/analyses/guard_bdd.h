@@ -44,6 +44,9 @@ public:
   /// dest are trivial.
   exprt guard_expr(exprt expr) const;
 
+  /// \return guard for `guard => other`
+  guard_bddt implies(const guard_bddt &other) const;
+
   bool is_true() const
   {
     return bdd.is_true();
@@ -63,6 +66,13 @@ public:
   guard_bddt operator!() const
   {
     return guard_bddt(manager, bdd.bdd_not());
+  }
+
+  /// Underlying representation of the guard. The type can vary for each guard
+  /// implementation.
+  const bddt &underlying() const
+  {
+    return bdd;
   }
 
 private:

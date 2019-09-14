@@ -64,6 +64,11 @@ exprt guard_bddt::guard_expr(exprt expr) const
   }
 }
 
+guard_bddt guard_bddt::implies(const guard_bddt &other) const
+{
+  return guard_bddt{manager, bdd.bdd_not().bdd_or(other.bdd)};
+}
+
 guard_bddt &guard_bddt::append(const guard_bddt &guard)
 {
   bdd = bdd.bdd_and(guard.bdd);

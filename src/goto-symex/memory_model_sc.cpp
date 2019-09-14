@@ -17,7 +17,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
 {
   statistics() << "Adding SC constraints" << eom;
 
-  build_event_lists(equation);
+  build_event_lists(equation, guard_manager);
   build_clock_type();
 
   read_from(equation);
@@ -307,10 +307,14 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             // the guard of w_prime follows from rf; with rfi
             // optimisation such as the previous write_symbol_primed
             // it would even be wrong to add this guard
-            cond=
-              implies_exprt(
-                and_exprt(r->guard, (*w)->guard, ws1, rf),
+            if(r->guard.has_value() && (*w)->guard.has_value())
+            {
+              cond = implies_exprt(
+                and_exprt(r->guard->as_expr(), (*w)->guard->as_expr(), ws1, rf),
                 fr);
+            }
+            else
+              cond = true_exprt{};
           }
           else if(c_it->first.second==*w && !ws2.is_false())
           {
@@ -319,10 +323,15 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             // the guard of w follows from rf; with rfi
             // optimisation such as the previous write_symbol_primed
             // it would even be wrong to add this guard
-            cond=
-              implies_exprt(
-                and_exprt(r->guard, (*w_prime)->guard, ws2, rf),
+            if(r->guard.has_value() && (*w)->guard.has_value())
+            {
+              cond = implies_exprt(
+                and_exprt(
+                  r->guard->as_expr(), (*w_prime)->guard->as_expr(), ws2, rf),
                 fr);
+            }
+            else
+              cond = true_exprt{};
           }
 
           if(cond.is_not_nil())

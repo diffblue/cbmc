@@ -26,9 +26,10 @@ SCENARIO("Validation of well-formed SSA steps", "[core][goto-symex][validate]")
     fun_symbol.name = fun_name;
     symbol_exprt fun_foo(fun_name, code_type);
 
+    guard_managert guard_manager;
     goto_programt goto_program;
     goto_program.add_instruction(END_FUNCTION);
-    symex_target_equationt equation(null_message_handler);
+    symex_target_equationt equation{null_message_handler, guard_manager};
     symex_targett::sourcet at_end_function(fun_name, goto_program);
     equation.SSA_steps.emplace_back(
       at_end_function, goto_trace_stept::typet::FUNCTION_RETURN);
