@@ -425,7 +425,8 @@ static irep_idt get_method_identifier(
 
 void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
-  const methodt &m)
+  const methodt &m,
+  const optionalt<prefix_filtert> &method_context)
 {
   // Construct the fully qualified method name
   // (e.g. "my.package.ClassName.myMethodName:(II)I") and query the symbol table
@@ -605,8 +606,12 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
   {
     code_blockt code(convert_parameter_annotations(m, method_type));
-    code.append(convert_instructions(m));
-    method_symbol.value = std::move(code);
+    // Do not convert if method is not in context
+    if(!method_context || (*method_context)(id2string(method_identifier)))
+    {
+      code.append(convert_instructions(m));
+      method_symbol.value = std::move(code);
+    }
   }
 }
 
@@ -3184,7 +3189,8 @@ void java_bytecode_convert_method(
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy,
-  bool threading_support)
+  bool threading_support,
+  const optionalt<prefix_filtert> &method_context)
 
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
@@ -3197,7 +3203,7 @@ void java_bytecode_convert_method(
     class_hierarchy,
     threading_support);
 
-  java_bytecode_convert_method(class_symbol, method);
+  java_bytecode_convert_method(class_symbol, method, method_context);
 }
 
 /// Returns true iff method \p methodid from class \p classname is

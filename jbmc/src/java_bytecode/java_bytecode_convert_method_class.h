@@ -61,9 +61,12 @@ public:
   typedef methodt::local_variable_tablet local_variable_tablet;
   typedef methodt::local_variablet local_variablet;
 
-  void operator()(const symbolt &class_symbol, const methodt &method)
+  void operator()(
+    const symbolt &class_symbol,
+    const methodt &method,
+    const optionalt<prefix_filtert> &method_context)
   {
-    convert(class_symbol, method);
+    convert(class_symbol, method, method_context);
   }
 
   typedef uint16_t method_offsett;
@@ -290,7 +293,10 @@ protected:
     bool allow_merge = true);
 
   // conversion
-  void convert(const symbolt &class_symbol, const methodt &);
+  void convert(
+    const symbolt &class_symbol,
+    const methodt &,
+    const optionalt<prefix_filtert> &method_context);
 
   code_blockt convert_parameter_annotations(
     const methodt &method,

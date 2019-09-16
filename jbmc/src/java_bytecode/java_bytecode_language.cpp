@@ -1173,12 +1173,6 @@ bool java_bytecode_languaget::convert_single_method(
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
 {
-  // Do not convert if method is not in context
-  if(method_context && !(*method_context)(id2string(function_id)))
-  {
-    return false;
-  }
-
   const symbolt &symbol = symbol_table.lookup_ref(function_id);
 
   // Nothing to do if body is already loaded
@@ -1312,7 +1306,8 @@ bool java_bytecode_languaget::convert_single_method(
       std::move(needed_lazy_methods),
       string_preprocess,
       class_hierarchy,
-      threading_support);
+      threading_support,
+      method_context);
     INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
     return false;
   }
