@@ -245,7 +245,7 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
     options.get_bool_option("ignore-manifest-main-class");
 
   if(options.is_set("context-include") || options.is_set("context-exclude"))
-    method_in_context = get_context(options);
+    method_context = get_context(options);
 
   language_options_initialized=true;
 }
@@ -1174,7 +1174,7 @@ bool java_bytecode_languaget::convert_single_method(
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
 {
   // Do not convert if method is not in context
-  if(method_in_context && !(*method_in_context)(id2string(function_id)))
+  if(method_context && !(*method_context)(id2string(function_id)))
   {
     return false;
   }

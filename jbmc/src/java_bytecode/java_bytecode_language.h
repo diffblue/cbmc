@@ -297,7 +297,7 @@ private:
   std::unordered_map<std::string, object_creation_referencet> references;
 
   /// If set, method bodies are only elaborated if they pass the filter
-  optionalt<prefix_filtert> method_in_context;
+  optionalt<prefix_filtert> method_context;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();
