@@ -422,10 +422,10 @@ static void assign_array_data_component_from_json(
 
 /// Allocate a fresh array of length \p array_length_expr and assigns \p expr
 /// to it.
-static void allocate_array(
+static codet allocate_array(
   const exprt &expr,
   const exprt &array_length_expr,
-  object_creation_infot &info)
+  const source_locationt &loc)
 {
   const pointer_typet &pointer_type = to_pointer_type(expr.type());
   const auto &element_type =
@@ -433,8 +433,7 @@ static void allocate_array(
   side_effect_exprt java_new_array{ID_java_new_array, pointer_type};
   java_new_array.copy_to_operands(array_length_expr);
   java_new_array.type().subtype().set(ID_element_type, element_type);
-  code_assignt assign{expr, java_new_array, info.loc};
-  info.block.add(assign);
+  return code_assignt{expr, java_new_array, loc};
 }
 
 /// Declare a non-deterministic length expression
@@ -737,7 +736,8 @@ static std::pair<bool, object_creation_referencet> get_or_create_reference(
                                   side_effect_expr_nondett{java_int_type()}});
       info.block.add(code_assumet{binary_predicate_exprt{
         *reference.array_length, ID_ge, from_integer(0, java_int_type())}});
-      allocate_array(reference.expr, *reference.array_length, info);
+      info.block.add(
+        allocate_array(reference.expr, *reference.array_length, info.loc));
       info.references.insert({id, reference});
     }
     else
@@ -843,7 +843,7 @@ void assign_from_json_rec(
       {
         const exprt length =
           nondet_length(info.allocate_objects, info.block, info.loc);
-        allocate_array(expr, length, info);
+        info.block.add(allocate_array(expr, length, info.loc));
         assign_nondet_length_array_from_json(
           expr, json, length, type_from_array, info);
       }
@@ -853,7 +853,8 @@ void assign_from_json_rec(
         const auto &element_type =
           java_array_element_type(to_struct_tag_type(expr.type().subtype()));
         const std::size_t length = get_untyped_array(json, element_type).size();
-        allocate_array(expr, from_integer(length, java_int_type()), info);
+        info.block.add(allocate_array(
+          expr, from_integer(length, java_int_type()), info.loc));
         assign_array_data_component_from_json(
           expr, json, type_from_array, info);
       }
