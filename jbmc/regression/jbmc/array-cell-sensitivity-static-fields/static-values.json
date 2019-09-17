@@ -1,0 +1,17 @@
+{
+    "@type":"com.diffblue.retriever.StaticFieldMap",
+    "Test":{
+        "@type":"com.diffblue.retriever.StaticFieldMap",
+        "staticCharArrayRef":{
+            "@type":"[C",
+            "@ref": "id1"
+        },
+        "staticCharArray":{
+            "@type":"[C",
+            "@id": "id1",
+            "@items":[
+                "abcAefghijklmnopqrstuvwxyz"
+            ]
+        }
+    }
+}

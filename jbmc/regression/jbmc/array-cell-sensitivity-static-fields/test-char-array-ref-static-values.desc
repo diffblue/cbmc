@@ -1,0 +1,13 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--function Test.charArrayRef --property "java::Test.charArrayRef:()[C.assertion.2" --static-values static-values.json
+Generated 0 VCC[(]s[)], 0 remaining after simplification
+assertion at file Test.java line 31 .*: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Not that the json file has been modified on purpose so that this checks
+that it is actually loaded and not retrieved by execution of the Util function.
+This test does not work with symex-driven-lazy-loading because this option is
+not compatible with --property.
