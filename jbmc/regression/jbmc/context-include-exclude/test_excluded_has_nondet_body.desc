@@ -1,0 +1,15 @@
+CORE
+ExcludedProperties.class
+--context-exclude org.cprover.other --function ExcludedProperties.compileTimeReturnType
+^EXIT=10$
+^SIGNAL=0$
+.* line 14 assertion at file ExcludedProperties.java line 14 .*: SUCCESS
+.* line 16 assertion at file ExcludedProperties.java line 16 .*: FAILURE
+.* line 19 assertion at file ExcludedProperties.java line 19 .*: FAILURE
+.* line 21 assertion at file ExcludedProperties.java line 21 .*: FAILURE
+--
+--
+Test that for an excluded method, we keep the information about the
+(compile-time) return type of the method and return a nondet object of that
+type, or null.
+Note that we do this in the same way as for stubbed methods.
