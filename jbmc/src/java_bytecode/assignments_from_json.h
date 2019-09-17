@@ -11,22 +11,12 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_ASSIGNMENTS_FROM_JSON_H
 #define CPROVER_JAVA_BYTECODE_ASSIGNMENTS_FROM_JSON_H
 
+#include "code_with_references.h"
 #include <util/std_code.h>
 
 class jsont;
 class symbol_table_baset;
 class ci_lazy_methods_neededt;
-
-/// Information to store when several references point to the same Java object.
-struct object_creation_referencet
-{
-  /// Expression for the symbol that stores the value that may be reference
-  /// equal to other values.
-  exprt expr;
-
-  /// If `symbol` is an array, this expression stores its length.
-  optionalt<symbol_exprt> array_length;
-};
 
 /// Given an expression \p expr representing a Java object or primitive and a
 /// JSON representation \p json of the value of a Java object or primitive of a
