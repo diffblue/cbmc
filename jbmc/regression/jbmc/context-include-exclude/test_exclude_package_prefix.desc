@@ -1,0 +1,14 @@
+CORE
+Main.class
+--context-include Main --context-include org.cprover --context-exclude org.cprover.ot
+^EXIT=10$
+^SIGNAL=0$
+.* line 12 assertion at file Main.java line 12 .*: SUCCESS
+.* line 13 assertion at file Main.java line 13 .*: SUCCESS
+.* line 14 assertion at file Main.java line 14 .*: SUCCESS
+.* line 15 assertion at file Main.java line 15 .*: FAILURE
+--
+WARNING: no body for function .*
+--
+Tests that --context-exclude works with an argument that is the prefix of a
+package name.

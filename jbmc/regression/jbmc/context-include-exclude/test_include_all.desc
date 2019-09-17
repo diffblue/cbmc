@@ -3,9 +3,10 @@ Main.class
 
 ^EXIT=0$
 ^SIGNAL=0$
-.* line 10 assertion at file Main.java line 10 .*: SUCCESS
-.* line 11 assertion at file Main.java line 11 .*: SUCCESS
 .* line 12 assertion at file Main.java line 12 .*: SUCCESS
+.* line 13 assertion at file Main.java line 13 .*: SUCCESS
+.* line 14 assertion at file Main.java line 14 .*: SUCCESS
+.* line 15 assertion at file Main.java line 15 .*: SUCCESS
 --
 WARNING: no body for function .*
 --

@@ -3,9 +3,10 @@ Main.class
 --context-include Main.
 ^EXIT=10$
 ^SIGNAL=0$
-.* line 10 assertion at file Main.java line 10 .*: SUCCESS
-.* line 11 assertion at file Main.java line 11 .*: FAILURE
-.* line 12 assertion at file Main.java line 12 .*: FAILURE
+.* line 12 assertion at file Main.java line 12 .*: SUCCESS
+.* line 13 assertion at file Main.java line 13 .*: FAILURE
+.* line 14 assertion at file Main.java line 14 .*: FAILURE
+.* line 15 assertion at file Main.java line 15 .*: FAILURE
 --
 WARNING: no body for function .*
 --
