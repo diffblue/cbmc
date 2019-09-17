@@ -657,6 +657,12 @@ protected:
     symex_assignt &symex_assign,
     const function_application_exprt &f_l1);
 
+  /// Attempt to constant propagate trim operations.
+  bool constant_propagate_trim(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1);
+
   /// Assign constant string length and string data given by a char array to
   /// given ssa variables
   ///

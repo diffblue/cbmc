@@ -207,6 +207,10 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
       {
         return constant_propagate_set_char_at(state, symex_assign, f_l1);
       }
+      else if(func_id == ID_cprover_string_trim_func)
+      {
+        return constant_propagate_trim(state, symex_assign, f_l1);
+      }
     }
   }
 
@@ -911,6 +915,58 @@ bool goto_symext::constant_propagate_set_char_at(
 
   const array_exprt new_char_array(
     std::move(s_data.operands()), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_trim(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
+  const auto s_data_opt = try_evaluate_constant_string(state, s.content());
+
+  if(!s_data_opt)
+    return false;
+
+  auto is_not_whitespace = [](const exprt &expr) {
+    auto character = numeric_cast_v<unsigned int>(to_constant_expr(expr));
+    return character > ' ';
+  };
+
+  // Note the points where a trim would trim too.
+  auto &operands = s_data_opt->get().operands();
+  auto end_iter =
+    std::find_if(operands.rbegin(), operands.rend(), is_not_whitespace);
+  auto start_iter =
+    std::find_if(operands.begin(), operands.end(), is_not_whitespace);
+
+  // Then copy in the string with leading/trailing whitespace removed.
+  // Note: if start_iter == operands.end it means the entire string is
+  // whitespace, so we'll trim it to be empty anyway.
+  exprt::operandst new_operands;
+  if(start_iter != operands.end())
+    new_operands = exprt::operandst{start_iter, end_iter.base()};
+
+  const constant_exprt new_char_array_length =
+    from_integer(new_operands.size(), length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+  const array_exprt new_char_array(
+    std::move(new_operands), new_char_array_type);
 
   assign_string_constant(
     state,
