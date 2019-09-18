@@ -589,8 +589,7 @@ void get_virtual_calleest::get_functions(
   const std::string function_name_string(id2string(function_name));
   INVARIANT(!class_id.empty(), "All virtual functions must have a class");
 
-  resolve_inherited_componentt get_virtual_call_target(
-    symbol_table, class_hierarchy);
+  resolve_inherited_componentt get_virtual_call_target{symbol_table};
   const function_call_resolvert resolve_function_call =
     [&get_virtual_call_target](
       const irep_idt &class_id, const irep_idt &function_name) {

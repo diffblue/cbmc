@@ -371,7 +371,6 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 /// \param component_name: component basename to search for. If searching for
 ///   A.b, this is "b".
 /// \param symbol_table: global symbol table.
-/// \param class_hierarchy: global class hierarchy.
 /// \param include_interfaces: if true, search for the given component in all
 ///   ancestors including interfaces, rather than just parents.
 /// \return the concrete component referred to if any is found, or an invalid
@@ -381,11 +380,9 @@ get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
   const symbol_tablet &symbol_table,
-  const class_hierarchyt &class_hierarchy,
   bool include_interfaces)
 {
-  resolve_inherited_componentt component_resolver(
-    symbol_table, class_hierarchy);
+  resolve_inherited_componentt component_resolver{symbol_table};
   const auto resolved_component =
     component_resolver(component_class_id, component_name, include_interfaces);
 

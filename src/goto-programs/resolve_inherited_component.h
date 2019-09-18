@@ -21,8 +21,7 @@ Author: Diffblue Ltd.
 class resolve_inherited_componentt
 {
 public:
-  resolve_inherited_componentt(
-    const symbol_tablet &symbol_table, const class_hierarchyt &class_hierarchy);
+  explicit resolve_inherited_componentt(const symbol_tablet &symbol_table);
 
   class inherited_componentt
   {
@@ -54,7 +53,6 @@ public:
     const irep_idt &class_name, const irep_idt &component_name);
 
 private:
-  const class_hierarchyt &class_hierarchy;
   const symbol_tablet &symbol_table;
 };
 

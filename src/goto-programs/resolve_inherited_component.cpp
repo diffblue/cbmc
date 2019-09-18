@@ -12,16 +12,10 @@ Author: Diffblue Ltd.
 
 /// See the operator() method comment
 /// \param symbol_table: The symbol table to resolve the component against
-/// \param class_hierarchy: A prebuilt class_hierachy based on the symbol_table
-///
 resolve_inherited_componentt::resolve_inherited_componentt(
-  const symbol_tablet &symbol_table,
-  const class_hierarchyt &class_hierarchy)
-  : class_hierarchy(class_hierarchy), symbol_table(symbol_table)
+  const symbol_tablet &symbol_table)
+  : symbol_table(symbol_table)
 {
-  // We require the class_hierarchy to be already populated if we are being
-  // supplied it.
-  PRECONDITION(!class_hierarchy.class_map.empty());
 }
 
 /// Given a class and a component, identify the concrete field or method it is
@@ -58,10 +52,16 @@ resolve_inherited_componentt::operator()(
       return inherited_componentt(current_class, component_name);
     }
 
-    const auto current_class_id = class_hierarchy.class_map.find(current_class);
-    if(current_class_id != class_hierarchy.class_map.end())
+    const auto current_class_symbol_it =
+      symbol_table.symbols.find(current_class);
+
+    if(current_class_symbol_it != symbol_table.symbols.end())
     {
-      const class_hierarchyt::idst &parents = current_class_id->second.parents;
+      const auto parents =
+        make_range(to_struct_type(current_class_symbol_it->second.type).bases())
+          .map([](const struct_typet::baset &base) {
+            return base.type().get_identifier();
+          });
 
       if(include_interfaces)
       {
@@ -71,7 +71,7 @@ resolve_inherited_componentt::operator()(
       else
       {
         if(!parents.empty())
-          classes_to_visit.push_back(parents.front());
+          classes_to_visit.push_back(*parents.begin());
       }
     }
   }
