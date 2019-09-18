@@ -68,3 +68,9 @@ void code_with_references_listt::append(code_with_references_listt &&other)
 {
   list.splice(list.end(), other.list);
 }
+
+void code_with_references_listt::add_to_front(code_without_referencest code)
+{
+  auto ptr = std::make_shared<code_without_referencest>(std::move(code));
+  list.emplace_front(std::move(ptr));
+}

@@ -101,6 +101,8 @@ public:
   void add(reference_allocationt ref);
 
   void append(code_with_references_listt &&other);
+
+  void add_to_front(code_without_referencest code);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_CODE_WITH_REFERENCES_H
