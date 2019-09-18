@@ -663,6 +663,13 @@ protected:
     symex_assignt &symex_assign,
     const function_application_exprt &f_l1);
 
+  /// Attempt to constant propagate case changes, both upper and lower.
+  bool constant_propagate_case_change(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1,
+    bool to_upper);
+
   /// Assign constant string length and string data given by a char array to
   /// given ssa variables
   ///

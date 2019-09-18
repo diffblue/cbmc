@@ -211,6 +211,14 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
       {
         return constant_propagate_trim(state, symex_assign, f_l1);
       }
+      else if(func_id == ID_cprover_string_to_lower_case_func)
+      {
+        return constant_propagate_case_change(state, symex_assign, f_l1, false);
+      }
+      else if(func_id == ID_cprover_string_to_upper_case_func)
+      {
+        return constant_propagate_case_change(state, symex_assign, f_l1, true);
+      }
     }
   }
 
@@ -915,6 +923,68 @@ bool goto_symext::constant_propagate_set_char_at(
 
   const array_exprt new_char_array(
     std::move(s_data.operands()), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_case_change(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1,
+  bool to_upper)
+{
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
+  const auto s_data_opt = try_evaluate_constant_string(state, s.content());
+
+  if(!s_data_opt)
+    return false;
+
+  array_exprt string_data = s_data_opt->get();
+
+  auto &operands = string_data.operands();
+  for(auto &operand : operands)
+  {
+    auto &constant_value = to_constant_expr(operand);
+    auto character = numeric_cast_v<unsigned int>(constant_value);
+
+    // Can't guarantee matches against non-ASCII characters.
+    if(character >= 128)
+      return false;
+
+    if(isalpha(character))
+    {
+      if(to_upper)
+      {
+        if(islower(character))
+          constant_value =
+            from_integer(toupper(character), constant_value.type());
+      }
+      else
+      {
+        if(isupper(character))
+          constant_value =
+            from_integer(tolower(character), constant_value.type());
+      }
+    }
+  }
+
+  const constant_exprt new_char_array_length =
+    from_integer(operands.size(), length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+  const array_exprt new_char_array(std::move(operands), new_char_array_type);
 
   assign_string_constant(
     state,
