@@ -298,10 +298,12 @@ static simplify_exprt::resultt<> simplify_string_compare_to(
 ///
 /// \param expr: the expression to simplify
 /// \param ns: namespace
+/// \param search_from_end: return the last instead of the first index
 /// \return: the modified expression or an unchanged expression
 static simplify_exprt::resultt<> simplify_string_index_of(
   const function_application_exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  const bool search_from_end)
 {
   std::size_t starting_index = 0;
 
@@ -336,21 +338,19 @@ static simplify_exprt::resultt<> simplify_string_index_of(
 
   const array_exprt &s1_data = s1_data_opt->get();
 
-  if(starting_index >= s1_data.operands().size())
+  const auto search_string_size = s1_data.operands().size();
+  if(starting_index >= search_string_size)
   {
     return from_integer(-1, expr.type());
   }
 
-  // Iterator pointing to the character in the first string at which the second
-  // string or character was found
-  exprt::operandst::const_iterator it;
-
+  unsigned long starting_offset =
+    starting_index > 0 ? (search_string_size - 1) - starting_index : 0;
   if(can_cast_expr<refined_string_exprt>(expr.arguments().at(1)))
   {
     // Second argument is a string
 
-    const refined_string_exprt &s2 =
-      to_string_expr(expr.arguments().at(1));
+    const refined_string_exprt &s2 = to_string_expr(expr.arguments().at(1));
 
     const auto s2_data_opt = try_get_string_data_array(s2.content(), ns);
 
@@ -361,11 +361,41 @@ static simplify_exprt::resultt<> simplify_string_index_of(
 
     const array_exprt &s2_data = s2_data_opt->get();
 
-    it = std::search(
-      std::next(s1_data.operands().begin(), starting_index),
-      s1_data.operands().end(),
-      s2_data.operands().begin(),
-      s2_data.operands().end());
+    // Searching for empty string is a special case and is simply the
+    // "always found at the first searched position. This needs to take into
+    // account starting position and if you're starting from the beginning or
+    // end.
+    if(s2_data.operands().empty())
+      return from_integer(
+        search_from_end
+          ? starting_index > 0 ? starting_index : search_string_size
+          : 0,
+        expr.type());
+
+    if(search_from_end)
+    {
+      auto end = std::prev(s1_data.operands().end(), starting_offset);
+      auto it = std::find_end(
+        s1_data.operands().begin(),
+        end,
+        s2_data.operands().begin(),
+        s2_data.operands().end());
+      if(it != end)
+        return from_integer(
+          std::distance(s1_data.operands().begin(), it), expr.type());
+    }
+    else
+    {
+      auto it = std::search(
+        std::next(s1_data.operands().begin(), starting_index),
+        s1_data.operands().end(),
+        s2_data.operands().begin(),
+        s2_data.operands().end());
+
+      if(it != s1_data.operands().end())
+        return from_integer(
+          std::distance(s1_data.operands().begin(), it), expr.type());
+    }
   }
   else if(expr.arguments().at(1).id() == ID_constant)
   {
@@ -374,33 +404,40 @@ static simplify_exprt::resultt<> simplify_string_index_of(
     const constant_exprt &c1 = to_constant_expr(expr.arguments().at(1));
     const auto c1_val = numeric_cast_v<mp_integer>(c1);
 
-    auto pred = [&](const exprt &c2)
-    {
+    auto pred = [&](const exprt &c2) {
       const auto c2_val = numeric_cast_v<mp_integer>(to_constant_expr(c2));
 
       return c1_val == c2_val;
     };
 
-    it = std::find_if(
-      std::next(s1_data.operands().begin(), starting_index),
-      s1_data.operands().end(),
-      pred);
+    if(search_from_end)
+    {
+      auto it = std::find_if(
+        std::next(s1_data.operands().rbegin(), starting_offset),
+        s1_data.operands().rend(),
+        pred);
+      if(it != s1_data.operands().rend())
+        return from_integer(
+          std::distance(s1_data.operands().begin(), it.base() - 1),
+          expr.type());
+    }
+    else
+    {
+      auto it = std::find_if(
+        std::next(s1_data.operands().begin(), starting_index),
+        s1_data.operands().end(),
+        pred);
+      if(it != s1_data.operands().end())
+        return from_integer(
+          std::distance(s1_data.operands().begin(), it), expr.type());
+    }
   }
   else
   {
     return simplify_exprt::unchanged(expr);
   }
 
-  if(it == s1_data.operands().end())
-  {
-    return from_integer(-1, expr.type());
-  }
-  else
-  {
-    const std::size_t idx = std::distance(s1_data.operands().begin(), it);
-
-    return from_integer(idx, expr.type());
-  }
+  return from_integer(-1, expr.type());
 }
 
 /// Simplify String.charAt function when arguments are constant
@@ -546,7 +583,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   }
   else if(func_id == ID_cprover_string_index_of_func)
   {
-    return simplify_string_index_of(expr, ns);
+    return simplify_string_index_of(expr, ns, false);
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
@@ -555,6 +592,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   else if(func_id == ID_cprover_string_contains_func)
   {
     return simplify_string_contains(expr, ns);
+  }
+  else if(func_id == ID_cprover_string_last_index_of_func)
+  {
+    return simplify_string_index_of(expr, ns, true);
   }
 
   return unchanged(expr);
