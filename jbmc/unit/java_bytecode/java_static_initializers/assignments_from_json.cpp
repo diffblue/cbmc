@@ -89,17 +89,23 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    code_blockt block;
     optionalt<ci_lazy_methods_neededt> option{};
-    assign_from_json(
+    const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,
       clinit_name,
-      block,
       symbol_table,
       option,
       max_user_array_length,
       references);
+
+    code_with_referencest::reference_substitutiont reference_substitution =
+      [&](const std::string &reference_id) -> object_creation_referencet & {
+      UNREACHABLE;
+    };
+    code_blockt block;
+    for(auto code_with_references : code.list)
+      block.append(code_with_references->to_code(reference_substitution));
     THEN("The instruction is the declaration of a symbol of TestClass* type")
     {
       const symbol_exprt declared_symbol =
@@ -175,17 +181,23 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    code_blockt block;
     optionalt<ci_lazy_methods_neededt> option{};
-    assign_from_json(
+    const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,
       clinit_name,
-      block,
       symbol_table,
       option,
       max_user_array_length,
       references);
+
+    code_with_referencest::reference_substitutiont reference_substitution =
+      [&](const std::string &reference_id) -> object_creation_referencet & {
+      UNREACHABLE;
+    };
+    code_blockt block;
+    for(auto code_with_references : code.list)
+      block.append(code_with_references->to_code(reference_substitution));
 
     THEN("The instruction is the declaration of a symbol of TestClass* type")
     {
@@ -294,17 +306,23 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    code_blockt block;
     optionalt<ci_lazy_methods_neededt> option{};
-    assign_from_json(
+    const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,
       clinit_name,
-      block,
       symbol_table,
       option,
       max_user_array_length,
       references);
+
+    code_with_referencest::reference_substitutiont reference_substitution =
+      [&](const std::string &reference_id) -> object_creation_referencet & {
+      UNREACHABLE;
+    };
+    code_blockt block;
+    for(auto code_with_references : code.list)
+      block.append(code_with_references->to_code(reference_substitution));
 
     THEN("The instruction is the declaration of a symbol of TestClass* type")
     {

@@ -902,11 +902,10 @@ code_with_references_listt assign_from_json_rec(
   return result;
 }
 
-void assign_from_json(
+code_with_references_listt assign_from_json(
   const exprt &expr,
   const jsont &json,
   const irep_idt &function_id,
-  code_blockt &assignments,
   symbol_table_baset &symbol_table,
   optionalt<ci_lazy_methods_neededt> &needed_lazy_methods,
   size_t max_user_array_length,
@@ -930,15 +929,15 @@ void assign_from_json(
                              location,
                              max_user_array_length,
                              class_type};
-  code_blockt body;
-  code_with_referencest::reference_substitutiont reference_substitution =
-    [&](const std::string &reference_id) -> object_creation_referencet & {
-    auto it = references.find(reference_id);
-    INVARIANT(it != references.end(), "reference id must be present in map");
-    return it->second;
-  };
-  const auto code_with_references = assign_from_json_rec(expr, json, {}, info);
+  code_with_references_listt code_with_references =
+    assign_from_json_rec(expr, json, {}, info);
+  code_blockt assignments;
   allocate.declare_created_symbols(assignments);
-  for(const auto &code_with_ref : code_with_references.list)
-    assignments.append(code_with_ref->to_code(reference_substitution));
+  std::for_each(
+    assignments.statements().rbegin(),
+    assignments.statements().rend(),
+    [&](const codet &c) {
+      code_with_references.add_to_front(code_without_referencest{c});
+    });
+  return code_with_references;
 }

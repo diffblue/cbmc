@@ -96,11 +96,10 @@ class ci_lazy_methods_neededt;
 ///   a function, not a line number.
 ///
 /// For parameter documentation, see \ref object_creation_infot.
-void assign_from_json(
+code_with_references_listt assign_from_json(
   const exprt &expr,
   const jsont &json,
   const irep_idt &function_id,
-  code_blockt &block,
   symbol_table_baset &symbol_table,
   optionalt<ci_lazy_methods_neededt> &needed_lazy_methods,
   size_t max_user_array_length,
