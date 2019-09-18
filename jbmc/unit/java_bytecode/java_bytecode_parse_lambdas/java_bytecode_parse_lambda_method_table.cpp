@@ -37,7 +37,7 @@ SCENARIO(
           compiler + "_classes/StaticLambdas.class",
         null_message_handler);
       optionalt<java_bytecode_parse_treet> parse_tree =
-        java_bytecode_parse(bytecode, null_message_handler);
+        java_bytecode_parse(bytecode, {}, null_message_handler);
       WHEN("Parsing that class")
       {
         REQUIRE(parse_tree);
@@ -348,7 +348,7 @@ SCENARIO(
             compiler + "_classes/LocalLambdas.class",
           null_message_handler);
         optionalt<java_bytecode_parse_treet> parse_tree =
-          java_bytecode_parse(bytecode, null_message_handler);
+          java_bytecode_parse(bytecode, {}, null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);
@@ -657,7 +657,7 @@ SCENARIO(
             compiler + "_classes/MemberLambdas.class",
           null_message_handler);
         optionalt<java_bytecode_parse_treet> parse_tree =
-          java_bytecode_parse(bytecode, null_message_handler);
+          java_bytecode_parse(bytecode, {}, null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);
@@ -992,7 +992,7 @@ SCENARIO(
             compiler + "_classes/OuterMemberLambdas$Inner.class",
           null_message_handler);
         optionalt<java_bytecode_parse_treet> parse_tree =
-          java_bytecode_parse(bytecode, null_message_handler);
+          java_bytecode_parse(bytecode, {}, null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);

@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bytecode_info.h"
 #include "java_bytecode_parse_tree.h"
-#include "java_type_signature_parser.h"
 #include "java_string_literal_expr.h"
 #include "java_types.h"
 
@@ -69,6 +68,7 @@ struct java_bytecodet
     u2 class_access_flags;
   };
   optionalt<inner_classt> inner_class_info;
+  optionalt<std::string> get_outer_class_name();
 
   struct bootstrap_methodt
   {
@@ -183,6 +183,10 @@ java_bytecode_reft::java_bytecode_reft(java_bytecodet &&bytecode) noexcept
 java_bytecode_reft::java_bytecode_reft(java_bytecode_reft &&) noexcept =
   default;
 java_bytecode_reft::~java_bytecode_reft() = default;
+optionalt<std::string> java_bytecode_reft::get_outer_class_name()
+{
+  return bytecode->get_outer_class_name();
+}
 
 // An element_valuet for constant values looked up from the constant pool
 struct const_element_valuet : public java_bytecodet::element_valuet
@@ -346,8 +350,9 @@ private:
 class java_bytecode_parsert : public messaget
 {
 public:
-  bool parse(const java_bytecodet &java_bytecode);
-  optionalt<java_class_type_signaturet> class_sig;
+  bool parse(
+    const java_bytecodet &java_bytecode,
+    const java_generic_type_parameter_mapt &outer_generic_parameters);
   java_bytecode_parse_treet parse_tree;
 
 private:
@@ -384,21 +389,25 @@ private:
 
   typet value_type_entry(u2 index)
   {
-    PRECONDITION(class_sig);
+    PRECONDITION(parse_tree.parsed_class.parsed_sig);
     return java_value_type_signaturet::parse_single_value_type(
-        id2string(pool_entry(index).s), class_sig->type_parameter_map)
+        id2string(pool_entry(index).s),
+        parse_tree.parsed_class.parsed_sig->type_parameter_map)
       ->get_type("java::" + id2string(parse_tree.parsed_class.name));
   }
 
   typet method_type_entry(u2 index)
   {
-    PRECONDITION(class_sig);
+    PRECONDITION(parse_tree.parsed_class.parsed_sig);
     return java_method_type_signaturet(
-        id2string(pool_entry(index).s), class_sig->type_parameter_map)
+        id2string(pool_entry(index).s),
+        parse_tree.parsed_class.parsed_sig->type_parameter_map)
       .get_type("java::" + id2string(parse_tree.parsed_class.name));
   }
 
-  void rClassFile(const java_bytecodet &java_bytecode);
+  void rClassFile(
+    const java_bytecodet &java_bytecode,
+    const java_generic_type_parameter_mapt &outer_generic_parameters);
   void rconstant_pool(const java_bytecodet::constant_poolt &raw_constant_pool);
   void rinterfaces(const std::vector<u2> &implements_indices);
   void rfields(const std::vector<java_bytecodet::fieldt> &fields);
@@ -693,11 +702,13 @@ bool java_bytecode_loadert::parse()
   return false;
 }
 
-bool java_bytecode_parsert::parse(const java_bytecodet &java_bytecode)
+bool java_bytecode_parsert::parse(
+  const java_bytecodet &java_bytecode,
+  const java_generic_type_parameter_mapt &outer_generic_parameters)
 {
   try
   {
-    rClassFile(java_bytecode);
+    rClassFile(java_bytecode, outer_generic_parameters);
   }
 
   catch(const char *message)
@@ -783,7 +794,9 @@ void java_bytecode_loadert::rClassFile()
     rclass_attribute(java_bytecode.this_class_index);
 }
 
-void java_bytecode_parsert::rClassFile(const java_bytecodet &java_bytecode)
+void java_bytecode_parsert::rClassFile(
+  const java_bytecodet &java_bytecode,
+  const java_generic_type_parameter_mapt &outer_generic_parameters)
 {
   parse_tree.loading_successful = false;
 
@@ -815,8 +828,8 @@ void java_bytecode_parsert::rClassFile(const java_bytecodet &java_bytecode)
   }
   try
   {
-    // TODO: Load the parameter map of the outer class first
-    class_sig = java_class_type_signaturet(signature, {});
+    parsed_class.parsed_sig =
+      java_class_type_signaturet(signature, outer_generic_parameters);
   }
   catch(unsupported_java_class_signature_exceptiont &)
   {
@@ -863,8 +876,9 @@ void java_bytecode_parsert::rClassFile(const java_bytecodet &java_bytecode)
 /// Get the class references for the benefit of a dependency analysis.
 void java_bytecode_parsert::get_class_refs()
 {
-  PRECONDITION(class_sig);
-  class_sig->collect_class_dependencies(parse_tree.class_refs);
+  PRECONDITION(parse_tree.parsed_class.parsed_sig);
+  parse_tree.parsed_class.parsed_sig->collect_class_dependencies(
+    parse_tree.class_refs);
 
   for(const auto &c : constant_pool)
   {
@@ -897,7 +911,8 @@ void java_bytecode_parsert::get_class_refs()
       try
       {
         java_value_type_signaturet::parse_single_value_type(
-            field.signature.value(), class_sig->type_parameter_map)
+            field.signature.value(),
+            parse_tree.parsed_class.parsed_sig->type_parameter_map)
           ->collect_class_dependencies(parse_tree.class_refs);
         gathered = true;
       }
@@ -922,7 +937,7 @@ void java_bytecode_parsert::get_class_refs()
       {
         java_method_type_signaturet method_sig {
           method.signature.value(),
-          class_sig->type_parameter_map
+          parse_tree.parsed_class.parsed_sig->type_parameter_map
         };
         method_sig.collect_class_dependencies(parse_tree.class_refs);
         for(const auto &var : method.local_variable_table)
@@ -2261,6 +2276,20 @@ void java_bytecode_loadert::rinner_classes_attribute(
   }
 }
 
+optionalt<std::string> java_bytecodet::get_outer_class_name()
+{
+  if(!inner_class_info)
+    return {};
+  if(inner_class_info->outer_class_info_index == 0)
+    // outer_class_info_index == 0 => the inner class is anonymous or local
+    // TODO: Surely we should still be able to find the outer class
+    return {};
+  const auto get_pool_entry =
+    [this](u2 index) -> raw_pool_entryt & { return constant_pool[index]; };
+  return class_infot(constant_pool[inner_class_info->outer_class_info_index])
+    .get_name(get_pool_entry);
+}
+
 /// When a parsed class is an inner class, the accessibility
 /// information for the parsed class is overwritten, and the parsed class is
 /// marked as an inner class.
@@ -2512,12 +2541,13 @@ java_bytecode_reft java_bytecode_load(
 
 optionalt<java_bytecode_parse_treet> java_bytecode_parse(
   java_bytecode_reft &bytecode,
+  const java_generic_type_parameter_mapt &outer_generic_parameters,
   class message_handlert &message_handler)
 {
   java_bytecode_parsert java_bytecode_parser;
   java_bytecode_parser.set_message_handler(message_handler);
 
-  if(java_bytecode_parser.parse(*bytecode))
+  if(java_bytecode_parser.parse(*bytecode, outer_generic_parameters))
     return {};
 
   return std::move(java_bytecode_parser.parse_tree);

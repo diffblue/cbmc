@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 
 #include "bytecode_info.h"
+#include "java_type_signature_parser.h"
 
 struct java_bytecode_parse_treet
 {
@@ -268,6 +269,7 @@ struct java_bytecode_parse_treet
     typedef std::list<irep_idt> implementst;
     implementst implements;
     optionalt<std::string> signature;
+    optionalt<java_class_type_signaturet> parsed_sig;
     typedef std::list<fieldt> fieldst;
     typedef std::list<methodt> methodst;
     fieldst fields;

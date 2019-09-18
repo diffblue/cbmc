@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <util/optional.h>
 
+#include "java_type_signature_parser.h"
+
 struct java_bytecodet;
 struct java_bytecode_parse_treet;
 
@@ -37,6 +39,7 @@ public:
   {
     return *bytecode;
   }
+  optionalt<std::string> get_outer_class_name();
 };
 
 /// Attempt to load the bytecode from the given file.
@@ -63,10 +66,13 @@ java_bytecode_reft java_bytecode_load(
 
 /// Attempt to parse a Java class from the loaded bytecode
 /// \param bytecode: the loaded bytecode
+/// \param outer_generic_parameters The generic paramaters of the outer class,
+///   if any
 /// \param message_handler: handles log messages
 /// \return parse tree, or empty optionalt on failure
 optionalt<java_bytecode_parse_treet> java_bytecode_parse(
   java_bytecode_reft &bytecode,
+  const java_generic_type_parameter_mapt &outer_generic_parameters,
   class message_handlert &message_handler);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSER_H

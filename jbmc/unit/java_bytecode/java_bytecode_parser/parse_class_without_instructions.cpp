@@ -62,7 +62,7 @@ SCENARIO(
       null_message_handler,
       true);
     optionalt<java_bytecode_parse_treet> loaded =
-      java_bytecode_parse(bytecode, null_message_handler);
+      java_bytecode_parse(bytecode, {}, null_message_handler);
     THEN("Loading should succeed")
     {
       REQUIRE(loaded);
@@ -96,7 +96,7 @@ SCENARIO(
       null_message_handler,
       false);
     optionalt<java_bytecode_parse_treet> loaded =
-      java_bytecode_parse(bytecode, null_message_handler);
+      java_bytecode_parse(bytecode, {}, null_message_handler);
     THEN("Loading should succeed")
     {
       REQUIRE(loaded);
