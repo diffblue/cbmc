@@ -180,6 +180,48 @@ static simplify_exprt::resultt<> simplify_string_endswith(
   return from_integer(res ? 1 : 0, expr.type());
 }
 
+/// Simplify String.contains function when arguments are constant
+static simplify_exprt::resultt<> simplify_string_contains(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  // We want to get both arguments of any starts-with comparison, and
+  // trace them back to the actual string instance. All variables on the
+  // way must be constant for us to be sure this will work.
+  auto &first_argument = to_string_expr(expr.arguments().at(0));
+  auto &second_argument = to_string_expr(expr.arguments().at(1));
+
+  const auto first_value_opt =
+    try_get_string_data_array(first_argument.content(), ns);
+
+  if(!first_value_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const array_exprt &first_value = first_value_opt->get();
+
+  const auto second_value_opt =
+    try_get_string_data_array(second_argument.content(), ns);
+
+  if(!second_value_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const array_exprt &second_value = second_value_opt->get();
+
+  // Is our 'contains' array directly contained in our target.
+  const bool includes =
+    std::search(
+      first_value.operands().begin(),
+      first_value.operands().end(),
+      second_value.operands().begin(),
+      second_value.operands().end()) != first_value.operands().end();
+
+  return from_integer(includes ? 1 : 0, expr.type());
+}
+
 /// Simplify String.isEmpty function when arguments are constant
 /// \param expr: the expression to simplify
 /// \param ns: namespace
@@ -509,6 +551,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   else if(func_id == ID_cprover_string_char_at_func)
   {
     return simplify_string_char_at(expr, ns);
+  }
+  else if(func_id == ID_cprover_string_contains_func)
+  {
+    return simplify_string_contains(expr, ns);
   }
 
   return unchanged(expr);
