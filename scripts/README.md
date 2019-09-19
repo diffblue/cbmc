@@ -1,7 +1,6 @@
 A collection of utility scripts and script applications.
 
-pretty-printers 
-------
+# pretty-printers 
 
 GDB:
 
@@ -25,3 +24,14 @@ scripts, and the code injects the pretty-printers during that.
 
 Nothing else is required to get the pretty-printers to work, beside using 
 GDB to debug the code.
+
+# options
+
+There is an `options.json` file to control any internal options.
+
+List of options.
+
+`clion_pretty_printers`: Some pretty printers work differently if you're
+running them in CLion versus baseline GDB, and aren't very pretty if you 
+look at them in the alternate view. Set to true if you use CLion, false if
+you use commandline GDB. Defaults to true. 
