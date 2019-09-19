@@ -104,7 +104,7 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   }
 }
 
-static prefix_filtert get_context(const optionst &options)
+prefix_filtert get_context(const optionst &options)
 {
   std::vector<std::string> context_include;
   std::vector<std::string> context_exclude;

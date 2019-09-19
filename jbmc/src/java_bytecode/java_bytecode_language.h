@@ -304,4 +304,6 @@ std::unique_ptr<languaget> new_java_bytecode_language();
 
 void parse_java_language_options(const cmdlinet &cmd, optionst &options);
 
+prefix_filtert get_context(const optionst &options);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H

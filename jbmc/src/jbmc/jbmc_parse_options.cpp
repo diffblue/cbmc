@@ -690,6 +690,8 @@ int jbmc_parse_optionst::get_goto_program(
   std::unique_ptr<abstract_goto_modelt> &goto_model_ptr,
   const optionst &options)
 {
+  if(options.is_set("context-include") || options.is_set("context-exclude"))
+    method_context = get_context(options);
   lazy_goto_modelt lazy_goto_model =
     lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
   lazy_goto_model.initialize(cmdline.args, options);
@@ -1009,7 +1011,9 @@ bool jbmc_parse_optionst::generate_function_body(
   // Provide a simple stub implementation for any function we don't have a
   // bytecode implementation for:
 
-  if(body_available)
+  if(
+    body_available &&
+    (!method_context || (*method_context)(id2string(function_name))))
     return false;
 
   if(!can_generate_function_body(function_name))
