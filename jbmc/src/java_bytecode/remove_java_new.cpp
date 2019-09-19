@@ -306,7 +306,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     CHECK_RETURN(sub_type.id() == ID_pointer);
     sub_java_new.type() = sub_type;
 
-      plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
+    plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
     dereference_exprt deref_expr(
       plus_exprt(data, tmp_i), data.type().subtype());
 
