@@ -192,7 +192,6 @@ private:
     {
       // Fill in symbol table entry body if not already done
       language_files.convert_lazy_method(name, function_symbol_table);
-      body_provided = function_symbol_table.lookup_ref(name).value.is_not_nil();
 
       // Create goto_functiont
       goto_convert_functionst convert_functions(
