@@ -272,6 +272,13 @@ public:
   /// Type parameters in scope in the class, including those from outer classes
   java_generic_type_parameter_mapt type_parameter_map;
 
+private:
+  /// Private default constructor used by object_type
+  java_class_type_signaturet()
+  {
+  }
+
+public:
   /// Create a java_class_type_signaturet by parsing a type signature
   /// \param type_string The type signature to parse
   /// \param outer_parameter_map A map giving the parameters in scope for this
@@ -279,6 +286,9 @@ public:
   java_class_type_signaturet(
     const std::string &type_string,
     const java_generic_type_parameter_mapt &outer_parameter_map);
+
+  /// The type signature of java.lang.Object
+  static const java_class_type_signaturet object_type;
 
   /// \copydoc java_type_signaturet::collect_class_dependencies
   void collect_class_dependencies(std::set<irep_idt> &deps) const override;

@@ -808,31 +808,37 @@ void java_bytecode_parsert::rClassFile(
     std::back_inserter(constant_pool),
     [](const raw_pool_entryt &raw_entry) { return pool_entryt(raw_entry); });
 
-  std::string signature;
-  if(java_bytecode.signature_index == 0)
-  {
-    // Signature not provided for non-generic types, fake-up a signature
-    signature =
-      "L" +
-      id2string(
-        pool_entry(pool_entry(java_bytecode.super_class_index).ref1).s) +
-      ";";
-    for(u2 implements_index : java_bytecode.implements_indices)
-      signature +=
-        "L" + id2string(pool_entry(pool_entry(implements_index).ref1).s) + ";";
-  }
+  if(java_bytecode.super_class_index == 0)
+    parsed_class.parsed_sig = java_class_type_signaturet::object_type;
   else
   {
-    parsed_class.signature = signature =
-      id2string(pool_entry(java_bytecode.signature_index).s);
-  }
-  try
-  {
-    parsed_class.parsed_sig =
-      java_class_type_signaturet(signature, outer_generic_parameters);
-  }
-  catch(unsupported_java_class_signature_exceptiont &)
-  {
+    std::string signature;
+    if(java_bytecode.signature_index == 0)
+    {
+      // Signature not provided for non-generic types, fake-up a signature
+      signature =
+        "L" +
+          id2string(
+            pool_entry(pool_entry(java_bytecode.super_class_index).ref1).s) +
+          ";";
+      for(u2 implements_index : java_bytecode.implements_indices)
+        signature +=
+          "L" + id2string(pool_entry(pool_entry(implements_index).ref1).s) +
+            ";";
+    }
+    else
+    {
+      parsed_class.signature = signature =
+        id2string(pool_entry(java_bytecode.signature_index).s);
+    }
+    try
+    {
+      parsed_class.parsed_sig =
+        java_class_type_signaturet(signature, outer_generic_parameters);
+    }
+    catch(unsupported_java_class_signature_exceptiont &)
+    {
+    }
   }
 
   rconstant_pool(java_bytecode.constant_pool);
@@ -849,6 +855,10 @@ void java_bytecode_parsert::rClassFile(
   parsed_class.is_annotation = (access_flags & ACC_ANNOTATION) != 0;
   parsed_class.name =
     constant(java_bytecode.this_class_index).type().get(ID_C_base_name);
+  INVARIANT(
+    (java_bytecode.super_class_index == 0) ==
+      (parsed_class.name == "java.lang.Object"),
+    "Object (and only Object) must not have a superclass");
 
   if(java_bytecode.super_class_index != 0)
   {

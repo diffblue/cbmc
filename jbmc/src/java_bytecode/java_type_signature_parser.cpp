@@ -461,6 +461,8 @@ java_class_type_signaturet::java_class_type_signaturet(
   while(!type_str.empty());
 }
 
+const java_class_type_signaturet java_class_type_signaturet::object_type;
+
 void java_class_type_signaturet::collect_class_dependencies(
   std::set<irep_idt> &deps) const
 {
