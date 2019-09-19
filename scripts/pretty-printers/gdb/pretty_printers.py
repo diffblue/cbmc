@@ -1,7 +1,8 @@
-import gdb
 import json
 import os
 from json import JSONDecodeError
+
+import gdb
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -236,14 +237,57 @@ class InstructionPrettyPrinter:
         return "string"
 
 
+def untypedef(type_obj):
+    if (type_obj.code == gdb.TYPE_CODE_REF or
+            type_obj.code == getattr(gdb, 'TYPE_CODE_RVALUE_REF', None)):
+
+        type_obj = type_obj.target()
+
+    if type_obj.code == gdb.TYPE_CODE_TYPEDEF:
+        type_obj = type_obj.strip_typedefs()
+
+    return type_obj
+
+
+def child_of_irept(val):
+    """ Use the irep pretty-printer if we're a child of irept. Based on the
+        assumption that all children will be using the sub/named_sub capabilities
+        of irept and have no other internal fields. """
+
+    type = untypedef(val.type)
+    if type is None or type.name is None:
+        return
+
+    if type.code == gdb.TYPE_CODE_STRUCT \
+        or type.code == gdb.TYPE_CODE_ENUM \
+        or type.code == gdb.TYPE_CODE_UNION:
+
+        hierarchy_types = set()
+        while type is not None:
+            if type.name is None or type.name in hierarchy_types:
+                break
+            else:
+                hierarchy_types.add(type.name)
+
+            for field in type.fields():
+                if field.is_base_class:
+                    type = untypedef(field.type)
+
+        if "irept" in hierarchy_types:
+            return IrepPrettyPrinter(val)
+
+    return None
+
+
 # If you change the name of this make sure to change install.py too.
 def load_cbmc_printers():
+    gdb.printing.register_pretty_printer(None, child_of_irept)
+
     printers = gdb.printing.RegexpCollectionPrettyPrinter("CBMC")
 
     # First argument is the name of the pretty-printer, second is a regex match for which type
     # it should be applied too, third is the class that should be called to pretty-print that type.
     printers.add_printer("dstringt", "^(?:dstringt|irep_idt)", DStringPrettyPrinter)
-    printers.add_printer("irept", "^irept", IrepPrettyPrinter)
     printers.add_printer("instructiont", "^goto_programt::instructiont", InstructionPrettyPrinter)
 
     # We aren't associating with a particular object file, so pass in None instead of gdb.current_objfile()
