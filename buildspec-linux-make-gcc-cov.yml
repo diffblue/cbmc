@@ -22,27 +22,23 @@ phases:
       - make -C unit CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
       - make -C jbmc/src CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
       - make -C jbmc/unit CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
+      - echo Build completed on `date`
   post_build:
     commands:
-      - make -C unit test 
-      # Also enable compilation with coverage/profiling flags when running the
-      # regression tests, to also get results for the driver program in
-      # regression/invariants
-      - make -C regression test CPROVER_WITH_PROFILING=1
-      - make -C regression/cbmc test-paths-lifo
-      - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
-      - make -C jbmc/unit test
-      - make -C jbmc/regression test
-      - lcov --capture --directory . --output-file lcov.info
-      - lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      # codecov script creation
       # If $CODEBUILD_SOURCE_VERSION starts with 'pr/', filter out pr number, if not, return empty
       - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed '/^pr\//!d;s/^pr\///')
       # If $CODEBUILD_SOURCE_VERSION is commit id, set $VCS_COMMIT_ID
       - VCS_COMMIT_ID=$(echo $CODEBUILD_SOURCE_VERSION | sed -r '/^[a-z0-9]{40}$/!d') 
       - COV_SCRIPT=/root/.cache/codecov.sh
       - if [ ! -f "$COV_SCRIPT" ]; then curl -s https://codecov.io/bash > "$COV_SCRIPT"; fi
-      - bash $COV_SCRIPT -t "$CODECOV_TOKEN" || true
-      - echo Build completed on `date`
+      # Run unit test
+      - scripts/run_test_upload_cov_report.sh unit
+      # Run regression tests
+      - scripts/run_test_upload_cov_report.sh regression
+      # Run regression/cbmc tests with test-cprover-smt2
+      - scripts/run_test_upload_cov_report.sh cproversmt2
+
 cache:
   paths:
     - '/var/cache/apt/**/*'
