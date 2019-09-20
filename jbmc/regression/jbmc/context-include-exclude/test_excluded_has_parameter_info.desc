@@ -1,0 +1,13 @@
+CORE
+ExcludedProperties.class
+--context-exclude org.cprover.other --show-symbol-table --function ExcludedProperties.parameters
+^EXIT=0$
+^SIGNAL=0$
+java::org\.cprover\.other\.MyOther\.identity:\(I\)I::arg0i
+--
+java::org\.cprover\.other\.MyOther\.identity:\(I\)I::stub
+--
+Test that for an excluded method, we still create a symbol for its parameter(s)
+just like for non-excluded methods.
+Only the body of excluded methods should be missing, not their signature or
+other "meta-information".

@@ -173,6 +173,9 @@ private:
     const key_type &name,
     symbol_table_baset &function_symbol_table) const
   {
+    // Fill in symbol table entry body if not already done
+    language_files.convert_lazy_method(name, function_symbol_table);
+
     underlying_mapt::iterator it=goto_functions.find(name);
     if(it!=goto_functions.end())
       return *it;
@@ -190,10 +193,6 @@ private:
     // Second chance: see if language_filest can provide a body:
     if(!body_provided)
     {
-      // Fill in symbol table entry body if not already done
-      language_files.convert_lazy_method(name, function_symbol_table);
-      body_provided = function_symbol_table.lookup_ref(name).value.is_not_nil();
-
       // Create goto_functiont
       goto_convert_functionst convert_functions(
         function_symbol_table, message_handler);

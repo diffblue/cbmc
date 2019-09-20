@@ -179,6 +179,25 @@ symbol_tablet load_java_class(
     java_class_name, class_path, main, std::move(java_lang), command_line);
 }
 
+goto_modelt load_goto_model_from_java_class(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::vector<std::string> &command_line_flags,
+  const std::unordered_map<std::string, std::string> &command_line_options,
+  const std::string &main)
+{
+  free_form_cmdlinet command_line;
+  for(const auto &flag : command_line_flags)
+    command_line.add_flag(flag);
+  for(const auto &option : command_line_options)
+    command_line.add_option(option.first, option.second);
+
+  std::unique_ptr<languaget> lang = new_java_bytecode_language();
+
+  return load_goto_model_from_java_class(
+    java_class_name, class_path, main, std::move(lang), command_line);
+}
+
 /// See \ref load_goto_model_from_java_class
 /// With the command line configured to disable lazy loading and string
 /// refinement and the language set to be the default java_bytecode language
@@ -187,12 +206,10 @@ goto_modelt load_goto_model_from_java_class(
   const std::string &class_path,
   const std::string &main)
 {
-  free_form_cmdlinet command_line;
-  command_line.add_flag("no-lazy-methods");
-  command_line.add_flag("no-refine-strings");
-
-  std::unique_ptr<languaget> lang = new_java_bytecode_language();
-
   return load_goto_model_from_java_class(
-    java_class_name, class_path, main, std::move(lang), command_line);
+    java_class_name,
+    class_path,
+    {"no-lazy-methods", "no-refine-strings"},
+    {},
+    main);
 }

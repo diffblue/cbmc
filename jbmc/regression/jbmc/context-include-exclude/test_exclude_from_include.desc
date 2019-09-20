@@ -3,15 +3,12 @@ Main.class
 --context-include Main.main --context-include 'Main.<clinit' --context-include org.cprover.MyClass --context-exclude 'org.cprover.MyClass$Inner.'
 ^EXIT=10$
 ^SIGNAL=0$
-.* line 10 assertion at file Main.java line 10 .*: FAILURE
-.* line 11 assertion at file Main.java line 11 .*: SUCCESS
 .* line 12 assertion at file Main.java line 12 .*: FAILURE
-WARNING: no body for function java::Main\.myMethod:\(I\)I
-WARNING: no body for function java::org\.cprover\.MyClass\$Inner\.doIt:\(I\)I
+.* line 13 assertion at file Main.java line 13 .*: SUCCESS
+.* line 14 assertion at file Main.java line 14 .*: FAILURE
+.* line 15 assertion at file Main.java line 15 .*: FAILURE
 --
-WARNING: no body for function .*clinit_wrapper
-WARNING: no body for function java::org\.cprover\.MyClass\.<init>:\(I\)V
-WARNING: no body for function java::org\.cprover\.MyClass\.get:\(\)I
+WARNING: no body for function .*
 --
 Tests that only the specified methods and classes are included, while
 the inner class from MyClass is excluded.

@@ -25,11 +25,6 @@ symbol_tablet load_java_class(
   const std::string &class_path,
   const std::string &main = "");
 
-goto_modelt load_goto_model_from_java_class(
-  const std::string &java_class_name,
-  const std::string &class_path,
-  const std::string &main = "");
-
 symbol_tablet load_java_class(
   const std::string &java_class_name,
   const std::string &class_path,
@@ -54,5 +49,19 @@ symbol_tablet load_java_class_lazy(
   const std::string &java_class_name,
   const std::string &class_path,
   const std::string &main);
+
+/// Overload of load_goto_model_from_java_class with configurable command-line
+/// options.
+goto_modelt load_goto_model_from_java_class(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::vector<std::string> &command_line_flags,
+  const std::unordered_map<std::string, std::string> &command_line_options,
+  const std::string &main = "");
+
+goto_modelt load_goto_model_from_java_class(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  const std::string &main = "");
 
 #endif // CPROVER_JAVA_TESTING_UTILS_LOAD_JAVA_CLASS_H

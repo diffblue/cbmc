@@ -1,13 +1,14 @@
 CORE
 Main.class
---context-exclude 'org.cprover.MyClass$Inner.'
-^EXIT=10$
+--context-exclude org.cprover.oh
+^EXIT=0$
 ^SIGNAL=0$
 .* line 12 assertion at file Main.java line 12 .*: SUCCESS
 .* line 13 assertion at file Main.java line 13 .*: SUCCESS
-.* line 14 assertion at file Main.java line 14 .*: FAILURE
+.* line 14 assertion at file Main.java line 14 .*: SUCCESS
 .* line 15 assertion at file Main.java line 15 .*: SUCCESS
 --
 WARNING: no body for function .*
 --
-Tests that no methods except those in the specified class are excluded.
+Tests that when --context-exclude is given a package prefix that does not occur
+anywhere on the classpath, it has no effect.

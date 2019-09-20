@@ -1,0 +1,12 @@
+CORE
+ExcludedProperties.class
+--context-exclude org.cprover.other --function ExcludedProperties.runtimeReturnType
+^EXIT=10$
+^SIGNAL=0$
+.* line 28 assertion at file ExcludedProperties.java line 28.*: FAILURE
+--
+--
+Test that for an excluded method, we do not convert its "real" body from the
+bytecode.
+We instead assign it a "return nondet" body as for stubbed methods, which is
+tested by test_excluded_has_nondet_body.desc.

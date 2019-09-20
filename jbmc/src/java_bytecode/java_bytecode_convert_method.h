@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 
 class class_hierarchyt;
+class prefix_filtert;
 
 void java_bytecode_initialize_parameter_names(
   symbolt &method_symbol,
@@ -37,7 +38,8 @@ void java_bytecode_convert_method(
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy,
-  bool threading_support);
+  bool threading_support,
+  const optionalt<prefix_filtert> &method_context);
 
 void create_method_stub_symbol(
   const irep_idt &identifier,

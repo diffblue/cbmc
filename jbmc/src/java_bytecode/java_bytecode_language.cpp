@@ -104,7 +104,7 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   }
 }
 
-static prefix_filtert get_context(const optionst &options)
+prefix_filtert get_context(const optionst &options)
 {
   std::vector<std::string> context_include;
   std::vector<std::string> context_exclude;
@@ -245,7 +245,7 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
     options.get_bool_option("ignore-manifest-main-class");
 
   if(options.is_set("context-include") || options.is_set("context-exclude"))
-    method_in_context = get_context(options);
+    method_context = get_context(options);
 
   language_options_initialized=true;
 }
@@ -1173,12 +1173,6 @@ bool java_bytecode_languaget::convert_single_method(
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
 {
-  // Do not convert if method is not in context
-  if(method_in_context && !(*method_in_context)(id2string(function_id)))
-  {
-    return false;
-  }
-
   const symbolt &symbol = symbol_table.lookup_ref(function_id);
 
   // Nothing to do if body is already loaded
@@ -1312,29 +1306,33 @@ bool java_bytecode_languaget::convert_single_method(
       std::move(needed_lazy_methods),
       string_preprocess,
       class_hierarchy,
-      threading_support);
+      threading_support,
+      method_context);
     INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
     return false;
   }
 
-  // The return of an opaque function is a source of an otherwise invisible
-  // instantiation, so here we ensure we've loaded the appropriate classes.
-  const java_method_typet function_type = to_java_method_type(symbol.type);
-  if(
-    const pointer_typet *pointer_return_type =
-      type_try_dynamic_cast<pointer_typet>(function_type.return_type()))
+  if(needed_lazy_methods)
   {
-    // If the return type is abstract, we won't forcibly instantiate it here
-    // otherwise this can cause abstract methods to be explictly called
-    // TODO(tkiley): Arguably no abstract class should ever be added to
-    // TODO(tkiley): ci_lazy_methods_neededt, but this needs further
-    // TODO(tkiley): investigation
-    namespacet ns{symbol_table};
-    const java_class_typet &underlying_type =
-      to_java_class_type(ns.follow(pointer_return_type->subtype()));
+    // The return of an opaque function is a source of an otherwise invisible
+    // instantiation, so here we ensure we've loaded the appropriate classes.
+    const java_method_typet function_type = to_java_method_type(symbol.type);
+    if(
+      const pointer_typet *pointer_return_type =
+        type_try_dynamic_cast<pointer_typet>(function_type.return_type()))
+    {
+      // If the return type is abstract, we won't forcibly instantiate it here
+      // otherwise this can cause abstract methods to be explictly called
+      // TODO(tkiley): Arguably no abstract class should ever be added to
+      // TODO(tkiley): ci_lazy_methods_neededt, but this needs further
+      // TODO(tkiley): investigation
+      namespacet ns{symbol_table};
+      const java_class_typet &underlying_type =
+        to_java_class_type(ns.follow(pointer_return_type->subtype()));
 
-    if(!underlying_type.is_abstract())
-      needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
+      if(!underlying_type.is_abstract())
+        needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
+    }
   }
 
   INVARIANT(declaring_class(symbol), "Method must have a declaring class.");

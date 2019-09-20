@@ -81,6 +81,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              loaded.\n" \
   " --context-include i          only analyze code matching specification i that\n" /* NOLINT(*) */ \
   " --context-exclude e          does not match specification e.\n" \
+  "                              All other methods are excluded, i.e. we load their\n" /* NOLINT(*) */ \
+  "                              signatures and meta-information, but not their\n" /* NOLINT(*) */ \
+  "                              bodies.\n" \
   "                              A specification is any prefix of a package, class\n" /* NOLINT(*) */ \
   "                              or method name, e.g. \"org.cprover.\" or\n" /* NOLINT(*) */ \
   "                              \"org.cprover.MyClass.\" or\n" \
@@ -296,12 +299,20 @@ private:
   /// IDs of such objects to symbols that store their values.
   std::unordered_map<std::string, object_creation_referencet> references;
 
-  /// If set, method bodies are only elaborated if they pass the filter
-  optionalt<prefix_filtert> method_in_context;
+  /// If set, method bodies are only elaborated if they pass the filter.
+  /// Methods that do not pass the filter are "excluded": their symbols will
+  /// include all the meta-information that is available from the bytecode
+  /// (parameter types, return type, accessibility etc.) but the value of the
+  /// symbol (corresponding to the body of the method) will be replaced with the
+  /// same kind of "return nondet null or instance of return type" body that we
+  /// use for stubbed methods. The original method body will never be loaded.
+  optionalt<prefix_filtert> method_context;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();
 
 void parse_java_language_options(const cmdlinet &cmd, optionst &options);
+
+prefix_filtert get_context(const optionst &options);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
