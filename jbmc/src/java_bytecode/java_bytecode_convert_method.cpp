@@ -605,10 +605,10 @@ void java_bytecode_convert_methodt::convert(
   method_has_this = method_type.has_this();
   if((!m.is_abstract) && (!m.is_native))
   {
-    code_blockt code(convert_parameter_annotations(m, method_type));
     // Do not convert if method is not in context
     if(!method_context || (*method_context)(id2string(method_identifier)))
     {
+      code_blockt code{convert_parameter_annotations(m, method_type)};
       code.append(convert_instructions(m));
       method_symbol.value = std::move(code);
     }
