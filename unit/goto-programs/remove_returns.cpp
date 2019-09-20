@@ -6,6 +6,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 
 #include <goto-programs/goto_functions.h>
@@ -52,21 +53,10 @@ TEST_CASE(
       symbol_exprt{"local_variable", signedbv_typet{32}},
       symbol_exprt{"bar_function", code_typet{{}, signedbv_typet{32}}},
       {}});
-  try
-  {
-    const cbmc_invariants_should_throwt invariants_throw;
-    remove_returns(symbol_table, goto_functions);
-    FAIL("Expected invariant failure.");
-  }
-  catch(const invariant_failedt &exception)
-  {
-    REQUIRE_THAT(
-      exception.what(),
-      Catch::Matchers::Contains("called function `bar_function' should have an "
-                                "entry in the function map"));
-  }
-  catch(...)
-  {
-    FAIL("Incorrect exception type thrown.");
-  }
+  const cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_THROWS_MATCHES(
+    remove_returns(symbol_table, goto_functions),
+    invariant_failedt,
+    invariant_failure_containing("called function `bar_function' should have "
+                                 "an entry in the function map"));
 }

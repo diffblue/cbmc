@@ -11,6 +11,7 @@ Author: Diffblue Limited
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 #include <linking/static_lifetime_init.h>
+#include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 #include <util/symbol_table.h>
 
@@ -29,21 +30,10 @@ TEST_CASE(
 
   create_java_initialize(symbol_table);
   symbol_table.get_writeable_ref(INITIALIZE_FUNCTION).value = code_blockt{};
-  try
-  {
-    const cbmc_invariants_should_throwt invariants_throw;
-    get_or_create_string_literal_symbol("bar", symbol_table, false);
-    FAIL("Expected invariant failure.");
-  }
-  catch(const invariant_failedt &exception)
-  {
-    REQUIRE_THAT(
-      exception.what(),
-      Catch::Matchers::Contains("Cannot create more string literals after "
-                                "making " INITIALIZE_FUNCTION));
-  }
-  catch(...)
-  {
-    FAIL("Incorrect exception type thrown.");
-  }
+  const cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_THROWS_MATCHES(
+    get_or_create_string_literal_symbol("bar", symbol_table, false),
+    invariant_failedt,
+    invariant_failure_containing("Cannot create more string literals after "
+                                 "making " INITIALIZE_FUNCTION));
 }
