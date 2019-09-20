@@ -13,7 +13,8 @@ try:
         pretty_printer_options = json.load(json_file)
 except JSONDecodeError as e:
     print("Options file at {0} failed to load. Exception: {1}".format(options_path, e.msg))
-
+except Exception as e:
+    print("Error attempting to load configuration. Exception: {1}".format(options_path, e))
 
 def get_option(value):
     return pretty_printer_options.get(value, None)
