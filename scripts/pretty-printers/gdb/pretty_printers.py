@@ -72,12 +72,10 @@ def get_node_value(data_ref):
     if id_value:
         if has_children:
             return "[{0}]".format(id_value)
-        else:
-            return "\"{0}\"".format(id_value)
     elif has_children:
         return "[...]"
 
-    return "\"\""
+    return None
 
 
 def get_id(data_ref):
@@ -148,6 +146,13 @@ class IrepPrettyPrinter:
         we return a single child with the value of the node.
         """
 
+        if has_children_nodes(self.val):
+            if self.clion_representation:
+                yield "ID", self.val["data"]
+            else:
+                yield "ID key", "ID"
+                yield "ID value", self.val["data"]
+
         sub = self.val["sub"]
         sub_count = 0
         item = sub["_M_impl"]["_M_start"]
@@ -158,9 +163,12 @@ class IrepPrettyPrinter:
             iter_item = item.dereference()
 
             if self.clion_representation:
+                item_deref = iter_item["data"].referenced_value()
                 nested_id = get_node_value(iter_item["data"].referenced_value())
                 if nested_id:
                     node_key = "{0}: {1}".format(node_key, nested_id)
+                else:
+                    iter_item = item_deref["data"]
 
                 yield node_key, iter_item
             else:
@@ -188,9 +196,12 @@ class IrepPrettyPrinter:
 
             iter_item = result["second"]
             if self.clion_representation:
-                nested_id = get_node_value(iter_item["data"].referenced_value())
+                item_deref = iter_item["data"].referenced_value()
+                nested_id = get_node_value(item_deref)
                 if nested_id:
                     node_key = "{0}: {1}".format(node_key, nested_id)
+                else:
+                    iter_item = item_deref["data"]
 
                 yield node_key, iter_item
             else:
