@@ -3209,8 +3209,8 @@ bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname,
   const irep_idt &methodid) const
 {
-  const auto inherited_method = get_inherited_component(
-    classname, methodid, symbol_table, class_hierarchy, false);
+  const auto inherited_method =
+    get_inherited_component(classname, methodid, symbol_table, false);
   return inherited_method.has_value();
 }
 
@@ -3224,7 +3224,7 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
   const irep_idt &component_name) const
 {
   const auto inherited_method = get_inherited_component(
-    class_identifier, component_name, symbol_table, class_hierarchy, true);
+    class_identifier, component_name, symbol_table, true);
 
   INVARIANT(
     inherited_method.has_value(), "static field should be in symbol table");

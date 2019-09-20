@@ -122,7 +122,6 @@ get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
   const symbol_tablet &symbol_table,
-  const class_hierarchyt &class_hierarchy,
   bool include_interfaces);
 
 bool is_non_null_library_global(const irep_idt &);

@@ -672,8 +672,8 @@ static void create_stub_global_symbols(
 
         // The final 'true' parameter here includes interfaces, as they can
         // define static fields.
-        const auto referred_component = get_inherited_component(
-          class_id, component, symbol_table, class_hierarchy, true);
+        const auto referred_component =
+          get_inherited_component(class_id, component, symbol_table, true);
         if(!referred_component)
         {
           // Create a new stub global on an arbitrary incomplete ancestor of the
