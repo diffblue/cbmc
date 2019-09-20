@@ -48,6 +48,7 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
        java_bytecode/java_object_factory/struct_tag_types.cpp \
        java_bytecode/java_replace_nondet/replace_nondet.cpp \
+       java_bytecode/java_static_initializers/assignments_from_json.cpp \
        java_bytecode/java_static_initializers/java_static_initializers.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
        java_bytecode/java_trace_validation/java_trace_validation.cpp \

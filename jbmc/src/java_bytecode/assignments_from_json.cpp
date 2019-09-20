@@ -99,7 +99,7 @@ has_enum_type(const exprt &expr, const symbol_table_baset &symbol_table)
 /// \param declaring_class_type: type of the class where \p expr is declared.
 /// \return `true` if \p expr has an enum type and is declared within the
 ///   definition of that same type, `false` otherwise.
-bool is_enum_with_type_equal_to_declaring_type(
+static bool is_enum_with_type_equal_to_declaring_type(
   const exprt &expr,
   const symbol_table_baset &symbol_table,
   const java_class_typet &declaring_class_type)
@@ -188,9 +188,8 @@ static bool has_nondet_length(const jsont &json)
   if(!json.is_object())
     return false;
   const auto &json_object = to_json_object(json);
-  if(json_object.find("@nondetLength") != json_object.end())
-    return (json["@nondetLength"].is_true());
-  return false;
+  auto nondet_it = json_object.find("@nondetLength");
+  return nondet_it != json_object.end() && nondet_it->second.is_true();
 }
 
 /// For typed versions of primitive, string or array types, looks up their
@@ -438,63 +437,82 @@ static void allocate_array(
   info.block.add(assign);
 }
 
+/// Declare a non-deterministic length expression
+/// \param[out] allocate: allocation functor
+/// \param[out] code: code block to which code will get appended
+/// \param loc: location for the created code
+/// \return the length expression that has been non-deterministically created
+static symbol_exprt nondet_length(
+  allocate_objectst &allocate,
+  code_blockt &code,
+  source_locationt loc)
+{
+  const symbol_exprt length_expr = allocate.allocate_automatic_local_object(
+    java_int_type(), "user_specified_array_length");
+  code.add(code_assignt{
+    length_expr, side_effect_expr_nondett{java_int_type(), std::move(loc)}});
+  code.add(code_assumet{binary_predicate_exprt{
+    length_expr, ID_ge, from_integer(0, java_int_type())}});
+  return length_expr;
+}
+
 /// One of the cases in the recursive algorithm: the case where \p expr
-/// represents an array.
-/// The length of the array is given by a symbol: \p given_length_expr if it is
-/// specified (this will be the case when there are two or more reference-equal
-/// arrays), or a fresh symbol otherwise.
-/// If \p given_length_expr is specified, we assume that an array with this
-/// symbol as its length has already been allocated and that \p expr has been
-/// assigned to it.
-/// Either way, the length symbol stores a nondet integer, and we add
-/// constraints on this: if "nondetLength" is specified in \p json, then the
-/// number of elements specified in \p json should be the minimum length of the
-/// array. Otherwise the number of elements should be the exact length of the
-/// array.
+/// represents an array which is not flagged with `@nondetLength`.
+/// The length of the array is given by symbol \p given_length_expr.
+/// We assume that an array with this symbol as its length has already been
+/// allocated and that \p expr has been assigned to it.
+/// We constraint the length of the array to be the number of elements, which
+/// is known and constant.
 /// For the assignment of the array elements, see
 /// \ref assign_array_data_component_from_json.
 /// For the overall algorithm, see \ref assign_from_json_rec.
-static void assign_array_from_json(
+static void assign_det_length_array_from_json(
   const exprt &expr,
   const jsont &json,
-  const optionalt<symbol_exprt> &given_length_expr,
+  const exprt &given_length_expr,
   const optionalt<std::string> &type_from_array,
   object_creation_infot &info)
 {
   PRECONDITION(is_java_array_type(expr.type()));
   const auto &element_type =
     java_array_element_type(to_struct_tag_type(expr.type().subtype()));
-
-  exprt length_expr;
-  if(given_length_expr)
-    length_expr = *given_length_expr;
-  else
-  {
-    length_expr = info.allocate_objects.allocate_automatic_local_object(
-      java_int_type(), "user_specified_array_length");
-    info.block.add(code_assignt{
-      length_expr, side_effect_expr_nondett{java_int_type(), info.loc}});
-    info.block.add(code_assumet{binary_predicate_exprt{
-      length_expr, ID_ge, from_integer(0, java_int_type())}});
-    allocate_array(expr, length_expr, info);
-  }
   const json_arrayt json_array = get_untyped_array(json, element_type);
   const auto number_of_elements =
     from_integer(json_array.size(), java_int_type());
-  info.block.add(code_assumet{
-    binary_predicate_exprt{length_expr, ID_ge, number_of_elements}});
-  if(has_nondet_length(json))
-  {
-    info.block.add(code_assumet{binary_predicate_exprt{
-      length_expr,
+  info.block.add(
+    code_assumet{equal_exprt{given_length_expr, number_of_elements}});
+  assign_array_data_component_from_json(expr, json, type_from_array, info);
+}
+
+/// One of the cases in the recursive algorithm: the case where \p expr
+/// represents an array which is flagged with @nondetLength.
+/// The length of the array is given by symbol \p given_length_expr.
+/// We assume that an array with this symbol as its length has already been
+/// allocated and that \p expr has been assigned to it.
+/// We constrain the length of the array to be greater or equal to the number
+/// of elements specified in \p json.
+/// For the assignment of the array elements, see
+/// \ref assign_array_data_component_from_json.
+/// For the overall algorithm, see \ref assign_from_json_rec.
+static void assign_nondet_length_array_from_json(
+  const exprt &expr,
+  const jsont &json,
+  const exprt &given_length_expr,
+  const optionalt<std::string> &type_from_array,
+  object_creation_infot &info)
+{
+  PRECONDITION(is_java_array_type(expr.type()));
+  const auto &element_type =
+    java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+  const json_arrayt json_array = get_untyped_array(json, element_type);
+  const auto number_of_elements =
+    from_integer(json_array.size(), java_int_type());
+  info.block.add(code_assumet{and_exprt{
+    binary_predicate_exprt{given_length_expr, ID_ge, number_of_elements},
+    binary_predicate_exprt{
+      given_length_expr,
       ID_le,
-      from_integer(info.max_user_array_length, java_int_type())}});
-  }
-  else
-  {
-    info.block.add(code_assumet{
-      binary_predicate_exprt{length_expr, ID_le, number_of_elements}});
-  }
+      from_integer(info.max_user_array_length, java_int_type())}}});
   assign_array_data_component_from_json(expr, json, type_from_array, info);
 }
 
@@ -771,8 +789,18 @@ static void assign_reference_from_json(
   {
     if(is_java_array_type(expr.type()))
     {
-      assign_array_from_json(
-        reference.expr, json, reference.array_length, type_from_array, info);
+      INVARIANT(
+        reference.array_length, "an array reference should store its length");
+      if(has_nondet_length(json))
+      {
+        assign_nondet_length_array_from_json(
+          reference.expr, json, *reference.array_length, type_from_array, info);
+      }
+      else
+      {
+        assign_det_length_array_from_json(
+          reference.expr, json, *reference.array_length, type_from_array, info);
+      }
     }
     else
       assign_struct_from_json(dereference_exprt(reference.expr), json, info);
@@ -810,7 +838,26 @@ void assign_from_json_rec(
       assign_reference_from_json(expr, json, type_from_array, info);
     }
     else if(is_java_array_type(expr.type()))
-      assign_array_from_json(expr, json, {}, type_from_array, info);
+    {
+      if(has_nondet_length(json))
+      {
+        const exprt length =
+          nondet_length(info.allocate_objects, info.block, info.loc);
+        allocate_array(expr, length, info);
+        assign_nondet_length_array_from_json(
+          expr, json, length, type_from_array, info);
+      }
+      else
+      {
+        PRECONDITION(is_java_array_type(expr.type()));
+        const auto &element_type =
+          java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+        const std::size_t length = get_untyped_array(json, element_type).size();
+        allocate_array(expr, from_integer(length, java_int_type()), info);
+        assign_array_data_component_from_json(
+          expr, json, type_from_array, info);
+      }
+    }
     else if(
       const auto runtime_type =
         ::runtime_type(json, type_from_array, info.symbol_table))
