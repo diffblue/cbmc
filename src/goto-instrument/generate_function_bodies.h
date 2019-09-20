@@ -83,7 +83,9 @@ void generate_function_bodies(
   "                              One of assert-false, assume-false,\n" \
   /* NOLINTNEXTLINE(whitespace/line_length) */ \
   "                              nondet-return, assert-false-assume-false and\n" \
-  "                              havoc[,params:<regex>][,globals:<regex>]\n" \
+  "                              havoc[,params:<regex>][,globals:<regex>],\n" \
+  "                              assert-first-arg, assume-first-arg,\n" \
+  "                              assert-then-assume-first-arg\n" \
   "                              (default: nondet-return)"
 // clang-format on
 

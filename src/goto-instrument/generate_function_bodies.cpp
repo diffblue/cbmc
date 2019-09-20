@@ -143,6 +143,63 @@ protected:
   }
 };
 
+class assert_then_assume_first_arg_generate_function_bodiest
+  : public generate_function_bodiest
+{
+protected:
+  void generate_function_body_impl(
+    goto_functiont &function,
+    symbol_tablet &symbol_table,
+    const irep_idt &function_name) const override
+  {
+    PRECONDITION(function.body.empty());
+    auto const &function_symbol = symbol_table.lookup_ref(function_name);
+    const auto function_parameters = function.parameter_identifiers;
+    CHECK_RETURN(!function_parameters.empty());
+
+    const namespacet ns{symbol_table};
+    const symbolt &first_param_symbol = ns.lookup(*function_parameters.begin());
+    const auto first_param_symbol_expr = first_param_symbol.symbol_expr();
+    exprt boolean_condition =
+      typecast_exprt::conditional_cast(first_param_symbol_expr, bool_typet{});
+
+    auto add_instruction = [&](goto_programt::instructiont &&i) {
+      auto instruction = function.body.add(std::move(i));
+      instruction->source_location = function_symbol.location;
+      instruction->source_location.set_function(function_name);
+      return instruction;
+    };
+    if(assert_arg)
+    {
+      auto assert_instruction =
+        add_instruction(goto_programt::make_assertion(boolean_condition));
+
+      std::ostringstream comment_stream;
+      comment_stream << id2string(ID_assertion) << " "
+                     << format(assert_instruction->get_condition());
+      assert_instruction->source_location.set_comment(comment_stream.str());
+      assert_instruction->source_location.set_property_class(ID_assertion);
+    }
+    if(assume_arg)
+    {
+      add_instruction(goto_programt::make_assumption(boolean_condition));
+    }
+    add_instruction(goto_programt::make_end_function());
+  }
+  bool assert_arg = false;
+  bool assume_arg = false;
+
+public:
+  void set_assert()
+  {
+    assert_arg = true;
+  }
+  void set_assume()
+  {
+    assume_arg = true;
+  }
+};
+
 class havoc_generate_function_bodiest : public generate_function_bodiest
 {
 public:
@@ -352,6 +409,31 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
       assert_false_then_assume_false_generate_function_bodiest>();
   }
 
+  if(options == "assert-then-assume-first-arg")
+  {
+    auto generator = util_make_unique<
+      assert_then_assume_first_arg_generate_function_bodiest>();
+    generator->set_assert();
+    generator->set_assume();
+    return generator;
+  }
+
+  if(options == "assert-first-arg")
+  {
+    auto generator = util_make_unique<
+      assert_then_assume_first_arg_generate_function_bodiest>();
+    generator->set_assert();
+    return generator;
+  }
+
+  if(options == "assume-first-arg")
+  {
+    auto generator = util_make_unique<
+      assert_then_assume_first_arg_generate_function_bodiest>();
+    generator->set_assume();
+    return generator;
+  }
+
   const std::vector<std::string> option_components = split_string(options, ',');
   if(!option_components.empty() && option_components[0] == "havoc")
   {
@@ -442,6 +524,11 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
 ///
 /// nondet-return: return nondet for non-void functions
 ///
+/// assert-then-assume-first-arg: void function(int condition) {
+///   assert(condition);
+///   assume(condition);
+/// }
+///
 /// \param functions_regex: Specifies the functions whose body should be
 ///   generated
 /// \param generate_function_body: Specifies what kind of body to generate
@@ -458,10 +545,16 @@ void generate_function_bodies(
   bool did_generate_body = false;
   for(auto &function : model.goto_functions.function_map)
   {
-    if(
-      !function.second.body_available() &&
-      std::regex_match(id2string(function.first), functions_regex))
+    if(id2string(function.first) == "main")
+      continue;
+    if(std::regex_match(id2string(function.first), functions_regex))
     {
+      if(function.second.body_available())
+      {
+        messages.warning() << "function body present: removing"
+                           << messaget::eom;
+        function.second.body.clear();
+      }
       if(std::regex_match(id2string(function.first), cprover_prefix))
       {
         messages.warning() << "generate function bodies: matched function '"
