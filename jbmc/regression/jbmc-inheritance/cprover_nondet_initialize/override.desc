@@ -1,0 +1,14 @@
+CORE
+Test.class
+--function Test.override --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Check that if F extends A, and A.cproverNondetInitialize and
+F.cproverNondetInitialize both exist then a nondet F doesn't get the constraint
+specified in A.cproverNondetInitialize. Specifically, it doesn't get the
+constraint that x must be 42, so when we assert that x is 42 jbmc is able to
+falsify it.

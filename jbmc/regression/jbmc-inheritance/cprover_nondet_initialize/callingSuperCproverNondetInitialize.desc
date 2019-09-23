@@ -1,0 +1,11 @@
+CORE
+Test.class
+--function Test.callingSuperCproverNondetInitialize --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Check that calls to super.cproverNondetInitialize call cproverNondetInitialize
+in the base class.
