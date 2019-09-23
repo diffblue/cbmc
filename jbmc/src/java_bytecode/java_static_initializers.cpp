@@ -822,19 +822,27 @@ code_blockt get_user_specified_clinit_body(
         }
       }
     }
-    code_blockt body;
+    code_with_references_listt code_with_references;
     for(const auto &value_pair : static_field_values)
     {
-      assign_from_json(
+      code_with_references.append(assign_from_json(
         value_pair.first,
         value_pair.second,
         real_clinit_name,
-        body,
         symbol_table,
         needed_lazy_methods,
         max_user_array_length,
-        references);
+        references));
     }
+    code_with_referencest::reference_substitutiont reference_substitution =
+      [&](const std::string &reference_id) -> object_creation_referencet & {
+      auto it = references.find(reference_id);
+      INVARIANT(it != references.end(), "reference id must be present in map");
+      return it->second;
+    };
+    code_blockt body;
+    for(const auto &code_with_ref : code_with_references.list)
+      body.append(code_with_ref->to_code(reference_substitution));
     return body;
   }
   return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};

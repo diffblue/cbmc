@@ -3,6 +3,7 @@ SRC = assignments_from_json.cpp \
       character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
       ci_lazy_methods_needed.cpp \
+      code_with_references.cpp \
       convert_java_nondet.cpp \
       create_array_with_type_intrinsic.cpp \
       expr2java.cpp \
