@@ -1765,9 +1765,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuffer.append:(C)Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_char_func;
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuffer.append:(J)Ljava/lang/StringBuffer;"]=
-      ID_cprover_string_concat_long_func;
-  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.append:(Ljava/lang/String;)"
       "Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_func;
