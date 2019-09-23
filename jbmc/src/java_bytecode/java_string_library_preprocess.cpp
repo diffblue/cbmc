@@ -1507,7 +1507,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
       ID_cprover_string_delete_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::org.cprover.CProverString.deleteCharAt:(Ljava/lang/"
-     "StringBufferI)Ljava/lang/StringBuffer;"] =
+     "StringBuffer;I)Ljava/lang/StringBuffer;"] =
       ID_cprover_string_delete_char_at_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::org.cprover.CProverString.deleteCharAt:(Ljava/lang/"
