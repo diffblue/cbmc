@@ -26,8 +26,6 @@ int yyxmlerror(const std::string &error)
 #endif
 %}
 
-%error-verbose
-
 %union {char *s;}
 
 %token STARTXMLDECL
