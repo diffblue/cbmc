@@ -1197,6 +1197,34 @@ bool java_bytecode_languaget::convert_single_method(
     return false;
   INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
 
+  bool ret = convert_single_method_code(
+    function_id, symbol_table, needed_lazy_methods, class_to_declared_symbols);
+
+  INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
+
+  return ret;
+}
+
+/// \brief Convert a method (one whose type is known but whose body hasn't
+///   been converted) but don't run typecheck, etc
+/// \remarks Amends the symbol table entry for function `function_id`, which
+///   should be a method provided by this instance of `java_bytecode_languaget`
+///   to have a value representing the method body.
+/// \param function_id: method ID to convert
+/// \param symbol_table: global symbol table
+/// \param needed_lazy_methods: optionally a collection of needed methods to
+///   update with any methods touched during the conversion
+/// \param class_to_declared_symbols: maps classes to the symbols that
+///   they declare.
+bool java_bytecode_languaget::convert_single_method_code(
+  const irep_idt &function_id,
+  symbol_table_baset &symbol_table,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
+{
+  const auto &symbol = symbol_table.lookup_ref(function_id);
+  PRECONDITION(symbol.value.is_nil());
+
   // Get bytecode for specified function if we have it
   method_bytecodet::opt_reft cmb = method_bytecode.get(function_id);
 
@@ -1219,8 +1247,6 @@ bool java_bytecode_languaget::convert_single_method(
     // Add these to the needed_lazy_methods collection
     notify_static_method_calls(generated_code, needed_lazy_methods);
     writable_symbol.value = std::move(generated_code);
-    INVARIANT(
-      declaring_class(writable_symbol), "Method must have a declaring class.");
     return false;
   }
   else if(
@@ -1305,8 +1331,6 @@ bool java_bytecode_languaget::convert_single_method(
     // function:
     notify_static_method_calls(
       to_code(writable_symbol.value), needed_lazy_methods);
-    INVARIANT(
-      declaring_class(writable_symbol), "Method must have a declaring class.");
     return false;
   }
 
@@ -1327,7 +1351,6 @@ bool java_bytecode_languaget::convert_single_method(
       language_options->threading_support,
       language_options->method_context,
       language_options->assert_no_exceptions_thrown);
-    INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
     return false;
   }
 
@@ -1354,7 +1377,6 @@ bool java_bytecode_languaget::convert_single_method(
     }
   }
 
-  INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
   return true;
 }
 

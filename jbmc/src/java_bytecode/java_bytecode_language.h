@@ -290,6 +290,11 @@ protected:
     symbol_table_baset &symbol_table,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
+  bool convert_single_method_code(
+    const irep_idt &function_id,
+    symbol_table_baset &symbol_table,
+    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
 
   bool do_ci_lazy_method_conversion(symbol_tablet &);
   const select_pointer_typet &get_pointer_type_selector() const;
