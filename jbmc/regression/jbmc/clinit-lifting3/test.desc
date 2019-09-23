@@ -1,0 +1,12 @@
+CORE
+Test.class
+--function Test.main --java-lift-clinit-calls
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+Unwinding recursion java::Other\.<clinit_wrapper> iteration 1\nUnwinding recursion java::Third\.<clinit_wrapper> iteration 1\nUnwinding loop java::Test\.main:\(ZZ\)V\.0 iteration 1
+--
+Unwinding recursion java::Other\.<clinit_wrapper> iteration 1\nUnwinding recursion java::Third\.<clinit_wrapper> iteration 1\nUnwinding loop java::Test\.main:\(ZZ\)V\.0 iteration 2
+--
+This checks that the clinit-wrapper functions are called prior to iteration 1 of the loop, but not iteration 2.
+

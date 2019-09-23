@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_utils.h"
 #include "lambda_synthesis.h"
+#include "lift_clinit_calls.h"
 
 #include "expr2java.h"
 #include "load_method_by_regex.h"
@@ -104,6 +105,8 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   {
     options.set_option("static-values", cmd.get_value("static-values"));
   }
+  options.set_option(
+    "java-lift-clinit-calls", cmd.isset("java-lift-clinit-calls"));
 }
 
 prefix_filtert get_context(const optionst &options)
@@ -247,6 +250,8 @@ java_bytecode_language_optionst::java_bytecode_language_optionst(
 
   if(options.is_set("context-include") || options.is_set("context-exclude"))
     method_context = get_context(options);
+
+  should_lift_clinit_calls = options.get_bool_option("java-lift-clinit-calls");
 }
 
 /// Consume options that are java bytecode specific.
@@ -1174,7 +1179,8 @@ static void notify_static_method_calls(
 }
 
 /// \brief Convert a method (one whose type is known but whose body hasn't
-///   been converted) but don't run typecheck, etc
+///   been converted) if it doesn't already have a body, and lift clinit calls
+///   if requested by the user.
 /// \remarks Amends the symbol table entry for function `function_id`, which
 ///   should be a method provided by this instance of `java_bytecode_languaget`
 ///   to have a value representing the method body.
@@ -1199,6 +1205,13 @@ bool java_bytecode_languaget::convert_single_method(
 
   bool ret = convert_single_method_code(
     function_id, symbol_table, needed_lazy_methods, class_to_declared_symbols);
+
+  if(symbol.value.is_not_nil() && language_options->should_lift_clinit_calls)
+  {
+    auto &writable_symbol = symbol_table.get_writeable_ref(function_id);
+    writable_symbol.value =
+      lift_clinit_calls(std::move(to_code(writable_symbol.value)));
+  }
 
   INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
 

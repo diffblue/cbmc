@@ -43,6 +43,7 @@ SRC = assignments_from_json.cpp \
       java_trace_validation.cpp \
       java_types.cpp \
       java_utils.cpp \
+      lift_clinit_calls.cpp \
       lambda_synthesis.cpp \
       load_method_by_regex.cpp \
       mz_zip_archive.cpp \
