@@ -1679,8 +1679,20 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_2,
       std::placeholders::_3,
       std::placeholders::_4);
+  conversion_table
+    ["java::java.lang.StringBuilder.<init>:(Ljava/lang/CharSequence;)V"] =
+      std::bind(
+        &java_string_library_preprocesst::make_copy_constructor_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3,
+        std::placeholders::_4);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuilder.<init>:()V"]=
+      ID_cprover_string_empty_string_func;
+  cprover_equivalent_to_java_constructor
+    ["java::java.lang.StringBuilder.<init>:(I)V"] =
       ID_cprover_string_empty_string_func;
 
   cprover_equivalent_to_java_assign_and_return_function

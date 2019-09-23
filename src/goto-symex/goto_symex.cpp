@@ -359,8 +359,8 @@ void goto_symext::constant_propagate_empty_string(
   const array_typet char_array_type(char_type, length);
 
   DATA_INVARIANT(
-    f_l1.arguments().size() == 2,
-    "empty string primitive takes two output arguments");
+    f_l1.arguments().size() >= 2,
+    "empty string primitive requires two output arguments");
 
   const array_exprt char_array({}, char_array_type);
 
