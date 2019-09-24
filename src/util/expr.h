@@ -258,6 +258,11 @@ public:
     return static_cast<source_locationt &>(add(ID_C_source_location));
   }
 
+  void drop_source_location()
+  {
+    remove(ID_C_source_location);
+  }
+
   /// Check that the expression is well-formed (shallow checks only, i.e.,
   /// subexpressions and its type are not checked).
   ///
