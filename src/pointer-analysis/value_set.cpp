@@ -936,6 +936,11 @@ void value_sett::get_value_set_rec(
     const typet &op_type = ns.follow(byte_extract_expr.op().type());
     if(op1_offset.has_value() && op_type.id() == ID_struct)
     {
+      if(*op1_offset == 0)
+      {
+        get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
+        return;
+      }
       const struct_typet &struct_type = to_struct_type(op_type);
 
       for(const auto &c : struct_type.components())

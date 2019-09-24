@@ -1,0 +1,9 @@
+CORE
+main.c
+--unwinding-assertions --unwind 11
+^\[main.unwind.0\] line \d+ unwinding assertion loop 0: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
