@@ -670,6 +670,12 @@ protected:
     const function_application_exprt &f_l1,
     bool to_upper);
 
+  /// Attempt to constant proagate character replacement.
+  bool constant_propagate_replace(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1);
+
   /// Assign constant string length and string data given by a char array to
   /// given ssa variables
   ///

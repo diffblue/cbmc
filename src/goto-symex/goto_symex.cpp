@@ -219,6 +219,10 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
       {
         return constant_propagate_case_change(state, symex_assign, f_l1, true);
       }
+      else if(func_id == ID_cprover_string_replace_func)
+      {
+        return constant_propagate_replace(state, symex_assign, f_l1);
+      }
     }
   }
 
@@ -985,6 +989,114 @@ bool goto_symext::constant_propagate_case_change(
 
   const array_typet new_char_array_type(char_type, new_char_array_length);
   const array_exprt new_char_array(std::move(operands), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_replace(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
+  const auto s_data_opt = try_evaluate_constant_string(state, s.content());
+
+  if(!s_data_opt)
+    return false;
+
+  auto &new_data = f_l1.arguments().at(4);
+  auto &old_data = f_l1.arguments().at(3);
+
+  array_exprt characters_to_find(s_data_opt->get().type());
+  array_exprt characters_to_replace(s_data_opt->get().type());
+
+  // Two main ways to perform a replace: characters or strings.
+  bool is_single_character = new_data.type().id() == ID_unsignedbv &&
+                             old_data.type().id() == ID_unsignedbv;
+  if(is_single_character)
+  {
+    const auto new_char_pointer = try_evaluate_constant(state, new_data);
+    const auto old_char_pointer = try_evaluate_constant(state, old_data);
+
+    if(!new_char_pointer || !old_char_pointer)
+    {
+      return {};
+    }
+
+    characters_to_find.operands().emplace_back(old_char_pointer->get());
+    characters_to_replace.operands().emplace_back(new_char_pointer->get());
+  }
+  else
+  {
+    auto &new_char_array = to_string_expr(new_data);
+    auto &old_char_array = to_string_expr(old_data);
+
+    const auto new_char_array_opt =
+      try_evaluate_constant_string(state, new_char_array.content());
+
+    const auto old_char_array_opt =
+      try_evaluate_constant_string(state, old_char_array.content());
+
+    if(!new_char_array_opt || !old_char_array_opt)
+    {
+      return {};
+    }
+
+    characters_to_find = old_char_array_opt->get();
+    characters_to_replace = new_char_array_opt->get();
+  }
+
+  // Copy data, then do initial search for a replace sequence.
+  array_exprt existing_data = s_data_opt->get();
+  auto found_pattern = std::search(
+    existing_data.operands().begin(),
+    existing_data.operands().end(),
+    characters_to_find.operands().begin(),
+    characters_to_find.operands().end());
+
+  // If we've found a match, proceed to perform a replace on all instances.
+  while(found_pattern != existing_data.operands().end())
+  {
+    // Find the difference between our first/last match iterator.
+    auto match_end = found_pattern + characters_to_find.operands().size();
+
+    // Erase them.
+    found_pattern = existing_data.operands().erase(found_pattern, match_end);
+
+    // Insert our replacement characters, then move the iterator to the end of
+    // our new sequence.
+    found_pattern = existing_data.operands().insert(
+                      found_pattern,
+                      characters_to_replace.operands().begin(),
+                      characters_to_replace.operands().end()) +
+                    characters_to_replace.operands().size();
+
+    // Then search from there for any additional matches.
+    found_pattern = std::search(
+      found_pattern,
+      existing_data.operands().end(),
+      characters_to_find.operands().begin(),
+      characters_to_find.operands().end());
+  }
+
+  const constant_exprt new_char_array_length =
+    from_integer(existing_data.operands().size(), length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+  const array_exprt new_char_array(
+    std::move(existing_data.operands()), new_char_array_type);
 
   assign_string_constant(
     state,
