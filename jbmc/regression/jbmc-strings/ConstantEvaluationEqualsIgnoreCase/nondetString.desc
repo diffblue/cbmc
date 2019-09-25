@@ -1,0 +1,9 @@
+CORE
+Main.class
+--function Main.nondetString --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^Generated [1-9]\d* VCC\(s\), [1-9]\d* remaining after simplification$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--

@@ -484,6 +484,75 @@ static simplify_exprt::resultt<> simplify_string_char_at(
   return c;
 }
 
+/// Take the passed-in constant string array and lower-case every character.
+static bool lower_case_string_expression(array_exprt &string_data)
+{
+  auto &operands = string_data.operands();
+  for(auto &operand : operands)
+  {
+    auto &constant_value = to_constant_expr(operand);
+    auto character = numeric_cast_v<unsigned int>(constant_value);
+
+    // Can't guarantee matches against non-ASCII characters.
+    if(character >= 128)
+      return false;
+
+    if(isalpha(character))
+    {
+      if(isupper(character))
+        constant_value =
+          from_integer(tolower(character), constant_value.type());
+    }
+  }
+
+  return true;
+}
+
+/// Simplify String.equalsIgnorecase function when arguments are constant
+///
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_equals_ignore_case(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  // We want to get both arguments of any starts-with comparison, and
+  // trace them back to the actual string instance. All variables on the
+  // way must be constant for us to be sure this will work.
+  auto &first_argument = to_string_expr(expr.arguments().at(0));
+  auto &second_argument = to_string_expr(expr.arguments().at(1));
+
+  const auto first_value_opt =
+    try_get_string_data_array(first_argument.content(), ns);
+
+  if(!first_value_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  array_exprt first_value = first_value_opt->get();
+
+  const auto second_value_opt =
+    try_get_string_data_array(second_argument.content(), ns);
+
+  if(!second_value_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  array_exprt second_value = second_value_opt->get();
+
+  // Just lower-case both expressions.
+  if(
+    !lower_case_string_expression(first_value) ||
+    !lower_case_string_expression(second_value))
+    return simplify_exprt::unchanged(expr);
+
+  bool is_equal = first_value == second_value;
+  return from_integer(is_equal ? 1 : 0, expr.type());
+}
+
 /// Simplify String.startsWith function when arguments are constant
 ///
 /// \param expr: the expression to simplify
@@ -596,6 +665,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   else if(func_id == ID_cprover_string_last_index_of_func)
   {
     return simplify_string_index_of(expr, ns, true);
+  }
+  else if(func_id == ID_cprover_string_equals_ignore_case_func)
+  {
+    return simplify_string_equals_ignore_case(expr, ns);
   }
 
   return unchanged(expr);
