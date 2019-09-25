@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.check
+line 5 Array size should be >= 0: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that defining an array with negative size does not crash JBMC
