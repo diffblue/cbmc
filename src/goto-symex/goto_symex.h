@@ -610,6 +610,19 @@ protected:
     symex_assignt &symex_assign,
     const function_application_exprt &f_l1);
 
+  /// Attempt to constant propagate deleting a substring from a string
+  ///
+  /// \param state: goto symex state
+  /// \param symex_assign: object handling symbol assignments
+  /// \param f_l1: application of function ID_cprover_string_delete_func with
+  ///   l1 renaming applied
+  /// \return true if the operation could be evaluated to a constant string,
+  ///   false otherwise
+  bool constant_propagate_delete(
+    statet &state,
+    symex_assignt &symex_assign,
+    const function_application_exprt &f_l1);
+
   /// Assign constant string length and string data given by a char array to
   /// given ssa variables
   ///

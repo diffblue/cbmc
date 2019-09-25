@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.testIndexOutOfBounds2 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+no uncaught exception: FAILURE$
+--
+--
