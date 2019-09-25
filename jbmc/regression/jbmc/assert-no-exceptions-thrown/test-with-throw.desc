@@ -1,0 +1,14 @@
+CORE
+Test.class
+--function Test.check
+line 22 assertion at file Test.java line 22 .*: FAILURE
+line 24 assertion at file Test.java line 24 .*: FAILURE
+line 26 assertion at file Test.java line 26 .*: FAILURE
+line 28 assertion at file Test.java line 28 .*: FAILURE
+line 30 assertion at file Test.java line 30 .*: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that we get the expected behaviour when --assert-no-exceptions-thrown is
+not used. This is to make sure that test.desc is actually testing what we wanted.

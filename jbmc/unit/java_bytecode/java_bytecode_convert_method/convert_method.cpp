@@ -457,6 +457,7 @@ SCENARIO(
   symbol_tablet symbol_table;
   java_string_library_preprocesst string_preprocess;
   const class_hierarchyt class_hierarchy{};
+  const bool assert_no_exceptions_thrown = false;
   java_bytecode_convert_methodt converter{symbol_table,
                                           null_message_handler,
                                           10,
@@ -464,7 +465,8 @@ SCENARIO(
                                           {},
                                           string_preprocess,
                                           class_hierarchy,
-                                          false};
+                                          false,
+                                          assert_no_exceptions_thrown};
 
   GIVEN("An int array")
   {
@@ -571,6 +573,7 @@ SCENARIO(
   const std::size_t max_array_length = 10;
   const bool throw_assertion_error = true;
   const bool threading_support = false;
+  const bool assert_no_exceptions_thrown = false;
   java_bytecode_convert_methodt converter{symbol_table,
                                           null_message_handler,
                                           max_array_length,
@@ -578,7 +581,8 @@ SCENARIO(
                                           {},
                                           string_preprocess,
                                           class_hierarchy,
-                                          threading_support};
+                                          threading_support,
+                                          assert_no_exceptions_thrown};
 
   GIVEN("An int_array variable")
   {
@@ -677,6 +681,7 @@ SCENARIO(
   const std::size_t max_array_length = 10;
   const bool throw_assertion_error = true;
   const bool threading_support = false;
+  const bool assert_no_exceptions_thrown = false;
   java_bytecode_convert_methodt converter{symbol_table,
                                           null_message_handler,
                                           max_array_length,
@@ -684,7 +689,8 @@ SCENARIO(
                                           {},
                                           string_preprocess,
                                           class_hierarchy,
-                                          threading_support};
+                                          threading_support,
+                                          assert_no_exceptions_thrown};
 
   GIVEN("An int_array variable")
   {
@@ -818,6 +824,7 @@ SCENARIO(
   const std::size_t max_array_length = 10;
   const bool throw_assertion_error = true;
   const bool threading_support = false;
+  const bool assert_no_exceptions_thrown = false;
   java_bytecode_convert_methodt converter{symbol_table,
                                           null_message_handler,
                                           max_array_length,
@@ -825,7 +832,8 @@ SCENARIO(
                                           {},
                                           string_preprocess,
                                           class_hierarchy,
-                                          threading_support};
+                                          threading_support,
+                                          assert_no_exceptions_thrown};
 
   GIVEN("An int_array variable")
   {

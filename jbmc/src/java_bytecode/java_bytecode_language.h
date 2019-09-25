@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
   "(disable-uncaught-exception-check)" \
   "(throw-assertion-error)" \
+  "(assert-no-exceptions-thrown)" \
   "(java-assume-inputs-non-null)" \
   "(java-assume-inputs-interval):" \
   "(java-assume-inputs-integral)" \
@@ -57,6 +58,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              assert statements instead of failing\n" \
   "                              at the location of the assert statement\n" \
   " --throw-runtime-exceptions   make implicit runtime exceptions explicit\n" \
+  " --assert-no-exceptions-thrown\n"\
+  "                              transform `throw` instructions into `assert FALSE`\n"/* NOLINT(*) */ \
+  "                              followed by `assume FALSE`.\n" \
   " --max-nondet-array-length N  limit nondet (e.g. input) array size to <= N\n" /* NOLINT(*) */ \
   " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */ \
   "                              at level N references are set to null\n" /* NOLINT(*) */ \
@@ -150,6 +154,54 @@ private:
   std::unordered_multimap<irep_idt, symbolt> map;
 };
 
+struct java_bytecode_language_optionst
+{
+  java_bytecode_language_optionst(const optionst &options, messaget &log);
+
+  java_bytecode_language_optionst() = default;
+
+  /// assume inputs variables to be non-null
+  bool assume_inputs_non_null = false;
+  bool string_refinement_enabled = false;
+  bool throw_runtime_exceptions = false;
+  bool assert_uncaught_exceptions = false;
+  bool throw_assertion_error = false;
+  bool threading_support = false;
+  bool nondet_static = false;
+  bool ignore_manifest_main_class = false;
+
+  /// Transform `athrow` bytecode instructions into `assert FALSE` followed
+  /// by `assume FALSE`.
+  bool assert_no_exceptions_thrown = false;
+
+  /// max size for user code created arrays
+  size_t max_user_array_length = 0;
+  lazy_methods_modet lazy_methods_mode =
+    lazy_methods_modet::LAZY_METHODS_MODE_EAGER;
+
+  /// list of classes to force load even without reference from the entry point
+  std::vector<irep_idt> java_load_classes;
+  std::string java_cp_include_files;
+  /// JSON which contains initial values of static fields (right
+  /// after the static initializer of the class was run). This is read from the
+  /// file specified by the --static-values command-line option.
+  optionalt<json_objectt> static_values_json;
+
+  /// List of classes to never load
+  std::unordered_set<std::string> no_load_classes;
+
+  std::vector<load_extra_methodst> extra_methods;
+
+  /// If set, method bodies are only elaborated if they pass the filter.
+  /// Methods that do not pass the filter are "excluded": their symbols will
+  /// include all the meta-information that is available from the bytecode
+  /// (parameter types, return type, accessibility etc.) but the value of the
+  /// symbol (corresponding to the body of the method) will be replaced with the
+  /// same kind of "return nondet null or instance of return type" body that we
+  /// use for stubbed methods. The original method body will never be loaded.
+  optionalt<prefix_filtert> method_context;
+};
+
 #define JAVA_CLASS_MODEL_SUFFIX "@class_model"
 
 class java_bytecode_languaget:public languaget
@@ -180,17 +232,7 @@ public:
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget(
     std::unique_ptr<select_pointer_typet> pointer_type_selector)
-    : language_options_initialized(false),
-      threading_support(false),
-      assume_inputs_non_null(false),
-      object_factory_parameters(),
-      max_user_array_length(0),
-      lazy_methods_mode(lazy_methods_modet::LAZY_METHODS_MODE_EAGER),
-      string_refinement_enabled(false),
-      throw_runtime_exceptions(false),
-      assert_uncaught_exceptions(false),
-      throw_assertion_error(false),
-      nondet_static(false),
+    : object_factory_parameters(),
       pointer_type_selector(std::move(pointer_type_selector))
   {
   }
@@ -252,31 +294,14 @@ protected:
   bool do_ci_lazy_method_conversion(symbol_tablet &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
-  bool language_options_initialized;
+  optionalt<java_bytecode_language_optionst> language_options;
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
-  bool ignore_manifest_main_class;
   java_class_loadert java_class_loader;
-  bool threading_support;
-  bool assume_inputs_non_null;      // assume inputs variables to be non-null
   java_object_factory_parameterst object_factory_parameters;
-  size_t max_user_array_length;     // max size for user code created arrays
   method_bytecodet method_bytecode;
-  lazy_methods_modet lazy_methods_mode;
-  bool string_refinement_enabled;
-  bool throw_runtime_exceptions;
-  bool assert_uncaught_exceptions;
-  bool throw_assertion_error;
   java_string_library_preprocesst string_preprocess;
-  std::string java_cp_include_files;
-  bool nondet_static;
-  /// JSON which contains initial values of static fields (right
-  /// after the static initializer of the class was run). This is read from the
-  /// file specified by the --static-values command-line option.
-  optionalt<json_objectt> static_values_json;
 
-  // list of classes to force load even without reference from the entry point
-  std::vector<irep_idt> java_load_classes;
 
 private:
   virtual std::vector<load_extra_methodst>
@@ -289,10 +314,6 @@ private:
   synthetic_methods_mapt synthetic_methods;
   stub_global_initializer_factoryt stub_global_initializer_factory;
   class_hierarchyt class_hierarchy;
-  // List of classes to never load
-  std::unordered_set<std::string> no_load_classes;
-
-  std::vector<load_extra_methodst> extra_methods;
 
   /// Map used in all calls to functions that deterministically create objects
   /// (currently only \ref assign_from_json).
@@ -300,14 +321,6 @@ private:
   /// IDs of such objects to symbols that store their values.
   std::unordered_map<std::string, object_creation_referencet> references;
 
-  /// If set, method bodies are only elaborated if they pass the filter.
-  /// Methods that do not pass the filter are "excluded": their symbols will
-  /// include all the meta-information that is available from the bytecode
-  /// (parameter types, return type, accessibility etc.) but the value of the
-  /// symbol (corresponding to the body of the method) will be replaced with the
-  /// same kind of "return nondet null or instance of return type" body that we
-  /// use for stubbed methods. The original method body will never be loaded.
-  optionalt<prefix_filtert> method_context;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

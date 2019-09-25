@@ -666,12 +666,12 @@ and the methods in them. The methods, along with their parsed representation
 \ref java_bytecode_languaget::method_bytecode via a reference held in
 \ref java_bytecode_convert_classt::method_bytecode. typecheck then performs a
 switch over the value of
-[lazy_methods_mode](\ref java_bytecode_languaget::lazy_methods_mode) to
+[lazy_methods_mode](\ref java_bytecode_language_optionst::lazy_methods_mode) to
 determine which loading strategy to use.
 
 \subsection eager-loading Eager loading
 
-If [lazy_methods_mode](\ref java_bytecode_languaget::lazy_methods_mode) is
+If [lazy_methods_mode](\ref java_bytecode_language_optionst::lazy_methods_mode) is
 \ref java_bytecode_languaget::LAZY_METHODS_MODE_EAGER then eager loading is
 used. Under eager loading
 \ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &, lazy_class_to_declared_symbols_mapt &)
@@ -695,7 +695,7 @@ method parameters) and function references (at function call sites) to
 locate further classes and methods to load. The following paragraph describes
 the mechanism used.
 
-If [lazy_methods_mode](\ref java_bytecode_languaget::lazy_methods_mode) is
+If [lazy_methods_mode](\ref java_bytecode_language_optionst::lazy_methods_mode) is
 \ref lazy_methods_modet::LAZY_METHODS_MODE_CONTEXT_INSENSITIVE then
 context-insensitive lazy loading is used. Under this stragegy
 \ref java_bytecode_languaget::do_ci_lazy_method_conversion is called to do all

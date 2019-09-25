@@ -40,12 +40,14 @@ public:
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     java_string_library_preprocesst &_string_preprocess,
     const class_hierarchyt &class_hierarchy,
-    bool threading_support)
+    bool threading_support,
+    bool assert_no_exceptions_thrown)
     : messaget(_message_handler),
       symbol_table(symbol_table),
       ns(symbol_table),
       max_array_length(_max_array_length),
       throw_assertion_error(throw_assertion_error),
+      assert_no_exceptions_thrown(assert_no_exceptions_thrown),
       threading_support(threading_support),
       needed_lazy_methods(std::move(needed_lazy_methods)),
       string_preprocess(_string_preprocess),
@@ -76,6 +78,7 @@ protected:
   namespacet ns;
   const size_t max_array_length;
   const bool throw_assertion_error;
+  const bool assert_no_exceptions_thrown;
   const bool threading_support;
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods;
 
