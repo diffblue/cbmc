@@ -188,4 +188,22 @@ class My {
       assert false;
     }
   }
+
+  public static void intervalUnion(int intArg) {
+    if (intArg == -3) {
+      assert false;
+    } else if (intArg == -1) {
+      assert false;
+    } else if (intArg == 0) {
+      assert false;
+    } else if (intArg == 1) {
+      assert false;
+    } else if (intArg == 3) {
+      assert false;
+    } else if (intArg == 6) {
+      assert false;
+    } else {
+      assert false;
+    }
+  }
 }

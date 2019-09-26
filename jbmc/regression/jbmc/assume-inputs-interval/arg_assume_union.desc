@@ -1,0 +1,17 @@
+CORE
+My.class
+--function My.intervalUnion --java-assume-inputs-interval [-3:-2],[5:],[1:2]
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My\.intervalUnion:\(I\)V\.assertion\.1\].[^$]*FAILURE
+\[java::My\.intervalUnion:\(I\)V\.assertion\.2\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.3\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.4\].[^$]*FAILURE
+\[java::My\.intervalUnion:\(I\)V\.assertion\.5\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.6\].[^$]*FAILURE
+\[java::My\.intervalUnion:\(I\)V\.assertion\.7\].[^$]*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-interval works with multiple intervals.
