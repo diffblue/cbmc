@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 array,iterator1,iterator2,iterator3 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=10$
