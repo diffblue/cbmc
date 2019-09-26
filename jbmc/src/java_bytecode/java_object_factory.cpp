@@ -1076,22 +1076,10 @@ void java_object_factoryt::gen_nondet_init(
     // add assumes to obey numerical restrictions
     if(type != java_boolean_type() && type != java_char_type())
     {
-      if(object_factory_parameters.assume_inputs_interval.lower_set)
-      {
-        assignments.add(code_assumet(binary_relation_exprt(
-          expr,
-          ID_ge,
-          from_integer(
-            object_factory_parameters.assume_inputs_interval.lower, type))));
-      }
-      if(object_factory_parameters.assume_inputs_interval.upper_set)
-      {
-        assignments.add(code_assumet(binary_relation_exprt(
-          expr,
-          ID_le,
-          from_integer(
-            object_factory_parameters.assume_inputs_interval.upper, type))));
-      }
+      exprt within_bounds = object_factory_parameters.assume_inputs_interval
+        .make_contains_expr(expr);
+      if(within_bounds != true_exprt{})
+        assignments.add(code_assumet(std::move(within_bounds)));
       if(
         object_factory_parameters.assume_inputs_integral &&
         (type == java_float_type() || type == java_double_type()))
