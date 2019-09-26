@@ -28,6 +28,7 @@ SRC = allocate_objects.cpp \
       get_module.cpp \
       identifier.cpp \
       ieee_float.cpp \
+      interval_union.cpp \
       invariant.cpp \
       irep.cpp \
       irep_hash.cpp \
