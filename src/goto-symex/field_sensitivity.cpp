@@ -180,14 +180,15 @@ exprt field_sensitivityt::get_fields(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     ssa_expr.type().id() == ID_array &&
-    to_array_type(ssa_expr.type()).size().id() == ID_constant &&
-    numeric_cast_v<mp_integer>(
-      to_constant_expr(to_array_type(ssa_expr.type()).size())) <=
-      max_field_sensitivity_array_size)
+    to_array_type(ssa_expr.type()).size().id() == ID_constant)
   {
+    const mp_integer mp_array_size = numeric_cast_v<mp_integer>(
+      to_constant_expr(to_array_type(ssa_expr.type()).size()));
+    if(mp_array_size < 0 || mp_array_size > max_field_sensitivity_array_size)
+      return ssa_expr;
+
     const array_typet &type = to_array_type(ssa_expr.type());
-    const std::size_t array_size =
-      numeric_cast_v<std::size_t>(to_constant_expr(type.size()));
+    const std::size_t array_size = numeric_cast_v<std::size_t>(mp_array_size);
 
     array_exprt result(type);
     result.reserve_operands(array_size);

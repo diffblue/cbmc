@@ -141,7 +141,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       if(total>(1<<30)) // realistic limit
         throw analysis_exceptiont("array too large for flattening");
 
-      entry.total_width = numeric_cast_v<std::size_t>(total);
+      if(total < 0)
+        entry.total_width = 0;
+      else
+        entry.total_width = numeric_cast_v<std::size_t>(total);
     }
   }
   else if(type_id==ID_vector)
