@@ -39,10 +39,7 @@ static void get_xml_options(const xmlt &xml, cmdlinet &cmdline)
   }
   else if(xml.name == "flagOption")
   {
-    if(xml.get_attribute("actual") == "on")
-    {
-      cmdline.set(xml.get_attribute("name"));
-    }
+    cmdline.set(xml.get_attribute("name"), xml.get_attribute("actual") == "on");
   }
 }
 

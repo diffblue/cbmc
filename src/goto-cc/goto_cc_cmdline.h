@@ -34,16 +34,16 @@ public:
   // never fails, will add if not found
   std::size_t get_optnr(const std::string &option);
 
-  void set(const std::string &opt, const std::string &value)
+  void set(const std::string &opt, const std::string &value) override
   {
     std::size_t nr=get_optnr(opt);
     options[nr].isset=true;
     options[nr].values.push_back(value);
   }
 
-  void set(const std::string &opt)
+  void set(const std::string &opt, bool value = true) override
   {
-    options[get_optnr(opt)].isset=true;
+    options[get_optnr(opt)].isset = value;
   }
 
   // This lets you distinguish input file name arguments

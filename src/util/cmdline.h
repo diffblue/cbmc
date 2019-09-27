@@ -32,7 +32,7 @@ public:
 
   virtual bool isset(char option) const;
   virtual bool isset(const char *option) const;
-  virtual void set(const std::string &option);
+  virtual void set(const std::string &option, bool value = true);
   virtual void set(const std::string &option, const std::string &value);
   virtual void clear();
 

@@ -52,12 +52,12 @@ std::string cmdlinet::get_value(char option) const
     return "";
 }
 
-void cmdlinet::set(const std::string &option)
+void cmdlinet::set(const std::string &option, bool value)
 {
   auto i=getoptnr(option);
 
   if(i.has_value())
-    options[*i].isset=true;
+    options[*i].isset = value;
 
   // otherwise ignore
 }
