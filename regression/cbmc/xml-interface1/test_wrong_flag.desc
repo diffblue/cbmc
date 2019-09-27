@@ -1,0 +1,6 @@
+CORE
+--xml-interface
+< test_wrong_flag.xml
+^EXIT=6$
+^SIGNAL=0$
+unknown command line option
