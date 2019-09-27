@@ -153,32 +153,9 @@ void full_slicert::add_jumps(
     {
       // check whether the nearest post-dominator is different from
       // lex_succ
-      goto_programt::const_targett nearest=lex_succ;
-      std::size_t post_dom_size=0;
-      for(cfg_dominatorst::target_sett::const_iterator d_it =
-            j_PC_node.dominators.begin();
-          d_it != j_PC_node.dominators.end();
-          ++d_it)
+      if(j_PC_node.dominator && pd.cfg[*j_PC_node.dominator].PC != lex_succ)
       {
-        const auto &node = cfg.get_node(*d_it);
-        if(node.node_required)
-        {
-          const irep_idt &id2 = node.function_id;
-          INVARIANT(id==id2,
-                    "goto/jump expected to be within a single function");
-
-          const auto &postdom_node = pd.get_node(*d_it);
-
-          if(postdom_node.dominators.size() > post_dom_size)
-          {
-            nearest=*d_it;
-            post_dom_size = postdom_node.dominators.size();
-          }
-        }
-      }
-      if(nearest!=lex_succ)
-      {
-        add_to_queue(queue, *it, nearest);
+        add_to_queue(queue, *it, lex_succ);
         jumps.erase(it);
       }
     }

@@ -38,7 +38,7 @@ static void unreachable_instructions(
       ++it)
   {
     const cfg_dominatorst::cfgt::nodet &n=dominators.cfg[it->second];
-    if(n.dominators.empty())
+    if(!n.dominator)
       dest.insert(std::make_pair(it->first->location_number,
                                  it->first));
   }
