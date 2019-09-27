@@ -1528,8 +1528,11 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::org.cprover.CProverString.offsetByCodePoints:(Ljava/lang/"
      "String;II)I"] = ID_cprover_string_offset_by_code_point_func;
   cprover_equivalent_to_java_assign_function
-    ["java::org.cprover.CProverString.setCharAt:(Ljava/lang/String;IC)V"] =
-      ID_cprover_string_char_set_func;
+    ["java::org.cprover.CProverString.setCharAt:(Ljava/lang/"
+     "StringBuffer;IC)V"] = ID_cprover_string_char_set_func;
+  cprover_equivalent_to_java_assign_function
+    ["java::org.cprover.CProverString.setCharAt:(Ljava/lang/"
+     "StringBuilder;IC)V"] = ID_cprover_string_char_set_func;
   cprover_equivalent_to_java_assign_function
     ["java::org.cprover.CProverString.setLength:(Ljava/lang/StringBuffer;I)V"] =
       ID_cprover_string_set_length_func;
