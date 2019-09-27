@@ -14,6 +14,11 @@ Author: Diffblue Limited
 #include <util/invariant.h>
 #include <util/std_expr.h>
 
+interval_uniont interval_uniont::all_integers()
+{
+  return of_interval(intervalt{});
+}
+
 interval_uniont interval_uniont::greater_or_equal(const mp_integer &value)
 {
   interval_uniont interval_union{};

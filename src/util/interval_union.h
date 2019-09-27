@@ -31,6 +31,9 @@ public:
   /// Empty union
   interval_uniont() = default;
 
+  /// Set of all integers
+  static interval_uniont all_integers();
+
   /// Construct interval_uniont object representing the set of integers that are
   /// greater or equal to \p value.
   static interval_uniont greater_or_equal(const mp_integer &value);
