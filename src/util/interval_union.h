@@ -78,6 +78,9 @@ public:
   /// Expression which is true exactly when \p e belongs to the set.
   exprt make_contains_expr(const exprt &e) const;
 
+  /// If the set contains only one element, return the value of this element.
+  optionalt<mp_integer> as_singleton() const;
+
 private:
   /// Non-overlapping intervals stored in order of their lower bound, so that
   /// each interval is strictly below the following one.

@@ -235,6 +235,18 @@ interval_uniont::of_string(const std::string &to_parse)
   return result;
 }
 
+optionalt<mp_integer> interval_uniont::as_singleton() const
+{
+  if(intervals.size() != 1)
+    return {};
+  const intervalt &interval = intervals[0];
+  if(!interval.lower_set || !interval.upper_set)
+    return {};
+  if(interval.upper != interval.lower)
+    return {};
+  return interval.lower;
+}
+
 /// Check that interval \p a is strictly below interval \p b
 static bool strictly_below(
   const interval_templatet<mp_integer> &a,
