@@ -1,0 +1,9 @@
+<options>
+  <valueOption actual="main.c"/>
+  <valueOption name="function" actual="foo"/>
+  <valueOption name="unknown-option" actual="3"/>
+  <valueOption name="property" actual="foo.assertion.1"/>
+  <valueOption name="property" actual="foo.assertion.3"/>
+  <flagOption name="trace" actual="on"/>
+  <flagOption name="show-properties" actual="off"/>
+</options>
