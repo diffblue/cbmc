@@ -1076,10 +1076,19 @@ void java_object_factoryt::gen_nondet_init(
     // add assumes to obey numerical restrictions
     if(type != java_boolean_type() && type != java_char_type())
     {
-      exprt within_bounds = object_factory_parameters.assume_inputs_interval
-        .make_contains_expr(expr);
-      if(within_bounds != true_exprt{})
-        assignments.add(code_assumet(std::move(within_bounds)));
+      const auto &interval = object_factory_parameters.assume_inputs_interval;
+      if(auto singleton = interval.as_singleton())
+      {
+        assignments.add(
+          code_assignt{expr, from_integer(*singleton, expr.type())});
+      }
+      else
+      {
+        exprt within_bounds = interval.make_contains_expr(expr);
+        if(!within_bounds.is_true())
+          assignments.add(code_assumet(std::move(within_bounds)));
+      }
+
       if(
         object_factory_parameters.assume_inputs_integral &&
         (type == java_float_type() || type == java_double_type()))
