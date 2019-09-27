@@ -4,7 +4,7 @@ My.class
 ^EXIT=1$
 ^SIGNAL=0$
 ^Invalid User Input
-^Reason: interval must be of the form
+^Reason: argument must be a comma-seperated sequence of intervals of the form
 --
 --
 Check that --java-assume-inputs-interval throws exception for malformed
