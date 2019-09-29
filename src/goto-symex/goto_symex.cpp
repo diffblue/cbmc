@@ -199,6 +199,14 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
       {
         return constant_propagate_delete(state, symex_assign, f_l1);
       }
+      else if(func_id == ID_cprover_string_set_length_func)
+      {
+        return constant_propagate_set_length(state, symex_assign, f_l1);
+      }
+      else if(func_id == ID_cprover_string_char_set_func)
+      {
+        return constant_propagate_set_char_at(state, symex_assign, f_l1);
+      }
     }
   }
 
@@ -752,6 +760,157 @@ bool goto_symext::constant_propagate_delete(
     s_data.operands().end());
 
   const array_exprt new_char_array(std::move(operands), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_set_length(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  // The function application expression f_l1 takes the following arguments:
+  // - result string length (output parameter)
+  // - result string data array (output parameter)
+  // - current string
+  // - new length of the string
+  PRECONDITION(f_l1.arguments().size() == 4);
+
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const auto &new_length_opt =
+    try_evaluate_constant(state, f_l1.arguments().at(3));
+
+  if(!new_length_opt)
+  {
+    return false;
+  }
+
+  const mp_integer new_length =
+    numeric_cast_v<mp_integer>(new_length_opt->get());
+
+  if(new_length < 0)
+  {
+    return false;
+  }
+
+  const std::size_t new_size = numeric_cast_v<std::size_t>(new_length);
+
+  const constant_exprt new_char_array_length =
+    from_integer(new_size, length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+
+  exprt::operandst operands;
+
+  if(new_size != 0)
+  {
+    operands.reserve(new_size);
+
+    const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
+    const auto s_data_opt = try_evaluate_constant_string(state, s.content());
+
+    if(!s_data_opt)
+    {
+      return false;
+    }
+
+    const array_exprt &s_data = s_data_opt->get();
+
+    operands.insert(
+      operands.end(),
+      s_data.operands().begin(),
+      std::next(
+        s_data.operands().begin(),
+        std::min(new_size, s_data.operands().size())));
+
+    operands.insert(
+      operands.end(),
+      new_size - std::min(new_size, s_data.operands().size()),
+      from_integer(0, char_type));
+  }
+
+  const array_exprt new_char_array(std::move(operands), new_char_array_type);
+
+  assign_string_constant(
+    state,
+    symex_assign,
+    to_ssa_expr(f_l1.arguments().at(0)),
+    new_char_array_length,
+    to_ssa_expr(f_l1.arguments().at(1)),
+    new_char_array);
+
+  return true;
+}
+
+bool goto_symext::constant_propagate_set_char_at(
+  statet &state,
+  symex_assignt &symex_assign,
+  const function_application_exprt &f_l1)
+{
+  // The function application expression f_l1 takes the following arguments:
+  // - result string length (output parameter)
+  // - result string data array (output parameter)
+  // - current string
+  // - index of char to set
+  // - new char
+  PRECONDITION(f_l1.arguments().size() == 5);
+
+  const auto &f_type = to_mathematical_function_type(f_l1.function().type());
+  const auto &length_type = f_type.domain().at(0);
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+
+  const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
+  const auto s_data_opt = try_evaluate_constant_string(state, s.content());
+
+  if(!s_data_opt)
+  {
+    return false;
+  }
+
+  array_exprt s_data = s_data_opt->get();
+
+  const auto &index_opt = try_evaluate_constant(state, f_l1.arguments().at(3));
+
+  if(!index_opt)
+  {
+    return false;
+  }
+
+  const mp_integer index = numeric_cast_v<mp_integer>(index_opt->get());
+
+  if(index < 0 || index >= s_data.operands().size())
+  {
+    return false;
+  }
+
+  const auto &new_char_opt =
+    try_evaluate_constant(state, f_l1.arguments().at(4));
+
+  if(!new_char_opt)
+  {
+    return false;
+  }
+
+  const constant_exprt new_char_array_length =
+    from_integer(s_data.operands().size(), length_type);
+
+  const array_typet new_char_array_type(char_type, new_char_array_length);
+
+  s_data.operands()[numeric_cast_v<std::size_t>(index)] = new_char_opt->get();
+
+  const array_exprt new_char_array(
+    std::move(s_data.operands()), new_char_array_type);
 
   assign_string_constant(
     state,
