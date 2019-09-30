@@ -75,10 +75,19 @@ void cover_instrument_end_of_function(
   const irep_idt &function_id,
   goto_programt &goto_program)
 {
-  auto if_it = goto_program.instructions.end();
-  while(!if_it->is_function_call())
-    if_it--;
-  if_it++;
+  const auto last_function_call = std::find_if(
+    goto_program.instructions.rbegin(),
+    goto_program.instructions.rend(),
+    [](const goto_programt::instructiont &instruction) {
+      return instruction.is_function_call();
+    });
+  INVARIANT(
+    last_function_call != goto_program.instructions.rend(),
+    "Goto program should have at least one function call");
+  INVARIANT(
+    last_function_call != goto_program.instructions.rbegin(),
+    "Goto program shouldn't end with a function call");
+  const auto if_it = last_function_call.base();
   const std::string &comment =
     "additional goal to ensure reachability of end of function";
   goto_program.insert_before_swap(if_it);
