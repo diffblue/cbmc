@@ -65,6 +65,13 @@ public:
     return guard_bddt(manager, bdd.bdd_not());
   }
 
+  /// Returns true if `operator|=` with \p other_guard may result in a simpler
+  /// expression. For `bdd_exprt` we always simplify maximally.
+  bool disjunction_may_simplify(const guard_bddt &other_guard)
+  {
+    return true;
+  }
+
 private:
   bdd_exprt &manager;
   bddt bdd;

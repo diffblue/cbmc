@@ -601,6 +601,38 @@ void goto_symext::merge_gotos(statet &state)
   frame.goto_state_map.erase(state_map_it);
 }
 
+static guardt
+merge_state_guards(goto_statet &goto_state, goto_symex_statet &state)
+{
+  // adjust guard, even using guards from unreachable states. This helps to
+  // shrink the state guard if the incoming edge is from a path that was
+  // truncated by config.unwind, config.depth or an assume-false instruction.
+
+  // Note when an unreachable state contributes its guard, merging it in is
+  // optional, since the formula already implies the unreachable guard is
+  // impossible. Therefore we only integrate it when to do so simplifies the
+  // state guard.
+
+  // This function can trash either state's guards, since goto_state is dying
+  // and state's guard will shortly be overwritten.
+
+  if(
+    (goto_state.reachable && state.reachable) ||
+    state.guard.disjunction_may_simplify(goto_state.guard))
+  {
+    state.guard |= goto_state.guard;
+    return std::move(state.guard);
+  }
+  else if(!state.reachable && goto_state.reachable)
+  {
+    return std::move(goto_state.guard);
+  }
+  else
+  {
+    return std::move(state.guard);
+  }
+}
+
 void goto_symext::merge_goto(
   const symex_targett::sourcet &,
   goto_statet &&goto_state,
@@ -612,13 +644,12 @@ void goto_symext::merge_goto(
       "atomic sections differ across branches",
       state.source.pc->source_location);
 
-  // adjust guard, even using guards from unreachable states. This helps to
-  // shrink the state guard if the incoming edge is from a path that was
-  // truncated by config.unwind, config.depth or an assume-false instruction.
+  // Merge guards. Don't write this to `state` yet because we might move
+  // goto_state over it below.
+  guardt new_guard = merge_state_guards(goto_state, state);
 
-  auto new_guard = std::move(state.guard);
-  new_guard |= goto_state.guard;
-
+  // Merge constant propagator, value-set etc. only if the incoming state is
+  // reachable:
   if(goto_state.reachable)
   {
     if(!state.reachable)
