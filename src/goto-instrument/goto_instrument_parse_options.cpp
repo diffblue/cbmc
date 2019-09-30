@@ -692,6 +692,10 @@ int goto_instrument_parse_optionst::doit()
       // applied
       restore_returns(goto_model);
 
+      // dump_c (actually goto_program2code) requires valid instruction
+      // location numbers:
+      goto_model.goto_functions.update();
+
       if(cmdline.args.size()==2)
       {
         #ifdef _MSC_VER
@@ -1520,6 +1524,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     log.status() << "Performing a reachability slice" << messaget::eom;
+
+    // reachability_slicer requires that the model has unique location numbers:
+    goto_model.goto_functions.update();
+
     if(cmdline.isset("property"))
       reachability_slicer(goto_model, cmdline.get_values("property"));
     else
@@ -1546,7 +1554,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     if(cmdline.isset("property"))
       property_slicer(goto_model, cmdline.get_values("property"));
     else
+    {
+      // full_slicer requires that the model has unique location numbers:
+      goto_model.goto_functions.update();
       full_slicer(goto_model);
+    }
   }
 
   // splice option
@@ -1566,6 +1578,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("aggressive-slice"))
   {
     do_indirect_call_and_rtti_removal();
+
+    // reachability_slicer requires that the model has unique location numbers:
+    goto_model.goto_functions.update();
 
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
@@ -1594,6 +1609,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       cmdline.isset("aggressive-slice-preserve-all-direct-paths");
 
     aggressive_slicer.doit();
+
+    goto_model.goto_functions.update();
 
     log.status() << "Performing a reachability slice" << messaget::eom;
     if(cmdline.isset("property"))
