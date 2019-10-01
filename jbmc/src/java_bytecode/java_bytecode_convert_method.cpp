@@ -2268,7 +2268,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     method_symbol == symbol_table.symbols.end() &&
     !(is_virtual && is_method_inherited(
                       class_method_descriptor.class_id(),
-                      class_method_descriptor.get_component_name())))
+                      class_method_descriptor.mangled_method_name())))
   {
     create_method_stub_symbol(
       invoked_method_id,
@@ -3222,13 +3222,13 @@ void java_bytecode_convert_method(
 /// a method inherited from a class (and not an interface!) from which
 /// \p classname inherits, either directly or indirectly.
 /// \param classname: class whose method is referenced
-/// \param methodid: method basename
+/// \param mangled_method_name: The particular overload of a given method.
 bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname,
-  const irep_idt &methodid) const
+  const irep_idt &mangled_method_name) const
 {
-  const auto inherited_method =
-    get_inherited_component(classname, methodid, symbol_table, false);
+  const auto inherited_method = get_inherited_component(
+    classname, mangled_method_name, symbol_table, false);
   return inherited_method.has_value();
 }
 

@@ -4598,21 +4598,34 @@ public:
   /// \param base_method_name: The name of the method to which this expression
   ///   is applied as would be seen in the source code. For example this could
   ///   be - `toString`.
+  /// \param mangled_method_name: The method name after mangling it by
+  ///   combining it with the descriptor. The mangled name is distinguished from
+  ///   other overloads of the method with different counts of or types of
+  ///   parameters. It is not distinguished between different implementations
+  ///   within a class hierarchy. For example if the overall expression refers
+  ///   to the `java.lang.Object.toString` method, then the mangled_method_name
+  ///   would be `toString:()Ljava/lang/String;`
   explicit class_method_descriptor_exprt(
     typet _type,
-    irep_idt component_name,
+    irep_idt mangled_method_name,
     irep_idt class_id,
     irep_idt base_method_name,
     irep_idt identifier)
     : nullary_exprt(ID_virtual_function, std::move(_type))
   {
-    set(ID_component_name, std::move(component_name));
+    set(ID_component_name, std::move(mangled_method_name));
     set(ID_C_class, std::move(class_id));
     set(ID_C_base_name, std::move(base_method_name));
     set(ID_identifier, std::move(identifier));
   }
 
-  const irep_idt &get_component_name() const
+  /// The method name after mangling it by combining it with the descriptor.
+  /// The mangled name is distinguished from other overloads of the method with
+  /// different counts of or types of parameters. It is not distinguished
+  /// between different implementations within a class hierarchy. For example if
+  /// the overall expression refers to the `java.lang.Object.toString` method,
+  /// then the mangled_method_name would be `toString:()Ljava/lang/String;`
+  const irep_idt &mangled_method_name() const
   {
     return get(ID_component_name);
   }
