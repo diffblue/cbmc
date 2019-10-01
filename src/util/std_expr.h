@@ -4645,6 +4645,9 @@ public:
     return get(ID_C_base_name);
   }
 
+  /// A unique identifier of the combination of class and method overload to
+  /// which this expression refers. For example this could be -
+  /// `java::java.lang.Object.toString:()Ljava/lang/String;`.
   const irep_idt &get_identifier() const
   {
     return get(ID_identifier);
