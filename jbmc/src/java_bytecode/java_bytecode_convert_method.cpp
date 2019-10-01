@@ -1330,7 +1330,16 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       bytecode == BC_invokeinterface || bytecode == BC_invokespecial ||
       bytecode == BC_invokevirtual || bytecode == BC_invokestatic)
     {
-      convert_invoke(i_it->source_location, statement, arg0, c, results);
+      class_method_descriptor_exprt *class_method_descriptor =
+        expr_try_dynamic_cast<class_method_descriptor_exprt>(arg0);
+
+      INVARIANT(
+        class_method_descriptor,
+        "invokeinterface, invokespecial, invokevirtual and invokestatic should "
+        "be called with a class method descriptor expression as arg0");
+
+      convert_invoke(
+        i_it->source_location, statement, *class_method_descriptor, c, results);
     }
     else if(bytecode == BC_return)
     {
@@ -2153,7 +2162,7 @@ static void adjust_invoke_argument_types(
 void java_bytecode_convert_methodt::convert_invoke(
   source_locationt location,
   const irep_idt &statement,
-  exprt &arg0,
+  class_method_descriptor_exprt &class_method_descriptor,
   codet &c,
   exprt::operandst &results)
 {
@@ -2161,7 +2170,7 @@ void java_bytecode_convert_methodt::convert_invoke(
   const bool is_virtual(
     statement == "invokevirtual" || statement == "invokeinterface");
 
-  const irep_idt &invoked_method_id = arg0.get(ID_identifier);
+  const irep_idt &invoked_method_id = class_method_descriptor.get_identifier();
   INVARIANT(
     !invoked_method_id.empty(),
     "invoke statement arg0 must have an identifier");
@@ -2177,21 +2186,22 @@ void java_bytecode_convert_methodt::convert_invoke(
     // invokespecial will have zero arguments (the `this` is added below)
     // but the symbol for the <init> will have the this parameter.
     INVARIANT(
-      to_java_method_type(arg0.type()).return_type().id() ==
+      to_java_method_type(class_method_descriptor.type()).return_type().id() ==
         to_code_type(method_symbol->second.type).return_type().id(),
       "Function return type must not change in kind");
-    arg0.type() = method_symbol->second.type;
+    class_method_descriptor.type() = method_symbol->second.type;
   }
 
   // Note arg0 and arg0.type() are subject to many side-effects in this method,
   // then finally used to populate the call instruction.
-  java_method_typet &method_type = to_java_method_type(arg0.type());
+  java_method_typet &method_type =
+    to_java_method_type(class_method_descriptor.type());
 
   java_method_typet::parameterst &parameters(method_type.parameters());
 
   if(use_this)
   {
-    irep_idt classname = arg0.get(ID_C_class);
+    irep_idt classname = class_method_descriptor.get(ID_C_class);
 
     if(parameters.empty() || !parameters[0].get_this())
     {
@@ -2242,8 +2252,6 @@ void java_bytecode_convert_methodt::convert_invoke(
     results[0] = promoted;
   }
 
-  assert(arg0.id() == ID_virtual_function);
-
   // If we don't have a definition for the called symbol, and we won't
   // inherit a definition from a super-class, we create a new symbol and
   // insert it in the symbol table. The name and type of the method are
@@ -2258,16 +2266,17 @@ void java_bytecode_convert_methodt::convert_invoke(
   // We set opaque methods as final to avoid assuming they can be overridden.
   if(
     method_symbol == symbol_table.symbols.end() &&
-    !(is_virtual &&
-      is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
+    !(is_virtual && is_method_inherited(
+                      class_method_descriptor.get_class_name(),
+                      class_method_descriptor.get_component_name())))
   {
     create_method_stub_symbol(
       invoked_method_id,
-      arg0.get(ID_C_base_name),
-      id2string(arg0.get(ID_C_class)).substr(6) + "." +
-        id2string(arg0.get(ID_C_base_name)) + "()",
+      class_method_descriptor.get_base_name(),
+      id2string(class_method_descriptor.get_class_name()).substr(6) + "." +
+        id2string(class_method_descriptor.get_base_name()) + "()",
       method_type,
-      arg0.get(ID_C_class),
+      class_method_descriptor.get_class_name(),
       symbol_table,
       get_message_handler());
   }
@@ -2278,7 +2287,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     // dynamic binding
     PRECONDITION(use_this);
     PRECONDITION(!arguments.empty());
-    function = arg0;
+    function = class_method_descriptor;
     // Populate needed methods later,
     // once we know what object types can exist.
   }
@@ -2290,7 +2299,8 @@ void java_bytecode_convert_methodt::convert_invoke(
     {
       needed_lazy_methods->add_needed_method(invoked_method_id);
       // Calling a static method causes static initialization:
-      needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
+      needed_lazy_methods->add_needed_class(
+        class_method_descriptor.get_class_name());
     }
   }
 
@@ -2305,7 +2315,8 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   if(!use_this)
   {
-    codet clinit_call = get_clinit_call(arg0.get(ID_C_class));
+    codet clinit_call =
+      get_clinit_call(class_method_descriptor.get_class_name());
     if(clinit_call.get_statement() != ID_skip)
       c = code_blockt({clinit_call, c});
   }

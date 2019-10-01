@@ -420,11 +420,11 @@ std::string expr2javat::convert_with_precedence(
     return "pod_constructor";
   else if(src.id()==ID_virtual_function)
   {
-    return "VIRTUAL_FUNCTION(" +
-      id2string(src.get(ID_C_class)) +
-      "." +
-      id2string(src.get(ID_component_name)) +
-      ")";
+    const class_method_descriptor_exprt &virtual_function =
+      to_class_method_descriptor_expr(src);
+    return "CLASS_METHOD_DESCRIPTOR(" +
+           id2string(virtual_function.get_class_name()) + "." +
+           id2string(virtual_function.get_component_name()) + ")";
   }
   else if(
     const auto &literal = expr_try_dynamic_cast<java_string_literal_exprt>(src))

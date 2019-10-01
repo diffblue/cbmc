@@ -494,7 +494,7 @@ protected:
   void convert_invoke(
     source_locationt location,
     const irep_idt &statement,
-    exprt &arg0,
+    class_method_descriptor_exprt &class_method_descriptor,
     codet &c,
     exprt::operandst &results);
 
