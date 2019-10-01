@@ -2201,11 +2201,11 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   if(use_this)
   {
-    irep_idt classname = class_method_descriptor.get(ID_C_class);
+    const irep_idt class_id = class_method_descriptor.class_id();
 
     if(parameters.empty() || !parameters[0].get_this())
     {
-      typet thistype = struct_tag_typet(classname);
+      typet thistype = struct_tag_typet(class_id);
       reference_typet object_ref_type = java_reference_type(thistype);
       java_method_typet::parametert this_p(object_ref_type);
       this_p.set_this();
@@ -2220,7 +2220,7 @@ void java_bytecode_convert_methodt::convert_invoke(
       if(is_constructor(invoked_method_id))
       {
         if(needed_lazy_methods)
-          needed_lazy_methods->add_needed_class(classname);
+          needed_lazy_methods->add_needed_class(class_id);
         method_type.set_is_constructor();
       }
       else
