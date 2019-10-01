@@ -4595,17 +4595,20 @@ public:
   /// \param class_id: Unique identifier in the symbol table, of the compile
   ///   time type of the class which this expression is applied to. For example
   ///   this could be - `java::java.lang.Object`.
+  /// \param base_method_name: The name of the method to which this expression
+  ///   is applied as would be seen in the source code. For example this could
+  ///   be - `toString`.
   explicit class_method_descriptor_exprt(
     typet _type,
     irep_idt component_name,
     irep_idt class_id,
-    irep_idt base_name,
+    irep_idt base_method_name,
     irep_idt identifier)
     : nullary_exprt(ID_virtual_function, std::move(_type))
   {
     set(ID_component_name, std::move(component_name));
     set(ID_C_class, std::move(class_id));
-    set(ID_C_base_name, std::move(base_name));
+    set(ID_C_base_name, std::move(base_method_name));
     set(ID_identifier, std::move(identifier));
   }
 
@@ -4622,7 +4625,9 @@ public:
     return get(ID_C_class);
   }
 
-  const irep_idt &get_base_name() const
+  /// The name of the method to which this expression is applied as would be
+  /// seen in the source code. For example this could be - `toString`.
+  const irep_idt &base_method_name() const
   {
     return get(ID_C_base_name);
   }

@@ -2272,9 +2272,9 @@ void java_bytecode_convert_methodt::convert_invoke(
   {
     create_method_stub_symbol(
       invoked_method_id,
-      class_method_descriptor.get_base_name(),
+      class_method_descriptor.base_method_name(),
       id2string(class_method_descriptor.class_id()).substr(6) + "." +
-        id2string(class_method_descriptor.get_base_name()) + "()",
+        id2string(class_method_descriptor.base_method_name()) + "()",
       method_type,
       class_method_descriptor.class_id(),
       symbol_table,
