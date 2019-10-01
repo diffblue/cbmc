@@ -1,0 +1,12 @@
+CORE
+test.c
+--show-lexical-loops
+^2 is head of \{ 2, 3, 4, 7, 8, 9 \(backedge\) \}$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This checks that we identify a loop with a "hole" as a lexical loop. The hole is made from
+instructions that cannot reach the back-edge (they are postdominated by a 'break' instruction)
+but which are lexically included in the loop.

@@ -61,6 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
 #include <analyses/is_threaded.h>
+#include <analyses/lexical_loops.h>
 #include <analyses/local_bitvector_analysis.h>
 #include <analyses/local_safe_pointers.h>
 #include <analyses/natural_loops.h>
@@ -631,6 +632,11 @@ int goto_instrument_parse_optionst::doit()
     {
       show_natural_loops(goto_model, std::cout);
       return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("show-lexical-loops"))
+    {
+      show_lexical_loops(goto_model, std::cout);
     }
 
     if(cmdline.isset("print-internal-representation"))
