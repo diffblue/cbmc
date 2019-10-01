@@ -758,13 +758,13 @@ void java_bytecode_parsert::rconstant_pool()
           id2string(name_entry.s)+
           ":"+id2string(pool_entry(nameandtype_entry.ref2).s);
 
-        irep_idt class_name = class_tag.get_identifier();
+        irep_idt class_id = class_tag.get_identifier();
 
-        irep_idt identifier=
-          id2string(class_name)+"."+id2string(component_name);
+        irep_idt identifier =
+          id2string(class_id) + "." + id2string(component_name);
 
         entry.expr = class_method_descriptor_exprt{
-          type, component_name, class_name, name_entry.s, identifier};
+          type, component_name, class_id, name_entry.s, identifier};
       }
       break;
 

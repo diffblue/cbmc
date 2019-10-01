@@ -263,7 +263,7 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
     // didn't already exist. It can't be instantiated already, otherwise it
     // would give a concrete definition of the called method, and
     // candidate_target_methods would be non-empty.
-    const irep_idt &call_class = virtual_function.get_class_name();
+    const irep_idt &call_class = virtual_function.class_id();
     bool was_missing = instantiated_classes.count(call_class) == 0;
     CHECK_RETURN(was_missing);
     any_new_classes = true;
@@ -477,7 +477,7 @@ void ci_lazy_methodst::get_virtual_method_targets(
   std::unordered_set<irep_idt> &callable_methods,
   symbol_tablet &symbol_table)
 {
-  const auto &call_class = called_function.get_class_name();
+  const auto &call_class = called_function.class_id();
   INVARIANT(
     !call_class.empty(), "All virtual calls should be aimed at a class");
   const auto &call_basename = called_function.get_component_name();

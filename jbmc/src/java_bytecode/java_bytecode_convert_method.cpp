@@ -2267,16 +2267,16 @@ void java_bytecode_convert_methodt::convert_invoke(
   if(
     method_symbol == symbol_table.symbols.end() &&
     !(is_virtual && is_method_inherited(
-                      class_method_descriptor.get_class_name(),
+                      class_method_descriptor.class_id(),
                       class_method_descriptor.get_component_name())))
   {
     create_method_stub_symbol(
       invoked_method_id,
       class_method_descriptor.get_base_name(),
-      id2string(class_method_descriptor.get_class_name()).substr(6) + "." +
+      id2string(class_method_descriptor.class_id()).substr(6) + "." +
         id2string(class_method_descriptor.get_base_name()) + "()",
       method_type,
-      class_method_descriptor.get_class_name(),
+      class_method_descriptor.class_id(),
       symbol_table,
       get_message_handler());
   }
@@ -2299,8 +2299,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     {
       needed_lazy_methods->add_needed_method(invoked_method_id);
       // Calling a static method causes static initialization:
-      needed_lazy_methods->add_needed_class(
-        class_method_descriptor.get_class_name());
+      needed_lazy_methods->add_needed_class(class_method_descriptor.class_id());
     }
   }
 
@@ -2315,8 +2314,7 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   if(!use_this)
   {
-    codet clinit_call =
-      get_clinit_call(class_method_descriptor.get_class_name());
+    codet clinit_call = get_clinit_call(class_method_descriptor.class_id());
     if(clinit_call.get_statement() != ID_skip)
       c = code_blockt({clinit_call, c});
   }

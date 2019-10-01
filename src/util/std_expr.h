@@ -4592,16 +4592,19 @@ inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
 class class_method_descriptor_exprt : public nullary_exprt
 {
 public:
+  /// \param class_id: Unique identifier in the symbol table, of the compile
+  ///   time type of the class which this expression is applied to. For example
+  ///   this could be - `java::java.lang.Object`.
   explicit class_method_descriptor_exprt(
     typet _type,
     irep_idt component_name,
-    irep_idt class_name,
+    irep_idt class_id,
     irep_idt base_name,
     irep_idt identifier)
     : nullary_exprt(ID_virtual_function, std::move(_type))
   {
     set(ID_component_name, std::move(component_name));
-    set(ID_C_class, std::move(class_name));
+    set(ID_C_class, std::move(class_id));
     set(ID_C_base_name, std::move(base_name));
     set(ID_identifier, std::move(identifier));
   }
@@ -4611,7 +4614,10 @@ public:
     return get(ID_component_name);
   }
 
-  const irep_idt &get_class_name() const
+  /// Unique identifier in the symbol table, of the compile time type of the
+  /// class which this expression is applied to. For example this could be -
+  /// `java::java.lang.Object`.
+  const irep_idt &class_id() const
   {
     return get(ID_C_class);
   }
