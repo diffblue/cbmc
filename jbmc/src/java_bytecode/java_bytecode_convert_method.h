@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
 
 #include "ci_lazy_methods_needed.h"
+#include "java_bytecode_convert_method_class.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_string_library_preprocess.h"
 
@@ -57,5 +58,23 @@ void java_bytecode_convert_method_lazy(
   const java_bytecode_parse_treet::methodt &,
   symbol_tablet &symbol_table,
   message_handlert &);
+
+/// Extracts the names of parameters from the local variable table, creates
+/// the parameter symbols and adds them to the symbol table.
+/// \param m: the parsed method
+/// \param method_identifier: the identifier of the method
+/// \param parameters: the method's parameters
+/// \param slots_for_parameters: the number of parameter slots available,
+/// i.e. an integer
+/// \param variables: a table of local variables
+/// \param symbol_table: the symbol table
+void create_parameter_symbols(
+  const java_bytecode_parse_treet::methodt &m,
+  const irep_idt &method_identifier,
+  java_method_typet::parameterst &parameters,
+  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters,
+  expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
+    &variables,
+  symbol_table_baset &symbol_table);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H

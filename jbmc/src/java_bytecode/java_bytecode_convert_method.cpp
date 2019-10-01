@@ -423,54 +423,24 @@ static irep_idt get_method_identifier(
     method.descriptor;
 }
 
-void java_bytecode_convert_methodt::convert(
-  const symbolt &class_symbol,
-  const methodt &m,
-  const optionalt<prefix_filtert> &method_context)
+void create_parameter_symbols(
+  const java_bytecode_parse_treet::methodt &m,
+  const irep_idt &method_identifier,
+  java_method_typet::parameterst &parameters,
+  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters,
+  expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
+    &variables,
+  symbol_table_baset &symbol_table)
 {
-  // Construct the fully qualified method name
-  // (e.g. "my.package.ClassName.myMethodName:(II)I") and query the symbol table
-  // to retrieve the symbol (constructed by java_bytecode_convert_method_lazy)
-  // associated to the method
-  const irep_idt method_identifier =
-    get_method_identifier(class_symbol.name, m);
-
-  method_id=method_identifier;
-  set_declaring_class(
-    symbol_table.get_writeable_ref(method_identifier), class_symbol.name);
-
-  // Obtain a std::vector of java_method_typet::parametert objects from the
-  // (function) type of the symbol
-  // Don't try to hang on to this reference into the symbol table, as we're
-  // about to create symbols for the method's parameters, which would invalidate
-  // the reference. Instead, copy the type here, set it up, then assign it back
-  // to the symbol later.
-  java_method_typet method_type =
-    to_java_method_type(symbol_table.lookup_ref(method_identifier).type);
-  method_type.set_is_final(m.is_final);
-  method_return_type = method_type.return_type();
-  java_method_typet::parameterst &parameters = method_type.parameters();
-
-  // Determine the number of local variable slots used by the JVM to maintain
-  // the formal parameters
-  slots_for_parameters = java_method_parameter_slots(method_type);
-
-  debug() << "Generating codet: class "
-             << class_symbol.name << ", method "
-             << m.name << eom;
-
-  // We now set up the local variables for the method parameters
-  variables.clear();
-
   // Find parameter names in the local variable table:
   for(const auto &v : m.local_variable_table)
   {
     // Skip this variable if it is not a method parameter
-    if(!is_parameter(v))
+    if(v.index >= slots_for_parameters)
       continue;
 
     std::ostringstream id_oss;
-    id_oss << method_id << "::" << v.name;
+    id_oss << method_identifier << "::" << v.name;
     irep_idt identifier(id_oss.str());
     symbol_exprt result = symbol_exprt::typeless(identifier);
     result.set(ID_C_base_name, v.name);
@@ -495,11 +465,9 @@ void java_bytecode_convert_methodt::convert(
     param_index+=java_local_variable_slots(param.type());
   }
   INVARIANT(
-    param_index==slots_for_parameters,
+    param_index == slots_for_parameters,
     "java_parameter_count and local computation must agree");
-
-  // Assign names to parameters
-  param_index=0;
+  param_index = 0;
   for(auto &param : parameters)
   {
     irep_idt base_name, identifier;
@@ -509,17 +477,17 @@ void java_bytecode_convert_methodt::convert(
     // regardless of whether we have an LVT or not; and assign it to the
     // parameter object (which is stored in the type of the symbol, not in the
     // symbol table)
-    if(param_index==0 && param.get_this())
+    if(param_index == 0 && param.get_this())
     {
       // my.package.ClassName.myMethodName:(II)I::this
       base_name = ID_this;
-      identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      identifier = id2string(method_identifier) + "::" + id2string(base_name);
     }
     else if(!variables[param_index].empty())
     {
       // if already present in the LVT ...
-      base_name=variables[param_index][0].symbol_expr.get(ID_C_base_name);
-      identifier=variables[param_index][0].symbol_expr.get(ID_identifier);
+      base_name = variables[param_index][0].symbol_expr.get(ID_C_base_name);
+      identifier = variables[param_index][0].symbol_expr.get(ID_identifier);
     }
     else
     {
@@ -535,10 +503,10 @@ void java_bytecode_convert_methodt::convert(
 
     // Build a new symbol for the parameter and add it to the symbol table
     parameter_symbolt parameter_symbol;
-    parameter_symbol.base_name=base_name;
-    parameter_symbol.mode=ID_java;
-    parameter_symbol.name=identifier;
-    parameter_symbol.type=param.type();
+    parameter_symbol.base_name = base_name;
+    parameter_symbol.mode = ID_java;
+    parameter_symbol.name = identifier;
+    parameter_symbol.type = param.type();
     symbol_table.add(parameter_symbol);
 
     // Add as a JVM local variable
@@ -548,16 +516,63 @@ void java_bytecode_convert_methodt::convert(
       0,
       std::numeric_limits<size_t>::max(),
       true);
-    param_index+=java_local_variable_slots(param.type());
+    param_index += java_local_variable_slots(param.type());
   }
-
-  symbolt &method_symbol = symbol_table.get_writeable_ref(method_identifier);
-
   // The parameter slots detected in this function should agree with what
   // java_parameter_count() thinks about this method
   INVARIANT(
-    param_index==slots_for_parameters,
+    param_index == slots_for_parameters,
     "java_parameter_count and local computation must agree");
+}
+
+void java_bytecode_convert_methodt::convert(
+  const symbolt &class_symbol,
+  const methodt &m,
+  const optionalt<prefix_filtert> &method_context)
+{
+  // Construct the fully qualified method name
+  // (e.g. "my.package.ClassName.myMethodName:(II)I") and query the symbol table
+  // to retrieve the symbol (constructed by java_bytecode_convert_method_lazy)
+  // associated to the method
+  const irep_idt method_identifier =
+    get_method_identifier(class_symbol.name, m);
+
+  method_id = method_identifier;
+  set_declaring_class(
+    symbol_table.get_writeable_ref(method_identifier), class_symbol.name);
+
+  // Obtain a std::vector of java_method_typet::parametert objects from the
+  // (function) type of the symbol
+  // Don't try to hang on to this reference into the symbol table, as we're
+  // about to create symbols for the method's parameters, which would invalidate
+  // the reference. Instead, copy the type here, set it up, then assign it back
+  // to the symbol later.
+  java_method_typet method_type =
+    to_java_method_type(symbol_table.lookup_ref(method_identifier).type);
+  method_type.set_is_final(m.is_final);
+  method_return_type = method_type.return_type();
+  java_method_typet::parameterst &parameters = method_type.parameters();
+
+  // Determine the number of local variable slots used by the JVM to maintain
+  // the formal parameters
+  slots_for_parameters = java_method_parameter_slots(method_type);
+
+  debug() << "Generating codet: class " << class_symbol.name << ", method "
+          << m.name << eom;
+
+  // We now set up the local variables for the method parameters
+  variables.clear();
+
+  // Assign names to parameters and add parameter symbols to table
+  create_parameter_symbols(
+    m,
+    method_identifier,
+    parameters,
+    slots_for_parameters,
+    variables,
+    symbol_table);
+
+  symbolt &method_symbol = symbol_table.get_writeable_ref(method_identifier);
 
   // Check the fields that can't change are valid
   INVARIANT(
