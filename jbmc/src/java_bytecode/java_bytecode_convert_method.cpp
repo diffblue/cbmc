@@ -397,6 +397,20 @@ void java_bytecode_convert_method_lazy(
     method_symbol.type.set(ID_C_must_not_throw, true);
   }
 
+  // Assign names to parameters in the method symbol
+  java_method_typet &method_type = to_java_method_type(method_symbol.type);
+  method_type.set_is_final(m.is_final);
+  java_method_typet::parameterst &parameters = method_type.parameters();
+  java_bytecode_convert_methodt::method_offsett slots_for_parameters =
+    java_method_parameter_slots(method_type);
+  variablest dummy_local_variable_table;
+  create_parameter_names(
+    m,
+    method_identifier,
+    parameters,
+    slots_for_parameters,
+    dummy_local_variable_table);
+
   symbol_table.add(method_symbol);
 
   if(!m.is_static)
@@ -423,16 +437,15 @@ static irep_idt get_method_identifier(
     method.descriptor;
 }
 
-void create_parameter_symbols(
+void create_parameter_names(
   const java_bytecode_parse_treet::methodt &m,
   const irep_idt &method_identifier,
   java_method_typet::parameterst &parameters,
   const java_bytecode_convert_methodt::method_offsett &slots_for_parameters,
-  expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
-    &variables,
-  symbol_table_baset &symbol_table)
+  variablest &variables)
 {
-  // Find parameter names in the local variable table:
+  // Find parameter names in the local variable table
+  // and store the result in the external variables vector
   for(const auto &v : m.local_variable_table)
   {
     // Skip this variable if it is not a method parameter
@@ -456,13 +469,13 @@ void create_parameter_symbols(
   // the vector introducing gaps where the entries are empty vectors. We now
   // make sure that the vector of each LV slot contains exactly one variablet,
   // which we will add below
-  std::size_t param_index=0;
+  std::size_t param_index = 0;
   for(const auto &param : parameters)
   {
     INVARIANT(
       variables[param_index].size() <= 1,
       "should have at most one entry per index");
-    param_index+=java_local_variable_slots(param.type());
+    param_index += java_local_variable_slots(param.type());
   }
   INVARIANT(
     param_index == slots_for_parameters,
@@ -500,12 +513,28 @@ void create_parameter_symbols(
     }
     param.set_base_name(base_name);
     param.set_identifier(identifier);
+    param_index += java_local_variable_slots(param.type());
+  }
+  // The parameter slots detected in this function should agree with what
+  // java_parameter_count() thinks about this method
+  INVARIANT(
+    param_index == slots_for_parameters,
+    "java_parameter_count and local computation must agree");
+}
 
-    // Build a new symbol for the parameter and add it to the symbol table
+void create_parameter_symbols(
+  const java_method_typet::parameterst &parameters,
+  expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
+    &variables,
+  symbol_table_baset &symbol_table)
+{
+  std::size_t param_index = 0;
+  for(const auto &param : parameters)
+  {
     parameter_symbolt parameter_symbol;
-    parameter_symbol.base_name = base_name;
+    parameter_symbol.base_name = param.get_base_name();
     parameter_symbol.mode = ID_java;
-    parameter_symbol.name = identifier;
+    parameter_symbol.name = param.get_identifier();
     parameter_symbol.type = param.type();
     symbol_table.add(parameter_symbol);
 
@@ -518,11 +547,6 @@ void create_parameter_symbols(
       true);
     param_index += java_local_variable_slots(param.type());
   }
-  // The parameter slots detected in this function should agree with what
-  // java_parameter_count() thinks about this method
-  INVARIANT(
-    param_index == slots_for_parameters,
-    "java_parameter_count and local computation must agree");
 }
 
 void java_bytecode_convert_methodt::convert(
@@ -560,17 +584,8 @@ void java_bytecode_convert_methodt::convert(
   debug() << "Generating codet: class " << class_symbol.name << ", method "
           << m.name << eom;
 
-  // We now set up the local variables for the method parameters
-  variables.clear();
-
-  // Assign names to parameters and add parameter symbols to table
-  create_parameter_symbols(
-    m,
-    method_identifier,
-    parameters,
-    slots_for_parameters,
-    variables,
-    symbol_table);
+  // Add parameter symbols to the symbol table
+  create_parameter_symbols(parameters, variables, symbol_table);
 
   symbolt &method_symbol = symbol_table.get_writeable_ref(method_identifier);
 
