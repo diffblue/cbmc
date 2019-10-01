@@ -27,83 +27,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <goto-programs/goto_model.h>
 
 #include "cfg_dominators.h"
-
-template <class, class>
-class natural_loops_templatet;
-
-/// A natural loop, specified as a set of instructions
-template <class P, class T>
-class natural_loop_templatet
-{
-  typedef natural_loops_templatet<P, T> natural_loopst;
-  // For natural_loopst to directly manipulate loop_instructions, cf. clients
-  // which should use the public iterface:
-  friend natural_loopst;
-
-  typedef std::set<T> loop_instructionst;
-  loop_instructionst loop_instructions;
-
-public:
-  explicit natural_loop_templatet(natural_loopst &natural_loops)
-    : natural_loops(natural_loops)
-  {
-  }
-
-  /// Returns true if \p instruction is in this loop
-  bool contains(const T instruction) const
-  {
-    return natural_loops.loop_contains(*this, instruction);
-  }
-
-  /// Get the \ref natural_loopst analysis this loop relates to
-  const natural_loopst &get_natural_loops() const
-  {
-    return natural_loops;
-  }
-  /// Get the \ref natural_loopst analysis this loop relates to
-  natural_loopst &get_natural_loops()
-  {
-    return natural_loops;
-  }
-
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename loop_instructionst::const_iterator const_iterator;
-
-  /// Iterator over this loop's instructions
-  const_iterator begin() const
-  {
-    return loop_instructions.begin();
-  }
-
-  /// Iterator over this loop's instructions
-  const_iterator end() const
-  {
-    return loop_instructions.end();
-  }
-
-  /// Number of instructions in this loop
-  std::size_t size() const
-  {
-    return loop_instructions.size();
-  }
-
-  /// Returns true if this loop contains no instructions
-  bool empty() const
-  {
-    return loop_instructions.empty();
-  }
-
-  /// Adds \p instruction to this loop. The caller must verify that the added
-  /// instruction does not alter loop structure; if it does they must discard
-  /// and recompute the related \ref natural_loopst instance.
-  void insert_instruction(const T instruction)
-  {
-    loop_instructions.insert(instruction);
-  }
-
-private:
-  natural_loopst &natural_loops;
-};
+#include "loop_analysis.h"
 
 /// Main driver for working out if a class (normally goto_programt) has any natural loops.
 /// \ref compute takes an entire goto_programt, iterates over the instructions and for
@@ -119,38 +43,22 @@ private:
 ///   * [function] is_backwards_goto() returning a bool.
 ///   * [function] get_target() which returns an object that needs:
 ///     * [field] location_number which is an unsigned int.
-template<class P, class T>
-class natural_loops_templatet
+template <class P, class T>
+class natural_loops_templatet : public loop_analysist<P, T>
 {
-public:
-  typedef natural_loop_templatet<P, T> natural_loopt;
-  // map loop headers to loops
-  typedef std::map<T, natural_loopt> loop_mapt;
+  typedef loop_analysist<P, T> parentt;
 
-  loop_mapt loop_map;
+public:
+  typedef typename parentt::loopt natural_loopt;
 
   void operator()(P &program)
   {
     compute(program);
   }
 
-  void output(std::ostream &) const;
-
   const cfg_dominators_templatet<P, T, false> &get_dominator_info() const
   {
     return cfg_dominators;
-  }
-
-  /// Returns true if \p instruction is in \p loop
-  bool loop_contains(const natural_loopt &loop, const T instruction) const
-  {
-    return loop.loop_instructions.count(instruction);
-  }
-
-  /// Returns true if \p instruction is the header of any loop
-  bool is_loop_header(const T instruction) const
-  {
-    return loop_map.count(instruction);
   }
 
   natural_loops_templatet()
@@ -161,15 +69,6 @@ public:
   {
     compute(program);
   }
-
-  // The loop structures stored in `loop_map` contain back-pointers to this
-  // class, so we forbid copying or moving the analysis struct. If this becomes
-  // necessary then either add a layer of indirection or update the loop_map
-  // back-pointers on copy/move.
-  natural_loops_templatet(const natural_loops_templatet &) = delete;
-  natural_loops_templatet(natural_loops_templatet &&) = delete;
-  natural_loops_templatet &operator=(const natural_loops_templatet &) = delete;
-  natural_loops_templatet &operator=(natural_loops_templatet &&) = delete;
 
 protected:
   cfg_dominators_templatet<P, T, false> cfg_dominators;
@@ -190,9 +89,10 @@ class natural_loopst:
 typedef natural_loops_templatet<goto_programt, goto_programt::targett>
     natural_loops_mutablet;
 
-void show_natural_loops(
-  const goto_modelt &,
-  std::ostream &out);
+inline void show_natural_loops(const goto_modelt &goto_model, std::ostream &out)
+{
+  show_loops<natural_loopst>(goto_model, out);
+}
 
 #ifdef DEBUG
 #include <iostream>
@@ -240,7 +140,7 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
 
   std::stack<T> stack;
 
-  auto insert_result = loop_map.emplace(n, natural_loopt{*this});
+  auto insert_result = parentt::loop_map.emplace(n, natural_loopt{*this});
   // Note the emplace *may* access a loop that already exists: this happens when
   // a given header has more than one incoming edge, such as
   // head: if(x) goto head; else goto head;
@@ -265,42 +165,9 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
     for(const auto &edge : node.in)
     {
       T q=cfg_dominators.cfg[edge.first].PC;
-      std::pair<typename natural_loopt::const_iterator, bool> result =
-        loop.loop_instructions.insert(q);
-      if(result.second)
+      if(loop.insert_instruction(q))
         stack.push(q);
     }
-  }
-}
-
-/// Print all natural loops that were found
-template<class P, class T>
-void natural_loops_templatet<P, T>::output(std::ostream &out) const
-{
-  for(const auto &loop : loop_map)
-  {
-    unsigned n=loop.first->location_number;
-
-    std::unordered_set<std::size_t> backedge_location_numbers;
-    for(const auto &backedge : loop.first->incoming_edges)
-      backedge_location_numbers.insert(backedge->location_number);
-
-    out << n << " is head of { ";
-
-    std::vector<std::size_t> loop_location_numbers;
-    for(const auto &loop_instruction_it : loop.second)
-      loop_location_numbers.push_back(loop_instruction_it->location_number);
-    std::sort(loop_location_numbers.begin(), loop_location_numbers.end());
-
-    for(const auto location_number : loop_location_numbers)
-    {
-      if(location_number != loop_location_numbers.at(0))
-        out << ", ";
-      out << location_number;
-      if(backedge_location_numbers.count(location_number))
-        out << " (backedge)";
-    }
-    out << " }\n";
   }
 }
 
