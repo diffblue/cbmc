@@ -28,12 +28,13 @@ public:
   smt2_solvert(std::istream &_in, decision_proceduret &_solver)
     : smt2_parsert(_in), solver(_solver), status(NOT_SOLVED)
   {
+    setup_commands();
   }
 
 protected:
   decision_proceduret &solver;
 
-  void command(const std::string &) override;
+  void setup_commands();
   void define_constants();
   void expand_function_applications(exprt &);
 
@@ -118,20 +119,19 @@ void smt2_solvert::expand_function_applications(exprt &expr)
   }
 }
 
-void smt2_solvert::command(const std::string &c)
+void smt2_solvert::setup_commands()
 {
   {
-    if(c == "assert")
-    {
+    commands["assert"] = [this]() {
       exprt e = expression();
       if(e.is_not_nil())
       {
         expand_function_applications(e);
         solver.set_to_true(e);
       }
-    }
-    else if(c == "check-sat")
-    {
+    };
+
+    commands["check-sat"] = [this]() {
       // add constant definitions as constraints
       define_constants();
 
@@ -151,20 +151,20 @@ void smt2_solvert::command(const std::string &c)
         std::cout << "error\n";
         status = NOT_SOLVED;
       }
-    }
-    else if(c == "check-sat-assuming")
-    {
+    };
+
+    commands["check-sat-assuming"] = [this]() {
       throw error("not yet implemented");
-    }
-    else if(c == "display")
-    {
+    };
+
+    commands["display"] = [this]() {
       // this is a command that Z3 appears to implement
       exprt e = expression();
       if(e.is_not_nil())
         std::cout << smt2_format(e) << '\n';
-    }
-    else if(c == "get-value")
-    {
+    };
+
+    commands["get-value"] = [this]() {
       std::vector<exprt> ops;
 
       if(next_token() != smt2_tokenizert::OPEN)
@@ -217,18 +217,18 @@ void smt2_solvert::command(const std::string &c)
       }
 
       std::cout << ")\n";
-    }
-    else if(c == "echo")
-    {
+    };
+
+    commands["echo"] = [this]() {
       if(next_token() != smt2_tokenizert::STRING_LITERAL)
         throw error("expected string literal");
 
       std::cout << smt2_format(constant_exprt(
                      smt2_tokenizer.get_buffer(), string_typet()))
                 << '\n';
-    }
-    else if(c == "get-assignment")
-    {
+    };
+
+    commands["get-assignment"] = [this]() {
       // print satisfying assignment for all named expressions
 
       if(status != SAT)
@@ -256,9 +256,9 @@ void smt2_solvert::command(const std::string &c)
         }
       }
       std::cout << ')' << '\n';
-    }
-    else if(c == "get-model")
-    {
+    };
+
+    commands["get-model"] = [this]() {
       // print a model for all identifiers
 
       if(status != SAT)
@@ -293,9 +293,9 @@ void smt2_solvert::command(const std::string &c)
         }
       }
       std::cout << ')' << '\n';
-    }
-    else if(c == "simplify")
-    {
+    };
+
+    commands["simplify"] = [this]() {
       // this is a command that Z3 appears to implement
       exprt e = expression();
       if(e.is_not_nil())
@@ -305,7 +305,9 @@ void smt2_solvert::command(const std::string &c)
         exprt e_simplified = simplify_expr(e, ns);
         std::cout << smt2_format(e) << '\n';
       }
-    }
+    };
+  }
+
 #if 0
     // TODO:
     | ( declare-const hsymboli hsorti )
@@ -330,9 +332,6 @@ void smt2_solvert::command(const std::string &c)
     | ( set-info hattributei )
     | ( set-option hoptioni )
 #endif
-    else
-      smt2_parsert::command(c);
-  }
 }
 
 class smt2_message_handlert : public message_handlert

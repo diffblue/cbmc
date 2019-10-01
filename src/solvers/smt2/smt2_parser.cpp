@@ -1259,21 +1259,36 @@ typet smt2_parsert::function_signature_declaration()
 
 void smt2_parsert::command(const std::string &c)
 {
-  if(c == "declare-const" || c == "declare-var")
+  auto c_it = commands.find(c);
+  if(c_it == commands.end())
   {
-    // declare-var appears to be a synonym for declare-const that is
-    // accepted by Z3 and CVC4
+    // silently ignore
+    ignore_command();
+  }
+  else
+    c_it->second();
+}
+
+void smt2_parsert::setup_commands()
+{
+  commands["declare-const"] = [this]() {
+    const auto s = smt2_tokenizer.get_buffer();
+
     if(next_token() != smt2_tokenizert::SYMBOL)
-      throw error() << "expected a symbol after '" << c << '\'';
+      throw error() << "expected a symbol after " << s;
 
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = sort();
 
     if(add_fresh_id(id, exprt(ID_nil, type)) != id)
       throw error() << "identifier '" << id << "' defined twice";
-  }
-  else if(c=="declare-fun")
-  {
+  };
+
+  // declare-var appears to be a synonym for declare-const that is
+  // accepted by Z3 and CVC4
+  commands["declare-var"] = commands["declare-const"];
+
+  commands["declare-fun"] = [this]() {
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after declare-fun");
 
@@ -1282,9 +1297,9 @@ void smt2_parsert::command(const std::string &c)
 
     if(add_fresh_id(id, exprt(ID_nil, type)) != id)
       throw error() << "identifier '" << id << "' defined twice";
-  }
-  else if(c == "define-const")
-  {
+  };
+
+  commands["define-const"] = [this]() {
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-const");
 
@@ -1304,9 +1319,9 @@ void smt2_parsert::command(const std::string &c)
     // create the entry
     if(add_fresh_id(id, value) != id)
       throw error() << "identifier '" << id << "' defined twice";
-  }
-  else if(c=="define-fun")
-  {
+  };
+
+  commands["define-fun"] = [this]() {
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-fun");
 
@@ -1345,11 +1360,7 @@ void smt2_parsert::command(const std::string &c)
 
     id_map.at(id).type = signature.type;
     id_map.at(id).parameters = signature.parameters;
-  }
-  else if(c=="exit")
-  {
-    exit=true;
-  }
-  else
-    ignore_command();
+  };
+
+  commands["exit"] = [this]() { exit = true; };
 }

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 
 #include <map>
+#include <unordered_map>
 
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
@@ -22,6 +23,7 @@ public:
   explicit smt2_parsert(std::istream &_in)
     : exit(false), smt2_tokenizer(_in), parenthesis_level(0)
   {
+    setup_commands();
   }
 
   virtual ~smt2_parsert() = default;
@@ -82,10 +84,6 @@ protected:
   std::size_t parenthesis_level;
   smt2_tokenizert::tokent next_token();
 
-  void command_sequence();
-
-  virtual void command(const std::string &);
-
   // for let/quantifier bindings, function parameters
   using renaming_mapt=std::map<irep_idt, irep_idt>;
   renaming_mapt renaming_map;
@@ -116,7 +114,6 @@ protected:
     }
   };
 
-  void ignore_command();
   exprt expression();
   exprt function_application();
   exprt function_application_ieee_float_op(
@@ -144,6 +141,14 @@ protected:
 
   /// Apply typecast to unsignedbv to given expression
   exprt cast_bv_to_unsigned(const exprt &);
+
+  // hashtable for all commands
+  std::unordered_map<std::string, std::function<void()>> commands;
+
+  void command_sequence();
+  void command(const std::string &);
+  void ignore_command();
+  void setup_commands();
 };
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
