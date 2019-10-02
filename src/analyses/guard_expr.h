@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 
+#include <util/expr_util.h>
 #include <util/std_expr.h>
 
 /// This is unused by this implementation of guards, but can be used by other
@@ -71,6 +72,11 @@ public:
 
   friend guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2);
   friend guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2);
+
+  /// Returns true if `operator|=` with \p other_guard may result in a simpler
+  /// expression. For `guard_exprt` in practice this means they're both
+  /// conjunctions, since for other things we just OR them together.
+  bool disjunction_may_simplify(const guard_exprt &other_guard);
 
 private:
   exprt expr;

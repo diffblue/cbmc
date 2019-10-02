@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
@@ -89,6 +88,17 @@ guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2)
   g1.expr = conjunction(op1);
 
   return g1;
+}
+
+bool guard_exprt::disjunction_may_simplify(const guard_exprt &other_guard)
+{
+  if(is_true() || is_false() || other_guard.is_true() || other_guard.is_false())
+    return true;
+  if(expr.id() == ID_and && other_guard.expr.id() == ID_and)
+    return true;
+  if(other_guard.expr == boolean_negate(expr))
+    return true;
+  return false;
 }
 
 guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2)

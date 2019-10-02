@@ -1,0 +1,10 @@
+CORE
+test.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This tests that with a __CPROVER_assume(0) before an infinite loop,
+symex terminates without needing a `--unwind` setting.

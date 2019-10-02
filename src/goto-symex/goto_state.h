@@ -49,6 +49,10 @@ public:
   // of the condition of the if).
   guardt guard;
 
+  /// Is this code reachable? If not we can take shortcuts such as not entering
+  /// function calls, but we still conduct guard arithmetic as usual.
+  bool reachable;
+
   // Map L1 names to (L2) constants. Values will be evicted from this map
   // when they become non-constant. This is used to propagate values that have
   // been worked out to only have one possible value.
@@ -73,7 +77,7 @@ public:
   explicit goto_statet(const class goto_symex_statet &s);
 
   explicit goto_statet(guard_managert &guard_manager)
-    : guard(true_exprt(), guard_manager)
+    : guard(true_exprt(), guard_manager), reachable(true)
   {
   }
 
