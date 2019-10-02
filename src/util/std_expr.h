@@ -4609,14 +4609,14 @@ public:
     typet _type,
     irep_idt mangled_method_name,
     irep_idt class_id,
-    irep_idt base_method_name,
-    irep_idt identifier)
+    irep_idt base_method_name)
     : nullary_exprt(ID_virtual_function, std::move(_type))
   {
+    irep_idt id = id2string(class_id) + "." + id2string(mangled_method_name);
     set(ID_component_name, std::move(mangled_method_name));
     set(ID_C_class, std::move(class_id));
     set(ID_C_base_name, std::move(base_method_name));
-    set(ID_identifier, std::move(identifier));
+    set(ID_identifier, std::move(id));
   }
 
   /// The method name after mangling it by combining it with the descriptor.

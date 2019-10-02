@@ -760,11 +760,8 @@ void java_bytecode_parsert::rconstant_pool()
 
         irep_idt class_id = class_tag.get_identifier();
 
-        irep_idt identifier =
-          id2string(class_id) + "." + id2string(mangled_method_name);
-
         entry.expr = class_method_descriptor_exprt{
-          type, mangled_method_name, class_id, name_entry.s, identifier};
+          type, mangled_method_name, class_id, name_entry.s};
       }
       break;
 
