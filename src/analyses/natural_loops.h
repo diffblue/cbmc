@@ -44,9 +44,9 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 ///   * [function] get_target() which returns an object that needs:
 ///     * [field] location_number which is an unsigned int.
 template <class P, class T>
-class natural_loops_templatet : public loop_analysist<P, T>
+class natural_loops_templatet : public loop_analysist<T>
 {
-  typedef loop_analysist<P, T> parentt;
+  typedef loop_analysist<T> parentt;
 
 public:
   typedef typename parentt::loopt natural_loopt;
@@ -140,7 +140,7 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
 
   std::stack<T> stack;
 
-  auto insert_result = parentt::loop_map.emplace(n, natural_loopt{*this});
+  auto insert_result = parentt::loop_map.emplace(n, natural_loopt{});
   // Note the emplace *may* access a loop that already exists: this happens when
   // a given header has more than one incoming edge, such as
   // head: if(x) goto head; else goto head;

@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class local_may_aliast;
 
 typedef std::set<exprt> modifiest;
-typedef const natural_loops_mutablet::natural_loopt loopt;
+typedef natural_loops_mutablet::natural_loopt loopt;
 
 void get_modifies(
   const local_may_aliast &local_may_alias,

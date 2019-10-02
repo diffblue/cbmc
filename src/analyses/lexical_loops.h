@@ -61,9 +61,9 @@ Author: Diffblue Ltd
 ///   * [function] get_target() which returns an object that needs:
 ///     * [field] location_number which is an unsigned int.
 template <class P, class T>
-class lexical_loops_templatet : public loop_analysist<P, T>
+class lexical_loops_templatet : public loop_analysist<T>
 {
-  typedef loop_analysist<P, T> parentt;
+  typedef loop_analysist<T> parentt;
 
 public:
   typedef typename parentt::loopt lexical_loopt;
@@ -92,11 +92,13 @@ public:
       out << "Note not all loops were in lexical loop form\n";
   }
 
+  virtual ~lexical_loops_templatet() = default;
+
 protected:
   void compute(P &program);
   bool compute_lexical_loop(T, T);
 
-  bool all_in_lexical_loop_form;
+  bool all_in_lexical_loop_form = false;
 };
 
 typedef lexical_loops_templatet<
@@ -178,7 +180,7 @@ bool lexical_loops_templatet<P, T>::compute_lexical_loop(
   }
 
   auto insert_result = parentt::loop_map.emplace(
-    loop_head, lexical_loopt{*this, std::move(loop_instructions)});
+    loop_head, lexical_loopt{std::move(loop_instructions)});
 
   // If this isn't a new loop head (i.e. return_result.second is false) then we
   // have multiple backedges targeting one loop header: this is not in simple
