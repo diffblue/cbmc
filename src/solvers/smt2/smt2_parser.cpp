@@ -1087,99 +1087,102 @@ exprt smt2_parsert::expression()
 
 typet smt2_parsert::sort()
 {
+  // a sort is one of the following three cases:
+  // SYMBOL
+  // ( _ SYMBOL ...
+  // ( SYMBOL ...
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
-  {
-    const std::string &buffer = smt2_tokenizer.get_buffer();
-
-    if(buffer=="Bool")
-      return bool_typet();
-    else if(buffer=="Int")
-      return integer_typet();
-    else if(buffer=="Real")
-      return real_typet();
-    else
-      throw error() << "unexpected sort: '" << buffer << '\'';
-  }
+    break;
 
   case smt2_tokenizert::OPEN:
-    if(next_token() != smt2_tokenizert::SYMBOL)
+    if(smt2_tokenizer.next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected symbol after '(' in a sort ");
 
     if(smt2_tokenizer.get_buffer() == "_")
     {
-      // indexed identifier
       if(next_token() != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_' in a sort");
-
-      if(smt2_tokenizer.get_buffer() == "BitVec")
-      {
-        if(next_token() != smt2_tokenizert::NUMERAL)
-          throw error("expected numeral as bit-width");
-
-        auto width = std::stoll(smt2_tokenizer.get_buffer());
-
-        // eat the ')'
-        if(next_token() != smt2_tokenizert::CLOSE)
-          throw error("expected ')' at end of sort");
-
-        return unsignedbv_typet(width);
-      }
-      else if(smt2_tokenizer.get_buffer() == "FloatingPoint")
-      {
-        if(next_token() != smt2_tokenizert::NUMERAL)
-          throw error("expected numeral as bit-width");
-
-        const auto width_e = std::stoll(smt2_tokenizer.get_buffer());
-
-        if(next_token() != smt2_tokenizert::NUMERAL)
-          throw error("expected numeral as bit-width");
-
-        const auto width_f = std::stoll(smt2_tokenizer.get_buffer());
-
-        // consume the ')'
-        if(next_token() != smt2_tokenizert::CLOSE)
-          throw error("expected ')' at end of sort");
-
-        return ieee_float_spect(width_f - 1, width_e).to_type();
-      }
-      else
-        throw error() << "unexpected sort: '" << smt2_tokenizer.get_buffer()
-                      << '\'';
     }
-    else if(smt2_tokenizer.get_buffer() == "Array")
-    {
-      // this gets two sorts as arguments, domain and range
-      auto domain = sort();
-      auto range = sort();
-
-      // eat the ')'
-      if(next_token() != smt2_tokenizert::CLOSE)
-        throw error("expected ')' at end of Array sort");
-
-      // we can turn arrays that map an unsigned bitvector type
-      // to something else into our 'array_typet'
-      if(domain.id() == ID_unsignedbv)
-        return array_typet(range, infinity_exprt(domain));
-      else
-        throw error("unsupported array sort");
-    }
-    else
-      throw error() << "unexpected sort: '" << smt2_tokenizer.get_buffer()
-                    << '\'';
+    break;
 
   case smt2_tokenizert::CLOSE:
   case smt2_tokenizert::NUMERAL:
   case smt2_tokenizert::STRING_LITERAL:
-  case smt2_tokenizert::END_OF_FILE:
   case smt2_tokenizert::NONE:
   case smt2_tokenizert::KEYWORD:
     throw error() << "unexpected token in a sort: '"
                   << smt2_tokenizer.get_buffer() << '\'';
+
+  case smt2_tokenizert::END_OF_FILE:
+    throw error() << "unexpected end-of-file in a sort";
   }
 
-  UNREACHABLE;
+  // now we have a SYMBOL
+  const auto &token = smt2_tokenizer.get_buffer();
+
+  const auto s_it = sorts.find(token);
+
+  if(s_it == sorts.end())
+    throw error() << "unexpected sort: '" << token << '\'';
+
+  return s_it->second();
+}
+
+void smt2_parsert::setup_sorts()
+{
+  sorts["Bool"] = [] { return bool_typet(); };
+  sorts["Int"] = [] { return integer_typet(); };
+  sorts["Real"] = [] { return real_typet(); };
+
+  sorts["BitVec"] = [this] {
+    if(next_token() != smt2_tokenizert::NUMERAL)
+      throw error("expected numeral as bit-width");
+
+    auto width = std::stoll(smt2_tokenizer.get_buffer());
+
+    // eat the ')'
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of sort");
+
+    return unsignedbv_typet(width);
+  };
+
+  sorts["FloatingPoint"] = [this] {
+    if(next_token() != smt2_tokenizert::NUMERAL)
+      throw error("expected numeral as bit-width");
+
+    const auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+
+    if(next_token() != smt2_tokenizert::NUMERAL)
+      throw error("expected numeral as bit-width");
+
+    const auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+
+    // consume the ')'
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of sort");
+
+    return ieee_float_spect(width_f - 1, width_e).to_type();
+  };
+
+  sorts["Array"] = [this] {
+    // this gets two sorts as arguments, domain and range
+    auto domain = sort();
+    auto range = sort();
+
+    // eat the ')'
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of Array sort");
+
+    // we can turn arrays that map an unsigned bitvector type
+    // to something else into our 'array_typet'
+    if(domain.id() == ID_unsignedbv)
+      return array_typet(range, infinity_exprt(domain));
+    else
+      throw error("unsupported array sort");
+  };
 }
 
 smt2_parsert::signature_with_parameter_idst

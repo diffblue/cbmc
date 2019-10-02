@@ -24,6 +24,7 @@ public:
     : exit(false), smt2_tokenizer(_in), parenthesis_level(0)
   {
     setup_commands();
+    setup_sorts();
   }
 
   virtual ~smt2_parsert() = default;
@@ -121,7 +122,6 @@ protected:
     const exprt::operandst &);
   exprt function_application_ieee_float_eq(const exprt::operandst &);
   exprt function_application_fp(const exprt::operandst &);
-  typet sort();
   exprt::operandst operands();
   typet function_signature_declaration();
   signature_with_parameter_idst function_signature_definition();
@@ -141,6 +141,11 @@ protected:
 
   /// Apply typecast to unsignedbv to given expression
   exprt cast_bv_to_unsigned(const exprt &);
+
+  // sorts
+  typet sort();
+  std::unordered_map<std::string, std::function<typet()>> sorts;
+  void setup_sorts();
 
   // hashtable for all commands
   std::unordered_map<std::string, std::function<void()>> commands;
