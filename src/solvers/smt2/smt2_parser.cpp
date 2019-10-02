@@ -542,295 +542,30 @@ exprt smt2_parsert::function_application()
     }
     else
     {
-      // non-indexed symbol; hash it
-      const irep_idt id = smt2_tokenizer.get_buffer();
+      // non-indexed symbol, look up in expression table
+      const auto id = smt2_tokenizer.get_buffer();
+      const auto e_it = expressions.find(id);
+      if(e_it != expressions.end())
+        return e_it->second();
 
-      if(id==ID_let)
-        return let_expression();
-      else if(id==ID_forall || id==ID_exists)
-        return quantifier_expression(id);
+      // get the operands
+      auto op = operands();
 
-      auto op=operands();
-
-      if(id==ID_and ||
-         id==ID_or ||
-         id==ID_xor)
+      // rummage through id_map
+      const irep_idt final_id = rename_id(id);
+      auto id_it = id_map.find(final_id);
+      if(id_it != id_map.end())
       {
-        return multi_ary(id, op);
-      }
-      else if(id==ID_not)
-      {
-        return unary(id, op);
-      }
-      else if(id==ID_equal ||
-              id==ID_le ||
-              id==ID_ge ||
-              id==ID_lt ||
-              id==ID_gt)
-      {
-        return binary_predicate(id, op);
-      }
-      else if(id=="bvule")
-      {
-        return binary_predicate(ID_le, op);
-      }
-      else if(id=="bvsle")
-      {
-        return binary_predicate(ID_le, cast_bv_to_signed(op));
-      }
-      else if(id=="bvuge")
-      {
-        return binary_predicate(ID_ge, op);
-      }
-      else if(id=="bvsge")
-      {
-        return binary_predicate(ID_ge, cast_bv_to_signed(op));
-      }
-      else if(id=="bvult")
-      {
-        return binary_predicate(ID_lt, op);
-      }
-      else if(id=="bvslt")
-      {
-        return binary_predicate(ID_lt, cast_bv_to_signed(op));
-      }
-      else if(id=="bvugt")
-      {
-        return binary_predicate(ID_gt, op);
-      }
-      else if(id=="bvsgt")
-      {
-        return binary_predicate(ID_gt, cast_bv_to_signed(op));
-      }
-      else if(id=="bvashr")
-      {
-        return cast_bv_to_unsigned(binary(ID_ashr, cast_bv_to_signed(op)));
-      }
-      else if(id=="bvlshr" || id=="bvshr")
-      {
-        return binary(ID_lshr, op);
-      }
-      else if(id=="bvlshr" || id=="bvashl" || id=="bvshl")
-      {
-        return binary(ID_shl, op);
-      }
-      else if(id=="bvand")
-      {
-        return multi_ary(ID_bitand, op);
-      }
-      else if(id=="bvnand")
-      {
-        return multi_ary(ID_bitnand, op);
-      }
-      else if(id=="bvor")
-      {
-        return multi_ary(ID_bitor, op);
-      }
-      else if(id=="bvnor")
-      {
-        return multi_ary(ID_bitnor, op);
-      }
-      else if(id=="bvxor")
-      {
-        return multi_ary(ID_bitxor, op);
-      }
-      else if(id=="bvxnor")
-      {
-        return multi_ary(ID_bitxnor, op);
-      }
-      else if(id=="bvnot")
-      {
-        return unary(ID_bitnot, op);
-      }
-      else if(id=="bvneg")
-      {
-        return unary(ID_unary_minus, op);
-      }
-      else if(id=="bvadd")
-      {
-        return multi_ary(ID_plus, op);
-      }
-      else if(id==ID_plus)
-      {
-        return multi_ary(id, op);
-      }
-      else if(id=="bvsub" || id=="-")
-      {
-        return binary(ID_minus, op);
-      }
-      else if(id=="bvmul" || id=="*")
-      {
-        return binary(ID_mult, op);
-      }
-      else if(id=="bvsdiv")
-      {
-        return cast_bv_to_unsigned(binary(ID_div, cast_bv_to_signed(op)));
-      }
-      else if(id=="bvudiv")
-      {
-        return binary(ID_div, op);
-      }
-      else if(id=="/" || id=="div")
-      {
-        return binary(ID_div, op);
-      }
-      else if(id=="bvsrem")
-      {
-        // 2's complement signed remainder (sign follows dividend)
-        // This matches our ID_mod, and what C does since C99.
-        return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(op)));
-      }
-      else if(id=="bvsmod")
-      {
-        // 2's complement signed remainder (sign follows divisor)
-        // We don't have that.
-        return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(op)));
-      }
-      else if(id=="bvurem" || id=="%")
-      {
-        return binary(ID_mod, op);
-      }
-      else if(id=="concat")
-      {
-        // add the widths
-        auto op_width = make_range(op).map([](const exprt &o) {
-          return to_unsignedbv_type(o.type()).get_width();
-        });
-
-        const std::size_t total_width =
-          std::accumulate(op_width.begin(), op_width.end(), 0);
-
-        return concatenation_exprt(
-          std::move(op), unsignedbv_typet(total_width));
-      }
-      else if(id=="distinct")
-      {
-        // pair-wise different constraint, multi-ary
-        return multi_ary("distinct", op);
-      }
-      else if(id=="ite")
-      {
-        if(op.size()!=3)
-          throw error("ite takes three operands");
-
-        if(op[0].type().id()!=ID_bool)
-          throw error("ite takes a boolean as first operand");
-
-        if(op[1].type()!=op[2].type())
-          throw error("ite needs matching types");
-
-        return if_exprt(op[0], op[1], op[2]);
-      }
-      else if(id=="=>" || id=="implies")
-      {
-        return binary(ID_implies, op);
-      }
-      else if(id == "select")
-      {
-        // array index
-        if(op.size() != 2)
-          throw error("select takes two operands");
-
-        if(op[0].type().id() != ID_array)
-          throw error("select expects array operand");
-
-        return index_exprt(op[0], op[1]);
-      }
-      else if(id == "store")
-      {
-        // array update
-        if(op.size() != 3)
-          throw error("store takes three operands");
-
-        if(op[0].type().id() != ID_array)
-          throw error("store expects array operand");
-
-        if(to_array_type(op[0].type()).subtype() != op[2].type())
-          throw error("store expects value that matches array element type");
-
-        return with_exprt(op[0], op[1], op[2]);
-      }
-      else if(id == "fp.isNaN")
-      {
-        if(op.size() != 1)
-          throw error("fp.isNaN takes one operand");
-
-        if(op[0].type().id() != ID_floatbv)
-          throw error("fp.isNaN takes FloatingPoint operand");
-
-        return unary_predicate_exprt(ID_isnan, op[0]);
-      }
-      else if(id == "fp.isInf")
-      {
-        if(op.size() != 1)
-          throw error("fp.isInf takes one operand");
-
-        if(op[0].type().id() != ID_floatbv)
-          throw error("fp.isInf takes FloatingPoint operand");
-
-        return unary_predicate_exprt(ID_isinf, op[0]);
-      }
-      else if(id == "fp.isNormal")
-      {
-        if(op.size() != 1)
-          throw error("fp.isNormal takes one operand");
-
-        if(op[0].type().id() != ID_floatbv)
-          throw error("fp.isNormal takes FloatingPoint operand");
-
-        return isnormal_exprt(op[0]);
-      }
-      else if(id == "fp")
-      {
-        return function_application_fp(op);
-      }
-      else if(
-        id == "fp.add" || id == "fp.mul" || id == "fp.sub" || id == "fp.div")
-      {
-        return function_application_ieee_float_op(id, op);
-      }
-      else if(id == "fp.eq")
-      {
-        return function_application_ieee_float_eq(op);
-      }
-      else if(id == "fp.leq")
-      {
-        return binary_predicate(ID_le, op);
-      }
-      else if(id == "fp.lt")
-      {
-        return binary_predicate(ID_lt, op);
-      }
-      else if(id == "fp.geq")
-      {
-        return binary_predicate(ID_ge, op);
-      }
-      else if(id == "fp.gt")
-      {
-        return binary_predicate(ID_gt, op);
-      }
-      else if(id == "fp.neg")
-      {
-        return unary(ID_unary_minus, op);
-      }
-      else
-      {
-        // rummage through id_map
-        const irep_idt final_id=rename_id(id);
-        auto id_it=id_map.find(final_id);
-        if(id_it!=id_map.end())
+        if(id_it->second.type.id() == ID_mathematical_function)
         {
-          if(id_it->second.type.id()==ID_mathematical_function)
-          {
-            return function_application(
-              symbol_exprt(final_id, id_it->second.type), op);
-          }
-          else
-            return symbol_exprt(final_id, id_it->second.type);
+          return function_application(
+            symbol_exprt(final_id, id_it->second.type), op);
         }
-
-        throw error() << "unknown function symbol '" << id << '\'';
+        else
+          return symbol_exprt(final_id, id_it->second.type);
       }
+
+      throw error() << "unknown function symbol '" << id << '\'';
     }
     break;
 
@@ -992,41 +727,14 @@ exprt smt2_parsert::expression()
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
-  {
-    // hash it
-    const irep_idt identifier = smt2_tokenizer.get_buffer();
+    {
+      const auto &identifier = smt2_tokenizer.get_buffer();
 
-    if(identifier == ID_true)
-      return true_exprt();
-    else if(identifier == ID_false)
-      return false_exprt();
-    else if(identifier == "roundNearestTiesToEven")
-    {
-      // we encode as 32-bit unsignedbv
-      return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
-    }
-    else if(identifier == "roundNearestTiesToAway")
-    {
-      throw error("unsupported rounding mode");
-    }
-    else if(identifier == "roundTowardPositive")
-    {
-      // we encode as 32-bit unsignedbv
-      return from_integer(ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
-    }
-    else if(identifier == "roundTowardNegative")
-    {
-      // we encode as 32-bit unsignedbv
-      return from_integer(
-        ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
-    }
-    else if(identifier == "roundTowardZero")
-    {
-      // we encode as 32-bit unsignedbv
-      return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
-    }
-    else
-    {
+      // in the expression table?
+      const auto e_it = expressions.find(identifier);
+      if(e_it != expressions.end())
+        return e_it->second();
+
       // rummage through id_map
       const irep_idt final_id = rename_id(identifier);
       auto id_it = id_map.find(final_id);
@@ -1038,9 +746,9 @@ exprt smt2_parsert::expression()
         return std::move(symbol_expr);
       }
 
+      // don't know, give up
       throw error() << "unknown expression '" << identifier << '\'';
     }
-  }
 
   case smt2_tokenizert::NUMERAL:
   {
@@ -1083,6 +791,259 @@ exprt smt2_parsert::expression()
   }
 
   UNREACHABLE;
+}
+
+void smt2_parsert::setup_expressions()
+{
+  expressions["true"] = [] { return true_exprt(); };
+  expressions["false"] = [] { return false_exprt(); };
+
+  expressions["roundNearestTiesToEven"] = [] {
+    // we encode as 32-bit unsignedbv
+    return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
+  };
+
+  expressions["roundNearestTiesToAway"] = [this]() -> exprt {
+    throw error("unsupported rounding mode");
+  };
+
+  expressions["roundTowardPositive"] = [] {
+    // we encode as 32-bit unsignedbv
+    return from_integer(ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
+  };
+
+  expressions["roundTowardNegative"] = [] {
+    // we encode as 32-bit unsignedbv
+    return from_integer(ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
+  };
+
+  expressions["roundTowardZero"] = [] {
+    // we encode as 32-bit unsignedbv
+    return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+  };
+
+  expressions["let"] = [this] { return let_expression(); };
+  expressions["exists"] = [this] { return quantifier_expression(ID_exists); };
+  expressions["forall"] = [this] { return quantifier_expression(ID_forall); };
+  expressions["and"] = [this] { return multi_ary(ID_and, operands()); };
+  expressions["or"] = [this] { return multi_ary(ID_or, operands()); };
+  expressions["xor"] = [this] { return multi_ary(ID_xor, operands()); };
+  expressions["not"] = [this] { return unary(ID_not, operands()); };
+  expressions["="] = [this] { return binary_predicate(ID_equal, operands()); };
+  expressions["<="] = [this] { return binary_predicate(ID_le, operands()); };
+  expressions[">="] = [this] { return binary_predicate(ID_ge, operands()); };
+  expressions["<"] = [this] { return binary_predicate(ID_lt, operands()); };
+  expressions[">"] = [this] { return binary_predicate(ID_gt, operands()); };
+
+  expressions["bvule"] = [this] { return binary_predicate(ID_le, operands()); };
+
+  expressions["bvsle"] = [this] {
+    return binary_predicate(ID_le, cast_bv_to_signed(operands()));
+  };
+
+  expressions["bvuge"] = [this] { return binary_predicate(ID_ge, operands()); };
+
+  expressions["bvsge"] = [this] {
+    return binary_predicate(ID_ge, cast_bv_to_signed(operands()));
+  };
+
+  expressions["bvult"] = [this] { return binary_predicate(ID_lt, operands()); };
+
+  expressions["bvslt"] = [this] {
+    return binary_predicate(ID_lt, cast_bv_to_signed(operands()));
+  };
+
+  expressions["bvugt"] = [this] { return binary_predicate(ID_gt, operands()); };
+
+  expressions["bvsgt"] = [this] {
+    return binary_predicate(ID_gt, cast_bv_to_signed(operands()));
+  };
+
+  expressions["bvashr"] = [this] {
+    return cast_bv_to_unsigned(binary(ID_ashr, cast_bv_to_signed(operands())));
+  };
+
+  expressions["bvlshr"] = [this] { return binary(ID_lshr, operands()); };
+  expressions["bvshr"] = [this] { return binary(ID_lshr, operands()); };
+  expressions["bvlshl"] = [this] { return binary(ID_shl, operands()); };
+  expressions["bvashl"] = [this] { return binary(ID_shl, operands()); };
+  expressions["bvshl"] = [this] { return binary(ID_shl, operands()); };
+  expressions["bvand"] = [this] { return multi_ary(ID_bitand, operands()); };
+  expressions["bvnand"] = [this] { return multi_ary(ID_bitnand, operands()); };
+  expressions["bvor"] = [this] { return multi_ary(ID_bitor, operands()); };
+  expressions["bvnor"] = [this] { return multi_ary(ID_bitnor, operands()); };
+  expressions["bvxor"] = [this] { return multi_ary(ID_bitxor, operands()); };
+  expressions["bvxnor"] = [this] { return multi_ary(ID_bitxnor, operands()); };
+  expressions["bvnot"] = [this] { return unary(ID_bitnot, operands()); };
+  expressions["bvneg"] = [this] { return unary(ID_unary_minus, operands()); };
+  expressions["bvadd"] = [this] { return multi_ary(ID_plus, operands()); };
+  expressions["+"] = [this] { return multi_ary(ID_plus, operands()); };
+  expressions["bvsub"] = [this] { return binary(ID_minus, operands()); };
+  expressions["-"] = [this] { return binary(ID_minus, operands()); };
+  expressions["bvmul"] = [this] { return binary(ID_mult, operands()); };
+  expressions["*"] = [this] { return binary(ID_mult, operands()); };
+
+  expressions["bvsdiv"] = [this] {
+    return cast_bv_to_unsigned(binary(ID_div, cast_bv_to_signed(operands())));
+  };
+
+  expressions["bvudiv"] = [this] { return binary(ID_div, operands()); };
+  expressions["/"] = [this] { return binary(ID_div, operands()); };
+  expressions["div"] = [this] { return binary(ID_div, operands()); };
+
+  expressions["bvsrem"] = [this] {
+    // 2's complement signed remainder (sign follows dividend)
+    // This matches our ID_mod, and what C does since C99.
+    return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(operands())));
+  };
+
+  expressions["bvsmod"] = [this] {
+    // 2's complement signed remainder (sign follows divisor)
+    // We don't have that.
+    return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(operands())));
+  };
+
+  expressions["bvurem"] = [this] { return binary(ID_mod, operands()); };
+
+  expressions["%"] = [this] { return binary(ID_mod, operands()); };
+
+  expressions["concat"] = [this] {
+    auto op = operands();
+
+    // add the widths
+    auto op_width = make_range(op).map(
+      [](const exprt &o) { return to_unsignedbv_type(o.type()).get_width(); });
+
+    const std::size_t total_width =
+      std::accumulate(op_width.begin(), op_width.end(), 0);
+
+    return concatenation_exprt(std::move(op), unsignedbv_typet(total_width));
+  };
+
+  expressions["distinct"] = [this] {
+    // pair-wise different constraint, multi-ary
+    return multi_ary("distinct", operands());
+  };
+
+  expressions["ite"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 3)
+      throw error("ite takes three operands");
+
+    if(op[0].type().id() != ID_bool)
+      throw error("ite takes a boolean as first operand");
+
+    if(op[1].type() != op[2].type())
+      throw error("ite needs matching types");
+
+    return if_exprt(op[0], op[1], op[2]);
+  };
+
+  expressions["implies"] = [this] { return binary(ID_implies, operands()); };
+
+  expressions["=>"] = [this] { return binary(ID_implies, operands()); };
+
+  expressions["select"] = [this] {
+    auto op = operands();
+
+    // array index
+    if(op.size() != 2)
+      throw error("select takes two operands");
+
+    if(op[0].type().id() != ID_array)
+      throw error("select expects array operand");
+
+    return index_exprt(op[0], op[1]);
+  };
+
+  expressions["store"] = [this] {
+    auto op = operands();
+
+    // array update
+    if(op.size() != 3)
+      throw error("store takes three operands");
+
+    if(op[0].type().id() != ID_array)
+      throw error("store expects array operand");
+
+    if(to_array_type(op[0].type()).subtype() != op[2].type())
+      throw error("store expects value that matches array element type");
+
+    return with_exprt(op[0], op[1], op[2]);
+  };
+
+  expressions["fp.isNaN"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isNaN takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isNaN takes FloatingPoint operand");
+
+    return unary_predicate_exprt(ID_isnan, op[0]);
+  };
+
+  expressions["fp.isInf"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isInf takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isInf takes FloatingPoint operand");
+
+    return unary_predicate_exprt(ID_isinf, op[0]);
+  };
+
+  expressions["fp.isNormal"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isNormal takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isNormal takes FloatingPoint operand");
+
+    return isnormal_exprt(op[0]);
+  };
+
+  expressions["fp"] = [this] { return function_application_fp(operands()); };
+
+  expressions["fp.add"] = [this] {
+    return function_application_ieee_float_op("fp.add", operands());
+  };
+
+  expressions["fp.mul"] = [this] {
+    return function_application_ieee_float_op("fp.mul", operands());
+  };
+
+  expressions["fp.sub"] = [this] {
+    return function_application_ieee_float_op("fp.sub", operands());
+  };
+
+  expressions["fp.div"] = [this] {
+    return function_application_ieee_float_op("fp.div", operands());
+  };
+
+  expressions["fp.eq"] = [this] {
+    return function_application_ieee_float_eq(operands());
+  };
+
+  expressions["fp.leq"] = [this] {
+    return binary_predicate(ID_le, operands());
+  };
+
+  expressions["fp.lt"] = [this] { return binary_predicate(ID_lt, operands()); };
+
+  expressions["fp.geq"] = [this] {
+    return binary_predicate(ID_ge, operands());
+  };
+
+  expressions["fp.gt"] = [this] { return binary_predicate(ID_gt, operands()); };
+
+  expressions["fp.neg"] = [this] { return unary(ID_unary_minus, operands()); };
 }
 
 typet smt2_parsert::sort()
