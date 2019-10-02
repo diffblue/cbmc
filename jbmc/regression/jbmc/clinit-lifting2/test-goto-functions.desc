@@ -1,0 +1,11 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--function Test.main --java-lift-clinit-calls --show-goto-functions
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\s*// 0 no location\n\s*Other\.<clinit_wrapper>\(\);\s*// 1 no location\s*int total;
+--
+--
+This checks that the clinit-wrapper function is called once, even though there are two calls in the source
+With symex-driven loading there's an exception check after the clinit_wrapper function finishes.
