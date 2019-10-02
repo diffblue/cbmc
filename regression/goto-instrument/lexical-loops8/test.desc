@@ -7,5 +7,5 @@ test.c
 --
 ^warning: ignoring
 --
-This checks that a loop with a break edge and a continue edge nontheless
+This checks that a loop with a break edge and a continue edge nonetheless
 gets classified as a lexical loop
