@@ -123,7 +123,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              function. This may reduce the overall cost of static\n" /* NOLINT(*) */ \
   "                              initialisation, but may be unsound if there are\n" /* NOLINT(*) */ \
   "                              cyclic dependencies between static initializers due\n" /* NOLINT(*) */ \
-  "                              to potentially changing their order of execution." /* NOLINT(*) */
+  "                              to potentially changing their order of execution,\n" /* NOLINT(*) */ \
+  "                              or if static initializers have side-effects such as\n" /* NOLINT(*) */ \
+  "                              updating another class' static field.\n" /* NOLINT(*) */
 // clang-format on
 
 class symbolt;
