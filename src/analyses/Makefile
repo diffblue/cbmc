@@ -25,7 +25,6 @@ SRC = ai.cpp \
       local_may_alias.cpp \
       local_safe_pointers.cpp \
       locals.cpp \
-      natural_loops.cpp \
       reaching_definitions.cpp \
       sese_regions.cpp \
       static_analysis.cpp \

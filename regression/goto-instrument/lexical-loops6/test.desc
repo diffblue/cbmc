@@ -1,0 +1,12 @@
+CORE
+test.c
+--show-lexical-loops
+^Note not all loops were in lexical loop form$
+^EXIT=0$
+^SIGNAL=0$
+--
+is head of
+^warning: ignoring
+--
+This checks that a loop with multiple entry edges is correctly identified as
+having an unusual form

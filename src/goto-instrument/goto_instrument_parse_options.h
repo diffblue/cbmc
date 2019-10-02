@@ -87,7 +87,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   "(cav11)" \
   OPT_TIMESTAMP \
-  "(show-natural-loops)(accelerate)(havoc-loops)" \
+  "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \
   "(accelerate)(constant-propagator)" \
