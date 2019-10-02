@@ -15,6 +15,7 @@ Author: Diffblue Limited.
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
 
+#include <java_bytecode/java_bytecode_convert_method.h>
 #include <java_bytecode/java_bytecode_convert_method_class.h>
 #include <java_bytecode/java_utils.h>
 #include <testing-utils/message.h>
@@ -877,4 +878,79 @@ SCENARIO(
       }
     }
   }
+}
+
+TEST_CASE(
+  "create_parameter_names",
+  "[core][java_bytecode][java_bytecode_convert_method]"
+  "[create_parameter_names]")
+{
+  // Arrange
+  java_bytecode_parse_treet::methodt m;
+  irep_idt method_identifier = "someClass.someMethod";
+
+  // The parameters should be already populated, but not have names, ids
+  code_typet::parametert this_param;
+  this_param.set_this();
+  this_param.type() = java_lang_object_type();
+  code_typet::parametert ref_to_inner;
+  ref_to_inner.type() = java_lang_object_type();
+  code_typet::parametert other_param;
+  other_param.type() = java_lang_object_type();
+  java_method_typet::parameterst parameters{
+    this_param, ref_to_inner, other_param};
+  for(const auto param : parameters)
+  {
+    REQUIRE(param.get_identifier().empty());
+    REQUIRE(param.get_base_name().empty());
+  }
+
+  // The method should have local variables with names
+  // We allocate three slots for three variables with size 1
+  java_bytecode_convert_methodt::method_offsett slots_for_parameters = 3;
+  java_bytecode_parse_treet::methodt::local_variablet this_local_var;
+  this_local_var.name = "this";
+  this_local_var.length = 1;
+  this_local_var.index = 0;
+  java_bytecode_parse_treet::methodt::local_variablet ref_to_inner_local_var;
+  ref_to_inner_local_var.name = "this$0";
+  ref_to_inner_local_var.length = 1;
+  ref_to_inner_local_var.index = 1;
+  java_bytecode_parse_treet::methodt::local_variablet other_local_var;
+  other_local_var.name = "other";
+  other_local_var.length = 1;
+  other_local_var.index = 2;
+  m.local_variable_table = {
+    this_local_var, ref_to_inner_local_var, other_local_var};
+  REQUIRE(parameters.size() == 3);
+
+  // An empty variable vector
+  variablest variables;
+  REQUIRE(variables.size() == 0);
+
+  // Act
+  create_parameter_names(
+    m, method_identifier, parameters, slots_for_parameters, variables);
+
+  // Assert side effects
+  REQUIRE(parameters.size() == 3);
+  REQUIRE(parameters.at(0).get_identifier() == "someClass.someMethod::this");
+  REQUIRE(parameters.at(1).get_identifier() == "someClass.someMethod::this$0");
+  REQUIRE(parameters.at(2).get_identifier() == "someClass.someMethod::other");
+  REQUIRE(parameters.at(0).get_base_name() == "this");
+  REQUIRE(parameters.at(1).get_base_name() == "this$0");
+  REQUIRE(parameters.at(2).get_base_name() == "other");
+  REQUIRE(variables.size() == 3);
+  REQUIRE(
+    variables[0][0].symbol_expr.get_identifier() ==
+    "someClass.someMethod::this");
+  REQUIRE(
+    variables[1][0].symbol_expr.get_identifier() ==
+    "someClass.someMethod::this$0");
+  REQUIRE(
+    variables[2][0].symbol_expr.get_identifier() ==
+    "someClass.someMethod::other");
+  REQUIRE(variables[0][0].symbol_expr.get(ID_C_base_name) == "this");
+  REQUIRE(variables[1][0].symbol_expr.get(ID_C_base_name) == "this$0");
+  REQUIRE(variables[2][0].symbol_expr.get(ID_C_base_name) == "other");
 }
