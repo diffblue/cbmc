@@ -4588,6 +4588,8 @@ inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
   return ret;
 }
 
+inline void validate_expr(const class class_method_descriptor_exprt &value);
+
 /// An expression describing a method on a class
 class class_method_descriptor_exprt : public nullary_exprt
 {
@@ -4617,6 +4619,7 @@ public:
     set(ID_C_class, std::move(class_id));
     set(ID_C_base_name, std::move(base_method_name));
     set(ID_identifier, std::move(id));
+    validate_expr(*this);
   }
 
   /// The method name after mangling it by combining it with the descriptor.
@@ -4653,6 +4656,23 @@ public:
     return get(ID_identifier);
   }
 };
+
+inline void validate_expr(const class class_method_descriptor_exprt &value)
+{
+  validate_operands(value, 0, "class method descriptor must not have operands");
+  DATA_INVARIANT(
+    !value.mangled_method_name().empty(),
+    "class method descriptor must have a mangled method name.");
+  DATA_INVARIANT(
+    !value.class_id().empty(), "class method descriptor must have a class id.");
+  DATA_INVARIANT(
+    !value.base_method_name().empty(),
+    "class method descriptor must have a base method name.");
+  DATA_INVARIANT(
+    value.get_identifier() == id2string(value.class_id()) + "." +
+                                id2string(value.mangled_method_name()),
+    "class method descriptor must have an identifier in the expected format.");
+}
 
 /// \brief Cast an exprt to a \ref class_method_descriptor_exprt
 ///
