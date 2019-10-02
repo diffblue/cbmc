@@ -9,11 +9,30 @@ Author: Diffblue Ltd
 /// \file
 /// Compute lexical loops in a goto_function.
 ///
-/// A lexical loop is a block of (lexically) contiguous GOTO program
-/// instructions with a single entry edge at the top and a single backedge
-/// leading from bottom to top. This is a subset of the natural loops, which is
-/// cheaper to compute and spots most natural loops generated from typical C
-/// code.
+/// A lexical loop is a block of GOTO program instructions with a single entry
+/// edge at the top and a single backedge leading from bottom to top, where
+/// "top" and "bottom" refer to program order. The loop may have holes:
+/// instructions which sit in between the top and bottom in program order, but
+/// which can't reach the loop backedge. Lexical loops are a subset of the
+/// natural loops, which are cheaper to compute and include most natural loops
+/// generated from typical C code.
+///
+/// Example of a lexical loop:
+///
+///     1: x = x + 1
+///        IF x < 5 GOTO 2
+///        done = true (*)
+///        GOTO 3 (*)
+///     2: i = i + 1
+///        IF i < 10 GOTO 1
+///     3: RETURN x
+///
+/// Assuming there are no GOTOs outside the loop targeting label 2, this is a
+/// lexical loop because the header (1) is the only entry point and the only
+/// back-edge is the final conditional GOTO.
+/// The instructions marked with a (*) are *not* in the loop; they are on a path
+/// that always leaves the loop (once the IF x < 5 test is failed we are
+/// certainly leaving the loop).
 
 #ifndef CPROVER_ANALYSES_LEXICAL_LOOPS_H
 #define CPROVER_ANALYSES_LEXICAL_LOOPS_H
