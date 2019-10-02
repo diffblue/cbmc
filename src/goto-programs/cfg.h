@@ -211,9 +211,7 @@ public:
     for(const auto &id_and_function : goto_functions.function_map)
     {
       const auto &instructions = id_and_function.second.body.instructions;
-      possible_keys.reserve(
-        possible_keys.size() +
-        std::distance(instructions.begin(), instructions.end()));
+      possible_keys.reserve(possible_keys.size() + instructions.size());
       for(auto it = instructions.begin(); it != instructions.end(); ++it)
         possible_keys.push_back(it);
     }
@@ -226,8 +224,7 @@ public:
     goto_functionst goto_functions;
     std::vector<goto_programt::const_targett> possible_keys;
     const auto &instructions = goto_program.instructions;
-    possible_keys.reserve(
-      std::distance(instructions.begin(), instructions.end()));
+    possible_keys.reserve(instructions.size());
     for(auto it = instructions.begin(); it != instructions.end(); ++it)
       possible_keys.push_back(it);
     entry_map.setup_for_keys(possible_keys.begin(), possible_keys.end());
