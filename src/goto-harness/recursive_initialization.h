@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 #include <util/expr.h>
 #include <util/message.h>
 #include <util/optional.h>
+#include <util/prefix.h>
 #include <util/std_types.h>
 
 #include "function_harness_generator_options.h"
@@ -70,6 +71,14 @@ public:
     std::size_t depth,
     const recursion_sett &known_tags,
     code_blockt &body);
+
+  bool is_initialization_allowed(const symbolt &symbol)
+  {
+    return (
+      symbol.is_static_lifetime && symbol.is_lvalue &&
+      symbol.type.id() != ID_code &&
+      !has_prefix(id2string(symbol.name), CPROVER_PREFIX));
+  }
 
 private:
   const recursive_initialization_configt initialization_config;

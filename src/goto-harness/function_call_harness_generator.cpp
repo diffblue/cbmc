@@ -11,7 +11,6 @@ Author: Diffblue Ltd.
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/exception_utils.h>
-#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -213,10 +212,7 @@ void function_call_harness_generatort::implt::generate_nondet_globals(
     for(const auto &symbol_table_entry : *symbol_table)
     {
       const auto &symbol = symbol_table_entry.second;
-      if(
-        symbol.is_static_lifetime && symbol.is_lvalue &&
-        symbol.type.id() != ID_code &&
-        !has_prefix(id2string(symbol.name), CPROVER_PREFIX))
+      if(recursive_initialization->is_initialization_allowed(symbol))
       {
         globals.push_back(symbol.symbol_expr());
       }
