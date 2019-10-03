@@ -924,13 +924,9 @@ TEST_CASE(
     this_local_var, ref_to_inner_local_var, other_local_var};
   REQUIRE(parameters.size() == 3);
 
-  // An empty variable vector
-  variablest variables;
-  REQUIRE(variables.size() == 0);
-
   // Act
   create_parameter_names(
-    m, method_identifier, parameters, slots_for_parameters, variables);
+    m, method_identifier, parameters, slots_for_parameters);
 
   // Assert side effects
   REQUIRE(parameters.size() == 3);
@@ -940,19 +936,6 @@ TEST_CASE(
   REQUIRE(parameters.at(0).get_base_name() == "this");
   REQUIRE(parameters.at(1).get_base_name() == "this$0");
   REQUIRE(parameters.at(2).get_base_name() == "other");
-  REQUIRE(variables.size() == 3);
-  REQUIRE(
-    variables[0][0].symbol_expr.get_identifier() ==
-    "someClass.someMethod::this");
-  REQUIRE(
-    variables[1][0].symbol_expr.get_identifier() ==
-    "someClass.someMethod::this$0");
-  REQUIRE(
-    variables[2][0].symbol_expr.get_identifier() ==
-    "someClass.someMethod::other");
-  REQUIRE(variables[0][0].symbol_expr.get(ID_C_base_name) == "this");
-  REQUIRE(variables[1][0].symbol_expr.get(ID_C_base_name) == "this$0");
-  REQUIRE(variables[2][0].symbol_expr.get(ID_C_base_name) == "other");
 }
 
 TEST_CASE(

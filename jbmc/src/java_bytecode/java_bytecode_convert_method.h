@@ -72,13 +72,11 @@ typedef expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
 /// \param parameters: the java_method_typet's parameters [out]
 /// \param slots_for_parameters: the number of parameter slots available,
 /// i.e. a positive integer
-/// \param variables: external storage of jvm variables [out]
 void create_parameter_names(
   const java_bytecode_parse_treet::methodt &m,
   const irep_idt &method_identifier,
   java_method_typet::parameterst &parameters,
-  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters,
-  variablest &variables);
+  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters);
 
 /// Adds the parameter symbols to the symbol table
 /// \param parameters: the java_method_typet's parameters [out]

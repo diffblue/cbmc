@@ -403,13 +403,8 @@ void java_bytecode_convert_method_lazy(
   java_method_typet::parameterst &parameters = method_type.parameters();
   java_bytecode_convert_methodt::method_offsett slots_for_parameters =
     java_method_parameter_slots(method_type);
-  variablest dummy_local_variable_table;
   create_parameter_names(
-    m,
-    method_identifier,
-    parameters,
-    slots_for_parameters,
-    dummy_local_variable_table);
+    m, method_identifier, parameters, slots_for_parameters);
 
   symbol_table.add(method_symbol);
 
@@ -441,9 +436,9 @@ void create_parameter_names(
   const java_bytecode_parse_treet::methodt &m,
   const irep_idt &method_identifier,
   java_method_typet::parameterst &parameters,
-  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters,
-  variablest &variables)
+  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters)
 {
+  auto variables = variablest{};
   // Find parameter names in the local variable table
   // and store the result in the external variables vector
   for(const auto &v : m.local_variable_table)
