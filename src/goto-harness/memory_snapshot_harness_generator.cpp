@@ -11,7 +11,7 @@ Author: Daniel Poetzl
 #include "memory_snapshot_harness_generator.h"
 #include "memory_snapshot_harness_generator_options.h"
 
-#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_convert_functions.h>
 
 #include <json/json_parser.h>
 
@@ -316,12 +316,7 @@ void memory_snapshot_harness_generatort::
   harness_function.type = to_code_type(function.type);
 
   goto_convert(
-    to_code_block(to_code(function.value)),
-    goto_model.symbol_table,
-    harness_function.body,
-    message_handler,
-    function.mode);
-
+    goto_model.symbol_table, goto_model.goto_functions, message_handler);
   harness_function.body.add(goto_programt::make_end_function());
 }
 

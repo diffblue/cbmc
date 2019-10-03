@@ -18,7 +18,7 @@ Author: Diffblue Ltd.
 #include <util/string_utils.h>
 #include <util/ui_message.h>
 
-#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
 #include <algorithm>
@@ -300,14 +300,7 @@ void function_call_harness_generatort::implt::
     symbol_table->lookup_ref(harness_function_name);
   goto_functions->function_map[harness_function_name].type =
     to_code_type(generated_harness.type);
-  auto &body = goto_functions->function_map[harness_function_name].body;
-  goto_convert(
-    static_cast<const codet &>(generated_harness.value),
-    *symbol_table,
-    body,
-    *message_handler,
-    function_to_call.mode);
-  body.add(goto_programt::make_end_function());
+  goto_convert(*symbol_table, *goto_functions, *message_handler);
 }
 
 code_function_callt::argumentst
