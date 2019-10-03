@@ -56,6 +56,7 @@ class recursive_initializationt
 {
 public:
   using recursion_sett = std::set<irep_idt>;
+  using type_constructor_namest = std::map<typet, irep_idt>;
 
   recursive_initializationt(
     recursive_initialization_configt initialization_config,
@@ -64,13 +65,8 @@ public:
   /// Generate initialisation code for lhs into body.
   /// \param lhs: The expression to initialise.
   /// \param depth: The number of pointer follows. Starts at 0.
-  /// \param known_tags: The struct tags we've already seen during recursion.
   /// \param body: The code block to write initialisation code to.
-  void initialize(
-    const exprt &lhs,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body);
+  void initialize(const exprt &lhs, const exprt &depth, code_blockt &body);
 
   /// Get the `free` function as symbol expression, and inserts it into the
   ///   goto-model if it doesn't exist already.
@@ -88,56 +84,14 @@ public:
 private:
   const recursive_initialization_configt initialization_config;
   goto_modelt &goto_model;
+  irep_idt max_depth_var_name;
+  irep_idt min_depth_var_name;
+  type_constructor_namest type_constructor_names;
 
   /// Get the malloc function as symbol exprt,
   /// and inserts it into the goto-model if it doesn't
   /// exist already.
   symbol_exprt get_malloc_function();
-
-  void initialize_struct_tag(
-    const exprt &lhs,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body);
-  void initialize_pointer(
-    const exprt &lhs,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body);
-  void initialize_nondet(
-    const exprt &lhs,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body);
-
-  using array_convertert = std::function<void(
-    const exprt &pointer,
-    std::size_t length,
-    std::size_t current_index,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body)>;
-  array_convertert default_array_member_initialization();
-  array_convertert cstring_member_initialization();
-
-  void initialize_array(
-    const exprt &array,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body,
-    array_convertert array_member_initialization);
-  void initialize_dynamic_array(
-    const exprt &pointer,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body,
-    array_convertert array_member_initialization);
-
-  void initialize_cstring(
-    const exprt &pointer,
-    std::size_t depth,
-    const recursion_sett &known_tags,
-    code_blockt &body);
 
   bool should_be_treated_as_array(const irep_idt &pointer_name) const;
   bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
@@ -200,6 +154,70 @@ private:
   /// \param type: type to be pretty-printed
   /// \return a string without white characters, quotes, etc.
   std::string type2id(const typet &type) const;
+
+  /// Case analysis for which constructor should be used.
+  /// \param depth_symbol: the symbol for `depth` parameter
+  /// \param result_symbol: the symbol for `result` parameter
+  /// \param size_symbol: maybe the symbol for `size` parameter
+  /// \param lhs_name: the name of the original symbol
+  /// \return the body of the constructor
+  code_blockt build_constructor_body(
+    const exprt &depth_symbol,
+    const exprt &result_symbol,
+    const optionalt<exprt> &size_symbol,
+    const optionalt<irep_idt> &lhs_name);
+
+  /// Check if a constructor for the type of \p expr already exists and create
+  ///   it if not.
+  /// \param expr: the expression to be constructed
+  /// \return name of the constructor function
+  const irep_idt &build_constructor(const exprt &expr);
+
+  /// Generic constructor for all pointers: only builds one pointee (not an
+  ///   array) but may recourse in case the pointee contains more pointers, e.g.
+  ///   a struct.
+  /// \param depth: symbol of the depth parameter
+  /// \param result: symbol of the result parameter
+  /// \return the body of the constructor
+  code_blockt
+  build_pointer_constructor(const exprt &depth, const exprt &result);
+
+  /// Constructor for structures: simply iterates over members and initialise
+  ///   each one.
+  /// \param depth: symbol of the depth parameter
+  /// \param result: symbol of the result parameter
+  /// \return the body of the constructor
+  code_blockt build_struct_constructor(const exprt &depth, const exprt &result);
+
+  /// Default constructor: assigns non-deterministic value of the right type.
+  /// \param result: symbol of the result parameter
+  /// \return the body of the constructor
+  code_blockt build_nondet_constructor(const exprt &result) const;
+
+  /// Constructor for arrays: simply iterates over elements and initialise
+  ///   each one.
+  /// \param depth: symbol of the depth parameter
+  /// \param result: symbol of the result parameter
+  /// \return the body of the constructor
+  code_blockt build_array_constructor(const exprt &depth, const exprt &result);
+
+  /// Constructor for dynamic arrays: allocate memory for `n` elements (`n` is
+  ///   random but bounded) and initialise each one.
+  /// \param depth: symbol of the depth parameter
+  /// \param result: symbol of the result parameter
+  /// \param size: symbol of the size parameter
+  /// \param lhs_name: name of the original symbol
+  /// \return the body of the constructor
+  code_blockt build_dynamic_array_constructor(
+    const exprt &depth,
+    const exprt &result,
+    const exprt &size,
+    const optionalt<irep_idt> &lhs_name);
+
+  /// Constructor for strings: as array but the last element is zero.
+  /// \param result: symbol of the result parameter
+  /// \return the body of the constructor
+  code_blockt build_array_string_constructor(const exprt &result) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H

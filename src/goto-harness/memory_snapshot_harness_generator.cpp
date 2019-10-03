@@ -17,6 +17,8 @@ Author: Daniel Poetzl
 
 #include <json-symtab-language/json_symbol_table.h>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
@@ -290,7 +292,9 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
     else
     {
       recursive_initialization.initialize(
-        fresh_or_snapshot_symbol.symbol_expr(), 0, {}, code);
+        fresh_or_snapshot_symbol.symbol_expr(),
+        from_integer(0, size_type()),
+        code);
     }
   }
   return code;
