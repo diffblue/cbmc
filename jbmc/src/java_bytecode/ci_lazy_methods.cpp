@@ -478,12 +478,7 @@ void ci_lazy_methodst::get_virtual_method_targets(
   symbol_tablet &symbol_table)
 {
   const auto &call_class = called_function.class_id();
-  INVARIANT(
-    !call_class.empty(), "All virtual calls should be aimed at a class");
   const auto &method_name = called_function.mangled_method_name();
-  INVARIANT(
-    !method_name.empty(),
-    "Virtual function must have a reasonable name after removing class");
 
   class_hierarchyt::idst self_and_child_classes =
     class_hierarchy.get_children_trans(call_class);
