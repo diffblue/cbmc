@@ -397,6 +397,15 @@ void java_bytecode_convert_method_lazy(
     method_symbol.type.set(ID_C_must_not_throw, true);
   }
 
+  // Assign names to parameters in the method symbol
+  java_method_typet &method_type = to_java_method_type(method_symbol.type);
+  method_type.set_is_final(m.is_final);
+  java_method_typet::parameterst &parameters = method_type.parameters();
+  java_bytecode_convert_methodt::method_offsett slots_for_parameters =
+    java_method_parameter_slots(method_type);
+  create_parameter_names(
+    m, method_identifier, parameters, slots_for_parameters);
+
   symbol_table.add(method_symbol);
 
   if(!m.is_static)
@@ -423,6 +432,118 @@ static irep_idt get_method_identifier(
     method.descriptor;
 }
 
+void create_parameter_names(
+  const java_bytecode_parse_treet::methodt &m,
+  const irep_idt &method_identifier,
+  java_method_typet::parameterst &parameters,
+  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters)
+{
+  auto variables = variablest{};
+  // Find parameter names in the local variable table
+  // and store the result in the external variables vector
+  for(const auto &v : m.local_variable_table)
+  {
+    // Skip this variable if it is not a method parameter
+    if(v.index >= slots_for_parameters)
+      continue;
+
+    std::ostringstream id_oss;
+    id_oss << method_identifier << "::" << v.name;
+    irep_idt identifier(id_oss.str());
+    symbol_exprt result = symbol_exprt::typeless(identifier);
+    result.set(ID_C_base_name, v.name);
+
+    // Create a new variablet in the variables vector; in fact this entry will
+    // be rewritten below in the loop that iterates through the method
+    // parameters; the only field that seem to be useful to write here is the
+    // symbol_expr, others will be rewritten
+    variables[v.index].emplace_back(result, v.start_pc, v.length);
+  }
+
+  // The variables is a expanding_vectort, and the loop above may have expanded
+  // the vector introducing gaps where the entries are empty vectors. We now
+  // make sure that the vector of each LV slot contains exactly one variablet,
+  // which we will add below
+  std::size_t param_index = 0;
+  for(const auto &param : parameters)
+  {
+    INVARIANT(
+      variables[param_index].size() <= 1,
+      "should have at most one entry per index");
+    param_index += java_local_variable_slots(param.type());
+  }
+  INVARIANT(
+    param_index == slots_for_parameters,
+    "java_parameter_count and local computation must agree");
+  param_index = 0;
+  for(auto &param : parameters)
+  {
+    irep_idt base_name, identifier;
+
+    // Construct a sensible base name (base_name) and a fully qualified name
+    // (identifier) for every parameter of the method under translation,
+    // regardless of whether we have an LVT or not; and assign it to the
+    // parameter object (which is stored in the type of the symbol, not in the
+    // symbol table)
+    if(param_index == 0 && param.get_this())
+    {
+      // my.package.ClassName.myMethodName:(II)I::this
+      base_name = ID_this;
+      identifier = id2string(method_identifier) + "::" + id2string(base_name);
+    }
+    else if(!variables[param_index].empty())
+    {
+      // if already present in the LVT ...
+      base_name = variables[param_index][0].symbol_expr.get(ID_C_base_name);
+      identifier = variables[param_index][0].symbol_expr.get(ID_identifier);
+    }
+    else
+    {
+      // my.package.ClassName.myMethodName:(II)I::argNT, where N is the local
+      // variable slot where the parameter is stored and T is a character
+      // indicating the type
+      char suffix = java_char_from_type(param.type());
+      base_name = "arg" + std::to_string(param_index) + suffix;
+      identifier = id2string(method_identifier) + "::" + id2string(base_name);
+    }
+    param.set_base_name(base_name);
+    param.set_identifier(identifier);
+    param_index += java_local_variable_slots(param.type());
+  }
+  // The parameter slots detected in this function should agree with what
+  // java_parameter_count() thinks about this method
+  INVARIANT(
+    param_index == slots_for_parameters,
+    "java_parameter_count and local computation must agree");
+}
+
+void create_parameter_symbols(
+  const java_method_typet::parameterst &parameters,
+  expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
+    &variables,
+  symbol_table_baset &symbol_table)
+{
+  std::size_t param_index = 0;
+  for(const auto &param : parameters)
+  {
+    parameter_symbolt parameter_symbol;
+    parameter_symbol.base_name = param.get_base_name();
+    parameter_symbol.mode = ID_java;
+    parameter_symbol.name = param.get_identifier();
+    parameter_symbol.type = param.type();
+    symbol_table.add(parameter_symbol);
+
+    // Add as a JVM local variable
+    variables[param_index].clear();
+    variables[param_index].emplace_back(
+      parameter_symbol.symbol_expr(),
+      0,
+      std::numeric_limits<size_t>::max(),
+      true);
+    param_index += java_local_variable_slots(param.type());
+  }
+}
+
 void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
   const methodt &m,
@@ -435,7 +556,7 @@ void java_bytecode_convert_methodt::convert(
   const irep_idt method_identifier =
     get_method_identifier(class_symbol.name, m);
 
-  method_id=method_identifier;
+  method_id = method_identifier;
   set_declaring_class(
     symbol_table.get_writeable_ref(method_identifier), class_symbol.name);
 
@@ -455,109 +576,13 @@ void java_bytecode_convert_methodt::convert(
   // the formal parameters
   slots_for_parameters = java_method_parameter_slots(method_type);
 
-  debug() << "Generating codet: class "
-             << class_symbol.name << ", method "
-             << m.name << eom;
+  debug() << "Generating codet: class " << class_symbol.name << ", method "
+          << m.name << eom;
 
-  // We now set up the local variables for the method parameters
-  variables.clear();
-
-  // Find parameter names in the local variable table:
-  for(const auto &v : m.local_variable_table)
-  {
-    // Skip this variable if it is not a method parameter
-    if(!is_parameter(v))
-      continue;
-
-    std::ostringstream id_oss;
-    id_oss << method_id << "::" << v.name;
-    irep_idt identifier(id_oss.str());
-    symbol_exprt result = symbol_exprt::typeless(identifier);
-    result.set(ID_C_base_name, v.name);
-
-    // Create a new variablet in the variables vector; in fact this entry will
-    // be rewritten below in the loop that iterates through the method
-    // parameters; the only field that seem to be useful to write here is the
-    // symbol_expr, others will be rewritten
-    variables[v.index].emplace_back(result, v.start_pc, v.length);
-  }
-
-  // The variables is a expanding_vectort, and the loop above may have expanded
-  // the vector introducing gaps where the entries are empty vectors. We now
-  // make sure that the vector of each LV slot contains exactly one variablet,
-  // which we will add below
-  std::size_t param_index=0;
-  for(const auto &param : parameters)
-  {
-    INVARIANT(
-      variables[param_index].size() <= 1,
-      "should have at most one entry per index");
-    param_index+=java_local_variable_slots(param.type());
-  }
-  INVARIANT(
-    param_index==slots_for_parameters,
-    "java_parameter_count and local computation must agree");
-
-  // Assign names to parameters
-  param_index=0;
-  for(auto &param : parameters)
-  {
-    irep_idt base_name, identifier;
-
-    // Construct a sensible base name (base_name) and a fully qualified name
-    // (identifier) for every parameter of the method under translation,
-    // regardless of whether we have an LVT or not; and assign it to the
-    // parameter object (which is stored in the type of the symbol, not in the
-    // symbol table)
-    if(param_index==0 && param.get_this())
-    {
-      // my.package.ClassName.myMethodName:(II)I::this
-      base_name = ID_this;
-      identifier=id2string(method_identifier)+"::"+id2string(base_name);
-    }
-    else if(!variables[param_index].empty())
-    {
-      // if already present in the LVT ...
-      base_name=variables[param_index][0].symbol_expr.get(ID_C_base_name);
-      identifier=variables[param_index][0].symbol_expr.get(ID_identifier);
-    }
-    else
-    {
-      // my.package.ClassName.myMethodName:(II)I::argNT, where N is the local
-      // variable slot where the parameter is stored and T is a character
-      // indicating the type
-      char suffix = java_char_from_type(param.type());
-      base_name = "arg" + std::to_string(param_index) + suffix;
-      identifier = id2string(method_identifier) + "::" + id2string(base_name);
-    }
-    param.set_base_name(base_name);
-    param.set_identifier(identifier);
-
-    // Build a new symbol for the parameter and add it to the symbol table
-    parameter_symbolt parameter_symbol;
-    parameter_symbol.base_name=base_name;
-    parameter_symbol.mode=ID_java;
-    parameter_symbol.name=identifier;
-    parameter_symbol.type=param.type();
-    symbol_table.add(parameter_symbol);
-
-    // Add as a JVM local variable
-    variables[param_index].clear();
-    variables[param_index].emplace_back(
-      parameter_symbol.symbol_expr(),
-      0,
-      std::numeric_limits<size_t>::max(),
-      true);
-    param_index+=java_local_variable_slots(param.type());
-  }
+  // Add parameter symbols to the symbol table
+  create_parameter_symbols(parameters, variables, symbol_table);
 
   symbolt &method_symbol = symbol_table.get_writeable_ref(method_identifier);
-
-  // The parameter slots detected in this function should agree with what
-  // java_parameter_count() thinks about this method
-  INVARIANT(
-    param_index==slots_for_parameters,
-    "java_parameter_count and local computation must agree");
 
   // Check the fields that can't change are valid
   INVARIANT(

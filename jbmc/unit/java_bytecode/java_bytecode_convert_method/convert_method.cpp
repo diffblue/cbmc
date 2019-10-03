@@ -15,6 +15,7 @@ Author: Diffblue Limited.
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
 
+#include <java_bytecode/java_bytecode_convert_method.h>
 #include <java_bytecode/java_bytecode_convert_method_class.h>
 #include <java_bytecode/java_utils.h>
 #include <testing-utils/message.h>
@@ -877,4 +878,128 @@ SCENARIO(
       }
     }
   }
+}
+
+TEST_CASE(
+  "create_parameter_names",
+  "[core][java_bytecode][java_bytecode_convert_method]"
+  "[create_parameter_names]")
+{
+  // Arrange
+  java_bytecode_parse_treet::methodt m;
+  irep_idt method_identifier = "someClass.someMethod";
+
+  // The parameters should be already populated, but not have names, ids
+  code_typet::parametert this_param;
+  this_param.set_this();
+  this_param.type() = java_lang_object_type();
+  code_typet::parametert ref_to_inner;
+  ref_to_inner.type() = java_lang_object_type();
+  code_typet::parametert other_param;
+  other_param.type() = java_lang_object_type();
+  java_method_typet::parameterst parameters{
+    this_param, ref_to_inner, other_param};
+  for(const auto param : parameters)
+  {
+    REQUIRE(param.get_identifier().empty());
+    REQUIRE(param.get_base_name().empty());
+  }
+
+  // The method should have local variables with names
+  // We allocate three slots for three variables with size 1
+  java_bytecode_convert_methodt::method_offsett slots_for_parameters = 3;
+  java_bytecode_parse_treet::methodt::local_variablet this_local_var;
+  this_local_var.name = "this";
+  this_local_var.length = 1;
+  this_local_var.index = 0;
+  java_bytecode_parse_treet::methodt::local_variablet ref_to_inner_local_var;
+  ref_to_inner_local_var.name = "this$0";
+  ref_to_inner_local_var.length = 1;
+  ref_to_inner_local_var.index = 1;
+  java_bytecode_parse_treet::methodt::local_variablet other_local_var;
+  other_local_var.name = "other";
+  other_local_var.length = 1;
+  other_local_var.index = 2;
+  m.local_variable_table = {
+    this_local_var, ref_to_inner_local_var, other_local_var};
+  REQUIRE(parameters.size() == 3);
+
+  // Act
+  create_parameter_names(
+    m, method_identifier, parameters, slots_for_parameters);
+
+  // Assert side effects
+  REQUIRE(parameters.size() == 3);
+  REQUIRE(parameters.at(0).get_identifier() == "someClass.someMethod::this");
+  REQUIRE(parameters.at(1).get_identifier() == "someClass.someMethod::this$0");
+  REQUIRE(parameters.at(2).get_identifier() == "someClass.someMethod::other");
+  REQUIRE(parameters.at(0).get_base_name() == "this");
+  REQUIRE(parameters.at(1).get_base_name() == "this$0");
+  REQUIRE(parameters.at(2).get_base_name() == "other");
+}
+
+TEST_CASE(
+  "create_parameter_symbols",
+  "[core][java_bytecode][java_bytecode_convert_method]"
+  "[create_parameter_symbols]")
+{
+  // Arrange
+  const irep_idt method_id = "someClass.someMethod";
+  // The parameters should be already populated, with names, ids
+  code_typet::parametert this_param;
+  this_param.set_this();
+  this_param.type() = java_lang_object_type();
+  this_param.set_identifier(id2string(method_id) + "::this");
+  this_param.set_base_name("this");
+  code_typet::parametert ref_to_inner;
+  ref_to_inner.type() = java_lang_object_type();
+  ref_to_inner.set_identifier(id2string(method_id) + "::this$0");
+  ref_to_inner.set_base_name("this$0");
+  code_typet::parametert other_param;
+  other_param.type() = java_lang_object_type();
+  other_param.set_identifier(id2string(method_id) + "::other");
+  other_param.set_base_name("other");
+  java_method_typet::parameterst parameters{
+    this_param, ref_to_inner, other_param};
+
+  variablest variables;
+
+  symbol_tablet symbol_table;
+  REQUIRE(symbol_table.symbols.empty());
+
+  // Act
+  create_parameter_symbols(parameters, variables, symbol_table);
+
+  // Assert side effects on symbol table
+  REQUIRE(symbol_table.symbols.size() == 3);
+  const symbolt this_symbol =
+    symbol_table.lookup_ref(id2string(method_id) + "::this");
+  REQUIRE(this_symbol.name == id2string(method_id) + "::this");
+  REQUIRE(this_symbol.base_name == "this");
+  REQUIRE(this_symbol.type == java_lang_object_type());
+  REQUIRE(this_symbol.mode == ID_java);
+  const symbolt inner_symbol =
+    symbol_table.lookup_ref(id2string(method_id) + "::this$0");
+  REQUIRE(inner_symbol.name == id2string(method_id) + "::this$0");
+  REQUIRE(inner_symbol.base_name == "this$0");
+  REQUIRE(inner_symbol.type == java_lang_object_type());
+  REQUIRE(inner_symbol.mode == ID_java);
+  const symbolt other_symbol =
+    symbol_table.lookup_ref(id2string(method_id) + "::other");
+  REQUIRE(other_symbol.name == id2string(method_id) + "::other");
+  REQUIRE(other_symbol.base_name == "other");
+  REQUIRE(other_symbol.type == java_lang_object_type());
+  REQUIRE(other_symbol.mode == ID_java);
+
+  // Assert side effects on variables
+  REQUIRE(variables.size() == 3);
+  REQUIRE(
+    variables[0][0].symbol_expr.get_identifier() ==
+    id2string(method_id) + "::this");
+  REQUIRE(
+    variables[1][0].symbol_expr.get_identifier() ==
+    id2string(method_id) + "::this$0");
+  REQUIRE(
+    variables[2][0].symbol_expr.get_identifier() ==
+    id2string(method_id) + "::other");
 }

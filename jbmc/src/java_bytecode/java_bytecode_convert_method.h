@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
 
 #include "ci_lazy_methods_needed.h"
+#include "java_bytecode_convert_method_class.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_string_library_preprocess.h"
 
@@ -57,5 +58,33 @@ void java_bytecode_convert_method_lazy(
   const java_bytecode_parse_treet::methodt &,
   symbol_tablet &symbol_table,
   message_handlert &);
+
+typedef expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>
+  variablest;
+
+/// Extracts the names of parameters from the local variable table in
+/// the method, and uses it to construct sensible names/identifiers for
+/// the parameters in the parameters on the java_method_typet and the external
+/// variables vector
+/// \param m: the parsed method whose local variable table contains the name of
+/// the parameters
+/// \param method_identifier: the identifier of the method
+/// \param parameters: the java_method_typet's parameters [out]
+/// \param slots_for_parameters: the number of parameter slots available,
+/// i.e. a positive integer
+void create_parameter_names(
+  const java_bytecode_parse_treet::methodt &m,
+  const irep_idt &method_identifier,
+  java_method_typet::parameterst &parameters,
+  const java_bytecode_convert_methodt::method_offsett &slots_for_parameters);
+
+/// Adds the parameter symbols to the symbol table
+/// \param parameters: the java_method_typet's parameters [out]
+/// \param variables: external storage of jvm variables [out]
+/// \param symbol_table: the symbol table [out]
+void create_parameter_symbols(
+  const java_method_typet::parameterst &parameters,
+  variablest &variables,
+  symbol_table_baset &symbol_table);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
