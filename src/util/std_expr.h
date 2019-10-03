@@ -4594,6 +4594,7 @@ inline void validate_expr(const class class_method_descriptor_exprt &value);
 class class_method_descriptor_exprt : public nullary_exprt
 {
 public:
+  /// \param _type: The type of the method which this expression refers to.
   /// \param class_id: Unique identifier in the symbol table, of the compile
   ///   time type of the class which this expression is applied to. For example
   ///   this could be - `java::java.lang.Object`.
