@@ -72,6 +72,11 @@ public:
     const recursion_sett &known_tags,
     code_blockt &body);
 
+  /// Get the `free` function as symbol expression, and inserts it into the
+  ///   goto-model if it doesn't exist already.
+  /// \return the symbol expression for the `free` function
+  symbol_exprt get_free_function();
+
   bool is_initialization_allowed(const symbolt &symbol)
   {
     return (
@@ -139,6 +144,62 @@ private:
   optionalt<irep_idt>
   get_associated_size_variable(const irep_idt &array_name) const;
   bool should_be_treated_as_cstring(const irep_idt &pointer_name) const;
+
+  /// Construct a new global symbol of type `int` and set it's value to \p
+  ///   initial_value.
+  /// \param symbol_name: the base name for the new symbol
+  /// \param initial_value: the value the symbol should be initialised with
+  /// \return unique name assigned to the new symbol (may differ from \p
+  ///   symbol_name)
+  irep_idt get_fresh_global_name(
+    const std::string &symbol_name,
+    const exprt &initial_value) const;
+
+  /// Construct a new global symbol of type `int` initialised to 0.
+  /// \param symbol_name: the base name for the new symbol
+  /// \return the symbol expression associated with the new symbol
+  symbol_exprt get_fresh_global_symexpr(const std::string &symbol_name) const;
+
+  /// Construct a new local symbol of type `int` initialised to 0.
+  /// \param symbol_name: the base name for the new symbol
+  /// \return the symbol expression associated with the new symbol
+  symbol_exprt get_fresh_local_symexpr(const std::string &symbol_name) const;
+
+  /// Construct a new local symbol of type \p type initialised to \p init_value.
+  /// \param symbol_name: the base name for the new symbol
+  /// \param type: type for the new symbol
+  /// \param init_value: expression the symbol should be initialised with
+  /// \return the symbol expression associated with the new symbol
+  symbol_exprt get_fresh_local_typed_symexpr(
+    const std::string &symbol_name,
+    const typet &type,
+    const exprt &init_value) const;
+
+  /// Construct a new function symbol of type \p fun_type.
+  /// \param fun_name: the base name for the new symbol
+  /// \param fun_type: type for the new symbol
+  /// \return the new symbol
+  const symbolt &
+  get_fresh_fun_symbol(const std::string &fun_name, const typet &fun_type);
+
+  /// Construct a new parameter symbol of type \p param_type.
+  /// \param param_name: the base name for the new parameter
+  /// \param param_type: type for the new symbol
+  /// \return the new symbol
+  symbolt &get_fresh_param_symbol(
+    const std::string &param_name,
+    const typet &param_type);
+
+  /// Recover the symbol expression from symbol table.
+  /// \param symbol_name: the name of the symbol to get
+  /// \return symbol expression of the symbol with given name
+  symbol_exprt get_symbol_expr(const irep_idt &symbol_name) const;
+
+  /// Simple pretty-printer for \ref typet. Produces strings that can decorate
+  ///   variable names in C.
+  /// \param type: type to be pretty-printed
+  /// \return a string without white characters, quotes, etc.
+  std::string type2id(const typet &type) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H

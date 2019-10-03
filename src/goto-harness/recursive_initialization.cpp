@@ -428,6 +428,25 @@ std::string recursive_initialization_configt::to_string() const
 
 recursive_initializationt::array_convertert
 recursive_initializationt::default_array_member_initialization()
+irep_idt recursive_initializationt::get_fresh_global_name(
+  const std::string &symbol_name,
+  const exprt &initial_value) const
+{
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    signed_int_type(),
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_static_lifetime = true;
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = initial_value;
+  return fresh_symbol.name;
+}
+
+symbol_exprt recursive_initializationt::get_fresh_global_symexpr(
+  const std::string &symbol_name) const
 {
   return [this](
            const exprt &array,
@@ -437,6 +456,140 @@ recursive_initializationt::default_array_member_initialization()
            const recursion_sett &known_tags,
            code_blockt &body) {
     PRECONDITION(array.type().id() == ID_array);
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    signed_int_type(),
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_static_lifetime = true;
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = from_integer(0, signed_int_type());
+  return fresh_symbol.symbol_expr();
+}
+
+symbol_exprt recursive_initializationt::get_fresh_local_symexpr(
+  const std::string &symbol_name) const
+{
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    signed_int_type(),
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = from_integer(0, signed_int_type());
+  return fresh_symbol.symbol_expr();
+}
+
+symbol_exprt recursive_initializationt::get_fresh_local_typed_symexpr(
+  const std::string &symbol_name,
+  const typet &type,
+  const exprt &init_value) const
+{
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    type,
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = init_value;
+  return fresh_symbol.symbol_expr();
+}
+
+const symbolt &recursive_initializationt::get_fresh_fun_symbol(
+  const std::string &fun_name,
+  const typet &fun_type)
+{
+  irep_idt fresh_name(fun_name);
+
+  get_new_name(fresh_name, namespacet{goto_model.symbol_table}, '_');
+
+  // create the function symbol
+  symbolt function_symbol{};
+  function_symbol.name = function_symbol.base_name =
+    function_symbol.pretty_name = fresh_name;
+
+  function_symbol.is_lvalue = true;
+  function_symbol.mode = initialization_config.mode;
+  function_symbol.type = fun_type;
+
+  auto r = goto_model.symbol_table.insert(function_symbol);
+  CHECK_RETURN(r.second);
+  return *goto_model.symbol_table.lookup(fresh_name);
+}
+
+symbolt &recursive_initializationt::get_fresh_param_symbol(
+  const std::string &symbol_name,
+  const typet &symbol_type)
+{
+  symbolt &param_symbol = get_fresh_aux_symbol(
+    symbol_type,
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  param_symbol.is_parameter = true;
+  param_symbol.is_lvalue = true;
+
+  return param_symbol;
+}
+
+symbol_exprt
+recursive_initializationt::get_symbol_expr(const irep_idt &symbol_name) const
+{
+  auto maybe_symbol = goto_model.symbol_table.lookup(symbol_name);
+  CHECK_RETURN(maybe_symbol != nullptr);
+  return maybe_symbol->symbol_expr();
+}
+
+std::string recursive_initializationt::type2id(const typet &type) const
+{
+  if(type.id() == ID_struct_tag)
+  {
+    auto st_tag = id2string(to_struct_tag_type(type).get_identifier());
+    std::replace(st_tag.begin(), st_tag.end(), '-', '_');
+    return st_tag;
+  }
+  else if(type.id() == ID_pointer)
+    return "ptr_" + type2id(type.subtype());
+  else if(type.id() == ID_array)
+  {
+    const auto array_size =
+      numeric_cast_v<std::size_t>(to_constant_expr(to_array_type(type).size()));
+    return "arr_" + type2id(type.subtype()) + "_" + std::to_string(array_size);
+  }
+  else if(type == char_type())
+    return "char";
+  else if(type.id() == ID_signedbv)
+    return "int";
+  else if(type.id() == ID_unsignedbv)
+    return "uint";
+  else
+    return "";
+}
+
+symbol_exprt recursive_initializationt::get_free_function()
+{
+  auto free_sym = goto_model.symbol_table.lookup("free");
+  if(free_sym == nullptr)
+  {
+    symbolt new_free_sym;
+    new_free_sym.type = code_typet{code_typet{
+      {code_typet::parametert{pointer_type(empty_typet{})}}, empty_typet{}}};
+    new_free_sym.name = new_free_sym.pretty_name = new_free_sym.base_name =
+      "free";
+    new_free_sym.mode = initialization_config.mode;
+    goto_model.symbol_table.insert(new_free_sym);
+    return new_free_sym.symbol_expr();
+  }
+  return free_sym->symbol_expr();
+}
     initialize(
       index_exprt{array, from_integer(current_index, size_type())},
       depth,
