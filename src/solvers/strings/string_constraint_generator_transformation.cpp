@@ -18,10 +18,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 /// Reduce or extend a string to have the given length
 ///
-/// Add axioms ensuring the returned string expression `res` has length `k`
-/// and characters at position `i` in `res` are equal to the character at
-/// position `i` in `s1` if `i` is smaller that the length of `s1`, otherwise
-/// it is the null character `\u0000`.
+/// Add axioms ensuring the returned string expression `res` has length
+/// `max(k, 0)` and characters at position `i` in `res` are equal to the
+/// character at position `i` in `s1` if `i` is smaller that the length of `s1`,
+/// otherwise it is the null character `\u0000`.
+/// Note this means if `k` is negative then the string is truncated to length 0;
+/// in practice a wrapper function will usually handle this case.
 ///
 /// These axioms are:
 ///   1. \f$ |{\tt res}|={\tt k} \f$
@@ -47,12 +49,12 @@ string_constraint_generatort::add_axioms_for_set_length(
   const typet &char_type = s1.content().type().subtype();
 
   // We add axioms:
-  // a1 : |res|=k
+  // a1 : |res|=max(k, 0)
   // a2 : forall i< min(|s1|, k) .res[i] = s1[i]
   // a3 : forall |s1| <= i < |res|. res[i] = 0
 
   constraints.existential.push_back(
-    equal_to(array_pool.get_or_create_length(res), k));
+    equal_to(array_pool.get_or_create_length(res), zero_if_negative(k)));
 
   const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
