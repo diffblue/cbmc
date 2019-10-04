@@ -148,8 +148,8 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
 ///   1. res.length = str.length
 ///      && return_code = (position >= res.length || position < 0) ? 1 : 0
 ///   2. 0 <= pos < res.length ==> res[pos]=char
-///   3. forall i < min(res.length, pos). res[i] = str[i]
-///   4. forall pos+1 <= i < res.length. res[i] = str[i]
+///   3. forall 0 <= i < max(0, min(res.length, pos)). res[i] = str[i]
+///   4. forall max(0, pos+1) <= i < res.length. res[i] = str[i]
 string_constraintst string_set_char_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
@@ -167,18 +167,17 @@ string_constraintst string_set_char_builtin_functiont::constraints(
     const equal_exprt a3_body(result[q], input[q]);
     return string_constraintt(
       q,
-      minimum(
-        zero_if_negative(array_pool.get_or_create_length(result)), position),
+      zero_if_negative(
+        minimum(array_pool.get_or_create_length(result), position)),
       a3_body);
   }());
   constraints.universal.push_back([&] {
     const symbol_exprt q2 =
       generator.fresh_symbol("QA_char_set2", position.type());
-    const plus_exprt lower_bound(position, from_integer(1, position.type()));
     const equal_exprt a4_body(result[q2], input[q2]);
     return string_constraintt(
       q2,
-      lower_bound,
+      zero_if_negative(plus_exprt(position, from_integer(1, position.type()))),
       zero_if_negative(array_pool.get_or_create_length(result)),
       a4_body);
   }());
