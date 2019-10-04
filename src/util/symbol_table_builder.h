@@ -20,17 +20,13 @@ public:
   explicit symbol_table_buildert(symbol_table_baset &base_symbol_table)
     : symbol_table_baset(
         base_symbol_table.symbols,
-        base_symbol_table.symbol_base_map,
-        base_symbol_table.symbol_module_map),
+        base_symbol_table.symbol_base_map),
       base_symbol_table(base_symbol_table)
   {
   }
 
   symbol_table_buildert(symbol_table_buildert &&other)
-    : symbol_table_baset(
-        other.symbols,
-        other.symbol_base_map,
-        other.symbol_module_map),
+    : symbol_table_baset(other.symbols, other.symbol_base_map),
       base_symbol_table(other.base_symbol_table)
   {
   }

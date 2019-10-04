@@ -79,22 +79,6 @@ SCENARIO(
       // Reset symbol to a valid base_name after the previous test
       transformed_symbol.base_name = "TestBase";
     }
-    WHEN(
-      "A symbol module identifier is transformed without updating the module "
-      "mapping")
-    {
-      symbolt &transformed_symbol = symbol_table.get_writeable_ref(symbol_name);
-      transformed_symbol.module = "TransformTestModule";
-
-      THEN("validate() should throw an exception")
-      {
-        REQUIRE_THROWS_AS(
-          symbol_table.validate(validation_modet::EXCEPTION),
-          incorrect_goto_program_exceptiont);
-      }
-      // Reset symbol to a valid module name
-      transformed_symbol.module = "TestModule";
-    }
   }
 }
 

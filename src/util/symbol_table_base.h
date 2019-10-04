@@ -12,7 +12,6 @@
 #include "symbol.h"
 
 typedef std::multimap<irep_idt, irep_idt> symbol_base_mapt;
-typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
 
 class symbol_tablet;
 
@@ -26,16 +25,12 @@ public:
 public:
   const symbolst &symbols;
   const symbol_base_mapt &symbol_base_map;
-  const symbol_module_mapt &symbol_module_map;
 
 public:
   symbol_table_baset(
     const symbolst &symbols,
-    const symbol_base_mapt &symbol_base_map,
-    const symbol_module_mapt &symbol_module_map)
-    : symbols(symbols),
-      symbol_base_map(symbol_base_map),
-      symbol_module_map(symbol_module_map)
+    const symbol_base_mapt &symbol_base_map)
+    : symbols(symbols), symbol_base_map(symbol_base_map)
   {
   }
 

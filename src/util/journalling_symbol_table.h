@@ -51,8 +51,7 @@ private:
   explicit journalling_symbol_tablet(symbol_table_baset &base_symbol_table)
     : symbol_table_baset(
         base_symbol_table.symbols,
-        base_symbol_table.symbol_base_map,
-        base_symbol_table.symbol_module_map),
+        base_symbol_table.symbol_base_map),
       base_symbol_table(base_symbol_table)
   {
   }
@@ -61,10 +60,7 @@ public:
   journalling_symbol_tablet(const journalling_symbol_tablet &other) = delete;
 
   journalling_symbol_tablet(journalling_symbol_tablet &&other)
-    : symbol_table_baset(
-        other.symbols,
-        other.symbol_base_map,
-        other.symbol_module_map),
+    : symbol_table_baset(other.symbols, other.symbol_base_map),
       base_symbol_table(other.base_symbol_table),
       inserted(std::move(other.inserted)),
       updated(std::move(other.updated)),

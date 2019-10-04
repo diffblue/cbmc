@@ -21,26 +21,18 @@ class symbol_tablet : public symbol_table_baset
 private:
   symbolst internal_symbols;
   symbol_base_mapt internal_symbol_base_map;
-  symbol_module_mapt internal_symbol_module_map;
 
 public:
   symbol_tablet()
-    : symbol_table_baset(
-        internal_symbols,
-        internal_symbol_base_map,
-        internal_symbol_module_map)
+    : symbol_table_baset(internal_symbols, internal_symbol_base_map)
   {
   }
 
   /// Copy constructor.
   symbol_tablet(const symbol_tablet &other)
-    : symbol_table_baset(
-        internal_symbols,
-        internal_symbol_base_map,
-        internal_symbol_module_map),
+    : symbol_table_baset(internal_symbols, internal_symbol_base_map),
       internal_symbols(other.internal_symbols),
-      internal_symbol_base_map(other.internal_symbol_base_map),
-      internal_symbol_module_map(other.internal_symbol_module_map)
+      internal_symbol_base_map(other.internal_symbol_base_map)
   {
   }
 
@@ -53,13 +45,9 @@ public:
 
   /// Move constructor.
   symbol_tablet(symbol_tablet &&other)
-    : symbol_table_baset(
-        internal_symbols,
-        internal_symbol_base_map,
-        internal_symbol_module_map),
+    : symbol_table_baset(internal_symbols, internal_symbol_base_map),
       internal_symbols(std::move(other.internal_symbols)),
-      internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
-      internal_symbol_module_map(std::move(other.internal_symbol_module_map))
+      internal_symbol_base_map(std::move(other.internal_symbol_base_map))
   {
   }
 
@@ -68,7 +56,6 @@ public:
   {
     internal_symbols = std::move(other.internal_symbols);
     internal_symbol_base_map = std::move(other.internal_symbol_base_map);
-    internal_symbol_module_map = std::move(other.internal_symbol_module_map);
     return *this;
   }
 
@@ -78,7 +65,6 @@ public:
   {
     internal_symbols.swap(other.internal_symbols);
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
-    internal_symbol_module_map.swap(other.internal_symbol_module_map);
   }
 
 public:
@@ -105,7 +91,6 @@ public:
   {
     internal_symbols.clear();
     internal_symbol_base_map.clear();
-    internal_symbol_module_map.clear();
   }
 
   virtual iteratort begin() override
