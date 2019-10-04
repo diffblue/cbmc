@@ -90,7 +90,7 @@ private:
   {
     auto key_integer = KeyToDenseInteger{}(key);
     INVARIANT(((int64_t)key_integer) >= offset, "index should be in range");
-    auto ret = (std::size_t)key_integer - offset;
+    auto ret = (std::size_t)key_integer - (std::size_t)offset;
     INVARIANT(ret < map.size(), "index should be in range");
     return ret;
   }
@@ -180,7 +180,7 @@ private:
     // Return the next iterator >= it with its value set
     UnderlyingIterator skip_unset_values(UnderlyingIterator it)
     {
-      auto iterator_pos = std::distance(
+      auto iterator_pos = (std::size_t)std::distance(
         underlying_map.map.begin(),
         (typename backing_storet::const_iterator)it);
       while((std::size_t)iterator_pos < underlying_map.map.size() &&
@@ -235,7 +235,7 @@ public:
     std::unordered_set<int64_t> seen_keys;
     for(Iter it = first; it != last; ++it)
     {
-      int64_t integer_key = KeyToDenseInteger{}(*it);
+      int64_t integer_key = (int64_t)KeyToDenseInteger{}(*it);
       highest_key = std::max(integer_key, highest_key);
       lowest_key = std::min(integer_key, lowest_key);
       INVARIANT(
@@ -249,18 +249,18 @@ public:
     }
     else
     {
-      auto map_size = (highest_key - lowest_key) + 1;
+      std::size_t map_size = (std::size_t)((highest_key - lowest_key) + 1);
       INVARIANT(
         map_size > 0, // overflowed?
         "dense_integer_mapt size should fit in std::size_t");
       INVARIANT(
-        ((std::size_t)map_size) <= std::numeric_limits<std::size_t>::max(),
+        map_size <= std::numeric_limits<std::size_t>::max(),
         "dense_integer_mapt size should fit in std::size_t");
       offset = lowest_key;
-      map.resize((highest_key - lowest_key) + 1);
+      map.resize(map_size);
       for(Iter it = first; it != last; ++it)
         map.at(key_to_index(*it)).first = *it;
-      value_set.resize((highest_key - lowest_key) + 1);
+      value_set.resize(map_size);
     }
 
     possible_keys_vector.insert(possible_keys_vector.end(), first, last);
@@ -288,8 +288,10 @@ public:
 
   std::pair<iterator, bool> insert(const std::pair<const K, V> &pair)
   {
-    std::size_t index = key_to_index(pair.first);
-    iterator it{std::next(map.begin(), index), *this};
+    auto index = key_to_index(pair.first);
+    auto signed_index =
+      static_cast<typename backing_storet::iterator::difference_type>(index);
+    iterator it{std::next(map.begin(), signed_index), *this};
 
     if(index_is_set(index))
       return {it, false};
