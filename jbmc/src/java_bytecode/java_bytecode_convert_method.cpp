@@ -1644,7 +1644,12 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
         symbol_table.lookup_ref(field_id).symbol_expr());
 
       convert_getstatic(
-        arg0, symbol_expr, is_assertions_disabled_field, c, results);
+        i_it->source_location,
+        arg0,
+        symbol_expr,
+        is_assertions_disabled_field,
+        c,
+        results);
     }
     else if(bytecode == BC_putfield)
     {
@@ -2649,6 +2654,7 @@ code_blockt java_bytecode_convert_methodt::convert_putfield(
 }
 
 void java_bytecode_convert_methodt::convert_getstatic(
+  const source_locationt &source_location,
   const exprt &arg0,
   const symbol_exprt &symbol_expr,
   const bool is_assertions_disabled_field,
@@ -2676,7 +2682,9 @@ void java_bytecode_convert_methodt::convert_getstatic(
       needed_lazy_methods->add_needed_class(arg0.get_string(ID_class));
     }
   }
-  results[0] = java_bytecode_promotion(symbol_expr);
+  symbol_exprt symbol_with_location = symbol_expr;
+  symbol_with_location.add_source_location() = source_location;
+  results[0] = java_bytecode_promotion(symbol_with_location);
 
   // Note this initializer call deliberately inits the class used to make
   // the reference, which may be a child of the class that actually defines

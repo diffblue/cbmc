@@ -291,6 +291,45 @@ SCENARIO(
   }
 }
 
+SCENARIO(
+  "java_bytecode_convert_method_with_getstatic",
+  "[core][java_bytecode][java_bytecode_convert_method]")
+{
+  GIVEN("A class that reads a static field.")
+  {
+    const symbol_tablet symbol_table = load_java_class(
+      "ClassReadingStaticField",
+      "./java_bytecode/java_bytecode_convert_method");
+
+    WHEN("Converting the method that reads said field")
+    {
+      const auto &method_symbol =
+        symbol_table.lookup_ref("java::ClassReadingStaticField.test:()I");
+
+      THEN(
+        "There should be a symbol expression attributed to bytecode index "
+        "0 (the getstatic instruction)")
+      {
+        bool found = false;
+        method_symbol.value.visit_pre([&found](const exprt &subexpr) {
+          if(
+            const auto symbol_expr =
+              expr_try_dynamic_cast<symbol_exprt>(subexpr))
+          {
+            if(
+              symbol_expr->source_location().get_java_bytecode_index() == "0" &&
+              symbol_expr->get_identifier() ==
+                "java::ClassReadingStaticField.x")
+              found = true;
+          }
+        });
+
+        REQUIRE(found);
+      }
+    }
+  }
+}
+
 /// Allow access to private methods so that they can be unit tested
 class java_bytecode_convert_method_unit_testt
 {

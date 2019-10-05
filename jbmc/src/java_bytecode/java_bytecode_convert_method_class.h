@@ -432,6 +432,7 @@ protected:
     exprt::operandst &results) const;
 
   void convert_getstatic(
+    const source_locationt &source_location,
     const exprt &arg0,
     const symbol_exprt &symbol_expr,
     bool is_assertions_disabled_field,
