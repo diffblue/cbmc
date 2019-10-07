@@ -1733,9 +1733,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
     std::placeholders::_2,
     std::placeholders::_3,
     std::placeholders::_4);
-  cprover_equivalent_to_java_assign_function
-    ["java::java.lang.StringBuilder.setLength:(I)V"]=
-      ID_cprover_string_set_length_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.StringBuilder.substring:(II)Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
