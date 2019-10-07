@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 
+#include <util/exception_utils.h>
 #include <util/invariant.h>
 
 cmdlinet::cmdlinet()
@@ -52,14 +53,17 @@ std::string cmdlinet::get_value(char option) const
     return "";
 }
 
-void cmdlinet::set(const std::string &option)
+void cmdlinet::set(const std::string &option, bool value)
 {
   auto i=getoptnr(option);
 
   if(i.has_value())
-    options[*i].isset=true;
-
-  // otherwise ignore
+    options[*i].isset = value;
+  else
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "unknown command line option", option);
+  }
 }
 
 void cmdlinet::set(const std::string &option, const std::string &value)
@@ -71,8 +75,11 @@ void cmdlinet::set(const std::string &option, const std::string &value)
     options[*i].isset=true;
     options[*i].values.push_back(value);
   }
-
-  // otherwise ignore
+  else
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "unknown command line option", option);
+  }
 }
 
 static std::list<std::string> immutable_empty_list;

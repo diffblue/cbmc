@@ -1,0 +1,6 @@
+CORE broken-smt-backend
+--json-interface
+< test_wrong_option.json
+^EXIT=6$
+^SIGNAL=0$
+unknown command line option
