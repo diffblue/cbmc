@@ -28,14 +28,18 @@ std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
     {
       symbol_base_mapt::iterator base_result=
         internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
-      try
+      if(!new_symbol.module.empty())
       {
-        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
-      }
-      catch(...)
-      {
-        internal_symbol_base_map.erase(base_result);
-        throw;
+        try
+        {
+          internal_symbol_module_map.emplace(
+            new_symbol.module, new_symbol.name);
+        }
+        catch(...)
+        {
+          internal_symbol_base_map.erase(base_result);
+          throw;
+        }
       }
     }
     catch(...)
@@ -103,18 +107,27 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
     "current base_name: "+id2string(symbol.base_name)+")");
   internal_symbol_base_map.erase(base_it);
 
-  symbol_module_mapt::const_iterator
-    module_it=symbol_module_map.lower_bound(entry->second.module),
-    module_it_end=symbol_module_map.upper_bound(entry->second.module);
-  while(module_it!=module_it_end && module_it->second!=symbol.name)
-    ++module_it;
-  INVARIANT(
-    module_it!=module_it_end,
-    "symbolt::module should not be changed "
-    "after it is added to the symbol_table "
-    "(name: "+id2string(symbol.name)+", "
-    "current module: "+id2string(symbol.module)+")");
-  internal_symbol_module_map.erase(module_it);
+  if(!entry->second.module.empty())
+  {
+    symbol_module_mapt::const_iterator module_it =
+                                         symbol_module_map.lower_bound(
+                                           entry->second.module),
+                                       module_it_end =
+                                         symbol_module_map.upper_bound(
+                                           entry->second.module);
+    while(module_it != module_it_end && module_it->second != symbol.name)
+      ++module_it;
+    INVARIANT(
+      module_it != module_it_end,
+      "symbolt::module should not be changed "
+      "after it is added to the symbol_table "
+      "(name: " +
+        id2string(symbol.name) +
+        ", "
+        "current module: " +
+        id2string(symbol.module) + ")");
+    internal_symbol_module_map.erase(module_it);
+  }
 
   internal_symbols.erase(entry);
 }
