@@ -1,10 +1,11 @@
 public class StringBuilderChars01
 {
-   public static void main(String[] args)
+   public static void test(boolean choice)
    {
-      StringBuilder buffer = new StringBuilder("Diffblue Limited");
+      String s = choice ? "Diffblue" : "abcdefgh";
+      StringBuilder buffer = new StringBuilder(s);
 	  
-      assert buffer.toString().equals("Diffblue Limited");
+      assert !choice || buffer.toString().equals("Diffblue");
       assert buffer.charAt(0)!=buffer.charAt(4);
 
       char[] charArray = new char[buffer.length()];
@@ -20,9 +21,9 @@ public class StringBuilderChars01
 
       buffer.setCharAt(0, 'H');
       buffer.setCharAt(6, 'T');
-      assert buffer.toString().equals("HiffBlTe Limited");
+      assert !choice || buffer.toString().equals("HiffblTe");
 
       buffer.reverse();
-      assert buffer.toString().equals("detimiL eTlBffiH");
+      assert !choice || buffer.toString().equals("eTlbffiH");
    }
 }

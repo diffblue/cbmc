@@ -1,8 +1,15 @@
 public class StringBuilderCapLen01
 {
-   public static void main(String[] args)
+   public static void test(boolean choice)
    {
-      StringBuilder buffer = new StringBuilder("Diffblue is leader in automatic test case generation");
+      String s =
+        choice
+        ? "Diffblue is leader in automatic test case generation"
+        : "";
+      StringBuilder buffer = new StringBuilder(s);
+
+      if(!choice)
+        return;
 
       assert buffer.toString().equals("Diffblue is leader in automatic test case generation");
       assert buffer.length()==52;
