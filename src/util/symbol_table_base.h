@@ -24,8 +24,17 @@ public:
   typedef std::unordered_map<irep_idt, symbolt> symbolst;
 
 public:
+  /// Read-only field, used to look up symbols given their names.
+  /// Typically a subclass will have its own corresponding writeable field, and
+  /// the read-only fields declared here function as "getters" for them.
   const symbolst &symbols;
+  /// Read-only field, used to look up symbol names given their base names.
+  /// See \ref symbols.
   const symbol_base_mapt &symbol_base_map;
+  /// Read-only field, used to look up symbol names given their modules.
+  /// See \ref symbols.
+  /// Note that symbols whose module is empty are not recorded in this map.
+  /// Currently only used in EBMC.
   const symbol_module_mapt &symbol_module_map;
 
 public:

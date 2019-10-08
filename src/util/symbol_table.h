@@ -19,8 +19,11 @@
 class symbol_tablet : public symbol_table_baset
 {
 private:
+  /// Value referenced by \ref symbol_table_baset::symbols.
   symbolst internal_symbols;
+  /// Value referenced by \ref symbol_table_baset::symbol_base_map.
   symbol_base_mapt internal_symbol_base_map;
+  /// Value referenced by \ref symbol_table_baset::symbol_module_map.
   symbol_module_mapt internal_symbol_module_map;
 
 public:
