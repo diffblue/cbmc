@@ -12,6 +12,9 @@ Author: Diffblue Limited.
 
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
+#include <java_bytecode/java_bytecode_language.h>
+#include <linking/static_lifetime_init.h>
+#include <util/options.h>
 
 SCENARIO(
   "java_bytecode_language_opaque_field",
@@ -44,4 +47,49 @@ SCENARIO(
       }
     }
   }
+}
+
+static void use_external_driver(java_bytecode_languaget &language)
+{
+  optionst options;
+  options.set_option("symex-driven-lazy-loading", true);
+  language.set_language_options(options);
+}
+
+TEST_CASE(
+  "LAZY_METHODS_MODE_EXTERNAL_DRIVER based generation of cprover_initialise",
+  "[core][java_bytecode_language]")
+{
+  java_bytecode_languaget language;
+  null_message_handlert null_message_handler;
+  language.set_message_handler(null_message_handler);
+  use_external_driver(language);
+  symbol_tablet symbol_table;
+  language.typecheck(symbol_table, "");
+  {
+    const symbolt *const initialise = symbol_table.lookup(INITIALIZE_FUNCTION);
+    REQUIRE(initialise);
+    REQUIRE(initialise->value.is_nil());
+  }
+  language.convert_lazy_method(INITIALIZE_FUNCTION, symbol_table);
+  {
+    const symbolt *const initialise = symbol_table.lookup(INITIALIZE_FUNCTION);
+    REQUIRE(initialise);
+    REQUIRE(can_cast_expr<codet>(initialise->value));
+  }
+}
+
+TEST_CASE(
+  "Standard generation of cprover_initialise",
+  "[core][java_bytecode_language]")
+{
+  java_bytecode_languaget language;
+  null_message_handlert null_message_handler;
+  language.set_message_handler(null_message_handler);
+  language.set_language_options(optionst{});
+  symbol_tablet symbol_table;
+  language.typecheck(symbol_table, "");
+  const symbolt *const initialise = symbol_table.lookup(INITIALIZE_FUNCTION);
+  REQUIRE(initialise);
+  REQUIRE(can_cast_expr<codet>(initialise->value));
 }
