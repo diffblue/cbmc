@@ -1,10 +1,10 @@
 CORE
 test_set_length.class
---max-nondet-string-length 100 --function test_set_length.main
+--function test_set_length.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*assertion.1\].* line 8.* SUCCESS$
-^\[.*assertion.2\].* line 9.* SUCCESS$
-^\[.*assertion.3\].* line 10.* FAILURE$
+^\[.*assertion.1\].* line 9.* SUCCESS$
+^\[.*assertion.2\].* line 10.* SUCCESS$
+^\[.*assertion.3\].* line 11.* FAILURE$
 --
 non equal types
