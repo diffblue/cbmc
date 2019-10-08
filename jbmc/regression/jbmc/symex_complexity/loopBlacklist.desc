@@ -1,0 +1,13 @@
+CORE
+ComplexClass.class
+--function ComplexClass.loopBlacklist --symex-complexity-limit 1 --symex-complexity-failed-child-loops-limit 1 --verbosity 9 --unwind 9 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^(\[symex-complexity\] Trying to enter blacklisted loop|\[symex-complexity\] Loop operations considered too complex)
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This tests that we cancel out of a loop with huge unwind, low complexity limit and low branch failure limit.
+
+Same basis as branchCancel with nondeterministic values, but in this case we have an
+outer loop that we're also running 100 times that will cause the inner to be blacklisted.
