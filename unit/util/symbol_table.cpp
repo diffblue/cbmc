@@ -59,8 +59,6 @@ SCENARIO(
           symbol_table.validate(validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
-      // Reset symbol to a valid name after the previous test
-      transformed_symbol.name = symbol_name;
     }
     WHEN(
       "A symbol base_name is transformed without updating the base_name "
@@ -76,8 +74,6 @@ SCENARIO(
           symbol_table.validate(validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
-      // Reset symbol to a valid base_name after the previous test
-      transformed_symbol.base_name = "TestBase";
     }
     WHEN(
       "A symbol module identifier is transformed without updating the module "
@@ -92,8 +88,6 @@ SCENARIO(
           symbol_table.validate(validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
-      // Reset symbol to a valid module name
-      transformed_symbol.module = "TestModule";
     }
   }
 }
