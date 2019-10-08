@@ -1,7 +1,9 @@
 public class Test {
-    public String det()
+    public String nondetChoice(boolean choice)
     {
-        StringBuilder builder = new StringBuilder("abcdefghijklmnopqrstuvwxyz");
+        String s =
+          choice ? "abcdefghijklmnopqrstuvwxyz" : "bbcdefghijklmnopqrstuvwxyz";
+        StringBuilder builder = new StringBuilder(s);
         builder.setCharAt(3, '!');
         builder.setCharAt(5, '!');
         builder.setCharAt(7, '!');
@@ -49,9 +51,11 @@ public class Test {
         return result;
     }
 
-    public String withDependency(boolean b)
+    public String withDependency(boolean b, boolean choice)
     {
-        StringBuilder builder = new StringBuilder("abcdefghijklmnopqrstuvwxyz");
+        String s =
+          choice ? "abcdefghijklmnopqrstuvwxyz" : "abcdefghijklmnopqrstuvwxyy";
+        StringBuilder builder = new StringBuilder(s);
         builder.setCharAt(3, '!');
         builder.setCharAt(5, '!');
 
