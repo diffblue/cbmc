@@ -92,6 +92,58 @@ SCENARIO(
   }
 }
 
+SCENARIO(
+  "symbol_table_symbol_module_map",
+  "[core][utils][symbol_table_symbol_module_map]")
+{
+  GIVEN("A valid symbol table")
+  {
+    symbol_tablet symbol_table;
+    WHEN("Inserting a symbol with non-empty module")
+    {
+      symbolt symbol;
+      symbol.name = "TestName";
+      symbol.module = "TestModule";
+      symbol_table.insert(std::move(symbol));
+      THEN("The symbol module map contains an entry for the symbol")
+      {
+        REQUIRE(symbol_table.symbol_module_map.size() == 1);
+        const auto entry = symbol_table.symbol_module_map.begin();
+        REQUIRE(id2string(entry->first) == "TestModule");
+        REQUIRE(id2string(entry->second) == "TestName");
+      }
+      WHEN("Removing the symbol again")
+      {
+        symbol_table.remove("TestName");
+        THEN("The symbol module map no longer contains an entry for the symbol")
+        {
+          REQUIRE(symbol_table.symbol_module_map.size() == 0);
+        }
+      }
+    }
+    WHEN("Inserting a symbol with empty module")
+    {
+      symbolt symbol;
+      symbol.name = "TestName";
+      symbol_table.insert(std::move(symbol));
+      THEN("The symbol module map does not contain an entry for the symbol")
+      {
+        REQUIRE(symbol_table.symbol_module_map.size() == 0);
+      }
+      WHEN("Removing the symbol again")
+      {
+        symbol_table.remove("TestName");
+        THEN(
+          "The symbol module map still does not contain an entry for the "
+          "symbol")
+        {
+          REQUIRE(symbol_table.symbol_module_map.size() == 0);
+        }
+      }
+    }
+  }
+}
+
 SCENARIO("journalling_symbol_table_writer",
   "[core][utils][journalling_symbol_table_writer]")
 {
