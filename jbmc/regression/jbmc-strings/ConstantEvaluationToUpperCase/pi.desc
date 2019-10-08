@@ -1,0 +1,13 @@
+CORE
+Main.class
+--function Main.pi --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^Generated [1-9]\d* VCC\(s\), [1-9]\d* remaining after simplification$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This is technically wrong (as pi has an uppercase) but our current implementation
+only constant props things within the 0 - 128 range due to the tolower/toupper methods
+currently being used. If this ever changes to be a true all-character case change,
+just modify the test.
