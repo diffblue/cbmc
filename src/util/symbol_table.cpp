@@ -93,10 +93,10 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
   const symbolt &symbol=entry->second;
 
-  symbol_base_mapt::const_iterator
-    base_it=symbol_base_map.lower_bound(entry->second.base_name);
-  symbol_base_mapt::const_iterator
-    base_it_end=symbol_base_map.upper_bound(entry->second.base_name);
+  symbol_base_mapt::const_iterator base_it =
+    symbol_base_map.lower_bound(symbol.base_name);
+  symbol_base_mapt::const_iterator base_it_end =
+    symbol_base_map.upper_bound(symbol.base_name);
   while(base_it!=base_it_end && base_it->second!=symbol.name)
     ++base_it;
   INVARIANT(
@@ -107,14 +107,14 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
     "current base_name: "+id2string(symbol.base_name)+")");
   internal_symbol_base_map.erase(base_it);
 
-  if(!entry->second.module.empty())
+  if(!symbol.module.empty())
   {
     symbol_module_mapt::const_iterator module_it =
                                          symbol_module_map.lower_bound(
-                                           entry->second.module),
+                                           symbol.module),
                                        module_it_end =
                                          symbol_module_map.upper_bound(
-                                           entry->second.module);
+                                           symbol.module);
     while(module_it != module_it_end && module_it->second != symbol.name)
       ++module_it;
     INVARIANT(
