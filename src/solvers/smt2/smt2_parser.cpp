@@ -130,16 +130,6 @@ exprt::operandst smt2_parsert::operands()
 
 irep_idt smt2_parsert::add_fresh_id(const irep_idt &id, const exprt &expr)
 {
-  if(id_map
-       .emplace(
-         std::piecewise_construct,
-         std::forward_as_tuple(id),
-         std::forward_as_tuple(expr))
-       .second)
-  {
-    return id; // id not yet used
-  }
-
   auto &count=renaming_counters[id];
   irep_idt new_id;
   do
@@ -157,6 +147,20 @@ irep_idt smt2_parsert::add_fresh_id(const irep_idt &id, const exprt &expr)
   renaming_map[id] = new_id;
 
   return new_id;
+}
+
+void smt2_parsert::add_unique_id(const irep_idt &id, const exprt &expr)
+{
+  if(!id_map
+        .emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(id),
+          std::forward_as_tuple(expr))
+        .second)
+  {
+    // id already used
+    throw error() << "identifier '" << id << "' defined twice";
+  }
 }
 
 irep_idt smt2_parsert::rename_id(const irep_idt &id) const
@@ -261,12 +265,16 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error("expected ')' at end of bindings");
 
-  // go forwards, add to id_map
-  for(const auto &b : bindings)
+  // save the renaming map
+  renaming_mapt old_renaming_map = renaming_map;
+
+  // go forwards, add to id_map, renaming if need be
+  for(auto &b : bindings)
   {
     const irep_idt id =
       add_fresh_id(b.get_identifier(), exprt(ID_nil, b.type()));
-    CHECK_RETURN(id == b.get_identifier());
+
+    b.set_identifier(id);
   }
 
   exprt expr=expression();
@@ -279,6 +287,9 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   // remove bindings from id_map
   for(const auto &b : bindings)
     id_map.erase(b.get_identifier());
+
+  // restore renaming map
+  renaming_map = old_renaming_map;
 
   // go backwards, build quantified expression
   for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
@@ -1244,8 +1255,7 @@ void smt2_parsert::setup_commands()
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = sort();
 
-    if(add_fresh_id(id, exprt(ID_nil, type)) != id)
-      throw error() << "identifier '" << id << "' defined twice";
+    add_unique_id(id, exprt(ID_nil, type));
   };
 
   // declare-var appears to be a synonym for declare-const that is
@@ -1259,8 +1269,7 @@ void smt2_parsert::setup_commands()
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = function_signature_declaration();
 
-    if(add_fresh_id(id, exprt(ID_nil, type)) != id)
-      throw error() << "identifier '" << id << "' defined twice";
+    add_unique_id(id, exprt(ID_nil, type));
   };
 
   commands["define-const"] = [this]() {
@@ -1281,8 +1290,7 @@ void smt2_parsert::setup_commands()
     }
 
     // create the entry
-    if(add_fresh_id(id, value) != id)
-      throw error() << "identifier '" << id << "' defined twice";
+    add_unique_id(id, value);
   };
 
   commands["define-fun"] = [this]() {
@@ -1319,8 +1327,7 @@ void smt2_parsert::setup_commands()
     }
 
     // create the entry
-    if(add_fresh_id(id, body) != id)
-      throw error() << "identifier '" << id << "' defined twice";
+    add_unique_id(id, body);
 
     id_map.at(id).type = signature.type;
     id_map.at(id).parameters = signature.parameters;
