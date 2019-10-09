@@ -1125,7 +1125,8 @@ void java_bytecode_languaget::convert_lazy_method(
   lazy_class_to_declared_symbols_mapt class_to_declared_symbols;
   convert_single_method(function_id, symbol_table, class_to_declared_symbols);
 
-  // Instrument runtime exceptions (unless symbol is a stub)
+  // Instrument runtime exceptions (unless symbol is a stub or is the
+  // INITIALISE_FUNCTION).
   if(symbol.value.is_not_nil() && function_id != INITIALIZE_FUNCTION)
   {
     java_bytecode_instrument_symbol(
