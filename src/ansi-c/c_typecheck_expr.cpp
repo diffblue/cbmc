@@ -1038,10 +1038,10 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     op.swap(comma_expr);
   }
 
-  const typet expr_type=follow(expr.type());
+  const typet expr_type = expr.type();
 
   if(
-    expr_type.id() == ID_union && expr_type != op.type() &&
+    expr_type.id() == ID_union_tag && expr_type != op.type() &&
     op.id() != ID_initializer_list)
   {
     // This is a GCC extension. It's either a 'temporary union',
@@ -1054,7 +1054,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       op = typecast_exprt(op, signed_int_type());
 
     // we need to find a member with the right type
-    for(const auto &c : to_union_type(expr_type).components())
+    const auto &union_type = follow_tag(to_union_tag_type(expr_type));
+    for(const auto &c : union_type.components())
     {
       if(c.type() == op.type())
       {
