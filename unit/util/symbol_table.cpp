@@ -59,8 +59,6 @@ SCENARIO(
           symbol_table.validate(validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
-      // Reset symbol to a valid name after the previous test
-      transformed_symbol.name = symbol_name;
     }
     WHEN(
       "A symbol base_name is transformed without updating the base_name "
@@ -76,8 +74,6 @@ SCENARIO(
           symbol_table.validate(validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
-      // Reset symbol to a valid base_name after the previous test
-      transformed_symbol.base_name = "TestBase";
     }
     WHEN(
       "A symbol module identifier is transformed without updating the module "
@@ -92,8 +88,58 @@ SCENARIO(
           symbol_table.validate(validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
-      // Reset symbol to a valid module name
-      transformed_symbol.module = "TestModule";
+    }
+  }
+}
+
+SCENARIO(
+  "symbol_table_symbol_module_map",
+  "[core][utils][symbol_table_symbol_module_map]")
+{
+  GIVEN("A valid symbol table")
+  {
+    symbol_tablet symbol_table;
+    WHEN("Inserting a symbol with non-empty module")
+    {
+      symbolt symbol;
+      symbol.name = "TestName";
+      symbol.module = "TestModule";
+      symbol_table.insert(std::move(symbol));
+      THEN("The symbol module map contains an entry for the symbol")
+      {
+        REQUIRE(symbol_table.symbol_module_map.size() == 1);
+        const auto entry = symbol_table.symbol_module_map.begin();
+        REQUIRE(id2string(entry->first) == "TestModule");
+        REQUIRE(id2string(entry->second) == "TestName");
+      }
+      WHEN("Removing the symbol again")
+      {
+        symbol_table.remove("TestName");
+        THEN("The symbol module map no longer contains an entry for the symbol")
+        {
+          REQUIRE(symbol_table.symbol_module_map.size() == 0);
+        }
+      }
+    }
+    WHEN("Inserting a symbol with empty module")
+    {
+      symbolt symbol;
+      symbol.name = "TestName";
+      symbol_table.insert(std::move(symbol));
+      THEN("The symbol module map does not contain an entry for the symbol")
+      {
+        REQUIRE(symbol_table.symbol_module_map.size() == 0);
+      }
+      WHEN("Removing the symbol again")
+      {
+        symbol_table.remove("TestName");
+        THEN(
+          "The symbol module map still does not contain an entry for the "
+          "symbol")
+        {
+          REQUIRE(symbol_table.symbol_module_map.size() == 0);
+        }
+      }
     }
   }
 }
