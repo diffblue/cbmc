@@ -241,6 +241,11 @@ void goto_symext::symex_function_call_code(
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(goto_function.body);
 
+  auto emplace_sese_regions_result =
+    path_storage.sese_region_analysis.emplace(identifier, sese_region_analysist{});
+  if(emplace_sese_regions_result.second)
+    emplace_sese_regions_result.first->second(goto_function.body);
+
   const bool stop_recursing = get_unwind_recursion(
     identifier,
     state.source.thread_nr,

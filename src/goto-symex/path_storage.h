@@ -12,6 +12,7 @@
 
 #include <analyses/dirty.h>
 #include <analyses/local_safe_pointers.h>
+#include <analyses/sese_regions.h>
 
 #include <memory>
 
@@ -114,6 +115,8 @@ public:
   /// Local variables are considered 'dirty' if they've had an address taken and
   /// therefore may be referred to by a pointer.
   incremental_dirtyt dirty;
+
+  std::unordered_map<irep_idt, sese_region_analysist> sese_region_analysis;
 
 private:
   // Derived classes should override these methods, allowing the base class to
