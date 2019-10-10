@@ -208,21 +208,18 @@ exprt smt2_parsert::let_expression()
     b.first = add_fresh_id(b.first, b.second);
   }
 
-  exprt expr=expression();
+  exprt where = expression();
 
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error("expected ')' after let");
 
-  exprt result=expr;
+  binding_exprt::variablest variables;
+  exprt::operandst values;
 
-  // go backwards, build let_expr
-  for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
+  for(const auto &b : bindings)
   {
-    const let_exprt let(
-      symbol_exprt(r_it->first, r_it->second.type()),
-      r_it->second,
-      result);
-    result=let;
+    variables.push_back(symbol_exprt(b.first, b.second.type()));
+    values.push_back(b.second);
   }
 
   // we keep these in the id_map in order to retain globally
@@ -231,7 +228,7 @@ exprt smt2_parsert::let_expression()
   // restore renamings
   renaming_map=old_renaming_map;
 
-  return result;
+  return let_exprt(variables, values, where);
 }
 
 exprt smt2_parsert::quantifier_expression(irep_idt id)
