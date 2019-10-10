@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/range.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string2int.h>
@@ -1855,11 +1856,28 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_let)
   {
     const let_exprt &let_expr=to_let_expr(expr);
-    out << "(let ((";
-    convert_expr(let_expr.symbol());
-    out << ' ';
-    convert_expr(let_expr.value());
-    out << ")) ";
+    const auto &variables = let_expr.variables();
+    const auto &values = let_expr.values();
+
+    out << "(let (";
+    bool first = true;
+
+    for(auto &binding : make_range(variables).zip(values))
+    {
+      if(first)
+        first = false;
+      else
+        out << ' ';
+
+      out << '(';
+      convert_expr(binding.first);
+      out << ' ';
+      convert_expr(binding.second);
+      out << ')';
+    }
+
+    out << ") "; // bindings
+
     convert_expr(let_expr.where());
     out << ')'; // let
   }
