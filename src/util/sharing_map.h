@@ -55,10 +55,15 @@ Author: Daniel Poetzl
     typename equalT> \
   type sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>
 
-#define SHARING_MAPTV(R, V) \
-  template <class keyT, class valueT, class hashT, class predT> \
+#define SHARING_MAPTV(return_type, V) \
+  template < \
+    typename keyT, \
+    typename valueT, \
+    bool fail_if_equal, \
+    typename hashT, \
+    typename equalT> \
   template <class V> \
-  R sharing_mapt<keyT, valueT, hashT, predT>
+  return_type sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>
 
 /// Macro to abbreviate the out-of-class definitions of methods of sharing_mapt
 /// with a return type that is defined within the class.
