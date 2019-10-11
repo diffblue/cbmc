@@ -62,10 +62,7 @@ public:
   }
 
   constant_interval_exprt()
-    : constant_interval_exprt(
-        min_exprt(nil_typet()),
-        max_exprt(nil_typet()),
-        nil_typet())
+    : constant_interval_exprt(min_exprt(typet()), max_exprt(typet()), typet())
   {
   }
 
