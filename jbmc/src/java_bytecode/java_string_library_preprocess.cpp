@@ -1711,6 +1711,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuilder.append:(Ljava/lang/String;)"
      "Ljava/lang/StringBuilder;"] = ID_cprover_string_concat_func;
   cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuilder.append:(Ljava/lang/StringBuffer;)"
+     "Ljava/lang/StringBuilder;"] = ID_cprover_string_concat_func;
+  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.appendCodePoint:(I)"
      "Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_code_point_func;
