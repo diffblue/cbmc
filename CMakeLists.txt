@@ -36,6 +36,8 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     if(GIT_FOUND)
         get_filename_component(git_root ${GIT_EXECUTABLE} DIRECTORY)
         set(ENV{PATH} "${git_root}\\..\\usr\\bin;$ENV{PATH}")
+    else()
+        message(FATAL_ERROR "Git not found. Git bash is required to configure the build.")
     endif()
 endif()
 
