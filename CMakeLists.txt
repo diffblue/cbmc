@@ -28,8 +28,15 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
     #   Enable lots of warnings
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wswitch-enum")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    #   This would be the place to enable warnings for Windows builds, although
-    #   config.inc doesn't seem to do that currently
+    # This would be the place to enable warnings for Windows builds, although
+    # config.inc doesn't seem to do that currently
+
+    # Include Git Bash Environment (rqeuired for download_project (patch))
+    find_package(Git)
+    if(GIT_FOUND)
+        get_filename_component(git_root ${GIT_EXECUTABLE} DIRECTORY)
+        set(ENV{PATH} "${git_root}\\..\\usr\\bin;$ENV{PATH}")
+    endif()
 endif()
 
 set(enable_cbmc_tests on CACHE BOOL "Whether CBMC tests should be enabled")
