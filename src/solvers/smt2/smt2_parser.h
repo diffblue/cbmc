@@ -35,10 +35,14 @@ public:
 
   struct idt
   {
-    explicit idt(const exprt &expr) : type(expr.type()), definition(expr)
+    using kindt = enum { VARIABLE, BINDING, PARAMETER };
+
+    idt(kindt _kind, const exprt &expr)
+      : kind(_kind), type(expr.type()), definition(expr)
     {
     }
 
+    kindt kind;
     typet type;
     exprt definition;
     std::vector<irep_idt> parameters;
@@ -89,7 +93,7 @@ protected:
   renaming_mapt renaming_map;
   using renaming_counterst=std::map<irep_idt, unsigned>;
   renaming_counterst renaming_counters;
-  irep_idt add_fresh_id(const irep_idt &, const exprt &);
+  irep_idt add_fresh_id(const irep_idt &, idt::kindt, const exprt &);
   void add_unique_id(const irep_idt &, const exprt &);
   irep_idt rename_id(const irep_idt &) const;
 
