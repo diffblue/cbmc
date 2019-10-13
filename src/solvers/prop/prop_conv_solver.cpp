@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "prop_conv_solver.h"
 
+#include <util/range.h>
+
 #include <algorithm>
 
 bool prop_conv_solvert::is_in_conflict(const exprt &expr) const
@@ -308,23 +310,35 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   else if(expr.id() == ID_let)
   {
     const let_exprt &let_expr = to_let_expr(expr);
+    const auto &variables = let_expr.variables();
+    const auto &values = let_expr.values();
 
     // first check whether this is all boolean
-    if(
-      let_expr.value().type().id() == ID_bool &&
-      let_expr.where().type().id() == ID_bool)
-    {
-      literalt value = convert(let_expr.value());
+    const bool all_boolean =
+      let_expr.where().type().id() == ID_bool &&
+      std::all_of(values.begin(), values.end(), [](const exprt &e) {
+        return e.type().id() == ID_bool;
+      });
 
-      // We expect the identifier of the bound symbols to be unique,
-      // and thus, these can go straight into the symbol map.
-      // This property also allows us to cache any subexpressions.
-      const irep_idt &id = let_expr.symbol().get_identifier();
-      symbols[id] = value;
+    if(all_boolean)
+    {
+      for(auto &binding : make_range(variables).zip(values))
+      {
+        literalt value_converted = convert(binding.second);
+
+        // We expect the identifier of the bound symbols to be unique,
+        // and thus, these can go straight into the symbol map.
+        // This property also allows us to cache any subexpressions.
+        const irep_idt &id = binding.first.get_identifier();
+        symbols[id] = value_converted;
+      }
+
       literalt result = convert(let_expr.where());
 
       // remove again
-      symbols.erase(id);
+      for(auto &variable : variables)
+        symbols.erase(variable.get_identifier());
+
       return result;
     }
   }
