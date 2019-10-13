@@ -90,6 +90,7 @@ protected:
   using renaming_counterst=std::map<irep_idt, unsigned>;
   renaming_counterst renaming_counters;
   irep_idt add_fresh_id(const irep_idt &, const exprt &);
+  void add_unique_id(const irep_idt &, const exprt &);
   irep_idt rename_id(const irep_idt &) const;
 
   struct signature_with_parameter_idst
