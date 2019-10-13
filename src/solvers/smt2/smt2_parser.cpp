@@ -754,7 +754,20 @@ exprt smt2_parsert::expression()
         symbol_exprt symbol_expr(final_id, id_it->second.type);
         if(smt2_tokenizer.token_is_quoted_symbol())
           symbol_expr.set(ID_C_quoted, true);
-        return std::move(symbol_expr);
+
+        // nullary function?
+        if(symbol_expr.type().id() == ID_mathematical_function)
+        {
+          const auto &f_type =
+            to_mathematical_function_type(symbol_expr.type());
+
+          if(f_type.domain().empty())
+            return function_application_exprt(std::move(symbol_expr), {});
+          else // leave as is
+            return std::move(symbol_expr);
+        }
+        else
+          return std::move(symbol_expr);
       }
 
       // don't know, give up
