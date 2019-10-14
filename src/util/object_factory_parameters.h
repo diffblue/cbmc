@@ -17,9 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/magic.h>
 #include <util/optional.h>
 
-#include "integer_interval.h"
-#include "mp_arith.h"
-
 class cmdlinet;
 class optionst;
 

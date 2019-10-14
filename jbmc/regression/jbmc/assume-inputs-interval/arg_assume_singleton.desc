@@ -1,0 +1,24 @@
+CORE symex-driven-lazy-loading-expected-failure
+My.class
+--function My.intervalUnion --java-assume-inputs-interval [3:3] --property "java::My.intervalUnion:(I)V.assertion.1" --property "java::My.intervalUnion:(I)V.assertion.2" --property "java::My.intervalUnion:(I)V.assertion.3" --property "java::My.intervalUnion:(I)V.assertion.4" --property "java::My.intervalUnion:(I)V.assertion.6"
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^Generated 0 VCC\(s\), 0 remaining after simplification$
+\[java::My\.intervalUnion:\(I\)V\.assertion\.1\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.2\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.3\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.4\].[^$]*SUCCESS
+\[java::My\.intervalUnion:\(I\)V\.assertion\.6\].[^$]*SUCCESS
+--
+^warning: ignoring
+--
+Check when --java-assume-inputs-interval specifies a singleton, constant
+propagation can take place.
+We use --show-vcc and check that no condition was generated meaning everything
+was resolved during symbolic execution.
+Note that we exclude assertion 5 from the properties checked, because since it
+can be violated VCC will still get generated so that we could get a trace which
+falsifies the assertion.
+This is marked as failing for symex-driven-lazy-loading because this option is
+incompatible with the `--property` option.
