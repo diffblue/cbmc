@@ -128,7 +128,10 @@ exprt::operandst smt2_parsert::operands()
   return result;
 }
 
-irep_idt smt2_parsert::add_fresh_id(const irep_idt &id, const exprt &expr)
+irep_idt smt2_parsert::add_fresh_id(
+  const irep_idt &id,
+  idt::kindt kind,
+  const exprt &expr)
 {
   auto &count=renaming_counters[id];
   irep_idt new_id;
@@ -140,7 +143,7 @@ irep_idt smt2_parsert::add_fresh_id(const irep_idt &id, const exprt &expr)
              .emplace(
                std::piecewise_construct,
                std::forward_as_tuple(new_id),
-               std::forward_as_tuple(expr))
+               std::forward_as_tuple(kind, expr))
              .second);
 
   // record renaming
@@ -155,7 +158,7 @@ void smt2_parsert::add_unique_id(const irep_idt &id, const exprt &expr)
         .emplace(
           std::piecewise_construct,
           std::forward_as_tuple(id),
-          std::forward_as_tuple(expr))
+          std::forward_as_tuple(idt::VARIABLE, expr))
         .second)
   {
     // id already used
@@ -209,7 +212,7 @@ exprt smt2_parsert::let_expression()
   for(auto &b : bindings)
   {
     // get a fresh id for it
-    b.first = add_fresh_id(b.first, b.second);
+    b.first = add_fresh_id(b.first, idt::BINDING, b.second);
   }
 
   exprt where = expression();
@@ -269,7 +272,7 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   for(auto &b : bindings)
   {
     const irep_idt id =
-      add_fresh_id(b.get_identifier(), exprt(ID_nil, b.type()));
+      add_fresh_id(b.get_identifier(), idt::BINDING, exprt(ID_nil, b.type()));
 
     b.set_identifier(id);
   }
@@ -1181,7 +1184,8 @@ smt2_parsert::function_signature_definition()
     irep_idt id = smt2_tokenizer.get_buffer();
     domain.push_back(sort());
 
-    parameters.push_back(add_fresh_id(id, exprt(ID_nil, domain.back())));
+    parameters.push_back(
+      add_fresh_id(id, idt::PARAMETER, exprt(ID_nil, domain.back())));
 
     if(next_token() != smt2_tokenizert::CLOSE)
       throw error("expected ')' at end of parameter");
