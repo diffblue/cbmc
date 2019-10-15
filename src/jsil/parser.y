@@ -114,7 +114,6 @@ extern char *yyjsiltext;
 
 %start program
 
-%error-verbose
 %expect 0
 
 %%
