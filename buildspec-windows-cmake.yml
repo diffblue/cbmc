@@ -1,0 +1,34 @@
+version: 0.2
+
+env:
+  variables:
+    # CodeBuild console doesn't display color codes correctly
+    TESTPL_COLOR_OUTPUT: 0
+
+phases:
+  install:
+    commands:
+      - choco install -y --no-progress cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+      - choco install -y --no-progress winflexbison3 ninja
+      - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+
+  build:
+    commands:
+      - |
+        refreshenv
+        $Env:CLCACHE_DIR = "C:\clcache"
+        $Env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
+        $Env:PATH = "C:\Program Files\CMake\bin;$Env:PATH"
+        $Env:PATH = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$Env:PATH"
+        & .\scripts\vcvars64.ps1
+        git submodule update --init --recursive
+        cmake "-H." -Bbuild -G Ninja "-DCMAKE_C_COMPILER=clcache.exe" "-DCMAKE_CXX_COMPILER=clcache.exe" -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release --target cbmc
+        cmake --build build --config Release --target jbmc
+        cmake --build build --config Release --target unit
+        # display cache stats
+        clcache -s
+
+cache:
+  paths:
+    - 'c:\clcache\**\*'
