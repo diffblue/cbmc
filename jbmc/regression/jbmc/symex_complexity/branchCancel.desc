@@ -1,0 +1,19 @@
+CORE
+ComplexClass.class
+--function ComplexClass.branchCancel --symex-complexity-limit 1 --verbosity 9 --unwind 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^(\[symex-complexity\] Branch considered too complex|\[symex-complexity\] Loop operations considered too complex)
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This tests that we cancel out of a loop with huge unwind and low complexity limit.
+
+The basis here is that the undeterministic incrementor and list mean that symex can't
+work out statically what's going on, and so both pieces of unknowability cause the
+guard to grow. Once that guard has reached a certain number, it'll be killed via
+the complexity module.
+
+If this is broken it means that the heuristics used to generate a 'complexity'
+measure of code is broken and will need to be re-written. See complexity_limitert
+for the main block of code.

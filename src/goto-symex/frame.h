@@ -14,6 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "goto_state.h"
 #include "symex_target.h"
+#include <analyses/lexical_loops.h>
 
 /// Stack frames -- these are used for function calls and for exceptions
 struct framet
@@ -45,6 +46,27 @@ struct framet
     unsigned count = 0;
     bool is_recursion = false;
   };
+
+  class active_loop_infot
+  {
+  public:
+    explicit active_loop_infot(lexical_loopst::loopt &_loop) : loop(_loop)
+    {
+    }
+
+    /// Incremental counter on how many branches this loop has had killed.
+    std::size_t children_too_complex = 0;
+
+    /// Set of loop ID's that have been blacklisted.
+    std::vector<std::reference_wrapper<lexical_loopst::loopt>>
+      blacklisted_loops;
+
+    // Loop information.
+    lexical_loopst::loopt &loop;
+  };
+
+  std::shared_ptr<lexical_loopst> loops_info;
+  std::vector<active_loop_infot> active_loops;
 
   std::unordered_map<irep_idt, loop_infot> loop_iterations;
 

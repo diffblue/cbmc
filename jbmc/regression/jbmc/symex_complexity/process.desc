@@ -1,0 +1,18 @@
+CORE
+ComplexClass.class
+--function ComplexClass.process --symex-complexity-limit 2 --verbosity 9 --unwind 10 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^\[symex-complexity\] Branch considered too complex|\[symex-complexity\] Trying to enter blacklisted loop|\[symex-complexity\] Loop operations considered too complex$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This tests that the complexity limits apply correctly and that each level of them are detected correctly:
+
+Branch cancelling.
+Loop cancelling.
+Loop blacklisting.
+
+When these don't work this test may take some time to run (and then fail), which is hard to
+restrict because this is the problem this feature is meant to solve. If this test is running
+slowly, high chance something has gone wrong.

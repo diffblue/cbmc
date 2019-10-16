@@ -197,6 +197,19 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);
 
+  if(cmdline.isset("symex-complexity-limit"))
+  {
+    options.set_option(
+      "symex-complexity-limit", cmdline.get_value("symex-complexity-limit"));
+  }
+
+  if(cmdline.isset("symex-complexity-failed-child-loops-limit"))
+  {
+    options.set_option(
+      "symex-complexity-failed-child-loops-limit",
+      cmdline.get_value("symex-complexity-failed-child-loops-limit"));
+  }
+
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
 

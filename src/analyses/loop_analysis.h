@@ -13,47 +13,33 @@ Author: Diffblue Ltd
 #ifndef CPROVER_ANALYSES_LOOP_ANALYSIS_H
 #define CPROVER_ANALYSES_LOOP_ANALYSIS_H
 
-template <class P, class T>
+#include <memory>
+
+template <class T>
 class loop_analysist;
 
 /// A loop, specified as a set of instructions
-template <class P, class T>
+template <class T>
 class loop_templatet
 {
-  typedef loop_analysist<P, T> parent_analysist;
   typedef std::set<T> loop_instructionst;
   loop_instructionst loop_instructions;
 
-  friend loop_analysist<P, T>;
+  friend loop_analysist<T>;
 
 public:
-  explicit loop_templatet(parent_analysist &loop_analysis)
-    : loop_analysis(loop_analysis)
-  {
-  }
+  loop_templatet() = default;
 
   template <typename InstructionSet>
-  loop_templatet(parent_analysist &loop_analysis, InstructionSet &&instructions)
-    : loop_instructions(std::forward<InstructionSet>(instructions)),
-      loop_analysis(loop_analysis)
+  explicit loop_templatet(InstructionSet &&instructions)
+    : loop_instructions(std::forward<InstructionSet>(instructions))
   {
   }
 
   /// Returns true if \p instruction is in this loop
-  bool contains(const T instruction) const
+  bool virtual contains(const T instruction) const
   {
-    return loop_analysis.loop_contains(*this, instruction);
-  }
-
-  /// Get the \ref parent_analysist analysis this loop relates to
-  const parent_analysist &get_loop_analysis() const
-  {
-    return loop_analysis;
-  }
-  /// Get the \ref parent_analysist analysis this loop relates to
-  parent_analysist &get_loop_analysis()
-  {
-    return loop_analysis;
+    return !loop_instructions.empty() && loop_instructions.count(instruction);
   }
 
   // NOLINTNEXTLINE(readability/identifiers)
@@ -83,36 +69,25 @@ public:
     return loop_instructions.empty();
   }
 
-  /// Adds \p instruction to this loop. The caller must verify that the added
-  /// instruction does not alter loop structure; if it does they must discard
-  /// and recompute the related \ref parent_analysist instance.
+  /// Adds \p instruction to this loop.
   /// \return true if the instruction is new
   bool insert_instruction(const T instruction)
   {
     return loop_instructions.insert(instruction).second;
   }
-
-private:
-  parent_analysist &loop_analysis;
 };
 
-template <class P, class T>
+template <class T>
 class loop_analysist
 {
 public:
-  typedef loop_templatet<P, T> loopt;
+  typedef loop_templatet<T> loopt;
   // map loop headers to loops
   typedef std::map<T, loopt> loop_mapt;
 
   loop_mapt loop_map;
 
-  void output(std::ostream &) const;
-
-  /// Returns true if \p instruction is in \p loop
-  bool loop_contains(const loopt &loop, const T instruction) const
-  {
-    return loop.loop_instructions.count(instruction);
-  }
+  virtual void output(std::ostream &) const;
 
   /// Returns true if \p instruction is the header of any loop
   bool is_loop_header(const T instruction) const
@@ -121,20 +96,78 @@ public:
   }
 
   loop_analysist() = default;
+};
+
+template <typename T>
+class loop_with_parent_analysis_templatet : loop_templatet<T>
+{
+  typedef loop_analysist<T> parent_analysist;
+
+public:
+  explicit loop_with_parent_analysis_templatet(parent_analysist &loop_analysis)
+    : loop_analysis(loop_analysis)
+  {
+  }
+
+  template <typename InstructionSet>
+  explicit loop_with_parent_analysis_templatet(
+    parent_analysist &loop_analysis,
+    InstructionSet &&instructions)
+    : loop_templatet<T>(std::forward<InstructionSet>(instructions)),
+      loop_analysis(loop_analysis)
+  {
+  }
+
+  /// Returns true if \p instruction is in \p loop
+  bool loop_contains(
+    const typename loop_analysist<T>::loopt &loop,
+    const T instruction) const
+  {
+    return loop.loop_instructions.count(instruction);
+  }
+
+  /// Get the \ref parent_analysist analysis this loop relates to
+  const parent_analysist &get_loop_analysis() const
+  {
+    return loop_analysis;
+  }
+  /// Get the \ref parent_analysist analysis this loop relates to
+  parent_analysist &get_loop_analysis()
+  {
+    return loop_analysis;
+  }
+
+private:
+  parent_analysist &loop_analysis;
+};
+
+template <class T>
+class linked_loop_analysist : loop_analysist<T>
+{
+public:
+  linked_loop_analysist() = default;
+
+  /// Returns true if \p instruction is in \p loop
+  bool loop_contains(
+    const typename loop_analysist<T>::loopt &loop,
+    const T instruction) const
+  {
+    return loop.loop_instructions.count(instruction);
+  }
 
   // The loop structures stored in `loop_map` contain back-pointers to this
   // class, so we forbid copying or moving the analysis struct. If this becomes
   // necessary then either add a layer of indirection or update the loop_map
   // back-pointers on copy/move.
-  loop_analysist(const loop_analysist &) = delete;
-  loop_analysist(loop_analysist &&) = delete;
-  loop_analysist &operator=(const loop_analysist &) = delete;
-  loop_analysist &operator=(loop_analysist &&) = delete;
+  linked_loop_analysist(const linked_loop_analysist &) = delete;
+  linked_loop_analysist(linked_loop_analysist &&) = delete;
+  linked_loop_analysist &operator=(const linked_loop_analysist &) = delete;
+  linked_loop_analysist &operator=(linked_loop_analysist &&) = delete;
 };
 
 /// Print all natural loops that were found
-template <class P, class T>
-void loop_analysist<P, T>::output(std::ostream &out) const
+template <class T>
+void loop_analysist<T>::output(std::ostream &out) const
 {
   for(const auto &loop : loop_map)
   {

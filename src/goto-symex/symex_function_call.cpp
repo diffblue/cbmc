@@ -305,6 +305,14 @@ void goto_symext::symex_function_call_code(
   PRECONDITION(!state.call_stack().empty());
   framet &frame = state.call_stack().new_frame(state.source, state.guard);
 
+  // Only enable loop analysis when complexity is enabled.
+  if(symex_config.complexity_limits_active)
+  {
+    // Analyzes loops if required.
+    path_storage.add_function_loops(identifier, goto_function.body);
+    frame.loops_info = path_storage.get_loop_analysis(identifier);
+  }
+
   // preserve locality of local variables
   locality(identifier, state, path_storage, goto_function, ns);
 

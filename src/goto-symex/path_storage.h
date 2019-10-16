@@ -115,7 +115,28 @@ public:
   /// therefore may be referred to by a pointer.
   incremental_dirtyt dirty;
 
+  /// Generates a loop analysis for the instructions in goto_programt and
+  /// keys it against function ID.
+  void add_function_loops(const irep_idt &identifier, const goto_programt &body)
+  {
+    auto loop_iter = loop_analysis_map.find(identifier);
+    if(loop_iter == loop_analysis_map.end())
+    {
+      loop_analysis_map[identifier] =
+        std::make_shared<lexical_loopst>(lexical_loopst(body));
+    }
+  }
+
+  inline std::shared_ptr<lexical_loopst>
+  get_loop_analysis(const irep_idt &function_id)
+  {
+    return loop_analysis_map.at(function_id);
+  }
+
 private:
+  std::unordered_map<irep_idt, std::shared_ptr<lexical_loopst>>
+    loop_analysis_map;
+
   // Derived classes should override these methods, allowing the base class to
   // enforce preconditions.
   virtual patht &private_peek() = 0;
