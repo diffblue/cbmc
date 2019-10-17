@@ -10,7 +10,7 @@ phases:
     commands:
       - choco install cmake winflexbison3 -y --no-progress
       - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
-      - Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+        # - Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
   build:
     commands:
