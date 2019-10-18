@@ -18,6 +18,9 @@ public:
   {
     current_state.reachable = false;
   }
+  virtual ~symex_complexity_limit_exceeded_actiont()
+  {
+  }
 };
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_COMPLEXITY_LIMIT_EXCEEDED_ACTION_H
