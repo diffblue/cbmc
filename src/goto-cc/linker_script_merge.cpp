@@ -126,45 +126,58 @@ linker_script_merget::linker_script_merget(
       {replacement_predicatet(
          "address of array's first member",
          [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(expr.op0().op0());
+           return to_symbol_expr(
+             to_index_expr(to_address_of_expr(expr).object()).index());
          },
          [](const exprt &expr) {
            return expr.id() == ID_address_of &&
                   expr.type().id() == ID_pointer &&
 
-                  expr.op0().id() == ID_index &&
-                  expr.op0().type().id() == ID_unsignedbv &&
+                  to_address_of_expr(expr).object().id() == ID_index &&
+                  to_address_of_expr(expr).object().type().id() ==
+                    ID_unsignedbv &&
 
-                  expr.op0().op0().id() == ID_symbol &&
-                  expr.op0().op0().type().id() == ID_array &&
+                  to_index_expr(to_address_of_expr(expr).object())
+                      .array()
+                      .id() == ID_symbol &&
+                  to_index_expr(to_address_of_expr(expr).object())
+                      .array()
+                      .type()
+                      .id() == ID_array &&
 
-                  expr.op0().op1().id() == ID_constant &&
-                  expr.op0().op1().type().id() == ID_signedbv;
+                  to_index_expr(to_address_of_expr(expr).object())
+                      .index()
+                      .id() == ID_constant &&
+                  to_index_expr(to_address_of_expr(expr).object())
+                      .index()
+                      .type()
+                      .id() == ID_signedbv;
          }),
        replacement_predicatet(
          "address of array",
          [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(expr.op0());
+           return to_symbol_expr(to_address_of_expr(expr).object());
          },
          [](const exprt &expr) {
            return expr.id() == ID_address_of &&
                   expr.type().id() == ID_pointer &&
 
-                  expr.op0().id() == ID_symbol &&
-                  expr.op0().type().id() == ID_array;
+                  to_address_of_expr(expr).object().id() == ID_symbol &&
+                  to_address_of_expr(expr).object().type().id() == ID_array;
          }),
        replacement_predicatet(
          "address of struct",
          [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(expr.op0());
+           return to_symbol_expr(to_address_of_expr(expr).object());
          },
          [](const exprt &expr) {
            return expr.id() == ID_address_of &&
                   expr.type().id() == ID_pointer &&
 
-                  expr.op0().id() == ID_symbol &&
-                  (expr.op0().type().id() == ID_struct ||
-                   expr.op0().type().id() == ID_struct_tag);
+                  to_address_of_expr(expr).object().id() == ID_symbol &&
+                  (to_address_of_expr(expr).object().type().id() == ID_struct ||
+                   to_address_of_expr(expr).object().type().id() ==
+                     ID_struct_tag);
          }),
        replacement_predicatet(
          "array variable",
