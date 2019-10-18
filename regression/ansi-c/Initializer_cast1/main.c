@@ -27,6 +27,9 @@ int main()
   // struct
   s=(struct S){ 1, 2, 3, 4, 5, 6 };
 
+  // do it twice
+  s = (struct S)(struct S){1, 2, 3, 4, 5, 6};
+
   // union
   u=(union U)s;
 
