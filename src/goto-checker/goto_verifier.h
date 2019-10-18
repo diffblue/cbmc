@@ -40,6 +40,12 @@ public:
   /// Report results
   virtual void report() = 0;
 
+  /// Returns the assumptions
+  const assumptionst &get_assumptions()
+  {
+    return assumptions;
+  }
+
   /// Returns the properties
   const propertiest &get_properties()
   {
@@ -52,6 +58,7 @@ protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;
   messaget log;
+  assumptionst assumptions;
   propertiest properties;
 };
 

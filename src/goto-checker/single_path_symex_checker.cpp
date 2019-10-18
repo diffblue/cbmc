@@ -24,7 +24,7 @@ single_path_symex_checkert::single_path_symex_checkert(
 }
 
 incremental_goto_checkert::resultt single_path_symex_checkert::
-operator()(propertiest &properties)
+operator()(assumptionst &assumptions, propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
@@ -58,7 +58,7 @@ operator()(propertiest &properties)
 
     if(ready_to_decide)
     {
-      update_properties(properties, result.updated_properties, path.equation);
+      update_properties(assumptions, properties, result.updated_properties, path.equation);
 
       property_decider = util_make_unique<goto_symex_property_decidert>(
         options, ui_message_handler, path.equation, ns);

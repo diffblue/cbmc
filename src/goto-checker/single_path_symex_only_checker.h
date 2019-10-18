@@ -27,7 +27,7 @@ public:
     ui_message_handlert &ui_message_handler,
     abstract_goto_modelt &goto_model);
 
-  resultt operator()(propertiest &) override;
+  resultt operator()(assumptionst &, propertiest &) override;
 
   virtual ~single_path_symex_only_checkert() = default;
 
@@ -59,9 +59,10 @@ protected:
   /// Returns whether we should stop exploring paths
   virtual bool has_finished_exploration(const propertiest &);
 
-  /// Updates the \p properties from the \p equation and
+  /// Updates the \p assumptions and \p properties from the \p equation and
   /// adds their property IDs to \p updated_properties.
   virtual void update_properties(
+    assumptionst &assumptions,
     propertiest &properties,
     std::unordered_set<irep_idt> &updated_properties,
     const symex_target_equationt &equation);

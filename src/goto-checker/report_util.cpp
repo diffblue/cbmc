@@ -141,6 +141,19 @@ void report_error(ui_message_handlert &ui_message_handler)
   }
 }
 
+static void output_single_assumption_plain(
+  const assumption_infot &assumption_info,
+  messaget &log,
+  irep_idt current_file = irep_idt())
+{
+  const auto &l = assumption_info.pc->source_location;
+  if(l.get_file() != current_file)
+    log.result() << "file " << l.get_file() << ' ';
+  if(!l.get_line().empty())
+    log.result() << "line " << l.get_line() << ' ';
+  log.result() << assumption_info.description << messaget::eom;
+}
+
 static void output_single_property_plain(
   const irep_idt &property_id,
   const property_infot &property_info,
@@ -180,6 +193,35 @@ static void output_single_property_plain(
                << messaget::eom;
 }
 
+static std::vector<assumptionst::const_iterator>
+get_sorted_assumptions(const assumptionst &assumptions)
+{
+  std::vector<assumptionst::const_iterator> sorted_assumptions;
+  for(auto a_it = assumptions.begin(); a_it != assumptions.end(); a_it++)
+    sorted_assumptions.push_back(a_it);
+  // now determine an ordering for those goals:
+  // 1. alphabetical ordering of file name
+  // 2. numerical ordering of line number
+  // 3. alphabetical ordering description
+  std::sort(
+    sorted_assumptions.begin(),
+    sorted_assumptions.end(),
+    [](assumptionst::const_iterator pit1, assumptionst::const_iterator pit2) {
+      const auto &p1 = pit1->pc->source_location;
+      const auto &p2 = pit2->pc->source_location;
+      if(p1.get_file() != p2.get_file())
+        return id2string(p1.get_file()) < id2string(p2.get_file());
+      else if(!p1.get_line().empty() && !p2.get_line().empty())
+      {
+        return std::stoul(id2string(p1.get_line())) <
+               std::stoul(id2string(p2.get_line()));
+      }
+      else
+        return pit1->description < pit2->description;
+    });
+  return sorted_assumptions;
+}
+
 static std::vector<propertiest::const_iterator>
 get_sorted_properties(const propertiest &properties)
 {
@@ -209,15 +251,39 @@ get_sorted_properties(const propertiest &properties)
 
 static void output_properties_plain(
   const std::vector<propertiest::const_iterator> &sorted_properties,
+  const std::vector<assumptionst::const_iterator> &sorted_assumptions,
   messaget &log)
 {
   if(sorted_properties.empty())
     return;
 
-  log.result() << "\n** Results:" << messaget::eom;
   // now show in the order we have determined
   irep_idt previous_function;
   irep_idt current_file;
+
+  log.result() << "\n** Assumptions:" << messaget::eom;
+  for(const auto &a : sorted_assumptions)
+  {
+    const auto &l = a->pc->source_location;
+    if(l.get_function() != previous_function)
+    {
+      if(!previous_function.empty())
+        log.result() << '\n';
+      previous_function = l.get_function();
+      if(!previous_function.empty())
+      {
+        current_file = l.get_file();
+        if(!current_file.empty())
+          log.result() << current_file << ' ';
+        if(!l.get_function().empty())
+          log.result() << "function " << l.get_function();
+        log.result() << messaget::eom;
+      }
+    }
+    output_single_assumption_plain(*a, log, current_file);
+  }
+
+  log.result() << "\n** Results:" << messaget::eom;
   for(const auto &p : sorted_properties)
   {
     const auto &l = p->second.pc->source_location;
@@ -255,6 +321,7 @@ static void output_iterations(
 }
 
 void output_properties(
+  const assumptionst &assumptions,
   const propertiest &properties,
   std::size_t iterations,
   ui_message_handlert &ui_message_handler)
@@ -265,12 +332,16 @@ void output_properties(
   case ui_message_handlert::uit::PLAIN:
   {
     const auto sorted_properties = get_sorted_properties(properties);
-    output_properties_plain(sorted_properties, log);
+    const auto sorted_assumptions = get_sorted_assumptions(assumptions);
+    output_properties_plain(sorted_properties, sorted_assumptions, log);
     output_iterations(properties, iterations, log);
     break;
   }
   case ui_message_handlert::uit::XML_UI:
   {
+    for(const auto &assumption: assumptions)
+      log.result() << xml(assumption);
+
     for(const auto &property_pair : properties)
     {
       log.result() << xml(property_pair.first, property_pair.second);
@@ -279,6 +350,16 @@ void output_properties(
   }
   case ui_message_handlert::uit::JSON_UI:
   {
+    json_stream_objectt &json_assumptions =
+      ui_message_handler.get_json_stream().push_back_stream_object();
+    json_stream_arrayt &assumptions_array =
+      json_assumptions.push_back_stream_array("assumptions");
+    for(const auto &assumption : assumptions)
+    {
+      assumptions_array.push_back(
+        json(assumption));
+    }
+
     json_stream_objectt &json_result =
       ui_message_handler.get_json_stream().push_back_stream_object();
     json_stream_arrayt &result_array =
@@ -293,6 +374,7 @@ void output_properties(
 }
 
 void output_properties_with_traces(
+  const assumptionst &assumptions,
   const propertiest &properties,
   const goto_trace_storaget &traces,
   const trace_optionst &trace_options,
@@ -305,7 +387,8 @@ void output_properties_with_traces(
   case ui_message_handlert::uit::PLAIN:
   {
     const auto sorted_properties = get_sorted_properties(properties);
-    output_properties_plain(sorted_properties, log);
+    const auto sorted_assumptions = get_sorted_assumptions(assumptions);
+    output_properties_plain(sorted_properties, sorted_assumptions, log);
     for(const auto &property_it : sorted_properties)
     {
       if(property_it->second.status == property_statust::FAIL)
@@ -326,6 +409,9 @@ void output_properties_with_traces(
   }
   case ui_message_handlert::uit::XML_UI:
   {
+    for(const auto &assumption: assumptions)
+      log.result() << xml(assumption);
+
     for(const auto &property_pair : properties)
     {
       xmlt xml_result = xml(property_pair.first, property_pair.second);
@@ -342,6 +428,16 @@ void output_properties_with_traces(
   }
   case ui_message_handlert::uit::JSON_UI:
   {
+    json_stream_objectt &json_assumptions =
+      ui_message_handler.get_json_stream().push_back_stream_object();
+    json_stream_arrayt &assumptions_array =
+      json_assumptions.push_back_stream_array("assumptions");
+    for(const auto &assumption : assumptions)
+    {
+      assumptions_array.push_back(
+        json(assumption));
+    }
+
     json_stream_objectt &json_result =
       ui_message_handler.get_json_stream().push_back_stream_object();
     json_stream_arrayt &result_array =
@@ -482,6 +578,7 @@ static json_objectt json(const fault_location_infot &fault_location)
 }
 
 void output_properties_with_fault_localization(
+  const assumptionst &assumptions,
   const propertiest &properties,
   const std::unordered_map<irep_idt, fault_location_infot> &fault_locations,
   std::size_t iterations,
@@ -492,12 +589,22 @@ void output_properties_with_fault_localization(
   {
   case ui_message_handlert::uit::PLAIN:
   {
-    output_properties(properties, iterations, ui_message_handler);
+    output_properties(assumptions, properties, iterations, ui_message_handler);
     output_fault_localization_plain(fault_locations, log);
     break;
   }
   case ui_message_handlert::uit::JSON_UI:
   {
+    json_stream_objectt &json_assumptions =
+      ui_message_handler.get_json_stream().push_back_stream_object();
+    json_stream_arrayt &assumptions_array =
+      json_assumptions.push_back_stream_array("assumptions");
+    for(const auto &assumption : assumptions)
+    {
+      assumptions_array.push_back(
+        json(assumption));
+    }
+
     json_stream_objectt &json_result =
       ui_message_handler.get_json_stream().push_back_stream_object();
     json_stream_arrayt &result_array =
@@ -517,7 +624,7 @@ void output_properties_with_fault_localization(
   }
   case ui_message_handlert::uit::XML_UI:
   {
-    output_properties(properties, iterations, ui_message_handler);
+    output_properties(assumptions, properties, iterations, ui_message_handler);
     output_fault_localization_xml(fault_locations, log);
     break;
   }
@@ -525,6 +632,7 @@ void output_properties_with_fault_localization(
 }
 
 void output_properties_with_traces_and_fault_localization(
+  const assumptionst &assumptions,
   const propertiest &properties,
   const goto_trace_storaget &traces,
   const trace_optionst &trace_options,
@@ -538,12 +646,22 @@ void output_properties_with_traces_and_fault_localization(
   case ui_message_handlert::uit::PLAIN:
   {
     output_properties_with_traces(
-      properties, traces, trace_options, iterations, ui_message_handler);
+      assumptions, properties, traces, trace_options, iterations, ui_message_handler);
     output_fault_localization_plain(fault_locations, log);
     break;
   }
   case ui_message_handlert::uit::JSON_UI:
   {
+    json_stream_objectt &json_assumptions =
+      ui_message_handler.get_json_stream().push_back_stream_object();
+    json_stream_arrayt &assumptions_array =
+      json_assumptions.push_back_stream_array("assumptions");
+    for(const auto &assumption : assumptions)
+    {
+      assumptions_array.push_back(
+        json(assumption));
+    }
+
     json_stream_objectt &json_result =
       ui_message_handler.get_json_stream().push_back_stream_object();
     json_stream_arrayt &result_array =
@@ -571,7 +689,7 @@ void output_properties_with_traces_and_fault_localization(
   case ui_message_handlert::uit::XML_UI:
   {
     output_properties_with_traces(
-      properties, traces, trace_options, iterations, ui_message_handler);
+      assumptions, properties, traces, trace_options, iterations, ui_message_handler);
     output_fault_localization_xml(fault_locations, log);
     break;
   }

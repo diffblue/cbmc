@@ -28,7 +28,7 @@ multi_path_symex_checkert::multi_path_symex_checkert(
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::
-operator()(propertiest &properties)
+operator()(assumptionst &assumptions, propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
@@ -50,7 +50,7 @@ operator()(propertiest &properties)
       symex,
       ui_message_handler);
 
-    update_properties(properties, result.updated_properties);
+    update_properties(assumptions, properties, result.updated_properties);
 
     // Have we got anything to check? Otherwise we return DONE.
     if(!has_properties_to_check(properties))

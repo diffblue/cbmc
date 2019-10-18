@@ -61,6 +61,7 @@ public:
 
   /// Check whether the given properties with status NOT_CHECKED, UNKNOWN or
   /// properties newly discovered by `incremental_goto_checkert` hold.
+  /// \param [out] assumptions: Assumptions made while checking \p properties.
   /// \param [out] properties: Properties updated to whether their status
   ///   have been determined. Newly discovered properties are added.
   /// \return whether the goto checker found a violated property (FOUND_FAIL) or
@@ -75,7 +76,7 @@ public:
   /// that repeated calls to operator() shall return when the next FAILed
   /// property has been found until eventually it does not find any
   /// failing properties any more.
-  virtual resultt operator()(propertiest &properties) = 0;
+  virtual resultt operator()(assumptionst &assumptions, propertiest &properties) = 0;
 
 protected:
   incremental_goto_checkert(const optionst &, ui_message_handlert &);

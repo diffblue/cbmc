@@ -110,7 +110,7 @@ protected:
     unsigned thread_nr,
     unsigned unwind) override;
 
-  void no_body(const irep_idt &identifier) override;
+  void no_body(const symex_targett::sourcet &, const irep_idt &) override;
 
   std::unordered_set<irep_idt> body_warnings;
 

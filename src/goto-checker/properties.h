@@ -12,6 +12,8 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_PROPERTIES_H
 #define CPROVER_GOTO_CHECKER_PROPERTIES_H
 
+#include <list>
+#include <string>
 #include <unordered_map>
 
 #include <goto-programs/goto_model.h>
@@ -107,5 +109,34 @@ bool has_properties_to_check(const propertiest &properties);
 property_statust &operator|=(property_statust &, property_statust const &);
 property_statust &operator&=(property_statust &, property_statust const &);
 resultt determine_result(const propertiest &properties);
+
+/// Store information about assumptions made while performing verification.
+struct assumption_infot
+{
+  assumption_infot(
+    goto_programt::const_targett pc,
+    std::string description) :
+    pc(pc),
+    description(description)
+  {
+  }
+
+  /// A pointer to the corresponding goto instruction
+  goto_programt::const_targett pc;
+
+  /// A description (possibly derived from the assumption's comment)
+  std::string description;
+};
+
+/// A collection of assumptions
+typedef std::list<assumption_infot> assumptionst;
+
+std::string
+as_string(const assumption_infot &property_info);
+
+xmlt xml(const assumption_infot &property_info);
+
+json_objectt
+json(const assumption_infot &property_info);
 
 #endif // CPROVER_GOTO_CHECKER_PROPERTIES_H
