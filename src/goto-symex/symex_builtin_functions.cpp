@@ -546,38 +546,6 @@ void goto_symext::symex_cpp_delete(
   #endif
 }
 
-void goto_symext::symex_trace(
-  statet &state,
-  const code_function_callt &code)
-{
-  PRECONDITION(code.arguments().size() >= 2);
-
-  mp_integer debug_lvl;
-  optionalt<mp_integer> maybe_debug =
-    numeric_cast<mp_integer>(code.arguments()[0]);
-  DATA_INVARIANT(
-    maybe_debug.has_value(), "CBMC_trace expects constant as first argument");
-  debug_lvl = maybe_debug.value();
-
-  DATA_INVARIANT(
-    code.arguments()[1].id() == "implicit_address_of" &&
-      code.arguments()[1].operands().size() == 1 &&
-      code.arguments()[1].op0().id() == ID_string_constant,
-    "CBMC_trace expects string constant as second argument");
-
-  if(symex_config.debug_level >= debug_lvl)
-  {
-    std::list<renamedt<exprt, L2>> vars;
-
-    irep_idt event = to_string_constant(code.arguments()[1].op0()).get_value();
-
-    for(std::size_t j=2; j<code.arguments().size(); j++)
-      vars.push_back(state.rename(code.arguments()[j], ns));
-
-    target.output(state.guard.as_expr(), state.source, event, vars);
-  }
-}
-
 void goto_symext::symex_fkt(
   statet &,
   const code_function_callt &)
