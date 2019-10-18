@@ -27,6 +27,12 @@ class namespacet;
 class expr2ct
 {
 public:
+  expr2ct(
+    const expr2c_configurationt &configuration =
+      expr2c_configurationt::default_configuration)
+    : configuration(configuration), sizeof_nesting(0)
+  {
+  }
   explicit expr2ct(
     const namespacet &_ns,
     const expr2c_configurationt &configuration =
@@ -45,7 +51,7 @@ public:
   convert_with_identifier(const typet &src, const std::string &identifier);
 
 protected:
-  const namespacet &ns;
+  optionalt<std::reference_wrapper<const namespacet>> ns;
   const expr2c_configurationt &configuration;
 
   virtual std::string convert_rec(

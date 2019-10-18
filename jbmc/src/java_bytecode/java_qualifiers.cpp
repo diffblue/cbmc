@@ -15,7 +15,7 @@
 java_qualifierst &java_qualifierst::operator=(const java_qualifierst &other)
 {
   INVARIANT(
-    &other.ns == &ns,
+    (!other.ns && !ns) || (other.ns && ns && &other.ns->get() == &ns->get()),
     "Can only assign from a java_qualifierst using the same namespace");
   annotations = other.annotations;
   c_qualifierst::operator=(other);
@@ -24,7 +24,11 @@ java_qualifierst &java_qualifierst::operator=(const java_qualifierst &other)
 
 std::unique_ptr<qualifierst> java_qualifierst::clone() const
 {
-  auto other = util_make_unique<java_qualifierst>(ns);
+  std::unique_ptr<java_qualifierst> other;
+  if(ns)
+    other = util_make_unique<java_qualifierst>(*ns);
+  else
+    other = util_make_unique<java_qualifierst>();
   *other = *this;
   return std::move(other);
 }
@@ -112,7 +116,10 @@ std::string java_qualifierst::as_string() const
           out << ", ";
 
         out << '"' << value.get_name() << '"' << '=';
-        out << expr2java(value.get_value(), ns);
+        if(ns)
+          out << expr2java(value.get_value(), *ns);
+        else
+          out << expr2java(value.get_value());
       }
 
       out << ')';

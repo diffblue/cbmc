@@ -54,10 +54,13 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 
 void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  INVARIANT(
+    type.id() == ID_pointer, "Annotations must be pointers (to struct tags)");
+  INVARIANT(
+    type.subtype().id() == ID_struct_tag,
+    "Annotations must be pointers to struct tags");
 
-  out << '@' << type2java(type, ns);
+  out << '@' << type.subtype().get(ID_identifier);
 
   if(!element_value_pairs.empty())
   {
@@ -80,11 +83,7 @@ void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
 void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
   std::ostream &out) const
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
-  out << '"' << element_name << '"' << '=';
-  out << expr2java(value, ns);
+  out << '"' << element_name << '"' << '=' << expr2java(value);
 }
 
 /// Find an annotation given its name
@@ -115,9 +114,6 @@ java_bytecode_parse_treet::find_annotation(
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
   for(const auto &annotation : annotations)
   {
     out << "  ";
@@ -173,7 +169,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 #if 0
       out << ' ' << from_expr(arg);
 #else
-      out << ' ' << expr2java(arg, ns);
+      out << ' ' << expr2java(arg);
 #endif
     }
 

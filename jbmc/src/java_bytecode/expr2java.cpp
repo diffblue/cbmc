@@ -29,7 +29,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 std::string expr2javat::convert(const typet &src)
 {
-  return convert_rec(src, java_qualifierst(ns), "");
+  if(ns)
+    return convert_rec(src, java_qualifierst{*ns}, "");
+  else
+    return convert_rec(src, java_qualifierst{}, "");
 }
 
 std::string expr2javat::convert(const exprt &src)
@@ -110,7 +113,10 @@ std::string expr2javat::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
-  const typet &full_type=ns.follow(src.type());
+  if(!ns)
+    return convert_norep(src, precedence);
+
+  const typet &full_type = ns->get().follow(src.type());
 
   if(full_type.id()!=ID_struct)
     return convert_norep(src, precedence);
@@ -451,6 +457,13 @@ std::string expr2javat::convert_code(
     return convert_code_function_call(to_code_function_call(src), indent);
 
   return expr2ct::convert_code(src, indent);
+}
+
+std::string expr2java(const exprt &expr)
+{
+  expr2javat expr2java;
+  expr2java.get_shorthands(expr);
+  return expr2java.convert(expr);
 }
 
 std::string expr2java(const exprt &expr, const namespacet &ns)
