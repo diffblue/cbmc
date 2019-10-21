@@ -12,6 +12,7 @@ if(GIT_FOUND)
       COMMAND \"${GIT_EXECUTABLE}\" \"describe\" \"--tags\" \"--always\" \"--dirty\"
       OUTPUT_VARIABLE GIT_INFO
       OUTPUT_STRIP_TRAILING_WHITESPACE
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     configure_file(\${CUR}/version.cpp.in version.cpp)
     "
