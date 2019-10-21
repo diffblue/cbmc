@@ -97,8 +97,10 @@ protected:
     unsigned &precedence);
 
   std::string convert_binary(
-    const exprt &src, const std::string &symbol,
-    unsigned precedence, bool full_parentheses);
+    const binary_exprt &,
+    const std::string &symbol,
+    unsigned precedence,
+    bool full_parentheses);
 
   std::string convert_multi_ary(
     const exprt &src, const std::string &symbol,
@@ -149,13 +151,10 @@ protected:
   std::string
   convert_byte_extract(const byte_extract_exprt &, unsigned precedence);
 
-  std::string convert_byte_update(
-    const exprt &src,
-    unsigned precedence);
+  std::string
+  convert_byte_update(const byte_update_exprt &, unsigned precedence);
 
-  std::string convert_extractbit(
-    const exprt &src,
-    unsigned precedence);
+  std::string convert_extractbit(const extractbit_exprt &, unsigned precedence);
 
   std::string
   convert_extractbits(const extractbits_exprt &src, unsigned precedence);

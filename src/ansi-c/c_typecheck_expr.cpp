@@ -2672,10 +2672,11 @@ exprt c_typecheck_baset::do_special_functions(
     if(
       tmp1.id() == ID_typecast &&
       to_typecast_expr(tmp1).op().id() == ID_address_of &&
-      to_typecast_expr(tmp1).op().operands().size() == 1 &&
-      to_typecast_expr(tmp1).op().op0().id() == ID_index &&
-      to_typecast_expr(tmp1).op().op0().operands().size() == 2 &&
-      to_typecast_expr(tmp1).op().op0().op0().id() == ID_string_constant)
+      to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
+        ID_index &&
+      to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
+          .array()
+          .id() == ID_string_constant)
     {
       is_constant=true;
     }
