@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <iomanip>
 
-#include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/find_symbols.h>
 #include <util/invariant.h>
