@@ -74,10 +74,10 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   }
   else if(cpp_is_pod(symbol.type))
   {
-    if(symbol.type.id() == ID_pointer &&
-       symbol.type.subtype().id() == ID_code &&
-       symbol.value.id() == ID_address_of &&
-       symbol.value.op0().id() == ID_cpp_name)
+    if(
+      symbol.type.id() == ID_pointer && symbol.type.subtype().id() == ID_code &&
+      symbol.value.id() == ID_address_of &&
+      to_address_of_expr(symbol.value).object().id() == ID_cpp_name)
     {
       // initialization of a function pointer with
       // the address of a function: use pointer type information
@@ -102,9 +102,11 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         fargs.operands.push_back(new_object);
       }
 
-      exprt resolved_expr=resolve(
-        to_cpp_name(static_cast<irept &>(symbol.value.op0())),
-        cpp_typecheck_resolvet::wantt::BOTH, fargs);
+      exprt resolved_expr = resolve(
+        to_cpp_name(
+          static_cast<irept &>(to_address_of_expr(symbol.value).object())),
+        cpp_typecheck_resolvet::wantt::BOTH,
+        fargs);
 
       assert(symbol.type.subtype() == resolved_expr.type());
 
@@ -119,7 +121,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           address_of_exprt(
             lookup(resolved_expr.get(ID_component_name)).symbol_expr());
 
-        symbol.value.type().add(ID_to_member) = resolved_expr.op0().type();
+        symbol.value.type().add(ID_to_member) =
+          to_member_expr(resolved_expr).compound().type();
       }
       else
         UNREACHABLE;

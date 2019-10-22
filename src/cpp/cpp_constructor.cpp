@@ -235,8 +235,10 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
     assert(initializer.id()==ID_code &&
            initializer.get(ID_statement)==ID_expression);
 
-    side_effect_expr_function_callt &func_ini=
-      to_side_effect_expr_function_call(initializer.op0());
+    auto &statement_expr = to_code_expression(to_code(initializer));
+
+    side_effect_expr_function_callt &func_ini =
+      to_side_effect_expr_function_call(statement_expr.expression());
 
     exprt &tmp_this=func_ini.arguments().front();
     DATA_INVARIANT(

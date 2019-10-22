@@ -894,7 +894,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
           // simplify address
           if(expr.id()==ID_dereference)
-            address=expr.op0();
+            address = to_dereference_expr(expr).pointer();
 
           pointer_typet ptr_sub=pointer_type(type);
           c_qualifierst qual_from;
@@ -1333,10 +1333,11 @@ bool cpp_typecheckt::reference_binding(
            reference_compatible(returned_value, type, rank))
         {
           // returned values are lvalues in case of references only
-          assert(returned_value.id()==ID_dereference &&
-                 is_reference(returned_value.op0().type()));
+          DATA_INVARIANT(
+            is_reference(to_dereference_expr(returned_value).op().type()),
+            "the returned value must be pointer to reference");
 
-          new_expr=returned_value.op0();
+          new_expr = to_multi_ary_expr(returned_value).op0();
 
           if(returned_value.type() != type.subtype())
           {
@@ -1484,7 +1485,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     e.id() == ID_initializer_list && cpp_is_pod(type) &&
     e.operands().size() == 1)
   {
-    e = expr.op0();
+    e = to_unary_expr(expr).op();
   }
 
   if(!implicit_conversion_sequence(e, type, expr))
@@ -1696,7 +1697,7 @@ bool cpp_typecheckt::dynamic_typecast(
   if(type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
-      e=expr.op0();
+      e = to_dereference_expr(expr).pointer();
 
     if(e.type().id()==ID_pointer &&
        cast_away_constness(e.type(), type))
@@ -1749,7 +1750,7 @@ bool cpp_typecheckt::reinterpret_typecast(
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
-      e=expr.op0();
+      e = to_dereference_expr(expr).pointer();
 
     if(e.type().id()==ID_pointer &&
        cast_away_constness(e.type(), type))
@@ -1845,7 +1846,7 @@ bool cpp_typecheckt::static_typecast(
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
-      e=expr.op0();
+      e = to_dereference_expr(expr).pointer();
 
     if(e.type().id()==ID_pointer &&
        cast_away_constness(e.type(), type))
@@ -1884,8 +1885,8 @@ bool cpp_typecheckt::static_typecast(
       {
         if(e.id()==ID_dereference)
         {
-          make_ptr_typecast(e.op0(), type);
-          new_expr.swap(e.op0());
+          make_ptr_typecast(to_dereference_expr(e).pointer(), type);
+          new_expr.swap(to_dereference_expr(e).pointer());
           return true;
         }
 

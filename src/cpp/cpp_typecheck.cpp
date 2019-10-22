@@ -243,7 +243,7 @@ void cpp_typecheckt::do_not_typechecked()
         }
         else if(symbol.value.operands().size()==1)
         {
-          value = symbol.value.op0();
+          value = to_unary_expr(symbol.value).op();
           cont=true;
         }
         else

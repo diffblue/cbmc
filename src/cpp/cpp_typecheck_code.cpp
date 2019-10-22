@@ -55,22 +55,29 @@ void cpp_typecheckt::typecheck_code(codet &code)
     // as an extension, we support indexed access into signed/unsigned
     // bitvectors, typically used with __CPROVER::(un)signedbv<N>
     exprt &expr = code.op0();
-    if(
-      expr.operands().size() == 2 && expr.op0().id() == ID_index &&
-      expr.op0().operands().size() == 2)
-    {
-      exprt array = expr.op0().op0();
-      typecheck_expr(array);
 
-      if(array.type().id() == ID_signedbv || array.type().id() == ID_unsignedbv)
+    if(expr.operands().size() == 2)
+    {
+      auto &binary_expr = to_binary_expr(expr);
+
+      if(binary_expr.op0().id() == ID_index)
       {
-        shl_exprt shl{from_integer(1, array.type()), expr.op0().op1()};
-        exprt rhs =
-          if_exprt{equal_exprt{expr.op1(), from_integer(0, array.type())},
-                   bitand_exprt{array, bitnot_exprt{shl}},
-                   bitor_exprt{array, shl}};
-        expr.op0() = expr.op0().op0();
-        expr.op1() = rhs;
+        exprt array = to_index_expr(binary_expr.op0()).array();
+        typecheck_expr(array);
+
+        if(
+          array.type().id() == ID_signedbv ||
+          array.type().id() == ID_unsignedbv)
+        {
+          shl_exprt shl{from_integer(1, array.type()),
+                        to_index_expr(binary_expr.op0()).index()};
+          exprt rhs = if_exprt{
+            equal_exprt{binary_expr.op1(), from_integer(0, array.type())},
+            bitand_exprt{array, bitnot_exprt{shl}},
+            bitor_exprt{array, shl}};
+          binary_expr.op0() = to_index_expr(binary_expr.op0()).array();
+          binary_expr.op1() = rhs;
+        }
       }
     }
 
@@ -191,8 +198,7 @@ void cpp_typecheckt::typecheck_switch(codet &code)
     assert(decl.operands().size()==1);
 
     // replace declaration by its symbol
-    assert(decl.op0().op0().id()==ID_symbol);
-    value = decl.op0().op0();
+    value = to_code_decl(to_code(to_unary_expr(decl).op())).symbol();
 
     c_typecheck_baset::typecheck_switch(code);
 
@@ -287,11 +293,11 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     // a reference member
     if(
       symbol_expr.id() == ID_dereference &&
-      symbol_expr.op0().id() == ID_member &&
+      to_dereference_expr(symbol_expr).pointer().id() == ID_member &&
       symbol_expr.get_bool(ID_C_implicit))
     {
       // treat references as normal pointers
-      exprt tmp = symbol_expr.op0();
+      exprt tmp = to_dereference_expr(symbol_expr).pointer();
       symbol_expr.swap(tmp);
     }
 
@@ -316,18 +322,20 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
       if(
         symbol_expr.id() == ID_dereference &&
-        symbol_expr.op0().id() == ID_member &&
+        to_dereference_expr(symbol_expr).pointer().id() == ID_member &&
         symbol_expr.get_bool(ID_C_implicit))
       {
         // treat references as normal pointers
-        exprt tmp = symbol_expr.op0();
+        exprt tmp = to_dereference_expr(symbol_expr).pointer();
         symbol_expr.swap(tmp);
       }
     }
 
-    if(symbol_expr.id() == ID_member &&
-       symbol_expr.op0().id() == ID_dereference &&
-       symbol_expr.op0().op0() == cpp_scopes.current_scope().this_expr)
+    if(
+      symbol_expr.id() == ID_member &&
+      to_member_expr(symbol_expr).op().id() == ID_dereference &&
+      to_dereference_expr(to_member_expr(symbol_expr).op()).pointer() ==
+        cpp_scopes.current_scope().this_expr)
     {
       if(is_reference(symbol_expr.type()))
       {
