@@ -15,7 +15,6 @@ Author: Daniel Poetzl
 
 #include <goto-programs/remove_returns.h>
 
-#include <util/base_type.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/irep.h>
@@ -94,7 +93,7 @@ void replace_callst::operator()(
     auto f_it2 = goto_functions.function_map.find(new_id);
     PRECONDITION(f_it2 != goto_functions.function_map.end());
 
-    PRECONDITION(base_type_eq(f_it1->second.type, f_it2->second.type, ns));
+    PRECONDITION(f_it1->second.type == f_it2->second.type);
 
     // check that returns have not been removed
     if(to_code_type(f_it1->second.type).return_type().id() != ID_empty)
@@ -167,7 +166,7 @@ void replace_callst::check_replacement_map(
     auto it1 = goto_functions.function_map.find(p.first);
     if(it1 != goto_functions.function_map.end())
     {
-      if(!base_type_eq(it1->second.type, it2->second.type, ns))
+      if(it1->second.type != it2->second.type)
         throw invalid_command_line_argument_exceptiont(
           "functions " + id2string(p.first) + " and " + id2string(p.second) +
             " are not type-compatible",

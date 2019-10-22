@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <deque>
 #include <unordered_set>
 
-#include <util/base_type.h>
 #include <util/find_symbols.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
@@ -140,8 +139,7 @@ void linkingt::detailed_conflict_report_rec(
   else if(t1.id()==ID_pointer ||
           t1.id()==ID_array)
   {
-    if(depth>0 &&
-       !base_type_eq(t1.subtype(), t2.subtype(), ns))
+    if(depth > 0 && t1.subtype() != t2.subtype())
     {
       if(conflict_path.type().id() == ID_pointer)
         conflict_path = dereference_exprt(conflict_path);
@@ -190,7 +188,7 @@ void linkingt::detailed_conflict_report_rec(
           msg+=id2string(components2[i].get_name())+')';
           break;
         }
-        else if(!base_type_eq(subtype1, subtype2, ns))
+        else if(subtype1 != subtype2)
         {
           typedef std::unordered_set<typet, irep_hash> type_sett;
           type_sett parent_types;
@@ -307,7 +305,7 @@ void linkingt::detailed_conflict_report_rec(
       msg+=std::to_string(parameters1.size())+'/';
       msg+=std::to_string(parameters2.size())+')';
     }
-    else if(!base_type_eq(return_type1, return_type2, ns))
+    else if(return_type1 != return_type2)
     {
       conflict_path=
         index_exprt(conflict_path,
@@ -331,7 +329,7 @@ void linkingt::detailed_conflict_report_rec(
         const typet &subtype1=parameters1[i].type();
         const typet &subtype2=parameters2[i].type();
 
-        if(!base_type_eq(subtype1, subtype2, ns))
+        if(subtype1 != subtype2)
         {
           conflict_path=
             index_exprt(conflict_path,
@@ -450,7 +448,7 @@ void linkingt::duplicate_code_symbol(
   symbolt &new_symbol)
 {
   // Both are functions.
-  if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
+  if(old_symbol.type != new_symbol.type)
   {
     const code_typet &old_t=to_code_type(old_symbol.type);
     const code_typet &new_t=to_code_type(new_symbol.type);
@@ -461,11 +459,8 @@ void linkingt::duplicate_code_symbol(
     // casts we need to fail hard
     if(old_symbol.type.get_bool(ID_C_incomplete) && old_symbol.value.is_nil())
     {
-      if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
-         link_warning(
-           old_symbol,
-           new_symbol,
-           "implicit function declaration");
+      if(old_t.return_type() == new_t.return_type())
+        link_warning(old_symbol, new_symbol, "implicit function declaration");
       else
         link_error(
           old_symbol,
@@ -479,7 +474,7 @@ void linkingt::duplicate_code_symbol(
     else if(
       new_symbol.type.get_bool(ID_C_incomplete) && new_symbol.value.is_nil())
     {
-      if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+      if(old_t.return_type() == new_t.return_type())
         link_warning(
           old_symbol,
           new_symbol,
@@ -491,13 +486,12 @@ void linkingt::duplicate_code_symbol(
           "implicit function declaration");
     }
     // handle (incomplete) function prototypes
-    else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
-            ((old_t.parameters().empty() &&
-              old_t.has_ellipsis() &&
-              old_symbol.value.is_nil()) ||
-             (new_t.parameters().empty() &&
-              new_t.has_ellipsis() &&
-              new_symbol.value.is_nil())))
+    else if(
+      old_t.return_type() == new_t.return_type() &&
+      ((old_t.parameters().empty() && old_t.has_ellipsis() &&
+        old_symbol.value.is_nil()) ||
+       (new_t.parameters().empty() && new_t.has_ellipsis() &&
+        new_symbol.value.is_nil())))
     {
       if(old_t.parameters().empty() &&
          old_t.has_ellipsis() &&
@@ -547,9 +541,9 @@ void linkingt::duplicate_code_symbol(
     }
     // conflicting declarations without a definition, matching return
     // types
-    else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
-            old_symbol.value.is_nil() &&
-            new_symbol.value.is_nil())
+    else if(
+      old_t.return_type() == new_t.return_type() && old_symbol.value.is_nil() &&
+      new_symbol.value.is_nil())
     {
       link_warning(
         old_symbol,
@@ -588,7 +582,7 @@ void linkingt::duplicate_code_symbol(
       typedef std::deque<std::pair<typet, typet> > conflictst;
       conflictst conflicts;
 
-      if(!base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+      if(old_t.return_type() != new_t.return_type())
         conflicts.push_back(
           std::make_pair(old_t.return_type(), new_t.return_type()));
 
@@ -600,7 +594,7 @@ void linkingt::duplicate_code_symbol(
           n_it!=new_t.parameters().end();
           ++o_it, ++n_it)
       {
-        if(!base_type_eq(o_it->type(), n_it->type(), ns))
+        if(o_it->type() != n_it->type())
           conflicts.push_back(
             std::make_pair(o_it->type(), n_it->type()));
       }
@@ -693,7 +687,7 @@ void linkingt::duplicate_code_symbol(
 
           bool found=false;
           for(const auto &c : union_type.components())
-            if(base_type_eq(c.type(), src_type, ns))
+            if(c.type() == src_type)
             {
               found=true;
               if(warn_msg.empty())
@@ -768,7 +762,7 @@ void linkingt::duplicate_code_symbol(
     {
       // ok, silently ignore
     }
-    else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
+    else if(old_symbol.type == new_symbol.type)
     {
       // keep the one in old_symbol -- libraries come last!
       warning().source_location=new_symbol.location;
@@ -791,7 +785,7 @@ bool linkingt::adjust_object_type_rec(
   const typet &t2,
   adjust_type_infot &info)
 {
-  if(base_type_eq(t1, t2, ns))
+  if(t1 == t2)
     return false;
 
   if(
@@ -987,7 +981,7 @@ void linkingt::duplicate_object_symbol(
   // both are variables
   bool set_to_new = false;
 
-  if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
+  if(old_symbol.type != new_symbol.type)
   {
     bool failed=
       adjust_object_type(old_symbol, new_symbol, set_to_new);
@@ -1045,7 +1039,7 @@ void linkingt::duplicate_object_symbol(
       simplify(tmp_old, ns);
       simplify(tmp_new, ns);
 
-      if(base_type_eq(tmp_old, tmp_new, ns))
+      if(tmp_old == tmp_new)
       {
         // ok, the same
       }
@@ -1170,9 +1164,9 @@ void linkingt::duplicate_type_symbol(
     return;
   }
 
-  if(old_symbol.type.id()==ID_array &&
-     new_symbol.type.id()==ID_array &&
-     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  if(
+    old_symbol.type.id() == ID_array && new_symbol.type.id() == ID_array &&
+    old_symbol.type.subtype() == new_symbol.type.subtype())
   {
     if(to_array_type(old_symbol.type).size().is_nil() &&
        to_array_type(new_symbol.type).size().is_not_nil())
@@ -1242,9 +1236,9 @@ bool linkingt::needs_renaming_type(
     to_union_type(new_symbol.type).is_incomplete())
     return false; // not different
 
-  if(old_symbol.type.id()==ID_array &&
-     new_symbol.type.id()==ID_array &&
-     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  if(
+    old_symbol.type.id() == ID_array && new_symbol.type.id() == ID_array &&
+    old_symbol.type.subtype() == new_symbol.type.subtype())
   {
     if(to_array_type(old_symbol.type).size().is_nil() &&
        to_array_type(new_symbol.type).size().is_not_nil())
