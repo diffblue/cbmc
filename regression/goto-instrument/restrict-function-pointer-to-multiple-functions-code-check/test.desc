@@ -1,0 +1,9 @@
+CORE
+test.c
+--restrict-function-pointer use_f.function_pointer_call.1/f,g --show-goto-functions
+f\(10\)
+g\(10\)
+^EXIT=0$
+^SIGNAL=0$
+--
+h\(10\)
