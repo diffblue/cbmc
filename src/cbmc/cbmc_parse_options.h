@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/solver_factory.h>
 
 #include <goto-programs/goto_trace.h>
+#include <goto-programs/restrict_function_pointers.h>
 
 #include <solvers/strings/string_refinement.h>
 
@@ -81,6 +82,7 @@ class optionst;
   OPT_GOTO_TRACE \
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \
+  OPT_RESTRICT_FUNCTION_POINTER \
   "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 // clang-format on
 

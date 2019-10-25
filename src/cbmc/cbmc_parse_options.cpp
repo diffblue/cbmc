@@ -60,6 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
+#include <goto-programs/restrict_function_pointers.h>
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
@@ -78,6 +79,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
+#include <goto-programs/label_function_pointer_call_sites.h>
 #include <langapi/mode.h>
 
 #include "c_test_input_generator.h"
@@ -135,6 +137,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   cbmc_parse_optionst::set_default_options(options);
   parse_c_object_factory_options(cmdline, options);
+
+  parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
 
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
@@ -749,7 +753,6 @@ int cbmc_parse_optionst::get_goto_program(
     show_symbol_table(goto_model, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
-
   if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
     return CPROVER_EXIT_INTERNAL_ERROR;
 
@@ -836,6 +839,15 @@ bool cbmc_parse_optionst::process_goto_program(
   // remove function pointers
   log.status() << "Removal of function pointers and virtual functions"
                << messaget::eom;
+
+  const auto function_pointer_restrictions =
+    function_pointer_restrictionst::from_options(
+      options, log.get_message_handler());
+  if(!function_pointer_restrictions.restrictions.empty())
+  {
+    label_function_pointer_call_sites(goto_model);
+    restrict_function_pointers(goto_model, function_pointer_restrictions);
+  }
   remove_function_pointers(
     log.get_message_handler(),
     goto_model,
@@ -1066,6 +1078,7 @@ void cbmc_parse_optionst::help()
     HELP_FLUSH
     " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
+    RESTRICT_FUNCTION_POINTER_HELP
     "\n";
   // clang-format on
 }

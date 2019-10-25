@@ -28,6 +28,7 @@ SRC = adjust_float_expressions.cpp \
       interpreter_evaluate.cpp \
       json_expr.cpp \
       json_goto_trace.cpp \
+      label_function_pointer_call_sites.cpp \
       lazy_goto_model.cpp \
       link_goto_model.cpp \
       link_to_library.cpp \
@@ -51,6 +52,7 @@ SRC = adjust_float_expressions.cpp \
       remove_unused_functions.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
+      restrict_function_pointers.cpp \
       rewrite_union.cpp \
       replace_calls.cpp \
       resolve_inherited_component.cpp \

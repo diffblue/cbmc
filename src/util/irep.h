@@ -50,6 +50,11 @@ inline const std::string &id2string(const irep_idt &d)
   #endif
 }
 
+inline irep_idt string2id(const std::string &id_string)
+{
+  return irep_idt{id_string};
+}
+
 inline const std::string &name2string(const irep_namet &n)
 {
   #ifdef USE_DSTRING
