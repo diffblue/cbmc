@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_const_function_pointers.h>
 #include <goto-programs/replace_calls.h>
+#include <goto-programs/restrict_function_pointers.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
@@ -112,6 +113,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(validate-goto-binary)" \
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \
+  OPT_RESTRICT_FUNCTION_POINTER \
   "(ensure-one-backedge-per-target)" \
   // empty last line
 

@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/interpreter.h>
+#include <goto-programs/label_function_pointer_call_sites.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/parameter_assignments.h>
@@ -38,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/restrict_function_pointers.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
@@ -1032,6 +1034,20 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     options.set_option("unwind", cmdline.get_value("unwind"));
   }
 
+  {
+    parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
+
+    const auto function_pointer_restrictions =
+      function_pointer_restrictionst::from_options(
+        options, log.get_message_handler());
+
+    if(!function_pointer_restrictions.restrictions.empty())
+    {
+      label_function_pointer_call_sites(goto_model);
+      restrict_function_pointers(goto_model, function_pointer_restrictions);
+    }
+  }
+
   // skip over selected loops
   if(cmdline.isset("skip-loops"))
   {
@@ -1765,6 +1781,7 @@ void goto_instrument_parse_optionst::help()
     " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    RESTRICT_FUNCTION_POINTER_HELP
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
