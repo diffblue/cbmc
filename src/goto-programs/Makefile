@@ -53,6 +53,7 @@ SRC = adjust_float_expressions.cpp \
       remove_unused_functions.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
+      restrict_function_pointers.cpp \
       rewrite_union.cpp \
       replace_calls.cpp \
       resolve_inherited_component.cpp \
