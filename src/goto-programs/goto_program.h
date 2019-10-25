@@ -1169,6 +1169,30 @@ struct pointee_address_equalt
   }
 };
 
+template <typename GotoFunctionT, typename PredicateT, typename HandlerT>
+void for_each_goto_location_if(
+  GotoFunctionT &&goto_function,
+  PredicateT predicate,
+  HandlerT handle)
+{
+  auto &&instructions = goto_function.body.instructions;
+  for(auto it = instructions.begin(); it != instructions.end(); ++it)
+  {
+    if(predicate(it))
+    {
+      handle(it);
+    }
+  }
+}
+
+template <typename GotoFunctionT, typename HandlerT>
+void for_each_goto_location(GotoFunctionT &&goto_function, HandlerT handle)
+{
+  using iterator_t = decltype(goto_function.body.instructions.begin());
+  for_each_goto_location_if(
+    goto_function, [](const iterator_t &) { return true; }, handle);
+}
+
 #define forall_goto_program_instructions(it, program) \
   for(goto_programt::instructionst::const_iterator \
       it=(program).instructions.begin(); \
