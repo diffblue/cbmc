@@ -99,28 +99,44 @@ public:
   { return (const operandst &)get_sub(); }
 
   exprt &op0()
-  { return operands().front(); }
+  {
+    return operands().at(0);
+  }
 
   exprt &op1()
-  { return operands()[1]; }
+  {
+    return operands().at(1);
+  }
 
   exprt &op2()
-  { return operands()[2]; }
+  {
+    return operands().at(2);
+  }
 
   exprt &op3()
-  { return operands()[3]; }
+  {
+    return operands().at(3);
+  }
 
   const exprt &op0() const
-  { return operands().front(); }
+  {
+    return operands().at(0);
+  }
 
   const exprt &op1() const
-  { return operands()[1]; }
+  {
+    return operands().at(1);
+  }
 
   const exprt &op2() const
-  { return operands()[2]; }
+  {
+    return operands().at(2);
+  }
 
   const exprt &op3() const
-  { return operands()[3]; }
+  {
+    return operands().at(3);
+  }
 
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
