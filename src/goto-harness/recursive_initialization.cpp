@@ -14,6 +14,8 @@ Author: Diffblue Ltd.
 #include <util/fresh_symbol.h>
 #include <util/irep.h>
 #include <util/optional_utils.h>
+#include <util/pointer_offset_size.h>
+#include <util/rename.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -79,54 +81,183 @@ recursive_initializationt::recursive_initializationt(
   recursive_initialization_configt initialization_config,
   goto_modelt &goto_model)
   : initialization_config(std::move(initialization_config)),
-    goto_model(goto_model)
+    goto_model(goto_model),
+    max_depth_var_name(get_fresh_global_name(
+      "max_depth",
+      from_integer(
+        initialization_config.max_nondet_tree_depth,
+        signed_int_type()))),
+    min_depth_var_name(get_fresh_global_name(
+      "min_depth",
+      from_integer(
+        initialization_config.min_null_tree_depth,
+        signed_int_type())))
 {
 }
 
 void recursive_initializationt::initialize(
   const exprt &lhs,
-  const std::size_t depth,
-  const recursion_sett &known_tags,
+  const exprt &depth,
   code_blockt &body)
 {
-  auto const &type = lhs.type();
+  const irep_idt &fun_name = build_constructor(lhs);
+  const symbolt &fun_symbol = goto_model.symbol_table.lookup_ref(fun_name);
+
+  if(lhs.id() == ID_symbol)
+  {
+    const irep_idt &lhs_name = to_symbol_expr(lhs).get_identifier();
+    if(should_be_treated_as_array(lhs_name))
+    {
+      auto size_var = get_associated_size_variable(lhs_name);
+      if(size_var.has_value())
+      {
+        const symbol_exprt &size_symbol =
+          goto_model.symbol_table.lookup_ref(size_var.value()).symbol_expr();
+        body.add(code_function_callt{
+          fun_symbol.symbol_expr(),
+          {depth, address_of_exprt{lhs}, address_of_exprt{size_symbol}}});
+      }
+      else
+      {
+        const auto &fun_type_params =
+          to_code_type(fun_symbol.type).parameters();
+        const typet &size_var_type = fun_type_params.back().type();
+        body.add(code_function_callt{
+          fun_symbol.symbol_expr(),
+          {depth,
+           address_of_exprt{lhs},
+           null_pointer_exprt{pointer_type(size_var_type)}}});
+      }
+      return;
+    }
+    for(const auto &irep_pair :
+        initialization_config.array_name_to_associated_array_size_variable)
+    {
+      // skip initialisation of array-size variables
+      if(irep_pair.second == lhs_name)
+        return;
+    }
+  }
+  body.add(code_function_callt{fun_symbol.symbol_expr(),
+                               {depth, address_of_exprt{lhs}}});
+}
+
+code_blockt recursive_initializationt::build_constructor_body(
+  const exprt &depth_symbol,
+  const exprt &result_symbol,
+  const optionalt<exprt> &size_symbol,
+  const optionalt<irep_idt> &lhs_name)
+{
+  PRECONDITION(result_symbol.type().id() == ID_pointer);
+  const typet &type = result_symbol.type().subtype();
   if(type.id() == ID_struct_tag)
   {
-    initialize_struct_tag(lhs, depth, known_tags, body);
+    return build_struct_constructor(depth_symbol, result_symbol);
   }
   else if(type.id() == ID_pointer)
   {
-    if(lhs.id() == ID_symbol)
+    if(lhs_name.has_value())
     {
-      auto const &lhs_symbol = to_symbol_expr(lhs);
-      if(should_be_treated_as_cstring(lhs_symbol.get_identifier()))
+      if(should_be_treated_as_cstring(*lhs_name) && type == char_type())
+        return build_array_string_constructor(result_symbol);
+      else if(should_be_treated_as_array(*lhs_name))
       {
-        initialize_cstring(lhs, depth, known_tags, body);
-        return;
-      }
-      else if(should_be_treated_as_array(lhs_symbol.get_identifier()))
-      {
-        initialize_dynamic_array(
-          lhs, depth, known_tags, body, default_array_member_initialization());
-        return;
+        CHECK_RETURN(size_symbol.has_value());
+        return build_dynamic_array_constructor(
+          depth_symbol, result_symbol, *size_symbol, lhs_name);
       }
     }
-    initialize_pointer(lhs, depth, known_tags, body);
+    return build_pointer_constructor(depth_symbol, result_symbol);
   }
   else if(type.id() == ID_array)
   {
-    initialize_array(
-      lhs, depth, known_tags, body, default_array_member_initialization());
+    return build_array_constructor(depth_symbol, result_symbol);
   }
   else
   {
-    initialize_nondet(lhs, depth, known_tags, body);
+    return build_nondet_constructor(result_symbol);
   }
+}
+
+const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
+{
+  // for `expr` of type T builds a declaration of a function:
+  //
+  // void type_constructor_T(int depth_T, T *result);
+  //
+  // or in case a `size` is associated with the `expr`
+  //
+  // void type_constructor_T(int depth_T, T *result_T, int *size);
+  optionalt<irep_idt> size_var;
+  optionalt<irep_idt> expr_name;
+  if(expr.id() == ID_symbol)
+  {
+    expr_name = to_symbol_expr(expr).get_identifier();
+    if(should_be_treated_as_array(*expr_name))
+      size_var = get_associated_size_variable(*expr_name);
+  }
+  const typet &type = expr.type();
+  if(type_constructor_names.find(type) != type_constructor_names.end())
+    return type_constructor_names[type];
+
+  const std::string &pretty_type = type2id(type);
+  symbolt &depth_symbol =
+    get_fresh_param_symbol("depth_" + pretty_type, signed_int_type());
+  depth_symbol.value = from_integer(0, signed_int_type());
+
+  code_typet::parameterst fun_params;
+  code_typet::parametert depth_parameter{signed_int_type()};
+  depth_parameter.set_identifier(depth_symbol.name);
+  fun_params.push_back(depth_parameter);
+
+  const typet &result_type = pointer_type(type);
+  const symbolt &result_symbol =
+    get_fresh_param_symbol("result_" + pretty_type, result_type);
+  code_typet::parametert result_parameter{result_type};
+  result_parameter.set_identifier(result_symbol.name);
+  fun_params.push_back(result_parameter);
+
+  auto &symbol_table = goto_model.symbol_table;
+  optionalt<exprt> size_symbol_expr;
+  if(expr_name.has_value() && should_be_treated_as_array(*expr_name))
+  {
+    typet size_var_type;
+    if(size_var.has_value())
+    {
+      const symbol_exprt &size_var_symbol_expr =
+        symbol_table.lookup_ref(*size_var).symbol_expr();
+      size_var_type = pointer_type(size_var_symbol_expr.type());
+    }
+    else
+      size_var_type = pointer_type(signed_int_type());
+
+    const symbolt &size_symbol =
+      get_fresh_param_symbol("size_" + pretty_type, size_var_type);
+    fun_params.push_back(code_typet::parametert{size_var_type});
+    fun_params.back().set_identifier(size_symbol.name);
+    size_symbol_expr = size_symbol.symbol_expr();
+  }
+  const symbolt &function_symbol = get_fresh_fun_symbol(
+    "type_constructor_" + pretty_type, code_typet{fun_params, empty_typet{}});
+  type_constructor_names[type] = function_symbol.name;
+  symbolt *mutable_symbol = symbol_table.get_writeable(function_symbol.name);
+
+  // the body is specific for each type of expression
+  mutable_symbol->value = build_constructor_body(
+    depth_symbol.symbol_expr(),
+    result_symbol.symbol_expr(),
+    size_symbol_expr,
+    // the expression name may be needed to decide if expr should be treated as
+    // a string
+    expr_name);
+
+  goto_model.goto_functions.function_map[function_symbol.name].type =
+    to_code_type(function_symbol.type);
+  return type_constructor_names[type];
 }
 
 symbol_exprt recursive_initializationt::get_malloc_function()
 {
-  // unused for now, we'll need it for arrays
   auto malloc_sym = goto_model.symbol_table.lookup("malloc");
   if(malloc_sym == nullptr)
   {
@@ -140,107 +271,6 @@ symbol_exprt recursive_initializationt::get_malloc_function()
     return new_malloc_sym.symbol_expr();
   }
   return malloc_sym->symbol_expr();
-}
-
-void recursive_initializationt::initialize_struct_tag(
-  const exprt &lhs,
-  const std::size_t depth,
-  const recursion_sett &known_tags,
-  code_blockt &body)
-{
-  PRECONDITION(lhs.type().id() == ID_struct_tag);
-  auto const &type = to_struct_tag_type(lhs.type());
-  auto new_known_tags = known_tags;
-  new_known_tags.insert(type.get_identifier());
-  auto const &ns = namespacet{goto_model.symbol_table};
-  for(auto const &component : ns.follow_tag(type).components())
-  {
-    initialize(member_exprt{lhs, component}, depth, new_known_tags, body);
-  }
-}
-
-void recursive_initializationt::initialize_pointer(
-  const exprt &lhs,
-  const std::size_t depth,
-  const recursion_sett &known_tags,
-  code_blockt &body)
-{
-  PRECONDITION(lhs.type().id() == ID_pointer);
-  auto const &type = to_pointer_type(lhs.type());
-  allocate_objectst allocate_objects{initialization_config.mode,
-                                     type.source_location(),
-                                     "initializer",
-                                     goto_model.symbol_table};
-  exprt choice =
-    allocate_objects.allocate_automatic_local_object(bool_typet{}, "choice");
-  symbolt &pointee_symbol = get_fresh_aux_symbol(
-    type.subtype(),
-    "__goto_harness",
-    "pointee",
-    lhs.source_location(),
-    initialization_config.mode,
-    goto_model.symbol_table);
-  pointee_symbol.is_static_lifetime = true;
-  pointee_symbol.is_lvalue = true;
-
-  auto pointee = pointee_symbol.symbol_expr();
-  allocate_objects.declare_created_symbols(body);
-  body.add(code_assignt{lhs, null_pointer_exprt{type}, type.source_location()});
-  bool is_unknown_struct_tag =
-    can_cast_type<tag_typet>(type.subtype()) &&
-    known_tags.find(to_tag_type(type.subtype()).get_identifier()) ==
-      known_tags.end();
-
-  if(
-    depth < initialization_config.max_nondet_tree_depth ||
-    is_unknown_struct_tag)
-  {
-    if(depth < initialization_config.min_null_tree_depth)
-    {
-      initialize(pointee, depth + 1, known_tags, body);
-      body.add(code_assignt{lhs, address_of_exprt{pointee}});
-    }
-    else
-    {
-      code_blockt then_case{};
-      initialize(pointee, depth + 1, known_tags, then_case);
-      then_case.add(code_assignt{lhs, address_of_exprt{pointee}});
-      body.add(code_ifthenelset{choice, then_case});
-    }
-  }
-}
-
-void recursive_initializationt::initialize_nondet(
-  const exprt &lhs,
-  const std::size_t depth,
-  const recursion_sett &known_tags,
-  code_blockt &body)
-{
-  if(
-    lhs.id() != ID_symbol ||
-    !is_array_size_parameter(to_symbol_expr(lhs).get_identifier()))
-  {
-    body.add(code_assignt{
-      lhs, side_effect_expr_nondett{lhs.type(), source_locationt{}}});
-  }
-}
-
-void recursive_initializationt::initialize_array(
-  const exprt &array,
-  const std::size_t depth,
-  const recursion_sett &known_tags,
-  code_blockt &body,
-  array_convertert array_member_initialization)
-{
-  PRECONDITION(array.type().id() == ID_array);
-  const auto &array_type = to_array_type(array.type());
-  const auto array_size =
-    numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
-  for(std::size_t index = 0; index < array_size; index++)
-  {
-    array_member_initialization(
-      array, array_size, index, depth, known_tags, body);
-  }
 }
 
 bool recursive_initializationt::should_be_treated_as_array(
@@ -271,119 +301,6 @@ bool recursive_initializationt::should_be_treated_as_cstring(
 {
   return initialization_config.pointers_to_treat_as_cstrings.count(
            pointer_name) != 0;
-}
-
-void recursive_initializationt::initialize_dynamic_array(
-  const exprt &pointer,
-  const std::size_t depth,
-  const recursion_sett &known_tags,
-  code_blockt &body,
-  array_convertert array_initialization)
-{
-  PRECONDITION(pointer.type().id() == ID_pointer);
-
-  // size_t number_of_arrays = max_array_size - min_array_size;
-  // T *arrays[number_of_arrays];
-  //
-  // T array1[min_array_size];
-  // initialize(array1);
-  // arrays[0] = &array1[0];
-  //
-  // T array2[min_array_size+1];
-  // initialize(array2);
-  // arrays[1] = &array2[0];
-  //
-  // ... and so on ...
-  //
-  // T arrayN[max_array_size];
-  // initialize(arrayN);
-  // arrays[number_of_arrays-1] = &arrayN[0];
-  //
-  // size_t array_index;
-  // assume(0 <= array_index < number_of_arrays);
-  // actual_size = array_index + min_array_size;
-  // array_pointer = arrays[array_index];
-
-  const auto &pointer_type = to_pointer_type(pointer.type());
-  allocate_objectst allocate_objects{initialization_config.mode,
-                                     pointer_type.source_location(),
-                                     "initializer",
-                                     goto_model.symbol_table};
-  const auto min_array_size = initialization_config.min_dynamic_array_size;
-  const auto max_array_size = initialization_config.max_dynamic_array_size;
-  PRECONDITION(max_array_size >= min_array_size);
-  const auto number_of_arrays = max_array_size - min_array_size + 1;
-
-  auto const array_variables = [&]() {
-    std::vector<symbol_exprt> array_variables;
-    for(auto array_size = min_array_size; array_size <= max_array_size;
-        array_size++)
-    {
-      array_variables.push_back(
-        allocate_objects.allocate_automatic_local_object(
-          array_typet{pointer_type.subtype(),
-                      from_integer(array_size, size_type())},
-          "array"));
-    }
-    return array_variables;
-  }();
-
-  const auto arrays = allocate_objects.allocate_automatic_local_object(
-    array_typet{pointer_type, from_integer(number_of_arrays, size_type())},
-    "arrays");
-
-  const auto nondet_index = allocate_objects.allocate_automatic_local_object(
-    size_type(), "nondet_index");
-
-  allocate_objects.declare_created_symbols(body);
-
-  {
-    std::size_t array_counter = 0;
-    for(const auto &array_variable : array_variables)
-    {
-      initialize_array(
-        array_variable, depth + 1, known_tags, body, array_initialization);
-      body.add(code_assignt{
-        index_exprt{arrays, from_integer(array_counter++, size_type())},
-        address_of_exprt{
-          index_exprt{array_variable, from_integer(0, size_type())}}});
-    }
-    INVARIANT(array_counter == number_of_arrays, "initialized all arrays");
-  }
-
-  body.add(code_assumet{and_exprt{
-    binary_relation_exprt{nondet_index, ID_ge, from_integer(0, size_type())},
-    binary_relation_exprt{
-      nondet_index, ID_lt, from_integer(number_of_arrays, size_type())}}});
-
-  if(pointer.id() == ID_symbol)
-  {
-    const auto array_id = to_symbol_expr(pointer).get_identifier();
-    const auto size_var = get_associated_size_variable(array_id);
-    if(size_var.has_value())
-    {
-      const auto size_var_symbol_expr =
-        goto_model.symbol_table.lookup_ref(size_var.value()).symbol_expr();
-      body.add(code_assignt{
-        size_var_symbol_expr,
-        typecast_exprt{
-          plus_exprt{nondet_index,
-                     from_integer(min_array_size, nondet_index.type())},
-          size_var_symbol_expr.type()}});
-    }
-  }
-
-  body.add(code_assignt{pointer, index_exprt{arrays, nondet_index}});
-}
-
-void recursive_initializationt::initialize_cstring(
-  const exprt &pointer,
-  std::size_t depth,
-  const recursion_sett &known_tags,
-  code_blockt &body)
-{
-  initialize_dynamic_array(
-    pointer, depth, known_tags, body, cstring_member_initialization());
 }
 
 std::string recursive_initialization_configt::to_string() const
@@ -426,49 +343,423 @@ std::string recursive_initialization_configt::to_string() const
   return out.str();
 }
 
-recursive_initializationt::array_convertert
-recursive_initializationt::default_array_member_initialization()
+irep_idt recursive_initializationt::get_fresh_global_name(
+  const std::string &symbol_name,
+  const exprt &initial_value) const
 {
-  return [this](
-           const exprt &array,
-           const std::size_t length,
-           const std::size_t current_index,
-           const std::size_t depth,
-           const recursion_sett &known_tags,
-           code_blockt &body) {
-    PRECONDITION(array.type().id() == ID_array);
-    initialize(
-      index_exprt{array, from_integer(current_index, size_type())},
-      depth,
-      known_tags,
-      body);
-  };
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    signed_int_type(),
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_static_lifetime = true;
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = initial_value;
+  return fresh_symbol.name;
 }
 
-recursive_initializationt::array_convertert
-recursive_initializationt::cstring_member_initialization()
+symbol_exprt recursive_initializationt::get_fresh_global_symexpr(
+  const std::string &symbol_name) const
 {
-  return [this](
-           const exprt &array,
-           const std::size_t length,
-           const std::size_t current_index,
-           const std::size_t depth,
-           const recursion_sett &known_tags,
-           code_blockt &body) {
-    PRECONDITION(array.type().id() == ID_array);
-    PRECONDITION(array.type().subtype() == char_type());
-    auto const member =
-      index_exprt{array, from_integer(current_index, size_type())};
-    if(current_index + 1 == length)
-    {
-      body.add(code_assignt{member, from_integer(0, array.type().subtype())});
-    }
-    else
-    {
-      initialize(member, depth, known_tags, body);
-      // We shouldn't have `\0` anywhere but at the end of a string.
-      body.add(code_assumet{
-        notequal_exprt{member, from_integer(0, array.type().subtype())}});
-    }
-  };
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    signed_int_type(),
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_static_lifetime = true;
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = from_integer(0, signed_int_type());
+  return fresh_symbol.symbol_expr();
+}
+
+symbol_exprt recursive_initializationt::get_fresh_local_symexpr(
+  const std::string &symbol_name) const
+{
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    signed_int_type(),
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = from_integer(0, signed_int_type());
+  return fresh_symbol.symbol_expr();
+}
+
+symbol_exprt recursive_initializationt::get_fresh_local_typed_symexpr(
+  const std::string &symbol_name,
+  const typet &type,
+  const exprt &init_value) const
+{
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    type,
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.value = init_value;
+  return fresh_symbol.symbol_expr();
+}
+
+const symbolt &recursive_initializationt::get_fresh_fun_symbol(
+  const std::string &fun_name,
+  const typet &fun_type)
+{
+  irep_idt fresh_name(fun_name);
+
+  get_new_name(fresh_name, namespacet{goto_model.symbol_table}, '_');
+
+  // create the function symbol
+  symbolt function_symbol{};
+  function_symbol.name = function_symbol.base_name =
+    function_symbol.pretty_name = fresh_name;
+
+  function_symbol.is_lvalue = true;
+  function_symbol.mode = initialization_config.mode;
+  function_symbol.type = fun_type;
+
+  auto r = goto_model.symbol_table.insert(function_symbol);
+  CHECK_RETURN(r.second);
+  return *goto_model.symbol_table.lookup(fresh_name);
+}
+
+symbolt &recursive_initializationt::get_fresh_param_symbol(
+  const std::string &symbol_name,
+  const typet &symbol_type)
+{
+  symbolt &param_symbol = get_fresh_aux_symbol(
+    symbol_type,
+    CPROVER_PREFIX,
+    symbol_name,
+    source_locationt{},
+    initialization_config.mode,
+    goto_model.symbol_table);
+  param_symbol.is_parameter = true;
+  param_symbol.is_lvalue = true;
+
+  return param_symbol;
+}
+
+symbol_exprt
+recursive_initializationt::get_symbol_expr(const irep_idt &symbol_name) const
+{
+  auto maybe_symbol = goto_model.symbol_table.lookup(symbol_name);
+  CHECK_RETURN(maybe_symbol != nullptr);
+  return maybe_symbol->symbol_expr();
+}
+
+std::string recursive_initializationt::type2id(const typet &type) const
+{
+  if(type.id() == ID_struct_tag)
+  {
+    auto st_tag = id2string(to_struct_tag_type(type).get_identifier());
+    std::replace(st_tag.begin(), st_tag.end(), '-', '_');
+    return st_tag;
+  }
+  else if(type.id() == ID_pointer)
+    return "ptr_" + type2id(type.subtype());
+  else if(type.id() == ID_array)
+  {
+    const auto array_size =
+      numeric_cast_v<std::size_t>(to_constant_expr(to_array_type(type).size()));
+    return "arr_" + type2id(type.subtype()) + "_" + std::to_string(array_size);
+  }
+  else if(type == char_type())
+    return "char";
+  else if(type.id() == ID_signedbv)
+    return "int";
+  else if(type.id() == ID_unsignedbv)
+    return "uint";
+  else
+    return "";
+}
+
+symbol_exprt recursive_initializationt::get_free_function()
+{
+  auto free_sym = goto_model.symbol_table.lookup("free");
+  if(free_sym == nullptr)
+  {
+    symbolt new_free_sym;
+    new_free_sym.type = code_typet{code_typet{
+      {code_typet::parametert{pointer_type(empty_typet{})}}, empty_typet{}}};
+    new_free_sym.name = new_free_sym.pretty_name = new_free_sym.base_name =
+      "free";
+    new_free_sym.mode = initialization_config.mode;
+    goto_model.symbol_table.insert(new_free_sym);
+    return new_free_sym.symbol_expr();
+  }
+  return free_sym->symbol_expr();
+}
+
+code_blockt recursive_initializationt::build_pointer_constructor(
+  const exprt &depth,
+  const exprt &result)
+{
+  PRECONDITION(result.type().id() == ID_pointer);
+  const typet &type = result.type().subtype();
+  PRECONDITION(type.id() == ID_pointer);
+
+  code_blockt body{};
+
+  // build:
+  // void type_constructor_ptr_T(int depth, T** result)
+  // {
+  //   if(has_seen && depth >= max_depth)
+  //     *result=NULL;
+  //   else if(depth < min_null_tree_depth || nondet()) {
+  //     size_t has_seen_prev;
+  //     has_seen_prev = T_has_seen;
+  //     T_has_seen = 1;
+  //     *result = malloc(sizeof(T));
+  //     type_constructor_T(depth+1, *result);
+  //     T_has_seen=has_seen_prev;
+  //   }
+  //   else
+  //     *result=NULL;
+  // }
+
+  binary_predicate_exprt depth_gt_max_depth{
+    depth, ID_ge, get_symbol_expr(max_depth_var_name)};
+  exprt::operandst should_not_recurse{depth_gt_max_depth};
+
+  optionalt<symbol_exprt> has_seen;
+  if(can_cast_type<struct_tag_typet>(type.subtype()))
+    has_seen = get_fresh_global_symexpr("has_seen_" + type2id(type.subtype()));
+
+  if(has_seen.has_value())
+  {
+    equal_exprt has_seen_expr{*has_seen, from_integer(1, has_seen->type())};
+    should_not_recurse.push_back(has_seen_expr);
+  }
+
+  null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
+  code_blockt null_and_return{};
+  code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
+  null_and_return.add(assign_null);
+  null_and_return.add(code_returnt{});
+  body.add(code_ifthenelset{conjunction(should_not_recurse), null_and_return});
+
+  exprt::operandst should_recurse_ops{
+    binary_predicate_exprt{depth, ID_lt, get_symbol_expr(min_depth_var_name)},
+    side_effect_expr_nondett{bool_typet{}, source_locationt{}}};
+  code_blockt then_case{};
+
+  code_assignt seen_assign_prev{};
+  if(has_seen.has_value())
+  {
+    const symbol_exprt &has_seen_prev =
+      get_fresh_local_symexpr("has_seen_prev_" + type2id(type.subtype()));
+    then_case.add(code_declt{has_seen_prev});
+    then_case.add(code_assignt{has_seen_prev, *has_seen});
+    then_case.add(code_assignt{*has_seen, from_integer(1, has_seen->type())});
+    seen_assign_prev = code_assignt{*has_seen, has_seen_prev};
+  }
+
+  const symbol_exprt &local_result =
+    get_fresh_local_typed_symexpr("local_result", type, nullptr_expr);
+  then_case.add(code_declt{local_result});
+  const namespacet ns{goto_model.symbol_table};
+  then_case.add(code_function_callt{
+    local_result, get_malloc_function(), {*size_of_expr(type.subtype(), ns)}});
+  initialize(
+    dereference_exprt{local_result},
+    plus_exprt{depth, from_integer(1, depth.type())},
+    then_case);
+  then_case.add(code_assignt{dereference_exprt{result}, local_result});
+
+  if(has_seen.has_value())
+  {
+    then_case.add(seen_assign_prev);
+  }
+
+  body.add(
+    code_ifthenelset{disjunction(should_recurse_ops), then_case, assign_null});
+  return body;
+}
+
+code_blockt recursive_initializationt::build_array_string_constructor(
+  const exprt &result) const
+{
+  PRECONDITION(result.type().id() == ID_pointer);
+  const typet &type = result.type().subtype();
+  PRECONDITION(type.id() == ID_array);
+  PRECONDITION(type.subtype() == char_type());
+  const array_typet &array_type = to_array_type(type);
+  const auto array_size =
+    numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
+  code_blockt body{};
+
+  for(std::size_t index = 0; index < array_size - 1; index++)
+  {
+    index_exprt index_expr{dereference_exprt{result},
+                           from_integer(index, size_type())};
+    body.add(code_assignt{
+      index_expr, side_effect_expr_nondett{char_type(), source_locationt{}}});
+    body.add(code_assumet{
+      notequal_exprt{index_expr, from_integer(0, array_type.subtype())}});
+  }
+  body.add(code_assignt{index_exprt{dereference_exprt{result},
+                                    from_integer(array_size - 1, size_type())},
+                        from_integer(0, array_type.subtype())});
+
+  return body;
+}
+
+code_blockt recursive_initializationt::build_array_constructor(
+  const exprt &depth,
+  const exprt &result)
+{
+  PRECONDITION(result.type().id() == ID_pointer);
+  const typet &type = result.type().subtype();
+  PRECONDITION(type.id() == ID_array);
+  const array_typet &array_type = to_array_type(type);
+  const auto array_size =
+    numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
+  code_blockt body{};
+
+  for(std::size_t index = 0; index < array_size; index++)
+  {
+    initialize(
+      index_exprt{dereference_exprt{result}, from_integer(index, size_type())},
+      depth,
+      body);
+  }
+  return body;
+}
+
+code_blockt recursive_initializationt::build_struct_constructor(
+  const exprt &depth,
+  const exprt &result)
+{
+  PRECONDITION(result.type().id() == ID_pointer);
+  const typet &struct_type = result.type().subtype();
+  PRECONDITION(struct_type.id() == ID_struct_tag);
+  code_blockt body{};
+  const namespacet ns{goto_model.symbol_table};
+  for(const auto &component :
+      ns.follow_tag(to_struct_tag_type(struct_type)).components())
+  {
+    initialize(member_exprt{dereference_exprt{result}, component}, depth, body);
+  }
+  return body;
+}
+
+code_blockt
+recursive_initializationt::build_nondet_constructor(const exprt &result) const
+{
+  PRECONDITION(result.type().id() == ID_pointer);
+  code_blockt body{};
+  body.add(code_assignt{
+    dereference_exprt{result},
+    side_effect_expr_nondett{result.type().subtype(), source_locationt{}}});
+  return body;
+}
+
+code_blockt recursive_initializationt::build_dynamic_array_constructor(
+  const exprt &depth,
+  const exprt &result,
+  const exprt &size,
+  const optionalt<irep_idt> &lhs_name)
+{
+  PRECONDITION(result.type().id() == ID_pointer);
+  const typet &pointer_type = result.type().subtype();
+  PRECONDITION(pointer_type.id() == ID_pointer);
+  const typet &element_type = pointer_type.subtype();
+
+  // builds:
+  // void type_constructor_ptr_T(int depth, T** result, int* size)
+  // {
+  //   int nondet_size;
+  //   assume(nondet_size >= min_array_size && nondet_size <= max_array_size);
+  //   T* local_result = malloc(nondet_size * sizeof(T));
+  //   for (int i = 0; i < nondet_size; ++i)
+  //   {
+  //     type_construct_T(depth+1, local_result+i);
+  //   }
+  //   *result = local_result;
+  //   if (size!=NULL)
+  //     *size = nondet_size;
+  // }
+
+  const auto min_array_size = initialization_config.min_dynamic_array_size;
+  const auto max_array_size = initialization_config.max_dynamic_array_size;
+  PRECONDITION(max_array_size >= min_array_size);
+
+  code_blockt body{};
+  const symbol_exprt &nondet_size = get_fresh_local_symexpr("nondet_size");
+  body.add(code_declt{nondet_size});
+
+  body.add(code_assumet{and_exprt{
+    binary_relation_exprt{
+      nondet_size, ID_ge, from_integer(min_array_size, nondet_size.type())},
+    binary_relation_exprt{
+      nondet_size, ID_le, from_integer(max_array_size, nondet_size.type())}}});
+
+  const symbol_exprt &local_result =
+    get_fresh_local_typed_symexpr("local_result", pointer_type, exprt{});
+  body.add(code_declt{local_result});
+  const namespacet ns{goto_model.symbol_table};
+  for(auto array_size = min_array_size; array_size <= max_array_size;
+      ++array_size)
+  {
+    body.add(code_ifthenelset{
+      equal_exprt{nondet_size, from_integer(array_size, nondet_size.type())},
+      code_function_callt{local_result,
+                          get_malloc_function(),
+                          {mult_exprt{from_integer(array_size, size_type()),
+                                      *size_of_expr(element_type, ns)}}}});
+  }
+
+  const symbol_exprt &index_iter = get_fresh_local_symexpr("index");
+  body.add(code_declt{index_iter});
+  code_assignt for_init{index_iter, from_integer(0, index_iter.type())};
+  binary_relation_exprt for_cond{index_iter, ID_lt, nondet_size};
+  side_effect_exprt for_iter{
+    ID_preincrement, {index_iter}, typet{}, source_locationt{}};
+  code_blockt for_body{};
+  if(lhs_name.has_value() && should_be_treated_as_cstring(*lhs_name))
+  {
+    code_blockt else_case{};
+    initialize(
+      dereference_exprt{plus_exprt{local_result, index_iter}},
+      plus_exprt{depth, from_integer(1, depth.type())},
+      else_case);
+    else_case.add(code_assumet{
+      notequal_exprt{dereference_exprt{plus_exprt{local_result, index_iter}},
+                     from_integer(0, char_type())}});
+
+    for_body.add(code_ifthenelset{
+      equal_exprt{
+        index_iter,
+        minus_exprt{nondet_size, from_integer(1, nondet_size.type())}},
+      code_assignt{dereference_exprt{plus_exprt{local_result, index_iter}},
+                   from_integer(0, char_type())},
+      else_case});
+  }
+  else
+  {
+    initialize(
+      dereference_exprt{plus_exprt{local_result, index_iter}},
+      plus_exprt{depth, from_integer(1, depth.type())},
+      for_body);
+  }
+
+  body.add(code_fort{for_init, for_cond, for_iter, for_body});
+  body.add(code_assignt{dereference_exprt{result}, local_result});
+
+  CHECK_RETURN(size.type().id() == ID_pointer);
+  body.add(code_ifthenelset{
+    notequal_exprt{size, null_pointer_exprt{to_pointer_type(size.type())}},
+    code_assignt{
+      dereference_exprt{size},
+      typecast_exprt::conditional_cast(nondet_size, size.type().subtype())}});
+
+  return body;
 }

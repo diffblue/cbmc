@@ -10,15 +10,15 @@ Author: Diffblue Ltd.
 
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/exception_utils.h>
-#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/ui_message.h>
 
-#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
 #include <algorithm>
@@ -53,6 +53,8 @@ struct function_call_harness_generatort::implt
 
   std::map<irep_idt, irep_idt> function_argument_to_associated_array_size;
   std::map<irep_idt, irep_idt> function_parameter_to_associated_array_size;
+
+  std::set<symbol_exprt> global_pointers;
 
   /// \see goto_harness_generatort::generate
   void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
@@ -195,6 +197,11 @@ void function_call_harness_generatort::implt::generate(
 
   generate_nondet_globals(function_body);
   call_function(arguments, function_body);
+  for(const auto &global_pointer : global_pointers)
+  {
+    function_body.add(code_function_callt{
+      recursive_initialization->get_free_function(), {global_pointer}});
+  }
   add_harness_function_to_goto_model(std::move(function_body));
 }
 
@@ -213,10 +220,7 @@ void function_call_harness_generatort::implt::generate_nondet_globals(
     for(const auto &symbol_table_entry : *symbol_table)
     {
       const auto &symbol = symbol_table_entry.second;
-      if(
-        symbol.is_static_lifetime && symbol.is_lvalue &&
-        symbol.type.id() != ID_code &&
-        !has_prefix(id2string(symbol.name), CPROVER_PREFIX))
+      if(recursive_initialization->is_initialization_allowed(symbol))
       {
         globals.push_back(symbol.symbol_expr());
       }
@@ -232,7 +236,10 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
   code_blockt &block,
   const exprt &lhs)
 {
-  recursive_initialization->initialize(lhs, 0, {}, block);
+  recursive_initialization->initialize(
+    lhs, from_integer(0, signed_int_type()), block);
+  if(lhs.type().id() == ID_pointer)
+    global_pointers.insert(to_symbol_expr(lhs));
 }
 
 void function_call_harness_generatort::validate_options(
@@ -300,14 +307,7 @@ void function_call_harness_generatort::implt::
     symbol_table->lookup_ref(harness_function_name);
   goto_functions->function_map[harness_function_name].type =
     to_code_type(generated_harness.type);
-  auto &body = goto_functions->function_map[harness_function_name].body;
-  goto_convert(
-    static_cast<const codet &>(generated_harness.value),
-    *symbol_table,
-    body,
-    *message_handler,
-    function_to_call.mode);
-  body.add(goto_programt::make_end_function());
+  goto_convert(*symbol_table, *goto_functions, *message_handler);
 }
 
 code_function_callt::argumentst
@@ -377,6 +377,8 @@ void function_call_harness_generatort::implt::call_function(
   for(auto const &argument : arguments)
   {
     generate_initialisation_code_for(function_body, argument);
+    if(argument.type().id() == ID_pointer)
+      global_pointers.insert(to_symbol_expr(argument));
   }
   code_function_callt function_call{function_to_call.symbol_expr(),
                                     std::move(arguments)};

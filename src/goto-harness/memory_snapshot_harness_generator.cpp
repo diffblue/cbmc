@@ -11,12 +11,14 @@ Author: Daniel Poetzl
 #include "memory_snapshot_harness_generator.h"
 #include "memory_snapshot_harness_generator_options.h"
 
-#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_convert_functions.h>
 
 #include <json/json_parser.h>
 
 #include <json-symtab-language/json_symbol_table.h>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
@@ -231,7 +233,7 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   for(auto pair : snapshot)
   {
     const auto name = id2string(pair.first);
-    if(name.find(CPROVER_PREFIX) != 0)
+    if(!has_prefix(name, CPROVER_PREFIX))
       ordered_snapshot_symbols.push_back(pair);
   }
 
@@ -249,7 +251,22 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
                pointer_depth(right.second.symbol_expr().type());
     });
 
-  code_blockt code;
+  code_blockt code{};
+
+  // add initialization for existing globals
+  for(const auto &pair : goto_model.symbol_table)
+  {
+    const auto &global_symbol = pair.second;
+    if(
+      global_symbol.is_static_lifetime && global_symbol.is_lvalue &&
+      global_symbol.type.id() != ID_code)
+    {
+      auto symeexr = global_symbol.symbol_expr();
+      if(symeexr.type() == global_symbol.value.type())
+        code.add(code_assignt{symeexr, global_symbol.value});
+    }
+  }
+
   for(const auto &pair : ordered_snapshot_symbols)
   {
     const symbolt &snapshot_symbol = pair.second;
@@ -275,7 +292,9 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
     else
     {
       recursive_initialization.initialize(
-        fresh_or_snapshot_symbol.symbol_expr(), 0, {}, code);
+        fresh_or_snapshot_symbol.symbol_expr(),
+        from_integer(0, size_type()),
+        code);
     }
   }
   return code;
@@ -316,12 +335,7 @@ void memory_snapshot_harness_generatort::
   harness_function.type = to_code_type(function.type);
 
   goto_convert(
-    to_code_block(to_code(function.value)),
-    goto_model.symbol_table,
-    harness_function.body,
-    message_handler,
-    function.mode);
-
+    goto_model.symbol_table, goto_model.goto_functions, message_handler);
   harness_function.body.add(goto_programt::make_end_function());
 }
 
@@ -379,6 +393,7 @@ void memory_snapshot_harness_generatort::generate(
 
   const symbolt *called_function_symbol =
     symbol_table.lookup(entry_location.function_name);
+  recursive_initialization_config.mode = called_function_symbol->mode;
 
   // introduce a symbol for a Boolean variable to indicate the point at which
   // the function initialisation is completed
