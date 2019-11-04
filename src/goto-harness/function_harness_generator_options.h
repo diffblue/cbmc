@@ -15,6 +15,8 @@ Author: Diffblue Ltd.
 #define FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT "nondet-globals"
 #define FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                  \
   "treat-pointer-as-array"
+#define FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                    \
+  "treat-pointers-equal"
 #define FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                   \
   "associated-array-size"
 #define FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                    \
@@ -25,6 +27,7 @@ Author: Diffblue Ltd.
   "(" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT "):"                             \
   "(" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT ")"                        \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT "):"               \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT "):"                 \
   "(" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT "):"                \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING "):"                 \
 // FUNCTION_HARNESS_GENERATOR_OPTIONS
@@ -43,6 +46,9 @@ Author: Diffblue Ltd.
   "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                   \
   " p    treat the function parameter with the name `p' as\n"                  \
   "                              an array\n"                                   \
+  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                     \
+  " p,q    treat the function parameter with the name `q' equal\n"             \
+  "                              to parameter `q'\n"                           \
   "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                    \
   " array_name:size_name\n"                                                    \
   "                              set the parameter <size_name> to the size"    \

@@ -100,6 +100,19 @@ void recursive_initializationt::initialize(
   const exprt &depth,
   code_blockt &body)
 {
+  if(
+    lhs.id() == ID_symbol &&
+    should_be_treated_equal(to_symbol_expr(lhs).get_identifier()))
+  {
+    if(common_arguments_origin.has_value())
+    {
+      body.add(code_assignt{lhs, *common_arguments_origin});
+      return;
+    }
+    else
+      common_arguments_origin = lhs;
+  }
+
   const irep_idt &fun_name = build_constructor(lhs);
   const symbolt &fun_symbol = goto_model.symbol_table.lookup_ref(fun_name);
 
@@ -278,6 +291,13 @@ bool recursive_initializationt::should_be_treated_as_array(
 {
   return initialization_config.pointers_to_treat_as_arrays.find(array_name) !=
          initialization_config.pointers_to_treat_as_arrays.end();
+}
+
+bool recursive_initializationt::should_be_treated_equal(
+  const irep_idt &pointer_name) const
+{
+  return initialization_config.pointers_to_treat_equal.find(pointer_name) !=
+         initialization_config.pointers_to_treat_equal.end();
 }
 
 bool recursive_initializationt::is_array_size_parameter(
@@ -762,4 +782,18 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
       typecast_exprt::conditional_cast(nondet_size, size.type().subtype())}});
 
   return body;
+}
+
+bool recursive_initializationt::needs_freeing(const exprt &expr) const
+{
+  if(expr.type().id() != ID_pointer)
+    return false;
+  if(common_arguments_origin.has_value() && expr.id() == ID_symbol)
+  {
+    auto origin_name =
+      to_symbol_expr(*common_arguments_origin).get_identifier();
+    auto expr_name = to_symbol_expr(expr).get_identifier();
+    return origin_name == expr_name;
+  }
+  return true;
 }

@@ -37,6 +37,7 @@ struct recursive_initialization_configt
   std::map<irep_idt, irep_idt> array_name_to_associated_array_size_variable;
 
   std::set<irep_idt> pointers_to_treat_as_cstrings;
+  std::set<irep_idt> pointers_to_treat_equal;
 
   std::string to_string() const; // for debugging purposes
 
@@ -81,12 +82,15 @@ public:
       !has_prefix(id2string(symbol.name), CPROVER_PREFIX));
   }
 
+  bool needs_freeing(const exprt &expr) const;
+
 private:
   const recursive_initialization_configt initialization_config;
   goto_modelt &goto_model;
   irep_idt max_depth_var_name;
   irep_idt min_depth_var_name;
   type_constructor_namest type_constructor_names;
+  optionalt<exprt> common_arguments_origin;
 
   /// Get the malloc function as symbol exprt,
   /// and inserts it into the goto-model if it doesn't
@@ -94,6 +98,7 @@ private:
   symbol_exprt get_malloc_function();
 
   bool should_be_treated_as_array(const irep_idt &pointer_name) const;
+  bool should_be_treated_equal(const irep_idt &pointer_name) const;
   bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
   optionalt<irep_idt>
   get_associated_size_variable(const irep_idt &array_name) const;

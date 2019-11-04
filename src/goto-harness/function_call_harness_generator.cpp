@@ -48,6 +48,9 @@ struct function_call_harness_generatort::implt
   std::set<irep_idt> function_parameters_to_treat_as_arrays;
   std::set<irep_idt> function_arguments_to_treat_as_arrays;
 
+  std::set<irep_idt> function_parameters_to_treat_equal;
+  std::set<irep_idt> function_arguments_to_treat_equal;
+
   std::set<irep_idt> function_parameters_to_treat_as_cstrings;
   std::set<irep_idt> function_arguments_to_treat_as_cstrings;
 
@@ -111,6 +114,16 @@ void function_call_harness_generatort::handle_option(
   {
     p_impl->function_parameters_to_treat_as_arrays.insert(
       values.begin(), values.end());
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT)
+  {
+    for(auto const &value : values)
+    {
+      for(auto const &param_id : split_string(value, ','))
+      {
+        p_impl->function_parameters_to_treat_equal.insert(param_id);
+      }
+    }
   }
   else if(option == FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT)
   {
@@ -183,6 +196,8 @@ void function_call_harness_generatort::implt::generate(
   recursive_initialization_config.mode = function_to_call.mode;
   recursive_initialization_config.pointers_to_treat_as_arrays =
     function_arguments_to_treat_as_arrays;
+  recursive_initialization_config.pointers_to_treat_equal =
+    function_arguments_to_treat_equal;
   recursive_initialization_config.array_name_to_associated_array_size_variable =
     function_argument_to_associated_array_size;
   for(const auto &pair : function_argument_to_associated_array_size)
@@ -238,7 +253,7 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
 {
   recursive_initialization->initialize(
     lhs, from_integer(0, signed_int_type()), block);
-  if(lhs.type().id() == ID_pointer)
+  if(recursive_initialization->needs_freeing(lhs))
     global_pointers.insert(to_symbol_expr(lhs));
 }
 
@@ -257,6 +272,46 @@ void function_call_harness_generatort::validate_options(
       "min dynamic array size cannot be greater than max dynamic array size",
       "--" COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT
       " --" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
+  }
+
+  auto function_to_call = goto_model.symbol_table.lookup_ref(p_impl->function);
+  auto ftype = to_code_type(function_to_call.type);
+  for(auto const &pointer_id : p_impl->function_parameters_to_treat_equal)
+  {
+    std::string decorated_pointer_id =
+      id2string(p_impl->function) + "::" + id2string(pointer_id);
+    bool is_a_param = false;
+    typet common_type = empty_typet{};
+    for(auto const &formal_param : ftype.parameters())
+    {
+      if(formal_param.get_identifier() == decorated_pointer_id)
+      {
+        is_a_param = true;
+        if(formal_param.type().id() != ID_pointer)
+        {
+          throw invalid_command_line_argument_exceptiont{
+            id2string(pointer_id) + " is not a pointer parameter",
+            "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
+        }
+        if(common_type.id() != ID_empty)
+        {
+          if(common_type != formal_param.type())
+          {
+            throw invalid_command_line_argument_exceptiont{
+              "pointer arguments of conflicting type",
+              "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
+          }
+        }
+        else
+          common_type = formal_param.type();
+      }
+    }
+    if(!is_a_param)
+    {
+      throw invalid_command_line_argument_exceptiont{
+        id2string(pointer_id) + " is not a parameter",
+        "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
+    }
   }
 }
 
@@ -348,6 +403,11 @@ function_call_harness_generatort::implt::declare_arguments(
       function_arguments_to_treat_as_cstrings.insert(argument_name);
     }
 
+    if(function_parameters_to_treat_equal.count(parameter_name) != 0)
+    {
+      function_arguments_to_treat_equal.insert(argument_name);
+    }
+
     auto it = function_parameter_to_associated_array_size.find(parameter_name);
     if(it != function_parameter_to_associated_array_size.end())
     {
@@ -377,7 +437,7 @@ void function_call_harness_generatort::implt::call_function(
   for(auto const &argument : arguments)
   {
     generate_initialisation_code_for(function_body, argument);
-    if(argument.type().id() == ID_pointer)
+    if(recursive_initialization->needs_freeing(argument))
       global_pointers.insert(to_symbol_expr(argument));
   }
   code_function_callt function_call{function_to_call.symbol_expr(),
