@@ -209,18 +209,6 @@ size_t memory_snapshot_harness_generatort::pointer_depth(const typet &t) const
     return pointer_depth(t.subtype()) + 1;
 }
 
-bool memory_snapshot_harness_generatort::refers_to(
-  const exprt &expr,
-  const irep_idt &name) const
-{
-  if(expr.id() == ID_symbol)
-    return to_symbol_expr(expr).get_identifier() == name;
-  return std::any_of(
-    expr.operands().begin(),
-    expr.operands().end(),
-    [this, name](const exprt &subexpr) { return refers_to(subexpr, name); });
-}
-
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   const symbol_tablet &snapshot,
   goto_modelt &goto_model) const
@@ -228,28 +216,31 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   recursive_initializationt recursive_initialization{
     recursive_initialization_config, goto_model};
 
-  using snapshot_pairt = std::pair<irep_idt, symbolt>;
-  std::vector<snapshot_pairt> ordered_snapshot_symbols;
-  for(auto pair : snapshot)
-  {
-    const auto name = id2string(pair.first);
-    if(!has_prefix(name, CPROVER_PREFIX))
-      ordered_snapshot_symbols.push_back(pair);
-  }
-
+  std::vector<std::pair<irep_idt, symbolt>> ordered_snapshot_symbols;
   // sort the snapshot symbols so that the non-pointer symbols are first, then
   // pointers, then pointers-to-pointers, etc. so that we don't assign
   // uninitialized values
-  std::stable_sort(
-    ordered_snapshot_symbols.begin(),
-    ordered_snapshot_symbols.end(),
-    [this](const snapshot_pairt &left, const snapshot_pairt &right) {
-      if(refers_to(right.second.value, left.first))
-        return true;
-      else
-        return pointer_depth(left.second.symbol_expr().type()) <
-               pointer_depth(right.second.symbol_expr().type());
-    });
+  {
+    std::vector<std::pair<irep_idt, symbolt>> selected_snapshot_symbols;
+    using relationt = typename preordert<irep_idt>::relationt;
+    relationt reference_relation;
+
+    for(const auto &snapshot_pair : snapshot)
+    {
+      const auto name = id2string(snapshot_pair.first);
+      if(name.find(CPROVER_PREFIX) != 0)
+      {
+        collect_references(
+          snapshot_pair.second.value,
+          [&reference_relation, &snapshot_pair](const irep_idt &id) {
+            reference_relation.insert(std::make_pair(snapshot_pair.first, id));
+          });
+        selected_snapshot_symbols.push_back(snapshot_pair);
+      }
+    }
+    preordert<irep_idt> reference_order{reference_relation};
+    reference_order.sort(selected_snapshot_symbols, ordered_snapshot_symbols);
+  }
 
   code_blockt code{};
 

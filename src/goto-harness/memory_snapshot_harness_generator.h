@@ -275,11 +275,95 @@ protected:
   /// \return pointer depth of type \p t
   size_t pointer_depth(const typet &t) const;
 
-  /// Recursively test pointer reference
-  /// \param expr: expression to be tested
-  /// \param name: name to be located
-  /// \return true if \p expr refers to an object named \p name
-  bool refers_to(const exprt &expr, const irep_idt &name) const;
+  template <typename Adder>
+  void collect_references(const exprt &expr, Adder &&add_reference) const
+  {
+    if(expr.id() == ID_symbol)
+      add_reference(to_symbol_expr(expr).get_identifier());
+    for(const auto &operand : expr.operands())
+    {
+      collect_references(operand, add_reference);
+    }
+  }
+
+  /// Simple structure for linearising posets. Should be constructed with a map
+  /// assigning a key to a set of keys that precede it.
+  template <typename Key>
+  struct preordert
+  {
+  public:
+    using relationt = std::multimap<Key, Key>;
+    using keyst = std::set<Key>;
+
+    explicit preordert(const relationt &preorder_relation)
+      : preorder_relation(preorder_relation)
+    {
+    }
+
+    template <typename T>
+    void sort(
+      const std::vector<std::pair<Key, T>> &input,
+      std::vector<std::pair<Key, T>> &output)
+    {
+      std::unordered_map<Key, T> searchable_input;
+      using valuet = std::pair<Key, T>;
+
+      for(const auto &item : input)
+      {
+        searchable_input[item.first] = item.second;
+      }
+      auto associate_key_with_t =
+        [&searchable_input](const Key &key) -> optionalt<valuet> {
+        if(searchable_input.count(key) != 0)
+          return valuet(key, searchable_input[key]);
+        else
+          return {};
+      };
+      auto push_to_output = [&output](const valuet &value) {
+        output.push_back(value);
+      };
+      for(const auto &item : input)
+      {
+        dfs(item, associate_key_with_t, push_to_output);
+      }
+    }
+
+  private:
+    const relationt &preorder_relation;
+
+    keyst seen;
+    keyst inserted;
+
+    template <typename Value, typename Map, typename Handler>
+    void dfs(Value &&node, Map &&key_to_t, Handler &&handle)
+    {
+      PRECONDITION(seen.empty() && inserted.empty());
+      dfs_inner(node, key_to_t, handle);
+      seen.clear();
+      inserted.clear();
+    }
+
+    template <typename Value, typename Map, typename Handler>
+    void dfs_inner(Value &&node, Map &&key_to_t, Handler &&handle)
+    {
+      const Key &key = node.first;
+      if(seen.count(key) == 0)
+      {
+        seen.insert(key);
+        auto key_range = preorder_relation.equal_range(key);
+        for(auto it = key_range.first; it != key_range.second; ++it)
+        {
+          auto maybe_value = key_to_t(it->second);
+          if(maybe_value.has_value())
+            dfs_inner(*maybe_value, key_to_t, handle);
+        }
+      }
+      if(inserted.count(key) != 0)
+        return;
+      handle(node);
+      inserted.insert(key);
+    }
+  };
 
   /// data to store the command-line options
   std::string memory_snapshot_file;
