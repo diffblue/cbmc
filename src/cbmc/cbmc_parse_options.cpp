@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cbmc_parse_options.h"
 
-#include <fstream>
 #include <cstdlib> // exit()
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -178,8 +178,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
-  if(cmdline.isset("reachability-slice") &&
-     cmdline.isset("reachability-slice-fb"))
+  if(
+    cmdline.isset("reachability-slice") &&
+    cmdline.isset("reachability-slice-fb"))
   {
     log.error()
       << "--reachability-slice and --reachability-slice-fb must not be "
@@ -258,9 +259,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
 
-  if(cmdline.isset("stop-on-fail") ||
-     cmdline.isset("dimacs") ||
-     cmdline.isset("outfile"))
+  if(
+    cmdline.isset("stop-on-fail") || cmdline.isset("dimacs") ||
+    cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
 
   if(
@@ -370,8 +371,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("max-node-refinement"))
     options.set_option(
-      "max-node-refinement",
-      cmdline.get_value("max-node-refinement"));
+      "max-node-refinement", cmdline.get_value("max-node-refinement"));
 
   // SMT Options
 
@@ -387,11 +387,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("fpa"))
     options.set_option("fpa", true);
 
-  bool solver_set=false;
+  bool solver_set = false;
 
   if(cmdline.isset("boolector"))
   {
-    options.set_option("boolector", true), solver_set=true;
+    options.set_option("boolector", true), solver_set = true;
     options.set_option("smt2", true);
   }
 
@@ -403,25 +403,25 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("mathsat"))
   {
-    options.set_option("mathsat", true), solver_set=true;
+    options.set_option("mathsat", true), solver_set = true;
     options.set_option("smt2", true);
   }
 
   if(cmdline.isset("cvc4"))
   {
-    options.set_option("cvc4", true), solver_set=true;
+    options.set_option("cvc4", true), solver_set = true;
     options.set_option("smt2", true);
   }
 
   if(cmdline.isset("yices"))
   {
-    options.set_option("yices", true), solver_set=true;
+    options.set_option("yices", true), solver_set = true;
     options.set_option("smt2", true);
   }
 
   if(cmdline.isset("z3"))
   {
-    options.set_option("z3", true), solver_set=true;
+    options.set_option("z3", true), solver_set = true;
     options.set_option("smt2", true);
   }
 
@@ -461,8 +461,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("symex-coverage-report"))
   {
     options.set_option(
-      "symex-coverage-report",
-      cmdline.get_value("symex-coverage-report"));
+      "symex-coverage-report", cmdline.get_value("symex-coverage-report"));
     options.set_option("paths-symex-explore-all", true);
   }
 
@@ -512,8 +511,7 @@ int cbmc_parse_optionst::doit()
   // Unwinding of transition systems is done by hw-cbmc.
   //
 
-  if(cmdline.isset("module") ||
-     cmdline.isset("gen-interface"))
+  if(cmdline.isset("module") || cmdline.isset("gen-interface"))
   {
     log.error() << "This version of CBMC has no support for "
                    " hardware modules. Please use hw-cbmc."
@@ -552,13 +550,13 @@ int cbmc_parse_optionst::doit()
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
-    std::string filename=cmdline.args[0];
+    std::string filename = cmdline.args[0];
 
-    #ifdef _MSC_VER
+#ifdef _MSC_VER
     std::ifstream infile(widen(filename));
-    #else
+#else
     std::ifstream infile(filename);
-    #endif
+#endif
 
     if(!infile)
     {
@@ -567,10 +565,9 @@ int cbmc_parse_optionst::doit()
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
-    std::unique_ptr<languaget> language=
-      get_language_from_filename(filename);
+    std::unique_ptr<languaget> language = get_language_from_filename(filename);
 
-    if(language==nullptr)
+    if(language == nullptr)
     {
       log.error() << "failed to figure out type of file '" << filename << "'"
                   << messaget::eom;
@@ -595,11 +592,12 @@ int cbmc_parse_optionst::doit()
   int get_goto_program_ret =
     get_goto_program(goto_model, options, cmdline, ui_message_handler);
 
-  if(get_goto_program_ret!=-1)
+  if(get_goto_program_ret != -1)
     return get_goto_program_ret;
 
-  if(cmdline.isset("show-claims") || // will go away
-     cmdline.isset("show-properties")) // use this one
+  if(
+    cmdline.isset("show-claims") ||   // will go away
+    cmdline.isset("show-properties")) // use this one
   {
     show_properties(goto_model, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
@@ -840,14 +838,20 @@ bool cbmc_parse_optionst::process_goto_program(
   log.status() << "Removal of function pointers and virtual functions"
                << messaget::eom;
 
-  const auto function_pointer_restrictions =
-    function_pointer_restrictionst::from_options(
-      options, log.get_message_handler());
-  if(!function_pointer_restrictions.restrictions.empty())
+  if(
+    options.is_set(RESTRICT_FUNCTION_POINTER_OPT) ||
+    options.is_set(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT) ||
+    options.is_set(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT))
   {
     label_function_pointer_call_sites(goto_model);
+    auto const by_name_restrictions =
+      get_function_pointer_by_name_restrictions(goto_model, options);
+    const auto function_pointer_restrictions =
+      by_name_restrictions.merge(function_pointer_restrictionst::from_options(
+        options, log.get_message_handler()));
     restrict_function_pointers(goto_model, function_pointer_restrictions);
   }
+
   remove_function_pointers(
     log.get_message_handler(),
     goto_model,

@@ -29,11 +29,15 @@ Author: Diffblue Ltd.
 #define RESTRICT_FUNCTION_POINTER_OPT "restrict-function-pointer"
 #define RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                \
   "function-pointer-restrictions-file"
+#define RESTRICT_FUNCTION_POINTER_BY_NAME_OPT                                  \
+  "restrict-function-pointer-by-name"
 
 #define OPT_RESTRICT_FUNCTION_POINTER                                          \
   "(" RESTRICT_FUNCTION_POINTER_OPT                                            \
   "):"                                                                         \
-  "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT "):"
+  "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                  \
+  "):"                                                                         \
+  "(" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT "):"
 
 #define RESTRICT_FUNCTION_POINTER_HELP                                         \
   "--" RESTRICT_FUNCTION_POINTER_OPT                                           \
@@ -70,8 +74,13 @@ struct function_pointer_restrictionst
     message_handlert &message_handler);
 
   void write_to_file(const std::string &filename) const;
+  function_pointer_restrictionst
+  merge(const function_pointer_restrictionst &other) const;
 };
 
+function_pointer_restrictionst get_function_pointer_by_name_restrictions(
+  const goto_modelt &goto_model,
+  const optionst &options);
 /// Apply a function pointer restrictions to a goto_model. Each restriction is a
 /// mapping from a pointer name to a set of possible targets. Replace calls of
 /// these "restricted" pointers with a branch on the value of the function
