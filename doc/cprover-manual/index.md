@@ -9,6 +9,7 @@
 [A Short Tutorial](cbmc/tutorial/),
 [Loop Unwinding](cbmc/unwinding/),
 [Assertion Checking](cbmc/assertions/),
+[Restricting function pointers](cbmc/restrict-function-pointer/),
 [Memory Analyzer](cbmc/memory-analyzer/),
 [Program Harness](cbmc/goto-harness/)
 
