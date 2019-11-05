@@ -1,0 +1,11 @@
+CORE
+test.c
+--restrict-function-pointer-by-name main::1::fptr/f --restrict-function-pointer-by-name use_f::fptr/g --restrict-function-pointer-by-name g_fptr/f,h
+\[use_f.assertion.2\] line \d+ assertion fptr\(\) == 2: SUCCESS
+\[use_f.assertion.1\] line \d+ dereferenced function pointer at use_f.function_pointer_call.1 must be g: SUCCESS
+\[main.assertion.1\] line \d+ dereferenced function pointer at main.function_pointer_call.1 must be one of \[(h|f), (h|f)\]: SUCCESS
+\[main.assertion.2\] line \d+ assertion res == 1 \|\| res == 3: SUCCESS
+\[main.assertion.3\] line \d+ dereferenced function pointer at main.function_pointer_call.2 must be f: SUCCESS
+\[main.assertion.4\] line \d+ assertion fptr\(\) == 1: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
