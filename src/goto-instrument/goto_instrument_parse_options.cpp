@@ -1037,13 +1037,20 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
 
-    const auto function_pointer_restrictions =
-      function_pointer_restrictionst::from_options(
-        options, log.get_message_handler());
-
-    if(!function_pointer_restrictions.restrictions.empty())
+    if(
+      !options.get_list_option(RESTRICT_FUNCTION_POINTER_OPT).empty() ||
+      !options.get_list_option(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT).empty() ||
+      !options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT).empty())
     {
       label_function_pointer_call_sites(goto_model);
+
+      auto const by_name_restrictions =
+        get_function_pointer_by_name_restrictions(goto_model, options);
+
+      const auto function_pointer_restrictions =
+        by_name_restrictions.merge(function_pointer_restrictionst::from_options(
+          options, log.get_message_handler()));
+
       restrict_function_pointers(goto_model, function_pointer_restrictions);
     }
   }

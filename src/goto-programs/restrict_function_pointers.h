@@ -29,11 +29,15 @@ Author: Diffblue Ltd.
 #define RESTRICT_FUNCTION_POINTER_OPT "restrict-function-pointer"
 #define RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                \
   "function-pointer-restrictions-file"
+#define RESTRICT_FUNCTION_POINTER_BY_NAME_OPT                                  \
+  "restrict-function-pointer-by-name"
 
 #define OPT_RESTRICT_FUNCTION_POINTER                                          \
   "(" RESTRICT_FUNCTION_POINTER_OPT                                            \
   "):"                                                                         \
-  "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT "):"
+  "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                  \
+  "):"                                                                         \
+  "(" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT "):"
 
 #define HELP_RESTRICT_FUNCTION_POINTER                                         \
   "--" RESTRICT_FUNCTION_POINTER_OPT                                           \
@@ -78,13 +82,17 @@ public:
 
   void write_to_file(const std::string &filename) const;
 
+  function_pointer_restrictionst
+  merge(const function_pointer_restrictionst &other) const;
+
+  static restrictionst parse_function_pointer_restrictions_from_command_line(
+    const std::list<std::string> &restriction_opts,
+    const std::string &option_name);
+
 protected:
   static restrictionst merge_function_pointer_restrictions(
     restrictionst lhs,
     const restrictionst &rhs);
-
-  static restrictionst parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts);
 
   static restrictionst parse_function_pointer_restrictions_from_file(
     const std::list<std::string> &filenames,
@@ -93,6 +101,10 @@ protected:
   static restrictiont
   parse_function_pointer_restriction(const std::string &restriction_opt);
 };
+
+function_pointer_restrictionst get_function_pointer_by_name_restrictions(
+  const goto_modelt &goto_model,
+  const optionst &options);
 
 /// Apply function pointer restrictions to a goto_model. Each restriction is a
 /// mapping from a pointer name to a set of possible targets. Replace calls of

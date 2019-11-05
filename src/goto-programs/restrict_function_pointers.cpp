@@ -104,12 +104,13 @@ source_locationt make_function_pointer_restriction_assertion_source_location(
   return source_location;
 }
 
-template <typename Handler>
-void for_each_function_call(goto_functiont &goto_function, Handler handler)
+template <typename Handler, typename GotoFunctionT>
+void for_each_function_call(GotoFunctionT &&goto_function, Handler handler)
 {
+  using targett = decltype(goto_function.body.instructions.begin());
   for_each_instruction_if(
     goto_function,
-    [](goto_programt::targett target) { return target->is_function_call(); },
+    [](targett target) { return target->is_function_call(); },
     handler);
 }
 
@@ -220,6 +221,9 @@ void parse_function_pointer_restriction_options_from_cmdline(
   options.set_option(
     RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT,
     cmdline.get_values(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT));
+  options.set_option(
+    RESTRICT_FUNCTION_POINTER_BY_NAME_OPT,
+    cmdline.get_values(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT));
 }
 
 function_pointer_restrictionst::restrictionst
@@ -244,9 +248,11 @@ function_pointer_restrictionst::merge_function_pointer_restrictions(
   return result;
 }
 
-function_pointer_restrictionst::restrictionst function_pointer_restrictionst::
-  parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts)
+function_pointer_restrictionst::restrictionst
+function_pointer_restrictionst::
+parse_function_pointer_restrictions_from_command_line(
+  const std::list<std::string> &restriction_opts,
+  const std::string &option_name)
 {
   auto function_pointer_restrictions =
     function_pointer_restrictionst::restrictionst{};
@@ -361,7 +367,8 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
   auto const restriction_opts =
     options.get_list_option(RESTRICT_FUNCTION_POINTER_OPT);
   auto const commandline_restrictions =
-    parse_function_pointer_restrictions_from_command_line(restriction_opts);
+    parse_function_pointer_restrictions_from_command_line(
+      restriction_opts, RESTRICT_FUNCTION_POINTER_OPT);
   auto const file_restrictions = parse_function_pointer_restrictions_from_file(
     options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT),
     message_handler);
@@ -458,4 +465,62 @@ void function_pointer_restrictionst::write_to_file(
   }
 
   function_pointer_restrictions_json.output(outFile);
+}
+function_pointer_restrictionst function_pointer_restrictionst::merge(
+  const function_pointer_restrictionst &other) const
+{
+  return function_pointer_restrictionst{
+    merge_function_pointer_restrictions(restrictions, other.restrictions)};
+}
+
+function_pointer_restrictionst get_function_pointer_by_name_restrictions(
+  const goto_modelt &goto_model,
+  const optionst &options)
+{
+  function_pointer_restrictionst::restrictionst by_name_restrictions =
+      function_pointer_restrictionst::
+      parse_function_pointer_restrictions_from_command_line(
+        options.get_list_option(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT),
+        RESTRICT_FUNCTION_POINTER_BY_NAME_OPT);
+  function_pointer_restrictionst::restrictionst restrictions;
+  for(auto const &goto_function : goto_model.goto_functions.function_map)
+  {
+    for_each_function_call(
+      goto_function.second, [&](goto_programt::const_targett location) {
+        PRECONDITION(location->is_function_call());
+        if(can_cast_expr<dereference_exprt>(
+             location->get_function_call().function()))
+        {
+          PRECONDITION(can_cast_expr<symbol_exprt>(
+            to_dereference_expr(location->get_function_call().function())
+              .pointer()));
+          auto const &function_pointer_call_site = to_symbol_expr(
+            to_dereference_expr(location->get_function_call().function())
+              .pointer());
+          auto const &body = goto_function.second.body;
+          for(auto it = std::prev(location); it != body.instructions.end();
+              ++it)
+          {
+            if(
+              it->is_assign() &&
+              it->get_assign().lhs() == function_pointer_call_site &&
+              can_cast_expr<symbol_exprt>(it->get_assign().rhs()))
+            {
+              auto const &assign_rhs = to_symbol_expr(it->get_assign().rhs());
+              auto const restriction =
+                by_name_restrictions.find(assign_rhs.get_identifier());
+              if(
+                restriction != by_name_restrictions.end() &&
+                restriction->first == assign_rhs.get_identifier())
+              {
+                restrictions.emplace(
+                  function_pointer_call_site.get_identifier(),
+                  restriction->second);
+              }
+            }
+          }
+        }
+      });
+  }
+  return function_pointer_restrictionst{restrictions};
 }
