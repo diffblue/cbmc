@@ -146,3 +146,28 @@ know it will have:
 ```
 --restrict-function-pointer fs_open.function_pointer_call.1/nullfs_open
 ```
+
+### Loading from file
+
+If you have many places where you want to restrict function pointers, it'd be a
+nuisance to have to specify them all on the command line. In these cases, you
+can specify a file to load the restrictions from instead, via the
+`--function-pointer-restrictions-file` option, which you can give the name of a
+JSON file with this format:
+
+```
+{
+  "function_call_site_name": ["function1", "function2", ...],
+   ...
+}
+```
+
+**Note:** If you pass in multiple files, or a mix of files and command line
+restrictions, the final restrictions will be a set union of all specified
+restrictions.
+
+**Note:** as of now, if something goes wrong during type checking (i.e. making
+sure that all function pointer replacements refer to functions in the symbol
+table that have the correct type), the error message will refer the command line
+option `--restrict-function-pointer` regardless of whether the restriction in
+question came from the command line or a file.
