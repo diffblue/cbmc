@@ -190,9 +190,8 @@ void arrayst::collect_arrays(const exprt &a)
 
     DATA_INVARIANT(
       struct_op.id() == ID_symbol || struct_op.id() == ID_nondet_symbol,
-      ("unexpected array expression: member with '" + struct_op.id_string() +
-       "'")
-        .c_str());
+      "unexpected array expression: member with '" + struct_op.id_string() +
+        "'");
   }
   else if(a.id()==ID_constant ||
           a.id()==ID_array ||
@@ -216,8 +215,7 @@ void arrayst::collect_arrays(const exprt &a)
     // cast between array types?
     DATA_INVARIANT(
       typecast_op.type().id() == ID_array,
-      ("unexpected array type cast from " + typecast_op.type().id_string())
-        .c_str());
+      "unexpected array type cast from " + typecast_op.type().id_string());
 
     arrays.make_union(a, typecast_op);
     collect_arrays(typecast_op);
@@ -236,8 +234,7 @@ void arrayst::collect_arrays(const exprt &a)
   {
     DATA_INVARIANT(
       false,
-      ("unexpected array expression (collect_arrays): '" + a.id_string() + "'")
-        .c_str());
+      "unexpected array expression (collect_arrays): '" + a.id_string() + "'");
   }
 }
 
@@ -523,9 +520,8 @@ void arrayst::add_array_constraints(
   {
     DATA_INVARIANT(
       false,
-      ("unexpected array expression (add_array_constraints): '" +
-       expr.id_string() + "'")
-        .c_str());
+      "unexpected array expression (add_array_constraints): '" +
+        expr.id_string() + "'");
   }
 }
 
