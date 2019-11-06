@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/type.h>
 
+#include "java_type_signature_parser.h"
+
 class java_annotationt : public irept
 {
 public:
@@ -1074,12 +1076,28 @@ get_all_generic_parameters(const typet &type);
 class unsupported_java_class_signature_exceptiont:public std::logic_error
 {
 public:
-  explicit unsupported_java_class_signature_exceptiont(std::string type):
-    std::logic_error(
-      "Unsupported class signature: "+type)
+  explicit unsupported_java_class_signature_exceptiont(const std::string &type)
+    : std::logic_error("Unsupported class signature: " + type)
   {
   }
 };
+
+inline typet java_method_type_from_string_with_exception(
+  const std::string &descriptor,
+  const std::string &signature,
+  const java_generic_type_parameter_mapt &parameter_map,
+  const std::string &class_name)
+{
+  try
+  {
+    return java_method_type_signaturet(signature, parameter_map)
+      .get_type(class_name);
+  }
+  catch(unsupported_java_class_signature_exceptiont &)
+  {
+    return *java_type_from_string(descriptor, class_name);
+  }
+}
 
 inline optionalt<typet> java_type_from_string_with_exception(
   const std::string &descriptor,
@@ -1120,12 +1138,6 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
   return narrow_cast<size_t>(std::distance(gen_types.cbegin(), iter));
 }
 
-void get_dependencies_from_generic_parameters(
-  const std::string &,
-  std::set<irep_idt> &);
-void get_dependencies_from_generic_parameters(
-  const typet &,
-  std::set<irep_idt> &);
 
 /// Take a signature string and remove everything in angle brackets allowing for
 /// the type to be parsed normally, for example

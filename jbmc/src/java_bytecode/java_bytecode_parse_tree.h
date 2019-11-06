@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 
 #include "bytecode_info.h"
+#include "java_type_signature_parser.h"
 
 struct java_bytecode_parse_treet
 {
@@ -220,7 +221,6 @@ struct java_bytecode_parse_treet
     bool is_inner_class = false;
     bool is_static_class = false;
     bool is_anonymous_class = false;
-    bool attribute_bootstrapmethods_read = false;
     irep_idt outer_class; // when no outer class is set, there is no outer class
     size_t enum_elements=0;
 
@@ -269,6 +269,7 @@ struct java_bytecode_parse_treet
     typedef std::list<irep_idt> implementst;
     implementst implements;
     optionalt<std::string> signature;
+    optionalt<java_class_type_signaturet> parsed_sig;
     typedef std::list<fieldt> fieldst;
     typedef std::list<methodt> methodst;
     fieldst fields;

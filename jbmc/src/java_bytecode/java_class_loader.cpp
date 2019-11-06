@@ -125,9 +125,10 @@ java_class_loadert::get_parse_tree(
   }
 
   // Rummage through the class path
-  for(const auto &cp_entry : classpath_entries)
+  for(const classpath_entryt &cp_entry : classpath_entries)
   {
-    auto parse_tree = load_class(class_name, cp_entry);
+    optionalt<java_bytecode_parse_treet> parse_tree =
+      get_parse_tree(class_name, cp_entry);
     if(parse_tree.has_value())
       parse_trees.emplace_back(std::move(*parse_tree));
   }
@@ -179,6 +180,30 @@ java_class_loadert::get_parse_tree(
   warning() << "failed to load class " << class_name << eom;
   parse_trees.emplace_back(class_name);
   return parse_trees;
+}
+
+optionalt<java_bytecode_parse_treet> java_class_loadert::get_parse_tree(
+  const irep_idt &class_name,
+  const classpath_entryt &cp_entry)
+{
+  java_bytecode_reft bytecode = load_class(class_name, cp_entry);
+  if(!bytecode.has_value())
+    return {};
+  // Load outer class's generic parameters
+  java_generic_type_parameter_mapt outer_generic_parameters;
+  optionalt<std::string> outer_name = bytecode.get_outer_class_name();
+  if(outer_name)
+  {
+    optionalt<java_bytecode_parse_treet> outer =
+      get_parse_tree(*outer_name, cp_entry);
+    if(outer && outer->parsed_class.parsed_sig)
+    {
+      outer_generic_parameters =
+        outer->parsed_class.parsed_sig->type_parameter_map;
+    }
+  }
+  return java_bytecode_parse(
+    bytecode, outer_generic_parameters, get_message_handler());
 }
 
 /// Load all class files from a .jar file

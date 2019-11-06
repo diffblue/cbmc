@@ -52,6 +52,7 @@ SRC = allocate_objects.cpp \
       nondet.cpp \
       object_factory_parameters.cpp \
       options.cpp \
+      parsable_string.cpp \
       parse_options.cpp \
       parser.cpp \
       pointer_offset_size.cpp \

@@ -100,6 +100,8 @@ private:
   parse_tree_with_overridest_mapt class_map;
 
   optionalt<std::vector<irep_idt>> read_jar_file(const std::string &jar_path);
+  optionalt<java_bytecode_parse_treet>
+  get_parse_tree(const irep_idt &class_name, const classpath_entryt &cp_entry);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

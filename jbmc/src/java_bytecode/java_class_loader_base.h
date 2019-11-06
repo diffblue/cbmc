@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jar_pool.h"
 #include "java_bytecode_parse_tree.h"
+#include "java_bytecode_parser.h"
 
 /// Base class for maintaining classpath.
 class java_class_loader_baset : public messaget
@@ -55,15 +56,15 @@ protected:
   std::list<classpath_entryt> classpath_entries;
 
   /// attempt to load a class from a classpath_entry
-  optionalt<java_bytecode_parse_treet>
+  java_bytecode_reft
   load_class(const irep_idt &class_name, const classpath_entryt &);
 
   /// attempt to load a class from a given jar file
-  optionalt<java_bytecode_parse_treet>
+  java_bytecode_reft
   get_class_from_jar(const irep_idt &class_name, const std::string &jar_file);
 
   /// attempt to load a class from a given directory
-  optionalt<java_bytecode_parse_treet>
+  java_bytecode_reft
   get_class_from_directory(const irep_idt &class_name, const std::string &path);
 };
 
