@@ -839,9 +839,9 @@ bool cbmc_parse_optionst::process_goto_program(
                << messaget::eom;
 
   if(
-    options.is_set(RESTRICT_FUNCTION_POINTER_OPT) ||
-    options.is_set(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT) ||
-    options.is_set(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT))
+    !options.get_list_option(RESTRICT_FUNCTION_POINTER_OPT).empty() ||
+    !options.get_list_option(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT).empty() ||
+    !options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT).empty())
   {
     label_function_pointer_call_sites(goto_model);
     auto const by_name_restrictions =
