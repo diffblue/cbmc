@@ -4,6 +4,7 @@
 add_library(minisat2-condensed
     minisat/simp/SimpSolver.cc
     minisat/core/Solver.cc
+    minisat/utils/Options.cc
 )
 
 set_target_properties(
