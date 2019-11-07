@@ -392,11 +392,8 @@ void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
   {
     if(expr.id() == ID_not)
     {
-      if(expr.operands().size() == 1)
-      {
-        add_constraints_to_prop(expr.op0(), !value);
-        return;
-      }
+      add_constraints_to_prop(to_not_expr(expr).op(), !value);
+      return;
     }
     else
     {
@@ -430,13 +427,11 @@ void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
         }
         else if(expr.id() == ID_implies)
         {
-          if(expr.operands().size() == 2)
-          {
-            literalt l0 = convert(expr.op0());
-            literalt l1 = convert(expr.op1());
-            prop.lcnf(!l0, l1);
-            return;
-          }
+          const auto &implies_expr = to_implies_expr(expr);
+          literalt l_lhs = convert(implies_expr.lhs());
+          literalt l_rhs = convert(implies_expr.rhs());
+          prop.lcnf(!l_lhs, l_rhs);
+          return;
         }
         else if(expr.id() == ID_equal)
         {

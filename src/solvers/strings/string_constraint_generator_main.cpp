@@ -351,11 +351,14 @@ string_constraint_generatort::add_axioms_for_char_literal(
   // for C programs argument to char literal should be one string constant
   // of size 1.
   if(
-    arg.operands().size() == 1 && arg.op0().operands().size() == 1 &&
-    arg.op0().op0().operands().size() == 2 &&
-    arg.op0().op0().op0().id() == ID_string_constant)
+    arg.operands().size() == 1 &&
+    to_unary_expr(arg).op().operands().size() == 1 &&
+    to_unary_expr(to_unary_expr(arg).op()).op().operands().size() == 2 &&
+    to_binary_expr(to_unary_expr(to_unary_expr(arg).op()).op()).op0().id() ==
+      ID_string_constant)
   {
-    const string_constantt &s = to_string_constant(arg.op0().op0().op0());
+    const string_constantt &s = to_string_constant(
+      to_binary_expr(to_unary_expr(to_unary_expr(arg).op()).op()).op0());
     const std::string &sval = id2string(s.get_value());
     CHECK_RETURN(sval.size() == 1);
     return {from_integer(unsigned(sval[0]), arg.type()), {}};

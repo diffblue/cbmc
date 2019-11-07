@@ -98,10 +98,13 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
     // passing the lemmas to the solver.
     return to_array_string_expr(if_exprt(if_expr.cond(), t, f, array_type));
   }
+
   const bool is_constant_array =
     char_pointer.id() == ID_address_of &&
-    (to_address_of_expr(char_pointer).object().id() == ID_index) &&
-    char_pointer.op0().op0().id() == ID_array;
+    to_address_of_expr(char_pointer).object().id() == ID_index &&
+    to_index_expr(to_address_of_expr(char_pointer).object()).array().id() ==
+      ID_array;
+
   if(is_constant_array)
   {
     return to_array_string_expr(

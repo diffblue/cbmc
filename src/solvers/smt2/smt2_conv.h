@@ -104,8 +104,8 @@ protected:
   void convert_struct(const struct_exprt &expr);
   void convert_union(const union_exprt &expr);
   void convert_constant(const constant_exprt &expr);
-  void convert_relation(const exprt &expr);
-  void convert_is_dynamic_object(const exprt &expr);
+  void convert_relation(const binary_relation_exprt &);
+  void convert_is_dynamic_object(const unary_exprt &);
   void convert_plus(const plus_exprt &expr);
   void convert_minus(const minus_exprt &expr);
   void convert_div(const div_exprt &expr);

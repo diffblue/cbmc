@@ -1900,8 +1900,10 @@ static exprt lower_byte_update_struct(
         typecast_exprt::conditional_cast(member, bv_typet{element_bits_int}),
         from_integer(0, bv_typet{shift}),
         bv_typet{shift + element_bits_int}};
+
       if(!little_endian)
-        member.op0().swap(member.op1());
+        to_concatenation_expr(member).op0().swap(
+          to_concatenation_expr(member).op1());
     }
 
     // Finally construct the updated member.
@@ -2125,7 +2127,9 @@ static exprt lower_byte_update(
                             bv_typet{width}};
 
       if(!is_little_endian)
-        val_before.op0().swap(val_before.op1());
+        to_concatenation_expr(val_before)
+          .op0()
+          .swap(to_concatenation_expr(val_before).op1());
     }
     bitand_exprt bitand_expr{val_before, bitnot_exprt{mask_shifted}};
 
@@ -2143,7 +2147,9 @@ static exprt lower_byte_update(
                             bv_typet{width}};
 
       if(!is_little_endian)
-        zero_extended.op0().swap(zero_extended.op1());
+        to_concatenation_expr(zero_extended)
+          .op0()
+          .swap(to_concatenation_expr(zero_extended).op1());
     }
     else
       zero_extended = value;

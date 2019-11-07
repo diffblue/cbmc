@@ -33,25 +33,24 @@ bddt bdd_exprt::from_expr_rec(const exprt &expr)
       "logical and, or, and xor expressions have at least two operands");
     exprt bin_expr=make_binary(expr);
 
-    bddt op0 = from_expr_rec(bin_expr.op0());
-    bddt op1 = from_expr_rec(bin_expr.op1());
+    bddt lhs = from_expr_rec(to_binary_expr(bin_expr).lhs());
+    bddt rhs = from_expr_rec(to_binary_expr(bin_expr).rhs());
 
     return expr.id() == ID_and
-             ? op0.bdd_and(op1)
-             : (expr.id() == ID_or ? op0.bdd_or(op1) : op0.bdd_xor(op1));
+             ? lhs.bdd_and(rhs)
+             : (expr.id() == ID_or ? lhs.bdd_or(rhs) : lhs.bdd_xor(rhs));
   }
   else if(expr.id()==ID_implies)
   {
     const implies_exprt &imp_expr=to_implies_expr(expr);
 
-    bddt n_op0 = from_expr_rec(imp_expr.op0()).bdd_not();
-    bddt op1 = from_expr_rec(imp_expr.op1());
+    bddt n_lhs = from_expr_rec(imp_expr.lhs()).bdd_not();
+    bddt rhs = from_expr_rec(imp_expr.rhs());
 
-    return n_op0.bdd_or(op1);
+    return n_lhs.bdd_or(rhs);
   }
-  else if(expr.id()==ID_equal &&
-          expr.operands().size()==2 &&
-          expr.op0().type().id()==ID_bool)
+  else if(
+    expr.id() == ID_equal && to_equal_expr(expr).lhs().type().id() == ID_bool)
   {
     const equal_exprt &eq_expr=to_equal_expr(expr);
 
