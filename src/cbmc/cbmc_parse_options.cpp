@@ -360,7 +360,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("solver-parameters"))
   {
-    options.set_option("solver-parameters", cmdline.get_comma_separated_values("solver-parameters"));
+    options.set_option(
+      "solver-parameters",
+      cmdline.get_comma_separated_values("solver-parameters"));
   }
 
   if(cmdline.isset("refine-strings"))

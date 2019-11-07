@@ -82,7 +82,11 @@ public:
   // Set optional parameters in the backend solver.
   // \param param: The parameter as a string
   // \return True if parameter is valid and has been set.
-  static bool set_parameter(const char *const param) {return false;}
+  static bool set_parameter(const char *const param)
+  {
+    return false;
+  }
+
 protected:
   enum class statust { INIT, SAT, UNSAT, ERROR };
   statust status;

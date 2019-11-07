@@ -174,19 +174,23 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   auto solver = util_make_unique<solvert>();
 
   bool is_without_simplifier = options.get_bool_option("beautify") ||
-    !options.get_bool_option("sat-preprocessor");
+                               !options.get_bool_option("sat-preprocessor");
 
-  if (options.is_set("solver-parameters"))
+  if(options.is_set("solver-parameters"))
   {
     std::list<std::string> opts = options.get_list_option("solver-parameters");
-    for (auto &opt : opts) {
-      bool success = is_without_simplifier \
-        ? satcheck_no_simplifiert::set_parameter(opt.c_str()) \
-        : satcheckt::set_parameter(opt.c_str());
+    for(auto &opt : opts)
+    {
+      bool success = is_without_simplifier
+                       ? satcheck_no_simplifiert::set_parameter(opt.c_str())
+                       : satcheckt::set_parameter(opt.c_str());
       messaget log(message_handler);
-      if (success) {
+      if(success)
+      {
         log.warning() << "Setting ";
-      } else {
+      }
+      else
+      {
         log.warning() << "Cannot set ";
       }
       log.warning() << "SAT solver parameter " << opt << messaget::eom;
