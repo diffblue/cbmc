@@ -20,76 +20,145 @@ exprt float_bvt::convert(const exprt &expr) const
   else if(expr.id()==ID_unary_minus)
     return negation(to_unary_minus_expr(expr).op(), get_spec(expr));
   else if(expr.id()==ID_ieee_float_equal)
-    return is_equal(expr.op0(), expr.op1(), get_spec(expr.op0()));
+  {
+    const auto &equal_expr = to_ieee_float_equal_expr(expr);
+    return is_equal(
+      equal_expr.lhs(), equal_expr.rhs(), get_spec(equal_expr.lhs()));
+  }
   else if(expr.id()==ID_ieee_float_notequal)
-    return not_exprt(is_equal(expr.op0(), expr.op1(), get_spec(expr.op0())));
+  {
+    const auto &notequal_expr = to_ieee_float_notequal_expr(expr);
+    return not_exprt(is_equal(
+      notequal_expr.lhs(), notequal_expr.rhs(), get_spec(notequal_expr.lhs())));
+  }
   else if(expr.id()==ID_floatbv_typecast)
   {
-    const typet &src_type=expr.op0().type();
-    const typet &dest_type=expr.type();
+    const auto &floatbv_typecast_expr = to_floatbv_typecast_expr(expr);
+    const auto &op = floatbv_typecast_expr.op();
+    const typet &src_type = floatbv_typecast_expr.op().type();
+    const typet &dest_type = floatbv_typecast_expr.type();
+    const auto &rounding_mode = floatbv_typecast_expr.rounding_mode();
 
     if(dest_type.id()==ID_signedbv &&
        src_type.id()==ID_floatbv) // float -> signed
-      return
-        to_signed_integer(
-          expr.op0(),
-          to_signedbv_type(dest_type).get_width(),
-          expr.op1(),
-          get_spec(expr.op0()));
+      return to_signed_integer(
+        op,
+        to_signedbv_type(dest_type).get_width(),
+        rounding_mode,
+        get_spec(op));
     else if(dest_type.id()==ID_unsignedbv &&
             src_type.id()==ID_floatbv) // float -> unsigned
-      return
-        to_unsigned_integer(
-          expr.op0(),
-          to_unsignedbv_type(dest_type).get_width(),
-          expr.op1(),
-          get_spec(expr.op0()));
+      return to_unsigned_integer(
+        op,
+        to_unsignedbv_type(dest_type).get_width(),
+        rounding_mode,
+        get_spec(op));
     else if(src_type.id()==ID_signedbv &&
             dest_type.id()==ID_floatbv) // signed -> float
-      return from_signed_integer(
-        expr.op0(), expr.op1(), get_spec(expr));
+      return from_signed_integer(op, rounding_mode, get_spec(expr));
     else if(src_type.id()==ID_unsignedbv &&
             dest_type.id()==ID_floatbv) // unsigned -> float
-      return from_unsigned_integer(
-        expr.op0(), expr.op1(), get_spec(expr));
+    {
+      return from_unsigned_integer(op, rounding_mode, get_spec(expr));
+    }
     else if(dest_type.id()==ID_floatbv &&
             src_type.id()==ID_floatbv) // float -> float
-      return
-        conversion(
-          expr.op0(), expr.op1(), get_spec(expr.op0()), get_spec(expr));
+    {
+      return conversion(op, rounding_mode, get_spec(op), get_spec(expr));
+    }
     else
       return nil_exprt();
   }
-  else if(expr.id()==ID_typecast &&
-          expr.type().id()==ID_bool &&
-          expr.op0().type().id()==ID_floatbv)  // float -> bool
-    return not_exprt(is_zero(expr.op0()));
+  else if(
+    expr.id() == ID_typecast && expr.type().id() == ID_bool &&
+    to_typecast_expr(expr).op().type().id() == ID_floatbv) // float -> bool
+  {
+    return not_exprt(is_zero(to_typecast_expr(expr).op()));
+  }
   else if(expr.id()==ID_floatbv_plus)
-    return add_sub(false, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
+  {
+    const auto &float_expr = to_ieee_float_op_expr(expr);
+    return add_sub(
+      false,
+      float_expr.lhs(),
+      float_expr.rhs(),
+      float_expr.rounding_mode(),
+      get_spec(expr));
+  }
   else if(expr.id()==ID_floatbv_minus)
-    return add_sub(true, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
+  {
+    const auto &float_expr = to_ieee_float_op_expr(expr);
+    return add_sub(
+      true,
+      float_expr.lhs(),
+      float_expr.rhs(),
+      float_expr.rounding_mode(),
+      get_spec(expr));
+  }
   else if(expr.id()==ID_floatbv_mult)
-    return mul(expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
+  {
+    const auto &float_expr = to_ieee_float_op_expr(expr);
+    return mul(
+      float_expr.lhs(),
+      float_expr.rhs(),
+      float_expr.rounding_mode(),
+      get_spec(expr));
+  }
   else if(expr.id()==ID_floatbv_div)
-    return div(expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
+  {
+    const auto &float_expr = to_ieee_float_op_expr(expr);
+    return div(
+      float_expr.lhs(),
+      float_expr.rhs(),
+      float_expr.rounding_mode(),
+      get_spec(expr));
+  }
   else if(expr.id()==ID_isnan)
-    return isnan(expr.op0(), get_spec(expr.op0()));
+  {
+    const auto &op = to_unary_expr(expr).op();
+    return isnan(op, get_spec(op));
+  }
   else if(expr.id()==ID_isfinite)
-    return isfinite(expr.op0(), get_spec(expr.op0()));
+  {
+    const auto &op = to_unary_expr(expr).op();
+    return isfinite(op, get_spec(op));
+  }
   else if(expr.id()==ID_isinf)
-    return isinf(expr.op0(), get_spec(expr.op0()));
+  {
+    const auto &op = to_unary_expr(expr).op();
+    return isinf(op, get_spec(op));
+  }
   else if(expr.id()==ID_isnormal)
-    return isnormal(expr.op0(), get_spec(expr.op0()));
+  {
+    const auto &op = to_unary_expr(expr).op();
+    return isnormal(op, get_spec(op));
+  }
   else if(expr.id()==ID_lt)
-    return relation(expr.op0(), relt::LT, expr.op1(), get_spec(expr.op0()));
+  {
+    const auto &rel_expr = to_binary_relation_expr(expr);
+    return relation(
+      rel_expr.lhs(), relt::LT, rel_expr.rhs(), get_spec(rel_expr.lhs()));
+  }
   else if(expr.id()==ID_gt)
-    return relation(expr.op0(), relt::GT, expr.op1(), get_spec(expr.op0()));
+  {
+    const auto &rel_expr = to_binary_relation_expr(expr);
+    return relation(
+      rel_expr.lhs(), relt::GT, rel_expr.rhs(), get_spec(rel_expr.lhs()));
+  }
   else if(expr.id()==ID_le)
-    return relation(expr.op0(), relt::LE, expr.op1(), get_spec(expr.op0()));
+  {
+    const auto &rel_expr = to_binary_relation_expr(expr);
+    return relation(
+      rel_expr.lhs(), relt::LE, rel_expr.rhs(), get_spec(rel_expr.lhs()));
+  }
   else if(expr.id()==ID_ge)
-    return relation(expr.op0(), relt::GE, expr.op1(), get_spec(expr.op0()));
+  {
+    const auto &rel_expr = to_binary_relation_expr(expr);
+    return relation(
+      rel_expr.lhs(), relt::GE, rel_expr.rhs(), get_spec(rel_expr.lhs()));
+  }
   else if(expr.id()==ID_sign)
-    return sign_bit(expr.op0());
+    return sign_bit(to_unary_expr(expr).op());
 
   return nil_exprt();
 }
