@@ -128,7 +128,7 @@ minisat2-download:
 	@$(TAR) xfz minisat2_2.2.1.orig.tar.gz
 	@rm -Rf ../minisat-2.2.1
 	@mv minisat2-2.2.1 ../minisat-2.2.1
-	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
+	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch && patch -p1 < ../scripts/minisat-2.2.1-export-parseSingleOption.patch)
 	@rm minisat2_2.2.1.orig.tar.gz
 
 cudd-download:

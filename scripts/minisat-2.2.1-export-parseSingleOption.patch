@@ -1,0 +1,76 @@
+From f394073844d6abe65dbd81eb6a787ae25e780e77 Mon Sep 17 00:00:00 2001
+From: Chaitanya Mangla <manglac@amazon.com>
+Date: Wed, 6 Nov 2019 16:20:14 -0800
+Subject: [PATCH] Exporting parseSingleOption
+
+---
+ minisat/utils/Options.cc | 22 +++++++++++++---------
+ minisat/utils/Options.h  |  2 ++
+ 2 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/minisat/utils/Options.cc b/minisat/utils/Options.cc
+index 83c40e8..3484d8f 100644
+--- a/minisat/utils/Options.cc
++++ b/minisat/utils/Options.cc
+@@ -34,25 +34,29 @@ void Minisat::parseOptions(int& argc, char** argv, bool strict)
+             else if (match(str, "-verb"))
+                 printUsageAndExit(argc, argv, true);
+         } else {
+-            bool parsed_ok = false;
+-        
+-            for (int k = 0; !parsed_ok && k < Option::getOptionList().size(); k++){
+-                parsed_ok = Option::getOptionList()[k]->parse(argv[i]);
+-
+-                // fprintf(stderr, "checking %d: %s against flag <%s> (%s)\n", i, argv[i], Option::getOptionList()[k]->name, parsed_ok ? "ok" : "skip");
+-            }
+-
+-            if (!parsed_ok)
++            bool parsed_ok = parseSingleOption(argv[i]);
++            if (!parsed_ok) {
+                 if (strict && match(argv[i], "-"))
+                     fprintf(stderr, "ERROR! Unknown flag \"%s\". Use '--%shelp' for help.\n", argv[i], Option::getHelpPrefixString()), exit(1);
+                 else
+                     argv[j++] = argv[i];
++            }
+         }
+     }
+ 
+     argc -= (i - j);
+ }
+ 
++bool Minisat::parseSingleOption(const char* option)
++{
++    bool parsed_ok = false;
++    for(int k = 0; !parsed_ok && k < Option::getOptionList().size(); k++)
++    {
++        parsed_ok = Option::getOptionList()[k]->parse(option);
++        // fprintf(stderr, "checking %d: %s against flag <%s> (%s)\n", i, argv[i], Option::getOptionList()[k]->name, parsed_ok ? "ok" : "skip");
++    }
++    return parsed_ok;
++}
+ 
+ void Minisat::setUsageHelp      (const char* str){ Option::getUsageString() = str; }
+ void Minisat::setHelpPrefixStr  (const char* str){ Option::getHelpPrefixString() = str; }
+diff --git a/minisat/utils/Options.h b/minisat/utils/Options.h
+index 7d2e83a..e95bae5 100644
+--- a/minisat/utils/Options.h
++++ b/minisat/utils/Options.h
+@@ -39,6 +39,7 @@ extern void parseOptions     (int& argc, char** argv, bool strict = false);
+ extern void printUsageAndExit(int  argc, char** argv, bool verbose = false);
+ extern void setUsageHelp     (const char* str);
+ extern void setHelpPrefixStr (const char* str);
++extern bool parseSingleOption(const char* option);
+ 
+ 
+ //==================================================================================================
+@@ -86,6 +87,7 @@ class Option
+     friend  void printUsageAndExit (int  argc, char** argv, bool verbose);
+     friend  void setUsageHelp      (const char* str);
+     friend  void setHelpPrefixStr  (const char* str);
++    friend  bool parseSingleOption (const char* option);
+ };
+ 
+ 
+-- 
+2.23.0
+
