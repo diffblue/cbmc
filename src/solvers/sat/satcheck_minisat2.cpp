@@ -374,9 +374,8 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 
 bool satcheck_minisat_simplifiert::set_parameter(const char *const param)
 {
-  char *p = new char[strlen(param) + 2];
-  p[0] = '-';
-  p[1] = 0;
-  strcat(p, param);
-  return Minisat::parseSingleOption(p);
+  int p_len = strlen(param) + 2;
+  char *p = new char[p_len];
+  int cx = snprintf(p, p_len, "-%s", param); // prefix param with '-'
+  return cx >= 0 && cx < p_len && Minisat::parseSingleOption(p);
 }
