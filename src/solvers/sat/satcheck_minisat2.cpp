@@ -379,3 +379,4 @@ bool satcheck_minisat_simplifiert::set_parameter(const char *const param)
   strcat(p, param);
   return Minisat::parseSingleOption(p);
 }
+

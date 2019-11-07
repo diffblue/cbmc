@@ -88,7 +88,11 @@ public:
   const std::string solver_text() override final;
   void set_frozen(literalt a) override final;
   bool is_eliminated(literalt a) const;
-  static bool set_parameter(const char *const params);
+
+  // Set SimpSolver options
+  // \param param: The parameter as a string, e.g. "cl-lim=-1"
+  // \return True if minisat succeeded in setting it
+  static bool set_parameter(const char *const param);
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_MINISAT2_H
