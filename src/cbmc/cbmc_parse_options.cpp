@@ -358,6 +358,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+  if(cmdline.isset("solver-parameters"))
+  {
+    options.set_option("solver-parameters", cmdline.get_comma_separated_values("solver-parameters"));
+  }
+
   if(cmdline.isset("refine-strings"))
   {
     options.set_option("refine-strings", true);
@@ -1052,6 +1057,7 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --solver-parameters          Set parameters in the backend solver\n"
     HELP_STRING_REFINEMENT_CBMC
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)

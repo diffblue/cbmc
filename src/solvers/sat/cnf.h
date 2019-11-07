@@ -79,6 +79,7 @@ public:
     return clause_counter;
   }
 
+  static bool set_parameter(const char *const param) {return false;}
 protected:
   enum class statust { INIT, SAT, UNSAT, ERROR };
   statust status;

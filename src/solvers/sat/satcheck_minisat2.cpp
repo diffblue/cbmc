@@ -371,3 +371,11 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 
   return solver->isEliminated(a.var_no());
 }
+
+bool satcheck_minisat_simplifiert::set_parameter(const char *const param)
+{
+  char *p = new char[strlen(param) + 2];
+  p[0] = '-'; p[1] = 0;
+  strcat(p, param);
+  return Minisat::parseSingleOption(p);
+}

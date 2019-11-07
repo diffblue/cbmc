@@ -88,6 +88,7 @@ public:
   const std::string solver_text() override final;
   void set_frozen(literalt a) override final;
   bool is_eliminated(literalt a) const;
+  static bool set_parameter(const char *const params);
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_MINISAT2_H
