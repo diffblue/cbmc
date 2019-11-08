@@ -145,9 +145,11 @@ SCENARIO("expr_dynamic_cast",
 
   GIVEN("A byte extract expression with little endianness")
   {
-    auto byte = byte_extract_exprt(ID_byte_extract_little_endian);
-    byte.op() = symbol_exprt(typet());
-    byte.offset() = constant_exprt("0", typet());
+    auto byte = byte_extract_exprt(
+      ID_byte_extract_little_endian,
+      symbol_exprt(typet()),
+      constant_exprt("0", typet()),
+      typet());
     THEN("try_expr_dynamic_cast<byte_extract_expr> returns non-empty")
     {
       REQUIRE(expr_try_dynamic_cast<byte_extract_exprt>(byte));
@@ -155,9 +157,11 @@ SCENARIO("expr_dynamic_cast",
   }
   GIVEN("A byte extract expression with big endianness")
   {
-    auto byte = byte_extract_exprt(ID_byte_extract_big_endian);
-    byte.op() = symbol_exprt(typet());
-    byte.offset() = constant_exprt("0", typet());
+    auto byte = byte_extract_exprt(
+      ID_byte_extract_big_endian,
+      symbol_exprt(typet()),
+      constant_exprt("0", typet()),
+      typet());
     THEN("try_expr_dynamic_cast<byte_extract_expr> returns non-empty")
     {
       REQUIRE(expr_try_dynamic_cast<byte_extract_exprt>(byte));
@@ -177,9 +181,11 @@ SCENARIO("can_cast_expr", "[core][utils][expr_cast][can_cast_expr]")
 {
   GIVEN("A byte extract expression with little endianness")
   {
-    auto byte = byte_extract_exprt(ID_byte_extract_little_endian);
-    byte.op() = symbol_exprt(typet());
-    byte.offset() = constant_exprt("0", typet());
+    auto byte = byte_extract_exprt(
+      ID_byte_extract_little_endian,
+      symbol_exprt(typet()),
+      constant_exprt("0", typet()),
+      typet());
     THEN("can_expr_expr<byte_extract_expr> returns true")
     {
       REQUIRE(can_cast_expr<byte_extract_exprt>(byte));
@@ -187,9 +193,11 @@ SCENARIO("can_cast_expr", "[core][utils][expr_cast][can_cast_expr]")
   }
   GIVEN("A byte extract expression with big endianness")
   {
-    auto byte = byte_extract_exprt(ID_byte_extract_big_endian);
-    byte.op() = symbol_exprt(typet());
-    byte.offset() = constant_exprt("0", typet());
+    auto byte = byte_extract_exprt(
+      ID_byte_extract_big_endian,
+      symbol_exprt(typet()),
+      constant_exprt("0", typet()),
+      typet());
     THEN("can_expr_expr<byte_extract_expr> returns true")
     {
       REQUIRE(can_cast_expr<byte_extract_exprt>(byte));
