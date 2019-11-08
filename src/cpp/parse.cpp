@@ -920,19 +920,20 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
   if(lex.get_token(tk)!=TOK_STATIC_ASSERT)
     return false;
 
-  cpp_static_assert=cpp_static_assertt();
-  set_location(cpp_static_assert, tk);
-
   if(lex.get_token(tk)!='(')
     return false;
 
-  if(!rExpression(cpp_static_assert.cond(), false))
+  exprt cond;
+
+  if(!rExpression(cond, false))
     return false;
 
   if(lex.get_token(tk)!=',')
     return false;
 
-  if(!rExpression(cpp_static_assert.description(), false))
+  exprt description;
+
+  if(!rExpression(description, false))
     return false;
 
   if(lex.get_token(tk)!=')')
@@ -940,6 +941,10 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
 
   if(lex.get_token(tk)!=';')
     return false;
+
+  cpp_static_assert =
+    cpp_static_assertt(std::move(cond), std::move(description));
+  set_location(cpp_static_assert, tk);
 
   return true;
 }
@@ -7505,7 +7510,7 @@ optionalt<codet> Parser::rStatement()
 
   case TOK_STATIC_ASSERT:
     {
-      cpp_static_assertt cpp_static_assert;
+      cpp_static_assertt cpp_static_assert{nil_exprt(), nil_exprt()};
 
       if(!rStaticAssert(cpp_static_assert))
         return {};
