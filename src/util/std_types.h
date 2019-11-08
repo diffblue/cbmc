@@ -1789,11 +1789,6 @@ inline vector_typet &to_vector_type(typet &type)
 class complex_typet:public type_with_subtypet
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 2, "use complex_typet(type) instead"))
-  complex_typet():type_with_subtypet(ID_complex)
-  {
-  }
-
   explicit complex_typet(typet _subtype)
     : type_with_subtypet(ID_complex, std::move(_subtype))
   {

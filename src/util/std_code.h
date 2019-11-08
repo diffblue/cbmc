@@ -748,18 +748,6 @@ code_blockt create_fatal_assertion(
 class code_ifthenelset:public codet
 {
 public:
-  DEPRECATED(SINCE(
-    2018,
-    12,
-    2,
-    "use code_ifthenelset(condition, then_code[, else_code]) instead"))
-  code_ifthenelset():codet(ID_ifthenelse)
-  {
-    operands().resize(3);
-    op1().make_nil();
-    op2().make_nil();
-  }
-
   /// An if \p condition then \p then_code else \p else_code statement.
   code_ifthenelset(exprt condition, codet then_code, codet else_code)
     : codet(
@@ -1034,13 +1022,6 @@ inline code_dowhilet &to_code_dowhile(codet &code)
 class code_fort:public codet
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use code_fort(init, cond, iter, body) instead"))
-  code_fort():codet(ID_for)
-  {
-    operands().resize(4);
-  }
-
   /// A statement describing a for loop with initializer \p _init, loop
   /// condition \p _cond, increment \p _iter, and body \p _body.
   code_fort(exprt _init, exprt _cond, exprt _iter, codet _body)
@@ -1973,17 +1954,6 @@ inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
-  DEPRECATED(SINCE(
-    2018,
-    8,
-    9,
-    "use side_effect_expr_nondett(statement, type, loc) instead"))
-  explicit side_effect_expr_nondett(const typet &_type):
-    side_effect_exprt(ID_nondet, _type)
-  {
-    set_nullable(true);
-  }
-
   side_effect_expr_nondett(typet _type, source_locationt loc)
     : side_effect_exprt(ID_nondet, std::move(_type), std::move(loc))
   {
@@ -2468,12 +2438,6 @@ static inline const code_landingpadt &to_code_landingpad(const codet &code)
 class code_try_catcht:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 2, "use code_try_catcht(try_code) instead"))
-  code_try_catcht():codet(ID_try_catch)
-  {
-    operands().resize(1);
-  }
-
   /// A statement representing try \p _try_code catch ...
   explicit code_try_catcht(codet _try_code)
     : codet(ID_try_catch, {std::move(_try_code)})

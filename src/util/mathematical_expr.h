@@ -19,11 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class transt : public ternary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use transt(op0, op1, op2) instead"))
-  transt() : ternary_exprt(ID_trans)
-  {
-  }
-
   transt(
     const irep_idt &_id,
     const exprt &_op0,

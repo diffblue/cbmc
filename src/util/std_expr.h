@@ -54,14 +54,7 @@ public:
 class ternary_exprt : public expr_protectedt
 {
 public:
-  // constructors
-  DEPRECATED(
-    SINCE(2018, 9, 21, "use ternary_exprt(id, op0, op1, op2, type) instead"))
-  explicit ternary_exprt(const irep_idt &_id) : expr_protectedt(_id, type())
-  {
-    operands().resize(3);
-  }
-
+  // constructor
   ternary_exprt(
     const irep_idt &_id,
     exprt _op0,
@@ -278,13 +271,6 @@ public:
   unary_exprt(const irep_idt &_id, const exprt &_op)
     : expr_protectedt(_id, _op.type(), {_op})
   {
-  }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use unary_exprt(id, op, type) instead"))
-  unary_exprt(const irep_idt &_id, const typet &_type)
-    : expr_protectedt(_id, _type)
-  {
-    operands().resize(1);
   }
 
   unary_exprt(const irep_idt &_id, exprt _op, typet _type)
@@ -548,29 +534,9 @@ inline bswap_exprt &to_bswap_expr(exprt &expr)
 class predicate_exprt : public expr_protectedt
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 2, "use predicate_exprt(id) instead"))
-  predicate_exprt() : expr_protectedt(irep_idt(), bool_typet())
-  {
-  }
-
   explicit predicate_exprt(const irep_idt &_id)
     : expr_protectedt(_id, bool_typet())
   {
-  }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use unary_predicate_exprt(id, op) instead"))
-  predicate_exprt(const irep_idt &_id, const exprt &_op)
-    : expr_protectedt(_id, bool_typet())
-  {
-    add_to_operands(_op);
-  }
-
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use binary_predicate_exprt(op1, id, op2) instead"))
-  predicate_exprt(const irep_idt &_id, const exprt &_op0, const exprt &_op1)
-    : expr_protectedt(_id, bool_typet())
-  {
-    add_to_operands(_op0, _op1);
   }
 };
 
@@ -579,17 +545,6 @@ public:
 class unary_predicate_exprt:public unary_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 2, "use unary_predicate_exprt(id, op) instead"))
-  unary_predicate_exprt():unary_exprt(irep_idt(), bool_typet())
-  {
-  }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use unary_predicate_exprt(id, op) instead"))
-  explicit unary_predicate_exprt(const irep_idt &_id):
-    unary_exprt(_id, bool_typet())
-  {
-  }
-
   unary_predicate_exprt(const irep_idt &_id, exprt _op)
     : unary_exprt(_id, std::move(_op), bool_typet())
   {
@@ -601,11 +556,6 @@ public:
 class sign_exprt:public unary_predicate_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 2, "use sign_exprt(op) instead"))
-  sign_exprt()
-  {
-  }
-
   explicit sign_exprt(exprt _op)
     : unary_predicate_exprt(ID_sign, std::move(_op))
   {
@@ -650,19 +600,6 @@ inline sign_exprt &to_sign_expr(exprt &expr)
 class binary_exprt : public expr_protectedt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use binary_exprt(lhs, id, rhs) instead"))
-  explicit binary_exprt(const irep_idt &_id) : expr_protectedt(_id, typet())
-  {
-    operands().resize(2);
-  }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use binary_exprt(lhs, id, rhs, type) instead"))
-  binary_exprt(const irep_idt &_id, const typet &_type)
-    : expr_protectedt(_id, _type)
-  {
-    operands().resize(2);
-  }
-
   binary_exprt(const exprt &_lhs, const irep_idt &_id, exprt _rhs)
     : expr_protectedt(_id, _lhs.type(), {_lhs, std::move(_rhs)})
   {
@@ -756,19 +693,6 @@ inline binary_exprt &to_binary_expr(exprt &expr)
 class binary_predicate_exprt:public binary_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use binary_predicate_exprt(lhs, id, rhs) instead"))
-  binary_predicate_exprt():binary_exprt(irep_idt(), bool_typet())
-  {
-  }
-
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use binary_predicate_exprt(lhs, id, rhs) instead"))
-  explicit binary_predicate_exprt(const irep_idt &_id):
-    binary_exprt(_id, bool_typet())
-  {
-  }
-
   binary_predicate_exprt(exprt _op0, const irep_idt &_id, exprt _op1)
     : binary_exprt(std::move(_op0), _id, std::move(_op1), bool_typet())
   {
@@ -800,19 +724,6 @@ public:
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use binary_relation_exprt(lhs, id, rhs) instead"))
-  binary_relation_exprt()
-  {
-  }
-
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use binary_relation_exprt(lhs, id, rhs) instead"))
-  explicit binary_relation_exprt(const irep_idt &id):
-    binary_predicate_exprt(id)
-  {
-  }
-
   binary_relation_exprt(exprt _lhs, const irep_idt &_id, exprt _rhs)
     : binary_predicate_exprt(std::move(_lhs), _id, std::move(_rhs))
   {
@@ -879,11 +790,6 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 class multi_ary_exprt : public expr_protectedt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use multi_ary_exprt(id, op, type) instead"))
-  explicit multi_ary_exprt(const irep_idt &_id) : expr_protectedt(_id, typet())
-  {
-  }
-
   DEPRECATED(SINCE(2018, 12, 7, "use multi_ary_exprt(id, op, type) instead"))
   multi_ary_exprt(const irep_idt &_id, const typet &_type)
     : expr_protectedt(_id, _type)
@@ -980,11 +886,6 @@ inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
 class plus_exprt:public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use plus_exprt(lhs, rhs, type) instead"))
-  plus_exprt(const typet &type) : multi_ary_exprt(ID_plus, type)
-  {
-  }
-
   plus_exprt(exprt _lhs, exprt _rhs)
     : multi_ary_exprt(std::move(_lhs), ID_plus, std::move(_rhs))
   {
@@ -1588,12 +1489,6 @@ inline array_exprt &to_array_expr(exprt &expr)
 class array_list_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use array_list_exprt(operands, type) instead"))
-  explicit array_list_exprt(const array_typet &_type)
-    : multi_ary_exprt(ID_array_list, _type)
-  {
-  }
-
   array_list_exprt(operandst _operands, array_typet _type)
     : multi_ary_exprt(ID_array_list, std::move(_operands), std::move(_type))
   {
@@ -1647,12 +1542,6 @@ inline array_list_exprt &to_array_list_expr(exprt &expr)
 class vector_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use vector_exprt(operands, type) instead"))
-  explicit vector_exprt(const vector_typet &_type)
-    : multi_ary_exprt(ID_vector, _type)
-  {
-  }
-
   vector_exprt(operandst _operands, vector_typet _type)
     : multi_ary_exprt(ID_vector, std::move(_operands), std::move(_type))
   {
@@ -2276,11 +2165,6 @@ inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 class and_exprt:public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use and_exprt(op, op) instead"))
-  and_exprt():multi_ary_exprt(ID_and, bool_typet())
-  {
-  }
-
   and_exprt(exprt op0, exprt op1)
     : multi_ary_exprt(std::move(op0), ID_and, std::move(op1), bool_typet())
   {
@@ -2389,11 +2273,6 @@ inline implies_exprt &to_implies_expr(exprt &expr)
 class or_exprt:public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use or_exprt(op, op) instead"))
-  or_exprt():multi_ary_exprt(ID_or, bool_typet())
-  {
-  }
-
   or_exprt(exprt op0, exprt op1)
     : multi_ary_exprt(std::move(op0), ID_or, std::move(op1), bool_typet())
   {
@@ -2457,11 +2336,6 @@ inline or_exprt &to_or_expr(exprt &expr)
 class xor_exprt:public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use xor_exprt(op, op) instead"))
-  xor_exprt():multi_ary_exprt(ID_bitxor, bool_typet())
-  {
-  }
-
   xor_exprt(exprt _op0, exprt _op1)
     : multi_ary_exprt(std::move(_op0), ID_xor, std::move(_op1), bool_typet())
   {
@@ -3000,11 +2874,6 @@ public:
   explicit not_exprt(exprt _op) : unary_exprt(ID_not, std::move(_op))
   {
     PRECONDITION(as_const(*this).op().type().id() == ID_bool);
-  }
-
-  DEPRECATED(SINCE(2019, 1, 12, "use not_exprt(op) instead"))
-  not_exprt():unary_exprt(ID_not, bool_typet())
-  {
   }
 };
 
@@ -3672,11 +3541,6 @@ public:
     : unary_predicate_exprt(ID_isnan, std::move(op))
   {
   }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use isnan_exprt(op) instead"))
-  isnan_exprt():unary_predicate_exprt(ID_isnan)
-  {
-  }
 };
 
 template <>
@@ -3720,11 +3584,6 @@ class isinf_exprt:public unary_predicate_exprt
 public:
   explicit isinf_exprt(exprt op)
     : unary_predicate_exprt(ID_isinf, std::move(op))
-  {
-  }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use isinf_exprt(op) instead"))
-  isinf_exprt():unary_predicate_exprt(ID_isinf)
   {
   }
 };
@@ -3772,11 +3631,6 @@ public:
     : unary_predicate_exprt(ID_isfinite, std::move(op))
   {
   }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use isfinite_exprt(op) instead"))
-  isfinite_exprt():unary_predicate_exprt(ID_isfinite)
-  {
-  }
 };
 
 template <>
@@ -3822,11 +3676,6 @@ public:
     : unary_predicate_exprt(ID_isnormal, std::move(op))
   {
   }
-
-  DEPRECATED(SINCE(2018, 12, 2, "use isnormal_exprt(op) instead"))
-  isnormal_exprt():unary_predicate_exprt(ID_isnormal)
-  {
-  }
 };
 
 template <>
@@ -3868,11 +3717,6 @@ inline isnormal_exprt &to_isnormal_expr(exprt &expr)
 class ieee_float_equal_exprt:public binary_relation_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 2, "use ieee_float_equal_exprt(lhs, rhs) instead"))
-  ieee_float_equal_exprt():binary_relation_exprt(ID_ieee_float_equal)
-  {
-  }
-
   ieee_float_equal_exprt(exprt _lhs, exprt _rhs)
     : binary_relation_exprt(
         std::move(_lhs),
@@ -3922,13 +3766,6 @@ inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
 class ieee_float_notequal_exprt:public binary_relation_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 12, 2, "use ieee_float_notequal_exprt(lhs, rhs) instead"))
-  ieee_float_notequal_exprt():
-    binary_relation_exprt(ID_ieee_float_notequal)
-  {
-  }
-
   ieee_float_notequal_exprt(exprt _lhs, exprt _rhs)
     : binary_relation_exprt(
         std::move(_lhs),
@@ -4550,11 +4387,6 @@ inline popcount_exprt &to_popcount_expr(exprt &expr)
 class cond_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use cond_exprt(operands, type) instead"))
-  explicit cond_exprt(const typet &_type) : multi_ary_exprt(ID_cond, _type)
-  {
-  }
-
   cond_exprt(operandst _operands, typet _type)
     : multi_ary_exprt(ID_cond, std::move(_operands), std::move(_type))
   {

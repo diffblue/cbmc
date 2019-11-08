@@ -28,19 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class byte_extract_exprt:public binary_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2019, 1, 12, "use byte_extract_exprt(id, op, offset, type) instead"))
-  explicit byte_extract_exprt(irep_idt _id):binary_exprt(_id)
-  {
-  }
-
-  DEPRECATED(
-    SINCE(2019, 1, 12, "use byte_extract_exprt(id, op, offset, type) instead"))
-  explicit byte_extract_exprt(irep_idt _id, const typet &_type):
-    binary_exprt(_id, _type)
-  {
-  }
-
   byte_extract_exprt(
     irep_idt _id,
     const exprt &_op,
