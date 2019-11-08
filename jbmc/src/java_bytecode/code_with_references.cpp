@@ -40,7 +40,7 @@ reference_allocationt::to_code(reference_substitutiont &references) const
   // the file.
   code_blockt code;
   code.add(code_assignt{*reference.array_length,
-                        side_effect_expr_nondett{java_int_type()}});
+                        side_effect_expr_nondett{java_int_type(), loc}});
   code.add(code_assumet{binary_predicate_exprt{
     *reference.array_length, ID_ge, from_integer(0, java_int_type())}});
   code.add(allocate_array(reference.expr, *reference.array_length, loc));
