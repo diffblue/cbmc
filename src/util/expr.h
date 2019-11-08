@@ -237,9 +237,6 @@ public:
     op.push_back(std::move(e3));
   }
 
-  DEPRECATED(SINCE(2019, 1, 19, "use typecast_exprt() instead"))
-  void make_typecast(const typet &_type);
-
   DEPRECATED(SINCE(2019, 5, 28, "use make_boolean_expr(value) instead"))
   void make_bool(bool value);
 
@@ -381,7 +378,6 @@ protected:
   // protect these low-level methods
   using exprt::add;
   using exprt::make_bool;
-  using exprt::make_typecast;
   using exprt::op0;
   using exprt::op1;
   using exprt::op2;
