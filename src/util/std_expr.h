@@ -2117,7 +2117,9 @@ inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
 class is_dynamic_object_exprt : public unary_predicate_exprt
 {
 public:
-  is_dynamic_object_exprt() : unary_predicate_exprt(ID_is_dynamic_object)
+  DEPRECATED(SINCE(2019, 11, 8, "use is_dynamic_object(op) instead"))
+  is_dynamic_object_exprt()
+    : unary_predicate_exprt(ID_is_dynamic_object, exprt())
   {
   }
 
