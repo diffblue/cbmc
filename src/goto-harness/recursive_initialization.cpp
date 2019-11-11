@@ -187,7 +187,8 @@ code_blockt recursive_initializationt::build_constructor_body(
   const exprt &depth_symbol,
   const symbol_exprt &result_symbol,
   const optionalt<exprt> &size_symbol,
-  const optionalt<irep_idt> &lhs_name)
+  const optionalt<irep_idt> &lhs_name,
+  const bool is_nullable)
 {
   PRECONDITION(result_symbol.type().id() == ID_pointer);
   const typet &type = result_symbol.type().subtype();
@@ -197,6 +198,10 @@ code_blockt recursive_initializationt::build_constructor_body(
   }
   else if(type.id() == ID_pointer)
   {
+    if(type.subtype().id() == ID_code)
+    {
+      return build_function_pointer_constructor(result_symbol, is_nullable);
+    }
     if(lhs_name.has_value())
     {
       if(should_be_treated_as_cstring(*lhs_name) && type == char_type())
@@ -231,17 +236,23 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
   // void type_constructor_T(int depth_T, T *result_T, int *size);
   optionalt<irep_idt> size_var;
   optionalt<irep_idt> expr_name;
+  bool is_nullable = false;
+  bool has_size_param = false;
   if(expr.id() == ID_symbol)
   {
     expr_name = to_symbol_expr(expr).get_identifier();
+    is_nullable = initialization_config.potential_null_function_pointers.count(
+      expr_name.value());
     if(should_be_treated_as_array(*expr_name))
     {
       size_var = get_associated_size_variable(*expr_name);
+      has_size_param = true;
     }
   }
   const typet &type = expr.type();
-  if(type_constructor_names.find(type) != type_constructor_names.end())
-    return type_constructor_names[type];
+  const constructor_keyt key{type, is_nullable, has_size_param};
+  if(type_constructor_names.find(key) != type_constructor_names.end())
+    return type_constructor_names[key];
 
   const std::string &pretty_type = type2id(type);
   symbolt &depth_symbol =
@@ -282,7 +293,7 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
   }
   const symbolt &function_symbol = get_fresh_fun_symbol(
     "type_constructor_" + pretty_type, code_typet{fun_params, empty_typet{}});
-  type_constructor_names[type] = function_symbol.name;
+  type_constructor_names[key] = function_symbol.name;
   symbolt *mutable_symbol = symbol_table.get_writeable(function_symbol.name);
 
   // the body is specific for each type of expression
@@ -292,11 +303,12 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
     size_symbol_expr,
     // the expression name may be needed to decide if expr should be treated as
     // a string
-    expr_name);
+    expr_name,
+    is_nullable);
 
   goto_model.goto_functions.function_map[function_symbol.name].type =
     to_code_type(function_symbol.type);
-  return type_constructor_names[type];
+  return type_constructor_names.at(key);
 }
 
 symbol_exprt recursive_initializationt::get_malloc_function()
@@ -876,4 +888,59 @@ void recursive_initializationt::free_cluster_origins(code_blockt &body)
   {
     body.add(code_function_callt{get_free_function(), {*origin}});
   }
+}
+
+code_blockt recursive_initializationt::build_function_pointer_constructor(
+  const symbol_exprt &result,
+  bool is_nullable)
+{
+  PRECONDITION(can_cast_type<pointer_typet>(result.type()));
+  const auto &result_type = to_pointer_type(result.type());
+  PRECONDITION(can_cast_type<pointer_typet>(result_type.subtype()));
+  const auto &function_pointer_type = to_pointer_type(result_type.subtype());
+  PRECONDITION(can_cast_type<code_typet>(function_pointer_type.subtype()));
+  const auto &function_type = to_code_type(function_pointer_type.subtype());
+
+  std::vector<exprt> targets;
+
+  for(const auto &sym : goto_model.get_symbol_table())
+  {
+    if(sym.second.type == function_type)
+    {
+      targets.push_back(address_of_exprt{sym.second.symbol_expr()});
+    }
+  }
+
+  if(is_nullable)
+    targets.push_back(null_pointer_exprt{function_pointer_type});
+
+  code_blockt body{};
+
+  const auto function_pointer_selector =
+    get_fresh_local_symexpr("function_pointer_selector");
+  body.add(
+    code_assignt{function_pointer_selector,
+                 side_effect_expr_nondett{function_pointer_selector.type(),
+                                          source_locationt{}}});
+  auto function_pointer_index = std::size_t{0};
+
+  for(const auto &target : targets)
+  {
+    auto const assign = code_assignt{dereference_exprt{result}, target};
+    if(function_pointer_index != targets.size() - 1)
+    {
+      auto const condition = equal_exprt{
+        function_pointer_selector,
+        from_integer(function_pointer_index, function_pointer_selector.type())};
+      auto const then = code_blockt{{assign, code_returnt{}}};
+      body.add(code_ifthenelset{condition, then});
+    }
+    else
+    {
+      body.add(assign);
+    }
+    ++function_pointer_index;
+  }
+
+  return body;
 }
