@@ -22,6 +22,7 @@ class Result:
         self.failure = []
         self.error = {}
         self.warning = {}
+        self.log = log
 
         if log == "":
             return

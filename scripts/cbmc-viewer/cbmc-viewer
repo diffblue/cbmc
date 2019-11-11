@@ -27,6 +27,7 @@ import errors
 from block import Block
 from markup import Markup
 from srcloc import SourceLocation
+import viewerconfig
 
 ################################################################
 
@@ -110,7 +111,13 @@ def command_line_parser():
     parser.add_argument(
         '--json-summary',
         metavar='summary.json',
-        help='File to write summary of key metrics to (in JSON format)'
+        help='File to write summary of key metrics to (in JSON format).'
+    )
+    parser.add_argument(
+        '--config',
+        default='cbmc-viewer.py',
+        metavar='FILE',
+        help='Python configuration file for cbmc-viewer.'
     )
     return parser
 
@@ -175,6 +182,62 @@ def coverage_summary_section(code, code_touched):
     summary.append('</ul></p>')
     return summary
 
+def missing_functions_section(functions, config):
+    """Report on functions omitted from the test."""
+
+    functions = sorted(functions)
+    section = []
+    if not functions:
+        return section
+
+    expected_missing_functions = config.expected_missing_functions()
+    if expected_missing_functions is None:
+        section.append("<p>Functions omitted from test:</p><ul>")
+        section.extend(["<li>{}</li>".format(func) for func in functions])
+        section.append("</ul>")
+        return section
+
+    expected = [func for func in functions
+                if func in expected_missing_functions]
+    unexpected = [func for func in functions
+                  if func not in expected_missing_functions]
+
+    if expected:
+        section.append("<p>Functions omitted from test (expected):</p><ul>")
+        section.extend(["<li>{}</li>".format(func) for func in expected])
+        section.append("</ul>")
+    if unexpected:
+        section.append("<p>Functions omitted from test (unexpected):</p><ul>")
+        section.extend(["<li>{}</li>".format(func) for func in unexpected])
+        section.append("</ul>")
+    return section
+
+def warning_section(result, config):
+    """Report on warnings issued by CBMC."""
+
+    warnings = []
+    with open(result.log) as log:
+        for line in log:
+            if "warning" in line.lower():
+                warnings.append(line)
+
+    if not warnings:
+        return ""
+
+    prefix = "**** WARNING: no body for function"
+    length = len(prefix)
+    function_warnings = [line for line in warnings if line.startswith(prefix)]
+    other_warnings = [line for line in warnings if not line.startswith(prefix)]
+    functions = [warn[length:].strip() for warn in function_warnings]
+
+    section = []
+    section.extend(missing_functions_section(functions, config))
+    if other_warnings:
+        section.append("<p>Warnings:</p><ul>")
+        section.extend(["<li>{}</li>".format(warn)
+                        for warn in sorted(other_warnings)])
+        section.append("</ul>")
+    return '\n'.join(section)
 
 def error_section(result, properties, loops, traces, markup):
     """Error section of the report."""
@@ -185,7 +248,8 @@ def error_section(result, properties, loops, traces, markup):
 
 
 def cbmc_report(result, coverage, properties, markup,
-                htmldir="", loops=None, traces=None, json_summary=None):
+                htmldir="", loops=None, traces=None, json_summary=None,
+                config=None):
     """Full cbmc report."""
 
     # pylint: disable=too-many-arguments,too-many-locals
@@ -214,6 +278,8 @@ def cbmc_report(result, coverage, properties, markup,
         summary_data['coverage'] = {}
         summary_data['coverage']['statically-reachable'] = code
         summary_data['coverage']['reached'] = code_touched
+
+    html.append(warning_section(result, config))
 
     html.append('<h2 style="text-align:center">Errors</h2>')
     err = error_section(result, properties, loops, traces, markup)
@@ -258,6 +324,7 @@ def main():
                   srcloc=srcloc)
 
     markup = Markup(tags, block, args.srcdir, args.htmldir, args.srcexclude)
+    config = viewerconfig.Config(args.config)
 
     properties = Property(args.property, srcloc)
     result = Result(args.result)
@@ -273,7 +340,8 @@ def main():
                 htmldir=args.htmldir,
                 loops=loop,
                 traces=trace,
-                json_summary=args.json_summary)
+                json_summary=args.json_summary,
+                config=config)
 
     markup.markup_directory()
 

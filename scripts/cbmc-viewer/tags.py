@@ -26,6 +26,15 @@ class Tags:
         self.define = {}
         self.function = {}
         self.variable = {}
+
+        # Use process id to generate a "unique" name for the tags file
+        # to enable concurrent invocations of cbmc-viewer.  The
+        # tempfile module does not help here, because it may create a
+        # file in another directory, and etags generates paths
+        # relative to the source directory and the output file
+        # directory.
+        tagsfile += '-' + str(os.getpid())
+
         self.make_tags_file(srcdir, tagscmd, tagsfile, fltr)
         self.parse_tags_file(tagsfile)
         self.cleanup_tags()
@@ -34,6 +43,7 @@ class Tags:
     def make_tags_file(srcdir=".", tagscmd="etags", tagsfile="TAGS",
                        fltr=""):
         """Make a tags file for a source tree."""
+
         cwd = os.getcwd()
         try:
             os.chdir(srcdir)
