@@ -178,12 +178,11 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 
   if(options.is_set("solver-parameters"))
   {
-    std::list<std::string> opts = options.get_list_option("solver-parameters");
-    for(auto &opt : opts)
+    for(auto &opt : options.get_list_option("solver-parameters"))
     {
       bool success = is_without_simplifier
-                       ? satcheck_no_simplifiert::set_parameter(opt.c_str())
-                       : satcheckt::set_parameter(opt.c_str());
+                       ? satcheck_no_simplifiert::set_parameter(opt)
+                       : satcheckt::set_parameter(opt);
       messaget log(message_handler);
       if(success)
       {

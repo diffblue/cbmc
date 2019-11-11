@@ -82,7 +82,7 @@ public:
   // Set optional parameters in the backend solver.
   // \param param: The parameter as a string
   // \return True if parameter is valid and has been set.
-  static bool set_parameter(const char *const param)
+  static bool set_parameter(std::string param)
   {
     return false;
   }
