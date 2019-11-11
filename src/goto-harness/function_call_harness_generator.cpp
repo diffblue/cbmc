@@ -72,10 +72,10 @@ struct function_call_harness_generatort::implt
   void ensure_harness_does_not_already_exist();
   /// Update the goto-model with the new harness function.
   void add_harness_function_to_goto_model(code_blockt function_body);
-  /// declare local variables for each of the parameters of the entry function
+  /// Declare local variables for each of the parameters of the entry function
   /// and return them
   code_function_callt::argumentst declare_arguments(code_blockt &function_body);
-  /// write initialisation code for each of the arguments into function_body,
+  /// Write initialisation code for each of the arguments into function_body,
   /// then insert a call to the entry function with the arguments
   void call_function(
     const code_function_callt::argumentst &arguments,
@@ -269,7 +269,7 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
 void function_call_harness_generatort::validate_options(
   const goto_modelt &goto_model)
 {
-  if(p_impl->function == ID_empty)
+  if(p_impl->function == ID_empty_string)
     throw invalid_command_line_argument_exceptiont{
       "required parameter entry function not set",
       "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
@@ -283,8 +283,17 @@ void function_call_harness_generatort::validate_options(
       " --" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
   }
 
-  auto function_to_call = goto_model.symbol_table.lookup_ref(p_impl->function);
-  auto ftype = to_code_type(function_to_call.type);
+  const auto function_to_call_pointer =
+    goto_model.symbol_table.lookup(p_impl->function);
+  if(function_to_call_pointer == nullptr)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "entry function `" + id2string(p_impl->function) +
+        "' does not exist in the symbol table",
+      "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
+  }
+  const auto &function_to_call = *function_to_call_pointer;
+  const auto &ftype = to_code_type(function_to_call.type);
   for(auto const &equal_cluster : p_impl->function_parameters_to_treat_equal)
   {
     for(auto const &pointer_id : equal_cluster)

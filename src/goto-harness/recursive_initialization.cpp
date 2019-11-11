@@ -185,7 +185,7 @@ void recursive_initializationt::initialize(
 
 code_blockt recursive_initializationt::build_constructor_body(
   const exprt &depth_symbol,
-  const exprt &result_symbol,
+  const symbol_exprt &result_symbol,
   const optionalt<exprt> &size_symbol,
   const optionalt<irep_idt> &lhs_name)
 {
@@ -220,7 +220,7 @@ code_blockt recursive_initializationt::build_constructor_body(
   }
 }
 
-const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
+irep_idt recursive_initializationt::build_constructor(const exprt &expr)
 {
   // for `expr` of type T builds a declaration of a function:
   //
@@ -235,7 +235,9 @@ const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
   {
     expr_name = to_symbol_expr(expr).get_identifier();
     if(should_be_treated_as_array(*expr_name))
+    {
       size_var = get_associated_size_variable(*expr_name);
+    }
   }
   const typet &type = expr.type();
   if(type_constructor_names.find(type) != type_constructor_names.end())
@@ -554,7 +556,7 @@ symbol_exprt recursive_initializationt::get_free_function()
 
 code_blockt recursive_initializationt::build_pointer_constructor(
   const exprt &depth,
-  const exprt &result)
+  const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
@@ -639,7 +641,7 @@ code_blockt recursive_initializationt::build_pointer_constructor(
 }
 
 code_blockt recursive_initializationt::build_array_string_constructor(
-  const exprt &result) const
+  const symbol_exprt &result) const
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
@@ -668,7 +670,7 @@ code_blockt recursive_initializationt::build_array_string_constructor(
 
 code_blockt recursive_initializationt::build_array_constructor(
   const exprt &depth,
-  const exprt &result)
+  const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
@@ -690,7 +692,7 @@ code_blockt recursive_initializationt::build_array_constructor(
 
 code_blockt recursive_initializationt::build_struct_constructor(
   const exprt &depth,
-  const exprt &result)
+  const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &struct_type = result.type().subtype();
@@ -705,8 +707,8 @@ code_blockt recursive_initializationt::build_struct_constructor(
   return body;
 }
 
-code_blockt
-recursive_initializationt::build_nondet_constructor(const exprt &result) const
+code_blockt recursive_initializationt::build_nondet_constructor(
+  const symbol_exprt &result) const
 {
   PRECONDITION(result.type().id() == ID_pointer);
   code_blockt body{};
@@ -718,7 +720,7 @@ recursive_initializationt::build_nondet_constructor(const exprt &result) const
 
 code_blockt recursive_initializationt::build_dynamic_array_constructor(
   const exprt &depth,
-  const exprt &result,
+  const symbol_exprt &result,
   const exprt &size,
   const optionalt<irep_idt> &lhs_name)
 {
@@ -820,7 +822,19 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
 
 bool recursive_initializationt::needs_freeing(const exprt &expr) const
 {
-  return expr.type().id() == ID_pointer && expr.type().id() != ID_code;
+  if(expr.type().id() != ID_pointer || expr.type().subtype().id() == ID_code)
+    return false;
+  for(auto const &common_arguments_origin : common_arguments_origins)
+  {
+    if(common_arguments_origin.has_value() && expr.id() == ID_symbol)
+    {
+      auto origin_name =
+        to_symbol_expr(*common_arguments_origin).get_identifier();
+      auto expr_name = to_symbol_expr(expr).get_identifier();
+      return origin_name == expr_name;
+    }
+  }
+  return true;
 }
 
 void recursive_initializationt::free_if_possible(

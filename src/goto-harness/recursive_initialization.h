@@ -173,7 +173,7 @@ private:
   /// \return the body of the constructor
   code_blockt build_constructor_body(
     const exprt &depth_symbol,
-    const exprt &result_symbol,
+    const symbol_exprt &result_symbol,
     const optionalt<exprt> &size_symbol,
     const optionalt<irep_idt> &lhs_name);
 
@@ -181,7 +181,7 @@ private:
   ///   it if not.
   /// \param expr: the expression to be constructed
   /// \return name of the constructor function
-  const irep_idt &build_constructor(const exprt &expr);
+  irep_idt build_constructor(const exprt &expr);
 
   /// Generic constructor for all pointers: only builds one pointee (not an
   ///   array) but may recourse in case the pointee contains more pointers, e.g.
@@ -190,26 +190,28 @@ private:
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
   code_blockt
-  build_pointer_constructor(const exprt &depth, const exprt &result);
+  build_pointer_constructor(const exprt &depth, const symbol_exprt &result);
 
   /// Constructor for structures: simply iterates over members and initialise
   ///   each one.
   /// \param depth: symbol of the depth parameter
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_struct_constructor(const exprt &depth, const exprt &result);
+  code_blockt
+  build_struct_constructor(const exprt &depth, const symbol_exprt &result);
 
   /// Default constructor: assigns non-deterministic value of the right type.
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_nondet_constructor(const exprt &result) const;
+  code_blockt build_nondet_constructor(const symbol_exprt &result) const;
 
   /// Constructor for arrays: simply iterates over elements and initialise
   ///   each one.
   /// \param depth: symbol of the depth parameter
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_array_constructor(const exprt &depth, const exprt &result);
+  code_blockt
+  build_array_constructor(const exprt &depth, const symbol_exprt &result);
 
   /// Constructor for dynamic arrays: allocate memory for `n` elements (`n` is
   ///   random but bounded) and initialise each one.
@@ -220,14 +222,14 @@ private:
   /// \return the body of the constructor
   code_blockt build_dynamic_array_constructor(
     const exprt &depth,
-    const exprt &result,
+    const symbol_exprt &result,
     const exprt &size,
     const optionalt<irep_idt> &lhs_name);
 
   /// Constructor for strings: as array but the last element is zero.
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_array_string_constructor(const exprt &result) const;
+  code_blockt build_array_string_constructor(const symbol_exprt &result) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
