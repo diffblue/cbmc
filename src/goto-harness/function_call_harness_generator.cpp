@@ -12,6 +12,7 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -80,6 +81,16 @@ struct function_call_harness_generatort::implt
   void call_function(
     const code_function_callt::argumentst &arguments,
     code_blockt &function_body);
+  /// For function parameters that are pointers to functions we want to
+  /// be able to specify whether or not they can be NULL. To disambiguate
+  /// this specification from that for a global variable of the same name,
+  /// we prepend the name of the function to the parameter name. However,
+  /// what is actually being initialised in the implementation is not the
+  /// parameter itself, but a corresponding function argument (local variable
+  /// of the harness function). We need a mapping from function parameter
+  /// name to function argument names, and this is what this function does.
+  std::unordered_set<irep_idt>
+  map_function_parameters_to_function_argument_names();
 };
 
 function_call_harness_generatort::function_call_harness_generatort(
@@ -226,6 +237,8 @@ void function_call_harness_generatort::implt::generate(
     recursive_initialization_config.variables_that_hold_array_sizes.insert(
       pair.second);
   }
+  recursive_initialization_config.potential_null_function_pointers =
+    map_function_parameters_to_function_argument_names();
   recursive_initialization_config.pointers_to_treat_as_cstrings =
     function_arguments_to_treat_as_cstrings;
   recursive_initialization = util_make_unique<recursive_initializationt>(
@@ -344,6 +357,43 @@ void function_call_harness_generatort::validate_options(
           id2string(pointer_id) + " is not a parameter",
           "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
       }
+    }
+  }
+
+  const namespacet ns{goto_model.symbol_table};
+
+  // Make sure all function pointers that the user asks are nullable are
+  // present in the symbol table.
+  for(const auto &nullable :
+      p_impl->recursive_initialization_config.potential_null_function_pointers)
+  {
+    const auto &function_pointer_symbol_pointer =
+      goto_model.symbol_table.lookup(nullable);
+
+    if(function_pointer_symbol_pointer == nullptr)
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "nullable function pointer `" + id2string(nullable) +
+          "' not found in symbol table",
+        "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
+    }
+
+    const auto &function_pointer_type =
+      ns.follow(function_pointer_symbol_pointer->type);
+
+    if(!can_cast_type<pointer_typet>(function_pointer_type))
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "`" + id2string(nullable) + "' is not a pointer",
+        "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
+    }
+
+    if(!can_cast_type<code_typet>(
+         to_pointer_type(function_pointer_type).subtype()))
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "`" + id2string(nullable) + "' is not pointing to a function",
+        "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
     }
   }
 }
@@ -489,4 +539,26 @@ void function_call_harness_generatort::implt::call_function(
   function_call.add_source_location() = function_to_call.location;
 
   function_body.add(std::move(function_call));
+}
+
+std::unordered_set<irep_idt> function_call_harness_generatort::implt::
+  map_function_parameters_to_function_argument_names()
+{
+  std::unordered_set<irep_idt> nullables;
+  for(const auto &nullable :
+      recursive_initialization_config.potential_null_function_pointers)
+  {
+    const auto &nullable_name = id2string(nullable);
+    const auto &function_prefix = id2string(function) + "::";
+    if(has_prefix(nullable_name, function_prefix))
+    {
+      nullables.insert(
+        "__goto_harness::" + nullable_name.substr(function_prefix.size()));
+    }
+    else
+    {
+      nullables.insert(nullable_name);
+    }
+  }
+  return nullables;
 }

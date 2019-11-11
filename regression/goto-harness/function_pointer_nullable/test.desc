@@ -1,6 +1,6 @@
 CORE
 test.c
---harness-type call-function --function entry_point --function-pointer-can-be-null __goto_harness::f_but_may_be_null
+--harness-type call-function --function entry_point --function-pointer-can-be-null entry_point::f_but_may_be_null
 ^EXIT=10$
 ^SIGNAL=0$
 \[entry_point.assertion.1\] line \d+ assertion f != \(void \*\)0: SUCCESS
