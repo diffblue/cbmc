@@ -80,16 +80,6 @@ void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
   op.back().swap(e3);
 }
 
-/// Create a \ref typecast_exprt to the given type.
-/// \param _type: cast destination type
-/// \deprecated use constructors instead
-void exprt::make_typecast(const typet &_type)
-{
-  typecast_exprt new_expr(*this, _type);
-
-  swap(new_expr);
-}
-
 /// Return whether the expression is a constant.
 /// \return True if is a constant, false otherwise
 bool exprt::is_constant() const
