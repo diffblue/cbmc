@@ -1,0 +1,8 @@
+CORE
+test.c
+--function entry_point --harness-type call-function --associated-array-size array_with_size:size
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+call to '\w+': not enough arguments, inserting non-deterministic value
