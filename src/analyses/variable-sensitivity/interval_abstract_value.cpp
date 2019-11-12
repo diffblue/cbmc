@@ -307,6 +307,39 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
 
     return environment.abstract_object_factory(type, interval, ns);
   }
+  else if(num_operands == 3)
+  {
+    if(expr.id() == ID_if)
+    {
+      const constant_interval_exprt &condition_interval = interval_operands[0]->interval;
+      const constant_interval_exprt &true_interval = interval_operands[1]->interval;
+      const constant_interval_exprt &false_interval = interval_operands[2]->interval;
+
+      // Check the value of the condition interval
+      if(condition_interval.is_definitely_false().is_unknown()) {
+        // Value of the condition is both true and false, so
+        // combine the intervals of both the true and false expressions
+        return environment.abstract_object_factory(
+          type,
+          constant_interval_exprt(
+            constant_interval_exprt::get_min(true_interval.get_lower(), false_interval.get_lower()),
+            constant_interval_exprt::get_max(true_interval.get_upper(), false_interval.get_upper())),
+          ns);
+      }
+      if(condition_interval.is_definitely_false().is_true()) {
+        // The condition is definitely false, so return only
+        // the interval from the 'false' expression
+        return environment.abstract_object_factory(
+          false_interval.type(), false_interval, ns);
+      }
+      if(condition_interval.is_definitely_true().is_true()) {
+        // The condition is definitely true, so return only
+        // the interval from the 'true' expression
+        return environment.abstract_object_factory(
+          true_interval.type(), true_interval, ns);
+      }
+    }
+  }
 
   return environment.abstract_object_factory(type, ns, true);
 }
