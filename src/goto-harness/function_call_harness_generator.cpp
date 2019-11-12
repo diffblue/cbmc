@@ -196,6 +196,18 @@ void function_call_harness_generatort::handle_option(
           .end()),
       [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
   }
+  else if(option == COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT)
+  {
+    std::transform(
+      values.begin(),
+      values.end(),
+      std::inserter(
+        p_impl->recursive_initialization_config
+          .potential_null_function_pointers,
+        p_impl->recursive_initialization_config.potential_null_function_pointers
+          .end()),
+      [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
+  }
   else
   {
     throw invalid_command_line_argument_exceptiont{

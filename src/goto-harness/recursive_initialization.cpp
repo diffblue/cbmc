@@ -21,6 +21,7 @@ Author: Diffblue Ltd.
 #include <util/string2int.h>
 
 #include <functional>
+#include <iterator>
 
 bool recursive_initialization_configt::handle_option(
   const std::string &option,
@@ -72,6 +73,17 @@ bool recursive_initialization_configt::handle_option(
   {
     min_dynamic_array_size = harness_options_parser::require_one_size_value(
       COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT, values);
+    return true;
+  }
+  else if(option == COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT)
+  {
+    std::transform(
+      values.begin(),
+      values.end(),
+      std::inserter(
+        potential_null_function_pointers,
+        potential_null_function_pointers.end()),
+      [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
     return true;
   }
   return false;
