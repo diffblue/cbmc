@@ -10,7 +10,7 @@
 /// Unit tests for testing of correct tracking of
 /// last written location by objects
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <iostream>
 #include <string>
@@ -24,6 +24,7 @@
 #include <util/type.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <util/arith_tools.h>
+#include <util/mathematical_types.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 //#include <src/ansi-c/c_to_expr.h>

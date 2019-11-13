@@ -11,7 +11,8 @@
 
 #include <langapi/language_util.h>
 #include <util/json.h>
-#include <util/json_expr.h>
+#include <goto-programs/json_expr.h>
+#include <util/json_irep.h>
 
 
 /**
@@ -59,12 +60,15 @@ void variable_sensitivity_dependence_domaint::eval_data_deps(
  * \param ns the namespace
  */
 void variable_sensitivity_dependence_domaint::transform(
+  const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   ai_baset &ai,
    const namespacet &ns)
 {
-  variable_sensitivity_domaint::transform(from, to, ai, ns);
+  variable_sensitivity_domaint::transform(
+    function_from, from, function_to, to, ai, ns);
 
   variable_sensitivity_dependence_grapht *dep_graph=
     dynamic_cast<variable_sensitivity_dependence_grapht*>(&ai);
@@ -73,9 +77,9 @@ void variable_sensitivity_dependence_domaint::transform(
   // propagate control dependencies across function calls
   if(from->is_function_call())
   {
-    if(from->function == to->function)
+    if(function_from == function_to)
     {
-      control_dependencies(from, to, *dep_graph);
+      control_dependencies(function_from, from, function_to, to, *dep_graph);
     }
     else
     {
@@ -112,7 +116,7 @@ void variable_sensitivity_dependence_domaint::transform(
     }
   }
   else
-    control_dependencies(from, to, *dep_graph);
+    control_dependencies(function_from, from, function_to, to, *dep_graph);
 
   // Find all the data dependencies in the the 'to' expression
   data_dependencies(from, to, *dep_graph, ns);
@@ -191,7 +195,9 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
 }
 
 void variable_sensitivity_dependence_domaint::control_dependencies(
+  const irep_idt &from_function,
   goto_programt::const_targett from,
+  const irep_idt &to_function,
   goto_programt::const_targett to,
   variable_sensitivity_dependence_grapht &dep_graph)
 {
@@ -223,7 +229,7 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 
   const goto_functionst &goto_functions=dep_graph.goto_functions;
 
-  const irep_idt id=goto_programt::get_function_id(from);
+  const irep_idt id = from_function;
   cfg_post_dominatorst &pd_tmp=dep_graph.cfg_post_dominators()[id];
 
   goto_functionst::function_mapt::const_iterator f_it=
@@ -252,13 +258,8 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 
     // we could hard-code assume and goto handling here to improve
     // performance
-    cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
-      pd.cfg.entry_map.find(cd);
-
-    assert(e!=pd.cfg.entry_map.end());
-
     const cfg_post_dominatorst::cfgt::nodet &m=
-      pd.cfg[e->second];
+      pd.get_node(cd);
 
     // successors of M
     for(const auto &edge : m.out)
@@ -582,7 +583,7 @@ jsont variable_sensitivity_dependence_domaint::output_json(
     }
   }
 
-  return graph;
+  return std::move(graph);
 }
 
 void variable_sensitivity_dependence_domaint::populate_dep_graph(

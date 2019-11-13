@@ -207,15 +207,15 @@ void dep_graph_domaint::transform(
   // entry point of a function should have a control dependency on the call
   if(!control_deps.empty())
   {
-    const goto_programt::const_targett &dep = control_deps.begin()->first;
+    const goto_programt::const_targett &dep = *control_deps.begin();
     if(dep->is_function_call())
     {
       INVARIANT(
         std::all_of(
           std::next(control_deps.begin()),
           control_deps.end(),
-          [](const std::pair<const goto_programt::const_targett, tvt> &d)
-            { return d.first->is_function_call(); }),
+          [](const goto_programt::const_targett &d)
+            { return d->is_function_call(); }),
         "All entries must be function calls");
 
       control_deps.clear();
@@ -249,7 +249,7 @@ void dep_graph_domaint::transform(
         s->control_dep_candidates, control_dep_candidates);
 
       control_deps.clear();
-      control_deps.insert(std::make_pair(from, tvt::unknown()));
+      control_deps.insert(from);
 
       control_dep_candidates.clear();
     }

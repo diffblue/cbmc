@@ -204,7 +204,7 @@ bool abstract_environmentt::assign(
     }
     else
     {
-      lhs_value=map.const_find(symbol_expr).first;
+      lhs_value = map.find(symbol_expr.get_identifier()).value();
     }
   }
 
@@ -247,7 +247,7 @@ bool abstract_environmentt::assign(
 
     if(final_value != lhs_value)
     {
-      map[symbol_expr]=final_value;
+      map.insert_or_replace(symbol_expr.get_identifier(), final_value);
     }
   }
   return true;
@@ -492,16 +492,18 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
     // For each element in the intersection of map and env.map merge
     // If the result of the merge is top, remove from the map
     bool modified=false;
-    for(const auto &entry : env.map.get_delta_view(map))
+    decltype(env.map)::delta_viewt delta_view;
+    env.map.get_delta_view(map, delta_view);
+    for(const auto &entry : delta_view)
     {
       bool object_modified=false;
-      abstract_object_pointert new_object=
+      abstract_object_pointert new_object =
         abstract_objectt::merge(
-          entry.other_m,
+          entry.get_other_map_value(),
           entry.m,
           object_modified);
       modified|=object_modified;
-      map.find(entry.k, tvt(true)).first=new_object;
+      map.replace(entry.k, new_object);
     }
 
     return modified;
@@ -620,10 +622,11 @@ void abstract_environmentt::output(
 {
   out << "{\n";
 
-  for(const auto &entry : map.get_view())
+  decltype(map)::viewt view;
+  map.get_view(view);
+  for(const auto &entry : view)
   {
-    out << entry.first.get_identifier()
-        << " () -> ";
+    out << entry.first << " () -> ";
     entry.second->output(out, ai, ns);
     out << "\n";
   }
@@ -644,7 +647,9 @@ Function: abstract_environmentt::verify
 
 bool abstract_environmentt::verify() const
 {
-  for(const auto &entry : map.get_view())
+  decltype(map)::viewt view;
+  map.get_view(view);
+  for(const auto &entry : view)
   {
     if(entry.second == nullptr)
     {
@@ -690,7 +695,7 @@ Function: abstract_environmentt::erase
 
 void abstract_environmentt::erase(const symbol_exprt &expr)
 {
-    map.erase(expr);
+    map.erase_if_exists(expr.get_identifier());
 }
 
 /*******************************************************************\
@@ -713,17 +718,20 @@ Function: abstract_environmentt::environment_diff
 
 \*******************************************************************/
 
-std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
+std::vector<abstract_environmentt::map_keyt>
+abstract_environmentt::modified_symbols(
   const abstract_environmentt &first, const abstract_environmentt &second)
 {
   // Find all symbols who have different write locations in each map
-  std::vector<symbol_exprt> symbols_diff;
-  for (const auto &entry : first.map.get_view())
+  std::vector<abstract_environmentt::map_keyt> symbols_diff;
+  decltype(first.map)::viewt view;
+  first.map.get_view(view);
+  for(const auto &entry : view)
   {
-    const auto second_entry = second.map.const_find(entry.first);
-    if (second_entry.second)
+    const auto second_entry = second.map.find(entry.first);
+    if (second_entry.has_value())
     {
-      if(second_entry.first->has_been_modified(entry.second))
+      if(second_entry.value().get()->has_been_modified(entry.second))
         symbols_diff.push_back(entry.first);
     }
   }
@@ -732,7 +740,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
   for(const auto &entry : second.map.get_view())
   {
     const auto &second_entry = first.map.find(entry.first);
-    if (!second_entry.second)
+    if (!second_entry.has_value())
     {
       symbols_diff.push_back(entry.first);
     }
@@ -744,7 +752,7 @@ static std::size_t count_globals(const namespacet &ns)
 {
   auto const& symtab = ns.get_symbol_table();
   auto val = std::count_if(symtab.begin(), symtab.end(),
-                       [](const symbol_table_baset::const_iteratort::value_type& sym) {
+                       [](const symbol_tablet::const_iteratort::value_type& sym) {
                          return sym.second.is_lvalue && sym.second.is_static_lifetime;
                        });
   return val;

@@ -542,7 +542,7 @@ void abstract_objectt::dump_map_diff(
   bool first = true;
   for(auto &item : delta_view)
   {
-    out << (first ? "" : ", ") << item.k << "=" << item.in_both;
+    out << (first ? "" : ", ") << item.k << "=" << item.is_in_both_maps();
     first = false;
   }
   out << "}";

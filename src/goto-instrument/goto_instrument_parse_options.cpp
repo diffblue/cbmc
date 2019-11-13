@@ -110,7 +110,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "uninitialized.h"
 #include "unwind.h"
 #include "wmm/weak_memory.h"
-#include "version.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()

@@ -81,7 +81,7 @@ private:
     size_t operator()(const mp_integer &i) const { return std::hash<BigInt::ullong_t>{}(i.to_ulong()); }
   };
 
-  typedef sharing_mapt<mp_integer, abstract_object_pointert, mp_integer_hash>
+  typedef sharing_mapt<mp_integer, abstract_object_pointert, false, mp_integer_hash>
     shared_array_mapt;
 
   shared_array_mapt map;

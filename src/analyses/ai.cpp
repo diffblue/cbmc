@@ -53,10 +53,10 @@ void ai_baset::output(
 
     abstract_state_before(i_it)->output(out, *this, ns);
     out << "\n";
-    #if 1
+#if 1
     goto_program.output_instruction(ns, function_id, out, *i_it);
     out << "\n";
-    #endif
+#endif
   }
 }
 
@@ -75,7 +75,7 @@ jsont ai_baset::output_json(
     }
     else
     {
-      result[id2string(f_it->first)]=json_arrayt();
+      result[id2string(f_it->first)] = json_arrayt();
     }
   }
 
@@ -162,10 +162,10 @@ void ai_baset::entry_state(const goto_functionst &goto_functions)
 {
   // find the 'entry function'
 
-  goto_functionst::function_mapt::const_iterator
-    f_it=goto_functions.function_map.find(goto_functions.entry_point());
+  goto_functionst::function_mapt::const_iterator f_it =
+    goto_functions.function_map.find(goto_functions.entry_point());
 
-  if(f_it!=goto_functions.function_map.end())
+  if(f_it != goto_functions.function_map.end())
     entry_state(f_it->second.body);
 }
 
@@ -203,13 +203,12 @@ void ai_baset::finalize()
   // Nothing to do per default
 }
 
-ai_baset::locationt ai_baset::get_next(
-  working_sett &working_set)
+ai_baset::locationt ai_baset::get_next(working_sett &working_set)
 {
   PRECONDITION(!working_set.empty());
 
-  working_sett::iterator i=working_set.begin();
-  locationt l=i->second;
+  working_sett::iterator i = working_set.begin();
+  locationt l = i->second;
   working_set.erase(i);
 
   return l;
@@ -229,15 +228,15 @@ bool ai_baset::fixedpoint(
       working_set,
       goto_program.instructions.begin());
 
-  bool new_data=false;
+  bool new_data = false;
 
   while(!working_set.empty())
   {
-    locationt l=get_next(working_set);
+    locationt l = get_next(working_set);
 
     // goto_program is really only needed for iterator manipulation
     if(visit(function_id, l, working_set, goto_program, goto_functions, ns))
-      new_data=true;
+      new_data = true;
   }
 
   return new_data;
@@ -251,7 +250,7 @@ bool ai_baset::visit(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  bool new_data=false;
+  bool new_data = false;
 
   // Function call and end are special cases
   if(l->is_function_call() && !goto_functions.function_map.empty())
@@ -333,8 +332,6 @@ bool ai_baset::visit_edge(
   return false;
 }
 
-#include <iostream>
-
 bool ai_baset::do_function_call(
   const irep_idt &calling_function_id,
   locationt l_call,
@@ -346,8 +343,7 @@ bool ai_baset::do_function_call(
 {
   PRECONDITION(l_call->is_function_call());
 
-  const goto_functionst::goto_functiont &goto_function=
-    f_it->second;
+  const goto_functionst::goto_functiont &goto_function = f_it->second;
 
   // This branch is for legacy support only and is deprecated
 
@@ -369,12 +365,10 @@ bool ai_baset::do_function_call(
     !goto_function.body.instructions.empty(),
     "By analysis time, all functions should have bodies");
 
-  bool any_changes=false;
-
   // This is the edge from call site to function head.
 
   {
-    locationt l_begin=goto_function.body.instructions.begin();
+    locationt l_begin = goto_function.body.instructions.begin();
 
     working_sett working_set; // Redundant; fixpoint will add l_begin
 
@@ -408,36 +402,36 @@ bool ai_baset::do_function_call(
       progress_data.stack.pop_front();
 
       print_progress_interval(ns);
+    }
   }
 
-
   // This is the edge from function end to return site.
+
   {
     // get location at end of the procedure we have called
-    locationt l_end=--goto_function.body.instructions.end();
+    const locationt l_end = --goto_function.body.instructions.end();
     assert(l_end->is_end_function());
 
     // do edge from end of function to instruction after call
-    const statet &end_state=get_state(l_end);
-
-    locationt l_begin=goto_function.body.instructions.begin();
-    //const statet &start_state=get_state(l_begin);
+    const statet &end_state = get_state(l_end);
 
     if(end_state.is_bottom())
       return false; // function exit point not reachable
 
     working_sett working_set; // Redundant; visit will add l_return
 
-    std::unique_ptr<statet> pre_merge_tmp_state(make_temporary_state(*tmp_state));
+    const std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
+    tmp_state->transform(f_it->first, l_end, f_it->first, l_return, *this, ns);
 
-    // We try to
+    const std::unique_ptr<statet> pre_merge_state{
+      make_temporary_state(*tmp_state)};
+
+    const locationt l_begin = goto_function.body.instructions.begin();
     tmp_state->merge_three_way_function_return(
-      get_state(l_call), get_state(l_begin), *pre_merge_tmp_state, ns);
+      get_state(l_call), get_state(l_begin), *pre_merge_state, ns);
 
-    any_changes|=merge(*tmp_state, l_end, l_return);
+    return merge(*tmp_state, l_end, l_return);
   }
-
-  return any_changes;
 }
 
 bool ai_baset::do_function_call_rec(
@@ -457,8 +451,6 @@ bool ai_baset::do_function_call_rec(
     function.id() == ID_symbol,
     "Function pointers and indirect calls must be removed before analysis.");
 
-  bool new_data=false;
-
   const irep_idt &identifier = to_symbol_expr(function).get_identifier();
 
   goto_functionst::function_mapt::const_iterator it =
@@ -468,20 +460,18 @@ bool ai_baset::do_function_call_rec(
     it != goto_functions.function_map.end(),
     "Function " + id2string(identifier) + "not in function map");
 
-  new_data = do_function_call(
+  return do_function_call(
     calling_function_id, l_call, l_return, goto_functions, it, arguments, ns);
-
-  return new_data;
 }
 
 void ai_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  goto_functionst::function_mapt::const_iterator
-    f_it=goto_functions.function_map.find(goto_functions.entry_point());
+  goto_functionst::function_mapt::const_iterator f_it =
+    goto_functions.function_map.find(goto_functions.entry_point());
 
-  if(f_it!=goto_functions.function_map.end())
+  if(f_it != goto_functions.function_map.end())
     fixedpoint(f_it->first, f_it->second.body, goto_functions, ns);
 }
 
@@ -497,8 +487,8 @@ void ai_baset::concurrent_fixedpoint(
   // functions
   goto_programt tmp;
   tmp.add_instruction();
-  goto_programt::const_targett sh_target=tmp.instructions.begin();
-  statet &shared_state=get_state(sh_target);
+  goto_programt::const_targett sh_target = tmp.instructions.begin();
+  statet &shared_state = get_state(sh_target);
 
   struct wl_entryt
   {
@@ -527,8 +517,7 @@ void ai_baset::concurrent_fixedpoint(
       {
         thread_wl.push_back(wl_entryt(it->first, it->second.body, t_it));
 
-        goto_programt::const_targett l_end=
-          it->second.body.instructions.end();
+        goto_programt::const_targett l_end = it->second.body.instructions.end();
         --l_end;
 
         merge_shared(shared_state, l_end, sh_target, ns);
@@ -537,10 +526,10 @@ void ai_baset::concurrent_fixedpoint(
 
   // now feed in the shared state into all concurrently executing
   // functions, and iterate until the shared state stabilizes
-  bool new_shared=true;
+  bool new_shared = true;
   while(new_shared)
   {
-    new_shared=false;
+    new_shared = false;
 
     for(const auto &wl_entry : thread_wl)
     {
@@ -552,7 +541,7 @@ void ai_baset::concurrent_fixedpoint(
 
       while(!working_set.empty())
       {
-        goto_programt::const_targett l=get_next(working_set);
+        goto_programt::const_targett l = get_next(working_set);
 
         visit(
           wl_entry.function_id,
@@ -566,7 +555,7 @@ void ai_baset::concurrent_fixedpoint(
         // carries all possible values; otherwise we would need to
         // merge over each and every state
         if(l->is_end_function())
-          new_shared|=merge_shared(shared_state, l, sh_target, ns);
+          new_shared |= merge_shared(shared_state, l, sh_target, ns);
       }
     }
   }

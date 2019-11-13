@@ -70,7 +70,9 @@ public:
   {}
 
   void transform(
+    const irep_idt &function_from,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     ai_baset &ai,
     const namespacet &ns) override;
@@ -184,7 +186,9 @@ private:
     const exprt &expr, const namespacet &ns, data_depst &deps) const;
 
   void control_dependencies(
+    const irep_idt &from_function,
     goto_programt::const_targett from,
+    const irep_idt &to_function,
     goto_programt::const_targett to,
     variable_sensitivity_dependence_grapht &dep_graph);
 
@@ -223,14 +227,11 @@ public:
   {
   }
 
-  void initialize(const goto_functionst &goto_functions)
+  void
+  initialize(const irep_idt &function_id, const goto_programt &goto_program)
   {
-    ait<variable_sensitivity_dependence_domaint>::initialize(goto_functions);
-  }
-
-  void initialize(const goto_programt &goto_program)
-  {
-    ait<variable_sensitivity_dependence_domaint>::initialize(goto_program);
+    ait<variable_sensitivity_dependence_domaint>::initialize(
+      function_id, goto_program);
   }
 
   void finalize()

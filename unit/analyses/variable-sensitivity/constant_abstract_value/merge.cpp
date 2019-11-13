@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include <typeinfo>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
@@ -16,6 +16,7 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/mathematical_types.h>
 
 
 SCENARIO("merge_constant_abstract_value",

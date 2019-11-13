@@ -3,7 +3,7 @@ main.c
 --variable --arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* array\[0\] == 5: Unknown$
-^\[main.assertion.2\] .* array\[1\] == 5: Unknown$
+^\[main.assertion.1\] line 11 array\[0\] == 5: UNKNOWN$
+^\[main.assertion.2\] line 12 array\[1\] == 5: UNKNOWN$
 --
 ^warning: ignoring

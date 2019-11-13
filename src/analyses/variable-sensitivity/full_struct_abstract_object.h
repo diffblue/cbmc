@@ -51,7 +51,7 @@ public:
 
 private:
   // no entry means component is top
-  typedef sharing_mapt<irep_idt, abstract_object_pointert, irep_id_hash>
+  typedef sharing_mapt<irep_idt, abstract_object_pointert, false, irep_id_hash>
     shared_struct_mapt;
   shared_struct_mapt map;
 

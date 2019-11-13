@@ -82,10 +82,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
     int index=0;
     for(const exprt &entry : expr.operands())
     {
-      map.insert(
-        mp_integer(index),
-        environment.eval(entry, ns),
-        tvt(false));
+      map.insert(mp_integer(index), environment.eval(entry, ns));
       ++index;
     }
     clear_top();
@@ -275,16 +272,16 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
     mp_integer index_value;
     if(eval_index(index, env, ns, index_value))
     {
-      shared_array_mapt::const_find_type value = map.find(index_value);
+      auto const value = map.find(index_value);
 
       // Here we are assuming it is always in bounds
-      if(!value.second)
+      if(!value.has_value())
       {
         return env.abstract_object_factory(type().subtype(), ns, true, false);
       }
       else
       {
-        return value.first;
+        return value.value();
       }
     }
     else
@@ -358,20 +355,21 @@ sharing_ptrt<array_abstract_objectt>
     {
       // We were able to evaluate the index to a value, which we
       // assume is in bounds...
-      shared_array_mapt::const_find_type old_value = map.find(index_value);
+      auto const old_value = map.find(index_value);
 
-      if(!old_value.second)
+      if(!old_value.has_value())
       {
         result->map.insert(
           index_value,
           environment.write(
-            get_top_entry(environment, ns), value, stack, ns, merging_write),
-          tvt(false));
+            get_top_entry(environment, ns), value, stack, ns, merging_write));
       }
       else
       {
-        result->map.find(index_value, tvt(true)).first =
-          environment.write(old_value.first, value, stack, ns, merging_write);
+        result->map.replace(
+          index_value,
+          environment.write(
+            old_value.value(), value, stack, ns, merging_write));
       }
 
       result->clear_top();
@@ -387,8 +385,9 @@ sharing_ptrt<array_abstract_objectt>
       for(const auto &starting_value : view)
       {
         // Merging write since we don't know which index we are writing to
-        result->map.find(starting_value.first, tvt(true)).first =
-          environment.write(starting_value.second, value, stack, ns, true);
+        result->map.replace(
+          starting_value.first,
+          environment.write(starting_value.second, value, stack, ns, true));
 
         result->clear_top();
       }
@@ -414,10 +413,9 @@ sharing_ptrt<array_abstract_objectt>
 
         INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
 
-        shared_array_mapt::const_find_type old_value=
-          result->map.find(index_value);
+        auto const old_value = result->map.find(index_value);
 
-        if(!old_value.second) // Array element is top
+        if(!old_value.has_value()) // Array element is top
         {
           DATA_INVARIANT(result->verify(), "Structural invariants maintained");
           return result;
@@ -425,26 +423,26 @@ sharing_ptrt<array_abstract_objectt>
 
         bool dummy;
 
-        result->map.find(index_value, tvt(true)).first =
-          abstract_objectt::merge(old_value.first, value, dummy);
+        result->map.replace(
+          index_value,
+          abstract_objectt::merge(old_value.value(), value, dummy));
 
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
         return result;
       }
       else
       {
-        shared_array_mapt::find_type old_value=
-          result->map.find(index_value);
-        if(old_value.second)
+        auto const old_value = result->map.find(index_value);
+        if(old_value.has_value())
         {
-          if(value != old_value.first)
+          if(value != abstract_object_pointert{old_value.value()})
           {
-            old_value.first = value;
+            result->map.replace(index_value, value);
           }
         }
         else
         {
-          result->map.insert(index_value, value, tvt(false));
+          result->map.insert(index_value, value);
         }
         result->clear_top();
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -544,7 +542,7 @@ constant_array_abstract_objectt::visit_sub_elements(
     auto newval = visitor.visit(item.second);
     if(newval != item.second)
     {
-      result->map.find(item.first, tvt(true)).first = newval;
+      result->map.replace(item.first, std::move(newval));
       modified = true;
     }
   }

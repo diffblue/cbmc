@@ -3,5 +3,5 @@ main.c
 --variable-sensitivity --interval-values --show
 ^EXIT=0$
 ^SIGNAL=0$
-main::1::r \(\) -> TOP
-main::1::s \(\) -> \[00000000000000000000000000000000, 00000000000000000000000000000000\]
+main::1::r \(\) -> TOP @ \[1\]
+main::1::s \(\) -> \[0, 0\] @ \[3\]

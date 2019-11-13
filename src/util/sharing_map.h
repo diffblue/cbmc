@@ -289,6 +289,19 @@ public:
   template <class valueU>
   void insert(const key_type &k, valueU &&m);
 
+  template <class valueU>
+  void insert_or_replace(const key_type &k, valueU &&m)
+  {
+    if(has_key(k))
+    {
+      replace(k, std::forward<valueU>(m));
+    }
+    else
+    {
+      insert(k, std::forward<valueU>(m));
+    }
+  }
+
   /// Replace element, element must exist in map
   ///
   /// Complexity:
