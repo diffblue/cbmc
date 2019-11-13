@@ -48,8 +48,8 @@ struct function_call_harness_generatort::implt
   std::set<irep_idt> function_parameters_to_treat_as_arrays;
   std::set<irep_idt> function_arguments_to_treat_as_arrays;
 
-  std::set<irep_idt> function_parameters_to_treat_equal;
-  std::set<irep_idt> function_arguments_to_treat_equal;
+  std::vector<std::set<irep_idt>> function_parameters_to_treat_equal;
+  std::vector<std::set<irep_idt>> function_arguments_to_treat_equal;
 
   std::set<irep_idt> function_parameters_to_treat_as_cstrings;
   std::set<irep_idt> function_arguments_to_treat_as_cstrings;
@@ -119,9 +119,14 @@ void function_call_harness_generatort::handle_option(
   {
     for(auto const &value : values)
     {
-      for(auto const &param_id : split_string(value, ','))
+      for(auto const &param_cluster : split_string(value, ';'))
       {
-        p_impl->function_parameters_to_treat_equal.insert(param_id);
+        std::set<irep_idt> equal_param_set;
+        for(auto const &param_id : split_string(param_cluster, ','))
+        {
+          equal_param_set.insert(param_id);
+        }
+        p_impl->function_parameters_to_treat_equal.push_back(equal_param_set);
       }
     }
   }
@@ -276,41 +281,44 @@ void function_call_harness_generatort::validate_options(
 
   auto function_to_call = goto_model.symbol_table.lookup_ref(p_impl->function);
   auto ftype = to_code_type(function_to_call.type);
-  for(auto const &pointer_id : p_impl->function_parameters_to_treat_equal)
+  for(auto const &equal_cluster : p_impl->function_parameters_to_treat_equal)
   {
-    std::string decorated_pointer_id =
-      id2string(p_impl->function) + "::" + id2string(pointer_id);
-    bool is_a_param = false;
-    typet common_type = empty_typet{};
-    for(auto const &formal_param : ftype.parameters())
+    for(auto const &pointer_id : equal_cluster)
     {
-      if(formal_param.get_identifier() == decorated_pointer_id)
+      std::string decorated_pointer_id =
+        id2string(p_impl->function) + "::" + id2string(pointer_id);
+      bool is_a_param = false;
+      typet common_type = empty_typet{};
+      for(auto const &formal_param : ftype.parameters())
       {
-        is_a_param = true;
-        if(formal_param.type().id() != ID_pointer)
+        if(formal_param.get_identifier() == decorated_pointer_id)
         {
-          throw invalid_command_line_argument_exceptiont{
-            id2string(pointer_id) + " is not a pointer parameter",
-            "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
-        }
-        if(common_type.id() != ID_empty)
-        {
-          if(common_type != formal_param.type())
+          is_a_param = true;
+          if(formal_param.type().id() != ID_pointer)
           {
             throw invalid_command_line_argument_exceptiont{
-              "pointer arguments of conflicting type",
+              id2string(pointer_id) + " is not a pointer parameter",
               "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
           }
+          if(common_type.id() != ID_empty)
+          {
+            if(common_type != formal_param.type())
+            {
+              throw invalid_command_line_argument_exceptiont{
+                "pointer arguments of conflicting type",
+                "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
+            }
+          }
+          else
+            common_type = formal_param.type();
         }
-        else
-          common_type = formal_param.type();
       }
-    }
-    if(!is_a_param)
-    {
-      throw invalid_command_line_argument_exceptiont{
-        id2string(pointer_id) + " is not a parameter",
-        "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
+      if(!is_a_param)
+      {
+        throw invalid_command_line_argument_exceptiont{
+          id2string(pointer_id) + " is not a parameter",
+          "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
+      }
     }
   }
 }
@@ -403,11 +411,6 @@ function_call_harness_generatort::implt::declare_arguments(
       function_arguments_to_treat_as_cstrings.insert(argument_name);
     }
 
-    if(function_parameters_to_treat_equal.count(parameter_name) != 0)
-    {
-      function_arguments_to_treat_equal.insert(argument_name);
-    }
-
     auto it = function_parameter_to_associated_array_size.find(parameter_name);
     if(it != function_parameter_to_associated_array_size.end())
     {
@@ -425,6 +428,22 @@ function_call_harness_generatort::implt::declare_arguments(
         {argument_name, associated_array_size_argument->second});
     }
   }
+
+  // translate the parameter to argument also in the equality clusters
+  for(auto const &equal_cluster : function_parameters_to_treat_equal)
+  {
+    std::set<irep_idt> cluster_argument_names;
+    for(auto const &parameter_name : equal_cluster)
+    {
+      INVARIANT(
+        parameter_name_to_argument_name.count(parameter_name) != 0,
+        id2string(parameter_name) + " is not a parameter");
+      cluster_argument_names.insert(
+        parameter_name_to_argument_name[parameter_name]);
+    }
+    function_arguments_to_treat_equal.push_back(cluster_argument_names);
+  }
+
   allocate_objects.declare_created_symbols(function_body);
   return arguments;
 }

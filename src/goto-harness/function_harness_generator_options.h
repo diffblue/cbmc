@@ -47,8 +47,8 @@ Author: Diffblue Ltd.
   " p    treat the function parameter with the name `p' as\n"                  \
   "                              an array\n"                                   \
   "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                     \
-  " p,q    treat the function parameter with the name `q' equal\n"             \
-  "                              to parameter `q'\n"                           \
+  " p,q,r[;s,t]    treat the function parameters `q,r' equal\n"                \
+  "                              to parameter `p'; `s` to `t` and so on\n"     \
   "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                    \
   " array_name:size_name\n"                                                    \
   "                              set the parameter <size_name> to the size"    \

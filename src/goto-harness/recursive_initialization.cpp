@@ -93,6 +93,8 @@ recursive_initializationt::recursive_initializationt(
         initialization_config.min_null_tree_depth,
         signed_int_type())))
 {
+  common_arguments_origins.resize(
+    this->initialization_config.pointers_to_treat_equal.size());
 }
 
 void recursive_initializationt::initialize(
@@ -100,17 +102,23 @@ void recursive_initializationt::initialize(
   const exprt &depth,
   code_blockt &body)
 {
-  if(
-    lhs.id() == ID_symbol &&
-    should_be_treated_equal(to_symbol_expr(lhs).get_identifier()))
+  if(lhs.id() == ID_symbol)
   {
-    if(common_arguments_origin.has_value())
+    const auto maybe_cluster_index =
+      find_equal_cluster(to_symbol_expr(lhs).get_identifier());
+    if(maybe_cluster_index.has_value())
     {
-      body.add(code_assignt{lhs, *common_arguments_origin});
-      return;
+      if(common_arguments_origins[*maybe_cluster_index].has_value())
+      {
+        body.add(
+          code_assignt{lhs, *common_arguments_origins[*maybe_cluster_index]});
+        return;
+      }
+      else
+      {
+        common_arguments_origins[*maybe_cluster_index] = lhs;
+      }
     }
-    else
-      common_arguments_origin = lhs;
   }
 
   const irep_idt &fun_name = build_constructor(lhs);
@@ -293,11 +301,17 @@ bool recursive_initializationt::should_be_treated_as_array(
          initialization_config.pointers_to_treat_as_arrays.end();
 }
 
-bool recursive_initializationt::should_be_treated_equal(
-  const irep_idt &pointer_name) const
+optionalt<std::size_t>
+recursive_initializationt::find_equal_cluster(const irep_idt &name) const
 {
-  return initialization_config.pointers_to_treat_equal.find(pointer_name) !=
-         initialization_config.pointers_to_treat_equal.end();
+  for(size_t index = 0;
+      index != initialization_config.pointers_to_treat_equal.size();
+      ++index)
+  {
+    if(initialization_config.pointers_to_treat_equal[index].count(name) != 0)
+      return index;
+  }
+  return {};
 }
 
 bool recursive_initializationt::is_array_size_parameter(
@@ -786,14 +800,25 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
 
 bool recursive_initializationt::needs_freeing(const exprt &expr) const
 {
-  if(expr.type().id() != ID_pointer)
+  if(expr.type().id() != ID_pointer || expr.type().id() == ID_code)
     return false;
-  if(common_arguments_origin.has_value() && expr.id() == ID_symbol)
+  if(expr.id() == ID_symbol)
   {
-    auto origin_name =
-      to_symbol_expr(*common_arguments_origin).get_identifier();
     auto expr_name = to_symbol_expr(expr).get_identifier();
-    return origin_name == expr_name;
+    if(find_equal_cluster(expr_name).has_value())
+    {
+      for(auto const &origin_expr : common_arguments_origins)
+      {
+        if(!origin_expr.has_value())
+          continue;
+        INVARIANT(
+          origin_expr->id() == ID_symbol, "common origin is not a symbol");
+        auto origin_name = to_symbol_expr(*origin_expr).get_identifier();
+        if(origin_name == expr_name)
+          return true;
+      }
+      return false;
+    }
   }
   return true;
 }
