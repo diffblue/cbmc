@@ -171,8 +171,6 @@ bool has_subtype(
 
     if(pred(top))
       return true;
-    else if(top.id() == ID_symbol)
-      push_if_not_visited(ns.follow(top));
     else if(top.id() == ID_c_enum_tag)
       push_if_not_visited(ns.follow_tag(to_c_enum_tag_type(top)));
     else if(top.id() == ID_struct_tag)
