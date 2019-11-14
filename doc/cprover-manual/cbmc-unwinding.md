@@ -90,13 +90,14 @@ first use:
 to obtain a list of all loops in the program. Then identify the loops
 you need to set a separate bound for, and note their loop ID. Then use:
 
-    --unwindset L:B,L:B,...
+    --unwindset L:B
 
-where `L` denotes a loop ID and `B` denotes the bound for that loop.
+where `L` denotes a loop ID and `B` denotes the bound for that loop. The
+option can be given multiple times.
 
 As an example, consider a program with two loops in the function main:
 
-    --unwindset c::main.0:10,c::main.1:20
+    --unwindset main.0:10 --unwindset main.1:20
 
 This sets a bound of 10 for the first loop, and a bound of 20 for the
 second loop.

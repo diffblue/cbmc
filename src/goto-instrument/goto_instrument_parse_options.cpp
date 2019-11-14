@@ -175,7 +175,7 @@ int goto_instrument_parse_optionst::doit()
           unwindset.parse_unwindset_file(cmdline.get_value("unwindset-file"));
 
         if(unwindset_given)
-          unwindset.parse_unwindset(cmdline.get_value("unwindset"));
+          unwindset.parse_unwindset(cmdline.get_values("unwindset"));
 
         bool unwinding_assertions=cmdline.isset("unwinding-assertions");
         bool partial_loops=cmdline.isset("partial-loops");
