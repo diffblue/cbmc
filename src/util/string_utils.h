@@ -10,6 +10,8 @@ Author: Daniel Poetzl
 #ifndef CPROVER_UTIL_STRING_UTILS_H
 #define CPROVER_UTIL_STRING_UTILS_H
 
+#include "deprecate.h"
+
 #include <iosfwd>
 #include <string>
 #include <vector>
@@ -26,6 +28,11 @@ std::string strip_string(const std::string &s);
 /// \param remove_empty: If true, all empty-string elements will be removed.
 ///   This is applied after strip so whitespace only elements will be removed if
 ///   both are set to true.
+DEPRECATED(SINCE(
+  2019,
+  11,
+  14,
+  "use split_string(s, delim, strip, remove_empty) instead"))
 void split_string(
   const std::string &s,
   char delim,

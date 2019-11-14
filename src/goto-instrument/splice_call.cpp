@@ -31,8 +31,8 @@ static bool parse_caller_callee(
   const std::string &callercallee,
   std::vector<std::string> &result)
 {
-  split_string(callercallee, ',', result);
-  return (result.size()!= 2);
+  result = split_string(callercallee, ',');
+  return result.size() != 2;
 }
 
 bool splice_call(
