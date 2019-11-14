@@ -12,6 +12,7 @@ Author: Diffblue Ltd.
 #include <ansi-c/c_object_factory_parameters.h>
 
 #include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_inline.h>
 #include <goto-programs/remove_skip.h>
 
 #include <util/arith_tools.h>
@@ -566,6 +567,15 @@ void generate_function_bodies(
       did_generate_body = true;
       generate_function_body.generate_function_body(
         function.second, model.symbol_table, function.first);
+    }
+  }
+
+  for(auto &function : model.goto_functions.function_map)
+  {
+    if(std::regex_match(id2string(function.first), functions_regex))
+    {
+      goto_function_inline_calls(
+        model, function.first, message_handler, false, false);
     }
   }
   if(!did_generate_body)
