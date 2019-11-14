@@ -90,8 +90,8 @@ void memory_snapshot_harness_generatort::handle_option(
   }
   else if(option == MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT)
   {
-    std::vector<std::string> havoc_candidates;
-    split_string(values.front(), ',', havoc_candidates, true);
+    std::vector<std::string> havoc_candidates =
+      split_string(values.front(), ',', true);
     for(const auto &candidate : havoc_candidates)
     {
       variables_to_havoc.insert(candidate);
@@ -431,8 +431,7 @@ memory_snapshot_harness_generatort::entry_goto_locationt
 memory_snapshot_harness_generatort::parse_goto_location(
   const std::string &cmdl_option)
 {
-  std::vector<std::string> start;
-  split_string(cmdl_option, ':', start, true);
+  std::vector<std::string> start = split_string(cmdl_option, ':', true);
 
   if(
     start.empty() || start.front().empty() ||
