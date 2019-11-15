@@ -13,7 +13,7 @@ Author: Daniel Poetzl
 #ifndef CPROVER_GOTO_PROGRAMS_REPLACE_CALLS_H
 #define CPROVER_GOTO_PROGRAMS_REPLACE_CALLS_H
 
-#include "goto_model.h"
+#include <goto-programs/goto_model.h>
 
 class replace_callst
 {

@@ -52,7 +52,6 @@ SRC = adjust_float_expressions.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
       rewrite_union.cpp \
-      replace_calls.cpp \
       resolve_inherited_component.cpp \
       safety_checker.cpp \
       set_properties.cpp \

@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_const_function_pointers.h>
-#include <goto-programs/replace_calls.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
@@ -32,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "aggressive_slicer.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
+#include "replace_calls.h"
 
 #include "count_eloc.h"
 
