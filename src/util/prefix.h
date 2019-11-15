@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
+// C++20 will have std::string::starts_with
+
 inline bool has_prefix(const std::string &s, const std::string &prefix)
 {
   return s.compare(0, prefix.size(), prefix)==0;
