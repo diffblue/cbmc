@@ -21,43 +21,52 @@ void unwindsett::parse_unwind(const std::string &unwind)
     global_limit = unsafe_string2unsigned(unwind);
 }
 
+void unwindsett::parse_unwindset_one_loop(std::string val)
+{
+  unsigned thread_nr = 0;
+  bool thread_nr_set = false;
+
+  if(!val.empty() && isdigit(val[0]) && val.find(":") != std::string::npos)
+  {
+    std::string nr = val.substr(0, val.find(":"));
+    thread_nr = unsafe_string2unsigned(nr);
+    thread_nr_set = true;
+    val.erase(0, nr.size() + 1);
+  }
+
+  if(val.rfind(":") != std::string::npos)
+  {
+    std::string id = val.substr(0, val.rfind(":"));
+    std::string uw_string = val.substr(val.rfind(":") + 1);
+
+    // the below initialisation makes g++-5 happy
+    optionalt<unsigned> uw(0);
+
+    if(uw_string.empty())
+      uw = {};
+    else
+      uw = unsafe_string2unsigned(uw_string);
+
+    if(thread_nr_set)
+      thread_loop_map[std::pair<irep_idt, unsigned>(id, thread_nr)] = uw;
+    else
+      loop_map[id] = uw;
+  }
+}
+
 void unwindsett::parse_unwindset(const std::string &unwindset)
 {
-  std::vector<std::string> unwindset_loops =
+  std::vector<std::string> unwindset_elements =
     split_string(unwindset, ',', true, true);
 
-  for(auto &val : unwindset_loops)
-  {
-    unsigned thread_nr = 0;
-    bool thread_nr_set = false;
+  for(auto &element : unwindset_elements)
+    parse_unwindset_one_loop(element);
+}
 
-    if(!val.empty() && isdigit(val[0]) && val.find(":") != std::string::npos)
-    {
-      std::string nr = val.substr(0, val.find(":"));
-      thread_nr = unsafe_string2unsigned(nr);
-      thread_nr_set = true;
-      val.erase(0, nr.size() + 1);
-    }
-
-    if(val.rfind(":") != std::string::npos)
-    {
-      std::string id = val.substr(0, val.rfind(":"));
-      std::string uw_string = val.substr(val.rfind(":") + 1);
-
-      // the below initialisation makes g++-5 happy
-      optionalt<unsigned> uw(0);
-
-      if(uw_string.empty())
-        uw = { };
-      else
-        uw = unsafe_string2unsigned(uw_string);
-
-      if(thread_nr_set)
-        thread_loop_map[std::pair<irep_idt, unsigned>(id, thread_nr)] = uw;
-      else
-        loop_map[id] = uw;
-    }
-  }
+void unwindsett::parse_unwindset(const std::list<std::string> &unwindset)
+{
+  for(auto &element : unwindset)
+    parse_unwindset(element);
 }
 
 optionalt<unsigned>
