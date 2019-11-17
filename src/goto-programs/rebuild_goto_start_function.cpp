@@ -47,13 +47,8 @@ rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
 template<typename maybe_lazy_goto_modelt>
 bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
 {
-  const irep_idt &mode = get_entry_point_mode(goto_model.symbol_table);
-
-  // Get the relevant languaget to generate the new entry point with
-  std::unique_ptr<languaget> language=get_language_from_mode(mode);
-  INVARIANT(language, "No language found for mode: "+id2string(mode));
-  language->set_message_handler(get_message_handler());
-  language->set_language_options(options);
+  std::unique_ptr<languaget> language = get_entry_point_language(
+    goto_model.symbol_table, options, get_message_handler());
 
   // To create a new entry point we must first remove the old one
   remove_existing_entry_point(goto_model.symbol_table);
@@ -67,6 +62,21 @@ bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
     goto_model.unload(goto_functionst::entry_point());
 
   return return_code;
+}
+
+std::unique_ptr<languaget> get_entry_point_language(
+  const symbol_table_baset &symbol_table,
+  const optionst &options,
+  message_handlert &message_handler)
+{
+  const irep_idt &mode = get_entry_point_mode(symbol_table);
+
+  // Get the relevant languaget to generate the new entry point with
+  std::unique_ptr<languaget> language = get_language_from_mode(mode);
+  INVARIANT(language, "No language found for mode: " + id2string(mode));
+  language->set_message_handler(message_handler);
+  language->set_language_options(options);
+  return language;
 }
 
 const irep_idt &get_entry_point_mode(const symbol_table_baset &symbol_table)

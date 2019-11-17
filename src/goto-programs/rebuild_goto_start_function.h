@@ -54,6 +54,15 @@ void remove_existing_entry_point(symbol_table_baset &);
 /// \return A mode string saying which language to use
 const irep_idt &get_entry_point_mode(const symbol_table_baset &);
 
+/// Find the language corresponding to the __CPROVER_start function
+/// \param symbol_table: The symbol table of the goto model.
+/// \param options: Command-line options
+/// \param message_handler: The message handler to report any messages with
+std::unique_ptr<languaget> get_entry_point_language(
+  const symbol_table_baset &symbol_table,
+  const optionst &options,
+  message_handlert &message_handler);
+
 // NOLINTNEXTLINE(readability/namespace)  using required for templates
 using rebuild_goto_start_functiont =
   rebuild_goto_start_function_baset<goto_modelt>;
