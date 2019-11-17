@@ -56,7 +56,7 @@ bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
   language->set_language_options(options);
 
   // To create a new entry point we must first remove the old one
-  remove_existing_entry_point();
+  remove_existing_entry_point(goto_model.symbol_table);
 
   bool return_code=
     language->generate_support_functions(goto_model.symbol_table);
@@ -81,18 +81,14 @@ get_entry_point_mode() const
   return current_entry_point.mode;
 }
 
-/// Eliminate the existing entry point function symbol and any symbols created
-/// in that scope from the symbol table.
-template<typename maybe_lazy_goto_modelt>
-void rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
-remove_existing_entry_point()
+void remove_existing_entry_point(symbol_table_baset &symbol_table)
 {
   // Remove the function itself
-  goto_model.symbol_table.remove(goto_functionst::entry_point());
+  symbol_table.remove(goto_functionst::entry_point());
 
   // And any symbols created in the scope of the entry point
   std::vector<irep_idt> entry_point_symbols;
-  for(const auto &symbol_entry : goto_model.symbol_table.symbols)
+  for(const auto &symbol_entry : symbol_table.symbols)
   {
     const bool is_entry_point_symbol=
       has_prefix(
@@ -105,7 +101,7 @@ remove_existing_entry_point()
 
   for(const irep_idt &entry_point_symbol : entry_point_symbols)
   {
-    goto_model.symbol_table.remove(entry_point_symbol);
+    symbol_table.remove(entry_point_symbol);
   }
 }
 

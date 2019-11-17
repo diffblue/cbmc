@@ -41,11 +41,13 @@ public:
 private:
   irep_idt get_entry_point_mode() const;
 
-  void remove_existing_entry_point();
-
   const optionst &options;
   maybe_lazy_goto_modelt &goto_model;
 };
+
+/// Eliminate the existing entry point function symbol and any symbols created
+/// in that scope from the \p symbol_table.
+void remove_existing_entry_point(symbol_table_baset &);
 
 // NOLINTNEXTLINE(readability/namespace)  using required for templates
 using rebuild_goto_start_functiont =
