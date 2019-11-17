@@ -12,38 +12,20 @@ Author: Thomas Kiley, thomas@diffblue.com
 #ifndef CPROVER_GOTO_PROGRAMS_REBUILD_GOTO_START_FUNCTION_H
 #define CPROVER_GOTO_PROGRAMS_REBUILD_GOTO_START_FUNCTION_H
 
-#include <util/message.h>
+#include <memory>
+
+#include <util/irep.h>
+
+class languaget;
+class message_handlert;
 class optionst;
-
-#include "lazy_goto_model.h"
-
-
-class symbol_tablet;
-class goto_functionst;
+class symbol_table_baset;
 
 #define OPT_FUNCTIONS \
   "(function):"
 
 #define HELP_FUNCTIONS \
   " --function name              set main function name\n"
-
-template<typename maybe_lazy_goto_modelt>
-class rebuild_goto_start_function_baset: public messaget
-{
-public:
-  rebuild_goto_start_function_baset(
-    const optionst &options,
-    maybe_lazy_goto_modelt &goto_model,
-    message_handlert &message_handler);
-
-  bool operator()();
-
-private:
-  irep_idt get_entry_point_mode() const;
-
-  const optionst &options;
-  maybe_lazy_goto_modelt &goto_model;
-};
 
 /// Eliminate the existing entry point function symbol and any symbols created
 /// in that scope from the \p symbol_table.
@@ -62,13 +44,5 @@ std::unique_ptr<languaget> get_entry_point_language(
   const symbol_table_baset &symbol_table,
   const optionst &options,
   message_handlert &message_handler);
-
-// NOLINTNEXTLINE(readability/namespace)  using required for templates
-using rebuild_goto_start_functiont =
-  rebuild_goto_start_function_baset<goto_modelt>;
-
-// NOLINTNEXTLINE(readability/namespace)  using required for templates
-using rebuild_lazy_goto_start_functiont =
-  rebuild_goto_start_function_baset<lazy_goto_modelt>;
 
 #endif // CPROVER_GOTO_PROGRAMS_REBUILD_GOTO_START_FUNCTION_H

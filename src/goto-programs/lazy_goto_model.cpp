@@ -201,11 +201,21 @@ void lazy_goto_modelt::initialize(
 
   if(binaries_provided_start && options.is_set("function"))
   {
-    // Rebuild the entry-point, using the language annotation of the
-    // existing __CPROVER_start function:
-    rebuild_lazy_goto_start_functiont rebuild_existing_start(
-      options, *this, message_handler);
-    entry_point_generation_failed=rebuild_existing_start();
+    // Get the language annotation of the existing __CPROVER_start function.
+    std::unique_ptr<languaget> language =
+      get_entry_point_language(symbol_table, options, message_handler);
+
+    // To create a new entry point we must first remove the old one
+    remove_existing_entry_point(symbol_table);
+
+    // Create the new entry-point
+    entry_point_generation_failed =
+      language->generate_support_functions(symbol_table);
+
+    // Remove the function from the goto functions so it is copied back in
+    // from the symbol table during goto_convert
+    if(!entry_point_generation_failed)
+      unload(goto_functionst::entry_point());
   }
   else if(!binaries_provided_start)
   {

@@ -19,50 +19,9 @@ Author: Thomas Kiley, thomas@diffblue.com
 #include <langapi/mode.h>
 #include <langapi/language.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include <memory>
-
-/// To rebuild the _start function in the event the program was compiled into
-/// GOTO with a different entry function selected.
-/// \param options: Command-line options
-/// \param goto_model: The goto functions (to replace the body of the _start
-///   function) and symbol table (to replace the _start function symbol) of the
-///   program.
-/// \param message_handler: The message handler to report any messages with
-template <typename maybe_lazy_goto_modelt>
-rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
-  rebuild_goto_start_function_baset(
-    const optionst &options,
-    maybe_lazy_goto_modelt &goto_model,
-    message_handlert &message_handler)
-  : messaget(message_handler), options(options), goto_model(goto_model)
-{
-}
-
-/// To rebuild the _start function in the event the program was compiled into
-/// GOTO with a different entry function selected. It works by discarding the
-/// _start symbol and GOTO function and calling on the relevant languaget to
-/// generate the _start function again.
-/// \return Returns true if either the symbol is not found, or something went
-///   wrong with generating the start_function. False otherwise.
-template<typename maybe_lazy_goto_modelt>
-bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
-{
-  std::unique_ptr<languaget> language = get_entry_point_language(
-    goto_model.symbol_table, options, get_message_handler());
-
-  // To create a new entry point we must first remove the old one
-  remove_existing_entry_point(goto_model.symbol_table);
-
-  bool return_code=
-    language->generate_support_functions(goto_model.symbol_table);
-
-  // Remove the function from the goto functions so it is copied back in
-  // from the symbol table during goto_convert
-  if(!return_code)
-    goto_model.unload(goto_functionst::entry_point());
-
-  return return_code;
-}
 
 std::unique_ptr<languaget> get_entry_point_language(
   const symbol_table_baset &symbol_table,
@@ -109,6 +68,3 @@ void remove_existing_entry_point(symbol_table_baset &symbol_table)
     symbol_table.remove(entry_point_symbol);
   }
 }
-
-template class rebuild_goto_start_function_baset<goto_modelt>;
-template class rebuild_goto_start_function_baset<lazy_goto_modelt>;
