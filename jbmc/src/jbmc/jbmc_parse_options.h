@@ -26,13 +26,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/show_properties.h>
-#include <java_bytecode/lazy_goto_model.h>
 
 #include <goto-symex/path_storage.h>
 
 #include <solvers/strings/string_refinement.h>
 
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/lazy_goto_model.h>
 
 #include <json/json_interface.h>
 #include <xmllang/xml_interface.h>
