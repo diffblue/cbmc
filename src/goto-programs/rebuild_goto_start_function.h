@@ -49,6 +49,11 @@ private:
 /// in that scope from the \p symbol_table.
 void remove_existing_entry_point(symbol_table_baset &);
 
+/// Find out the mode of the current entry point to determine the mode of the
+/// replacement entry point
+/// \return A mode string saying which language to use
+const irep_idt &get_entry_point_mode(const symbol_table_baset &);
+
 // NOLINTNEXTLINE(readability/namespace)  using required for templates
 using rebuild_goto_start_functiont =
   rebuild_goto_start_function_baset<goto_modelt>;

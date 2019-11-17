@@ -47,7 +47,7 @@ rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
 template<typename maybe_lazy_goto_modelt>
 bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
 {
-  const irep_idt &mode=get_entry_point_mode();
+  const irep_idt &mode = get_entry_point_mode(goto_model.symbol_table);
 
   // Get the relevant languaget to generate the new entry point with
   std::unique_ptr<languaget> language=get_language_from_mode(mode);
@@ -69,15 +69,10 @@ bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
   return return_code;
 }
 
-/// Find out the mode of the current entry point to determine the mode of the
-/// replacement entry point
-/// \return A mode string saying which language to use
-template<typename maybe_lazy_goto_modelt>
-irep_idt rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
-get_entry_point_mode() const
+const irep_idt &get_entry_point_mode(const symbol_table_baset &symbol_table)
 {
   const symbolt &current_entry_point =
-    goto_model.symbol_table.lookup_ref(goto_functionst::entry_point());
+    symbol_table.lookup_ref(goto_functionst::entry_point());
   return current_entry_point.mode;
 }
 
