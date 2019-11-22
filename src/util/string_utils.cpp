@@ -50,7 +50,8 @@ void split_string(
 
   if(s.empty())
   {
-    result.push_back("");
+    if(!remove_empty)
+      result.push_back("");
     return;
   }
 
@@ -84,7 +85,7 @@ void split_string(
   if(!remove_empty || !new_s.empty())
     result.push_back(new_s);
 
-  if(result.empty())
+  if(!remove_empty && result.empty())
     result.push_back("");
 }
 
