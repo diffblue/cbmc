@@ -120,7 +120,7 @@ SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
 {
   GIVEN("An expression created with add_to_operands(std::move(...))")
   {
-    multi_ary_exprt test_expr(ID_1);
+    multi_ary_exprt test_expr(ID_1, {}, typet());
     exprt test_subexpr(ID_1);
     exprt test_subsubexpr(ID_1);
     test_subexpr.add_to_operands(std::move(test_subsubexpr));
@@ -154,7 +154,7 @@ SCENARIO("exprt_sharing", "[core][utils][exprt]")
 {
   GIVEN("An expression created with add_to_operands(std::move(...))")
   {
-    multi_ary_exprt test_expr(ID_1);
+    multi_ary_exprt test_expr(ID_1, {}, typet());
     exprt test_subexpr(ID_1);
     exprt test_subsubexpr(ID_1);
     test_subexpr.add_to_operands(std::move(test_subsubexpr));
