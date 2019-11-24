@@ -33,11 +33,10 @@ lazy_goto_modelt::lazy_goto_modelt(
       goto_model->goto_functions.function_map,
       language_files,
       symbol_table,
-      [this] (
+      [this](
         const irep_idt &function_name,
         goto_functionst::goto_functiont &function,
-        journalling_symbol_tablet &journalling_symbol_table) -> void
-      {
+        journalling_symbol_tablet &journalling_symbol_table) -> void {
         goto_model_functiont model_function(
           journalling_symbol_table,
           goto_model->goto_functions,
@@ -66,11 +65,10 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
       goto_model->goto_functions.function_map,
       language_files,
       symbol_table,
-      [this] (
+      [this](
         const irep_idt &function_name,
         goto_functionst::goto_functiont &function,
-        journalling_symbol_tablet &journalling_symbol_table) -> void
-      {
+        journalling_symbol_tablet &journalling_symbol_table) -> void {
         goto_model_functiont model_function(
           journalling_symbol_table,
           goto_model->goto_functions,
@@ -151,16 +149,16 @@ void lazy_goto_modelt::initialize(
           "failed to open input file '" + filename + '\'');
       }
 
-      language_filet &lf=add_language_file(filename);
-      lf.language=get_language_from_filename(filename);
+      language_filet &lf = add_language_file(filename);
+      lf.language = get_language_from_filename(filename);
 
-      if(lf.language==nullptr)
+      if(lf.language == nullptr)
       {
         throw invalid_source_file_exceptiont(
           "failed to figure out type of file '" + filename + '\'');
       }
 
-      languaget &language=*lf.language;
+      languaget &language = *lf.language;
       language.set_message_handler(message_handler);
       language.set_language_options(options);
 
@@ -198,7 +196,7 @@ void lazy_goto_modelt::initialize(
   bool binaries_provided_start =
     symbol_table.has_symbol(goto_functionst::entry_point());
 
-  bool entry_point_generation_failed=false;
+  bool entry_point_generation_failed = false;
 
   if(binaries_provided_start && options.is_set("function"))
   {
@@ -226,7 +224,7 @@ void lazy_goto_modelt::initialize(
   {
     // Allow all language front-ends to try to provide the user-specified
     // (--function) entry-point, or some language-specific default:
-    entry_point_generation_failed=
+    entry_point_generation_failed =
       language_files.generate_support_functions(symbol_table);
   }
 
@@ -243,10 +241,11 @@ void lazy_goto_modelt::initialize(
 void lazy_goto_modelt::load_all_functions() const
 {
   symbol_tablet::symbolst::size_type table_size;
-  symbol_tablet::symbolst::size_type new_table_size=symbol_table.symbols.size();
+  symbol_tablet::symbolst::size_type new_table_size =
+    symbol_table.symbols.size();
   do
   {
-    table_size=new_table_size;
+    table_size = new_table_size;
 
     // Find symbols that correspond to functions
     std::vector<irep_idt> fn_ids_to_convert;
@@ -262,8 +261,8 @@ void lazy_goto_modelt::load_all_functions() const
     // Repeat while new symbols are being added in case any of those are
     // stubbed functions. Even stubs can create new stubs while being
     // converted if they are special stubs (e.g. string functions)
-    new_table_size=symbol_table.symbols.size();
-  } while(new_table_size!=table_size);
+    new_table_size = symbol_table.symbols.size();
+  } while(new_table_size != table_size);
 
   goto_model->goto_functions.compute_location_numbers();
 }
