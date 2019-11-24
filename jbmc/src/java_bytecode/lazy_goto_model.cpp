@@ -4,8 +4,9 @@
 /// Model for lazy loading of functions
 
 #include "lazy_goto_model.h"
-#include "read_goto_binary.h"
-#include "rebuild_goto_start_function.h"
+
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <langapi/mode.h>
 

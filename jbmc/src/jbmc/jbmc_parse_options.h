@@ -25,8 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_trace.h>
-#include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/show_properties.h>
+#include <java_bytecode/lazy_goto_model.h>
 
 #include <goto-symex/path_storage.h>
 

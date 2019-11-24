@@ -17,7 +17,7 @@ Author: Diffblue Ltd.
 #include <util/options.h>
 #include <util/suffix.h>
 
-#include <goto-programs/lazy_goto_model.h>
+#include <java_bytecode/lazy_goto_model.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <util/file_util.h>

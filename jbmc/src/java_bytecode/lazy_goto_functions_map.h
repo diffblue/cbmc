@@ -8,8 +8,8 @@
 
 #include <unordered_set>
 
-#include "goto_functions.h"
-#include "goto_convert_functions.h"
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_functions.h>
 
 #include <langapi/language_file.h>
 #include <util/journalling_symbol_table.h>

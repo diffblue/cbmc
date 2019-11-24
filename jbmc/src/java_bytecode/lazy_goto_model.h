@@ -8,10 +8,11 @@
 
 #include <langapi/language_file.h>
 
-#include "abstract_goto_model.h"
-#include "goto_model.h"
+#include <goto-programs/abstract_goto_model.h>
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_model.h>
+
 #include "lazy_goto_functions_map.h"
-#include "goto_convert_functions.h"
 
 class optionst;
 
