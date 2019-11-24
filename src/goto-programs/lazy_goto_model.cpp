@@ -201,6 +201,10 @@ void lazy_goto_modelt::initialize(
 
   if(binaries_provided_start && options.is_set("function"))
   {
+    // The goto binaries provided already contain a __CPROVER_start
+    // function that may be tied to a different entry point `function`.
+    // Hence, we will rebuild the __CPROVER_start function.
+
     // Get the language annotation of the existing __CPROVER_start function.
     std::unique_ptr<languaget> language =
       get_entry_point_language(symbol_table, options, message_handler);
