@@ -30,8 +30,9 @@ std::unique_ptr<languaget> get_entry_point_language(
 {
   const irep_idt &mode = get_entry_point_mode(symbol_table);
 
-  // Get the relevant languaget to generate the new entry point with
+  // Get the relevant languaget to generate the new entry point with.
   std::unique_ptr<languaget> language = get_language_from_mode(mode);
+  // This might fail if the driver program hasn't registered that language.
   INVARIANT(language, "No language found for mode: " + id2string(mode));
   language->set_message_handler(message_handler);
   language->set_language_options(options);
