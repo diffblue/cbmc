@@ -28,7 +28,6 @@ SRC = adjust_float_expressions.cpp \
       interpreter_evaluate.cpp \
       json_expr.cpp \
       json_goto_trace.cpp \
-      lazy_goto_model.cpp \
       link_goto_model.cpp \
       link_to_library.cpp \
       loop_ids.cpp \

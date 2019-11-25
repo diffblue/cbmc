@@ -35,23 +35,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
 #include <goto-programs/adjust_float_expressions.h>
-#include <goto-programs/lazy_goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
-#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/show_symbol_table.h>
 
 #include <goto-instrument/full_slicer.h>
-#include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/nondet_static.h>
+#include <goto-instrument/reachability_slicer.h>
 
 #include <goto-symex/path_storage.h>
 
@@ -68,6 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_multi_path_symex_only_checker.h>
 #include <java_bytecode/java_single_path_symex_checker.h>
 #include <java_bytecode/java_single_path_symex_only_checker.h>
+#include <java_bytecode/lazy_goto_model.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/remove_java_new.h>

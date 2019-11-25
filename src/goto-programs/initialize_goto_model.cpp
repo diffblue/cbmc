@@ -20,8 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/unicode.h>
 
-#include <langapi/mode.h>
 #include <langapi/language.h>
+#include <langapi/language_file.h>
+#include <langapi/mode.h>
 
 #include <goto-programs/rebuild_goto_start_function.h>
 #include <util/exception_utils.h>
@@ -151,11 +152,21 @@ goto_modelt initialize_goto_model(
 
   if(binaries_provided_start && options.is_set("function"))
   {
-    // Rebuild the entry-point, using the language annotation of the
-    // existing __CPROVER_start function:
-    rebuild_goto_start_functiont rebuild_existing_start(
-      options, goto_model, msg.get_message_handler());
-    entry_point_generation_failed=rebuild_existing_start();
+    // Get the language annotation of the existing __CPROVER_start function.
+    std::unique_ptr<languaget> language = get_entry_point_language(
+      goto_model.symbol_table, options, message_handler);
+
+    // To create a new entry point we must first remove the old one
+    remove_existing_entry_point(goto_model.symbol_table);
+
+    // Create the new entry-point
+    entry_point_generation_failed =
+      language->generate_support_functions(goto_model.symbol_table);
+
+    // Remove the function from the goto functions so it is copied back in
+    // from the symbol table during goto_convert
+    if(!entry_point_generation_failed)
+      goto_model.unload(goto_functionst::entry_point());
   }
   else if(!binaries_provided_start)
   {

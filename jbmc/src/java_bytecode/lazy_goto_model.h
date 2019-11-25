@@ -8,10 +8,11 @@
 
 #include <langapi/language_file.h>
 
-#include "abstract_goto_model.h"
-#include "goto_model.h"
+#include <goto-programs/abstract_goto_model.h>
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_model.h>
+
 #include "lazy_goto_functions_map.h"
-#include "goto_convert_functions.h"
 
 class optionst;
 
@@ -148,7 +149,7 @@ public:
   /// \param message_handler: The message_handler to use for logging
   /// \tparam THandler: a type that defines methods process_goto_function and
   /// process_goto_functions
-  template<typename THandler>
+  template <typename THandler>
   static lazy_goto_modelt from_handler_object(
     THandler &handler,
     const optionst &options,
@@ -165,15 +166,13 @@ public:
       [&handler](const irep_idt &name) -> bool {
         return handler.can_generate_function_body(name);
       },
-      [&handler]
-      (const irep_idt &function_name,
-       symbol_table_baset &symbol_table,
-       goto_functiont &function,
-       bool is_first_chance)
-      {
-        return
-          handler.generate_function_body(
-            function_name, symbol_table, function, is_first_chance);
+      [&handler](
+        const irep_idt &function_name,
+        symbol_table_baset &symbol_table,
+        goto_functiont &function,
+        bool is_first_chance) {
+        return handler.generate_function_body(
+          function_name, symbol_table, function, is_first_chance);
       },
       message_handler);
   }
@@ -184,7 +183,10 @@ public:
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions() const;
 
-  void unload(const irep_idt &name) const { goto_functions.unload(name); }
+  void unload(const irep_idt &name) const
+  {
+    goto_functions.unload(name);
+  }
 
   language_filet &add_language_file(const std::string &filename)
   {
@@ -197,8 +199,8 @@ public:
   /// Before freezing the functions all module-level passes are run
   /// \param model: The lazy_goto_modelt to freeze
   /// \return The frozen goto_modelt or an empty optional if freezing fails
-  static std::unique_ptr<goto_modelt> process_whole_model_and_freeze(
-    lazy_goto_modelt &&model)
+  static std::unique_ptr<goto_modelt>
+  process_whole_model_and_freeze(lazy_goto_modelt &&model)
   {
     if(model.finalize())
       return nullptr;
@@ -237,8 +239,8 @@ public:
   ///    `languaget::convert_lazy_method` function. If that results in a `codet`
   ///    representation of the function stored in the symbol table, convert it
   ///    to GOTO and return it as in step (3).
-  const goto_functionst::goto_functiont &get_goto_function(const irep_idt &id)
-    override
+  const goto_functionst::goto_functiont &
+  get_goto_function(const irep_idt &id) override
   {
     return goto_functions.at(id);
   }
