@@ -1,10 +1,9 @@
-CORE symex-driven-lazy-loading-expected-failure
-Test.class
+CORE
+Test
 --classpath ./NotHere.jar
 ^EXIT=6$
 ^SIGNAL=0$
-^the program has no entry point$
-^failed to load class Test$
+Could not find or load main class Test
 --
 --
-symex-driven lazy loading should emit "the program has no entry point" but currently doesn't
+This is not quite 'java' behavior as 'java' always includes . in the classpath.

@@ -1,10 +1,9 @@
-CORE symex-driven-lazy-loading-expected-failure
-Test.class
+CORE
+Test
 --classpath wrong
 ^EXIT=6$
 ^SIGNAL=0$
-the program has no entry point
+Could not find or load main class Test
 --
 --
 We override the default path. Hence, Test cannot be found.
-Currently fails because symex-driven lazy-loading aborts without an error message.

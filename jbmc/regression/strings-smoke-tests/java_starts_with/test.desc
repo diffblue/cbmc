@@ -1,5 +1,5 @@
 CORE
-test_starts_with.class
+test_starts_with
 --max-nondet-string-length 1000 --function test_starts_with.main
 ^EXIT=10$
 ^SIGNAL=0$

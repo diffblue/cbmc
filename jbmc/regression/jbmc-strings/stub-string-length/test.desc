@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main --max-nondet-string-length 10
 VERIFICATION SUCCESSFUL
 ^EXIT=0$

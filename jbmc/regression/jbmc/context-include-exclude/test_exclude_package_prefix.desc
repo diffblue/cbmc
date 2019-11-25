@@ -1,5 +1,5 @@
 CORE
-Main.class
+Main
 --context-include Main --context-include org.cprover --context-exclude org.cprover.ot
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-Test_octal.class
+Test_octal
 --max-nondet-string-length 1000 --function Test_octal.main
 ^EXIT=10$
 ^SIGNAL=0$

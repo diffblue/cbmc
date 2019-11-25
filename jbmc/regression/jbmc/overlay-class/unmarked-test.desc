@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --classpath `../../../../scripts/format_classpath.sh . annotations unmarked-overlay` --verbosity 10
 ^Getting class 'Test' from file \.[\\/]Test\.class$
 ^Getting class 'Test' from file unmarked-overlay[\\/]Test\.class$
@@ -13,4 +13,4 @@ Test.class
 --
 ^Skipping class Test marked with OverlayClassImplementation but found before original definition$
 ^Adding symbol from overlay class
-exists in an overlay class without being marked as an overlay and also exists in the underlying class
+exists in an overlay class without being marked as an overlay and also exists in the underlying

@@ -1,5 +1,5 @@
 CORE
-interproc1.class
+interproc1
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$

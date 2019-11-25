@@ -1,5 +1,5 @@
 CORE
-aliasing1.class
+aliasing1
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$

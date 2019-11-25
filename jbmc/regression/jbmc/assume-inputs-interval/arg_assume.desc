@@ -1,5 +1,5 @@
 CORE
-My.class
+My
 --function My.numericalArg --java-assume-inputs-interval [1:3]
 ^EXIT=10$
 ^SIGNAL=0$

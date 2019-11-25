@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-A.class
+A
 --reachability-slice --function A.foo --show-goto-functions --property 'java::A.foo:(I)V.assertion.2'
 ^EXIT=0$
 ^SIGNAL=0$

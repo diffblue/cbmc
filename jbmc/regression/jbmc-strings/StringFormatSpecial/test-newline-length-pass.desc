@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-Test.class
+Test
 --function Test.newlineLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.newlineLength:()Ljava/lang/String;.assertion.2"
 ^EXIT=0$
 ^SIGNAL=0$

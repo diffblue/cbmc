@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-TestClass.class
+TestClass
 --function TestClass.testFunction --verbosity 10
 ^EXIT=10$
 ^SIGNAL=0$

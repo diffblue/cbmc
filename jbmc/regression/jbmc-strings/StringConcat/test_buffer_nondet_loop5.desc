@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --max-nondet-string-length 100 --function Test.bufferNonDetLoop5 --depth 10000 --unwind 3
 ^EXIT=10$
 ^SIGNAL=0$

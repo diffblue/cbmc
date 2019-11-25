@@ -1,5 +1,5 @@
 KNOWNBUG
-SymStream.class
+org.symphonyoss.symphony.clients.model.SymStream
 --show-goto-functions
 lambda function reference org/symphonyoss/symphony/clients/model/SymUser\.toSymUser in class \"SymStream\"
 ^EXIT=0$

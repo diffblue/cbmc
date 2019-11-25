@@ -1,5 +1,5 @@
 CORE
-test_insert_int.class
+test_insert_int
 --max-nondet-string-length 1000 --function test_insert_int.main
 ^EXIT=10$
 ^SIGNAL=0$

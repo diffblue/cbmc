@@ -1,5 +1,5 @@
 CORE
-Main.class
+Main
 --context-exclude 'org.cprover.MyClass$Inner.' --function 'org.cprover.MyClass$Inner.doIt:(I)I'
 ^EXIT=1$
 ^SIGNAL=0$

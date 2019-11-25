@@ -1,5 +1,5 @@
 CORE
-StringBuilderConstructors01.class
+StringBuilderConstructors01
 --function StringBuilderConstructors01.stringFail --max-nondet-string-length 1000
 ^EXIT=10$
 ^SIGNAL=0$

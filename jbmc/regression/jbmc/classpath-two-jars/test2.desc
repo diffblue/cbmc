@@ -1,9 +1,10 @@
 CORE
-lib/test2.jar
---main-class Test --classpath libs/test.jar
+
+-jar lib/test2.jar --main-class Test --classpath libs/test.jar
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
 --
-This is a correct way of dealing with two jars.
+We allow this, but note that 'java' does not allow a -jar jarfile which has
+no manifest with a main class specified.

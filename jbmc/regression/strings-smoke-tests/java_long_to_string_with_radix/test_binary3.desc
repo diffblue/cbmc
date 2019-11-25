@@ -1,5 +1,5 @@
 THOROUGH
-Test_binary3.class
+Test_binary3
 --max-nondet-string-length 1000 --function Test_binary3.main
 ^EXIT=10$
 ^SIGNAL=0$

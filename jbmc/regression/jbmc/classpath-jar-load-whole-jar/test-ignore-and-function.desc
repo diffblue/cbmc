@@ -1,6 +1,6 @@
 CORE
-target/jar-file.jar
---verbosity 10 --ignore-manifest-main-class --function org.cprover.first.RelevantClass.entry
+
+-jar target/jar-file.jar --verbosity 10 --ignore-manifest-main-class --function org.cprover.first.RelevantClass.entry
 ^EXIT=10$
 ^SIGNAL=0$
 Getting class 'org\.cprover\.first\.RelevantClass' from JAR target\/jar-file.jar

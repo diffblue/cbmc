@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.testDivByZero
 ^EXIT=10$
 ^SIGNAL=0$

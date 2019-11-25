@@ -1,5 +1,5 @@
 CORE
-ArithmeticExceptionTest.class
+ArithmeticExceptionTest
 --throw-runtime-exceptions --function ArithmeticExceptionTest.main
 ^EXIT=10$
 ^SIGNAL=0$

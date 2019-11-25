@@ -1,5 +1,5 @@
 CORE
-test_intern.class
+test_intern
 --max-nondet-string-length 1000 --function test_intern.testFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --unwind 10
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main --validate-goto-model
 ^EXIT=0$
 ^SIGNAL=0$

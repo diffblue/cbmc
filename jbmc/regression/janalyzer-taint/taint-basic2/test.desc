@@ -1,5 +1,5 @@
 CORE
-basic2.class
+basic2
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --function test.foo
 ^EXIT=10$
 ^SIGNAL=0$

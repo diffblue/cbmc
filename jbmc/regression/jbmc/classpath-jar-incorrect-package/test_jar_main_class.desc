@@ -1,11 +1,9 @@
-KNOWNBUG
-test.jar
---main-class Test.class
+CORE
+
+-jar test.jar --main-class Test
 ^EXIT=6$
 ^SIGNAL=0$
+Could not find or load main class Test
 --
-Java main class: Test
-failed to open input file 'Test.class'
 --
 Test.class is not in the right directory corresponding to its package.
-Issue: 2864

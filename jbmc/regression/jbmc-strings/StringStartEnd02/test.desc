@@ -1,5 +1,5 @@
 CORE
-StringStartEnd02.class
+StringStartEnd02
 --unwind 30 --max-nondet-string-length 1000
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 KNOWNBUG symex-driven-lazy-loading-expected-failure
-My.class
+My
 --function My.fieldStaticNoClinit --java-assume-inputs-integral --nondet-static
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.withDependency --max-nondet-string-length 10000
 ^EXIT=10$
 ^SIGNAL=0$

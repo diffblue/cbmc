@@ -126,6 +126,52 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              to potentially changing their order of execution,\n" /* NOLINT(*) */ \
   "                              or if static initializers have side-effects such as\n" /* NOLINT(*) */ \
   "                              updating another class' static field.\n" /* NOLINT(*) */
+
+#ifdef _WIN32
+  #define JAVA_CLASSPATH_SEPARATOR ";"
+#else
+  #define JAVA_CLASSPATH_SEPARATOR ":"
+#endif
+
+#define HELP_JAVA_CLASSPATH /* NOLINT(*) */ \
+  " -classpath dirs/jars\n" \
+  " -cp dirs/jars\n" \
+  " --classpath dirs/jars        set class search path of directories and\n" \
+  "                              jar files\n" \
+  "                              A " JAVA_CLASSPATH_SEPARATOR \
+  " separated list of directories and JAR\n" \
+  "                               archives to search for class files.\n" \
+  " --main-class class-name      set the name of the main class\n"
+
+#define HELP_JAVA_CLASS_NAME /* NOLINT(*) */ \
+  "    class-name                name of class\n" \
+  "                              The entry point is the method specified by\n" /* NOLINT(*) */ \
+  "                              --function, or otherwise, the\n" \
+  "                              public static void main(String[])\n" \
+  "                              method of the given class.\n"
+
+#define OPT_JAVA_JAR /* NOLINT(*) */ \
+  "(jar):"
+
+#define HELP_JAVA_JAR /* NOLINT(*) */ \
+  "    -jar jarfile             JAR file to be checked\n" \
+  "                              The entry point is the method specified by\n" \
+  "                              --function or otherwise, the\n" \
+  "                              public static void main(String[]) method\n" \
+  "                              of the class specified by --main-class or the main\n" /* NOLINT(*) */ \
+  "                              class specified in the JAR manifest\n" \
+  "                              (checked in this order).\n"
+
+#define OPT_JAVA_GOTO_BINARY /* NOLINT(*) */ \
+  "(gb):"
+
+#define HELP_JAVA_GOTO_BINARY /* NOLINT(*) */ \
+  "    --gb goto-binary          goto-binary file to be checked\n" \
+  "                              The entry point is the method specified by\n" \
+  "                              --function, or otherwise, the\n" \
+  "                              public static void main(String[])\n" \
+  "                              of the class specified by --main-class\n" \
+  "                              (checked in this order).\n"
 // clang-format on
 
 class symbolt;
@@ -213,6 +259,9 @@ struct java_bytecode_language_optionst
   /// turning `if(x) A.clinit() else B.clinit()` into
   /// `A.clinit(); B.clinit(); if(x) ...`
   bool should_lift_clinit_calls;
+
+  /// If set then a JAR file has been given via the -jar option.
+  optionalt<std::string> main_jar;
 };
 
 #define JAVA_CLASS_MODEL_SUFFIX "@class_model"
@@ -222,10 +271,18 @@ class java_bytecode_languaget:public languaget
 public:
   void set_language_options(const optionst &) override;
 
+  void set_message_handler(message_handlert &message_handler) override;
+
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
     std::ostream &outstream) override;
+
+  // This is an extension to languaget
+  // required because parsing of Java programs can be initiated without
+  // opening a file first or providing a path to a file
+  // as dictated by \ref languaget.
+  virtual bool parse();
 
   bool parse(
     std::istream &instream,
@@ -338,6 +395,8 @@ private:
   /// IDs of such objects to symbols that store their values.
   std::unordered_map<std::string, object_creation_referencet> references;
 
+  void parse_from_main_class();
+  void initialize_class_loader();
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

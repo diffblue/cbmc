@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.testNullDeref
 ^EXIT=10$
 ^SIGNAL=0$

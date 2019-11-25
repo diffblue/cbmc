@@ -1,5 +1,5 @@
 CORE
-ExcludedProperties.class
+ExcludedProperties
 --context-exclude org.cprover.other --function ExcludedProperties.runtimeReturnType
 ^EXIT=10$
 ^SIGNAL=0$

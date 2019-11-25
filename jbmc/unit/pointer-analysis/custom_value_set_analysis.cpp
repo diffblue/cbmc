@@ -182,6 +182,7 @@ SCENARIO("test_value_set_analysis",
 
     optionst options;
     options.set_option("java-cp-include-files", "CustomVSATest.class");
+    config.java.main_class = "CustomVSATest";
 
     register_language(new_java_bytecode_language);
 

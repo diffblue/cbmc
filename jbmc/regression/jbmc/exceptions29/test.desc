@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --unwind 10
 ^\[java::test.main:\(\[Ljava/lang/String;\)V\.assertion.1\] line 14 assertion at file test\.java line 14 function java::test.main:\(\[Ljava/lang/String;\)V bytecode-index 21: FAILURE$
 ^VERIFICATION FAILED$

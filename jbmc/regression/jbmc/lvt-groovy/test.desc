@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-DetectSplitPackagesTask.class
+org.springframework.build.gradle.DetectSplitPackagesTask
 --show-symbol-table --no-lazy-methods --no-refine-strings
 ^EXIT=0$
 ^SIGNAL=0$

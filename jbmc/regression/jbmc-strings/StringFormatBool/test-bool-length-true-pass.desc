@@ -1,5 +1,5 @@
 KNOWNBUG
-Test.class
+Test
 --function Test.testBoolLengthTrue --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testBoolLengthTrue:()Ljava/lang/String;.assertion.2"
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-Sync.class
+Sync
 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

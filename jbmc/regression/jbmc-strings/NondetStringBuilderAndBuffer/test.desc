@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --no-refine-strings --function Test.testme
 ^EXIT=0$
 ^SIGNAL=0$

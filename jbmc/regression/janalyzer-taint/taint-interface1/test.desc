@@ -1,5 +1,5 @@
 CORE
-interface1.class
+interface1
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$

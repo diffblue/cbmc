@@ -1,5 +1,5 @@
 CORE
-Break.class
+Break
 --show-goto-functions --function Break.main
 ^EXIT=0$
 ^SIGNAL=0$

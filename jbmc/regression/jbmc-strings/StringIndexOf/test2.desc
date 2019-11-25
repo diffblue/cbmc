@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.check2 --unwind 10 --max-nondet-string-length 10 --java-assume-inputs-non-null
 ^EXIT=10$
 ^SIGNAL=0$

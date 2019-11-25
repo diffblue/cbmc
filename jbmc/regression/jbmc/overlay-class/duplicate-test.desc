@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --classpath `../../../../scripts/format_classpath.sh . annotations . correct-overlay` --verbosity 10
 ^Getting class 'Test' from file \.[\\/]Test\.class$
 ^Getting class 'Test' from file correct-overlay[\\/]Test\.class$

@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-java/lang/Object.class
+java.lang.Object
 --no-lazy-methods
 ^EXIT=6$
 ^SIGNAL=0$

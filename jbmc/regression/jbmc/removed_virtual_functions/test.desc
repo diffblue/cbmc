@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-ArrayListEquals.class
+ArrayListEquals
 --java-max-vla-length 48 --unwind 8 --java-unwind-enum-static --trace --function ArrayListEquals.check2 --show-goto-functions
 e2 . ArrayList\$Itr.hasNext:\(\)Z\(\);
 ^EXIT=0$

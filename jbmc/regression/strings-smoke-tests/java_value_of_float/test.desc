@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --function test.check --max-nondet-string-length 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$

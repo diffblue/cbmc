@@ -1,5 +1,5 @@
 CORE
-test_concat.class
+test_concat
 --max-nondet-string-length 1000 --function test_concat.main
 ^EXIT=10$
 ^SIGNAL=0$

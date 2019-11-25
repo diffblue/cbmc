@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.check_char --max-nondet-string-length 100
 VERIFICATION FAILED
 ^EXIT=10$

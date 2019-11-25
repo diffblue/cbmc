@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main --java-lift-clinit-calls
 activate-multi-line-match
 ^EXIT=0$

@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --program-only --function Test.main
 ^EXIT=0$
 ^SIGNAL=0$

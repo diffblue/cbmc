@@ -19,6 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
   const irep_idt &class_name)
 {
+  debug() << "Classpath:";
+  for(const auto &entry : classpath_entries)
+  {
+    debug() << "\n  " << entry.path;
+  }
+  debug() << messaget::eom;
+
   std::stack<irep_idt> queue;
   // Always require java.lang.Object, as it is the base of
   // internal classes such as array types.

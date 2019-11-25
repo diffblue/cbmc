@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-My.class
+My
 --function My.fieldStatic --java-assume-inputs-integral --nondet-static
 ^EXIT=10$
 ^SIGNAL=0$

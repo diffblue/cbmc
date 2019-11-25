@@ -1,10 +1,9 @@
-KNOWNBUG
-src/Test.class
+CORE
+src/Test
 
 ^EXIT=6$
 ^SIGNAL=0$
+Could not find or load main class src.Test
 --
-Parsing src/Test.class
 --
 Test class is not in src package. Therefore, this must fail.
-Issue: 2864

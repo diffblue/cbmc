@@ -1,9 +1,11 @@
-KNOWNBUG
-Test.class
+CORE
+Test
 --classpath ./NotHere.jar
-^EXIT=0$
+^EXIT=6$
 ^SIGNAL=0$
-^Warning: file './NotHere.jar' does not exist$
+Warning: failed to access JAR file `./NotHere.jar'
+Error: Could not find or load main class Test
 --
 --
-Issue: 2864
+Note: 'java' does not emit such a warning.
+It silently ignores non-existing jars.

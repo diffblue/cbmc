@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.checkMinLength --string-non-empty --max-nondet-string-length 2147483647
 ^EXIT=10$
 ^SIGNAL=0$

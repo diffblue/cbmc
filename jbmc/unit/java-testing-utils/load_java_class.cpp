@@ -110,6 +110,7 @@ goto_modelt load_goto_model_from_java_class(
   config.java.classpath.clear();
   config.java.classpath.push_back(class_path);
   config.main = main;
+  config.java.main_class = java_class_name;
 
   // Add the language to the model
   language_filet &lf=lazy_goto_model.add_language_file(filename);

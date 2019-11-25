@@ -1,6 +1,6 @@
 CORE
-target/jar-file.jar
---verbosity 10 --ignore-manifest-main-class --function 'org.cprover.second.IrrelevantClassOtherPkg.<init>'
+
+-jar target/jar-file.jar --verbosity 10 --ignore-manifest-main-class --function 'org.cprover.second.IrrelevantClassOtherPkg.<init>'
 ^EXIT=0$
 ^SIGNAL=0$
 Getting class 'org\.cprover\.second\.IrrelevantClassOtherPkg' from JAR target\/jar-file.jar

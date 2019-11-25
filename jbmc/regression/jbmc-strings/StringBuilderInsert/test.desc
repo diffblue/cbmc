@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$

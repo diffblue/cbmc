@@ -1,5 +1,5 @@
 CORE
-jarfile3.class
+jarfile3
 --function jarfile3.f --java-cp-include-files 'jarfile3\.class'
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-test_endswith.class
+test_endswith
 --max-nondet-string-length 100 --function test_endswith.main
 ^EXIT=10$
 ^SIGNAL=0$

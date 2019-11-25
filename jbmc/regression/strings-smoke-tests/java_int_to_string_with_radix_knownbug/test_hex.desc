@@ -1,5 +1,5 @@
 KNOWNBUG
-Test_hex.class
+Test_hex
 --max-nondet-string-length 1000 --function Test_hex.main
 ^EXIT=10$
 ^SIGNAL=0$

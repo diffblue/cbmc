@@ -1,5 +1,5 @@
 CORE
-test_delete.class
+test_delete
 --max-nondet-string-length 1000 --function test_delete.main
 ^EXIT=10$
 ^SIGNAL=0$

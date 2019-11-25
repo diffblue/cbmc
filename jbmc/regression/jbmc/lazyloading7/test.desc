@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-test.class
+test
 --verbosity 10 --function test.f --lazy-methods-extra-entry-point 'test.sety:\(I\)V'
 ^EXIT=0$
 ^SIGNAL=0$

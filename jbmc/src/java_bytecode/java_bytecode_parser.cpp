@@ -1804,9 +1804,9 @@ void java_bytecode_parsert::rmethod()
     rmethod_attribute(method);
 }
 
-optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(
+optionalt<java_bytecode_parse_treet> java_bytecode_parse(
   std::istream &istream,
+  const irep_idt &class_name,
   message_handlert &message_handler,
   bool skip_instructions)
 {
@@ -1816,7 +1816,9 @@ java_bytecode_parse(
 
   bool parser_result=java_bytecode_parser.parse();
 
-  if(parser_result)
+  if(
+    parser_result ||
+    java_bytecode_parser.parse_tree.parsed_class.name != class_name)
   {
     return {};
   }
@@ -1824,9 +1826,9 @@ java_bytecode_parse(
   return std::move(java_bytecode_parser.parse_tree);
 }
 
-optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(
+optionalt<java_bytecode_parse_treet> java_bytecode_parse(
   const std::string &file,
+  const irep_idt &class_name,
   message_handlert &message_handler,
   bool skip_instructions)
 {
@@ -1834,13 +1836,11 @@ java_bytecode_parse(
 
   if(!in)
   {
-    messaget message(message_handler);
-    message.error() << "failed to open input file '" << file << '\''
-                    << messaget::eom;
     return {};
   }
 
-  return java_bytecode_parse(in, message_handler, skip_instructions);
+  return java_bytecode_parse(
+    in, class_name, message_handler, skip_instructions);
 }
 
 /// Parses the local variable type table of a method. The LVTT holds generic

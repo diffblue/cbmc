@@ -1,5 +1,5 @@
 CORE
-Lambdatest.class
+Lambdatest
 --function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 line 76 assertion.*SUCCESS$
 line 79 assertion.*FAILURE$

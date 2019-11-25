@@ -1,5 +1,5 @@
 CORE
-test_empty.class
+test_empty
 --max-nondet-string-length 1000 --function test_empty.main
 ^EXIT=10$
 ^SIGNAL=0$

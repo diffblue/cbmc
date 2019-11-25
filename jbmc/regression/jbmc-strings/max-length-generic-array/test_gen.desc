@@ -1,5 +1,5 @@
 CORE
-IntegerTests.class
+IntegerTests
 --max-nondet-string-length 100 --function IntegerTests.testMyGenSet
 ^EXIT=10$
 ^SIGNAL=0$

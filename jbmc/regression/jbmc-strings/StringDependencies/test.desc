@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --max-nondet-string-length 100 --verbosity 10 --function Test.test
 ^EXIT=0$
 ^SIGNAL=0$

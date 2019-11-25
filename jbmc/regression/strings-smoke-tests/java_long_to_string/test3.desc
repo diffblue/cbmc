@@ -1,5 +1,5 @@
 THOROUGH
-Test3.class
+Test3
 --max-nondet-string-length 1000 --function Test3.main
 ^EXIT=10$
 ^SIGNAL=0$

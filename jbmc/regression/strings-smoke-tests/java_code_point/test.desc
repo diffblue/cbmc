@@ -1,5 +1,5 @@
 CORE
-test_code_point.class
+test_code_point
 --max-nondet-string-length 1000 --function test_code_point.main
 ^EXIT=0$
 ^SIGNAL=0$

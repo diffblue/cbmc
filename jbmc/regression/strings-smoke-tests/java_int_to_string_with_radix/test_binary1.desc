@@ -1,5 +1,5 @@
 CORE
-Test_binary1.class
+Test_binary1
 --max-nondet-string-length 1000 --function Test_binary1.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$

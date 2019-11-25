@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --classpath `../../../../scripts/format_classpath.sh my_cp .`
 ^EXIT=0$
 ^SIGNAL=0$

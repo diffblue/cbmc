@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --max-nondet-string-length 4000 --function Test.checkMaxLength
 ^SIGNAL=0$
 --

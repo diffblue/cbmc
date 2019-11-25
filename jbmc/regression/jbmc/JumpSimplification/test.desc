@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --show-goto-functions --function Test.foo
 activate-multi-line-match
 ^EXIT=0$

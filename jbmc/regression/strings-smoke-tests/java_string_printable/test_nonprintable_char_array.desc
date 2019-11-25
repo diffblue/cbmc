@@ -1,5 +1,5 @@
 FUTURE
-Test.class
+Test
 --function Test.printable_char_array --max-nondet-string-length 100
 assertion.* file Test.java line 42 .* FAILURE
 ^EXIT=10$

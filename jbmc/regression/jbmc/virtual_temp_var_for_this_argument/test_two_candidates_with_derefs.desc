@@ -1,5 +1,5 @@
 CORE
-Main.class
+Main
 --show-goto-functions --function Main.twoCandidatesWithDerefs
 ^EXIT=0$
 ^SIGNAL=0$

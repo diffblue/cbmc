@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-Main.class
+Main
 --function Main.constantIndexOf --property "java::Main.constantIndexOf:()V.assertion.1"
 ^Generated [0-9]+ VCC\(s\), 1 remaining after simplification$
 ^VERIFICATION FAILED$
