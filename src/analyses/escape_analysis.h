@@ -103,7 +103,7 @@ private:
   void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
   void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);
   irep_idt get_function(const exprt &);
-  void check_lhs(const exprt &, std::set<irep_idt> &);
+  void check_lhs(const exprt &, std::set<irep_idt> &) const;
 
   friend class escape_analysist;
 

@@ -387,7 +387,7 @@ bool escape_domaint::merge(
 
 void escape_domaint::check_lhs(
   const exprt &lhs,
-  std::set<irep_idt> &cleanup_functions)
+  std::set<irep_idt> &cleanup_functions) const
 {
   if(lhs.id()==ID_symbol)
   {
@@ -483,7 +483,7 @@ void escape_analysist::instrument(
 
         std::set<irep_idt> cleanup_functions1;
 
-        escape_domaint &d = operator[](i_it);
+        const escape_domaint &d = operator[](i_it);
 
         const escape_domaint::cleanup_mapt::const_iterator m_it =
           d.cleanup_map.find("&" + id2string(code_dead.get_identifier()));
@@ -523,8 +523,5 @@ void escape_analysist::instrument(
         }
       }
     }
-
-    Forall_goto_program_instructions(i_it, f_it->second.body)
-      get_state(i_it);
   }
 }

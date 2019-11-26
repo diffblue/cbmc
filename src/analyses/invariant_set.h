@@ -92,12 +92,15 @@ public:
   bool threaded;
   bool is_false;
 
-  invariant_sett():
-    threaded(false),
-    is_false(false),
-    value_sets(nullptr),
-    object_store(nullptr),
-    ns(nullptr)
+  invariant_sett(
+    value_setst &_value_sets,
+    inv_object_storet &_object_store,
+    const namespacet &_ns)
+    : threaded(false),
+      is_false(false),
+      value_sets(_value_sets),
+      object_store(_object_store),
+      ns(_ns)
   {
   }
 
@@ -140,21 +143,6 @@ public:
     const exprt &lhs,
     const exprt &rhs);
 
-  void set_value_sets(value_setst &_value_sets)
-  {
-    value_sets=&_value_sets;
-  }
-
-  void set_object_store(inv_object_storet &_object_store)
-  {
-    object_store=&_object_store;
-  }
-
-  void set_namespace(const namespacet &_ns)
-  {
-    ns=&_ns;
-  }
-
   static void intersection(ineq_sett &dest, const ineq_sett &other)
   {
     ineq_sett::iterator it_d=dest.begin();
@@ -192,9 +180,9 @@ public:
   void simplify(exprt &expr) const;
 
 protected:
-  value_setst *value_sets;
-  inv_object_storet *object_store;
-  const namespacet *ns;
+  value_setst &value_sets;
+  inv_object_storet &object_store;
+  const namespacet &ns;
 
   tvt implies_rec(const exprt &expr) const;
   static void nnf(exprt &expr, bool negate=false);
