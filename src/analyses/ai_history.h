@@ -255,26 +255,27 @@ protected:
     return recursion_limit != 0;
   }
 
-  call_stack_historyt(cse_ptrt p, unsigned int rl)
-    : ai_history_baset(p->current_location),
-      current_stack(p),
-      recursion_limit(rl)
+  call_stack_historyt(cse_ptrt cur_stack, unsigned int rec_lim)
+    : ai_history_baset(cur_stack->current_location),
+      current_stack(cur_stack),
+      recursion_limit(rec_lim)
   {
-    PRECONDITION(p != nullptr); // A little late by now but worth documenting
+    PRECONDITION(
+      cur_stack != nullptr); // A little late by now but worth documenting
   }
 
 public:
   explicit call_stack_historyt(locationt l)
     : ai_history_baset(l),
-      current_stack(new call_stack_entryt(l, nullptr)),
+      current_stack(std::make_shared<call_stack_entryt>(l, nullptr)),
       recursion_limit(0)
   {
   }
 
-  call_stack_historyt(locationt l, unsigned int rl)
+  call_stack_historyt(locationt l, unsigned int rec_lim)
     : ai_history_baset(l),
-      current_stack(new call_stack_entryt(l, nullptr)),
-      recursion_limit(rl)
+      current_stack(std::make_shared<call_stack_entryt>(l, nullptr)),
+      recursion_limit(rec_lim)
   {
   }
 
@@ -341,13 +342,15 @@ protected:
   unsigned int recursion_limit;
 
 public:
-  explicit call_stack_history_factoryt(unsigned int rl) : recursion_limit(rl)
+  explicit call_stack_history_factoryt(unsigned int rec_lim)
+    : recursion_limit(rec_lim)
   {
   }
 
   ai_history_baset::trace_ptrt epoch(ai_history_baset::locationt l) override
   {
-    ai_history_baset::trace_ptrt p(new call_stack_historyt(l, recursion_limit));
+    ai_history_baset::trace_ptrt p(
+      std::make_shared<call_stack_historyt>(l, recursion_limit));
     return p;
   }
 

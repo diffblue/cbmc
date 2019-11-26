@@ -44,8 +44,8 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
     if(l_return->location_number == to->location_number)
     {
       // Is skipping the function call, only update the location
-      next_stack =
-        cse_ptrt(new call_stack_entryt(l_return, current_stack->caller));
+      next_stack = cse_ptrt(
+        std::make_shared<call_stack_entryt>(l_return, current_stack->caller));
     }
     else
     {
@@ -83,7 +83,7 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
         }
       }
 
-      next_stack = cse_ptrt(new call_stack_entryt(to, shorten));
+      next_stack = cse_ptrt(std::make_shared<call_stack_entryt>(to, shorten));
     }
   }
   else if(current_stack->current_location->is_end_function())
@@ -103,8 +103,8 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
       if(l_caller_return->location_number == to->location_number)
       {
         // ... which is where we are going
-        next_stack =
-          cse_ptrt(new call_stack_entryt(to, current_stack->caller->caller));
+        next_stack = cse_ptrt(std::make_shared<call_stack_entryt>(
+          to, current_stack->caller->caller));
       }
       else
       {
@@ -116,12 +116,15 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
   else
   {
     // Just update the location
-    next_stack = cse_ptrt(new call_stack_entryt(to, current_stack->caller));
+    next_stack =
+      cse_ptrt(std::make_shared<call_stack_entryt>(to, current_stack->caller));
   }
   INVARIANT(next_stack != nullptr, "All branches should initialise next_stack");
 
   // Create the potential next history
   trace_ptrt next(new call_stack_historyt(next_stack, recursion_limit));
+  // It would be nice to use make_shared here but ... that doesn't work with
+  // protected constructors
 
   // If there is already an equivalent history, merge with that instead
   auto it = others.find(next);
