@@ -20,18 +20,20 @@ Author: Daniel Kroening, kroening@kroening.com
 /// provide an executable front-end for all of them.
 ///
 /// There are a lot of different analyses and a lot of ways they can be
-/// used.  Goto-analyze has five, largely independent, sets of options:
+/// used.  Goto-analyze has six, largely independent, sets of options:
 ///
 /// 1. Task : What you do once you've computed the domains.
 /// 2. Abstract interpreter : What kind of abstract interpretation you do.
-/// 3. Domain : What domain you use.
-/// 4. Sensitivity : How that domain handles things like arrays, pointers, etc.
-///    (see variable_sensitivity_domain.h)
-/// 5. Output : What you do with the results.
+/// 3. History : What kind of steps and CFG sensitivity the interpreter uses.
+/// 4. Domain : What domain you use to represent the values of the variables.
+///             This includes domain specific configuration.
+/// 5. Storage : How many history steps share domains.
+/// 6. Output : What you do with the results.
 ///
-/// Formally speaking, 2, 3 and 4 are an artificial distinction as they are
-/// all really parts of the "what domain" question.  However they correspond
-/// to parts of our code architecture, so ... they should stay.
+/// Formally speaking, 2, 3, 4 and 5 are somewhat artificial distinction as they
+/// are all really parts of the "what abstraction" question.
+/// However they correspond to parts of our code architecture, so ...
+/// they should stay.
 ///
 /// Ideally, the cross product of options should be supported but ... in
 /// practice there will always be ones that are not meaningful.  Those
@@ -73,22 +75,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// --------------------
 ///
 /// This option is effectively about how we compute the fix-point(s) /
-/// which child class of ai_baset we use.  I.E.  ait<domainT> or
-/// concurrency_aware_ait<domainT>, etc.   For migrating / refactor /
-/// unifying with the pointer analysis code we might want a
-/// location_insensitive_ait<domainT> or something but this is not urgent.
-/// We will need a context_aware_ait<domainT>.
-///
-///
-/// Domain
-/// ------
-///
-/// Which child of ai_domain_baset we use to represent the abstract state at
-/// each location / implement the transformers.  I expect most of these will
-/// be non-relational (i.e. an abstract object for each variable) due to the
-/// cost of implementing effective non-relational domains in this style vs.
-/// using 2LS.  The exception might be equalities, which we could implement
-/// here.
+/// which child class of ai_baset we use.  This and the other AI related
+/// option categories (history, domain, storage, etc.) are more extensively
+/// documented in analyses/ai.h and analyses/ai_*.h
 ///
 ///
 /// Output
@@ -96,7 +85,6 @@ Author: Daniel Kroening, kroening@kroening.com
 ///
 /// Text, XML, JSON plus some others for specific domains such as dependence
 /// graphs in DOT format.
-
 
 #ifndef CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
@@ -115,11 +103,43 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/ai.h>
 #include <analyses/goto_check.h>
 
-class bmct;
 class goto_functionst;
 class optionst;
 
 // clang-format off
+#define GOTO_ANALYSER_OPTIONS_TASKS \
+  "(show)(verify)(simplify):" \
+  "(show-on-source)" \
+  "(unreachable-instructions)(unreachable-functions)" \
+  "(reachable-functions)"
+
+#define GOTO_ANALYSER_OPTIONS_AI \
+  "(recursive-interprocedural)" \
+  "(legacy-ait)" \
+  "(legacy-concurrent)"
+
+#define GOTO_ANALYSER_OPTIONS_HISTORY \
+  "(ahistorical)" \
+  "(call-stack):"
+
+#define GOTO_ANALYSER_OPTIONS_DOMAIN \
+  "(intervals)" \
+  "(non-null)" \
+  "(constants)" \
+  "(dependence-graph)"
+
+#define GOTO_ANALYSER_OPTIONS_STORAGE \
+  "(one-domain-per-history)" \
+  "(one-domain-per-location)"
+
+#define GOTO_ANALYSER_OPTIONS_OUTPUT \
+  "(json):(xml):" \
+  "(text):(dot):"
+
+#define GOTO_ANALYSER_OPTIONS_SPECIFIC_ANALYSES \
+  "(taint):(show-taint)" \
+  "(show-local-may-alias)"
+
 #define GOTO_ANALYSER_OPTIONS \
   OPT_FUNCTIONS \
   "D:I:(std89)(std99)(std11)" \
@@ -134,23 +154,19 @@ class optionst;
   "(show-reachable-properties)(property):" \
   "(verbosity):(version)" \
   "(gcc)(arch):" \
-  "(taint):(show-taint)" \
-  "(show-local-may-alias)" \
-  "(json):(xml):" \
-  "(text):(dot):" \
   OPT_FLUSH \
   OPT_TIMESTAMP \
-  "(unreachable-instructions)(unreachable-functions)" \
-  "(reachable-functions)" \
-  "(intervals)(show-intervals)" \
-  "(non-null)(show-non-null)" \
-  "(constants)" \
-  "(dependence-graph)" \
-  "(show)(verify)(simplify):" \
-  "(show-on-source)" \
-  "(location-sensitive)(concurrent)" \
-  "(no-simplify-slicing)" \
   OPT_VALIDATE \
+  GOTO_ANALYSER_OPTIONS_TASKS \
+  "(no-simplify-slicing)" \
+  "(show-intervals)(show-non-null)" \
+  GOTO_ANALYSER_OPTIONS_AI \
+  "(location-sensitive)(concurrent)" \
+  GOTO_ANALYSER_OPTIONS_HISTORY \
+  GOTO_ANALYSER_OPTIONS_DOMAIN \
+  GOTO_ANALYSER_OPTIONS_STORAGE \
+  GOTO_ANALYSER_OPTIONS_OUTPUT \
+  GOTO_ANALYSER_OPTIONS_SPECIFIC_ANALYSES \
 // clang-format on
 
 class goto_analyzer_parse_optionst: public parse_options_baset

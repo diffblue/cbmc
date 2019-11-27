@@ -133,6 +133,10 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_values("error-label"));
 #endif
 
+  // The user should either select:
+  //  1. a specific analysis, or
+  //  2. a tuple of task / analyser options / outputs
+
   // Select a specific analysis
   if(cmdline.isset("taint"))
   {
@@ -187,11 +191,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("dot", true);
     options.set_option("outfile", cmdline.get_value("dot"));
   }
-
-  // The use should either select:
-  //  1. a specific analysis, or
-  //  2. a triple of task / analyzer / domain, or
-  //  3. one of the general display options
 
   // Task options
   if(cmdline.isset("show"))
@@ -252,15 +251,57 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(options.get_bool_option("general-analysis") || reachability_task)
   {
     // Abstract interpreter choice
-    if(cmdline.isset("location-sensitive"))
-      options.set_option("location-sensitive", true);
-    else if(cmdline.isset("concurrent"))
-      options.set_option("concurrent", true);
+    if(cmdline.isset("recursive-interprocedural"))
+      options.set_option("recursive-interprocedural", true);
+    else if(cmdline.isset("legacy-ait") || cmdline.isset("location-sensitive"))
+    {
+      options.set_option("legacy-ait", true);
+      // Fixes a number of other options as well
+      options.set_option("ahistorical", true);
+      options.set_option("history set", true);
+      options.set_option("one-domain-per-location", true);
+      options.set_option("storage set", true);
+    }
+    else if(cmdline.isset("legacy-concurrent") || cmdline.isset("concurrent"))
+    {
+      options.set_option("legacy-concurrent", true);
+      options.set_option("ahistorical", true);
+      options.set_option("history set", true);
+      options.set_option("one-domain-per-location", true);
+      options.set_option("storage set", true);
+    }
     else
     {
-      // Silently default to location-sensitive as it's the "default"
-      // view of abstract interpretation.
-      options.set_option("location-sensitive", true);
+      // Silently default to legacy-ait for backwards compatability
+      options.set_option("legacy-ait", true);
+      // Fixes a number of other options as well
+      options.set_option("ahistorical", true);
+      options.set_option("history set", true);
+      options.set_option("one-domain-per-location", true);
+      options.set_option("storage set", true);
+    }
+
+    // History choice
+    if(cmdline.isset("ahistorical"))
+    {
+      options.set_option("ahistorical", true);
+      options.set_option("history set", true);
+    }
+    else if(cmdline.isset("call-stack"))
+    {
+      options.set_option("call-stack", true);
+      options.set_option(
+        "call-stack-recursion-limit", cmdline.get_value("call-stack"));
+      options.set_option("history set", true);
+    }
+
+    if(!options.get_bool_option("history set"))
+    {
+      // Default to ahistorical as it is the expected for of analysis
+      log.status() << "History not specified, defaulting to --ahistorical"
+                   << messaget::eom;
+      options.set_option("ahistorical", true);
+      options.set_option("history set", true);
     }
 
     // Domain choice
@@ -307,6 +348,29 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     }
   }
 
+  // Storage choice
+  if(cmdline.isset("one-domain-per-history"))
+  {
+    options.set_option("one-domain-per-history", true);
+    options.set_option("storage set", true);
+  }
+  else if(cmdline.isset("one-domain-per-location"))
+  {
+    options.set_option("one-domain-per-location", true);
+    options.set_option("storage set", true);
+  }
+
+  if(!options.get_bool_option("storage set"))
+  {
+    // one-domain-per-location and one-domain-per-history are effectively
+    // the same when using ahistorical so we default to per-history so that
+    // more sophisticated history objects work as expected
+    log.status() << "Storage not specified,"
+                 << " defaulting to --one-domain-per-history" << messaget::eom;
+    options.set_option("one-domain-per-history", true);
+    options.set_option("storage set", true);
+  }
+
   if(cmdline.isset("validate-goto-model"))
   {
     options.set_option("validate-goto-model", true);
@@ -315,63 +379,103 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
 /// For the task, build the appropriate kind of analyzer
 /// Ideally this should be a pure function of options.
-/// However at the moment some domains require the goto_model
+/// However at the moment some domains require the goto_model or parts of it
 ai_baset *goto_analyzer_parse_optionst::build_analyzer(
   const optionst &options,
   const namespacet &ns)
 {
-  ai_baset *domain = nullptr;
+  // These support all of the option categories
+  if(options.get_bool_option("recursive-interprocedural"))
+  {
+    // Build the history factory
+    std::unique_ptr<ai_history_factory_baset> hf = nullptr;
+    if(options.get_bool_option("ahistorical"))
+    {
+      hf = util_make_unique<
+        ai_history_factory_default_constructort<ahistoricalt>>();
+    }
+    else if(options.get_bool_option("call-stack"))
+    {
+      hf = util_make_unique<call_stack_history_factoryt>(
+        options.get_unsigned_int_option("call-stack-recursion-limit"));
+    }
 
-  if(options.get_bool_option("location-sensitive"))
+    // Build the domain factory
+    std::unique_ptr<ai_domain_factory_baset> df = nullptr;
+    if(options.get_bool_option("constants"))
+    {
+      df = util_make_unique<
+        ai_domain_factory_default_constructort<constant_propagator_domaint>>();
+    }
+    else if(options.get_bool_option("intervals"))
+    {
+      df = util_make_unique<
+        ai_domain_factory_default_constructort<interval_domaint>>();
+    }
+    // non-null is not fully supported, despite the historical options
+    // dependency-graph is quite heavily tied to the legacy-ait infrastructure
+
+    // Build the storage object
+    std::unique_ptr<ai_storage_baset> st = nullptr;
+    if(options.get_bool_option("one-domain-per-history"))
+    {
+      st = util_make_unique<history_sensitive_storaget>();
+    }
+    else if(options.get_bool_option("one-domain-per-location"))
+    {
+      st = util_make_unique<location_sensitive_storaget>();
+    }
+
+    // Only try to build the abstract interpreter if all the parts have been
+    // correctly specified and configured
+    if(hf != nullptr && df != nullptr && st != nullptr)
+    {
+      if(options.get_bool_option("recursive-interprocedural"))
+      {
+        return new ai_recursive_interproceduralt(
+          std::move(hf), std::move(df), std::move(st));
+      }
+      UNREACHABLE;
+    }
+  }
+  else if(options.get_bool_option("legacy-ait"))
   {
     if(options.get_bool_option("constants"))
     {
       // constant_propagator_ait derives from ait<constant_propagator_domaint>
-      domain=new constant_propagator_ait(goto_model.goto_functions);
+      return new constant_propagator_ait(goto_model.goto_functions);
     }
     else if(options.get_bool_option("dependence-graph"))
     {
-      domain=new dependence_grapht(ns);
+      return new dependence_grapht(ns);
     }
     else if(options.get_bool_option("intervals"))
     {
-      domain=new ait<interval_domaint>();
+      return new ait<interval_domaint>();
     }
 #if 0
     // Not actually implemented, despite the option...
     else if(options.get_bool_option("non-null"))
     {
-      domain=new ait<non_null_domaint>();
+      return new ait<non_null_domaint>();
     }
 #endif
   }
-  else if(options.get_bool_option("concurrent"))
+  else if(options.get_bool_option("legacy-concurrent"))
   {
 #if 0
-    // Disabled until merge_shared is implemented for these
-    if(options.get_bool_option("constants"))
+    // Very few domains can work with this interpreter
+    // as it requires that changes to the domain are
+    // 'non-revertable' and it has merge shared
+    if(options.get_bool_option("dependence-graph"))
     {
-      domain=new concurrency_aware_ait<constant_propagator_domaint>();
+      return new dependence_grapht(ns);
     }
-    else if(options.get_bool_option("dependence-graph"))
-    {
-      domain=new dependence_grapht(ns);
-    }
-    else if(options.get_bool_option("intervals"))
-    {
-      domain=new concurrency_aware_ait<interval_domaint>();
-    }
-#if 0
-    // Not actually implemented, despite the option...
-    else if(options.get_bool_option("non-null"))
-    {
-      domain=new concurrency_aware_ait<non_null_domaint>();
-    }
-#endif
 #endif
   }
 
-  return domain;
+  // Construction failed due to configuration errors
+  return nullptr;
 }
 
 /// invoke main modules
@@ -584,7 +688,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(analyzer == nullptr)
     {
-      log.status() << "Task / Interpreter / Domain combination not supported"
+      log.status() << "Task / Interpreter combination not supported"
                    << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }
@@ -737,14 +841,30 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Abstract interpreter options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    " --location-sensitive         use location-sensitive abstract interpreter\n"
-    " --concurrent                 use concurrency-aware abstract interpreter\n"
+    " --recursive-interprocedural  use recursion to handle interprocedural reasoning\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --legacy-ait                 recursion for function and one domain per location\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --legacy-concurrent          legacy-ait with an extended fixed-point for concurrency\n"
+    "\n"
+    "History options:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --ahistorical                the most basic history, tracks locations only\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --call-stack n               track the calling location stack for each function\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                              limiting to at most n recursive loops, 0 to disable\n"
     "\n"
     "Domain options:\n"
-    " --constants                  constant domain\n"
-    " --intervals                  interval domain\n"
-    " --non-null                   non-null domain\n"
+    " --constants                  a constant for each variable if possible\n"
+    " --intervals                  an interval for each variable\n"
+    " --non-null                   tracks which pointers are non-null\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    "\n"
+    "Storage options:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --one-domain-per-history     stores a domain for each history object created\n"
+    " --one-domain-per-location    stores a domain for each location reached\n"
     "\n"
     "Output options:\n"
     " --text file_name             output results in plain text to given file\n"
@@ -786,7 +906,6 @@ void goto_analyzer_parse_optionst::help()
     " --gcc                        use GCC as preprocessor\n"
     #endif
     " --no-library                 disable built-in abstract C library\n"
-    "\n"
     HELP_FUNCTIONS
     "\n"
     "Program representations:\n"

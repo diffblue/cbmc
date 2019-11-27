@@ -1,0 +1,25 @@
+CORE
+main.c
+--verify --recursive-interprocedural --call-stack 0 --constants --one-domain-per-history
+^\[f00.assertion.1\] .* assertion x < 0: SUCCESS \(unreachable\)$
+^\[f00.assertion.2\] .* assertion 1: SUCCESS \(unreachable\)$
+^\[f00.assertion.3\] .* assertion 0: SUCCESS \(unreachable\)$
+^\[f00.assertion.4\] .* assertion x >= 0: SUCCESS$
+^\[f00.assertion.5\] .* assertion x < 0: FAILURE \(if reachable\)$
+^\[f00.assertion.6\] .* assertion x < 2: FAILURE \(if reachable\)$
+^\[f00.assertion.7\] .* assertion \(x <= 0\) \? 1 : y: UNKNOWN$
+^\[f00.assertion.8\] .* assertion \(x <= 1\) \? 0 : y: UNKNOWN$
+^\[f00.assertion.9\] .* assertion \(x <= 2\) \? \(\(x <= 3\) \? 1 : 0\) : y: UNKNOWN$
+^\[f00.assertion.10\] .* assertion \(x <= 0\) \? 1 : y: UNKNOWN$
+^\[f00.assertion.11\] .* assertion \(x <= 1\) \? 0 : y: UNKNOWN$
+^\[f00.assertion.12\] .* assertion \(x <= 2\) \? \(\(x <= 3\) \? 1 : 0\) : y: UNKNOWN$
+^\[f00.assertion.13\] .* assertion \(x <= 0\) \? 1 : y: UNKNOWN$
+^\[f00.assertion.14\] .* assertion \(x <= 1\) \? 0 : y: UNKNOWN$
+^\[f00.assertion.15\] .* assertion \(x <= 2\) \? \(\(x <= 3\) \? 1 : 0\) : y: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests the verify tasks handling of multiple traces for each assertion
+
