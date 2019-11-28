@@ -1,8 +1,11 @@
 CORE
 main.c
-
+--signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Even with --signed-overflow-check enabled, verification should succeed here as
+strtol reports overflow condition with errno set to ERANGE.
