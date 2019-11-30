@@ -43,6 +43,10 @@ public:
 
   parse_tree_with_overlayst &operator()(const irep_idt &class_name);
 
+  /// Checks whether \p class_name is parseable from the classpath,
+  /// ignoring class loading limits.
+  bool can_load_class(const irep_idt &class_name);
+
   parse_tree_with_overlayst &get_parse_tree(
     java_class_loader_limitt &class_loader_limit,
     const irep_idt &class_name);

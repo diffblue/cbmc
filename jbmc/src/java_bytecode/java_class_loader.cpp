@@ -103,6 +103,17 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
     .has_value();
 }
 
+bool java_class_loadert::can_load_class(const irep_idt &class_name)
+{
+  for(const auto &cp_entry : classpath_entries)
+  {
+    auto parse_tree = load_class(class_name, cp_entry);
+    if(parse_tree.has_value())
+      return true;
+  }
+  return false;
+}
+
 /// Check through all the places class parse trees can appear and returns the
 /// first implementation it finds plus any overlay class implementations.
 /// Uses \p class_loader_limit to limit the class files that it might (directly
