@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <util/message.h>
+#include <util/nodiscard.h>
 #include <util/optional.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -144,5 +145,11 @@ optionalt<irep_idt> declaring_class(const symbolt &symbol);
 /// Sets the identifier of the class which declared a given \p symbol to \p
 /// declaring_class.
 void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class);
+
+/// Get JVM type name of the class in which \p method_name is defined.
+/// Returns an empty optional if the class name cannot be retrieved,
+/// e.g. method_name is an internal function.
+NODISCARD optionalt<std::string>
+class_name_from_method_name(const std::string &method_name);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
