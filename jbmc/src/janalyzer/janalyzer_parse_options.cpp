@@ -751,6 +751,8 @@ void janalyzer_parse_optionst::help()
     "\n"
     " janalyzer [-?] [-h] [--help] show help\n"
     " janalyzer\n"
+    HELP_JAVA_METHOD_NAME
+    " janalyzer\n"
     HELP_JAVA_CLASS_NAME
     " janalyzer\n"
     HELP_JAVA_JAR

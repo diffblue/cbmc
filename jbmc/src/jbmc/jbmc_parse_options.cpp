@@ -1051,6 +1051,8 @@ void jbmc_parse_optionst::help()
     "\n"
     " jbmc [-?] [-h] [--help]      show help\n"
     " jbmc\n"
+    HELP_JAVA_METHOD_NAME
+    " jbmc\n"
     HELP_JAVA_CLASS_NAME
     " jbmc\n"
     HELP_JAVA_JAR

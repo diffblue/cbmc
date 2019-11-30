@@ -143,6 +143,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "                               archives to search for class files.\n" \
   " --main-class class-name      set the name of the main class\n"
 
+#define HELP_JAVA_METHOD_NAME /* NOLINT(*) */ \
+  "    method-name               fully qualified name of method\n" \
+  "                              used as entry point, e.g.\n" \
+  "                              mypackage.Myclass.foo:(I)Z\n"
+
 #define HELP_JAVA_CLASS_NAME /* NOLINT(*) */ \
   "    class-name                name of class\n" \
   "                              The entry point is the method specified by\n" /* NOLINT(*) */ \
