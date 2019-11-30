@@ -140,7 +140,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              jar files\n" \
   "                              A " JAVA_CLASSPATH_SEPARATOR \
   " separated list of directories and JAR\n" \
-  "                               archives to search for class files.\n" \
+  "                              archives to search for class files.\n" \
   " --main-class class-name      set the name of the main class\n"
 
 #define HELP_JAVA_METHOD_NAME /* NOLINT(*) */ \
@@ -150,7 +150,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define HELP_JAVA_CLASS_NAME /* NOLINT(*) */ \
   "    class-name                name of class\n" \
-  "                              The entry point is the method specified by\n" /* NOLINT(*) */ \
+  "                              The entry point is the method specified by\n" \
   "                              --function, or otherwise, the\n" \
   "                              public static void main(String[])\n" \
   "                              method of the given class.\n"
@@ -159,7 +159,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(jar):"
 
 #define HELP_JAVA_JAR /* NOLINT(*) */ \
-  "    -jar jarfile             JAR file to be checked\n" \
+  "    -jar jarfile              JAR file to be checked\n" \
   "                              The entry point is the method specified by\n" \
   "                              --function or otherwise, the\n" \
   "                              public static void main(String[]) method\n" \
