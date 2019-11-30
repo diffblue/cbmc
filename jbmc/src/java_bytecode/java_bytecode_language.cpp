@@ -318,16 +318,46 @@ void java_bytecode_languaget::initialize_class_loader()
   }
 }
 
+static void throwMainClassLoadingError(const std::string &main_class)
+{
+  throw invalid_source_file_exceptiont(
+    "Error: Could not find or load main class " + main_class);
+}
+
 void java_bytecode_languaget::parse_from_main_class()
 {
   if(!main_class.empty())
   {
-    status() << "Java main class: " << main_class << eom;
+    // Try to load class
+    status() << "Trying to load Java main class: " << main_class << eom;
+    if(!java_class_loader.can_load_class(main_class))
+    {
+      // Try to extract class name and load class
+      const auto maybe_class_name =
+        class_name_from_method_name(id2string(main_class));
+      if(!maybe_class_name)
+      {
+        throwMainClassLoadingError(id2string(main_class));
+        return;
+      }
+      status() << "Trying to load Java main class: " << maybe_class_name.value()
+               << eom;
+      if(!java_class_loader.can_load_class(maybe_class_name.value()))
+      {
+        throwMainClassLoadingError(id2string(main_class));
+        return;
+      }
+      // Everything went well. We have a loadable main class.
+      // The entry point ('main') will be checked later.
+      config.main = id2string(main_class);
+      main_class = maybe_class_name.value();
+    }
+    status() << "Found Java main class: " << main_class << eom;
+    // Now really load it.
     const auto &parse_trees = java_class_loader(main_class);
     if(parse_trees.empty() || !parse_trees.front().loading_successful)
     {
-      throw invalid_source_file_exceptiont(
-        "Error: Could not find or load main class " + id2string(main_class));
+      throwMainClassLoadingError(id2string(main_class));
     }
   }
 }
