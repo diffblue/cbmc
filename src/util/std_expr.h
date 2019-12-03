@@ -4696,44 +4696,92 @@ inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
   return ret;
 }
 
+inline void validate_expr(const class class_method_descriptor_exprt &value);
+
 /// An expression describing a method on a class
 class class_method_descriptor_exprt : public nullary_exprt
 {
 public:
+  /// \param _type: The type of the method which this expression refers to.
+  /// \param class_id: Unique identifier in the symbol table, of the compile
+  ///   time type of the class which this expression is applied to. For example
+  ///   this could be - `java::java.lang.Object`.
+  /// \param base_method_name: The name of the method to which this expression
+  ///   is applied as would be seen in the source code. For example this could
+  ///   be - `toString`.
+  /// \param mangled_method_name: The method name after mangling it by
+  ///   combining it with the descriptor. The mangled name is distinguished from
+  ///   other overloads of the method with different counts of or types of
+  ///   parameters. It is not distinguished between different implementations
+  ///   within a class hierarchy. For example if the overall expression refers
+  ///   to the `java.lang.Object.toString` method, then the mangled_method_name
+  ///   would be `toString:()Ljava/lang/String;`
   explicit class_method_descriptor_exprt(
     typet _type,
-    irep_idt component_name,
-    irep_idt class_name,
-    irep_idt base_name,
-    irep_idt identifier)
+    irep_idt mangled_method_name,
+    irep_idt class_id,
+    irep_idt base_method_name)
     : nullary_exprt(ID_virtual_function, std::move(_type))
   {
-    set(ID_component_name, std::move(component_name));
-    set(ID_C_class, std::move(class_name));
-    set(ID_C_base_name, std::move(base_name));
-    set(ID_identifier, std::move(identifier));
+    irep_idt id = id2string(class_id) + "." + id2string(mangled_method_name);
+    set(ID_component_name, std::move(mangled_method_name));
+    set(ID_C_class, std::move(class_id));
+    set(ID_C_base_name, std::move(base_method_name));
+    set(ID_identifier, std::move(id));
+    validate_expr(*this);
   }
 
-  const irep_idt &get_component_name() const
+  /// The method name after mangling it by combining it with the descriptor.
+  /// The mangled name is distinguished from other overloads of the method with
+  /// different counts of or types of parameters. It is not distinguished
+  /// between different implementations within a class hierarchy. For example if
+  /// the overall expression refers to the `java.lang.Object.toString` method,
+  /// then the mangled_method_name would be `toString:()Ljava/lang/String;`
+  const irep_idt &mangled_method_name() const
   {
     return get(ID_component_name);
   }
 
-  const irep_idt &get_class_name() const
+  /// Unique identifier in the symbol table, of the compile time type of the
+  /// class which this expression is applied to. For example this could be -
+  /// `java::java.lang.Object`.
+  const irep_idt &class_id() const
   {
     return get(ID_C_class);
   }
 
-  const irep_idt &get_base_name() const
+  /// The name of the method to which this expression is applied as would be
+  /// seen in the source code. For example this could be - `toString`.
+  const irep_idt &base_method_name() const
   {
     return get(ID_C_base_name);
   }
 
+  /// A unique identifier of the combination of class and method overload to
+  /// which this expression refers. For example this could be -
+  /// `java::java.lang.Object.toString:()Ljava/lang/String;`.
   const irep_idt &get_identifier() const
   {
     return get(ID_identifier);
   }
 };
+
+inline void validate_expr(const class class_method_descriptor_exprt &value)
+{
+  validate_operands(value, 0, "class method descriptor must not have operands");
+  DATA_INVARIANT(
+    !value.mangled_method_name().empty(),
+    "class method descriptor must have a mangled method name.");
+  DATA_INVARIANT(
+    !value.class_id().empty(), "class method descriptor must have a class id.");
+  DATA_INVARIANT(
+    !value.base_method_name().empty(),
+    "class method descriptor must have a base method name.");
+  DATA_INVARIANT(
+    value.get_identifier() == id2string(value.class_id()) + "." +
+                                id2string(value.mangled_method_name()),
+    "class method descriptor must have an identifier in the expected format.");
+}
 
 /// \brief Cast an exprt to a \ref class_method_descriptor_exprt
 ///

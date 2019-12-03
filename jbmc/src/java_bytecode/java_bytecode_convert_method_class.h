@@ -311,7 +311,7 @@ protected:
 
   bool is_method_inherited(
     const irep_idt &classname,
-    const irep_idt &methodid) const;
+    const irep_idt &mangled_method_name) const;
 
   irep_idt get_static_field(
     const irep_idt &class_identifier, const irep_idt &component_name) const;

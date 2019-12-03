@@ -263,7 +263,7 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
     // didn't already exist. It can't be instantiated already, otherwise it
     // would give a concrete definition of the called method, and
     // candidate_target_methods would be non-empty.
-    const irep_idt &call_class = virtual_function.get_class_name();
+    const irep_idt &call_class = virtual_function.class_id();
     bool was_missing = instantiated_classes.count(call_class) == 0;
     CHECK_RETURN(was_missing);
     any_new_classes = true;
@@ -292,13 +292,13 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
     }
 
     // Check that `get_virtual_method_target` returns a method now
-    const irep_idt &call_basename = virtual_function.get_component_name();
-    const irep_idt method_name = get_virtual_method_target(
-      instantiated_classes, call_basename, call_class, symbol_table);
-    CHECK_RETURN(!method_name.empty());
+    const irep_idt &method_name = virtual_function.mangled_method_name();
+    const irep_idt method_id = get_virtual_method_target(
+      instantiated_classes, method_name, call_class, symbol_table);
+    CHECK_RETURN(!method_id.empty());
 
     // Add what it returns to methods_to_convert_later
-    methods_to_convert_later.insert(method_name);
+    methods_to_convert_later.insert(method_id);
   }
   return any_new_classes;
 }
@@ -477,13 +477,8 @@ void ci_lazy_methodst::get_virtual_method_targets(
   std::unordered_set<irep_idt> &callable_methods,
   symbol_tablet &symbol_table)
 {
-  const auto &call_class = called_function.get_class_name();
-  INVARIANT(
-    !call_class.empty(), "All virtual calls should be aimed at a class");
-  const auto &call_basename = called_function.get_component_name();
-  INVARIANT(
-    !call_basename.empty(),
-    "Virtual function must have a reasonable name after removing class");
+  const auto &call_class = called_function.class_id();
+  const auto &method_name = called_function.mangled_method_name();
 
   class_hierarchyt::idst self_and_child_classes =
     class_hierarchy.get_children_trans(call_class);
@@ -491,10 +486,10 @@ void ci_lazy_methodst::get_virtual_method_targets(
 
   for(const irep_idt &class_name : self_and_child_classes)
   {
-    const irep_idt method_name = get_virtual_method_target(
-      instantiated_classes, call_basename, class_name, symbol_table);
-    if(!method_name.empty())
-      callable_methods.insert(method_name);
+    const irep_idt method_id = get_virtual_method_target(
+      instantiated_classes, method_name, class_name, symbol_table);
+    if(!method_id.empty())
+      callable_methods.insert(method_id);
   }
 }
 

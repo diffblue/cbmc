@@ -2231,11 +2231,11 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   if(use_this)
   {
-    irep_idt classname = class_method_descriptor.get(ID_C_class);
+    const irep_idt class_id = class_method_descriptor.class_id();
 
     if(parameters.empty() || !parameters[0].get_this())
     {
-      typet thistype = struct_tag_typet(classname);
+      typet thistype = struct_tag_typet(class_id);
       reference_typet object_ref_type = java_reference_type(thistype);
       java_method_typet::parametert this_p(object_ref_type);
       this_p.set_this();
@@ -2250,7 +2250,7 @@ void java_bytecode_convert_methodt::convert_invoke(
       if(is_constructor(invoked_method_id))
       {
         if(needed_lazy_methods)
-          needed_lazy_methods->add_needed_class(classname);
+          needed_lazy_methods->add_needed_class(class_id);
         method_type.set_is_constructor();
       }
       else
@@ -2297,16 +2297,16 @@ void java_bytecode_convert_methodt::convert_invoke(
   if(
     method_symbol == symbol_table.symbols.end() &&
     !(is_virtual && is_method_inherited(
-                      class_method_descriptor.get_class_name(),
-                      class_method_descriptor.get_component_name())))
+                      class_method_descriptor.class_id(),
+                      class_method_descriptor.mangled_method_name())))
   {
     create_method_stub_symbol(
       invoked_method_id,
-      class_method_descriptor.get_base_name(),
-      id2string(class_method_descriptor.get_class_name()).substr(6) + "." +
-        id2string(class_method_descriptor.get_base_name()) + "()",
+      class_method_descriptor.base_method_name(),
+      id2string(class_method_descriptor.class_id()).substr(6) + "." +
+        id2string(class_method_descriptor.base_method_name()) + "()",
       method_type,
-      class_method_descriptor.get_class_name(),
+      class_method_descriptor.class_id(),
       symbol_table,
       get_message_handler());
   }
@@ -2329,8 +2329,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     {
       needed_lazy_methods->add_needed_method(invoked_method_id);
       // Calling a static method causes static initialization:
-      needed_lazy_methods->add_needed_class(
-        class_method_descriptor.get_class_name());
+      needed_lazy_methods->add_needed_class(class_method_descriptor.class_id());
     }
   }
 
@@ -2345,8 +2344,7 @@ void java_bytecode_convert_methodt::convert_invoke(
 
   if(!use_this)
   {
-    codet clinit_call =
-      get_clinit_call(class_method_descriptor.get_class_name());
+    codet clinit_call = get_clinit_call(class_method_descriptor.class_id());
     if(clinit_call.get_statement() != ID_skip)
       c = code_blockt({clinit_call, c});
   }
@@ -3257,13 +3255,13 @@ void java_bytecode_convert_method(
 /// a method inherited from a class (and not an interface!) from which
 /// \p classname inherits, either directly or indirectly.
 /// \param classname: class whose method is referenced
-/// \param methodid: method basename
+/// \param mangled_method_name: The particular overload of a given method.
 bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname,
-  const irep_idt &methodid) const
+  const irep_idt &mangled_method_name) const
 {
-  const auto inherited_method =
-    get_inherited_component(classname, methodid, symbol_table, false);
+  const auto inherited_method = get_inherited_component(
+    classname, mangled_method_name, symbol_table, false);
   return inherited_method.has_value();
 }
 

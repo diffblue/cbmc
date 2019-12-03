@@ -133,11 +133,8 @@ SCENARIO(
   const symbolt &callee_symbol =
     symbol_table.lookup_ref("java::VirtualFunctionsTestParent.f:()V");
 
-  class_method_descriptor_exprt callee{callee_symbol.type,
-                                       "f:()V",
-                                       "java::VirtualFunctionsTestParent",
-                                       "f",
-                                       callee_symbol.name};
+  class_method_descriptor_exprt callee{
+    callee_symbol.type, "f:()V", "java::VirtualFunctionsTestParent", "f"};
 
   const code_function_callt call(
     callee,
