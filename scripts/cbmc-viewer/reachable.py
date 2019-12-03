@@ -43,7 +43,8 @@ class Reachable:
 
         # strip the noise sent to stdout before the actual json
         jsn = re.sub(r'^.*\n\[', '[', output, flags=re.DOTALL)
-        # add last line numbers omitted by json_output_function (eg, builtins)
+        # add line numbers omitted by json_output_function (eg, builtins)
+        jsn = jsn.replace('"first line": \n', '"first line": 0\n')
         jsn = jsn.replace('"last line": \n', '"last line": 0\n')
 
         for function in json.loads(jsn):
