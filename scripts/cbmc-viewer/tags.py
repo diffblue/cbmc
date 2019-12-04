@@ -14,6 +14,8 @@ import re
 import sys
 import errno
 
+import sources
+
 ################################################################
 
 
@@ -53,7 +55,6 @@ class Tags:
                   .format(srcdir, e.strerror))
             return
 
-        # Remove TAGS file before running etags --append
         try:
             os.remove(tagsfile)
         except OSError as e:
@@ -61,11 +62,8 @@ class Tags:
             if e.errno != errno.ENOENT:
                 raise
 
-        # Use --append for etags, or etags will overwrite the tags
-        # file for each file it gets from xargs
-        cmd = r"find -L . -type f \( -iname '*.[hc]' -or -iname '*.inl' \)"
-        cmd += " | grep -v '{}'".format(fltr) if fltr else ""
-        cmd += " | xargs {} --output={} --append".format(tagscmd, tagsfile)
+        files = ' '.join(sources.find_sources(srcdir, fltr))
+        cmd = "{} --output={} {}".format(tagscmd, tagsfile, files)
         try:
             if os.system(cmd):
                 raise OSError

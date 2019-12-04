@@ -1,6 +1,5 @@
 """Mark up the source tree and links into the source tree."""
 
-import subprocess
 import sys
 import html
 import os
@@ -8,7 +7,7 @@ import re
 import errno
 
 import linestatus
-
+import sources
 
 class Markup:
     """Mark up the source tree and links into the source tree."""
@@ -252,18 +251,7 @@ def source_files(srcdir, srcfilter=""):
         print(msg)
         return []
 
-    cmd = ["find", "-L", ".", "(", "-iname", "*.[ch]", "-or", "-iname", "*.inl", ")"]
-    try:
-        find = subprocess.check_output(cmd).decode('utf-8')
-    except:
-        msg = "Can't annotate source files: "
-        msg += "Can't run command '{}'".format(" ".join(cmd))
-        print(msg)
-        raise
-
-    files = find.split('\n')
-    if srcfilter:
-        files = [f for f in files if not re.match(srcfilter, f)]
+    files = sources.find_sources(srcdir, srcfilter)
     files = [re.sub('^./', '', f) for f in files]
 
     try:
