@@ -21,7 +21,7 @@ macro(add_test_pl_tests cmdline)
 endmacro(add_test_pl_tests)
 
 # Standalone regression tests that do not need test.pl
-macro(add_standalone_test cmdline)
+macro(add_standalone_test name cmdline)
   add_test(
     NAME "${name}-CORE"
     COMMAND "${cmdline}"
