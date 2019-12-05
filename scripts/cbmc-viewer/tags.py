@@ -11,8 +11,9 @@ simple trick may fail.  And it does fail a lot.
 
 import os
 import re
-import sys
-import errno
+import subprocess
+import json
+import logging
 
 import sources
 
@@ -46,41 +47,12 @@ class Tags:
                        fltr=""):
         """Make a tags file for a source tree."""
 
-        cwd = os.getcwd()
-        try:
-            os.chdir(srcdir)
-        except OSError as e:
-            print(("Can't construct symbol table: "
-                   "Can't change to directory {}: {}")
-                  .format(srcdir, e.strerror))
-            return
+        files = sources.find_sources(srcdir, fltr)
+        run_etags(srcdir, files, tagscmd, tagsfile)
 
         try:
-            os.remove(tagsfile)
-        except OSError as e:
-            # raise exceptions other than "file does not exist"
-            if e.errno != errno.ENOENT:
-                raise
-
-        files = ' '.join(sources.find_sources(srcdir, fltr))
-        cmd = "{} --output={} {}".format(tagscmd, tagsfile, files)
-        try:
-            if os.system(cmd):
-                raise OSError
-        except OSError as e:
-            print(("Can't construct symbol table: "
-                   "Can't run command '{}' in directory {}: {}")
-                  .format(cmd, srcdir, e.strerror or ""))
-            return
-        try:
-            os.chdir(cwd)
-        except OSError as e:
-            print(("Can't construct symbol table: "
-                   "Can't change to directory {}: {}")
-                  .format(cwd, e.strerror))
-            sys.exit()  # don't just return
-        try:
-            os.rename(srcdir+'/'+tagsfile, './'+tagsfile)
+            os.rename(os.path.join(srcdir, tagsfile),
+                      os.path.join('.', tagsfile))
         except OSError as e:
             print(("Can't construct symbol table: "
                    "Can't move file {} to {}: {}")
@@ -170,3 +142,43 @@ class Tags:
         if d:
             result.extend(d)
         return result
+
+################################################################
+
+def run(cmd, verbose=False, cwd=None):
+    if isinstance(cmd, str):
+        cmd = cmd.split()
+    if verbose:
+        print('Running: {}'.format(' '.join(cmd)))
+
+    result = subprocess.run(cmd, cwd=cwd,
+                            capture_output=True, universal_newlines=True)
+    if result.returncode:
+        debug = {'command': result.args,
+                 'returncode': result.returncode,
+                 'stdout': result.stdout.split('\n'),
+                 'stderr': result.stderr.split('\n')}
+        logging.info(json.dumps(debug, indent=2))
+    result.check_returncode()
+
+    return result.stdout
+
+################################################################
+
+def run_etags(root, files, etags_command, etags_filename):
+    if not files:
+        return ''
+    etags_pathname = os.path.join(root, etags_filename)
+
+    try:
+        os.remove(etags_pathname)
+    except FileNotFoundError:
+        pass # file did not exist
+
+    while files:
+        paths, files = files[:100], files[100:]
+        print('paths = ', paths)
+        run([etags_command, '-o', etags_filename, '--append'] + paths, cwd=root)
+
+    with open(etags_pathname) as etags_data:
+        return etags_data.read()

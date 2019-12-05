@@ -1,7 +1,6 @@
 """Basic block coverage reporting for CBMC."""
 
 import re
-import os
 from pprint import pprint
 
 import linestatus
