@@ -146,13 +146,17 @@ class Tags:
 ################################################################
 
 def run(cmd, verbose=False, cwd=None):
+    """Run a command in a directory."""
+
     if isinstance(cmd, str):
         cmd = cmd.split()
     if verbose:
         print('Running: {}'.format(' '.join(cmd)))
 
     result = subprocess.run(cmd, cwd=cwd,
-                            capture_output=True, universal_newlines=True)
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            universal_newlines=True)
     if result.returncode:
         debug = {'command': result.args,
                  'returncode': result.returncode,
@@ -166,6 +170,8 @@ def run(cmd, verbose=False, cwd=None):
 ################################################################
 
 def run_etags(root, files, etags_command, etags_filename):
+    """Run etags on a list of files to generate symbol definitions."""
+
     if not files:
         return ''
     etags_pathname = os.path.join(root, etags_filename)
@@ -176,9 +182,9 @@ def run_etags(root, files, etags_command, etags_filename):
         pass # file did not exist
 
     while files:
-        paths, files = files[:100], files[100:]
-        print('paths = ', paths)
-        run([etags_command, '-o', etags_filename, '--append'] + paths, cwd=root)
+        prefix, files = files[:100], files[100:]
+        run([etags_command, '-o', etags_filename, '--append'] + prefix,
+            cwd=root)
 
     with open(etags_pathname) as etags_data:
         return etags_data.read()
