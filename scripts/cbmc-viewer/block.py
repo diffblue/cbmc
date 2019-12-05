@@ -261,11 +261,7 @@ class Block:
         """Clean up file names that begin with a path prefix."""
         if not path:
             return lambda n: n
-        path = path.rstrip('/')+'/'
-        abspath = os.path.abspath(path).rstrip('/')+'/'
-        realpath = os.path.realpath(path).rstrip('/')+'/'
-        regstr = '^({})'.format("|".join([path, abspath, realpath]))
-        regexp = re.compile(regstr)
+        regexp = re.compile(SrcLoc.path_regexp(path))
         return lambda n: regexp.sub("", n)
 
 

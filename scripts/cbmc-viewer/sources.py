@@ -41,7 +41,8 @@ def find_sources_with_walk(root='.'):
                  if name.lower().endswith((".h", ".c", ".inl"))]
         files.extend(names)
     dirlen = len(root) + 1
-    files = [name[dirlen:].replace(os.sep, '/') for name in files]
+    files = [name[dirlen:] for name in files]
     # find returns relative path names
     files = ['.' + os.sep + name for name in files]
+    files = [name.replace(os.sep, '/') for name in files]
     return files

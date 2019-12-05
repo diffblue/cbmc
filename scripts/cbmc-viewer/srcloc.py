@@ -54,24 +54,23 @@ def parse_xml_string(xml, abort=True, src=""):
 def path_regexp(path):
     """Form a regular expression for several variants of a path"""
 
-    path = path.rstrip('/')+'/'
-    relpath = path if os.path.isabs(path) else "./" + path
-    abspath = os.path.abspath(path) + '/'
-    realpath = os.path.realpath(path) + '/'
+    path = path.rstrip(os.sep)+os.sep
+    relpath = path if os.path.isabs(path) else "." + os.sep + path
+    abspath = os.path.abspath(path) + os.sep
+    realpath = os.path.realpath(path) + os.sep
     paths = [path, relpath, abspath, realpath]
-    return "|".join(["({})".format(path_) for path_ in paths])
-
+    return "|".join(["({})".format(make_linux_path(path_)) for path_ in paths])
 
 SOURCE_LOCATION_REGEXP = '(file ([^ ]*)) (function ?([^ ]*)) (line ([0-9]*))'
 SOURCE_LOCATION_RE = re.compile(SOURCE_LOCATION_REGEXP)
 
 def make_linux_path(path):
     """Turn a path (eg, a Windows path) into a Linux path."""
-    return path.replace('\\', '/')
+    return path.replace(os.sep, '/')
 
 def make_linux_normpath(path):
     """Turn a path into a normalized Linux path."""
-    return os.path.normpath(make_linux_path(path))
+    return make_linux_path(os.path.normpath(path))
 
 class SourceLocation:
     """Methods for maniuplating source locations found in cbmc output."""
