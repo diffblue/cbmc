@@ -21,18 +21,30 @@ macro(add_test_pl_tests cmdline)
 endmacro(add_test_pl_tests)
 
 # Standalone regression tests that do not need test.pl
-macro(add_standalone_test name cmdline)
-  add_test(
-    NAME "${name}-CORE"
-    COMMAND "${cmdline}"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-  )
+function(add_standalone_test)
+    set(prefix          ARG)
+    set(no_values       )
+    set(single_values   NAME)
+    set(multi_values    COMMAND)
+    cmake_parse_arguments(
+        ${prefix}
+        "${no_values}"
+        "${single_values}"
+        "${multi_values}"
+        ${ARGN}
+    )
 
-  set_tests_properties(
-    "${name}-CORE" PROPERTIES
-    LABELS "CORE;CBMC"
-  )
-endmacro(add_standalone_test)
+    add_test(
+        NAME "${ARG_NAME}-CORE"
+        COMMAND ${ARG_COMMAND}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+
+    set_tests_properties(
+        "${ARG_NAME}-CORE" PROPERTIES
+        LABELS "CORE;CBMC"
+    )
+endfunction()
 
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
