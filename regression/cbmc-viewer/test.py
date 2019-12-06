@@ -192,8 +192,10 @@ def generateReport(options):
             logging.debug(
                 "$ %s%s", " ".join(command["command"]),
                 ("" if command["stdout"] is None else (" > %s" % command["stdout"])))
-            proc = subprocess.run(command["command"], stdout=handle,
-                                  stderr=subprocess.PIPE, text=True)
+            proc = subprocess.run(command["command"],
+                                  stdout=handle,
+                                  stderr=subprocess.PIPE,
+                                  universal_newlines=True)
         except FileNotFoundError:
             logging.error("Failed to run command '%s' in directory %s.",
                           " ".join(command["command"]), os.getcwd())

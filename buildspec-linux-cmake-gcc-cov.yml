@@ -8,12 +8,13 @@ env:
 phases:
   install:
     runtime-versions:
-      java: openjdk8    
+      java: openjdk8
     commands:
       - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
       - add-apt-repository ppa:ubuntu-toolchain-r/test
       - apt-get update -y
-      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq lcov cmake curl gdb
+      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq lcov cmake curl gdb python3 python3-pip
+      - pip3 install lxml
   build:
     commands:
       - echo Build started on `date`
