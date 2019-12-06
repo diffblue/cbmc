@@ -63,6 +63,12 @@ regression/**/*.smt2
 jbmc/regression/**/tests.log
 jbmc/regression/**/tests-symex-driven-loading.log
 
+regression/cbmc-viewer/**/*.log
+regression/cbmc-viewer/**/*.xml
+regression/cbmc-viewer/**/*.goto
+regression/cbmc-viewer/**/*.json
+regression/cbmc-viewer/**/html
+
 # regression/coverage file
 /regression/coverage_**
 
