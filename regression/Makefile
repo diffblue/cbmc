@@ -3,6 +3,7 @@
 # listed with decreasing runtimes (i.e. longest running at the top)
 DIRS = cbmc \
        cbmc-library \
+       cbmc-viewer \
        goto-analyzer \
        ansi-c \
        goto-instrument \
