@@ -1124,17 +1124,21 @@ bool constant_interval_exprt::is_float(const constant_interval_exprt &interval)
 bool constant_interval_exprt::is_bitvector(const typet &t)
 {
   return t.id() == ID_bv || t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
-         t.id() == ID_c_bool;
+         t.id() == ID_c_bool ||
+         (t.id() == ID_c_bit_field && is_bitvector(t.subtype()));
 }
 
 bool constant_interval_exprt::is_signed(const typet &t)
 {
-  return t.id() == ID_signedbv;
+  return t.id() == ID_signedbv ||
+         (t.id() == ID_c_bit_field && is_signed(t.subtype()));
 }
 
 bool constant_interval_exprt::is_unsigned(const typet &t)
 {
-  return t.id() == ID_bv || t.id() == ID_unsignedbv || t.id() == ID_c_bool;
+  return t.id() == ID_bv || t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
+         t.id() == ID_c_enum ||
+         (t.id() == ID_c_bit_field && is_unsigned(t.subtype()));
 }
 
 bool constant_interval_exprt::is_signed(const constant_interval_exprt &interval)
