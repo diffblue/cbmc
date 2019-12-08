@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: analyses variable-sensitivity
+ Module: analyses variable-sensitivity intervals
 
- Author: Thomas Kiley, thomas.kiley@diffblue.com
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
@@ -92,21 +92,6 @@ void interval_abstract_valuet::output(
   }
 }
 
-/*******************************************************************\
-
-Function: interval_abstract_valuet::merge
-
-  Inputs:
-   other - the abstract object to merge with
-
- Outputs: Returns the result of the merge
-
- Purpose: Attempts to do a interval/interval merge if both are intervals,
-          otherwise falls back to the parent merge
-
-
-\*******************************************************************/
-
 abstract_object_pointert interval_abstract_valuet::merge(
   abstract_object_pointert other) const
 {
@@ -114,31 +99,22 @@ abstract_object_pointert interval_abstract_valuet::merge(
     std::dynamic_pointer_cast<const interval_abstract_valuet>(other);
   if(cast_other)
   {
-    return merge_interval_interval(cast_other);
+    return merge_intervals(cast_other);
   }
   else
   {
-    // TODO(tkiley): How do we set the result to be toppish? Does it matter?
     return abstract_valuet::merge(other);
   }
 }
 
-/*******************************************************************\
-
-Function: interval_abstract_valuet::merge_interval_interval
-
-  Inputs:
-   other - the abstract object to merge with
-
- Outputs: Returns a new abstract object that is the result of the merge
-          unless the merge is the same as this abstract object, in which
-          case it returns this.
-
- Purpose: Merges another interval abstract value into this one
-
-\*******************************************************************/
-
-abstract_object_pointert interval_abstract_valuet::merge_interval_interval(
+/// Merge another interval abstract object with this one
+/// \param other The interval abstract object to merge with
+/// \return This if the other interval is subsumed by this,
+///          other if this is subsumed by other.
+///          Otherwise, a new interval abstract object
+///          with the smallest interval that subsumes both
+///          this and other
+abstract_object_pointert interval_abstract_valuet::merge_intervals(
   interval_abstract_value_pointert other) const
 {
   if(is_bottom() || other->interval.contains(interval))
@@ -156,17 +132,4 @@ abstract_object_pointert interval_abstract_valuet::merge_interval_interval(
         constant_interval_exprt::get_min(interval.get_lower(), other->interval.get_lower()),
         constant_interval_exprt::get_max(interval.get_upper(), other->interval.get_upper())));
   }
-
-#if 0
-    // Can we actually merge these value
-    if(value==other->value)
-    {
-      return shared_from_this();
-    }
-    else
-    {
-      return abstract_valuet::merge(other);
-    }
-  }
-#endif
 }
