@@ -108,19 +108,15 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
 
     const constant_interval_exprt &interval = iav->interval;
 
-    // The typecast case should probably be handled by constant_interval_exprt
-    // directly as well
     if(expr.id() == ID_typecast)
     {
       const typecast_exprt &tce = to_typecast_expr(expr);
 
-      exprt lower = interval.get_lower();
-      lower.type() = tce.type();
+      const constant_interval_exprt &new_interval
+        = interval.typecast(tce.type());
 
-      exprt upper = interval.get_upper();
-      upper.type() = tce.type();
+      INVARIANT(new_interval.type() == type, "");
 
-      const constant_interval_exprt new_interval(lower, upper, tce.type());
       return environment.abstract_object_factory(tce.type(), new_interval, ns);
     }
     else
