@@ -35,7 +35,7 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
     type.id()==ID_c_bool || type.id()==ID_bool ||
     type.id()==ID_integer || type.id()==ID_c_bit_field)
   {
-    abstract_object_type=CONSTANT;
+    abstract_object_type=has_interval?INTERVAL:CONSTANT;
   }
   else if(type.id()==ID_array)
   {
@@ -102,6 +102,9 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   case CONSTANT:
     return initialize_abstract_object<constant_abstract_valuet>(
       followed_type, top, bottom, e, environment, ns);
+  case INTERVAL:
+    return initialize_abstract_object<interval_abstract_valuet>(
+      followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
     return initialize_abstract_object<constant_array_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
@@ -156,5 +159,6 @@ void variable_sensitivity_object_factoryt::set_options(const optionst &options)
   has_last_written_location_context_flag=true; // For efficency of 3way merge
   has_data_dependencies_context_flag=
     options.get_bool_option("data-dependencies");
+  has_interval=options.get_bool_option("interval");
   initialized=true;
 }

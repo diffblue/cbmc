@@ -93,7 +93,7 @@ public:
   virtual bool is_bottom() const;
 
   // Interface for transforms
-  abstract_object_pointert expression_transform(
+  virtual abstract_object_pointert expression_transform(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns) const;

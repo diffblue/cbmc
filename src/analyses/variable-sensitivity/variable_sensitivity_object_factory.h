@@ -9,6 +9,7 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
@@ -47,6 +48,7 @@ private:
   {
     TWO_VALUE,
     CONSTANT,
+    INTERVAL,
     ARRAY_SENSITIVE,
     ARRAY_INSENSITIVE,
     POINTER_SENSITIVE,
@@ -79,6 +81,7 @@ private:
   bool has_pointers_flag;
   bool has_last_written_location_context_flag;
   bool has_data_dependencies_context_flag;
+  bool has_interval;
   bool initialized;
 };
 
