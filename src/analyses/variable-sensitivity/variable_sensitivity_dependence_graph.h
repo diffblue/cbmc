@@ -168,9 +168,8 @@ public:
   explicit variable_sensitivity_dependence_grapht(
     const goto_functionst &goto_functions,
     const namespacet &_ns,
-    const bool print_progress = false,
-    const float min_progress_interval = 0):
-      ait<variable_sensitivity_dependence_domaint>(print_progress, min_progress_interval),
+    const ai_configt &config = {})
+    : ait<variable_sensitivity_dependence_domaint>(config),
       goto_functions(goto_functions),
       ns(_ns)
   {
