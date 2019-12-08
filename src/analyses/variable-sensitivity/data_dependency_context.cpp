@@ -97,9 +97,12 @@ abstract_object_pointert data_dependency_contextt::insert_data_deps(
   else
   {
     std::set_difference(
-      dependencies.begin(), dependencies.end(),
-      data_deps.begin(), data_deps.end(),
-      std::inserter(new_dependencies, new_dependencies.begin()));
+      dependencies.begin(),
+      dependencies.end(),
+      data_deps.begin(),
+      data_deps.end(),
+      std::inserter(new_dependencies, new_dependencies.begin()),
+      location_ordert{});
   }
 
   // If there are no new dependencies to add, just return
