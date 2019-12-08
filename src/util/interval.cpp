@@ -1661,15 +1661,15 @@ constant_interval_exprt::typecast(const typet &type) const
 {
   if(this->type().id() == ID_bool && is_int(type))
   {
-    unsigned lower_num = !has_no_lower_bound() && get_lower().is_true();
-    unsigned upper_num = has_no_upper_bound() || get_upper().is_true();
+    bool lower = !has_no_lower_bound() && get_lower().is_true();
+    bool upper = has_no_upper_bound() || get_upper().is_true();
 
-    INVARIANT(lower_num <= upper_num, "");
+    INVARIANT(!lower || upper, "");
 
-    constant_exprt lower = from_integer(lower_num, type);
-    constant_exprt upper = from_integer(upper_num, type);
+    constant_exprt lower_num = from_integer(lower, type);
+    constant_exprt upper_num = from_integer(upper, type);
 
-    return constant_interval_exprt(lower, upper, type);
+    return constant_interval_exprt(lower_num, upper_num, type);
   }
   else
   {
