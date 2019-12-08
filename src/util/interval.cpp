@@ -1164,7 +1164,7 @@ bool constant_interval_exprt::is_float(const constant_interval_exprt &interval)
 bool constant_interval_exprt::is_bitvector(const typet &t)
 {
   return t.id() == ID_bv || t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
-         t.id() == ID_pointer || t.id() == ID_bool;
+         t.id() == ID_c_bool;
 }
 
 bool constant_interval_exprt::is_signed(const typet &t)
@@ -1174,8 +1174,7 @@ bool constant_interval_exprt::is_signed(const typet &t)
 
 bool constant_interval_exprt::is_unsigned(const typet &t)
 {
-  return t.id() == ID_bv || t.id() == ID_unsignedbv || t.id() == ID_pointer ||
-         t.id() == ID_bool;
+  return t.id() == ID_bv || t.id() == ID_unsignedbv || t.id() == ID_c_bool;
 }
 
 bool constant_interval_exprt::is_signed(const constant_interval_exprt &interval)
@@ -1660,13 +1659,28 @@ constant_interval_exprt::unary_minus(const constant_interval_exprt &a)
 constant_interval_exprt
 constant_interval_exprt::typecast(const typet &type) const
 {
-  exprt lower = get_lower();
-  lower.type() = type;
+  if(this->type().id() == ID_bool && is_int(type))
+  {
+    unsigned lower_num = !has_no_lower_bound() && get_lower().is_true();
+    unsigned upper_num = has_no_upper_bound() || get_upper().is_true();
 
-  exprt upper = get_upper();
-  upper.type() = type;
+    INVARIANT(lower_num <= upper_num, "");
 
-  return constant_interval_exprt(lower, upper, type);
+    constant_exprt lower = from_integer(lower_num, type);
+    constant_exprt upper = from_integer(upper_num, type);
+
+    return constant_interval_exprt(lower, upper, type);
+  }
+  else
+  {
+    exprt lower = get_lower();
+    lower.type() = type;
+
+    exprt upper = get_upper();
+    upper.type() = type;
+
+    return constant_interval_exprt(lower, upper, type);
+  }
 }
 
 /* Binary */
