@@ -3,7 +3,7 @@
  Author: DiffBlue Limited
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/interval.h>
 #include <util/std_types.h>

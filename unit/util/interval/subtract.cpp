@@ -3,7 +3,7 @@
  Author: DiffBlue Limited
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/interval.h>
 #include <util/std_types.h>
@@ -11,8 +11,9 @@
 #include <util/symbol_table.h>
 #include <util/arith_tools.h>
 
-#define V(X)   (binary2integer(X.get(ID_value).c_str(), 2))
-#define V_(X)  (binary2integer(X.c_str(), 2))
+#define V(X)   (bvrep2integer(X.get(ID_value).c_str(), 32, true))
+#define V_(X)  (bvrep2integer(X.c_str(), 32, true))
+#define CEV(X) (from_integer(mp_integer(X), signedbv_typet(32)))
 
 
 SCENARIO("subtract interval domain",
@@ -20,23 +21,13 @@ SCENARIO("subtract interval domain",
 {
   GIVEN("Two simple signed intervals")
   {
-    const typet type=signedbv_typet(32);
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
-    source_locationt source_location;
-
-    std::map<int, constant_exprt> values;
-
-    for(int i = -100; i <= 100; i++)
-    {
-      values[i] = from_integer(mp_integer(i), type);
-    }
-
     WHEN("The result is positive [6,8]-[2,4]")
     {
-      constant_interval_exprt left(values[6], values[8]);
-      constant_interval_exprt right(values[2], values[4]);
+      constant_interval_exprt left(CEV(6), CEV(8));
+      constant_interval_exprt right(CEV(2), CEV(4));
 
       constant_interval_exprt result = left.minus(right);
 
@@ -57,8 +48,8 @@ SCENARIO("subtract interval domain",
 
     WHEN("One contains infinite [2,4]-[6,INF]")
     {
-      constant_interval_exprt left(values[2], values[4]);
-      constant_interval_exprt right(values[6], max_exprt(type));
+      constant_interval_exprt left(CEV(2), CEV(4));
+      constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result = left.minus(right);
 
@@ -81,8 +72,8 @@ SCENARIO("subtract interval domain",
 
     WHEN("Both contain infinite [2,INF]-[6,INF]")
     {
-      constant_interval_exprt left(values[2],  max_exprt(type));
-      constant_interval_exprt right(values[6], max_exprt(type));
+      constant_interval_exprt left(CEV(2),  max_exprt(signedbv_typet(32)));
+      constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result = left.minus(right);
 
