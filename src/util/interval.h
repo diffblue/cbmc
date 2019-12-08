@@ -55,18 +55,21 @@ public:
 class constant_interval_exprt : public binary_exprt
 {
 public:
-  constant_interval_exprt(const exprt &lower, const exprt &upper, typet type)
+  constant_interval_exprt(
+    const exprt &lower,
+    const exprt &upper,
+    const typet type)
     : binary_exprt(lower, ID_constant_interval, upper, type)
   {
     PRECONDITION(is_well_formed());
   }
 
-  constant_interval_exprt()
-    : constant_interval_exprt(min_exprt(typet()), max_exprt(typet()), typet())
+  constant_interval_exprt(const constant_interval_exprt &x)
+    : constant_interval_exprt(x.get_lower(), x.get_upper(), x.type())
   {
   }
 
-  explicit constant_interval_exprt(const exprt &x)
+  constant_interval_exprt(const exprt &x)
     : constant_interval_exprt(x, x, x.type())
   {
   }
@@ -97,7 +100,7 @@ public:
     b &= is_valid_bound(lower);
     b &= is_valid_bound(upper);
 
-    b &= !is_numeric() || less_than_or_equal(lower, upper);
+    b &= !is_numeric() || is_bottom() || less_than_or_equal(lower, upper);
 
     return b;
   }

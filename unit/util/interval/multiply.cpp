@@ -3,7 +3,7 @@
  Author: DiffBlue Limited
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
 #include <util/interval.h>
@@ -11,30 +11,21 @@
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
-#define V(X) (binary2integer(X.get(ID_value).c_str(), 2))
-#define V_(X) (binary2integer(X.c_str(), 2))
+#define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
+#define V_(X) (bvrep2integer(X.c_str(), 32, true))
+#define CEV(X) (from_integer(mp_integer(X), signedbv_typet(32)))
 
 SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 {
   GIVEN("A selection of constant_exprts in a std::vector and map")
   {
-    const typet type = signedbv_typet(32);
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
-    std::map<int, constant_exprt> values;
-    std::vector<exprt> ve;
-
-    for(int i = -100; i <= 100; i++)
-    {
-      values[i] = from_integer(mp_integer(i), type);
-      ve.push_back(exprt(from_integer(mp_integer(i), type)));
-    }
-
     WHEN("Both are positive [2,5]*[7,11]")
     {
-      constant_interval_exprt a(values[2], values[5]);
-      constant_interval_exprt b(values[7], values[11]);
+      constant_interval_exprt a(CEV(2), CEV(5));
+      constant_interval_exprt b(CEV(7), CEV(11));
 
       constant_interval_exprt result = a.multiply(b);
 
@@ -57,8 +48,8 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 
     WHEN("One is entirely negative [-2,-5]*[7,11]")
     {
-      constant_interval_exprt a(values[-5], values[-2]);
-      constant_interval_exprt b(values[7], values[11]);
+      constant_interval_exprt a(CEV(-5), CEV(-2));
+      constant_interval_exprt b(CEV(7), CEV(11));
 
       constant_interval_exprt result = a.multiply(b);
 
@@ -81,8 +72,8 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 
     WHEN("Range contains and extends from zero [-2,5]*[7,11]")
     {
-      constant_interval_exprt a(values[-2], values[5]);
-      constant_interval_exprt b(values[7], values[11]);
+      constant_interval_exprt a(CEV(-2), CEV(5));
+      constant_interval_exprt b(CEV(7), CEV(11));
 
       constant_interval_exprt result = a.multiply(b);
 
@@ -105,8 +96,8 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 
     WHEN("One domain is infinite and other crosses zero [-2,5]*[7,INF]")
     {
-      constant_interval_exprt a(values[-2], values[5]);
-      constant_interval_exprt b(values[7], max_exprt(type));
+      constant_interval_exprt a(CEV(-2), CEV(5));
+      constant_interval_exprt b(CEV(7), max_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result = a.multiply(b);
 
@@ -129,8 +120,8 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 
     WHEN("One domain is infinite and other is positive [2,5]*[7,INF]")
     {
-      constant_interval_exprt a(values[2], values[5]);
-      constant_interval_exprt b(values[7], max_exprt(type));
+      constant_interval_exprt a(CEV(2), CEV(5));
+      constant_interval_exprt b(CEV(7), max_exprt(signedbv_typet(32)));
       constant_interval_exprt result = a.multiply(b);
 
       THEN("Domain is consistent")

@@ -469,8 +469,6 @@ constant_interval_exprt constant_interval_exprt::get_extremes(
   const constant_interval_exprt &b,
   const irep_idt &operation)
 {
-  constant_interval_exprt result;
-
   std::vector<exprt> results;
 
   generate_expression(a.get_lower(), b.get_lower(), operation, results);

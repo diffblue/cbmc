@@ -3,7 +3,7 @@
  Author: DiffBlue Limited
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
 #include <util/interval.h>
@@ -12,33 +12,28 @@
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
-#define V(X) (binary2integer(X.get(ID_value).c_str(), 2))
-#define V_(X) (binary2integer(X.c_str(), 2))
+#define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
+#define V_(X) (bvrep2integer(X.c_str(), 32, true))
+#define CEV(X) (from_integer(mp_integer(X), signedbv_typet(32)))
 
 SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 {
   GIVEN("A selection of constant_exprts in a std::vector and map")
   {
-    const typet type = signedbv_typet(32);
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
-    std::map<int, constant_exprt> values;
     std::vector<exprt> ve;
 
     for(int i = -100; i <= 100; i++)
     {
-      values[i] = from_integer(mp_integer(i), type);
-      ve.push_back(from_integer(mp_integer(i), type));
-      //      values[i] = constant_exprt(std::to_string(i), integer_typet());;
-      //      ve.push_back(exprt(constant_exprt(std::to_string(i), integer_typet())));
+      ve.push_back(from_integer(mp_integer(i), signedbv_typet(32)));
     }
-
     WHEN("-20 <= 20 is tested")
     {
-      binary_predicate_exprt op1(values[-20], ID_le, values[20]);
+      binary_predicate_exprt op1(CEV(-20), ID_le, CEV(20));
       bool interval_eval =
-        constant_interval_exprt::less_than_or_equal(values[-20], values[20]);
+        constant_interval_exprt::less_than_or_equal(CEV(-20), CEV(20));
       simplify(op1, ns);
 
       THEN("Require it is TRUE")
@@ -50,9 +45,9 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
     WHEN("20 <= -20 is tested")
     {
-      binary_predicate_exprt op1(values[20], ID_le, values[-20]);
+      binary_predicate_exprt op1(CEV(20), ID_le, CEV(-20));
       bool interval_eval =
-        constant_interval_exprt::less_than_or_equal(values[20], values[-20]);
+        constant_interval_exprt::less_than_or_equal(CEV(20), CEV(-20));
       simplify(op1, ns);
 
       THEN("Require it is FALSE")
@@ -64,9 +59,9 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
     WHEN("-20 <= -20 is tested")
     {
-      binary_predicate_exprt op1(values[-20], ID_le, values[-20]);
+      binary_predicate_exprt op1(CEV(-20), ID_le, CEV(-20));
       bool interval_eval =
-        constant_interval_exprt::less_than_or_equal(values[-20], values[-20]);
+        constant_interval_exprt::less_than_or_equal(CEV(-20), CEV(-20));
 
       simplify(op1, ns);
 
@@ -74,13 +69,13 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
       {
         REQUIRE(op1.is_true());
         REQUIRE(interval_eval);
-        REQUIRE(constant_interval_exprt::equal(values[1], values[1]));
+        REQUIRE(constant_interval_exprt::equal(CEV(1), CEV(1)));
       }
     }
 
     WHEN("Two are selected and min found [20, -20]")
     {
-      std::vector<exprt> selected = {values[20], values[-20]};
+      std::vector<exprt> selected = {CEV(20), CEV(-20)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
@@ -96,8 +91,7 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
     WHEN("Four are selected and min found [-20, 0, 20, 50]")
     {
-      std::vector<exprt> selected = {
-        values[-20], values[0], values[50], values[20]};
+      std::vector<exprt> selected = {CEV(-20), CEV(0), CEV(50), CEV(20)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
@@ -111,7 +105,7 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
     WHEN("One is selected [-100]")
     {
-      std::vector<exprt> selected = {values[-100]};
+      std::vector<exprt> selected = {CEV(-100)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
@@ -126,7 +120,7 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
     WHEN("Five are selected [20, 30, 15, 0, -100]")
     {
       std::vector<exprt> selected = {
-        values[20], values[30], values[15], values[0], values[-100]};
+        CEV(20), CEV(30), CEV(15), CEV(0), CEV(-100)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
