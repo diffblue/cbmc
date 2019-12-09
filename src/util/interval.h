@@ -5,8 +5,8 @@
  Author: Daniel Neville (2017)
 
 \*******************************************************************/
-#ifndef SRC_ANALYSES_INTERVAL_H_
-#define SRC_ANALYSES_INTERVAL_H_
+#ifndef CPROVER_UTIL_INTERVAL_H
+#define CPROVER_UTIL_INTERVAL_H
 
 #include <util/arith_tools.h>
 #include <util/expr.h>
@@ -69,7 +69,7 @@ public:
   {
   }
 
-  constant_interval_exprt(const exprt &x)
+  explicit constant_interval_exprt(const exprt &x)
     : constant_interval_exprt(x, x, x.type())
   {
   }
