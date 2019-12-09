@@ -5,19 +5,17 @@
 
 #include <testing-utils/use_catch.h>
 
-#include <util/interval.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
-#define V(X)   (bvrep2integer(X.get(ID_value).c_str(), 32, true))
-#define V_(X)  (bvrep2integer(X.c_str(), 32, true))
+#define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
+#define V_(X) (bvrep2integer(X.c_str(), 32, true))
 #define CEV(X) (from_integer(mp_integer(X), signedbv_typet(32)))
 
-
-SCENARIO("add interval domain",
-  "[core][analyses][interval][add]")
+SCENARIO("add interval domain", "[core][analyses][interval][add]")
 {
   GIVEN("Two simple signed intervals")
   {
@@ -38,7 +36,6 @@ SCENARIO("add interval domain",
         REQUIRE(V(right.get_lower()) == 6);
         REQUIRE(V(right.get_upper()) == 8);
       }
-
 
       THEN("The result is [8, 12]")
       {
@@ -73,7 +70,7 @@ SCENARIO("add interval domain",
 
     WHEN("Both contain infinite [2,INF]+[6,INF]")
     {
-      constant_interval_exprt left(CEV(2),  max_exprt(signedbv_typet(32)));
+      constant_interval_exprt left(CEV(2), max_exprt(signedbv_typet(32)));
       constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result = left.plus(right);

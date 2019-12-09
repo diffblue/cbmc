@@ -5,14 +5,13 @@
 
 #include <testing-utils/use_catch.h>
 
-#include <util/interval.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
-SCENARIO("bitwise interval domain",
-  "[core][analyses][interval][bitwise]")
+SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
 {
   WHEN("We have two unsigned single value intervals - 5 and 9")
   {

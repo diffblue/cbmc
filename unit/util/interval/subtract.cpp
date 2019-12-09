@@ -5,19 +5,17 @@
 
 #include <testing-utils/use_catch.h>
 
-#include <util/interval.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
-#define V(X)   (bvrep2integer(X.get(ID_value).c_str(), 32, true))
-#define V_(X)  (bvrep2integer(X.c_str(), 32, true))
+#define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
+#define V_(X) (bvrep2integer(X.c_str(), 32, true))
 #define CEV(X) (from_integer(mp_integer(X), signedbv_typet(32)))
 
-
-SCENARIO("subtract interval domain",
-  "[core][analyses][interval][subtract]")
+SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
 {
   GIVEN("Two simple signed intervals")
   {
@@ -72,7 +70,7 @@ SCENARIO("subtract interval domain",
 
     WHEN("Both contain infinite [2,INF]-[6,INF]")
     {
-      constant_interval_exprt left(CEV(2),  max_exprt(signedbv_typet(32)));
+      constant_interval_exprt left(CEV(2), max_exprt(signedbv_typet(32)));
       constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result = left.minus(right);
@@ -98,14 +96,14 @@ SCENARIO("subtract interval domain",
 
 SCENARIO("Subtracting unsigned integers")
 {
-  auto get_value = [](int x) {
-    return from_integer(x, signedbv_typet(32));
-  };
+  auto get_value = [](int x) { return from_integer(x, signedbv_typet(32)); };
 
-  WHEN("Subtracting two constant intervals") {
+  WHEN("Subtracting two constant intervals")
+  {
     auto lhs = constant_interval_exprt(get_value(10));
     auto rhs = constant_interval_exprt(get_value(3));
-    THEN("it should work") {
+    THEN("it should work")
+    {
       auto result = lhs.minus(rhs);
       REQUIRE(result.is_single_value_interval());
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
