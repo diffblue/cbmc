@@ -5,20 +5,18 @@
 
 #include <testing-utils/use_catch.h>
 
-#include <util/interval.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
 #include <util/arith_tools.h>
+#include <util/interval.h>
 #include <util/mp_arith.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
-#define V(X)   (bvrep2integer(X.get(ID_value).c_str(), 32, true))
-#define V_(X)  (bvrep2integer(X.c_str(), 32, true))
+#define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
+#define V_(X) (bvrep2integer(X.c_str(), 32, true))
 #define CEV(X) (from_integer(mp_integer(X), signedbv_typet(32)))
 
-
-SCENARIO("get extreme exprt value",
-  "[core][analyses][interval][get_extreme]")
+SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 {
   GIVEN("A selection of constant_exprts in a std::vector and map")
   {
@@ -31,71 +29,72 @@ SCENARIO("get extreme exprt value",
     {
       ve.push_back(from_integer(mp_integer(i), signedbv_typet(32)));
     }
-      WHEN("-20 <= 20 is tested")
-      {
-        binary_predicate_exprt op1(CEV(-20), ID_le, CEV(20));
-        bool interval_eval = constant_interval_exprt::less_than_or_equal(CEV(-20), CEV(20));
-        simplify(op1, ns);
-
-        THEN("Require it is TRUE")
-        {
-          REQUIRE(op1.is_true());
-          REQUIRE(interval_eval);
-        }
-      }
-
-
-      WHEN("20 <= -20 is tested")
-      {
-        binary_predicate_exprt op1(CEV(20), ID_le, CEV(-20));
-        bool interval_eval = constant_interval_exprt::less_than_or_equal(CEV(20), CEV(-20));
-        simplify(op1, ns);
-
-        THEN("Require it is FALSE")
-        {
-          REQUIRE(op1.is_false());
-          REQUIRE_FALSE(interval_eval);
-        }
-      }
-
-      WHEN("-20 <= -20 is tested")
-      {
-        binary_predicate_exprt op1(CEV(-20), ID_le, CEV(-20));
-        bool interval_eval = constant_interval_exprt::less_than_or_equal(CEV(-20), CEV(-20));
-
-        simplify(op1, ns);
-
-        THEN("Require it is TRUE")
-        {
-          REQUIRE(op1.is_true());
-          REQUIRE(interval_eval);
-          REQUIRE(constant_interval_exprt::equal(CEV(1), CEV(1)));
-        }
-      }
-
-      WHEN("Two are selected and min found [20, -20]")
-      {
-        std::vector<exprt> selected = { CEV(20), CEV(-20) };
-
-        exprt min = constant_interval_exprt::get_extreme(selected, true);
-        exprt max = constant_interval_exprt::get_extreme(selected, false);
-
-        THEN("Min (-20) and max (20) are verified")
-        {
-          CAPTURE(min.pretty());
-
-          REQUIRE(V(min) == -20);
-          REQUIRE(V(max) == 20);
-        }
-      }
-
-    WHEN("Four are selected and min found [-20, 0, 20, 50]")
+    WHEN("-20 <= 20 is tested")
     {
-      std::vector<exprt> selected = { CEV(-20), CEV(0), CEV(50), CEV(20) };
+      binary_predicate_exprt op1(CEV(-20), ID_le, CEV(20));
+      bool interval_eval =
+        constant_interval_exprt::less_than_or_equal(CEV(-20), CEV(20));
+      simplify(op1, ns);
+
+      THEN("Require it is TRUE")
+      {
+        REQUIRE(op1.is_true());
+        REQUIRE(interval_eval);
+      }
+    }
+
+    WHEN("20 <= -20 is tested")
+    {
+      binary_predicate_exprt op1(CEV(20), ID_le, CEV(-20));
+      bool interval_eval =
+        constant_interval_exprt::less_than_or_equal(CEV(20), CEV(-20));
+      simplify(op1, ns);
+
+      THEN("Require it is FALSE")
+      {
+        REQUIRE(op1.is_false());
+        REQUIRE_FALSE(interval_eval);
+      }
+    }
+
+    WHEN("-20 <= -20 is tested")
+    {
+      binary_predicate_exprt op1(CEV(-20), ID_le, CEV(-20));
+      bool interval_eval =
+        constant_interval_exprt::less_than_or_equal(CEV(-20), CEV(-20));
+
+      simplify(op1, ns);
+
+      THEN("Require it is TRUE")
+      {
+        REQUIRE(op1.is_true());
+        REQUIRE(interval_eval);
+        REQUIRE(constant_interval_exprt::equal(CEV(1), CEV(1)));
+      }
+    }
+
+    WHEN("Two are selected and min found [20, -20]")
+    {
+      std::vector<exprt> selected = {CEV(20), CEV(-20)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
 
+      THEN("Min (-20) and max (20) are verified")
+      {
+        CAPTURE(min.pretty());
+
+        REQUIRE(V(min) == -20);
+        REQUIRE(V(max) == 20);
+      }
+    }
+
+    WHEN("Four are selected and min found [-20, 0, 20, 50]")
+    {
+      std::vector<exprt> selected = {CEV(-20), CEV(0), CEV(50), CEV(20)};
+
+      exprt min = constant_interval_exprt::get_extreme(selected, true);
+      exprt max = constant_interval_exprt::get_extreme(selected, false);
 
       THEN("Min (-20) and max (50) are verified")
       {
@@ -106,7 +105,7 @@ SCENARIO("get extreme exprt value",
 
     WHEN("One is selected [-100]")
     {
-      std::vector<exprt> selected = { CEV(-100) };
+      std::vector<exprt> selected = {CEV(-100)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
@@ -120,8 +119,8 @@ SCENARIO("get extreme exprt value",
 
     WHEN("Five are selected [20, 30, 15, 0, -100]")
     {
-      std::vector<exprt> selected = { CEV(20), CEV(30), CEV(15), CEV(0), CEV(-100) };
-
+      std::vector<exprt> selected = {
+        CEV(20), CEV(30), CEV(15), CEV(0), CEV(-100)};
 
       exprt min = constant_interval_exprt::get_extreme(selected, true);
       exprt max = constant_interval_exprt::get_extreme(selected, false);
