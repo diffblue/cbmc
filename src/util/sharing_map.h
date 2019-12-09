@@ -26,7 +26,6 @@ Author: Daniel Poetzl
 #include <tuple>
 #include <type_traits>
 #include <vector>
-#include <set>
 
 #include "as_const.h"
 #include "irep.h"
@@ -391,12 +390,12 @@ public:
 
   static void insert_view_item(viewt &v, view_itemt &&vi)
   {
-      v.push_back(vi);
+    v.push_back(vi);
   }
 
   static void insert_view_item(sorted_viewt &v, view_itemt &&vi)
   {
-      v.insert(vi);
+    v.insert(vi);
   }
 
   class delta_view_itemt
@@ -448,7 +447,8 @@ public:
   /// - Best case: O(N + H)
   ///
   /// \param [out] view: Empty view
-  template <class V> void get_view(V&) const;
+  template <class V>
+  void get_view(V &) const;
   viewt get_view() const
   {
     viewt result;
@@ -495,7 +495,8 @@ public:
     const bool only_common = true) const;
 
   delta_viewt get_delta_view(
-    const sharing_mapt &other, const bool only_common=true) const;
+    const sharing_mapt &other,
+    const bool only_common = true) const;
 
   /// Call a function for every key-value pair in the map.
   ///

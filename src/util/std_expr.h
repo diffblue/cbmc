@@ -114,15 +114,17 @@ public:
   }
 };
 
-namespace std {
-  template<> struct hash<::symbol_exprt>
+namespace std
+{
+template <>
+struct hash<::symbol_exprt>
+{
+  size_t operator()(const ::symbol_exprt &sym)
   {
-    size_t operator()(const ::symbol_exprt& sym)
-    {
-      return irep_id_hash()(sym.get_identifier());
-    }
-  };
-}
+    return irep_id_hash()(sym.get_identifier());
+  }
+};
+} // namespace std
 
 /// Expression to hold a symbol (variable) with extra accessors to
 /// ID_c_static_lifetime and ID_C_thread_local
