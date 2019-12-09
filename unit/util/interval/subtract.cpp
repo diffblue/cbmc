@@ -94,7 +94,9 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
   }
 }
 
-SCENARIO("Subtracting unsigned integers")
+SCENARIO(
+  "Subtracting unsigned integers",
+  "[core][analyses][interval][subtract]")
 {
   auto get_value = [](int x) { return from_integer(x, signedbv_typet(32)); };
 
