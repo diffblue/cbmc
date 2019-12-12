@@ -51,7 +51,7 @@ string_constraint_generatort::add_axioms_for_index_of(
     binary_relation_exprt(index, ID_lt, array_pool.get_or_create_length(str)));
   constraints.existential.push_back(a1);
 
-  equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
+  equal_exprt a2(not_expr(contains), equal_exprt(index, minus1));
   constraints.existential.push_back(a2);
 
   implies_exprt a3(
@@ -76,7 +76,7 @@ string_constraint_generatort::add_axioms_for_index_of(
     m,
     lower_bound,
     zero_if_negative(array_pool.get_or_create_length(str)),
-    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
+    implies_exprt(not_expr(contains), not_expr(equal_exprt(str[m], c))));
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};
@@ -130,7 +130,7 @@ string_constraint_generatort::add_axioms_for_index_of_string(
   constraints.existential.push_back(a1);
 
   equal_exprt a2(
-    not_exprt(contains), equal_exprt(offset, from_integer(-1, index_type)));
+    not_expr(contains), equal_exprt(offset, from_integer(-1, index_type)));
   constraints.existential.push_back(a2);
 
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
@@ -160,7 +160,7 @@ string_constraint_generatort::add_axioms_for_index_of_string(
         array_pool.get_or_create_length(haystack),
         array_pool.get_or_create_length(needle)),
       from_integer(1, index_type)),
-    not_exprt(contains),
+    not_expr(contains),
     from_integer(0, index_type),
     array_pool.get_or_create_length(needle),
     haystack,
@@ -231,7 +231,7 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
   constraints.existential.push_back(a1);
 
   equal_exprt a2(
-    not_exprt(contains), equal_exprt(offset, from_integer(-1, index_type)));
+    not_expr(contains), equal_exprt(offset, from_integer(-1, index_type)));
   constraints.existential.push_back(a2);
 
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
@@ -264,7 +264,7 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
   string_not_contains_constraintt a5 = {
     from_integer(0, index_type),
     plus_exprt(end_index, from_integer(1, index_type)),
-    not_exprt(contains),
+    not_expr(contains),
     from_integer(0, index_type),
     array_pool.get_or_create_length(needle),
     haystack,
@@ -396,7 +396,7 @@ string_constraint_generatort::add_axioms_for_last_index_of(
   const string_constraintt a5(
     m,
     zero_if_negative(end_index),
-    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
+    implies_exprt(not_expr(contains), notequal_exprt(str[m], c)));
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};

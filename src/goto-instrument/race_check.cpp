@@ -54,7 +54,7 @@ public:
 
   const exprt get_assertion(const rw_set_baset::entryt &entry)
   {
-    return not_exprt(get_guard_symbol_expr(entry.object));
+    return not_expr(get_guard_symbol_expr(entry.object));
   }
 
   void add_initialization(goto_programt &goto_program) const;

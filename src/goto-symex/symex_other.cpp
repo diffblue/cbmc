@@ -52,7 +52,7 @@ void goto_symext::havoc_rec(
     havoc_rec(state, guard_t, if_expr.true_case());
 
     guardt guard_f=state.guard;
-    guard_f.add(not_exprt(if_expr.cond()));
+    guard_f.add(not_expr(if_expr.cond()));
     havoc_rec(state, guard_f, if_expr.false_case());
   }
   else if(dest.id()==ID_typecast)

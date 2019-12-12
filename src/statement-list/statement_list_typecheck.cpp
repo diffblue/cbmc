@@ -761,7 +761,7 @@ void statement_list_typecheckt::typecheck_statement_list_not(
   typecheck_instruction_without_operand(op_code);
   if(fc_bit)
   {
-    const not_exprt unsimplified{rlo_bit};
+    const exprt unsimplified = not_expr(rlo_bit);
     rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
     or_bit = false;
   }
@@ -845,7 +845,7 @@ void statement_list_typecheckt::typecheck_statement_list_or_not(
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
   const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
-  const not_exprt not_op{op};
+  const exprt not_op = not_expr(op);
 
   // If inside of a bit string, create an 'or' expression with the operand and
   // the current contents of the rlo bit.
@@ -886,7 +886,7 @@ void statement_list_typecheckt::typecheck_statement_list_xor_not(
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
   const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
-  const not_exprt not_op{op};
+  const exprt not_op = not_expr(op);
 
   // If inside of a bit string, create an 'xor not' expression with the
   // operand and the current contents of the rlo bit.
@@ -988,12 +988,12 @@ void statement_list_typecheckt::typecheck_statement_list_nesting_closed(
   {
     if(or_bit)
     {
-      const not_exprt op{rlo_bit};
+      const exprt op = not_expr(rlo_bit);
       rlo_bit = nesting_stack.back().rlo_bit;
       add_to_or_rlo_wrapper(op);
     }
     else
-      rlo_bit = and_exprt{nesting_stack.back().rlo_bit, not_exprt{rlo_bit}};
+      rlo_bit = and_exprt{nesting_stack.back().rlo_bit, not_expr(rlo_bit)};
   }
   else if(ID_statement_list_or_nested == statement)
   {
@@ -1003,7 +1003,7 @@ void statement_list_typecheckt::typecheck_statement_list_nesting_closed(
   else if(ID_statement_list_or_not_nested == statement)
   {
     or_bit = false;
-    rlo_bit = or_exprt{nesting_stack.back().rlo_bit, not_exprt{rlo_bit}};
+    rlo_bit = or_exprt{nesting_stack.back().rlo_bit, not_expr(rlo_bit)};
   }
   else if(ID_statement_list_xor_nested == statement)
   {
@@ -1013,7 +1013,7 @@ void statement_list_typecheckt::typecheck_statement_list_nesting_closed(
   else if(ID_statement_list_xor_not_nested == statement)
   {
     or_bit = false;
-    rlo_bit = xor_exprt{nesting_stack.back().rlo_bit, not_exprt{rlo_bit}};
+    rlo_bit = xor_exprt{nesting_stack.back().rlo_bit, not_expr(rlo_bit)};
   }
   nesting_stack.pop_back();
 }
@@ -1240,7 +1240,7 @@ exprt statement_list_typecheckt::typecheck_simple_boolean_instruction_operand(
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
   const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
-  const not_exprt not_op{op};
+  const exprt not_op = not_expr(op);
   return negate ? not_op : op;
 }
 

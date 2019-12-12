@@ -92,14 +92,14 @@ string_constraint_generatort::add_axioms_from_bool(
 
   std::string str_false = "false";
   const implies_exprt a3(
-    not_exprt(eq),
+    not_expr(eq),
     equal_to(array_pool.get_or_create_length(res), str_false.length()));
   constraints.existential.push_back(a3);
 
   for(std::size_t i = 0; i < str_false.length(); i++)
   {
     exprt chr = from_integer(str_false[i], char_type);
-    implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
+    implies_exprt a4(not_expr(eq), equal_exprt(res[i], chr));
     constraints.existential.push_back(a4);
   }
 
@@ -248,7 +248,7 @@ string_constraint_generatort::add_axioms_from_int_hex(
     // disallow 0s at the beginning
     if(size > 1)
       constraints.existential.push_back(
-        implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
+        implies_exprt(premise, not_expr(equal_exprt(res[0], zero_char))));
   }
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
@@ -352,7 +352,7 @@ string_constraint_generatort::add_axioms_for_correct_number_format(
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
     implies_exprt no_leading_zero_after_minus(
-      starts_with_minus, not_exprt(equal_exprt(str[1], zero_char)));
+      starts_with_minus, not_expr(equal_exprt(str[1], zero_char)));
     constraints.existential.push_back(no_leading_zero_after_minus);
   }
   return constraints;
@@ -443,7 +443,7 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     }
 
     const implies_exprt a6(
-      and_exprt(premise, not_exprt(starts_with_minus)),
+      and_exprt(premise, not_expr(starts_with_minus)),
       equal_exprt(input_int, sum));
     constraints.existential.push_back(a6);
 

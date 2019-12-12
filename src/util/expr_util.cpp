@@ -133,7 +133,7 @@ exprt boolean_negate(const exprt &src)
   else if(src.is_false())
     return true_exprt();
   else
-    return not_exprt(src);
+    return not_expr(src);
 }
 
 bool has_subexpr(

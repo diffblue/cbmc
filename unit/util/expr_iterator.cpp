@@ -52,7 +52,7 @@ SCENARIO("expr_iterator", "[core][utils][expr_iterator]")
           ++it)
       {
         if(it->id() == ID_notequal)
-          it.mutate() = not_exprt(equal_exprt(symbol, symbol));
+          it.mutate() = not_expr(equal_exprt(symbol, symbol));
 
         ids.push_back(it->id());
       }
@@ -82,7 +82,7 @@ SCENARIO("expr_iterator", "[core][utils][expr_iterator]")
         bool replace_here = it->id() == ID_notequal;
 
         if(replace_here)
-          it.mutate() = not_exprt(equal_exprt(symbol, symbol));
+          it.mutate() = not_expr(equal_exprt(symbol, symbol));
 
         ids.push_back(it->id());
 

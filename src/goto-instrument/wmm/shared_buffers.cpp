@@ -316,8 +316,7 @@ void shared_bufferst::write(
   // checking this
   const exprt buff0_used_expr=symbol_exprt(vars.w_buff0_used, bool_typet());
   const exprt buff1_used_expr=symbol_exprt(vars.w_buff1_used, bool_typet());
-  const exprt cond_expr=
-    not_exprt(and_exprt(buff1_used_expr, buff0_used_expr));
+  const exprt cond_expr = not_expr(and_exprt(buff1_used_expr, buff0_used_expr));
 
   target = goto_program.insert_before(
     target, goto_programt::make_assertion(cond_expr, source_location));
@@ -526,16 +525,11 @@ void shared_bufferst::nondet_flush(
     // or buff0 not mine and buff1 unused
     // or buff0 not mine and buff1 not mine
     // -> read from memory (and does not modify the buffer in any aspect)
-    const exprt cond_134_expr=
+    const exprt cond_134_expr = or_exprt(
+      not_expr(buff0_used_expr),
       or_exprt(
-        not_exprt(buff0_used_expr),
-        or_exprt(
-          and_exprt(
-            not_exprt(buff0_thd_expr),
-            not_exprt(buff1_used_expr)),
-          and_exprt(
-            not_exprt(buff0_thd_expr),
-            not_exprt(buff1_thd_expr))));
+        and_exprt(not_expr(buff0_thd_expr), not_expr(buff1_used_expr)),
+        and_exprt(not_expr(buff0_thd_expr), not_expr(buff1_thd_expr))));
     const exprt val_134_expr=lhs;
     const exprt buff0_used_134_expr=buff0_used_expr;
     const exprt buff1_used_134_expr=buff1_used_expr;
@@ -559,12 +553,10 @@ void shared_bufferst::nondet_flush(
     // (5)
     // buff0 and buff1 are used, buff0 is not mine, buff1 is mine
     // -> read from buff1
-    const exprt cond_5_expr=
+    const exprt cond_5_expr = and_exprt(
+      buff0_used_expr,
       and_exprt(
-        buff0_used_expr,
-        and_exprt(
-          buff1_used_expr,
-          and_exprt(not_exprt(buff0_thd_expr), buff1_thd_expr)));
+        buff1_used_expr, and_exprt(not_expr(buff0_thd_expr), buff1_thd_expr)));
     const exprt val_5_expr=buff1_expr;
     const exprt buff0_used_5_expr=buff0_used_expr;
     const exprt buff1_used_5_expr=false_exprt();
@@ -701,7 +693,7 @@ void shared_bufferst::nondet_flush(
     // (1)
     // if buff0 unused
     // -> read from memory (and does not modify the buffer in any aspect)
-    const exprt cond_1_expr=not_exprt(buff0_used_expr);
+    const exprt cond_1_expr = not_expr(buff0_used_expr);
     const exprt val_1_expr=lhs;
     const exprt buff0_used_1_expr=buff0_used_expr;
     const exprt buff1_used_1_expr=buff1_used_expr;
@@ -726,12 +718,9 @@ void shared_bufferst::nondet_flush(
     // (3)
     // if buff0 used and not mine, and buff1 not used
     // -> read from buff0 or memory
-    const exprt cond_3_expr=
-      and_exprt(
-        buff0_used_expr,
-        and_exprt(
-          not_exprt(buff0_thd_expr),
-          not_exprt(buff1_used_expr)));
+    const exprt cond_3_expr = and_exprt(
+      buff0_used_expr,
+      and_exprt(not_expr(buff0_thd_expr), not_expr(buff1_used_expr)));
     const exprt val_3_expr=if_exprt(choice0_expr, buff0_expr, lhs);
     const exprt buff0_used_3_expr=choice0_expr;
     const exprt buff1_used_3_expr=false_exprt();
@@ -743,10 +732,9 @@ void shared_bufferst::nondet_flush(
     // (4)
     // buff0 and buff1 are both used, and both not mine
     // -> read from memory or buff0 or buff1
-    const exprt cond_4_expr=
-      and_exprt(
-        and_exprt(buff0_used_expr, not_exprt(buff1_thd_expr)),
-        and_exprt(buff1_used_expr, not_exprt(buff0_thd_expr)));
+    const exprt cond_4_expr = and_exprt(
+      and_exprt(buff0_used_expr, not_expr(buff1_thd_expr)),
+      and_exprt(buff1_used_expr, not_expr(buff0_thd_expr)));
     const exprt val_4_expr=
       if_exprt(
         choice0_expr,
@@ -755,8 +743,8 @@ void shared_bufferst::nondet_flush(
           choice1_expr,
           buff0_expr,
           buff1_expr));
-    const exprt buff0_used_4_expr=
-      or_exprt(choice0_expr, not_exprt(choice1_expr));
+    const exprt buff0_used_4_expr =
+      or_exprt(choice0_expr, not_expr(choice1_expr));
     const exprt buff1_used_4_expr=choice0_expr;
     const exprt buff0_4_expr=buff0_expr;
     const exprt buff1_4_expr=buff1_expr;
@@ -767,10 +755,9 @@ void shared_bufferst::nondet_flush(
     // (5)
     // buff0 and buff1 are both used, and buff0 not mine, and buff1 mine
     // -> read buff1 or buff0
-    const exprt cond_5_expr=
-      and_exprt(
-        and_exprt(buff0_used_expr, buff1_thd_expr),
-        and_exprt(buff1_used_expr, not_exprt(buff0_thd_expr)));
+    const exprt cond_5_expr = and_exprt(
+      and_exprt(buff0_used_expr, buff1_thd_expr),
+      and_exprt(buff1_used_expr, not_expr(buff0_thd_expr)));
     const exprt val_5_expr=
       if_exprt(
         choice0_expr,

@@ -366,7 +366,7 @@ simplify_exprt::simplify_ieee_float_relation(const binary_relation_exprt &expr)
     {
     }
     else if(expr.id()==ID_ieee_float_equal)
-      isnan = not_exprt(isnan);
+      isnan = not_expr(isnan);
     else
       UNREACHABLE;
 

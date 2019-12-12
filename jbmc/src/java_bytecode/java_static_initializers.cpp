@@ -604,7 +604,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   {
     exprt assumption = gen_clinit_eqexpr(
       clinit_state_sym.symbol_expr(), clinit_statest::IN_PROGRESS);
-    assumption = not_exprt(assumption);
+    assumption = not_expr(assumption);
     code_assumet assume(assumption);
     function_body.add(assume);
   }

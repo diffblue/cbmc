@@ -73,8 +73,8 @@ void goto_symex_property_decidert::convert_goals()
   {
     // Our goal is to falsify a property, i.e., we will
     // add the negation of the property as goal.
-    goal_pair.second.condition = solver->decision_procedure().handle(
-      not_exprt(goal_pair.second.as_expr()));
+    goal_pair.second.condition =
+      solver->decision_procedure().handle(not_expr(goal_pair.second.as_expr()));
   }
 }
 

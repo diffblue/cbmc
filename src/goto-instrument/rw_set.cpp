@@ -186,7 +186,7 @@ void _rw_set_loct::read_write_rec(
     read_write_rec(if_expr.true_case(), r, w, suffix, true_guard);
 
     exprt::operandst false_guard = guard_conjuncts;
-    false_guard.push_back(not_exprt(if_expr.cond()));
+    false_guard.push_back(not_expr(if_expr.cond()));
     read_write_rec(if_expr.false_case(), r, w, suffix, false_guard);
   }
   else

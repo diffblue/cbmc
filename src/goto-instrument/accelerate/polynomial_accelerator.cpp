@@ -459,7 +459,7 @@ bool polynomial_acceleratort::fit_const(
   scratch_programt program(symbol_table, message_handler);
 
   program.append(body);
-  program.add_instruction(ASSERT)->guard=equal_exprt(target, not_exprt(target));
+  program.add_instruction(ASSERT)->guard=equal_exprt(target, not_expr(target));
 
   try
   {
@@ -599,7 +599,7 @@ void polynomial_acceleratort::assert_for_values(
   exprt overflow_expr;
   overflow.overflow_expr(rhs, overflow_expr);
 
-  program.add(goto_programt::make_assumption(not_exprt(overflow_expr)));
+  program.add(goto_programt::make_assumption(not_expr(overflow_expr)));
 
   rhs=typecast_exprt(rhs, target.type());
 

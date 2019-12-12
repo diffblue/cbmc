@@ -73,7 +73,7 @@ string_constraint_generatort::add_axioms_for_equals(
         array_pool.get_or_create_length(s1),
         array_pool.get_or_create_length(s2)),
       equal_exprt(witness, from_integer(-1, index_type)));
-    return implies_exprt(not_exprt(eq), or_exprt(diff_length, witnessing));
+    return implies_exprt(not_expr(eq), or_exprt(diff_length, witnessing));
   }());
 
   return {tc_eq, std::move(constraints)};
@@ -171,9 +171,9 @@ string_constraint_generatort::add_axioms_for_equals_ignore_case(
     binary_relation_exprt(witness, ID_ge, zero));
   const exprt witness_eq = character_equals_ignore_case(
     s1[witness], s2[witness], char_a, char_A, char_Z);
-  const not_exprt witness_diff(witness_eq);
+  const exprt witness_diff = not_expr(witness_eq);
   const implies_exprt a3(
-    not_exprt(eq),
+    not_expr(eq),
     or_exprt(
       notequal_exprt(
         array_pool.get_or_create_length(s1),
@@ -267,7 +267,7 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const and_exprt cond2(ret_length_diff, guard2);
 
   const implies_exprt a3(
-    not_exprt(res_null),
+    not_expr(res_null),
     and_exprt(
       binary_relation_exprt(x, ID_ge, from_integer(0, return_type)),
       or_exprt(cond1, cond2)));
@@ -277,7 +277,7 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const string_constraintt a4(
     i2,
     zero_if_negative(x),
-    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
+    implies_exprt(not_expr(res_null), equal_exprt(s1[i2], s2[i2])));
   constraints.universal.push_back(a4);
 
   return {res, std::move(constraints)};

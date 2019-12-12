@@ -91,27 +91,27 @@ exprt good_pointer_def(
   CHECK_RETURN(size_of_expr_opt.has_value());
 
   const or_exprt good_dynamic_tmp1(
-    not_exprt(malloc_object(pointer, ns)),
+    not_expr(malloc_object(pointer, ns)),
     and_exprt(
-      not_exprt(dynamic_object_lower_bound(pointer, nil_exprt())),
-      not_exprt(
+      not_expr(dynamic_object_lower_bound(pointer, nil_exprt())),
+      not_expr(
         dynamic_object_upper_bound(pointer, ns, size_of_expr_opt.value()))));
 
   const and_exprt good_dynamic_tmp2(
-    not_exprt(deallocated(pointer, ns)), good_dynamic_tmp1);
+    not_expr(deallocated(pointer, ns)), good_dynamic_tmp1);
 
   const or_exprt good_dynamic(
-    not_exprt(dynamic_object(pointer)), good_dynamic_tmp2);
+    not_expr(dynamic_object(pointer)), good_dynamic_tmp2);
 
-  const not_exprt not_null(null_pointer(pointer));
+  const exprt not_null = not_expr(null_pointer(pointer));
 
-  const not_exprt not_invalid{is_invalid_pointer_exprt{pointer}};
+  const exprt not_invalid = not_expr(is_invalid_pointer_exprt{pointer});
 
   const or_exprt bad_other(
     object_lower_bound(pointer, nil_exprt()),
     object_upper_bound(pointer, size_of_expr_opt.value()));
 
-  const or_exprt good_other(dynamic_object(pointer), not_exprt(bad_other));
+  const or_exprt good_other(dynamic_object(pointer), not_expr(bad_other));
 
   return and_exprt(
     not_null,

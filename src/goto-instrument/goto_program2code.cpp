@@ -566,7 +566,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
   if(target->get_target()==after_loop)
   {
-    w.cond()=not_exprt(target->guard);
+    w.cond() = not_expr(target->guard);
     simplify(w.cond(), ns);
   }
   else if(target->guard.is_true())
@@ -592,7 +592,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   }
   else if(!loop_end->guard.is_true())
   {
-    code_ifthenelset i(not_exprt(loop_end->guard), code_breakt());
+    code_ifthenelset i(not_expr(loop_end->guard), code_breakt());
     simplify(i.cond(), ns);
 
     copy_source_location(target, i);
@@ -1064,7 +1064,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return convert_goto_goto(target, dest);
   }
 
-  code_ifthenelset i(not_exprt(target->guard), code_blockt());
+  code_ifthenelset i(not_expr(target->guard), code_blockt());
   copy_source_location(target, i);
   simplify(i.cond(), ns);
 
@@ -1706,7 +1706,7 @@ void goto_program2codet::cleanup_code_ifthenelse(
     code.get_statement() == ID_ifthenelse &&
     i_t_e.then_case().get_statement() == ID_skip)
   {
-    not_exprt tmp(i_t_e.cond());
+    exprt tmp = not_expr(i_t_e.cond());
     simplify(tmp, ns);
     // simplification might have removed essential type casts
     cleanup_expr(tmp, false);

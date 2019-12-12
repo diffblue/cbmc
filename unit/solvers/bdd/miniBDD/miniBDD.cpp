@@ -193,7 +193,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     prop_conv_solvert solver(bdd_prop, null_message_handler);
 
     symbol_exprt var("x", bool_typet());
-    literalt result = solver.convert(and_exprt(var, not_exprt(var)));
+    literalt result = solver.convert(and_exprt(var, not_expr(var)));
 
     REQUIRE(result.is_false());
   }
@@ -330,7 +330,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     symbol_exprt a("a", bool_typet());
     symbol_exprt b("b", bool_typet());
 
-    or_exprt o(and_exprt(a, b), not_exprt(a));
+    or_exprt o(and_exprt(a, b), not_expr(a));
 
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);

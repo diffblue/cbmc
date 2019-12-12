@@ -215,7 +215,7 @@ const exprt qbf_squolem_coret::f_get(literalt l)
     #endif
 
     if(l.sign())
-      return not_exprt(it->second);
+      return not_expr(it->second);
     else
       return it->second;
   }
@@ -237,7 +237,7 @@ const exprt qbf_squolem_coret::f_get(literalt l)
     function_cache[l.var_no()]=res;
 
     if(l.sign())
-      return not_exprt(res);
+      return not_expr(res);
     else
       return res;
   }

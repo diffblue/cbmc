@@ -67,7 +67,7 @@ instrument_equal_operands(const exprt &lhs, const exprt &rhs)
   {
     // lhs == rhs is equivalent to X lhs; XN rhs;
     result.push_back(lhs);
-    result.push_back(not_exprt{rhs});
+    result.push_back(not_expr(rhs));
   }
   else if(ID_not != lhs.id() && ID_not == rhs.id())
   {

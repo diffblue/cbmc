@@ -56,9 +56,9 @@ void collect_mcdc_controlling_rec(
 
             for(std::size_t j = 0; j < operands.size(); j++)
             {
-              others1.push_back(not_exprt(operands[j]));
+              others1.push_back(not_expr(operands[j]));
               if(i != j)
-                others2.push_back(not_exprt(operands[j]));
+                others2.push_back(not_expr(operands[j]));
               else
                 others2.push_back((operands[j]));
             }
@@ -88,7 +88,7 @@ void collect_mcdc_controlling_rec(
             if(i != j)
             {
               if(src.id() == ID_or)
-                others.push_back(not_exprt(operands[j]));
+                others.push_back(not_expr(operands[j]));
               else
                 others.push_back(operands[j]);
             }
@@ -661,7 +661,7 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string comment_t = description + " '" + p_string + "' true";
       goto_program.insert_before_swap(i_it);
-      *i_it = goto_programt::make_assertion(not_exprt(p), source_location);
+      *i_it = goto_programt::make_assertion(not_expr(p), source_location);
       i_it->source_location.set_comment(comment_t);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
       i_it->source_location.set_property_class(property_class);
@@ -694,7 +694,7 @@ void cover_mcdc_instrumentert::instrument(
         "MC/DC independence condition '" + p_string + "'";
 
       goto_program.insert_before_swap(i_it);
-      *i_it = goto_programt::make_assertion(not_exprt(p), source_location);
+      *i_it = goto_programt::make_assertion(not_expr(p), source_location);
       i_it->source_location.set_comment(description);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
       i_it->source_location.set_property_class(property_class);

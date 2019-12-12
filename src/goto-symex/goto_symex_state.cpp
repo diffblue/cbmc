@@ -401,7 +401,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       }
     }
 
-    not_exprt no_write(write_guard.as_expr());
+    not_exprt no_write = not_expr(write_guard.as_expr());
 
     // we cannot determine for sure that there has been a write already
     // so generate a read even if l1_identifier has been written on

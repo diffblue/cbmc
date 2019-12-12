@@ -510,7 +510,7 @@ void symex_target_equationt::convert_assertions(
       step.cond_handle = decision_procedure.handle(implication);
 
       // store disjunct
-      disjuncts.push_back(not_exprt(step.cond_handle));
+      disjuncts.push_back(not_expr(step.cond_handle));
     }
     else if(step.is_assume())
     {

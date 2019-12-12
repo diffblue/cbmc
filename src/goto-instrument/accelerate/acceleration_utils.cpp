@@ -398,7 +398,7 @@ bool acceleration_utilst::do_assumptions(
     program.assume(*it);
   }
 
-  program.assume(not_exprt(condition));
+  program.assume(not_expr(condition));
 
   program.assign(
     loop_counter,
@@ -427,7 +427,7 @@ bool acceleration_utilst::do_assumptions(
 
   program.add(goto_programt::make_assertion(condition));
 
-  guard=not_exprt(condition);
+  guard = not_expr(condition);
   simplify(guard, ns);
 
 #ifdef DEBUG
@@ -485,7 +485,7 @@ void acceleration_utilst::ensure_no_overflows(scratch_programt &program)
 #endif
 
   instrumenter.add_overflow_checks();
-  program.add(goto_programt::make_assumption(not_exprt(overflow_var)));
+  program.add(goto_programt::make_assumption(not_expr(overflow_var)));
 
   // goto_functionst::goto_functiont fn;
   // fn.body.instructions.swap(program.instructions);
@@ -728,7 +728,7 @@ bool acceleration_utilst::do_arrays(
           ++it)
       {
         idx_touched_operands.push_back(
-          not_exprt(equal_exprt(idx, it->to_expr())));
+          not_expr(equal_exprt(idx, it->to_expr())));
       }
 
       exprt idx_not_touched=conjunction(idx_touched_operands);

@@ -271,7 +271,7 @@ TEST_CASE("Simplify cast from bool", "[core][util]")
 
     exprt simp = simplify_expr(comparison, ns);
 
-    REQUIRE(simp == not_exprt(B));
+    REQUIRE(simp == not_expr(B));
   }
 
   {
@@ -283,7 +283,7 @@ TEST_CASE("Simplify cast from bool", "[core][util]")
 
     exprt simp = simplify_expr(comparison, ns);
 
-    REQUIRE(simp == not_exprt(B));
+    REQUIRE(simp == not_expr(B));
   }
 
   {

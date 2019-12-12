@@ -136,7 +136,7 @@ void all_paths_enumeratort::extend_path(
 
   if(t->is_goto())
   {
-    guard = not_exprt(t->get_condition());
+    guard = not_expr(t->get_condition());
 
     for(goto_programt::targetst::iterator it=t->targets.begin();
         it != t->targets.end();
