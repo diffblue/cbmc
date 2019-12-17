@@ -15,6 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/json.h>
 #include <util/json_irep.h>
+#include <util/string2int.h>
 #include <util/ui_message.h>
 #include <util/xml.h>
 #include <util/xml_irep.h>
@@ -188,8 +189,10 @@ get_sorted_properties(const propertiest &properties)
     sorted_properties.push_back(p_it);
   // now determine an ordering for those goals:
   // 1. alphabetical ordering of file name
-  // 2. numerical ordering of line number
-  // 3. alphabetical ordering of goal ID
+  // 2. alphabetical ordering of function name
+  // 3. numerical ordering of line number
+  // 4. alphabetical ordering of goal ID
+  // 5. number ordering of the goal ID number
   std::sort(
     sorted_properties.begin(),
     sorted_properties.end(),
@@ -198,11 +201,49 @@ get_sorted_properties(const propertiest &properties)
       const auto &p2 = pit2->second.pc->source_location;
       if(p1.get_file() != p2.get_file())
         return id2string(p1.get_file()) < id2string(p2.get_file());
-      else if(!p1.get_line().empty() && !p2.get_line().empty())
+      if(p1.get_function() != p2.get_function())
+        return id2string(p1.get_function()) < id2string(p2.get_function());
+      else if(
+        !p1.get_line().empty() && !p2.get_line().empty() &&
+        p1.get_line() != p2.get_line())
         return std::stoul(id2string(p1.get_line())) <
                std::stoul(id2string(p2.get_line()));
+
+      const auto split_property_id =
+        [](const irep_idt &property_id) -> std::pair<std::string, std::size_t> {
+        const auto property_string = id2string(property_id);
+        const auto last_dot = property_string.rfind('.');
+        std::string property_name;
+        std::string property_number;
+        if(last_dot == std::string::npos)
+        {
+          property_name = "";
+          property_number = property_string;
+        }
+        else
+        {
+          property_name = property_string.substr(0, last_dot);
+          property_number = property_string.substr(last_dot + 1);
+        }
+        const auto maybe_number = string2optional_size_t(property_number);
+        if(maybe_number.has_value())
+          return std::make_pair(property_name, *maybe_number);
+        else
+          return std::make_pair(property_name, 0);
+      };
+
+      const auto left_split = split_property_id(pit1->first);
+      const auto left_id_name = left_split.first;
+      const auto left_id_number = left_split.second;
+
+      const auto right_split = split_property_id(pit2->first);
+      const auto right_id_name = left_split.first;
+      const auto right_id_number = left_split.second;
+
+      if(left_id_name != right_id_name)
+        return left_id_name < right_id_name;
       else
-        return id2string(pit1->first) < id2string(pit2->first);
+        return left_id_number < right_id_number;
     });
   return sorted_properties;
 }
