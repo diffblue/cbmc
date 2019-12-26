@@ -245,7 +245,7 @@ require manual modification of build files.
    ```
 4. Generate build files with CMake:
    ```
-   cmake -H. -Bbuild
+   cmake -S . -Bbuild
    ```
    This command tells CMake to use the configuration in the current directory,
    and to generate build files into the `build` directory.  This is the point
@@ -314,7 +314,7 @@ If compiling with cmake:
 1. Add the `-DCMAKE_USE_CUDD=true` flag to the `cmake` configuration phase.
    For instance:
    ```
-   cmake -H. -Bbuild -DCMAKE_USE_CUDD=true
+   cmake -S . -Bbuild -DCMAKE_USE_CUDD=true
    ```
 2. Run the build:
    ```
@@ -336,6 +336,6 @@ compilation flag:
     ```
   * If compiling with CMake:
     ```
-    cmake -H. -Bbuild -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
+    cmake -S . -Bbuild -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
     ```
     and then `cmake --build build`

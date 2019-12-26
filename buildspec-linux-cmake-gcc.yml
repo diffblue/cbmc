@@ -16,7 +16,7 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++'
+      - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++'
       - git submodule update --init --recursive
       - cmake --build build -- -j2
   post_build:
