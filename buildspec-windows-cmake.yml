@@ -22,7 +22,7 @@ phases:
         $Env:PATH = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$Env:PATH"
         & .\scripts\vcvars64.ps1
         git submodule update --init --recursive
-        cmake "-H." -Bbuild -G Ninja "-DCMAKE_C_COMPILER=clcache.exe" "-DCMAKE_CXX_COMPILER=clcache.exe" -DCMAKE_BUILD_TYPE=Release
+        cmake -S . -Bbuild -G Ninja "-DCMAKE_C_COMPILER=clcache.exe" "-DCMAKE_CXX_COMPILER=clcache.exe" -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release --target cbmc
         cmake --build build --config Release --target jbmc
         cmake --build build --config Release --target unit

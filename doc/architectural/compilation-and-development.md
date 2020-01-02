@@ -186,7 +186,7 @@ obtain an HTML report for the test and unit tests, first build the dedicated
 coverage configuration using CMake (setting `enable_coverage` and building the
 `coverage` target):
 
-    cmake -H. -Bcov-build -Denable_coverage=1 -Dparallel_tests=2
+    cmake -S . -Bcov-build -Denable_coverage=1 -Dparallel_tests=2
     make -C cov-build coverage
 
 This configures a build environment in the `cov-build/` folder with coverage
