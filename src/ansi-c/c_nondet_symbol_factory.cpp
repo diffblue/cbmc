@@ -54,6 +54,13 @@ void symbol_factoryt::gen_nondet_init(
     const pointer_typet &pointer_type=to_pointer_type(type);
     const typet &subtype = pointer_type.subtype();
 
+    if(subtype.id() == ID_code)
+    {
+      assignments.add(
+        code_assignt{expr, side_effect_expr_nondett{pointer_type, loc}});
+      return;
+    }
+
     if(subtype.id() == ID_struct_tag)
     {
       const irep_idt struct_tag = to_struct_tag_type(subtype).get_identifier();

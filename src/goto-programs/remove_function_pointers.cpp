@@ -416,7 +416,39 @@ void remove_function_pointerst::remove_function_pointer(
     t->source_location.set_property_class("pointer dereference");
     t->source_location.set_comment("invalid function pointer");
   }
-  new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
+
+  const auto calling_from_entry = [&function_id, this]() -> bool {
+    const auto &cprover_start =
+      to_code_block(to_code(ns.lookup(CPROVER_PREFIX "_start").value));
+    for(const auto &statement_code : cprover_start.statements())
+    {
+      if(statement_code.get_statement() == ID_function_call)
+      {
+        const auto f_call = to_code_function_call(statement_code);
+        if(
+          f_call.function().id() == ID_symbol &&
+          to_symbol_expr(f_call.function()).get_identifier() == function_id)
+          return true;
+      }
+    }
+    return false;
+  };
+  const auto target_is_param = [&function_id, &pointer, this]() -> bool {
+    for(const auto &param :
+        to_code_type(ns.lookup(function_id).type).parameters())
+    {
+      if(param.get_identifier() == to_symbol_expr(pointer).get_identifier())
+        return true;
+    }
+    return false;
+  };
+
+  // do not cut this execution if the function pointer is the parameter of the
+  // entry point
+  if(functions.empty() && calling_from_entry() && target_is_param())
+    ;
+  else
+    new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
 
   goto_programt new_code;
 
