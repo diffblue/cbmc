@@ -5,6 +5,7 @@
 import re
 import subprocess
 import json
+import os
 
 
 def clean(s):
@@ -51,6 +52,17 @@ class Reachable:
             funcname = function['function']
             filename = function['file name']
             filename = srcloc.clean_path(filename)
+
+            # Declare as reachable functions only those functions in
+            # files under the source root.  This is the code under
+            # test, and this is the code we annotate and display in
+            # the report.
+            #
+            # srcloc.clean_path above returns paths relative to the
+            # source root for all files under the source root, and
+            # absolute paths for all other files.
+            if os.path.isabs(filename):
+                continue
 
             # goto-analyzer constructs useless file names for built-ins
             match = re.match('^.*(<[^>]*>)$', filename)

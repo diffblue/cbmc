@@ -114,7 +114,7 @@ class SourceLocation:
 
             # Compute file path relative to root
             # src_file may be an absolute path or relative to src_dir
-            path = ('' if src_file.startswith('/') else src_dir + '/') + src_file
+            path = os.path.join(src_dir, src_file)
             path = make_linux_normpath(path)
             path = self.strip_root(path)
 
