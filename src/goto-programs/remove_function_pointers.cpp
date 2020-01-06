@@ -447,8 +447,8 @@ void remove_function_pointerst::remove_function_pointer(
   // entry point
   if(functions.empty() && calling_from_entry() && target_is_param())
     ;
-  else
-    new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
+  //else
+  new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
 
   goto_programt new_code;
 

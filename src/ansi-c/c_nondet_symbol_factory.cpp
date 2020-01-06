@@ -54,10 +54,44 @@ void symbol_factoryt::gen_nondet_init(
     const pointer_typet &pointer_type=to_pointer_type(type);
     const typet &subtype = pointer_type.subtype();
 
+    //TODO check if really is not target candidate
     if(subtype.id() == ID_code)
     {
+      symbolt function_symbol;
+      code_typet function_type = to_code_type(subtype);
+
+      for(size_t index = 0; index < function_type.parameters().size(); index++)
+      {
+        auto &param = function_type.parameters().at(index);
+        symbolt param_symbol;
+        param_symbol.type = param.type();
+        param_symbol.name = "param" + std::to_string(index);
+        param_symbol.base_name = param_symbol.name;
+        param_symbol.pretty_name = param_symbol.name;
+        param_symbol.mode = "C";
+        param_symbol.is_parameter = true;
+        //TODO check if not present
+        symbol_table.add(param_symbol);
+        param.set_identifier(param_symbol.name);
+        //TODO flags
+      }
+      function_symbol.type = function_type;
+      code_blockt function_body;
+      function_body.add(
+        code_returnt{side_effect_expr_nondett{function_type.return_type()}});
+      function_symbol.value = function_body;
+      //      function_symbol.name = CPROVER_PREFIX "_generated_function";
+      function_symbol.name = "my_generated_function";
+      function_symbol.base_name = function_symbol.name;
+      function_symbol.pretty_name = function_symbol.name;
+      function_symbol.mode = "C";
+      //TODO set flags
+      symbol_table.add(function_symbol);
+
+      // assignments.add(
+      //   code_assignt{expr, side_effect_expr_nondett{pointer_type, loc}});
       assignments.add(
-        code_assignt{expr, side_effect_expr_nondett{pointer_type, loc}});
+        code_assignt{expr, address_of_exprt{function_symbol.symbol_expr()}});
       return;
     }
 
