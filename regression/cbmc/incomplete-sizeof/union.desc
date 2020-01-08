@@ -1,0 +1,9 @@
+CORE
+union.c
+
+^EXIT=6$
+^SIGNAL=0$
+^file union.c line \d+ function main: invalid application of \'sizeof\' to an incomplete type$
+^CONVERSION ERROR$
+--
+^warning: ignoring
