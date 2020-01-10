@@ -305,6 +305,9 @@ def main():
     parser = command_line_parser()
     args = parser.parse_args()
 
+    args.srcdir = os.path.abspath(args.srcdir) if args.srcdir else None
+    args.blddir = os.path.abspath(args.blddir) if args.blddir else None
+
     # blddir defaults to srcdir
     args.blddir = args.blddir or args.srcdir
 
