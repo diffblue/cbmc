@@ -351,9 +351,11 @@ def main():
 ################################################################
 
 if __name__ == "__main__":
+    # pylint: disable=bare-except
     try:
         main()
-    # pylint: disable=bare-except
+    except SystemExit:
+        pass
     except:
         print('\ncbmc-viewer has encountered an error.\n')
         print(textwrap.fill(textwrap.dedent("""\
