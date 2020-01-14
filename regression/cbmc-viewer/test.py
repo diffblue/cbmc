@@ -136,7 +136,7 @@ def flatten_command_list(commands):
     return ret
 
 
-def generateReport(options):
+def generateReport(options, env):
     """Generate the HTML report with CBMC-viewer."""
 
     _commands = [{
@@ -195,7 +195,8 @@ def generateReport(options):
             proc = subprocess.run(command["command"],
                                   stdout=handle,
                                   stderr=subprocess.PIPE,
-                                  universal_newlines=True)
+                                  universal_newlines=True,
+                                  env=env)
         except FileNotFoundError:
             logging.error("Failed to run command '%s' in directory %s.",
                           " ".join(command["command"]), os.getcwd())
@@ -253,6 +254,21 @@ def main():
 
     set_up_loggers(args)
 
+    # Path to root of cbmc source tree
+    source_root = os.path.abspath(
+        os.path.join(os.path.dirname(__file__) or '.', "..", "..")
+    )
+    # Paths to cbmc tools built by make
+    paths = [os.path.join(source_root, "src", tool) for tool in
+             ['cbmc', 'goto-cc', 'goto-instrument', 'goto-analyzer']]
+    # Path to cbmc tools built by cmake
+    paths.append(os.path.join(source_root, "build", "bin"))
+    # Path to cbmc-viewer script
+    paths.append(os.path.join(source_root, "scripts", "cbmc-viewer"))
+    # Add tool paths to the environment of the test
+    env = os.environ
+    env['PATH'] = ":".join(paths) + ":" + env['PATH']
+
     testdir = os.getcwd()
     total_tests = len(next(os.walk(testdir))[1])
     failed_results = 0
@@ -264,7 +280,7 @@ def main():
                 options.append(option.strip())
 
         os.chdir(test)
-        generateReport(options)
+        generateReport(options, env)
         if treeDiff(expected) == (expected == "pass"):
             logging.info('[OK] %s', test)
         else:
