@@ -267,7 +267,7 @@ def main():
     paths.append(os.path.join(source_root, "scripts", "cbmc-viewer"))
     # Add tool paths to the environment of the test
     env = os.environ
-    env['PATH'] = ":".join(paths) + ":" + env['PATH']
+    env['PATH'] = os.pathsep.join(paths) + os.pathsep + env['PATH']
 
     testdir = os.getcwd()
     total_tests = len(next(os.walk(testdir))[1])
