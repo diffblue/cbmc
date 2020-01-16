@@ -951,6 +951,21 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   }
   else
   {
+    if(
+      (type.id() == ID_struct_tag &&
+       follow_tag(to_struct_tag_type(type)).is_incomplete()) ||
+      (type.id() == ID_union_tag &&
+       follow_tag(to_union_tag_type(type)).is_incomplete()) ||
+      (type.id() == ID_c_enum_tag &&
+       follow_tag(to_c_enum_tag_type(type)).is_incomplete()) ||
+      (type.id() == ID_array && to_array_type(type).is_incomplete()))
+    {
+      error().source_location = expr.source_location();
+      error() << "invalid application of \'sizeof\' to an incomplete type\n\t\'"
+              << to_string(type) << "\'" << eom;
+      throw 0;
+    }
+
     auto size_of_opt = size_of_expr(type, *this);
 
     if(!size_of_opt.has_value())
