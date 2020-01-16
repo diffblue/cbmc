@@ -11,6 +11,8 @@ phases:
       - choco install cyg-get -y --no-progress
       - cyg-get bash patch bison flex make wget perl jq
       - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+      - cyg-get python3 python3-pip
+      - pip3 install lxml
 
   build:
     commands:
