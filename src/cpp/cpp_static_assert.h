@@ -17,7 +17,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_static_assertt : public binary_exprt
 {
 public:
-  cpp_static_assertt() : binary_exprt(ID_cpp_static_assert)
+  cpp_static_assertt(exprt _cond, exprt _description)
+    : binary_exprt(
+        std::move(_cond),
+        ID_cpp_static_assert,
+        std::move(_description),
+        typet())
   {
   }
 
