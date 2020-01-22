@@ -188,13 +188,14 @@ using propertyt = std::pair<irep_idt, property_infot>;
 /// 3. numerical ordering of line number
 /// 4. alphabetical ordering of goal ID
 /// 5. number ordering of the goal ID number
-/// \param pit1: The first property.
-/// \param pit2: The second propery.
+/// \param property1: The first property.
+/// \param property2: The second propery.
 /// \return True if the first property is less than the second property
-static bool is_property_less_than(const propertyt &pit1, const propertyt &pit2)
+static bool
+is_property_less_than(const propertyt &property1, const propertyt &property2)
 {
-  const auto &p1 = pit1.second.pc->source_location;
-  const auto &p2 = pit2.second.pc->source_location;
+  const auto &p1 = property1.second.pc->source_location;
+  const auto &p2 = property2.second.pc->source_location;
   if(p1.get_file() != p2.get_file())
     return id2string(p1.get_file()) < id2string(p2.get_file());
   if(p1.get_function() != p2.get_function())
@@ -228,11 +229,11 @@ static bool is_property_less_than(const propertyt &pit1, const propertyt &pit2)
       return std::make_pair(property_name, 0);
   };
 
-  const auto left_split = split_property_id(pit1.first);
+  const auto left_split = split_property_id(property1.first);
   const auto left_id_name = left_split.first;
   const auto left_id_number = left_split.second;
 
-  const auto right_split = split_property_id(pit2.first);
+  const auto right_split = split_property_id(property2.first);
   const auto right_id_name = left_split.first;
   const auto right_id_number = left_split.second;
 
