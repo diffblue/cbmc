@@ -234,8 +234,8 @@ is_property_less_than(const propertyt &property1, const propertyt &property2)
   const auto left_id_number = left_split.second;
 
   const auto right_split = split_property_id(property2.first);
-  const auto right_id_name = left_split.first;
-  const auto right_id_number = left_split.second;
+  const auto right_id_name = right_split.first;
+  const auto right_id_number = right_split.second;
 
   if(left_id_name != right_id_name)
     return left_id_name < right_id_name;

@@ -69,4 +69,34 @@ TEST_CASE("Comparing two properties", "[core][goto-checker][report_util]")
       }
     }
   }
+  SECTION("Compare property ids")
+  {
+    goto_programt::instructionst instructions;
+    instructions.push_back(instruction_for_location("fileA", "funcA", 1));
+
+    std::vector<irep_idt> properties;
+    properties.push_back("A.1");
+    properties.push_back("A.2");
+    properties.push_back("B.1");
+    properties.push_back("B.2");
+
+    for(auto first_property = properties.begin();
+        first_property != properties.end();
+        ++first_property)
+    {
+      for(auto second_property = std::next(first_property);
+          second_property != properties.end();
+          ++second_property)
+      {
+        const propertyt p1 =
+          property(*first_property, test_info(instructions.begin()));
+        const propertyt p2 =
+          property(*second_property, test_info(instructions.begin()));
+        INFO(p1);
+        INFO(p2);
+        REQUIRE(is_property_less_than(p1, p2));
+        REQUIRE_FALSE(is_property_less_than(p2, p1));
+      }
+    }
+  }
 }
