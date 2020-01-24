@@ -1,0 +1,12 @@
+CORE
+main.c
+--function func --min-null-tree-depth 10 --max-nondet-tree-depth 3 --harness-type call-function --treat-pointers-equal 'p,q;r,s,t' --treat-pointers-equal-maybe
+^EXIT=10$
+^SIGNAL=0$
+^\[func.assertion.\d+\] line \d+ assertion p == q: FAILURE$
+^\[func.assertion.\d+\] line \d+ assertion \(void \*\)p != \(void \*\)r: SUCCESS$
+^\[func.assertion.\d+\] line \d+ assertion r == s: FAILURE$
+^\[func.assertion.\d+\] line \d+ assertion r == t: FAILURE$
+VERIFICATION FAILED
+--
+^warning: ignoring

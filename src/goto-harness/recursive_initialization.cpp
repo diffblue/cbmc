@@ -102,6 +102,9 @@ void recursive_initializationt::initialize(
   const exprt &depth,
   code_blockt &body)
 {
+  // special handling for the case that pointer arguments should be treated
+  // equal: if the equality is enforced (rather than the pointers may be equal),
+  // then we don't even build the constructor functions
   if(lhs.id() == ID_symbol)
   {
     const auto maybe_cluster_index =
@@ -110,8 +113,25 @@ void recursive_initializationt::initialize(
     {
       if(common_arguments_origins[*maybe_cluster_index].has_value())
       {
-        body.add(
-          code_assignt{lhs, *common_arguments_origins[*maybe_cluster_index]});
+        const auto set_equal_case =
+          code_assignt{lhs, *common_arguments_origins[*maybe_cluster_index]};
+        if(initialization_config.arguments_may_be_equal)
+        {
+          const irep_idt &fun_name = build_constructor(lhs);
+          const symbolt &fun_symbol =
+            goto_model.symbol_table.lookup_ref(fun_name);
+          const auto proper_init_case = code_function_callt{
+            fun_symbol.symbol_expr(), {depth, address_of_exprt{lhs}}};
+
+          body.add(code_ifthenelset{
+            side_effect_expr_nondett{bool_typet{}, source_locationt{}},
+            set_equal_case,
+            proper_init_case});
+        }
+        else
+        {
+          body.add(set_equal_case);
+        }
         return;
       }
       else
@@ -301,10 +321,10 @@ bool recursive_initializationt::should_be_treated_as_array(
          initialization_config.pointers_to_treat_as_arrays.end();
 }
 
-optionalt<std::size_t>
+optionalt<recursive_initializationt::equal_cluster_idt>
 recursive_initializationt::find_equal_cluster(const irep_idt &name) const
 {
-  for(size_t index = 0;
+  for(equal_cluster_idt index = 0;
       index != initialization_config.pointers_to_treat_equal.size();
       ++index)
   {
@@ -800,25 +820,46 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
 
 bool recursive_initializationt::needs_freeing(const exprt &expr) const
 {
-  if(expr.type().id() != ID_pointer || expr.type().id() == ID_code)
-    return false;
-  if(expr.id() == ID_symbol)
+  return expr.type().id() == ID_pointer && expr.type().id() != ID_code;
+}
+
+void recursive_initializationt::free_if_possible(
+  const exprt &expr,
+  code_blockt &body)
+{
+  PRECONDITION(expr.id() == ID_symbol);
+  const auto expr_id = to_symbol_expr(expr).get_identifier();
+  const auto maybe_cluster_index = find_equal_cluster(expr_id);
+  const auto call_free = code_function_callt{get_free_function(), {expr}};
+  if(!maybe_cluster_index.has_value())
   {
-    auto expr_name = to_symbol_expr(expr).get_identifier();
-    if(find_equal_cluster(expr_name).has_value())
-    {
-      for(auto const &origin_expr : common_arguments_origins)
-      {
-        if(!origin_expr.has_value())
-          continue;
-        INVARIANT(
-          origin_expr->id() == ID_symbol, "common origin is not a symbol");
-        auto origin_name = to_symbol_expr(*origin_expr).get_identifier();
-        if(origin_name == expr_name)
-          return true;
-      }
-      return false;
-    }
+    // not in any equality cluster -> just free
+    body.add(call_free);
+    return;
   }
-  return true;
+
+  if(
+    to_symbol_expr(*common_arguments_origins[*maybe_cluster_index])
+        .get_identifier() != expr_id &&
+    initialization_config.arguments_may_be_equal)
+  {
+    // in equality cluster but not common origin -> free if not equal to origin
+    const auto condition =
+      notequal_exprt{expr, *common_arguments_origins[*maybe_cluster_index]};
+    body.add(code_ifthenelset{condition, call_free});
+  }
+  else
+  {
+    // expr is common origin, leave freeing until the rest of the cluster is
+    // freed
+    return;
+  }
+}
+
+void recursive_initializationt::free_cluster_origins(code_blockt &body)
+{
+  for(auto const &origin : common_arguments_origins)
+  {
+    body.add(code_function_callt{get_free_function(), {*origin}});
+  }
 }

@@ -39,6 +39,8 @@ struct recursive_initialization_configt
   std::set<irep_idt> pointers_to_treat_as_cstrings;
   std::vector<std::set<irep_idt>> pointers_to_treat_equal;
 
+  bool arguments_may_be_equal = false;
+
   std::string to_string() const; // for debugging purposes
 
   /// Parse the options specific for recursive initialisation
@@ -58,6 +60,7 @@ class recursive_initializationt
 public:
   using recursion_sett = std::set<irep_idt>;
   using type_constructor_namest = std::map<typet, irep_idt>;
+  using equal_cluster_idt = std::size_t;
 
   recursive_initializationt(
     recursive_initialization_configt initialization_config,
@@ -83,6 +86,8 @@ public:
   }
 
   bool needs_freeing(const exprt &expr) const;
+  void free_if_possible(const exprt &expr, code_blockt &body);
+  void free_cluster_origins(code_blockt &body);
 
 private:
   const recursive_initialization_configt initialization_config;
@@ -98,7 +103,7 @@ private:
   symbol_exprt get_malloc_function();
 
   bool should_be_treated_as_array(const irep_idt &pointer_name) const;
-  optionalt<std::size_t> find_equal_cluster(const irep_idt &name) const;
+  optionalt<equal_cluster_idt> find_equal_cluster(const irep_idt &name) const;
   bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
   optionalt<irep_idt>
   get_associated_size_variable(const irep_idt &array_name) const;

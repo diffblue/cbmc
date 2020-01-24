@@ -169,6 +169,10 @@ void function_call_harness_generatort::handle_option(
     p_impl->function_parameters_to_treat_as_cstrings.insert(
       values.begin(), values.end());
   }
+  else if(option == FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT)
+  {
+    p_impl->recursive_initialization_config.arguments_may_be_equal = true;
+  }
   else
   {
     throw invalid_command_line_argument_exceptiont{
@@ -219,9 +223,9 @@ void function_call_harness_generatort::implt::generate(
   call_function(arguments, function_body);
   for(const auto &global_pointer : global_pointers)
   {
-    function_body.add(code_function_callt{
-      recursive_initialization->get_free_function(), {global_pointer}});
+    recursive_initialization->free_if_possible(global_pointer, function_body);
   }
+  recursive_initialization->free_cluster_origins(function_body);
   add_harness_function_to_goto_model(std::move(function_body));
 }
 
