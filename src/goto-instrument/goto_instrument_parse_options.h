@@ -113,6 +113,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \
   "(ensure-one-backedge-per-target)" \
+  "(replace-runtime-checks):(runtime-checks-language):" \
   // empty last line
 
 // clang-format on

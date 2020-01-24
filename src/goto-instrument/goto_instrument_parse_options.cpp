@@ -100,6 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "race_check.h"
 #include "reachability_slicer.h"
 #include "remove_function.h"
+#include "replace_runtime_checks.h"
 #include "rw_set.h"
 #include "show_locations.h"
 #include "skip_loops.h"
@@ -1459,6 +1460,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     havoc_loops(goto_model);
   }
 
+  if(cmdline.isset("replace-runtime-checks"))
+  {
+    std::string replace_option = cmdline.get_value("replace-runtime-checks");
+    log.status() << "Replacing runtime checks" << messaget::eom;
+    if(!cmdline.isset("runtime-checks-language"))
+      throw invalid_command_line_argument_exceptiont{
+        "unspecified language for runtime checks", "--runtime-checks-language"};
+    std::string language_id = cmdline.get_value("runtime-checks-language");
+    replace_runtime_checks(goto_model, replace_option, language_id);
+  }
+
   if(cmdline.isset("k-induction"))
   {
     bool base_case=cmdline.isset("base-case");
@@ -1782,6 +1794,16 @@ void goto_instrument_parse_optionst::help()
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_TIMESTAMP
+    " --replace-runtime-checks <rplc-option>\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                              replace runtime checks with assume/assert/both\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                              <rplc-option> should be \'assert-first-arg\'\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                              \'assert-first-arg\' or \'assert-then-assume-first-arg\'\n"
+    " --runtime-checks-language <lang>\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                              language identification for the runtime checks\n"
     "\n";
   // clang-format on
 }

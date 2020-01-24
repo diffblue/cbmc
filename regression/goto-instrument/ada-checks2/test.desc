@@ -1,0 +1,8 @@
+CORE
+main.c
+--generate-function-body __CPROVER_Ada_Overflow_Check --generate-function-body-options assert-then-assume-first-arg
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

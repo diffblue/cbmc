@@ -1,0 +1,9 @@
+CORE
+main.c
+--replace-runtime-checks assert-then-assume-first-arg --runtime-checks-language Ada
+^EXIT=10$
+^SIGNAL=0$
+^\[main.\d+\] line \d+ Ada Overflow check i > 5: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

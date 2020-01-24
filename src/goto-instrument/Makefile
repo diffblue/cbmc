@@ -54,6 +54,7 @@ SRC = accelerate/accelerate.cpp \
       points_to.cpp \
       race_check.cpp \
       reachability_slicer.cpp \
+      replace_runtime_checks.cpp \
       remove_function.cpp \
       replace_calls.cpp \
       rw_set.cpp \

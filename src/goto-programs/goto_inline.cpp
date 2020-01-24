@@ -281,6 +281,56 @@ void goto_function_inline(
   goto_inline.goto_inline(function, goto_function, inline_map, true);
 }
 
+void goto_function_inline_calls(
+  goto_modelt &goto_model,
+  const irep_idt function,
+  message_handlert &message_handler,
+  bool adjust_function,
+  bool caching)
+{
+  const namespacet ns(goto_model.symbol_table);
+  goto_function_inline_calls(
+    goto_model.goto_functions,
+    function,
+    ns,
+    message_handler,
+    adjust_function,
+    caching);
+}
+
+void goto_function_inline_calls(
+  goto_functionst &goto_functions,
+  const irep_idt function,
+  const namespacet &ns,
+  message_handlert &message_handler,
+  bool adjust_function,
+  bool caching)
+{
+  goto_inlinet goto_inline(
+    goto_functions, ns, message_handler, adjust_function, caching);
+
+  goto_inlinet::inline_mapt inline_map;
+  for(auto &function_pair : goto_functions.function_map)
+  {
+    auto &goto_function = function_pair.second;
+    for(goto_programt::targett i_it = goto_function.body.instructions.begin();
+        i_it != goto_function.body.instructions.end();
+        i_it++)
+    {
+      const auto &instruction = *i_it;
+      if(
+        instruction.is_function_call() &&
+        to_symbol_expr(instruction.get_function_call().function())
+            .get_identifier() == function)
+      {
+        inline_map[function_pair.first].push_back(
+          goto_inlinet::callt{i_it, true});
+      }
+    }
+  }
+  goto_inline.goto_inline(inline_map, true);
+}
+
 jsont goto_function_inline_and_log(
   goto_modelt &goto_model,
   const irep_idt function,
