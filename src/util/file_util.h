@@ -32,4 +32,9 @@ bool is_directory(const std::string &path);
 /// \return true iff the directory was created
 bool create_directory(const std::string &path);
 
+/// Check whether file with given path exists.
+/// C++17 will allow us to use std::filesystem::directory_entry(file).exists()
+/// \return true iff the file exists
+bool file_exists(const std::string &path);
+
 #endif // CPROVER_UTIL_FILE_UTIL_H

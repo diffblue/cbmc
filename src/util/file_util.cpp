@@ -203,3 +203,12 @@ bool create_directory(const std::string &path)
   return mkdir(path.c_str(), 0777) == 0;
 #endif
 }
+
+bool file_exists(const std::string &path)
+{
+#ifdef _WIN32
+  return _waccess(utf8_to_utf16_native_endian(path).c_str(), 0) == 0;
+#else
+  return access(path.c_str(), F_OK) == 0;
+#endif
+}
