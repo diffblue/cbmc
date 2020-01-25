@@ -37,4 +37,9 @@ bool create_directory(const std::string &path);
 /// \return true iff the file exists
 bool file_exists(const std::string &path);
 
+// Delete a file with given path
+/// C++17 will allow us to use std::filesystem::remove
+/// \return true if the file was deleted, false if it did not exist
+bool file_remove(const std::string &path);
+
 #endif // CPROVER_UTIL_FILE_UTIL_H

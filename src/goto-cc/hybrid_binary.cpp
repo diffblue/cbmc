@@ -11,6 +11,7 @@ Author: Michael Tautschnig, 2018
 
 #include "hybrid_binary.h"
 
+#include <util/file_util.h>
 #include <util/run.h>
 #include <util/suffix.h>
 
@@ -64,8 +65,8 @@ int hybrid_binary(
   }
 
   // delete the goto binary
-  int remove_result = remove(goto_binary_file.c_str());
-  if(remove_result != 0)
+  bool remove_result = file_remove(goto_binary_file);
+  if(!remove_result)
   {
     message.error() << "Remove failed: " << std::strerror(errno)
                     << messaget::eom;
@@ -124,8 +125,8 @@ int hybrid_binary(
   }
 
   // delete the goto binary
-  int remove_result = remove(goto_binary_file.c_str());
-  if(remove_result != 0)
+  bool remove_result = file_remove(goto_binary_file);
+  if(!remove_result)
   {
     message.error() << "Remove failed: " << std::strerror(errno)
                     << messaget::eom;
