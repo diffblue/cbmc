@@ -93,6 +93,8 @@ recursive_initializationt::recursive_initializationt(
         initialization_config.min_null_tree_depth,
         signed_int_type())))
 {
+  common_arguments_origins.resize(
+    this->initialization_config.pointers_to_treat_equal.size());
 }
 
 void recursive_initializationt::initialize(
@@ -100,6 +102,45 @@ void recursive_initializationt::initialize(
   const exprt &depth,
   code_blockt &body)
 {
+  // special handling for the case that pointer arguments should be treated
+  // equal: if the equality is enforced (rather than the pointers may be equal),
+  // then we don't even build the constructor functions
+  if(lhs.id() == ID_symbol)
+  {
+    const auto maybe_cluster_index =
+      find_equal_cluster(to_symbol_expr(lhs).get_identifier());
+    if(maybe_cluster_index.has_value())
+    {
+      if(common_arguments_origins[*maybe_cluster_index].has_value())
+      {
+        const auto set_equal_case =
+          code_assignt{lhs, *common_arguments_origins[*maybe_cluster_index]};
+        if(initialization_config.arguments_may_be_equal)
+        {
+          const irep_idt &fun_name = build_constructor(lhs);
+          const symbolt &fun_symbol =
+            goto_model.symbol_table.lookup_ref(fun_name);
+          const auto proper_init_case = code_function_callt{
+            fun_symbol.symbol_expr(), {depth, address_of_exprt{lhs}}};
+
+          body.add(code_ifthenelset{
+            side_effect_expr_nondett{bool_typet{}, source_locationt{}},
+            set_equal_case,
+            proper_init_case});
+        }
+        else
+        {
+          body.add(set_equal_case);
+        }
+        return;
+      }
+      else
+      {
+        common_arguments_origins[*maybe_cluster_index] = lhs;
+      }
+    }
+  }
+
   const irep_idt &fun_name = build_constructor(lhs);
   const symbolt &fun_symbol = goto_model.symbol_table.lookup_ref(fun_name);
 
@@ -278,6 +319,19 @@ bool recursive_initializationt::should_be_treated_as_array(
 {
   return initialization_config.pointers_to_treat_as_arrays.find(array_name) !=
          initialization_config.pointers_to_treat_as_arrays.end();
+}
+
+optionalt<recursive_initializationt::equal_cluster_idt>
+recursive_initializationt::find_equal_cluster(const irep_idt &name) const
+{
+  for(equal_cluster_idt index = 0;
+      index != initialization_config.pointers_to_treat_equal.size();
+      ++index)
+  {
+    if(initialization_config.pointers_to_treat_equal[index].count(name) != 0)
+      return index;
+  }
+  return {};
 }
 
 bool recursive_initializationt::is_array_size_parameter(
@@ -762,4 +816,50 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
       typecast_exprt::conditional_cast(nondet_size, size.type().subtype())}});
 
   return body;
+}
+
+bool recursive_initializationt::needs_freeing(const exprt &expr) const
+{
+  return expr.type().id() == ID_pointer && expr.type().id() != ID_code;
+}
+
+void recursive_initializationt::free_if_possible(
+  const exprt &expr,
+  code_blockt &body)
+{
+  PRECONDITION(expr.id() == ID_symbol);
+  const auto expr_id = to_symbol_expr(expr).get_identifier();
+  const auto maybe_cluster_index = find_equal_cluster(expr_id);
+  const auto call_free = code_function_callt{get_free_function(), {expr}};
+  if(!maybe_cluster_index.has_value())
+  {
+    // not in any equality cluster -> just free
+    body.add(call_free);
+    return;
+  }
+
+  if(
+    to_symbol_expr(*common_arguments_origins[*maybe_cluster_index])
+        .get_identifier() != expr_id &&
+    initialization_config.arguments_may_be_equal)
+  {
+    // in equality cluster but not common origin -> free if not equal to origin
+    const auto condition =
+      notequal_exprt{expr, *common_arguments_origins[*maybe_cluster_index]};
+    body.add(code_ifthenelset{condition, call_free});
+  }
+  else
+  {
+    // expr is common origin, leave freeing until the rest of the cluster is
+    // freed
+    return;
+  }
+}
+
+void recursive_initializationt::free_cluster_origins(code_blockt &body)
+{
+  for(auto const &origin : common_arguments_origins)
+  {
+    body.add(code_function_callt{get_free_function(), {*origin}});
+  }
 }

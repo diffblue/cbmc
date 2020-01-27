@@ -15,18 +15,24 @@ Author: Diffblue Ltd.
 #define FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT "nondet-globals"
 #define FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                  \
   "treat-pointer-as-array"
+#define FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                    \
+  "treat-pointers-equal"
 #define FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                   \
   "associated-array-size"
 #define FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                    \
   "treat-pointer-as-cstring"
+#define FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT              \
+  "treat-pointers-equal-maybe"
 
 // clang-format off
 #define FUNCTION_HARNESS_GENERATOR_OPTIONS                                     \
   "(" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT "):"                             \
   "(" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT ")"                        \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT "):"               \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT "):"                 \
   "(" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT "):"                \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING "):"                 \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT ")"            \
 // FUNCTION_HARNESS_GENERATOR_OPTIONS
 
 // clang-format on
@@ -43,6 +49,11 @@ Author: Diffblue Ltd.
   "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                   \
   " p    treat the function parameter with the name `p' as\n"                  \
   "                              an array\n"                                   \
+  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                     \
+  " p,q,r[;s,t]    treat the function parameters `q,r' equal\n"                \
+  "                              to parameter `p'; `s` to `t` and so on\n"     \
+  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT               \
+  "                function parameters equality is non-deterministic\n"        \
   "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                    \
   " array_name:size_name\n"                                                    \
   "                              set the parameter <size_name> to the size"    \
