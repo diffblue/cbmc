@@ -19,6 +19,7 @@ Author: Diffblue Ltd.
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
+#include <util/string_utils.h>
 
 #include <functional>
 #include <iterator>
@@ -86,6 +87,22 @@ bool recursive_initialization_configt::handle_option(
       [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
     return true;
   }
+  else if(option == COMMON_HARNESS_GENERATOR_MEMBER_SELECTION_OPT)
+  {
+    auto selection_spec_strings = split_string(
+      harness_options_parser::require_exactly_one_value(
+        COMMON_HARNESS_GENERATOR_MEMBER_SELECTION_OPT, values),
+      '.');
+
+    std::transform(
+      selection_spec_strings.begin(),
+      selection_spec_strings.end(),
+      std::back_inserter(selection_spec),
+      [](const std::string &member_name_string) {
+        return irep_idt{member_name_string};
+      });
+    return true;
+  }
   return false;
 }
 
@@ -114,10 +131,20 @@ void recursive_initializationt::initialize(
   const exprt &depth,
   code_blockt &body)
 {
+  if(
+    lhs.id() == ID_symbol && !initialization_config.selection_spec.empty() &&
+    initialization_config.selection_spec.front() ==
+      to_symbol_expr(lhs).get_identifier())
+  {
+    initialize_selected_member(lhs, depth, body);
+    return;
+  }
   // special handling for the case that pointer arguments should be treated
   // equal: if the equality is enforced (rather than the pointers may be equal),
   // then we don't even build the constructor functions
-  if(lhs.id() == ID_symbol)
+  if(
+    lhs.id() == ID_symbol &&
+    should_be_treated_equal(to_symbol_expr(lhs).get_identifier()))
   {
     const auto maybe_cluster_index =
       find_equal_cluster(to_symbol_expr(lhs).get_identifier());
@@ -955,4 +982,53 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
   }
 
   return body;
+}
+
+void recursive_initializationt::initialize_selected_member(
+  const exprt &lhs,
+  const exprt &depth,
+  code_blockt &body)
+{
+  PRECONDITION(lhs.id() == ID_symbol);
+  PRECONDITION(lhs.type().id() == ID_struct_tag);
+  PRECONDITION(!initialization_config.selection_spec.empty());
+
+  auto component_member = lhs;
+  const namespacet ns{goto_model.symbol_table};
+
+  for(auto it = initialization_config.selection_spec.begin() + 1;
+      it != initialization_config.selection_spec.end();
+      it++)
+  {
+    if(component_member.type().id() != ID_struct_tag)
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "'" + id2string(*it) + "' is not a component name",
+        "--" COMMON_HARNESS_GENERATOR_MEMBER_SELECTION_OPT};
+    }
+    const auto &struct_tag_type = to_struct_tag_type(component_member.type());
+    const auto &struct_type = to_struct_type(ns.follow_tag(struct_tag_type));
+
+    bool found = false;
+    for(auto const &component : struct_type.components())
+    {
+      const auto &component_type = component.type();
+      const auto component_name = component.get_name();
+
+      if(*it == component_name)
+      {
+        component_member =
+          member_exprt{component_member, component_name, component_type};
+        found = true;
+        break;
+      }
+    }
+    if(!found)
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "'" + id2string(*it) + "' is not a component name",
+        "--" COMMON_HARNESS_GENERATOR_MEMBER_SELECTION_OPT};
+    }
+  }
+  initialize(component_member, depth, body);
 }
