@@ -1,0 +1,12 @@
+CORE
+main.c
+--function func --min-null-tree-depth 10 --max-nondet-tree-depth 3 --harness-type call-function --havoc-member 'dummy.inner.inner_data2' --nondet-globals
+^\[func.assertion.\d+\] line \d+ assertion dummy.data1 == 0: SUCCESS$
+^\[func.assertion.\d+\] line \d+ assertion dummy.inner.inner_data1 == 0: SUCCESS$
+^\[func.assertion.\d+\] line \d+ assertion dummy.inner.inner_data2 == 0: FAILURE$
+^\[func.assertion.\d+\] line \d+ assertion dummy.data2 == 0: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+--
+^warning: ignoring

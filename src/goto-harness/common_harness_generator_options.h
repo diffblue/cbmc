@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 #define COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT "max-array-size"
 #define COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT              \
   "function-pointer-can-be-null"
+#define COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT "havoc-member"
 
 // clang-format off
 #define COMMON_HARNESS_GENERATOR_OPTIONS                                       \
@@ -24,6 +25,7 @@ Author: Diffblue Ltd.
   "(" COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT "):"                         \
   "(" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT "):"                         \
   "(" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT "):"           \
+  "(" COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT "):"                           \
 // COMMON_HARNESS_GENERATOR_OPTIONS
 
 // clang-format on
@@ -44,7 +46,9 @@ Author: Diffblue Ltd.
   "                              (default: 2)\n"                               \
   "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT               \
   " <function-name>,  name of the function(s) pointer parameters\n"            \
-  "              that can be NULL pointing."
+  "              that can be NULL pointing."                                   \
+  "--" COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT                               \
+  "              path to the member to be havoced\n"                           \
   // COMMON_HARNESS_GENERATOR_HELP
 
 // clang-format on

@@ -42,6 +42,8 @@ struct recursive_initialization_configt
 
   bool arguments_may_be_equal = false;
 
+  std::vector<std::vector<irep_idt>> selection_specs;
+
   std::string to_string() const; // for debugging purposes
 
   /// Parse the options specific for recursive initialisation
@@ -263,6 +265,19 @@ private:
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
   code_blockt build_array_string_constructor(const symbol_exprt &result) const;
+
+  /// Select the specified struct-member to be non-deterministically
+  ///   initialized.
+  /// \param lhs: symbol expression of the top structure
+  /// \param depth: only to be passed
+  /// \param body: code block for the initializing assignment
+  /// \param selection_spec: the user specification of the particular member to
+  ///   havoc
+  void initialize_selected_member(
+    const exprt &lhs,
+    const exprt &depth,
+    code_blockt &body,
+    const std::vector<irep_idt> &selection_spec);
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
