@@ -1,0 +1,16 @@
+CORE
+main.c
+--generate-havocing-body 'touches_parameter,1,params:0;2,2,params:1'
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main.assertion.\d+\] line \d+ assertion parameter == 10: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion unchanged_parameter == 10: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion my_struct.i == 10: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion my_struct.j == "10": FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion parameter == 10: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion unchanged_parameter == 10: FAILURE
+^\[main.assertion.\d+\] line \d+ assertion my_struct.i == 10: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion my_struct.j == "10": SUCCESS$
+--
+^warning: ignoring

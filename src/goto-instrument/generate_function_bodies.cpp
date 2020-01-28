@@ -12,12 +12,15 @@ Author: Diffblue Ltd.
 #include <ansi-c/c_object_factory_parameters.h>
 
 #include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_skip.h>
 
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/make_unique.h>
+#include <util/prefix.h>
+#include <util/string2int.h>
 #include <util/string_utils.h>
 
 void generate_function_bodiest::generate_function_body(
@@ -159,6 +162,19 @@ public:
   {
   }
 
+  havoc_generate_function_bodiest(
+    std::vector<irep_idt> globals_to_havoc,
+    std::vector<std::size_t> param_numbers_to_havoc,
+    const c_object_factory_parameterst &object_factory_parameters,
+    message_handlert &message_handler)
+    : generate_function_bodiest(),
+      globals_to_havoc(std::move(globals_to_havoc)),
+      param_numbers_to_havoc(std::move(param_numbers_to_havoc)),
+      object_factory_parameters(object_factory_parameters),
+      message(message_handler)
+  {
+  }
+
 private:
   void havoc_expr_rec(
     const exprt &lhs,
@@ -196,6 +212,24 @@ private:
     dest.destructive_append(tmp_dest);
   }
 
+  bool should_havoc_param(
+    const std::string &param_name,
+    std::size_t param_number) const
+  {
+    if(parameters_to_havoc.has_value())
+    {
+      return std::regex_match(param_name, *parameters_to_havoc);
+    }
+    else
+    {
+      CHECK_RETURN(param_numbers_to_havoc.has_value());
+      return std::binary_search(
+        param_numbers_to_havoc->begin(),
+        param_numbers_to_havoc->end(),
+        param_number);
+    }
+  }
+
 protected:
   void generate_function_body_impl(
     goto_functiont &function,
@@ -211,14 +245,14 @@ protected:
     };
 
     const namespacet ns(symbol_table);
-    for(auto const &parameter : function.parameter_identifiers)
+    for(std::size_t i = 0; i < function.parameter_identifiers.size(); ++i)
     {
+      const auto &parameter = function.parameter_identifiers[i];
       const symbolt &parameter_symbol = ns.lookup(parameter);
       if(
         parameter_symbol.type.id() == ID_pointer &&
         !parameter_symbol.type.subtype().get_bool(ID_C_constant) &&
-        std::regex_match(
-          id2string(parameter_symbol.base_name), parameters_to_havoc))
+        should_havoc_param(id2string(parameter_symbol.base_name), i))
       {
         auto goto_instruction =
           add_instruction(goto_programt::make_incomplete_goto(equal_exprt(
@@ -305,7 +339,8 @@ protected:
 
 private:
   const std::vector<irep_idt> globals_to_havoc;
-  std::regex parameters_to_havoc;
+  optionalt<std::regex> parameters_to_havoc;
+  optionalt<std::vector<std::size_t>> param_numbers_to_havoc;
   const c_object_factory_parameterst &object_factory_parameters;
   mutable messaget message;
 };
@@ -357,6 +392,7 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
   {
     std::regex globals_regex;
     std::regex params_regex;
+    std::vector<std::size_t> param_numbers;
     for(std::size_t i = 1; i < option_components.size(); ++i)
     {
       const std::vector<std::string> key_value_pair =
@@ -372,7 +408,29 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
       }
       else if(key_value_pair[0] == "params")
       {
-        params_regex = key_value_pair[1];
+        auto param_identifiers = split_string(key_value_pair[1], ';');
+        if(param_identifiers.size() == 1)
+        {
+          auto maybe_nondet_param_number =
+            string2optional_size_t(param_identifiers.back());
+          if(!maybe_nondet_param_number.has_value())
+          {
+            params_regex = key_value_pair[1];
+            continue;
+          }
+        }
+        std::transform(
+          param_identifiers.begin(),
+          param_identifiers.end(),
+          std::back_inserter(param_numbers),
+          [](const std::string &param_id) {
+            auto maybe_nondet_param_number = string2optional_size_t(param_id);
+            INVARIANT(
+              maybe_nondet_param_number.has_value(),
+              param_id + " not a number");
+            return *maybe_nondet_param_number;
+          });
+        std::sort(param_numbers.begin(), param_numbers.end());
       }
       else
       {
@@ -401,47 +459,24 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
         globals_to_havoc.push_back(symbol.first);
       }
     }
-    return util_make_unique<havoc_generate_function_bodiest>(
-      std::move(globals_to_havoc),
-      std::move(params_regex),
-      object_factory_parameters,
-      message_handler);
+    if(param_numbers.empty())
+      return util_make_unique<havoc_generate_function_bodiest>(
+        std::move(globals_to_havoc),
+        std::move(params_regex),
+        object_factory_parameters,
+        message_handler);
+    else
+      return util_make_unique<havoc_generate_function_bodiest>(
+        std::move(globals_to_havoc),
+        std::move(param_numbers),
+        object_factory_parameters,
+        message_handler);
   }
   throw generate_function_bodies_errort("Can't parse \"" + options + "\"");
 }
 
-/// Generate function bodies with some default behavior
-/// A list of currently accepted command line arguments
-/// + the type of bodies generated by them
-///
-/// assert-false: { assert(false); }
-///
-/// assume-false: { assume(false); }
-///
-/// assert-false-assume-false: {
-///   assert(false);
-///   assume(false); }
-///
-/// havoc[,params:regex][,globals:regex]:
-/// Assign nondet to the targets of pointer-to-non-const parameters
-/// matching regex, and non-const globals matching regex and then
-/// return nondet for non-void functions, e.g.:
-///
-/// int global; const int c_global;
-/// int function(int *param, const int *const_param);
-///
-/// havoc,params:(?!__).*,globals:(?!__).* (where (?!__) means
-/// "not preceded by __", which is recommended to avoid overwrite
-/// internal symbols), leads to
-///
-/// int function(int *param, consnt int *const_param) {
-///   *param = nondet_int();
-///   global = nondet_int();
-///   return nondet_int();
-/// }
-///
-/// nondet-return: return nondet for non-void functions
-///
+/// Generate function bodies with some default behavior: assert-false,
+///   assume-false, assert-false-assume-false, havoc, nondet-return.
 /// \param functions_regex: Specifies the functions whose body should be
 ///   generated
 /// \param generate_function_body: Specifies what kind of body to generate
@@ -480,5 +515,101 @@ void generate_function_bodies(
     messages.warning()
       << "generate function bodies: No function name matched regex"
       << messaget::eom;
+  }
+}
+
+void generate_function_bodies(
+  const std::string &function_name,
+  const std::string &call_site_id,
+  const generate_function_bodiest &generate_function_body,
+  goto_modelt &model,
+  message_handlert &message_handler)
+{
+  PRECONDITION(!has_prefix(function_name, CPROVER_PREFIX));
+  auto call_site_number = string2optional_size_t(call_site_id);
+  PRECONDITION(call_site_number.has_value());
+
+  messaget messages(message_handler);
+
+  bool found = false;
+  irep_idt function_mode;
+  typet function_type;
+
+  // get the mode and type from symbol table
+  for(auto const &symbol_pair : model.symbol_table)
+  {
+    auto const symbol = symbol_pair.second;
+    if(symbol.type.id() == ID_code && symbol.name == function_name)
+    {
+      function_mode = symbol.mode;
+      function_type = symbol.type;
+      found = true;
+      break;
+    }
+  }
+  CHECK_RETURN(found);
+
+  // add function of the right name to the symbol table
+  symbolt havoc_function_symbol{};
+  havoc_function_symbol.name = havoc_function_symbol.base_name =
+    havoc_function_symbol.pretty_name = function_name + "." + call_site_id;
+
+  havoc_function_symbol.is_lvalue = true;
+  havoc_function_symbol.mode = function_mode;
+  havoc_function_symbol.type = function_type;
+
+  model.symbol_table.insert(havoc_function_symbol);
+
+  auto const &generated_havoc =
+    model.symbol_table.lookup_ref(havoc_function_symbol.name);
+
+  // convert to get the function stub to goto-model
+  model.goto_functions.function_map[havoc_function_symbol.name].type =
+    to_code_type(generated_havoc.type);
+  goto_convert(model.symbol_table, model.goto_functions, message_handler);
+
+  // now generate body as above
+  for(auto &function : model.goto_functions.function_map)
+  {
+    if(
+      !function.second.body_available() &&
+      havoc_function_symbol.name == id2string(function.first))
+    {
+      generate_function_body.generate_function_body(
+        function.second, model.symbol_table, function.first);
+    }
+  }
+
+  auto is_havoc_function_call = [&function_name](const exprt &expr) {
+    if(expr.id() != ID_symbol)
+      return false;
+    std::string called_function_name =
+      id2string(to_symbol_expr(expr).get_identifier());
+    if(called_function_name == function_name)
+      return true;
+
+    return (has_prefix(called_function_name, function_name + "."));
+  };
+
+  // finally, rename the (right) call site
+  std::size_t counter = 0;
+  for(auto &function : model.goto_functions.function_map)
+  {
+    for(auto &instruction : function.second.body.instructions)
+    {
+      if(instruction.is_function_call())
+      {
+        auto &called_function =
+          to_code_function_call(instruction.code).function();
+        if(is_havoc_function_call(called_function))
+        {
+          if(++counter == *call_site_number)
+          {
+            called_function = generated_havoc.symbol_expr();
+            return;
+          }
+        }
+      }
+    }
   }
 }
