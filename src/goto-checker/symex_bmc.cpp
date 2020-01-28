@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <limits>
 
+#include <util/scope_guard.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
 
@@ -43,7 +44,25 @@ void symex_bmct::symex_step(
   statet &state)
 {
   const source_locationt &source_location = state.source.pc->source_location;
-
+  // Turn on throwing invariants so we can safely log invariant failure during Symex
+  auto const invariants_should_throw_during_symex_step =
+    cbmc_invariants_should_throwt{};
+  // If an exception is thrown during symex step, log the last relevant source location
+  auto const print_step_location_on_error =
+    on_exit_scope_with_exception([source_location, this]() {
+      auto const actual_source_location =
+        source_location.is_not_nil() ? source_location : last_source_location;
+      log.error() << "Error during BMC near location ";
+      if(actual_source_location.is_not_nil())
+      {
+        log.error() << actual_source_location;
+      }
+      else
+      {
+        log.error() << "<unknown source location>";
+      }
+      log.error() << messaget::eom;
+    });
   if(!source_location.is_nil() && last_source_location != source_location)
   {
     log.debug() << "BMC at " << source_location.as_string() << " (depth "
@@ -51,7 +70,6 @@ void symex_bmct::symex_step(
 
     last_source_location = source_location;
   }
-
   const goto_programt::const_targett cur_pc = state.source.pc;
   const guardt cur_guard = state.guard;
 
