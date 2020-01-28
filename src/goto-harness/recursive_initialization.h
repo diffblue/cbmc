@@ -27,6 +27,7 @@ struct recursive_initialization_configt
   std::size_t min_null_tree_depth = 1;
   std::size_t max_nondet_tree_depth = 2;
   irep_idt mode;
+  std::unordered_set<irep_idt> potential_null_function_pointers;
 
   // array stuff
   std::size_t max_dynamic_array_size = 2;
@@ -59,8 +60,30 @@ class recursive_initializationt
 {
 public:
   using recursion_sett = std::set<irep_idt>;
-  using type_constructor_namest = std::map<typet, irep_idt>;
   using equal_cluster_idt = std::size_t;
+  struct constructor_keyt
+  {
+    typet constructor_type;
+    bool is_nullable;
+    bool has_size_parameter;
+    bool operator<(const constructor_keyt &other) const
+    {
+      return std::tie(constructor_type, is_nullable, has_size_parameter) <
+             std::tie(
+               other.constructor_type,
+               other.is_nullable,
+               other.has_size_parameter);
+    };
+    bool operator==(const constructor_keyt &other) const
+    {
+      return std::tie(constructor_type, is_nullable, has_size_parameter) ==
+             std::tie(
+               other.constructor_type,
+               other.is_nullable,
+               other.has_size_parameter);
+    };
+  };
+  using type_constructor_namest = std::map<constructor_keyt, irep_idt>;
 
   recursive_initializationt(
     recursive_initialization_configt initialization_config,
@@ -170,18 +193,28 @@ private:
   /// \param result_symbol: the symbol for `result` parameter
   /// \param size_symbol: maybe the symbol for `size` parameter
   /// \param lhs_name: the name of the original symbol
+  /// \param is_nullable: flag for setting a function pointer nullable
   /// \return the body of the constructor
   code_blockt build_constructor_body(
     const exprt &depth_symbol,
-    const exprt &result_symbol,
+    const symbol_exprt &result_symbol,
     const optionalt<exprt> &size_symbol,
-    const optionalt<irep_idt> &lhs_name);
+    const optionalt<irep_idt> &lhs_name,
+    const bool is_nullable);
 
   /// Check if a constructor for the type of \p expr already exists and create
   ///   it if not.
   /// \param expr: the expression to be constructed
   /// \return name of the constructor function
-  const irep_idt &build_constructor(const exprt &expr);
+  irep_idt build_constructor(const exprt &expr);
+
+  /// Constructor for function pointers.
+  /// \param result: symbol of the result parameter
+  /// \param is_nullable: if the function pointer can be null
+  /// \return the body of the constructor
+  code_blockt build_function_pointer_constructor(
+    const symbol_exprt &result,
+    bool is_nullable);
 
   /// Generic constructor for all pointers: only builds one pointee (not an
   ///   array) but may recourse in case the pointee contains more pointers, e.g.
@@ -190,26 +223,28 @@ private:
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
   code_blockt
-  build_pointer_constructor(const exprt &depth, const exprt &result);
+  build_pointer_constructor(const exprt &depth, const symbol_exprt &result);
 
   /// Constructor for structures: simply iterates over members and initialise
   ///   each one.
   /// \param depth: symbol of the depth parameter
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_struct_constructor(const exprt &depth, const exprt &result);
+  code_blockt
+  build_struct_constructor(const exprt &depth, const symbol_exprt &result);
 
   /// Default constructor: assigns non-deterministic value of the right type.
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_nondet_constructor(const exprt &result) const;
+  code_blockt build_nondet_constructor(const symbol_exprt &result) const;
 
   /// Constructor for arrays: simply iterates over elements and initialise
   ///   each one.
   /// \param depth: symbol of the depth parameter
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_array_constructor(const exprt &depth, const exprt &result);
+  code_blockt
+  build_array_constructor(const exprt &depth, const symbol_exprt &result);
 
   /// Constructor for dynamic arrays: allocate memory for `n` elements (`n` is
   ///   random but bounded) and initialise each one.
@@ -220,14 +255,14 @@ private:
   /// \return the body of the constructor
   code_blockt build_dynamic_array_constructor(
     const exprt &depth,
-    const exprt &result,
+    const symbol_exprt &result,
     const exprt &size,
     const optionalt<irep_idt> &lhs_name);
 
   /// Constructor for strings: as array but the last element is zero.
   /// \param result: symbol of the result parameter
   /// \return the body of the constructor
-  code_blockt build_array_string_constructor(const exprt &result) const;
+  code_blockt build_array_string_constructor(const symbol_exprt &result) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H

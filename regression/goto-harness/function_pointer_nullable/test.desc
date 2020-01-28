@@ -1,0 +1,12 @@
+CORE
+test.c
+--harness-type call-function --function entry_point --function-pointer-can-be-null entry_point::f_but_may_be_null
+^EXIT=10$
+^SIGNAL=0$
+\[entry_point.assertion.1\] line \d+ assertion f != \(void \*\)0: SUCCESS
+\[entry_point.assertion.2\] line \d+ assertion f == \(void \*\)0: FAILURE
+\[entry_point.assertion.3\] line \d+ assertion f_but_may_be_null != \(void \*\)0: FAILURE
+\[entry_point.assertion.4\] line \d+ assertion f_but_may_be_null == \(void \*\)0: FAILURE
+\[entry_point.assertion.5\] line \d+ assertion f_but_may_be_null == \(void \*\)0 || f\(\) == f_but_may_be_null\(\): SUCCESS
+--
+^warning: ignoring

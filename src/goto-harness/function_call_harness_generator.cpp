@@ -12,6 +12,7 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -72,14 +73,24 @@ struct function_call_harness_generatort::implt
   void ensure_harness_does_not_already_exist();
   /// Update the goto-model with the new harness function.
   void add_harness_function_to_goto_model(code_blockt function_body);
-  /// declare local variables for each of the parameters of the entry function
+  /// Declare local variables for each of the parameters of the entry function
   /// and return them
   code_function_callt::argumentst declare_arguments(code_blockt &function_body);
-  /// write initialisation code for each of the arguments into function_body,
+  /// Write initialisation code for each of the arguments into function_body,
   /// then insert a call to the entry function with the arguments
   void call_function(
     const code_function_callt::argumentst &arguments,
     code_blockt &function_body);
+  /// For function parameters that are pointers to functions we want to
+  /// be able to specify whether or not they can be NULL. To disambiguate
+  /// this specification from that for a global variable of the same name,
+  /// we prepend the name of the function to the parameter name. However,
+  /// what is actually being initialised in the implementation is not the
+  /// parameter itself, but a corresponding function argument (local variable
+  /// of the harness function). We need a mapping from function parameter
+  /// name to function argument names, and this is what this function does.
+  std::unordered_set<irep_idt>
+  map_function_parameters_to_function_argument_names();
 };
 
 function_call_harness_generatort::function_call_harness_generatort(
@@ -173,6 +184,30 @@ void function_call_harness_generatort::handle_option(
   {
     p_impl->recursive_initialization_config.arguments_may_be_equal = true;
   }
+  else if(option == COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT)
+  {
+    std::transform(
+      values.begin(),
+      values.end(),
+      std::inserter(
+        p_impl->recursive_initialization_config
+          .potential_null_function_pointers,
+        p_impl->recursive_initialization_config.potential_null_function_pointers
+          .end()),
+      [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
+  }
+  else if(option == COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT)
+  {
+    std::transform(
+      values.begin(),
+      values.end(),
+      std::inserter(
+        p_impl->recursive_initialization_config
+          .potential_null_function_pointers,
+        p_impl->recursive_initialization_config.potential_null_function_pointers
+          .end()),
+      [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
+  }
   else
   {
     throw invalid_command_line_argument_exceptiont{
@@ -214,6 +249,8 @@ void function_call_harness_generatort::implt::generate(
     recursive_initialization_config.variables_that_hold_array_sizes.insert(
       pair.second);
   }
+  recursive_initialization_config.potential_null_function_pointers =
+    map_function_parameters_to_function_argument_names();
   recursive_initialization_config.pointers_to_treat_as_cstrings =
     function_arguments_to_treat_as_cstrings;
   recursive_initialization = util_make_unique<recursive_initializationt>(
@@ -269,7 +306,7 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
 void function_call_harness_generatort::validate_options(
   const goto_modelt &goto_model)
 {
-  if(p_impl->function == ID_empty)
+  if(p_impl->function == ID_empty_string)
     throw invalid_command_line_argument_exceptiont{
       "required parameter entry function not set",
       "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
@@ -283,8 +320,17 @@ void function_call_harness_generatort::validate_options(
       " --" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
   }
 
-  auto function_to_call = goto_model.symbol_table.lookup_ref(p_impl->function);
-  auto ftype = to_code_type(function_to_call.type);
+  const auto function_to_call_pointer =
+    goto_model.symbol_table.lookup(p_impl->function);
+  if(function_to_call_pointer == nullptr)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "entry function `" + id2string(p_impl->function) +
+        "' does not exist in the symbol table",
+      "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
+  }
+  const auto &function_to_call = *function_to_call_pointer;
+  const auto &ftype = to_code_type(function_to_call.type);
   for(auto const &equal_cluster : p_impl->function_parameters_to_treat_equal)
   {
     for(auto const &pointer_id : equal_cluster)
@@ -323,6 +369,43 @@ void function_call_harness_generatort::validate_options(
           id2string(pointer_id) + " is not a parameter",
           "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT};
       }
+    }
+  }
+
+  const namespacet ns{goto_model.symbol_table};
+
+  // Make sure all function pointers that the user asks are nullable are
+  // present in the symbol table.
+  for(const auto &nullable :
+      p_impl->recursive_initialization_config.potential_null_function_pointers)
+  {
+    const auto &function_pointer_symbol_pointer =
+      goto_model.symbol_table.lookup(nullable);
+
+    if(function_pointer_symbol_pointer == nullptr)
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "nullable function pointer `" + id2string(nullable) +
+          "' not found in symbol table",
+        "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
+    }
+
+    const auto &function_pointer_type =
+      ns.follow(function_pointer_symbol_pointer->type);
+
+    if(!can_cast_type<pointer_typet>(function_pointer_type))
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "`" + id2string(nullable) + "' is not a pointer",
+        "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
+    }
+
+    if(!can_cast_type<code_typet>(
+         to_pointer_type(function_pointer_type).subtype()))
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "`" + id2string(nullable) + "' is not pointing to a function",
+        "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
     }
   }
 }
@@ -468,4 +551,26 @@ void function_call_harness_generatort::implt::call_function(
   function_call.add_source_location() = function_to_call.location;
 
   function_body.add(std::move(function_call));
+}
+
+std::unordered_set<irep_idt> function_call_harness_generatort::implt::
+  map_function_parameters_to_function_argument_names()
+{
+  std::unordered_set<irep_idt> nullables;
+  for(const auto &nullable :
+      recursive_initialization_config.potential_null_function_pointers)
+  {
+    const auto &nullable_name = id2string(nullable);
+    const auto &function_prefix = id2string(function) + "::";
+    if(has_prefix(nullable_name, function_prefix))
+    {
+      nullables.insert(
+        "__goto_harness::" + nullable_name.substr(function_prefix.size()));
+    }
+    else
+    {
+      nullables.insert(nullable_name);
+    }
+  }
+  return nullables;
 }

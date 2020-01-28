@@ -1,0 +1,9 @@
+CORE
+test.c
+--harness-type call-function --harness-function-name harness --function use_fptr
+^EXIT=10$
+^SIGNAL=0$
+\[use_fptr.assertion.1\] line \d+ assertion m == first \|\| m == second: SUCCESS
+\[use_fptr.assertion.2\] line \d+ assertion m >= first && m >= second: FAILURE
+--
+^warning: ignoring

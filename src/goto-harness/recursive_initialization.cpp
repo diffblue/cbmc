@@ -21,6 +21,7 @@ Author: Diffblue Ltd.
 #include <util/string2int.h>
 
 #include <functional>
+#include <iterator>
 
 bool recursive_initialization_configt::handle_option(
   const std::string &option,
@@ -72,6 +73,17 @@ bool recursive_initialization_configt::handle_option(
   {
     min_dynamic_array_size = harness_options_parser::require_one_size_value(
       COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT, values);
+    return true;
+  }
+  else if(option == COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT)
+  {
+    std::transform(
+      values.begin(),
+      values.end(),
+      std::inserter(
+        potential_null_function_pointers,
+        potential_null_function_pointers.end()),
+      [](const std::string &opt) -> irep_idt { return irep_idt{opt}; });
     return true;
   }
   return false;
@@ -185,9 +197,10 @@ void recursive_initializationt::initialize(
 
 code_blockt recursive_initializationt::build_constructor_body(
   const exprt &depth_symbol,
-  const exprt &result_symbol,
+  const symbol_exprt &result_symbol,
   const optionalt<exprt> &size_symbol,
-  const optionalt<irep_idt> &lhs_name)
+  const optionalt<irep_idt> &lhs_name,
+  const bool is_nullable)
 {
   PRECONDITION(result_symbol.type().id() == ID_pointer);
   const typet &type = result_symbol.type().subtype();
@@ -197,6 +210,10 @@ code_blockt recursive_initializationt::build_constructor_body(
   }
   else if(type.id() == ID_pointer)
   {
+    if(type.subtype().id() == ID_code)
+    {
+      return build_function_pointer_constructor(result_symbol, is_nullable);
+    }
     if(lhs_name.has_value())
     {
       if(should_be_treated_as_cstring(*lhs_name) && type == char_type())
@@ -220,7 +237,7 @@ code_blockt recursive_initializationt::build_constructor_body(
   }
 }
 
-const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
+irep_idt recursive_initializationt::build_constructor(const exprt &expr)
 {
   // for `expr` of type T builds a declaration of a function:
   //
@@ -231,15 +248,23 @@ const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
   // void type_constructor_T(int depth_T, T *result_T, int *size);
   optionalt<irep_idt> size_var;
   optionalt<irep_idt> expr_name;
+  bool is_nullable = false;
+  bool has_size_param = false;
   if(expr.id() == ID_symbol)
   {
     expr_name = to_symbol_expr(expr).get_identifier();
+    is_nullable = initialization_config.potential_null_function_pointers.count(
+      expr_name.value());
     if(should_be_treated_as_array(*expr_name))
+    {
       size_var = get_associated_size_variable(*expr_name);
+      has_size_param = true;
+    }
   }
   const typet &type = expr.type();
-  if(type_constructor_names.find(type) != type_constructor_names.end())
-    return type_constructor_names[type];
+  const constructor_keyt key{type, is_nullable, has_size_param};
+  if(type_constructor_names.find(key) != type_constructor_names.end())
+    return type_constructor_names[key];
 
   const std::string &pretty_type = type2id(type);
   symbolt &depth_symbol =
@@ -280,7 +305,7 @@ const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
   }
   const symbolt &function_symbol = get_fresh_fun_symbol(
     "type_constructor_" + pretty_type, code_typet{fun_params, empty_typet{}});
-  type_constructor_names[type] = function_symbol.name;
+  type_constructor_names[key] = function_symbol.name;
   symbolt *mutable_symbol = symbol_table.get_writeable(function_symbol.name);
 
   // the body is specific for each type of expression
@@ -290,11 +315,12 @@ const irep_idt &recursive_initializationt::build_constructor(const exprt &expr)
     size_symbol_expr,
     // the expression name may be needed to decide if expr should be treated as
     // a string
-    expr_name);
+    expr_name,
+    is_nullable);
 
   goto_model.goto_functions.function_map[function_symbol.name].type =
     to_code_type(function_symbol.type);
-  return type_constructor_names[type];
+  return type_constructor_names.at(key);
 }
 
 symbol_exprt recursive_initializationt::get_malloc_function()
@@ -554,7 +580,7 @@ symbol_exprt recursive_initializationt::get_free_function()
 
 code_blockt recursive_initializationt::build_pointer_constructor(
   const exprt &depth,
-  const exprt &result)
+  const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
@@ -639,7 +665,7 @@ code_blockt recursive_initializationt::build_pointer_constructor(
 }
 
 code_blockt recursive_initializationt::build_array_string_constructor(
-  const exprt &result) const
+  const symbol_exprt &result) const
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
@@ -668,7 +694,7 @@ code_blockt recursive_initializationt::build_array_string_constructor(
 
 code_blockt recursive_initializationt::build_array_constructor(
   const exprt &depth,
-  const exprt &result)
+  const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
@@ -690,7 +716,7 @@ code_blockt recursive_initializationt::build_array_constructor(
 
 code_blockt recursive_initializationt::build_struct_constructor(
   const exprt &depth,
-  const exprt &result)
+  const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &struct_type = result.type().subtype();
@@ -705,8 +731,8 @@ code_blockt recursive_initializationt::build_struct_constructor(
   return body;
 }
 
-code_blockt
-recursive_initializationt::build_nondet_constructor(const exprt &result) const
+code_blockt recursive_initializationt::build_nondet_constructor(
+  const symbol_exprt &result) const
 {
   PRECONDITION(result.type().id() == ID_pointer);
   code_blockt body{};
@@ -718,7 +744,7 @@ recursive_initializationt::build_nondet_constructor(const exprt &result) const
 
 code_blockt recursive_initializationt::build_dynamic_array_constructor(
   const exprt &depth,
-  const exprt &result,
+  const symbol_exprt &result,
   const exprt &size,
   const optionalt<irep_idt> &lhs_name)
 {
@@ -820,7 +846,19 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
 
 bool recursive_initializationt::needs_freeing(const exprt &expr) const
 {
-  return expr.type().id() == ID_pointer && expr.type().id() != ID_code;
+  if(expr.type().id() != ID_pointer || expr.type().subtype().id() == ID_code)
+    return false;
+  for(auto const &common_arguments_origin : common_arguments_origins)
+  {
+    if(common_arguments_origin.has_value() && expr.id() == ID_symbol)
+    {
+      auto origin_name =
+        to_symbol_expr(*common_arguments_origin).get_identifier();
+      auto expr_name = to_symbol_expr(expr).get_identifier();
+      return origin_name == expr_name;
+    }
+  }
+  return true;
 }
 
 void recursive_initializationt::free_if_possible(
@@ -862,4 +900,59 @@ void recursive_initializationt::free_cluster_origins(code_blockt &body)
   {
     body.add(code_function_callt{get_free_function(), {*origin}});
   }
+}
+
+code_blockt recursive_initializationt::build_function_pointer_constructor(
+  const symbol_exprt &result,
+  bool is_nullable)
+{
+  PRECONDITION(can_cast_type<pointer_typet>(result.type()));
+  const auto &result_type = to_pointer_type(result.type());
+  PRECONDITION(can_cast_type<pointer_typet>(result_type.subtype()));
+  const auto &function_pointer_type = to_pointer_type(result_type.subtype());
+  PRECONDITION(can_cast_type<code_typet>(function_pointer_type.subtype()));
+  const auto &function_type = to_code_type(function_pointer_type.subtype());
+
+  std::vector<exprt> targets;
+
+  for(const auto &sym : goto_model.get_symbol_table())
+  {
+    if(sym.second.type == function_type)
+    {
+      targets.push_back(address_of_exprt{sym.second.symbol_expr()});
+    }
+  }
+
+  if(is_nullable)
+    targets.push_back(null_pointer_exprt{function_pointer_type});
+
+  code_blockt body{};
+
+  const auto function_pointer_selector =
+    get_fresh_local_symexpr("function_pointer_selector");
+  body.add(
+    code_assignt{function_pointer_selector,
+                 side_effect_expr_nondett{function_pointer_selector.type(),
+                                          source_locationt{}}});
+  auto function_pointer_index = std::size_t{0};
+
+  for(const auto &target : targets)
+  {
+    auto const assign = code_assignt{dereference_exprt{result}, target};
+    if(function_pointer_index != targets.size() - 1)
+    {
+      auto const condition = equal_exprt{
+        function_pointer_selector,
+        from_integer(function_pointer_index, function_pointer_selector.type())};
+      auto const then = code_blockt{{assign, code_returnt{}}};
+      body.add(code_ifthenelset{condition, then});
+    }
+    else
+    {
+      body.add(assign);
+    }
+    ++function_pointer_index;
+  }
+
+  return body;
 }
