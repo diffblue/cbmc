@@ -27,6 +27,35 @@ Date: February 2016
 
 #include "loop_utils.h"
 
+/// Predicate to be used with the exprt::visit() function. The function
+/// found_return_value() will return `true` iff this predicate is called on an
+/// expr that contains `__CPROVER_return_value`.
+class return_value_visitort : public const_expr_visitort
+{
+public:
+  return_value_visitort() : const_expr_visitort()
+  {
+  }
+
+  // \brief Has this object been passed to exprt::visit() on an exprt whose
+  //        descendants contain __CPROVER_return_value?
+  bool found_return_value()
+  {
+    return found;
+  }
+
+  void operator()(const exprt &exp) override
+  {
+    if(exp.id() != ID_symbol)
+      return;
+    const symbol_exprt &sym = to_symbol_expr(exp);
+    found |= sym.get_identifier() == CPROVER_PREFIX "return_value";
+  }
+
+protected:
+  bool found;
+};
+
 static void check_apply_invariants(
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
@@ -147,17 +176,42 @@ bool code_contractst::apply_contract(
   if(ensures.is_nil())
     return false;
 
-  // replace formal parameters by arguments, replace return
   replace_symbolt replace;
-
-  // TODO: return value could be nil
-  if(type.return_type()!=empty_typet())
+  // Replace return value
+  if(type.return_type() != empty_typet())
   {
-    symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
-    replace.insert(ret_val, call.lhs());
+    if(call.lhs().is_not_nil())
+    {
+      // foo() ensures that its return value is > 5. Then rewrite calls to foo:
+      // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
+      symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
+      replace.insert(ret_val, call.lhs());
+    }
+    else
+    {
+      // Function does have a return value, but call is not being assigned to
+      // anything so we can't use the trick above.
+      return_value_visitort v;
+      ensures.visit(v);
+      if(v.found_return_value())
+      {
+        // The postcondition does mention __CPROVER_return_value, so mint a
+        // fresh variable to replace __CPROVER_return_value with.
+        const symbolt &fresh = get_fresh_aux_symbol(
+          type.return_type(),
+          id2string(function),
+          "ignored_return_value",
+          call.source_location(),
+          symbol_table.lookup_ref(function).mode,
+          ns,
+          symbol_table);
+        symbol_exprt ret_val(CPROVER_PREFIX "return_value", type.return_type());
+        replace.insert(ret_val, fresh.symbol_expr());
+      }
+    }
   }
 
-  // formal parameters
+  // Replace formal parameters
   code_function_callt::argumentst::const_iterator a_it=
     call.arguments().begin();
   for(code_typet::parameterst::const_iterator
