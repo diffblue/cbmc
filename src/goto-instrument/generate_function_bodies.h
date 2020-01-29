@@ -70,21 +70,43 @@ void generate_function_bodies(
   goto_modelt &model,
   message_handlert &message_handler);
 
+/// Generate a clone of \p function_name (labelled with \p call_site_id) and
+///   instantiate its body with selective havocing of its parameters.
+/// \param function_name: The function whose body should be generated
+/// \param call_site_id: the number of the call site
+/// \param generate_function_body: the previously constructed body generator
+/// \param model: the goto-model to be modified
+/// \param message_handler: the message-handler
+void generate_function_bodies(
+  const std::string &function_name,
+  const std::string &call_site_id,
+  const generate_function_bodiest &generate_function_body,
+  goto_modelt &model,
+  message_handlert &message_handler);
+
 // clang-format off
 #define OPT_REPLACE_FUNCTION_BODY \
   "(generate-function-body):" \
+  "(generate-havocing-body):" \
   "(generate-function-body-options):"
 
 #define HELP_REPLACE_FUNCTION_BODY \
   " --generate-function-body <regex>\n" \
   /* NOLINTNEXTLINE(whitespace/line_length) */ \
   "                              Generate bodies for functions matching regex\n" \
+  " --generate-havocing-body <option>\n" \
+  /* NOLINTNEXTLINE(whitespace/line_length) */ \
+  "                              <fun_name>,params:<p_n1;p_n2;..>\n" \
+  "                              or\n" \
+  /* NOLINTNEXTLINE(whitespace/line_length) */ \
+  "                              <fun_name>[,<call-site-id>,params:<p_n1;p_n2;..>]+\n" \
   " --generate-function-body-options <option>\n" \
   "                              One of assert-false, assume-false,\n" \
   /* NOLINTNEXTLINE(whitespace/line_length) */ \
   "                              nondet-return, assert-false-assume-false and\n" \
   "                              havoc[,params:<regex>][,globals:<regex>]\n" \
-  "                              (default: nondet-return)"
+  "                                   [,params:<p_n1;p_n2;..>]\n" \
+  "                              (default: nondet-return)\n"
 // clang-format on
 
 #endif // CPROVER_GOTO_PROGRAMS_GENERATE_FUNCTION_BODIES_H

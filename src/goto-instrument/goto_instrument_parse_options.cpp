@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/json.h>
 #include <util/string2int.h>
+#include <util/string_utils.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -1252,6 +1253,52 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       *generate_implementation,
       goto_model,
       ui_message_handler);
+  }
+
+  if(cmdline.isset("generate-havocing-body"))
+  {
+    optionst c_object_factory_options;
+    parse_c_object_factory_options(cmdline, c_object_factory_options);
+    c_object_factory_parameterst object_factory_parameters(
+      c_object_factory_options);
+
+    auto options_split =
+      split_string(cmdline.get_value("generate-havocing-body"), ',');
+    if(options_split.size() < 2)
+      throw invalid_command_line_argument_exceptiont{
+        "not enough arguments for this option", "--generate-havocing-body"};
+
+    if(options_split.size() == 2)
+    {
+      auto generate_implementation = generate_function_bodies_factory(
+        std::string{"havoc,"} + options_split.back(),
+        object_factory_parameters,
+        goto_model.symbol_table,
+        ui_message_handler);
+      generate_function_bodies(
+        std::regex(options_split[0]),
+        *generate_implementation,
+        goto_model,
+        ui_message_handler);
+    }
+    else
+    {
+      CHECK_RETURN(options_split.size() % 2 == 1);
+      for(size_t i = 1; i + 1 < options_split.size(); i += 2)
+      {
+        auto generate_implementation = generate_function_bodies_factory(
+          std::string{"havoc,"} + options_split[i + 1],
+          object_factory_parameters,
+          goto_model.symbol_table,
+          ui_message_handler);
+        generate_function_bodies(
+          options_split[0],
+          options_split[i],
+          *generate_implementation,
+          goto_model,
+          ui_message_handler);
+      }
+    }
   }
 
   // add generic checks, if needed

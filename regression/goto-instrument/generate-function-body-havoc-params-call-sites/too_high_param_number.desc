@@ -1,0 +1,8 @@
+CORE
+main.c
+--generate-havocing-body 'touches_parameter,1,params:0;5,2,params:1'
+^EXIT=1$
+^SIGNAL=0$
+^Reason: function touches_parameter.1 does not take 6 arguments$
+--
+^warning: ignoring

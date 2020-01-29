@@ -1,0 +1,8 @@
+CORE
+main.c
+--generate-havocing-body 'touches_parameter,1,params:0;3,2,params:1'
+^EXIT=1$
+^SIGNAL=0$
+^Reason: argument number 3 of function touches_parameter.1 is not a pointer$
+--
+^warning: ignoring
