@@ -1,7 +1,7 @@
 if(WIN32)
-    set(is_windows true)
+  set(is_windows true)
 else()
-    set(is_windows false)
+  set(is_windows false)
 endif()
 
 add_test_pl_tests(
