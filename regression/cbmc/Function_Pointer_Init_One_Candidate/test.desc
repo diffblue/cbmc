@@ -1,0 +1,10 @@
+CORE
+main.c
+--function foo
+^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) == 5: FAILURE$
+^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) == 4: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED
+--
+^warning: ignoring
