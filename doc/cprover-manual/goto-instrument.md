@@ -118,6 +118,11 @@ int main() {
 }
 ```
 
+Note that only parameters of pointer type can be havoc(ed) and CBMC will produce
+an error report if given a parameter number associated with a non-pointer
+parameter. Requesting to havoc a parameter with a number higher than the number
+of parameters a given function takes will also results in an error report.
+
 ### Loop Transformations
 
 ### Memory Model Instrumentations

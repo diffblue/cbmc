@@ -236,6 +236,33 @@ protected:
     symbol_tablet &symbol_table,
     const irep_idt &function_name) const override
   {
+    const namespacet ns(symbol_table);
+    // some user input checking
+    if(param_numbers_to_havoc.has_value() && !param_numbers_to_havoc->empty())
+    {
+      auto max_param_number = std::max_element(
+        param_numbers_to_havoc->begin(), param_numbers_to_havoc->end());
+      if(*max_param_number >= function.parameter_identifiers.size())
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "function " + id2string(function_name) + " does not take " +
+            std::to_string(*max_param_number + 1) + " arguments",
+          "--generate-havocing-body"};
+      }
+      for(const auto number : *param_numbers_to_havoc)
+      {
+        const auto &parameter = function.parameter_identifiers[number];
+        const symbolt &parameter_symbol = ns.lookup(parameter);
+        if(parameter_symbol.type.id() != ID_pointer)
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "argument number " + std::to_string(number) + " of function " +
+              id2string(function_name) + " is not a pointer",
+            "--generate-havocing-body"};
+        }
+      }
+    }
+
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
@@ -244,7 +271,6 @@ protected:
       return instruction;
     };
 
-    const namespacet ns(symbol_table);
     for(std::size_t i = 0; i < function.parameter_identifiers.size(); ++i)
     {
       const auto &parameter = function.parameter_identifiers[i];
