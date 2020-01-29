@@ -56,6 +56,9 @@ void symbol_factoryt::gen_nondet_init(
 
     if(subtype.id() == ID_code)
     {
+      // Handle the pointer-to-code case separately:
+      // leave as nondet_ptr to allow `remove_function_pointers`
+      // to replace the pointer.
       assignments.add(
         code_assignt{expr, side_effect_expr_nondett{pointer_type, loc}});
       return;
