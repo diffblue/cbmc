@@ -115,9 +115,9 @@ def command_line_parser():
     )
     parser.add_argument(
         '--config',
-        default='cbmc-viewer.py',
+        default='cbmc-viewer.json',
         metavar='FILE',
-        help='Python configuration file for cbmc-viewer.'
+        help='JSON configuration file for cbmc-viewer.'
     )
     return parser
 
