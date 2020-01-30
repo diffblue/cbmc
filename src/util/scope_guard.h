@@ -67,4 +67,4 @@ on_exit_scope_with_exception(OnErrorHandler onErrorHandler)
     std::move(onErrorHandler)};
 }
 
-#endif //CPROVER_UTIL_SCOPE_GUARD_H
+#endif // CPROVER_UTIL_SCOPE_GUARD_H
