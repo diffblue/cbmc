@@ -100,17 +100,14 @@ bool symex_bmc_incremental_one_loopt::should_stop_unwind(
 /// \return True if the back edge encountered during symbolic execution
 ///   corresponds to the given loop (incr_loop_id)
 bool symex_bmc_incremental_one_loopt::check_break(
-  const irep_idt &id,
-  bool is_function,
-  statet &state,
-  const exprt &cond,
+  const irep_idt &loop_id,
   unsigned unwind)
 {
   if(unwind < incr_min_unwind)
     return false;
 
   // loop specified by incremental-loop
-  return (id == incr_loop_id);
+  return (loop_id == incr_loop_id);
 }
 
 bool symex_bmc_incremental_one_loopt::from_entry_point_of(

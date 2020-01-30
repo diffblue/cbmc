@@ -38,12 +38,7 @@ protected:
   std::unique_ptr<goto_symext::statet> state;
 
   // returns true if the symbolic execution is to be interrupted for checking
-  bool check_break(
-    const irep_idt &id,
-    bool is_function,
-    goto_symext::statet &state,
-    const exprt &cond,
-    unsigned unwind) override;
+  bool check_break(const irep_idt &loop_id, unsigned unwind) override;
 
   bool should_stop_unwind(
     const symex_targett::sourcet &source,

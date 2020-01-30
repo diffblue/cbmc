@@ -287,7 +287,7 @@ void goto_symext::symex_goto(statet &state)
     if(new_guard.is_true())
     {
       // we continue executing the loop
-      if(check_break(loop_id, false, state, new_guard, unwind))
+      if(check_break(loop_id, unwind))
       {
         should_pause_symex = true;
       }
@@ -584,12 +584,7 @@ void goto_symext::symex_unreachable_goto(statet &state)
   symex_transition(state);
 }
 
-bool goto_symext::check_break(
-  const irep_idt &id,
-  bool is_function,
-  statet &state,
-  const exprt &cond,
-  unsigned unwind)
+bool goto_symext::check_break(const irep_idt &loop_id, unsigned unwind)
 {
   // dummy implementation
   return false;

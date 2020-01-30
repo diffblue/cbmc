@@ -333,15 +333,8 @@ void symex_target_equationt::convert_without_assertions(
 
 void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 {
-  convert_guards(decision_procedure);
-  convert_assignments(decision_procedure);
-  convert_decls(decision_procedure);
-  convert_assumptions(decision_procedure);
+  convert_without_assertions(decision_procedure);
   convert_assertions(decision_procedure);
-  convert_goto_instructions(decision_procedure);
-  convert_function_calls(decision_procedure);
-  convert_io(decision_procedure);
-  convert_constraints(decision_procedure);
 }
 
 void symex_target_equationt::convert_assignments(
@@ -476,7 +469,7 @@ void symex_target_equationt::convert_assertions(
   {
     for(auto &step : SSA_steps)
     {
-      // ignore already converted assertions in the error trace
+      // hide already converted assertions in the error trace
       if(step.is_assert() && step.converted)
         step.hidden = true;
 
@@ -503,7 +496,7 @@ void symex_target_equationt::convert_assertions(
 
   for(auto &step : SSA_steps)
   {
-    // ignore already converted assertions in the error trace
+    // hide already converted assertions in the error trace
     if(step.is_assert() && step.converted)
       step.hidden = true;
 

@@ -168,12 +168,15 @@ public:
   /// by the symbolic executions.
   bool ignore_assertions = false;
 
-  virtual bool check_break(
-    const irep_idt &id,
-    bool is_function,
-    statet &state,
-    const exprt &cond,
-    unsigned unwind);
+  /// \brief Defines condition for interrupting symbolic execution for a
+  ///   specific loop
+  ///
+  /// False constant by default, over-ridden by incremental BMC implementation
+  ///   to allow breaking if the unwinding the user specified loop
+  /// \param loop_id: the loop identifier
+  /// \param unwind: current unwinding counter
+  /// \return true if the symbolic execution is to be interrupted for checking
+  virtual bool check_break(const irep_idt &loop_id, unsigned unwind);
 
 protected:
   /// The configuration to use for this symbolic execution
