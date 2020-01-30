@@ -44,10 +44,12 @@ void symex_bmct::symex_step(
   statet &state)
 {
   const source_locationt &source_location = state.source.pc->source_location;
-  // Turn on throwing invariants so we can safely log invariant failure during Symex
+  // Turn on throwing invariants so we can safely log invariant failure during
+  // Symex
   auto const invariants_should_throw_during_symex_step =
     cbmc_invariants_should_throwt{};
-  // If an exception is thrown during symex step, log the last relevant source location
+  // If an exception is thrown during symex step, log the last relevant
+  // source location
   auto const print_step_location_on_error =
     on_exit_scope_with_exception([source_location, this]() {
       auto const actual_source_location =
