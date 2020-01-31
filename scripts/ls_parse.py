@@ -182,7 +182,7 @@ def get_linker_script_data(script):
                 match = m
                 matched_str = buf[m.span()[0]:m.span()[1]]
                 for s, v in locals().items():
-                    if v is regex and s is not "regex":
+                    if v is regex and s != "regex":
                         matched_re = s
         if jump_fun is not None:
             info("regex '%s' matched '%s'", matched_re, matched_str)
@@ -321,9 +321,11 @@ def memory_cmd_fun(state, _, buf):
     asrt(not state["MEM"], "encountered MEMORY twice", buf)
     state["MEM"] = True
 
+
 def unknown_cmd_fun(state, _, buf):
     asrt(not state["MEM"], "encountered UNKNOWN twice", buf)
     state["UNKNOWN"] = True
+
 
 def match_up_expr_assigns(state):
     blocks = set([data["origin"] for data in state["expr-assigns"]])
@@ -479,13 +481,11 @@ def final_json_output(regions, symbol_table):
     return ret
 
 
-
 def symbols_from_file(sym_file):
     if sym_file == "-":
         return [s.strip() for s in sys.stdin.readlines()]
-    else:
-        with open(sym_file) as f:
-            return [s.strip() for s in f.readlines()]
+    with open(sym_file) as f:
+        return [s.strip() for s in f.readlines()]
 
 
 def safe_eval(expr):
