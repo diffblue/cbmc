@@ -6,10 +6,12 @@
 # Copyright Amazon, Inc. 2017
 
 
+import ast
 import argparse
 import json
 import logging
 from   logging import error, warning, info, debug
+import operator
 import os
 import re
 import subprocess
@@ -17,6 +19,12 @@ import sys
 import textwrap
 import traceback
 
+# ast.Num was deprecated in python 3.8
+if sys.version_info.major > 3 or \
+        (sys.version_info.major == 3 and sys.version_info.minor > 7):
+    ast_num = ast.Constant
+else:
+    ast_num = ast.Num
 
 def epilog():
     return textwrap.dedent("""
@@ -211,12 +219,11 @@ def assign_expr_fun(state, match, _):
                           expr)
             if expr != old_expr:
                 info("Subbed %s(%s) with %d", op, block_name, data[op])
-    info("Final expression is '%s'. Evaluating; "
-         "may the angels have mercy on my soul.", expr)
     try:
-        ret["addr"] = eval(expr)
+        ret["addr"] = safe_eval(expr)
     except RuntimeError:
-        warning("Unable to evaluate '%s'" , expr)
+        error("Unable to evaluate '%s'", expr)
+        sys.exit(1)
     info("Evaluated '%s' to %d", expr, ret["addr"])
     state["expr-assigns"].append(ret)
 
@@ -479,6 +486,30 @@ def symbols_from_file(sym_file):
     else:
         with open(sym_file) as f:
             return [s.strip() for s in f.readlines()]
+
+
+def safe_eval(expr):
+    tree = ast.parse(expr, mode="eval").body
+
+    def eval_single_node(node):
+        logging.debug(node)
+        if isinstance(node, ast_num):
+            return node.n
+        if isinstance(node, ast.BinOp):
+            left = eval_single_node(node.left)
+            right = eval_single_node(node.right)
+            op = eval_single_node(node.op)
+            return op(left, right)
+        return {
+            ast.Add: operator.add,
+            ast.Sub: operator.sub,
+            ast.Mult: operator.mul,
+            # Use floordiv (i.e. //) so that we never need to
+            # cast to an int
+            ast.Div: operator.floordiv,
+        }[type(node)]
+
+    return eval_single_node(tree)
 
 
 def main():
