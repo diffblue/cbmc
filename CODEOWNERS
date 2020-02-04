@@ -7,10 +7,10 @@
 # These files should rarely change
 
 /src/big-int/ @kroening
-/src/ansi-c/ @kroening @tautschnig
-/src/assembler/ @kroening @tautschnig
-/src/goto-cc/ @kroening @tautschnig
-/src/linking/ @kroening @tautschnig
+/src/ansi-c/ @kroening @tautschnig @chrisr-diffblue
+/src/assembler/ @kroening @tautschnig @chrisr-diffblue
+/src/goto-cc/ @kroening @tautschnig @chrisr-diffblue
+/src/linking/ @kroening @tautschnig @chrisr-diffblue
 /src/memory-models/ @kroening @tautschnig
 /src/goto-symex/ @kroening @tautschnig @peterschrammel @smowton @romainbrenguier
 /src/json/ @kroening @tautschnig @peterschrammel
