@@ -302,10 +302,10 @@ void java_bytecode_convert_classt::convert(
     }
     catch(const unsupported_java_class_signature_exceptiont &e)
     {
-      warning() << "Class: " << c.name
-                << "\n could not parse signature: " << c.signature.value()
-                << "\n " << e.what() << "\n ignoring that the class is generic"
-                << eom;
+      debug() << "Class: " << c.name
+              << "\n could not parse signature: " << c.signature.value()
+              << "\n " << e.what() << "\n ignoring that the class is generic"
+              << eom;
     }
   }
 
@@ -364,10 +364,10 @@ void java_bytecode_convert_classt::convert(
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        warning() << "Superclass: " << c.super_class << " of class: " << c.name
-                  << "\n could not parse signature: " << superclass_ref.value()
-                  << "\n " << e.what()
-                  << "\n ignoring that the superclass is generic" << eom;
+        debug() << "Superclass: " << c.super_class << " of class: " << c.name
+                << "\n could not parse signature: " << superclass_ref.value()
+                << "\n " << e.what()
+                << "\n ignoring that the superclass is generic" << eom;
         class_type.add_base(base);
       }
     }
@@ -404,10 +404,10 @@ void java_bytecode_convert_classt::convert(
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        warning() << "Interface: " << interface << " of class: " << c.name
-                  << "\n could not parse signature: " << interface_ref.value()
-                  << "\n " << e.what()
-                  << "\n ignoring that the interface is generic" << eom;
+        debug() << "Interface: " << interface << " of class: " << c.name
+                << "\n could not parse signature: " << interface_ref.value()
+                << "\n " << e.what()
+                << "\n ignoring that the interface is generic" << eom;
         class_type.add_base(base);
       }
     }
