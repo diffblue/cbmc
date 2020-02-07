@@ -420,3 +420,83 @@ TEST_CASE("simplify_expr boolean expressions", "[core][util]")
     }
   }
 }
+
+TEST_CASE("Simplifying cast expressions", "[core][util]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  const auto short_type = signedbv_typet(16);
+  const auto int_type = signedbv_typet(32);
+  const auto long_type = signedbv_typet(64);
+  array_typet array_type(int_type, from_integer(5, int_type));
+
+  symbolt a_symbol;
+  a_symbol.base_name = "a";
+  a_symbol.name = "a";
+  a_symbol.type = array_type;
+  a_symbol.is_lvalue = true;
+  symbol_table.add(a_symbol);
+
+  symbolt i_symbol;
+  i_symbol.base_name = "i";
+  i_symbol.name = "i";
+  i_symbol.type = int_type;
+  i_symbol.is_lvalue = true;
+  symbol_table.add(i_symbol);
+
+  config.set_arch("none");
+
+  SECTION("Simplifying a[(signed long int)0]")
+  {
+    // a[(signed long int)0]
+    index_exprt expr{symbol_exprt{"a", array_type},
+                     typecast_exprt{from_integer(0, int_type), long_type}};
+    // cast is applied on the constant
+    const auto simplified_expr = simplify_expr(expr, ns);
+    REQUIRE(
+      simplified_expr ==
+      index_exprt{symbol_exprt{"a", array_type}, from_integer(0, long_type)});
+  }
+  SECTION("Simplifying a[(signed long int)i]")
+  {
+    // a[(signed long int)0]
+    index_exprt expr{symbol_exprt{"a", array_type},
+                     typecast_exprt{i_symbol.symbol_expr(), long_type}};
+    // Cast is not removed as up casting a symbol
+    const auto simplified_expr = simplify_expr(expr, ns);
+    REQUIRE(simplified_expr == expr);
+  }
+  SECTION("Simplifying a[(signed int)i]")
+  {
+    // a[(signed int)i]
+    index_exprt expr{symbol_exprt{"a", array_type},
+                     typecast_exprt{i_symbol.symbol_expr(), int_type}};
+
+    const auto simplified_expr = simplify_expr(expr, ns);
+    REQUIRE(
+      simplified_expr ==
+      index_exprt{symbol_exprt{"a", array_type}, i_symbol.symbol_expr()});
+  }
+  SECTION("Simplifying a[(signed short)0]")
+  {
+    // a[(signed short)0]
+    index_exprt expr{symbol_exprt{"a", array_type},
+                     typecast_exprt{from_integer(0, int_type), short_type}};
+
+    // Can be simplified as the number is a constant
+    const auto simplified_expr = simplify_expr(expr, ns);
+    REQUIRE(
+      simplified_expr ==
+      index_exprt{symbol_exprt{"a", array_type}, from_integer(0, short_type)});
+  }
+  SECTION("Simplifying a[(signed short)i]")
+  {
+    // a[(signed short)i]
+    index_exprt expr{symbol_exprt{"a", array_type},
+                     typecast_exprt{i_symbol.symbol_expr(), short_type}};
+
+    // No simplification as the cast may have an effect
+    const auto simplified_expr = simplify_expr(expr, ns);
+    REQUIRE(simplified_expr == expr);
+  }
+}
