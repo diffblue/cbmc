@@ -298,3 +298,125 @@ TEST_CASE("Simplify cast from bool", "[core][util]")
     REQUIRE(simp == B);
   }
 }
+
+TEST_CASE("simplify_expr boolean expressions", "[core][util]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+
+  SECTION("Binary boolean operations")
+  {
+    struct test_entryt
+    {
+      exprt lhs;
+      exprt rhs;
+      exprt expected_value;
+    };
+
+    SECTION("AND")
+    {
+      std::vector<test_entryt> test_values = {
+        {true_exprt(), true_exprt(), true_exprt()},
+        {true_exprt(), false_exprt(), false_exprt()},
+        {false_exprt(), true_exprt(), false_exprt()},
+        {false_exprt(), false_exprt(), false_exprt()},
+      };
+
+      for(const auto &entry : test_values)
+      {
+        const exprt result = simplify_expr(and_exprt{entry.lhs, entry.rhs}, ns);
+        REQUIRE(result == entry.expected_value);
+      }
+    }
+
+    SECTION("OR")
+    {
+      std::vector<test_entryt> test_values = {
+        {true_exprt(), true_exprt(), true_exprt()},
+        {true_exprt(), false_exprt(), true_exprt()},
+        {false_exprt(), true_exprt(), true_exprt()},
+        {false_exprt(), false_exprt(), false_exprt()},
+      };
+
+      for(const auto &entry : test_values)
+      {
+        const exprt result = simplify_expr(or_exprt{entry.lhs, entry.rhs}, ns);
+        REQUIRE(result == entry.expected_value);
+      }
+    }
+
+    SECTION("Implies")
+    {
+      std::vector<test_entryt> test_values = {
+        {true_exprt(), true_exprt(), true_exprt()},
+        {true_exprt(), false_exprt(), false_exprt()},
+        {false_exprt(), true_exprt(), true_exprt()},
+        {false_exprt(), false_exprt(), true_exprt()},
+      };
+
+      for(const auto &entry : test_values)
+      {
+        const exprt result =
+          simplify_expr(implies_exprt{entry.lhs, entry.rhs}, ns);
+        REQUIRE(result == entry.expected_value);
+      }
+    }
+  }
+  SECTION("Not")
+  {
+    REQUIRE(simplify_expr(not_exprt{true_exprt()}, ns) == false_exprt());
+    REQUIRE(simplify_expr(not_exprt{false_exprt()}, ns) == true_exprt());
+  }
+  SECTION("Nested boolean expressions")
+  {
+    INFO("((!true) || (false => false)) && true)")
+    REQUIRE(
+      simplify_expr(
+        and_exprt{or_exprt{not_exprt{true_exprt{}},
+                           implies_exprt{false_exprt{}, false_exprt{}}},
+                  true_exprt{}},
+        ns) == true_exprt{});
+  }
+  SECTION("Numeric comparisons")
+  {
+    struct test_entryt
+    {
+      irep_idt comparison;
+      int lhs;
+      int rhs;
+      exprt expected;
+    };
+
+    std::vector<test_entryt> comparisons = {
+      {ID_lt, -1, 1, true_exprt()},
+      {ID_lt, 1, 1, false_exprt()},
+      {ID_lt, 1, -1, false_exprt()},
+
+      {ID_le, -1, 1, true_exprt()},
+      {ID_le, 1, 1, true_exprt()},
+      {ID_le, 1, -1, false_exprt()},
+
+      {ID_ge, -1, 1, false_exprt()},
+      {ID_ge, 1, 1, true_exprt()},
+      {ID_ge, 1, -1, true_exprt()},
+
+      {ID_gt, -1, 1, false_exprt()},
+      {ID_gt, 1, 1, false_exprt()},
+      {ID_gt, 1, -1, true_exprt()},
+    };
+
+    const auto binary_relation_from = [](const test_entryt &entry) {
+      const signedbv_typet int_type(32);
+      return binary_relation_exprt{from_integer(entry.lhs, int_type),
+                                   entry.comparison,
+                                   from_integer(entry.rhs, int_type)};
+    };
+
+    for(const test_entryt &test_entry : comparisons)
+    {
+      REQUIRE(
+        simplify_expr(binary_relation_from(test_entry), ns) ==
+        test_entry.expected);
+    }
+  }
+}
