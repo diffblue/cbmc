@@ -1574,6 +1574,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_2,
         std::placeholders::_3,
         std::placeholders::_4);
+  cprover_equivalent_to_java_function
+    ["java::org.cprover.CProverString.parseInt:(Ljava/lang/String;I)I"] =
+      ID_cprover_string_parse_int_func;
+  cprover_equivalent_to_java_function
+    ["java::org.cprover.CProverString.parseLong:(Ljava/lang/String;I)J"] =
+      ID_cprover_string_parse_int_func;
 
   // String library
   conversion_table["java::java.lang.String.<init>:(Ljava/lang/String;)V"] =
@@ -1819,18 +1825,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       conversion_table["java::java.lang.String.length:()I"];
 
   // Other libraries
-  cprover_equivalent_to_java_function
-    ["java::java.lang.Integer.parseInt:(Ljava/lang/String;)I"]=
-      ID_cprover_string_parse_int_func;
-  cprover_equivalent_to_java_function
-    ["java::java.lang.Integer.parseInt:(Ljava/lang/String;I)I"]=
-      ID_cprover_string_parse_int_func;
-  cprover_equivalent_to_java_function
-    ["java::java.lang.Long.parseLong:(Ljava/lang/String;)J"]=
-      ID_cprover_string_parse_int_func;
-  cprover_equivalent_to_java_function
-    ["java::java.lang.Long.parseLong:(Ljava/lang/String;I)J"]=
-      ID_cprover_string_parse_int_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Integer.toHexString:(I)Ljava/lang/String;"]=
       ID_cprover_string_of_int_hex_func;

@@ -385,7 +385,6 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
 
   const equal_exprt starts_with_minus(str[0], from_integer('-', char_type));
   const constant_exprt zero_expr = from_integer(0, type);
-  exprt::operandst digit_constraints;
 
   exprt sum = get_numeric_value_from_character(
     str[0], char_type, type, strict_formatting, radix_ul);
@@ -407,8 +406,7 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     //   (the first part avoid overflows in the multiplication and the second
     //     one in the addition of the definition of sum_j)
     // For all 1<=size<=max_string_length we add axioms:
-    // a5 : |res| == size =>
-    //        forall max_string_length-2 <= j < size. no_overflow_j
+    // a5 : |res| >= size => no_overflow_j (only added when overflow possible)
     // a6 : |res| == size && res[0] is a digit for radix =>
     //        input_int == sum_{size-1}
     // a7 : |res| == size && res[0] == '-' => input_int == -sum_{size-1}
@@ -424,31 +422,33 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     // a digit, which is `max_string_length - 2` because of the space left for
     // a minus sign. That assumes that we were able to identify the radix. If we
     // weren't then we check for overflow on every index.
+    optionalt<exprt> no_overflow;
     if(size - 1 >= max_string_length - 2 || radix_ul == 0)
     {
-      const and_exprt no_overflow(
-        equal_exprt(sum, div_exprt(radix_sum, radix)),
-        binary_relation_exprt(new_sum, ID_ge, radix_sum));
-      digit_constraints.push_back(no_overflow);
+      no_overflow = and_exprt{equal_exprt(sum, div_exprt(radix_sum, radix)),
+                              binary_relation_exprt(new_sum, ID_ge, radix_sum)};
     }
     sum = new_sum;
 
-    const equal_exprt premise =
-      equal_to(array_pool.get_or_create_length(str), size);
+    exprt length_expr = array_pool.get_or_create_length(str);
 
-    if(!digit_constraints.empty())
+    if(no_overflow.has_value())
     {
-      const implies_exprt a5(premise, conjunction(digit_constraints));
+      const binary_predicate_exprt string_length_ge_size{
+        length_expr, ID_ge, from_integer(size, length_expr.type())};
+      const implies_exprt a5(string_length_ge_size, *no_overflow);
       constraints.existential.push_back(a5);
     }
 
+    const equal_exprt string_length_equals_size = equal_to(length_expr, size);
+
     const implies_exprt a6(
-      and_exprt(premise, not_exprt(starts_with_minus)),
+      and_exprt(string_length_equals_size, not_exprt(starts_with_minus)),
       equal_exprt(input_int, sum));
     constraints.existential.push_back(a6);
 
     const implies_exprt a7(
-      and_exprt(premise, starts_with_minus),
+      and_exprt(string_length_equals_size, starts_with_minus),
       equal_exprt(input_int, unary_minus_exprt(sum)));
     constraints.existential.push_back(a7);
   }
