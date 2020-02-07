@@ -1,0 +1,416 @@
+XML Specification for CBMC Traces
+=================================
+
+Traces of GOTO programs consist of *steps*, i.e. steps are elements of
+the XML object.
+
+Trace Step Types
+----------------
+
+-   assignment
+
+-   assume
+
+-   assert
+
+-   goto instruction
+
+-   function call
+
+-   function return
+
+-   output
+
+-   input
+
+-   declaration
+
+-   dead statement
+
+-   spawn statement
+
+-   memory barrier
+
+unused:
+
+-   constraint
+
+-   location
+
+-   shared read
+
+-   shared write
+
+-   atomic begin
+
+-   atomic end
+
+Source Location
+---------------
+
+Every trace step optionally contains the source location as an element.
+
+**Attributes** (all are optional):
+
+-   `working-directory`: string of the full path
+
+-   `file`: name of the file containing this location
+
+-   `line`: non-negative integer
+
+-   `column`: non-negative integer
+
+-   `function`: name of the function this line belongs to
+
+**Example**:
+
+``` {.xml}
+<location file="test.c" function="main" line="7"
+          working-directory="/tmp/subfolder"/>
+```
+
+**XSD**:
+
+``` {.xml}
+<xs:element name="location">
+  <xs:complexType>
+    <xs:attribute name="file" type="xs:string" use="optional"></xs:attribute>
+    <xs:attribute name="line" type="xs:int" use="optional"></xs:attribute>
+    <xs:attribute name="working-directory" type="xs:string"
+                  use="optional"></xs:attribute>
+  </xs:complexType>
+</xs:element>
+```
+
+Trace Steps in XML
+------------------
+
+The attributes `hidden, thread, step_nr` are common to all trace steps.
+
+``` {.xml}
+<xs:attributeGroup name="traceStepAttrs"/>
+  <xs:attribute name="hidden" type="xs:string"></xs:attribute>
+  <xs:attribute name="step_nr" type="xs:int"></xs:attribute>
+  <xs:attribute name="thread" type="xs:int"></xs:attribute>
+</xs:attributeGroup>
+```
+
+[Assert]{} (element name: `failure`)
+
+**Attributes**:
+
+-   `hidden`: boolean attribute
+
+-   `thread`: thread number (positive integer)
+
+-   `step_nr`: number in the trace (positive integer)
+
+-   `reason`: comment (string)
+
+-   `property`: property ID (irep\_idt)
+
+**Example**:
+
+``` {.xml}
+<failure hidden="false" step_nr="23" thread="0"
+         property="main.assertion.1"
+         reason="assertion a + b &lt; 10">
+  <location .. />
+</failure>
+```
+
+**XSD**:
+
+``` {.xml}
+<xs:element name="failure">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attribute name="property" type="xs:string"></xs:attribute>
+    <xs:attribute name="reason" type="xs:string"></xs:attribute>
+  </xs:complexType>
+</xs:element>
+```
+
+[Assignment, Declaration]{} (element name: `assignment`)
+
+**Attributes**:\
+if the lhs symbol is known
+
+-   `mode`: {C, Java, ...}
+
+-   `identifier`: string (symbol name)
+
+-   `base_name`: string (e.g. “counter”)
+
+-   `display_name`: string (e.g. "main::1::counter")
+
+always present
+
+-   `hidden`: boolean attribute
+
+-   `thread`: thread number (positive integer)
+
+-   `step_nr`: number in the trace (positive integer)
+
+-   `assignment_type`: {actual\_parameter, state}
+
+**Elements**:\
+if the lhs symbol is known
+
+-   `type`: C type (e.g. “signed int”)
+
+always present
+
+-   `full_lhs`: original lhs expression (after dereferencing)
+
+-   `full_lhs_value`: a constant with the new value
+
+**Example**:
+
+``` {.xml}
+<assignment assignment_type="state" base_name="b" display_name="main::1::b"
+            hidden="false" identifier="main::1::b" mode="C" step_nr="22"
+            thread="0">
+  <location .. />
+  <type>signed int</type>
+  <full_lhs>b</full_lhs>
+  <full_lhs_value>-1879048192</full_lhs_value>
+</assignment>
+```
+
+**XSD**:
+
+``` {.xml}
+<xs:element name="assignment">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+      <xs:element name="type" type="xs:string" minOccurs="0"></xs:element>
+      <xs:element name="full_lhs" type="xs:string"></xs:element>
+      <xs:element name="full_lhs_value" type="xs:int"></xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attribute name="assignment_type" type="xs:string"></xs:attribute>
+    <xs:attribute name="base_name" type="xs:string"
+                  use="optional"></xs:attribute>
+    <xs:attribute name="display_name" type="xs:string"
+                  use="optional"></xs:attribute>
+    <xs:attribute name="identifier" type="xs:string"
+                  use="optional"></xs:attribute>
+    <xs:attribute name="mode" type="xs:string" use="optional"></xs:attribute>
+  </xs:complexType>
+</xs:element>
+```
+
+[Input]{} (element name: `input`)
+
+**Attributes**:
+
+-   `hidden`: boolean attribute
+
+-   `thread`: thread number (positive integer)
+
+-   `step_nr`: number in the trace (positive integer)
+
+**Elements**:
+
+-   `input_id`: IO id (the variable name)
+
+for each IO argument
+
+-   `value`: the (correctly typed) value the input is initialised with
+
+-   `value_expression`: the internal representation of the value
+
+**Example**:
+
+``` {.xml}
+<input hidden="false" step_nr="21" thread="0">
+  <input_id>i</input_id>
+  <value>-2147145201</value>
+  <value_expression>
+    <integer binary="10000000000001010010101000001111"
+             c_type="int" width="32">
+      -2147145201
+    </integer>
+  </value_expression>
+  <location .. />
+</input>
+```
+
+**XSD**:
+
+``` {.xml}
+<xs:group name="ioArgGroup">
+  <xs:all>
+    <xs:element name="value" type="xs:string"></xs:element>
+    <xs:element name="value_expression">
+      <xs:complexType></xs:complexType>
+    </xs:element>
+  </xs:all>
+</xs:group>
+
+<xs:element name="input">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+      <xs:element name="input_id" type="xs:string"></xs:element>
+      <xs:group ref="ioArgGroup" maxOccurs="unbounded"></xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+```
+
+[Output]{} (element name: `output`)
+
+**Attributes**:
+
+-   `hidden`: boolean attribute
+
+-   `thread`: thread number (positive integer)
+
+-   `step_nr`: number in the trace (positive integer)
+
+**Elements**:
+
+-   `text`: formatted list of IO arguments
+
+for each IO argument
+
+-   `value`: the (correctly typed) value the input is initialised with
+
+-   `value_expression`: the internal representation of the value
+
+[Function Call]{} (element name: `function_call`)\
+[Function Return]{} (element name: `function_return`)
+
+**Attributes**:
+
+-   `hidden`: boolean attribute
+
+-   `thread`: thread number (positive integer)
+
+-   `step_nr`: number in the trace (positive integer)
+
+**Elements**:
+
+-   `function`: compound element containing the following\
+    Attributes:
+
+    -   `display_name`: language specific pretty name
+
+    -   `identifier`: the internal unique identifier
+
+    Elements:
+
+    -   `location`: source location of the called function
+
+**Example**:
+
+``` {.xml}
+<function_call hidden="false" step_nr="20" thread="0">
+  <function display_name="main" identifier="main">
+    <location .. />
+  </function>
+  <location .. />
+</function_call>
+```
+
+**XSD**:
+
+``` {.xml}
+<xs:element name="function_call">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+      <xs:element name="function">
+        <!-- See below -->
+      </xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="function">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+    </xs:all>
+    <xs:attribute name="display_name" type="xs:string"></xs:attribute>
+    <xs:attribute name="identifier" type="xs:string"></xs:attribute>
+  </xs:complexType>
+</xs:element>
+```
+
+[All Other Steps]{} (element name: `location-only`)
+
+Only included if the source location exists and differs from the
+previous one.\
+**Attributes**:
+
+-   `hidden`: boolean attribute
+
+-   `thread`: thread number (positive integer)
+
+-   `step_nr`: number in the trace (positive integer)
+
+**Elements**:
+
+-   `location`: location of the called function
+
+**Example**:
+
+``` {.xml}
+<location-only hidden="false" step_nr="19" thread="0">
+  <location .. />
+</location-only>
+```
+
+**XSD**:
+
+``` {.xml}
+<xs:element name="location-only">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+```
+
+Full Trace XSD
+--------------
+
+``` {.xml}
+<xs:element name="goto_trace">
+  <xs:complexType>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="assignment"></xs:element>
+      <xs:element name="failure"></xs:element>
+      <xs:element name="function_call"></xs:element>
+      <xs:element name="function_return"></xs:element>
+      <xs:element name="input"></xs:element>
+      <xs:element name="output"></xs:element>
+      <xs:element name="location-only"></xs:element>
+    </xs:choice>
+  </xs:complexType>
+</xs:element>
+```
+
+Notes
+-----
+
+The path from the input C code to XML trace goes through the following
+steps:\
+C -> GOTO -> SSA -> GOTO Trace -> XML Trace
+
+#### SSA to GOTO Trace
+
+SSA steps are sorted by clocks and the following steps are skipped: PHI,
+GUARD assignments; shared-read, shared-write, constraint, spawn,
+atomic-begin, atomic-end.
