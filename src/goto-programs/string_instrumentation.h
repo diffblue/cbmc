@@ -41,16 +41,19 @@ private:
 void string_instrumentation(
   symbol_tablet &,
   message_handlert &,
-  goto_programt &);
+  goto_programt &,
+  size_t);
 
 void string_instrumentation(
   symbol_tablet &,
   message_handlert &,
-  goto_functionst &);
+  goto_functionst &,
+  size_t);
 
 void string_instrumentation(
   goto_modelt &,
-  message_handlert &);
+  message_handlert &,
+  const std::string &);
 
 predicate_exprt is_zero_string(const exprt &what, bool write = false);
 exprt zero_string_length(const exprt &what, bool write=false);

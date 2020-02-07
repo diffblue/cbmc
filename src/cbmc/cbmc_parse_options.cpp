@@ -362,6 +362,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option("refine-strings", true);
     options.set_option("string-printable", cmdline.isset("string-printable"));
+    options.set_option(
+      "max-nondet-string-length",
+      cmdline.get_value("max-nondet-string-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -830,8 +833,13 @@ bool cbmc_parse_optionst::process_goto_program(
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);
 
-  if(options.get_bool_option("string-abstraction"))
-    string_instrumentation(goto_model, log.get_message_handler());
+  if(
+    options.get_bool_option("string-abstraction") ||
+    options.get_bool_option("refine-strings"))
+    string_instrumentation(
+      goto_model,
+      log.get_message_handler(),
+      options.get_option("max-nondet-string-length"));
 
   // remove function pointers
   log.status() << "Removal of function pointers and virtual functions"
