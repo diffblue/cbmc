@@ -82,6 +82,90 @@ string_constraint_generatort::add_axioms_for_index_of(
   return {index, std::move(constraints)};
 }
 
+/// Add axioms stating that the returned value is the index within `haystack`
+/// (`str`) of the first occurrence of `needle` (`c`) starting the search at
+/// `from_index`, or is `-1` if no such character occurs at or after position
+/// `from_index`.
+/// \todo Make argument names match whose of add_axioms_for_index_of_string
+///
+/// These axioms are:
+///   1a. \f$-1 \le {\tt index} < {\tt terminating_zero} \f$
+///   1b. \f${\tt terminating_zero} < |{\tt haystack}| \f$
+///   2a. \f$ \lnot contains \Leftrightarrow {\tt index} = -1 \f$
+///   2b. \f$ {\tt haystack}{\tt terminating_zero} = '\0' \f$
+///   3. \f$ contains \Rightarrow {\tt from\_index} \le {\tt index}
+///          \land {\tt haystack}[{\tt index}] = {\tt needle} \f$
+///   4. \f$ \forall i \in [{\tt from\_index}, {\tt index}).\ contains
+///          \Rightarrow {\tt haystack}[i] \ne {\tt needle} \f$
+///   5. \f$ \forall m, n \in [{\tt from\_index}, {\tt terminating_zero+1})
+///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}
+///      \f$
+/// \param str: an array of characters expression
+/// \param c: a character expression
+/// \param from_index: an integer expression
+/// \return integer expression `index`
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_c_index_of(
+  const array_string_exprt &str,
+  const exprt &c,
+  const exprt &from_index)
+{
+  string_constraintst constraints;
+  const typet &index_type = str.length_type();
+  symbol_exprt index = fresh_symbol("index_of", index_type);
+  symbol_exprt contains = fresh_symbol("contains_in_index_of");
+  symbol_exprt terminating_zero = fresh_symbol("zero_in_index_of", index_type);
+
+  exprt minus1 = from_integer(-1, index_type);
+  and_exprt a1(
+    binary_relation_exprt(index, ID_ge, minus1),
+    binary_relation_exprt(index, ID_le, terminating_zero),
+    binary_relation_exprt(
+      terminating_zero, ID_lt, array_pool.get_or_create_length(str)));
+  constraints.existential.push_back(a1);
+
+  equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
+  constraints.existential.push_back(a2);
+
+  const exprt lower_bound(zero_if_negative(from_index));
+  // make sure that terminating zero exists (and is the smallest index after
+  // from that has a 0 character)
+  constraints.existential.push_back(
+    equal_exprt{str[terminating_zero], from_integer(0, c.type())});
+  symbol_exprt k = fresh_symbol("QA_index_of", index_type);
+  const string_constraintt a0 = string_constraintt{
+    k,
+    lower_bound,
+    zero_if_negative(terminating_zero),
+    not_exprt{equal_exprt{str[k], from_integer(0, c.type())}}};
+  constraints.universal.push_back(a0);
+
+  implies_exprt a3(
+    contains,
+    and_exprt(
+      binary_relation_exprt(from_index, ID_le, index),
+      equal_exprt(str[index], c)));
+  constraints.existential.push_back(a3);
+
+  symbol_exprt n = fresh_symbol("QA_index_of", index_type);
+  string_constraintt a4{n,
+                        lower_bound,
+                        zero_if_negative(index),
+                        implies_exprt{contains, notequal_exprt{str[n], c}}};
+  constraints.universal.push_back(a4);
+
+  symbol_exprt m = fresh_symbol("QA_index_of", index_type);
+  string_constraintt a5(
+    m,
+    lower_bound,
+    zero_if_negative(
+      plus_exprt{terminating_zero, from_integer(1, terminating_zero.type())}),
+    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
+  constraints.universal.push_back(a5);
+
+  return {index, std::move(constraints)};
+}
+
 /// Add axioms stating that the returned value `index` is the index within
 /// `haystack` of the first occurrence of `needle` starting the search at
 /// `from_index`, or `-1` if needle does not occur at or after position
@@ -327,6 +411,37 @@ string_constraint_generatort::add_axioms_for_index_of(
     array_string_exprt sub = get_string_expr(array_pool, c);
     return add_axioms_for_index_of_string(str, sub, from_index);
   }
+}
+
+/// Index of the first occurence of a target inside the string
+///
+/// If the target is a character:
+// NOLINTNEXTLINE
+/// \copybrief add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
+/// (More...) \endlink
+///
+/// If the target is a refined_string:
+/// \copybrief add_axioms_for_index_of_string
+/// \link add_axioms_for_index_of_string (More...)
+/// \endlink
+/// \warning slow for string targets
+/// \param f: function application with arguments refined_string `haystack`,
+///   refined_string or character `needle`, and optional integer `from_index`
+///   with default value `0`
+/// \return integer expression
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_c_index_of(
+  const function_application_exprt &f)
+{
+  auto const &str = f.arguments().at(0);
+  auto const &c = f.arguments().at(1);
+  auto const str_array = get_string_expr(array_pool, str);
+  return add_axioms_for_c_index_of(
+    str_array,
+    typecast_exprt{c, str_array.content().type().subtype()},
+    from_integer(0, str_array.length_type()));
 }
 
 /// Add axioms stating that the returned value is the index within `haystack`
