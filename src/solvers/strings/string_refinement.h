@@ -56,6 +56,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 // it is not turned on by default and not all options are available.
 #define OPT_STRING_REFINEMENT_CBMC \
   "(refine-strings)" \
+  "(max-nondet-string-length):" \
   "(string-printable)"
 
 #define HELP_STRING_REFINEMENT_CBMC \

@@ -24,9 +24,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <stack>
 #include <unordered_set>
+#include <util/c_types.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/magic.h>
+#include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 
@@ -324,6 +326,16 @@ static void add_equations_for_symbol_resolution(
       stream << log_message << "non equal types lhs: " << format(lhs)
              << "\n####################### rhs: " << format(rhs)
              << messaget::eom;
+      continue;
+    }
+
+    if(
+      rhs.id() == ID_symbol &&
+      has_prefix(
+        id2string(to_symbol_expr(rhs).get_identifier()), "symex::args::"))
+    {
+      // Symex introduces a new name for non-constant arguments that it uses in
+      // trace building, we do not need it here for symbol resolve.
       continue;
     }
 
@@ -1066,7 +1078,7 @@ static exprt get_char_array_and_concretize(
   const namespacet &ns,
   messaget::mstreamt &stream,
   const array_string_exprt &arr,
-  array_poolt &array_pool)
+  const array_poolt &array_pool)
 {
   stream << "- " << format(arr) << ":\n";
   stream << std::string(4, ' ') << "- type: " << format(arr.type())
@@ -1115,7 +1127,7 @@ void debug_model(
   const namespacet &ns,
   const std::function<exprt(const exprt &)> &super_get,
   const std::vector<symbol_exprt> &symbols,
-  array_poolt &array_pool)
+  const array_poolt &array_pool)
 {
   stream << "debug_model:" << '\n';
   for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
@@ -1201,7 +1213,8 @@ static optionalt<exprt> substitute_array_access(
   symbol_generatort &symbol_generator,
   const bool left_propagate)
 {
-  const exprt &array = index_expr.array();
+  const auto array =
+    massage_weird_arrays_into_non_weird_arrays(index_expr.array());
   if(auto array_of = expr_try_dynamic_cast<array_of_exprt>(array))
     return array_of->op();
   if(auto array_with = expr_try_dynamic_cast<with_exprt>(array))
@@ -1617,8 +1630,20 @@ static void initial_index_set(
   }
   if(auto ite = expr_try_dynamic_cast<if_exprt>(s))
   {
-    initial_index_set(index_set, ns, qvar, upper_bound, ite->true_case(), i);
-    initial_index_set(index_set, ns, qvar, upper_bound, ite->false_case(), i);
+    initial_index_set(
+      index_set,
+      ns,
+      qvar,
+      upper_bound,
+      massage_weird_arrays_into_non_weird_arrays(ite->true_case()),
+      i);
+    initial_index_set(
+      index_set,
+      ns,
+      qvar,
+      upper_bound,
+      massage_weird_arrays_into_non_weird_arrays(ite->false_case()),
+      i);
     return;
   }
   const minus_exprt u_minus_1(upper_bound, from_integer(1, upper_bound.type()));
@@ -1641,7 +1666,8 @@ static void initial_index_set(
     if(it->id() == ID_index && is_char_type(it->type()))
     {
       const auto &index_expr = to_index_expr(*it);
-      const auto &s = index_expr.array();
+      const auto s =
+        massage_weird_arrays_into_non_weird_arrays(index_expr.array());
       initial_index_set(index_set, ns, qvar, bound, s, index_expr.index());
       it.next_sibling_or_parent();
     }
@@ -1835,7 +1861,9 @@ exprt string_refinementt::get(const exprt &expr) const
       else
         UNREACHABLE;
     }
-    const auto array = supert::get(current.get());
+    const auto array =
+      massage_weird_arrays_into_non_weird_arrays(supert::get(current.get()));
+
     const auto index = get(index_expr->index());
 
     // If the underlying solver does not know about the existence of an array,
