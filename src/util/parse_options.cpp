@@ -118,6 +118,11 @@ int parse_options_baset::main()
     log.error() << e.what() << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
+  catch(const invariant_failedt &e)
+  {
+    log.error() << e.what() << messaget::eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
   catch(...)
   {
     log.error() << "Unknown exception type!" << messaget::eom;
