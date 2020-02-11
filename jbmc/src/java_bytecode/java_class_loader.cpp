@@ -164,11 +164,10 @@ java_class_loadert::get_parse_tree(
         ++parse_tree_it;
         break;
       }
-      warning()
-        << "Skipping class " << class_name
-        << " marked with OverlayClassImplementation but found before"
-          " original definition"
-        << eom;
+      debug() << "Skipping class " << class_name
+              << " marked with OverlayClassImplementation but found before"
+                 " original definition"
+              << eom;
     }
     auto unloaded_or_overlay_out_of_order_it = parse_tree_it;
     ++parse_tree_it;
@@ -180,9 +179,8 @@ java_class_loadert::get_parse_tree(
     // Remove non-initial classes that aren't overlays
     if(!is_overlay_class(parse_tree_it->parsed_class))
     {
-      warning()
-        << "Skipping duplicate definition of class " << class_name
-        << " not marked with OverlayClassImplementation" << eom;
+      debug() << "Skipping duplicate definition of class " << class_name
+              << " not marked with OverlayClassImplementation" << eom;
       auto duplicate_non_overlay_it = parse_tree_it;
       ++parse_tree_it;
       parse_trees.erase(duplicate_non_overlay_it);
@@ -194,7 +192,7 @@ java_class_loadert::get_parse_tree(
     return parse_trees;
 
   // Not found or failed to load
-  warning() << "failed to load class " << class_name << eom;
+  debug() << "failed to load class " << class_name << eom;
   parse_trees.emplace_back(class_name);
   return parse_trees;
 }
