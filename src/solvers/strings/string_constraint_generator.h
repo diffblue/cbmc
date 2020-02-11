@@ -288,7 +288,7 @@ public:
     const std::size_t max_string_length,
     const exprt &radix,
     const unsigned long radix_ul);
-  string_constraintst add_axioms_for_correct_number_format(
+  std::vector<exprt> get_conjuncts_for_correct_number_format(
     const array_string_exprt &str,
     const exprt &radix_as_char,
     const unsigned long radix_ul,
@@ -297,11 +297,33 @@ public:
   std::pair<exprt, string_constraintst>
   add_axioms_for_parse_int(const function_application_exprt &f);
   std::pair<exprt, string_constraintst>
+  add_axioms_for_is_valid_int(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst>
   add_axioms_for_compare_to(const function_application_exprt &f);
 
   std::pair<exprt, string_constraintst> combine_results(
     std::pair<exprt, string_constraintst> result1,
     std::pair<exprt, string_constraintst> result2);
+
+  /// Argument block for parseInt and cousins, common to parseInt itself and
+  /// CProverString.isValidInt
+  struct parseint_argumentst
+  {
+    /// String being parsed
+    array_string_exprt str;
+    /// Radix, as parseInt's result type
+    exprt radix;
+    /// Radix as an unsigned long (or 0 if unknown)
+    unsigned long radix_ul;
+    /// Max string length (assuming no leading zeroes) considering the radix
+    // (or pessimistic assumption of base-2 if unknown) and result type. For
+    // example, the longest possible decimal int64 is 16 characters long in hex.
+    std::size_t max_string_length;
+  };
+
+  parseint_argumentst unpack_parseint_arguments(
+    const function_application_exprt &f,
+    const typet &target_int_type);
 };
 
 exprt length_constraint_for_concat_char(

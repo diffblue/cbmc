@@ -161,7 +161,7 @@ string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
   const typecast_exprt radix_input_type(radix, type);
   const bool strict_formatting = true;
 
-  auto result1 = add_axioms_for_correct_number_format(
+  auto result1 = get_conjuncts_for_correct_number_format(
     res, radix_as_char, radix_ul, max_size, strict_formatting);
   auto result2 = add_axioms_for_characters_in_integer_string(
     input_int,
@@ -171,7 +171,7 @@ string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
     max_size,
     radix_input_type,
     radix_ul);
-  merge(result2, std::move(result1));
+  result2.existential.push_back(conjunction(std::move(result1)));
   return {from_integer(0, get_return_code_type()), std::move(result2)};
 }
 
@@ -276,15 +276,15 @@ string_constraint_generatort::add_axioms_from_int_hex(
 /// \param max_size: maximum number of characters
 /// \param strict_formatting: if true, don't allow a leading plus, redundant
 ///   zeros or upper case letters
-string_constraintst
-string_constraint_generatort::add_axioms_for_correct_number_format(
+std::vector<exprt>
+string_constraint_generatort::get_conjuncts_for_correct_number_format(
   const array_string_exprt &str,
   const exprt &radix_as_char,
   const unsigned long radix_ul,
   const std::size_t max_size,
   const bool strict_formatting)
 {
-  string_constraintst constraints;
+  std::vector<exprt> conjuncts;
   const typet &char_type = str.content().type().subtype();
   const typet &index_type = str.length_type();
 
@@ -297,20 +297,20 @@ string_constraint_generatort::add_axioms_for_correct_number_format(
   // |str| > 0
   const exprt non_empty = greater_or_equal_to(
     array_pool.get_or_create_length(str), from_integer(1, index_type));
-  constraints.existential.push_back(non_empty);
+  conjuncts.push_back(non_empty);
 
   if(strict_formatting)
   {
     // str[0] = '-' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(starts_with_minus, starts_with_digit);
-    constraints.existential.push_back(correct_first);
+    conjuncts.push_back(correct_first);
   }
   else
   {
     // str[0] = '-' || str[0] = '+' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(
       starts_with_minus, starts_with_digit, starts_with_plus);
-    constraints.existential.push_back(correct_first);
+    conjuncts.push_back(correct_first);
   }
 
   // str[0]='+' or '-' ==> |str| > 1
@@ -318,10 +318,10 @@ string_constraint_generatort::add_axioms_for_correct_number_format(
     or_exprt(starts_with_minus, starts_with_plus),
     greater_or_equal_to(
       array_pool.get_or_create_length(str), from_integer(2, index_type)));
-  constraints.existential.push_back(contains_digit);
+  conjuncts.push_back(contains_digit);
 
   // |str| <= max_size
-  constraints.existential.push_back(
+  conjuncts.push_back(
     less_than_or_equal_to(array_pool.get_or_create_length(str), max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
@@ -336,7 +336,7 @@ string_constraint_generatort::add_axioms_for_correct_number_format(
         from_integer(index + 1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
-    constraints.existential.push_back(character_at_index_is_digit);
+    conjuncts.push_back(character_at_index_is_digit);
   }
 
   if(strict_formatting)
@@ -348,14 +348,14 @@ string_constraint_generatort::add_axioms_for_correct_number_format(
       equal_exprt(chr, zero_char),
       equal_to(
         array_pool.get_or_create_length(str), from_integer(1, index_type)));
-    constraints.existential.push_back(no_leading_zero);
+    conjuncts.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
     implies_exprt no_leading_zero_after_minus(
       starts_with_minus, not_exprt(equal_exprt(str[1], zero_char)));
-    constraints.existential.push_back(no_leading_zero_after_minus);
+    conjuncts.push_back(no_leading_zero_after_minus);
   }
-  return constraints;
+  return conjuncts;
 }
 
 /// Add axioms connecting the characters in the input string to the value of the
@@ -455,6 +455,65 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   return constraints;
 }
 
+string_constraint_generatort::parseint_argumentst
+string_constraint_generatort::unpack_parseint_arguments(
+  const function_application_exprt &f,
+  const typet &target_int_type)
+{
+  PRECONDITION(f.arguments().size() == 1 || f.arguments().size() == 2);
+  PRECONDITION(target_int_type.id() == ID_signedbv);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
+
+  const exprt radix =
+    f.arguments().size() == 1
+      ? static_cast<exprt>(from_integer(10, target_int_type))
+      : static_cast<exprt>(typecast_exprt(f.arguments()[1], target_int_type));
+  // Most of the time we can evaluate radix as an integer. The value 0 is used
+  // to indicate when we can't tell what the radix is.
+  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
+  PRECONDITION((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
+
+  const std::size_t max_string_length =
+    max_printed_string_length(target_int_type, radix_ul);
+
+  return {str, radix, radix_ul, max_string_length};
+}
+
+/// Check a string is a valid integer, using the same rules as Java
+/// Integer.parseInt
+///
+/// Add axioms relating a boolean return value to being a valid integer
+/// \param f: a function application with arguments refined_string `str` and
+///   an optional integer for the radix
+/// \return boolean expression indicating whether the string is a valid integer
+std::pair<exprt, string_constraintst>
+string_constraint_generatort::add_axioms_for_is_valid_int(
+  const function_application_exprt &f)
+{
+  irep_idt called_function = to_symbol_expr(f.function()).get_identifier();
+  PRECONDITION(
+    called_function == ID_cprover_string_is_valid_int_func ||
+    called_function == ID_cprover_string_is_valid_long_func);
+  const signedbv_typet target_int_type{static_cast<size_t>(
+    called_function == ID_cprover_string_is_valid_int_func ? 32 : 64)};
+  auto args = unpack_parseint_arguments(f, target_int_type);
+
+  const typet &char_type = args.str.content().type().subtype();
+  const typecast_exprt radix_as_char(args.radix, char_type);
+  const bool strict_formatting = false;
+
+  /// \note the only thing stopping us from taking longer strings with many
+  /// leading zeros is the axioms for correct number format
+  auto conjuncts = get_conjuncts_for_correct_number_format(
+    args.str,
+    radix_as_char,
+    args.radix_ul,
+    args.max_string_length,
+    strict_formatting);
+
+  return {typecast_exprt{conjunction(conjuncts), f.type()}, {}};
+}
+
 /// Integer value represented by a string
 ///
 /// Add axioms ensuring the value of the returned integer corresponds
@@ -466,43 +525,21 @@ std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
-  PRECONDITION(f.arguments().size() == 1 || f.arguments().size() == 2);
-  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
+  auto args = unpack_parseint_arguments(f, f.type());
+
   const typet &type = f.type();
-  PRECONDITION(type.id() == ID_signedbv);
-  const exprt radix =
-    f.arguments().size() == 1
-      ? static_cast<exprt>(from_integer(10, type))
-      : static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
-  // Most of the time we can evaluate radix as an integer. The value 0 is used
-  // to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
-  PRECONDITION((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
 
   const symbol_exprt input_int = fresh_symbol("parsed_int", type);
-  const typet &char_type = str.content().type().subtype();
-  const typecast_exprt radix_as_char(radix, char_type);
   const bool strict_formatting = false;
-
-  const std::size_t max_string_length =
-    max_printed_string_length(type, radix_ul);
-
-  /// \todo We should throw an exception when constraints added in
-  /// add_axioms_for_correct_number_format do not hold.
-  /// \note the only thing stopping us from taking longer strings with many
-  /// leading zeros is the axioms for correct number format
-  auto constraints1 = add_axioms_for_correct_number_format(
-    str, radix_as_char, radix_ul, max_string_length, strict_formatting);
 
   auto constraints2 = add_axioms_for_characters_in_integer_string(
     input_int,
     type,
     strict_formatting,
-    str,
-    max_string_length,
-    radix,
-    radix_ul);
-  merge(constraints2, std::move(constraints1));
+    args.str,
+    args.max_string_length,
+    args.radix,
+    args.radix_ul);
 
   return {input_int, std::move(constraints2)};
 }

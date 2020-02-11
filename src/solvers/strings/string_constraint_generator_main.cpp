@@ -239,6 +239,10 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_index_of(expr);
   else if(id == ID_cprover_string_last_index_of_func)
     return add_axioms_for_last_index_of(expr);
+  else if(
+    id == ID_cprover_string_is_valid_int_func ||
+    id == ID_cprover_string_is_valid_long_func)
+    return add_axioms_for_is_valid_int(expr);
   else if(id == ID_cprover_string_parse_int_func)
     return add_axioms_for_parse_int(expr);
   else if(id == ID_cprover_string_code_point_at_func)

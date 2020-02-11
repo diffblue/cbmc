@@ -1580,6 +1580,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::org.cprover.CProverString.parseLong:(Ljava/lang/String;I)J"] =
       ID_cprover_string_parse_int_func;
+  cprover_equivalent_to_java_function
+    ["java::org.cprover.CProverString.isValidInt:(Ljava/lang/String;I)Z"] =
+      ID_cprover_string_is_valid_int_func;
+  cprover_equivalent_to_java_function
+    ["java::org.cprover.CProverString.isValidLong:(Ljava/lang/String;I)Z"] =
+      ID_cprover_string_is_valid_long_func;
 
   // String library
   conversion_table["java::java.lang.String.<init>:(Ljava/lang/String;)V"] =
