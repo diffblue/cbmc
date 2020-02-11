@@ -10,11 +10,13 @@ SRC = bmc_util.cpp \
       multi_path_symex_only_checker.cpp \
       properties.cpp \
       report_util.cpp \
+      single_loop_incremental_symex_checker.cpp \
       single_path_symex_checker.cpp \
       single_path_symex_only_checker.cpp \
       solver_factory.cpp \
       symex_coverage.cpp \
       symex_bmc.cpp \
+      symex_bmc_incremental_one_loop.cpp \
       # Empty last line
 
 INCLUDES= -I ..

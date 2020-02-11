@@ -164,6 +164,20 @@ public:
   /// symbolic execution from that state.
   bool should_pause_symex;
 
+  /// If this flag is set to true then assertions will be temporarily ignored
+  /// by the symbolic executions.
+  bool ignore_assertions = false;
+
+  /// \brief Defines condition for interrupting symbolic execution for a
+  ///   specific loop
+  ///
+  /// False constant by default, over-ridden by incremental BMC implementation
+  ///   to allow breaking if the unwinding the user specified loop
+  /// \param loop_id: the loop identifier
+  /// \param unwind: current unwinding counter
+  /// \return true if the symbolic execution is to be interrupted for checking
+  virtual bool check_break(const irep_idt &loop_id, unsigned unwind);
+
 protected:
   /// The configuration to use for this symbolic execution
   const symex_configt symex_config;

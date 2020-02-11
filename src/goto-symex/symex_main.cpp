@@ -653,7 +653,7 @@ void goto_symext::execute_next_instruction(
     break;
 
   case ASSERT:
-    if(state.reachable)
+    if(state.reachable && !ignore_assertions)
       symex_assert(instruction, state);
     symex_transition(state);
     break;

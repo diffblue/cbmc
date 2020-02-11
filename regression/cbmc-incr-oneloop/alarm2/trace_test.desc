@@ -1,0 +1,9 @@
+CORE
+main.c
+--incremental-loop main.0 --unwind-min 5 --unwind-max 10 --trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^State \d+ file main.c function havocIO line 501 thread \d+$
+--
+^warning: ignoring

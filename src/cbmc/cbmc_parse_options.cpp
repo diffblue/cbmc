@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
 #include <goto-checker/properties.h>
+#include <goto-checker/single_loop_incremental_symex_checker.h>
 #include <goto-checker/single_path_symex_checker.h>
 #include <goto-checker/single_path_symex_only_checker.h>
 #include <goto-checker/stop_on_fail_verifier.h>
@@ -369,6 +370,30 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       "max-node-refinement",
       cmdline.get_value("max-node-refinement"));
 
+  if(cmdline.isset("incremental-loop"))
+  {
+    options.set_option(
+      "incremental-loop", cmdline.get_value("incremental-loop"));
+    options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+
+    if(cmdline.isset("unwind-min"))
+      options.set_option("unwind-min", cmdline.get_value("unwind-min"));
+
+    if(cmdline.isset("unwind-max"))
+      options.set_option("unwind-max", cmdline.get_value("unwind-max"));
+
+    if(cmdline.isset("ignore-properties-before-unwind-min"))
+      options.set_option("ignore-properties-before-unwind-min", true);
+
+    if(cmdline.isset("paths"))
+    {
+      log.error() << "--paths not supported with --incremental-loop"
+                  << messaget::eom;
+      exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+  }
+
   // SMT Options
 
   if(cmdline.isset("smt1"))
@@ -658,7 +683,22 @@ int cbmc_parse_optionst::doit()
 
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
-  if(
+  if(options.is_set("incremental-loop"))
+  {
+    if(options.get_bool_option("stop-on-fail"))
+    {
+      verifier = util_make_unique<
+        stop_on_fail_verifiert<single_loop_incremental_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+    else
+    {
+      verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+        single_loop_incremental_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+  }
+  else if(
     options.get_bool_option("stop-on-fail") && options.get_bool_option("paths"))
   {
     verifier =

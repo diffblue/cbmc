@@ -1,0 +1,13 @@
+CORE
+main.c
+--ignore-properties-before-unwind-min --incremental-loop main.0 --unwind-max 2 --unwind-min 1
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test "correctly" succeeds because the second iteration of the loop is
+unreachable due to the assumption which is violated after the first iteration.
+This behaviour is intended and documented, i.e. using ignore-before-unwind
+assumes that we know that iterations before unwind-min are correct.

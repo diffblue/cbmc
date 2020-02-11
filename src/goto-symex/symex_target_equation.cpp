@@ -318,17 +318,23 @@ void symex_target_equationt::constraint(
   merge_ireps(SSA_step);
 }
 
-void symex_target_equationt::convert(decision_proceduret &decision_procedure)
+void symex_target_equationt::convert_without_assertions(
+  decision_proceduret &decision_procedure)
 {
   convert_guards(decision_procedure);
   convert_assignments(decision_procedure);
   convert_decls(decision_procedure);
   convert_assumptions(decision_procedure);
-  convert_assertions(decision_procedure);
   convert_goto_instructions(decision_procedure);
   convert_function_calls(decision_procedure);
   convert_io(decision_procedure);
   convert_constraints(decision_procedure);
+}
+
+void symex_target_equationt::convert(decision_proceduret &decision_procedure)
+{
+  convert_without_assertions(decision_procedure);
+  convert_assertions(decision_procedure);
 }
 
 void symex_target_equationt::convert_assignments(
@@ -448,7 +454,8 @@ void symex_target_equationt::convert_constraints(
 }
 
 void symex_target_equationt::convert_assertions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  bool optimized_for_single_assertions)
 {
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
@@ -458,13 +465,13 @@ void symex_target_equationt::convert_assertions(
   if(number_of_assertions==0)
     return;
 
-  if(number_of_assertions==1)
+  if(number_of_assertions == 1 && optimized_for_single_assertions)
   {
     for(auto &step : SSA_steps)
     {
-      // ignore already converted assertions in the error trace
+      // hide already converted assertions in the error trace
       if(step.is_assert() && step.converted)
-        step.ignore = true;
+        step.hidden = true;
 
       if(step.is_assert() && !step.ignore && !step.converted)
       {
@@ -489,9 +496,9 @@ void symex_target_equationt::convert_assertions(
 
   for(auto &step : SSA_steps)
   {
-    // ignore already converted assertions in the error trace
+    // hide already converted assertions in the error trace
     if(step.is_assert() && step.converted)
-      step.ignore = true;
+      step.hidden = true;
 
     if(step.is_assert() && !step.ignore && !step.converted)
     {

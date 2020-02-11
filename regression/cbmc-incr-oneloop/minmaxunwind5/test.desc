@@ -1,6 +1,6 @@
 CORE
 main.c
---no-unwinding-assertions --unwind-min 4 --unwind-max 6 --incremental-check main.1
+--unwind-min 4 --unwind-max 6 --incremental-loop main.1
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

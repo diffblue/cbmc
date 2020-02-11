@@ -1,0 +1,13 @@
+CORE
+main.c
+--incremental-loop main.3 --unwindset main.1:2,main.2:8
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^Unwinding loop main\.0 iteration 5
+^Not unwinding loop main\.1 iteration 2
+^Not unwinding loop main\.2 iteration 8
+^Unwinding loop main\.3 iteration 3
+--
+^warning: ignoring
+^Unwinding loop main\.0 iteration 6
