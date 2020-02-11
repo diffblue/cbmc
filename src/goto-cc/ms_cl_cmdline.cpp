@@ -46,7 +46,7 @@ const char *non_ms_cl_options[]=
   "--verbosity",
   "--function",
   "--validate-goto-model",
-  "--export-function-local-symbols",
+  "--export-file-local-symbols",
   "--mangle-suffix",
   nullptr
 };

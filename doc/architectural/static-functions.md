@@ -59,7 +59,9 @@ For performance reasons, it might be desirable to analyze the API
 function independently of the static function. We can analyze the API
 function by "stubbing out" the static function, replacing it with a
 function that does nothing apart from asserting that its inputs satisfy
-the function's contract. Add the following to `harness.c`:
+the function's contract. ("Stubbing out" a function is sometimes known
+as "modelling" or "abstracting it out".) Add the following to
+`harness.c`:
 
 \code{.c}
 static void private_function(const int *a, int *b)
