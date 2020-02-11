@@ -626,7 +626,10 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
     ns(goto_model.symbol_table),
     cmdline(_cmdline),
     warning_is_fatal(Werror),
-    keep_file_local(cmdline.isset("export-function-local-symbols")),
+    keep_file_local(
+      // function-local is the old name and is still in use, but is misleading
+      cmdline.isset("export-function-local-symbols") ||
+      cmdline.isset("export-file-local-symbols")),
     file_local_mangle_suffix(
       cmdline.isset("mangle-suffix") ? cmdline.get_value("mangle-suffix") : "")
 {
@@ -634,6 +637,11 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
   echo_file_name=false;
   wrote_object=false;
   working_directory=get_current_working_directory();
+
+  if(cmdline.isset("export-function-local-symbols"))
+    warning() << "The `--export-function-local-symbols` flag is deprecated. "
+                 "Please use `--export-file-local-symbols` instead."
+              << eom;
 }
 
 /// cleans up temporary files

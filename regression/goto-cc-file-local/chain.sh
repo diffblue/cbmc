@@ -63,7 +63,7 @@ for src in ${SRC}; do
 
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        --export-function-local-symbols \
+        --export-file-local-symbols \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
@@ -72,7 +72,7 @@ for src in ${SRC}; do
 
   else
     "${goto_cc}"                        \
-        --export-function-local-symbols \
+        --export-file-local-symbols \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
@@ -86,7 +86,7 @@ if is_in final-link "$ALL_ARGS"; then
   rm -f ${OUT_FILE}
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        --export-function-local-symbols \
+        --export-file-local-symbols \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
@@ -95,7 +95,7 @@ if is_in final-link "$ALL_ARGS"; then
 
   else
     "${goto_cc}"                        \
-        --export-function-local-symbols \
+        --export-file-local-symbols \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
