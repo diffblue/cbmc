@@ -1315,12 +1315,11 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
-  // Code for the output
-  code_blockt code;
+  code_blockt copy_constructor_body;
 
   // String expression that will hold the result
   const refined_string_exprt string_expr =
-    decl_string_expr(loc, function_id, symbol_table, code);
+    decl_string_expr(loc, function_id, symbol_table, copy_constructor_body);
 
   // Assign argument to a string_expr
   const java_method_typet::parameterst &params = type.parameters();
@@ -1328,16 +1327,16 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
   PRECONDITION(!params[1].get_identifier().empty());
   const symbol_exprt arg1{params[1].get_identifier(), params[1].type()};
   code_assign_java_string_to_string_expr(
-    string_expr, arg1, loc, symbol_table, code);
+    string_expr, arg1, loc, symbol_table, copy_constructor_body);
 
   // Assign string_expr to `this` object
   const symbol_exprt arg_this{params[0].get_identifier(), params[0].type()};
-  code.add(
+  copy_constructor_body.add(
     code_assign_string_expr_to_java_string(
       arg_this, string_expr, symbol_table, true),
     loc);
 
-  return code;
+  return copy_constructor_body;
 }
 
 /// Generates code for the String.length method
