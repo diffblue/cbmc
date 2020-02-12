@@ -1300,7 +1300,8 @@ code_blockt java_string_library_preprocesst::make_copy_string_code(
 /// object.
 /// \param type: type of the function
 /// \param loc: location in the source
-/// \param function_id: unused
+/// \param function_id: name of the function (used for variable naming) where
+///   the generated code ends up.
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1314,8 +1315,6 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
-  (void)function_id;
-
   // Code for the output
   code_blockt code;
 
