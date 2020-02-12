@@ -78,16 +78,16 @@ protected:
   }
 
   void instrument(goto_programt &dest, goto_programt::targett it);
-  void do_function_call(goto_programt &dest, goto_programt::targett it);
+  void do_function_call(goto_programt &dest, goto_programt::targett target);
 
   // strings
   void do_sprintf(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
   void do_snprintf(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
   void do_strcat(
     goto_programt &dest,
@@ -99,19 +99,19 @@ protected:
     const code_function_callt &);
   void do_strchr(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
   void do_strrchr(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
   void do_strstr(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
   void do_strtok(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
   void do_strerror(
     goto_programt &dest,
@@ -119,7 +119,7 @@ protected:
     const code_function_callt &);
   void do_fscanf(
     goto_programt &dest,
-    goto_programt::targett it,
+    goto_programt::targett target,
     const code_function_callt &);
 
   void do_format_string_read(
