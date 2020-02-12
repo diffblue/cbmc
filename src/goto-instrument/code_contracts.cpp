@@ -15,8 +15,10 @@ Date: February 2016
 
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/message.h>
 #include <util/replace_symbol.h>
 
+#include <goto-programs/goto_convert.h>
 #include <goto-programs/remove_skip.h>
 
 #include <analyses/local_may_alias.h>
@@ -30,12 +32,18 @@ class code_contractst
 public:
   code_contractst(
     symbol_tablet &_symbol_table,
-    goto_functionst &_goto_functions):
-      ns(_symbol_table),
+    goto_functionst &_goto_functions,
+    std::list<std::string> _functions_to_assert_ensures)
+    : ns(_symbol_table),
       symbol_table(_symbol_table),
       goto_functions(_goto_functions),
+      functions_to_assert_ensures(_functions_to_assert_ensures),
       temporary_counter(0)
   {
+    if(functions_to_assert_ensures.empty())
+      mode_assert_ensures = false;
+    else
+      mode_assert_ensures = true;
   }
 
   void operator()();
@@ -44,8 +52,11 @@ protected:
   namespacet ns;
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
+  std::list<std::string> functions_to_assert_ensures;
 
   unsigned temporary_counter;
+
+  bool mode_assert_ensures;
 
   std::unordered_set<irep_idt> summarized;
 
@@ -54,6 +65,15 @@ protected:
   void apply_contract(
     goto_programt &goto_program,
     goto_programt::targett target);
+
+  void
+  assert_ensures_after_calls(goto_functionst::goto_functiont &goto_function);
+
+  void
+  assert_ensures(goto_programt &goto_program, goto_programt::targett target);
+
+  goto_programt
+  make_ensures_assertion_for_call(const code_function_callt &call);
 
   void add_contract_check(
     const irep_idt &function,
@@ -242,6 +262,82 @@ void code_contractst::code_contracts(
       apply_contract(goto_function.body, it);
 }
 
+goto_programt code_contractst::make_ensures_assertion_for_call(
+  const code_function_callt &call)
+{
+  goto_programt goto_assertion;
+
+  // we don't handle function pointers
+  if(call.function().id() != ID_symbol)
+    return goto_assertion;
+
+  const irep_idt &function = to_symbol_expr(call.function()).get_identifier();
+  const symbolt &f_sym = ns.lookup(function);
+  const code_typet &type = to_code_type(f_sym.type);
+
+  exprt ensures = static_cast<const exprt &>(type.find(ID_C_spec_ensures));
+
+  // is there a contract?
+  if(ensures.is_nil())
+    return goto_assertion;
+
+  // replace formal parameters by arguments, replace return
+  replace_symbolt replace;
+
+  // TODO: return value could be nil
+  if(type.return_type() != empty_typet())
+  {
+    symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
+    replace.insert(ret_val, call.lhs());
+  }
+
+  // formal parameters
+  code_function_callt::argumentst::const_iterator a_it =
+    call.arguments().begin();
+  for(code_typet::parameterst::const_iterator p_it = type.parameters().begin();
+      p_it != type.parameters().end() && a_it != call.arguments().end();
+      ++p_it, ++a_it)
+  {
+    if(!p_it->get_identifier().empty())
+    {
+      symbol_exprt p(p_it->get_identifier(), p_it->type());
+      replace.insert(p, *a_it);
+    }
+  }
+
+  replace(ensures);
+
+  code_assertt assertion(ensures);
+  null_message_handlert message_handler;
+  // We first need to convert the expression to a goto_program
+  goto_convert(assertion, symbol_table, goto_assertion, message_handler, ID_C);
+
+  return goto_assertion;
+}
+
+void code_contractst::assert_ensures(
+  goto_programt &goto_program,
+  goto_programt::targett target)
+{
+  const code_function_callt &call = target->get_function_call();
+
+  // Create the goto program for the assertion
+  goto_programt goto_assertion = make_ensures_assertion_for_call(call);
+
+  // assert the ensures part of the contract after the call
+  ++target;
+  goto_program.insert_before_swap(target, goto_assertion);
+}
+
+void code_contractst::assert_ensures_after_calls(
+  goto_functionst::goto_functiont &goto_function)
+{
+  // look at all function calls
+  Forall_goto_program_instructions(it, goto_function.body)
+    if(it->is_function_call())
+      assert_ensures(goto_function.body, it);
+}
+
 const symbolt &code_contractst::new_tmp_symbol(
   const typet &type,
   const source_locationt &source_location,
@@ -372,23 +468,39 @@ void code_contractst::add_contract_check(
 
 void code_contractst::operator()()
 {
-  Forall_goto_functions(it, goto_functions)
-    code_contracts(it->second);
+  if(mode_assert_ensures)
+  {
+    Forall_goto_functions(it, goto_functions)
+      assert_ensures_after_calls(it->second);
+  }
+  else
+  {
+    Forall_goto_functions(it, goto_functions)
+      code_contracts(it->second);
 
-  goto_functionst::function_mapt::iterator i_it=
-    goto_functions.function_map.find(INITIALIZE_FUNCTION);
-  assert(i_it!=goto_functions.function_map.end());
+    goto_functionst::function_mapt::iterator i_it =
+      goto_functions.function_map.find(INITIALIZE_FUNCTION);
+    INVARIANT(
+      i_it != goto_functions.function_map.end(),
+      "There must exist an INITIALIZE_FUNCTION");
 
-  for(const auto &contract : summarized)
-    add_contract_check(contract, i_it->second.body);
+    for(const auto &contract : summarized)
+      add_contract_check(contract, i_it->second.body);
 
-  // remove skips
-  remove_skip(i_it->second.body);
-
+    // remove skips
+    remove_skip(i_it->second.body);
+  }
   goto_functions.update();
+}
+
+void assert_ensures(goto_modelt &goto_model, std::list<std::string> functions)
+{
+  code_contractst(
+    goto_model.symbol_table, goto_model.goto_functions, functions)();
 }
 
 void code_contracts(goto_modelt &goto_model)
 {
-  code_contractst(goto_model.symbol_table, goto_model.goto_functions)();
+  std::list<std::string> empty;
+  code_contractst(goto_model.symbol_table, goto_model.goto_functions, empty)();
 }
