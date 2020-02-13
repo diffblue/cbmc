@@ -2299,5 +2299,56 @@ long double copysignl(long double x, long double y)
   return (signbit(y)) ? -abs : abs;
 }
 
+/* FUNCTION: __builtin_sadd_overflow */
 
+_Bool __builtin_sadd_overflow(int a, int b, int *res)
+{
+  *res = a + b;
+  return __CPROVER_overflow_plus(a, b);
+}
 
+/* FUNCTION: __builtin_saddl_overflow */
+
+_Bool __builtin_saddl_overflow(long a, long b, long *res)
+{
+  *res = a + b;
+  return __CPROVER_overflow_plus(a, b);
+}
+
+/* FUNCTION: __builtin_saddll_overflow */
+
+_Bool __builtin_saddll_overflow(long long a, long long b, long long *res)
+{
+  *res = a + b;
+  return __CPROVER_overflow_plus(a, b);
+}
+
+/* FUNCTION: __builtin_uadd_overflow */
+
+_Bool __builtin_uadd_overflow(unsigned a, unsigned b, unsigned *res)
+{
+  *res = a + b;
+  return __CPROVER_overflow_plus(a, b);
+}
+
+/* FUNCTION: __builtin_uaddl_overflow */
+
+_Bool __builtin_uaddl_overflow(
+  unsigned long a,
+  unsigned long b,
+  unsigned long *res)
+{
+  *res = a + b;
+  return __CPROVER_overflow_plus(a, b);
+}
+
+/* FUNCTION: __builtin_uaddll_overflow */
+
+_Bool __builtin_uaddll_overflow(
+  unsigned long long a,
+  unsigned long long b,
+  unsigned long long *res)
+{
+  *res = a + b;
+  return __CPROVER_overflow_plus(a, b);
+}

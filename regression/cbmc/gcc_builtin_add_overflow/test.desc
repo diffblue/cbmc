@@ -1,0 +1,51 @@
+CORE gcc-only
+main.c
+
+\[check_int.assertion.1\] line \d+ assertion !__builtin_sadd_overflow\(one, one, &result\): SUCCESS
+\[check_int.assertion.2\] line \d+ assertion result == 2: SUCCESS
+\[check_int.assertion.3\] line \d+ assertion __builtin_sadd_overflow\(one, .*, &result\): SUCCESS
+\[check_int.assertion.4\] line \d+ assertion !__builtin_sadd_overflow\(.* / 2, .* / 2, &result\): SUCCESS
+\[check_int.assertion.5\] line \d+ assertion result \+ 1 == .*: SUCCESS
+\[check_int.assertion.6\] line \d+ assertion __builtin_sadd_overflow\(.* / 2 \+ 2, .* / 2 \+ 2, &result\): SUCCESS
+\[check_int.assertion.7\] line \d+ assertion __builtin_sadd_overflow\(-one, .*, &result\): SUCCESS
+\[check_int.assertion.8\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long.assertion.1\] line \d+ assertion !__builtin_saddl_overflow\(one, one, &result\): SUCCESS
+\[check_long.assertion.2\] line \d+ assertion result == 2l: SUCCESS
+\[check_long.assertion.3\] line \d+ assertion __builtin_saddl_overflow\(one, .*, &result\): SUCCESS
+\[check_long.assertion.4\] line \d+ assertion !__builtin_saddl_overflow\(.* / 2l, .* / 2l, &result\): SUCCESS
+\[check_long.assertion.5\] line \d+ assertion result \+ 1l == .*: SUCCESS
+\[check_long.assertion.6\] line \d+ assertion __builtin_saddl_overflow\(.* / 2l \+ 2l, .* / 2l \+ 2l, &result\): SUCCESS
+\[check_long.assertion.7\] line \d+ assertion __builtin_saddl_overflow\(-one, .*, &result\): SUCCESS
+\[check_long.assertion.8\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long_long.assertion.1\] line \d+ assertion !__builtin_saddll_overflow\(one, one, &result\): SUCCESS
+\[check_long_long.assertion.2\] line \d+ assertion result == 2ll: SUCCESS
+\[check_long_long.assertion.3\] line \d+ assertion __builtin_saddll_overflow\(one, .*, &result\): SUCCESS
+\[check_long_long.assertion.4\] line \d+ assertion !__builtin_saddll_overflow\(.* / 2ll, .* / 2ll, &result\): SUCCESS
+\[check_long_long.assertion.5\] line \d+ assertion result \+ 1ll == .*: SUCCESS
+\[check_long_long.assertion.6\] line \d+ assertion __builtin_saddll_overflow\(.* / 2ll \+ 2ll, .* / 2ll \+ 2ll, &result\): SUCCESS
+\[check_long_long.assertion.7\] line \d+ assertion __builtin_saddll_overflow\(-one, .*, &result\): SUCCESS
+\[check_long_long.assertion.8\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned.assertion.1\] line \d+ assertion !__builtin_uadd_overflow\(one, one, &result\): SUCCESS
+\[check_unsigned.assertion.2\] line \d+ assertion result == 2u: SUCCESS
+\[check_unsigned.assertion.3\] line \d+ assertion !__builtin_uadd_overflow\(.* / 2, .* / 2, &result\): SUCCESS
+\[check_unsigned.assertion.4\] line \d+ assertion result \+ 1u == .*: SUCCESS
+\[check_unsigned.assertion.5\] line \d+ assertion __builtin_uadd_overflow\(.* / 2 \+ 2, .* / 2 \+ 2, &result\): SUCCESS
+\[check_unsigned.assertion.6\] line \d+ assertion __builtin_uadd_overflow\(one, .*, &result\): SUCCESS
+\[check_unsigned.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned_long.assertion.1\] line \d+ assertion !__builtin_uaddl_overflow\(one, one, &result\): SUCCESS
+\[check_unsigned_long.assertion.2\] line \d+ assertion result == 2ul: SUCCESS
+\[check_unsigned_long.assertion.3\] line \d+ assertion !__builtin_uaddl_overflow\(.* / 2, .* / 2, &result\): SUCCESS
+\[check_unsigned_long.assertion.4\] line \d+ assertion result \+ 1ul == .*: SUCCESS
+\[check_unsigned_long.assertion.5\] line \d+ assertion __builtin_uaddl_overflow\(.* / 2 \+ 2, .* / 2 \+ 2, &result\): SUCCESS
+\[check_unsigned_long.assertion.6\] line \d+ assertion __builtin_uaddl_overflow\(one, .*, &result\): SUCCESS
+\[check_unsigned_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned_long_long.assertion.1\] line \d+ assertion !__builtin_uaddl_overflow\(one, one, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.2\] line \d+ assertion result == 2ull: SUCCESS
+\[check_unsigned_long_long.assertion.3\] line \d+ assertion !__builtin_uaddll_overflow\(.* / 2, .* / 2, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.4\] line \d+ assertion result \+ 1ull == .*: SUCCESS
+\[check_unsigned_long_long.assertion.5\] line \d+ assertion __builtin_uaddll_overflow\(.* / 2 \+ 2, .* / 2 \+ 2, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.6\] line \d+ assertion __builtin_uaddl_overflow\(one, .*, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
