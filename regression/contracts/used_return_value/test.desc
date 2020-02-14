@@ -1,0 +1,8 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--

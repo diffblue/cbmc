@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 
 #include "aggressive_slicer.h"
+#include "code_contracts.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
 #include "replace_calls.h"
@@ -96,7 +97,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "(interpreter)(show-reaching-definitions)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
-  "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
+  "(horn)(skip-loops):(model-argc-argv):" \
+  "(" FLAG_REPLACE_CALL "):" \
+  "(" FLAG_REPLACE_ALL_CALLS ")" \
+  "(" FLAG_ENFORCE_CONTRACT "):" \
+  "(" FLAG_ENFORCE_ALL_CONTRACTS ")" \
   "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\

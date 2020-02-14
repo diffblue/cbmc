@@ -81,7 +81,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "alignment_checks.h"
 #include "branch.h"
 #include "call_sequences.h"
-#include "code_contracts.h"
 #include "concurrency.h"
 #include "document_properties.h"
 #include "dot.h"
@@ -1130,11 +1129,51 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  // verify and set invariants and pre/post-condition pairs
-  if(cmdline.isset("apply-code-contracts"))
+  const std::list<std::pair<std::string, std::string>> contract_flags(
+    {{FLAG_REPLACE_CALL, FLAG_REPLACE_ALL_CALLS},
+     {FLAG_ENFORCE_CONTRACT, FLAG_ENFORCE_ALL_CONTRACTS}});
+  for(const auto &pair : contract_flags)
   {
-    log.status() << "Applying Code Contracts" << messaget::eom;
-    code_contracts(goto_model);
+    if(cmdline.isset(pair.first.c_str()) && cmdline.isset(pair.second.c_str()))
+    {
+      log.error() << "Pass at most one of --" << pair.first << " and --"
+                  << pair.second << "." << messaget::eom;
+      exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+  }
+
+  if(
+    cmdline.isset(FLAG_REPLACE_CALL) || cmdline.isset(FLAG_REPLACE_ALL_CALLS) ||
+    cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
+    cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
+  {
+    code_contractst cont(goto_model, log);
+
+    if(cmdline.isset(FLAG_REPLACE_CALL))
+    {
+      std::set<std::string> to_replace(
+        cmdline.get_values(FLAG_REPLACE_CALL).begin(),
+        cmdline.get_values(FLAG_REPLACE_CALL).end());
+      if(cont.replace_calls(to_replace))
+        exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+
+    if(cmdline.isset(FLAG_REPLACE_ALL_CALLS))
+      if(cont.replace_calls())
+        exit(CPROVER_EXIT_USAGE_ERROR);
+
+    if(cmdline.isset(FLAG_ENFORCE_CONTRACT))
+    {
+      std::set<std::string> to_enforce(
+        cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
+        cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
+      if(cont.enforce_contracts(to_enforce))
+        exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+
+    if(cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
+      if(cont.enforce_contracts())
+        exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   // replace function pointers, if explicitly requested
@@ -1819,6 +1858,12 @@ void goto_instrument_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     HELP_REPLACE_CALLS
+    "\n"
+    "Function contracts and invariants:\n"
+    HELP_REPLACE_CALL
+    HELP_REPLACE_ALL_CALLS
+    HELP_ENFORCE_CONTRACT
+    HELP_ENFORCE_ALL_CONTRACTS
     "\n"
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)

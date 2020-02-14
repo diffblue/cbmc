@@ -1,9 +1,12 @@
-KNOWNBUG
+CORE
 main.c
---apply-code-contracts
+--replace-all-calls-with-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+^warning: ignoring
 --
-Applying code contracts currently also checks them.
+This code is purposely unsound (the function does not abide by its
+contract). Verifying the function in isolation should fail, and
+verifying its caller should succeed.
