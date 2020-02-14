@@ -131,8 +131,12 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
 {
   if(options.get_bool_option("dimacs"))
     return get_dimacs();
-  if(options.get_bool_option("refine"))
+  if(
+    options.get_bool_option("refine") &&
+    !options.get_bool_option("refine-strings"))
+  {
     return get_bv_refinement();
+  }
   else if(options.get_bool_option("refine-strings"))
     return get_string_refinement();
   if(options.get_bool_option("smt2"))
