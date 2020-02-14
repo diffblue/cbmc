@@ -13,7 +13,7 @@ endforeach()
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
     COMMAND converter < ${converter_input_path} > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-    DEPENDS converter
+    DEPENDS converter ${converter_input_path}
 )
 
 add_executable(file_converter file_converter.cpp)
