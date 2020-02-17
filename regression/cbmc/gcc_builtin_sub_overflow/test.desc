@@ -1,0 +1,44 @@
+CORE gcc-only
+main.c
+
+\[check_int.assertion.1\] line \d+ assertion !__builtin_ssub_overflow\(1, 1, &result\): SUCCESS
+\[check_int.assertion.2\] line \d+ assertion result == 0: SUCCESS
+\[check_int.assertion.3\] line \d+ assertion __builtin_ssub_overflow\(.*, 1, &result\): SUCCESS
+\[check_int.assertion.4\] line \d+ assertion !__builtin_ssub_overflow\(.* / 2, .* / 2, &result\): SUCCESS
+\[check_int.assertion.5\] line \d+ assertion result - 1 == .*: SUCCESS
+\[check_int.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long.assertion.1\] line \d+ assertion !__builtin_ssubl_overflow\(1l, 1l, &result\): SUCCESS
+\[check_long.assertion.2\] line \d+ assertion result == 0l: SUCCESS
+\[check_long.assertion.3\] line \d+ assertion __builtin_ssubl_overflow\(.*, 1l, &result\): SUCCESS
+\[check_long.assertion.4\] line \d+ assertion !__builtin_ssubl_overflow\(.* / 2l, .* / 2l, &result\): SUCCESS
+\[check_long.assertion.5\] line \d+ assertion result - 1l == .*: SUCCESS
+\[check_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long_long.assertion.1\] line \d+ assertion !__builtin_ssubl_overflow\(1ll, 1ll, &result\): SUCCESS
+\[check_long_long.assertion.2\] line \d+ assertion result == 0ll: SUCCESS
+\[check_long_long.assertion.3\] line \d+ assertion __builtin_ssubl_overflow\(.*, 1ll, &result\): SUCCESS
+\[check_long_long.assertion.4\] line \d+ assertion !__builtin_ssubl_overflow\(.* / 2ll, .* / 2ll, &result\): SUCCESS
+\[check_long_long.assertion.5\] line \d+ assertion result - 1ll == .*: SUCCESS
+\[check_long_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned.assertion.1\] line \d+ assertion !__builtin_usub_overflow\(1u, 1u, &result\): SUCCESS
+\[check_unsigned.assertion.2\] line \d+ assertion result == 0u: SUCCESS
+\[check_unsigned.assertion.3\] line \d+ assertion __builtin_usub_overflow\(0u, 1u, &result\): SUCCESS
+\[check_unsigned.assertion.4\] line \d+ assertion !__builtin_usub_overflow\(.* / 2u, .* / 2u, &result\): SUCCESS
+\[check_unsigned.assertion.5\] line \d+ assertion result == 0u: SUCCESS
+\[check_unsigned.assertion.6\] line \d+ assertion __builtin_usub_overflow\(.* / 2u, .*, &result\): SUCCESS
+\[check_unsigned.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned_long.assertion.1\] line \d+ assertion !__builtin_usubl_overflow\(1ul, 1ul, &result\): SUCCESS
+\[check_unsigned_long.assertion.2\] line \d+ assertion result == 0ul: SUCCESS
+\[check_unsigned_long.assertion.3\] line \d+ assertion __builtin_usubl_overflow\(0ul, 1ul, &result\): SUCCESS
+\[check_unsigned_long.assertion.4\] line \d+ assertion !__builtin_usubl_overflow\(.* / 2ul, .* / 2ul, &result\): SUCCESS
+\[check_unsigned_long.assertion.5\] line \d+ assertion result == 0ul: SUCCESS
+\[check_unsigned_long.assertion.6\] line \d+ assertion __builtin_usubl_overflow\(.* / 2ul, .*, &result\): SUCCESS
+\[check_unsigned_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned_long_long.assertion.1\] line \d+ assertion !__builtin_usubll_overflow\(1ull, 1ull, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.2\] line \d+ assertion result == 0ull: SUCCESS
+\[check_unsigned_long_long.assertion.3\] line \d+ assertion __builtin_usubll_overflow\(0ull, 1ull, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.4\] line \d+ assertion !__builtin_usubll_overflow\(.* / 2ull, .* / 2ull, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.5\] line \d+ assertion result == 0ull: SUCCESS
+\[check_unsigned_long_long.assertion.6\] line \d+ assertion __builtin_usubll_overflow\(.* / 2ull, .*, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+^EXIT=10$
+^SIGNAL=0$
