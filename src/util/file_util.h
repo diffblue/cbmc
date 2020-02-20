@@ -42,4 +42,9 @@ bool file_exists(const std::string &path);
 /// \return true if the file was deleted, false if it did not exist
 bool file_remove(const std::string &path);
 
+/// Rename a file.
+/// C++17 will allow us to use std::filesystem::rename
+/// Throws an exception on failure.
+void file_rename(const std::string &old_path, const std::string &new_path);
+
 #endif // CPROVER_UTIL_FILE_UTIL_H
