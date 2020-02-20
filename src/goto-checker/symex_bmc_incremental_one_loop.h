@@ -47,6 +47,8 @@ protected:
     const call_stackt &context,
     unsigned unwind) override;
 
+  void log_unwinding(unsigned unwind);
+
   ui_message_handlert::uit output_ui;
 };
 
