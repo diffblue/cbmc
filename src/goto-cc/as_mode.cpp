@@ -24,6 +24,7 @@ Author: Michael Tautschnig
 #include <cstring>
 
 #include <util/config.h>
+#include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
 #include <util/tempdir.h>
@@ -289,14 +290,17 @@ int as_modet::as_hybrid_binary(const compilet &compiler)
 
   // save the goto-cc output file
   std::string saved = output_file + ".goto-cc-saved";
-  int result = rename(output_file.c_str(), saved.c_str());
-  if(result!=0)
+  try
   {
-    error() << "Rename failed: " << std::strerror(errno) << eom;
-    return result;
+    file_rename(output_file, saved);
+  }
+  catch(const cprover_exception_baset &e)
+  {
+    error() << "Rename failed: " << e.what() << eom;
+    return 1;
   }
 
-  result=run_as();
+  int result = run_as();
 
   if(result == 0)
   {
