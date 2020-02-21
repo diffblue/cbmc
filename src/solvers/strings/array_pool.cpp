@@ -7,6 +7,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include "array_pool.h"
+#include "max_concrete_char_array.h"
 
 symbol_exprt symbol_generatort::
 operator()(const irep_idt &prefix, const typet &type)
@@ -54,7 +55,8 @@ array_poolt::get_length_if_exists(const array_string_exprt &s) const
 array_string_exprt
 array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
-  array_typet array_type{char_type, infinity_exprt(index_type)};
+  array_typet array_type =
+    make_char_array_type(char_type, index_type, maximum_fresh_string_length);
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
   arrays_of_pointers.emplace(
@@ -141,10 +143,9 @@ static void attempt_assign_length_from_type(
   // This invariant seems always true, but I don't know why.
   // If we find a case where this is violated, try calling
   // attempt_assign_length_from_type on the true and false cases.
-  const exprt &size_from_type = to_array_type(array_expr.type()).size();
   const exprt &size_to_assign =
-    size_from_type != infinity_exprt(size_from_type.type())
-      ? size_from_type
+    can_cast_expr<array_exprt>(array_expr)
+      ? to_array_type(array_expr.type()).size()
       : symbol_generator("string_length", array_expr.length_type());
 
   const auto emplace_result =

@@ -413,8 +413,8 @@ void initialize_nondet_string_fields(
       code_assumet(binary_relation_exprt(length_expr, ID_le, max_length)));
   }
 
-  const exprt data_expr =
-    make_nondet_infinite_char_array(symbol_table, loc, function_id, code);
+  const exprt data_expr = make_nondet_char_array(
+    symbol_table, loc, function_id, code, max_nondet_string_length);
   struct_expr.operands()[struct_type.component_number("length")] = length_expr;
 
   const address_of_exprt array_pointer(

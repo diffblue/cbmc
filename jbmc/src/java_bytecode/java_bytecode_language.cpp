@@ -261,6 +261,8 @@ java_bytecode_language_optionst::java_bytecode_language_optionst(
 void java_bytecode_languaget::set_language_options(const optionst &options)
 {
   object_factory_parameters.set(options);
+  string_preprocess.set_max_intermediate_string_length(
+    object_factory_parameters.max_intermediate_string_length);
   language_options = java_bytecode_language_optionst{options, *this};
   const auto &new_points = build_extra_entry_points(options);
   language_options->extra_methods.insert(

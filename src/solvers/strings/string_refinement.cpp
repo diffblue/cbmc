@@ -75,29 +75,34 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const string_constraintt &axiom);
+  const string_constraintt &axiom,
+  std::function<exprt(const exprt &)> get);
 
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const string_not_contains_constraintt &axiom);
+  const string_not_contains_constraintt &axiom,
+  std::function<exprt(const exprt &)> get);
 
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const string_axiomst &axioms);
+  const string_axiomst &axioms,
+  std::function<exprt(const exprt &)> get);
 
 exprt simplify_sum(const exprt &f);
 
 static void update_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const std::vector<exprt> &current_constraints);
+  const std::vector<exprt> &current_constraints,
+  std::function<exprt(const exprt &)> get);
 
 static void update_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const exprt &formula);
+  const exprt &formula,
+  std::function<exprt(const exprt &)> get);
 
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
@@ -157,7 +162,7 @@ string_refinementt::string_refinementt(const infot &info, bool)
   : supert(info),
     config_(info),
     loop_bound_(info.refinement_bound),
-    generator(*info.ns)
+    generator(*info.ns, info.maximum_intermediate_string_length)
 {
 }
 
@@ -539,6 +544,16 @@ output_equations(std::ostream &output, const std::vector<exprt> &equations)
 }
 #endif
 
+static std::function<exprt(const exprt &)> concretise_index_function(
+  std::function<exprt(const exprt &)> get_from_solver,
+  bool index_sets_are_concrete)
+{
+  if(index_sets_are_concrete)
+    return get_from_solver;
+  else
+    return {};
+}
+
 /// Main decision procedure of the solver. Looks for a valuation of variables
 /// compatible with the constraints that have been given to `set_to` so far.
 ///
@@ -704,7 +719,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   log.debug() << "dec_solve: add constraints" << messaget::eom;
   merge(constraints, dependencies.add_constraints(generator));
-
 #ifdef DEBUG
   output_equations(log.debug(), equations);
 #endif
@@ -768,16 +782,27 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     add_lemma(substitute_array_access(lemma, generator.fresh_symbol, true));
   }
 
-  // All generated strings should have non-negative length
+  // All generated strings should have non-negative length, and perhaps a
+  // maximum length
   for(const auto &pair : generator.array_pool.created_strings())
   {
     exprt length = generator.array_pool.get_or_create_length(pair.first);
     add_lemma(
       binary_relation_exprt{length, ID_ge, from_integer(0, length.type())});
+    if(config_.maximum_intermediate_string_length)
+    {
+      add_lemma(binary_relation_exprt{
+        length,
+        ID_le,
+        from_integer(
+          *config_.maximum_intermediate_string_length, length.type())});
+    }
   }
 
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
+  const auto concretise_index =
+    concretise_index_function(get, config_.store_constants_in_index_set);
   dependencies.clean_cache();
   const decision_proceduret::resultt initial_result = supert::dec_solve();
   if(initial_result == resultt::D_SATISFIABLE)
@@ -807,8 +832,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     return initial_result;
   }
 
-  initial_index_set(index_sets, ns, axioms);
-  update_index_set(index_sets, ns, current_constraints);
+  initial_index_set(index_sets, ns, axioms, concretise_index);
+  update_index_set(index_sets, ns, current_constraints, concretise_index);
   current_constraints.clear();
   const auto initial_instances =
     generate_instantiations(index_sets, axioms, not_contain_witnesses);
@@ -850,7 +875,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       // and instantiating universal formulas with this indices.
       // We will then relaunch the solver with these added lemmas.
       index_sets.current.clear();
-      update_index_set(index_sets, ns, current_constraints);
+      update_index_set(index_sets, ns, current_constraints, concretise_index);
 
       display_index_set(log.debug(), index_sets);
 
@@ -1511,12 +1536,13 @@ exprt simplify_sum(const exprt &f)
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const string_axiomst &axioms)
+  const string_axiomst &axioms,
+  std::function<exprt(const exprt &)> concretise_index)
 {
   for(const auto &axiom : axioms.universal)
-    initial_index_set(index_set, ns, axiom);
+    initial_index_set(index_set, ns, axiom, concretise_index);
   for(const auto &axiom : axioms.not_contains)
-    initial_index_set(index_set, ns, axiom);
+    initial_index_set(index_set, ns, axiom, concretise_index);
 }
 
 /// Add to the index set all the indices that appear in the formulas.
@@ -1526,10 +1552,11 @@ static void initial_index_set(
 static void update_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const std::vector<exprt> &current_constraints)
+  const std::vector<exprt> &current_constraints,
+  std::function<exprt(const exprt &)> get)
 {
   for(const auto &axiom : current_constraints)
-    update_index_set(index_set, ns, axiom);
+    update_index_set(index_set, ns, axiom, get);
 }
 
 /// An expression representing an array of characters can be in the form of an
@@ -1569,8 +1596,11 @@ static void add_to_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
   const exprt &s,
-  exprt i)
+  exprt i,
+  std::function<exprt(const exprt &)> concretise)
 {
+  if(concretise)
+    i = concretise(i);
   simplify(i, ns);
   const bool is_size_t = numeric_cast<std::size_t>(i).has_value();
   if(i.id() != ID_constant || is_size_t)
@@ -1604,7 +1634,8 @@ static void initial_index_set(
   const exprt &qvar,
   const exprt &upper_bound,
   const exprt &s,
-  const exprt &i)
+  const exprt &i,
+  std::function<exprt(const exprt &)> get)
 {
   PRECONDITION(
     s.id() == ID_symbol || s.id() == ID_nondet_symbol || s.id() == ID_array ||
@@ -1612,25 +1643,28 @@ static void initial_index_set(
   if(s.id() == ID_array)
   {
     for(std::size_t j = 0; j < s.operands().size(); ++j)
-      add_to_index_set(index_set, ns, s, from_integer(j, i.type()));
+      add_to_index_set(index_set, ns, s, from_integer(j, i.type()), get);
     return;
   }
   if(auto ite = expr_try_dynamic_cast<if_exprt>(s))
   {
-    initial_index_set(index_set, ns, qvar, upper_bound, ite->true_case(), i);
-    initial_index_set(index_set, ns, qvar, upper_bound, ite->false_case(), i);
+    initial_index_set(
+      index_set, ns, qvar, upper_bound, ite->true_case(), i, get);
+    initial_index_set(
+      index_set, ns, qvar, upper_bound, ite->false_case(), i, get);
     return;
   }
   const minus_exprt u_minus_1(upper_bound, from_integer(1, upper_bound.type()));
   exprt i_copy = i;
   replace_expr(qvar, u_minus_1, i_copy);
-  add_to_index_set(index_set, ns, s, i_copy);
+  add_to_index_set(index_set, ns, s, i_copy, get);
 }
 
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const string_constraintt &axiom)
+  const string_constraintt &axiom,
+  std::function<exprt(const exprt &)> get)
 {
   const symbol_exprt &qvar = axiom.univ_var;
   const auto &bound = axiom.upper_bound;
@@ -1642,7 +1676,7 @@ static void initial_index_set(
     {
       const auto &index_expr = to_index_expr(*it);
       const auto &s = index_expr.array();
-      initial_index_set(index_set, ns, qvar, bound, s, index_expr.index());
+      initial_index_set(index_set, ns, qvar, bound, s, index_expr.index(), get);
       it.next_sibling_or_parent();
     }
     else
@@ -1653,7 +1687,8 @@ static void initial_index_set(
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const string_not_contains_constraintt &axiom)
+  const string_not_contains_constraintt &axiom,
+  std::function<exprt(const exprt &)> get)
 {
   auto it = axiom.premise.depth_begin();
   const auto end = axiom.premise.depth_end();
@@ -1665,7 +1700,7 @@ static void initial_index_set(
       const exprt &i = to_index_expr(*it).index();
 
       // cur is of the form s[i] and no quantified variable appears in i
-      add_to_index_set(index_set, ns, s, i);
+      add_to_index_set(index_set, ns, s, i, get);
 
       it.next_sibling_or_parent();
     }
@@ -1675,17 +1710,20 @@ static void initial_index_set(
 
   const minus_exprt kminus1(
     axiom.exists_upper_bound, from_integer(1, axiom.exists_upper_bound.type()));
-  add_to_index_set(index_set, ns, axiom.s1.content(), kminus1);
+  add_to_index_set(index_set, ns, axiom.s1.content(), kminus1, get);
 }
 
 /// Add to the index set all the indices that appear in the formula
 /// \param index_set: set of indexes
 /// \param ns: namespace
 /// \param formula: a string constraint
+/// \param get: if set, a concretisation function to apply to each index before
+///   inserting into the index set; otherwise indices are recorded symbolically.
 static void update_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
-  const exprt &formula)
+  const exprt &formula,
+  std::function<exprt(const exprt &)> get)
 {
   std::list<exprt> to_process;
   to_process.push_back(formula);
@@ -1701,9 +1739,9 @@ static void update_index_set(
       DATA_INVARIANT(
         s.type().id() == ID_array,
         string_refinement_invariantt("index expressions must index on arrays"));
-      exprt simplified = simplify_sum(i);
+      exprt simplified = get ? i : simplify_sum(i);
       if(s.id() != ID_array) // do not update index set of constant arrays
-        add_to_index_set(index_set, ns, s, simplified);
+        add_to_index_set(index_set, ns, s, simplified, get);
     }
     else
     {
@@ -1785,8 +1823,8 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
       string_refinement_invariantt("array-lists must have at least two "
                                    "operands"));
     const typet &char_type = expr.operands()[1].type();
-    array_typet arr_type(char_type, infinity_exprt(char_type));
-    exprt ret_expr = array_of_exprt(from_integer(0, char_type), arr_type);
+    exprt ret_expr =
+      array_of_exprt(from_integer(0, char_type), to_array_type(expr.type()));
 
     for(size_t i = 0; i < expr.operands().size(); i += 2)
     {
@@ -1802,6 +1840,140 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
   }
 
   return expr;
+}
+
+/// Given an index set, return a sorted vector of the concrete indices
+/// defined in the current model.
+/// \param index_set index set
+/// \return concrete indices
+std::vector<size_t> string_refinementt::get_model_defined_indices(
+  const std::set<exprt> &index_set) const
+{
+  std::vector<size_t> defined_indices;
+  for(const auto &index_expr : index_set)
+  {
+    if(auto index = numeric_cast<size_t>(simplify_expr(get(index_expr), ns)))
+    {
+      defined_indices.push_back(*index);
+    }
+  }
+  std::sort(defined_indices.begin(), defined_indices.end());
+  defined_indices.erase(
+    std::unique(defined_indices.begin(), defined_indices.end()),
+    defined_indices.end());
+  return defined_indices;
+}
+
+/// Replace the given array with one where any index not defined in the given
+/// defined indices inherits its value from its right-hand defined neighbouring
+// index.
+/// For example, if the input array represents the string "abcde" and the
+/// defined indices are 1, 3 and 4, the result is "bbdde".
+/// \param array array to restrict
+/// \param defined_indices sorted index-set to restrict by
+/// \return restricted array
+static std::pair<interval_sparse_arrayt, bool> restrict_sparse_array_to_indices(
+  interval_sparse_arrayt array,
+  const std::vector<std::size_t> &defined_indices)
+{
+  if(defined_indices.empty())
+  {
+    if(array.begin() == array.end())
+      return {std::move(array), false};
+    else
+    {
+      return {
+        interval_sparse_arrayt{array.at(std::numeric_limits<size_t>::max())},
+        true};
+    }
+  }
+
+  // In the resulting array, we want all undefined indices (those not appearing
+  // in defined_indices) to inherit their value from their right-hand defined
+  // neighbour. This means all intervals should be extended to their left
+  // to cover any intermediate undefined region.
+
+  bool any_changes = false;
+
+  for(auto intervals_it = array.begin(); intervals_it != array.end();
+      /* no increment */)
+  {
+    auto find_defined_index = std::lower_bound(
+      defined_indices.begin(), defined_indices.end(), intervals_it->first);
+    if(
+      find_defined_index == defined_indices.end() ||
+      *find_defined_index != intervals_it->first)
+    {
+      any_changes = true;
+
+      // If there is no previous defined index, or the previous defined index
+      // already has an interval associated (necessarily the previous interval),
+      // just drop this interval and therefore effectively extend the one to
+      // our right to cover the whole intervening space:
+      bool should_drop_interval =
+        find_defined_index == defined_indices.begin() ||
+        (intervals_it != array.begin() &&
+         std::prev(intervals_it)->first == *std::prev(find_defined_index));
+
+      if(should_drop_interval)
+      {
+        intervals_it = array.erase(intervals_it);
+      }
+      else
+      {
+        // Extend the interval to our right (i.e. shrink this one) so that
+        // this one extends to exactly the previous defined index. Remember
+        // these intervals are of the form "VALUE until-including INDEX".
+        exprt existing_value = intervals_it->second;
+        intervals_it = array.erase(intervals_it);
+        array.insert({*std::prev(find_defined_index), existing_value});
+      }
+    }
+    else
+    {
+      // This interval already extends to a defined index; leave it alone.
+      intervals_it++;
+    }
+  }
+
+  return {std::move(array), any_changes};
+}
+
+/// Replace the given array with one where any index not defined in the given
+/// index set inherits its value from its right-hand defined neighbouring index.
+/// For example, if the input array represents the string "abcde" and the
+/// defined indices are 1, 3 and 4, the result is "bbdde".
+/// \param array array to restrict
+/// \param index_set index-set to restrict by (if it contains symbolic
+/// expressions they are resolved against the current model)
+/// \return restricted array
+interval_sparse_arrayt string_refinementt::restrict_sparse_array_to_index_set(
+  interval_sparse_arrayt array,
+  const std::set<exprt> &index_set) const
+{
+  std::ostringstream old_value;
+  if(log.get_message_handler().get_verbosity() >= 10)
+  {
+    array.print(old_value);
+  }
+
+  std::vector<std::size_t> defined_indices =
+    get_model_defined_indices(index_set);
+
+  bool any_changes;
+  std::tie(array, any_changes) =
+    restrict_sparse_array_to_indices(std::move(array), defined_indices);
+
+  if(any_changes && log.get_message_handler().get_verbosity() >= 10)
+  {
+    log.debug() << "Removed undefined indices from a string.\n"
+                << "Old string: " << old_value.str() << "\n"
+                << "New string: ";
+    array.print(log.debug());
+    log.debug() << messaget::eom;
+  }
+
+  return array;
 }
 
 /// Evaluates the given expression in the valuation found by
@@ -1845,9 +2017,36 @@ exprt string_refinementt::get(const exprt &expr) const
 
     const exprt unknown =
       from_integer(CHARACTER_FOR_UNKNOWN, index_expr->type());
-    if(
-      const auto sparse_array = interval_sparse_arrayt::of_expr(array, unknown))
+    if(auto sparse_array = interval_sparse_arrayt::of_expr(array, unknown))
     {
+      if(can_cast_expr<constant_exprt>(
+           to_array_type(current.get().type()).size()))
+      {
+        auto find_it = index_sets.cumulative.find(current);
+        if(find_it != index_sets.cumulative.end())
+        {
+          // The underlying solver assigns fixed-sized array cells arbitrary
+          // values at cells that are otherwise unconstrained. (For example, if
+          // our current constraints specified char x[5] had x[3] == 'a' and
+          // isdigit(x[4]) it might return "@:^a0", and the leading arbitrary
+          // choices might violate universal axioms (perhaps for-all i we must
+          // have isalphanumeric(x[i]))).
+          //
+          // Therefore, mask out cells that don't appear in (this model of)
+          // the array's index set, instead using the nearest constrained cell
+          // on the right-hand side. Because index sets are initialised to
+          // contain the upper-bound of each universal constraint, and all
+          // universal constraints created by this solver have the property that
+          // a valid solution to a universal constraint at one offset is also
+          // valid at another (e.g. we can have for-all i, x[i] == y[i+offset],
+          // but not for-all i, x[i] = i), this will ensure that if a universal
+          // constraint holds for all values in the index set, it also holds for
+          // all values in that universal constraint's bounds.
+          sparse_array =
+            restrict_sparse_array_to_index_set(*sparse_array, find_it->second);
+        }
+      }
+
       if(const auto index_value = numeric_cast<std::size_t>(index))
         return sparse_array->at(*index_value);
       return sparse_array->to_if_expression(index);

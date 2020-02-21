@@ -21,7 +21,7 @@ SCENARIO("array_pool", "[core][solvers][strings][string_constraint_generator]")
   GIVEN("An array pool")
   {
     symbol_generatort symbol_generator;
-    array_poolt pool(symbol_generator);
+    array_poolt pool(symbol_generator, {});
 
     WHEN("Looking for a pointer symbol")
     {

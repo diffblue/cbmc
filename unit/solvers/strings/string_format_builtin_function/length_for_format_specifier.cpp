@@ -50,7 +50,7 @@ SCENARIO(
   const symbol_tablet symbol_table;
   const namespacet ns{symbol_table};
   symbol_generatort fresh_symbol;
-  array_poolt array_pool{fresh_symbol};
+  array_poolt array_pool{fresh_symbol, {}};
 
   WHEN("format specifier = %s")
   {

@@ -192,3 +192,22 @@ array_exprt interval_sparse_arrayt::concretize(
     size, it == entries.end() ? default_value : it->second);
   return array;
 }
+
+void interval_sparse_arrayt::print(std::ostream &log) const
+{
+  if(entries.empty())
+    log << format(default_value) << " everywhere";
+  else
+  {
+    bool first = true;
+    for(const auto &entry : entries)
+    {
+      if(!first)
+        log << ", then ";
+      else
+        first = false;
+      log << format(entry.second) << " up to index " << entry.first;
+    }
+    log << "; otherwise " << format(default_value);
+  }
+}

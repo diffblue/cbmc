@@ -42,8 +42,11 @@ public:
 class array_poolt final
 {
 public:
-  explicit array_poolt(symbol_generatort &symbol_generator)
-    : fresh_symbol(symbol_generator)
+  explicit array_poolt(
+    symbol_generatort &symbol_generator,
+    optionalt<std::size_t> maximum_string_length)
+    : fresh_symbol(symbol_generator),
+      maximum_fresh_string_length(maximum_string_length)
   {
   }
 
@@ -100,6 +103,9 @@ private:
 
   /// Generate fresh symbols
   symbol_generatort &fresh_symbol;
+
+  /// Maximum length of fresh strings introduced by this class
+  optionalt<std::size_t> maximum_fresh_string_length;
 
   array_string_exprt make_char_array_for_char_pointer(
     const exprt &char_pointer,

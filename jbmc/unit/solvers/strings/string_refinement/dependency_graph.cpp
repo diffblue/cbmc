@@ -87,7 +87,7 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
     WHEN("We add dependencies")
     {
       symbol_generatort generator;
-      array_poolt array_pool(generator);
+      array_poolt array_pool(generator, {});
 
       optionalt<exprt> new_equation1 =
         add_node(dependencies, equation1, array_pool, generator);

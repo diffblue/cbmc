@@ -46,6 +46,10 @@ struct object_factory_parameterst
   /// Minimum value for the non-deterministically-chosen length of a string.
   size_t min_nondet_string_length = 0;
 
+  /// Maximum size of intermediate strings (not inputs, but strings
+  /// resulting from substring, concatenation and similar operations).
+  optionalt<std::size_t> max_intermediate_string_length;
+
   /// Maximum depth of pointer chains (that contain recursion) in the nondet
   /// generated input objects.
   ///

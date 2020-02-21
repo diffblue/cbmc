@@ -133,6 +133,28 @@ public:
   /// Complexity is logarithmic in the number of entries.
   exprt at(std::size_t index) const;
 
+  /// Iterators over interval boundaries
+  typedef std::map<std::size_t, exprt>::const_iterator const_iterator;
+  const_iterator begin() const
+  {
+    return entries.begin();
+  }
+  const_iterator end() const
+  {
+    return entries.end();
+  }
+  const_iterator erase(const_iterator pos)
+  {
+    return entries.erase(pos);
+  }
+  std::pair<const_iterator, bool>
+  insert(const std::pair<std::size_t, exprt> &value)
+  {
+    return entries.insert(value);
+  }
+
+  void print(std::ostream &log) const;
+
   /// Array containing the same value at each index.
   explicit interval_sparse_arrayt(exprt default_value)
     : sparse_arrayt(default_value)

@@ -34,6 +34,11 @@ void object_factory_parameterst::set(const optionst &options)
     max_nondet_string_length =
       options.get_unsigned_int_option("max-nondet-string-length");
   }
+  if(options.is_set("max-intermediate-string-length"))
+  {
+    max_nondet_string_length =
+      options.get_unsigned_int_option("max-intermediate-string-length");
+  }
   if(options.is_set("string-printable"))
   {
     string_printable = options.get_bool_option("string-printable");
@@ -74,6 +79,12 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
     options.set_option(
       "max-nondet-string-length",
       cmdline.get_value("max-nondet-string-length"));
+  }
+  if(cmdline.isset("max-intermediate-string-length"))
+  {
+    options.set_option(
+      "max-intermediate-string-length",
+      cmdline.get_value("max-intermediate-string-length"));
   }
   if(cmdline.isset("string-printable"))
   {

@@ -126,7 +126,7 @@ protected:
 
   propt &prop;
 
-  messaget log;
+  mutable messaget log;
 
   static const char *context_prefix;
 
