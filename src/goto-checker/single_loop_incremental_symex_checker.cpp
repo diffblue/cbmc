@@ -34,7 +34,8 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
       equation,
       options,
       path_storage,
-      guard_manager),
+      guard_manager,
+      ui_message_handler.get_ui()),
     property_decider(options, ui_message_handler, equation, ns)
 {
   setup_symex(symex, ns, options, ui_message_handler);

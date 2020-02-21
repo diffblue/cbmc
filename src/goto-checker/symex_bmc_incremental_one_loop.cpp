@@ -19,7 +19,8 @@ symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
   symex_target_equationt &target,
   const optionst &options,
   path_storaget &path_storage,
-  guard_managert &guard_manager)
+  guard_managert &guard_manager,
+  ui_message_handlert::uit output_ui)
   : symex_bmct(
       message_handler,
       outer_symbol_table,
@@ -33,7 +34,8 @@ symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
                                    : std::numeric_limits<unsigned>::max()),
     incr_min_unwind(
       options.is_set("unwind-min") ? options.get_signed_int_option("unwind-min")
-                                   : 0)
+                                   : 0),
+    output_ui(output_ui)
 {
   ignore_assertions =
     incr_min_unwind >= 1 &&
@@ -56,6 +58,7 @@ bool symex_bmc_incremental_one_loopt::should_stop_unwind(
     this_loop_limit = incr_max_unwind;
     if(unwind + 1 >= incr_min_unwind)
       ignore_assertions = false;
+
     abort_unwind_decision = tvt(unwind >= this_loop_limit);
   }
   else
@@ -85,6 +88,7 @@ bool symex_bmc_incremental_one_loopt::should_stop_unwind(
     abort_unwind_decision.is_known(), "unwind decision should be taken by now");
   bool abort = abort_unwind_decision.is_true();
 
+  log_unwinding(unwind);
   log.statistics() << (abort ? "Not unwinding" : "Unwinding") << " loop " << id
                    << " iteration " << unwind;
 
@@ -130,4 +134,30 @@ bool symex_bmc_incremental_one_loopt::resume(
   symex_with_state(*state, get_goto_function, state->symbol_table);
 
   return should_pause_symex;
+}
+void symex_bmc_incremental_one_loopt::log_unwinding(unsigned unwind)
+{
+  const std::string unwind_num = std::to_string(unwind);
+  switch(output_ui)
+  {
+  case ui_message_handlert::uit::PLAIN:
+  {
+    log.statistics() << "Current unwinding: " << unwind_num << messaget::eom;
+    break;
+  }
+  case ui_message_handlert::uit::XML_UI:
+  {
+    xmlt xml("current-unwinding");
+    xml.data = unwind_num;
+    log.statistics() << xml << messaget::eom;
+    break;
+  }
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    json_objectt json;
+    json["currentUnwinding"] = json_numbert(unwind_num);
+    log.statistics() << json << messaget::eom;
+    break;
+  }
+  }
 }
