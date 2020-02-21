@@ -1,6 +1,9 @@
-CORE
+CORE limited-size-strings-expected-failure
 Test
 --function Test.check --unwind 4 --max-nondet-string-length 3 --java-assume-inputs-non-null
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+--
+--
+Actually works fine with limited size strings, just takes a very long time.

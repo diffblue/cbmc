@@ -60,8 +60,7 @@ regression/**/tests-*.log
 regression/**/*.goto-cc-saved
 regression/**/*.gb
 regression/**/*.smt2
-jbmc/regression/**/tests.log
-jbmc/regression/**/tests-symex-driven-loading.log
+jbmc/regression/**/*.log
 
 # regression/coverage file
 /regression/coverage_**

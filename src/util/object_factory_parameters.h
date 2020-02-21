@@ -46,6 +46,12 @@ struct object_factory_parameterst
   /// Minimum value for the non-deterministically-chosen length of a string.
   size_t min_nondet_string_length = 0;
 
+  /// If true, and nondet strings have a reasonably small bounded size
+  // (currently limited to 256 chars) we'll use a fixed-size array to store
+  // them. Otherwise the array will be unbounded (but the actual string
+  // length will still be bounded as normal).
+  bool use_fixed_size_arrays_for_bounded_strings = false;
+
   /// Maximum depth of pointer chains (that contain recursion) in the nondet
   /// generated input objects.
   ///

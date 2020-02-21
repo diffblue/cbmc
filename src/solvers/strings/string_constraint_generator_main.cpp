@@ -31,8 +31,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
 
-string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
-  : array_pool(fresh_symbol), ns(ns)
+string_constraint_generatort::string_constraint_generatort(
+  const namespacet &ns,
+  optionalt<std::size_t> maximum_string_length,
+  bool use_fixed_size_arrays_for_bounded_strings)
+  : array_pool(
+      fresh_symbol,
+      maximum_string_length,
+      use_fixed_size_arrays_for_bounded_strings),
+    ns(ns)
 {
 }
 

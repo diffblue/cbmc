@@ -327,6 +327,9 @@ static irep_idt integer_interval_to_string(const integer_intervalt &interval)
 ///   data array)
 /// \param min_nondet_string_length: minimum length of strings to initialize
 /// \param max_nondet_string_length: maximum length of strings to initialize
+/// \param use_fixed_size_array_for_bounded_string: if true, allocate a fixed
+//    size array when  max_nondet_string_length is set and reasonably small
+//    (currently hard-coded to 256 chars)
 /// \param loc: location in the source
 /// \param function_id: function ID to associate with auxiliary variables
 /// \param symbol_table: the symbol table
@@ -362,6 +365,7 @@ void initialize_nondet_string_fields(
   code_blockt &code,
   const std::size_t &min_nondet_string_length,
   const std::size_t &max_nondet_string_length,
+  const bool use_fixed_size_array_for_bounded_string,
   const source_locationt &loc,
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
@@ -413,8 +417,13 @@ void initialize_nondet_string_fields(
       code_assumet(binary_relation_exprt(length_expr, ID_le, max_length)));
   }
 
-  const exprt data_expr =
-    make_nondet_infinite_char_array(symbol_table, loc, function_id, code);
+  const exprt data_expr = make_nondet_char_array(
+    symbol_table,
+    loc,
+    function_id,
+    code,
+    use_fixed_size_array_for_bounded_string ? max_nondet_string_length
+                                            : optionalt<size_t>{});
   struct_expr.operands()[struct_type.component_number("length")] = length_expr;
 
   const address_of_exprt array_pointer(
@@ -832,6 +841,7 @@ void java_object_factoryt::gen_nondet_struct_init(
         assignments,
         object_factory_parameters.min_nondet_string_length,
         object_factory_parameters.max_nondet_string_length,
+        object_factory_parameters.use_fixed_size_arrays_for_bounded_strings,
         location,
         object_factory_parameters.function_id,
         symbol_table,

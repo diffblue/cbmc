@@ -1,4 +1,4 @@
-CORE
+CORE limited-size-strings-expected-failure
 Test
 --max-nondet-string-length 4000 --function Test.checkMaxLength
 ^SIGNAL=0$

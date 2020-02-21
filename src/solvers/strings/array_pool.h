@@ -42,8 +42,14 @@ public:
 class array_poolt final
 {
 public:
-  explicit array_poolt(symbol_generatort &symbol_generator)
-    : fresh_symbol(symbol_generator)
+  explicit array_poolt(
+    symbol_generatort &symbol_generator,
+    optionalt<std::size_t> maximum_string_length,
+    bool use_fixed_size_arrays_for_bounded_strings)
+    : fresh_symbol(symbol_generator),
+      maximum_fresh_string_length(maximum_string_length),
+      use_fixed_size_arrays_for_bounded_strings(
+        use_fixed_size_arrays_for_bounded_strings)
   {
   }
 
@@ -100,6 +106,13 @@ private:
 
   /// Generate fresh symbols
   symbol_generatort &fresh_symbol;
+
+  /// Maximum length of fresh strings introduced by this class
+  optionalt<std::size_t> maximum_fresh_string_length;
+
+  /// If true, fresh strings with short, bounded size (<= 256 chars) will be
+  /// allocated as fixed-size arrays.
+  bool use_fixed_size_arrays_for_bounded_strings = false;
 
   array_string_exprt make_char_array_for_char_pointer(
     const exprt &char_pointer,

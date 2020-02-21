@@ -263,6 +263,11 @@ solver_factoryt::get_string_refinement()
       options.get_unsigned_int_option("max-node-refinement");
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
+  if(options.is_set("max-intermediate-string-length"))
+    info.maximum_intermediate_string_length =
+      options.get_unsigned_int_option("max-intermediate-string-length");
+  if(options.is_set("use-fixed-size-arrays-for-bounded-strings"))
+    info.use_fixed_size_arrays_for_bounded_strings = true;
   info.message_handler = &message_handler;
 
   auto decision_procedure = util_make_unique<string_refinementt>(info);

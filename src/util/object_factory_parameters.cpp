@@ -47,6 +47,10 @@ void object_factory_parameterst::set(const optionst &options)
     min_nondet_string_length =
       options.get_unsigned_int_option("min-nondet-string-length");
   }
+  if(options.is_set("use-fixed-size-arrays-for-bounded-strings"))
+  {
+    use_fixed_size_arrays_for_bounded_strings = true;
+  }
 }
 
 /// Parse the object factory parameters from a given command line
