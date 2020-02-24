@@ -56,6 +56,8 @@ src/cpp/cprover_library.inc
 # regression/test files
 *.out
 regression/**/tests.log
+regression/**/tests-*.log
+regression/**/*.goto-cc-saved
 regression/**/*.gb
 regression/**/*.smt2
 jbmc/regression/**/tests.log
