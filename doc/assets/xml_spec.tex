@@ -60,16 +60,18 @@ element.
 \begin{minted}{xml}
 <xs:element name="location">
   <xs:complexType>
-    <xs:attribute name="file" type="xs:string" use="optional"></xs:attribute>
-    <xs:attribute name="line" type="xs:int" use="optional"></xs:attribute>
+    <xs:attribute name="file" type="xs:string" use="optional"/>
+    <xs:attribute name="line" type="xs:int" use="optional"/>
+    <xs:attribute name="column" type="xs:int" use="optional"/>
     <xs:attribute name="working-directory" type="xs:string"
-                  use="optional"></xs:attribute>
+                  use="optional"/>
+    <xs:attribute name="function" type="xs:string" use="optional"/>
   </xs:complexType>
 </xs:element>
-\end{minted}  
-  
+\end{minted}
+
 \subsection{Trace Steps in XML}
-\vspace{1em}
+
 \noindent The attributes \texttt{hidden, thread, step\_nr} are common to all trace steps.
 
 \begin{minted}{xml}
@@ -98,7 +100,7 @@ element.
 <failure hidden="false" step_nr="23" thread="0"
          property="main.assertion.1"
          reason="assertion a + b &lt; 10">
-  <location .. />         
+  <location .. />
 </failure>
 \end{minted}
 
@@ -115,8 +117,7 @@ element.
   </xs:complexType>
 </xs:element>
 \end{minted}
-  
-\hrulefill
+
 
 \begin{center}
 {\Large Assignment, Declaration} (element name: \texttt{assignment})
@@ -125,7 +126,7 @@ element.
 \noindent\textbf{Attributes}:\\
 if the lhs symbol is known
 \begin{itemize}
-\item \texttt{mode}: \{C, Java, $\ldots$\}
+\item \texttt{mode}: \{C, Java, …\}
 \item \texttt{identifier}: string (symbol name)
 \item \texttt{base\_name}: string (e.g. ``counter'')
 \item \texttt{display\_name}: string (e.g. ``main::1::counter'')
@@ -184,7 +185,6 @@ always present
 </xs:element>
 \end{minted}
 
-\hrulefill
 
 \begin{center}
 {\Large Input} (element name: \texttt{input})
@@ -224,28 +224,21 @@ for each IO argument
 
 \noindent\textbf{XSD}:
 \begin{minted}{xml}
-<xs:group name="ioArgGroup">
-  <xs:all>
-    <xs:element name="value" type="xs:string"></xs:element>
-    <xs:element name="value_expression">
-      <xs:complexType></xs:complexType>
-    </xs:element>
-  </xs:all>
-</xs:group>
-
 <xs:element name="input">
   <xs:complexType>
-    <xs:all>
-      <xs:element name="location" minOccurs="0"></xs:element>
-      <xs:element name="input_id" type="xs:string"></xs:element>
-      <xs:group ref="ioArgGroup" maxOccurs="unbounded"></xs:element>
-    </xs:all>
-    <xs:attributeGroup ref="traceStepAttrs">
+    <xs:sequence>
+      <xs:element name="input_id" type="xs:string"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="value" type="xs:string"/>
+        <xs:element ref="value_expression"/>
+      </xs:sequence>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="traceStepAttrs"/>
   </xs:complexType>
 </xs:element>
 \end{minted}
 
-\hrulefill
 
 \begin{center}
   {\Large Output} (element name: \texttt{output})
@@ -264,11 +257,28 @@ for each IO argument
 \end{itemize}
 for each IO argument
 \begin{itemize}
-\item \texttt{value}: the (correctly typed) value the input is initialised with
+\item \texttt{text}: The textual representation of the output
+\item \texttt{location}: The original source location of the output
+\item \texttt{value}: the (correctly typed) value of the object that is being output
 \item \texttt{value\_expression}: the internal representation of the value
 \end{itemize}
 
-\hrulefill
+\begin{minted}{xml}
+<xs:element name="output">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="text" type="xs:string"/>
+      <xs:element ref="location" minOccurs="0"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="value" type="xs:string"/>
+        <xs:element ref="value_expression"/>
+      </xs:sequence>
+    </xs:sequence>
+  <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+\end{minted}
+
 
 \begin{center}
   {\Large Function Call} (element name: \texttt{function\_call})\\
@@ -293,6 +303,7 @@ for each IO argument
   Elements:
   \begin{itemize}
   \item \texttt{location}: source location of the called function
+  \item \texttt{function}: The function that is being called/returned from.
   \end{itemize}
 \end{itemize}
 
@@ -312,11 +323,19 @@ for each IO argument
   <xs:complexType>
     <xs:all>
       <xs:element name="location" minOccurs="0"></xs:element>
-      <xs:element name="function">
-        <!-- See below -->
-      </xs:element>
+      <xs:element ref="function"/>
     </xs:all>
     <xs:attributeGroup ref="traceStepAttrs">
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="function_return">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element ref="function"/>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="traceStepAttrs"/>
   </xs:complexType>
 </xs:element>
 
@@ -331,7 +350,6 @@ for each IO argument
 </xs:element>
 \end{minted}
 
-\hrulefill
 
 \begin{center}
   {\Large All Other Steps} (element name: \texttt{location-only})
@@ -392,7 +410,7 @@ for each IO argument
 
 The path from the input C code to XML trace goes through the following steps:\\
 
-$\textrm{C} \to \textrm{GOTO} \to \textrm{SSA} \to \textrm{GOTO Trace} \to \textrm{XML Trace}$
+\texttt{C} → \texttt{GOTO} → \texttt{SSA} → \texttt{GOTO Trace} → \texttt{XML Trace}
 
 \paragraph{SSA to GOTO Trace}
 

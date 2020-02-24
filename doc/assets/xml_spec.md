@@ -74,10 +74,12 @@ Every trace step optionally contains the source location as an element.
 ``` {.xml}
 <xs:element name="location">
   <xs:complexType>
-    <xs:attribute name="file" type="xs:string" use="optional"></xs:attribute>
-    <xs:attribute name="line" type="xs:int" use="optional"></xs:attribute>
+    <xs:attribute name="file" type="xs:string" use="optional"/>
+    <xs:attribute name="line" type="xs:int" use="optional"/>
+    <xs:attribute name="column" type="xs:int" use="optional"/>
     <xs:attribute name="working-directory" type="xs:string"
-                  use="optional"></xs:attribute>
+                  use="optional"/>
+    <xs:attribute name="function" type="xs:string" use="optional"/>
   </xs:complexType>
 </xs:element>
 ```
@@ -88,14 +90,14 @@ Trace Steps in XML
 The attributes `hidden, thread, step_nr` are common to all trace steps.
 
 ``` {.xml}
-<xs:attributeGroup name="traceStepAttrs"/>
+<xs:attributeGroup name="traceStepAttrs">
   <xs:attribute name="hidden" type="xs:string"></xs:attribute>
   <xs:attribute name="step_nr" type="xs:int"></xs:attribute>
   <xs:attribute name="thread" type="xs:int"></xs:attribute>
 </xs:attributeGroup>
 ```
 
-[Assert]{} (element name: `failure`)
+Assert (element name: `failure`)
 
 **Attributes**:
 
@@ -127,14 +129,14 @@ The attributes `hidden, thread, step_nr` are common to all trace steps.
     <xs:all>
       <xs:element name="location" minOccurs="0"></xs:element>
     </xs:all>
-    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attributeGroup ref="traceStepAttrs">
     <xs:attribute name="property" type="xs:string"></xs:attribute>
     <xs:attribute name="reason" type="xs:string"></xs:attribute>
   </xs:complexType>
 </xs:element>
 ```
 
-[Assignment, Declaration]{} (element name: `assignment`)
+Assignment, Declaration (element name: `assignment`)
 
 **Attributes**:\
 if the lhs symbol is known
@@ -143,7 +145,7 @@ if the lhs symbol is known
 
 -   `identifier`: string (symbol name)
 
--   `base_name`: string (e.g. “counter”)
+-   `base_name`: string (e.g. "counter")
 
 -   `display_name`: string (e.g. "main::1::counter")
 
@@ -160,7 +162,7 @@ always present
 **Elements**:\
 if the lhs symbol is known
 
--   `type`: C type (e.g. “signed int”)
+-   `type`: C type (e.g. "signed int")
 
 always present
 
@@ -192,7 +194,7 @@ always present
       <xs:element name="full_lhs" type="xs:string"></xs:element>
       <xs:element name="full_lhs_value" type="xs:int"></xs:element>
     </xs:all>
-    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attributeGroup ref="traceStepAttrs">
     <xs:attribute name="assignment_type" type="xs:string"></xs:attribute>
     <xs:attribute name="base_name" type="xs:string"
                   use="optional"></xs:attribute>
@@ -205,7 +207,7 @@ always present
 </xs:element>
 ```
 
-[Input]{} (element name: `input`)
+Input (element name: `input`)
 
 **Attributes**:
 
@@ -244,28 +246,22 @@ for each IO argument
 **XSD**:
 
 ``` {.xml}
-<xs:group name="ioArgGroup">
-  <xs:all>
-    <xs:element name="value" type="xs:string"></xs:element>
-    <xs:element name="value_expression">
-      <xs:complexType></xs:complexType>
-    </xs:element>
-  </xs:all>
-</xs:group>
-
 <xs:element name="input">
   <xs:complexType>
-    <xs:all>
-      <xs:element name="location" minOccurs="0"></xs:element>
-      <xs:element name="input_id" type="xs:string"></xs:element>
-      <xs:group ref="ioArgGroup" maxOccurs="unbounded"></xs:element>
-    </xs:all>
+    <xs:sequence>
+      <xs:element name="input_id" type="xs:string"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="value" type="xs:string"/>
+        <xs:element ref="value_expression"/>
+      </xs:sequence>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:sequence>
     <xs:attributeGroup ref="traceStepAttrs"/>
   </xs:complexType>
 </xs:element>
 ```
 
-[Output]{} (element name: `output`)
+Output (element name: `output`)
 
 **Attributes**:
 
@@ -281,12 +277,33 @@ for each IO argument
 
 for each IO argument
 
--   `value`: the (correctly typed) value the input is initialised with
+-   `text`: The textual representation of the output
+
+-   `location`: The original source location of the output
+
+-   `value`: the (correctly typed) value of the object that is being
+    output
 
 -   `value_expression`: the internal representation of the value
 
-[Function Call]{} (element name: `function_call`)\
-[Function Return]{} (element name: `function_return`)
+``` {.xml}
+<xs:element name="output">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="text" type="xs:string"/>
+      <xs:element ref="location" minOccurs="0"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="value" type="xs:string"/>
+        <xs:element ref="value_expression"/>
+      </xs:sequence>
+    </xs:sequence>
+  <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+```
+
+Function Call (element name: `function_call`)\
+Function Return (element name: `function_return`)
 
 **Attributes**:
 
@@ -309,6 +326,8 @@ for each IO argument
 
     -   `location`: source location of the called function
 
+    -   `function`: The function that is being called/returned from.
+
 **Example**:
 
 ``` {.xml}
@@ -327,10 +346,18 @@ for each IO argument
   <xs:complexType>
     <xs:all>
       <xs:element name="location" minOccurs="0"></xs:element>
-      <xs:element name="function">
-        <!-- See below -->
-      </xs:element>
+      <xs:element ref="function"/>
     </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs">
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="function_return">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element ref="function"/>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:sequence>
     <xs:attributeGroup ref="traceStepAttrs"/>
   </xs:complexType>
 </xs:element>
@@ -346,7 +373,7 @@ for each IO argument
 </xs:element>
 ```
 
-[All Other Steps]{} (element name: `location-only`)
+All Other Steps (element name: `location-only`)
 
 Only included if the source location exists and differs from the
 previous one.\
@@ -378,7 +405,7 @@ previous one.\
     <xs:all>
       <xs:element name="location" minOccurs="0"></xs:element>
     </xs:all>
-    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attributeGroup ref="traceStepAttrs">
   </xs:complexType>
 </xs:element>
 ```
@@ -390,13 +417,13 @@ Full Trace XSD
 <xs:element name="goto_trace">
   <xs:complexType>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="assignment"></xs:element>
-      <xs:element name="failure"></xs:element>
-      <xs:element name="function_call"></xs:element>
-      <xs:element name="function_return"></xs:element>
-      <xs:element name="input"></xs:element>
-      <xs:element name="output"></xs:element>
-      <xs:element name="location-only"></xs:element>
+      <xs:element ref="assignment"></xs:element>
+      <xs:element ref="failure"></xs:element>
+      <xs:element ref="function_call"></xs:element>
+      <xs:element ref="function_return"></xs:element>
+      <xs:element ref="input"></xs:element>
+      <xs:element ref="output"></xs:element>
+      <xs:element ref="location-only"></xs:element>
     </xs:choice>
   </xs:complexType>
 </xs:element>
@@ -407,7 +434,7 @@ Notes
 
 The path from the input C code to XML trace goes through the following
 steps:\
-C -> GOTO -> SSA -> GOTO Trace -> XML Trace
+`C` → `GOTO` → `SSA` → `GOTO Trace` → `XML Trace`
 
 #### SSA to GOTO Trace
 
