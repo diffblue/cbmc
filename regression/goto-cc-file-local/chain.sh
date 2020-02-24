@@ -47,6 +47,13 @@ if is_in wall "$ALL_ARGS"; then
   fi
 fi
 
+export_flag=""
+if is_in old-flag "$ALL_ARGS"; then
+  export_flag="--export-function-local-symbols"
+else
+  export_flag="--export-file-local-symbols"
+fi
+
 cnt=0
 for src in ${SRC}; do
   cnt=$((cnt + 1))
@@ -63,7 +70,7 @@ for src in ${SRC}; do
 
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        --export-file-local-symbols \
+        ${export_flag}                  \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
@@ -72,7 +79,7 @@ for src in ${SRC}; do
 
   else
     "${goto_cc}"                        \
-        --export-file-local-symbols \
+        ${export_flag}                  \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
@@ -86,7 +93,7 @@ if is_in final-link "$ALL_ARGS"; then
   rm -f ${OUT_FILE}
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        --export-file-local-symbols \
+        ${export_flag}                  \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
@@ -95,7 +102,7 @@ if is_in final-link "$ALL_ARGS"; then
 
   else
     "${goto_cc}"                        \
-        --export-file-local-symbols \
+        ${export_flag}                  \
         --verbosity 10                  \
         ${wall}                         \
         ${suffix}                       \
