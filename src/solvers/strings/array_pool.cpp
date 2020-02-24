@@ -7,6 +7,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include "array_pool.h"
+#include "string_refinement_util.h"
+#include <util/pointer_predicates.h>
 
 symbol_exprt symbol_generatort::
 operator()(const irep_idt &prefix, const typet &type)
@@ -102,13 +104,15 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
   const bool is_constant_array =
     char_pointer.id() == ID_address_of &&
     to_address_of_expr(char_pointer).object().id() == ID_index &&
-    to_index_expr(to_address_of_expr(char_pointer).object()).array().id() ==
-      ID_array;
+    (to_index_expr(to_address_of_expr(char_pointer).object()).array().id() ==
+       ID_array ||
+     to_index_expr(to_address_of_expr(char_pointer).object()).array().id() ==
+       ID_string_constant);
 
   if(is_constant_array)
   {
-    return to_array_string_expr(
-      to_index_expr(to_address_of_expr(char_pointer).object()).array());
+    return to_array_string_expr(convert_string_representation_to_array(
+      to_index_expr(to_address_of_expr(char_pointer).object()).array()));
   }
   const std::string symbol_name = "char_array_" + id2string(char_pointer.id());
   const auto array_sym =
@@ -135,35 +139,57 @@ static void attempt_assign_length_from_type(
   std::unordered_map<array_string_exprt, exprt, irep_hash> &length_of_array,
   symbol_generatort &symbol_generator)
 {
-  DATA_INVARIANT(
-    array_expr.id() != ID_if,
-    "attempt_assign_length_from_type does not handle if exprts");
-  // This invariant seems always true, but I don't know why.
-  // If we find a case where this is violated, try calling
-  // attempt_assign_length_from_type on the true and false cases.
+  if(array_expr.id() == ID_if)
+  {
+    const auto &if_expr = to_if_expr(array_expr);
+    attempt_assign_length_from_type(
+      to_array_string_expr(if_expr.true_case()),
+      length_of_array,
+      symbol_generator);
+    attempt_assign_length_from_type(
+      to_array_string_expr(if_expr.false_case()),
+      length_of_array,
+      symbol_generator);
+    return;
+  }
   const exprt &size_from_type = to_array_type(array_expr.type()).size();
   const exprt &size_to_assign =
     size_from_type != infinity_exprt(size_from_type.type())
       ? size_from_type
       : symbol_generator("string_length", array_expr.length_type());
 
-  const auto emplace_result =
+  // c++17
+  // length_of_array.insert_or_assign(array_expr, size_to_assign);
+  if(length_of_array.count(array_expr) == 0)
+  {
     length_of_array.emplace(array_expr, size_to_assign);
-  INVARIANT(
-    emplace_result.second,
-    "attempt_assign_length_from_type should only be called when no entry"
-    "for the array_string_exprt exists in the length_of_array map");
+  }
+  else
+  {
+    length_of_array[array_expr] = size_to_assign;
+  }
+  //  const auto emplace_result =
+  // INVARIANT(
+  //   emplace_result.second,
+  //   "attempt_assign_length_from_type should only be called when no entry "
+  //   "for the array_string_exprt exists in the length_of_array map");
 }
 
 void array_poolt::insert(
   const exprt &pointer_expr,
   const array_string_exprt &array_expr)
 {
-  const auto it_bool =
+  const auto association_it = arrays_of_pointers.find(pointer_expr);
+  if(association_it != arrays_of_pointers.end())
+  {
+    INVARIANT(
+      association_it->second == array_expr,
+      "should not associate two different arrays to the same pointer");
+  }
+  else
+  {
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));
-
-  INVARIANT(
-    it_bool.second, "should not associate two arrays to the same pointer");
+  }
 
   if(length_of_array.find(array_expr) == length_of_array.end())
   {

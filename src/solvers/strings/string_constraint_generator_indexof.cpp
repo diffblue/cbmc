@@ -41,14 +41,17 @@ string_constraint_generatort::add_axioms_for_index_of(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type = str.length_type();
+  const typet &index_type = from_index.type();
   symbol_exprt index = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_in_index_of");
 
   exprt minus1 = from_integer(-1, index_type);
   and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
-    binary_relation_exprt(index, ID_lt, array_pool.get_or_create_length(str)));
+    binary_relation_exprt(
+      index,
+      ID_lt,
+      typecast_exprt{array_pool.get_or_create_length(str), index.type()}));
   constraints.existential.push_back(a1);
 
   equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
@@ -75,7 +78,8 @@ string_constraint_generatort::add_axioms_for_index_of(
   string_constraintt a5(
     m,
     lower_bound,
-    zero_if_negative(array_pool.get_or_create_length(str)),
+    zero_if_negative(
+      typecast_exprt{array_pool.get_or_create_length(str), m.type()}),
     implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
   constraints.universal.push_back(a5);
 
@@ -306,9 +310,9 @@ string_constraint_generatort::add_axioms_for_index_of(
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt str = get_string_expr(array_pool, args[0]);
   const exprt &c = args[1];
-  const typet &index_type = str.length_type();
+  const typet &index_type = f.type();
   const typet &char_type = str.content().type().subtype();
-  PRECONDITION(f.type() == index_type);
+
   const exprt from_index =
     args.size() == 2 ? from_integer(0, index_type) : args[2];
 

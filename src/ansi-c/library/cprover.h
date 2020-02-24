@@ -159,4 +159,9 @@ __CPROVER_bool __CPROVER_overflow_plus();
 __CPROVER_bool __CPROVER_overflow_shl();
 __CPROVER_bool __CPROVER_overflow_unary_minus();
 
+long __CPROVER_math_func_string_index_of(
+  const char *haystack,
+  __CPROVER_size_t length,
+  char needle);
+
 #endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H

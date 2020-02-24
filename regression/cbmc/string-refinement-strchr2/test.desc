@@ -1,0 +1,10 @@
+CORE broken-smt-backend
+test.c
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion first_o != (NULL|\(\(void \*\)0\)): SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion \*first_o == test\[0\]: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

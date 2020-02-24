@@ -129,6 +129,7 @@ public:
     libt lib;
 
     bool string_abstraction;
+    bool string_c_refinement;
 
     static const std::size_t default_object_bits=8;
   } ansi_c;

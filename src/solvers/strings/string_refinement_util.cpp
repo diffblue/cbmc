@@ -14,19 +14,22 @@ Author: Diffblue Ltd.
 #include <numeric>
 #include <unordered_set>
 #include <util/arith_tools.h>
+#include <util/expr_cast.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/graph.h>
 #include <util/magic.h>
 #include <util/make_unique.h>
 #include <util/ssa_expr.h>
-#include <util/std_expr.h>
+#include <util/string2int.h>
+#include <util/string_constant.h>
 #include <util/unicode.h>
 
 bool is_char_type(const typet &type)
 {
-  return type.id() == ID_unsignedbv && to_unsignedbv_type(type).get_width() <=
-                                         STRING_REFINEMENT_MAX_CHAR_WIDTH;
+  return (type.id() == ID_unsignedbv || type.id() == ID_signedbv) &&
+         to_bitvector_type(type).get_width() <=
+           STRING_REFINEMENT_MAX_CHAR_WIDTH;
 }
 
 bool is_char_array_type(const typet &type, const namespacet &ns)
@@ -191,4 +194,53 @@ array_exprt interval_sparse_arrayt::concretize(
   array.operands().resize(
     size, it == entries.end() ? default_value : it->second);
   return array;
+}
+
+exprt byte_extract_object_with_constant_offset(
+  const byte_extract_exprt &byte_extract_expr)
+{
+  const auto &offset = byte_extract_expr.offset();
+  PRECONDITION(offset.id() == ID_constant);
+
+  const auto &constant_offset = to_constant_expr(offset);
+  const auto &op = byte_extract_expr.op();
+  auto numeric_offset =
+    string2optional_int(id2string(constant_offset.get_value()));
+  CHECK_RETURN(numeric_offset.has_value());
+
+  return *numeric_offset == 0
+           ? op
+           : array_exprt{
+               array_exprt::operandst{op.operands().begin() + *numeric_offset,
+                                      op.operands().end()},
+               to_array_type(op.type())};
+}
+
+exprt convert_string_representation_to_array(const exprt &expr)
+{
+  exprt result = expr;
+  if(can_cast_expr<byte_extract_exprt>(result))
+  {
+    result =
+      byte_extract_object_with_constant_offset(to_byte_extract_expr(result));
+  }
+  if(
+    auto const &string_constant =
+      expr_try_dynamic_cast<string_constantt>(result))
+  {
+    result = static_cast<const exprt &>(string_constant->to_array_expr());
+  }
+  CHECK_RETURN(result.type().id() == ID_array);
+
+  CHECK_RETURN(
+    result.id() == ID_array || result.id() == ID_if ||
+    result.id() == ID_symbol || result.id() == ID_array_list);
+  if(result.id() == ID_if)
+  {
+    return if_exprt{result.op0(),
+                    convert_string_representation_to_array(result.op1()),
+                    convert_string_representation_to_array(result.op2()),
+                    result.type()};
+  }
+  return result;
 }

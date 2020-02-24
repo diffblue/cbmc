@@ -15,8 +15,8 @@ Author: Diffblue Ltd.
 #include "string_constraint.h"
 #include "string_constraint_generator.h"
 
-/// For now, any unsigned bitvector type of width smaller or equal to 16 is
-/// considered a character.
+/// For now, any signed or unsigned bitvector type of width smaller or equal to
+/// 16 is considered a character.
 /// \note type that are not characters maybe detected as characters (for
 /// instance unsigned char in C), this will make dec_solve do unnecessary
 /// steps for these, but should not affect correctness.
@@ -140,4 +140,7 @@ public:
   }
 };
 
+exprt byte_extract_object_with_constant_offset(const exprt &expr);
+
+exprt convert_string_representation_to_array(const exprt &expr);
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_UTIL_H

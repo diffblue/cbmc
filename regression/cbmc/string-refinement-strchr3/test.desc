@@ -1,0 +1,11 @@
+CORE broken-smt-backend
+test.c
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[strchr.assertion.\d+\] line \d+ zero should be present: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion result: SUCCESS$
+^\[main.assertion.\d+\] line \d+ unreachable: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
