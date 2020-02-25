@@ -64,6 +64,11 @@ void message_handlert::print(
     message_count.resize(level+1, 0);
   ++message_count[level];
 }
+void message_handlert::print(unsigned level, const structured_datat &data)
+{
+  // default to just printing out the data in a format
+  print(level, data.to_pretty());
+}
 
 messaget::~messaget()
 {

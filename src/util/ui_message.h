@@ -40,6 +40,7 @@ public:
     PRECONDITION(json_stream!=nullptr);
     return *json_stream;
   }
+  void print(unsigned level, const structured_datat &data) override;
 
 protected:
   std::unique_ptr<console_message_handlert> console_message_handler;

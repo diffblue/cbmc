@@ -310,3 +310,18 @@ void ui_message_handlert::flush(unsigned level)
     break;
   }
 }
+void ui_message_handlert::print(unsigned level, const structured_datat &data)
+{
+  switch(get_ui())
+  {
+  case uit::PLAIN:
+    print(level, data.to_pretty());
+    break;
+  case uit::XML_UI:
+    print(level, data.to_xml());
+    break;
+  case uit::JSON_UI:
+    print(level, data.to_json());
+    break;
+  }
+}
