@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- This is mostly meant for reference purposes.
+     This schema is descriptive of observed output from
+     cbmc, not prescriptive (i.e. there currently is
+     no mechanism in place to ensure that cbmc outputs
+     will conform to this specification).
+-->
+
+<xs:element name="location">
+  <xs:complexType>
+    <xs:attribute name="file" type="xs:string" use="optional"/>
+    <xs:attribute name="line" type="xs:int" use="optional"/>
+    <xs:attribute name="working-directory" type="xs:string"
+                  use="optional"/>
+    <xs:attribute name="function" type="xs:string" use="optional"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:attributeGroup name="traceStepAttrs">
+  <xs:attribute name="hidden" type="xs:string"/>
+  <xs:attribute name="step_nr" type="xs:int"/>
+  <xs:attribute name="thread" type="xs:int"/>
+</xs:attributeGroup>
+
+<xs:element name="failure">
+  <xs:complexType>
+    <xs:all>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attribute name="property" type="xs:string"/>
+    <xs:attribute name="reason" type="xs:string"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="assignment">
+  <xs:complexType>
+    <xs:all>
+      <xs:element ref="location" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="full_lhs" type="xs:string"/>
+      <xs:element name="full_lhs_value" type="xs:string"/>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+    <xs:attribute name="assignment_type" type="xs:string"/>
+    <xs:attribute name="base_name" type="xs:string"
+                  use="optional"/>
+    <xs:attribute name="display_name" type="xs:string"
+                  use="optional"/>
+    <xs:attribute name="identifier" type="xs:string"
+                  use="optional"/>
+    <xs:attribute name="mode" type="xs:string" use="optional"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="value_expression">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:any processContents="lax" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="input">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="input_id" type="xs:string"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="value" type="xs:string"/>
+        <xs:element ref="value_expression"/>
+      </xs:sequence>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="output">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="text" type="xs:string"/>
+      <xs:element ref="location" minOccurs="0"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="value" type="xs:string"/>
+        <xs:element ref="value_expression"/>
+      </xs:sequence>
+    </xs:sequence>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="function_call">
+  <xs:complexType>
+    <xs:all>
+      <xs:element ref="location" minOccurs="0"/>
+      <xs:element ref="function"/>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="function">
+  <xs:complexType>
+    <xs:all>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="display_name" type="xs:string"/>
+    <xs:attribute name="identifier" type="xs:string"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="function_return">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element ref="function"/>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+
+<xs:element name="location-only">
+  <xs:complexType>
+    <xs:all>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="goto_trace">
+  <xs:complexType>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="assignment"></xs:element>
+      <xs:element ref="failure"></xs:element>
+      <xs:element ref="function_call"></xs:element>
+      <xs:element ref="function_return"></xs:element>
+      <xs:element ref="input"></xs:element>
+      <xs:element ref="output"></xs:element>
+      <xs:element ref="location-only"></xs:element>
+    </xs:choice>
+  </xs:complexType>
+</xs:element>
+  <xs:element name="result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="goto_trace" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="property" type="xs:string"/>
+      <xs:attribute name="status" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="message">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="location" minOccurs="0"/>
+        <xs:element name="text" type="xs:string"/>
+      </xs:sequence>
+      <xs:attribute name="type" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="program" type="xs:string"/>
+  <xs:element name="cprover-status" type="xs:string"/>
+  <xs:element name="cprover">
+    <xs:complexType>
+      <xs:sequence>
+      <xs:element ref="program"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="message"/>
+        <xs:element ref="result"/>
+       </xs:choice>
+      <xs:element ref="cprover-status" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
