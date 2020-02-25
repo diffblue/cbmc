@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.i
 --bounds-check --32 --no-simplify
 ^EXIT=10$
@@ -10,5 +10,6 @@ array\.List dynamic object upper bound in p->List\[2\]: FAILURE
 --
 Test is built from SV-COMP's memsafety/20051113-1.c_false-valid-memtrack.c.
 C90 did not have flexible arrays, and using arrays of size 1 was common
-practice: http://c-faq.com/struct/structhack.html. We need to treat those as if
-it were a zero-sized array.
+practice: http://c-faq.com/struct/structhack.html. But past C90 using
+non-flexible members for struct-hack is undefined, hence we changed the test to
+use flexible member instead.

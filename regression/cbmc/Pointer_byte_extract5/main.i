@@ -11,13 +11,15 @@ typedef union
 typedef struct
 {
   int Count;
-  Union List[1];
+  // flexible array member -- note that smt conversion does not yet support
+  // 0-sized arrays
+  Union List[0];
 } Struct3;
 #pragma pack(pop)
 
 int main()
 {
-  Struct3 *p = malloc(sizeof(Struct3) + sizeof(Union));
+  Struct3 *p = malloc(sizeof(Struct3) + 2 * sizeof(Union));
   p->Count = 3;
   int po=0;
 
