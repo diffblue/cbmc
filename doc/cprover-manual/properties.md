@@ -319,3 +319,19 @@ example, replacing functions or setting global variables with the `__CPROVER`
 prefix might make analysis impossible. To avoid doing this by accident, negative
 lookahead can be used. For example, `(?!__).*` matches all names not starting
 with `__`.
+
+### Malloc failure mode
+
+|Flag                    |  Check                                          |
+|------------------------|-------------------------------------------------|
+| `--malloc-fail-null`   |  in case malloc fails return NULL               |
+| `--malloc-fail-assert` |  in case malloc fails report as failed property |
+
+Calling `malloc` may fail for a number of reasons and the function may return a
+NULL pointer. The users can choose if and how they want the `malloc`-related
+failures to occur. The option `--malloc-fail-null` results in `malloc` returning
+the NULL pointer when failing. The option `--malloc-fail-assert` places
+additional properties inside `malloc` that are checked and if failing the
+verification is terminated (by `assume(false)`). One such property is that the
+allocated size is not too large, i.e. internally representable. When neither of
+those two options are used, CBMC will assume that `malloc` does not fail.

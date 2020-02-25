@@ -50,6 +50,7 @@ class optionst;
   "(object-bits):" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
+  "(malloc-fail-assert)(malloc-fail-null)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \

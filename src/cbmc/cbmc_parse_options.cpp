@@ -1067,6 +1067,9 @@ void cbmc_parse_optionst::help()
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"
+    " --malloc-fail-null           set malloc failure mode to return null\n"
     HELP_REACHABILITY_SLICER
     HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)

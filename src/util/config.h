@@ -130,6 +130,15 @@ public:
 
     bool string_abstraction;
 
+    enum malloc_failure_modet
+    {
+      malloc_failure_mode_none = 0,
+      malloc_failure_mode_return_null = 1,
+      malloc_failure_mode_assert_then_assume = 2
+    };
+
+    malloc_failure_modet malloc_failure_mode = malloc_failure_mode_none;
+
     static const std::size_t default_object_bits=8;
   } ansi_c;
 

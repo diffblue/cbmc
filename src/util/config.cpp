@@ -1093,6 +1093,16 @@ bool configt::set(const cmdlinet &cmdline)
     bv_encoding.is_object_bits_default = false;
   }
 
+  if(cmdline.isset("malloc-fail-assert") && cmdline.isset("malloc-fail-null"))
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "at most one malloc failure mode is acceptable", "--malloc-fail-null"};
+  }
+  if(cmdline.isset("malloc-fail-null"))
+    ansi_c.malloc_failure_mode = ansi_c.malloc_failure_mode_return_null;
+  if(cmdline.isset("malloc-fail-assert"))
+    ansi_c.malloc_failure_mode = ansi_c.malloc_failure_mode_assert_then_assume;
+
   return false;
 }
 
