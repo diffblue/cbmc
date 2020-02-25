@@ -53,6 +53,8 @@ const char *goto_cc_options_without_argument[]=
   "--validate-goto-model",
   "-?",
   "--export-file-local-symbols",
+  // This is deprecated. Currently prints out a deprecation warning.
+  "--export-function-local-symbols",
   nullptr
 };
 
