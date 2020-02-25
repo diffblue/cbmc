@@ -103,6 +103,7 @@ SRC += analyses/ai/ai.cpp \
        util/symbol_table.cpp \
        util/symbol.cpp \
        util/unicode.cpp \
+       util/xml.cpp \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

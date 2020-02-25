@@ -248,3 +248,12 @@ std::string xmlt::unescape(const std::string &str)
 
   return result;
 }
+bool operator==(const xmlt &a, const xmlt &b)
+{
+  return a.name == b.name && a.data == b.data && a.elements == b.elements &&
+         a.attributes == b.attributes;
+}
+bool operator!=(const xmlt &a, const xmlt &b)
+{
+  return !(a == b);
+}

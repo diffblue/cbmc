@@ -135,4 +135,7 @@ inline std::ostream &operator<<(
   return out;
 }
 
+bool operator==(const xmlt &a, const xmlt &b);
+bool operator!=(const xmlt &a, const xmlt &b);
+
 #endif // CPROVER_UTIL_XML_H
