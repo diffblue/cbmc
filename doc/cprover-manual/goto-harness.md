@@ -237,7 +237,7 @@ $ goto-harness \
   --harness-function-name harness \
   --harness-type call-function \
   --function is_prefix_of \
-  --associated_array-size string:string_length \
+  --associated-array-size string:string_length \
   --associated-array-size prefix:prefix_length \
   array_example.gb array_example-mod.gb
 $ cbmc --function harness --pointer-check array_example-mod.gb
