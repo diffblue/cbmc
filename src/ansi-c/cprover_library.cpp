@@ -45,7 +45,9 @@ std::string get_cprover_library_text(
   const struct cprover_library_entryt cprover_library[],
   const std::string &prologue)
 {
-  std::ostringstream library_text(prologue);
+  // the default mode is ios_base::out which means subsequent write to the
+  // stream will overwrite the original content
+  std::ostringstream library_text(prologue, std::ios_base::ate);
 
   std::size_t count=0;
 
