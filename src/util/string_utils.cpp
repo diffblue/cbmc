@@ -167,3 +167,11 @@ std::string escape_non_alnum(const std::string &to_escape)
   }
   return escaped.str();
 }
+std::string capitalize(const std::string &str)
+{
+  if(str.empty())
+    return str;
+  std::string capitalized = str;
+  capitalized[0] = toupper(capitalized[0]);
+  return capitalized;
+}

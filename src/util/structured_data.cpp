@@ -11,13 +11,6 @@ Author: Thomas Kiley
 #include "string_utils.h"
 #include <algorithm>
 
-std::string capitalize(const std::string &str)
-{
-  std::string capitalized = str;
-  capitalized[0] = toupper(capitalized[0]);
-  return capitalized;
-}
-
 labelt::labelt(std::vector<std::string> components)
 {
   auto to_lower_string = [](const std::string &s) -> std::string {

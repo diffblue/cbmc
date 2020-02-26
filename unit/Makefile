@@ -98,6 +98,7 @@ SRC += analyses/ai/ai.cpp \
        util/std_expr.cpp \
        util/string2int.cpp \
        util/structured_data.cpp \
+       util/string_utils/capitalize.cpp \
        util/string_utils/join_string.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
