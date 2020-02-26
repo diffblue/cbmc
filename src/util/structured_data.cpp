@@ -71,3 +71,161 @@ bool labelt::operator<(const labelt &other) const
 {
   return camel_case() < other.camel_case();
 }
+structured_data_entryt structured_data_entryt::data_node(const jsont &data)
+{
+  // Structured data (e.g. arrays and objects) should use an entry
+  PRECONDITION(!(data.is_array() || data.is_object()));
+  return structured_data_entryt(data);
+}
+structured_data_entryt
+structured_data_entryt::entry(std::map<labelt, structured_data_entryt> children)
+{
+  return structured_data_entryt(children);
+}
+structured_data_entryt::structured_data_entryt(const jsont &data) : data(data)
+{
+}
+structured_data_entryt::structured_data_entryt(
+  std::map<labelt, structured_data_entryt> children)
+  : children(std::move(children))
+{
+}
+bool structured_data_entryt::is_leaf() const
+{
+  return children.empty();
+}
+std::string structured_data_entryt::leaf_data() const
+{
+  return data.value;
+}
+std::map<labelt, structured_data_entryt>
+structured_data_entryt::get_children() const
+{
+  return children;
+}
+jsont structured_data_entryt::leaf_object() const
+{
+  return data;
+}
+structured_datat::structured_datat(
+  std::map<labelt, structured_data_entryt> data)
+  : data(std::move(data))
+{
+}
+
+xmlt xml_node(const std::pair<labelt, structured_data_entryt> &entry)
+{
+  const labelt &label = entry.first;
+  const structured_data_entryt &data = entry.second;
+  xmlt output_data{label.kebab_case()};
+  if(data.is_leaf())
+  {
+    output_data.data = data.leaf_data();
+  }
+  else
+  {
+    const auto &children = data.get_children();
+    output_data.elements =
+      make_range(children).map(xml_node).collect<std::list<xmlt>>();
+  }
+  return output_data;
+}
+
+xmlt structured_datat::to_xml() const
+{
+  if(data.size() == 0)
+    return xmlt{};
+  if(data.size() == 1)
+  {
+    return xml_node(*data.begin());
+  }
+  else
+  {
+    xmlt root{"root"};
+    root.elements = make_range(data).map(xml_node).collect<std::list<xmlt>>();
+    return root;
+  }
+}
+
+jsont json_node(const structured_data_entryt &entry)
+{
+  if(entry.is_leaf())
+    return entry.leaf_object();
+  else
+  {
+    json_objectt result;
+    for(const auto sub_entry : entry.get_children())
+    {
+      result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
+    }
+    return std::move(result);
+  }
+}
+
+jsont structured_datat::to_json() const
+{
+  if(data.size() == 0)
+    return jsont{};
+
+  json_objectt result;
+  for(const auto sub_entry : data)
+  {
+    result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
+  }
+  return std::move(result);
+}
+
+std::vector<std::string>
+pretty_node(const std::pair<labelt, structured_data_entryt> &entry)
+{
+  const labelt &label = entry.first;
+  const structured_data_entryt &data = entry.second;
+  if(data.is_leaf())
+  {
+    std::ostringstream line;
+    line << label.pretty() << ": " << data.leaf_data();
+    return {line.str()};
+  }
+  else
+  {
+    const auto indent = [](const std::string line) { return "\t" + line; };
+
+    const auto &children = data.get_children();
+    std::vector<std::vector<std::string>> lines =
+      make_range(children)
+        .map(pretty_node)
+        .map([&](std::vector<std::string> sub_lines) {
+          return make_range(sub_lines)
+            .map(indent)
+            .collect<std::vector<std::string>>();
+        })
+        .collect<std::vector<std::vector<std::string>>>();
+
+    std::vector<std::string> result;
+    for(const auto &sub_lines : lines)
+    {
+      result.insert(result.end(), sub_lines.begin(), sub_lines.end());
+    }
+    return result;
+  }
+}
+
+std::string structured_datat::to_pretty() const
+{
+  if(data.empty())
+    return "";
+
+  std::vector<std::vector<std::string>> lines =
+    make_range(data)
+      .map(pretty_node)
+      .collect<std::vector<std::vector<std::string>>>();
+  std::vector<std::string> flattened_lines;
+  for(const auto &line_section : lines)
+  {
+    flattened_lines.insert(
+      flattened_lines.end(), line_section.begin(), line_section.end());
+  }
+  std::ostringstream output;
+  join_strings(output, flattened_lines.begin(), flattened_lines.end(), "\n");
+  return output.str();
+}
