@@ -49,6 +49,46 @@ private:
   std::map<labelt, structured_data_entryt> children;
 };
 
+/// A way of representing nested key/value data. Used for logging on any
+/// message handler.
+/// Usage:
+/// ```
+/// structured_datat data{
+///   {{labelt{{"my", "data"}},
+///      structured_data_entryt::entry(
+///        {{labelt{{"my", "number"}},
+///           structured_data_entryt::data_node(json_numbert("10"))},
+///         {labelt{{"my", "string"}},
+///           structured_data_entryt::data_node(json_stringt("hi"))}})}}};
+/// message() << data << eom;
+/// ```
+/// Then if the output dependending on the UI of the message handler, you'll
+/// get appropriately formatted data:
+///
+/// XML:
+/// ```xml
+/// <my-data>
+///   <my-number>10</my-number>
+///   <my-string>hi</my-string>
+/// </my-data>
+/// ```
+///
+/// JSON:
+/// ```json
+/// {
+///   "myData": {
+///      "myNumber": 10
+///      "myString": "hi"
+///    }
+///  }
+/// ```
+///
+/// Plain:
+/// ```
+/// My data:
+///    My number: 10
+///    My string: hi
+/// ```
 class structured_datat
 {
 public:
