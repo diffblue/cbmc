@@ -2406,3 +2406,57 @@ _Bool __builtin_usubll_overflow(
   *res = a - b;
   return __CPROVER_overflow_minus(a, b);
 }
+
+/* FUNCTION: __builtin_smul_overflow */
+
+_Bool __builtin_smul_overflow(int a, int b, int *res)
+{
+  *res = a * b;
+  return __CPROVER_overflow_mult(a, b);
+}
+
+/* FUNCTION: __builtin_smull_overflow */
+
+_Bool __builtin_smull_overflow(long a, long b, long *res)
+{
+  *res = a * b;
+  return __CPROVER_overflow_mult(a, b);
+}
+
+/* FUNCTION: __builtin_smulll_overflow */
+
+_Bool __builtin_smulll_overflow(long long a, long long b, long long *res)
+{
+  *res = a * b;
+  return __CPROVER_overflow_mult(a, b);
+}
+
+/* FUNCTION: __builtin_umul_overflow */
+
+_Bool __builtin_umul_overflow(unsigned a, unsigned b, unsigned *res)
+{
+  *res = a * b;
+  return __CPROVER_overflow_mult(a, b);
+}
+
+/* FUNCTION: __builtin_umull_overflow */
+
+_Bool __builtin_umull_overflow(
+  unsigned long a,
+  unsigned long b,
+  unsigned long *res)
+{
+  *res = a * b;
+  return __CPROVER_overflow_mult(a, b);
+}
+
+/* FUNCTION: __builtin_umulll_overflow */
+
+_Bool __builtin_umulll_overflow(
+  unsigned long long a,
+  unsigned long long b,
+  unsigned long long *res)
+{
+  *res = a * b;
+  return __CPROVER_overflow_mult(a, b);
+}

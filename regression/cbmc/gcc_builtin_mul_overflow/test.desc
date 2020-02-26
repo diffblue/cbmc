@@ -1,0 +1,41 @@
+CORE gcc-only
+main.c
+
+\[check_int.assertion.1\] line \d+ assertion !__builtin_smul_overflow\(1, 1, &result\): SUCCESS
+\[check_int.assertion.2\] line \d+ assertion result == 1: SUCCESS
+\[check_int.assertion.3\] line \d+ assertion !__builtin_smul_overflow\( lt_isqrt_of_int_max, lt_isqrt_of_int_max, &result\): SUCCESS
+\[check_int.assertion.4\] line \d+ assertion result == lt_isqrt_of_int_max \* lt_isqrt_of_int_max: SUCCESS
+\[check_int.assertion.5\] line \d+ assertion __builtin_smul_overflow\( lt_isqrt_of_int_max << 1, lt_isqrt_of_int_max << 1, &result\): SUCCESS
+\[check_int.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long.assertion.1\] line \d+ assertion !__builtin_smull_overflow\(1l, 1l, &result\): SUCCESS
+\[check_long.assertion.2\] line \d+ assertion result == 1l: SUCCESS
+\[check_long.assertion.3\] line \d+ assertion !__builtin_smull_overflow\( lt_isqrt_of_long_max, lt_isqrt_of_long_max, &result\): SUCCESS
+\[check_long.assertion.4\] line \d+ assertion result == lt_isqrt_of_long_max \* lt_isqrt_of_long_max: SUCCESS
+\[check_long.assertion.5\] line \d+ assertion __builtin_smull_overflow\( lt_isqrt_of_long_max << 1, lt_isqrt_of_long_max << 1, &result\): SUCCESS
+\[check_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long_long.assertion.1\] line \d+ assertion !__builtin_smulll_overflow\(1ll, 1ll, &result\): SUCCESS
+\[check_long_long.assertion.2\] line \d+ assertion result == 1ll: SUCCESS
+\[check_long_long.assertion.3\] line \d+ assertion !__builtin_smulll_overflow\( lt_isqrt_of_long_long_max, lt_isqrt_of_long_long_max, &result\): SUCCESS
+\[check_long_long.assertion.4\] line \d+ assertion result == lt_isqrt_of_long_long_max \* lt_isqrt_of_long_long_max: SUCCESS
+\[check_long_long.assertion.5\] line \d+ assertion __builtin_smulll_overflow\( lt_isqrt_of_long_long_max << 1, lt_isqrt_of_long_long_max << 1, &result\): SUCCESS
+\[check_long_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned.assertion.1\] line \d+ assertion !__builtin_umul_overflow\(1u, 1u, &result\): SUCCESS
+\[check_unsigned.assertion.2\] line \d+ assertion result == 1u: SUCCESS
+\[check_unsigned.assertion.3\] line \d+ assertion !__builtin_umul_overflow\( lt_isqrt_of_unsigned_max, lt_isqrt_of_unsigned_max, &result\): SUCCESS
+\[check_unsigned.assertion.4\] line \d+ assertion result == lt_isqrt_of_unsigned_max \* lt_isqrt_of_unsigned_max: SUCCESS
+\[check_unsigned.assertion.5\] line \d+ assertion __builtin_umul_overflow\( lt_isqrt_of_unsigned_max << 1, lt_isqrt_of_unsigned_max << 1, &result\): SUCCESS
+\[check_unsigned.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned_long.assertion.1\] line \d+ assertion !__builtin_umull_overflow\(1ul, 1ul, &result\): SUCCESS
+\[check_unsigned_long.assertion.2\] line \d+ assertion result == 1ul: SUCCESS
+\[check_unsigned_long.assertion.3\] line \d+ assertion !__builtin_umull_overflow\( lt_isqrt_of_unsigned_long_max, lt_isqrt_of_unsigned_long_max, &result\): SUCCESS
+\[check_unsigned_long.assertion.4\] line \d+ assertion result == lt_isqrt_of_unsigned_long_max \* lt_isqrt_of_unsigned_long_max: SUCCESS
+\[check_unsigned_long.assertion.5\] line \d+ assertion __builtin_umull_overflow\( lt_isqrt_of_unsigned_long_max << 1, lt_isqrt_of_unsigned_long_max << 1, &result\): SUCCESS
+\[check_unsigned_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_unsigned_long_long.assertion.1\] line \d+ assertion !__builtin_umulll_overflow\(1ull, 1ull, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.2\] line \d+ assertion result == 1ull: SUCCESS
+\[check_unsigned_long_long.assertion.3\] line \d+ assertion !__builtin_umulll_overflow\( lt_isqrt_of_unsigned_long_long_max, lt_isqrt_of_unsigned_long_long_max, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.4\] line \d+ assertion result == lt_isqrt_of_unsigned_long_long_max \* lt_isqrt_of_unsigned_long_long_max: SUCCESS
+\[check_unsigned_long_long.assertion.5\] line \d+ assertion __builtin_umulll_overflow\( lt_isqrt_of_unsigned_long_long_max << 1, lt_isqrt_of_unsigned_long_long_max << 1, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+^EXIT=10$
+^SIGNAL=0$
