@@ -1,0 +1,16 @@
+CORE
+main.c
+
+\[main.assertion.1\] .*: SUCCESS
+\[main.assertion.2\] .*: SUCCESS
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test checks that two usages of the primitive __CPROVER_r_ok() can be false
+simultaneously in the encoding of the program. Previously, at most one call
+could be false at a time. This was imprecise, however, it was sufficient to
+guarantee soundness when the __CPROVER_r_ok() primitive was used directly in an
+assertion (i.e., as assert(__CPROVER_r_ok(p, size)). See issue #5194.

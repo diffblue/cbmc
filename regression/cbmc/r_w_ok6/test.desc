@@ -1,0 +1,16 @@
+CORE broken-smt-backend
+main.c
+
+\[main.assertion.1\] .*: SUCCESS
+\[main.assertion.2\] .*: FAILURE
+\[main.assertion.3\] .*: FAILURE
+\[main.assertion.4\] .*: FAILURE
+\[main.assertion.5\] .*: FAILURE
+\[main.assertion.6\] .*: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test checks that __CPROVER_r_ok() gives the correct result when the given
+pointer can point to different memory segments of different sizes

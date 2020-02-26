@@ -1249,15 +1249,15 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
     {
-      const or_exprt dynamic_bounds_violation(
-        dynamic_object_lower_bound(address, nil_exprt()),
-        dynamic_object_upper_bound(address, ns, size));
+      const or_exprt object_bounds_violation(
+        object_lower_bound(address, nil_exprt()),
+        object_upper_bound(address, size));
 
       conditions.push_back(conditiont(
         or_exprt(
           in_bounds_of_some_explicit_allocation,
           implies_exprt(
-            malloc_object(address, ns), not_exprt(dynamic_bounds_violation))),
+            dynamic_object(address), not_exprt(object_bounds_violation))),
         "pointer outside dynamic object bounds"));
     }
 
