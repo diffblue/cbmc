@@ -9,7 +9,7 @@
 
 #ifdef SHARING
 
-SCENARIO("irept_sharing_trade_offs", "[!mayfail][core][utils][irept]")
+SCENARIO("irept_sharing_trade_offs", "[core][utils][irept]" XFAIL)
 {
   GIVEN("An irept created with move_to_sub")
   {
@@ -116,7 +116,7 @@ SCENARIO("irept_sharing", "[core][utils][irept]")
 
 #include <util/expr.h>
 
-SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
+SCENARIO("exprt_sharing_trade_offs", "[core][utils][exprt]" XFAIL)
 {
   GIVEN("An expression created with add_to_operands(std::move(...))")
   {
