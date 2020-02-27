@@ -206,7 +206,7 @@ clean: testing-utils-clean
 test: $(CATCH_TEST)
 	if ! ./$(CATCH_TEST) -l | grep -q "^$(N_CATCH_TESTS) test cases" ; then \
 		./$(CATCH_TEST) -l ; fi
-	./$(CATCH_TEST)
+	./$(CATCH_TEST) ${TAGS}
 
 
 ###############################################################################
