@@ -30,6 +30,7 @@ DIRS = cbmc \
        goto-cc-file-local \
        linking-goto-binaries \
        symtab2gb \
+       solver-hardness \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

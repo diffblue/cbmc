@@ -25,6 +25,17 @@ multi_path_symex_checkert::multi_path_symex_checkert(
     equation_generated(false),
     property_decider(options, ui_message_handler, equation, ns)
 {
+  if(options.is_set("write-solver-stats-to"))
+  {
+    if(
+      auto hardness_collector =
+        dynamic_cast<hardness_collectort *>(&property_decider.get_prop()))
+    {
+      hardness_collector->enable_hardness_collection();
+      hardness_collector->get_solver_hardness().set_outfile(
+        options.get_option("write-solver-stats-to"));
+    }
+  }
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::
@@ -154,4 +165,20 @@ multi_path_symex_checkert::localize_fault(const irep_idt &property_id) const
     property_decider.get_stack_decision_procedure());
 
   return fault_localizer(property_id);
+}
+
+void multi_path_symex_checkert::report()
+{
+  if(options.is_set("write-solver-stats-to"))
+  {
+    if(
+      auto hardness_collector =
+        dynamic_cast<hardness_collectort *>(&property_decider.get_prop()))
+    {
+      if(hardness_collector->is_hardness_collection_enabled())
+      {
+        hardness_collector->get_solver_hardness().produce_report();
+      }
+    }
+  }
 }

@@ -44,6 +44,9 @@ public:
   /// Calls solve() on the solver instance
   decision_proceduret::resultt solve();
 
+  /// Returns the prop
+  propt &get_prop() const;
+
   /// Returns the solver instance
   decision_proceduret &get_decision_procedure() const;
 

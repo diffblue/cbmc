@@ -89,7 +89,7 @@ operator()(propertiest &properties)
 
         log.status() << "converting SSA" << messaget::eom;
         equation.convert_without_assertions(
-          property_decider.get_decision_procedure());
+          property_decider.get_decision_procedure(), nullptr);
 
         property_decider.update_properties_goals_from_symex_target_equation(
           properties);
@@ -97,7 +97,7 @@ operator()(propertiest &properties)
         // We convert the assertions in a new context.
         property_decider.get_stack_decision_procedure().push();
         equation.convert_assertions(
-          property_decider.get_decision_procedure(), false);
+          property_decider.get_decision_procedure(), nullptr, false);
         property_decider.convert_goals();
 
         current_equation_converted = true;

@@ -110,6 +110,11 @@ goto_symex_property_decidert::get_decision_procedure() const
   return solver->decision_procedure();
 }
 
+propt &goto_symex_property_decidert::get_prop() const
+{
+  return solver->prop();
+}
+
 stack_decision_proceduret &
 goto_symex_property_decidert::get_stack_decision_procedure() const
 {

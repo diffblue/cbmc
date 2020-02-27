@@ -26,6 +26,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <linking/static_lifetime_init.h>
 
 #include <solvers/decision_procedure.h>
+#include <solvers/flattening/boolbv.h>
 
 #include <util/make_unique.h>
 #include <util/ui_message.h>
@@ -149,14 +150,22 @@ void output_graphml(
 
 void convert_symex_target_equation(
   symex_target_equationt &equation,
-  decision_proceduret &decision_procedure,
+  goto_symex_property_decidert &property_decider,
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
   msg.status() << "converting SSA" << messaget::eom;
 
   // convert SSA
-  equation.convert(decision_procedure);
+  if(dynamic_cast<boolbvt *>(&property_decider.get_decision_procedure()))
+  {
+    equation.convert(
+      property_decider.get_decision_procedure(), property_decider.get_prop());
+  }
+  else
+  {
+    equation.convert(property_decider.get_decision_procedure());
+  }
 }
 
 std::unique_ptr<memory_model_baset>
@@ -361,8 +370,7 @@ std::chrono::duration<double> prepare_property_decider(
     << property_decider.get_decision_procedure().decision_procedure_text()
     << messaget::eom;
 
-  convert_symex_target_equation(
-    equation, property_decider.get_decision_procedure(), ui_message_handler);
+  convert_symex_target_equation(equation, property_decider, ui_message_handler);
   property_decider.update_properties_goals_from_symex_target_equation(
     properties);
   property_decider.convert_goals();

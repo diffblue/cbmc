@@ -46,6 +46,7 @@ class optionst;
   OPT_REACHABILITY_SLICER \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
+  "(write-solver-stats-to):"  \
   "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
   "(object-bits):" \
   OPT_GOTO_CHECK \

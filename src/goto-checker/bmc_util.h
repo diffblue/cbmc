@@ -36,7 +36,7 @@ class ui_message_handlert;
 
 void convert_symex_target_equation(
   symex_target_equationt &,
-  decision_proceduret &,
+  goto_symex_property_decidert &,
   message_handlert &);
 
 /// Returns a function that checks whether an SSA step is an assertion

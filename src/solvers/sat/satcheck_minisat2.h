@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cnf.h"
 
+#include <solvers/hardness_collector.h>
+
 // Select one: basic solver or with simplification.
 // Note that the solver with simplifier isn't really robust
 // when used incrementally, as variables may disappear
@@ -23,8 +25,8 @@ class Solver; // NOLINT(readability/identifiers)
 class SimpSolver; // NOLINT(readability/identifiers)
 }
 
-template<typename T>
-class satcheck_minisat2_baset:public cnf_solvert
+template <typename T>
+class satcheck_minisat2_baset : public cnf_solvert, public hardness_collectort
 {
 public:
   satcheck_minisat2_baset(T *, message_handlert &message_handler);
@@ -62,6 +64,17 @@ public:
     time_limit_seconds=lim;
   }
 
+  bool is_hardness_collection_enabled() const override
+  {
+    return solver_hardness.has_value();
+  }
+  void enable_hardness_collection() override;
+  solver_hardnesst &get_solver_hardness() override
+  {
+    PRECONDITION(solver_hardness.has_value());
+    return *solver_hardness;
+  }
+
 protected:
   resultt do_prop_solve() override;
 
@@ -70,6 +83,8 @@ protected:
 
   void add_variables();
   bvt assumptions;
+
+  optionalt<solver_hardnesst> solver_hardness;
 };
 
 class satcheck_minisat_no_simplifiert:

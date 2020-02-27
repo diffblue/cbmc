@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <solvers/decision_procedure.h>
+#include <solvers/hardness_collector.h>
+#include <solvers/prop/prop.h>
 
 #include "goto_symex_state.h"
 #include "ssa_step.h"
@@ -319,27 +321,52 @@ void symex_target_equationt::constraint(
 }
 
 void symex_target_equationt::convert_without_assertions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
-  convert_guards(decision_procedure);
-  convert_assignments(decision_procedure);
-  convert_decls(decision_procedure);
-  convert_assumptions(decision_procedure);
-  convert_goto_instructions(decision_procedure);
-  convert_function_calls(decision_procedure);
-  convert_io(decision_procedure);
-  convert_constraints(decision_procedure);
+  if(solver_hardness)
+    solver_hardness->register_ssa_size(SSA_steps.size());
+
+  convert_guards(decision_procedure, solver_hardness);
+  convert_assignments(decision_procedure, solver_hardness);
+  convert_decls(decision_procedure, solver_hardness);
+  convert_assumptions(decision_procedure, solver_hardness);
+  convert_goto_instructions(decision_procedure, solver_hardness);
+  convert_function_calls(decision_procedure, solver_hardness);
+  convert_io(decision_procedure, solver_hardness);
+  convert_constraints(decision_procedure, solver_hardness);
+}
+
+void symex_target_equationt::convert(
+  decision_proceduret &decision_procedure,
+  propt &prop)
+{
+  auto solver_hardness = [&prop]() -> solver_hardnesst * {
+    if(auto hardness_collector = dynamic_cast<hardness_collectort *>(&prop))
+    {
+      if(hardness_collector->is_hardness_collection_enabled())
+      {
+        return &hardness_collector->get_solver_hardness();
+      }
+    }
+    return nullptr;
+  }();
+
+  convert_without_assertions(decision_procedure, solver_hardness);
+  convert_assertions(decision_procedure, solver_hardness); //, solver_hardness);
 }
 
 void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 {
-  convert_without_assertions(decision_procedure);
-  convert_assertions(decision_procedure);
+  convert_without_assertions(decision_procedure, nullptr);
+  convert_assertions(decision_procedure, nullptr); //, solver_hardness);
 }
 
 void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
   {
     if(step.is_assignment() && !step.ignore && !step.converted)
@@ -351,13 +378,22 @@ void symex_target_equationt::convert_assignments(
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
+
+      if(solver_hardness != nullptr)
+      {
+        solver_hardness->register_ssa(
+          step_index, step.cond_expr, step.source.pc);
+      }
     }
+    ++step_index;
   }
 }
 
 void symex_target_equationt::convert_decls(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
   {
     if(step.is_decl() && !step.ignore && !step.converted)
@@ -366,13 +402,22 @@ void symex_target_equationt::convert_decls(
       // the satisfiability of the formula.
       decision_procedure.handle(step.cond_expr);
       step.converted = true;
+
+      if(solver_hardness != nullptr)
+      {
+        solver_hardness->register_ssa(
+          step_index, step.cond_expr, step.source.pc);
+      }
     }
+    ++step_index;
   }
 }
 
 void symex_target_equationt::convert_guards(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
   {
     if(step.ignore)
@@ -385,13 +430,21 @@ void symex_target_equationt::convert_guards(
       });
 
       step.guard_handle = decision_procedure.handle(step.guard);
+
+      if(solver_hardness != nullptr)
+      {
+        solver_hardness->register_ssa(step_index, step.guard, step.source.pc);
+      }
     }
+    ++step_index;
   }
 }
 
 void symex_target_equationt::convert_assumptions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
   {
     if(step.is_assume())
@@ -407,14 +460,23 @@ void symex_target_equationt::convert_assumptions(
           });
 
         step.cond_handle = decision_procedure.handle(step.cond_expr);
+
+        if(solver_hardness != nullptr)
+        {
+          solver_hardness->register_ssa(
+            step_index, step.cond_expr, step.source.pc);
+        }
       }
     }
+    ++step_index;
   }
 }
 
 void symex_target_equationt::convert_goto_instructions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
   {
     if(step.is_goto())
@@ -430,14 +492,23 @@ void symex_target_equationt::convert_goto_instructions(
           });
 
         step.cond_handle = decision_procedure.handle(step.cond_expr);
+
+        if(solver_hardness != nullptr)
+        {
+          solver_hardness->register_ssa(
+            step_index, step.cond_expr, step.source.pc);
+        }
       }
     }
+    ++step_index;
   }
 }
 
 void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
   {
     if(step.is_constraint() && !step.ignore && !step.converted)
@@ -449,12 +520,20 @@ void symex_target_equationt::convert_constraints(
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
+
+      if(solver_hardness != nullptr)
+      {
+        solver_hardness->register_ssa(
+          step_index, step.cond_expr, step.source.pc);
+      }
     }
+    ++step_index;
   }
 }
 
 void symex_target_equationt::convert_assertions(
   decision_proceduret &decision_procedure,
+  solver_hardnesst *solver_hardness,
   bool optimized_for_single_assertions)
 {
   // we find out if there is only _one_ assertion,
@@ -467,6 +546,7 @@ void symex_target_equationt::convert_assertions(
 
   if(number_of_assertions == 1 && optimized_for_single_assertions)
   {
+    std::size_t step_index = 0;
     for(auto &step : SSA_steps)
     {
       // hide already converted assertions in the error trace
@@ -478,10 +558,26 @@ void symex_target_equationt::convert_assertions(
         step.converted = true;
         decision_procedure.set_to_false(step.cond_expr);
         step.cond_handle = false_exprt();
+
+        if(solver_hardness != nullptr)
+        {
+          solver_hardness->register_ssa(
+            step_index, step.cond_expr, step.source.pc);
+        }
+
         return; // prevent further assumptions!
       }
       else if(step.is_assume())
+      {
         decision_procedure.set_to_true(step.cond_expr);
+
+        if(solver_hardness != nullptr)
+        {
+          solver_hardness->register_ssa(
+            step_index, step.cond_expr, step.source.pc);
+        }
+      }
+      ++step_index;
     }
 
     UNREACHABLE; // unreachable
@@ -493,6 +589,8 @@ void symex_target_equationt::convert_assertions(
   disjuncts.reserve(number_of_assertions);
 
   exprt assumption=true_exprt();
+
+  std::vector<goto_programt::const_targett> involved_steps;
 
   for(auto &step : SSA_steps)
   {
@@ -516,6 +614,11 @@ void symex_target_equationt::convert_assertions(
       // do the conversion
       step.cond_handle = decision_procedure.handle(implication);
 
+      if(solver_hardness != nullptr)
+      {
+        involved_steps.push_back(step.source.pc);
+      }
+
       // store disjunct
       disjuncts.push_back(not_exprt(step.cond_handle));
     }
@@ -527,19 +630,35 @@ void symex_target_equationt::convert_assertions(
         assumption.copy_to_operands(step.cond_handle);
       else
         assumption = and_exprt(assumption, step.cond_handle);
+
+      if(solver_hardness != nullptr)
+      {
+        involved_steps.push_back(step.source.pc);
+      }
     }
   }
 
+  const auto assertion_disjunction = disjunction(disjuncts);
   // the below is 'true' if there are no assertions
-  decision_procedure.set_to_true(disjunction(disjuncts));
+  decision_procedure.set_to_true(assertion_disjunction);
+
+  if(solver_hardness)
+  {
+    solver_hardness->register_assertion_ssas(
+      assertion_disjunction, involved_steps);
+  }
 }
 
 void symex_target_equationt::convert_function_calls(
-  decision_proceduret &dec_proc)
+  decision_proceduret &dec_proc,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
+  {
     if(!step.ignore)
     {
+      and_exprt::operandst conjuncts;
       step.converted_function_arguments.reserve(step.ssa_function_arguments.size());
 
       for(const auto &arg : step.ssa_function_arguments)
@@ -556,18 +675,30 @@ void symex_target_equationt::convert_function_calls(
           merge_irep(eq);
 
           dec_proc.set_to(eq, true);
+          conjuncts.push_back(eq);
           step.converted_function_arguments.push_back(symbol);
         }
       }
+      if(solver_hardness != nullptr)
+      {
+        solver_hardness->register_ssa(
+          step_index, conjunction(conjuncts), step.source.pc);
+      }
     }
+    ++step_index;
+  }
 }
 
 void symex_target_equationt::convert_io(
-  decision_proceduret &dec_proc)
+  decision_proceduret &dec_proc,
+  solver_hardnesst *solver_hardness)
 {
+  std::size_t step_index = 0;
   for(auto &step : SSA_steps)
+  {
     if(!step.ignore)
     {
+      and_exprt::operandst conjuncts;
       for(const auto &arg : step.io_args)
       {
         if(arg.is_constant() ||
@@ -583,10 +714,18 @@ void symex_target_equationt::convert_io(
           merge_irep(eq);
 
           dec_proc.set_to(eq, true);
+          conjuncts.push_back(eq);
           step.converted_io_args.push_back(symbol);
         }
       }
+      if(solver_hardness != nullptr)
+      {
+        solver_hardness->register_ssa(
+          step_index, conjunction(conjuncts), step.source.pc);
+      }
     }
+    ++step_index;
+  }
 }
 
 /// Merging causes identical ireps to be shared.
