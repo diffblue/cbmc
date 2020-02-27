@@ -1,0 +1,9 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion p: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

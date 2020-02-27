@@ -16,8 +16,10 @@ extern const void *__CPROVER_malloc_object;
 extern __CPROVER_size_t __CPROVER_malloc_size;
 extern _Bool __CPROVER_malloc_is_new_array;
 extern const void *__CPROVER_memory_leak;
+
 extern int __CPROVER_malloc_failure_mode;
 extern __CPROVER_size_t __CPROVER_max_malloc_size;
+extern _Bool __CPROVER_malloc_may_fail;
 
 // malloc failure modes
 extern int __CPROVER_malloc_failure_mode_return_null;
