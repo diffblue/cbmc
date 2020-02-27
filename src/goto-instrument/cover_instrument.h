@@ -36,18 +36,31 @@ public:
   {
   }
 
+  /// The type of function used to make goto_program assertions.
+  using assertion_factoryt = std::function<
+    goto_programt::instructiont(const exprt &, const source_locationt &)>;
+  static_assert(
+    std::is_same<
+      assertion_factoryt,
+      std::function<decltype(goto_programt::make_assertion)>>::value,
+    "`assertion_factoryt` is expected to have the same type as "
+    "`goto_programt::make_assertion`.");
+
   /// Instruments a goto program
   /// \param function_id: name of \p goto_program
   /// \param goto_program: a goto program
   /// \param basic_blocks: detected basic blocks
+  /// \param make_assertion: A function which makes goto program assertions.
+  ///    This parameter may be used to customise the expressions asserted.
   void operator()(
     const irep_idt &function_id,
     goto_programt &goto_program,
-    const cover_blocks_baset &basic_blocks) const
+    const cover_blocks_baset &basic_blocks,
+    const assertion_factoryt &make_assertion) const
   {
     Forall_goto_program_instructions(i_it, goto_program)
     {
-      instrument(function_id, goto_program, i_it, basic_blocks);
+      instrument(function_id, goto_program, i_it, basic_blocks, make_assertion);
     }
   }
 
@@ -63,7 +76,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const = 0;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const = 0;
 
   void initialize_source_location(
     goto_programt::targett t,
@@ -96,13 +110,16 @@ public:
   /// \param function_id: name of \p goto_program
   /// \param goto_program: a goto program
   /// \param basic_blocks: detected basic blocks of the goto program
+  /// \param make_assertion: A function which makes goto program assertions.
+  ///    This parameter may be used to customise the expressions asserted.
   void operator()(
     const irep_idt &function_id,
     goto_programt &goto_program,
-    const cover_blocks_baset &basic_blocks) const
+    const cover_blocks_baset &basic_blocks,
+    const cover_instrumenter_baset::assertion_factoryt &make_assertion) const
   {
     for(const auto &instrumenter : instrumenters)
-      (*instrumenter)(function_id, goto_program, basic_blocks);
+      (*instrumenter)(function_id, goto_program, basic_blocks, make_assertion);
   }
 
 private:
@@ -125,7 +142,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// Branch coverage instrumenter
@@ -144,7 +162,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// Condition coverage instrumenter
@@ -163,7 +182,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// Decision coverage instrumenter
@@ -182,7 +202,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// MC/DC coverage instrumenter
@@ -201,7 +222,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// Path coverage instrumenter
@@ -220,7 +242,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// Assertion coverage instrumenter
@@ -239,7 +262,8 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 /// __CPROVER_cover coverage instrumenter
@@ -258,11 +282,13 @@ protected:
     const irep_idt &function_id,
     goto_programt &,
     goto_programt::targett &,
-    const cover_blocks_baset &) const override;
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
 };
 
 void cover_instrument_end_of_function(
   const irep_idt &function_id,
-  goto_programt &goto_program);
+  goto_programt &goto_program,
+  const cover_instrumenter_baset::assertion_factoryt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H

@@ -19,7 +19,8 @@ void cover_decision_instrumentert::instrument(
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &) const
+  const cover_blocks_baset &,
+  const assertion_factoryt &make_assertion) const
 {
   if(is_non_cover_assertion(i_it))
     i_it->turn_into_skip();
@@ -37,12 +38,12 @@ void cover_decision_instrumentert::instrument(
 
       const std::string comment_t = "decision '" + d_string + "' true";
       goto_program.insert_before_swap(i_it);
-      *i_it = goto_programt::make_assertion(d, source_location);
+      *i_it = make_assertion(d, source_location);
       initialize_source_location(i_it, comment_t, function_id);
 
       const std::string comment_f = "decision '" + d_string + "' false";
       goto_program.insert_before_swap(i_it);
-      *i_it = goto_programt::make_assertion(not_exprt(d), source_location);
+      *i_it = make_assertion(not_exprt(d), source_location);
       initialize_source_location(i_it, comment_f, function_id);
     }
 

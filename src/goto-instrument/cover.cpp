@@ -30,12 +30,17 @@ Date: May 2016
 /// \param mode: mode of the function to instrument (for instance ID_C or
 ///   ID_java)
 /// \param message_handler: a message handler
-void instrument_cover_goals(
+/// \param make_assertion: A function which takes an expression, with a source
+///   location and makes an assertion based on that expression. The expression
+///   asserted is expected to include the expression passed in, but may include
+///   other additional conditions.
+static void instrument_cover_goals(
   const irep_idt &function_id,
   goto_programt &goto_program,
   const cover_instrumenterst &instrumenters,
   const irep_idt &mode,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const cover_instrumenter_baset::assertion_factoryt &make_assertion)
 {
   const std::unique_ptr<cover_blocks_baset> basic_blocks =
     mode == ID_java ? std::unique_ptr<cover_blocks_baset>(
@@ -45,7 +50,7 @@ void instrument_cover_goals(
 
   basic_blocks->report_block_anomalies(
     function_id, goto_program, message_handler);
-  instrumenters(function_id, goto_program, *basic_blocks);
+  instrumenters(function_id, goto_program, *basic_blocks, make_assertion);
 }
 
 /// Create and add an instrumenter based on the given criterion
@@ -309,7 +314,8 @@ static void instrument_cover_goals(
       function.body,
       cover_config.cover_instrumenters,
       function_symbol.mode,
-      message_handler);
+      message_handler,
+      cover_config.make_assertion);
     changed = true;
   }
 
@@ -317,7 +323,8 @@ static void instrument_cover_goals(
     cover_config.traces_must_terminate &&
     function_symbol.name == goto_functionst::entry_point())
   {
-    cover_instrument_end_of_function(function_symbol.name, function.body);
+    cover_instrument_end_of_function(
+      function_symbol.name, function.body, cover_config.make_assertion);
     changed = true;
   }
 
