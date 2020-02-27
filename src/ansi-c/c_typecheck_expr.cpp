@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 
 #include <cassert>
+#include <sstream>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -33,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "builtin_factory.h"
 #include "c_qualifiers.h"
 #include "c_typecast.h"
+#include "expr2c.h"
 #include "padding.h"
 #include "type2name.h"
 
@@ -2800,6 +2802,102 @@ exprt c_typecheck_baset::do_special_functions(
     overflow.id("overflow-" + overflow.id_string());
     overflow.type() = bool_typet{};
     return overflow;
+  }
+  else if(
+    identifier == "__builtin_add_overflow" ||
+    identifier == "__builtin_sub_overflow" ||
+    identifier == "__builtin_mul_overflow")
+  {
+    // check function signature
+    if(expr.arguments().size() != 3)
+    {
+      std::ostringstream error_message;
+      error_message << expr.source_location().as_string() << ": " << identifier
+                    << " takes exactly 3 arguments, but "
+                    << expr.arguments().size() << " were provided";
+      throw invalid_source_file_exceptiont{error_message.str()};
+    }
+
+    auto lhs = expr.arguments()[0];
+    auto rhs = expr.arguments()[1];
+    auto result_ptr = expr.arguments()[2];
+
+    typecheck_expr(lhs);
+    typecheck_expr(rhs);
+    typecheck_expr(result_ptr);
+
+    {
+      auto const raise_wrong_argument_error =
+        [this,
+         identifier](const exprt &wrong_argument, std::size_t argument_number) {
+          std::ostringstream error_message;
+          error_message << wrong_argument.source_location().as_string() << ": "
+                        << identifier << " has signature " << identifier
+                        << "(integral, integral, integral*), "
+                        << "but argument " << argument_number << " ("
+                        << expr2c(wrong_argument, *this) << ") has type `"
+                        << type2c(wrong_argument.type(), *this) << '`';
+          throw invalid_source_file_exceptiont{error_message.str()};
+        };
+      for(auto const arg_index : {0, 1})
+      {
+        auto const &argument = expr.arguments()[arg_index];
+
+        if(!is_signed_or_unsigned_bitvector(argument.type()))
+        {
+          raise_wrong_argument_error(argument, arg_index + 1);
+        }
+      }
+      if(
+        result_ptr.type().id() != ID_pointer ||
+        !is_signed_or_unsigned_bitvector(result_ptr.type().subtype()))
+      {
+        raise_wrong_argument_error(result_ptr, 3);
+      }
+    }
+
+    // actual logic implementing the operators
+    auto const make_operation = [&identifier](exprt lhs, exprt rhs) -> exprt {
+      if(identifier == "__builtin_add_overflow")
+      {
+        return plus_exprt{lhs, rhs};
+      }
+      else if(identifier == "__builtin_sub_overflow")
+      {
+        return minus_exprt{lhs, rhs};
+      }
+      else
+      {
+        INVARIANT(
+          identifier == "__builtin_mul_overflow",
+          "the three overflow operations are add, sub and mul");
+        return mult_exprt{lhs, rhs};
+      }
+    };
+
+    // we’re basically generating this expression
+    // (*result = (result_type)((integer)lhs OP (integer)rhs)),
+    //   ((integer)result == (integer)lhs OP (integer)rhs)
+    // i.e. perform the operation (+, -, *) on arbitrary length integer,
+    // cast to result type, check if the casted result is still equivalent
+    // to the arbitrary length result.
+    auto operation = make_operation(
+      typecast_exprt{lhs, integer_typet{}},
+      typecast_exprt{rhs, integer_typet{}});
+
+    auto operation_result =
+      typecast_exprt{operation, result_ptr.type().subtype()};
+    typecheck_expr_typecast(operation_result);
+    auto overflow_check = notequal_exprt{
+      typecast_exprt{dereference_exprt{result_ptr}, integer_typet{}},
+      operation};
+    typecheck_expr(overflow_check);
+    return exprt{ID_comma,
+                 bool_typet{},
+                 {side_effect_expr_assignt{dereference_exprt{result_ptr},
+                                           operation_result,
+                                           expr.source_location()},
+                  overflow_check}};
   }
   else
     return nil_exprt();

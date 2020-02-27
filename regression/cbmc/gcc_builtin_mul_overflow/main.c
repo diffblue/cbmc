@@ -104,6 +104,22 @@ void check_unsigned_long_long(void)
   assert(0 && "reachability");
 }
 
+void check_generic(void)
+{
+  unsigned char small_result;
+  long long big_result;
+
+  assert(__builtin_mul_overflow(100, 100, &small_result));
+  assert(!__builtin_mul_overflow(100, 100, &big_result));
+  assert(big_result == 10000);
+  assert(!__builtin_mul_overflow(10, 10, &small_result));
+  assert(small_result == 100);
+  assert(!__builtin_mul_overflow(INT_MAX, INT_MAX, &big_result));
+  assert(big_result == 4611686014132420609ll);
+  assert(__builtin_mul_overflow(INT_MAX * 2ll, INT_MAX * 2ll, &big_result));
+  assert(0 && "reachability");
+}
+
 int main(void)
 {
   check_int();
@@ -112,5 +128,6 @@ int main(void)
   check_unsigned();
   check_unsigned_long();
   check_unsigned_long_long();
+  check_generic();
   return 0;
 }

@@ -82,13 +82,31 @@ void check_unsigned_long_long(void)
   unsigned long long const one = 1ull;
   unsigned long long result;
 
-  assert(!__builtin_uaddl_overflow(one, one, &result));
+  assert(!__builtin_uaddll_overflow(one, one, &result));
   assert(result == 2ull);
   assert(!__builtin_uaddll_overflow(ULLONG_MAX / 2, ULLONG_MAX / 2, &result));
   assert(result + 1ull == ULLONG_MAX);
   assert(
     __builtin_uaddll_overflow(ULLONG_MAX / 2 + 2, ULLONG_MAX / 2 + 2, &result));
-  assert(__builtin_uaddl_overflow(one, ULLONG_MAX, &result));
+  assert(__builtin_uaddll_overflow(one, ULLONG_MAX, &result));
+  assert(0 && "reachability");
+}
+
+void check_generic(void)
+{
+  unsigned char small_result;
+  signed long long big_result;
+  assert(!__builtin_add_overflow(17, 25, &small_result));
+  assert(small_result == 42);
+  assert(!__builtin_add_overflow(17, 25, &big_result));
+  assert(big_result == 42ll);
+  assert(__builtin_add_overflow(216, 129, &small_result));
+  assert(!__builtin_add_overflow(216, 129, &big_result));
+  assert(big_result == 345);
+  assert(!__builtin_add_overflow(INT_MAX, INT_MAX, &big_result));
+  assert(big_result == 2ll * INT_MAX);
+  assert(
+    __builtin_add_overflow(LLONG_MAX / 2 + 1, LLONG_MAX / 2 + 1, &big_result));
   assert(0 && "reachability");
 }
 
@@ -100,4 +118,5 @@ int main(void)
   check_unsigned();
   check_unsigned_long();
   check_unsigned_long_long();
+  check_generic();
 }

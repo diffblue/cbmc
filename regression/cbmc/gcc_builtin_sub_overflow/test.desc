@@ -40,5 +40,15 @@ main.c
 \[check_unsigned_long_long.assertion.5\] line \d+ assertion result == 0ull: SUCCESS
 \[check_unsigned_long_long.assertion.6\] line \d+ assertion __builtin_usubll_overflow\(.* / 2ull, .*, &result\): SUCCESS
 \[check_unsigned_long_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_generic.assertion.1\] line 79 assertion __builtin_sub_overflow\(5, 10, &small_result\): SUCCESS
+\[check_generic.assertion.2\] line 80 assertion !__builtin_sub_overflow\(5, 10, &big_result\): SUCCESS
+\[check_generic.assertion.3\] line 81 assertion big_result == -5ll: SUCCESS
+\[check_generic.assertion.4\] line 82 assertion !__builtin_sub_overflow\(10, 5, &small_result\): SUCCESS
+\[check_generic.assertion.5\] line 83 assertion small_result == 5: SUCCESS
+\[check_generic.assertion.6\] line 84 assertion !__builtin_sub_overflow\(10, 5, &big_result\): SUCCESS
+\[check_generic.assertion.7\] line 85 assertion big_result == 5ll: SUCCESS
+\[check_generic.assertion.8\] line 86 assertion !__builtin_sub_overflow\(.*, .*, &big_result\): SUCCESS
+\[check_generic.assertion.9\] line 87 assertion big_result == 2ll \* .* \+ 1: SUCCESS
+\[check_generic.assertion.10\] line 88 assertion 0 && "reachability": FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
