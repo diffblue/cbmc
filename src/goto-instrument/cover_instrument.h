@@ -40,7 +40,7 @@ public:
   /// \param function_id: name of \p goto_program
   /// \param goto_program: a goto program
   /// \param basic_blocks: detected basic blocks
-  virtual void operator()(
+  void operator()(
     const irep_idt &function_id,
     goto_programt &goto_program,
     const cover_blocks_baset &basic_blocks) const
