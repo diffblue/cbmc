@@ -75,6 +75,31 @@ __CPROVER_HIDE:;
   __CPROVER_size_t alloc_size = nmemb * size;
 #pragma CPROVER check pop
 
+  if(__CPROVER_malloc_failure_mode == __CPROVER_malloc_failure_mode_return_null)
+  {
+    __CPROVER_bool should_malloc_fail = __VERIFIER_nondet___CPROVER_bool();
+    if(
+      alloc_size > __CPROVER_max_malloc_size ||
+      (__CPROVER_malloc_may_fail && should_malloc_fail))
+    {
+      return (void *)0;
+    }
+  }
+  else if(
+    __CPROVER_malloc_failure_mode ==
+    __CPROVER_malloc_failure_mode_assert_then_assume)
+  {
+    __CPROVER_assert(
+      alloc_size <= __CPROVER_max_malloc_size, "max allocation size exceeded");
+    __CPROVER_assume(alloc_size <= __CPROVER_max_malloc_size);
+
+    __CPROVER_bool should_malloc_fail = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_assert(
+      !__CPROVER_malloc_may_fail || !should_malloc_fail,
+      "max allocation may fail");
+    __CPROVER_assume(!__CPROVER_malloc_may_fail || !should_malloc_fail);
+  }
+
   void *malloc_res;
   // realistically, calloc may return NULL,
   // and __CPROVER_allocate doesn't, but no one cares
