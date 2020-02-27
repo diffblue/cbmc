@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^\[main\.overflow\.\d+\] line \d+ (pointer )?arithmetic overflow on .*sizeof\(signed int\) .* : SUCCESS
 ^VERIFICATION FAILED$
-^\*\* 8 of 11 failed
+^\*\* 8 of 12 failed
 --
 ^\[main\.overflow\.\d+\] line \d+ (pointer )?arithmetic overflow on .*sizeof\(signed int\) .* : FAILURE
 ^warning: ignoring

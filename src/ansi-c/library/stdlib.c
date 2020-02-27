@@ -115,23 +115,47 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   // realistically, malloc may return NULL,
   // and __CPROVER_allocate doesn't, but no one cares
   __CPROVER_HIDE:;
-  void *malloc_res;
-  malloc_res = __CPROVER_allocate(malloc_size, 0);
 
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
+    if(
+      __CPROVER_malloc_failure_mode ==
+      __CPROVER_malloc_failure_mode_return_null)
+    {
+      if(malloc_size > __CPROVER_max_malloc_size)
+      {
+        return (void *)0;
+      }
+    }
+    else if(
+      __CPROVER_malloc_failure_mode ==
+      __CPROVER_malloc_failure_mode_assert_then_assume)
+    {
+      __CPROVER_assert(
+        malloc_size <= __CPROVER_max_malloc_size,
+        "max allocation size exceeded");
+      __CPROVER_assume(malloc_size <= __CPROVER_max_malloc_size);
+    }
 
-  // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object=record_malloc?malloc_res:__CPROVER_malloc_object;
-  __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
-  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+    void *malloc_res;
+    malloc_res = __CPROVER_allocate(malloc_size, 0);
 
-  // detect memory leaks
-  __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_memory_leak=record_may_leak?malloc_res:__CPROVER_memory_leak;
+    // make sure it's not recorded as deallocated
+    __CPROVER_deallocated =
+      (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
 
-  return malloc_res;
+    // record the object size for non-determistic bounds checking
+    __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_malloc_object =
+      record_malloc ? malloc_res : __CPROVER_malloc_object;
+    __CPROVER_malloc_size = record_malloc ? malloc_size : __CPROVER_malloc_size;
+    __CPROVER_malloc_is_new_array =
+      record_malloc ? 0 : __CPROVER_malloc_is_new_array;
+
+    // detect memory leaks
+    __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_memory_leak =
+      record_may_leak ? malloc_res : __CPROVER_memory_leak;
+
+    return malloc_res;
 }
 
 /* FUNCTION: __builtin_alloca */

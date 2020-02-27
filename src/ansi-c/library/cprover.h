@@ -16,6 +16,12 @@ extern const void *__CPROVER_malloc_object;
 extern __CPROVER_size_t __CPROVER_malloc_size;
 extern _Bool __CPROVER_malloc_is_new_array;
 extern const void *__CPROVER_memory_leak;
+extern int __CPROVER_malloc_failure_mode;
+extern __CPROVER_size_t __CPROVER_max_malloc_size;
+
+// malloc failure modes
+extern int __CPROVER_malloc_failure_mode_return_null;
+extern int __CPROVER_malloc_failure_mode_assert_then_assume;
 
 void __CPROVER_assume(__CPROVER_bool assumption) __attribute__((__noreturn__));
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
