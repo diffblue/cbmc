@@ -937,12 +937,17 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
       it++)
   {
     std::string bin_name=*it+goto_binary_tmp_suffix;
-    int result=rename(it->c_str(), bin_name.c_str());
-    if(result!=0)
+
+    try
     {
-      error() << "Rename failed: " << std::strerror(errno) << eom;
-      return result;
+      file_rename(*it, bin_name);
     }
+    catch(const cprover_exception_baset &e)
+    {
+      error() << "Rename failed: " << e.what() << eom;
+      return 1;
+    }
+
     goto_binaries.push_back(bin_name);
   }
 

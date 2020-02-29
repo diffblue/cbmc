@@ -189,16 +189,17 @@ int ld_modet::ld_hybrid_binary(compilet &compiler)
   // save the goto-cc output file
   std::string goto_binary = output_file + goto_binary_tmp_suffix;
 
-  int result;
-
-  result = rename(output_file.c_str(), goto_binary.c_str());
-  if(result != 0)
+  try
   {
-    error() << "Rename failed: " << std::strerror(errno) << eom;
-    return result;
+    file_rename(output_file, goto_binary);
+  }
+  catch(const cprover_exception_baset &e)
+  {
+    error() << "Rename failed: " << e.what() << eom;
+    return 1;
   }
 
-  result = run_ld();
+  int result = run_ld();
 
   if(result == 0 && cmdline.isset('T'))
   {

@@ -221,3 +221,41 @@ bool file_remove(const std::string &path)
   return unlink(path.c_str()) == 0;
 #endif
 }
+
+void file_rename(const std::string &old_path, const std::string &new_path)
+{
+#ifdef _WIN32
+  if(is_directory(old_path))
+  {
+    // rename() only renames directories, but does not move them.
+    // MoveFile is not atomic.
+    auto MoveFile_result =
+      MoveFileW(widen(old_path).c_str(), widen(new_path).c_str());
+
+    if(MoveFile_result == 0)
+      throw system_exceptiont("MoveFile failed");
+  }
+  else
+  {
+    // C++17 requires this to be atomic, which is delivered by
+    // ReplaceFile(). MoveFile() or rename() do not guarantee this.
+    // Any existing file at new_path is to be overwritten.
+    auto ReplaceFile_result = ReplaceFileW(
+      widen(new_path).c_str(), // note the ordering
+      widen(old_path).c_str(),
+      nullptr,  // lpBackupFileName
+      0,        // dwReplaceFlags
+      nullptr,  // lpExclude
+      nullptr); // lpReserved
+
+    if(ReplaceFile_result == 0)
+      throw system_exceptiont("ReplaceFile failed");
+  }
+#else
+  int rename_result = rename(old_path.c_str(), new_path.c_str());
+
+  if(rename_result != 0)
+    throw system_exceptiont(
+      std::string("rename failed: ") + std::strerror(errno));
+#endif
+}
