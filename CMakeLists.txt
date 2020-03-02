@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 
 include(GNUInstallDirs)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DownloadProject.cmake")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -30,7 +31,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # This would be the place to enable warnings for Windows builds, although
     # config.inc doesn't seem to do that currently
 
-    # Include Git Bash Environment (rqeuired for download_project (patch))
+    # Include Git Bash Environment (required for download_project (patch))
     find_package(Git)
     if(GIT_FOUND)
         get_filename_component(git_root ${GIT_EXECUTABLE} DIRECTORY)
@@ -50,8 +51,17 @@ if(${enable_cbmc_tests})
     enable_testing()
 endif()
 
+option(use_smt_switch "use generic smt interface")
+if (use_smt_switch)
+    download_project(
+            PROJ smt-switch
+            URL https://github.com/makaimann/smt-switch/archive/hwmcc19.tar.gz
+            URL_MD5 c3c40be8b1294017cd129b9a3d99ff30
+    )
+    add_subdirectory(${smt-switch_SOURCE_DIR})
+endif ()
+
 if(DEFINED CMAKE_USE_CUDD)
-    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DownloadProject.cmake")
     message(STATUS "Downloading Cudd-3.0.0")
     download_project(PROJ cudd
             URL https://sourceforge.net/projects/cudd-mirror/files/cudd-3.0.0.tar.gz/download
