@@ -358,7 +358,7 @@ __CPROVER_HIDE:;
 inline int strcmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+#ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_precondition(__CPROVER_is_zero_string(s1),
                          "strcmp zero-termination of 1st argument");
@@ -369,13 +369,16 @@ inline int strcmp(const char *s1, const char *s2)
     __CPROVER_assume(retval!=0);
 
   return retval;
-  #else
+#else
   __CPROVER_size_t i=0;
   unsigned char ch1, ch2;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1==ch2)
     {
@@ -389,7 +392,7 @@ inline int strcmp(const char *s1, const char *s2)
   }
   while(ch1!=0 && ch2!=0);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strcasecmp */
@@ -404,7 +407,7 @@ inline int strcmp(const char *s1, const char *s2)
 inline int strcasecmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+#ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_precondition(__CPROVER_is_zero_string(s1),
                          "strcasecmp zero-termination of 1st argument");
@@ -415,13 +418,16 @@ inline int strcasecmp(const char *s1, const char *s2)
     __CPROVER_assume(retval!=0);
 
   return retval;
-  #else
+#else
   __CPROVER_size_t i=0;
   unsigned char ch1, ch2;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
     if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
@@ -438,7 +444,7 @@ inline int strcasecmp(const char *s1, const char *s2)
   }
   while(ch1!=0 && ch2!=0);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strncmp */
@@ -453,22 +459,25 @@ inline int strcasecmp(const char *s1, const char *s2)
 inline int strncmp(const char *s1, const char *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+#ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_is_zero_string(s1) ||
                          __CPROVER_buffer_size(s1)>=n,
                          "strncmp zero-termination of 1st argument");
   __CPROVER_precondition(__CPROVER_is_zero_string(s2) ||
                          __CPROVER_buffer_size(s2)>=n,
                          "strncmp zero-termination of 2nd argument");
-  #else
+#else
   __CPROVER_size_t i=0;
   unsigned char ch1, ch2;
   if(n == 0)
     return 0;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1==ch2)
     {
@@ -482,7 +491,7 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
   }
   while(ch1!=0 && ch2!=0 && i<n);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strncasecmp */
@@ -497,22 +506,25 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
 inline int strncasecmp(const char *s1, const char *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+#ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_precondition(__CPROVER_is_zero_string(s1),
                          "strncasecmp zero-termination of 1st argument");
   __CPROVER_precondition(__CPROVER_is_zero_string(s2),
                          "strncasecmp zero-termination of 2nd argument");
   return retval;
-  #else
+#else
   __CPROVER_size_t i=0;
   unsigned char ch1, ch2;
   if(n == 0)
     return 0;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
     if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
@@ -529,7 +541,7 @@ inline int strncasecmp(const char *s1, const char *s2, size_t n)
   }
   while(ch1!=0 && ch2!=0 && i<n);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strlen */
