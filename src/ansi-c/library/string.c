@@ -374,8 +374,11 @@ inline int strcmp(const char *s1, const char *s2)
   unsigned char ch1, ch2;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1==ch2)
     {
@@ -389,7 +392,7 @@ inline int strcmp(const char *s1, const char *s2)
   }
   while(ch1!=0 && ch2!=0);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strcasecmp */
@@ -420,8 +423,11 @@ inline int strcasecmp(const char *s1, const char *s2)
   unsigned char ch1, ch2;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
     if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
@@ -438,7 +444,7 @@ inline int strcasecmp(const char *s1, const char *s2)
   }
   while(ch1!=0 && ch2!=0);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strncmp */
@@ -467,8 +473,11 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
     return 0;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1==ch2)
     {
@@ -482,7 +491,7 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
   }
   while(ch1!=0 && ch2!=0 && i<n);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strncasecmp */
@@ -511,8 +520,11 @@ inline int strncasecmp(const char *s1, const char *s2, size_t n)
     return 0;
   do
   {
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "conversion"
     ch1=s1[i];
     ch2=s2[i];
+#  pragma CPROVER check pop
 
     if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
     if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
@@ -529,7 +541,7 @@ inline int strncasecmp(const char *s1, const char *s2, size_t n)
   }
   while(ch1!=0 && ch2!=0 && i<n);
   return 0;
-  #endif
+#endif
 }
 
 /* FUNCTION: strlen */
