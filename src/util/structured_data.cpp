@@ -17,9 +17,7 @@ labelt::labelt(std::vector<std::string> components) : components(components)
   PRECONDITION(std::all_of(
     components.begin(), components.end(), [](const std::string &component) {
       return !component.empty() &&
-             std::all_of(component.begin(), component.end(), [](const char &c) {
-               return !(::isalpha(c)) || ::islower(c);
-             });
+             std::none_of(component.begin(), component.end(), ::isupper);
     }));
 }
 
