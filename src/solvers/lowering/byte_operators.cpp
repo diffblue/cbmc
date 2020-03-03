@@ -21,6 +21,41 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
+/// Determine the member of maximum fixed bit width in a union type. If no
+/// member, or no member of fixed and non-zero width can be found, return
+/// nullopt.
+/// \param union_type: Type to determine the member of.
+/// \param ns: Namespace to resolve tag types.
+/// \return Pair of a componentt pointing to the maximum fixed bit-width
+///   member of \p union_type and the bit width of that member.
+static optionalt<std::pair<struct_union_typet::componentt, mp_integer>>
+find_widest_union_component(const union_typet &union_type, const namespacet &ns)
+{
+  const union_typet::componentst &components = union_type.components();
+
+  mp_integer max_width = 0;
+  typet max_comp_type;
+  irep_idt max_comp_name;
+
+  for(const auto &comp : components)
+  {
+    auto element_width = pointer_offset_bits(comp.type(), ns);
+
+    if(!element_width.has_value() || *element_width <= max_width)
+      continue;
+
+    max_width = *element_width;
+    max_comp_type = comp.type();
+    max_comp_name = comp.get_name();
+  }
+
+  if(max_width == 0)
+    return {};
+  else
+    return std::make_pair(
+      struct_union_typet::componentt{max_comp_name, max_comp_type}, max_width);
+}
+
 static exprt bv_to_expr(
   const exprt &bitvector_expr,
   const typet &target_type,
@@ -1124,31 +1159,18 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
     const union_typet &union_type = to_union_type(ns.follow(src.type()));
-    const union_typet::componentst &components = union_type.components();
 
-    mp_integer max_width = 0;
-    typet max_comp_type;
-    irep_idt max_comp_name;
+    const auto widest_member = find_widest_union_component(union_type, ns);
 
-    for(const auto &comp : components)
-    {
-      auto element_width = pointer_offset_bits(comp.type(), ns);
-
-      if(!element_width.has_value() || *element_width <= max_width)
-        continue;
-
-      max_width = *element_width;
-      max_comp_type = comp.type();
-      max_comp_name = comp.get_name();
-    }
-
-    if(max_width > 0)
+    if(widest_member.has_value())
     {
       byte_extract_exprt tmp(unpacked);
-      tmp.type() = max_comp_type;
+      tmp.type() = widest_member->first.type();
 
       return union_exprt(
-        max_comp_name, lower_byte_extract(tmp, ns), src.type());
+        widest_member->first.get_name(),
+        lower_byte_extract(tmp, ns),
+        src.type());
     }
   }
 
@@ -1945,34 +1967,19 @@ static exprt lower_byte_update_union(
   const optionalt<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
-  const union_typet::componentst &components = union_type.components();
-
-  mp_integer max_width = 0;
-  typet max_comp_type;
-  irep_idt max_comp_name;
-
-  for(const auto &comp : components)
-  {
-    auto element_width = pointer_offset_bits(comp.type(), ns);
-
-    if(!element_width.has_value() || *element_width <= max_width)
-      continue;
-
-    max_width = *element_width;
-    max_comp_type = comp.type();
-    max_comp_name = comp.get_name();
-  }
+  const auto widest_member = find_widest_union_component(union_type, ns);
 
   PRECONDITION_WITH_DIAGNOSTICS(
-    max_width > 0,
+    widest_member.has_value(),
     "lower_byte_update of union of unknown size is not supported");
 
   byte_update_exprt bu = src;
-  bu.set_op(member_exprt{src.op(), max_comp_name, max_comp_type});
-  bu.type() = max_comp_type;
+  bu.set_op(member_exprt{
+    src.op(), widest_member->first.get_name(), widest_member->first.type()});
+  bu.type() = widest_member->first.type();
 
   return union_exprt{
-    max_comp_name,
+    widest_member->first.get_name(),
     lower_byte_update(bu, value_as_byte_array, non_const_update_bound, ns),
     src.type()};
 }
