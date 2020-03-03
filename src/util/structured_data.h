@@ -41,7 +41,7 @@ struct structured_data_entryt
   const std::map<labelt, structured_data_entryt> &children() const;
 
 private:
-  explicit structured_data_entryt(const jsont &data);
+  explicit structured_data_entryt(jsont data);
   explicit structured_data_entryt(
     std::map<labelt, structured_data_entryt> children);
 

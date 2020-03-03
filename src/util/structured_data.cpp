@@ -71,10 +71,11 @@ structured_data_entryt structured_data_entryt::data_node(const jsont &data)
 structured_data_entryt
 structured_data_entryt::entry(std::map<labelt, structured_data_entryt> children)
 {
-  return structured_data_entryt(children);
+  return structured_data_entryt(std::move(children));
 }
 
-structured_data_entryt::structured_data_entryt(const jsont &data) : data(data)
+structured_data_entryt::structured_data_entryt(jsont data)
+  : data(std::move(data))
 {
 }
 
@@ -123,7 +124,7 @@ pretty_node(const std::pair<labelt, structured_data_entryt> &entry)
   }
   else
   {
-    const auto indent = [](const std::string line) { return "\t" + line; };
+    const auto indent = [](const std::string &line) { return "\t" + line; };
 
     const auto &children = data.children();
     std::vector<std::vector<std::string>> lines =
