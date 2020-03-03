@@ -22,6 +22,7 @@ labelt::labelt(std::vector<std::string> components) : components(components)
              });
     }));
 }
+
 std::string labelt::camel_case() const
 {
   std::ostringstream output;
@@ -30,18 +31,21 @@ std::string labelt::camel_case() const
     output, std::next(components.begin()), components.end(), "", capitalize);
   return output.str();
 }
+
 std::string labelt::snake_case() const
 {
   std::ostringstream output;
   join_strings(output, components.begin(), components.end(), '_');
   return output.str();
 }
+
 std::string labelt::kebab_case() const
 {
   std::ostringstream output;
   join_strings(output, components.begin(), components.end(), '-');
   return output.str();
 }
+
 std::string labelt::pretty() const
 {
   std::ostringstream output;
@@ -53,33 +57,40 @@ std::string labelt::pretty() const
   join_strings(output, range.begin(), range.end(), ' ');
   return output.str();
 }
+
 bool labelt::operator<(const labelt &other) const
 {
   return components < other.components;
 }
+
 structured_data_entryt structured_data_entryt::data_node(const jsont &data)
 {
   // Structured data (e.g. arrays and objects) should use an entry
   PRECONDITION(!(data.is_array() || data.is_object()));
   return structured_data_entryt(data);
 }
+
 structured_data_entryt
 structured_data_entryt::entry(std::map<labelt, structured_data_entryt> children)
 {
   return structured_data_entryt(children);
 }
+
 structured_data_entryt::structured_data_entryt(const jsont &data) : data(data)
 {
 }
+
 structured_data_entryt::structured_data_entryt(
   std::map<labelt, structured_data_entryt> children)
   : _children(std::move(children))
 {
 }
+
 bool structured_data_entryt::is_leaf() const
 {
   return _children.empty();
 }
+
 std::string structured_data_entryt::leaf_data() const
 {
   return data.value;
@@ -89,10 +100,12 @@ structured_data_entryt::children() const
 {
   return _children;
 }
+
 jsont structured_data_entryt::leaf_object() const
 {
   return data;
 }
+
 structured_datat::structured_datat(
   std::map<labelt, structured_data_entryt> data)
   : _data(std::move(data))
@@ -153,6 +166,7 @@ std::string to_pretty(const structured_datat &data)
   join_strings(output, flattened_lines.begin(), flattened_lines.end(), "\n");
   return output.str();
 }
+
 const std::map<labelt, structured_data_entryt> &structured_datat::data() const
 {
   return _data;
