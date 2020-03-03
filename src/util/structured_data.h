@@ -63,32 +63,13 @@ private:
 /// message() << data << eom;
 /// ```
 /// Then if the output dependending on the UI of the message handler, you'll
-/// get appropriately formatted data:
+/// get appropriately formatted data.
 ///
-/// XML:
-/// ```xml
-/// <my-data>
-///   <my-number>10</my-number>
-///   <my-string>hi</my-string>
-/// </my-data>
-/// ```
-///
-/// JSON:
-/// ```json
-/// {
-///   "myData": {
-///      "myNumber": 10
-///      "myString": "hi"
-///    }
-///  }
-/// ```
-///
-/// Plain:
-/// ```
-/// My data:
-///    My number: 10
-///    My string: hi
-/// ```
+/// See
+/// \ref to_xml(const structured_datat &),
+/// \ref to_json(const structured_datat &),
+/// \ref to_pretty(const structured_datat &)
+/// for details of the format.
 class structured_datat
 {
 public:
@@ -99,6 +80,13 @@ private:
   std::map<labelt, structured_data_entryt> _data;
 };
 
+/// Convert the structured_data into plain text. For the example structured
+/// data, this will produce:
+/// ```
+/// My data:
+///    My number: 10
+///    My string: hi
+/// ```
 std::string to_pretty(const structured_datat &);
 
 #endif // CPROVER_UTIL_STRUCTURED_DATA_H
