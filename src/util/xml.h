@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <iosfwd>
 
+class structured_datat;
+
 class xmlt
 {
 public:
@@ -138,4 +140,5 @@ inline std::ostream &operator<<(
 bool operator==(const xmlt &a, const xmlt &b);
 bool operator!=(const xmlt &a, const xmlt &b);
 
+xmlt to_xml(const structured_datat &data);
 #endif // CPROVER_UTIL_XML_H

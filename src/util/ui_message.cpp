@@ -12,9 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include "cmdline.h"
+#include "json.h"
 #include "json_irep.h"
 #include "json_stream.h"
 #include "make_unique.h"
+#include "xml.h"
 #include "xml_irep.h"
 
 ui_message_handlert::ui_message_handlert(

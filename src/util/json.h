@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "range.h"
 
+class structured_datat;
+
 class json_objectt;
 class json_arrayt;
 
@@ -464,5 +466,7 @@ inline const json_stringt &to_json_string(const jsont &json)
 }
 
 bool operator==(const jsont &left, const jsont &right);
+
+jsont to_json(const structured_datat &data);
 
 #endif // CPROVER_UTIL_JSON_H

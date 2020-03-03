@@ -99,8 +99,6 @@ private:
   std::map<labelt, structured_data_entryt> _data;
 };
 
-xmlt to_xml(const structured_datat &data);
-jsont to_json(const structured_datat &data);
 std::string to_pretty(const structured_datat &);
 
 #endif // CPROVER_UTIL_STRUCTURED_DATA_H

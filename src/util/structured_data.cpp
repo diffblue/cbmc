@@ -106,69 +106,6 @@ structured_datat::structured_datat(
 {
 }
 
-xmlt xml_node(const std::pair<labelt, structured_data_entryt> &entry)
-{
-  const labelt &label = entry.first;
-  const structured_data_entryt &data = entry.second;
-  xmlt output_data{label.kebab_case()};
-  if(data.is_leaf())
-  {
-    output_data.data = data.leaf_data();
-  }
-  else
-  {
-    const auto &children = data.get_children();
-    output_data.elements =
-      make_range(children).map(xml_node).collect<std::list<xmlt>>();
-  }
-  return output_data;
-}
-
-xmlt to_xml(const structured_datat &data)
-{
-  if(data.data().size() == 0)
-    return xmlt{};
-  if(data.data().size() == 1)
-  {
-    return xml_node(*data.data().begin());
-  }
-  else
-  {
-    xmlt root{"root"};
-    root.elements =
-      make_range(data.data()).map(xml_node).collect<std::list<xmlt>>();
-    return root;
-  }
-}
-
-jsont json_node(const structured_data_entryt &entry)
-{
-  if(entry.is_leaf())
-    return entry.leaf_object();
-  else
-  {
-    json_objectt result;
-    for(const auto sub_entry : entry.get_children())
-    {
-      result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
-    }
-    return std::move(result);
-  }
-}
-
-jsont to_json(const structured_datat &data)
-{
-  if(data.data().size() == 0)
-    return jsont{};
-
-  json_objectt result;
-  for(const auto sub_entry : data.data())
-  {
-    result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
-  }
-  return std::move(result);
-}
-
 std::vector<std::string>
 pretty_node(const std::pair<labelt, structured_data_entryt> &entry)
 {
