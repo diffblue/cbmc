@@ -141,6 +141,53 @@ static struct_exprt bv_to_struct_expr(
   return struct_exprt{std::move(operands), struct_type};
 }
 
+/// Convert a bitvector-typed expression \p bitvector_expr to a union-typed
+/// expression. See \ref bv_to_expr for an overview.
+static union_exprt bv_to_union_expr(
+  const exprt &bitvector_expr,
+  const union_typet &union_type,
+  const endianness_mapt &endianness_map,
+  const namespacet &ns)
+{
+  const union_typet::componentst &components = union_type.components();
+
+  // empty union, handled the same way as done in expr_initializert
+  if(components.empty())
+    return union_exprt{irep_idt{}, nil_exprt{}, union_type};
+
+  const auto widest_member = find_widest_union_component(union_type, ns);
+
+  std::size_t component_bits;
+  if(widest_member.has_value())
+    component_bits = numeric_cast_v<std::size_t>(widest_member->second);
+  else
+    component_bits = to_bitvector_type(bitvector_expr.type()).get_width();
+
+  if(component_bits == 0)
+  {
+    return union_exprt{components.front().get_name(),
+                       constant_exprt{irep_idt{}, components.front().type()},
+                       union_type};
+  }
+
+  const auto bounds = map_bounds(endianness_map, 0, component_bits - 1);
+  bitvector_typet type{bitvector_expr.type().id(), component_bits};
+  const irep_idt &component_name = widest_member.has_value()
+                                     ? widest_member->first.get_name()
+                                     : components.front().get_name();
+  const typet &component_type = widest_member.has_value()
+                                  ? widest_member->first.type()
+                                  : components.front().type();
+  return union_exprt{
+    component_name,
+    bv_to_expr(
+      extractbits_exprt{bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
+      component_type,
+      endianness_map,
+      ns),
+    union_type};
+}
+
 /// Convert a bitvector-typed expression \p bitvector_expr to an array-typed
 /// expression. See \ref bv_to_expr for an overview.
 static array_exprt bv_to_array_expr(
@@ -324,6 +371,21 @@ static exprt bv_to_expr(
     struct_exprt result = bv_to_struct_expr(
       bitvector_expr,
       ns.follow_tag(to_struct_tag_type(target_type)),
+      endianness_map,
+      ns);
+    result.type() = target_type;
+    return std::move(result);
+  }
+  else if(target_type.id() == ID_union)
+  {
+    return bv_to_union_expr(
+      bitvector_expr, to_union_type(target_type), endianness_map, ns);
+  }
+  else if(target_type.id() == ID_union_tag)
+  {
+    union_exprt result = bv_to_union_expr(
+      bitvector_expr,
+      ns.follow_tag(to_union_tag_type(target_type)),
       endianness_map,
       ns);
     result.type() = target_type;
