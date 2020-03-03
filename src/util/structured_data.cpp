@@ -102,7 +102,7 @@ jsont structured_data_entryt::leaf_object() const
 }
 structured_datat::structured_datat(
   std::map<labelt, structured_data_entryt> data)
-  : data(std::move(data))
+  : _data(std::move(data))
 {
 }
 
@@ -126,16 +126,16 @@ xmlt xml_node(const std::pair<labelt, structured_data_entryt> &entry)
 
 xmlt structured_datat::to_xml() const
 {
-  if(data.size() == 0)
+  if(data().size() == 0)
     return xmlt{};
-  if(data.size() == 1)
+  if(data().size() == 1)
   {
-    return xml_node(*data.begin());
+    return xml_node(*data().begin());
   }
   else
   {
     xmlt root{"root"};
-    root.elements = make_range(data).map(xml_node).collect<std::list<xmlt>>();
+    root.elements = make_range(data()).map(xml_node).collect<std::list<xmlt>>();
     return root;
   }
 }
@@ -161,7 +161,7 @@ jsont structured_datat::to_json() const
     return jsont{};
 
   json_objectt result;
-  for(const auto sub_entry : data)
+  for(const auto sub_entry : data())
   {
     result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
   }
@@ -205,11 +205,11 @@ pretty_node(const std::pair<labelt, structured_data_entryt> &entry)
 
 std::string structured_datat::to_pretty() const
 {
-  if(data.empty())
+  if(data().empty())
     return "";
 
   std::vector<std::vector<std::string>> lines =
-    make_range(data)
+    make_range(data())
       .map(pretty_node)
       .collect<std::vector<std::vector<std::string>>>();
   std::vector<std::string> flattened_lines;
@@ -221,4 +221,8 @@ std::string structured_datat::to_pretty() const
   std::ostringstream output;
   join_strings(output, flattened_lines.begin(), flattened_lines.end(), "\n");
   return output.str();
+}
+const std::map<labelt, structured_data_entryt> &structured_datat::data() const
+{
+  return _data;
 }

@@ -98,8 +98,10 @@ public:
   jsont to_json() const;
   std::string to_pretty() const;
 
+  const std::map<labelt, structured_data_entryt> & data() const;
+
 private:
-  std::map<labelt, structured_data_entryt> data;
+  std::map<labelt, structured_data_entryt> _data;
 };
 
 #endif // CPROVER_UTIL_STRUCTURED_DATA_H
