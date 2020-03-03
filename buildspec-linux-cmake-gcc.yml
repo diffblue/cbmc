@@ -22,6 +22,7 @@ phases:
   post_build:
     commands:
       - cd build; ctest -V -L CORE -j2
+      - cd build; ctest -V -R unit-xfail -j2
       - echo Build completed on `date`
 cache:
   paths:

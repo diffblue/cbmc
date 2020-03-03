@@ -65,4 +65,11 @@ add_test(
     COMMAND $<TARGET_FILE:unit>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_test(
+    NAME unit-xfail
+    COMMAND $<TARGET_FILE:unit> "[!shouldfail]"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 set_tests_properties(unit PROPERTIES LABELS "CORE;CBMC")

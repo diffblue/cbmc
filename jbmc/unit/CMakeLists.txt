@@ -36,4 +36,11 @@ add_test(
     COMMAND $<TARGET_FILE:java-unit>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_test(
+    NAME java-unit-xfail
+    COMMAND $<TARGET_FILE:java-unit> "[!shouldfail]"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 set_tests_properties(java-unit PROPERTIES LABELS "CORE;CBMC")
