@@ -11,14 +11,8 @@ Author: Thomas Kiley
 
 TEST_CASE("label", "[core][util][structured_data][label]")
 {
-  SECTION("Empty label")
-  {
-    labelt empty_label({});
-    REQUIRE(empty_label.camel_case() == "");
-    REQUIRE(empty_label.kebab_case() == "");
-    REQUIRE(empty_label.snake_case() == "");
-    REQUIRE(empty_label.pretty() == "");
-  }
+  const cbmc_invariants_should_throwt invariant_throw_during_tests{};
+
   SECTION("Single element")
   {
     labelt empty_label({"hello"});
@@ -35,41 +29,35 @@ TEST_CASE("label", "[core][util][structured_data][label]")
     REQUIRE(empty_label.snake_case() == "hello_goodbye");
     REQUIRE(empty_label.pretty() == "Hello goodbye");
   }
-  SECTION("Odd casing elements")
+  SECTION("Valid labels")
   {
-    labelt empty_label({"HelLo", "Goodbye"});
-    REQUIRE(empty_label.camel_case() == "helloGoodbye");
-    REQUIRE(empty_label.kebab_case() == "hello-goodbye");
-    REQUIRE(empty_label.snake_case() == "hello_goodbye");
-    REQUIRE(empty_label.pretty() == "Hello goodbye");
+    labelt numbered_label({"hello", "1"});
+    REQUIRE(numbered_label.camel_case() == "hello1");
+    REQUIRE(numbered_label.kebab_case() == "hello-1");
+    REQUIRE(numbered_label.snake_case() == "hello_1");
+    REQUIRE(numbered_label.pretty() == "Hello 1");
+  }
+  SECTION("Invalid components")
+  {
+    REQUIRE_THROWS_AS(labelt{{}}, invariant_failedt);
+    std::vector<std::string> starts_with_upper{"Hello"};
+    REQUIRE_THROWS_AS(labelt{starts_with_upper}, invariant_failedt);
+    std::vector<std::string> contains_upper{"Hello"};
+    REQUIRE_THROWS_AS(labelt{contains_upper}, invariant_failedt);
+    REQUIRE_THROWS_AS(labelt{{""}}, invariant_failedt);
   }
 }
 
 TEST_CASE("Label equality", "[core][util][structured_data][label]")
 {
-  labelt empty_label({});
   labelt single_label({"a"});
-  labelt capital_label({"A"});
   labelt b_label({"b"});
   labelt multi_label({"b", "c", "d"});
   labelt multi_label2({"b", "d", "d"});
 
-  REQUIRE(empty_label < single_label);
-  REQUIRE(empty_label < capital_label);
-  REQUIRE(empty_label < b_label);
-  REQUIRE(empty_label < multi_label);
-  REQUIRE(empty_label < multi_label2);
-
-  REQUIRE_FALSE(single_label < capital_label);
-  REQUIRE_FALSE(capital_label < single_label);
-
   REQUIRE(single_label < b_label);
   REQUIRE(single_label < multi_label);
   REQUIRE(single_label < multi_label2);
-
-  REQUIRE(capital_label < b_label);
-  REQUIRE(capital_label < multi_label);
-  REQUIRE(capital_label < multi_label2);
 
   REQUIRE(b_label < multi_label);
   REQUIRE(b_label < multi_label2);

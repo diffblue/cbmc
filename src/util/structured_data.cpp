@@ -11,27 +11,23 @@ Author: Thomas Kiley
 #include "string_utils.h"
 #include <algorithm>
 
-labelt::labelt(std::vector<std::string> components)
+labelt::labelt(std::vector<std::string> components) : components(components)
 {
-  auto to_lower_string = [](const std::string &s) -> std::string {
-    std::string lower_case = s;
-    std::for_each(
-      lower_case.begin(), lower_case.end(), [](char &c) { c = ::tolower(c); });
-    return lower_case;
-  };
-  this->components = make_range(components)
-                       .map(to_lower_string)
-                       .collect<std::vector<std::string>>();
+  PRECONDITION(!components.empty());
+  PRECONDITION(std::all_of(
+    components.begin(), components.end(), [](const std::string &component) {
+      return !component.empty() &&
+             std::all_of(component.begin(), component.end(), [](const char &c) {
+               return !(::isalpha(c)) || ::islower(c);
+             });
+    }));
 }
 std::string labelt::camel_case() const
 {
   std::ostringstream output;
-  if(!components.empty())
-  {
-    output << *components.begin();
-    join_strings(
-      output, std::next(components.begin()), components.end(), "", capitalize);
-  }
+  output << *components.begin();
+  join_strings(
+    output, std::next(components.begin()), components.end(), "", capitalize);
   return output.str();
 }
 std::string labelt::snake_case() const
@@ -49,15 +45,12 @@ std::string labelt::kebab_case() const
 std::string labelt::pretty() const
 {
   std::ostringstream output;
-  if(!components.empty())
-  {
-    const auto range =
-      make_range(components.begin(), std::next(components.begin()))
-        .map(capitalize)
-        .concat(make_range(std::next(components.begin()), components.end()));
+  const auto range =
+    make_range(components.begin(), std::next(components.begin()))
+      .map(capitalize)
+      .concat(make_range(std::next(components.begin()), components.end()));
 
-    join_strings(output, range.begin(), range.end(), ' ');
-  }
+  join_strings(output, range.begin(), range.end(), ' ');
   return output.str();
 }
 bool labelt::operator<(const labelt &other) const
