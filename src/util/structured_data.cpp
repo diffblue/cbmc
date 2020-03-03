@@ -62,7 +62,7 @@ std::string labelt::pretty() const
 }
 bool labelt::operator<(const labelt &other) const
 {
-  return camel_case() < other.camel_case();
+  return components < other.components;
 }
 structured_data_entryt structured_data_entryt::data_node(const jsont &data)
 {
