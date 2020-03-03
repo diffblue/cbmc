@@ -315,13 +315,13 @@ void ui_message_handlert::print(unsigned level, const structured_datat &data)
   switch(get_ui())
   {
   case uit::PLAIN:
-    print(level, data.to_pretty());
+    print(level, to_pretty(data));
     break;
   case uit::XML_UI:
-    print(level, data.to_xml());
+    print(level, to_xml(data));
     break;
   case uit::JSON_UI:
-    print(level, data.to_json());
+    print(level, to_json(data));
     break;
   }
 }

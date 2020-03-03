@@ -85,18 +85,18 @@ TEST_CASE("Convert structured_datat", "[core][util][structured_data]")
 
     THEN("Empty json object")
     {
-      REQUIRE(empty_data.to_json() == json_nullt());
+      REQUIRE(to_json(empty_data) == json_nullt());
     }
 
     THEN("Empty xml object")
     {
-      REQUIRE(empty_data.to_xml().elements.empty());
-      REQUIRE(empty_data.to_xml().data.empty());
+      REQUIRE(to_xml(empty_data).elements.empty());
+      REQUIRE(to_xml(empty_data).data.empty());
     }
 
     THEN("Empty pretty object")
     {
-      REQUIRE(empty_data.to_pretty() == "");
+      REQUIRE(to_pretty(empty_data) == "");
     }
   }
   GIVEN("Single node XML")
@@ -110,20 +110,20 @@ TEST_CASE("Convert structured_datat", "[core][util][structured_data]")
     {
       json_objectt expected;
       expected["nodeName"] = json_stringt{"nodeValue"};
-      REQUIRE(single_node.to_json() == expected);
+      REQUIRE(to_json(single_node) == expected);
     }
 
     THEN("Appropriate xml object")
     {
       xmlt expected_xml{"node-name"};
       expected_xml.data = "nodeValue";
-      auto result = single_node.to_xml();
+      auto result = to_xml(single_node);
       REQUIRE(result == expected_xml);
     }
 
     THEN("Appropriate pretty object")
     {
-      REQUIRE(single_node.to_pretty() == "Node name: nodeValue");
+      REQUIRE(to_pretty(single_node) == "Node name: nodeValue");
     }
   }
   GIVEN("Nested nodes")
@@ -142,7 +142,7 @@ TEST_CASE("Convert structured_datat", "[core][util][structured_data]")
       json_objectt expected;
       expected["child1"] = json_stringt{"c1v"};
       expected["child2"] = json_stringt{"c2v"};
-      REQUIRE(single_node.to_json() == expected);
+      REQUIRE(to_json(single_node) == expected);
     }
 
     THEN("Empty xml object")
@@ -153,7 +153,7 @@ TEST_CASE("Convert structured_datat", "[core][util][structured_data]")
       xmlt expected_child2 = xmlt{"child-2"};
       expected_child2.data = "c2v";
       expected_xml.elements = {{expected_child1, expected_child2}};
-      auto result = single_node.to_xml();
+      auto result = to_xml(single_node);
       REQUIRE(result == expected_xml);
     }
 
@@ -162,7 +162,7 @@ TEST_CASE("Convert structured_datat", "[core][util][structured_data]")
       std::string expected =
         "Child 1: c1v\n"
         "Child 2: c2v";
-      REQUIRE(single_node.to_pretty() == expected);
+      REQUIRE(to_pretty(single_node) == expected);
     }
   }
   SECTION("Non-string data")
@@ -177,21 +177,21 @@ TEST_CASE("Convert structured_datat", "[core][util][structured_data]")
     {
       json_objectt expected;
       expected["child1"] = json_numbert{"10"};
-      REQUIRE(single_node.to_json() == expected);
+      REQUIRE(to_json(single_node) == expected);
     }
 
     THEN("Empty xml object")
     {
       xmlt expected_xml = xmlt{"child-1"};
       expected_xml.data = "10";
-      auto result = single_node.to_xml();
+      auto result = to_xml(single_node);
       REQUIRE(result == expected_xml);
     }
 
     THEN("Empty pretty object")
     {
       std::string expected = "Child 1: 10";
-      REQUIRE(single_node.to_pretty() == expected);
+      REQUIRE(to_pretty(single_node) == expected);
     }
   }
 }

@@ -67,7 +67,7 @@ void message_handlert::print(
 void message_handlert::print(unsigned level, const structured_datat &data)
 {
   // default to just printing out the data in a format
-  print(level, data.to_pretty());
+  print(level, to_pretty(data));
 }
 
 messaget::~messaget()
