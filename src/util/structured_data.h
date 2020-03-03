@@ -38,7 +38,7 @@ struct structured_data_entryt
   bool is_leaf() const;
   std::string leaf_data() const;
   jsont leaf_object() const;
-  std::map<labelt, structured_data_entryt> get_children() const;
+  const std::map<labelt, structured_data_entryt> &children() const;
 
 private:
   explicit structured_data_entryt(const jsont &data);
@@ -46,7 +46,7 @@ private:
     std::map<labelt, structured_data_entryt> children);
 
   jsont data;
-  std::map<labelt, structured_data_entryt> children;
+  std::map<labelt, structured_data_entryt> _children;
 };
 
 /// A way of representing nested key/value data. Used for logging on any
@@ -74,7 +74,7 @@ class structured_datat
 {
 public:
   explicit structured_datat(std::map<labelt, structured_data_entryt> data);
-  const std::map<labelt, structured_data_entryt> & data() const;
+  const std::map<labelt, structured_data_entryt> &data() const;
 
 private:
   std::map<labelt, structured_data_entryt> _data;

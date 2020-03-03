@@ -80,21 +80,21 @@ structured_data_entryt::structured_data_entryt(const jsont &data) : data(data)
 }
 structured_data_entryt::structured_data_entryt(
   std::map<labelt, structured_data_entryt> children)
-  : children(std::move(children))
+  : _children(std::move(children))
 {
 }
 bool structured_data_entryt::is_leaf() const
 {
-  return children.empty();
+  return _children.empty();
 }
 std::string structured_data_entryt::leaf_data() const
 {
   return data.value;
 }
-std::map<labelt, structured_data_entryt>
-structured_data_entryt::get_children() const
+const std::map<labelt, structured_data_entryt> &
+structured_data_entryt::children() const
 {
-  return children;
+  return _children;
 }
 jsont structured_data_entryt::leaf_object() const
 {
@@ -121,7 +121,7 @@ pretty_node(const std::pair<labelt, structured_data_entryt> &entry)
   {
     const auto indent = [](const std::string line) { return "\t" + line; };
 
-    const auto &children = data.get_children();
+    const auto &children = data.children();
     std::vector<std::vector<std::string>> lines =
       make_range(children)
         .map(pretty_node)

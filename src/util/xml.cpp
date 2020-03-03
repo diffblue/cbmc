@@ -270,7 +270,7 @@ xmlt xml_node(const std::pair<labelt, structured_data_entryt> &entry)
   }
   else
   {
-    const auto &children = data.get_children();
+    const auto &children = data.children();
     output_data.elements =
       make_range(children).map(xml_node).collect<std::list<xmlt>>();
   }

@@ -214,7 +214,7 @@ jsont json_node(const structured_data_entryt &entry)
   else
   {
     json_objectt result;
-    for(const auto sub_entry : entry.get_children())
+    for(const auto sub_entry : entry.children())
     {
       result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
     }
