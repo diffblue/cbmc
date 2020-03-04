@@ -135,7 +135,7 @@ nothing other than `nullfs`; But perhaps due to the logic being too complicated
 symex ends up being unable to figure this out, so in the call to `fs_open()` we
 end up branching on all functions matching the signature of
 `filesystem_t::open`, which could be quite a few functions within the program.
-Worst of all, if it's address is ever taken in the program, as far as the "dumb"
+Worst of all, if its address is ever taken in the program, as far as the "dumb"
 function pointer removal is concerned it could be `fs_open()` itself due to it
 having a matching signature, leading to symex being forced to follow a
 potentially infinite recursion until its unwind limit.
@@ -168,6 +168,6 @@ restrictions.
 
 **Note:** as of now, if something goes wrong during type checking (i.e. making
 sure that all function pointer replacements refer to functions in the symbol
-table that have the correct type), the error message will refer the command line
-option `--restrict-function-pointer` regardless of whether the restriction in
-question came from the command line or a file.
+table that have the correct type), the error message will refer to the command
+line option `--restrict-function-pointer` regardless of whether the restriction
+in question came from the command line or a file.

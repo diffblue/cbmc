@@ -1170,27 +1170,27 @@ struct pointee_address_equalt
 };
 
 template <typename GotoFunctionT, typename PredicateT, typename HandlerT>
-void for_each_goto_location_if(
+void for_each_instruction_if(
   GotoFunctionT &&goto_function,
   PredicateT predicate,
-  HandlerT handle)
+  HandlerT handler)
 {
   auto &&instructions = goto_function.body.instructions;
   for(auto it = instructions.begin(); it != instructions.end(); ++it)
   {
     if(predicate(it))
     {
-      handle(it);
+      handler(it);
     }
   }
 }
 
 template <typename GotoFunctionT, typename HandlerT>
-void for_each_goto_location(GotoFunctionT &&goto_function, HandlerT handle)
+void for_each_instruction(GotoFunctionT &&goto_function, HandlerT handler)
 {
   using iterator_t = decltype(goto_function.body.instructions.begin());
-  for_each_goto_location_if(
-    goto_function, [](const iterator_t &) { return true; }, handle);
+  for_each_instruction_if(
+    goto_function, [](const iterator_t &) { return true; }, handler);
 }
 
 #define forall_goto_program_instructions(it, program) \
