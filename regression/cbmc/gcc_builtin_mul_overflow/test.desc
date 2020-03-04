@@ -37,5 +37,14 @@ main.c
 \[check_unsigned_long_long.assertion.4\] line \d+ assertion result == lt_isqrt_of_unsigned_long_long_max \* lt_isqrt_of_unsigned_long_long_max: SUCCESS
 \[check_unsigned_long_long.assertion.5\] line \d+ assertion __builtin_umulll_overflow\( lt_isqrt_of_unsigned_long_long_max << 1, lt_isqrt_of_unsigned_long_long_max << 1, &result\): SUCCESS
 \[check_unsigned_long_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_generic.assertion.1\] line \d+ assertion __builtin_mul_overflow\(100, 100, &small_result\): SUCCESS
+\[check_generic.assertion.2\] line \d+ assertion !__builtin_mul_overflow\(100, 100, &big_result\): SUCCESS
+\[check_generic.assertion.3\] line \d+ assertion big_result == 10000: SUCCESS
+\[check_generic.assertion.4\] line \d+ assertion !__builtin_mul_overflow\(10, 10, &small_result\): SUCCESS
+\[check_generic.assertion.5\] line \d+ assertion small_result == 100: SUCCESS
+\[check_generic.assertion.6\] line \d+ assertion !__builtin_mul_overflow\(.*, .*, &big_result\): SUCCESS
+\[check_generic.assertion.7\] line \d+ assertion big_result == 4611686014132420609ll: SUCCESS
+\[check_generic.assertion.8\] line \d+ assertion __builtin_mul_overflow\(.* \* 2ll, .* \* 2ll, &big_result\): SUCCESS
+\[check_generic.assertion.9\] line \d+ assertion 0 && "reachability": FAILURE
 ^EXIT=10$
 ^SIGNAL=0$

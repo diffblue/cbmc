@@ -39,13 +39,24 @@ main.c
 \[check_unsigned_long.assertion.5\] line \d+ assertion __builtin_uaddl_overflow\(.* / 2 \+ 2, .* / 2 \+ 2, &result\): SUCCESS
 \[check_unsigned_long.assertion.6\] line \d+ assertion __builtin_uaddl_overflow\(one, .*, &result\): SUCCESS
 \[check_unsigned_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
-\[check_unsigned_long_long.assertion.1\] line \d+ assertion !__builtin_uaddl_overflow\(one, one, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.1\] line \d+ assertion !__builtin_uaddll_overflow\(one, one, &result\): SUCCESS
 \[check_unsigned_long_long.assertion.2\] line \d+ assertion result == 2ull: SUCCESS
 \[check_unsigned_long_long.assertion.3\] line \d+ assertion !__builtin_uaddll_overflow\(.* / 2, .* / 2, &result\): SUCCESS
 \[check_unsigned_long_long.assertion.4\] line \d+ assertion result \+ 1ull == .*: SUCCESS
 \[check_unsigned_long_long.assertion.5\] line \d+ assertion __builtin_uaddll_overflow\(.* / 2 \+ 2, .* / 2 \+ 2, &result\): SUCCESS
-\[check_unsigned_long_long.assertion.6\] line \d+ assertion __builtin_uaddl_overflow\(one, .*, &result\): SUCCESS
+\[check_unsigned_long_long.assertion.6\] line \d+ assertion __builtin_uaddll_overflow\(one, .*, &result\): SUCCESS
 \[check_unsigned_long_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_generic.assertion.1\] line \d+ assertion !__builtin_add_overflow\(17, 25, &small_result\): SUCCESS
+\[check_generic.assertion.2\] line \d+ assertion small_result == 42: SUCCESS
+\[check_generic.assertion.3\] line \d+ assertion !__builtin_add_overflow\(17, 25, &big_result\): SUCCESS
+\[check_generic.assertion.4\] line \d+ assertion big_result == 42ll: SUCCESS
+\[check_generic.assertion.5\] line \d+ assertion __builtin_add_overflow\(216, 129, &small_result\): SUCCESS
+\[check_generic.assertion.6\] line \d+ assertion !__builtin_add_overflow\(216, 129, &big_result\): SUCCESS
+\[check_generic.assertion.7\] line \d+ assertion big_result == 345: SUCCESS
+\[check_generic.assertion.8\] line \d+ assertion !__builtin_add_overflow\(.*, .*, &big_result\): SUCCESS
+\[check_generic.assertion.9\] line \d+ assertion big_result == 2ll \* .*: SUCCESS
+\[check_generic.assertion.10\] line \d+ assertion __builtin_add_overflow\(.* / 2 \+ 1, .*/ 2 \+ 1, &big_result\): SUCCESS
+\[check_generic.assertion.11\] line \d+ assertion 0 && "reachability": FAILURE
 VERIFICATION FAILED
 ^EXIT=10$
 ^SIGNAL=0$
