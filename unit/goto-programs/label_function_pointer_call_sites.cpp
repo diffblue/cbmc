@@ -40,7 +40,7 @@ TEST_CASE("Label function pointer call sites", "[core]")
     [](goto_programt::const_targett it) {
       static int call_count = 0;
 
-      switch (call_count)
+      switch(call_count)
       {
       case 0:
         // first call instruction
@@ -83,6 +83,5 @@ TEST_CASE("Label function pointer call sites", "[core]")
       }
 
       call_count++;
-    }
-  );
+    });
 }

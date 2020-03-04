@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: GOTO Program Utilities
+Module: Restrict function pointers
 
 Author: Diffblue Ltd.
 
@@ -35,7 +35,7 @@ Author: Diffblue Ltd.
   "):"                                                                         \
   "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT "):"
 
-#define RESTRICT_FUNCTION_POINTER_HELP                                         \
+#define HELP_RESTRICT_FUNCTION_POINTER                                         \
   "--" RESTRICT_FUNCTION_POINTER_OPT                                           \
   " <pointer_name>/<target[,targets]*>\n"                                      \
   "           restrict a function pointer to a set of possible targets\n"      \
@@ -44,18 +44,22 @@ Author: Diffblue Ltd.
   "           works for globals and function parameters right now\n"           \
   "--" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                 \
   " <file_name>\n"                                                             \
-  "           add from function pointer restrictions from file"
+  "           add function pointer restrictions from file"
 
 void parse_function_pointer_restriction_options_from_cmdline(
   const cmdlinet &cmdline,
   optionst &options);
 
+class jsont;
 class message_handlert;
-struct function_pointer_restrictionst
+
+class function_pointer_restrictionst
 {
+public:
   using restrictionst =
     std::unordered_map<irep_idt, std::unordered_set<irep_idt>>;
-  using value_type = restrictionst::value_type;
+  using restrictiont = restrictionst::value_type;
+
   const restrictionst restrictions;
 
   /// parse function pointer restrictions from command line
@@ -65,14 +69,32 @@ struct function_pointer_restrictionst
   static function_pointer_restrictionst
   from_options(const optionst &options, message_handlert &message_handler);
 
+  jsont to_json() const;
+  static function_pointer_restrictionst from_json(const jsont &json);
+
   static function_pointer_restrictionst read_from_file(
     const std::string &filename,
     message_handlert &message_handler);
 
   void write_to_file(const std::string &filename) const;
+
+protected:
+  static restrictionst merge_function_pointer_restrictions(
+    restrictionst lhs,
+    const restrictionst &rhs);
+
+  static restrictionst parse_function_pointer_restrictions_from_command_line(
+    const std::list<std::string> &restriction_opts);
+
+  static restrictionst parse_function_pointer_restrictions_from_file(
+    const std::list<std::string> &filenames,
+    message_handlert &message_handler);
+
+  static restrictiont
+  parse_function_pointer_restriction(const std::string &restriction_opt);
 };
 
-/// Apply a function pointer restrictions to a goto_model. Each restriction is a
+/// Apply function pointer restrictions to a goto_model. Each restriction is a
 /// mapping from a pointer name to a set of possible targets. Replace calls of
 /// these "restricted" pointers with a branch on the value of the function
 /// pointer, comparing it to the set of possible targets. This also adds an

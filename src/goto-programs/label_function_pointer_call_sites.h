@@ -21,9 +21,10 @@ Author: Diffblue Ltd.
 /// only need to be able to handle these two cases.
 ///
 /// It does this by replacing all CALL instructions to function pointers with an
-/// assignment to a function pointer variable with a name following the pattern
-/// [function_name].function_pointer_call.[N], where "N" is the nth call to a
-/// function pointer in the function "function_name".
+/// assignment to a new function pointer variable followed by a call to that new
+/// function pointer. The name of the introduced variable follows the pattern
+/// [function_name].function_pointer_call.[N], where N is the nth call to a
+/// function pointer in the function function_name.
 void label_function_pointer_call_sites(goto_modelt &goto_model);
 
 #endif // CPROVER_GOTO_PROGRAMS_LABEL_FUNCTION_POINTER_CALL_SITES_H
