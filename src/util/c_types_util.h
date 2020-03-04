@@ -80,7 +80,7 @@ inline bool is_c_enum_type(const typet &type)
 /// \param c_enum the enum type \p member_name is supposed to be part of.
 /// \return constant, that could be assigned as the value of an expression with
 ///   type c_enum.
-constant_exprt convert_member_name_to_enum_value(
+inline constant_exprt convert_member_name_to_enum_value(
   const irep_idt &member_name,
   const c_enum_typet &c_enum)
 {
@@ -100,7 +100,7 @@ constant_exprt convert_member_name_to_enum_value(
 /// Convert id to a Boolean value
 /// \param bool_value: A string that is compared to "true" ignoring case.
 /// \return a constant of type Boolean
-bool id2boolean(const std::string &bool_value)
+inline bool id2boolean(const std::string &bool_value)
 {
   std::string string_value = bool_value;
   std::transform(
@@ -117,7 +117,7 @@ bool id2boolean(const std::string &bool_value)
 /// \param bool_value: A Boolean value.
 /// \param type: The type, the resulting constant is supposed to have.
 /// \return a constant of type \param type with either 0 or 1 as value.
-constant_exprt from_c_boolean_value(bool bool_value, const typet &type)
+inline constant_exprt from_c_boolean_value(bool bool_value, const typet &type)
 {
   return bool_value ? from_integer(mp_integer(1), type)
                     : from_integer(mp_integer(0), type);
