@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "range.h"
 
+class structured_datat;
+
 class json_objectt;
 class json_arrayt;
 
@@ -464,5 +466,28 @@ inline const json_stringt &to_json_string(const jsont &json)
 }
 
 bool operator==(const jsont &left, const jsont &right);
+
+/// Convert the structured_datat into an json object. For example, the
+/// structured data:
+/// structured_datat data{
+///   {{labelt{{"my", "data"}},
+///      structured_data_entryt::entry(
+///        {{labelt{{"my", "number"}},
+///           structured_data_entryt::data_node(json_numbert("10"))},
+///         {labelt{{"my", "string"}},
+///           structured_data_entryt::data_node(json_stringt("hi"))}})}}};
+///
+/// Will produce:
+/// ```json
+/// {
+///   "myData": {
+///      "myNumber": 10
+///      "myString": "hi"
+///    }
+///  }
+/// ```
+/// \param data: The structured data to convert.
+/// \return The json object as specified.
+jsont to_json(const structured_datat &data);
 
 #endif // CPROVER_UTIL_JSON_H

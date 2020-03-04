@@ -12,9 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include "cmdline.h"
+#include "json.h"
 #include "json_irep.h"
 #include "json_stream.h"
 #include "make_unique.h"
+#include "xml.h"
 #include "xml_irep.h"
 
 ui_message_handlert::ui_message_handlert(
@@ -307,6 +309,21 @@ void ui_message_handlert::flush(unsigned level)
   case uit::XML_UI:
   case uit::JSON_UI:
     out << std::flush;
+    break;
+  }
+}
+void ui_message_handlert::print(unsigned level, const structured_datat &data)
+{
+  switch(get_ui())
+  {
+  case uit::PLAIN:
+    print(level, to_pretty(data));
+    break;
+  case uit::XML_UI:
+    print(level, to_xml(data));
+    break;
+  case uit::JSON_UI:
+    print(level, to_json(data));
     break;
   }
 }

@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "json.h"
 
+#include "structured_data.h"
+
 #include <algorithm>
 #include <ostream>
 
@@ -203,4 +205,32 @@ bool operator==(const jsont &left, const jsont &right)
   }
   }
   UNREACHABLE;
+}
+
+jsont json_node(const structured_data_entryt &entry)
+{
+  if(entry.is_leaf())
+    return entry.leaf_object();
+  else
+  {
+    json_objectt result;
+    for(const auto sub_entry : entry.children())
+    {
+      result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
+    }
+    return std::move(result);
+  }
+}
+
+jsont to_json(const structured_datat &data)
+{
+  if(data.data().size() == 0)
+    return jsont{};
+
+  json_objectt result;
+  for(const auto sub_entry : data.data())
+  {
+    result[sub_entry.first.camel_case()] = json_node(sub_entry.second);
+  }
+  return std::move(result);
 }

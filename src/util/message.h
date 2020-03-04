@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "deprecate.h"
 #include "invariant.h"
 #include "source_location.h"
+#include "structured_data.h"
 
 class json_objectt;
 class jsont;
@@ -35,6 +36,8 @@ public:
   virtual void print(unsigned level, const xmlt &xml) = 0;
 
   virtual void print(unsigned level, const jsont &json) = 0;
+
+  virtual void print(unsigned level, const structured_datat &data);
 
   virtual void print(
     unsigned level,
@@ -255,6 +258,17 @@ public:
     }
 
     mstreamt &operator<<(const json_objectt &data);
+
+    mstreamt &operator<<(const structured_datat &data)
+    {
+      if(this->tellp() > 0)
+        *this << eom; // force end of previous message
+      if(message.message_handler)
+      {
+        message.message_handler->print(message_level, data);
+      }
+      return *this;
+    }
 
     template <class T>
     mstreamt &operator << (const T &x)

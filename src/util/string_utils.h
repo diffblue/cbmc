@@ -18,6 +18,8 @@ Author: Daniel Poetzl
 
 std::string strip_string(const std::string &s);
 
+std::string capitalize(const std::string &str);
+
 /// Given a string s, split into a sequence of substrings when separated by
 /// specified delimiter.
 /// \param s: The string to split up

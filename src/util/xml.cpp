@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "exception_utils.h"
 #include "string2int.h"
+#include "structured_data.h"
 
 void xmlt::clear()
 {
@@ -247,4 +248,48 @@ std::string xmlt::unescape(const std::string &str)
   }
 
   return result;
+}
+bool operator==(const xmlt &a, const xmlt &b)
+{
+  return a.name == b.name && a.data == b.data && a.elements == b.elements &&
+         a.attributes == b.attributes;
+}
+bool operator!=(const xmlt &a, const xmlt &b)
+{
+  return !(a == b);
+}
+
+xmlt xml_node(const std::pair<labelt, structured_data_entryt> &entry)
+{
+  const labelt &label = entry.first;
+  const structured_data_entryt &data = entry.second;
+  xmlt output_data{label.kebab_case()};
+  if(data.is_leaf())
+  {
+    output_data.data = data.leaf_data();
+  }
+  else
+  {
+    const auto &children = data.children();
+    output_data.elements =
+      make_range(children).map(xml_node).collect<std::list<xmlt>>();
+  }
+  return output_data;
+}
+
+xmlt to_xml(const structured_datat &data)
+{
+  if(data.data().size() == 0)
+    return xmlt{};
+  if(data.data().size() == 1)
+  {
+    return xml_node(*data.data().begin());
+  }
+  else
+  {
+    xmlt root{"root"};
+    root.elements =
+      make_range(data.data()).map(xml_node).collect<std::list<xmlt>>();
+    return root;
+  }
 }

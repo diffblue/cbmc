@@ -137,27 +137,8 @@ bool symex_bmc_incremental_one_loopt::resume(
 }
 void symex_bmc_incremental_one_loopt::log_unwinding(unsigned unwind)
 {
-  const std::string unwind_num = std::to_string(unwind);
-  switch(output_ui)
-  {
-  case ui_message_handlert::uit::PLAIN:
-  {
-    log.statistics() << "Current unwinding: " << unwind_num << messaget::eom;
-    break;
-  }
-  case ui_message_handlert::uit::XML_UI:
-  {
-    xmlt xml("current-unwinding");
-    xml.data = unwind_num;
-    log.statistics() << xml << messaget::eom;
-    break;
-  }
-  case ui_message_handlert::uit::JSON_UI:
-  {
-    json_objectt json;
-    json["currentUnwinding"] = json_numbert(unwind_num);
-    log.statistics() << json << messaget::eom;
-    break;
-  }
-  }
+  structured_datat data{{{labelt({"current", "unwinding"}),
+                          structured_data_entryt::data_node(
+                            json_numbert{std::to_string(unwind)})}}};
+  log.statistics() << data;
 }

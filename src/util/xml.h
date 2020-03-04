@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <iosfwd>
 
+class structured_datat;
+
 class xmlt
 {
 public:
@@ -134,5 +136,30 @@ inline std::ostream &operator<<(
   xml.output(out);
   return out;
 }
+
+bool operator==(const xmlt &a, const xmlt &b);
+bool operator!=(const xmlt &a, const xmlt &b);
+
+/// Convert the structured_datat into an xml object. For example, the
+/// structured data:
+/// structured_datat data{
+///   {{labelt{{"my", "data"}},
+///      structured_data_entryt::entry(
+///        {{labelt{{"my", "number"}},
+///           structured_data_entryt::data_node(json_numbert("10"))},
+///         {labelt{{"my", "string"}},
+///           structured_data_entryt::data_node(json_stringt("hi"))}})}}};
+///
+/// Will produce:
+/// ```xml
+/// <my-data>
+///   <my-number>10</my-number>
+///   <my-string>hi</my-string>
+/// </my-data>
+/// ```
+///
+/// \param data: The structured data to convert.
+/// \return The XML object as specified.
+xmlt to_xml(const structured_datat &data);
 
 #endif // CPROVER_UTIL_XML_H
