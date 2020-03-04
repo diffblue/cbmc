@@ -207,9 +207,10 @@ all: $(CATCH_TEST)
 clean: testing-utils-clean
 
 test: $(CATCH_TEST)
-	if ! ./$(CATCH_TEST) -l | grep -q "^$(N_CATCH_TESTS) test cases" ; then \
-		./$(CATCH_TEST) -l ; fi
-	./$(CATCH_TEST)
+	# Include hidden tests by specifying "*,[.]" for tests to count
+	if ! ./$(CATCH_TEST) "*,[.]" -l | grep -q "^$(N_CATCH_TESTS) matching test cases" ; then \
+		./$(CATCH_TEST) "*,[.]" -l ; fi
+	./$(CATCH_TEST) ${TAGS}
 
 
 ###############################################################################

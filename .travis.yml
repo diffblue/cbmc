@@ -243,7 +243,7 @@ jobs:
         - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_USE_CUDD=true' -DCMAKE_CXX_FLAGS="-DBDD_GUARDS" '-DWITH_MEMORY_ANALYZER=On'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE -j2)
+      script: (cd build; ctest -V -L CORE -j2; ctest -V -R unit-xfail -j2)
 
     # cmake build using clang++-6
     - stage: Test different OS/CXX/Flags
@@ -280,7 +280,7 @@ jobs:
         - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-7' '-DCMAKE_CXX_FLAGS=-Qunused-arguments' '-DWITH_MEMORY_ANALYZER=On'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE -j2)
+      script: (cd build; ctest -V -L CORE -j2; ctest -V -R unit-xfail -j2)
 
     # cmake build on OSX, using default clang
     - stage: Test different OS/CXX/Flags
@@ -300,7 +300,7 @@ jobs:
         - cmake -S . -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE -j2)
+      script: (cd build; ctest -V -L CORE -j2; ctest -V -R unit-xfail -j2)
 
 
     # Run Coverity
@@ -355,9 +355,13 @@ script:
   - env PATH=$PATH:`pwd`/src/solvers UBSAN_OPTIONS=print_stacktrace=1 make -C regression/cbmc test-cprover-smt2
   - make -C unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
   - make -C unit test
+  - echo "Running expected failure tests"
+  - make TAGS="[!shouldfail]" -C unit test
   - env UBSAN_OPTIONS=print_stacktrace=1 make -C jbmc/regression test-parallel "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2 JOBS=2
   - make -C jbmc/unit "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j2
   - make -C jbmc/unit test
+  - echo "Running expected failure tests"
+  - make TAGS="[!shouldfail]" -C jbmc/unit test
 
 before_cache:
   - ccache -s

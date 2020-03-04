@@ -188,7 +188,7 @@ void validate_local_variable_lambda_assignment(
 SCENARIO(
   "Converting invokedynamic with a local lambda",
   "[core]"
-  "[lambdas][java_bytecode][java_bytecode_convert_method][!mayfail]")
+  "[lambdas][java_bytecode][java_bytecode_convert_method]" XFAIL)
 {
   // NOLINTNEXTLINE(whitespace/braces)
   run_test_with_compilers([](const std::string &compiler) {
@@ -380,7 +380,7 @@ void validate_member_variable_lambda_assignment(
 SCENARIO(
   "Converting invokedynamic with a member lambda",
   "[core]"
-  "[lamdba][java_bytecode][java_bytecode_convert_method][!mayfail]")
+  "[lamdba][java_bytecode][java_bytecode_convert_method]" XFAIL)
 {
   // NOLINTNEXTLINE(whitespace/braces)
   run_test_with_compilers([](const std::string &compiler) {
@@ -548,7 +548,7 @@ void validate_static_member_variable_lambda_assignment(
 SCENARIO(
   "Converting invokedynamic with a static member lambda",
   "[core]"
-  "[lamdba][java_bytecode][java_bytecode_convert_method][!mayfail]")
+  "[lamdba][java_bytecode][java_bytecode_convert_method]" XFAIL)
 {
   // NOLINTNEXTLINE(whitespace/braces)
   run_test_with_compilers([](const std::string &compiler) {

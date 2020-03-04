@@ -36,4 +36,7 @@ Author: Michael Tautschnig
 #include <util/pragma_pop.def>
 #endif
 
+/// Add to the end of test tags to mark a test that is expected to fail
+#define XFAIL "[.][!shouldfail]"
+
 #endif // CPROVER_TESTING_UTILS_USE_CATCH_H
