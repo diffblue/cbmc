@@ -130,6 +130,18 @@ access. If you add a branch to the example that requires that `argc>=3`,
 the bug is fixed and CBMC will report that the proofs of all properties
 have been successful.
 
+To simplify further processing of counterexample traces, CBMC supports XML as a
+possible output format.
+
+```
+    cbmc file1.c --trace --xml-ui
+```
+
+The specification of the XML trace output can be found here: [XML
+Specification](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/assets/xml_spec.tex)
+and can be build by `pdflatex -shell-escape xml_spec.tex`. Alternatively, you
+view it in Markdown [here](../../../assets/xml_spec).
+
 ### Verifying Modules
 
 In the example above, we used a program that starts with a `main`
