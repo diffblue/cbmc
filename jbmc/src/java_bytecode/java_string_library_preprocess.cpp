@@ -209,9 +209,43 @@ java_string_library_preprocesst::get_string_type_base_classes(
 void java_string_library_preprocesst::add_string_type(
   const irep_idt &class_name, symbol_tablet &symbol_table)
 {
-  java_class_typet string_type;
-  string_type.set_tag(class_name);
-  string_type.set_name("java::" + id2string(class_name));
+  irep_idt class_symbol_name = "java::" + id2string(class_name);
+  symbolt tmp_string_symbol;
+  tmp_string_symbol.name = class_symbol_name;
+  symbolt *string_symbol = nullptr;
+  bool already_exists = symbol_table.move(tmp_string_symbol, string_symbol);
+
+  if(already_exists)
+  {
+    // A library has already defined this type -- we'll replace its
+    // components with those required for internal string modelling, but
+    // otherwise leave it alone.
+    to_java_class_type(string_symbol->type).components().clear();
+  }
+  else
+  {
+    // No definition of this type exists -- define it as it usually occurs in
+    // the JDK:
+    java_class_typet new_string_type;
+    new_string_type.set_tag(class_name);
+    new_string_type.set_name(class_symbol_name);
+    new_string_type.set_access(ID_public);
+    new_string_type.add_base(struct_tag_typet("java::java.lang.Object"));
+
+    std::vector<irep_idt> bases = get_string_type_base_classes(class_name);
+    for(const irep_idt &base_name : bases)
+      new_string_type.add_base(
+        struct_tag_typet("java::" + id2string(base_name)));
+
+    string_symbol->base_name = id2string(class_name);
+    string_symbol->pretty_name = id2string(class_name);
+    string_symbol->type = new_string_type;
+    string_symbol->is_type = true;
+    string_symbol->mode = ID_java;
+  }
+
+  auto &string_type = to_java_class_type(string_symbol->type);
+
   string_type.components().resize(3);
   string_type.components()[0].set_name("@java.lang.Object");
   string_type.components()[0].set_pretty_name("@java.lang.Object");
@@ -223,22 +257,6 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components()[2].set_name("data");
   string_type.components()[2].set_pretty_name("data");
   string_type.components()[2].type() = pointer_type(java_char_type());
-  string_type.set_access(ID_public);
-  string_type.add_base(struct_tag_typet("java::java.lang.Object"));
-
-  std::vector<irep_idt> bases = get_string_type_base_classes(class_name);
-  for(const irep_idt &base_name : bases)
-    string_type.add_base(struct_tag_typet("java::" + id2string(base_name)));
-
-  symbolt tmp_string_symbol;
-  tmp_string_symbol.name="java::"+id2string(class_name);
-  symbolt *string_symbol=nullptr;
-  symbol_table.move(tmp_string_symbol, string_symbol);
-  string_symbol->base_name=id2string(class_name);
-  string_symbol->pretty_name=id2string(class_name);
-  string_symbol->type=string_type;
-  string_symbol->is_type=true;
-  string_symbol->mode = ID_java;
 }
 
 /// calls string_refine_preprocesst::process_operands with a list of parameters.

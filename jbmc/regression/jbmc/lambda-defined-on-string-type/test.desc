@@ -1,0 +1,13 @@
+CORE
+Test
+--function Test.testme --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+line 4 assertion at file Test\.java line 4 function java::Test\.testme:\(\)V bytecode-index 9: SUCCESS
+line 5 assertion at file Test\.java line 5 function java::Test\.testme:\(\)V bytecode-index 15: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This checks that a lambda functions work when defined on a string type (String, StringBuilder, StringBuffer,
+CharSequence, i.e. the types that the string solver may define or redefine)
+We use a dummy String type because the typical example in the wild, CharSequence.chars(), requires much
+more of the JDK than the tiny fragment present in jbmc's models library at present.
