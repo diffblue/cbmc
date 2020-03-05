@@ -59,7 +59,24 @@ if (use_smt_switch)
             URL_MD5 c3c40be8b1294017cd129b9a3d99ff30
     )
     add_subdirectory(${smt-switch_SOURCE_DIR})
+    target_compile_features(smt-switch PRIVATE cxx_std_17)
     add_compile_options(-DHAVE_SMT_SWITCH)
+
+    if (BUILD_CVC4)
+        add_custom_target(obtain-switch-cvc4
+                COMMAND ./contrib/setup-cvc4.sh -y WORKING_DIRECTORY ${smt-switch_SOURCE_DIR})
+
+        add_dependencies(smt-switch-cvc4 obtain-switch-cvc4)
+    else()
+        message(WARNING "No smt-switch backend selected, add -DBUILD_CVC4=ON to enable CVC4 backend")
+    endif ()
+
+    if (BUILD_BTOR)
+        message(SEND_ERROR "Using the boolector smt-switch backend is not supported")
+    endif ()
+    if (BUILD_MSAT)
+        message(SEND_ERROR "Using the MSat smt-switch backend is not supported")
+    endif ()
 endif ()
 
 if(DEFINED CMAKE_USE_CUDD)
