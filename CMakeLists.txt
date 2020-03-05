@@ -59,6 +59,7 @@ if (use_smt_switch)
             URL_MD5 c3c40be8b1294017cd129b9a3d99ff30
     )
     add_subdirectory(${smt-switch_SOURCE_DIR})
+    add_compile_options(-DHAVE_SMT_SWITCH)
 endif ()
 
 if(DEFINED CMAKE_USE_CUDD)
