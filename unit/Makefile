@@ -66,6 +66,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
+       solvers/smt_switch.cpp \
        util/allocate_objects.cpp \
        util/cmdline.cpp \
        util/dense_integer_map.cpp \

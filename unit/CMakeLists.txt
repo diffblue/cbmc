@@ -60,6 +60,14 @@ target_link_libraries(
         statement-list
 )
 
+if (use_smt_switch)
+    target_link_libraries(
+            unit
+            smt-switch
+            smt-switch-cvc4
+    )
+endif ()
+
 add_test(
     NAME unit
     COMMAND $<TARGET_FILE:unit>
