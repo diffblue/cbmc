@@ -357,7 +357,7 @@ __CPROVER_HIDE:;
 
 inline int strcmp(const char *s1, const char *s2)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_precondition(__CPROVER_is_zero_string(s1),
@@ -406,7 +406,7 @@ inline int strcmp(const char *s1, const char *s2)
 
 inline int strcasecmp(const char *s1, const char *s2)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_precondition(__CPROVER_is_zero_string(s1),
@@ -458,7 +458,7 @@ inline int strcasecmp(const char *s1, const char *s2)
 
 inline int strncmp(const char *s1, const char *s2, size_t n)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_is_zero_string(s1) ||
                          __CPROVER_buffer_size(s1)>=n,
@@ -505,7 +505,7 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
 
 inline int strncasecmp(const char *s1, const char *s2, size_t n)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_precondition(__CPROVER_is_zero_string(s1),
