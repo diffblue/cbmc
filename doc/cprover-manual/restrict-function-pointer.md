@@ -2,11 +2,17 @@
 
 ## Restricting function pointers
 
+In this document, we describe the `goto-instrument` feature to replace calls
+through function pointers by case distinctions over calls to given sets of
+functions.
+
 ### Motivation
 
-CBMC comes with a way to resolve calls to function pointers to direct function
-calls. This is needed because symbolic execution itself can't handle calls to
-function pointers. In practice, this looks something like this:
+The CPROVER framework includes a goto program transformation pass
+`remove_function_pointers()` to resolve calls to function pointers to direct
+function calls. The pass is needed by `cbmc`, as symbolic execution itself can't
+handle calls to function pointers. In practice, the transformation pass works as
+follows:
 
 Given that there are functions with these signatures available in the program:
 
@@ -53,15 +59,16 @@ functions matching a particular signature, or if some of these functions are
 expensive in symex (e.g. functions with lots of loops or recursion), then this
 can be a bit cumbersome - especially if we, as a user, already know that a
 particular function pointer will only resolve to a single function or a small
-set of functions. This is what the `--restrict-function-pointer` option allows.
+set of functions. The `goto-instrument` option `--restrict-function-pointer`
+allows to manually specify this set of functions.
 
 ### Example
 
-Take the motivating example. Let us assume that we know for a fact that `call`
-will always receive pointers to either `f` or `g` during actual executions of
-the program, and symbolic execution for `h` is too expensive to simply ignore
-the cost of its branch. For this, we will label the places in each function
-where function pointers are being called, to this pattern:
+Take the motivating example above. Let us assume that we know for a fact that
+`call` will always receive pointers to either `f` or `g` during actual
+executions of the program, and symbolic execution for `h` is too expensive to
+simply ignore the cost of its branch. For this, we will label the places in each
+function where function pointers are being called, to this pattern:
 
 ```
 <function-name>.function_pointer_call.<N>
@@ -70,14 +77,14 @@ where function pointers are being called, to this pattern:
 where `N` is referring to which function call it is - so the first call to a
 function pointer in a function will have `N=1`, the 5th `N=5` etc.
 
-We can call `cbmc` with `--restrict-function-pointer
-call.function_pointer_call.1/f,g`. This can be read as
+We can call `goto-instrument --restrict-function-pointer
+call.function_pointer_call.1/f,g in.gb out.gb`. This can be read as
 
 > For the first call to a function pointer in the function `call`, assume that
 > it can only be a call to `f` or `g`
 
-The resulting code looks similar to the original example, except now there will
-not be a call to `h`:
+The resulting output (written to goto binary `out.gb`) looks similar to the
+original example, except now there will not be a call to `h`:
 
 ```
 void call(fptr_t fptr) {
