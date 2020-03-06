@@ -26,6 +26,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "letify.h"
 
+// TODO: Make conditional
+#include <smt.h>
+
 class typecast_exprt;
 class constant_exprt;
 class index_exprt;
@@ -43,7 +46,8 @@ public:
     CVC4,
     MATHSAT,
     YICES,
-    Z3
+    Z3,
+    SMT_SWITCH
   };
 
   smt2_convt(
@@ -83,6 +87,8 @@ protected:
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
+  // SMT-switch solver interface
+  smt::AbsSmtSolver *switch_solver;
 
   std::vector<exprt> assumptions;
   boolbv_widtht boolbv_width;

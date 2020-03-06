@@ -30,6 +30,7 @@ std::string smt2_dect::decision_procedure_text() const
      solver==solvert::MATHSAT?"MathSAT":
      solver==solvert::YICES?"Yices":
      solver==solvert::Z3?"Z3":
+     solver==solvert::SMT_SWITCH?"SMT-Switch":
      "(unknown)");
   // clang-format on
 }
@@ -114,6 +115,11 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
   case solvert::GENERIC:
+    UNREACHABLE;
+
+  // Since we are not invoking SMT-switch directly, this shouldn't
+  // be needed. TODO
+  case solvert::SMT_SWITCH:
     UNREACHABLE;
   }
 

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/fixedbv.h>
 #include <util/format_expr.h>
+#include <util/make_unique.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
@@ -33,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/floatbv/float_bv.h>
 #include <solvers/lowering/expr_lowering.h>
 #include <solvers/prop/literal_expr.h>
+#include <solvers/smt2/smt2_ifile.h>
 
 // Mark different kinds of error conditions
 
@@ -97,6 +99,12 @@ smt2_convt::smt2_convt(
     emit_set_logic = false;
     use_datatypes = true;
     break;
+
+  // TODO: Eventually, this should take over.
+  case solvert::SMT_SWITCH:
+    // switch_solver = util_make_unique<smt2_ifilet>(smt2_ifilet(out));
+    switch_solver = new smt2_ifilet(out);
+    break;
   }
 
   write_header();
@@ -138,6 +146,7 @@ void smt2_convt::write_header()
   {
   // clang-format off
   case solvert::GENERIC: break;
+  case solvert::SMT_SWITCH: break;
   case solvert::BOOLECTOR: out << "; Generated for Boolector\n"; break;
   case solvert::CPROVER_SMT2:
     out << "; Generated for the CPROVER SMT2 solver\n"; break;
@@ -182,9 +191,14 @@ void smt2_convt::write_footer(std::ostream &os)
   for(const auto &object : object_sizes)
     define_object_size(object.second, object.first);
 
-  os << "(check-sat)"
-     << "\n";
-  os << "\n";
+  if(solver == solvert::SMT_SWITCH) {
+    switch_solver->check_sat();
+  } else {
+    os << "(check-sat)"
+       << "\n";
+    os << "\n";    
+  }
+
 
   if(solver!=solvert::BOOLECTOR)
   {

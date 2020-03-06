@@ -446,6 +446,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("smt2", true);
   }
 
+  if (cmdline.isset("smt-switch"))
+  {
+    options.set_option("smt-switch", true), solver_set=true;
+    options.set_option("smt2", true);
+  }
+
   if(cmdline.isset("smt2") && !solver_set)
   {
     if(cmdline.isset("outfile"))
@@ -1091,6 +1097,7 @@ void cbmc_parse_optionst::help()
     " --mathsat                    use MathSAT\n"
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
+    " --smt-switch                 use smt-switch library\n"
     " --refine                     use refinement procedure (experimental)\n"
     HELP_STRING_REFINEMENT_CBMC
     " --outfile filename           output formula to given file\n"

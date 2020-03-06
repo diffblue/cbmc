@@ -110,6 +110,8 @@ else()
     target_link_libraries(solvers util)
 endif()
 
+target_link_libraries(solvers smt-switch)
+
 # Executable
 add_executable(smt2_solver smt2/smt2_solver.cpp)
 target_link_libraries(smt2_solver solvers)

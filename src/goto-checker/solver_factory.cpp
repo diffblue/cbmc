@@ -165,6 +165,8 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
     s = smt2_dect::solvert::Z3;
   else if(options.get_bool_option("generic"))
     s = smt2_dect::solvert::GENERIC;
+  else if(options.get_bool_option("smt-switch"))
+    s = smt2_dect::solvert::SMT_SWITCH;
 
   return s;
 }

@@ -52,7 +52,7 @@ class optionst;
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \
-  "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
+  "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)(smt-switch)" \
   "(cprover-smt2)" \
   "(no-sat-preprocessor)" \
   "(beautify)" \
