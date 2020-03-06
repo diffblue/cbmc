@@ -233,23 +233,21 @@ void file_rename(const std::string &old_path, const std::string &new_path)
       MoveFileW(widen(old_path).c_str(), widen(new_path).c_str());
 
     if(MoveFile_result == 0)
-      throw system_exceptiont("MoveFile failed");
+      throw system_exceptiont("MoveFileW failed");
   }
   else
   {
-    // C++17 requires this to be atomic, which is delivered by
-    // ReplaceFile(). MoveFile() or rename() do not guarantee this.
+    // C++17 requires this to be atomic.
+    // MoveFile, MoveFileEx() or rename() do not guarantee this.
     // Any existing file at new_path is to be overwritten.
-    auto ReplaceFile_result = ReplaceFileW(
-      widen(new_path).c_str(), // note the ordering
+    // rename() does not do so on Windows.
+    auto MoveFileEx_result = MoveFileExW(
       widen(old_path).c_str(),
-      nullptr,  // lpBackupFileName
-      0,        // dwReplaceFlags
-      nullptr,  // lpExclude
-      nullptr); // lpReserved
+      widen(new_path).c_str(),
+      MOVEFILE_REPLACE_EXISTING); // flags
 
-    if(ReplaceFile_result == 0)
-      throw system_exceptiont("ReplaceFile failed");
+    if(MoveFileEx_result == 0)
+      throw system_exceptiont("MoveFileExW failed");
   }
 #else
   int rename_result = rename(old_path.c_str(), new_path.c_str());
