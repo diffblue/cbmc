@@ -26,7 +26,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
     #   Enable lots of warnings
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wswitch-enum")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # This would be the place to enable warnings for Windows builds, although
     # config.inc doesn't seem to do that currently
@@ -135,6 +134,12 @@ function(cprover_default_properties)
     set(CBMC_CXX_STANDARD_REQUIRED true)
     set(CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY
             "Developer ID Application: Daniel Kroening")
+
+    foreach (target IN LISTS ARGN)
+        message(${target})
+        target_compile_options(${target} PRIVATE -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wswitch-enum)
+    endforeach ()
+
 
     set_target_properties(
       ${ARGN}
