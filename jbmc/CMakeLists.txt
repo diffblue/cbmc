@@ -10,7 +10,6 @@ add_custom_target(java-models-library ALL
 
 cprover_default_properties(
     java_bytecode
-    java-models-library
     jbmc
     jbmc-lib
     janalyzer
