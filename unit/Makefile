@@ -23,6 +23,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
+       get_goto_model_from_c_test.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-programs/goto_model_function_type_consistency.cpp \
