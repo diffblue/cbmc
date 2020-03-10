@@ -1,0 +1,32 @@
+version: 0.2
+
+env:
+  variables:
+    # CodeBuild console doesn't display color codes correctly
+    TESTPL_COLOR_OUTPUT: 0
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
+      - apt-get update -y
+      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq cmake clang-7 libgmp3-dev
+  build:
+    commands:
+      - echo Build started on `date`
+      - cmake -S . -Bbuild '-Duse_smt_switch=ON' '-DBUILD_CVC4=ON' '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-7' '-DCMAKE_CXX_FLAGS=-Qunused-arguments -std=c++17'
+      - git submodule update --init --recursive
+      - cmake --build build -- -j2
+  post_build:
+    commands:
+      # we only run unit tests for now - as these are the only users of SMT Switch
+      - cd build; ctest -V -R unit CORE -j2
+      - cd build; ctest -V -R unit-xfail -j2
+      - echo Build completed on `date`
+cache:
+  paths:
+    - '/var/cache/apt/**/*'
+    - '/var/lib/apt/lists/**/*'
+    - '/root/.ccache/**/*'
