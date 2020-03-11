@@ -81,10 +81,10 @@ void variable_sensitivity_domaint::transform(
     {
       // TODO : check return values
       const code_assignt &inst = to_code_assign(instruction.code);
-
-      const abstract_objectt::locationst write_location={ from };
-      abstract_object_pointert rhs =abstract_state.eval(inst.rhs(), ns)
-        ->update_location_context(write_location, true);
+      const abstract_objectt::locationst write_location = {from};
+      abstract_object_pointert rhs =
+        abstract_state.eval(inst.rhs(), ns)
+          ->update_location_context(write_location, true);
       abstract_state.assign(inst.lhs(), rhs, ns);
     }
     break;
