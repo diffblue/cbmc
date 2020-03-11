@@ -339,3 +339,21 @@ compilation flag:
     cmake -S . -Bbuild -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
     ```
     and then `cmake --build build`
+
+## Use SMT-Switch interface
+
+CBMC can be compiled with the [smt-switch](https://github.com/makaimann/smt-switch) library. Currently this is unused - but will be used to use different SMT back-ends when solving.
+
+This requires CMake and C++17 support.
+
+To enable compiling, specify the following CMake flags:
+
+```
+-Duse_smt_switch=ON -DBUILD_CVC4=ON
+```
+
+Currently on the CVC4 back-end can be configured this way.
+
+_Note: on first run after cleaning build directory, this will take a while_.
+
+See [SMT Switch documentation](doc/smt-switch.md) for more details on how this can be used in code.
