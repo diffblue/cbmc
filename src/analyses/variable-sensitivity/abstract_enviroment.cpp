@@ -247,6 +247,7 @@ bool abstract_environmentt::assign(
 
     if(final_value != lhs_value)
     {
+      CHECK_RETURN(!symbol_expr.get_identifier().empty());
       map.insert_or_replace(symbol_expr.get_identifier(), final_value);
     }
   }
@@ -402,7 +403,7 @@ Function: abstract_environmentt::abstract_object_factory
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet &type, const namespacet &ns, bool top, bool bottom) const
 {
-  exprt empty_constant_expr=exprt();
+  exprt empty_constant_expr = nil_exprt();
   return abstract_object_factory(
     type, top, bottom, empty_constant_expr, *this, ns);
 }
@@ -732,7 +733,10 @@ abstract_environmentt::modified_symbols(
     if (second_entry.has_value())
     {
       if(second_entry.value().get()->has_been_modified(entry.second))
+      {
+        CHECK_RETURN(!entry.first.empty());
         symbols_diff.push_back(entry.first);
+      }
     }
   }
 
@@ -742,6 +746,7 @@ abstract_environmentt::modified_symbols(
     const auto &second_entry = first.map.find(entry.first);
     if (!second_entry.has_value())
     {
+      CHECK_RETURN(!entry.first.empty());
       symbols_diff.push_back(entry.first);
     }
   }
