@@ -16,6 +16,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
+       get_goto_model_from_c_test.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
