@@ -51,6 +51,7 @@ SRC = ai.cpp \
       variable-sensitivity/write_stack.cpp \
       variable-sensitivity/write_stack_entry.cpp \
       variable-sensitivity/data_dependency_context.cpp \
+      variable-sensitivity/value_set_abstract_object.cpp \
       variable-sensitivity/variable_sensitivity_dependence_graph.cpp \
       variable-sensitivity/interval_abstract_value.cpp \
 			variable-sensitivity/interval_array_abstract_object.cpp \

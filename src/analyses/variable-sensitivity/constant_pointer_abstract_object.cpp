@@ -238,13 +238,27 @@ void constant_pointer_abstract_objectt::output(
     const exprt &value=value_stack.to_expression();
     if(value.id()==ID_address_of)
     {
-      const address_of_exprt &address_expr(to_address_of_expr(value));
-      if(address_expr.object().id()==ID_symbol)
+      const auto &addressee = to_address_of_expr(value).object();
+      if(addressee.id() == ID_symbol)
       {
-        const symbol_exprt &symbol_pointed_to(
-          to_symbol_expr(address_expr.object()));
+        const symbol_exprt &symbol_pointed_to(to_symbol_expr(addressee));
 
         out << symbol_pointed_to.get_identifier();
+      }
+      else if(addressee.id() == ID_index)
+      {
+        auto const &array_index = to_index_expr(addressee);
+        auto const &array = array_index.array();
+        if(array.id() == ID_symbol)
+        {
+          auto const &array_symbol = to_symbol_expr(array);
+          out << array_symbol.get_identifier() << "[";
+          if(array_index.index().id() == ID_constant)
+            out << to_constant_expr(array_index.index()).get_value();
+          else
+            out << "?";
+          out << "]";
+        }
       }
     }
 

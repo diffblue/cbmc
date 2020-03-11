@@ -14,6 +14,7 @@
 
 #include "abstract_enviroment.h"
 
+#include "context_abstract_object.h"
 #include "interval_abstract_value.h"
 
 static inline exprt look_through_casts(exprt e)
@@ -231,9 +232,31 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
 
       if(constant_interval_exprt::is_int(op->type()))
       {
-        const auto ivop = environment.abstract_object_factory(op->type(), op->to_constant(), ns);
-        iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(ivop);
+        const auto op_as_constant = op->to_constant();
+        if(op_as_constant.is_nil())
+        {
+          auto top_object =
+            environment.abstract_object_factory(expr.type(), ns, true);
+          auto top_context_object =
+            std::dynamic_pointer_cast<const context_abstract_objectt>(
+              top_object);
+          CHECK_RETURN(top_context_object);
+          return top_context_object->get_child();
+        }
+        const auto ivop =
+          environment.abstract_object_factory(op->type(), op_as_constant, ns);
+        const auto ivop_context =
+          std::dynamic_pointer_cast<const context_abstract_objectt>(ivop);
+        if(ivop_context)
+        {
+          iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(
+            ivop_context->get_child());
+        }
+        else
+          iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(ivop);
       }
+      CHECK_RETURN(
+        !std::dynamic_pointer_cast<const context_abstract_objectt>(iav));
 
       if(!iav)
       {
