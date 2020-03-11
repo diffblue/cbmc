@@ -140,8 +140,8 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
     solver->addClause_(c);
 
-    if(solver_hardness.has_value())
-      solver_hardness->register_clause(bv);
+    with_solver_hardness(
+      [&bv](solver_hardnesst &hardness) { hardness.register_clause(bv); });
     clause_counter++;
   }
   catch(const Minisat::OutOfMemoryException &)
@@ -331,12 +331,6 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
       assumptions.push_back(assumption);
     }
   }
-}
-
-template <typename T>
-void satcheck_minisat2_baset<T>::enable_hardness_collection()
-{
-  solver_hardness = solver_hardnesst{};
 }
 
 satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert(

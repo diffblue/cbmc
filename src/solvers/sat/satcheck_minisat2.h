@@ -64,15 +64,18 @@ public:
     time_limit_seconds=lim;
   }
 
-  bool is_hardness_collection_enabled() const override
+  void
+  with_solver_hardness(std::function<void(solver_hardnesst &)> handler) override
   {
-    return solver_hardness.has_value();
+    if(solver_hardness.has_value())
+    {
+      handler(solver_hardness.value());
+    }
   }
-  void enable_hardness_collection() override;
-  solver_hardnesst &get_solver_hardness() override
+
+  void enable_hardness_collection() override
   {
-    PRECONDITION(solver_hardness.has_value());
-    return *solver_hardness;
+    solver_hardness = solver_hardnesst{};
   }
 
 protected:

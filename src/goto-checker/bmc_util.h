@@ -35,9 +35,9 @@ struct trace_optionst;
 class ui_message_handlert;
 
 void convert_symex_target_equation(
-  symex_target_equationt &,
-  goto_symex_property_decidert &,
-  message_handlert &);
+  symex_target_equationt &equation,
+  decision_proceduret &decision_procedure,
+  message_handlert &message_handler);
 
 /// Returns a function that checks whether an SSA step is an assertion
 /// with \p property_id. Usually used for `build_goto_trace`.

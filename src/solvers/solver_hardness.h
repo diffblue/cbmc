@@ -47,68 +47,23 @@ struct solver_hardnesst
   // and the number of distinct variables that were used in all clauses.
   struct sat_hardnesst
   {
-    size_t clauses;
-    size_t literals;
-    std::unordered_set<size_t> variables;
+    size_t clauses = 0;
+    size_t literals = 0;
+    std::unordered_set<size_t> variables = {};
 
-    sat_hardnesst() : clauses(0), literals(0)
-    {
-    }
-
-    bool empty() const
-    {
-      return clauses == 0;
-    }
-
-    void clear()
-    {
-      clauses = 0;
-      literals = 0;
-      variables.clear();
-    }
+    sat_hardnesst &operator+=(const sat_hardnesst &other);
   };
 
   // Associate an SSA step expression (the one passed to the solver: the guard
   // for GOTO; equality for ASSIGN, etc.) with the SAT hardness of the resulting
   // query. The GOTO and source level instructions are stored as \ref
   // goto_programt::const_targett.
-  struct hardness_statst
+  struct hardness_ssa_keyt
   {
-    sat_hardnesst sat_hardness;
     std::string ssa_expression;
     goto_programt::const_targett pc;
 
-    hardness_statst() : sat_hardness{}, ssa_expression{""}
-    {
-    }
-
-    bool empty() const
-    {
-      return ssa_expression.empty();
-    }
-    void clear()
-    {
-      sat_hardness.clear();
-      ssa_expression = "";
-    }
-
-    bool operator==(const hardness_statst &other) const
-    {
-      if(ssa_expression != other.ssa_expression)
-        return false;
-      return pc->source_location.as_string() ==
-             other.pc->source_location.as_string();
-    }
-  };
-
-  struct hardness_stats_hashert
-  {
-    std::size_t operator()(const hardness_statst &hashed_stats) const
-    {
-      return std::hash<std::string>{}(
-        hashed_stats.ssa_expression +
-        hashed_stats.pc->source_location.as_string());
-    }
+    bool operator==(const hardness_ssa_keyt &other) const;
   };
 
   // As above but for the special case of multiple assertions, which are
@@ -120,14 +75,7 @@ struct solver_hardnesst
     std::string ssa_expression;
     std::vector<goto_programt::const_targett> pcs;
 
-    assertion_statst() : sat_hardness{}, ssa_expression{""}
-    {
-    }
-
-    bool empty() const
-    {
-      return pcs.empty();
-    }
+    bool empty() const;
   };
 
   /// Called from the `symtex_target_equationt::convert_*`, this function
@@ -141,6 +89,8 @@ struct solver_hardnesst
     const exprt ssa_expression,
     goto_programt::const_targett pc);
 
+  void register_ssa_size(std::size_t size);
+
   /// Called from the `symtex_target_equationt::convert_assertions`, this
   ///   function associates the disjunction of assertions to all the solver
   ///   queries collected since the last call.
@@ -153,49 +103,55 @@ struct solver_hardnesst
     const std::vector<goto_programt::const_targett> &pcs);
 
   /// Called e.g. from the `satcheck_minisat2::lcnf`, this function adds the
-  ///   complexity statistics from the last SAT query to the `current_stats`.
+  ///   complexity statistics from the last SAT query to the `current_ssa_key`.
   /// \param bv: the clause (vector of literals)
   void register_clause(const bvt &bv);
+
+  void set_outfile(const std::string &file_name);
 
   /// Print the statistics to a JSON file (specified via command-line option).
   void produce_report();
 
-  void set_outfile(const std::string &file_name)
-  {
-    outfile = file_name;
-  }
+  solver_hardnesst() = default;
 
-  void register_ssa_size(std::size_t size);
+  // copying this isn’t really a meaningful operation
+  solver_hardnesst(const solver_hardnesst &) = delete;
+  solver_hardnesst(solver_hardnesst &&) = default;
 
-  bool were_assertion_steps_registered() const
-  {
-    return !assertion_stats.empty();
-  }
+  // copying this isn’t really a meaningful operation
+  solver_hardnesst &operator=(const solver_hardnesst &) = delete;
+  solver_hardnesst &operator=(solver_hardnesst &&) = default;
 
-  solver_hardnesst() : outfile{""}, max_ssa_set_size(0)
-  {
-  }
-
-  solver_hardnesst(const solver_hardnesst &other)
-  {
-    // we only allow copying the statistics before initialization
-    PRECONDITION(other.hardness_stats.empty());
-    outfile = "";
-    max_ssa_set_size = 0;
-  }
-
+private:
   // A minor modification of \ref goto_programt::output_instruction
   static std::string goto_instruction2string(goto_programt::const_targett pc);
 
   static std::string expr2string(const exprt expr);
 
-private:
   std::string outfile;
-  std::vector<std::unordered_set<hardness_statst, hardness_stats_hashert>>
+  std::vector<std::unordered_map<hardness_ssa_keyt, sat_hardnesst>>
     hardness_stats;
-  hardness_statst current_stats;
+  hardness_ssa_keyt current_ssa_key;
+  sat_hardnesst current_hardness;
   assertion_statst assertion_stats;
   std::size_t max_ssa_set_size;
 };
+
+// NOLINTNEXTLINE(readability/namespace)
+namespace std
+{
+template <>
+// NOLINTNEXTLINE(readability/identifiers)
+struct hash<solver_hardnesst::hardness_ssa_keyt>
+{
+  std::size_t
+  operator()(const solver_hardnesst::hardness_ssa_keyt &hashed_stats) const
+  {
+    return std::hash<std::string>{}(
+      hashed_stats.ssa_expression +
+      hashed_stats.pc->source_location.as_string());
+  }
+};
+} // namespace std
 
 #endif // CPROVER_SOLVERS_SOLVER_HARDNESS_H

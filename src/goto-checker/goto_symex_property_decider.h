@@ -44,9 +44,6 @@ public:
   /// Calls solve() on the solver instance
   decision_proceduret::resultt solve();
 
-  /// Returns the prop
-  propt &get_prop() const;
-
   /// Returns the solver instance
   decision_proceduret &get_decision_procedure() const;
 
@@ -68,7 +65,6 @@ public:
     std::unordered_set<irep_idt> &updated_properties,
     decision_proceduret::resultt dec_result,
     bool set_pass = true) const;
-
 protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;

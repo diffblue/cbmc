@@ -20,13 +20,27 @@ Author: Diffblue Ltd.
 #include <util/json_stream.h>
 #include <util/string2int.h>
 
-void solver_hardnesst::register_ssa_size(std::size_t size)
+solver_hardnesst::sat_hardnesst &solver_hardnesst::sat_hardnesst::
+operator+=(const solver_hardnesst::sat_hardnesst &other)
 {
-  // do not shrink
-  if(size <= hardness_stats.size())
-    return;
+  clauses += other.clauses;
+  literals += other.literals;
+  variables.insert(other.variables.begin(), other.variables.end());
+  return *this;
+}
 
-  hardness_stats.resize(size);
+bool solver_hardnesst::hardness_ssa_keyt::
+operator==(const solver_hardnesst::hardness_ssa_keyt &other) const
+{
+  if(ssa_expression != other.ssa_expression)
+    return false;
+  return pc->source_location.as_string() ==
+         other.pc->source_location.as_string();
+}
+
+bool solver_hardnesst::assertion_statst::empty() const
+{
+  return pcs.empty();
 }
 
 void solver_hardnesst::register_ssa(
@@ -36,12 +50,27 @@ void solver_hardnesst::register_ssa(
 {
   PRECONDITION(ssa_index < hardness_stats.size());
 
-  current_stats.ssa_expression = expr2string(ssa_expression);
-  current_stats.pc = pc;
-  hardness_stats[ssa_index].insert(current_stats);
+  current_ssa_key.ssa_expression = expr2string(ssa_expression);
+  current_ssa_key.pc = pc;
+  auto pre_existing =
+    hardness_stats[ssa_index].insert({current_ssa_key, current_hardness});
+  if(!pre_existing.second)
+  { // there already was an element with the same key
+    pre_existing.first->second += current_hardness;
+  }
   if(hardness_stats[ssa_index].size() > max_ssa_set_size)
     max_ssa_set_size = hardness_stats[ssa_index].size();
-  current_stats.clear();
+  current_ssa_key = {};
+  current_hardness = {};
+}
+
+void solver_hardnesst::register_ssa_size(std::size_t size)
+{
+  // do not shrink
+  if(size <= hardness_stats.size())
+    return;
+
+  hardness_stats.resize(size);
 }
 
 void solver_hardnesst::register_assertion_ssas(
@@ -51,21 +80,26 @@ void solver_hardnesst::register_assertion_ssas(
   if(assertion_stats.empty())
     return;
 
-  assertion_stats.sat_hardness = current_stats.sat_hardness;
+  assertion_stats.sat_hardness = current_hardness;
   assertion_stats.ssa_expression = expr2string(ssa_expression);
   assertion_stats.pcs = pcs;
-  current_stats.clear();
+  current_ssa_key = {};
+  current_hardness = {};
 }
 
 void solver_hardnesst::register_clause(const bvt &bv)
 {
-  auto &current_hardness = current_stats.sat_hardness;
   current_hardness.clauses++;
   current_hardness.literals += bv.size();
   for(const auto &literal : bv)
   {
     current_hardness.variables.insert(literal.var_no());
   }
+}
+
+void solver_hardnesst::set_outfile(const std::string &file_name)
+{
+  outfile = file_name;
 }
 
 void solver_hardnesst::produce_report()
@@ -87,17 +121,19 @@ void solver_hardnesst::produce_report()
 
   for(std::size_t i = 0; i < hardness_stats.size(); i++)
   {
-    const auto &ssa_set = hardness_stats[i];
-    if(ssa_set.empty())
+    const auto &ssa_step_hardness = hardness_stats[i];
+    if(ssa_step_hardness.empty())
       continue;
 
     std::size_t j = 0;
-    for(const auto &stat : ssa_set)
+    for(const auto &key_value_pair : ssa_step_hardness)
     {
+      auto const &ssa = key_value_pair.first;
+      auto const &hardness = key_value_pair.second;
       auto hardness_stats_json = json_objectt{};
-      hardness_stats_json["SSA_expr"] = json_stringt{stat.ssa_expression};
+      hardness_stats_json["SSA_expr"] = json_stringt{ssa.ssa_expression};
       hardness_stats_json["GOTO"] =
-        json_stringt{goto_instruction2string(stat.pc)};
+        json_stringt{goto_instruction2string(ssa.pc)};
 
       // It might be desirable to collect all SAT hardness statistics pertaining
       // to a particular GOTO instruction, since there may be a number of SSA
@@ -105,15 +141,15 @@ void solver_hardnesst::produce_report()
       // identifier for each one.
       hardness_stats_json["GOTO_ID"] =
         json_numbert{std::to_string((i << ssa_set_bit_offset) + j)};
-      hardness_stats_json["Source"] = json(stat.pc->source_location);
+      hardness_stats_json["Source"] = json(ssa.pc->source_location);
 
       auto sat_hardness_json = json_objectt{};
       sat_hardness_json["Clauses"] =
-        json_numbert{std::to_string(stat.sat_hardness.clauses)};
+        json_numbert{std::to_string(hardness.clauses)};
       sat_hardness_json["Literals"] =
-        json_numbert{std::to_string(stat.sat_hardness.literals)};
+        json_numbert{std::to_string(hardness.literals)};
       sat_hardness_json["Variables"] =
-        json_numbert{std::to_string(stat.sat_hardness.variables.size())};
+        json_numbert{std::to_string(hardness.variables.size())};
 
       hardness_stats_json["SAT_hardness"] = sat_hardness_json;
 
