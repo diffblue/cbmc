@@ -224,6 +224,16 @@ public:
     const abstract_object_visitort &visitor) const
   { return shared_from_this(); }
 
+  virtual size_t internal_hash() const
+  {
+    return std::hash<abstract_object_pointert>{}(shared_from_this());
+  }
+
+  virtual bool internal_equality(const abstract_object_pointert &other) const
+  {
+    return shared_from_this() == other;
+  }
+
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
@@ -359,5 +369,26 @@ bool abstract_objectt::merge_shared_maps(
 
   return modified;
 }
+
+struct abstract_hashert
+{
+  typedef abstract_object_pointert argument_typet;
+  typedef std::size_t result_typet;
+  result_typet operator()(argument_typet const &s) const noexcept
+  {
+    return s->internal_hash();
+  }
+};
+
+struct abstract_equalert
+{
+  typedef abstract_object_pointert argument_typet;
+  typedef std::size_t result_typet;
+  bool operator()(argument_typet const &left, argument_typet const &right) const
+    noexcept
+  {
+    return left->internal_equality(right);
+  }
+};
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H

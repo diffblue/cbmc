@@ -47,6 +47,18 @@ public:
                       const abstract_environmentt &env,
                       const namespacet& ns) const override;
 
+  size_t internal_hash() const override
+  {
+    return std::hash<std::string>{}(value.pretty());
+  }
+
+  bool internal_equality(const abstract_object_pointert &other) const override
+  {
+    auto cast_other =
+      std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
+    return cast_other && value == cast_other->value;
+  }
+
 protected:
   CLONE
   virtual abstract_object_pointert merge(
