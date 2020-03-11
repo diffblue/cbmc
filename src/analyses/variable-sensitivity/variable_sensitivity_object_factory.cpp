@@ -59,6 +59,14 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
   {
     abstract_object_type=UNION_INSENSITIVE;
   }
+  if(
+    has_value_set_flag &&
+    (abstract_object_type == INTERVAL || abstract_object_type == CONSTANT ||
+     abstract_object_type == POINTER_INSENSITIVE ||
+     abstract_object_type == POINTER_SENSITIVE))
+  {
+    abstract_object_type = VALUE_SET;
+  }
 
   return abstract_object_type;
 }
@@ -137,6 +145,9 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   case TWO_VALUE:
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
+  case VALUE_SET:
+    return initialize_abstract_object<value_set_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
   default:
     UNREACHABLE;
     return initialize_abstract_object<abstract_objectt>(
@@ -168,5 +179,6 @@ void variable_sensitivity_object_factoryt::set_options(const optionst &options)
   has_data_dependencies_context_flag=
     options.get_bool_option("data-dependencies");
   has_interval=options.get_bool_option("interval");
+  has_value_set_flag = options.get_bool_option("value-set");
   initialized=true;
 }

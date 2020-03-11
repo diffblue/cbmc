@@ -8,21 +8,21 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
+#include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/constant_array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/full_struct_abstract_object.h>
-#include <analyses/variable-sensitivity/union_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
-#include <analyses/variable-sensitivity/write_location_context.h>
 #include <analyses/variable-sensitivity/data_dependency_context.h>
-#include <util/options.h>
+#include <analyses/variable-sensitivity/full_struct_abstract_object.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/write_location_context.h>
 #include <util/namespace.h>
-
+#include <util/options.h>
 
 class variable_sensitivity_object_factoryt
 {
@@ -56,7 +56,8 @@ private:
     STRUCT_SENSITIVE,
     STRUCT_INSENSITIVE,
     // TODO: plug in UNION_SENSITIVE HERE
-    UNION_INSENSITIVE
+    UNION_INSENSITIVE,
+    VALUE_SET
   };
   ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
   template <class abstract_object_class>
@@ -81,6 +82,7 @@ private:
   bool has_pointers_flag;
   bool has_last_written_location_context_flag;
   bool has_data_dependencies_context_flag;
+  bool has_value_set_flag;
   bool has_interval;
   bool initialized;
 };

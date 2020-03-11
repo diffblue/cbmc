@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 #include "interval_array_abstract_object.h"
 #include "abstract_enviroment.h"
 #include "interval_abstract_value.h"
+#include "value_set_abstract_object.h"
 #include <util/interval.h>
 
 interval_array_abstract_objectt::interval_array_abstract_objectt(typet type)
@@ -38,6 +39,19 @@ static constant_interval_exprt eval_and_get_as_interval(
   const namespacet &ns)
 {
   auto evaluated_index = environment.eval(expr, ns);
+  auto maybe_interval = evaluated_index->unwrap_context();
+  auto interval_as_value_set =
+    std::dynamic_pointer_cast<const value_set_abstract_objectt>(maybe_interval);
+  if(interval_as_value_set)
+  {
+    auto evaluated_index_interval =
+      std::dynamic_pointer_cast<const interval_abstract_valuet>(
+        interval_as_value_set->get_as_interval());
+    INVARIANT(
+      evaluated_index_interval != nullptr,
+      "Expecting expression to evaluate to index");
+    return evaluated_index_interval->get_interval();
+  }
   auto evaluated_index_interval =
     std::dynamic_pointer_cast<const interval_abstract_valuet>(
       evaluated_index->unwrap_context());
