@@ -138,7 +138,8 @@ SCENARIO("merge_full_struct_abstract_object",
     options.set_option("pointers", true);
     options.set_option("arrays", true);
     options.set_option("structs", true);
-    variable_sensitivity_object_factoryt::instance().set_options(options);
+    variable_sensitivity_object_factoryt::instance().set_options(
+      vsd_configt::from_options(options));
 
     struct_utilt util(enviroment, ns);
 

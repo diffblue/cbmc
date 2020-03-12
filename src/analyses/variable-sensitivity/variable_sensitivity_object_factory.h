@@ -24,6 +24,63 @@
 #include <util/namespace.h>
 #include <util/options.h>
 
+struct vsd_configt
+{
+  struct
+  {
+    bool struct_sensitivity;
+    bool array_sensitivity;
+    bool pointer_sensitivity;
+  } primitive_sensitivity;
+
+  struct
+  {
+    bool data_dependency_context;
+    bool last_write_context;
+  } context_tracking;
+
+  struct
+  {
+    bool intervals;
+    bool value_set;
+  } advanced_sensitivities;
+
+  static vsd_configt from_options(const optionst &options)
+  {
+    vsd_configt config{};
+
+    if(
+      options.get_bool_option("value-set") &&
+      options.get_bool_option("data-dependencies"))
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "Value set is not currently supported with data dependency analysis",
+        "--value-set --data-dependencies",
+        "--data-dependencies"};
+    }
+
+    config.primitive_sensitivity.struct_sensitivity =
+      options.get_bool_option("structs");
+    config.primitive_sensitivity.array_sensitivity =
+      options.get_bool_option("arrays");
+    config.primitive_sensitivity.pointer_sensitivity =
+      options.get_bool_option("pointers");
+
+    // This should always be on (for efficeny with 3-way merge)
+    // Does not work with value set
+    config.context_tracking.last_write_context =
+      !options.get_bool_option("value-set");
+    config.context_tracking.data_dependency_context =
+      options.get_bool_option("data-dependencies");
+    config.advanced_sensitivities.intervals =
+      options.get_bool_option("interval");
+    config.advanced_sensitivities.value_set =
+      options.get_bool_option("value-set");
+
+    return config;
+  }
+};
+
 class variable_sensitivity_object_factoryt
 {
 public:
@@ -38,7 +95,7 @@ public:
     const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns);
-  void set_options(const optionst &options);
+  void set_options(const vsd_configt &options);
 
 private:
   variable_sensitivity_object_factoryt():initialized(false)
