@@ -1,0 +1,26 @@
+KNOWNBUG
+main.c
+--variable --structs --arrays --pointers --value-set --verify --pointer-check
+^\[main\.assertion\.1\] line 33 assertion s\.i == 0: UNKNOWN$
+^\[main\.assertion\.2\] line 35 assertion s\.d == 1.0: UNKNOWN$
+^\[main\.assertion\.3\] line 36 assertion s\.d == 1.0 \|\| s.d == 2.0: SUCCESS$
+^\[main\.assertion\.4\] line 37 assertion s\.d > 0.0: SUCCESS$
+^\[main\.assertion\.5\] line 38 assertion s\.d > 10.0: FAILURE \(if reachable\)$
+^\[main\.assertion\.6\] line 40 assertion s\.str\[0\] == 'x': UNKNOWN$
+^\[main\.assertion\.7\] line 41 assertion s\.str\[0\] == 'x' \|\| s.str\[0\] == 'y': SUCCESS$
+^\[main\.assertion\.8\] line 42 assertion s\.str\[1\] == '\\n': SUCCESS$
+^\[main\.assertion\.9\] line 55 assertion u\.i == 1: UNKNOWN$
+^\[main\.assertion\.10\] line 57 assertion u\.d == 3.0: UNKNOWN$
+^\[main\.assertion\.11\] line 58 assertion u\.d == 1.0 \|\| u\.d == 2.0 \|\| u\.d == 3.0: SUCCESS$
+^\[main\.assertion\.12\] line 59 assertion u\.d > 0.0: SUCCESS$
+^\[main\.assertion\.13\] line 60 assertion u\.d > 10.0: FAILURE \(if reachable\)$
+^\[main\.assertion\.14\] line 62 assertion u\.str\[0\] == 'z': UNKNOWN$
+^\[main\.assertion\.15\] line 63 assertion u\.str\[0\] == 'x' \|\| u.str\[0\] == 'y' \|\| u.str\[0\] == 'z': SUCCESS$
+^\[main\.assertion\.16\] line 64 assertion u\.str\[1\] == '\\n': SUCCESS$
+^Summary: 8 pass, 2 fail if reachable, 6 unknown$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+ADA-494 has been filed to fix this.
