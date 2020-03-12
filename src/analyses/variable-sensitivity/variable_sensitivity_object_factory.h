@@ -164,13 +164,7 @@ private:
     const exprt &e,
     const abstract_environmentt &enviroment,
     const namespacet &ns);
-  bool has_structs_flag;
-  bool has_arrays_flag;
-  bool has_pointers_flag;
-  bool has_last_written_location_context_flag;
-  bool has_data_dependencies_context_flag;
-  bool has_value_set_flag;
-  bool has_interval;
+  vsd_configt configuration;
   bool initialized;
 };
 
@@ -203,11 +197,11 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     const abstract_environmentt &enviroment,
     const namespacet &ns)
 {
-  if(has_data_dependencies_context_flag)
+  if(configuration.context_tracking.data_dependency_context)
     return initialize_context_abstract_object<
       abstract_object_classt, data_dependency_contextt>(
         type, top, bottom, e, enviroment, ns);
-  if(has_last_written_location_context_flag)
+  if(configuration.context_tracking.last_write_context)
     return initialize_context_abstract_object<
       abstract_object_classt, write_location_contextt>(
         type, top, bottom, e, enviroment, ns);
