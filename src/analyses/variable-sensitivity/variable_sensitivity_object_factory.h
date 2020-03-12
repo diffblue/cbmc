@@ -79,6 +79,37 @@ struct vsd_configt
 
     return config;
   }
+
+  static vsd_configt constant_domain()
+  {
+    vsd_configt config{};
+    config.primitive_sensitivity.pointer_sensitivity = true;
+    config.primitive_sensitivity.array_sensitivity = true;
+    config.primitive_sensitivity.struct_sensitivity = true;
+    config.context_tracking.last_write_context = true;
+    return config;
+  }
+
+  static vsd_configt value_set()
+  {
+    vsd_configt config{};
+    config.primitive_sensitivity.pointer_sensitivity = true;
+    config.primitive_sensitivity.array_sensitivity = true;
+    config.primitive_sensitivity.struct_sensitivity = true;
+    config.advanced_sensitivities.value_set = true;
+    return config;
+  }
+
+  static vsd_configt intervals()
+  {
+    vsd_configt config{};
+    config.primitive_sensitivity.pointer_sensitivity = true;
+    config.primitive_sensitivity.array_sensitivity = true;
+    config.primitive_sensitivity.struct_sensitivity = true;
+    config.context_tracking.last_write_context = true;
+    config.advanced_sensitivities.intervals = true;
+    return config;
+  }
 };
 
 class variable_sensitivity_object_factoryt
