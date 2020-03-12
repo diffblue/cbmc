@@ -76,7 +76,6 @@ private:
     const exprt &e,
     const abstract_environmentt &enviroment,
     const namespacet &ns);
-  bool has_variables_flag;
   bool has_structs_flag;
   bool has_arrays_flag;
   bool has_pointers_flag;
