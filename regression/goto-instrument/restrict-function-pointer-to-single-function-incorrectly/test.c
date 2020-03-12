@@ -2,38 +2,27 @@
 
 typedef int (*fptr_t)(int);
 
-fptr_t get_f(void);
-
 void use_f(fptr_t fptr)
 {
   assert(fptr(10) == 11);
-}
-
-int main(void)
-{
-  use_f(get_f());
 }
 
 int f(int x)
 {
   return x + 1;
 }
+
 int g(int x)
 {
   return x;
 }
 
-// this is just here to distinguish the behavior from FP removal, which'd include g
-int g_always_false_cond = 1;
-
-fptr_t get_f(void)
+int main(void)
 {
-  if(!g_always_false_cond)
-  {
-    return f;
-  }
-  else
-  {
-    return g;
-  }
+  int one = 1;
+
+  // We take the address of f and g. In this case remove_function_pointers()
+  // would create a case distinction involving both f and g in the function
+  // use_f() above.
+  use_f(!one ? f : g); // selects g
 }

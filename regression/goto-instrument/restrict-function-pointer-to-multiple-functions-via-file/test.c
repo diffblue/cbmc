@@ -27,37 +27,41 @@ int f(int x)
 {
   return x + 1;
 }
+
 int g(int x)
 {
   return x;
 }
+
 int h(int x)
 {
   return x - 1;
 }
 
-int g_select_function = 0;
+int select_function = 0;
 
 void select_f(void)
 {
-  g_select_function = 0;
+  select_function = 0;
 }
+
 void select_g(void)
 {
-  g_select_function = 1;
+  select_function = 1;
 }
+
 void select_h(void)
 {
-  g_select_function = 2;
+  select_function = 2;
 }
 
 fptr_t get_f(void)
 {
-  if(g_select_function == 0)
+  if(select_function == 0)
   {
     return f;
   }
-  else if(g_select_function == 1)
+  else if(select_function == 1)
   {
     return g;
   }

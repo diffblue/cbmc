@@ -4,3 +4,12 @@ test.c
 \[use_f\.assertion\.1\] line \d+ dereferenced function pointer at use_f.function_pointer_call.1 must be f: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
+--
+--
+The function pointer restriction feature outputs safety assertions for all calls
+that it replaces. That is, when it replaces a call with a case distinction over
+a given set of functions, it adds an assertion checking that in the original
+program, indeed no other function could have been called at that location. This
+test verifies this feature, by checking that the safety assertion fails when a
+function pointer call is replaced by a call to f, when however g could be called
+in the original program.

@@ -5,3 +5,7 @@ test.c
 \[use_fg.assertion.1\] line \d+ dereferenced function pointer at use_fg.function_pointer_call.1 must be one of \[(f|g), (f|g)\]: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$
+--
+--
+This test checks that the selected function pointer is replaced by a case
+distinction over both functions f and g.

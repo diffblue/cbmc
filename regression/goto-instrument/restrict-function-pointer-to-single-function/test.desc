@@ -4,3 +4,9 @@ test.c
 \[use_f\.assertion\.2\] line \d+ assertion fptr\(10\) == 11: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$
+--
+--
+This test checks that the function f is called for the first function pointer
+call in function use_f. Without the restrict function pointer option, the
+regular function pointer removal would create a case distinction over both f and
+g for the given program (as the address of both is taken).

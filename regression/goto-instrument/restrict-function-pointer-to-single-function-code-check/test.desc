@@ -6,3 +6,6 @@ f\(10\)
 ^SIGNAL=0$
 --
 g\(10\)
+--
+This test checks that no call to g appears in the goto program after the
+transformation by the restrict function pointer feature.
