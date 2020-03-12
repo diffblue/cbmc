@@ -175,7 +175,8 @@ void variable_sensitivity_object_factoryt::set_options(const optionst &options)
   has_structs_flag=options.get_bool_option("structs");
   has_arrays_flag=options.get_bool_option("arrays");
   has_pointers_flag=options.get_bool_option("pointers");
-  has_last_written_location_context_flag=true; // For efficency of 3way merge
+  has_last_written_location_context_flag = !options.get_bool_option(
+    "value-set"); // For efficency of 3way merge (note does not work with value set)
   has_data_dependencies_context_flag=
     options.get_bool_option("data-dependencies");
   has_interval=options.get_bool_option("interval");
