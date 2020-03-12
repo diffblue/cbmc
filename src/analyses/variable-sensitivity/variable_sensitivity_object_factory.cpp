@@ -36,7 +36,8 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
     type.id()==ID_c_bool || type.id()==ID_bool ||
     type.id()==ID_integer || type.id()==ID_c_bit_field)
   {
-    abstract_object_type=has_interval?INTERVAL:CONSTANT;
+    abstract_object_type =
+      configuration.advanced_sensitivities.intervals ? INTERVAL : CONSTANT;
   }
   else if(type.id()==ID_floatbv)
   {
@@ -44,23 +45,30 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
   }
   else if(type.id()==ID_array)
   {
-    abstract_object_type=has_arrays_flag?ARRAY_SENSITIVE:ARRAY_INSENSITIVE;
+    abstract_object_type = configuration.primitive_sensitivity.array_sensitivity
+                             ? ARRAY_SENSITIVE
+                             : ARRAY_INSENSITIVE;
   }
   else if(type.id()==ID_pointer)
   {
-    abstract_object_type=
-      has_pointers_flag?POINTER_SENSITIVE:POINTER_INSENSITIVE;
+    abstract_object_type =
+      configuration.primitive_sensitivity.pointer_sensitivity
+        ? POINTER_SENSITIVE
+        : POINTER_INSENSITIVE;
   }
   else if(type.id()==ID_struct)
   {
-    abstract_object_type=has_structs_flag?STRUCT_SENSITIVE:STRUCT_INSENSITIVE;
+    abstract_object_type =
+      configuration.primitive_sensitivity.struct_sensitivity
+        ? STRUCT_SENSITIVE
+        : STRUCT_INSENSITIVE;
   }
   else if(type.id()==ID_union)
   {
     abstract_object_type=UNION_INSENSITIVE;
   }
   if(
-    has_value_set_flag &&
+    configuration.advanced_sensitivities.value_set &&
     (abstract_object_type == INTERVAL || abstract_object_type == CONSTANT ||
      abstract_object_type == POINTER_INSENSITIVE ||
      abstract_object_type == POINTER_SENSITIVE))
@@ -119,7 +127,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     return initialize_abstract_object<interval_abstract_valuet>(
       followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
-    return has_interval
+    return configuration.advanced_sensitivities.intervals
              ? initialize_abstract_object<interval_array_abstract_objectt>(
                  followed_type, top, bottom, e, environment, ns)
              : initialize_abstract_object<constant_array_abstract_objectt>(
@@ -172,14 +180,6 @@ Function: variable_sensitivity_object_factoryt::set_options
 void variable_sensitivity_object_factoryt::set_options(
   const vsd_configt &options)
 {
-  has_structs_flag = options.primitive_sensitivity.struct_sensitivity;
-  has_arrays_flag = options.primitive_sensitivity.array_sensitivity;
-  has_pointers_flag = options.primitive_sensitivity.pointer_sensitivity;
-  has_last_written_location_context_flag =
-    options.context_tracking.last_write_context;
-  has_data_dependencies_context_flag =
-    options.context_tracking.last_write_context;
-  has_interval = options.advanced_sensitivities.intervals;
-  has_value_set_flag = options.advanced_sensitivities.value_set;
+  this->configuration = options;
   initialized = true;
 }
