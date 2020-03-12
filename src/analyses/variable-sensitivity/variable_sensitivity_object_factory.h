@@ -125,9 +125,19 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
       abstract_object_classt, write_location_contextt>(
         type, top, bottom, e, enviroment, ns);
   else
-    return initialize_context_abstract_object<
-      abstract_object_classt, context_abstract_objectt>(
-        type, top, bottom, e, enviroment, ns);
+  {
+    if(top || bottom)
+    {
+      return abstract_object_pointert(
+        new abstract_object_classt(type, top, bottom));
+    }
+    else
+    {
+      PRECONDITION(type == ns.follow(e.type()));
+      return abstract_object_pointert(
+        new abstract_object_classt(e, enviroment, ns));
+    }
+  }
 }
 
 template <class abstract_object_classt, class context_classt>
