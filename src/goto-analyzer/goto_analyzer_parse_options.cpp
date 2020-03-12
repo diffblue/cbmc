@@ -636,7 +636,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     // Store options in static variable_sensitivity_object_factory object
     try
     {
-      variable_sensitivity_object_factoryt::instance().set_options(options);
+      variable_sensitivity_object_factoryt::instance().set_options(
+        vsd_configt::from_options(options));
     }
     catch(const invalid_command_line_argument_exceptiont &e)
     {

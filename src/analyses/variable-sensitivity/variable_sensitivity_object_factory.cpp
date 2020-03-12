@@ -169,26 +169,17 @@ Function: variable_sensitivity_object_factoryt::set_options
 
 \*******************************************************************/
 
-void variable_sensitivity_object_factoryt::set_options(const optionst &options)
+void variable_sensitivity_object_factoryt::set_options(
+  const vsd_configt &options)
 {
-  if(
-    options.get_bool_option("value-set") &&
-    options.get_bool_option("data-dependencies"))
-  {
-    throw invalid_command_line_argument_exceptiont{
-      "Value set is not currently supported with data dependency analysis",
-      "--value-set --data-dependencies",
-      "--data-dependencies"};
-  }
-
-  has_structs_flag=options.get_bool_option("structs");
-  has_arrays_flag=options.get_bool_option("arrays");
-  has_pointers_flag=options.get_bool_option("pointers");
-  has_last_written_location_context_flag = !options.get_bool_option(
-    "value-set"); // For efficency of 3way merge (note does not work with value set)
-  has_data_dependencies_context_flag=
-    options.get_bool_option("data-dependencies");
-  has_interval=options.get_bool_option("interval");
-  has_value_set_flag = options.get_bool_option("value-set");
-  initialized=true;
+  has_structs_flag = options.primitive_sensitivity.struct_sensitivity;
+  has_arrays_flag = options.primitive_sensitivity.array_sensitivity;
+  has_pointers_flag = options.primitive_sensitivity.pointer_sensitivity;
+  has_last_written_location_context_flag =
+    options.context_tracking.last_write_context;
+  has_data_dependencies_context_flag =
+    options.context_tracking.last_write_context;
+  has_interval = options.advanced_sensitivities.intervals;
+  has_value_set_flag = options.advanced_sensitivities.value_set;
+  initialized = true;
 }
