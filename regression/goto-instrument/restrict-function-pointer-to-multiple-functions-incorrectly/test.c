@@ -27,10 +27,12 @@ int f(int x)
 {
   return x + 1;
 }
+
 int g(int x)
 {
   return x;
 }
+
 int h(int x)
 {
   return x - 1;
@@ -42,10 +44,12 @@ void select_f(void)
 {
   g_select_function = 0;
 }
+
 void select_g(void)
 {
   g_select_function = 1;
 }
+
 void select_h(void)
 {
   g_select_function = 2;
