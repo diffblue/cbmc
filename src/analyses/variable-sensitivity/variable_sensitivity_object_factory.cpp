@@ -171,6 +171,16 @@ Function: variable_sensitivity_object_factoryt::set_options
 
 void variable_sensitivity_object_factoryt::set_options(const optionst &options)
 {
+  if(
+    options.get_bool_option("value-set") &&
+    options.get_bool_option("data-dependencies"))
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "Value set is not currently supported with data dependency analysis",
+      "--value-set --data-dependencies",
+      "--data-dependencies"};
+  }
+
   has_variables_flag=options.get_bool_option("variable");
   has_structs_flag=options.get_bool_option("structs");
   has_arrays_flag=options.get_bool_option("arrays");
