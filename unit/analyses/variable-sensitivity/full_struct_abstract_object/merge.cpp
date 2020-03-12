@@ -134,12 +134,8 @@ SCENARIO("merge_full_struct_abstract_object",
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
-    optionst options;
-    options.set_option("pointers", true);
-    options.set_option("arrays", true);
-    options.set_option("structs", true);
     variable_sensitivity_object_factoryt::instance().set_options(
-      vsd_configt::from_options(options));
+      vsd_configt::constant_domain());
 
     struct_utilt util(enviroment, ns);
 
