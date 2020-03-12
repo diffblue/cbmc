@@ -634,7 +634,15 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   if(options.get_bool_option("general-analysis"))
   {
     // Store options in static variable_sensitivity_object_factory object
-    variable_sensitivity_object_factoryt::instance().set_options(options);
+    try
+    {
+      variable_sensitivity_object_factoryt::instance().set_options(options);
+    }
+    catch(const invalid_command_line_argument_exceptiont &e)
+    {
+      log.error() << e.what() << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
 
     // Output file factory
     const std::string outfile=options.get_option("outfile");
