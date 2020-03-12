@@ -181,7 +181,6 @@ void variable_sensitivity_object_factoryt::set_options(const optionst &options)
       "--data-dependencies"};
   }
 
-  has_variables_flag=options.get_bool_option("variable");
   has_structs_flag=options.get_bool_option("structs");
   has_arrays_flag=options.get_bool_option("arrays");
   has_pointers_flag=options.get_bool_option("pointers");
