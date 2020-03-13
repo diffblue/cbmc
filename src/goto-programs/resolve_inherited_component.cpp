@@ -27,12 +27,15 @@ resolve_inherited_componentt::resolve_inherited_componentt(
 ///   class specifier)
 /// \param include_interfaces: If true, consider inheritance from interfaces
 ///   (parent types other than the first listed)
+/// \param user_filter: Predicate that should return true for symbols that can
+///   be returned. Those for which it returns false will be ignored.
 /// \return The concrete component that has been resolved
 optionalt<resolve_inherited_componentt::inherited_componentt>
 resolve_inherited_componentt::operator()(
   const irep_idt &class_id,
   const irep_idt &component_name,
-  bool include_interfaces)
+  bool include_interfaces,
+  const std::function<bool(const symbolt &)> user_filter)
 {
   PRECONDITION(!class_id.empty());
   PRECONDITION(!component_name.empty());
@@ -47,7 +50,8 @@ resolve_inherited_componentt::operator()(
     const irep_idt &full_component_identifier=
       build_full_component_identifier(current_class, component_name);
 
-    if(symbol_table.has_symbol(full_component_identifier))
+    const symbolt *symbol = symbol_table.lookup(full_component_identifier);
+    if(symbol && user_filter(*symbol))
     {
       return inherited_componentt(current_class, component_name);
     }

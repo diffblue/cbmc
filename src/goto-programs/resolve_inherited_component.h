@@ -47,7 +47,10 @@ public:
   optionalt<inherited_componentt> operator()(
     const irep_idt &class_id,
     const irep_idt &component_name,
-    bool include_interfaces);
+    bool include_interfaces,
+    std::function<bool(const symbolt &)> user_filter = [](const symbolt &) {
+      return true;
+    });
 
   static irep_idt build_full_component_identifier(
     const irep_idt &class_name, const irep_idt &component_name);
