@@ -330,6 +330,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("structs", cmdline.isset("structs"));
       options.set_option("data-dependencies", cmdline.isset("data-dependencies"));
       options.set_option("interval", cmdline.isset("interval-values"));
+      options.set_option("value-set", cmdline.isset("value-set"));
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
