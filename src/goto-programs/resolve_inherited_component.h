@@ -59,4 +59,10 @@ private:
   const symbol_tablet &symbol_table;
 };
 
+optionalt<resolve_inherited_componentt::inherited_componentt>
+get_inherited_method_implementation(
+  const irep_idt &call_basename,
+  const irep_idt &classname,
+  const symbol_tablet &symbol_table);
+
 #endif // CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H
