@@ -546,8 +546,8 @@ irep_idt ci_lazy_methodst::get_virtual_method_target(
   if(!instantiated_classes.count(classname))
     return irep_idt();
 
-  resolve_inherited_componentt call_resolver{symbol_table};
-  const auto resolved_call = call_resolver(classname, call_basename, false);
+  auto resolved_call =
+    get_inherited_method_implementation(call_basename, classname, symbol_table);
 
   if(resolved_call)
     return resolved_call->get_full_component_identifier();
