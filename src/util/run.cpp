@@ -165,7 +165,8 @@ static fdt stdio_redirection(int fd, const std::string &file)
 // https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
 std::wstring quote_windows_arg(const std::wstring &src)
 {
-  if(src.find_first_of(L" \t\n\v\"") == src.npos)
+  // note that an empty argument requires quotes
+  if(src.find_first_of(L" \t\n\v\"") == src.npos && !src.empty())
     return src;
 
   std::wstring result = L"\"";
