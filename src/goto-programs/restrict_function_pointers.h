@@ -66,12 +66,11 @@ public:
 
   const restrictionst restrictions;
 
-  /// parse function pointer restrictions from command line
-  ///
-  /// Note: These are are only syntactically checked at this stage,
-  ///       because type checking them requires a goto_modelt
-  static function_pointer_restrictionst
-  from_options(const optionst &options, message_handlert &message_handler);
+  /// Parse function pointer restrictions from command line
+  static function_pointer_restrictionst from_options(
+    const optionst &options,
+    const goto_modelt &goto_model,
+    message_handlert &message_handler);
 
   jsont to_json() const;
   static function_pointer_restrictionst from_json(const jsont &json);
@@ -82,13 +81,6 @@ public:
 
   void write_to_file(const std::string &filename) const;
 
-  function_pointer_restrictionst
-  merge(const function_pointer_restrictionst &other) const;
-
-  static restrictionst parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts,
-    const std::string &option_name);
-
 protected:
   static restrictionst merge_function_pointer_restrictions(
     restrictionst lhs,
@@ -98,14 +90,33 @@ protected:
     const std::list<std::string> &filenames,
     message_handlert &message_handler);
 
+  static restrictionst parse_function_pointer_restrictions_from_command_line(
+    const std::list<std::string> &restriction_opts);
+
+  static restrictionst parse_function_pointer_restrictions(
+    const std::list<std::string> &restriction_opts,
+    const std::string &option);
+
   static restrictiont parse_function_pointer_restriction(
     const std::string &restriction_opt,
     const std::string &option);
-};
 
-function_pointer_restrictionst get_function_pointer_by_name_restrictions(
-  const goto_modelt &goto_model,
-  const optionst &options);
+  /// Get function pointer restrictions from restrictions with named pointers
+  ///
+  /// This takes a list of restrictions, with each restriction consisting of a
+  /// function pointer name, and the list of target functions. That is, each
+  /// input restriction is of the form \<fp-name\>/\<target\>(,\<target\>)*. The
+  /// method then returns a `restrictionst` object constructed from the given
+  /// list of restrictions
+  ///
+  /// \param restriction_name_opts: restrictions
+  /// \param goto_model: goto model with labelled function pointer calls
+  /// \return function pointer restrictions in the internal format that is
+  ///   understood by other methods in this class
+  static restrictionst get_function_pointer_by_name_restrictions(
+    const std::list<std::string> &restriction_name_opts,
+    const goto_modelt &goto_model);
+};
 
 /// Apply function pointer restrictions to a goto_model. Each restriction is a
 /// mapping from a pointer name to a set of possible targets. Replace calls of
