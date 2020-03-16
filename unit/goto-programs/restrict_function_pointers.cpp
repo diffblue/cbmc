@@ -23,7 +23,8 @@ void restriction_parsing_test()
 {
   {
     const auto res =
-      fp_restrictionst::parse_function_pointer_restriction("func1/func2");
+      fp_restrictionst::parse_function_pointer_restriction(
+        "func1/func2", "test");
     REQUIRE(res.first == "func1");
     REQUIRE(res.second.size() == 1);
     REQUIRE(res.second.find("func2") != res.second.end());
@@ -31,7 +32,8 @@ void restriction_parsing_test()
 
   {
     const auto res =
-      fp_restrictionst::parse_function_pointer_restriction("func1/func2,func3");
+      fp_restrictionst::parse_function_pointer_restriction(
+        "func1/func2,func3", "test");
     REQUIRE(res.first == "func1");
     REQUIRE(res.second.size() == 2);
     REQUIRE(res.second.find("func2") != res.second.end());
@@ -39,27 +41,29 @@ void restriction_parsing_test()
   }
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func"),
+    fp_restrictionst::parse_function_pointer_restriction("func", "test"),
     invalid_command_line_argument_exceptiont);
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("/func"),
+    fp_restrictionst::parse_function_pointer_restriction("/func", "test"),
     invalid_command_line_argument_exceptiont);
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func/"),
+    fp_restrictionst::parse_function_pointer_restriction("func/", "test"),
     invalid_command_line_argument_exceptiont);
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func/,"),
+    fp_restrictionst::parse_function_pointer_restriction("func/,", "test"),
     invalid_command_line_argument_exceptiont);
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func1/func2,"),
+    fp_restrictionst::parse_function_pointer_restriction(
+      "func1/func2,", "test"),
     invalid_command_line_argument_exceptiont);
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func1/,func2"),
+    fp_restrictionst::parse_function_pointer_restriction(
+      "func1/,func2", "test"),
     invalid_command_line_argument_exceptiont);
 }
 
