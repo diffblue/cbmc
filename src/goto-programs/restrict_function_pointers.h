@@ -98,8 +98,9 @@ protected:
     const std::list<std::string> &filenames,
     message_handlert &message_handler);
 
-  static restrictiont
-  parse_function_pointer_restriction(const std::string &restriction_opt);
+  static restrictiont parse_function_pointer_restriction(
+    const std::string &restriction_opt,
+    const std::string &option);
 };
 
 function_pointer_restrictionst get_function_pointer_by_name_restrictions(

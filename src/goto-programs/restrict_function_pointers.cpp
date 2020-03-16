@@ -260,7 +260,7 @@ parse_function_pointer_restrictions_from_command_line(
   for(const std::string &restriction_opt : restriction_opts)
   {
     const auto restriction =
-      parse_function_pointer_restriction(restriction_opt);
+      parse_function_pointer_restriction(restriction_opt, "--" + option_name);
 
     const bool inserted = function_pointer_restrictions
                             .emplace(restriction.first, restriction.second)
@@ -298,7 +298,8 @@ function_pointer_restrictionst::parse_function_pointer_restrictions_from_file(
 
 function_pointer_restrictionst::restrictiont
 function_pointer_restrictionst::parse_function_pointer_restriction(
-  const std::string &restriction_opt)
+  const std::string &restriction_opt,
+  const std::string &option)
 {
   // the format for restrictions is <pointer_name>/<target[,more_targets]*>
   // exactly one pointer and at least one target
@@ -311,7 +312,7 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   {
     throw invalid_command_line_argument_exceptiont{
       "couldn't find '/' in `" + restriction_opt + "'",
-      "--" RESTRICT_FUNCTION_POINTER_OPT,
+      option,
       restriction_format_message};
   }
 
@@ -319,7 +320,7 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   {
     throw invalid_command_line_argument_exceptiont{
       "couldn't find names of targets after '/' in `" + restriction_opt + "'",
-      "--" RESTRICT_FUNCTION_POINTER_OPT,
+      option,
       restriction_format_message};
   }
 
@@ -327,7 +328,7 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   {
     throw invalid_command_line_argument_exceptiont{
       "couldn't find target name before '/' in `" + restriction_opt + "'",
-      "--" RESTRICT_FUNCTION_POINTER_OPT};
+      option};
   }
 
   auto const pointer_name = restriction_opt.substr(0, pointer_name_end);
@@ -339,7 +340,7 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   {
     throw invalid_command_line_argument_exceptiont{
       "missing target list for function pointer restriction " + pointer_name,
-      "--" RESTRICT_FUNCTION_POINTER_OPT,
+      option,
       restriction_format_message};
   }
 
@@ -352,7 +353,7 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
     {
       throw invalid_command_line_argument_exceptiont(
         "leading or trailing comma in restrictions for `" + pointer_name + "'",
-        "--" RESTRICT_FUNCTION_POINTER_OPT,
+        option,
         restriction_format_message);
     }
   }
