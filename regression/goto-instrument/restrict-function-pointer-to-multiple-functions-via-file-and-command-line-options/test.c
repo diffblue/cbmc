@@ -34,4 +34,3 @@ int main(void)
   use_f(h);
   use_f(other);
 }
-
