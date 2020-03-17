@@ -2,30 +2,14 @@
 
 typedef int (*fptr_t)(int);
 
-fptr_t get_f(void);
-
 void use_f(fptr_t fptr)
 {
-  assert(fptr(10) >= 10);
-}
-
-void select_f(void);
-void select_g(void);
-void select_h(void);
-
-int main(void)
-{
-  select_f();
-  use_f(get_f());
-  select_g();
-  use_f(get_f());
-  select_h();
-  use_f(get_f());
+  fptr(1);
 }
 
 int f(int x)
 {
-  return x + 1;
+  return x;
 }
 
 int g(int x)
@@ -35,38 +19,19 @@ int g(int x)
 
 int h(int x)
 {
-  return x - 1;
+  return x;
 }
 
-int select_function = 0;
-
-void select_f(void)
+int other(int x)
 {
-  select_function = 0;
+  return x;
 }
 
-void select_g(void)
+int main(void)
 {
-  select_function = 1;
+  use_f(f);
+  use_f(g);
+  use_f(h);
+  use_f(other);
 }
 
-void select_h(void)
-{
-  select_function = 2;
-}
-
-fptr_t get_f(void)
-{
-  if(select_function == 0)
-  {
-    return f;
-  }
-  else if(select_function == 1)
-  {
-    return g;
-  }
-  else
-  {
-    return h;
-  }
-}
