@@ -12,11 +12,17 @@ Author: Diffblue Ltd.
 #ifdef HAVE_SMT_SWITCH
 #  include <cvc4_factory.h>
 #  include <smt.h>
+#  define SMT_SWITCH_TEST_LABEL
+#else
+// if smt-switch is not enabled, make the test XFAIL
+#  define SMT_SWITCH_TEST_LABEL XFAIL
 #endif
 
 #include <vector>
 
-TEST_CASE("Trivial SMT switch using CVC4", "[core][solvers][smt-switch]")
+TEST_CASE(
+  "Trivial SMT switch using CVC4",
+  "[core][solvers][smt-switch]" SMT_SWITCH_TEST_LABEL)
 {
 #ifdef HAVE_SMT_SWITCH
   smt::SmtSolver s = smt::CVC4SolverFactory::create();
@@ -38,6 +44,7 @@ TEST_CASE("Trivial SMT switch using CVC4", "[core][solvers][smt-switch]")
         s->make_term(smt::Select, arr, y)))));
   REQUIRE_FALSE(s->check_sat().is_sat());
 #else
-  INFO("SMT switch test disabled");
+  INFO("SMT switch not enabled");
+  REQUIRE(false);
 #endif
 }
