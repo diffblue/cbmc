@@ -1257,7 +1257,13 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_mod)
   {
-    convert_mod(to_mod_expr(expr));
+    // TODO: change to use term in some capacity
+    (void)convert_mod(to_mod_expr(expr));
+
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
   }
   else if(expr.id()==ID_mult)
   {
@@ -2890,23 +2896,15 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
 }
 
-void smt2_convt::convert_mod(const mod_exprt &expr)
+SMT_Term smt2_convt::convert_mod(const mod_exprt &expr)
 {
-  if(expr.type().id()==ID_unsignedbv ||
-     expr.type().id()==ID_signedbv)
-  {
-    if(expr.type().id()==ID_unsignedbv)
-      out << "(bvurem ";
-    else
-      out << "(bvsrem ";
+  PRECONDITION(
+    expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv);
 
-    convert_expr(expr.op0());
-    out << " ";
-    convert_expr(expr.op1());
-    out << ")";
-  }
+  if(expr.type().id() == ID_unsignedbv)
+    return SMT_Term{SMT_Ops::bvurem};
   else
-    UNEXPECTEDCASE("unsupported type for mod: "+expr.type().id_string());
+    return SMT_Term{SMT_Ops::bvsrem};
 }
 
 void smt2_convt::convert_is_dynamic_object(const unary_exprt &expr)

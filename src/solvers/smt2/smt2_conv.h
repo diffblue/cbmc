@@ -31,6 +31,22 @@ class constant_exprt;
 class index_exprt;
 class member_exprt;
 
+// TODO: This should be replaced on the spot with the
+//  smt-switch ops.h class
+enum class SMT_Ops
+{
+  // Bitvector arithmetic
+  bvurem,
+  bvsrem,
+  bvudiv,
+  bvsdiv
+};
+
+struct SMT_Term
+{
+  SMT_Ops op;
+};
+
 class smt2_convt : public stack_decision_proceduret
 {
 public:
@@ -115,7 +131,7 @@ protected:
   void convert_floatbv_minus(const ieee_float_op_exprt &expr);
   void convert_floatbv_div(const ieee_float_op_exprt &expr);
   void convert_floatbv_mult(const ieee_float_op_exprt &expr);
-  void convert_mod(const mod_exprt &expr);
+  SMT_Term convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
 
