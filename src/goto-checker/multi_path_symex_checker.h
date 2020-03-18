@@ -54,6 +54,8 @@ public:
   fault_location_infot
   localize_fault(const irep_idt &property_id) const override;
 
+  void report() override;
+
 protected:
   bool equation_generated;
   goto_symex_property_decidert property_decider;

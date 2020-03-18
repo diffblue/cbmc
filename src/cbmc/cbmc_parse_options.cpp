@@ -460,6 +460,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     }
   }
 
+  if(cmdline.isset("write-solver-stats-to"))
+  {
+    options.set_option(
+      "write-solver-stats-to", cmdline.get_value("write-solver-stats-to"));
+  }
+
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
 
@@ -1109,6 +1115,8 @@ void cbmc_parse_optionst::help()
     HELP_FLUSH
     " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
+    " --write-solver-stats-to json-file\n"
+    "                              collect the solver query complexity\n"
     "\n";
   // clang-format on
 }

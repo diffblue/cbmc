@@ -173,21 +173,35 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
   return s;
 }
 
+template <typename SatcheckT>
+static std::unique_ptr<SatcheckT>
+make_satcheck_prop(message_handlert &message_handler, const optionst &options)
+{
+  auto satcheck = util_make_unique<SatcheckT>(message_handler);
+  if(options.is_set("write-solver-stats-to"))
+  {
+    satcheck->enable_hardness_collection();
+    satcheck->with_solver_hardness([&options](solver_hardnesst &hardness) {
+      hardness.set_outfile(options.get_option("write-solver-stats-to"));
+    });
+  }
+  return satcheck;
+}
+
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
   auto solver = util_make_unique<solvert>();
-
   if(
     options.get_bool_option("beautify") ||
     !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
     solver->set_prop(
-      util_make_unique<satcheck_no_simplifiert>(message_handler));
+      make_satcheck_prop<satcheck_no_simplifiert>(message_handler, options));
   }
   else // with simplifier
   {
-    solver->set_prop(util_make_unique<satcheckt>(message_handler));
+    solver->set_prop(make_satcheck_prop<satcheckt>(message_handler, options));
   }
 
   auto bv_pointers =
@@ -225,9 +239,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
     if(options.get_bool_option("sat-preprocessor"))
     {
       no_beautification();
-      return util_make_unique<satcheckt>(message_handler);
+      return make_satcheck_prop<satcheckt>(message_handler, options);
     }
-    return util_make_unique<satcheck_no_simplifiert>(message_handler);
+    return make_satcheck_prop<satcheck_no_simplifiert>(
+      message_handler, options);
   }();
 
   bv_refinementt::infot info;
@@ -258,7 +273,8 @@ solver_factoryt::get_string_refinement()
 {
   string_refinementt::infot info;
   info.ns = &ns;
-  auto prop = util_make_unique<satcheck_no_simplifiert>(message_handler);
+  auto prop =
+    make_satcheck_prop<satcheck_no_simplifiert>(message_handler, options);
   info.prop = prop.get();
   info.refinement_bound = DEFAULT_MAX_NB_REFINEMENT;
   info.output_xml = output_xml_in_refinement;

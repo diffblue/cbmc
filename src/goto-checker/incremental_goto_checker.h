@@ -77,6 +77,12 @@ public:
   /// failing properties any more.
   virtual resultt operator()(propertiest &properties) = 0;
 
+  /// Additional reporting that may result from the underlying solver, no-op by
+  /// default.
+  virtual void report()
+  {
+  }
+
 protected:
   incremental_goto_checkert(const optionst &, ui_message_handlert &);
 

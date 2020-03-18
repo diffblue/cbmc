@@ -31,6 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class decision_proceduret;
 class namespacet;
 class decision_proceduret;
+class hardness_collectort;
+struct solver_hardnesst;
 
 /// Inheriting the interface of symex_targett this class represents the SSA
 /// form of the input program as a list of \ref SSA_stept. It further extends

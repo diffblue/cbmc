@@ -13,6 +13,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <chrono>
 
+#include <solvers/hardness_collector.h>
+
 #include "bmc_util.h"
 #include "counterexample_beautification.h"
 #include "goto_symex_fault_localizer.h"
@@ -154,4 +156,14 @@ multi_path_symex_checkert::localize_fault(const irep_idt &property_id) const
     property_decider.get_stack_decision_procedure());
 
   return fault_localizer(property_id);
+}
+
+void multi_path_symex_checkert::report()
+{
+  if(options.is_set("write-solver-stats-to"))
+  {
+    with_solver_hardness(
+      property_decider.get_decision_procedure(),
+      [](solver_hardnesst &hardness) { hardness.produce_report(); });
+  }
 }

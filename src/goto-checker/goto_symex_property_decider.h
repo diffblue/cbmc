@@ -65,7 +65,6 @@ public:
     std::unordered_set<irep_idt> &updated_properties,
     decision_proceduret::resultt dec_result,
     bool set_pass = true) const;
-
 protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;

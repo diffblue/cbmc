@@ -17,8 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <solvers/conflict_provider.h>
+#include <solvers/hardness_collector.h>
 
-#include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
 #include "prop_conv.h"
@@ -26,7 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class prop_conv_solvert : public conflict_providert,
                           public prop_convt,
-                          public solver_resource_limitst
+                          public solver_resource_limitst,
+                          public hardness_collectort
 {
 public:
   prop_conv_solvert(propt &_prop, message_handlert &message_handler)
@@ -98,6 +99,9 @@ public:
   }
 
   std::size_t get_number_of_solver_calls() const override;
+
+  void with_solver_hardness(handlert handler) override;
+  void enable_hardness_collection() override;
 
 protected:
   virtual void post_process();

@@ -60,3 +60,5 @@ if(WITH_MEMORY_ANALYZER)
   add_subdirectory(snapshot-harness)
   add_subdirectory(memory-analyzer)
 endif()
+
+add_subdirectory(solver-hardness)

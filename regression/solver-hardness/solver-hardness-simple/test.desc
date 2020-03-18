@@ -1,0 +1,11 @@
+CORE
+main.c
+--write-solver-stats-to "solver_hardness.json"
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion a \+ b \< 10: FAILURE$
+^VERIFICATION FAILED$
+^Valid JSON File$
+\"SAT_hardness\": \{(\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+), (\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+), (\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+)\}
+--
+^warning: ignoring

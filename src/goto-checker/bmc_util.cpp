@@ -155,7 +155,6 @@ void convert_symex_target_equation(
   messaget msg(message_handler);
   msg.status() << "converting SSA" << messaget::eom;
 
-  // convert SSA
   equation.convert(decision_procedure);
 }
 

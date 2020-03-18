@@ -140,6 +140,8 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
     solver->addClause_(c);
 
+    with_solver_hardness(
+      [&bv](solver_hardnesst &hardness) { hardness.register_clause(bv); });
     clause_counter++;
   }
   catch(const Minisat::OutOfMemoryException &)

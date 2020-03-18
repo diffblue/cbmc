@@ -78,6 +78,7 @@ public:
       output_properties(properties, iterations, ui_message_handler);
     }
     output_overall_result(determine_result(properties), ui_message_handler);
+    incremental_goto_checker.report();
   }
 
   const goto_trace_storaget &get_traces() const
