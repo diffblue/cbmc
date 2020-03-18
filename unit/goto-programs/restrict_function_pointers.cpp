@@ -6,9 +6,11 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
+#include <testing-utils/get_goto_model_from_c.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
+#include <goto-programs/label_function_pointer_call_sites.h>
 #include <goto-programs/restrict_function_pointers.h>
 
 #include <json/json_parser.h>
@@ -17,23 +19,22 @@ class fp_restrictionst : public function_pointer_restrictionst
 {
   friend void restriction_parsing_test();
   friend void merge_restrictions_test();
+  friend void get_function_pointer_by_name_restrictions_test();
 };
 
 void restriction_parsing_test()
 {
   {
-    const auto res =
-      fp_restrictionst::parse_function_pointer_restriction(
-        "func1/func2", "test");
+    const auto res = fp_restrictionst::parse_function_pointer_restriction(
+      "func1/func2", "test");
     REQUIRE(res.first == "func1");
     REQUIRE(res.second.size() == 1);
     REQUIRE(res.second.find("func2") != res.second.end());
   }
 
   {
-    const auto res =
-      fp_restrictionst::parse_function_pointer_restriction(
-        "func1/func2,func3", "test");
+    const auto res = fp_restrictionst::parse_function_pointer_restriction(
+      "func1/func2,func3", "test");
     REQUIRE(res.first == "func1");
     REQUIRE(res.second.size() == 2);
     REQUIRE(res.second.find("func2") != res.second.end());
@@ -90,6 +91,137 @@ void merge_restrictions_test()
   const auto &fp2_restrictions = result.at("fp2");
   REQUIRE(fp2_restrictions.size() == 1);
   REQUIRE(fp2_restrictions.count("func1") == 1);
+}
+
+void get_function_pointer_by_name_restrictions_test()
+{
+  SECTION("Translate parameter restriction to indexed restriction")
+  {
+    const std::string code = R"(
+      typedef void (*fp_t)(void);
+      void f();
+
+      void func(fp_t fp)
+      {
+        f(); // ignored
+
+        fp();
+      }
+
+      void main() {}
+    )";
+
+    goto_modelt goto_model = get_goto_model_from_c(code);
+    label_function_pointer_call_sites(goto_model);
+
+    const auto restrictions =
+      fp_restrictionst::get_function_pointer_by_name_restrictions(
+        {"func::fp/g"}, goto_model);
+
+    REQUIRE(restrictions.size() == 1);
+
+    const auto set = restrictions.at("func.function_pointer_call.1");
+    REQUIRE(set.size() == 1);
+    REQUIRE(set.count("g") == 1);
+  }
+
+  SECTION("Translate local nested variable restriction to indexed restriction")
+  {
+    const std::string code = R"(
+      typedef void (*fp_t)(void);
+      void f();
+
+      void main()
+      {
+        f(); // ignored
+
+        {
+          fp_t fp;
+          fp();
+        }
+      }
+    )";
+
+    goto_modelt goto_model = get_goto_model_from_c(code);
+    label_function_pointer_call_sites(goto_model);
+
+    const auto restrictions =
+      fp_restrictionst::get_function_pointer_by_name_restrictions(
+        {"main::1::1::fp/g"}, goto_model);
+
+    REQUIRE(restrictions.size() == 1);
+
+    const auto set = restrictions.at("main.function_pointer_call.1");
+    REQUIRE(set.size() == 1);
+    REQUIRE(set.count("g") == 1);
+  }
+
+  SECTION("Translate global variable restriction to indexed restriction")
+  {
+    const std::string code = R"(
+      typedef void (*fp_t)(void);
+      void f();
+
+      fp_t fp;
+
+      void main()
+      {
+        f(); // ignored
+
+        fp();
+      }
+    )";
+
+    goto_modelt goto_model = get_goto_model_from_c(code);
+    label_function_pointer_call_sites(goto_model);
+
+    const auto restrictions =
+      fp_restrictionst::get_function_pointer_by_name_restrictions(
+        {"fp/g"}, goto_model);
+
+    REQUIRE(restrictions.size() == 1);
+
+    const auto set = restrictions.at("main.function_pointer_call.1");
+    REQUIRE(set.size() == 1);
+    REQUIRE(set.count("g") == 1);
+  }
+
+  SECTION(
+    "Translate a variable restriction to indexed restrictions, "
+    "for the case when a function pointer is called more than once")
+  {
+    const std::string code = R"(
+      typedef void (*fp_t)(void);
+      void f();
+
+      fp_t fp;
+
+      void main()
+      {
+        f(); // ignored
+
+        fp();
+        fp(); // second call to same function pointer
+      }
+    )";
+
+    goto_modelt goto_model = get_goto_model_from_c(code);
+    label_function_pointer_call_sites(goto_model);
+
+    const auto restrictions =
+      fp_restrictionst::get_function_pointer_by_name_restrictions(
+        {"fp/g"}, goto_model);
+
+    REQUIRE(restrictions.size() == 2);
+
+    const auto set1 = restrictions.at("main.function_pointer_call.1");
+    REQUIRE(set1.size() == 1);
+    REQUIRE(set1.count("g") == 1);
+
+    const auto set2 = restrictions.at("main.function_pointer_call.2");
+    REQUIRE(set2.size() == 1);
+    REQUIRE(set2.count("g") == 1);
+  }
 }
 
 TEST_CASE("Restriction parsing", "[core]")
@@ -151,4 +283,11 @@ TEST_CASE("Json conversion", "[core]")
   REQUIRE(
     function_pointer_restrictions1.restrictions ==
     function_pointer_restrictions2.restrictions);
+}
+
+TEST_CASE(
+  "Get function pointer by name restrictions",
+  "[core][goto-programs][restrict-function-pointers]")
+{
+  get_function_pointer_by_name_restrictions_test();
 }
