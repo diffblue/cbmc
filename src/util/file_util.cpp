@@ -160,13 +160,28 @@ std::string concat_dir_file(
   const std::string &directory,
   const std::string &file_name)
 {
-  #ifdef _WIN32
-  return (file_name.size() > 1 && file_name[0] != '/' && file_name[1] == ':') ?
-          file_name : directory + "\\" + file_name;
-  #else
-  return (!file_name.empty() && file_name[0]=='/') ?
-          file_name : directory+"/"+file_name;
-  #endif
+#ifdef _WIN32
+  if(
+    file_name.size() > 1 && file_name[0] != '/' && file_name[0] != '\\' &&
+    file_name[1] == ':')
+  {
+    return file_name;
+  }
+  else if(
+    !directory.empty() && (directory.back() == '/' || directory.back() == '\\'))
+  {
+    return directory + file_name;
+  }
+  else
+    return directory + '\\' + file_name;
+#else
+  if(!file_name.empty() && file_name[0] == '/')
+    return file_name;
+  else if(!directory.empty() && directory.back() == '/')
+    return directory + file_name;
+  else
+    return directory + '/' + file_name;
+#endif
 }
 
 bool is_directory(const std::string &path)
