@@ -344,7 +344,11 @@ compilation flag:
 
 CBMC can be compiled with the [smt-switch](https://github.com/makaimann/smt-switch) library. Currently this is unused - but will be used to use different SMT back-ends when solving.
 
-This requires CMake and C++17 support.
+This requires CMake and C++17 support. It also requires the dependencies required for the chosen solver:
+
+ - [CVC4 dependencies](https://github.com/CVC4/CVC4/blob/master/INSTALL.md#build-dependencies)
+ - [Boolector](https://github.com/Boolector/boolector#prerequisites)
+ - _MathSAT does not require any additional dependencies._
 
 To enable compiling, specify the following CMake flags:
 
