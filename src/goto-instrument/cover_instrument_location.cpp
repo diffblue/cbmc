@@ -18,7 +18,8 @@ void cover_location_instrumentert::instrument(
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &basic_blocks) const
+  const cover_blocks_baset &basic_blocks,
+  const assertion_factoryt &make_assertion) const
 {
   if(is_non_cover_assertion(i_it))
     i_it->turn_into_skip();
@@ -40,7 +41,7 @@ void cover_location_instrumentert::instrument(
       const std::string comment =
         "block " + b + " (lines " + source_lines + ")";
       goto_program.insert_before_swap(i_it);
-      *i_it = goto_programt::make_assertion(false_exprt(), source_location);
+      *i_it = make_assertion(false_exprt(), source_location);
       initialize_source_location(i_it, comment, function_id);
       i_it++;
     }

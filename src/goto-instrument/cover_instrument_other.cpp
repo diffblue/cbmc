@@ -19,7 +19,8 @@ void cover_path_instrumentert::instrument(
   const irep_idt &,
   goto_programt &,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &) const
+  const cover_blocks_baset &,
+  const assertion_factoryt &) const
 {
   if(is_non_cover_assertion(i_it))
     i_it->turn_into_skip();
@@ -31,7 +32,8 @@ void cover_assertion_instrumentert::instrument(
   const irep_idt &function_id,
   goto_programt &,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &) const
+  const cover_blocks_baset &,
+  const assertion_factoryt &) const
 {
   // turn into 'assert(false)' to avoid simplification
   if(is_non_cover_assertion(i_it))
@@ -46,7 +48,8 @@ void cover_cover_instrumentert::instrument(
   const irep_idt &function_id,
   goto_programt &,
   goto_programt::targett &i_it,
-  const cover_blocks_baset &) const
+  const cover_blocks_baset &,
+  const assertion_factoryt &make_assertion) const
 {
   // turn __CPROVER_cover(x) into 'assert(!x)'
   if(i_it->is_function_call())
@@ -60,10 +63,8 @@ void cover_cover_instrumentert::instrument(
       code_function_call.arguments().size() == 1)
     {
       const exprt c = code_function_call.arguments()[0];
+      *i_it = make_assertion(not_exprt(c), i_it->source_location);
       std::string comment = "condition '" + from_expr(ns, function_id, c) + "'";
-      i_it->guard = not_exprt(c);
-      i_it->type = ASSERT;
-      i_it->code.clear();
       initialize_source_location(i_it, comment, function_id);
     }
   }
@@ -73,7 +74,8 @@ void cover_cover_instrumentert::instrument(
 
 void cover_instrument_end_of_function(
   const irep_idt &function_id,
-  goto_programt &goto_program)
+  goto_programt &goto_program,
+  const cover_instrumenter_baset::assertion_factoryt &make_assertion)
 {
   const auto last_function_call = std::find_if(
     goto_program.instructions.rbegin(),
@@ -88,10 +90,11 @@ void cover_instrument_end_of_function(
     last_function_call != goto_program.instructions.rbegin(),
     "Goto program shouldn't end with a function call");
   const auto if_it = last_function_call.base();
+  const auto location = if_it->source_location;
   const std::string &comment =
     "additional goal to ensure reachability of end of function";
   goto_program.insert_before_swap(if_it);
-  *if_it = goto_programt::make_assertion(false_exprt());
+  *if_it = make_assertion(false_exprt(), location);
   if_it->source_location.set_comment(comment);
   if_it->source_location.set_property_class("reachability_constraint");
   if_it->source_location.set_function(function_id);

@@ -44,6 +44,8 @@ struct cover_configt
   std::unique_ptr<goal_filterst> goal_filters =
     util_make_unique<goal_filterst>();
   cover_instrumenterst cover_instrumenters;
+  cover_instrumenter_baset::assertion_factoryt make_assertion =
+    goto_programt::make_assertion;
 };
 
 void instrument_cover_goals(
