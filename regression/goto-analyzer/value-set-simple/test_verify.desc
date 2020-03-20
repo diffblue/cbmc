@@ -1,0 +1,22 @@
+KNOWNBUG
+main.c
+--variable --structs --arrays --pointers --value-set --verify --pointer-check
+^\[main.assertion.1\] line 16 assertion global_int == 2: UNKNOWN$
+^\[main.assertion.2\] line 17 assertion global_int == 1 \|\| global_int == 2: SUCCESS$
+^\[main.assertion.3\] line 18 assertion global_int > 0: SUCCESS$
+^\[main.assertion.4\] line 19 assertion global_int > 3: FAILURE \(if reachable\)$
+^\[main.assertion.5\] line 29 assertion local_double == 2.0: UNKNOWN$
+^\[main.assertion.6\] line 30 assertion local_double == 1.0 \|\| local_double == 2.0: SUCCESS$
+^\[main.assertion.7\] line 31 assertion local_double > 0.0: SUCCESS$
+^\[main.assertion.8\] line 32 assertion local_double > 3.0: FAILURE \(if reachable\)$
+^\[main.assertion.9\] line 44 assertion local_double_ptr == &d2: UNKNOWN$
+^\[main.assertion.10\] line 45 assertion local_double_ptr == &d1 \|\| local_double == &d2: SUCCESS$
+^\[main.assertion.11\] line 46 assertion \*local_double_ptr > 0.0: SUCCESS$
+^\[main.assertion.12\] line 47 assertion \*local_double_ptr > 3.0: FAILURE \(if reachable\)$
+^Summary: 6 pass, 3 fail if reachable, 3 unknown$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+ADA-494 has been filed to fix this.
