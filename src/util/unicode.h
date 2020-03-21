@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_UNICODE_H
 #define CPROVER_UTIL_UNICODE_H
 
@@ -57,10 +56,8 @@ std::vector<const char *> to_c_str_array(It b, It e)
 {
   // Assumes that walking the range will be faster than repeated allocation
   std::vector<const char *> ret(std::distance(b, e) + 1, nullptr);
-  std::transform(b, e, std::begin(ret), [] (const std::string & s)
-    {
-      return s.c_str();
-    });
+  std::transform(
+    b, e, std::begin(ret), [](const std::string &s) { return s.c_str(); });
   return ret;
 }
 
