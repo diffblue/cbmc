@@ -24,6 +24,10 @@ std::wstring widen(const std::string &s);
 std::string
 utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s);
 
+/// \param utf8_str: UTF-8 string
+/// \return UTF-32 encoding of the string
+std::u32string utf8_to_utf32(const std::string &utf8_str);
+
 std::wstring utf8_to_utf16_native_endian(const std::string &in);
 std::string utf16_native_endian_to_java(const char16_t ch);
 std::string utf16_native_endian_to_java(const std::wstring &in);

@@ -199,11 +199,25 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
 {
   std::wstring result;
   result.reserve(in.size());
+
+  for(auto codepoint : utf8_to_utf32(in))
+    utf16_append_code(codepoint, result);
+
+  return result;
+}
+
+/// Convert UTF8-encoded string to UTF-32 with architecture-native endianness.
+/// \par parameters: String in UTF-8 format
+/// \return String in UTF-32 format.
+std::u32string utf8_to_utf32(const std::string &utf8_str)
+{
+  std::u32string result;
+  result.reserve(utf8_str.size());
   std::string::size_type i = 0;
-  while(i < in.size())
+  while(i < utf8_str.size())
   {
-    unsigned char c = in[i++];
-    unsigned int code = 0;
+    unsigned char c = utf8_str[i++];
+    char32_t code = 0;
     // the ifs that follow find out how many UTF8 characters (1-4) store the
     // next unicode character. This is determined by the few most
     // significant bits.
@@ -212,31 +226,31 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
       // if it's one character, then code is exactly the value
       code = c;
     }
-    else if(c <= 0xDF && i < in.size())
+    else if(c <= 0xDF && i < utf8_str.size())
     { // in other cases, we need to read the right number of chars and decode
       // note: if we wanted to make sure that we capture incorrect strings,
       // we should check that whatever follows first character starts with
       // bits 10.
       code = (c & 0x1Fu) << 6;
-      c = in[i++];
+      c = utf8_str[i++];
       code += c & 0x3Fu;
     }
-    else if(c <= 0xEF && i + 1 < in.size())
+    else if(c <= 0xEF && i + 1 < utf8_str.size())
     {
       code = (c & 0xFu) << 12;
-      c = in[i++];
+      c = utf8_str[i++];
       code += (c & 0x3Fu) << 6;
-      c = in[i++];
+      c = utf8_str[i++];
       code += c & 0x3Fu;
     }
-    else if(c <= 0xF7 && i + 2 < in.size())
+    else if(c <= 0xF7 && i + 2 < utf8_str.size())
     {
       code = (c & 0x7u) << 18;
-      c = in[i++];
+      c = utf8_str[i++];
       code += (c & 0x3Fu) << 12;
-      c = in[i++];
+      c = utf8_str[i++];
       code += (c & 0x3Fu) << 6;
-      c = in[i++];
+      c = utf8_str[i++];
       code += c & 0x3Fu;
     }
     else
@@ -248,7 +262,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
       code = 32;
     }
 
-    utf16_append_code(code, result);
+    result.append(1, code);
   }
 
   return result;
