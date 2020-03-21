@@ -29,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <windows.h>
 #endif
 
+static void utf8_append_code(unsigned int c, std::string &);
+
 std::string narrow(const wchar_t *s)
 {
 #ifdef _WIN32
@@ -41,16 +43,7 @@ std::string narrow(const wchar_t *s)
   return r;
 
 #else
-  // dummy conversion
-  std::string r;
-  r.reserve(wcslen(s));
-  while(*s != 0)
-  {
-    r += static_cast<char>(*s);
-    s++;
-  }
-
-  return r;
+  return narrow(std::wstring(s));
 #endif
 }
 
@@ -65,16 +58,7 @@ std::wstring widen(const char *s)
   return r;
 
 #else
-  // dummy conversion
-  std::wstring r;
-  r.reserve(strlen(s));
-  while(*s != 0)
-  {
-    r += wchar_t(*s);
-    s++;
-  }
-
-  return r;
+  return widen(std::string(s));
 #endif
 }
 
@@ -90,8 +74,14 @@ std::string narrow(const std::wstring &s)
   return r;
 
 #else
-  // dummy conversion
-  return std::string(s.begin(), s.end());
+  std::string result;
+
+  result.reserve(s.size()); // at least that long
+
+  for(const auto codepoint : s)
+    utf8_append_code(codepoint, result);
+
+  return result;
 #endif
 }
 
@@ -106,8 +96,13 @@ std::wstring widen(const std::string &s)
   return r;
 
 #else
-  // dummy conversion
-  return std::wstring(s.begin(), s.end());
+  auto utf32 = utf8_to_utf32(std::string(s));
+
+  std::wstring r;
+  r.reserve(utf32.size());
+  for(auto codepoint : utf32)
+    r += codepoint;
+  return r;
 #endif
 }
 
