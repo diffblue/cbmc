@@ -198,51 +198,6 @@ void restrict_function_pointer(
                        address_of_exprt{function_pointer_target_symbol_expr}}));
   }
 }
-
-void get_by_name_restriction(
-  const goto_functiont &goto_function,
-  const function_pointer_restrictionst::restrictionst &by_name_restrictions,
-  function_pointer_restrictionst::restrictionst &restrictions,
-  const goto_programt::const_targett &location)
-{
-  PRECONDITION(location->is_function_call());
-
-  const exprt &function = location->get_function_call().function();
-
-  if(!can_cast_expr<dereference_exprt>(function))
-    return;
-
-  auto const &function_pointer_call_site = to_symbol_expr(
-    to_dereference_expr(function)
-      .pointer());
-
-  for(auto it = std::prev(location);
-      it != goto_function.body.instructions.end();
-      ++it)
-  {
-    if(!it->is_assign())
-      continue;
-
-    if(it->get_assign().lhs() != function_pointer_call_site)
-      continue;
-
-    if(!can_cast_expr<symbol_exprt>(it->get_assign().rhs()))
-      continue;
-
-    auto const &rhs = to_symbol_expr(it->get_assign().rhs());
-    auto const restriction =
-      by_name_restrictions.find(rhs.get_identifier());
-
-    if(
-      restriction != by_name_restrictions.end() &&
-      restriction->first == rhs.get_identifier())
-    {
-      restrictions.emplace(
-        function_pointer_call_site.get_identifier(),
-        restriction->second);
-    }
-  }
-}
 } // namespace
 
 void restrict_function_pointers(
@@ -431,6 +386,52 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   return std::make_pair(pointer_name, target_names);
 }
 
+optionalt<function_pointer_restrictionst::restrictiont>
+function_pointer_restrictionst::get_by_name_restriction(
+  const goto_functiont &goto_function,
+  const function_pointer_restrictionst::restrictionst &by_name_restrictions,
+  const goto_programt::const_targett &location)
+{
+  PRECONDITION(location->is_function_call());
+
+  const exprt &function = location->get_function_call().function();
+
+  if(!can_cast_expr<dereference_exprt>(function))
+    return {};
+
+  // the function pointer is guaranteed to be a symbol expression, as the
+  // label_function_pointer_call_sites() pass (which must be run before the
+  // function pointer restriction) replaces calls via complex pointer
+  // expressions by calls to a function pointer variable
+  auto const &function_pointer_call_site =
+    to_symbol_expr(to_dereference_expr(function).pointer());
+
+  const goto_programt::const_targett it = std::prev(location);
+
+  const code_assignt &assign = it->get_assign();
+
+  INVARIANT(
+    to_symbol_expr(assign.lhs()).get_identifier() ==
+      function_pointer_call_site.get_identifier(),
+    "called function pointer must have been assigned at the previous location");
+
+  if(!can_cast_expr<symbol_exprt>(assign.rhs()))
+    return {};
+
+  const auto &rhs = to_symbol_expr(assign.rhs());
+
+  const auto restriction = by_name_restrictions.find(rhs.get_identifier());
+
+  if(restriction != by_name_restrictions.end())
+  {
+    return optionalt<function_pointer_restrictionst::restrictiont>(
+      std::make_pair(
+       function_pointer_call_site.get_identifier(), restriction->second));
+  }
+
+  return {};
+}
+
 function_pointer_restrictionst function_pointer_restrictionst::from_options(
   const optionst &options,
   const goto_modelt &goto_model,
@@ -562,8 +563,13 @@ function_pointer_restrictionst::get_function_pointer_by_name_restrictions(
     for_each_function_call(
       goto_function.second,
       [&](const goto_programt::const_targett it) {
-        get_by_name_restriction(
-          goto_function.second, by_name_restrictions, restrictions, it);
+        const auto restriction = get_by_name_restriction(
+          goto_function.second, by_name_restrictions, it);
+
+        if(restriction)
+        {
+          restrictions.insert(*restriction);
+        }
       });
   }
 

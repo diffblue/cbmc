@@ -101,6 +101,11 @@ protected:
     const std::string &restriction_opt,
     const std::string &option);
 
+  static optionalt<restrictiont> get_by_name_restriction(
+    const goto_functiont &goto_function,
+    const function_pointer_restrictionst::restrictionst &by_name_restrictions,
+    const goto_programt::const_targett &location);
+
   /// Get function pointer restrictions from restrictions with named pointers
   ///
   /// This takes a list of restrictions, with each restriction consisting of a
