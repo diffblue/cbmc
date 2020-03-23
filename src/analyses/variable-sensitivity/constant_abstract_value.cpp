@@ -9,14 +9,14 @@
 #include <ostream>
 
 #include <array>
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/simplify_expr.h>
-#include <util/type.h>
 #include <goto-programs/adjust_float_expressions.h>
-#include <util/ieee_float.h>
+#include <langapi/language_util.h>
 #include <util/arith_tools.h>
-
+#include <util/ieee_float.h>
+#include <util/namespace.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/type.h>
 
 #include "abstract_enviroment.h"
 #include "constant_abstract_value.h"
@@ -157,7 +157,7 @@ void constant_abstract_valuet::output(
 {
   if(!is_top() && !is_bottom())
   {
-    out << to_constant_expr(value).get_value();
+    out << from_expr(to_constant_expr(value));
   }
   else
   {
