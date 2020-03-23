@@ -20,66 +20,6 @@ Author: Diffblue Ltd.
 
 namespace
 {
-void typecheck_function_pointer_restrictions(
-  const goto_modelt &goto_model,
-  const function_pointer_restrictionst &restrictions)
-{
-  const std::string options =
-    "--" RESTRICT_FUNCTION_POINTER_OPT "/"
-    "--" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT "/"
-    "--" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT;
-
-  for(auto const &restriction : restrictions.restrictions)
-  {
-    auto const function_pointer_sym =
-      goto_model.symbol_table.lookup(restriction.first);
-    if(function_pointer_sym == nullptr)
-    {
-      throw invalid_command_line_argument_exceptiont{
-        id2string(restriction.first) + " not found in the symbol table",
-        options};
-    }
-    auto const &function_pointer_type = function_pointer_sym->type;
-    if(function_pointer_type.id() != ID_pointer)
-    {
-      throw invalid_command_line_argument_exceptiont{
-        "not a function pointer: " + id2string(restriction.first),
-        options};
-    }
-    auto const &function_type =
-      to_pointer_type(function_pointer_type).subtype();
-    if(function_type.id() != ID_code)
-    {
-      throw invalid_command_line_argument_exceptiont{
-        "not a function pointer: " + id2string(restriction.first),
-        options};
-    }
-    auto const &ns = namespacet{goto_model.symbol_table};
-    for(auto const &function_pointer_target : restriction.second)
-    {
-      auto const function_pointer_target_sym =
-        goto_model.symbol_table.lookup(function_pointer_target);
-      if(function_pointer_target_sym == nullptr)
-      {
-        throw invalid_command_line_argument_exceptiont{
-          "symbol not found: " + id2string(function_pointer_target),
-          options};
-      }
-      auto const &function_pointer_target_type =
-        function_pointer_target_sym->type;
-      if(function_type != function_pointer_target_type)
-      {
-        throw invalid_command_line_argument_exceptiont{
-          "type mismatch: `" + id2string(restriction.first) + "' points to `" +
-            type2c(function_type, ns) + "', but restriction `" +
-            id2string(function_pointer_target) + "' has type `" +
-            type2c(function_pointer_target_type, ns) + "'",
-          options};
-      }
-    }
-  }
-}
-
 source_locationt make_function_pointer_restriction_assertion_source_location(
   source_locationt source_location,
   const function_pointer_restrictionst::restrictiont restriction)
@@ -200,12 +140,82 @@ void restrict_function_pointer(
 }
 } // namespace
 
+function_pointer_restrictionst::invalid_restriction_exceptiont::
+  invalid_restriction_exceptiont(std::string reason, std::string correct_format)
+  : reason(std::move(reason)), correct_format(std::move(correct_format))
+{
+}
+
+std::string
+function_pointer_restrictionst::invalid_restriction_exceptiont::what() const
+{
+  std::string res;
+
+  res += "Invalid restriction";
+  res += "\nReason: " + reason;
+
+  if(!correct_format.empty())
+  {
+    res += "\nFormat: " + correct_format;
+  }
+
+  return res;
+}
+
+void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
+  const goto_modelt &goto_model,
+  const function_pointer_restrictionst::restrictionst &restrictions)
+{
+  for(auto const &restriction : restrictions)
+  {
+    auto const function_pointer_sym =
+      goto_model.symbol_table.lookup(restriction.first);
+    if(function_pointer_sym == nullptr)
+    {
+      throw invalid_restriction_exceptiont{id2string(restriction.first) +
+                                           " not found in the symbol table"};
+    }
+    auto const &function_pointer_type = function_pointer_sym->type;
+    if(function_pointer_type.id() != ID_pointer)
+    {
+      throw invalid_restriction_exceptiont{"not a function pointer: " +
+                                           id2string(restriction.first)};
+    }
+    auto const &function_type =
+      to_pointer_type(function_pointer_type).subtype();
+    if(function_type.id() != ID_code)
+    {
+      throw invalid_restriction_exceptiont{"not a function pointer: " +
+                                           id2string(restriction.first)};
+    }
+    auto const &ns = namespacet{goto_model.symbol_table};
+    for(auto const &function_pointer_target : restriction.second)
+    {
+      auto const function_pointer_target_sym =
+        goto_model.symbol_table.lookup(function_pointer_target);
+      if(function_pointer_target_sym == nullptr)
+      {
+        throw invalid_restriction_exceptiont{
+          "symbol not found: " + id2string(function_pointer_target)};
+      }
+      auto const &function_pointer_target_type =
+        function_pointer_target_sym->type;
+      if(function_type != function_pointer_target_type)
+      {
+        throw invalid_restriction_exceptiont{
+          "type mismatch: `" + id2string(restriction.first) + "' points to `" +
+          type2c(function_type, ns) + "', but restriction `" +
+          id2string(function_pointer_target) + "' has type `" +
+          type2c(function_pointer_target_type, ns) + "'"};
+      }
+    }
+  }
+}
+
 void restrict_function_pointers(
   goto_modelt &goto_model,
   const function_pointer_restrictionst &restrictions)
 {
-  typecheck_function_pointer_restrictions(goto_model, restrictions);
-
   for(auto &function_item : goto_model.goto_functions.function_map)
   {
     goto_functiont &goto_function = function_item.second;
@@ -283,24 +293,21 @@ function_pointer_restrictionst::parse_function_pointer_restrictions(
 
     if(!inserted)
     {
-      throw invalid_command_line_argument_exceptiont{
+      throw invalid_restriction_exceptiont{
         "function pointer restriction for `" + id2string(restriction.first) +
-          "' was specified twice",
-        option};
+        "' was specified twice"};
     }
   }
 
   return function_pointer_restrictions;
 }
 
-function_pointer_restrictionst::restrictionst
-function_pointer_restrictionst::
-parse_function_pointer_restrictions_from_command_line(
-  const std::list<std::string> &restriction_opts)
+function_pointer_restrictionst::restrictionst function_pointer_restrictionst::
+  parse_function_pointer_restrictions_from_command_line(
+    const std::list<std::string> &restriction_opts)
 {
   return parse_function_pointer_restrictions(
-    restriction_opts,
-    "--" RESTRICT_FUNCTION_POINTER_OPT);
+    restriction_opts, "--" RESTRICT_FUNCTION_POINTER_OPT);
 }
 
 function_pointer_restrictionst::restrictionst
@@ -335,25 +342,22 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
 
   if(pointer_name_end == std::string::npos)
   {
-    throw invalid_command_line_argument_exceptiont{
-      "couldn't find '/' in `" + restriction_opt + "'",
-      option,
-      restriction_format_message};
+    throw invalid_restriction_exceptiont{"couldn't find '/' in `" +
+                                           restriction_opt + "'",
+                                         restriction_format_message};
   }
 
   if(pointer_name_end == restriction_opt.size())
   {
-    throw invalid_command_line_argument_exceptiont{
+    throw invalid_restriction_exceptiont{
       "couldn't find names of targets after '/' in `" + restriction_opt + "'",
-      option,
       restriction_format_message};
   }
 
   if(pointer_name_end == 0)
   {
-    throw invalid_command_line_argument_exceptiont{
-      "couldn't find target name before '/' in `" + restriction_opt + "'",
-      option};
+    throw invalid_restriction_exceptiont{
+      "couldn't find target name before '/' in `" + restriction_opt + "'"};
   }
 
   auto const pointer_name = restriction_opt.substr(0, pointer_name_end);
@@ -363,9 +367,8 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
 
   if(target_name_strings.size() == 1 && target_name_strings[0].empty())
   {
-    throw invalid_command_line_argument_exceptiont{
+    throw invalid_restriction_exceptiont{
       "missing target list for function pointer restriction " + pointer_name,
-      option,
       restriction_format_message};
   }
 
@@ -376,9 +379,8 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   {
     if(target_name == ID_empty_string)
     {
-      throw invalid_command_line_argument_exceptiont(
+      throw invalid_restriction_exceptiont(
         "leading or trailing comma in restrictions for `" + pointer_name + "'",
-        option,
         restriction_format_message);
     }
   }
@@ -426,7 +428,7 @@ function_pointer_restrictionst::get_by_name_restriction(
   {
     return optionalt<function_pointer_restrictionst::restrictiont>(
       std::make_pair(
-       function_pointer_call_site.get_identifier(), restriction->second));
+        function_pointer_call_site.get_identifier(), restriction->second));
   }
 
   return {};
@@ -439,18 +441,49 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
 {
   auto const restriction_opts =
     options.get_list_option(RESTRICT_FUNCTION_POINTER_OPT);
-  auto const commandline_restrictions =
-    parse_function_pointer_restrictions_from_command_line(restriction_opts);
 
-  auto const restriction_file_opts =
-    options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT);
-  auto const file_restrictions = parse_function_pointer_restrictions_from_file(
-    restriction_file_opts, message_handler);
+  restrictionst commandline_restrictions;
+  try
+  {
+    commandline_restrictions =
+      parse_function_pointer_restrictions_from_command_line(restriction_opts);
+    typecheck_function_pointer_restrictions(
+      goto_model, commandline_restrictions);
+  }
+  catch(const invalid_restriction_exceptiont &e)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      e.reason, "--" RESTRICT_FUNCTION_POINTER_OPT, e.correct_format};
+  }
 
-  auto const restriction_name_opts =
-    options.get_list_option(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT);
-  auto const name_restrictions = get_function_pointer_by_name_restrictions(
-    restriction_name_opts, goto_model);
+  restrictionst file_restrictions;
+  try
+  {
+    auto const restriction_file_opts =
+      options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT);
+    file_restrictions = parse_function_pointer_restrictions_from_file(
+      restriction_file_opts, message_handler);
+    typecheck_function_pointer_restrictions(goto_model, file_restrictions);
+  }
+  catch(const invalid_restriction_exceptiont &e)
+  {
+    throw deserialization_exceptiont{e.what()};
+  }
+
+  restrictionst name_restrictions;
+  try
+  {
+    auto const restriction_name_opts =
+      options.get_list_option(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT);
+    name_restrictions = get_function_pointer_by_name_restrictions(
+      restriction_name_opts, goto_model);
+    typecheck_function_pointer_restrictions(goto_model, name_restrictions);
+  }
+  catch(const invalid_restriction_exceptiont &e)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      e.reason, "--" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT, e.correct_format};
+  }
 
   return {merge_function_pointer_restrictions(
     commandline_restrictions,
@@ -561,8 +594,7 @@ function_pointer_restrictionst::get_function_pointer_by_name_restrictions(
   for(auto const &goto_function : goto_model.goto_functions.function_map)
   {
     for_each_function_call(
-      goto_function.second,
-      [&](const goto_programt::const_targett it) {
+      goto_function.second, [&](const goto_programt::const_targett it) {
         const auto restriction = get_by_name_restriction(
           goto_function.second, by_name_restrictions, it);
 

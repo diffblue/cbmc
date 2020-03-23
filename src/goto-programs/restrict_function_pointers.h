@@ -82,6 +82,23 @@ public:
   void write_to_file(const std::string &filename) const;
 
 protected:
+  class invalid_restriction_exceptiont : public cprover_exception_baset
+  {
+  public:
+    explicit invalid_restriction_exceptiont(
+      std::string reason,
+      std::string correct_format = "");
+
+    std::string what() const override;
+
+    std::string reason;
+    std::string correct_format;
+  };
+
+  static void typecheck_function_pointer_restrictions(
+    const goto_modelt &goto_model,
+    const restrictionst &restrictions);
+
   static restrictionst merge_function_pointer_restrictions(
     restrictionst lhs,
     const restrictionst &rhs);
