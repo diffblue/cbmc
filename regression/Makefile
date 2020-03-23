@@ -32,7 +32,8 @@ DIRS = cbmc \
        symtab2gb \
        solver-hardness \
        goto-ld \
-       # Empty last line
+       validate-trace-xml-schema \
+			 # Empty last line
 
 ifeq ($(OS),Windows_NT)
     detected_OS := Windows
