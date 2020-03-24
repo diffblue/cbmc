@@ -17,7 +17,8 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-SCENARIO("expr_dynamic_cast",
+SCENARIO(
+  "expr_dynamic_cast undefined",
   "[core][utils][expr_cast][expr_dynamic_cast]")
 {
   symbol_exprt symbol_expr;

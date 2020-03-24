@@ -24,13 +24,12 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 
-
-
+#include <algorithm>
+#include <iosfwd>
+#include <iterator>
+#include <map>
 #include <memory>
 #include <set>
-#include <map>
-#include <iosfwd>
-#include <algorithm>
 #include <stack>
 
 #include <goto-programs/goto_program.h>

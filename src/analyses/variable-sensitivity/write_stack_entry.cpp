@@ -1,5 +1,15 @@
-#include <unordered_set>
+/*******************************************************************\
 
+ Module: Analyses Variable Sensitivity
+
+ Author: DiffBlue Limited. All rights reserved.
+
+\*******************************************************************/
+
+/// \file
+/// Represents an entry in the write_stackt
+
+#include <unordered_set>
 
 #include <util/std_expr.h>
 

@@ -550,8 +550,10 @@ bool variable_sensitivity_domaint::ignore_function_call_transform(
 /// modified will be taken from the \p function_call domain.
 /// \param function_call: The local of the merge - values from here will be
 ///   taken if they have not been modified
-/// \param function_start: THe base of the merge - changes that have been made
-///   between here and this will be retained.
+/// \param function_start: The base of the merge - changes that have been made
+///   between here and the end will be retained.
+/// \param function_end: The end of the merge - changes that have been made
+///   between the start and here will be retained.
 /// \param ns: The global namespace
 void variable_sensitivity_domaint::merge_three_way_function_return(
   const ai_domain_baset &function_call,
