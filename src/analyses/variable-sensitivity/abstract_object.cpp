@@ -61,21 +61,11 @@ abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom):
   PRECONDITION(!(top && bottom));
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::abstract_objectt
-
-  Inputs:
-   expr - the expression to use as the starting pointer for an abstract object
-   environment - The environment this abstract object is being created in
-   ns - the namespace
-
- Outputs:
-
- Purpose: Construct an abstract object from the expression
-
-\*******************************************************************/
-
+/// Construct an abstract object from the expression
+/// \param expr: The expression to use as the starting pointer for an abstract
+///   object
+/// \param environment: The environment this abstract object is being created in
+/// \param ns: The namespace
 abstract_objectt::abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
@@ -527,6 +517,7 @@ void abstract_objectt::dump_map(
 /**
  * \brief Dump all elements in m1 that are different or missing in m2
  *
+ * \param out the stream to write output to
  * \param m1 the 'target' sharing_map
  * \param m2 the reference sharing map
  */

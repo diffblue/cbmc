@@ -54,7 +54,10 @@ void variable_sensitivity_dependence_domaint::eval_data_deps(
  * the data dependencies, this involves calculating all the data
  * dependencies that exist in the 'to' instruction.
  *
+ * \param function_from the function of the instruction before the abstract
+ *   domain
  * \param from the instruction before the abstract domain
+ * \param function_to the function of the instruction after the abstract domain
  * \param to the instruction after the abstract domain
  * \param ai the abstract interpreter
  * \param ns the namespace
@@ -432,8 +435,10 @@ bool variable_sensitivity_dependence_domaint::merge(
  *
  * \param function_call: The local of the merge - values from here will be
  *   taken if they have not been modified
- * \param function_start: THe base of the merge - changes that have been made
- *   between here and this will be retained.
+ * \param function_start: The base of the merge - changes that have been made
+ *   between here and the end will be retained.
+ * \param function_end: The end of the merge - changes that have been made
+///   between the start and here will be retained.
  * \param ns: The global namespace
  */
 void variable_sensitivity_dependence_domaint::merge_three_way_function_return(
@@ -445,8 +450,8 @@ void variable_sensitivity_dependence_domaint::merge_three_way_function_return(
   // The gathering of the data dependencies for the domain is handled by the
   // 'transform' and simply relies on the underlying domains with their
   // data_dependency_context to be correct. Therefore all we need to ensure at
-  // the three way merge is that the underlying variable senstivitiy domain 
-  // does it's three way merge.
+  // the three way merge is that the underlying variable sensitivity domain
+  // does its three way merge.
   variable_sensitivity_domaint::merge_three_way_function_return(
     function_call,
     function_start,
