@@ -28,7 +28,3 @@ phases:
         cmake --build build --config Release --target unit
         # display cache stats
         clcache -s
-
-cache:
-  paths:
-    - 'c:\clcache\**\*'
