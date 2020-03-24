@@ -265,7 +265,7 @@ Function: abstract_object_pointert abstract_environmentt::write
    remaining_stack - what is left of the stack before the rhs can replace or be
                      merged with the rhs
    ns - the namespace
-   merge_write - Are re replacing the left hand side with the right hand side
+   merge_write - Are we replacing the left hand side with the right hand side
                  (e.g. we know for a fact that we are overwriting this object)
                  or could the write in fact not take place and therefore we
                  should merge to model the case where it did not.

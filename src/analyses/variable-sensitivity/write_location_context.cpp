@@ -6,9 +6,11 @@
 
 \*******************************************************************/
 
-#include <util/std_types.h>
 #include <ostream>
+
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <util/std_types.h>
+
 #include "write_location_context.h"
 
 /**

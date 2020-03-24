@@ -6,6 +6,5 @@ activate-multi-line-match
 ^SIGNAL=0$
 Control dependencies: [0-9]+ \[TRUE\]\n.*\n.*\n\s+a = 1;
 Control dependencies: [0-9]+ \[UNCONDITIONAL\]\n.*\n.*\n\s+a = 2;
-
 --
 ^warning: ignoring
