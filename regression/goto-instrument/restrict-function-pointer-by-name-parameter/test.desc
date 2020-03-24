@@ -1,0 +1,12 @@
+CORE
+test.c
+--restrict-function-pointer-by-name use_fp::fp/f
+\[use_fp\.assertion\.1\] line \d+ dereferenced function pointer at use_fp\.function_pointer_call\.1 must be f: SUCCESS
+\[use_fp\.assertion\.2\] line \d+ assertion fp\(\) == 1: SUCCESS
+f\(\)
+^EXIT=0$
+^SIGNAL=0$
+--
+g\(\)
+--
+Check that a call to a function pointer parameter is correctly restricted

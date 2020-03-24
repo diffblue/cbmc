@@ -29,11 +29,15 @@ Author: Diffblue Ltd.
 #define RESTRICT_FUNCTION_POINTER_OPT "restrict-function-pointer"
 #define RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                \
   "function-pointer-restrictions-file"
+#define RESTRICT_FUNCTION_POINTER_BY_NAME_OPT                                  \
+  "restrict-function-pointer-by-name"
 
 #define OPT_RESTRICT_FUNCTION_POINTER                                          \
   "(" RESTRICT_FUNCTION_POINTER_OPT                                            \
   "):"                                                                         \
-  "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT "):"
+  "(" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                  \
+  "):"                                                                         \
+  "(" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT "):"
 
 #define HELP_RESTRICT_FUNCTION_POINTER                                         \
   "--" RESTRICT_FUNCTION_POINTER_OPT                                           \
@@ -62,12 +66,11 @@ public:
 
   const restrictionst restrictions;
 
-  /// parse function pointer restrictions from command line
-  ///
-  /// Note: These are are only syntactically checked at this stage,
-  ///       because type checking them requires a goto_modelt
-  static function_pointer_restrictionst
-  from_options(const optionst &options, message_handlert &message_handler);
+  /// Parse function pointer restrictions from command line
+  static function_pointer_restrictionst from_options(
+    const optionst &options,
+    const goto_modelt &goto_model,
+    message_handlert &message_handler);
 
   jsont to_json() const;
   static function_pointer_restrictionst from_json(const jsont &json);
@@ -79,19 +82,62 @@ public:
   void write_to_file(const std::string &filename) const;
 
 protected:
+  class invalid_restriction_exceptiont : public cprover_exception_baset
+  {
+  public:
+    explicit invalid_restriction_exceptiont(
+      std::string reason,
+      std::string correct_format = "");
+
+    std::string what() const override;
+
+    std::string reason;
+    std::string correct_format;
+  };
+
+  static void typecheck_function_pointer_restrictions(
+    const goto_modelt &goto_model,
+    const restrictionst &restrictions);
+
   static restrictionst merge_function_pointer_restrictions(
     restrictionst lhs,
     const restrictionst &rhs);
-
-  static restrictionst parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts);
 
   static restrictionst parse_function_pointer_restrictions_from_file(
     const std::list<std::string> &filenames,
     message_handlert &message_handler);
 
-  static restrictiont
-  parse_function_pointer_restriction(const std::string &restriction_opt);
+  static restrictionst parse_function_pointer_restrictions_from_command_line(
+    const std::list<std::string> &restriction_opts);
+
+  static restrictionst parse_function_pointer_restrictions(
+    const std::list<std::string> &restriction_opts,
+    const std::string &option);
+
+  static restrictiont parse_function_pointer_restriction(
+    const std::string &restriction_opt,
+    const std::string &option);
+
+  static optionalt<restrictiont> get_by_name_restriction(
+    const goto_functiont &goto_function,
+    const function_pointer_restrictionst::restrictionst &by_name_restrictions,
+    const goto_programt::const_targett &location);
+
+  /// Get function pointer restrictions from restrictions with named pointers
+  ///
+  /// This takes a list of restrictions, with each restriction consisting of a
+  /// function pointer name, and the list of target functions. That is, each
+  /// input restriction is of the form \<fp-name\>/\<target\>(,\<target\>)*. The
+  /// method then returns a `restrictionst` object constructed from the given
+  /// list of restrictions
+  ///
+  /// \param restriction_name_opts: restrictions
+  /// \param goto_model: goto model with labelled function pointer calls
+  /// \return function pointer restrictions in the internal format that is
+  ///   understood by other methods in this class
+  static restrictionst get_function_pointer_by_name_restrictions(
+    const std::list<std::string> &restriction_name_opts,
+    const goto_modelt &goto_model);
 };
 
 /// Apply function pointer restrictions to a goto_model. Each restriction is a

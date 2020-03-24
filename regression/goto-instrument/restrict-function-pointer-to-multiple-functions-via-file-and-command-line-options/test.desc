@@ -1,13 +1,14 @@
 CORE
 test.c
---function-pointer-restrictions-file restrictions.json --restrict-function-pointer use_f.function_pointer_call.1/g
-\[use_f\.assertion\.1\] line \d+ dereferenced function pointer at use_f.function_pointer_call.1 must be one of \[(f|g), (f|g)\]: FAILURE
+--function-pointer-restrictions-file restrictions.json --restrict-function-pointer use_f.function_pointer_call.1/g --restrict-function-pointer-by-name use_f::fptr/h
+\[use_f\.assertion\.1\] line \d+ dereferenced function pointer at use_f.function_pointer_call.1 must be one of \[(f|g|h), (f|g|h), (f|g|h)\]: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
 --
 --
 This test checks that the restrictions for a function pointer are the union of
-the restrictions given in a file and on the command line.
+the restrictions given in a file and on the command line (both with functions
+pointers being numbered and named)
 
 The test further checks that the correct safety assertions are generated. The
 function pointer restriction feature outputs safety assertions for all calls
