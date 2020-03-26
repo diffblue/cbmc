@@ -52,7 +52,8 @@ SCENARIO("Constructing two environments to make sure we correctly identify modif
     symbol_table.add(second_sym);
     namespacet ns(symbol_table);
 
-    variable_sensitivity_object_factoryt::instance().set_options(vsd_configt{});
+    variable_sensitivity_object_factoryt::instance().set_options(
+      vsd_configt::constant_domain());
 
     WHEN("The identifiers get inserted into two environments")
     {
