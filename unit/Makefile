@@ -14,26 +14,18 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
-       util/interval/multiply.cpp \
-       util/interval/add.cpp \
-       util/interval/get_extreme.cpp \
-       util/interval/subtract.cpp \
-       util/interval/modulo.cpp \
-       util/interval/shift.cpp \
-       util/interval/comparisons.cpp \
-       util/interval/bitwise.cpp \
        analyses/variable-sensitivity/abstract_object/merge.cpp \
        analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
        analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \
-       analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
-       analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
        analyses/variable-sensitivity/eval.cpp \
+       analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
        analyses/variable-sensitivity/write_stack.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
-       goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
+       goto-instrument/cover_instrument.cpp \
        goto-programs/goto_model_function_type_consistency.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
@@ -51,8 +43,8 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/apply_condition.cpp \
        goto-symex/expr_skeleton.cpp \
        goto-symex/goto_symex_state.cpp \
-       goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
+       goto-symex/ssa_equation.cpp \
        goto-symex/symex_assign.cpp \
        goto-symex/symex_level0.cpp \
        goto-symex/symex_level1.cpp \
@@ -88,7 +80,16 @@ SRC += analyses/ai/ai.cpp \
        util/format_number_range.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
+       util/interval/add.cpp \
+       util/interval/bitwise.cpp \
+       util/interval/comparisons.cpp \
        util/interval_constraint.cpp \
+       util/interval/eval.cpp \
+       util/interval/get_extreme.cpp \
+       util/interval/modulo.cpp \
+       util/interval/multiply.cpp \
+       util/interval/shift.cpp \
+       util/interval/subtract.cpp \
        util/interval_union.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
@@ -115,8 +116,8 @@ SRC += analyses/ai/ai.cpp \
        util/string_utils/join_string.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
-       util/symbol_table.cpp \
        util/symbol.cpp \
+       util/symbol_table.cpp \
        util/unicode.cpp \
        # Empty last line
 
