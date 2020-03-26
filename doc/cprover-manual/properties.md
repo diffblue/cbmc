@@ -132,9 +132,10 @@ The goto-instrument program supports these checks:
 As all of these checks apply across the entire input program, we may wish to
 disable them for selected statements in the program. For example, unsigned
 overflows can be expected and acceptable in certain instructions even when
-elsewhere we do not expect them. To selectively disable automatically generated
-properties use `#pragma CPROVER check disable "<name_of_check>"`, which remains
-in effect until a `#pragma CPROVER check pop` (to re-enable all properties
+elsewhere we do not expect them. As of version 5.12, CBMC supports selectively
+disabling automatically generated properties.  To disable property generation,
+use `#pragma CPROVER check disable "<name_of_check>"`, which remains in effect
+until a `#pragma CPROVER check pop` (to re-enable all properties
 disabled before or since the last `#pragma CPROVER check push`) is provided.
 For example, for unsigned overflow checks, use
 ```
