@@ -2262,7 +2262,7 @@ bool Parser::rAttribute(typet &t)
 
       typet attr(ID_gcc_attribute_mode);
       set_location(attr, tk);
-      attr.set(ID_size, name.get(ID_identifier));
+      attr.set(ID_size, to_cpp_name(name).get_base_name());
       merge_types(attr, t);
       break;
     }
@@ -2880,7 +2880,7 @@ bool Parser::rDeclaratorWithInit(
     bit_field_type.subtype().make_nil();
     set_location(bit_field_type, tk);
 
-    // merge_types(bit_field_type, declarator.type());
+    merge_types(bit_field_type, dw.type());
 
     return true;
   }
@@ -3226,6 +3226,15 @@ bool Parser::rDeclarator(
   }
 
   optCvQualify(d_outer);
+  if(d_outer.is_not_nil() && !d_outer.has_subtypes())
+  {
+    merged_typet merged_type;
+    merged_type.move_to_subtypes(d_outer);
+    typet nil;
+    nil.make_nil();
+    merged_type.move_to_sub(nil);
+    d_outer.swap(merged_type);
+  }
 
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 13\n";
