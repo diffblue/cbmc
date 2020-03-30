@@ -55,7 +55,7 @@ public:
 
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
-  abstract_object_sett get_values() const
+  const abstract_object_sett &get_values() const
   {
     return values;
   }
