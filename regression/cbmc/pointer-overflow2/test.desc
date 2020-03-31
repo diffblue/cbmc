@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+--pointer-overflow-check
+^EXIT=0$
+^SIGNAL=0$
+\[main.overflow.1\] line \d+ pointer arithmetic overflow on - in p - \(signed long int\)1: SUCCESS
+\[main.overflow.2\] line \d+ pointer arithmetic overflow on \+ in p \+ \(signed long int\)1: SUCCESS
+\[main.overflow.3\] line \d+ pointer arithmetic overflow on \+ in p \+ \(signed long int\)-1: SUCCESS
+\[main.overflow.4\] line \d+ pointer arithmetic overflow on - in p - \(signed long int\)-1: SUCCESS
+--
+^warning: ignoring
