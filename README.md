@@ -1,6 +1,6 @@
 [![Build Status][travis_img]][travis]
-![Build Status][codebuild_img]
-![Build Status][codebuild_windows_img]
+[![Build Status][codebuild_img]][codebuild]
+[![Build Status][codebuild_windows_img]][codebuild_windows]
 [![Build Status][coverity_img]][coverity]
 [![Build Status][codecov_img]][codecov]
 
@@ -56,7 +56,9 @@ License
 
 [travis]: https://travis-ci.org/diffblue/cbmc
 [travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=master
+[codebuild]: https://us-east-1.console.aws.amazon.com/codesuite/codebuild/projects/cbmc/history?region=us-east-1
 [codebuild_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiajhxcmNGUEgyV0xZa2ZFaVd3czJmbm1DdEt3QVdJRVdZaGJuMTUwOHFrZUM3eERwS1g4VEQ3Ymw3bmFncldVQXArajlYL1pXbGZNVTdXdndzUHU4Ly9JPSIsIml2UGFyYW1ldGVyU3BlYyI6IkVUUEdWVEt0SUFONlhyNVAiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
+[codebuild_windows]: https://us-east-1.console.aws.amazon.com/codesuite/codebuild/projects/cbmc-windows/history?region=us-east-1
 [codebuild_windows_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTFQ4Q0lCSEc1Rk5NcmlzaFZDdU44Vk8zY0c1VCtIVWMwWnJMRitmVFI5bE94Q3dhekVPMWRobFU2Q0xTTlpDSWZUQ3J1eksrWW1rSll1OExXdll2bExZPSIsIml2UGFyYW1ldGVyU3BlYyI6InpqcloyaEdxbjBiQUtvNysiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
 [coverity]: https://scan.coverity.com/projects/diffblue-cbmc
 [coverity_img]: https://scan.coverity.com/projects/13552/badge.svg
