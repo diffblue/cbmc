@@ -1,14 +1,8 @@
 file(GLOB cpp_library_sources "library/*.c")
 
-add_custom_command(OUTPUT converter_input.txt
-    COMMAND cat ${cpp_library_sources} > converter_input.txt
-    DEPENDS ${cpp_library_sources}
-)
-
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-    COMMAND ../ansi-c/converter < "converter_input.txt" > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-    DEPENDS "converter_input.txt" ../ansi-c/converter
-)
+        COMMAND cat ${cpp_library_sources} | $<TARGET_FILE:converter> > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+        DEPENDS converter ${cpp_library_sources})
 
 ################################################################################
 
@@ -32,6 +26,12 @@ endif()
 
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 add_library(cpp ${sources})
+
+set_source_files_properties(
+        ${sources}
+        PROPERTIES
+        OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+)
 
 generic_includes(cpp)
 
