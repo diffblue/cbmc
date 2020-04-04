@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Ensure that the new operator is implemented.

@@ -1,0 +1,10 @@
+CORE
+test.c
+--show-goto-functions
+IF !\(\(signed int\)s\[\(.*\)len\] != 0\) THEN GOTO 2
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Ensure that if the string abstraction flag is not provided, the regular model for
+string functions is used (in this case searching for the terminator).
