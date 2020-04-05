@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_UNICODE_H
 #define CPROVER_UTIL_UNICODE_H
 
@@ -24,6 +23,10 @@ std::wstring widen(const std::string &s);
 
 std::string
 utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s);
+
+/// \param utf8_str: UTF-8 string
+/// \return UTF-32 encoding of the string
+std::u32string utf8_to_utf32(const std::string &utf8_str);
 
 std::wstring utf8_to_utf16_native_endian(const std::string &in);
 std::string utf16_native_endian_to_java(const char16_t ch);
@@ -57,10 +60,8 @@ std::vector<const char *> to_c_str_array(It b, It e)
 {
   // Assumes that walking the range will be faster than repeated allocation
   std::vector<const char *> ret(std::distance(b, e) + 1, nullptr);
-  std::transform(b, e, std::begin(ret), [] (const std::string & s)
-    {
-      return s.c_str();
-    });
+  std::transform(
+    b, e, std::begin(ret), [](const std::string &s) { return s.c_str(); });
   return ret;
 }
 
