@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 test.c
 --restrict-function-pointer main.function_pointer_call.1/f
 ^EXIT=0$
@@ -7,7 +7,7 @@ test.c
 --
 --
 This test checks that a function pointer call that is the target of a goto (in
-the goto program) is correctly handled. Currently there is a bug, as the
+the goto program) is correctly handled. Previously there was a bug, as the
 function pointer labelling step which is part of the restrict function pointer
-feature inserts a new instructions before the function pointer calls, but does
+feature inserted a new instruction before the function pointer call, but did
 not adjust the goto targets.

@@ -15,13 +15,14 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
   for(auto &goto_function : goto_model.goto_functions.function_map)
   {
     std::size_t function_pointer_call_counter = 0;
+
     for_each_instruction_if(
       goto_function.second,
       [](const goto_programt::targett it) {
         return it->is_function_call() && can_cast_expr<dereference_exprt>(
                                            it->get_function_call().function());
       },
-      [&](goto_programt::targett it) {
+      [&](goto_programt::targett &it) {
         auto const &function_call = it->get_function_call();
         auto const &function_pointer_dereference =
           to_dereference_expr(function_call.function());
@@ -52,13 +53,22 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
 
         // add assignment to the new function pointer variable, followed by a
         // call of the new variable
-        auto const assign_instruction = goto_programt::make_assignment(
+        auto assign_instruction = goto_programt::make_assignment(
           code_assignt{new_function_pointer,
                        function_pointer_dereference.pointer()},
           source_location);
-        goto_function.second.body.insert_before(it, assign_instruction);
-        to_code_function_call(it->code).function() =
+
+        goto_function.second.body.insert_before_swap(it, assign_instruction);
+        const auto next = std::next(it);
+        to_code_function_call(next->code).function() =
           dereference_exprt{new_function_pointer};
+        // we need to increment the iterator once more (in addition to the
+        // increment already done by for_each_goto_function_if()). This is
+        // because insert_before_swap() inserts a new instruction after the
+        // instruction pointed to by it (and then swaps the contents with the
+        // previous instruction). We need to increment the iterator as we also
+        // need to skip over this newly inserted instruction.
+        it++;
       });
   }
 }
