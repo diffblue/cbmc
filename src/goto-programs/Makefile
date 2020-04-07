@@ -29,6 +29,7 @@ SRC = adjust_float_expressions.cpp \
       interpreter_evaluate.cpp \
       json_expr.cpp \
       json_goto_trace.cpp \
+      label_function_pointer_call_sites.cpp \
       lazy_goto_model.cpp \
       label_function_pointer_call_sites.cpp \
       link_goto_model.cpp \

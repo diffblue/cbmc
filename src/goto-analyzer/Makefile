@@ -3,6 +3,7 @@ SRC = goto_analyzer_main.cpp \
       taint_analysis.cpp \
       taint_parser.cpp \
       unreachable_instructions.cpp \
+      get_function_pointer_values.cpp \
       show_on_source.cpp \
       static_show_domain.cpp \
       static_simplifier.cpp \
