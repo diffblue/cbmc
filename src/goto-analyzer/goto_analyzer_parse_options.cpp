@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/label_function_pointer_call_sites.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
@@ -64,6 +65,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/version.h>
 
 #include "show_on_source.h"
+#include "show_function_pointer_values.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
@@ -331,6 +333,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("data-dependencies", cmdline.isset("data-dependencies"));
       options.set_option("interval", cmdline.isset("interval-values"));
       options.set_option("value-set", cmdline.isset("value-set"));
+      if(cmdline.isset("get-fp-values")) {
+        options.set_option("function-pointer-values", cmdline.get_value("get-fp-values"));
+      }
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
@@ -693,6 +698,12 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       show_on_source(goto_model, *analyzer, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
+    else if(options.is_set("function-pointer-values"))
+    {
+      std::string filename = options.get_option("function-pointer-values");
+      print_function_pointer_values(goto_model, *analyzer, options, ui_message_handler, filename);
+      return CPROVER_EXIT_SUCCESS;
+    }
     else if(options.get_bool_option("verify"))
     {
       result = static_verifier(
@@ -760,6 +771,10 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
     #endif
 
+    if(options.is_set("function-pointer-values")) {
+      label_function_pointer_call_sites(goto_model);
+    }
+
     // remove function pointers
     log.status() << "Removing function pointers and virtual functions"
                  << messaget::eom;
@@ -774,14 +789,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_returns(goto_model);
     remove_vector(goto_model);
     remove_complex(goto_model);
-
-#if 0
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-#else
-    (void)options; // unused parameter
-#endif
 
     // recalculate numbers, etc.
     goto_model.goto_functions.update();

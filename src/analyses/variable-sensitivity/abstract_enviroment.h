@@ -77,12 +77,12 @@ public:
 
   abstract_object_statisticst gather_statistics(const namespacet &ns) const;
 
-protected:
-  bool bottom;
-
   // We may need to break out more of these cases into these
   virtual abstract_object_pointert eval_expression(
     const exprt &e, const namespacet &ns) const;
+
+protected:
+  bool bottom;
 
   sharing_mapt<map_keyt, abstract_object_pointert> map;
 

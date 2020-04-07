@@ -152,7 +152,7 @@ class optionst;
   "(non-null)(show-non-null)" \
   "(variable)" \
   "(variable-sensitivity)" \
-  "(pointers)(arrays)(structs)(value-set)(data-dependencies)" \
+  "(pointers)(arrays)(structs)(value-set)(data-dependencies)(get-fp-values):" \
   "(constants)" \
   "(dependence-graph)" \
   "(dependence-graph-vs)" \
