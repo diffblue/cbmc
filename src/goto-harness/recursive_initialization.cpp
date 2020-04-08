@@ -623,6 +623,17 @@ code_blockt recursive_initializationt::build_pointer_constructor(
 
   code_blockt body{};
 
+  // always initalize void* pointers as NULL
+  if(type.subtype().id() == ID_empty)
+  {
+    null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
+    code_blockt null_and_return{};
+    code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
+    null_and_return.add(assign_null);
+    null_and_return.add(code_returnt{});
+    return null_and_return;
+  }
+
   // build:
   // void type_constructor_ptr_T(int depth, T** result)
   // {
