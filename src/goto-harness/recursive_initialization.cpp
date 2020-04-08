@@ -621,19 +621,16 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   const typet &type = result.type().subtype();
   PRECONDITION(type.id() == ID_pointer);
 
-  code_blockt body{};
+  null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
+  const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
 
   // always initalize void* pointers as NULL
   if(type.subtype().id() == ID_empty)
   {
-    null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
-    code_blockt null_and_return{};
-    code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
-    null_and_return.add(assign_null);
-    null_and_return.add(code_returnt{});
-    return null_and_return;
+    return code_blockt{{assign_null, code_returnt{}}};
   }
 
+  code_blockt body{};
   // build:
   // void type_constructor_ptr_T(int depth, T** result)
   // {
@@ -666,11 +663,7 @@ code_blockt recursive_initializationt::build_pointer_constructor(
     should_not_recurse.push_back(has_seen_expr);
   }
 
-  null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
-  code_blockt null_and_return{};
-  code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
-  null_and_return.add(assign_null);
-  null_and_return.add(code_returnt{});
+  code_blockt null_and_return{{assign_null, code_returnt{}}};
   body.add(code_ifthenelset{conjunction(should_not_recurse), null_and_return});
 
   exprt::operandst should_recurse_ops{
