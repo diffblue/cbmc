@@ -639,7 +639,8 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   // {
   //   if(has_seen && depth >= max_depth)
   //     *result=NULL;
-  //   else if(depth < min_null_tree_depth || nondet()) {
+  //     return
+  //   if(nondet()) {
   //     size_t has_seen_prev;
   //     has_seen_prev = T_has_seen;
   //     T_has_seen = 1;
