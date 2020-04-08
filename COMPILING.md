@@ -170,6 +170,16 @@ Follow these instructions:
       ```
       bash.exe -login
       ```
+      Please note that this might open a different shell instead, especially if
+      you have installed other Linux subsystems previously. To verify that you
+      are in the correct shell, make sure that the Windows file system can be
+      accessed via the folder`/cygdrive`. If the command above does not open
+      the Cygwin shell, you can also access it by using its absolute path,
+      `C:\cygwin64\bin\bash.exe` by default. In the Developer Command Prompt, 
+      simply type
+      ```
+      C:\cygwin64\bin\bash.exe -login
+      ```
    2. To compile with MinGW, use Cygwin setup to install a mingw g++ compiler
       package, i.e. one of `mingw{32,64}-{x86_64,i686}-gcc-g++`. You may also
       have to adjust the section in `src/common` that defines `CC` and `CXX`
