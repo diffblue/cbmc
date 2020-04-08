@@ -187,6 +187,17 @@ public:
     return clone;
   }
 
+  abstract_object_pointert make_bottom() const
+  {
+    if(is_bottom())
+    {
+      return shared_from_this();
+    }
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->make_bottom();
+    return clone;
+  }
+
   abstract_object_pointert clear_top() const
   {
     if(!is_top())
