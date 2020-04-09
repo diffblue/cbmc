@@ -1,0 +1,11 @@
+CORE
+main.c
+--harness-type call-function --function test_function --treat-pointer-as-cstring input
+\[test_function\.assertion\.1\] line \d+ assertion input == 0: SUCCESS
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Ensure the harness is able to initalize a void* ptr to a null value, even when
+the parameter is specified to be treated as a string.
