@@ -1,0 +1,13 @@
+CORE
+main.c
+--harness-type call-function --function test_ptr_array --treat-pointer-as-array input_array
+\[test_ptr_array\.assertion\.1\] line \d+ assertion input_array\[0\] == 0: SUCCESS
+\[test_ptr_array\.assertion\.2\] line \d+ assertion .*: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Ensure the harness is able to initalize an array of void* pointers where
+the array is non-null, but the elements are null, if the void** is treated as an
+array.
