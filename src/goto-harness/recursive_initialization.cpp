@@ -793,6 +793,15 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
   PRECONDITION(pointer_type.id() == ID_pointer);
   const typet &element_type = pointer_type.subtype();
 
+  null_pointer_exprt nullptr_expr{::pointer_type(element_type)};
+  const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
+
+  // always initalize void* pointers as NULL
+  if(element_type.id() == ID_empty)
+  {
+    return code_blockt{{assign_null, code_returnt{}}};
+  }
+
   // builds:
   // void type_constructor_ptr_T(int depth, T** result, int* size)
   // {
