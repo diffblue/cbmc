@@ -230,6 +230,15 @@ void recursive_initializationt::initialize(
                                {depth, address_of_exprt{lhs}}});
 }
 
+code_blockt build_null_pointer(const symbol_exprt &result_symbol)
+{
+  const typet &type_to_construct = result_symbol.type().subtype();
+  const null_pointer_exprt nullptr_expr{to_pointer_type(type_to_construct)};
+  const code_assignt assign_null{dereference_exprt{result_symbol},
+                                 nullptr_expr};
+  return code_blockt{{assign_null, code_returnt{}}};
+}
+
 code_blockt recursive_initializationt::build_constructor_body(
   const exprt &depth_symbol,
   const symbol_exprt &result_symbol,
@@ -248,6 +257,11 @@ code_blockt recursive_initializationt::build_constructor_body(
     if(type.subtype().id() == ID_code)
     {
       return build_function_pointer_constructor(result_symbol, is_nullable);
+    }
+    if(type.subtype().id() == ID_empty)
+    {
+      // always initalize void* pointers as NULL
+      return build_null_pointer(result_symbol);
     }
     if(lhs_name.has_value())
     {
@@ -620,15 +634,7 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   PRECONDITION(result.type().id() == ID_pointer);
   const typet &type = result.type().subtype();
   PRECONDITION(type.id() == ID_pointer);
-
-  null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
-  const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
-
-  // always initalize void* pointers as NULL
-  if(type.subtype().id() == ID_empty)
-  {
-    return code_blockt{{assign_null, code_returnt{}}};
-  }
+  PRECONDITION(type.subtype().id() != ID_empty);
 
   code_blockt body{};
   // build:
@@ -663,6 +669,8 @@ code_blockt recursive_initializationt::build_pointer_constructor(
     should_not_recurse.push_back(has_seen_expr);
   }
 
+  null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
+  const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
   code_blockt null_and_return{{assign_null, code_returnt{}}};
   body.add(code_ifthenelset{conjunction(should_not_recurse), null_and_return});
 
@@ -792,15 +800,7 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
   const typet &pointer_type = result.type().subtype();
   PRECONDITION(pointer_type.id() == ID_pointer);
   const typet &element_type = pointer_type.subtype();
-
-  null_pointer_exprt nullptr_expr{::pointer_type(element_type)};
-  const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
-
-  // always initalize void* pointers as NULL
-  if(element_type.id() == ID_empty)
-  {
-    return code_blockt{{assign_null, code_returnt{}}};
-  }
+  PRECONDITION(element_type.id() != ID_empty);
 
   // builds:
   // void type_constructor_ptr_T(int depth, T** result, int* size)
