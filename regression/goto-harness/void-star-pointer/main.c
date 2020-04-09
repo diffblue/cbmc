@@ -12,3 +12,10 @@ void test_void_array(void *input_array[10])
   assert(input_array[0] == 0);
   assert(false);
 }
+
+void test_ptr_array(void **input_array)
+{
+  __CPROVER_assume(input_array != 0);
+  assert(input_array[0] == 0);
+  assert(false);
+}
