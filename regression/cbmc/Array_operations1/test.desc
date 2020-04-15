@@ -4,7 +4,9 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[test_copy\.assertion\.4\] .* expected to fail: FAILURE$
-^\*\* 1 of 8 failed
+^\[test_unequal\.assertion\.1\] .* different sizes arrays are unequal: SUCCESS
+^\[test_unequal\.assertion\.2\] .* different typed arrays are unequal: SUCCESS
+^\*\* 1 of 10 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

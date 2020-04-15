@@ -12,6 +12,23 @@ void test_equal()
   __CPROVER_assert(array1[index] == array2[index], "arrays are equal");
 }
 
+void test_unequal()
+{
+  int a1[10];
+  int a2[16];
+
+  __CPROVER_assert(
+    !__CPROVER_array_equal(a1, a2), "different sizes arrays are unequal");
+
+  float a3[10];
+  void *lost_type1 = a1;
+  void *lost_type3 = a3;
+
+  __CPROVER_assert(
+    !__CPROVER_array_equal(lost_type1, lost_type3),
+    "different typed arrays are unequal");
+}
+
 void test_copy()
 {
   char array1[100], array2[100], array3[90];
@@ -54,4 +71,5 @@ int main()
   test_copy();
   test_replace();
   test_set();
+  test_unequal();
 }
