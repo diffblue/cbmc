@@ -240,7 +240,7 @@ void goto_symext::symex_other(
 
     // check for size (or type) mismatch
     if(array1.type() != array2.type())
-      assignment.lhs() = false_exprt();
+      assignment.rhs() = false_exprt();
 
     symex_assign(state, assignment);
   }
