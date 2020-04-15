@@ -5,8 +5,12 @@ main.c
 ^SIGNAL=0$
 ^\[test_copy\.assertion\.4\] .* expected to fail: FAILURE$
 ^\[test_unequal\.assertion\.1\] .* different sizes arrays are unequal: SUCCESS
-^\[test_unequal\.assertion\.2\] .* different typed arrays are unequal: SUCCESS
-^\*\* 1 of 10 failed
+^\[test_unequal\.assertion\.2\] .* expected to fail: FAILURE
+^\[test_unequal\.assertion\.3\] .* different typed arrays are unequal: SUCCESS
+^\[test_unequal\.assertion\.4\] .* expected to fail: FAILURE
+^\[test_unequal\.assertion\.5\] .* expected to fail: FAILURE
+^\[test_unequal\.assertion\.6\] .* expected to fail: FAILURE
+^\*\* 5 of 14 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
