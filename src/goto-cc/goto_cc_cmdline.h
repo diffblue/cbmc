@@ -34,6 +34,12 @@ public:
   // never fails, will add if not found
   std::size_t get_optnr(const std::string &option);
 
+  /// Set option \p option to \p value.
+  void set(const std::string &opt, const char *value) override
+  {
+    set(opt, std::string{value});
+  }
+
   void set(const std::string &opt, const std::string &value) override
   {
     std::size_t nr=get_optnr(opt);

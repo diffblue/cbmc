@@ -34,4 +34,9 @@ else()
     COMMAND "${CMAKE_COMMAND}" -E create_symlink
       goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-gcc
     BYPRODUCTS ${CMAKE_BINARY_DIR}/bin/goto-gcc)
+  add_custom_command(TARGET goto-cc
+    POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E create_symlink
+      goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-ld
+    BYPRODUCTS ${CMAKE_BINARY_DIR}/bin/goto-ld)
 endif()
