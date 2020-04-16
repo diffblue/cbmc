@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_internal_additions.h"
 
+#include <limits>
+
 #include <util/c_types.h>
 #include <util/config.h>
 
@@ -120,6 +122,24 @@ static std::string architecture_string(T value, const char *s)
          std::string(s) + "=" + std::to_string(value) + ";\n";
 }
 
+using max_alloc_sizet = uint64_t;
+/// The maximum allocation size is determined by the number of bits that
+/// are left in the pointer of width \p pointer_width after allowing for the
+/// signed bit, and the bits used for the objects ID (determined by
+/// \p object_bits).
+/// \param pointer_width: The width of the pointer
+/// \param object_bits : The number of bits used to represent the ID
+/// \return The size in bytes of the maximum allocation supported.
+static max_alloc_sizet
+max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
+{
+  PRECONDITION(object_bits < pointer_width - 1);
+  PRECONDITION(object_bits >= 1);
+  const auto bits_for_offset = pointer_width - object_bits - 1;
+  PRECONDITION(bits_for_offset < std::numeric_limits<max_alloc_sizet>::digits);
+  return ((max_alloc_sizet)1) << (max_alloc_sizet)bits_for_offset;
+}
+
 void ansi_c_internal_additions(std::string &code)
 {
   // clang-format off
@@ -162,8 +182,8 @@ void ansi_c_internal_additions(std::string &code)
     "int " CPROVER_PREFIX "malloc_failure_mode_assert_then_assume="+
     std::to_string(config.ansi_c.malloc_failure_mode_assert_then_assume)+";\n"
     CPROVER_PREFIX "size_t " CPROVER_PREFIX "max_malloc_size="+
-    std::to_string(1 << (config.ansi_c.pointer_width -
-                         config.bv_encoding.object_bits - 1))+";\n"
+    std::to_string(max_malloc_size(config.ansi_c.pointer_width, config
+    .bv_encoding.object_bits))+";\n"
 
     // this is ANSI-C
     "extern " CPROVER_PREFIX "thread_local const char __func__["
