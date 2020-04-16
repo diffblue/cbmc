@@ -133,6 +133,7 @@ using max_alloc_sizet = uint64_t;
 static max_alloc_sizet
 max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
 {
+  PRECONDITION(pointer_width >= 1);
   PRECONDITION(object_bits < pointer_width - 1);
   PRECONDITION(object_bits >= 1);
   const auto bits_for_offset = pointer_width - object_bits - 1;

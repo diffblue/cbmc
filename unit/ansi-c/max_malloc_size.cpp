@@ -27,6 +27,11 @@ TEST_CASE(
     REQUIRE_THROWS_AS(max_malloc_size(4, 0), invariant_failedt);
   }
 
+  SECTION("Not enough bits in the pointer")
+  {
+    REQUIRE_THROWS_AS(max_malloc_size(0, 0), invariant_failedt);
+  }
+
   SECTION("Max allocation size overflow")
   {
     REQUIRE_THROWS_AS(max_malloc_size(128, 63), invariant_failedt);
