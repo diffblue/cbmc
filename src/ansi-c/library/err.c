@@ -17,7 +17,7 @@ void err(int eval, const char *fmt, ...)
   abort();
 }
 
-/* FUNCTION: err */
+/* FUNCTION: errx */
 
 #ifndef __CPROVER_ERR_H_INCLUDED
 #include <err.h>
