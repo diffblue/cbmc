@@ -124,9 +124,16 @@ static std::string architecture_string(T value, const char *s)
 
 using max_alloc_sizet = uint64_t;
 /// The maximum allocation size is determined by the number of bits that
-/// are left in the pointer of width \p pointer_width after allowing for the
-/// signed bit, and the bits used for the objects ID (determined by
-/// \p object_bits).
+/// are left in the pointer of width \p pointer_width.
+///
+/// The allocation size cannot exceed the number represented by the (signed)
+/// offset, otherwise it would not be possible to store a pointer into a
+/// valid bit of memory. Therefore, the max allocation size is
+/// 2^(offset_bits - 1), where the offset bits is the number of bits left in the
+/// pointer after the object bits.
+///
+/// The offset must be signed, as a pointer can point to the end of the memory
+/// block, and needs to be able to point back to the start.
 /// \param pointer_width: The width of the pointer
 /// \param object_bits : The number of bits used to represent the ID
 /// \return The size in bytes of the maximum allocation supported.
@@ -136,9 +143,14 @@ max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
   PRECONDITION(pointer_width >= 1);
   PRECONDITION(object_bits < pointer_width - 1);
   PRECONDITION(object_bits >= 1);
-  const auto bits_for_offset = pointer_width - object_bits - 1;
-  PRECONDITION(bits_for_offset < std::numeric_limits<max_alloc_sizet>::digits);
-  return ((max_alloc_sizet)1) << (max_alloc_sizet)bits_for_offset;
+  const auto offset_bits = pointer_width - object_bits;
+  // We require the offset to be able to express upto allocation_size - 1,
+  // but also down to -allocation_size, therefore the size is allowable
+  // is number of bits, less the signed bit.
+  const auto bits_for_positive_offset = offset_bits - 1;
+  PRECONDITION(
+    bits_for_positive_offset < std::numeric_limits<max_alloc_sizet>::digits);
+  return ((max_alloc_sizet)1) << (max_alloc_sizet)bits_for_positive_offset;
 }
 
 void ansi_c_internal_additions(std::string &code)
