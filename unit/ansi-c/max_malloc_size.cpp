@@ -17,7 +17,6 @@ TEST_CASE(
 
   SECTION("Too many bits for pointer ID")
   {
-    REQUIRE_THROWS_AS(max_malloc_size(4, 3), invariant_failedt);
     REQUIRE_THROWS_AS(max_malloc_size(4, 4), invariant_failedt);
     REQUIRE_THROWS_AS(max_malloc_size(4, 5), invariant_failedt);
   }
@@ -39,6 +38,9 @@ TEST_CASE(
 
   SECTION("Valid allocation size configurations")
   {
+    // The one bit offset can be used to store 0, or -1, so we can allocate
+    // a single bit
+    REQUIRE(max_malloc_size(4, 3) == 1);
     // Here we use 4 bits for the object ID, leaving 3 for the offset
     REQUIRE(max_malloc_size(8, 4) == 8);
     REQUIRE(max_malloc_size(128, 64) == 9223372036854775808ull /*2^63*/);

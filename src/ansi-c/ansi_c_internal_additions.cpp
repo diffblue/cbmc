@@ -141,7 +141,7 @@ static max_alloc_sizet
 max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
 {
   PRECONDITION(pointer_width >= 1);
-  PRECONDITION(object_bits < pointer_width - 1);
+  PRECONDITION(object_bits < pointer_width);
   PRECONDITION(object_bits >= 1);
   const auto offset_bits = pointer_width - object_bits;
   // We require the offset to be able to express upto allocation_size - 1,
