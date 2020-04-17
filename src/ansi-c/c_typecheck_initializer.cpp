@@ -397,6 +397,25 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
     if(full_type.id()==ID_array ||
        full_type.id()==ID_vector)
     {
+      // zero_initializer may have built an array_of expression for a large
+      // array; as we have a designated initializer we need to have an array of
+      // individual objects
+      if(dest->id() == ID_array_of)
+      {
+        const array_typet array_type = to_array_type(dest->type());
+        const auto array_size = numeric_cast<mp_integer>(array_type.size());
+        if(!array_size.has_value())
+        {
+          error().source_location = value.source_location();
+          error() << "cannot zero-initialize array with subtype '"
+                  << to_string(full_type.subtype()) << "'" << eom;
+          throw 0;
+        }
+        const exprt zero = to_array_of_expr(*dest).what();
+        *dest = array_exprt{{}, array_type};
+        dest->operands().resize(numeric_cast_v<std::size_t>(*array_size), zero);
+      }
+
       if(index>=dest->operands().size())
       {
         if(full_type.id()==ID_array &&
