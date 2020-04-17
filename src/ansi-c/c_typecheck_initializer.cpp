@@ -872,6 +872,26 @@ exprt c_typecheck_baset::do_initializer_list(
 
   const typet &full_type=follow(type);
 
+  // 6.7.9, 14: An array of character type may be initialized by a character
+  // string literal or UTF-8 string literal, optionally enclosed in braces.
+  if(
+    full_type.id() == ID_array && value.operands().size() >= 1 &&
+    to_multi_ary_expr(value).op0().id() == ID_string_constant &&
+    (full_type.subtype().id() == ID_signedbv ||
+     full_type.subtype().id() == ID_unsignedbv) &&
+    to_bitvector_type(full_type.subtype()).get_width() ==
+      char_type().get_width())
+  {
+    if(value.operands().size() > 1)
+    {
+      warning().source_location = value.find_source_location();
+      warning() << "ignoring excess initializers" << eom;
+    }
+
+    return do_initializer_rec(
+      to_multi_ary_expr(value).op0(), type, force_constant);
+  }
+
   exprt result;
   if(full_type.id()==ID_struct ||
      full_type.id()==ID_union ||
@@ -908,26 +928,6 @@ exprt c_typecheck_baset::do_initializer_list(
         throw 0;
       }
       result = *zero;
-    }
-
-    // 6.7.9, 14: An array of character type may be initialized by a character
-    // string literal or UTF-8 string literal, optionally enclosed in braces.
-    if(
-      value.operands().size() >= 1 &&
-      to_multi_ary_expr(value).op0().id() == ID_string_constant &&
-      (full_type.subtype().id() == ID_signedbv ||
-       full_type.subtype().id() == ID_unsignedbv) &&
-      to_bitvector_type(full_type.subtype()).get_width() ==
-        char_type().get_width())
-    {
-      if(value.operands().size()>1)
-      {
-        warning().source_location=value.find_source_location();
-        warning() << "ignoring excess initializers" << eom;
-      }
-
-      return do_initializer_rec(
-        to_multi_ary_expr(value).op0(), type, force_constant);
     }
   }
   else
