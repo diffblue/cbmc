@@ -19,6 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "string_constraint_generator.h"
 #include "string_refinement_invariant.h"
+#include "string_refinement_util.h"
 
 #include <iterator>
 #include <limits>
@@ -68,8 +69,9 @@ exprt string_constraint_generatort::associate_array_to_pointer(
   /// \todo: we allow expression of the form of `arr[0]` instead of `arr` as
   ///        the array argument but this could go away.
   array_string_exprt array_expr = to_array_string_expr(
-    f.arguments()[0].id() == ID_index ? to_index_expr(f.arguments()[0]).array()
-                                      : f.arguments()[0]);
+    f.arguments()[0].id() == ID_index
+      ? to_index_expr(f.arguments()[0]).array()
+      : massage_weird_arrays_into_non_weird_arrays(f.arguments()[0]));
 
   const exprt &pointer_expr = f.arguments()[1];
   array_pool.insert(simplify_expr(pointer_expr, ns), array_expr);
@@ -237,6 +239,8 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_contains(expr);
   else if(id == ID_cprover_string_index_of_func)
     return add_axioms_for_index_of(expr);
+  else if(id == ID_cprover_string_c_index_of_func)
+    return add_axioms_for_c_index_of(expr);
   else if(id == ID_cprover_string_last_index_of_func)
     return add_axioms_for_last_index_of(expr);
   else if(

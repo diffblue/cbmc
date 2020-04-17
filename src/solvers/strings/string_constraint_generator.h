@@ -193,12 +193,18 @@ public:
     const array_string_exprt &str,
     const exprt &c,
     const exprt &from_index);
+  std::pair<exprt, string_constraintst> add_axioms_for_c_index_of(
+    const array_string_exprt &str,
+    const exprt &c,
+    const exprt &from_index);
   std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
     const array_string_exprt &haystack,
     const array_string_exprt &needle,
     const exprt &from_index);
   std::pair<exprt, string_constraintst>
   add_axioms_for_index_of(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst>
+  add_axioms_for_c_index_of(const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
     const array_string_exprt &haystack,
     const array_string_exprt &needle,

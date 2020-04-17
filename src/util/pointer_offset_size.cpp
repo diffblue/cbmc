@@ -632,6 +632,17 @@ optionalt<exprt> get_subexpression_at_offset(
     return typecast_exprt(expr, target_type_raw);
   }
 
+  if(
+    offset_bytes == 0 && expr.type().id() == ID_pointer &&
+    target_type_raw.id() == ID_array)
+  {
+    // subexpression at offset zero is the whole thing even for arrays
+    return byte_extract_exprt{byte_extract_id(),
+                              expr,
+                              from_integer(offset_bytes, index_type()),
+                              target_type_raw};
+  }
+
   const typet &source_type = ns.follow(expr.type());
   const auto target_size_bits = pointer_offset_bits(target_type_raw, ns);
   if(!target_size_bits.has_value())

@@ -17,10 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/invariant.h>
+#include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/message.h>
+#include <util/refined_string_type.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string2int.h>
 #include <util/string_constant.h>
+#include <util/string_expr.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
@@ -57,10 +62,12 @@ class string_instrumentationt:public messaget
 public:
   string_instrumentationt(
     symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    ns(_symbol_table)
+    message_handlert &_message_handler,
+    size_t max_nondet_string_length)
+    : messaget(_message_handler),
+      symbol_table(_symbol_table),
+      ns(_symbol_table),
+      max_nondet_string_length(max_nondet_string_length)
   {
   }
 
@@ -70,6 +77,8 @@ public:
 protected:
   symbol_tablet &symbol_table;
   namespacet ns;
+  size_t max_nondet_string_length;
+  size_t symbol_counter = 0;
 
   void make_type(exprt &dest, const typet &type)
   {
@@ -97,6 +106,17 @@ protected:
     goto_programt &dest,
     goto_programt::targett it,
     const code_function_callt &);
+
+  auxiliary_symbolt new_aux_symbol(
+    const std::string &name,
+    const typet &type,
+    symbol_table_baset &symbol_table);
+
+  refined_string_exprt
+  char_ptr_to_refined_string(const exprt &char_ptr, goto_programt &program);
+
+  void do_strchr_via_c_index_of(goto_functiont &strchr_function);
+
   void do_strchr(
     goto_programt &dest,
     goto_programt::targett target,
@@ -157,29 +177,46 @@ protected:
 void string_instrumentation(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  goto_programt &dest)
+  goto_programt &dest,
+  size_t max_nondet_string_length)
 {
-  string_instrumentationt string_instrumentation(symbol_table, message_handler);
+  string_instrumentationt string_instrumentation(
+    symbol_table, message_handler, max_nondet_string_length);
   string_instrumentation(dest);
 }
 
 void string_instrumentation(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  goto_functionst &dest)
+  goto_functionst &dest,
+  size_t max_nondet_string_length)
 {
-  string_instrumentationt string_instrumentation(symbol_table, message_handler);
+  string_instrumentationt string_instrumentation(
+    symbol_table, message_handler, max_nondet_string_length);
   string_instrumentation(dest);
 }
 
 void string_instrumentation(
   goto_modelt &goto_model,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const std::string &maybe_max_nondet_string_length_string)
 {
+  size_t max_nondet_string_length = 1000; // default
+  if(!maybe_max_nondet_string_length_string.empty())
+  {
+    auto maybe_max_nondet_string_length =
+      string2optional_size_t(maybe_max_nondet_string_length_string);
+    if(!maybe_max_nondet_string_length.has_value())
+    {
+      throw invalid_command_line_argument_exceptiont{"", ""};
+    }
+    max_nondet_string_length = *maybe_max_nondet_string_length;
+  }
   string_instrumentation(
     goto_model.symbol_table,
     message_handler,
-    goto_model.goto_functions);
+    goto_model.goto_functions,
+    max_nondet_string_length);
 }
 
 void string_instrumentationt::operator()(goto_functionst &dest)
@@ -189,6 +226,10 @@ void string_instrumentationt::operator()(goto_functionst &dest)
       it!=dest.function_map.end();
       it++)
   {
+    if(it->first == "strchr")
+    {
+      do_strchr_via_c_index_of(it->second);
+    }
     (*this)(it->second.body);
   }
 }
@@ -228,8 +269,6 @@ void string_instrumentationt::do_function_call(
     else if(identifier=="strxfrm")
     {
     }
-    else if(identifier=="strchr")
-      do_strchr(dest, target, call);
     else if(identifier=="strcspn")
     {
     }
@@ -610,6 +649,199 @@ void string_instrumentationt::do_strncmp(
 {
 }
 
+auxiliary_symbolt string_instrumentationt::new_aux_symbol(
+  const std::string &name,
+  const typet &type,
+  symbol_table_baset &symbol_table)
+{
+  auto decorated_name = std::string{name};
+  decorated_name += std::to_string(++symbol_counter);
+  auxiliary_symbolt new_symbol;
+  new_symbol.base_name = decorated_name;
+  new_symbol.pretty_name = decorated_name;
+  new_symbol.is_static_lifetime = false;
+  new_symbol.is_state_var = false;
+  new_symbol.mode = ID_C;
+  new_symbol.name = decorated_name;
+  new_symbol.type = type;
+  symbol_table.add(new_symbol);
+
+  return new_symbol;
+}
+
+/// Helper function to produce the necessary associations related to
+/// char-pointers needed for string solver.
+refined_string_exprt string_instrumentationt::char_ptr_to_refined_string(
+  const exprt &char_ptr,
+  goto_programt &program)
+{
+  // int string_length = nondet();
+  const auto length_symbol = new_aux_symbol(
+    "cprover_string_index_of_func::string_length", index_type(), symbol_table);
+  const auto length_symbol_expr = length_symbol.symbol_expr();
+  program.add(goto_programt::make_decl(length_symbol_expr));
+  program.add(goto_programt::make_assignment(
+    length_symbol_expr,
+    side_effect_expr_nondett{length_symbol.type, source_locationt{}}));
+
+  // assume(string_length <= max_nondet_string_length);
+  program.add(goto_programt::make_assumption(binary_relation_exprt{
+    length_symbol_expr,
+    ID_le,
+    from_integer(max_nondet_string_length, index_type())}));
+
+  // char *string_content = src;
+  const auto content_symbol = new_aux_symbol(
+    "cprover_string_index_of_func::string_content",
+    char_ptr.type(),
+    symbol_table);
+  const auto content_symbol_expr = content_symbol.symbol_expr();
+  program.add(goto_programt::make_decl(content_symbol_expr));
+  program.add(goto_programt::make_assignment(content_symbol_expr, char_ptr));
+
+  // char (*nondet_infinite_array_ponter)[\infty];
+  const symbolt nondet_infinite_array_pointer = new_aux_symbol(
+    "cprover_string_index_of_func::nondet_infinite_array_pointer",
+    pointer_type(array_typet{char_type(), infinity_exprt(index_type())}),
+    symbol_table);
+  const symbol_exprt nondet_infinite_array_pointer_expr =
+    nondet_infinite_array_pointer.symbol_expr();
+  program.add(goto_programt::make_decl(nondet_infinite_array_pointer_expr));
+  program.add(goto_programt::make_assignment(
+    nondet_infinite_array_pointer_expr,
+    typecast_exprt{address_of_exprt{char_ptr},
+                   nondet_infinite_array_pointer_expr.type()}));
+
+  // cprover_associate_length_to_array_func(nondet_infinite_array_pointer,
+  //                                        string_length);
+  const auto refined_string_expr = refined_string_exprt{
+    length_symbol_expr,
+    content_symbol_expr,
+    refined_string_typet{index_type(), to_pointer_type(char_ptr.type())}};
+  const symbolt return_array_length = new_aux_symbol(
+    "cprover_string_index_of_func::return_array_length",
+    index_type(),
+    symbol_table);
+  dereference_exprt nondet_array_expr{nondet_infinite_array_pointer_expr};
+  const auto cprover_associate_length_to_array_func_symbol = symbol_exprt{
+    ID_cprover_associate_length_to_array_func,
+    mathematical_function_typet{{nondet_array_expr.type(), length_symbol.type},
+                                return_array_length.type}};
+  const auto apply_associate_length_to_array = function_application_exprt{
+    cprover_associate_length_to_array_func_symbol,
+    {nondet_array_expr, refined_string_expr.length()},
+    index_type()};
+  const auto return_length_expr = return_array_length.symbol_expr();
+  program.add(goto_programt::make_decl(return_length_expr));
+  program.add(goto_programt::make_assignment(
+    return_length_expr, apply_associate_length_to_array));
+
+  // cprover_associate_array_to_pointer_func(nondet_infinite_array_pointer,
+  //                                         src);
+  const address_of_exprt array_pointer(
+    index_exprt(nondet_array_expr, from_integer(0, index_type())));
+  program.add(goto_programt::make_assignment(array_pointer, char_ptr));
+  const symbolt return_sym_pointer =
+    new_aux_symbol("return_array_pointer", index_type(), symbol_table);
+  const auto cprover_associate_array_to_pointer_func_symbol =
+    symbol_exprt{ID_cprover_associate_array_to_pointer_func,
+                 mathematical_function_typet{
+                   {nondet_array_expr.type(), array_pointer.type()},
+                   return_sym_pointer.type}};
+  const auto apply_associate_pointer_to_array =
+    function_application_exprt{cprover_associate_array_to_pointer_func_symbol,
+                               {nondet_array_expr, char_ptr}};
+  const auto return_pointer_expr = return_sym_pointer.symbol_expr();
+  program.add(goto_programt::make_decl(return_pointer_expr));
+  program.add(goto_programt::make_assignment(
+    return_pointer_expr, apply_associate_pointer_to_array));
+
+  return refined_string_exprt{refined_string_expr.length(), char_ptr};
+}
+
+// Implement strchr in terms of indexOf for the purposes of using the
+// string-solver.
+//
+// char * strchr(char *src, int c) {
+//   int string_length = nondet();
+//   assume (string_length < =max_nondet_string_length);
+//   char *string_content = src;
+//   char (*nondet_infinite_array_pointer)[\infty];
+//   nondet_infinite_array_pointer = string_content;
+//
+//   cprover_associate_length_to_array_func(nondet_infinite_array_pointer,
+//                                          string_length);
+//   cprover_associate_array_to_pointer_func(nondet_infinite_array_pointer,
+//                                           src);
+//   struct refined_string_struct {
+//     int length = string_length;
+//     char *content = src;
+//   } refined_string;
+//
+//   maybe_return = cprover_string_index_of_func(refined_string, c);
+//   if (maybe_return >= 0)
+//     return src + maybe_return;
+//   else
+//     return NULL:
+// }
+void string_instrumentationt::do_strchr_via_c_index_of(
+  goto_functiont &strchr_function)
+{
+  //   struct refined_string_struct {
+  //     int length = string_length;
+  //     char *content = src;
+  //   } refined_string;
+  const auto &params = to_code_type(strchr_function.type).parameters();
+  const auto &str_param = params.at(0);
+  const auto &ch_param = params.at(1);
+  const auto refined_string_type =
+    refined_string_typet{index_type(), to_pointer_type(str_param.type())};
+  const auto str_param_symbol =
+    symbol_exprt{str_param.get_identifier(), str_param.type()};
+  const auto ch_param_symbol =
+    symbol_exprt{ch_param.get_identifier(), ch_param.type()};
+  goto_programt new_body;
+  const auto refined_string =
+    char_ptr_to_refined_string(str_param_symbol, new_body);
+
+  //   maybe_return = cprover_string_index_of_func(refined_string, c);
+  const auto cprover_string_index_of_func_symbol = symbol_exprt{
+    ID_cprover_string_c_index_of_func,
+    mathematical_function_typet(
+      {refined_string.type(), ch_param_symbol.type()}, index_type())};
+  const auto apply_index_of = function_application_exprt{
+    cprover_string_index_of_func_symbol, {refined_string, ch_param_symbol}};
+  const auto maybe_return =
+    new_aux_symbol("strchr::indexOf::maybe_return", index_type(), symbol_table);
+  const auto maybe_return_expr = maybe_return.symbol_expr();
+  new_body.add(goto_programt::make_decl(maybe_return_expr));
+  new_body.add(
+    goto_programt::make_assignment(maybe_return_expr, apply_index_of));
+
+  //   if (maybe_return >= 0)
+  //     return src + maybe_return;
+  //   else
+  //     return NULL:
+  auto found_case = new_body.add(goto_programt::make_return(code_returnt{
+    plus_exprt{str_param_symbol,
+               typecast_exprt{maybe_return.symbol_expr(), size_type()}}}));
+  auto jump_to_found_case = new_body.insert_before(
+    found_case,
+    goto_programt::make_goto(
+      found_case,
+      binary_relation_exprt{
+        maybe_return.symbol_expr(), ID_ge, from_integer(0, index_type())}));
+  auto return_null = new_body.insert_after(
+    jump_to_found_case,
+    goto_programt::make_return(
+      code_returnt{null_pointer_exprt{to_pointer_type(str_param.type())}}));
+  auto end_function = new_body.add(goto_programt::make_end_function());
+  new_body.insert_after(
+    return_null, goto_programt::make_goto(end_function, true_exprt{}));
+
+  strchr_function.body = std::move(new_body);
+}
+
 void string_instrumentationt::do_strchr(
   goto_programt &dest,
   goto_programt::targett target,
@@ -625,11 +857,50 @@ void string_instrumentationt::do_strchr(
 
   goto_programt tmp;
 
-  goto_programt::targett assertion = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[0]), target->source_location));
-  assertion->source_location.set_property_class("string");
-  assertion->source_location.set_comment(
-    "zero-termination of string argument of strchr");
+  auto new_aux_symbol =
+    [](
+      const irep_idt &name,
+      const typet &type,
+      symbol_table_baset &symbol_table) -> auxiliary_symbolt {
+    auxiliary_symbolt new_symbol;
+    new_symbol.base_name = name;
+    new_symbol.pretty_name = name;
+    new_symbol.is_static_lifetime = false;
+    new_symbol.is_state_var = false;
+    new_symbol.mode = ID_C;
+    new_symbol.name = name;
+    new_symbol.type = type;
+    symbol_table.add(new_symbol);
+
+    return new_symbol;
+  };
+
+  const auto length_symbol =
+    new_aux_symbol("strchr_arg_length", size_type(), symbol_table);
+
+  std::vector<typet> argument_types;
+  for(const auto &arg : arguments)
+    argument_types.push_back(arg.type());
+
+  const auto func_symbol = new_aux_symbol(
+    ID_cprover_string_index_of_func,
+    mathematical_function_typet(std::move(argument_types), size_type()),
+    symbol_table);
+
+  const auto &string_arg = arguments.at(0);
+  const auto refined_string_type =
+    refined_string_typet{size_type(), to_pointer_type(string_arg.type())};
+
+  exprt::operandst refined_arguments;
+  refined_arguments.push_back(struct_exprt{
+    {length_symbol.symbol_expr(), string_arg}, refined_string_type});
+  refined_arguments.push_back(arguments.at(1));
+
+  const auto apply_index_of = function_application_exprt(
+    func_symbol.symbol_expr(), refined_arguments, size_type());
+
+  tmp.add(goto_programt::make_assignment(
+    target->get_function_call().lhs(), plus_exprt{string_arg, apply_index_of}));
 
   target->turn_into_skip();
   dest.insert_before_swap(target, tmp);

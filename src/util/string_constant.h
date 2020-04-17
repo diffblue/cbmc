@@ -50,4 +50,10 @@ inline string_constantt &to_string_constant(typet &type)
   return to_string_constant((exprt &)type);
 }
 
+template <>
+inline bool can_cast_expr<string_constantt>(const exprt &base)
+{
+  return base.id() == ID_string_constant;
+}
+
 #endif // CPROVER_ANSI_C_STRING_CONSTANT_H
