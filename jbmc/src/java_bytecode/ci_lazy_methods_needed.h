@@ -63,7 +63,8 @@ private:
     const pointer_typet &pointer_type,
     const namespacet &ns);
 
-  void gather_field_types(const typet &class_type, const namespacet &ns);
+  void
+  gather_field_types(const struct_tag_typet &class_type, const namespacet &ns);
 };
 
 #endif
