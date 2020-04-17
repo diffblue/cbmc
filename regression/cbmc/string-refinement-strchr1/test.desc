@@ -1,0 +1,12 @@
+CORE broken-smt-backend
+test.c
+--refine-strings --max-nondet-string-length 10
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion \*first_o == test\[1\]: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion \*first_o == test\[0\]: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion \*first_t == test\[1\]: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion \*first_t == test\[0\]: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

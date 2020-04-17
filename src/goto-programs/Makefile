@@ -1,5 +1,6 @@
 SRC = adjust_float_expressions.cpp \
       builtin_functions.cpp \
+      c_string_refinement.cpp \
       class_hierarchy.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \

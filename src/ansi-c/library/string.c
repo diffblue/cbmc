@@ -1,3 +1,19 @@
+
+/* FUNCTION: __CPROVER_math_func_string_index_of */
+
+long __CPROVER_math_func_string_index_of(
+  const char *haystack,
+  __CPROVER_size_t length,
+  char needle)
+{
+  for(__CPROVER_size_t i = 0; i < length; i++)
+  {
+    if(haystack[i] == needle)
+      return i;
+  }
+  return -1;
+}
+
 /* FUNCTION: __builtin___strcpy_chk */
 
 inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t s)
@@ -944,8 +960,15 @@ inline int memcmp(const void *s1, const void *s2, size_t n)
 #include <string.h>
 #define __CPROVER_STRING_H_INCLUDED
 #endif
+#include <stdint.h> // SIZE_MAX
 
 #undef strchr
+
+__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t();
+long __CPROVER_math_func_string_index_of(
+  const char *haystack,
+  __CPROVER_size_t length,
+  char needle);
 
 inline char *strchr(const char *src, int c)
 {
@@ -957,14 +980,27 @@ inline char *strchr(const char *src, int c)
   __CPROVER_size_t i;
   return found?src+i:0;
   #else
-  for(__CPROVER_size_t i=0; ; i++)
-  {
-    if(src[i]==(char)c)
-      return ((char *)src)+i; // cast away const-ness
-    if(src[i]==0) break;
-  }
-  return 0;
-  #endif
+
+    /* for(__CPROVER_size_t i=0; ; i++) */
+    /* { */
+    /*   if(src[i]==(char)c) */
+    /*     return ((char *)src)+i; // cast away const-ness */
+    /*   if(src[i]==0) break; */
+    /* } */
+    /* return 0; */
+
+    __CPROVER_size_t src_array_length =
+      SIZE_MAX; // __VERIFIER_nondet___CPROVER_size_t();
+    long index_of_zero =
+      __CPROVER_math_func_string_index_of(src, src_array_length, '\0');
+    __CPROVER_assert(index_of_zero >= 0, "zero should be present");
+    long index_of_c =
+      __CPROVER_math_func_string_index_of(src, src_array_length, (char)c);
+    if(index_of_c >= 0 && index_of_c < index_of_zero)
+      return ((char *)src) + (__CPROVER_size_t)index_of_c;
+    else
+      return (char *)0;
+#endif
 }
 
 /* FUNCTION: strrchr */

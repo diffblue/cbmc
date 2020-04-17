@@ -49,6 +49,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
 #include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/c_string_refinement.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
@@ -242,6 +243,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("string-abstraction"))
     options.set_option("string-abstraction", true);
+  if(cmdline.isset("refine-strings"))
+    options.set_option("refine-strings", true);
 
   if(cmdline.isset("reachability-slice-fb"))
     options.set_option("reachability-slice-fb", true);
@@ -363,6 +366,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option("refine-strings", true);
     options.set_option("string-printable", cmdline.isset("string-printable"));
+    options.set_option(
+      "max-nondet-string-length",
+      cmdline.get_value("max-nondet-string-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -878,6 +884,11 @@ bool cbmc_parse_optionst::process_goto_program(
 
   if(options.get_bool_option("string-abstraction"))
     string_instrumentation(goto_model, log.get_message_handler());
+  else if(options.get_bool_option("refine-strings"))
+    c_string_refinement(
+      goto_model,
+      log.get_message_handler(),
+      options.get_option("max-nondet-string-length"));
 
   // remove function pointers
   log.status() << "Removal of function pointers and virtual functions"
