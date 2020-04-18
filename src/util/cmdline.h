@@ -32,8 +32,14 @@ public:
 
   virtual bool isset(char option) const;
   virtual bool isset(const char *option) const;
+  /// Set option \p option to \p value, or \c true if the value is omitted.
   virtual void set(const std::string &option, bool value = true);
   virtual void set(const std::string &option, const std::string &value);
+  virtual void set(const std::string &option, const char *value)
+  {
+    set(option, std::string{value});
+  }
+
   virtual void clear();
 
   bool has_option(const std::string &option) const

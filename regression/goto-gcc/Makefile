@@ -18,6 +18,9 @@ tests.log: ../test.pl ../../src/goto-cc/goto-gcc
 ../../src/goto-cc/goto-gcc: ../../src/goto-cc/goto-cc
 	@ln -sf goto-cc ../../src/goto-cc/goto-gcc
 
+../../src/goto-cc/goto-ld: ../../src/goto-cc/goto-cc
+	@ln -sf goto-cc ../../src/goto-cc/goto-ld
+
 test tests.log: archives/libour_archive.a
 archives/libour_archive.a: archives/foo.c ../../src/goto-cc/goto-gcc
 	@cd archives && \

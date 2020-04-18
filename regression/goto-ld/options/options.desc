@@ -1,0 +1,9 @@
+CORE
+
+--native-linker=true -o dummy.gb
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is just to test that goto-ld exits without an error or a segmentation fault
+when processong command-line options, running the dummy-linker (/bin/)true.

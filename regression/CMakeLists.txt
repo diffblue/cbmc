@@ -62,3 +62,6 @@ if(WITH_MEMORY_ANALYZER)
 endif()
 
 add_subdirectory(solver-hardness)
+if(NOT WIN32)
+  add_subdirectory(goto-ld)
+endif()
