@@ -1,8 +1,16 @@
 file(GLOB cpp_library_sources "library/*.c")
 
-add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-        COMMAND cat ${cpp_library_sources} | $<TARGET_FILE:converter> > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-        DEPENDS converter ${cpp_library_sources})
+# Convert cmake paths to native paths for Windows builds
+file(TO_NATIVE_PATH "${cpp_library_sources}"
+     cpp_library_sources_paths)
+file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+     cprover_library_path)
+file(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/converter"
+     converter_path)
+
+add_custom_command(OUTPUT "${cprover_library_path}"
+        COMMAND cat ${cpp_library_sources_paths} | "${converter_path}" > "${cprover_library_path}"
+        DEPENDS converter ${cpp_library_sources_paths})
 
 ################################################################################
 
