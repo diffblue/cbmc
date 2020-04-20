@@ -761,6 +761,9 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     original_qualifiers.is_transparent_union;
   remove_qualifiers.write(type);
 
+  bool is_packed = type.get_bool(ID_C_packed);
+  irept alignment = type.find(ID_C_alignment);
+
   if(type.find(ID_tag).is_nil())
   {
     // Anonymous? Must come with body.
@@ -867,6 +870,11 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   type.swap(tag_type);
 
   original_qualifiers.write(type);
+
+  if(is_packed)
+    type.set(ID_C_packed, true);
+  if(alignment.is_not_nil())
+    type.set(ID_C_alignment, alignment);
 }
 
 void c_typecheck_baset::typecheck_compound_body(
