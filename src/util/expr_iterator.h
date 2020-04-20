@@ -165,8 +165,7 @@ protected:
   depth_iterator_baset &operator=(const depth_iterator_baset&)=default;
   depth_iterator_baset &operator=(depth_iterator_baset &&other)
   {
-    m_stack=std::move(other.m_stack);
-    // VS 2019 cl wants this function definition to return a value
+    m_stack = std::move(other.m_stack);
     return *this;
   }
 
