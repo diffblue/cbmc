@@ -448,7 +448,8 @@ public:
   /// - Best case: O(N + H)
   ///
   /// \param [out] view: Empty view
-  template <class V> void get_view(V&) const;
+  template <class V>
+  void get_view(V &view) const;
   viewt get_view() const
   {
     viewt result;

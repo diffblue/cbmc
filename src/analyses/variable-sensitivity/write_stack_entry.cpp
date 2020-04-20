@@ -1,5 +1,15 @@
-#include <unordered_set>
+/*******************************************************************\
 
+ Module: Analyses Variable Sensitivity
+
+ Author: DiffBlue Limited. All rights reserved.
+
+\*******************************************************************/
+
+/// \file
+/// Represents an entry in the write_stackt
+
+#include <unordered_set>
 
 #include <util/std_expr.h>
 
@@ -61,7 +71,7 @@ exprt offset_entryt::get_access_expr() const
   // This constructs a something that is basicallyt '(null)[offset])'
   // meaning that we don't know what the type is at this point, as the
   // array part will be filled in later.
-  return index_exprt(exprt(), offset->to_constant());
+  return index_exprt(nil_exprt(), offset->to_constant());
 }
 
 /// For an offset entry, the type of the access expression can only be

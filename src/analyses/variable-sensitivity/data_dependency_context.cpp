@@ -12,7 +12,6 @@ Author: Diffblue Ltd
  */
 
 #include <algorithm>
-#include <iterator>
 
 #include "data_dependency_context.h"
 

@@ -330,6 +330,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("structs", cmdline.isset("structs"));
       options.set_option("data-dependencies", cmdline.isset("data-dependencies"));
       options.set_option("interval", cmdline.isset("interval-values"));
+      options.set_option("value-set", cmdline.isset("value-set"));
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
@@ -633,7 +634,16 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   if(options.get_bool_option("general-analysis"))
   {
     // Store options in static variable_sensitivity_object_factory object
-    variable_sensitivity_object_factoryt::instance().set_options(options);
+    try
+    {
+      variable_sensitivity_object_factoryt::instance().set_options(
+        vsd_configt::from_options(options));
+    }
+    catch(const invalid_command_line_argument_exceptiont &e)
+    {
+      log.error() << e.what() << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
 
     // Output file factory
     const std::string outfile=options.get_option("outfile");

@@ -8,21 +8,109 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
+#include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/constant_array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/full_struct_abstract_object.h>
-#include <analyses/variable-sensitivity/union_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
-#include <analyses/variable-sensitivity/write_location_context.h>
 #include <analyses/variable-sensitivity/data_dependency_context.h>
-#include <util/options.h>
+#include <analyses/variable-sensitivity/full_struct_abstract_object.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/write_location_context.h>
 #include <util/namespace.h>
+#include <util/options.h>
 
+struct vsd_configt
+{
+  struct
+  {
+    bool struct_sensitivity;
+    bool array_sensitivity;
+    bool pointer_sensitivity;
+  } primitive_sensitivity;
+
+  struct
+  {
+    bool data_dependency_context;
+    bool last_write_context;
+  } context_tracking;
+
+  struct
+  {
+    bool intervals;
+    bool value_set;
+  } advanced_sensitivities;
+
+  static vsd_configt from_options(const optionst &options)
+  {
+    vsd_configt config{};
+
+    if(
+      options.get_bool_option("value-set") &&
+      options.get_bool_option("data-dependencies"))
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "Value set is not currently supported with data dependency analysis",
+        "--value-set --data-dependencies",
+        "--data-dependencies"};
+    }
+
+    config.primitive_sensitivity.struct_sensitivity =
+      options.get_bool_option("structs");
+    config.primitive_sensitivity.array_sensitivity =
+      options.get_bool_option("arrays");
+    config.primitive_sensitivity.pointer_sensitivity =
+      options.get_bool_option("pointers");
+
+    // This should always be on (for efficeny with 3-way merge)
+    // Does not work with value set
+    config.context_tracking.last_write_context =
+      !options.get_bool_option("value-set");
+    config.context_tracking.data_dependency_context =
+      options.get_bool_option("data-dependencies");
+    config.advanced_sensitivities.intervals =
+      options.get_bool_option("interval");
+    config.advanced_sensitivities.value_set =
+      options.get_bool_option("value-set");
+
+    return config;
+  }
+
+  static vsd_configt constant_domain()
+  {
+    vsd_configt config{};
+    config.primitive_sensitivity.pointer_sensitivity = true;
+    config.primitive_sensitivity.array_sensitivity = true;
+    config.primitive_sensitivity.struct_sensitivity = true;
+    config.context_tracking.last_write_context = true;
+    return config;
+  }
+
+  static vsd_configt value_set()
+  {
+    vsd_configt config{};
+    config.primitive_sensitivity.pointer_sensitivity = true;
+    config.primitive_sensitivity.array_sensitivity = true;
+    config.primitive_sensitivity.struct_sensitivity = true;
+    config.advanced_sensitivities.value_set = true;
+    return config;
+  }
+
+  static vsd_configt intervals()
+  {
+    vsd_configt config{};
+    config.primitive_sensitivity.pointer_sensitivity = true;
+    config.primitive_sensitivity.array_sensitivity = true;
+    config.primitive_sensitivity.struct_sensitivity = true;
+    config.context_tracking.last_write_context = true;
+    config.advanced_sensitivities.intervals = true;
+    return config;
+  }
+};
 
 class variable_sensitivity_object_factoryt
 {
@@ -38,7 +126,7 @@ public:
     const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns);
-  void set_options(const optionst &options);
+  void set_options(const vsd_configt &options);
 
 private:
   variable_sensitivity_object_factoryt():initialized(false)
@@ -56,7 +144,8 @@ private:
     STRUCT_SENSITIVE,
     STRUCT_INSENSITIVE,
     // TODO: plug in UNION_SENSITIVE HERE
-    UNION_INSENSITIVE
+    UNION_INSENSITIVE,
+    VALUE_SET
   };
   ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
   template <class abstract_object_class>
@@ -75,13 +164,7 @@ private:
     const exprt &e,
     const abstract_environmentt &enviroment,
     const namespacet &ns);
-  bool has_variables_flag;
-  bool has_structs_flag;
-  bool has_arrays_flag;
-  bool has_pointers_flag;
-  bool has_last_written_location_context_flag;
-  bool has_data_dependencies_context_flag;
-  bool has_interval;
+  vsd_configt configuration;
   bool initialized;
 };
 
@@ -114,18 +197,28 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     const abstract_environmentt &enviroment,
     const namespacet &ns)
 {
-  if(has_data_dependencies_context_flag)
+  if(configuration.context_tracking.data_dependency_context)
     return initialize_context_abstract_object<
       abstract_object_classt, data_dependency_contextt>(
         type, top, bottom, e, enviroment, ns);
-  if(has_last_written_location_context_flag)
+  if(configuration.context_tracking.last_write_context)
     return initialize_context_abstract_object<
       abstract_object_classt, write_location_contextt>(
         type, top, bottom, e, enviroment, ns);
   else
-    return initialize_context_abstract_object<
-      abstract_object_classt, context_abstract_objectt>(
-        type, top, bottom, e, enviroment, ns);
+  {
+    if(top || bottom)
+    {
+      return abstract_object_pointert(
+        new abstract_object_classt(type, top, bottom));
+    }
+    else
+    {
+      PRECONDITION(type == ns.follow(e.type()));
+      return abstract_object_pointert(
+        new abstract_object_classt(e, enviroment, ns));
+    }
+  }
 }
 
 template <class abstract_object_classt, class context_classt>

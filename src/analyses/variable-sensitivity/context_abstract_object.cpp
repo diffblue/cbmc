@@ -8,6 +8,10 @@
 
 #include "context_abstract_object.h"
 
+abstract_object_pointert context_abstract_objectt::get_child() const
+{
+  return child_abstract_object;
+}
 
 void context_abstract_objectt::set_child(
   const abstract_object_pointert &child)
@@ -98,6 +102,7 @@ abstract_object_pointert context_abstract_objectt::write(
  *
  * \param expr the expression to evaluate and find the result of. This will
  * be the symbol referred to be op0()
+ * \param operands: the operands to use instead of expr.operands()
  * \param environment the abstract environment in which to resolve 'expr'
  * \param ns the current namespace
  *

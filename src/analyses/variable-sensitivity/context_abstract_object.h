@@ -90,6 +90,8 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
+  abstract_object_pointert get_child() const;
+
 protected:
   CLONE
 
