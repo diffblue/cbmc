@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-primitive-check
+^EXIT=10$
+^SIGNAL=0$
+\[main.pointer_primitives.1\] line \d+ pointer in pointer primitive is neither null nor valid in R_OK.*: FAILURE
+\*\* 1 of \d+ failed
+--
+^warning: ignoring
+--
+Verifies that the check fails for a primitive in an assume that uses an
+uninitialized pointer
