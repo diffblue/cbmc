@@ -122,7 +122,6 @@ static std::string architecture_string(T value, const char *s)
          std::string(s) + "=" + std::to_string(value) + ";\n";
 }
 
-using max_alloc_sizet = uint64_t;
 /// The maximum allocation size is determined by the number of bits that
 /// are left in the pointer of width \p pointer_width.
 ///
@@ -137,7 +136,7 @@ using max_alloc_sizet = uint64_t;
 /// \param pointer_width: The width of the pointer
 /// \param object_bits : The number of bits used to represent the ID
 /// \return The size in bytes of the maximum allocation supported.
-static max_alloc_sizet
+static mp_integer
 max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
 {
   PRECONDITION(pointer_width >= 1);
@@ -148,9 +147,7 @@ max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
   // but also down to -allocation_size, therefore the size is allowable
   // is number of bits, less the signed bit.
   const auto bits_for_positive_offset = offset_bits - 1;
-  PRECONDITION(
-    bits_for_positive_offset < std::numeric_limits<max_alloc_sizet>::digits);
-  return ((max_alloc_sizet)1) << (max_alloc_sizet)bits_for_positive_offset;
+  return ((mp_integer)1) << (mp_integer)bits_for_positive_offset;
 }
 
 void ansi_c_internal_additions(std::string &code)
@@ -195,7 +192,7 @@ void ansi_c_internal_additions(std::string &code)
     "int " CPROVER_PREFIX "malloc_failure_mode_assert_then_assume="+
     std::to_string(config.ansi_c.malloc_failure_mode_assert_then_assume)+";\n"
     CPROVER_PREFIX "size_t " CPROVER_PREFIX "max_malloc_size="+
-    std::to_string(max_malloc_size(config.ansi_c.pointer_width, config
+      integer2string(max_malloc_size(config.ansi_c.pointer_width, config
     .bv_encoding.object_bits))+";\n"
 
     // this is ANSI-C

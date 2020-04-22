@@ -33,7 +33,6 @@ TEST_CASE(
 
   SECTION("Max allocation size overflow")
   {
-    REQUIRE_THROWS_AS(max_malloc_size(128, 63), invariant_failedt);
   }
 
   SECTION("Valid allocation size configurations")
@@ -44,5 +43,8 @@ TEST_CASE(
     // Here we use 4 bits for the object ID, leaving 3 for the offset
     REQUIRE(max_malloc_size(8, 4) == 8);
     REQUIRE(max_malloc_size(128, 64) == 9223372036854775808ull /*2^63*/);
+    REQUIRE(
+      max_malloc_size(128, 63) == string2integer("18446744073709551616"
+                                                 /*2^64*/));
   }
 }
