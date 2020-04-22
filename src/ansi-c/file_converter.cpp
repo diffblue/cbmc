@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Convert file contents to C strings
 
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -37,10 +38,23 @@ static void convert_line(const std::string &line)
   std::cout << "\\n\"\n";
 }
 
-int main()
+int main(int argc, char *argv[])
 {
   std::string line;
 
-  while(getline(std::cin, line))
-    convert_line(line);
+  for(int i = 1; i < argc; ++i)
+  {
+    std::ifstream input_file(argv[i]);
+
+    if(!input_file)
+    {
+      std::cerr << "Failed to open " << argv[i] << '\n';
+      return 1;
+    }
+
+    while(getline(input_file, line))
+      convert_line(line);
+  }
+
+  return 0;
 }

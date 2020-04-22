@@ -73,7 +73,7 @@ library_check: library/*.c
 	touch $@
 
 cprover_library.inc: ../ansi-c/library/converter$(EXEEXT) library/*.c
-	cat library/*.c | ../ansi-c/library/converter$(EXEEXT) > $@
+	../ansi-c/library/converter$(EXEEXT) library/*.c > $@
 
 generated_files: cprover_library.inc
 

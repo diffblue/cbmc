@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -53,19 +53,28 @@ static void convert_line(const std::string &line, bool first)
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
   std::string line;
   bool first = true;
 
   std::cout << "{\n";
 
-  if(getline(std::cin, line))
+  for(int i = 1; i < argc; ++i)
   {
-    convert_line(line, true);
-    first = false;
-    while(getline(std::cin, line))
-      convert_line(line, false);
+    std::ifstream input_file(argv[i]);
+
+    if(!input_file)
+    {
+      std::cerr << "Failed to open " << argv[i] << '\n';
+      return 1;
+    }
+
+    while(getline(input_file, line))
+    {
+      convert_line(line, first);
+      first = false;
+    }
   }
 
   if(!first)
@@ -74,4 +83,6 @@ int main()
   std::cout <<
     "{ 0, 0 }\n"
     "}";
+
+  return 0;
 }
