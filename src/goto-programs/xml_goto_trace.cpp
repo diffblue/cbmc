@@ -70,30 +70,21 @@ void convert(
         xml_assignment.new_element().swap(xml_location);
 
       {
-        auto lhs_object = step.get_lhs_object();
-
         const symbolt *symbol;
 
         if(
           lhs_object.has_value() &&
           !ns.lookup(lhs_object->get_identifier(), symbol))
         {
-          const symbolt *symbol;
+          std::string type_string = from_type(ns, symbol->name, symbol->type);
 
-          if(
-            lhs_object.has_value() &&
-            !ns.lookup(lhs_object->get_identifier(), symbol))
-          {
-            std::string type_string = from_type(ns, symbol->name, symbol->type);
-
-            xml_assignment.set_attribute("mode", id2string(symbol->mode));
-            xml_assignment.set_attribute("identifier", id2string(symbol->name));
-            xml_assignment.set_attribute(
-              "base_name", id2string(symbol->base_name));
-            xml_assignment.set_attribute(
-              "display_name", id2string(symbol->display_name()));
-            xml_assignment.new_element("type").data = type_string;
-          }
+          xml_assignment.set_attribute("mode", id2string(symbol->mode));
+          xml_assignment.set_attribute("identifier", id2string(symbol->name));
+          xml_assignment.set_attribute(
+            "base_name", id2string(symbol->base_name));
+          xml_assignment.set_attribute(
+            "display_name", id2string(symbol->display_name()));
+          xml_assignment.new_element("type").data = type_string;
         }
       }
 
