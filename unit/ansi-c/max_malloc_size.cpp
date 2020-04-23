@@ -31,10 +31,6 @@ TEST_CASE(
     REQUIRE_THROWS_AS(max_malloc_size(0, 0), invariant_failedt);
   }
 
-  SECTION("Max allocation size overflow")
-  {
-  }
-
   SECTION("Valid allocation size configurations")
   {
     // The one bit offset can be used to store 0, or -1, so we can allocate
