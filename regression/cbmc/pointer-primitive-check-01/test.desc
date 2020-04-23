@@ -1,0 +1,16 @@
+CORE
+main.c
+--pointer-primitive-check
+^EXIT=10$
+^SIGNAL=0$
+\[main.pointer_primitives.1\] line \d+ pointer in pointer primitive is neither null nor valid in POINTER_OBJECT.*: FAILURE
+\[main.pointer_primitives.2\] line \d+ pointer in pointer primitive is neither null nor valid in POINTER_OFFSET.*: FAILURE
+\[main.pointer_primitives.3\] line \d+ pointer in pointer primitive is neither null nor valid in POINTER_OBJECT.*: FAILURE
+\[main.pointer_primitives.4\] line \d+ pointer in pointer primitive is neither null nor valid in OBJECT_SIZE.*: FAILURE
+\[main.pointer_primitives.5\] line \d+ pointer in pointer primitive is neither null nor valid in R_OK.*: FAILURE
+\[main.pointer_primitives.6\] line \d+ pointer in pointer primitive is neither null nor valid in W_OK.*: FAILURE
+\*\* 7 of \d+ failed
+--
+^warning: ignoring
+--
+Verifies that checks are added for all pointer primitives

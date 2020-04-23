@@ -72,6 +72,8 @@ public:
     enable_built_in_assertions=_options.get_bool_option("built-in-assertions");
     enable_assumptions=_options.get_bool_option("assumptions");
     error_labels=_options.get_list_option("error-label");
+    enable_pointer_primitive_check =
+      _options.get_bool_option("pointer-primitive-check");
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -185,6 +187,20 @@ protected:
     const exprt &src_expr,
     const guardt &guard);
 
+  /// Generates VCCs to check that pointers passed to pointer primitives are
+  /// either null or valid
+  ///
+  /// \param expr: the pointer primitive expression
+  /// \param guard: the condition under which the operation happens
+  void pointer_primitive_check(const exprt &expr, const guardt &guard);
+
+  /// Returns true if the given expression is a pointer primitive such as
+  /// __CPROVER_r_ok()
+  ///
+  /// \param expr expression
+  /// \return true if the given expression is a pointer primitive
+  bool is_pointer_primitive(const exprt &expr);
+
   conditionst address_check(const exprt &address, const exprt &size);
   void integer_overflow_check(const exprt &, const guardt &);
   void conversion_check(const exprt &, const guardt &);
@@ -238,6 +254,7 @@ protected:
   bool enable_assertions;
   bool enable_built_in_assertions;
   bool enable_assumptions;
+  bool enable_pointer_primitive_check;
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
@@ -1163,6 +1180,53 @@ void goto_checkt::pointer_validity_check(
   }
 }
 
+void goto_checkt::pointer_primitive_check(
+  const exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_pointer_primitive_check)
+    return;
+
+  const exprt pointer = (expr.id() == ID_r_ok || expr.id() == ID_w_ok)
+                          ? to_binary_expr(expr).lhs()
+                          : to_unary_expr(expr).op();
+
+  CHECK_RETURN(pointer.type().id() == ID_pointer);
+
+  const auto size_of_expr_opt = size_of_expr(pointer.type().subtype(), ns);
+
+  const exprt size = !size_of_expr_opt.has_value()
+                       ? from_integer(1, size_type())
+                       : size_of_expr_opt.value();
+
+  const conditionst &conditions = address_check(pointer, size);
+
+  exprt::operandst conjuncts;
+
+  for(const auto &c : conditions)
+    conjuncts.push_back(c.assertion);
+
+  const or_exprt or_expr(null_object(pointer), conjunction(conjuncts));
+
+  add_guarded_property(
+    or_expr,
+    "pointer in pointer primitive is neither null nor valid",
+    "pointer primitives",
+    expr.source_location(),
+    expr,
+    guard);
+}
+
+bool goto_checkt::is_pointer_primitive(const exprt &expr)
+{
+  // we don't need to include the __CPROVER_same_object primitive here as it
+  // is replaced by lower level primitives in the special function handling
+  // during typechecking (see c_typecheck_expr.cpp)
+  return expr.id() == ID_pointer_object || expr.id() == ID_pointer_offset ||
+         expr.id() == ID_object_size || expr.id() == ID_r_ok ||
+         expr.id() == ID_w_ok || expr.id() == ID_is_dynamic_object;
+}
+
 goto_checkt::conditionst
 goto_checkt::address_check(const exprt &address, const exprt &size)
 {
@@ -1740,6 +1804,10 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
   }
+  else if(is_pointer_primitive(expr))
+  {
+    pointer_primitive_check(expr, guard);
+  }
 }
 
 void goto_checkt::check(const exprt &expr)
@@ -1860,6 +1928,8 @@ void goto_checkt::goto_check(
         flag_resetter.set_flag(enable_undefined_shift_check, false);
       else if(d.first == "disable:nan-check")
         flag_resetter.set_flag(enable_nan_check, false);
+      else if(d.first == "disable:pointer-primitive-check")
+        flag_resetter.set_flag(enable_pointer_primitive_check, false);
     }
 
     new_code.clear();
@@ -2049,7 +2119,7 @@ void goto_checkt::goto_check(
     }
     else if(i.is_dead())
     {
-      if(enable_pointer_check)
+      if(enable_pointer_check || enable_pointer_primitive_check)
       {
         assert(i.code.operands().size()==1);
         const symbol_exprt &variable=to_symbol_expr(i.code.op0());

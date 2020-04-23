@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Verifies that a null pointer does not fail the pointer primitives check
