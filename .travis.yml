@@ -338,6 +338,37 @@ jobs:
         - WITH_MEMORY_ANALYZER=1
       script: echo "This is coverity build. No need for tests."
 
+    # cmake install test
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      dist: trusty
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      env:
+        - NAME="cmake install test"
+        - BINARIES="cbmc goto-cc goto-gcc goto-ld goto-instrument goto-analyzer goto-diff goto-harness jbmc janalyzer jdiff"
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - maven
+      install:
+        - ccache -z
+        - ccache --max-size=1G
+        - cmake --version
+        - cmake -S . -Bbuild '-DCMAKE_CXX_COMPILER=/usr/bin/g++-5' '-DCMAKE_INSTALL_PREFIX=install'
+        - cmake --build build -- -j4
+        - pushd build; make install; popd
+      script: |
+        for b in $BINARIES; do
+          ( echo === $b === &&
+            install/bin/$b --version &&
+            man -M install/share/man $b | head ) || exit 1 ;
+        done
+
 install:
   - ccache -z
   - ccache --max-size=1G
