@@ -14,6 +14,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
+       ansi-c/max_malloc_size.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
        get_goto_model_from_c_test.cpp \
