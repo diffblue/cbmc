@@ -23,6 +23,19 @@ Author: Daniel Kroening
 #include "printf_formatter.h"
 #include "xml_expr.h"
 
+xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
+{
+  xmlt full_lhs_value{"full_lhs_value"};
+
+  auto lhs_object = step.get_lhs_object();
+  irep_idt identifier =
+    lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
+
+  if(step.full_lhs_value.is_not_nil())
+    full_lhs_value.data = from_expr(ns, identifier, step.full_lhs_value);
+  return full_lhs_value;
+}
+
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
@@ -88,16 +101,13 @@ void convert(
         }
       }
 
-      std::string full_lhs_string, full_lhs_value_string;
+      std::string full_lhs_string;
 
       if(step.full_lhs.is_not_nil())
         full_lhs_string = from_expr(ns, identifier, step.full_lhs);
 
-      if(step.full_lhs_value.is_not_nil())
-        full_lhs_value_string = from_expr(ns, identifier, step.full_lhs_value);
-
       xml_assignment.new_element("full_lhs").data = full_lhs_string;
-      xml_assignment.new_element("full_lhs_value").data = full_lhs_value_string;
+      xml_assignment.new_element(full_lhs_value(step, ns));
 
       xml_assignment.set_attribute_bool("hidden", step.hidden);
       xml_assignment.set_attribute("thread", std::to_string(step.thread_nr));
