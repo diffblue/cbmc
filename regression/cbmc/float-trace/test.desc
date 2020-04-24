@@ -1,0 +1,14 @@
+CORE
+test.c
+--trace --xml-ui
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+<full_lhs_value binary="00000000000000000000000000000000">0.0f</full_lhs_value>
+<full_lhs_value binary="00111111100000000000000000000000">1.0f</full_lhs_value>
+<full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">0.0</full_lhs_value>
+<full_lhs_value binary="01010010000000000000000000000000">1\.374390e\+11f</full_lhs_value>
+--
+--
+Checks that the binary value is printed for floating point types
+point types
