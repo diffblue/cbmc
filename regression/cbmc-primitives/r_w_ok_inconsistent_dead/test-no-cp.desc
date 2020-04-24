@@ -1,0 +1,13 @@
+FUTURE
+main.c
+--pointer-check --no-simplify --no-propagation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that an inconsistent assumption involving a pointer to an out of scope
+variable and __CPROVER_r_ok() can be detected via assert(0). We use
+--no-simplify and --no-propagation to ensure that the case is not solved by the
+constant propagation and thus tests the constraint encoding.

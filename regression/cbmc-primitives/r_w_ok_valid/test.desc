@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that __CPROVER_r_ok() is true for valid pointers to global, local, or
+malloced memory

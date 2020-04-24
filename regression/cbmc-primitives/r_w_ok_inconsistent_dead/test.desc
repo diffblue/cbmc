@@ -1,0 +1,11 @@
+FUTURE
+main.c
+--function test_global_pointer --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that an inconsistent assumption involving a pointer to an out of scope
+variable and __CPROVER_r_ok() can be detected via assert(0).

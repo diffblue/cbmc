@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that __CPROVER_r_ok() is false for a pointer to a valid memory object,
+though potentially with an offset that is out of bounds.
