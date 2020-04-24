@@ -23,6 +23,7 @@
 #include <util/options.h>
 #include <util/symbol_table.h>
 
+#include <testing-utils/get_goto_model_from_c.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
@@ -49,67 +50,11 @@ public:
   json_stream_arrayt json_stream_array;
 };
 
-void get_goto_model(std::istream &in, goto_modelt &goto_model)
-{
-  optionst options;
-  cbmc_parse_optionst::set_default_options(options);
-
-  messaget null_message(null_message_handler);
-
-  language_filest language_files;
-  language_files.set_message_handler(null_message_handler);
-
-  std::string filename;
-
-  language_filet &language_file = language_files.add_file(filename);
-
-  language_file.language = get_default_language();
-
-  languaget &language = *language_file.language;
-  language.set_message_handler(null_message_handler);
-  language.set_language_options(options);
-
-  {
-    bool r = language.parse(in, filename);
-    REQUIRE(!r);
-  }
-
-  language_file.get_modules();
-
-  {
-    bool r = language_files.typecheck(goto_model.symbol_table);
-    REQUIRE(!r);
-  }
-
-  REQUIRE(!goto_model.symbol_table.has_symbol(goto_functionst::entry_point()));
-
-  {
-    bool r = language_files.generate_support_functions(goto_model.symbol_table);
-    REQUIRE(!r);
-  }
-
-  goto_convert(
-    goto_model.symbol_table, goto_model.goto_functions, null_message_handler);
-}
-
 TEST_CASE("json symbol table read/write consistency")
 {
-  register_language(new_ansi_c_language);
-
-  cmdlinet cmdline;
-  config.main = std::string("main");
-  config.set(cmdline);
-
-  goto_modelt goto_model;
-
   // Get symbol table associated with goto program
-
-  {
-    std::string program = "int main() { return 0; }\n";
-
-    std::istringstream in(program);
-    get_goto_model(in, goto_model);
-  }
+  const std::string program = "int main() { return 0; }\n";
+  const auto goto_model = get_goto_model_from_c(program);
 
   const symbol_tablet &symbol_table1 = goto_model.symbol_table;
 

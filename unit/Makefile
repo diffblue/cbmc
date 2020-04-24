@@ -23,6 +23,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
+       get_goto_model_from_c_test.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-programs/goto_model_function_type_consistency.cpp \
@@ -36,7 +37,9 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_validate.cpp \
        goto-programs/goto_trace_output.cpp \
        goto-programs/is_goto_binary.cpp \
+       goto-programs/label_function_pointer_call_sites.cpp \
        goto-programs/osx_fat_reader.cpp \
+       goto-programs/restrict_function_pointers.cpp \
        goto-programs/remove_returns.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/apply_condition.cpp \
