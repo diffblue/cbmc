@@ -8,6 +8,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
         libgtk2.0-dev libyajl-dev sudo time
 
 ADD integration/xen/docker_compile_xen.sh docker_compile_xen.sh
+ADD .git /tmp/cbmc/.git
 ADD src /tmp/cbmc/src
 ADD scripts /tmp/cbmc/scripts
 RUN ./docker_compile_xen.sh
