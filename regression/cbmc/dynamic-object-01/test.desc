@@ -1,0 +1,12 @@
+FUTURE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+\[main.assertion.1\] line \d+ assertion __CPROVER_DYNAMIC_OBJECT\(p\): FAILURE
+\[main.assertion.2\] line \d+ assertion !__CPROVER_DYNAMIC_OBJECT\(p\): FAILURE
+--
+^warning: ignoring
+--
+Check that the dynamic object property is havoc'd when dynamic objects are
+deallocated. Recorded as ADA-526.

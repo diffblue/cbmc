@@ -1,0 +1,14 @@
+FUTURE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+\[main.assertion.1\] line \d+ assertion __CPROVER_OBJECT_SIZE\(p\) == 1: FAILURE
+\[main.assertion.2\] line \d+ assertion __CPROVER_OBJECT_SIZE\(p\) != 1: FAILURE
+\[main.assertion.3\] line \d+ assertion __CPROVER_OBJECT_SIZE\(p\) == 1: FAILURE
+\[main.assertion.4\] line \d+ assertion __CPROVER_OBJECT_SIZE\(p\) != 1: FAILURE
+--
+^warning: ignoring
+--
+Check that object size is havoc'd when objects are deallocated. Recorded as
+ADA-527.
