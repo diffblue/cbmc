@@ -72,9 +72,8 @@ std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 class goto_programt
 {
 public:
-  /// Copying is deleted as this class contains pointers that cannot be copied
-  goto_programt(const goto_programt &)=delete;
-  goto_programt &operator=(const goto_programt &)=delete;
+  goto_programt(const goto_programt &);
+  goto_programt &operator=(const goto_programt &other);
 
   // Move operations need to be explicitly enabled as they are deleted with the
   // copy operations
@@ -808,7 +807,7 @@ public:
   }
 
   /// Copy a full goto program, preserving targets
-  void copy_from(const goto_programt &src);
+  void copy_from(const goto_programt &other);
 
   /// Does the goto program have an assertion?
   bool has_assertion() const;

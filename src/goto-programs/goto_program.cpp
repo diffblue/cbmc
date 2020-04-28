@@ -11,8 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program.h"
 
-#include <ostream>
+#include <algorithm>
 #include <iomanip>
+#include <ostream>
 
 #include <util/base_type.h>
 #include <util/expr_iterator.h>
@@ -623,43 +624,45 @@ void goto_programt::compute_target_numbers()
 /// cleared, and targets are adjusted as needed
 ///
 /// \param src: the goto program to copy from
-void goto_programt::copy_from(const goto_programt &src)
+void goto_programt::copy_from(const goto_programt &other)
 {
-  // Definitions for mapping between the two programs
-  typedef std::map<const_targett, targett> targets_mappingt;
-  targets_mappingt targets_mapping;
-
-  clear();
-
-  // Loop over program - 1st time collects targets and copy
-
-  for(instructionst::const_iterator
-      it=src.instructions.begin();
-      it!=src.instructions.end();
-      ++it)
+  instructions = instructionst(other.instructions.size(), make_skip());
+  // the only difficult thing about copying goto programs
+  // is preserving the pointers to next instructions, which
+  // we can restore by simply getting the offset from the old
+  // and applying it to the new
+  // We're not using std::transform or other algorithms here
+  // because we need to mess around with the iterators directly
+  auto copy_it = instructions.begin();
+  for(auto instruction_it = other.instructions.begin();
+      instruction_it != other.instructions.end();
+      ++instruction_it, ++copy_it)
   {
-    auto new_instruction=add_instruction();
-    targets_mapping[it]=new_instruction;
-    *new_instruction=*it;
+    // copy the instruction, afterwards only the targets need to be copied
+    *copy_it = *instruction_it;
+
+    auto const copy_target = [&](const_targett target) -> targett {
+      if(target == other.instructions.end())
+      {
+        return instructions.end();
+      }
+      auto it = instructions.begin();
+      std::advance(it, std::distance(other.instructions.begin(), target));
+      return it;
+    };
+
+    std::transform(
+      instruction_it->targets.begin(),
+      instruction_it->targets.end(),
+      std::inserter(copy_it->targets, copy_it->targets.end()),
+      copy_target);
+
+    std::transform(
+      instruction_it->incoming_edges.begin(),
+      instruction_it->incoming_edges.end(),
+      std::inserter(copy_it->incoming_edges, copy_it->incoming_edges.end()),
+      copy_target);
   }
-
-  // Loop over program - 2nd time updates targets
-
-  for(auto &i : instructions)
-  {
-    for(auto &t : i.targets)
-    {
-      targets_mappingt::iterator
-        m_target_it=targets_mapping.find(t);
-
-      CHECK_RETURN(m_target_it != targets_mapping.end());
-
-      t=m_target_it->second;
-    }
-  }
-
-  compute_incoming_edges();
-  compute_target_numbers();
 }
 
 /// Returns true if the goto program includes an `ASSERT` instruction the guard
@@ -1179,4 +1182,15 @@ std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
   }
 
   return out;
+}
+
+goto_programt::goto_programt(const goto_programt &other)
+{
+  copy_from(other);
+}
+
+goto_programt &goto_programt::operator=(const goto_programt &other)
+{
+  copy_from(other);
+  return *this;
 }

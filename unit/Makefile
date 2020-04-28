@@ -23,6 +23,7 @@ SRC += analyses/ai/ai.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-programs/goto_model_function_type_consistency.cpp \
        goto-programs/goto_program_assume.cpp \
+       goto-programs/goto_program_copy_constructor.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \
        goto-programs/goto_program_function_call.cpp \
@@ -34,8 +35,8 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/is_goto_binary.cpp \
        goto-programs/label_function_pointer_call_sites.cpp \
        goto-programs/osx_fat_reader.cpp \
-       goto-programs/restrict_function_pointers.cpp \
        goto-programs/remove_returns.cpp \
+       goto-programs/restrict_function_pointers.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/apply_condition.cpp \
        goto-symex/expr_skeleton.cpp \
