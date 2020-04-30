@@ -40,7 +40,15 @@
       <xs:element ref="location" minOccurs="0"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
       <xs:element name="full_lhs" type="xs:string"/>
-      <xs:element name="full_lhs_value" type="xs:string"/>
+      <xs:element name="full_lhs_value">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="binary" type="xs:string"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
     </xs:all>
     <xs:attributeGroup ref="traceStepAttrs"/>
     <xs:attribute name="assignment_type" type="xs:string"/>
