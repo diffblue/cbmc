@@ -1,0 +1,16 @@
+CORE
+test.c
+--incremental-loop main.0
+activate-multi-line-match
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 2
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Incremental status: SUCCESS
+--
+Check that for valid asserts, the incremental status is inconclusive
+as it is only after the incrementer has been stopped we conclude is
+verified.
