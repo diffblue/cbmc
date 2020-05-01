@@ -11,6 +11,6 @@ then
 fi
 
 mkdir -p doxygen/build
-wget http://doxygen.nl/files/doxygen-${DOXYGEN_VERSION}.src.tar.gz -O- | tar -xz --strip-components=1 --directory doxygen
+wget https://downloads.sourceforge.net/project/doxygen/rel-${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.src.tar.gz -O- | tar -xz --strip-components=1 --directory doxygen
 ( cd doxygen/build && cmake .. )
 make -j4 -C doxygen/build
