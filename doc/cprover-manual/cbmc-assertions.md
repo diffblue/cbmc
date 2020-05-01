@@ -33,7 +33,7 @@ properties together with the condition.
 
 The assertion language of the CPROVER tools is identical to the language
 used for expressions.  Note that
-[nondeterminism](./modeling-nondeterminism.md) can be exploited in order
+[nondeterminism](../../modeling/nondeterminism/) can be exploited in order
 to check a range of choices.  As an example, the following code fragment
 asserts that **all** elements of the array are zero:
 
