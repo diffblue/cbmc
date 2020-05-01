@@ -81,8 +81,6 @@ operator()(propertiest &properties)
     update_properties_status_from_symex_target_equation(
       properties, result.updated_properties, equation);
 
-    output_incremental_status(properties, log);
-
     initial_equation_generated = true;
   }
 
@@ -171,6 +169,8 @@ operator()(propertiest &properties)
       break;
     }
 
+    output_incremental_status(properties, log);
+
     // We continue symbolic execution
     full_equation_generated =
       !symex.resume(goto_symext::get_goto_function(goto_model));
@@ -181,8 +181,6 @@ operator()(propertiest &properties)
       properties, result.updated_properties, equation);
 
     current_equation_converted = false;
-
-    output_incremental_status(properties, log);
   }
 
   return result;
