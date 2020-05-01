@@ -2,10 +2,9 @@ CORE
 test.c
 --incremental-loop main.0
 activate-multi-line-match
-Current unwinding: 1\nUnwinding .*\nIncremental status: INCONCLUSIVE
-Current unwinding: 6\nUnwinding .*\nIncremental status: INCONCLUSIVE
-Current unwinding: 7\nUnwinding .*\nIncremental status: FAILURE
-Current unwinding: 9\nUnwinding .*\nIncremental status: FAILURE
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 2
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 6
+Incremental status: FAILURE\nCurrent unwinding: 7
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
