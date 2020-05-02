@@ -18,7 +18,7 @@ void assert(_Bool assertion);
 The function **\_\_CPROVER\_assume** adds an expression as a constraint
 to the program. If the expression evaluates to false, the execution
 aborts without failure. More detail on the use of assumptions is in the
-section on [Assumptions](./modeling-assumptions.md).
+section on [Assumptions](../modeling/assumptions/).
 
 #### \_\_CPROVER\_r_ok, \_\_CPROVER\_w_ok
 
