@@ -1,9 +1,15 @@
 CORE
 main.c
 --incremental-loop main.0 --unwind-min 5 --unwind-max 10
+activate-multi-line-match
 Current unwinding: 1
+Incremental status: INCONCLUSIVE
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 6
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 7
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
+--
+The multi-line match is added to verify that an incremental status is printed immediately after each unwinding

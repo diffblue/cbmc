@@ -1,0 +1,11 @@
+CORE
+test.c
+--incremental-loop main.0
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+Incremental status
+--
+Verify no incremental status updates when no properties to check

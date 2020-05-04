@@ -47,6 +47,23 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
     prop_conv_solver->set_all_frozen();
 }
 
+void output_incremental_status(
+  const propertiest &properties,
+  messaget &message_hander)
+{
+  const auto any_failures = std::any_of(
+    properties.begin(),
+    properties.end(),
+    [](const std::pair<irep_idt, property_infot> &property) {
+      return property.second.status == property_statust::FAIL;
+    });
+  std::string status = any_failures ? "FAILURE" : "INCONCLUSIVE";
+  structured_datat incremental_status{
+    {{labelt({"incremental", "status"}),
+      structured_data_entryt::data_node(json_stringt(status))}}};
+  message_hander.statistics() << incremental_status;
+}
+
 incremental_goto_checkert::resultt single_loop_incremental_symex_checkert::
 operator()(propertiest &properties)
 {
@@ -151,6 +168,8 @@ operator()(propertiest &properties)
 
       break;
     }
+
+    output_incremental_status(properties, log);
 
     // We continue symbolic execution
     full_equation_generated =

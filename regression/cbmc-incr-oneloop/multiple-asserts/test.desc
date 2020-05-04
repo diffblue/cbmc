@@ -1,0 +1,16 @@
+CORE
+test.c
+--incremental-loop main.0
+activate-multi-line-match
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 2
+Incremental status: INCONCLUSIVE\nCurrent unwinding: 6
+Incremental status: FAILURE\nCurrent unwinding: 7
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Ensure that with multiple properties, the incremental status
+switches to failure as soon as one property has been falsified
+but keeps unwinding till it has resolved them all
