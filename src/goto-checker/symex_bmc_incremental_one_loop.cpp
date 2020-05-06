@@ -37,8 +37,12 @@ symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
                                    : 0),
     output_ui(output_ui)
 {
+  // the intended behaviour is to stop asserts that are violated before the
+  // unwind
+  // therefore if the min-unwind is 1, then we do one unwind and immediately
+  // start checking for properties
   ignore_assertions =
-    incr_min_unwind >= 1 &&
+    incr_min_unwind > 1 &&
     options.get_bool_option("ignore-properties-before-unwind-min");
 }
 
