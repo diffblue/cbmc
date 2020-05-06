@@ -1,0 +1,12 @@
+FUTURE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that an inconsistent assumption involving a pointer initialized to an
+integer address not pointing to memory and __CPROVER_r_ok() can be detected via
+assert(0).

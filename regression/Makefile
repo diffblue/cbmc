@@ -33,7 +33,8 @@ DIRS = cbmc \
        solver-hardness \
        goto-ld \
        validate-trace-xml-schema \
-			 # Empty last line
+       cbmc-primitives \
+       # Empty last line
 
 ifeq ($(OS),Windows_NT)
     detected_OS := Windows

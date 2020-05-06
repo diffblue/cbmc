@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that __CPROVER_r_ok() on a null pointers is false

@@ -56,6 +56,7 @@ add_subdirectory(goto-cc-file-local)
 add_subdirectory(linking-goto-binaries)
 add_subdirectory(symtab2gb)
 add_subdirectory(validate-trace-xml-schema)
+add_subdirectory(cbmc-primitives)
 
 if(WITH_MEMORY_ANALYZER)
   add_subdirectory(snapshot-harness)
