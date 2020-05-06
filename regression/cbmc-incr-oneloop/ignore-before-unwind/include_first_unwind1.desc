@@ -1,0 +1,12 @@
+CORE
+main.c
+--ignore-properties-before-unwind-min --incremental-loop main.0 --unwind-max 2 --unwind-min 1
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ property: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This test correctly fails because the first iteration of the loop violates the
+property.
