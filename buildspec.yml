@@ -13,7 +13,7 @@ phases:
     commands:
       - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
       - apt-get update -y
-      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq gdb
+      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq gdb libxml2-utils
   build:
     commands:
       - echo Build started on `date`

@@ -55,6 +55,7 @@ add_subdirectory(goto-harness)
 add_subdirectory(goto-cc-file-local)
 add_subdirectory(linking-goto-binaries)
 add_subdirectory(symtab2gb)
+add_subdirectory(validate-trace-xml-schema)
 
 if(WITH_MEMORY_ANALYZER)
   add_subdirectory(snapshot-harness)
