@@ -221,6 +221,11 @@ void run_property_decider(
   "                              of loop L\n" \
   "                              (use --show-loops to get the loop IDs)\n" \
   " --unwind-min nr              start incremental-loop after nr unwindings\n" \
+  "                              but before solving that iteration. If for\n" \
+  "                              example it is 1, then the loop will be\n" \
+  "                              unwound once, and immediately checked.\n" \
+  "                              Note: this means for min-unwind 1 or\n"\
+  "                              0 all properties are checked.\n" \
   " --unwind-max nr              stop incremental-loop after nr unwindings\n" \
   " --ignore-properties-before-unwind-min\n" \
   "                              do not check properties before unwind-min\n" \
