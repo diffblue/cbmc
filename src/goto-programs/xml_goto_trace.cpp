@@ -27,8 +27,8 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
 {
   xmlt full_lhs_value{"full_lhs_value"};
 
-  auto lhs_object = step.get_lhs_object();
-  irep_idt identifier =
+  const auto &lhs_object = step.get_lhs_object();
+  const irep_idt identifier =
     lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
 
   if(step.full_lhs_value.is_not_nil())
