@@ -4,11 +4,11 @@
 
 int main()
 {
-  float zero = 0.0f;
-  float one = 1.0f;
-  float complex = 0x1p+37f;
-  float inf = INFINITY;
-  float nan = NAN;
+  float fzero = 0.0f;
+  float fone = 1.0f;
+  float fcomplex = 0x1p+37f;
+  float finf = INFINITY;
+  float fnan = NAN;
 
   double dzero = 0.0;
   double done = 1.0;
