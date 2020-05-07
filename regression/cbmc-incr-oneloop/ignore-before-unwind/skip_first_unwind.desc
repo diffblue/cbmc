@@ -1,6 +1,6 @@
 CORE
 main.c
---ignore-properties-before-unwind-min --incremental-loop main.0 --unwind-max 2 --unwind-min 1
+--ignore-properties-before-unwind-min --incremental-loop main.0 --unwind-max 2 --unwind-min 2
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
