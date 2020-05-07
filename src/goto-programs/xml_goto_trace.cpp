@@ -19,9 +19,37 @@ Author: Daniel Kroening
 #include <util/xml_irep.h>
 
 #include <langapi/language_util.h>
+#include <util/arith_tools.h>
 
 #include "printf_formatter.h"
 #include "xml_expr.h"
+
+bool full_lhs_value_includes_binary(
+  const goto_trace_stept &step,
+  const namespacet &ns)
+{
+  return can_cast_type<floatbv_typet>(step.full_lhs_value.type());
+}
+
+xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
+{
+  xmlt full_lhs_value{"full_lhs_value"};
+
+  const auto &lhs_object = step.get_lhs_object();
+  const irep_idt identifier =
+    lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
+
+  if(step.full_lhs_value.is_not_nil())
+    full_lhs_value.data = from_expr(ns, identifier, step.full_lhs_value);
+  if(full_lhs_value_includes_binary(step, ns))
+  {
+    const auto width = to_floatbv_type(step.full_lhs_value.type()).get_width();
+    const auto binary_representation = integer2binary(
+      bvrep2integer(step.full_lhs_value.get(ID_value), width, false), width);
+    full_lhs_value.set_attribute("binary", binary_representation);
+  }
+  return full_lhs_value;
+}
 
 void convert(
   const namespacet &ns,
@@ -88,16 +116,13 @@ void convert(
         }
       }
 
-      std::string full_lhs_string, full_lhs_value_string;
+      std::string full_lhs_string;
 
       if(step.full_lhs.is_not_nil())
         full_lhs_string = from_expr(ns, identifier, step.full_lhs);
 
-      if(step.full_lhs_value.is_not_nil())
-        full_lhs_value_string = from_expr(ns, identifier, step.full_lhs_value);
-
       xml_assignment.new_element("full_lhs").data = full_lhs_string;
-      xml_assignment.new_element("full_lhs_value").data = full_lhs_value_string;
+      xml_assignment.new_element(full_lhs_value(step, ns));
 
       xml_assignment.set_attribute_bool("hidden", step.hidden);
       xml_assignment.set_attribute("thread", std::to_string(step.thread_nr));

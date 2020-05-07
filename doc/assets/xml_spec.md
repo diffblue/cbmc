@@ -168,7 +168,9 @@ always present
 
 -   `full_lhs`: original lhs expression (after dereferencing)
 
--   `full_lhs_value`: a constant with the new value
+-   `full_lhs_value`: a constant with the new value.
+     - if the type is a floating point number type, there will be an attribute`binary` 
+       showing its value.
 
 **Example**:
 
@@ -181,6 +183,12 @@ always present
   <full_lhs>b</full_lhs>
   <full_lhs_value>-1879048192</full_lhs_value>
 </assignment>
+<assignment assignment_type="state" base_name="d" display_name="main::1::d" hidden="false" identifier="main::1::d" mode="C" step_nr="26" thread="0">
+  <location file="main.i" function="main" line="3" working-directory="/home/tkiley/workspace/cbmc/regression/cbmc/Float24"/>
+  <type>double</type>
+  <full_lhs>d</full_lhs>
+  <full_lhs_value binary="0100000000010100011001100110011001100110011001100110011001100110">5.1</full_lhs_value>
+</assignment>
 ```
 
 **XSD**:
@@ -192,7 +200,15 @@ always present
       <xs:element name="location" minOccurs="0"></xs:element>
       <xs:element name="type" type="xs:string" minOccurs="0"></xs:element>
       <xs:element name="full_lhs" type="xs:string"></xs:element>
-      <xs:element name="full_lhs_value" type="xs:int"></xs:element>
+      <xs:element name="full_lhs_value">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="binary" type="xs:string"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
     </xs:all>
     <xs:attributeGroup ref="traceStepAttrs">
     <xs:attribute name="assignment_type" type="xs:string"></xs:attribute>

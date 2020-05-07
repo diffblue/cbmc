@@ -138,9 +138,11 @@ possible output format.
 ```
 
 The specification of the XML trace output can be found here: [XML
-Specification](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/assets/xml_spec.tex)
-and can be build by `pdflatex -shell-escape xml_spec.tex`. Alternatively, you
-view it in Markdown [here](../../../assets/xml_spec).
+Specification](../assets/xml_spec.tex)
+and can be built by `pdflatex -shell-escape xml_spec.tex`. See the [README
+](../assets/README.md#xml_spec.tex) for details.
+
+Alternatively, you can view it in [Markdown](../assets/xml_spec.md).
 
 ### Verifying Modules
 
@@ -348,4 +350,3 @@ comes with a small set of definitions, which includes functions such as
 
 We also have a [list of interesting applications of
 CBMC](http://www.cprover.org/cbmc/applications/).
-
