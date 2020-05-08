@@ -1,0 +1,26 @@
+CORE
+main.c
+--dependence-graph --show
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\/\/ ([0-9]+).*\n.*b = 2;(.*\n)*Data dependencies: (([0-9]+,\1)|(\1,[0-9]+))\n(.*\n){2,3}.*result = b
+\/\/ ([0-9]+).*\n.*c = 3;(.*\n)*Data dependencies: (([0-9]+,\1)|(\1,[0-9]+))\n(.*\n){2,3}.*result = b
+--
+^warning: ignoring
+--
+
+The two regular expressions above match output portions like shown below (with
+<N> being a location number). The intention is to check whether a function
+parameter in the callee correctly depends on the caller-provided argument.
+
+      // 3 file main.c line 11 function main
+        b = 2;
+...
+**** 12 file main.c line 5 function bar
+Data dependencies: (<N>,...)|(...,<N>)
+
+        // 12 file main.c line 5 function bar
+        result = b;
+
+The second regex matches for c.

@@ -121,8 +121,7 @@ public:
 
   virtual ~rw_range_sett();
 
-  explicit rw_range_sett(const namespacet &_ns):
-    ns(_ns)
+  explicit rw_range_sett(const namespacet &_ns) : ns(_ns)
   {
   }
 
@@ -134,6 +133,21 @@ public:
   const objectst &get_w_set() const
   {
     return w_range_set;
+  }
+
+  /// Enable maintaining a read set for a single expression
+  void enable_expr_read_set()
+  {
+    expr_r_range_set = objectst{};
+  }
+
+  /// Obtain the read set for a single expression. Requires a prior call to
+  /// \ref enable_expr_read_set.
+  objectst fetch_expr_read_set()
+  {
+    objectst result = std::move(*expr_r_range_set);
+    expr_r_range_set.reset();
+    return result;
   }
 
   const range_domaint &get_ranges(objectst::const_iterator it) const
@@ -167,6 +181,7 @@ protected:
   const namespacet &ns;
 
   objectst r_range_set, w_range_set;
+  optionalt<objectst> expr_r_range_set;
 
   virtual void get_objects_rec(
     get_modet mode,
