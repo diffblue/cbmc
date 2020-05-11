@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Check that __CPROVER_same_object() is true when given a pointer to the start of
+a memory block, and a pointer to within the memory block.
