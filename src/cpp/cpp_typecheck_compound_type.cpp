@@ -669,15 +669,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           expr_call.type()=to_code_type(component.type()).return_type();
 
-          func_symb.value =
-            code_returnt(already_typechecked_exprt{std::move(expr_call)})
-              .make_block();
+          func_symb.value = code_blockt{
+            {code_returnt(already_typechecked_exprt{std::move(expr_call)})}};
         }
         else
         {
-          func_symb.value =
-            code_expressiont(already_typechecked_exprt{std::move(expr_call)})
-              .make_block();
+          func_symb.value = code_blockt{{code_expressiont(
+            already_typechecked_exprt{std::move(expr_call)})}};
         }
 
         // add this new function to the list of components
@@ -1241,7 +1239,8 @@ void cpp_typecheckt::move_member_initializers(
       throw 0;
     }
 
-    to_code(value).make_block();
+    if(to_code(value).get_statement() != ID_block)
+      value = code_blockt{{to_code(value)}};
 
     exprt::operandst::iterator o_it=value.operands().begin();
     forall_irep(it, initializers.get_sub())

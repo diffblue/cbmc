@@ -1257,10 +1257,9 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       {
         labels_in_use.insert(*it);
 
-        code_labelt l(*it);
-        l.code().swap(b);
+        code_labelt l(*it, std::move(b));
         l.add_source_location()=target->source_location;
-        b.swap(l);
+        b = std::move(l);
       }
 
     assert(b.get_statement()==ID_label);
@@ -1323,10 +1322,9 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     {
       labels_in_use.insert(*it);
 
-      code_labelt l(*it);
-      l.code().swap(b);
+      code_labelt l(*it, std::move(b));
       l.add_source_location()=target->source_location;
-      b.swap(l);
+      b = std::move(l);
     }
 
   assert(b.get_statement()==ID_label);
