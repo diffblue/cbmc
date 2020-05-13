@@ -99,9 +99,8 @@ void split_string(
   // delim can't be a space character if using strip
   PRECONDITION(!std::isspace(delim) || !strip);
 
-  std::vector<std::string> result;
+  std::vector<std::string> result = split_string(s, delim, strip);
 
-  split_string(s, delim, result, strip);
   if(result.size() != 2)
   {
     throw deserialization_exceptiont{"expected string '" + s +
