@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -1187,11 +1188,22 @@ void goto_checkt::pointer_primitive_check(
   if(!enable_pointer_primitive_check)
     return;
 
+  if(expr.source_location().is_built_in())
+    return;
+
   const exprt pointer = (expr.id() == ID_r_ok || expr.id() == ID_w_ok)
                           ? to_binary_expr(expr).lhs()
                           : to_unary_expr(expr).op();
 
   CHECK_RETURN(pointer.type().id() == ID_pointer);
+
+  if(pointer.id() == ID_symbol)
+  {
+    const auto &symbol_expr = to_symbol_expr(pointer);
+
+    if(has_prefix(id2string(symbol_expr.get_identifier()), CPROVER_PREFIX))
+      return;
+  }
 
   const auto size_of_expr_opt = size_of_expr(pointer.type().subtype(), ns);
 
