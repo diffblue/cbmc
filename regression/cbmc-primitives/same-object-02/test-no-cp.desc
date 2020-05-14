@@ -1,0 +1,13 @@
+CORE
+main.c
+--no-simplify --no-propagation
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Check that __CPROVER_same_object() is false when given two pointers to different
+malloc'd objects. We use --no-simplify and --no-propagation to ensure that the
+case is not solved by the constant propagation and thus tests the constraint
+encoding.
