@@ -16,12 +16,32 @@ to the basic data structures and workflow needed for contributing to
 
 ## Initial setup
 
-Clone the [CBMC repository][cbmc-repo] and build it:
+Clone the [CBMC repository][cbmc-repo] and build it. The build instructions are
+written in a file called COMPILING.md in the top level of the repository. I
+recommend that you build using CMake---this will place all of the CBMC tools in
+a single directory, which you can add to your `$PATH`. For example, if you built
+the codebase with the following two commands at the top level of the repository:
 
-    git clone https://github.com/diffblue/cbmc.git
-    cd cbmc/src
-    make minisat2-download
-    make
+    cmake -DCMAKE_BUILD_TYPE=Debug                  \
+          -DCMAKE_CXX_COMPILER=/usr/bin/clang++     \
+          -DCMAKE_C_COMPILER=/usr/bin/clang         \
+          -B build -S .
+    cmake --build build
+
+then all the CBMC binaries will be built into `build/bin`, and you can run the
+following commands to make CBMC invokable from your terminal.
+
+    # Assuming you cloned CBMC into ~/code
+    export PATH=~/code/cbmc/build/bin:$PATH
+    # Add to your shell's startup configuration file so that you don't have to run that command every time.
+    echo 'export PATH=~/code/cbmc/build/bin:$PATH' >> .bashrc
+
+If you are using Make instead of CMake, the built binaries will be
+scattered throughout the source tree. This tutorial uses the binaries
+`src/cbmc/cbmc`, `src/goto-instrument/goto-instrument`, and
+`src/goto-cc/goto-gcc`, so you will need to add each of those
+directories to your `$PATH`, or symlink to those binaries from a
+directory that is already in your `$PATH`.
 
 Ensure that [graphviz][graphviz] is installed on your system (in
 particular, you should be able to run a program called `dot`).  Install
@@ -30,48 +50,29 @@ particular, you should be able to run a program called `dot`).  Install
     # In the src directory
     doxygen doxyfile
     # View the documentation in a web browser
-    firefox doxy/html/index.html
+    firefox ~/code/cbmc/doc/html/index.html
 
 If you've never used doxygen documentation before, get familiar with the
 layout.  Open the generated HTML page in a web browser; search for the
 class `goto_programt` in the search bar, and jump to the documentation
 for that class; and read through the copious documentation.
 
-The build writes executable programs into several of the source
-directories.  In this tutorial, we'll be using binaries inside the
-`cbmc`, `goto-instrument`, and `goto-cc` directories.  Add these
-directories to your `$PATH`:
-
-    # Assuming you cloned CBMC into ~/code
-    export PATH=~/code/cbmc/src/goto-instrument:~/code/cbmc/src/goto-cc:~/code/cbmc/src/cbmc:$PATH
-    # Add to your shell's startup configuration file so that you don't have to run that command every time.
-    echo 'export PATH=~/code/cbmc/src/goto-instrument:~/code/cbmc/src/goto-cc:~/code/cbmc/src/cbmc:$PATH' >> .bashrc
-
-Optional: install an image viewer that can read images on stdin.
-I use [feh][feh].
-
 [cbmc-repo]:  https://github.com/diffblue/cbmc/
 [doxygen]:    http://www.stack.nl/~dimitri/doxygen/
 [graphviz]:   http://www.graphviz.org/
-[feh]:        https://feh.finalrewind.org/
-
 
 
 ## Whirlwind tour of the tools
 
-CBMC's code is located under the `cbmc` directory.  Even if you plan to
+CBMC's code is located under the `src` directory.  Even if you plan to
 contribute only to CBMC, it is important to be familiar with several
 other of cprover's auxiliary tools.
 
 
 ### Compiling with `goto-cc`
 
-There should be an executable file called `goto-cc` in the `goto-cc`
-directory; make a symbolic link to it called `goto-gcc`:
-
-    cd cbmc/src/goto-cc
-    ln -s "$(pwd)/goto-cc" goto-gcc
-
+If you built using CMake on Unix, you should be able to run the
+`goto-gcc` command.
 Find or write a moderately-interesting C program; we'll call it `main.c`.
 Run the following commands:
 
@@ -102,16 +103,10 @@ structured programming constructs.
 
 Find or write a small C program (2 or 3 functions, each containing a few
 varied statements).  Compile it using `goto-gcc` as above into an object
-file called `main`.  If you installed `feh`, try the following command
-to dump a control-flow graph:
+file called `main`. You can write the diagram to a file and then view it:
 
-    goto-instrument --dot main | tail -n +2 | dot -Tpng | feh -
-
-If you didn't install `feh`, you can write the diagram to the file and
-then view it:
-
-    goto-instrument --dot main | tail -n +2 | dot -Tpng > main.png
-    Now open main.png with an image viewer
+    goto-instrument --dot main.goto | tail -n +2 | dot -Tpng > main.png
+    open main.png
 
 (the invocation of `tail` is used to filter out the first line of
 `goto-instrument` output.  If `goto-instrument` writes more or less
@@ -148,7 +143,7 @@ At some point in that function, there will be a long sequence of `if` statements
 **Task:** Add a `--greet` switch to `goto-instrument`, taking an optional
 argument, with the following behaviour:
 
-    $ goto-instrument --greet main
+    $ goto-instrument --greet main.goto
     hello, world!
     $ goto-instrument --greet Leperina main
     hello, Leperina!
