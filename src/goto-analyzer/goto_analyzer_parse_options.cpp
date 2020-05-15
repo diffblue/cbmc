@@ -809,14 +809,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_vector(goto_model);
     remove_complex(goto_model);
 
-#if 0
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-#else
-    (void)options; // unused parameter
-#endif
-
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
 
