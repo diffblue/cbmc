@@ -6,14 +6,14 @@ add_executable(converter library/converter.cpp)
 file(GLOB ansi_c_library_sources "library/*.c")
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-    COMMAND cat ${ansi_c_library_sources} | $<TARGET_FILE:converter> > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+    COMMAND $<TARGET_FILE:converter> ${ansi_c_library_sources} > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
     DEPENDS converter ${ansi_c_library_sources})
 
 add_executable(file_converter file_converter.cpp)
 
 function(make_inc name)
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
-        COMMAND file_converter < "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" > "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
+        COMMAND file_converter "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" > "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
         DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" file_converter
     )
 endfunction(make_inc)

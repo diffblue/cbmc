@@ -1,7 +1,7 @@
 file(GLOB cpp_library_sources "library/*.c")
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
-        COMMAND cat ${cpp_library_sources} | $<TARGET_FILE:converter> > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+        COMMAND $<TARGET_FILE:converter> ${cpp_library_sources} > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
         DEPENDS converter ${cpp_library_sources})
 
 ################################################################################

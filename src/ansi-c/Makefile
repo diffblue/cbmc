@@ -110,10 +110,10 @@ library_check: library/*.c
 	touch $@
 
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
-	cat library/*.c | library/converter$(EXEEXT) > $@
+	library/converter$(EXEEXT) library/*.c > $@
 
 %.inc: %.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < $< > $@
+	./file_converter$(EXEEXT) $< > $@
 
 ansi_c_internal_additions$(OBJEXT): $(BUILTIN_FILES)
 
