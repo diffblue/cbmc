@@ -1282,7 +1282,15 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
     const exprt in_bounds_of_some_explicit_allocation =
       disjunction(alloc_disjuncts);
 
-    if(flags.is_unknown() || flags.is_null())
+    const bool unknown = flags.is_unknown() || flags.is_uninitialized();
+
+    if(unknown)
+    {
+      conditions.push_back(conditiont{
+        not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
+    }
+
+    if(unknown || flags.is_null())
     {
       conditions.push_back(conditiont(
         or_exprt(
@@ -1291,21 +1299,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         "pointer NULL"));
     }
 
-    if(flags.is_unknown())
-    {
-      conditions.push_back(conditiont{
-        not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
-    }
-
-    if(flags.is_uninitialized())
-    {
-      conditions.push_back(
-        conditiont{or_exprt{in_bounds_of_some_explicit_allocation,
-                            not_exprt{is_invalid_pointer_exprt{address}}},
-                   "pointer uninitialized"});
-    }
-
-    if(flags.is_unknown() || flags.is_dynamic_heap())
+    if(unknown || flags.is_dynamic_heap())
     {
       conditions.push_back(conditiont(
         or_exprt(
@@ -1314,7 +1308,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         "deallocated dynamic object"));
     }
 
-    if(flags.is_unknown() || flags.is_dynamic_local())
+    if(unknown || flags.is_dynamic_local())
     {
       conditions.push_back(conditiont(
         or_exprt(
@@ -1323,7 +1317,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         "dead object"));
     }
 
-    if(flags.is_unknown() || flags.is_dynamic_heap())
+    if(unknown || flags.is_dynamic_heap())
     {
       const or_exprt object_bounds_violation(
         object_lower_bound(address, nil_exprt()),
@@ -1337,9 +1331,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         "pointer outside dynamic object bounds"));
     }
 
-    if(
-      flags.is_unknown() || flags.is_dynamic_local() ||
-      flags.is_static_lifetime())
+    if(unknown || flags.is_dynamic_local() || flags.is_static_lifetime())
     {
       const or_exprt object_bounds_violation(
         object_lower_bound(address, nil_exprt()),
@@ -1354,7 +1346,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         "pointer outside object bounds"));
     }
 
-    if(flags.is_unknown() || flags.is_integer_address())
+    if(unknown || flags.is_integer_address())
     {
       conditions.push_back(conditiont(
         implies_exprt(
