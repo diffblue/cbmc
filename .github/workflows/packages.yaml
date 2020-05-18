@@ -1,0 +1,410 @@
+name: Package CBMC
+on: [push]
+
+jobs:
+  Tags:
+    #
+    # Generate a set of values (like a single timestamp and package name)
+    # that can be used consistently by the subsequent jobs building
+    # the packages.
+    #
+    name: Generate package tag
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE_NAME: cbmc-latest
+      VERSION_SCRIPT: .github/workflows/version.py
+    outputs:
+      time: ${{ steps.time.outputs.time }}
+      sha: ${{ steps.sha.outputs.sha }}
+      runid: ${{ steps.runid.outputs.runid }}
+      runnum: ${{ steps.runnum.outputs.runnum }}
+      name: ${{ env.PACKAGE_NAME }}
+      cbmc_version: ${{ steps.version.outputs.cbmc_version }}
+      pkg_version: ${{ steps.version.outputs.pkg_version }}
+      opentag: ${{ steps.opentag.outputs.opentag }}
+      closedtag: ${{ steps.closedtag.outputs.closedtag }}
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - id: time
+        run: |
+          TIME=$(date --utc +%Y%m%dT%H%M%SZ)
+          echo "::set-output name=time::${TIME}"
+
+      - id: sha
+        run: |
+          SHA=${{ github.sha }}
+          echo "::set-output name=sha::${SHA:0:8}"
+
+      - id: runid
+        run: |
+          ID=${{ github.run_id }}
+          echo "::set-output name=runid::${ID}"
+
+      - id: runnum
+        run: |
+          NUM=${{ github.run_number }}
+          echo "::set-output name=runnum::${NUM}"
+
+      - id: version
+        run: |
+          CBMC_VERSION=$(grep CBMC_VERSION src/config.inc | sed 's/.*= *//')
+          PKG_VERSION=$(echo ${CBMC_VERSION}-${{ github.run_number }})
+          echo "::set-output name=cbmc_version::${CBMC_VERSION}"
+          echo "::set-output name=pkg_version::${PKG_VERSION}"
+
+      - name: echo
+        run: |
+          echo TIME = ${{ steps.time.outputs.time }}
+          echo SHA = ${{ steps.sha.outputs.sha }}
+          echo RUN ID = ${{ steps.runid.outputs.runid }}
+          echo RUN NUMBER = ${{ steps.runnum.outputs.runnum }}
+          echo CBMC_VERSION = ${{ steps.version.outputs.cbmc_version }}
+          echo PKG_VERSION = ${{ steps.version.outputs.pkg_version }}
+
+  Ubuntu16_Stable:
+    name: Ubuntu 16 cbmc package
+    runs-on: ubuntu-16.04
+    needs: Tags
+    env:
+      OS: xenial
+      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
+      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
+      TIME: ${{needs.Tags.outputs.time}}
+      SHA: ${{needs.Tags.outputs.sha}}
+
+      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
+      ARTIFACT_STABLE_NAME: Ubuntu16 cbmc ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+
+      SCRIPT_DIR: .github/workflows/debian
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Update the submodules
+        run: git submodule update --init
+
+      - name: Create the package
+        run: |
+          cp -r . /tmp/cbmc-${CBMC_VERSION}
+          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire /tmp
+          df -m /tmp
+          ls /tmp
+          make -C /tmp GITHUB=1 STABLE=1 CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
+          df -m /tmp
+          ls /tmp
+          mv /tmp/*.deb ${PACKAGE_STABLE_NAME}
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.ARTIFACT_STABLE_NAME }}
+          path: ${{ env.PACKAGE_STABLE_NAME }}
+
+  Ubuntu16_Latest:
+    name: Ubuntu 16 cbmc-latest package
+    runs-on: ubuntu-16.04
+    needs: Tags
+    env:
+      OS: xenial
+      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
+      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
+      TIME: ${{needs.Tags.outputs.time}}
+      SHA: ${{needs.Tags.outputs.sha}}
+
+      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
+      ARTIFACT_LATEST_NAME: Ubuntu16 cbmc-latest ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+
+      SCRIPT_DIR: .github/workflows/debian
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Update the submodules
+        run: git submodule update --init
+
+      - name: Create the package
+        run: |
+          cp -r . /tmp/cbmc-${CBMC_VERSION}
+          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire /tmp
+          df -m /tmp
+          ls /tmp
+          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog /tmp
+          make -C /tmp GITHUB=1 STABLE= CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
+          df -m /tmp
+          ls /tmp
+          mv /tmp/*.deb ${PACKAGE_LATEST_NAME}
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.ARTIFACT_LATEST_NAME }}
+          path: ${{ env.PACKAGE_LATEST_NAME }}
+
+  Ubuntu18_Stable:
+    name: Ubuntu 18 cbmc package
+    runs-on: ubuntu-18.04
+    needs: Tags
+    env:
+      OS: bionic
+      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
+      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
+      TIME: ${{needs.Tags.outputs.time}}
+      SHA: ${{needs.Tags.outputs.sha}}
+
+      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
+      ARTIFACT_STABLE_NAME: Ubuntu18 cbmc ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+
+      SCRIPT_DIR: .github/workflows/debian
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Update the submodules
+        run: git submodule update --init
+
+      - name: Create the package
+        run: |
+          cp -r . /tmp/cbmc-${CBMC_VERSION}
+          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire /tmp
+          df -m /tmp
+          ls /tmp
+          make -C /tmp GITHUB=1 STABLE=1 CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
+          df -m /tmp
+          ls /tmp
+          mv /tmp/*.deb ${PACKAGE_STABLE_NAME}
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.ARTIFACT_STABLE_NAME }}
+          path: ${{ env.PACKAGE_STABLE_NAME }}
+
+  Ubuntu18_Latest:
+    name: Ubuntu 18 cbmc-latest package
+    runs-on: ubuntu-18.04
+    needs: Tags
+    env:
+      OS: bionic
+      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
+      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
+      TIME: ${{needs.Tags.outputs.time}}
+      SHA: ${{needs.Tags.outputs.sha}}
+
+      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
+      ARTIFACT_LATEST_NAME: Ubuntu18 cbmc-latest ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+
+      SCRIPT_DIR: .github/workflows/debian
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Update the submodules
+        run: git submodule update --init
+
+      - name: Create the package
+        run: |
+          cp -r . /tmp/cbmc-${CBMC_VERSION}
+          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire /tmp
+          df -m /tmp
+          ls /tmp
+          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog /tmp
+          make -C /tmp GITHUB=1 STABLE= CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
+          df -m /tmp
+          ls /tmp
+          mv /tmp/*.deb ${PACKAGE_LATEST_NAME}
+
+      - name: Upload the package
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.ARTIFACT_LATEST_NAME }}
+          path: ${{ env.PACKAGE_LATEST_NAME }}
+
+#  Ubuntu16:
+#    name: Ubuntu 16 package
+#    runs-on: ubuntu-16.04
+#    needs: Tags
+#    env:
+#      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
+#      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
+#
+#      ARTIFACT_STABLE_NAME: Ubuntu16 cbmc ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+#      ARTIFACT_LATEST_NAME: Ubuntu16 cbmc-latest ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+#
+#      SCRIPT_DIR: .github/workflows/ubuntu16
+#
+#    steps:
+#      - name: Checkout the repository
+#        uses: actions/checkout@v2
+#
+#      - name: Update the submodules
+#        run: git submodule update --init
+#
+#      - name: Create the cbmc package
+#        run: |
+#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc PACKAGE_NAME=cbmc_amd64.deb PREFIX=/usr
+#          mv cbmc_amd64.deb ${PACKAGE_STABLE_NAME}
+#
+#      - name: Create the cbmc-latest package
+#        run: |
+#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc-latest PACKAGE_NAME=cbmc-latest_amd64.deb PREFIX=/usr/local/cbmc-latest
+#          mv cbmc-latest_amd64.deb ${PACKAGE_LATEST_NAME}
+#
+#      - name: Upload the cbmc package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{ env.ARTIFACT_STABLE_NAME }}
+#          path: ${{ env.PACKAGE_STABLE_NAME }}
+#
+#      - name: Upload the cbmc-latest package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{ env.ARTIFACT_LATEST_NAME }}
+#          path: ${{ env.PACKAGE_LATEST_NAME }}
+
+
+#  Ubuntu18:
+#    name: Ubuntu 18 package
+#    runs-on: ubuntu-18.04
+#    needs: Tags
+#    env:
+#      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
+#      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
+#
+#      ARTIFACT_STABLE_NAME: Ubuntu18 cbmc ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+#      ARTIFACT_LATEST_NAME: Ubuntu18 cbmc-latest ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+#
+#      SCRIPT_DIR: .github/workflows/ubuntu18
+#
+#    steps:
+#      - name: Checkout the repository
+#        uses: actions/checkout@v2
+#
+#      - name: Update the submodules
+#        run: git submodule update --init
+#
+#      - name: Create the cbmc package
+#        run: |
+#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc PACKAGE_NAME=cbmc_amd64.deb PREFIX=/usr
+#          mv cbmc_amd64.deb ${PACKAGE_STABLE_NAME}
+#
+#      - name: Create the cbmc-latest package
+#        run: |
+#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc-latest PACKAGE_NAME=cbmc-latest_amd64.deb PREFIX=/usr/local/cbmc-latest
+#          mv cbmc-latest_amd64.deb ${PACKAGE_LATEST_NAME}
+#
+#      - name: Upload the cbmc package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{ env.ARTIFACT_STABLE_NAME }}
+#          path: ${{ env.PACKAGE_STABLE_NAME }}
+#
+#      - name: Upload the cbmc-latest package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{ env.ARTIFACT_LATEST_NAME }}
+#          path: ${{ env.PACKAGE_LATEST_NAME }}
+
+  MacOS:
+    name: MacOS packages
+    runs-on: macos-10.15
+    needs: Tags
+    env:
+      OS: catalina
+      VERSION: ${{needs.Tags.outputs.pkg_version}}
+      TIME: ${{needs.Tags.outputs.time}}
+      SHA: ${{needs.Tags.outputs.sha}}
+
+      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~catalina.tar.gz
+      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~catalina.tar.gz
+
+      ARTIFACT_STABLE_NAME: MacOS cbmc ${{needs.Tags.outputs.pkg_version}} catalina ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+      ARTIFACT_LATEST_NAME: MacOS cbmc-latest ${{needs.Tags.outputs.pkg_version}} catalina ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+
+      SCRIPT_DIR: .github/workflows/macos15
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Update the submodules
+        run: git submodule update --init
+
+      - name: Build the package
+        run: |
+          make -f ${SCRIPT_DIR}/Makefile
+          mv cbmc.tar.gz ${PACKAGE_STABLE_NAME}
+          mv cbmc-latest.tar.gz ${PACKAGE_LATEST_NAME}
+
+      - name: Upload the cbmc package
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{env.ARTIFACT_STABLE_NAME}}
+          path: ${{env.PACKAGE_STABLE_NAME}}
+
+      - name: Upload the cbmc-latest package
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{env.ARTIFACT_LATEST_NAME}}
+          path: ${{env.PACKAGE_LATEST_NAME}}
+
+  VS2019:
+    name: Windows VS2019 installers
+    runs-on: windows-2019
+    needs: Tags
+    env:
+      OS: vs2019
+      VERSION: ${{needs.Tags.outputs.pkg_version}}
+      TIME: ${{needs.Tags.outputs.time}}
+      SHA: ${{needs.Tags.outputs.sha}}
+
+      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~vs2019.msi
+      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~vs2019.msi
+
+      ARTIFACT_STABLE_NAME: Windows cbmc ${{needs.Tags.outputs.pkg_version}} vs2019 ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+      ARTIFACT_LATEST_NAME: Windows cbmc-latest ${{needs.Tags.outputs.pkg_version}} vs2019 ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+
+      SCRIPT_DIR: .github\workflows\vs2019
+
+    defaults:
+      run:
+         shell: cmd
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Update the submodules
+        run: git submodule update --init
+
+      - name: Install bison and flex
+        run: ${{env.SCRIPT_DIR}}\install-bison.bat
+
+      - name: Build cbmc
+        run: ${{env.SCRIPT_DIR}}\build-cbmc.bat
+
+      - name: Build the stable installer
+        run: |
+           ${{env.SCRIPT_DIR}}\build-installer.bat cbmc && move cbmc.msi ${{env.PACKAGE_STABLE_NAME}}
+
+      - name: Build the latest installer
+        run: |
+           ${{env.SCRIPT_DIR}}\build-installer.bat cbmc-latest && move cbmc-latest.msi ${{env.PACKAGE_LATEST_NAME}}
+
+      - name: Upload the cbmc installer
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{env.ARTIFACT_STABLE_NAME}}
+          path: ${{env.PACKAGE_STABLE_NAME}}
+
+      - name: Upload the cbmc-latest installer
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{env.ARTIFACT_LATEST_NAME}}
+          path: ${{env.PACKAGE_LATEST_NAME}}
