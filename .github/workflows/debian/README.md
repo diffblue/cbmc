@@ -10,3 +10,5 @@ This builds the Debian package for CBMC, using an auto-generated changelog.
 Install with `sudo dpkg -i `cbmc_<RELEASE>_<ARCHITECTURE>.deb`.
 
 Remove with `sudo dpkg -r cbmc`.
+
+Read the Makefile for the API.

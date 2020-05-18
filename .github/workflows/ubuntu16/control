@@ -1,0 +1,15 @@
+Package: cbmc
+Version: VERSION
+Architecture: amd64
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Original-Maintainer: Michael Tautschnig <mt@debian.org>
+Installed-Size: SIZE
+Depends: gcc (>= 4:5.3.1), libc6 (>= 2.23), libgcc1 (>= 1:6.0.1), libstdc++6 (>= 5.4.0)
+Section: science
+Priority: extra
+Homepage: http://www.cprover.org/cbmc/
+Description: Bounded model checker for C and C++ programs
+  CBMC is a Bounded Model Checker for C and C++ programs.  CBMC verifies
+  memory safety (which includes array bounds checks and checks for the
+  safe use of pointers), checks for exceptions, checks for various
+  variants of undefined behavior, and user-specified assertions.
