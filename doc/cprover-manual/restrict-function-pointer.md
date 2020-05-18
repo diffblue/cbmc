@@ -178,3 +178,18 @@ sure that all function pointer replacements refer to functions in the symbol
 table that have the correct type), the error message will refer to the command
 line option `--restrict-function-pointer` regardless of whether the restriction
 in question came from the command line or a file.
+
+### Getting restrictions automatically
+
+Manually setting the function pointer restrictions can be useful for testing
+specific constructed scenarios. However, they can also also be computed automatically
+via `goto-analyzer`:
+
+```
+goto-analyzer --get-function-pointer-restrictions <restrictions-json-file-name> <file-to-analyze>
+```
+
+This is a coarse analysis but should produce useful restrictions under most circumstances.
+
+Note that this is starting an analysis at `main` collecting function pointers that are actually being used,
+use `--function` like in cbmc if you need a different entry point.

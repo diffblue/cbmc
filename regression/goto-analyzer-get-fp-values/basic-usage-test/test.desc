@@ -1,0 +1,35 @@
+CORE
+test.c
+
+\[fptr_is_g_or_h.assertion.1\] line \d+ dereferenced function pointer at fptr_is_g_or_h\.function_pointer_call\.1 must be one of \[h|g, g|h\]: SUCCESS
+\[fptr_is_g_or_h.assertion.2\] line \d+ assertion fptr\(10, dummy\) <= 10: SUCCESS
+\[fptr_is_f.assertion.1\] line \d+ dereferenced function pointer at fptr_is_f\.function_pointer_call\.1 must be f: SUCCESS
+\[fptr_is_f.assertion.2\] line \d+ assertion fptr\(10, dummy\) == 11: SUCCESS
+\[fptr_is_top.pointer_dereference.8\] line \d+ invalid function pointer: FAILURE
+\[fptr_is_top.pointer_dereference.4\] line \d+ dereference failure: dead object in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.pointer_dereference.6\] line \d+ dereference failure: pointer outside object bounds in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.pointer_dereference.7\] line \d+ dereference failure: invalid integer address in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.pointer_dereference.1\] line \d+ dereference failure: pointer NULL in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.pointer_dereference.2\] line \d+ dereference failure: pointer invalid in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.pointer_dereference.3\] line \d+ dereference failure: deallocated dynamic object in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.pointer_dereference.5\] line \d+ dereference failure: pointer outside dynamic object bounds in fptr_is_top_function_pointer_call_1: FAILURE
+\[fptr_is_top.assertion.1\] line \d+ assertion result >= 9 && result <= 11: SUCCESS
+\[fptr_is_top.assertion.2\] line \d+ assertion result == 9: FAILURE
+\[fptr_is_top.assertion.3\] line \d+ assertion result == 10: FAILURE
+\[fptr_is_top.assertion.4\] line \d+ assertion result == 11: FAILURE
+\[fptr_is_bottom.assertion.1\] line \d+ dereferenced function pointer at fptr_is_bottom\.function_pointer_call\.1 must be one of \[\]: SUCCESS
+\[fptr_is_bottom.assertion.2\] line \d+ assertion fptr\(10, dummy\) >= 10: SUCCESS
+\"fptr_is_bottom\.function_pointer_call\.1\": \[ \]
+\"fptr_is_f\.function_pointer_call\.1\": \[ \"f\" \]
+\"fptr_is_g_or_h\.function_pointer_call\.1\": \[ \"g|h\", \"g|h\" \]
+^EXIT=0$
+^SIGNAL=0$
+--
+\"fptr_is_top\.function_pointer_call\.1\"
+--
+The exclusion here is happening because top function pointers shouldn't come up in the restrictions
+(i.e. they should be unrestricted).address
+
+Also note that the assertion results here are nearly identical (modulo naming) with those
+you'd get from cbmc without function pointer restrictions. This is by design, because if
+this feature works correctly cbmc should behave the same way except it has less work to do.

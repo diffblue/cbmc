@@ -115,6 +115,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/ai.h>
 #include <analyses/goto_check.h>
 
+#include "get_function_pointer_values.h"
+
 class bmct;
 class goto_functionst;
 class optionst;
@@ -153,6 +155,7 @@ class optionst;
   "(variable)" \
   "(variable-sensitivity)" \
   "(pointers)(arrays)(structs)(value-set)(data-dependencies)" \
+  OPT_GET_FUNCTION_POINTER_VALUES \
   "(constants)" \
   "(dependence-graph)" \
   "(dependence-graph-vs)" \

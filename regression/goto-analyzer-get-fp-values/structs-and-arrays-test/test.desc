@@ -1,0 +1,10 @@
+KNOWNBUG
+test.c
+
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+VSD currently doesn't seem to work very well with structs & arrays
+(will probably be fixed as part of https://github.com/diffblue/cbmc/issues/5307)

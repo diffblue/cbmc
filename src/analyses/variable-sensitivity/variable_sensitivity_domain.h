@@ -114,7 +114,6 @@ public:
   bool is_bottom() const override;
   bool is_top() const override;
 
-protected:
   virtual abstract_object_pointert eval(
     const exprt &expr, const namespacet &ns) const
   {
