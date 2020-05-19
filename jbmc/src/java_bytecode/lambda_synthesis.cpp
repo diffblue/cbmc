@@ -121,7 +121,7 @@ static optionalt<irep_idt> get_unique_abstract_method(
     }
     if(!ns.lookup(mangled_name).type.get_bool(ID_C_abstract))
       continue;
-    if(result.has_value() && mangled_name != *result)
+    if(result.has_value())
     {
       throw no_unique_unimplemented_method_exceptiont(
         "produces a type with at least two unimplemented methods");
