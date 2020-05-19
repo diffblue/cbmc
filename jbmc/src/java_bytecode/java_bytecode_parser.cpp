@@ -54,8 +54,7 @@ private:
   using fieldt = java_bytecode_parse_treet::fieldt;
   using instructiont = java_bytecode_parse_treet::instructiont;
   using annotationt = java_bytecode_parse_treet::annotationt;
-  using method_handle_typet =
-    java_bytecode_parse_treet::classt::method_handle_typet;
+  using method_handle_typet = java_class_typet::method_handle_typet;
   using lambda_method_handlet =
     java_bytecode_parse_treet::classt::lambda_method_handlet;
 
@@ -328,6 +327,11 @@ public:
     PRECONDITION(entry.ref1 > 0 && entry.ref1 < 10); // Java 8 spec 4.4.8
     reference_kind = static_cast<method_handle_kindt>(entry.ref1);
     reference_index = entry.ref2;
+  }
+
+  method_handle_kindt get_reference_kind() const
+  {
+    return reference_kind;
   }
 
   base_ref_infot get_reference(const pool_entry_lookupt &pool_entry) const

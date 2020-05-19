@@ -450,34 +450,62 @@ public:
     set(ID_interface, interface);
   }
 
-  // it may be better to introduce a class like
-  // class java_lambda_method_handlet : private irept
-  // {
-  //   java_lambda_method_handlet(const irep_idt &id) : irept(id)
-  //   {
-  //   }
-  //
-  //   const irep_idt &get_lambda_method_handle() const
-  //   {
-  //     return id();
-  //   }
-  // };
-  using java_lambda_method_handlest = irept::subt;
+  enum class method_handle_typet
+  {
+    LAMBDA_METHOD_HANDLE,
+    LAMBDA_CONSTRUCTOR_HANDLE,
+    UNKNOWN_HANDLE
+  };
+
+  class java_lambda_method_handlet : public irept
+  {
+  public:
+    java_lambda_method_handlet(
+      const irep_idt &id,
+      method_handle_typet handle_type)
+      : irept(id)
+    {
+      set(ID_handle_type, static_cast<int>(handle_type));
+    }
+
+    java_lambda_method_handlet()
+    {
+      set(
+        ID_handle_type, static_cast<int>(method_handle_typet::UNKNOWN_HANDLE));
+    }
+
+    const irep_idt &get_lambda_method_identifier() const
+    {
+      return id();
+    }
+
+    method_handle_typet get_handle_type() const
+    {
+      return (method_handle_typet)get_int(ID_handle_type);
+    }
+  };
+
+  using java_lambda_method_handlest = std::vector<java_lambda_method_handlet>;
 
   const java_lambda_method_handlest &lambda_method_handles() const
   {
-    return find(ID_java_lambda_method_handles).get_sub();
+    return (const java_lambda_method_handlest &)find(
+             ID_java_lambda_method_handles)
+      .get_sub();
   }
 
   java_lambda_method_handlest &lambda_method_handles()
   {
-    return add(ID_java_lambda_method_handles).get_sub();
+    return (java_lambda_method_handlest &)add(ID_java_lambda_method_handles)
+      .get_sub();
   }
 
-  void add_lambda_method_handle(const irep_idt &identifier)
+  void add_lambda_method_handle(
+    const irep_idt &identifier,
+    method_handle_typet handle_type)
   {
     // creates a symbol_exprt for the identifier and pushes it in the vector
-    lambda_method_handles().emplace_back(identifier);
+    lambda_method_handles().emplace_back(identifier, handle_type);
   }
   void add_unknown_lambda_method_handle()
   {
