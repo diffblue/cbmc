@@ -1905,6 +1905,30 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   std::replace(class_name.begin(), class_name.end(), '.', '$');
   // replace '/' for '.' (package)
   std::replace(class_name.begin(), class_name.end(), '/', '.');
+
+  // The following lambda kinds specified in the JVMS (see for example
+  // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html#jvms-5.4.3.5
+  // but which aren't actually created by javac. Java has no syntax for a field-
+  // refernce like this, and even writing a stereotypical lambda like
+  // Producer<FieldType> = instance -> instance.field does not generate this
+  // kind of handle, but rather a synthetic method implementing the getfield
+  // operation.
+  // We don't implement a handle kind that can't be produced yet, but should
+  // they ever turn up this is where to fix them.
+
+  if(
+    entry.get_reference_kind() ==
+      method_handle_infot::method_handle_kindt::REF_getField ||
+    entry.get_reference_kind() ==
+      method_handle_infot::method_handle_kindt::REF_putField ||
+    entry.get_reference_kind() ==
+      method_handle_infot::method_handle_kindt::REF_getStatic ||
+    entry.get_reference_kind() ==
+      method_handle_infot::method_handle_kindt::REF_putStatic)
+  {
+    return {};
+  }
+
   const std::string method_ref =
     class_name + "." + name_and_type.get_name(pool_entry_lambda) + ':' +
     name_and_type.get_descriptor(pool_entry_lambda);
@@ -1914,7 +1938,11 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   lambda_method_handle.lambda_method_name =
     name_and_type.get_name(pool_entry_lambda);
   lambda_method_handle.lambda_method_ref = method_ref;
-  lambda_method_handle.handle_type = method_handle_typet::LAMBDA_METHOD_HANDLE;
+  lambda_method_handle.handle_type =
+    entry.get_reference_kind() ==
+        method_handle_infot::method_handle_kindt::REF_newInvokeSpecial
+      ? method_handle_typet::LAMBDA_CONSTRUCTOR_HANDLE
+      : method_handle_typet::LAMBDA_METHOD_HANDLE;
 
   return lambda_method_handle;
 }
