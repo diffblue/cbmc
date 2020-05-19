@@ -1,9 +1,10 @@
-KNOWNBUG
+CORE symex-driven-lazy-loading-expected-failure
 org.symphonyoss.symphony.clients.model.SymStream
---show-goto-functions
-lambda function reference org/symphonyoss/symphony/clients/model/SymUser\.toSymUser in class \"SymStream\"
+--show-goto-functions --verbosity 10
+lambda function reference toSymUser in class "org\.symphonyoss\.symphony\.clients\.model\.SymStream"
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-lambda functions without "lambda$" prefix aren't recognized currently TG-2691
+Symex-driven-lazy-loading wants an entry point to start from, but here we do just want to convert the
+whole program to GOTO for testing purposes

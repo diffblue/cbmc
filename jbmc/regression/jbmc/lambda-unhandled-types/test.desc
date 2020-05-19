@@ -4,15 +4,9 @@ Test
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
-^ignoring invokedynamic at java::Test.main:\(\)V address 0 which produces a stub type java::StubInterface
-^ignoring invokedynamic at java::Test.main:\(\)V address 6 which produces type java::StubSuperinterface which should have exactly one abstract method but actually has 0.
-^ignoring invokedynamic at java::Test.main:\(\)V address 12 which produces type java::InterfaceDeclaringEquals which should have exactly one abstract method but actually has 2.
-^ignoring invokedynamic at java::Test.main:\(\)V address 18 which produces type java::InterfaceWithDefaults which should have exactly one abstract method but actually has 2.
-^ignoring invokedynamic at java::Test.main:\(\)V address \d+ which produces type java::ChildInterface which should have exactly one abstract method but actually has 0.
+^ignoring invokedynamic at java::Test.main:\(\)V address 0 with type java::StubInterface which produces a type that inherits the stub type java::StubInterface
+^ignoring invokedynamic at java::Test.main:\(\)V address 6 with type java::StubSuperinterface which produces a type that inherits the stub type java::StubInterface
 --
 --
-This exercises five cases that aren't currently supported: stub interfaces, stub
-superinterfaces, interfaces that declare methods also declared on
-java.lang.Object, interfaces that provide default methods, interfaces that
-inherit their one method. All we require at this point is that jbmc shouldn't
-crash when these are seen.
+This exercises two cases that aren't currently supported: stub interfaces and stub superinterfaces.
+All we require at this point is that jbmc shouldn't crash when these are seen.
