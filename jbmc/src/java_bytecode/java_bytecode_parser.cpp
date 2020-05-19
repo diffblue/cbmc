@@ -1911,22 +1911,12 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 
   lambda_method_handlet lambda_method_handle;
 
-  if(has_prefix(name_and_type.get_name(pool_entry_lambda), "lambda$"))
-  {
-    // names seem to be lambda$POSTFIX$NUM
-    // where POSTFIX is FUN for a function name in which the lambda is define
-    //                "static" when it is a static member of the class
-    //                "new" when it is a class variable, instantiated in <init>
-    lambda_method_handle.lambda_method_name =
-      name_and_type.get_name(pool_entry_lambda);
-    lambda_method_handle.lambda_method_ref = method_ref;
-    lambda_method_handle.handle_type =
-      method_handle_typet::LAMBDA_METHOD_HANDLE;
+  lambda_method_handle.lambda_method_name =
+    name_and_type.get_name(pool_entry_lambda);
+  lambda_method_handle.lambda_method_ref = method_ref;
+  lambda_method_handle.handle_type = method_handle_typet::LAMBDA_METHOD_HANDLE;
 
-    return lambda_method_handle;
-  }
-
-  return {};
+  return lambda_method_handle;
 }
 
 /// Read all entries of the `BootstrapMethods` attribute of a class file.
