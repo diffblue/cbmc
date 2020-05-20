@@ -203,7 +203,7 @@ specific constructed scenarios. However, they can also also be computed automati
 via `goto-analyzer`:
 
 ```
-goto-analyzer --get-function-pointer-restrictions <restrictions-json-file-name> <file-to-analyze>
+goto-analyzer --get-function-pointer-values <restrictions-json-file-name> <file-to-analyze>
 ```
 
 This is a coarse analysis but should produce useful restrictions under most circumstances.
