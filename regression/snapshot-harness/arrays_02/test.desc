@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 p,q --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=0$
@@ -9,3 +9,5 @@ p,q --harness-type initialise-with-memory-snapshot --initial-goto-location main:
 VERIFICATION SUCCESSFUL
 --
 ^warning: ignoring
+--
+For more information take a look at github#5351
