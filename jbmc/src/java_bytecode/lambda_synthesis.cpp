@@ -102,6 +102,10 @@ public:
   const std::string message;
 };
 
+/// Find the unique abstract method that isn't equals(...) or hashCode() in a
+/// list of methods. Returns the method's symbol-table identifier if one is
+/// found, or empty if there are no matching methods, or throws
+/// no_unique_unimplemented_method_exceptiont if there are at least two.
 static optionalt<irep_idt> get_unique_abstract_method(
   const java_class_typet::methodst &methods,
   const namespacet &ns)
@@ -131,6 +135,10 @@ static optionalt<irep_idt> get_unique_abstract_method(
   return result;
 }
 
+/// Find the unique unimplemented method on a given interface type, including
+/// considering its parents. Returns the method's symbol-table identifier if one
+/// is found, or empty if there are no unimplemented methods, or throws
+/// no_unique_unimplemented_method_exceptiont if there are at least two.
 static optionalt<irep_idt> get_unique_unimplemented_method(
   const irep_idt &interface_id,
   const namespacet &ns)
@@ -529,6 +537,16 @@ static symbol_exprt create_and_declare_local(
   return new_instance_var;
 }
 
+/// Instantiates an object suitable for calling a given constructor (but does
+/// not actually call it). Adds a local to symbol_table, and code implementing
+/// the required operation to result; returns a symbol carrying a reference to
+/// the newly instantiated object.
+/// \param function_id: ID of the function that `result` falls within
+/// \param lambda_method_symbol: the constructor that will be called, and so
+///   whose `this` parameter we should instantiate.
+/// \param symbol_table: symbol table, will gain a local variable
+/// \param result: will gain instructions instantiating the required type
+/// \return the newly instantiated symbol
 static symbol_exprt instantiate_new_object(
   const irep_idt &function_id,
   const symbolt &lambda_method_symbol,
@@ -566,6 +584,22 @@ static symbol_exprt instantiate_new_object(
   return new_instance_var;
 }
 
+/// Create the body for the synthetic method implementing an invokedynamic
+/// method. For most lambdas this means creating a simple function body like
+/// TR new_synthetic_method(T1 param1, T2 param2, ...) {
+///   return target_method(capture1, capture2, ..., param1, param2, ...);
+/// }, where the first parameter might be a `this` parameter.
+/// For a constructor method, the generated code will be of the form
+/// TNew new_synthetic_method(T1 param1, T2 param2, ...) {
+///   return new TNew(capture1, capture2, ..., param1, param2, ...);
+/// }
+/// i.e. the TNew object will be both instantiated and constructed.
+/// \param function_id: synthetic method whose body should be generated;
+///   information about the lambda method to generate has already been stored
+///   in the symbol table by create_invokedynamic_synthetic_classes.
+/// \param symbol_table: will gain local variable symbols
+/// \param message_handler: log
+/// \return the method body for `function_id`
 codet invokedynamic_synthetic_method(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,

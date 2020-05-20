@@ -1881,6 +1881,12 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
   }
 }
 
+/// Translate the lambda method reference kind in a class file into the kind
+/// of handling the method requires. invokestatic/special translate into direct
+/// method calls; invokevirtual/interface translate into virtual dispatch,
+/// newinvokespecial translates into a special instantiate-and-construct
+/// sequence. The field-manipulation reference kinds appear never to happen in
+/// reality and don't have syntax in the Java language.
 static java_class_typet::method_handle_typet get_method_handle_type(
   method_handle_infot::method_handle_kindt java_handle_kind)
 {

@@ -450,14 +450,24 @@ public:
     set(ID_interface, interface);
   }
 
+  /// Indicates what sort of code should be synthesised for a lambda call:
   enum class method_handle_typet
   {
+    /// Direct call to the given method
     LAMBDA_STATIC_METHOD_HANDLE,
+    /// Virtual call to the given interface or method
     LAMBDA_VIRTUAL_METHOD_HANDLE,
+    /// Instantiate the needed type then call a constructor
     LAMBDA_CONSTRUCTOR_HANDLE,
+    /// Can't be called
     UNKNOWN_HANDLE
   };
 
+  /// Represents a lambda call to a method. We store the method being called in
+  /// the same class_method_descriptor_exprt as java_bytecode_convert_method
+  /// uses to translate virtual method calls to denote the method targeted, and
+  /// use method_handle_typet above to indicate what kind of dispatch should be
+  /// used.
   class java_lambda_method_handlet : public irept
   {
   public:
