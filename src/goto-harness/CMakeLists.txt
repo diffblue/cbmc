@@ -5,6 +5,7 @@ generic_includes(goto-harness)
 target_link_libraries(goto-harness
   util
   goto-programs
+  goto-instrument-lib
   json
   json-symtab-language
 )

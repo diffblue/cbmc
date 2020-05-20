@@ -16,6 +16,10 @@ OBJ += \
   ../linking/linking$(LIBEXT) \
   ../json/json$(LIBEXT) \
   ../json-symtab-language/json-symtab-language$(LIBEXT) \
+  ../ansi-c/ansi-c$(LIBEXT) \
+  ../cpp/cpp$(LIBEXT) \
+  ../goto-instrument/dump_c$(OBJEXT) \
+  ../goto-instrument/goto_program2code$(OBJEXT) \
   # Empty last line
 
 INCLUDES= -I ..

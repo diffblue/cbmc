@@ -12,22 +12,28 @@ name=${*:$#}
 name=${name%.c}
 args=${*:5:$#-5}
 
+input_c_file="${name}.c"
+input_goto_binary="${name}.gb"
+harness_c_file="${name}-harness.c"
+
+
+
 if [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "${name}.c"
-  mv "${name}.exe" "${name}.gb"
+  $goto_cc "$input_c_file"
+  mv "${name}.exe" "$input_goto_binary"
 else
-  $goto_cc -o "${name}.gb" "${name}.c"
+  $goto_cc -o "$input_goto_binary" "$input_c_file"
 fi
 
-if [ -e "${name}-mod.gb" ] ; then
-  rm -f "${name}-mod.gb"
+if [ -e "$harness_c_file" ] ; then
+  rm -f "$harness_c_file"
 fi
 
 # `# some comment` is an inline comment - basically, cause bash to execute an empty command
-$cbmc --show-goto-functions "${name}.gb"
-$goto_harness "${name}.gb" "${name}-mod.gb" --harness-function-name $entry_point ${args}
-$cbmc --show-goto-functions "${name}-mod.gb"
-$cbmc --function $entry_point "${name}-mod.gb" \
+$cbmc --show-goto-functions "$input_goto_binary"
+$goto_harness "$input_goto_binary" "$harness_c_file" --harness-function-name $entry_point ${args}
+$cbmc --show-goto-functions "$harness_c_file"
+$cbmc --function $entry_point "$input_c_file" "$harness_c_file" \
   --pointer-check `# because we want to see out of bounds errors` \
   --unwind 11 `# with the way we set up arrays symex can't figure out loop bounds automatically` \
   --unwinding-assertions `# we want to make sure we don't accidentally pass tests because we didn't unwind enough` \
