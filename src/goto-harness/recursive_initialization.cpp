@@ -532,6 +532,7 @@ symbol_exprt recursive_initializationt::get_fresh_local_typed_symexpr(
     initialization_config.mode,
     goto_model.symbol_table);
   fresh_symbol.is_lvalue = true;
+  fresh_symbol.mode = initialization_config.mode;
   return fresh_symbol.symbol_expr();
 }
 
