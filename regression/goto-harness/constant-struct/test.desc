@@ -1,0 +1,7 @@
+CORE
+test.c
+--function entry_point --harness-type call-function
+\[entry_point.assertion.1\] line \d+ assertion value.x - value.x == 0: SUCCESS
+\[entry_point.assertion.2\] line \d+ assertion value.x != 13: FAILURE
+^EXIT=10$
+^SIGNAL=0$

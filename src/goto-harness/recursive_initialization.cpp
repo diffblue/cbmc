@@ -690,12 +690,17 @@ code_blockt recursive_initializationt::build_pointer_constructor(
     seen_assign_prev = code_assignt{*has_seen, has_seen_prev};
   }
 
-  const symbol_exprt &local_result =
-    get_fresh_local_typed_symexpr("local_result", type, nullptr_expr);
+  // we want to initialize the pointee as non-const even for pointer to const
+  const typet non_const_pointer_type =
+    pointer_type(remove_const(type.subtype()));
+  const symbol_exprt &local_result = get_fresh_local_typed_symexpr(
+    "local_result", non_const_pointer_type, nullptr_expr);
   then_case.add(code_declt{local_result});
   const namespacet ns{goto_model.symbol_table};
-  then_case.add(code_function_callt{
-    local_result, get_malloc_function(), {*size_of_expr(type.subtype(), ns)}});
+  then_case.add(
+    code_function_callt{local_result,
+                        get_malloc_function(),
+                        {*size_of_expr(non_const_pointer_type.subtype(), ns)}});
   initialize(
     dereference_exprt{local_result},
     plus_exprt{depth, from_integer(1, depth.type())},
@@ -774,7 +779,28 @@ code_blockt recursive_initializationt::build_struct_constructor(
   for(const auto &component :
       ns.follow_tag(to_struct_tag_type(struct_type)).components())
   {
-    initialize(member_exprt{dereference_exprt{result}, component}, depth, body);
+    if(component.get_is_padding())
+    {
+      continue;
+    }
+    // if the struct component is const we need to cast away the const
+    // for initialisation purposes.
+    // As far as I'm aware that's the closest thing to a 'correct' way
+    // to initialize dynamically allocated structs with const components
+    exprt component_initialisation_lhs = [&result, &component]() -> exprt {
+      auto member_expr = member_exprt{dereference_exprt{result}, component};
+      if(component.type().get_bool(ID_C_constant))
+      {
+        return dereference_exprt{
+          typecast_exprt{address_of_exprt{std::move(member_expr)},
+                         pointer_type(remove_const(component.type()))}};
+      }
+      else
+      {
+        return std::move(member_expr);
+      }
+    }();
+    initialize(component_initialisation_lhs, depth, body);
   }
   return body;
 }
@@ -797,9 +823,9 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
   const optionalt<irep_idt> &lhs_name)
 {
   PRECONDITION(result.type().id() == ID_pointer);
-  const typet &pointer_type = result.type().subtype();
-  PRECONDITION(pointer_type.id() == ID_pointer);
-  const typet &element_type = pointer_type.subtype();
+  const typet &dynamic_array_type = result.type().subtype();
+  PRECONDITION(dynamic_array_type.id() == ID_pointer);
+  const typet &element_type = dynamic_array_type.subtype();
   PRECONDITION(element_type.id() != ID_empty);
 
   // builds:
@@ -831,8 +857,11 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
     binary_relation_exprt{
       nondet_size, ID_le, from_integer(max_array_size, nondet_size.type())}}});
 
-  const symbol_exprt &local_result =
-    get_fresh_local_typed_symexpr("local_result", pointer_type, exprt{});
+  // we want the local result to be mutable so we can initialise it
+  const typet mutable_dynamic_array_type =
+    pointer_type(remove_const(element_type));
+  const symbol_exprt &local_result = get_fresh_local_typed_symexpr(
+    "local_result", mutable_dynamic_array_type, exprt{});
   body.add(code_declt{local_result});
   const namespacet ns{goto_model.symbol_table};
   for(auto array_size = min_array_size; array_size <= max_array_size;
