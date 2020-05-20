@@ -522,8 +522,7 @@ symbol_exprt recursive_initializationt::get_fresh_local_symexpr(
 
 symbol_exprt recursive_initializationt::get_fresh_local_typed_symexpr(
   const std::string &symbol_name,
-  const typet &type,
-  const exprt &init_value) const
+  const typet &type) const
 {
   symbolt &fresh_symbol = get_fresh_aux_symbol(
     type,
@@ -533,7 +532,6 @@ symbol_exprt recursive_initializationt::get_fresh_local_typed_symexpr(
     initialization_config.mode,
     goto_model.symbol_table);
   fresh_symbol.is_lvalue = true;
-  fresh_symbol.value = init_value;
   return fresh_symbol.symbol_expr();
 }
 
@@ -693,8 +691,9 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   // we want to initialize the pointee as non-const even for pointer to const
   const typet non_const_pointer_type =
     pointer_type(remove_const(type.subtype()));
-  const symbol_exprt &local_result = get_fresh_local_typed_symexpr(
-    "local_result", non_const_pointer_type, nullptr_expr);
+  const symbol_exprt &local_result =
+    get_fresh_local_typed_symexpr("local_result", non_const_pointer_type);
+
   then_case.add(code_declt{local_result});
   const namespacet ns{goto_model.symbol_table};
   then_case.add(
@@ -860,8 +859,8 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
   // we want the local result to be mutable so we can initialise it
   const typet mutable_dynamic_array_type =
     pointer_type(remove_const(element_type));
-  const symbol_exprt &local_result = get_fresh_local_typed_symexpr(
-    "local_result", mutable_dynamic_array_type, exprt{});
+  const symbol_exprt &local_result =
+    get_fresh_local_typed_symexpr("local_result", mutable_dynamic_array_type);
   body.add(code_declt{local_result});
   const namespacet ns{goto_model.symbol_table};
   for(auto array_size = min_array_size; array_size <= max_array_size;

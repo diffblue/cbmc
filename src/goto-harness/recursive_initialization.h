@@ -157,12 +157,10 @@ private:
   /// Construct a new local symbol of type \p type initialised to \p init_value.
   /// \param symbol_name: the base name for the new symbol
   /// \param type: type for the new symbol
-  /// \param init_value: expression the symbol should be initialised with
   /// \return the symbol expression associated with the new symbol
   symbol_exprt get_fresh_local_typed_symexpr(
     const std::string &symbol_name,
-    const typet &type,
-    const exprt &init_value) const;
+    const typet &type) const;
 
   /// Construct a new function symbol of type \p fun_type.
   /// \param fun_name: the base name for the new symbol
