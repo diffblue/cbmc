@@ -248,9 +248,7 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   for(const auto &pair : goto_model.symbol_table)
   {
     const auto &global_symbol = pair.second;
-    if(
-      global_symbol.is_static_lifetime && global_symbol.is_lvalue &&
-      global_symbol.type.id() != ID_code)
+    if(recursive_initializationt::is_initialization_allowed(global_symbol))
     {
       auto symeexr = global_symbol.symbol_expr();
       if(symeexr.type() == global_symbol.value.type())
@@ -272,7 +270,8 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
         ? fresh_symbol_copy(snapshot_symbol, symbol_table)
         : snapshot_symbol;
 
-    if(!fresh_or_snapshot_symbol.is_static_lifetime)
+    if(!recursive_initializationt::is_initialization_allowed(
+         fresh_or_snapshot_symbol))
       continue;
 
     if(variables_to_havoc.count(fresh_or_snapshot_symbol.base_name) == 0)

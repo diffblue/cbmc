@@ -281,7 +281,7 @@ void function_call_harness_generatort::implt::generate_nondet_globals(
     for(const auto &symbol_table_entry : *symbol_table)
     {
       const auto &symbol = symbol_table_entry.second;
-      if(recursive_initialization->is_initialization_allowed(symbol))
+      if(recursive_initializationt::is_initialization_allowed(symbol))
       {
         globals.push_back(symbol.symbol_expr());
       }

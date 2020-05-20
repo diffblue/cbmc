@@ -103,12 +103,14 @@ public:
   /// \return the symbol expression for the `free` function
   symbol_exprt get_free_function();
 
-  bool is_initialization_allowed(const symbolt &symbol)
+  static bool is_initialization_allowed(const symbolt &symbol)
   {
+    auto const symbol_name = id2string(symbol.name);
     return (
       symbol.is_static_lifetime && symbol.is_lvalue &&
-      symbol.type.id() != ID_code &&
-      !has_prefix(id2string(symbol.name), CPROVER_PREFIX));
+      !symbol.type.get_bool(ID_C_constant) && symbol.type.id() != ID_code &&
+      !has_prefix(symbol_name, CPROVER_PREFIX) &&
+      !has_prefix(symbol_name, GOTO_HARNESS_PREFIX));
   }
 
   bool needs_freeing(const exprt &expr) const;
