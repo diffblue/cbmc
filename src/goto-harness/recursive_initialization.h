@@ -22,6 +22,7 @@ Author: Diffblue Ltd.
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator.h"
 
+#define GOTO_HARNESS_PREFIX "__GOTO_HARNESS"
 struct recursive_initialization_configt
 {
   std::size_t min_null_tree_depth = 1;

@@ -479,10 +479,10 @@ static symbolt &get_fresh_global_symbol(
   irep_idt mode)
 {
   source_locationt source_location{};
-  source_location.set_file(CPROVER_PREFIX "harness.c");
+  source_location.set_file(GOTO_HARNESS_PREFIX "harness.c");
   symbolt &fresh_symbol = get_fresh_aux_symbol(
     std::move(symbol_type),
-    CPROVER_PREFIX,
+    GOTO_HARNESS_PREFIX,
     symbol_base_name,
     source_locationt{},
     mode,
@@ -494,7 +494,7 @@ static symbolt &get_fresh_global_symbol(
   fresh_symbol.is_file_local = false;
   fresh_symbol.is_thread_local = false;
   fresh_symbol.is_state_var = false;
-  fresh_symbol.module = CPROVER_PREFIX "harness";
+  fresh_symbol.module = GOTO_HARNESS_PREFIX "harness";
   fresh_symbol.location = std::move(source_location);
   return fresh_symbol;
 }
@@ -529,7 +529,7 @@ symbol_exprt recursive_initializationt::get_fresh_local_symexpr(
 {
   symbolt &fresh_symbol = get_fresh_aux_symbol(
     signed_int_type(),
-    CPROVER_PREFIX,
+    GOTO_HARNESS_PREFIX,
     symbol_name,
     source_locationt{},
     initialization_config.mode,
@@ -545,7 +545,7 @@ symbol_exprt recursive_initializationt::get_fresh_local_typed_symexpr(
 {
   symbolt &fresh_symbol = get_fresh_aux_symbol(
     type,
-    CPROVER_PREFIX,
+    GOTO_HARNESS_PREFIX,
     symbol_name,
     source_locationt{},
     initialization_config.mode,
@@ -583,7 +583,7 @@ symbolt &recursive_initializationt::get_fresh_param_symbol(
 {
   symbolt &param_symbol = get_fresh_aux_symbol(
     symbol_type,
-    CPROVER_PREFIX,
+    GOTO_HARNESS_PREFIX,
     symbol_name,
     source_locationt{},
     initialization_config.mode,
