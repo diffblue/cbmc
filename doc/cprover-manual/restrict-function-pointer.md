@@ -8,6 +8,21 @@ to replace calls through function pointers by case distinctions over calls
 to given sets of functions. This can greatly simplify the program for
 CBMC.
 
+## Getting Started
+
+There is more detail about each of the steps below, but you can get started straight away on your program using the following commands:
+
+```bash
+$ goto-cc program.c -o program.gb
+# Analyze program to produce possible function pointer values and
+# store in new file function_pointers.json
+$ goto-analyzer --get-function-pointer-values function_pointers.json program.gb
+# Replace the function pointers in the program with the restricted set
+$ goto-instrument --function-pointer-restrictions-file function_pointers.json program.gb program_fp_removed.gb
+# Analyze the simplified program
+$ cbmc program_fp_removed.gb
+```
+
 ### Motivation
 
 The CPROVER framework includes a goto program transformation pass
