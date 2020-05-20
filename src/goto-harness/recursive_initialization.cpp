@@ -590,6 +590,7 @@ symbolt &recursive_initializationt::get_fresh_param_symbol(
     goto_model.symbol_table);
   param_symbol.is_parameter = true;
   param_symbol.is_lvalue = true;
+  param_symbol.mode = initialization_config.mode;
 
   return param_symbol;
 }
