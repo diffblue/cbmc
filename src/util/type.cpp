@@ -28,3 +28,9 @@ void type_with_subtypest::move_to_subtypes(typet &type)
   sub.push_back(static_cast<const typet &>(get_nil_irep()));
   sub.back().swap(type);
 }
+
+typet remove_const(typet type)
+{
+  type.remove(ID_C_constant);
+  return type;
+}
