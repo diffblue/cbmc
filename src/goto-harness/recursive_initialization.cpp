@@ -472,19 +472,42 @@ std::string recursive_initialization_configt::to_string() const
   return out.str();
 }
 
+static symbolt &get_fresh_global_symbol(
+  symbol_tablet &symbol_table,
+  const std::string &symbol_base_name,
+  typet symbol_type,
+  irep_idt mode)
+{
+  source_locationt source_location{};
+  source_location.set_file(CPROVER_PREFIX "harness.c");
+  symbolt &fresh_symbol = get_fresh_aux_symbol(
+    std::move(symbol_type),
+    CPROVER_PREFIX,
+    symbol_base_name,
+    source_locationt{},
+    mode,
+    symbol_table);
+  fresh_symbol.base_name = fresh_symbol.pretty_name = symbol_base_name;
+  fresh_symbol.is_static_lifetime = true;
+  fresh_symbol.is_lvalue = true;
+  fresh_symbol.is_auxiliary = false;
+  fresh_symbol.is_file_local = false;
+  fresh_symbol.is_thread_local = false;
+  fresh_symbol.is_state_var = false;
+  fresh_symbol.module = CPROVER_PREFIX "harness";
+  fresh_symbol.location = std::move(source_location);
+  return fresh_symbol;
+}
+
 irep_idt recursive_initializationt::get_fresh_global_name(
   const std::string &symbol_name,
   const exprt &initial_value) const
 {
-  symbolt &fresh_symbol = get_fresh_aux_symbol(
-    signed_int_type(),
-    CPROVER_PREFIX,
+  auto &fresh_symbol = get_fresh_global_symbol(
+    goto_model.symbol_table,
     symbol_name,
-    source_locationt{},
-    initialization_config.mode,
-    goto_model.symbol_table);
-  fresh_symbol.is_static_lifetime = true;
-  fresh_symbol.is_lvalue = true;
+    signed_int_type(), // FIXME why always signed_int_type???
+    initialization_config.mode);
   fresh_symbol.value = initial_value;
   return fresh_symbol.name;
 }
@@ -492,15 +515,11 @@ irep_idt recursive_initializationt::get_fresh_global_name(
 symbol_exprt recursive_initializationt::get_fresh_global_symexpr(
   const std::string &symbol_name) const
 {
-  symbolt &fresh_symbol = get_fresh_aux_symbol(
-    signed_int_type(),
-    CPROVER_PREFIX,
+  auto &fresh_symbol = get_fresh_global_symbol(
+    goto_model.symbol_table,
     symbol_name,
-    source_locationt{},
-    initialization_config.mode,
-    goto_model.symbol_table);
-  fresh_symbol.is_static_lifetime = true;
-  fresh_symbol.is_lvalue = true;
+    signed_int_type(),
+    initialization_config.mode);
   fresh_symbol.value = from_integer(0, signed_int_type());
   return fresh_symbol.symbol_expr();
 }
