@@ -16,31 +16,28 @@ Author: Diffblue Ltd.
 /// \param parsed_class: the class to inspect
 /// \param lambda_method_ref: the reference/descriptor of the lambda method
 ///   to which this lambda entry points to, must be unique
-/// \param method_type: the descriptor the lambda method should have
 /// \return
 require_parse_tree::lambda_method_handlet
 require_parse_tree::require_lambda_entry_for_descriptor(
   const java_bytecode_parse_treet::classt &parsed_class,
-  const std::string &lambda_method_ref,
-  const std::string &method_type)
+  const std::string &lambda_method_ref)
 {
   typedef java_bytecode_parse_treet::classt::lambda_method_handle_mapt::
     value_type lambda_method_entryt;
 
-  INFO(
-    "Looking for entry with lambda_method_ref: " << lambda_method_ref
-                                                 << " and method_type: "
-                                                 << method_type);
+  INFO("Looking for entry with lambda_method_ref: " << lambda_method_ref);
+  const irep_idt method_ref_with_prefix =
+    "java::" + id2string(lambda_method_ref);
+
   std::vector<lambda_method_entryt> matches;
   std::copy_if(
     parsed_class.lambda_method_handle_map.begin(),
     parsed_class.lambda_method_handle_map.end(),
     back_inserter(matches),
-    [&method_type,
-     &lambda_method_ref](const lambda_method_entryt &entry) { //NOLINT
+    [&method_ref_with_prefix](const lambda_method_entryt &entry) { //NOLINT
       return (
-        entry.second.method_type == method_type &&
-        entry.second.lambda_method_ref == lambda_method_ref);
+        entry.second.get_method_descriptor().get_identifier() ==
+        method_ref_with_prefix);
     });
   REQUIRE(matches.size() == 1);
   return matches.at(0).second;

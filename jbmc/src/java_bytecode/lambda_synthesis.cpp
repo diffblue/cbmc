@@ -508,6 +508,27 @@ codet invokedynamic_synthetic_constructor(
   return std::move(result);
 }
 
+static symbol_exprt create_and_declare_local(
+  const irep_idt &function_id,
+  const irep_idt &basename,
+  const typet &type,
+  symbol_table_baset &symbol_table,
+  code_blockt &method)
+{
+  irep_idt new_var_name = id2string(function_id) + "::" + id2string(basename);
+  auxiliary_symbolt new_instance_var_symbol;
+  new_instance_var_symbol.name = new_var_name;
+  new_instance_var_symbol.base_name = basename;
+  new_instance_var_symbol.mode = ID_java;
+  new_instance_var_symbol.type = type;
+  bool add_failed = symbol_table.add(new_instance_var_symbol);
+  POSTCONDITION(!add_failed);
+  symbol_exprt new_instance_var = new_instance_var_symbol.symbol_expr();
+  method.add(code_declt{new_instance_var});
+
+  return new_instance_var;
+}
+
 static symbol_exprt instantiate_new_object(
   const irep_idt &function_id,
   const symbolt &lambda_method_symbol,
@@ -531,18 +552,12 @@ static symbol_exprt instantiate_new_object(
   }
 
   // Make a local to hold the new instance:
-  irep_idt new_instance_var_basename = "newinvokespecial_instance";
-  irep_idt new_instance_var_name =
-    id2string(function_id) + "::" + id2string(new_instance_var_basename);
-  auxiliary_symbolt new_instance_var_symbol;
-  new_instance_var_symbol.name = new_instance_var_name;
-  new_instance_var_symbol.base_name = new_instance_var_basename;
-  new_instance_var_symbol.mode = ID_java;
-  new_instance_var_symbol.type = created_type;
-  bool add_failed = symbol_table.add(new_instance_var_symbol);
-  POSTCONDITION(!add_failed);
-  symbol_exprt new_instance_var = new_instance_var_symbol.symbol_expr();
-  result.add(code_declt{new_instance_var});
+  symbol_exprt new_instance_var = create_and_declare_local(
+    function_id,
+    "newinvokespecial_instance",
+    created_type,
+    symbol_table,
+    result);
 
   // Instantiate the object:
   side_effect_exprt java_new_expr(ID_java_new, created_type, {});
@@ -611,6 +626,9 @@ codet invokedynamic_synthetic_method(
   const auto is_constructor_lambda =
     handle_type ==
     java_class_typet::method_handle_typet::LAMBDA_CONSTRUCTOR_HANDLE;
+  const auto use_virtual_dispatch =
+    handle_type ==
+    java_class_typet::method_handle_typet::LAMBDA_VIRTUAL_METHOD_HANDLE;
 
   if(is_constructor_lambda)
   {
@@ -621,18 +639,24 @@ codet invokedynamic_synthetic_method(
     lambda_method_args.insert(lambda_method_args.begin(), new_instance_var);
   }
 
+  const auto &lambda_method_descriptor =
+    lambda_method_handle.get_lambda_method_descriptor();
+  exprt callee;
+  if(use_virtual_dispatch)
+    callee = lambda_method_descriptor;
+  else
+    callee = lambda_method_symbol.symbol_expr();
+
   if(return_type != empty_typet() && !is_constructor_lambda)
   {
-    result.add(code_returnt(side_effect_expr_function_callt(
-      lambda_method_symbol.symbol_expr(),
-      lambda_method_args,
-      return_type,
-      source_locationt())));
+    symbol_exprt result_local = create_and_declare_local(
+      function_id, "return_value", return_type, symbol_table, result);
+    result.add(code_function_callt(result_local, callee, lambda_method_args));
+    result.add(code_returnt{result_local});
   }
   else
   {
-    result.add(code_function_callt(
-      lambda_method_symbol.symbol_expr(), lambda_method_args));
+    result.add(code_function_callt(callee, lambda_method_args));
   }
 
   if(is_constructor_lambda)

@@ -452,7 +452,8 @@ public:
 
   enum class method_handle_typet
   {
-    LAMBDA_METHOD_HANDLE,
+    LAMBDA_STATIC_METHOD_HANDLE,
+    LAMBDA_VIRTUAL_METHOD_HANDLE,
     LAMBDA_CONSTRUCTOR_HANDLE,
     UNKNOWN_HANDLE
   };
@@ -461,10 +462,10 @@ public:
   {
   public:
     java_lambda_method_handlet(
-      const irep_idt &id,
+      const class_method_descriptor_exprt &method_descriptor,
       method_handle_typet handle_type)
-      : irept(id)
     {
+      set(ID_object_descriptor, method_descriptor);
       set(ID_handle_type, static_cast<int>(handle_type));
     }
 
@@ -474,9 +475,15 @@ public:
         ID_handle_type, static_cast<int>(method_handle_typet::UNKNOWN_HANDLE));
     }
 
+    const class_method_descriptor_exprt &get_lambda_method_descriptor() const
+    {
+      return static_cast<const class_method_descriptor_exprt &>(
+        find(ID_object_descriptor));
+    }
+
     const irep_idt &get_lambda_method_identifier() const
     {
-      return id();
+      return get_lambda_method_descriptor().get_identifier();
     }
 
     method_handle_typet get_handle_type() const
@@ -501,11 +508,11 @@ public:
   }
 
   void add_lambda_method_handle(
-    const irep_idt &identifier,
+    const class_method_descriptor_exprt &method_descriptor,
     method_handle_typet handle_type)
   {
     // creates a symbol_exprt for the identifier and pushes it in the vector
-    lambda_method_handles().emplace_back(identifier, handle_type);
+    lambda_method_handles().emplace_back(method_descriptor, handle_type);
   }
   void add_unknown_lambda_method_handle()
   {

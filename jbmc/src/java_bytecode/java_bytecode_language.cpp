@@ -1228,18 +1228,20 @@ static void notify_static_method_calls(
         // starts to introduce virtual function calls then we will need to
         // duplicate the behavior of java_bytecode_convert_method where it
         // handles the invokevirtual instruction
-        const symbol_exprt &fn_sym =
-          expr_dynamic_cast<symbol_exprt>(fn_call->function());
-        needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+        const symbol_exprt *fn_sym =
+          expr_try_dynamic_cast<symbol_exprt>(fn_call->function());
+        if(fn_sym)
+          needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
       }
       else if(
         it->id() == ID_side_effect &&
         to_side_effect_expr(*it).get_statement() == ID_function_call)
       {
         const auto &call_expr = to_side_effect_expr_function_call(*it);
-        const symbol_exprt &fn_sym =
-          expr_dynamic_cast<symbol_exprt>(call_expr.function());
-        needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+        const symbol_exprt *fn_sym =
+          expr_try_dynamic_cast<symbol_exprt>(call_expr.function());
+        if(fn_sym)
+          needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
       }
     }
   }
