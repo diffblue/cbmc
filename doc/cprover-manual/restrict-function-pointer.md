@@ -2,9 +2,11 @@
 
 ## Restricting function pointers
 
-In this document, we describe the `goto-instrument` feature to replace calls
-through function pointers by case distinctions over calls to given sets of
-functions.
+In this document, we describe the CPROVER feature to use `goto-analyzer`
+to identify possible function pointer values, and then `goto-instrument`
+to replace calls through function pointers by case distinctions over calls
+to given sets of functions. This can greatly simplify the program for
+CBMC.
 
 ### Motivation
 
