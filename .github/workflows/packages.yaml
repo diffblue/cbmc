@@ -1,6 +1,14 @@
 name: Package CBMC
 on: [push]
 
+# This is the trigger to use when merged into the cbmc repo.
+# Until then leave the old trigger to facilitate debugging of the pull request.
+# on:
+#   # Build packages when new commits are added to the develop branch.
+#   push:
+#     branches:
+#       - develop
+
 jobs:
   Tags:
     #
@@ -225,91 +233,6 @@ jobs:
         with:
           name: ${{ env.ARTIFACT_LATEST_NAME }}
           path: ${{ env.PACKAGE_LATEST_NAME }}
-
-#  Ubuntu16:
-#    name: Ubuntu 16 package
-#    runs-on: ubuntu-16.04
-#    needs: Tags
-#    env:
-#      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
-#      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
-#
-#      ARTIFACT_STABLE_NAME: Ubuntu16 cbmc ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
-#      ARTIFACT_LATEST_NAME: Ubuntu16 cbmc-latest ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
-#
-#      SCRIPT_DIR: .github/workflows/ubuntu16
-#
-#    steps:
-#      - name: Checkout the repository
-#        uses: actions/checkout@v2
-#
-#      - name: Update the submodules
-#        run: git submodule update --init
-#
-#      - name: Create the cbmc package
-#        run: |
-#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc PACKAGE_NAME=cbmc_amd64.deb PREFIX=/usr
-#          mv cbmc_amd64.deb ${PACKAGE_STABLE_NAME}
-#
-#      - name: Create the cbmc-latest package
-#        run: |
-#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc-latest PACKAGE_NAME=cbmc-latest_amd64.deb PREFIX=/usr/local/cbmc-latest
-#          mv cbmc-latest_amd64.deb ${PACKAGE_LATEST_NAME}
-#
-#      - name: Upload the cbmc package
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: ${{ env.ARTIFACT_STABLE_NAME }}
-#          path: ${{ env.PACKAGE_STABLE_NAME }}
-#
-#      - name: Upload the cbmc-latest package
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: ${{ env.ARTIFACT_LATEST_NAME }}
-#          path: ${{ env.PACKAGE_LATEST_NAME }}
-
-
-#  Ubuntu18:
-#    name: Ubuntu 18 package
-#    runs-on: ubuntu-18.04
-#    needs: Tags
-#    env:
-#      PACKAGE_STABLE_NAME: cbmc_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
-#      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
-#
-#      ARTIFACT_STABLE_NAME: Ubuntu18 cbmc ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
-#      ARTIFACT_LATEST_NAME: Ubuntu18 cbmc-latest ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
-#
-#      SCRIPT_DIR: .github/workflows/ubuntu18
-#
-#    steps:
-#      - name: Checkout the repository
-#        uses: actions/checkout@v2
-#
-#      - name: Update the submodules
-#        run: git submodule update --init
-#
-#      - name: Create the cbmc package
-#        run: |
-#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc PACKAGE_NAME=cbmc_amd64.deb PREFIX=/usr
-#          mv cbmc_amd64.deb ${PACKAGE_STABLE_NAME}
-#
-#      - name: Create the cbmc-latest package
-#        run: |
-#          make -f ${SCRIPT_DIR}/Makefile SCRIPT_DIR=${SCRIPT_DIR} PKGDIR=cbmc-latest PACKAGE_NAME=cbmc-latest_amd64.deb PREFIX=/usr/local/cbmc-latest
-#          mv cbmc-latest_amd64.deb ${PACKAGE_LATEST_NAME}
-#
-#      - name: Upload the cbmc package
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: ${{ env.ARTIFACT_STABLE_NAME }}
-#          path: ${{ env.PACKAGE_STABLE_NAME }}
-#
-#      - name: Upload the cbmc-latest package
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: ${{ env.ARTIFACT_LATEST_NAME }}
-#          path: ${{ env.PACKAGE_LATEST_NAME }}
 
   MacOS:
     name: MacOS packages
