@@ -346,6 +346,13 @@ bool compilet::link()
     convert_symbols(goto_model.goto_functions);
   }
 
+  if(keep_file_local)
+  {
+    function_name_manglert<file_name_manglert> mangler(
+      get_message_handler(), goto_model, file_local_mangle_suffix);
+    mangler.mangle();
+  }
+
   if(write_bin_object_file(output_file_executable, goto_model))
     return true;
 

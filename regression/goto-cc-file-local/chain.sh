@@ -54,39 +54,61 @@ else
   export_flag="--export-file-local-symbols"
 fi
 
-cnt=0
-for src in ${SRC}; do
-  cnt=$((cnt + 1))
-  out_suffix=""
-  if is_in out-file-counter "$ALL_ARGS"; then
-    out_suffix="_$cnt"
-    if is_in suffix "$ALL_ARGS"; then
-      suffix="--mangle-suffix custom_$cnt"
+OUT_FILE="main.gb"
+if is_in compile-and-link "$ALL_ARGS"; then
+    if [[ "${is_windows}" == "true" ]]; then
+      "${goto_cc}"                        \
+          ${export_flag}                  \
+          --verbosity 10                  \
+          ${wall}                         \
+          ${suffix}                       \
+          ${SRC}                          \
+          /Fe"${OUT_FILE}"
+  
+    else
+      "${goto_cc}"                        \
+          ${export_flag}                  \
+          --verbosity 10                  \
+          ${wall}                         \
+          ${suffix}                       \
+          ${SRC}                          \
+          -o "${OUT_FILE}"
     fi
-  fi
-
-  base=${src%.c}
-  OUT_FILE=$(basename "${base}${out_suffix}")".gb"
-
-  if [[ "${is_windows}" == "true" ]]; then
-    "${goto_cc}"                        \
-        ${export_flag}                  \
-        --verbosity 10                  \
-        ${wall}                         \
-        ${suffix}                       \
-        /c "${base}.c"                  \
-        /Fo"${OUT_FILE}"
-
-  else
-    "${goto_cc}"                        \
-        ${export_flag}                  \
-        --verbosity 10                  \
-        ${wall}                         \
-        ${suffix}                       \
-        -c "${base}.c"                  \
-        -o "${OUT_FILE}"
-  fi
-done
+else
+  cnt=0
+  for src in ${SRC}; do
+    cnt=$((cnt + 1))
+    out_suffix=""
+    if is_in out-file-counter "$ALL_ARGS"; then
+      out_suffix="_$cnt"
+      if is_in suffix "$ALL_ARGS"; then
+        suffix="--mangle-suffix custom_$cnt"
+      fi
+    fi
+  
+    base=${src%.c}
+    OUT_FILE=$(basename "${base}${out_suffix}")".gb"
+  
+    if [[ "${is_windows}" == "true" ]]; then
+      "${goto_cc}"                        \
+          ${export_flag}                  \
+          --verbosity 10                  \
+          ${wall}                         \
+          ${suffix}                       \
+          /c "${base}.c"                  \
+          /Fo"${OUT_FILE}"
+  
+    else
+      "${goto_cc}"                        \
+          ${export_flag}                  \
+          --verbosity 10                  \
+          ${wall}                         \
+          ${suffix}                       \
+          -c "${base}.c"                  \
+          -o "${OUT_FILE}"
+    fi
+  done
+fi
 
 if is_in final-link "$ALL_ARGS"; then
   OUT_FILE=final-link.gb

@@ -1,0 +1,12 @@
+CORE
+main.c
+assertion-check compile-and-link
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+Check that when files are compiled together in a single invocation
+of goto-cc, exported function symbols are still mangled correctly.
