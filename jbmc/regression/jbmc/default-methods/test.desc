@@ -1,0 +1,13 @@
+CORE
+Test
+--function Test.testme
+line 9 assertion at file Test\.java line 9 function java::Test\.testme:\(\)V bytecode-index 14: SUCCESS
+line 10 assertion at file Test\.java line 10 function java::Test\.testme:\(\)V bytecode-index 25: SUCCESS
+line 11 assertion at file Test\.java line 11 function java::Test\.testme:\(\)V bytecode-index 36: SUCCESS
+line 12 assertion at file Test\.java line 12 function java::Test\.testme:\(\)V bytecode-index 47: SUCCESS
+line 13 assertion at file Test\.java line 13 function java::Test\.testme:\(\)V bytecode-index 58: SUCCESS
+line 14 assertion at file Test\.java line 14 function java::Test\.testme:\(\)V bytecode-index 69: SUCCESS
+line 15 assertion at file Test\.java line 15 function java::Test\.testme:\(\)V bytecode-index 80: SUCCESS
+line 18 assertion at file Test\.java line 18 function java::Test\.testme:\(\)V bytecode-index 86: FAILURE
+^EXIT=10$
+^SIGNAL=0$

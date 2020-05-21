@@ -52,8 +52,7 @@ private:
     const optionalt<symbol_exprt> &,
     const irep_idt &,
     dispatch_table_entriest &,
-    dispatch_table_entries_mapt &,
-    const function_call_resolvert &) const;
+    dispatch_table_entries_mapt &) const;
   exprt
   get_method(const irep_idt &class_id, const irep_idt &component_name) const;
 };
@@ -510,14 +509,12 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 ///   get_child_functions_rec("C", C.f, "f")
 ///   -> [{"C", C.f}, {"B", C.f}, {"A", A.f}]
 /// \param entry_map: map of class identifiers to dispatch table entries
-/// \param resolve_function_call`: function to resolve abstract method call
 void get_virtual_calleest::get_child_functions_rec(
   const irep_idt &this_id,
   const optionalt<symbol_exprt> &last_method_defn,
   const irep_idt &component_name,
   dispatch_table_entriest &functions,
-  dispatch_table_entries_mapt &entry_map,
-  const function_call_resolvert &resolve_function_call) const
+  dispatch_table_entries_mapt &entry_map) const
 {
   auto findit=class_hierarchy.class_map.find(this_id);
   if(findit==class_hierarchy.class_map.end())
@@ -550,7 +547,8 @@ void get_virtual_calleest::get_child_functions_rec(
     }
     if(!function.symbol_expr.has_value())
     {
-      const auto resolved_call = resolve_function_call(child, component_name);
+      const auto resolved_call = get_inherited_method_implementation(
+        component_name, child, symbol_table);
       if(resolved_call)
       {
         function.class_id = resolved_call->get_class_identifier();
@@ -566,12 +564,7 @@ void get_virtual_calleest::get_child_functions_rec(
     entry_map.emplace(child, function);
 
     get_child_functions_rec(
-      child,
-      function.symbol_expr,
-      component_name,
-      functions,
-      entry_map,
-      resolve_function_call);
+      child, function.symbol_expr, component_name, functions, entry_map);
   }
 }
 
@@ -590,15 +583,8 @@ void get_virtual_calleest::get_functions(
   const std::string function_name_string(id2string(function_name));
   INVARIANT(!class_id.empty(), "All virtual functions must have a class");
 
-  resolve_inherited_componentt get_virtual_call_target{symbol_table};
-  const function_call_resolvert resolve_function_call =
-    [&get_virtual_call_target](
-      const irep_idt &class_id, const irep_idt &function_name) {
-    return get_virtual_call_target(class_id, function_name, false);
-    };
-
-  const auto resolved_call =
-    get_virtual_call_target(class_id, function_name, false);
+  auto resolved_call =
+    get_inherited_method_implementation(function_name, class_id, symbol_table);
 
   // might be an abstract function
   dispatch_table_entryt root_function(class_id);
@@ -618,12 +604,7 @@ void get_virtual_calleest::get_functions(
   // iterate over all children, transitively
   dispatch_table_entries_mapt entry_map;
   get_child_functions_rec(
-    class_id,
-    root_function.symbol_expr,
-    function_name,
-    functions,
-    entry_map,
-    resolve_function_call);
+    class_id, root_function.symbol_expr, function_name, functions, entry_map);
 
   if(root_function.symbol_expr.has_value())
     functions.push_back(root_function);

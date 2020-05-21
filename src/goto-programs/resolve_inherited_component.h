@@ -47,7 +47,10 @@ public:
   optionalt<inherited_componentt> operator()(
     const irep_idt &class_id,
     const irep_idt &component_name,
-    bool include_interfaces);
+    bool include_interfaces,
+    std::function<bool(const symbolt &)> user_filter = [](const symbolt &) {
+      return true;
+    });
 
   static irep_idt build_full_component_identifier(
     const irep_idt &class_name, const irep_idt &component_name);
@@ -55,5 +58,11 @@ public:
 private:
   const symbol_tablet &symbol_table;
 };
+
+optionalt<resolve_inherited_componentt::inherited_componentt>
+get_inherited_method_implementation(
+  const irep_idt &call_basename,
+  const irep_idt &classname,
+  const symbol_tablet &symbol_table);
 
 #endif // CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H

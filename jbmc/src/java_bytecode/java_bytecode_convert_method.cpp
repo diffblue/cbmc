@@ -3252,7 +3252,7 @@ void java_bytecode_convert_method(
 }
 
 /// Returns true iff method \p methodid from class \p classname is
-/// a method inherited from a class (and not an interface!) from which
+/// a method inherited from a class or interface from which
 /// \p classname inherits, either directly or indirectly.
 /// \param classname: class whose method is referenced
 /// \param mangled_method_name: The particular overload of a given method.
@@ -3260,8 +3260,9 @@ bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname,
   const irep_idt &mangled_method_name) const
 {
-  const auto inherited_method = get_inherited_component(
-    classname, mangled_method_name, symbol_table, false);
+  const auto inherited_method = get_inherited_method_implementation(
+    mangled_method_name, classname, symbol_table);
+
   return inherited_method.has_value();
 }
 
