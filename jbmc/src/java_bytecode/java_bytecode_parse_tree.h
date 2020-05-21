@@ -228,21 +228,21 @@ struct java_bytecode_parse_treet
     typedef std::vector<u2> u2_valuest;
     struct lambda_method_handlet
     {
-      java_class_typet::method_handle_typet handle_type;
+      java_class_typet::method_handle_kindt handle_type;
       optionalt<class_method_descriptor_exprt> method_descriptor;
 
       /// Construct a lambda method handle with parameters \p params.
       lambda_method_handlet(
         const class_method_descriptor_exprt &method_descriptor,
-        java_class_typet::method_handle_typet handle_type)
+        java_class_typet::method_handle_kindt handle_type)
         : handle_type(handle_type), method_descriptor(method_descriptor)
       {
         PRECONDITION(
-          handle_type != java_class_typet::method_handle_typet::UNKNOWN_HANDLE);
+          handle_type != java_class_typet::method_handle_kindt::UNKNOWN_HANDLE);
       }
 
       lambda_method_handlet()
-        : handle_type(java_class_typet::method_handle_typet::UNKNOWN_HANDLE),
+        : handle_type(java_class_typet::method_handle_kindt::UNKNOWN_HANDLE),
           method_descriptor()
       {
       }
@@ -255,7 +255,7 @@ struct java_bytecode_parse_treet
       bool is_unknown_handle() const
       {
         return handle_type ==
-               java_class_typet::method_handle_typet::UNKNOWN_HANDLE;
+               java_class_typet::method_handle_kindt::UNKNOWN_HANDLE;
       }
 
       const class_method_descriptor_exprt &get_method_descriptor() const

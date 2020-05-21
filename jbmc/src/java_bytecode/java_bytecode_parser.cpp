@@ -54,7 +54,7 @@ private:
   using fieldt = java_bytecode_parse_treet::fieldt;
   using instructiont = java_bytecode_parse_treet::instructiont;
   using annotationt = java_bytecode_parse_treet::annotationt;
-  using method_handle_typet = java_class_typet::method_handle_typet;
+  using method_handle_typet = java_class_typet::method_handle_kindt;
   using lambda_method_handlet =
     java_bytecode_parse_treet::classt::lambda_method_handlet;
 
@@ -302,7 +302,7 @@ private:
 class method_handle_infot : public structured_pool_entryt
 {
 public:
-  /// Correspond to the different valid values for field reference_kind From
+  /// Correspond to the different valid values for field handle_kind From
   /// Java 8 spec 4.4.8
   /// (https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html)
   enum class method_handle_kindt
@@ -323,13 +323,13 @@ public:
   {
     PRECONDITION(entry.tag == CONSTANT_MethodHandle);
     PRECONDITION(entry.ref1 > 0 && entry.ref1 < 10); // Java 8 spec 4.4.8
-    reference_kind = static_cast<method_handle_kindt>(entry.ref1);
+    handle_kind = static_cast<method_handle_kindt>(entry.ref1);
     reference_index = entry.ref2;
   }
 
-  method_handle_kindt get_reference_kind() const
+  method_handle_kindt get_handle_kind() const
   {
-    return reference_kind;
+    return handle_kind;
   }
 
   base_ref_infot get_reference(const pool_entry_lookupt &pool_entry) const
@@ -337,7 +337,7 @@ public:
     const base_ref_infot ref_entry{pool_entry(reference_index)};
 
     // validate the correctness of the constant pool entry
-    switch(reference_kind)
+    switch(handle_kind)
     {
     case method_handle_kindt::REF_getField:
     case method_handle_kindt::REF_getStatic:
@@ -373,7 +373,7 @@ public:
   }
 
 private:
-  method_handle_kindt reference_kind;
+  method_handle_kindt handle_kind;
   u2 reference_index;
 };
 
@@ -1887,25 +1887,25 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
 /// newinvokespecial translates into a special instantiate-and-construct
 /// sequence. The field-manipulation reference kinds appear never to happen in
 /// reality and don't have syntax in the Java language.
-static java_class_typet::method_handle_typet get_method_handle_type(
+static java_class_typet::method_handle_kindt get_method_handle_type(
   method_handle_infot::method_handle_kindt java_handle_kind)
 {
   switch(java_handle_kind)
   {
   case method_handle_infot::method_handle_kindt::REF_newInvokeSpecial:
-    return java_class_typet::method_handle_typet::LAMBDA_CONSTRUCTOR_HANDLE;
+    return java_class_typet::method_handle_kindt::LAMBDA_CONSTRUCTOR_HANDLE;
   case method_handle_infot::method_handle_kindt::REF_invokeInterface:
   case method_handle_infot::method_handle_kindt::REF_invokeVirtual:
-    return java_class_typet::method_handle_typet::LAMBDA_VIRTUAL_METHOD_HANDLE;
+    return java_class_typet::method_handle_kindt::LAMBDA_VIRTUAL_METHOD_HANDLE;
   case method_handle_infot::method_handle_kindt::REF_invokeStatic:
   case method_handle_infot::method_handle_kindt::REF_invokeSpecial:
-    return java_class_typet::method_handle_typet::LAMBDA_STATIC_METHOD_HANDLE;
+    return java_class_typet::method_handle_kindt::LAMBDA_STATIC_METHOD_HANDLE;
   case method_handle_infot::method_handle_kindt::REF_getField:
   case method_handle_infot::method_handle_kindt::REF_getStatic:
   case method_handle_infot::method_handle_kindt::REF_putField:
   case method_handle_infot::method_handle_kindt::REF_putStatic:
   default:
-    return java_class_typet::method_handle_typet::UNKNOWN_HANDLE;
+    return java_class_typet::method_handle_kindt::UNKNOWN_HANDLE;
   }
 }
 
@@ -1937,13 +1937,13 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   // they ever turn up this is where to fix them.
 
   if(
-    entry.get_reference_kind() ==
+    entry.get_handle_kind() ==
       method_handle_infot::method_handle_kindt::REF_getField ||
-    entry.get_reference_kind() ==
+    entry.get_handle_kind() ==
       method_handle_infot::method_handle_kindt::REF_putField ||
-    entry.get_reference_kind() ==
+    entry.get_handle_kind() ==
       method_handle_infot::method_handle_kindt::REF_getStatic ||
-    entry.get_reference_kind() ==
+    entry.get_handle_kind() ==
       method_handle_infot::method_handle_kindt::REF_putStatic)
   {
     return {};
@@ -1958,7 +1958,7 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   typet method_type = *java_type_from_string(descriptor);
 
   method_handle_typet handle_type =
-    get_method_handle_type(entry.get_reference_kind());
+    get_method_handle_type(entry.get_handle_kind());
 
   class_method_descriptor_exprt method_descriptor{
     method_type, mangled_method_name, class_name, method_name};

@@ -451,7 +451,7 @@ public:
   }
 
   /// Indicates what sort of code should be synthesised for a lambda call:
-  enum class method_handle_typet
+  enum class method_handle_kindt
   {
     /// Direct call to the given method
     LAMBDA_STATIC_METHOD_HANDLE,
@@ -466,23 +466,23 @@ public:
   /// Represents a lambda call to a method. We store the method being called in
   /// the same class_method_descriptor_exprt as java_bytecode_convert_method
   /// uses to translate virtual method calls to denote the method targeted, and
-  /// use method_handle_typet above to indicate what kind of dispatch should be
+  /// use method_handle_kindt above to indicate what kind of dispatch should be
   /// used.
   class java_lambda_method_handlet : public irept
   {
   public:
     java_lambda_method_handlet(
       const class_method_descriptor_exprt &method_descriptor,
-      method_handle_typet handle_type)
+      method_handle_kindt handle_kind)
     {
       set(ID_object_descriptor, method_descriptor);
-      set(ID_handle_type, static_cast<int>(handle_type));
+      set(ID_handle_type, static_cast<int>(handle_kind));
     }
 
     java_lambda_method_handlet()
     {
       set(
-        ID_handle_type, static_cast<int>(method_handle_typet::UNKNOWN_HANDLE));
+        ID_handle_type, static_cast<int>(method_handle_kindt::UNKNOWN_HANDLE));
     }
 
     const class_method_descriptor_exprt &get_lambda_method_descriptor() const
@@ -496,9 +496,9 @@ public:
       return get_lambda_method_descriptor().get_identifier();
     }
 
-    method_handle_typet get_handle_type() const
+    method_handle_kindt get_handle_kind() const
     {
-      return (method_handle_typet)get_int(ID_handle_type);
+      return (method_handle_kindt)get_int(ID_handle_type);
     }
   };
 
@@ -519,10 +519,10 @@ public:
 
   void add_lambda_method_handle(
     const class_method_descriptor_exprt &method_descriptor,
-    method_handle_typet handle_type)
+    method_handle_kindt handle_kind)
   {
     // creates a symbol_exprt for the identifier and pushes it in the vector
-    lambda_method_handles().emplace_back(method_descriptor, handle_type);
+    lambda_method_handles().emplace_back(method_descriptor, handle_kind);
   }
   void add_unknown_lambda_method_handle()
   {

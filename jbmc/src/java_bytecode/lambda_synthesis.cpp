@@ -67,8 +67,8 @@ get_lambda_method_handle(
   // If the lambda method handle has an unknown type, it does not refer to
   // any symbol (it has an empty identifier)
   if(
-    lambda_method_handle.get_handle_type() !=
-    java_class_typet::method_handle_typet::UNKNOWN_HANDLE)
+    lambda_method_handle.get_handle_kind() !=
+    java_class_typet::method_handle_kindt::UNKNOWN_HANDLE)
     return lambda_method_handle;
   return {};
 }
@@ -656,13 +656,13 @@ codet invokedynamic_synthetic_method(
 
   const auto &lambda_method_symbol =
     ns.lookup(lambda_method_handle.get_lambda_method_identifier());
-  const auto handle_type = lambda_method_handle.get_handle_type();
+  const auto handle_type = lambda_method_handle.get_handle_kind();
   const auto is_constructor_lambda =
     handle_type ==
-    java_class_typet::method_handle_typet::LAMBDA_CONSTRUCTOR_HANDLE;
+    java_class_typet::method_handle_kindt::LAMBDA_CONSTRUCTOR_HANDLE;
   const auto use_virtual_dispatch =
     handle_type ==
-    java_class_typet::method_handle_typet::LAMBDA_VIRTUAL_METHOD_HANDLE;
+    java_class_typet::method_handle_kindt::LAMBDA_VIRTUAL_METHOD_HANDLE;
 
   if(is_constructor_lambda)
   {
