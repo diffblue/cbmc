@@ -410,14 +410,13 @@ void java_bytecode_convert_method_lazy(
 
   if(!m.is_static)
   {
-    class_typet::methodt new_method;
-    new_method.set_name(method_symbol.name);
+    java_class_typet::methodt new_method{method_symbol.name, method_type};
     new_method.set_base_name(method_symbol.base_name);
     new_method.set_pretty_name(method_symbol.pretty_name);
     new_method.set_access(member_type.get_access());
-    new_method.type() = method_symbol.type;
+    new_method.set_descriptor(m.descriptor);
 
-    to_class_type(class_symbol.type)
+    to_java_class_type(class_symbol.type)
       .methods()
       .emplace_back(std::move(new_method));
   }

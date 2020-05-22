@@ -283,6 +283,18 @@ public:
     {
       set(ID_is_native_method, is_native);
     }
+
+    /// Gets the method's descriptor -- the mangled form of its type
+    const irep_idt &get_descriptor() const
+    {
+      return get(ID_object_descriptor);
+    }
+
+    /// Sets the method's descriptor -- the mangled form of its type
+    void set_descriptor(const irep_idt &id)
+    {
+      set(ID_object_descriptor, id);
+    }
   };
 
   using methodst = std::vector<methodt>;
