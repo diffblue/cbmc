@@ -102,58 +102,37 @@ public:
   const std::string message;
 };
 
-/// Find the unique abstract method that isn't equals(...) or hashCode() in a
-/// list of methods. Returns the method if one is found, or null if there are no
-/// matching methods, or throws no_unique_unimplemented_method_exceptiont if
-/// there are at least two.
-static const java_class_typet::methodt *get_unique_abstract_method(
-  const java_class_typet::methodst &methods,
-  const namespacet &ns)
+struct compare_base_name_and_descriptort
 {
-  const java_class_typet::methodt *result = nullptr;
-  for(const auto &method : methods)
+  int operator()(
+    const java_class_typet::methodt *a,
+    const java_class_typet::methodt *b) const
   {
-    const auto &mangled_name = method.get_name();
-    static const irep_idt equals = "equals";
-    static const irep_idt hashCode = "hashCode";
-    if(method.get_base_name() == equals || method.get_base_name() == hashCode)
-    {
-      // equals and hashCode methods can't be the implemented method of a
-      // functional interface, even if the interface re-declares them as
-      // abstract.
-      continue;
-    }
-    if(!ns.lookup(mangled_name).type.get_bool(ID_C_abstract))
-      continue;
-    if(result)
-    {
-      throw no_unique_unimplemented_method_exceptiont(
-        "produces a type with at least two unimplemented methods");
-    }
-    result = &method;
+    return a->get_base_name() == b->get_base_name()
+             ? (a->get_descriptor() == b->get_descriptor()
+                  ? 0
+                  : a->get_descriptor() < b->get_descriptor())
+             : a->get_base_name() < b->get_base_name();
   }
-  return result;
-}
+};
 
-static bool same_base_name_and_descriptor(
-  const java_class_typet::methodt &method1,
-  const java_class_typet::methodt &method2)
-{
-  return method1.get_base_name() == method2.get_base_name() &&
-         method1.get_descriptor() == method2.get_descriptor();
-}
+/// Map from method, indexed by name and descriptor but not defining class, onto
+/// defined-ness (i.e. true if defined with a default method, false if abstract)
+typedef std::map<
+  const java_class_typet::methodt *,
+  bool,
+  compare_base_name_and_descriptort>
+  methods_by_name_and_descriptort;
 
-/// Find the unique unimplemented method on a given interface type, including
-/// considering its parents. Returns the method if one is found, or empty if
-/// there are no unimplemented methods, or throws
-/// no_unique_unimplemented_method_exceptiont if there are at least two.
-/// If there are multiple name-and-descriptor-compatible unimplemented methods,
-/// for example because both If1.f(int) and If2.f(int) are unimplemented but
-/// due to their compatible descriptors both can be satisfied with one method,
-/// one of the matching methods is chosen arbitrarily.
-static const java_class_typet::methodt *get_unique_unimplemented_method(
-  const irep_idt &interface_id,
-  const namespacet &ns)
+/// Find all methods defined by this method and its parent types, returned as
+/// a map from const java_class_typet::methodt * onto a boolean value which is
+/// true if the method is defined (i.e. has a default definition) as of this
+/// node in the class graph.
+/// If there are multiple name-and-descriptor-compatible methods,
+/// for example because both If1.f(int) and If2.f(int) are inherited here, only
+/// one is stored in the map, chosen arbitrarily.
+static const methods_by_name_and_descriptort
+get_interface_methods(const irep_idt &interface_id, const namespacet &ns)
 {
   static const irep_idt jlo = "java::java.lang.Object";
   // Terminate recursion at Object; any other base of an interface must
@@ -170,25 +149,56 @@ static const java_class_typet::methodt *get_unique_unimplemented_method(
       "produces a type that inherits the stub type " + id2string(interface_id));
   }
 
-  const java_class_typet::methodt *result =
-    get_unique_abstract_method(interface.methods(), ns);
+  methods_by_name_and_descriptort all_methods;
 
+  // First accumulate definitions from child types:
   for(const auto &base : interface.bases())
   {
-    const java_class_typet::methodt *base_result =
-      get_unique_unimplemented_method(base.type().get_identifier(), ns);
-    if(
-      base_result && result &&
-      !same_base_name_and_descriptor(*base_result, *result))
+    const methods_by_name_and_descriptort base_methods =
+      get_interface_methods(base.type().get_identifier(), ns);
+    for(const auto base_method : base_methods)
     {
-      throw no_unique_unimplemented_method_exceptiont(
-        "produces a type with at least two unimplemented methods");
+      if(base_method.second)
+      {
+        // Any base definition fills any abstract definition from another base:
+        all_methods[base_method.first] = true;
+      }
+      else
+      {
+        // An abstract method incoming from a base falls to any existing
+        // definition, so only insert if not present:
+        all_methods.emplace(base_method.first, false);
+      }
     }
-    else if(base_result)
-      result = base_result;
   }
 
-  return result;
+  // Now insert defintions from this class:
+  for(const auto &method : interface.methods())
+  {
+    static const irep_idt equals = "equals";
+    static const irep_idt equals_descriptor = "(Ljava/lang/Object;)Z";
+    static const irep_idt hashCode = "hashCode";
+    static const irep_idt hashCode_descriptor = "()I";
+    if(
+      (method.get_base_name() == equals &&
+       method.get_descriptor() == equals_descriptor) ||
+      (method.get_base_name() == hashCode &&
+       method.get_descriptor() == hashCode_descriptor))
+    {
+      // Ignore any uses of functions that are certainly defined on
+      // java.lang.Object-- even if explicitly made abstract, they can't be the
+      // implemented method of a functional interface.
+      continue;
+    }
+
+    // Note unlike inherited definitions, an abstract definition here *does*
+    // wipe out a non-abstract definition (i.e. a default method) from a parent
+    // type.
+    all_methods[&method] =
+      !ns.lookup(method.get_name()).type.get_bool(ID_C_abstract);
+  }
+
+  return all_methods;
 }
 
 static const java_class_typet::methodt *try_get_unique_unimplemented_method(
@@ -201,13 +211,29 @@ static const java_class_typet::methodt *try_get_unique_unimplemented_method(
   const namespacet ns{symbol_table};
   try
   {
+    const methods_by_name_and_descriptort all_methods =
+      get_interface_methods(functional_interface_tag.get_identifier(), ns);
+
     const java_class_typet::methodt *method_and_descriptor_to_implement =
-      get_unique_unimplemented_method(
-        functional_interface_tag.get_identifier(), ns);
+      nullptr;
+
+    for(const auto &entry : all_methods)
+    {
+      if(!entry.second)
+      {
+        if(method_and_descriptor_to_implement != nullptr)
+        {
+          throw no_unique_unimplemented_method_exceptiont(
+            "produces a type with at least two unimplemented methods");
+        }
+        method_and_descriptor_to_implement = entry.first;
+      }
+    }
+
     if(!method_and_descriptor_to_implement)
     {
       throw no_unique_unimplemented_method_exceptiont(
-        "produces a type with no methods");
+        "produces a type with no unimplemented methods");
     }
     return method_and_descriptor_to_implement;
   }
