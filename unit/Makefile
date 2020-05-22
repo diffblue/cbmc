@@ -80,6 +80,7 @@ SRC += analyses/ai/ai.cpp \
        util/interval/add.cpp \
        util/interval/bitwise.cpp \
        util/interval/comparisons.cpp \
+       util/interval/divide.cpp \
        util/interval/eval.cpp \
        util/interval/get_extreme.cpp \
        util/interval/modulo.cpp \
