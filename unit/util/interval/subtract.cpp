@@ -27,7 +27,8 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
       constant_interval_exprt left(CEV(6), CEV(8));
       constant_interval_exprt right(CEV(2), CEV(4));
 
-      constant_interval_exprt result = left.minus(right);
+      constant_interval_exprt result =
+        constant_interval_exprt::minus(left, right);
 
       THEN("Domain is consistent")
       {
@@ -49,7 +50,8 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
       constant_interval_exprt left(CEV(2), CEV(4));
       constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
-      constant_interval_exprt result = left.minus(right);
+      constant_interval_exprt result =
+        constant_interval_exprt::minus(left, right);
 
       THEN("Domain is consistent")
       {
@@ -73,7 +75,8 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
       constant_interval_exprt left(CEV(2), max_exprt(signedbv_typet(32)));
       constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
-      constant_interval_exprt result = left.minus(right);
+      constant_interval_exprt result =
+        constant_interval_exprt::minus(left, right);
 
       THEN("Domain is consistent")
       {
@@ -106,7 +109,7 @@ SCENARIO(
     auto rhs = constant_interval_exprt(get_value(3));
     THEN("it should work")
     {
-      auto result = lhs.minus(rhs);
+      auto result = constant_interval_exprt::minus(lhs, rhs);
       REQUIRE(result.is_single_value_interval());
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
       REQUIRE(maybe_lower.has_value());
@@ -121,7 +124,7 @@ SCENARIO(
 
     THEN("it should not give a completely crazy result")
     {
-      auto result = lhs.minus(rhs);
+      auto result = constant_interval_exprt::minus(lhs, rhs);
       REQUIRE(result.is_single_value_interval());
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
       REQUIRE(maybe_lower.has_value());
@@ -135,7 +138,7 @@ SCENARIO(
     auto rhs = constant_interval_exprt(get_value(0), get_value(1));
     THEN("it should not give a completely crazy result")
     {
-      auto result = lhs.minus(rhs);
+      auto result = constant_interval_exprt::minus(lhs, rhs);
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
       REQUIRE(maybe_lower.has_value());
       REQUIRE(maybe_lower.value() == 9);

@@ -27,8 +27,9 @@ SCENARIO("shift interval domain", "[core][analyses][interval][shift]")
       THEN("Something else")
       {
         REQUIRE(
-          constant_interval_exprt(CEV(4), CEV(8))
-            .left_shift(constant_interval_exprt(CEV(1))) ==
+          constant_interval_exprt::left_shift(
+            constant_interval_exprt(CEV(4), CEV(8)),
+            constant_interval_exprt(CEV(1))) ==
           constant_interval_exprt(CEV(8), CEV(16)));
       }
     }

@@ -27,45 +27,54 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
       THEN("Ensure result is consistent.")
       {
         REQUIRE(
-          constant_interval_exprt(CEV(10), CEV(20))
-            .modulo(constant_interval_exprt(CEV(5), CEV(5))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(10), CEV(20)),
+            constant_interval_exprt(CEV(5), CEV(5))) ==
           constant_interval_exprt(CEV(0), CEV(4)));
         REQUIRE(
-          constant_interval_exprt(CEV(10), CEV(20))
-            .modulo(constant_interval_exprt(CEV(4), CEV(5))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(10), CEV(20)),
+            constant_interval_exprt(CEV(4), CEV(5))) ==
           constant_interval_exprt(CEV(0), CEV(4)));
         REQUIRE(
-          constant_interval_exprt(CEV(10), CEV(20))
-            .modulo(constant_interval_exprt(CEV(0), CEV(5))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(10), CEV(20)),
+            constant_interval_exprt(CEV(0), CEV(5))) ==
           constant_interval_exprt::top(signedbv_typet(32)));
         REQUIRE(
-          constant_interval_exprt(CEV(10), CEV(20))
-            .modulo(constant_interval_exprt(CEV(-5), CEV(5))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(10), CEV(20)),
+            constant_interval_exprt(CEV(-5), CEV(5))) ==
           constant_interval_exprt::top(signedbv_typet(32)));
 
         REQUIRE(
-          constant_interval_exprt(CEV(-10), CEV(20))
-            .modulo(constant_interval_exprt(CEV(0), CEV(5))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(-10), CEV(20)),
+            constant_interval_exprt(CEV(0), CEV(5))) ==
           constant_interval_exprt::top(signedbv_typet(32)));
         REQUIRE(
-          constant_interval_exprt(CEV(-20), CEV(-10))
-            .modulo(constant_interval_exprt(CEV(0), CEV(5))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(-20), CEV(-10)),
+            constant_interval_exprt(CEV(0), CEV(5))) ==
           constant_interval_exprt::top(signedbv_typet(32)));
 
         REQUIRE(
-          constant_interval_exprt(CEV(-20), CEV(-10))
-            .modulo(constant_interval_exprt(CEV(1), CEV(1))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(-20), CEV(-10)),
+            constant_interval_exprt(CEV(1), CEV(1))) ==
           constant_interval_exprt(CEV(0)));
 
         REQUIRE(
-          constant_interval_exprt(CEV(30), CEV(50))
-            .modulo(constant_interval_exprt(CEV(2), CEV(2))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(30), CEV(50)),
+            constant_interval_exprt(CEV(2), CEV(2))) ==
           constant_interval_exprt(CEV(0), CEV(1)));
 
         // Problems
         REQUIRE(
-          constant_interval_exprt(CEV(30), max_exprt(signedbv_typet(32)))
-            .modulo(constant_interval_exprt(CEV(2), CEV(2))) ==
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(30), max_exprt(signedbv_typet(32))),
+            constant_interval_exprt(CEV(2), CEV(2))) ==
           constant_interval_exprt(CEV(0), CEV(1)));
       }
     }

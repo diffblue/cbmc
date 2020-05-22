@@ -27,7 +27,8 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
       constant_interval_exprt left(CEV(2), CEV(4));
       constant_interval_exprt right(CEV(6), CEV(8));
 
-      constant_interval_exprt result = left.plus(right);
+      constant_interval_exprt result =
+        constant_interval_exprt::plus(left, right);
 
       THEN("Domain is consistent")
       {
@@ -49,7 +50,8 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
       constant_interval_exprt left(CEV(2), CEV(4));
       constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
-      constant_interval_exprt result = left.plus(right);
+      constant_interval_exprt result =
+        constant_interval_exprt::plus(left, right);
 
       THEN("Domain is consistent")
       {
@@ -73,7 +75,8 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
       constant_interval_exprt left(CEV(2), max_exprt(signedbv_typet(32)));
       constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
 
-      constant_interval_exprt result = left.plus(right);
+      constant_interval_exprt result =
+        constant_interval_exprt::plus(left, right);
 
       THEN("Domain is consistent")
       {

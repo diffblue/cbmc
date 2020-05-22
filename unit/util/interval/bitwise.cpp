@@ -24,14 +24,14 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
     THEN("Bitwise or should yield bitwise representation of 13")
     {
       REQUIRE(
-        five.bitwise_or(nine) ==
+        constant_interval_exprt::bitwise_or(five, nine) ==
         constant_interval_exprt(from_integer(13, unsigned_int)));
     }
 
     THEN("Bitwise and should yield bitwise representation of 1")
     {
       REQUIRE(
-        five.bitwise_and(nine) ==
+        constant_interval_exprt::bitwise_and(five, nine) ==
         constant_interval_exprt(from_integer(1, unsigned_int)));
       REQUIRE(
         (five & nine) ==
@@ -41,23 +41,23 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
     THEN("Bitwise xor should yield bitwise representation of 12")
     {
       REQUIRE(
-        five.bitwise_xor(nine) ==
+        constant_interval_exprt::bitwise_xor(five, nine) ==
         constant_interval_exprt(from_integer(12, unsigned_int)));
     }
 
     THEN("Left shift on the 5 should produce 10")
     {
       REQUIRE(
-        five.left_shift(
-          constant_interval_exprt(from_integer(1, unsigned_int))) ==
+        constant_interval_exprt::left_shift(
+          five, constant_interval_exprt(from_integer(1, unsigned_int))) ==
         constant_interval_exprt(from_integer(10, unsigned_int)));
     }
 
     THEN("Right shift on the 5 should produce 2")
     {
       REQUIRE(
-        five.right_shift(
-          constant_interval_exprt(from_integer(1, unsigned_int))) ==
+        constant_interval_exprt::right_shift(
+          five, constant_interval_exprt(from_integer(1, unsigned_int))) ==
         constant_interval_exprt(from_integer(2, unsigned_int)));
     }
   }

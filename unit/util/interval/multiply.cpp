@@ -27,7 +27,7 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
       constant_interval_exprt a(CEV(2), CEV(5));
       constant_interval_exprt b(CEV(7), CEV(11));
 
-      constant_interval_exprt result = a.multiply(b);
+      constant_interval_exprt result = constant_interval_exprt::multiply(a, b);
 
       THEN("Domain is consistent")
       {
@@ -51,7 +51,7 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
       constant_interval_exprt a(CEV(-5), CEV(-2));
       constant_interval_exprt b(CEV(7), CEV(11));
 
-      constant_interval_exprt result = a.multiply(b);
+      constant_interval_exprt result = constant_interval_exprt::multiply(a, b);
 
       THEN("Domain is consistent")
       {
@@ -75,7 +75,7 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
       constant_interval_exprt a(CEV(-2), CEV(5));
       constant_interval_exprt b(CEV(7), CEV(11));
 
-      constant_interval_exprt result = a.multiply(b);
+      constant_interval_exprt result = constant_interval_exprt::multiply(a, b);
 
       THEN("Domain is consistent")
       {
@@ -99,22 +99,23 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
       constant_interval_exprt a(CEV(-2), CEV(5));
       constant_interval_exprt b(CEV(7), max_exprt(signedbv_typet(32)));
 
-      constant_interval_exprt result = a.multiply(b);
+      constant_interval_exprt result = constant_interval_exprt::multiply(a, b);
 
       THEN("Domain is consistent")
       {
         CHECK(V(a.get_lower()) == -2);
         CHECK(V(a.get_upper()) == 5);
         CHECK(V(b.get_lower()) == 7);
-        CHECK(constant_interval_exprt::is_max(b.get_upper()));
+
+        CHECK(b.has_no_upper_bound());
       }
 
       CAPTURE(result);
 
       THEN("The result is [-INF, INF]")
       {
-        CHECK(constant_interval_exprt::is_max(result.get_upper()));
-        CHECK(constant_interval_exprt::is_min(result.get_lower()));
+        CHECK(result.has_no_upper_bound());
+        CHECK(result.has_no_lower_bound());
       }
     }
 
@@ -122,7 +123,7 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
     {
       constant_interval_exprt a(CEV(2), CEV(5));
       constant_interval_exprt b(CEV(7), max_exprt(signedbv_typet(32)));
-      constant_interval_exprt result = a.multiply(b);
+      constant_interval_exprt result = constant_interval_exprt::multiply(a, b);
 
       THEN("Domain is consistent")
       {
