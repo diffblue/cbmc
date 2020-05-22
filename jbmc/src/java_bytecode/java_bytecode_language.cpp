@@ -1241,7 +1241,16 @@ static void notify_static_method_calls(
         const symbol_exprt *fn_sym =
           expr_try_dynamic_cast<symbol_exprt>(call_expr.function());
         if(fn_sym)
-          needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
+        {
+          INVARIANT(
+            false,
+            "Java synthetic methods are not "
+            "expected to produce side_effect_expr_function_callt. If "
+            "that has changed, remove this invariant. Also note that "
+            "as of the time of writing remove_virtual_functions did "
+            "not support this form of function call.");
+          // needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
+        }
       }
     }
   }
