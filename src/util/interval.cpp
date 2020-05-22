@@ -1442,8 +1442,7 @@ std::ostream &operator<<(std::ostream &out, const constant_interval_exprt &i)
     // FIXME Not everything that's a bitvector is also an integer
     if(i.is_bitvector(i.get_lower()))
     {
-      out << binary2integer(
-        id2string(i.get_lower().get(ID_value)), i.is_signed());
+      out << integer2string(*numeric_cast<mp_integer>(i.get_lower()));
     }
     else
     {
@@ -1473,8 +1472,7 @@ std::ostream &operator<<(std::ostream &out, const constant_interval_exprt &i)
   {
     if(i.is_bitvector(i.get_upper()))
     {
-      out << binary2integer(
-        id2string(i.get_upper().get(ID_value)), i.is_signed());
+      out << integer2string(*numeric_cast<mp_integer>(i.get_upper()));
     }
     else
     {
