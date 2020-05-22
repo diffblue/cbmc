@@ -22,6 +22,14 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
+    WHEN("Single element multiplication")
+    {
+      constant_interval_exprt a(CEV(5));
+      constant_interval_exprt b(CEV(10));
+      const auto a_times_b = a.multiply(b);
+      REQUIRE(V(a_times_b.get_upper()) == 50);
+    }
+
     WHEN("Both are positive [2,5]*[7,11]")
     {
       constant_interval_exprt a(CEV(2), CEV(5));
