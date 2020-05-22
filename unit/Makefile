@@ -21,6 +21,9 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
        analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
+       analyses/variable-sensitivity/value_set/abstract_value.cpp \
+       analyses/variable-sensitivity/value_set/array_abstract_object.cpp \
+       analyses/variable-sensitivity/value_set/pointer_abstract_object.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
        get_goto_model_from_c_test.cpp \
