@@ -433,7 +433,7 @@ tvt constant_interval_exprt::equal(const constant_interval_exprt &o) const
     return tvt(equal(get_lower(), o.get_lower()));
   }
 
-  if(equal(get_upper(), o.get_upper()) && equal(get_upper(), o.get_upper()))
+  if(equal(get_upper(), o.get_upper()) && equal(get_lower(), o.get_lower()))
   {
     return tvt(true);
   }
