@@ -54,7 +54,11 @@ SRC = ai.cpp \
       variable-sensitivity/value_set_abstract_object.cpp \
       variable-sensitivity/variable_sensitivity_dependence_graph.cpp \
       variable-sensitivity/interval_abstract_value.cpp \
-			variable-sensitivity/interval_array_abstract_object.cpp \
+      variable-sensitivity/interval_array_abstract_object.cpp \
+      variable-sensitivity/value_set_abstract_object.cpp \
+      variable-sensitivity/value_set_abstract_value.cpp \
+      variable-sensitivity/value_set_pointer_abstract_object.cpp \
+      variable-sensitivity/value_set_array_abstract_object.cpp \
       # Empty last line
 
 INCLUDES= -I ..
