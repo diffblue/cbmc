@@ -103,14 +103,14 @@ public:
 };
 
 /// Find the unique abstract method that isn't equals(...) or hashCode() in a
-/// list of methods. Returns the method's symbol-table identifier if one is
-/// found, or empty if there are no matching methods, or throws
-/// no_unique_unimplemented_method_exceptiont if there are at least two.
-static optionalt<irep_idt> get_unique_abstract_method(
+/// list of methods. Returns the method if one is found, or null if there are no
+/// matching methods, or throws no_unique_unimplemented_method_exceptiont if
+/// there are at least two.
+static const java_class_typet::methodt *get_unique_abstract_method(
   const java_class_typet::methodst &methods,
   const namespacet &ns)
 {
-  optionalt<irep_idt> result;
+  const java_class_typet::methodt *result = nullptr;
   for(const auto &method : methods)
   {
     const auto &mangled_name = method.get_name();
@@ -125,21 +125,33 @@ static optionalt<irep_idt> get_unique_abstract_method(
     }
     if(!ns.lookup(mangled_name).type.get_bool(ID_C_abstract))
       continue;
-    if(result.has_value())
+    if(result)
     {
       throw no_unique_unimplemented_method_exceptiont(
         "produces a type with at least two unimplemented methods");
     }
-    result = mangled_name;
+    result = &method;
   }
   return result;
 }
 
+static bool same_base_name_and_descriptor(
+  const java_class_typet::methodt &method1,
+  const java_class_typet::methodt &method2)
+{
+  return method1.get_base_name() == method2.get_base_name() &&
+         method1.get_descriptor() == method2.get_descriptor();
+}
+
 /// Find the unique unimplemented method on a given interface type, including
-/// considering its parents. Returns the method's symbol-table identifier if one
-/// is found, or empty if there are no unimplemented methods, or throws
+/// considering its parents. Returns the method if one is found, or empty if
+/// there are no unimplemented methods, or throws
 /// no_unique_unimplemented_method_exceptiont if there are at least two.
-static optionalt<irep_idt> get_unique_unimplemented_method(
+/// If there are multiple name-and-descriptor-compatible unimplemented methods,
+/// for example because both If1.f(int) and If2.f(int) are unimplemented but
+/// due to their compatible descriptors both can be satisfied with one method,
+/// one of the matching methods is chosen arbitrarily.
+static const java_class_typet::methodt *get_unique_unimplemented_method(
   const irep_idt &interface_id,
   const namespacet &ns)
 {
@@ -158,26 +170,28 @@ static optionalt<irep_idt> get_unique_unimplemented_method(
       "produces a type that inherits the stub type " + id2string(interface_id));
   }
 
-  optionalt<irep_idt> result =
+  const java_class_typet::methodt *result =
     get_unique_abstract_method(interface.methods(), ns);
 
   for(const auto &base : interface.bases())
   {
-    optionalt<irep_idt> base_result =
+    const java_class_typet::methodt *base_result =
       get_unique_unimplemented_method(base.type().get_identifier(), ns);
-    if(base_result.has_value() && result.has_value() && *base_result != *result)
+    if(
+      base_result && result &&
+      !same_base_name_and_descriptor(*base_result, *result))
     {
       throw no_unique_unimplemented_method_exceptiont(
         "produces a type with at least two unimplemented methods");
     }
-    else if(base_result.has_value())
+    else if(base_result)
       result = base_result;
   }
 
   return result;
 }
 
-static optionalt<irep_idt> interface_method_id(
+static const java_class_typet::methodt *try_get_unique_unimplemented_method(
   const symbol_tablet &symbol_table,
   const struct_tag_typet &functional_interface_tag,
   const irep_idt &method_identifier,
@@ -187,14 +201,15 @@ static optionalt<irep_idt> interface_method_id(
   const namespacet ns{symbol_table};
   try
   {
-    optionalt<irep_idt> method_to_implement = get_unique_unimplemented_method(
-      functional_interface_tag.get_identifier(), ns);
-    if(!method_to_implement)
+    const java_class_typet::methodt *method_and_descriptor_to_implement =
+      get_unique_unimplemented_method(
+        functional_interface_tag.get_identifier(), ns);
+    if(!method_and_descriptor_to_implement)
     {
       throw no_unique_unimplemented_method_exceptiont(
         "produces a type with no methods");
     }
-    return method_to_implement;
+    return method_and_descriptor_to_implement;
   }
   catch(const no_unique_unimplemented_method_exceptiont &e)
   {
@@ -301,35 +316,22 @@ static symbolt constructor_symbol(
 
 static symbolt implemented_method_symbol(
   synthetic_methods_mapt &synthetic_methods,
-  const symbolt &interface_method_symbol,
+  const java_class_typet::methodt &method_to_implement,
   const irep_idt &synthetic_class_name)
 {
-  const std::string implemented_method_name = [&] {
-    std::string implemented_method_name =
-      id2string(interface_method_symbol.name);
-    const std::string &implemented_interface_tag_str =
-      id2string(interface_method_symbol.type.get(ID_C_class));
-    INVARIANT(
-      !implemented_interface_tag_str.empty(),
-      "implemented method's type must specify its declaring class");
-    INVARIANT(
-      has_prefix(implemented_method_name, implemented_interface_tag_str),
-      "method names should be prefixed by their defining type");
-    implemented_method_name.replace(
-      0,
-      implemented_interface_tag_str.length(),
-      id2string(synthetic_class_name));
-    return implemented_method_name;
-  }();
+  const std::string implemented_method_name =
+    id2string(synthetic_class_name) + "." +
+    id2string(method_to_implement.get_base_name()) + ":" +
+    id2string(method_to_implement.get_descriptor());
 
   symbolt implemented_method_symbol;
   implemented_method_symbol.name = implemented_method_name;
   synthetic_methods[implemented_method_symbol.name] =
     synthetic_method_typet::INVOKEDYNAMIC_METHOD;
   implemented_method_symbol.pretty_name = implemented_method_symbol.name;
-  implemented_method_symbol.base_name = interface_method_symbol.base_name;
+  implemented_method_symbol.base_name = method_to_implement.get_base_name();
   implemented_method_symbol.mode = ID_java;
-  implemented_method_symbol.type = interface_method_symbol.type;
+  implemented_method_symbol.type = method_to_implement.type();
   auto &implemented_method_type = to_code_type(implemented_method_symbol.type);
   implemented_method_type.parameters()[0].type() =
     java_reference_type(struct_tag_typet(synthetic_class_name));
@@ -398,13 +400,13 @@ void create_invokedynamic_synthetic_classes(
     }
     const auto &functional_interface_tag = to_struct_tag_type(
       to_java_reference_type(dynamic_method_type.return_type()).subtype());
-    const auto interface_method_id = ::interface_method_id(
+    const auto unimplemented_method = try_get_unique_unimplemented_method(
       symbol_table,
       functional_interface_tag,
       method_identifier,
       instruction.address,
       log);
-    if(!interface_method_id)
+    if(!unimplemented_method)
       continue;
     log.debug() << "identified invokedynamic at " << method_identifier
                 << " address " << instruction.address << " for lambda: "
@@ -415,9 +417,7 @@ void create_invokedynamic_synthetic_classes(
     symbol_table.add(constructor_symbol(
       synthetic_methods, synthetic_class_name, dynamic_method_type));
     symbol_table.add(implemented_method_symbol(
-      synthetic_methods,
-      symbol_table.lookup_ref(*interface_method_id),
-      synthetic_class_name));
+      synthetic_methods, *unimplemented_method, synthetic_class_name));
     symbol_table.add(synthetic_class_symbol(
       synthetic_class_name,
       *lambda_handle,

@@ -1,0 +1,17 @@
+CORE
+Test
+--function Test.main
+line 36 assertion at file Test\.java line 36 function java::Test\.main:\(\)V bytecode-index 22: SUCCESS
+line 37 assertion at file Test\.java line 37 function java::Test\.main:\(\)V bytecode-index 33: SUCCESS
+line 38 assertion at file Test\.java line 38 function java::Test\.main:\(\)V bytecode-index 44: SUCCESS
+line 39 assertion at file Test\.java line 39 function java::Test\.main:\(\)V bytecode-index 55: SUCCESS
+line 40 assertion at file Test\.java line 40 function java::Test\.main:\(\)V bytecode-index 66: SUCCESS
+line 41 assertion at file Test\.java line 41 function java::Test\.main:\(\)V bytecode-index 77: SUCCESS
+line 42 assertion at file Test\.java line 42 function java::Test\.main:\(\)V bytecode-index 83: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This checks that we support various versions of implementing methods that are inherited by multiple routes,
+whether by inheriting the same interface at more than one place in the class graph, or by implementing
+multiple interfaces that have methods with matching name and descriptors.
