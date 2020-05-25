@@ -109,7 +109,7 @@ void dep_graph_domaint::control_dependencies(
       const cfg_post_dominatorst::cfgt::nodet &m_s=
         pd.cfg[edge.first];
 
-      if(m_s.dominators.find(to)!=m_s.dominators.end())
+      if(pd.dominates(to, m_s))
         post_dom_one=true;
       else
         post_dom_all=false;
