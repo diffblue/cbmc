@@ -1,0 +1,15 @@
+CORE
+Test
+--function Test.main
+^VERIFICATION SUCCESSFUL$
+line 24 assertion at file Test\.java line 24 function java::Test\.main:\(\)V bytecode-index 30: SUCCESS
+line 25 assertion at file Test\.java line 25 function java::Test\.main:\(\)V bytecode-index 41: SUCCESS
+line 26 assertion at file Test\.java line 26 function java::Test\.main:\(\)V bytecode-index 52: SUCCESS
+line 27 assertion at file Test\.java line 27 function java::Test\.main:\(\)V bytecode-index 64: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This checks that the REF_invokeStatic, REF_invokeDynamic, REF_newInvokeSpecial and REF_invokeInterface method
+handles present in Test.class behave as intended. REF_invokeSpecial is used for the synthetic lambda methods
+(and private method calls), and is exercised in other lambda tests.

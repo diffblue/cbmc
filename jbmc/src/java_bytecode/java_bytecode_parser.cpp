@@ -54,8 +54,7 @@ private:
   using fieldt = java_bytecode_parse_treet::fieldt;
   using instructiont = java_bytecode_parse_treet::instructiont;
   using annotationt = java_bytecode_parse_treet::annotationt;
-  using method_handle_typet =
-    java_bytecode_parse_treet::classt::method_handle_typet;
+  using method_handle_typet = java_class_typet::method_handle_kindt;
   using lambda_method_handlet =
     java_bytecode_parse_treet::classt::lambda_method_handlet;
 
@@ -147,9 +146,7 @@ private:
     return narrow_cast<T>(result);
   }
 
-  void store_unknown_method_handle(
-    size_t bootstrap_method_index,
-    std::vector<u2> u2_values);
+  void store_unknown_method_handle(size_t bootstrap_method_index);
 };
 
 #define CONSTANT_Class                7
@@ -305,7 +302,7 @@ private:
 class method_handle_infot : public structured_pool_entryt
 {
 public:
-  /// Correspond to the different valid values for field reference_kind From
+  /// Correspond to the different valid values for field handle_kind From
   /// Java 8 spec 4.4.8
   /// (https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html)
   enum class method_handle_kindt
@@ -326,8 +323,13 @@ public:
   {
     PRECONDITION(entry.tag == CONSTANT_MethodHandle);
     PRECONDITION(entry.ref1 > 0 && entry.ref1 < 10); // Java 8 spec 4.4.8
-    reference_kind = static_cast<method_handle_kindt>(entry.ref1);
+    handle_kind = static_cast<method_handle_kindt>(entry.ref1);
     reference_index = entry.ref2;
+  }
+
+  method_handle_kindt get_handle_kind() const
+  {
+    return handle_kind;
   }
 
   base_ref_infot get_reference(const pool_entry_lookupt &pool_entry) const
@@ -335,7 +337,7 @@ public:
     const base_ref_infot ref_entry{pool_entry(reference_index)};
 
     // validate the correctness of the constant pool entry
-    switch(reference_kind)
+    switch(handle_kind)
     {
     case method_handle_kindt::REF_getField:
     case method_handle_kindt::REF_getStatic:
@@ -371,7 +373,7 @@ public:
   }
 
 private:
-  method_handle_kindt reference_kind;
+  method_handle_kindt handle_kind;
   u2 reference_index;
 };
 
@@ -1879,6 +1881,34 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
   }
 }
 
+/// Translate the lambda method reference kind in a class file into the kind
+/// of handling the method requires. invokestatic/special translate into direct
+/// method calls; invokevirtual/interface translate into virtual dispatch,
+/// newinvokespecial translates into a special instantiate-and-construct
+/// sequence. The field-manipulation reference kinds appear never to happen in
+/// reality and don't have syntax in the Java language.
+static java_class_typet::method_handle_kindt get_method_handle_type(
+  method_handle_infot::method_handle_kindt java_handle_kind)
+{
+  switch(java_handle_kind)
+  {
+  case method_handle_infot::method_handle_kindt::REF_newInvokeSpecial:
+    return java_class_typet::method_handle_kindt::LAMBDA_CONSTRUCTOR_HANDLE;
+  case method_handle_infot::method_handle_kindt::REF_invokeInterface:
+  case method_handle_infot::method_handle_kindt::REF_invokeVirtual:
+    return java_class_typet::method_handle_kindt::LAMBDA_VIRTUAL_METHOD_HANDLE;
+  case method_handle_infot::method_handle_kindt::REF_invokeStatic:
+  case method_handle_infot::method_handle_kindt::REF_invokeSpecial:
+    return java_class_typet::method_handle_kindt::LAMBDA_STATIC_METHOD_HANDLE;
+  case method_handle_infot::method_handle_kindt::REF_getField:
+  case method_handle_infot::method_handle_kindt::REF_getStatic:
+  case method_handle_infot::method_handle_kindt::REF_putField:
+  case method_handle_infot::method_handle_kindt::REF_putStatic:
+  default:
+    return java_class_typet::method_handle_kindt::UNKNOWN_HANDLE;
+  }
+}
+
 /// Read method handle pointed to from constant pool entry at index, return type
 /// of method handle and name if lambda function is found.
 /// \param entry: the constant pool entry of the methodhandle_info structure
@@ -1896,33 +1926,45 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   const name_and_type_infot &name_and_type =
     ref_entry.get_name_and_type(pool_entry_lambda);
 
-  std::string class_name = class_entry.get_name(pool_entry_lambda);
-  // replace '.' for '$' (inner classes)
-  std::replace(class_name.begin(), class_name.end(), '.', '$');
-  // replace '/' for '.' (package)
-  std::replace(class_name.begin(), class_name.end(), '/', '.');
-  const std::string method_ref =
-    class_name + "." + name_and_type.get_name(pool_entry_lambda) + ':' +
-    name_and_type.get_descriptor(pool_entry_lambda);
+  // The following lambda kinds specified in the JVMS (see for example
+  // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html#jvms-5.4.3.5
+  // but which aren't actually created by javac. Java has no syntax for a field-
+  // refernce like this, and even writing a stereotypical lambda like
+  // Producer<FieldType> = instance -> instance.field does not generate this
+  // kind of handle, but rather a synthetic method implementing the getfield
+  // operation.
+  // We don't implement a handle kind that can't be produced yet, but should
+  // they ever turn up this is where to fix them.
 
-  lambda_method_handlet lambda_method_handle;
-
-  if(has_prefix(name_and_type.get_name(pool_entry_lambda), "lambda$"))
+  if(
+    entry.get_handle_kind() ==
+      method_handle_infot::method_handle_kindt::REF_getField ||
+    entry.get_handle_kind() ==
+      method_handle_infot::method_handle_kindt::REF_putField ||
+    entry.get_handle_kind() ==
+      method_handle_infot::method_handle_kindt::REF_getStatic ||
+    entry.get_handle_kind() ==
+      method_handle_infot::method_handle_kindt::REF_putStatic)
   {
-    // names seem to be lambda$POSTFIX$NUM
-    // where POSTFIX is FUN for a function name in which the lambda is define
-    //                "static" when it is a static member of the class
-    //                "new" when it is a class variable, instantiated in <init>
-    lambda_method_handle.lambda_method_name =
-      name_and_type.get_name(pool_entry_lambda);
-    lambda_method_handle.lambda_method_ref = method_ref;
-    lambda_method_handle.handle_type =
-      method_handle_typet::LAMBDA_METHOD_HANDLE;
-
-    return lambda_method_handle;
+    return {};
   }
 
-  return {};
+  irep_idt class_name =
+    java_classname(class_entry.get_name(pool_entry_lambda)).get_identifier();
+
+  irep_idt method_name = name_and_type.get_name(pool_entry_lambda);
+  std::string descriptor = name_and_type.get_descriptor(pool_entry_lambda);
+  irep_idt mangled_method_name = id2string(method_name) + ":" + descriptor;
+  typet method_type = *java_type_from_string(descriptor);
+
+  method_handle_typet handle_type =
+    get_method_handle_type(entry.get_handle_kind());
+
+  class_method_descriptor_exprt method_descriptor{
+    method_type, mangled_method_name, class_name, method_name};
+  lambda_method_handlet lambda_method_handle{method_descriptor, handle_type};
+
+  return lambda_method_handle;
 }
 
 /// Read all entries of the `BootstrapMethods` attribute of a class file.
@@ -1979,7 +2021,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     // understand
     if(num_bootstrap_arguments < 3)
     {
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index);
       debug()
         << "format of BootstrapMethods entry not recognized: too few arguments"
         << eom;
@@ -2006,7 +2048,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
       debug() << "format of BootstrapMethods entry not recognized: extra "
                  "arguments of wrong type"
               << eom;
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index);
       continue;
     }
 
@@ -2023,7 +2065,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
       debug() << "format of BootstrapMethods entry not recognized: arguments "
                  "wrong type"
               << eom;
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index);
       continue;
     }
 
@@ -2036,7 +2078,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
       debug() << "format of BootstrapMethods entry not recognized: method "
                  "handle not recognised"
               << eom;
-      store_unknown_method_handle(bootstrap_method_index, std::move(u2_values));
+      store_unknown_method_handle(bootstrap_method_index);
       continue;
     }
 
@@ -2044,12 +2086,9 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     POSTCONDITION(
       lambda_method_handle->handle_type != method_handle_typet::UNKNOWN_HANDLE);
 
-    lambda_method_handle->interface_type =
-      pool_entry(interface_type_argument.ref1).s;
-    lambda_method_handle->method_type = pool_entry(method_type_argument.ref1).s;
-    lambda_method_handle->u2_values = std::move(u2_values);
     debug() << "lambda function reference "
-            << id2string(lambda_method_handle->lambda_method_name)
+            << id2string(lambda_method_handle->get_method_descriptor()
+                           .base_method_name())
             << " in class \"" << parse_tree.parsed_class.name << "\""
             << "\n  interface type is "
             << id2string(pool_entry(interface_type_argument.ref1).s)
@@ -2063,12 +2102,11 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
 /// Creates an unknown method handle and puts it into the parsed_class
 /// \param bootstrap_method_index: The current index in the bootstrap entry
 ///   table
-/// \param u2_values: The indices of the arguments for the call
 void java_bytecode_parsert::store_unknown_method_handle(
-  size_t bootstrap_method_index,
-  std::vector<u2> u2_values)
+  size_t bootstrap_method_index)
 {
-  const lambda_method_handlet lambda_method_handle(std::move(u2_values));
+  const lambda_method_handlet lambda_method_handle =
+    lambda_method_handlet::get_unknown_handle();
   parse_tree.parsed_class.add_method_handle(
     bootstrap_method_index, lambda_method_handle);
 }

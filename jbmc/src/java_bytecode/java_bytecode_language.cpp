@@ -1205,6 +1205,10 @@ void java_bytecode_languaget::convert_lazy_method(
 
 /// Notify ci_lazy_methods, if present, of any static function calls made by
 /// the given function body.
+/// Note only static function calls need to be reported -- virtual function
+/// calls are routinely found by searching the function body after conversion
+/// because we can only approximate the possible callees once all function
+/// bodies currently believed to be needed have been loaded.
 /// \param function_body: function body code
 /// \param needed_lazy_methods: optional ci_lazy_method_neededt interface. If
 ///   not set, this is a no-op; otherwise, its add_needed_method function will
@@ -1224,22 +1228,29 @@ static void notify_static_method_calls(
         const auto fn_call = expr_try_dynamic_cast<code_function_callt>(*it);
         if(!fn_call)
           continue;
-        // Only support non-virtual function calls for now, if string solver
-        // starts to introduce virtual function calls then we will need to
-        // duplicate the behavior of java_bytecode_convert_method where it
-        // handles the invokevirtual instruction
-        const symbol_exprt &fn_sym =
-          expr_dynamic_cast<symbol_exprt>(fn_call->function());
-        needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+        const symbol_exprt *fn_sym =
+          expr_try_dynamic_cast<symbol_exprt>(fn_call->function());
+        if(fn_sym)
+          needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
       }
       else if(
         it->id() == ID_side_effect &&
         to_side_effect_expr(*it).get_statement() == ID_function_call)
       {
         const auto &call_expr = to_side_effect_expr_function_call(*it);
-        const symbol_exprt &fn_sym =
-          expr_dynamic_cast<symbol_exprt>(call_expr.function());
-        needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+        const symbol_exprt *fn_sym =
+          expr_try_dynamic_cast<symbol_exprt>(call_expr.function());
+        if(fn_sym)
+        {
+          INVARIANT(
+            false,
+            "Java synthetic methods are not "
+            "expected to produce side_effect_expr_function_callt. If "
+            "that has changed, remove this invariant. Also note that "
+            "as of the time of writing remove_virtual_functions did "
+            "not support this form of function call.");
+          // needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
+        }
       }
     }
   }

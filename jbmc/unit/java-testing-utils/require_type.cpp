@@ -549,9 +549,10 @@ require_type::require_lambda_method_handles(
     lambda_method_handles.end(),
     expected_identifiers.begin(),
     [](
-      const irept &lambda_method_handle,
+      const java_class_typet::java_lambda_method_handlet &lambda_method_handle,
       const std::string &expected_identifier) { //NOLINT
-      return lambda_method_handle.id() == expected_identifier;
+      return lambda_method_handle.get_lambda_method_descriptor()
+               .get_identifier() == expected_identifier;
     }));
   return lambda_method_handles;
 }

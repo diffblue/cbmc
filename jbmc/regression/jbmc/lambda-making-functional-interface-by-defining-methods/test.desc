@@ -1,0 +1,16 @@
+CORE
+Test
+--function Test.main
+line 37 assertion at file Test\.java line 37 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 16: SUCCESS
+line 38 assertion at file Test\.java line 38 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 27: SUCCESS
+line 39 assertion at file Test\.java line 39 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 38: SUCCESS
+line 40 assertion at file Test\.java line 40 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 49: SUCCESS
+line 41 assertion at file Test\.java line 41 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 60: SUCCESS
+line 42 assertion at file Test\.java line 42 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 66: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This checks that we recognise functional interfaces created by taking an interface with two undefined methods 
+and then supplying a default definition of one of them, either directly or by inheritence.
+We also test the case where an interface has inherited a default but then makes it explicitly abstract again.

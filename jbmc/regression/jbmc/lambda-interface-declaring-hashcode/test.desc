@@ -1,0 +1,7 @@
+CORE
+Test
+--function Test.main
+^VERIFICATION SUCCESSFUL$
+line 7 assertion at file Test\.java line 7 function java::Test\.main:\(\)V bytecode-index 14: SUCCESS
+^EXIT=0$
+^SIGNAL=0$

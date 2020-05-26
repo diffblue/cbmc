@@ -58,9 +58,10 @@ SCENARIO(
           const std::string method_type = "()V";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -81,9 +82,10 @@ SCENARIO(
             "(ILjava/lang/Object;LDummyGeneric;)V";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -103,9 +105,10 @@ SCENARIO(
             "([I[Ljava/lang/Object;[LDummyGeneric;)V";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -123,9 +126,10 @@ SCENARIO(
           const std::string method_type = "()I";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -143,9 +147,10 @@ SCENARIO(
           const std::string method_type = "()Ljava/lang/Object;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -163,9 +168,10 @@ SCENARIO(
           const std::string method_type = "()LDummyGeneric;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -184,9 +190,10 @@ SCENARIO(
           const std::string method_type = "()[I";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -204,9 +211,10 @@ SCENARIO(
           const std::string method_type = "()[Ljava/lang/Object;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -224,9 +232,10 @@ SCENARIO(
           const std::string method_type = "()[LDummyGeneric;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -244,9 +253,10 @@ SCENARIO(
           const std::string method_type = "()I";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -277,9 +287,10 @@ SCENARIO(
           const std::string method_type = "()Ljava/lang/Object;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const auto lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -310,9 +321,10 @@ SCENARIO(
           const std::string method_type = "()LDummyGeneric;";
           const lambda_method_handlet &lambda_entry =
             require_parse_tree::require_lambda_entry_for_descriptor(
-              parsed_class, lambda_method_ref, method_type);
+              parsed_class, lambda_method_ref);
 
-          const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+          const irep_idt &lambda_impl_name =
+            lambda_entry.get_method_descriptor().base_method_name();
 
           const java_bytecode_parse_treet::methodt &lambda_method =
             require_parse_tree::require_method(parsed_class, lambda_impl_name);
@@ -369,9 +381,10 @@ SCENARIO(
             const std::string method_type = "()V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -392,9 +405,10 @@ SCENARIO(
               "(ILjava/lang/Object;LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -415,9 +429,10 @@ SCENARIO(
               "([I[Ljava/lang/Object;[LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -436,9 +451,10 @@ SCENARIO(
             const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -456,9 +472,10 @@ SCENARIO(
             const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -476,9 +493,10 @@ SCENARIO(
             const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -497,9 +515,10 @@ SCENARIO(
             const std::string method_type = "()[I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -517,9 +536,10 @@ SCENARIO(
             const std::string method_type = "()[Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -537,9 +557,10 @@ SCENARIO(
             const std::string method_type = "()[LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -558,9 +579,10 @@ SCENARIO(
             const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -590,9 +612,10 @@ SCENARIO(
             const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -620,9 +643,10 @@ SCENARIO(
             const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const java_bytecode_parse_treet::methodt &lambda_method =
               require_parse_tree::require_method(
@@ -678,9 +702,10 @@ SCENARIO(
             const std::string method_type = "()V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -701,9 +726,10 @@ SCENARIO(
               "(ILjava/lang/Object;LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -723,9 +749,10 @@ SCENARIO(
               "([I[Ljava/lang/Object;[LDummyGeneric;)V";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -744,9 +771,10 @@ SCENARIO(
             const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -764,9 +792,10 @@ SCENARIO(
             const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -784,9 +813,10 @@ SCENARIO(
             const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -805,9 +835,10 @@ SCENARIO(
             const std::string method_type = "()[I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -825,9 +856,10 @@ SCENARIO(
             const std::string method_type = "()[Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -845,9 +877,10 @@ SCENARIO(
             const std::string method_type = "()[LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -866,9 +899,10 @@ SCENARIO(
             const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -904,9 +938,10 @@ SCENARIO(
             const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -943,9 +978,10 @@ SCENARIO(
             const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const java_bytecode_parse_treet::methodt &lambda_method =
               require_parse_tree::require_method(
@@ -1020,9 +1056,10 @@ SCENARIO(
             const std::string method_type = "()I";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -1058,9 +1095,10 @@ SCENARIO(
             const std::string method_type = "()Ljava/lang/Object;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const auto lambda_method = require_parse_tree::require_method(
               parsed_class, lambda_impl_name);
@@ -1100,9 +1138,10 @@ SCENARIO(
             const std::string method_type = "()LDummyGeneric;";
             const lambda_method_handlet &lambda_entry =
               require_parse_tree::require_lambda_entry_for_descriptor(
-                parsed_class, lambda_method_ref, method_type);
+                parsed_class, lambda_method_ref);
 
-            const irep_idt &lambda_impl_name = lambda_entry.lambda_method_name;
+            const irep_idt &lambda_impl_name =
+              lambda_entry.get_method_descriptor().base_method_name();
 
             const java_bytecode_parse_treet::methodt &lambda_method =
               require_parse_tree::require_method(

@@ -283,6 +283,18 @@ public:
     {
       set(ID_is_native_method, is_native);
     }
+
+    /// Gets the method's descriptor -- the mangled form of its type
+    const irep_idt &get_descriptor() const
+    {
+      return get(ID_object_descriptor);
+    }
+
+    /// Sets the method's descriptor -- the mangled form of its type
+    void set_descriptor(const irep_idt &id)
+    {
+      set(ID_object_descriptor, id);
+    }
   };
 
   using methodst = std::vector<methodt>;
@@ -450,34 +462,79 @@ public:
     set(ID_interface, interface);
   }
 
-  // it may be better to introduce a class like
-  // class java_lambda_method_handlet : private irept
-  // {
-  //   java_lambda_method_handlet(const irep_idt &id) : irept(id)
-  //   {
-  //   }
-  //
-  //   const irep_idt &get_lambda_method_handle() const
-  //   {
-  //     return id();
-  //   }
-  // };
-  using java_lambda_method_handlest = irept::subt;
+  /// Indicates what sort of code should be synthesised for a lambda call:
+  enum class method_handle_kindt
+  {
+    /// Direct call to the given method
+    LAMBDA_STATIC_METHOD_HANDLE,
+    /// Virtual call to the given interface or method
+    LAMBDA_VIRTUAL_METHOD_HANDLE,
+    /// Instantiate the needed type then call a constructor
+    LAMBDA_CONSTRUCTOR_HANDLE,
+    /// Can't be called
+    UNKNOWN_HANDLE
+  };
+
+  /// Represents a lambda call to a method. We store the method being called in
+  /// the same class_method_descriptor_exprt as java_bytecode_convert_method
+  /// uses to translate virtual method calls to denote the method targeted, and
+  /// use method_handle_kindt above to indicate what kind of dispatch should be
+  /// used.
+  class java_lambda_method_handlet : public irept
+  {
+  public:
+    java_lambda_method_handlet(
+      const class_method_descriptor_exprt &method_descriptor,
+      method_handle_kindt handle_kind)
+    {
+      set(ID_object_descriptor, method_descriptor);
+      set(ID_handle_type, static_cast<int>(handle_kind));
+    }
+
+    java_lambda_method_handlet()
+    {
+      set(
+        ID_handle_type, static_cast<int>(method_handle_kindt::UNKNOWN_HANDLE));
+    }
+
+    const class_method_descriptor_exprt &get_lambda_method_descriptor() const
+    {
+      return static_cast<const class_method_descriptor_exprt &>(
+        find(ID_object_descriptor));
+    }
+
+    const irep_idt &get_lambda_method_identifier() const
+    {
+      return get_lambda_method_descriptor().get_identifier();
+    }
+
+    method_handle_kindt get_handle_kind() const
+    {
+      return (method_handle_kindt)get_int(ID_handle_type);
+    }
+  };
+
+  using java_lambda_method_handlest = std::vector<java_lambda_method_handlet>;
 
   const java_lambda_method_handlest &lambda_method_handles() const
   {
-    return find(ID_java_lambda_method_handles).get_sub();
+    return (const java_lambda_method_handlest &)find(
+             ID_java_lambda_method_handles)
+      .get_sub();
   }
 
   java_lambda_method_handlest &lambda_method_handles()
   {
-    return add(ID_java_lambda_method_handles).get_sub();
+    return (java_lambda_method_handlest &)add(ID_java_lambda_method_handles)
+      .get_sub();
   }
 
-  void add_lambda_method_handle(const irep_idt &identifier)
+  void add_lambda_method_handle(
+    const class_method_descriptor_exprt &method_descriptor,
+    method_handle_kindt handle_kind)
   {
     // creates a symbol_exprt for the identifier and pushes it in the vector
-    lambda_method_handles().emplace_back(identifier);
+    lambda_method_handles().emplace_back(method_descriptor, handle_kind);
   }
   void add_unknown_lambda_method_handle()
   {

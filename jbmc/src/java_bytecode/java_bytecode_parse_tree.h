@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 
 #include "bytecode_info.h"
+#include "java_types.h"
 
 struct java_bytecode_parse_treet
 {
@@ -224,38 +225,43 @@ struct java_bytecode_parse_treet
     irep_idt outer_class; // when no outer class is set, there is no outer class
     size_t enum_elements=0;
 
-    enum class method_handle_typet
-    {
-      LAMBDA_METHOD_HANDLE,
-      UNKNOWN_HANDLE
-    };
-
     typedef std::vector<u2> u2_valuest;
     struct lambda_method_handlet
     {
-      method_handle_typet handle_type = method_handle_typet::UNKNOWN_HANDLE;
-      irep_idt lambda_method_name;
-      irep_idt lambda_method_ref;
-      irep_idt interface_type;
-      irep_idt method_type;
-      u2_valuest u2_values;
-      lambda_method_handlet() = default;
+      java_class_typet::method_handle_kindt handle_type;
+      optionalt<class_method_descriptor_exprt> method_descriptor;
 
       /// Construct a lambda method handle with parameters \p params.
-      explicit lambda_method_handlet(const u2_valuest &params)
-        : u2_values(params)
+      lambda_method_handlet(
+        const class_method_descriptor_exprt &method_descriptor,
+        java_class_typet::method_handle_kindt handle_type)
+        : handle_type(handle_type), method_descriptor(method_descriptor)
+      {
+        PRECONDITION(
+          handle_type != java_class_typet::method_handle_kindt::UNKNOWN_HANDLE);
+      }
+
+      lambda_method_handlet()
+        : handle_type(java_class_typet::method_handle_kindt::UNKNOWN_HANDLE),
+          method_descriptor()
       {
       }
 
-      /// Construct a lambda method handle with parameters \p params.
-      explicit lambda_method_handlet(u2_valuest &&params)
-        : u2_values(std::move(params))
+      static lambda_method_handlet get_unknown_handle()
       {
+        return lambda_method_handlet{};
       }
 
       bool is_unknown_handle() const
       {
-        return handle_type == method_handle_typet::UNKNOWN_HANDLE;
+        return handle_type ==
+               java_class_typet::method_handle_kindt::UNKNOWN_HANDLE;
+      }
+
+      const class_method_descriptor_exprt &get_method_descriptor() const
+      {
+        PRECONDITION(!is_unknown_handle());
+        return *method_descriptor;
       }
     };
 

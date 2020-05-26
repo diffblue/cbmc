@@ -24,8 +24,7 @@ typedef java_bytecode_parse_treet::classt::lambda_method_handlet
 
 lambda_method_handlet require_lambda_entry_for_descriptor(
   const java_bytecode_parse_treet::classt &parsed_class,
-  const std::string &lambda_method_ref,
-  const std::string &method_type);
+  const std::string &lambda_method_ref);
 
 typedef java_bytecode_parse_treet::methodt methodt;
 

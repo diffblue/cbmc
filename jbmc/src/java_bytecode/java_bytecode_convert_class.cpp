@@ -426,7 +426,8 @@ void java_bytecode_convert_classt::convert(
     lambda_entry.second.is_unknown_handle()
       ? class_type.add_unknown_lambda_method_handle()
       : class_type.add_lambda_method_handle(
-          "java::" + id2string(lambda_entry.second.lambda_method_ref));
+          lambda_entry.second.get_method_descriptor(),
+          lambda_entry.second.handle_type);
   }
 
   // Load annotations
