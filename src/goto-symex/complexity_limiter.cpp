@@ -98,7 +98,7 @@ bool complexity_limitert::are_loop_children_too_complicated(
   // complicated, we make sure we don't execute it the other 17 times. But as
   // soon as we're running the loop again via a different context it gets a
   // chance to redeem itself.
-  optionalt<std::reference_wrapper<lexical_loopst::loopt>> loop_to_blacklist;
+  lexical_loopst::loopt *loop_to_blacklist = nullptr;
   for(auto frame_iter = current_call_stack.rbegin();
       frame_iter != current_call_stack.rend();
       ++frame_iter)
@@ -121,8 +121,7 @@ bool complexity_limitert::are_loop_children_too_complicated(
         sum_complexity += loop_info.children_too_complex;
         if(sum_complexity > max_loops_complexity)
         {
-          loop_to_blacklist =
-            std::reference_wrapper<lexical_loopst::loopt>(loop_info.loop);
+          loop_to_blacklist = &loop_info.loop;
         }
       }
     }

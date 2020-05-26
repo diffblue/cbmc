@@ -20,6 +20,7 @@ Date:   April 2017
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
 #include <util/refined_string_type.h>
 #include <util/std_code.h>
@@ -188,6 +189,17 @@ java_string_library_preprocesst::get_string_type_base_classes(
 
   std::vector<irep_idt> bases;
   bases.reserve(3);
+
+  // StringBuilder and StringBuffer derive from AbstractStringBuilder;
+  // other String types (String and CharSequence) derive directly from Object.
+  if(
+    class_name == "java.lang.StringBuilder" ||
+    class_name == "java.lang.StringBuffer")
+    bases.push_back("java.lang.AbstractStringBuilder");
+  else
+    bases.push_back("java.lang.Object");
+
+  // Interfaces:
   if(class_name != "java.lang.CharSequence")
   {
     bases.push_back("java.io.Serializable");
@@ -195,10 +207,6 @@ java_string_library_preprocesst::get_string_type_base_classes(
   }
   if(class_name == "java.lang.String")
     bases.push_back("java.lang.Comparable");
-
-  if(class_name == "java.lang.StringBuilder" ||
-     class_name == "java.lang.StringBuffer")
-    bases.push_back("java.lang.AbstractStringBuilder");
 
   return bases;
 }
@@ -209,36 +217,55 @@ java_string_library_preprocesst::get_string_type_base_classes(
 void java_string_library_preprocesst::add_string_type(
   const irep_idt &class_name, symbol_tablet &symbol_table)
 {
-  java_class_typet string_type;
-  string_type.set_tag(class_name);
-  string_type.set_name("java::" + id2string(class_name));
+  irep_idt class_symbol_name = "java::" + id2string(class_name);
+  symbolt tmp_string_symbol;
+  tmp_string_symbol.name = class_symbol_name;
+  symbolt *string_symbol = nullptr;
+  bool already_exists = symbol_table.move(tmp_string_symbol, string_symbol);
+
+  if(already_exists)
+  {
+    // A library has already defined this type -- we'll replace its
+    // components with those required for internal string modelling, but
+    // otherwise leave it alone.
+    to_java_class_type(string_symbol->type).components().clear();
+  }
+  else
+  {
+    // No definition of this type exists -- define it as it usually occurs in
+    // the JDK:
+    java_class_typet new_string_type;
+    new_string_type.set_tag(class_name);
+    new_string_type.set_name(class_symbol_name);
+    new_string_type.set_access(ID_public);
+
+    std::vector<irep_idt> bases = get_string_type_base_classes(class_name);
+    for(const irep_idt &base_name : bases)
+      new_string_type.add_base(
+        struct_tag_typet("java::" + id2string(base_name)));
+
+    string_symbol->base_name = id2string(class_name);
+    string_symbol->pretty_name = id2string(class_name);
+    string_symbol->type = new_string_type;
+    string_symbol->is_type = true;
+    string_symbol->mode = ID_java;
+  }
+
+  auto &string_type = to_java_class_type(string_symbol->type);
+
   string_type.components().resize(3);
-  string_type.components()[0].set_name("@java.lang.Object");
-  string_type.components()[0].set_pretty_name("@java.lang.Object");
-  string_type.components()[0].type() =
-    struct_tag_typet("java::java.lang.Object");
+  const struct_tag_typet &supertype = string_type.bases().front().type();
+  irep_idt supertype_component_name =
+    "@" + id2string(supertype.get_identifier()).substr(6);
+  string_type.components()[0].set_name(supertype_component_name);
+  string_type.components()[0].set_pretty_name(supertype_component_name);
+  string_type.components()[0].type() = supertype;
   string_type.components()[1].set_name("length");
   string_type.components()[1].set_pretty_name("length");
   string_type.components()[1].type()=string_length_type();
   string_type.components()[2].set_name("data");
   string_type.components()[2].set_pretty_name("data");
   string_type.components()[2].type() = pointer_type(java_char_type());
-  string_type.set_access(ID_public);
-  string_type.add_base(struct_tag_typet("java::java.lang.Object"));
-
-  std::vector<irep_idt> bases = get_string_type_base_classes(class_name);
-  for(const irep_idt &base_name : bases)
-    string_type.add_base(struct_tag_typet("java::" + id2string(base_name)));
-
-  symbolt tmp_string_symbol;
-  tmp_string_symbol.name="java::"+id2string(class_name);
-  symbolt *string_symbol=nullptr;
-  symbol_table.move(tmp_string_symbol, string_symbol);
-  string_symbol->base_name=id2string(class_name);
-  string_symbol->pretty_name=id2string(class_name);
-  string_symbol->type=string_type;
-  string_symbol->is_type=true;
-  string_symbol->mode = ID_java;
 }
 
 /// calls string_refine_preprocesst::process_operands with a list of parameters.
@@ -776,14 +803,15 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
 
   if(is_constructor)
   {
-    // A String has a field Object with @clsid = String
-    struct_tag_typet jlo_tag("java::java.lang.Object");
-    struct_exprt jlo_init({}, jlo_tag);
-    irep_idt clsid = get_tag(lhs.type().subtype());
+    // Initialise the supertype with the appropriate classid:
     namespacet ns(symbol_table);
-    java_root_class_init(jlo_init, ns.follow_tag(jlo_tag), clsid);
-
-    struct_exprt struct_rhs({jlo_init, rhs_length, rhs_array}, deref.type());
+    const struct_typet &lhs_type = to_struct_type(ns.follow(deref.type()));
+    auto zero_base_object = *zero_initializer(
+      lhs_type.components().front().type(), source_locationt{}, ns);
+    set_class_identifier(
+      to_struct_expr(zero_base_object), ns, to_struct_tag_type(deref.type()));
+    struct_exprt struct_rhs(
+      {zero_base_object, rhs_length, rhs_array}, deref.type());
     return code_assignt(checked_dereference(lhs), struct_rhs);
   }
   else

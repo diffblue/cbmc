@@ -43,6 +43,7 @@ SCENARIO(
 
     // Add java.lang.String to symbol table
     java_string_library_preprocesst preprocess;
+    preprocess.initialize_known_type_table();
     preprocess.add_string_type("java.lang.String", symbol_table);
     namespacet ns(symbol_table);
 
