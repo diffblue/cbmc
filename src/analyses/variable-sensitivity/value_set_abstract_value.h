@@ -16,11 +16,37 @@
 
 #include "abstract_value.h"
 
+#include <unordered_set>
+
 class value_set_abstract_valuet : public abstract_valuet
 {
 public:
+  using valuest = std::unordered_set<exprt, irep_hash>;
+
   explicit value_set_abstract_valuet(const typet &type);
+  value_set_abstract_valuet(
+    exprt expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
+  value_set_abstract_valuet(const typet &type, valuest values);
+
+  /// Get the possible values for this abstract object.
+  /// Only meaningful when this is neither TOP nor BOTTOM.
+  const valuest &get_values() const;
+
   CLONE
+
+  /// TODO arbitrary limit, make configurable
+  static constexpr std::size_t max_value_set_size = 10;
+
+protected:
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
+
+private:
+  /// If BOTTOM then empty.
+  /// If neither BOTTOM or TOP then the exact set of values.
+  /// If TOP this field doesn't mean anything and shouldn't be looked at.
+  valuest values;
 };
 
 // NOLINTNEXTLINE(whitespace/line_length)
