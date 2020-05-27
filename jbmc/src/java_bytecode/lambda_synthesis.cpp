@@ -616,7 +616,7 @@ static symbol_exprt instantiate_new_object(
 /// unchanged. \p role is a suggested name prefix for any temporary variable
 /// needed; \p function_id is the id of the function any created code it
 /// added to.
-exprt adjust_type_if_necessary(
+exprt box_or_unbox_type_if_necessary(
   exprt expr,
   const typet &required_type,
   code_blockt &code_block,
@@ -630,10 +630,7 @@ exprt adjust_type_if_necessary(
 
   if(original_is_pointer == required_is_pointer)
   {
-    if(original_is_pointer && original_type != required_type)
-      return typecast_exprt{expr, required_type};
-    else
-      return expr;
+    return expr;
   }
 
   // One is a pointer, the other a primitive -- box or unbox as necessary, and
@@ -647,9 +644,6 @@ exprt adjust_type_if_necessary(
       boxed_type_info != nullptr,
       "Only boxed primitive types should participate in a pointer vs."
       " primitive type disagreement");
-    INVARIANT(
-      required_type == boxed_type_info->corresponding_primitive_type,
-      "Boxed types are only convertable to their corresponding unboxed type");
 
     symbol_exprt fresh_local = create_and_declare_local(
       function_id, role + "_unboxed", required_type, symbol_table, code_block);
@@ -677,8 +671,25 @@ exprt adjust_type_if_necessary(
     code_block.add(code_function_callt{
       fresh_local, boxed_type_factory_method.symbol_expr(), {expr}});
 
-    return typecast_exprt::conditional_cast(fresh_local, required_type);
+    return std::move(fresh_local);
   }
+}
+
+/// Box or unbox expr as per \ref box_or_unbox_type_if_necessary, then cast the
+/// result to \p required_type. If the source is legal Java that should mean a
+/// pointer upcast or primitive widening conversion, but this is not checked.
+exprt adjust_type_if_necessary(
+  exprt expr,
+  const typet &required_type,
+  code_blockt &code_block,
+  symbol_table_baset &symbol_table,
+  const irep_idt &function_id,
+  const std::string &role)
+{
+  return typecast_exprt::conditional_cast(
+    box_or_unbox_type_if_necessary(
+      expr, required_type, code_block, symbol_table, function_id, role),
+    required_type);
 }
 
 /// Create the body for the synthetic method implementing an invokedynamic
