@@ -43,6 +43,17 @@ SCENARIO("add interval domain", "[core][analyses][interval][add]")
         REQUIRE(V(result.get_lower()) == 8);
         REQUIRE(V(result.get_upper()) == 12);
       }
+
+      AND_WHEN("Incrementing the interval")
+      {
+        const auto incremented = left.increment();
+
+        THEN("The result is correct")
+        {
+          REQUIRE(V(incremented.get_lower()) == 3);
+          REQUIRE(V(incremented.get_upper()) == 5);
+        }
+      }
     }
 
     WHEN("One contains infinite [2,4]+[6,INF]")
