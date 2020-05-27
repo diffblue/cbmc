@@ -21,11 +21,16 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
     constant_interval_exprt nine =
       constant_interval_exprt(from_integer(9, unsigned_int));
 
+    constant_interval_exprt five_to_nine(
+      from_integer(5, unsigned_int), from_integer(9, unsigned_int));
+
     THEN("Bitwise or should yield bitwise representation of 13")
     {
       REQUIRE(
         constant_interval_exprt::bitwise_or(five, nine) ==
         constant_interval_exprt(from_integer(13, unsigned_int)));
+
+      REQUIRE(constant_interval_exprt::bitwise_or(five_to_nine, nine).is_top());
     }
 
     THEN("Bitwise and should yield bitwise representation of 1")
@@ -36,6 +41,9 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
       REQUIRE(
         (five & nine) ==
         constant_interval_exprt(from_integer(1, unsigned_int)));
+
+      REQUIRE(
+        constant_interval_exprt::bitwise_and(five_to_nine, nine).is_top());
     }
 
     THEN("Bitwise xor should yield bitwise representation of 12")
@@ -43,6 +51,9 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
       REQUIRE(
         constant_interval_exprt::bitwise_xor(five, nine) ==
         constant_interval_exprt(from_integer(12, unsigned_int)));
+
+      REQUIRE(
+        constant_interval_exprt::bitwise_xor(five_to_nine, nine).is_top());
     }
   }
 }
