@@ -62,8 +62,12 @@ struct java_boxed_type_infot
 const java_boxed_type_infot *
 get_boxed_type_info_by_name(const irep_idt &type_name);
 
+/// Returns true iff the argument is the symbol-table identifier of a Java
+/// primitive wrapper type (for example, java::java.lang.Byte)
+bool is_primitive_wrapper_type_id(const irep_idt &id);
+
 /// Returns true iff the argument is the fully qualified name of a Java
-/// primitive wrapper type.
+/// primitive wrapper type (for example, java.lang.Byte)
 bool is_primitive_wrapper_type_name(const std::string &type_name);
 
 void generate_class_stub(

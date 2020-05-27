@@ -104,6 +104,11 @@ get_java_primitive_type_info(const typet &maybe_primitive_type)
   return found == type_info_by_primitive_type.end() ? nullptr : &found->second;
 }
 
+bool is_primitive_wrapper_type_id(const irep_idt &id)
+{
+  return get_boxed_type_info_by_name(id) != nullptr;
+}
+
 bool is_primitive_wrapper_type_name(const std::string &type_name)
 {
   static const std::unordered_set<std::string> primitive_wrapper_type_names = {
