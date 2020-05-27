@@ -1,0 +1,8 @@
+CORE
+BoxingWithOtherConversions
+--function BoxingWithOtherConversions.testBroadenReturnTypeToObject --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+\[java::BoxingWithOtherConversions\.testBroadenReturnTypeToObject:\(\)V.assertion\.1\] line 29 assertion at file BoxingWithOtherConversions\.java line 29 function java::BoxingWithOtherConversions\.testBroadenReturnTypeToObject:\(\)V bytecode-index 21: SUCCESS
+\[java::BoxingWithOtherConversions\.testBroadenReturnTypeToObject:\(\)V.assertion\.2\] line 30 assertion at file BoxingWithOtherConversions\.java line 30 function java::BoxingWithOtherConversions\.testBroadenReturnTypeToObject:\(\)V bytecode-index 33: SUCCESS
+\[java::BoxingWithOtherConversions\.testBroadenReturnTypeToObject:\(\)V.assertion\.3\] line 31 assertion at file BoxingWithOtherConversions\.java line 31 function java::BoxingWithOtherConversions\.testBroadenReturnTypeToObject:\(\)V bytecode-index 39: FAILURE

@@ -662,17 +662,12 @@ exprt adjust_type_if_necessary(
   }
   else
   {
-    const irep_idt &boxed_type_id =
-      to_struct_tag_type(required_type.subtype()).get_identifier();
     const auto *primitive_type_info =
       get_java_primitive_type_info(original_type);
     INVARIANT(
       primitive_type_info != nullptr,
       "A Java non-pointer type involved in a type disagreement should"
       " be a primitive");
-    INVARIANT(
-      boxed_type_id == primitive_type_info->boxed_type_name,
-      "Boxed types are only convertable to their corresponding unboxed type");
 
     symbol_exprt fresh_local = create_and_declare_local(
       function_id, role + "_boxed", required_type, symbol_table, code_block);
@@ -682,7 +677,7 @@ exprt adjust_type_if_necessary(
     code_block.add(code_function_callt{
       fresh_local, boxed_type_factory_method.symbol_expr(), {expr}});
 
-    return std::move(fresh_local);
+    return typecast_exprt::conditional_cast(fresh_local, required_type);
   }
 }
 
