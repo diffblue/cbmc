@@ -610,6 +610,82 @@ static symbol_exprt instantiate_new_object(
   return new_instance_var;
 }
 
+/// If \p expr needs (un)boxing to satisfy \p required_type, add the required
+/// symbols to \p symbol_table and code to \p code_block, then return an
+/// expression giving the adjusted expression. Otherwise return \p expr
+/// unchanged. \p role is a suggested name prefix for any temporary variable
+/// needed; \p function_id is the id of the function any created code it
+/// added to.
+exprt adjust_type_if_necessary(
+  exprt expr,
+  const typet &required_type,
+  code_blockt &code_block,
+  symbol_table_baset &symbol_table,
+  const irep_idt &function_id,
+  const std::string &role)
+{
+  const typet &original_type = expr.type();
+  const bool original_is_pointer = can_cast_type<pointer_typet>(original_type);
+  const bool required_is_pointer = can_cast_type<pointer_typet>(required_type);
+
+  if(original_is_pointer == required_is_pointer)
+  {
+    if(original_is_pointer && original_type != required_type)
+      return typecast_exprt{expr, required_type};
+    else
+      return expr;
+  }
+
+  // One is a pointer, the other a primitive -- box or unbox as necessary, and
+  // check the types are consistent:
+  if(original_is_pointer)
+  {
+    const irep_idt &boxed_type_id =
+      to_struct_tag_type(original_type.subtype()).get_identifier();
+    const auto *boxed_type_info = get_boxed_type_info_by_name(boxed_type_id);
+    INVARIANT(
+      boxed_type_info != nullptr,
+      "Only boxed primitive types should participate in a pointer vs."
+      " primitive type disagreement");
+    INVARIANT(
+      required_type == boxed_type_info->corresponding_primitive_type,
+      "Boxed types are only convertable to their corresponding unboxed type");
+
+    symbol_exprt fresh_local = create_and_declare_local(
+      function_id, role + "_unboxed", required_type, symbol_table, code_block);
+    const symbolt &unboxing_function_symbol =
+      symbol_table.lookup_ref(boxed_type_info->unboxing_function_name);
+    code_block.add(code_function_callt{
+      fresh_local, unboxing_function_symbol.symbol_expr(), {expr}});
+
+    return std::move(fresh_local);
+  }
+  else
+  {
+    const irep_idt &boxed_type_id =
+      to_struct_tag_type(required_type.subtype()).get_identifier();
+    const auto *primitive_type_info =
+      get_java_primitive_type_info(original_type);
+    INVARIANT(
+      primitive_type_info != nullptr,
+      "A Java non-pointer type involved in a type disagreement should"
+      " be a primitive");
+    INVARIANT(
+      boxed_type_id == primitive_type_info->boxed_type_name,
+      "Boxed types are only convertable to their corresponding unboxed type");
+
+    symbol_exprt fresh_local = create_and_declare_local(
+      function_id, role + "_boxed", required_type, symbol_table, code_block);
+    const symbolt &boxed_type_factory_method =
+      symbol_table.lookup_ref(primitive_type_info->boxed_type_factory_method);
+
+    code_block.add(code_function_callt{
+      fresh_local, boxed_type_factory_method.symbol_expr(), {expr}});
+
+    return std::move(fresh_local);
+  }
+}
+
 /// Create the body for the synthetic method implementing an invokedynamic
 /// method. For most lambdas this means creating a simple function body like
 /// TR new_synthetic_method(T1 param1, T2 param2, ...) {
@@ -642,7 +718,6 @@ codet invokedynamic_synthetic_method(
   const symbolt &function_symbol = ns.lookup(function_id);
   const auto &function_type = to_code_type(function_symbol.type);
   const auto &parameters = function_type.parameters();
-  const auto &return_type = function_type.return_type();
 
   const symbolt &class_symbol = ns.lookup(*declaring_class(function_symbol));
   const java_class_typet &class_type = to_java_class_type(class_symbol.type);
@@ -707,12 +782,37 @@ codet invokedynamic_synthetic_method(
   else
     callee = lambda_method_symbol.symbol_expr();
 
-  if(return_type != empty_typet() && !is_constructor_lambda)
+  // Adjust boxing if required:
+  const code_typet &callee_type = to_code_type(lambda_method_symbol.type);
+  const auto &callee_parameters = callee_type.parameters();
+  const auto &callee_return_type = callee_type.return_type();
+  INVARIANT(
+    callee_parameters.size() == lambda_method_args.size(),
+    "should have args for every parameter");
+  for(unsigned i = 0; i < callee_parameters.size(); ++i)
+  {
+    lambda_method_args[i] = adjust_type_if_necessary(
+      std::move(lambda_method_args[i]),
+      callee_parameters[i].type(),
+      result,
+      symbol_table,
+      function_id,
+      "param" + std::to_string(i));
+  }
+
+  if(callee_return_type != empty_typet() && !is_constructor_lambda)
   {
     symbol_exprt result_local = create_and_declare_local(
-      function_id, "return_value", return_type, symbol_table, result);
+      function_id, "return_value", callee_return_type, symbol_table, result);
     result.add(code_function_callt(result_local, callee, lambda_method_args));
-    result.add(code_returnt{result_local});
+    exprt adjusted_local = adjust_type_if_necessary(
+      result_local,
+      function_type.return_type(),
+      result,
+      symbol_table,
+      function_id,
+      "retval");
+    result.add(code_returnt{adjusted_local});
   }
   else
   {
@@ -722,8 +822,8 @@ codet invokedynamic_synthetic_method(
   if(is_constructor_lambda)
   {
     // Return the newly-created object.
-    result.add(code_returnt{
-      typecast_exprt::conditional_cast(lambda_method_args.at(0), return_type)});
+    result.add(code_returnt{typecast_exprt::conditional_cast(
+      lambda_method_args.at(0), function_type.return_type())});
   }
 
   return std::move(result);

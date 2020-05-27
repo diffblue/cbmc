@@ -32,6 +32,36 @@ bool java_is_array_type(const typet &type);
 /// and in particular may not have length and data fields.
 bool is_java_string_type(const struct_typet &struct_type);
 
+/// Return type for get_java_primitive_type_info
+struct java_primitive_type_infot
+{
+  /// Name, including java:: prefix, of the corresponding boxed type
+  const irep_idt boxed_type_name;
+  /// Full identifier of the boxed type's factory method that takes the
+  /// corresponding primitive as its sole argument
+  const irep_idt boxed_type_factory_method;
+};
+
+/// If \p primitive_type is a Java primitive type, return information about it,
+/// otherwise return null
+const java_primitive_type_infot *
+get_java_primitive_type_info(const typet &maybe_primitive_type);
+
+/// Return type for get_boxed_type_info_by_name
+struct java_boxed_type_infot
+{
+  /// Name of the function defined on the boxed type that returns the boxed
+  /// value
+  const irep_idt unboxing_function_name;
+  /// Primitive type that this boxed type contains
+  const typet corresponding_primitive_type;
+};
+
+/// If \p type_name is a Java boxed type tag, return information about it,
+/// otherwise return null
+const java_boxed_type_infot *
+get_boxed_type_info_by_name(const irep_idt &type_name);
+
 /// Returns true iff the argument is the fully qualified name of a Java
 /// primitive wrapper type.
 bool is_primitive_wrapper_type_name(const std::string &type_name);

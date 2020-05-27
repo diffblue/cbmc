@@ -38,6 +38,72 @@ bool is_java_string_type(const struct_typet &struct_type)
          struct_type.has_component("data");
 }
 
+const java_boxed_type_infot *
+get_boxed_type_info_by_name(const irep_idt &type_name)
+{
+  static std::unordered_map<irep_idt, java_boxed_type_infot> type_info_by_name =
+    {
+      {"java::java.lang.Boolean",
+       {"java::java.lang.Boolean.booleanValue:()Z", java_boolean_type()}},
+      {"java::java.lang.Byte",
+       {"java::java.lang.Byte.byteValue:()B", java_byte_type()}},
+      {"java::java.lang.Character",
+       {"java::java.lang.Character.charValue:()C", java_char_type()}},
+      {"java::java.lang.Double",
+       {"java::java.lang.Double.doubleValue:()D", java_double_type()}},
+      {"java::java.lang.Float",
+       {"java::java.lang.Float.floatValue:()F", java_float_type()}},
+      {"java::java.lang.Integer",
+       {"java::java.lang.Integer.intValue:()I", java_int_type()}},
+      {"java::java.lang.Long",
+       {"java::java.lang.Long.longValue:()J", java_long_type()}},
+      {"java::java.lang.Short",
+       {"java::java.lang.Short.shortValue:()S", java_short_type()}},
+    };
+
+  auto found = type_info_by_name.find(type_name);
+  return found == type_info_by_name.end() ? nullptr : &found->second;
+}
+
+const java_primitive_type_infot *
+get_java_primitive_type_info(const typet &maybe_primitive_type)
+{
+  static std::unordered_map<typet, java_primitive_type_infot, irep_hash>
+    type_info_by_primitive_type = {
+      {java_boolean_type(),
+       {"java::java.lang.Boolean",
+        "java::java.lang.Boolean.valueOf:(Z)Ljava/lang/Boolean;"}},
+      {java_byte_type(),
+       {"java::java.lang.Byte",
+        "java::java.lang.Byte.valueOf:(B)Ljava/lang/Byte;"}},
+      {java_char_type(),
+       {"java::java.lang.Character",
+        "java::java.lang.Character.valueOf:(C)"
+        "Ljava/lang/Character;"}},
+      {java_double_type(),
+       {"java::java.lang.Double",
+        "java::java.lang.Double.valueOf:(D)"
+        "Ljava/lang/Double;"}},
+      {java_float_type(),
+       {"java::java.lang.Float",
+        "java::java.lang.Float.valueOf:(F)"
+        "Ljava/lang/Float;"}},
+      {java_int_type(),
+       {"java::java.lang.Integer",
+        "java::java.lang.Integer.valueOf:(I)"
+        "Ljava/lang/Integer;"}},
+      {java_long_type(),
+       {"java::java.lang.Long",
+        "java::java.lang.Long.valueOf:(J)Ljava/lang/Long;"}},
+      {java_short_type(),
+       {"java::java.lang.Short",
+        "java::java.lang.Short.valueOf:(S)"
+        "Ljava/lang/Short;"}}};
+
+  auto found = type_info_by_primitive_type.find(maybe_primitive_type);
+  return found == type_info_by_primitive_type.end() ? nullptr : &found->second;
+}
+
 bool is_primitive_wrapper_type_name(const std::string &type_name)
 {
   static const std::unordered_set<std::string> primitive_wrapper_type_names = {
