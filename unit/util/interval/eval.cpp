@@ -98,15 +98,8 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
 
     THEN("When we apply bitwise negation to it, is should be bitwise negated")
     {
-      auto bitwise_negated_val =
-        numeric_cast<mp_integer>(five_to_eight.eval(ID_bitnot).get_lower());
-      REQUIRE(bitwise_negated_val.has_value());
-      REQUIRE(bitwise_negated_val.value() == (-9 /* ~5 */));
-
-      auto upper_value =
-        numeric_cast<mp_integer>(five_to_eight.eval(ID_bitnot).get_upper());
-      REQUIRE(bitwise_negated_val.has_value());
-      REQUIRE(bitwise_negated_val.value() == (-6 /* ~8 */));
+      // For intervals, bitwise not returns top
+      REQUIRE(five_to_eight.eval(ID_bitnot).is_top());
     }
   }
 }
