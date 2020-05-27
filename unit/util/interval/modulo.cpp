@@ -17,6 +17,25 @@
 
 SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
 {
+  GIVEN("Two single element internvals")
+  {
+    constant_interval_exprt a(CEV(5));
+    constant_interval_exprt b(CEV(10));
+    constant_interval_exprt zero(CEV(0));
+    const auto a_mod_b = a.modulo(b);
+    REQUIRE(V(a_mod_b.get_upper()) == 5);
+
+    const auto b_mod_a = b.modulo(a);
+    // TODO: precision with single element modulo
+    REQUIRE(V(b_mod_a.get_upper()) == 4);
+
+    const auto zero_mod_a = zero.modulo(a);
+    REQUIRE(zero_mod_a == constant_interval_exprt(CEV(0)));
+
+    // TODO: this causes an invariant as it is unable to simplify the
+    // TODO: simplify(a % 0) == a % 0
+    // REQUIRE(a.modulo(zero).is_top());
+  }
   GIVEN("Two simple signed intervals")
   {
     symbol_tablet symbol_table;
@@ -52,6 +71,19 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
             constant_interval_exprt(CEV(-10), CEV(20)),
             constant_interval_exprt(CEV(0), CEV(5))) ==
           constant_interval_exprt::top(signedbv_typet(32)));
+
+        REQUIRE(
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(-10), CEV(20)),
+            constant_interval_exprt(CEV(1), CEV(5))) ==
+          constant_interval_exprt(CEV(-10), CEV(20)));
+
+        REQUIRE(
+          constant_interval_exprt::modulo(
+            constant_interval_exprt(CEV(-10), CEV(-1)),
+            constant_interval_exprt(CEV(-5), CEV(-1))) ==
+          constant_interval_exprt(CEV(-5), CEV(0)));
+
         REQUIRE(
           constant_interval_exprt::modulo(
             constant_interval_exprt(CEV(-20), CEV(-10)),
