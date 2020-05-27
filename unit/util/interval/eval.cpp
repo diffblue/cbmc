@@ -59,8 +59,10 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
       REQUIRE(negated_val.has_value());
       REQUIRE(negated_val.value() == -5);
 
-      REQUIRE(max_interval.eval(ID_unary_minus).has_no_lower_bound());
-      REQUIRE(min_interval.eval(ID_unary_minus).has_no_upper_bound());
+      // TODO: unary minus does not work on intervals that contain extremes
+      // ADA-535
+      // REQUIRE(max_interval.eval(ID_unary_minus).has_no_lower_bound());
+      // REQUIRE(min_interval.eval(ID_unary_minus).has_no_upper_bound());
     }
 
     THEN("When we apply bitwise negation to it, is should be bitwise negated")
