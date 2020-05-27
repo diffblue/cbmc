@@ -31,7 +31,7 @@ static bool is_volatile(const namespacet &ns, const typet &src)
   return false;
 }
 
-void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
+static void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
 {
   Forall_operands(it, expr)
     nondet_volatile_rhs(symbol_table, *it);
@@ -52,7 +52,7 @@ void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
   }
 }
 
-void nondet_volatile_lhs(const symbol_tablet &symbol_table, exprt &expr)
+static void nondet_volatile_lhs(const symbol_tablet &symbol_table, exprt &expr)
 {
   if(expr.id()==ID_if)
   {
@@ -75,9 +75,8 @@ void nondet_volatile_lhs(const symbol_tablet &symbol_table, exprt &expr)
   }
 }
 
-void nondet_volatile(
-  symbol_tablet &symbol_table,
-  goto_programt &goto_program)
+static void
+nondet_volatile(symbol_tablet &symbol_table, goto_programt &goto_program)
 {
   namespacet ns(symbol_table);
 
@@ -88,7 +87,7 @@ void nondet_volatile(
     if(instruction.is_assign())
     {
       nondet_volatile_rhs(symbol_table, to_code_assign(instruction.code).rhs());
-      nondet_volatile_lhs(symbol_table, to_code_assign(instruction.code).rhs());
+      nondet_volatile_lhs(symbol_table, to_code_assign(instruction.code).lhs());
     }
     else if(instruction.is_function_call())
     {
