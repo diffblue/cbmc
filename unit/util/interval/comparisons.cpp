@@ -237,3 +237,32 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
     }
   }
 }
+
+TEST_CASE("interval::equality", "[core][analyses][interval]")
+{
+  SECTION("Single element intervals")
+  {
+    constant_interval_exprt two(CEV(2));
+    constant_interval_exprt four(CEV(4));
+
+    REQUIRE_FALSE(two.equal(four).is_true());
+    REQUIRE(two.equal(two).is_true());
+
+    REQUIRE(two.not_equal(four).is_true());
+    REQUIRE_FALSE(two.not_equal(two).is_true());
+  }
+  SECTION("Proper intervals")
+  {
+    constant_interval_exprt two_to_four(CEV(2), CEV(4));
+    constant_interval_exprt six_to_eight(CEV(6), CEV(8));
+    constant_interval_exprt five_to_ten(CEV(5), CEV(10));
+
+    // TODO: wrongly concludes that these are unequal
+    // ADA-537
+    // REQUIRE(two_to_four.equal(six_to_eight).is_unknown());
+    REQUIRE_FALSE(two_to_four.equal(five_to_ten).is_true());
+
+    REQUIRE_FALSE(two_to_four.not_equal(six_to_eight).is_unknown());
+    REQUIRE(two_to_four.not_equal(five_to_ten).is_true());
+  }
+}
