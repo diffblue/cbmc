@@ -120,6 +120,8 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         REQUIRE_FALSE(
           constant_interval_exprt(CEV(10), CEV(20)) >
           constant_interval_exprt(CEV(30), CEV(40)));
+        REQUIRE(
+          constant_interval_exprt(CEV(10)) < constant_interval_exprt(CEV(30)));
       }
 
       THEN(
@@ -184,6 +186,9 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
           constant_interval_exprt(CEV(10), CEV(31))
             .less_than_or_equal(constant_interval_exprt(CEV(30), CEV(40))) ==
           tvt::unknown());
+        CHECK(constant_interval_exprt(CEV(10))
+                .less_than_or_equal(constant_interval_exprt(CEV(30)))
+                .is_true());
       }
 
       THEN(
