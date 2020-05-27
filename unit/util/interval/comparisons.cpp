@@ -208,6 +208,32 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
             .greater_than_or_equal(constant_interval_exprt(CEV(30), CEV(40))) ==
           tvt::unknown());
       }
+      THEN("Intervals for truthyness")
+      {
+        constant_interval_exprt spans_zero(CEV(-1), CEV(1));
+        REQUIRE(spans_zero.is_definitely_true().is_unknown());
+        REQUIRE(spans_zero.is_definitely_false().is_unknown());
+
+        constant_interval_exprt includes_zero_positive(CEV(0), CEV(1));
+        REQUIRE(includes_zero_positive.is_definitely_true().is_unknown());
+        REQUIRE(includes_zero_positive.is_definitely_false().is_unknown());
+
+        constant_interval_exprt includes_zero_negative(CEV(-1), CEV(9));
+        REQUIRE(includes_zero_negative.is_definitely_true().is_unknown());
+        REQUIRE(includes_zero_negative.is_definitely_false().is_unknown());
+
+        constant_interval_exprt zero(CEV(0));
+        REQUIRE(zero.is_definitely_false().is_true());
+        REQUIRE(zero.is_definitely_true().is_false());
+
+        constant_interval_exprt positive_interval(CEV(1), CEV(5));
+        REQUIRE(positive_interval.is_definitely_true().is_true());
+        REQUIRE(positive_interval.is_definitely_false().is_false());
+
+        constant_interval_exprt negative_interval(CEV(-5), CEV(-1));
+        REQUIRE(negative_interval.is_definitely_true().is_true());
+        REQUIRE(negative_interval.is_definitely_false().is_false());
+      }
     }
   }
 }
