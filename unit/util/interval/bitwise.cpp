@@ -44,21 +44,5 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
         constant_interval_exprt::bitwise_xor(five, nine) ==
         constant_interval_exprt(from_integer(12, unsigned_int)));
     }
-
-    THEN("Left shift on the 5 should produce 10")
-    {
-      REQUIRE(
-        constant_interval_exprt::left_shift(
-          five, constant_interval_exprt(from_integer(1, unsigned_int))) ==
-        constant_interval_exprt(from_integer(10, unsigned_int)));
-    }
-
-    THEN("Right shift on the 5 should produce 2")
-    {
-      REQUIRE(
-        constant_interval_exprt::right_shift(
-          five, constant_interval_exprt(from_integer(1, unsigned_int))) ==
-        constant_interval_exprt(from_integer(2, unsigned_int)));
-    }
   }
 }
