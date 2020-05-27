@@ -48,8 +48,8 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
     THEN("When we apply unary addition to it, nothing should happen")
     {
       REQUIRE(five.eval(ID_unary_plus) == five);
-      REQUIRE(min_interval.eval(ID_unary_minus).has_no_lower_bound());
-      REQUIRE(max_interval.eval(ID_unary_minus).has_no_upper_bound());
+      REQUIRE(min_interval.eval(ID_unary_plus).has_no_lower_bound());
+      REQUIRE(max_interval.eval(ID_unary_plus).has_no_upper_bound());
     }
 
     THEN("When we apply unary subtraction to it, it should be negated")
@@ -91,7 +91,7 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
       auto upper_value = numeric_cast<mp_integer>(
         five_to_eight.eval(ID_unary_minus).get_upper());
       REQUIRE(upper_value.has_value());
-      REQUIRE(upper_value.value() == -8);
+      REQUIRE(upper_value.value() == -5);
     }
 
     THEN("When we apply bitwise negation to it, is should be bitwise negated")
