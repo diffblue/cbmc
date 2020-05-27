@@ -88,7 +88,7 @@ void nondet_volatile(
     if(instruction.is_assign())
     {
       nondet_volatile_rhs(symbol_table, to_code_assign(instruction.code).rhs());
-      nondet_volatile_lhs(symbol_table, to_code_assign(instruction.code).rhs());
+      nondet_volatile_lhs(symbol_table, to_code_assign(instruction.code).lhs());
     }
     else if(instruction.is_function_call())
     {

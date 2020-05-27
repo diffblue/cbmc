@@ -1,0 +1,9 @@
+CORE
+test.c
+--nondet-volatile
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Check that volatile variables appearing in the lhs of an assignment are
+correctly treated as nondet
