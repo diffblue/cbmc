@@ -806,7 +806,7 @@ codet invokedynamic_synthetic_method(
       "param" + std::to_string(i));
   }
 
-  if(callee_return_type != empty_typet() && !is_constructor_lambda)
+  if(function_type.return_type() != empty_typet() && !is_constructor_lambda)
   {
     symbol_exprt result_local = create_and_declare_local(
       function_id, "return_value", callee_return_type, symbol_table, result);

@@ -1,0 +1,9 @@
+CORE
+Test
+--function Test.test --classpath `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+\[java::Test\.test:\(\)V\.assertion\.1\] line 17 assertion at file Test\.java line 17 function java::Test\.test:\(\)V bytecode-index 22: SUCCESS
+\[java::Test\.test:\(\)V\.assertion\.2\] line 21 assertion at file Test\.java line 21 function java::Test\.test:\(\)V bytecode-index 41: SUCCESS
+\[java::Test\.test:\(\)V\.assertion\.3\] line 25 assertion at file Test\.java line 25 function java::Test\.test:\(\)V bytecode-index 60: SUCCESS
+\[java::Test\.test:\(\)V\.assertion\.4\] line 27 assertion at file Test\.java line 27 function java::Test\.test:\(\)V bytecode-index 66: FAILURE
