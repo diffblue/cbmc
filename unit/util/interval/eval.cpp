@@ -103,3 +103,62 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
     }
   }
 }
+
+TEST_CASE("binary eval switch", "[core][analyses][interval]")
+{
+  const auto interval_of = [](const int value) {
+    return constant_interval_exprt(from_integer(value, signedbv_typet(32)));
+  };
+
+  const auto interval_from_to = [](const int lower, const int upper) {
+    return constant_interval_exprt(
+      from_integer(lower, signedbv_typet(32)),
+      from_integer(upper, signedbv_typet(32)));
+  };
+
+  const auto boolean_interval = [](const bool value) {
+    return constant_interval_exprt::tvt_to_interval(tvt(value));
+  };
+
+  constant_interval_exprt two = interval_of(2);
+  constant_interval_exprt five = interval_of(5);
+  constant_interval_exprt eight = interval_of(8);
+
+  SECTION("Numeric operations")
+  {
+    REQUIRE(five.eval(ID_plus, eight) == interval_of(13));
+    REQUIRE(five.eval(ID_minus, eight) == interval_of(-3));
+    REQUIRE(five.eval(ID_mult, eight) == interval_of(40));
+    REQUIRE(five.eval(ID_div, eight) == interval_of(0));
+    REQUIRE(five.eval(ID_mod, eight) == interval_from_to(0, 5));
+    REQUIRE(five.eval(ID_shl, two) == interval_of(20 /* 5 << 2 */));
+    REQUIRE(five.eval(ID_ashr, two) == interval_of(1 /* 5 >> 2 */));
+    REQUIRE(five.eval(ID_bitor, eight) == interval_of(13));
+    REQUIRE(five.eval(ID_bitand, eight) == interval_of(0));
+    REQUIRE(five.eval(ID_bitxor, two) == interval_of(7));
+  }
+  SECTION("Comparisons")
+  {
+    REQUIRE(five.eval(ID_lt, eight) == boolean_interval(true));
+    REQUIRE(five.eval(ID_le, eight) == boolean_interval(true));
+    REQUIRE(five.eval(ID_gt, eight) == boolean_interval(false));
+    REQUIRE(five.eval(ID_ge, eight) == boolean_interval(false));
+    REQUIRE(five.eval(ID_equal, eight) == boolean_interval(false));
+    REQUIRE(five.eval(ID_notequal, eight) == boolean_interval(true));
+  }
+  SECTION("Logical operators")
+  {
+    const auto true_interval = boolean_interval(true);
+    const auto false_interval = boolean_interval(false);
+    REQUIRE(
+      true_interval.eval(ID_and, false_interval) == boolean_interval(false));
+    REQUIRE(
+      true_interval.eval(ID_or, false_interval) == boolean_interval(true));
+    REQUIRE(
+      true_interval.eval(ID_xor, false_interval) == boolean_interval(true));
+  }
+  SECTION("Invalid operations")
+  {
+    REQUIRE(five.eval(ID_type, eight).is_top());
+  }
+}
