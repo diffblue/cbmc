@@ -87,6 +87,7 @@ SRC += analyses/ai/ai.cpp \
        util/interval/multiply.cpp \
        util/interval/shift.cpp \
        util/interval/subtract.cpp \
+       util/interval/to_string.cpp \
        util/interval_constraint.cpp \
        util/interval_union.cpp \
        util/irep.cpp \
