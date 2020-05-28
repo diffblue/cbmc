@@ -10,8 +10,11 @@
 
 #include <ansi-c/expr2c.h>
 
-value_set_abstract_valuet::value_set_abstract_valuet(const typet &type)
-  : abstract_valuet{type}, values{}
+value_set_abstract_valuet::value_set_abstract_valuet(
+  const typet &type,
+  bool top,
+  bool bottom)
+  : abstract_valuet{type, top, bottom}, values{}
 {
 }
 
@@ -77,6 +80,18 @@ value_set_abstract_valuet::value_set_abstract_valuet(
   const namespacet &ns)
   : value_set_abstract_valuet{expr.type(), valuest{expr}}
 {
+}
+
+exprt value_set_abstract_valuet::to_constant() const
+{
+  if(!is_top() && !is_bottom() && values.size() == 1)
+  {
+    return *values.begin();
+  }
+  else
+  {
+    return nil_exprt{};
+  }
 }
 
 void value_set_abstract_valuet::output(

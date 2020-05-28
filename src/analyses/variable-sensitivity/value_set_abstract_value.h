@@ -23,7 +23,10 @@ class value_set_abstract_valuet : public abstract_valuet
 public:
   using valuest = std::unordered_set<exprt, irep_hash>;
 
-  explicit value_set_abstract_valuet(const typet &type);
+  explicit value_set_abstract_valuet(
+    const typet &type,
+    bool top = true,
+    bool bottom = false);
   value_set_abstract_valuet(
     exprt expr,
     const abstract_environmentt &environment,
@@ -38,6 +41,8 @@ public:
 
   /// TODO arbitrary limit, make configurable
   static constexpr std::size_t max_value_set_size = 10;
+
+  exprt to_constant() const override;
 
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;

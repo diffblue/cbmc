@@ -110,7 +110,8 @@ TEST_CASE(
   VALUE_SET_TEST_TAGS)
 {
   auto const type = signedbv_typet{32};
-  auto const value_set = value_set_abstract_valuet{type, {}};
+  auto const value_set =
+    value_set_abstract_valuet{type, value_set_abstract_valuet::valuest{}};
   REQUIRE(!value_set.is_top());
   REQUIRE(value_set.is_bottom());
 }
@@ -251,7 +252,8 @@ TEST_CASE(
   VALUE_SET_TEST_TAGS)
 {
   auto const type = signedbv_typet{32};
-  auto const value_set = value_set_abstract_valuet{type, {}};
+  auto const value_set =
+    value_set_abstract_valuet{type, value_set_abstract_valuet::valuest{}};
 
   std::stringstream ss;
   value_set.output(
@@ -310,4 +312,50 @@ TEST_CASE(
   value_set.output(
     ss, ait<variable_sensitivity_domaint>{}, namespacet{symbol_tablet{}});
   REQUIRE(ss.str() == "TOP");
+}
+
+TEST_CASE(
+  "Value set abstract value that is TOP can not be turned into a constant",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto const value_set = value_set_abstract_valuet{type};
+
+  REQUIRE(value_set.to_constant() == nil_exprt{});
+}
+
+TEST_CASE(
+  "Value set abstract value that is bottom can not be turned into a constant",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto const value_set =
+    value_set_abstract_valuet{type, value_set_abstract_valuet::valuest{}};
+
+  REQUIRE(value_set.to_constant() == nil_exprt{});
+}
+
+TEST_CASE(
+  "Value set with multiple possible values can not be turned into a constant",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto values = value_set_abstract_valuet::valuest{};
+  values.insert(from_integer(0, type));
+  values.insert(from_integer(1, type));
+  auto const value_set = value_set_abstract_valuet{type, values};
+
+  REQUIRE(value_set.to_constant() == nil_exprt{});
+}
+
+TEST_CASE(
+  "Value set with exactly one possible value can be turned into a constant",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto const value = from_integer(0, type);
+  auto const value_set =
+    value_set_abstract_valuet{type, value_set_abstract_valuet::valuest{value}};
+
+  REQUIRE(value_set.to_constant() == value);
 }
