@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 first,second,string_size,prefix --harness-type initialise-with-memory-snapshot --initial-goto-location main:4 --havoc-variables prefix --size-of-array prefix:prefix_size --max-array-size 5
 ^SIGNAL=0$
@@ -6,3 +6,5 @@ first,second,string_size,prefix --harness-type initialise-with-memory-snapshot -
 VERIFICATION SUCCESSFUL
 --
 unwinding assertion loop \d+: FAILURE
+--
+For more information take a look at github#5351

@@ -9,23 +9,56 @@ Author: Diffblue Ltd.
 #include "goto_harness_parse_options.h"
 
 #include <cstddef>
+#include <fstream>
 #include <set>
 #include <string>
+#include <unordered_set>
 #include <utility>
 
+#include <goto-instrument/dump_c.h>
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
+#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/write_goto_binary.h>
+#include <langapi/mode.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
+#include <util/expr_iterator.h>
 #include <util/invariant.h>
 #include <util/version.h>
 
 #include "function_call_harness_generator.h"
 #include "goto_harness_generator_factory.h"
 #include "memory_snapshot_harness_generator.h"
+
+std::unordered_set<irep_idt>
+get_symbol_names_from_goto_model(const goto_modelt &goto_model)
+{
+  auto symbols = std::unordered_set<irep_idt>{};
+  std::transform(
+    goto_model.get_symbol_table().begin(),
+    goto_model.get_symbol_table().end(),
+    std::inserter(symbols, symbols.end()),
+    [](const std::pair<const irep_idt, symbolt> &key_value_pair) {
+      return key_value_pair.first;
+    });
+  return symbols;
+}
+
+static void filter_goto_model(
+  goto_modelt &goto_model_with_harness,
+  const std::unordered_set<irep_idt> &goto_model_without_harness_symbols)
+{
+  for(auto &symbol : goto_model_with_harness.get_symbol_table())
+  {
+    if(
+      goto_model_without_harness_symbols.count(symbol.first) == 1 &&
+      symbol.second.is_function())
+      goto_model_with_harness.unload(symbol.first);
+  }
+}
 
 // The basic idea is that this module is handling the following
 // sequence of events:
@@ -62,6 +95,8 @@ int goto_harness_parse_optionst::doit()
                                      got_harness_config.in_file + "'"};
   }
   auto goto_model = std::move(read_goto_binary_result.value());
+  auto const goto_model_without_harness_symbols =
+    get_symbol_names_from_goto_model(goto_model);
 
   // This has to be called after the defaults are set up (as per the
   // config.set(cmdline) above) otherwise, e.g. the architecture specification
@@ -87,13 +122,15 @@ int goto_harness_parse_optionst::doit()
   harness_generator->generate(
     goto_model, got_harness_config.harness_function_name);
 
-  // Write end result to new goto-binary
-  if(write_goto_binary(
-       got_harness_config.out_file, goto_model, ui_message_handler))
-  {
-    throw system_exceptiont{"failed to write goto program from file '" +
-                            got_harness_config.out_file + "'"};
-  }
+  filter_goto_model(goto_model, goto_model_without_harness_symbols);
+  auto harness_out = std::ofstream{got_harness_config.out_file};
+  dump_c(
+    goto_model.goto_functions,
+    true,
+    true,
+    false,
+    namespacet{goto_model.get_symbol_table()},
+    harness_out);
 
   return CPROVER_EXIT_SUCCESS;
 }

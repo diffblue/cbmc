@@ -281,7 +281,7 @@ void function_call_harness_generatort::implt::generate_nondet_globals(
     for(const auto &symbol_table_entry : *symbol_table)
     {
       const auto &symbol = symbol_table_entry.second;
-      if(recursive_initialization->is_initialization_allowed(symbol))
+      if(recursive_initializationt::is_initialization_allowed(symbol))
       {
         globals.push_back(symbol.symbol_expr());
       }
@@ -478,7 +478,7 @@ function_call_harness_generatort::implt::declare_arguments(
   for(const auto &parameter : parameters)
   {
     auto argument = allocate_objects.allocate_automatic_local_object(
-      parameter.type(), parameter.get_base_name());
+      remove_const(parameter.type()), parameter.get_base_name());
     parameter_name_to_argument_name.insert(
       {parameter.get_base_name(), argument.get_identifier()});
     arguments.push_back(argument);

@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 x,p1,p2 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=0$
@@ -10,3 +10,5 @@ x,p1,p2 --harness-type initialise-with-memory-snapshot --initial-goto-location m
 \[main.assertion.5\] line [0-9]+ assertion \*\*p2 == x: SUCCESS
 --
 ^warning: ignoring
+--
+For more information take a look at github#5351

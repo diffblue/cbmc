@@ -22,6 +22,7 @@ Author: Diffblue Ltd.
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator.h"
 
+#define GOTO_HARNESS_PREFIX "__GOTO_HARNESS"
 struct recursive_initialization_configt
 {
   std::size_t min_null_tree_depth = 1;
@@ -102,12 +103,14 @@ public:
   /// \return the symbol expression for the `free` function
   symbol_exprt get_free_function();
 
-  bool is_initialization_allowed(const symbolt &symbol)
+  static bool is_initialization_allowed(const symbolt &symbol)
   {
+    auto const symbol_name = id2string(symbol.name);
     return (
       symbol.is_static_lifetime && symbol.is_lvalue &&
-      symbol.type.id() != ID_code &&
-      !has_prefix(id2string(symbol.name), CPROVER_PREFIX));
+      !symbol.type.get_bool(ID_C_constant) && symbol.type.id() != ID_code &&
+      !has_prefix(symbol_name, CPROVER_PREFIX) &&
+      !has_prefix(symbol_name, GOTO_HARNESS_PREFIX));
   }
 
   bool needs_freeing(const exprt &expr) const;
@@ -157,12 +160,10 @@ private:
   /// Construct a new local symbol of type \p type initialised to \p init_value.
   /// \param symbol_name: the base name for the new symbol
   /// \param type: type for the new symbol
-  /// \param init_value: expression the symbol should be initialised with
   /// \return the symbol expression associated with the new symbol
   symbol_exprt get_fresh_local_typed_symexpr(
     const std::string &symbol_name,
-    const typet &type,
-    const exprt &init_value) const;
+    const typet &type) const;
 
   /// Construct a new function symbol of type \p fun_type.
   /// \param fun_name: the base name for the new symbol

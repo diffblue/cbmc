@@ -8,8 +8,8 @@ DIRS = analyses \
        goto-cc \
        goto-checker \
        goto-diff \
-       goto-harness \
        goto-instrument \
+       goto-harness \
        goto-programs \
        goto-symex \
        jsil \
@@ -66,7 +66,8 @@ languages: util.dir langapi.dir \
 solvers.dir: util.dir
 
 goto-harness.dir: util.dir goto-programs.dir langapi.dir linking.dir \
-                  json.dir json-symtab-language.dir
+                  json.dir json-symtab-language.dir \
+                  goto-instrument.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir

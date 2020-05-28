@@ -224,4 +224,8 @@ inline type_with_subtypest &to_type_with_subtypes(typet &type)
     for(type_with_subtypest::subtypest::iterator it=to_type_with_subtypes(type).subtypes().begin(); \
         it!=to_type_with_subtypes(type).subtypes().end(); ++it)
 
+/// Remove const qualifier from type (if any).
+/// Returns type as is if there is no const qualifier.
+typet remove_const(typet type);
+
 #endif // CPROVER_UTIL_TYPE_H

@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 st,p --harness-type initialise-with-memory-snapshot --initial-source-location main.c:27
 ^EXIT=0$
@@ -10,3 +10,5 @@ st,p --harness-type initialise-with-memory-snapshot --initial-source-location ma
 VERIFICATION SUCCESSFUL
 --
 ^warning: ignoring
+--
+For more information take a look at github#5351
