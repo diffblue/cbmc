@@ -818,7 +818,7 @@ constant_interval_exprt constant_interval_exprt::eval(
   }
   if(binary_operator == ID_minus)
   {
-    return unary_minus(other);
+    return minus(other);
   }
   if(binary_operator == ID_mult)
   {
