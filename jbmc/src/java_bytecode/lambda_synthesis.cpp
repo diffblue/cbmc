@@ -610,12 +610,78 @@ static symbol_exprt instantiate_new_object(
   return new_instance_var;
 }
 
+/// If \p maybe_boxed_type is a boxed primitive return its unboxing method;
+/// otherwise return empty.
+static optionalt<irep_idt> get_unboxing_method(const typet &maybe_boxed_type)
+{
+  const irep_idt &boxed_type_id =
+    to_struct_tag_type(maybe_boxed_type.subtype()).get_identifier();
+  const java_boxed_type_infot *boxed_type_info =
+    get_boxed_type_info_by_name(boxed_type_id);
+  return boxed_type_info ? boxed_type_info->unboxing_function_name
+                         : optionalt<irep_idt>{};
+}
+
+/// Produce a class_method_descriptor_exprt or symbol_exprt for
+/// \p function_symbol depending on whether virtual dispatch could be required
+/// (i.e., if it is non-static and its 'this' parameter is a non-final type)
+exprt make_function_expr(
+  const symbolt &function_symbol,
+  const symbol_tablet &symbol_table)
+{
+  const auto &method_type = to_java_method_type(function_symbol.type);
+  if(!method_type.has_this())
+    return function_symbol.symbol_expr();
+  const irep_idt &declared_on_class_id =
+    to_struct_tag_type(method_type.get_this()->type().subtype())
+      .get_identifier();
+  const auto &this_symbol = symbol_table.lookup_ref(declared_on_class_id);
+  if(to_java_class_type(this_symbol.type).get_final())
+    return function_symbol.symbol_expr();
+
+  // Neither final nor static; make a class_method_descriptor_exprt that will
+  // trigger remove_virtual_functions to produce a virtual dispatch table:
+
+  const std::string &function_name = id2string(function_symbol.name);
+  const auto method_name_start_idx = function_name.rfind('.');
+  const irep_idt mangled_method_name =
+    function_name.substr(method_name_start_idx + 1);
+
+  return class_method_descriptor_exprt{function_symbol.type,
+                                       mangled_method_name,
+                                       declared_on_class_id,
+                                       function_symbol.base_name};
+}
+
 /// If \p expr needs (un)boxing to satisfy \p required_type, add the required
 /// symbols to \p symbol_table and code to \p code_block, then return an
 /// expression giving the adjusted expression. Otherwise return \p expr
 /// unchanged. \p role is a suggested name prefix for any temporary variable
 /// needed; \p function_id is the id of the function any created code it
 /// added to.
+///
+/// Regarding the apparent behaviour of the Java compiler / runtime with regard
+/// to adapting generic methods to/from primtitive types:
+///
+/// When unboxing, it appears to permit widening numeric conversions at the
+/// same time. For example, implementing Consumer<Short> by a function of
+/// type long -> void is possible, as the generated function will look like
+/// impl(Object o) { realfunc(((Number)o).longValue()); }
+///
+/// On the other hand when boxing to satisfy a generic interface type this is
+/// not permitted: in theory we should be able to implement Producer<Long> by a
+/// function of type () -> int, generating boxing code like
+/// impl() { return Long.valueOf(realfunc()); }
+///
+/// However it appears there is no way to convey to the lambda metafactory
+/// that a Long is really required rather than an Integer (the obvious
+/// conversion from int), so the compiler forbids this and requires that only
+/// simple boxing is performed.
+///
+/// Therefore when unboxing we cast to Number first, while when boxing and the
+/// target type is not a specific boxed type (i.e. the target is Object or
+/// Number etc) then we use the primitive type as our cue regarding the boxed
+/// type to produce.
 exprt box_or_unbox_type_if_necessary(
   exprt expr,
   const typet &required_type,
@@ -635,44 +701,40 @@ exprt box_or_unbox_type_if_necessary(
 
   // One is a pointer, the other a primitive -- box or unbox as necessary, and
   // check the types are consistent:
-  if(original_is_pointer)
-  {
-    const irep_idt &boxed_type_id =
-      to_struct_tag_type(original_type.subtype()).get_identifier();
-    const auto *boxed_type_info = get_boxed_type_info_by_name(boxed_type_id);
-    INVARIANT(
-      boxed_type_info != nullptr,
-      "Only boxed primitive types should participate in a pointer vs."
-      " primitive type disagreement");
 
-    symbol_exprt fresh_local = create_and_declare_local(
-      function_id, role + "_unboxed", required_type, symbol_table, code_block);
-    const symbolt &unboxing_function_symbol =
-      symbol_table.lookup_ref(boxed_type_info->unboxing_function_name);
-    code_block.add(code_function_callt{
-      fresh_local, unboxing_function_symbol.symbol_expr(), {expr}});
+  const auto *primitive_type_info = get_java_primitive_type_info(
+    original_is_pointer ? required_type : original_type);
+  INVARIANT(
+    primitive_type_info != nullptr,
+    "A Java non-pointer type involved in a type disagreement should"
+    " be a primitive");
 
-    return std::move(fresh_local);
-  }
-  else
-  {
-    const auto *primitive_type_info =
-      get_java_primitive_type_info(original_type);
-    INVARIANT(
-      primitive_type_info != nullptr,
-      "A Java non-pointer type involved in a type disagreement should"
-      " be a primitive");
+  const irep_idt fresh_local_name =
+    role + (original_is_pointer ? "_unboxed" : "_boxed");
 
-    symbol_exprt fresh_local = create_and_declare_local(
-      function_id, role + "_boxed", required_type, symbol_table, code_block);
-    const symbolt &boxed_type_factory_method =
-      symbol_table.lookup_ref(primitive_type_info->boxed_type_factory_method);
+  const symbol_exprt fresh_local = create_and_declare_local(
+    function_id, fresh_local_name, required_type, symbol_table, code_block);
 
-    code_block.add(code_function_callt{
-      fresh_local, boxed_type_factory_method.symbol_expr(), {expr}});
+  const irep_idt transform_function_id =
+    original_is_pointer
+      ? get_unboxing_method(original_type) // Use static type if known
+          .value_or(primitive_type_info->unboxing_function_name)
+      : primitive_type_info->boxed_type_factory_method;
 
-    return std::move(fresh_local);
-  }
+  const symbolt &transform_function_symbol =
+    symbol_table.lookup_ref(transform_function_id);
+
+  const typet &transform_function_param_type =
+    to_code_type(transform_function_symbol.type).parameters()[0].type();
+  const exprt cast_expr =
+    typecast_exprt::conditional_cast(expr, transform_function_param_type);
+
+  code_block.add(code_function_callt{
+    fresh_local,
+    make_function_expr(transform_function_symbol, symbol_table),
+    {expr}});
+
+  return std::move(fresh_local);
 }
 
 /// Box or unbox expr as per \ref box_or_unbox_type_if_necessary, then cast the
