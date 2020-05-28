@@ -1622,13 +1622,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // label the assertions
   label_properties(goto_model);
 
-  // nondet volatile?
-  if(cmdline.isset("nondet-volatile"))
-  {
-    log.status() << "Making volatile variables non-deterministic"
-                 << messaget::eom;
-    nondet_volatile(goto_model);
-  }
+  parse_nondet_volatile_options(cmdline, options);
+  nondet_volatile(goto_model, options);
 
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
@@ -1803,6 +1798,7 @@ void goto_instrument_parse_optionst::help()
     " --race-check                 add floating-point data race checks\n"
     "\n"
     "Semantic transformations:\n"
+    HELP_NONDET_VOLATILE
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n" // NOLINT(*)
     " --unwind <n>                 unwinds the loops <n> times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"

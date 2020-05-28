@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "code_contracts.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
+#include "nondet_volatile.h"
 #include "replace_calls.h"
 
 #include "count_eloc.h"
@@ -65,7 +66,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_INSERT_FINAL_ASSERT_FALSE \
   OPT_SHOW_CLASS_HIERARCHY \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
-  "(nondet-volatile)(isr):" \
+  "(isr):" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
   "(function-enter):(function-exit):(branch):" \
@@ -119,6 +120,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \
   OPT_RESTRICT_FUNCTION_POINTER \
+  OPT_NONDET_VOLATILE \
   "(ensure-one-backedge-per-target)" \
   // empty last line
 
