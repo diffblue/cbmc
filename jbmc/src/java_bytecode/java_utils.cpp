@@ -72,33 +72,41 @@ get_java_primitive_type_info(const typet &maybe_primitive_type)
     type_info_by_primitive_type = {
       {java_boolean_type(),
        {"java::java.lang.Boolean",
-        "java::java.lang.Boolean.valueOf:(Z)Ljava/lang/Boolean;"}},
+        "java::java.lang.Boolean.valueOf:(Z)Ljava/lang/Boolean;",
+        "java::java.lang.Boolean.booleanValue:()Z"}},
       {java_byte_type(),
        {"java::java.lang.Byte",
-        "java::java.lang.Byte.valueOf:(B)Ljava/lang/Byte;"}},
+        "java::java.lang.Byte.valueOf:(B)Ljava/lang/Byte;",
+        "java::java.lang.Number.byteValue:()B"}},
       {java_char_type(),
        {"java::java.lang.Character",
         "java::java.lang.Character.valueOf:(C)"
-        "Ljava/lang/Character;"}},
+        "Ljava/lang/Character;",
+        "java::java.lang.Character.charValue:()C"}},
       {java_double_type(),
        {"java::java.lang.Double",
         "java::java.lang.Double.valueOf:(D)"
-        "Ljava/lang/Double;"}},
+        "Ljava/lang/Double;",
+        "java::java.lang.Number.doubleValue:()D"}},
       {java_float_type(),
        {"java::java.lang.Float",
         "java::java.lang.Float.valueOf:(F)"
-        "Ljava/lang/Float;"}},
+        "Ljava/lang/Float;",
+        "java::java.lang.Number.floatValue:()F"}},
       {java_int_type(),
        {"java::java.lang.Integer",
         "java::java.lang.Integer.valueOf:(I)"
-        "Ljava/lang/Integer;"}},
+        "Ljava/lang/Integer;",
+        "java::java.lang.Number.intValue:()I"}},
       {java_long_type(),
        {"java::java.lang.Long",
-        "java::java.lang.Long.valueOf:(J)Ljava/lang/Long;"}},
+        "java::java.lang.Long.valueOf:(J)Ljava/lang/Long;",
+        "java::java.lang.Number.longValue:()J"}},
       {java_short_type(),
        {"java::java.lang.Short",
         "java::java.lang.Short.valueOf:(S)"
-        "Ljava/lang/Short;"}}};
+        "Ljava/lang/Short;",
+        "java::java.lang.Number.shortValue:()S"}}};
 
   auto found = type_info_by_primitive_type.find(maybe_primitive_type);
   return found == type_info_by_primitive_type.end() ? nullptr : &found->second;

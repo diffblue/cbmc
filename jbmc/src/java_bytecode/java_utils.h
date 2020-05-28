@@ -40,6 +40,11 @@ struct java_primitive_type_infot
   /// Full identifier of the boxed type's factory method that takes the
   /// corresponding primitive as its sole argument
   const irep_idt boxed_type_factory_method;
+  /// Full identifier of the most general boxed-type method that yields this
+  /// type. For most primitives that means the corresponding method on
+  /// java.lang.Number; for Character and Boolean it means the method on their
+  /// specific boxed type.
+  const irep_idt unboxing_function_name;
 };
 
 /// If \p primitive_type is a Java primitive type, return information about it,
