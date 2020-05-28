@@ -544,8 +544,7 @@ static code_with_references_listt assign_struct_components_from_json(
     {
       const auto member_json = [&]() -> jsont {
         if(
-          is_primitive_wrapper_type_name(id2string(
-            strip_java_namespace_prefix(java_class_type.get_name()))) &&
+          is_primitive_wrapper_type_id(java_class_type.get_name()) &&
           id2string(component_name) == "value")
         {
           return get_untyped_primitive(json);
