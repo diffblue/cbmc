@@ -7,7 +7,9 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "value_set_test_common.h"
+#include <analyses/ai.h>
 #include <analyses/variable-sensitivity/value_set_abstract_value.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <ansi-c/expr2c.h>
 
 #include <sstream>
@@ -241,4 +243,71 @@ TEST_CASE(
 
   REQUIRE(merged_abstract_object->is_top());
   REQUIRE(!merged_abstract_object->is_bottom());
+}
+
+TEST_CASE(
+  "Make sure the output method works correctly with a value set with 0 "
+  "elements",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto const value_set = value_set_abstract_valuet{type, {}};
+
+  std::stringstream ss;
+  value_set.output(
+    ss, ait<variable_sensitivity_domaint>{}, namespacet{symbol_tablet{}});
+  REQUIRE(ss.str() == "BOTTOM");
+}
+
+TEST_CASE(
+  "Make sure the output method works correctly with a value set with 1 element",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto const value = from_integer(10, type);
+  auto const value_set = value_set_abstract_valuet{type, {value}};
+
+  std::stringstream ss;
+  value_set.output(
+    ss, ait<variable_sensitivity_domaint>{}, namespacet{symbol_tablet{}});
+  REQUIRE(ss.str() == "{ 10 }");
+}
+
+TEST_CASE(
+  "Make sure the output method works correctly with a value set with 3 "
+  "elements",
+  VALUE_SET_TEST_TAGS)
+{
+  auto const type = signedbv_typet{32};
+  auto const value1 = from_integer(10, type);
+  auto const value2 = from_integer(12, type);
+  auto const value3 = from_integer(14, type);
+  auto const value_set =
+    value_set_abstract_valuet{type, {value1, value2, value3}};
+
+  std::stringstream ss;
+  value_set.output(
+    ss, ait<variable_sensitivity_domaint>{}, namespacet{symbol_tablet{}});
+  REQUIRE(ss.str() == "{ 10 12 14 }");
+}
+
+TEST_CASE(
+  "Make sure that the output method works with a TOP value set",
+  VALUE_SET_TEST_TAGS)
+{
+  // Build and ensure value set is TOP
+  auto const type = signedbv_typet{32};
+  auto values = value_set_abstract_valuet::valuest{};
+  for(std::size_t i = 0; i <= value_set_abstract_valuet::max_value_set_size;
+      ++i)
+  {
+    values.insert(from_integer(i, type));
+  }
+  auto const value_set = value_set_abstract_valuet{type, values};
+  REQUIRE(value_set.is_top());
+
+  std::stringstream ss;
+  value_set.output(
+    ss, ait<variable_sensitivity_domaint>{}, namespacet{symbol_tablet{}});
+  REQUIRE(ss.str() == "TOP");
 }
