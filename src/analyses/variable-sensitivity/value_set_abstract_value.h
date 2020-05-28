@@ -39,6 +39,9 @@ public:
   /// TODO arbitrary limit, make configurable
   static constexpr std::size_t max_value_set_size = 10;
 
+  void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
+    const override;
+
 protected:
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 

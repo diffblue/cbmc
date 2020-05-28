@@ -8,6 +8,8 @@
 
 #include "value_set_abstract_value.h"
 
+#include <ansi-c/expr2c.h>
+
 value_set_abstract_valuet::value_set_abstract_valuet(const typet &type)
   : abstract_valuet{type}, values{}
 {
@@ -75,4 +77,36 @@ value_set_abstract_valuet::value_set_abstract_valuet(
   const namespacet &ns)
   : value_set_abstract_valuet{expr.type(), valuest{expr}}
 {
+}
+
+void value_set_abstract_valuet::output(
+  std::ostream &out,
+  const class ai_baset &,
+  const namespacet &ns) const
+{
+  if(is_bottom())
+  {
+    out << "BOTTOM";
+    return;
+  }
+  else if(is_top())
+  {
+    out << "TOP";
+    return;
+  }
+
+  std::vector<std::string> vals;
+  for(const auto &elem : values)
+  {
+    vals.push_back(expr2c(elem, ns));
+  }
+
+  std::sort(vals.begin(), vals.end());
+
+  out << "{ ";
+  for(const auto &val : vals)
+  {
+    out << val << " ";
+  }
+  out << "}";
 }
