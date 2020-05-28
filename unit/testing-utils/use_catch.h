@@ -39,6 +39,4 @@ Author: Michael Tautschnig
 /// Add to the end of test tags to mark a test that is expected to fail
 #define XFAIL "[.][!shouldfail]"
 
-#include "catch_pretty_print_expr.h"
-
 #endif // CPROVER_TESTING_UTILS_USE_CATCH_H
