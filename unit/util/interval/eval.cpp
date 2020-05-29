@@ -83,17 +83,14 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
       REQUIRE(five_to_eight.eval(ID_unary_plus) == five_to_eight);
     }
 
-    THEN("When we apply unary subtraction to it, it should be negated")
+    THEN("When we apply unary minus to it, it should be negated")
     {
-      auto negated_val = numeric_cast<mp_integer>(
-        five_to_eight.eval(ID_unary_minus).get_lower());
-      REQUIRE(negated_val.has_value());
-      REQUIRE(negated_val.value() == -8);
-
-      auto upper_value = numeric_cast<mp_integer>(
-        five_to_eight.eval(ID_unary_minus).get_upper());
-      REQUIRE(upper_value.has_value());
-      REQUIRE(upper_value.value() == -5);
+      const constant_interval_exprt &negated_value =
+        five_to_eight.eval(ID_unary_minus);
+      REQUIRE(
+        negated_value ==
+        constant_interval_exprt{from_integer(-8, signedbv_typet(32)),
+                                from_integer(-5, signedbv_typet(32))});
     }
 
     THEN("When we apply bitwise negation to it, is should be bitwise negated")
