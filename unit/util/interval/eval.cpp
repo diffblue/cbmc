@@ -124,12 +124,17 @@ TEST_CASE("binary eval switch", "[core][analyses][interval]")
   constant_interval_exprt five = interval_of(5);
   constant_interval_exprt eight = interval_of(8);
 
+  // Here we test only single element intervals, more robust testing of each
+  // opertion can be found in the method unit tests (e.g.
+  // unit/util/interval/add.cpp)
+
   SECTION("Numeric operations")
   {
     REQUIRE(five.eval(ID_plus, eight) == interval_of(13));
     REQUIRE(five.eval(ID_minus, eight) == interval_of(-3));
     REQUIRE(five.eval(ID_mult, eight) == interval_of(40));
     REQUIRE(five.eval(ID_div, eight) == interval_of(0));
+    // Note modulo is implemented very imprecisely
     REQUIRE(five.eval(ID_mod, eight) == interval_from_to(0, 5));
     REQUIRE(five.eval(ID_shl, two) == interval_of(20 /* 5 << 2 */));
     REQUIRE(five.eval(ID_ashr, two) == interval_of(1 /* 5 >> 2 */));
