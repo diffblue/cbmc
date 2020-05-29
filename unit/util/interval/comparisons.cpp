@@ -257,12 +257,24 @@ TEST_CASE("interval::equality", "[core][analyses][interval]")
     constant_interval_exprt six_to_eight(CEV(6), CEV(8));
     constant_interval_exprt five_to_ten(CEV(5), CEV(10));
 
-    // TODO: wrongly concludes that these are unequal
-    // ADA-537
-    // REQUIRE(two_to_four.equal(six_to_eight).is_unknown());
-    REQUIRE_FALSE(two_to_four.equal(five_to_ten).is_true());
-
-    REQUIRE_FALSE(two_to_four.not_equal(six_to_eight).is_unknown());
-    REQUIRE(two_to_four.not_equal(five_to_ten).is_true());
+    SECTION("Same interval")
+    {
+      // TODO: wrongly concludes that these are equal
+      // ADA-537
+      // REQUIRE(two_to_four.equal(two_to_four).is_unknown());
+      // REQUIRE(two_to_four.not_equal(two_to_four).is_unknown());
+    }
+    SECTION("Overlapping intervals")
+    {
+      // TODO: wrongly concludes that these are not equal
+      // ADA-537
+      // REQUIRE_FALSE(six_to_eight.equal(five_to_ten).is_unknown());
+      // REQUIRE_FALSE(six_to_eight.not_equal(five_to_ten).is_unknown());
+    }
+    SECTION("Disjoint intervals")
+    {
+      REQUIRE_FALSE(two_to_four.equal(six_to_eight).is_true());
+      REQUIRE(two_to_four.not_equal(six_to_eight).is_true());
+    }
   }
 }
