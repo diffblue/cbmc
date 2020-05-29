@@ -66,6 +66,7 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
             constant_interval_exprt(CEV(-5), CEV(5))) ==
           constant_interval_exprt::top(signedbv_typet(32)));
 
+        INFO("Taking modulo on interval that contains zero results in top");
         REQUIRE(
           constant_interval_exprt::modulo(
             constant_interval_exprt(CEV(-10), CEV(20)),
