@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-variable b
+\[main.assertion.1\] line \d+ assertion a == 0: SUCCESS
+\[main.assertion.2\] line \d+ assertion b == 0: FAILURE
+\[main.assertion.3\] line \d+ assertion b != 0: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Check that volatile global variables are havocked when given via the
+--nondet-volatile-variable option. Variable a is initialized to zero (as it has
+static storage duration), and is not havocked, thus the assert(a == 0) passes.
