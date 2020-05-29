@@ -27,7 +27,7 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
       constant_interval_exprt a(CEV(5));
       constant_interval_exprt b(CEV(10));
       const auto a_times_b = a.multiply(b);
-      REQUIRE(V(a_times_b.get_upper()) == 50);
+      REQUIRE(a_times_b == constant_interval_exprt(CEV(50), CEV(50)));
     }
 
     WHEN("Both are positive [2,5]*[7,11]")
