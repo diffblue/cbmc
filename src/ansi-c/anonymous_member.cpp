@@ -34,7 +34,7 @@ static exprt make_member_expr(
      struct_union.type().get_bool(ID_C_constant))
     result.set(ID_C_constant, true);
 
-  return result;
+  return std::move(result);
 }
 
 exprt get_component_rec(

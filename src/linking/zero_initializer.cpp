@@ -85,7 +85,7 @@ exprt zero_initializert::zero_initializer_rec(
   {
     constant_exprt result(ID_0, type);
     result.add_source_location()=source_location;
-    return result;
+    return std::move(result);
   }
   else if(type_id==ID_verilog_signedbv ||
           type_id==ID_verilog_unsignedbv)
@@ -95,14 +95,14 @@ exprt zero_initializert::zero_initializer_rec(
 
     constant_exprt result(value, type);
     result.add_source_location()=source_location;
-    return result;
+    return std::move(result);
   }
   else if(type_id==ID_complex)
   {
     exprt sub_zero=zero_initializer_rec(type.subtype(), source_location);
     complex_exprt result(sub_zero, sub_zero, to_complex_type(type));
     result.add_source_location()=source_location;
-    return result;
+    return std::move(result);
   }
   else if(type_id==ID_code)
   {
@@ -122,7 +122,7 @@ exprt zero_initializert::zero_initializer_rec(
       value.type().id(ID_array);
       value.type().set(ID_size, from_integer(0, size_type()));
       value.add_source_location()=source_location;
-      return value;
+      return std::move(value);
     }
     else
     {
@@ -156,7 +156,7 @@ exprt zero_initializert::zero_initializer_rec(
       array_exprt value(array_type);
       value.operands().resize(integer2unsigned(array_size), tmpval);
       value.add_source_location()=source_location;
-      return value;
+      return std::move(value);
     }
   }
   else if(type_id==ID_vector)
@@ -187,7 +187,7 @@ exprt zero_initializert::zero_initializer_rec(
     value.operands().resize(integer2unsigned(vector_size), tmpval);
     value.add_source_location()=source_location;
 
-    return value;
+    return std::move(value);
   }
   else if(type_id==ID_struct)
   {
@@ -265,7 +265,7 @@ exprt zero_initializert::zero_initializer_rec(
         zero_initializer_rec(component.type(), source_location);
     }
 
-    return value;
+    return std::move(value);
   }
   else if(type_id==ID_symbol)
   {

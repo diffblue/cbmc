@@ -82,7 +82,7 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
       result.operands()[i]=expand_structs_and_arrays(new_src);
     }
 
-    return result; // done
+    return std::move(result); // done
   }
   else if(src_type.id()==ID_array) // src is an array
   {
@@ -114,7 +114,7 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
         result.operands()[i]=expand_structs_and_arrays(new_src);
       }
 
-      return result; // done
+      return std::move(result); // done
     }
     else
     {
@@ -153,7 +153,7 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
       operands[i]=expand_structs_and_arrays(new_src);
     }
 
-    return result; // done
+    return std::move(result); // done
   }
 
   return src;
@@ -550,13 +550,13 @@ exprt path_symex_statet::instantiate_rec_address(
     // which we simply instantiate as non-address
     dereference_exprt tmp=to_dereference_expr(src);
     tmp.pointer()=instantiate_rec(tmp.pointer(), propagate);
-    return tmp;
+    return std::move(tmp);
   }
   else if(src.id()==ID_member)
   {
     member_exprt tmp=to_member_expr(src);
     tmp.struct_op()=instantiate_rec_address(tmp.struct_op(), propagate);
-    return tmp;
+    return std::move(tmp);
   }
   else if(src.id()==ID_string_constant)
   {
@@ -583,7 +583,7 @@ exprt path_symex_statet::instantiate_rec_address(
     if_expr.false_case()=
       instantiate_rec_address(if_expr.false_case(), propagate);
     if_expr.cond()=instantiate_rec(if_expr.cond(), propagate);
-    return if_expr;
+    return std::move(if_expr);
   }
   else
   {

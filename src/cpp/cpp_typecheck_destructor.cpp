@@ -170,5 +170,5 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       block.move_to_operands(dtor_code);
   }
 
-  return block;
+  return std::move(block);
 }

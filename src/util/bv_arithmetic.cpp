@@ -87,7 +87,7 @@ exprt bv_arithmetict::to_expr() const
 {
   constant_exprt result(spec.to_type());
   result.set_value(integer2binary(value, spec.width));
-  return result;
+  return std::move(result);
 }
 
 bv_arithmetict &bv_arithmetict::operator/=(const bv_arithmetict &other)

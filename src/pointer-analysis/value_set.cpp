@@ -201,7 +201,7 @@ exprt value_sett::to_expr(object_map_dt::const_iterator it) const
 
   od.type()=od.object().type();
 
-  return od;
+  return std::move(od);
 }
 
 bool value_sett::make_union(const value_sett::valuest &new_values)
@@ -1689,5 +1689,5 @@ exprt value_sett::make_member(
   member_expr.op0()=src;
   member_expr.set_component_name(component_name);
 
-  return member_expr;
+  return std::move(member_expr);
 }

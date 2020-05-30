@@ -81,7 +81,7 @@ exprt pointer_logict::pointer_expr(
     {
       constant_exprt result(type);
       result.set_value(ID_NULL);
-      return result;
+      return std::move(result);
     }
     else
     {
@@ -95,14 +95,14 @@ exprt pointer_logict::pointer_expr(
   {
     constant_exprt result(type);
     result.set_value("INVALID");
-    return result;
+    return std::move(result);
   }
 
   if(pointer.object>=objects.size())
   {
     constant_exprt result(type);
     result.set_value("INVALID-"+std::to_string(pointer.object));
-    return result;
+    return std::move(result);
   }
 
   const exprt &object_expr=objects[pointer.object];
@@ -133,7 +133,7 @@ exprt pointer_logict::object_rec(
       pointer_offset_size(src.type().subtype(), ns);
 
     if(size<=0)
-      return src;
+      return std::move(src);
 
     mp_integer index=offset/size;
     mp_integer rest=offset%size;

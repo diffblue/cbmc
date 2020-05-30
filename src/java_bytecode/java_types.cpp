@@ -195,7 +195,7 @@ typet java_type_from_string(const std::string &src)
         result.parameters().push_back(param);
       }
 
-      return result;
+      return std::move(result);
     }
 
   case '[': // array type
@@ -241,7 +241,7 @@ typet java_type_from_string(const std::string &src)
       reference_typet result;
       result.subtype()=symbol_typet(identifier);
       result.subtype().set(ID_C_base_name, class_name);
-      return result;
+      return std::move(result);
     }
 
   default:

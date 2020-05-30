@@ -185,7 +185,7 @@ const exprt java_bytecode_convert_methodt::variable(
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, base_name);
     used_local_names.insert(result);
-    return result;
+    return std::move(result);
   }
   else
   {
@@ -477,7 +477,7 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
     .set_property_class("array-index-out-of-bounds-high");
 
   // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
-  return bounds_checks;
+  return std::move(bounds_checks);
 }
 
 /// Find all goto statements in 'repl' that target 'old_label' and redirect them
@@ -2431,7 +2431,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   for(auto &block : root_block.operands())
     code.move_to_operands(block);
 
-  return code;
+  return std::move(code);
 }
 
 void java_bytecode_convert_method(

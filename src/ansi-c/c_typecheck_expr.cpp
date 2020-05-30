@@ -2059,7 +2059,7 @@ exprt c_typecheck_baset::do_special_functions(
     same_object_expr.operands()=expr.arguments();
     same_object_expr.add_source_location()=source_location;
 
-    return same_object_expr;
+    return std::move(same_object_expr);
   }
   else if(identifier==CPROVER_PREFIX "buffer_size")
   {
@@ -2090,7 +2090,7 @@ exprt c_typecheck_baset::do_special_functions(
     is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
     is_zero_string_expr.add_source_location()=source_location;
 
-    return is_zero_string_expr;
+    return std::move(is_zero_string_expr);
   }
   else if(identifier==CPROVER_PREFIX "zero_string_length")
   {
@@ -2217,7 +2217,7 @@ exprt c_typecheck_baset::do_special_functions(
         ieee_float_spect::double_precision()).to_expr();
     inf_expr.add_source_location()=source_location;
 
-    return inf_expr;
+    return std::move(inf_expr);
   }
   else if(identifier==CPROVER_PREFIX "inff")
   {
@@ -2226,7 +2226,7 @@ exprt c_typecheck_baset::do_special_functions(
         ieee_float_spect::single_precision()).to_expr();
     inff_expr.add_source_location()=source_location;
 
-    return inff_expr;
+    return std::move(inff_expr);
   }
   else if(identifier==CPROVER_PREFIX "infl")
   {
@@ -2235,7 +2235,7 @@ exprt c_typecheck_baset::do_special_functions(
       ieee_floatt::plus_infinity(ieee_float_spect(type)).to_expr();
     infl_expr.add_source_location()=source_location;
 
-    return infl_expr;
+    return std::move(infl_expr);
   }
   else if(identifier==CPROVER_PREFIX "abs" ||
           identifier==CPROVER_PREFIX "labs" ||
@@ -2369,7 +2369,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    return equality_expr;
+    return std::move(equality_expr);
   }
   else if(identifier=="__builtin_expect")
   {

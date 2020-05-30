@@ -1339,5 +1339,5 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
   case whatt::LENGTH: result.set_component_name("length"); break;
   }
 
-  return result;
+  return std::move(result);
 }

@@ -35,7 +35,7 @@ exprt concatenate_array_id(
   identifier=a+"["+integer2string(i)+"]";
   symbol_exprt new_expr(identifier, type);
 
-  return new_expr;
+  return std::move(new_expr);
 }
 
 exprt concatenate_array_id(
@@ -47,7 +47,7 @@ exprt concatenate_array_id(
   identifier=a+"["+integer2string(index)+"]";
   symbol_exprt new_expr(identifier, type);
 
-  return new_expr;
+  return std::move(new_expr);
 }
 
 void constant_propagator_domaint::assign_rec(

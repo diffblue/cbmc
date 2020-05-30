@@ -139,7 +139,7 @@ static exprt unpack_rec(
   to_array_type(array.type()).size()=
     from_integer(array.operands().size(), size_type());
 
-  return array;
+  return std::move(array);
 }
 
 /// rewrite byte extraction from an array to byte extraction from a
@@ -247,7 +247,7 @@ exprt flatten_byte_extract(
         array.copy_to_operands(flatten_byte_extract(tmp, ns));
       }
 
-      return array;
+      return std::move(array);
     }
   }
   else if(type.id()==ID_struct)
@@ -283,7 +283,7 @@ exprt flatten_byte_extract(
     }
 
     if(!failed)
-      return s;
+      return std::move(s);
   }
 
   const exprt &root=unpacked.op();
@@ -332,7 +332,7 @@ exprt flatten_byte_extract(
   {
     concatenation_exprt concatenation(src.type());
     concatenation.operands().swap(op);
-    return concatenation;
+    return std::move(concatenation);
   }
 }
 
@@ -582,7 +582,7 @@ exprt flatten_byte_update(
     // original_bits |= newvalue
     bitor_exprt bitor_expr(bitand_expr, value_shifted);
 
-    return bitor_expr;
+    return std::move(bitor_expr);
   }
   else
   {

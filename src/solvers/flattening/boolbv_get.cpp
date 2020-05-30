@@ -160,7 +160,7 @@ exprt boolbvt::bv_get_rec(
 
       struct_exprt dest(type);
       dest.operands().swap(op);
-      return dest;
+      return std::move(dest);
     }
     else if(type.id()==ID_union)
     {
@@ -181,7 +181,7 @@ exprt boolbvt::bv_get_rec(
 
       value.op()=bv_get_rec(bv, unknown, offset, subtype);
 
-      return value;
+      return std::move(value);
     }
     else if(type.id()==ID_vector)
     {
@@ -263,7 +263,7 @@ exprt boolbvt::bv_get_rec(
 
       constant_exprt value_expr(type);
       value_expr.set_value(integer2string(int_value+from));
-      return value_expr;
+      return std::move(value_expr);
     }
     break;
 
@@ -271,7 +271,7 @@ exprt boolbvt::bv_get_rec(
   case bvtypet::IS_C_ENUM:
     constant_exprt value_expr(type);
     value_expr.set_value(value);
-    return value_expr;
+    return std::move(value_expr);
   }
 
   return nil_exprt();

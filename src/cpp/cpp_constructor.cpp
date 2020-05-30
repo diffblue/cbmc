@@ -179,7 +179,7 @@ codet cpp_typecheckt::cpp_constructor(
       throw 0;
     }
 
-    return new_code;
+    return std::move(new_code);
   }
   else if(tmp_type.id()==ID_union)
   {

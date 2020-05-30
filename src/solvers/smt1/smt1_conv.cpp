@@ -132,7 +132,7 @@ exprt smt1_convt::ce_value(
     assert(value.size()==boolbv_width(type));
     constant_exprt c(type);
     c.set_value(value);
-    return c;
+    return std::move(c);
   }
   else if(type.id()==ID_bool)
   {
@@ -160,7 +160,7 @@ exprt smt1_convt::ce_value(
 
     result.copy_to_operands(pointer_logic.pointer_expr(p, type));
 
-    return result;
+    return std::move(result);
   }
   else if(type.id()==ID_struct)
   {
@@ -233,7 +233,7 @@ typet smt1_convt::array_index_type() const
 {
   signedbv_typet t;
   t.set_width(array_index_bits);
-  return t;
+  return std::move(t);
 }
 
 void smt1_convt::array_index(const exprt &expr)
@@ -3138,7 +3138,7 @@ exprt smt1_convt::binary2union(
   std::string cval=binary.substr(total_width-comp_width, comp_width);
   e.op()=ce_value(sub_type, "", cval, true);
 
-  return e;
+  return std::move(e);
 }
 
 void smt1_convt::flatten_array(const exprt &op)
