@@ -10,11 +10,20 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include "freer.h"
 
+#include <iomanip>
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <iostream>
+
+#ifdef _WIN32
+// the ordering of includes is required
+// clang-format off
+#include <windows.h>
+#include <dbghelp.h>
+// clang-format on
+#endif
 
 bool cbmc_invariants_should_throw = false;
 
@@ -93,6 +102,35 @@ void print_backtrace(
       out << '\n' << std::flush;
     }
 
+#elif defined(_WIN32)
+
+  void *stack[50];
+  HANDLE process = GetCurrentProcess();
+
+  SymInitialize(process, NULL, TRUE);
+
+  auto number_of_frames =
+    CaptureStackBackTrace(0, sizeof(stack) / sizeof(void *), stack, NULL);
+
+  // Read
+  // https://docs.microsoft.com/en-us/windows/win32/api/dbghelp/ns-dbghelp-symbol_info
+  // for the rationale behind the size of 'symbol'
+  const auto max_name_len = 255;
+  auto symbol = static_cast<SYMBOL_INFO *>(
+    calloc(sizeof SYMBOL_INFO + (max_name_len - 1) * sizeof(TCHAR), 1));
+  symbol->MaxNameLen = max_name_len;
+  symbol->SizeOfStruct = sizeof SYMBOL_INFO;
+
+  for(std::size_t i = 0; i < number_of_frames; i++)
+  {
+    SymFromAddr(process, (DWORD64)(stack[i]), 0, symbol);
+    out << std::setw(3) << i;
+    out << " 0x" << std::hex << std::setw(8) << symbol->Address;
+    out << ' ' << symbol->Name;
+    out << '\n' << std::flush;
+  }
+
+  free(symbol);
 #else
     out << "Backtraces not supported\n" << std::flush;
 #endif
