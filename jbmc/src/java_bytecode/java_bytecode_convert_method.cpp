@@ -1761,7 +1761,8 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     // instruction before the actual instruction:
     if(catch_instruction.has_value())
     {
-      c.make_block();
+      if(c.get_statement() != ID_block)
+        c = code_blockt{{c}};
       c.operands().insert(c.operands().begin(), *catch_instruction);
     }
 
@@ -1831,12 +1832,16 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
         }
         else
         {
-          c.make_block();
+          if(c.get_statement() != ID_block)
+            c = code_blockt{{c}};
+
           auto &last_statement=to_code_block(c).find_last_statement();
           if(last_statement.get_statement()==ID_goto)
           {
             // Insert stack twiddling before branch:
-            last_statement.make_block();
+            if(last_statement.get_statement() != ID_block)
+              last_statement = code_blockt{{last_statement}};
+
             last_statement.operands().insert(
               last_statement.operands().begin(),
               more_code.statements().begin(),

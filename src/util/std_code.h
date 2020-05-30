@@ -78,9 +78,6 @@ public:
   codet &last_statement();
   const codet &last_statement() const;
 
-  DEPRECATED(SINCE(2019, 2, 6, "use code_blockt(...) instead"))
-  class code_blockt &make_block();
-
   /// Check that the code statement is well-formed (shallow checks only, i.e.,
   /// enclosed statements, subexpressions, etc. are not checked)
   ///
@@ -1377,13 +1374,6 @@ inline code_returnt &to_code_return(codet &code)
 class code_labelt:public codet
 {
 public:
-  DEPRECATED(SINCE(2019, 2, 6, "use code_labelt(label, _code) instead"))
-  explicit code_labelt(const irep_idt &_label):codet(ID_label)
-  {
-    operands().resize(1);
-    set_label(_label);
-  }
-
   code_labelt(const irep_idt &_label, codet _code)
     : codet(ID_label, {std::move(_code)})
   {
