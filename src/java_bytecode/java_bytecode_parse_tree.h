@@ -66,6 +66,10 @@ public:
       is_static(false), is_final(false)
     {
     }
+
+    virtual ~membert()
+    {
+    }
   };
 
   class methodt:public membert
