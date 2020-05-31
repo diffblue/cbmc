@@ -137,7 +137,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CP_CFLAGS =
   CP_CXXFLAGS +=
   LINKLIB = lib /NOLOGO /OUT:$@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ /nologo $^ $(LIBS)
+  LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ /Z7 /nologo $^ DbgHelp.lib $(LIBS)
   LINKNATIVE = $(HOSTCXX) /Fe$@ /nologo /EHsc $^
 ifeq ($(origin CC),default)
   CC = cl
