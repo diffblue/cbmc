@@ -154,8 +154,8 @@ exprt field_sensitivityt::get_fields(
     const struct_typet &type = to_struct_type(ns.follow(ssa_expr.type()));
     const struct_union_typet::componentst &components = type.components();
 
-    struct_exprt result(ssa_expr.type());
-    result.reserve_operands(components.size());
+    struct_exprt::operandst fields;
+    fields.reserve(components.size());
 
     const exprt &struct_op = ssa_expr.get_original_expr();
 
@@ -168,14 +168,13 @@ exprt field_sensitivityt::get_fields(
       tmp.set_expression(member);
       if(was_l2)
       {
-        result.add_to_operands(
-          state.rename(get_fields(ns, state, tmp), ns).get());
+        fields.push_back(state.rename(get_fields(ns, state, tmp), ns).get());
       }
       else
-        result.add_to_operands(get_fields(ns, state, tmp));
+        fields.push_back(get_fields(ns, state, tmp));
     }
 
-    return std::move(result);
+    return struct_exprt(std::move(fields), ssa_expr.type());
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
@@ -190,8 +189,8 @@ exprt field_sensitivityt::get_fields(
     const array_typet &type = to_array_type(ssa_expr.type());
     const std::size_t array_size = numeric_cast_v<std::size_t>(mp_array_size);
 
-    array_exprt result(type);
-    result.reserve_operands(array_size);
+    array_exprt::operandst elements;
+    elements.reserve(array_size);
 
     const exprt &array = ssa_expr.get_original_expr();
 
@@ -204,14 +203,13 @@ exprt field_sensitivityt::get_fields(
       tmp.set_expression(index);
       if(was_l2)
       {
-        result.add_to_operands(
-          state.rename(get_fields(ns, state, tmp), ns).get());
+        elements.push_back(state.rename(get_fields(ns, state, tmp), ns).get());
       }
       else
-        result.add_to_operands(get_fields(ns, state, tmp));
+        elements.push_back(get_fields(ns, state, tmp));
     }
 
-    return std::move(result);
+    return array_exprt(std::move(elements), type);
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
   else

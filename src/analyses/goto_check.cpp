@@ -829,8 +829,8 @@ void goto_checkt::integer_overflow_check(
     return;
   }
 
-  multi_ary_exprt overflow("overflow-" + expr.id_string(), bool_typet());
-  overflow.operands()=expr.operands();
+  multi_ary_exprt overflow(
+    "overflow-" + expr.id_string(), expr.operands(), bool_typet());
 
   if(expr.operands().size()>=3)
   {
