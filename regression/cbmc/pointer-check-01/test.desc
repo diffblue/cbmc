@@ -1,0 +1,9 @@
+CORE
+test.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Check that pointer check for *p fails when its value is constrained to 0
