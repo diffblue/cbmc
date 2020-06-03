@@ -1,0 +1,11 @@
+CORE
+test.c
+--nondet-volatile-model a:model_a --nondet-volatile-model b:model_b
+\[main.assertion.1\] line \d+ assertion result == 3: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+--
+Checks that two volatile reads in the same expression can both be modelled by
+given functions
