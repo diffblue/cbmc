@@ -248,8 +248,7 @@ SCENARIO(
             member_exprt{struct1_sym, "field1", int_type}};
           struct1_v0_field1.set_level_0(0);
           struct1_v0_field1.set_level_2(0);
-          struct_exprt struct_expr(struct_type);
-          struct_expr.add_to_operands(struct1_v0_field1);
+          struct_exprt struct_expr({struct1_v0_field1}, struct_type);
           with_exprt struct1_v0_with_field_set = rhs;
           struct1_v0_with_field_set.old() = struct_expr;
           REQUIRE(assign_step.ssa_rhs == struct1_v0_with_field_set);

@@ -1019,8 +1019,8 @@ bool goto_symext::constant_propagate_replace(
   auto &new_data = f_l1.arguments().at(4);
   auto &old_data = f_l1.arguments().at(3);
 
-  array_exprt characters_to_find(s_data_opt->get().type());
-  array_exprt characters_to_replace(s_data_opt->get().type());
+  array_exprt::operandst characters_to_find;
+  array_exprt::operandst characters_to_replace;
 
   // Two main ways to perform a replace: characters or strings.
   bool is_single_character = new_data.type().id() == ID_unsignedbv &&
@@ -1035,8 +1035,8 @@ bool goto_symext::constant_propagate_replace(
       return {};
     }
 
-    characters_to_find.operands().emplace_back(old_char_pointer->get());
-    characters_to_replace.operands().emplace_back(new_char_pointer->get());
+    characters_to_find.emplace_back(old_char_pointer->get());
+    characters_to_replace.emplace_back(new_char_pointer->get());
   }
   else
   {
@@ -1054,8 +1054,8 @@ bool goto_symext::constant_propagate_replace(
       return {};
     }
 
-    characters_to_find = old_char_array_opt->get();
-    characters_to_replace = new_char_array_opt->get();
+    characters_to_find = old_char_array_opt->get().operands();
+    characters_to_replace = new_char_array_opt->get().operands();
   }
 
   // Copy data, then do initial search for a replace sequence.
@@ -1063,14 +1063,14 @@ bool goto_symext::constant_propagate_replace(
   auto found_pattern = std::search(
     existing_data.operands().begin(),
     existing_data.operands().end(),
-    characters_to_find.operands().begin(),
-    characters_to_find.operands().end());
+    characters_to_find.begin(),
+    characters_to_find.end());
 
   // If we've found a match, proceed to perform a replace on all instances.
   while(found_pattern != existing_data.operands().end())
   {
     // Find the difference between our first/last match iterator.
-    auto match_end = found_pattern + characters_to_find.operands().size();
+    auto match_end = found_pattern + characters_to_find.size();
 
     // Erase them.
     found_pattern = existing_data.operands().erase(found_pattern, match_end);
@@ -1079,16 +1079,16 @@ bool goto_symext::constant_propagate_replace(
     // our new sequence.
     found_pattern = existing_data.operands().insert(
                       found_pattern,
-                      characters_to_replace.operands().begin(),
-                      characters_to_replace.operands().end()) +
-                    characters_to_replace.operands().size();
+                      characters_to_replace.begin(),
+                      characters_to_replace.end()) +
+                    characters_to_replace.size();
 
     // Then search from there for any additional matches.
     found_pattern = std::search(
       found_pattern,
       existing_data.operands().end(),
-      characters_to_find.operands().begin(),
-      characters_to_find.operands().end());
+      characters_to_find.begin(),
+      characters_to_find.end());
   }
 
   const constant_exprt new_char_array_length =

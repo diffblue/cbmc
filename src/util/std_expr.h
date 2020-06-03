@@ -790,12 +790,6 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 class multi_ary_exprt : public expr_protectedt
 {
 public:
-  DEPRECATED(SINCE(2018, 12, 7, "use multi_ary_exprt(id, op, type) instead"))
-  multi_ary_exprt(const irep_idt &_id, const typet &_type)
-    : expr_protectedt(_id, _type)
-  {
-  }
-
   multi_ary_exprt(const irep_idt &_id, operandst _operands, typet _type)
     : expr_protectedt(_id, std::move(_type))
   {
@@ -1437,12 +1431,6 @@ inline array_of_exprt &to_array_of_expr(exprt &expr)
 class array_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use array_exprt(operands, type) instead"))
-  explicit array_exprt(const array_typet &_type)
-    : multi_ary_exprt(ID_array, _type)
-  {
-  }
-
   array_exprt(operandst _operands, array_typet _type)
     : multi_ary_exprt(ID_array, std::move(_operands), std::move(_type))
   {
@@ -1644,11 +1632,6 @@ inline union_exprt &to_union_expr(exprt &expr)
 class struct_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 1, 12, "use struct_exprt(operands, type) instead"))
-  explicit struct_exprt(const typet &_type) : multi_ary_exprt(ID_struct, _type)
-  {
-  }
-
   struct_exprt(operandst _operands, typet _type)
     : multi_ary_exprt(ID_struct, std::move(_operands), std::move(_type))
   {
@@ -1936,12 +1919,6 @@ inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
 class dynamic_object_exprt:public binary_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 2, 11, "use dynamic_object_exprt(type) instead"))
-  dynamic_object_exprt()
-    : binary_exprt(exprt(ID_unknown), ID_dynamic_object, exprt(ID_unknown))
-  {
-  }
-
   explicit dynamic_object_exprt(typet type)
     : binary_exprt(
         exprt(ID_unknown),
@@ -2006,12 +1983,6 @@ inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
 class is_dynamic_object_exprt : public unary_predicate_exprt
 {
 public:
-  DEPRECATED(SINCE(2019, 11, 8, "use is_dynamic_object(op) instead"))
-  is_dynamic_object_exprt()
-    : unary_predicate_exprt(ID_is_dynamic_object, exprt())
-  {
-  }
-
   explicit is_dynamic_object_exprt(const exprt &op)
     : unary_predicate_exprt(ID_is_dynamic_object, op)
   {

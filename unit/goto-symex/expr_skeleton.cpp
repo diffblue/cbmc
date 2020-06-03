@@ -23,7 +23,7 @@ SCENARIO("expr skeleton", "[core][goto-symex][symex-assign][expr-skeleton]")
     const signedbv_typet int_type{32};
     const expr_skeletont index_skeleton =
       expr_skeletont::remove_op0(index_exprt{
-        array_exprt{array_typet{int_type, from_integer(2, size_type())}},
+        array_exprt{{}, array_typet{int_type, from_integer(2, size_type())}},
         from_integer(1, size_type())});
     const expr_skeletont member_skeleton = expr_skeletont::remove_op0(
       member_exprt{symbol_exprt{"struct1", typet{}}, "field1", int_type});
