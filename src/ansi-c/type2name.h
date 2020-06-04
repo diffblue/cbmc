@@ -20,4 +20,6 @@ class namespacet;
 
 std::string type2name(const typet &type, const namespacet &ns);
 
+std::string type2identifier(const typet &type, const namespacet &ns);
+
 #endif // CPROVER_ANSI_C_TYPE2NAME_H
