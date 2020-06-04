@@ -14,6 +14,7 @@ Date: September 2011
 #include "nondet_volatile.h"
 
 #include <util/cmdline.h>
+#include <util/fresh_symbol.h>
 #include <util/options.h>
 #include <util/std_expr.h>
 #include <util/string_utils.h>
@@ -46,11 +47,23 @@ public:
 private:
   static bool is_volatile(const namespacet &ns, const typet &src);
 
-  void handle_volatile_expression(exprt &expr, const namespacet &ns);
+  void handle_volatile_expression(
+    exprt &expr,
+    const namespacet &ns,
+    goto_programt &pre,
+    goto_programt &post);
 
-  void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr);
+  void nondet_volatile_rhs(
+    const symbol_tablet &symbol_table,
+    exprt &expr,
+    goto_programt &pre,
+    goto_programt &post);
 
-  void nondet_volatile_lhs(const symbol_tablet &symbol_table, exprt &expr);
+  void nondet_volatile_lhs(
+    const symbol_tablet &symbol_table,
+    exprt &expr,
+    goto_programt &pre,
+    goto_programt &post);
 
   void
   nondet_volatile(symbol_tablet &symbol_table, goto_programt &goto_program);
@@ -89,8 +102,11 @@ bool nondet_volatilet::is_volatile(const namespacet &ns, const typet &src)
 
 void nondet_volatilet::handle_volatile_expression(
   exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  goto_programt &pre,
+  goto_programt &post)
 {
+  // Check if we should replace the variable by a nondet expression
   if(
     all_nondet ||
     (expr.id() == ID_symbol &&
@@ -99,18 +115,56 @@ void nondet_volatilet::handle_volatile_expression(
     typet t = expr.type();
     t.remove(ID_C_volatile);
 
-    // replace by nondet
     side_effect_expr_nondett nondet_expr(t, expr.source_location());
     expr.swap(nondet_expr);
+
+    return;
   }
+
+  // Now check if we should replace the variable by a model
+
+  if(expr.id() != ID_symbol)
+  {
+    return;
+  }
+
+  const irep_idt &id = to_symbol_expr(expr).get_identifier();
+  const auto &it = variable_models.find(id);
+
+  if(it == variable_models.end())
+  {
+    return;
+  }
+
+  const auto &model_symbol = ns.lookup(it->second);
+
+  const auto &new_variable = get_fresh_aux_symbol(
+                               to_code_type(model_symbol.type).return_type(),
+                               "",
+                               "modelled_volatile",
+                               source_locationt(),
+                               ID_C,
+                               goto_model.symbol_table)
+                               .symbol_expr();
+
+  pre.instructions.push_back(goto_programt::make_decl(new_variable));
+
+  code_function_callt call(new_variable, model_symbol.symbol_expr(), {});
+  pre.instructions.push_back(goto_programt::make_function_call(call));
+
+  post.instructions.push_back(goto_programt::make_dead(new_variable));
+
+  expr = new_variable;
 }
 
 void nondet_volatilet::nondet_volatile_rhs(
   const symbol_tablet &symbol_table,
-  exprt &expr)
+  exprt &expr,
+  goto_programt &pre,
+  goto_programt &post)
 {
   Forall_operands(it, expr)
-    nondet_volatile_rhs(symbol_table, *it);
+    nondet_volatile_rhs(symbol_table, *it, pre, post);
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_dereference)
@@ -119,33 +173,37 @@ void nondet_volatilet::nondet_volatile_rhs(
 
     if(is_volatile(ns, expr.type()))
     {
-      handle_volatile_expression(expr, ns);
+      handle_volatile_expression(expr, ns, pre, post);
     }
   }
 }
 
 void nondet_volatilet::nondet_volatile_lhs(
   const symbol_tablet &symbol_table,
-  exprt &expr)
+  exprt &expr,
+  goto_programt &pre,
+  goto_programt &post)
 {
   if(expr.id()==ID_if)
   {
-    nondet_volatile_rhs(symbol_table, to_if_expr(expr).cond());
-    nondet_volatile_lhs(symbol_table, to_if_expr(expr).true_case());
-    nondet_volatile_lhs(symbol_table, to_if_expr(expr).false_case());
+    nondet_volatile_rhs(symbol_table, to_if_expr(expr).cond(), pre, post);
+    nondet_volatile_lhs(symbol_table, to_if_expr(expr).true_case(), pre, post);
+    nondet_volatile_lhs(symbol_table, to_if_expr(expr).false_case(), pre, post);
   }
   else if(expr.id()==ID_index)
   {
-    nondet_volatile_lhs(symbol_table, to_index_expr(expr).array());
-    nondet_volatile_rhs(symbol_table, to_index_expr(expr).index());
+    nondet_volatile_lhs(symbol_table, to_index_expr(expr).array(), pre, post);
+    nondet_volatile_rhs(symbol_table, to_index_expr(expr).index(), pre, post);
   }
   else if(expr.id()==ID_member)
   {
-    nondet_volatile_lhs(symbol_table, to_member_expr(expr).struct_op());
+    nondet_volatile_lhs(
+      symbol_table, to_member_expr(expr).struct_op(), pre, post);
   }
   else if(expr.id()==ID_dereference)
   {
-    nondet_volatile_rhs(symbol_table, to_dereference_expr(expr).pointer());
+    nondet_volatile_rhs(
+      symbol_table, to_dereference_expr(expr).pointer(), pre, post);
   }
 }
 
@@ -155,14 +213,21 @@ void nondet_volatilet::nondet_volatile(
 {
   namespacet ns(symbol_table);
 
-  Forall_goto_program_instructions(i_it, goto_program)
+  for(auto i_it = goto_program.instructions.begin();
+      i_it != goto_program.instructions.end();
+      i_it++)
   {
-    goto_programt::instructiont &instruction=*i_it;
+    goto_programt pre;
+    goto_programt post;
+
+    goto_programt::instructiont &instruction = *i_it;
 
     if(instruction.is_assign())
     {
-      nondet_volatile_rhs(symbol_table, to_code_assign(instruction.code).rhs());
-      nondet_volatile_lhs(symbol_table, to_code_assign(instruction.code).lhs());
+      nondet_volatile_rhs(
+        symbol_table, to_code_assign(instruction.code).rhs(), pre, post);
+      nondet_volatile_lhs(
+        symbol_table, to_code_assign(instruction.code).lhs(), pre, post);
     }
     else if(instruction.is_function_call())
     {
@@ -176,18 +241,26 @@ void nondet_volatilet::nondet_volatile(
           it=code_function_call.arguments().begin();
           it!=code_function_call.arguments().end();
           it++)
-        nondet_volatile_rhs(symbol_table, *it);
+        nondet_volatile_rhs(symbol_table, *it, pre, post);
 
       // do return value
-      nondet_volatile_lhs(symbol_table, code_function_call.lhs());
+      nondet_volatile_lhs(symbol_table, code_function_call.lhs(), pre, post);
     }
     else if(instruction.has_condition())
     {
       // do condition
       exprt cond = instruction.get_condition();
-      nondet_volatile_rhs(symbol_table, cond);
+      nondet_volatile_rhs(symbol_table, cond, pre, post);
       instruction.set_condition(cond);
     }
+
+    const auto pre_size = pre.instructions.size();
+    goto_program.insert_before_swap(i_it, pre);
+    std::advance(i_it, pre_size);
+
+    const auto post_size = post.instructions.size();
+    goto_program.destructive_insert(std::next(i_it), post);
+    std::advance(i_it, post_size);
   }
 }
 
