@@ -77,6 +77,17 @@ SRC += analyses/ai/ai.cpp \
        util/format_number_range.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
+       util/interval/add.cpp \
+       util/interval/bitwise.cpp \
+       util/interval/comparisons.cpp \
+       util/interval/divide.cpp \
+       util/interval/eval.cpp \
+       util/interval/get_extreme.cpp \
+       util/interval/modulo.cpp \
+       util/interval/multiply.cpp \
+       util/interval/shift.cpp \
+       util/interval/subtract.cpp \
+       util/interval/to_string.cpp \
        util/interval_constraint.cpp \
        util/interval_union.cpp \
        util/irep.cpp \
