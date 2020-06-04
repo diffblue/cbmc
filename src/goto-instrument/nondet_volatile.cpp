@@ -16,6 +16,7 @@ Date: September 2011
 #include <util/cmdline.h>
 #include <util/options.h>
 #include <util/std_expr.h>
+#include <util/string_utils.h>
 #include <util/symbol_table.h>
 
 using havoc_predicatet = std::function<bool(const exprt &)>;
@@ -27,6 +28,9 @@ public:
     symbol_tablet &symbol_table,
     goto_programt &goto_program,
     havoc_predicatet should_havoc);
+
+  static const symbolt &
+  typecheck_variable(const irep_idt &id, const namespacet &ns);
 
 private:
   static bool is_volatile(const namespacet &ns, const typet &src);
@@ -40,6 +44,19 @@ private:
     const symbol_tablet &symbol_table,
     exprt &expr,
     havoc_predicatet should_havoc);
+
+  static void typecheck_model(
+    const irep_idt &id,
+    const symbolt &variable,
+    const namespacet &ns);
+
+  void
+  typecheck_options(const goto_modelt &goto_model, const optionst &options);
+
+  // configuration obtained from command line options
+  bool all_nondet;
+  std::set<irep_idt> nondet_variables;
+  std::map<irep_idt, irep_idt> variable_models;
 };
 
 bool nondet_volatilet::is_volatile(const namespacet &ns, const typet &src)
@@ -158,6 +175,146 @@ void nondet_volatilet::nondet_volatile(
   }
 }
 
+const symbolt &
+nondet_volatilet::typecheck_variable(const irep_idt &id, const namespacet &ns)
+{
+  const symbolt *symbol;
+
+  if(ns.lookup(id, symbol))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "given symbol `" + id2string(id) + "` not found in symbol table",
+      "--" NONDET_VOLATILE_VARIABLE_OPT);
+  }
+
+  if(!symbol->is_static_lifetime || !symbol->type.get_bool(ID_C_volatile))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "symbol `" + id2string(id) +
+        "` does not represent a volatile variable "
+        "with static lifetime",
+      "--" NONDET_VOLATILE_VARIABLE_OPT);
+  }
+
+  INVARIANT(!symbol->is_type, "symbol must not represent a type");
+
+  INVARIANT(!symbol->is_function(), "symbol must not represent a function");
+
+  return *symbol;
+}
+
+void nondet_volatilet::typecheck_model(
+  const irep_idt &id,
+  const symbolt &variable,
+  const namespacet &ns)
+{
+  const symbolt *symbol;
+
+  if(ns.lookup(id, symbol))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "given model name " + id2string(id) + " not found in symbol table",
+      "--" NONDET_VOLATILE_MODEL_OPT);
+  }
+
+  if(!symbol->is_function())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "symbol `" + id2string(id) + "` is not a function",
+      "--" NONDET_VOLATILE_MODEL_OPT);
+  }
+
+  const auto &code_type = to_code_type(symbol->type);
+
+  if(variable.type != code_type.return_type())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "return type of model `" + id2string(id) +
+        "` is not compatible with the "
+        "type of the modelled variable " +
+        id2string(variable.name),
+      "--" NONDET_VOLATILE_MODEL_OPT);
+  }
+
+  if(!code_type.parameters().empty())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "model `" + id2string(id) + "` must not take parameters ",
+      "--" NONDET_VOLATILE_MODEL_OPT);
+  }
+}
+
+void nondet_volatilet::typecheck_options(
+  const goto_modelt &goto_model,
+  const optionst &options)
+{
+  PRECONDITION(nondet_variables.empty());
+  PRECONDITION(variable_models.empty());
+
+  if(options.get_bool_option(NONDET_VOLATILE_OPT))
+  {
+    all_nondet = true;
+    return;
+  }
+
+  const namespacet ns(goto_model.symbol_table);
+
+  if(options.is_set(NONDET_VOLATILE_VARIABLE_OPT))
+  {
+    const auto &variable_list =
+      options.get_list_option(NONDET_VOLATILE_VARIABLE_OPT);
+
+    nondet_variables.insert(variable_list.begin(), variable_list.end());
+
+    for(const auto &id : nondet_variables)
+    {
+      typecheck_variable(id, ns);
+    }
+  }
+
+  if(options.is_set(NONDET_VOLATILE_MODEL_OPT))
+  {
+    const auto &model_list = options.get_list_option(NONDET_VOLATILE_MODEL_OPT);
+
+    for(const auto &s : model_list)
+    {
+      std::string variable;
+      std::string model;
+
+      try
+      {
+        split_string(s, ':', variable, model, true);
+      }
+      catch(const deserialization_exceptiont &e)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "cannot split argument `" + s + "` into variable name and model name",
+          "--" NONDET_VOLATILE_MODEL_OPT);
+      }
+
+      const auto &variable_symbol = typecheck_variable(variable, ns);
+
+      if(nondet_variables.count(variable) != 0)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "conflicting options for variable `" + variable + "`",
+          "--" NONDET_VOLATILE_VARIABLE_OPT "/--" NONDET_VOLATILE_MODEL_OPT);
+      }
+
+      typecheck_model(model, variable_symbol, ns);
+
+      const auto p = variable_models.insert(std::make_pair(variable, model));
+
+      if(!p.second && p.first->second != model)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "conflicting models for variable `" + variable + "`",
+          "--" NONDET_VOLATILE_MODEL_OPT);
+      }
+    }
+  }
+}
+
 void nondet_volatile(goto_modelt &goto_model, havoc_predicatet should_havoc)
 {
   Forall_goto_functions(f_it, goto_model.goto_functions)
@@ -171,29 +328,45 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
 {
   PRECONDITION(!options.is_set(NONDET_VOLATILE_OPT));
   PRECONDITION(!options.is_set(NONDET_VOLATILE_VARIABLE_OPT));
+  PRECONDITION(!options.is_set(NONDET_VOLATILE_MODEL_OPT));
 
   const bool nondet_volatile_opt = cmdline.isset(NONDET_VOLATILE_OPT);
   const bool nondet_volatile_variable_opt =
     cmdline.isset(NONDET_VOLATILE_VARIABLE_OPT);
+  const bool nondet_volatile_model_opt =
+    cmdline.isset(NONDET_VOLATILE_MODEL_OPT);
 
-  if(nondet_volatile_opt && nondet_volatile_variable_opt)
+  if(
+    nondet_volatile_opt &&
+    (nondet_volatile_variable_opt || nondet_volatile_model_opt))
   {
     throw invalid_command_line_argument_exceptiont(
-      "only one of " NONDET_VOLATILE_OPT "/" NONDET_VOLATILE_VARIABLE_OPT
-      "can "
-      "be given at a time",
-      NONDET_VOLATILE_OPT "/" NONDET_VOLATILE_VARIABLE_OPT);
+      "--" NONDET_VOLATILE_OPT
+      " cannot be used with --" NONDET_VOLATILE_VARIABLE_OPT
+      " or --" NONDET_VOLATILE_MODEL_OPT,
+      "--" NONDET_VOLATILE_OPT "/--" NONDET_VOLATILE_VARIABLE_OPT
+      "/--" NONDET_VOLATILE_MODEL_OPT);
   }
 
   if(nondet_volatile_opt)
   {
     options.set_option(NONDET_VOLATILE_OPT, true);
   }
-  else if(cmdline.isset(NONDET_VOLATILE_VARIABLE_OPT))
+  else
   {
-    options.set_option(
-      NONDET_VOLATILE_VARIABLE_OPT,
-      cmdline.get_values(NONDET_VOLATILE_VARIABLE_OPT));
+    if(nondet_volatile_variable_opt)
+    {
+      options.set_option(
+        NONDET_VOLATILE_VARIABLE_OPT,
+        cmdline.get_values(NONDET_VOLATILE_VARIABLE_OPT));
+    }
+
+    if(nondet_volatile_model_opt)
+    {
+      options.set_option(
+        NONDET_VOLATILE_MODEL_OPT,
+        cmdline.get_values(NONDET_VOLATILE_MODEL_OPT));
+    }
   }
 }
 
@@ -211,31 +384,9 @@ void nondet_volatile(goto_modelt &goto_model, const optionst &options)
     std::set<irep_idt> variables(variable_list.begin(), variable_list.end());
     const namespacet ns(goto_model.symbol_table);
 
-    // typecheck given variables
     for(const auto &id : variables)
     {
-      const symbolt *symbol;
-
-      if(ns.lookup(id, symbol))
-      {
-        throw invalid_command_line_argument_exceptiont(
-          "given name " + id2string(id) + " not found in symbol table",
-          NONDET_VOLATILE_VARIABLE_OPT);
-      }
-
-      if(!symbol->is_static_lifetime || !symbol->type.get_bool(ID_C_volatile))
-      {
-        throw invalid_command_line_argument_exceptiont(
-          "given name " + id2string(id) +
-            " does not represent a volatile "
-            "variable with static lifetime",
-          NONDET_VOLATILE_VARIABLE_OPT);
-      }
-
-      INVARIANT(!symbol->is_type, "symbol must not represent a type");
-
-      INVARIANT(
-        symbol->type.id() != ID_code, "symbol must not represent a function");
+      nondet_volatilet::typecheck_variable(id, ns);
     }
 
     auto should_havoc = [&variables](const exprt &expr) {

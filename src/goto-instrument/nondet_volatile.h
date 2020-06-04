@@ -20,17 +20,22 @@ class optionst;
 // clang-format off
 #define NONDET_VOLATILE_OPT "nondet-volatile"
 #define NONDET_VOLATILE_VARIABLE_OPT "nondet-volatile-variable"
+#define NONDET_VOLATILE_MODEL_OPT "nondet-volatile-model"
 
 #define OPT_NONDET_VOLATILE \
   "(" NONDET_VOLATILE_OPT ")" \
-  "(" NONDET_VOLATILE_VARIABLE_OPT "):"
+  "(" NONDET_VOLATILE_VARIABLE_OPT "):" \
+  "(" NONDET_VOLATILE_MODEL_OPT "):"
 
 #define HELP_NONDET_VOLATILE \
   " --" NONDET_VOLATILE_OPT "            makes reads from volatile variables " \
   "non-deterministic\n" \
   " --" NONDET_VOLATILE_VARIABLE_OPT " <variable>\n" \
   "                              makes reads from given volatile variable " \
-  "non-deterministic\n"
+  "non-deterministic\n" \
+  " --" NONDET_VOLATILE_MODEL_OPT "<variable>:<model>\n" \
+  "                              models reads from given volatile variable " \
+  "by a call to the given model"
 // clang-format on
 
 void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options);
