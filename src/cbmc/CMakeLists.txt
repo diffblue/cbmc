@@ -34,3 +34,10 @@ add_if_library(cbmc-lib jsil)
 # Executable
 add_executable(cbmc cbmc_main.cpp)
 target_link_libraries(cbmc cbmc-lib)
+install(TARGETS cbmc DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Man page
+if(NOT WIN32)
+  install(FILES ${CMAKE_SOURCE_DIR}/doc/man/cbmc.1
+          DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+endif()
