@@ -1,0 +1,10 @@
+CORE
+test.c
+--nondet-volatile-variable x
+^Invalid User Input$
+given name x does not represent a volatile variable with static lifetime$
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Check that it is invalid to specify a non-volatile variable to be havocked
