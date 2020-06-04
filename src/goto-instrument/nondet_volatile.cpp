@@ -20,7 +20,29 @@ Date: September 2011
 
 using havoc_predicatet = std::function<bool(const exprt &)>;
 
-static bool is_volatile(const namespacet &ns, const typet &src)
+class nondet_volatilet
+{
+public:
+  static void nondet_volatile(
+    symbol_tablet &symbol_table,
+    goto_programt &goto_program,
+    havoc_predicatet should_havoc);
+
+private:
+  static bool is_volatile(const namespacet &ns, const typet &src);
+
+  static void nondet_volatile_rhs(
+    const symbol_tablet &symbol_table,
+    exprt &expr,
+    havoc_predicatet should_havoc);
+
+  static void nondet_volatile_lhs(
+    const symbol_tablet &symbol_table,
+    exprt &expr,
+    havoc_predicatet should_havoc);
+};
+
+bool nondet_volatilet::is_volatile(const namespacet &ns, const typet &src)
 {
   if(src.get_bool(ID_C_volatile))
     return true;
@@ -35,7 +57,7 @@ static bool is_volatile(const namespacet &ns, const typet &src)
   return false;
 }
 
-static void nondet_volatile_rhs(
+void nondet_volatilet::nondet_volatile_rhs(
   const symbol_tablet &symbol_table,
   exprt &expr,
   havoc_predicatet should_havoc)
@@ -59,7 +81,7 @@ static void nondet_volatile_rhs(
   }
 }
 
-static void nondet_volatile_lhs(
+void nondet_volatilet::nondet_volatile_lhs(
   const symbol_tablet &symbol_table,
   exprt &expr,
   havoc_predicatet should_havoc)
@@ -91,7 +113,7 @@ static void nondet_volatile_lhs(
   }
 }
 
-static void nondet_volatile(
+void nondet_volatilet::nondet_volatile(
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
   havoc_predicatet should_havoc)
@@ -139,7 +161,8 @@ static void nondet_volatile(
 void nondet_volatile(goto_modelt &goto_model, havoc_predicatet should_havoc)
 {
   Forall_goto_functions(f_it, goto_model.goto_functions)
-    nondet_volatile(goto_model.symbol_table, f_it->second.body, should_havoc);
+    nondet_volatilet::nondet_volatile(
+      goto_model.symbol_table, f_it->second.body, should_havoc);
 
   goto_model.goto_functions.update();
 }
