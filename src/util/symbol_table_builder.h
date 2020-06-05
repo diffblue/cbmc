@@ -85,6 +85,9 @@ public:
     return base_symbol_table.end();
   }
 
+  using symbol_table_baset::begin;
+  using symbol_table_baset::end;
+
   /// Try to find the next free identity for the passed-in prefix in
   /// this symbol table.
   /// \remark

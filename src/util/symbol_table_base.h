@@ -237,8 +237,8 @@ public:
 
   using const_iteratort = symbolst::const_iterator;
 
-  const_iteratort begin() const;
-  const_iteratort end() const;
+  virtual const_iteratort begin() const;
+  virtual const_iteratort end() const;
 };
 
 std::ostream &
