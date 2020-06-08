@@ -1,0 +1,11 @@
+CORE
+test.c
+--nondet-volatile-model a:non_existing_model
+^Invalid User Input$
+given model name .* not found in symbol table
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Check that the command line typechecking reports when a given model for a
+variable cannot be found

@@ -1,0 +1,11 @@
+CORE
+test.c
+--nondet-volatile-model a:model
+^Invalid User Input$
+return type of model .* is not compatible with the type of the modelled variable
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Check that the command line typechecking reports when a model with a return type
+that is incompatible with the type of the modelled variable is given

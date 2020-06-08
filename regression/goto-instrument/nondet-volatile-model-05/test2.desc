@@ -1,0 +1,11 @@
+CORE
+test.c
+--nondet-volatile-model a:model_a --nondet-volatile-variable a
+^Invalid User Input$
+conflicting options for variable
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Check that the command line typechecking reports when conflicting options are
+given for a variable
