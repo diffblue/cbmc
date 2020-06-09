@@ -1,0 +1,15 @@
+CORE
+test.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+--
+Example of an illegal identifier name we crashed on before:
+__atomic_compare_exchange_n_*{V}$V$
+
+Example of the substitutes we are producing now.
+__atomic_compare_exchange__ptr__start_sub_V_end_sub_

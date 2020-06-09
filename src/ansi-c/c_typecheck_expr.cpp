@@ -1890,16 +1890,18 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         INVARIANT(
           !parameters.empty(),
           "GCC polymorphic built-ins should have at least one parameter");
+        /// XXX why are we only looking at the type of the first parameter?
         if(parameters.front().type().id() == ID_pointer)
         {
           identifier_with_type =
             id2string(identifier) + "_" +
-            type2name(parameters.front().type().subtype(), *this);
+            type2identifier(parameters.front().type().subtype(), *this);
         }
         else
         {
-          identifier_with_type = id2string(identifier) + "_" +
-                                 type2name(parameters.front().type(), *this);
+          identifier_with_type =
+            id2string(identifier) + "_" +
+            type2identifier(parameters.front().type(), *this);
         }
         gcc_polymorphic->set_identifier(identifier_with_type);
 
