@@ -579,6 +579,8 @@ void function_pointer_restrictionst::write_to_file(
   }
 
   function_pointer_restrictions_json.output(outFile);
+  // Ensure output file ends with a newline character.
+  outFile << '\n';
 }
 
 function_pointer_restrictionst::restrictionst
