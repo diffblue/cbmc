@@ -1,0 +1,11 @@
+CORE
+test.c
+--nondet-volatile-model a:model_a --nondet-volatile-model a:model_b
+^Invalid User Input$
+conflicting models for variable
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Check that the command line typechecking reports when two conflicting models are
+given for a variable

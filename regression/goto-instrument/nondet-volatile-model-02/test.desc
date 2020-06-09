@@ -1,0 +1,16 @@
+CORE
+test.c
+--nondet-volatile-variable b --nondet-volatile-model c:model
+\[main.assertion.1\] line \d+ assertion a == 0: SUCCESS
+\[main.assertion.2\] line \d+ assertion b >= 0: FAILURE
+\[main.assertion.3\] line \d+ assertion b == 0: FAILURE
+\[main.assertion.4\] line \d+ assertion b != 0: FAILURE
+\[main.assertion.5\] line \d+ assertion c >= 0: SUCCESS
+\[main.assertion.6\] line \d+ assertion c == 0: FAILURE
+\[main.assertion.7\] line \d+ assertion c != 0: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that both options for selectively havocking/modelling volatile reads can
+be used together

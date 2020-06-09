@@ -2,7 +2,7 @@ CORE
 test.c
 --nondet-volatile-variable x
 ^Invalid User Input$
-given name x does not represent a volatile variable with static lifetime$
+symbol `x` does not represent a volatile variable with static lifetime$
 ^EXIT=1$
 ^SIGNAL=0$
 --
