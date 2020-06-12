@@ -1,0 +1,22 @@
+CORE
+test.c
+--unwind 6 test.c --trace --xml-ui --partial-loops --slice-formula
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+\s*<loop-head .*>\n\s*  <location .* line="5" .*/>\n\s*</loop-head>\n\s*<loop-head .*>\n\s*  <location .* line="5".*/>\n\s*</loop-head>\n
+--
+--
+Ensure even with sliced formulas, we get a location only step for
+each iteration of the loop (called loop-heads) when using partial loops.
+
+This test is checking the following XML:(deleting the new lines
+after each \n to obtain the monster regex above).
+
+\s*<loop-head .*>
+\s*  <location .* line="5" .*/>
+\s*</loop-head>
+\s*<loop-head .*>
+\s*  <location .* line="5".*/>
+\s*</loop-head>
+
