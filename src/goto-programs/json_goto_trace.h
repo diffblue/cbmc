@@ -16,6 +16,7 @@ Date: November 2005
 
 #include "goto_trace.h"
 
+#include <algorithm>
 #include <util/invariant.h>
 #include <util/json.h>
 #include <util/json_irep.h>
@@ -99,7 +100,8 @@ void convert_return(
 ///   needs.
 void convert_default(
   json_objectt &json_location_only,
-  const conversion_dependenciest &conversion_dependencies);
+  const conversion_dependenciest &conversion_dependencies,
+  const std::string &step_type);
 
 /// Templated version of the conversion method.
 /// Works by dispatching to the more specialised
@@ -186,10 +188,17 @@ void convert(
     case goto_trace_stept::typet::SHARED_WRITE:
     case goto_trace_stept::typet::CONSTRAINT:
     case goto_trace_stept::typet::NONE:
-      if(source_location != previous_source_location)
+      const bool is_loophead = std::any_of(
+        step.pc->incoming_edges.begin(),
+        step.pc->incoming_edges.end(),
+        [](goto_programt::targett t) { return t->is_backwards_goto(); });
+      if(source_location != previous_source_location || is_loophead)
       {
         json_objectt &json_location_only = dest_array.push_back().make_object();
-        convert_default(json_location_only, conversion_dependencies);
+        convert_default(
+          json_location_only,
+          conversion_dependencies,
+          is_loophead ? "loop-head" : "location-only");
       }
     }
 

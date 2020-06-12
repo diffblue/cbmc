@@ -1,0 +1,37 @@
+CORE
+test.c
+--unwind 6 test.c --trace --json-ui --partial-loops --slice-formula
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+\s*\{\n\s*  .*\n\s*  "sourceLocation": \{\n\s*    .*,\n\s*    .*,\n\s*    "line": "5",\n\s*    .*\n\s*  \},\n\s*  "stepType": "loop-head",\n\s*  .*\n\s*\},\n\s*\{\n\s*  .*\n\s*  "sourceLocation": \{\n\s*    .*,\n\s*    .*,\n\s*    "line": "5",\n\s*    .*\n\s*  \},\n\s*  "stepType": "loop-head",\n\s*  .*\n\s*\},
+--
+--
+Ensure even with sliced formulas, we get a location only step for
+each iteration of the loop (called loop-heads) when using partial loops.
+
+This test is checking the following json:(deleting the new lines after each \n to obtain
+monster regex above).
+
+\s*\{\n
+\s*  .*\n
+\s*  "sourceLocation": \{\n
+\s*    .*,\n
+\s*    .*,\n
+\s*    "line": "5",\n
+\s*    .*\n
+\s*  \},\n
+\s*  "stepType": "loop-head",\n
+\s*  .*\n
+\s*\},\n
+\s*\{\n
+\s*  .*\n
+\s*  "sourceLocation": \{\n
+\s*    .*,\n
+\s*    .*,\n
+\s*    "line": "5",\n
+\s*    .*\n
+\s*  \},\n
+\s*  "stepType": "loop-head",\n
+\s*  .*\n
+\s*\},
