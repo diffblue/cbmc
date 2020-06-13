@@ -1,13 +1,10 @@
-name: Package CBMC
-on: [push]
+name: CBMC Packages
 
-# This is the trigger to use when merged into the cbmc repo.
-# Until then leave the old trigger to facilitate debugging of the pull request.
-# on:
-#   # Build packages when new commits are added to the develop branch.
-#   push:
-#     branches:
-#       - develop
+on:
+  # Build packages when new commits are pushed to develop
+  push:
+    branches:
+      - develop
 
 jobs:
   Tags:
