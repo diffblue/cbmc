@@ -174,3 +174,75 @@ std::string capitalize(const std::string &str)
   capitalized[0] = toupper(capitalized[0]);
   return capitalized;
 }
+
+std::string wrap_line(
+  const std::string &line,
+  const std::size_t left_margin,
+  const std::size_t width)
+{
+  return wrap_line(line.cbegin(), line.cend(), left_margin, width);
+}
+
+std::string wrap_line(
+  std::string::const_iterator left,
+  std::string::const_iterator right,
+  const std::size_t left_margin,
+  const std::size_t width)
+{
+  PRECONDITION(left_margin < width);
+
+  const std::size_t column_width = width - left_margin;
+  const std::string margin(left_margin, ' ');
+
+  auto distance = std::distance(left, right);
+  CHECK_RETURN(distance > 0);
+
+  std::string result;
+
+  if(static_cast<std::size_t>(distance) <= column_width)
+  {
+    result.append(margin);
+    result.append(left, right);
+
+    return result;
+  }
+
+  auto it_line_begin = left;
+
+  do
+  {
+    // points to the first character past the current column
+    auto it = it_line_begin + column_width;
+
+    auto rit_r = std::reverse_iterator<decltype(it)>(it) - 1;
+    auto rit_l = rit_r + column_width;
+
+    auto rit_space = std::find(rit_r, rit_l, ' ');
+
+    if(rit_space != rit_l)
+    {
+      auto it_space = rit_space.base() - 1;
+      CHECK_RETURN(*it_space == ' ');
+
+      result.append(margin);
+      result.append(it_line_begin, it_space);
+      result.append("\n");
+
+      it_line_begin = it_space + 1;
+    }
+    else
+    {
+      // we have not found a space, thus cannot wrap this line
+      result.clear();
+      result.append(left, right);
+
+      return result;
+    }
+  } while(static_cast<std::size_t>(std::distance(it_line_begin, right)) >
+          column_width);
+
+  result.append(margin);
+  result.append(it_line_begin, right);
+
+  return result;
+}
