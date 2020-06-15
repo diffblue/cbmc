@@ -252,7 +252,11 @@ public:
 
     locationt n = std::next(l);
 
-    auto step_return = p->step(n, *(storage->abstract_traces_before(n)));
+    auto step_return = p->step(
+      n,
+      *(storage->abstract_traces_before(n)),
+      ai_history_baset::no_caller_history);
+    // Caller history not needed as this is a local step
 
     return storage->abstract_state_before(step_return.second, *domain_factory);
   }
@@ -469,6 +473,7 @@ protected:
     trace_ptrt p,
     const irep_idt &to_function_id,
     locationt to_l,
+    trace_ptrt caller_history,
     const namespacet &ns,
     working_sett &working_set);
 

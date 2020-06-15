@@ -303,8 +303,14 @@ bool ai_baset::visit(
       if(to_l == goto_program.instructions.end())
         continue;
 
-      new_data |=
-        visit_edge(function_id, p, function_id, to_l, ns, working_set);
+      new_data |= visit_edge(
+        function_id,
+        p,
+        function_id,
+        to_l,
+        ai_history_baset::no_caller_history,
+        ns,
+        working_set); // Local steps so no caller history needed
     }
   }
 
@@ -316,11 +322,13 @@ bool ai_baset::visit_edge(
   trace_ptrt p,
   const irep_idt &to_function_id,
   locationt to_l,
+  trace_ptrt caller_history,
   const namespacet &ns,
   working_sett &working_set)
 {
   // Has history taught us not to step here...
-  auto next = p->step(to_l, *(storage->abstract_traces_before(to_l)));
+  auto next =
+    p->step(to_l, *(storage->abstract_traces_before(to_l)), caller_history);
   if(next.first == ai_history_baset::step_statust::BLOCKED)
     return false;
   trace_ptrt to_p = next.second;
@@ -366,6 +374,8 @@ bool ai_baset::visit_edge_function_call(
     p_call,
     calling_function_id,
     l_return,
+    ai_history_baset::
+      no_caller_history, // Not needed as we are skipping the function call
     ns,
     working_set);
 }
@@ -439,6 +449,7 @@ bool ai_baset::visit_function_call(
     p_call,
     calling_function_id,
     l_return,
+    ai_history_baset::no_caller_history, // Would be the same as p_call...
     ns,
     working_set);
 }
@@ -480,6 +491,8 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
       p_call,
       callee_function_id,
       l_begin,
+      ai_history_baset::
+        no_caller_history, // Not needed as p_call already has the info
       ns,
       catch_working_set);
 
@@ -525,6 +538,7 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
           p_end,
           calling_function_id,
           l_return,
+          p_call, // To allow function-local history
           ns,
           working_set);
       }

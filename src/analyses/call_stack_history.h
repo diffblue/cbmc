@@ -81,7 +81,10 @@ public:
   {
   }
 
-  step_returnt step(locationt to, const trace_sett &others) const override;
+  step_returnt step(
+    locationt to,
+    const trace_sett &others,
+    trace_ptrt caller_hist) const override;
 
   bool operator<(const ai_history_baset &op) const override;
   bool operator==(const ai_history_baset &op) const override;
