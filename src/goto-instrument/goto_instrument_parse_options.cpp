@@ -1799,7 +1799,7 @@ void goto_instrument_parse_optionst::help()
     " --race-check                 add floating-point data race checks\n"
     "\n"
     "Semantic transformations:\n"
-    HELP_NONDET_VOLATILE
+    << HELP_NONDET_VOLATILE <<
     " --unwind <n>                 unwinds the loops <n> times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"
     " --unwindset-file <file>      read unwindset from file\n"
