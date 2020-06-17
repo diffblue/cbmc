@@ -108,4 +108,44 @@ std::string escape(const std::string &);
 /// \return string with non-alphanumeric characters escaped
 std::string escape_non_alnum(const std::string &to_escape);
 
+/// Wrap line at spaces to not extend past the right margin, and include given
+/// padding with spaces to the left
+///
+/// The given string should not contain any newlines.
+///
+/// \param line: line to wrap, should not contain newlines
+/// \param left_margin: each line will be padded to the left with `left_margin`
+///   spaces
+/// \param width: width of the resulting text, i.e., right margin
+/// \return resulting string such that each line has length less or equal to
+///   `width`, and each line includes `left_margin` spaces to the left; if the
+///   given line cannot be wrapped (i.e., it cannot be broken up at spaces such
+///   that every resulting line fits within the margin), the given line is
+///   returned unchanged
+std::string wrap_line(
+  const std::string &line,
+  const std::size_t left_margin = 0,
+  const std::size_t width = 80);
+
+/// Wrap line at spaces to not extend past the right margin, and include given
+/// padding with spaces to the left
+///
+/// The given string should not contain any newlines.
+///
+/// \param left: iterator to beginning of string
+/// \param right: iterator to end of string
+/// \param left_margin: each line will be padded to the left with `left_margin`
+///   spaces
+/// \param width: width of the resulting text, i.e., right margin
+/// \return resulting string such that each line has length less or equal to
+///   `width`, and each line includes `left_margin` spaces to the left; if the
+///   given line cannot be wrapped (i.e., it cannot be broken up at spaces such
+///   that every resulting line fits within the margin), the given line is
+///   returned unchanged
+std::string wrap_line(
+  const std::string::const_iterator left,
+  const std::string::const_iterator right,
+  const std::size_t left_margin = 0,
+  const std::size_t width = 80);
+
 #endif
