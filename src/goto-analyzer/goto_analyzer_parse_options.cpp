@@ -42,13 +42,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/validate_goto_model.h>
 
-#include <analyses/is_threaded.h>
-#include <analyses/goto_check.h>
-#include <analyses/local_may_alias.h>
+#include <analyses/call_stack_history.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
+#include <analyses/goto_check.h>
 #include <analyses/interval_domain.h>
-#include <analyses/call_stack_history.h>
+#include <analyses/is_threaded.h>
+#include <analyses/local_may_alias.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>
