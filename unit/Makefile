@@ -35,6 +35,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/label_function_pointer_call_sites.cpp \
        goto-programs/osx_fat_reader.cpp \
        goto-programs/restrict_function_pointers.cpp \
+       goto-programs/structured_trace_util.cpp \
        goto-programs/remove_returns.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/apply_condition.cpp \
