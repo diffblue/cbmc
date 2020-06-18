@@ -16,60 +16,53 @@ void link_edges(goto_programt::targett source, goto_programt::targett target)
   target->incoming_edges.insert(source);
 }
 
+source_locationt simple_location(const std::string &file, unsigned line)
+{
+  source_locationt location;
+  location.set_file(file);
+  location.set_line(line);
+  return location;
+}
+
+goto_programt::targett add_instruction(
+  const source_locationt &location,
+  goto_programt::instructionst &instructions)
+{
+  goto_programt::instructiont instruction;
+  instruction.location_number = instructions.size();
+  instruction.source_location = location;
+  instructions.push_back(instruction);
+  return std::next(instructions.begin(), instruction.location_number);
+}
+
 TEST_CASE("structured_trace_util", "[core][util][trace]")
 {
   goto_programt::instructionst instructions;
 
   source_locationt nil_location;
 
-  source_locationt unrelated_location;
-  unrelated_location.set_file("foo.c");
-  unrelated_location.set_line(1);
+  const source_locationt unrelated_location = simple_location("foo.c", 1);
 
   source_locationt no_file_location;
-  unrelated_location.set_line(1);
+  no_file_location.set_line(1);
 
-  source_locationt basic_location;
-  basic_location.set_file("test.c");
-  basic_location.set_line(1);
-
-  source_locationt loop_head_location;
-  loop_head_location.set_file("test.c");
-  loop_head_location.set_line(2);
-
-  source_locationt back_edge_location;
-  back_edge_location.set_file("test.c");
-  back_edge_location.set_line(3);
+  const source_locationt basic_location = simple_location("test.c", 1);
+  const source_locationt loop_head_location = simple_location("test.c", 2);
+  const source_locationt back_edge_location = simple_location("test.c", 3);
 
   // 0 # normal_location
+  add_instruction(basic_location, instructions);
   // 1 # loop_head
+  add_instruction(loop_head_location, instructions);
   // 2: goto 1 # back_edge
+  const auto back_edge = add_instruction(back_edge_location, instructions);
+  back_edge->type = GOTO;
   // 3: no_location
-  // 4: no_file
-  goto_programt::instructiont normal_instruction;
-  normal_instruction.location_number = 0;
-  normal_instruction.source_location = basic_location;
-  instructions.push_back(normal_instruction);
-
-  goto_programt::instructiont loop_head;
-  loop_head.location_number = 1;
-  loop_head.source_location = loop_head_location;
-  instructions.push_back(loop_head);
-
-  goto_programt::instructiont back_edge;
-  back_edge.source_location = back_edge_location;
-  back_edge.location_number = 2;
-  back_edge.type = GOTO;
-  instructions.push_back(back_edge);
-
   goto_programt::instructiont no_location;
   no_location.location_number = 3;
   instructions.push_back(no_location);
-
-  goto_programt::instructiont no_file;
-  no_file.location_number = 4;
-  no_file.source_location = no_file_location;
-  instructions.push_back(no_file);
+  // 4: no_file
+  add_instruction(no_file_location, instructions);
 
   link_edges(
     std::next(instructions.begin(), 2), std::next(instructions.begin(), 1));
@@ -133,7 +126,7 @@ TEST_CASE("structured_trace_util", "[core][util][trace]")
     goto_trace_stept step;
     step.step_nr = 1;
     step.thread_nr = 2;
-    step.hidden = true;
+    step.hidden = false;
     step.pc = std::next(instructions.begin(), 1);
     SECTION("Simple step")
     {
@@ -142,7 +135,7 @@ TEST_CASE("structured_trace_util", "[core][util][trace]")
       REQUIRE(parsed_step);
       REQUIRE(parsed_step->step_number == 1);
       REQUIRE(parsed_step->thread_number == 2);
-      REQUIRE(parsed_step->hidden);
+      REQUIRE_FALSE(parsed_step->hidden);
       REQUIRE(parsed_step->kind == default_step_kindt::LOOP_HEAD);
       REQUIRE(parsed_step->location == loop_head_location);
     }
@@ -153,7 +146,7 @@ TEST_CASE("structured_trace_util", "[core][util][trace]")
       REQUIRE(parsed_step);
       REQUIRE(parsed_step->step_number == 1);
       REQUIRE(parsed_step->thread_number == 2);
-      REQUIRE(parsed_step->hidden);
+      REQUIRE_FALSE(parsed_step->hidden);
       REQUIRE(parsed_step->kind == default_step_kindt::LOOP_HEAD);
       REQUIRE(parsed_step->location == loop_head_location);
     }
