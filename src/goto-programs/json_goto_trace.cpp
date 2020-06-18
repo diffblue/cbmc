@@ -276,16 +276,6 @@ void convert_return(
     json_call_return["sourceLocation"] = location;
 }
 
-/// Convert all other types of steps not already handled
-/// by the other conversion functions.
-/// \param [out] json_location_only: The JSON object that
-///   will contain the information about the step
-///   after this function has run.
-/// \param conversion_dependencies: A structure
-///   that contains information the conversion function
-///   needs.
-/// \param step_kind: The kind of default step we are printing.
-///   See \ref default_step_kind
 void convert_default(
   json_objectt &json_location_only,
   const conversion_dependenciest &conversion_dependencies,

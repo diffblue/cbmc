@@ -99,6 +99,8 @@ void convert_return(
 /// \param conversion_dependencies: A structure
 ///   that contains information the conversion function
 ///   needs.
+/// \param step_kind: The kind of default step we are printing.
+///   See \ref default_step_kind
 void convert_default(
   json_objectt &json_location_only,
   const conversion_dependenciest &conversion_dependencies,
