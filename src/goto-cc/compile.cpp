@@ -348,7 +348,7 @@ bool compilet::link()
 
   if(keep_file_local)
   {
-    function_name_manglert<file_name_manglert> mangler(
+    function_name_manglert<djb_manglert> mangler(
       get_message_handler(), goto_model, file_local_mangle_suffix);
     mangler.mangle();
   }
