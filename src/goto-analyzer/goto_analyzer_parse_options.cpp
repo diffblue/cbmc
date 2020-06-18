@@ -48,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/interval_domain.h>
+#include <analyses/call_stack_history.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>

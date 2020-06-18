@@ -3,6 +3,7 @@ SRC = ai.cpp \
       ai_history.cpp \
       call_graph.cpp \
       call_graph_helpers.cpp \
+      call_stack_history.cpp \
       constant_propagator.cpp \
       custom_bitvector_analysis.cpp \
       dependence_graph.cpp \
