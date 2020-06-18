@@ -1,0 +1,11 @@
+diff --git a/src/util/CMakeLists.txt b/src/util/CMakeLists.txt
+index 113ed3afe..6d693238a 100644
+--- a/src/util/CMakeLists.txt
++++ b/src/util/CMakeLists.txt
+@@ -49,3 +49,6 @@ add_dependencies(util generate_version_cpp)
+ generic_includes(util)
+ 
+ target_link_libraries(util big-int langapi)
++if(WIN32)
++  target_link_libraries(util dbghelp)
++endif()
