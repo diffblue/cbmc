@@ -389,10 +389,18 @@ Function Return (element name: `function_return`)
 </xs:element>
 ```
 
-All Other Steps (element name: `location-only`)
+All Other Steps (element name: `location-only` and `loop-head`)
 
-Only included if the source location exists and differs from the
-previous one.\
+A step that indicates where in the source program we are.
+
+A `location-only` step is emitted if the source location exists and
+differs from the previous one.
+
+A  `loop-head` step is emitted if the location relates to the start of a loop,
+even if the previous step is also the same start of the loop (to ensure
+that it is printed out for each loop iteration)
+
+
 **Attributes**:
 
 -   `hidden`: boolean attribute
@@ -411,12 +419,24 @@ previous one.\
 <location-only hidden="false" step_nr="19" thread="0">
   <location .. />
 </location-only>
+<loop-head hidden="false" step_nr="19" thread="0">
+  <location .. />
+</loop-head>
 ```
 
 **XSD**:
 
 ``` {.xml}
 <xs:element name="location-only">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="location" minOccurs="0"></xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs">
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="loop-head">
   <xs:complexType>
     <xs:all>
       <xs:element name="location" minOccurs="0"></xs:element>
@@ -440,6 +460,7 @@ Full Trace XSD
       <xs:element ref="input"></xs:element>
       <xs:element ref="output"></xs:element>
       <xs:element ref="location-only"></xs:element>
+      <xs:element ref="loop-head"></xs:element>
     </xs:choice>
   </xs:complexType>
 </xs:element>

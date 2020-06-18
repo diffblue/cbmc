@@ -138,6 +138,15 @@
   </xs:complexType>
 </xs:element>
 
+<xs:element name="loop-head">
+  <xs:complexType>
+    <xs:all>
+      <xs:element ref="location" minOccurs="0"/>
+    </xs:all>
+    <xs:attributeGroup ref="traceStepAttrs"/>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="goto_trace">
   <xs:complexType>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -148,6 +157,7 @@
       <xs:element ref="input"></xs:element>
       <xs:element ref="output"></xs:element>
       <xs:element ref="location-only"></xs:element>
+      <xs:element ref="loop-head"></xs:element>
     </xs:choice>
   </xs:complexType>
 </xs:element>
