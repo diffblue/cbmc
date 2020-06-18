@@ -96,15 +96,11 @@ void convert_return(
 /// \param [out] json_location_only: The JSON object that
 ///   will contain the information about the step
 ///   after this function has run.
-/// \param conversion_dependencies: A structure
-///   that contains information the conversion function
-///   needs.
-/// \param step_kind: The kind of default step we are printing.
-///   See \ref default_step_kind
+/// \param default_step: The procesed details about this step, see \ref
+///   default_step_kind
 void convert_default(
   json_objectt &json_location_only,
-  const conversion_dependenciest &conversion_dependencies,
-  const default_step_kindt &step_kind);
+  const default_trace_stept &default_step);
 
 /// Templated version of the conversion method.
 /// Works by dispatching to the more specialised
@@ -191,15 +187,13 @@ void convert(
     case goto_trace_stept::typet::SHARED_WRITE:
     case goto_trace_stept::typet::CONSTRAINT:
     case goto_trace_stept::typet::NONE:
-      const auto default_step_kind = ::default_step_kind(*step.pc);
-      if(
-        source_location != previous_source_location ||
-        default_step_kind == default_step_kindt::LOOP_HEAD)
+      const auto default_step = ::default_step(step, previous_source_location);
+      if(default_step)
       {
         json_objectt &json_location_only = dest_array.push_back().make_object();
-        convert_default(
-          json_location_only, conversion_dependencies, default_step_kind);
+        convert_default(json_location_only, *default_step);
       }
+      break;
     }
 
     if(source_location.is_not_nil() && !source_location.get_file().empty())
