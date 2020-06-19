@@ -237,6 +237,9 @@ patch-debian-patches: $(SRCDIR)/debian
 	sed -i "s/<version>SUREFIRE<\/version>/<version>$$SUREFIRE_VERSION<\/version>/" \
 	  $(SRCDIR)/debian/patches/surefire
 
+	# Patch 64bit_regression_tests patch
+	cd $(SRCDIR)/debian/patches && patch < ../../../64bit_regression_tests.patch
+
 	# Refresh all patches with quilt
 	sudo apt-get -y install quilt
 	cd $(SRCDIR) && export QUILT_PATCHES=debian/patches && \
