@@ -17,14 +17,53 @@ TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
 
   symbol_table.insert(symbol);
 
-  int counter = 0;
-  for(auto &entry : symbol_table)
+  SECTION("Non const iterator")
   {
-    (void)entry; // we are just testing iteration here
-    ++counter;
+    int counter = 0;
+    for(auto &entry : symbol_table)
+    {
+      (void)entry; // we are just testing iteration here
+      ++counter;
+    }
+    REQUIRE(counter == 1);
   }
-
-  REQUIRE(counter == 1);
+  SECTION("Const iterator")
+  {
+    int counter = 0;
+    for(const auto &entry : symbol_table)
+    {
+      (void)entry; // we are just testing iteration here
+      ++counter;
+    }
+    REQUIRE(counter == 1);
+  }
+  SECTION("Polymorphic access")
+  {
+    SECTION("Non-const iterator")
+    {
+      symbol_table_baset &base_st = symbol_table;
+      REQUIRE(std::distance(base_st.begin(), base_st.end()) == 1);
+      int counter = 0;
+      for(auto &entry : base_st)
+      {
+        (void)entry; // we are just testing iteration here
+        ++counter;
+      }
+      REQUIRE(counter == 1);
+    }
+    SECTION("Const iterator")
+    {
+      const symbol_table_baset &base_st = symbol_table;
+      REQUIRE(std::distance(base_st.begin(), base_st.end()) == 1);
+      int counter = 0;
+      for(const auto &entry : base_st)
+      {
+        (void)entry; // we are just testing iteration here
+        ++counter;
+      }
+      REQUIRE(counter == 1);
+    }
+  }
 }
 
 SCENARIO(

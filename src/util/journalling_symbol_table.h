@@ -140,6 +140,9 @@ public:
       base_symbol_table.end(), [this](const irep_idt &id) { on_update(id); });
   }
 
+  using symbol_table_baset::begin;
+  using symbol_table_baset::end;
+
   const changesett &get_inserted() const
   {
     return inserted;

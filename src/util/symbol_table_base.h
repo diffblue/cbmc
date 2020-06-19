@@ -234,6 +234,11 @@ public:
 
   virtual iteratort begin() = 0;
   virtual iteratort end() = 0;
+
+  using const_iteratort = symbolst::const_iterator;
+
+  virtual const_iteratort begin() const;
+  virtual const_iteratort end() const;
 };
 
 std::ostream &

@@ -60,6 +60,16 @@ void symbol_table_baset::show(std::ostream &out) const
     out << symbols.at(name);
 }
 
+symbol_table_baset::const_iteratort symbol_table_baset::end() const
+{
+  return symbols.end();
+}
+
+symbol_table_baset::const_iteratort symbol_table_baset::begin() const
+{
+  return symbols.begin();
+}
+
 /// Print the contents of the symbol table.
 /// \param out: The ostream to direct output to
 /// \param symbol_table: The symbol table to print out
