@@ -185,6 +185,7 @@ SRC = $(BOOLEFORCE_SRC) \
       sat/cnf_clause_list.cpp \
       sat/dimacs_cnf.cpp \
       sat/pbs_dimacs_cnf.cpp \
+      sat/remote_sat.cpp \
       sat/resolution_proof.cpp \
       smt2/letify.cpp \
       smt2/smt2_conv.cpp \
@@ -259,5 +260,5 @@ solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
 -include smt2/smt2_solver$(DEPEXT)
 
 smt2_solver$(EXEEXT): $(OBJ) smt2/smt2_solver$(OBJEXT) \
-	../util/util$(LIBEXT) ../big-int/big-int$(LIBEXT) $(SOLVER_LIB)
+	../util/util$(LIBEXT) ../big-int/big-int$(LIBEXT) ../json/json$(LIBEXT) $(SOLVER_LIB)
 	$(LINKBIN)
