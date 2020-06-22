@@ -32,6 +32,9 @@ public:
   void set_assignment(literalt a, bool value) override;
   bool is_in_conflict(literalt l) const override;
 
+  static void
+  write_dimacs_clause(const bvt &, std::ostream &, bool break_lines);
+
 protected:
   void write_problem_line(std::ostream &out);
   void write_clauses(std::ostream &out);
