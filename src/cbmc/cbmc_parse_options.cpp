@@ -434,6 +434,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("smt2", true);
   }
 
+  if(cmdline.isset("remote-sat"))
+  {
+    options.set_option("remote-sat", true), solver_set = true;
+  }
+
   if(cmdline.isset("yices"))
   {
     options.set_option("yices", true), solver_set=true;

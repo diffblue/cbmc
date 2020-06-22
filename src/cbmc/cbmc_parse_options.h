@@ -56,6 +56,7 @@ class optionst;
   OPT_JSON_INTERFACE \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
   "(cprover-smt2)" \
+  "(remote-sat)" \
   "(no-sat-preprocessor)" \
   "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
