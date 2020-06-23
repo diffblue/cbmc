@@ -1,0 +1,12 @@
+CORE
+dummy.c
+--function main --harness-type call-function
+\[default_serve\.assertion\.1\] line \d+ assertion 0 && \"default serve should fail so we can see it is being called\": FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+static void default_serve
+--
+When running the harness we should run into the assertion failure from the
+static default_serve function, but the harness C code should not contain this
+or any other static functions or variables.
