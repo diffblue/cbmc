@@ -1,0 +1,12 @@
+CORE
+main.c
+--show --dependence-graph
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+Function: main\n.*\n.*\n.*\nControl dependencies: [0-9]+
+Function: func\n.*\n.*\n.*\nControl dependencies: [0-9]+
+Function: __CPROVER_initialize\n.*\n.*\n.*\nControl dependencies: [0-9]+
+--
+Function: __CPROVER__start\n.*\n.*\n.*\nControl dependencies: [0-9]+
+^warning: ignoring
