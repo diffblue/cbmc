@@ -214,8 +214,9 @@ void dep_graph_domaint::transform(
         std::all_of(
           std::next(control_deps.begin()),
           control_deps.end(),
-          [](const goto_programt::const_targett &d)
-            { return d->is_function_call(); }),
+          [](const goto_programt::const_targett &d) {
+            return d->is_function_call();
+          }),
         "All entries must be function calls");
 
       control_deps.clear();

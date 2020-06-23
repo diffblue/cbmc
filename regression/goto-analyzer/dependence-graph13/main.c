@@ -1,6 +1,5 @@
 void func()
 {
-
 }
 
 void main(void)
