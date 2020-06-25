@@ -276,22 +276,15 @@ void convert_return(
     json_call_return["sourceLocation"] = location;
 }
 
-/// Convert all other types of steps not already handled
-/// by the other conversion functions.
-/// \param [out] json_location_only: The JSON object that
-///   will contain the information about the step
-///   after this function has run.
-/// \param conversion_dependencies: A structure
-///   that contains information the conversion function
-///   needs.
 void convert_default(
   json_objectt &json_location_only,
-  const conversion_dependenciest &conversion_dependencies)
+  const conversion_dependenciest &conversion_dependencies,
+  const default_step_kindt &step_kind)
 {
   const goto_trace_stept &step = conversion_dependencies.step;
   const jsont &location = conversion_dependencies.location;
 
-  json_location_only["stepType"] = json_stringt("location-only");
+  json_location_only["stepType"] = json_stringt(default_step_name(step_kind));
   json_location_only["hidden"] = jsont::json_boolean(step.hidden);
   json_location_only["thread"] = json_numbert(std::to_string(step.thread_nr));
   json_location_only["sourceLocation"] = location;

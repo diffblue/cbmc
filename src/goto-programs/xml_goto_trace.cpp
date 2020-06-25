@@ -22,6 +22,7 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 
 #include "printf_formatter.h"
+#include "structured_trace_util.h"
 #include "xml_expr.h"
 
 bool full_lhs_value_includes_binary(
@@ -237,12 +238,22 @@ void convert(
     case goto_trace_stept::typet::GOTO:
     case goto_trace_stept::typet::ASSUME:
     case goto_trace_stept::typet::NONE:
-      if(source_location!=previous_source_location)
+    {
+      // If this is just a source location then we output only the first
+      // location of a sequence of same locations.
+      // However, we don't want to suppress loop head locations because
+      // they might come from different loop iterations. If we suppressed
+      // them it would be impossible to know in which loop iteration
+      // we are in.
+      const auto default_step_kind = ::default_step_kind(*step.pc);
+      if(
+        source_location != previous_source_location ||
+        default_step_kind == default_step_kindt::LOOP_HEAD)
       {
-        // just the source location
         if(!xml_location.name.empty())
         {
-          xmlt &xml_location_only=dest.new_element("location-only");
+          xmlt &xml_location_only =
+            dest.new_element(default_step_name(default_step_kind));
 
           xml_location_only.set_attribute_bool("hidden", step.hidden);
           xml_location_only.set_attribute(
@@ -253,6 +264,8 @@ void convert(
           xml_location_only.new_element().swap(xml_location);
         }
       }
+      break;
+    }
     }
 
     if(source_location.is_not_nil() && !source_location.get_file().empty())

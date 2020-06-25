@@ -15,7 +15,9 @@ Date: November 2005
 #define CPROVER_GOTO_PROGRAMS_JSON_GOTO_TRACE_H
 
 #include "goto_trace.h"
+#include "structured_trace_util.h"
 
+#include <algorithm>
 #include <util/invariant.h>
 #include <util/json.h>
 #include <util/json_irep.h>
@@ -97,9 +99,12 @@ void convert_return(
 /// \param conversion_dependencies: A structure
 ///   that contains information the conversion function
 ///   needs.
+/// \param step_kind: The kind of default step we are printing.
+///   See \ref default_step_kind
 void convert_default(
   json_objectt &json_location_only,
-  const conversion_dependenciest &conversion_dependencies);
+  const conversion_dependenciest &conversion_dependencies,
+  const default_step_kindt &step_kind);
 
 /// Templated version of the conversion method.
 /// Works by dispatching to the more specialised
@@ -186,10 +191,14 @@ void convert(
     case goto_trace_stept::typet::SHARED_WRITE:
     case goto_trace_stept::typet::CONSTRAINT:
     case goto_trace_stept::typet::NONE:
-      if(source_location != previous_source_location)
+      const auto default_step_kind = ::default_step_kind(*step.pc);
+      if(
+        source_location != previous_source_location ||
+        default_step_kind == default_step_kindt::LOOP_HEAD)
       {
         json_objectt &json_location_only = dest_array.push_back().make_object();
-        convert_default(json_location_only, conversion_dependencies);
+        convert_default(
+          json_location_only, conversion_dependencies, default_step_kind);
       }
     }
 
