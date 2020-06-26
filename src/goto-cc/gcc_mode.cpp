@@ -364,7 +364,6 @@ int gcc_modet::doit()
   compilet compiler(cmdline,
                     gcc_message_handler,
                     cmdline.isset("Werror") &&
-                    cmdline.isset("Wextra") &&
                     !cmdline.isset("Wno-error"));
 
   if(cmdline.isset("version"))
