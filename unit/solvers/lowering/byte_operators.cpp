@@ -215,7 +215,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
 
     THEN("byte_extract lowering yields the expected value")
     {
-      for(const auto endianness :
+      for(const auto &endianness :
           {ID_byte_extract_little_endian, ID_byte_extract_big_endian})
       {
         for(const auto &t1 : types)
@@ -366,7 +366,7 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
 
     THEN("byte_update lowering yields the expected value")
     {
-      for(const auto endianness :
+      for(const auto &endianness :
           {ID_byte_update_little_endian, ID_byte_update_big_endian})
       {
         for(const auto &t1 : types)
