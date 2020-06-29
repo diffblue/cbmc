@@ -326,6 +326,7 @@ with `__`.
 |------------------------|-------------------------------------------------|
 | `--malloc-fail-null`   |  in case malloc fails return NULL               |
 | `--malloc-fail-assert` |  in case malloc fails report as failed property |
+| `--malloc-may-fail`    |  malloc may non-deterministically fail          |
 
 Calling `malloc` may fail for a number of reasons and the function may return a
 NULL pointer. The users can choose if and how they want the `malloc`-related
@@ -335,3 +336,7 @@ additional properties inside `malloc` that are checked and if failing the
 verification is terminated (by `assume(false)`). One such property is that the
 allocated size is not too large, i.e. internally representable. When neither of
 those two options are used, CBMC will assume that `malloc` does not fail.
+
+Malloc may also fail for external reasons which are not modelled by CProver. If
+you want to replicate this behaviour use the option `--malloc-may-fail` in
+conjunction with one of the above modes of failure.

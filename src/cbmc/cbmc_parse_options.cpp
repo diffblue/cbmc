@@ -1076,6 +1076,8 @@ void cbmc_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"
     " --malloc-fail-null           set malloc failure mode to return null\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --malloc-may-fail            allow malloc calls to return a null pointer\n"
     HELP_REACHABILITY_SLICER
     HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)

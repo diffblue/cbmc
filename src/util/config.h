@@ -129,6 +129,7 @@ public:
     libt lib;
 
     bool string_abstraction;
+    bool malloc_may_fail = false;
 
     enum malloc_failure_modet
     {
