@@ -34,19 +34,17 @@ class no_decl_found_exceptiont : public std::exception
 {
 public:
   explicit no_decl_found_exceptiont(const std::string &var_name)
-    : _varname(var_name)
+    : message{"Failed to find declaration for: " + var_name}
   {
   }
 
   virtual const char *what() const throw()
   {
-    std::ostringstream stringStream;
-    stringStream << "Failed to find declaration for: " << _varname;
-    return stringStream.str().c_str();
+    return message.c_str();
   }
 
 private:
-  std::string _varname;
+  std::string message;
 };
 
 pointer_assignment_locationt find_struct_component_assignments(
