@@ -27,7 +27,7 @@ TEST_CASE("Add array types", "[core]")
 
   SECTION("Array class symbol exists")
   {
-    for(const std::string array_type : array_types)
+    for(const std::string &array_type : array_types)
     {
       const auto array_type_symbol = require_symbol::require_symbol_exists(
         symbol_table, "java::array[" + array_type + "]");
@@ -38,7 +38,7 @@ TEST_CASE("Add array types", "[core]")
   }
   SECTION("Array clone method exists")
   {
-    for(const std::string array_type : array_types)
+    for(const std::string &array_type : array_types)
     {
       const auto array_type_symbol = require_symbol::require_symbol_exists(
         symbol_table,
