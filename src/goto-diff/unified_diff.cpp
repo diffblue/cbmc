@@ -368,7 +368,7 @@ void unified_difft::output(std::ostream &os) const
 {
   goto_programt empty;
 
-  for(const std::pair<irep_idt, differencest> &p : differences_map_)
+  for(auto const &p : differences_map_)
   {
     const irep_idt &function = p.first;
 
