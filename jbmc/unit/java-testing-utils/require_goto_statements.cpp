@@ -263,7 +263,7 @@ require_goto_statements::find_pointer_assignments(
   }
 
   std::ostringstream found_symbols;
-  for(const auto entry : all_symbols)
+  for(const auto &entry : all_symbols)
   {
     found_symbols << entry << std::endl;
   }
