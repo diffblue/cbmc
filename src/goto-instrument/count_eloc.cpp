@@ -54,8 +54,8 @@ void count_eloc(const goto_modelt &goto_model)
   working_dirst eloc_map;
   collect_eloc(goto_model, eloc_map);
 
-  for(const std::pair<irep_idt, filest> &files : eloc_map)
-    for(const std::pair<irep_idt, linest> &lines : files.second)
+  for(auto const &files : eloc_map)
+    for(auto const &lines : files.second)
       eloc+=lines.second.size();
 
   std::cout << "Effective lines of code: " << eloc << '\n';
@@ -66,8 +66,8 @@ void list_eloc(const goto_modelt &goto_model)
   working_dirst eloc_map;
   collect_eloc(goto_model, eloc_map);
 
-  for(const std::pair<irep_idt, filest> &files : eloc_map)
-    for(const std::pair<irep_idt, linest> &lines : files.second)
+  for(auto const &files : eloc_map)
+    for(auto const &lines : files.second)
     {
       std::string file=id2string(lines.first);
       if(!files.first.empty())
