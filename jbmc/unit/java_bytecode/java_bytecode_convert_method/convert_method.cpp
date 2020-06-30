@@ -938,7 +938,7 @@ TEST_CASE(
   other_param.type() = java_lang_object_type();
   java_method_typet::parameterst parameters{
     this_param, ref_to_inner, other_param};
-  for(const auto param : parameters)
+  for(const auto &param : parameters)
   {
     REQUIRE(param.get_identifier().empty());
     REQUIRE(param.get_base_name().empty());

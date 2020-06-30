@@ -946,7 +946,7 @@ void get_dependencies_from_generic_parameters_rec(
   // Java generic type that holds different types in its type arguments
   if(is_java_generic_type(t))
   {
-    for(const auto type_arg : to_java_generic_type(t).generic_type_arguments())
+    for(const auto &type_arg : to_java_generic_type(t).generic_type_arguments())
       get_dependencies_from_generic_parameters_rec(type_arg, refs);
   }
 
@@ -1126,7 +1126,7 @@ std::string pretty_signature(const java_method_typet &method_type)
   result << '(';
 
   bool first = true;
-  for(const auto p : method_type.parameters())
+  for(const auto &p : method_type.parameters())
   {
     if(p.get_this())
       continue;

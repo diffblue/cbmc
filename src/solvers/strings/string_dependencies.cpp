@@ -238,7 +238,7 @@ optionalt<exprt> add_node(
     node.result_from = builtin_function_node.index;
 
     // Ensure all atomic strings in the argument have an associated node
-    for(const auto arg : builtin_function_node.data->string_arguments())
+    for(const auto &arg : builtin_function_node.data->string_arguments())
     {
       for_each_atomic_string(
         arg, [&](const array_string_exprt &atomic) { // NOLINT
@@ -314,7 +314,7 @@ void string_dependenciest::for_each_successor(
 void string_dependenciest::for_each_node(
   const std::function<void(const nodet &)> &f) const
 {
-  for(const auto string_node : string_nodes)
+  for(const auto &string_node : string_nodes)
     f(nodet(string_node));
   for(std::size_t i = 0; i < builtin_function_nodes.size(); ++i)
     f(nodet(builtin_function_nodes[i]));

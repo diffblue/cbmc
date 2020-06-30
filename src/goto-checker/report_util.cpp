@@ -473,7 +473,7 @@ static void output_fault_localization_plain(
   messaget &log)
 {
   log.result() << "\n** Most likely fault location:" << messaget::eom;
-  for(const auto fault_location_pair : fault_locations)
+  for(const auto &fault_location_pair : fault_locations)
   {
     output_fault_localization_plain(
       fault_location_pair.first, fault_location_pair.second, log);
@@ -509,7 +509,7 @@ static void output_fault_localization_xml(
   messaget &log)
 {
   xmlt dest("fault-localization");
-  for(const auto fault_location_pair : fault_locations)
+  for(const auto &fault_location_pair : fault_locations)
   {
     xmlt xml_diagnosis =
       xml(fault_location_pair.first, fault_location_pair.second, log);

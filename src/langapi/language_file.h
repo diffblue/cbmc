@@ -84,7 +84,7 @@ public:
     // Clear relevant entries from lazy_method_map
     language_filet *language_file = &file_map.at(filename);
     std::unordered_set<irep_idt> files_methods;
-    for(const std::pair<irep_idt, language_filet *> &method : lazy_method_map)
+    for(auto const &method : lazy_method_map)
     {
       if(method.second == language_file)
         files_methods.insert(method.first);

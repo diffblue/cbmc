@@ -60,7 +60,7 @@ const require_parse_tree::methodt require_parse_tree::require_method(
 
   INFO("Looking for method: " << method_name);
   std::ostringstream found_methods;
-  for(const auto entry : parsed_class.methods)
+  for(const auto &entry : parsed_class.methods)
   {
     found_methods << id2string(entry.name) << std::endl;
   }
@@ -80,7 +80,7 @@ void require_parse_tree::require_instructions_match_expectation(
 {
   REQUIRE(instructions.size() == expected_instructions.size());
   auto actual_instruction_it = instructions.begin();
-  for(const auto expected_instruction : expected_instructions)
+  for(const auto &expected_instruction : expected_instructions)
   {
     expected_instruction.require_instructions_equal(*actual_instruction_it);
     ++actual_instruction_it;

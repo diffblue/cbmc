@@ -137,7 +137,7 @@ void c_test_input_generatort::operator()(const goto_trace_storaget &traces)
   {
   case ui_message_handlert::uit::PLAIN:
     log.result() << "\nTest suite:\n";
-    for(const auto trace : traces.all())
+    for(const auto &trace : traces.all())
     {
       test_inputst test_inputs = (*this)(trace, ns);
       test_inputs.output_plain_text(log.result(), ns, trace);
@@ -153,7 +153,7 @@ void c_test_input_generatort::operator()(const goto_trace_storaget &traces)
     json_stream_arrayt &tests_array =
       json_result.push_back_stream_array("tests");
 
-    for(const auto trace : traces.all())
+    for(const auto &trace : traces.all())
     {
       test_inputst test_inputs = (*this)(trace, ns);
       tests_array.push_back(test_inputs.to_json(ns, trace, print_trace));
@@ -161,7 +161,7 @@ void c_test_input_generatort::operator()(const goto_trace_storaget &traces)
     break;
   }
   case ui_message_handlert::uit::XML_UI:
-    for(const auto trace : traces.all())
+    for(const auto &trace : traces.all())
     {
       test_inputst test_inputs = (*this)(trace, ns);
       log.result() << test_inputs.to_xml(ns, trace, print_trace);
