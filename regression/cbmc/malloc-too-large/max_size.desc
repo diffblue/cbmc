@@ -1,9 +1,9 @@
 CORE
 max_size.c
---malloc-fail-assert
+--overly-large-allocation-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[malloc.assertion.\d+\] line \d+ max allocation size exceeded: FAILURE$
+^\[malloc.allocate.\d+\] line \d+ .*: FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
