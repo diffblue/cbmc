@@ -1073,11 +1073,12 @@ void cbmc_parse_optionst::help()
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"
-    " --malloc-fail-null           set malloc failure mode to return null\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --malloc-may-fail            allow malloc calls to return a null pointer\n"
+    << help_entry(
+      "--overly-large-allocation-returns-null",
+      "memory allocation functions return null when more memory is allocated than can be addressed by cbmc") // NOLINT(*)
+    << help_entry(
+      "--allocation-may-fail",
+      "allow memory allocation functions to return null") <<
     HELP_REACHABILITY_SLICER
     HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)

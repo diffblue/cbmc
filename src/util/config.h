@@ -129,16 +129,9 @@ public:
     libt lib;
 
     bool string_abstraction;
-    bool malloc_may_fail = false;
 
-    enum malloc_failure_modet
-    {
-      malloc_failure_mode_none = 0,
-      malloc_failure_mode_return_null = 1,
-      malloc_failure_mode_assert_then_assume = 2
-    };
-
-    malloc_failure_modet malloc_failure_mode = malloc_failure_mode_none;
+    bool allocate_may_fail = false;
+    bool allocate_size_null = false;
 
     static const std::size_t default_object_bits=8;
   } ansi_c;
