@@ -470,10 +470,15 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // already type checked
   }
+  else if(expr.id() == ID_C_spec_assigns || expr.id() == ID_target_list)
+  {
+    // already type checked
+  }
   else
   {
     error().source_location = expr.source_location();
-    error() << "unexpected expression: " << expr.pretty() << eom;
+    error() << "expression categorized improperly during parsing: "
+            << expr.pretty() << eom;
     throw 0;
   }
 }

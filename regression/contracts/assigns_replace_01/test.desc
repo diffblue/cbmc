@@ -1,0 +1,9 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that a variable inside the assigns clause is havocked.

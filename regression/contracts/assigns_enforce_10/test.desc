@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that verification fails when a function with an assigns clause calls another function with an assigns clause that is incompatible with the caller's assigns clause.

@@ -1,0 +1,9 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds when an assigns clause is combined with a function contract in a loop properly.

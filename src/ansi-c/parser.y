@@ -204,6 +204,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
 %token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
+%token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_XORXOR      "^^"
@@ -508,6 +509,36 @@ ensures_opt:
         { init($$); parser_stack($$).make_nil(); }
         | TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
         { $$=$3; }
+        ;
+
+assigns_opt:
+        /* nothing */
+        { init($$); parser_stack($$).make_nil(); }
+        | TOK_CPROVER_ASSIGNS '(' target_list ')'
+        { $$=$3; }
+        ;
+
+target_list:
+          target
+        {
+          init($$, ID_target_list);
+          mto($$, $1);
+        }
+        | target_list ',' target
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+target:
+          identifier
+        | '*' target
+        {
+          $$=$1;
+          set($$, ID_dereference);
+          mto($$, $2);
+        }
         ;
 
 statement_expression: '(' compound_statement ')'
@@ -2853,14 +2884,21 @@ asm_definition:
 
 function_definition:
           function_head
+          assigns_opt
           requires_opt
           ensures_opt
           function_body
         {
+
+          // Capture assigns clause
           if(parser_stack($2).is_not_nil())
-            parser_stack($1).add(ID_C_spec_requires).swap(parser_stack($2));
+            parser_stack($1).add(ID_C_spec_assigns).swap(parser_stack($2));
+
+          // Capture code contract
           if(parser_stack($3).is_not_nil())
-            parser_stack($1).add(ID_C_spec_ensures).swap(parser_stack($3));
+            parser_stack($1).add(ID_C_spec_requires).swap(parser_stack($3));
+          if(parser_stack($4).is_not_nil())
+            parser_stack($1).add(ID_C_spec_ensures).swap(parser_stack($4));
           // The head is a declaration with one declarator,
           // and the body becomes the 'value'.
           $$=$1;
@@ -2868,7 +2906,7 @@ function_definition:
             to_ansi_c_declaration(parser_stack($$));
             
           assert(ansi_c_declaration.declarators().size()==1);
-          ansi_c_declaration.add_initializer(parser_stack($4));
+          ansi_c_declaration.add_initializer(parser_stack($5));
           
           // Kill the scope that 'function_head' creates.
           PARSER.pop_scope();

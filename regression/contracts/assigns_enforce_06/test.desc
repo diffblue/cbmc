@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds when functions with assigns clauses are called from within a loop.

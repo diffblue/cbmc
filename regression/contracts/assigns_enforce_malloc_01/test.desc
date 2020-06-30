@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds when a formal parameter pointer outside of the assigns clause is instead pointed as freshly allocated memory before being assigned.
