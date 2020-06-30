@@ -1067,7 +1067,7 @@ void cbmc_parse_optionst::help()
     HELP_SHOW_GOTO_FUNCTIONS
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
+    << HELP_GOTO_CHECK <<
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"

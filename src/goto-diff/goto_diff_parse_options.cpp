@@ -407,7 +407,7 @@ void goto_diff_parse_optionst::help()
     " --compact-output             output dependencies in compact mode\n"
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
+    << HELP_GOTO_CHECK <<
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     "Other options:\n"
     " --version                    show version and exit\n"

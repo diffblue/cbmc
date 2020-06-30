@@ -1792,7 +1792,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
-    HELP_GOTO_CHECK
+    << HELP_GOTO_CHECK <<
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
     " --error-label label          check that label is unreachable\n"
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
