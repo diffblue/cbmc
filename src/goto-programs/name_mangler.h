@@ -121,10 +121,9 @@ public:
 
       auto inserted = model.goto_functions.function_map.emplace(
         pair.second, std::move(found->second));
-      INVARIANT(
-        inserted.second,
-        "The mangled name '" + std::string(pair.second.c_str()) +
-          "' should not already exist in the codebase");
+      if(!inserted.second)
+        log.debug() << "Found a mangled name that already exists: "
+                    << std::string(pair.second.c_str()) << log.eom;
 
       model.goto_functions.function_map.erase(found);
     }
