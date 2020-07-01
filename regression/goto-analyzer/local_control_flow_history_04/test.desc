@@ -1,0 +1,16 @@
+CORE
+main.c
+--verify --recursive-interprocedural --loop-unwind 17 --constants --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion total == \(n \* \(n - 1\) / 2\): SUCCESS$
+^\[main.assertion.2\] .* assertion total == \(n \* \(n - 1\) / 2\): SUCCESS$
+^\[main.assertion.3\] .* assertion total == \(n \* \(n - 1\) / 2\): UNKNOWN$
+--
+^warning: ignoring
+--
+A basic test of the loop unwinding limit.
+You might think this has an off-by-one error but to process a loop 16 times
+you have to visit the loop guard 17 times.  Setting the loop limit to 16 will
+cause the last two visits to merge loosing the precision needed to prove the
+conjecture.
