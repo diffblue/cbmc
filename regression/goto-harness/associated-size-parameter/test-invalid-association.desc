@@ -1,0 +1,9 @@
+CORE
+main.c
+--harness-type call-function --function test --associated-array-size array:sze
+Expected parameter: \"sze\" on function \"test\"
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Tes the error message for invalid array size association is reported correctly.
