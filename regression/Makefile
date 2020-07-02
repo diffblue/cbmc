@@ -28,6 +28,7 @@ DIRS = cbmc \
        systemc \
        contracts \
        goto-cc-file-local \
+       goto-cc-regression-gh-issue-5380 \
        linking-goto-binaries \
        symtab2gb \
        solver-hardness \

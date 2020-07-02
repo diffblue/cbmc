@@ -1,0 +1,16 @@
+CORE
+test.c
+--export-function-local-symbols
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed$
+--
+This test guards against a regression added when the local file
+name mangler would not add the required name into the symbol
+table. When the regression was present, we were met with an
+invariant violation during goto-cc compilation. Without it,
+nothing spectacular happens - compilation proceeds as expected.
+For more information look up issue 5380 in github.com/diffblue/cbmc.
+
