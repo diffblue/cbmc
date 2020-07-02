@@ -169,11 +169,11 @@ void recursive_initializationt::initialize(
             goto_model.symbol_table.lookup_ref(fun_name);
           const auto proper_init_case = code_function_callt{
             fun_symbol.symbol_expr(), {depth, address_of_exprt{lhs}}};
-
+          const auto should_make_equal =
+            get_fresh_local_typed_symexpr("should_make_equal", bool_typet{});
+          body.add(code_declt{should_make_equal});
           body.add(code_ifthenelset{
-            side_effect_expr_nondett{bool_typet{}, source_locationt{}},
-            set_equal_case,
-            proper_init_case});
+            should_make_equal, set_equal_case, proper_init_case});
         }
         else
         {
@@ -693,9 +693,12 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   code_blockt null_and_return{{assign_null, code_returnt{}}};
   body.add(code_ifthenelset{conjunction(should_not_recurse), null_and_return});
 
+  const auto should_recurse_nondet =
+    get_fresh_local_typed_symexpr("should_recurse_nondet", bool_typet{});
+  body.add(code_declt{should_recurse_nondet});
   exprt::operandst should_recurse_ops{
     binary_predicate_exprt{depth, ID_lt, get_symbol_expr(min_depth_var_name)},
-    side_effect_expr_nondett{bool_typet{}, source_locationt{}}};
+    should_recurse_nondet};
   code_blockt then_case{};
 
   code_assignt seen_assign_prev{};
@@ -753,8 +756,10 @@ code_blockt recursive_initializationt::build_array_string_constructor(
   {
     index_exprt index_expr{dereference_exprt{result},
                            from_integer(index, size_type())};
-    body.add(code_assignt{
-      index_expr, side_effect_expr_nondett{char_type(), source_locationt{}}});
+    auto const nondet_char =
+      get_fresh_local_typed_symexpr("nondet_char", char_type());
+    body.add(code_declt{nondet_char});
+    body.add(code_assignt{index_expr, nondet_char});
     body.add(code_assumet{
       notequal_exprt{index_expr, from_integer(0, array_type.subtype())}});
   }
@@ -830,9 +835,10 @@ code_blockt recursive_initializationt::build_nondet_constructor(
 {
   PRECONDITION(result.type().id() == ID_pointer);
   code_blockt body{};
-  body.add(code_assignt{
-    dereference_exprt{result},
-    side_effect_expr_nondett{result.type().subtype(), source_locationt{}}});
+  auto const nondet_symbol =
+    get_fresh_local_typed_symexpr("nondet", result.type().subtype());
+  body.add(code_declt{nondet_symbol});
+  body.add(code_assignt{dereference_exprt{result}, nondet_symbol});
   return body;
 }
 
@@ -1029,10 +1035,6 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
   const auto function_pointer_selector =
     get_fresh_local_symexpr("function_pointer_selector");
   body.add(code_declt{function_pointer_selector});
-  body.add(
-    code_assignt{function_pointer_selector,
-                 side_effect_expr_nondett{function_pointer_selector.type(),
-                                          source_locationt{}}});
   auto function_pointer_index = std::size_t{0};
 
   for(const auto &target : targets)
