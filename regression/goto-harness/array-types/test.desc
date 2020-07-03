@@ -1,0 +1,11 @@
+CORE
+example.c
+--harness-type call-function --function test --treat-pointer-as-array arr
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+type_constructor_ptr_int\(0, &arr, \(signed int \*\)\(void \*\)0\);
+--
+incompatible pointer types
+--
+Ensure that the function pointer types match
