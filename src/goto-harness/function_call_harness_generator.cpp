@@ -508,7 +508,11 @@ function_call_harness_generatort::implt::declare_arguments(
         associated_array_size_argument == parameter_name_to_argument_name.end())
       {
         throw invalid_command_line_argument_exceptiont{
-          "associated array size is not there",
+          "could not find parameter to associate the array size of array \"" +
+            id2string(parameter_name) + "\" (Expected parameter: \"" +
+            id2string(associated_array_size_parameter) + "\" on function \"" +
+            id2string(function_to_call.display_name()) + "\" in " +
+            function_to_call.location.as_string() + ")",
           "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT};
       }
       function_argument_to_associated_array_size.insert(
