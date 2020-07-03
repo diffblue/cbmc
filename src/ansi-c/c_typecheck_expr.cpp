@@ -1730,6 +1730,14 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
   }
   else if(op_type.id()==ID_pointer)
   {
+    if(op_type.subtype().id() == ID_empty)
+    {
+      error().source_location = expr.source_location();
+      error() << "cannot dereference void pointer '" << to_string(op) << "'"
+        << eom;
+      throw 0;
+    }
+
     expr.type()=op_type.subtype();
   }
   else

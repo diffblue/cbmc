@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=1$
+^SIGNAL=0$
+^CONVERSION ERROR$
+cannot dereference void pointer
+--
+^warning: ignoring
+--
+Checks that cbmc reports an error for void pointer dereferences
