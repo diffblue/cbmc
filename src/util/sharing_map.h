@@ -448,7 +448,7 @@ public:
   ///
   /// \param [out] view: Empty view
   template <class V>
-  void get_view(V &) const;
+  void get_view(V &view) const;
   viewt get_view() const
   {
     viewt result;
