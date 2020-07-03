@@ -6,14 +6,13 @@
 
 \*******************************************************************/
 
-#include "data_dependency_context.h"
 #include "variable_sensitivity_dependence_graph.h"
+#include "data_dependency_context.h"
 
+#include <goto-programs/json_expr.h>
 #include <langapi/language_util.h>
 #include <util/json.h>
-#include <goto-programs/json_expr.h>
 #include <util/json_irep.h>
-
 
 /**
  * Evaluate an expression and accumulate all the data dependencies
@@ -24,16 +23,18 @@
  * \param deps the destination in which to accumlate data dependencies
  */
 void variable_sensitivity_dependence_domaint::eval_data_deps(
-  const exprt &expr, const namespacet &ns, data_depst &deps) const
+  const exprt &expr,
+  const namespacet &ns,
+  data_depst &deps) const
 {
-  const auto res=
+  const auto res =
     std::dynamic_pointer_cast<const data_dependency_contextt>(eval(expr, ns));
 
   if(res->get_data_dependencies().size() > 0)
   {
     // If the expression was able to be eval'ed to something with data
     // dependencies, then that's all we need to gather.
-    for (const auto dep : res->get_data_dependencies())
+    for(const auto dep : res->get_data_dependencies())
       deps[dep].insert(expr);
   }
   else
@@ -68,14 +69,14 @@ void variable_sensitivity_dependence_domaint::transform(
   const irep_idt &function_to,
   locationt to,
   ai_baset &ai,
-   const namespacet &ns)
+  const namespacet &ns)
 {
   variable_sensitivity_domaint::transform(
     function_from, from, function_to, to, ai, ns);
 
-  variable_sensitivity_dependence_grapht *dep_graph=
-    dynamic_cast<variable_sensitivity_dependence_grapht*>(&ai);
-  assert(dep_graph!=nullptr);
+  variable_sensitivity_dependence_grapht *dep_graph =
+    dynamic_cast<variable_sensitivity_dependence_grapht *>(&ai);
+  assert(dep_graph != nullptr);
 
   // propagate control dependencies across function calls
   if(from->is_function_call())
@@ -89,15 +90,15 @@ void variable_sensitivity_dependence_domaint::transform(
       // edge to function entry point
       const goto_programt::const_targett next = std::next(from);
 
-      variable_sensitivity_dependence_domaint *s=
-        dynamic_cast<variable_sensitivity_dependence_domaint*>
-          (&(dep_graph->get_state(next)));
-      assert(s!=nullptr);
+      variable_sensitivity_dependence_domaint *s =
+        dynamic_cast<variable_sensitivity_dependence_domaint *>(
+          &(dep_graph->get_state(next)));
+      assert(s != nullptr);
 
       if(s->has_values.is_false())
       {
-        s->has_values=tvt::unknown();
-        s->has_changed=true;
+        s->has_values = tvt::unknown();
+        s->has_changed = true;
       }
 
       // modify abstract state of return location
@@ -106,7 +107,7 @@ void variable_sensitivity_dependence_domaint::transform(
            control_dep_candidates,
            control_dep_calls,
            control_dep_call_candidates))
-        s->has_changed=true;
+        s->has_changed = true;
 
       control_deps.clear();
       control_dep_candidates.clear();
@@ -136,28 +137,28 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   if(to->is_assign())
   {
     const code_assignt &inst = to_code_assign(to->code);
-    const exprt &rhs=inst.rhs();
+    const exprt &rhs = inst.rhs();
 
     // Handle return value of a 'no body' function
     if(rhs.id() == ID_side_effect)
     {
-      const side_effect_exprt &see=to_side_effect_expr(rhs);
-      if(see.get_statement()==ID_nondet)
+      const side_effect_exprt &see = to_side_effect_expr(rhs);
+      if(see.get_statement() == ID_nondet)
       {
         if(from->is_function_call())
         {
-          const code_function_callt &cfc=to_code_function_call(from->code);
-          const exprt &call=cfc.function();
+          const code_function_callt &cfc = to_code_function_call(from->code);
+          const exprt &call = cfc.function();
 
-          if(call.id()==ID_symbol)
+          if(call.id() == ID_symbol)
           {
-            const irep_idt id=to_symbol_expr(call).id();
-            const goto_functionst &goto_functions=dep_graph.goto_functions;
+            const irep_idt id = to_symbol_expr(call).id();
+            const goto_functionst &goto_functions = dep_graph.goto_functions;
 
-            goto_functionst::function_mapt::const_iterator it=
+            goto_functionst::function_mapt::const_iterator it =
               goto_functions.function_map.find(id);
 
-            if(it!=goto_functions.function_map.end())
+            if(it != goto_functions.function_map.end())
             {
               if(!it->second.body_available()) // body not available
               {
@@ -182,16 +183,16 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
       eval_data_deps(rhs, ns, domain_data_deps);
     }
   }
-  else if (to->is_function_call())
+  else if(to->is_function_call())
   {
     const code_function_callt &call = to_code_function_call(to->code);
-    const code_function_callt::argumentst &args= call.arguments();
+    const code_function_callt::argumentst &args = call.arguments();
     for(const auto arg : args)
     {
       eval_data_deps(arg, ns, domain_data_deps);
     }
   }
-  else if (to->is_goto())
+  else if(to->is_goto())
   {
     eval_data_deps(to->guard, ns, domain_data_deps);
   }
@@ -230,25 +231,25 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
 
   // Compute postdominators if needed
 
-  const goto_functionst &goto_functions=dep_graph.goto_functions;
+  const goto_functionst &goto_functions = dep_graph.goto_functions;
 
   const irep_idt id = from_function;
-  cfg_post_dominatorst &pd_tmp=dep_graph.cfg_post_dominators()[id];
+  cfg_post_dominatorst &pd_tmp = dep_graph.cfg_post_dominators()[id];
 
-  goto_functionst::function_mapt::const_iterator f_it=
+  goto_functionst::function_mapt::const_iterator f_it =
     goto_functions.function_map.find(id);
 
-  if(f_it==goto_functions.function_map.end())
+  if(f_it == goto_functions.function_map.end())
     return;
 
-  const goto_programt &goto_program=f_it->second.body;
+  const goto_programt &goto_program = f_it->second.body;
 
-  if(pd_tmp.cfg.size()==0) // have we computed the dominators already?
+  if(pd_tmp.cfg.size() == 0) // have we computed the dominators already?
   {
     pd_tmp(goto_program);
   }
 
-  const cfg_post_dominatorst &pd=pd_tmp;
+  const cfg_post_dominatorst &pd = pd_tmp;
 
   // Check all candidates
 
@@ -256,24 +257,22 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
   {
     // check all CFG successors of M
     // special case: assumptions also introduce a control dependency
-    bool post_dom_all=!cd->is_assume();
-    bool post_dom_one=false;
+    bool post_dom_all = !cd->is_assume();
+    bool post_dom_one = false;
 
     // we could hard-code assume and goto handling here to improve
     // performance
-    const cfg_post_dominatorst::cfgt::nodet &m=
-      pd.get_node(cd);
+    const cfg_post_dominatorst::cfgt::nodet &m = pd.get_node(cd);
 
     // successors of M
     for(const auto &edge : m.out)
     {
-      const cfg_post_dominatorst::cfgt::nodet &m_s=
-        pd.cfg[edge.first];
+      const cfg_post_dominatorst::cfgt::nodet &m_s = pd.cfg[edge.first];
 
-      if(m_s.dominators.find(to)!=m_s.dominators.end())
-        post_dom_one=true;
+      if(m_s.dominators.find(to) != m_s.dominators.end())
+        post_dom_one = true;
       else
-        post_dom_all=false;
+        post_dom_all = false;
     }
 
     if(post_dom_all || !post_dom_one)
@@ -282,12 +281,13 @@ void variable_sensitivity_dependence_domaint::control_dependencies(
     }
     else
     {
-      tvt branch=tvt::unknown();
+      tvt branch = tvt::unknown();
 
       if(cd->is_goto() && !cd->is_backwards_goto())
       {
-        goto_programt::const_targett t=cd->get_target();
-        branch=to->location_number>=t->location_number?tvt(false):tvt(true);
+        goto_programt::const_targett t = cd->get_target();
+        branch =
+          to->location_number >= t->location_number ? tvt(false) : tvt(true);
       }
 
       control_deps.insert(std::make_pair(cd, branch));
@@ -314,37 +314,37 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
   const control_dep_callst &other_control_dep_calls,
   const control_dep_callst &other_control_dep_call_candidates)
 {
-  bool changed=false;
+  bool changed = false;
 
   // Merge control dependencies
 
-  control_depst::iterator it=control_deps.begin();
+  control_depst::iterator it = control_deps.begin();
 
   for(const auto &c_dep : other_control_deps)
   {
     // find position to insert
-    while(it!=control_deps.end() && it->first<c_dep.first)
+    while(it != control_deps.end() && it->first < c_dep.first)
       ++it;
 
-    if(it==control_deps.end() || c_dep.first<it->first)
+    if(it == control_deps.end() || c_dep.first < it->first)
     {
       // hint points at position that will follow the new element
       control_deps.insert(it, c_dep);
-      changed=true;
+      changed = true;
     }
     else
     {
-      assert(it!=control_deps.end());
-      assert(!(it->first<c_dep.first));
-      assert(!(c_dep.first<it->first));
+      assert(it != control_deps.end());
+      assert(!(it->first < c_dep.first));
+      assert(!(c_dep.first < it->first));
 
-      tvt &branch1=it->second;
-      const tvt &branch2=c_dep.second;
+      tvt &branch1 = it->second;
+      const tvt &branch2 = c_dep.second;
 
-      if(branch1!=branch2 && !branch1.is_unknown())
+      if(branch1 != branch2 && !branch1.is_unknown())
       {
-        branch1=tvt::unknown();
-        changed=true;
+        branch1 = tvt::unknown();
+        changed = true;
       }
 
       ++it;
@@ -353,33 +353,31 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
 
   // Merge control dependency candidates
 
-  size_t n=control_dep_candidates.size();
+  size_t n = control_dep_candidates.size();
 
   control_dep_candidates.insert(
-      other_control_dep_candidates.begin(),
-      other_control_dep_candidates.end());
+    other_control_dep_candidates.begin(), other_control_dep_candidates.end());
 
-  changed|=n!=control_dep_candidates.size();
+  changed |= n != control_dep_candidates.size();
 
   // Merge call control dependencies
 
-  n=control_dep_calls.size();
+  n = control_dep_calls.size();
 
   control_dep_calls.insert(
-      other_control_dep_calls.begin(),
-      other_control_dep_calls.end());
+    other_control_dep_calls.begin(), other_control_dep_calls.end());
 
-  changed|=n!=control_dep_calls.size();
+  changed |= n != control_dep_calls.size();
 
   // Merge call control dependency candidates
 
-  n=control_dep_call_candidates.size();
+  n = control_dep_call_candidates.size();
 
   control_dep_call_candidates.insert(
-      other_control_dep_call_candidates.begin(),
-      other_control_dep_call_candidates.end());
+    other_control_dep_call_candidates.begin(),
+    other_control_dep_call_candidates.end());
 
-   changed|=n!=control_dep_call_candidates.size();
+  changed |= n != control_dep_call_candidates.size();
 
   return changed;
 }
@@ -393,9 +391,9 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
  * \return true if something has changed in the merge
  */
 bool variable_sensitivity_dependence_domaint::merge(
-    const variable_sensitivity_domaint &b,
-    locationt from,
-    locationt to)
+  const variable_sensitivity_domaint &b,
+  locationt from,
+  locationt to)
 {
   bool changed = false;
 
@@ -403,11 +401,11 @@ bool variable_sensitivity_dependence_domaint::merge(
   changed |= has_values.is_false() || has_changed;
 
   // Handle data dependencies
-  const auto& cast_b =
-    dynamic_cast<const variable_sensitivity_dependence_domaint&>(b);
+  const auto &cast_b =
+    dynamic_cast<const variable_sensitivity_dependence_domaint &>(b);
 
   // Merge data dependencies
-  for (auto bdep : cast_b.domain_data_deps)
+  for(auto bdep : cast_b.domain_data_deps)
   {
     for(exprt bexpr : bdep.second)
     {
@@ -422,8 +420,8 @@ bool variable_sensitivity_dependence_domaint::merge(
     cast_b.control_dep_calls,
     cast_b.control_dep_call_candidates);
 
-  has_changed=false;
-  has_values=tvt::unknown();
+  has_changed = false;
+  has_values = tvt::unknown();
 
   return changed;
 }
@@ -453,10 +451,7 @@ void variable_sensitivity_dependence_domaint::merge_three_way_function_return(
   // the three way merge is that the underlying variable sensitivity domain
   // does its three way merge.
   variable_sensitivity_domaint::merge_three_way_function_return(
-    function_call,
-    function_start,
-    function_end,
-    ns);
+    function_call, function_start, function_end, ns);
 }
 
 /**
@@ -467,33 +462,31 @@ void variable_sensitivity_dependence_domaint::merge_three_way_function_return(
  * \param ns the namespace
  */
 void variable_sensitivity_dependence_domaint::output(
-   std::ostream &out,
-   const ai_baset &ai,
-   const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   if(!control_deps.empty() || !control_dep_calls.empty())
   {
     out << "Control dependencies: ";
-    for(control_depst::const_iterator
-        it=control_deps.begin();
-        it!=control_deps.end();
+    for(control_depst::const_iterator it = control_deps.begin();
+        it != control_deps.end();
         ++it)
     {
-      if(it!=control_deps.begin())
+      if(it != control_deps.begin())
         out << ",";
 
-      const goto_programt::const_targett cd=it->first;
-      const tvt branch=it->second;
+      const goto_programt::const_targett cd = it->first;
+      const tvt branch = it->second;
 
       out << cd->location_number << " [" << branch << "]";
     }
 
-    for(control_dep_callst::const_iterator
-        it=control_dep_calls.begin();
-        it!=control_dep_calls.end();
+    for(control_dep_callst::const_iterator it = control_dep_calls.begin();
+        it != control_dep_calls.end();
         ++it)
     {
-      if(!control_deps.empty() || it!=control_dep_calls.begin())
+      if(!control_deps.empty() || it != control_dep_calls.begin())
         out << ",";
 
       out << (*it)->location_number << " [UNCONDITIONAL]";
@@ -504,30 +497,30 @@ void variable_sensitivity_dependence_domaint::output(
 
   if(!domain_data_deps.empty())
   {
-      out << "Data dependencies: ";
-      bool first = true;
-      for (auto &dep : domain_data_deps)
+    out << "Data dependencies: ";
+    bool first = true;
+    for(auto &dep : domain_data_deps)
+    {
+      if(!first)
+        out << ", ";
+
+      out << dep.first->location_number;
+      out << " [";
+      bool first_expr = true;
+      for(auto &expr : dep.second)
       {
-        if(!first)
+        if(!first_expr)
           out << ", ";
 
-        out << dep.first->location_number;
-        out << " [";
-        bool first_expr = true;
-        for (auto &expr : dep.second)
-        {
-          if (!first_expr)
-            out << ", ";
-
-          out << from_expr(ns, "", expr);
-          first_expr = false;
-        }
-        out << "]";
-
-        first = false;
+        out << from_expr(ns, "", expr);
+        first_expr = false;
       }
-      out << std::endl;
+      out << "]";
+
+      first = false;
     }
+    out << std::endl;
+  }
 }
 
 /**
@@ -546,45 +539,45 @@ jsont variable_sensitivity_dependence_domaint::output_json(
 
   for(const auto &cd : control_deps)
   {
-    const goto_programt::const_targett target=cd.first;
-    const tvt branch=cd.second;
+    const goto_programt::const_targett target = cd.first;
+    const tvt branch = cd.second;
 
-    json_objectt &link=graph.push_back().make_object();
+    json_objectt &link = graph.push_back().make_object();
 
-    link["locationNumber"]=
+    link["locationNumber"] =
       json_numbert(std::to_string(target->location_number));
-    link["sourceLocation"]=json(target->source_location);
-    link["type"]=json_stringt("control");
-    link["branch"]=json_stringt(branch.to_string());
+    link["sourceLocation"] = json(target->source_location);
+    link["type"] = json_stringt("control");
+    link["branch"] = json_stringt(branch.to_string());
   }
 
   for(const auto &target : control_dep_calls)
   {
-    json_objectt &link=graph.push_back().make_object();
-    link["locationNumber"]=
+    json_objectt &link = graph.push_back().make_object();
+    link["locationNumber"] =
       json_numbert(std::to_string(target->location_number));
-    link["sourceLocation"]=json(target->source_location);
-    link["type"]=json_stringt("control");
-    link["branch"]=json_stringt("UNCONDITIONAL");
+    link["sourceLocation"] = json(target->source_location);
+    link["type"] = json_stringt("control");
+    link["branch"] = json_stringt("UNCONDITIONAL");
   }
 
   for(const auto &dep : domain_data_deps)
   {
-    json_objectt &link=graph.push_back().make_object();
-    link["locationNumber"]=
+    json_objectt &link = graph.push_back().make_object();
+    link["locationNumber"] =
       json_numbert(std::to_string(dep.first->location_number));
-    link["sourceLocation"]=json(dep.first->source_location);
+    link["sourceLocation"] = json(dep.first->source_location);
     json_stringt(dep.first->source_location.as_string());
-    link["type"]=json_stringt("data");
+    link["type"] = json_stringt("data");
 
-    const std::set<exprt> &expr_set=dep.second;
-    json_arrayt &expressions=link["expressions"].make_array();
+    const std::set<exprt> &expr_set = dep.second;
+    json_arrayt &expressions = link["expressions"].make_array();
 
     for(const exprt &e : expr_set)
     {
-      json_objectt &object=expressions.push_back().make_object();
-      object["expression"]=json_stringt(from_expr(ns, "", e));
-      object["certainty"]=json_stringt("maybe");
+      json_objectt &object = expressions.push_back().make_object();
+      object["expression"] = json_stringt(from_expr(ns, "", e));
+      object["certainty"] = json_stringt("maybe");
     }
   }
 
@@ -610,10 +603,10 @@ void variable_sensitivity_dependence_grapht::add_dep(
   goto_programt::const_targett from,
   goto_programt::const_targett to)
 {
-  const node_indext n_from=state_map[from].get_node_id();
-  assert(n_from<size());
-  const node_indext n_to=state_map[to].get_node_id();
-  assert(n_to<size());
+  const node_indext n_from = state_map[from].get_node_id();
+  assert(n_from < size());
+  const node_indext n_to = state_map[to].get_node_id();
+  assert(n_to < size());
 
   // add_edge is redundant as the subsequent operations also insert
   // entries into the edge maps (implicitly)

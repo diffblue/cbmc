@@ -1,4 +1,4 @@
-int f2(int, const int*);
+int f2(int, const int *);
 extern const int g_map[];
 
 int g_out1;

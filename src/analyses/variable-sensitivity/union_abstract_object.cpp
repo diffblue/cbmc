@@ -6,12 +6,11 @@
 
 \*******************************************************************/
 
-#include <util/std_expr.h>
-#include <util/namespace.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <util/namespace.h>
+#include <util/std_expr.h>
 
 #include "union_abstract_object.h"
-
 
 /*******************************************************************\
 
@@ -26,10 +25,10 @@ Function: union_abstract_objectt::union_abstract_objectt
 
 \*******************************************************************/
 
-union_abstract_objectt::union_abstract_objectt(const typet &type):
-  abstract_objectt(type)
+union_abstract_objectt::union_abstract_objectt(const typet &type)
+  : abstract_objectt(type)
 {
-  PRECONDITION(type.id()==ID_union);
+  PRECONDITION(type.id() == ID_union);
 }
 
 /*******************************************************************\
@@ -49,10 +48,12 @@ Function: union_abstract_objectt::union_abstract_objectt
 \*******************************************************************/
 
 union_abstract_objectt::union_abstract_objectt(
-  const typet &type, bool top, bool bottom):
-    abstract_objectt(type, top, bottom)
+  const typet &type,
+  bool top,
+  bool bottom)
+  : abstract_objectt(type, top, bottom)
 {
-  PRECONDITION(type.id()==ID_union);
+  PRECONDITION(type.id() == ID_union);
 }
 
 /*******************************************************************\
@@ -70,11 +71,12 @@ Function: union_abstract_objectt::union_abstract_objectt
 \*******************************************************************/
 
 union_abstract_objectt::union_abstract_objectt(
-  const exprt &expr, const abstract_environmentt &environment,
-  const namespacet &ns):
-    abstract_objectt(expr, environment, ns)
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+  : abstract_objectt(expr, environment, ns)
 {
-  PRECONDITION(ns.follow(expr.type()).id()==ID_union);
+  PRECONDITION(ns.follow(expr.type()).id() == ID_union);
 }
 
 /**

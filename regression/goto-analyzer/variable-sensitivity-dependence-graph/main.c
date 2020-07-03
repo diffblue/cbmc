@@ -1,4 +1,5 @@
-struct structt {
+struct structt
+{
   int a;
   int b;
 };
@@ -15,20 +16,20 @@ void array_task(void);
 
 void main(void)
 {
-  if (in == 1)
+  if(in == 1)
     st.a++;
 
-  if (in == 2)
+  if(in == 2)
     st.b++;
 
   out1 = st.a;
   out2 = st.b;
   out3 = st.a + st.b;
 
-  if (in == 1)
+  if(in == 1)
     ar[0]++;
 
-  if (out1 == 2)
+  if(out1 == 2)
     ar[1]++;
 
   out1 = ar[0];
@@ -39,7 +40,7 @@ void main(void)
   arr[1] = 2;
   arr[2] = 3;
 
-  if (in > 0)
+  if(in > 0)
   {
     arr[2] = arr[1];
   }

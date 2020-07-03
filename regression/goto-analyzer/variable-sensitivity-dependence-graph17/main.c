@@ -13,9 +13,9 @@ void main(void)
   g_a[2] = 3;
 
   i = 0;
-  if (g_in > 0)
+  if(g_in > 0)
   {
-    i=1;
+    i = 1;
     g_a[2] = g_a[1];
   }
 

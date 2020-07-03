@@ -129,8 +129,9 @@ public:
   void set_options(const vsd_configt &options);
 
 private:
-  variable_sensitivity_object_factoryt():initialized(false)
-  {}
+  variable_sensitivity_object_factoryt() : initialized(false)
+  {
+  }
   static variable_sensitivity_object_factoryt s_instance;
   enum ABSTRACT_OBJECT_TYPET
   {
@@ -188,23 +189,23 @@ Function: variable_sensitivity_object_factoryt::initialize_abstract_object
 \*******************************************************************/
 
 template <class abstract_object_classt>
-abstract_object_pointert variable_sensitivity_object_factoryt::
-  initialize_abstract_object(
-    const typet type,
-    bool top,
-    bool bottom,
-    const exprt &e,
-    const abstract_environmentt &enviroment,
-    const namespacet &ns)
+abstract_object_pointert
+variable_sensitivity_object_factoryt::initialize_abstract_object(
+  const typet type,
+  bool top,
+  bool bottom,
+  const exprt &e,
+  const abstract_environmentt &enviroment,
+  const namespacet &ns)
 {
   if(configuration.context_tracking.data_dependency_context)
     return initialize_context_abstract_object<
-      abstract_object_classt, data_dependency_contextt>(
-        type, top, bottom, e, enviroment, ns);
+      abstract_object_classt,
+      data_dependency_contextt>(type, top, bottom, e, enviroment, ns);
   if(configuration.context_tracking.last_write_context)
     return initialize_context_abstract_object<
-      abstract_object_classt, write_location_contextt>(
-        type, top, bottom, e, enviroment, ns);
+      abstract_object_classt,
+      write_location_contextt>(type, top, bottom, e, enviroment, ns);
   else
   {
     if(top || bottom)
@@ -222,31 +223,31 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
 }
 
 template <class abstract_object_classt, class context_classt>
-abstract_object_pointert variable_sensitivity_object_factoryt::
-  initialize_context_abstract_object(
-    const typet type,
-    bool top,
-    bool bottom,
-    const exprt &e,
-    const abstract_environmentt &enviroment,
-    const namespacet &ns)
+abstract_object_pointert
+variable_sensitivity_object_factoryt::initialize_context_abstract_object(
+  const typet type,
+  bool top,
+  bool bottom,
+  const exprt &e,
+  const abstract_environmentt &enviroment,
+  const namespacet &ns)
 {
   if(top || bottom)
   {
-    return abstract_object_pointert(
-      new context_classt(
-        abstract_object_pointert(
-          new abstract_object_classt(type, top, bottom)),
-        type, top, bottom));
+    return abstract_object_pointert(new context_classt(
+      abstract_object_pointert(new abstract_object_classt(type, top, bottom)),
+      type,
+      top,
+      bottom));
   }
   else
   {
-    PRECONDITION(type==ns.follow(e.type()));
-    return abstract_object_pointert(
-      new context_classt(
-        abstract_object_pointert(
-          new abstract_object_classt(e, enviroment, ns)),
-        e, enviroment, ns));
+    PRECONDITION(type == ns.follow(e.type()));
+    return abstract_object_pointert(new context_classt(
+      abstract_object_pointert(new abstract_object_classt(e, enviroment, ns)),
+      e,
+      enviroment,
+      ns));
   }
 }
 

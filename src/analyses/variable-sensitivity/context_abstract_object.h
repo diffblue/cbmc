@@ -17,15 +17,15 @@
  * instantiated directly - instead it is intended to be inherited from for
  * other classes to define what the context actually means.
  */
-class context_abstract_objectt: public abstract_objectt
+class context_abstract_objectt : public abstract_objectt
 {
 public:
   // These constructors mirror those in the base abstract_objectt, but with
   // the addition of an extra argument which is the abstract_objectt to wrap.
   explicit context_abstract_objectt(
     const abstract_object_pointert child,
-    const typet &type):
-    abstract_objectt(type)
+    const typet &type)
+    : abstract_objectt(type)
   {
     child_abstract_object = child;
   }
@@ -34,8 +34,8 @@ public:
     const abstract_object_pointert child,
     const typet &type,
     bool top,
-    bool bottom):
-    abstract_objectt(type, top, bottom)
+    bool bottom)
+    : abstract_objectt(type, top, bottom)
   {
     child_abstract_object = child;
   }
@@ -44,13 +44,15 @@ public:
     const abstract_object_pointert child,
     const exprt &expr,
     const abstract_environmentt &environment,
-    const namespacet &ns):
-    abstract_objectt(expr, environment, ns)
+    const namespacet &ns)
+    : abstract_objectt(expr, environment, ns)
   {
     child_abstract_object = child;
   }
 
-  virtual ~context_abstract_objectt() {}
+  virtual ~context_abstract_objectt()
+  {
+  }
 
   virtual const typet &type() const
   {
@@ -79,8 +81,9 @@ public:
     const namespacet &ns) const override;
 
   virtual void output(
-    std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
-  override;
+    std::ostream &out,
+    const class ai_baset &ai,
+    const namespacet &ns) const override;
 
   abstract_object_pointert unwrap_context() const override;
 
@@ -98,8 +101,7 @@ protected:
   // The abstract_objectt that will be wrapped in a context
   abstract_object_pointert child_abstract_object;
 
-  void set_child(
-    const abstract_object_pointert &child);
+  void set_child(const abstract_object_pointert &child);
 
   // These are internal hooks that allow sub-classes to perform additional
   // actions when an abstract_object is set/unset to TOP
@@ -119,8 +121,8 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  virtual bool has_been_modified(const abstract_object_pointert before) const
-    override;
+  virtual bool
+  has_been_modified(const abstract_object_pointert before) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONTEXT_ABSTRACT_OBJECT_H

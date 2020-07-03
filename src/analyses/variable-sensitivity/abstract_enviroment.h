@@ -9,10 +9,10 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 
+#include <iosfwd>
 #include <map>
 #include <memory>
 #include <stack>
-#include <iosfwd>
 #include <vector>
 
 #include "abstract_object_statistics.h"
@@ -26,8 +26,8 @@ public:
   using map_keyt = irep_idt;
   abstract_environmentt();
   // These three are really the heart of the method
-  virtual abstract_object_pointert eval(
-    const exprt &expr, const namespacet &ns) const;
+  virtual abstract_object_pointert
+  eval(const exprt &expr, const namespacet &ns) const;
   virtual bool assign(
     const exprt &expr,
     const abstract_object_pointert value,
@@ -46,12 +46,14 @@ public:
   virtual abstract_object_pointert abstract_object_factory(
     const typet &type,
     const namespacet &ns,
-    bool top=true,
-    bool bottom=false) const;
+    bool top = true,
+    bool bottom = false) const;
   // For converting constants in the program
   // Maybe these two should be compacted to one call...
   virtual abstract_object_pointert abstract_object_factory(
-    const typet &type, const exprt &e, const namespacet &ns) const;
+    const typet &type,
+    const exprt &e,
+    const namespacet &ns) const;
 
   virtual bool merge(const abstract_environmentt &env);
 
@@ -66,8 +68,8 @@ public:
   bool is_bottom() const;
   bool is_top() const;
 
-  void output(
-    std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
+  void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
+    const;
 
   bool verify() const;
 
@@ -81,8 +83,8 @@ protected:
   bool bottom;
 
   // We may need to break out more of these cases into these
-  virtual abstract_object_pointert eval_expression(
-    const exprt &e, const namespacet &ns) const;
+  virtual abstract_object_pointert
+  eval_expression(const exprt &e, const namespacet &ns) const;
 
   sharing_mapt<map_keyt, abstract_object_pointert> map;
 

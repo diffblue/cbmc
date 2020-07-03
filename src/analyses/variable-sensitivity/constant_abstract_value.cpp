@@ -21,20 +21,23 @@
 #include "abstract_enviroment.h"
 #include "constant_abstract_value.h"
 
-constant_abstract_valuet::constant_abstract_valuet(typet t):
-  abstract_valuet(t), value()
-{}
+constant_abstract_valuet::constant_abstract_valuet(typet t)
+  : abstract_valuet(t), value()
+{
+}
 
-constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm):
-  abstract_valuet(t, tp, bttm), value()
-{}
+constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm)
+  : abstract_valuet(t, tp, bttm), value()
+{
+}
 
 constant_abstract_valuet::constant_abstract_valuet(
   const exprt e,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    abstract_valuet(e.type(), false, false), value(e)
-{}
+  const namespacet &ns)
+  : abstract_valuet(e.type(), false, false), value(e)
+{
+}
 
 abstract_object_pointert constant_abstract_valuet::expression_transform(
   const exprt &expr,
@@ -62,8 +65,8 @@ abstract_object_pointert constant_abstract_valuet::expression_transform(
   // another to check if there are any top subexpressions left
   for(const exprt &op : adjusted_expr.operands())
   {
-    abstract_object_pointert lhs_abstract_object=environment.eval(op, ns);
-    const exprt &lhs_value=lhs_abstract_object->to_constant();
+    abstract_object_pointert lhs_abstract_object = environment.eval(op, ns);
+    const exprt &lhs_value = lhs_abstract_object->to_constant();
     if(lhs_value.is_nil())
     {
       // do not give up if a sub-expression is not a constant,
@@ -153,7 +156,9 @@ exprt constant_abstract_valuet::to_constant() const
 }
 
 void constant_abstract_valuet::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   if(!is_top() && !is_bottom())
   {
@@ -180,10 +185,10 @@ Function: constant_abstract_valuet::merge
 
 \*******************************************************************/
 
-abstract_object_pointert constant_abstract_valuet::merge(
-  abstract_object_pointert other) const
+abstract_object_pointert
+constant_abstract_valuet::merge(abstract_object_pointert other) const
 {
-  constant_abstract_value_pointert cast_other=
+  constant_abstract_value_pointert cast_other =
     std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
   if(cast_other)
   {
@@ -221,7 +226,7 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
   else
   {
     // Can we actually merge these value
-    if(value==other->value)
+    if(value == other->value)
     {
       return shared_from_this();
     }
@@ -232,10 +237,11 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
   }
 }
 
-void constant_abstract_valuet::get_statistics(abstract_object_statisticst &statistics,
-                                              abstract_object_visitedt &visited,
-                                              const abstract_environmentt &env,
-                                              const namespacet& ns) const
+void constant_abstract_valuet::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
 {
   abstract_valuet::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_constants;

@@ -8,16 +8,16 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include <ostream>
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include "full_struct_abstract_object.h"
 
 // #define DEBUG
 
 #ifdef DEBUG
-#include <iostream>
+#  include <iostream>
 #endif
 
 /**
@@ -26,9 +26,10 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
  *        to ensure it shares as much data as possible.
  */
 full_struct_abstract_objectt::full_struct_abstract_objectt(
-  const full_struct_abstract_objectt &ao):
-    struct_abstract_objectt(ao), map(ao.map)
-{ }
+  const full_struct_abstract_objectt &ao)
+  : struct_abstract_objectt(ao), map(ao.map)
+{
+}
 
 /*******************************************************************\
 
@@ -43,10 +44,10 @@ Function: full_struct_abstract_objectt::struct_abstract_objectt
 
 \*******************************************************************/
 
-full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t):
-  struct_abstract_objectt(t)
+full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t)
+  : struct_abstract_objectt(t)
 {
-  PRECONDITION(t.id()==ID_struct);
+  PRECONDITION(t.id() == ID_struct);
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
@@ -67,10 +68,12 @@ Function: struct_abstract_objectt::struct_abstract_objectt
 \*******************************************************************/
 
 full_struct_abstract_objectt::full_struct_abstract_objectt(
-  const typet &t, bool top, bool bottom):
-    struct_abstract_objectt(t, top, bottom)
+  const typet &t,
+  bool top,
+  bool bottom)
+  : struct_abstract_objectt(t, top, bottom)
 {
-  PRECONDITION(t.id()==ID_struct);
+  PRECONDITION(t.id() == ID_struct);
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
@@ -91,22 +94,21 @@ Function: full_struct_abstract_objectt::full_struct_abstract_objectt
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    struct_abstract_objectt(e, environment, ns)
+  const namespacet &ns)
+  : struct_abstract_objectt(e, environment, ns)
 {
-  PRECONDITION(ns.follow(e.type()).id()==ID_struct);
+  PRECONDITION(ns.follow(e.type()).id() == ID_struct);
 
   const struct_typet struct_type_def = to_struct_type(ns.follow(e.type()));
 
   bool did_initialize_values = false;
   auto struct_type_it = struct_type_def.components().begin();
-  for(auto param_it = e.operands().begin();
-      param_it != e.operands().end();
+  for(auto param_it = e.operands().begin(); param_it != e.operands().end();
       ++param_it)
   {
     map.insert_or_replace(
       struct_type_it->get_name(),
-      environment.abstract_object_factory (param_it->type(), *param_it, ns));
+      environment.abstract_object_factory(param_it->type(), *param_it, ns));
     did_initialize_values = true;
     ++struct_type_it;
   }
@@ -140,7 +142,7 @@ Function: struct_abstract_objectt::read_component
 abstract_object_pointert full_struct_abstract_objectt::read_component(
   const abstract_environmentt &environment,
   const member_exprt &member_expr,
-  const namespacet& ns) const
+  const namespacet &ns) const
 {
 #ifdef DEBUG
   std::cout << "Reading component " << member_expr.get_component_name()
@@ -149,14 +151,13 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
 
   if(is_top())
   {
-    return environment.abstract_object_factory(
-      member_expr.type(), ns, true);
+    return environment.abstract_object_factory(member_expr.type(), ns, true);
   }
   else
   {
     PRECONDITION(!is_bottom());
 
-    const irep_idt c=member_expr.get_component_name();
+    const irep_idt c = member_expr.get_component_name();
 
     auto const value = map.find(c);
 
@@ -166,8 +167,7 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
     }
     else
     {
-      return environment.abstract_object_factory(
-        member_expr.type(), ns, true);
+      return environment.abstract_object_factory(member_expr.type(), ns, true);
     }
   }
 }
@@ -194,13 +194,13 @@ Function: struct_abstract_objectt::write_component
 \*******************************************************************/
 
 sharing_ptrt<struct_abstract_objectt>
-  full_struct_abstract_objectt::write_component(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> &stack,
-    const member_exprt &member_expr,
-    const abstract_object_pointert value,
-    bool merging_write) const
+full_struct_abstract_objectt::write_component(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> &stack,
+  const member_exprt &member_expr,
+  const abstract_object_pointert value,
+  bool merging_write) const
 {
 #ifdef DEBUG
   std::cout << "Writing component " << member_expr.get_component_name()
@@ -214,22 +214,20 @@ sharing_ptrt<struct_abstract_objectt>
         member_expr.compound().type(), false, true));
   }
 
-  const auto &result=
+  const auto &result =
     std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
   if(!stack.empty())
   {
     abstract_object_pointert starting_value;
-    const irep_idt c=member_expr.get_component_name();
+    const irep_idt c = member_expr.get_component_name();
     auto const old_value = map.find(c);
     if(!old_value.has_value())
     {
-      starting_value=
-        environment.abstract_object_factory(
-          member_expr.type(), ns, true, false);
+      starting_value = environment.abstract_object_factory(
+        member_expr.type(), ns, true, false);
       result->map.insert(
-        c,
-        environment.write(starting_value, value, stack, ns, merging_write));
+        c, environment.write(starting_value, value, stack, ns, merging_write));
     }
     else
     {
@@ -244,12 +242,11 @@ sharing_ptrt<struct_abstract_objectt>
   }
   else
   {
-
 #ifdef DEBUG
     std::cout << "Setting component" << std::endl;
 #endif
 
-    const irep_idt c=member_expr.get_component_name();
+    const irep_idt c = member_expr.get_component_name();
     auto const old_value = result->map.find(c);
 
     if(merging_write)
@@ -312,7 +309,9 @@ Function: full_struct_abstract_objectt::output
 \*******************************************************************/
 
 void full_struct_abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   // To ensure that a consistent ordering of fields is output, use
   // the underlying type declaration for this struct to determine
@@ -332,7 +331,8 @@ void full_struct_abstract_objectt::output(
         out << ", ";
       }
       out << '.' << field.get_name() << '=';
-      static_cast<const abstract_object_pointert &>(value.value())->output(out, ai, ns);
+      static_cast<const abstract_object_pointert &>(value.value())
+        ->output(out, ai, ns);
       first = false;
     }
   }
@@ -376,10 +376,10 @@ Function: full_struct_abstract_objectt::merge
 
 \*******************************************************************/
 
-abstract_object_pointert full_struct_abstract_objectt::merge(
-  abstract_object_pointert other) const
+abstract_object_pointert
+full_struct_abstract_objectt::merge(abstract_object_pointert other) const
 {
-  constant_struct_pointert cast_other=
+  constant_struct_pointert cast_other =
     std::dynamic_pointer_cast<const full_struct_abstract_objectt>(other);
   if(cast_other)
   {
@@ -416,7 +416,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   }
   else
   {
-    const auto &result=
+    const auto &result =
       std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
     bool modified = abstract_objectt::merge_shared_maps<irep_idt>(
@@ -451,7 +451,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
 abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
-  const auto &result=
+  const auto &result =
     std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
   bool modified = false;

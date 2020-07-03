@@ -8,11 +8,11 @@
 
 #include <ostream>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <analyses/ai.h>
 #include "constant_pointer_abstract_object.h"
+#include <analyses/ai.h>
+#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 /*******************************************************************\
 
@@ -28,10 +28,10 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const typet &t):
-    pointer_abstract_objectt(t)
+  const typet &t)
+  : pointer_abstract_objectt(t)
 {
-  PRECONDITION(t.id()==ID_pointer);
+  PRECONDITION(t.id() == ID_pointer);
 }
 
 /*******************************************************************\
@@ -51,10 +51,12 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const typet &t, bool tp, bool bttm):
-    pointer_abstract_objectt(t, tp, bttm)
+  const typet &t,
+  bool tp,
+  bool bttm)
+  : pointer_abstract_objectt(t, tp, bttm)
 {
-  PRECONDITION(t.id()==ID_pointer);
+  PRECONDITION(t.id() == ID_pointer);
 }
 
 /*******************************************************************\
@@ -71,9 +73,10 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const constant_pointer_abstract_objectt &old):
-    pointer_abstract_objectt(old), value_stack(old.value_stack)
-{}
+  const constant_pointer_abstract_objectt &old)
+  : pointer_abstract_objectt(old), value_stack(old.value_stack)
+{
+}
 
 /*******************************************************************\
 
@@ -91,11 +94,11 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    pointer_abstract_objectt(e, environment, ns),
+  const namespacet &ns)
+  : pointer_abstract_objectt(e, environment, ns),
     value_stack(e, environment, ns)
 {
-  PRECONDITION(e.type().id()==ID_pointer);
+  PRECONDITION(e.type().id() == ID_pointer);
   if(value_stack.is_top_value())
   {
     make_top();
@@ -122,10 +125,10 @@ Function: constant_pointer_abstract_objectt::merge
 
 \*******************************************************************/
 
-abstract_object_pointert constant_pointer_abstract_objectt::merge(
-  abstract_object_pointert other) const
+abstract_object_pointert
+constant_pointer_abstract_objectt::merge(abstract_object_pointert other) const
 {
-  auto cast_other=
+  auto cast_other =
     std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
   if(cast_other)
   {
@@ -155,8 +158,8 @@ Function: constant_pointer_abstract_objectt::merge_constant_pointers
 \*******************************************************************/
 
 abstract_object_pointert
-  constant_pointer_abstract_objectt::merge_constant_pointers(
-    const constant_pointer_abstract_pointert other) const
+constant_pointer_abstract_objectt::merge_constant_pointers(
+  const constant_pointer_abstract_pointert other) const
 {
   if(is_bottom())
   {
@@ -164,8 +167,8 @@ abstract_object_pointert
   }
   else
   {
-    bool matching_pointer=
-      value_stack.to_expression()==other->value_stack.to_expression();
+    bool matching_pointer =
+      value_stack.to_expression() == other->value_stack.to_expression();
 
     if(matching_pointer)
     {
@@ -226,7 +229,9 @@ Function: constant_pointer_abstract_objectt::output
 \*******************************************************************/
 
 void constant_pointer_abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   if(is_top() || is_bottom() || value_stack.is_top_value())
   {
@@ -235,8 +240,8 @@ void constant_pointer_abstract_objectt::output(
   else
   {
     out << "ptr ->(";
-    const exprt &value=value_stack.to_expression();
-    if(value.id()==ID_address_of)
+    const exprt &value = value_stack.to_expression();
+    if(value.id() == ID_address_of)
     {
       const auto &addressee = to_address_of_expr(value).object();
       if(addressee.id() == ID_symbol)
@@ -284,7 +289,8 @@ Function: constant_pointer_abstract_objectt::read_dereference
 \*******************************************************************/
 
 abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
-  const abstract_environmentt &env, const namespacet &ns) const
+  const abstract_environmentt &env,
+  const namespacet &ns) const
 {
   if(is_top() || is_bottom() || value_stack.is_top_value())
   {
@@ -325,12 +331,12 @@ Function: constant_pointer_abstract_objectt::write_dereference
 \*******************************************************************/
 
 sharing_ptrt<pointer_abstract_objectt>
-  constant_pointer_abstract_objectt::write_dereference(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> stack,
-    const abstract_object_pointert new_value,
-    bool merging_write) const
+constant_pointer_abstract_objectt::write_dereference(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> stack,
+  const abstract_object_pointert new_value,
+  bool merging_write) const
 {
   if(is_top() || is_bottom() || value_stack.is_top_value())
   {
@@ -342,16 +348,15 @@ sharing_ptrt<pointer_abstract_objectt>
     if(stack.empty())
     {
       // We should not be changing the type of an abstract object
-      PRECONDITION(new_value->type()==ns.follow(type().subtype()));
+      PRECONDITION(new_value->type() == ns.follow(type().subtype()));
 
       // Get an expression that we can assign to
-      exprt value=value_stack.to_expression().op0();
+      exprt value = value_stack.to_expression().op0();
       if(merging_write)
       {
-        abstract_object_pointert pointed_value=
-          environment.eval(value, ns);
+        abstract_object_pointert pointed_value = environment.eval(value, ns);
         bool modifications;
-        abstract_object_pointert merged_value=
+        abstract_object_pointert merged_value =
           abstract_objectt::merge(pointed_value, new_value, modifications);
         environment.assign(value, merged_value, ns);
       }
@@ -362,16 +367,16 @@ sharing_ptrt<pointer_abstract_objectt>
     }
     else
     {
-      exprt value=value_stack.to_expression().op0();
-      abstract_object_pointert pointed_value=
-        environment.eval(value, ns);
-      abstract_object_pointert modified_value=
+      exprt value = value_stack.to_expression().op0();
+      abstract_object_pointert pointed_value = environment.eval(value, ns);
+      abstract_object_pointert modified_value =
         environment.write(pointed_value, new_value, stack, ns, merging_write);
       environment.assign(value, modified_value, ns);
 
       // but the pointer itself does not change!
     }
-    return std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(shared_from_this());
+    return std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
+      shared_from_this());
   }
 }
 

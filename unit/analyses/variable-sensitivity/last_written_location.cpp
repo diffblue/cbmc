@@ -15,22 +15,24 @@
 #include <iostream>
 #include <string>
 
+#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <util/arith_tools.h>
 #include <util/expr.h>
+#include <util/mathematical_types.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
-#include <util/namespace.h>
 #include <util/type.h>
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
-#include <util/arith_tools.h>
-#include <util/mathematical_types.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 //#include <src/ansi-c/c_to_expr.h>
 
-SCENARIO("Constructing two environments to make sure we correctly identify modified symbols",
-    "[core][analyses][variable-sensitivity][last-written-location]")
+SCENARIO(
+  "Constructing two environments to make sure we correctly identify modified "
+  "symbols",
+  "[core][analyses][variable-sensitivity][last-written-location]")
 {
   GIVEN("Two identifiers that contain integer values")
   {
@@ -73,9 +75,10 @@ SCENARIO("Constructing two environments to make sure we correctly identify modif
       second_env.assign(first_val, first_eval_rhs, ns);
       second_env.assign(second_val, second_eval_rhs, ns);
 
-      THEN("The modified symbols between the two domains should be none") {
-        auto changed_vals = abstract_environmentt::modified_symbols(
-          env, second_env);
+      THEN("The modified symbols between the two domains should be none")
+      {
+        auto changed_vals =
+          abstract_environmentt::modified_symbols(env, second_env);
         REQUIRE(changed_vals.size() == 0);
       }
     }
@@ -100,7 +103,8 @@ SCENARIO("Constructing two environments to make sure we correctly identify modif
     symbol_table.add(second_sym);
     namespacet ns(symbol_table);
 
-    WHEN("The identifiers get inserted into two environments, but one of \
+    WHEN(
+      "The identifiers get inserted into two environments, but one of \
           them has a different value in one of the environments")
     {
       abstract_environmentt env;
@@ -122,9 +126,10 @@ SCENARIO("Constructing two environments to make sure we correctly identify modif
       second_env.assign(first_val, first_eval_rhs, ns);
       second_env.assign(second_val, new_rhs_val, ns);
 
-      THEN("The modified symbols between the two domains should be none") {
-      auto changed_vals = abstract_environmentt::modified_symbols(
-          env, second_env);
+      THEN("The modified symbols between the two domains should be none")
+      {
+        auto changed_vals =
+          abstract_environmentt::modified_symbols(env, second_env);
         REQUIRE(changed_vals.size() == 0);
       }
     }

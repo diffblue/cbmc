@@ -12,13 +12,13 @@
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/simplify_expr.h>
-#include <util/type.h>
 #include <goto-programs/adjust_float_expressions.h>
-#include <util/ieee_float.h>
 #include <util/arith_tools.h>
+#include <util/ieee_float.h>
+#include <util/namespace.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/type.h>
 
 #include "abstract_object.h"
 
@@ -35,9 +35,10 @@ Function: abstract_objectt::abstract_objectt
 
 \*******************************************************************/
 
-abstract_objectt::abstract_objectt(const typet &type):
-t(type), bottom(false), top(true)
-{}
+abstract_objectt::abstract_objectt(const typet &type)
+  : t(type), bottom(false), top(true)
+{
+}
 
 /*******************************************************************\
 
@@ -55,8 +56,8 @@ Function: abstract_objectt::abstract_objectt
 
 \*******************************************************************/
 
-abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom):
-  t(type), bottom(bottom), top(top)
+abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom)
+  : t(type), bottom(bottom), top(top)
 {
   PRECONDITION(!(top && bottom));
 }
@@ -69,9 +70,10 @@ abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom):
 abstract_objectt::abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    t(expr.type()), bottom(false), top(true)
-{}
+  const namespacet &ns)
+  : t(expr.type()), bottom(false), top(true)
+{
+}
 
 /// Ctor for building object of types that differ from the types of input
 /// expressions
@@ -83,9 +85,10 @@ abstract_objectt::abstract_objectt(
   const typet &type,
   const exprt &expr,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-  t(type), bottom(false), top(true)
-{}
+  const namespacet &ns)
+  : t(type), bottom(false), top(true)
+{
+}
 
 /*******************************************************************\
 
@@ -118,8 +121,8 @@ Function: abstract_objectt::merge
 
 \*******************************************************************/
 
-abstract_object_pointert abstract_objectt::merge(
-  abstract_object_pointert other) const
+abstract_object_pointert
+abstract_objectt::merge(abstract_object_pointert other) const
 {
   return abstract_object_merge(other);
 }
@@ -144,9 +147,9 @@ abstract_object_pointert abstract_objectt::abstract_object_merge(
   if(is_top() || other->bottom)
     return this->abstract_object_merge_internal(other);
 
-  internal_abstract_object_pointert merged=mutable_clone();
+  internal_abstract_object_pointert merged = mutable_clone();
   merged->make_top();
-  merged->bottom=false;
+  merged->bottom = false;
   return merged->abstract_object_merge_internal(other);
 }
 
@@ -231,7 +234,7 @@ abstract_object_pointert abstract_objectt::expression_transform(
 {
   exprt copy = expr;
 
-  for (exprt &op : copy.operands())
+  for(exprt &op : copy.operands())
   {
     abstract_object_pointert op_abstract_object = environment.eval(op, ns);
     const exprt &const_op = op_abstract_object->to_constant();
@@ -240,7 +243,7 @@ abstract_object_pointert abstract_objectt::expression_transform(
 
   simplify(copy, ns);
 
-  for (const exprt &op : copy.operands())
+  for(const exprt &op : copy.operands())
   {
     abstract_object_pointert op_abstract_object = environment.eval(op, ns);
     const exprt &const_op = op_abstract_object->to_constant();
@@ -382,7 +385,9 @@ Function: abstract_objectt::output
 \*******************************************************************/
 
 void abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   if(top)
   {
@@ -422,10 +427,11 @@ abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert op2,
   bool &out_modifications)
 {
-  abstract_object_pointert result=op1->should_use_base_merge(op2)?
-    op1->abstract_object_merge(op2):op1->merge(op2);
+  abstract_object_pointert result = op1->should_use_base_merge(op2)
+                                      ? op1->abstract_object_merge(op2)
+                                      : op1->merge(op2);
   // If no modifications, we will return the original pointer
-  out_modifications=result!=op1;
+  out_modifications = result != op1;
 
   return result;
 }
@@ -462,10 +468,11 @@ abstract_object_pointert abstract_objectt::meet(
   abstract_object_pointert op2,
   bool &out_modifications)
 {
-  abstract_object_pointert result=op1->should_use_base_meet(op2)?
-    op1->abstract_object_meet(op2):op1->meet(op2);
+  abstract_object_pointert result = op1->should_use_base_meet(op2)
+                                      ? op1->abstract_object_meet(op2)
+                                      : op1->meet(op2);
   // If no modifications, we will return the original pointer
-  out_modifications=result!=op1;
+  out_modifications = result != op1;
 
   return result;
 }
@@ -499,13 +506,14 @@ abstract_object_pointert abstract_objectt::update_location_context(
 }
 
 void abstract_objectt::dump_map(
-  std::ostream out, const abstract_objectt::shared_mapt &m)
+  std::ostream out,
+  const abstract_objectt::shared_mapt &m)
 {
   shared_mapt::viewt view;
   m.get_view(view);
 
   out << "{";
-  bool first=true;
+  bool first = true;
   for(auto &item : view)
   {
     out << (first ? "" : ", ") << item.first;

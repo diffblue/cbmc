@@ -62,14 +62,14 @@ into calls to eval, assume, assign and merge.
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
 
+#include <iosfwd>
 #include <map>
 #include <memory>
-#include <iosfwd>
 
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 
-class variable_sensitivity_domaint:public ai_domain_baset
+class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
   virtual void transform(
@@ -96,10 +96,8 @@ public:
 
   void output(std::ostream &out) const;
 
-  virtual bool merge(
-    const variable_sensitivity_domaint &b,
-    locationt from,
-    locationt to);
+  virtual bool
+  merge(const variable_sensitivity_domaint &b, locationt from, locationt to);
 
   void merge_three_way_function_return(
     const ai_domain_baset &function_call,
@@ -107,15 +105,13 @@ public:
     const ai_domain_baset &function_end,
     const namespacet &ns) override;
 
-  bool ai_simplify(
-    exprt &condition,
-    const namespacet &ns) const override;
+  bool ai_simplify(exprt &condition, const namespacet &ns) const override;
 
   bool is_bottom() const override;
   bool is_top() const override;
 
-  virtual abstract_object_pointert eval(
-    const exprt &expr, const namespacet &ns) const
+  virtual abstract_object_pointert
+  eval(const exprt &expr, const namespacet &ns) const
   {
     return abstract_state.eval(expr, ns);
   }
@@ -129,8 +125,8 @@ private:
 
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
-  std::vector<irep_idt> get_modified_symbols(
-    const variable_sensitivity_domaint &other) const;
+  std::vector<irep_idt>
+  get_modified_symbols(const variable_sensitivity_domaint &other) const;
 
   void apply_domain(
     std::vector<symbol_exprt> modified_symbols,

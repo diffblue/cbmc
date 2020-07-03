@@ -16,9 +16,9 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
 
-#include <stack>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <iostream>
+#include <stack>
 
 /**
  * General implementation of an abstract_objectt which tracks the
@@ -31,34 +31,42 @@
  * of this, 'context_abstract_objectt<T>' which provides the same
  * constructors as the standard 'abstract_objectt' class.
  */
-class write_location_contextt: public context_abstract_objectt
+class write_location_contextt : public context_abstract_objectt
 {
 public:
   explicit write_location_contextt(
     const abstract_object_pointert child,
-    const typet &type):
-      context_abstract_objectt(child, type) { }
+    const typet &type)
+    : context_abstract_objectt(child, type)
+  {
+  }
 
   write_location_contextt(
     const abstract_object_pointert child,
     const typet &type,
     bool top,
-    bool bottom):
-      context_abstract_objectt(child, type, top, bottom) { }
+    bool bottom)
+    : context_abstract_objectt(child, type, top, bottom)
+  {
+  }
 
   explicit write_location_contextt(
     const abstract_object_pointert child,
     const exprt &expr,
     const abstract_environmentt &environment,
-    const namespacet &ns):
-      context_abstract_objectt(child, expr, environment, ns) { }
+    const namespacet &ns)
+    : context_abstract_objectt(child, expr, environment, ns)
+  {
+  }
 
-  virtual ~write_location_contextt() {}
+  virtual ~write_location_contextt()
+  {
+  }
 
   // Standard abstract_objectt interface
 
-  virtual bool has_been_modified(const abstract_object_pointert before) const
-    override;
+  virtual bool
+  has_been_modified(const abstract_object_pointert before) const override;
 
   virtual abstract_object_pointert update_location_context(
     const abstract_objectt::locationst &locations,
@@ -66,12 +74,14 @@ public:
 
   // A visitor class to update the last_written_locations of any visited
   // abstract_object with a given set of locations.
-  class location_update_visitort:
-    public abstract_objectt::abstract_object_visitort
+  class location_update_visitort
+    : public abstract_objectt::abstract_object_visitort
   {
   public:
-    explicit location_update_visitort(const locationst &locations):
-      locations(locations) { }
+    explicit location_update_visitort(const locationst &locations)
+      : locations(locations)
+    {
+    }
 
     abstract_object_pointert visit(const abstract_object_pointert element) const
     {
@@ -85,15 +95,15 @@ public:
   locationst get_location_union(const locationst &locations) const;
 
   virtual void output(
-    std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
-      override;
-
+    std::ostream &out,
+    const class ai_baset &ai,
+    const namespacet &ns) const override;
 
 protected:
   CLONE
 
-  virtual abstract_object_pointert merge(
-    abstract_object_pointert other) const override;
+  virtual abstract_object_pointert
+  merge(abstract_object_pointert other) const override;
 
   virtual abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert other) const override;
@@ -116,8 +126,8 @@ private:
   // To enforce copy-on-write these are private and have read-only accessors
   abstract_objectt::locationst last_written_locations;
 
-  void set_last_written_locations(
-    const abstract_objectt::locationst &locations);
+  void
+  set_last_written_locations(const abstract_objectt::locationst &locations);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H

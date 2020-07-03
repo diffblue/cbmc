@@ -13,7 +13,7 @@
 #include <analyses/variable-sensitivity/abstract_value.h>
 #include <util/std_expr.h>
 
-class constant_abstract_valuet:public abstract_valuet
+class constant_abstract_valuet : public abstract_valuet
 {
 private:
   typedef sharing_ptrt<constant_abstract_valuet>
@@ -27,7 +27,9 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual ~constant_abstract_valuet() {}
+  virtual ~constant_abstract_valuet()
+  {
+  }
 
   virtual abstract_object_pointert expression_transform(
     const exprt &expr,
@@ -42,10 +44,11 @@ public:
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
-  void get_statistics(abstract_object_statisticst &statistics,
-                      abstract_object_visitedt &visited,
-                      const abstract_environmentt &env,
-                      const namespacet& ns) const override;
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
 
   size_t internal_hash() const override
   {
@@ -61,17 +64,17 @@ public:
 
 protected:
   CLONE
-  virtual abstract_object_pointert merge(
-    abstract_object_pointert other) const override;
+  virtual abstract_object_pointert
+  merge(abstract_object_pointert other) const override;
 
   abstract_object_pointert try_transform_expr_with_all_rounding_modes(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
 
-private :
-  abstract_object_pointert merge_constant_constant(
-    constant_abstract_value_pointert other) const;
+private:
+  abstract_object_pointert
+  merge_constant_constant(constant_abstract_value_pointert other) const;
 
   exprt value;
 };

@@ -9,16 +9,16 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 
-#include <stack>
-#include <iosfwd>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <iosfwd>
+#include <stack>
 #include <util/sharing_map.h>
 
 class abstract_environmentt;
 class member_exprt;
 
-class full_struct_abstract_objectt:public struct_abstract_objectt
+class full_struct_abstract_objectt : public struct_abstract_objectt
 {
 public:
   typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
@@ -40,8 +40,8 @@ public:
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
-  virtual abstract_object_pointert visit_sub_elements(
-    const abstract_object_visitort &visitor) const override;
+  virtual abstract_object_pointert
+  visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
   void get_statistics(
     abstract_object_statisticst &statistics,
@@ -55,8 +55,8 @@ private:
     shared_struct_mapt;
   shared_struct_mapt map;
 
-  abstract_object_pointert merge_constant_structs(
-    constant_struct_pointert other) const;
+  abstract_object_pointert
+  merge_constant_structs(constant_struct_pointert other) const;
 
 protected:
   CLONE
@@ -65,7 +65,7 @@ protected:
   virtual abstract_object_pointert read_component(
     const abstract_environmentt &environment,
     const member_exprt &member_expr,
-    const namespacet& ns) const override;
+    const namespacet &ns) const override;
 
   virtual sharing_ptrt<struct_abstract_objectt> write_component(
     abstract_environmentt &environment,
@@ -78,8 +78,8 @@ protected:
   virtual bool verify() const override;
   // Set the state of this to the merge result of op1 and op2 and
   // return if the result is different from op1
-  virtual abstract_object_pointert merge(
-    abstract_object_pointert other) const override;
+  virtual abstract_object_pointert
+  merge(abstract_object_pointert other) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H

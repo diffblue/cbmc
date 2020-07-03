@@ -16,7 +16,7 @@
 #include <analyses/variable-sensitivity/abstract_value.h>
 #include <util/std_expr.h>
 
-class interval_abstract_valuet:public abstract_valuet
+class interval_abstract_valuet : public abstract_valuet
 {
 private:
   typedef sharing_ptrt<interval_abstract_valuet>
@@ -28,8 +28,7 @@ public:
 
   interval_abstract_valuet(const constant_interval_exprt e, int merge_count);
 
-  explicit interval_abstract_valuet(
-    const constant_interval_exprt e);
+  explicit interval_abstract_valuet(const constant_interval_exprt e);
 
   interval_abstract_valuet(
     const exprt e,
@@ -62,16 +61,16 @@ public:
 
 protected:
   CLONE
-  virtual abstract_object_pointert merge(
-    abstract_object_pointert other) const override;
+  virtual abstract_object_pointert
+  merge(abstract_object_pointert other) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 
-private :
-  abstract_object_pointert merge_intervals(
-    interval_abstract_value_pointert other) const;
-  abstract_object_pointert meet_intervals(
-    interval_abstract_value_pointert other) const;
+private:
+  abstract_object_pointert
+  merge_intervals(interval_abstract_value_pointert other) const;
+  abstract_object_pointert
+  meet_intervals(interval_abstract_value_pointert other) const;
 
   constant_interval_exprt interval;
 

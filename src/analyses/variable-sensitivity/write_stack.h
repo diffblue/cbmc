@@ -52,7 +52,12 @@ private:
     const abstract_environmentt environment,
     const namespacet &ns);
 
-  enum class integral_resultt { LHS_INTEGRAL, RHS_INTEGRAL, NEITHER_INTEGRAL };
+  enum class integral_resultt
+  {
+    LHS_INTEGRAL,
+    RHS_INTEGRAL,
+    NEITHER_INTEGRAL
+  };
 
   static integral_resultt get_which_side_integral(
     const exprt &expr,

@@ -26,9 +26,9 @@ Function: abstract_valuet::abstract_valuet
 
 \*******************************************************************/
 
-abstract_valuet::abstract_valuet(const typet &type):
-  abstract_objectt(type)
-{}
+abstract_valuet::abstract_valuet(const typet &type) : abstract_objectt(type)
+{
+}
 
 /*******************************************************************\
 
@@ -46,9 +46,10 @@ Function: abstract_valuet::abstract_valuet
 
 \*******************************************************************/
 
-abstract_valuet::abstract_valuet(const typet &type, bool top, bool bottom):
-  abstract_objectt(type, top, bottom)
-{}
+abstract_valuet::abstract_valuet(const typet &type, bool top, bool bottom)
+  : abstract_objectt(type, top, bottom)
+{
+}
 
 /*******************************************************************\
 
@@ -68,6 +69,7 @@ Function: abstract_valuet::abstract_valuet
 abstract_valuet::abstract_valuet(
   const exprt &expr,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    abstract_objectt(expr, environment, ns)
-{}
+  const namespacet &ns)
+  : abstract_objectt(expr, environment, ns)
+{
+}

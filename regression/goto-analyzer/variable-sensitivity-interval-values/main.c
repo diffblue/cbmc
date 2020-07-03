@@ -5,10 +5,13 @@ int main(void)
   int x = 0;
   int zero = x;
   int nondet_condition;
-  if(nondet_condition) {
+  if(nondet_condition)
+  {
     x = 1;
     int one = x;
-  } else {
+  }
+  else
+  {
     x = -1;
     int minus_one = x;
   }

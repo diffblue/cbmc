@@ -13,8 +13,7 @@ abstract_object_pointert context_abstract_objectt::get_child() const
   return child_abstract_object;
 }
 
-void context_abstract_objectt::set_child(
-  const abstract_object_pointert &child)
+void context_abstract_objectt::set_child(const abstract_object_pointert &child)
 {
   child_abstract_object = child;
 }
@@ -77,18 +76,16 @@ abstract_object_pointert context_abstract_objectt::write(
   const abstract_object_pointert value,
   bool merging_write) const
 {
-  abstract_object_pointert updated_child=
-    child_abstract_object->write(
-      environment, ns, stack, specifier, value, merging_write);
+  abstract_object_pointert updated_child = child_abstract_object->write(
+    environment, ns, stack, specifier, value, merging_write);
 
   // Only perform an update if the write to the child has in fact changed it...
   if(updated_child == child_abstract_object)
     return shared_from_this();
 
   // Need to ensure the result of the write is still wrapped in a context
-  const auto &result=
-    std::dynamic_pointer_cast<context_abstract_objectt>(
-      mutable_clone());
+  const auto &result =
+    std::dynamic_pointer_cast<context_abstract_objectt>(mutable_clone());
 
   // Update the child and record the updated write locations
   result->set_child(updated_child);
@@ -109,10 +106,10 @@ abstract_object_pointert context_abstract_objectt::write(
  * \return the resolved expression
  */
 abstract_object_pointert context_abstract_objectt::expression_transform(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
 {
   PRECONDITION(expr.operands().size() == operands.size());
 
@@ -127,7 +124,7 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
       auto p = std::dynamic_pointer_cast<const context_abstract_objectt>(op);
       INVARIANT(p, "Operand shall be of type context_abstract_objectt");
       return p->child_abstract_object;
-  });
+    });
 
   return child_abstract_object->expression_transform(
     expr, child_operands, environment, ns);
@@ -142,7 +139,9 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
  * \param ns the current namespace
  */
 void context_abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   child_abstract_object->output(out, ai, ns);
 }
@@ -161,9 +160,8 @@ bool context_abstract_objectt::has_been_modified(
   // Default implementation, with no other information to go on
   // falls back to relying on copy-on-write and pointer inequality
   // to indicate if an abstract_objectt has been modified
-  auto before_context=
-    std::dynamic_pointer_cast<const context_abstract_objectt>
-      (before);
+  auto before_context =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(before);
 
   return this->child_abstract_object.get() !=
          before_context->child_abstract_object.get();

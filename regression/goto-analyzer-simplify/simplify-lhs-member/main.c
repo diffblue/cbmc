@@ -1,6 +1,6 @@
 struct test_struct
 {
-  int * pointer_component;
+  int *pointer_component;
   int array[5];
 };
 
@@ -12,23 +12,23 @@ void main()
 
   // Simplify a pointer inside a struct
   int symbol;
-  value.pointer_component=&symbol;
+  value.pointer_component = &symbol;
 
   // Simplify
-  *value.pointer_component=5;
+  *value.pointer_component = 5;
 
   int nondet;
-  if(nondet>0)
+  if(nondet > 0)
   {
-    value.pointer_component=&nondet;
+    value.pointer_component = &nondet;
   }
   else
   {
-    value.pointer_component=&symbol;
+    value.pointer_component = &symbol;
   }
 
   // No simplification
-  *value.pointer_component=6;
+  *value.pointer_component = 6;
 
   // Simplify an array
 

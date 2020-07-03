@@ -12,9 +12,9 @@ int main(void)
 
   bool b3;
   if(x)
-  	b3 = true;
+    b3 = true;
   else
-  	b3 = false;
+    b3 = false;
 
   int i = b3 ? 10 : 20;
 

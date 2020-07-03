@@ -8,7 +8,6 @@ int main()
   {
     int x=1,y=2,z;
     z=x+y;
-    __CPROVER_assert(z==3, "z==3");
+    __CPROVER_assert(z == 3, "z==3");
   }
-
 }

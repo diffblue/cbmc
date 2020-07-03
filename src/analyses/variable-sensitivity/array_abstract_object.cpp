@@ -6,11 +6,10 @@
 
 \*******************************************************************/
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include "array_abstract_object.h"
-
+#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 /*******************************************************************\
 
@@ -25,10 +24,10 @@ Function: array_abstract_objectt::array_abstract_objectt
 
 \*******************************************************************/
 
-array_abstract_objectt::array_abstract_objectt(const typet &t):
-  abstract_objectt(t)
+array_abstract_objectt::array_abstract_objectt(const typet &t)
+  : abstract_objectt(t)
 {
-  PRECONDITION(t.id()==ID_array);
+  PRECONDITION(t.id() == ID_array);
 }
 
 /*******************************************************************\
@@ -48,10 +47,12 @@ Function: array_abstract_objectt::array_abstract_objectt
 \*******************************************************************/
 
 array_abstract_objectt::array_abstract_objectt(
-  const typet &t, bool tp, bool bttm):
-    abstract_objectt(t, tp, bttm)
+  const typet &t,
+  bool tp,
+  bool bttm)
+  : abstract_objectt(t, tp, bttm)
 {
-  PRECONDITION(t.id()==ID_array);
+  PRECONDITION(t.id() == ID_array);
 }
 
 /*******************************************************************\
@@ -72,10 +73,10 @@ Function: array_abstract_objectt::array_abstract_objectt
 array_abstract_objectt::array_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    abstract_objectt(e, environment, ns)
+  const namespacet &ns)
+  : abstract_objectt(e, environment, ns)
 {
-  PRECONDITION(e.type().id()==ID_array);
+  PRECONDITION(e.type().id() == ID_array);
 }
 
 /**
@@ -126,7 +127,6 @@ abstract_object_pointert array_abstract_objectt::write(
     environment, ns, stack, to_index_expr(specifier), value, merging_write);
 }
 
-
 /*******************************************************************\
 
 Function: array_abstract_objectt::read_index
@@ -145,10 +145,10 @@ Function: array_abstract_objectt::read_index
 abstract_object_pointert array_abstract_objectt::read_index(
   const abstract_environmentt &env,
   const index_exprt &index,
-  const namespacet& ns) const
+  const namespacet &ns) const
 {
   array_typet array_type(to_array_type(type()));
-  const typet &subtype=array_type.subtype();
+  const typet &subtype = array_type.subtype();
 
   // if we are bottom then so are the values in the array
   // otherwise the values are top
@@ -200,8 +200,12 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   }
 }
 
-void array_abstract_objectt::get_statistics(abstract_object_statisticst &statistics, abstract_object_visitedt &visited,
-                                            const abstract_environmentt &env, const namespacet &ns) const {
+void array_abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
   abstract_objectt::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_arrays;
 }

@@ -5,13 +5,12 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
-#include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 
 #include "pointer_abstract_object.h"
-
 
 /*******************************************************************\
 
@@ -26,10 +25,10 @@ Function: pointer_abstract_objectt::pointer_abstract_objectt
 
 \*******************************************************************/
 
-pointer_abstract_objectt::pointer_abstract_objectt(const typet &t):
-  abstract_objectt(t)
+pointer_abstract_objectt::pointer_abstract_objectt(const typet &t)
+  : abstract_objectt(t)
 {
-  PRECONDITION(t.id()==ID_pointer);
+  PRECONDITION(t.id() == ID_pointer);
 }
 
 /*******************************************************************\
@@ -49,10 +48,12 @@ Function: pointer_abstract_objectt::pointer_abstract_objectt
 \*******************************************************************/
 
 pointer_abstract_objectt::pointer_abstract_objectt(
-  const typet &t, bool tp, bool bttm):
-    abstract_objectt(t, tp, bttm)
+  const typet &t,
+  bool tp,
+  bool bttm)
+  : abstract_objectt(t, tp, bttm)
 {
-  PRECONDITION(t.id()==ID_pointer);
+  PRECONDITION(t.id() == ID_pointer);
 }
 
 /*******************************************************************\
@@ -71,10 +72,10 @@ Function: pointer_abstract_objectt::pointer_abstract_objectt
 pointer_abstract_objectt::pointer_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    abstract_objectt(e, environment, ns)
+  const namespacet &ns)
+  : abstract_objectt(e, environment, ns)
 {
-  PRECONDITION(e.type().id()==ID_pointer);
+  PRECONDITION(e.type().id() == ID_pointer);
 }
 
 /**
@@ -140,10 +141,11 @@ Function: pointer_abstract_objectt::read_dereference
 \*******************************************************************/
 
 abstract_object_pointert pointer_abstract_objectt::read_dereference(
-  const abstract_environmentt &env, const namespacet &ns) const
+  const abstract_environmentt &env,
+  const namespacet &ns) const
 {
   pointer_typet pointer_type(to_pointer_type(type()));
-  const typet &pointed_to_type=pointer_type.subtype();
+  const typet &pointed_to_type = pointer_type.subtype();
 
   return env.abstract_object_factory(pointed_to_type, ns, true, false);
 }
@@ -173,12 +175,12 @@ Function: pointer_abstract_objectt::write_dereference
 \*******************************************************************/
 
 sharing_ptrt<pointer_abstract_objectt>
-  pointer_abstract_objectt::write_dereference(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> stack,
-    const abstract_object_pointert value,
-    bool merging_write) const
+pointer_abstract_objectt::write_dereference(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> stack,
+  const abstract_object_pointert value,
+  bool merging_write) const
 {
   if(is_top() || is_bottom())
   {
@@ -192,9 +194,12 @@ sharing_ptrt<pointer_abstract_objectt>
   }
 }
 
-void
-pointer_abstract_objectt::get_statistics(abstract_object_statisticst &statistics, abstract_object_visitedt &visited,
-                                         const abstract_environmentt &env, const namespacet &ns) const {
+void pointer_abstract_objectt::get_statistics(
+  abstract_object_statisticst &statistics,
+  abstract_object_visitedt &visited,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
   abstract_objectt::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_pointers;
 }

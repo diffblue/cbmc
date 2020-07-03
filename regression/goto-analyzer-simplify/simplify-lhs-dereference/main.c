@@ -2,22 +2,21 @@ void main()
 {
   int symbol;
 
-  int *pointer=&symbol;
+  int *pointer = &symbol;
 
   // Simplify
-  *pointer=5;
+  *pointer = 5;
 
   int nondet;
-  if(nondet>0)
+  if(nondet > 0)
   {
-    pointer=&nondet;
+    pointer = &nondet;
   }
   else
   {
-    pointer=&symbol;
+    pointer = &symbol;
   }
 
   // No simplification
-  *pointer=6;
-
+  *pointer = 6;
 }

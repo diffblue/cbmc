@@ -14,5 +14,5 @@ void main(int argc, char *argv[])
   if(x > y)
     z = 3;
 
-  __CPROVER_assert(z == 1, "x < y, z == 1");  
+  __CPROVER_assert(z == 1, "x < y, z == 1");
 }

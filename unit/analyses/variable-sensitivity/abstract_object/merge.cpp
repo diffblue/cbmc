@@ -11,22 +11,23 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <util/std_types.h>
 
-SCENARIO("merge_abstract_object",
+SCENARIO(
+  "merge_abstract_object",
   "[core][analyses][variable-sensitivity][abstract_object][merge]")
 {
   GIVEN("Two abstract objects of type pointer")
   {
-    const typet object_type=signedbv_typet(32);
+    const typet object_type = signedbv_typet(32);
     WHEN("Both are top")
     {
-      abstract_object_pointert op1=
+      abstract_object_pointert op1 =
         std::make_shared<const abstract_objectt>(object_type, true, false);
 
-      abstract_object_pointert op2=
+      abstract_object_pointert op2 =
         std::make_shared<const abstract_objectt>(object_type, true, false);
 
       bool modifications;
-      abstract_object_pointert result=
+      abstract_object_pointert result =
         abstract_objectt::merge(op1, op2, modifications);
 
       THEN("The result is the original abstract object")
@@ -37,20 +38,20 @@ SCENARIO("merge_abstract_object",
         REQUIRE_FALSE(result->is_bottom());
 
         // Is optimal
-        REQUIRE(op1==result);
+        REQUIRE(op1 == result);
       }
     }
     WHEN("The first is top, the second is bottom")
     {
-      abstract_object_pointert op1=
-      std::make_shared<const abstract_objectt>(object_type, true, false);
+      abstract_object_pointert op1 =
+        std::make_shared<const abstract_objectt>(object_type, true, false);
 
-      abstract_object_pointert op2=
-      std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op2 =
+        std::make_shared<const abstract_objectt>(object_type, false, true);
 
       bool modifications;
-      abstract_object_pointert result=
-          abstract_objectt::merge(op1, op2, modifications);
+      abstract_object_pointert result =
+        abstract_objectt::merge(op1, op2, modifications);
 
       THEN("The result is the original abstract object")
       {
@@ -60,19 +61,19 @@ SCENARIO("merge_abstract_object",
         REQUIRE_FALSE(result->is_bottom());
 
         // Is optimal
-        REQUIRE(op1==result);
+        REQUIRE(op1 == result);
       }
     }
     WHEN("The first is bottom and the second is top")
     {
-      abstract_object_pointert op1=
-      std::make_shared<const abstract_objectt>(object_type, false, true);
-      abstract_object_pointert op2=
-      std::make_shared<const abstract_objectt>(object_type, true, false);
+      abstract_object_pointert op1 =
+        std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op2 =
+        std::make_shared<const abstract_objectt>(object_type, true, false);
 
       bool modifications;
-      abstract_object_pointert result=
-      abstract_objectt::merge(op1, op2, modifications);
+      abstract_object_pointert result =
+        abstract_objectt::merge(op1, op2, modifications);
 
       THEN("The result is top and a new abstract object")
       {
@@ -81,19 +82,19 @@ SCENARIO("merge_abstract_object",
         REQUIRE(result->is_top());
         REQUIRE_FALSE(result->is_bottom());
 
-        REQUIRE_FALSE(op1==result);
+        REQUIRE_FALSE(op1 == result);
       }
     }
     WHEN("Both are bottom")
     {
-      abstract_object_pointert op1=
-      std::make_shared<const abstract_objectt>(object_type, false, true);
-      abstract_object_pointert op2=
-      std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op1 =
+        std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op2 =
+        std::make_shared<const abstract_objectt>(object_type, false, true);
 
       bool modifications;
-      abstract_object_pointert result=
-      abstract_objectt::merge(op1, op2, modifications);
+      abstract_object_pointert result =
+        abstract_objectt::merge(op1, op2, modifications);
 
       THEN("The result is the original abstract object")
       {
@@ -103,7 +104,7 @@ SCENARIO("merge_abstract_object",
         REQUIRE(result->is_bottom());
 
         // Is optimal
-        REQUIRE(op1==result);
+        REQUIRE(op1 == result);
       }
     }
   }

@@ -9,13 +9,13 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H
 
-#include <stack>
 #include <analyses/variable-sensitivity/abstract_object.h>
+#include <stack>
 
 class abstract_environmentt;
 class member_exprt;
 
-class struct_abstract_objectt:public abstract_objectt
+class struct_abstract_objectt : public abstract_objectt
 {
 public:
   explicit struct_abstract_objectt(const typet &type);
@@ -38,8 +38,11 @@ public:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  void get_statistics(abstract_object_statisticst &statistics, abstract_object_visitedt &visited,
-                      const abstract_environmentt &env, const namespacet &ns) const override;
+  void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
 
 protected:
   CLONE

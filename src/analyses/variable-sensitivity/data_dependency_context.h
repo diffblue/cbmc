@@ -17,15 +17,15 @@ Author: Diffblue Ltd
 #include "variable_sensitivity_domain.h"
 #include "write_location_context.h"
 
-class data_dependency_contextt:
-  public write_location_contextt {
+class data_dependency_contextt : public write_location_contextt
+{
 public:
   // These constructors mirror those in the base abstract_objectt, but with
   // the addition of an extra argument which is the abstract_objectt to wrap.
   explicit data_dependency_contextt(
     const abstract_object_pointert child,
-    const typet &type):
-      write_location_contextt(child, type)
+    const typet &type)
+    : write_location_contextt(child, type)
   {
   }
 
@@ -33,8 +33,8 @@ public:
     const abstract_object_pointert child,
     const typet &type,
     bool top,
-    bool bottom):
-      write_location_contextt(child, type, top, bottom)
+    bool bottom)
+    : write_location_contextt(child, type, top, bottom)
   {
   }
 
@@ -42,8 +42,8 @@ public:
     const abstract_object_pointert child,
     const exprt &expr,
     const abstract_environmentt &environment,
-    const namespacet &ns):
-      write_location_contextt(child, expr, environment, ns)
+    const namespacet &ns)
+    : write_location_contextt(child, expr, environment, ns)
   {
   }
 
@@ -65,18 +65,18 @@ public:
   std::set<goto_programt::const_targett> get_data_dominators() const;
 
   virtual void output(
-    std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
-  override;
+    std::ostream &out,
+    const class ai_baset &ai,
+    const namespacet &ns) const override;
 
 protected:
   CLONE
 
-  virtual abstract_object_pointert merge(
-    abstract_object_pointert other) const override;
+  virtual abstract_object_pointert
+  merge(abstract_object_pointert other) const override;
 
   virtual abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert other) const override;
-
 
 private:
   class location_ordert
@@ -86,19 +86,18 @@ private:
       goto_programt::const_targett instruction,
       goto_programt::const_targett other_instruction) const
     {
-      return instruction->location_number>
-             other_instruction->location_number;
+      return instruction->location_number > other_instruction->location_number;
     }
   };
   typedef std::set<goto_programt::const_targett, location_ordert> dependencest;
   dependencest data_deps;
   dependencest data_dominators;
 
-  abstract_object_pointert insert_data_deps(
-    const dependencest &dependencies) const;
+  abstract_object_pointert
+  insert_data_deps(const dependencest &dependencies) const;
 
-  abstract_object_pointert set_data_deps(
-    const dependencest &dependencies) const;
+  abstract_object_pointert
+  set_data_deps(const dependencest &dependencies) const;
 
   abstract_object_pointert insert_data_deps(const locationst &locations) const
   {
@@ -115,7 +114,6 @@ private:
 
     return set_data_deps(dependencies);
   }
-
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DATA_DEPENDENCY_CONTEXT_H

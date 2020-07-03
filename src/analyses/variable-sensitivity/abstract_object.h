@@ -32,24 +32,23 @@
 #include <set>
 #include <stack>
 
+#include "abstract_object_statistics.h"
 #include <goto-programs/goto_program.h>
 #include <util/expr.h>
 #include <util/sharing_map.h>
-#include "abstract_object_statistics.h"
 
 class typet;
 class constant_exprt;
 class abstract_environmentt;
 class namespacet;
 
-#define CLONE \
-  virtual internal_abstract_object_pointert mutable_clone() const override \
-  { \
-    typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
-      >::type current_typet; \
-    return internal_abstract_object_pointert(new current_typet(*this)); \
-  } \
-
+#define CLONE                                                                  \
+  virtual internal_abstract_object_pointert mutable_clone() const override     \
+  {                                                                            \
+    typedef std::remove_const<                                                 \
+      std::remove_reference<decltype(*this)>::type>::type current_typet;       \
+    return internal_abstract_object_pointert(new current_typet(*this));        \
+  }
 
 /* Merge is designed to allow different abstractions to be merged
  * gracefully.  There are two real use-cases for this:
@@ -69,14 +68,13 @@ class namespacet;
  * merge then it merges, otherwise it calls the parent merge.
  */
 
-
-template<class T>
-using sharing_ptrt=std::shared_ptr<const T>; // NOLINT(*)
+template <class T>
+using sharing_ptrt = std::shared_ptr<const T>; // NOLINT(*)
 
 typedef sharing_ptrt<class abstract_objectt> abstract_object_pointert;
 using abstract_object_visitedt = std::set<abstract_object_pointert>;
 
-class abstract_objectt:public std::enable_shared_from_this<abstract_objectt>
+class abstract_objectt : public std::enable_shared_from_this<abstract_objectt>
 {
 public:
   explicit abstract_objectt(const typet &type);
@@ -91,7 +89,9 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual ~abstract_objectt() {}
+  virtual ~abstract_objectt()
+  {
+  }
 
   const typet &type() const;
   virtual bool is_top() const;
@@ -127,15 +127,17 @@ public:
     bool merging_write) const;
 
   virtual void output(
-    std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
+    std::ostream &out,
+    const class ai_baset &ai,
+    const namespacet &ns) const;
 
   typedef std::set<goto_programt::const_targett> locationst;
   typedef sharing_mapt<irep_idt, abstract_object_pointert, false, irep_id_hash>
     shared_mapt;
 
   static void dump_map(std::ostream out, const shared_mapt &m);
-  static void dump_map_diff(
-    std::ostream out, const shared_mapt &m1, const shared_mapt &m2);
+  static void
+  dump_map_diff(std::ostream out, const shared_mapt &m1, const shared_mapt &m2);
 
   abstract_object_pointert clone() const
   {
@@ -204,8 +206,8 @@ public:
    */
   struct abstract_object_visitort
   {
-    virtual abstract_object_pointert visit(
-      const abstract_object_pointert element) const = 0;
+    virtual abstract_object_pointert
+    visit(const abstract_object_pointert element) const = 0;
   };
 
   /**
@@ -219,9 +221,11 @@ public:
    * \return A new abstract_object if it's contents is modifed, or this if
    * no modification is needed
    */
-  virtual abstract_object_pointert visit_sub_elements(
-    const abstract_object_visitort &visitor) const
-  { return shared_from_this(); }
+  virtual abstract_object_pointert
+  visit_sub_elements(const abstract_object_visitort &visitor) const
+  {
+    return shared_from_this();
+  }
 
   virtual size_t internal_hash() const
   {
@@ -241,19 +245,23 @@ private:
 
   // Hooks to allow a sub-class to perform its own operations on
   // setting/clearing top
-  virtual void make_top_internal() {}
-  virtual void clear_top_internal() {}
+  virtual void make_top_internal()
+  {
+  }
+  virtual void clear_top_internal()
+  {
+  }
 
   // Hook for a subclass to perform any additional operations as
   // part of an abstract_object_merge
-  virtual abstract_object_pointert abstract_object_merge_internal(
-    const abstract_object_pointert other) const;
+  virtual abstract_object_pointert
+  abstract_object_merge_internal(const abstract_object_pointert other) const;
   virtual abstract_object_pointert
   abstract_object_meet_internal(const abstract_object_pointert &other) const;
 
 protected:
-  template<class T>
-  using internal_sharing_ptrt=std::shared_ptr<T>;
+  template <class T>
+  using internal_sharing_ptrt = std::shared_ptr<T>;
 
   typedef internal_sharing_ptrt<class abstract_objectt>
     internal_abstract_object_pointert;
@@ -264,8 +272,8 @@ protected:
     return internal_abstract_object_pointert(new abstract_objectt(*this));
   }
 
-  abstract_object_pointert abstract_object_merge(
-    const abstract_object_pointert other) const;
+  abstract_object_pointert
+  abstract_object_merge(const abstract_object_pointert other) const;
 
   bool should_use_base_merge(const abstract_object_pointert other) const;
 
@@ -277,27 +285,32 @@ protected:
 
   bool should_use_base_meet(const abstract_object_pointert &other) const;
 
-  template<class keyt>
+  template <class keyt>
   static bool merge_maps(
     const std::map<keyt, abstract_object_pointert> &map1,
     const std::map<keyt, abstract_object_pointert> &map2,
     std::map<keyt, abstract_object_pointert> &out_map);
 
-
-  template<class keyt, typename hash>
+  template <class keyt, typename hash>
   static bool merge_shared_maps(
     const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map1,
     const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map2,
     sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map);
 
-
-
   // The one exception is merge in descendant classes, which needs this
-  void make_top() { top=true; this->make_top_internal(); }
-  void clear_top() { top=false; this->clear_top_internal(); }
+  void make_top()
+  {
+    top = true;
+    this->make_top_internal();
+  }
+  void clear_top()
+  {
+    top = false;
+    this->clear_top_internal();
+  }
 };
 
-template<typename keyt>
+template <typename keyt>
 bool abstract_objectt::merge_maps(
   const std::map<keyt, abstract_object_pointert> &m1,
   const std::map<keyt, abstract_object_pointert> &m2,
@@ -307,7 +320,7 @@ bool abstract_objectt::merge_maps(
 
   typedef std::map<keyt, abstract_object_pointert> abstract_object_mapt;
 
-  bool modified=false;
+  bool modified = false;
 
   std::vector<std::pair<keyt, abstract_object_pointert>> intersection_set;
   std::set_intersection(
@@ -318,8 +331,7 @@ bool abstract_objectt::merge_maps(
     std::back_inserter(intersection_set),
     [](
       const std::pair<keyt, abstract_object_pointert> &op1,
-      const std::pair<keyt, abstract_object_pointert> &op2)
-    {
+      const std::pair<keyt, abstract_object_pointert> &op2) {
       return op1.first < op2.first;
     });
 
@@ -327,39 +339,38 @@ bool abstract_objectt::merge_maps(
   {
     // merge entries
 
-    const abstract_object_pointert &v1=m1.at(entry.first);
-    const abstract_object_pointert &v2=m2.at(entry.first);
+    const abstract_object_pointert &v1 = m1.at(entry.first);
+    const abstract_object_pointert &v2 = m2.at(entry.first);
 
-    bool changes=false;
-    abstract_object_pointert v_new=abstract_objectt::merge(v1, v2, changes);
+    bool changes = false;
+    abstract_object_pointert v_new = abstract_objectt::merge(v1, v2, changes);
 
+    modified |= changes;
 
-    modified|=changes;
-
-    out_map[entry.first]=v_new;
+    out_map[entry.first] = v_new;
   }
 
   return modified;
 }
 
-template<typename keyt, typename hash>
+template <typename keyt, typename hash>
 bool abstract_objectt::merge_shared_maps(
   const sharing_mapt<keyt, abstract_object_pointert, false, hash> &m1,
   const sharing_mapt<keyt, abstract_object_pointert, false, hash> &m2,
   sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map)
 {
-  bool modified=false;
+  bool modified = false;
 
   typename sharing_mapt<keyt, abstract_object_pointert, false, hash>::
-  delta_viewt delta_view;
+    delta_viewt delta_view;
   m1.get_delta_view(m2, delta_view, true);
 
   for(auto &item : delta_view)
   {
     bool changes = false;
-    abstract_object_pointert v_new = abstract_objectt::merge(
-      item.m, item.get_other_map_value(), changes);
-    if (changes)
+    abstract_object_pointert v_new =
+      abstract_objectt::merge(item.m, item.get_other_map_value(), changes);
+    if(changes)
     {
       modified = true;
       out_map.replace(item.k, v_new);

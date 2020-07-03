@@ -4,7 +4,7 @@ void main()
   int symbol_b;
 
   int nondet;
-  int * nondet_pointer;
+  int *nondet_pointer;
   if(nondet > 0)
   {
     nondet_pointer = &symbol_a;
@@ -14,7 +14,7 @@ void main()
     nondet_pointer = &symbol_b;
   }
 
-  int *arr[] = { &symbol_a, &symbol_b, nondet_pointer };
+  int *arr[] = {&symbol_a, &symbol_b, nondet_pointer};
 
   // Simplify the pointer
   *arr[0] = 1;

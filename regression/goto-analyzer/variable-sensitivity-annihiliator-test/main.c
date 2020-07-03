@@ -14,12 +14,12 @@ void main(void)
 
 void func(void)
 {
-  if (g_in1 == 0)
-    g_out = 1;  // unreachable.
+  if(g_in1 == 0)
+    g_out = 1; // unreachable.
 
-  if (g_in2 == 0)
+  if(g_in2 == 0)
     g_out = 2;
 
-  if (g_in1 == 0 && g_in2 == 0)
-    g_out = 3;  // unreachable, but not .
+  if(g_in1 == 0 && g_in2 == 0)
+    g_out = 3; // unreachable, but not .
 }

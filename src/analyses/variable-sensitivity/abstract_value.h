@@ -10,8 +10,7 @@
 
 #include <analyses/variable-sensitivity/abstract_object.h>
 
-
-class abstract_valuet:public abstract_objectt
+class abstract_valuet : public abstract_objectt
 {
 public:
   explicit abstract_valuet(const typet &type);
@@ -21,7 +20,9 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual ~abstract_valuet() {}
+  virtual ~abstract_valuet()
+  {
+  }
 
 protected:
   CLONE

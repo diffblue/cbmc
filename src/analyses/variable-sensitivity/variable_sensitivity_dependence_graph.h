@@ -11,8 +11,8 @@
 #include "variable_sensitivity_domain.h"
 
 #include <analyses/cfg_dominators.h>
-#include <util/graph.h>
 #include <util/container_utils.h>
+#include <util/graph.h>
 
 #include <ostream>
 
@@ -21,22 +21,28 @@ class variable_sensitivity_dependence_grapht;
 class vs_dep_edget
 {
 public:
-  enum class kindt { NONE, CTRL, DATA, BOTH };
+  enum class kindt
+  {
+    NONE,
+    CTRL,
+    DATA,
+    BOTH
+  };
 
   void add(kindt _kind)
   {
     switch(kind)
     {
-      case kindt::NONE:
-        kind=_kind;
-        break;
-      case kindt::DATA:
-      case kindt::CTRL:
-        if(kind!=_kind)
-          kind=kindt::BOTH;
-        break;
-      case kindt::BOTH:
-        break;
+    case kindt::NONE:
+      kind = _kind;
+      break;
+    case kindt::DATA:
+    case kindt::CTRL:
+      if(kind != _kind)
+        kind = kindt::BOTH;
+      break;
+    case kindt::BOTH:
+      break;
     }
   }
 
@@ -49,7 +55,7 @@ protected:
   kindt kind;
 };
 
-struct vs_dep_nodet:public graph_nodet<vs_dep_edget>
+struct vs_dep_nodet : public graph_nodet<vs_dep_edget>
 {
   typedef graph_nodet<vs_dep_edget>::edget edget;
   typedef graph_nodet<vs_dep_edget>::edgest edgest;
@@ -57,17 +63,18 @@ struct vs_dep_nodet:public graph_nodet<vs_dep_edget>
   goto_programt::const_targett PC;
 };
 
-class variable_sensitivity_dependence_domaint:
-  public variable_sensitivity_domaint
+class variable_sensitivity_dependence_domaint
+  : public variable_sensitivity_domaint
 {
 public:
   typedef grapht<vs_dep_nodet>::node_indext node_indext;
 
-  explicit variable_sensitivity_dependence_domaint():
-    node_id(std::numeric_limits<node_indext>::max()),
-    has_values(false),
-    has_changed(false)
-  {}
+  explicit variable_sensitivity_dependence_domaint()
+    : node_id(std::numeric_limits<node_indext>::max()),
+      has_values(false),
+      has_changed(false)
+  {
+  }
 
   void transform(
     const irep_idt &function_from,
@@ -127,15 +134,10 @@ public:
     const ai_domain_baset &function_end,
     const namespacet &ns) override;
 
+  void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
+    const override;
 
-  void output(
-    std::ostream &out,
-    const ai_baset &ai,
-    const namespacet &ns) const override;
-
-  jsont output_json(
-    const ai_baset &ai,
-    const namespacet &ns) const override;
+  jsont output_json(const ai_baset &ai, const namespacet &ns) const override;
 
   void populate_dep_graph(
     variable_sensitivity_dependence_grapht &,
@@ -143,12 +145,12 @@ public:
 
   void set_node_id(node_indext id)
   {
-    node_id=id;
+    node_id = id;
   }
 
   node_indext get_node_id() const
   {
-    assert(node_id!=std::numeric_limits<node_indext>::max());
+    assert(node_id != std::numeric_limits<node_indext>::max());
     return node_id;
   }
 
@@ -167,9 +169,9 @@ private:
       return a->location_number < b->location_number;
     }
   };
-  typedef std::map<
-    goto_programt::const_targett,
-    std::set<exprt>, dependency_ordert> data_depst;
+  typedef std::
+    map<goto_programt::const_targett, std::set<exprt>, dependency_ordert>
+      data_depst;
   data_depst domain_data_deps;
 
   typedef std::map<goto_programt::const_targett, tvt> control_depst;
@@ -182,8 +184,8 @@ private:
   control_dep_callst control_dep_calls;
   control_dep_callst control_dep_call_candidates;
 
-  void eval_data_deps(
-    const exprt &expr, const namespacet &ns, data_depst &deps) const;
+  void eval_data_deps(const exprt &expr, const namespacet &ns, data_depst &deps)
+    const;
 
   void control_dependencies(
     const irep_idt &from_function,
@@ -205,9 +207,9 @@ private:
     const control_dep_callst &other_control_dep_call_candidates);
 };
 
-class variable_sensitivity_dependence_grapht:
-  public ait<variable_sensitivity_dependence_domaint>,
-  public grapht<vs_dep_nodet>
+class variable_sensitivity_dependence_grapht
+  : public ait<variable_sensitivity_dependence_domaint>,
+    public grapht<vs_dep_nodet>
 {
 public:
   using ait<variable_sensitivity_dependence_domaint>::operator[];
@@ -242,8 +244,6 @@ public:
     }
   }
 
-
-
   void add_dep(
     vs_dep_edget::kindt kind,
     goto_programt::const_targett from,
@@ -251,15 +251,14 @@ public:
 
   virtual statet &get_state(goto_programt::const_targett l)
   {
-    std::pair<state_mapt::iterator, bool> entry=
-      state_map.insert(
-        std::make_pair(l, variable_sensitivity_dependence_domaint()));
+    std::pair<state_mapt::iterator, bool> entry = state_map.insert(
+      std::make_pair(l, variable_sensitivity_dependence_domaint()));
 
     if(entry.second)
     {
-      const node_indext node_id=add_node();
+      const node_indext node_id = add_node();
       entry.first->second.set_node_id(node_id);
-      nodes[node_id].PC=l;
+      nodes[node_id].PC = l;
     }
 
     return entry.first->second;

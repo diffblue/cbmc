@@ -16,14 +16,13 @@
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/std_expr.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
 
 /// Build a topstack
-write_stackt::write_stackt():
-  stack(),
-  top_stack(true)
-{}
+write_stackt::write_stackt() : stack(), top_stack(true)
+{
+}
 
 /// Construct a write stack from an expression
 /// \param expr: The expression to represent
@@ -34,16 +33,16 @@ write_stackt::write_stackt(
   const abstract_environmentt &environment,
   const namespacet &ns)
 {
-  top_stack=false;
-  if(expr.type().id()==ID_array)
+  top_stack = false;
+  if(expr.type().id() == ID_array)
   {
     // We are assigning an array to a pointer, which is equivalent to assigning
     // the first element of that arary
     // &(expr)[0]
     construct_stack_to_pointer(
-      address_of_exprt(
-        index_exprt(
-          expr, from_integer(0, size_type()))), environment, ns);
+      address_of_exprt(index_exprt(expr, from_integer(0, size_type()))),
+      environment,
+      ns);
   }
   else
   {
@@ -60,36 +59,36 @@ void write_stackt::construct_stack_to_pointer(
   const abstract_environmentt &environment,
   const namespacet &ns)
 {
-  PRECONDITION(expr.type().id()==ID_pointer);
+  PRECONDITION(expr.type().id() == ID_pointer);
 
-  if(expr.id()==ID_address_of)
+  if(expr.id() == ID_address_of)
   {
     // resovle reminder, can either be a symbol, member or index of
     // otherwise unsupported
     construct_stack_to_lvalue(expr.op0(), environment, ns);
   }
-  else if(expr.id()==ID_plus || expr.id()==ID_minus)
+  else if(expr.id() == ID_plus || expr.id() == ID_minus)
   {
     exprt base;
     exprt offset;
-    const integral_resultt &which_side=
+    const integral_resultt &which_side =
       get_which_side_integral(expr, base, offset);
     INVARIANT(
-      which_side!=integral_resultt::NEITHER_INTEGRAL,
+      which_side != integral_resultt::NEITHER_INTEGRAL,
       "An offset must be an integral amount");
 
-    if(expr.id()==ID_minus)
+    if(expr.id() == ID_minus)
     {
       // can't get a valid pointer by subtracting from a constant number
-      if(which_side==integral_resultt::LHS_INTEGRAL)
+      if(which_side == integral_resultt::LHS_INTEGRAL)
       {
-        top_stack=true;
+        top_stack = true;
         return;
       }
       offset = unary_minus_exprt(offset);
     }
 
-    abstract_object_pointert offset_value=environment.eval(offset, ns);
+    abstract_object_pointert offset_value = environment.eval(offset, ns);
 
     add_to_stack(
       std::make_shared<offset_entryt>(offset_value), environment, ns);
@@ -100,21 +99,21 @@ void write_stackt::construct_stack_to_pointer(
     if(!top_stack)
     {
       // check the symbol at the bottom of the stack
-      std::shared_ptr<const write_stack_entryt> entry=*stack.cbegin();
+      std::shared_ptr<const write_stack_entryt> entry = *stack.cbegin();
       INVARIANT(
-        entry->get_access_expr().id()==ID_symbol,
+        entry->get_access_expr().id() == ID_symbol,
         "The base should be an addressable location (i.e. symbol)");
 
-      if(entry->get_access_expr().type().id()!=ID_array)
+      if(entry->get_access_expr().type().id() != ID_array)
       {
-        top_stack=true;
+        top_stack = true;
       }
     }
   }
   else
   {
     // unknown expression type - play it safe and set to top
-    top_stack=true;
+    top_stack = true;
   }
 }
 
@@ -130,22 +129,22 @@ void write_stackt::construct_stack_to_lvalue(
 {
   if(!top_stack)
   {
-    if(expr.id()==ID_member)
+    if(expr.id() == ID_member)
     {
       add_to_stack(std::make_shared<simple_entryt>(expr), environment, ns);
       construct_stack_to_lvalue(expr.op0(), environment, ns);
     }
-    else if(expr.id()==ID_symbol)
+    else if(expr.id() == ID_symbol)
     {
       add_to_stack(std::make_shared<simple_entryt>(expr), environment, ns);
     }
-    else if(expr.id()==ID_index)
+    else if(expr.id() == ID_index)
     {
       construct_stack_to_array_index(to_index_expr(expr), environment, ns);
     }
     else
     {
-      top_stack=true;
+      top_stack = true;
     }
   }
 }
@@ -159,7 +158,7 @@ void write_stackt::construct_stack_to_array_index(
   const abstract_environmentt &environment,
   const namespacet &ns)
 {
-  abstract_object_pointert offset_value=
+  abstract_object_pointert offset_value =
     environment.eval(index_expr.index(), ns);
 
   add_to_stack(std::make_shared<offset_entryt>(offset_value), environment, ns);
@@ -173,26 +172,26 @@ exprt write_stackt::to_expression() const
 {
   // A top stack is useless and its expression should not be evaluated
   PRECONDITION(!is_top_value());
-  exprt access_expr=nil_exprt();
+  exprt access_expr = nil_exprt();
   for(const std::shared_ptr<write_stack_entryt> &entry : stack)
   {
-    exprt new_expr=entry->get_access_expr();
-    if(access_expr.id()==ID_nil)
+    exprt new_expr = entry->get_access_expr();
+    if(access_expr.id() == ID_nil)
     {
-      access_expr=new_expr;
+      access_expr = new_expr;
     }
     else
     {
-      if(new_expr.operands().size()==0)
+      if(new_expr.operands().size() == 0)
       {
         new_expr.operands().resize(1);
       }
-      new_expr.op0()=access_expr;
+      new_expr.op0() = access_expr;
 
       // If neccesary, complete the type of the new access expression
       entry->adjust_access_type(new_expr);
 
-      access_expr=new_expr;
+      access_expr = new_expr;
     }
   }
   address_of_exprt top_expr(access_expr);
@@ -217,7 +216,8 @@ void write_stackt::add_to_stack(
   const abstract_environmentt environment,
   const namespacet &ns)
 {
-  if(stack.empty() ||
+  if(
+    stack.empty() ||
     !stack.front()->try_squash_in(entry_pointer, environment, ns))
   {
     stack.insert(stack.begin(), entry_pointer);
@@ -231,25 +231,24 @@ void write_stackt::add_to_stack(
 /// \param [out] out_integral_expr: The subexpression which is integraled typed.
 /// \return: An enum specifying whether the integral type is the LHS (op0),
 ///   RHS (op1) or neither.
-write_stackt::integral_resultt
-  write_stackt::get_which_side_integral(
+write_stackt::integral_resultt write_stackt::get_which_side_integral(
   const exprt &expr,
   exprt &out_base_expr,
   exprt &out_integral_expr)
 {
-  PRECONDITION(expr.operands().size()==2);
-  static const std::unordered_set<irep_idt, irep_id_hash> integral_types=
-    { ID_signedbv, ID_unsignedbv, ID_integer };
-  if(integral_types.find(expr.op0().type().id())!=integral_types.cend())
+  PRECONDITION(expr.operands().size() == 2);
+  static const std::unordered_set<irep_idt, irep_id_hash> integral_types = {
+    ID_signedbv, ID_unsignedbv, ID_integer};
+  if(integral_types.find(expr.op0().type().id()) != integral_types.cend())
   {
-    out_integral_expr=expr.op0();
-    out_base_expr=expr.op1();
+    out_integral_expr = expr.op0();
+    out_base_expr = expr.op1();
     return integral_resultt::LHS_INTEGRAL;
   }
-  else if(integral_types.find(expr.op1().type().id())!=integral_types.cend())
+  else if(integral_types.find(expr.op1().type().id()) != integral_types.cend())
   {
-    out_integral_expr=expr.op1();
-    out_base_expr=expr.op0();
+    out_integral_expr = expr.op1();
+    out_base_expr = expr.op0();
     return integral_resultt::RHS_INTEGRAL;
   }
   else

@@ -27,8 +27,8 @@ Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 
 \*******************************************************************/
 
-constant_array_abstract_objectt::constant_array_abstract_objectt(typet type):
-array_abstract_objectt(type)
+constant_array_abstract_objectt::constant_array_abstract_objectt(typet type)
+  : array_abstract_objectt(type)
 {
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
@@ -50,8 +50,10 @@ Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 \*******************************************************************/
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(
-  typet type, bool top, bool bottom):
-array_abstract_objectt(type, top, bottom)
+  typet type,
+  bool top,
+  bool bottom)
+  : array_abstract_objectt(type, top, bottom)
 {
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
@@ -74,12 +76,12 @@ Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
-  const namespacet &ns):
-    array_abstract_objectt(expr, environment, ns)
+  const namespacet &ns)
+  : array_abstract_objectt(expr, environment, ns)
 {
-  if(expr.id()==ID_array)
+  if(expr.id() == ID_array)
   {
-    int index=0;
+    int index = 0;
     for(const exprt &entry : expr.operands())
     {
       map.insert(mp_integer(index), environment.eval(entry, ns));
@@ -110,7 +112,7 @@ bool constant_array_abstract_objectt::verify() const
   // Either the object is top or bottom (=> map empty)
   // or the map is not empty => neither top nor bottom
   return array_abstract_objectt::verify() &&
-    (is_top() || is_bottom()) == map.empty();
+         (is_top() || is_bottom()) == map.empty();
 }
 
 /// \brief Perform any additional structural modifications when setting this
@@ -136,10 +138,10 @@ Function: constant_array_abstract_objectt::merge
 
 \*******************************************************************/
 
-abstract_object_pointert constant_array_abstract_objectt::merge(
-  abstract_object_pointert other) const
+abstract_object_pointert
+constant_array_abstract_objectt::merge(abstract_object_pointert other) const
 {
-  auto cast_other=
+  auto cast_other =
     std::dynamic_pointer_cast<const constant_array_abstract_objectt>(other);
   if(cast_other)
   {
@@ -176,8 +178,9 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   }
   else
   {
-    const auto &result=
-      std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
+    const auto &result =
+      std::dynamic_pointer_cast<constant_array_abstract_objectt>(
+        mutable_clone());
 
     bool modified =
       abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hash>(
@@ -217,7 +220,9 @@ Function: constant_array_abstract_objectt::output
 \*******************************************************************/
 
 void constant_array_abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   if(is_top() || is_bottom())
   {
@@ -263,8 +268,7 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
 {
   if(is_top())
   {
-    return env.abstract_object_factory(
-      index.type(), ns, true);
+    return env.abstract_object_factory(index.type(), ns, true);
   }
   else
   {
@@ -331,13 +335,13 @@ Function: constant_array_abstract_objectt::write_index
 \*******************************************************************/
 
 sharing_ptrt<array_abstract_objectt>
-  constant_array_abstract_objectt::write_index(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> stack,
-    const index_exprt &index_expr,
-    const abstract_object_pointert value,
-    bool merging_write) const
+constant_array_abstract_objectt::write_index(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> stack,
+  const index_exprt &index_expr,
+  const abstract_object_pointert value,
+  bool merging_write) const
 {
   if(is_bottom())
   {
@@ -345,7 +349,7 @@ sharing_ptrt<array_abstract_objectt>
       environment, ns, stack, index_expr, value, merging_write);
   }
 
-  const auto &result=
+  const auto &result =
     std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
 
   if(!stack.empty())
@@ -473,7 +477,8 @@ Function: constant_array_abstract_objectt::get_top_entry
 \*******************************************************************/
 
 abstract_object_pointert constant_array_abstract_objectt::get_top_entry(
-  const abstract_environmentt &env, const namespacet &ns) const
+  const abstract_environmentt &env,
+  const namespacet &ns) const
 {
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
@@ -499,12 +504,12 @@ bool constant_array_abstract_objectt::eval_index(
   const namespacet &ns,
   mp_integer &out_index) const
 {
-  abstract_object_pointert index_abstract_object=env.eval(index.index(), ns);
-  exprt value=index_abstract_object->to_constant();
+  abstract_object_pointert index_abstract_object = env.eval(index.index(), ns);
+  exprt value = index_abstract_object->to_constant();
   if(value.is_constant())
   {
-    constant_exprt constant_index=to_constant_expr(value);
-    bool result=to_integer(constant_index, out_index);
+    constant_exprt constant_index = to_constant_expr(value);
+    bool result = to_integer(constant_index, out_index);
     return !result;
   }
   else
@@ -524,13 +529,11 @@ bool constant_array_abstract_objectt::eval_index(
  * \return A new abstract_object if it's contents is modifed, or this if
  * no modification is needed
  */
-abstract_object_pointert
-constant_array_abstract_objectt::visit_sub_elements(
+abstract_object_pointert constant_array_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
-  const auto &result=
-    std::dynamic_pointer_cast<constant_array_abstract_objectt>(
-      mutable_clone());
+  const auto &result =
+    std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
 
   bool modified = false;
 

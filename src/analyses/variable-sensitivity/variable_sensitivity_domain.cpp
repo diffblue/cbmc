@@ -10,17 +10,16 @@ Date: April 2016
 
 #include <ostream>
 
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <util/message.h>
 #include <util/simplify_expr.h>
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 
 #include "variable_sensitivity_domain.h"
 #include <util/cprover_prefix.h>
 
 #ifdef DEBUG
-#include <iostream>
+#  include <iostream>
 #endif
-
 
 /*******************************************************************\
 
@@ -36,85 +35,86 @@ Function: variable_sensitivity_domaint::transform
 \*******************************************************************/
 
 void variable_sensitivity_domaint::transform(
-    const irep_idt &function_from,
-    locationt from,
-    const irep_idt &function_to,
-    locationt to,
-    ai_baset &ai,
-    const namespacet &ns)
+  const irep_idt &function_from,
+  locationt from,
+  const irep_idt &function_to,
+  locationt to,
+  ai_baset &ai,
+  const namespacet &ns)
 {
-  #ifdef DEBUG
+#ifdef DEBUG
   std::cout << "Transform from/to:\n";
-  std::cout << from->location_number << " --> "
-            << to->location_number << std::endl;
-  #endif
+  std::cout << from->location_number << " --> " << to->location_number
+            << std::endl;
+#endif
 
-  const goto_programt::instructiont &instruction=*from;
+  const goto_programt::instructiont &instruction = *from;
   switch(instruction.type)
   {
   case DECL:
-    {
-      const abstract_objectt::locationst write_location={ from };
-      abstract_object_pointert top_object=
-        abstract_state.abstract_object_factory(
-            to_code_decl(instruction.code).symbol().type(), ns, true)
-          ->update_location_context(write_location, true);
-      abstract_state.assign(
-          to_code_decl(instruction.code).symbol(), top_object, ns);
-    }
-    // We now store top.
-    break;
+  {
+    const abstract_objectt::locationst write_location = {from};
+    abstract_object_pointert top_object =
+      abstract_state
+        .abstract_object_factory(
+          to_code_decl(instruction.code).symbol().type(), ns, true)
+        ->update_location_context(write_location, true);
+    abstract_state.assign(
+      to_code_decl(instruction.code).symbol(), top_object, ns);
+  }
+  // We now store top.
+  break;
 
   case DEAD:
+  {
+    // Remove symbol from map, the only time this occurs now (keep TOP.)
+    // It should be the case that DEAD only provides symbols for deletion.
+    const exprt &expr = to_code_dead(instruction.code).symbol();
+    if(expr.id() == ID_symbol)
     {
-      // Remove symbol from map, the only time this occurs now (keep TOP.)
-      // It should be the case that DEAD only provides symbols for deletion.
-      const exprt &expr=to_code_dead(instruction.code).symbol();
-      if(expr.id()==ID_symbol)
-      {
-        abstract_state.erase(to_symbol_expr(expr));
-      }
+      abstract_state.erase(to_symbol_expr(expr));
     }
-    break;
+  }
+  break;
 
   case ASSIGN:
-    {
-      // TODO : check return values
-      const code_assignt &inst = to_code_assign(instruction.code);
-      const abstract_objectt::locationst write_location = {from};
-      abstract_object_pointert rhs =
-        abstract_state.eval(inst.rhs(), ns)
-          ->update_location_context(write_location, true);
-      abstract_state.assign(inst.lhs(), rhs, ns);
-    }
-    break;
+  {
+    // TODO : check return values
+    const code_assignt &inst = to_code_assign(instruction.code);
+    const abstract_objectt::locationst write_location = {from};
+    abstract_object_pointert rhs =
+      abstract_state.eval(inst.rhs(), ns)
+        ->update_location_context(write_location, true);
+    abstract_state.assign(inst.lhs(), rhs, ns);
+  }
+  break;
 
   case GOTO:
+  {
+    if(1) // (flow_sensitivity == FLOW_SENSITIVE)
     {
-      if(1) // (flow_sensitivity == FLOW_SENSITIVE)
+      // Get the next line
+      locationt next = from;
+      next++;
+      // Is this a GOTO to the next line (i.e. pointless)
+      if(next != from->get_target())
       {
-        // Get the next line
-        locationt next=from;
-        next++;
-        // Is this a GOTO to the next line (i.e. pointless)
-        if(next!=from->get_target())
+        if(to == from->get_target())
         {
-          if(to==from->get_target())
-          {
-            // The AI is exploring the branch where the jump is taken
-            abstract_state.assume(instruction.guard, ns);
-          }
-          else
-          {
-            // Exploring the path where the jump is not taken - therefore assume
-            // the condition is false
-            abstract_state.assume(not_exprt(instruction.guard), ns);
-          }
+          // The AI is exploring the branch where the jump is taken
+          abstract_state.assume(instruction.guard, ns);
         }
-        // ignore jumps to the next line, we can assume nothing
+        else
+        {
+          // Exploring the path where the jump is not taken - therefore assume
+          // the condition is false
+          abstract_state.assume(not_exprt(instruction.guard), ns);
+        }
       }
+      // ignore jumps to the next line, we can assume nothing
     }
-    break;
+  }
+  break;
 
   case ASSUME:
     abstract_state.assume(instruction.guard, ns);
@@ -131,9 +131,9 @@ void variable_sensitivity_domaint::transform(
     // erase parameters
 
     const irep_idt id = function_from;
-    const symbolt &symbol=ns.lookup(id);
+    const symbolt &symbol = ns.lookup(id);
 
-    const code_typet &type=to_code_type(symbol.type);
+    const code_typet &type = to_code_type(symbol.type);
 
     for(const auto &param : type.parameters())
     {
@@ -143,7 +143,6 @@ void variable_sensitivity_domaint::transform(
         abstract_state.abstract_object_factory(param.type(), ns, true, false),
         ns);
     }
-
 
     break;
   }
@@ -176,8 +175,8 @@ void variable_sensitivity_domaint::transform(
     throw "exceptions not handled";
 
   case OTHER:
-//    throw "other";
-      break;
+    //    throw "other";
+    break;
 
   case NO_INSTRUCTION_TYPE:
     break;
@@ -243,7 +242,6 @@ void variable_sensitivity_domaint::make_top()
   abstract_state.make_top();
 }
 
-
 /*******************************************************************\
 
 Function: variable_sensitivity_domaint::make_entry
@@ -278,14 +276,13 @@ bool variable_sensitivity_domaint::merge(
   locationt from,
   locationt to)
 {
-  #ifdef DEBUG
-  std::cout << "Merging from/to:\n "
-            << from->location_number << " --> "
+#ifdef DEBUG
+  std::cout << "Merging from/to:\n " << from->location_number << " --> "
             << to->location_number << std::endl;
-  #endif
+#endif
 
   // Use the abstract_environment merge
-  bool any_changes=abstract_state.merge(b.abstract_state);
+  bool any_changes = abstract_state.merge(b.abstract_state);
 
   DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
   return any_changes;
@@ -309,27 +306,28 @@ Function: variable_sensitivity_domaint::ai_simplify
 \*******************************************************************/
 
 bool variable_sensitivity_domaint::ai_simplify(
-  exprt &condition, const namespacet &ns) const
+  exprt &condition,
+  const namespacet &ns) const
 {
-  sharing_ptrt<abstract_objectt> res=abstract_state.eval(condition, ns);
-  exprt c=res->to_constant();
+  sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition, ns);
+  exprt c = res->to_constant();
 
-  if(c.id()==ID_nil)
+  if(c.id() == ID_nil)
   {
-    bool no_simplification=true;
+    bool no_simplification = true;
 
     // Try to simplify recursively any child operations
     for(exprt &op : condition.operands())
     {
-      no_simplification&=ai_simplify(op, ns);
+      no_simplification &= ai_simplify(op, ns);
     }
 
     return no_simplification;
   }
   else
   {
-    bool condition_changed=(condition!=c);
-    condition=c;
+    bool condition_changed = (condition != c);
+    condition = c;
     return !condition_changed;
   }
 }
@@ -370,9 +368,8 @@ bool variable_sensitivity_domaint::is_top() const
 /// Get symbols that have been modified since this domain and other
 /// \param other: The domain that things may have been modified in
 /// \return A list of symbols whose write location is different
-std::vector<irep_idt>
-  variable_sensitivity_domaint::get_modified_symbols(
-    const variable_sensitivity_domaint &other) const
+std::vector<irep_idt> variable_sensitivity_domaint::get_modified_symbols(
+  const variable_sensitivity_domaint &other) const
 {
   return abstract_environmentt::modified_symbols(
     abstract_state, other.abstract_state);
@@ -400,22 +397,25 @@ Function: variable_sensitivity_domaint::transform_function_call
 \*******************************************************************/
 
 void variable_sensitivity_domaint::transform_function_call(
-  locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+  locationt from,
+  locationt to,
+  ai_baset &ai,
+  const namespacet &ns)
 {
-  PRECONDITION(from->type==FUNCTION_CALL);
+  PRECONDITION(from->type == FUNCTION_CALL);
 
-  const code_function_callt &function_call=to_code_function_call(from->code);
-  const exprt &function=function_call.function();
+  const code_function_callt &function_call = to_code_function_call(from->code);
+  const exprt &function = function_call.function();
 
-  const locationt next=std::next(from);
+  const locationt next = std::next(from);
 
-  if(function.id()==ID_symbol)
+  if(function.id() == ID_symbol)
   {
     // called function identifier
-    const symbol_exprt &symbol_expr=to_symbol_expr(function);
-    const irep_idt function_id=symbol_expr.get_identifier();
+    const symbol_exprt &symbol_expr = to_symbol_expr(function);
+    const irep_idt function_id = symbol_expr.get_identifier();
 
-    const code_function_callt::argumentst &called_arguments=
+    const code_function_callt::argumentst &called_arguments =
       function_call.arguments();
 
     if(is_same_code_location(to, next))
@@ -439,7 +439,7 @@ void variable_sensitivity_domaint::transform_function_call(
             called_arg.type().id() == ID_pointer &&
             !called_arg.type().subtype().get_bool(ID_C_constant))
           {
-            abstract_object_pointert pointer_value=
+            abstract_object_pointert pointer_value =
               abstract_state.eval(called_arg, ns);
 
             CHECK_RETURN(pointer_value);
@@ -451,7 +451,8 @@ void variable_sensitivity_domaint::transform_function_call(
               std::stack<exprt>(),
               nil_exprt(),
               abstract_state.abstract_object_factory(
-                called_arg.type().subtype(), ns, true), false);
+                called_arg.type().subtype(), ns, true),
+              false);
           }
         }
 
@@ -462,7 +463,8 @@ void variable_sensitivity_domaint::transform_function_call(
           {
             abstract_state.assign(
               symbol_exprt(symbol.first, symbol.second.type),
-              abstract_state.abstract_object_factory(symbol.second.type, ns, true),
+              abstract_state.abstract_object_factory(
+                symbol.second.type, ns, true),
               ns);
           }
         }
@@ -471,26 +473,28 @@ void variable_sensitivity_domaint::transform_function_call(
     else
     {
       // we have an actual call
-      const symbolt &symbol=ns.lookup(function_id);
-      const code_typet &code_type=to_code_type(symbol.type);
-      const code_typet::parameterst &declaration_parameters=
+      const symbolt &symbol = ns.lookup(function_id);
+      const code_typet &code_type = to_code_type(symbol.type);
+      const code_typet::parameterst &declaration_parameters =
         code_type.parameters();
 
-      code_typet::parameterst::const_iterator parameter_it=
+      code_typet::parameterst::const_iterator parameter_it =
         declaration_parameters.begin();
 
       for(const exprt &called_arg : called_arguments)
       {
-        if(parameter_it==declaration_parameters.end())
+        if(parameter_it == declaration_parameters.end())
         {
-          INVARIANT(code_type.has_ellipsis(), "Only case for insufficient args");
+          INVARIANT(
+            code_type.has_ellipsis(), "Only case for insufficient args");
           break;
         }
 
         // Evaluate the expression that is being
         // passed into the function call (called_arg)
-        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns)
-          ->update_location_context({from}, true);
+        abstract_object_pointert param_val =
+          abstract_state.eval(called_arg, ns)
+            ->update_location_context({from}, true);
 
         // Assign the evaluated value to the symbol associated with the
         // parameter of the function
@@ -503,13 +507,13 @@ void variable_sensitivity_domaint::transform_function_call(
 
       // Too few arguments so invalid code
       DATA_INVARIANT(
-        parameter_it==declaration_parameters.end(),
+        parameter_it == declaration_parameters.end(),
         "Number of arguments should match parameters");
     }
   }
   else
   {
-    PRECONDITION(to==next);
+    PRECONDITION(to == next);
     abstract_state.havoc("unknown opaque function call");
   }
 }
@@ -531,18 +535,17 @@ Function: variable_sensitivity_domaint::ignore_function_call_transform
 bool variable_sensitivity_domaint::ignore_function_call_transform(
   const irep_idt &function_id) const
 {
-  static const std::set<irep_idt> ignored_internal_function={
+  static const std::set<irep_idt> ignored_internal_function = {
     CPROVER_PREFIX "set_must",
     CPROVER_PREFIX "get_must",
     CPROVER_PREFIX "set_may",
     CPROVER_PREFIX "get_may",
     CPROVER_PREFIX "cleanup",
     CPROVER_PREFIX "clear_may",
-    CPROVER_PREFIX "clear_must"
-  };
+    CPROVER_PREFIX "clear_must"};
 
-  return ignored_internal_function.find(function_id)!=
-  ignored_internal_function.cend();
+  return ignored_internal_function.find(function_id) !=
+         ignored_internal_function.cend();
 }
 
 /// Perform a context aware merge of the changes that have been applied
@@ -564,27 +567,27 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
   // TODO(tkiley): flag to turn of the context aware merge
   if(true)
   {
-    const variable_sensitivity_domaint &cast_function_call=
+    const variable_sensitivity_domaint &cast_function_call =
       static_cast<const variable_sensitivity_domaint &>(function_call);
 
-    const variable_sensitivity_domaint &cast_function_start=
+    const variable_sensitivity_domaint &cast_function_start =
       static_cast<const variable_sensitivity_domaint &>(function_start);
 
-    const variable_sensitivity_domaint &cast_function_end=
+    const variable_sensitivity_domaint &cast_function_end =
       static_cast<const variable_sensitivity_domaint &>(function_end);
 
     const std::vector<irep_idt> &modified_symbol_names =
       cast_function_start.get_modified_symbols(cast_function_end);
 
     std::vector<symbol_exprt> modified_symbols;
-      modified_symbols.reserve(modified_symbol_names.size());
-      std::transform(
-        modified_symbol_names.begin(),
-        modified_symbol_names.end(),
-        std::back_inserter(modified_symbols),
-        [&ns](const irep_idt &id) { return ns.lookup(id).symbol_expr(); });
+    modified_symbols.reserve(modified_symbol_names.size());
+    std::transform(
+      modified_symbol_names.begin(),
+      modified_symbol_names.end(),
+      std::back_inserter(modified_symbols),
+      [&ns](const irep_idt &id) { return ns.lookup(id).symbol_expr(); });
 
-    abstract_state=cast_function_call.abstract_state;
+    abstract_state = cast_function_call.abstract_state;
     apply_domain(modified_symbols, cast_function_end, ns);
   }
   else
@@ -604,9 +607,9 @@ void variable_sensitivity_domaint::apply_domain(
   const variable_sensitivity_domaint &source,
   const namespacet &ns)
 {
-  for (const auto &symbol : modified_symbols)
+  for(const auto &symbol : modified_symbols)
   {
-    abstract_object_pointert value=source.abstract_state.eval(symbol, ns);
+    abstract_object_pointert value = source.abstract_state.eval(symbol, ns);
     abstract_state.assign(symbol, value, ns);
   }
 }

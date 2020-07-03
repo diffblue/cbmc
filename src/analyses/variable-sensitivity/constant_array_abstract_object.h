@@ -8,8 +8,8 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
 
-#include <vector>
 #include <iosfwd>
+#include <vector>
 
 #include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
@@ -17,7 +17,7 @@
 class ai_baset;
 class abstract_environmentt;
 
-class constant_array_abstract_objectt:public array_abstract_objectt
+class constant_array_abstract_objectt : public array_abstract_objectt
 {
 public:
   typedef sharing_ptrt<constant_array_abstract_objectt> const
@@ -30,13 +30,15 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual ~constant_array_abstract_objectt() {}
+  virtual ~constant_array_abstract_objectt()
+  {
+  }
 
-  void output(
-    std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
+  void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
+    const override;
 
-  virtual abstract_object_pointert visit_sub_elements(
-    const abstract_object_visitort &visitor) const override;
+  virtual abstract_object_pointert
+  visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
   void get_statistics(
     abstract_object_statisticst &statistics,
@@ -60,8 +62,8 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  virtual abstract_object_pointert merge(
-    abstract_object_pointert other) const override;
+  virtual abstract_object_pointert
+  merge(abstract_object_pointert other) const override;
 
   virtual bool verify() const override;
   virtual void make_top_internal() override;
@@ -78,19 +80,26 @@ private:
   // to the value at that index
   struct mp_integer_hash
   {
-    size_t operator()(const mp_integer &i) const { return std::hash<BigInt::ullong_t>{}(i.to_ulong()); }
+    size_t operator()(const mp_integer &i) const
+    {
+      return std::hash<BigInt::ullong_t>{}(i.to_ulong());
+    }
   };
 
-  typedef sharing_mapt<mp_integer, abstract_object_pointert, false, mp_integer_hash>
+  typedef sharing_mapt<
+    mp_integer,
+    abstract_object_pointert,
+    false,
+    mp_integer_hash>
     shared_array_mapt;
 
   shared_array_mapt map;
 
-  abstract_object_pointert get_top_entry(
-    const abstract_environmentt &env, const namespacet &ns) const;
+  abstract_object_pointert
+  get_top_entry(const abstract_environmentt &env, const namespacet &ns) const;
 
-  abstract_object_pointert constant_array_merge(
-    const constant_array_pointert other) const;
+  abstract_object_pointert
+  constant_array_merge(const constant_array_pointert other) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H

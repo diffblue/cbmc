@@ -5,26 +5,26 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
+#include <algorithm>
 #include <functional>
-#include <stack>
 #include <map>
 #include <ostream>
-#include <algorithm>
+#include <stack>
 
-#include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/array_abstract_object.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/ai.h>
+#include <analyses/variable-sensitivity/abstract_object.h>
+#include <analyses/variable-sensitivity/array_abstract_object.h>
+#include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/simplify_expr.h>
 
 #include "abstract_enviroment.h"
 #include "abstract_object_statistics.h"
 
 #ifdef DEBUG
-#include <iostream>
+#  include <iostream>
 #endif
 
 /*******************************************************************\
@@ -41,72 +41,72 @@ Function: abstract_environmentt::eval
 
 \*******************************************************************/
 
-abstract_object_pointert abstract_environmentt::eval(
-  const exprt &expr, const namespacet &ns) const
+abstract_object_pointert
+abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 {
   if(bottom)
     return abstract_object_factory(expr.type(), ns, false, true);
 
   // first try to canonicalise, including constant folding
-  const exprt &simplified_expr=simplify_expr(expr, ns);
+  const exprt &simplified_expr = simplify_expr(expr, ns);
 
-  const irep_idt simplified_id=simplified_expr.id();
-  if(simplified_id==ID_symbol)
+  const irep_idt simplified_id = simplified_expr.id();
+  if(simplified_id == ID_symbol)
   {
     const symbol_exprt &symbol(to_symbol_expr(simplified_expr));
-    const auto &symbol_entry=map.find(symbol.get_identifier());
+    const auto &symbol_entry = map.find(symbol.get_identifier());
     if(!symbol_entry.has_value())
     {
       return abstract_object_factory(simplified_expr.type(), ns, true);
     }
     else
     {
-      abstract_object_pointert found_symbol_value=symbol_entry.value();
+      abstract_object_pointert found_symbol_value = symbol_entry.value();
       return found_symbol_value;
     }
   }
-  else if(simplified_id==ID_member)
+  else if(simplified_id == ID_member)
   {
     member_exprt member_expr(to_member_expr(simplified_expr));
 
     const exprt &parent = member_expr.compound();
 
-    abstract_object_pointert parent_abstract_object=eval(parent, ns);
+    abstract_object_pointert parent_abstract_object = eval(parent, ns);
     return parent_abstract_object->read(*this, member_expr, ns);
   }
-  else if(simplified_id==ID_address_of)
+  else if(simplified_id == ID_address_of)
   {
-    abstract_object_pointert pointer_object=
+    abstract_object_pointert pointer_object =
       abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
 
     // Store the abstract object in the pointer
     return pointer_object;
   }
-  else if(simplified_id==ID_dereference)
+  else if(simplified_id == ID_dereference)
   {
     dereference_exprt dereference(to_dereference_expr(simplified_expr));
-    abstract_object_pointert pointer_abstract_object=
+    abstract_object_pointert pointer_abstract_object =
       eval(dereference.pointer(), ns);
 
     return pointer_abstract_object->read(*this, nil_exprt(), ns);
   }
-  else if(simplified_id==ID_index)
+  else if(simplified_id == ID_index)
   {
     index_exprt index_expr(to_index_expr(simplified_expr));
-    abstract_object_pointert array_abstract_object=
+    abstract_object_pointert array_abstract_object =
       eval(index_expr.array(), ns);
 
     return array_abstract_object->read(*this, index_expr, ns);
   }
-  else if(simplified_id==ID_array)
+  else if(simplified_id == ID_array)
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
-  else if(simplified_id==ID_struct)
+  else if(simplified_id == ID_struct)
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
-  else if(simplified_id==ID_constant)
+  else if(simplified_id == ID_constant)
   {
     return abstract_object_factory(
       simplified_expr.type(), to_constant_expr(simplified_expr), ns);
@@ -115,7 +115,7 @@ abstract_object_pointert abstract_environmentt::eval(
   {
     // No special handling required by the abstract environment
     // delegate to the abstract object
-    if(simplified_expr.operands().size()>0)
+    if(simplified_expr.operands().size() > 0)
     {
       return eval_expression(simplified_expr, ns);
     }
@@ -163,22 +163,24 @@ Function: abstract_environmentt::assign
 \*******************************************************************/
 
 bool abstract_environmentt::assign(
-  const exprt &expr, const abstract_object_pointert value, const namespacet &ns)
+  const exprt &expr,
+  const abstract_object_pointert value,
+  const namespacet &ns)
 {
   PRECONDITION(value);
 
   if(value->is_bottom())
   {
-    bool bottom_at_start=this->is_bottom();
+    bool bottom_at_start = this->is_bottom();
     this->make_bottom();
     return !bottom_at_start;
   }
 
-  abstract_object_pointert lhs_value=nullptr;
+  abstract_object_pointert lhs_value = nullptr;
   // Build a stack of index, member and dereference accesses which
   // we will work through the relevant abstract objects
   exprt s = expr;
-  std::stack<exprt> stactions;    // I'm not a continuation, honest guv'
+  std::stack<exprt> stactions; // I'm not a continuation, honest guv'
   while(s.id() != ID_symbol)
   {
     if(s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
@@ -188,19 +190,18 @@ bool abstract_environmentt::assign(
     }
     else
     {
-      lhs_value=eval(s, ns);
+      lhs_value = eval(s, ns);
       break;
     }
   }
 
   if(!lhs_value)
   {
-    INVARIANT(s.id()==ID_symbol, "Have a symbol or a stack");
+    INVARIANT(s.id() == ID_symbol, "Have a symbol or a stack");
     const symbol_exprt &symbol_expr(to_symbol_expr(s));
     if(!map.has_key(symbol_expr.get_identifier()))
     {
-      lhs_value=abstract_object_factory(
-        symbol_expr.type(), ns, true, false);
+      lhs_value = abstract_object_factory(symbol_expr.type(), ns, true, false);
     }
     else
     {
@@ -213,37 +214,41 @@ bool abstract_environmentt::assign(
   // This is the root abstract object that is in the map of abstract objects
   // It might not have the same type as value if the above stack isn't empty
 
-
   if(!stactions.empty())
   {
     // The symbol is not in the map - it is therefore top
-    final_value=write(lhs_value, value, stactions, ns, false);
+    final_value = write(lhs_value, value, stactions, ns, false);
   }
   else
   {
     // If we don't have a symbol on the LHS, then we must have some expression
     // that we can write to (i.e. a pointer, an array, a struct) This appears
     // to be none of that.
-    if(s.id()!=ID_symbol)
+    if(s.id() != ID_symbol)
     {
       throw "invalid l-value";
     }
     // We can assign the AO directly to the symbol
-    final_value=value;
+    final_value = value;
   }
 
-  const typet &lhs_type=ns.follow(lhs_value->type());
-  const typet &rhs_type=ns.follow(final_value->type());
+  const typet &lhs_type = ns.follow(lhs_value->type());
+  const typet &rhs_type = ns.follow(final_value->type());
 
   // Write the value for the root symbol back into the map
-  INVARIANT(lhs_type==rhs_type,
-            "Assignment types must match" "\n"
-            "lhs_type :" + lhs_type.pretty() + "\n"
-            "rhs_type :" + rhs_type.pretty());
+  INVARIANT(
+    lhs_type == rhs_type,
+    "Assignment types must match"
+    "\n"
+    "lhs_type :" +
+      lhs_type.pretty() +
+      "\n"
+      "rhs_type :" +
+      rhs_type.pretty());
   // If LHS was directly the symbol
-  if(s.id()==ID_symbol)
+  if(s.id() == ID_symbol)
   {
-    symbol_exprt symbol_expr=to_symbol_expr(s);
+    symbol_exprt symbol_expr = to_symbol_expr(s);
 
     if(final_value != lhs_value)
     {
@@ -287,10 +292,10 @@ abstract_object_pointert abstract_environmentt::write(
   bool merge_write)
 {
   PRECONDITION(!remaining_stack.empty());
-  const exprt & next_expr=remaining_stack.top();
+  const exprt &next_expr = remaining_stack.top();
   remaining_stack.pop();
 
-  const irep_idt &stack_head_id=next_expr.id();
+  const irep_idt &stack_head_id = next_expr.id();
 
   // Each handler takes the abstract object referenced, copies it,
   // writes according to the type of expression (e.g. for ID_member)
@@ -298,17 +303,17 @@ abstract_object_pointert abstract_environmentt::write(
   // write_member which will attempt to update the abstract object for the
   // relevant member. This modified abstract object is returned and this
   // is inserted back into the map
-  if(stack_head_id==ID_index)
+  if(stack_head_id == ID_index)
   {
     return lhs->write(
-        *this, ns, remaining_stack, to_index_expr(next_expr), rhs, merge_write);
+      *this, ns, remaining_stack, to_index_expr(next_expr), rhs, merge_write);
   }
-  else if(stack_head_id==ID_member)
+  else if(stack_head_id == ID_member)
   {
     return lhs->write(
       *this, ns, remaining_stack, to_member_expr(next_expr), rhs, merge_write);
   }
-  else if(stack_head_id==ID_dereference)
+  else if(stack_head_id == ID_dereference)
   {
     return lhs->write(
       *this, ns, remaining_stack, nil_exprt(), rhs, merge_write);
@@ -342,17 +347,18 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // This should be enforced by the well-structured-ness of the
   // goto-program and the way assume is used.
 
-  PRECONDITION(expr.type().id()==ID_bool);
+  PRECONDITION(expr.type().id() == ID_bool);
 
   // Evaluate the expression
   abstract_object_pointert res = eval(expr, ns);
 
   exprt possibly_constant = res->to_constant();
 
-  if(possibly_constant.id()!=ID_nil)  // I.E. actually a value
+  if(possibly_constant.id() != ID_nil) // I.E. actually a value
   {
     // Should be of the right type
-    INVARIANT(possibly_constant.type().id()==ID_bool, "simplication preserves type");
+    INVARIANT(
+      possibly_constant.type().id() == ID_bool, "simplication preserves type");
 
     if(possibly_constant.is_false())
     {
@@ -383,7 +389,6 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   return false;
 }
 
-
 /*******************************************************************\
 
 Function: abstract_environmentt::abstract_object_factory
@@ -401,7 +406,10 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet &type, const namespacet &ns, bool top, bool bottom) const
+  const typet &type,
+  const namespacet &ns,
+  bool top,
+  bool bottom) const
 {
   exprt empty_constant_expr = nil_exprt();
   return abstract_object_factory(
@@ -424,7 +432,9 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet &type, const exprt &e, const namespacet &ns) const
+  const typet &type,
+  const exprt &e,
+  const namespacet &ns) const
 {
   return abstract_object_factory(type, false, false, e, *this, ns);
 }
@@ -447,8 +457,12 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet &type, bool top, bool bottom, const exprt &e,
-  const abstract_environmentt &environment, const namespacet &ns) const
+  const typet &type,
+  bool top,
+  bool bottom,
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
 {
   return variable_sensitivity_object_factoryt::instance().get_abstract_object(
     type, top, bottom, e, environment, ns);
@@ -467,7 +481,6 @@ Function: abstract_environmentt::merge
 
 \*******************************************************************/
 
-
 #include <iostream>
 
 bool abstract_environmentt::merge(const abstract_environmentt &env)
@@ -481,7 +494,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
 
   if(bottom)
   {
-    *this=env;
+    *this = env;
     return !env.bottom;
   }
   else if(env.bottom)
@@ -492,18 +505,15 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   {
     // For each element in the intersection of map and env.map merge
     // If the result of the merge is top, remove from the map
-    bool modified=false;
+    bool modified = false;
     decltype(env.map)::delta_viewt delta_view;
     env.map.get_delta_view(map, delta_view);
     for(const auto &entry : delta_view)
     {
-      bool object_modified=false;
-      abstract_object_pointert new_object =
-        abstract_objectt::merge(
-          entry.get_other_map_value(),
-          entry.m,
-          object_modified);
-      modified|=object_modified;
+      bool object_modified = false;
+      abstract_object_pointert new_object = abstract_objectt::merge(
+        entry.get_other_map_value(), entry.m, object_modified);
+      modified |= object_modified;
       map.replace(entry.k, new_object);
     }
 
@@ -546,7 +556,7 @@ void abstract_environmentt::make_top()
 {
   // since we assume anything is not in the map is top this is sufficient
   map.clear();
-  bottom=false;
+  bottom = false;
 }
 
 /*******************************************************************\
@@ -564,7 +574,7 @@ Function: abstract_environmentt::make_bottom
 void abstract_environmentt::make_bottom()
 {
   map.clear();
-  bottom=true;
+  bottom = true;
 }
 
 /*******************************************************************\
@@ -661,15 +671,16 @@ bool abstract_environmentt::verify() const
 }
 
 abstract_object_pointert abstract_environmentt::eval_expression(
-  const exprt &e, const namespacet &ns) const
+  const exprt &e,
+  const namespacet &ns) const
 {
   // We create a temporary top abstract object (according to the
   // type of the expression), and call expression transform on it.
   // The value of the temporary abstract object is ignored, its
   // purpose is just to dispatch the expression transform call to
   // a concrete subtype of abstract_objectt.
-  abstract_object_pointert eval_obj=abstract_object_factory(
-    e.type(), ns, true);
+  abstract_object_pointert eval_obj =
+    abstract_object_factory(e.type(), ns, true);
 
   std::vector<abstract_object_pointert> operands;
 
@@ -696,7 +707,7 @@ Function: abstract_environmentt::erase
 
 void abstract_environmentt::erase(const symbol_exprt &expr)
 {
-    map.erase_if_exists(expr.get_identifier());
+  map.erase_if_exists(expr.get_identifier());
 }
 
 /*******************************************************************\
@@ -721,7 +732,8 @@ Function: abstract_environmentt::environment_diff
 
 std::vector<abstract_environmentt::map_keyt>
 abstract_environmentt::modified_symbols(
-  const abstract_environmentt &first, const abstract_environmentt &second)
+  const abstract_environmentt &first,
+  const abstract_environmentt &second)
 {
   // Find all symbols who have different write locations in each map
   std::vector<abstract_environmentt::map_keyt> symbols_diff;
@@ -730,7 +742,7 @@ abstract_environmentt::modified_symbols(
   for(const auto &entry : view)
   {
     const auto second_entry = second.map.find(entry.first);
-    if (second_entry.has_value())
+    if(second_entry.has_value())
     {
       if(second_entry.value().get()->has_been_modified(entry.second))
       {
@@ -744,7 +756,7 @@ abstract_environmentt::modified_symbols(
   for(const auto &entry : second.map.get_view())
   {
     const auto &second_entry = first.map.find(entry.first);
-    if (!second_entry.has_value())
+    if(!second_entry.has_value())
     {
       CHECK_RETURN(!entry.first.empty());
       symbols_diff.push_back(entry.first);
@@ -755,11 +767,13 @@ abstract_environmentt::modified_symbols(
 
 static std::size_t count_globals(const namespacet &ns)
 {
-  auto const& symtab = ns.get_symbol_table();
-  auto val = std::count_if(symtab.begin(), symtab.end(),
-                       [](const symbol_tablet::const_iteratort::value_type& sym) {
-                         return sym.second.is_lvalue && sym.second.is_static_lifetime;
-                       });
+  auto const &symtab = ns.get_symbol_table();
+  auto val = std::count_if(
+    symtab.begin(),
+    symtab.end(),
+    [](const symbol_tablet::const_iteratort::value_type &sym) {
+      return sym.second.is_lvalue && sym.second.is_static_lifetime;
+    });
   return val;
 }
 
@@ -781,8 +795,6 @@ abstract_environmentt::gather_statistics(const namespacet &ns) const
   return statistics;
 }
 
-abstract_environmentt::abstract_environmentt()
-: bottom(false)
+abstract_environmentt::abstract_environmentt() : bottom(false)
 {
-
 }

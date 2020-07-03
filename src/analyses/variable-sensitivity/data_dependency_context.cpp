@@ -31,9 +31,8 @@ bool data_dependency_contextt::has_been_modified(
   if(this->write_location_contextt::has_been_modified(before))
     return true;
 
-  auto cast_before=
-    std::dynamic_pointer_cast<const data_dependency_contextt>
-      (before);
+  auto cast_before =
+    std::dynamic_pointer_cast<const data_dependency_contextt>(before);
 
   if(!cast_before)
   {
@@ -51,8 +50,8 @@ bool data_dependency_contextt::has_been_modified(
     cast_before->data_deps.cend(),
     std::inserter(intersection, intersection.end()),
     location_ordert());
-  bool all_matched=intersection.size()==data_deps.size() &&
-                   intersection.size()==cast_before->data_deps.size();
+  bool all_matched = intersection.size() == data_deps.size() &&
+                     intersection.size() == cast_before->data_deps.size();
 
   if(!all_matched)
     return true;
@@ -66,8 +65,8 @@ bool data_dependency_contextt::has_been_modified(
     std::inserter(intersection, intersection.end()),
     location_ordert());
 
-  all_matched=intersection.size()==data_dominators.size() &&
-              intersection.size()==cast_before->data_dominators.size();
+  all_matched = intersection.size() == data_dominators.size() &&
+                intersection.size() == cast_before->data_dominators.size();
 
   return !all_matched;
 }
@@ -108,7 +107,7 @@ abstract_object_pointert data_dependency_contextt::insert_data_deps(
   if(new_dependencies.empty())
     return shared_from_this();
 
-  const auto &result=
+  const auto &result =
     std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
 
   for(auto l : new_dependencies)
@@ -136,8 +135,8 @@ abstract_object_pointert data_dependency_contextt::insert_data_deps(
  * \return a new data_dependency_context if new dependencies were set,
  * or 'this' if the dependencies were not changed.
  */
-abstract_object_pointert data_dependency_contextt::set_data_deps(
-  const dependencest &dependencies) const
+abstract_object_pointert
+data_dependency_contextt::set_data_deps(const dependencest &dependencies) const
 {
   // If the dependencies will not change, just return 'this'
   abstract_objectt::locationst intersection;
@@ -149,12 +148,12 @@ abstract_object_pointert data_dependency_contextt::set_data_deps(
     dependencies.cend(),
     std::inserter(intersection, intersection.end()),
     location_ordert());
-  if(intersection.size()==data_deps.size() &&
-     intersection.size()==dependencies.size())
+  if(
+    intersection.size() == data_deps.size() &&
+    intersection.size() == dependencies.size())
     return shared_from_this();
 
-
-  const auto &result=
+  const auto &result =
     std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
 
   result->data_deps = dependencies;
@@ -197,7 +196,7 @@ abstract_object_pointert data_dependency_contextt::write(
       this->write_location_contextt::write(
         environment, ns, stack, specifier, value, merging_write));
 
-  const auto cast_value=
+  const auto cast_value =
     std::dynamic_pointer_cast<const data_dependency_contextt>(value);
 
   return updated_parent->set_data_deps(cast_value->data_deps);
@@ -214,8 +213,7 @@ abstract_object_pointert data_dependency_contextt::write(
  * \return a clone of this abstract object with it's location context
  * updated
  */
-abstract_object_pointert
-data_dependency_contextt::update_location_context(
+abstract_object_pointert data_dependency_contextt::update_location_context(
   const abstract_objectt::locationst &locations,
   const bool update_sub_elements) const
 {
@@ -236,10 +234,10 @@ data_dependency_contextt::update_location_context(
  * \return the result of the merge, or 'this' if the merge would not change
  * the current abstract object
  */
-abstract_object_pointert data_dependency_contextt::merge(
-  abstract_object_pointert other) const
+abstract_object_pointert
+data_dependency_contextt::merge(abstract_object_pointert other) const
 {
-  auto cast_other=
+  auto cast_other =
     std::dynamic_pointer_cast<const data_dependency_contextt>(other);
 
   if(cast_other)
@@ -252,9 +250,8 @@ abstract_object_pointert data_dependency_contextt::merge(
       std::dynamic_pointer_cast<const data_dependency_contextt>(
         merged_parent->insert_data_deps(cast_other->data_deps));
 
-    const auto &result=
-      std::dynamic_pointer_cast<data_dependency_contextt>(
-        updated_parent->mutable_clone());
+    const auto &result = std::dynamic_pointer_cast<data_dependency_contextt>(
+      updated_parent->mutable_clone());
 
     // On a merge, data_dominators are the intersection of this object and the
     // other object. In other words, the dominators at this merge point are
@@ -262,8 +259,10 @@ abstract_object_pointert data_dependency_contextt::merge(
     // merge point.
     result->data_dominators.clear();
     std::set_intersection(
-      data_dominators.begin(), data_dominators.end(),
-      cast_other->data_dominators.begin(), cast_other->data_dominators.end(),
+      data_dominators.begin(),
+      data_dominators.end(),
+      cast_other->data_dominators.begin(),
+      cast_other->data_dominators.end(),
       std::inserter(result->data_dominators, result->data_dominators.end()),
       location_ordert());
 
@@ -296,7 +295,7 @@ abstract_object_pointert
 data_dependency_contextt::abstract_object_merge_internal(
   const abstract_object_pointert other) const
 {
-  auto other_context=
+  auto other_context =
     std::dynamic_pointer_cast<const data_dependency_contextt>(other);
 
   if(other_context)
@@ -316,10 +315,11 @@ data_dependency_contextt::abstract_object_merge_internal(
  * \return set of data dependencies
  */
 std::set<goto_programt::const_targett>
-  data_dependency_contextt::get_data_dependencies() const
+data_dependency_contextt::get_data_dependencies() const
 {
   std::set<goto_programt::const_targett> result;
-  for (const auto d : data_deps) result.insert(d);
+  for(const auto d : data_deps)
+    result.insert(d);
   return result;
 }
 
@@ -329,15 +329,18 @@ std::set<goto_programt::const_targett>
  * \return set of data dominators
  */
 std::set<goto_programt::const_targett>
-  data_dependency_contextt::get_data_dominators() const
+data_dependency_contextt::get_data_dominators() const
 {
   std::set<goto_programt::const_targett> result;
-  for (const auto d : data_dominators) result.insert(d);
+  for(const auto d : data_dominators)
+    result.insert(d);
   return result;
 }
 
 void data_dependency_contextt::output(
-  std::ostream &out, const class ai_baset &ai, const namespacet &ns) const
+  std::ostream &out,
+  const class ai_baset &ai,
+  const namespacet &ns) const
 {
   this->write_location_contextt::output(out, ai, ns);
 
