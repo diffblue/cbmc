@@ -1,6 +1,6 @@
 CORE
 main.c
---variable --simplify out.gb
+--constants --simplify out.gb
 ^EXIT=0$
 ^SIGNAL=0$
 ^Simplified:  assert: 1, assume: 0, goto: 1, assigns: 8, function calls: 0$

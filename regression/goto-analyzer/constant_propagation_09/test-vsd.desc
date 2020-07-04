@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---constants --arrays --verify
+--variable --arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line 9 assertion a\[(\(signed( long)? long int\))?0\] == 0: FAILURE \(if reachable\)$
