@@ -103,7 +103,7 @@ public:
     const ai_domain_baset &function_call,
     const ai_domain_baset &function_start,
     const ai_domain_baset &function_end,
-    const namespacet &ns) override;
+    const namespacet &ns);
 
   bool ai_simplify(exprt &condition, const namespacet &ns) const override;
 
