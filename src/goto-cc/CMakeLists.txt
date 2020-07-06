@@ -28,7 +28,7 @@ target_link_libraries(goto-cc goto-cc-lib)
 
 if(WIN32)
   set_target_properties(goto-cc PROPERTIES OUTPUT_NAME goto-cl)
-  install(TARGETS goto-cl DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS goto-cc DESTINATION ${CMAKE_INSTALL_BINDIR})
 else()
   add_custom_command(TARGET goto-cc
     POST_BUILD
