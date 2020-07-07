@@ -262,11 +262,6 @@ private:
     const exprt &size,
     const optionalt<irep_idt> &lhs_name);
 
-  /// Constructor for strings: as array but the last element is zero.
-  /// \param result: symbol of the result parameter
-  /// \return the body of the constructor
-  code_blockt build_array_string_constructor(const symbol_exprt &result) const;
-
   /// Select the specified struct-member to be non-deterministically
   ///   initialized.
   /// \param lhs: symbol expression of the top structure
