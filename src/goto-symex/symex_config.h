@@ -34,6 +34,8 @@ struct symex_configt final
 
   bool partial_loops;
 
+  bool havoc_undefined_functions;
+
   mp_integer debug_level;
 
   /// \brief Should the additional validation checks be run?
