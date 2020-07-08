@@ -84,6 +84,29 @@ public:
     return static_cast<const typet &>(find(ID_type));
   }
 
+
+ static void indent_str(std::string &s, unsigned indent)
+  {
+  for(unsigned i=0; i<indent; i++)
+    s+=' ';
+  }
+
+  const std::string get_type_string(int depth) const
+  {
+    std::string etype = type().pretty();
+
+    indent_str(etype, depth);
+    
+    if(operands().empty()) return(etype);
+    else {
+      std::string res;
+      for(auto op: operands()) {
+        res += op.get_type_string(depth+1);
+      }
+      return(res);
+    }
+  }
+
   /// Amount of nodes this expression tree contains. This is the size of the
   /// actual tree, ignoring memory/sub-tree sharing.
   std::size_t size() const;

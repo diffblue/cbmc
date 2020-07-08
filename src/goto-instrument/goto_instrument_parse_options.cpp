@@ -24,12 +24,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/version.h>
 
+#include <json/json_parser.h>
+
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/ensure_one_backedge_per_target.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/interpreter.h>
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/label_function_pointer_call_sites.h>
+#include <goto-programs/link_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/parameter_assignments.h>
@@ -80,6 +84,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cpp/cprover_library.h>
 
+#include "abstraction.h"
+#include "abstraction_spect.h"
 #include "accelerate/accelerate.h"
 #include "alignment_checks.h"
 #include "branch.h"
@@ -1012,6 +1018,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else
     options.set_option("assert-to-assume", false);
 
+  if(cmdline.isset("use-abstraction"))
+  {
+    std::string abs_file = cmdline.get_value("use-abstraction");
+
+    abstraction_spect abst_spec(abs_file, ui_message_handler);
+
+    std::vector<std::string> abstfiles = abst_spec.get_abstraction_function_files();
+
+    am_abstractiont::link_abst_functions(goto_model, abst_spec, ui_message_handler, options);
+    
+    am_abstractiont::abstract_goto_program(goto_model, abst_spec);
+  }
+
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
@@ -1779,6 +1798,8 @@ void goto_instrument_parse_optionst::help()
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
+    " --print-detailed-ir\n" // NOLINTNEXTLINE(*)
+    "                              show internal representation of the program with type information\n"
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
@@ -1793,6 +1814,8 @@ void goto_instrument_parse_optionst::help()
     " --show-local-safe-pointers   show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     " --show-safe-dereferences     show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     "                              *and* used as a dereference operand\n" // NOLINT(*)
+    " --show-index-exprs array_name\n"
+    "                              show expressions that index into the target array\n"
     HELP_VALIDATE
     // NOLINTNEXTLINE(whitespace/line_length)
     " --validate-goto-binary       check the well-formedness of the passed in goto\n"
@@ -1878,6 +1901,7 @@ void goto_instrument_parse_optionst::help()
     " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
     "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
     "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
+    " --use-abstraction <file>     abstract given arrays specified in the json file\n"
     HELP_RESTRICT_FUNCTION_POINTER
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
