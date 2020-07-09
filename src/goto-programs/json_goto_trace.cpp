@@ -278,14 +278,12 @@ void convert_return(
 
 void convert_default(
   json_objectt &json_location_only,
-  const conversion_dependenciest &conversion_dependencies,
-  const default_step_kindt &step_kind)
+  const default_trace_stept &default_step)
 {
-  const goto_trace_stept &step = conversion_dependencies.step;
-  const jsont &location = conversion_dependencies.location;
-
-  json_location_only["stepType"] = json_stringt(default_step_name(step_kind));
-  json_location_only["hidden"] = jsont::json_boolean(step.hidden);
-  json_location_only["thread"] = json_numbert(std::to_string(step.thread_nr));
-  json_location_only["sourceLocation"] = location;
+  json_location_only["stepType"] =
+    json_stringt(default_step_name(default_step.kind));
+  json_location_only["hidden"] = jsont::json_boolean(default_step.hidden);
+  json_location_only["thread"] =
+    json_numbert(std::to_string(default_step.thread_number));
+  json_location_only["sourceLocation"] = json(default_step.location);
 }
