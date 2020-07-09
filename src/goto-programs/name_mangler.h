@@ -13,6 +13,8 @@
 #include <regex>
 #include <vector>
 
+#define FILE_LOCAL_PREFIX CPROVER_PREFIX "file_local_"
+
 /// \brief Mangles the names in an entire program and its symbol table
 ///
 /// The type parameter to this class should be a functor that has a no-arg
