@@ -277,11 +277,10 @@ std::string type2name(const typet &type, const namespacet &ns)
 /// If we want utilities like dump_c to work properly identifiers
 /// should ideally always be valid C identifiers
 /// This replaces some invalid characters that can appear in type2name output.
-std::string type2identifier(const typet &type, const namespacet &ns)
+std::string type_name2type_identifier(const std::string &name)
 {
-  auto type2name_res = type2name(type, ns);
   std::string result{};
-  for(char c : type2name_res)
+  for(char c : name)
   {
     switch(c)
     {
@@ -300,4 +299,9 @@ std::string type2identifier(const typet &type, const namespacet &ns)
     }
   }
   return result;
+}
+
+std::string type2identifier(const typet &type, const namespacet &ns)
+{
+  return type_name2type_identifier(type2name(type, ns));
 }
