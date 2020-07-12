@@ -1,0 +1,11 @@
+CORE paths-lifo-expected-failure
+access.c
+--program-only
+^EXIT=0$
+^SIGNAL=0$
+s!0@1#1\.\.n == \{ s!0@1#1\.\.n\[\[0\]\], s!0@1#1\.\.n\[\[1\]\], s!0@1#1\.\.n\[\[2\]\], s!0@1#1\.\.n\[\[3\]\] } WITH \[\(.*\)i!0@1#2:=k!0@1#1\]
+--
+byte_update
+--
+This tests applying field-sensitivity to a pointer to an array that is part of a struct. See cbmc issue #5397 and PR #5418 for more detail.
+Disabled for paths-lifo mode, which does not support --program-only.

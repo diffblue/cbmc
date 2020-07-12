@@ -99,6 +99,36 @@ static json_objectt value_set_dereference_stats_to_json(
   return json_result;
 }
 
+optionalt<exprt> value_set_dereferencet::try_add_offset_to_indices(
+  const exprt &expr,
+  const exprt &offset_elements)
+{
+  if(const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr))
+  {
+    return index_exprt{
+      index_expr->array(),
+      plus_exprt{index_expr->index(),
+                 typecast_exprt::conditional_cast(
+                   offset_elements, index_expr->index().type())}};
+  }
+  else if(const auto *if_expr = expr_try_dynamic_cast<if_exprt>(expr))
+  {
+    const auto true_case =
+      try_add_offset_to_indices(if_expr->true_case(), offset_elements);
+    if(!true_case)
+      return {};
+    const auto false_case =
+      try_add_offset_to_indices(if_expr->false_case(), offset_elements);
+    if(!false_case)
+      return {};
+    return if_exprt{if_expr->cond(), *true_case, *false_case};
+  }
+  else
+  {
+    return {};
+  }
+}
+
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   bool display_points_to_sets)
@@ -138,6 +168,33 @@ exprt value_set_dereferencet::dereference(
         dereference(
           typecast_exprt(if_expr.false_case(), pointer.type()),
           display_points_to_sets));
+    }
+  }
+  else if(pointer.id() == ID_plus && pointer.operands().size() == 2)
+  {
+    // Try to improve results for *(p + i) where p points to known offsets but
+    // i is non-constant-- if `p` points to known positions in arrays or array-members
+    // of structs then we can add the non-constant expression `i` to the index
+    // instead of using a byte-extract expression.
+
+    exprt pointer_expr = to_plus_expr(pointer).op0();
+    exprt offset_expr = to_plus_expr(pointer).op1();
+
+    if(can_cast_type<pointer_typet>(offset_expr.type()))
+      std::swap(pointer_expr, offset_expr);
+
+    if(
+      can_cast_type<pointer_typet>(pointer_expr.type()) &&
+      !can_cast_type<pointer_typet>(offset_expr.type()) &&
+      !can_cast_expr<constant_exprt>(offset_expr))
+    {
+      exprt derefd_pointer = dereference(pointer_expr);
+      if(
+        auto derefd_with_offset =
+          try_add_offset_to_indices(derefd_pointer, offset_expr))
+        return *derefd_with_offset;
+
+      // If any of this fails, fall through to use the normal byte-extract path.
     }
   }
 

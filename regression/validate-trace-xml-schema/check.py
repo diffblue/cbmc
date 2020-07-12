@@ -28,6 +28,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # program-only instead of trace
     ['vla1', 'program-only.desc'],
     ['Quantifiers-simplify', 'simplify_not_forall.desc'],
+    ['array-cell-sensitivity15', 'test.desc'],
     # these test for invalid command line handling
     ['bad_option', 'test_multiple.desc'],
     ['bad_option', 'test.desc'],
