@@ -308,15 +308,15 @@ std::string type_name2type_identifier(const std::string &name)
       static const std::regex non_alpha_numeric{"[^A-Za-z0-9\x80-\xff]+"};
       return std::regex_replace(identifier, non_alpha_numeric, "_");
     };
-  const auto strip_leading_non_letters = [](const std::string &identifier) {
+  const auto strip_leading_digits = [](const std::string &identifier) {
     static const std::regex identifier_regex{
-      "[A-Za-z\x80-\xff][A-Za-z0-9_\x80-\xff]*"};
+      "[A-Za-z\x80-\xff_][A-Za-z0-9_\x80-\xff]*"};
     std::smatch match_results;
     bool found = std::regex_search(identifier, match_results, identifier_regex);
     POSTCONDITION(found);
     return match_results.str(0);
   };
-  return strip_leading_non_letters(replace_invalid_characters_with_underscore(
+  return strip_leading_digits(replace_invalid_characters_with_underscore(
     replace_special_characters(name)));
 }
 

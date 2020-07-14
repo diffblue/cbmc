@@ -50,18 +50,19 @@ TEST_CASE(
     R"(abcdefghijklmnopqrstuvwxyz{|}~)");
   CHECK(
     type_name2type_identifier(printable_characters) ==
-    "ptr_0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz_"
+    "_ptr_0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz_"
     "start_sub_end_sub_");
 }
 
 TEST_CASE(
-  "type_name2type_identifier leading digits",
+  "type_name2type_identifier leading characters",
   "[core][ansi-c][type_name2type_identifier]")
 {
   CHECK(
-    type_name2type_identifier(
-      "0123456789_banana_0123456789_split_0123456789") ==
+    type_name2type_identifier("0123456789banana_0123456789_split_0123456789") ==
     "banana_0123456789_split_0123456789");
+  CHECK(type_name2type_identifier("0123456789_banana") == "_banana");
+  CHECK(type_name2type_identifier("_0123456789") == "_0123456789");
 }
 
 TEST_CASE(
