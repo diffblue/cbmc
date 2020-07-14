@@ -324,7 +324,7 @@ std::string type_name2type_identifier(const std::string &name)
       replace_special_characters(name))));
 }
 
-std::string type2identifier(const typet &type, const namespacet &ns)
+std::string type_to_partial_identifier(const typet &type, const namespacet &ns)
 {
   return type_name2type_identifier(type2name(type, ns));
 }

@@ -29,6 +29,6 @@ std::string type2name(const typet &type, const namespacet &ns);
  *   depends.
  * @return An identifying string which can be used as part of a `C` identifier.
  */
-std::string type2identifier(const typet &type, const namespacet &ns);
+std::string type_to_partial_identifier(const typet &type, const namespacet &ns);
 
 #endif // CPROVER_ANSI_C_TYPE2NAME_H
