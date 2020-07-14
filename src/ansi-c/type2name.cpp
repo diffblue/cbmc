@@ -305,13 +305,9 @@ std::string type_name2type_identifier(const std::string &name)
   };
   const auto replace_invalid_characters_with_underscore =
     [](const std::string &identifier) {
-      static const std::regex non_alpha_numeric{"[^A-Za-z0-9]"};
+      static const std::regex non_alpha_numeric{"[^A-Za-z0-9]+"};
       return std::regex_replace(identifier, non_alpha_numeric, "_");
     };
-  const auto remove_duplicate_underscores = [](const std::string &identifier) {
-    static const std::regex duplicate_underscore{"_+"};
-    return std::regex_replace(identifier, duplicate_underscore, "_");
-  };
   const auto strip_leading_non_letters = [](const std::string &identifier) {
     static const std::regex identifier_regex{"[A-Za-z][A-Za-z0-9_]*"};
     std::smatch match_results;
@@ -319,9 +315,8 @@ std::string type_name2type_identifier(const std::string &name)
     POSTCONDITION(found);
     return match_results.str(0);
   };
-  return strip_leading_non_letters(
-    remove_duplicate_underscores(replace_invalid_characters_with_underscore(
-      replace_special_characters(name))));
+  return strip_leading_non_letters(replace_invalid_characters_with_underscore(
+    replace_special_characters(name)));
 }
 
 std::string type_to_partial_identifier(const typet &type, const namespacet &ns)
