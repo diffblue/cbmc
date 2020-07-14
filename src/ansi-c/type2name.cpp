@@ -305,11 +305,12 @@ std::string type_name2type_identifier(const std::string &name)
   };
   const auto replace_invalid_characters_with_underscore =
     [](const std::string &identifier) {
-      static const std::regex non_alpha_numeric{"[^A-Za-z0-9]+"};
+      static const std::regex non_alpha_numeric{"[^A-Za-z0-9\x80-\xff]+"};
       return std::regex_replace(identifier, non_alpha_numeric, "_");
     };
   const auto strip_leading_non_letters = [](const std::string &identifier) {
-    static const std::regex identifier_regex{"[A-Za-z][A-Za-z0-9_]*"};
+    static const std::regex identifier_regex{
+      "[A-Za-z\x80-\xff][A-Za-z0-9_\x80-\xff]*"};
     std::smatch match_results;
     bool found = std::regex_search(identifier, match_results, identifier_regex);
     POSTCONDITION(found);

@@ -63,3 +63,11 @@ TEST_CASE(
       "0123456789_banana_0123456789_split_0123456789") ==
     "banana_0123456789_split_0123456789");
 }
+
+TEST_CASE(
+  "type_name2type_identifier UTF-8 characters",
+  "[core][ansi-c][type_name2type_identifier]")
+{
+  const std::string utf8_example = "\xF0\x9F\x8D\x8C\xF0\x9F\x8D\xA8";
+  CHECK(type_name2type_identifier(utf8_example) == utf8_example);
+}
