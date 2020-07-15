@@ -15,6 +15,6 @@ install(TARGETS goto-harness DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(CODE "execute_process( \
   COMMAND ${CMAKE_COMMAND} -E create_symlink \
   cbmc.1 \
-  \$ENV{DESTDIR}${CMAKE_INSTALL_FULL_MANDIR}/man1/goto-harness.1 \
+  \$ENV{DESTDIR}\${CMAKE_INSTALL_FULL_MANDIR}/man1/goto-harness.1 \
   )"
 )
