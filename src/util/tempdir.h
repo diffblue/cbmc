@@ -19,14 +19,21 @@ std::string get_temporary_directory(const std::string &name_template);
 class temp_dirt
 {
 public:
-  std::string path;
+  explicit temp_dirt(const std::string &name_template);
+  ~temp_dirt();
+
+  temp_dirt(const temp_dirt &) = delete;
+
+  temp_dirt(temp_dirt &&other)
+  {
+    path.swap(other.path);
+  }
 
   std::string operator()(const std::string &file);
 
   void clear();
 
-  explicit temp_dirt(const std::string &name_template);
-  ~temp_dirt();
+  std::string path;
 };
 
 #endif // CPROVER_UTIL_TEMPDIR_H
