@@ -655,7 +655,7 @@ int gcc_modet::doit()
 
   // We now iterate over any input files
 
-  temp_dirt temp_dir("goto-cc-XXXXXX");
+  std::vector<temp_dirt> temp_dirs;
 
   {
     std::string language;
@@ -688,7 +688,9 @@ int gcc_modet::doit()
 
           std::string new_name=
             get_base_name(arg_it->arg, true)+new_suffix;
-          std::string dest=temp_dir(new_name);
+
+          temp_dirs.emplace_back("goto-cc-XXXXXX");
+          std::string dest = temp_dirs.back()(new_name);
 
           int exit_code=
             preprocess(language, arg_it->arg, dest, act_as_bcc);

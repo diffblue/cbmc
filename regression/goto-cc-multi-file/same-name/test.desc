@@ -1,0 +1,9 @@
+CORE
+main.c
+dir1/test.c dir2/test.c
+^EXIT=0$
+^SIGNAL=0$
+^f1
+^f2
+--
+^warning: ignoring
