@@ -44,6 +44,12 @@ public:
 
   exprt to_constant() const override;
 
+  abstract_object_pointert expression_transform(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 
