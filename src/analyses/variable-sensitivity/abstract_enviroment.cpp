@@ -183,10 +183,20 @@ bool abstract_environmentt::assign(
   std::stack<exprt> stactions; // I'm not a continuation, honest guv'
   while(s.id() != ID_symbol)
   {
-    if(s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
+    if(s.id() == ID_index)
     {
       stactions.push(s);
-      s = s.op0();
+      s = to_index_expr(s).array();
+    }
+    else if(s.id() == ID_member)
+    {
+      stactions.push(s);
+      s = to_member_expr(s).struct_op();
+    }
+    else if(s.id() == ID_dereference)
+    {
+      stactions.push(s);
+      s = to_dereference_expr(s).pointer();
     }
     else
     {

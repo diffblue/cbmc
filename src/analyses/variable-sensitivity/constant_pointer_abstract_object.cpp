@@ -301,7 +301,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
   }
   else
   {
-    return env.eval(value_stack.to_expression().op0(), ns);
+    return env.eval(
+      to_address_of_expr(value_stack.to_expression()).object(), ns);
   }
 }
 
@@ -351,7 +352,7 @@ constant_pointer_abstract_objectt::write_dereference(
       PRECONDITION(new_value->type() == ns.follow(type().subtype()));
 
       // Get an expression that we can assign to
-      exprt value = value_stack.to_expression().op0();
+      exprt value = to_address_of_expr(value_stack.to_expression()).object();
       if(merging_write)
       {
         abstract_object_pointert pointed_value = environment.eval(value, ns);
@@ -367,7 +368,7 @@ constant_pointer_abstract_objectt::write_dereference(
     }
     else
     {
-      exprt value = value_stack.to_expression().op0();
+      exprt value = to_address_of_expr(value_stack.to_expression()).object();
       abstract_object_pointert pointed_value = environment.eval(value, ns);
       abstract_object_pointert modified_value =
         environment.write(pointed_value, new_value, stack, ns, merging_write);

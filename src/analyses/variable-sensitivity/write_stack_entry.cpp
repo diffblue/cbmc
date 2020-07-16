@@ -79,7 +79,7 @@ exprt offset_entryt::get_access_expr() const
 void offset_entryt::adjust_access_type(exprt &expr) const
 {
   PRECONDITION(expr.id() == ID_index);
-  expr.type() = expr.op0().type().subtype();
+  expr.type() = to_index_expr(expr).array().type().subtype();
 }
 
 /// Try to combine a new stack element with the current top of the stack. This

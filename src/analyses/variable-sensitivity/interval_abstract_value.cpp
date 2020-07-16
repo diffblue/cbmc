@@ -21,7 +21,7 @@ static inline exprt look_through_casts(exprt e)
 {
   while(e.id() == ID_typecast)
   {
-    e = e.op0();
+    e = to_typecast_expr(e).op();
   }
   return e;
 }
@@ -145,8 +145,9 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
 {
   PRECONDITION(e.operands().size() == 2);
   const auto &relation = e.id();
-  const auto &lhs = e.op0();
-  const auto &rhs = e.op1();
+  const auto &binary_e = to_binary_expr(e);
+  const auto &lhs = binary_e.lhs();
+  const auto &rhs = binary_e.rhs();
   PRECONDITION(
     relation == ID_le || relation == ID_lt || relation == ID_ge ||
     relation == ID_gt || relation == ID_equal);

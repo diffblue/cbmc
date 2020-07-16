@@ -65,7 +65,8 @@ void write_stackt::construct_stack_to_pointer(
   {
     // resovle reminder, can either be a symbol, member or index of
     // otherwise unsupported
-    construct_stack_to_lvalue(expr.op0(), environment, ns);
+    construct_stack_to_lvalue(
+      to_address_of_expr(expr).object(), environment, ns);
   }
   else if(expr.id() == ID_plus || expr.id() == ID_minus)
   {
@@ -132,7 +133,8 @@ void write_stackt::construct_stack_to_lvalue(
     if(expr.id() == ID_member)
     {
       add_to_stack(std::make_shared<simple_entryt>(expr), environment, ns);
-      construct_stack_to_lvalue(expr.op0(), environment, ns);
+      construct_stack_to_lvalue(
+        to_member_expr(expr).struct_op(), environment, ns);
     }
     else if(expr.id() == ID_symbol)
     {
@@ -186,7 +188,7 @@ exprt write_stackt::to_expression() const
       {
         new_expr.operands().resize(1);
       }
-      new_expr.op0() = access_expr;
+      new_expr.operands()[0] = access_expr;
 
       // If neccesary, complete the type of the new access expression
       entry->adjust_access_type(new_expr);
@@ -237,18 +239,20 @@ write_stackt::integral_resultt write_stackt::get_which_side_integral(
   exprt &out_integral_expr)
 {
   PRECONDITION(expr.operands().size() == 2);
+  const auto binary_e = to_binary_expr(expr);
   static const std::unordered_set<irep_idt, irep_id_hash> integral_types = {
     ID_signedbv, ID_unsignedbv, ID_integer};
-  if(integral_types.find(expr.op0().type().id()) != integral_types.cend())
+  if(integral_types.find(binary_e.lhs().type().id()) != integral_types.cend())
   {
-    out_integral_expr = expr.op0();
-    out_base_expr = expr.op1();
+    out_integral_expr = binary_e.lhs();
+    out_base_expr = binary_e.rhs();
     return integral_resultt::LHS_INTEGRAL;
   }
-  else if(integral_types.find(expr.op1().type().id()) != integral_types.cend())
+  else if(
+    integral_types.find(binary_e.rhs().type().id()) != integral_types.cend())
   {
-    out_integral_expr = expr.op1();
-    out_base_expr = expr.op0();
+    out_integral_expr = binary_e.rhs();
+    out_base_expr = binary_e.lhs();
     return integral_resultt::RHS_INTEGRAL;
   }
   else
