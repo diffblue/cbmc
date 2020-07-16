@@ -1893,15 +1893,15 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         /// XXX why are we only looking at the type of the first parameter?
         if(parameters.front().type().id() == ID_pointer)
         {
-          identifier_with_type =
-            id2string(identifier) + "_" +
-            type2identifier(parameters.front().type().subtype(), *this);
+          identifier_with_type = id2string(identifier) + "_" +
+                                 type_to_partial_identifier(
+                                   parameters.front().type().subtype(), *this);
         }
         else
         {
           identifier_with_type =
             id2string(identifier) + "_" +
-            type2identifier(parameters.front().type(), *this);
+            type_to_partial_identifier(parameters.front().type(), *this);
         }
         gcc_polymorphic->set_identifier(identifier_with_type);
 
