@@ -1,0 +1,15 @@
+CORE
+dummy.c
+--function another --harness-type call-function
+^EXIT=10$
+^SIGNAL=0$
+\[static_function\.assertion\.1\] line \d assertion a == 0: FAILURE
+\[non_static_with_non_matching_signature\.assertion\.1] line \d+ assertion static_with_matching_signature\(10\) == 10: SUCCESS
+
+^VERIFICATION FAILED$
+--
+^CONVERSION ERROR$
+--
+For this particular error, we care mostly that goto-harness
+doesn't reference static symbols in other files, which would
+cause analysis through CBMC to fail with a conversion error.
