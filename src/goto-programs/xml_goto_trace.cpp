@@ -43,6 +43,11 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
   if(bv_type && constant)
   {
     const auto width = bv_type->get_width();
+    // It is fine to pass `false` into the `is_signed` parameter, even for
+    // signed values, because the subsequent conversion to binary will result
+    // in the same value either way. E.g. if the value is `-1` for a signed 8
+    // bit value, this will convert to `255` which is `11111111` in binary,
+    // which is the desired result.
     const auto binary_representation =
       integer2binary(bvrep2integer(constant->get_value(), width, false), width);
     value_xml.set_attribute("binary", binary_representation);
