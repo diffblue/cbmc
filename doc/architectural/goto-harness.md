@@ -1,15 +1,29 @@
 [CPROVER Manual TOC](../../)
 
-## Goto Harness
+# Goto Harness
 
-This is a tool that can generate harnesses, that is functions that instrument
+This is a tool for generating harnesses, that is, functions that instrument
 another function under analysis, by setting up an appropriate environment before
 calling them.
 
 This is useful when trying to analyse an isolated unit of a program without
 having to manually construct an appropriate environment.
 
-### Usage
+## Quick Start Guide
+
+For a given C program - `program.c` - to generate a harness for a function
+`test_function`, we have to do the following:
+
+```sh
+# Compile the program
+$ goto-cc program.c -o program.gb
+# Run goto-harness to produce harness file
+$ goto-harness --harness-type call-function --harness-function-name generated_harness_test_function --function test_function program.gb harness.c
+# Run the checks targetting the generated harness
+$ cbmc --pointer-check harness.c --function generated_harness_test_function
+```
+
+## Detailed Usage
 
 We have two types of harnesses we can generate for now:
 
@@ -17,6 +31,9 @@ We have two types of harnesses we can generate for now:
 without having any information about the program state.
 * The `memory-snapshot` harness, which loads an existing program state (in form
 of a JSON file) and selectively _havoc-ing_ some variables.
+
+**NOTE**: Due to a [bug](https://github.com/diffblue/cbmc/issues/5351), the
+`memory-snapshot` harness is currently inoperable. We are working to fix this.
 
 It is used similarly to how `goto-instrument` is used by modifying an existing
 GOTO binary, as produced by `goto-cc`.
@@ -45,7 +62,7 @@ $ goto-cc -o main.gb main.c
 ```
 
 Then we can call `goto-harness` on the generated GOTO binary
-to get a modified one that contains the harness function:
+to get a new C file that contains the harness function:
 
 ```sh
 $ goto-harness \
@@ -53,7 +70,7 @@ $ goto-harness \
 --harness-type call-function \
 --function function_to_test \
 main.gb \
-main-with-harness.gb
+harness.c
 ```
 
 The options we pass to `goto-harness` are:
@@ -63,34 +80,66 @@ The options we pass to `goto-harness` are:
 * `harness-type` is the type of harness to generate (`call-function` is the
   function-call harness generator)
 * `function` is the name of the function that gets instrumented
-* then we pass the input GOTO-binary and a name for the output GOTO binary.
+* then we pass the input GOTO-binary and a name for the output C file.
 
-What comes of this is a GOTO binary roughly corresponding to the following C
-pseudocode:
+What comes out of this is a C file that looks like this:
 
 ```C
-// modified_goto_binary.c
+// function_to_test
+// file main.c line 3
+signed int function_to_test(signed int some_argument);
+// harness
+// 
+void harness(void);
+// type_constructor_int
+// 
+void type_constructor_int(signed int depth_int, signed int *result_int);
 
-#include <assert.h>
+// __GOTO_HARNESS::max_depth
+// file __GOTO_HARNESSharness.c
+signed int max_depth=2;
+// __GOTO_HARNESS::min_depth
+// file __GOTO_HARNESSharness.c
+signed int min_depth=1;
 
-int function_to_test(int some_argument)
-{
-  assert(some_argument == 0);
-  return some_argument;
-}
-
+// harness
+// 
 void harness(void)
 {
-  int argument = nondet_int();
-  function_to_test(argument);
+  signed int some_argument;
+  type_constructor_int(0, &some_argument);
+  function_to_test(some_argument);
+}
+
+// type_constructor_int
+// 
+void type_constructor_int(signed int depth_int, signed int *result_int)
+{
+  signed int nondet;
+  *result_int = nondet;
 }
 ```
 
-You can pass that modified GOTO binary to `cbmc` and select `harness` as the
-entry function for analysis, or further modify it with `goto-harness` or
-`goto-instrument` or other tools.
+After you have generated the harness file, you have two choices. The first
+one is to pass it along with the original file containing the function to
+be harnessed to CBMC for analysis, something that would look like this:
 
-The example above demonstrates the most simple case, which is roughly the same
+```sh
+$ cbmc --function harness harness.c main.c
+[...]
+
+[function_to_test.assertion.1] line 5 assertion some_argument == 0: FAILURE
+
+** 1 of 1 failed (2 iterations)
+VERIFICATION FAILED
+```
+
+Or, you could choose to turn it into another goto binary with `goto-cc`, to
+be served as input to another instrumentation tool (like `goto-instrument`).
+
+---
+
+The example above demonstrates the simplest case, which is roughly the same
 as the entry point `cbmc` automatically generates for functions. However, the
 `function-call` harness can also non-deterministically initialise global
 variables, array and struct elements. Consider this more complicated example:
@@ -167,15 +216,15 @@ $ goto-harness \
    --min-null-tree-depth 1 \
    --nondet-globals \
    list_example.gb \
-   list_example_with_harness.gb
-$ cbmc --function harness list_example_with_harness.gb --unwind 20 --unwinding-assertions
+   list_example_harness.c
+$ cbmc list_example.c list_example_harness.c --function harness --unwind 20 --unwinding-assertions
 ```
 
 We have 3 new options here:
 
 * `max-nondet-tree-depth` is the maximum extent to which we will generate and
   initialize non-null pointers - in this case, this means generating lists up to
-  length 2
+  length 4
 * `min-null-tree-depth` this is the minimum depth at which pointers can be
   nullpointers for generated values - in this case, this sets the _minimum_
   length for our linked lists to one.
@@ -205,17 +254,17 @@ We also have support for arrays (currently only for array function parameters,
 globals and struct members are considered for the future).
 
 Take this example of an implementation of an `is_prefix_of` function that
-should return true if the first string parameter `string` is a prefix of the
-second one `prefix`.
+should return true if the first string parameter `prefix` is a prefix of the
+second one `string`.
 
 ```c
 // array_example.c
 
 int is_prefix_of(
-  const char *string,
-  int string_length,
   const char *prefix,
-  int prefix_length
+  int prefix_length,
+  const char *string,
+  int string_length
 )
 {
   if(prefix_length > string_length) { return 0; }
@@ -239,8 +288,8 @@ $ goto-harness \
   --function is_prefix_of \
   --associated-array-size string:string_length \
   --associated-array-size prefix:prefix_length \
-  array_example.gb array_example-mod.gb
-$ cbmc --function harness --pointer-check array_example-mod.gb
+  array_example.gb array_example_harness.c
+$ cbmc --function harness --unwind 10 --pointer-check array_example_harness.c array_example.c
 ```
 
 We have the additional option `associated-array-size` here. This is in the format
@@ -250,6 +299,7 @@ the parameter `array-size-parameter-name` holding its size (it should have
 some integral type like `int` or `size_t`).
 
 Running the example shows the bug highlighted in the comments:
+
 ```
 [...]
 [is_prefix_of.pointer_dereference.6] line 14 dereference failure: pointer outside object bounds in prefix[(signed long int)i]: FAILURE
@@ -282,7 +332,7 @@ void function(char *pointer, int size)
 
 Then call the following:
 
-```
+```sh
 $ goto-cc -o nondet_string.gb nondet_string.c
 $ goto-harness \
   --harness-function-name harness \
@@ -290,8 +340,8 @@ $ goto-harness \
   --function function \
   --treat-pointer-as-cstring pointer \
   --associated-array-size pointer:size \
-  nondet_string.gb nondet_string-mod.gb
-$ cbmc --function harness nondet_string-mod.gb
+  nondet_string.gb nondet_string_harness.c
+$ cbmc --function harness nondet_string_harness.c nondet_string.c --unwind 10
 ```
 
 Note that C strings are supported by the same mechanism
@@ -312,7 +362,13 @@ main.c function function
 VERIFICATION SUCCESSFUL
 ```
 
-### The memory snapshot harness
+## The memory snapshot harness
+
+***NOTE:*** The memory snapshot harness is temporarily inoperable because of
+a bug that occured when we changed the implementation of `goto-harness` to
+produce C files instead of `goto` binaries. The bug is being tracked
+[here](https://github.com/diffblue/cbmc/issues/5351). We are sorry for the
+inconvenience, and hope to get it back to working properly soon.
 
 The `function-call` harness is used in situations in which we want to analyze a
 function in an arbitrary environment. If we want to analyze a function starting
