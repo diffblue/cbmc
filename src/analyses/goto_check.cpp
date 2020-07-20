@@ -1164,10 +1164,24 @@ void goto_checkt::pointer_validity_check(
 
   const exprt &pointer=expr.pointer();
 
-  auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-  CHECK_RETURN(size_of_expr_opt.has_value());
+  exprt size;
 
-  auto conditions = address_check(pointer, size_of_expr_opt.value());
+  if(expr.type().id() == ID_empty)
+  {
+    // a dereference *p (with p being a pointer to void) is valid if p points to
+    // valid memory (of any size). the smallest possible size of the memory
+    // segment p could be pointing to is 1, hence we use this size for the
+    // address check
+    size = from_integer(1, size_type());
+  }
+  else
+  {
+    auto size_of_expr_opt = size_of_expr(expr.type(), ns);
+    CHECK_RETURN(size_of_expr_opt.has_value());
+    size = size_of_expr_opt.value();
+  }
+
+  auto conditions = address_check(pointer, size);
 
   for(const auto &c : conditions)
   {
