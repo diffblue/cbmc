@@ -8,6 +8,7 @@ Author: Diffblue Ltd.
 
 #include "recursive_initialization.h"
 
+#include <goto-programs/name_mangler.h>
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -1008,6 +1009,27 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
   for(const auto &target : targets)
   {
     auto const assign = code_assignt{dereference_exprt{result}, target};
+    auto const sym_to_lookup =
+      target.id() == ID_address_of
+        ?
+        // This is either address of or pointer; in pointer case, we don't
+        // need to do anything. In the address of case, the operand is
+        // a symbol representing a target function.
+        to_symbol_expr(to_address_of_expr(target).object()).get_identifier()
+        : "";
+    // skip referencing globals because the corresponding symbols in the symbol
+    // table are no longer marked as file local.
+    if(has_prefix(id2string(sym_to_lookup), FILE_LOCAL_PREFIX))
+    {
+      continue;
+    }
+    else if(
+      goto_model.get_symbol_table().lookup(sym_to_lookup) &&
+      goto_model.get_symbol_table().lookup(sym_to_lookup)->is_file_local)
+    {
+      continue;
+    }
+
     if(function_pointer_index != targets.size() - 1)
     {
       auto const condition = equal_exprt{
