@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Checks that cbmc does not crash with --pointer-check on dereference of a valid
+void pointer
