@@ -29,13 +29,13 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
 {
   xmlt value_xml{"full_lhs_value"};
 
-  const auto &lhs_object = step.get_lhs_object();
-  const irep_idt identifier =
-    lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
-
   const exprt &value = step.full_lhs_value;
   if(value.is_nil())
     return value_xml;
+
+  const auto &lhs_object = step.get_lhs_object();
+  const irep_idt identifier =
+    lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
   value_xml.data = from_expr(ns, identifier, value);
 
   const auto &bv_type = type_try_dynamic_cast<bitvector_typet>(value.type());
