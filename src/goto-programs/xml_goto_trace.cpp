@@ -33,14 +33,13 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
   const irep_idt identifier =
     lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
 
-  if(step.full_lhs_value.is_nil())
+  const exprt &value = step.full_lhs_value;
+  if(value.is_nil())
     return value_xml;
-  value_xml.data = from_expr(ns, identifier, step.full_lhs_value);
+  value_xml.data = from_expr(ns, identifier, value);
 
-  const auto &bv_type =
-    type_try_dynamic_cast<bitvector_typet>(step.full_lhs_value.type());
-  const auto &constant =
-    expr_try_dynamic_cast<constant_exprt>(step.full_lhs_value);
+  const auto &bv_type = type_try_dynamic_cast<bitvector_typet>(value.type());
+  const auto &constant = expr_try_dynamic_cast<constant_exprt>(value);
   if(bv_type && constant)
   {
     const auto width = bv_type->get_width();
