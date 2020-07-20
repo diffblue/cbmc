@@ -27,15 +27,15 @@ Author: Daniel Kroening
 
 xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
 {
-  xmlt full_lhs_value{"full_lhs_value"};
+  xmlt value_xml{"full_lhs_value"};
 
   const auto &lhs_object = step.get_lhs_object();
   const irep_idt identifier =
     lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
 
   if(step.full_lhs_value.is_nil())
-    return full_lhs_value;
-  full_lhs_value.data = from_expr(ns, identifier, step.full_lhs_value);
+    return value_xml;
+  value_xml.data = from_expr(ns, identifier, step.full_lhs_value);
 
   const auto &bv_type =
     type_try_dynamic_cast<bitvector_typet>(step.full_lhs_value.type());
@@ -46,9 +46,9 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
     const auto width = bv_type->get_width();
     const auto binary_representation =
       integer2binary(bvrep2integer(constant->get_value(), width, false), width);
-    full_lhs_value.set_attribute("binary", binary_representation);
+    value_xml.set_attribute("binary", binary_representation);
   }
-  return full_lhs_value;
+  return value_xml;
 }
 
 void convert(
