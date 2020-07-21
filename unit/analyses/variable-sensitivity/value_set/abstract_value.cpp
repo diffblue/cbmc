@@ -57,6 +57,7 @@ public:
       {
         oss << ", ";
       }
+      first = false;
       oss << expr2c(value, ns);
     }
     oss << " }";
