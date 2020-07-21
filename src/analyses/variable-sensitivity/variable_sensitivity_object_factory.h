@@ -84,6 +84,8 @@ struct vsd_configt
       options.get_bool_option("interval");
     config.advanced_sensitivities.value_set =
       options.get_bool_option("value-set");
+    config.advanced_sensitivities.new_value_set =
+      options.get_bool_option("new-value-set");
 
     return config;
   }
