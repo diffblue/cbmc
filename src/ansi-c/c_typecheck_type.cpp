@@ -1160,6 +1160,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     throw 0;
   }
 
+  if(as_expr.find(ID_enum_underlying_type).is_not_nil())
+  {
+    warning().source_location = source_location;
+    warning() << "ignoring specification of underlying type for enum" << eom;
+  }
+
   // enums start at zero;
   // we also track min and max to find a nice base type
   mp_integer value=0, min_value=0, max_value=0;
@@ -1350,6 +1356,12 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     error().source_location=type.source_location();
     error() << "anonymous enum tag without members" << eom;
     throw 0;
+  }
+
+  if(type.find(ID_enum_underlying_type).is_not_nil())
+  {
+    warning().source_location = type.source_location();
+    warning() << "ignoring specification of underlying type for enum" << eom;
   }
 
   source_locationt source_location=type.source_location();
