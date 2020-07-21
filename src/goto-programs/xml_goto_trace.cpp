@@ -25,31 +25,34 @@ Author: Daniel Kroening
 #include "structured_trace_util.h"
 #include "xml_expr.h"
 
-bool full_lhs_value_includes_binary(
-  const goto_trace_stept &step,
-  const namespacet &ns)
-{
-  return can_cast_type<floatbv_typet>(step.full_lhs_value.type());
-}
-
 xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
 {
-  xmlt full_lhs_value{"full_lhs_value"};
+  xmlt value_xml{"full_lhs_value"};
+
+  const exprt &value = step.full_lhs_value;
+  if(value.is_nil())
+    return value_xml;
 
   const auto &lhs_object = step.get_lhs_object();
   const irep_idt identifier =
     lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
+  value_xml.data = from_expr(ns, identifier, value);
 
-  if(step.full_lhs_value.is_not_nil())
-    full_lhs_value.data = from_expr(ns, identifier, step.full_lhs_value);
-  if(full_lhs_value_includes_binary(step, ns))
+  const auto &bv_type = type_try_dynamic_cast<bitvector_typet>(value.type());
+  const auto &constant = expr_try_dynamic_cast<constant_exprt>(value);
+  if(bv_type && constant)
   {
-    const auto width = to_floatbv_type(step.full_lhs_value.type()).get_width();
-    const auto binary_representation = integer2binary(
-      bvrep2integer(step.full_lhs_value.get(ID_value), width, false), width);
-    full_lhs_value.set_attribute("binary", binary_representation);
+    const auto width = bv_type->get_width();
+    // It is fine to pass `false` into the `is_signed` parameter, even for
+    // signed values, because the subsequent conversion to binary will result
+    // in the same value either way. E.g. if the value is `-1` for a signed 8
+    // bit value, this will convert to `255` which is `11111111` in binary,
+    // which is the desired result.
+    const auto binary_representation =
+      integer2binary(bvrep2integer(constant->get_value(), width, false), width);
+    value_xml.set_attribute("binary", binary_representation);
   }
-  return full_lhs_value;
+  return value_xml;
 }
 
 void convert(
