@@ -1790,10 +1790,10 @@ bit_field_size:
 enum_name:
           enum_key
           gcc_type_attribute_opt
-          {
-            // an anon enum
-          }
-          '{' enumerator_list_opt '}'
+        {
+          // an anon enum
+        }
+         '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
           parser_stack($1).operands().swap(parser_stack($5).operands());
@@ -1802,10 +1802,10 @@ enum_name:
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
-          {
-            // an enum with tag
-            parser_stack($1).set(ID_tag, parser_stack($3));
-          }
+        {
+          // an enum with tag
+          parser_stack($1).set(ID_tag, parser_stack($3));
+        }
           '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
@@ -1822,7 +1822,7 @@ enum_name:
           $$=merge($1, merge($2, $4)); // throw in the gcc attributes
         }
         ;
-        
+
 enum_key: TOK_ENUM
         {
           $$=$1;
