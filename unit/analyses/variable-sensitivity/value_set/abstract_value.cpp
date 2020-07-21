@@ -12,6 +12,7 @@ Author: Diffblue Ltd.
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <ansi-c/expr2c.h>
 
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <sstream>
 #include <string>
 #include <util/arith_tools.h>
@@ -359,4 +360,120 @@ TEST_CASE(
     value_set_abstract_valuet{type, value_set_abstract_valuet::valuest{value}};
 
   REQUIRE(value_set.to_constant() == value);
+}
+
+static abstract_environmentt get_value_set_abstract_environment()
+{
+  vsd_configt config;
+  config.advanced_sensitivities.new_value_set = true;
+  config.context_tracking.data_dependency_context = false;
+  config.context_tracking.last_write_context = false;
+  variable_sensitivity_object_factoryt::instance().set_options(config);
+  auto environment = abstract_environmentt{};
+  environment.make_top();
+  return environment;
+}
+
+TEST_CASE("Eval on an constant gives us that constant", VALUE_SET_TEST_TAGS)
+{
+  const auto environment = get_value_set_abstract_environment();
+  namespacet ns{symbol_tablet{}};
+  const auto zero = from_integer(0, signedbv_typet{32});
+  const auto eval_result = environment.eval(zero, ns);
+  REQUIRE(eval_result != nullptr);
+  REQUIRE(!eval_result->is_top());
+  REQUIRE(!eval_result->is_bottom());
+  const auto eval_result_as_value_set =
+    std::dynamic_pointer_cast<const value_set_abstract_valuet>(
+      eval_result->unwrap_context());
+  REQUIRE(eval_result_as_value_set != nullptr);
+  REQUIRE(eval_result_as_value_set->get_values().size() == 1);
+  REQUIRE_THAT(eval_result_as_value_set->get_values(), ContainsAllOf{zero});
+}
+
+TEST_CASE(
+  "Eval on a plus expression with constant operands gives us the result of "
+  "that plus",
+  VALUE_SET_TEST_TAGS)
+{
+  const auto environment = get_value_set_abstract_environment();
+  namespacet ns{symbol_tablet{}};
+  const auto s32_type = signedbv_typet{32};
+  const auto three = from_integer(3, s32_type);
+  const auto five = from_integer(5, s32_type);
+  const auto three_plus_five = plus_exprt{three, five};
+
+  auto eval_result = environment.eval(three_plus_five, ns);
+  REQUIRE(eval_result != nullptr);
+  REQUIRE(!eval_result->is_top());
+  REQUIRE(!eval_result->is_bottom());
+
+  const auto eval_result_as_value_set =
+    std::dynamic_pointer_cast<const value_set_abstract_valuet>(
+      eval_result->unwrap_context());
+  REQUIRE(eval_result_as_value_set != nullptr);
+  const auto eight = from_integer(8, s32_type);
+  REQUIRE(eval_result_as_value_set->get_values().size() == 1);
+  REQUIRE_THAT(eval_result_as_value_set->get_values(), ContainsAllOf{eight});
+}
+
+TEST_CASE(
+  "Eval on a multiply expression on symbols gives us the results of that "
+  "multiplication",
+  VALUE_SET_TEST_TAGS)
+{
+  auto environment = get_value_set_abstract_environment();
+  symbol_tablet symbol_table;
+
+  const auto s32_type = signedbv_typet{32};
+
+  symbolt a_symbol{};
+  a_symbol.name = a_symbol.pretty_name = a_symbol.base_name = "a";
+  a_symbol.is_lvalue = true;
+  a_symbol.type = s32_type;
+  symbol_table.add(a_symbol);
+
+  symbolt b_symbol{};
+  b_symbol.name = b_symbol.pretty_name = b_symbol.base_name = "b";
+  b_symbol.is_lvalue = true;
+  b_symbol.type = s32_type;
+  symbol_table.add(b_symbol);
+  symbol_table.add(b_symbol);
+
+  const namespacet ns{symbol_table};
+
+  const auto three = from_integer(3, s32_type);
+  const auto four = from_integer(4, s32_type);
+  const auto five = from_integer(5, s32_type);
+  const auto six = from_integer(6, s32_type);
+
+  const auto three_or_five = std::make_shared<const value_set_abstract_valuet>(
+    s32_type, value_set_abstract_valuet::valuest{three, five});
+  environment.assign(a_symbol.symbol_expr(), three_or_five, ns);
+
+  const auto four_or_six = std::make_shared<const value_set_abstract_valuet>(
+    s32_type, value_set_abstract_valuet::valuest{four, six});
+  environment.assign(b_symbol.symbol_expr(), four_or_six, ns);
+
+  const auto a_times_b =
+    mult_exprt{a_symbol.symbol_expr(), b_symbol.symbol_expr()};
+
+  const auto eval_result = environment.eval(a_times_b, ns);
+  REQUIRE(eval_result != nullptr);
+  REQUIRE(!eval_result->is_top());
+  REQUIRE(!eval_result->is_bottom());
+
+  const auto eval_result_as_value_set =
+    std::dynamic_pointer_cast<const value_set_abstract_valuet>(
+      eval_result->unwrap_context());
+  REQUIRE(eval_result_as_value_set != nullptr);
+  REQUIRE(eval_result_as_value_set->get_values().size() == 4);
+
+  const auto twelve = from_integer(12, s32_type);
+  const auto eighteen = from_integer(18, s32_type);
+  const auto twenty = from_integer(20, s32_type);
+  const auto twentyfour = from_integer(30, s32_type);
+  REQUIRE_THAT(
+    eval_result_as_value_set->get_values(),
+    ContainsAllOf(twelve, eighteen, twenty, twentyfour));
 }
