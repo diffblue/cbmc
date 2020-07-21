@@ -267,9 +267,13 @@ extern char *yyansi_ctext;
 
 %start grammar
 
-%expect 1 /* the famous "dangling `else'" ambiguity */
+%expect 2 /* the famous "dangling `else'" ambiguity */
           /* results in one shift/reduce conflict   */
           /* that we don't want to be reported      */
+
+          /* a second shift/reduce conflict arises due to enum underlying */
+          /* type specifications and bitfield specifications, which are both */
+          /* introduced by a ':' and follow a type */
 
 %{
 /************************************************************************/
@@ -1790,23 +1794,15 @@ bit_field_size:
 enum_name:
           enum_key
           gcc_type_attribute_opt
+          enum_underlying_type_opt
         {
           // an anon enum
+          if(parser_stack($3).is_not_nil())
+          {
+            parser_stack($1).set(ID_enum_underlying_type, parser_stack($3));
+          }
         }
          '{' enumerator_list_opt '}'
-          gcc_type_attribute_opt
-        {
-          parser_stack($1).operands().swap(parser_stack($5).operands());
-          $$=merge($1, merge($2, $7)); // throw in the gcc attributes
-        }
-        | enum_key
-          gcc_type_attribute_opt
-          identifier_or_typedef_name
-        {
-          // an enum with tag
-          parser_stack($1).set(ID_tag, parser_stack($3));
-        }
-          '{' enumerator_list_opt '}'
           gcc_type_attribute_opt
         {
           parser_stack($1).operands().swap(parser_stack($6).operands());
@@ -1815,13 +1811,53 @@ enum_name:
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
+          enum_underlying_type_opt
+        {
+          // an enum with tag
+          parser_stack($1).set(ID_tag, parser_stack($3));
+
+          if(parser_stack($4).is_not_nil())
+          {
+            parser_stack($1).set(ID_enum_underlying_type, parser_stack($4));
+          }
+        }
+          braced_enumerator_list_opt
           gcc_type_attribute_opt
         {
-          parser_stack($1).id(ID_c_enum_tag); // tag only
-          parser_stack($1).set(ID_tag, parser_stack($3));
-          $$=merge($1, merge($2, $4)); // throw in the gcc attributes
+          if(parser_stack($6).is_not_nil())
+          {
+            parser_stack($1).operands().swap(parser_stack($6).operands());
+          }
+          else
+          {
+            parser_stack($1).id(ID_c_enum_tag);
+          }
+
+          $$=merge($1, merge($2, $7)); // throw in the gcc attributes
         }
         ;
+
+enum_underlying_type_opt:
+        /* empty */
+        {
+          init($$);
+          parser_stack($$).make_nil();
+        }
+        | ':' basic_type_name
+        {
+          $$=$2;
+        }
+
+braced_enumerator_list_opt:
+        /* empty */
+        {
+          init($$);
+          parser_stack($$).make_nil();
+        }
+        | '{' enumerator_list_opt '}'
+        {
+          $$=$2;
+        }
 
 enum_key: TOK_ENUM
         {
