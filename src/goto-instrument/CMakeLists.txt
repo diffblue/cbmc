@@ -35,6 +35,6 @@ install(TARGETS goto-instrument DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(CODE "execute_process( \
   COMMAND ${CMAKE_COMMAND} -E create_symlink \
   cbmc.1 \
-  ${CMAKE_INSTALL_FULL_MANDIR}/man1/goto-instrument.1 \
+  \$ENV{DESTDIR}${CMAKE_INSTALL_FULL_MANDIR}/man1/goto-instrument.1 \
   )"
 )
