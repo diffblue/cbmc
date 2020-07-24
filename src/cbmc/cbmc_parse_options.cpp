@@ -198,6 +198,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
 
+  if(cmdline.isset("show-byte-ops"))
+    options.set_option("show-byte-ops", true);
+
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
@@ -640,7 +643,8 @@ int cbmc_parse_optionst::doit()
 
   if(
     options.get_bool_option("program-only") ||
-    options.get_bool_option("show-vcc"))
+    options.get_bool_option("show-vcc") ||
+    options.get_bool_option("show-byte-ops"))
   {
     if(options.get_bool_option("paths"))
     {
