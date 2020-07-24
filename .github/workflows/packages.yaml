@@ -69,7 +69,7 @@ jobs:
           echo CBMC_VERSION = ${{ steps.version.outputs.cbmc_version }}
           echo PKG_VERSION = ${{ steps.version.outputs.pkg_version }}
 
-  Ubuntu16_Stable:
+  Ubuntu16:
     name: Ubuntu 16 cbmc package
     runs-on: ubuntu-16.04
     needs: Tags
@@ -105,43 +105,43 @@ jobs:
           name: ${{ env.ARTIFACT_STABLE_NAME }}
           path: ${{ env.PACKAGE_STABLE_NAME }}
 
-  Ubuntu16_Latest:
-    name: Ubuntu 16 cbmc-latest package
-    runs-on: ubuntu-16.04
-    needs: Tags
-    env:
-      OS: xenial
-      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
-      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
-      TIME: ${{needs.Tags.outputs.time}}
-      SHA: ${{needs.Tags.outputs.sha}}
+#  Ubuntu16_Latest:
+#    name: Ubuntu 16 cbmc-latest package
+#    runs-on: ubuntu-16.04
+#    needs: Tags
+#    env:
+#      OS: xenial
+#      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
+#      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
+#      TIME: ${{needs.Tags.outputs.time}}
+#      SHA: ${{needs.Tags.outputs.sha}}
+#
+#      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
+#      ARTIFACT_LATEST_NAME: Ubuntu16 cbmc-latest ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+#
+#      SCRIPT_DIR: .github/workflows/debian
+#    steps:
+#
+#      - name: Checkout the repository
+#        uses: actions/checkout@v2
+#
+#      - name: Update the submodules
+#        run: git submodule update --init
+#
+#      - name: Create the package
+#        run: |
+#          cp -r . /tmp/cbmc-${CBMC_VERSION}
+#          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire ${SCRIPT_DIR}/64bit_regression_tests.patch /tmp
+#          make -C /tmp GITHUB=1 STABLE= CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
+#          mv /tmp/*.deb ${PACKAGE_LATEST_NAME}
+#
+#      - name: Upload the package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{ env.ARTIFACT_LATEST_NAME }}
+#          path: ${{ env.PACKAGE_LATEST_NAME }}
 
-      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~xenial_amd64.deb
-      ARTIFACT_LATEST_NAME: Ubuntu16 cbmc-latest ${{needs.Tags.outputs.pkg_version}} xenial ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
-
-      SCRIPT_DIR: .github/workflows/debian
-    steps:
-
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-
-      - name: Update the submodules
-        run: git submodule update --init
-
-      - name: Create the package
-        run: |
-          cp -r . /tmp/cbmc-${CBMC_VERSION}
-          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire ${SCRIPT_DIR}/64bit_regression_tests.patch /tmp
-          make -C /tmp GITHUB=1 STABLE= CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
-          mv /tmp/*.deb ${PACKAGE_LATEST_NAME}
-
-      - name: Upload the package
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ env.ARTIFACT_LATEST_NAME }}
-          path: ${{ env.PACKAGE_LATEST_NAME }}
-
-  Ubuntu18_Stable:
+  Ubuntu18:
     name: Ubuntu 18 cbmc package
     runs-on: ubuntu-18.04
     needs: Tags
@@ -177,41 +177,41 @@ jobs:
           name: ${{ env.ARTIFACT_STABLE_NAME }}
           path: ${{ env.PACKAGE_STABLE_NAME }}
 
-  Ubuntu18_Latest:
-    name: Ubuntu 18 cbmc-latest package
-    runs-on: ubuntu-18.04
-    needs: Tags
-    env:
-      OS: bionic
-      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
-      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
-      TIME: ${{needs.Tags.outputs.time}}
-      SHA: ${{needs.Tags.outputs.sha}}
-
-      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
-      ARTIFACT_LATEST_NAME: Ubuntu18 cbmc-latest ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
-
-      SCRIPT_DIR: .github/workflows/debian
-    steps:
-
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-
-      - name: Update the submodules
-        run: git submodule update --init
-
-      - name: Create the package
-        run: |
-          cp -r . /tmp/cbmc-${CBMC_VERSION}
-          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire ${SCRIPT_DIR}/64bit_regression_tests.patch /tmp
-          make -C /tmp GITHUB=1 STABLE= CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
-          mv /tmp/*.deb ${PACKAGE_LATEST_NAME}
-
-      - name: Upload the package
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ env.ARTIFACT_LATEST_NAME }}
-          path: ${{ env.PACKAGE_LATEST_NAME }}
+#  Ubuntu18_Latest:
+#    name: Ubuntu 18 cbmc-latest package
+#    runs-on: ubuntu-18.04
+#    needs: Tags
+#    env:
+#      OS: bionic
+#      PKG_VERSION: ${{needs.Tags.outputs.pkg_version}}
+#      CBMC_VERSION: ${{needs.Tags.outputs.cbmc_version}}
+#      TIME: ${{needs.Tags.outputs.time}}
+#      SHA: ${{needs.Tags.outputs.sha}}
+#
+#      PACKAGE_LATEST_NAME: cbmc-latest_${{needs.Tags.outputs.pkg_version}}~bionic_amd64.deb
+#      ARTIFACT_LATEST_NAME: Ubuntu18 cbmc-latest ${{needs.Tags.outputs.pkg_version}} bionic ${{needs.Tags.outputs.time}} ${{needs.Tags.outputs.sha}} ${{needs.Tags.outputs.runid}}
+#
+#      SCRIPT_DIR: .github/workflows/debian
+#    steps:
+#
+#      - name: Checkout the repository
+#        uses: actions/checkout@v2
+#
+#      - name: Update the submodules
+#        run: git submodule update --init
+#
+#      - name: Create the package
+#        run: |
+#          cp -r . /tmp/cbmc-${CBMC_VERSION}
+#          cp ${SCRIPT_DIR}/Makefile ${SCRIPT_DIR}/changelog ${SCRIPT_DIR}/surefire ${SCRIPT_DIR}/64bit_regression_tests.patch /tmp
+#          make -C /tmp GITHUB=1 STABLE= CBMC_VERSION=${CBMC_VERSION} PKG_VERSION=${PKG_VERSION}
+#          mv /tmp/*.deb ${PACKAGE_LATEST_NAME}
+#
+#      - name: Upload the package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{ env.ARTIFACT_LATEST_NAME }}
+#          path: ${{ env.PACKAGE_LATEST_NAME }}
 
   MacOS:
     name: MacOS packages
@@ -242,7 +242,7 @@ jobs:
         run: |
           make -f ${SCRIPT_DIR}/Makefile
           mv cbmc.tar.gz ${PACKAGE_STABLE_NAME}
-          mv cbmc-latest.tar.gz ${PACKAGE_LATEST_NAME}
+#          mv cbmc-latest.tar.gz ${PACKAGE_LATEST_NAME}
 
       - name: Upload the cbmc package
         uses: actions/upload-artifact@v1
@@ -250,11 +250,11 @@ jobs:
           name: ${{env.ARTIFACT_STABLE_NAME}}
           path: ${{env.PACKAGE_STABLE_NAME}}
 
-      - name: Upload the cbmc-latest package
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{env.ARTIFACT_LATEST_NAME}}
-          path: ${{env.PACKAGE_LATEST_NAME}}
+#      - name: Upload the cbmc-latest package
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{env.ARTIFACT_LATEST_NAME}}
+#          path: ${{env.PACKAGE_LATEST_NAME}}
 
   VS2019:
     name: Windows VS2019 installers
@@ -298,9 +298,9 @@ jobs:
         run: |
            ${{env.SCRIPT_DIR}}\build-installer.bat cbmc && move cbmc.msi ${{env.PACKAGE_STABLE_NAME}}
 
-      - name: Build the latest installer
-        run: |
-           ${{env.SCRIPT_DIR}}\build-installer.bat cbmc-latest && move cbmc-latest.msi ${{env.PACKAGE_LATEST_NAME}}
+#      - name: Build the latest installer
+#        run: |
+#           ${{env.SCRIPT_DIR}}\build-installer.bat cbmc-latest && move cbmc-latest.msi ${{env.PACKAGE_LATEST_NAME}}
 
       - name: Upload the cbmc installer
         uses: actions/upload-artifact@v1
@@ -308,8 +308,8 @@ jobs:
           name: ${{env.ARTIFACT_STABLE_NAME}}
           path: ${{env.PACKAGE_STABLE_NAME}}
 
-      - name: Upload the cbmc-latest installer
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{env.ARTIFACT_LATEST_NAME}}
-          path: ${{env.PACKAGE_LATEST_NAME}}
+#      - name: Upload the cbmc-latest installer
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: ${{env.ARTIFACT_LATEST_NAME}}
+#          path: ${{env.PACKAGE_LATEST_NAME}}
