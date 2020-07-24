@@ -1,0 +1,10 @@
+CORE
+main.c
+--show-byte-ops --json-ui
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+"byteOpsStats": \{\n\s*"byteExtractStats": \{\n\s*"byteExtractList": \[\n\s*\{\n\s*"sourceLocation": \{(\n.*)*\},\n\s*"ssaExpr": \{(\n.*)*\},\n\s*"ssaExprString": ".* .* byte\_extract\_little\_endian\(.*\)"\n\s*\}\n\s*\],\n\s*"numOfExtracts": 1\n\s*\},\n\s*"byteUpdateStats": \{\n\s*"byteUpdateList": \[\n\s*\{\n\s*"sourceLocation": \{(\n.*)*\},\n\s*"ssaExpr": \{(\n.*)*\},\n\s*"ssaExprString": ".* .* byte\_update\_little\_endian\(.*\)"\n\s*\}\n\s*\],\n\s*"numOfUpdates": 1\n\s*\}
+--
+--
+To test json output for --show-byte-ops option that displays byte extract and update metrics.

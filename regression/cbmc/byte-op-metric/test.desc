@@ -1,0 +1,16 @@
+CORE
+main.c
+--show-byte-ops
+^EXIT=0$
+^SIGNAL=0$
+^Byte Extracts:$
+^.*main\.c line 8 function main$
+^.* byte\_extract\_little\_endian\(.*\)$
+^Number of byte extracts: 1$
+^Byte Updates:$
+^.*main\.c line 8 function main$
+^.* byte\_update\_little\_endian\(.*\)$
+^Number of byte updates: 1$
+--
+--
+To test --show-byte-ops option that displays byte extract and update metrics.
