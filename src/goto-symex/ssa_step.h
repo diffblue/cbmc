@@ -148,6 +148,11 @@ public:
   exprt cond_handle;
   std::string comment;
 
+  exprt get_ssa_expr() const
+  {
+    return ((is_shared_read() || is_shared_write()) ? ssa_lhs : cond_expr);
+  }
+
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
   bool formatted = false;
