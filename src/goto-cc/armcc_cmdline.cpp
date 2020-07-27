@@ -11,6 +11,8 @@ Author: Daniel Kroening
 
 #include "armcc_cmdline.h"
 
+#include <util/optional.h>
+
 #include <cstring>
 #include <iostream>
 
@@ -265,18 +267,17 @@ static const char *options_with_arg[]=
   nullptr
 };
 
-bool prefix_in_list(const char *option, const char **list, std::string &prefix)
+optionalt<std::string> prefix_in_list(const char *option, const char **list)
 {
   for(std::size_t i = 0; list[i] != nullptr; i++)
   {
     if(strncmp(option, list[i], strlen(list[i])) == 0)
     {
-      prefix = std::string(list[i]);
-      return true;
+      return {list[i]};
     }
   }
 
-  return false;
+  return {};
 }
 
 bool armcc_cmdlinet::parse(int argc, const char **argv)
@@ -291,35 +292,34 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     }
 
     // it starts with - and it isn't "-"
-
-    std::string prefix;
+    optionalt<std::string> prefix;
 
     if(in_list(argv[i], options_no_arg))
     {
       // options that don't have any arguments
       set(argv[i]);
     }
-    else if(prefix_in_list(argv[i], options_with_arg, prefix))
+    else if((prefix = prefix_in_list(argv[i], options_with_arg)))
     {
       // options that have a separated _or_ concatenated argument
-      if(strlen(argv[i])>prefix.size()) // concatenated?
-        set(prefix, std::string(argv[i], prefix.size(), std::string::npos));
+      if(strlen(argv[i]) > prefix->size()) // Concatenated.
+        set(*prefix, std::string(argv[i], prefix->size(), std::string::npos));
       else
       {
         // Separated.
         if(i!=argc-1) // Guard against end of command line.
         {
-          set(prefix, argv[i+1]);
+          set(*prefix, argv[i + 1]);
           i++;
         }
         else
-          set(prefix, "");
+          set(*prefix, "");
       }
     }
-    else if(prefix_in_list(argv[i], options_with_prefix, prefix))
+    else if((prefix = prefix_in_list(argv[i], options_with_prefix)))
     {
       // options that have a concatenated argument
-      set(prefix, std::string(argv[i], prefix.size(), std::string::npos));
+      set(*prefix, std::string(argv[i], prefix->size(), std::string::npos));
     }
     else
     { // unrecognized option
