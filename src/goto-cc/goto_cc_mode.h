@@ -24,7 +24,7 @@ public:
   virtual int main(int argc, const char **argv);
   virtual int doit()=0;
   virtual void help_mode()=0;
-  virtual void help();
+  void help();
   virtual void usage_error();
 
   goto_cc_modet(
