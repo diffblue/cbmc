@@ -47,23 +47,6 @@ bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
   return false;
 }
 
-bool goto_cc_cmdlinet::prefix_in_list(
-  const char *option,
-  const char **list,
-  std::string &prefix)
-{
-  for(std::size_t i=0; list[i]!=nullptr; i++)
-  {
-    if(strncmp(option, list[i], strlen(list[i]))==0)
-    {
-      prefix=std::string(list[i]);
-      return true;
-    }
-  }
-
-  return false;
-}
-
 std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 {
   optionalt<std::size_t> optnr;

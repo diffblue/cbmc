@@ -265,6 +265,20 @@ static const char *options_with_arg[]=
   nullptr
 };
 
+bool prefix_in_list(const char *option, const char **list, std::string &prefix)
+{
+  for(std::size_t i = 0; list[i] != nullptr; i++)
+  {
+    if(strncmp(option, list[i], strlen(list[i])) == 0)
+    {
+      prefix = std::string(list[i]);
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool armcc_cmdlinet::parse(int argc, const char **argv)
 {
   for(int i=1; i<argc; i++)

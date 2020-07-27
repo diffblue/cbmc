@@ -26,11 +26,6 @@ public:
 
   static bool in_list(const char *option, const char **list);
 
-  static bool prefix_in_list(
-    const char *option,
-    const char **list,
-    std::string &prefix);
-
   // never fails, will add if not found
   std::size_t get_optnr(const std::string &option);
 
