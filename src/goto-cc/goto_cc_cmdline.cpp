@@ -13,10 +13,11 @@ Date:   April 2010
 
 #include "goto_cc_cmdline.h"
 
-#include <cstring>
+#include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <cstdio>
+#include <cstring>
+#include <iostream>
 
 #include <util/invariant.h>
 #include <util/prefix.h>
@@ -137,10 +138,8 @@ void goto_cc_cmdlinet::add_infile_arg(const std::string &arg)
 
 bool goto_cc_cmdlinet::have_infile_arg() const
 {
-  for(parsed_argvt::const_iterator it = parsed_argv.begin();
-      it != parsed_argv.end();
-      it++)
-    if(it->is_infile_name)
-      return true;
-  return false;
+  return std::any_of(
+    parsed_argv.cbegin(), parsed_argv.cend(), [](const argt &arg) {
+      return arg.is_infile_name;
+    });
 }
