@@ -134,3 +134,13 @@ void goto_cc_cmdlinet::add_infile_arg(const std::string &arg)
     fclose(tmp);
   }
 }
+
+bool goto_cc_cmdlinet::have_infile_arg() const
+{
+  for(parsed_argvt::const_iterator it = parsed_argv.begin();
+      it != parsed_argv.end();
+      it++)
+    if(it->is_infile_name)
+      return true;
+  return false;
+}
