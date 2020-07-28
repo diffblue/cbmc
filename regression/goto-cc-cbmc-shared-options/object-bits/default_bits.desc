@@ -1,0 +1,13 @@
+CORE
+test.c
+--function main
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+assertion object_bits != 6: SUCCESS
+assertion object_bits != 8: FAILURE
+assertion object_bits != 10: SUCCESS
+--
+^warning: ignoring
+--
+Test that the default value for object-bits is 8.

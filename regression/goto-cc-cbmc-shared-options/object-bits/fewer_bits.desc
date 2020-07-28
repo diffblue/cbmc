@@ -1,0 +1,14 @@
+CORE
+test.c
+--function main --object-bits 6
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+assertion object_bits != 6: FAILURE
+assertion object_bits != 8: SUCCESS
+assertion object_bits != 10: SUCCESS
+--
+^warning: ignoring
+--
+Test test running with fewer bits than usual results in correct setup of
+intrinsic constants.
