@@ -36,7 +36,7 @@ can be hit or satisfied (or prove that can't be done).
 For example, given an input program
 `f(int x, int y) { assert(x + y % 3 == 1); assert(x % y == 0); }` then goto-
 symex would produce a formula something like
-`F1 + F2 % 3 != 1 OR (F1 + F2 % 3 == 1 AND F1 % F2 != 0), where F-variables
+`F1 + F2 % 3 != 1 OR (F1 + F2 % 3 == 1 AND F1 % F2 != 0)`, where `F`-variables
 are free. The precise expression of that formula depends on CBMC's command-line
 configuration: for some backends it will lower the arithmetic operations into
 bitwise operations; other backends understand arithmetic and so they will remain
