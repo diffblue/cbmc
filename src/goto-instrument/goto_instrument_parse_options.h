@@ -74,6 +74,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(show-value-sets)" \
+  "(show-value-set-fi)" \
   "(show-global-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-escape-analysis)(escape-analysis)" \
@@ -83,6 +84,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(fp-reachability-slice):" \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
+  "(value-set-fi-fp-removal)" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(print-internal-representation)" \
   "(remove-function-pointers)" \
@@ -107,6 +109,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
+  "(moderate-function-pointer-removal)"\
+  "(extreme-function-pointer-removal)"\
   OPT_AGGRESSIVE_SLICER \
   OPT_FLUSH \
   "(splice-call):" \

@@ -54,6 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
 #include <pointer-analysis/value_set_analysis.h>
+#include <pointer-analysis/value_set_analysis_fi.h>
 
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
@@ -111,6 +112,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "uninitialized.h"
 #include "unwind.h"
+#include "value_set_fi_fp_removal.h"
 #include "wmm/weak_memory.h"
 
 /// invoke main modules
@@ -290,6 +292,17 @@ int goto_instrument_parse_optionst::doit()
       value_set_analysis(goto_model.goto_functions);
       show_value_sets(
         ui_message_handler.get_ui(), goto_model, value_set_analysis);
+      return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("show-value-set-fi"))
+    {
+      namespacet ns(goto_model.symbol_table);
+      value_set_analysis_fit value_set(
+        ns, value_set_analysis_fit::track_optionst::TRACK_FUNCTION_POINTERS);
+
+      value_set(goto_model.goto_functions);
+      value_set.output(goto_model.goto_functions, std::cout);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -906,7 +919,6 @@ int goto_instrument_parse_optionst::doit()
         "goto-instrument needs one input and one output file, aside from other "
         "flags");
     }
-
     help();
     return CPROVER_EXIT_USAGE_ERROR;
   }
@@ -1198,6 +1210,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("value-set-fi-fp-removal"))
+  {
+    value_set_fi_fp_removal(goto_model, false);
+  }
+
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
   {
@@ -1206,6 +1223,16 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else if(cmdline.isset("remove-const-function-pointers"))
   {
     do_remove_const_function_pointers_only();
+  }
+  else if(cmdline.isset("moderate-function-pointer-removal"))
+  {
+    value_set_fi_fp_removal(goto_model, true);
+    do_indirect_call_and_rtti_removal();
+  }
+  else if(cmdline.isset("extreme-function-pointer-removal"))
+  {
+    value_set_fi_fp_removal(goto_model, false);
+    do_indirect_call_and_rtti_removal();
   }
 
   if(cmdline.isset("replace-calls"))
