@@ -54,6 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
 #include <pointer-analysis/value_set_analysis.h>
+#include <pointer-analysis/value_set_analysis_fi.h>
 
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
@@ -111,6 +112,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "uninitialized.h"
 #include "unwind.h"
+#include "value_set_fi_fp_removal.h"
 #include "wmm/weak_memory.h"
 
 /// invoke main modules
@@ -1198,6 +1200,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("value-set-fi-fp-removal"))
+  {
+    value_set_fi_fp_removal(goto_model, ui_message_handler);
+    do_indirect_call_and_rtti_removal();
+  }
+
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
   {
@@ -1867,6 +1875,9 @@ void goto_instrument_parse_optionst::help()
     " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
+    "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
+    "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
     HELP_RESTRICT_FUNCTION_POINTER
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
