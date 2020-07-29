@@ -1,7 +1,7 @@
 project(CBMC)
 
-find_package(BISON)
-find_package(FLEX)
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
