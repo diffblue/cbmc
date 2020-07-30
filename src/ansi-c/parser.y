@@ -1837,13 +1837,21 @@ enum_name:
         }
         ;
 
+basic_type_name_list:
+    basic_type_name
+  | basic_type_name_list basic_type_name
+
+enum_underlying_type:
+    basic_type_name_list
+  | typedef_name
+
 enum_underlying_type_opt:
         /* empty */
         {
           init($$);
           parser_stack($$).make_nil();
         }
-        | ':' basic_type_name
+        | ':' enum_underlying_type
         {
           $$=$2;
         }
