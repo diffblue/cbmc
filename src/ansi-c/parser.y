@@ -1840,6 +1840,9 @@ enum_name:
 basic_type_name_list:
     basic_type_name
   | basic_type_name_list basic_type_name
+  {
+    $$ = merge($1, $2);
+  }
 
 enum_underlying_type:
     basic_type_name_list
