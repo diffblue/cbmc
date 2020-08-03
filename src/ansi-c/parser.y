@@ -1837,13 +1837,21 @@ enum_name:
         }
         ;
 
+basic_type_name_list:
+    basic_type_name
+  | basic_type_name_list basic_type_name
+
+enum_underlying_type:
+    basic_type_name_list
+  | typedef_name
+
 enum_underlying_type_opt:
         /* empty */
         {
           init($$);
           parser_stack($$).make_nil();
         }
-        | ':' basic_type_name
+        | ':' enum_underlying_type
         {
           $$=$2;
         }
@@ -2995,14 +3003,14 @@ function_head:
           PARSER.add_declarator(parser_stack($$), parser_stack($1));
           create_function_scope($$);
         }
-        | declaration_specifier declarator
+        | declaration_specifier declarator post_declarator_attributes_opt
         {
           init($$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
           create_function_scope($$);
         }
-        | type_specifier declarator
+        | type_specifier declarator post_declarator_attributes_opt
         {
           init($$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));

@@ -1,0 +1,12 @@
+CORE
+test.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+--
+A previous attempt to allow underlying type specifications didn't allow typedef
+names or multi word types (e.g. unsigned int). We still don't actually fully
+apply the underlying type to the enum, but this at least lets us use parse code
+that uses this feature.
