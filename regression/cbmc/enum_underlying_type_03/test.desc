@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=6$
+^SIGNAL=0$
+^file main.c line \d+: non-integral type 'float' is an invalid underlying type$
+--
+^warning: ignoring
+--
+Checks that non-integral types are rejected
