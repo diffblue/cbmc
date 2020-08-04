@@ -240,7 +240,8 @@ public:
     for(const auto &location_state :
         static_cast<location_sensitive_storaget &>(*storage).internal())
     {
-      std::static_pointer_cast<variable_sensitivity_dependence_domaint>(location_state.second)
+      std::static_pointer_cast<variable_sensitivity_dependence_domaint>(
+        location_state.second)
         ->populate_dep_graph(*this, location_state.first);
     }
   }
