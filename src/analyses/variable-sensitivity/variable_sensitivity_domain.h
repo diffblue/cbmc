@@ -135,10 +135,13 @@ private:
 
   abstract_environmentt abstract_state;
 
+#ifdef ENABLE_STATS
 public:
   abstract_object_statisticst gather_statistics(const namespacet &ns) const;
+#endif
 };
 
+#ifdef ENABLE_STATS
 template <>
 struct get_domain_statisticst<variable_sensitivity_domaint>
 {
@@ -178,5 +181,6 @@ struct get_domain_statisticst<variable_sensitivity_domaint>
         << "<< End Variable Sensitivity Domain Statistics >>\n";
   }
 };
+#endif
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
