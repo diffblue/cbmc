@@ -37,7 +37,7 @@ public:
 
   ~interval_abstract_valuet() override = default;
 
-  virtual exprt to_constant() const override;
+  exprt to_constant() const override;
 
   // Interface for transforms
   abstract_object_pointert expression_transform(
@@ -46,7 +46,7 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const class ai_baset &ai,
     const class namespacet &ns) const override;
@@ -61,8 +61,7 @@ public:
 
 protected:
   CLONE
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert other) const override;
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 

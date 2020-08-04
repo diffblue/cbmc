@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Variable Sensitivity Domain
+
+Author: Hannes Steffenhagen
+
+\*******************************************************************/
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_STATISTICS_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_STATISTICS_H
 

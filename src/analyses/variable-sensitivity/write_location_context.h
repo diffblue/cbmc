@@ -65,10 +65,9 @@ public:
 
   // Standard abstract_objectt interface
 
-  virtual bool
-  has_been_modified(const abstract_object_pointert before) const override;
+  bool has_been_modified(const abstract_object_pointert before) const override;
 
-  virtual abstract_object_pointert update_location_context(
+  abstract_object_pointert update_location_context(
     const abstract_objectt::locationst &locations,
     const bool update_sub_elements) const override;
 
@@ -94,21 +93,18 @@ public:
 
   locationst get_location_union(const locationst &locations) const;
 
-  virtual void output(
-    std::ostream &out,
-    const class ai_baset &ai,
-    const namespacet &ns) const override;
+  void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
+    const override;
 
 protected:
   CLONE
 
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert other) const override;
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
 
-  virtual abstract_object_pointert abstract_object_merge_internal(
+  abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert other) const override;
 
-  virtual abstract_object_pointert write(
+  abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,

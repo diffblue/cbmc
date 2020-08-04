@@ -31,15 +31,15 @@ public:
   {
   }
 
-  virtual abstract_object_pointert expression_transform(
+  abstract_object_pointert expression_transform(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
-  virtual exprt to_constant() const override;
+  exprt to_constant() const override;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const class ai_baset &ai,
     const class namespacet &ns) const override;
@@ -64,8 +64,7 @@ public:
 
 protected:
   CLONE
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert other) const override;
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
 
   abstract_object_pointert try_transform_expr_with_all_rounding_modes(
     const exprt &expr,

@@ -48,7 +48,7 @@ abstract_object_pointert constant_abstract_valuet::expression_transform(
   // try finding the rounding mode. If it's not constant, try
   // seeing if we can get the same result with all rounding modes
   auto rounding_mode_symbol =
-    symbol_exprt("__CPROVER_rounding_mode", signedbv_typet(32));
+    symbol_exprt(CPROVER_PREFIX "rounding_mode", signedbv_typet(32));
   auto rounding_mode_value = environment.eval(rounding_mode_symbol, ns);
   auto rounding_mode_constant = rounding_mode_value->to_constant();
   if(rounding_mode_constant.is_nil())
@@ -103,7 +103,7 @@ constant_abstract_valuet::try_transform_expr_with_all_rounding_modes(
   const namespacet &ns) const
 {
   const symbol_exprt rounding_mode_symbol =
-    symbol_exprt("__CPROVER_rounding_mode", signedbv_typet(32));
+    symbol_exprt(CPROVER_PREFIX "rounding_mode", signedbv_typet(32));
   // NOLINTNEXTLINE (whitespace/braces)
   auto rounding_modes = std::array<ieee_floatt::rounding_modet, 4>{
     // NOLINTNEXTLINE (whitespace/braces)

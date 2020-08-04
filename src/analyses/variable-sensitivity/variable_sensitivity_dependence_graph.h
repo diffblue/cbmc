@@ -82,7 +82,7 @@ public:
     ai_baset &ai,
     const namespacet &ns) override;
 
-  virtual void make_bottom() override
+  void make_bottom() override
   {
     variable_sensitivity_domaint::make_bottom();
     has_values = tvt(false);
@@ -94,7 +94,7 @@ public:
     control_dep_call_candidates.clear();
   }
 
-  virtual void make_top() override
+  void make_top() override
   {
     variable_sensitivity_domaint::make_top();
     has_values = tvt(true);
@@ -106,7 +106,7 @@ public:
     control_dep_call_candidates.clear();
   }
 
-  virtual void make_entry() override
+  void make_entry() override
   {
     make_top();
   }
@@ -121,12 +121,12 @@ public:
     return variable_sensitivity_domaint::is_top() && has_values.is_true();
   }
 
-  virtual bool merge(
+  bool merge(
     const variable_sensitivity_domaint &b,
     locationt from,
     locationt to) override;
 
-  virtual void merge_three_way_function_return(
+  void merge_three_way_function_return(
     const ai_domain_baset &function_call,
     const ai_domain_baset &function_start,
     const ai_domain_baset &function_end,
@@ -143,7 +143,9 @@ public:
 
   node_indext get_node_id() const
   {
-    assert(node_id != std::numeric_limits<node_indext>::max());
+    DATA_INVARIANT(
+      node_id != std::numeric_limits<node_indext>::max(),
+      "Check for the old uninitialised value");
     return node_id;
   }
 

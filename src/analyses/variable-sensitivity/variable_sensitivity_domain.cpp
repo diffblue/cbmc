@@ -44,8 +44,7 @@ void variable_sensitivity_domaint::transform(
 {
 #ifdef DEBUG
   std::cout << "Transform from/to:\n";
-  std::cout << from->location_number << " --> " << to->location_number
-            << std::endl;
+  std::cout << from->location_number << " --> " << to->location_number << '\n';
 #endif
 
   const goto_programt::instructiont &instruction = *from;
@@ -278,7 +277,7 @@ bool variable_sensitivity_domaint::merge(
 {
 #ifdef DEBUG
   std::cout << "Merging from/to:\n " << from->location_number << " --> "
-            << to->location_number << std::endl;
+            << to->location_number << '\n';
 #endif
 
   // Use the abstract_environment merge

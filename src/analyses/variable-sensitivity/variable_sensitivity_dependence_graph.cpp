@@ -76,7 +76,8 @@ void variable_sensitivity_dependence_domaint::transform(
 
   variable_sensitivity_dependence_grapht *dep_graph =
     dynamic_cast<variable_sensitivity_dependence_grapht *>(&ai);
-  assert(dep_graph != nullptr);
+  DATA_INVARIANT(
+    dep_graph != nullptr, "Domains should all be of the same type");
 
   // propagate control dependencies across function calls
   if(from->is_function_call())
@@ -93,7 +94,7 @@ void variable_sensitivity_dependence_domaint::transform(
       variable_sensitivity_dependence_domaint *s =
         dynamic_cast<variable_sensitivity_dependence_domaint *>(
           &(dep_graph->get_state(next)));
-      assert(s != nullptr);
+      DATA_INVARIANT(s != nullptr, "Domains should all be of the same type");
 
       if(s->has_values.is_false())
       {
@@ -334,9 +335,12 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
     }
     else
     {
-      assert(it != control_deps.end());
-      assert(!(it->first < c_dep.first));
-      assert(!(c_dep.first < it->first));
+      INVARIANT(
+        it != control_deps.end(), "Property of branch needed for safety");
+      INVARIANT(
+        !(it->first < c_dep.first), "Property of loop needed for safety");
+      INVARIANT(
+        !(c_dep.first < it->first), "Property of loop needed for safety");
 
       tvt &branch1 = it->second;
       const tvt &branch2 = c_dep.second;
@@ -641,9 +645,9 @@ void variable_sensitivity_dependence_grapht::add_dep(
   goto_programt::const_targett to)
 {
   const node_indext n_from = (*this)[from].get_node_id();
-  assert(n_from < size());
+  DATA_INVARIANT(n_from < size(), "Node ids must be within the graph");
   const node_indext n_to = (*this)[to].get_node_id();
-  assert(n_to < size());
+  DATA_INVARIANT(n_to < size(), "Node ids must be within the graph");
 
   // add_edge is redundant as the subsequent operations also insert
   // entries into the edge maps (implicitly)

@@ -35,12 +35,12 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
-  virtual abstract_object_pointert
+  abstract_object_pointert
   visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
   void get_statistics(
@@ -62,12 +62,12 @@ protected:
   CLONE
 
   // struct interface
-  virtual abstract_object_pointert read_component(
+  abstract_object_pointert read_component(
     const abstract_environmentt &environment,
     const member_exprt &member_expr,
     const namespacet &ns) const override;
 
-  virtual sharing_ptrt<struct_abstract_objectt> write_component(
+  sharing_ptrt<struct_abstract_objectt> write_component(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> &stack,
@@ -75,11 +75,10 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  virtual bool verify() const override;
+  bool verify() const override;
   // Set the state of this to the merge result of op1 and op2 and
   // return if the result is different from op1
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert other) const override;
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H

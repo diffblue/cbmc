@@ -183,7 +183,7 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
         mutable_clone());
 
     bool modified =
-      abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hash>(
+      abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hasht>(
         map, other->map, result->map);
 
     if(!modified)

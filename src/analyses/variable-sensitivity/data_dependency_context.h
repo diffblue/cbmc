@@ -47,7 +47,7 @@ public:
   {
   }
 
-  virtual abstract_object_pointert write(
+  abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
@@ -55,7 +55,7 @@ public:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  virtual abstract_object_pointert update_location_context(
+  abstract_object_pointert update_location_context(
     const abstract_objectt::locationst &locations,
     const bool update_sub_elements) const override;
 
@@ -64,18 +64,15 @@ public:
   std::set<goto_programt::const_targett> get_data_dependencies() const;
   std::set<goto_programt::const_targett> get_data_dominators() const;
 
-  virtual void output(
-    std::ostream &out,
-    const class ai_baset &ai,
-    const namespacet &ns) const override;
+  void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
+    const override;
 
 protected:
   CLONE
 
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert other) const override;
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
 
-  virtual abstract_object_pointert abstract_object_merge_internal(
+  abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert other) const override;
 
 private:

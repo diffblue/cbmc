@@ -59,17 +59,17 @@ public:
     return child_abstract_object->type();
   }
 
-  virtual bool is_top() const override
+  bool is_top() const override
   {
     return child_abstract_object->is_top();
   }
 
-  virtual bool is_bottom() const override
+  bool is_bottom() const override
   {
     return child_abstract_object->is_bottom();
   }
 
-  virtual exprt to_constant() const override
+  exprt to_constant() const override
   {
     return child_abstract_object->to_constant();
   }
@@ -80,10 +80,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
-  virtual void output(
-    std::ostream &out,
-    const class ai_baset &ai,
-    const namespacet &ns) const override;
+  void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
+    const override;
 
   abstract_object_pointert unwrap_context() const override;
 
@@ -105,15 +103,15 @@ protected:
 
   // These are internal hooks that allow sub-classes to perform additional
   // actions when an abstract_object is set/unset to TOP
-  virtual void make_top_internal() override;
-  virtual void clear_top_internal() override;
+  void make_top_internal() override;
+  void clear_top_internal() override;
 
-  virtual abstract_object_pointert read(
+  abstract_object_pointert read(
     const abstract_environmentt &env,
     const exprt &specifier,
     const namespacet &ns) const override;
 
-  virtual abstract_object_pointert write(
+  abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
@@ -121,8 +119,7 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  virtual bool
-  has_been_modified(const abstract_object_pointert before) const override;
+  bool has_been_modified(const abstract_object_pointert before) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONTEXT_ABSTRACT_OBJECT_H

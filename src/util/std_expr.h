@@ -114,9 +114,11 @@ public:
   }
 };
 
+// NOLINTNEXTLINE(readability/namespace)
 namespace std
 {
 template <>
+// NOLINTNEXTLINE(readability/identifiers)
 struct hash<::symbol_exprt>
 {
   size_t operator()(const ::symbol_exprt &sym)

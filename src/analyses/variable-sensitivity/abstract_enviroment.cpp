@@ -491,8 +491,6 @@ Function: abstract_environmentt::merge
 
 \*******************************************************************/
 
-#include <iostream>
-
 bool abstract_environmentt::merge(const abstract_environmentt &env)
 {
   // Use the sharing_map's "iterative over all differences" functionality

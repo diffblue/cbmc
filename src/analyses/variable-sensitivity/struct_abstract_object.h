@@ -25,12 +25,12 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual abstract_object_pointert read(
+  abstract_object_pointert read(
     const abstract_environmentt &env,
     const exprt &specifier,
     const namespacet &ns) const override;
 
-  virtual abstract_object_pointert write(
+  abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,

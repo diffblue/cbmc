@@ -6,8 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#ifndef PROJECT_INTERVAL_ARRAY_ABSTRACT_OBJECTT_H
-#define PROJECT_INTERVAL_ARRAY_ABSTRACT_OBJECTT_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ARRAY_ABSTRACT_OBJECT_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ARRAY_ABSTRACT_OBJECT_H
 
 #include "constant_array_abstract_object.h"
 
@@ -52,4 +52,4 @@ public:
     const namespacet &ns) const override;
 };
 
-#endif //PROJECT_INTERVAL_ARRAY_ABSTRACT_OBJECTT_H
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ARRAY_ABSTRACT_OBJECT_H

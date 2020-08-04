@@ -43,7 +43,7 @@ class abstract_environmentt;
 class namespacet;
 
 #define CLONE                                                                  \
-  virtual internal_abstract_object_pointert mutable_clone() const override     \
+  internal_abstract_object_pointert mutable_clone() const override             \
   {                                                                            \
     typedef std::remove_const<                                                 \
       std::remove_reference<decltype(*this)>::type>::type current_typet;       \

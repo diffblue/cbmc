@@ -72,7 +72,7 @@ into calls to eval, assume, assign and merge.
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
-  virtual void transform(
+  void transform(
     const irep_idt &function_from,
     locationt from,
     const irep_idt &function_to,
@@ -81,18 +81,16 @@ public:
     const namespacet &ns) override;
 
   // no states
-  virtual void make_bottom() override;
+  void make_bottom() override;
 
   // all states
-  virtual void make_top() override;
+  void make_top() override;
 
   // a reasonable entry-point state
-  virtual void make_entry() override;
+  void make_entry() override;
 
-  virtual void output(
-    std::ostream &out,
-    const ai_baset &ai,
-    const namespacet &ns) const override;
+  void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
+    const override;
 
   void output(std::ostream &out) const;
 

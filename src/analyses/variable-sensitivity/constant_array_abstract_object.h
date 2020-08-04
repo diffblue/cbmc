@@ -37,7 +37,7 @@ public:
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
-  virtual abstract_object_pointert
+  abstract_object_pointert
   visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
   void get_statistics(
@@ -49,12 +49,12 @@ public:
 protected:
   CLONE
 
-  virtual abstract_object_pointert read_index(
+  abstract_object_pointert read_index(
     const abstract_environmentt &env,
     const index_exprt &index,
     const namespacet &ns) const override;
 
-  virtual sharing_ptrt<array_abstract_objectt> write_index(
+  sharing_ptrt<array_abstract_objectt> write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
@@ -62,11 +62,10 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert other) const override;
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
 
-  virtual bool verify() const override;
-  virtual void make_top_internal() override;
+  bool verify() const override;
+  void make_top_internal() override;
 
   virtual bool eval_index(
     const index_exprt &index,
@@ -78,7 +77,7 @@ private:
   // Since we don't store for any index where the value is top
   // we don't use a regular array but instead a map of array indices
   // to the value at that index
-  struct mp_integer_hash
+  struct mp_integer_hasht
   {
     size_t operator()(const mp_integer &i) const
     {
@@ -90,7 +89,7 @@ private:
     mp_integer,
     abstract_object_pointert,
     false,
-    mp_integer_hash>
+    mp_integer_hasht>
     shared_array_mapt;
 
   shared_array_mapt map;

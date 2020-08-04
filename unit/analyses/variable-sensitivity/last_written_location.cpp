@@ -27,7 +27,7 @@
 #include <util/symbol_table.h>
 #include <util/type.h>
 
-//#include <src/ansi-c/c_to_expr.h>
+// #include <src/ansi-c/c_to_expr.h>
 
 SCENARIO(
   "Constructing two environments to make sure we correctly identify modified "
@@ -104,8 +104,8 @@ SCENARIO(
     namespacet ns(symbol_table);
 
     WHEN(
-      "The identifiers get inserted into two environments, but one of \
-          them has a different value in one of the environments")
+      "The identifiers get inserted into two environments, but one of "
+      "them has a different value in one of the environments")
     {
       abstract_environmentt env;
 

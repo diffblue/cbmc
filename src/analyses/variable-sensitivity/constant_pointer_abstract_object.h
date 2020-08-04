@@ -54,8 +54,7 @@ public:
     const namespacet &ns) const override;
 
 protected:
-  virtual abstract_object_pointert
-  merge(abstract_object_pointert op1) const override;
+  abstract_object_pointert merge(abstract_object_pointert op1) const override;
 
   CLONE
 
