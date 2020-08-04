@@ -418,7 +418,7 @@ void variable_sensitivity_domaint::transform_function_call(
     const code_function_callt::argumentst &called_arguments =
       function_call.arguments();
 
-    if(is_same_code_location(to, next))
+    if(to->location_number == next->location_number)
     {
       if(ignore_function_call_transform(function_id))
       {
