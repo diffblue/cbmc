@@ -99,7 +99,7 @@ public:
   virtual bool
   merge(const variable_sensitivity_domaint &b, locationt from, locationt to);
 
-  void merge_three_way_function_return(
+  virtual void merge_three_way_function_return(
     const ai_domain_baset &function_call,
     const ai_domain_baset &function_start,
     const ai_domain_baset &function_end,
