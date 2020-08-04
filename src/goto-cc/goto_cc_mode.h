@@ -21,7 +21,7 @@ Date: June 2006
 class goto_cc_modet:public messaget
 {
 public:
-  virtual int main(int argc, const char **argv);
+  int main(int argc, const char **argv);
   virtual int doit()=0;
   virtual void help_mode()=0;
   void help();
