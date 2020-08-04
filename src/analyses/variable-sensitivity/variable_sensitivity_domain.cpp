@@ -592,7 +592,7 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
   }
   else
   {
-    UNREACHABLE;  // This case is not handled but also is not currently used
+    UNREACHABLE; // This case is not handled but also is not currently used
     /*
     ai_domain_baset::merge_three_way_function_return(
       function_call, function_start, function_end, ns);
