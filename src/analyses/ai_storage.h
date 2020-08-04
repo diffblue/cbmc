@@ -144,6 +144,7 @@ public:
 // A couple of older domains make direct use of the state map
 class invariant_propagationt;
 class dependence_grapht;
+class variable_sensitivity_dependence_grapht;
 
 /// The most conventional storage; one domain per location
 class location_sensitive_storaget : public trace_map_storaget
@@ -161,6 +162,7 @@ protected:
   // Support some older domains that explicitly iterate across the state map
   friend invariant_propagationt;
   friend dependence_grapht;
+  friend variable_sensitivity_dependence_grapht; // Based on dependence_grapht
   state_mapt &internal(void)
   {
     return state_map;

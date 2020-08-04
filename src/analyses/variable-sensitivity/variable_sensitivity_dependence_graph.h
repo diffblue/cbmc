@@ -221,9 +221,8 @@ public:
 
   explicit variable_sensitivity_dependence_grapht(
     const goto_functionst &goto_functions,
-    const namespacet &_ns,
-    const ai_configt &config = {})
-    : ait<variable_sensitivity_dependence_domaint>(config),
+    const namespacet &_ns)
+    : ait<variable_sensitivity_dependence_domaint>(),
       goto_functions(goto_functions),
       ns(_ns)
   {
@@ -238,9 +237,11 @@ public:
 
   void finalize()
   {
-    for(const auto &location_state : state_map)
+    for(const auto &location_state :
+        static_cast<location_sensitive_storaget &>(*storage).internal())
     {
-      location_state.second.populate_dep_graph(*this, location_state.first);
+      std::static_pointer_cast<variable_sensitivity_dependence_domaint>(location_state.second)
+        ->populate_dep_graph(*this, location_state.first);
     }
   }
 
