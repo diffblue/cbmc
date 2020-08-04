@@ -12,9 +12,13 @@ Author: Daniel Kroening
 #include "armcc_cmdline.h"
 
 #include <util/optional.h>
+#include <util/prefix.h>
 
+#include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <string>
+#include <vector>
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
@@ -197,7 +201,8 @@ static const char *options_no_arg[]=
   nullptr
 };
 
-static const char *options_with_prefix[]=
+// clang-format off
+static const std::vector<std::string> options_with_prefix
 {
   "--project=",
   "--workdir=",
@@ -243,11 +248,10 @@ static const char *options_with_prefix[]=
   "--configure_sysroot=",
   "--configure_cpp_headers=",
   "--configure_extra_includes=",
-  "--configure_extra_libraries=",
-  nullptr
+  "--configure_extra_libraries="
 };
 
-static const char *options_with_arg[]=
+static const std::vector<std::string> options_with_arg
 {
   // goto-cc specific
   "--verbosity",
@@ -263,21 +267,20 @@ static const char *options_with_arg[]=
   "-Warmcc,",
   "-o",
   "--cpu",
-  "--apcs",
-  nullptr
+  "--apcs"
 };
+// clang-format on
 
-optionalt<std::string> prefix_in_list(const char *option, const char **list)
+optionalt<std::string>
+prefix_in_list(const std::string &option, const std::vector<std::string> &list)
 {
-  for(std::size_t i = 0; list[i] != nullptr; i++)
-  {
-    if(strncmp(option, list[i], strlen(list[i])) == 0)
-    {
-      return {list[i]};
-    }
-  }
-
-  return {};
+  const auto found =
+    std::find_if(list.cbegin(), list.cend(), [&](const std::string &argument) {
+      return has_prefix(argument, option);
+    });
+  if(found == list.cend())
+    return {};
+  return {*found};
 }
 
 bool armcc_cmdlinet::parse(int argc, const char **argv)
