@@ -598,6 +598,43 @@ void variable_sensitivity_dependence_domaint::populate_dep_graph(
     dep_graph.add_dep(vs_dep_edget::kindt::DATA, d_dep.first, this_loc);
 }
 
+/// This ensures that all domains are constructed with the node ID that links
+/// them to the graph part of the dependency graph.  Using a factory is a tad
+/// verbose but it works well with the ait infrastructure.
+class variable_sensitivity_dependence_domain_factoryt
+  : public ai_domain_factoryt<variable_sensitivity_dependence_domaint>
+{
+public:
+  explicit variable_sensitivity_dependence_domain_factoryt(
+    variable_sensitivity_dependence_grapht &_dg)
+    : dg(_dg)
+  {
+  }
+
+  std::unique_ptr<statet> make(locationt l) const override
+  {
+    auto node_id = dg.add_node();
+    dg.nodes[node_id].PC = l;
+    auto p = util_make_unique<variable_sensitivity_dependence_domaint>(node_id);
+    CHECK_RETURN(p->is_bottom());
+
+    return std::unique_ptr<statet>(p.release());
+  }
+
+private:
+  variable_sensitivity_dependence_grapht &dg;
+};
+
+variable_sensitivity_dependence_grapht::variable_sensitivity_dependence_grapht(
+  const goto_functionst &goto_functions,
+  const namespacet &_ns)
+  : ait<variable_sensitivity_dependence_domaint>(
+      util_make_unique<variable_sensitivity_dependence_domain_factoryt>(*this)),
+    goto_functions(goto_functions),
+    ns(_ns)
+{
+}
+
 void variable_sensitivity_dependence_grapht::add_dep(
   vs_dep_edget::kindt kind,
   goto_programt::const_targett from,
