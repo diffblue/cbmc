@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=6$
+^SIGNAL=0$
+^file main.c line \d+: enumerator value is not representable in the underlying type 'unsigned_char'$
+--
+^warning: ignoring
+--
+Checks that values that cannot be represented by the specified underlying type
+are rejected

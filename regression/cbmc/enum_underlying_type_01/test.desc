@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Checks that the underlying type specification of an enum is correctly
+interpreted, i.e., the size and signedness of the integral type chosen for the
+enum is the one specified. Also checks that it works with typedef'd types.
