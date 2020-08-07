@@ -1,0 +1,23 @@
+name: pull-request-checks
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  check-macos-10_15-cmake-clang:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        run: brew install cmake ninja maven flex bison
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+      - name: Build with Ninja
+        run: cd build; ninja
+      - name: Run CTest
+        run: cd build; ctest -V -L CORE .
