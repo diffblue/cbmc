@@ -4,6 +4,24 @@ on:
     branches: [ develop ]
 
 jobs:
+  check-macos-10_15-make-clang:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        run: brew install maven flex bison
+      - name: Build using Make
+        run: |
+          make -C src minisat2-download
+          make -C src
+          make -C unit
+      - name: Run unit tests
+        run: cd unit; ./unit_tests
+      - name: Run regression tests
+        run: cd regression; make
+
   check-macos-10_15-cmake-clang:
     runs-on: macos-10.15
     steps:
