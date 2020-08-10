@@ -1,6 +1,6 @@
 CORE
 minimal_reproducer_for_struct_problem.c
---variable --structs --verify
+--variable-sensitivity --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line 13 x.a==0: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity  --pointers --arrays --structs --unreachable-instructions
+--variable-sensitivity  --vsd-pointers --vsd-arrays --vsd-structs --unreachable-instructions
 ^EXIT=0$
 ^SIGNAL=0$
 line 18 function func

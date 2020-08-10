@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---variable --structs --arrays --pointers --value-set --verify --pointer-check
+--variable-sensitivity --vsd-structs --vsd-arrays --vsd-pointers --vsd-value-sets --verify --pointer-check
 ^\[main\.assertion\.1\] line 33 assertion s\.i == 0: UNKNOWN$
 ^\[main\.assertion\.2\] line 35 assertion s\.d == 1.0: UNKNOWN$
 ^\[main\.assertion\.3\] line 36 assertion s\.d == 1.0 \|\| s.d == 2.0: SUCCESS$

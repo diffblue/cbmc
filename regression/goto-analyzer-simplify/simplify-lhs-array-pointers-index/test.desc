@@ -1,6 +1,6 @@
 CORE
 main.c
-"--variable --arrays --pointers"
+"--variable-sensitivity --vsd-arrays --vsd-pointers"
 
 symbol_a = 1
 symbol_b = 2

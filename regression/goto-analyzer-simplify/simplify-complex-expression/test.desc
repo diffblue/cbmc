@@ -1,6 +1,6 @@
 CORE
 main.c
---variable
+--variable-sensitivity
 r == 2
 ^SIGNAL=0$
 ^EXIT=6$

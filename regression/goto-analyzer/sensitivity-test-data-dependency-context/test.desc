@@ -1,6 +1,6 @@
 CORE
 data-dependency-context.c
---variable --structs --arrays --data-dependencies --show
+--variable-sensitivity --vsd-structs --vsd-arrays --vsd-data-dependencies --show
 // Enable multi-line checking
 activate-multi-line-match
 ^EXIT=0$

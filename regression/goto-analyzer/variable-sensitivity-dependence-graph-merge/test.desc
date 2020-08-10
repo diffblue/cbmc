@@ -1,6 +1,6 @@
 CORE
 main.c
---dependence-graph-vs --structs --arrays --verify
+--dependence-graph-vs --vsd-structs --vsd-arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 20 s_str.idx > 1: UNKNOWN$

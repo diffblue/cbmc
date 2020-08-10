@@ -1,6 +1,6 @@
 CORE
 main.c
---variable --structs --arrays --pointers --value-set --show --pointer-check
+--variable-sensitivity --vsd-structs --vsd-arrays --vsd-pointers --vsd-value-sets --show --pointer-check
 ^global_int_show \(\) -> value-set-begin: [12], [12], :value-set-end$
 ^main::1::local_double_show \(\) -> value-set-begin: [12]\.0, [12]\.0, :value-set-end$
 ^main::1::local_double_ptr_show \(\) -> value-set-begin: ptr ->\(main::1::d[12]\), ptr ->\(main::1::d[12]\), :value-set-end$

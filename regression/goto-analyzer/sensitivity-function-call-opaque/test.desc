@@ -1,6 +1,6 @@
 CORE
 main.c
---variable --pointers --arrays --structs --verify
+--variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 16 assertion x==3: SUCCESS$

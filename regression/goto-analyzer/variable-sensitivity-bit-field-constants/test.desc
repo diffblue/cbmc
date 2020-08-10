@@ -1,6 +1,6 @@
 CORE
 main.c
---function main --variable --structs --verify
+--function main --variable-sensitivity --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line 12 bs\.byte==10: SUCCESS

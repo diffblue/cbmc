@@ -1,6 +1,6 @@
 CORE
 main.c
-"--variable --arrays --pointers --structs"
+"--variable-sensitivity --vsd-arrays --vsd-pointers --vsd-structs"
 
 symbol = 5
 \*value\.pointer_component = 6

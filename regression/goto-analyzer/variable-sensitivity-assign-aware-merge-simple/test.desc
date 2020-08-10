@@ -1,6 +1,6 @@
 CORE
 main.c
---function pointer_test --variable --pointers --arrays --structs --verify
+--function pointer_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[pointer_test.assertion\.1\] line 41 j==1: SUCCESS$

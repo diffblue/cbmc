@@ -1,6 +1,6 @@
 CORE
 main.c
-"--variable --pointers"
+"--variable-sensitivity --vsd-pointers"
 
 symbol = 5
 \*pointer = 6

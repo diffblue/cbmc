@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --interval-values --show
+--variable-sensitivity --vsd-intervals --show
 ^EXIT=0$
 ^SIGNAL=0$
 main::1::z \(\) -> \[3, 3\] @ \[5\]

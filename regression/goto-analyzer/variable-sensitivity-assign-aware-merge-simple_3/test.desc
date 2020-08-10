@@ -1,6 +1,6 @@
 CORE
 main.c
---function global_test --variable --pointers --arrays --structs --verify
+--function global_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[global_test\.assertion\.1\] line 67 global==42: SUCCESS$

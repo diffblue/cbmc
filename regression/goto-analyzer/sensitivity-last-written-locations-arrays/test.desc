@@ -1,6 +1,6 @@
 CORE
 sensitivity_dependency_arrays.c
---variable  --arrays --pointers --structs --show
+--variable-sensitivity  --vsd-arrays --vsd-pointers --vsd-structs --show
 // Enable multi-line checking
 activate-multi-line-match
 ^EXIT=0$
