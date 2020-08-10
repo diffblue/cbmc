@@ -107,7 +107,7 @@ auto wrap_string_conversion(do_conversiont do_conversion)
 ///   (unsigned) long long
 /// does not accept negative inputs when the result type is unsigned
 template <typename T>
-optionalt<T> string2optional(const std::string &str, int base)
+optionalt<T> string2optional(const std::string &str, int base = 10)
 {
   return wrap_string_conversion([&]() {
     return narrow_or_throw_out_of_range<T>(string2optional_base<T>(str, base));
