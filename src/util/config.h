@@ -173,10 +173,8 @@ public:
   struct bv_encodingt
   {
     // number of bits to encode heap object addresses
-    std::size_t object_bits;
-    bool is_object_bits_default;
-
-    static const std::size_t default_object_bits=8;
+    std::size_t object_bits = 8;
+    bool is_object_bits_default = true;
   } bv_encoding;
 
   // this is the function to start executing

@@ -771,10 +771,6 @@ bool configt::set(const cmdlinet &cmdline)
 
   cpp.cpp_standard=cppt::default_cpp_standard();
 
-  bv_encoding.object_bits=bv_encoding.default_object_bits;
-  // This will allow us to override by language defaults later.
-  bv_encoding.is_object_bits_default=true;
-
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
   ansi_c.ts_18661_3_Floatn_types=false;
