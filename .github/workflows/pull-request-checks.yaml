@@ -21,3 +21,21 @@ jobs:
         run: cd build; ninja
       - name: Run CTest
         run: cd build; ctest -V -L CORE .
+  check-vs-2019-build-only:
+    runs-on: windows-2019
+    env:
+      SCRIPT_DIR: .github/workflows/vs2019
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install bison and flex
+        run: "%SCRIPT_DIR%\\install-bison.bat"
+
+      - name: Build cbmc
+        run: "%SCRIPT_DIR%\\build-cbmc.bat"
