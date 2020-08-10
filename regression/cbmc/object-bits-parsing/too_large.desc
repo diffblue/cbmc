@@ -1,0 +1,9 @@
+CORE
+test.c
+--object-bits 65
+object-bits must be positive and less than the pointer width
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Test parsing of a too large object-bits setting.
