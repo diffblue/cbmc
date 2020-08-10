@@ -51,6 +51,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/is_threaded.h>
 #include <analyses/local_control_flow_history.h>
 #include <analyses/local_may_alias.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>
@@ -356,6 +359,31 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("non-null", true);
       options.set_option("domain set", true);
     }
+    else if(cmdline.isset("vsd") || cmdline.isset("variable-sensitivity"))
+    {
+      options.set_option("vsd", true);
+      options.set_option("domain set", true);
+
+      // Configuration of VSD
+      options.set_option("pointers", cmdline.isset("vsd-pointers"));
+      options.set_option("arrays", cmdline.isset("vsd-arrays"));
+      options.set_option("structs", cmdline.isset("vsd-structs"));
+      options.set_option(
+        "data-dependencies", cmdline.isset("vsd-data-dependencies"));
+      options.set_option("interval", cmdline.isset("vsd-intervals"));
+      options.set_option("value-set", cmdline.isset("vsd-value-sets"));
+    }
+    else if(cmdline.isset("dependence-graph-vs"))
+    {
+      options.set_option("dependence-graph-vs", true);
+      options.set_option("domain set", true);
+
+      // Configuration of variable sensitivity domain
+      options.set_option("pointers", cmdline.isset("vsd-pointers"));
+      options.set_option("arrays", cmdline.isset("vsd-arrays"));
+      options.set_option("structs", cmdline.isset("vsd-structs"));
+      options.set_option("data-dependencies", true);
+    }
 
     // Reachability questions, when given with a domain swap from specific
     // to general tasks so that they can use the domain & parameterisations.
@@ -450,8 +478,14 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
       df = util_make_unique<
         ai_domain_factory_default_constructort<interval_domaint>>();
     }
+    else if(options.get_bool_option("vsd"))
+    {
+      df = util_make_unique<
+        ai_domain_factory_default_constructort<variable_sensitivity_domaint>>();
+    }
     // non-null is not fully supported, despite the historical options
     // dependency-graph is quite heavily tied to the legacy-ait infrastructure
+    // dependency-graph-vs is very similar to dependency-graph
 
     // Build the storage object
     std::unique_ptr<ai_storage_baset> st = nullptr;
@@ -486,6 +520,15 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     else if(options.get_bool_option("dependence-graph"))
     {
       return new dependence_grapht(ns);
+    }
+    else if(options.get_bool_option("dependence-graph-vs"))
+    {
+      return new variable_sensitivity_dependence_grapht(
+        goto_model.goto_functions, ns);
+    }
+    else if(options.get_bool_option("vsd"))
+    {
+      return new ait<variable_sensitivity_domaint>();
     }
     else if(options.get_bool_option("intervals"))
     {
@@ -702,6 +745,18 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(options.get_bool_option("general-analysis"))
   {
+    // TODO : replace with the domain factory infrastructure
+    try
+    {
+      variable_sensitivity_object_factoryt::instance().set_options(
+        vsd_configt::from_options(options));
+    }
+    catch(const invalid_command_line_argument_exceptiont &e)
+    {
+      log.error() << e.what() << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
+
     // Output file factory
     const std::string outfile=options.get_option("outfile");
 
@@ -915,6 +970,16 @@ void goto_analyzer_parse_optionst::help()
     " --intervals                  an interval for each variable\n"
     " --non-null                   tracks which pointers are non-null\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    " --vsd                        a configurable non-relational domain\n" // NOLINT(*)
+    " --dependence-graph-vs        dependencies between instructions using VSD\n" // NOLINT(*)
+    "\n"
+    "Variable sensitivity domain (VSD) options:\n"
+    " --vsd-structs                struct field sensitive analysis\n"
+    " --vsd-arrays                 array entry sensitive analysis\n"
+    " --vsd-pointers               pointer sensitive analysis\n"
+    " --vsd-value-sets             use value sets\n"
+    " --vsd-data-dependencies      track data dependencies\n"
+    " --vsd-intervals              use intervals\n"
     "\n"
     "Storage options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
