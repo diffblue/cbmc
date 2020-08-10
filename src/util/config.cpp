@@ -776,8 +776,8 @@ configt::bv_encodingt parse_object_bits_encoding(
   const std::string &argument,
   const std::size_t pointer_width)
 {
-  const unsigned int object_bits = unsafe_string2unsigned(argument);
-  if(object_bits <= 0 || object_bits >= pointer_width)
+  const auto object_bits = string2optional<unsigned int>(argument);
+  if(!object_bits || *object_bits <= 0 || *object_bits >= pointer_width)
   {
     throw invalid_command_line_argument_exceptiont(
       "object-bits must be positive and less than the pointer width (" +
@@ -786,7 +786,7 @@ configt::bv_encodingt parse_object_bits_encoding(
   }
 
   configt::bv_encodingt bv_encoding;
-  bv_encoding.object_bits = object_bits;
+  bv_encoding.object_bits = *object_bits;
   bv_encoding.is_object_bits_default = false;
   return bv_encoding;
 }
