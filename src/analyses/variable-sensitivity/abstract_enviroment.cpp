@@ -803,6 +803,6 @@ abstract_environmentt::gather_statistics(const namespacet &ns) const
   return statistics;
 }
 
-abstract_environmentt::abstract_environmentt() : bottom(false)
+abstract_environmentt::abstract_environmentt() : bottom(true)
 {
 }
