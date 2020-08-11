@@ -1,0 +1,10 @@
+CORE
+test.c
+--object-bits 0
+Value of "0" given for object-bits is out of range.
+object-bits must be positive and less than the pointer width
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Test parsing of a too small object-bits setting.

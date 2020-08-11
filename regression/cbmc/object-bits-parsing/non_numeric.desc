@@ -1,0 +1,10 @@
+CORE
+test.c
+--object-bits foobar
+Value of "foobar" given for object-bits is not a valid unsigned integer.
+object-bits must be positive and less than the pointer width
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+Test parsing of an invalid non numeric object-bits setting.
