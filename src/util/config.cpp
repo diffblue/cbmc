@@ -786,7 +786,7 @@ configt::bv_encodingt parse_object_bits_encoding(
   const auto object_bits = string2optional<unsigned int>(argument);
   if(!object_bits)
     throw_for_reason("not a valid unsigned integer");
-  if(*object_bits <= 0 || *object_bits >= pointer_width)
+  if(*object_bits == 0 || *object_bits >= pointer_width)
     throw_for_reason("out of range");
 
   configt::bv_encodingt bv_encoding;
