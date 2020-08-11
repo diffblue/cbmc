@@ -776,14 +776,18 @@ configt::bv_encodingt parse_object_bits_encoding(
   const std::string &argument,
   const std::size_t pointer_width)
 {
-  const auto object_bits = string2optional<unsigned int>(argument);
-  if(!object_bits || *object_bits <= 0 || *object_bits >= pointer_width)
-  {
+  const auto throw_for_reason = [&](const std::string &reason) {
     throw invalid_command_line_argument_exceptiont(
-      "object-bits must be positive and less than the pointer width (" +
+      "Value of \"" + argument + "\" given for object-bits is " + reason +
+        ". object-bits must be positive and less than the pointer width (" +
         std::to_string(pointer_width) + ") ",
       "--object_bits");
-  }
+  };
+  const auto object_bits = string2optional<unsigned int>(argument);
+  if(!object_bits)
+    throw_for_reason("not a valid unsigned integer");
+  if(*object_bits <= 0 || *object_bits >= pointer_width)
+    throw_for_reason("out of range");
 
   configt::bv_encodingt bv_encoding;
   bv_encoding.object_bits = *object_bits;
