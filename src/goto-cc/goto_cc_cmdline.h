@@ -26,11 +26,6 @@ public:
 
   static bool in_list(const char *option, const char **list);
 
-  static bool prefix_in_list(
-    const char *option,
-    const char **list,
-    std::string &prefix);
-
   // never fails, will add if not found
   std::size_t get_optnr(const std::string &option);
 
@@ -68,14 +63,7 @@ public:
   typedef std::list<argt> parsed_argvt;
   parsed_argvt parsed_argv;
 
-  bool have_infile_arg() const
-  {
-    for(parsed_argvt::const_iterator
-        it=parsed_argv.begin(); it!=parsed_argv.end(); it++)
-      if(it->is_infile_name)
-        return true;
-    return false;
-  }
+  bool have_infile_arg() const;
 
   std::string stdin_file;
 

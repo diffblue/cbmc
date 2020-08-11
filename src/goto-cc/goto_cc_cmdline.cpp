@@ -13,10 +13,11 @@ Date:   April 2010
 
 #include "goto_cc_cmdline.h"
 
-#include <cstring>
+#include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <cstdio>
+#include <cstring>
+#include <iostream>
 
 #include <util/invariant.h>
 #include <util/prefix.h>
@@ -41,23 +42,6 @@ bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
   {
     if(strcmp(option, list[i])==0)
       return true;
-  }
-
-  return false;
-}
-
-bool goto_cc_cmdlinet::prefix_in_list(
-  const char *option,
-  const char **list,
-  std::string &prefix)
-{
-  for(std::size_t i=0; list[i]!=nullptr; i++)
-  {
-    if(strncmp(option, list[i], strlen(list[i]))==0)
-    {
-      prefix=std::string(list[i]);
-      return true;
-    }
   }
 
   return false;
@@ -133,4 +117,12 @@ void goto_cc_cmdlinet::add_infile_arg(const std::string &arg)
 
     fclose(tmp);
   }
+}
+
+bool goto_cc_cmdlinet::have_infile_arg() const
+{
+  return std::any_of(
+    parsed_argv.cbegin(), parsed_argv.cend(), [](const argt &arg) {
+      return arg.is_infile_name;
+    });
 }

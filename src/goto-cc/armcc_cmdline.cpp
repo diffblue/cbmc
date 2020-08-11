@@ -11,8 +11,14 @@ Author: Daniel Kroening
 
 #include "armcc_cmdline.h"
 
+#include <util/optional.h>
+#include <util/prefix.h>
+
+#include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <string>
+#include <vector>
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
@@ -195,7 +201,8 @@ static const char *options_no_arg[]=
   nullptr
 };
 
-static const char *options_with_prefix[]=
+// clang-format off
+static const std::vector<std::string> options_with_prefix
 {
   "--project=",
   "--workdir=",
@@ -241,11 +248,10 @@ static const char *options_with_prefix[]=
   "--configure_sysroot=",
   "--configure_cpp_headers=",
   "--configure_extra_includes=",
-  "--configure_extra_libraries=",
-  nullptr
+  "--configure_extra_libraries="
 };
 
-static const char *options_with_arg[]=
+static const std::vector<std::string> options_with_arg
 {
   // goto-cc specific
   "--verbosity",
@@ -261,9 +267,21 @@ static const char *options_with_arg[]=
   "-Warmcc,",
   "-o",
   "--cpu",
-  "--apcs",
-  nullptr
+  "--apcs"
 };
+// clang-format on
+
+optionalt<std::string>
+prefix_in_list(const std::string &option, const std::vector<std::string> &list)
+{
+  const auto found =
+    std::find_if(list.cbegin(), list.cend(), [&](const std::string &argument) {
+      return has_prefix(argument, option);
+    });
+  if(found == list.cend())
+    return {};
+  return {*found};
+}
 
 bool armcc_cmdlinet::parse(int argc, const char **argv)
 {
@@ -277,35 +295,34 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     }
 
     // it starts with - and it isn't "-"
-
-    std::string prefix;
+    optionalt<std::string> prefix;
 
     if(in_list(argv[i], options_no_arg))
     {
       // options that don't have any arguments
       set(argv[i]);
     }
-    else if(prefix_in_list(argv[i], options_with_arg, prefix))
+    else if((prefix = prefix_in_list(argv[i], options_with_arg)))
     {
       // options that have a separated _or_ concatenated argument
-      if(strlen(argv[i])>prefix.size()) // concatenated?
-        set(prefix, std::string(argv[i], prefix.size(), std::string::npos));
+      if(strlen(argv[i]) > prefix->size()) // Concatenated.
+        set(*prefix, std::string(argv[i], prefix->size(), std::string::npos));
       else
       {
         // Separated.
         if(i!=argc-1) // Guard against end of command line.
         {
-          set(prefix, argv[i+1]);
+          set(*prefix, argv[i + 1]);
           i++;
         }
         else
-          set(prefix, "");
+          set(*prefix, "");
       }
     }
-    else if(prefix_in_list(argv[i], options_with_prefix, prefix))
+    else if((prefix = prefix_in_list(argv[i], options_with_prefix)))
     {
       // options that have a concatenated argument
-      set(prefix, std::string(argv[i], prefix.size(), std::string::npos));
+      set(*prefix, std::string(argv[i], prefix->size(), std::string::npos));
     }
     else
     { // unrecognized option

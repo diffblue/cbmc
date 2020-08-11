@@ -19,6 +19,7 @@ SRC += analyses/ai/ai.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
        get_goto_model_from_c_test.cpp \
+       goto-cc/armcc_cmdline.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
@@ -162,6 +163,8 @@ testing-utils-clean:
 BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \
+          ../src/goto-cc/armcc_cmdline$(OBJEXT) \
+          ../src/goto-cc/goto_cc_cmdline$(OBJEXT) \
           ../src/goto-instrument/source_lines$(OBJEXT) \
           ../src/goto-instrument/cover$(OBJEXT) \
           ../src/goto-instrument/cover_basic_blocks$(OBJEXT) \
