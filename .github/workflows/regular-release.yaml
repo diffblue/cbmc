@@ -1,0 +1,66 @@
+on:
+  schedule:
+#            ┌───────────── minute (0 - 59)
+#            │ ┌───────────── hour (0 - 23)
+#            │ │ ┌───────────── day of the month (1 - 31)
+#            │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+#            │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+#            │ │ │ │ │
+#            │ │ │ │ │
+#            │ │ │ │ │
+    - cron: '0 9 * * THU'
+      # ^ this means 9:00 AM every thursday
+      # I can’t figure out the right syntax
+      # for ‘every other thursday’
+
+jobs:
+  bump_cbmc_version:
+    runs-on: ubuntu-20.04
+    outputs:
+      cbmc_version: ${{ steps.cbmc_version_number.outputs.CBMC_VERSION }}
+      bump_git_sha: ${{ steps.commit_bump.outputs.bump_git_sha }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Get new CBMC version number
+        id: cbmc_version_number
+        run: |
+          NEW_CBMC_VERSION=$(grep '^CBMC_VERSION =' src/config.inc | cut -d = -f 2 | scripts/increment_version.sh)
+          echo ::set-env name=CBMC_VERSION::$NEW_CBMC_VERSION
+          echo ::set-output name=CBMC_VERSION::$NEW_CBMC_VERSION
+      - name: Update CBMC version
+        run: |
+          sed -i "s/CBMC_VERSION = .*/CBMC_VERSION = $CBMC_VERSION/" src/config.inc
+      - name: Set git identity to github bot
+        run: |
+          git config --local user.name db-ci-cprover
+          git config --local user.email "db-ci-cprover@diffblue.com"
+      - name: Commit changes
+        id: commit_bump
+        run: |
+          git commit -a -m "Bump version to $CBMC_VERSION"
+          echo "::set-output name=bump_git_sha::$(git rev-parse HEAD)"
+      - name: Push changes
+        run: |
+          git push
+  perform-release:
+    needs: bump_cbmc_version
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # We just added a commit to master, so the default GITHUB_REF doesn’t work anymore
+          ref: master
+      - name: DEBUG show bump version
+        run: echo ${{ needs.bump_cbmc_version.outputs.CBMC_VERSION }}
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
+        with:
+          tag_name: cbmc-${{ needs.bump_cbmc_version.outputs.CBMC_VERSION }}
+          release_name: cbmc-${{ needs.bump_cbmc_version.outputs.CBMC_VERSION }}
+          draft: false
+          prerelease: false
+          commitish: ${{ needs.bump_cbmc_version.outputs.bump_git_sha }}
