@@ -1,0 +1,33 @@
+name: cprover-release
+on:
+  # Only on pull request so I can see what's happening
+  pull_request:
+    branches: [develop]
+  release:
+    types: [created]
+
+jobs:
+  update-cbmc-version:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set CBMC_VERSION environment variable
+        run: |
+          # This instead of cbmc-5.12.6 this should be GITHUB_REF for releases
+          echo "::set-env name=CBMC_VERSION::$(echo cbmc-5.12.6 | cut -s -d - -f 2)"
+      - name: Update version in config.inc
+        run: sed -i "s/CBMC_VERSION = .*/CBMC_VERSION = $CBMC_VERSION/" src/config.inc
+      - name: Set git identity to github actions bot
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "github-actions"
+      - name: Commit version changes
+        run: git commit -a -m "Bump CBMC version to $CBMC_VERSION"
+      - name: DEBUG show config.inc contents
+        run: cat src/config.inc
+      - name: DEBUG show what we _would_ be pushing
+        run: |
+          git show HEAD
+          git status
+          # git push # should do the trick
+
