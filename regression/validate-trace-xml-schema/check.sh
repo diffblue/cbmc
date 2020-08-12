@@ -13,6 +13,7 @@ fi
 xmllint="$(command -v xmllint)"
 if [ $? -ne 0 ] > /dev/null; then
     echo "xmllint not found, skipping XSD tests"
+    exit
 fi
 
 python3 check.py ../../src/cbmc/cbmc "$xmllint"
