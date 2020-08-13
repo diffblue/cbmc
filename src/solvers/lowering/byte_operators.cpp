@@ -21,41 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
-/// Determine the member of maximum fixed bit width in a union type. If no
-/// member, or no member of fixed and non-zero width can be found, return
-/// nullopt.
-/// \param union_type: Type to determine the member of.
-/// \param ns: Namespace to resolve tag types.
-/// \return Pair of a componentt pointing to the maximum fixed bit-width
-///   member of \p union_type and the bit width of that member.
-static optionalt<std::pair<struct_union_typet::componentt, mp_integer>>
-find_widest_union_component(const union_typet &union_type, const namespacet &ns)
-{
-  const union_typet::componentst &components = union_type.components();
-
-  mp_integer max_width = 0;
-  typet max_comp_type;
-  irep_idt max_comp_name;
-
-  for(const auto &comp : components)
-  {
-    auto element_width = pointer_offset_bits(comp.type(), ns);
-
-    if(!element_width.has_value() || *element_width <= max_width)
-      continue;
-
-    max_width = *element_width;
-    max_comp_type = comp.type();
-    max_comp_name = comp.get_name();
-  }
-
-  if(max_width == 0)
-    return {};
-  else
-    return std::make_pair(
-      struct_union_typet::componentt{max_comp_name, max_comp_type}, max_width);
-}
-
 static exprt bv_to_expr(
   const exprt &bitvector_expr,
   const typet &target_type,
@@ -155,7 +120,7 @@ static union_exprt bv_to_union_expr(
   if(components.empty())
     return union_exprt{irep_idt{}, nil_exprt{}, union_type};
 
-  const auto widest_member = find_widest_union_component(union_type, ns);
+  const auto widest_member = union_type.find_widest_union_component(ns);
 
   std::size_t component_bits;
   if(widest_member.has_value())
@@ -1222,7 +1187,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   {
     const union_typet &union_type = to_union_type(ns.follow(src.type()));
 
-    const auto widest_member = find_widest_union_component(union_type, ns);
+    const auto widest_member = union_type.find_widest_union_component(ns);
 
     if(widest_member.has_value())
     {
@@ -2029,7 +1994,7 @@ static exprt lower_byte_update_union(
   const optionalt<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
-  const auto widest_member = find_widest_union_component(union_type, ns);
+  const auto widest_member = union_type.find_widest_union_component(ns);
 
   PRECONDITION_WITH_DIAGNOSTICS(
     widest_member.has_value(),
