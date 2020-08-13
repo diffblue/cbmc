@@ -16,11 +16,17 @@ jobs:
         run: |
           make -C src minisat2-download
           make -C src
+          make -C jbmc/src
           make -C unit
+          make -C jbmc/unit
       - name: Run unit tests
         run: cd unit; ./unit_tests
+      - name: Run JBMC unit tests
+        run: cd jbmc/unit; ./unit_tests
       - name: Run regression tests
         run: cd regression; make
+      - name: Run JBMC regression tests
+        run: cd jbmc/regression; make
 
   check-macos-10_15-cmake-clang:
     runs-on: macos-10.15
