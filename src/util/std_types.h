@@ -401,9 +401,8 @@ public:
   {
   }
 
-  /// Determine the member of maximum fixed bit width in a union type. If no
-  /// member, or no member of fixed and non-zero width can be found, return
-  /// nullopt.
+  /// Determine the member of maximum bit width in a union type. If no member,
+  /// or a member of non-fixed width can be found, return nullopt.
   /// \param ns: Namespace to resolve tag types.
   /// \return Pair of a componentt pointing to the maximum fixed bit-width
   ///   member of the union type and the bit width of that member.
