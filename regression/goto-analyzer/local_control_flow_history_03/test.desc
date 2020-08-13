@@ -1,0 +1,10 @@
+CORE
+main.c
+--verify --recursive-interprocedural --loop-unwind 0 --constants --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion total == \(n \* \(n - 1\) / 2\): SUCCESS$
+--
+^warning: ignoring
+--
+A basic test of loop unwinding.

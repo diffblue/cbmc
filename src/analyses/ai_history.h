@@ -88,11 +88,16 @@ public:
   typedef std::pair<step_statust, trace_ptrt> step_returnt;
   /// Step creates a new history by advancing the current one to location "to"
   /// It is given the set of all other histories that have reached this point.
+  /// In the case of function call return it is also given the full history of
+  /// the caller.  This allows function-local histories as they can "pick up"
+  /// the state from before the call when computing the return edge.
   ///
   /// PRECONDITION(to.id_dereferenceable());
   /// PRECONDITION(to in goto_program.get_successors(current_location()) ||
   ///              current_location()->is_function_call() ||
   ///              current_location()->is_end_function());
+  /// PRECONDITION(caller_hist == no_caller_history ||
+  ///              current_location()->is_end_function);
   ///
   /// Step may do one of three things :
   ///  1. Create a new history object and return a pointer to it
@@ -108,7 +113,12 @@ public:
   ///     other than the call location) or undesireable (omitting some traces)
   ///     POSTCONDITION(IMPLIES(result.first == BLOCKED,
   ///                           result.second == nullptr()));
-  virtual step_returnt step(locationt to, const trace_sett &others) const = 0;
+  virtual step_returnt step(
+    locationt to,
+    const trace_sett &others,
+    trace_ptrt caller_hist) const = 0;
+
+  static const trace_ptrt no_caller_history;
 
   /// The order for history_sett
   virtual bool operator<(const ai_history_baset &op) const = 0;
@@ -157,7 +167,10 @@ public:
   {
   }
 
-  step_returnt step(locationt to, const trace_sett &others) const override
+  step_returnt step(
+    locationt to,
+    const trace_sett &others,
+    trace_ptrt caller_hist) const override
   {
     trace_ptrt next(new ahistoricalt(to));
 

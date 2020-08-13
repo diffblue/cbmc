@@ -27,3 +27,6 @@ xmlt ai_history_baset::output_xml(void) const
   xml.data = out.str();
   return xml;
 }
+
+const ai_history_baset::trace_ptrt ai_history_baset::no_caller_history =
+  nullptr;
