@@ -1,0 +1,10 @@
+CORE
+dummy.c
+--traec
+did you mean --trace
+^EXIT=64$
+^SIGNAL=0$
+--
+--
+This checks that we get a useful suggestion when we make a typo on the
+commandline
