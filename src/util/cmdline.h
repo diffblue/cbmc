@@ -116,6 +116,7 @@ protected:
   };
 
   void parse_optstring(const char *optstring);
+  bool parse_arguments(int argc, const char **argv);
 
   std::vector<optiont> options;
 
