@@ -115,6 +115,8 @@ protected:
     {}
   };
 
+  void parse_optstring(const char *optstring);
+
   std::vector<optiont> options;
 
   optionalt<std::size_t> getoptnr(char option) const;

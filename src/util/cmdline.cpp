@@ -155,46 +155,7 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 {
   clear();
 
-  while(optstring[0]!=0)
-  {
-    optiont option;
-
-    DATA_INVARIANT(
-      optstring[0] != ':', "cmdlinet::parse: Invalid option string\n");
-
-    if(optstring[0]=='(')
-    {
-      option.islong=true;
-      option.optchar=0;
-      option.isset=false;
-      option.optstring.clear();
-
-      for(optstring++; optstring[0]!=')' && optstring[0]!=0; optstring++)
-        option.optstring+=optstring[0];
-
-      if(optstring[0]==')')
-        optstring++;
-    }
-    else
-    {
-      option.islong=false;
-      option.optchar=optstring[0];
-      option.optstring.clear();
-      option.isset=false;
-
-      optstring++;
-    }
-
-    if(optstring[0]==':')
-    {
-      option.hasval=true;
-      optstring++;
-    }
-    else
-      option.hasval=false;
-
-    options.push_back(option);
-  }
+  parse_optstring(optstring);
 
   for(int i=1; i<argc; i++)
   {
@@ -249,6 +210,49 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 cmdlinet::option_namest cmdlinet::option_names() const
 {
   return option_namest{*this};
+}
+void cmdlinet::parse_optstring(const char *optstring)
+{
+  while(optstring[0] != 0)
+  {
+    optiont option;
+
+    DATA_INVARIANT(
+      optstring[0] != ':', "cmdlinet::parse: Invalid option string\n");
+
+    if(optstring[0] == '(')
+    {
+      option.islong = true;
+      option.optchar = 0;
+      option.isset = false;
+      option.optstring.clear();
+
+      for(optstring++; optstring[0] != ')' && optstring[0] != 0; optstring++)
+        option.optstring += optstring[0];
+
+      if(optstring[0] == ')')
+        optstring++;
+    }
+    else
+    {
+      option.islong = false;
+      option.optchar = optstring[0];
+      option.optstring.clear();
+      option.isset = false;
+
+      optstring++;
+    }
+
+    if(optstring[0] == ':')
+    {
+      option.hasval = true;
+      optstring++;
+    }
+    else
+      option.hasval = false;
+
+    options.push_back(option);
+  }
 }
 
 std::vector<std::string>
