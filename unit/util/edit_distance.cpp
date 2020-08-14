@@ -1,5 +1,6 @@
-/// \file Unit tests for checking if two strings are within a certain edit distance
+/// \file
 /// \author Diffblue Ltd.
+/// Unit tests for checking if two strings are within a certain edit distance
 
 #include <testing-utils/use_catch.h>
 #include <util/edit_distance.h>
