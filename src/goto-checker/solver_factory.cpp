@@ -32,6 +32,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>
+#include <solvers/sat/external_sat.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/strings/string_refinement.h>
 
@@ -131,6 +132,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
 {
   if(options.get_bool_option("dimacs"))
     return get_dimacs();
+  if(options.is_set("sat-solver-invocation"))
+    return get_external_sat();
   if(
     options.get_bool_option("refine") &&
     !options.get_bool_option("refine-strings"))
@@ -229,7 +232,23 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
 
   auto bv_dimacs =
     util_make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
+
   return util_make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
+}
+
+std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
+{
+  no_beautification();
+  no_incremental_check();
+
+  std::string sat_solver_invocation =
+    options.get_option("sat-solver-invocation");
+  auto prop =
+    util_make_unique<external_satt>(message_handler, sat_solver_invocation);
+
+  auto bv_pointers = util_make_unique<bv_pointerst>(ns, *prop, message_handler);
+
+  return util_make_unique<solvert>(std::move(bv_pointers), std::move(prop));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
