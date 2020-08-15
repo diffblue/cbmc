@@ -2,7 +2,7 @@ CORE
 dummy.c
 --traec
 did you mean --trace
-^EXIT=64$
+^EXIT=[123456789]\d*$
 ^SIGNAL=0$
 --
 --
