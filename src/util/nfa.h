@@ -1,7 +1,13 @@
 /// \file
 /// \author Diffblue Ltd.
 ///
-/// A simple NFA implementation
+/// A simple NFA implementation.
+///
+/// This was created for use in the util/edit_distance.h functionality, which
+/// in turn is used in util/cmdline.h for suggesting spelling corrections when
+/// a user mistypes a command line option. Because of this the implementation
+/// wasn’t done with performance in mind and is probably unsuitable as-is for
+/// other purposes where performance does matter.
 
 #ifndef CPROVER_UTIL_NFA_H
 #define CPROVER_UTIL_NFA_H
