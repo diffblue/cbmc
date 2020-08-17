@@ -205,7 +205,7 @@ void run_property_decider(
   " --show-goto-symex-steps      show which steps symex travels, includes " \
   "                              diagnostic information\n" \
   " --show-points-to-sets        show points-to sets for\n" \
-  "                              pointer dereference\n" \
+  "                              pointer dereference. Requires --json-ui.\n" \
   " --program-only               only show program expression\n" \
   " --show-byte-ops              show all byte extracts and updates\n" \
   " --show-loops                 show the loops in the program\n" \
