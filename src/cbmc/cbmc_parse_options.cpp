@@ -575,6 +575,17 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
+  if(cmdline.isset("show-points-to-sets"))
+  {
+    if(!cmdline.isset("json-ui") || cmdline.isset("xml-ui"))
+    {
+      log.error() << "--show-points-to-sets supports only"
+                     " json output. Use --json-ui."
+                  << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
+  }
+
   register_languages();
 
   // configure gcc, if required
