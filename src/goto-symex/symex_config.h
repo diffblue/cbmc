@@ -46,6 +46,7 @@ struct symex_configt final
   /// \brief Prints out the path that symex is actively taking during execution,
   /// includes diagnostic information about call stack and guard size.
   bool show_symex_steps;
+  bool show_points_to_sets;
 
   /// Maximum sizes for which field sensitivity will be applied to array cells
   std::size_t max_field_sensitivity_array_size;
