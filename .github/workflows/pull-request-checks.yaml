@@ -51,7 +51,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils cpanminus
+          sudo apt-get install -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils cpanminus dpkg-dev
           cpanm Thread::Pool::Simple
       - name: Configure using CMake
         run: |
@@ -60,6 +60,11 @@ jobs:
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Build with Ninja
         run: cd build; ninja
+      - name: Check if package building works
+        run: |
+          cd build
+          ninja package
+          ls *.deb
       - name: Run tests
         run: cd build; ctest . -V -L CORE
         env:
