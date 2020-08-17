@@ -325,6 +325,7 @@ void postprocess_equation(
   const namespacet &ns,
   ui_message_handlert &ui_message_handler)
 {
+  const auto postprocess_equation_start = std::chrono::steady_clock::now();
   // add a partial ordering, if required
   if(equation.has_threads())
   {
@@ -344,6 +345,13 @@ void postprocess_equation(
   {
     symex.validate(validation_modet::INVARIANT);
   }
+
+  const auto postprocess_equation_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> postprocess_equation_runtime =
+    std::chrono::duration<double>(
+      postprocess_equation_stop - postprocess_equation_start);
+  log.status() << "Runtime Postprocess Equation: "
+               << postprocess_equation_runtime.count() << "s" << messaget::eom;
 }
 
 std::chrono::duration<double> prepare_property_decider(
@@ -391,7 +399,15 @@ void run_property_decider(
       return is_property_to_check(properties.at(property_id).status);
     });
 
+  auto const sat_solver_start = std::chrono::steady_clock::now();
+
   decision_proceduret::resultt dec_result = property_decider.solve();
+
+  auto const sat_solver_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> sat_solver_runtime =
+    std::chrono::duration<double>(sat_solver_stop - sat_solver_start);
+  log.status() << "Runtime Solver: " << sat_solver_runtime.count() << "s"
+               << messaget::eom;
 
   property_decider.update_properties_status_from_goals(
     properties, result.updated_properties, dec_result, set_pass);

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/range.h>
 
 #include <algorithm>
+#include <chrono>
 
 bool prop_conv_solvert::is_in_conflict(const exprt &expr) const
 {
@@ -480,9 +481,17 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
   // post-processing isn't incremental yet
   if(!post_processing_done)
   {
+    const auto post_process_start = std::chrono::steady_clock::now();
+
     log.statistics() << "Post-processing" << messaget::eom;
     post_process();
     post_processing_done = true;
+
+    const auto post_process_stop = std::chrono::steady_clock::now();
+    std::chrono::duration<double> post_process_runtime =
+      std::chrono::duration<double>(post_process_stop - post_process_start);
+    log.status() << "Runtime Post-process: " << post_process_runtime.count()
+                 << "s" << messaget::eom;
   }
 
   log.statistics() << "Solving with " << prop.solver_text() << messaget::eom;

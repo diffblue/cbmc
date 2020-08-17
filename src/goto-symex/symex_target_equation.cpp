@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_target_equation.h"
 
+#include <chrono>
+
 #include <util/format_expr.h>
 #include <util/std_expr.h>
 
@@ -346,8 +348,16 @@ void symex_target_equationt::convert_without_assertions(
 
 void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 {
+  const auto convert_SSA_start = std::chrono::steady_clock::now();
+
   convert_without_assertions(decision_procedure);
   convert_assertions(decision_procedure);
+
+  const auto convert_SSA_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> convert_SSA_runtime =
+    std::chrono::duration<double>(convert_SSA_stop - convert_SSA_start);
+  log.status() << "Runtime Convert SSA: " << convert_SSA_runtime.count() << "s"
+               << messaget::eom;
 }
 
 void symex_target_equationt::convert_assignments(
