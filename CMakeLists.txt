@@ -213,3 +213,5 @@ option(WITH_JBMC "Build the JBMC Java front-end" ON)
 if(WITH_JBMC)
     add_subdirectory(jbmc)
 endif()
+
+include(cmake/packaging.cmake)
