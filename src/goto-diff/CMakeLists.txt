@@ -29,11 +29,3 @@ add_if_library(goto-diff-lib jsil)
 add_executable(goto-diff goto_diff_main.cpp)
 target_link_libraries(goto-diff goto-diff-lib)
 install(TARGETS goto-diff DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-# Symlink man page to cbmc man page until a real man page is written
-install(CODE "execute_process( \
-  COMMAND ${CMAKE_COMMAND} -E create_symlink \
-  cbmc.1 \
-  \$ENV{DESTDIR}${CMAKE_INSTALL_FULL_MANDIR}/man1/goto-diff.1 \
-  )"
-)

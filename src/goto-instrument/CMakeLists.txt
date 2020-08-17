@@ -30,11 +30,3 @@ add_if_library(goto-instrument-lib glpk)
 add_executable(goto-instrument goto_instrument_main.cpp)
 target_link_libraries(goto-instrument goto-instrument-lib)
 install(TARGETS goto-instrument DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-# Symlink man page to cbmc man page until a real man page is written
-install(CODE "execute_process( \
-  COMMAND ${CMAKE_COMMAND} -E create_symlink \
-  cbmc.1 \
-  \$ENV{DESTDIR}${CMAKE_INSTALL_FULL_MANDIR}/man1/goto-instrument.1 \
-  )"
-)

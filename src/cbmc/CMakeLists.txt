@@ -38,6 +38,7 @@ install(TARGETS cbmc DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page
 if(NOT WIN32)
-  install(FILES ${CMAKE_SOURCE_DIR}/doc/man/cbmc.1
-          DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
