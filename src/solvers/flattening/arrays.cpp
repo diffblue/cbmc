@@ -159,6 +159,20 @@ void arrayst::collect_arrays(const exprt &a)
     record_array_index(index_expr);
 #endif
   }
+  else if(a.id() == ID_array_list)
+  {
+    const auto &array_list_expr = to_array_list_expr(a);
+
+    // make sure this shows as an application
+    for(std::size_t op_index = 0;
+        op_index + 1 < array_list_expr.operands().size();
+        op_index += 2)
+    {
+      index_exprt index_expr(
+        array_list_expr, array_list_expr.operands()[op_index]);
+      record_array_index(index_expr);
+    }
+  }
   else if(a.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(a);
@@ -464,6 +478,9 @@ void arrayst::add_array_constraints(
     return add_array_constraints_with(index_set, to_with_expr(expr));
   else if(expr.id()==ID_update)
     return add_array_constraints_update(index_set, to_update_expr(expr));
+  else if(expr.id() == ID_array_list)
+    return add_array_constraints_array_list(
+      index_set, to_array_list_expr(expr));
   else if(expr.id()==ID_if)
     return add_array_constraints_if(index_set, to_if_expr(expr));
   else if(expr.id()==ID_array_of)
@@ -660,6 +677,32 @@ void arrayst::add_array_constraints_update(
     }
   }
 #endif
+}
+
+void arrayst::add_array_constraints_array_list(
+  const index_sett &,
+  const array_list_exprt &array_list_expr)
+{
+  // we got x={ [i]=v, ... }
+  // add constaint x[i]=v
+
+  for(std::size_t op_index = 0;
+      op_index + 1 < array_list_expr.operands().size();
+      op_index += 2)
+  {
+    const exprt &index = array_list_expr.operands()[op_index];
+    const exprt &value = array_list_expr.operands()[op_index + 1];
+
+    index_exprt index_expr(
+      array_list_expr, index, array_list_expr.type().subtype());
+
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      index_expr.type() == value.type(),
+      "update operand should match array element type",
+      irep_pretty_diagnosticst{array_list_expr});
+
+    set_to_true(equal_exprt(index_expr, value));
+  }
 }
 
 void arrayst::add_array_constraints_array_of(

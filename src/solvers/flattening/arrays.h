@@ -120,6 +120,9 @@ protected:
     const index_sett &index_set, const with_exprt &expr);
   void add_array_constraints_update(
     const index_sett &index_set, const update_exprt &expr);
+  void add_array_constraints_array_list(
+    const index_sett &,
+    const array_list_exprt &);
   void add_array_constraints_array_of(
     const index_sett &index_set, const array_of_exprt &exprt);
   void add_array_constraints_array_constant(
