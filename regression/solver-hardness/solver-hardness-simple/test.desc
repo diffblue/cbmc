@@ -5,6 +5,7 @@ main.c
 ^SIGNAL=0$
 ^\[main.assertion.\d+\] line \d+ assertion a \+ b \< 10: FAILURE$
 ^VERIFICATION FAILED$
-\"SAT_hardness\":\{(\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+)\}
+^Valid JSON File$
+\"SAT_hardness\": \{(\"ClauseSet\": \[.*\]|\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+), (\"ClauseSet\": \[.*\]|\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+), (\"ClauseSet\": \[.*\]|\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+), (\"ClauseSet\": \[.*\]|\"Clauses\": \d+|\"Variables\": \d+|\"Literals\": \d+)\}
 --
 ^warning: ignoring
