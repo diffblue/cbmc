@@ -26,8 +26,8 @@ operator+=(const solver_hardnesst::sat_hardnesst &other)
   clauses += other.clauses;
   literals += other.literals;
   variables.insert(other.variables.begin(), other.variables.end());
-  clause_set.insert(clause_set.end(),
-    other.clause_set.begin(), other.clause_set.end());
+  clause_set.insert(
+    clause_set.end(), other.clause_set.begin(), other.clause_set.end());
   return *this;
 }
 
