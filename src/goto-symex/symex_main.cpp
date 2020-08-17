@@ -47,6 +47,7 @@ symex_configt::symex_configt(const optionst &options)
     debug_level(unsafe_string2int(options.get_option("debug-level"))),
     run_validation_checks(options.get_bool_option("validate-ssa-equation")),
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
+    show_points_to_sets(options.get_bool_option("show-points-to-sets")),
     max_field_sensitivity_array_size(
       options.is_set("no-array-field-sensitivity")
         ? 0

@@ -52,7 +52,8 @@ public:
   /// Dereference the given pointer-expression. Any errors are
   /// reported to the callback method given in the constructor.
   /// \param pointer: A pointer-typed expression, to be dereferenced.
-  exprt dereference(const exprt &pointer);
+  /// \param display_points_to_sets: Display size and contents of points to sets
+  exprt dereference(const exprt &pointer, bool display_points_to_sets = false);
 
   /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
