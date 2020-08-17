@@ -122,6 +122,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("simplify", true);
   options.set_option("simplify-if", true);
   options.set_option("show-goto-symex-steps", false);
+  options.set_option("show-points-to-sets", false);
 
   // Other default
   options.set_option("arrays-uf", "auto");
@@ -519,6 +520,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-goto-symex-steps"))
     options.set_option("show-goto-symex-steps", true);
+
+  if(cmdline.isset("show-points-to-sets"))
+    options.set_option("show-points-to-sets", true);
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
