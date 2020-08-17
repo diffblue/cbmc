@@ -59,7 +59,9 @@ static bool should_use_local_definition_for(const exprt &expr)
   return false;
 }
 
-exprt value_set_dereferencet::dereference(const exprt &pointer, bool display_points_to_sets)
+exprt value_set_dereferencet::dereference(
+  const exprt &pointer,
+  bool display_points_to_sets)
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
@@ -70,7 +72,8 @@ exprt value_set_dereferencet::dereference(const exprt &pointer, bool display_poi
   {
     const if_exprt &if_expr=to_if_expr(pointer);
     exprt true_case = dereference(if_expr.true_case(), display_points_to_sets);
-    exprt false_case = dereference(if_expr.false_case(), display_points_to_sets);
+    exprt false_case =
+      dereference(if_expr.false_case(), display_points_to_sets);
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
   else if(pointer.id() == ID_typecast)
@@ -89,8 +92,12 @@ exprt value_set_dereferencet::dereference(const exprt &pointer, bool display_poi
       const auto &if_expr = to_if_expr(*underlying);
       return if_exprt(
         if_expr.cond(),
-        dereference(typecast_exprt(if_expr.true_case(), pointer.type()), display_points_to_sets),
-        dereference(typecast_exprt(if_expr.false_case(), pointer.type()), display_points_to_sets));
+        dereference(
+          typecast_exprt(if_expr.true_case(), pointer.type()),
+          display_points_to_sets),
+        dereference(
+          typecast_exprt(if_expr.false_case(), pointer.type()),
+          display_points_to_sets));
     }
   }
 
@@ -116,7 +123,8 @@ exprt value_set_dereferencet::dereference(const exprt &pointer, bool display_poi
 
   if(display_points_to_sets)
   {
-    json_result["PointsToSetSize"] = json_numbert(std::to_string(points_to_set.size()));
+    json_result["PointsToSetSize"] =
+      json_numbert(std::to_string(points_to_set.size()));
 
     json_arrayt points_to_set_json;
     for(auto p : points_to_set)
@@ -159,7 +167,8 @@ exprt value_set_dereferencet::dereference(const exprt &pointer, bool display_poi
 
   if(display_points_to_sets)
   {
-    json_result["RetainedValuesSetSize"] = json_numbert(std::to_string(points_to_set.size()));
+    json_result["RetainedValuesSetSize"] =
+      json_numbert(std::to_string(points_to_set.size()));
 
     json_arrayt retained_values_set_json;
     for(auto &value : retained_values)
