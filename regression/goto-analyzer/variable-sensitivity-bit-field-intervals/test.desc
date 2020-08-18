@@ -3,6 +3,6 @@ main.c
 --function main --variable-sensitivity --vsd-structs --vsd-intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
-\[main\.assertion\.1\] line 12 bs\.byte==10: SUCCESS
-\[main\.assertion\.2\] line 13 bs\.bitfield==1: SUCCESS
+\[main\.assertion\.1\] line \d+ bs\.byte==10: SUCCESS
+\[main\.assertion\.2\] line \d+ bs\.bitfield==1: SUCCESS
 --

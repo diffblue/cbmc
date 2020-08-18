@@ -3,10 +3,10 @@ main.c
 --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.assertion\.1\] line 11 assertion y==5: SUCCESS$
-^\[main\.assertion\.2\] line 12 assertion p2x==&y: SUCCESS$
-^\[main\.assertion\.3\] line 13 assertion \*p2x==5: SUCCESS$
-^\[bar\.assertion\.1\] line 18 assertion \*unmodified==3: SUCCESS$
-^\[bar\.assertion\.2\] line 22 assertion \*modifed==5: SUCCESS$
+^\[main\.assertion\.1\] line \d+ assertion y == 5: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion p2x == &y: SUCCESS$
+^\[main\.assertion\.3\] line \d+ assertion \*p2x == 5: SUCCESS$
+^\[bar\.assertion\.1\] line \d+ assertion \*unmodified == 3: SUCCESS$
+^\[bar\.assertion\.2\] line \d+ assertion \*modifed == 5: SUCCESS$
 --
 ^warning: ignoring

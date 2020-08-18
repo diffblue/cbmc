@@ -3,6 +3,6 @@ main.c
 --function global_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[global_test\.assertion\.1\] line 67 global==42: SUCCESS$
-^\[global_test\.assertion\.2\] line 70 global==50: UNKNOWN$
+^\[global_test\.assertion\.1\] line \d+ global==42: SUCCESS$
+^\[global_test\.assertion\.2\] line \d+ global==50: UNKNOWN$
 --

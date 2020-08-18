@@ -3,12 +3,12 @@ main.c
 --function pass_param --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[pass_param\.assertion\.1\] line 25 human_instance.age==24: SUCCESS$
-^\[pass_param\.assertion\.2\] line 26 human_instance.height==1.80: SUCCESS$
-^\[pass_param\.assertion\.3\] line 29 human_instance.age==10: SUCCESS$
-^\[pass_param\.assertion\.4\] line 30 human_instance.age==24: FAILURE \(if reachable\)$
-^\[pass_param\.assertion\.5\] line 31 human_instance.height==1.80: SUCCESS$
-^\[pass_param\.assertion\.6\] line 34 human_instance.age==32: UNKNOWN$
-^\[pass_param\.assertion\.7\] line 35 human_instance.age==10: UNKNOWN$
-^\[pass_param\.assertion\.8\] line 36 human_instance.height==1.80: SUCCESS$
+^\[pass_param\.assertion\.1\] line \d+ human_instance.age==24: SUCCESS$
+^\[pass_param\.assertion\.2\] line \d+ human_instance.height==1.80: SUCCESS$
+^\[pass_param\.assertion\.3\] line \d+ human_instance.age==10: SUCCESS$
+^\[pass_param\.assertion\.4\] line \d+ human_instance.age==24: FAILURE \(if reachable\)$
+^\[pass_param\.assertion\.5\] line \d+ human_instance.height==1.80: SUCCESS$
+^\[pass_param\.assertion\.6\] line \d+ human_instance.age==32: UNKNOWN$
+^\[pass_param\.assertion\.7\] line \d+ human_instance.age==10: UNKNOWN$
+^\[pass_param\.assertion\.8\] line \d+ human_instance.height==1.80: SUCCESS$
 --
