@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.2)
 
 
 # Grab the current CBMC version from config.inc
+# We do this so we have a matching cbmc version between the Makefile build and
+# the CMake build. This version info is useful for things like generating
+# packages (which usually need to contain version info in their metadata and
+# filenames)
 file(
   STRINGS src/config.inc CBMC_VERSION
   REGEX "CBMC_VERSION = (.*)")
