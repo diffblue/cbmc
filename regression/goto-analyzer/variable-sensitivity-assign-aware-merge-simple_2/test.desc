@@ -1,10 +1,11 @@
 CORE
 main.c
---function simple_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
+--function simple_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify --three-way-merge
 ^EXIT=0$
 ^SIGNAL=0$
-^\[simple_test\.assertion\.1\] line 25 i==0: SUCCESS$
-^\[simple_test\.assertion\.2\] line 26 global==0: SUCCESS$
-^\[simple_test\.assertion\.3\] line 31 i==1: SUCCESS$
-^\[simple_test\.assertion\.4\] line 32 global==2: SUCCESS$
+^\[simple_test\.assertion\.1\] line \d+ i==0: SUCCESS$
+^\[simple_test\.assertion\.2\] line \d+ global==0: SUCCESS$
+^\[simple_test\.assertion\.3\] line \d+ i==1: SUCCESS$
+^\[simple_test\.assertion\.4\] line \d+ global==2: SUCCESS$
 --
+i==1 and global==2 specifically need three-way-merge

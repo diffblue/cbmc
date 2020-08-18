@@ -115,6 +115,7 @@ class optionst;
 
 #define GOTO_ANALYSER_OPTIONS_AI \
   "(recursive-interprocedural)" \
+  "(three-way-merge)" \
   "(legacy-ait)" \
   "(legacy-concurrent)"
 

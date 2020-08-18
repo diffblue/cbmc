@@ -51,6 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/is_threaded.h>
 #include <analyses/local_control_flow_history.h>
 #include <analyses/local_may_alias.h>
+#include <analyses/variable-sensitivity/three_way_merge_abstract_interpreter.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
@@ -259,6 +260,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     // Abstract interpreter choice
     if(cmdline.isset("recursive-interprocedural"))
       options.set_option("recursive-interprocedural", true);
+    else if(cmdline.isset("three-way-merge"))
+      options.set_option("three-way-merge", true);
     else if(cmdline.isset("legacy-ait") || cmdline.isset("location-sensitive"))
     {
       options.set_option("legacy-ait", true);
@@ -444,7 +447,9 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
   const namespacet &ns)
 {
   // These support all of the option categories
-  if(options.get_bool_option("recursive-interprocedural"))
+  if(
+    options.get_bool_option("recursive-interprocedural") ||
+    options.get_bool_option("three-way-merge"))
   {
     // Build the history factory
     std::unique_ptr<ai_history_factory_baset> hf = nullptr;
@@ -507,7 +512,15 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
         return new ai_recursive_interproceduralt(
           std::move(hf), std::move(df), std::move(st));
       }
-      UNREACHABLE;
+      else if(options.get_bool_option("three-way-merge"))
+      {
+        // Only works with VSD
+        if(options.get_bool_option("vsd"))
+        {
+          return new ai_three_way_merget(
+            std::move(hf), std::move(df), std::move(st));
+        }
+      }
     }
   }
   else if(options.get_bool_option("legacy-ait"))
@@ -940,6 +953,8 @@ void goto_analyzer_parse_optionst::help()
     "Abstract interpreter options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --recursive-interprocedural  use recursion to handle interprocedural reasoning\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --three-way-merge            use VSD's three-way merge on return from function call\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --legacy-ait                 recursion for function and one domain per location\n"
     // NOLINTNEXTLINE(whitespace/line_length)

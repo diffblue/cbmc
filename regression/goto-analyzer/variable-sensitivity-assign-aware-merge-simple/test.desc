@@ -1,14 +1,15 @@
 CORE
 main.c
---function pointer_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
+--function pointer_test --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify --three-way-merge
 ^EXIT=0$
 ^SIGNAL=0$
-^\[pointer_test.assertion\.1\] line 41 j==1: SUCCESS$
-^\[pointer_test.assertion\.2\] line 42 i==10: SUCCESS$
-^\[pointer_test.assertion\.3\] line 47 j==2: SUCCESS$
-^\[pointer_test.assertion\.4\] line 48 i==10: SUCCESS$
-^\[pointer_test.assertion\.5\] line 53 j==3: SUCCESS$
-^\[pointer_test.assertion\.6\] line 54 i==11: UNKNOWN$
-^\[pointer_test.assertion\.7\] line 59 j==4: SUCCESS$
-^\[pointer_test.assertion\.8\] line 60 i==11: UNKNOWN$
+^\[pointer_test.assertion\.1\] line \d+ j==1: SUCCESS$
+^\[pointer_test.assertion\.2\] line \d+ i==10: SUCCESS$
+^\[pointer_test.assertion\.3\] line \d+ j==2: SUCCESS$
+^\[pointer_test.assertion\.4\] line \d+ i==10: SUCCESS$
+^\[pointer_test.assertion\.5\] line \d+ j==3: SUCCESS$
+^\[pointer_test.assertion\.6\] line \d+ i==11: UNKNOWN$
+^\[pointer_test.assertion\.7\] line \d+ j==4: SUCCESS$
+^\[pointer_test.assertion\.8\] line \d+ i==11: UNKNOWN$
 --
+j==2, j==3 and j==4 are the bits that specifically need three-way-merge
