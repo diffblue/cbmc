@@ -4,6 +4,42 @@ on:
     branches: [ develop ]
 
 jobs:
+  check-ubuntu-20_04-make-gcc:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+          TESTPL_JOBS: 4
+        run: |
+          sudo apt-get install -yq gcc gdb g++ maven jq flex bison libxml2-utils cpanminus
+          make -C src minisat2-download
+          cpanm Thread::Pool::Simple
+      - name: Build with make
+        run: |
+          make -C src CXX='/usr/bin/g++' -j2
+          make -C unit CXX='/usr/bin/g++' -j2
+          make -C jbmc/src  CXX='/usr/bin/g++' -j2
+          make -C jbmc/unit CXX='/usr/bin/g++' -j2
+      - name: Run unit tests
+        run: |
+          make -C unit test
+          make -C jbmc/unit test
+          echo "Running expected failure tests"
+          make TAGS="[!shouldfail]" -C unit test
+          make TAGS="[!shouldfail]" -C jbmc/unit test
+      - name: Run regression tests
+        run: |
+          make -C regression test
+          make -C regression/cbmc test-paths-lifo
+          env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+          make -C jbmc/regression test
+
   check-macos-10_15-make-clang:
     runs-on: macos-10.15
     steps:
