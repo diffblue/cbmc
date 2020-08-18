@@ -9,7 +9,9 @@ phases:
   install:
     commands:
       - choco install -y --no-progress cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-      - choco install -y --no-progress winflexbison3 ninja
+      - choco install cyg-get -y --no-progress
+      - cyg-get bison flex
+      - choco install -y --no-progress ninja
       - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
 
   build:
