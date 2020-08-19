@@ -19,6 +19,7 @@ Date: May 2018
 #include <util/deprecate.h>
 #include <util/find_symbols.h>
 #include <util/std_types.h>
+#include <util/ui_message.h>
 
 #include "goto_program.h"
 
@@ -40,6 +41,8 @@ public:
   /// Note: This is now the preferred way of getting the identifiers of the
   /// parameters. The identifiers in the type will go away.
   parameter_identifierst parameter_identifiers;
+
+  size_t get_memop_calls(ui_message_handlert &ui_message_handler) const;
 
   bool body_available() const
   {
