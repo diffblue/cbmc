@@ -92,8 +92,7 @@ void show_goto_functions(
 
 void show_memop_calls(
   const goto_functionst &goto_functions,
-  ui_message_handlert &ui_message_handler
-  )
+  ui_message_handlert &ui_message_handler)
 {
   messaget msg(ui_message_handler);
 
@@ -106,23 +105,23 @@ void show_memop_calls(
   ui_message_handlert::uit ui = ui_message_handler.get_ui();
   switch(ui)
   {
-    case ui_message_handlert::uit::XML_UI:
-    {
-      xmlt xml_memop_count{"memop_count"};
-      xml_memop_count.set_attribute("count", memop_count);
+  case ui_message_handlert::uit::XML_UI:
+  {
+    xmlt xml_memop_count{"memop_count"};
+    xml_memop_count.set_attribute("count", memop_count);
 
-      msg.status() << xml_memop_count;
-    }
-    break;
-    case ui_message_handlert::uit::JSON_UI:
-    {
-      json_objectt json_memop_count{
-        {"memOpCount", json_numbert(std::to_string(memop_count))}
-      };
-      msg.status() << json_memop_count;
-    }
-    break;
-    case ui_message_handlert::uit::PLAIN:
-      msg.status() << "\nMemop Count: " << memop_count << messaget::eom;;
+    msg.status() << xml_memop_count;
+  }
+  break;
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    json_objectt json_memop_count{
+      {"memOpCount", json_numbert(std::to_string(memop_count))}};
+    msg.status() << json_memop_count;
+  }
+  break;
+  case ui_message_handlert::uit::PLAIN:
+    msg.status() << "\nMemop Count: " << memop_count << messaget::eom;
+  break;
   }
 }
