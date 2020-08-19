@@ -77,28 +77,29 @@ void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
 
 bool is_mem_op(const irept &irep)
 {
-  return (irep.id() == "memcmp" || irep.id() == "memcpy" ||
-    irep.id() == "memset" || irep.id() == "__builtin___memcpy_chk" ||
+  return (
+    irep.id() == "memcmp" || irep.id() == "memcpy" || irep.id() == "memset" ||
+    irep.id() == "__builtin___memcpy_chk" ||
     irep.id() == "__builtin___memset_chk");
 }
 
-json_objectt show_goto_instruction_json(
-  const goto_programt::instructiont &instruction)
+json_objectt
+show_goto_instruction_json(const goto_programt::instructiont &instruction)
 {
   std::stringstream ss;
   ss << format(instruction.get_function_call());
   const std::string &func_call = ss.str();
 
   json_objectt json_instr{
-    {"instruction", json_objectt{
-      {"functionCall", json_stringt(func_call)},
-      {"sourceLocation", json(instruction.code.source_location())}}}};
+    {"instruction",
+     json_objectt{
+       {"functionCall", json_stringt(func_call)},
+       {"sourceLocation", json(instruction.code.source_location())}}}};
 
   return json_instr;
 }
 
-xmlt show_goto_instruction_xml(
-  const goto_programt::instructiont &instruction)
+xmlt show_goto_instruction_xml(const goto_programt::instructiont &instruction)
 {
   xmlt xml_instr{"instruction"};
 
@@ -108,8 +109,7 @@ xmlt show_goto_instruction_xml(
 
   xmlt &xml_function_call = xml_instr.new_element("function_call");
   xml_function_call.data = func_call;
-  xml_instr.new_element(
-    xml(instruction.code.source_location()));
+  xml_instr.new_element(xml(instruction.code.source_location()));
 
   return xml_instr;
 }
@@ -123,30 +123,29 @@ void show_goto_instruction(
 
   switch(ui)
   {
-    case ui_message_handlert::uit::XML_UI:
-    {
-      msg.status() << show_goto_instruction_xml(instruction);
-    }
-    break;
-    case ui_message_handlert::uit::JSON_UI:
-    {
-      msg.status() << show_goto_instruction_json(instruction);
-    }
-    break;
-    case ui_message_handlert::uit::PLAIN:
-    {
-      msg.status() << messaget::faint << "\n"
-        << instruction.code.source_location().as_string()
-        << messaget::reset << messaget::eom;
-      msg.status() << format(instruction.get_function_call()) << messaget::eom;
-    }
-    break;
+  case ui_message_handlert::uit::XML_UI:
+  {
+    msg.status() << show_goto_instruction_xml(instruction);
   }
-
+  break;
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    msg.status() << show_goto_instruction_json(instruction);
+  }
+  break;
+  case ui_message_handlert::uit::PLAIN:
+  {
+    msg.status() << messaget::faint << "\n"
+                 << instruction.code.source_location().as_string()
+                 << messaget::reset << messaget::eom;
+    msg.status() << format(instruction.get_function_call()) << messaget::eom;
+  }
+  break;
+  }
 }
 
-size_t goto_functiont::get_memop_calls(
-  ui_message_handlert &ui_message_handler) const
+size_t
+goto_functiont::get_memop_calls(ui_message_handlert &ui_message_handler) const
 {
   size_t memop_count = 0;
   for(const auto &instruction : body.instructions)
