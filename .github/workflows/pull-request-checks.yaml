@@ -39,6 +39,31 @@ jobs:
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test
+  check-ubuntu-20_04-cmake-gcc:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get install -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils cpanminus
+          cpanm Thread::Pool::Simple
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+      - name: Build with Ninja
+        run: cd build; ninja
+      - name: Run tests
+        run: cd build; ctest . -V -L CORE
+        env:
+          TESTPL_JOBS: 2
 
   check-macos-10_15-make-clang:
     runs-on: macos-10.15
