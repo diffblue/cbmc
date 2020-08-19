@@ -271,6 +271,13 @@ int goto_diff_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
+  if(cmdline.isset("list-memop-calls"))
+  {
+    show_memop_calls(goto_model1.goto_functions, ui_message_handler);
+    show_memop_calls(goto_model2.goto_functions, ui_message_handler);
+    return CPROVER_EXIT_SUCCESS;
+  }
+
   if(cmdline.isset("change-impact") ||
      cmdline.isset("forward-impact") ||
      cmdline.isset("backward-impact"))

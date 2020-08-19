@@ -666,6 +666,12 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
+    if(cmdline.isset("list-memop-calls"))
+    {
+      show_memop_calls(goto_model.goto_functions, ui_message_handler);
+      return CPROVER_EXIT_SUCCESS;
+    }
+
     if(cmdline.isset("list-undefined-functions"))
     {
       list_undefined_functions(goto_model, std::cout);

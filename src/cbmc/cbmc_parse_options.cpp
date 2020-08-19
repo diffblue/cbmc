@@ -824,6 +824,12 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_SUCCESS;
   }
 
+  if(cmdline.isset("list-memop-calls"))
+  {
+    show_memop_calls(goto_model.goto_functions, ui_message_handler);
+    return CPROVER_EXIT_SUCCESS;
+  }
+
   log.status() << config.object_bits_info() << messaget::eom;
 
   return -1; // no error, continue
