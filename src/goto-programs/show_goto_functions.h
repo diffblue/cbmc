@@ -21,11 +21,13 @@ class goto_functionst;
 // clang-format off
 #define OPT_SHOW_GOTO_FUNCTIONS \
   "(show-goto-functions)" \
-  "(list-goto-functions)"
+  "(list-goto-functions)" \
+  "(list-memop-calls)"
 
 #define HELP_SHOW_GOTO_FUNCTIONS \
   " --show-goto-functions        show loaded goto program\n" \
-  " --list-goto-functions        list loaded goto functions\n"
+  " --list-goto-functions        list loaded goto functions\n" \
+  " --list-memop-calls           list all calls to memop\n"
 // clang-format on
 
 void show_goto_functions(
@@ -38,5 +40,9 @@ void show_goto_functions(
   const goto_modelt &,
   ui_message_handlert &ui_message_handler,
   bool list_only);
+
+void show_memop_calls(
+  const goto_functionst &goto_functions,
+  ui_message_handlert &ui_message_handler);
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_H

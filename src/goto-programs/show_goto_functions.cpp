@@ -89,3 +89,40 @@ void show_goto_functions(
   show_goto_functions(
     ns, ui_message_handler, goto_model.goto_functions, list_only);
 }
+
+void show_memop_calls(
+  const goto_functionst &goto_functions,
+  ui_message_handlert &ui_message_handler
+  )
+{
+  messaget msg(ui_message_handler);
+
+  const auto sorted = goto_functions.sorted();
+  static size_t memop_count = 0;
+
+  for(const auto &fun : sorted)
+    memop_count += fun->second.get_memop_calls(ui_message_handler);
+
+  ui_message_handlert::uit ui = ui_message_handler.get_ui();
+  switch(ui)
+  {
+    case ui_message_handlert::uit::XML_UI:
+    {
+      xmlt xml_memop_count{"memop_count"};
+      xml_memop_count.set_attribute("count", memop_count);
+
+      msg.status() << xml_memop_count;
+    }
+    break;
+    case ui_message_handlert::uit::JSON_UI:
+    {
+      json_objectt json_memop_count{
+        {"memOpCount", json_numbert(std::to_string(memop_count))}
+      };
+      msg.status() << json_memop_count;
+    }
+    break;
+    case ui_message_handlert::uit::PLAIN:
+      msg.status() << "\nMemop Count: " << memop_count << messaget::eom;;
+  }
+}
