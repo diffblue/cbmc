@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 
-#include "mp_arith.h"
+#include "cprover_prefix.h"
 #include "format_spec.h"
 #include "irep.h"
-#include "cprover_prefix.h"
+#include "mp_arith.h"
+#include "optional.h"
 
 class constant_exprt;
 class floatbv_typet;
@@ -271,8 +272,8 @@ public:
     return format(format_spect());
   }
 
-  std::string to_string_decimal(std::size_t precision) const;
-  std::string to_string_scientific(std::size_t precision) const;
+  std::string to_string_decimal(optionalt<std::size_t> precision = {}) const;
+  std::string to_string_scientific(optionalt<std::size_t> precision = {}) const;
   std::string format(const format_spect &format_spec) const;
 
   // expressions

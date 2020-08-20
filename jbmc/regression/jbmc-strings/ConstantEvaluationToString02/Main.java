@@ -6,5 +6,6 @@ public class Main {
     assert Long.toString(0xffL, 16).equals("ff");
     assert Byte.toString((byte)7).equals("7");
     assert Short.toString((short)7).equals("7");
+    assert Float.toString(1.25F).equals("1.25");
   }
 }

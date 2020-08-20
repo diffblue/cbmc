@@ -131,7 +131,8 @@ mp_integer ieee_floatt::base10_digits(const mp_integer &src)
   return result;
 }
 
-std::string ieee_floatt::to_string_decimal(std::size_t precision) const
+std::string
+ieee_floatt::to_string_decimal(optionalt<std::size_t> precision) const
 {
   std::string result;
 
@@ -151,10 +152,10 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
     result+='0';
 
     // add zeros, if needed
-    if(precision>0)
+    if(precision && *precision > 0)
     {
       result+='.';
-      for(std::size_t i=0; i<precision; i++)
+      for(std::size_t i = 0; i < *precision; i++)
         result+='0';
     }
   }
@@ -169,10 +170,10 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
       result+=integer2string(_fraction*power(2, _exponent));
 
       // add dot and zeros, if needed
-      if(precision>0)
+      if(precision && *precision > 0)
       {
         result+='.';
-        for(std::size_t i=0; i<precision; i++)
+        for(std::size_t i = 0; i < *precision; i++)
           result+='0';
       }
     }
@@ -185,15 +186,15 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
       _fraction*=power(5, position);
 
       // apply rounding
-      if(position>precision)
+      if(precision && position > *precision)
       {
-        mp_integer r=power(10, position-precision);
+        mp_integer r = power(10, position - *precision);
         mp_integer remainder=_fraction%r;
         _fraction/=r;
         // not sure if this is the right kind of rounding here
         if(remainder>=r/2)
           ++_fraction;
-        position=precision;
+        position = *precision;
       }
 
       std::string tmp=integer2string(_fraction);
@@ -207,16 +208,19 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
       result+=std::string(tmp, dot, std::string::npos);
 
       // append zeros if needed
-      for(mp_integer i=position; i<precision; ++i)
-        result+='0';
-      #else
+      if(precision)
+      {
+        for(mp_integer i = position; i < *precision; ++i)
+          result += '0';
+      }
+#else
 
       result+=integer2string(_fraction);
 
       if(_exponent!=0)
         result+="*2^"+integer2string(_exponent);
 
-      #endif
+#endif
     }
   }
 
@@ -225,7 +229,8 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
 
 /// format as [-]d.ddde+-d Note that printf always produces at least two digits
 /// for the exponent.
-std::string ieee_floatt::to_string_scientific(std::size_t precision) const
+std::string
+ieee_floatt::to_string_scientific(optionalt<std::size_t> precision) const
 {
   std::string result;
 
@@ -245,10 +250,10 @@ std::string ieee_floatt::to_string_scientific(std::size_t precision) const
     result+='0';
 
     // add zeros, if needed
-    if(precision>0)
+    if(precision && *precision > 0)
     {
       result+='.';
-      for(std::size_t i=0; i<precision; i++)
+      for(std::size_t i = 0; i < *precision; i++)
         result+='0';
     }
 
@@ -261,10 +266,10 @@ std::string ieee_floatt::to_string_scientific(std::size_t precision) const
 
     // C99 appears to say that conversion to decimal should
     // use the currently selected IEEE rounding mode.
-    if(base10_digits(_fraction)>precision+1)
+    if(precision && base10_digits(_fraction) > *precision + 1)
     {
       // re-align
-      mp_integer distance=base10_digits(_fraction)-(precision+1);
+      mp_integer distance = base10_digits(_fraction) - (*precision + 1);
       mp_integer p=power(10, distance);
       mp_integer remainder=_fraction%p;
       _fraction/=p;
@@ -287,14 +292,19 @@ std::string ieee_floatt::to_string_scientific(std::size_t precision) const
     result+=decimals[0];
 
     // Now add dot and further zeros, if needed.
-    if(precision>0)
+    if(!precision)
+    {
+      result += '.';
+      result += decimals.substr(1);
+    }
+    else if(*precision > 0)
     {
       result+='.';
 
-      while(decimals.size()<precision+1)
+      while(decimals.size() < *precision + 1)
         decimals+='0';
 
-      result+=decimals.substr(1, precision);
+      result += decimals.substr(1, *precision);
     }
 
     // add exponent

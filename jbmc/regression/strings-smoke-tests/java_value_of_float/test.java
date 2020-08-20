@@ -1,11 +1,15 @@
 public class test
 {
-    public static void check(int i)
-    {
-        String s = String.valueOf(123.456f);
-        if(i == 1)
-            assert(s.equals("123.456"));
-        else
-            assert(!s.equals("123.456"));
+  public static void check(int i, boolean b) {
+    String s = "";
+
+    if (b) {
+      s = String.valueOf(123.456);
     }
+
+    if (i == 1)
+      assert (!b || s.equals("123.456"));
+    else
+      assert (!b || !s.equals("123.456"));
+  }
 }
