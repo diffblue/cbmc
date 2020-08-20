@@ -144,3 +144,23 @@ jobs:
           BASE_BRANCH: ${{ github.base_ref }}
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-clang-format.sh
+
+  check-cpplint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          pip install unidiff
+      - name: Check updated lines of code meet linting standards
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          MERGE_BRANCH: ${{ github.ref }}
+        run: ./.github/workflows/pull-request-check-cpplint.sh
