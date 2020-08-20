@@ -23,22 +23,6 @@ Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #include <string>
 #include <thread>
 
-class missing_configurationt : public cprover_exception_baset
-{
-public:
-  missing_configurationt(std::string message) : _message(std::move(message))
-  {
-  }
-
-  std::string what() const override
-  {
-    return _message;
-  }
-
-protected:
-  std::string _message;
-};
-
 external_satt::external_satt(message_handlert &message_handler, std::string cmd)
   : cnf_clause_list_assignmentt(message_handler), _cmd(std::move(cmd))
 {
@@ -134,7 +118,7 @@ external_satt::parse_result(std::string solver_output)
         try
         {
           signed long long as_long = std::stol(assignment_string);
-          auto index = std::labs(as_long);
+          size_t index = std::labs(as_long);
 
           if(index >= number_of_variables)
           {
@@ -161,7 +145,7 @@ external_satt::parse_result(std::string solver_output)
   if(result == resultt::P_SATISFIABLE)
   {
     // We don't need to check zero
-    for(auto index = 1; index < no_variables(); index++)
+    for(size_t index = 1; index < no_variables(); index++)
     {
       if(!assigned_variables[index])
       {
