@@ -37,8 +37,9 @@ public:
   boolbvt(
     const namespacet &_ns,
     propt &_prop,
-    message_handlert &message_handler)
-    : arrayst(_ns, _prop, message_handler),
+    message_handlert &message_handler,
+    bool get_array_constraints = false)
+    : arrayst(_ns, _prop, message_handler, get_array_constraints),
       unbounded_array(unbounded_arrayt::U_NONE),
       boolbv_width(_ns),
       bv_utils(_prop),
