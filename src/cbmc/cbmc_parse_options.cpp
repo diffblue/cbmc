@@ -1116,7 +1116,7 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
-    " --sat-solver-invocation cmd  command to invoke SAT solver process (experimental)\n"
+    " --sat-solver-invocation cmd  command to invoke SAT solver process\n"
     HELP_STRING_REFINEMENT_CBMC
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)

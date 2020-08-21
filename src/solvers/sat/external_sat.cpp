@@ -1,8 +1,7 @@
-/*******************************************************************\
-
-Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-\*******************************************************************/
+/// \file
+/// Allows call an external SAT solver to allow faster integration of 
+/// newer SAT solvers
+/// \author Francis Botero <fbbotero@amazon.com>
 
 #include "external_sat.h"
 
@@ -13,8 +12,6 @@ Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #include <util/string_utils.h>
 #include <util/tempfile.h>
 
-#include <json/json_parser.h>
-
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
@@ -24,7 +21,7 @@ Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #include <thread>
 
 external_satt::external_satt(message_handlert &message_handler, std::string cmd)
-  : cnf_clause_list_assignmentt(message_handler), _cmd(std::move(cmd))
+  : cnf_clause_list_assignmentt(message_handler), solver_cmd(std::move(cmd))
 {
 }
 
@@ -43,7 +40,7 @@ void external_satt::set_assignment(literalt, bool)
   UNIMPLEMENTED;
 }
 
-inline void external_satt::write_cnf_file(std::string cnf_file)
+void external_satt::write_cnf_file(std::string cnf_file)
 {
   log.status() << "Writing temporary CNF" << messaget::eom;
   std::ofstream out(cnf_file);
@@ -57,18 +54,17 @@ inline void external_satt::write_cnf_file(std::string cnf_file)
   out.close();
 }
 
-inline std::string external_satt::execute_solver(std::string cnf_file)
+std::string external_satt::execute_solver(std::string cnf_file)
 {
   log.status() << "Invoking SAT solver" << messaget::eom;
   std::ostringstream response_ostream;
-  auto cmd_result = run(_cmd, {"", cnf_file}, "", response_ostream, "");
+  auto cmd_result = run(solver_cmd, {"", cnf_file}, "", response_ostream, "");
 
   log.status() << "Solver returned code: " << cmd_result << messaget::eom;
   return response_ostream.str();
 }
 
-inline external_satt::resultt
-external_satt::parse_result(std::string solver_output)
+external_satt::resultt external_satt::parse_result(std::string solver_output)
 {
   std::istringstream response_istream(solver_output);
   std::string line;

@@ -1,14 +1,13 @@
-/*******************************************************************\
+/// \file
+/// Allows call an external SAT solver to allow faster integration of 
+/// newer SAT solvers
+/// \author Francis Botero <fbbotero@amazon.com>
 
-Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-\*******************************************************************/
-
-#ifndef CPROVER_SOLVERS_EXTERNAL_SAT_SAT_H
-#define CPROVER_SOLVERS_EXTERNAL_SAT_SAT_H
+#ifndef CPROVER_SOLVERS_SAT_EXTERNAL_SAT_H
+#define CPROVER_SOLVERS_SAT_EXTERNAL_SAT_H
 
 #include "cnf_clause_list.h"
-/// \brief Allows call an external SAT solver to allow faster integration of newer SAT solvers
 class external_satt : public cnf_clause_list_assignmentt
 {
 public:
@@ -31,7 +30,7 @@ public:
 
 protected:
   resultt do_prop_solve() override;
-  std::string _cmd;
+  std::string solver_cmd;
 
 private:
   inline void write_cnf_file(std::string);
@@ -39,4 +38,4 @@ private:
   inline resultt parse_result(std::string);
 };
 
-#endif // CPROVER_SOLVERS_EXTERNAL_SAT_SAT_H
+#endif // CPROVER_SOLVERS_SAT_EXTERNAL_SAT_H
