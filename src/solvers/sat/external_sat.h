@@ -3,7 +3,6 @@
 /// newer SAT solvers
 /// \author Francis Botero <fbbotero@amazon.com>
 
-
 #ifndef CPROVER_SOLVERS_SAT_EXTERNAL_SAT_H
 #define CPROVER_SOLVERS_SAT_EXTERNAL_SAT_H
 
