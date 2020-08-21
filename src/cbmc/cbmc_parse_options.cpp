@@ -123,6 +123,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("simplify-if", true);
   options.set_option("show-goto-symex-steps", false);
   options.set_option("show-points-to-sets", false);
+  options.set_option("show-array-constraints", false);
 
   // Other default
   options.set_option("arrays-uf", "auto");
@@ -347,6 +348,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("dimacs"))
     options.set_option("dimacs", true);
+
+  if(cmdline.isset("show-array-constraints"))
+    options.set_option("show-array-constraints", true);
 
   if(cmdline.isset("refine-arrays"))
   {
@@ -1155,6 +1159,7 @@ void cbmc_parse_optionst::help()
     HELP_TIMESTAMP
     " --write-solver-stats-to json-file\n"
     "                              collect the solver query complexity\n"
+    " --show-array-constraints     show array theory constraints added\n"
     "\n";
   // clang-format on
 }
