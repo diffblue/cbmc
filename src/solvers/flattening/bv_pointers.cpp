@@ -84,7 +84,8 @@ bv_pointerst::bv_pointerst(
   propt &_prop,
   message_handlert &message_handler,
   bool get_array_constraints)
-  : boolbvt(_ns, _prop, message_handler, get_array_constraints), pointer_logic(_ns)
+  : boolbvt(_ns, _prop, message_handler, get_array_constraints),
+    pointer_logic(_ns)
 {
   object_bits=config.bv_encoding.object_bits;
   std::size_t pointer_width = boolbv_width(pointer_type(empty_typet()));

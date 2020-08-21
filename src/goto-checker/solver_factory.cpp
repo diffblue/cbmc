@@ -219,9 +219,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     solver->set_prop(make_satcheck_prop<satcheckt>(message_handler, options));
   }
 
-  bool get_array_constraints = options.get_bool_option("show-array-constraints");
-  auto bv_pointers =
-    util_make_unique<bv_pointerst>(ns, solver->prop(), message_handler, get_array_constraints);
+  bool get_array_constraints =
+    options.get_bool_option("show-array-constraints");
+  auto bv_pointers = util_make_unique<bv_pointerst>(
+    ns, solver->prop(), message_handler, get_array_constraints);
 
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
