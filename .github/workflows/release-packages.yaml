@@ -1,0 +1,45 @@
+on:
+  release:
+    types: [created]
+
+name: Upload additional release assets
+jobs:
+  ubuntu-package:
+    runs-on: ubuntu-20.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: sudo apt install g++ flex bison cmake ninja-build maven jq xmllint dpkg-dev
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build using Ninja
+        run: |
+          cd build
+          ninja
+      - name: Run CTest
+        run: cd build; ctest -V .
+      - name: Create packages
+        id: create_packages
+        run: |
+          cd build
+          ninja package
+          deb_package_name="$(ls *.deb)"
+          echo "::set-output name=deb_package::./build/$deb_package_name"
+          echo "::set-output name=deb_package_name::$deb_package_name"
+      - name: Get release info
+        id: get_release_info
+        uses: bruceadams/get-release@v1.2.0
+      - name: Upload binary packages
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: ${{ steps.create_packages.outputs.deb_package }}
+          asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
+          asset_content_type: application/x-deb
