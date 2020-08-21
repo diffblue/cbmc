@@ -1,5 +1,5 @@
 /// \file
-/// Allows call an external SAT solver to allow faster integration of 
+/// Allows call an external SAT solver to allow faster integration of
 /// newer SAT solvers
 /// \author Francis Botero <fbbotero@amazon.com>
 

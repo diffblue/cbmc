@@ -1,5 +1,5 @@
 /// \file
-/// Allows call an external SAT solver to allow faster integration of 
+/// Allows calling an external SAT solver to allow faster integration of
 /// newer SAT solvers
 /// \author Francis Botero <fbbotero@amazon.com>
 
@@ -31,11 +31,9 @@ public:
 protected:
   resultt do_prop_solve() override;
   std::string solver_cmd;
-
-private:
-  inline void write_cnf_file(std::string);
-  inline std::string execute_solver(std::string);
-  inline resultt parse_result(std::string);
+  void write_cnf_file(std::string);
+  std::string execute_solver(std::string);
+  resultt parse_result(std::string);
 };
 
 #endif // CPROVER_SOLVERS_SAT_EXTERNAL_SAT_H

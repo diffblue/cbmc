@@ -132,7 +132,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
 {
   if(options.get_bool_option("dimacs"))
     return get_dimacs();
-  if(options.is_set("sat-solver-invocation"))
+  if(options.is_set("external-sat-solver"))
     return get_external_sat();
   if(
     options.get_bool_option("refine") &&
@@ -241,10 +241,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
   no_beautification();
   no_incremental_check();
 
-  std::string sat_solver_invocation =
-    options.get_option("sat-solver-invocation");
+  std::string external_sat_solver =
+    options.get_option("external-sat-solver");
   auto prop =
-    util_make_unique<external_satt>(message_handler, sat_solver_invocation);
+    util_make_unique<external_satt>(message_handler, external_sat_solver);
 
   auto bv_pointers = util_make_unique<bv_pointerst>(ns, *prop, message_handler);
 
