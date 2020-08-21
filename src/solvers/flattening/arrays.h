@@ -33,12 +33,15 @@ public:
   arrayst(
     const namespacet &_ns,
     propt &_prop,
-    message_handlert &message_handler);
+    message_handlert &message_handler,
+    bool get_array_constraints = false);
 
   void post_process() override
   {
     post_process_arrays();
     SUB::post_process();
+    if(get_array_constraints)
+      display_constraints();
   }
 
   // NOLINTNEXTLINE(readability/identifiers)
@@ -49,6 +52,8 @@ public:
 
 protected:
   const namespacet &ns;
+  messaget log;
+  message_handlert &message_handler;
 
   virtual void post_process_arrays()
   {
@@ -77,6 +82,27 @@ protected:
   typedef std::map<std::size_t, index_sett> index_mapt;
   index_mapt index_map;
 
+  enum class constraint_typet
+  {
+    ARRAY_ACKERMANN,
+    ARRAY_EQUALITY,
+    ARRAY_WITH,
+    ARRAY_WITH_OTHER,
+    ARRAY_IF_TRUE,
+    ARRAY_IF_FALSE,
+    ARRAY_OF,
+    ARRAY_TYPECAST,
+    ARRAY_CONSTANT,
+    ARRAY_NON_CONSTANT,
+    ARRAY_COMPREHENSION
+  };
+
+  typedef std::list<exprt> array_constraintst;
+  typedef std::map<constraint_typet, array_constraintst> array_constraints_mapt;
+  array_constraints_mapt array_constraints_map;
+  void display_constraints();
+  std::string enum_to_string(constraint_typet);
+
   // adds array constraints lazily
   enum class lazy_typet
   {
@@ -103,6 +129,7 @@ protected:
 
   bool lazy_arrays;
   bool incremental_cache;
+  bool get_array_constraints;
   std::list<lazy_constraintt> lazy_array_constraints;
   void add_array_constraint(const lazy_constraintt &lazy, bool refine = true);
   std::map<exprt, bool> expr_map;

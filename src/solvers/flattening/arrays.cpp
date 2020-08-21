@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/json_irep.h>
+#include <util/message.h>
+#include <util/ui_message.h>
 
 #include <solvers/prop/prop.h>
 
@@ -26,11 +29,14 @@ Author: Daniel Kroening, kroening@kroening.com
 arrayst::arrayst(
   const namespacet &_ns,
   propt &_prop,
-  message_handlert &message_handler)
-  : equalityt(_prop, message_handler), ns(_ns)
+  message_handlert &_message_handler,
+  bool _get_array_constraints)
+  : equalityt(_prop, _message_handler), ns(_ns), log(_message_handler),
+    message_handler(_message_handler)
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving
+  get_array_constraints = _get_array_constraints;
 }
 
 void arrayst::record_array_index(const index_exprt &index)
@@ -365,6 +371,8 @@ void arrayst::add_array_Ackermann_constraints()
             lazy_constraintt lazy(lazy_typet::ARRAY_ACKERMANN,
               implies_exprt(literal_exprt(indices_equal_lit), values_equal));
             add_array_constraint(lazy, true); // added lazily
+            array_constraints_map[
+              constraint_typet::ARRAY_ACKERMANN].push_back(lazy.lazy);
 
 #if 0 // old code for adding, not significantly faster
             prop.lcnf(!indices_equal_lit, convert(values_equal));
@@ -451,6 +459,8 @@ void arrayst::add_array_constraints_equality(
     // equality constraints are not added lazily
     // convert must be done to guarantee correct update of the index_set
     prop.lcnf(!array_equality.l, convert(equality_expr));
+    array_constraints_map[
+      constraint_typet::ARRAY_EQUALITY].push_back(equality_expr);
   }
 }
 
@@ -511,6 +521,8 @@ void arrayst::add_array_constraints(
       lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
         equal_exprt(index_expr1, index_expr2));
       add_array_constraint(lazy, false); // added immediately
+      array_constraints_map[
+        constraint_typet::ARRAY_TYPECAST].push_back(lazy.lazy);
     }
   }
   else if(expr.id()==ID_index)
@@ -549,6 +561,8 @@ void arrayst::add_array_constraints_with(
     lazy_constraintt lazy(
       lazy_typet::ARRAY_WITH, equal_exprt(index_expr, value));
     add_array_constraint(lazy, false); // added immediately
+    array_constraints_map[
+      constraint_typet::ARRAY_WITH].push_back(lazy.lazy);
 
     updated_indices.insert(index);
   }
@@ -582,7 +596,10 @@ void arrayst::add_array_constraints_with(
         // add constraint
         lazy_constraintt lazy(lazy_typet::ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
+
         add_array_constraint(lazy, false); // added immediately
+        array_constraints_map[
+          constraint_typet::ARRAY_WITH_OTHER].push_back(lazy.lazy);
 
 #if 0 // old code for adding, not significantly faster
         {
@@ -678,6 +695,8 @@ void arrayst::add_array_constraints_array_of(
     lazy_constraintt lazy(
       lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.what()));
     add_array_constraint(lazy, false); // added immediately
+    array_constraints_map[
+      constraint_typet::ARRAY_OF].push_back(lazy.lazy);
   }
 }
 
@@ -713,6 +732,8 @@ void arrayst::add_array_constraints_array_constant(
       lazy_constraintt lazy{lazy_typet::ARRAY_CONSTANT,
                             equal_exprt{index_expr, v}};
       add_array_constraint(lazy, false); // added immediately
+      array_constraints_map[
+        constraint_typet::ARRAY_CONSTANT].push_back(lazy.lazy);
     }
     else
     {
@@ -755,6 +776,8 @@ void arrayst::add_array_constraints_array_constant(
           implies_exprt{index_constraint,
                         equal_exprt{index_expr, operands[range.first]}}};
         add_array_constraint(lazy, true); // added lazily
+        array_constraints_map[
+          constraint_typet::ARRAY_NON_CONSTANT].push_back(lazy.lazy);
       }
     }
   }
@@ -778,7 +801,10 @@ void arrayst::add_array_constraints_comprehension(
     lazy_constraintt lazy(
       lazy_typet::ARRAY_COMPREHENSION,
       equal_exprt(index_expr, comprehension_body));
+
     add_array_constraint(lazy, false); // added immediately
+    array_constraints_map[
+      constraint_typet::ARRAY_COMPREHENSION].push_back(lazy.lazy);
   }
 }
 
@@ -806,6 +832,8 @@ void arrayst::add_array_constraints_if(
                             or_exprt(literal_exprt(!cond_lit),
                               equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); // added immediately
+    array_constraints_map[
+      constraint_typet::ARRAY_IF_TRUE].push_back(lazy.lazy);
 
 #if 0 // old code for adding, not significantly faster
     prop.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
@@ -825,9 +853,75 @@ void arrayst::add_array_constraints_if(
       or_exprt(literal_exprt(cond_lit),
       equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); // added immediately
+    array_constraints_map[
+      constraint_typet::ARRAY_IF_FALSE].push_back(lazy.lazy);
 
 #if 0 // old code for adding, not significantly faster
     prop.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
 #endif
   }
+}
+
+std::string arrayst::enum_to_string(constraint_typet type)
+{
+  switch(type)
+  {
+    case constraint_typet::ARRAY_ACKERMANN:
+      return "arrayAckermann";
+    case constraint_typet::ARRAY_EQUALITY:
+      return "arrayEquality";
+    case constraint_typet::ARRAY_WITH:
+      return "arrayWith";
+    case constraint_typet::ARRAY_WITH_OTHER:
+      return "arrayWithOther";
+    case constraint_typet::ARRAY_IF_TRUE:
+      return "arrayIfTrue";
+    case constraint_typet::ARRAY_IF_FALSE:
+      return "arrayIfFalse";
+    case constraint_typet::ARRAY_OF:
+      return "arrayOf";
+    case constraint_typet::ARRAY_TYPECAST:
+      return "arrayTypecast";
+    case constraint_typet::ARRAY_CONSTANT:
+      return "arrayConstant";
+    case constraint_typet::ARRAY_NON_CONSTANT:
+      return "arrayNonConstant";
+    case constraint_typet::ARRAY_COMPREHENSION:
+      return "arrayComprehension";
+    default:
+      UNREACHABLE;
+  }
+}
+
+void arrayst::display_constraints()
+{
+  json_objectt json_result;
+  json_objectt &json_array_theory =
+    json_result["arrayConstraints"].make_object();
+
+  size_t num_constraints = 0;
+
+  array_constraints_mapt::iterator it = array_constraints_map.begin();
+  while(it != array_constraints_map.end())
+  {
+    std::string contraint_type_string = enum_to_string(it->first);
+    json_arrayt &json_constraint_list =
+      json_array_theory[contraint_type_string].make_array();
+
+    array_constraintst::iterator constraint_it = it->second.begin();
+    while(constraint_it != it->second.end())
+    {
+      std::stringstream ss;
+      ss << format(*constraint_it);
+      json_constraint_list.push_back(json_stringt(ss.str()));
+
+      constraint_it++;
+      num_constraints++;
+    }
+    it++;
+  }
+
+  json_result["numOfConstraints"] =
+    json_numbert(std::to_string(num_constraints));
+  log.status() << ",\n" << json_result;
 }
