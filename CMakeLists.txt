@@ -32,6 +32,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR
    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
@@ -39,8 +40,18 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
     #   Ensure NDEBUG is not set for release builds
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
-    #   Enable lots of warnings
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wswitch-enum")
+
+    option(CPROVER_VERBOSE_WARNINGS OFF "enable additional warnings and do not treat warnings as errors")
+    if(NOT CPROVER_VERBOSE_WARNINGS)
+      #   Enable lots of warnings
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wswitch-enum")
+    else()
+      # Enable even more warnings and do not treat warnings
+      # as errors so we can use them as suggestions.
+      # The ‘default’ set of warnings for example doesn’t contain deprecation warnings,
+      # which are disabled because they would break a -Werror build
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Wextra -Wswitch-enum")
+    endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # This would be the place to enable warnings for Windows builds, although
     # config.inc doesn't seem to do that currently
