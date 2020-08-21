@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-def diff_to_added_lines(diff_file, repository_root, out_stream):
+def diff_to_added_lines(diff_file, repository_root):
 
   try:
     import unidiff
@@ -11,7 +11,6 @@ def diff_to_added_lines(diff_file, repository_root, out_stream):
     sys.exit(1)
 
   import os.path
-  import json
 
   # Create a set of all the files and the specific lines within that file that are in the diff
   added_lines = dict()
@@ -33,7 +32,7 @@ def diff_to_added_lines(diff_file, repository_root, out_stream):
             added_lines[filename] = []
           added_lines[filename].append(diff_line.target_line_no)
 
-  json.dump(added_lines, out_stream)
+  return added_lines
 
 if __name__ == "__main__":
 
@@ -45,7 +44,9 @@ if __name__ == "__main__":
 
     sys.exit(1)
 
-  diff_to_added_lines(sys.argv[1], sys.argv[2], sys.stdout)
+  diff_file = sys.argv[1]
+  repository_root = sys.argv[2]
 
-diff_file = sys.argv[1]
-repository_root = sys.argv[2]
+  added_lines = diff_to_added_lines(diff_file, repository_root)
+  import json
+  json.dump(added_lines, sys.stdout)
