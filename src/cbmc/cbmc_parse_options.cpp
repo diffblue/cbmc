@@ -581,6 +581,17 @@ int cbmc_parse_optionst::doit()
     }
   }
 
+  if(cmdline.isset("show-array-constraints"))
+  {
+    if(!cmdline.isset("json-ui") || cmdline.isset("xml-ui"))
+    {
+      log.error() << "--show-array-constraints supports only"
+                     " json output. Use --json-ui."
+                  << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
+  }
+
   register_languages();
 
   // configure gcc, if required
@@ -1160,6 +1171,8 @@ void cbmc_parse_optionst::help()
     " --write-solver-stats-to json-file\n"
     "                              collect the solver query complexity\n"
     " --show-array-constraints     show array theory constraints added\n"
+    "                              during post processing.\n"
+    "                              Requires --json-ui.\n"
     "\n";
   // clang-format on
 }
