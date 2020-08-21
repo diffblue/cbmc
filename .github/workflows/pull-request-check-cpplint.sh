@@ -21,5 +21,4 @@ MERGE_BASE=$(git merge-base ${BASE_BRANCH} ${MERGE_BRANCH})
 echo "Checking standards of code touched since $MERGE_BASE"
 
 # Do the checking.
-script_folder='./scripts'
-$script_folder/run_diff.sh CPPLINT $MERGE_BASE
+./scripts/run_diff.sh CPPLINT $MERGE_BASE
