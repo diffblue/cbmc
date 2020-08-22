@@ -1,0 +1,11 @@
+#!/bin/bash
+
+HEAD_SHA
+cat <<EOF
+{
+  "name": "$CHECK_NAME",
+  "head_sha": "$HEAD_SHA",
+  "conclusion": "neutral",
+  "annotations": $ANNOTATIONS
+}
+EOF
