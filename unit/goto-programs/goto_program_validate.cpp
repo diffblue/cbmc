@@ -194,7 +194,9 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       goto_convert(goto_model, null_message_handler);
 
       goto_programt::instructiont instruction;
-      instruction.make_return();
+      // this should flag about a deprecation warning
+      instruction.make_return(); //
+      //
 
       auto &function_map = goto_model.goto_functions.function_map;
       auto it = function_map.find("g");

@@ -157,7 +157,7 @@ class analysis_exceptiont : public cprover_exception_baset
 {
 public:
   explicit analysis_exceptiont(std::string reason);
-  std::string what() const override;
+  virtual std::string what() const;
 
 private:
   /// The reason this exception was generated.
