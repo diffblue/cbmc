@@ -1,0 +1,5 @@
+#!/bin/bash
+
+filename="$(realpath "${@:$#}")"
+yaml_filename="$(realpath "$filename" | tr / _).yaml"
+clang-tidy "${@:1:$#-1}" --export-fixes "$yaml_filename" "$filename"

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+set -x
+
+script_dir="$(dirname "$(realpath "$0")")"
+source_dir="$(realpath "$script_dir/..")"
+
+CI_BUILD_DIR="$(realpath clang-tidy-ci-build)"
+mkdir $CI_BUILD_DIR
+cd $CI_BUILD_DIR
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=Yes -DCPROVER_VERBOSE_WARNINGS=Yes "$source_dir"
+
+mkdir clang_tidy_fixes
+cd clang_tidy_fixes
+cpp_extension_pattern='h\|hh\|hpp\|cpp\|cc\|cxx'
+
+# for each C++ source file that changed run clang-tidy and write anything
+# it writes into a (unique) yaml file in the fixes directory
+git -C "$source_dir" diff --name-only "$BASE_BRANCH" "$MERGE_BRANCH" \
+  | sed "s|^|$source_dir/|" \
+  | tee '/tmp/changed_sources.txt' \
+  | grep "^.*\.\($cpp_extension_pattern\)$" \
+  | parallel "$script_dir/ci_run_clang_tidy" -p ../compile_commands.json
+
+echo "<< CHANGED SOURCES"
+cat /tmp/changed_sources.txt
+echo ">> CHANGED SOURCES"
+
+"$script_dir/clang_tidy_fixes_to_github_annotations.py" \
+  --git-base-ref "$BASE_BRANCH" \
+  --git-changes-ref "$MERGE_BRANCH" \
+  --fixes-directory "$(realpath "$(pwd)")" \
+  --source-base-directory "$source_dir" \
+  > "$CI_BUILD_DIR/github_annotations.json"
+
+# This is used in the corresponding github action in .github/workflows/pull-request-linting.yaml
+echo "::set-output name=annotations::$(cat $CI_BUILD_DIR/github_annotations.json)"

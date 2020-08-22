@@ -1,0 +1,39 @@
+name: pull-request-linting
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Check out branches so they’re local
+        run: |
+          git checkout -b ${{ github.ref }}
+          git checkout ${{ github.base_ref }}
+          git checkout ${{ github.ref }}
+
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTENT: noninteractive
+        run: |
+          sudo apt-get install -yq clang-tidy cmake python3 python3-pip parallel
+          pip3 install --user PyYaml unidiff
+      - name: Run clang-tidy linter
+        id: linter
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          MERGE_BRANCH: ${{ github.ref }}
+        run: scripts/ci_get_clang_tidy_annotations
+      - name: Push annotations
+        uses: LouisBrunner/checks-action@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Clang-Tidy linting
+          output: '{"summary": "I have to put something here"}'
+          conclusion: neutral
+          annotations: ${{ steps.linter.outputs.annotations }}
