@@ -632,8 +632,10 @@ private:
 variable_sensitivity_dependence_grapht::variable_sensitivity_dependence_grapht(
   const goto_functionst &goto_functions,
   const namespacet &_ns)
-  : ait<variable_sensitivity_dependence_domaint>(
-      util_make_unique<variable_sensitivity_dependence_domain_factoryt>(*this)),
+  : ai_three_way_merget(
+      util_make_unique<ai_history_factory_default_constructort<ahistoricalt>>(),
+      util_make_unique<variable_sensitivity_dependence_domain_factoryt>(*this),
+      util_make_unique<location_sensitive_storaget>()),
     goto_functions(goto_functions),
     ns(_ns)
 {

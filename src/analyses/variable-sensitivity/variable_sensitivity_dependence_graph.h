@@ -8,6 +8,7 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DEPENDENCE_GRAPH_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DEPENDENCE_GRAPH_H
 
+#include "three_way_merge_abstract_interpreter.h"
 #include "variable_sensitivity_domain.h"
 
 #include <analyses/cfg_dominators.h>
@@ -204,12 +205,24 @@ private:
 
 class variable_sensitivity_dependence_domain_factoryt;
 
-class variable_sensitivity_dependence_grapht
-  : public ait<variable_sensitivity_dependence_domaint>,
-    public grapht<vs_dep_nodet>
+class variable_sensitivity_dependence_grapht : public ai_three_way_merget,
+                                               public grapht<vs_dep_nodet>
 {
+protected:
+  // Legacy-style mutable access to the storage
+  virtual statet &get_state(locationt l)
+  {
+    auto &s = dynamic_cast<location_sensitive_storaget &>(*storage);
+    return s.get_state(l, *domain_factory);
+  }
+
+  variable_sensitivity_dependence_domaint &operator[](locationt l)
+  {
+    return dynamic_cast<variable_sensitivity_dependence_domaint &>(
+      get_state(l));
+  }
+
 public:
-  using ait<variable_sensitivity_dependence_domaint>::operator[];
   using grapht<vs_dep_nodet>::operator[];
 
   friend class variable_sensitivity_dependence_domaint;
@@ -223,8 +236,7 @@ public:
   void
   initialize(const irep_idt &function_id, const goto_programt &goto_program)
   {
-    ait<variable_sensitivity_dependence_domaint>::initialize(
-      function_id, goto_program);
+    ai_recursive_interproceduralt::initialize(function_id, goto_program);
   }
 
   void finalize()
