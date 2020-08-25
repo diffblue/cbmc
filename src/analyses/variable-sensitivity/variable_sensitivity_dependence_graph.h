@@ -209,6 +209,8 @@ class variable_sensitivity_dependence_grapht : public ai_three_way_merget,
                                                public grapht<vs_dep_nodet>
 {
 protected:
+  using ai_baset::get_state;
+
   // Legacy-style mutable access to the storage
   virtual statet &get_state(locationt l)
   {
