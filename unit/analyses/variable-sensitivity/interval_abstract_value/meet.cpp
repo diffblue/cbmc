@@ -28,7 +28,7 @@ SCENARIO(
 
     const auto varx = symbol_exprt(type);
     const auto x_le_10 = binary_relation_exprt(varx, ID_le, val10);
-    const auto lt_10_x = binary_relation_exprt(val10, ID_le, varx);
+    const auto lt_10_x = binary_relation_exprt(val10, ID_lt, varx);
 
     const exprt val2 = from_integer(2, type);
     const exprt val15 = from_integer(15, type);
