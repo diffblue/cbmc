@@ -57,10 +57,10 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "cbmc")
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(CPACK_GENERATOR TGZ DEB)
 elseif(WIN32)
-
-  # On windows we need to make sure to ship the
-  # MSVC redistributable
-  include(InstallRequiredSystemLibraries)
+  # Note: We don't ship VC redistributables with
+  # the windows installer; We assume these are likely
+  # already present on a developer machine, and if not
+  # can easily be installed separately via vcredist.exe
   set(CPACK_GENERATOR ZIP WIX)
 endif()
 

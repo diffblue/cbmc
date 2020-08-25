@@ -170,6 +170,40 @@ jobs:
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-cpplint.sh
 
+  # I just added this to check if my stuff is working on github actions
+  windows-msi-package:
+    runs-on: windows-2019
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: |
+          choco install winflexbison3
+      - uses: microsoft/setup-msbuild@v1.0.1
+      - name: Configure with cmake
+        run: |
+          New-Item -ItemType Directory -Path build
+          Set-Location build
+          cmake ..
+      - name: Build Release
+        run: |
+          Set-Location build
+          cmake --build . --config Release
+      - name: Create packages
+        id: create_packages
+        # We need to get the path to cpack because fascinatingly,
+        # chocolatey also includes a command called "cpack" which takes precedence
+        run: |
+          Set-Location build
+          $cpack = "$(Split-Path -Parent (Get-Command cmake).Source)\cpack.exe"
+          & $cpack . -C Release
+          $msi_name = (Get-ChildItem -name *.msi).Name
+          Write-Output "::set-output name=msi_installer::build/$msi_name"
+          Write-Output "::set-output name=msi_name::$msi_name"
+
   check-string-table:
     runs-on: ubuntu-20.04
     steps:

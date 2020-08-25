@@ -30,6 +30,19 @@ Get the [latest release](https://github.com/diffblue/cbmc/releases)
 Get the current *develop* version: `git clone https://github.com/diffblue/cbmc.git`
 * Develop versions are not recommended for production use.
 
+Installing
+==========
+
+### Windows
+
+For windows you can install cbmc binaries via the .msi's found on the
+[releases](https://github.com/diffblue/cbmc/releases) page.
+
+Note that we depend on the Visual C++ redistributables. You likely
+already have these, if not please download and run vcredist.x64.exe from
+[Microsoft](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) to install them prior to running
+cbmc.
+
 Report bugs
 ===========
 
