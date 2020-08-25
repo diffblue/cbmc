@@ -110,16 +110,18 @@ SCENARIO(
     struct_type.components().push_back(comp_b);
     struct_type.components().push_back(comp_c);
 
-    struct_exprt val1(struct_type);
-    val1.operands().push_back(from_integer(1, integer_typet()));
-    val1.operands().push_back(from_integer(2, integer_typet()));
-    val1.operands().push_back(from_integer(3, integer_typet()));
+    exprt::operandst val1_op;
+    val1_op.push_back(from_integer(1, integer_typet()));
+    val1_op.push_back(from_integer(2, integer_typet()));
+    val1_op.push_back(from_integer(3, integer_typet()));
+    struct_exprt val1(val1_op, struct_type);
 
     // struct val1 = {.a = 1, .b = 4, .c = 5}
-    struct_exprt val2(struct_type);
-    val2.operands().push_back(from_integer(1, integer_typet()));
-    val2.operands().push_back(from_integer(4, integer_typet()));
-    val2.operands().push_back(from_integer(5, integer_typet()));
+    exprt::operandst val2_op;
+    val2_op.push_back(from_integer(1, integer_typet()));
+    val2_op.push_back(from_integer(4, integer_typet()));
+    val2_op.push_back(from_integer(5, integer_typet()));
+    struct_exprt val2(val2_op, struct_type);
 
     // index_exprt for reading from an array
     const member_exprt a(nil_exprt(), "a", integer_typet());

@@ -80,16 +80,18 @@ SCENARIO(
       integer_typet(), from_integer(3, integer_typet()));
 
     // int val1[3] = {1, 2, 3}
-    exprt val1 = array_exprt(array_type);
-    val1.operands().push_back(from_integer(1, integer_typet()));
-    val1.operands().push_back(from_integer(2, integer_typet()));
-    val1.operands().push_back(from_integer(3, integer_typet()));
+    exprt::operandst val1_op;
+    val1_op.push_back(from_integer(1, integer_typet()));
+    val1_op.push_back(from_integer(2, integer_typet()));
+    val1_op.push_back(from_integer(3, integer_typet()));
+    exprt val1 = array_exprt(val1_op, array_type);
 
     // int val2[3] = {1, 4, 5}
-    exprt val2 = array_exprt(array_type);
-    val2.operands().push_back(from_integer(1, integer_typet()));
-    val2.operands().push_back(from_integer(4, integer_typet()));
-    val2.operands().push_back(from_integer(5, integer_typet()));
+    exprt::operandst val2_op;
+    val2_op.push_back(from_integer(1, integer_typet()));
+    val2_op.push_back(from_integer(4, integer_typet()));
+    val2_op.push_back(from_integer(5, integer_typet()));
+    exprt val2 = array_exprt(val2_op, array_type);
 
     // index_exprt for reading from an array
     const index_exprt i0 =
@@ -131,9 +133,9 @@ SCENARIO(
         REQUIRE_FALSE(modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0) == val1.op0());
-        REQUIRE(util.read_index(cast_result, i1) == val1.op1());
-        REQUIRE(util.read_index(cast_result, i2) == val1.op2());
+        REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
+        REQUIRE(util.read_index(cast_result, i1) == val1.operands()[1]);
+        REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
         REQUIRE(result == op1);
@@ -161,7 +163,7 @@ SCENARIO(
         REQUIRE(modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0) == val1.op0());
+        REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
         REQUIRE(util.read_index(cast_result, i1) == nil_exprt());
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
@@ -219,9 +221,9 @@ SCENARIO(
         REQUIRE_FALSE(modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0) == val1.op0());
-        REQUIRE(util.read_index(cast_result, i1) == val1.op1());
-        REQUIRE(util.read_index(cast_result, i2) == val1.op2());
+        REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
+        REQUIRE(util.read_index(cast_result, i1) == val1.operands()[1]);
+        REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
         REQUIRE(result == op1);
@@ -335,9 +337,9 @@ SCENARIO(
         REQUIRE(modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0) == val1.op0());
-        REQUIRE(util.read_index(cast_result, i1) == val1.op1());
-        REQUIRE(util.read_index(cast_result, i2) == val1.op2());
+        REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
+        REQUIRE(util.read_index(cast_result, i1) == val1.operands()[1]);
+        REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
         REQUIRE(result != op1);
@@ -452,9 +454,9 @@ SCENARIO(
         REQUIRE_FALSE(modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0) == val1.op0());
-        REQUIRE(util.read_index(cast_result, i1) == val1.op1());
-        REQUIRE(util.read_index(cast_result, i2) == val1.op2());
+        REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
+        REQUIRE(util.read_index(cast_result, i1) == val1.operands()[1]);
+        REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
         REQUIRE(result == op1);
