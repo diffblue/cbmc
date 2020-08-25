@@ -15,13 +15,16 @@ static symbolt simple_symbol(const irep_idt &identifier, const typet &type)
   return b1;
 }
 
-SCENARIO("eval", "[core]")
+SCENARIO(
+  "eval",
+  "[core][analyses][variable-sensitivity][interval_abstract_value]")
 {
   GIVEN("An environment with intervals domain")
   {
     variable_sensitivity_object_factoryt::instance().set_options(
       vsd_configt::intervals());
     abstract_environmentt environment;
+    environment.make_top(); // Domains are bottom on construction
 
     symbol_tablet symbol_table;
     namespacet ns{symbol_table};
