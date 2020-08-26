@@ -126,6 +126,16 @@ jobs:
       - name: Install bison and flex
         run: "${{env.SCRIPT_DIR}}\\install-bison.bat"
 
+      - name: Install z3
+        run: |
+          Invoke-WebRequest "https://github.com/Z3Prover/z3/releases/download/z3-4.8.8/z3-4.8.8-x64-win.zip" -OutFile z3.zip
+          Expand-Archive z3.zip
+          # We need Get-ChildItem.Name here because the path includes
+          # the z3 version number, which we expect to change.
+          $z3_path = "$(Get-Location)\z3\$((Get-ChildItem z3).Name)"
+          $env:PATH += ";$z3_path"
+          Write-Output "::set-env name=PATH::$env:PATH"
+
       - name: Build cbmc
         run: "${{env.SCRIPT_DIR}}\\build-cbmc.bat"
 
