@@ -12,7 +12,6 @@ void main()
 
   // TODO: Currently writing to an offset pointer sets the domain to top
   // so recreate the variables to reign the domain back in
-  // This will be addressed by diffblue/cbmc-toyota#118
   int new_array[] = {1, 2, 3, 4, 5};
   int *new_pointer = new_array;
 
