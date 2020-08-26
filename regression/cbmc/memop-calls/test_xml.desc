@@ -1,0 +1,14 @@
+CORE
+main.c
+--list-memop-calls --xml-ui
+^EXIT=0$
+^SIGNAL=0$
+<instruction>
+<function_call>__builtin___memcpy_chk(.*);
+</function_call>
+<location file="main.c" function="main" line="7".*>
+</instruction>
+<memop_count count="1"/>
+--
+--
+To test xml output for --list-memop-calls option that lists all memcpy, memset and memcmp calls.

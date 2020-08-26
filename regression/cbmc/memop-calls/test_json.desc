@@ -1,0 +1,10 @@
+CORE
+main.c
+--list-memop-calls --json-ui
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\{\n\s*"instruction": \{\n\s*"functionCall": "__builtin___memcpy_chk\(.*\);",\n\s*"sourceLocation": \{(\n.*)*\},\n\s*\{\n\s*"memOpCount": 1\n\s*\}
+--
+--
+To test json output for --list-memop-calls option that lists all memcpy, memset and memcmp calls.

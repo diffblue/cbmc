@@ -1,0 +1,11 @@
+CORE
+main.c
+--list-memop-calls
+^EXIT=0$
+^SIGNAL=0$
+^.*main\.c line 7 function main$
+^__builtin___memcpy_chk\(.*\);$
+^Memop Count: 1$
+--
+--
+To test output for --list-memop-calls option that lists all memcpy, memset and memcmp calls.
