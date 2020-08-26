@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^Runtime Symex:.*$
+^Runtime Convert SSA:.*$
+^Runtime Post-process:.*$
+^Runtime Solver:.*$
+--
+--
+To test runtime profiling output.
