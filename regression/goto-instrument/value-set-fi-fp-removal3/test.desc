@@ -1,0 +1,13 @@
+CORE
+test.c
+--value-set-fi-fp-removal
+^EXIT=0$
+^SIGNAL=0$
+^  function: add$
+--
+^  function: multiply$
+^  function: subtract$
+--
+This test checks that the value-set-fi-based function pointer removal
+precisely identifies the function to call for a particular function pointer
+call.
