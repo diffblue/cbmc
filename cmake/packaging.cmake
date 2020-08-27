@@ -28,6 +28,19 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(CPACK_GENERATOR TGZ DEB)
 endif()
 
+# Source package support
+set(CPACK_SOURCE_GENERATOR DEB)
+set(CPACK_SOURCE_IGNORE_FILES
+        /.git*
+        /*build*
+        /*.yml
+        /AccessingCodebuildLogs.md
+        /gcloud-travis-cbmc.json.enc
+        )
+
+# Support for generator specific configuration
+set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPackGeneratorConfig.cmake")
+
 # Yes, this has to go at the bottom,
 # otherwise it can’t take into account
 # all the variables we set above!
