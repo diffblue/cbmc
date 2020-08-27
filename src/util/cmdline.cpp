@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 
+#include <util/edit_distance.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 
@@ -248,6 +249,66 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 cmdlinet::option_namest cmdlinet::option_names() const
 {
   return option_namest{*this};
+}
+
+std::vector<std::string>
+cmdlinet::get_argument_suggestions(const std::string &unknown_argument)
+{
+  struct suggestiont
+  {
+    std::size_t distance;
+    std::string suggestion;
+
+    bool operator<(const suggestiont &other) const
+    {
+      return distance < other.distance;
+    }
+  };
+
+  auto argument_suggestions = std::vector<suggestiont>{};
+  // We allow 3 errors here. This can lead to the output being a bit chatty,
+  // which we mitigate by reducing suggestions to those with the minimum
+  // distance further down below
+  const auto argument_matcher = levenshtein_automatont{unknown_argument, 3};
+  for(const auto &option : options)
+  {
+    if(option.islong)
+    {
+      const auto long_name = "--" + option.optstring;
+      if(auto distance = argument_matcher.get_edit_distance(long_name))
+      {
+        argument_suggestions.push_back({distance.value(), long_name});
+      }
+    }
+    if(!option.islong)
+    {
+      const auto short_name = std::string{"-"} + option.optchar;
+      if(auto distance = argument_matcher.get_edit_distance(short_name))
+      {
+        argument_suggestions.push_back({distance.value(), short_name});
+      }
+    }
+  }
+
+  auto final_suggestions = std::vector<std::string>{};
+  if(!argument_suggestions.empty())
+  {
+    // we only want to keep suggestions with the minimum distance
+    // because otherwise they become quickly too noisy to be useful
+    auto min = std::min_element(
+      argument_suggestions.begin(), argument_suggestions.end());
+    INVARIANT(
+      min != argument_suggestions.end(),
+      "there is a minimum because it's not empty");
+    for(auto const &suggestion : argument_suggestions)
+    {
+      if(suggestion.distance == min->distance)
+      {
+        final_suggestions.push_back(suggestion.suggestion);
+      }
+    }
+  }
+  return final_suggestions;
 }
 
 cmdlinet::option_namest::option_names_iteratort::option_names_iteratort(

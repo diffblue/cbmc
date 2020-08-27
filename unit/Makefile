@@ -73,6 +73,7 @@ SRC += analyses/ai/ai.cpp \
        util/allocate_objects.cpp \
        util/cmdline.cpp \
        util/dense_integer_map.cpp \
+       util/edit_distance.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr.cpp \
        util/expr_iterator.cpp \

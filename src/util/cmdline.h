@@ -94,6 +94,9 @@ public:
   cmdlinet();
   virtual ~cmdlinet();
 
+  std::vector<std::string>
+  get_argument_suggestions(const std::string &unknown_argument);
+
 protected:
   struct optiont
   {

@@ -11,6 +11,7 @@ SRC = allocate_objects.cpp \
       cout_message.cpp \
       dstring.cpp \
       endianness_map.cpp \
+      edit_distance.cpp \
       expr.cpp \
       expr_initializer.cpp \
       expr_util.cpp \

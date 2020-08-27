@@ -1,0 +1,12 @@
+CORE
+dummy.c
+--traec
+did you mean --trace
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This checks that we get a useful suggestion when we make a typo on the
+commandline.
+
+The error code is 1 on linux/osx and 64 on windows for some reason.
