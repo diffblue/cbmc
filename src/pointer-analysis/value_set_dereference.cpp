@@ -276,7 +276,7 @@ exprt value_set_dereferencet::dereference(
     ss << format(value);
     json_result["Value"] = json_stringt(ss.str());
 
-    std::cout << ",\n" << json_result;
+    log.status() << json_result;
   }
 
 #ifdef DEBUG

@@ -264,7 +264,8 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
       state.symbol_table,
       symex_dereference_state,
       language_mode,
-      expr_is_not_null);
+      expr_is_not_null,
+      log);
 
     // std::cout << "**** " << format(tmp1) << '\n';
     exprt tmp2 =

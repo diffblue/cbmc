@@ -36,7 +36,7 @@ public:
     : options(_options),
       ns(_ns),
       value_sets(_value_sets),
-      dereference(_ns, _new_symbol_table, *this, ID_nil, false)
+      dereference(_ns, _new_symbol_table, *this, ID_nil, false, messaget())
   {
   }
 
