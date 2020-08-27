@@ -4,23 +4,25 @@
 
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
- abstract_objectt is the top of the inheritance heirarchy of objects
- used to represent individual variables in the general non-relational
- domain.  It is a two element abstraction (i.e. it is either top or
- bottom).  Within the hierachy of objects under it, child classes are
- more precise abstractions (the converse doesn't hold to avoid
- diamonds and inheriting unnecessary fields).  Thus the common parent
- of two classes is an abstraction capable of representing both.  This
- is important for understanding merge.
-
- These objects are intended to be used in a copy-on-write style, which
- is why their interface differs a bit from ai_domain_baset's
- modify-in-place style of interface.
-
- Although these can represent bottom (this variable cannot take any
- value) it is not common for them to do so.
-
 \*******************************************************************/
+
+/// \file
+/// abstract_objectt is the top of the inheritance heirarchy of objects
+/// used to represent individual variables in the general non-relational
+/// domain.  It is a two element abstraction (i.e. it is either top or
+/// bottom).  Within the hierachy of objects under it, child classes are
+/// more precise abstractions (the converse doesn't hold to avoid
+/// diamonds and inheriting unnecessary fields).  Thus the common parent
+/// of two classes is an abstraction capable of representing both.  This
+/// is important for understanding merge.
+///
+/// These objects are intended to be used in a copy-on-write style, which
+/// is why their interface differs a bit from ai_domain_baset's
+/// modify-in-place style of interface.
+///
+/// Although these can represent bottom (this variable cannot take any
+/// value) it is not common for them to do so.
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 
@@ -50,23 +52,22 @@ class namespacet;
     return internal_abstract_object_pointert(new current_typet(*this));        \
   }
 
-/* Merge is designed to allow different abstractions to be merged
- * gracefully.  There are two real use-cases for this:
- *
- *  1. Having different abstractions for the variable in different
- *     parts of the program.
- *  2. Allowing different domains to write to ambiguous locations
- *     for example, if a stores multiple values (maybe one per
- *     location) with a constant for each, i does not represent one
- *     single value (top, non-unit interval, etc.) and v is something
- *     other than constant, then
- *         a[i] = v
- *     will cause this to happen.
- *
- * To handle this, merge is dispatched to the first abstract object being
- * merged, which switches based on the type of the other object. If it can
- * merge then it merges, otherwise it calls the parent merge.
- */
+/// Merge is designed to allow different abstractions to be merged
+/// gracefully.  There are two real use-cases for this:
+///
+///  1. Having different abstractions for the variable in different
+///     parts of the program.
+///  2. Allowing different domains to write to ambiguous locations
+///     for example, if a stores multiple values (maybe one per
+///     location) with a constant for each, i does not represent one
+///     single value (top, non-unit interval, etc.) and v is something
+///     other than constant, then
+///         a[i] = v
+///     will cause this to happen.
+///
+/// To handle this, merge is dispatched to the first abstract object being
+/// merged, which switches based on the type of the other object. If it can
+/// merge then it merges, otherwise it calls the parent merge.
 
 template <class T>
 using sharing_ptrt = std::shared_ptr<const T>; // NOLINT(*)
@@ -104,7 +105,7 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const;
 
-  // Interface for transforms
+  /// Interface for transforms
   virtual abstract_object_pointert expression_transform(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
@@ -154,9 +155,9 @@ public:
    */
   virtual bool has_been_modified(const abstract_object_pointert before) const
   {
-    // Default implementation, with no other information to go on
-    // falls back to relying on copy-on-write and pointer inequality
-    // to indicate if an abstract_objectt has been modified
+    /// Default implementation, with no other information to go on
+    /// falls back to relying on copy-on-write and pointer inequality
+    /// to indicate if an abstract_objectt has been modified
     return this != before.get();
   };
 
@@ -238,7 +239,7 @@ public:
   }
 
 private:
-  // To enforce copy-on-write these are private and have read-only accessors
+  /// To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
   bool top;

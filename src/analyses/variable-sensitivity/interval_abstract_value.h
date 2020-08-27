@@ -5,6 +5,10 @@
  Author: Diffblue Ltd.
 
 \*******************************************************************/
+
+/// \file
+/// An interval to represent a set of possible values.
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ABSTRACT_VALUE_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ABSTRACT_VALUE_H
 

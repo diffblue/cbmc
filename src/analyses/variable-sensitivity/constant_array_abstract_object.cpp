@@ -14,41 +14,23 @@
 
 #include "constant_array_abstract_object.h"
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::constant_array_abstract_objectt
-
-  Inputs:
-   type - the type the abstract_object is representing
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+///
+/// \param type: the type the abstract_object is representing
 constant_array_abstract_objectt::constant_array_abstract_objectt(typet type)
   : array_abstract_objectt(type)
 {
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::constant_array_abstract_objectt
-
-  Inputs:
-   type - the type the abstract_object is representing
-   top - is the abstract_object starting as top
-   bottom - is the abstract_object starting as bottom
-
- Outputs:
-
- Purpose: Start the abstract object at either top or bottom or neither
-          Asserts if both top and bottom are true
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+///
+/// \param type: the type the abstract_object is representing
+/// \param top: is the abstract_object starting as top
+/// \param bottom: is the abstract_object starting as bottom
+///
+/// Start the abstract object at either top or bottom or neither
+/// Asserts if both top and bottom are true
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   typet type,
   bool top,
@@ -58,21 +40,11 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::constant_array_abstract_objectt
-
-  Inputs:
-   expr - the expression to use as the starting pointer for an abstract object
-   environment - the environment the abstract object is being created in
-   ns - the namespace
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+///
+/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param environment: the environment the abstract object is being created in
+/// \param ns: the namespace
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
@@ -92,21 +64,14 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::verify
-
-  Inputs:
-
- Outputs: Returns true if the struct is valid
-
- Purpose: To validate that the struct object is in a valid state.
-          This means either it is top or bottom, or if neither of those
-          then there exists something in the map of components.
-          If there is something in the map, then it can't be top or bottom
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::verify
+///
+/// \return Returns true if the struct is valid
+///
+/// To validate that the struct object is in a valid state.
+/// This means either it is top or bottom, or if neither of those
+/// then there exists something in the map of components.
+/// If there is something in the map, then it can't be top or bottom
 bool constant_array_abstract_objectt::verify() const
 {
   // Either the object is top or bottom (=> map empty)
@@ -124,20 +89,14 @@ void constant_array_abstract_objectt::make_top_internal()
   map.clear();
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::merge
-
-  Inputs:
-   other - The object to merge in
-
- Outputs: Returns the result of the merge.
-
- Purpose: Tries to do an array/array merge if merging with a constant array
-          If it can't, falls back to parent merge
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::merge
+///
+/// \param other: The object to merge in
+///
+/// \return Returns the result of the merge.
+///
+/// Tries to do an array/array merge if merging with a constant array
+/// If it can't, falls back to parent merge
 abstract_object_pointert
 constant_array_abstract_objectt::merge(abstract_object_pointert other) const
 {
@@ -154,21 +113,15 @@ constant_array_abstract_objectt::merge(abstract_object_pointert other) const
   }
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::constant_array_merge
-
-  Inputs:
-   other - The object to merge in
-
- Outputs: Returns a new abstract object that is the result of the merge
-          unless the merge is the same as this abstract object, in which
-          case it returns this..
-
- Purpose: Merges an array into this array
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::constant_array_merge
+///
+/// \param other: The object to merge in
+///
+/// \return Returns a new abstract object that is the result of the merge
+///         unless the merge is the same as this abstract object, in which
+///         case it returns this..
+///
+/// Merges an array into this array
 abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   const constant_array_pointert other) const
 {
@@ -201,24 +154,16 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   }
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::output
-
-  Inputs:
-   out - the stream to write to
-   ai - the abstract interpreter that contains the abstract domain
-        (that contains the object ... )
-   ns - the current namespace
-
- Outputs:
-
- Purpose: To provide a human readable string to the out representing
-          the current known value about this object. For this array we
-          print: { [0] - <output of object at index 0... }
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::output
+///
+/// \param out: the stream to write to
+/// \param ai: the abstract interpreter that contains the abstract domain
+///            (that contains the object ... )
+/// \param ns: the current namespace
+///
+/// To provide a human readable string to the out representing
+/// the current known value about this object. For this array we
+/// print: { [0] - <output of object at index 0... }
 void constant_array_abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -244,23 +189,17 @@ void constant_array_abstract_objectt::output(
   }
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::read_index
-
-  Inputs:
-   env - the environment
-   index - the expression used to access the specific value in the array
-
- Outputs: An abstract object representing the value in the array
-
- Purpose: A helper function to read elements from an array. This will return
-          the abstract object stored for that index, or top if we don't know
-          about the specified index.
-          If we can't resolve the index to a constant, we return top
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::read_index
+///
+/// \param env: the environment
+/// \param index: the expression used to access the specific value in the array
+///
+/// \return An abstract object representing the value in the array
+///
+/// A helper function to read elements from an array. This will return
+/// the abstract object stored for that index, or top if we don't know
+/// about the specified index.
+/// If we can't resolve the index to a constant, we return top
 abstract_object_pointert constant_array_abstract_objectt::read_index(
   const abstract_environmentt &env,
   const index_exprt &index,
@@ -314,26 +253,19 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
   }
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::write_index
-
-  Inputs:
-   environment - the abstract environment
-   ns - the namespace
-   stack - the remaining stack of expressions on the LHS to evaluate
-   index_expr - the expression uses to access a specific index
-   value - the value we are trying to assign to that value in the array
-   merging_write - Should this and all future writes be merged with the current
-                   value
-
- Outputs: The array_abstract_objectt representing the result of writing
-          to a specific index.
-
- Purpose: A helper function to evaluate writing to a index of an array.
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::write_index
+///
+/// \param environment: the abstract environment
+/// \param ns: the namespace
+/// \param stack: the remaining stack of expressions on the LHS to evaluate
+/// \param index_expr: the expression uses to access a specific index
+/// \param value: the value we are trying to assign to that value in the array
+/// \param merging_write: Should this and all future writes be merged with the current
+///                       value
+/// \return The array_abstract_objectt representing the result of writing
+///         to a specific index.
+///
+/// A helper function to evaluate writing to a index of an array.
 sharing_ptrt<array_abstract_objectt>
 constant_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
@@ -461,21 +393,15 @@ constant_array_abstract_objectt::write_index(
   }
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::get_top_entry
-
-  Inputs:
-   environment - the abstract environment
-   ns - the namespace
-
- Outputs: An abstract object pointer of type type().subtype() (i.e. the
-          type of the array's values).
-
- Purpose: Short hand method for creating a top element of the array
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::get_top_entry
+///
+/// \param environment: the abstract environment
+/// \param ns: the namespace
+///
+/// \return An abstract object pointer of type type().subtype() (i.e. the
+///         type of the array's values).
+///
+/// Purpose: Short hand method for creating a top element of the array
 abstract_object_pointert constant_array_abstract_objectt::get_top_entry(
   const abstract_environmentt &env,
   const namespacet &ns) const
@@ -483,21 +409,15 @@ abstract_object_pointert constant_array_abstract_objectt::get_top_entry(
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
 
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::eval_index
-
-  Inputs:
-   environment - the abstract environment
-   ns - the namespace
-
- Outputs: An abstract object pointer of type type().subtype() (i.e. the
-          type of the array's values).
-
- Purpose: Short hand method for creating a top element of the array
-
-\*******************************************************************/
-
+/// Function: constant_array_abstract_objectt::eval_index
+///
+/// \param environment: the abstract environment
+/// \param ns: the namespace
+///
+/// \return An abstract object pointer of type type().subtype() (i.e. the
+///         type of the array's values).
+///
+/// Short hand method for creating a top element of the array
 bool constant_array_abstract_objectt::eval_index(
   const index_exprt &index,
   const abstract_environmentt &env,

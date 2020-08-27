@@ -22,40 +22,22 @@
 
 #include "abstract_object.h"
 
-/*******************************************************************\
-
-Function: abstract_objectt::abstract_objectt
-
-  Inputs:
-   type - the type the abstract_object is representing
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::abstract_objectt
+///
+/// \param type: the type the abstract_object is representing
 abstract_objectt::abstract_objectt(const typet &type)
   : t(type), bottom(false), top(true)
 {
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::abstract_objectt
-
-  Inputs:
-   type - the type the abstract_object is representing
-   top - is the abstract_object starting as top
-   bottom - is the abstract_object starting as bottom
-
- Outputs:
-
- Purpose: Start the abstract object at either top or bottom or neither
-          Asserts if both top and bottom are true
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::abstract_objectt
+///
+/// \param type: the type the abstract_object is representing
+/// \param top: is the abstract_object starting as top
+/// \param bottom: is the abstract_object starting as bottom
+///
+/// Start the abstract object at either top or bottom or neither
+/// Asserts if both top and bottom are true
 abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom)
   : t(type), bottom(bottom), top(top)
 {
@@ -90,57 +72,38 @@ abstract_objectt::abstract_objectt(
 {
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::type
-
-  Inputs:
-
- Outputs: The program type this abstract object represents
-
- Purpose: Get the real type of the variable this abstract object is
-          representing.
-
-\*******************************************************************/
+/// Function: abstract_objectt::type
+///
+/// \return The program type this abstract object represents
+///
+/// Get the real type of the variable this abstract object is representing.
 const typet &abstract_objectt::type() const
 {
   return t;
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::merge
-
-  Inputs:
-   other - The object to merge with this
-
- Outputs: Returns the result of the merge.
-
- Purpose: Create a new abstract object that is the result of the merge, unless
-          the object would be unchanged, then would return itself.
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::merge
+///
+/// \param other: The object to merge with this
+///
+/// \return Returns the result of the merge.
+///
+/// Create a new abstract object that is the result of the merge, unless
+/// the object would be unchanged, then would return itself.
 abstract_object_pointert
 abstract_objectt::merge(abstract_object_pointert other) const
 {
   return abstract_object_merge(other);
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::abstract_object_merge
-
-  Inputs:
-   other - The object to merge with this
-
- Outputs: Returns the result of the abstract object.
-
- Purpose: Create a new abstract object that is the result of the merge, unless
-          the object would be unchanged, then would return itself.
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::abstract_object_merge
+///
+/// \param other: The object to merge with this
+///
+/// \return Returns the result of the abstract object.
+///
+/// Create a new abstract object that is the result of the merge, unless
+/// the object would be unchanged, then would return itself.
 abstract_object_pointert abstract_objectt::abstract_object_merge(
   const abstract_object_pointert other) const
 {
@@ -210,22 +173,15 @@ abstract_object_pointert abstract_objectt::abstract_object_meet_internal(
   return shared_from_this();
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::expression_transform
-
-  Inputs:
-   expr - the expression to evaluate and find the result of it. this will
-          be the symbol referred to be op0()
-
- Outputs: Returns the abstract_object representing the result of this expression
-          to the maximum precision available.
-
- Purpose: To try and resolve different expressions with the maximum level
-          of precision available.
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::expression_transform
+///
+/// \param expr: the expression to evaluate and find the result of it. this will
+///              be the symbol referred to be op0()
+///
+/// \return Returns the abstract_object representing the result of this expression
+///         to the maximum precision available.
+///
+/// To try and resolve different expressions with the maximum level of precision available.
 abstract_object_pointert abstract_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -304,36 +260,22 @@ abstract_object_pointert abstract_objectt::write(
   return environment.abstract_object_factory(type(), ns, true);
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::is_top
-
-  Inputs:
-
- Outputs: Returns true if the abstract object is representing the top (i.e. we
-          don't know anything about the value).
-
- Purpose: Find out if the abstract object is top
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::is_top
+///
+/// \return Returns true if the abstract object is representing the top (i.e. we
+///         don't know anything about the value).
+///
+/// Find out if the abstract object is top
 bool abstract_objectt::is_top() const
 {
   return top;
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::is_bottom
-
-  Inputs:
-
- Outputs: Returns true if the abstract object is representing the bottom.
-
- Purpose: Find out if the abstract object is bottom
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::is_bottom
+///
+/// \return Returns true if the abstract object is representing the bottom.
+///
+/// Find out if the abstract object is bottom
 bool abstract_objectt::is_bottom() const
 {
   return bottom;
@@ -347,43 +289,28 @@ bool abstract_objectt::verify() const
   return !(top && bottom);
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::to_constant
-
-  Inputs:
-
- Outputs: Returns an exprt representing the value if the value is known and
-          constant. Otherwise returns the nil expression
-
- Purpose: If abstract element represents a single value, then that value,
-          otherwise nil. E.G. if it is an interval then this will be x if it is
-          [x,x] This is the (sort of) dual to the constant_exprt constructor
-          that allows an object to be built from a value.
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::to_constant
+///
+/// \return Returns an exprt representing the value if the value is known and
+///          constant. Otherwise returns the nil expression
+///
+/// If abstract element represents a single value, then that value,
+/// otherwise nil. E.G. if it is an interval then this will be x if it is
+/// [x,x] This is the (sort of) dual to the constant_exprt constructor
+/// that allows an object to be built from a value.
 exprt abstract_objectt::to_constant() const
 {
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::output
-
-  Inputs:
-   out - the stream to write to
-   ai - the abstract interpreter that contains the abstract domain
-        (that contains the object ... )
-   ns - the current namespace
-
- Outputs:
-
- Purpose: Print the value of the abstract object
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::output
+///
+/// \param out: the stream to write to
+/// \param ai: the abstract interpreter that contains the abstract domain
+///            (that contains the object ... )
+/// \param ns: the current namespace
+///
+/// Print the value of the abstract object
 void abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -403,25 +330,18 @@ void abstract_objectt::output(
   }
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::merge
-
-  Inputs:
-   op1 - the first abstract object to merge, this object determines
-         the sensitivity of the output and is the object compared against
-         to choose whether this merge changed anything
-   op2 - the second abstract object to merge
-
- Outputs: The merged abstract object with the same sensitivity as the
-          first parameter. out_modifications will be true if the resulting
-          abstract object is different from op1
-
- Purpose: Clones the first parameter and merges it with the second.
-
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::merge
+///
+/// \param op1: the first abstract object to merge, this object determines
+///             the sensitivity of the output and is the object compared against
+///             to choose whether this merge changed anything
+/// \param op2: the second abstract object to merge
+///
+/// \return The merged abstract object with the same sensitivity as the
+///         first parameter. out_modifications will be true if the resulting
+///         abstract object is different from op1
+///
+/// Clones the first parameter and merges it with the second.
 abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert op1,
   abstract_object_pointert op2,
@@ -436,20 +356,14 @@ abstract_object_pointert abstract_objectt::merge(
   return result;
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::should_use_base_merge
-
-  Inputs:
-   other - the object being merged with
-
- Outputs: Returns true if the base class is capable of doing a complete merge
-
- Purpose: To detect the cases where the base merge is sufficient to do a merge
-          We can't do if this->is_bottom() since we want the specific
-
-\*******************************************************************/
-
+/// Function: abstract_objectt::should_use_base_merge
+///
+/// \param other: the object being merged with
+///
+/// \return Returns true if the base class is capable of doing a complete merge
+///
+/// To detect the cases where the base merge is sufficient to do a merge
+/// We can't do if this->is_bottom() since we want the specific
 bool abstract_objectt::should_use_base_merge(
   const abstract_object_pointert other) const
 {

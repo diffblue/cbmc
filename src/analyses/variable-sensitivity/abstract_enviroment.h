@@ -6,6 +6,14 @@
 
 \*******************************************************************/
 
+/// \file
+/// An abstract version of a program environment.  Each variable has
+/// an abstract object rather than a value.  If these are top then
+/// they are not explicitly stored so that the memory used is
+/// proportional to what is known rather than just the number of
+/// variables.
+/// Note the use of sharing_mapt is critical for scalability.
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 
@@ -25,7 +33,7 @@ class abstract_environmentt
 public:
   using map_keyt = irep_idt;
   abstract_environmentt();
-  // These three are really the heart of the method
+  /// These three are really the heart of the method
   virtual abstract_object_pointert
   eval(const exprt &expr, const namespacet &ns) const;
   virtual bool assign(
@@ -57,9 +65,9 @@ public:
 
   virtual bool merge(const abstract_environmentt &env);
 
-  // This should be used as a default case / everything else has failed
-  // The string is so that I can easily find and diagnose cases where this
-  // occurs
+  /// This should be used as a default case / everything else has failed
+  /// The string is so that I can easily find and diagnose cases where this
+  /// occurs
   virtual void havoc(const std::string &havoc_string);
 
   void make_top();

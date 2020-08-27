@@ -21,19 +21,16 @@ Date: April 2016
 #  include <iostream>
 #endif
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::transform
-
-  Inputs: The instruction before (from) and after (to) the abstract domain,
-          the abstract interpreter (ai) and the namespace (ns).
-
- Outputs: None
-
- Purpose: Compute the abstract transformer for a single instruction
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_domaint::transform
+///
+/// \param from: the instruction before the abstract domain
+/// \param to: the instruction after the abstract domain
+/// \param ai: the abstract interpreter
+/// \param ns: the namespace
+///
+/// \return none
+///
+/// Compute the abstract transformer for a single instruction
 void variable_sensitivity_domaint::transform(
   const irep_idt &function_from,
   locationt from,
@@ -188,18 +185,15 @@ void variable_sensitivity_domaint::transform(
   DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::output
-
-  Inputs: The output stream (out), the abstract interpreter (ai) and
-          the namespace.
-
- Outputs: None
-
- Purpose: Basic text output of the abstract domain
-
-\*******************************************************************/
+/// Function: variable_sensitivity_domaint::output
+///
+/// \param out: the output stream
+/// \param ai: the abstract interpreter
+/// \param ns: the namespace
+///
+/// \return none
+///
+/// Basic text output of the abstract domain
 void variable_sensitivity_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -208,68 +202,40 @@ void variable_sensitivity_domaint::output(
   abstract_state.output(out, ai, ns);
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::make_bottom
-
-  Inputs: None
-
- Outputs: None
-
- Purpose: Sets the domain to bottom (no relations).
-
-\*******************************************************************/
+/// Function: variable_sensitivity_domaint::make_bottom
+///
+/// Sets the domain to bottom (no relations).
 void variable_sensitivity_domaint::make_bottom()
 {
   abstract_state.make_bottom();
   return;
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::make_top
-
-  Inputs: None
-
- Outputs: None
-
- Purpose: Sets the domain to top (all relations).
-
-\*******************************************************************/
+/// Function: variable_sensitivity_domaint::make_top
+///
+/// Sets the domain to top (all relations).
 void variable_sensitivity_domaint::make_top()
 {
   abstract_state.make_top();
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::make_entry
-
-  Inputs: None
-
- Outputs: None
-
- Purpose: Set up a sane entry state.
-
-\*******************************************************************/
+/// Function: variable_sensitivity_domaint::make_entry
+///
+/// Set up a sane entry state.
 void variable_sensitivity_domaint::make_entry()
 {
   abstract_state.make_top();
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::merge
-
-  Inputs: The other domain (b) and it's preceding location (from) and
-          current location (to).
-
- Outputs: True if something has changed.
-
- Purpose: Computes the join between "this" and "b".
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_domaint::merge
+///
+/// \param b: the other domain
+/// \param from: it's preceding location
+/// \param to: it's current location
+///
+/// \return true if something has changed.
+///
+/// Computes the join between "this" and "b".
 bool variable_sensitivity_domaint::merge(
   const variable_sensitivity_domaint &b,
   locationt from,
@@ -287,23 +253,17 @@ bool variable_sensitivity_domaint::merge(
   return any_changes;
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::ai_simplify
-
-  Inputs:
-   condition - the expression to simplify
-   ns - the namespace
-   lhs - is the expression on the left hand side
-
- Outputs: True if no simplification was made
-
- Purpose: Use the information in the domain to simplify the expression
-          with respect to the current location.  This may be able to
-          reduce some values to constants.
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_domaint::ai_simplify
+///
+/// \param condition: the expression to simplify
+/// \param ns: the namespace
+/// \param lhs: is the expression on the left hand side
+///
+/// \return True if no simplification was made
+///
+/// Use the information in the domain to simplify the expression
+/// with respect to the current location.  This may be able to
+/// reduce some values to constants.
 bool variable_sensitivity_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
@@ -331,34 +291,21 @@ bool variable_sensitivity_domaint::ai_simplify(
   }
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::is_bottom
-
-  Inputs:
-
- Outputs: True if the domain is bottom (i.e. unreachable).
-
- Purpose: Find out if the domain is currently unreachable.
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_domaint::is_bottom
+///
+/// \return True if the domain is bottom (i.e. unreachable).
+///
+/// Find out if the domain is currently unreachable.
 bool variable_sensitivity_domaint::is_bottom() const
 {
   return abstract_state.is_bottom();
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::is_top
-
-  Inputs:
-
- Outputs: True if the domain is top
-
- Purpose: Is the domain completely top at this state
-
-\*******************************************************************/
+/// Function: variable_sensitivity_domaint::is_top
+///
+/// \return True if the domain is top
+///
+/// Is the domain completely top at this state
 bool variable_sensitivity_domaint::is_top() const
 {
   return abstract_state.is_top();
@@ -374,27 +321,19 @@ std::vector<irep_idt> variable_sensitivity_domaint::get_modified_symbols(
     abstract_state, other.abstract_state);
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::transform_function_call
-
-  Inputs:
-   from - the location to transform from which is a function call
-   to - the destination of the transform (potentially inside the function call)
-   ai - the abstract interpreter
-   ns - the namespace of the current state
-
- Outputs:
-
- Purpose: Used by variable_sensitivity_domaint::transform to handle
-          FUNCTION_CALL transforms. This is copying the values of the arguments
-          into new symbols corresponding to the declared parameter names.
-
-          If the function call is opaque we currently top the return value
-          and the value of any things whose address is passed into the function.
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_domaint::transform_function_call
+///
+/// \param from: the location to transform from which is a function call
+/// \param to: the destination of the transform (potentially inside the function call)
+/// \param ai: the abstract interpreter
+/// \param ns: the namespace of the current state
+///
+/// Used by variable_sensitivity_domaint::transform to handle
+/// FUNCTION_CALL transforms. This is copying the values of the arguments
+/// into new symbols corresponding to the declared parameter names.
+///
+/// If the function call is opaque we currently top the return value
+/// and the value of any things whose address is passed into the function.
 void variable_sensitivity_domaint::transform_function_call(
   locationt from,
   locationt to,
@@ -517,20 +456,14 @@ void variable_sensitivity_domaint::transform_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: variable_sensitivity_domaint::ignore_function_call_transform
-
-  Inputs:
-   function_id - the name of the function being called
-
- Outputs: Returns true if the function should be ignored
-
- Purpose: Used to specify which CPROVER internal functions should be skipped
-          over when doing function call transforms
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_domaint::ignore_function_call_transform
+///
+/// \param function_id: the name of the function being called
+///
+/// \return Returns true if the function should be ignored
+///
+/// Used to specify which CPROVER internal functions should be skipped
+/// over when doing function call transforms
 bool variable_sensitivity_domaint::ignore_function_call_transform(
   const irep_idt &function_id) const
 {

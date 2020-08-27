@@ -5,6 +5,13 @@
  Author: Owen Jones owen.jones@diffblue.com
 
 \*******************************************************************/
+
+/// \file
+/// Tracks the user-supplied configuration for VSD and build the
+/// correct type of abstract object when needed.  Note this is a factory
+/// within the domain and so is lower-level than the abstract domain
+/// factory that is part of the ai_baset interface.
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
@@ -169,25 +176,19 @@ private:
   bool initialized;
 };
 
-/*******************************************************************\
-
-Function: variable_sensitivity_object_factoryt::initialize_abstract_object
-
- Inputs:
-  abstract_object_classt - the class to use for the abstract object
-  type - the type of the variable
-  top - whether the abstract object should be top in the two-value domain
-  bottom - whether the abstract object should be bottom in the two-value domain
-  e - if top and bottom are false this expression is used as the starting
-      pointer for the abstract object
-  ns - namespace, used when following the input type
-
- Outputs: An abstract object of the appropriate type.
-
- Purpose: Initialize the abstract object class and return it.
-
-\*******************************************************************/
-
+/// Function: variable_sensitivity_object_factoryt::initialize_abstract_object
+/// Initialize the abstract object class and return it.
+///
+/// \param abstract_object_classt: the class to use for the abstract object
+/// \param type: the type of the variable
+/// \param top: whether the abstract object should be top in the two-value domain
+/// \param bottom: whether the abstract object should be bottom in the two-value domain
+/// \param e: if top and bottom are false this expression is used as the starting
+///           pointer for the abstract object
+/// \param ns: namespace, used when following the input type
+///
+/// \return An abstract object of the appropriate type.
+///
 template <class abstract_object_classt>
 abstract_object_pointert
 variable_sensitivity_object_factoryt::initialize_abstract_object(

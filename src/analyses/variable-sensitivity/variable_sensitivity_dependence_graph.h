@@ -5,6 +5,10 @@
  Author: Diffblue Ltd.
 
 \*******************************************************************/
+
+/// \file
+/// A forked and modified version of analyses/dependence_graph.{h,cpp}
+/// that uses VSD to track and generate the dependencies.
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DEPENDENCE_GRAPH_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DEPENDENCE_GRAPH_H
 

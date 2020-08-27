@@ -5,6 +5,10 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
+
+/// \file
+/// The parent class of all abstractions that represent a base type
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_H
 

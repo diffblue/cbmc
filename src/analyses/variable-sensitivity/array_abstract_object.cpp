@@ -11,41 +11,23 @@
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-/*******************************************************************\
-
-Function: array_abstract_objectt::array_abstract_objectt
-
-  Inputs:
-   type - the type the abstract_object is representing
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Function: array_abstract_objectt::array_abstract_objectt
+///
+/// \param type: the type the abstract_object is representing
 array_abstract_objectt::array_abstract_objectt(const typet &t)
   : abstract_objectt(t)
 {
   PRECONDITION(t.id() == ID_array);
 }
 
-/*******************************************************************\
-
-Function: array_abstract_objectt::array_abstract_objectt
-
-  Inputs:
-   type - the type the abstract_object is representing
-   top - is the abstract_object starting as top
-   bottom - is the abstract_object starting as bottom
-
- Outputs:
-
- Purpose: Start the abstract object at either top or bottom or neither
-          Asserts if both top and bottom are true
-
-\*******************************************************************/
-
+/// Function: array_abstract_objectt::array_abstract_objectt
+///
+/// \param type: the type the abstract_object is representing
+/// \param top: is the abstract_object starting as top
+/// \param bottom: is the abstract_object starting as bottom
+///
+/// Start the abstract object at either top or bottom or neither
+/// Asserts if both top and bottom are true
 array_abstract_objectt::array_abstract_objectt(
   const typet &t,
   bool tp,
@@ -55,21 +37,11 @@ array_abstract_objectt::array_abstract_objectt(
   PRECONDITION(t.id() == ID_array);
 }
 
-/*******************************************************************\
-
-Function: array_abstract_objectt::array_abstract_objectt
-
-  Inputs:
-   expr - the expression to use as the starting pointer for an abstract object
-   environment - the environment the abstract object is being created in
-   ns - the namespace
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Function: array_abstract_objectt::array_abstract_objectt
+///
+/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param environment: the environment the abstract object is being created in
+/// \param ns: the namespace
 array_abstract_objectt::array_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
@@ -127,21 +99,15 @@ abstract_object_pointert array_abstract_objectt::write(
     environment, ns, stack, to_index_expr(specifier), value, merging_write);
 }
 
-/*******************************************************************\
-
-Function: array_abstract_objectt::read_index
-
-  Inputs:
-   env - the environment
-   index - the expression used to access the specific value in the array
-
- Outputs: An abstract object representing the value in the array
-
- Purpose: A helper function to read elements from an array. More precise
-          abstractions may override this to provide more precise results.
-
-\*******************************************************************/
-
+/// Function: array_abstract_objectt::read_index
+///
+/// \param env: the environment
+/// \param index: the expression used to access the specific value in the array
+///
+/// \return An abstract object representing the value in the array
+///
+/// A helper function to read elements from an array. More precise
+/// abstractions may override this to provide more precise results.
 abstract_object_pointert array_abstract_objectt::read_index(
   const abstract_environmentt &env,
   const index_exprt &index,
@@ -155,28 +121,22 @@ abstract_object_pointert array_abstract_objectt::read_index(
   return env.abstract_object_factory(subtype, ns, !is_bottom(), is_bottom());
 }
 
-/*******************************************************************\
-
-Function: array_abstract_objectt::write_index
-
-  Inputs:
-   environment - the abstract environment
-   ns - the namespace
-   stack - the remaining stack of expressions on the LHS to evaluate
-   index_expr - the expression uses to access a specific index
-   value - the value we are trying to assign to that value in the array
-   merging_write - ?
-
- Outputs: The struct_abstract_objectt representing the result of writing
-          to a specific component. In this case this will always be top
-          as we are not tracking the value of this struct.
-
- Purpose: A helper function to evaluate writing to a component of a struct.
-          More precise abstractions may override this to
-          update what they are storing for a specific component.
-
-\*******************************************************************/
-
+/// Function: array_abstract_objectt::write_index
+///
+/// \param environment: the abstract environment
+/// \param ns: the namespace
+/// \param stack: the remaining stack of expressions on the LHS to evaluate
+/// \param index_expr: the expression uses to access a specific index
+/// \param value: the value we are trying to assign to that value in the array
+/// \param merging_write: ?
+///
+/// \return The struct_abstract_objectt representing the result of writing
+///          to a specific component. In this case this will always be top
+///          as we are not tracking the value of this struct.
+///
+/// A helper function to evaluate writing to a component of a struct.
+/// More precise abstractions may override this to
+/// update what they are storing for a specific component.
 sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,

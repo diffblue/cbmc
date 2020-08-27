@@ -6,6 +6,9 @@
 
 \*******************************************************************/
 
+/// \file
+/// The base of all structure abstractions
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H
 

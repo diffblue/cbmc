@@ -6,6 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+/// \file
+/// An abstraction of an array using intervals
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ARRAY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ARRAY_ABSTRACT_OBJECT_H
 

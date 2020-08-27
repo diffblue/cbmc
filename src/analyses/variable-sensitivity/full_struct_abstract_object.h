@@ -6,6 +6,8 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// An abstraction of a structure that stores one abstract object per field
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 

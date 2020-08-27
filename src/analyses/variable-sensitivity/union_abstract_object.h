@@ -6,6 +6,9 @@
 
 \*******************************************************************/
 
+/// \file
+/// The base of all union abstractions
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_UNION_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_UNION_ABSTRACT_OBJECT_H
 

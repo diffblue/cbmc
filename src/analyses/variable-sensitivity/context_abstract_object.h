@@ -11,6 +11,7 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 
 /**
+ * \file
  * General implementation of a an abstract_objectt which can track
  * side information in the form of a 'context' associated with a wrapped
  * abstract_objectt of some other type. This class is not intended to be

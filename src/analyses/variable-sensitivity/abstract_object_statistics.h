@@ -6,6 +6,9 @@ Author: Hannes Steffenhagen
 
 \*******************************************************************/
 
+/// \file
+/// Statistics gathering for the variable senstivity domain
+
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_STATISTICS_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_STATISTICS_H
 
