@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # By default, just create a new minor version. If we ever need to change
 # major/patch version just do it manually.
 read -r version_line
