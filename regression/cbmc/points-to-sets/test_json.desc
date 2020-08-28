@@ -1,0 +1,11 @@
+CORE
+main.c
+--show-points-to-sets --json-ui
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\{\n\s*"Pointer": "main::1::p!0@1",\n\s*"PointsToSet": \[ "object_descriptor\(integer_address, unknown\)" \],\n\s*"PointsToSetSize": 1,\n\s*"RetainedValuesSet": \[ "object_descriptor\(integer_address, unknown\)" \],\n\s*"RetainedValuesSetSize": 1,\n\s*"Value": "byte_extract_little_endian\(__CPROVER_memory, pointer_offset\(main::1::p!0@1\), signedbv\[32\]\)"\n\s*\},\n\s*\{\n\s*"Pointer": "main::1::p!0@1",\n\s*"PointsToSet": \[ "object_descriptor\(integer_address, unknown\)" \],\n\s*"PointsToSetSize": 1,\n\s*"RetainedValuesSet": \[ "object_descriptor\(integer_address, unknown\)" \],\n\s*"RetainedValuesSetSize": 1,\n\s*"Value": "byte_extract_little_endian\(__CPROVER_memory, pointer_offset\(main::1::p!0@1\), signedbv\[32\]\)"\n\s*\}
+--
+--
+To test output for --show-points-to-sets option that displays the size and contents of points-to sets in json format.
+xml-ui and plain output not supported.

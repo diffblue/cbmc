@@ -1,12 +1,12 @@
 CORE
 main.c
---show-points-to-sets
+--show-points-to-sets --xml-ui
 ^EXIT=(0|127|134|137)$
 ^SIGNAL=0$
 --- begin invariant violation report ---
 Invariant check failed
 Condition: false
-Reason: Cannot print json data on PLAIN UI
+Reason: Cannot print json data on XML UI
 --
 --
 To test output for --show-points-to-sets option that displays the size and contents of points-to sets in json format.
