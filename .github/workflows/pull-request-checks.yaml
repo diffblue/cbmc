@@ -87,10 +87,11 @@ jobs:
           mkdir build
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
-      - name: Check if source package building works
+      - name: Build source package
+        run: ninja -C build package_source
+      - name: Check source package is valid
         run: |
           cd build
-          ninja package_source
           lintian $(ls | grep Source.deb)
 
   check-macos-10_15-make-clang:
