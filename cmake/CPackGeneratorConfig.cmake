@@ -5,5 +5,5 @@ message(STATUS "Configuring for generator ${CPACK_GENERATOR} and TOPLEVEL_TAG ${
 
 if("${CPACK_TOPLEVEL_TAG}" STREQUAL "Linux-Source")
   message(STATUS "Adding python dependency")
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS},python")
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS},python,python3")
 endif()
