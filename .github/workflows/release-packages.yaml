@@ -13,7 +13,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt install g++ flex bison cmake ninja-build maven jq xmllint dpkg-dev
+        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev
       - name: Configure CMake
         run: |
           mkdir build
