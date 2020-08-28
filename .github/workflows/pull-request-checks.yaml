@@ -92,7 +92,7 @@ jobs:
       - name: Check source package is valid
         run: |
           cd build
-          lintian $(ls | grep Source.deb)
+          lintian --check $(ls | grep Source.deb) --info
 
   check-macos-10_15-make-clang:
     runs-on: macos-10.15
