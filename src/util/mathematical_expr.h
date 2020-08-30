@@ -186,6 +186,29 @@ public:
   }
 };
 
+/// \brief Cast an exprt to a \ref tuple_exprt
+///
+/// \a expr must be known to be \ref tuple_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref tuple_exprt
+inline const tuple_exprt &to_tuple_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_tuple);
+  const tuple_exprt &ret = static_cast<const tuple_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_tuple_expr(const exprt &)
+inline tuple_exprt &to_tuple_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_tuple);
+  tuple_exprt &ret = static_cast<tuple_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 /// \brief Application of (mathematical) function
 class function_application_exprt : public binary_exprt
 {
