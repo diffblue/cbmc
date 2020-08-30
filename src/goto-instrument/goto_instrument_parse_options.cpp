@@ -847,12 +847,16 @@ int goto_instrument_parse_optionst::doit()
       remove_skip(goto_model);
     }
 
-    if(cmdline.isset("horn-encoding"))
+    if(cmdline.isset("horn") || cmdline.isset("horn-smt2"))
     {
       log.status() << "Horn-clause encoding" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
+      remove_returns(goto_model);
 
-      if(cmdline.args.size()==2)
+      auto format =
+        cmdline.isset("horn-smt2") ? horn_formatt::SMT2 : horn_formatt::ASCII;
+
+      if(cmdline.args.size() == 2) // output to file
       {
         #ifdef _MSC_VER
         std::ofstream out(widen(cmdline.args[1]));
@@ -867,10 +871,24 @@ int goto_instrument_parse_optionst::doit()
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
-        horn_encoding(goto_model, out);
+        horn_encoding(goto_model, format, out);
       }
-      else
-        horn_encoding(goto_model, std::cout);
+      else // output to console
+      {
+        std::ostringstream result;
+        horn_encoding(goto_model, format, result);
+        messaget message(ui_message_handler);
+
+        // add colors
+        for(auto &line : split_string(result.str(), '\n'))
+        {
+          if(!line.empty() && line[0] == ';')
+            message.result()
+              << messaget::faint << line << messaget::reset << messaget::eom;
+          else
+            message.result() << line << messaget::eom;
+        }
+      }
 
       return CPROVER_EXIT_SUCCESS;
     }

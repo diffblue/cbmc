@@ -16,8 +16,12 @@ Author:
 
 #include <goto-programs/goto_model.h>
 
-void horn_encoding(
-  const goto_modelt &,
-  std::ostream &out);
+enum horn_formatt
+{
+  ASCII,
+  SMT2
+};
+
+void horn_encoding(const goto_modelt &, horn_formatt, std::ostream &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H
