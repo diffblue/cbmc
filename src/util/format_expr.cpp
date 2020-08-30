@@ -309,6 +309,25 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
               << format(if_expr.true_case()) << " : "
               << format(if_expr.false_case()) << ')';
   }
+  else if(id == ID_tuple)
+  {
+    const auto &tuple_expr = to_tuple_expr(expr);
+    os << u8"\u27e8";
+
+    bool first = true;
+
+    for(auto &op : tuple_expr.operands())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+
+      os << format(op);
+    }
+
+    return os << u8"\u27e9";
+  }
   else if(id == ID_code)
   {
     const auto &code = to_code(expr);
