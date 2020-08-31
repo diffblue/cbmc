@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/range.h>
 #include <util/std_expr.h>
@@ -1802,7 +1803,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     out << "((";
     convert_expr(bound);
     out << " ";
-    convert_type(bound.type());
+    convert_constant_type(bound.type());
     out << ")) ";
 
     convert_expr(quantifier_expr.where());
@@ -1944,6 +1945,18 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     exprt lowered = lower_popcount(to_popcount_expr(expr), ns);
     convert_expr(lowered);
+  }
+  else if(expr.id() == ID_function_application)
+  {
+    const auto &function_application = to_function_application_expr(expr);
+    out << '(';
+    convert_expr(function_application.function());
+    for(auto &argument : function_application.arguments())
+    {
+      out << ' ';
+      convert_expr(argument);
+    }
+    out << ')';
   }
   else
     INVARIANT_WITH_DIAGNOSTICS(
@@ -4179,10 +4192,9 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         smt2_identifiers.insert(smt2_identifier);
 
         out << "; set_to true (equal)\n";
-        out << "(define-fun |" << smt2_identifier << "| () ";
-
-        convert_type(equal_expr.lhs().type());
-        out << " ";
+        out << "(define-fun |" << smt2_identifier << "| ";
+        convert_function_type(equal_expr.lhs().type());
+        out << ' ';
         convert_expr(prepared_rhs);
 
         out << ")" << "\n";
@@ -4315,10 +4327,8 @@ void smt2_convt::find_symbols(const exprt &expr)
       smt2_identifiers.insert(smt2_identifier);
 
       out << "; find_symbols\n";
-      out << "(declare-fun |"
-          << smt2_identifier
-          << "| () ";
-      convert_type(expr.type());
+      out << "(declare-fun |" << smt2_identifier << "| ";
+      convert_function_type(expr.type());
       out << ")" << "\n";
     }
   }
@@ -4329,8 +4339,8 @@ void smt2_convt::find_symbols(const exprt &expr)
       const irep_idt id =
         "array_of." + std::to_string(defined_expressions.size());
       out << "; the following is a substitute for lambda i. x" << "\n";
-      out << "(declare-fun " << id << " () ";
-      convert_type(expr.type());
+      out << "(declare-fun " << id << ' ';
+      convert_function_type(expr.type());
       out << ")" << "\n";
 
       // use a quantifier instead of the lambda
@@ -4353,8 +4363,8 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       const irep_idt id = "array." + std::to_string(defined_expressions.size());
       out << "; the following is a substitute for an array constructor" << "\n";
-      out << "(declare-fun " << id << " () ";
-      convert_type(array_type);
+      out << "(declare-fun " << id << ' ';
+      convert_function_type(array_type);
       out << ")" << "\n";
 
       for(std::size_t i=0; i<expr.operands().size(); i++)
@@ -4380,8 +4390,8 @@ void smt2_convt::find_symbols(const exprt &expr)
       const irep_idt id =
         "string." + std::to_string(defined_expressions.size());
       out << "; the following is a substitute for a string" << "\n";
-      out << "(declare-fun " << id << " () ";
-      convert_type(array_type);
+      out << "(declare-fun " << id << ' ';
+      convert_function_type(array_type);
       out << ")" << "\n";
 
       for(std::size_t i=0; i<tmp.operands().size(); i++)
@@ -4406,8 +4416,8 @@ void smt2_convt::find_symbols(const exprt &expr)
       {
         const irep_idt id =
           "object_size." + std::to_string(object_sizes.size());
-        out << "(declare-fun " << id << " () ";
-        convert_type(expr.type());
+        out << "(declare-fun " << id << ' ';
+        convert_function_type(expr.type());
         out << ")" << "\n";
 
         object_sizes[expr]=id;
@@ -4454,12 +4464,12 @@ void smt2_convt::find_symbols(const exprt &expr)
         if(i!=0)
           out << " ";
         out << "(op" << i << ' ';
-        convert_type(expr.operands()[i].type());
+        convert_constant_type(expr.operands()[i].type());
         out << ')';
       }
 
       out << ") ";
-      convert_type(expr.type()); // return type
+      convert_constant_type(expr.type()); // return type
       out << ' ';
 
       exprt tmp1=expr;
@@ -4499,7 +4509,33 @@ bool smt2_convt::use_array_theory(const exprt &expr)
   }
 }
 
-void smt2_convt::convert_type(const typet &type)
+void smt2_convt::convert_function_type(const typet &type)
+{
+  if(type.id() == ID_mathematical_function)
+  {
+    const auto &function_type = to_mathematical_function_type(type);
+    out << '(';
+    bool first = true;
+    for(auto &d : function_type.domain())
+    {
+      if(first)
+        first = false;
+      else
+        out << ' ';
+      convert_constant_type(d);
+    }
+    out << ") ";
+    convert_constant_type(function_type.codomain());
+  }
+  else
+  {
+    // 0-ary function, also known as 'constant'
+    out << "() ";
+    convert_constant_type(type);
+  }
+}
+
+void smt2_convt::convert_constant_type(const typet &type)
 {
   if(type.id()==ID_array)
   {
@@ -4510,13 +4546,13 @@ void smt2_convt::convert_type(const typet &type)
     const typet &subtype = array_type.subtype();
 
     out << "(Array ";
-    convert_type(array_type.size().type());
+    convert_constant_type(array_type.size().type());
     out << " ";
 
     if(subtype.id()==ID_bool && !use_array_of_bool)
       out << "(_ BitVec 1)";
     else
-      convert_type(array_type.subtype());
+      convert_constant_type(array_type.subtype());
 
     out << ")";
   }
@@ -4590,7 +4626,7 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    convert_type(ns.follow_tag(to_c_enum_tag_type(type)));
+    convert_constant_type(ns.follow_tag(to_c_enum_tag_type(type)));
   }
   else if(type.id()==ID_floatbv)
   {
@@ -4626,7 +4662,12 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_c_bit_field)
   {
-    convert_type(c_bit_field_replacement_type(to_c_bit_field_type(type), ns));
+    convert_constant_type(
+      c_bit_field_replacement_type(to_c_bit_field_type(type), ns));
+  }
+  else if(type.id() == ID_mathematical_function)
+  {
+    UNEXPECTEDCASE("convert_constant_type got a function");
   }
   else
   {
@@ -4665,11 +4706,11 @@ void smt2_convt::find_symbols_rec(
           << "(mk-" << smt_typename;
 
       out << " (" << smt_typename << ".imag ";
-      convert_type(type.subtype());
+      convert_constant_type(type.subtype());
       out << ")";
 
       out << " (" << smt_typename << ".real ";
-      convert_type(type.subtype());
+      convert_constant_type(type.subtype());
       out << ")";
 
       out << "))))\n";
@@ -4696,7 +4737,7 @@ void smt2_convt::find_symbols_rec(
       for(mp_integer i=0; i!=size; ++i)
       {
         out << " (" << smt_typename << "." << i << " ";
-        convert_type(type.subtype());
+        convert_constant_type(type.subtype());
         out << ")";
       }
 
@@ -4743,7 +4784,7 @@ void smt2_convt::find_symbols_rec(
       {
         out << "(" << smt_typename << "." << component.get_name()
                       << " ";
-        convert_type(component.type());
+        convert_constant_type(component.type());
         out << ") ";
       }
 
@@ -4774,7 +4815,7 @@ void smt2_convt::find_symbols_rec(
             << component.get_name() << " "
             << "((s " << smt_typename << ") "
             <<  "(v ";
-        convert_type(component.type());
+        convert_constant_type(component.type());
         out << ")) " << smt_typename << " "
             << "(mk-" << smt_typename
             << " ";
