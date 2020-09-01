@@ -29,7 +29,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 # Source package support
-set(CPACK_SOURCE_GENERATOR DEB)
+set(CPACK_SOURCE_GENERATOR TGZ)
 set(CPACK_SOURCE_IGNORE_FILES
         /.git*
         /*build*
