@@ -108,6 +108,8 @@ void solver_hardnesst::register_clause(
   std::cout << "0\n";
 #endif
 
+  // The clause_counter is incremented after the call to register_clause.
+  // Here we add 1 to solver_clause_num to incorporate this increment.
   current_hardness.clause_set.push_back(solver_clause_num + 1);
   std::sort(
     current_hardness.clause_set.begin(), current_hardness.clause_set.end());

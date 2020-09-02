@@ -50,7 +50,7 @@ struct solver_hardnesst
     size_t clauses = 0;
     size_t literals = 0;
     std::unordered_set<size_t> variables = {};
-    std::vector<int> clause_set = {};
+    std::vector<size_t> clause_set = {};
 
     sat_hardnesst &operator+=(const sat_hardnesst &other);
   };
