@@ -522,16 +522,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-goto-symex-steps", true);
 
   if(cmdline.isset("show-points-to-sets"))
-  {
-    if(!cmdline.isset("json-ui"))
-    {
-      log.error() << "--show-points-to-sets supports only"
-                     " json output. Use --json-ui."
-                  << messaget::eom;
-      exit(CPROVER_EXIT_USAGE_ERROR);
-    }
     options.set_option("show-points-to-sets", true);
-  }
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
