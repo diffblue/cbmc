@@ -91,7 +91,9 @@ void solver_hardnesst::register_assertion_ssas(
 
 void solver_hardnesst::register_clause(
   const bvt &bv,
-  const size_t solver_clause_num)
+  const bvt &cnf,
+  const size_t cnf_clause_index,
+  bool register_cnf)
 {
   current_hardness.clauses++;
   current_hardness.literals += bv.size();
@@ -101,16 +103,16 @@ void solver_hardnesst::register_clause(
     current_hardness.variables.insert(literal.var_no());
   }
 
+  if(register_cnf)
+  {
 #ifdef DEBUG
-  std::cout << solver_clause_num << ": ";
-  for(const auto &literal : bv)
-    std::cout << literal.dimacs() << " ";
-  std::cout << "0\n";
+    std::cout << cnf_clause_index << ": ";
+    for(const auto &literal : cnf)
+      std::cout << literal.dimacs() << " ";
+    std::cout << "0\n";
 #endif
-
-  // The clause_counter is incremented after the call to register_clause.
-  // Here we add 1 to solver_clause_num to incorporate this increment.
-  current_hardness.clause_set.push_back(solver_clause_num + 1);
+    current_hardness.clause_set.push_back(cnf_clause_index);
+  }
 }
 
 void solver_hardnesst::set_outfile(const std::string &file_name)

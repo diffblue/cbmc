@@ -108,7 +108,11 @@ struct solver_hardnesst
   /// \param bv: the clause (vector of literals)
   /// \param solver_clause_num: clause counter value passed from
   /// `satcheck_minisat2::lcnf`
-  void register_clause(const bvt &bv, const size_t solver_clause_num);
+  void register_clause(
+    const bvt &bv,
+    const bvt &cnf,
+    const size_t cnf_clause_index,
+    bool register_cnf);
 
   void set_outfile(const std::string &file_name);
 

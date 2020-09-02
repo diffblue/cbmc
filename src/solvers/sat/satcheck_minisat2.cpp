@@ -140,10 +140,22 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
     solver->addClause_(c);
 
-    size_t solver_clause_num = clause_counter;
-    with_solver_hardness([&bv, &solver_clause_num](solver_hardnesst &hardness) {
-      hardness.register_clause(bv, solver_clause_num);
-    });
+    // To map clauses to lines of program code, track clause indices in the
+    // dimacs cnf output. Dimacs output is generated after processing clauses
+    // to remove duplicates and clauses that are trivially true. Here, a clause
+    // is checked to see if it can be thus eliminated. If not, add the clause
+    // index to list of clauses in solver_hardnesst::register_clause().
+    static size_t cnf_clause_index = 0;
+    bvt cnf;
+    bool clause_removed = process_clause(bv, cnf);
+
+    if(!clause_removed)
+      cnf_clause_index++;
+
+    with_solver_hardness(
+      [&bv, &cnf, &clause_removed](solver_hardnesst &hardness) {
+        hardness.register_clause(bv, cnf, cnf_clause_index, !clause_removed);
+      });
     clause_counter++;
   }
   catch(const Minisat::OutOfMemoryException &)
