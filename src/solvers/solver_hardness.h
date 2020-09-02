@@ -106,8 +106,10 @@ struct solver_hardnesst
   /// Called e.g. from the `satcheck_minisat2::lcnf`, this function adds the
   ///   complexity statistics from the last SAT query to the `current_ssa_key`.
   /// \param bv: the clause (vector of literals)
-  /// \param solver_clause_num: clause counter value passed from
-  /// `satcheck_minisat2::lcnf`
+  /// \param cnf: processed clause
+  /// \param cnf_clause_index: index of clause in dimacs output
+  /// \param register_cnf: negation of boolean variable tracking if the clause
+  /// can be eliminated
   void register_clause(
     const bvt &bv,
     const bvt &cnf,
