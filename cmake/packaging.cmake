@@ -37,6 +37,8 @@ set(CPACK_SOURCE_IGNORE_FILES
         /AccessingCodebuildLogs.md
         /gcloud-travis-cbmc.json.enc
         )
+set(CPACK_SOURCE_PACKAGE_FILE_NAME
+        "cbmc-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.orig")
 
 # Support for generator specific configuration
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPackGeneratorConfig.cmake")
