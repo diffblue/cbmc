@@ -24,7 +24,7 @@ jobs:
           cd build
           ninja
       - name: Run CTest
-        run: cd build; ctest -V .
+        run: cd build; ctest . -V -L CORE -C Release 
       - name: Create packages
         id: create_packages
         run: |
