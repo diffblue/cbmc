@@ -173,6 +173,7 @@ void run_property_decider(
 // clang-format off
 #define OPT_BMC \
   "(program-only)" \
+  "(show-byte-ops)" \
   "(show-loops)" \
   "(show-vcc)" \
   "(show-goto-symex-steps)" \
@@ -203,6 +204,7 @@ void run_property_decider(
   " --show-goto-symex-steps      show which steps symex travels, includes " \
   "                              diagnostic information\n" \
   " --program-only               only show program expression\n" \
+  " --show-byte-ops              show all byte extracts and updates\n" \
   " --show-loops                 show the loops in the program\n" \
   " --depth nr                   limit search depth\n" \
   " --max-field-sensitivity-array-size M\n" \

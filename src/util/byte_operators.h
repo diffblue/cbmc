@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// The object can either be interpreted in big endian or little endian, which
 /// is reflected by the \c id of the expression which is either
 /// \c ID_byte_extract_big_endian or \c ID_byte_extract_little_endian
-class byte_extract_exprt:public binary_exprt
+class byte_extract_exprt : public binary_exprt
 {
 public:
   byte_extract_exprt(
@@ -35,6 +35,9 @@ public:
     const typet &_type)
     : binary_exprt(_op, _id, _offset, _type)
   {
+    INVARIANT(
+      _id == ID_byte_extract_little_endian || _id == ID_byte_extract_big_endian,
+      "byte_extract_exprt: Invalid ID");
   }
 
   exprt &op() { return op0(); }
@@ -84,6 +87,9 @@ public:
     const exprt &_value)
     : ternary_exprt(_id, _op, _offset, _value, _op.type())
   {
+    INVARIANT(
+      _id == ID_byte_update_little_endian || _id == ID_byte_update_big_endian,
+      "byte_update_exprt: Invalid ID");
   }
 
   DEPRECATED(SINCE(2019, 5, 21, "use set_op or as_const instead"))
@@ -110,6 +116,13 @@ public:
   const exprt &offset() const { return op1(); }
   const exprt &value() const { return op2(); }
 };
+
+template <>
+inline bool can_cast_expr<byte_update_exprt>(const exprt &base)
+{
+  return base.id() == ID_byte_update_little_endian ||
+         base.id() == ID_byte_update_big_endian;
+}
 
 inline const byte_update_exprt &to_byte_update_expr(const exprt &expr)
 {

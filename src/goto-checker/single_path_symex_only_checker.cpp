@@ -127,6 +127,9 @@ void single_path_symex_only_checkert::equation_output(
   if(options.get_bool_option("program-only"))
     show_program(ns, equation);
 
+  if(options.get_bool_option("show-byte-ops"))
+    show_byte_ops(options, ui_message_handler, ns, equation);
+
   if(options.get_bool_option("validate-ssa-equation"))
   {
     symex.validate(validation_modet::INVARIANT);
