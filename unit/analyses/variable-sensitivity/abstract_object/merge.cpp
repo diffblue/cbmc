@@ -2,7 +2,7 @@
 
  Module: Unit tests for variable/sensitivity/abstract_object::merge
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 

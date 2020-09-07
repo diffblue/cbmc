@@ -2,7 +2,7 @@
 
  Module: Unit tests for constant_abstract_valuet::merge
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 

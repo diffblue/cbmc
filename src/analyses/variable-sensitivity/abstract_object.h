@@ -10,7 +10,7 @@
 /// abstract_objectt is the top of the inheritance heirarchy of objects
 /// used to represent individual variables in the general non-relational
 /// domain.  It is a two element abstraction (i.e. it is either top or
-/// bottom).  Within the hierachy of objects under it, child classes are
+/// bottom).  Within the hierarchy of objects under it, child classes are
 /// more precise abstractions (the converse doesn't hold to avoid
 /// diamonds and inheriting unnecessary fields).  Thus the common parent
 /// of two classes is an abstraction capable of representing both.  This

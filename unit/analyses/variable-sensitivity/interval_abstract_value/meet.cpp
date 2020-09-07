@@ -2,7 +2,7 @@
 
  Module: Unit tests for interval_abstract_valuet::meet
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 

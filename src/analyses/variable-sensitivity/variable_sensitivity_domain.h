@@ -8,14 +8,15 @@
 
 /// \file
 /// There are different ways of handling arrays, structures, unions and
-/// pointers.  Our existing solution basically ignores them which is
-/// imprecise at best and out-right wrong at worst.  For one project we
-/// needed to do better.  We could have implemented a particular way of
-/// handling them in an existing domain, created a new one with it, etc.
-/// This would work but it means duplicate code and it is is inflexible when
-/// the same person / the next person comes along and says "actually, we
-/// really care about the pointer precision but less so the array so could
-/// you just ...".  Thus the idea was to do this properly:
+/// pointers.  interval_domaint and constant_propagator_domaint
+/// basically ignores them which is imprecise at best and out-right
+/// wrong at worst.  For one project we needed to do better.  We could
+/// have implemented a particular way of handling them in an existing
+/// domain, created a new one with it, etc.  This would work but it
+/// means duplicate code and it is is inflexible when the same person
+/// / the next person comes along and says "actually, we really care
+/// about the pointer precision but less so the array so could you
+/// just ...".  Thus the idea was to do this properly:
 ///
 /// 1. Build a "non-relational domain" and allow the abstractions used for
 /// individual variables to be different.

@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Diffblue Limited. All Rights Reserved.
+// Copyright 2016-2020 Diffblue Limited.
 
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>

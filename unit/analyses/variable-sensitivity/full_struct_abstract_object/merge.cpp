@@ -2,7 +2,7 @@
 
  Module: Unit tests for full_struct_abstract_object::merge
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 

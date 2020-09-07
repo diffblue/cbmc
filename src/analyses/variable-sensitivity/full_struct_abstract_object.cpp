@@ -76,13 +76,12 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   bool did_initialize_values = false;
   auto struct_type_it = struct_type_def.components().begin();
   for(auto param_it = e.operands().begin(); param_it != e.operands().end();
-      ++param_it)
+      ++param_it, ++struct_type_it)
   {
     map.insert_or_replace(
       struct_type_it->get_name(),
       environment.abstract_object_factory(param_it->type(), *param_it, ns));
     did_initialize_values = true;
-    ++struct_type_it;
   }
 
   if(did_initialize_values)

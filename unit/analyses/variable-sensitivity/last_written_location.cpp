@@ -2,7 +2,7 @@
 
  Module: Write Stack Unit Tests
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 

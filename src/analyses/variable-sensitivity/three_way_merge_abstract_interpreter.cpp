@@ -132,7 +132,7 @@ bool ai_three_way_merget::visit_edge_function_call(
       ns);
 
     // TODO : this is probably needed to avoid three_way_merge modifying one of
-    // it's arguments as it goes.  A better solution would be to refactor
+    // its arguments as it goes.  A better solution would be to refactor
     // merge_three_way_function_return.
     const std::unique_ptr<statet> ptr_s_working_copy(
       make_temporary_state(s_working));
@@ -155,101 +155,3 @@ bool ai_three_way_merget::visit_edge_function_call(
 
   return new_data;
 }
-
-#if 0
-   // This is the edge from function end to return site.
- 
-   {
-     if(end_state.is_bottom())
-       return false; // function exit point not reachable
- 
-     working_sett working_set; // Redundant; visit will add l_return
- 
--    return visit_edge(
--      f_it->first, l_end, calling_function_id, l_return, ns, working_set);
-+    const std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
-+    tmp_state->transform(f_it->first, l_end, f_it->first, l_return, *this, ns);
-+
-+    const std::unique_ptr<statet> pre_merge_state{
-+      make_temporary_state(*tmp_state)};
-+
-+    const locationt l_begin = goto_function.body.instructions.begin();
-+    tmp_state->merge_three_way_function_return(
-+      get_state(l_call), get_state(l_begin), *pre_merge_state, ns);
-+
-+    return merge(*tmp_state, l_end, l_return);
-   }
-
-#endif
-
-#if 0
-bool ai_baset::visit_edge(
-  const irep_idt &function_id,
-  trace_ptrt p,
-  const irep_idt &to_function_id,
-  locationt to_l,
-  trace_ptrt caller_history,
-  const namespacet &ns,
-  working_sett &working_set)
-{
-  // We only care about the return cases
-  if (caller_history == ai_history_baset::no_caller_history) {
-    return ai_recursive_interproceduralt::visit_edge(function_id, p, to_function_id, to_l, caller_history, ns, working_set);
-  }
-
-  // There are four histories / locations / domains we care about
-  // In chronological order...
-
-  trace_ptr call_site_history = caller_history;
-  statet &call_site_state = get_state(call_site_history);
-  locationt call_site_location = call_site_history.current_location();
-  INVARIANT(call_site_location->is_function_call(), "caller_history implies that is is a function call");
-
-  trace_ptr callee_start_history = TBD;
-  statet &callee_start_state = get_state(callee_start_history);
-  locationt callee_start_location = callee_start_history.current_location();
-
-  trace_ptr callee_end_history = p;
-  statet &callee_end_state = get_state(callee_end_history);
-  locationt callee_end_location = callee_end_history.current_location();
-  INVARIANT(callee_end_location->is_end_function(), "TBD");
-
-  trace_ptr return_site_history = STEP;
-  statet &return_site_state = get_state(return_site_history);
-  locationt return_site_location = to_l;
-  INVARIANT(std::next(call_site_location) == to_l, "TBD");
-
-
-  
-  // Has history taught us not to step here...
-  auto next =
-    p->step(to_l, *(storage->abstract_traces_before(to_l)), caller_history);
-  if(next.first == ai_history_baset::step_statust::BLOCKED)
-    return false;
-  trace_ptrt to_p = next.second;
-
-  // Abstract domains are mutable so we must copy before we transform
-  statet &current = get_state(p);
-
-  std::unique_ptr<statet> tmp_state(make_temporary_state(current));
-  statet &new_values = *tmp_state;
-
-  // Apply transformer
-  new_values.transform(function_id, p, to_function_id, to_p, *this, ns);
-
-  // Expanding a domain means that it has to be analysed again
-  // Likewise if the history insists that it is a new trace
-  // (assuming it is actually reachable).
-  if(
-    merge(new_values, p, to_p) ||
-    (next.first == ai_history_baset::step_statust::NEW &&
-     !new_values.is_bottom()))
-  {
-    put_in_working_set(working_set, to_p);
-    return true;
-  }
-
-  return false;
-}
-
-#endif

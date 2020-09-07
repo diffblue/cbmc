@@ -2,7 +2,7 @@
 
  Module: Variable Sensitivity Domain
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 

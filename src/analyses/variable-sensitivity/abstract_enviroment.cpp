@@ -140,7 +140,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 /// what kind of array abstraction it is).  So, as we find the variable
 /// ('a' in this case) we build a stack of which part of it is accessed.
 ///
-/// As abstractions may split the assignment into multiple write (for
+/// As abstractions may split the assignment into multiple writes (for
 /// example pointers that could point to several locations, arrays with
 /// non-constant indexes), each of which has to handle the rest of the
 /// compound write, thus the stack is passed (to write, which does the

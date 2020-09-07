@@ -131,9 +131,9 @@ abstract_object_pointert array_abstract_objectt::read_index(
 /// \param value: the value we are trying to assign to that value in the array
 /// \param merging_write: ?
 ///
-/// \return The struct_abstract_objectt representing the result of writing
+/// \return The array_abstract_objectt representing the result of writing
 ///          to a specific component. In this case this will always be top
-///          as we are not tracking the value of this struct.
+///          as we are not tracking the value in the array.
 ///
 /// A helper function to evaluate writing to a component of a struct.
 /// More precise abstractions may override this to

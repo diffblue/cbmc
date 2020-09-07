@@ -210,7 +210,7 @@ abstract_object_pointert data_dependency_contextt::write(
  * \param update_sub_elements if true, propogate the update operation to any
  * children of this abstract object
  *
- * \return a clone of this abstract object with it's location context
+ * \return a clone of this abstract object with its location context
  * updated
  */
 abstract_object_pointert data_dependency_contextt::update_location_context(
@@ -280,7 +280,7 @@ data_dependency_contextt::merge(abstract_object_pointert other) const
 
 /**
  * Helper function for abstract_objectt::abstract_object_merge to perform any
- * additional actions after the base abstract_object_merge has completed it's
+ * additional actions after the base abstract_object_merge has completed its
  * actions but immediately prior to it returning. As such, this function gives
  * the ability to perform additional work for a merge.
  *

@@ -15,13 +15,13 @@
 
 /**
  * Update the location context for an abstract object, potentially
- * propogating the update to any children of this abstract object.
+ * propagating the update to any children of this abstract object.
  *
  * \param locations the set of locations to be updated
  * \param update_sub_elements if true, propogate the update operation to any
  * children of this abstract object
  *
- * \return a clone of this abstract object with it's location context
+ * \return a clone of this abstract object with its location context
  * updated
  */
 abstract_object_pointert write_location_contextt::update_location_context(
@@ -152,7 +152,7 @@ write_location_contextt::merge(abstract_object_pointert other) const
 
 /**
  * Helper function for abstract_objectt::abstract_object_merge to perform any
- * additional actions after the base abstract_object_merge has completed it's
+ * additional actions after the base abstract_object_merge has completed its
  * actions but immediately prior to it returning. As such, this function gives
  * the ability to perform additional work for a merge.
  *

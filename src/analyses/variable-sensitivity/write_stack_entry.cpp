@@ -2,7 +2,7 @@
 
  Module: Analyses Variable Sensitivity
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: DiffBlue Limited.
 
 \*******************************************************************/
 
