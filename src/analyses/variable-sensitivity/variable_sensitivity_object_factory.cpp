@@ -14,7 +14,8 @@ variable_sensitivity_object_factoryt
 
 /// Function: variable_sensitivity_object_factoryt::get_abstract_object_type
 ///
-/// \param type: the type of the variable the abstract object is meant to represent
+/// \param type: the type of the variable the abstract object is
+///              meant to represent
 ///
 /// \return An enum indicating the abstract object type to use.
 ///
@@ -75,10 +76,12 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
 /// Function: variable_sensitivity_object_factoryt::get_abstract_object
 ///
 /// \param type: the type of the variable
-/// \param top: whether the abstract object should be top in the two-value domain
-/// \param bottom: whether the abstract object should be bottom in the two-value domain
-/// \param e: if top and bottom are false this expression is used as the starting
-///           pointer for the abstract object
+/// \param top: whether the abstract object should be top in the
+///             two-value domain
+/// \param bottom: whether the abstract object should be bottom in the
+///                two-value domain
+/// \param e: if top and bottom are false this expression is used as the
+///           starting pointer for the abstract object
 /// \param ns: namespace, used when following the input type
 ///
 /// \return An abstract object of the appropriate type.

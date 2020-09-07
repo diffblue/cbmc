@@ -42,7 +42,8 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
 
 /// Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 ///
-/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param expr: the expression to use as the starting pointer for
+///              an abstract object
 /// \param environment: the environment the abstract object is being created in
 /// \param ns: the namespace
 constant_array_abstract_objectt::constant_array_abstract_objectt(
@@ -260,8 +261,8 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
 /// \param stack: the remaining stack of expressions on the LHS to evaluate
 /// \param index_expr: the expression uses to access a specific index
 /// \param value: the value we are trying to assign to that value in the array
-/// \param merging_write: Should this and all future writes be merged with the current
-///                       value
+/// \param merging_write: Should this and all future writes be merged with the
+///                       current value
 /// \return The array_abstract_objectt representing the result of writing
 ///         to a specific index.
 ///

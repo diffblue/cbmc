@@ -178,10 +178,11 @@ abstract_object_pointert abstract_objectt::abstract_object_meet_internal(
 /// \param expr: the expression to evaluate and find the result of it. this will
 ///              be the symbol referred to be op0()
 ///
-/// \return Returns the abstract_object representing the result of this expression
-///         to the maximum precision available.
+/// \return Returns the abstract_object representing the result of
+///         this expression to the maximum precision available.
 ///
-/// To try and resolve different expressions with the maximum level of precision available.
+/// To try and resolve different expressions with the maximum level
+/// of precision available.
 abstract_object_pointert abstract_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,

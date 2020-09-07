@@ -40,8 +40,10 @@ union_abstract_objectt::union_abstract_objectt(
 
 /// Function: union_abstract_objectt::union_abstract_objectt
 ///
-/// \param expr: the expression to use as the starting pointer for an abstract object
-/// \param environment: the environment the abstract object is going to be evaluated in.
+/// \param expr: the expression to use as the starting pointer for
+///              an abstract object
+/// \param environment: the environment the abstract object is going
+///                     to be evaluated in.
 union_abstract_objectt::union_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,

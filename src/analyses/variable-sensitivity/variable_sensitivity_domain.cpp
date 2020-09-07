@@ -324,7 +324,8 @@ std::vector<irep_idt> variable_sensitivity_domaint::get_modified_symbols(
 /// Function: variable_sensitivity_domaint::transform_function_call
 ///
 /// \param from: the location to transform from which is a function call
-/// \param to: the destination of the transform (potentially inside the function call)
+/// \param to: the destination of the transform
+///            (potentially inside the function call)
 /// \param ai: the abstract interpreter
 /// \param ns: the namespace of the current state
 ///

@@ -36,7 +36,8 @@ abstract_valuet::abstract_valuet(const typet &type, bool top, bool bottom)
 
 /// Function: abstract_valuet::abstract_valuet
 ///
-/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param expr: the expression to use as the starting pointer for
+///              an abstract object
 /// \param environment: The environment this abstract object is being created in
 /// \param ns: the namespace
 ///

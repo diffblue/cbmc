@@ -39,7 +39,8 @@ array_abstract_objectt::array_abstract_objectt(
 
 /// Function: array_abstract_objectt::array_abstract_objectt
 ///
-/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param expr: the expression to use as the starting pointer for
+///              an abstract object
 /// \param environment: the environment the abstract object is being created in
 /// \param ns: the namespace
 array_abstract_objectt::array_abstract_objectt(

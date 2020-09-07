@@ -181,10 +181,12 @@ private:
 ///
 /// \param abstract_object_classt: the class to use for the abstract object
 /// \param type: the type of the variable
-/// \param top: whether the abstract object should be top in the two-value domain
-/// \param bottom: whether the abstract object should be bottom in the two-value domain
-/// \param e: if top and bottom are false this expression is used as the starting
-///           pointer for the abstract object
+/// \param top: whether the abstract object should be top in the
+///             two-value domain
+/// \param bottom: whether the abstract object should be bottom in the
+///                two-value domain
+/// \param e: if top and bottom are false this expression is used as the
+///           starting pointer for the abstract object
 /// \param ns: namespace, used when following the input type
 ///
 /// \return An abstract object of the appropriate type.

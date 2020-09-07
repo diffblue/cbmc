@@ -41,7 +41,8 @@ struct_abstract_objectt::struct_abstract_objectt(
 
 /// Function: struct_abstract_objectt::struct_abstract_objectt
 ///
-/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param expr: the expression to use as the starting pointer for
+/// an abstract object
 struct_abstract_objectt::struct_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,

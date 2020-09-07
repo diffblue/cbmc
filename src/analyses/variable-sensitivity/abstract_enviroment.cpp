@@ -259,15 +259,16 @@ bool abstract_environmentt::assign(
 
 /// Function: abstract_object_pointert abstract_environmentt::write
 ///
-/// \param lhs: the abstract object for the left hand side of the write (i.e. the one
-///             to update).
+/// \param lhs: the abstract object for the left hand side of the write
+///             (i.e. the one to update).
 /// \param rhs: the value we are trying to write to the left hand side
-/// \param remaining_stack: what is left of the stack before the rhs can replace or be
-///                         merged with the rhs
+/// \param remaining_stack: what is left of the stack before the rhs can replace
+///                         or be merged with the rhs
 /// \param ns: the namespace
-/// \param merge_write: Are we replacing the left hand side with the right hand side
-///                     (e.g. we know for a fact that we are overwriting this object)
-///                     or could the write in fact not take place and therefore we
+/// \param merge_write: Are we replacing the left hand side with the
+///                     right hand side (e.g. we know for a fact that
+///                     we are overwriting this object) or could the
+///                     write in fact not take place and therefore we
 ///                     should merge to model the case where it did not.
 ///
 /// \return A modified version of the rhs after the write has taken place
@@ -383,7 +384,8 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
 ///
 /// \param type: the type of the object whose state should be tracked
 /// \param top: does the type of the object start as top
-/// \param bottom: does the type of the object start as bottom in the two-value domain
+/// \param bottom: does the type of the object start as bottom in
+///                the two-value domain
 ///
 /// \return The abstract object that has been created
 ///
@@ -421,8 +423,10 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
 ///
 /// \param type: the type of the object whose state should be tracked
 /// \param top: does the type of the object start as top in the two-value domain
-/// \param bottom: does the type of the object start as bottom in the two-value domain
-/// \param expr: the starting value of the symbol if top and bottom are both false
+/// \param bottom: does the type of the object start as bottom in
+///                the two-value domain
+/// \param expr: the starting value of the symbol if top and bottom
+///              are both false
 ///
 /// \return The abstract object that has been created
 ///

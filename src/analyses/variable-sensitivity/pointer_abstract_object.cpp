@@ -40,7 +40,8 @@ pointer_abstract_objectt::pointer_abstract_objectt(
 
 /// Function: pointer_abstract_objectt::pointer_abstract_objectt
 ///
-/// \param expr: the expression to use as the starting pointer for an abstract object
+/// \param expr: the expression to use as the starting pointer for
+///              an abstract object
 pointer_abstract_objectt::pointer_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
@@ -125,9 +126,9 @@ abstract_object_pointert pointer_abstract_objectt::read_dereference(
 ///               pointing to
 /// \param merging_write: is it a merging write (i.e. we aren't certain
 ///                       we are writing to this particular pointer therefore
-///                       the value should be merged with whatever is already there
-///                       or we are certain we are writing to this pointer so
-///                       therefore the value can be replaced
+///                       the value should be merged with whatever is already
+///                       there or we are certain we are writing to this pointer
+///                       so therefore the value can be replaced
 ///
 /// \return A modified abstract object representing this pointer after it
 ///         has been written to.
