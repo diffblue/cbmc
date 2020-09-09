@@ -27,13 +27,6 @@
 #  include <iostream>
 #endif
 
-/// Function: abstract_environmentt::eval
-/// Evaluate the value of an expression relative to the current domain
-///
-/// \param expr: the expression to evaluate
-/// \param ns: the current namespace
-///
-/// \return The abstract_object representing the value of the expression
 abstract_object_pointert
 abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 {
@@ -121,35 +114,6 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   }
 }
 
-/// Function: abstract_environmentt::assign
-///
-/// \param expr: the expression to assign to
-/// \param value: the value to assign to the expression
-/// \param ns: the namespace
-///
-/// \return A boolean, true if the assignment has changed the domain.
-///
-/// Assign a value to an expression
-///
-///  Assign is in principe simple, it updates the map with the new
-/// abstract object.  The challenge is how to handle write to compound
-/// objects, for example:
-///    a[i].x.y = 23;
-/// In this case we clearly want to update a, but we need to delegate to
-/// the object in a so that it updates the right part of it (depending on
-/// what kind of array abstraction it is).  So, as we find the variable
-/// ('a' in this case) we build a stack of which part of it is accessed.
-///
-/// As abstractions may split the assignment into multiple writes (for
-/// example pointers that could point to several locations, arrays with
-/// non-constant indexes), each of which has to handle the rest of the
-/// compound write, thus the stack is passed (to write, which does the
-/// actual updating) as an explicit argument rather than just via
-/// recursion.
-///
-/// The same use case (but for the opposite reason; because you will only
-/// update one of the multiple objects) is also why a merge_write flag is
-/// needed.
 bool abstract_environmentt::assign(
   const exprt &expr,
   const abstract_object_pointert value,
@@ -257,26 +221,6 @@ bool abstract_environmentt::assign(
   return true;
 }
 
-/// Function: abstract_object_pointert abstract_environmentt::write
-///
-/// \param lhs: the abstract object for the left hand side of the write
-///             (i.e. the one to update).
-/// \param rhs: the value we are trying to write to the left hand side
-/// \param remaining_stack: what is left of the stack before the rhs can replace
-///                         or be merged with the rhs
-/// \param ns: the namespace
-/// \param merge_write: Are we replacing the left hand side with the
-///                     right hand side (e.g. we know for a fact that
-///                     we are overwriting this object) or could the
-///                     write in fact not take place and therefore we
-///                     should merge to model the case where it did not.
-///
-/// \return A modified version of the rhs after the write has taken place
-///
-/// Write an abstract object onto another respecting a stack of
-/// member, index and dereference access. This ping-pongs between
-/// this method and the relevant write methods in abstract_struct,
-/// abstract_pointer and abstract_array until the stack is empty
 abstract_object_pointert abstract_environmentt::write(
   abstract_object_pointert lhs,
   abstract_object_pointert rhs,
@@ -318,20 +262,6 @@ abstract_object_pointert abstract_environmentt::write(
   }
 }
 
-/// Function: abstract_environmentt::assume
-///
-/// \param expr: the expression that is to be assumed
-/// \param ns: the current namespace
-///
-/// \return True if the assume changed the domain.
-///
-/// Reduces the domain to (an over-approximation) of the cases
-/// when the the expression holds.  Used to implement assume
-/// statements and conditional branches.
-/// It would be valid to simply return false here because it
-/// is an over-approximation.  We try to do better than that.
-/// The better the implementation the more precise the results
-/// will be.
 bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
 {
   // We should only attempt to assume Boolean things
@@ -380,17 +310,6 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   return false;
 }
 
-/// Function: abstract_environmentt::abstract_object_factory
-///
-/// \param type: the type of the object whose state should be tracked
-/// \param top: does the type of the object start as top
-/// \param bottom: does the type of the object start as bottom in
-///                the two-value domain
-///
-/// \return The abstract object that has been created
-///
-/// Look at the configuration for the sensitivity and create an
-/// appropriate abstract_object
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet &type,
   const namespacet &ns,
@@ -402,15 +321,6 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
     type, top, bottom, empty_constant_expr, *this, ns);
 }
 
-/// Function: abstract_environmentt::abstract_object_factory
-///
-/// \param type: the type of the object whose state should be tracked
-/// \param expr: the starting value of the symbol
-///
-/// \return The abstract object that has been created
-///
-/// Look at the configuration for the sensitivity and create an
-/// appropriate abstract_object, assigning an appropriate value
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet &type,
   const exprt &e,
@@ -419,19 +329,6 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
   return abstract_object_factory(type, false, false, e, *this, ns);
 }
 
-/// Function: abstract_environmentt::abstract_object_factory
-///
-/// \param type: the type of the object whose state should be tracked
-/// \param top: does the type of the object start as top in the two-value domain
-/// \param bottom: does the type of the object start as bottom in
-///                the two-value domain
-/// \param expr: the starting value of the symbol if top and bottom
-///              are both false
-///
-/// \return The abstract object that has been created
-///
-/// Look at the configuration for the sensitivity and create an
-/// appropriate abstract_object
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet &type,
   bool top,
@@ -444,13 +341,6 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
     type, top, bottom, e, environment, ns);
 }
 
-/// Function: abstract_environmentt::merge
-///
-/// \param env: the other environment
-///
-/// \return A Boolean, true when the merge has changed something
-///
-/// Computes the join between "this" and "b"
 bool abstract_environmentt::merge(const abstract_environmentt &env)
 {
   // Use the sharing_map's "iterative over all differences" functionality
@@ -489,22 +379,12 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   }
 }
 
-/// Function: abstract_environmentt::havoc
-///
-/// \param havoc_string: diagnostic string to track down havoc causing.
-///
-/// \return None
-///
-/// Set the domain to top
 void abstract_environmentt::havoc(const std::string &havoc_string)
 {
   // TODO(tkiley): error reporting
   make_top();
 }
 
-/// Function: abstract_environmentt::make_top
-///
-/// Set the domain to top
 void abstract_environmentt::make_top()
 {
   // since we assume anything is not in the map is top this is sufficient
@@ -512,38 +392,22 @@ void abstract_environmentt::make_top()
   bottom = false;
 }
 
-/// Function: abstract_environmentt::make_bottom
-///
-/// Set the domain to top
 void abstract_environmentt::make_bottom()
 {
   map.clear();
   bottom = true;
 }
 
-/// abstract_environmentt::is_bottom
-///
-/// Gets whether the domain is bottom
 bool abstract_environmentt::is_bottom() const
 {
   return map.empty() && bottom;
 }
 
-/// Function: abstract_environmentt::is_top
-///
-/// Gets whether the domain is top
 bool abstract_environmentt::is_top() const
 {
   return map.empty() && !bottom;
 }
 
-/// Function: abstract_environmentt::output
-///
-/// \param out: the stream to write to
-/// \param ai: the abstract interpreter that contains this domain
-/// \param ns: the current namespace
-///
-/// Print out all the values in the abstract object map
 void abstract_environmentt::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -562,9 +426,6 @@ void abstract_environmentt::output(
   out << "}\n";
 }
 
-/// Function: abstract_environmentt::verify
-///
-/// Check there aren't any null pointer mapped values
 bool abstract_environmentt::verify() const
 {
   decltype(map)::viewt view;
@@ -601,33 +462,11 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   return eval_obj->expression_transform(e, operands, *this, ns);
 }
 
-/// Function: abstract_environmentt::erase
-///
-/// \param expr:  A symbol to delete from the map
-///
-///
-/// Delete a symbol from the map.  This is necessary if the
-/// symbol falls out of scope and should no longer be tracked.
 void abstract_environmentt::erase(const symbol_exprt &expr)
 {
   map.erase_if_exists(expr.get_identifier());
 }
 
-/// Function: abstract_environmentt::environment_diff
-///
-///  Inputs:  Two abstract_environmentt's that need to be intersected for,
-///           so that we can find symbols that have changed between
-///           different domains.
-///
-/// Outputs:  An std::vector containing the symbols that are present in
-///           both environments.
-///
-///  Purpose:  For our implementation of variable sensitivity domains, we
-///           need to be able to efficiently find symbols that have changed
-///           between different domains. To do this, we need to be able
-///           to quickly find which symbols have new written locations,
-///           which we do by finding the intersection between two different
-///           domains (environments).
 std::vector<abstract_environmentt::map_keyt>
 abstract_environmentt::modified_symbols(
   const abstract_environmentt &first,

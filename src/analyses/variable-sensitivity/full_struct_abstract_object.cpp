@@ -20,20 +20,12 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #  include <iostream>
 #endif
 
-/**
- * \brief Explicit copy-constructor to make it clear that the shared_map
- *        used to store the values of fields is copy-constructed as well
- *        to ensure it shares as much data as possible.
- */
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const full_struct_abstract_objectt &ao)
   : struct_abstract_objectt(ao), map(ao.map)
 {
 }
 
-/// Function: full_struct_abstract_objectt::struct_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
 full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t)
   : struct_abstract_objectt(t)
 {
@@ -41,14 +33,6 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t)
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-/// Function: struct_abstract_objectt::struct_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
-/// \param top: is the abstract_object starting as top
-/// \param bottom: is the abstract_object starting as bottom
-///
-/// Start the abstract object at either top or bottom or
-/// neither asserts if both top and bottom are true
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const typet &t,
   bool top,
@@ -59,10 +43,6 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-/// Function: full_struct_abstract_objectt::full_struct_abstract_objectt
-///
-/// \param expr: the expression to use as the starting pointer for an
-///              abstract object
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
@@ -92,18 +72,6 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-/// Function: struct_abstract_objectt::read_component
-///
-/// \param environment: the abstract environment
-/// \param member_expr: the expression uses to access a specific component
-///
-/// \return The abstract object representing the value of that
-///         component. For this abstraction this will always be top
-///         since we are not tracking the struct.
-///
-/// A helper function to evaluate the abstract object contained
-/// within a struct. More precise abstractions may override
-/// this to return more precise results.
 abstract_object_pointert full_struct_abstract_objectt::read_component(
   const abstract_environmentt &environment,
   const member_exprt &member_expr,
@@ -136,21 +104,6 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   }
 }
 
-/// Function: struct_abstract_objectt::write_component
-///
-/// \param environment: the abstract environment
-/// \param stack: the remaining stack of expressions on the LHS to evaluate
-/// \param member_expr: the expression uses to access a specific component
-/// \param value: the value we are trying to write to the component
-///
-/// \return The struct_abstract_objectt representing the result of
-///         writing to a specific component. In this case this will
-///         always be top as we are not tracking the value of this
-///          struct.
-///
-/// A helper function to evaluate writing to a component of a
-/// struct. More precise abstractions may override this to
-/// update what they are storing for a specific component.
 sharing_ptrt<struct_abstract_objectt>
 full_struct_abstract_objectt::write_component(
   abstract_environmentt &environment,
@@ -247,16 +200,6 @@ full_struct_abstract_objectt::write_component(
   }
 }
 
-/// Function: full_struct_abstract_objectt::output
-///
-/// \param out: the stream to write to
-/// \param ai: the abstract interpreter that contains the abstract domain
-///            (that contains the object ... )
-/// \param ns: the current namespace
-///
-/// To provide a human readable string to the out representing
-/// the current known value about this object. For this array we
-/// print: { .component_name=<output of object for component_name... }
 void full_struct_abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -288,14 +231,6 @@ void full_struct_abstract_objectt::output(
   out << "}";
 }
 
-/// Function: full_struct_abstract_objectt::verify
-///
-/// \return Returns true if the struct is valid
-///
-/// To validate that the struct object is in a valid state.
-/// This means either it is top or bottom, or if neither of those
-/// then there exists something in the map of components.
-/// If there is something in the map, then it can't be top or bottom
 bool full_struct_abstract_objectt::verify() const
 {
   // Either the object is top or bottom (=> map empty)
@@ -303,15 +238,6 @@ bool full_struct_abstract_objectt::verify() const
   return (is_top() || is_bottom()) == map.empty();
 }
 
-/// Function: full_struct_abstract_objectt::merge
-///
-/// \param other: the other object being merged
-///
-/// \return  Returns the result of the merge.
-///
-/// To merge an abstract object into this abstract object. If
-/// the other is also a struct, we perform a constant_structs merge
-/// Otherwise we call back to the parent merge.
 abstract_object_pointert
 full_struct_abstract_objectt::merge(abstract_object_pointert other) const
 {
@@ -328,15 +254,6 @@ full_struct_abstract_objectt::merge(abstract_object_pointert other) const
   }
 }
 
-/// Function: full_struct_abstract_objectt::merge_constant_structs
-///
-/// \param other: the other object being merged
-///
-/// \return Returns a new abstract object that is the result of the merge
-///         unless the merge is the same as this abstract object, in which
-///         case it returns this.
-///
-/// Performs an element wise merge of the map for each struct
 abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   constant_struct_pointert other) const
 {
@@ -367,17 +284,6 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   }
 }
 
-/**
- * Apply a visitor operation to all sub elements of this abstract_object.
- * A sub element might be a member of a struct, or an element of an array,
- * for instance, but this is entirely determined by the particular
- * derived instance of abstract_objectt.
- *
- * \param visitor an instance of a visitor class that will be applied to
- * all sub elements
- * \return A new abstract_object if it's contents is modifed, or this if
- * no modification is needed
- */
 abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {

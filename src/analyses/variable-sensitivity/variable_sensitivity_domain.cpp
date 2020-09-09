@@ -21,16 +21,6 @@ Date: April 2016
 #  include <iostream>
 #endif
 
-/// Function: variable_sensitivity_domaint::transform
-///
-/// \param from: the instruction before the abstract domain
-/// \param to: the instruction after the abstract domain
-/// \param ai: the abstract interpreter
-/// \param ns: the namespace
-///
-/// \return none
-///
-/// Compute the abstract transformer for a single instruction
 void variable_sensitivity_domaint::transform(
   const irep_idt &function_from,
   locationt from,
@@ -185,15 +175,6 @@ void variable_sensitivity_domaint::transform(
   DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
 }
 
-/// Function: variable_sensitivity_domaint::output
-///
-/// \param out: the output stream
-/// \param ai: the abstract interpreter
-/// \param ns: the namespace
-///
-/// \return none
-///
-/// Basic text output of the abstract domain
 void variable_sensitivity_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -202,40 +183,22 @@ void variable_sensitivity_domaint::output(
   abstract_state.output(out, ai, ns);
 }
 
-/// Function: variable_sensitivity_domaint::make_bottom
-///
-/// Sets the domain to bottom (no relations).
 void variable_sensitivity_domaint::make_bottom()
 {
   abstract_state.make_bottom();
   return;
 }
 
-/// Function: variable_sensitivity_domaint::make_top
-///
-/// Sets the domain to top (all relations).
 void variable_sensitivity_domaint::make_top()
 {
   abstract_state.make_top();
 }
 
-/// Function: variable_sensitivity_domaint::make_entry
-///
-/// Set up a sane entry state.
 void variable_sensitivity_domaint::make_entry()
 {
   abstract_state.make_top();
 }
 
-/// Function: variable_sensitivity_domaint::merge
-///
-/// \param b: the other domain
-/// \param from: it's preceding location
-/// \param to: it's current location
-///
-/// \return true if something has changed.
-///
-/// Computes the join between "this" and "b".
 bool variable_sensitivity_domaint::merge(
   const variable_sensitivity_domaint &b,
   locationt from,
@@ -253,17 +216,6 @@ bool variable_sensitivity_domaint::merge(
   return any_changes;
 }
 
-/// Function: variable_sensitivity_domaint::ai_simplify
-///
-/// \param condition: the expression to simplify
-/// \param ns: the namespace
-/// \param lhs: is the expression on the left hand side
-///
-/// \return True if no simplification was made
-///
-/// Use the information in the domain to simplify the expression
-/// with respect to the current location.  This may be able to
-/// reduce some values to constants.
 bool variable_sensitivity_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
@@ -291,29 +243,16 @@ bool variable_sensitivity_domaint::ai_simplify(
   }
 }
 
-/// Function: variable_sensitivity_domaint::is_bottom
-///
-/// \return True if the domain is bottom (i.e. unreachable).
-///
-/// Find out if the domain is currently unreachable.
 bool variable_sensitivity_domaint::is_bottom() const
 {
   return abstract_state.is_bottom();
 }
 
-/// Function: variable_sensitivity_domaint::is_top
-///
-/// \return True if the domain is top
-///
-/// Is the domain completely top at this state
 bool variable_sensitivity_domaint::is_top() const
 {
   return abstract_state.is_top();
 }
 
-/// Get symbols that have been modified since this domain and other
-/// \param other: The domain that things may have been modified in
-/// \return A list of symbols whose write location is different
 std::vector<irep_idt> variable_sensitivity_domaint::get_modified_symbols(
   const variable_sensitivity_domaint &other) const
 {
@@ -321,20 +260,6 @@ std::vector<irep_idt> variable_sensitivity_domaint::get_modified_symbols(
     abstract_state, other.abstract_state);
 }
 
-/// Function: variable_sensitivity_domaint::transform_function_call
-///
-/// \param from: the location to transform from which is a function call
-/// \param to: the destination of the transform
-///            (potentially inside the function call)
-/// \param ai: the abstract interpreter
-/// \param ns: the namespace of the current state
-///
-/// Used by variable_sensitivity_domaint::transform to handle
-/// FUNCTION_CALL transforms. This is copying the values of the arguments
-/// into new symbols corresponding to the declared parameter names.
-///
-/// If the function call is opaque we currently top the return value
-/// and the value of any things whose address is passed into the function.
 void variable_sensitivity_domaint::transform_function_call(
   locationt from,
   locationt to,
@@ -457,14 +382,6 @@ void variable_sensitivity_domaint::transform_function_call(
   }
 }
 
-/// Function: variable_sensitivity_domaint::ignore_function_call_transform
-///
-/// \param function_id: the name of the function being called
-///
-/// \return Returns true if the function should be ignored
-///
-/// Used to specify which CPROVER internal functions should be skipped
-/// over when doing function call transforms
 bool variable_sensitivity_domaint::ignore_function_call_transform(
   const irep_idt &function_id) const
 {
@@ -481,16 +398,6 @@ bool variable_sensitivity_domaint::ignore_function_call_transform(
          ignored_internal_function.cend();
 }
 
-/// Perform a context aware merge of the changes that have been applied
-/// between function_start and the current state. Anything that has not been
-/// modified will be taken from the \p function_call domain.
-/// \param function_call: The local of the merge - values from here will be
-///   taken if they have not been modified
-/// \param function_start: The base of the merge - changes that have been made
-///   between here and the end will be retained.
-/// \param function_end: The end of the merge - changes that have been made
-///   between the start and here will be retained.
-/// \param ns: The global namespace
 void variable_sensitivity_domaint::merge_three_way_function_return(
   const ai_domain_baset &function_call,
   const ai_domain_baset &function_start,
@@ -533,11 +440,6 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
   }
 }
 
-/// Given a domain and some symbols, apply those symbols values
-/// to the current domain
-/// \param modified_symbols: The symbols to write
-/// \param source: The domain to take the values from
-/// \param ns: The global namespace
 void variable_sensitivity_domaint::apply_domain(
   std::vector<symbol_exprt> modified_symbols,
   const variable_sensitivity_domaint &source,

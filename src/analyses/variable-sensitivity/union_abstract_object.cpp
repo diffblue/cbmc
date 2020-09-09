@@ -12,23 +12,12 @@
 
 #include "union_abstract_object.h"
 
-/// Function: union_abstract_objectt::union_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
 union_abstract_objectt::union_abstract_objectt(const typet &type)
   : abstract_objectt(type)
 {
   PRECONDITION(type.id() == ID_union);
 }
 
-/// Function: union_abstract_objectt::union_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
-/// \param top: is the abstract_object starting as top
-/// \param bottom: is the abstract_object starting as bottom
-///
-/// Start the abstract object at either top or bottom or neither
-/// Asserts if both top and bottom are true
 union_abstract_objectt::union_abstract_objectt(
   const typet &type,
   bool top,
@@ -38,12 +27,6 @@ union_abstract_objectt::union_abstract_objectt(
   PRECONDITION(type.id() == ID_union);
 }
 
-/// Function: union_abstract_objectt::union_abstract_objectt
-///
-/// \param expr: the expression to use as the starting pointer for
-///              an abstract object
-/// \param environment: the environment the abstract object is going
-///                     to be evaluated in.
 union_abstract_objectt::union_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
@@ -53,18 +36,6 @@ union_abstract_objectt::union_abstract_objectt(
   PRECONDITION(ns.follow(expr.type()).id() == ID_union);
 }
 
-/**
- * A helper function to evaluate an abstract object contained
- * within a container object. More precise abstractions may override this
- * to return more precise results.
- *
- * \param env the abstract environment
- * \param specifier a modifier expression, such as an array index or field
- * specifier used to indicate access to a specific component
- * \param ns the current namespace
- *
- * \return the abstract_objectt representing the value of the read component.
- */
 abstract_object_pointert union_abstract_objectt::read(
   const abstract_environmentt &env,
   const exprt &specifier,
@@ -73,22 +44,6 @@ abstract_object_pointert union_abstract_objectt::read(
   return read_component(env, to_member_expr(specifier), ns);
 }
 
-/**
- * A helper function to evaluate writing to a component of an
- * abstract object. More precise abstractions may override this to
- * update what they are storing for a specific component.
- *
- * \param environment the abstract environment
- * \param ns the current namespace
- * \param stack the remaining stack of expressions on the LHS to evaluate
- * \param specifier the expression uses to access a specific component
- * \param value the value we are trying to write to the component
- * \param merging_write if true, this and all future writes will be merged
- * with the current value
- *
- * \return the abstract_objectt representing the result of writing
- * to a specific component.
- */
 abstract_object_pointert union_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -101,18 +56,6 @@ abstract_object_pointert union_abstract_objectt::write(
     environment, ns, stack, to_member_expr(specifier), value, merging_write);
 }
 
-/// Function: union_abstract_objectt::read_component
-///
-/// \param environment: the abstract environment
-/// \param member_expr: the expression uses to access a specific component
-///
-/// The abstract object representing the value of that component. For
-/// this abstraction this will always be top since we are not tracking
-/// the union.
-///
-/// A helper function to evaluate the abstract object contained
-/// within a union. More precise abstractions may override this
-/// to return more precise results.
 abstract_object_pointert union_abstract_objectt::read_component(
   const abstract_environmentt &environment,
   const member_exprt &member_expr,
@@ -122,20 +65,6 @@ abstract_object_pointert union_abstract_objectt::read_component(
     member_expr.type(), ns, !is_bottom(), is_bottom());
 }
 
-/// Function: union_abstract_objectt::write_component
-///
-/// \param environment: the abstract environment
-/// \param stack: the remaining stack of expressions on the LHS to evaluate
-/// \param member_expr: the expression uses to access a specific component
-/// \param value: the value we are trying to write to the component
-///
-/// \return The union_abstract_objectt representing the result of writing
-///         to a specific component. In this case this will always be top
-///         as we are not tracking the value of this union.
-///
-/// A helper function to evaluate writing to a component of a union.
-/// More precise abstractions may override this to
-/// update what they are storing for a specific component.
 sharing_ptrt<union_abstract_objectt> union_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,

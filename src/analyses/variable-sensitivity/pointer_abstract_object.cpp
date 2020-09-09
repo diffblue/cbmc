@@ -12,23 +12,12 @@
 
 #include "pointer_abstract_object.h"
 
-/// Function: pointer_abstract_objectt::pointer_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
 pointer_abstract_objectt::pointer_abstract_objectt(const typet &t)
   : abstract_objectt(t)
 {
   PRECONDITION(t.id() == ID_pointer);
 }
 
-/// Function: pointer_abstract_objectt::pointer_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
-/// \param top: is the abstract_object starting as top
-/// \param bottom: is the abstract_object starting as bottom
-///
-/// Start the abstract object at either top or bottom or neither
-/// Asserts if both top and bottom are true
 pointer_abstract_objectt::pointer_abstract_objectt(
   const typet &t,
   bool tp,
@@ -38,10 +27,6 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   PRECONDITION(t.id() == ID_pointer);
 }
 
-/// Function: pointer_abstract_objectt::pointer_abstract_objectt
-///
-/// \param expr: the expression to use as the starting pointer for
-///              an abstract object
 pointer_abstract_objectt::pointer_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
@@ -51,18 +36,6 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   PRECONDITION(e.type().id() == ID_pointer);
 }
 
-/**
- * A helper function to evaluate an abstract object contained
- * within a container object. More precise abstractions may override this
- * to return more precise results.
- *
- * \param env the abstract environment
- * \param specifier a modifier expression, such as an array index or field
- * specifier used to indicate access to a specific component
- * \param ns the current namespace
- *
- * \return the abstract_objectt representing the value of the read component.
- */
 abstract_object_pointert pointer_abstract_objectt::read(
   const abstract_environmentt &env,
   const exprt &specifier,
@@ -71,22 +44,6 @@ abstract_object_pointert pointer_abstract_objectt::read(
   return read_dereference(env, ns);
 }
 
-/**
- * A helper function to evaluate writing to a component of an
- * abstract object. More precise abstractions may override this to
- * update what they are storing for a specific component.
- *
- * \param environment the abstract environment
- * \param ns the current namespace
- * \param stack the remaining stack of expressions on the LHS to evaluate
- * \param specifier the expression uses to access a specific component
- * \param value the value we are trying to write to the component
- * \param merging_write if true, this and all future writes will be merged
- * with the current value
- *
- * \return the abstract_objectt representing the result of writing
- * to a specific component.
- */
 abstract_object_pointert pointer_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -98,15 +55,6 @@ abstract_object_pointert pointer_abstract_objectt::write(
   return write_dereference(environment, ns, stack, value, merging_write);
 }
 
-/// Function: pointer_abstract_objectt::read_dereference
-///
-/// \param env: the environment
-/// \param ns: the namespace
-///
-/// \return An abstract object representing the value being pointed to
-///
-/// A helper function to read elements from an array. More precise
-/// abstractions may override this to provide more precise results.
 abstract_object_pointert pointer_abstract_objectt::read_dereference(
   const abstract_environmentt &env,
   const namespacet &ns) const
@@ -117,24 +65,6 @@ abstract_object_pointert pointer_abstract_objectt::read_dereference(
   return env.abstract_object_factory(pointed_to_type, ns, true, false);
 }
 
-/// Function: pointer_abstract_objectt::write_dereference
-///
-/// \param environment: the abstract environment
-/// \param ns: the namespace
-/// \param stack: the remaining stack of expressions on the LHS to evaluate
-/// \param value: the value we are trying to assign to what the pointer is
-///               pointing to
-/// \param merging_write: is it a merging write (i.e. we aren't certain
-///                       we are writing to this particular pointer therefore
-///                       the value should be merged with whatever is already
-///                       there or we are certain we are writing to this pointer
-///                       so therefore the value can be replaced
-///
-/// \return A modified abstract object representing this pointer after it
-///         has been written to.
-///
-/// A helper function to evaluate writing to a pointers value. More
-/// precise abstractions may override this provide more precise results.
 sharing_ptrt<pointer_abstract_objectt>
 pointer_abstract_objectt::write_dereference(
   abstract_environmentt &environment,

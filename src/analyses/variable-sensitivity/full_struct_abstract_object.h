@@ -25,23 +25,55 @@ class full_struct_abstract_objectt : public struct_abstract_objectt
 public:
   typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
 
-  // Define an explicit copy constructor to ensure sharing of maps
+  /**
+   * \brief Explicit copy-constructor to make it clear that the shared_map
+   *        used to store the values of fields is copy-constructed as well
+   *        to ensure it shares as much data as possible.
+   */
   full_struct_abstract_objectt(const full_struct_abstract_objectt &ao);
 
+  /// \param type: the type the abstract_object is representing
   explicit full_struct_abstract_objectt(const typet &type);
 
+  /// Start the abstract object at either top or bottom or
+  /// neither asserts if both top and bottom are true
+  ///
+  /// \param type: the type the abstract_object is representing
+  /// \param top: is the abstract_object starting as top
+  /// \param bottom: is the abstract_object starting as bottom
   full_struct_abstract_objectt(const typet &type, bool top, bool bottom);
 
+  /// \param expr: the expression to use as the starting pointer for an
+  ///              abstract object
   full_struct_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  /// To provide a human readable string to the out representing
+  /// the current known value about this object. For this array we
+  /// print: { .component_name=<output of object for component_name... }
+  ///
+  /// \param out: the stream to write to
+  /// \param ai: the abstract interpreter that contains the abstract domain
+  ///            (that contains the object ... )
+  /// \param ns: the current namespace
   void output(
     std::ostream &out,
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
+  /**
+   * Apply a visitor operation to all sub elements of this abstract_object.
+   * A sub element might be a member of a struct, or an element of an array,
+   * for instance, but this is entirely determined by the particular
+   * derived instance of abstract_objectt.
+   *
+   * \param visitor an instance of a visitor class that will be applied to
+   * all sub elements
+   * \return A new abstract_object if it's contents is modifed, or this if
+   * no modification is needed
+   */
   abstract_object_pointert
   visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
@@ -57,18 +89,47 @@ private:
     shared_struct_mapt;
   shared_struct_mapt map;
 
+  /// Performs an element wise merge of the map for each struct
+  ///
+  /// \param other: the other object being merged
+  ///
+  /// \return Returns a new abstract object that is the result of the merge
+  ///         unless the merge is the same as this abstract object, in which
+  ///         case it returns this.
   abstract_object_pointert
   merge_constant_structs(constant_struct_pointert other) const;
 
 protected:
   CLONE
 
-  // struct interface
+  /// A helper function to evaluate the abstract object contained
+  /// within a struct. More precise abstractions may override
+  /// this to return more precise results.
+  ///
+  /// \param environment: the abstract environment
+  /// \param member_expr: the expression uses to access a specific component
+  ///
+  /// \return The abstract object representing the value of that
+  ///         component. For this abstraction this will always be top
+  ///         since we are not tracking the struct.
   abstract_object_pointert read_component(
     const abstract_environmentt &environment,
     const member_exprt &member_expr,
     const namespacet &ns) const override;
 
+  /// A helper function to evaluate writing to a component of a
+  /// struct. More precise abstractions may override this to
+  /// update what they are storing for a specific component.
+  ///
+  /// \param environment: the abstract environment
+  /// \param stack: the remaining stack of expressions on the LHS to evaluate
+  /// \param member_expr: the expression uses to access a specific component
+  /// \param value: the value we are trying to write to the component
+  ///
+  /// \return The struct_abstract_objectt representing the result of
+  ///         writing to a specific component. In this case this will
+  ///         always be top as we are not tracking the value of this
+  ///          struct.
   sharing_ptrt<struct_abstract_objectt> write_component(
     abstract_environmentt &environment,
     const namespacet &ns,
@@ -77,9 +138,23 @@ protected:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
+  /// Function: full_struct_abstract_objectt::verify
+  ///
+  /// \return Returns true if the struct is valid
+  ///
+  /// To validate that the struct object is in a valid state.
+  /// This means either it is top or bottom, or if neither of those
+  /// then there exists something in the map of components.
+  /// If there is something in the map, then it can't be top or bottom
   bool verify() const override;
-  // Set the state of this to the merge result of op1 and op2 and
-  // return if the result is different from op1
+
+  /// To merge an abstract object into this abstract object. If
+  /// the other is also a struct, we perform a constant_structs merge
+  /// Otherwise we call back to the parent merge.
+  ///
+  /// \param other: the other object being merged
+  ///
+  /// \return  Returns the result of the merge.
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 };
 

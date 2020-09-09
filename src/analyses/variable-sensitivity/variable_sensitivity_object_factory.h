@@ -126,6 +126,20 @@ public:
   {
     return s_instance;
   }
+
+  /// Get the appropriate abstract object for the variable under
+  /// consideration.
+  ///
+  /// \param type: the type of the variable
+  /// \param top: whether the abstract object should be top in the
+  ///             two-value domain
+  /// \param bottom: whether the abstract object should be bottom in the
+  ///                two-value domain
+  /// \param e: if top and bottom are false this expression is used as the
+  ///           starting pointer for the abstract object
+  /// \param ns: namespace, used when following the input type
+  ///
+  /// \return An abstract object of the appropriate type.
   abstract_object_pointert get_abstract_object(
     const typet type,
     bool top,
@@ -133,6 +147,11 @@ public:
     const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns);
+
+  /// Called once to record the appropriate variables from the command line
+  /// options so that they can be accessed easily when they are needed.
+  ///
+  /// \param options: the command line options
   void set_options(const vsd_configt &options);
 
 private:
@@ -155,6 +174,13 @@ private:
     UNION_INSENSITIVE,
     VALUE_SET
   };
+
+  /// Decide which abstract object type to use for the variable in question.
+  ///
+  /// \param type: the type of the variable the abstract object is
+  ///              meant to represent
+  ///
+  /// \return An enum indicating the abstract object type to use.
   ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
   template <class abstract_object_class>
   abstract_object_pointert initialize_abstract_object(

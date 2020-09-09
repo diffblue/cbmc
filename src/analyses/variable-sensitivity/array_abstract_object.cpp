@@ -11,23 +11,12 @@
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-/// Function: array_abstract_objectt::array_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
 array_abstract_objectt::array_abstract_objectt(const typet &t)
   : abstract_objectt(t)
 {
   PRECONDITION(t.id() == ID_array);
 }
 
-/// Function: array_abstract_objectt::array_abstract_objectt
-///
-/// \param type: the type the abstract_object is representing
-/// \param top: is the abstract_object starting as top
-/// \param bottom: is the abstract_object starting as bottom
-///
-/// Start the abstract object at either top or bottom or neither
-/// Asserts if both top and bottom are true
 array_abstract_objectt::array_abstract_objectt(
   const typet &t,
   bool tp,
@@ -37,12 +26,6 @@ array_abstract_objectt::array_abstract_objectt(
   PRECONDITION(t.id() == ID_array);
 }
 
-/// Function: array_abstract_objectt::array_abstract_objectt
-///
-/// \param expr: the expression to use as the starting pointer for
-///              an abstract object
-/// \param environment: the environment the abstract object is being created in
-/// \param ns: the namespace
 array_abstract_objectt::array_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
@@ -52,18 +35,6 @@ array_abstract_objectt::array_abstract_objectt(
   PRECONDITION(e.type().id() == ID_array);
 }
 
-/**
- * A helper function to evaluate an abstract object contained
- * within a container object. More precise abstractions may override this
- * to return more precise results.
- *
- * \param env the abstract environment
- * \param specifier a modifier expression, such as an array index or field
- * specifier used to indicate access to a specific component
- * \param ns the current namespace
- *
- * \return the abstract_objectt representing the value of the read component.
- */
 abstract_object_pointert array_abstract_objectt::read(
   const abstract_environmentt &env,
   const exprt &specifier,
@@ -72,22 +43,6 @@ abstract_object_pointert array_abstract_objectt::read(
   return this->read_index(env, to_index_expr(specifier), ns);
 }
 
-/**
- * A helper function to evaluate writing to a component of an
- * abstract object. More precise abstractions may override this to
- * update what they are storing for a specific component.
- *
- * \param environment the abstract environment
- * \param ns the current namespace
- * \param stack the remaining stack of expressions on the LHS to evaluate
- * \param specifier the expression uses to access a specific component
- * \param value the value we are trying to write to the component
- * \param merging_write if true, this and all future writes will be merged
- * with the current value
- *
- * \return the abstract_objectt representing the result of writing
- * to a specific component.
- */
 abstract_object_pointert array_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -100,15 +55,6 @@ abstract_object_pointert array_abstract_objectt::write(
     environment, ns, stack, to_index_expr(specifier), value, merging_write);
 }
 
-/// Function: array_abstract_objectt::read_index
-///
-/// \param env: the environment
-/// \param index: the expression used to access the specific value in the array
-///
-/// \return An abstract object representing the value in the array
-///
-/// A helper function to read elements from an array. More precise
-/// abstractions may override this to provide more precise results.
 abstract_object_pointert array_abstract_objectt::read_index(
   const abstract_environmentt &env,
   const index_exprt &index,
@@ -122,22 +68,6 @@ abstract_object_pointert array_abstract_objectt::read_index(
   return env.abstract_object_factory(subtype, ns, !is_bottom(), is_bottom());
 }
 
-/// Function: array_abstract_objectt::write_index
-///
-/// \param environment: the abstract environment
-/// \param ns: the namespace
-/// \param stack: the remaining stack of expressions on the LHS to evaluate
-/// \param index_expr: the expression uses to access a specific index
-/// \param value: the value we are trying to assign to that value in the array
-/// \param merging_write: ?
-///
-/// \return The array_abstract_objectt representing the result of writing
-///          to a specific component. In this case this will always be top
-///          as we are not tracking the value in the array.
-///
-/// A helper function to evaluate writing to a component of a struct.
-/// More precise abstractions may override this to
-/// update what they are storing for a specific component.
 sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,

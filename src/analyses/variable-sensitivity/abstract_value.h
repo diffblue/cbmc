@@ -17,8 +17,24 @@
 class abstract_valuet : public abstract_objectt
 {
 public:
+  /// \param type: the type the abstract_value is representing
   explicit abstract_valuet(const typet &type);
+
+  /// Start the abstract object at either top or bottom or neither
+  /// Asserts if both top and bottom are true
+  ///
+  /// \param type: the type the abstract_value is representing
+  /// \param top: is the abstract_value starting as top
+  /// \param bottom: is the abstract_value starting as bottom
   abstract_valuet(const typet &type, bool top, bool bottom);
+
+  /// Construct an abstract value from the expression
+  ///
+  /// \param expr: the expression to use as the starting pointer for
+  ///              an abstract object
+  /// \param environment: The environment this abstract object is
+  ///                     being created in
+  /// \param ns: the namespace
   abstract_valuet(
     const exprt &expr,
     const abstract_environmentt &environment,

@@ -12,14 +12,6 @@
 variable_sensitivity_object_factoryt
   variable_sensitivity_object_factoryt::s_instance;
 
-/// Function: variable_sensitivity_object_factoryt::get_abstract_object_type
-///
-/// \param type: the type of the variable the abstract object is
-///              meant to represent
-///
-/// \return An enum indicating the abstract object type to use.
-///
-/// Decide which abstract object type to use for the variable in question.
 variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
 variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
 {
@@ -73,21 +65,6 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
   return abstract_object_type;
 }
 
-/// Function: variable_sensitivity_object_factoryt::get_abstract_object
-///
-/// \param type: the type of the variable
-/// \param top: whether the abstract object should be top in the
-///             two-value domain
-/// \param bottom: whether the abstract object should be bottom in the
-///                two-value domain
-/// \param e: if top and bottom are false this expression is used as the
-///           starting pointer for the abstract object
-/// \param ns: namespace, used when following the input type
-///
-/// \return An abstract object of the appropriate type.
-///
-/// Get the appropriate abstract object for the variable under
-/// consideration.
 abstract_object_pointert
 variable_sensitivity_object_factoryt::get_abstract_object(
   const typet type,
@@ -153,12 +130,6 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   }
 }
 
-/// Function: variable_sensitivity_object_factoryt::set_options
-///
-/// \param options: the command line options
-///
-/// Called once to record the appropriate variables from the command line
-/// options so that they can be accessed easily when they are needed.
 void variable_sensitivity_object_factoryt::set_options(
   const vsd_configt &options)
 {

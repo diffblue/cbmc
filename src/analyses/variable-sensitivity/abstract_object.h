@@ -78,12 +78,36 @@ using abstract_object_visitedt = std::set<abstract_object_pointert>;
 class abstract_objectt : public std::enable_shared_from_this<abstract_objectt>
 {
 public:
+  /// \param type: the type the abstract_object is representing
   explicit abstract_objectt(const typet &type);
+
+  /// Start the abstract object at either top or bottom or neither
+  /// Asserts if both top and bottom are true
+  ///
+  /// \param type: the type the abstract_object is representing
+  /// \param top: is the abstract_object starting as top
+  /// \param bottom: is the abstract_object starting as bottom
   abstract_objectt(const typet &type, bool top, bool bottom);
+
+  /// Construct an abstract object from the expression
+  ///
+  /// \param expr: The expression to use as the starting pointer for an abstract
+  ///   object
+  /// \param environment: The environment this abstract object is
+  ///   being created in
+  /// \param ns: The namespace
   abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
+
+  /// Ctor for building object of types that differ from the types of input
+  /// expressions
+  ///
+  /// \param type explicitly declared type the resulting object should have
+  /// \param expr expression used to build the object
+  /// \param environment abstract environment to evaluate the expression
+  /// \param ns namespace to uncover names inside the expression
   abstract_objectt(
     const typet &type,
     const exprt &expr,
@@ -94,9 +118,25 @@ public:
   {
   }
 
+  /// Get the real type of the variable this abstract object is representing.
+  ///
+  /// \return The program type this abstract object represents
   const typet &type() const;
+
+  /// Find out if the abstract object is top
+  ///
+  /// \return Returns true if the abstract object is representing the top
+  ///         (i.e. we don't know anything about the value).
   virtual bool is_top() const;
+
+  /// Find out if the abstract object is bottom
+  ///
+  /// \return Returns true if the abstract object is representing the bottom.
   virtual bool is_bottom() const;
+
+  /// \brief Verify the internal structure of an abstract_object is correct
+  /// \return true if the abstract_object is correctly constructed, or false
+  /// otherwise
   virtual bool verify() const;
 
   virtual void get_statistics(
@@ -106,19 +146,65 @@ public:
     const namespacet &ns) const;
 
   /// Interface for transforms
+  ///
+  /// \param expr: the expression to evaluate and find the result of it.
+  ///              This will be the symbol referred to be op0()
+  ///
+  /// \return Returns the abstract_object representing the result of
+  ///         this expression to the maximum precision available.
+  ///
+  /// To try and resolve different expressions with the maximum level
+  /// of precision available.
   virtual abstract_object_pointert expression_transform(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
 
+  /// Converts to a constant expression if possible
+  ///
+  /// \return Returns an exprt representing the value if the value is known and
+  ///          constant. Otherwise returns the nil expression
+  ///
+  /// If abstract element represents a single value, then that value,
+  /// otherwise nil. E.G. if it is an interval then this will be x if it is
+  /// [x,x] This is the (sort of) dual to the constant_exprt constructor
+  /// that allows an object to be built from a value.
   virtual exprt to_constant() const;
 
+  /**
+   * A helper function to evaluate an abstract object contained
+   * within a container object. More precise abstractions may override this
+   * to return more precise results.
+   *
+   * \param env the abstract environment
+   * \param specifier a modifier expression, such as an array index or field
+   * specifier used to indicate access to a specific component
+   * \param ns the current namespace
+   *
+   * \return the abstract_objectt representing the value of the read component.
+   */
   virtual abstract_object_pointert read(
     const abstract_environmentt &env,
     const exprt &specifier,
     const namespacet &ns) const;
 
+  /**
+   * A helper function to evaluate writing to a component of an
+   * abstract object. More precise abstractions may override this to
+   * update what they are storing for a specific component.
+   *
+   * \param environment the abstract environment
+   * \param ns the current namespace
+   * \param stack the remaining stack of expressions on the LHS to evaluate
+   * \param specifier the expression uses to access a specific component
+   * \param value the value we are trying to write to the component
+   * \param merging_write if true, this and all future writes will be merged
+   * with the current value
+   *
+   * \return the abstract_objectt representing the result of writing
+   * to a specific component.
+   */
   virtual abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
@@ -127,6 +213,12 @@ public:
     const abstract_object_pointert value,
     bool merging_write) const;
 
+  /// Print the value of the abstract object
+  ///
+  /// \param out: the stream to write to
+  /// \param ai: the abstract interpreter that contains the abstract domain
+  ///            (that contains the object ... )
+  /// \param ns: the current namespace
   virtual void output(
     std::ostream &out,
     const class ai_baset &ai,
@@ -137,6 +229,13 @@ public:
     shared_mapt;
 
   static void dump_map(std::ostream out, const shared_mapt &m);
+  /**
+   * \brief Dump all elements in m1 that are different or missing in m2
+   *
+   * \param out the stream to write output to
+   * \param m1 the 'target' sharing_map
+   * \param m2 the reference sharing map
+   */
   static void
   dump_map_diff(std::ostream out, const shared_mapt &m1, const shared_mapt &m2);
 
@@ -161,19 +260,52 @@ public:
     return this != before.get();
   };
 
+  /// Clones the first parameter and merges it with the second.
+  ///
+  /// \param op1: the first abstract object to merge, this object determines
+  ///             the sensitivity of the output and is the object compared
+  ///             against to choose whether this merge changed anything
+  /// \param op2: the second abstract object to merge
+  ///
+  /// \return The merged abstract object with the same sensitivity as the
+  ///         first parameter. out_modifications will be true if the resulting
+  ///         abstract object is different from op1
   static abstract_object_pointert merge(
     abstract_object_pointert op1,
     abstract_object_pointert op2,
     bool &out_modifications);
 
+  /// Interface method for the meet operation. Decides whether to use the base
+  /// implementation or if a more precise abstraction is attainable.
+  /// \param op1 lhs object for meet
+  /// \param op2 rhs object for meet
+  /// \param out_modifications reference to a flag indicating modification
+  /// (result is not op1)
+  /// \return resulting object after meet
   static abstract_object_pointert meet(
     abstract_object_pointert op1,
     abstract_object_pointert op2,
     bool &out_modifications);
 
+  /// Base implementation of the meet operation: only used if no more precise
+  /// abstraction can be used, can only result in {TOP, BOTTOM, one of the
+  /// original objects}
+  /// \param other pointer to the abstract object to meet
+  /// \return the resulting abstract object pointer
   virtual abstract_object_pointert
   meet(const abstract_object_pointert &other) const;
 
+  /**
+   * Update the location context for an abstract object, potentially
+   * propogating the update to any children of this abstract object.
+   *
+   * \param locations the set of locations to be updated
+   * \param update_sub_elements if true, propogate the update operation to any
+   * children of this abstract object
+   *
+   * \return a clone of this abstract object with it's location context
+   * updated
+   */
   virtual abstract_object_pointert update_location_context(
     const locationst &locations,
     const bool update_sub_elements) const;
@@ -253,10 +385,25 @@ private:
   {
   }
 
-  // Hook for a subclass to perform any additional operations as
-  // part of an abstract_object_merge
+  /**
+   * Helper function for abstract_objectt::abstract_object_merge to perform any
+   * additional actions after the base abstract_object_merge has completed it's
+   * actions but immediately prior to it returning. As such, this function gives
+   * the ability to perform additional work for a merge.
+   *
+   * This default implementation just returns itself.
+   *
+   * \param other the object to merge with this
+   *
+   * \return the result of the merge
+   */
   virtual abstract_object_pointert
   abstract_object_merge_internal(const abstract_object_pointert other) const;
+
+  /// Helper function for base meet, in case additional work was needed. Base
+  /// implementation simply return pointer to itself.
+  /// \param other pointer to the other object
+  /// \return the resulting object
   virtual abstract_object_pointert
   abstract_object_meet_internal(const abstract_object_pointert &other) const;
 
@@ -273,17 +420,43 @@ protected:
     return internal_abstract_object_pointert(new abstract_objectt(*this));
   }
 
+  /// Create a new abstract object that is the result of the merge, unless
+  /// the object would be unchanged, then would return itself.
+  ///
+  /// \param other: The object to merge with this
+  ///
+  /// \return Returns the result of the abstract object.
   abstract_object_pointert
   abstract_object_merge(const abstract_object_pointert other) const;
 
+  /// To detect the cases where the base merge is sufficient to do a merge
+  /// We can't do if this->is_bottom() since we want the specific
+  ///
+  /// \param other: the object being merged with
+  ///
+  /// \return Returns true if the base class is capable of doing
+  ///         a complete merge
   bool should_use_base_merge(const abstract_object_pointert other) const;
 
-  // Sets the state of this object
+  /// Create a new abstract object that is the result of the merge, unless
+  /// the object would be unchanged, then would return itself.
+  ///
+  /// \param other: The object to merge with this
+  ///
+  /// \return Returns the result of the merge.
   virtual abstract_object_pointert merge(abstract_object_pointert other) const;
 
+  /// Helper function for base meet. Two cases: return itself (if trivially
+  /// contained in other); return BOTTOM otherwise.
+  /// \param other pointer to the other object
+  /// \return the resulting object
   abstract_object_pointert
   abstract_object_meet(const abstract_object_pointert &other) const;
 
+  /// Helper function to decide if base meet implementation should be used
+  /// \param other pointer to the other object to meet
+  /// \return true if base implementation would yield the most precise
+  /// abstraction anyway
   bool should_use_base_meet(const abstract_object_pointert &other) const;
 
   template <class keyt>

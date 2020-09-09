@@ -68,6 +68,13 @@ public:
 
 protected:
   CLONE
+
+  /// Attempts to do a constant/constant merge if both are constants,
+  /// otherwise falls back to the parent merge
+  ///
+  /// \param other: the abstract object to merge with
+  ///
+  /// \return Returns the result of the merge
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
   abstract_object_pointert try_transform_expr_with_all_rounding_modes(
@@ -76,6 +83,13 @@ protected:
     const namespacet &ns) const;
 
 private:
+  /// Merges another constant abstract value into this one
+  ///
+  /// \param other: the abstract object to merge with
+  ///
+  /// \return Returns a new abstract object that is the result of the merge
+  ///         unless the merge is the same as this abstract object, in which
+  ///         case it returns this.
   abstract_object_pointert
   merge_constant_constant(constant_abstract_value_pointert other) const;
 

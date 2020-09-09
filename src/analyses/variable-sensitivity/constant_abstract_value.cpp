@@ -170,14 +170,6 @@ void constant_abstract_valuet::output(
   }
 }
 
-/// Function: constant_abstract_valuet::merge
-///
-/// \param other: the abstract object to merge with
-///
-/// \return Returns the result of the merge
-///
-/// Attempts to do a constant/constant merge if both are constants,
-/// otherwise falls back to the parent merge
 abstract_object_pointert
 constant_abstract_valuet::merge(abstract_object_pointert other) const
 {
@@ -194,15 +186,6 @@ constant_abstract_valuet::merge(abstract_object_pointert other) const
   }
 }
 
-/// Function: constant_abstract_valuet::merge_constant_constant
-///
-/// \param other: the abstract object to merge with
-///
-/// \return Returns a new abstract object that is the result of the merge
-///         unless the merge is the same as this abstract object, in which
-///         case it returns this.
-///
-/// Merges another constant abstract value into this one
 abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
   constant_abstract_value_pointert other) const
 {

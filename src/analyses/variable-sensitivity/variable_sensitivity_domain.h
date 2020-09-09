@@ -74,6 +74,14 @@
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
+  /// Compute the abstract transformer for a single instruction
+  ///
+  /// \param from: the instruction before the abstract domain
+  /// \param to: the instruction after the abstract domain
+  /// \param ai: the abstract interpreter
+  /// \param ns: the namespace
+  ///
+  /// \return none
   void transform(
     const irep_idt &function_from,
     locationt from,
@@ -82,32 +90,72 @@ public:
     ai_baset &ai,
     const namespacet &ns) override;
 
-  /// no states
+  /// Sets the domain to bottom (no states / unreachable).
   void make_bottom() override;
 
-  /// all states
+  /// Sets the domain to top (all states).
   void make_top() override;
 
-  /// a reasonable entry-point state
+  /// Set up a reasonable entry-point state
   void make_entry() override;
 
+  /// Basic text output of the abstract domain
+  ///
+  /// \param out: the output stream
+  /// \param ai: the abstract interpreter
+  /// \param ns: the namespace
+  ///
+  /// \return none
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
   void output(std::ostream &out) const;
 
+  /// Computes the join between "this" and "b".
+  ///
+  /// \param b: the other domain
+  /// \param from: it's preceding location
+  /// \param to: it's current location
+  ///
+  /// \return true if something has changed.
   virtual bool
   merge(const variable_sensitivity_domaint &b, locationt from, locationt to);
 
+  /// Perform a context aware merge of the changes that have been applied
+  /// between function_start and the current state. Anything that has not been
+  /// modified will be taken from the \p function_call domain.
+  /// \param function_call: The local of the merge - values from here will be
+  ///   taken if they have not been modified
+  /// \param function_start: The base of the merge - changes that have been made
+  ///   between here and the end will be retained.
+  /// \param function_end: The end of the merge - changes that have been made
+  ///   between the start and here will be retained.
+  /// \param ns: The global namespace
   virtual void merge_three_way_function_return(
     const ai_domain_baset &function_call,
     const ai_domain_baset &function_start,
     const ai_domain_baset &function_end,
     const namespacet &ns);
 
+  /// Use the information in the domain to simplify the expression
+  /// with respect to the current location.  This may be able to
+  /// reduce some values to constants.
+  ///
+  /// \param condition: the expression to simplify
+  /// \param ns: the namespace
+  /// \param lhs: is the expression on the left hand side
+  ///
+  /// \return True if no simplification was made
   bool ai_simplify(exprt &condition, const namespacet &ns) const override;
 
+  /// Find out if the domain is currently unreachable.
+  ///
+  /// \return True if the domain is bottom (i.e. unreachable).
   bool is_bottom() const override;
+
+  /// Is the domain completely top at this state
+  ///
+  /// \return True if the domain is top
   bool is_top() const override;
 
   virtual abstract_object_pointert
@@ -117,17 +165,43 @@ public:
   }
 
 private:
+  /// Used by variable_sensitivity_domaint::transform to handle
+  /// FUNCTION_CALL transforms. This is copying the values of the arguments
+  /// into new symbols corresponding to the declared parameter names.
+  ///
+  /// If the function call is opaque we currently top the return value
+  /// and the value of any things whose address is passed into the function.
+  ///
+  /// \param from: the location to transform from which is a function call
+  /// \param to: the destination of the transform
+  ///            (potentially inside the function call)
+  /// \param ai: the abstract interpreter
+  /// \param ns: the namespace of the current state
   void transform_function_call(
     locationt from,
     locationt to,
     ai_baset &ai,
     const namespacet &ns);
 
+  /// Used to specify which CPROVER internal functions should be skipped
+  /// over when doing function call transforms
+  ///
+  /// \param function_id: the name of the function being called
+  ///
+  /// \return Returns true if the function should be ignored
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
+  /// Get symbols that have been modified since this domain and other
+  /// \param other: The domain that things may have been modified in
+  /// \return A list of symbols whose write location is different
   std::vector<irep_idt>
   get_modified_symbols(const variable_sensitivity_domaint &other) const;
 
+  /// Given a domain and some symbols, apply those symbols values
+  /// to the current domain
+  /// \param modified_symbols: The symbols to write
+  /// \param source: The domain to take the values from
+  /// \param ns: The global namespace
   void apply_domain(
     std::vector<symbol_exprt> modified_symbols,
     const variable_sensitivity_domaint &target,
