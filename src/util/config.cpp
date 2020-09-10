@@ -765,15 +765,41 @@ void configt::set_arch(const irep_idt &arch)
   }
 }
 
+/// \brief Parses the `object_bits` argument from the command line arguments.
+/// \param argument The command line argument to parse the `object_bits` from.
+/// \param pointer_width The width of a pointer in bits. This is used to check
+///   the value of object_bits is within the valid range.
+/// \return A `bv_encodingt` on successful parsing. In the case where an invalid
+///    argument is specified, an `invalid_command_line_argument_exceptiont` will
+///    be thrown.
+configt::bv_encodingt parse_object_bits_encoding(
+  const std::string &argument,
+  const std::size_t pointer_width)
+{
+  const auto throw_for_reason = [&](const std::string &reason) {
+    throw invalid_command_line_argument_exceptiont(
+      "Value of \"" + argument + "\" given for object-bits is " + reason +
+        ". object-bits must be positive and less than the pointer width (" +
+        std::to_string(pointer_width) + ") ",
+      "--object_bits");
+  };
+  const auto object_bits = string2optional<unsigned int>(argument);
+  if(!object_bits)
+    throw_for_reason("not a valid unsigned integer");
+  if(*object_bits == 0 || *object_bits >= pointer_width)
+    throw_for_reason("out of range");
+
+  configt::bv_encodingt bv_encoding;
+  bv_encoding.object_bits = *object_bits;
+  bv_encoding.is_object_bits_default = false;
+  return bv_encoding;
+}
+
 bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
 
   cpp.cpp_standard=cppt::default_cpp_standard();
-
-  bv_encoding.object_bits=bv_encoding.default_object_bits;
-  // This will allow us to override by language defaults later.
-  bv_encoding.is_object_bits_default=true;
 
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
@@ -1078,19 +1104,8 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(cmdline.isset("object-bits"))
   {
-    bv_encoding.object_bits=
-      unsafe_string2unsigned(cmdline.get_value("object-bits"));
-
-    if(!(0<bv_encoding.object_bits &&
-         bv_encoding.object_bits<ansi_c.pointer_width))
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "object-bits must be positive and less than the pointer width (" +
-          std::to_string(ansi_c.pointer_width) + ") ",
-        "--object_bits");
-    }
-
-    bv_encoding.is_object_bits_default = false;
+    bv_encoding = parse_object_bits_encoding(
+      cmdline.get_value("object-bits"), ansi_c.pointer_width);
   }
 
   if(cmdline.isset("malloc-fail-assert") && cmdline.isset("malloc-fail-null"))

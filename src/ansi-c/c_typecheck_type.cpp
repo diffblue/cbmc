@@ -1160,6 +1160,26 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     throw 0;
   }
 
+  const bool have_underlying_type =
+    type.find_type(ID_enum_underlying_type).is_not_nil();
+
+  if(have_underlying_type)
+  {
+    typecheck_type(type.add_type(ID_enum_underlying_type));
+
+    const typet &underlying_type =
+      static_cast<const typet &>(type.find(ID_enum_underlying_type));
+
+    if(!is_signed_or_unsigned_bitvector(underlying_type))
+    {
+      std::ostringstream msg;
+      msg << source_location << ": non-integral type '"
+          << underlying_type.get(ID_C_c_type)
+          << "' is an invalid underlying type";
+      throw invalid_source_file_exceptiont{msg.str()};
+    }
+  }
+
   // enums start at zero;
   // we also track min and max to find a nice base type
   mp_integer value=0, min_value=0, max_value=0;
@@ -1205,8 +1225,27 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     if(value>max_value)
       max_value=value;
 
-    typet constant_type=
-      enum_constant_type(min_value, max_value);
+    typet constant_type;
+
+    if(have_underlying_type)
+    {
+      constant_type = type.find_type(ID_enum_underlying_type);
+      const auto &tmp = to_integer_bitvector_type(constant_type);
+
+      if(value < tmp.smallest() || value > tmp.largest())
+      {
+        std::ostringstream msg;
+        msg
+          << v.source_location()
+          << ": enumerator value is not representable in the underlying type '"
+          << constant_type.get(ID_C_c_type) << "'";
+        throw invalid_source_file_exceptiont{msg.str()};
+      }
+    }
+    else
+    {
+      constant_type = enum_constant_type(min_value, max_value);
+    }
 
     v=from_integer(value, constant_type);
 
@@ -1239,8 +1278,17 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   bool is_packed=type.get_bool(ID_C_packed);
 
   // We use a subtype to store the underlying type.
-  bitvector_typet underlying_type =
-    enum_underlying_type(min_value, max_value, is_packed);
+  bitvector_typet underlying_type(ID_nil);
+
+  if(have_underlying_type)
+  {
+    underlying_type =
+      to_bitvector_type(type.find_type(ID_enum_underlying_type));
+  }
+  else
+  {
+    underlying_type = enum_underlying_type(min_value, max_value, is_packed);
+  }
 
   // Get the width to make the values have a bitvector type
   std::size_t width = underlying_type.get_width();
@@ -1350,6 +1398,12 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     error().source_location=type.source_location();
     error() << "anonymous enum tag without members" << eom;
     throw 0;
+  }
+
+  if(type.find(ID_enum_underlying_type).is_not_nil())
+  {
+    warning().source_location = type.source_location();
+    warning() << "ignoring specification of underlying type for enum" << eom;
   }
 
   source_locationt source_location=type.source_location();

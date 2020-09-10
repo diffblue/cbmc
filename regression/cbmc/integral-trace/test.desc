@@ -1,0 +1,22 @@
+CORE
+test.c
+--trace --xml-ui
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+<full_lhs>u8</full_lhs>\s*<full_lhs_value binary="01100001">97</full_lhs_value>
+<full_lhs>u16</full_lhs>\s*<full_lhs_value binary="0{12}1000">8</full_lhs_value>
+<full_lhs>u32</full_lhs>\s*<full_lhs_value binary="0{27}10000">16ul?</full_lhs_value>
+<full_lhs>u64</full_lhs>\s*<full_lhs_value binary="0{58}100000">32ull?</full_lhs_value>
+<full_lhs>i1</full_lhs>\s*<full_lhs_value binary="0{6}10">2</full_lhs_value>
+<full_lhs>i2</full_lhs>\s*<full_lhs_value binary="0{14}11">3</full_lhs_value>
+<full_lhs>i3</full_lhs>\s*<full_lhs_value binary="0{29}100">4</full_lhs_value>
+<full_lhs>i4</full_lhs>\s*<full_lhs_value binary="0{61}101">5ll?</full_lhs_value>
+<full_lhs>in1</full_lhs>\s*<full_lhs_value binary="1{6}10">-2</full_lhs_value>
+<full_lhs>in2</full_lhs>\s*<full_lhs_value binary="1{14}01">-3</full_lhs_value>
+<full_lhs>in3</full_lhs>\s*<full_lhs_value binary="1{29}100">-4</full_lhs_value>
+<full_lhs>in4</full_lhs>\s*<full_lhs_value binary="1{61}011">-5ll?</full_lhs_value>
+--
+--
+Checks that the binary value is printed for integral types.

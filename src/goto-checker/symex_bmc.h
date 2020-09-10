@@ -81,6 +81,7 @@ public:
   }
 
   const bool record_coverage;
+  const bool havoc_bodyless_functions;
 
   unwindsett unwindset;
 

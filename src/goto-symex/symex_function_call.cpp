@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+#include <analyses/guard_expr.h>
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
@@ -291,6 +292,25 @@ void goto_symext::symex_function_call_code(
         side_effect_expr_nondett(call.lhs().type(), call.source_location());
       code_assignt code(call.lhs(), rhs);
       symex_assign(state, code);
+    }
+
+    if(symex_config.havoc_undefined_functions)
+    {
+      // assign non det to function arguments if pointers
+      // are not const
+      for(const auto &arg : call.arguments())
+      {
+        if(
+          arg.type().id() == ID_pointer &&
+          !arg.type().subtype().get_bool(ID_C_constant) &&
+          arg.type().subtype().id() != ID_code)
+        {
+          exprt object = dereference_exprt(arg, arg.type().subtype());
+          exprt cleaned_object = clean_expr(object, state, true);
+          const guardt guard(true_exprt(), state.guard_manager);
+          havoc_rec(state, guard, cleaned_object);
+        }
+      }
     }
 
     symex_transition(state);

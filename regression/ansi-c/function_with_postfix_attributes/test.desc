@@ -1,0 +1,11 @@
+CORE gcc-only
+test.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+--
+gcc doesn't support postfix attributes but clang does, and Apples CoreFoundation framework makes use of this for availability macros.
+
+Testing both the inline and non-inline variants because these are different cases in our parser.

@@ -24,6 +24,7 @@ SRC = ai.cpp \
       is_threaded.cpp \
       local_bitvector_analysis.cpp \
       local_cfg.cpp \
+      local_control_flow_history.cpp \
       local_may_alias.cpp \
       local_safe_pointers.cpp \
       locals.cpp \

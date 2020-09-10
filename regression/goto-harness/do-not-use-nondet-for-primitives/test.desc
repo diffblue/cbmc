@@ -1,0 +1,17 @@
+CORE
+test.c
+--function test_function --harness-type call-function
+\[test_function\.assertion\.1\] line \d+ assertion test != 42
+^EXIT=10$
+^SIGNAL=0$
+--
+nondet_signed_int
+--
+If we use side_effect_expr_nondett then dump_c will generation function calls
+to functions with names like nondet_signed_int without declaration.
+This can cause problems around usability.
+
+To fix this, we changed goto-harness to just not use side_effect_expr_nondett
+at all.
+
+This test tests for the absence the use for these things.

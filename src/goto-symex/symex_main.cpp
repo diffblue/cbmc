@@ -42,6 +42,8 @@ symex_configt::symex_configt(const optionst &options)
     simplify_opt(options.get_bool_option("simplify")),
     unwinding_assertions(options.get_bool_option("unwinding-assertions")),
     partial_loops(options.get_bool_option("partial-loops")),
+    havoc_undefined_functions(
+      options.get_bool_option("havoc-undefined-functions")),
     debug_level(unsafe_string2int(options.get_option("debug-level"))),
     run_validation_checks(options.get_bool_option("validate-ssa-equation")),
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),

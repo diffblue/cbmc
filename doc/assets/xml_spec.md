@@ -169,8 +169,10 @@ always present
 -   `full_lhs`: original lhs expression (after dereferencing)
 
 -   `full_lhs_value`: a constant with the new value.
-     - if the type is a floating point number type, there will be an attribute`binary` 
-       showing its value.
+     - If the type of data can be represented as a fixed width sequence of bits
+       then, there will be an attribute `binary` containing the binary
+       representation. If the data type is signed and the value is negative
+       then the binary will be encoded using two's complement.
 
 **Example**:
 
@@ -181,7 +183,7 @@ always present
   <location .. />
   <type>signed int</type>
   <full_lhs>b</full_lhs>
-  <full_lhs_value>-1879048192</full_lhs_value>
+  <full_lhs_value binary="10010000000000000000000000000000">-1879048192</full_lhs_value>
 </assignment>
 <assignment assignment_type="state" base_name="d" display_name="main::1::d" hidden="false" identifier="main::1::d" mode="C" step_nr="26" thread="0">
   <location file="main.i" function="main" line="3" working-directory="/home/tkiley/workspace/cbmc/regression/cbmc/Float24"/>

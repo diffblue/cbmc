@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
+#include <regex>
+
 typedef std::unordered_map<irep_idt, std::pair<size_t, bool>> symbol_numbert;
 
 static std::string type2name(
@@ -277,27 +279,48 @@ std::string type2name(const typet &type, const namespacet &ns)
 /// If we want utilities like dump_c to work properly identifiers
 /// should ideally always be valid C identifiers
 /// This replaces some invalid characters that can appear in type2name output.
-std::string type2identifier(const typet &type, const namespacet &ns)
+std::string type_name2type_identifier(const std::string &name)
 {
-  auto type2name_res = type2name(type, ns);
-  std::string result{};
-  for(char c : type2name_res)
-  {
-    switch(c)
+  const auto replace_special_characters = [](const std::string &name) {
+    std::string result{};
+    for(char c : name)
     {
-    case '*':
-      result += "_ptr_";
-      break;
-    case '{':
-      result += "_start_sub_";
-      break;
-    case '}':
-      result += "_end_sub_";
-      break;
-    default:
-      result += c;
-      break;
+      switch(c)
+      {
+      case '*':
+        result += "_ptr_";
+        break;
+      case '{':
+        result += "_start_sub_";
+        break;
+      case '}':
+        result += "_end_sub_";
+        break;
+      default:
+        result += c;
+        break;
+      }
     }
-  }
-  return result;
+    return result;
+  };
+  const auto replace_invalid_characters_with_underscore =
+    [](const std::string &identifier) {
+      static const std::regex non_alpha_numeric{"[^A-Za-z0-9\x80-\xff]+"};
+      return std::regex_replace(identifier, non_alpha_numeric, "_");
+    };
+  const auto strip_leading_digits = [](const std::string &identifier) {
+    static const std::regex identifier_regex{
+      "[A-Za-z\x80-\xff_][A-Za-z0-9_\x80-\xff]*"};
+    std::smatch match_results;
+    bool found = std::regex_search(identifier, match_results, identifier_regex);
+    POSTCONDITION(found);
+    return match_results.str(0);
+  };
+  return strip_leading_digits(replace_invalid_characters_with_underscore(
+    replace_special_characters(name)));
+}
+
+std::string type_to_partial_identifier(const typet &type, const namespacet &ns)
+{
+  return type_name2type_identifier(type2name(type, ns));
 }

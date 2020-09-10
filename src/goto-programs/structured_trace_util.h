@@ -13,6 +13,7 @@ Author: Diffblue
 
 #include "goto_program.h"
 #include <string>
+class goto_trace_stept;
 
 /// There are two kinds of step for location markers - location-only and
 /// loop-head (for locations associated with the first step of a loop).
@@ -35,5 +36,18 @@ default_step_kind(const goto_programt::instructiont &instruction);
 /// \param step_type: The kind of step, deduced from \ref default_step_kind
 /// \return  Either "loop-head" or "location-only"
 std::string default_step_name(const default_step_kindt &step_type);
+
+struct default_trace_stept
+{
+  default_step_kindt kind;
+  bool hidden;
+  unsigned thread_number;
+  std::size_t step_number;
+  source_locationt location;
+};
+
+optionalt<default_trace_stept> default_step(
+  const goto_trace_stept &step,
+  const source_locationt &previous_source_location);
 
 #endif // CPROVER_GOTO_PROGRAMS_STRUCTURED_TRACE_UTIL_H

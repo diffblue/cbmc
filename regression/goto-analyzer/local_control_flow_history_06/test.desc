@@ -1,0 +1,11 @@
+CORE
+main.c
+--verify --recursive-interprocedural --loop-unwind-and-branching 12 --constants --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion flotal == \(n \* \(n - 1\) / 2\): UNKNOWN$
+^\[do_the_loop.assertion.1\] .* assertion flotal == \(n \* \(n - 1\) / 2\): SUCCESS$
+--
+^warning: ignoring
+--
+Demonstrate the function local behaviour of this history

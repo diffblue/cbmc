@@ -1,0 +1,11 @@
+CORE
+requires-transform.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test will only terminate, if the transformation of loops to assumes by
+goto-symex is applied.

@@ -51,6 +51,7 @@ target_link_libraries(
         testing-utils
         ansi-c
         solvers
+        goto-cc-lib
         goto-checker
         goto-programs
         goto-instrument-lib

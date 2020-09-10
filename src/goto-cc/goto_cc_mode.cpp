@@ -66,6 +66,7 @@ void goto_cc_modet::help()
   " --native-assembler cmd      command to invoke as assembler (goto-as only)\n"
   " --print-rejected-preprocessed-source file\n"
   "                             copy failing (preprocessed) source to file\n"
+  " --object-bits               number of bits used for object addresses\n"
   "\n";
   // clang-format on
 }

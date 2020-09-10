@@ -83,6 +83,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(fp-reachability-slice):" \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
+  "(value-set-fi-fp-removal)" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(print-internal-representation)" \
   "(remove-function-pointers)" \

@@ -1,0 +1,11 @@
+CORE
+main.c
+--verify --recursive-interprocedural --loop-unwind-and-branching 32 --constants --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion total <= \(n \* \(n - 1\) / 2\): SUCCESS$
+--
+^warning: ignoring
+--
+Test tracking all local control-flow history.
+Note the exponential rise in the number of paths!

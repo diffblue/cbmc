@@ -1,0 +1,18 @@
+CORE
+test.c
+--function test --harness-type call-function --treat-pointers-equal x,y --treat-pointers-equal-maybe
+should_make_equal
+\[test.assertion.1\] line 3 assertion x: SUCCESS
+\[test.assertion.2\] line 4 assertion y: SUCCESS
+\[test.assertion.3\] line 5 assertion x == y: FAILURE
+\[test.assertion.4\] line 6 assertion x != y: FAILURE
+\[test.assertion.5\] line 7 assertion \*x == \*y: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+__CPROVER_nondet_bool
+--
+We are no longer using side_effect_expr_nondett for nondet primitives,
+specifically this is testing that we are using a variable called some variation
+of “should_make_equal” (plus some optional postfix) as the condition variable
+that assigns the same destination to pointers.

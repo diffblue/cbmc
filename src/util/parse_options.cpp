@@ -55,7 +55,22 @@ void parse_options_baset::usage_error()
 void parse_options_baset::unknown_option_msg()
 {
   if(!cmdline.unknown_arg.empty())
-    log.error() << "Unknown option: " << cmdline.unknown_arg << messaget::eom;
+  {
+    log.error() << "Unknown option: " << cmdline.unknown_arg;
+    auto const suggestions =
+      cmdline.get_argument_suggestions(cmdline.unknown_arg);
+    if(!suggestions.empty())
+    {
+      log.error() << ", did you mean ";
+      if(suggestions.size() > 1)
+      {
+        log.error() << "one of ";
+      }
+      join_strings(log.error(), suggestions.begin(), suggestions.end(), ", ");
+      log.error() << "?";
+    }
+    log.error() << messaget::eom;
+  }
 }
 
 int parse_options_baset::main()

@@ -198,6 +198,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
 
+  if(cmdline.isset("show-byte-ops"))
+    options.set_option("show-byte-ops", true);
+
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
@@ -239,6 +242,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("drop-unused-functions"))
     options.set_option("drop-unused-functions", true);
+
+  if(cmdline.isset("havoc-undefined-functions"))
+    options.set_option("havoc-undefined-functions", true);
 
   if(cmdline.isset("string-abstraction"))
     options.set_option("string-abstraction", true);
@@ -637,7 +643,8 @@ int cbmc_parse_optionst::doit()
 
   if(
     options.get_bool_option("program-only") ||
-    options.get_bool_option("show-vcc"))
+    options.get_bool_option("show-vcc") ||
+    options.get_bool_option("show-byte-ops"))
   {
     if(options.get_bool_option("paths"))
     {
@@ -1082,6 +1089,9 @@ void cbmc_parse_optionst::help()
     HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    " --havoc-undefined-functions\n"
+    "                              for any function that has no body, assign non-deterministic values to\n" // NOLINT(*)
+    "                              any parameters passed as non-const pointers and the return value\n" // NOLINT(*)
     "\n"
     "Semantic transformations:\n"
     // NOLINTNEXTLINE(whitespace/line_length)

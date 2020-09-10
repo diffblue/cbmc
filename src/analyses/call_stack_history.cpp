@@ -11,8 +11,10 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include "call_stack_history.h"
 
-ai_history_baset::step_returnt
-call_stack_historyt::step(locationt to, const trace_sett &others) const
+ai_history_baset::step_returnt call_stack_historyt::step(
+  locationt to,
+  const trace_sett &others,
+  trace_ptrt caller_hist) const
 {
   DATA_INVARIANT(current_stack != nullptr, "current_stack must exist");
 
@@ -79,12 +81,29 @@ call_stack_historyt::step(locationt to, const trace_sett &others) const
     }
     else
     {
+      INVARIANT(
+        caller_hist != ai_history_baset::no_caller_history,
+        "return from function should have a caller");
+
       // The expected call return site...
       locationt l_caller_return =
         std::next(current_stack->caller->current_location);
 
       if(l_caller_return->location_number == to->location_number)
       {
+        INVARIANT(
+          std::next(caller_hist->current_location())->location_number ==
+            l_caller_return->location_number,
+          "caller and caller_hist should be consistent");
+        // It is tempting to think that...
+        // INVARIANT(*(current_stack->caller) ==
+        //           *(std::dynamic_pointer_cast<const call_stack_historyt>
+        //                                       (caller_hist)->current_stack),
+        //           "call stacks should match");
+        // and that we could just use caller_hist->current_stack here.
+        // This fails when you hit the recursion limit so that the
+        // caller_hist has a deep stack but *this has a shallow one.
+
         // ... which is where we are going
         next_stack = cse_ptrt(std::make_shared<call_stack_entryt>(
           to, current_stack->caller->caller));

@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line 18 assertion count == 5: SUCCESS$
+^\[main.assertion.2\] line 19 assertion count == 17: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

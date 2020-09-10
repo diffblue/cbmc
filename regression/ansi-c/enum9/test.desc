@@ -1,0 +1,12 @@
+CORE
+main.c
+--verbosity 2
+^EXIT=0$
+^SIGNAL=0$
+(main.c:13:\d+)|(main.c\(13\)): warning: ignoring specification of underlying type for enum
+(main.c:14:\d+)|(main.c\(14\)): warning: ignoring specification of underlying type for enum
+(main.c:19:\d+)|(main.c\(19\)): warning: ignoring specification of underlying type for enum
+--
+--
+Checks that files containing enums with an underlying type specification can be
+parsed, and that a warning is output saying that the specification is ignored

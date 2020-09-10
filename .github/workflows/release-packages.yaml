@@ -1,0 +1,58 @@
+on:
+  release:
+    types: [created]
+
+name: Upload additional release assets
+jobs:
+  ubuntu-package:
+    runs-on: ubuntu-20.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build using Ninja
+        run: |
+          cd build
+          ninja
+      - name: Run CTest
+        run: cd build; ctest . -V -L CORE -C Release 
+      - name: Create packages
+        id: create_packages
+        run: |
+          cd build
+          ninja package
+          deb_package_name="$(ls *.deb)"
+          echo "::set-output name=deb_package::./build/$deb_package_name"
+          echo "::set-output name=deb_package_name::$deb_package_name"
+      - name: Get release info
+        id: get_release_info
+        uses: bruceadams/get-release@v1.2.0
+      - name: Upload binary packages
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: ${{ steps.create_packages.outputs.deb_package }}
+          asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
+          asset_content_type: application/x-deb
+
+  homebrew-pr:
+    runs-on: macos-10.15
+    steps:
+      - name: Get release tag name
+        # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
+        # strip that here
+        run: echo "::set-env name=RELEASE_TAG::${GITHUB_REF/refs\/tags\/}"
+      - name: Create homebrew PR
+        run: |
+          brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}

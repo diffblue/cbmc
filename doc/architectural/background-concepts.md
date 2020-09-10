@@ -467,7 +467,7 @@ One way to understand which functions form basic blocks is to consider the
 successors of each instruction. If we have two instructions A and B, we say
 that B is a *successor* of A if, after executing A, we can execute B without any
 intervening instructions. For instance, in the example above, the loop
-initialization statement `unsigned long int i.1 = 1` is a successor of
+initialization statement `unsigned int i.1 = 1` is a successor of
 `unsigned long fac.1 = 1`. On the other hand, `return fac.1` is not a successor
 of `unsigned long fac.1 = 1`: we always have to execute some other intermediate
 statements to reach the return statement.
@@ -534,7 +534,7 @@ and \ref analyses-specific-analyses.
 
 While control flow graphs are already quite useful for static analysis,
 some techniques benefit from a further transformation to a
-representation know as **static single assignment**, short **SSA**. The
+representation known as **static single assignment**, short **SSA**. The
 point of this step is to ensure that we can talk about the entire history
 of assignments to a given variable. This is achieved by renaming
 variables again: whenever we assign to a variable, we *clone* this
@@ -1218,10 +1218,11 @@ a map that associates both `fac` and `i` to "not 0".
 An abstract domain is a set $D$ (or, if you
 prefer, a data type) with the following properties:
 - There is a function merge that takes two elements of $D$ and returns
-  an element of $D$. This function is associative (merge(x, merge(y,z))
-  = merge(merge(x,y), z)), commutative (merge(x,y) = merge(y,x)) and
-  idempotent (merge(x,x) = x).
-- There is an element bottom of $D$ such that merge(x, bottom) = x.
+  an element of $D$. This function is:
+  * **associative** - `(merge(x, merge(y,z)) = merge(merge(x,y), z))`,
+  * **commutative** - `(merge(x,y) = merge(y,x))` and
+  * **idempotent** `(merge(x,x) = x)`.
+- There is an element bottom of $D$ such that `merge(x, bottom) = x`.
 
 Algebraically speaking, $D$ needs to be a semi-lattice.
 
@@ -1229,12 +1230,12 @@ For our example, we use the following domain:
 - D contains the elements "bottom" (nothing is known),
   "equals 0", "not 0" and "could be 0".
 
-- merge is defined as follows:
-  merge(bottom, x) = x
-  merge("could be 0", x) = "could be 0"
-  merge(x,x) = x
-  merge("equals 0", "not 0") = "could be 0"
-- bottom is bottom, obviously.
+- `merge` is defined as follows:
+  * `merge(bottom, x)` = `x`
+  * `merge("could be 0", x)` = `"could be 0"`
+  * `merge(x,x) = `x`
+  * `merge("equals 0", "not 0")` = `"could be 0"`
+- `bottom` is bottom, obviously.
 It is easy but tedious to check that all conditions hold.
 
 The second ingredient we need are the **abstract state transformers**.
@@ -1251,7 +1252,7 @@ case, the result is "could be 0".
 
 What if `x` and `y` are both "not 0"? In a mathematically ideal world,
 we would have `x*y` be non-zero as well. But in a C program,
-multiplication could overflow, yielding 0! So, to be correct, we have to
+multiplication could *overflow*, yielding `0`. So, to be correct, we have to
 yield "could be 0" in this case.
 
 Finally, when `x` is bottom, we can just return whatever value we had

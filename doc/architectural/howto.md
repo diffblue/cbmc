@@ -229,7 +229,7 @@ of that particular node:
   - `node.op0().id() == ID_symbol`
   - `node.op0().type().id() == ID_array`
 
-The fact that the `op0()` child has a `symbol` ID menas that you could
+The fact that the `op0()` child has a `symbol` ID means that you could
 cast it to a `symbol_exprt` (which is a subtype of `exprt`) using the
 function `to_symbol_expr`.
 

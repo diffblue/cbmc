@@ -1,0 +1,8 @@
+CORE
+test.c
+--object-bits 8
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Test parsing of a valid object-bits setting.

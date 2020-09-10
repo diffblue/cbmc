@@ -83,6 +83,9 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
 
+  if(cmdline.isset("show-byte-ops"))
+    options.set_option("show-byte-ops", true);
+
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 

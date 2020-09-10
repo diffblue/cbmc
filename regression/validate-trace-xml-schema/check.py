@@ -33,6 +33,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s), [
     # these test for invalid command line handling
     'bad_option/test_multiple.desc',
     'bad_option/test.desc',
+    'unknown-argument-suggestion/test.desc',
     # this one produces XML intermingled with main XML output when used with --xml-ui
     'graphml_witness2/test.desc',
     # produces intermingled XML on the command line

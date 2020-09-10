@@ -120,7 +120,10 @@ class optionst;
 
 #define GOTO_ANALYSER_OPTIONS_HISTORY \
   "(ahistorical)" \
-  "(call-stack):"
+  "(call-stack):" \
+  "(loop-unwind):" \
+  "(branching):" \
+  "(loop-unwind-and-branching):"
 
 #define GOTO_ANALYSER_OPTIONS_DOMAIN \
   "(intervals)" \

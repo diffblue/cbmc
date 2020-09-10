@@ -1,0 +1,14 @@
+CORE
+test.c
+--function test --harness-type call-function
+\[test.assertion.1\] line \d+ assertion list: SUCCESS
+\[test.assertion.2\] line \d+ assertion list->next: FAILURE
+\[test.assertion.3\] line \d+ assertion !\(list->next != \(\(struct linked_list \*\).*\)\): FAILURE
+should_recurse_nondet
+^EXIT=10$
+^SIGNAL=0$
+--
+__CPROVER_nondet_bool
+--
+This is to check that we use the new mechanism to decide whether we should recurse
+non-deterministically (i.e. without using side_effect_expr_nondett).

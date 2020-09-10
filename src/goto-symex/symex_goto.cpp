@@ -252,9 +252,12 @@ void goto_symext::symex_goto(statet &state)
     // is it label: goto label; or while(cond); - popular in SV-COMP
     if(
       symex_config.self_loops_to_assumptions &&
+      // label: goto label; or do {} while(cond);
       (goto_target == state.source.pc ||
+       // while(cond);
        (instruction.incoming_edges.size() == 1 &&
-        *instruction.incoming_edges.begin() == goto_target)))
+        *instruction.incoming_edges.begin() == goto_target &&
+        goto_target->is_goto() && new_guard.is_true())))
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
