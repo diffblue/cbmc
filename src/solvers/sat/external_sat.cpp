@@ -70,6 +70,8 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
   std::string line;
   external_satt::resultt result = resultt::P_ERROR;
   std::vector<bool> assigned_variables(no_variables(), false);
+  assignment.insert(assignment.begin(), no_variables(), tvt(false));
+
   while(getline(response_istream, line))
   {
     if(line[0] == 's')
@@ -92,7 +94,6 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
       if(status == "SATISFIABLE")
       {
         result = resultt::P_SATISFIABLE;
-        assignment.insert(assignment.begin(), no_variables() - 1, tvt(false));
       }
       if(status == "TIMEOUT")
       {
@@ -101,7 +102,7 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
       }
     }
 
-    if(line[0] == 'v' && result == resultt::P_SATISFIABLE)
+    if(line[0] == 'v')
     {
       auto assignments = split_string(line, ' ');
 
