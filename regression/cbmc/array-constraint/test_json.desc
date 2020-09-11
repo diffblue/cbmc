@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--show-array-constraints --json-ui
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+\{\n\s*"arrayConstraints": \{\n\s*"arrayEquality": \[.*\],\n\s*"arrayWith": \[.*\]\n\s*\},\n\s*"numOfConstraints": 4\n\s*\}
+--
+--
+To test output for --show-array-constraints option that displays the count and list of all array constraints added during post processing in json format.

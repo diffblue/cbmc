@@ -1,6 +1,6 @@
 CORE
 main.c
---show-array-constraints
+--show-array-constraints --xml-ui
 ^EXIT=1$
 ^SIGNAL=0$
 --
