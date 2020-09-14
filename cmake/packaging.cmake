@@ -1,6 +1,6 @@
 set(CPACK_PACKAGE_NAME "cbmc")
 set(CPACK_PACKAGE_VENDOR "Diffblue Ltd.")
-set(CPACK_PACKAGE_CONTACT "info@diffblue.com")
+set(CPACK_PACKAGE_CONTACT "Diffblue Open Source Team <cbmc@diffblue.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CBMC is a Bounded Model Checker for C and C++ programs")
 set(CPACK_PACKAGE_DESCRIPTION
 "CBMC generates traces that demonstrate how an assertion can be violated,
