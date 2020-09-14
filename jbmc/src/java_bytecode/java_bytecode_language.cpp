@@ -261,6 +261,16 @@ java_bytecode_language_optionst::java_bytecode_language_optionst(
 void java_bytecode_languaget::set_language_options(const optionst &options)
 {
   object_factory_parameters.set(options);
+  if(options.is_set("max-intermediate-string-length"))
+  {
+    string_preprocess.set_max_intermediate_string_length(
+      options.get_unsigned_int_option("max-intermediate-string-length"));
+  }
+  if(options.is_set("use-fixed-size-arrays-for-bounded-strings"))
+  {
+    string_preprocess.set_use_fixed_size_arrays_for_bounded_strings(true);
+  }
+
   language_options = java_bytecode_language_optionst{options, *this};
   const auto &new_points = build_extra_entry_points(options);
   language_options->extra_methods.insert(

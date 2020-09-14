@@ -48,7 +48,10 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  explicit string_constraint_generatort(const namespacet &ns);
+  string_constraint_generatort(
+    const namespacet &ns,
+    optionalt<std::size_t> maximum_string_length,
+    bool use_fixed_size_arrays_for_bounded_strings);
 
   std::pair<exprt, string_constraintst>
   add_axioms_for_function_application(const function_application_exprt &expr);

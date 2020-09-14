@@ -163,6 +163,7 @@ SRC = $(BOOLEFORCE_SRC) \
       strings/array_pool.cpp \
       strings/equation_symbol_mapping.cpp \
       strings/format_specifier.cpp \
+      strings/max_concrete_char_array.cpp \
       strings/string_builtin_function.cpp \
       strings/string_dependencies.cpp \
       strings/string_concatenation_builtin_function.cpp \

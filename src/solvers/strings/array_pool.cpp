@@ -7,6 +7,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include "array_pool.h"
+#include "max_concrete_char_array.h"
 
 symbol_exprt symbol_generatort::
 operator()(const irep_idt &prefix, const typet &type)
@@ -54,7 +55,11 @@ array_poolt::get_length_if_exists(const array_string_exprt &s) const
 array_string_exprt
 array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
-  array_typet array_type{char_type, infinity_exprt(index_type)};
+  array_typet array_type = make_char_array_type(
+    char_type,
+    index_type,
+    use_fixed_size_arrays_for_bounded_strings ? maximum_fresh_string_length
+                                              : optionalt<size_t>{});
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
   arrays_of_pointers.emplace(
@@ -122,6 +127,19 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
   return to_array_string_expr(insert_result.first->second);
 }
 
+static bool is_array_of_constants(const exprt &e)
+{
+  const array_exprt *array = expr_try_dynamic_cast<array_exprt>(e);
+  if(!array)
+    return false;
+  for(const auto &op : array->operands())
+  {
+    if(!can_cast_expr<constant_exprt>(op))
+      return false;
+  }
+  return true;
+}
+
 /// Given an array_string_exprt, get the size of the underlying array. If that
 /// size is undefined, create a new symbol for the size.
 /// Then add an entry from `array_expr` to that size in the `length_of_array`
@@ -141,10 +159,9 @@ static void attempt_assign_length_from_type(
   // This invariant seems always true, but I don't know why.
   // If we find a case where this is violated, try calling
   // attempt_assign_length_from_type on the true and false cases.
-  const exprt &size_from_type = to_array_type(array_expr.type()).size();
   const exprt &size_to_assign =
-    size_from_type != infinity_exprt(size_from_type.type())
-      ? size_from_type
+    is_array_of_constants(array_expr)
+      ? to_array_type(array_expr.type()).size()
       : symbol_generator("string_length", array_expr.length_type());
 
   const auto emplace_result =

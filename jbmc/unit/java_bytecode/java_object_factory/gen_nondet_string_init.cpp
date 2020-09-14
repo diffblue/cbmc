@@ -90,20 +90,20 @@ SCENARIO(
           "tmp_object_factory = NONDET(int);",
           CPROVER_PREFIX "assume(tmp_object_factory >= 0);",
           CPROVER_PREFIX "assume(tmp_object_factory <= 20);",
-          "char (*nondet_infinite_array_pointer)[INFINITY()];",
-          "nondet_infinite_array_pointer = "
+          "char (*nondet_array_pointer)[INFINITY()];",
+          "nondet_array_pointer = "
             "ALLOCATE(char [INFINITY()], INFINITY(), false);",
-          "*nondet_infinite_array_pointer = NONDET(char [INFINITY()]);",
+          "*nondet_array_pointer = NONDET(char [INFINITY()]);",
           "int return_array;",
           "return_array = cprover_associate_array_to_pointer_func"
-            "(*nondet_infinite_array_pointer, *nondet_infinite_array_pointer);",
+            "(*nondet_array_pointer, *nondet_array_pointer);",
           "int return_array;",
           "return_array = cprover_associate_length_to_array_func"
-            "(*nondet_infinite_array_pointer, tmp_object_factory);",
+            "(*nondet_array_pointer, tmp_object_factory);",
           "arg = { .@java.lang.Object={ .@class_identifier"
             "=\"java::java.lang.String\" },"
             " .length=tmp_object_factory, "
-            ".data=*nondet_infinite_array_pointer };"};
+            ".data=*nondet_array_pointer };"};
         // clang-format on
 
         for(std::size_t i = 0;

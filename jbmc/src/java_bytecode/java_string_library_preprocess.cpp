@@ -17,6 +17,7 @@ Date:   April 2017
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
 #include <goto-programs/class_identifier.h>
+#include <solvers/strings/max_concrete_char_array.h>
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -520,8 +521,21 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   const side_effect_expr_nondett nondet_length(str.length().type(), loc);
   code.add(code_assignt(str.length(), nondet_length), loc);
 
-  const exprt nondet_array_expr =
-    make_nondet_infinite_char_array(symbol_table, loc, function_id, code);
+  const exprt nondet_array_expr = make_nondet_char_array(
+    symbol_table,
+    loc,
+    function_id,
+    code,
+    use_fixed_size_arrays_for_bounded_strings ? max_intermediate_string_length
+                                              : optionalt<size_t>{});
+
+  if(max_intermediate_string_length)
+  {
+    code.add(code_assumet(binary_relation_exprt(
+      str.length(),
+      ID_le,
+      from_integer(*max_intermediate_string_length, java_int_type()))));
+  }
 
   const address_of_exprt array_pointer(
     index_exprt(nondet_array_expr, from_integer(0, java_int_type())));
@@ -603,23 +617,26 @@ codet java_string_library_preprocesst::code_return_function_application(
     make_function_application(function_id, arguments, type, symbol_table));
 }
 
-/// Declare a fresh symbol of type array of character with infinite size.
+/// Declare a fresh symbol of type array of characters suitable for a string
+/// of the given maximum length
 /// \param symbol_table: the symbol table
 /// \param loc: source location
 /// \param function_id: name of the function containing the array
 /// \param [out] code: code block where the declaration gets added
+/// \param max_length: maximum string length
 /// \return created symbol expression
-exprt make_nondet_infinite_char_array(
+exprt make_nondet_char_array(
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
   const irep_idt &function_id,
-  code_blockt &code)
+  code_blockt &code,
+  optionalt<std::size_t> max_length)
 {
-  const array_typet array_type(
-    java_char_type(), infinity_exprt(java_int_type()));
+  const array_typet array_type =
+    make_char_array_type(java_char_type(), java_int_type(), max_length);
   const symbolt data_sym = fresh_java_symbol(
     pointer_type(array_type),
-    "nondet_infinite_array_pointer",
+    "nondet_array_pointer",
     loc,
     function_id,
     symbol_table);

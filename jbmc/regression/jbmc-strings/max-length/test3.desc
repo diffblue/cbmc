@@ -1,4 +1,4 @@
-CORE
+CORE limited-size-strings-expected-failure
 Test
 --max-nondet-string-length 4001 --function Test.checkMaxLength
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE
+CORE limited-size-strings-expected-failure
 Test
 --function Test.checkAbort --trace --max-nondet-string-length 100000000
 ^EXIT=10$

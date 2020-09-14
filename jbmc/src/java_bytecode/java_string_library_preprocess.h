@@ -44,6 +44,15 @@ public:
 
   void initialize_known_type_table();
   void initialize_conversion_table();
+  void set_max_intermediate_string_length(
+    optionalt<std::size_t> max_intermediate_string_length_)
+  {
+    this->max_intermediate_string_length = max_intermediate_string_length_;
+  }
+  void set_use_fixed_size_arrays_for_bounded_strings(bool value)
+  {
+    use_fixed_size_arrays_for_bounded_strings = value;
+  }
 
   bool implements_function(const irep_idt &function_id) const;
   void get_all_function_names(std::unordered_set<irep_idt> &methods) const;
@@ -144,6 +153,13 @@ private:
 
   // A set tells us what java types should be considered as string objects
   std::unordered_set<irep_idt> string_types;
+
+  // Maximum length enforced on freshly-allocated strings
+  optionalt<std::size_t> max_intermediate_string_length;
+
+  // If true, allocate fixed-size arrays to hold small (currently hard-coded
+  // to 256 chars) bounded strings
+  bool use_fixed_size_arrays_for_bounded_strings = false;
 
   code_blockt make_float_to_string_code(
     const java_method_typet &type,
@@ -309,11 +325,12 @@ private:
     symbol_table_baset &symbol_table);
 };
 
-exprt make_nondet_infinite_char_array(
+exprt make_nondet_char_array(
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
   const irep_idt &function_id,
-  code_blockt &code);
+  code_blockt &code,
+  optionalt<std::size_t> max_length);
 
 void add_pointer_to_array_association(
   const exprt &pointer,

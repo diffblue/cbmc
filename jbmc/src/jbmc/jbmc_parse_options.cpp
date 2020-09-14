@@ -299,6 +299,16 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+  if(cmdline.isset("max-intermediate-string-length"))
+  {
+    options.set_option(
+      "max-intermediate-string-length",
+      cmdline.get_value("max-intermediate-string-length"));
+  }
+
+  if(cmdline.isset("use-fixed-size-arrays-for-bounded-strings"))
+    options.set_option("use-fixed-size-arrays-for-bounded-strings", true);
+
   if(cmdline.isset("no-refine-strings"))
     options.set_option("refine-strings", false);
 
@@ -457,6 +467,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-goto-symex-steps"))
     options.set_option("show-goto-symex-steps", true);
+
+  if(!string_solver_options_valid(options, log))
+    exit(CPROVER_EXIT_USAGE_ERROR);
 }
 
 /// invoke main modules

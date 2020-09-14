@@ -1,4 +1,4 @@
-CORE
+CORE limited-size-strings-expected-failure
 Test
 --function Test.nonDet --max-nondet-string-length 1000
 ^EXIT=10$
