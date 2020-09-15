@@ -72,6 +72,7 @@ protected:
 
   std::unique_ptr<solvert> get_default();
   std::unique_ptr<solvert> get_dimacs();
+  std::unique_ptr<solvert> get_external_sat();
   std::unique_ptr<solvert> get_bv_refinement();
   std::unique_ptr<solvert> get_string_refinement();
   std::unique_ptr<solvert> get_smt2(smt2_dect::solvert solver);

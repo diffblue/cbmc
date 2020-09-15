@@ -440,6 +440,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("smt2", true);
   }
 
+  if(cmdline.isset("external-sat-solver"))
+  {
+    options.set_option(
+      "external-sat-solver", cmdline.get_value("external-sat-solver")),
+      solver_set = true;
+  }
+
   if(cmdline.isset("yices"))
   {
     options.set_option("yices", true), solver_set=true;
@@ -1113,6 +1120,7 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --external-sat-solver cmd    command to invoke SAT solver process\n"
     HELP_STRING_REFINEMENT_CBMC
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)

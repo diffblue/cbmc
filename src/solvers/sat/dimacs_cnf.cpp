@@ -51,7 +51,7 @@ void dimacs_cnft::write_problem_line(std::ostream &out)
       << clauses.size() << "\n";
 }
 
-static void write_dimacs_clause(
+void dimacs_cnft::write_dimacs_clause(
   const bvt &clause,
   std::ostream &out,
   bool break_lines)
@@ -100,5 +100,5 @@ void dimacs_cnft::write_clauses(std::ostream &out)
 
 void dimacs_cnf_dumpt::lcnf(const bvt &bv)
 {
-  write_dimacs_clause(bv, out, true);
+  dimacs_cnft::write_dimacs_clause(bv, out, true);
 }
