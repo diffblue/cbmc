@@ -24,7 +24,7 @@ jobs:
           cd build
           ninja
       - name: Run CTest
-        run: cd build; ctest . -V -L CORE -C Release 
+        run: cd build; ctest . -V -L CORE -C Release
       - name: Create packages
         id: create_packages
         run: |
@@ -56,3 +56,44 @@ jobs:
           brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
+
+  windows-msi-package:
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: |
+          choco install winflexbison3
+      - uses: microsoft/setup-msbuild@v1.0.1
+        name: Setup Visual Studio environment
+      - name: Configure with cmake
+        run: |
+          New-Item -ItemType Directory -Path build
+          Set-Location build
+          cmake ..
+      - name: Build Release
+        run: |
+          Set-Location build
+          cmake --build . --config Release
+      - name: Create packages
+        id: create_packages
+        run: |
+          Set-Location build
+          $cpack = "$(Split-Path -Parent (Get-Command cmake).Source)\cpack.exe"
+          & $cpack . -C Release
+          $msi_name = (Get-ChildItem -name *.msi).Name
+          Write-Output "::set-output name=msi_installer::build/$msi_name"
+          Write-Output "::set-output name=msi_name::$msi_name"
+      - name: Get release info
+        id: get_release_info
+        uses: bruceadams/get-release@v1.2.0
+      - name: Upload binary packages
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: ${{ steps.create_packages.outputs.msi_installer }}
+          asset_name: ${{ steps.create_packages.outputs.msi_name }}
+          asset_content_type: application/x-msi
