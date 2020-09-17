@@ -85,7 +85,7 @@ jobs:
           Set-Location build
           $cpack = "$(Split-Path -Parent (Get-Command cmake).Source)\cpack.exe"
           & $cpack . -C Release
-          $msi_name = (Get-ChildItem -name *.msi).Name
+          $msi_name = Get-ChildItem -Filter *.msi -Name
           Write-Output "::set-output name=msi_installer::build/$msi_name"
           Write-Output "::set-output name=msi_name::$msi_name"
       - name: Get release info
