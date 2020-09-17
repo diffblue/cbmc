@@ -964,7 +964,7 @@ void goto_analyzer_parse_optionst::help()
     HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
+    << HELP_GOTO_CHECK <<
     "\n"
     "Other options:\n"
     HELP_VALIDATE

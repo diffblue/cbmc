@@ -39,7 +39,8 @@ void goto_check(
   "overflow-check)"                                                            \
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"                  \
-  "(pointer-primitive-check)"
+  "(pointer-primitive-check)"                                                  \
+  "(overly-large-allocation-check)"
 
 // clang-format off
 #define HELP_GOTO_CHECK \
@@ -56,7 +57,10 @@ void goto_check(
   " --nan-check                  check floating-point for NaN\n" \
   " --no-built-in-assertions     ignore assertions in built-in library\n" \
   " --enum-range-check           checks that all enum type expressions have values in the enum range\n" /* NOLINT(whitespace/line_length) */ \
-  " --pointer-primitive-check    checks that all pointers in pointer primitives are valid or null\n" /* NOLINT(whitespace/line_length) */
+  " --pointer-primitive-check    checks that all pointers in pointer primitives are valid or null\n" /* NOLINT(whitespace/line_length) */ \
+  << help_entry( \
+    "--overly-large-allocation-check", \
+    "checks that no individual allocation exceeds CBMC's address space limit")
 
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
@@ -72,7 +76,8 @@ void goto_check(
   options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("nan-check", cmdline.isset("nan-check")); \
   options.set_option("built-in-assertions", !cmdline.isset("no-built-in-assertions")); /* NOLINT(whitespace/line_length) */ \
-  options.set_option("pointer-primitive-check", cmdline.isset("pointer-primitive-check")) /* NOLINT(whitespace/line_length) */
+  options.set_option("pointer-primitive-check", cmdline.isset("pointer-primitive-check")); /* NOLINT(whitespace/line_length) */ \
+  options.set_option("overly-large-allocation-check", cmdline.isset("overly-large-allocation-check")) /* NOLINT(whitespace/line_length) */
 // clang-format on
 
 #endif // CPROVER_ANALYSES_GOTO_CHECK_H

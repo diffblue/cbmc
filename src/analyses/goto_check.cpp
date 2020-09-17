@@ -75,6 +75,8 @@ public:
     error_labels=_options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
+    enable_overly_large_allocation_check =
+      _options.get_bool_option("overly-large-allocation-check");
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -195,6 +197,10 @@ protected:
   /// \param guard: the condition under which the operation happens
   void pointer_primitive_check(const exprt &expr, const guardt &guard);
 
+  void overly_large_allocation_check(
+    const side_effect_exprt &expr,
+    const guardt &guard);
+
   /// Returns true if the given expression is a pointer primitive such as
   /// __CPROVER_r_ok()
   ///
@@ -256,6 +262,7 @@ protected:
   bool enable_built_in_assertions;
   bool enable_assumptions;
   bool enable_pointer_primitive_check;
+  bool enable_overly_large_allocation_check;
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
@@ -1243,6 +1250,29 @@ void goto_checkt::pointer_primitive_check(
     guard);
 }
 
+void goto_checkt::overly_large_allocation_check(
+  const side_effect_exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_overly_large_allocation_check)
+    return;
+
+  const exprt size_expr = expr.operands().front();
+
+  binary_relation_exprt bre(
+    size_expr,
+    ID_le,
+    ns.lookup(CPROVER_PREFIX "max_malloc_size").symbol_expr());
+
+  add_guarded_property(
+    bre,
+    "more memory allocated than can be addressed by cbmc",
+    "allocate",
+    expr.source_location(),
+    expr,
+    guard);
+}
+
 bool goto_checkt::is_pointer_primitive(const exprt &expr)
 {
   // we don't need to include the __CPROVER_same_object primitive here as it
@@ -1826,6 +1856,15 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   {
     pointer_primitive_check(expr, guard);
   }
+  else if(expr.id() == ID_side_effect)
+  {
+    const auto &side_effect_expr = to_side_effect_expr(expr);
+
+    if(side_effect_expr.get_statement() == ID_allocate)
+    {
+      overly_large_allocation_check(side_effect_expr, guard);
+    }
+  }
 }
 
 void goto_checkt::check(const exprt &expr)
@@ -1948,6 +1987,8 @@ void goto_checkt::goto_check(
         flag_resetter.set_flag(enable_nan_check, false);
       else if(d.first == "disable:pointer-primitive-check")
         flag_resetter.set_flag(enable_pointer_primitive_check, false);
+      else if(d.first == "disable:overly-large-allocation-check")
+        flag_resetter.set_flag(enable_overly_large_allocation_check, false);
     }
 
     new_code.clear();
