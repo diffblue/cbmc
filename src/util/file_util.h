@@ -20,6 +20,9 @@ void delete_directory(const std::string &path);
 std::string get_current_working_directory();
 void set_current_path(const std::string &path);
 
+// C++17 will allow us to use std::filesystem::absolute
+std::string get_absolute_path(const std::string &rel_path);
+
 // C++17 will allow us to use std::filesystem::path(dir).append(file)
 std::string concat_dir_file(const std::string &directory,
                             const std::string &file_name);

@@ -77,6 +77,41 @@ std::string get_current_working_directory()
   return working_directory;
 }
 
+/// \param rel_path: relative path
+/// \return absolute path
+std::string get_absolute_path(const std::string &rel_path)
+{
+#ifndef _WIN32
+  errno = 0;
+  char *wd = realpath(rel_path.c_str(), nullptr);
+
+  if(wd == nullptr || errno != 0)
+    throw system_exceptiont(
+      std::string("realpath failed: ") + std::strerror(errno));
+
+  std::string abs_path = wd;
+  free(wd);
+#else
+  TCHAR buffer[4096];
+#  ifdef UNICODE
+  DWORD retval = GetFullPathNameW(widen(rel_path).c_str(), 4096, buffer, NULL);
+#  else
+  DWORD retval = GetFullPathNameA(rel_path.c_str(), 4096, buffer, NULL);
+#  endif
+  if(retval == 0)
+    throw system_exceptiont("failed to get current directory of process");
+
+#  ifdef UNICODE
+  std::string abs_path(narrow(buffer));
+#  else
+  std::string abs_path(buffer);
+#  endif
+
+#endif
+
+  return abs_path;
+}
+
 /// Set working directory.
 /// \param path: New working directory to change to
 void set_current_path(const std::string &path)

@@ -83,6 +83,7 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   OPT_FLUSH \
   "(localize-faults)" \
+  "(use-abstraction):" \
   OPT_GOTO_TRACE \
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \

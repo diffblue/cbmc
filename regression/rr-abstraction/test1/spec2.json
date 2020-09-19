@@ -1,0 +1,33 @@
+{
+    "entries": [
+    {
+        "entity": "array",
+        "function": "main",
+        "name": "main::1::a1",
+        "shape": {
+            "indices": ["c0", "c1", "l"],
+            "assumptions": ["c0 == 0", "c0 < c1", "c1 < l"],
+            "shape-type": "c*c*l"
+        },
+        "abst-function-file": "./abst-funcs.c",
+        "abst-functions":{
+            "add-abs-conc": "add_abs_to_conc_3",
+            "sub-abs-conc": "sub_conc_from_abs_3",
+            "multiply-abs-conc": "multiply_abs_with_conc_3",
+            "precise-check": "is_precise_3",
+            "abstract-index": "three_abs",
+            "concretize-index": "concretize_3",
+            "multiply-indices": null,
+            "mod-indices": null
+        },
+        "related-entities": [
+            {
+                "entity": "length",
+                "function": "main",
+                "name": "main::1::a2_len"
+            }
+        ]
+
+    }
+]
+}

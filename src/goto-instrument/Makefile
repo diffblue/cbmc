@@ -1,4 +1,5 @@
-SRC = accelerate/accelerate.cpp \
+SRC = abstraction.cpp \
+      accelerate/accelerate.cpp \
       accelerate/acceleration_utils.cpp \
       accelerate/all_paths_enumerator.cpp \
       accelerate/cone_of_influence.cpp \
@@ -12,6 +13,7 @@ SRC = accelerate/accelerate.cpp \
       accelerate/scratch_program.cpp \
       accelerate/trace_automaton.cpp \
       accelerate/util.cpp \
+      abstraction_spect.cpp \
       aggressive_slicer.cpp \
       alignment_checks.cpp \
       branch.cpp \

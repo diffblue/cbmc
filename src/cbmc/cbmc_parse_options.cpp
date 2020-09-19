@@ -51,6 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
+#include <goto-programs/link_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/mm_io.h>

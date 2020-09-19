@@ -1,0 +1,9 @@
+Copied from test1.
+Main.c has a simple while loop that copies a2 array into a1 but it also has "sum" 
+which is not an abstracted variable that is being assigned inside the array. This should 
+lead to an error.
+
+With spec2.json there should be no error.
+Value of "sum" is not dependent on the loop size.
+
+Spec1.json is not used.

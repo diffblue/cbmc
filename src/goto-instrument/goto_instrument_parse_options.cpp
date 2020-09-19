@@ -28,8 +28,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/ensure_one_backedge_per_target.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/interpreter.h>
 #include <goto-programs/label_function_pointer_call_sites.h>
+#include <goto-programs/link_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/parameter_assignments.h>
@@ -103,6 +105,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "race_check.h"
 #include "reachability_slicer.h"
 #include "remove_function.h"
+#include "rr_abstraction.h"
+#include "rr_abstraction_spect.h"
 #include "rw_set.h"
 #include "show_locations.h"
 #include "skip_loops.h"
@@ -1012,6 +1016,21 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else
     options.set_option("assert-to-assume", false);
 
+  if(cmdline.isset("use-rra"))
+  {
+    std::string abs_file = cmdline.get_value("use-rra");
+
+    rr_abstraction_spect abst_spec(abs_file, ui_message_handler);
+
+    std::vector<std::string> abstfiles =
+      abst_spec.get_abstraction_function_files();
+
+    rr_abstractiont::link_abst_functions(
+      goto_model, abst_spec, ui_message_handler, options);
+
+    rr_abstractiont::abstract_goto_program(goto_model, abst_spec);
+  }
+
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
@@ -1878,6 +1897,8 @@ void goto_instrument_parse_optionst::help()
     " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
     "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
     "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --use-rra <file>             apply rr-abstraction to the arrays specified in the json file\n"
     HELP_RESTRICT_FUNCTION_POINTER
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS

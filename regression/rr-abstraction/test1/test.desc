@@ -1,0 +1,9 @@
+CORE
+main.c
+1
+^EXIT=0$
+^SIGNAL=0$
+^Writing GOTO
+--
+--
+Just adds functions from abst-funcs to module under test.

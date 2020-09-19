@@ -23,6 +23,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../pointer-analysis/rewrite_index$(OBJEXT) \
       ../pointer-analysis/goto_program_dereference$(OBJEXT) \
       ../goto-instrument/source_lines$(OBJEXT) \
+      ../goto-instrument/abstraction_spect$(OBJEXT) \
       ../goto-instrument/cover$(OBJEXT) \
       ../goto-instrument/cover_basic_blocks$(OBJEXT) \
       ../goto-instrument/cover_filter$(OBJEXT) \
