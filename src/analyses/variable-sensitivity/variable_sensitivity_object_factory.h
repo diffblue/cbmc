@@ -137,6 +137,7 @@ public:
   ///                two-value domain
   /// \param e: if top and bottom are false this expression is used as the
   ///           starting pointer for the abstract object
+  /// \param environment: the current abstract environment
   /// \param ns: namespace, used when following the input type
   ///
   /// \return An abstract object of the appropriate type.
@@ -205,7 +206,6 @@ private:
 /// Function: variable_sensitivity_object_factoryt::initialize_abstract_object
 /// Initialize the abstract object class and return it.
 ///
-/// \param abstract_object_classt: the class to use for the abstract object
 /// \param type: the type of the variable
 /// \param top: whether the abstract object should be top in the
 ///             two-value domain
@@ -213,6 +213,7 @@ private:
 ///                two-value domain
 /// \param e: if top and bottom are false this expression is used as the
 ///           starting pointer for the abstract object
+/// \param environment: the current abstract environment
 /// \param ns: namespace, used when following the input type
 ///
 /// \return An abstract object of the appropriate type.
@@ -224,17 +225,17 @@ variable_sensitivity_object_factoryt::initialize_abstract_object(
   bool top,
   bool bottom,
   const exprt &e,
-  const abstract_environmentt &enviroment,
+  const abstract_environmentt &environment,
   const namespacet &ns)
 {
   if(configuration.context_tracking.data_dependency_context)
     return initialize_context_abstract_object<
       abstract_object_classt,
-      data_dependency_contextt>(type, top, bottom, e, enviroment, ns);
+      data_dependency_contextt>(type, top, bottom, e, environment, ns);
   if(configuration.context_tracking.last_write_context)
     return initialize_context_abstract_object<
       abstract_object_classt,
-      write_location_contextt>(type, top, bottom, e, enviroment, ns);
+      write_location_contextt>(type, top, bottom, e, environment, ns);
   else
   {
     if(top || bottom)
@@ -246,7 +247,7 @@ variable_sensitivity_object_factoryt::initialize_abstract_object(
     {
       PRECONDITION(type == ns.follow(e.type()));
       return abstract_object_pointert(
-        new abstract_object_classt(e, enviroment, ns));
+        new abstract_object_classt(e, environment, ns));
     }
   }
 }
@@ -258,7 +259,7 @@ variable_sensitivity_object_factoryt::initialize_context_abstract_object(
   bool top,
   bool bottom,
   const exprt &e,
-  const abstract_environmentt &enviroment,
+  const abstract_environmentt &environment,
   const namespacet &ns)
 {
   if(top || bottom)
@@ -273,9 +274,9 @@ variable_sensitivity_object_factoryt::initialize_context_abstract_object(
   {
     PRECONDITION(type == ns.follow(e.type()));
     return abstract_object_pointert(new context_classt(
-      abstract_object_pointert(new abstract_object_classt(e, enviroment, ns)),
+      abstract_object_pointert(new abstract_object_classt(e, environment, ns)),
       e,
-      enviroment,
+      environment,
       ns));
   }
 }

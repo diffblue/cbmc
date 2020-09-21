@@ -93,6 +93,7 @@ protected:
   /// \param env: the environment
   /// \param index: the expression used to access the specific value
   ///               in the array
+  /// \param ns: the namespace
   ///
   /// \return An abstract object representing the value in the array
   abstract_object_pointert read_index(
@@ -139,10 +140,12 @@ protected:
   /// object to TOP
   void make_top_internal() override;
 
-  /// Short hand method for creating a top element of the array
+  /// Evaluates the index and tries to convert it to a constant integer
   ///
-  /// \param environment: the abstract environment
+  /// \param index: the index expression showing where to access the array
+  /// \param env: the abstract environment
   /// \param ns: the namespace
+  /// \param out_index: the index if it can be converted to a constant
   ///
   /// \return An abstract object pointer of type type().subtype() (i.e. the
   ///         type of the array's values).
@@ -175,7 +178,7 @@ private:
 
   /// Short hand method for creating a top element of the array
   ///
-  /// \param environment: the abstract environment
+  /// \param env: the abstract environment
   /// \param ns: the namespace
   ///
   /// \return An abstract object pointer of type type().subtype() (i.e. the

@@ -6,7 +6,8 @@
 
 \*******************************************************************/
 
-/// \file The base of all pointer abstractions
+/// \file
+/// The base of all pointer abstractions
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_POINTER_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_POINTER_ABSTRACT_OBJECT_H
 
@@ -34,8 +35,11 @@ public:
 
   /// \param expr: the expression to use as the starting pointer for
   ///              an abstract object
+  /// \param environment: the environment in which the pointer is being
+  ///                     created
+  /// \param ns: the current namespace
   explicit pointer_abstract_objectt(
-    const exprt &e,
+    const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
 

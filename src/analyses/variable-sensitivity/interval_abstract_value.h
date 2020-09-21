@@ -43,7 +43,20 @@ public:
 
   exprt to_constant() const override;
 
-  // Interface for transforms
+  /// Interface for transforms
+  ///
+  /// \param expr: the expression to evaluate and find the result of it.
+  ///              This will be the symbol referred to be op0()
+  /// \param operands: an abstract_object (pointer) that represent
+  ///                  the possible values of each operand
+  /// \param environment: the abstract environment in which the
+  ///                     expression is being evaluated
+  /// \param ns: the current variable namespace
+  ///
+  /// \return Returns the abstract_object representing the result of
+  ///         this expression to the maximum precision available.
+  ///
+  /// Perform the interval transforms
   abstract_object_pointert expression_transform(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,

@@ -19,12 +19,12 @@ pointer_abstract_objectt::pointer_abstract_objectt(const typet &t)
 }
 
 pointer_abstract_objectt::pointer_abstract_objectt(
-  const typet &t,
-  bool tp,
-  bool bttm)
-  : abstract_objectt(t, tp, bttm)
+  const typet &type,
+  bool top,
+  bool bottom)
+  : abstract_objectt(type, top, bottom)
 {
-  PRECONDITION(t.id() == ID_pointer);
+  PRECONDITION(type.id() == ID_pointer);
 }
 
 pointer_abstract_objectt::pointer_abstract_objectt(

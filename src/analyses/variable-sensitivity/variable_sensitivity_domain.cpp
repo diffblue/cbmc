@@ -220,7 +220,7 @@ bool variable_sensitivity_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
 {
-  sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition, ns);
+  abstract_object_pointert res = abstract_state.eval(condition, ns);
   exprt c = res->to_constant();
 
   if(c.id() == ID_nil)
@@ -404,40 +404,30 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
   const ai_domain_baset &function_end,
   const namespacet &ns)
 {
-  // TODO(tkiley): flag to turn of the context aware merge
-  if(true)
-  {
-    const variable_sensitivity_domaint &cast_function_call =
-      static_cast<const variable_sensitivity_domaint &>(function_call);
+  const variable_sensitivity_domaint &cast_function_call =
+    static_cast<const variable_sensitivity_domaint &>(function_call);
 
-    const variable_sensitivity_domaint &cast_function_start =
-      static_cast<const variable_sensitivity_domaint &>(function_start);
+  const variable_sensitivity_domaint &cast_function_start =
+    static_cast<const variable_sensitivity_domaint &>(function_start);
 
-    const variable_sensitivity_domaint &cast_function_end =
-      static_cast<const variable_sensitivity_domaint &>(function_end);
+  const variable_sensitivity_domaint &cast_function_end =
+    static_cast<const variable_sensitivity_domaint &>(function_end);
 
-    const std::vector<irep_idt> &modified_symbol_names =
-      cast_function_start.get_modified_symbols(cast_function_end);
+  const std::vector<irep_idt> &modified_symbol_names =
+    cast_function_start.get_modified_symbols(cast_function_end);
 
-    std::vector<symbol_exprt> modified_symbols;
-    modified_symbols.reserve(modified_symbol_names.size());
-    std::transform(
-      modified_symbol_names.begin(),
-      modified_symbol_names.end(),
-      std::back_inserter(modified_symbols),
-      [&ns](const irep_idt &id) { return ns.lookup(id).symbol_expr(); });
+  std::vector<symbol_exprt> modified_symbols;
+  modified_symbols.reserve(modified_symbol_names.size());
+  std::transform(
+    modified_symbol_names.begin(),
+    modified_symbol_names.end(),
+    std::back_inserter(modified_symbols),
+    [&ns](const irep_idt &id) { return ns.lookup(id).symbol_expr(); });
 
-    abstract_state = cast_function_call.abstract_state;
-    apply_domain(modified_symbols, cast_function_end, ns);
-  }
-  else
-  {
-    UNREACHABLE; // This case is not handled but also is not currently used
-    /*
-    ai_domain_baset::merge_three_way_function_return(
-      function_call, function_start, function_end, ns);
-    */
-  }
+  abstract_state = cast_function_call.abstract_state;
+  apply_domain(modified_symbols, cast_function_end, ns);
+
+  return;
 }
 
 void variable_sensitivity_domaint::apply_domain(

@@ -149,6 +149,11 @@ public:
   ///
   /// \param expr: the expression to evaluate and find the result of it.
   ///              This will be the symbol referred to be op0()
+  /// \param operands: an abstract_object (pointer) that represent
+  ///                  the possible values of each operand
+  /// \param environment: the abstract environment in which the
+  ///                     expression is being evaluated
+  /// \param ns: the current variable namespace
   ///
   /// \return Returns the abstract_object representing the result of
   ///         this expression to the maximum precision available.
@@ -266,6 +271,7 @@ public:
   ///             the sensitivity of the output and is the object compared
   ///             against to choose whether this merge changed anything
   /// \param op2: the second abstract object to merge
+  /// \param out_modifications: reference to a flag indicating modification
   ///
   /// \return The merged abstract object with the same sensitivity as the
   ///         first parameter. out_modifications will be true if the resulting

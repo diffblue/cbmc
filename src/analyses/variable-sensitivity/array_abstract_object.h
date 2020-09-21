@@ -98,6 +98,7 @@ protected:
   /// \param env: the environment
   /// \param index: the expression used to access the specific value
   ///               in the array
+  /// \param ns: the current variable namespace
   ///
   /// \return An abstract object representing the value in the array
   virtual abstract_object_pointert read_index(

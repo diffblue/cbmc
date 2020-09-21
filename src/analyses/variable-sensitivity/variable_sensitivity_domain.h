@@ -46,7 +46,7 @@
 /// abstract_environment : This contains the map from variable names for
 /// abstract_objectt's (the "non-relational" part of the domain).  The map
 /// itself if copy-on-write for performance and scalability but this is all
-/// wrapped up nicely in @danpoe's sharing_map.  The interface here is
+/// wrapped up nicely in danpoe's sharing_map.  The interface here is
 /// evaluate (exprt -> abstract_objectt*), assign (name, abstract_objectt*
 /// -> bool), assume (exprt -> bool) and merge.  It has a factory to build
 /// abstract_objectt* from types or constants but apart from that, doesn't
@@ -76,12 +76,12 @@ class variable_sensitivity_domaint : public ai_domain_baset
 public:
   /// Compute the abstract transformer for a single instruction
   ///
+  /// \param function_from: the name of the function containing from
   /// \param from: the instruction before the abstract domain
+  /// \param function_to: the name of the function containing to
   /// \param to: the instruction after the abstract domain
   /// \param ai: the abstract interpreter
   /// \param ns: the namespace
-  ///
-  /// \return none
   void transform(
     const irep_idt &function_from,
     locationt from,
@@ -104,8 +104,6 @@ public:
   /// \param out: the output stream
   /// \param ai: the abstract interpreter
   /// \param ns: the namespace
-  ///
-  /// \return none
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
@@ -143,7 +141,6 @@ public:
   ///
   /// \param condition: the expression to simplify
   /// \param ns: the namespace
-  /// \param lhs: is the expression on the left hand side
   ///
   /// \return True if no simplification was made
   bool ai_simplify(exprt &condition, const namespacet &ns) const override;
@@ -200,7 +197,7 @@ private:
   /// Given a domain and some symbols, apply those symbols values
   /// to the current domain
   /// \param modified_symbols: The symbols to write
-  /// \param source: The domain to take the values from
+  /// \param target: The domain to take the values from
   /// \param ns: The global namespace
   void apply_domain(
     std::vector<symbol_exprt> modified_symbols,

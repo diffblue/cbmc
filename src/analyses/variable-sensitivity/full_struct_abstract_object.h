@@ -45,6 +45,8 @@ public:
 
   /// \param expr: the expression to use as the starting pointer for an
   ///              abstract object
+  /// \param environment: the environment in which we evaluate expr
+  /// \param ns: the current namespace
   full_struct_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
@@ -108,6 +110,7 @@ protected:
   ///
   /// \param environment: the abstract environment
   /// \param member_expr: the expression uses to access a specific component
+  /// \param ns: the current namespace
   ///
   /// \return The abstract object representing the value of that
   ///         component. For this abstraction this will always be top
@@ -122,9 +125,13 @@ protected:
   /// update what they are storing for a specific component.
   ///
   /// \param environment: the abstract environment
+  /// \param ns: the current namespace
   /// \param stack: the remaining stack of expressions on the LHS to evaluate
   /// \param member_expr: the expression uses to access a specific component
   /// \param value: the value we are trying to write to the component
+  /// \param merging_write: whether to over-write or to merge with the
+  ///                       current value.  In other words is there
+  ///                       any certainty that this write will happen.
   ///
   /// \return The struct_abstract_objectt representing the result of
   ///         writing to a specific component. In this case this will

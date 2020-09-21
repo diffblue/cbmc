@@ -132,6 +132,7 @@ public:
   /// \param top: does the type of the object start as top
   /// \param bottom: does the type of the object start as bottom in
   ///                the two-value domain
+  /// \param ns: the current variable namespace
   ///
   /// \return The abstract object that has been created
   virtual abstract_object_pointert abstract_object_factory(
@@ -143,7 +144,8 @@ public:
   /// For converting constants in the program
   ///
   /// \param type: the type of the object whose state should be tracked
-  /// \param expr: the starting value of the symbol
+  /// \param e: the starting value of the symbol
+  /// \param ns: the current variable namespace
   ///
   /// \return The abstract object that has been created
   ///
@@ -168,8 +170,6 @@ public:
   /// occurs
   ///
   /// \param havoc_string: diagnostic string to track down havoc causing.
-  ///
-  /// \return None
   ///
   /// Set the domain to top
   virtual void havoc(const std::string &havoc_string);
@@ -235,8 +235,10 @@ private:
   ///             the two-value domain
   /// \param bottom: does the type of the object start as bottom in
   ///                the two-value domain
-  /// \param expr: the starting value of the symbol if top and bottom
-  ///              are both false
+  /// \param e: the starting value of the symbol if top and bottom
+  ///           are both false
+  /// \param environment: the current environment (normally *this)
+  /// \param ns: the current variable namespace
   ///
   /// \return The abstract object that has been created
   abstract_object_pointert abstract_object_factory(
@@ -244,7 +246,7 @@ private:
     bool top,
     bool bottom,
     const exprt &e,
-    const abstract_environmentt &eviroment,
+    const abstract_environmentt &environment,
     const namespacet &ns) const;
 };
 

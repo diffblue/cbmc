@@ -343,10 +343,6 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
 
 bool abstract_environmentt::merge(const abstract_environmentt &env)
 {
-  // Use the sharing_map's "iterative over all differences" functionality
-  // This should give a significant performance boost
-  // We can strip down to just the things that are in both
-
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present
 
