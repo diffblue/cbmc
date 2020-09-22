@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 main.c
 --incremental-loop main.0 --unwind-max 15
 activate-multi-line-match

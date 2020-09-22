@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 
 --verbosity 10 /c main1.c main2.c /Fodir
 ^EXIT=64$
