@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 dummy.c
 --function main --harness-type call-function
 \[default_serve\.assertion\.1\] line \d+ assertion 0 && \"default serve should fail so we can see it is being called\": FAILURE
