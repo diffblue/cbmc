@@ -43,6 +43,20 @@ already have these, if not please download and run vcredist.x64.exe from
 [Microsoft](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) to install them prior to running
 cbmc.
 
+### macOS
+
+For macOS there is a [Homebrew](https://brew.sh) package
+[available](https://formulae.brew.sh/formula/cbmc). Once you have installed
+Homebrew, simply run
+
+    brew install cbmc
+
+to install cbmc, or if you already have it installed via homebrew
+
+    brew upgrade cbmc
+
+to get an up-to-date version.
+
 Report bugs
 ===========
 
