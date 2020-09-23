@@ -186,8 +186,7 @@ void ansi_c_internal_additions(std::string &code)
       CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);\n"
     "const void *" CPROVER_PREFIX "alloca_object = 0;\n"
 
-    "int " CPROVER_PREFIX "malloc_failure_mode="+
-      std::to_string(config.ansi_c.malloc_failure_mode)+";\n"
+    "extern int " CPROVER_PREFIX "malloc_failure_mode;\n"
     "int " CPROVER_PREFIX "malloc_failure_mode_return_null="+
     std::to_string(config.ansi_c.malloc_failure_mode_return_null)+";\n"
     "int " CPROVER_PREFIX "malloc_failure_mode_assert_then_assume="+
@@ -195,8 +194,7 @@ void ansi_c_internal_additions(std::string &code)
     CPROVER_PREFIX "size_t " CPROVER_PREFIX "max_malloc_size="+
     integer2string(max_malloc_size(config.ansi_c.pointer_width, config
     .bv_encoding.object_bits))+";\n"
-    CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_may_fail = " +
-    std::to_string(config.ansi_c.malloc_may_fail) + ";\n"
+    "extern " CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_may_fail;\n"
 
     // this is ANSI-C
     "extern " CPROVER_PREFIX "thread_local const char __func__["
