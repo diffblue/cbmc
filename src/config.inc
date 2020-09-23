@@ -5,7 +5,7 @@ BUILD_ENV = AUTO
 ifeq ($(BUILD_ENV),MSVC)
   #CXXFLAGS += /Wall /WX
 else
-  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
+  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum -Wno-range-loop-analysis
 endif
 
 ifeq ($(CPROVER_WITH_PROFILING),1)
