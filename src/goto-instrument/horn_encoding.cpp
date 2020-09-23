@@ -472,11 +472,12 @@ protected:
 class smt2_encoding_targett : public encoding_targett
 {
 public:
-  smt2_encoding_targett(std::ostream &__out, const namespacet &__ns)
+  smt2_encoding_targett(std::ostream &__out, const namespacet &__ns, bool __use_synth_fun)
     : out(__out),
       smt2_conv(__ns, "", "", "HORN", smt2_convt::solvert::Z3, __out),
       comment_stream(&null_streambuf)
   {
+    smt2_conv.use_synth_fun = __use_synth_fun;
   }
 
   void set_to_true(exprt e) override
@@ -525,7 +526,15 @@ void horn_encoding(
   case horn_formatt::SMT2:
   {
     const namespacet ns(model.symbol_table);
-    smt2_encoding_targett target(out, ns);
+    smt2_encoding_targett target(out, ns, false);
+    target << horn_encoding(model);
+  }
+  break;
+
+  case horn_formatt::SYNTH:
+  {
+    const namespacet ns(model.symbol_table);
+    smt2_encoding_targett target(out, ns, true);
     target << horn_encoding(model);
   }
   break;

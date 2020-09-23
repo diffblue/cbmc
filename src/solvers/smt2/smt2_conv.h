@@ -60,6 +60,7 @@ public:
   bool use_datatypes;
   bool use_array_of_bool;
   bool emit_set_logic;
+  bool use_synth_fun = false;
 
   exprt handle(const exprt &expr) override;
   void set_to(const exprt &expr, bool value) override;

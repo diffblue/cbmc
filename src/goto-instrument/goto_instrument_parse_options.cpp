@@ -847,14 +847,16 @@ int goto_instrument_parse_optionst::doit()
       remove_skip(goto_model);
     }
 
-    if(cmdline.isset("horn") || cmdline.isset("horn-smt2"))
+    if(cmdline.isset("horn") || cmdline.isset("horn-smt2") || cmdline.isset("synth"))
     {
       log.status() << "Horn-clause encoding" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
       remove_returns(goto_model);
 
       auto format =
-        cmdline.isset("horn-smt2") ? horn_formatt::SMT2 : horn_formatt::ASCII;
+        cmdline.isset("horn-smt2") ? horn_formatt::SMT2 :
+        cmdline.isset("synth") ? horn_formatt::SYNTH :
+        horn_formatt::ASCII;
 
       if(cmdline.args.size() == 2) // output to file
       {

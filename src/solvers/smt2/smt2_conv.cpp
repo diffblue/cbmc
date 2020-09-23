@@ -4327,9 +4327,35 @@ void smt2_convt::find_symbols(const exprt &expr)
       smt2_identifiers.insert(smt2_identifier);
 
       out << "; find_symbols\n";
-      out << "(declare-fun |" << smt2_identifier << "| ";
-      convert_function_type(expr.type());
-      out << ")" << "\n";
+
+      if(use_synth_fun && expr.type().id() == ID_mathematical_function)
+      {
+        out << "(synth-fun |" << smt2_identifier << "| ";
+
+        const auto &function_type = to_mathematical_function_type(expr.type());
+        out << '(';
+        bool first = true;
+        std::size_t count = 0;
+        for(auto &d : function_type.domain())
+        {
+          if(first)
+            first = false;
+          else
+            out << ' ';
+          out << 'x' << (count++) << ' ';
+          convert_constant_type(d);
+        }
+        out << ") ";
+        convert_constant_type(function_type.codomain());
+
+        out << ')' << '\n';
+      }
+      else
+      {
+        out << "(declare-fun |" << smt2_identifier << "| ";
+        convert_function_type(expr.type());
+        out << ")" << "\n";
+      }
     }
   }
   else if(expr.id()==ID_array_of)

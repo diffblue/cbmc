@@ -19,7 +19,8 @@ Author:
 enum horn_formatt
 {
   ASCII,
-  SMT2
+  SMT2,
+  SYNTH
 };
 
 void horn_encoding(const goto_modelt &, horn_formatt, std::ostream &);
