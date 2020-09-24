@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_dereference.h"
 
+#ifdef DEBUG
 #include <iostream>
-#include <util/format_expr.h>
-#include <util/json_irep.h>
+#endif
 
 #include <util/arith_tools.h>
 #include <util/array_name.h>
@@ -23,8 +23,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
+#include <util/json_irep.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
