@@ -12,6 +12,7 @@ DIRS = analyses \
        goto-harness \
        goto-programs \
        goto-symex \
+			 goto-unwind \
        jsil \
        json \
        json-symtab-language \
@@ -32,6 +33,7 @@ all: cbmc.dir \
      goto-diff.dir \
      goto-instrument.dir \
      goto-harness.dir \
+		 goto-unwind.dir \
      symtab2gb.dir \
      # Empty last line
 
@@ -72,6 +74,8 @@ goto-harness.dir: util.dir goto-programs.dir langapi.dir linking.dir \
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir
 
+goto-unwind.dir: goto-programs.dir goto-unwind.dir util.dir analyses.dir cpp.dir langapi.dir linking.dir
+
 goto-checker.dir: solvers.dir goto-symex.dir goto-programs.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
@@ -91,6 +95,8 @@ memory-analyzer.dir: util.dir goto-programs.dir ansi-c.dir
 
 symtab2gb.dir: util.dir goto-programs.dir langapi.dir linking.dir \
                json.dir json-symtab-language.dir
+
+goto-programs.dir: ansi-c.dir
 
 # building for a particular directory
 

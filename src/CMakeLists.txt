@@ -55,6 +55,7 @@ endmacro(generic_flex)
 
 #   Set the public include locations for a target.
 macro(generic_includes name)
+    message("GENERIC INCLUDES: ${name}; CBMC_SOURCE_DIR: ${CBMC_SOURCE_DIR}")
     target_include_directories(${name}
         PUBLIC
         ${CBMC_BINARY_DIR}
@@ -106,6 +107,7 @@ add_subdirectory(goto-analyzer)
 add_subdirectory(goto-diff)
 add_subdirectory(goto-harness)
 add_subdirectory(symtab2gb)
+add_subdirectory(goto-unwind)
 
 if(UNIX OR WITH_MEMORY_ANALYZER)
 add_subdirectory(memory-analyzer)

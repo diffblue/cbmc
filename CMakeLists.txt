@@ -195,6 +195,7 @@ cprover_default_properties(
     goto-instrument-lib
     goto-programs
     goto-symex
+    goto-unwind
     jsil
     json
     json-symtab-language
