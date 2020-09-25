@@ -645,17 +645,14 @@ void c_typecheck_baset::typecheck_declaration(
     irept contract;
 
     {
-      exprt spec_assigns=
-        static_cast<const exprt&>(declaration.find(ID_C_spec_assigns));
+      exprt spec_assigns = declaration.spec_assigns();
       contract.add(ID_C_spec_assigns).swap(spec_assigns);
 
-      exprt spec_requires=
-        static_cast<const exprt&>(declaration.find(ID_C_spec_requires));
-      contract.add(ID_C_spec_requires).swap(spec_requires);
-
-      exprt spec_ensures=
-        static_cast<const exprt&>(declaration.find(ID_C_spec_ensures));
+      exprt spec_ensures = declaration.spec_ensures();
       contract.add(ID_C_spec_ensures).swap(spec_ensures);
+
+      exprt spec_requires = declaration.spec_requires();
+      contract.add(ID_C_spec_requires).swap(spec_requires);
     }
 
     // Now do declarators, if any.
