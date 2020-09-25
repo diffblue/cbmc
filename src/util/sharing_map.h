@@ -619,7 +619,7 @@ SHARING_MAPT(void)
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
 
-      for(const auto &item : m)
+      for(const auto item : m)
       {
         stack.push(&item.second);
       }
@@ -694,7 +694,7 @@ SHARING_MAPT(std::size_t)
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
 
-      for(const auto &item : m)
+      for(const auto item : m)
       {
         stack.push(&item.second);
       }
@@ -939,7 +939,7 @@ SHARING_MAPT(void)
 
       if(ip2->is_internal())
       {
-        for(const auto &item : ip1->get_to_map())
+        for(const auto item : ip1->get_to_map())
         {
           const nodet &child = item.second;
 
@@ -964,7 +964,7 @@ SHARING_MAPT(void)
       {
         SM_ASSERT(ip2->is_leaf());
 
-        for(const auto &item : ip1->get_to_map())
+        for(const auto item : ip1->get_to_map())
         {
           const nodet &child = item.second;
 

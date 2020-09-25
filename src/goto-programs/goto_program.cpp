@@ -1093,7 +1093,7 @@ bool goto_programt::equals(const goto_programt &other) const
 
     // the number of targets is the same as instructiont::equals returned "true"
     auto other_target_it = other_it->targets.begin();
-    for(const auto t : ins.targets)
+    for(const auto &t : ins.targets)
     {
       if(
         t->location_number - ins.location_number !=

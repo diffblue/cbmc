@@ -165,7 +165,7 @@ void solver_hardnesst::produce_report()
       json_stringt{assertion_stats.ssa_expression};
 
     auto assertion_stats_pcs_json = json_arrayt{};
-    for(const auto pc : assertion_stats.pcs)
+    for(const auto &pc : assertion_stats.pcs)
     {
       auto assertion_stats_pc_json = json_objectt{};
       assertion_stats_pc_json["GOTO"] =

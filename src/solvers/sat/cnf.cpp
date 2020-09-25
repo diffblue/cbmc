@@ -166,7 +166,7 @@ literalt cnft::land(const bvt &bv)
   if(bv.size()==2)
     return land(bv[0], bv[1]);
 
-  for(const auto l : bv)
+  for(const auto &l : bv)
     if(l.is_false())
       return l;
 
@@ -179,7 +179,7 @@ literalt cnft::land(const bvt &bv)
   literalt literal=new_variable();
   lits[1]=neg(literal);
 
-  for(const auto l : new_bv)
+  for(const auto &l : new_bv)
   {
     lits[0]=pos(l);
     lcnf(lits);
@@ -188,7 +188,7 @@ literalt cnft::land(const bvt &bv)
   lits.clear();
   lits.reserve(new_bv.size()+1);
 
-  for(const auto l : new_bv)
+  for(const auto &l : new_bv)
     lits.push_back(neg(l));
 
   lits.push_back(pos(literal));
@@ -209,7 +209,7 @@ literalt cnft::lor(const bvt &bv)
   if(bv.size()==2)
     return lor(bv[0], bv[1]);
 
-  for(const auto l : bv)
+  for(const auto &l : bv)
     if(l.is_true())
       return l;
 
@@ -222,7 +222,7 @@ literalt cnft::lor(const bvt &bv)
   literalt literal=new_variable();
   lits[1]=pos(literal);
 
-  for(const auto l : new_bv)
+  for(const auto &l : new_bv)
   {
     lits[0]=neg(l);
     lcnf(lits);
@@ -231,7 +231,7 @@ literalt cnft::lor(const bvt &bv)
   lits.clear();
   lits.reserve(new_bv.size()+1);
 
-  for(const auto l : new_bv)
+  for(const auto &l : new_bv)
     lits.push_back(pos(l));
 
   lits.push_back(neg(literal));
@@ -254,7 +254,7 @@ literalt cnft::lxor(const bvt &bv)
 
   literalt literal=const_literal(false);
 
-  for(const auto l : bv)
+  for(const auto &l : bv)
     literal=lxor(l, literal);
 
   return literal;
@@ -404,7 +404,7 @@ bvt cnft::eliminate_duplicates(const bvt &bv)
   bvt dest;
   dest.reserve(bv.size());
 
-  for(const auto l : bv)
+  for(const auto &l : bv)
     if(s.insert(l).second)
       dest.push_back(l);
 
@@ -423,7 +423,7 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
 
   // first check simple things
 
-  for(const auto l : bv)
+  for(const auto &l : bv)
   {
     // we never use index 0
     INVARIANT(l.var_no() != 0, "variable 0 must not be used");
@@ -449,7 +449,7 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
   dest.clear();
   dest.reserve(bv.size());
 
-  for(const auto l : bv)
+  for(const auto &l : bv)
   {
     if(l.is_false())
       continue; // remove
