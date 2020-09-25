@@ -163,8 +163,7 @@ std::string escape_non_alnum(const std::string &to_escape)
     else if(isalnum(uch))
       escaped << ch;
     else
-      escaped << '_' << std::hex << std::setfill('0') << std::setw(2)
-              << (unsigned int)ch;
+      escaped << '_' << std::hex << std::setfill('0') << std::setw(2) << uch;
   }
   return escaped.str();
 }
