@@ -9,7 +9,6 @@ Author: Daniel Poetzl
 #include "string_utils.h"
 #include "exception_utils.h"
 #include "invariant.h"
-#include "narrow.h"
 
 #include <algorithm>
 #include <cassert>
@@ -157,7 +156,7 @@ std::string escape_non_alnum(const std::string &to_escape)
   std::ostringstream escaped;
   for(auto &ch : to_escape)
   {
-    const auto uch = narrow<int>(narrow_cast<unsigned char>(ch));
+    const int uch{static_cast<unsigned char>(ch)};
     if(ch == '_')
       escaped << "__";
     else if(isalnum(uch))
