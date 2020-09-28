@@ -329,7 +329,7 @@ void build_goto_trace(
 
   for(const auto &time_and_ssa_steps : time_map)
   {
-    for(const auto ssa_step_it : time_and_ssa_steps.second)
+    for(const auto &ssa_step_it : time_and_ssa_steps.second)
     {
       const auto &SSA_step = *ssa_step_it;
       goto_trace.steps.push_back(goto_trace_stept());
