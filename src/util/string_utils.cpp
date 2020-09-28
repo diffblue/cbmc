@@ -156,6 +156,13 @@ std::string escape_non_alnum(const std::string &to_escape)
   std::ostringstream escaped;
   for(auto &ch : to_escape)
   {
+    // `ch` may have a negative value in the case of utf-8 encodings of
+    // characters above unicode code point 127. The following line maps these
+    // negative values to positive values in the 128-255 range, using a
+    // `static_cast`. This is neccessary in order to avoid undefined behaviour
+    // in `isalnum`. The positive values are then stored in an integer using a
+    // widening initialisation so that the stream insertion operator prints them
+    // as numbers rather than characters.
     const int uch{static_cast<unsigned char>(ch)};
     if(ch == '_')
       escaped << "__";
