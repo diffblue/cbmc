@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 Main
 --function Main.nondetFail --max-nondet-string-length 1000 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.nondetFail:(ZLjava/lang/String;Ljava/lang/String;)V.assertion.1" 
 ^EXIT=10$

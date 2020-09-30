@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 Test
 --function Test.testBool --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testBool:(Z)Ljava/lang/String;.assertion.2"
 ^EXIT=10$

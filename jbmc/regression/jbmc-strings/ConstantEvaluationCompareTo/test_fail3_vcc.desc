@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 Main
 --function Main.constantCompareToFail3 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.constantCompareToFail3:()V.assertion.1" --show-vcc
 ^EXIT=0$

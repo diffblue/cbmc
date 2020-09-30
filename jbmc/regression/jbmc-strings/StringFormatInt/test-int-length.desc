@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 Test
 --function Test.testIntLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testIntLength:(I)V.assertion.1"
  

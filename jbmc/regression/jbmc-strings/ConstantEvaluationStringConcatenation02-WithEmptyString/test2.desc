@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 Main
 --function Main.test2 --property "java::Main.test2:()V.assertion.1" --property "java::Main.test2:()V.assertion.2"
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
