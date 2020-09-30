@@ -1,26 +1,45 @@
-name: Build and Test Xen
+name: Build Xen with CPROVER tools
 
-on: [push]
+on:
+  pull_request:
+    branches: [ develop ]
 
 jobs:
-  Linux:
-
+  CompileXen:
     runs-on: ubuntu-18.04
-
     steps:
-    - name: Install Packages
-      run: sudo apt-get install coreutils \
-        build-essential gcc git make flex bison \
-        software-properties-common libwww-perl python \
-        bin86 gdb bcc liblzma-dev python-dev gettext iasl \
-        uuid-dev libncurses5-dev libncursesw5-dev pkg-config \
-        libgtk2.0-dev libyajl-dev sudo time
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Install Packages
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get install -y coreutils  build-essential gcc git make flex bison software-properties-common libwww-perl python
+          sudo apt-get install -y bin86 gdb bcc liblzma-dev python-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
+          sudo apt-get install -y libgtk2.0-dev libyajl-dev sudo time
 
-    - uses: actions/checkout@v1
+      - name: Build CBMC tools
+        run: |
+          make -C src minisat2-download
+          make -C src cbmc.dir goto-cc.dir goto-diff.dir
 
-    - name: build CBMC tools
-      run: make -C src minisat2-download
-      run: make -C src cbmc.dir goto-cc.dir goto-diff.dir
+      - name: Get one-line-scan
+        run: git clone -b path-addition https://github.com/awslabs/one-line-scan.git
 
-    - name: get Xen 4.13
-      run: git clone git://xenbits.xen.org/xen.git xen_4_13 && cd xen_4_13 && git reset --hard RELEASE-4.13.0
+      - name: Get Xen 4.13
+        run: git clone git://xenbits.xen.org/xen.git xen_4_13 && cd xen_4_13 && git reset --hard RELEASE-4.13.0 && pwd
+
+      - name: Prepare compile Xen with CBMC via one-line-scan
+        run: |
+          ln -s goto-cc src/goto-cc/goto-ld
+          ln -s goto-cc src/goto-cc/goto-as
+          ln -s goto-cc src/goto-cc/goto-g++
+
+      - name: Compile Xen with CBMC via one-line-scan, and check for goto-cc section
+        run: one-line-scan/one-line-scan --add-to-path $(pwd)/src/cbmc --add-to-path $(pwd)/src/goto-diff  --add-to-path $(pwd)/src/goto-cc --no-analysis --trunc-existing --extra-cflags -Wno-error -o CPROVER -j 3 -- make -C xen_4_13 xen -j $(nproc) -k || true
+        
+      - name: Check for goto-cc section in xen-syms binary
+        run: objdump -h xen_4_13/xen/xen-syms | grep "goto-cc"
