@@ -16,7 +16,7 @@ echo "Remove strawberry"
 del /s /q "c:/Strawberry/c/bin"
 
 echo "Configure CBMC with cmake"
-cmake --config Release -S. -Bbuild -GNinja
+cmake -S. -Bbuild
 
 echo "Build CBMC with cmake"
-cmake --build build
+cmake --build build --config Release
