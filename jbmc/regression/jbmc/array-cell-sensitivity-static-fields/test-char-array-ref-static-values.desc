@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 Test
 --function Test.charArrayRef --property "java::Test.charArrayRef:()[C.assertion.2" --static-values static-values.json
 Generated 0 VCC[(]s[)], 0 remaining after simplification

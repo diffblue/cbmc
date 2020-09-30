@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 Test
 --function Test.charArray --property "java::Test.charArray:()[C.assertion.1"
 Generated 0 VCC[(]s[)], 0 remaining after simplification
