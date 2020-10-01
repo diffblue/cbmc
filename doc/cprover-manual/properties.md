@@ -147,6 +147,21 @@ unsigned foo(unsigned x)
   x = x + 2; // unsigned overflow checks are generated here
 ```
 
+#### Flag --nan-check limitations
+
+Please note that `--nan-check` flag is adding not-a-number checks only for
+generation of NaN value. Current implementation of `--nan-check` flag is not
+providing checks for propagation of NaN values. Generating assertions on type
+casting or structure/union member access is unsupported and such operation
+will not be examined.
+
+For example:
+
+```
+float f = 0.0/0.0; // will generate NaN - CBMC will add assertion
+float g = NAN+0.0; // propagation of NaN value - no assertion generated
+```
+
 #### Generating function bodies
 
 Sometimes implementations for called functions are not available in the goto
