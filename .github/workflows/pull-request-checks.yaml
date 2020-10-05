@@ -39,6 +39,7 @@ jobs:
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test
+
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
     steps:
@@ -111,13 +112,11 @@ jobs:
         run: cd build; ninja
       - name: Run CTest
         run: cd build; ctest -V -L CORE .
-  check-vs-2019-build-only:
+
+  check-vs-2019-build-and-test:
     runs-on: windows-2019
     env:
       SCRIPT_DIR: .github/workflows/vs2019
-    defaults:
-      run:
-        shell: cmd
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -125,10 +124,23 @@ jobs:
           submodules: recursive
 
       - name: Install bison and flex
-        run: "%SCRIPT_DIR%\\install-bison.bat"
+        run: "${{env.SCRIPT_DIR}}\\install-bison.bat"
+
+      - name: Install z3
+        run: |
+          Invoke-WebRequest "https://github.com/Z3Prover/z3/releases/download/z3-4.8.8/z3-4.8.8-x64-win.zip" -OutFile z3.zip
+          Expand-Archive z3.zip
+          # We need Get-ChildItem.Name here because the path includes
+          # the z3 version number, which we expect to change.
+          $z3_path = "$(Get-Location)\z3\$((Get-ChildItem z3).Name)"
+          $env:PATH += ";$z3_path"
+          Write-Output "::set-env name=PATH::$env:PATH"
 
       - name: Build cbmc
-        run: "%SCRIPT_DIR%\\build-cbmc.bat"
+        run: "${{env.SCRIPT_DIR}}\\build-cbmc.bat"
+
+      - name: Test cbmc
+        run: "${{env.SCRIPT_DIR}}\\run-tests.bat"
 
   check-clang-format:
     runs-on: ubuntu-20.04

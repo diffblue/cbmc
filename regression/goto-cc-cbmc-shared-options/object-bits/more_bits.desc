@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 test.c
 --function main --object-bits 10
 ^EXIT=10$

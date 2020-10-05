@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 My
 --function My.intervalUnion --java-assume-inputs-interval [3:3] --property "java::My.intervalUnion:(I)V.assertion.1" --property "java::My.intervalUnion:(I)V.assertion.2" --property "java::My.intervalUnion:(I)V.assertion.3" --property "java::My.intervalUnion:(I)V.assertion.4" --property "java::My.intervalUnion:(I)V.assertion.6"
 ^EXIT=0$

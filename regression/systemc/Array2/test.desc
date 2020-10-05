@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 main.cpp
 -DNO_IO -DNO_STRING
 ^EXIT=0$

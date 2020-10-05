@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 test
 --function test.nondet --max-nondet-string-length 1000 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::test.nondet:(Ljava/lang/String;)V.assertion.1"
 ^EXIT=10$

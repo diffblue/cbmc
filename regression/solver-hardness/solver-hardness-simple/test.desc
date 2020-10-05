@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 main.c
 --write-solver-stats-to "solver_hardness.json"
 ^EXIT=10$

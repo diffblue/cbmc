@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 Test
 --function Test.percentLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.percentLength:()Ljava/lang/String;.assertion.2"
 ^EXIT=0$

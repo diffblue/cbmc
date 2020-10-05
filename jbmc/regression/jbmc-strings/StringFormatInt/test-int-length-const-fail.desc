@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 Test
 --function Test.testIntLengthConstFAIL --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testIntLengthConstFAIL:()V.assertion.1"
 ^EXIT=10$

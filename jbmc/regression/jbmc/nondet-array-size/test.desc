@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 TestClass
 --function "TestClass.minimalJbmc" --unwind 5 --max-nondet-string-length 10 --java-unwind-enum-static --trace --json-ui
 ^EXIT=10$

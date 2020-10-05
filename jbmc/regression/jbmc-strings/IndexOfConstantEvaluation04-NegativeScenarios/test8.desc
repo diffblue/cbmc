@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 Main
 --function Main.constantIndexOf --property "java::Main.constantIndexOf:(Ljava/lang/String;CI)V.assertion.8" --show-vcc
 ^Generated 1 VCC\(s\), 1 remaining after simplification$

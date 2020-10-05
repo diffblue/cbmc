@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 Main
 --function Main.test2 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.test2:(I)V.assertion.1"
 ^Generated 1 VCC\(s\), 1 remaining after simplification$

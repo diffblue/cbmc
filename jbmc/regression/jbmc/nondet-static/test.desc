@@ -1,4 +1,4 @@
-CORE symex-driven-lazy-loading-expected-failure
+CORE symex-driven-lazy-loading-expected-failure winbug
 My
 --function "My.<init>" --nondet-static --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE
+CORE winbug
 dummy.c
 --function another --harness-type call-function
 ^EXIT=10$
