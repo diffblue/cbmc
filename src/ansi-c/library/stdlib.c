@@ -477,8 +477,10 @@ inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
   void *res;
   res=malloc(malloc_size);
   if(res != (void *)0)
+  {
     __CPROVER_array_copy(res, ptr);
-  free(ptr);
+    free(ptr);
+  }
 
   return res;
 }

@@ -1,0 +1,11 @@
+CORE
+test.c
+--malloc-may-fail --malloc-fail-null
+^\[main.precondition_instance.\d+] line \d+ double free: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is a test checking for a regression where the --malloc-may-fail flag
+introduced a double-free bug in the stdlib models with realloc.
