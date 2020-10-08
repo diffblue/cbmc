@@ -527,20 +527,13 @@ __CPROVER_HIDE:;
   // As _mid_memalign simplifies for alignment <= MALLOC_ALIGNMENT
   // to a malloc call, it should be sound, if we do it too.
 
-  // The original posix_memalign check on the pointer is:
-
-  // void *tmp = malloc(size);
-  // if(tmp != NULL){
-  //   *ptr = tmp;
-  //   return 0;
-  // }
-  // return ENOMEM;
-
-  // As _CPROVER_allocate used in malloc never returns null,
-  // this check is not applicable and can be simplified:
-
-  *ptr = malloc(size);
-  return 0;
+  void *tmp = malloc(size);
+  if(tmp != (void *)0)
+  {
+    *ptr = tmp;
+    return 0;
+  }
+  return ENOMEM;
 }
 
 /* FUNCTION: random */
