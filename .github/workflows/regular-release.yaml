@@ -68,7 +68,7 @@ jobs:
 
             ```sh
             msiexec /i ${{ env.CBMC_TAG }}-win64.msi
-            PATH="c:\program files\cbmc\bin";%PATH%
+            PATH="C:\Program Files\cbmc\bin";%PATH%
             ```
 
             Note that we depend on the Visual C++ redistributables. You likely already have these, if not please download and run vcredist.x64.exe from Microsoft to install them prior to running cbmc, or make sure you have Visual Studio 2019 installed.
