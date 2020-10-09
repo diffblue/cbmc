@@ -38,6 +38,7 @@ jobs:
             ## MacOS
 
             On MacOS, install CBMC using [Homebrew](https://brew.sh/) with
+
             ```sh
             brew install cbmc
             ```
@@ -50,8 +51,7 @@ jobs:
 
             ## Ubuntu
 
-            On Ubuntu, install CBMC by downloading the *.deb package below for your version of Ubuntu
-            and install with one of
+            On Ubuntu, install CBMC by downloading the *.deb package below for your version of Ubuntu and install with one of
 
             ```sh
             # Ubuntu 18:
@@ -62,9 +62,7 @@ jobs:
 
             ## Windows
 
-            On Windows, install CBMC by downloading the `${{ env.CBMC_TAG }}-win64.msi` installer
-            below, double-clicking on the installer to run it, and adding the folder
-            `C:\Program Files\cbmc\bin` in your `PATH` environment variable.
+            On Windows, install CBMC by downloading the `${{ env.CBMC_TAG }}-win64.msi` installer below, double-clicking on the installer to run it, and adding the folder `C:\Program Files\cbmc\bin` in your `PATH` environment variable.
 
             For installation from the windows command prompt, run:
 
@@ -73,11 +71,8 @@ jobs:
             PATH="c:\program files\cbmc\bin";%PATH%
             ```
 
-            Note that we depend on the Visual C++ redistributables. You likely already have these,
-            if not please download and run vcredist.x64.exe from Microsoft to install them prior
-            to running cbmc, or make sure you have Visual Studio 2019 installed.
+            Note that we depend on the Visual C++ redistributables. You likely already have these, if not please download and run vcredist.x64.exe from Microsoft to install them prior to running cbmc, or make sure you have Visual Studio 2019 installed.
 
-            You can download either [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/community/)
-            or the [Visual C++ Redistributables](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) from Microsoft for free.
+            You can download either [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/community/) or the [Visual C++ Redistributables](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) from Microsoft for free.
           draft: false
           prerelease: false
