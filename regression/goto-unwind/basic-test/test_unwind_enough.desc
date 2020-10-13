@@ -1,0 +1,26 @@
+CORE
+test.c
+--unwind-limit 11
+\[fib.assertion.1\] line \d+ assertion N >= 0: SUCCESS
+\[fib.1\] line \d+ assertion: SUCCESS
+\[fib.assertion.2\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.3\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.4\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.5\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.6\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.7\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.8\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.9\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.10\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.11\] line \d+ assertion N >= -1: SUCCESS
+\[fib.assertion.12\] line \d+ assertion N >= -1: SUCCESS
+\[main.assertion.1\] line \d+ assertion fib\(0\) == 1: SUCCESS
+\[main.assertion.2\] line \d+ assertion fib\(10\) == 55: FAILURE
+\[main.assertion.3\] line \d+ assertion fib\(10\) == 89: SUCCESS
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+After unwinding enough, analysing with cbmc should still work This contains a
+loop that'll unwind 11 times so we need to unwind 11 times.
