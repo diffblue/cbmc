@@ -156,7 +156,7 @@ get_interface_methods(const irep_idt &interface_id, const namespacet &ns)
   {
     const methods_by_name_and_descriptort base_methods =
       get_interface_methods(base.type().get_identifier(), ns);
-    for(const auto base_method : base_methods)
+    for(const auto &base_method : base_methods)
     {
       if(base_method.second)
       {
