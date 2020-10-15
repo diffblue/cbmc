@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int f1(int *a, int *b) __CPROVER_assigns(*a)
 {
   if(*a > 0)

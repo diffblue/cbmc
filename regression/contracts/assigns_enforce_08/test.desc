@@ -6,4 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that verification succeeds when a function with an assigns clause calls another with an additional level of indirection, and that functions respects the assigns clause of the caller.
+This test checks that verification succeeds when a function with an assigns
+clause calls another with an additional level of indirection, and that
+functions respects the assigns clause of the caller.

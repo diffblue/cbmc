@@ -1,5 +1,3 @@
-#include <assert.h>
-
 void f1(int *x1, int *y1, int *z1) __CPROVER_assigns(*x1, *y1)
 {
   f2(x1, y1, z1);

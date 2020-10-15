@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int z;
 
 int foo(int *x) __CPROVER_assigns(z)

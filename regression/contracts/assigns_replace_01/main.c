@@ -9,7 +9,7 @@ int main()
 {
   int n = 6;
   foo(&n);
+  assert(n == 7);
   assert(n == 6);
-
   return 0;
 }

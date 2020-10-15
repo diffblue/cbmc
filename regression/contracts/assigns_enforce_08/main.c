@@ -1,5 +1,3 @@
-#include <assert.h>
-
 void f1(int *x) __CPROVER_assigns(*x)
 {
   int *a = x;

@@ -3,6 +3,8 @@ main.c
 --enforce-all-contracts
 ^EXIT=6$
 ^SIGNAL=0$
+Call to malloc at location 18 falls between goto source location 23 and it's
+destination at location 15. Unable to complete instrumentation, as this
 malloc may be in a loop.$
 --
 --
