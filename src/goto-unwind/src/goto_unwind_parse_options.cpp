@@ -150,7 +150,9 @@ goto_unwind_parse_optionst::get_goto_model(const std::string &goto_binary_path)
   return goto_model;
 }
 
-void goto_unwind_parse_optionst::do_unwind(goto_modelt &model, size_t limit)
+void goto_unwind_parse_optionst::do_unwind(
+  goto_modelt &model,
+  const size_t limit)
 {
   unwindsett unwindset{};
   goto_unwindt unwind{};
