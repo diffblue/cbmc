@@ -32,10 +32,13 @@ struct goto_unwind_optionst
   std::string destination_goto_binary_filepath;
 
   static constexpr const char *unwind_limit_option_name = "unwind-limit";
+  static constexpr size_t unwind_limit_default_value = 10;
 
   static std::ostream &help(std::ostream &log)
   {
-    log << "--" << unwind_limit_option_name << " N    How far to unwind\n";
+    log << "--" << unwind_limit_option_name
+        << " N    How far to unwind (default: " << unwind_limit_default_value
+        << ")\n";
     return log;
   }
 
@@ -92,7 +95,7 @@ struct goto_unwind_optionst
     goto_unwind_options.unwind_limit =
       parse_int_option<std::size_t>(
         cmdline, unwind_limit_option_name, "couldn't parse as size_t")
-        .value_or(10);
+        .value_or(unwind_limit_default_value);
     return goto_unwind_options;
   }
 };
