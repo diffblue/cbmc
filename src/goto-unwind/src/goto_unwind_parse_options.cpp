@@ -74,17 +74,17 @@ struct goto_unwind_optionst
 
   static goto_unwind_optionst from_cmdline(const cmdlinet &cmdline)
   {
-    goto_unwind_optionst goto_unwind_options{};
+    goto_unwind_optionst options{};
 
     if(cmdline.args.size() == 1)
     {
-      goto_unwind_options.source_goto_binary_filepath =
-        goto_unwind_options.destination_goto_binary_filepath = cmdline.args[0];
+      options.source_goto_binary_filepath =
+        options.destination_goto_binary_filepath = cmdline.args[0];
     }
     else if(cmdline.args.size() == 2)
     {
-      goto_unwind_options.source_goto_binary_filepath = cmdline.args[0];
-      goto_unwind_options.destination_goto_binary_filepath = cmdline.args[1];
+      options.source_goto_binary_filepath = cmdline.args[0];
+      options.destination_goto_binary_filepath = cmdline.args[1];
     }
     else
     {
@@ -93,11 +93,11 @@ struct goto_unwind_optionst
         "<Source binary> [<Destination binary>]"};
     }
 
-    goto_unwind_options.unwind_limit =
+    options.unwind_limit =
       parse_int_option<std::size_t>(
         cmdline, unwind_limit_option_name, "couldn't parse as size_t")
         .value_or(unwind_limit_default_value);
-    return goto_unwind_options;
+    return options;
   }
 };
 
