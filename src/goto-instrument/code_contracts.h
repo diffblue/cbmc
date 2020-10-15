@@ -104,7 +104,7 @@ protected:
   /// to ensure that the left-hand-side of the assignment aliases some
   /// expression in original_references, unless it is contained in
   /// freely_assignable_exprs.
-  void instrument_assn_statement(
+  void instrument_assigns_statement(
     goto_programt::instructionst::iterator &ins_it,
     goto_programt &program,
     exprt &assigns,

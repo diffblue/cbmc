@@ -11,12 +11,7 @@ Date: February 2016
 /// \file
 /// Verify and use annotated invariants and pre/post-conditions
 
-#include "code_contracts.h"
-#include "loop_utils.h"
-
 #include <algorithm>
-#include <cstring>
-#include <iostream>
 #include <unordered_set>
 
 #include <analyses/local_may_alias.h>
@@ -31,6 +26,9 @@ Date: February 2016
 #include <util/message.h>
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
+
+#include "code_contracts.h"
+#include "loop_utils.h"
 
 /// Predicate to be used with the exprt::visit() function. The function
 /// found_return_value() will return `true` iff this predicate is called on an
@@ -70,12 +68,15 @@ static void check_apply_invariants(
   PRECONDITION(!loop.empty());
 
   // find the last back edge
-  goto_programt::targett loop_end = loop_head;
-  for(loopt::const_iterator it = loop.begin(); it != loop.end(); ++it)
-    if(
-      (*it)->is_goto() && (*it)->get_target() == loop_head &&
-      (*it)->location_number > loop_end->location_number)
-      loop_end = *it;
+  goto_programt::targett loop_end=loop_head;
+  for(loopt::const_iterator
+      it=loop.begin();
+      it!=loop.end();
+      ++it)
+    if((*it)->is_goto() &&
+       (*it)->get_target()==loop_head &&
+       (*it)->location_number>loop_end->location_number)
+      loop_end=*it;
 
   // see whether we have an invariant
   exprt invariant = static_cast<const exprt &>(
@@ -138,7 +139,7 @@ static void check_apply_invariants(
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->targets.clear();
-  loop_end->type = ASSUME;
+  loop_end->type=ASSUME;
   if(loop_head->is_goto())
     loop_end->set_condition(false_exprt());
   else
@@ -149,10 +150,11 @@ bool code_contractst::has_contract(const irep_idt fun_name)
 {
   const symbolt &function_symbol = ns.lookup(fun_name);
   const code_typet &type = to_code_type(function_symbol.type);
-  const irept assigns = type.find(ID_C_spec_assigns);
-  const irept ensures = type.find(ID_C_spec_ensures);
+  if(type.find(ID_C_spec_assigns).is_not_nil())
+    return true;
 
-  return ensures.is_not_nil() || assigns.is_not_nil();
+  return type.find(ID_C_spec_requires).is_not_nil() ||
+         type.find(ID_C_spec_ensures).is_not_nil();
 }
 
 bool code_contractst::apply_contract(
@@ -223,7 +225,7 @@ bool code_contractst::apply_contract(
   }
 
   // Replace formal parameters
-  code_function_callt::argumentst::const_iterator a_it =
+  code_function_callt::argumentst::const_iterator a_it=
     call.arguments().begin();
   for(code_typet::parameterst::const_iterator p_it = type.parameters().begin();
       p_it != type.parameters().end() && a_it != call.arguments().end();
@@ -260,11 +262,7 @@ bool code_contractst::apply_contract(
     const exprt::operandst &targets = assigns.operands();
     for(const exprt &curr_op : targets)
     {
-      if(curr_op.id() == ID_symbol)
-      {
-        assigns_tgts.insert(curr_op);
-      }
-      else if(curr_op.id() == ID_dereference)
+      if(curr_op.id() == ID_symbol || curr_op.id() == ID_dereference)
       {
         assigns_tgts.insert(curr_op);
       }
@@ -335,7 +333,7 @@ const symbolt &code_contractst::new_tmp_symbol(
     symbol_table);
 }
 
-exprt create_alias_expression(
+static exprt create_alias_expression(
   const exprt &assigns,
   const exprt &lhs,
   std::vector<exprt> &aliasable_references)
@@ -344,9 +342,9 @@ exprt create_alias_expression(
   exprt running = false_exprt();
   for(auto aliasable : aliasable_references)
   {
-    exprt leftPtr = address_of_exprt{lhs};
-    exprt rightPtr = aliasable;
-    exprt same = same_object(leftPtr, rightPtr);
+    exprt left_ptr = address_of_exprt{lhs};
+    exprt right_ptr = aliasable;
+    exprt same = same_object(left_ptr, right_ptr);
 
     if(first_iter)
     {
@@ -372,13 +370,12 @@ void code_contractst::populate_assigns_references(
   std::vector<exprt> &created_references)
 {
   const code_typet &type = to_code_type(function_symbol.type);
-  exprt assigns = static_cast<const exprt &>(type.find(ID_C_spec_assigns));
+  const exprt &assigns =
+    static_cast<const exprt &>(type.find(ID_C_spec_assigns));
 
-  exprt::operandst &targets = assigns.operands();
-  for(exprt curr_op : targets)
+  const exprt::operandst &targets = assigns.operands();
+  for(const exprt &curr_op : targets)
   {
-    exprt op_addr = address_of_exprt{curr_op};
-
     // Declare a new symbol to stand in for the reference
     symbol_exprt standin = new_tmp_symbol(
                              pointer_type(curr_op.type()),
@@ -391,14 +388,15 @@ void code_contractst::populate_assigns_references(
       goto_programt::make_decl(standin, function_symbol.location));
 
     created_decls.add(goto_programt::make_assignment(
-      code_assignt(standin, std::move(op_addr)), function_symbol.location));
+      code_assignt(standin, std::move(address_of_exprt{curr_op})),
+      function_symbol.location));
 
     // Add a map entry from the original operand to the new symbol
     created_references.push_back(standin);
   }
 }
 
-void code_contractst::instrument_assn_statement(
+void code_contractst::instrument_assigns_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,
   exprt &assigns,
@@ -407,7 +405,7 @@ void code_contractst::instrument_assn_statement(
 {
   INVARIANT(
     instruction_iterator->is_assign(),
-    "The first argument of instrument_assn_statement should always be"
+    "The first argument of instrument_assigns_statement should always be"
     " an assignment");
   const exprt &lhs = instruction_iterator->get_assign().lhs();
   if(freely_assignable_exprs.find(lhs) != freely_assignable_exprs.end())
@@ -569,7 +567,7 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
       const irep_idt &called_name =
         to_symbol_expr(call.function()).get_identifier();
 
-      if(std::strcmp(called_name.c_str(), "malloc") == 0)
+      if(called_name == "malloc")
       {
         malloc_calls.push_back(instruction);
       }
@@ -666,7 +664,7 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
 
   // Insert aliasing assertions
   for(; instruction_iterator != program.instructions.end();
-      std::advance(instruction_iterator, 1))
+      ++instruction_iterator)
   {
     if(instruction_iterator->is_decl())
     {
@@ -674,7 +672,7 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
     }
     else if(instruction_iterator->is_assign())
     {
-      instrument_assn_statement(
+      instrument_assigns_statement(
         instruction_iterator,
         program,
         assigns,
@@ -779,7 +777,7 @@ void code_contractst::add_contract_check(
     static_cast<const exprt &>(gf.type.find(ID_C_spec_ensures));
   INVARIANT(
     ensures.is_not_nil() || assigns.is_not_nil(),
-    "Code conract enforcement is trivial without an ensures or assigns "
+    "Code contract enforcement is trivial without an ensures or assigns "
     "clause.");
 
   // build:
@@ -810,7 +808,7 @@ void code_contractst::add_contract_check(
   replace_symbolt replace;
 
   // decl ret
-  if(gf.type.return_type() != empty_typet())
+  if(gf.type.return_type()!=empty_typet())
   {
     symbol_exprt r = new_tmp_symbol(
                        gf.type.return_type(),
@@ -820,7 +818,7 @@ void code_contractst::add_contract_check(
                        .symbol_expr();
     check.add(goto_programt::make_decl(r, skip->source_location));
 
-    call.lhs() = r;
+    call.lhs()=r;
 
     symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
     replace.insert(ret_val, r);
