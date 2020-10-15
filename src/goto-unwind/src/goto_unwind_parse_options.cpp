@@ -14,6 +14,7 @@
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/write_goto_binary.h>
+#include <util/exit_codes.h>
 #include <util/string2int.h>
 #include <util/validate.h>
 #include <util/version.h>
@@ -109,7 +110,7 @@ int goto_unwind_parse_optionst::doit()
     options.destination_goto_binary_filepath,
     goto_model,
     log.get_message_handler());
-  return 0;
+  return CPROVER_EXIT_SUCCESS;
 }
 void goto_unwind_parse_optionst::help()
 {
