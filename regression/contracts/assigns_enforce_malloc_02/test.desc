@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=6$
+^SIGNAL=0$
+Unable to complete instrumentation, as this malloc may be in a loop.$
+--
+--
+This test checks that an error is thrown when malloc is called within a loop.

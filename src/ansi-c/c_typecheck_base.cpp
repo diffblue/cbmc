@@ -17,9 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_types.h>
 
+#include "c_storage_spec.h"
 #include "expr2c.h"
 #include "type2name.h"
-#include "c_storage_spec.h"
 
 std::string c_typecheck_baset::to_string(const exprt &expr)
 {
@@ -645,13 +645,14 @@ void c_typecheck_baset::typecheck_declaration(
     irept contract;
 
     {
-      exprt spec_requires=
-        static_cast<const exprt&>(declaration.find(ID_C_spec_requires));
-      contract.add(ID_C_spec_requires).swap(spec_requires);
+      exprt spec_assigns = declaration.spec_assigns();
+      contract.add(ID_C_spec_assigns).swap(spec_assigns);
 
-      exprt spec_ensures=
-        static_cast<const exprt&>(declaration.find(ID_C_spec_ensures));
+      exprt spec_ensures = declaration.spec_ensures();
       contract.add(ID_C_spec_ensures).swap(spec_ensures);
+
+      exprt spec_requires = declaration.spec_requires();
+      contract.add(ID_C_spec_requires).swap(spec_requires);
     }
 
     // Now do declarators, if any.
@@ -725,6 +726,12 @@ void c_typecheck_baset::typecheck_declaration(
       irep_idt identifier=symbol.name;
       declarator.set_name(identifier);
 
+      // If the declarator is for a function definition, typecheck it.
+      if(can_cast_type<code_typet>(declarator.type()))
+      {
+        typecheck_assigns(to_code_type(declarator.type()), contract);
+      }
+
       typecheck_symbol(symbol);
 
       // add code contract (if any); we typecheck this after the
@@ -732,6 +739,8 @@ void c_typecheck_baset::typecheck_declaration(
       // available
       symbolt &new_symbol = symbol_table.get_writeable_ref(identifier);
 
+      typecheck_assigns_exprs(
+        static_cast<codet &>(contract), ID_C_spec_assigns);
       typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_requires);
 
       typet ret_type = void_type();
@@ -743,12 +752,15 @@ void c_typecheck_baset::typecheck_declaration(
       typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_ensures);
       parameter_map.clear();
 
-      if(contract.find(ID_C_spec_requires).is_not_nil())
-        new_symbol.type.add(ID_C_spec_requires)=
-          contract.find(ID_C_spec_requires);
-      if(contract.find(ID_C_spec_ensures).is_not_nil())
-        new_symbol.type.add(ID_C_spec_ensures)=
-          contract.find(ID_C_spec_ensures);
+      irept assigns_to_add = contract.find(ID_C_spec_assigns);
+      if(assigns_to_add.is_not_nil())
+        new_symbol.type.add(ID_C_spec_assigns) = assigns_to_add;
+      irept requires_to_add = contract.find(ID_C_spec_requires);
+      if(requires_to_add.is_not_nil())
+        new_symbol.type.add(ID_C_spec_requires) = requires_to_add;
+      irept ensures_to_add = contract.find(ID_C_spec_ensures);
+      if(ensures_to_add.is_not_nil())
+        new_symbol.type.add(ID_C_spec_ensures) = ensures_to_add;
     }
   }
 }

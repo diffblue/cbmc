@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds if only expressions inside the assigns clause are assigned within the function.
+
+Note: For all 'enforce' tests, nothing can be assumed about the return value of the function (as the function call is not replaced at this point).
+
+To make such assumptions would cause verification to fail.

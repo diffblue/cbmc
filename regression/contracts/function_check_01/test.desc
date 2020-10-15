@@ -1,11 +1,9 @@
-KNOWNBUG
+CORE
 main.c
---apply-code-contracts
+--replace-all-calls-with-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 --
---check-code-contracts not implemented yet.
---apply-code-contracts is the current name for the flag. This should be
-updated as the flag changes.
+This tests a simple example of a function with requires and ensures which should both be satisfied.

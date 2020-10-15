@@ -1,0 +1,11 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=10$
+^SIGNAL=0$
+assertion n == 7: FAILURE
+assertion n == 6: FAILURE
+^VERIFICATION FAILED$
+--
+--
+This test checks that a variable inside the assigns clause is havocked.

@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+assertion: SUCCESS$
+assertion: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+This test checks that variables which mask a formal parameter are logically distinct from the formal parameter itself. Specifically, we check that the masked variable may alias a parameter in the assigns clause, while the formal parameter does not, so verification fails, but not because of the masking variable.

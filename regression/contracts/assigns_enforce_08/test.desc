@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds when a function with an assigns
+clause calls another with an additional level of indirection, and that
+functions respects the assigns clause of the caller.
