@@ -89,7 +89,8 @@ struct goto_unwind_optionst
     else
     {
       throw invalid_command_line_argument_exceptiont{
-        "Expecting exactly one or two arguments",
+        "Expecting either a single binary to read from and modify, or both a "
+        "source and a destination binary",
         "<Source binary> [<Destination binary>]"};
     }
 
