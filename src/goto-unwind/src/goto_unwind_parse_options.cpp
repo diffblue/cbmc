@@ -102,6 +102,13 @@ struct goto_unwind_optionst
   }
 };
 
+// due to an interesting quirk with C++11 we do need to define these
+// even if they are static constexpr... C++17 removed this limitation
+// so if we ever manage to upgrade please remove these lines and forget
+// they ever existed.
+constexpr const char *goto_unwind_optionst::unwind_limit_option_name;
+constexpr size_t goto_unwind_optionst::unwind_limit_default_value;
+
 int goto_unwind_parse_optionst::doit()
 {
   const auto options = goto_unwind_optionst::from_cmdline(cmdline);
