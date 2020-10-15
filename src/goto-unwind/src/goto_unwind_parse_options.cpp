@@ -130,9 +130,7 @@ goto_modelt
 goto_unwind_parse_optionst::get_goto_model(const std::string &goto_binary_path)
 {
   auto goto_model = [&goto_binary_path, this]() {
-    if(
-      auto goto_model =
-        read_goto_binary(goto_binary_path, log.get_message_handler()))
+    if(auto goto_model = read_goto_binary(goto_binary_path, ui_message_handler))
     {
       return std::move(*goto_model);
     }
@@ -144,7 +142,7 @@ goto_unwind_parse_optionst::get_goto_model(const std::string &goto_binary_path)
   const bool add_safety_assertion = true;
   const bool only_remove_const_fps = false;
   remove_function_pointers(
-    log.get_message_handler(),
+    ui_message_handler,
     goto_model,
     add_safety_assertion,
     only_remove_const_fps);
