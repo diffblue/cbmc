@@ -16,6 +16,8 @@ public:
 
   int doit() override;
   void help() override;
+
+private:
   goto_modelt get_goto_model(const std::string &goto_binary_path);
   void do_unwind(goto_modelt &model, size_t limit);
 };
