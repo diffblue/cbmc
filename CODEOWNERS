@@ -64,3 +64,6 @@ CMakeLists.txt @hannes-steffenhagen-diffblue
 
 /scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
 /scripts/expected_doxygen_warnings.txt
+
+# CI pipeline is the responsibility of the Open Source maintenance team at Diffblue.
+/.github/ @diffblue/diffblue-opensource
