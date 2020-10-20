@@ -1,0 +1,11 @@
+CORE requires_posix_only_headers
+create_destroy.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+pointer handling for concurrency is unsound
+--
+Sanity check that cbmc can deal with creation and destruction of semaphores.

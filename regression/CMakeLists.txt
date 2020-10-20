@@ -61,6 +61,7 @@ add_subdirectory(linking-goto-binaries)
 add_subdirectory(symtab2gb)
 add_subdirectory(validate-trace-xml-schema)
 add_subdirectory(cbmc-primitives)
+add_subdirectory(cbmc-sequentialization)
 
 if(WITH_MEMORY_ANALYZER)
   add_subdirectory(snapshot-harness)

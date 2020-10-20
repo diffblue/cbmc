@@ -1,0 +1,12 @@
+FUTURE requires_posix_only_headers
+with_mutex.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+pointer handling for concurrency is unsound
+--
+Test that adding an appropriate mutex to the `no_mutex.c` example leads to cbmc
+considering the program to be sound.

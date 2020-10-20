@@ -1,0 +1,12 @@
+FUTURE requires_posix_only_headers
+blocking_wait.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+pointer handling for concurrency is unsound
+--
+Test that sem_wait will block when the value of a semaphore is 0, until it is
+increased via sem_post.
