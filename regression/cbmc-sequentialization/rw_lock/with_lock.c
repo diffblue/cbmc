@@ -7,9 +7,7 @@
 
 struct sharedt
 {
-#ifndef NO_LOCKS
   pthread_rwlock_t lock;
-#endif
   int a;
   int b;
   int c;
@@ -40,15 +38,11 @@ void *writer1(void *arguments)
   struct sharedt *shared = (struct sharedt *)arguments;
   for(int i = 0; i < 1000; ++i)
   {
-#ifndef NO_LOCKS
     const int lock_error = pthread_rwlock_wrlock(&(shared->lock));
     assert(!lock_error);
-#endif
     set_state1(shared);
-#ifndef NO_LOCKS
     const int unlock_error = pthread_rwlock_unlock(&(shared->lock));
     assert(!unlock_error);
-#endif
   }
   pthread_exit(NULL);
 }
@@ -58,15 +52,11 @@ void *writer2(void *arguments)
   struct sharedt *shared = (struct sharedt *)arguments;
   for(int i = 0; i < 1000; ++i)
   {
-#ifndef NO_LOCKS
     const int lock_error = pthread_rwlock_wrlock(&(shared->lock));
     assert(!lock_error);
-#endif
     set_state2(shared);
-#ifndef NO_LOCKS
     const int unlock_error = pthread_rwlock_unlock(&(shared->lock));
     assert(!unlock_error);
-#endif
   }
   pthread_exit(NULL);
 }
@@ -76,20 +66,16 @@ void *checker(void *arguments)
   struct sharedt *shared = (struct sharedt *)arguments;
   for(int i = 0; i < 1000; ++i)
   {
-#ifndef NO_LOCKS
     const int lock_error = pthread_rwlock_rdlock(&(shared->lock));
     assert(!lock_error);
-#endif
     const bool is_state1 = shared->a == 1 && shared->b == 2 && shared->c == 3;
     // The following call to yield is here in order to increase the chance of
     // thread swaps during concrete execution in order to show unsoundness.
     sched_yield();
     const bool is_state2 = shared->a == 4 && shared->b == 5 && shared->c == 6;
     assert(is_state1 != is_state2);
-#ifndef NO_LOCKS
     const int unlock_error = pthread_rwlock_unlock(&(shared->lock));
     assert(!unlock_error);
-#endif
     printf(is_state1 ? "State1\n" : "State2\n");
   }
   pthread_exit(NULL);
@@ -99,11 +85,9 @@ int main(void)
 {
   struct sharedt shared;
   set_state1(&shared);
-#ifndef NO_LOCKS
   const pthread_rwlockattr_t *init_attributes = NULL;
   const int init_error = pthread_rwlock_init(&(shared.lock), init_attributes);
   assert(!init_error);
-#endif
 
   const pthread_attr_t *const attributes = NULL;
   void *const thread_argument = &shared;
@@ -130,9 +114,7 @@ int main(void)
   assert(!pthread_join(thread_checker2, NULL));
   assert(!pthread_join(thread_checker3, NULL));
 
-#ifndef NO_LOCKS
   const int destroy_error = pthread_rwlock_destroy(&(shared.lock));
   assert(!destroy_error);
-#endif
   return EXIT_SUCCESS;
 }
