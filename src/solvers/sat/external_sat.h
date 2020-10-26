@@ -14,7 +14,7 @@ public:
 
   bool has_set_assumptions() const override final
   {
-    return false;
+    return true;
   }
 
   bool has_is_in_conflict() const override final
@@ -27,9 +27,16 @@ public:
   bool is_in_conflict(literalt) const override;
   void set_assignment(literalt, bool) override;
 
+  void set_assumptions(const bvt &_assumptions) override
+  {
+    assumptions = _assumptions;
+  }
+
 protected:
-  resultt do_prop_solve() override;
   std::string solver_cmd;
+  bvt assumptions;
+
+  resultt do_prop_solve() override;
   void write_cnf_file(std::string);
   std::string execute_solver(std::string);
   resultt parse_result(std::string);
