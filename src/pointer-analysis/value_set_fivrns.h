@@ -37,7 +37,7 @@ public:
   unsigned to_function, from_function;
   unsigned to_target_index, from_target_index;
   static object_numberingt object_numbering;
-  static hash_numbering<irep_idt, irep_id_hash> function_numbering;
+  static numberingt<irep_idt> function_numbering;
 
   void set_from(const irep_idt &function, unsigned inx)
   {

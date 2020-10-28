@@ -112,10 +112,6 @@ public:
 template <typename Key>
 using numbering = template_numberingt<std::map<Key, std::size_t>>; // NOLINT
 
-template <typename Key, typename Hash>
-using hash_numbering = // NOLINT
-  template_numberingt<std::unordered_map<Key, std::size_t, Hash>>;
-
 /// \tparam keyt: The type of keys which will be numbered.
 /// \tparam hasht: The type of hashing functor used to hash keys.
 template <typename keyt, typename hasht = std::hash<keyt>>
