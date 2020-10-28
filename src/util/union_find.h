@@ -132,11 +132,13 @@ public:
   size_type get_other(size_type a);
 };
 
-template <typename T>
+/// \tparam T: The type of values stored.
+/// \tparam hasht: The type of hash used for looking up the value numbering.
+template <typename T, typename hasht = std::hash<T>>
 // NOLINTNEXTLINE(readability/identifiers)
 class union_find final
 {
-  using numbering_typet = numbering<T>;
+  using numbering_typet = numberingt<T, hasht>;
   numbering_typet numbers;
 
   // NOLINTNEXTLINE(readability/identifiers)
