@@ -262,7 +262,7 @@ protected:
   offset_mapt build_offset_map(const struct_typet &src);
 
   // strings
-  numbering<irep_idt> string_numbering;
+  numberingt<irep_idt> string_numbering;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BOOLBV_H

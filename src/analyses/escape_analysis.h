@@ -120,7 +120,7 @@ protected:
   {
   }
 
-  numbering<irep_idt> bits;
+  numberingt<irep_idt> bits;
 
   void insert_cleanup(
     goto_functionst::goto_functiont &,

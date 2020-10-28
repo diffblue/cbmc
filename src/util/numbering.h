@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_NUMBERING_H
 #define CPROVER_UTIL_NUMBERING_H
 
-#include <map>
 #include <unordered_map>
 #include <vector>
 
@@ -108,9 +107,6 @@ public:
     return data_.cend();
   }
 };
-
-template <typename Key>
-using numbering = template_numberingt<std::map<Key, std::size_t>>; // NOLINT
 
 /// \tparam keyt: The type of keys which will be numbered.
 /// \tparam hasht: The type of hashing functor used to hash keys.

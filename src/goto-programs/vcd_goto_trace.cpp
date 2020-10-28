@@ -82,7 +82,7 @@ void output_vcd(
 
   // we first collect all variables that are assigned
 
-  numbering<irep_idt> n;
+  numberingt<irep_idt> n;
 
   for(const auto &step : goto_trace.steps)
   {

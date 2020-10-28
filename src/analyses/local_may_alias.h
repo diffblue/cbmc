@@ -60,7 +60,7 @@ protected:
 
   typedef std::stack<local_cfgt::node_nrt> work_queuet;
 
-  mutable numbering<exprt> objects;
+  mutable numberingt<exprt, irep_hash> objects;
 
   typedef unsigned_union_find alias_sett;
 
