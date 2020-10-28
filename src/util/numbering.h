@@ -15,18 +15,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "optional.h"
 
-/// \tparam Map: a map from a key type to some numeric type
-template <typename Map>
-class template_numberingt final
+/// \tparam keyt: The type of keys which will be numbered.
+/// \tparam hasht: The type of hashing functor used to hash keys.
+template <typename keyt, typename hasht = std::hash<keyt>>
+class numberingt final
 {
 public:
-  using number_type = typename Map::mapped_type; // NOLINT
-  using key_type = typename Map::key_type;       // NOLINT
+  using number_type = std::size_t; // NOLINT
+  using key_type = keyt;           // NOLINT
 
 private:
   using data_typet = std::vector<key_type>; // NOLINT
   data_typet data_;
-  Map numbers_;
+  std::unordered_map<keyt, number_type, hasht> numbers_;
 
 public:
   using size_type = typename data_typet::size_type;           // NOLINT
@@ -108,10 +109,5 @@ public:
   }
 };
 
-/// \tparam keyt: The type of keys which will be numbered.
-/// \tparam hasht: The type of hashing functor used to hash keys.
-template <typename keyt, typename hasht = std::hash<keyt>>
-using numberingt =
-  template_numberingt<std::unordered_map<keyt, std::size_t, hasht>>;
 
 #endif // CPROVER_UTIL_NUMBERING_H
