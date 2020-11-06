@@ -599,7 +599,7 @@ void goto_convertt::remove_overflow(
   const irep_idt &statement = expr.get_statement();
   const exprt &lhs = expr.lhs();
   const exprt &rhs = expr.rhs();
-  const exprt &result_ptr = expr.result();
+  const exprt &result = expr.result();
 
   // actual logic implementing the operators: perform operations on signed
   // bitvector types of sufficiently large size to hold the result
@@ -639,8 +639,8 @@ void goto_convertt::remove_overflow(
 
   // Generating the following sequence of statements:
   // large_signedbv tmp = (large_signedbv)lhs OP (large_signedbv)rhs;
-  // *result = (result_type)tmp;
-  // (large_signedbv)*result != tmp;
+  // *result = (result_type)tmp; // only if result is a pointer
+  // (large_signedbv)(result_type)tmp != tmp;
   // This performs the operation (+, -, *) on a signed bitvector type of
   // sufficiently large width to store the precise result, cast to result
   // type, check if the cast result is not equivalent to the full-length
@@ -653,17 +653,33 @@ void goto_convertt::remove_overflow(
 
   make_temp_symbol(operation, "large_bv", dest, mode);
 
-  const auto &result_type = to_pointer_type(result_ptr.type()).subtype();
-  code_assignt result_assignment{dereference_exprt{result_ptr},
-                                 typecast_exprt{operation, result_type},
-                                 expr.source_location()};
-  convert_assign(result_assignment, dest, mode);
+  optionalt<typet> result_type;
+  if(result.type().id() == ID_pointer)
+  {
+    result_type = to_pointer_type(result.type()).subtype();
+    code_assignt result_assignment{dereference_exprt{result},
+                                   typecast_exprt{operation, *result_type},
+                                   expr.source_location()};
+    convert_assign(result_assignment, dest, mode);
+  }
+  else
+  {
+    result_type = result.type();
+    // evaluate side effects
+    exprt tmp = result;
+    clean_expr(tmp, dest, mode, false); // result _not_ used
+  }
 
   if(result_is_used)
   {
-    notequal_exprt overflow_check{
-      typecast_exprt{dereference_exprt{result_ptr}, operation.type()},
-      operation};
+    typecast_exprt inner_tc{operation, *result_type};
+    inner_tc.add_source_location() = expr.source_location();
+    inner_tc.add_source_location().add_pragma("disable:conversion-check");
+    typecast_exprt outer_tc{inner_tc, operation.type()};
+    outer_tc.add_source_location() = expr.source_location();
+    outer_tc.add_source_location().add_pragma("disable:conversion-check");
+
+    notequal_exprt overflow_check{outer_tc, operation};
     overflow_check.add_source_location() = expr.source_location();
 
     expr.swap(overflow_check);

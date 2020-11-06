@@ -57,6 +57,11 @@ main.c
 \[check_generic.assertion.9\] line \d+ assertion big_result == 2ll \* .*: SUCCESS
 \[check_generic.assertion.10\] line \d+ assertion __builtin_add_overflow\(.* / 2 \+ 1, .*/ 2 \+ 1, &big_result\): SUCCESS
 \[check_generic.assertion.11\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_generic_p.assertion.1\] line \d+ assertion !__builtin_add_overflow_p\(17, 25, small_result\): SUCCESS
+\[check_generic_p.assertion.2\] line \d+ assertion small_result == 0: SUCCESS
+\[check_generic_p.assertion.3\] line \d+ assertion !__builtin_add_overflow_p\(17, 25, big_result\): SUCCESS
+\[check_generic_p.assertion.4\] line \d+ assertion big_result == 0: SUCCESS
+\[check_generic_p.assertion.5\] line \d+ assertion 0 && "reachability": FAILURE
 \[check_non_const\.assertion\.1\] line \d+ assertion !__builtin_add_overflow\(a, b, &r\): FAILURE
 \[check_non_const\.assertion\.2\] line \d+ assertion __builtin_add_overflow\(c, d, &c\): FAILURE
 VERIFICATION FAILED
