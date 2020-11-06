@@ -119,7 +119,7 @@ Let us have a closer look at this property and why it fails. To aid the
 understanding of the problem, CBMC can generate a *counterexample trace*
 for failed properties. To obtain this trace, run:
 
-    cbmc file1.c --bounds-check --trace
+    cbmc file1.c --bounds-check --pointer-check --trace
 
 CBMC then prints a counterexample trace, that is, a program trace that
 begins with `main` and ends in a state which violates the property. In
@@ -134,7 +134,7 @@ To simplify further processing of counterexample traces, CBMC supports XML as a
 possible output format.
 
 ```
-    cbmc file1.c --trace --xml-ui
+    cbmc file1.c --bounds-check --pointer-check --trace --xml-ui
 ```
 
 The specification of the XML trace output can be found here: [XML
