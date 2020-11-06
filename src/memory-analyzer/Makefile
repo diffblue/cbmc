@@ -7,7 +7,7 @@ SRC = \
 
 INCLUDES= -I ..
 
-LIBS = \
+OBJ += \
   ../ansi-c/ansi-c$(LIBEXT) \
   ../goto-programs/goto-programs$(LIBEXT) \
   ../linking/linking$(LIBEXT) \
@@ -15,6 +15,7 @@ LIBS = \
   ../big-int/big-int$(LIBEXT) \
   ../langapi/langapi$(LIBEXT)
 
+LIBS =
 
 CLEANFILES = memory-analyzer$(EXEEXT)
 

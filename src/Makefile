@@ -163,4 +163,4 @@ cadical-download:
 doc :
 	doxygen
 
-.PHONY: ipasir-build minisat2-download glucose-download
+.PHONY: minisat2-download cudd-download glucose-download cadical-download

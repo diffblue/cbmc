@@ -90,6 +90,9 @@ void satcheck_ipasirt::lcnf(const bvt &bv)
   }
   ipasir_add(solver, 0); // terminate clause
 
+  with_solver_hardness(
+    [&bv](solver_hardnesst &hardness) { hardness.register_clause(bv); });
+
   clause_counter++;
 }
 
@@ -158,8 +161,8 @@ void satcheck_ipasirt::set_assignment(literalt a, bool value)
   INVARIANT(false, "method not supported");
 }
 
-satcheck_ipasirt::satcheck_ipasirt()
-: solver(nullptr)
+satcheck_ipasirt::satcheck_ipasirt(message_handlert &message_handler)
+  : cnf_solvert(message_handler), solver(nullptr)
 {
   INVARIANT(!solver, "there cannot be a solver already");
   solver=ipasir_init();
