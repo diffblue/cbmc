@@ -1,4 +1,4 @@
-CORE winbug
+CORE winbug macos-assert-broken
 main.cpp
 -std=c++11
 ^EXIT=0$
