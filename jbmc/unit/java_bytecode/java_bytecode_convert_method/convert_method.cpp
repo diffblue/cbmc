@@ -929,13 +929,10 @@ TEST_CASE(
   irep_idt method_identifier = "someClass.someMethod";
 
   // The parameters should be already populated, but not have names, ids
-  code_typet::parametert this_param;
+  code_typet::parametert this_param(java_lang_object_type());
   this_param.set_this();
-  this_param.type() = java_lang_object_type();
-  code_typet::parametert ref_to_inner;
-  ref_to_inner.type() = java_lang_object_type();
-  code_typet::parametert other_param;
-  other_param.type() = java_lang_object_type();
+  code_typet::parametert ref_to_inner(java_lang_object_type());
+  code_typet::parametert other_param(java_lang_object_type());
   java_method_typet::parameterst parameters{
     this_param, ref_to_inner, other_param};
   for(const auto &param : parameters)
@@ -985,17 +982,14 @@ TEST_CASE(
   // Arrange
   const irep_idt method_id = "someClass.someMethod";
   // The parameters should be already populated, with names, ids
-  code_typet::parametert this_param;
+  code_typet::parametert this_param(java_lang_object_type());
   this_param.set_this();
-  this_param.type() = java_lang_object_type();
   this_param.set_identifier(id2string(method_id) + "::this");
   this_param.set_base_name("this");
-  code_typet::parametert ref_to_inner;
-  ref_to_inner.type() = java_lang_object_type();
+  code_typet::parametert ref_to_inner(java_lang_object_type());
   ref_to_inner.set_identifier(id2string(method_id) + "::this$0");
   ref_to_inner.set_base_name("this$0");
-  code_typet::parametert other_param;
-  other_param.type() = java_lang_object_type();
+  code_typet::parametert other_param(java_lang_object_type());
   other_param.set_identifier(id2string(method_id) + "::other");
   other_param.set_base_name("other");
   java_method_typet::parameterst parameters{

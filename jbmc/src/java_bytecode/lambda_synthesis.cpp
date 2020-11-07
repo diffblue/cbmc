@@ -325,12 +325,11 @@ static symbolt constructor_symbol(
       id2string(constructor_name) + "::" + id2string(param_basename));
   }
 
-  java_method_typet::parametert constructor_this_param;
+  java_method_typet::parametert constructor_this_param(
+    java_reference_type(struct_tag_typet(synthetic_class_name)));
   constructor_this_param.set_this();
   constructor_this_param.set_base_name("this");
   constructor_this_param.set_identifier(id2string(constructor_name) + "::this");
-  constructor_this_param.type() =
-    java_reference_type(struct_tag_typet(synthetic_class_name));
 
   constructor_type.parameters().insert(
     constructor_type.parameters().begin(), constructor_this_param);
