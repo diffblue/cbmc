@@ -2136,10 +2136,30 @@ static exprt lower_byte_update(
         instantiate_byte_array(value_as_byte_array, 0, (type_bits + 7) / 8, ns);
     }
 
+    const std::size_t update_size_bits = update_bytes.size() * 8;
+    const std::size_t bit_width = std::max(type_bits, update_size_bits);
+
+    const bool is_little_endian = src.id() == ID_byte_update_little_endian;
+
+    exprt val_before =
+      typecast_exprt::conditional_cast(src.op(), bv_typet{type_bits});
+    if(bit_width > type_bits)
+    {
+      val_before =
+        concatenation_exprt{from_integer(0, bv_typet{bit_width - type_bits}),
+                            val_before,
+                            bv_typet{bit_width}};
+
+      if(!is_little_endian)
+        to_concatenation_expr(val_before)
+          .op0()
+          .swap(to_concatenation_expr(val_before).op1());
+    }
+
     if(non_const_update_bound.has_value())
     {
       const exprt src_as_bytes = unpack_rec(
-        src.op(),
+        val_before,
         src.id() == ID_byte_update_little_endian,
         mp_integer{0},
         mp_integer{update_bytes.size()},
@@ -2158,19 +2178,15 @@ static exprt lower_byte_update(
       }
     }
 
-    const std::size_t update_size = update_bytes.size();
-    const std::size_t width = std::max(type_bits, update_size * 8);
-
-    const bool is_little_endian = src.id() == ID_byte_update_little_endian;
-
     // build mask
     exprt mask;
     if(is_little_endian)
-      mask = from_integer(power(2, update_size * 8) - 1, bv_typet{width});
+      mask = from_integer(power(2, update_size_bits) - 1, bv_typet{bit_width});
     else
     {
       mask = from_integer(
-        power(2, width) - power(2, width - update_size * 8), bv_typet{width});
+        power(2, bit_width) - power(2, bit_width - update_size_bits),
+        bv_typet{bit_width});
     }
 
     const typet &offset_type = src.offset().type();
@@ -2186,34 +2202,20 @@ static exprt lower_byte_update(
       mask_shifted.true_case().swap(mask_shifted.false_case());
 
     // original_bits &= ~mask
-    exprt val_before =
-      typecast_exprt::conditional_cast(src.op(), bv_typet{type_bits});
-    if(width > type_bits)
-    {
-      val_before =
-        concatenation_exprt{from_integer(0, bv_typet{width - type_bits}),
-                            val_before,
-                            bv_typet{width}};
-
-      if(!is_little_endian)
-        to_concatenation_expr(val_before)
-          .op0()
-          .swap(to_concatenation_expr(val_before).op1());
-    }
     bitand_exprt bitand_expr{val_before, bitnot_exprt{mask_shifted}};
 
     // concatenate and zero-extend the value
-    concatenation_exprt value{update_bytes, bv_typet{update_size * 8}};
+    concatenation_exprt value{update_bytes, bv_typet{update_size_bits}};
     if(is_little_endian)
       std::reverse(value.operands().begin(), value.operands().end());
 
     exprt zero_extended;
-    if(width > update_size * 8)
+    if(bit_width > update_size_bits)
     {
-      zero_extended =
-        concatenation_exprt{from_integer(0, bv_typet{width - update_size * 8}),
-                            value,
-                            bv_typet{width}};
+      zero_extended = concatenation_exprt{
+        from_integer(0, bv_typet{bit_width - update_size_bits}),
+        value,
+        bv_typet{bit_width}};
 
       if(!is_little_endian)
         to_concatenation_expr(zero_extended)
@@ -2233,12 +2235,22 @@ static exprt lower_byte_update(
     // original_bits |= newvalue
     bitor_exprt bitor_expr{bitand_expr, value_shifted};
 
-    if(!is_little_endian && width > type_bits)
+    if(!is_little_endian && bit_width > type_bits)
     {
       return simplify_expr(
         typecast_exprt::conditional_cast(
-          extractbits_exprt{
-            bitor_expr, width - 1, width - type_bits, bv_typet{type_bits}},
+          extractbits_exprt{bitor_expr,
+                            bit_width - 1,
+                            bit_width - type_bits,
+                            bv_typet{type_bits}},
+          src.type()),
+        ns);
+    }
+    else if(bit_width > type_bits)
+    {
+      return simplify_expr(
+        typecast_exprt::conditional_cast(
+          extractbits_exprt{bitor_expr, type_bits - 1, 0, bv_typet{type_bits}},
           src.type()),
         ns);
     }
