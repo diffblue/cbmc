@@ -752,11 +752,6 @@ public:
   class parametert:public exprt
   {
   public:
-    DEPRECATED(SINCE(2018, 9, 21, "use parametert(type) instead"))
-    parametert():exprt(ID_parameter)
-    {
-    }
-
     explicit parametert(const typet &type):exprt(ID_parameter, type)
     {
     }
