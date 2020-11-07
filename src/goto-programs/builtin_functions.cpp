@@ -856,12 +856,13 @@ void goto_convertt::do_function_call_symbol(
   {
     do_prob_coin(lhs, function, arguments, dest);
   }
-  else if(has_prefix(id2string(identifier), CPROVER_PREFIX "prob_uniform_"))
+  else if(identifier.starts_with(CPROVER_PREFIX "prob_uniform_"))
   {
     do_prob_uniform(lhs, function, arguments, dest);
   }
-  else if(has_prefix(id2string(identifier), "nondet_") ||
-          has_prefix(id2string(identifier), "__VERIFIER_nondet_"))
+  else if(
+    identifier.starts_with("nondet_") ||
+    identifier.starts_with("__VERIFIER_nondet_"))
   {
     // make it a side effect if there is an LHS
     if(lhs.is_nil())
@@ -887,7 +888,7 @@ void goto_convertt::do_function_call_symbol(
     assignment.add_source_location()=function.source_location();
     copy(assignment, ASSIGN, dest);
   }
-  else if(has_prefix(id2string(identifier), CPROVER_PREFIX "uninterpreted_"))
+  else if(identifier.starts_with(CPROVER_PREFIX "uninterpreted_"))
   {
     // make it a side effect if there is an LHS
     if(lhs.is_nil())

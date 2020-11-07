@@ -847,7 +847,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     // preserve location
     expr.add_source_location()=source_location;
   }
-  else if(has_prefix(id2string(identifier), CPROVER_PREFIX "constant_infinity"))
+  else if(identifier.starts_with(CPROVER_PREFIX "constant_infinity"))
   {
     expr=infinity_exprt(symbol.type);
 
@@ -1836,7 +1836,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       throw 0;
     }
   }
-  else if(has_prefix(id2string(statement), "assign"))
+  else if(statement.starts_with("assign"))
     typecheck_side_effect_assignment(expr);
   else if(statement==ID_function_call)
     typecheck_side_effect_function_call(

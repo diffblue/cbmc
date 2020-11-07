@@ -99,7 +99,7 @@ void slice_global_inits(goto_modelt &goto_model)
         // if we are to keep the left-hand side, then we also need to keep all
         // symbols occurring in the right-hand side
         if(
-          has_prefix(id2string(id), CPROVER_PREFIX) ||
+          id.starts_with(CPROVER_PREFIX) ||
           symbols_to_keep.find(id) != symbols_to_keep.end())
         {
           fixed_point_reached = false;
@@ -124,7 +124,7 @@ void slice_global_inits(goto_modelt &goto_model)
       const irep_idt id=symbol_expr.get_identifier();
 
       if(
-        !has_prefix(id2string(id), CPROVER_PREFIX) &&
+        !id.starts_with(CPROVER_PREFIX) &&
         symbols_to_keep.find(id) == symbols_to_keep.end())
       {
         i_it->turn_into_skip();

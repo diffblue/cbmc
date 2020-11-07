@@ -185,7 +185,7 @@ void print_global_state_size(const goto_modelt &goto_model)
     if(
       symbol.is_type || symbol.is_macro || symbol.type.id() == ID_code ||
       symbol.type.get_bool(ID_C_constant) ||
-      has_prefix(id2string(symbol.name), CPROVER_PREFIX) ||
+      symbol.name.starts_with(CPROVER_PREFIX) ||
       (has_initialize && initialized.find(symbol.name) == initialized.end()))
     {
       continue;

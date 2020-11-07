@@ -809,7 +809,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
 
     dest=type_exprt(typet(base_name));
   }
-  else if(has_prefix(id2string(base_name), "constant_infinity"))
+  else if(base_name.starts_with("constant_infinity"))
   {
     // ok, but type missing
     dest=exprt(ID_infinity, size_type());

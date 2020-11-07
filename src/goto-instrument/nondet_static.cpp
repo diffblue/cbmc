@@ -37,7 +37,7 @@ bool is_nondet_initializable_static(
   const irep_idt &id = symbol_expr.get_identifier();
 
   // is it a __CPROVER_* variable?
-  if(has_prefix(id2string(id), CPROVER_PREFIX))
+  if(id.starts_with(CPROVER_PREFIX))
     return false;
 
   // variable not in symbol table such as symex variable?
@@ -112,7 +112,7 @@ void nondet_static(
       const code_function_callt &fct=to_code_function_call(instruction.code);
       const symbol_exprt &fsym=to_symbol_expr(fct.function());
 
-      if(has_prefix(id2string(fsym.get_identifier()), "#ini#"))
+      if(fsym.get_identifier().starts_with("#ini#"))
         nondet_static(ns, goto_functions, fsym.get_identifier());
     }
   }

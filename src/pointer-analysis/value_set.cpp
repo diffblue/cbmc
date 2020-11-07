@@ -41,9 +41,9 @@ object_numberingt value_sett::object_numbering;
 bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
 {
   // we always track fields on these
-  if(has_prefix(id2string(id), "value_set::dynamic_object") ||
-     id=="value_set::return_value" ||
-     id=="value_set::memory")
+  if(
+    id.starts_with("value_set::dynamic_object") ||
+    id == "value_set::return_value" || id == "value_set::memory")
     return true;
 
   // otherwise it has to be a struct
@@ -146,7 +146,7 @@ void value_sett::output(std::ostream &out, const std::string &indent) const
   values.iterate([&](const irep_idt &, const entryt &e) {
     irep_idt identifier, display_name;
 
-    if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
+    if(e.identifier.starts_with("value_set::dynamic_object"))
     {
       display_name = id2string(e.identifier) + e.suffix;
       identifier.clear();

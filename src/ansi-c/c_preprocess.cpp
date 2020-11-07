@@ -537,7 +537,7 @@ bool c_preprocess_gcc_clang(
   {
     if(arch == "i386" || arch == "x86_64" || arch == "x32")
       argv.push_back("-m16");
-    else if(has_prefix(id2string(arch), "mips"))
+    else if(arch.starts_with("mips"))
       argv.push_back("-mips16");
   }
   else if(config.ansi_c.pointer_width == 32)
@@ -546,7 +546,7 @@ bool c_preprocess_gcc_clang(
       argv.push_back("-m32");
     else if(arch == "x32")
       argv.push_back("-mx32");
-    else if(has_prefix(id2string(arch), "mips"))
+    else if(arch.starts_with("mips"))
       argv.push_back("-mabi=32");
     else if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
       argv.push_back("-m32");
@@ -559,7 +559,7 @@ bool c_preprocess_gcc_clang(
   {
     if(arch == "i386" || arch == "x86_64" || arch == "x32")
       argv.push_back("-m64");
-    else if(has_prefix(id2string(arch), "mips"))
+    else if(arch.starts_with("mips"))
       argv.push_back("-mabi=64");
     else if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
       argv.push_back("-m64");

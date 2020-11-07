@@ -139,10 +139,10 @@ std::string graphml_witnesst::convert_assign_rec(
       assign.rhs().operands().begin();
     for(const auto &comp : components)
     {
-      if(comp.type().id()==ID_code ||
-         comp.get_is_padding() ||
-         // for some reason #is_padding gets lost in *some* cases
-         has_prefix(id2string(comp.get_name()), "$pad"))
+      if(
+        comp.type().id() == ID_code || comp.get_is_padding() ||
+        // for some reason #is_padding gets lost in *some* cases
+        comp.get_name().starts_with("$pad"))
         continue;
 
       INVARIANT(
@@ -251,7 +251,7 @@ static bool filter_out(
     // Do not filter out assertions in functions the name of which starts with
     // CPROVER_PREFIX, because we need to maintain those as violation nodes:
     // these are assertions generated, for examples, for memory leaks.
-    if(!has_prefix(id2string(id), CPROVER_PREFIX) || !it->is_assert())
+    if(!id.starts_with(CPROVER_PREFIX) || !it->is_assert())
       return true;
   }
 
@@ -262,7 +262,7 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
 {
   if(
     expr.id() == ID_symbol &&
-    has_prefix(id2string(to_symbol_expr(expr).get_identifier()), prefix))
+    to_symbol_expr(expr).get_identifier().starts_with(prefix))
   {
     return true;
   }

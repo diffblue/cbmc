@@ -1215,7 +1215,7 @@ void goto_checkt::pointer_primitive_check(
   {
     const auto &symbol_expr = to_symbol_expr(pointer);
 
-    if(has_prefix(id2string(symbol_expr.get_identifier()), CPROVER_PREFIX))
+    if(symbol_expr.get_identifier().starts_with(CPROVER_PREFIX))
       return;
   }
 

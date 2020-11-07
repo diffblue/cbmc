@@ -726,7 +726,7 @@ bool compilet::add_written_cprover_symbols(const symbol_tablet &symbol_table)
   {
     const irep_idt &name=pair.second.name;
     const typet &new_type=pair.second.type;
-    if(!(has_prefix(id2string(name), CPROVER_PREFIX) && new_type.id()==ID_code))
+    if(!(name.starts_with(CPROVER_PREFIX) && new_type.id() == ID_code))
       continue;
 
     bool inserted;

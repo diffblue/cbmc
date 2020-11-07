@@ -87,7 +87,7 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
       {
         const symbolt &symbol = ns.lookup(obj_identifier);
 
-        if(has_prefix(id2string(symbol.base_name), "auto_object"))
+        if(symbol.base_name.starts_with("auto_object"))
         {
           // done already?
           if(!state.get_level2().current_names.has_key(

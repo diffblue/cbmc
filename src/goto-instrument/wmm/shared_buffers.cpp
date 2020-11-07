@@ -953,15 +953,15 @@ bool shared_bufferst::is_buffered(
 {
   const irep_idt &identifier=symbol_expr.get_identifier();
 
-  if(identifier==CPROVER_PREFIX "alloc" ||
-     identifier==CPROVER_PREFIX "alloc_size" ||
-     identifier=="stdin" ||
-     identifier=="stdout" ||
-     identifier=="stderr" ||
-     identifier=="sys_nerr" ||
-     has_prefix(id2string(identifier), "__unbuffered_") ||
-     has_prefix(id2string(identifier), "__CPROVER"))
+  if(
+    identifier == CPROVER_PREFIX "alloc" ||
+    identifier == CPROVER_PREFIX "alloc_size" || identifier == "stdin" ||
+    identifier == "stdout" || identifier == "stderr" ||
+    identifier == "sys_nerr" || identifier.starts_with("__unbuffered_") ||
+    identifier.starts_with("__CPROVER"))
+  {
     return false; // not buffered
+  }
 
   const symbolt &symbol=ns.lookup(identifier);
 

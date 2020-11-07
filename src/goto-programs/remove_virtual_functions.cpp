@@ -624,9 +624,9 @@ void get_virtual_calleest::get_functions(
                         ? b.symbol_expr->get_identifier()
                         : irep_idt();
 
-      if(has_prefix(id2string(a_id), "java::java.lang.Object"))
+      if(a_id.starts_with("java::java.lang.Object"))
         return false;
-      else if(has_prefix(id2string(b_id), "java::java.lang.Object"))
+      else if(b_id.starts_with("java::java.lang.Object"))
         return true;
       else
       {

@@ -1019,7 +1019,7 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
         : "";
     // skip referencing globals because the corresponding symbols in the symbol
     // table are no longer marked as file local.
-    if(has_prefix(id2string(sym_to_lookup), FILE_LOCAL_PREFIX))
+    if(sym_to_lookup.starts_with(FILE_LOCAL_PREFIX))
     {
       continue;
     }

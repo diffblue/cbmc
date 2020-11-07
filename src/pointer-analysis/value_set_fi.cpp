@@ -56,7 +56,7 @@ void value_set_fit::output(
 
     const entryt &e=v_it->second;
 
-    if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
+    if(e.identifier.starts_with("value_set::dynamic_object"))
     {
       display_name=id2string(e.identifier)+e.suffix;
       identifier.clear();
@@ -257,10 +257,9 @@ bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
     if(it2==values.end())
     {
       // we always track these
-      if(has_prefix(id2string(it->second.identifier),
-                    "value_set::dynamic_object") ||
-         has_prefix(id2string(it->second.identifier),
-                    "value_set::return_value"))
+      if(
+        it->second.identifier.starts_with("value_set::dynamic_object") ||
+        it->second.identifier.starts_with("value_set::return_value"))
       {
         values.insert(*it);
         result=true;
@@ -468,7 +467,7 @@ void value_set_fit::get_value_set_rec(
     irep_idt ident = id2string(to_symbol_expr(expr).get_identifier()) + suffix;
     valuest::const_iterator v_it=values.find(ident);
 
-    if(has_prefix(id2string(ident), alloc_adapter_prefix))
+    if(ident.starts_with(alloc_adapter_prefix))
     {
       insert(dest, expr, 0);
       return;
@@ -1152,12 +1151,11 @@ void value_set_fit::assign_rec(
   {
     const irep_idt &identifier = to_symbol_expr(lhs).get_identifier();
 
-    if(has_prefix(id2string(identifier),
-                  "value_set::dynamic_object") ||
-       has_prefix(id2string(identifier),
-                  "value_set::return_value") ||
-       values.find(id2string(identifier)+suffix)!=values.end())
-       // otherwise we don't track this value
+    if(
+      identifier.starts_with("value_set::dynamic_object") ||
+      identifier.starts_with("value_set::return_value") ||
+      values.find(id2string(identifier) + suffix) != values.end())
+    // otherwise we don't track this value
     {
       entryt &entry = get_entry(identifier, suffix);
 

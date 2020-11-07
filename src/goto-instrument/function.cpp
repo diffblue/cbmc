@@ -76,7 +76,7 @@ void function_enter(
   Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     // don't instrument our internal functions
-    if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
+    if(f_it->first.starts_with(CPROVER_PREFIX))
       continue;
 
     // don't instrument the function to be called,
@@ -101,7 +101,7 @@ void function_exit(
   Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     // don't instrument our internal functions
-    if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
+    if(f_it->first.starts_with(CPROVER_PREFIX))
       continue;
 
     // don't instrument the function to be called,

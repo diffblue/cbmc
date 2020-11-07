@@ -44,7 +44,7 @@ static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
     return {};
 
   // just for linking
-  if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
+  if(identifier.starts_with(CPROVER_PREFIX "architecture_"))
     return {};
 
   const typet &type = ns.follow(symbol.type);

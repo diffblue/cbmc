@@ -1604,7 +1604,7 @@ std::string expr2ct::convert_symbol(const exprt &src)
     dest=id2string(entry->second);
 
     #if 0
-    if(has_prefix(id2string(id), SYMEX_DYNAMIC_PREFIX "dynamic_object"))
+    if(id.starts_with(SYMEX_DYNAMIC_PREFIX "dynamic_object"))
     {
       if(sizeof_nesting++ == 0)
         dest+=" /*"+convert(src.type());
@@ -1908,9 +1908,9 @@ std::string expr2ct::convert_constant(
       {
         const irep_idt &op_value = to_constant_expr(annotation).get_value();
 
-        if(op_value=="INVALID" ||
-           has_prefix(id2string(op_value), "INVALID-") ||
-           op_value=="NULL+offset")
+        if(
+          op_value == "INVALID" || op_value.starts_with("INVALID-") ||
+          op_value == "NULL+offset")
           dest=id2string(op_value);
         else
           return convert_norep(src, precedence);

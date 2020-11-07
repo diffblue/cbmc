@@ -212,7 +212,7 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
 
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
+  if(identifier.starts_with(CPROVER_FKT_PREFIX))
   {
     symex_fkt(state, code);
   }
