@@ -249,14 +249,20 @@ static void json_output_function(
   const source_locationt &last_location,
   json_arrayt &dest)
 {
-  json_objectt entry{
-    {"function", json_stringt(function)},
-    {"file name",
-     json_stringt(concat_dir_file(
-       id2string(first_location.get_working_directory()),
-       id2string(first_location.get_file())))},
-    {"first line", json_numbert(id2string(first_location.get_line()))},
-    {"last line", json_numbert(id2string(last_location.get_line()))}};
+  // source locations occassionally omit line numbers
+  // an empty string makes json unparsable
+  std::string first_line = id2string(first_location.get_line());
+  std::string last_line = id2string(last_location.get_line());
+  first_line = first_line.empty() ? "0" : first_line;
+  last_line = last_line.empty() ? "0" : last_line;
+
+  json_objectt entry{{"function", json_stringt(function)},
+                     {"file name",
+                      json_stringt(concat_dir_file(
+                        id2string(first_location.get_working_directory()),
+                        id2string(first_location.get_file())))},
+                     {"first line", json_numbert(first_line)},
+                     {"last line", json_numbert(last_line)}};
 
   dest.push_back(std::move(entry));
 }
@@ -269,13 +275,20 @@ static void xml_output_function(
 {
   xmlt &x=dest.new_element("function");
 
+  // source locations occassionally omit line numbers
+  // an empty string makes xml unparsable
+  std::string first_line = id2string(first_location.get_line());
+  std::string last_line = id2string(last_location.get_line());
+  first_line = first_line.empty() ? "0" : first_line;
+  last_line = last_line.empty() ? "0" : last_line;
+
   x.set_attribute("name", id2string(function));
   x.set_attribute("file name",
                   concat_dir_file(
                     id2string(first_location.get_working_directory()),
                     id2string(first_location.get_file())));
-  x.set_attribute("first line", id2string(first_location.get_line()));
-  x.set_attribute("last line", id2string(last_location.get_line()));
+  x.set_attribute("first line", first_line);
+  x.set_attribute("last line", last_line);
 }
 
 static void list_functions(
