@@ -14,11 +14,13 @@ instructions.
 
 #include "cnf.h"
 
+#include <solvers/hardness_collector.h>
+
 /// Interface for generic SAT solver interface IPASIR
-class satcheck_ipasirt:public cnf_solvert
+class satcheck_ipasirt : public cnf_solvert, public hardness_collectort
 {
 public:
-  satcheck_ipasirt();
+  satcheck_ipasirt(message_handlert &message_handler);
   virtual ~satcheck_ipasirt() override;
 
   /// This method returns the description produced by the linked SAT solver
@@ -44,12 +46,28 @@ public:
     return true;
   }
 
+  void
+  with_solver_hardness(std::function<void(solver_hardnesst &)> handler) override
+  {
+    if(solver_hardness.has_value())
+    {
+      handler(solver_hardness.value());
+    }
+  }
+
+  void enable_hardness_collection() override
+  {
+    solver_hardness = solver_hardnesst{};
+  }
+
 protected:
   resultt do_prop_solve() override;
 
   void *solver;
 
   bvt assumptions;
+
+  optionalt<solver_hardnesst> solver_hardness;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_IPASIR_H
