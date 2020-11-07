@@ -105,15 +105,6 @@ bool exprt::is_false() const
          get(ID_value)==ID_false;
 }
 
-/// Replace the expression by a Boolean expression representing \p value.
-/// \param value: the Boolean value to give to the expression
-/// \deprecated use constructors instead
-void exprt::make_bool(bool value)
-{
-  *this=exprt(ID_constant, typet(ID_bool));
-  set(ID_value, value?ID_true:ID_false);
-}
-
 /// Return whether the expression represents a Boolean.
 /// \return True if is a Boolean, false otherwise.
 bool exprt::is_boolean() const
