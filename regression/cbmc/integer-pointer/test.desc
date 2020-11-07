@@ -1,0 +1,13 @@
+KNOWNBUG
+main.c
+--pointer-check --no-simplify --no-propagation
+^EXIT=10$
+^SIGNAL=0$
+\[main.assertion.1\] .*: FAILURE
+\[main.assertion.2\] .*: FAILURE
+--
+^warning: ignoring
+--
+The assertion should fail as q has the same value as p. However since q was
+initialized via an integer literal it points into __CPROVER_memory, and not to
+the malloced memory. Issue #5327.
