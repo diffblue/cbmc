@@ -183,10 +183,22 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
   auto satcheck = util_make_unique<SatcheckT>(message_handler);
   if(options.is_set("write-solver-stats-to"))
   {
-    satcheck->enable_hardness_collection();
-    satcheck->with_solver_hardness([&options](solver_hardnesst &hardness) {
-      hardness.set_outfile(options.get_option("write-solver-stats-to"));
-    });
+    if(
+      auto hardness_collector = dynamic_cast<hardness_collectort *>(&*satcheck))
+    {
+      hardness_collector->enable_hardness_collection();
+      hardness_collector->with_solver_hardness(
+        [&options](solver_hardnesst &hardness) {
+          hardness.set_outfile(options.get_option("write-solver-stats-to"));
+        });
+    }
+    else
+    {
+      messaget log(message_handler);
+      log.warning()
+        << "Configured solver does not support --write-solver-stats-to. "
+        << "Solver stats will not be written." << messaget::eom;
+    }
   }
   return satcheck;
 }
