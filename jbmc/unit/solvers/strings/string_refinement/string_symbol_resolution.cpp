@@ -15,8 +15,11 @@ Author: Diffblue Ltd.
 #include <iostream>
 #include <java_bytecode/java_bytecode_language.h>
 #include <langapi/mode.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -63,11 +66,10 @@ SCENARIO(
 
     WHEN("There is a function call")
     {
-      java_method_typet::parameterst parameters;
-      typet return_type;
+      mathematical_function_typet::domaint domain{{string_typet{}}};
       symbol_exprt fun_sym(
-        "f", java_method_typet(std::move(parameters), return_type));
-      const function_application_exprt fun(fun_sym, {c}, bool_typet());
+        "f", mathematical_function_typet{domain, bool_typet{}});
+      const function_application_exprt fun{fun_sym, {c}};
       symbol_exprt bool_sym("bool_b", bool_typet());
       equations.emplace_back(bool_sym, fun);
       union_find_replacet symbol_resolve =
