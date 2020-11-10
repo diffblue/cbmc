@@ -19,14 +19,16 @@ DIRS = cbmc \
        test-script \
        goto-analyzer-taint \
        goto-gcc \
-       goto-harness \
        goto-cl \
        goto-cc-cbmc \
+       goto-cc-cbmc-shared-options \
        cbmc-cpp \
        goto-cc-goto-analyzer \
        statement-list \
        systemc \
        contracts \
+       goto-harness \
+       goto-harness-multi-file-project \
        goto-cc-file-local \
        goto-cc-regression-gh-issue-5380 \
        linking-goto-binaries \
@@ -36,6 +38,7 @@ DIRS = cbmc \
        validate-trace-xml-schema \
        cbmc-primitives \
        goto-interpreter \
+       cbmc-sequentialization \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)
