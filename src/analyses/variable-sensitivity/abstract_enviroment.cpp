@@ -474,7 +474,7 @@ abstract_environmentt::modified_symbols(
   first.map.get_view(view);
   for(const auto &entry : view)
   {
-    const auto second_entry = second.map.find(entry.first);
+    const auto &second_entry = second.map.find(entry.first);
     if(second_entry.has_value())
     {
       if(second_entry.value().get()->has_been_modified(entry.second))

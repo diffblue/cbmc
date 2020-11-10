@@ -34,7 +34,7 @@ void variable_sensitivity_dependence_domaint::eval_data_deps(
   {
     // If the expression was able to be eval'ed to something with data
     // dependencies, then that's all we need to gather.
-    for(const auto dep : res->get_data_dependencies())
+    for(const auto &dep : res->get_data_dependencies())
       deps[dep].insert(expr);
   }
   else
@@ -188,7 +188,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   {
     const code_function_callt &call = to_code_function_call(to->code);
     const code_function_callt::argumentst &args = call.arguments();
-    for(const auto arg : args)
+    for(const auto &arg : args)
     {
       eval_data_deps(arg, ns, domain_data_deps);
     }

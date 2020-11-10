@@ -318,7 +318,7 @@ std::set<goto_programt::const_targett>
 data_dependency_contextt::get_data_dependencies() const
 {
   std::set<goto_programt::const_targett> result;
-  for(const auto d : data_deps)
+  for(const auto &d : data_deps)
     result.insert(d);
   return result;
 }
@@ -332,7 +332,7 @@ std::set<goto_programt::const_targett>
 data_dependency_contextt::get_data_dominators() const
 {
   std::set<goto_programt::const_targett> result;
-  for(const auto d : data_dominators)
+  for(const auto &d : data_dominators)
     result.insert(d);
   return result;
 }

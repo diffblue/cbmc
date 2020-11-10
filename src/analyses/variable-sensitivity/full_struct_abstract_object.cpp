@@ -213,7 +213,7 @@ void full_struct_abstract_objectt::output(
   bool first = true;
 
   out << "{";
-  for(const auto field : type_decl.components())
+  for(const auto &field : type_decl.components())
   {
     auto value = map.find(field.get_name());
     if(value.has_value())
