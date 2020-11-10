@@ -69,8 +69,7 @@ protected:
     std::size_t operator()(const packedt &p) const;
   };
 
-  typedef hash_numbering<packedt, vector_hasht> numberingt;
-  numberingt numbering;
+  numberingt<packedt, vector_hasht> numbering;
 
   void pack(const irept &irep, packedt &);
 

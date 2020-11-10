@@ -163,7 +163,7 @@ public:
 
   unsigned get_bit_nr(const exprt &);
 
-  typedef numbering<irep_idt> bitst;
+  typedef numberingt<irep_idt> bitst;
   bitst bits;
 
 protected:

@@ -183,7 +183,7 @@ protected:
 
   typedef std::stack<unsigned> work_queuet;
 
-  numbering<irep_idt> pointers;
+  numberingt<irep_idt> pointers;
 
   // pointers -> flagst
   // This is a vector, so it's fast.

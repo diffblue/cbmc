@@ -68,7 +68,7 @@ protected:
   array_equalitiest array_equalities;
 
   // this is used to find the clusters of arrays being compared
-  union_find<exprt> arrays;
+  union_find<exprt, irep_hash> arrays;
 
   // this tracks the array indicies for each array
   typedef std::set<exprt> index_sett;

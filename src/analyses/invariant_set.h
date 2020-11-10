@@ -55,7 +55,7 @@ public:
 protected:
   const namespacet &ns;
 
-  typedef hash_numbering<irep_idt, irep_id_hash> mapt;
+  typedef numberingt<irep_idt> mapt;
   mapt map;
 
   struct entryt

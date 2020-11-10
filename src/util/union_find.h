@@ -132,23 +132,25 @@ public:
   size_type get_other(size_type a);
 };
 
-template <typename T>
+/// \tparam T: The type of values stored.
+/// \tparam hasht: The type of hash used for looking up the value numbering.
+template <typename T, typename hasht = std::hash<T>>
 // NOLINTNEXTLINE(readability/identifiers)
 class union_find final
 {
-  typedef numbering<T> numbering_typet;
+  using numbering_typet = numberingt<T, hasht>;
   numbering_typet numbers;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::number_type number_type;
+  using number_type = typename numbering_typet::number_type;
 
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::size_type size_type;
+  using size_type = typename numbering_typet::size_type;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::iterator iterator;
+  using iterator = typename numbering_typet::iterator;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::const_iterator const_iterator;
+  using const_iterator = typename numbering_typet::const_iterator;
 
   // true == already in same set
   bool make_union(const T &a, const T &b)
@@ -160,8 +162,7 @@ public:
   }
 
   // true == already in same set
-  bool make_union(typename numbering<T>::const_iterator it_a,
-                  typename numbering<T>::const_iterator it_b)
+  bool make_union(const_iterator it_a, const_iterator it_b)
   {
     size_type na=it_a-numbers.begin(), nb=it_b-numbers.begin();
     bool is_union=find_number(na)==find_number(nb);
@@ -183,13 +184,12 @@ public:
   }
 
   // are 'a' and 'b' in the same set?
-  bool same_set(typename numbering<T>::const_iterator it_a,
-                typename numbering<T>::const_iterator it_b) const
+  bool same_set(const_iterator it_a, const_iterator it_b) const
   {
     return uuf.same_set(it_a-numbers.begin(), it_b-numbers.begin());
   }
 
-  const T &find(typename numbering<T>::const_iterator it) const
+  const T &find(const_iterator it) const
   {
     return numbers[find_number(it-numbers.begin())];
   }
@@ -199,7 +199,7 @@ public:
     return numbers[find_number(number(a))];
   }
 
-  size_type find_number(typename numbering<T>::const_iterator it) const
+  size_type find_number(const_iterator it) const
   {
     return find_number(it-numbers.begin());
   }
@@ -228,7 +228,7 @@ public:
       return uuf.is_root(na);
   }
 
-  bool is_root(typename numbering<T>::const_iterator it) const
+  bool is_root(const_iterator it) const
   {
     return uuf.is_root(it-numbers.begin());
   }
@@ -251,7 +251,7 @@ public:
     uuf.clear();
   }
 
-  void isolate(typename numbering<T>::const_iterator it)
+  void isolate(const_iterator it)
   {
     uuf.isolate(it-numbers.begin());
   }
@@ -281,7 +281,7 @@ public:
 
 protected:
   unsigned_union_find uuf;
-  typedef numbering<T> subt;
+  using subt = numbering_typet;
 };
 
 #endif // CPROVER_UTIL_UNION_FIND_H

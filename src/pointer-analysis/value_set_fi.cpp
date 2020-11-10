@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank{};
 
 object_numberingt value_set_fit::object_numbering;
-hash_numbering<irep_idt, irep_id_hash> value_set_fit::function_numbering;
+numberingt<irep_idt> value_set_fit::function_numbering;
 
 static const char *alloc_adapter_prefix="alloc_adaptor::";
 
