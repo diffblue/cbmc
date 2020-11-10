@@ -2,7 +2,7 @@ CORE
 Test
 --function Test.main --show-vcc
 java::Test\.main:\(Z\)V::14::t1!0@1#\d+ = address_of\(symex_dynamic::dynamic_object\d+\)
-java::Test\.main:\(Z\)V::9::x!0@1#\d+ = 5 \+ java::Test\.main:\(Z\)V::9::x!0@1#\d+
+java::Test\.main:\(Z\)V::9::x!0@1#\d+ = java::Test\.main:\(Z\)V::9::x!0@1#\d+ \+ 5
 java::Test\.g:\(\)I#return_value!0#[0-9]+ = 5
 ^EXIT=0$
 ^SIGNAL=0$

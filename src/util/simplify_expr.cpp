@@ -2090,7 +2090,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
 #endif
 
   exprt expr = node;
-  bool no_change_sort_and_join = sort_and_join(expr);
+  bool no_change_join_operands = join_operands(expr);
 
   resultt<> r = unchanged(expr);
 
@@ -2291,7 +2291,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
     r = simplify_complex(to_unary_expr(expr));
   }
 
-  if(!no_change_sort_and_join)
+  if(!no_change_join_operands)
     r = changed(r);
 
 #ifdef DEBUGX
