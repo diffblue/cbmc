@@ -35,6 +35,68 @@ jobs:
         env:
           TESTPL_JOBS: 2
 
+  check-ubuntu-20_04-cmake-clang-8:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get install -yq cmake ninja-build clang-8 clang++-8 maven flex bison libxml2-utils cpanminus dpkg-dev
+          cpanm Thread::Pool::Simple
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang-8 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-8
+      - name: Build with Ninja
+        run: cd build; ninja
+      - name: Check if package building works
+        run: |
+          cd build
+          ninja package
+          ls *.deb
+      - name: Run tests
+        run: cd build; ctest . -V -L CORE
+        env:
+          TESTPL_JOBS: 2
+
+  check-ubuntu-20_04-cmake-clang-3_8:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get install -yq cmake ninja-build clang-3.8 clang++-3.8 maven flex bison libxml2-utils cpanminus dpkg-dev
+          cpanm Thread::Pool::Simple
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang-3.8 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.8
+      - name: Build with Ninja
+        run: cd build; ninja
+      - name: Check if package building works
+        run: |
+          cd build
+          ninja package
+          ls *.deb
+      - name: Run tests
+        run: cd build; ctest . -V -L CORE
+        env:
+          TESTPL_JOBS: 2
+
   check-macos-10_15-cmake-clang:
     runs-on: macos-10.15
     steps:
