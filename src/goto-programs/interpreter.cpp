@@ -140,18 +140,18 @@ void interpretert::command()
     done=true;
   else if(ch=='h')
   {
-    status()
-      << "Interpreter help\n"
-      << "h: display this menu\n"
-      << "j: output json trace\n"
-      << "m: output memory dump\n"
-      << "o: output goto trace\n"
-      << "q: quit\n"
-      << "r: run until completion\n"
-      << "s#: step a number of instructions\n"
-      << "sa: step across a function\n"
-      << "so: step out of a function\n"
-      << eom;
+    status() << "Interpreter help\n"
+             << "h: display this menu\n"
+             << "j: output json trace\n"
+             << "m: output memory dump\n"
+             << "o: output goto trace\n"
+             << "q: quit\n"
+             << "r: run up to entry point\n"
+             << "s#: step a number of instructions\n"
+             << "sa: step across a function\n"
+             << "so: step out of a function\n"
+             << "se: step until end of program\n"
+             << eom;
   }
   else if(ch=='j')
   {
