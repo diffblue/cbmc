@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <functional>
 #include <set>
 
-#include <util/deprecate.h>
 #include <util/irep.h>
 
 class goto_modelt;

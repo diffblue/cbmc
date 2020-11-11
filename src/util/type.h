@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class namespacet;
 
-#include "deprecate.h"
 #include "source_location.h"
 #include "validate_types.h"
 #include "validation_mode.h"

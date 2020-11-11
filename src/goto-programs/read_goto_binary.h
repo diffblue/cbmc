@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <util/deprecate.h>
 #include <util/optional.h>
 
 class goto_functionst;
