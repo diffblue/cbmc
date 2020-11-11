@@ -41,6 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/restrict_function_pointers.h>
+#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
@@ -599,6 +600,9 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("interpreter"))
     {
+      do_indirect_call_and_rtti_removal();
+      rewrite_union(goto_model);
+
       log.status() << "Starting interpreter" << messaget::eom;
       interpreter(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;

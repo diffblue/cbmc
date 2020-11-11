@@ -30,14 +30,13 @@ public:
   interpretert(
     const symbol_tablet &_symbol_table,
     const goto_functionst &_goto_functions,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
-    goto_functions(_goto_functions),
-    stack_pointer(0),
-    done(false),
-    stop_on_assertion(false)
+    message_handlert &_message_handler)
+    : messaget(_message_handler),
+      symbol_table(_symbol_table),
+      ns(_symbol_table),
+      goto_functions(_goto_functions),
+      stack_pointer(0),
+      done(false)
   {
     show=true;
   }
@@ -265,18 +264,16 @@ protected:
   list_input_varst function_input_vars;
 
   goto_functionst::function_mapt::const_iterator function;
-  goto_programt::const_targett pc, next_pc, target_assert;
+  goto_programt::const_targett pc, next_pc;
   goto_tracet steps;
   bool done;
   bool show;
-  bool stop_on_assertion;
   static const size_t npos;
   size_t num_steps;
   size_t total_steps;
 
   dynamic_typest dynamic_types;
   int num_dynamic_objects;
-  mp_integer stack_depth;
   unsigned thread_id;
 
   bool evaluate_boolean(const exprt &expr)

@@ -857,41 +857,11 @@ void interpretert::evaluate(
     }
     return;
   }
-  else if(expr.id()==ID_byte_extract_little_endian ||
-          expr.id()==ID_byte_extract_big_endian)
-  {
-    const auto &byte_extract_expr = to_byte_extract_expr(expr);
-
-    mp_vectort extract_offset;
-    evaluate(byte_extract_expr.op1(), extract_offset);
-    mp_vectort extract_from;
-    evaluate(byte_extract_expr.op0(), extract_from);
-
-    if(extract_offset.size()==1 && extract_from.size()!=0)
-    {
-      const typet &target_type=expr.type();
-      mp_integer memory_offset;
-      // If memory offset is found (which should normally be the case)
-      // extract the corresponding data from the appropriate memory location
-      if(!byte_offset_to_memory_offset(
-           byte_extract_expr.op0().type(), extract_offset[0], memory_offset))
-      {
-        mp_integer target_type_leaves;
-        if(!count_type_leaves(target_type, target_type_leaves) &&
-           target_type_leaves>0)
-        {
-          dest.insert(dest.end(),
-            extract_from.begin()+memory_offset.to_long(),
-            extract_from.begin()+(memory_offset+target_type_leaves).to_long());
-          return;
-        }
-      }
-    }
-  }
-  else if(expr.id()==ID_dereference ||
-          expr.id()==ID_index ||
-          expr.id()==ID_symbol ||
-          expr.id()==ID_member)
+  else if(
+    expr.id() == ID_dereference || expr.id() == ID_index ||
+    expr.id() == ID_symbol || expr.id() == ID_member ||
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
   {
     mp_integer address=evaluate_address(
       expr,
@@ -932,16 +902,45 @@ void interpretert::evaluate(
     }
     else if(!address.is_zero())
     {
-      if(!unbounded_size(expr.type()))
+      if(
+        expr.id() == ID_byte_extract_little_endian ||
+        expr.id() == ID_byte_extract_big_endian)
+      {
+        const auto &byte_extract_expr = to_byte_extract_expr(expr);
+
+        mp_vectort extract_from;
+        evaluate(byte_extract_expr.op(), extract_from);
+        INVARIANT(
+          !extract_from.empty(),
+          "evaluate_address should have returned address == 0");
+        const mp_integer memory_offset =
+          address - evaluate_address(byte_extract_expr.op(), true);
+        const typet &target_type = expr.type();
+        mp_integer target_type_leaves;
+        if(
+          !count_type_leaves(target_type, target_type_leaves) &&
+          target_type_leaves > 0)
+        {
+          dest.insert(
+            dest.end(),
+            extract_from.begin() + numeric_cast_v<std::size_t>(memory_offset),
+            extract_from.begin() +
+              numeric_cast_v<std::size_t>(memory_offset + target_type_leaves));
+          return;
+        }
+        // we fail
+      }
+      else if(!unbounded_size(expr.type()))
       {
         dest.resize(numeric_cast_v<std::size_t>(get_size(expr.type())));
         read(address, dest);
+        return;
       }
       else
       {
         read_unbounded(address, dest);
+        return;
       }
-      return;
     }
   }
   else if(expr.id()==ID_typecast)

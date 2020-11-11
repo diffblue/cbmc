@@ -64,6 +64,8 @@ void interpretert::operator()()
 void interpretert::initialize(bool init)
 {
   build_memory_map();
+  // reset the call stack
+  call_stack = call_stackt{};
 
   total_steps=0;
   const goto_functionst::function_mapt::const_iterator
@@ -83,15 +85,20 @@ void interpretert::initialize(bool init)
   done=false;
   if(init)
   {
-    stack_depth=call_stack.size()+1;
-    show_state();
-    step();
-    while(!done && (stack_depth<=call_stack.size()) && (stack_depth!=npos))
+    // execute instructions up to and including __CPROVER_initialize()
+    while(!done && call_stack.size() == 0)
     {
       show_state();
       step();
     }
-    while(!done && (call_stack.size()==0))
+    // initialization
+    while(!done && call_stack.size() > 0)
+    {
+      show_state();
+      step();
+    }
+    // invoke the user entry point
+    while(!done && call_stack.size() == 0)
     {
       show_state();
       step();
@@ -140,18 +147,18 @@ void interpretert::command()
     done=true;
   else if(ch=='h')
   {
-    status()
-      << "Interpreter help\n"
-      << "h: display this menu\n"
-      << "j: output json trace\n"
-      << "m: output memory dump\n"
-      << "o: output goto trace\n"
-      << "q: quit\n"
-      << "r: run until completion\n"
-      << "s#: step a number of instructions\n"
-      << "sa: step across a function\n"
-      << "so: step out of a function\n"
-      << eom;
+    status() << "Interpreter help\n"
+             << "h: display this menu\n"
+             << "j: output json trace\n"
+             << "m: output memory dump\n"
+             << "o: output goto trace\n"
+             << "q: quit\n"
+             << "r: run up to entry point\n"
+             << "s#: step a number of instructions\n"
+             << "sa: step across a function\n"
+             << "so: step out of a function\n"
+             << "se: step until end of program\n"
+             << eom;
   }
   else if(ch=='j')
   {
@@ -200,7 +207,7 @@ void interpretert::command()
   else if((ch=='s') || (ch==0))
   {
     num_steps=1;
-    stack_depth=npos;
+    std::size_t stack_depth = npos;
     ch=tolower(command[1]);
     if(ch=='e')
       num_steps=npos;
@@ -210,7 +217,7 @@ void interpretert::command()
       stack_depth=call_stack.size()+1;
     else
     {
-      num_steps=safe_string2size_t(command+1);
+      num_steps = unsafe_string2size_t(command + 1);
       if(num_steps==0)
         num_steps=1;
     }
@@ -742,9 +749,7 @@ void interpretert::execute_assert()
 {
   if(!evaluate_boolean(pc->get_condition()))
   {
-    if((target_assert==pc) || stop_on_assertion)
-      throw "program assertion reached";
-    else if(show)
+    if(show)
       error() << "assertion failed at " << pc->location_number
               << "\n" << eom;
   }
@@ -860,6 +865,7 @@ void interpretert::execute_function_call()
 void interpretert::build_memory_map()
 {
   // put in a dummy for NULL
+  memory.clear();
   memory.resize(1);
   inverse_memory_map[0] = {};
 
@@ -1071,12 +1077,11 @@ void interpretert::print_memory(bool input_flags)
     const memory_cellt &cell=cell_address.second;
     const auto identifier = address_to_symbol(i).get_identifier();
     const auto offset=address_to_offset(i);
-    debug() << identifier << "[" << offset << "]"
-            << "=" << cell.value << eom;
+    status() << identifier << "[" << offset << "]"
+             << "=" << cell.value << eom;
     if(input_flags)
-      debug() << "(" << static_cast<int>(cell.initialized) << ")"
-              << eom;
-    debug() << eom;
+      status() << "(" << static_cast<int>(cell.initialized) << ")" << eom;
+    status() << eom;
   }
 }
 

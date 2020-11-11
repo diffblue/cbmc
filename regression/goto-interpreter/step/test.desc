@@ -1,0 +1,20 @@
+CORE
+main.c
+r0,s,sa,m,s2,m,s2,m,so,m,se
+^Starting interpreter$
+^__CPROVER_rounding_mode\[0\]=0$
+^__CPROVER_rounding_mode\[0\]=1$
+^main::1::i\[0\]=1$
+^\d+- Program End\.$
+^EXIT=0$
+^SIGNAL=0$
+--
+^main::1::i\[0\]=2$
+--
+Use the various step instructions: restart execution without running
+initialization (r0), execute one step (s), step over __CPROVER_initialize (sa),
+generate the first memory dump (__CPROVER_rounding_mode set to 0), step into
+main and execute the first assignment (__CPROVER_rounding_mode set to 1),
+execute two steps (s2) to declare i and assign 1 to i, step to the end of the
+function (so) without dumping intermittent values, thus never dumping i==2. The
+execute to the end of the program (se).

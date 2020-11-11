@@ -1,0 +1,9 @@
+CORE
+main.c
+m
+^Starting interpreter$
+^__CPROVER_rounding_mode\[0\]=0$
+^\d+- Program End\.$
+^EXIT=0$
+^SIGNAL=0$
+--
