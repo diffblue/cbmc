@@ -112,6 +112,10 @@ jobs:
           choco install winflexbison3
       - uses: microsoft/setup-msbuild@v1.0.1
         name: Setup Visual Studio environment
+      - name: Setup code sign environment
+        run: | 
+          echo "$(Split-Path -Path $(Get-ChildItem -Path ${env:ProgramFiles(x86)} -Recurse -Filter 'signtool.exe' | Where-Object FullName -like '*10.0.19041.0\x64\signtool.exe').FullName)" >> $env:GITHUB_PATH
+          echo "pfxcert=$([string](Get-Location)+'\CodeSignCertificate.pfx')" >> $env:GITHUB_ENV
       - name: Configure with cmake
         run: |
           New-Item -ItemType Directory -Path build
@@ -130,6 +134,23 @@ jobs:
           $msi_name = Get-ChildItem -Filter *.msi -Name
           Write-Output "::set-output name=msi_installer::build/$msi_name"
           Write-Output "::set-output name=msi_name::$msi_name"
+      - name: Decode signing certificate
+        id: decode_certificate
+        run: |
+          $pfx_bytes=[System.Convert]::FromBase64String("${{ secrets.CODESIGNCERTPFX }}")
+          [IO.File]::WriteAllBytes($env:pfxcert, $pfx_bytes)
+      - name: Sign the installer
+        id: code_sign
+        run: |
+          & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr http://tsa.starfieldtech.com ${{ steps.create_packages.outputs.msi_installer }}
+      - name: Remove signing certificate
+        id: remove_certificate
+        run: |
+          Remove-Item $env:pfxcert
+      - name: Verify installer signature
+        id: verify_codesign
+        run: |
+          & signtool.exe verify /pa ${{ steps.create_packages.outputs.msi_installer }}
       - name: Get release info
         id: get_release_info
         uses: bruceadams/get-release@v1.2.0
