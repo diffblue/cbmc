@@ -214,8 +214,7 @@ void value_set_fi_fp_removal(
                            << messaget::eom;
 
           const auto &pointer = to_dereference_expr(call.function()).pointer();
-          std::list<exprt> addresses;
-          value_sets.get_values(f.first, target, pointer, addresses);
+          auto addresses = value_sets.get_values(f.first, target, pointer);
 
           std::set<symbol_exprt> functions;
 

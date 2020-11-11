@@ -65,17 +65,6 @@ public:
 
 public:
   // interface value_sets
-  DEPRECATED(SINCE(2019, 05, 22, "use list returning version instead"))
-  void get_values(
-    const irep_idt &,
-    locationt l,
-    const exprt &expr,
-    value_setst::valuest &dest) override
-  {
-    (*this)[l].value_set.get_value_set(expr, dest, baset::ns);
-  }
-
-  // interface value_sets
   std::vector<exprt>
   get_values(const irep_idt &, locationt l, const exprt &expr) override
   {

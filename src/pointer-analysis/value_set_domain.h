@@ -33,9 +33,9 @@ public:
     return value_set.make_union(other.value_set);
   }
 
-  void output(const namespacet &ns, std::ostream &out) const override
+  void output(const namespacet &, std::ostream &out) const override
   {
-    value_set.output(ns, out);
+    value_set.output(out);
   }
 
   void initialize(const namespacet &, locationt l) override

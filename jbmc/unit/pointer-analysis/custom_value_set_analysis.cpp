@@ -145,17 +145,8 @@ typedef
 #define TEST_FUNCTION_NAME TEST_PREFIX "test:()V"
 #define TEST_LOCAL_PREFIX TEST_FUNCTION_NAME "::"
 
-template<class VST>
-static value_setst::valuest
-get_values(const VST &value_set, const namespacet &ns, const exprt &expr)
-{
-  value_setst::valuest vals;
-  value_set.get_value_set(expr, vals, ns);
-  return vals;
-}
-
-static std::size_t exprs_with_id(
-  const value_setst::valuest &exprs, const irep_idt &id)
+static std::size_t
+exprs_with_id(const std::vector<exprt> &exprs, const irep_idt &id)
 {
   return std::count_if(
     exprs.begin(),
@@ -222,15 +213,15 @@ SCENARIO("test_value_set_analysis",
         TEST_LOCAL_PREFIX "23::ignored", jlo_ref_type);
       THEN("The normal analysis should write to it")
       {
-        auto normal_exprs=
-          get_values(normal_function_end_vs, ns, written_symbol);
+        auto normal_exprs =
+          normal_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(exprs_with_id(normal_exprs, ID_dynamic_object)==1);
         REQUIRE(exprs_with_id(normal_exprs, ID_unknown)==0);
       }
       THEN("The custom analysis should ignore the write to it")
       {
-        auto test_exprs=
-          get_values(test_function_end_vs, ns, written_symbol);
+        auto test_exprs =
+          test_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(exprs_with_id(test_exprs, ID_dynamic_object)==0);
         REQUIRE(exprs_with_id(test_exprs, ID_unknown)==1);
       }
@@ -242,15 +233,15 @@ SCENARIO("test_value_set_analysis",
         TEST_LOCAL_PREFIX "31::no_write", jlo_ref_type);
       THEN("The normal analysis should write to it")
       {
-        auto normal_exprs=
-          get_values(normal_function_end_vs, ns, written_symbol);
+        auto normal_exprs =
+          normal_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(exprs_with_id(normal_exprs, ID_dynamic_object)==1);
         REQUIRE(exprs_with_id(normal_exprs, ID_unknown)==0);
       }
       THEN("The custom analysis should ignore the write to it")
       {
-        auto test_exprs=
-          get_values(test_function_end_vs, ns, written_symbol);
+        auto test_exprs =
+          test_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(exprs_with_id(test_exprs, ID_dynamic_object)==0);
         REQUIRE(exprs_with_id(test_exprs, ID_unknown)==1);
       }
@@ -262,15 +253,15 @@ SCENARIO("test_value_set_analysis",
         TEST_LOCAL_PREFIX "55::read", jlo_ref_type);
       THEN("The normal analysis should find a dynamic object")
       {
-        auto normal_exprs=
-          get_values(normal_function_end_vs, ns, written_symbol);
+        auto normal_exprs =
+          normal_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(exprs_with_id(normal_exprs, ID_dynamic_object)==1);
         REQUIRE(exprs_with_id(normal_exprs, ID_unknown)==0);
       }
       THEN("The custom analysis should have no information about it")
       {
-        auto test_exprs=
-          get_values(test_function_end_vs, ns, written_symbol);
+        auto test_exprs =
+          test_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(test_exprs.size()==0);
       }
     }
@@ -281,16 +272,16 @@ SCENARIO("test_value_set_analysis",
         TEST_PREFIX "maybe_unknown_read", jlo_ref_type);
       THEN("The normal analysis should find a dynamic object")
       {
-        auto normal_exprs=
-          get_values(normal_function_end_vs, ns, written_symbol);
+        auto normal_exprs =
+          normal_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(exprs_with_id(normal_exprs, ID_dynamic_object)==1);
         REQUIRE(exprs_with_id(normal_exprs, ID_unknown)==0);
       }
       THEN("The custom analysis should find a dynamic object "
            "*and* an unknown entry")
       {
-        auto test_exprs=
-          get_values(test_function_end_vs, ns, written_symbol);
+        auto test_exprs =
+          test_function_end_vs.get_value_set(written_symbol, ns);
         REQUIRE(test_exprs.size()==2);
         REQUIRE(exprs_with_id(test_exprs, ID_unknown)==1);
         REQUIRE(exprs_with_id(test_exprs, ID_dynamic_object)==1);
@@ -301,16 +292,16 @@ SCENARIO("test_value_set_analysis",
     {
       symbol_exprt read_before_cause_write(
         TEST_PREFIX "first_effect_read", jlo_ref_type);
-        auto normal_exprs_before=
-          get_values(normal_function_end_vs, ns, read_before_cause_write);
-        auto test_exprs_before=
-          get_values(test_function_end_vs, ns, read_before_cause_write);
+      auto normal_exprs_before =
+        normal_function_end_vs.get_value_set(read_before_cause_write, ns);
+      auto test_exprs_before =
+        test_function_end_vs.get_value_set(read_before_cause_write, ns);
       symbol_exprt read_after_cause_write(
         TEST_PREFIX "second_effect_read", jlo_ref_type);
-        auto normal_exprs_after=
-          get_values(normal_function_end_vs, ns, read_after_cause_write);
-        auto test_exprs_after=
-          get_values(test_function_end_vs, ns, read_after_cause_write);
+      auto normal_exprs_after =
+        normal_function_end_vs.get_value_set(read_after_cause_write, ns);
+      auto test_exprs_after =
+        test_function_end_vs.get_value_set(read_after_cause_write, ns);
 
       THEN("Before writing to 'cause' both analyses should think 'effect' "
            "points to some object")
