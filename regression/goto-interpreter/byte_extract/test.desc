@@ -1,0 +1,13 @@
+KNOWNBUG
+main.c
+se
+^Starting interpreter$
+^\d+- Program End\.$
+^EXIT=0$
+^SIGNAL=0$
+--
+^assertion failed at \d+$
+--
+The memory model of the interpreter does not record individual bytes. Therefore,
+an access to individual bytes still yields the full object, making the assertion
+in this test spuriously fail.
