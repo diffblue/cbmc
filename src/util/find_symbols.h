@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <unordered_set>
 
-#include "deprecate.h"
 #include "irep.h"
 
 class exprt;
@@ -48,12 +47,6 @@ void find_symbols(
   find_symbols_sett &dest,
   bool current,
   bool next);
-
-/// Find sub expressions with id ID_symbol or ID_next_symbol
-DEPRECATED(SINCE(2019, 06, 17, "Unused"))
-void find_symbols(
-  const exprt &src,
-  std::set<exprt> &dest);
 
 /// Find sub expressions with id ID_symbol
 void find_symbols(
