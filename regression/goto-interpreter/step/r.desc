@@ -1,0 +1,8 @@
+CORE
+main.c
+r,q
+^Starting interpreter$
+^\d+- Program End\.$
+^EXIT=0$
+^SIGNAL=0$
+--

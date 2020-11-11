@@ -51,6 +51,12 @@ public:
     _size=new_size;
   }
 
+  void clear()
+  {
+    underlying.clear();
+    _size = 0;
+  }
+
   typedef typename underlyingt::iterator iteratort;
   typedef typename underlyingt::const_iterator const_iteratort;
 

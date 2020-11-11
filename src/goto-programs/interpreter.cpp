@@ -858,6 +858,7 @@ void interpretert::execute_function_call()
 void interpretert::build_memory_map()
 {
   // put in a dummy for NULL
+  memory.clear();
   memory.resize(1);
   inverse_memory_map[0] = {};
 
