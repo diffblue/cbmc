@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/rational.h>
@@ -893,7 +894,14 @@ void goto_convertt::do_function_call_symbol(
     if(lhs.is_nil())
       return;
 
-    const function_application_exprt rhs(function, arguments, lhs.type());
+    const code_typet &function_call_type = to_code_type(function.type());
+    mathematical_function_typet::domaint domain;
+    for(const auto &parameter : function_call_type.parameters())
+      domain.push_back(parameter.type());
+    mathematical_function_typet function_type{domain,
+                                              function_call_type.return_type()};
+    const function_application_exprt rhs(
+      symbol_exprt{function.get_identifier(), function_type}, arguments);
 
     code_assignt assignment(lhs, rhs);
     assignment.add_source_location()=function.source_location();

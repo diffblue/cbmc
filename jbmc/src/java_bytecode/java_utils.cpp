@@ -408,7 +408,7 @@ exprt make_function_application(
     symbol_table);
 
   // Function application
-  return function_application_exprt(symbol.symbol_expr(), arguments, range);
+  return function_application_exprt{symbol.symbol_expr(), arguments};
 }
 
 /// Strip java:: prefix from given identifier

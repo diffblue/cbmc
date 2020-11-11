@@ -192,20 +192,6 @@ class function_application_exprt : public binary_exprt
 public:
   using argumentst = exprt::operandst;
 
-  DEPRECATED(
-    SINCE(2019, 3, 3, "use function_application_exprt(fkt, arg) instead"))
-  function_application_exprt(
-    const symbol_exprt &_function,
-    const argumentst &_arguments,
-    const typet &_type)
-    : binary_exprt(
-        _function,
-        ID_function_application,
-        tuple_exprt(_arguments),
-        _type)
-  {
-  }
-
   function_application_exprt(const exprt &_function, argumentst _arguments);
 
   exprt &function()
