@@ -274,7 +274,6 @@ protected:
 
   dynamic_typest dynamic_types;
   int num_dynamic_objects;
-  mp_integer stack_depth;
   unsigned thread_id;
 
   bool evaluate_boolean(const exprt &expr)

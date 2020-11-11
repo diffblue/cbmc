@@ -64,6 +64,8 @@ void interpretert::operator()()
 void interpretert::initialize(bool init)
 {
   build_memory_map();
+  // reset the call stack
+  call_stack = call_stackt{};
 
   total_steps=0;
   const goto_functionst::function_mapt::const_iterator
@@ -83,15 +85,20 @@ void interpretert::initialize(bool init)
   done=false;
   if(init)
   {
-    stack_depth=call_stack.size()+1;
-    show_state();
-    step();
-    while(!done && (stack_depth<=call_stack.size()) && (stack_depth!=npos))
+    // execute instructions up to and including __CPROVER_initialize()
+    while(!done && call_stack.size() == 0)
     {
       show_state();
       step();
     }
-    while(!done && (call_stack.size()==0))
+    // initialization
+    while(!done && call_stack.size() > 0)
+    {
+      show_state();
+      step();
+    }
+    // invoke the user entry point
+    while(!done && call_stack.size() == 0)
     {
       show_state();
       step();
@@ -200,7 +207,7 @@ void interpretert::command()
   else if((ch=='s') || (ch==0))
   {
     num_steps=1;
-    stack_depth=npos;
+    std::size_t stack_depth = npos;
     ch=tolower(command[1]);
     if(ch=='e')
       num_steps=npos;
@@ -210,7 +217,7 @@ void interpretert::command()
       stack_depth=call_stack.size()+1;
     else
     {
-      num_steps=safe_string2size_t(command+1);
+      num_steps = unsafe_string2size_t(command + 1);
       if(num_steps==0)
         num_steps=1;
     }

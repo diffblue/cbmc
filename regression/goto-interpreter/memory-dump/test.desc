@@ -1,6 +1,6 @@
 CORE
 main.c
-s1,so,m
+m
 ^Starting interpreter$
 ^__CPROVER_rounding_mode\[0\]=0$
 ^\d+- Program End\.$
