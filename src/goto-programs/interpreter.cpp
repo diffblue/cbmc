@@ -1070,12 +1070,11 @@ void interpretert::print_memory(bool input_flags)
     const memory_cellt &cell=cell_address.second;
     const auto identifier = address_to_symbol(i).get_identifier();
     const auto offset=address_to_offset(i);
-    debug() << identifier << "[" << offset << "]"
-            << "=" << cell.value << eom;
+    status() << identifier << "[" << offset << "]"
+             << "=" << cell.value << eom;
     if(input_flags)
-      debug() << "(" << static_cast<int>(cell.initialized) << ")"
-              << eom;
-    debug() << eom;
+      status() << "(" << static_cast<int>(cell.initialized) << ")" << eom;
+    status() << eom;
   }
 }
 
