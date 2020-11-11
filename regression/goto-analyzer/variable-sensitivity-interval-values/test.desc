@@ -1,0 +1,11 @@
+CORE
+main.c
+--variable-sensitivity --vsd-intervals --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::zero \(\) -> \[0, 0\] @ \[3\]
+main::1::1::one \(\) -> \[1, 1\] @ \[8\]
+main::1::2::minus_one \(\) -> \[FFFFFFFF, FFFFFFFF\] @ \[13\]
+main::1::between_minus_one_and_one \(\) -> \[FFFFFFFF, 1\] @ \[17\]
+main::1::thirteen \(\) -> \[D, D\] @ \[20\]
+--

@@ -11,6 +11,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/options.h>
 
 #include <analyses/dependence_graph.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
 
 /// Runs the analyzer and then prints out the domain
 /// \param goto_model: the program analyzed
@@ -31,16 +32,38 @@ void static_show_domain(
   {
     out << ai.output_xml(goto_model);
   }
-  else if(options.get_bool_option("dot") &&
-          options.get_bool_option("dependence-graph"))
+  else if(
+    options.get_bool_option("dot") &&
+    (options.get_bool_option("dependence-graph") ||
+     options.get_bool_option("dependence-graph-vs")))
   {
-    const dependence_grapht *d=dynamic_cast<const dependence_grapht*>(&ai);
-    INVARIANT(d!=nullptr,
-              "--dependence-graph sets ai to be a dependence_graph");
+    // It would be nice to cast this to a grapht but C++ templates and
+    // inheritance need some care to work together.
+    if(options.get_bool_option("dependence-graph"))
+    {
+      auto d = dynamic_cast<const dependence_grapht *>(&ai);
+      INVARIANT(
+        d != nullptr,
+        "--dependence-graph should set ai to be a dependence_grapht");
 
-    out << "digraph g {\n";
-    d->output_dot(out);
-    out << "}\n";
+      out << "digraph g {\n";
+      d->output_dot(out);
+      out << "}\n";
+    }
+    else if(options.get_bool_option("dependence-graph-vs"))
+    {
+      auto d =
+        dynamic_cast<const variable_sensitivity_dependence_grapht *>(&ai);
+      INVARIANT(
+        d != nullptr,
+        "--dependence-graph-vsd should set ai to be a "
+        "variable_sensitivity_dependence_grapht");
+
+      out << "digraph g {\n";
+      d->output_dot(out);
+      out << "}\n";
+    }
+    UNREACHABLE;
   }
   else
   {

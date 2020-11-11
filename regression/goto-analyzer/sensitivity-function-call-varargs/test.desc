@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ assertion y == 6: UNKNOWN$
+^\[main\.assertion\.2\] line \d+ assertion z == 0: UNKNOWN$
+--
+^warning: ignoring

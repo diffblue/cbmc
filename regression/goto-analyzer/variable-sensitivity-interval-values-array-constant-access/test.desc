@@ -1,0 +1,7 @@
+CORE
+main.c
+--show --variable-sensitivity --vsd-intervals --vsd-arrays
+^EXIT=0$
+^SIGNAL=0$
+main::1::second_value \(\) -> \[2, 2\] @ \[3\]
+main::1::second_value_after_write \(\) -> \[A, A\] @ \[6\]

@@ -14,6 +14,16 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
+       analyses/variable-sensitivity/abstract_object/merge.cpp \
+       analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
+       analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/eval.cpp \
+       analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
+       analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/last_written_location.cpp \
+       analyses/variable-sensitivity/value_set/abstract_value.cpp \
+       analyses/variable-sensitivity/value_set/array_abstract_object.cpp \
+       analyses/variable-sensitivity/value_set/pointer_abstract_object.cpp \
        ansi-c/max_malloc_size.cpp \
        ansi-c/type2name.cpp \
        big-int/big-int.cpp \

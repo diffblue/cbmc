@@ -1,0 +1,6 @@
+CORE
+main.c
+"--variable-sensitivity --vsd-arrays --vsd-pointers"
+array\[0l\] = 5
+array\[\(signed long int\)nondet\] = 6
+new_array\[1l\] = 7

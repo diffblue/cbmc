@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --variable-sensitivity
+^\[main\.assertion\.1\] line 10 1: SUCCESS
+^\[main\.assertion\.2\] line 11 0 || 1: SUCCESS
+^\[main\.assertion\.3\] line 12 1 && 1: SUCCESS
+^\[main\.assertion\.4\] line 13 1 || x: SUCCESS
+^\[main\.assertion\.5\] line 14 y || 1: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

@@ -1,0 +1,7 @@
+CORE
+main.c
+--variable-sensitivity --verify
+^EXIT=0$
+^SIGNAL=0$
+\[main\.assertion\.1\] line 19 t1 == 5 after calling function with missing body: SUCCESS
+--

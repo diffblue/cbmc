@@ -1,9 +1,9 @@
-FUTURE
+CORE
 sensitivity_test_constants_float.c
---variable --verify
+--variable-sensitivity --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x==0.0: SUCCESS$
-^\[main.assertion.2\] .* assertion x==1.0: FAILURE \(if reachable\)$
+^\[main.assertion.1\] .* x==0.0: SUCCESS$
+^\[main.assertion.2\] .* x==1.0: FAILURE \(if reachable\)$
 --
 ^warning: ignoring

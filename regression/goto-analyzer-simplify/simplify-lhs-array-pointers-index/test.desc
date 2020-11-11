@@ -1,0 +1,8 @@
+CORE
+main.c
+"--variable-sensitivity --vsd-arrays --vsd-pointers"
+
+symbol_a = 1
+symbol_b = 2
+\*arr\[2l\] = 3;
+\*arr\[\(signed long int\)nondet_index\] = 4;

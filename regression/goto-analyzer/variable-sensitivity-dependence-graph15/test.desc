@@ -1,0 +1,11 @@
+CORE
+main.c
+--show --dependence-graph-vs
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+Control dependencies: [0-9]+ \[UNCONDITIONAL\]\n(.*\n){2,3}.*g_out2 = t1;
+Control dependencies: [0-9]+ \[TRUE\]\n(.*\n){2,3}.*g_out1 = t2;
+Control dependencies: [0-9]+ \[FALSE\]\n(.*\n){2,3}.*g_out1 = 0;
+--
+^warning: ignoring

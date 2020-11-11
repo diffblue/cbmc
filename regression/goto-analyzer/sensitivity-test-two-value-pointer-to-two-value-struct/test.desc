@@ -1,13 +1,26 @@
-FUTURE
+CORE
 sensitivity_test_two_value_pointer_to_two_value_struct.c
---variable --verify
+--variable-sensitivity --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion \(\*p\).a==0: UNKNOWN$
-^\[main.assertion.2\] .* assertion \(\*p\).a==1: UNKNOWN$
-^\[main.assertion.3\] .* assertion p->a==0: UNKNOWN$
-^\[main.assertion.4\] .* assertion p->a==1: UNKNOWN$
-^\[main.assertion.5\] .* assertion p->b==2.0: UNKNOWN$
-^\[main.assertion.6\] .* assertion p->b==1.0: UNKNOWN$
+^\[main.assertion.1\] .* \(\*p\).a==0: UNKNOWN$
+^\[main.assertion.2\] .* \(\*p\).a==1: UNKNOWN$
+^\[main.assertion.3\] .* p->a==0: UNKNOWN$
+^\[main.assertion.4\] .* p->a==1: UNKNOWN$
+^\[main.assertion.5\] .* p->b==2.0: UNKNOWN$
+^\[main.assertion.6\] .* p->b==1.0: UNKNOWN$
+^\[main.assertion.8\] .* comp_p==&x.b: UNKNOWN$
+^\[main.assertion.9\] .* \*comp_p==0: UNKNOWN$
+^\[main.assertion.10\] .* \*comp_p==1: UNKNOWN$
+^\[main.assertion.11\] .* compb_p==&x.a: UNKNOWN$
+^\[main.assertion.12\] .* compb_p==&x.b: UNKNOWN$
+^\[main.assertion.13\] .* \*compb_p==2.0: UNKNOWN$
+^\[main.assertion.14\] .* \*compb_p==1.0: UNKNOWN$
+^\[main.assertion.15\] .* implicit_p==&x.a: UNKNOWN$
+^\[main.assertion.16\] .* implicit_p==&x: UNKNOWN$
+^\[main.assertion.17\] .* \*implicit_p==0: UNKNOWN$
+^\[main.assertion.18\] .* \*implicit_p==1: UNKNOWN$
+^\[main.assertion.19\] .* x.a==5: UNKNOWN$
+^\[main.assertion.20\] .* x.a==1: UNKNOWN$
 --
 ^warning: ignoring

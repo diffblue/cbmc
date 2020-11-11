@@ -1,0 +1,11 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ assertion x == 3: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion y == 4: UNKNOWN$
+^\[main\.assertion\.3\] line \d+ assertion z == 0: UNKNOWN$
+^\[main\.assertion\.4\] line \d+ assertion global_value == 4: UNKNOWN$
+--
+^warning: ignoring

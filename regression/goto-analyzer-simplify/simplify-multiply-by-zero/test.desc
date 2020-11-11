@@ -1,0 +1,11 @@
+CORE
+main.c
+"--variable-sensitivity"
+^SIGNAL=0$
+^EXIT=6$
+main#return_value = 0;
+--
+--
+Tests that a multiplication
+of variable*variable can be simplified
+if one of the variables can be evaluated to 0.

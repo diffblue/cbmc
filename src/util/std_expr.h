@@ -113,6 +113,20 @@ public:
   }
 };
 
+// NOLINTNEXTLINE(readability/namespace)
+namespace std
+{
+template <>
+// NOLINTNEXTLINE(readability/identifiers)
+struct hash<::symbol_exprt>
+{
+  size_t operator()(const ::symbol_exprt &sym)
+  {
+    return irep_id_hash()(sym.get_identifier());
+  }
+};
+} // namespace std
+
 /// Expression to hold a symbol (variable) with extra accessors to
 /// ID_c_static_lifetime and ID_C_thread_local
 class decorated_symbol_exprt:public symbol_exprt

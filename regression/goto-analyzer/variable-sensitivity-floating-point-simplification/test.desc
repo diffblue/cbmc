@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable-sensitivity --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion\.1\] line 12 assertion small_0_1 < big_0_1: SUCCESS
+^\[main.assertion\.2\] line 24 assertion one / 10.0f < 0.2f: SUCCESS
+^\[main.assertion\.3\] line 33 assertion one_tenth_ish < 0.2f: UNKNOWN
+^\[main.assertion\.4\] line 38 assertion 10.0f / five == 2.0f: SUCCESS

@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --variable-sensitivity
+^\[main.assertion.1\] line 10 0: FAILURE \(if reachable\)$
+^\[main.assertion.2\] line 11 0 && 1: FAILURE \(if reachable\)$
+^\[main.assertion.3\] line 12 0 || 0: FAILURE \(if reachable\)$
+^\[main.assertion.4\] line 13 0 && x: FAILURE \(if reachable\)$
+^\[main.assertion.5\] line 14 y && 0: FAILURE \(if reachable\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
