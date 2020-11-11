@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 src=../../../src
 goto_cc=$src/goto-cc/goto-cc
 goto_instrument=$src/goto-instrument/goto-instrument
@@ -16,9 +18,7 @@ k=$1
 $goto_cc -o $name.o $name.c
 
 $goto_instrument --k-induction $k --base-case $name.o $name.base.o
-$cbmc $name.base.o
-if [ $? == 0 ] ; then echo "## Base case passes" ; else echo "## Base case fails" ; fi
+if $cbmc $name.base.o ; then echo "## Base case passes" ; else echo "## Base case fails" ; fi
 
 $goto_instrument --k-induction $k --step-case $name.o $name.step.o
-$cbmc $name.step.o
-if [ $? == 0 ] ; then echo "## Step case passes" ; else echo "## Step case fails" ; fi
+if $cbmc $name.step.o ; then echo "## Step case passes" ; else echo "## Step case fails" ; fi

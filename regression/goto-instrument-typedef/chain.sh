@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 GC=$1
 GI=$2
 is_windows=$3
@@ -9,7 +11,7 @@ name=${name%.c}
 
 args=${*:4:$#-4}
 
-rm "${name}.gb"
+rm -f "${name}.gb"
 if [[ "${is_windows}" == "true" ]]; then
   "$GC" "${name}.c" --function fun
   mv "${name}.exe" "${name}.gb"
