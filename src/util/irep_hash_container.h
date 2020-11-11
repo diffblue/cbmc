@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_IREP_HASH_CONTAINER_H
 #define CPROVER_UTIL_IREP_HASH_CONTAINER_H
 
+#include <map>
 #include <vector>
 
 #include "irep.h"
