@@ -742,9 +742,7 @@ void interpretert::execute_assert()
 {
   if(!evaluate_boolean(pc->get_condition()))
   {
-    if((target_assert==pc) || stop_on_assertion)
-      throw "program assertion reached";
-    else if(show)
+    if(show)
       error() << "assertion failed at " << pc->location_number
               << "\n" << eom;
   }
