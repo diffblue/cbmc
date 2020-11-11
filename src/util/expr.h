@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_EXPR_H
 
 #include "as_const.h"
-#include "deprecate.h"
 #include "type.h"
 #include "validate_expressions.h"
 #include "validate_types.h"
@@ -128,24 +127,6 @@ protected:
 public:
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
-
-  DEPRECATED(SINCE(2018, 10, 1, "use add_to_operands(std::move(expr)) instead"))
-  void move_to_operands(exprt &expr);
-
-  DEPRECATED(SINCE(
-    2018,
-    10,
-    1,
-    "use add_to_operands(std::move(e1), std::move(e2)) instead"))
-  void move_to_operands(exprt &e1, exprt &e2);
-
-  DEPRECATED(SINCE(
-    2018,
-    10,
-    1,
-    "use add_to_operands(std::move(e1), std::move(e2), std::move(e3))"
-    "instead"))
-  void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
 
   /// Copy the given argument to the end of `exprt`'s operands.
   /// \param expr: `exprt` to append to the operands
