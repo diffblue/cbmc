@@ -330,8 +330,9 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
                                     .symbol_expr();
       main_arguments[param_number] = result;
       init_code.add(code_declt{result});
-      init_code.add(
-        code_assignt{result, side_effect_exprt(ID_java_new, p.type())});
+      init_code.add(code_assignt{
+        result,
+        side_effect_exprt{ID_java_new, {}, p.type(), function.location}});
       continue;
     }
 

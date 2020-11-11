@@ -1865,15 +1865,6 @@ inline const code_expressiont &to_code_expression(const codet &code)
 class side_effect_exprt : public exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 8, 9, "use side_effect_exprt(statement, type, loc) instead"))
-  side_effect_exprt(const irep_idt &statement, const typet &_type)
-    : exprt(ID_side_effect, _type)
-  {
-    set_statement(statement);
-  }
-
-  /// constructor with operands
   side_effect_exprt(
     const irep_idt &statement,
     operandst _operands,
@@ -2116,24 +2107,6 @@ to_side_effect_expr_statement_expression(const exprt &expr)
 class side_effect_expr_function_callt:public side_effect_exprt
 {
 public:
-  DEPRECATED(SINCE(
-    2018,
-    8,
-    9,
-    "use side_effect_expr_function_callt("
-    "function, arguments, type, loc) instead"))
-  side_effect_expr_function_callt(
-    const exprt &_function,
-    const exprt::operandst &_arguments,
-    const typet &_type)
-    : side_effect_exprt(ID_function_call, _type)
-  {
-    operands().resize(2);
-    op1().id(ID_arguments);
-    function() = _function;
-    arguments() = _arguments;
-  }
-
   side_effect_expr_function_callt(
     exprt _function,
     exprt::operandst _arguments,
