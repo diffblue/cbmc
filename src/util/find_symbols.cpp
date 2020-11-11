@@ -63,16 +63,6 @@ bool has_symbol(
 
 void find_symbols(
   const exprt &src,
-  std::set<exprt> &dest)
-{
-  src.visit_pre([&dest](const exprt &e) {
-    if(e.id() == ID_symbol || e.id() == ID_next_symbol)
-      dest.insert(e);
-  });
-}
-
-void find_symbols(
-  const exprt &src,
   std::set<symbol_exprt> &dest)
 {
   src.visit_pre([&dest](const exprt &e) {
