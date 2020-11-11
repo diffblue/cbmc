@@ -35,6 +35,7 @@ DIRS = cbmc \
        goto-ld \
        validate-trace-xml-schema \
        cbmc-primitives \
+       goto-interpreter \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

@@ -1,0 +1,18 @@
+CORE
+main.c
+h,q
+^Starting interpreter$
+^Interpreter help$
+^h: display this menu$
+^j: output json trace$
+^m: output memory dump$
+^o: output goto trace$
+^q: quit$
+^r: run until completion$
+^s#: step a number of instructions$
+^sa: step across a function$
+^so: step out of a function$
+^\d+- Program End\.$
+^EXIT=0$
+^SIGNAL=0$
+--
