@@ -9,17 +9,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_EXPR_H
 #define CPROVER_UTIL_EXPR_H
 
+#include "as_const.h"
 #include "deprecate.h"
 #include "type.h"
 #include "validate_expressions.h"
 #include "validate_types.h"
 #include "validation_mode.h"
 
-#define forall_operands(it, expr) \
-  if((expr).has_operands()) /* NOLINT(readability/braces) */ \
-    for(exprt::operandst::const_iterator it=(expr).operands().begin(), \
-        it##_end=(expr).operands().end(); \
-        it!=it##_end; ++it)
+#define forall_operands(it, expr)                                              \
+  for(exprt::operandst::const_iterator                                         \
+        it = as_const(expr).operands().begin(),                                \
+        it##_end = as_const(expr).operands().end();                            \
+      it != it##_end;                                                          \
+      ++it)
 
 #define Forall_operands(it, expr) \
   if((expr).has_operands()) /* NOLINT(readability/braces) */ \

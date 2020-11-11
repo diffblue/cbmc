@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
-#include "as_const.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "narrow.h"
