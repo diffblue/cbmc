@@ -54,19 +54,16 @@ void unwindsett::parse_unwindset_one_loop(std::string val)
   }
 }
 
-void unwindsett::parse_unwindset(const std::string &unwindset)
-{
-  std::vector<std::string> unwindset_elements =
-    split_string(unwindset, ',', true, true);
-
-  for(auto &element : unwindset_elements)
-    parse_unwindset_one_loop(element);
-}
-
 void unwindsett::parse_unwindset(const std::list<std::string> &unwindset)
 {
   for(auto &element : unwindset)
-    parse_unwindset(element);
+  {
+    std::vector<std::string> unwindset_elements =
+      split_string(element, ',', true, true);
+
+    for(auto &element : unwindset_elements)
+      parse_unwindset_one_loop(element);
+  }
 }
 
 optionalt<unsigned>
@@ -104,5 +101,10 @@ void unwindsett::parse_unwindset_file(const std::string &file_name)
 
   std::stringstream buffer;
   buffer << file.rdbuf();
-  parse_unwindset(buffer.str());
+
+  std::vector<std::string> unwindset_elements =
+    split_string(buffer.str(), ',', true, true);
+
+  for(auto &element : unwindset_elements)
+    parse_unwindset_one_loop(element);
 }

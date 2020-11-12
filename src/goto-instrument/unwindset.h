@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <string>
 
-#include <util/deprecate.h>
 #include <util/irep.h>
 #include <util/optional.h>
 
@@ -31,10 +30,6 @@ public:
 
   // global limit for all loops
   void parse_unwind(const std::string &unwind);
-
-  // limit for instances of a loop
-  DEPRECATED(SINCE(2019, 11, 15, "use parse_unwindset(list) instead"))
-  void parse_unwindset(const std::string &unwindset);
 
   // limit for instances of a loop
   void parse_unwindset(const std::list<std::string> &unwindset);
