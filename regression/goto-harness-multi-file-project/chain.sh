@@ -7,6 +7,13 @@ goto_harness="$2"
 cbmc="$3"
 goto_harness_args="${@:4:$#-4}"
 
+cleanup()
+{
+  rm -rf "$target_dir"
+}
+
+trap cleanup EXIT
+
 source_dir="$(pwd)"
 target_dir="$(mktemp -d)"
 

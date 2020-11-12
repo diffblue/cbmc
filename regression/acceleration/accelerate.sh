@@ -1,4 +1,11 @@
-#!/bin/sh
+#!/bin/bash
+
+cleanup()
+{
+  rm -f $ofile $accfile $instrfile
+}
+
+trap cleanup EXIT
 
 bindir=`dirname $0`
 goto_cc="$bindir/../../goto-cc/goto-cc"
@@ -26,8 +33,3 @@ $goto_cc $cfile -o $ofile
 $goto_instrument --inline --remove-pointers $ofile $instrfile
 timeout 5 $goto_instrument --accelerate $instrfile $accfile
 timeout 5 $cbmc --unwind 5 --z3 $cbmcargs $accfile
-retcode=$?
-
-#rm -f $ofile $accfile $instrfile
-
-exit $retcode
