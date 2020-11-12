@@ -133,14 +133,6 @@ bool value_sett::insert(
   return true;
 }
 
-void value_sett::output(
-  const namespacet &,
-  std::ostream &out,
-  const std::string &indent) const
-{
-  output(out, indent);
-}
-
 void value_sett::output(std::ostream &out, const std::string &indent) const
 {
   values.iterate([&](const irep_idt &, const entryt &e) {
@@ -356,44 +348,12 @@ bool value_sett::eval_pointer_offset(
   return mod;
 }
 
-void value_sett::get_value_set(
-  exprt expr,
-  value_setst::valuest &dest,
-  const namespacet &ns) const
-{
-  object_mapt object_map = get_value_set(std::move(expr), ns, false);
-
-  for(object_map_dt::const_iterator
-      it=object_map.read().begin();
-      it!=object_map.read().end();
-      it++)
-    dest.push_back(to_expr(*it));
-
-  #if 0
-  for(value_setst::valuest::const_iterator it=dest.begin();
-      it!=dest.end(); it++)
-    std::cout << "GET_VALUE_SET: " << format(*it) << '\n';
-  #endif
-}
-
 std::vector<exprt>
 value_sett::get_value_set(exprt expr, const namespacet &ns) const
 {
   const object_mapt object_map = get_value_set(std::move(expr), ns, false);
   return make_range(object_map.read())
     .map([&](const object_map_dt::value_type &pair) { return to_expr(pair); });
-}
-
-void value_sett::get_value_set(
-  exprt expr,
-  object_mapt &dest,
-  const namespacet &ns,
-  bool is_simplified) const
-{
-  if(!is_simplified)
-    simplify(expr, ns);
-
-  get_value_set_rec(expr, dest, "", expr.type(), ns);
 }
 
 value_sett::object_mapt value_sett::get_value_set(

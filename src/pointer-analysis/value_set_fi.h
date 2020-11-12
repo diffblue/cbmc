@@ -205,12 +205,6 @@ public:
   typedef std::unordered_set<idt, string_hash> assign_recursion_sett;
   #endif
 
-  DEPRECATED(SINCE(2019, 05, 22, "Use the version returning vector instead"))
-  void get_value_set(
-    const exprt &expr,
-    std::list<exprt> &dest,
-    const namespacet &ns) const;
-
   std::vector<exprt>
   get_value_set(const exprt &expr, const namespacet &ns) const;
 

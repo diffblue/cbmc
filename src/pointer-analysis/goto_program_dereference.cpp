@@ -126,17 +126,6 @@ void goto_program_dereferencet::dereference_rec(exprt &expr)
 }
 
 /// Gets the value set corresponding to the current target and
-/// expression `expr`.
-/// \param expr: an expression
-/// \param [out] dest: gets the value set
-void goto_program_dereferencet::get_value_set(
-  const exprt &expr,
-  value_setst::valuest &dest) const
-{
-  value_sets.get_values(current_function, current_target, expr, dest);
-}
-
-/// Gets the value set corresponding to the current target and
 /// expression \p expr.
 /// \param expr: an expression
 /// \return the value set
