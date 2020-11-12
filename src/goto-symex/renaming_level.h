@@ -31,12 +31,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 using symex_renaming_levelt =
   sharing_mapt<irep_idt, std::pair<ssa_exprt, std::size_t>>;
 
-/// Add the \c ssa_exprt of current_names to vars
-DEPRECATED(SINCE(2019, 6, 5, "Unused"))
-void get_variables(
-  const symex_renaming_levelt &current_names,
-  std::unordered_set<ssa_exprt, irep_hash> &vars);
-
 /// Set the level 0 renaming of SSA expressions.
 /// Level 0 corresponds to threads.
 /// The renaming is built for one particular interleaving.

@@ -428,16 +428,6 @@ void interpretert::execute_decl()
   PRECONDITION(pc->code.get_statement()==ID_decl);
 }
 
-/// retrieves the member at offset
-/// \par parameters: an object and a memory offset
-struct_typet::componentt interpretert::get_component(
-  const irep_idt &object,
-  const mp_integer &offset)
-{
-  const symbolt &symbol = ns.lookup(object);
-  return get_component(symbol.type, offset);
-}
-
 /// Retrieves the member at \p offset of an object of type \p object_type.
 struct_typet::componentt
 interpretert::get_component(const typet &object_type, const mp_integer &offset)

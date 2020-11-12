@@ -23,13 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <unordered_set>
 
-bool java_is_array_type(const typet &type)
-{
-  if(type.id() != ID_struct)
-    return false;
-  return is_java_array_tag(to_struct_type(type).get_tag());
-}
-
 bool is_java_string_type(const struct_typet &struct_type)
 {
   return java_string_library_preprocesst::implements_java_char_sequence(

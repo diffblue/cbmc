@@ -17,19 +17,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "goto_symex_state.h"
 
-void get_variables(
-  const symex_renaming_levelt &current_names,
-  std::unordered_set<ssa_exprt, irep_hash> &vars)
-{
-  symex_renaming_levelt::viewt view;
-  current_names.get_view(view);
-
-  for(const auto &pair : view)
-  {
-    vars.insert(pair.second.first);
-  }
-}
-
 renamedt<ssa_exprt, L0>
 symex_level0(ssa_exprt ssa_expr, const namespacet &ns, std::size_t thread_nr)
 {

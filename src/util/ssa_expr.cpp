@@ -218,11 +218,6 @@ bool ssa_exprt::can_build_identifier(const exprt &expr)
     return false;
 }
 
-void ssa_exprt::update_identifier()
-{
-  ::update_identifier(*this);
-}
-
 ssa_exprt remove_level_2(ssa_exprt ssa)
 {
   ssa.remove_level_2();
