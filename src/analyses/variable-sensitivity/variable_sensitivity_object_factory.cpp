@@ -8,6 +8,7 @@
 #include "variable_sensitivity_object_factory.h"
 #include "interval_array_abstract_object.h"
 #include "util/namespace.h"
+#include "value_set_abstract_value.h"
 
 variable_sensitivity_object_factoryt
   variable_sensitivity_object_factoryt::s_instance;
@@ -24,10 +25,18 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
   {
     abstract_object_type =
       configuration.advanced_sensitivities.intervals ? INTERVAL : CONSTANT;
+    if(configuration.advanced_sensitivities.new_value_set)
+    {
+      abstract_object_type = VALUE_SET;
+    }
   }
   else if(type.id() == ID_floatbv)
   {
     abstract_object_type = CONSTANT;
+    if(configuration.advanced_sensitivities.new_value_set)
+    {
+      abstract_object_type = VALUE_SET;
+    }
   }
   else if(type.id() == ID_array)
   {
@@ -121,6 +130,11 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   case VALUE_SET:
+    if(configuration.advanced_sensitivities.new_value_set)
+    {
+      return initialize_abstract_object<value_set_abstract_valuet>(
+        followed_type, top, bottom, e, environment, ns);
+    }
     return initialize_abstract_object<value_set_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   default:

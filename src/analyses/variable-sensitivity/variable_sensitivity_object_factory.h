@@ -50,6 +50,7 @@ struct vsd_configt
   {
     bool intervals;
     bool value_set;
+    bool new_value_set;
   } advanced_sensitivities;
 
   static vsd_configt from_options(const optionst &options)
@@ -83,6 +84,8 @@ struct vsd_configt
       options.get_bool_option("interval");
     config.advanced_sensitivities.value_set =
       options.get_bool_option("value-set");
+    config.advanced_sensitivities.new_value_set =
+      options.get_bool_option("new-value-set");
 
     return config;
   }
