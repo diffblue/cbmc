@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 Main
---function Main.constantIsEmptyFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.constantIsEmptyFail:()V.assertion.1"
+--function Main.constantIsEmptyFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Main.constantIsEmptyFail:()V.assertion.1'
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
