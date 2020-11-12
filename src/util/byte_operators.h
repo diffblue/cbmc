@@ -92,13 +92,6 @@ public:
       "byte_update_exprt: Invalid ID");
   }
 
-  DEPRECATED(SINCE(2019, 5, 21, "use set_op or as_const instead"))
-  exprt &op() { return op0(); }
-  DEPRECATED(SINCE(2019, 5, 21, "use set_offset or as_const instead"))
-  exprt &offset() { return op1(); }
-  DEPRECATED(SINCE(2019, 5, 21, "use set_value or as_const instead"))
-  exprt &value() { return op2(); }
-
   void set_op(exprt e)
   {
     op0() = std::move(e);
