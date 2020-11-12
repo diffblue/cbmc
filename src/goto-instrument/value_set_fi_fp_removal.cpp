@@ -112,9 +112,7 @@ void remove_function_pointer(
 
   // the final target is a skip
   goto_programt final_skip;
-
-  goto_programt::targett t_final = final_skip.add_instruction();
-  t_final->make_skip();
+  goto_programt::targett t_final = final_skip.add(goto_programt::make_skip());
 
   // build the calls and gotos
 
@@ -124,8 +122,8 @@ void remove_function_pointer(
   for(const auto &fun : functions)
   {
     // call function
-    goto_programt::targett t1 = new_code_calls.add_instruction();
-    t1->make_function_call(code);
+    goto_programt::targett t1 =
+      new_code_calls.add(goto_programt::make_function_call(code));
     to_code_function_call(t1->code).function() = fun;
 
     // the signature of the function might not match precisely
@@ -135,21 +133,20 @@ void remove_function_pointer(
       to_code_function_call(t1->code), new_code_calls, goto_model);
 
     // goto final
-    goto_programt::targett t3 = new_code_calls.add_instruction();
-    t3->make_goto(t_final, true_exprt());
+    new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
 
     // goto to call
     address_of_exprt address_of(fun, pointer_type(fun.type()));
 
-    goto_programt::targett t4 = new_code_gotos.add_instruction();
-    t4->make_goto(
+    new_code_gotos.add(goto_programt::make_goto(
       t1,
       equal_exprt(
-        pointer, typecast_exprt::conditional_cast(address_of, pointer.type())));
+        pointer,
+        typecast_exprt::conditional_cast(address_of, pointer.type()))));
   }
 
-  goto_programt::targett t = new_code_gotos.add_instruction();
-  t->make_assertion(false_exprt());
+  goto_programt::targett t =
+    new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
   t->source_location.set_property_class("pointer dereference");
   t->source_location.set_comment("invalid function pointer");
 
