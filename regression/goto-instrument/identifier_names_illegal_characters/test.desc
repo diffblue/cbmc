@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 test.c
-
+--dump-c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
