@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 Main
---function Main.constantIsEmptyPass --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Main.constantIsEmptyPass:()V.assertion.1"
+--function Main.constantIsEmptyPass --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Main.constantIsEmptyPass:()V.assertion.1'
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

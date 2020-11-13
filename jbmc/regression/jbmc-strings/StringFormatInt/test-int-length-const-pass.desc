@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 Test
---function Test.testIntLengthConstPASS --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testIntLengthConstPASS:()V.assertion.1"
+--function Test.testIntLengthConstPASS --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.testIntLengthConstPASS:()V.assertion.1'
 ^EXIT=0$
 ^SIGNAL=0$
 line 20 assertion at file Test.java .*: SUCCESS

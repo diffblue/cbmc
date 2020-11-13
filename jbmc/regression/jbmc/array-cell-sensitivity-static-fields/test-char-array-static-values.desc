@@ -1,6 +1,6 @@
-CORE symex-driven-lazy-loading-expected-failure winbug
+CORE symex-driven-lazy-loading-expected-failure
 Test
---function Test.charArray --property "java::Test.charArray:()[C.assertion.2" --static-values static-values.json
+--function Test.charArray --property 'java::Test.charArray:()[C.assertion.2' --static-values static-values.json
 Generated 0 VCC[(]s[)], 0 remaining after simplification
 assertion at file Test.java line 21 .*: SUCCESS
 ^EXIT=0$

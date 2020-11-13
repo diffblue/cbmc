@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 Test
---function Test.newlineLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.newlineLength:()Ljava/lang/String;.assertion.1"
+--function Test.newlineLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.newlineLength:()Ljava/lang/String;.assertion.1'
 ^EXIT=10$
 ^SIGNAL=0$
 line 32 assertion at file Test.java .*: FAILURE
