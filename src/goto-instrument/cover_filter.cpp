@@ -29,7 +29,7 @@ bool internal_functions_filtert::operator()(
   if(function.name == INITIALIZE_FUNCTION)
     return false;
 
-  if(function.is_hidden())
+  if(goto_function.is_hidden())
     return false;
 
   // ignore Java built-ins (synthetic functions)

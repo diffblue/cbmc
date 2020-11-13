@@ -60,19 +60,17 @@ public:
     return type.get_bool(ID_C_inlined);
   }
 
-  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
   bool is_hidden() const
   {
-    return type.get_bool(ID_C_hide);
+    return function_is_hidden;
   }
 
-  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
   void make_hidden()
   {
-    type.set(ID_C_hide, true);
+    function_is_hidden = true;
   }
 
-  goto_functiont() : body(), type({}, empty_typet())
+  goto_functiont() : body(), type({}, empty_typet()), function_is_hidden(false)
   {
   }
 
@@ -81,6 +79,7 @@ public:
     body.clear();
     type.clear();
     parameter_identifiers.clear();
+    function_is_hidden = false;
   }
 
   void swap(goto_functiont &other)
@@ -88,6 +87,7 @@ public:
     body.swap(other.body);
     type.swap(other.type);
     parameter_identifiers.swap(other.parameter_identifiers);
+    std::swap(function_is_hidden, other.function_is_hidden);
   }
 
   void copy_from(const goto_functiont &other)
@@ -95,6 +95,7 @@ public:
     body.copy_from(other.body);
     type = other.type;
     parameter_identifiers = other.parameter_identifiers;
+    function_is_hidden = other.function_is_hidden;
   }
 
   goto_functiont(const goto_functiont &) = delete;
@@ -103,7 +104,8 @@ public:
   goto_functiont(goto_functiont &&other)
     : body(std::move(other.body)),
       type(std::move(other.type)),
-      parameter_identifiers(std::move(other.parameter_identifiers))
+      parameter_identifiers(std::move(other.parameter_identifiers)),
+      function_is_hidden(other.function_is_hidden)
   {
   }
 
@@ -112,6 +114,7 @@ public:
     body = std::move(other.body);
     type = std::move(other.type);
     parameter_identifiers = std::move(other.parameter_identifiers);
+    function_is_hidden = other.function_is_hidden;
     return *this;
   }
 
@@ -120,6 +123,9 @@ public:
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(const namespacet &ns, const validation_modet vm) const;
+
+protected:
+  bool function_is_hidden;
 };
 
 void get_local_identifiers(const goto_functiont &, std::set<irep_idt> &dest);
