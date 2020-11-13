@@ -16,6 +16,7 @@ Author: Michael Tautschnig
 
 #include <util/prefix.h>
 
+// clang-format off
 // non-bcc options
 const char *goto_bcc_options_with_argument[]=
 {
@@ -24,6 +25,8 @@ const char *goto_bcc_options_with_argument[]=
   "--native-compiler",
   "--native-linker",
   "--print-rejected-preprocessed-source",
+  "--mangle-suffix",
+  "--object-bits",
   nullptr
 };
 
@@ -66,6 +69,7 @@ const char *bcc_options_with_argument[]=
   "-t",
   nullptr
 };
+// clang-format on
 
 bool bcc_cmdlinet::parse(int argc, const char **argv)
 {

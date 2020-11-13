@@ -19,14 +19,17 @@ Author: Daniel Kroening
 
 #include <util/unicode.h>
 
+// clang-format off
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 const char *non_ms_link_options[]=
 {
   "--help",
-  "--verbosity"
+  "--verbosity",
+  "--validate-goto-model"
 };
+// clang-format on
 
 bool ms_link_cmdlinet::parse(const std::vector<std::string> &arguments)
 {
