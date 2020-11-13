@@ -23,6 +23,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #ifndef CPROVER_ANALYSES_AI_STORAGE_H
 #define CPROVER_ANALYSES_AI_STORAGE_H
 
+#include <util/deprecate.h>
+
 #include <goto-programs/goto_program.h>
 
 #include "ai_domain.h"
