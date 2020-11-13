@@ -20,12 +20,14 @@ Date: January 2010
 
 void uninitialized_domaint::transform(
   const irep_idt &,
-  locationt from,
+  trace_ptrt trace_from,
   const irep_idt &,
-  locationt,
+  trace_ptrt,
   ai_baset &,
   const namespacet &ns)
 {
+  locationt from{trace_from->current_location()};
+
   if(has_values.is_false())
     return;
 

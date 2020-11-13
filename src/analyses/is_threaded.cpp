@@ -48,12 +48,14 @@ public:
 
   void transform(
     const irep_idt &,
-    locationt from,
+    trace_ptrt trace_from,
     const irep_idt &,
-    locationt,
+    trace_ptrt,
     ai_baset &,
-    const namespacet &) final override
+    const namespacet &) override
   {
+    locationt from{trace_from->current_location()};
+
     INVARIANT(reachable,
               "Transformers are only applied at reachable locations");
 

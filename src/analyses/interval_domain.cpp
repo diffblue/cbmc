@@ -57,13 +57,16 @@ void interval_domaint::output(
 }
 
 void interval_domaint::transform(
-  const irep_idt &,
-  locationt from,
-  const irep_idt &,
-  locationt to,
-  ai_baset &,
+  const irep_idt &function_from,
+  trace_ptrt trace_from,
+  const irep_idt &function_to,
+  trace_ptrt trace_to,
+  ai_baset &ai,
   const namespacet &ns)
 {
+  locationt from{trace_from->current_location()};
+  locationt to{trace_to->current_location()};
+
   const goto_programt::instructiont &instruction=*from;
   switch(instruction.type)
   {

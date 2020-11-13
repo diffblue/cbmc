@@ -125,9 +125,9 @@ bool ai_three_way_merget::visit_edge_function_call(
     // but in VSD it does, so this cannot be omitted.
     s_working.transform(
       callee_function_id,
-      l_callee_end,
+      p_callee_end,
       calling_function_id,
-      l_return_site,
+      p_return_site,
       *this,
       ns);
 

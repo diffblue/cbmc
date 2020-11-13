@@ -149,17 +149,17 @@ public:
   /// `transform_*` method for the recognised instruction.
   /// \param function_from: Just passed to `transform_function_call` and
   ///   `transform_end_function` callees.
-  /// \param from: Reference to a GOTO instruction according to which `*this`
-  ///   instance should be transformed.
+  /// \param trace_from: The ai_history giving the GOTO instruction which
+  ///    `*this` instance should be transformed.
   /// \param function_to: Just passed to `transform_function_call` callee.
-  /// \param to: Just passed to `transform_end_function` callee.
+  /// \param trace_to: Just passed to `transform_end_function` callee.
   /// \param ai: A reference to 'reaching_definitions_analysist' instance.
   /// \param ns: Just passed to callees.
   void transform(
     const irep_idt &function_from,
-    locationt from,
+    trace_ptrt trace_from,
     const irep_idt &function_to,
-    locationt to,
+    trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) final override;
 

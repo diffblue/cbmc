@@ -194,12 +194,15 @@ void dep_graph_domaint::data_dependencies(
 
 void dep_graph_domaint::transform(
   const irep_idt &function_from,
-  goto_programt::const_targett from,
+  trace_ptrt trace_from,
   const irep_idt &function_to,
-  goto_programt::const_targett to,
+  trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
 {
+  locationt from{trace_from->current_location()};
+  locationt to{trace_to->current_location()};
+
   dependence_grapht *dep_graph=dynamic_cast<dependence_grapht*>(&ai);
   assert(dep_graph!=nullptr);
 

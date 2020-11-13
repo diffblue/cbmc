@@ -38,9 +38,9 @@ public:
 
   void transform(
     const irep_idt &,
-    locationt,
+    trace_ptrt,
     const irep_idt &,
-    locationt,
+    trace_ptrt,
     ai_baset &,
     const namespacet &) override
   {
