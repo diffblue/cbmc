@@ -63,7 +63,7 @@ if is_in compile-and-link "$ALL_ARGS"; then
           ${wall}                         \
           ${suffix}                       \
           ${SRC}                          \
-          /Fe"${OUT_FILE}"
+          "/Fe${OUT_FILE}"
   
     else
       "${goto_cc}"                        \
@@ -95,8 +95,8 @@ else
           --verbosity 10                  \
           ${wall}                         \
           ${suffix}                       \
-          /c "${base}.c"                  \
-          /Fo"${OUT_FILE}"
+          '/c' "${base}.c"                  \
+          "/Fo${OUT_FILE}"
   
     else
       "${goto_cc}"                        \
@@ -120,7 +120,7 @@ if is_in final-link "$ALL_ARGS"; then
         ${wall}                         \
         ${suffix}                       \
         ./*.gb                          \
-        /Fe"${OUT_FILE}"
+        "/Fe${OUT_FILE}"
 
   else
     "${goto_cc}"                        \
