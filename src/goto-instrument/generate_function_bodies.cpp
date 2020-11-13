@@ -64,7 +64,6 @@ void generate_function_bodiest::generate_parameter_names(
       symbol_table.add(new_param_sym);
     }
   }
-  function.type = to_code_type(function_symbol.type);
   function.set_parameter_identifiers(to_code_type(function_symbol.type));
 }
 
@@ -321,9 +320,10 @@ protected:
       function.body.destructive_append(dest);
     }
 
-    if(function.type.return_type() != empty_typet())
+    const typet &return_type = to_code_type(function_symbol.type).return_type();
+    if(return_type != empty_typet())
     {
-      typet type(function.type.return_type());
+      typet type(return_type);
       type.remove(ID_C_constant);
 
       symbolt &aux_symbol = get_fresh_aux_symbol(
@@ -350,8 +350,8 @@ protected:
 
       function.body.destructive_append(dest);
 
-      exprt return_expr = typecast_exprt::conditional_cast(
-        aux_symbol.symbol_expr(), function.type.return_type());
+      exprt return_expr =
+        typecast_exprt::conditional_cast(aux_symbol.symbol_expr(), return_type);
 
       add_instruction(goto_programt::make_return(code_returnt(return_expr)));
 
@@ -590,8 +590,6 @@ void generate_function_bodies(
     model.symbol_table.lookup_ref(havoc_function_symbol.name);
 
   // convert to get the function stub to goto-model
-  model.goto_functions.function_map[havoc_function_symbol.name].type =
-    to_code_type(generated_havoc.type);
   goto_convert(model.symbol_table, model.goto_functions, message_handler);
 
   // now generate body as above

@@ -283,8 +283,6 @@ void remove_complex(symbol_tablet &symbol_table)
 static void remove_complex(
   goto_functionst::goto_functiont &goto_function)
 {
-  remove_complex(goto_function.type);
-
   for(auto &i : goto_function.body.instructions)
     i.transform([](exprt e) -> optionalt<exprt> {
       if(have_to_remove_complex(e))

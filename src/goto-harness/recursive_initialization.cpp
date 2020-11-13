@@ -366,8 +366,6 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
     expr_name,
     is_nullable);
 
-  goto_model.goto_functions.function_map[function_symbol.name].type =
-    to_code_type(function_symbol.type);
   return type_constructor_names.at(key);
 }
 

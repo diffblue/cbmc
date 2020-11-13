@@ -484,8 +484,8 @@ void code_contractst::instrument_call_statement(
       return;
     }
 
-    exprt called_assigns = static_cast<const exprt &>(
-      called_func->second.type.find(ID_C_spec_assigns));
+    exprt called_assigns =
+      static_cast<const exprt &>(called_sym.type.find(ID_C_spec_assigns));
     if(called_assigns.is_nil()) // Called function has no assigns clause
     {
       // Fail if called function has no assigns clause.
@@ -749,8 +749,6 @@ bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
 
   goto_functiont &wrapper = goto_functions.function_map[original];
   wrapper.parameter_identifiers = mangled_fun->second.parameter_identifiers;
-  if(mangled_fun->second.type.is_not_nil())
-    wrapper.type = mangled_fun->second.type;
   wrapper.body.add(goto_programt::make_end_function(sl));
   add_contract_check(original, mangled, wrapper.body);
   return false;
@@ -763,18 +761,15 @@ void code_contractst::add_contract_check(
 {
   PRECONDITION(!dest.instructions.empty());
 
-  goto_functionst::function_mapt::iterator f_it =
-    goto_functions.function_map.find(mangled_fun);
-  PRECONDITION(f_it != goto_functions.function_map.end());
-
-  const goto_functionst::goto_functiont &gf = f_it->second;
+  const symbolt &function_symbol = ns.lookup(mangled_fun);
+  const code_typet &code_type = to_code_type(function_symbol.type);
 
   const exprt &assigns =
-    static_cast<const exprt &>(gf.type.find(ID_C_spec_assigns));
+    static_cast<const exprt &>(code_type.find(ID_C_spec_assigns));
   const exprt &requires =
-    static_cast<const exprt &>(gf.type.find(ID_C_spec_requires));
+    static_cast<const exprt &>(code_type.find(ID_C_spec_requires));
   const exprt &ensures =
-    static_cast<const exprt &>(gf.type.find(ID_C_spec_ensures));
+    static_cast<const exprt &>(code_type.find(ID_C_spec_ensures));
   INVARIANT(
     ensures.is_not_nil() || assigns.is_not_nil(),
     "Code contract enforcement is trivial without an ensures or assigns "
@@ -803,15 +798,14 @@ void code_contractst::add_contract_check(
     skip->source_location));
 
   // prepare function call including all declarations
-  const symbolt &function_symbol = ns.lookup(mangled_fun);
   code_function_callt call(function_symbol.symbol_expr());
   replace_symbolt replace;
 
   // decl ret
-  if(gf.type.return_type()!=empty_typet())
+  if(code_type.return_type() != empty_typet())
   {
     symbol_exprt r = new_tmp_symbol(
-                       gf.type.return_type(),
+                       code_type.return_type(),
                        skip->source_location,
                        wrapper_fun,
                        function_symbol.mode)
@@ -825,6 +819,11 @@ void code_contractst::add_contract_check(
   }
 
   // decl parameter1 ...
+  goto_functionst::function_mapt::iterator f_it =
+    goto_functions.function_map.find(mangled_fun);
+  PRECONDITION(f_it != goto_functions.function_map.end());
+
+  const goto_functionst::goto_functiont &gf = f_it->second;
   for(const auto &parameter : gf.parameter_identifiers)
   {
     PRECONDITION(!parameter.empty());

@@ -35,7 +35,6 @@ static void rename_symbols_in_function(
   }
 
   goto_programt &program=function.body;
-  rename_symbol(function.type);
 
   Forall_goto_program_instructions(iit, program)
   {
@@ -99,7 +98,6 @@ static bool link_functions(
         in_dest_symbol_table.body.swap(src_func.body);
         in_dest_symbol_table.parameter_identifiers.swap(
           src_func.parameter_identifiers);
-        in_dest_symbol_table.type=src_func.type;
       }
       else if(src_func.body.instructions.empty() ||
               src_ns.lookup(src_it->first).is_weak)
@@ -109,13 +107,6 @@ static bool link_functions(
       else if(to_code_type(ns.lookup(final_id).type).get_inlined())
       {
         // ok, we silently ignore
-      }
-      else
-      {
-        // the linking code will have ensured that types match
-        rename_symbol(src_func.type);
-        INVARIANT(base_type_eq(in_dest_symbol_table.type, src_func.type, ns),
-                  "linking ensures that types match");
       }
     }
   }

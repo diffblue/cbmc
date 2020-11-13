@@ -94,10 +94,8 @@ void replace_callst::operator()(
     auto f_it2 = goto_functions.function_map.find(new_id);
     PRECONDITION(f_it2 != goto_functions.function_map.end());
 
-    PRECONDITION(base_type_eq(f_it1->second.type, f_it2->second.type, ns));
-
     // check that returns have not been removed
-    if(to_code_type(f_it1->second.type).return_type().id() != ID_empty)
+    if(to_code_type(function.type()).return_type().id() != ID_empty)
     {
       goto_programt::const_targett next_it = std::next(it);
       if(next_it != goto_program.instructions.end() && next_it->is_assign())
@@ -112,7 +110,7 @@ void replace_callst::operator()(
     }
 
     // Finally modify the call
-    function.type() = f_it2->second.type;
+    function.type() = ns.lookup(f_it2->first).type;
     se.set_identifier(new_id);
 
     ins.set_function_call(cfc);
@@ -167,7 +165,8 @@ void replace_callst::check_replacement_map(
     auto it1 = goto_functions.function_map.find(p.first);
     if(it1 != goto_functions.function_map.end())
     {
-      if(!base_type_eq(it1->second.type, it2->second.type, ns))
+      if(!base_type_eq(
+           ns.lookup(it1->first).type, ns.lookup(it2->first).type, ns))
         throw invalid_command_line_argument_exceptiont(
           "functions " + id2string(p.first) + " and " + id2string(p.second) +
             " are not type-compatible",

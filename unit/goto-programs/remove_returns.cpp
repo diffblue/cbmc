@@ -48,11 +48,22 @@ TEST_CASE(
 {
   symbol_tablet symbol_table;
   goto_functionst goto_functions;
+
+  symbolt foo_function_symbol;
+  foo_function_symbol.name = "foo_function";
+  foo_function_symbol.type = code_typet{{}, empty_typet{}};
+  symbol_table.insert(foo_function_symbol);
+
+  symbolt bar_function_symbol;
+  bar_function_symbol.name = "bar_function";
+  bar_function_symbol.type = code_typet{{}, signedbv_typet{32}};
+  symbol_table.insert(bar_function_symbol);
+
   *goto_functions.function_map["foo_function"].body.add_instruction() =
-    goto_programt::make_function_call(code_function_callt{
-      symbol_exprt{"local_variable", signedbv_typet{32}},
-      symbol_exprt{"bar_function", code_typet{{}, signedbv_typet{32}}},
-      {}});
+    goto_programt::make_function_call(
+      code_function_callt{symbol_exprt{"local_variable", signedbv_typet{32}},
+                          bar_function_symbol.symbol_expr(),
+                          {}});
   const cbmc_invariants_should_throwt invariants_throw;
   REQUIRE_THROWS_MATCHES(
     remove_returns(symbol_table, goto_functions),

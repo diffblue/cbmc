@@ -322,7 +322,6 @@ void memory_snapshot_harness_generatort::
   CHECK_RETURN(function_iterator_pair.second);
 
   goto_functiont &harness_function = function_iterator_pair.first->second;
-  harness_function.type = to_code_type(function.type);
 
   goto_convert(
     goto_model.symbol_table, goto_model.goto_functions, message_handler);

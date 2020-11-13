@@ -87,6 +87,7 @@ bool goto_convert_functionst::hide(const goto_programt &goto_program)
 
 void goto_convert_functionst::add_return(
   goto_functionst::goto_functiont &f,
+  const typet &return_type,
   const source_locationt &source_location)
 {
 #if 0
@@ -133,7 +134,7 @@ void goto_convert_functionst::add_return(
 
 #endif
 
-  side_effect_expr_nondett rhs(f.type.return_type(), source_location);
+  side_effect_expr_nondett rhs(return_type, source_location);
 
   f.body.add(
     goto_programt::make_return(code_returnt(std::move(rhs)), source_location));
@@ -154,7 +155,6 @@ void goto_convert_functionst::convert_function(
 
   // store the parameter identifiers in the goto functions
   const code_typet &code_type = to_code_type(symbol.type);
-  f.type = code_type;
   f.set_parameter_identifiers(code_type);
 
   if(
@@ -190,15 +190,15 @@ void goto_convert_functionst::convert_function(
 
   targets = targetst();
   targets.set_return(end_function);
-  targets.has_return_value = f.type.return_type().id() != ID_empty &&
-                             f.type.return_type().id() != ID_constructor &&
-                             f.type.return_type().id() != ID_destructor;
+  targets.has_return_value = code_type.return_type().id() != ID_empty &&
+                             code_type.return_type().id() != ID_constructor &&
+                             code_type.return_type().id() != ID_destructor;
 
   goto_convert_rec(code, f.body, mode);
 
   // add non-det return value, if needed
   if(targets.has_return_value)
-    add_return(f, end_location);
+    add_return(f, code_type.return_type(), end_location);
 
   // handle SV-COMP's __VERIFIER_atomic_
   if(
