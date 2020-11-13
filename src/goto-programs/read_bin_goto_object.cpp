@@ -131,8 +131,8 @@ static bool read_bin_goto_object(
         instruction.labels.push_back(label);
         if(label == CPROVER_PREFIX "HIDE")
           hidden=true;
-        // The above info is normally in the type of the goto_functiont object,
-        // which should likely be stored in the binary.
+        // The above info is also held in the goto_functiont object, and could
+        // be stored in the binary.
       }
     }
 
