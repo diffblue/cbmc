@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_AI_DOMAIN_H
 #define CPROVER_ANALYSES_AI_DOMAIN_H
 
+#include <util/deprecate.h>
 #include <util/expr.h>
 #include <util/json.h>
 #include <util/make_unique.h>
