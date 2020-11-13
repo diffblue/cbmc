@@ -22,7 +22,6 @@ symbolt create_new_symbol(const irep_idt &name, const irep_idt &file_name)
   source_locationt location;
   location.set_file(file_name);
   symbol.location = location;
-  symbol.type = code_typet{{}, empty_typet{}};
 
   return symbol;
 }

@@ -256,7 +256,7 @@ void goto_inlinet::insert_function_body(
   end.type=LOCATION;
 
   // make sure the inlined function does not introduce hiding
-  if(ns.lookup(identifier).is_hidden())
+  if(goto_function.is_hidden())
   {
     for(auto &instruction : body.instructions)
       instruction.labels.remove(CPROVER_PREFIX "HIDE");
