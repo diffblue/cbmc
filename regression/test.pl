@@ -41,7 +41,8 @@ sub run($$$$$) {
   }
 
   print LOG "Running $cmdline\n";
-  system("bash", "-c", "cd '$name' ; $cmdline");
+  # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
+  system("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
   my $exit_value = $? >> 8;
   my $signal_num = $? & 127;
   my $dumped_core = $? & 128;
