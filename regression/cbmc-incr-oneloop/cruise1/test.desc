@@ -1,4 +1,4 @@
-CORE winbug
+CORE
 main.c
 --incremental-loop main.0 --unwind-max 10
 ^EXIT=0$
