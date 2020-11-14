@@ -20,9 +20,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef HASH_CODE
 #  define HASH_CODE 1
 #endif
-// #define NAMED_SUB_IS_FORWARD_LIST
+// use forward_list by default, unless _GLIBCXX_DEBUG is set as the debug
+// overhead is noticeably higher with the regression test suite taking four
+// times as long.
+#if !defined(NAMED_SUB_IS_FORWARD_LIST) && !defined(_GLIBCXX_DEBUG)
+#  define NAMED_SUB_IS_FORWARD_LIST 1
+#endif
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
 #  include "forward_list_as_map.h"
 #else
 #include <map>
@@ -386,7 +391,7 @@ class irept
   : public non_sharing_treet<
       irept,
 #endif
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
       forward_list_as_mapt<irep_namet, irept>>
 #else
       std::map<irep_namet, irept>>
