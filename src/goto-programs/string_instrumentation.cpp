@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/invariant.h>
-#include <util/message.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -52,15 +51,11 @@ exprt buffer_size(const exprt &what)
   return result;
 }
 
-class string_instrumentationt:public messaget
+class string_instrumentationt
 {
 public:
-  string_instrumentationt(
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    ns(_symbol_table)
+  explicit string_instrumentationt(symbol_tablet &_symbol_table)
+    : symbol_table(_symbol_table), ns(_symbol_table)
   {
   }
 
@@ -156,29 +151,24 @@ protected:
 
 void string_instrumentation(
   symbol_tablet &symbol_table,
-  message_handlert &message_handler,
   goto_programt &dest)
 {
-  string_instrumentationt string_instrumentation(symbol_table, message_handler);
+  string_instrumentationt string_instrumentation{symbol_table};
   string_instrumentation(dest);
 }
 
 void string_instrumentation(
   symbol_tablet &symbol_table,
-  message_handlert &message_handler,
   goto_functionst &dest)
 {
-  string_instrumentationt string_instrumentation(symbol_table, message_handler);
+  string_instrumentationt string_instrumentation{symbol_table};
   string_instrumentation(dest);
 }
 
-void string_instrumentation(
-  goto_modelt &goto_model,
-  message_handlert &message_handler)
+void string_instrumentation(goto_modelt &goto_model)
 {
   string_instrumentation(
     goto_model.symbol_table,
-    message_handler,
     goto_model.goto_functions);
 }
 
