@@ -22,7 +22,7 @@ public:
   {
   }
 
-  virtual void operator()(symex_target_equationt &equation);
+  virtual void operator()(symex_target_equationt &equation, message_handlert &);
 
 protected:
   virtual bool program_order_is_relaxed(

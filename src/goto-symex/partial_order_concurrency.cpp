@@ -73,7 +73,8 @@ void partial_order_concurrencyt::add_init_writes(
 }
 
 void partial_order_concurrencyt::build_event_lists(
-  symex_target_equationt &equation)
+  symex_target_equationt &equation,
+  message_handlert &message_handler)
 {
   add_init_writes(equation);
 
@@ -107,6 +108,7 @@ void partial_order_concurrencyt::build_event_lists(
     }
   }
 
+  messaget log{message_handler};
   for(address_mapt::const_iterator
       a_it=address_map.begin();
       a_it!=address_map.end();
@@ -116,9 +118,8 @@ void partial_order_concurrencyt::build_event_lists(
     if(a_rec.reads.empty())
       continue;
 
-    statistics() << "Shared " << a_it->first << ": "
-                 << a_rec.reads.size() << "R/"
-                 << a_rec.writes.size() << "W" << eom;
+    log.statistics() << "Shared " << a_it->first << ": " << a_rec.reads.size()
+                     << "R/" << a_rec.writes.size() << "W" << messaget::eom;
   }
 }
 

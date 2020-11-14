@@ -12,14 +12,12 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #ifndef CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 #define CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 
-#include <util/message.h>
-
 #include "symex_target_equation.h"
 
 /// Base class for implementing memory models via additional constraints for
 /// SSA equations. Provides methods for encoding ordering of shared read/write
 /// events.
-class partial_order_concurrencyt:public messaget
+class partial_order_concurrencyt
 {
 public:
   explicit partial_order_concurrencyt(const namespacet &_ns);
@@ -67,7 +65,10 @@ protected:
   /// 2) the _numbering_ map (with per-thread unique number of every event)
   /// \param equation: the target equation (containing the events to be
   ///   processed)
-  void build_event_lists(symex_target_equationt &);
+  /// \param message_handler: message handler to output statistics
+  void build_event_lists(
+    symex_target_equationt &equation,
+    message_handlert &message_handler);
 
   /// For each shared read event and for each shared write event that appears
   /// after spawn or has false _guard_ prepend a shared write SSA step with
