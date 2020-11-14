@@ -418,6 +418,11 @@ protected:
     const source_locationt &location,
     method_offsett address);
 
+  exprt::operandst &convert_shl(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    exprt::operandst &results) const;
+
   exprt::operandst &convert_ushr(
     const irep_idt &statement,
     const exprt::operandst &op,
