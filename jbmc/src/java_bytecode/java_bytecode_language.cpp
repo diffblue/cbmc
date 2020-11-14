@@ -1139,10 +1139,10 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     java_class_loader,
     language_options->java_load_classes,
     get_pointer_type_selector(),
-    get_message_handler(),
     synthetic_methods);
 
-  return method_gather(symbol_table, method_bytecode, method_converter);
+  return method_gather(
+    symbol_table, method_bytecode, method_converter, get_message_handler());
 }
 
 const select_pointer_typet &
