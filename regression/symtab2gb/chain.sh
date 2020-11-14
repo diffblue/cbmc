@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 symtab2gb_exe=$1
 cbmc_exe=$2
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 goto_cc=$1
 cbmc=$2
 is_windows=$3
