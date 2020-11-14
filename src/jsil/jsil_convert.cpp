@@ -16,18 +16,14 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_parse_tree.h"
 
-class jsil_convertt:public messaget
+class jsil_convertt
 {
 public:
-  jsil_convertt(
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table)
+  jsil_convertt(symbol_tablet &_symbol_table) : symbol_table(_symbol_table)
   {
   }
 
-  bool operator()(const jsil_parse_treet &parse_tree);
+  bool operator()(const jsil_parse_treet &parse_tree, message_handlert &);
 
 protected:
   symbol_tablet &symbol_table;
@@ -35,7 +31,9 @@ protected:
   bool convert_code(const symbolt &symbol, codet &code);
 };
 
-bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
+bool jsil_convertt::operator()(
+  const jsil_parse_treet &parse_tree,
+  message_handlert &message_handler)
 {
   for(jsil_parse_treet::itemst::const_iterator
       it=parse_tree.items.begin();
@@ -58,7 +56,8 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
     }
     if(symbol_table.add(new_symbol))
     {
-      error() << "duplicate symbol " << new_symbol.name << eom;
+      messaget log{message_handler};
+      log.error() << "duplicate symbol " << new_symbol.name << messaget::eom;
       throw 0;
     }
   }
@@ -118,11 +117,11 @@ bool jsil_convert(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  jsil_convertt jsil_convert(symbol_table, message_handler);
+  jsil_convertt jsil_convert{symbol_table};
 
   try
   {
-    return jsil_convert(parse_tree);
+    return jsil_convert(parse_tree, message_handler);
   }
 
   catch(int)
@@ -131,12 +130,14 @@ bool jsil_convert(
 
   catch(const char *e)
   {
-    jsil_convert.error() << e << messaget::eom;
+    messaget log{message_handler};
+    log.error() << e << messaget::eom;
   }
 
   catch(const std::string &e)
   {
-    jsil_convert.error() << e << messaget::eom;
+    messaget log{message_handler};
+    log.error() << e << messaget::eom;
   }
 
   return true;
