@@ -219,6 +219,37 @@ std::wstring quote_windows_arg(const std::wstring &src)
 }
 #endif
 
+#ifdef _WIN32
+// https://stackoverflow.com/a/17387176
+// Returns the last Win32 error, in string format. Returns an empty string if
+// there is no error.
+std::string get_last_error_as_string()
+{
+  // Get the error message, if any.
+  DWORD error_message_id = GetLastError();
+  if(error_message_id == 0)
+    return {};
+
+  LPWSTR message_buffer = nullptr;
+  std::size_t size = FormatMessageW(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+      FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    error_message_id,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPWSTR)&message_buffer,
+    0,
+    NULL);
+
+  std::wstring message(message_buffer, size);
+
+  // Free the buffer.
+  LocalFree(message_buffer);
+
+  return narrow(message);
+}
+#endif
+
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
@@ -272,12 +303,20 @@ int run(
 
   if(!bSuccess)
   {
+    // obtain the error message before doing further system calls
+    std::string windows_error = get_last_error_as_string();
+
     if(!std_input.empty())
       CloseHandle(siStartInfo.hStdInput);
     if(!std_output.empty())
       CloseHandle(siStartInfo.hStdOutput);
     if(!std_error.empty())
       CloseHandle(siStartInfo.hStdError);
+
+    // now re-open the file and write the above error message
+    std::ofstream stderr_stream(std_error);
+    stderr_stream << windows_error;
+
     return -1;
   }
 
