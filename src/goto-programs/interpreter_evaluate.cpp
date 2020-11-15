@@ -404,8 +404,8 @@ void interpretert::evaluate(
     {
       const std::string &value = id2string(to_constant_expr(expr).get_value());
       if(show)
-        warning() << "string decoding not fully implemented "
-                  << value.size() + 1 << eom;
+        output.warning() << "string decoding not fully implemented "
+                         << value.size() + 1 << messaget::eom;
       dest.push_back(get_string_container()[value]);
       return;
     }
@@ -457,15 +457,14 @@ void interpretert::evaluate(
     if(side_effect.get_statement()==ID_nondet)
     {
       if(show)
-        error() << "nondet not implemented" << eom;
+        output.error() << "nondet not implemented" << messaget::eom;
       return;
     }
     else if(side_effect.get_statement()==ID_allocate)
     {
       if(show)
-        error() << "heap memory allocation not fully implemented "
-                << expr.type().subtype().pretty()
-                << eom;
+        output.error() << "heap memory allocation not fully implemented "
+                       << expr.type().subtype().pretty() << messaget::eom;
       std::stringstream buffer;
       num_dynamic_objects++;
       buffer << "interpreter::dynamic_object" << num_dynamic_objects;
@@ -478,9 +477,8 @@ void interpretert::evaluate(
       return;
     }
     if(show)
-      error() << "side effect not implemented "
-              << side_effect.get_statement()
-              << eom;
+      output.error() << "side effect not implemented "
+                     << side_effect.get_statement() << messaget::eom;
   }
   else if(expr.id()==ID_bitor)
   {
@@ -1041,14 +1039,14 @@ void interpretert::evaluate(
   {
     if(expr.type().id()==ID_signedbv)
     {
-      warning() << "Infinite size arrays not supported" << eom;
+      output.warning() << "Infinite size arrays not supported" << messaget::eom;
       return;
     }
   }
-  error() << "!! failed to evaluate expression: "
-          << from_expr(ns, function->first, expr) << "\n"
-          << expr.id() << "[" << expr.type().id() << "]"
-          << eom;
+  output.error() << "!! failed to evaluate expression: "
+                 << from_expr(ns, function->first, expr) << "\n"
+                 << expr.id() << "[" << expr.type().id() << "]"
+                 << messaget::eom;
 }
 
 mp_integer interpretert::evaluate_address(
@@ -1157,9 +1155,8 @@ mp_integer interpretert::evaluate_address(
 
   if(!fail_quietly)
   {
-    error() << "!! failed to evaluate address: "
-            << from_expr(ns, function->first, expr)
-            << eom;
+    output.error() << "!! failed to evaluate address: "
+                   << from_expr(ns, function->first, expr) << messaget::eom;
   }
 
   return 0;
