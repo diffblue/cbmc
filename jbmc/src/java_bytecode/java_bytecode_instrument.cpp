@@ -22,15 +22,14 @@ Date:   June 2017
 #include "java_expr.h"
 #include "java_utils.h"
 
-class java_bytecode_instrumentt:public messaget
+class java_bytecode_instrumentt
 {
 public:
   java_bytecode_instrumentt(
     symbol_table_baset &_symbol_table,
     const bool _throw_runtime_exceptions,
     message_handlert &_message_handler)
-    : messaget(_message_handler),
-      symbol_table(_symbol_table),
+    : symbol_table(_symbol_table),
       throw_runtime_exceptions(_throw_runtime_exceptions),
       message_handler(_message_handler)
   {
@@ -104,7 +103,7 @@ code_ifthenelset java_bytecode_instrumentt::throw_exception(
     generate_class_stub(
       exc_name,
       symbol_table,
-      get_message_handler(),
+      message_handler,
       struct_union_typet::componentst{});
   }
 
