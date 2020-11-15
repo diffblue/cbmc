@@ -378,11 +378,6 @@ bool c_preprocess_visual_studio(
     command_file << shell_quote(file) << "\n";
   }
 
-  temporary_filet tmpi("tmp.cl", "");
-
-  std::string command = "CL @\"" + command_file_name() + "\"";
-  command += " 2> \"" + stderr_file() + "\"";
-
   // _popen isn't very reliable on WIN32
   // that's why we use run()
   int result =
