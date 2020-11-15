@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class symbol_tablet;
 class symbolt;
 
-class java_bytecode_convert_methodt:public messaget
+class java_bytecode_convert_methodt
 {
 public:
   java_bytecode_convert_methodt(
@@ -42,7 +42,7 @@ public:
     const class_hierarchyt &class_hierarchy,
     bool threading_support,
     bool assert_no_exceptions_thrown)
-    : messaget(_message_handler),
+    : log(_message_handler),
       symbol_table(symbol_table),
       ns(symbol_table),
       max_array_length(_max_array_length),
@@ -74,6 +74,7 @@ public:
   typedef uint16_t method_offsett;
 
 protected:
+  messaget log;
   symbol_table_baset &symbol_table;
   namespacet ns;
   const size_t max_array_length;
