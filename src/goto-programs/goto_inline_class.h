@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_functions.h"
 
-class goto_inlinet:public messaget
+class goto_inlinet
 {
 public:
   goto_inlinet(
@@ -25,12 +25,12 @@ public:
     const namespacet &ns,
     message_handlert &message_handler,
     bool adjust_function,
-    bool caching=true):
-    messaget(message_handler),
-    goto_functions(goto_functions),
-    ns(ns),
-    adjust_function(adjust_function),
-    caching(caching)
+    bool caching = true)
+    : log(message_handler),
+      goto_functions(goto_functions),
+      ns(ns),
+      adjust_function(adjust_function),
+      caching(caching)
   {
   }
 
@@ -122,6 +122,7 @@ public:
   };
 
 protected:
+  messaget log;
   goto_functionst &goto_functions;
   const namespacet &ns;
 
