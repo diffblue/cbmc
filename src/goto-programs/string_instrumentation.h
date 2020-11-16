@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 
-class message_handlert;
 class goto_modelt;
 
 class incorrect_source_program_exceptiont : public cprover_exception_baset
@@ -40,17 +39,13 @@ private:
 
 void string_instrumentation(
   symbol_tablet &,
-  message_handlert &,
   goto_programt &);
 
 void string_instrumentation(
   symbol_tablet &,
-  message_handlert &,
   goto_functionst &);
 
-void string_instrumentation(
-  goto_modelt &,
-  message_handlert &);
+void string_instrumentation(goto_modelt &);
 
 predicate_exprt is_zero_string(const exprt &what, bool write = false);
 exprt zero_string_length(const exprt &what, bool write=false);
