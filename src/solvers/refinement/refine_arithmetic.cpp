@@ -158,9 +158,6 @@ void bv_refinementt::get_values(approximationt &a)
 /// refine overapproximation
 void bv_refinementt::check_SAT(approximationt &a)
 {
-  // get values
-  get_values(a);
-
   // see if the satisfying assignment is spurious in any way
 
   const typet &type = a.expr.type();
