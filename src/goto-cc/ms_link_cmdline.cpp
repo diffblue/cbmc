@@ -11,7 +11,6 @@ Author: Daniel Kroening
 
 #include "ms_link_cmdline.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr2c.h"
 
 #include <algorithm>
-#include <cassert>
 #include <sstream>
 
 #include <map>

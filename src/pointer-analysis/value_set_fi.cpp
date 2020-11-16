@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_fi.h"
 
-#include <cassert>
 #include <iterator>
 #include <ostream>
 

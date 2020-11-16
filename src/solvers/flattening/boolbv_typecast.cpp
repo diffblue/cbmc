@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
-
 #include <util/std_types.h>
 
 #include <solvers/floatbv/float_utils.h>

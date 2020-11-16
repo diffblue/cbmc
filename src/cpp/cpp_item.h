@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_ITEM_H
 #define CPROVER_CPP_CPP_ITEM_H
 
-#include <cassert>
-
 #include "cpp_declaration.h"
 #include "cpp_linkage_spec.h"
 #include "cpp_namespace_spec.h"

@@ -14,7 +14,6 @@ Date:   April 2010
 #include "goto_cc_cmdline.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <iostream>

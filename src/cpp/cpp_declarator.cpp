@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/merged_type.h>
 
 #include <ostream>
-#include <cassert>
 
 void cpp_declaratort::output(std::ostream &out) const
 {

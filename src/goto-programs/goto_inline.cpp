@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_inline.h"
 
-#include <cassert>
-
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/std_code.h>

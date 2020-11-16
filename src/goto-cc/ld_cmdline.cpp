@@ -11,7 +11,6 @@ Author: Daniel Kroening, 2013
 
 #include "ld_cmdline.h"
 
-#include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>

@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_convert_type.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>

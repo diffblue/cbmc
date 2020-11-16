@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <cassert>
-
 #include <util/std_expr.h>
 
 void goto_symext::symex_decl(statet &state)

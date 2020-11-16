@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_PARSER_H
 #define CPROVER_CPP_CPP_PARSER_H
 
-#include <cassert>
-
 #include <util/string_hash.h>
 #include <util/parser.h>
 #include <util/expr.h>

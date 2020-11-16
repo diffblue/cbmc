@@ -13,8 +13,6 @@ Author: Daniel Kroening
 
 #include "xml_goto_trace.h"
 
-#include <cassert>
-
 #include <util/symbol.h>
 #include <util/xml_irep.h>
 

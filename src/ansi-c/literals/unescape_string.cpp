@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unescape_string.h"
 
-#include <cassert>
 #include <cctype>
 
+#include <util/invariant.h>
 #include <util/unicode.h>
 
 static void append_universal_char(
@@ -50,7 +50,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
     {
       // go to next character
       i++;
-      assert(i<src.size()); // backslash can't be last character
+      INVARIANT(i < src.size(), "backslash can't be last character");
 
       ch=(unsigned char)src[i];
       switch(ch)

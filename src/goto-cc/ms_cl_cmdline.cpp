@@ -11,7 +11,6 @@ Author: Daniel Kroening
 
 #include "ms_cl_cmdline.h"
 
-#include <cassert>
 #include <cstring>
 #include <cstdlib>
 #include <iostream>

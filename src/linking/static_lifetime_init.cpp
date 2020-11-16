@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_lifetime_init.h"
 
-#include <cassert>
 #include <cstdlib>
 
 #include <util/arith_tools.h>

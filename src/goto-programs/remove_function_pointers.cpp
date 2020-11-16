@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "remove_function_pointers.h"
 
-#include <cassert>
-
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
