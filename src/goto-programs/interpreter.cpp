@@ -39,20 +39,20 @@ const std::size_t interpretert::npos=std::numeric_limits<size_t>::max();
 
 void interpretert::operator()()
 {
-  status() << "0- Initialize:" << eom;
+  output.status() << "0- Initialize:" << messaget::eom;
   initialize(true);
   try
   {
-    status() << "Type h for help\n" << eom;
+    output.status() << "Type h for help\n" << messaget::eom;
 
     while(!done)
       command();
 
-    status() << total_steps << "- Program End.\n" << eom;
+    output.status() << total_steps << "- Program End.\n" << messaget::eom;
   }
   catch (const char *e)
   {
-    error() << e << "\n" << eom;
+    output.error() << e << "\n" << messaget::eom;
   }
 
   while(!done)
@@ -113,22 +113,19 @@ void interpretert::show_state()
 {
   if(!show)
     return;
-  status() << "\n"
-           << total_steps+1
-           << " ----------------------------------------------------\n";
+  output.status() << "\n"
+                  << total_steps + 1
+                  << " ----------------------------------------------------\n";
 
   if(pc==function->second.body.instructions.end())
   {
-    status() << "End of function '" << function->first << "'\n";
+    output.status() << "End of function '" << function->first << "'\n";
   }
   else
     function->second.body.output_instruction(
-      ns,
-      function->first,
-      status(),
-      *pc);
+      ns, function->first, output.status(), *pc);
 
-  status() << eom;
+  output.status() << messaget::eom;
 }
 
 /// reads a user command and executes it.
@@ -147,18 +144,18 @@ void interpretert::command()
     done=true;
   else if(ch=='h')
   {
-    status() << "Interpreter help\n"
-             << "h: display this menu\n"
-             << "j: output json trace\n"
-             << "m: output memory dump\n"
-             << "o: output goto trace\n"
-             << "q: quit\n"
-             << "r: run up to entry point\n"
-             << "s#: step a number of instructions\n"
-             << "sa: step across a function\n"
-             << "so: step out of a function\n"
-             << "se: step until end of program\n"
-             << eom;
+    output.status() << "Interpreter help\n"
+                    << "h: display this menu\n"
+                    << "j: output json trace\n"
+                    << "m: output memory dump\n"
+                    << "o: output goto trace\n"
+                    << "q: quit\n"
+                    << "r: run up to entry point\n"
+                    << "s#: step a number of instructions\n"
+                    << "sa: step across a function\n"
+                    << "so: step out of a function\n"
+                    << "se: step until end of program\n"
+                    << messaget::eom;
   }
   else if(ch=='j')
   {
@@ -176,7 +173,7 @@ void interpretert::command()
         return;
       }
     }
-    json_steps.output(result());
+    json_steps.output(output.result());
   }
   else if(ch=='m')
   {
@@ -197,7 +194,7 @@ void interpretert::command()
         return;
       }
     }
-    steps.output(ns, result());
+    steps.output(ns, output.result());
   }
   else if(ch=='r')
   {
@@ -408,8 +405,9 @@ void interpretert::execute_other()
     mp_integer size=get_size(pc->code.op0().type());
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
-      error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
-              << size << ")\n" << eom;
+      output.error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
+                     << size << ")\n"
+                     << messaget::eom;
     else
     {
       assign(address, rhs);
@@ -637,9 +635,9 @@ exprt interpretert::get_value(
         symbol_expr, from_integer(offset_from_address, integer_typet()));
     }
 
-    error() << "interpreter: invalid pointer "
-            << rhs[numeric_cast_v<std::size_t>(offset)] << " > object count "
-            << memory.size() << eom;
+    output.error() << "interpreter: invalid pointer "
+                   << rhs[numeric_cast_v<std::size_t>(offset)]
+                   << " > object count " << memory.size() << messaget::eom;
 
     throw "interpreter: reading from invalid pointer";
   }
@@ -671,10 +669,9 @@ void interpretert::execute_assign()
     mp_integer size=get_size(code_assign.lhs().type());
 
     if(size!=rhs.size())
-      error() << "!! failed to obtain rhs ("
-              << rhs.size() << " vs. "
-              << size << ")\n"
-              << eom;
+      output.error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
+                     << size << ")\n"
+                     << messaget::eom;
     else
     {
       goto_trace_stept &trace_step=steps.get_last_step();
@@ -716,11 +713,11 @@ void interpretert::assign(
       memory_cellt &cell = memory[numeric_cast_v<std::size_t>(address_val)];
       if(show)
       {
-        status() << total_steps << " ** assigning "
-                 << address_to_symbol(address_val).get_identifier() << "["
-                 << address_to_offset(address_val)
-                 << "]:=" << rhs[numeric_cast_v<std::size_t>(i)] << "\n"
-                 << eom;
+        output.status() << total_steps << " ** assigning "
+                        << address_to_symbol(address_val).get_identifier()
+                        << "[" << address_to_offset(address_val)
+                        << "]:=" << rhs[numeric_cast_v<std::size_t>(i)] << "\n"
+                        << messaget::eom;
       }
       cell.value = rhs[numeric_cast_v<std::size_t>(i)];
       if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
@@ -740,8 +737,8 @@ void interpretert::execute_assert()
   if(!evaluate_boolean(pc->get_condition()))
   {
     if(show)
-      error() << "assertion failed at " << pc->location_number
-              << "\n" << eom;
+      output.error() << "assertion failed at " << pc->location_number << "\n"
+                     << messaget::eom;
   }
 }
 
@@ -847,7 +844,7 @@ void interpretert::execute_function_call()
     }
 
     if(show)
-      error() << "no body for "+id2string(identifier) << eom;
+      output.error() << "no body for " << identifier << messaget::eom;
   }
 }
 
@@ -903,8 +900,8 @@ typet interpretert::concretize_type(const typet &type)
     if(computed_size.size()==1 &&
        computed_size[0]>=0)
     {
-      result() << "Concretized array with size " << computed_size[0]
-               << eom;
+      output.result() << "Concretized array with size " << computed_size[0]
+                      << messaget::eom;
       return
         array_typet(
           type.subtype(),
@@ -912,7 +909,8 @@ typet interpretert::concretize_type(const typet &type)
     }
     else
     {
-      warning() << "Failed to concretize variable array" << eom;
+      output.warning() << "Failed to concretize variable array"
+                       << messaget::eom;
     }
   }
   return type;
@@ -1067,11 +1065,12 @@ void interpretert::print_memory(bool input_flags)
     const memory_cellt &cell=cell_address.second;
     const auto identifier = address_to_symbol(i).get_identifier();
     const auto offset=address_to_offset(i);
-    status() << identifier << "[" << offset << "]"
-             << "=" << cell.value << eom;
+    output.status() << identifier << "[" << offset << "]"
+                    << "=" << cell.value << messaget::eom;
     if(input_flags)
-      status() << "(" << static_cast<int>(cell.initialized) << ")" << eom;
-    status() << eom;
+      output.status() << "(" << static_cast<int>(cell.initialized) << ")"
+                      << messaget::eom;
+    output.status() << messaget::eom;
   }
 }
 

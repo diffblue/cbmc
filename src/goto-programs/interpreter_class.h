@@ -24,14 +24,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_trace.h"
 #include "json_goto_trace.h"
 
-class interpretert:public messaget
+class interpretert
 {
 public:
   interpretert(
     const symbol_tablet &_symbol_table,
     const goto_functionst &_goto_functions,
     message_handlert &_message_handler)
-    : messaget(_message_handler),
+    : output(_message_handler),
       symbol_table(_symbol_table),
       ns(_symbol_table),
       goto_functions(_goto_functions),
@@ -97,6 +97,7 @@ public:
   const dynamic_typest &get_dynamic_types() { return dynamic_types; }
 
 protected:
+  messaget output;
   const symbol_tablet &symbol_table;
 
   // This is a cache so that we don't have to create it when a call needs it
