@@ -88,7 +88,9 @@ bool has_component_rec(
     {
       return true;
     }
-    else if(comp.get_anonymous())
+    else if(
+      comp.get_anonymous() &&
+      (comp.type().id() == ID_struct_tag || comp.type().id() == ID_union_tag))
     {
       if(has_component_rec(comp.type(), component_name, ns))
         return true;
