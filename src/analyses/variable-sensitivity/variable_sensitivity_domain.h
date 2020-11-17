@@ -76,7 +76,8 @@ class variable_sensitivity_domaint : public ai_domain_baset
 public:
   explicit variable_sensitivity_domaint(
     variable_sensitivity_object_factory_ptrt _object_factory)
-  : abstract_state(_object_factory) {
+    : abstract_state(_object_factory)
+  {
   }
 
   /// Compute the abstract transformer for a single instruction
@@ -217,7 +218,7 @@ public:
 #endif
 };
 
-template<>
+template <>
 class ai_domain_factory_default_constructort<variable_sensitivity_domaint>
   : public ai_domain_factoryt<variable_sensitivity_domaint>
 {
@@ -226,7 +227,8 @@ public:
 
   explicit ai_domain_factory_default_constructort(
     variable_sensitivity_object_factory_ptrt _object_factory)
-  : object_factory(_object_factory) {
+    : object_factory(_object_factory)
+  {
   }
 
   std::unique_ptr<statet> make(locationt l) const override

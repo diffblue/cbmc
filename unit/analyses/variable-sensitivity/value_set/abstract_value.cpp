@@ -70,12 +70,11 @@ public:
 std::unique_ptr<variable_sensitivity_domain_factoryt> domain_factory()
 {
   auto vs_object_factory =
-    std::make_shared<variable_sensitivity_object_factoryt>(vsd_configt {});
+    std::make_shared<variable_sensitivity_object_factoryt>(vsd_configt{});
 
-  return
-    util_make_unique<variable_sensitivity_domain_factoryt>(vs_object_factory);
+  return util_make_unique<variable_sensitivity_domain_factoryt>(
+    vs_object_factory);
 }
-
 
 TEST_CASE(
   "A value set abstract object created from type is top",
@@ -267,11 +266,10 @@ TEST_CASE(
   auto const value_set =
     value_set_abstract_valuet{type, value_set_abstract_valuet::valuest{}};
 
-  const ait<variable_sensitivity_domaint> ai { domain_factory() };
+  const ait<variable_sensitivity_domaint> ai{domain_factory()};
 
   std::stringstream ss;
-  value_set.output(
-    ss, ai, namespacet{symbol_tablet{}});
+  value_set.output(ss, ai, namespacet{symbol_tablet{}});
   REQUIRE(ss.str() == "BOTTOM");
 }
 
@@ -283,11 +281,10 @@ TEST_CASE(
   auto const value = from_integer(10, type);
   auto const value_set = value_set_abstract_valuet{type, {value}};
 
-  const ait<variable_sensitivity_domaint> ai { domain_factory() };
+  const ait<variable_sensitivity_domaint> ai{domain_factory()};
 
   std::stringstream ss;
-  value_set.output(
-    ss, ai, namespacet{symbol_tablet{}});
+  value_set.output(ss, ai, namespacet{symbol_tablet{}});
   REQUIRE(ss.str() == "{ 10 }");
 }
 
@@ -303,11 +300,10 @@ TEST_CASE(
   auto const value_set =
     value_set_abstract_valuet{type, {value1, value2, value3}};
 
-  const ait<variable_sensitivity_domaint> ai { domain_factory() };
+  const ait<variable_sensitivity_domaint> ai{domain_factory()};
 
   std::stringstream ss;
-  value_set.output(
-    ss, ai, namespacet{symbol_tablet{}});
+  value_set.output(ss, ai, namespacet{symbol_tablet{}});
   REQUIRE(ss.str() == "{ 10 12 14 }");
 }
 
@@ -326,11 +322,10 @@ TEST_CASE(
   auto const value_set = value_set_abstract_valuet{type, values};
   REQUIRE(value_set.is_top());
 
-  const ait<variable_sensitivity_domaint> ai { domain_factory() };
+  const ait<variable_sensitivity_domaint> ai{domain_factory()};
 
   std::stringstream ss;
-  value_set.output(
-    ss, ai, namespacet{symbol_tablet{}});
+  value_set.output(ss, ai, namespacet{symbol_tablet{}});
   REQUIRE(ss.str() == "TOP");
 }
 
@@ -386,8 +381,9 @@ static abstract_environmentt get_value_set_abstract_environment()
   config.advanced_sensitivities.new_value_set = true;
   config.context_tracking.data_dependency_context = false;
   config.context_tracking.last_write_context = false;
-  auto object_factory = variable_sensitivity_object_factoryt::configured_with(config);
-  auto environment = abstract_environmentt { object_factory };
+  auto object_factory =
+    variable_sensitivity_object_factoryt::configured_with(config);
+  auto environment = abstract_environmentt{object_factory};
   environment.make_top();
   return environment;
 }

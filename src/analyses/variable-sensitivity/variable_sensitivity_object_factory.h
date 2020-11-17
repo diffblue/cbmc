@@ -124,19 +124,20 @@ struct vsd_configt
 
 class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =
-std::shared_ptr<variable_sensitivity_object_factoryt>;
+  std::shared_ptr<variable_sensitivity_object_factoryt>;
 
 class variable_sensitivity_object_factoryt
 {
 public:
-  static variable_sensitivity_object_factory_ptrt configured_with(
-    const vsd_configt &options) {
+  static variable_sensitivity_object_factory_ptrt
+  configured_with(const vsd_configt &options)
+  {
     return std::make_shared<variable_sensitivity_object_factoryt>(options);
   }
 
   explicit variable_sensitivity_object_factoryt(const vsd_configt &options)
-    : configuration(options),
-      initialized(true) {
+    : configuration(options), initialized(true)
+  {
   }
 
   /// Get the appropriate abstract object for the variable under

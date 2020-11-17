@@ -30,7 +30,7 @@ SCENARIO(
 
     auto object_factory = variable_sensitivity_object_factoryt::configured_with(
       vsd_configt::constant_domain());
-    abstract_environmentt enviroment { object_factory };
+    abstract_environmentt enviroment{object_factory};
     enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);

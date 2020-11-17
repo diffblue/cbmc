@@ -447,7 +447,8 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
   const namespacet &ns)
 {
   auto vsd_config = vsd_configt::from_options(options);
-  auto vs_object_factory = variable_sensitivity_object_factoryt::configured_with(vsd_config);
+  auto vs_object_factory =
+    variable_sensitivity_object_factoryt::configured_with(vsd_config);
 
   // These support all of the option categories
   if(
@@ -488,8 +489,8 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     }
     else if(options.get_bool_option("vsd"))
     {
-      df = util_make_unique<
-        variable_sensitivity_domain_factoryt>(vs_object_factory);
+      df = util_make_unique<variable_sensitivity_domain_factoryt>(
+        vs_object_factory);
     }
     // non-null is not fully supported, despite the historical options
     // dependency-graph is quite heavily tied to the legacy-ait infrastructure
@@ -544,7 +545,8 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     }
     else if(options.get_bool_option("vsd"))
     {
-      auto df = util_make_unique<variable_sensitivity_domain_factoryt>(vs_object_factory);
+      auto df = util_make_unique<variable_sensitivity_domain_factoryt>(
+        vs_object_factory);
       return new ait<variable_sensitivity_domaint>(std::move(df));
     }
     else if(options.get_bool_option("intervals"))

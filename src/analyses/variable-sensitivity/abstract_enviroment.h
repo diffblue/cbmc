@@ -30,7 +30,7 @@
 
 class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =
-std::shared_ptr<variable_sensitivity_object_factoryt>;
+  std::shared_ptr<variable_sensitivity_object_factoryt>;
 
 class abstract_environmentt
 {
@@ -41,8 +41,8 @@ public:
 
   abstract_environmentt(
     variable_sensitivity_object_factory_ptrt _object_factory)
-  : bottom(true),
-    object_factory(_object_factory) {
+    : bottom(true), object_factory(_object_factory)
+  {
   }
 
   /// These three are really the heart of the method

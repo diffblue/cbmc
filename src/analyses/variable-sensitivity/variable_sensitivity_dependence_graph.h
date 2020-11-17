@@ -76,8 +76,8 @@ public:
 
   explicit variable_sensitivity_dependence_domaint(
     node_indext id,
-    variable_sensitivity_object_factory_ptrt object_factory
-  ) : variable_sensitivity_domaint(object_factory),
+    variable_sensitivity_object_factory_ptrt object_factory)
+    : variable_sensitivity_domaint(object_factory),
       node_id(id),
       has_values(false),
       has_changed(false)
