@@ -1525,7 +1525,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     else if(bytecode == patternt("?shl"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
-      results[0]=shl_exprt(op[0], op[1]);
+      results = convert_shl(statement, op, results);
     }
     else if(bytecode == patternt("?shr"))
     {
@@ -2746,6 +2746,23 @@ exprt::operandst &java_bytecode_convert_methodt::convert_cmp(
 
   results[0] = if_exprt(
     binary_relation_exprt(op[0], ID_equal, op[1]), from_integer(0, t), greater);
+  return results;
+}
+
+exprt::operandst &java_bytecode_convert_methodt::convert_shl(
+  const irep_idt &statement,
+  const exprt::operandst &op,
+  exprt::operandst &results) const
+{
+  const typet type = java_type_from_char(statement[0]);
+
+  const std::size_t width = get_bytecode_type_width(type);
+
+  // According to JLS 15.19 Shift Operators
+  // a mask 0b11111 is applied for int and 0b111111 for long.
+  exprt mask = from_integer(width - 1, op[1].type());
+
+  results[0] = shl_exprt(op[0], bitand_exprt(op[1], mask));
   return results;
 }
 
