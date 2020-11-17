@@ -122,10 +122,14 @@ struct vsd_configt
   }
 };
 
+class variable_sensitivity_object_factoryt;
+using variable_sensitivity_object_factory_ptrt =
+std::shared_ptr<variable_sensitivity_object_factoryt>;
+
 class variable_sensitivity_object_factoryt
 {
 public:
-  static std::shared_ptr<variable_sensitivity_object_factoryt> configured_with(
+  static variable_sensitivity_object_factory_ptrt configured_with(
     const vsd_configt &options) {
     return std::make_shared<variable_sensitivity_object_factoryt>(options);
   }

@@ -446,6 +446,9 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
   const optionst &options,
   const namespacet &ns)
 {
+  auto vsd_config = vsd_configt::from_options(options);
+  auto vs_object_factory = variable_sensitivity_object_factoryt::configured_with(vsd_config);
+
   // These support all of the option categories
   if(
     options.get_bool_option("recursive-interprocedural") ||
@@ -485,10 +488,6 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     }
     else if(options.get_bool_option("vsd"))
     {
-      auto vsd_config = vsd_configt::from_options(options);
-      auto vs_object_factory =
-        std::make_shared<variable_sensitivity_object_factoryt>(vsd_config);
-
       df = util_make_unique<
         variable_sensitivity_domain_factoryt>(vs_object_factory);
     }
@@ -540,19 +539,11 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     }
     else if(options.get_bool_option("dependence-graph-vs"))
     {
-      auto vsd_config = vsd_configt::from_options(options);
-      auto vs_object_factory =
-        std::make_shared<variable_sensitivity_object_factoryt>(vsd_config);
-
       return new variable_sensitivity_dependence_grapht(
         goto_model.goto_functions, ns, vs_object_factory);
     }
     else if(options.get_bool_option("vsd"))
     {
-      auto vsd_config = vsd_configt::from_options(options);
-      auto vs_object_factory =
-        std::make_shared<variable_sensitivity_object_factoryt>(vsd_config);
-
       auto df = util_make_unique<variable_sensitivity_domain_factoryt>(vs_object_factory);
       return new ait<variable_sensitivity_domaint>(std::move(df));
     }
@@ -770,18 +761,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(options.get_bool_option("general-analysis"))
   {
-    // TODO : replace with the domain factory infrastructure
-    //try
-    //{
-    //  variable_sensitivity_object_factoryt::instance().set_options(
-    //    vsd_configt::from_options(options));
-    //}
-    //catch(const invalid_command_line_argument_exceptiont &e)
-    //{
-    //  log.error() << e.what() << messaget::eom;
-    //  return CPROVER_EXIT_USAGE_ERROR;
-    //}
-
     // Output file factory
     const std::string outfile=options.get_option("outfile");
 
@@ -802,7 +781,17 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     // Build analyzer
     log.status() << "Selecting abstract domain" << messaget::eom;
     namespacet ns(goto_model.symbol_table);  // Must live as long as the domain.
-    std::unique_ptr<ai_baset> analyzer(build_analyzer(options, ns));
+    std::unique_ptr<ai_baset> analyzer;
+
+    try
+    {
+      analyzer.reset(build_analyzer(options, ns));
+    }
+    catch(const invalid_command_line_argument_exceptiont &e)
+    {
+      log.error() << e.what() << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
 
     if(analyzer == nullptr)
     {
