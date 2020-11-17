@@ -91,7 +91,7 @@ jobs:
       - name: Get release tag name
         # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
         # strip that here
-        run: echo "::set-env name=RELEASE_TAG::${GITHUB_REF/refs\/tags\/}"
+        run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
       - name: Create homebrew PR
         run: |
           brew update-reset
@@ -110,7 +110,7 @@ jobs:
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
-      - uses: microsoft/setup-msbuild@v1.0.1
+      - uses: microsoft/setup-msbuild@v1.0.2
         name: Setup Visual Studio environment
       - name: Setup code sign environment
         run: | 
