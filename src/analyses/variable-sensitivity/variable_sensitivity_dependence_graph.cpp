@@ -610,8 +610,10 @@ class variable_sensitivity_dependence_domain_factoryt
 {
 public:
   explicit variable_sensitivity_dependence_domain_factoryt(
-    variable_sensitivity_dependence_grapht &_dg)
-    : dg(_dg)
+    variable_sensitivity_dependence_grapht &_dg,
+    variable_sensitivity_object_factory_ptrt _object_factory)
+    : dg(_dg),
+      object_factory(_object_factory)
   {
   }
 
@@ -619,7 +621,7 @@ public:
   {
     auto node_id = dg.add_node();
     dg.nodes[node_id].PC = l;
-    auto p = util_make_unique<variable_sensitivity_dependence_domaint>(node_id);
+    auto p = util_make_unique<variable_sensitivity_dependence_domaint>(node_id, object_factory);
     CHECK_RETURN(p->is_bottom());
 
     return std::unique_ptr<statet>(p.release());
@@ -627,14 +629,16 @@ public:
 
 private:
   variable_sensitivity_dependence_grapht &dg;
+  variable_sensitivity_object_factory_ptrt object_factory;
 };
 
 variable_sensitivity_dependence_grapht::variable_sensitivity_dependence_grapht(
   const goto_functionst &goto_functions,
-  const namespacet &_ns)
+  const namespacet &_ns,
+  variable_sensitivity_object_factory_ptrt _object_factory)
   : ai_three_way_merget(
       util_make_unique<ai_history_factory_default_constructort<ahistoricalt>>(),
-      util_make_unique<variable_sensitivity_dependence_domain_factoryt>(*this),
+      util_make_unique<variable_sensitivity_dependence_domain_factoryt>(*this, _object_factory),
       util_make_unique<location_sensitive_storaget>()),
     goto_functions(goto_functions),
     ns(_ns)

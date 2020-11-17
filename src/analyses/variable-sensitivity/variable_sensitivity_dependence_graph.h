@@ -74,8 +74,13 @@ class variable_sensitivity_dependence_domaint
 public:
   typedef grapht<vs_dep_nodet>::node_indext node_indext;
 
-  explicit variable_sensitivity_dependence_domaint(node_indext id)
-    : node_id(id), has_values(false), has_changed(false)
+  explicit variable_sensitivity_dependence_domaint(
+    node_indext id,
+    variable_sensitivity_object_factory_ptrt object_factory
+  ) : variable_sensitivity_domaint(object_factory),
+      node_id(id),
+      has_values(false),
+      has_changed(false)
   {
   }
 
@@ -237,7 +242,8 @@ public:
 
   explicit variable_sensitivity_dependence_grapht(
     const goto_functionst &goto_functions,
-    const namespacet &_ns);
+    const namespacet &_ns,
+    variable_sensitivity_object_factory_ptrt object_factory);
 
   void
   initialize(const irep_idt &function_id, const goto_programt &goto_program)

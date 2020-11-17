@@ -540,8 +540,12 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     }
     else if(options.get_bool_option("dependence-graph-vs"))
     {
+      auto vsd_config = vsd_configt::from_options(options);
+      auto vs_object_factory =
+        std::make_shared<variable_sensitivity_object_factoryt>(vsd_config);
+
       return new variable_sensitivity_dependence_grapht(
-        goto_model.goto_functions, ns);
+        goto_model.goto_functions, ns, vs_object_factory);
     }
     else if(options.get_bool_option("vsd"))
     {
