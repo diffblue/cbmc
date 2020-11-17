@@ -212,6 +212,11 @@ public:
 #endif
 };
 
+class variable_sensitivity_domain_factoryt
+  : public ai_domain_factory_default_constructort<variable_sensitivity_domaint>
+{
+};
+
 #ifdef ENABLE_STATS
 template <>
 struct get_domain_statisticst<variable_sensitivity_domaint>
