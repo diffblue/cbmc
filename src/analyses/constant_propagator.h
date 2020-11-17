@@ -35,9 +35,9 @@ class constant_propagator_domaint:public ai_domain_baset
 public:
   virtual void transform(
     const irep_idt &function_from,
-    locationt from,
+    trace_ptrt trace_from,
     const irep_idt &function_to,
-    locationt to,
+    trace_ptrt trace_to,
     ai_baset &ai_base,
     const namespacet &ns) final override;
 

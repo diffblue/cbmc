@@ -103,24 +103,6 @@ public:
     const irep_idt &function_to,
     trace_ptrt to,
     ai_baset &ai,
-    const namespacet &ns)
-  {
-    return transform(
-      function_from,
-      from->current_location(),
-      function_to,
-      to->current_location(),
-      ai,
-      ns);
-  }
-
-  DEPRECATED(SINCE(2019, 08, 01, "use the history signature instead"))
-  virtual void transform(
-    const irep_idt &function_from,
-    locationt from,
-    const irep_idt &function_to,
-    locationt to,
-    ai_baset &ai,
     const namespacet &ns) = 0;
 
   virtual void

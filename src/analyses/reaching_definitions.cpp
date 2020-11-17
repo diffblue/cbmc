@@ -90,12 +90,15 @@ void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 
 void rd_range_domaint::transform(
   const irep_idt &function_from,
-  locationt from,
+  trace_ptrt trace_from,
   const irep_idt &function_to,
-  locationt to,
+  trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
 {
+  locationt from{trace_from->current_location()};
+  locationt to{trace_to->current_location()};
+
   reaching_definitions_analysist *rd=
     dynamic_cast<reaching_definitions_analysist*>(&ai);
   INVARIANT_STRUCTURED(

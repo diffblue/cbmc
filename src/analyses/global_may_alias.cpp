@@ -91,13 +91,15 @@ void global_may_alias_domaint::get_rhs_aliases_address_of(
 }
 
 void global_may_alias_domaint::transform(
-  const irep_idt &,
-  locationt from,
-  const irep_idt &,
-  locationt,
-  ai_baset &,
-  const namespacet &)
+  const irep_idt &function_from,
+  trace_ptrt trace_from,
+  const irep_idt &function_to,
+  trace_ptrt trace_to,
+  ai_baset &ai,
+  const namespacet &ns)
 {
+  locationt from{trace_from->current_location()};
+
   if(has_values.is_false())
     return;
 

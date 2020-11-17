@@ -15,13 +15,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 void invariant_set_domaint::transform(
-  const irep_idt &,
-  locationt from_l,
-  const irep_idt &,
-  locationt to_l,
-  ai_baset &,
+  const irep_idt &function_from,
+  trace_ptrt trace_from,
+  const irep_idt &function_to,
+  trace_ptrt trace_to,
+  ai_baset &ai,
   const namespacet &ns)
 {
+  locationt from_l(trace_from->current_location());
+  locationt to_l(trace_to->current_location());
+
   switch(from_l->type)
   {
   case GOTO:

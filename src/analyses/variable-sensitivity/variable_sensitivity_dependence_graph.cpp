@@ -65,14 +65,17 @@ void variable_sensitivity_dependence_domaint::eval_data_deps(
  */
 void variable_sensitivity_dependence_domaint::transform(
   const irep_idt &function_from,
-  locationt from,
+  trace_ptrt trace_from,
   const irep_idt &function_to,
-  locationt to,
+  trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
 {
+  locationt from{trace_from->current_location()};
+  locationt to{trace_to->current_location()};
+
   variable_sensitivity_domaint::transform(
-    function_from, from, function_to, to, ai, ns);
+    function_from, trace_from, function_to, trace_to, ai, ns);
 
   variable_sensitivity_dependence_grapht *dep_graph =
     dynamic_cast<variable_sensitivity_dependence_grapht *>(&ai);
