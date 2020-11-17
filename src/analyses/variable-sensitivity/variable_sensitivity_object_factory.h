@@ -125,6 +125,11 @@ struct vsd_configt
 class variable_sensitivity_object_factoryt
 {
 public:
+  explicit variable_sensitivity_object_factoryt(const vsd_configt &options)
+    : configuration(options),
+      initialized(true) {
+  }
+
   static variable_sensitivity_object_factoryt &instance()
   {
     return s_instance;

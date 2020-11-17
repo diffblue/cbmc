@@ -212,9 +212,21 @@ public:
 #endif
 };
 
+class variable_sensitivity_object_factoryt;
+using variable_sensitivity_object_factory_ptrt =
+  std::shared_ptr<variable_sensitivity_object_factoryt>;
+
 class variable_sensitivity_domain_factoryt
   : public ai_domain_factory_default_constructort<variable_sensitivity_domaint>
 {
+public:
+  explicit variable_sensitivity_domain_factoryt(
+    variable_sensitivity_object_factory_ptrt object_factory
+  ) : vs_object_factory(object_factory) {
+  }
+
+private:
+  variable_sensitivity_object_factory_ptrt vs_object_factory;
 };
 
 #ifdef ENABLE_STATS
