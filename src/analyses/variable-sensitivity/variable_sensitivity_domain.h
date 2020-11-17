@@ -78,8 +78,6 @@ std::shared_ptr<variable_sensitivity_object_factoryt>;
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
-  variable_sensitivity_domaint() { }
-
   explicit variable_sensitivity_domaint(
     variable_sensitivity_object_factory_ptrt _object_factory) {
   }
@@ -222,11 +220,14 @@ public:
 #endif
 };
 
-class variable_sensitivity_domain_factoryt
-  : public ai_domain_factory_default_constructort<variable_sensitivity_domaint>
+template<>
+class ai_domain_factory_default_constructort<variable_sensitivity_domaint>
+  : public ai_domain_factoryt<variable_sensitivity_domaint>
 {
 public:
-  explicit variable_sensitivity_domain_factoryt(
+  ai_domain_factory_default_constructort() = delete;
+
+  explicit ai_domain_factory_default_constructort(
     variable_sensitivity_object_factory_ptrt _object_factory)
   : object_factory(_object_factory) {
   }
@@ -241,6 +242,9 @@ public:
 private:
   variable_sensitivity_object_factory_ptrt object_factory;
 };
+
+using variable_sensitivity_domain_factoryt =
+  ai_domain_factory_default_constructort<variable_sensitivity_domaint>;
 
 #ifdef ENABLE_STATS
 template <>
