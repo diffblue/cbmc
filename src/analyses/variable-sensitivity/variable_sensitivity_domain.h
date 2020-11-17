@@ -71,9 +71,19 @@
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 
+class variable_sensitivity_object_factoryt;
+using variable_sensitivity_object_factory_ptrt =
+std::shared_ptr<variable_sensitivity_object_factoryt>;
+
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
+  variable_sensitivity_domaint() { }
+
+  explicit variable_sensitivity_domaint(
+    variable_sensitivity_object_factory_ptrt _object_factory) {
+  }
+
   /// Compute the abstract transformer for a single instruction
   ///
   /// \param function_from: the name of the function containing from
@@ -212,21 +222,24 @@ public:
 #endif
 };
 
-class variable_sensitivity_object_factoryt;
-using variable_sensitivity_object_factory_ptrt =
-  std::shared_ptr<variable_sensitivity_object_factoryt>;
-
 class variable_sensitivity_domain_factoryt
   : public ai_domain_factory_default_constructort<variable_sensitivity_domaint>
 {
 public:
   explicit variable_sensitivity_domain_factoryt(
-    variable_sensitivity_object_factory_ptrt object_factory
-  ) : vs_object_factory(object_factory) {
+    variable_sensitivity_object_factory_ptrt _object_factory)
+  : object_factory(_object_factory) {
+  }
+
+  std::unique_ptr<statet> make(locationt l) const override
+  {
+    auto d = util_make_unique<variable_sensitivity_domaint>(object_factory);
+    CHECK_RETURN(d->is_bottom());
+    return std::unique_ptr<statet>(d.release());
   }
 
 private:
-  variable_sensitivity_object_factory_ptrt vs_object_factory;
+  variable_sensitivity_object_factory_ptrt object_factory;
 };
 
 #ifdef ENABLE_STATS
