@@ -13,16 +13,32 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev
+        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-20.04-Release-${{ github.ref }}
+            ${{ runner.os }}-20.04-Release
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure CMake
         run: |
           mkdir build
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
       - name: Build using Ninja
         run: |
           cd build
           ninja -j2
+      - name: Print ccache stats
+        run: ccache -s
       - name: Run CTest
         run: cd build; ctest . -V -L CORE -C Release -j2
       - name: Create packages
@@ -53,16 +69,32 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev
+        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-18.04-Release-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-18.04-Release-${{ github.ref }}
+            ${{ runner.os }}-18.04-Release
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure CMake
         run: |
           mkdir build
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
       - name: Build using Ninja
         run: |
           cd build
           ninja -j2
+      - name: Print ccache stats
+        run: ccache -s
       - name: Run CTest
         run: cd build; ctest . -V -L CORE -C Release -j2
       - name: Create packages
