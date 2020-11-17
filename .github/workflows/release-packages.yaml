@@ -22,9 +22,9 @@ jobs:
       - name: Build using Ninja
         run: |
           cd build
-          ninja
+          ninja -j2
       - name: Run CTest
-        run: cd build; ctest . -V -L CORE -C Release
+        run: cd build; ctest . -V -L CORE -C Release -j2
       - name: Create packages
         id: create_packages
         run: |
@@ -62,9 +62,9 @@ jobs:
       - name: Build using Ninja
         run: |
           cd build
-          ninja
+          ninja -j2
       - name: Run CTest
-        run: cd build; ctest . -V -L CORE -C Release
+        run: cd build; ctest . -V -L CORE -C Release -j2
       - name: Create packages
         id: create_packages
         run: |
@@ -124,7 +124,7 @@ jobs:
       - name: Build Release
         run: |
           Set-Location build
-          cmake --build . --config Release
+          cmake --build . --config Release -j2
       - name: Create packages
         id: create_packages
         run: |

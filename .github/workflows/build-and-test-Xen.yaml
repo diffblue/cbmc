@@ -24,7 +24,7 @@ jobs:
       - name: Build CBMC tools
         run: |
           make -C src minisat2-download
-          make -C src cbmc.dir goto-cc.dir goto-diff.dir
+          make -C src cbmc.dir goto-cc.dir goto-diff.dir -j2
 
       - name: Get one-line-scan
         run: git clone -b path-addition https://github.com/awslabs/one-line-scan.git

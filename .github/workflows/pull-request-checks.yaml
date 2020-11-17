@@ -33,10 +33,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test
       - name: Run regression tests
         run: |
-          make -C regression test
+          make -C regression test-parallel JOBS=2
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test
+          make -C jbmc/regression test-parallel JOBS=2
 
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
@@ -57,14 +57,14 @@ jobs:
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Build with Ninja
-        run: cd build; ninja
+        run: cd build; ninja -j2
       - name: Check if package building works
         run: |
           cd build
           ninja package
           ls *.deb
       - name: Run tests
-        run: cd build; ctest . -V -L CORE
+        run: cd build; ctest . -V -L CORE -j2
 
   check-macos-10_15-make-clang:
     runs-on: macos-10.15
@@ -73,12 +73,12 @@ jobs:
         with:
           submodules: true
       - name: Fetch dependencies
-        run: brew install maven flex bison
+        run: brew install maven flex bison parallel
       - name: Build using Make
         run: |
           make -C src minisat2-download
-          make -C src
-          make -C jbmc/src
+          make -C src -j2
+          make -C jbmc/src -j2
           make -C unit
           make -C jbmc/unit
       - name: Run unit tests
@@ -86,9 +86,9 @@ jobs:
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
       - name: Run regression tests
-        run: cd regression; make
+        run: make -C regression test-parallel JOBS=2
       - name: Run JBMC regression tests
-        run: cd jbmc/regression; make
+        run: make -C jbmc/regression test-parallel JOBS=2
 
   check-macos-10_15-cmake-clang:
     runs-on: macos-10.15
@@ -104,9 +104,9 @@ jobs:
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
       - name: Build with Ninja
-        run: cd build; ninja
+        run: cd build; ninja -j2
       - name: Run CTest
-        run: cd build; ctest -V -L CORE .
+        run: cd build; ctest -V -L CORE . -j2
 
   check-vs-2019-build-and-test:
     runs-on: windows-2019
@@ -196,7 +196,7 @@ jobs:
       - name: Build Release
         run: |
           Set-Location build
-          cmake --build . --config Release
+          cmake --build . --config Release -- /p:CL_MPcount=2
       - name: Create packages
         id: create_packages
         # We need to get the path to cpack because fascinatingly,
@@ -227,9 +227,9 @@ jobs:
       - name: Build using Ninja
         run: |
           cd build
-          ninja
+          ninja -j2
       - name: Run CTest
-        run: cd build; ctest . -V -L CORE -C Release
+        run: cd build; ctest . -V -L CORE -C Release -j2
       - name: Create packages
         id: create_packages
         run: |
