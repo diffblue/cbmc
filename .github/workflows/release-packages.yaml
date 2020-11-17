@@ -110,7 +110,7 @@ jobs:
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
-      - uses: microsoft/setup-msbuild@v1.0.1
+      - uses: microsoft/setup-msbuild@v1.0.2
         name: Setup Visual Studio environment
       - name: Setup code sign environment
         run: | 
