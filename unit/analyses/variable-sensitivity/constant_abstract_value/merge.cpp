@@ -9,6 +9,7 @@
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
 #include <typeinfo>
 #include <util/arith_tools.h>
@@ -27,7 +28,9 @@ SCENARIO(
     const exprt val1 = from_integer(1, integer_typet());
     const exprt val2 = from_integer(2, integer_typet());
 
-    abstract_environmentt enviroment;
+    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+      vsd_configt::constant_domain());
+    abstract_environmentt enviroment { object_factory };
     enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);

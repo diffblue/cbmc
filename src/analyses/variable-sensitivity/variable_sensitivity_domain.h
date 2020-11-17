@@ -71,15 +71,12 @@
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 
-class variable_sensitivity_object_factoryt;
-using variable_sensitivity_object_factory_ptrt =
-std::shared_ptr<variable_sensitivity_object_factoryt>;
-
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
   explicit variable_sensitivity_domaint(
-    variable_sensitivity_object_factory_ptrt _object_factory) {
+    variable_sensitivity_object_factory_ptrt _object_factory)
+  : abstract_state(_object_factory) {
   }
 
   /// Compute the abstract transformer for a single instruction

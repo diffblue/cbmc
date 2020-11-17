@@ -11,6 +11,7 @@
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 SCENARIO(
   "meet_interval_abstract_value",
@@ -42,7 +43,10 @@ SCENARIO(
     const auto x_ge_max = binary_relation_exprt(varx, ID_ge, max_value);
     const auto x_gt_max = binary_relation_exprt(varx, ID_gt, max_value);
 
-    abstract_environmentt enviroment;
+    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+      vsd_configt::intervals());
+
+    abstract_environmentt enviroment { object_factory };
     enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);

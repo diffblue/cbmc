@@ -28,11 +28,23 @@
 #include <util/sharing_map.h>
 #include <util/std_expr.h>
 
+class variable_sensitivity_object_factoryt;
+using variable_sensitivity_object_factory_ptrt =
+std::shared_ptr<variable_sensitivity_object_factoryt>;
+
 class abstract_environmentt
 {
 public:
   using map_keyt = irep_idt;
-  abstract_environmentt();
+
+  abstract_environmentt() = delete;
+
+  abstract_environmentt(
+    variable_sensitivity_object_factory_ptrt _object_factory)
+  : bottom(true),
+    object_factory(_object_factory) {
+  }
+
   /// These three are really the heart of the method
 
   /// Evaluate the value of an expression relative to the current domain
@@ -248,6 +260,8 @@ private:
     const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
+
+  variable_sensitivity_object_factory_ptrt object_factory;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H

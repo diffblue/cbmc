@@ -10,9 +10,6 @@
 #include "util/namespace.h"
 #include "value_set_abstract_value.h"
 
-variable_sensitivity_object_factoryt
-  variable_sensitivity_object_factoryt::s_instance;
-
 variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
 variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
 {
@@ -142,11 +139,4 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   }
-}
-
-void variable_sensitivity_object_factoryt::set_options(
-  const vsd_configt &options)
-{
-  this->configuration = options;
-  initialized = true;
 }

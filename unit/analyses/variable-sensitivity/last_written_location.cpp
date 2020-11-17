@@ -34,6 +34,9 @@ SCENARIO(
   "symbols",
   "[core][analyses][variable-sensitivity][last-written-location]")
 {
+  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+    vsd_configt::constant_domain());
+
   GIVEN("Two identifiers that contain integer values")
   {
     const irep_idt identifier = "hello";
@@ -54,12 +57,9 @@ SCENARIO(
     symbol_table.add(second_sym);
     namespacet ns(symbol_table);
 
-    variable_sensitivity_object_factoryt::instance().set_options(
-      vsd_configt::constant_domain());
-
     WHEN("The identifiers get inserted into two environments")
     {
-      abstract_environmentt env;
+      abstract_environmentt env(object_factory);
 
       auto first_eval_rhs = env.eval(rhs_val, ns);
       auto first_eval_res = env.eval(first_val, ns);
@@ -71,7 +71,7 @@ SCENARIO(
       env.assign(first_val, first_eval_rhs, ns);
       env.assign(second_val, second_eval_rhs, ns);
 
-      abstract_environmentt second_env;
+      abstract_environmentt second_env(object_factory);
       second_env.assign(first_val, first_eval_rhs, ns);
       second_env.assign(second_val, second_eval_rhs, ns);
 
@@ -107,7 +107,7 @@ SCENARIO(
       "The identifiers get inserted into two environments, but one of "
       "them has a different value in one of the environments")
     {
-      abstract_environmentt env;
+      abstract_environmentt env(object_factory);
 
       auto first_eval_rhs = env.eval(rhs_val, ns);
       auto first_eval_res = env.eval(first_val, ns);
@@ -121,7 +121,7 @@ SCENARIO(
 
       auto rhs_val_3 = from_integer(20, integer_typet());
 
-      abstract_environmentt second_env;
+      abstract_environmentt second_env(object_factory);
       auto new_rhs_val = second_env.eval(rhs_val_3, ns);
       second_env.assign(first_val, first_eval_rhs, ns);
       second_env.assign(second_val, new_rhs_val, ns);
