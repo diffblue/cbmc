@@ -15,11 +15,9 @@ jobs:
           # This is needed in addition to -yq to prevent apt-get from asking for
           # user input
           DEBIAN_FRONTEND: noninteractive
-          TESTPL_JOBS: 4
         run: |
-          sudo apt-get install -yq gcc gdb g++ maven jq flex bison libxml2-utils cpanminus
+          sudo apt-get install -yq gcc gdb g++ maven jq flex bison libxml2-utils
           make -C src minisat2-download
-          cpanm Thread::Pool::Simple
       - name: Build with make
         run: |
           make -C src CXX='/usr/bin/g++' -j2
@@ -52,8 +50,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils cpanminus dpkg-dev
-          cpanm Thread::Pool::Simple
+          sudo apt-get install -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev
       - name: Configure using CMake
         run: |
           mkdir build
@@ -68,8 +65,6 @@ jobs:
           ls *.deb
       - name: Run tests
         run: cd build; ctest . -V -L CORE
-        env:
-          TESTPL_JOBS: 2
 
   check-macos-10_15-make-clang:
     runs-on: macos-10.15
