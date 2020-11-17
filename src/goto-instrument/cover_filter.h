@@ -16,20 +16,14 @@ Author: Daniel Kroening
 #include <memory>
 
 #include <util/invariant.h>
-#include <util/message.h>
 #include <util/symbol.h>
 
 #include <goto-programs/goto_model.h>
 
 /// Base class for filtering functions
-class function_filter_baset : public messaget
+class function_filter_baset
 {
 public:
-  explicit function_filter_baset(message_handlert &message_handler)
-    : messaget(message_handler)
-  {
-  }
-
   virtual ~function_filter_baset()
   {
   }
@@ -48,14 +42,9 @@ public:
 };
 
 /// Base class for filtering goals
-class goal_filter_baset : public messaget
+class goal_filter_baset
 {
 public:
-  explicit goal_filter_baset(message_handlert &message_handler)
-    : messaget(message_handler)
-  {
-  }
-
   virtual ~goal_filter_baset()
   {
   }
@@ -146,11 +135,6 @@ private:
 class internal_functions_filtert : public function_filter_baset
 {
 public:
-  explicit internal_functions_filtert(message_handlert &message_handler)
-    : function_filter_baset(message_handler)
-  {
-  }
-
   bool operator()(
     const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const override;
@@ -159,10 +143,7 @@ public:
 class file_filtert : public function_filter_baset
 {
 public:
-  explicit file_filtert(
-    message_handlert &message_handler,
-    const irep_idt &file_id)
-    : function_filter_baset(message_handler), file_id(file_id)
+  explicit file_filtert(const irep_idt &file_id) : file_id(file_id)
   {
   }
 
@@ -177,10 +158,8 @@ private:
 class single_function_filtert : public function_filter_baset
 {
 public:
-  explicit single_function_filtert(
-    message_handlert &message_handler,
-    const irep_idt &function_id)
-    : function_filter_baset(message_handler), function_id(function_id)
+  explicit single_function_filtert(const irep_idt &function_id)
+    : function_id(function_id)
   {
   }
 
@@ -196,11 +175,8 @@ private:
 class include_pattern_filtert : public function_filter_baset
 {
 public:
-  explicit include_pattern_filtert(
-    message_handlert &message_handler,
-    const std::string &cover_include_pattern)
-    : function_filter_baset(message_handler),
-      regex_matcher(cover_include_pattern)
+  explicit include_pattern_filtert(const std::string &cover_include_pattern)
+    : regex_matcher(cover_include_pattern)
   {
   }
 
@@ -216,11 +192,6 @@ private:
 class trivial_functions_filtert : public function_filter_baset
 {
 public:
-  explicit trivial_functions_filtert(message_handlert &message_handler)
-    : function_filter_baset(message_handler)
-  {
-  }
-
   bool operator()(
     const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const override;
@@ -230,11 +201,6 @@ public:
 class internal_goals_filtert : public goal_filter_baset
 {
 public:
-  explicit internal_goals_filtert(message_handlert &message_handler)
-    : goal_filter_baset(message_handler)
-  {
-  }
-
   bool operator()(const source_locationt &) const override;
 };
 
