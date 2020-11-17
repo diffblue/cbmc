@@ -91,7 +91,7 @@ jobs:
       - name: Get release tag name
         # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
         # strip that here
-        run: echo "::set-env name=RELEASE_TAG::${GITHUB_REF/refs\/tags\/}"
+        run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
       - name: Create homebrew PR
         run: |
           brew update-reset

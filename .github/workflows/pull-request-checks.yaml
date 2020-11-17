@@ -132,9 +132,7 @@ jobs:
           Expand-Archive z3.zip
           # We need Get-ChildItem.Name here because the path includes
           # the z3 version number, which we expect to change.
-          $z3_path = "$(Get-Location)\z3\$((Get-ChildItem z3).Name)"
-          $env:PATH += ";$z3_path"
-          Write-Output "::set-env name=PATH::$env:PATH"
+          echo "$(Get-Location)\z3\$((Get-ChildItem z3).Name)" >> $env:GITHUB_PATH
 
       - name: Build cbmc
         run: "${{env.SCRIPT_DIR}}\\build-cbmc.bat"
