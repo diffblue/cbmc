@@ -19,4 +19,4 @@ echo "Configure CBMC with cmake"
 cmake -S. -Bbuild
 
 echo "Build CBMC with cmake"
-cmake --build build --config Release
+cmake --build build --config Release -- /p:CL_MPcount=2
