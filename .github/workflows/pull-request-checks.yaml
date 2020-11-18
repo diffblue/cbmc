@@ -251,7 +251,21 @@ jobs:
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
+          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - uses: microsoft/setup-msbuild@v1.0.2
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-msbuild-${{ github.ref }}
+            ${{ runner.os }}-msbuild
+      - name: ccache environment
+        run: |
+          echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
+          echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
         run: |
           New-Item -ItemType Directory -Path build
@@ -260,7 +274,9 @@ jobs:
       - name: Build Release
         run: |
           Set-Location build
-          cmake --build . --config Release -- /p:CL_MPcount=2
+          cmake --build . --config Release -- /p:CL_MPcount=2 /p:CLToolExe=clcache
+      - name: Print ccache stats
+        run: clcache -s
       - name: Create packages
         id: create_packages
         # We need to get the path to cpack because fascinatingly,
