@@ -29,7 +29,7 @@ class symbol_exprt;
 class symbol_tablet;
 class typecast_exprt;
 
-class remove_const_function_pointerst:public messaget
+class remove_const_function_pointerst
 {
 public:
   typedef std::unordered_set<symbol_exprt, irep_hash> functionst;
@@ -101,6 +101,7 @@ private:
   exprt get_component_value(
     const struct_exprt &struct_expr, const member_exprt &member_expr);
 
+  messaget log;
   const namespacet &ns;
   const symbol_tablet &symbol_table;
 };
