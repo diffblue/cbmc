@@ -1669,6 +1669,49 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
 
       c = convert_putstatic(i_it->source_location, arg0, op, symbol_expr);
     }
+    else if(
+      bytecode == BC_f2i || bytecode == BC_f2l || bytecode == BC_d2i ||
+      bytecode == BC_d2l)
+    {
+      PRECONDITION(op.size() == 1 && results.size() == 1);
+      typet src_type = java_type_from_char(statement[0]);
+      typet dest_type = java_type_from_char(statement[2]);
+
+      // See JLS 5.1.3. Narrowing Primitive Conversion
+      // +-NaN is converted to 0
+      // +-Inf resp. values beyond the int/long range
+      //   are mapped to max/min of int/long.
+      // Other values are rounded towards zero
+
+      // for int: 2147483647, for long: 9223372036854775807L
+      exprt largest_as_dest =
+        to_integer_bitvector_type(dest_type).largest_expr();
+
+      // 2147483647 is not exactly representable in float;
+      // it will be rounded up to 2147483648, which is fine.
+      // 9223372036854775807L is not exactly representable
+      // neither in float nor in double; it is rounded up to
+      // 9223372036854775808.0, which is fine.
+      exprt largest_as_src =
+        from_integer(to_integer_bitvector_type(dest_type).largest(), src_type);
+
+      // for int: -2147483648, for long: -9223372036854775808L
+      exprt smallest_as_dest =
+        to_integer_bitvector_type(dest_type).smallest_expr();
+
+      // -2147483648 and -9223372036854775808L are exactly
+      // representable in float and double.
+      exprt smallest_as_src =
+        from_integer(to_integer_bitvector_type(dest_type).smallest(), src_type);
+
+      results[0] = if_exprt(
+        binary_relation_exprt(op[0], ID_le, smallest_as_src),
+        smallest_as_dest,
+        if_exprt(
+          binary_relation_exprt(op[0], ID_ge, largest_as_src),
+          largest_as_dest,
+          typecast_exprt::conditional_cast(op[0], dest_type)));
+    }
     else if(bytecode == patternt("?2?")) // i2c etc.
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
