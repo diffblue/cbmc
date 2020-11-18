@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>

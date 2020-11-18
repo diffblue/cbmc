@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "expr2cpp.h"
 
-#include <cassert>
-
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>

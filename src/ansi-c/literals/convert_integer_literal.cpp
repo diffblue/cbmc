@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "convert_integer_literal.h"
 
-#include <cassert>
 #include <cctype>
 
 #include <util/arith_tools.h>

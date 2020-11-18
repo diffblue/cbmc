@@ -11,7 +11,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 #include "graphml.h"
 
-#include <cassert>
 #include <set>
 
 #include <util/message.h>

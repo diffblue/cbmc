@@ -14,8 +14,6 @@ Date: August 2013
 
 #include "dependence_graph.h"
 
-#include <cassert>
-
 #include <util/container_utils.h>
 #include <util/json_irep.h>
 

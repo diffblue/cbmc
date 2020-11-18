@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "convert_float_literal.h"
 
-#include <cassert>
-
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/ieee_float.h>

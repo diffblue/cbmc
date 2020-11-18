@@ -11,7 +11,6 @@ Author: CM Wintersteiger, 2006
 
 #include "gcc_cmdline.h"
 
-#include <cassert>
 #include <cstring>
 #include <iostream>
 #include <fstream>

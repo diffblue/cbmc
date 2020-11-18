@@ -11,7 +11,6 @@ Author: Michael Tautschnig
 
 #include "as_cmdline.h"
 
-#include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>

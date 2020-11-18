@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_declaration.h"
 
 #include <ostream>
-#include <cassert>
 
 #include <util/config.h>
 #include <util/std_types.h>

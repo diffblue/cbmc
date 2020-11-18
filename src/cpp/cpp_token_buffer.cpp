@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token_buffer.h"
 
-#include <cassert>
-
 #include <ansi-c/ansi_c_y.tab.h>
 #include <ansi-c/ansi_c_parser.h>
 

@@ -16,7 +16,6 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <list>
 #include <map>
 #include <iosfwd>
-#include <cassert>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_program.h>

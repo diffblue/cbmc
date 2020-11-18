@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai.h"
 
-#include <cassert>
 #include <memory>
 #include <sstream>
 #include <type_traits>

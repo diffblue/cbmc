@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_UNION_FIND_H
 #define CPROVER_UTIL_UNION_FIND_H
 
-#include <cassert>
 #include <vector>
 
 #include "invariant.h"

@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include <cassert>
 #include <iosfwd>
 #include <vector>
 

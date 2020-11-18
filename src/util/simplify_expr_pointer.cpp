@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
-#include <cassert>
-
 #include "arith_tools.h"
 #include "c_types.h"
 #include "config.h"

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_GRAPH_H
 
 #include <algorithm>
-#include <cassert>
 #include <functional>
 #include <iosfwd>
 #include <list>

@@ -11,7 +11,6 @@ Author: Daniel Poetzl
 #include "invariant.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cctype>
 #include <iomanip>
 

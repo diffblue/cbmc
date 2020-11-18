@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/expr_util.h>

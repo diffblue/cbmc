@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set.h"
 
-#include <cassert>
 #include <ostream>
 
 #include <util/arith_tools.h>

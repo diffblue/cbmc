@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_DECLARATION_H
 #define CPROVER_ANSI_C_ANSI_C_DECLARATION_H
 
-#include <cassert>
-
 #include <util/std_expr.h>
 #include <util/symbol.h>
 

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "linking.h"
 
-#include <cassert>
 #include <deque>
 #include <unordered_set>
 

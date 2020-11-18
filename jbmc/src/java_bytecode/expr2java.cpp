@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "expr2java.h"
 
-#include <cassert>
 #include <sstream>
 
 #include <util/namespace.h>
