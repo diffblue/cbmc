@@ -170,7 +170,7 @@ jobs:
       - name: Build Release
         run: |
           Set-Location build
-          cmake --build . --config Release -j2 -- /p:CLToolExe=clcache
+          cmake --build . --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
       - name: Print ccache stats
         run: clcache -s
       - name: Create packages
