@@ -22,7 +22,7 @@ public:
   {
   }
 
-  virtual void operator()(symex_target_equationt &equation);
+  virtual void operator()(symex_target_equationt &equation, message_handlert &);
 
 protected:
   virtual exprt before(event_it e1, event_it e2);

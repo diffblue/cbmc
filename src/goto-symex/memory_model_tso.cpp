@@ -14,11 +14,13 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
 
-void memory_model_tsot::operator()(symex_target_equationt &equation)
+void memory_model_tsot::
+operator()(symex_target_equationt &equation, message_handlert &message_handler)
 {
-  statistics() << "Adding TSO constraints" << eom;
+  messaget log{message_handler};
+  log.statistics() << "Adding TSO constraints" << messaget::eom;
 
-  build_event_lists(equation);
+  build_event_lists(equation, message_handler);
   build_clock_type();
 
   read_from(equation);

@@ -330,8 +330,7 @@ void postprocess_equation(
   {
     std::unique_ptr<memory_model_baset> memory_model =
       get_memory_model(options, ns);
-    memory_model->set_message_handler(ui_message_handler);
-    (*memory_model)(equation);
+    (*memory_model)(equation, ui_message_handler);
   }
 
   messaget log(ui_message_handler);

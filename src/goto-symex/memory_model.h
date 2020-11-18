@@ -20,7 +20,7 @@ public:
   explicit memory_model_baset(const namespacet &_ns);
   virtual ~memory_model_baset();
 
-  virtual void operator()(symex_target_equationt &) = 0;
+  virtual void operator()(symex_target_equationt &, message_handlert &) = 0;
 
 protected:
   /// In-thread program order

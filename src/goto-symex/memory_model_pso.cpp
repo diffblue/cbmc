@@ -11,11 +11,13 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "memory_model_pso.h"
 
-void memory_model_psot::operator()(symex_target_equationt &equation)
+void memory_model_psot::
+operator()(symex_target_equationt &equation, message_handlert &message_handler)
 {
-  statistics() << "Adding PSO constraints" << eom;
+  messaget log{message_handler};
+  log.statistics() << "Adding PSO constraints" << messaget::eom;
 
-  build_event_lists(equation);
+  build_event_lists(equation, message_handler);
   build_clock_type();
 
   read_from(equation);
