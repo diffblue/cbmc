@@ -19,14 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 typedef std::list<const symbolt *> symbolptr_listt;
 
-#define forall_symbolptr_list(it, list) \
-  for(symbolptr_listt::const_iterator it=(list).begin(); \
-      it!=(list).end(); ++it)
-
-#define Forall_symbolptr_list(it, list) \
-  for(symbolptr_listt::iterator it=(list).begin(); \
-      it!=(list).end(); ++it)
-
 const symbolt &get_module_by_name(
   const symbol_tablet &symbol_table,
   const std::string &module,
@@ -60,8 +52,8 @@ const symbolt &get_module_by_name(
   {
     message.error() << "module '" << module << "' does not uniquely resolve:\n";
 
-    forall_symbolptr_list(it, symbolptr_list)
-      message.error() << "  " << (*it)->name << '\n';
+    for(const symbolt *symbol_ptr : symbolptr_list)
+      message.error() << "  " << symbol_ptr->name << '\n';
 
     message.error() << messaget::eom;
     throw 0;
@@ -107,8 +99,8 @@ const symbolt &get_module(
     // sorted alphabetically
     std::set<std::string> modules;
 
-    forall_symbolptr_list(it, symbolptr_list)
-      modules.insert(id2string((*it)->pretty_name));
+    for(const symbolt *symbol_ptr : symbolptr_list)
+      modules.insert(id2string(symbol_ptr->pretty_name));
 
     message.error() << "multiple modules found, please select one:\n";
 
