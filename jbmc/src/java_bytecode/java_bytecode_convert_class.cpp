@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/suffix.h>
 
-class java_bytecode_convert_classt:public messaget
+class java_bytecode_convert_classt
 {
 public:
   java_bytecode_convert_classt(
@@ -41,7 +41,7 @@ public:
     method_bytecodet &method_bytecode,
     java_string_library_preprocesst &_string_preprocess,
     const std::unordered_set<std::string> &no_load_classes)
-    : messaget(_message_handler),
+    : log(_message_handler),
       symbol_table(_symbol_table),
       max_array_length(_max_array_length),
       method_bytecode(method_bytecode),
@@ -98,7 +98,7 @@ public:
       generate_class_stub(
         class_name,
         symbol_table,
-        get_message_handler(),
+        log.get_message_handler(),
         struct_union_typet::componentst{});
   }
 
@@ -108,6 +108,7 @@ public:
   typedef java_bytecode_parse_treet::annotationt annotationt;
 
 private:
+  messaget log;
   symbol_tablet &symbol_table;
   const size_t max_array_length;
   method_bytecodet &method_bytecode;
@@ -274,7 +275,8 @@ void java_bytecode_convert_classt::convert(
   std::string qualified_classname="java::"+id2string(c.name);
   if(symbol_table.has_symbol(qualified_classname))
   {
-    debug() << "Skip class " << c.name << " (already loaded)" << eom;
+    log.debug() << "Skip class " << c.name << " (already loaded)"
+                << messaget::eom;
     return;
   }
 
@@ -302,10 +304,10 @@ void java_bytecode_convert_classt::convert(
     }
     catch(const unsupported_java_class_signature_exceptiont &e)
     {
-      debug() << "Class: " << c.name
-              << "\n could not parse signature: " << c.signature.value()
-              << "\n " << e.what() << "\n ignoring that the class is generic"
-              << eom;
+      log.debug() << "Class: " << c.name
+                  << "\n could not parse signature: " << c.signature.value()
+                  << "\n " << e.what()
+                  << "\n ignoring that the class is generic" << messaget::eom;
     }
   }
 
@@ -325,9 +327,11 @@ void java_bytecode_convert_classt::convert(
   {
     if(max_array_length != 0 && c.enum_elements > max_array_length)
     {
-      warning() << "Java Enum " << c.name << " won't work properly because max "
-                << "array length (" << max_array_length << ") is less than the "
-                << "enum size (" << c.enum_elements << ")" << eom;
+      log.warning() << "Java Enum " << c.name
+                    << " won't work properly because max "
+                    << "array length (" << max_array_length
+                    << ") is less than the "
+                    << "enum size (" << c.enum_elements << ")" << messaget::eom;
     }
     class_type.set(
       ID_java_enum_static_unwind,
@@ -364,10 +368,12 @@ void java_bytecode_convert_classt::convert(
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        debug() << "Superclass: " << c.super_class << " of class: " << c.name
-                << "\n could not parse signature: " << superclass_ref.value()
-                << "\n " << e.what()
-                << "\n ignoring that the superclass is generic" << eom;
+        log.debug() << "Superclass: " << c.super_class
+                    << " of class: " << c.name
+                    << "\n could not parse signature: "
+                    << superclass_ref.value() << "\n " << e.what()
+                    << "\n ignoring that the superclass is generic"
+                    << messaget::eom;
         class_type.add_base(base);
       }
     }
@@ -404,10 +410,11 @@ void java_bytecode_convert_classt::convert(
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
-        debug() << "Interface: " << interface << " of class: " << c.name
-                << "\n could not parse signature: " << interface_ref.value()
-                << "\n " << e.what()
-                << "\n ignoring that the interface is generic" << eom;
+        log.debug() << "Interface: " << interface << " of class: " << c.name
+                    << "\n could not parse signature: " << interface_ref.value()
+                    << "\n " << e.what()
+                    << "\n ignoring that the interface is generic"
+                    << messaget::eom;
         class_type.add_base(base);
       }
     }
@@ -455,10 +462,11 @@ void java_bytecode_convert_classt::convert(
   symbolt *class_symbol;
 
   // add before we do members
-  debug() << "Adding symbol: class '" << c.name << "'" << eom;
+  log.debug() << "Adding symbol: class '" << c.name << "'" << messaget::eom;
   if(symbol_table.move(new_symbol, class_symbol))
   {
-    error() << "failed to add class symbol " << new_symbol.name << eom;
+    log.error() << "failed to add class symbol " << new_symbol.name
+                << messaget::eom;
     throw 0;
   }
 
@@ -477,12 +485,11 @@ void java_bytecode_convert_classt::convert(
         std::string err =
           "Duplicate field definition for " + field_id + " in overlay class";
         // TODO: This could just be a warning if the types match
-        error() << err << eom;
+        log.error() << err << messaget::eom;
         throw err.c_str();
       }
-      debug()
-        << "Adding symbol from overlay class:  field '" << field.name << "'"
-        << eom;
+      log.debug() << "Adding symbol from overlay class:  field '" << field.name
+                  << "'" << messaget::eom;
       convert(*class_symbol, field);
       POSTCONDITION(check_field_exists(field, field_id, fields));
     }
@@ -493,12 +500,12 @@ void java_bytecode_convert_classt::convert(
     if(check_field_exists(field, field_id, fields))
     {
       // TODO: This could be a warning if the types match
-      error()
-        << "Field definition for " << field_id
-        << " already loaded from overlay class" << eom;
+      log.error() << "Field definition for " << field_id
+                  << " already loaded from overlay class" << messaget::eom;
       continue;
     }
-    debug() << "Adding symbol:  field '" << field.name << "'" << eom;
+    log.debug() << "Adding symbol:  field '" << field.name << "'"
+                << messaget::eom;
     convert(*class_symbol, field);
     POSTCONDITION(check_field_exists(field, field_id, fields));
   }
@@ -514,9 +521,8 @@ void java_bytecode_convert_classt::convert(
           + ":" + method.descriptor;
       if(is_ignored_method(c.name, method))
       {
-        debug()
-          << "Ignoring method:  '" << method_identifier << "'"
-          << eom;
+        log.debug() << "Ignoring method:  '" << method_identifier << "'"
+                    << messaget::eom;
         continue;
       }
       if(method_bytecode.contains_method(method_identifier))
@@ -530,26 +536,25 @@ void java_bytecode_convert_classt::convert(
         {
           // This method was defined in a previous class definition without
           // being marked as an overlay method
-          warning()
+          log.warning()
             << "Method " << method_identifier
             << " exists in an overlay class without being marked as an "
-              "overlay and also exists in another overlay class that appears "
-              "earlier in the classpath"
-            << eom;
+               "overlay and also exists in another overlay class that appears "
+               "earlier in the classpath"
+            << messaget::eom;
         }
         continue;
       }
       // Always run the lazy pre-stage, as it symbol-table
       // registers the function.
-      debug()
-        << "Adding symbol from overlay class:  method '" << method_identifier
-        << "'" << eom;
+      log.debug() << "Adding symbol from overlay class:  method '"
+                  << method_identifier << "'" << messaget::eom;
       java_bytecode_convert_method_lazy(
         *class_symbol,
         method_identifier,
         method,
         symbol_table,
-        get_message_handler());
+        log.get_message_handler());
       method_bytecode.add(qualified_classname, method_identifier, method);
       if(is_overlay_method(method))
         overlay_methods.insert(method_identifier);
@@ -562,9 +567,8 @@ void java_bytecode_convert_classt::convert(
         + ":" + method.descriptor;
     if(is_ignored_method(c.name, method))
     {
-      debug()
-        << "Ignoring method:  '" << method_identifier << "'"
-        << eom;
+      log.debug() << "Ignoring method:  '" << method_identifier << "'"
+                  << messaget::eom;
       continue;
     }
     if(method_bytecode.contains_method(method_identifier))
@@ -577,39 +581,41 @@ void java_bytecode_convert_classt::convert(
       {
         // This method was defined in a previous class definition without
         // being marked as an overlay method
-        warning()
+        log.warning()
           << "Method " << method_identifier
           << " exists in an overlay class without being marked as an overlay "
-            "and also exists in the underlying class"
-          << eom;
+             "and also exists in the underlying class"
+          << messaget::eom;
       }
       continue;
     }
     // Always run the lazy pre-stage, as it symbol-table
     // registers the function.
-    debug() << "Adding symbol:  method '" << method_identifier << "'" << eom;
+    log.debug() << "Adding symbol:  method '" << method_identifier << "'"
+                << messaget::eom;
     java_bytecode_convert_method_lazy(
       *class_symbol,
       method_identifier,
       method,
       symbol_table,
-      get_message_handler());
+      log.get_message_handler());
     method_bytecode.add(qualified_classname, method_identifier, method);
     if(is_overlay_method(method))
     {
-      warning()
+      log.warning()
         << "Method " << method_identifier
-        << " marked as an overlay where defined in the underlying class" << eom;
+        << " marked as an overlay where defined in the underlying class"
+        << messaget::eom;
     }
   }
   if(!overlay_methods.empty())
   {
-    error()
+    log.error()
       << "Overlay methods defined in overlay classes did not exist in the "
-        "underlying class:\n";
+         "underlying class:\n";
     for(const irep_idt &method_id : overlay_methods)
-      error() << "  " << method_id << "\n";
-    error() << eom;
+      log.error() << "  " << method_id << "\n";
+    log.error() << messaget::eom;
   }
 
   // is this a root class?
@@ -744,8 +750,8 @@ void java_bytecode_convert_classt::convert(
     const auto value = zero_initializer(field_type, class_symbol.location, ns);
     if(!value.has_value())
     {
-      error().source_location = class_symbol.location;
-      error() << "failed to zero-initialize " << f.name << eom;
+      log.error().source_location = class_symbol.location;
+      log.error() << "failed to zero-initialize " << f.name << messaget::eom;
       throw 0;
     }
     new_symbol.value = *value;
@@ -1025,12 +1031,14 @@ bool java_bytecode_convert_class(
 
   catch(const char *e)
   {
-    java_bytecode_convert_class.error() << e << messaget::eom;
+    messaget log{message_handler};
+    log.error() << e << messaget::eom;
   }
 
   catch(const std::string &e)
   {
-    java_bytecode_convert_class.error() << e << messaget::eom;
+    messaget log{message_handler};
+    log.error() << e << messaget::eom;
   }
 
   return true;

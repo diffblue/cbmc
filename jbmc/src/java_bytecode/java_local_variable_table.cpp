@@ -617,7 +617,7 @@ void java_bytecode_convert_methodt::find_initializers_for_slot(
     live_variable_at_address,
     amap,
     predecessor_map,
-    get_message_handler());
+    log.get_message_handler());
 
   // OK, we've established the flows all seem sensible.
   // Now merge vartable entries according to the predecessor_map:
@@ -654,10 +654,7 @@ void java_bytecode_convert_methodt::find_initializers_for_slot(
     INVARIANT(merge_vars.size()>=2, "merging requires at least 2 variables");
 
     merge_variable_table_entries(
-      *merge_into,
-      merge_vars,
-      dominator_analysis,
-      status());
+      *merge_into, merge_vars, dominator_analysis, log.status());
   }
 }
 
@@ -751,12 +748,12 @@ void java_bytecode_convert_methodt::setup_local_variables(
   dominator_analysis(dominator_args);
 
 #ifdef DEBUG
-  debug() << "jcm: setup-local-vars: m.is_static "
-          << m.is_static << " m.descriptor " << m.descriptor << eom;
-  debug() << "jcm: setup-local-vars: lv arg slots "
-          << slots_for_parameters << eom;
-  debug() << "jcm: setup-local-vars: lvt size "
-          << m.local_variable_table.size() << eom;
+  log.debug() << "jcm: setup-local-vars: m.is_static " << m.is_static
+              << " m.descriptor " << m.descriptor << messaget::eom;
+  log.debug() << "jcm: setup-local-vars: lv arg slots " << slots_for_parameters
+              << messaget::eom;
+  log.debug() << "jcm: setup-local-vars: lvt size "
+              << m.local_variable_table.size() << messaget::eom;
 #endif
 
   // Find out which local variable table entries should be merged:
@@ -779,9 +776,10 @@ void java_bytecode_convert_methodt::setup_local_variables(
   }
   catch(const char *message)
   {
-    warning() << "Bytecode -> codet translation error: " << message << eom
-              << "This is probably due to an unexpected LVT, "
-              << "falling back to translation without LVT" << eom;
+    log.warning() << "Bytecode -> codet translation error: " << message
+                  << messaget::eom
+                  << "This is probably due to an unexpected LVT, "
+                  << "falling back to translation without LVT" << messaget::eom;
     return;
   }
 
@@ -802,9 +800,10 @@ void java_bytecode_convert_methodt::setup_local_variables(
       continue;
 
 #ifdef DEBUG
-    debug() << "jcm: setup-local-vars: merged variable: idx " << v.var.index
-            << " name " << v.var.name << " v.var.descriptor '"
-            << v.var.descriptor << "' holes " << v.holes.size() << eom;
+    log.debug() << "jcm: setup-local-vars: merged variable: idx " << v.var.index
+                << " name " << v.var.name << " v.var.descriptor '"
+                << v.var.descriptor << "' holes " << v.holes.size()
+                << messaget::eom;
 #endif
 
     const std::string &method_name = id2string(method_id);

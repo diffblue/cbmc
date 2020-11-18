@@ -134,7 +134,7 @@ exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
 {
   if(stack.size()<n)
   {
-    error() << "malformed bytecode (pop too high)" << eom;
+    log.error() << "malformed bytecode (pop too high)" << messaget::eom;
     throw 0;
   }
 
@@ -575,8 +575,8 @@ void java_bytecode_convert_methodt::convert(
   // the formal parameters
   slots_for_parameters = java_method_parameter_slots(method_type);
 
-  debug() << "Generating codet: class " << class_symbol.name << ", method "
-          << m.name << eom;
+  log.debug() << "Generating codet: class " << class_symbol.name << ", method "
+              << m.name << messaget::eom;
 
   // Add parameter symbols to the symbol table
   create_parameter_symbols(parameters, variables, symbol_table);
@@ -870,11 +870,11 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
     {
       if(p<(*findstart) || p>=findlim_block_start_address)
       {
-        debug() << "Generating codet:  "
-                << "warning: refusing to create lexical block spanning "
-                << (*findstart) << "-" << findlim_block_start_address
-                << " due to incoming edge " << p << " -> "
-                << checkit->first << eom;
+        log.debug() << "Generating codet:  "
+                    << "warning: refusing to create lexical block spanning "
+                    << (*findstart) << "-" << findlim_block_start_address
+                    << " due to incoming edge " << p << " -> " << checkit->first
+                    << messaget::eom;
         return this_block;
       }
     }
@@ -893,10 +893,10 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   code_blockt &newblock=to_code_block(newlabel.code());
   auto nblocks=std::distance(findstart, findlim);
   assert(nblocks>=2);
-  debug() << "Generating codet:  combining "
-          << std::distance(findstart, findlim)
-          << " blocks for addresses " << (*findstart) << "-"
-          << findlim_block_start_address << eom;
+  log.debug() << "Generating codet:  combining "
+              << std::distance(findstart, findlim) << " blocks for addresses "
+              << (*findstart) << "-" << findlim_block_start_address
+              << messaget::eom;
 
   // Make a new block containing every child of interest:
   auto &this_block_children = this_block.statements();
@@ -2312,7 +2312,7 @@ void java_bytecode_convert_methodt::convert_invoke(
       method_type,
       class_method_descriptor.class_id(),
       symbol_table,
-      get_message_handler());
+      log.get_message_handler());
   }
 
   exprt function;
@@ -3075,8 +3075,8 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
     const auto value = zero_initializer(return_type, location, ns);
     if(!value.has_value())
     {
-      error().source_location = location;
-      error() << "failed to zero-initialize return type" << eom;
+      log.error().source_location = location;
+      log.error() << "failed to zero-initialize return type" << messaget::eom;
       throw 0;
     }
     return value;
