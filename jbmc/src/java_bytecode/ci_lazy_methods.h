@@ -94,7 +94,7 @@ typedef std::function<
 typedef std::function<std::vector<irep_idt>(const symbol_tablet &)>
   load_extra_methodst;
 
-class ci_lazy_methodst:public messaget
+class ci_lazy_methodst
 {
 public:
   ci_lazy_methodst(
@@ -105,14 +105,14 @@ public:
     java_class_loadert &java_class_loader,
     const std::vector<irep_idt> &extra_instantiated_classes,
     const select_pointer_typet &pointer_type_selector,
-    message_handlert &message_handler,
     const synthetic_methods_mapt &synthetic_methods);
 
   // not const since messaget
   bool operator()(
     symbol_tablet &symbol_table,
     method_bytecodet &method_bytecode,
-    const method_convertert &method_converter);
+    const method_convertert &method_converter,
+    message_handlert &message_handler);
 
 private:
   void initialize_instantiated_classes(
@@ -154,8 +154,9 @@ private:
   const select_pointer_typet &pointer_type_selector;
   const synthetic_methods_mapt &synthetic_methods;
 
-  std::unordered_set<irep_idt>
-  entry_point_methods(const symbol_tablet &symbol_table);
+  std::unordered_set<irep_idt> entry_point_methods(
+    const symbol_tablet &symbol_table,
+    message_handlert &message_handler);
 
   struct convert_method_resultt
   {
@@ -172,7 +173,8 @@ private:
     std::unordered_set<irep_idt> &methods_to_convert_later,
     std::unordered_set<irep_idt> &instantiated_classes,
     std::unordered_set<class_method_descriptor_exprt, irep_hash>
-      &called_virtual_functions);
+      &called_virtual_functions,
+    message_handlert &message_handler);
 
   bool handle_virtual_methods_with_no_callees(
     std::unordered_set<irep_idt> &methods_to_convert_later,

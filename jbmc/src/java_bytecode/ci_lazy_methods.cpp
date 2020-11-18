@@ -29,7 +29,6 @@ Author: Diffblue Ltd.
 ///   removed via `lazy-methods`. Example of use: `ArrayList` as general
 ///   implementation for `List` interface.
 /// \param pointer_type_selector: selector to handle correct pointer types
-/// \param message_handler: the message handler to use for output
 /// \param synthetic_methods: map from synthetic method names to the type of
 ///   synthetic method (e.g. stub class static initialiser). Indicates that
 ///   these method bodies are produced internally, rather than generated from
@@ -42,10 +41,8 @@ ci_lazy_methodst::ci_lazy_methodst(
   java_class_loadert &java_class_loader,
   const std::vector<irep_idt> &extra_instantiated_classes,
   const select_pointer_typet &pointer_type_selector,
-  message_handlert &message_handler,
   const synthetic_methods_mapt &synthetic_methods)
-  : messaget(message_handler),
-    main_class(main_class),
+  : main_class(main_class),
     main_jar_classes(main_jar_classes),
     lazy_methods_extra_entry_points(lazy_methods_extra_entry_points),
     java_class_loader(java_class_loader),
@@ -96,14 +93,16 @@ static bool references_class_model(const exprt &expr)
 /// \param [out] method_bytecode: map from method names to relevant symbol and
 ///   parsed-method objects.
 /// \param method_converter: Function for converting methods on demand.
+/// \param message_handler: the message handler to use for output
 /// \return Returns false on success
 bool ci_lazy_methodst::operator()(
   symbol_tablet &symbol_table,
   method_bytecodet &method_bytecode,
-  const method_convertert &method_converter)
+  const method_convertert &method_converter,
+  message_handlert &message_handler)
 {
   std::unordered_set<irep_idt> methods_to_convert_later =
-    entry_point_methods(symbol_table);
+    entry_point_methods(symbol_table, message_handler);
 
   // Add any extra entry points specified; we should elaborate these in the
   // same way as the main function.
@@ -134,6 +133,8 @@ bool ci_lazy_methodst::operator()(
     called_virtual_functions;
   bool class_initializer_seen = false;
 
+  messaget log{message_handler};
+
   bool any_new_classes = true;
   while(any_new_classes)
   {
@@ -155,7 +156,8 @@ bool ci_lazy_methodst::operator()(
             symbol_table,
             methods_to_convert_later,
             instantiated_classes,
-            called_virtual_functions);
+            called_virtual_functions,
+            message_handler);
           any_new_methods |= conversion_result.new_method_seen;
           class_initializer_seen |= conversion_result.class_initializer_seen;
         }
@@ -164,8 +166,9 @@ bool ci_lazy_methodst::operator()(
       // Given the object types we now know may be created, populate more
       // possible virtual function call targets:
 
-      debug() << "CI lazy methods: add virtual method targets ("
-              << called_virtual_functions.size() << " callsites)" << eom;
+      log.debug() << "CI lazy methods: add virtual method targets ("
+                  << called_virtual_functions.size() << " callsites)"
+                  << messaget::eom;
 
       for(const class_method_descriptor_exprt &called_virtual_function :
           called_virtual_functions)
@@ -214,9 +217,9 @@ bool ci_lazy_methodst::operator()(
     keep_symbols.add(sym.second);
   }
 
-  debug() << "CI lazy methods: removed "
-          << symbol_table.symbols.size() - keep_symbols.symbols.size()
-          << " unreachable methods and globals" << eom;
+  log.debug() << "CI lazy methods: removed "
+              << symbol_table.symbols.size() - keep_symbols.symbols.size()
+              << " unreachable methods and globals" << messaget::eom;
 
   symbol_table.swap(keep_symbols);
 
@@ -322,13 +325,15 @@ ci_lazy_methodst::convert_and_analyze_method(
   std::unordered_set<irep_idt> &methods_to_convert_later,
   std::unordered_set<irep_idt> &instantiated_classes,
   std::unordered_set<class_method_descriptor_exprt, irep_hash>
-    &called_virtual_functions)
+    &called_virtual_functions,
+  message_handlert &message_handler)
 {
   convert_method_resultt result;
   if(!methods_already_populated.insert(method_name).second)
     return result;
 
-  debug() << "CI lazy methods: elaborate " << method_name << eom;
+  messaget log{message_handler};
+  log.debug() << "CI lazy methods: elaborate " << method_name << messaget::eom;
 
   // Note this wraps *references* to methods_to_convert_later &
   // instantiated_classes
@@ -361,13 +366,14 @@ ci_lazy_methodst::convert_and_analyze_method(
 ///   * all the methods of the main class if it is not empty
 ///   * all the methods of the main jar file
 /// \return set of identifiers of entry point methods
-std::unordered_set<irep_idt>
-ci_lazy_methodst::entry_point_methods(const symbol_tablet &symbol_table)
+std::unordered_set<irep_idt> ci_lazy_methodst::entry_point_methods(
+  const symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
   std::unordered_set<irep_idt> methods_to_convert_later;
 
-  const main_function_resultt main_function = get_main_symbol(
-    symbol_table, this->main_class, this->get_message_handler());
+  const main_function_resultt main_function =
+    get_main_symbol(symbol_table, this->main_class, message_handler);
   if(!main_function.is_success())
   {
     // Failed, mark all functions in the given main class(es)
