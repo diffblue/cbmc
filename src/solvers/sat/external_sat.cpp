@@ -12,13 +12,11 @@
 #include <util/string_utils.h>
 #include <util/tempfile.h>
 
-#include <chrono>
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
-#include <random>
 #include <sstream>
 #include <string>
-#include <thread>
 
 external_satt::external_satt(message_handlert &message_handler, std::string cmd)
   : cnf_clause_list_assignmentt(message_handler), solver_cmd(std::move(cmd))
@@ -46,10 +44,17 @@ void external_satt::write_cnf_file(std::string cnf_file)
   std::ofstream out(cnf_file);
 
   // We start counting at 1, thus there is one variable fewer.
-  out << "p cnf " << (no_variables() - 1) << ' ' << no_clauses() << '\n';
+  out << "p cnf " << (no_variables() - 1) << ' '
+      << no_clauses() + assumptions.size() << '\n';
 
+  // output the problem clauses
   for(auto &c : clauses)
     dimacs_cnft::write_dimacs_clause(c, out, false);
+
+  // output the assumption clauses
+  forall_literals(it, assumptions)
+    if(!it->is_constant())
+      out << it->dimacs() << " 0\n";
 
   out.close();
 }
@@ -161,6 +166,14 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
 
 external_satt::resultt external_satt::do_prop_solve()
 {
+  // are we assuming 'false'?
+  if(
+    std::find(assumptions.begin(), assumptions.end(), const_literal(false)) !=
+    assumptions.end())
+  {
+    return resultt::P_UNSATISFIABLE;
+  }
+
   // create a temporary file
   temporary_filet cnf_file("external-sat", ".cnf");
   write_cnf_file(cnf_file());
