@@ -23,7 +23,7 @@ Date: June 2006
 class language_filest;
 class languaget;
 
-class compilet : public messaget
+class compilet
 {
 public:
   // configuration
@@ -102,6 +102,7 @@ protected:
   std::list<std::string> tmp_dirs;
   std::list<irep_idt> seen_modes;
 
+  messaget log;
   cmdlinet &cmdline;
   bool warning_is_fatal;
 
@@ -118,7 +119,10 @@ protected:
     const goto_modelt &src_goto_model)
   {
     if(write_bin_object_file(
-         file_name, src_goto_model, validate_goto_model, get_message_handler()))
+         file_name,
+         src_goto_model,
+         validate_goto_model,
+         log.get_message_handler()))
     {
       return true;
     }
