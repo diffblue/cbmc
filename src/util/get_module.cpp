@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include "message.h"
+#include "range.h"
 #include "symbol_table.h"
 
 typedef std::list<const symbolt *> symbolptr_listt;
@@ -27,10 +28,11 @@ const symbolt &get_module_by_name(
   symbolptr_listt symbolptr_list;
   messaget message(message_handler);
 
-  forall_symbol_base_map(it, symbol_table.symbol_base_map, module)
+  for(const auto &symbol_name_entry :
+      equal_range(symbol_table.symbol_base_map, module))
   {
-    symbol_tablet::symbolst::const_iterator it2=
-      symbol_table.symbols.find(it->second);
+    symbol_tablet::symbolst::const_iterator it2 =
+      symbol_table.symbols.find(symbol_name_entry.second);
 
     if(it2==symbol_table.symbols.end())
       continue;
