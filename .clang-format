@@ -30,8 +30,6 @@ DerivePointerAlignment: 'false'
 DisableFormat: 'false'
 ExperimentalAutoDetectBinPacking: 'false'
 ForEachMacros: [
-  'forall_rw_range_set_r_objects',
-  'forall_rw_range_set_w_objects',
   'forall_rw_set_r_entries',
   'forall_rw_set_w_entries',
   'forall_goto_functions',

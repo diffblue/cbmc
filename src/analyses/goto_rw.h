@@ -21,14 +21,6 @@ Date: April 2010
 
 #include <goto-programs/goto_model.h>
 
-#define forall_rw_range_set_r_objects(it, rw_set) \
-  for(rw_range_sett::objectst::const_iterator it=(rw_set).get_r_set().begin(); \
-      it!=(rw_set).get_r_set().end(); ++it)
-
-#define forall_rw_range_set_w_objects(it, rw_set) \
-  for(rw_range_sett::objectst::const_iterator it=(rw_set).get_w_set().begin(); \
-      it!=(rw_set).get_w_set().end(); ++it)
-
 class rw_range_sett;
 class goto_modelt;
 

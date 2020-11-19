@@ -161,11 +161,11 @@ void dep_graph_domaint::data_dependencies(
   rw_range_set_value_sett rw_set(ns, value_sets);
   goto_rw(function_to, to, rw_set);
 
-  forall_rw_range_set_r_objects(it, rw_set)
+  for(const auto &read_object_entry : rw_set.get_r_set())
   {
-    const range_domaint &r_ranges = rw_set.get_ranges(it->second);
-    const rd_range_domaint::ranges_at_loct &w_ranges=
-      dep_graph.reaching_definitions()[to].get(it->first);
+    const range_domaint &r_ranges = rw_set.get_ranges(read_object_entry.second);
+    const rd_range_domaint::ranges_at_loct &w_ranges =
+      dep_graph.reaching_definitions()[to].get(read_object_entry.first);
 
     for(const auto &w_range : w_ranges)
     {
@@ -186,7 +186,7 @@ void dep_graph_domaint::data_dependencies(
       }
     }
 
-    dep_graph.reaching_definitions()[to].clear_cache(it->first);
+    dep_graph.reaching_definitions()[to].clear_cache(read_object_entry.first);
   }
 }
 

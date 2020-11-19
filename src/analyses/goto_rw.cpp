@@ -65,20 +65,20 @@ rw_range_sett::~rw_range_sett()
 void rw_range_sett::output(std::ostream &out) const
 {
   out << "READ:\n";
-  forall_rw_range_set_r_objects(it, *this)
+  for(const auto &read_object_entry : get_r_set())
   {
-    out << "  " << it->first;
-    it->second->output(ns, out);
+    out << "  " << read_object_entry.first;
+    read_object_entry.second->output(ns, out);
     out << '\n';
   }
 
   out << '\n';
 
   out << "WRITE:\n";
-  forall_rw_range_set_w_objects(it, *this)
+  for(const auto &written_object_entry : get_w_set())
   {
-    out << "  " << it->first;
-    it->second->output(ns, out);
+    out << "  " << written_object_entry.first;
+    written_object_entry.second->output(ns, out);
     out << '\n';
   }
 }
