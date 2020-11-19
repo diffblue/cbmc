@@ -331,7 +331,7 @@ int gcc_modet::doit()
 
   auto default_verbosity = (cmdline.isset("Wall") || cmdline.isset("Wextra")) ?
     messaget::M_WARNING : messaget::M_ERROR;
-  eval_verbosity(
+  messaget::eval_verbosity(
     cmdline.get_value("verbosity"), default_verbosity, gcc_message_handler);
 
   bool act_as_bcc=
@@ -407,19 +407,21 @@ int gcc_modet::doit()
     return EX_OK;
   }
 
+  messaget log{gcc_message_handler};
+
   if(act_as_bcc)
   {
     if(produce_hybrid_binary)
-      debug() << "BCC mode (hybrid)" << eom;
+      log.debug() << "BCC mode (hybrid)" << messaget::eom;
     else
-      debug() << "BCC mode" << eom;
+      log.debug() << "BCC mode" << messaget::eom;
   }
   else
   {
     if(produce_hybrid_binary)
-      debug() << "GCC mode (hybrid)" << eom;
+      log.debug() << "GCC mode (hybrid)" << messaget::eom;
     else
-      debug() << "GCC mode" << eom;
+      log.debug() << "GCC mode" << messaget::eom;
   }
 
   // model validation
@@ -540,17 +542,23 @@ int gcc_modet::doit()
   switch(compiler.mode)
   {
   case compilet::LINK_LIBRARY:
-    debug() << "Linking a library only" << eom; break;
+    log.debug() << "Linking a library only" << messaget::eom;
+    break;
   case compilet::COMPILE_ONLY:
-    debug() << "Compiling only" << eom; break;
+    log.debug() << "Compiling only" << messaget::eom;
+    break;
   case compilet::ASSEMBLE_ONLY:
-    debug() << "Assembling only" << eom; break;
+    log.debug() << "Assembling only" << messaget::eom;
+    break;
   case compilet::PREPROCESS_ONLY:
-    debug() << "Preprocessing only" << eom; break;
+    log.debug() << "Preprocessing only" << messaget::eom;
+    break;
   case compilet::COMPILE_LINK:
-    debug() << "Compiling and linking a library" << eom; break;
+    log.debug() << "Compiling and linking a library" << messaget::eom;
+    break;
   case compilet::COMPILE_LINK_EXECUTABLE:
-    debug() << "Compiling and linking an executable" << eom; break;
+    log.debug() << "Compiling and linking an executable" << messaget::eom;
+    break;
   }
 
   if(cmdline.isset("i386-win32") ||
@@ -558,7 +566,7 @@ int gcc_modet::doit()
   {
     // We may wish to reconsider the below.
     config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
-    debug() << "Enabling Visual Studio syntax" << eom;
+    log.debug() << "Enabling Visual Studio syntax" << messaget::eom;
   }
   else
   {
@@ -697,7 +705,7 @@ int gcc_modet::doit()
 
           if(exit_code!=0)
           {
-            error() << "preprocessing has failed" << eom;
+            log.error() << "preprocessing has failed" << messaget::eom;
             return exit_code;
           }
 
@@ -729,7 +737,8 @@ int gcc_modet::doit()
     cmdline.isset('o') && cmdline.isset('c') &&
     compiler.source_files.size() >= 2)
   {
-    error() << "cannot specify -o with -c with multiple files" << eom;
+    log.error() << "cannot specify -o with -c with multiple files"
+                << messaget::eom;
     return 1; // to match gcc's behaviour
   }
 
@@ -826,10 +835,11 @@ int gcc_modet::preprocess(
   INVARIANT(new_argv.size()>=1, "No program name in argv");
   new_argv[0]=native_tool_name.c_str();
 
-  debug() << "RUN:";
+  messaget log{gcc_message_handler};
+  log.debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    debug() << " " << new_argv[i];
-  debug() << eom;
+    log.debug() << " " << new_argv[i];
+  log.debug() << messaget::eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file, "");
 }
@@ -869,10 +879,11 @@ int gcc_modet::run_gcc(const compilet &compiler)
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
 
-  debug() << "RUN:";
+  messaget log{gcc_message_handler};
+  log.debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    debug() << " " << new_argv[i];
-  debug() << eom;
+    log.debug() << " " << new_argv[i];
+  log.debug() << messaget::eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "", "");
 }
@@ -927,8 +938,9 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
       output_files.front()=="/dev/null"))
     return run_gcc(compiler);
 
-  debug() << "Running " << native_tool_name
-          << " to generate hybrid binary" << eom;
+  messaget log{gcc_message_handler};
+  log.debug() << "Running " << native_tool_name << " to generate hybrid binary"
+              << messaget::eom;
 
   // save the goto-cc output files
   std::list<std::string> goto_binaries;
@@ -945,7 +957,7 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
     }
     catch(const cprover_exception_baset &e)
     {
-      error() << "Rename failed: " << e.what() << eom;
+      log.error() << "Rename failed: " << e.what() << messaget::eom;
       return 1;
     }
 
@@ -987,7 +999,7 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
         goto_binary,
         *it,
         compiler.mode == compilet::COMPILE_LINK_EXECUTABLE,
-        get_message_handler());
+        gcc_message_handler);
   }
 
   return result;
@@ -1012,10 +1024,12 @@ int gcc_modet::asm_output(
       return EX_OK;
   }
 
+  messaget log{gcc_message_handler};
+
   if(produce_hybrid_binary)
   {
-    debug() << "Running " << native_tool_name
-      << " to generate native asm output" << eom;
+    log.debug() << "Running " << native_tool_name
+                << " to generate native asm output" << messaget::eom;
 
     int result=run_gcc(compiler);
     if(result!=0)
@@ -1043,23 +1057,24 @@ int gcc_modet::asm_output(
       output_files.begin()->second=="/dev/null"))
     return EX_OK;
 
-  debug()
-    << "Appending preprocessed sources to generate hybrid asm output"
-    << eom;
+  log.debug() << "Appending preprocessed sources to generate hybrid asm output"
+              << messaget::eom;
 
   for(const auto &so : output_files)
   {
     std::ifstream is(so.first);
     if(!is.is_open())
     {
-      error() << "Failed to open input source " << so.first << eom;
+      log.error() << "Failed to open input source " << so.first
+                  << messaget::eom;
       return 1;
     }
 
     std::ofstream os(so.second, std::ios::app);
     if(!os.is_open())
     {
-      error() << "Failed to open output file " << so.second << eom;
+      log.error() << "Failed to open output file " << so.second
+                  << messaget::eom;
       return 1;
     }
 

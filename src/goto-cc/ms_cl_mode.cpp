@@ -57,13 +57,14 @@ int ms_cl_modet::doit()
     has_prefix(base_name, "goto-link");
   #endif
 
-  const auto verbosity = eval_verbosity(
+  const auto verbosity = messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
 
   ms_cl_versiont ms_cl_version;
   ms_cl_version.get("cl.exe");
 
-  debug() << "Visual Studio mode " << ms_cl_version << eom;
+  messaget log{message_handler};
+  log.debug() << "Visual Studio mode " << ms_cl_version << messaget::eom;
 
   // model validation
   compiler.validate_goto_model = cmdline.isset("validate-goto-model");
@@ -109,7 +110,10 @@ int ms_cl_modet::doit()
       config.cpp.set_cpp11();
     }
     else
-      warning() << "unknown language standard " << std_string << eom;
+    {
+      log.warning() << "unknown language standard " << std_string
+                    << messaget::eom;
+    }
   }
   else
     config.cpp.set_cpp14();
@@ -126,7 +130,7 @@ int ms_cl_modet::doit()
       compiler.output_directory_object = Fo_value;
 
       if(!is_directory(Fo_value))
-        warning() << "not a directory: " << Fo_value << eom;
+        log.warning() << "not a directory: " << Fo_value << messaget::eom;
     }
     else
       compiler.output_file_object = Fo_value;
@@ -137,8 +141,8 @@ int ms_cl_modet::doit()
     cmdline.args.size() > 1 &&
     compiler.output_directory_object.empty())
   {
-    error() << "output directory required for /c with multiple input files"
-            << eom;
+    log.error() << "output directory required for /c with multiple input files"
+                << messaget::eom;
     return EX_USAGE;
   }
 
@@ -152,8 +156,10 @@ int ms_cl_modet::doit()
       cmdline.args.size() >= 1)
     {
       if(!is_directory(compiler.output_file_executable))
-        warning() << "not a directory: "
-                  << compiler.output_file_executable << eom;
+      {
+        log.warning() << "not a directory: " << compiler.output_file_executable
+                      << messaget::eom;
+      }
 
       compiler.output_file_executable+=
         get_base_name(cmdline.args[0], true) + ".exe";

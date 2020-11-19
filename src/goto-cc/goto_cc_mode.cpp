@@ -23,6 +23,7 @@ Author: CM Wintersteiger, 2006
 #endif
 
 #include <util/exception_utils.h>
+#include <util/message.h>
 #include <util/parse_options.h>
 #include <util/version.h>
 
@@ -30,10 +31,8 @@ Author: CM Wintersteiger, 2006
 goto_cc_modet::goto_cc_modet(
   goto_cc_cmdlinet &_cmdline,
   const std::string &_base_name,
-  message_handlert &_message_handler):
-  messaget(_message_handler),
-  cmdline(_cmdline),
-  base_name(_base_name)
+  message_handlert &_message_handler)
+  : cmdline(_cmdline), base_name(_base_name), message_handler(_message_handler)
 {
   register_languages();
 }
@@ -88,13 +87,15 @@ int goto_cc_modet::main(int argc, const char **argv)
 
   catch(const char *e)
   {
-    error() << e << eom;
+    messaget log{message_handler};
+    log.error() << e << messaget::eom;
     return EX_SOFTWARE;
   }
 
   catch(const std::string &e)
   {
-    error() << e << eom;
+    messaget log{message_handler};
+    log.error() << e << messaget::eom;
     return EX_SOFTWARE;
   }
 
@@ -105,12 +106,14 @@ int goto_cc_modet::main(int argc, const char **argv)
 
   catch(const std::bad_alloc &)
   {
-    error() << "Out of memory" << eom;
+    messaget log{message_handler};
+    log.error() << "Out of memory" << messaget::eom;
     return EX_SOFTWARE;
   }
   catch(const cprover_exception_baset &e)
   {
-    error() << e.what() << eom;
+    messaget log{message_handler};
+    log.error() << e.what() << messaget::eom;
     return EX_SOFTWARE;
   }
 }

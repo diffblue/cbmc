@@ -75,6 +75,8 @@ int as_modet::doit()
     return EX_OK;
   }
 
+  messaget log{message_handler};
+
   bool act_as_as86=
     base_name=="as86" ||
     base_name.find("goto-as86")!=std::string::npos;
@@ -83,40 +85,44 @@ int as_modet::doit()
      cmdline.isset("version"))
   {
     if(act_as_as86)
-      status() << "as86 version: 0.16.17 (goto-cc " << CBMC_VERSION << ")"
-               << eom;
+    {
+      log.status() << "as86 version: 0.16.17 (goto-cc " << CBMC_VERSION << ")"
+                   << messaget::eom;
+    }
     else
-      status() << "GNU assembler version 2.20.51.0.7 20100318"
-               << " (goto-cc " << CBMC_VERSION << ")" << eom;
+    {
+      log.status() << "GNU assembler version 2.20.51.0.7 20100318"
+                   << " (goto-cc " << CBMC_VERSION << ")" << messaget::eom;
+    }
 
-    status()
+    log.status()
       << '\n'
       << "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n"
       << "CBMC version: " << CBMC_VERSION << '\n'
       << "Architecture: " << config.this_architecture() << '\n'
-      << "OS: " << config.this_operating_system() << eom;
+      << "OS: " << config.this_operating_system() << messaget::eom;
 
     return EX_OK; // Exit!
   }
 
   auto default_verbosity = (cmdline.isset("w-") || cmdline.isset("warn")) ?
     messaget::M_WARNING : messaget::M_ERROR;
-  eval_verbosity(
+  messaget::eval_verbosity(
     cmdline.get_value("verbosity"), default_verbosity, message_handler);
 
   if(act_as_as86)
   {
     if(produce_hybrid_binary)
-      debug() << "AS86 mode (hybrid)" << eom;
+      log.debug() << "AS86 mode (hybrid)" << messaget::eom;
     else
-      debug() << "AS86 mode" << eom;
+      log.debug() << "AS86 mode" << messaget::eom;
   }
   else
   {
     if(produce_hybrid_binary)
-      debug() << "AS mode (hybrid)" << eom;
+      log.debug() << "AS mode (hybrid)" << messaget::eom;
     else
-      debug() << "AS mode" << eom;
+      log.debug() << "AS mode" << messaget::eom;
   }
 
   // get configuration
@@ -128,12 +134,12 @@ int as_modet::doit()
   if(cmdline.isset('b')) // as86 only
   {
     compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
-    debug() << "Compiling and linking an executable" << eom;
+    log.debug() << "Compiling and linking an executable" << messaget::eom;
   }
   else
   {
     compiler.mode=compilet::COMPILE_LINK;
-    debug() << "Compiling and linking a library" << eom;
+    log.debug() << "Compiling and linking a library" << messaget::eom;
   }
 
   config.ansi_c.mode=configt::ansi_ct::flavourt::GCC;
@@ -173,7 +179,7 @@ int as_modet::doit()
     std::ifstream is(infile);
     if(!is.is_open())
     {
-      error() << "Failed to open input source " << infile << eom;
+      log.error() << "Failed to open input source " << infile << messaget::eom;
       return 1;
     }
 
@@ -208,7 +214,7 @@ int as_modet::doit()
         os.open(dest);
         if(!os.is_open())
         {
-          error() << "Failed to tmp output file " << dest << eom;
+          log.error() << "Failed to tmp output file " << dest << messaget::eom;
           return 1;
         }
 
@@ -227,7 +233,10 @@ int as_modet::doit()
       compiler.add_input_file(dest);
     }
     else
-      warning() << "No GOTO-CC section found in " << arg_it->arg << eom;
+    {
+      log.warning() << "No GOTO-CC section found in " << arg_it->arg
+                    << messaget::eom;
+    }
   }
 
   // Revert to as in case there is no source to compile
@@ -285,8 +294,9 @@ int as_modet::as_hybrid_binary(const compilet &compiler)
   if(output_file=="/dev/null")
     return EX_OK;
 
-  debug() << "Running " << native_tool_name
-          << " to generate hybrid binary" << eom;
+  messaget log{message_handler};
+  log.debug() << "Running " << native_tool_name << " to generate hybrid binary"
+              << messaget::eom;
 
   // save the goto-cc output file
   std::string saved = output_file + ".goto-cc-saved";
@@ -296,7 +306,7 @@ int as_modet::as_hybrid_binary(const compilet &compiler)
   }
   catch(const cprover_exception_baset &e)
   {
-    error() << "Rename failed: " << e.what() << eom;
+    log.error() << "Rename failed: " << e.what() << messaget::eom;
     return 1;
   }
 
@@ -309,7 +319,7 @@ int as_modet::as_hybrid_binary(const compilet &compiler)
       saved,
       output_file,
       compiler.mode == compilet::COMPILE_LINK_EXECUTABLE,
-      get_message_handler());
+      message_handler);
   }
 
   return result;

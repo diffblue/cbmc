@@ -16,9 +16,9 @@ Date: June 2006
 
 #include "goto_cc_cmdline.h"
 
-#include <util/message.h>
+class message_handlert;
 
-class goto_cc_modet:public messaget
+class goto_cc_modet
 {
 public:
   int main(int argc, const char **argv);
@@ -36,6 +36,7 @@ public:
 protected:
   goto_cc_cmdlinet &cmdline;
   const std::string base_name;
+  message_handlert &message_handler;
   void register_languages();
 };
 
