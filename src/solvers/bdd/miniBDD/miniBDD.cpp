@@ -17,9 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#define forall_nodes(it)                                                       \
-  for(nodest::const_iterator it = nodes.begin(); it != nodes.end(); it++)
-
 void mini_bdd_nodet::remove_reference()
 {
   PRECONDITION_WITH_DIAGNOSTICS(
@@ -65,9 +62,11 @@ void mini_bdd_mgrt::DumpDot(std::ostream &out, bool suppress_zero) const
            "{ node [shape=plaintext,fontname=\"Times Italic\",fontsize=24] \" "
         << var_table[v].label << " \" }; ";
 
-    forall_nodes(u)
-      if(u->var == (v + 1) && u->reference_counter != 0)
-        out << '"' << u->node_number << "\"; ";
+    for(const auto &u : nodes)
+    {
+      if(u.var == (v + 1) && u.reference_counter != 0)
+        out << '"' << u.node_number << "\"; ";
+    }
 
     out << "}\n";
   }
@@ -83,22 +82,21 @@ void mini_bdd_mgrt::DumpDot(std::ostream &out, bool suppress_zero) const
 
   out << '\n';
 
-  forall_nodes(u)
+  for(const auto &u : nodes)
   {
-    if(u->reference_counter == 0)
+    if(u.reference_counter == 0)
       continue;
-    if(u->node_number <= 1)
+    if(u.node_number <= 1)
       continue;
 
-    if(!suppress_zero || u->high.node_number() != 0)
-      out << '"' << u->node_number << '"' << " -> " << '"'
-          << u->high.node_number() << '"'
+    if(!suppress_zero || u.high.node_number() != 0)
+      out << '"' << u.node_number << '"' << " -> " << '"'
+          << u.high.node_number() << '"'
           << " [style=solid,arrowsize=\".75\"];\n";
 
-    if(!suppress_zero || u->low.node_number() != 0)
-      out << '"' << u->node_number << '"' << " -> " << '"'
-          << u->low.node_number() << '"'
-          << " [style=dashed,arrowsize=\".75\"];\n";
+    if(!suppress_zero || u.low.node_number() != 0)
+      out << '"' << u.node_number << '"' << " -> " << '"' << u.low.node_number()
+          << '"' << " [style=dashed,arrowsize=\".75\"];\n";
 
     out << '\n';
   }
@@ -128,9 +126,9 @@ void mini_bdd_mgrt::DumpTikZ(
 
     unsigned previous = 0;
 
-    forall_nodes(u)
+    for(const auto &u : nodes)
     {
-      if(u->var == (v + 1) && u->reference_counter != 0)
+      if(u.var == (v + 1) && u.reference_counter != 0)
       {
         out << "  \\node[xshift=0cm, BDDnode, ";
 
@@ -139,11 +137,11 @@ void mini_bdd_mgrt::DumpTikZ(
         else
           out << "right of=n" << previous;
 
-        out << "] (n" << u->node_number << ") {";
+        out << "] (n" << u.node_number << ") {";
         if(node_numbers)
-          out << "\\small $" << u->node_number << "$";
+          out << "\\small $" << u.node_number << "$";
         out << "};\n";
-        previous = u->node_number;
+        previous = u.node_number;
       }
     }
 
@@ -164,17 +162,17 @@ void mini_bdd_mgrt::DumpTikZ(
   out << "  % edges\n";
   out << '\n';
 
-  forall_nodes(u)
+  for(const auto &u : nodes)
   {
-    if(u->reference_counter != 0 && u->node_number >= 2)
+    if(u.reference_counter != 0 && u.node_number >= 2)
     {
-      if(!suppress_zero || u->low.node_number() != 0)
-        out << "  \\draw[->,dashed] (n" << u->node_number << ") -> (n"
-            << u->low.node_number() << ");\n";
+      if(!suppress_zero || u.low.node_number() != 0)
+        out << "  \\draw[->,dashed] (n" << u.node_number << ") -> (n"
+            << u.low.node_number() << ");\n";
 
-      if(!suppress_zero || u->high.node_number() != 0)
-        out << "  \\draw[->] (n" << u->node_number << ") -> (n"
-            << u->high.node_number() << ");\n";
+      if(!suppress_zero || u.high.node_number() != 0)
+        out << "  \\draw[->] (n" << u.node_number << ") -> (n"
+            << u.high.node_number() << ");\n";
     }
   }
 
@@ -490,23 +488,22 @@ void mini_bdd_mgrt::DumpTable(std::ostream &out) const
   out << "\\# & \\mathit{var} & \\mathit{low} &"
          " \\mathit{high} \\\\\\hline\n";
 
-  forall_nodes(it)
+  for(const auto &n : nodes)
   {
-    out << it->node_number << " & ";
+    out << n.node_number << " & ";
 
-    if(it->node_number == 0 || it->node_number == 1)
-      out << it->var << " & & \\\\";
-    else if(it->reference_counter == 0)
+    if(n.node_number == 0 || n.node_number == 1)
+      out << n.var << " & & \\\\";
+    else if(n.reference_counter == 0)
       out << "- & - & - \\\\";
     else
-      out << it->var << "\\," << var_table[it->var - 1].label << " & "
-          << it->low.node_number() << " & " << it->high.node_number()
-          << " \\\\";
+      out << n.var << "\\," << var_table[n.var - 1].label << " & "
+          << n.low.node_number() << " & " << n.high.node_number() << " \\\\";
 
-    if(it->node_number == 1)
+    if(n.node_number == 1)
       out << "\\hline";
 
-    out << " % " << it->reference_counter << '\n';
+    out << " % " << n.reference_counter << '\n';
   }
 }
 
