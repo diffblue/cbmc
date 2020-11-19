@@ -136,10 +136,11 @@ public:
     return w_range_set;
   }
 
-  const range_domaint &get_ranges(objectst::const_iterator it) const
+  const range_domaint &
+  get_ranges(const std::unique_ptr<range_domain_baset> &ranges) const
   {
-    PRECONDITION(dynamic_cast<range_domaint*>(it->second.get())!=nullptr);
-    return static_cast<const range_domaint &>(*it->second);
+    PRECONDITION(dynamic_cast<range_domaint *>(ranges.get()) != nullptr);
+    return static_cast<const range_domaint &>(*ranges);
   }
 
   enum class get_modet { LHS_W, READ };
@@ -360,11 +361,12 @@ public:
   {
   }
 
-  const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
+  const guarded_range_domaint &
+  get_ranges(const std::unique_ptr<range_domain_baset> &ranges) const
   {
     PRECONDITION(
-      dynamic_cast<guarded_range_domaint*>(it->second.get())!=nullptr);
-    return static_cast<const guarded_range_domaint &>(*it->second);
+      dynamic_cast<guarded_range_domaint *>(ranges.get()) != nullptr);
+    return static_cast<const guarded_range_domaint &>(*ranges);
   }
 
   void get_objects_rec(

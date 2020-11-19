@@ -163,7 +163,7 @@ void dep_graph_domaint::data_dependencies(
 
   forall_rw_range_set_r_objects(it, rw_set)
   {
-    const range_domaint &r_ranges=rw_set.get_ranges(it);
+    const range_domaint &r_ranges = rw_set.get_ranges(it->second);
     const rd_range_domaint::ranges_at_loct &w_ranges=
       dep_graph.reaching_definitions()[to].get(it->first);
 

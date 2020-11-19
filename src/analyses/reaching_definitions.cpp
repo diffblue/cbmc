@@ -148,7 +148,7 @@ void rd_range_domaint::transform(
           continue;
         assert(symbol_ptr!=0);
 
-        const range_domaint &ranges=rw_set.get_ranges(it);
+        const range_domaint &ranges = rw_set.get_ranges(it->second);
 
         if(is_must_alias &&
            (!rd->get_is_threaded()(from) ||
@@ -357,7 +357,7 @@ void rd_range_domaint::transform_assign(
       nullptr_exceptiont,
       "Symbol is in symbol table");
 
-    const range_domaint &ranges=rw_set.get_ranges(it);
+    const range_domaint &ranges = rw_set.get_ranges(it->second);
 
     if(is_must_alias &&
        (!rd.get_is_threaded()(from) ||
