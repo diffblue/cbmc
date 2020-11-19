@@ -26,6 +26,8 @@ operator+=(const solver_hardnesst::sat_hardnesst &other)
   clauses += other.clauses;
   literals += other.literals;
   variables.insert(other.variables.begin(), other.variables.end());
+  clause_set.insert(
+    clause_set.end(), other.clause_set.begin(), other.clause_set.end());
   return *this;
 }
 
@@ -87,13 +89,29 @@ void solver_hardnesst::register_assertion_ssas(
   current_hardness = {};
 }
 
-void solver_hardnesst::register_clause(const bvt &bv)
+void solver_hardnesst::register_clause(
+  const bvt &bv,
+  const bvt &cnf,
+  const size_t cnf_clause_index,
+  bool register_cnf)
 {
   current_hardness.clauses++;
   current_hardness.literals += bv.size();
+
   for(const auto &literal : bv)
   {
     current_hardness.variables.insert(literal.var_no());
+  }
+
+  if(register_cnf)
+  {
+#ifdef DEBUG
+    std::cout << cnf_clause_index << ": ";
+    for(const auto &literal : cnf)
+      std::cout << literal.dimacs() << " ";
+    std::cout << "0\n";
+#endif
+    current_hardness.clause_set.push_back(cnf_clause_index);
   }
 }
 
@@ -151,6 +169,14 @@ void solver_hardnesst::produce_report()
       sat_hardness_json["Variables"] =
         json_numbert{std::to_string(hardness.variables.size())};
 
+      json_arrayt sat_hardness_clause_set_json;
+      for(auto const &clause : hardness.clause_set)
+      {
+        sat_hardness_clause_set_json.push_back(
+          json_numbert{std::to_string(clause)});
+      }
+      sat_hardness_json["ClauseSet"] = sat_hardness_clause_set_json;
+
       hardness_stats_json["SAT_hardness"] = sat_hardness_json;
 
       json_stream_array.push_back(hardness_stats_json);
@@ -182,6 +208,15 @@ void solver_hardnesst::produce_report()
       json_numbert{std::to_string(assertion_stats.sat_hardness.literals)};
     assertion_hardness_json["Variables"] = json_numbert{
       std::to_string(assertion_stats.sat_hardness.variables.size())};
+
+    json_arrayt assertion_sat_hardness_clause_set_json;
+    for(auto const &clause : assertion_stats.sat_hardness.clause_set)
+    {
+      assertion_sat_hardness_clause_set_json.push_back(
+        json_numbert{std::to_string(clause)});
+    }
+    assertion_hardness_json["ClauseSet"] =
+      assertion_sat_hardness_clause_set_json;
 
     assertion_stats_json["SAT_hardness"] = assertion_hardness_json;
 

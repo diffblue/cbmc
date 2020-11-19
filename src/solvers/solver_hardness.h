@@ -50,6 +50,7 @@ struct solver_hardnesst
     size_t clauses = 0;
     size_t literals = 0;
     std::unordered_set<size_t> variables = {};
+    std::vector<size_t> clause_set = {};
 
     sat_hardnesst &operator+=(const sat_hardnesst &other);
   };
@@ -105,7 +106,15 @@ struct solver_hardnesst
   /// Called e.g. from the `satcheck_minisat2::lcnf`, this function adds the
   ///   complexity statistics from the last SAT query to the `current_ssa_key`.
   /// \param bv: the clause (vector of literals)
-  void register_clause(const bvt &bv);
+  /// \param cnf: processed clause
+  /// \param cnf_clause_index: index of clause in dimacs output
+  /// \param register_cnf: negation of boolean variable tracking if the clause
+  /// can be eliminated
+  void register_clause(
+    const bvt &bv,
+    const bvt &cnf,
+    const size_t cnf_clause_index,
+    bool register_cnf);
 
   void set_outfile(const std::string &file_name);
 
