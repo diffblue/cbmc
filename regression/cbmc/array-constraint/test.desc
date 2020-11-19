@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-array-constraints
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+To test output for --show-array-constraints option that displays the count and list of all array constraints added during post processing in json format.

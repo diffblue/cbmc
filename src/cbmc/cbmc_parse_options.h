@@ -47,6 +47,7 @@ class optionst;
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "(write-solver-stats-to):"  \
+  "(show-array-constraints)"  \
   "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
   "(object-bits):" \
   OPT_GOTO_CHECK \

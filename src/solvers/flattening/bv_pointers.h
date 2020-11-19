@@ -20,7 +20,8 @@ public:
   bv_pointerst(
     const namespacet &_ns,
     propt &_prop,
-    message_handlert &message_handler);
+    message_handlert &message_handler,
+    bool get_array_constraints = false);
 
   void post_process() override;
 
