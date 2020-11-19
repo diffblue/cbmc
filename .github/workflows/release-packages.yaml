@@ -138,16 +138,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: recursive
+          submodules: true
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-      - uses: microsoft/setup-msbuild@v1.0.2
-        name: Setup Visual Studio environment
+      - name: Setup Visual Studio environment
+        uses: microsoft/setup-msbuild@v1.0.2
       - name: Setup code sign environment
-        run: | 
+        run: |
           echo "$(Split-Path -Path $(Get-ChildItem -Path ${env:ProgramFiles(x86)} -Recurse -Filter 'signtool.exe' | Where-Object FullName -like '*10.0.19041.0\x64\signtool.exe').FullName)" >> $env:GITHUB_PATH
           echo "pfxcert=$([string](Get-Location)+'\CodeSignCertificate.pfx')" >> $env:GITHUB_ENV
       - name: Prepare ccache
@@ -163,18 +163,15 @@ jobs:
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
-        run: |
-          New-Item -ItemType Directory -Path build
-          Set-Location build
-          cmake ..
+        run: cmake -S . -B build
       - name: Build Release
-        run: |
-          Set-Location build
-          cmake --build . --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
+        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
       - name: Print ccache stats
         run: clcache -s
       - name: Create packages
         id: create_packages
+        # We need to get the path to cpack because fascinatingly,
+        # chocolatey also includes a command called "cpack" which takes precedence
         run: |
           Set-Location build
           $cpack = "$(Split-Path -Parent (Get-Command cmake).Source)\cpack.exe"
