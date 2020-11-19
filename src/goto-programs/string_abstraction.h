@@ -13,18 +13,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
 #include <util/symbol_table.h>
-#include <util/message.h>
 #include <util/config.h>
 #include <util/std_expr.h>
 
 #include "goto_model.h"
+
+class message_handlert;
 
 /// Replace all uses of `char *` by a struct that carries that string, and also
 /// the underlying allocation and the C string length.
 /// This will become useful (with some modifications) for supporting strings in
 /// the C frontend, as the string solver expects a struct that bundles the
 /// string length and the underlying character array.
-class string_abstractiont:public messaget
+class string_abstractiont
 {
 public:
   string_abstractiont(
@@ -40,6 +41,7 @@ protected:
   symbol_tablet &symbol_table;
   namespacet ns;
   unsigned temporary_counter;
+  message_handlert &message_handler;
 
   typedef ::std::map< typet, typet > abstraction_types_mapt;
   abstraction_types_mapt abstraction_types_map;
