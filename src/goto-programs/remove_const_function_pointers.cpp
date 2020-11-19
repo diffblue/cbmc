@@ -19,12 +19,12 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include "goto_functions.h"
 
-#define LOG(message, irep) \
-  do { \
-    debug().source_location = irep.source_location(); \
-    debug() << message << ": " << format(irep) << eom; \
-  } \
-  while(0)
+#define LOG(message, irep)                                                     \
+  do                                                                           \
+  {                                                                            \
+    log.debug().source_location = irep.source_location();                      \
+    log.debug() << message << ": " << format(irep) << messaget::eom;           \
+  } while(0)
 
 /// To take a function call on a function pointer, and if possible resolve it to
 /// a small collection of possible values.
@@ -34,10 +34,8 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
   const namespacet &ns,
-  const symbol_tablet &symbol_table):
-    messaget(message_handler),
-    ns(ns),
-    symbol_table(symbol_table)
+  const symbol_tablet &symbol_table)
+  : log(message_handler), ns(ns), symbol_table(symbol_table)
 {}
 
 /// To take a function call on a function pointer, and if possible resolve it to
