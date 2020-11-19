@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/message.h>
 #include <util/run.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -122,7 +123,8 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   if(res<0)
   {
-    error() << "error running SMT2 solver" << eom;
+    messaget log{message_handler};
+    log.error() << "error running SMT2 solver" << messaget::eom;
     return decision_proceduret::resultt::D_ERROR;
   }
 
@@ -143,7 +145,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   while(in)
   {
-    auto parsed_opt = smt2irep(in, get_message_handler());
+    auto parsed_opt = smt2irep(in, message_handler);
 
     if(!parsed_opt.has_value())
       break;
@@ -177,8 +179,10 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       // returns unsat will give an error.
       if(res!=resultt::D_UNSATISFIABLE)
       {
-        error() << "SMT2 solver returned error message:\n"
-                << "\t\"" << parsed.get_sub()[1].id() <<"\"" << eom;
+        messaget log{message_handler};
+        log.error() << "SMT2 solver returned error message:\n"
+                    << "\t\"" << parsed.get_sub()[1].id() << "\""
+                    << messaget::eom;
         return decision_proceduret::resultt::D_ERROR;
       }
     }

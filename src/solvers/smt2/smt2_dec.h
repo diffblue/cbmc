@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 
-#include <util/message.h>
-
 #include <fstream>
+
+class message_handlert;
 
 class smt2_stringstreamt
 {
@@ -24,9 +24,7 @@ protected:
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
 */
-class smt2_dect : protected smt2_stringstreamt,
-                  public smt2_convt,
-                  public messaget
+class smt2_dect : protected smt2_stringstreamt, public smt2_convt
 {
 public:
   smt2_dect(
@@ -34,8 +32,10 @@ public:
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
-    solvert _solver):
-    smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream)
+    solvert _solver,
+    message_handlert &_message_handler)
+    : smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream),
+      message_handler(_message_handler)
   {
   }
 
@@ -43,6 +43,8 @@ public:
   std::string decision_procedure_text() const override;
 
 protected:
+  message_handlert &message_handler;
+
   resultt read_result(std::istream &in);
 };
 
