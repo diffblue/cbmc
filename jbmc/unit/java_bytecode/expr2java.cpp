@@ -99,6 +99,10 @@ TEST_CASE(
 #ifndef _MSC_VER
     REQUIRE(
       floating_point_to_java_string(value) == "0x1p+37f /* 1.37439e+11 */");
+#elif _MSC_VER >= 1928
+    REQUIRE(
+      floating_point_to_java_string(value) ==
+      "0x1.0000000000000p+37f /* 1.37439e+11 */");
 #else
     REQUIRE(
       floating_point_to_java_string(value) ==
@@ -112,6 +116,10 @@ TEST_CASE(
 #ifndef _MSC_VER
     REQUIRE(
       floating_point_to_java_string(value) == "0x1p+37 /* 1.37439e+11 */");
+#elif _MSC_VER >= 1928
+    REQUIRE(
+      floating_point_to_java_string(value) ==
+      "0x1.0000000000000p+37 /* 1.37439e+11 */");
 #else
     REQUIRE(
       floating_point_to_java_string(value) ==
