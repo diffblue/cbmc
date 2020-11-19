@@ -21,9 +21,9 @@ SCENARIO(
 {
   GIVEN("An environment with intervals domain")
   {
-    variable_sensitivity_object_factoryt::instance().set_options(
+    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
       vsd_configt::intervals());
-    abstract_environmentt environment;
+    abstract_environmentt environment(object_factory);
     environment.make_top(); // Domains are bottom on construction
 
     symbol_tablet symbol_table;
@@ -68,7 +68,7 @@ SCENARIO(
         // b1 = 0
         environment.assign(
           b1.symbol_expr(),
-          variable_sensitivity_object_factoryt::instance().get_abstract_object(
+          object_factory->get_abstract_object(
             number_type,
             false,
             false,

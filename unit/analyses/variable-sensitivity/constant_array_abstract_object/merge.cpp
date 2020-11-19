@@ -101,13 +101,12 @@ SCENARIO(
     const index_exprt i2 =
       index_exprt(nil_exprt(), from_integer(2, integer_typet()));
 
-    abstract_environmentt enviroment;
+    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+      vsd_configt::constant_domain());
+    abstract_environmentt enviroment(object_factory);
     enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
-
-    variable_sensitivity_object_factoryt::instance().set_options(
-      vsd_configt::constant_domain());
 
     array_utilt util(enviroment, ns);
 

@@ -337,7 +337,7 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  return variable_sensitivity_object_factoryt::instance().get_abstract_object(
+  return object_factory->get_abstract_object(
     type, top, bottom, e, environment, ns);
 }
 
@@ -526,8 +526,4 @@ abstract_environmentt::gather_statistics(const namespacet &ns) const
     }
   }
   return statistics;
-}
-
-abstract_environmentt::abstract_environmentt() : bottom(true)
-{
 }

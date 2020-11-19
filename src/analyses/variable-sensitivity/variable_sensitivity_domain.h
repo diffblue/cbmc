@@ -74,6 +74,12 @@
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
+  explicit variable_sensitivity_domaint(
+    variable_sensitivity_object_factory_ptrt _object_factory)
+    : abstract_state(_object_factory)
+  {
+  }
+
   /// Compute the abstract transformer for a single instruction
   ///
   /// \param function_from: the name of the function containing from
@@ -210,6 +216,27 @@ private:
 public:
   abstract_object_statisticst gather_statistics(const namespacet &ns) const;
 #endif
+};
+
+class variable_sensitivity_domain_factoryt
+  : public ai_domain_factoryt<variable_sensitivity_domaint>
+{
+public:
+  explicit variable_sensitivity_domain_factoryt(
+    variable_sensitivity_object_factory_ptrt _object_factory)
+    : object_factory(_object_factory)
+  {
+  }
+
+  std::unique_ptr<statet> make(locationt l) const override
+  {
+    auto d = util_make_unique<variable_sensitivity_domaint>(object_factory);
+    CHECK_RETURN(d->is_bottom());
+    return std::unique_ptr<statet>(d.release());
+  }
+
+private:
+  variable_sensitivity_object_factory_ptrt object_factory;
 };
 
 #ifdef ENABLE_STATS

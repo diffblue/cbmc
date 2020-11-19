@@ -128,13 +128,12 @@ SCENARIO(
     const member_exprt b(nil_exprt(), "b", integer_typet());
     const member_exprt c(nil_exprt(), "c", integer_typet());
 
-    abstract_environmentt enviroment;
+    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+      vsd_configt::constant_domain());
+    abstract_environmentt enviroment(object_factory);
     enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
-
-    variable_sensitivity_object_factoryt::instance().set_options(
-      vsd_configt::constant_domain());
 
     struct_utilt util(enviroment, ns);
 
