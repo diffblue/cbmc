@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+#include <chrono>
 #include <memory>
 
 #include <pointer-analysis/value_set_dereference.h>
@@ -471,9 +472,16 @@ void goto_symext::symex_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {
+  const auto symex_start = std::chrono::steady_clock::now();
   auto state = initialize_entry_point_state(get_goto_function);
 
   symex_with_state(*state, get_goto_function, new_symbol_table);
+
+  const auto symex_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> symex_runtime =
+    std::chrono::duration<double>(symex_stop - symex_start);
+  log.status() << "Runtime Symex: " << symex_runtime.count() << "s"
+               << messaget::eom;
 }
 
 void goto_symext::initialize_path_storage_from_entry_point_of(
