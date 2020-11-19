@@ -9,3 +9,5 @@ target_link_libraries(symtab2gb
         util
         goto-programs
         json-symtab-language)
+
+install(TARGETS symtab2gb DESTINATION ${CMAKE_INSTALL_BINDIR})
