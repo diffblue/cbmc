@@ -264,10 +264,12 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
       state.symbol_table,
       symex_dereference_state,
       language_mode,
-      expr_is_not_null);
+      expr_is_not_null,
+      log);
 
     // std::cout << "**** " << format(tmp1) << '\n';
-    exprt tmp2 = dereference.dereference(tmp1);
+    exprt tmp2 =
+      dereference.dereference(tmp1, symex_config.show_points_to_sets);
     // std::cout << "**** " << format(tmp2) << '\n';
 
     expr.swap(tmp2);

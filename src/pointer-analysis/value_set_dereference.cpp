@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUG
 #include <iostream>
-#include <util/format_expr.h>
 #endif
 
 #include <util/arith_tools.h>
@@ -24,8 +23,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
+#include <util/json_irep.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -60,7 +61,9 @@ static bool should_use_local_definition_for(const exprt &expr)
   return false;
 }
 
-exprt value_set_dereferencet::dereference(const exprt &pointer)
+exprt value_set_dereferencet::dereference(
+  const exprt &pointer,
+  bool display_points_to_sets)
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
@@ -70,8 +73,9 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   if(pointer.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(pointer);
-    exprt true_case = dereference(if_expr.true_case());
-    exprt false_case = dereference(if_expr.false_case());
+    exprt true_case = dereference(if_expr.true_case(), display_points_to_sets);
+    exprt false_case =
+      dereference(if_expr.false_case(), display_points_to_sets);
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
   else if(pointer.id() == ID_typecast)
@@ -90,13 +94,25 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       const auto &if_expr = to_if_expr(*underlying);
       return if_exprt(
         if_expr.cond(),
-        dereference(typecast_exprt(if_expr.true_case(), pointer.type())),
-        dereference(typecast_exprt(if_expr.false_case(), pointer.type())));
+        dereference(
+          typecast_exprt(if_expr.true_case(), pointer.type()),
+          display_points_to_sets),
+        dereference(
+          typecast_exprt(if_expr.false_case(), pointer.type()),
+          display_points_to_sets));
     }
   }
 
   // type of the object
   const typet &type=pointer.type().subtype();
+
+  json_objectt json_result;
+  if(display_points_to_sets)
+  {
+    std::stringstream ss;
+    ss << format(pointer);
+    json_result["Pointer"] = json_stringt(ss.str());
+  }
 
 #ifdef DEBUG
   std::cout << "value_set_dereferencet::dereference pointer=" << format(pointer)
@@ -106,6 +122,22 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   // collect objects the pointer may point to
   const std::vector<exprt> points_to_set =
     dereference_callback.get_value_set(pointer);
+
+  if(display_points_to_sets)
+  {
+    json_result["PointsToSetSize"] =
+      json_numbert(std::to_string(points_to_set.size()));
+
+    json_arrayt points_to_set_json;
+    for(auto p : points_to_set)
+    {
+      std::stringstream ss;
+      ss << format(p);
+      points_to_set_json.push_back(json_stringt(ss.str()));
+    }
+
+    json_result["PointsToSet"] = points_to_set_json;
+  }
 
 #ifdef DEBUG
   std::cout << "value_set_dereferencet::dereference points_to_set={";
@@ -133,6 +165,22 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       new_symbol_table);
 
     compare_against_pointer = fresh_binder.symbol_expr();
+  }
+
+  if(display_points_to_sets)
+  {
+    json_result["RetainedValuesSetSize"] =
+      json_numbert(std::to_string(points_to_set.size()));
+
+    json_arrayt retained_values_set_json;
+    for(auto &value : retained_values)
+    {
+      std::stringstream ss;
+      ss << format(value);
+      retained_values_set_json.push_back(json_stringt(ss.str()));
+    }
+
+    json_result["RetainedValuesSet"] = retained_values_set_json;
   }
 
 #ifdef DEBUG
@@ -223,6 +271,15 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 
   if(compare_against_pointer != pointer)
     value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
+
+  if(display_points_to_sets)
+  {
+    std::stringstream ss;
+    ss << format(value);
+    json_result["Value"] = json_stringt(ss.str());
+
+    log.status() << json_result;
+  }
 
 #ifdef DEBUG
   std::cout << "value_set_derefencet::dereference value=" << format(value)

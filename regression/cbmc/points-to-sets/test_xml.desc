@@ -1,0 +1,9 @@
+CORE
+main.c
+--show-points-to-sets --xml-ui
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+To test output for --show-points-to-sets option that displays the size and contents of points-to sets in json format.
+xml-ui and plain output not supported.

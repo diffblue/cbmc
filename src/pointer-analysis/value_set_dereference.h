@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <util/message.h>
 #include <util/std_expr.h>
 
 #include "dereference_callback.h"
@@ -34,17 +35,20 @@ public:
   ///   dereference failure
   /// \param _exclude_null_derefs: Ignore value-set entries that indicate a
   //    given dereference may follow a null pointer
+  /// \param _log: Messaget object for displaying points-to set
   value_set_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     dereference_callbackt &_dereference_callback,
     const irep_idt _language_mode,
-    bool _exclude_null_derefs):
-    ns(_ns),
-    new_symbol_table(_new_symbol_table),
-    dereference_callback(_dereference_callback),
-    language_mode(_language_mode),
-    exclude_null_derefs(_exclude_null_derefs)
+    bool _exclude_null_derefs,
+    const messaget &_log)
+    : ns(_ns),
+      new_symbol_table(_new_symbol_table),
+      dereference_callback(_dereference_callback),
+      language_mode(_language_mode),
+      exclude_null_derefs(_exclude_null_derefs),
+      log(_log)
   { }
 
   virtual ~value_set_dereferencet() { }
@@ -52,7 +56,8 @@ public:
   /// Dereference the given pointer-expression. Any errors are
   /// reported to the callback method given in the constructor.
   /// \param pointer: A pointer-typed expression, to be dereferenced.
-  exprt dereference(const exprt &pointer);
+  /// \param display_points_to_sets: Display size and contents of points to sets
+  exprt dereference(const exprt &pointer, bool display_points_to_sets = false);
 
   /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
@@ -105,6 +110,7 @@ private:
   /// Flag indicating whether `value_set_dereferencet::dereference` should
   /// disregard an apparent attempt to dereference NULL
   const bool exclude_null_derefs;
+  const messaget &log;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
