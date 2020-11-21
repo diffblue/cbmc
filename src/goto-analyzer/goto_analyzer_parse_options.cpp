@@ -368,6 +368,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("domain set", true);
 
       // Configuration of VSD
+      options.set_option("values", cmdline.get_value("vsd-values"));
       options.set_option("pointers", cmdline.isset("vsd-pointers"));
       options.set_option("arrays", cmdline.isset("vsd-arrays"));
       options.set_option("structs", cmdline.isset("vsd-structs"));
@@ -382,6 +383,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("domain set", true);
 
       // Configuration of variable sensitivity domain
+      options.set_option("values", cmdline.get_value("vsd-values"));
       options.set_option("pointers", cmdline.isset("vsd-pointers"));
       options.set_option("arrays", cmdline.isset("vsd-arrays"));
       options.set_option("structs", cmdline.isset("vsd-structs"));
@@ -991,6 +993,7 @@ void goto_analyzer_parse_optionst::help()
     " --dependence-graph-vs        dependencies between instructions using VSD\n" // NOLINT(*)
     "\n"
     "Variable sensitivity domain (VSD) options:\n"
+    " --vsd-values                 value tracking - constants|intervals|set-of-constants\n"
     " --vsd-structs                struct field sensitive analysis\n"
     " --vsd-arrays                 array entry sensitive analysis\n"
     " --vsd-pointers               pointer sensitive analysis\n"

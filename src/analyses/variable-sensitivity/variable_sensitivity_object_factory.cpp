@@ -10,7 +10,48 @@
 #include "util/namespace.h"
 #include "value_set_abstract_value.h"
 
-variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
+const vsd_configt::option_mappingt vsd_configt::value_option_mappings = {
+  { "intervals", INTERVAL },
+  { "constants", CONSTANT },
+  { "set-of-constants", VALUE_SET }
+};
+
+invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
+  const std::string& option_name,
+  const std::string& bad_argument,
+  const option_mappingt& mapping
+) {
+  auto option = "--vsd-" + option_name;
+  auto choices = std::string("");
+  for (auto& kv : mapping) {
+    choices += (!choices.empty() ? "|" : "");
+    choices += kv.first;
+  }
+
+  return invalid_command_line_argument_exceptiont {
+    "Unknown argument '" + bad_argument + "'",
+    option,
+    option + " " + choices };
+}
+
+ABSTRACT_OBJECT_TYPET vsd_configt::option_to_abstract_type(
+  const optionst& options,
+  const std::string& option_name,
+  const option_mappingt& mapping,
+  ABSTRACT_OBJECT_TYPET default_type
+) {
+  const auto argument = options.get_option(option_name);
+
+  if (argument.empty()) return default_type;
+
+  auto selected = mapping.find(argument);
+  if (selected == mapping.end()) {
+    throw invalid_argument(option_name, argument, mapping);
+  }
+  return selected->second;
+}
+
+ABSTRACT_OBJECT_TYPET
 variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
 {
   ABSTRACT_OBJECT_TYPET abstract_object_type = TWO_VALUE;
@@ -20,20 +61,12 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
     type.id() == ID_fixedbv || type.id() == ID_c_bool || type.id() == ID_bool ||
     type.id() == ID_integer || type.id() == ID_c_bit_field)
   {
-    abstract_object_type =
-      configuration.advanced_sensitivities.intervals ? INTERVAL : CONSTANT;
-    if(configuration.advanced_sensitivities.new_value_set)
-    {
-      abstract_object_type = VALUE_SET;
-    }
+    return configuration.value_abstract_type;
   }
   else if(type.id() == ID_floatbv)
   {
-    abstract_object_type = CONSTANT;
-    if(configuration.advanced_sensitivities.new_value_set)
-    {
-      abstract_object_type = VALUE_SET;
-    }
+    auto float_type = configuration.value_abstract_type;
+    return (float_type == INTERVAL) ? CONSTANT : float_type;
   }
   else if(type.id() == ID_array)
   {
@@ -100,7 +133,7 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     return initialize_abstract_object<interval_abstract_valuet>(
       followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
-    return configuration.advanced_sensitivities.intervals
+    return configuration.value_abstract_type == INTERVAL
              ? initialize_abstract_object<interval_array_abstract_objectt>(
                  followed_type, top, bottom, e, environment, ns)
              : initialize_abstract_object<constant_array_abstract_objectt>(

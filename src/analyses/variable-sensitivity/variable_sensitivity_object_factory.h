@@ -31,8 +31,26 @@
 #include <util/namespace.h>
 #include <util/options.h>
 
+enum ABSTRACT_OBJECT_TYPET
+{
+  TWO_VALUE,
+  CONSTANT,
+  INTERVAL,
+  ARRAY_SENSITIVE,
+  ARRAY_INSENSITIVE,
+  POINTER_SENSITIVE,
+  POINTER_INSENSITIVE,
+  STRUCT_SENSITIVE,
+  STRUCT_INSENSITIVE,
+  // TODO: plug in UNION_SENSITIVE HERE
+  UNION_INSENSITIVE,
+  VALUE_SET
+};
+
 struct vsd_configt
 {
+  ABSTRACT_OBJECT_TYPET value_abstract_type;
+
   struct
   {
     bool struct_sensitivity;
@@ -67,6 +85,13 @@ struct vsd_configt
         "--data-dependencies"};
     }
 
+    config.value_abstract_type = option_to_abstract_type(
+      options,
+      "values",
+      value_option_mappings,
+      CONSTANT
+    );
+
     config.primitive_sensitivity.struct_sensitivity =
       options.get_bool_option("structs");
     config.primitive_sensitivity.array_sensitivity =
@@ -97,6 +122,7 @@ struct vsd_configt
     config.primitive_sensitivity.array_sensitivity = true;
     config.primitive_sensitivity.struct_sensitivity = true;
     config.context_tracking.last_write_context = true;
+    config.value_abstract_type = CONSTANT;
     return config;
   }
 
@@ -107,6 +133,7 @@ struct vsd_configt
     config.primitive_sensitivity.array_sensitivity = true;
     config.primitive_sensitivity.struct_sensitivity = true;
     config.advanced_sensitivities.value_set = true;
+    config.value_abstract_type = VALUE_SET;
     return config;
   }
 
@@ -118,8 +145,27 @@ struct vsd_configt
     config.primitive_sensitivity.struct_sensitivity = true;
     config.context_tracking.last_write_context = true;
     config.advanced_sensitivities.intervals = true;
+    config.value_abstract_type = INTERVAL;
     return config;
   }
+
+private:
+  using option_mappingt = std::map<std::string, ABSTRACT_OBJECT_TYPET>;
+
+  static ABSTRACT_OBJECT_TYPET option_to_abstract_type(
+    const optionst& options,
+    const std::string& option_name,
+    const option_mappingt& mapping,
+    ABSTRACT_OBJECT_TYPET default_type
+  );
+
+  static invalid_command_line_argument_exceptiont invalid_argument(
+    const std::string& option_name,
+    const std::string& bad_argument,
+    const option_mappingt& mapping
+  );
+
+  static const option_mappingt value_option_mappings;
 };
 
 class variable_sensitivity_object_factoryt;
@@ -166,22 +212,6 @@ private:
   variable_sensitivity_object_factoryt() : initialized(false)
   {
   }
-
-  enum ABSTRACT_OBJECT_TYPET
-  {
-    TWO_VALUE,
-    CONSTANT,
-    INTERVAL,
-    ARRAY_SENSITIVE,
-    ARRAY_INSENSITIVE,
-    POINTER_SENSITIVE,
-    POINTER_INSENSITIVE,
-    STRUCT_SENSITIVE,
-    STRUCT_INSENSITIVE,
-    // TODO: plug in UNION_SENSITIVE HERE
-    UNION_INSENSITIVE,
-    VALUE_SET
-  };
 
   /// Decide which abstract object type to use for the variable in question.
   ///
