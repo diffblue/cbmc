@@ -115,24 +115,7 @@ static void static_verifier_xml(
   {
     xmlt &x = xml_result.new_element("result");
 
-    switch(result.status)
-    {
-    case static_verifier_resultt::TRUE:
-      x.set_attribute("status", "SUCCESS");
-      break;
-
-    case static_verifier_resultt::FALSE:
-      x.set_attribute("status", "FAILURE (if reachable)");
-      break;
-
-    case static_verifier_resultt::BOTTOM:
-      x.set_attribute("status", "SUCCESS (unreachable)");
-      break;
-
-    case static_verifier_resultt::UNKNOWN:
-      x.set_attribute("status", "UNKNOWN");
-    }
-
+    x.set_attribute("status", message(result.status));
     x.set_attribute("file", id2string(result.source_location.get_file()));
     x.set_attribute("line", id2string(result.source_location.get_line()));
     x.set_attribute(
@@ -167,28 +150,7 @@ static void static_verifier_text(
     if(!result.source_location.get_comment().empty())
       out << ", " << result.source_location.get_comment();
 
-    out << ": ";
-
-    switch(result.status)
-    {
-    case static_verifier_resultt::TRUE:
-      out << "Success";
-      break;
-
-    case static_verifier_resultt::FALSE:
-      out << "Failure (if reachable)";
-      break;
-
-    case static_verifier_resultt::BOTTOM:
-      out << "Success (unreachable)";
-      break;
-
-    case static_verifier_resultt::UNKNOWN:
-      out << "Unknown";
-      break;
-    }
-
-    out << '\n';
+    out << ": " << message(result.status) << '\n';
   }
 }
 
