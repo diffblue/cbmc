@@ -1,6 +1,6 @@
 CORE
 test
-'.[] | select(has("result")) | .result | .[] | select(has("trace")) | .trace | .[] | select(has("value")) | .value | select(.name == "pointer") | {has_data: has("data")}' --json-ui --trace
+filter.jq --json-ui --trace
 ^EXIT=0$
 ^SIGNAL=0$
 \{"has_data":true\}
