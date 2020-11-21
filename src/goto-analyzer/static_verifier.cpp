@@ -27,6 +27,31 @@ struct static_verifier_resultt
   irep_idt function_id;
 };
 
+static static_verifier_resultt::statust
+check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
+{
+  if(domain.is_bottom())
+  {
+    return static_verifier_resultt::BOTTOM;
+  }
+
+  domain.ai_simplify(e, ns);
+  if(e.is_true())
+  {
+    return static_verifier_resultt::TRUE;
+  }
+  else if(e.is_false())
+  {
+    return static_verifier_resultt::FALSE;
+  }
+  else
+  {
+    return static_verifier_resultt::UNKNOWN;
+  }
+
+  UNREACHABLE;
+}
+
 void static_verifier(
   const abstract_goto_modelt &abstract_goto_model,
   const ai_baset &ai,
@@ -222,31 +247,6 @@ static void static_verifier_console(
 
   if(!results.empty())
     m.result() << '\n';
-}
-
-static static_verifier_resultt::statust
-check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
-{
-  if(domain.is_bottom())
-  {
-    return static_verifier_resultt::BOTTOM;
-  }
-
-  domain.ai_simplify(e, ns);
-  if(e.is_true())
-  {
-    return static_verifier_resultt::TRUE;
-  }
-  else if(e.is_false())
-  {
-    return static_verifier_resultt::FALSE;
-  }
-  else
-  {
-    return static_verifier_resultt::UNKNOWN;
-  }
-
-  UNREACHABLE;
 }
 
 /// Runs the analyzer and then prints out the domain
