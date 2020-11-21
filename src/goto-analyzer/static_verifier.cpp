@@ -180,33 +180,31 @@ void static_verifier(
   {
     auto &property_status = property.second.status;
     const goto_programt::const_targett &property_location = property.second.pc;
-    exprt condition = property_location->get_condition();
-    const std::shared_ptr<const ai_baset::statet> predecessor_state_copy =
-      ai.abstract_state_before(property_location);
-    // simplify the condition given the domain information we have
-    // about the state right before the assertion is evaluated
-    predecessor_state_copy->ai_simplify(condition, ns);
-    // if the condition simplifies to true the assertion always succeeds
-    if(condition.is_true())
+
+    auto result = check_assertion(ai, property_location, "unused", ns);
+
+    switch(result.status)
     {
+    case static_verifier_resultt::TRUE:
+      // if the condition simplifies to true the assertion always succeeds
       property_status = property_statust::PASS;
-    }
-    // if the condition simplifies to false the assertion always fails
-    else if(condition.is_false())
-    {
+      break;
+    case static_verifier_resultt::FALSE:
+      // if the condition simplifies to false the assertion always fails
       property_status = property_statust::FAIL;
-    }
-    // if the domain state is bottom then the assertion is definitely
-    // unreachable
-    else if(predecessor_state_copy->is_bottom())
-    {
+      break;
+    case static_verifier_resultt::BOTTOM:
+      // if the domain state is bottom then the assertion is definitely
+      // unreachable
       property_status = property_statust::NOT_REACHABLE;
-    }
-    // if the condition isn't definitely true, false or unreachable
-    // we don't know whether or not it may fail
-    else
-    {
+      break;
+    case static_verifier_resultt::UNKNOWN:
+      // if the condition isn't definitely true, false or unreachable
+      // we don't know whether or not it may fail
       property_status = property_statust::UNKNOWN;
+      break;
+    default:
+      UNREACHABLE;
     }
   }
 }
