@@ -11,49 +11,48 @@ TraceXsd = os.path.abspath(os.path.join(this_script_dir, '..', '..', 'doc/assets
 test_base_dir = os.path.abspath(os.path.join(this_script_dir, '..', 'cbmc'))
 
 # some tests in the cbmc suite don't work for the trace checks for one reason or another
-ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s), [
+ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # these tests expect input from stdin
-    'json-interface1/test_wrong_option.desc',
-    'json-interface1/test.desc',
-    'json-interface1/test_wrong_flag.desc',
-    'xml-interface1/test_wrong_option.desc',
-    'xml-interface1/test.desc',
-    'xml-interface1/test_wrong_flag.desc',
+    ['json-interface1', 'test_wrong_option.desc'],
+    ['json-interface1', 'test.desc'],
+    ['json-interface1', 'test_wrong_flag.desc'],
+    ['xml-interface1', 'test_wrong_option.desc'],
+    ['xml-interface1', 'test.desc'],
+    ['xml-interface1', 'test_wrong_flag.desc'],
     # these want --show-goto-functions instead of producing a trace
-    'destructors/compound_literal.desc',
-    'destructors/enter_lexical_block.desc',
-    'reachability-slice-interproc2/test.desc',
+    ['destructors', 'compound_literal.desc'],
+    ['destructors', 'enter_lexical_block.desc'],
+    ['reachability-slice-interproc2', 'test.desc'],
     # this one wants show-properties instead producing a trace
-    'show_properties1/test.desc',
+    ['show_properties1', 'test.desc'],
     # program-only instead of trace
-    'vla1/program-only.desc',
-    'Quantifiers-simplify/simplify_not_forall.desc',
-    # this one doesn't work for me locally at all
-    # 'integer-assignments1/test.desc',
+    ['vla1', 'program-only.desc'],
+    ['Quantifiers-simplify', 'simplify_not_forall.desc'],
     # these test for invalid command line handling
-    'bad_option/test_multiple.desc',
-    'bad_option/test.desc',
-    'unknown-argument-suggestion/test.desc',
+    ['bad_option', 'test_multiple.desc'],
+    ['bad_option', 'test.desc'],
+    ['unknown-argument-suggestion', 'test.desc'],
     # this one produces XML intermingled with main XML output when used with --xml-ui
-    'graphml_witness2/test.desc',
+    ['graphml_witness2', 'test.desc'],
     # produces intermingled XML on the command line
-    'coverage_report1/test.desc',
-    'coverage_report1/paths.desc',
-    'graphml_witness1/test.desc',
-    'switch8/program-only.desc',
+    ['coverage_report1', 'test.desc'],
+    ['coverage_report1', 'paths.desc'],
+    ['graphml_witness1', 'test.desc'],
+    ['switch8', 'program-only.desc'],
     # this uses json-ui (fails for a different reason actually, but should also
     #   fail because of command line incompatibility)
-    'json1/test.desc',
+    ['json1', 'test.desc'],
     # uses show-goto-functions
-    'reachability-slice/test.desc',
-    'reachability-slice/test2.desc',
-    'reachability-slice/test3.desc',
-    'reachability-slice-interproc/test.desc',
-    'unsigned1/test.desc',
-    'reachability-slice-interproc3/test.desc',
-    'sync_lock_release-1/symbol_per_type.desc',
-    # this test is marked broken-smt-backend and doesn't work for me locally
-    'integer-assignments1/test.desc'
+    ['reachability-slice', 'test.desc'],
+    ['reachability-slice', 'test2.desc'],
+    ['reachability-slice', 'test3.desc'],
+    ['reachability-slice-interproc', 'test.desc'],
+    ['unsigned1', 'test.desc'],
+    ['reachability-slice-interproc3', 'test.desc'],
+    ['sync_lock_release-1', 'symbol_per_type.desc'],
+    # this test is marked smt-backend, and would thus fail as we run tests with
+    # the SAT back-end only
+    ['integer-assignments1', 'test.desc']
 ]))
 
 # TODO maybe consider looking them up on PATH, but direct paths are
