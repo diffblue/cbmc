@@ -998,6 +998,13 @@ bool configt::set(const cmdlinet &cmdline)
     else
       ansi_c.long_double_width=8*8;
   }
+  else if(os == "macos" && arch == "arm64")
+  {
+    // https://developer.apple.com/documentation/xcode/
+    // writing_arm64_code_for_apple_platforms#//apple_ref/doc/uid/TP40013702-SW1
+    ansi_c.char_is_unsigned = false;
+    ansi_c.long_double_width = 8 * 8;
+  }
 
   // Let's check some of the type widths in case we run
   // the same architecture and OS that we are verifying for.
