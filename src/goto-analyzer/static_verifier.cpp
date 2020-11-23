@@ -44,6 +44,8 @@ struct static_verifier_resultt
   statust status;
   source_locationt source_location;
   irep_idt function_id;
+  ai_history_baset::trace_sett unknown_histories;
+  ai_history_baset::trace_sett false_histories;
 };
 
 static statust
@@ -98,6 +100,14 @@ static static_verifier_resultt check_assertion(
     auto dp = ai.abstract_state_before(assert_location);
 
     result.status = check_assertion(*dp, e, ns);
+    if(result.status == statust::FALSE)
+    {
+      result.false_histories = trace_set;
+    }
+    else if(result.status == statust::UNKNOWN)
+    {
+      result.unknown_histories = trace_set;
+    }
   }
   else
   {
@@ -122,9 +132,11 @@ static static_verifier_resultt check_assertion(
         break;
       case statust::FALSE:
         ++false_traces;
+        result.false_histories.insert(trace_ptr);
         break;
       case statust::UNKNOWN:
         ++unknown_traces;
+        result.unknown_histories.insert(trace_ptr);
         break;
       default:
         UNREACHABLE;
