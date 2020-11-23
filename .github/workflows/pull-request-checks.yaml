@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         env:
           # This is needed in addition to -yq to prevent apt-get from asking for
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         env:
           # This is needed in addition to -yq to prevent apt-get from asking for
@@ -103,7 +103,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         run: brew install maven flex bison parallel ccache
       - name: Prepare ccache
@@ -143,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         run: brew install cmake ninja maven flex bison ccache
       - name: Prepare ccache
@@ -179,7 +179,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
@@ -216,7 +216,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: Fetch dependencies
         env:
@@ -236,7 +236,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: Fetch dependencies
         env:
@@ -258,7 +258,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
