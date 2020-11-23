@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^\[main\.array_bounds\.[1-5]\] .*: SUCCESS$
 ^\[main\.array_bounds\.[67]\] line 38 array.buffer (dynamic object )?upper bound in buffers\[\(signed long (long )?int\)0\]->buffer\[\(signed long (long )?int\)100\]: FAILURE$
-^\*\* 1 of 6 failed
+^\*\* 2 of 9 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

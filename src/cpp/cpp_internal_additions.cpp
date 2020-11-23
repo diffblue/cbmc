@@ -89,6 +89,9 @@ void cpp_internal_additions(std::ostream &out)
   out << "int " << rounding_mode_identifier() << " = "
       << std::to_string(config.ansi_c.rounding_mode) << ';' << '\n';
 
+  // atexit
+  out << "void exit(int);" << '\n';
+
   // pipes, write, read, close
   out << "struct " CPROVER_PREFIX "pipet {\n"
       << "  bool widowed;\n"

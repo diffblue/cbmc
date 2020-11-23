@@ -1,9 +1,8 @@
-CORE unix
+CORE
 main.c
---bounds-check
+--pointer-check --bounds-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\*\* 1 of 4 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

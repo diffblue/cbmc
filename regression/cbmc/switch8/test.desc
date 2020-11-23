@@ -13,7 +13,7 @@ main.c
 ^\[main\.pointer_dereference\.4\] line 42 dereference failure: dead object in \*p: FAILURE$
 ^\[main\.assertion\.4\] line 49 assertion e == 42: FAILURE$
 ^\[main\.assertion\.5\] line 51 assertion f == 42: FAILURE$
-^\*\* 4 of 10 failed
+^\*\* 4 of 18 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

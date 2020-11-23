@@ -186,6 +186,9 @@ void ansi_c_internal_additions(std::string &code)
       id2string(rounding_mode_identifier()) + '='+
       std::to_string(config.ansi_c.rounding_mode)+";\n"
 
+    // atexit
+    "void exit(int);\n"
+
     // pipes, write, read, close
     "struct " CPROVER_PREFIX "pipet {\n"
     "  _Bool widowed;\n"
