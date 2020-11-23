@@ -46,6 +46,45 @@ struct static_verifier_resultt
   irep_idt function_id;
   ai_history_baset::trace_sett unknown_histories;
   ai_history_baset::trace_sett false_histories;
+
+  jsont output_json(void) const
+  {
+    json_arrayt unknown_json;
+    for(const auto &trace_ptr : this->unknown_histories)
+      unknown_json.push_back(trace_ptr->output_json());
+
+    json_arrayt false_json;
+    for(const auto &trace_ptr : this->false_histories)
+      false_json.push_back(trace_ptr->output_json());
+
+    return json_objectt{
+      {"status", json_stringt{message(this->status)}},
+      {"sourceLocation", json(this->source_location)},
+      {"unknownHistories", unknown_json},
+      {"falseHistories", false_json},
+    };
+  }
+
+  xmlt output_xml(void) const
+  {
+    xmlt x("result");
+
+    x.set_attribute("status", message(this->status));
+    x.set_attribute("file", id2string(this->source_location.get_file()));
+    x.set_attribute("line", id2string(this->source_location.get_line()));
+    x.set_attribute(
+      "description", id2string(this->source_location.get_comment()));
+
+    xmlt &unknown_xml = x.new_element("unknown");
+    for(const auto &trace_ptr : this->unknown_histories)
+      unknown_xml.new_element(trace_ptr->output_xml());
+
+    xmlt &false_xml = x.new_element("false");
+    for(const auto &trace_ptr : this->false_histories)
+      false_xml.new_element(trace_ptr->output_xml());
+
+    return x;
+  }
 };
 
 static statust
@@ -248,9 +287,7 @@ static void static_verifier_json(
   m.status() << "Writing JSON report" << messaget::eom;
   out << make_range(results)
            .map([](const static_verifier_resultt &result) {
-             return json_objectt{
-               {"status", json_stringt{message(result.status)}},
-               {"sourceLocation", json(result.source_location)}};
+             return result.output_json();
            })
            .collect<json_arrayt>();
 }
@@ -263,17 +300,8 @@ static void static_verifier_xml(
   m.status() << "Writing XML report" << messaget::eom;
 
   xmlt xml_result{"cprover"};
-
   for(const auto &result : results)
-  {
-    xmlt &x = xml_result.new_element("result");
-
-    x.set_attribute("status", message(result.status));
-    x.set_attribute("file", id2string(result.source_location.get_file()));
-    x.set_attribute("line", id2string(result.source_location.get_line()));
-    x.set_attribute(
-      "description", id2string(result.source_location.get_comment()));
-  }
+    xml_result.new_element(result.output_xml());
 
   out << xml_result;
 }
