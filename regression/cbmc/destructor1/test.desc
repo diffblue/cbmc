@@ -1,0 +1,9 @@
+CORE
+main.c
+
+^\[assert_false.assertion.1\] line 10 assertion 0: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring

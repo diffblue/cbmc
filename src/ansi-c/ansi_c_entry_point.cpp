@@ -504,6 +504,26 @@ bool generate_ansi_c_start_function(
 
   record_function_outputs(symbol, init_code, symbol_table);
 
+  // now call destructor functions (a GCC extension)
+
+  for(const auto &symbol_table_entry : symbol_table.symbols)
+  {
+    const symbolt &symbol = symbol_table_entry.second;
+
+    if(symbol.type.id() != ID_code)
+      continue;
+
+    const code_typet &code_type = to_code_type(symbol.type);
+    if(
+      code_type.return_type().id() == ID_destructor &&
+      code_type.parameters().empty())
+    {
+      code_function_callt destructor_call(symbol.symbol_expr());
+      destructor_call.add_source_location() = symbol.location;
+      init_code.add(std::move(destructor_call));
+    }
+  }
+
   // add the entry point symbol
   symbolt new_symbol;
 
