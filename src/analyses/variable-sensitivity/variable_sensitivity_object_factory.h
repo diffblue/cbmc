@@ -65,92 +65,11 @@ struct vsd_configt
     bool new_value_set;
   } advanced_sensitivities;
 
-  static vsd_configt from_options(const optionst &options)
-  {
-    vsd_configt config{};
+  static vsd_configt from_options(const optionst &options);
 
-    if(
-      options.get_bool_option("value-set") &&
-      options.get_bool_option("data-dependencies"))
-    {
-      throw invalid_command_line_argument_exceptiont{
-        "Value set is not currently supported with data dependency analysis",
-        "--value-set --data-dependencies",
-        "--data-dependencies"};
-    }
-
-    config.value_abstract_type = option_to_abstract_type(
-      options,
-      "values",
-      value_option_mappings,
-      CONSTANT
-    );
-
-    config.pointer_abstract_type = option_to_abstract_type(
-      options,
-      "pointers",
-      pointer_option_mappings,
-      POINTER_INSENSITIVE
-    );
-
-    config.struct_abstract_type = option_to_abstract_type(
-      options,
-      "structs",
-      struct_option_mappings,
-      STRUCT_INSENSITIVE
-    );
-
-    config.array_abstract_type = option_to_abstract_type(
-      options,
-      "arrays",
-      array_option_mappings,
-      ARRAY_INSENSITIVE
-    );
-
-    // This should always be on (for efficeny with 3-way merge)
-    // Does not work with value set
-    config.context_tracking.last_write_context =
-      (config.value_abstract_type != VALUE_SET) &&
-      (config.pointer_abstract_type != VALUE_SET);
-    config.context_tracking.data_dependency_context =
-      options.get_bool_option("data-dependencies");
-    config.advanced_sensitivities.new_value_set =
-      options.get_bool_option("new-value-set");
-
-    return config;
-  }
-
-  static vsd_configt constant_domain()
-  {
-    vsd_configt config{};
-    config.context_tracking.last_write_context = true;
-    config.value_abstract_type = CONSTANT;
-    config.pointer_abstract_type = POINTER_SENSITIVE;
-    config.struct_abstract_type = STRUCT_SENSITIVE;
-    config.array_abstract_type = ARRAY_SENSITIVE;
-    return config;
-  }
-
-  static vsd_configt value_set()
-  {
-    vsd_configt config{};
-    config.value_abstract_type = VALUE_SET;
-    config.pointer_abstract_type = VALUE_SET;
-    config.struct_abstract_type = STRUCT_SENSITIVE;
-    config.array_abstract_type = ARRAY_SENSITIVE;
-    return config;
-  }
-
-  static vsd_configt intervals()
-  {
-    vsd_configt config{};
-    config.context_tracking.last_write_context = true;
-    config.value_abstract_type = INTERVAL;
-    config.pointer_abstract_type = POINTER_SENSITIVE;
-    config.struct_abstract_type = STRUCT_SENSITIVE;
-    config.array_abstract_type = ARRAY_SENSITIVE;
-    return config;
-  }
+  static vsd_configt constant_domain();
+  static vsd_configt value_set();
+  static vsd_configt intervals();
 
 private:
   using option_mappingt = std::map<std::string, ABSTRACT_OBJECT_TYPET>;
