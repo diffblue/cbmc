@@ -27,6 +27,11 @@ const vsd_configt::option_mappingt vsd_configt::struct_option_mappings = {
   { "every-field", STRUCT_SENSITIVE }
 };
 
+const vsd_configt::option_mappingt vsd_configt::array_option_mappings = {
+  { "top-bottom", ARRAY_INSENSITIVE },
+  { "every-element", ARRAY_SENSITIVE }
+};
+
 invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
   const std::string& option_name,
   const std::string& bad_argument,
@@ -81,9 +86,7 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
   }
   else if(type.id() == ID_array)
   {
-    abstract_object_type = configuration.primitive_sensitivity.array_sensitivity
-                             ? ARRAY_SENSITIVE
-                             : ARRAY_INSENSITIVE;
+    return configuration.array_abstract_type;
   }
   else if(type.id() == ID_pointer)
   {
