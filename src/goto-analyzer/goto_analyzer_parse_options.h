@@ -139,7 +139,7 @@ class optionst;
   "(vsd-structs):" \
   "(vsd-arrays):" \
   "(vsd-pointers):" \
-  "(vsd-data-dependencies)" \
+  "(vsd-data-dependencies)"
 
 #define GOTO_ANALYSER_OPTIONS_STORAGE \
   "(one-domain-per-history)" \

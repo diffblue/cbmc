@@ -62,7 +62,6 @@ struct vsd_configt
 
   struct
   {
-    bool intervals;
     bool new_value_set;
   } advanced_sensitivities;
 
@@ -115,8 +114,6 @@ struct vsd_configt
       (config.pointer_abstract_type != VALUE_SET);
     config.context_tracking.data_dependency_context =
       options.get_bool_option("data-dependencies");
-    config.advanced_sensitivities.intervals =
-      options.get_bool_option("interval");
     config.advanced_sensitivities.new_value_set =
       options.get_bool_option("new-value-set");
 
@@ -148,7 +145,6 @@ struct vsd_configt
   {
     vsd_configt config{};
     config.context_tracking.last_write_context = true;
-    config.advanced_sensitivities.intervals = true;
     config.value_abstract_type = INTERVAL;
     config.pointer_abstract_type = POINTER_SENSITIVE;
     config.struct_abstract_type = STRUCT_SENSITIVE;
