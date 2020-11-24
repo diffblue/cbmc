@@ -145,7 +145,7 @@ abstract_object_pointert initialize_abstract_object(
 }
 
 ABSTRACT_OBJECT_TYPET
-variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
+variable_sensitivity_object_factoryt::get_abstract_object_type(const typet& type) const
 {
   ABSTRACT_OBJECT_TYPET abstract_object_type = TWO_VALUE;
 
@@ -183,21 +183,14 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
 
 abstract_object_pointert
 variable_sensitivity_object_factoryt::get_abstract_object(
-  const typet type,
+  const typet &type,
   bool top,
   bool bottom,
   const exprt &e,
   const abstract_environmentt &environment,
-  const namespacet &ns)
+  const namespacet &ns) const
 {
-  if(!initialized)
-  {
-    throw "variable_sensitivity_object_factoryt::get_abstract_object() " \
-      "called without first calling " \
-      "variable_sensitivity_object_factoryt::set_options()\n";
-  }
-
-  typet followed_type = ns.follow(type);
+  const typet& followed_type = ns.follow(type);
   ABSTRACT_OBJECT_TYPET abstract_object_type =
     get_abstract_object_type(followed_type);
 

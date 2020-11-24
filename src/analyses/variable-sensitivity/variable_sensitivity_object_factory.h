@@ -188,7 +188,7 @@ public:
   }
 
   explicit variable_sensitivity_object_factoryt(const vsd_configt &options)
-    : configuration(options), initialized(true)
+    : configuration(options)
   {
   }
 
@@ -207,28 +207,26 @@ public:
   ///
   /// \return An abstract object of the appropriate type.
   abstract_object_pointert get_abstract_object(
-    const typet type,
+    const typet &type,
     bool top,
     bool bottom,
     const exprt &e,
     const abstract_environmentt &environment,
-    const namespacet &ns);
+    const namespacet &ns) const;
+
+  variable_sensitivity_object_factoryt() = delete;
+  variable_sensitivity_object_factoryt(const variable_sensitivity_object_factoryt&) = delete;
 
 private:
-  variable_sensitivity_object_factoryt() : initialized(false)
-  {
-  }
-
   /// Decide which abstract object type to use for the variable in question.
   ///
   /// \param type: the type of the variable the abstract object is
   ///              meant to represent
   ///
   /// \return An enum indicating the abstract object type to use.
-  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
+  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet& type) const;
 
   vsd_configt configuration;
-  bool initialized;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H // NOLINT(*)
