@@ -1298,12 +1298,6 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
 
     const bool unknown = flags.is_unknown() || flags.is_uninitialized();
 
-    if(unknown)
-    {
-      conditions.push_back(conditiont{
-        not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
-    }
-
     if(unknown || flags.is_null())
     {
       conditions.push_back(conditiont(
@@ -1311,6 +1305,12 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
           in_bounds_of_some_explicit_allocation,
           not_exprt(null_pointer(address))),
         "pointer NULL"));
+    }
+
+    if(unknown)
+    {
+      conditions.push_back(conditiont{
+        not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
     }
 
     if(unknown || flags.is_dynamic_heap())
