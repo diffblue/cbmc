@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
+--variable-sensitivity --vsd-pointers constants --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[bar\.assertion\.1\] line \d+ assertion other == 4: SUCCESS$

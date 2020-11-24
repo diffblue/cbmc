@@ -138,7 +138,7 @@ class optionst;
   "(vsd-values):" \
   "(vsd-structs)" \
   "(vsd-arrays)" \
-  "(vsd-pointers)" \
+  "(vsd-pointers):" \
   "(vsd-value-sets)" \
   "(vsd-data-dependencies)" \
 

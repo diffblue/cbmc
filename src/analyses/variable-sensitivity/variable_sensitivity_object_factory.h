@@ -50,12 +50,12 @@ enum ABSTRACT_OBJECT_TYPET
 struct vsd_configt
 {
   ABSTRACT_OBJECT_TYPET value_abstract_type;
+  ABSTRACT_OBJECT_TYPET pointer_abstract_type;
 
   struct
   {
     bool struct_sensitivity;
     bool array_sensitivity;
-    bool pointer_sensitivity;
   } primitive_sensitivity;
 
   struct
@@ -92,12 +92,17 @@ struct vsd_configt
       CONSTANT
     );
 
+    config.pointer_abstract_type = option_to_abstract_type(
+      options,
+      "pointers",
+      pointer_option_mappings,
+      POINTER_INSENSITIVE
+    );
+
     config.primitive_sensitivity.struct_sensitivity =
       options.get_bool_option("structs");
     config.primitive_sensitivity.array_sensitivity =
       options.get_bool_option("arrays");
-    config.primitive_sensitivity.pointer_sensitivity =
-      options.get_bool_option("pointers");
 
     // This should always be on (for efficeny with 3-way merge)
     // Does not work with value set
@@ -118,34 +123,34 @@ struct vsd_configt
   static vsd_configt constant_domain()
   {
     vsd_configt config{};
-    config.primitive_sensitivity.pointer_sensitivity = true;
     config.primitive_sensitivity.array_sensitivity = true;
     config.primitive_sensitivity.struct_sensitivity = true;
     config.context_tracking.last_write_context = true;
     config.value_abstract_type = CONSTANT;
+    config.pointer_abstract_type = POINTER_SENSITIVE;
     return config;
   }
 
   static vsd_configt value_set()
   {
     vsd_configt config{};
-    config.primitive_sensitivity.pointer_sensitivity = true;
     config.primitive_sensitivity.array_sensitivity = true;
     config.primitive_sensitivity.struct_sensitivity = true;
     config.advanced_sensitivities.value_set = true;
     config.value_abstract_type = VALUE_SET;
+    config.pointer_abstract_type = VALUE_SET;
     return config;
   }
 
   static vsd_configt intervals()
   {
     vsd_configt config{};
-    config.primitive_sensitivity.pointer_sensitivity = true;
     config.primitive_sensitivity.array_sensitivity = true;
     config.primitive_sensitivity.struct_sensitivity = true;
     config.context_tracking.last_write_context = true;
     config.advanced_sensitivities.intervals = true;
     config.value_abstract_type = INTERVAL;
+    config.pointer_abstract_type = POINTER_SENSITIVE;
     return config;
   }
 
@@ -166,6 +171,7 @@ private:
   );
 
   static const option_mappingt value_option_mappings;
+  static const option_mappingt pointer_option_mappings;
 };
 
 class variable_sensitivity_object_factoryt;

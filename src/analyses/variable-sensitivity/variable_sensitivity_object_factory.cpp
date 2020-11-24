@@ -16,6 +16,12 @@ const vsd_configt::option_mappingt vsd_configt::value_option_mappings = {
   { "set-of-constants", VALUE_SET }
 };
 
+const vsd_configt::option_mappingt vsd_configt::pointer_option_mappings = {
+  { "top-bottom", POINTER_INSENSITIVE },
+  { "constants", POINTER_SENSITIVE },
+  { "value-set", VALUE_SET }
+};
+
 invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
   const std::string& option_name,
   const std::string& bad_argument,
@@ -76,10 +82,7 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
   }
   else if(type.id() == ID_pointer)
   {
-    abstract_object_type =
-      configuration.primitive_sensitivity.pointer_sensitivity
-        ? POINTER_SENSITIVE
-        : POINTER_INSENSITIVE;
+    return configuration.pointer_abstract_type;
   }
   else if(type.id() == ID_struct)
   {

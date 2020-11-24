@@ -1,6 +1,6 @@
 CORE
 main.c
---function pass_param --variable-sensitivity --vsd-pointers --vsd-arrays --vsd-structs --verify
+--function pass_param --variable-sensitivity --vsd-pointers constants --vsd-arrays --vsd-structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[pass_param\.assertion\.1\] line \d+ human_instance.age==24: SUCCESS$
