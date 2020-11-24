@@ -139,7 +139,6 @@ class optionst;
   "(vsd-structs)" \
   "(vsd-arrays)" \
   "(vsd-pointers):" \
-  "(vsd-value-sets)" \
   "(vsd-data-dependencies)" \
 
 #define GOTO_ANALYSER_OPTIONS_STORAGE \

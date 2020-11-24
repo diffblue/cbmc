@@ -95,14 +95,6 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
   {
     abstract_object_type = UNION_INSENSITIVE;
   }
-  if(
-    configuration.advanced_sensitivities.value_set &&
-    (abstract_object_type == INTERVAL || abstract_object_type == CONSTANT ||
-     abstract_object_type == POINTER_INSENSITIVE ||
-     abstract_object_type == POINTER_SENSITIVE))
-  {
-    abstract_object_type = VALUE_SET;
-  }
 
   return abstract_object_type;
 }

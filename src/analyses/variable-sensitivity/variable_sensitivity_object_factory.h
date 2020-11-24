@@ -67,7 +67,6 @@ struct vsd_configt
   struct
   {
     bool intervals;
-    bool value_set;
     bool new_value_set;
   } advanced_sensitivities;
 
@@ -107,13 +106,12 @@ struct vsd_configt
     // This should always be on (for efficeny with 3-way merge)
     // Does not work with value set
     config.context_tracking.last_write_context =
-      !options.get_bool_option("value-set");
+      (config.value_abstract_type != VALUE_SET) &&
+      (config.pointer_abstract_type != VALUE_SET);
     config.context_tracking.data_dependency_context =
       options.get_bool_option("data-dependencies");
     config.advanced_sensitivities.intervals =
       options.get_bool_option("interval");
-    config.advanced_sensitivities.value_set =
-      options.get_bool_option("value-set");
     config.advanced_sensitivities.new_value_set =
       options.get_bool_option("new-value-set");
 
@@ -136,7 +134,6 @@ struct vsd_configt
     vsd_configt config{};
     config.primitive_sensitivity.array_sensitivity = true;
     config.primitive_sensitivity.struct_sensitivity = true;
-    config.advanced_sensitivities.value_set = true;
     config.value_abstract_type = VALUE_SET;
     config.pointer_abstract_type = VALUE_SET;
     return config;

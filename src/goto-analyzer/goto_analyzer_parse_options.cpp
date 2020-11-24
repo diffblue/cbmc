@@ -375,7 +375,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option(
         "data-dependencies", cmdline.isset("vsd-data-dependencies"));
       options.set_option("interval", cmdline.isset("vsd-intervals"));
-      options.set_option("value-set", cmdline.isset("vsd-value-sets"));
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
@@ -997,7 +996,6 @@ void goto_analyzer_parse_optionst::help()
     " --vsd-structs                struct field sensitive analysis\n"
     " --vsd-arrays                 array entry sensitive analysis\n"
     " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n"
-    " --vsd-value-sets             use value sets\n"
     " --vsd-data-dependencies      track data dependencies\n"
     " --vsd-intervals              use intervals\n"
     "\n"
