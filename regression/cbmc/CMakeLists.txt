@@ -24,17 +24,11 @@ add_test_pl_profile(
     "CORE"
 )
 
+# solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set_property(
     TEST "cbmc-cprover-smt2-CORE"
     PROPERTY ENVIRONMENT
       "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
-  )
-else()
-  string(REPLACE ";" "\\;" path_value "$ENV{PATH}")
-  set_property(
-    TEST "cbmc-cprover-smt2-CORE"
-    PROPERTY ENVIRONMENT
-      "PATH=${path_value}\;$<TARGET_FILE_DIR:smt2_solver>"
   )
 endif()

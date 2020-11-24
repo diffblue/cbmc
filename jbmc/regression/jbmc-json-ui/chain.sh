@@ -3,7 +3,7 @@
 JBMC_PATH=$1
 shift
 
-JQ_COMMAND=$1
+JQ_FILTER_FILE=$1
 shift
 
-$JBMC_PATH "$@" | jq -c "$JQ_COMMAND"
+$JBMC_PATH "$@" | jq -c -f $JQ_FILTER_FILE

@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         env:
           # This is needed in addition to -yq to prevent apt-get from asking for
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         env:
           # This is needed in addition to -yq to prevent apt-get from asking for
@@ -103,7 +103,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         run: brew install maven flex bison parallel ccache
       - name: Prepare ccache
@@ -143,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
       - name: Fetch dependencies
         run: brew install cmake ninja maven flex bison ccache
       - name: Prepare ccache
@@ -175,36 +175,48 @@ jobs:
   check-vs-2019-build-and-test:
     runs-on: windows-2019
     env:
-      SCRIPT_DIR: .github/workflows/vs2019
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           submodules: recursive
-
-      - name: Install bison and flex
-        run: "${{env.SCRIPT_DIR}}\\install-bison.bat"
-
-      - name: Install z3
+      - name: Fetch dependencies
         run: |
-          Invoke-WebRequest "https://github.com/Z3Prover/z3/releases/download/z3-4.8.8/z3-4.8.8-x64-win.zip" -OutFile z3.zip
-          Expand-Archive z3.zip
-          # We need Get-ChildItem.Name here because the path includes
-          # the z3 version number, which we expect to change.
-          echo "$(Get-Location)\z3\$((Get-ChildItem z3).Name)" >> $env:GITHUB_PATH
-
-      - name: Build cbmc
-        run: "${{env.SCRIPT_DIR}}\\build-cbmc.bat"
-
+          choco install winflexbison3
+          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
+      - name: Setup Visual Studio environment
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-msbuild-${{ github.ref }}
+            ${{ runner.os }}-msbuild
+      - name: ccache environment
+        run: |
+          echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
+          echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
+      - name: Configure with cmake
+        run: cmake -S . -B build
+      - name: Build Release
+        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
+      - name: Print ccache stats
+        run: clcache -s
+      - uses: ilammy/msvc-dev-cmd@v1.4.1
       - name: Test cbmc
-        run: "${{env.SCRIPT_DIR}}\\run-tests.bat"
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release . -j2
 
   check-clang-format:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: Fetch dependencies
         env:
@@ -224,7 +236,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
       - name: Fetch dependencies
         env:
@@ -239,7 +251,6 @@ jobs:
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-cpplint.sh
 
-  # I just added this to check if my stuff is working on github actions
   windows-msi-package:
     runs-on: windows-2019
     env:
@@ -253,7 +264,8 @@ jobs:
           choco install winflexbison3
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-      - uses: microsoft/setup-msbuild@v1.0.2
+      - name: Setup Visual Studio environment
+        uses: microsoft/setup-msbuild@v1.0.2
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -267,14 +279,9 @@ jobs:
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
-        run: |
-          New-Item -ItemType Directory -Path build
-          Set-Location build
-          cmake ..
+        run: cmake -S . -B build
       - name: Build Release
-        run: |
-          Set-Location build
-          cmake --build . --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
+        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
       - name: Print ccache stats
         run: clcache -s
       - name: Create packages
