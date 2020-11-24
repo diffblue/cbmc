@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---variable-sensitivity --vsd-structs --vsd-arrays --vsd-pointers constants --show
+--variable-sensitivity --vsd-structs every-field --vsd-arrays --vsd-pointers constants --show
 ^EXIT=0$
 ^SIGNAL=0$
 --

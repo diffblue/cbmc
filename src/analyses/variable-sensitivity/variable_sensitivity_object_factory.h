@@ -51,10 +51,10 @@ struct vsd_configt
 {
   ABSTRACT_OBJECT_TYPET value_abstract_type;
   ABSTRACT_OBJECT_TYPET pointer_abstract_type;
+  ABSTRACT_OBJECT_TYPET struct_abstract_type;
 
   struct
   {
-    bool struct_sensitivity;
     bool array_sensitivity;
   } primitive_sensitivity;
 
@@ -98,8 +98,13 @@ struct vsd_configt
       POINTER_INSENSITIVE
     );
 
-    config.primitive_sensitivity.struct_sensitivity =
-      options.get_bool_option("structs");
+    config.struct_abstract_type = option_to_abstract_type(
+      options,
+      "structs",
+      struct_option_mappings,
+      STRUCT_INSENSITIVE
+    );
+
     config.primitive_sensitivity.array_sensitivity =
       options.get_bool_option("arrays");
 
@@ -122,10 +127,10 @@ struct vsd_configt
   {
     vsd_configt config{};
     config.primitive_sensitivity.array_sensitivity = true;
-    config.primitive_sensitivity.struct_sensitivity = true;
     config.context_tracking.last_write_context = true;
     config.value_abstract_type = CONSTANT;
     config.pointer_abstract_type = POINTER_SENSITIVE;
+    config.struct_abstract_type = STRUCT_SENSITIVE;
     return config;
   }
 
@@ -133,9 +138,9 @@ struct vsd_configt
   {
     vsd_configt config{};
     config.primitive_sensitivity.array_sensitivity = true;
-    config.primitive_sensitivity.struct_sensitivity = true;
     config.value_abstract_type = VALUE_SET;
     config.pointer_abstract_type = VALUE_SET;
+    config.struct_abstract_type = STRUCT_SENSITIVE;
     return config;
   }
 
@@ -143,11 +148,11 @@ struct vsd_configt
   {
     vsd_configt config{};
     config.primitive_sensitivity.array_sensitivity = true;
-    config.primitive_sensitivity.struct_sensitivity = true;
     config.context_tracking.last_write_context = true;
     config.advanced_sensitivities.intervals = true;
     config.value_abstract_type = INTERVAL;
     config.pointer_abstract_type = POINTER_SENSITIVE;
+    config.struct_abstract_type = STRUCT_SENSITIVE;
     return config;
   }
 
@@ -169,6 +174,7 @@ private:
 
   static const option_mappingt value_option_mappings;
   static const option_mappingt pointer_option_mappings;
+  static const option_mappingt struct_option_mappings;
 };
 
 class variable_sensitivity_object_factoryt;

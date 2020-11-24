@@ -371,7 +371,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("values", cmdline.get_value("vsd-values"));
       options.set_option("pointers", cmdline.get_value("vsd-pointers"));
       options.set_option("arrays", cmdline.isset("vsd-arrays"));
-      options.set_option("structs", cmdline.isset("vsd-structs"));
+      options.set_option("structs", cmdline.get_value("vsd-structs"));
       options.set_option(
         "data-dependencies", cmdline.isset("vsd-data-dependencies"));
       options.set_option("interval", cmdline.isset("vsd-intervals"));
@@ -385,7 +385,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("values", cmdline.get_value("vsd-values"));
       options.set_option("pointers", cmdline.get_value("vsd-pointers"));
       options.set_option("arrays", cmdline.isset("vsd-arrays"));
-      options.set_option("structs", cmdline.isset("vsd-structs"));
+      options.set_option("structs", cmdline.get_value("vsd-structs"));
       options.set_option("data-dependencies", true);
     }
 
@@ -993,7 +993,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Variable sensitivity domain (VSD) options:\n"
     " --vsd-values                 value tracking - constants|intervals|set-of-constants\n"
-    " --vsd-structs                struct field sensitive analysis\n"
+    " --vsd-structs                struct field sensitive analysis - top-bottom|every-field\n"
     " --vsd-arrays                 array entry sensitive analysis\n"
     " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n"
     " --vsd-data-dependencies      track data dependencies\n"

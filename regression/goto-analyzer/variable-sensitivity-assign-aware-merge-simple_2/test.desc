@@ -1,6 +1,6 @@
 CORE
 main.c
---function simple_test --variable-sensitivity --vsd-pointers constants --vsd-arrays --vsd-structs --verify --three-way-merge
+--function simple_test --variable-sensitivity --vsd-pointers constants --vsd-arrays --vsd-structs every-field --verify --three-way-merge
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[simple_test\.assertion\.1\] line \d+ i==0: SUCCESS$
