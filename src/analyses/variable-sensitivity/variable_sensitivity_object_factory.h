@@ -73,11 +73,11 @@ struct vsd_configt
   static vsd_configt intervals();
 
   vsd_configt()
-    : value_abstract_type(CONSTANT),
-      pointer_abstract_type(POINTER_INSENSITIVE),
-      struct_abstract_type(STRUCT_INSENSITIVE),
-      array_abstract_type(ARRAY_INSENSITIVE),
-      union_abstract_type(UNION_INSENSITIVE),
+    : value_abstract_type{CONSTANT},
+      pointer_abstract_type{POINTER_INSENSITIVE},
+      struct_abstract_type{STRUCT_INSENSITIVE},
+      array_abstract_type{ARRAY_INSENSITIVE},
+      union_abstract_type{UNION_INSENSITIVE},
       context_tracking{false, true},
       advanced_sensitivities{false}
   {
@@ -118,7 +118,7 @@ public:
   }
 
   explicit variable_sensitivity_object_factoryt(const vsd_configt &options)
-    : configuration(options)
+    : configuration{options}
   {
   }
 
