@@ -24,40 +24,20 @@ vsd_configt vsd_configt::from_options(const optionst &options)
       "--data-dependencies"};
   }
 
-  config.value_abstract_type = option_to_abstract_type(
-    options,
-    "values",
-    value_option_mappings,
-    CONSTANT
-  );
+  config.value_abstract_type =
+    option_to_abstract_type(options, "values", value_option_mappings, CONSTANT);
 
   config.pointer_abstract_type = option_to_abstract_type(
-    options,
-    "pointers",
-    pointer_option_mappings,
-    POINTER_INSENSITIVE
-  );
+    options, "pointers", pointer_option_mappings, POINTER_INSENSITIVE);
 
   config.struct_abstract_type = option_to_abstract_type(
-    options,
-    "structs",
-    struct_option_mappings,
-    STRUCT_INSENSITIVE
-  );
+    options, "structs", struct_option_mappings, STRUCT_INSENSITIVE);
 
   config.array_abstract_type = option_to_abstract_type(
-    options,
-    "arrays",
-    array_option_mappings,
-    ARRAY_INSENSITIVE
-  );
+    options, "arrays", array_option_mappings, ARRAY_INSENSITIVE);
 
   config.union_abstract_type = option_to_abstract_type(
-    options,
-    "unions",
-    union_option_mappings,
-    UNION_INSENSITIVE
-  );
+    options, "unions", union_option_mappings, UNION_INSENSITIVE);
 
   // This should always be on (for efficeny with 3-way merge)
   // Does not work with value set
@@ -105,61 +85,57 @@ vsd_configt vsd_configt::intervals()
 }
 
 const vsd_configt::option_mappingt vsd_configt::value_option_mappings = {
-  { "intervals", INTERVAL },
-  { "constants", CONSTANT },
-  { "set-of-constants", VALUE_SET }
-};
+  {"intervals", INTERVAL},
+  {"constants", CONSTANT},
+  {"set-of-constants", VALUE_SET}};
 
 const vsd_configt::option_mappingt vsd_configt::pointer_option_mappings = {
-  { "top-bottom", POINTER_INSENSITIVE },
-  { "constants", POINTER_SENSITIVE },
-  { "value-set", VALUE_SET }
-};
+  {"top-bottom", POINTER_INSENSITIVE},
+  {"constants", POINTER_SENSITIVE},
+  {"value-set", VALUE_SET}};
 
 const vsd_configt::option_mappingt vsd_configt::struct_option_mappings = {
-  { "top-bottom", STRUCT_INSENSITIVE },
-  { "every-field", STRUCT_SENSITIVE }
-};
+  {"top-bottom", STRUCT_INSENSITIVE},
+  {"every-field", STRUCT_SENSITIVE}};
 
 const vsd_configt::option_mappingt vsd_configt::array_option_mappings = {
-  { "top-bottom", ARRAY_INSENSITIVE },
-  { "every-element", ARRAY_SENSITIVE }
-};
+  {"top-bottom", ARRAY_INSENSITIVE},
+  {"every-element", ARRAY_SENSITIVE}};
 
 const vsd_configt::option_mappingt vsd_configt::union_option_mappings = {
-  { "top-bottom", UNION_INSENSITIVE }
-};
+  {"top-bottom", UNION_INSENSITIVE}};
 
 invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
-  const std::string& option_name,
-  const std::string& bad_argument,
-  const option_mappingt& mapping
-) {
+  const std::string &option_name,
+  const std::string &bad_argument,
+  const option_mappingt &mapping)
+{
   auto option = "--vsd-" + option_name;
   auto choices = std::string("");
-  for (auto& kv : mapping) {
+  for(auto &kv : mapping)
+  {
     choices += (!choices.empty() ? "|" : "");
     choices += kv.first;
   }
 
-  return invalid_command_line_argument_exceptiont {
-    "Unknown argument '" + bad_argument + "'",
-    option,
-    option + " " + choices };
+  return invalid_command_line_argument_exceptiont{
+    "Unknown argument '" + bad_argument + "'", option, option + " " + choices};
 }
 
 ABSTRACT_OBJECT_TYPET vsd_configt::option_to_abstract_type(
-  const optionst& options,
-  const std::string& option_name,
-  const option_mappingt& mapping,
-  ABSTRACT_OBJECT_TYPET default_type
-) {
+  const optionst &options,
+  const std::string &option_name,
+  const option_mappingt &mapping,
+  ABSTRACT_OBJECT_TYPET default_type)
+{
   const auto argument = options.get_option(option_name);
 
-  if (argument.empty()) return default_type;
+  if(argument.empty())
+    return default_type;
 
   auto selected = mapping.find(argument);
-  if (selected == mapping.end()) {
+  if(selected == mapping.end())
+  {
     throw invalid_argument(option_name, argument, mapping);
   }
   return selected->second;
@@ -243,7 +219,8 @@ abstract_object_pointert initialize_abstract_object(
 }
 
 ABSTRACT_OBJECT_TYPET
-variable_sensitivity_object_factoryt::get_abstract_object_type(const typet& type) const
+variable_sensitivity_object_factoryt::get_abstract_object_type(
+  const typet &type) const
 {
   ABSTRACT_OBJECT_TYPET abstract_object_type = TWO_VALUE;
 
@@ -288,7 +265,7 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  const typet& followed_type = ns.follow(type);
+  const typet &followed_type = ns.follow(type);
   ABSTRACT_OBJECT_TYPET abstract_object_type =
     get_abstract_object_type(followed_type);
 

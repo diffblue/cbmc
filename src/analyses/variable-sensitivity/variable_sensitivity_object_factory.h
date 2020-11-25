@@ -72,14 +72,14 @@ struct vsd_configt
   static vsd_configt value_set();
   static vsd_configt intervals();
 
-  vsd_configt() :
-    value_abstract_type(CONSTANT),
-    pointer_abstract_type(POINTER_INSENSITIVE),
-    struct_abstract_type(STRUCT_INSENSITIVE),
-    array_abstract_type(ARRAY_INSENSITIVE),
-    union_abstract_type(UNION_INSENSITIVE),
-    context_tracking { false, true },
-    advanced_sensitivities { false }
+  vsd_configt()
+    : value_abstract_type(CONSTANT),
+      pointer_abstract_type(POINTER_INSENSITIVE),
+      struct_abstract_type(STRUCT_INSENSITIVE),
+      array_abstract_type(ARRAY_INSENSITIVE),
+      union_abstract_type(UNION_INSENSITIVE),
+      context_tracking{false, true},
+      advanced_sensitivities{false}
   {
   }
 
@@ -87,17 +87,15 @@ private:
   using option_mappingt = std::map<std::string, ABSTRACT_OBJECT_TYPET>;
 
   static ABSTRACT_OBJECT_TYPET option_to_abstract_type(
-    const optionst& options,
-    const std::string& option_name,
-    const option_mappingt& mapping,
-    ABSTRACT_OBJECT_TYPET default_type
-  );
+    const optionst &options,
+    const std::string &option_name,
+    const option_mappingt &mapping,
+    ABSTRACT_OBJECT_TYPET default_type);
 
   static invalid_command_line_argument_exceptiont invalid_argument(
-    const std::string& option_name,
-    const std::string& bad_argument,
-    const option_mappingt& mapping
-  );
+    const std::string &option_name,
+    const std::string &bad_argument,
+    const option_mappingt &mapping);
 
   static const option_mappingt value_option_mappings;
   static const option_mappingt pointer_option_mappings;
@@ -147,7 +145,8 @@ public:
     const namespacet &ns) const;
 
   variable_sensitivity_object_factoryt() = delete;
-  variable_sensitivity_object_factoryt(const variable_sensitivity_object_factoryt&) = delete;
+  variable_sensitivity_object_factoryt(
+    const variable_sensitivity_object_factoryt &) = delete;
 
 private:
   /// Decide which abstract object type to use for the variable in question.
@@ -156,7 +155,7 @@ private:
   ///              meant to represent
   ///
   /// \return An enum indicating the abstract object type to use.
-  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet& type) const;
+  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet &type) const;
 
   vsd_configt configuration;
 };
