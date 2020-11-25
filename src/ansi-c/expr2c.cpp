@@ -1709,24 +1709,21 @@ std::string expr2ct::convert_constant(
     if(c_enum_type.id()!=ID_c_enum)
       return convert_norep(src, precedence);
 
-    const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
-    const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
-
-    mp_integer int_value = bvrep2integer(value, width, is_signed);
-    mp_integer i=0;
-
-    irep_idt int_value_string=integer2string(int_value);
-
     const c_enum_typet::memberst &members=
       to_c_enum_type(c_enum_type).members();
 
     for(const auto &member : members)
     {
-      if(member.get_value() == int_value_string)
+      if(member.get_value() == value)
         return "/*enum*/" + id2string(member.get_base_name());
     }
 
     // failed...
+    const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
+    const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
+
+    mp_integer int_value = bvrep2integer(value, width, is_signed);
+
     return "/*enum*/"+integer2string(int_value);
   }
   else if(type.id()==ID_rational)
