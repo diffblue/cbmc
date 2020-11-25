@@ -87,7 +87,8 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
 
 goto-cc.dir: languages goto-programs.dir linking.dir
 
-memory-analyzer.dir: util.dir goto-programs.dir ansi-c.dir
+memory-analyzer.dir: util.dir goto-programs.dir langapi.dir linking.dir \
+	                   ansi-c.dir
 
 symtab2gb.dir: util.dir goto-programs.dir langapi.dir linking.dir \
                json.dir json-symtab-language.dir
