@@ -53,6 +53,7 @@ struct vsd_configt
   ABSTRACT_OBJECT_TYPET pointer_abstract_type;
   ABSTRACT_OBJECT_TYPET struct_abstract_type;
   ABSTRACT_OBJECT_TYPET array_abstract_type;
+  ABSTRACT_OBJECT_TYPET union_abstract_type;
 
   struct
   {
@@ -91,6 +92,7 @@ private:
   static const option_mappingt pointer_option_mappings;
   static const option_mappingt struct_option_mappings;
   static const option_mappingt array_option_mappings;
+  static const option_mappingt union_option_mappings;
 };
 
 class variable_sensitivity_object_factoryt;

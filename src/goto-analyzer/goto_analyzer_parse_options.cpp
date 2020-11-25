@@ -372,6 +372,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("pointers", cmdline.get_value("vsd-pointers"));
       options.set_option("arrays", cmdline.get_value("vsd-arrays"));
       options.set_option("structs", cmdline.get_value("vsd-structs"));
+      options.set_option("unions", cmdline.get_value("vsd-unions"));
       options.set_option(
         "data-dependencies", cmdline.isset("vsd-data-dependencies"));
     }
@@ -385,6 +386,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("pointers", cmdline.get_value("vsd-pointers"));
       options.set_option("arrays", cmdline.get_value("vsd-arrays"));
       options.set_option("structs", cmdline.get_value("vsd-structs"));
+      options.set_option("unions", cmdline.get_value("vsd-unions"));
       options.set_option("data-dependencies", true);
     }
 
@@ -995,6 +997,7 @@ void goto_analyzer_parse_optionst::help()
     " --vsd-structs                struct field sensitive analysis - top-bottom|every-field\n"
     " --vsd-arrays                 array entry sensitive analysis - top-bottom|every-element\n"
     " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n"
+    " --vsd-unions                 union sensitive analysis - top-bottom\n"
     " --vsd-data-dependencies      track data dependencies\n"
     "\n"
     "Storage options:\n"

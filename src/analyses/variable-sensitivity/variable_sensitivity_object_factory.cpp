@@ -52,6 +52,13 @@ vsd_configt vsd_configt::from_options(const optionst &options)
     ARRAY_INSENSITIVE
   );
 
+  config.union_abstract_type = option_to_abstract_type(
+    options,
+    "unions",
+    union_option_mappings,
+    UNION_INSENSITIVE
+  );
+
   // This should always be on (for efficeny with 3-way merge)
   // Does not work with value set
   config.context_tracking.last_write_context =
@@ -117,6 +124,10 @@ const vsd_configt::option_mappingt vsd_configt::struct_option_mappings = {
 const vsd_configt::option_mappingt vsd_configt::array_option_mappings = {
   { "top-bottom", ARRAY_INSENSITIVE },
   { "every-element", ARRAY_SENSITIVE }
+};
+
+const vsd_configt::option_mappingt vsd_configt::union_option_mappings = {
+  { "top-bottom", UNION_INSENSITIVE }
 };
 
 invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
@@ -262,7 +273,7 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet& type
   }
   else if(type.id() == ID_union)
   {
-    abstract_object_type = UNION_INSENSITIVE;
+    return configuration.union_abstract_type;
   }
 
   return abstract_object_type;
