@@ -1,10 +1,13 @@
-CORE
+CORE broken-smt-backend
 main.c
 --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
-\[main.pointer_primitives.1\] line \d+ pointer in pointer primitive is neither null nor valid in R_OK.*: FAILURE
-\*\* 1 of \d+ failed
+\[main.pointer_primitives.1\] line \d+ pointer invalid in R_OK\(\(const void \*\)p, \(__CPROVER_size_t\)1\): FAILURE
+\[main.pointer_primitives.2\] line \d+ deallocated dynamic object in R_OK\(\(const void \*\)p, \(__CPROVER_size_t\)1\): SUCCESS
+\[main.pointer_primitives.3\] line \d+ dead object in R_OK\(\(const void \*\)p, \(__CPROVER_size_t\)1\): SUCCESS
+\[main.pointer_primitives.4\] line \d+ pointer outside dynamic object bounds in R_OK\(\(const void \*\)p, \(__CPROVER_size_t\)1\): FAILURE
+\[main.pointer_primitives.5\] line \d+ pointer outside object bounds in R_OK\(\(const void \*\)p, \(__CPROVER_size_t\)1\): FAILURE
 --
 ^warning: ignoring
 --

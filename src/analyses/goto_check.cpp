@@ -1236,22 +1236,18 @@ void goto_checkt::pointer_primitive_check(
                        ? from_integer(1, size_type())
                        : size_of_expr_opt.value();
 
-  const conditionst &conditions = get_pointer_dereferenceable_conditions(pointer, size);
-
-  exprt::operandst conjuncts;
-
+  const conditionst &conditions =
+    get_pointer_points_to_valid_memory_conditions(pointer, size);
   for(const auto &c : conditions)
-    conjuncts.push_back(c.assertion);
-
-  const or_exprt or_expr(null_object(pointer), conjunction(conjuncts));
-
-  add_guarded_property(
-    or_expr,
-    "pointer in pointer primitive is neither null nor valid",
-    "pointer primitives",
-    expr.source_location(),
-    expr,
-    guard);
+  {
+    add_guarded_property(
+      or_exprt{null_object(pointer), c.assertion},
+      c.description,
+      "pointer primitives",
+      expr.source_location(),
+      expr,
+      guard);
+  }
 }
 
 bool goto_checkt::is_pointer_primitive(const exprt &expr)
