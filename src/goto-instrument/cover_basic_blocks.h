@@ -119,6 +119,11 @@ private:
   /// map block numbers to block information
   std::vector<block_infot> block_infos;
 
+  /// Adds the lines which \param instruction spans to \param block.
+  static void add_block_lines(
+    cover_basic_blockst::block_infot &block,
+    const goto_programt::instructiont &instruction);
+
   /// create list of covered lines as CSV string and set as property of source
   /// location of basic block, compress to ranges if applicable
   static void update_covered_lines(block_infot &block_info);
