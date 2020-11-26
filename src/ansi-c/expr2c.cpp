@@ -44,6 +44,7 @@ expr2c_configurationt expr2c_configurationt::default_configuration
   "TRUE",
   "FALSE",
   true,
+  false,
   false
 };
 
@@ -55,6 +56,7 @@ expr2c_configurationt expr2c_configurationt::clean_configuration
   "1",
   "0",
   false,
+  true,
   true
 };
 
@@ -198,7 +200,7 @@ std::string expr2ct::convert_rec(
 
   std::string d = declarator.empty() ? declarator : " " + declarator;
 
-  if(src.find(ID_C_typedef).is_not_nil())
+  if(!configuration.expand_typedef && src.find(ID_C_typedef).is_not_nil())
   {
     return q+id2string(src.get(ID_C_typedef))+d;
   }

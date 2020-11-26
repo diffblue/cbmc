@@ -1,16 +1,18 @@
+#include <stdlib.h>
+
 extern void __VERIFIER_error();
 
-static float one(float *foo)
+static size_t one(size_t *foo)
 {
   return *foo;
 }
 
-static float two(float *foo)
+static size_t two(size_t *foo)
 {
   return *foo;
 }
 
-float x = 0;
+size_t x = 0;
 
 void step()
 {
