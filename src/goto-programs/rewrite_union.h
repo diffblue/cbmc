@@ -22,4 +22,6 @@ void rewrite_union(goto_functionst::goto_functiont &);
 void rewrite_union(goto_functionst &);
 void rewrite_union(goto_modelt &);
 
+void restore_union(exprt &, const namespacet &);
+
 #endif // CPROVER_GOTO_PROGRAMS_REWRITE_UNION_H

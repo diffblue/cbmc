@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_code.h>
 
 #include <goto-programs/goto_model.h>
@@ -119,4 +120,66 @@ void rewrite_union(goto_functionst &goto_functions)
 void rewrite_union(goto_modelt &goto_model)
 {
   rewrite_union(goto_model.goto_functions);
+}
+
+/// Undo the union access -> byte_extract replacement that rewrite_union did for
+/// the purpose of displaying expressions to users.
+/// \param expr: expression to inspect and possibly transform
+/// \param ns: namespace
+/// \return True if, and only if, the expression is unmodified
+static bool restore_union_rec(exprt &expr, const namespacet &ns)
+{
+  bool unmodified = true;
+
+  Forall_operands(it, expr)
+    unmodified &= restore_union_rec(*it, ns);
+
+  if(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
+  {
+    byte_extract_exprt &be = to_byte_extract_expr(expr);
+    if(be.op().type().id() == ID_union || be.op().type().id() == ID_union_tag)
+    {
+      const union_typet &union_type = to_union_type(ns.follow(be.op().type()));
+
+      for(const auto &comp : union_type.components())
+      {
+        if(be.offset().is_zero() && be.type() == comp.type())
+        {
+          expr = member_exprt{be.op(), comp.get_name(), be.type()};
+          return false;
+        }
+        else if(
+          comp.type().id() == ID_array || comp.type().id() == ID_struct ||
+          comp.type().id() == ID_struct_tag)
+        {
+          optionalt<exprt> result = get_subexpression_at_offset(
+            member_exprt{be.op(), comp.get_name(), comp.type()},
+            be.offset(),
+            be.type(),
+            ns);
+          if(result.has_value())
+          {
+            expr = *result;
+            return false;
+          }
+        }
+      }
+    }
+  }
+
+  return unmodified;
+}
+
+/// Undo the union access -> byte_extract replacement that rewrite_union did for
+/// the purpose of displaying expressions to users.
+/// \param expr: expression to inspect and possibly transform
+/// \param ns: namespace
+void restore_union(exprt &expr, const namespacet &ns)
+{
+  exprt tmp = expr;
+
+  if(!restore_union_rec(tmp, ns))
+    expr.swap(tmp);
 }
