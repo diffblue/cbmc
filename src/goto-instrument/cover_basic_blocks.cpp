@@ -153,12 +153,17 @@ void cover_basic_blockst::add_block_lines(
   cover_basic_blockst::block_infot &block,
   const goto_programt::instructiont &instruction)
 {
-  const irep_idt &line = instruction.source_location.get_line();
-  if(!line.empty())
-  {
-    block.lines.insert(unsafe_string2unsigned(id2string(line)));
-    block.source_lines.insert(instruction.source_location);
-  }
+  const auto &add_location = [&](const source_locationt &location) {
+    const irep_idt &line = location.get_line();
+    if(!line.empty())
+    {
+      block.lines.insert(unsafe_string2unsigned(id2string(line)));
+      block.source_lines.insert(location);
+    }
+  };
+  add_location(instruction.source_location);
+  instruction.code.visit_pre(
+    [&](const exprt &expr) { add_location(expr.source_location()); });
 }
 
 void cover_basic_blockst::update_covered_lines(block_infot &block_info)
