@@ -29,12 +29,12 @@ optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
   return {};
 }
 
-cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
+cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
 {
   bool next_is_target = true;
   std::size_t current_block = 0;
 
-  forall_goto_program_instructions(it, _goto_program)
+  forall_goto_program_instructions(it, goto_program)
   {
     // Is it a potential beginning of a block?
     if(next_is_target || it->is_target())

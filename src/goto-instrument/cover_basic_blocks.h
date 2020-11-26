@@ -63,7 +63,7 @@ public:
 class cover_basic_blockst final : public cover_blocks_baset
 {
 public:
-  explicit cover_basic_blockst(const goto_programt &_goto_program);
+  explicit cover_basic_blockst(const goto_programt &goto_program);
 
   /// \param t: a goto instruction
   /// \return the block number of the block
