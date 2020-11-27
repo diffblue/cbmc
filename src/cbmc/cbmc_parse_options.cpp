@@ -1118,7 +1118,7 @@ void cbmc_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
+    HELP_COVER
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     // NOLINTNEXTLINE(whitespace/line_length)
     " --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"

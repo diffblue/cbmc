@@ -22,6 +22,10 @@ class message_handlert;
 class cmdlinet;
 class optionst;
 
+#define OPT_COVER "(cover):"
+#define HELP_COVER \
+  " --cover CC                   create test-suite with coverage criterion CC\n"
+
 enum class coverage_criteriont
 {
   LOCATION,

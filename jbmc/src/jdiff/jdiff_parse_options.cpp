@@ -367,7 +367,7 @@ void jdiff_parse_optionst::help()
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
-    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
+    HELP_COVER
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "Other options:\n"
