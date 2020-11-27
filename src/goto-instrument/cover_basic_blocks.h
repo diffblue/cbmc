@@ -63,7 +63,7 @@ public:
 class cover_basic_blockst final : public cover_blocks_baset
 {
 public:
-  explicit cover_basic_blockst(const goto_programt &_goto_program);
+  explicit cover_basic_blockst(const goto_programt &goto_program);
 
   /// \param t: a goto instruction
   /// \return the block number of the block
@@ -118,6 +118,11 @@ private:
   block_mapt block_map;
   /// map block numbers to block information
   std::vector<block_infot> block_infos;
+
+  /// Adds the lines which \param instruction spans to \param block.
+  static void add_block_lines(
+    cover_basic_blockst::block_infot &block,
+    const goto_programt::instructiont &instruction);
 
   /// create list of covered lines as CSV string and set as property of source
   /// location of basic block, compress to ranges if applicable

@@ -29,12 +29,12 @@ optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
   return {};
 }
 
-cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
+cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
 {
   bool next_is_target = true;
   std::size_t current_block = 0;
 
-  forall_goto_program_instructions(it, _goto_program)
+  forall_goto_program_instructions(it, goto_program)
   {
     // Is it a potential beginning of a block?
     if(next_is_target || it->is_target())
@@ -58,13 +58,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
 
     block_map[it] = current_block;
 
-    // update lines belonging to block
-    const irep_idt &line = it->source_location.get_line();
-    if(!line.empty())
-    {
-      block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
-      block_info.source_lines.insert(it->source_location);
-    }
+    add_block_lines(block_info, *it);
 
     // set representative program location to instrument
     if(
@@ -153,6 +147,23 @@ void cover_basic_blockst::output(std::ostream &out) const
   for(const auto &block_pair : block_map)
     out << block_pair.first->source_location << " -> " << block_pair.second
         << '\n';
+}
+
+void cover_basic_blockst::add_block_lines(
+  cover_basic_blockst::block_infot &block,
+  const goto_programt::instructiont &instruction)
+{
+  const auto &add_location = [&](const source_locationt &location) {
+    const irep_idt &line = location.get_line();
+    if(!line.empty())
+    {
+      block.lines.insert(unsafe_string2unsigned(id2string(line)));
+      block.source_lines.insert(location);
+    }
+  };
+  add_location(instruction.source_location);
+  instruction.code.visit_pre(
+    [&](const exprt &expr) { add_location(expr.source_location()); });
 }
 
 void cover_basic_blockst::update_covered_lines(block_infot &block_info)
