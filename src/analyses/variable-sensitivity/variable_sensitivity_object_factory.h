@@ -31,14 +31,29 @@
 #include <util/namespace.h>
 #include <util/options.h>
 
+enum ABSTRACT_OBJECT_TYPET
+{
+  TWO_VALUE,
+  CONSTANT,
+  INTERVAL,
+  ARRAY_SENSITIVE,
+  ARRAY_INSENSITIVE,
+  POINTER_SENSITIVE,
+  POINTER_INSENSITIVE,
+  STRUCT_SENSITIVE,
+  STRUCT_INSENSITIVE,
+  // TODO: plug in UNION_SENSITIVE HERE
+  UNION_INSENSITIVE,
+  VALUE_SET
+};
+
 struct vsd_configt
 {
-  struct
-  {
-    bool struct_sensitivity;
-    bool array_sensitivity;
-    bool pointer_sensitivity;
-  } primitive_sensitivity;
+  ABSTRACT_OBJECT_TYPET value_abstract_type;
+  ABSTRACT_OBJECT_TYPET pointer_abstract_type;
+  ABSTRACT_OBJECT_TYPET struct_abstract_type;
+  ABSTRACT_OBJECT_TYPET array_abstract_type;
+  ABSTRACT_OBJECT_TYPET union_abstract_type;
 
   struct
   {
@@ -48,78 +63,45 @@ struct vsd_configt
 
   struct
   {
-    bool intervals;
-    bool value_set;
     bool new_value_set;
   } advanced_sensitivities;
 
-  static vsd_configt from_options(const optionst &options)
+  static vsd_configt from_options(const optionst &options);
+
+  static vsd_configt constant_domain();
+  static vsd_configt value_set();
+  static vsd_configt intervals();
+
+  vsd_configt()
+    : value_abstract_type{CONSTANT},
+      pointer_abstract_type{POINTER_INSENSITIVE},
+      struct_abstract_type{STRUCT_INSENSITIVE},
+      array_abstract_type{ARRAY_INSENSITIVE},
+      union_abstract_type{UNION_INSENSITIVE},
+      context_tracking{false, true},
+      advanced_sensitivities{false}
   {
-    vsd_configt config{};
-
-    if(
-      options.get_bool_option("value-set") &&
-      options.get_bool_option("data-dependencies"))
-    {
-      throw invalid_command_line_argument_exceptiont{
-        "Value set is not currently supported with data dependency analysis",
-        "--value-set --data-dependencies",
-        "--data-dependencies"};
-    }
-
-    config.primitive_sensitivity.struct_sensitivity =
-      options.get_bool_option("structs");
-    config.primitive_sensitivity.array_sensitivity =
-      options.get_bool_option("arrays");
-    config.primitive_sensitivity.pointer_sensitivity =
-      options.get_bool_option("pointers");
-
-    // This should always be on (for efficeny with 3-way merge)
-    // Does not work with value set
-    config.context_tracking.last_write_context =
-      !options.get_bool_option("value-set");
-    config.context_tracking.data_dependency_context =
-      options.get_bool_option("data-dependencies");
-    config.advanced_sensitivities.intervals =
-      options.get_bool_option("interval");
-    config.advanced_sensitivities.value_set =
-      options.get_bool_option("value-set");
-    config.advanced_sensitivities.new_value_set =
-      options.get_bool_option("new-value-set");
-
-    return config;
   }
 
-  static vsd_configt constant_domain()
-  {
-    vsd_configt config{};
-    config.primitive_sensitivity.pointer_sensitivity = true;
-    config.primitive_sensitivity.array_sensitivity = true;
-    config.primitive_sensitivity.struct_sensitivity = true;
-    config.context_tracking.last_write_context = true;
-    return config;
-  }
+private:
+  using option_mappingt = std::map<std::string, ABSTRACT_OBJECT_TYPET>;
 
-  static vsd_configt value_set()
-  {
-    vsd_configt config{};
-    config.primitive_sensitivity.pointer_sensitivity = true;
-    config.primitive_sensitivity.array_sensitivity = true;
-    config.primitive_sensitivity.struct_sensitivity = true;
-    config.advanced_sensitivities.value_set = true;
-    return config;
-  }
+  static ABSTRACT_OBJECT_TYPET option_to_abstract_type(
+    const optionst &options,
+    const std::string &option_name,
+    const option_mappingt &mapping,
+    ABSTRACT_OBJECT_TYPET default_type);
 
-  static vsd_configt intervals()
-  {
-    vsd_configt config{};
-    config.primitive_sensitivity.pointer_sensitivity = true;
-    config.primitive_sensitivity.array_sensitivity = true;
-    config.primitive_sensitivity.struct_sensitivity = true;
-    config.context_tracking.last_write_context = true;
-    config.advanced_sensitivities.intervals = true;
-    return config;
-  }
+  static invalid_command_line_argument_exceptiont invalid_argument(
+    const std::string &option_name,
+    const std::string &bad_argument,
+    const option_mappingt &mapping);
+
+  static const option_mappingt value_option_mappings;
+  static const option_mappingt pointer_option_mappings;
+  static const option_mappingt struct_option_mappings;
+  static const option_mappingt array_option_mappings;
+  static const option_mappingt union_option_mappings;
 };
 
 class variable_sensitivity_object_factoryt;
@@ -136,7 +118,7 @@ public:
   }
 
   explicit variable_sensitivity_object_factoryt(const vsd_configt &options)
-    : configuration(options), initialized(true)
+    : configuration{options}
   {
   }
 
@@ -155,137 +137,27 @@ public:
   ///
   /// \return An abstract object of the appropriate type.
   abstract_object_pointert get_abstract_object(
-    const typet type,
+    const typet &type,
     bool top,
     bool bottom,
     const exprt &e,
     const abstract_environmentt &environment,
-    const namespacet &ns);
+    const namespacet &ns) const;
+
+  variable_sensitivity_object_factoryt() = delete;
+  variable_sensitivity_object_factoryt(
+    const variable_sensitivity_object_factoryt &) = delete;
 
 private:
-  variable_sensitivity_object_factoryt() : initialized(false)
-  {
-  }
-
-  enum ABSTRACT_OBJECT_TYPET
-  {
-    TWO_VALUE,
-    CONSTANT,
-    INTERVAL,
-    ARRAY_SENSITIVE,
-    ARRAY_INSENSITIVE,
-    POINTER_SENSITIVE,
-    POINTER_INSENSITIVE,
-    STRUCT_SENSITIVE,
-    STRUCT_INSENSITIVE,
-    // TODO: plug in UNION_SENSITIVE HERE
-    UNION_INSENSITIVE,
-    VALUE_SET
-  };
-
   /// Decide which abstract object type to use for the variable in question.
   ///
   /// \param type: the type of the variable the abstract object is
   ///              meant to represent
   ///
   /// \return An enum indicating the abstract object type to use.
-  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
-  template <class abstract_object_class>
-  abstract_object_pointert initialize_abstract_object(
-    const typet type,
-    bool top,
-    bool bottom,
-    const exprt &e,
-    const abstract_environmentt &enviroment,
-    const namespacet &ns);
-  template <class abstract_object_class, class context_classt>
-  abstract_object_pointert initialize_context_abstract_object(
-    const typet type,
-    bool top,
-    bool bottom,
-    const exprt &e,
-    const abstract_environmentt &enviroment,
-    const namespacet &ns);
+  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet &type) const;
+
   vsd_configt configuration;
-  bool initialized;
 };
-
-/// Function: variable_sensitivity_object_factoryt::initialize_abstract_object
-/// Initialize the abstract object class and return it.
-///
-/// \param type: the type of the variable
-/// \param top: whether the abstract object should be top in the
-///             two-value domain
-/// \param bottom: whether the abstract object should be bottom in the
-///                two-value domain
-/// \param e: if top and bottom are false this expression is used as the
-///           starting pointer for the abstract object
-/// \param environment: the current abstract environment
-/// \param ns: namespace, used when following the input type
-///
-/// \return An abstract object of the appropriate type.
-///
-template <class abstract_object_classt>
-abstract_object_pointert
-variable_sensitivity_object_factoryt::initialize_abstract_object(
-  const typet type,
-  bool top,
-  bool bottom,
-  const exprt &e,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  if(configuration.context_tracking.data_dependency_context)
-    return initialize_context_abstract_object<
-      abstract_object_classt,
-      data_dependency_contextt>(type, top, bottom, e, environment, ns);
-  if(configuration.context_tracking.last_write_context)
-    return initialize_context_abstract_object<
-      abstract_object_classt,
-      write_location_contextt>(type, top, bottom, e, environment, ns);
-  else
-  {
-    if(top || bottom)
-    {
-      return abstract_object_pointert(
-        new abstract_object_classt(type, top, bottom));
-    }
-    else
-    {
-      PRECONDITION(type == ns.follow(e.type()));
-      return abstract_object_pointert(
-        new abstract_object_classt(e, environment, ns));
-    }
-  }
-}
-
-template <class abstract_object_classt, class context_classt>
-abstract_object_pointert
-variable_sensitivity_object_factoryt::initialize_context_abstract_object(
-  const typet type,
-  bool top,
-  bool bottom,
-  const exprt &e,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  if(top || bottom)
-  {
-    return abstract_object_pointert(new context_classt(
-      abstract_object_pointert(new abstract_object_classt(type, top, bottom)),
-      type,
-      top,
-      bottom));
-  }
-  else
-  {
-    PRECONDITION(type == ns.follow(e.type()));
-    return abstract_object_pointert(new context_classt(
-      abstract_object_pointert(new abstract_object_classt(e, environment, ns)),
-      e,
-      environment,
-      ns));
-  }
-}
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H // NOLINT(*)

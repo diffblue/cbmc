@@ -368,13 +368,13 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("domain set", true);
 
       // Configuration of VSD
-      options.set_option("pointers", cmdline.isset("vsd-pointers"));
-      options.set_option("arrays", cmdline.isset("vsd-arrays"));
-      options.set_option("structs", cmdline.isset("vsd-structs"));
+      options.set_option("values", cmdline.get_value("vsd-values"));
+      options.set_option("pointers", cmdline.get_value("vsd-pointers"));
+      options.set_option("arrays", cmdline.get_value("vsd-arrays"));
+      options.set_option("structs", cmdline.get_value("vsd-structs"));
+      options.set_option("unions", cmdline.get_value("vsd-unions"));
       options.set_option(
         "data-dependencies", cmdline.isset("vsd-data-dependencies"));
-      options.set_option("interval", cmdline.isset("vsd-intervals"));
-      options.set_option("value-set", cmdline.isset("vsd-value-sets"));
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
@@ -382,9 +382,11 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("domain set", true);
 
       // Configuration of variable sensitivity domain
-      options.set_option("pointers", cmdline.isset("vsd-pointers"));
-      options.set_option("arrays", cmdline.isset("vsd-arrays"));
-      options.set_option("structs", cmdline.isset("vsd-structs"));
+      options.set_option("values", cmdline.get_value("vsd-values"));
+      options.set_option("pointers", cmdline.get_value("vsd-pointers"));
+      options.set_option("arrays", cmdline.get_value("vsd-arrays"));
+      options.set_option("structs", cmdline.get_value("vsd-structs"));
+      options.set_option("unions", cmdline.get_value("vsd-unions"));
       options.set_option("data-dependencies", true);
     }
 
@@ -991,12 +993,12 @@ void goto_analyzer_parse_optionst::help()
     " --dependence-graph-vs        dependencies between instructions using VSD\n" // NOLINT(*)
     "\n"
     "Variable sensitivity domain (VSD) options:\n"
-    " --vsd-structs                struct field sensitive analysis\n"
-    " --vsd-arrays                 array entry sensitive analysis\n"
-    " --vsd-pointers               pointer sensitive analysis\n"
-    " --vsd-value-sets             use value sets\n"
+    " --vsd-values                 value tracking - constants|intervals|set-of-constants\n"
+    " --vsd-structs                struct field sensitive analysis - top-bottom|every-field\n"
+    " --vsd-arrays                 array entry sensitive analysis - top-bottom|every-element\n"
+    " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n"
+    " --vsd-unions                 union sensitive analysis - top-bottom\n"
     " --vsd-data-dependencies      track data dependencies\n"
-    " --vsd-intervals              use intervals\n"
     "\n"
     "Storage options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)

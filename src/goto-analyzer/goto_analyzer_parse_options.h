@@ -135,12 +135,12 @@ class optionst;
   "(dependence-graph-vs)" \
 
 #define GOTO_ANALYSER_OPTIONS_VSD \
-  "(vsd-structs)" \
-  "(vsd-arrays)" \
-  "(vsd-pointers)" \
-  "(vsd-value-sets)" \
-  "(vsd-data-dependencies)" \
-  "(vsd-intervals)" \
+  "(vsd-values):" \
+  "(vsd-structs):" \
+  "(vsd-arrays):" \
+  "(vsd-pointers):" \
+  "(vsd-unions):" \
+  "(vsd-data-dependencies)"
 
 #define GOTO_ANALYSER_OPTIONS_STORAGE \
   "(one-domain-per-history)" \

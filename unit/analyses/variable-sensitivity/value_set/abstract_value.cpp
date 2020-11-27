@@ -378,6 +378,7 @@ TEST_CASE(
 static abstract_environmentt get_value_set_abstract_environment()
 {
   vsd_configt config;
+  config.value_abstract_type = VALUE_SET;
   config.advanced_sensitivities.new_value_set = true;
   config.context_tracking.data_dependency_context = false;
   config.context_tracking.last_write_context = false;

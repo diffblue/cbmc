@@ -10,8 +10,217 @@
 #include "util/namespace.h"
 #include "value_set_abstract_value.h"
 
-variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
-variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
+vsd_configt vsd_configt::from_options(const optionst &options)
+{
+  vsd_configt config{};
+
+  if(
+    options.get_bool_option("value-set") &&
+    options.get_bool_option("data-dependencies"))
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "Value set is not currently supported with data dependency analysis",
+      "--value-set --data-dependencies",
+      "--data-dependencies"};
+  }
+
+  config.value_abstract_type =
+    option_to_abstract_type(options, "values", value_option_mappings, CONSTANT);
+
+  config.pointer_abstract_type = option_to_abstract_type(
+    options, "pointers", pointer_option_mappings, POINTER_INSENSITIVE);
+
+  config.struct_abstract_type = option_to_abstract_type(
+    options, "structs", struct_option_mappings, STRUCT_INSENSITIVE);
+
+  config.array_abstract_type = option_to_abstract_type(
+    options, "arrays", array_option_mappings, ARRAY_INSENSITIVE);
+
+  config.union_abstract_type = option_to_abstract_type(
+    options, "unions", union_option_mappings, UNION_INSENSITIVE);
+
+  // This should always be on (for efficeny with 3-way merge)
+  // Does not work with value set
+  config.context_tracking.last_write_context =
+    (config.value_abstract_type != VALUE_SET) &&
+    (config.pointer_abstract_type != VALUE_SET);
+  config.context_tracking.data_dependency_context =
+    options.get_bool_option("data-dependencies");
+  config.advanced_sensitivities.new_value_set =
+    options.get_bool_option("new-value-set");
+
+  return config;
+}
+
+vsd_configt vsd_configt::constant_domain()
+{
+  vsd_configt config{};
+  config.context_tracking.last_write_context = true;
+  config.value_abstract_type = CONSTANT;
+  config.pointer_abstract_type = POINTER_SENSITIVE;
+  config.struct_abstract_type = STRUCT_SENSITIVE;
+  config.array_abstract_type = ARRAY_SENSITIVE;
+  return config;
+}
+
+vsd_configt vsd_configt::value_set()
+{
+  vsd_configt config{};
+  config.value_abstract_type = VALUE_SET;
+  config.pointer_abstract_type = VALUE_SET;
+  config.struct_abstract_type = STRUCT_SENSITIVE;
+  config.array_abstract_type = ARRAY_SENSITIVE;
+  return config;
+}
+
+vsd_configt vsd_configt::intervals()
+{
+  vsd_configt config{};
+  config.context_tracking.last_write_context = true;
+  config.value_abstract_type = INTERVAL;
+  config.pointer_abstract_type = POINTER_SENSITIVE;
+  config.struct_abstract_type = STRUCT_SENSITIVE;
+  config.array_abstract_type = ARRAY_SENSITIVE;
+  return config;
+}
+
+const vsd_configt::option_mappingt vsd_configt::value_option_mappings = {
+  {"intervals", INTERVAL},
+  {"constants", CONSTANT},
+  {"set-of-constants", VALUE_SET}};
+
+const vsd_configt::option_mappingt vsd_configt::pointer_option_mappings = {
+  {"top-bottom", POINTER_INSENSITIVE},
+  {"constants", POINTER_SENSITIVE},
+  {"value-set", VALUE_SET}};
+
+const vsd_configt::option_mappingt vsd_configt::struct_option_mappings = {
+  {"top-bottom", STRUCT_INSENSITIVE},
+  {"every-field", STRUCT_SENSITIVE}};
+
+const vsd_configt::option_mappingt vsd_configt::array_option_mappings = {
+  {"top-bottom", ARRAY_INSENSITIVE},
+  {"every-element", ARRAY_SENSITIVE}};
+
+const vsd_configt::option_mappingt vsd_configt::union_option_mappings = {
+  {"top-bottom", UNION_INSENSITIVE}};
+
+invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
+  const std::string &option_name,
+  const std::string &bad_argument,
+  const option_mappingt &mapping)
+{
+  auto option = "--vsd-" + option_name;
+  auto choices = std::string("");
+  for(auto &kv : mapping)
+  {
+    choices += (!choices.empty() ? "|" : "");
+    choices += kv.first;
+  }
+
+  return invalid_command_line_argument_exceptiont{
+    "Unknown argument '" + bad_argument + "'", option, option + " " + choices};
+}
+
+ABSTRACT_OBJECT_TYPET vsd_configt::option_to_abstract_type(
+  const optionst &options,
+  const std::string &option_name,
+  const option_mappingt &mapping,
+  ABSTRACT_OBJECT_TYPET default_type)
+{
+  const auto argument = options.get_option(option_name);
+
+  if(argument.empty())
+    return default_type;
+
+  auto selected = mapping.find(argument);
+  if(selected == mapping.end())
+  {
+    throw invalid_argument(option_name, argument, mapping);
+  }
+  return selected->second;
+}
+
+template <class abstract_object_classt, class context_classt>
+abstract_object_pointert initialize_context_abstract_object(
+  const typet type,
+  bool top,
+  bool bottom,
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+{
+  if(top || bottom)
+  {
+    return abstract_object_pointert(new context_classt{
+      abstract_object_pointert(new abstract_object_classt{type, top, bottom}),
+      type,
+      top,
+      bottom});
+  }
+  else
+  {
+    PRECONDITION(type == ns.follow(e.type()));
+    return abstract_object_pointert(new context_classt{
+      abstract_object_pointert(new abstract_object_classt{e, environment, ns}),
+      e,
+      environment,
+      ns});
+  }
+}
+
+/// Function: variable_sensitivity_object_factoryt::initialize_abstract_object
+/// Initialize the abstract object class and return it.
+///
+/// \param type: the type of the variable
+/// \param top: whether the abstract object should be top in the
+///             two-value domain
+/// \param bottom: whether the abstract object should be bottom in the
+///                two-value domain
+/// \param e: if top and bottom are false this expression is used as the
+///           starting pointer for the abstract object
+/// \param environment: the current abstract environment
+/// \param ns: namespace, used when following the input type
+///
+/// \return An abstract object of the appropriate type.
+///
+template <class abstract_object_classt>
+abstract_object_pointert initialize_abstract_object(
+  const typet type,
+  bool top,
+  bool bottom,
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns,
+  const vsd_configt &configuration)
+{
+  if(configuration.context_tracking.data_dependency_context)
+    return initialize_context_abstract_object<
+      abstract_object_classt,
+      data_dependency_contextt>(type, top, bottom, e, environment, ns);
+  if(configuration.context_tracking.last_write_context)
+    return initialize_context_abstract_object<
+      abstract_object_classt,
+      write_location_contextt>(type, top, bottom, e, environment, ns);
+  else
+  {
+    if(top || bottom)
+    {
+      return abstract_object_pointert(
+        new abstract_object_classt{type, top, bottom});
+    }
+    else
+    {
+      PRECONDITION(type == ns.follow(e.type()));
+      return abstract_object_pointert(
+        new abstract_object_classt{e, environment, ns});
+    }
+  }
+}
+
+ABSTRACT_OBJECT_TYPET
+variable_sensitivity_object_factoryt::get_abstract_object_type(
+  const typet &type) const
 {
   ABSTRACT_OBJECT_TYPET abstract_object_type = TWO_VALUE;
 
@@ -20,52 +229,28 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
     type.id() == ID_fixedbv || type.id() == ID_c_bool || type.id() == ID_bool ||
     type.id() == ID_integer || type.id() == ID_c_bit_field)
   {
-    abstract_object_type =
-      configuration.advanced_sensitivities.intervals ? INTERVAL : CONSTANT;
-    if(configuration.advanced_sensitivities.new_value_set)
-    {
-      abstract_object_type = VALUE_SET;
-    }
+    return configuration.value_abstract_type;
   }
   else if(type.id() == ID_floatbv)
   {
-    abstract_object_type = CONSTANT;
-    if(configuration.advanced_sensitivities.new_value_set)
-    {
-      abstract_object_type = VALUE_SET;
-    }
+    auto float_type = configuration.value_abstract_type;
+    return (float_type == INTERVAL) ? CONSTANT : float_type;
   }
   else if(type.id() == ID_array)
   {
-    abstract_object_type = configuration.primitive_sensitivity.array_sensitivity
-                             ? ARRAY_SENSITIVE
-                             : ARRAY_INSENSITIVE;
+    return configuration.array_abstract_type;
   }
   else if(type.id() == ID_pointer)
   {
-    abstract_object_type =
-      configuration.primitive_sensitivity.pointer_sensitivity
-        ? POINTER_SENSITIVE
-        : POINTER_INSENSITIVE;
+    return configuration.pointer_abstract_type;
   }
   else if(type.id() == ID_struct)
   {
-    abstract_object_type =
-      configuration.primitive_sensitivity.struct_sensitivity
-        ? STRUCT_SENSITIVE
-        : STRUCT_INSENSITIVE;
+    return configuration.struct_abstract_type;
   }
   else if(type.id() == ID_union)
   {
-    abstract_object_type = UNION_INSENSITIVE;
-  }
-  if(
-    configuration.advanced_sensitivities.value_set &&
-    (abstract_object_type == INTERVAL || abstract_object_type == CONSTANT ||
-     abstract_object_type == POINTER_INSENSITIVE ||
-     abstract_object_type == POINTER_SENSITIVE))
-  {
-    abstract_object_type = VALUE_SET;
+    return configuration.union_abstract_type;
   }
 
   return abstract_object_type;
@@ -73,21 +258,14 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(const typet type)
 
 abstract_object_pointert
 variable_sensitivity_object_factoryt::get_abstract_object(
-  const typet type,
+  const typet &type,
   bool top,
   bool bottom,
   const exprt &e,
   const abstract_environmentt &environment,
-  const namespacet &ns)
+  const namespacet &ns) const
 {
-  if(!initialized)
-  {
-    throw "variable_sensitivity_object_factoryt::get_abstract_object() " \
-      "called without first calling " \
-      "variable_sensitivity_object_factoryt::set_options()\n";
-  }
-
-  typet followed_type = ns.follow(type);
+  const typet &followed_type = ns.follow(type);
   ABSTRACT_OBJECT_TYPET abstract_object_type =
     get_abstract_object_type(followed_type);
 
@@ -95,48 +273,48 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   {
   case CONSTANT:
     return initialize_abstract_object<constant_abstract_valuet>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case INTERVAL:
     return initialize_abstract_object<interval_abstract_valuet>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case ARRAY_SENSITIVE:
-    return configuration.advanced_sensitivities.intervals
+    return configuration.value_abstract_type == INTERVAL
              ? initialize_abstract_object<interval_array_abstract_objectt>(
-                 followed_type, top, bottom, e, environment, ns)
+                 followed_type, top, bottom, e, environment, ns, configuration)
              : initialize_abstract_object<constant_array_abstract_objectt>(
-                 followed_type, top, bottom, e, environment, ns);
+                 followed_type, top, bottom, e, environment, ns, configuration);
   case ARRAY_INSENSITIVE:
     return initialize_abstract_object<array_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case POINTER_SENSITIVE:
     return initialize_abstract_object<constant_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case POINTER_INSENSITIVE:
     return initialize_abstract_object<pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case STRUCT_SENSITIVE:
     return initialize_abstract_object<full_struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case STRUCT_INSENSITIVE:
     return initialize_abstract_object<struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case UNION_INSENSITIVE:
     return initialize_abstract_object<union_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case TWO_VALUE:
     return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   case VALUE_SET:
     if(configuration.advanced_sensitivities.new_value_set)
     {
       return initialize_abstract_object<value_set_abstract_valuet>(
-        followed_type, top, bottom, e, environment, ns);
+        followed_type, top, bottom, e, environment, ns, configuration);
     }
     return initialize_abstract_object<value_set_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   default:
     UNREACHABLE;
     return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+      followed_type, top, bottom, e, environment, ns, configuration);
   }
 }
