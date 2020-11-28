@@ -140,6 +140,7 @@ class optionst;
   "(vsd-arrays):" \
   "(vsd-pointers):" \
   "(vsd-unions):" \
+  "(vsd-flow-insensitive)" \
   "(vsd-data-dependencies)"
 
 #define GOTO_ANALYSER_OPTIONS_STORAGE \
