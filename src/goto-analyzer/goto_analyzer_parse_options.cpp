@@ -493,7 +493,7 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     else if(options.get_bool_option("vsd"))
     {
       df = util_make_unique<variable_sensitivity_domain_factoryt>(
-        vs_object_factory);
+        vs_object_factory, vsd_config);
     }
     // non-null is not fully supported, despite the historical options
     // dependency-graph is quite heavily tied to the legacy-ait infrastructure
@@ -544,12 +544,12 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     else if(options.get_bool_option("dependence-graph-vs"))
     {
       return new variable_sensitivity_dependence_grapht(
-        goto_model.goto_functions, ns, vs_object_factory);
+        goto_model.goto_functions, ns, vs_object_factory, vsd_config);
     }
     else if(options.get_bool_option("vsd"))
     {
       auto df = util_make_unique<variable_sensitivity_domain_factoryt>(
-        vs_object_factory);
+        vs_object_factory, vsd_config);
       return new ait<variable_sensitivity_domaint>(std::move(df));
     }
     else if(options.get_bool_option("intervals"))

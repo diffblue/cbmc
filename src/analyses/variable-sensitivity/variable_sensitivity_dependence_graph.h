@@ -76,8 +76,9 @@ public:
 
   explicit variable_sensitivity_dependence_domaint(
     node_indext id,
-    variable_sensitivity_object_factory_ptrt object_factory)
-    : variable_sensitivity_domaint(object_factory),
+    variable_sensitivity_object_factory_ptrt object_factory,
+    const vsd_configt& configuration)
+    : variable_sensitivity_domaint(object_factory, configuration),
       node_id(id),
       has_values(false),
       has_changed(false)
@@ -243,7 +244,8 @@ public:
   explicit variable_sensitivity_dependence_grapht(
     const goto_functionst &goto_functions,
     const namespacet &_ns,
-    variable_sensitivity_object_factory_ptrt object_factory);
+    variable_sensitivity_object_factory_ptrt object_factory,
+    const vsd_configt& _configuration);
 
   void
   initialize(const irep_idt &function_id, const goto_programt &goto_program)
