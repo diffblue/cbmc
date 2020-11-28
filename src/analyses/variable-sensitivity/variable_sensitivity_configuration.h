@@ -30,6 +30,11 @@ enum ABSTRACT_OBJECT_TYPET
   VALUE_SET
 };
 
+enum class flow_sensitivityt {
+  sensitive,
+  insensitive
+};
+
 struct vsd_configt
 {
   ABSTRACT_OBJECT_TYPET value_abstract_type;
@@ -37,6 +42,8 @@ struct vsd_configt
   ABSTRACT_OBJECT_TYPET struct_abstract_type;
   ABSTRACT_OBJECT_TYPET array_abstract_type;
   ABSTRACT_OBJECT_TYPET union_abstract_type;
+
+  flow_sensitivityt flow_sensitivity;
 
   struct
   {
@@ -61,6 +68,7 @@ struct vsd_configt
       struct_abstract_type{STRUCT_INSENSITIVE},
       array_abstract_type{ARRAY_INSENSITIVE},
       union_abstract_type{UNION_INSENSITIVE},
+      flow_sensitivity{flow_sensitivityt::sensitive},
       context_tracking{false, true},
       advanced_sensitivities{false}
   {

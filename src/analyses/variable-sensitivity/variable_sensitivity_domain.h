@@ -78,7 +78,8 @@ public:
   explicit variable_sensitivity_domaint(
     variable_sensitivity_object_factory_ptrt _object_factory,
     const vsd_configt& _configuration)
-    : abstract_state(_object_factory)
+    : abstract_state(_object_factory),
+      flow_sensitivity(_configuration.flow_sensitivity)
   {
   }
 
@@ -213,6 +214,7 @@ private:
     const namespacet &ns);
 
   abstract_environmentt abstract_state;
+  flow_sensitivityt flow_sensitivity;
 
 #ifdef ENABLE_STATS
 public:

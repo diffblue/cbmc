@@ -80,7 +80,7 @@ void variable_sensitivity_domaint::transform(
 
   case GOTO:
   {
-    if(1) // (flow_sensitivity == FLOW_SENSITIVE)
+    if(flow_sensitivity == flow_sensitivityt::sensitive)
     {
       // Get the next line
       locationt next = from;
