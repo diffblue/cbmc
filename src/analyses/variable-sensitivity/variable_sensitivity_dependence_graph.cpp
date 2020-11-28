@@ -615,7 +615,7 @@ public:
   explicit variable_sensitivity_dependence_domain_factoryt(
     variable_sensitivity_dependence_grapht &_dg,
     variable_sensitivity_object_factory_ptrt _object_factory,
-    const vsd_configt& _configuration)
+    const vsd_configt &_configuration)
     : dg(_dg), object_factory(_object_factory), configuration(_configuration)
   {
   }
@@ -641,7 +641,7 @@ variable_sensitivity_dependence_grapht::variable_sensitivity_dependence_grapht(
   const goto_functionst &goto_functions,
   const namespacet &_ns,
   variable_sensitivity_object_factory_ptrt object_factory,
-  const vsd_configt& configuration)
+  const vsd_configt &configuration)
   : ai_three_way_merget(
       util_make_unique<ai_history_factory_default_constructort<ahistoricalt>>(),
       util_make_unique<variable_sensitivity_dependence_domain_factoryt>(

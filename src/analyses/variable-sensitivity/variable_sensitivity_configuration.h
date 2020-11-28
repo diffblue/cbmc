@@ -30,7 +30,8 @@ enum ABSTRACT_OBJECT_TYPET
   VALUE_SET
 };
 
-enum class flow_sensitivityt {
+enum class flow_sensitivityt
+{
   sensitive,
   insensitive
 };

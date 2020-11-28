@@ -16,5 +16,7 @@ int fun(int other)
 int main(int argc, char *argv[])
 {
   int z = fun(0);
-  assert(z == 0); // Unknown as flow-insensitive fails to stop the recursive case being explored
+  assert(
+    z ==
+    0); // Unknown as flow-insensitive fails to stop the recursive case being explored
 }

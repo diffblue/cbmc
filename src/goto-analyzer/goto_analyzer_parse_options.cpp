@@ -1067,7 +1067,5 @@ void vsd_options(optionst &options, const cmdlinet &cmdline)
   options.set_option("arrays", cmdline.get_value("vsd-arrays"));
   options.set_option("structs", cmdline.get_value("vsd-structs"));
   options.set_option("unions", cmdline.get_value("vsd-unions"));
-  options.set_option("flow-insensitive",
-                     cmdline.isset("vsd-flow-insensitive"));
+  options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive"));
 }
-

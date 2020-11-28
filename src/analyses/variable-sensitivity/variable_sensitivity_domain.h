@@ -77,7 +77,7 @@ class variable_sensitivity_domaint : public ai_domain_baset
 public:
   explicit variable_sensitivity_domaint(
     variable_sensitivity_object_factory_ptrt _object_factory,
-    const vsd_configt& _configuration)
+    const vsd_configt &_configuration)
     : abstract_state(_object_factory),
       flow_sensitivity(_configuration.flow_sensitivity)
   {
@@ -228,14 +228,15 @@ class variable_sensitivity_domain_factoryt
 public:
   explicit variable_sensitivity_domain_factoryt(
     variable_sensitivity_object_factory_ptrt _object_factory,
-    const vsd_configt& _configuration)
+    const vsd_configt &_configuration)
     : object_factory(_object_factory), configuration(_configuration)
   {
   }
 
   std::unique_ptr<statet> make(locationt l) const override
   {
-    auto d = util_make_unique<variable_sensitivity_domaint>(object_factory, configuration);
+    auto d = util_make_unique<variable_sensitivity_domaint>(
+      object_factory, configuration);
     CHECK_RETURN(d->is_bottom());
     return std::unique_ptr<statet>(d.release());
   }
