@@ -74,6 +74,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 
+void vsd_options(optionst &options, const cmdlinet &cmdline);
+
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv)
@@ -366,31 +368,17 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     else if(cmdline.isset("vsd") || cmdline.isset("variable-sensitivity"))
     {
       options.set_option("vsd", true);
-      options.set_option("domain set", true);
-
-      // Configuration of VSD
-      options.set_option("values", cmdline.get_value("vsd-values"));
-      options.set_option("pointers", cmdline.get_value("vsd-pointers"));
-      options.set_option("arrays", cmdline.get_value("vsd-arrays"));
-      options.set_option("structs", cmdline.get_value("vsd-structs"));
-      options.set_option("unions", cmdline.get_value("vsd-unions"));
-      options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive"));
       options.set_option(
         "data-dependencies", cmdline.isset("vsd-data-dependencies"));
+
+      vsd_options(options, cmdline);
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
       options.set_option("dependence-graph-vs", true);
-      options.set_option("domain set", true);
-
-      // Configuration of variable sensitivity domain
-      options.set_option("values", cmdline.get_value("vsd-values"));
-      options.set_option("pointers", cmdline.get_value("vsd-pointers"));
-      options.set_option("arrays", cmdline.get_value("vsd-arrays"));
-      options.set_option("structs", cmdline.get_value("vsd-structs"));
-      options.set_option("unions", cmdline.get_value("vsd-unions"));
-      options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive"));
       options.set_option("data-dependencies", true);
+
+      vsd_options(options, cmdline);
     }
 
     // Reachability questions, when given with a domain swap from specific
@@ -1068,3 +1056,18 @@ void goto_analyzer_parse_optionst::help()
     "\n";
   // clang-format on
 }
+
+void vsd_options(optionst &options, const cmdlinet &cmdline)
+{
+  options.set_option("domain set", true);
+
+  // Configuration of VSD
+  options.set_option("values", cmdline.get_value("vsd-values"));
+  options.set_option("pointers", cmdline.get_value("vsd-pointers"));
+  options.set_option("arrays", cmdline.get_value("vsd-arrays"));
+  options.set_option("structs", cmdline.get_value("vsd-structs"));
+  options.set_option("unions", cmdline.get_value("vsd-unions"));
+  options.set_option("flow-insensitive",
+                     cmdline.isset("vsd-flow-insensitive"));
+}
+
