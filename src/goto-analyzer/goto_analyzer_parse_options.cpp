@@ -52,6 +52,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_control_flow_history.h>
 #include <analyses/local_may_alias.h>
 #include <analyses/variable-sensitivity/three_way_merge_abstract_interpreter.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
