@@ -4,9 +4,10 @@ set -x -e
 # set up the additional volume
 if lsblk | grep ^nvme
 then
-  e2fsck -f -y /dev/nvme0n1
-  resize2fs /dev/nvme0n1
-  mount /dev/nvme0n1 /mnt
+  d=$(ls /dev/nvme* | tail -n 1)
+  e2fsck -f -y $d
+  resize2fs $d
+  mount $d /mnt
 else
   e2fsck -f -y /dev/xvdf
   resize2fs /dev/xvdf
@@ -17,17 +18,18 @@ fi
 apt-get install -y git time wget binutils make jq
 apt-get install -y zip unzip
 apt-get install -y gcc libc6-dev-i386
-apt-get install -y ant python3-tempita python
-
-# cgroup set up for benchexec
-chmod o+wt '/sys/fs/cgroup/cpuset/'
-chmod o+wt '/sys/fs/cgroup/cpu,cpuacct/user.slice'
-chmod o+wt '/sys/fs/cgroup/memory/user.slice'
-chmod o+wt '/sys/fs/cgroup/freezer/'
+apt-get install -y ant default-jdk python3-tempita python
+if [ x:USE_PERF: = xTrue ]
+then
+  apt-get install -y linux-tools-*-aws
+  git clone https://github.com/brendangregg/FlameGraph.git /mnt/FlameGraph
+fi
 
 # update benchmarks
 cd /mnt/sv-benchmarks
-git pull
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch origin master
+git checkout -b master origin/master
 
 # update benchexec
 cd /mnt/benchexec
@@ -43,8 +45,8 @@ cd ..
 mkdir -p run
 cd run
 wget -O cbmc.xml \
-  https://raw.githubusercontent.com/sosy-lab/sv-comp/master/benchmark-defs/cbmc.xml
-sed -i 's/witness.graphml/${logfile_path_abs}${inputfile_name}-witness.graphml/' cbmc.xml
+  'https://gitlab.com/sosy-lab/sv-comp/bench-defs/-/raw/master/benchmark-defs/cbmc.xml?inline=false'
+sed -i 's/witness.graphml/${logfile_path_abs}${taskdef_name}-witness.graphml/' cbmc.xml
 cd ..
 mkdir -p tmp
 export TMPDIR=/mnt/tmp
@@ -62,8 +64,8 @@ then
     fshell-witness2test-validate-violation-witnesses
   do
     wget -O $def.xml \
-      https://raw.githubusercontent.com/sosy-lab/sv-comp/master/benchmark-defs/$def.xml
-    sed -i 's#[\./]*/results-verified/LOGDIR/\${rundefinition_name}.\${inputfile_name}.files/witness.graphml#witnesses/${rundefinition_name}.${inputfile_name}-witness.graphml#' $def.xml
+      "https://gitlab.com/sosy-lab/sv-comp/bench-defs/-/raw/master/benchmark-defs/$def.xml?inline=false"
+    sed -i 's#[\./]*/results-verified/LOGDIR/\${rundefinition_name}.\${taskdef_name}/witness.graphml#witnesses/${rundefinition_name}.${taskdef_name}-witness.graphml#' $def.xml
   done
 
   ln -s ../cpachecker/scripts/cpa.sh cpa.sh
@@ -73,6 +75,8 @@ then
   git pull
   wget https://codeload.github.com/eliben/pycparser/zip/master -O pycparser-master.zip
   unzip pycparser-master.zip
+  wget https://codeload.github.com/inducer/pycparserext/zip/master -O pycparserext-master.zip
+  unzip pycparserext-master.zip
   cd ../run
   cp -a ../fshell-w2t/* .
 fi
@@ -109,12 +113,12 @@ do
         perf-test-sqs-:PERFTESTID:
       aws --region :AWSREGION: cloudformation delete-stack --stack-name \
         perf-test-exec-:PERFTESTID:
-      halt
+      poweroff
     fi
 
     # the queue is gone, or other host will be turning
     # off the lights
-    halt
+    poweroff
   fi
 
   retry=1
@@ -231,26 +235,67 @@ do
       rm -rf $wcp-logs-$t/*.logfiles
       aws s3 cp $wcp-logs-$t s3://:S3BUCKET:/:PERFTESTID:/$cfg/$wcp-logs-$t/ --recursive
     done
+  elif [ x:USE_PERF: = xTrue ]
+  then
+    rm -f perf.data
+    perf record --call-graph fp -o perf.data -- ../benchexec/bin/benchexec cbmc.xml --no-container \
+      --task $t -T 600s -M 7GB -o logs-$t/ -N $max_par -c -1
+    if timeout 2h perf report > sum.perf-graph-$t
+    then
+      gzip sum.perf-graph-$t
+      aws s3 cp sum.perf-graph-$t.gz s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.perf-graph-$t.gz
+    fi
+    if timeout 2h perf report -g none --no-children > sum.perf-flat-$t
+    then
+      gzip sum.perf-flat-$t
+      aws s3 cp sum.perf-flat-$t.gz s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.perf-flat-$t.gz
+    fi
+    if timeout 2h perf report -g graph,callee,count --no-children > sum.perf-callee-$t
+    then
+      gzip sum.perf-callee-$t
+      aws s3 cp sum.perf-callee-$t.gz s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.perf-callee-$t.gz
+    fi
+    if timeout 2h perf script > sum.perf-folded-$t
+    then
+      ../FlameGraph/stackcollapse-perf.pl sum.perf-folded-$t > sum.perf-collapsed-$t
+      ../FlameGraph/flamegraph.pl sum.perf-collapsed-$t > sum.perf-flamegraph-$t.svg
+      aws s3 cp sum.perf-flamegraph-$t.svg s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.perf-flamegraph-$t.svg
+    fi
+    rm -f perf.data sum.perf-*-$t{,.gz}
   else
-    rm -f gmon.sum gmon.out *.gmon.out.*
+    rm -f gmon.sum gmon.out
+    find . -name "*.gmon.out.*" -delete
     ../benchexec/bin/benchexec cbmc.xml --no-container \
       --task $t -T 600s -M 7GB -o logs-$t/ -N $max_par -c -1
     if ls *.gmon.out.* >/dev/null 2>&1
     then
-      gprof --sum ./cbmc-binary cbmc*.gmon.out.*
-      gprof ./cbmc-binary gmon.sum > sum.profile-$t
+      if timeout 2h gprof --sum ./cbmc-binary cbmc*.gmon.out.*
+      then
+        gprof ./cbmc-binary gmon.sum > sum.profile-$t
+        aws s3 cp sum.profile-$t s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.profile-$t
+      elif timeout 2h gprof ./cbmc-binary $(ls -S cbmc*.gmon.out.* | head -n 1) > single.profile-$t
+      then
+        aws s3 cp single.profile-$t s3://:S3BUCKET:/:PERFTESTID:/$cfg/single.profile-$t
+      fi
       rm -f gmon.sum
-      gprof --sum ./goto-cc goto-cc*.gmon.out.*
-      gprof ./goto-cc gmon.sum > sum.goto-cc-profile-$t
+      if timeout 2h gprof --sum ./goto-cc goto-cc*.gmon.out.*
+      then
+        gprof ./goto-cc gmon.sum > sum.goto-cc-profile-$t
+        aws s3 cp sum.goto-cc-profile-$t \
+          s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.goto-cc-profile-$t
+      elif timeout 2h gprof ./goto-cc $(ls -S goto-cc*.gmon.out.* | head -n 1) > single.goto-cc-profile-$t
+      then
+        aws s3 cp single.goto-cc-profile-$t \
+          s3://:S3BUCKET:/:PERFTESTID:/$cfg/single.goto-cc-profile-$t
+      fi
       rm -f gmon.sum gmon.out
-      rm -f cbmc*.gmon.out.*
-      rm -f goto-cc*.gmon.out.*
-      aws s3 cp sum.profile-$t s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.profile-$t
-      aws s3 cp sum.goto-cc-profile-$t \
-        s3://:S3BUCKET:/:PERFTESTID:/$cfg/sum.goto-cc-profile-$t
+      find . -name "cbmc*.gmon.out.*" -delete
+      find . -name "goto-cc*.gmon.out.*" -delete
     fi
+    rm -f sum.profile-$t sum.goto-cc-profile-$t
+    rm -f single.profile-$t single.goto-cc-profile-$t
   fi
-  rm -rf logs-$t sum.profile-$t
+  rm -rf logs-$t
   date
 
   # clear out the in-progress message
