@@ -34,6 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
+#include <deque>
+
 /// Returns true if \p expr is complicated enough that a local definition (using
 /// a let expression) is preferable to repeating it, potentially many times.
 /// Of course this is just a heuristic -- currently we allow any expression that
@@ -167,10 +169,12 @@ exprt value_set_dereferencet::dereference(
     compare_against_pointer = fresh_binder.symbol_expr();
   }
 
-  std::list<valuet> values =
-    make_range(retained_values).map([&](const exprt &value) {
-      return build_reference_to(value, compare_against_pointer, ns);
-    });
+  auto values =
+    make_range(retained_values)
+      .map([&](const exprt &value) {
+        return build_reference_to(value, compare_against_pointer, ns);
+      })
+      .collect<std::deque<valuet>>();
 
   const bool may_fail =
     values.empty() ||
@@ -220,9 +224,8 @@ exprt value_set_dereferencet::dereference(
 
   exprt value=nil_exprt();
 
-  for(std::list<valuet>::const_iterator
-      it=values.begin();
-      it!=values.end();
+  for(std::deque<valuet>::const_iterator it = values.begin();
+      it != values.end();
       it++)
   {
     if(it->value.is_not_nil())
