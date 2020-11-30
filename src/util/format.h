@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_FORMAT_H
 
 #include <iosfwd>
+#include <sstream>
+#include <string>
 
 //! The below enables convenient syntax for feeding
 //! objects into streams, via stream << format(o)
@@ -35,6 +37,14 @@ template <typename T>
 static inline format_containert<T> format(const T &o)
 {
   return format_containert<T>(o);
+}
+
+template <typename T>
+std::string format_to_string(const T &o)
+{
+  std::ostringstream oss;
+  oss << format(o);
+  return oss.str();
 }
 
 #endif // CPROVER_UTIL_FORMAT_H
