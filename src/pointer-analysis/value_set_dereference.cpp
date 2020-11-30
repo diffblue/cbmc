@@ -142,21 +142,9 @@ exprt value_set_dereferencet::dereference(
   // type of the object
   const typet &type=pointer.type().subtype();
 
-#ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference pointer=" << format(pointer)
-            << '\n';
-#endif
-
   // collect objects the pointer may point to
   const std::vector<exprt> points_to_set =
     dereference_callback.get_value_set(pointer);
-
-#ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference points_to_set={";
-  for(auto p : points_to_set)
-    std::cout << format(p) << "; ";
-  std::cout << "}\n" << std::flush;
-#endif
 
   // get the values of these
   const std::vector<exprt> retained_values =
@@ -178,13 +166,6 @@ exprt value_set_dereferencet::dereference(
 
     compare_against_pointer = fresh_binder.symbol_expr();
   }
-
-#ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference retained_values={";
-  for(const auto &value : retained_values)
-    std::cout << format(value) << "; ";
-  std::cout << "}\n" << std::flush;
-#endif
 
   std::list<valuet> values =
     make_range(retained_values).map([&](const exprt &value) {
@@ -268,17 +249,12 @@ exprt value_set_dereferencet::dereference(
   if(compare_against_pointer != pointer)
     value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
 
-#ifdef DEBUG
-  std::cout << "value_set_derefencet::dereference value=" << format(value)
-            << '\n'
-            << std::flush;
-#endif
-
   if(display_points_to_sets)
   {
     log.status() << value_set_dereference_stats_to_json(
       pointer, points_to_set, retained_values, value);
   }
+
   return value;
 }
 
