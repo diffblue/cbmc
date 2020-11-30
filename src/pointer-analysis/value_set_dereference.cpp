@@ -61,6 +61,42 @@ static bool should_use_local_definition_for(const exprt &expr)
   return false;
 }
 
+static json_objectt value_set_dereference_stats_to_json(
+  const exprt &pointer,
+  const std::vector<exprt> &points_to_set,
+  const std::vector<exprt> &retained_values,
+  const exprt &value)
+{
+  json_objectt json_result;
+  json_result["Pointer"] = json_stringt{format_to_string(pointer)};
+  json_result["PointsToSetSize"] =
+    json_numbert{std::to_string(points_to_set.size())};
+
+  json_arrayt points_to_set_json;
+  for(const auto &object : points_to_set)
+  {
+    points_to_set_json.push_back(json_stringt{format_to_string(object)});
+  }
+
+  json_result["PointsToSet"] = points_to_set_json;
+
+  json_result["RetainedValuesSetSize"] =
+    json_numbert{std::to_string(points_to_set.size())};
+
+  json_arrayt retained_values_set_json;
+  for(auto &retained_value : retained_values)
+  {
+    retained_values_set_json.push_back(
+      json_stringt{format_to_string(retained_value)});
+  }
+
+  json_result["RetainedValuesSet"] = retained_values_set_json;
+
+  json_result["Value"] = json_stringt{format_to_string(value)};
+
+  return json_result;
+}
+
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   bool display_points_to_sets)
@@ -106,45 +142,9 @@ exprt value_set_dereferencet::dereference(
   // type of the object
   const typet &type=pointer.type().subtype();
 
-  json_objectt json_result;
-  if(display_points_to_sets)
-  {
-    std::stringstream ss;
-    ss << format(pointer);
-    json_result["Pointer"] = json_stringt(ss.str());
-  }
-
-#ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference pointer=" << format(pointer)
-            << '\n';
-#endif
-
   // collect objects the pointer may point to
   const std::vector<exprt> points_to_set =
     dereference_callback.get_value_set(pointer);
-
-  if(display_points_to_sets)
-  {
-    json_result["PointsToSetSize"] =
-      json_numbert(std::to_string(points_to_set.size()));
-
-    json_arrayt points_to_set_json;
-    for(auto p : points_to_set)
-    {
-      std::stringstream ss;
-      ss << format(p);
-      points_to_set_json.push_back(json_stringt(ss.str()));
-    }
-
-    json_result["PointsToSet"] = points_to_set_json;
-  }
-
-#ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference points_to_set={";
-  for(auto p : points_to_set)
-    std::cout << format(p) << "; ";
-  std::cout << "}\n" << std::flush;
-#endif
 
   // get the values of these
   const std::vector<exprt> retained_values =
@@ -166,29 +166,6 @@ exprt value_set_dereferencet::dereference(
 
     compare_against_pointer = fresh_binder.symbol_expr();
   }
-
-  if(display_points_to_sets)
-  {
-    json_result["RetainedValuesSetSize"] =
-      json_numbert(std::to_string(points_to_set.size()));
-
-    json_arrayt retained_values_set_json;
-    for(auto &value : retained_values)
-    {
-      std::stringstream ss;
-      ss << format(value);
-      retained_values_set_json.push_back(json_stringt(ss.str()));
-    }
-
-    json_result["RetainedValuesSet"] = retained_values_set_json;
-  }
-
-#ifdef DEBUG
-  std::cout << "value_set_dereferencet::dereference retained_values={";
-  for(const auto &value : retained_values)
-    std::cout << format(value) << "; ";
-  std::cout << "}\n" << std::flush;
-#endif
 
   std::list<valuet> values =
     make_range(retained_values).map([&](const exprt &value) {
@@ -274,18 +251,9 @@ exprt value_set_dereferencet::dereference(
 
   if(display_points_to_sets)
   {
-    std::stringstream ss;
-    ss << format(value);
-    json_result["Value"] = json_stringt(ss.str());
-
-    log.status() << json_result;
+    log.status() << value_set_dereference_stats_to_json(
+      pointer, points_to_set, retained_values, value);
   }
-
-#ifdef DEBUG
-  std::cout << "value_set_derefencet::dereference value=" << format(value)
-            << '\n'
-            << std::flush;
-#endif
 
   return value;
 }
