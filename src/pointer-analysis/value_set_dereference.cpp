@@ -184,40 +184,7 @@ exprt value_set_dereferencet::dereference(
 
   if(may_fail)
   {
-    // first see if we have a "failed object" for this pointer
-
-    exprt failure_value;
-
-    if(
-      const symbolt *failed_symbol =
-        dereference_callback.get_or_create_failed_symbol(pointer))
-    {
-      // yes!
-      failure_value=failed_symbol->symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
-    }
-    else
-    {
-      // else: produce new symbol
-      symbolt &symbol = get_fresh_aux_symbol(
-        type,
-        "symex",
-        "invalid_object",
-        pointer.source_location(),
-        language_mode,
-        new_symbol_table);
-
-      // make it a lvalue, so we can assign to it
-      symbol.is_lvalue=true;
-
-      failure_value=symbol.symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
-    }
-
-    valuet value;
-    value.value=failure_value;
-    value.pointer_guard=true_exprt();
-    values.push_front(value);
+    values.push_front(get_failure_value(pointer, type));
   }
 
   // now build big case split, but we only do "good" objects
@@ -246,6 +213,45 @@ exprt value_set_dereferencet::dereference(
   }
 
   return result_value;
+}
+
+value_set_dereferencet::valuet value_set_dereferencet::get_failure_value(
+  const exprt &pointer,
+  const typet &type)
+{
+  // first see if we have a "failed object" for this pointer
+  exprt failure_value;
+
+  if(
+    const symbolt *failed_symbol =
+      dereference_callback.get_or_create_failed_symbol(pointer))
+  {
+    // yes!
+    failure_value = failed_symbol->symbol_expr();
+    failure_value.set(ID_C_invalid_object, true);
+  }
+  else
+  {
+    // else: produce new symbol
+    symbolt &symbol = get_fresh_aux_symbol(
+      type,
+      "symex",
+      "invalid_object",
+      pointer.source_location(),
+      language_mode,
+      new_symbol_table);
+
+    // make it a lvalue, so we can assign to it
+    symbol.is_lvalue = true;
+
+    failure_value = symbol.symbol_expr();
+    failure_value.set(ID_C_invalid_object, true);
+  }
+
+  valuet result{};
+  result.value = failure_value;
+  result.pointer_guard = true_exprt();
+  return result;
 }
 
 /// Check if the two types have matching number of ID_pointer levels, with
