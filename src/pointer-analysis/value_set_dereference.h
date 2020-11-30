@@ -112,6 +112,9 @@ private:
   const bool exclude_null_derefs;
   const messaget &log;
   valuet get_failure_value(const exprt &pointer, const typet &type);
+  exprt handle_dereference_base_case(
+    const exprt &pointer,
+    bool display_points_to_sets);
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H

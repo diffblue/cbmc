@@ -141,7 +141,13 @@ exprt value_set_dereferencet::dereference(
     }
   }
 
-  // type of the object
+  return handle_dereference_base_case(pointer, display_points_to_sets);
+}
+
+exprt value_set_dereferencet::handle_dereference_base_case(
+  const exprt &pointer,
+  bool display_points_to_sets)
+{ // type of the object
   const typet &type=pointer.type().subtype();
 
   // collect objects the pointer may point to
