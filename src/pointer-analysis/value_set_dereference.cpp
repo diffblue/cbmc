@@ -224,16 +224,14 @@ exprt value_set_dereferencet::dereference(
 
   exprt result_value = nil_exprt{};
 
-  for(std::deque<valuet>::const_iterator it = values.begin();
-      it != values.end();
-      it++)
+  for(const auto &value : values)
   {
-    if(it->value.is_not_nil())
+    if(value.value.is_not_nil())
     {
       if(result_value.is_nil()) // first?
-        result_value = it->value;
+        result_value = value.value;
       else
-        result_value = if_exprt(it->pointer_guard, it->value, result_value);
+        result_value = if_exprt(value.pointer_guard, value.value, result_value);
     }
   }
 
