@@ -222,7 +222,7 @@ exprt value_set_dereferencet::dereference(
 
   // now build big case split, but we only do "good" objects
 
-  exprt value=nil_exprt();
+  exprt result_value = nil_exprt{};
 
   for(std::deque<valuet>::const_iterator it = values.begin();
       it != values.end();
@@ -230,23 +230,24 @@ exprt value_set_dereferencet::dereference(
   {
     if(it->value.is_not_nil())
     {
-      if(value.is_nil()) // first?
-        value=it->value;
+      if(result_value.is_nil()) // first?
+        result_value = it->value;
       else
-        value=if_exprt(it->pointer_guard, it->value, value);
+        result_value = if_exprt(it->pointer_guard, it->value, result_value);
     }
   }
 
   if(compare_against_pointer != pointer)
-    value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
+    result_value =
+      let_exprt(to_symbol_expr(compare_against_pointer), pointer, result_value);
 
   if(display_points_to_sets)
   {
     log.status() << value_set_dereference_stats_to_json(
-      pointer, points_to_set, retained_values, value);
+      pointer, points_to_set, retained_values, result_value);
   }
 
-  return value;
+  return result_value;
 }
 
 /// Check if the two types have matching number of ID_pointer levels, with
