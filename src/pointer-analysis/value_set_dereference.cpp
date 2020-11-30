@@ -172,23 +172,11 @@ exprt value_set_dereferencet::dereference(
       return build_reference_to(value, compare_against_pointer, ns);
     });
 
-  // can this fail?
-  bool may_fail;
-
-  if(values.empty())
-  {
-    may_fail=true;
-  }
-  else
-  {
-    may_fail=false;
-    for(std::list<valuet>::const_iterator
-        it=values.begin();
-        it!=values.end();
-        it++)
-      if(it->value.is_nil())
-        may_fail=true;
-  }
+  const bool may_fail =
+    values.empty() ||
+    std::any_of(values.begin(), values.end(), [](const valuet &value) {
+      return value.value.is_nil();
+    });
 
   if(may_fail)
   {
