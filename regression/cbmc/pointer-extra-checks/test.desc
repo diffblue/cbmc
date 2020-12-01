@@ -8,8 +8,8 @@ main.c
 ^\[main.pointer_dereference.3\] .* dereference failure: pointer outside object bounds in \*q: SUCCESS$
 ^\[main.pointer_dereference.4\] .* dereference failure: deallocated dynamic object in \*r: SUCCESS$
 ^\[main.pointer_dereference.5\] .* dereference failure: pointer outside dynamic object bounds in \*r: SUCCESS$
-^\[main.pointer_dereference.6\] .* dereference failure: pointer invalid in \*s: FAILURE$
-^\[main.pointer_dereference.7\] .* dereference failure: pointer NULL in \*s: FAILURE$
+^\[main.pointer_dereference.6\] .* dereference failure: pointer NULL in \*s: FAILURE$
+^\[main.pointer_dereference.7\] .* dereference failure: pointer invalid in \*s: FAILURE$
 ^\[main.pointer_dereference.8\] .* dereference failure: deallocated dynamic object in \*s: FAILURE$
 ^\[main.pointer_dereference.9\] .* dereference failure: dead object in \*s: FAILURE$
 ^\[main.pointer_dereference.10\] .* dereference failure: pointer outside dynamic object bounds in \*s: FAILURE$

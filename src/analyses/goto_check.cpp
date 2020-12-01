@@ -202,7 +202,18 @@ protected:
   /// \return true if the given expression is a pointer primitive
   bool is_pointer_primitive(const exprt &expr);
 
-  conditionst address_check(const exprt &address, const exprt &size);
+  optionalt<goto_checkt::conditiont>
+  get_pointer_is_null_condition(const exprt &address, const exprt &size);
+  conditionst get_pointer_points_to_valid_memory_conditions(
+    const exprt &address,
+    const exprt &size);
+  exprt is_in_bounds_of_some_explicit_allocation(
+    const exprt &pointer,
+    const exprt &size);
+
+  conditionst get_pointer_dereferenceable_conditions(
+    const exprt &address,
+    const exprt &size);
   void integer_overflow_check(const exprt &, const guardt &);
   void conversion_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
@@ -1181,7 +1192,7 @@ void goto_checkt::pointer_validity_check(
     size = size_of_expr_opt.value();
   }
 
-  auto conditions = address_check(pointer, size);
+  auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
 
   for(const auto &c : conditions)
   {
@@ -1225,22 +1236,18 @@ void goto_checkt::pointer_primitive_check(
                        ? from_integer(1, size_type())
                        : size_of_expr_opt.value();
 
-  const conditionst &conditions = address_check(pointer, size);
-
-  exprt::operandst conjuncts;
-
+  const conditionst &conditions =
+    get_pointer_points_to_valid_memory_conditions(pointer, size);
   for(const auto &c : conditions)
-    conjuncts.push_back(c.assertion);
-
-  const or_exprt or_expr(null_object(pointer), conjunction(conjuncts));
-
-  add_guarded_property(
-    or_expr,
-    "pointer in pointer primitive is neither null nor valid",
-    "pointer primitives",
-    expr.source_location(),
-    expr,
-    guard);
+  {
+    add_guarded_property(
+      or_exprt{null_object(pointer), c.assertion},
+      c.description,
+      "pointer primitives",
+      expr.source_location(),
+      expr,
+      guard);
+  }
 }
 
 bool goto_checkt::is_pointer_primitive(const exprt &expr)
@@ -1253,123 +1260,17 @@ bool goto_checkt::is_pointer_primitive(const exprt &expr)
          expr.id() == ID_w_ok || expr.id() == ID_is_dynamic_object;
 }
 
-goto_checkt::conditionst
-goto_checkt::address_check(const exprt &address, const exprt &size)
+goto_checkt::conditionst goto_checkt::get_pointer_dereferenceable_conditions(
+  const exprt &address,
+  const exprt &size)
 {
-  PRECONDITION(local_bitvector_analysis);
-  PRECONDITION(address.type().id() == ID_pointer);
-  const auto &pointer_type = to_pointer_type(address.type());
-
-  local_bitvector_analysist::flagst flags =
-    local_bitvector_analysis->get(current_target, address);
-
-  // For Java, we only need to check for null
-  if(mode == ID_java)
+  auto conditions =
+    get_pointer_points_to_valid_memory_conditions(address, size);
+  if(auto maybe_null_condition = get_pointer_is_null_condition(address, size))
   {
-    if(flags.is_unknown() || flags.is_null())
-    {
-      notequal_exprt not_eq_null(address, null_pointer_exprt(pointer_type));
-
-      return {conditiont(not_eq_null, "reference is null")};
-    }
-    else
-      return {};
+    conditions.push_front(*maybe_null_condition);
   }
-  else
-  {
-    conditionst conditions;
-    exprt::operandst alloc_disjuncts;
-
-    for(const auto &a : allocations)
-    {
-      typecast_exprt int_ptr(address, a.first.type());
-
-      binary_relation_exprt lb_check(a.first, ID_le, int_ptr);
-
-      plus_exprt ub{int_ptr, size};
-
-      binary_relation_exprt ub_check(ub, ID_le, plus_exprt(a.first, a.second));
-
-      alloc_disjuncts.push_back(and_exprt(lb_check, ub_check));
-    }
-
-    const exprt in_bounds_of_some_explicit_allocation =
-      disjunction(alloc_disjuncts);
-
-    const bool unknown = flags.is_unknown() || flags.is_uninitialized();
-
-    if(unknown)
-    {
-      conditions.push_back(conditiont{
-        not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
-    }
-
-    if(unknown || flags.is_null())
-    {
-      conditions.push_back(conditiont(
-        or_exprt(
-          in_bounds_of_some_explicit_allocation,
-          not_exprt(null_pointer(address))),
-        "pointer NULL"));
-    }
-
-    if(unknown || flags.is_dynamic_heap())
-    {
-      conditions.push_back(conditiont(
-        or_exprt(
-          in_bounds_of_some_explicit_allocation,
-          not_exprt(deallocated(address, ns))),
-        "deallocated dynamic object"));
-    }
-
-    if(unknown || flags.is_dynamic_local())
-    {
-      conditions.push_back(conditiont(
-        or_exprt(
-          in_bounds_of_some_explicit_allocation,
-          not_exprt(dead_object(address, ns))),
-        "dead object"));
-    }
-
-    if(unknown || flags.is_dynamic_heap())
-    {
-      const or_exprt object_bounds_violation(
-        object_lower_bound(address, nil_exprt()),
-        object_upper_bound(address, size));
-
-      conditions.push_back(conditiont(
-        or_exprt(
-          in_bounds_of_some_explicit_allocation,
-          implies_exprt(
-            dynamic_object(address), not_exprt(object_bounds_violation))),
-        "pointer outside dynamic object bounds"));
-    }
-
-    if(unknown || flags.is_dynamic_local() || flags.is_static_lifetime())
-    {
-      const or_exprt object_bounds_violation(
-        object_lower_bound(address, nil_exprt()),
-        object_upper_bound(address, size));
-
-      conditions.push_back(conditiont(
-        or_exprt(
-          in_bounds_of_some_explicit_allocation,
-          implies_exprt(
-            not_exprt(dynamic_object(address)),
-            not_exprt(object_bounds_violation))),
-        "pointer outside object bounds"));
-    }
-
-    if(unknown || flags.is_integer_address())
-    {
-      conditions.push_back(conditiont(
-        implies_exprt(
-          integer_address(address), in_bounds_of_some_explicit_allocation),
-        "invalid integer address"));
-    }
-
-    return conditions;
-  }
+  return conditions;
 }
 
 std::string goto_checkt::array_name(const exprt &expr)
@@ -1855,8 +1756,8 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
     DATA_INVARIANT(
       expr.operands().size() == 2, "r/w_ok must have two operands");
 
-    const auto conditions =
-      address_check(to_binary_expr(expr).op0(), to_binary_expr(expr).op1());
+    const auto conditions = get_pointer_dereferenceable_conditions(
+      to_binary_expr(expr).op0(), to_binary_expr(expr).op1());
 
     exprt::operandst conjuncts;
 
@@ -2226,6 +2127,140 @@ void goto_checkt::goto_check(
 
   if(did_something)
     remove_skip(goto_program);
+}
+
+goto_checkt::conditionst
+goto_checkt::get_pointer_points_to_valid_memory_conditions(
+  const exprt &address,
+  const exprt &size)
+{
+  PRECONDITION(local_bitvector_analysis);
+  PRECONDITION(address.type().id() == ID_pointer);
+  local_bitvector_analysist::flagst flags =
+    local_bitvector_analysis->get(current_target, address);
+
+  conditionst conditions;
+
+  if(mode == ID_java)
+  {
+    // The following conditions don’t apply to Java
+    return conditions;
+  }
+
+  const exprt in_bounds_of_some_explicit_allocation =
+    is_in_bounds_of_some_explicit_allocation(address, size);
+
+  const bool unknown = flags.is_unknown() || flags.is_uninitialized();
+
+  if(unknown)
+  {
+    conditions.push_back(conditiont{
+      not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
+  }
+
+  if(unknown || flags.is_dynamic_heap())
+  {
+    conditions.push_back(conditiont(
+      or_exprt(
+        in_bounds_of_some_explicit_allocation,
+        not_exprt(deallocated(address, ns))),
+      "deallocated dynamic object"));
+  }
+
+  if(unknown || flags.is_dynamic_local())
+  {
+    conditions.push_back(conditiont(
+      or_exprt(
+        in_bounds_of_some_explicit_allocation,
+        not_exprt(dead_object(address, ns))),
+      "dead object"));
+  }
+
+  if(unknown || flags.is_dynamic_heap())
+  {
+    const or_exprt object_bounds_violation(
+      object_lower_bound(address, nil_exprt()),
+      object_upper_bound(address, size));
+
+    conditions.push_back(conditiont(
+      or_exprt(
+        in_bounds_of_some_explicit_allocation,
+        implies_exprt(
+          dynamic_object(address), not_exprt(object_bounds_violation))),
+      "pointer outside dynamic object bounds"));
+  }
+
+  if(unknown || flags.is_dynamic_local() || flags.is_static_lifetime())
+  {
+    const or_exprt object_bounds_violation(
+      object_lower_bound(address, nil_exprt()),
+      object_upper_bound(address, size));
+
+    conditions.push_back(conditiont(
+      or_exprt(
+        in_bounds_of_some_explicit_allocation,
+        implies_exprt(
+          not_exprt(dynamic_object(address)),
+          not_exprt(object_bounds_violation))),
+      "pointer outside object bounds"));
+  }
+
+  if(unknown || flags.is_integer_address())
+  {
+    conditions.push_back(conditiont(
+      implies_exprt(
+        integer_address(address), in_bounds_of_some_explicit_allocation),
+      "invalid integer address"));
+  }
+
+  return conditions;
+}
+
+optionalt<goto_checkt::conditiont> goto_checkt::get_pointer_is_null_condition(
+  const exprt &address,
+  const exprt &size)
+{
+  PRECONDITION(local_bitvector_analysis);
+  PRECONDITION(address.type().id() == ID_pointer);
+  const auto &pointer_type = to_pointer_type(address.type());
+  local_bitvector_analysist::flagst flags =
+    local_bitvector_analysis->get(current_target, address);
+  if(mode == ID_java)
+  {
+    if(flags.is_unknown() || flags.is_null())
+    {
+      notequal_exprt not_eq_null(address, null_pointer_exprt{pointer_type});
+      return {conditiont{not_eq_null, "reference is null"}};
+    }
+  }
+  else if(flags.is_unknown() || flags.is_uninitialized() || flags.is_null())
+  {
+    return {conditiont{
+      or_exprt{is_in_bounds_of_some_explicit_allocation(address, size),
+               not_exprt(null_pointer(address))},
+      "pointer NULL"}};
+  }
+  return {};
+}
+
+exprt goto_checkt::is_in_bounds_of_some_explicit_allocation(
+  const exprt &pointer,
+  const exprt &size)
+{
+  exprt::operandst alloc_disjuncts;
+  for(const auto &a : allocations)
+  {
+    typecast_exprt int_ptr(pointer, a.first.type());
+
+    binary_relation_exprt lb_check(a.first, ID_le, int_ptr);
+
+    plus_exprt ub{int_ptr, size};
+
+    binary_relation_exprt ub_check(ub, ID_le, plus_exprt(a.first, a.second));
+
+    alloc_disjuncts.push_back(and_exprt(lb_check, ub_check));
+  }
+  return disjunction(alloc_disjuncts);
 }
 
 void goto_check(
