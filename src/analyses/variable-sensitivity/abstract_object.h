@@ -244,11 +244,6 @@ public:
   static void
   dump_map_diff(std::ostream out, const shared_mapt &m1, const shared_mapt &m2);
 
-  abstract_object_pointert clone() const
-  {
-    return abstract_object_pointert(mutable_clone());
-  }
-
   /**
    * Determine whether 'this' abstract_object has been modified in comparison
    * to a previous 'before' state.
