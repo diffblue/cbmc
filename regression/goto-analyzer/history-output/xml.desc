@@ -1,0 +1,11 @@
+CORE
+main.c
+--verify --recursive-interprocedural --one-domain-per-history --vsd --branching 4 --xml -
+^EXIT=0$
+^SIGNAL=0$
+<history>local_control_flow_history : location \d+ after \d+ taken after \d+ taken<\/history>
+<history>local_control_flow_history : location \d+ after \d+ not taken after \d+ taken<\/history>
+--
+^warning: ignoring
+--
+Make sure that the JSON output contains the histories in which the assertion is false and unknown
