@@ -13,6 +13,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/range.h>
+#include <util/xml_irep.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -70,8 +71,16 @@ struct static_verifier_resultt
     xmlt x("result");
 
     x.set_attribute("status", message(this->status));
+
+    // DEPRECATED(SINCE(2020, 12, 2, "Remove and use the structured version"));
+    // Unstructed partial output of source location is not great...
     x.set_attribute("file", id2string(this->source_location.get_file()));
     x.set_attribute("line", id2string(this->source_location.get_line()));
+
+    // ... this is better
+    x.new_element(xml(source_location));
+
+    // ( get_comment is not output as part of xml(source_location) )
     x.set_attribute(
       "description", id2string(this->source_location.get_comment()));
 
