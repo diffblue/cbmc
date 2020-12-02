@@ -82,12 +82,11 @@ abstract_object_pointert array_abstract_objectt::write_index(
   // havoc and the default should derive from this.
   if(is_top() || is_bottom())
   {
-    return std::dynamic_pointer_cast<const array_abstract_objectt>(clone());
+    return shared_from_this();
   }
   else
   {
-    return sharing_ptrt<array_abstract_objectt>(
-      new array_abstract_objectt(type(), true, false));
+    return std::make_shared<array_abstract_objectt>(type(), true, false);
   }
 }
 
