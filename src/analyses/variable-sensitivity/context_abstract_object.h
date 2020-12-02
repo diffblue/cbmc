@@ -55,7 +55,7 @@ public:
   {
   }
 
-  virtual const typet &type() const
+  const typet &type() const override
   {
     return child_abstract_object->type();
   }

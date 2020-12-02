@@ -121,7 +121,7 @@ public:
   /// Get the real type of the variable this abstract object is representing.
   ///
   /// \return The program type this abstract object represents
-  const typet &type() const;
+  virtual const typet &type() const;
 
   /// Find out if the abstract object is top
   ///
