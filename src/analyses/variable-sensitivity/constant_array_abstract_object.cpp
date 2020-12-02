@@ -43,7 +43,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
       map.insert(mp_integer(index), environment.eval(entry, ns));
       ++index;
     }
-    clear_top();
+    set_not_top();
   }
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
@@ -56,7 +56,7 @@ bool constant_array_abstract_objectt::verify() const
          (is_top() || is_bottom()) == map.empty();
 }
 
-void constant_array_abstract_objectt::make_top_internal()
+void constant_array_abstract_objectt::set_top_internal()
 {
   // A structural invariant of constant_array_abstract_objectt is that
   // (is_top() || is_bottom()) => map.empty()
@@ -231,7 +231,7 @@ constant_array_abstract_objectt::write_index(
             old_value.value(), value, stack, ns, merging_write));
       }
 
-      result->clear_top();
+      result->set_not_top();
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
     }
@@ -248,7 +248,7 @@ constant_array_abstract_objectt::write_index(
           starting_value.first,
           environment.write(starting_value.second, value, stack, ns, true));
 
-        result->clear_top();
+        result->set_not_top();
       }
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -303,7 +303,7 @@ constant_array_abstract_objectt::write_index(
         {
           result->map.insert(index_value, value);
         }
-        result->clear_top();
+        result->set_not_top();
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
         return result;
       }

@@ -66,7 +66,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
 
   if(did_initialize_values)
   {
-    clear_top();
+    set_not_top();
   }
 
   DATA_INVARIANT(verify(), "Structural invariants maintained");
@@ -145,7 +145,7 @@ full_struct_abstract_objectt::write_component(
         environment.write(old_value.value(), value, stack, ns, merging_write));
     }
 
-    result->clear_top();
+    result->set_not_top();
     DATA_INVARIANT(result->verify(), "Structural invariants maintained");
     return result;
   }
@@ -189,7 +189,7 @@ full_struct_abstract_objectt::write_component(
       {
         result->map.insert(c, value);
       }
-      result->clear_top();
+      result->set_not_top();
       INVARIANT(!result->is_bottom(), "top != bottom");
     }
 

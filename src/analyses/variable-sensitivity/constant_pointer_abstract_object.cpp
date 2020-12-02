@@ -46,11 +46,11 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   PRECONDITION(expr.type().id() == ID_pointer);
   if(value_stack.is_top_value())
   {
-    make_top();
+    set_top();
   }
   else
   {
-    clear_top();
+    set_not_top();
   }
 }
 

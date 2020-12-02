@@ -318,7 +318,7 @@ public:
       return shared_from_this();
 
     internal_abstract_object_pointert clone = mutable_clone();
-    clone->make_top();
+    clone->set_top();
     return clone;
   }
 
@@ -328,7 +328,7 @@ public:
       return shared_from_this();
 
     internal_abstract_object_pointert clone = mutable_clone();
-    clone->clear_top();
+    clone->set_not_top();
     return clone;
   }
 
@@ -379,10 +379,10 @@ private:
 
   // Hooks to allow a sub-class to perform its own operations on
   // setting/clearing top
-  virtual void make_top_internal()
+  virtual void set_top_internal()
   {
   }
-  virtual void clear_top_internal()
+  virtual void set_not_top_internal()
   {
   }
 
@@ -473,15 +473,15 @@ protected:
     sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map);
 
   // The one exception is merge in descendant classes, which needs this
-  void make_top()
+  void set_top()
   {
     top = true;
-    this->make_top_internal();
+    this->set_top_internal();
   }
-  void clear_top()
+  void set_not_top()
   {
     top = false;
-    this->clear_top_internal();
+    this->set_not_top_internal();
   }
 };
 

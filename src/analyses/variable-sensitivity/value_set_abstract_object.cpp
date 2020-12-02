@@ -174,7 +174,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
     unwrapped_values.size() > max_value_set_size ||
     new_type == abstract_typet::UNSUPPORTED)
   {
-    result->make_top();
+    result->set_top();
   }
   else
   {

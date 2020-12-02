@@ -18,13 +18,13 @@ void context_abstract_objectt::set_child(const abstract_object_pointert &child)
   child_abstract_object = child;
 }
 
-void context_abstract_objectt::make_top_internal()
+void context_abstract_objectt::set_top_internal()
 {
   if(!child_abstract_object->is_top())
     set_child(child_abstract_object->make_top());
 }
 
-void context_abstract_objectt::clear_top_internal()
+void context_abstract_objectt::set_not_top_internal()
 {
   if(child_abstract_object->is_top())
     set_child(child_abstract_object->clear_top());

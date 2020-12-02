@@ -104,8 +104,8 @@ protected:
 
   // These are internal hooks that allow sub-classes to perform additional
   // actions when an abstract_object is set/unset to TOP
-  void make_top_internal() override;
-  void clear_top_internal() override;
+  void set_top_internal() override;
+  void set_not_top_internal() override;
 
   abstract_object_pointert read(
     const abstract_environmentt &env,

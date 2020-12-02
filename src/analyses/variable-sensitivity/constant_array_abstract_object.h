@@ -138,7 +138,7 @@ protected:
 
   /// \brief Perform any additional structural modifications when setting this
   /// object to TOP
-  void make_top_internal() override;
+  void set_top_internal() override;
 
   /// Evaluates the index and tries to convert it to a constant integer
   ///
