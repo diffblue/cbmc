@@ -42,7 +42,7 @@ abstract_object_pointert value_set_array_abstract_objectt::read_index(
   return array_abstract_objectt::read_index(env, index, ns);
 }
 
-sharing_ptrt<array_abstract_objectt>
+abstract_object_pointert
 value_set_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,

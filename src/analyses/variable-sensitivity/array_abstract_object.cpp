@@ -68,7 +68,7 @@ abstract_object_pointert array_abstract_objectt::read_index(
   return env.abstract_object_factory(subtype, ns, !is_bottom(), is_bottom());
 }
 
-sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
+abstract_object_pointert array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> stack,

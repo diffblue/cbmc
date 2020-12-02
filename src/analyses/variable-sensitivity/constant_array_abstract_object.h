@@ -110,9 +110,9 @@ protected:
   /// \param value: the value we are trying to assign to that value in the array
   /// \param merging_write: Should this and all future writes be merged with the
   ///                       current value
-  /// \return The array_abstract_objectt representing the result of writing
+  /// \return The abstract_object_pointert representing the result of writing
   ///         to a specific index.
-  sharing_ptrt<array_abstract_objectt> write_index(
+  abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,

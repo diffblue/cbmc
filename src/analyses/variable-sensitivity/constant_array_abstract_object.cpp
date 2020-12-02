@@ -189,7 +189,7 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
   }
 }
 
-sharing_ptrt<array_abstract_objectt>
+abstract_object_pointert
 constant_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,

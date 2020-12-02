@@ -47,7 +47,7 @@ static constant_interval_exprt eval_and_get_as_interval(
   return evaluated_index_interval->get_interval();
 }
 
-sharing_ptrt<array_abstract_objectt>
+abstract_object_pointert
 interval_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,

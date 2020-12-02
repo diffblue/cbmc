@@ -32,7 +32,7 @@ protected:
     const index_exprt &index,
     const namespacet &ns) const override;
 
-  sharing_ptrt<array_abstract_objectt> write_index(
+  abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,

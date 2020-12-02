@@ -117,10 +117,10 @@ protected:
   /// \param value: the value we are trying to assign to that value in the array
   /// \param merging_write: ?
   ///
-  /// \return The array_abstract_objectt representing the result of writing
+  /// \return The abstract_object_pointert representing the result of writing
   ///          to a specific component. In this case this will always be top
   ///          as we are not tracking the value in the array.
-  virtual sharing_ptrt<array_abstract_objectt> write_index(
+  virtual abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
