@@ -213,9 +213,9 @@ public:
   virtual abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const exprt &specifier,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const;
 
   /// Print the value of the abstract object

@@ -47,13 +47,12 @@ static constant_interval_exprt eval_and_get_as_interval(
   return evaluated_index_interval->get_interval();
 }
 
-abstract_object_pointert
-interval_array_abstract_objectt::write_index(
+abstract_object_pointert interval_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const index_exprt &index_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   auto index_interval =

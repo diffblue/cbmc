@@ -47,9 +47,9 @@ abstract_object_pointert union_abstract_objectt::read(
 abstract_object_pointert union_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return write_component(
@@ -70,7 +70,7 @@ abstract_object_pointert union_abstract_objectt::write_component(
   const namespacet &ns,
   const std::stack<exprt> &stack,
   const member_exprt &member_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   if(is_top() || is_bottom())

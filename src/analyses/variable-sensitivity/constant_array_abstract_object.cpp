@@ -189,13 +189,12 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
   }
 }
 
-abstract_object_pointert
-constant_array_abstract_objectt::write_index(
+abstract_object_pointert constant_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const index_exprt &index_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   if(is_bottom())

@@ -142,7 +142,7 @@ protected:
     const namespacet &ns,
     const std::stack<exprt> &stack,
     const member_exprt &member_expr,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   /// Function: full_struct_abstract_objectt::verify

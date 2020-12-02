@@ -71,9 +71,9 @@ abstract_object_pointert context_abstract_objectt::read(
 abstract_object_pointert context_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   abstract_object_pointert updated_child = child_abstract_object->write(

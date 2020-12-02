@@ -104,13 +104,12 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   }
 }
 
-abstract_object_pointert
-full_struct_abstract_objectt::write_component(
+abstract_object_pointert full_struct_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
   const member_exprt &member_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
 #ifdef DEBUG
@@ -120,7 +119,7 @@ full_struct_abstract_objectt::write_component(
   if(is_bottom())
   {
     return std::make_shared<full_struct_abstract_objectt>(
-        member_expr.compound().type(), false, true);
+      member_expr.compound().type(), false, true);
   }
 
   const auto &result =

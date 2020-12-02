@@ -102,8 +102,8 @@ public:
   abstract_object_pointert write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
-    const abstract_object_pointert value,
+    const std::stack<exprt> &stack,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   void get_statistics(

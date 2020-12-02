@@ -115,9 +115,9 @@ protected:
   abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const index_exprt &index_expr,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   /// Tries to do an array/array merge if merging with a constant array

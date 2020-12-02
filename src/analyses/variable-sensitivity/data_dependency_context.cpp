@@ -186,9 +186,9 @@ data_dependency_contextt::set_data_deps(const dependencest &dependencies) const
 abstract_object_pointert data_dependency_contextt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   const auto updated_parent =

@@ -46,9 +46,9 @@ abstract_object_pointert array_abstract_objectt::read(
 abstract_object_pointert array_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return this->write_index(
@@ -71,9 +71,9 @@ abstract_object_pointert array_abstract_objectt::read_index(
 abstract_object_pointert array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const index_exprt &index_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   // TODO(tkiley): Should this in fact havoc since we can't verify
