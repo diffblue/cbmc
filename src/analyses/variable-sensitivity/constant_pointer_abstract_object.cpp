@@ -169,7 +169,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
   }
 }
 
-sharing_ptrt<pointer_abstract_objectt>
+abstract_object_pointert
 constant_pointer_abstract_objectt::write_dereference(
   abstract_environmentt &environment,
   const namespacet &ns,

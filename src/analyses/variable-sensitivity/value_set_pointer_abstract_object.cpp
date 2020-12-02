@@ -47,7 +47,7 @@ abstract_object_pointert value_set_pointer_abstract_objectt::read_dereference(
   return pointer_abstract_objectt::read_dereference(env, ns);
 }
 
-sharing_ptrt<pointer_abstract_objectt>
+abstract_object_pointert
 value_set_pointer_abstract_objectt::write_dereference(
   abstract_environmentt &environment,
   const namespacet &ns,

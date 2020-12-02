@@ -42,7 +42,7 @@ protected:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
-  sharing_ptrt<pointer_abstract_objectt> write_dereference(
+  abstract_object_pointert write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
     std::stack<exprt> stack,

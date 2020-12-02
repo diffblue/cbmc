@@ -120,7 +120,7 @@ protected:
   ///
   /// \return A modified abstract object representing this pointer after it
   ///         has been written to.
-  virtual sharing_ptrt<pointer_abstract_objectt> write_dereference(
+  virtual abstract_object_pointert write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
