@@ -104,7 +104,7 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   }
 }
 
-sharing_ptrt<struct_abstract_objectt>
+abstract_object_pointert
 full_struct_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -119,9 +119,8 @@ full_struct_abstract_objectt::write_component(
 
   if(is_bottom())
   {
-    return sharing_ptrt<full_struct_abstract_objectt>(
-      new full_struct_abstract_objectt(
-        member_expr.compound().type(), false, true));
+    return std::make_shared<full_struct_abstract_objectt>(
+        member_expr.compound().type(), false, true);
   }
 
   const auto &result =

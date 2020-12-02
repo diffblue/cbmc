@@ -68,7 +68,7 @@ abstract_object_pointert struct_abstract_objectt::read_component(
     member_expr.type(), ns, !is_bottom(), is_bottom());
 }
 
-sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
+abstract_object_pointert struct_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -78,12 +78,11 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
 {
   if(is_top() || is_bottom())
   {
-    return std::dynamic_pointer_cast<const struct_abstract_objectt>(clone());
+    return shared_from_this();
   }
   else
   {
-    return sharing_ptrt<struct_abstract_objectt>(
-      new struct_abstract_objectt(type(), true, false));
+    return std::make_shared<struct_abstract_objectt>(type(), true, false);
   }
 }
 
