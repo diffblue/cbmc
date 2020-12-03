@@ -1,10 +1,10 @@
 CORE
 test.c
 --cover location --pointer-check --malloc-may-fail --malloc-fail-null
-\[main.coverage.4\] file test.c line \d+ function main block 4 \(lines test.c:main:12,13\): SATISFIED
-\[main.coverage.3\] file test.c line \d+ function main block 3 \(lines test.c:main:10\): FAILED
-\[main.coverage.2\] file test.c line \d+ function main block 2 \(lines test.c:main:4,5,7,9\): SATISFIED
-\[main.coverage.1\] file test.c line \d+ function main block 1 \(lines test.c:main:4\): SATISFIED
+\[main\.coverage\.4\] file test\.c line \d+ function main block 4 \(lines test\.c:main:13,14\): SATISFIED
+\[main\.coverage\.3\] file test\.c line \d+ function main block 3 \(lines test\.c:main:11\): FAILED
+\[main\.coverage\.2\] file test\.c line \d+ function main block 2 \(lines test\.c:main:5,6,8,10\): SATISFIED
+\[main\.coverage\.1\] file test\.c line \d+ function main block 1 \(lines test\.c:main:5\): SATISFIED
 ^EXIT=0$
 ^SIGNAL=0$
 --
