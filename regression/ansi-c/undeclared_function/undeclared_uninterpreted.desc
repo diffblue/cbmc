@@ -1,0 +1,11 @@
+CORE
+uninterpreted.c
+
+missing type information required to construct call to uninterpreted function
+^EXIT=70$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed$
+--
+Test to confirm that an actionable error message is provided.

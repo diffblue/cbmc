@@ -892,6 +892,15 @@ void goto_convertt::do_function_call_symbol(
     if(lhs.is_nil())
       return;
 
+    if(function.type().get_bool(ID_C_incomplete))
+    {
+      error().source_location = function.find_source_location();
+      error() << "'" << identifier << "' is not declared, "
+              << "missing type information required to construct call to "
+              << "uninterpreted function" << eom;
+      throw 0;
+    }
+
     const code_typet &function_call_type = to_code_type(function.type());
     mathematical_function_typet::domaint domain;
     for(const auto &parameter : function_call_type.parameters())
