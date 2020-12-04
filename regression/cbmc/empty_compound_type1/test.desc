@@ -1,0 +1,14 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+First observed on SV-COMP's
+linux-4.2-rc1.tar.xz-32_7a-drivers--staging--lustre--lustre--mdc--mdc.ko-entry_point.cil.out.i:
+accessing an empty union (or struct) in pointer dereferencing involving
+incompatible pointers resulted in a segmentation fault. This test was generated
+using C-Reduce plus some further manual simplification.
