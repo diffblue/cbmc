@@ -1,0 +1,115 @@
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{cite}
+
+\begin{document}
+%
+\title{Unbounding CBMC using Replication Reducing Abstraction}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Muralidhar Talupur\inst{1} 
+  Lefan Zhang\inst{2} 
+  Adrian Palacios\inst{1} 
+  Mark R. Tuttle\inst{1}
+  Mike Whalen\inst{1}
+}
+\authorrunning{Murali Talupur et al.}
+
+%
+\institute{Amazon/AWS/ARG \and
+Univ of Chicago}
+
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+Given a program CBMC first unwinds all the loops a small number of
+times to obtain straight line code. In practice, these loops are
+usually for traversing replicated data structures like arrays or lists
+and in effect CBMC is able to prove programs correct only for small
+data structures sizes. We describe a sound abstraction technique to
+reduce replicated data structures to almost minimal sizes while
+preserving all behaviors of interest. This in turn significantly
+reduces the number loop iterations required to traverse them, letting
+CBMC obtain fully unbounded proofs. This abstraction technique, called
+Replication Reducing Abstraction or RRA, is inspired by similar
+abstractions that have been successfully used in hardware and protocol
+verification.
+
+  
+\keywords{CBMC  \and Abstraction \and Memory safety \and Security.}
+\end{abstract}
+%
+%
+%
+\input{macros}
+\input{introduction}
+%\input{intuition}
+\input{model}
+\input{rra-desc}
+\input{proof}
+\input{refinement}
+\input{assert}
+\input{application}
+\input{related}
+\input{conclusion}
+
+\nop{
+\section{Program model}
+
+We first describe an intermediate format that corresponds closely to
+the goto-ir used by CBMC. Our objective is to have a realistic format
+so that the subtleties of our approach can be understood while also
+not swamping the presentation with low level details of the actual IR.
+
+There are two parts of the model, syntax of the instructions in the IR
+and then the underlying memory model over which these instructions
+operate.
+
+\subsection{Goto-ir language}
+
+\subsection{Memory model}
+
+Memory consists of an array of bytes, with each byte being
+individually addressable. A variable 
+
+
+\section{Replication Reducing Abstraction}
+
+\subsection{Abstraction for instructions}
+
+\subsection{Abstraction for expressions}
+
+\subsection{Abstraction for assertions}
+
+\subsection{Proof of soundness}
+
+
+\section{Built-in refinements}
+
+\subsection{Length refinement}
+
+\subsection{Const string refinement}
+
+\section{Application}
+
+\section{Next steps and Conclusion}
+}
+
+\bibliography{my}
+\bibliographystyle{plain}
+
+
+\end{document}

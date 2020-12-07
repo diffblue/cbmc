@@ -1,0 +1,3 @@
+This is similar to test5 except that there is array assignment in the loop. 
+In the current state this should throw an unsupported exception.
+But it should work once we fix abstract_expr_write to handle index exprt as well.

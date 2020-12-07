@@ -1,0 +1,61 @@
+\newcommand{\nop}[1]{}
+\newcommand{\aid}{{\tt arr}}
+\newcommand{\aabstid}{{\tt arr\$abst}}
+\newcommand{\aobj}{arr}
+\newcommand{\aabstobj}{\widehat{\aobj}}
+\newcommand{\abst}{\alpha_{(c_1,c_2)}}
+\newcommand{\abstm}{\alpha_{(c_1,c_2,...,c_m)}}
+\newcommand{\conc}{\gamma_{(c_1,c_2)}}
+\newcommand{\sizet}{{\tt uint}}
+\newcommand{\tr}{\(Tr\)}
+\newcommand{\trns}{Tr}
+\newcommand{\trrd}{\(Tr_{read}\)}
+\newcommand{\trnsrd}{Tr_{read}}
+\newcommand{\trwr}{\(Tr_{write}\)}
+\newcommand{\trnswr}{Tr_{write}}
+\newcommand{\tras}{\(Tr_{assert}\)}
+\newcommand{\trnsas}{Tr_{assert}}
+\newcommand{\accns}{Acc}
+\newcommand{\acc}{\(Acc\)}
+\newcommand{\prog}{{\tt P}}
+\newcommand{\progabst}{{\tt P\$abst}}
+\newcommand{\aargid}{{\tt arr'}}
+\newcommand{\arrayids}{\(ArraysAbst \)}
+\newcommand{\indexids}{\(IndicesAbst \)}
+\newcommand{\g}{{\bf G}}
+\newcommand{\tp}{\mathcal{N}}
+\newcommand{\chng}[3]{#1\{#2 \mapsto #3\}}
+\newcommand{\ex}[4]{\langle #1, #2 \rangle \rightarrow \langle #3, #4\rangle}
+\newcommand{\exstar}[4]{\langle #1, #2 \rangle \rightarrow^{*} \langle #3, #4\rangle}
+\newcommand{\exa}[3]{\langle #1, #2 \rangle \rightarrow_{e} #3}
+\newcommand{\exastar}[3]{\langle #1, #2 \rangle \rightarrow_{e}^{*} #3}
+\newcommand{\rl}[2]{\frac{#1}{#2}}
+\newcommand{\skp}{{\bf \tt skip}}
+\newcommand{\fl}{{\bf \tt fail}}
+\newcommand{\whld}[2]{{\tt while~#1~do~#2}}
+\definecolor{commentgreen}{rgb}{0,0.6,0}
+\definecolor{eclipseStrings}{RGB}{42,0.0,255}
+\definecolor{eclipseKeywords}{RGB}{127,0,85}
+\colorlet{numb}{magenta!60!black}
+
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    commentstyle=\color{eclipseStrings}, % style of comment
+    stringstyle=\color{eclipseKeywords}, % style of strings
+    showstringspaces=false,
+    breaklines=true,
+    string=[s]{"}{"},
+    comment=[l]{:\ "},
+    morecomment=[l]{:"},
+    literate=
+        *{0}{{{\color{numb}0}}}{1}
+         {1}{{{\color{numb}1}}}{1}
+         {2}{{{\color{numb}2}}}{1}
+         {3}{{{\color{numb}3}}}{1}
+         {4}{{{\color{numb}4}}}{1}
+         {5}{{{\color{numb}5}}}{1}
+         {6}{{{\color{numb}6}}}{1}
+         {7}{{{\color{numb}7}}}{1}
+         {8}{{{\color{numb}8}}}{1}
+         {9}{{{\color{numb}9}}}{1}
+}

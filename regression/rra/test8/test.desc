@@ -1,0 +1,9 @@
+CORE
+main.c
+1
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED
+--
+--
+Just adds functions from abst-funcs to module under test.

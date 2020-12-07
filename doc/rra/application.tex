@@ -1,0 +1,179 @@
+\section{Application}
+
+We applied RRA + CBMC to prove memory safety of several functions in
+AWS-C-Common, a core c99 package for AWS SDK.  The functions we
+considered involved reading, comparing, writing into arrays. These
+functions already have CBMC proofs but assuming small bounds,
+typically between 20-50, on the input array sizes.  With our approach,
+9 of the proofs were made fully unbounded. The only change we made,
+amounting to two lines of code, were to remove pointer arithmetic and
+make all memory accesses via array indexing. In this section, we
+introduce the workflow to use our tool to turn proofs into unbounded
+ones and list all functions in the package proved by us unboundedly.
+
+\subsection{User's workflow}
+
+\paragraph{Writing specifications for the unbounded proof} 
+
+Users of our tool first are required to identify arrays in their
+proofs to be made unbounded in a JSON specification file. The shape of
+abstraction also needs to be provided. Users are able to write custom
+functions for computation involving abstracted indices. Such custom
+functions should also be provided within the JSON file. An example
+specification is shown in Figure \ref{fig:examplejson}. It abstracts
+an array ``lhs'' in function ``aws\_array\_eq\_harness'' with shape
+``*c*c*''. Its corresponding length is also abstracted.
+
+\begin{figure}[H]
+	\begin{lstlisting}[language=json]
+{
+  "entries": [
+    {
+      "entity": "array",
+      "function": "aws_array_eq_harness",
+      "name": "aws_array_eq_harness::1::lhs",
+      "shape": {
+        "indices": ["cncrt", "cncrt1"],
+        "assumptions": ["cncrt0<cncrt1"],
+        "shape-type": "*c*c*"
+      },
+      "abst-function-file": "./abst-funcs.c",
+      "abst-functions":{
+        "add-abs-conc": "add_abs_to_conc_2",
+        "sub-abs-conc": "sub_conc_from_abs_2",
+        "multiply-abs-conc": "multiply_abs_with_conc_2",
+        "precise-check": "is_precise_2",
+        "abstract-index": "two_abs",
+        "concretize-index": "concretize_2",
+      },
+      "related-entities": [
+        {
+          "entity": "length",
+          "function": "aws_array_eq_harness",
+          "name": "aws_array_eq_harness::1::lhs_len"
+        }
+      ]
+    }
+  ]
+}
+  \end{lstlisting}
+	\caption{An example JSON specification file abstracting an array with 2 precise indices}
+	\label{fig:examplejson}
+\end{figure}
+
+\nop{
+\paragraph{Removing bounds that limit sizes of array initialization} 
+Bounded proofs often initialize arrays with a bounded size. Users need 
+to modify the initialization of such arrays so that the size becomes 
+a free variable. In AWS-C-Common, this involves removing an assumption 
+about the array size in most cases. Figure \ref{fig:removebound} shows 
+an example of such modification.
+
+\begin{figure}
+	\begin{lstlisting}[language=C++, keywordstyle=\color{blue}, commentstyle=\color{commentgreen}, basicstyle=\normalfont\ttfamily]
+size_t lhs_len;
+// __CPROVER_assume(lhs_len <= MAX_BUFFER_SIZE);
+void *lhs = can_fail_malloc(lhs_len);
+  \end{lstlisting}
+	\caption{Removing bounds for arrays}
+	\label{fig:removebound}
+\end{figure}
+}
+
+\paragraph{Rewriting operations unsupported by our program model} 
+Users need to rewrite operations in programs to be proved if the
+operations are not supported in our program model. For example, we
+assume elements in arrays are all accessed through array access
+operations. If pointers are used to iterate through an array in the
+program, users are required to rewrite them into array accesses. For
+the 9 AWS C Common examples we had to rewrite {\tt memcpy} and {\tt
+  memcmp} functions to remove pointer arithmetic. This was a minor
+change amounting to only 2 lines. Note that our tool will throw an
+error if this step is not done properly instead of showing any
+undefined behaviors.
+
+\paragraph{Proving the program}
+Proving a program takes three steps. First, users compile the program 
+written in C into an intermediate GOTO representation. Then, users send 
+the GOTO program together with the JSON specification file into our tool. 
+The tool will abstract the behavior of arrays and loops in the GOTO program. 
+Finally, users prove the modified GOTO program with CBMC. Figure 
+\ref{fig:exampleconsole} shows the three steps in console commands.
+
+\begin{figure}
+	\begin{lstlisting}[language=bash, basicstyle=\normalfont\ttfamily]
+./goto-cc program.c -o program.o
+./goto-instrument --use-abstraction spec.json  \
+    program.o program_abst.o
+./cbmc program_abst.o
+  \end{lstlisting}
+	\caption{Console commands to prove a program unboundedly using our tool}
+	\label{fig:exampleconsole}
+\end{figure}
+
+\nop{
+\paragraph{Checking counterexamples and adding constraints if needed}
+The program is proved unboundly if no counterexamples
+are found by CBMC in the last step. However, in some cases there might
+be false positive counterexamples found even if the program is
+correct. This is because our tool doesn't model all behaviors of the
+program precisely, and such impreciseness may introduce spurious
+counterexamples. Figure \ref{fig:spuriouscounterexample} shows one
+example of such cases. The program may read from the same imprecise
+location twice from an array and get different values. However, it is
+not possible in the original program. Users can remove such spurious
+counterexamples by adding hints as assumptions in the program.
+
+\begin{figure}
+	\begin{lstlisting}[language=C++, keywordstyle=\color{blue}, commentstyle=\color{commentgreen}, basicstyle=\normalfont\ttfamily]
+unsigned char val_1 = array[imprecise_index];
+unsigned char val_2 = array[imprecise_index];
+// The assertion might fail at imprecise_index:
+assert(val_1 == val_2);  
+  \end{lstlisting}
+	\caption{Spurious counter-example from abstraction: reading from imprecise locations might return different values}
+	\label{fig:spuriouscounterexample}
+\end{figure}
+}
+
+\subsection{List of proved programs}
+Table \ref{tab:listofproofs} shows the functions we proved from in
+AWS-C-Common by building on top of bounded proofs written
+previously. For each \emph{target function} to be proved, there was
+already a CBMC \emph{harness function} that initialized the
+arrays/buffers needed, called the target function and checked
+assertions on its output. We changed the harness function in most
+cases because the initialization of arrays needed to be
+unbounded. Changes introduced in the harness function are shown in the
+column ``Harness Modification' in the table.  In some cases we also
+needed to make changes to target functions because some operations
+such as pointer manipulations are not supported in our current program
+model. Such modification is shown as ``Target Modification'' in the
+table. \nop{For some target functions, imprecise abstraction led to some
+spurious counter-examples. We had to add additional hints to get such
+target functions propved. If such hints were made, the proof would not
+be considered ``Out of box''.} We also include time to finish the
+unbounded proofs (on i7-8700K, 16GB DDR4 Memory) in the table.
+
+\begin{table}
+	\begin{tabularx}{\textwidth}{XXXXX}
+		\toprule
+		Target Function                         & Harness Modification                                                      & Target Modification                                                                    & Additional Hints                                                      & Time of Proof \\
+		\midrule
+		aws-array-eq                            & Remove bounds                                                             & Avoid pointer as iterator in loop (2 loc)                                              & N/A                                                                   & 8.229s        \\
+	
+		aws-array-eq-ignore-case                & Remove bounds                                                             & N/A                                                                                    & N/A                                                                   & 6.281s        \\
+		aws-byte-buf-eq                         & Remove bounds; Unwind function calls in assertions                        & Avoid pointer as iterator in loop (2 loc); Unwind function calls in assertions (4 loc) & N/A                                                                   & 8m57.359s     \\
+		aws-byte-buf-eq-ignore-case             & Remove bounds; Unwind function calls in assertions                        & Unwind function calls in assertions (4 loc)                                            & N/A                                                                   & 6m34.761s     \\
+	
+		aws-byte-cursor-eq                      & Remove bounds; Unwind function calls in assertions                        & Avoid pointer as iterator in loop (2 loc); Unwind function calls in assertions (4 loc) & N/A                                                                   & 42.673s       \\
+	
+		aws-byte-cursor-eq-byte-buf             & Remove bounds; Unwind function calls in assertions                        & Avoid pointer as iterator in loop (2 loc); Unwind function calls in assertions (4 loc) & N/A                                                                   & 3m14.533s     \\
+		aws-byte-cursor-eq-byte-buf-ignore-case & Remove bounds; Unwind function calls in assertions                        & Unwind function calls in assertions (4 loc)                                            & N/A                                                                   & 2m29.888s     \\
+		aws-byte-cursor-left-trim-pred          & Remove bounds; Unwind function calls in assertions                        & Unwind function calls in assertions (4 loc)                                            & N/A                                                                   & 1.991s        \\
+		\bottomrule
+	\end{tabularx}
+	\caption{Functions proved in AWS-C-Common}
+	\label{tab:listofproofs}
+\end{table}
+

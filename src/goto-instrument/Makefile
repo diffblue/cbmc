@@ -56,6 +56,9 @@ SRC = accelerate/accelerate.cpp \
       reachability_slicer.cpp \
       remove_function.cpp \
       replace_calls.cpp \
+      rra.cpp \
+      rra_spec.cpp \
+      rra_spec_gen.cpp \
       rw_set.cpp \
       show_locations.cpp \
       skip_loops.cpp \

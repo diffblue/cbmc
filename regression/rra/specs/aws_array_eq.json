@@ -1,0 +1,28 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_array_eq_harness",
+            "name": "aws_array_eq_harness::1::rhs",
+            "shape": "c*c*l*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_array_eq_harness",
+                    "name": "aws_array_eq_harness::1::lhs"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_array_eq_harness",
+                    "name": "aws_array_eq_harness::1::lhs_len"
+                },
+                {
+                    "entity": "scalar",
+                    "function": "aws_array_eq_harness",
+                    "name": "aws_array_eq_harness::1::rhs_len"
+                }
+            ]
+
+        }
+    ]
+}

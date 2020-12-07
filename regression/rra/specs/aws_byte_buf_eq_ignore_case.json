@@ -1,0 +1,38 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_byte_buf_eq_ignore_case_harness",
+            "name": "aws_byte_buf_eq_ignore_case_harness::1::lhs.buffer",
+            "shape": "c*c*c*c*c*l*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_byte_buf_eq_ignore_case_harness",
+                    "name": "aws_byte_buf_eq_ignore_case_harness::1::rhs.buffer"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_buf_eq_ignore_case_harness",
+                    "name": "aws_byte_buf_eq_ignore_case_harness::1::lhs.len"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_buf_eq_ignore_case_harness",
+                    "name": "aws_byte_buf_eq_ignore_case_harness::1::lhs.capacity"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_buf_eq_ignore_case_harness",
+                    "name": "aws_byte_buf_eq_ignore_case_harness::1::rhs.len"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_buf_eq_ignore_case_harness",
+                    "name": "aws_byte_buf_eq_ignore_case_harness::1::rhs.capacity"
+                }
+            ]
+
+        }
+    ]
+}

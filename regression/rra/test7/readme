@@ -1,0 +1,4 @@
+Copied from test1.
+Main.c has a simple while loop that compares a1 and a2 but it also has "sum" 
+which is not an abstracted variable that is being assigned inside the loop. This should 
+lead to an assertion failure.

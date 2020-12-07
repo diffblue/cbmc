@@ -1,0 +1,162 @@
+\section{Refining abstract model with lemmas}
+
+Compared to works like array smashing~\cite{} or loop
+shrinking~\cite{loopshrink} a key distinguishing feature of our proof
+framework is that if the abstraction is too coarse we can refine it
+using manually supplied \emph{lemmas} or candidate invariants. If we
+were using shape \(*c*c*\) the reads from array locations
+corresponding to the \(*\)'s can return any value potentially leading to
+spurious counter examples. One way to refine the abstraction would be
+choose a shape with finer resolution like \(*c*c*c*\) but there is no
+guarantee that this will get rid of the spurious behavior.
+
+Consider for example the {\tt aws-array-compare-c-str} example which
+has two loops iterating over a string buffer that ends with the null
+character. The first loop returns the length of the string buffer and
+the second loop compares element-wise the string buffer against
+another array. If we used the shape \(*c*c*\) and the second \(c\) had
+the first null character then the string length \(str\_len\) would be
+\(3\). But reading from the \(*\)'s is unconstrained and imprecise
+array locations corresponding to first two \(*\)'s can return a null
+character inconsistent with \(str\_len\) being 3. This behavior cannot
+be removed by increasing the resolution of the shape. Rather we need
+some way of constraining the behavior of the \(*\)'s and this is what
+refinement with lemmas achieves.
+
+User would add a candidate data structure invariant, one that holds at
+all program locations, stating that \[\forall i < str\_len.str[i]
+\quad != 0.\] This get translated into assertions for the two precise
+indices and assumptions for the imprecise indices as follows:
+
+{\tt assert str\$abst[1] != 0}
+
+{\tt assert str\$abst[3] != 0}
+
+
+{\tt assume str\$abst[i] != 0} for \({\tt i} \in {\tt 0,2,4}\)
+
+When model checking \progabst{} we would check that lemma holds at
+precisely tracked locations and assume that it holds at the imprecise
+locations. At a first glance this is clearly sound, for, if there is
+any violation of the lemma it would be caught by the assertions
+on precise locations. But there is still a possibility that by constraining the
+behavior of imprecise locations we have indirectly constrained the
+behavior of the precise location downstream. What really matters is
+that if there is a violation of the lemma in the concrete program
+there is a violation of it even in the
+abstract model. Let {\tt lem} stand for the conjuction all user
+supplied lemmas and let \emph{t} be the shortest execution trace
+in \prog{} that violates {\tt lem}. We have the following claim.
+
+\begin{lemma}
+
+  If trace \emph{t} in \prog{} violates {\tt lem} then there is trace
+  \(\abst(t)\) in \progabst{} that violates \trrd({\tt lem}).
+  
+\end{lemma}
+
+\begin{proof}
+
+ We construct the required trace \(\abst(t)\) of in \progabst{}
+ following the exact same steps as in proof of Lemma 2. Since we are
+ constraining the set of values read from imprecise locations there is
+ a potential that we will violate Lemma 1 which is used in proof of
+ Lemma 2. But since \emph{t} is the shortest violating trace in all
+ states \(s\) of trace \emph{t} except the last state {\tt lem}
+ holds. So constraining reads from imprecise locations using {\tt lem}
+ will not rule out any values that we might see in \prog. That is,
+ Lemma 1 still holds even when we constrain \progabst{} with {\tt
+   lem}. Consequently, we can find an abstract trace \(\abst(t)\) that
+ violates \trrd({\tt lem}) in \progabst. \qed
+  
+\end{proof}
+
+Using this claim it is straight forward to see that if \progabst{}
+with user lemmas added has no assertion violations then there are no
+assertion violations in the \prog either. If there is an assertion
+failure for any of the user supplied lemmas in \progabst{} then either
+a similar failure exists in \prog{} in which case the lemma needs to
+replaced. Or it is a spurious failure because the abstraction is still
+too coarse. In this case we need to add further lemmas to refine the
+abstraction.
+
+This abstraction-refinement framework is similar to the one in
+CMP~\cite{self}. There we used Murphi model checker as proof assistant
+and here we use CBMC as a proof assistant. Both these approaches
+differ from traditional abstraction refinement frameworks such as
+predicate abstraction in that they change the concrete program being
+abstracted instead of changing the abstraction operation by changing
+the set of predicates. This has the effect of keeping the abstract
+program small. Typically the user supplied lemmas together fall far
+short of a full inductive invariant letting us avoid the problem of
+finding inductive loop invariants and also making this approach highly
+automated compared to theorem proving style methods.
+
+\section{Reducing trace lengths in {\tt P\$abst}}
+
+ The abstract traces constructed above have the same lengths as the
+ concrete traces. For CBMC to get unbounded proofs we need to argue
+ that there are equivalent traces in which the semantic rules for {\tt
+   while-do} statement are applied a small number of times to each
+ such statement in {\tt P\$abst} while preserving the states.
+ 
+For example, consider again the loop
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{l}
+    {\tt i = 0;} \\
+    {\tt res = true;} \\
+    {\tt while( i $!=$ len) do \{}  \\
+    \hspace{1cm} {\tt j = i;} \\
+    \hspace{1cm} {\tt res = res \&\& (arr[j] $!=$ 10);} \\
+    \hspace{1cm}  {\tt i = i + 1;} \\
+    \}\\
+    \end{tabular}
+\end{figure}
+
+The abstract version is
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{l}
+    {\tt i = 0;} \\
+    {\tt res = true;} \\
+    {\tt while( i\$abst $!= \abst$(len )) do \{}  \\
+    \hspace{1cm} {\tt j = i\$abst;} \\
+    \hspace{1cm} {\tt res = res \&\& (arr[j] $!=$ 10);} \\
+    \hspace{1cm}  {\tt i\$abst = i\$abst + 1;} \\
+    \}\\
+    \end{tabular}
+\end{figure}
+
+At {\tt i\$abst} = 0, 2, 4 the program can stutter indefinitely though
+the number of times we stutter makes no change in the outcome.
+
+We make the following restrictions which guarantees that for any trace
+with a {\tt while-do} statement unrolled more than 5 times there is a
+trace with no more than 5 unrollings that has the same effect on
+states associated with indices 1 and 3.
+
+\begin{itemize}
+\item[{\bf R1}] Conditions in while loop are of the form (i == j) or (i != j) where
+i is a integer variable, j is either an integer variable or constant.
+\item[{\bf R2}] Only variable that can be assigned in a loop is the iterator
+  and that too using an assign of the form {\tt i = i + c} for some
+  constant {\tt c}.
+\end{itemize}
+
+These two restrictions together ensure that loops iterate over the
+arrays in either monotonically increasing or decreasing order. It’s
+easy to see these restrictions make stuttering of no consequence and
+allow CBMC to explore all behaviors even with loop unrollings of
+length just 5.
+
+\begin{remark}
+If we were using a different symbolic engine, say one based on
+BDDs or IC3, we don’t need these restrictions. Unlike CBMC
+they work by computing fix point and states which add to length but
+don’t add any new behaviors will automatically be ignored.  It might
+be worthwhile connecting goto-programs to other symbolic engines too.
+\end{remark}
+

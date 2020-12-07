@@ -1,0 +1,38 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_byte_cursor_eq_byte_buf_ignore_case_harness",
+            "name": "aws_byte_cursor_eq_byte_buf_ignore_case_harness::1::cur.ptr",
+            "shape": "c*c*c*c*l*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_byte_cursor_eq_byte_buf_ignore_case_harness",
+                    "name": "aws_byte_cursor_eq_byte_buf_ignore_case_harness::1::buf.ptr"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_cursor_eq_byte_buf_ignore_case_harness",
+                    "name": "aws_byte_cursor_eq_byte_buf_ignore_case_harness::1::cur.len"
+                },
+                {
+                    "entity": "array",
+                    "function": "aws_byte_cursor_eq_byte_buf_ignore_case_harness",
+                    "name": "aws_byte_cursor_eq_byte_buf_ignore_case_harness::1::buf.buffer"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_cursor_eq_byte_buf_ignore_case_harness",
+                    "name": "aws_byte_cursor_eq_byte_buf_ignore_case_harness::1::buf.capacity"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_cursor_eq_byte_buf_ignore_case_harness",
+                    "name": "aws_byte_cursor_eq_byte_buf_ignore_case_harness::1::buf.len"
+                }
+            ]
+
+        }
+    ]
+}

@@ -1,0 +1,28 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_byte_buf_append_harness",
+            "name": "aws_byte_buf_append_harness::1::from.ptr",
+            "shape": "c*c*l*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_byte_buf_append_harness",
+                    "name": "aws_byte_buf_append_harness::1::to.ptr"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_buf_append_harness",
+                    "name": "aws_byte_buf_append_harness::1::from.len"
+                },
+                {
+                    "entity": "scalar",
+                    "function": "aws_byte_buf_append_harness",
+                    "name": "aws_byte_buf_append_harness::1::to.len"
+                }
+            ]
+
+        }
+    ]
+}

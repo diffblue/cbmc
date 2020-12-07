@@ -1,0 +1,28 @@
+{
+    "entries": [
+    {
+        "entity": "array",
+        "function": "main",
+        "name": "main::1::a1",
+        "shape": "c*c*l*",
+        "related-entities": [
+            {
+                "entity": "array",
+                "function": "main",
+                "name": "main::1::a2"
+            },
+            {
+                "entity": "length",
+                "function": "main",
+                "name": "main::1::a1_len"
+            },
+            {
+                "entity": "length",
+                "function": "main",
+                "name": "main::1::a2_len"
+            }
+        ]
+
+    }
+]
+}

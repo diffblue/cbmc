@@ -1,0 +1,3 @@
+This should work fine, i.e. abstraction phase should finish and we should get
+spurious counter examples. May be we can try modifying spec.json by dropping related
+entities to see if it still works. Drop a1_len, a2_len to see what happens.

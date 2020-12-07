@@ -1,0 +1,6 @@
+Main.c has a simple while loop that compares a2 and a1. There are three specs:
+1. spec.json gives all the related entities fully.
+2. spec1.json just says abstract a1
+3. spec2.json is malformed: it says abstract a1 and identifies a2_len as related.
+
+We plan to use spec1 and spec2 in future tests. Adding them here as remainder.

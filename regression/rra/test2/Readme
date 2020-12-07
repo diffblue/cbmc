@@ -1,0 +1,4 @@
+Assertions with function "bar" that has hidden index variable.
+We error out in the abstraction phase qcurrently because functions are not supported inside assertions. 
+But even when they are, we should still error as index variable doesn't appear explicitly in the
+args list and it cannot be checked using is_precise function.

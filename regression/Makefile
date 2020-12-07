@@ -39,6 +39,7 @@ DIRS = cbmc \
        cbmc-primitives \
        goto-interpreter \
        cbmc-sequentialization \
+       rra \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

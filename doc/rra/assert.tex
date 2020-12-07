@@ -1,0 +1,90 @@
+\section{Reducing spurious counter examples}
+
+The RRA technique expands original program's behavior as {\tt exp}
+with a deterministic value at state \(s\) is replaced with a set of
+possible values \(\abst(s)(\trnsrd({\tt exp}))\). Considering an
+example \({\tt assert(a[i]==a[j])}\), when \({\tt i}\) and \({\tt j}\)
+are evaluated into the same constant \({\tt c}\), the assertion will
+not fail:
+
+\[\rl{{\exastar{{\tt i}}{s}{c}}, {\exastar{{\tt j}}{s}{c}}}{\exastar{{\tt a[i]==a[j]}}{s}{{\tt true}}}\]
+
+However, if \({\tt c}\) is not at a location we track precisely, reading from arrays returns non-deterministic values, 
+and the assertion may fail:
+
+\[\rl{{\exastar{{\tt i}}{s}{c}}, {\exastar{{\tt j}}{s}{c}}, c\notin\{c_1, c_2\}}{\exa{\trnsrd({\tt a[i]==a[j]})}{\abst(s)}{\langle{\tt nondet()==nondet()}, \abst(s)\rangle}}\]
+
+But {\tt nondet()==nondet()} can evaluate to either \(true\) or
+\(false\) introducing spurious failures in \({\tt P\$abst}\). We can
+get reduce such failures by only checking an assertion when every
+array access is at a precisely tracked location. This is sound as long
+as we have enough precise locations tracked in the shape. For
+simplicity of presentation, in this section, we assume that all arrays
+in \(ArraysAbst \) are abstracted with the same shape.
+
+\subsection{Assertion transformation}
+\subsubsection{Getting locations accessed in expressions} For an expression \({\tt exp}\), we define a helper function \(\accns({\tt exp})\) 
+that returns all locations accessed in abstract arrays as a set of expressions. \(\accns\) iteratively goes through \({\tt exp}\) as a tree and 
+finds the accessed locations.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{lcl}
+    
+    \acc ({\tt i}) & \ra & \(\emptyset\) \\
+
+    \acc ({\tt a[exp]}) & \ra & if {\tt a} \(\in\) \arrayids{} then \(\{\tt exp\}\cup \accns({\tt exp})\)\\
+    && else \(\accns({\tt exp})\) \\
+    
+    \acc ({\tt exp1 + exp2}) & \ra & \(\accns({\tt exp1})\cup\accns({\tt exp2})\) \\
+    
+    \acc ({\tt exp1 rel\_op exp2}) & \ra &  \(\accns({\tt exp1})\cup\accns({\tt exp2})\) \\
+    
+    \acc ({\tt exp~?~exp1~:~exp2}) & \ra &  \(\accns({\tt exp})\cup\accns({\tt exp1})\cup\accns({\tt exp2})\)\\
+    
+    \acc ({\tt funcname(exps)}) & \ra & \(\bigcup_{{\tt exp}\in {\tt exps}}\accns({\tt exp})\) \\
+                                       
+  \end{tabular}
+\end{figure}
+
+\subsubsection{Transforming assertions} Expressions in assertions are transformed using \tras instead of \trrd to make sure we only check the 
+assertions when every locations accessed are precise. 
+
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{lcl}      
+      \(\trnsas({\tt exp})\) & \ra & \(\left(\bigwedge\limits_{{\tt loc}\in \accns({\tt exp})}{\tt is\_precise(loc^\prime)}\right)\Rightarrow \trnsrd({\tt exp})\) \\
+      && where \({\tt loc^\prime = }\abstm(\trnsrd({\tt loc}))\) \\
+      \tr({\tt assert(exp)})  & \ra &  {\tt assert(}\tras ({\tt exp}){\tt )} \\
+    \end{tabular}
+  \end{figure}
+
+\subsection{Proof of soundness}
+It may seem that adding conditions to assertions makes proofs weaker and breaks the soundness of the proof. However, we prove that proof soundness 
+for an assertion is still maintained if the number of precise locations tracked in the shape {\it *c*c*...*c*} is greater than the number of 
+locations accessed in the assertion. Assume that \(c_1, \dots, c_m\) are the locations tracked.
+
+\begin{theorem}[Assertion Soundness]\label{assert}
+ 
+    If \(m\geq \lvert \accns{\tt (exp)}\rvert\) and {\tt assert(}\tras({\tt exp}){\tt)} does not fail in {\tt
+      P\$abst} under all possible values of \(c_1, \dots, c_m\), then {\tt assert(exp)} does not fail in {\tt P}
+      
+\end{theorem}
+
+\begin{proof}[Assertion Soundness]
+
+    Suppose there is a trace \(t = s_0, s_1,...,s_n\) such
+  that {\tt assert(exp)} fails in \(s_n\) with locations \(\accns({\tt exp})=\{{\tt loc_1, \dots, loc_k}\}\) accessed. 
+  Assume that \(a_i=\langle {\tt loc_i}, s_n\rangle\) for \(1\leq i\leq k\). We sort \(a_1, \dots, a_k\) into distinct 
+  values \(a_1^\prime<\dots<a_{k^\prime}^\prime\) such that \(\left(\forall i\leq k\right)\left(\exists i^\prime\leq k^\prime\right)\left(a_i==a_{i^\prime}^\prime\right)\)
+  and \(k^\prime\leq k\).
+
+  Given \(m\geq \lvert \accns({\tt exp})\rvert=k\geq k^\prime\), 
+  we can find \(c_1, \dots, c_m\) such that \(c_i=a_i^\prime\) for \(i=1\dots k^\prime\). Then for every location accessed, 
+  \({\tt is\_precise(loc_i)=true}\), and therefore \(\trnsas({\tt exp})==\trnsrd({\tt exp})\). 
+
+  By Theorem \ref{main}, if \(s_n\) fails {\tt assert(exp)} then \(\abst(s_n)\) will violate \\ {\tt assert(}\trrd({\tt exp}){\tt)} 
+  and therefore violate {\tt assert(}\tras({\tt exp}){\tt)} under our selected \(c_1, \dots, c_m\). So {\tt
+  P\$abst} will fail the assert which contradicts our premise. \qed
+  
+\end{proof}

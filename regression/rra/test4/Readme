@@ -1,0 +1,4 @@
+Assert uses function bar which has index "i" explicitly in the args list. But another index 
+k derived from i is used to access the abstracted array. 
+We should error out in this case. The abstraction will be conservative meaning it will lead to spurious counterexamples and there is 
+no way to remove these spurious traces as long as we are using the scheme (is_precise(i) ==> bar(....,i)). 

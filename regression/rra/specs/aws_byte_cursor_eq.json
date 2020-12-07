@@ -1,0 +1,28 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_byte_cursor_eq_harness",
+            "name": "aws_byte_cursor_eq_harness::1::lhs.ptr",
+            "shape": "c*c*c*l*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_byte_cursor_eq_harness",
+                    "name": "aws_byte_cursor_eq_harness::1::rhs.ptr"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_cursor_eq_harness",
+                    "name": "aws_byte_cursor_eq_harness::1::lhs.len"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_byte_cursor_eq_harness",
+                    "name": "aws_byte_cursor_eq_harness::1::rhs.len"
+                }
+            ]
+
+        }
+    ]
+}

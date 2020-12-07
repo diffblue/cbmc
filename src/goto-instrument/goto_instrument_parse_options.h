@@ -88,6 +88,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(remove-function-pointers)" \
   "(show-claims)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
+  "(use-rra):" \
   "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \

@@ -1,0 +1,282 @@
+\section{Program Model}~\label{sec:model}
+
+\newcommand{\ra}{\(\rightarrow\)}
+\newcommand{\wh}{{\tt while }}
+\newcommand{\dt}{{\tt do }}
+
+\subsection{Syntactic description}
+
+CBMC compiles C programs into an intermediate form called
+goto-programs with a limited number of instruction types. We use a
+simplified model of goto-programs presented below to define RRA.
+
+There are only three types of variables allowed in our program model:
+{\tt bool}, {\tt uint} and {\tt array} over {\tt uint}. A program \prog{}
+consists of global variable declarations followed by a series of
+functions. Each function has a declaration followed by a list of
+instructions.
+
+More formally, the following grammar with the restrictions given after
+it describes the allowed programs. We will use plurals to refer to a
+list of things. For example, 'vars' refers to list of 'var'. In the
+following {\tt V} and {\tt C} refer to set of all variable identifiers
+and constants in the program. Entities in {\tt type writer} font refer
+to terminals and those in normal font refer to non-terminals.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{lcl}
+    type & \ra & {\tt bool} \(|\) {\tt uint} \(|\) {\tt array[uint] of uint} \\
+    program & \ra & decls funcs \\
+    decl & \ra & type {\tt id}, {\tt id} \(\in\) {\tt V}   \\
+    func & \ra & type id params instrs \\
+    param & \ra & decl \\
+    &&\\
+    instr & \ra & \wh exp {\tt do} instrs (while-do) \\
+    & \ra & exp {\tt =} exp (assign) \\
+    & \ra & {\tt assert} exp (assert) \\
+    & \ra & {\tt assume} exp (assume) \\
+    & \ra & {\tt return} exp (return) \\
+    & & \\
+    exp & \ra & {\tt id} where {\tt id} \(\in {\tt V} \cup {\tt C}\) \\
+    & \ra & {\tt a[} exp {\tt ]} \\
+    & \ra & exp {\tt +} exp \\
+    & \ra & exp {\tt rel\_op} exp, where {\tt rel\_op} \(\in \{==, \neq\}\) \\
+    & \ra & exp{\tt ?}exp{\tt :}exp \\
+    & \ra & {\tt funcname} exp
+    
+  \end{tabular}
+\end{figure}
+
+ 
+We have allowed only one type of arithmetic expression and two types
+of relational expressions to keep the presentation
+simple. Generalizing to other types of expressions is
+straightforward. Note that the whole system is closed, there are no
+inputs read from outside. A program taken together with it's CBMC
+proof harness is a closed system, so this is not a limitation. We
+don’t allow functions to have local variables. We further make the
+following restrictions to simplify the presentation:
+
+\begin{itemize}
+
+
+
+\item[{\bf A1}]  Variables are initialized before being used for the first time.
+
+\item[{\bf A2}] We assume there is a {\tt main} function that serves
+  as the entry point.
+
+\item[{\bf A3}] All functions have only one argument, except {\tt
+  main} which has none.
+
+\item[{\bf A4}] Every function apart from {\tt main}
+  has a return value.
+\end{itemize}
+
+
+Note that we have not considered explicit use of pointers in this
+language. \emph{We assume all memory accesses are through array
+references.} Extension to the general model with pointers will be
+considered in future work.
+
+The model described here corresponds to a program under verification
+along with its proof harness, which supplies all the inputs and
+\emph{closes} the system. But in a proof harness inputs are allowed to
+take all possible values (subject to any \emph{assumptions}) whereas
+in the model we force inputs to take a specific value. Our objective
+here is to show that every trace of the concrete program has a
+corresponding abstract trace. There is no loss of generality because
+our main soundness theorem holds no matter what specific inputs are
+chosen.
+
+\subsection{Semantics}
+
+With each function {\tt foo} we will associate a ghost
+variable~\footnote{A variable that monitors but doesn't in any way
+  affect the program execution.} \(ret_{\tt foo}\) that holds the
+return value of {\tt foo} after each invocation of {\tt foo}.\nop{ To
+define program semantics we assume we have call stack {\tt stack} that
+holds the real parameters passed to functions and a variable {\tt
+  stacktop} that has exact value at the top of {\tt stack}.} A state
+\(s\) of program {\tt P} is then given by
+\begin{itemize}
+
+\item valuation of all variables in {\tt V}
+\item valuation of the ghost variables.
+  
+\end{itemize}
+
+Denote by \(s({\tt v})\) the value of variable {\tt v} from {\tt V} in
+state \(s\).  In the initial state \(Init\) all variables are
+initialized to a special value \(\tp\), which stands for
+nondeterministic value. A read from \(\tp\) can return any value from
+the type of the variable to which it is assigned. Multiple reads from
+a variable with value \(\tp\) can return different values even if the
+variable has not been assigned in the interim.
+
+We write \(\chng{s}{\tt x}{\tt v}\) to denote the state derived from \(s\) by changing
+value of variable {\tt x} to \(v\). We give the small-step semantics for the program below.
+
+\subsubsection{Semantic rules for expressions}
+First define
+\(\rightarrow_e\) that gives semantic meaning to expressions. We will
+write \(\exastar{{\tt exp}}{s}{i}\) to mean expression {\tt exp} reduces
+to constant \(i\) in state \(s\) by repeated application of semantic
+rules. 
+
+For a variable {\tt v} in {\tt V}, we have the following rule:
+
+\[\rl{}{\exa{{\tt v}}{s}{s({\tt v})}}\]
+
+For array index expression:
+
+
+\[\rl{\exastar{{\tt exp}}{s}{i}}{\exa{{\tt a[exp]}}{s}{{\tt a[}i{\tt ]}}}\]
+
+
+For arithmetic expression:
+
+\[\rl{{\exastar{{\tt exp1}}{s}{i1}}, {\exastar{{\tt exp2}}{s}{i2}}}{\exa{{\tt exp1 + exp2}}{s}{{i1 + i2}}}\]
+
+For relational expression:
+
+\[\rl{{\exastar{{\tt exp1}}{s}{i1}}, {\exastar{{\tt exp2}}{s}{i2}}}{\exa{{\tt exp1 ~rel\_op ~exp2}}{s}{{i1 ~rel\_op ~i2}}}\]
+
+where {\tt rel\_op} determines the semantic \(rel\_op\) used in the rule.
+
+For if-then-else expression:
+
+\[\rl{{\exastar{{\tt exp}}{s}{b}}, {\exastar{{\tt exp1}}{s}{i1}}, {\exastar{{\tt exp2}}{s}{i2}} }{\exa{{\tt exp ? exp1 : exp2 }}{s}{b?i1:i2}}\]
+
+As semantics for function call expression requires semantics for
+instructions we will defer it to the next section.
+
+\subsubsection{Semantic rules of instructions}
+
+We write \(\ex{c}{s}{\skp}{s'}\) to mean that executing instruction
+\(c\) starting at state \(s\) leads to state \(s'\). Essentially,
+\(\skp\) denotes an empty instruction. An empty list of instructions
+can also be represented by a single \(\skp\) instruction.
+
+A list of instructions will be treated as a sequence of instructions
+separated by a semi-colon ({\tt ;}). First we have the following rule
+for sequencing of instructions:
+
+\[\rl{\ex{c_0}{s}{c'_0}{s'}}{\ex{c_0;c_1}{s}{c'_0;c_1}{s'}}\]
+
+For \(\skp\) instruction we have
+
+\[\rl{}{\ex{\skp;c_1}{s}{c_1}{s}}\]
+
+\nop{
+An empty list of instructions is treated
+as a \(\skp\) instruction. That is,
+
+\[\rl{}{\ex{[]}{s}{\skp}{s}}\]}
+
+
+We also have \(\fl\) instruction to capture program failure with the following semantic rule
+
+\[\rl{}{\ex{\fl;c}{s}{\fl}{s}}\]
+
+Execution of a well formed program always ends with either with \(\skp\) or \(\fl\)
+instruction.
+\nop{
+For handling assigments with function expression, assume we
+have the following variables and functions
+\begin{itemize}
+
+\item {\tt pop()} that pops the top element of {\tt stack}, modifies
+  {\tt stacktop} and returns the modified stack
+\item \({\tt push(v)}\) that pushes value \({\tt v}\) on top of
+  {\tt stack}, modifies {\tt stacktop} and returns the updated stack.
+\end{itemize}
+}
+
+
+
+For the {\tt while-do} instruction we have the following two rules
+
+\[\rl{\exastar{{\tt cond}}{s}{true}} {\ex{\whld{cond}{body}} {s} {{\tt body;}\whld{cond}{body}}{s}}\]
+
+and
+
+\[\rl{\exastar{{\tt cond}}{s}{false}} {\ex{\whld{cond}{body}} {s} {\skp} {s}}\]
+
+
+For assigns:
+
+\[\rl{\exastar{e2}{s}{ v}}{\ex{\tt e1 = e2} {s} {\skp} {\chng{s} {e1} {v}}}\]
+
+
+For assert instructions:
+
+\[\rl{\exastar{{\tt e}}{s}{true} }{\ex{{\tt assert(e)}} {s} {\skp} {s}}\]
+
+and
+
+\[\rl{\exastar{{\tt e}}{s}{false}}{\ex{{\tt assert(e)}} {s} {\fl} {s}}\]
+
+For assume instructions:
+
+\[\rl{\exastar{{\tt e}}{s}{true}}{\ex{{\tt assume(e)}} {s} {\skp} {s}}\]
+
+and
+
+\[\rl{\exastar{{\tt e}}{s}{false}}{\ex{{\tt assume(e)}} {s} {\fl} {s}}\]
+  
+For return instructions:
+
+
+\[\rl{\exastar{{\tt e}}{s}{{ v}} }{\ex{{\tt return(e)}} {s} {\skp} {\chng{s}{{\tt ret_{foo}}}{v}} }\]
+
+We can now define the semantic rule for function call expression. In
+the following, \({\tt body_{foo}}\) denotes the list of instructions
+following declaration of {\tt foo(arg)}. And similar to
+\(\rightarrow_{e}^{*}\), we use \(\rightarrow^{*}\) to denote repeated
+application of the single step semantic rule \(\rightarrow\). \nop{We have the
+  following rules for function call statement:
+
+\[\rl{\exa{{\tt arg}}{s}{{ v}} }{\ex{\tt foo(arg)}{s}{{{\tt arg = }} v;{\tt body_{foo}}}{s}}\]
+
+and
+
+\[\rl{}{\ex{\tt x = foo(exp)}{s}{\tt foo(arg);x=ret_{\tt foo}}{s}}\]
+}
+
+
+\[\rl{{\exastar{{\tt arg}}{s}{{ v}}}, {\exstar{{\tt arg} = v; {\tt body_{foo}}}{s}{\skp}{s'}} }{\exa{{\tt foo(arg)}}{s}{{s'({\tt ret_{foo}})}}}\]
+
+As the semantic rule makes it clear function arguments are passed by
+value.
+
+Given a program {\tt P} that has an entry point function {\tt main()}
+a {\bf rule trace} is a sequence of configurations, related by either
+\(\rightarrow\) or \(\rightarrow_e\), starting at \(\langle{\tt
+  body_{main}}, Init \rangle\) and ending in a configuration \(\langle
+last, s_n\rangle\) where \(last \in \{\skp, \fl\}\). An {\bf
+  instruction trace} is obtained by projecting out configurations that
+are related to the preceeding configuration by \(\rightarrow_e\). An
+{\bf execution trace} is projection of each configuration in an
+instruction trace on to the state component of it. Essentially, an
+execution trace just keeps next states from executing
+instructions. Evaluation of expressions don't contribute to the trace.
+
+\nop{
+\begin{definition}[Execution Trace]
+
+  An execution trace \(t\) of program {\tt P} is a sequence of states
+\(s_0 = Init, s_1,s_2,…s_n\) such that starting at \(\langle {\tt
+  main}, s_0 \rangle\) repeated application of execution rules above
+lead us to \(\langle \skp, s_n\rangle\) or  \(\langle \fl, s_n\rangle\).
+
+\end{definition}
+}
+
+\nop{
+From now on, for syntactic entities such as the program {\tt P} will
+use typewriter font and semantic entities like the state \(s\) using
+math-mode. Entities which play both a semantic and syntactic role like
+\(\abst\) and \arrayids{} will be given in math-mode.
+}

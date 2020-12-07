@@ -1,0 +1,33 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_array_eq_c_str_harness",
+            "name": "aws_array_eq_c_str_harness::1::array",
+            "shape": "c*c*c*c*l*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_array_eq_c_str_harness",
+                    "name": "aws_array_eq_c_str_harness::1::c_str"
+                },
+                {
+                    "entity": "length",
+                    "function": "aws_array_eq_c_str_harness",
+                    "name": "aws_array_eq_c_str_harness::1::array_len"
+                },
+                {
+                    "entity": "length",
+                    "function": "",
+                    "name": "str_len"
+                },
+                {
+                    "entity": "length",
+                    "function": "",
+                    "name": "allocated_str_len"
+                }
+            ]
+
+        }
+    ]
+}

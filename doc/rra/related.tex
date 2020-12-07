@@ -1,0 +1,57 @@
+\section{Related work}
+
+RRA technique was inspired by similar approaches in hardware
+verification~\cite{mcmillan} and protocol verification~\cite{self}
+which too are centered arounding reducing large data types or data
+structures to small sizes. These approaches essentially use a model
+checker as a proof engine in an interactive manner. There is an
+automatic abstraction phase followed by a manual refinement phase to
+make the model checker converge to a proof. In this paper we have
+described only the abstraction phase as refinement phase
+was not required for our examples. It's not hard to find programs that
+will require refinement. For example a program to bubble sort will
+have dependence between loop iterations and no matter what shape we
+pick we cannot converge on a proof as there will be some spurious
+counter example or the other. We will have to add lemmas to constrain
+the behavior of the abstracted entries.
+
+In software verification the work on Loop Shrinking~\cite{loopshrink}
+is closest to ours. Idea behind the work is as follows: if the loop
+iterations are independent and a failure for safety property being
+checked depends only on what happens at some k number of iterations
+then the original loop can be replaced by a shrunk loop that iterates
+over k non-deterministically chosen loop iteration numbers. If the
+loop is iterating over an array then for each set of iteration numbers
+only k values of the array are relevant. Authors of~\cite{loopshrink}
+go into great detail on how to identify the shrink factor k
+automatically. There are several crucial differences between this work
+and ~\cite{loopshrink}. We abstract the data structures directly
+whereas ~\cite{loopshrink} leaves the data structures untouched. So if
+same array A is accessed by two different loops there will be two sets
+of non-deterministically chosen iteration numbers. So the loops can
+potentially access different parts of the array. In our approach array
+A will get abstracted and the two loops will see the same values for
+precise indices and potentially different values for abstract
+indices. This can lead to spurious counter examples as in the string
+examples which required manual refinement. But with refinement phase
+our approach is far more general: it can handle examples which are not
+k-shrinkable for any constant k.
+
+In a similar vein there are other works that try to either abstract
+loops automatically~\cite{loopabs}, accelerate loops to enable finding
+deep bugs in programs~\cite{kroeningloops}, compute precise bounds on loop
+iterations~\cite{abc}. All these works are focus directly on loops not
+on the structures they are looping over and are aiming for full
+automation. In contrast we abstract the underlying data structures and
+we allow a refinement phase.
+
+Among well known works for SW model checking are Lazy
+Abstraction~\cite{lazyabstraction}, Lazy
+annotations~\cite{lazyannotations}. But these are well known to have
+problems with deep loops. CPA-Checker~\cite{cpachecker1}
+implements these and many other algorithms in a portfolio of engines but
+it is still not able to handle more than 2 of 9 examples (verify numbers!) from the
+AWS C Common library. The problem at its core is that some how a loop
+invariant has to be discovered by these algorithms before they can
+converge. But finding a quanitified invariant over arrays is very hard
+even for well structured programs encountered in practice.

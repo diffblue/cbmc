@@ -1,0 +1,2 @@
+Assertion has function "bar" which has index it uses explicitly in the signature. 
+We will error out for now but once we handle functions inside assertions this should work.

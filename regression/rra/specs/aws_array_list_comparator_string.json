@@ -1,0 +1,28 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_array_list_comparator_string_harness",
+            "name": "aws_array_list_comparator_string::1::str_a->bytes",
+            "shape": "*c*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_array_list_comparator_string_harness",
+                    "name": "aws_array_list_comparator_string::1::str_b->bytes"
+                },
+                {
+                    "entity": "scalar",
+                    "function": "aws_array_list_comparator_string_harness",
+                    "name": "aws_array_list_comparator_string::1::str_a->len"
+                },
+                {
+                    "entity": "scalar",
+                    "function": "aws_array_list_comparator_string_harness",
+                    "name": "aws_array_list_comparator_string::1::str_b->len"
+                }
+            ]
+
+        }
+    ]
+}

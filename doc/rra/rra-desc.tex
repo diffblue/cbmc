@@ -1,0 +1,339 @@
+\section{Formalizing RRA}~\label{sec:rra}
+
+User first specifies the arrays to be abstracted along with the shapes
+to use. In \emph{aws\_array\_eq} example the shape used can be written
+as {\it *c*}, that is, track one location precisely and abstract the
+locations before and after it. For the rest of this presentation, we
+will fix the shape to be {\it *c*c*} which keeps track of two locations
+\(c_1 < c_2\). In general, the shape  {\it *c*c*} can also represent
+cases where \((c_1 = c_2 - 1)\), that is, they are adjacent. This
+would complicate \(\abst\) and \(\conc\) functions described
+below. To keep the presentation simple we assume \(c_1 < c_2 -
+1\). Let the array to be abstracted be \aid. Extension to other
+shapes and multiple arrays is straightforward. The abstraction
+function \(\abst\) mapping concrete indices to abstract indices is
+parameterized by the values \(c_1, c_2\) for the precise locations and
+is as follows:
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{ccl}
+    \(\abst(v)\) & = & 0 if \(v < c_1\) \\
+    &=& 1 if \(v = c_1\) \\
+    &=& 2 if \(c_1 < v < c_2\) \\
+    &=& 3 if \(v = c_2\) \\
+    &=& 4 if \(v > c_2\)
+    \end{tabular}
+\end{figure}
+
+There will be a corresponding concretization function as follows:
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{ccl}
+    \(\conc(0)\)  &=& \(\{v \mid \mbox{ where } 0 \leq  v < c_1\}\) \\
+    \(\conc(1)\)  &=& \(\{c_1\}\) \\
+     \(\conc(2)\) &=& \(\{v \mid \mbox{ where } 0 \leq  c_1 < v < c_2\}\) \\ 
+    \(\conc(3)\)  &=& \(\{c_2\}\) \\
+     \(\conc(4)\) &=& \(\{v \mid \mbox{ where } 0 \leq  v > c_2\}\)
+    \end{tabular}
+\end{figure}
+
+Misusing notation slightly \(\abst\) and \(\conc\) can be applied to arrays too.
+Let length of \(\aobj\) be \(l\) such that \(c_2 < l\) and its range be \sizet. Then
+
+\(\abst(\aobj)\) is an array \(\aabstobj\) of length 5 such that
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{ccl}
+    \(\aabstobj[1]\)  &=& \(\aobj[c_1]\) \\
+    \(\aabstobj[3]\)  &=& \(\aobj[c_2]\) \\
+    \(\aabstobj[x]\)  &=& \(\tp\) for \(x \notin [1,3]\)\\
+    \end{tabular}
+\end{figure}
+
+The special value \(\tp\) at abstract locations in \(\aabstobj\) indicates that
+reads from those locations can return any value.
+
+\begin{remark}
+Abstraction function \(\abst\) assumes that \(\aobj\) is at least
+\(c_2+1\) elements in length. Now the lowest value for \(c_2\) can be
+\(2\) which happens when \(c_1 = 0\). So \(\aobj\) has to be of length
+at least 3 and soundness results discussed below hold only for arrays
+of size 3 or more. Regular CBMC without abstraction is any way
+adequate for smaller arrays and abstraction is meant to make large
+arrays manageable.
+\end{remark}
+
+Given an
+array \(\aabstobj\) of length 5, \(\conc(\aabstobj)\) is the set of
+all arrays \(\aobj\) of length at least \(c_2+1\) such that
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{ccl}
+    \(\aobj[c_1]\)  &=& \(\aabstobj[1]\) \\
+    \(\aobj[c_2]\)  &=& \(\aabstobj[3]\) \\
+    \(\aobj[x]\)  &=& \(v \in \sizet\) for \(x \notin [c_1,c_2]\)\\
+    \end{tabular}
+\end{figure}
+
+Note that an abstract array can concretize to a set of different
+concrete arrays. Abstracting and then concretizing an array will give us a
+set containing the original array. That is,
+\[\aobj \in \conc(\abst(\aobj))\]
+
+Functions \(\abst\) and \(\conc\) operate on states and since states are
+available only during execution these two functions are used
+dynamically as the program is being model checked.
+
+We will next define a function \tr{} that syntactically transforms a
+given program \prog{} to a program \progabst. This will essentially involve
+identifying entities to be abstracted, substituting them with abstract
+entities, and rewriting program logic to work with abstracted
+entities.
+
+\subsection{Preprocessing phase}
+
+In the abstract program \aid{} will be replaced by \aabstid{}. Now
+\aabstid{} might be passed to other functions as an argument, say as
+an argument named \aargid{} for some function {\tt foo}. When we
+transform \prog{} we have to change \aargid{} to an abstract entity as
+well. We first identify all arrays in all functions that can get their
+value from \aid{}, the main array being abstracted. This can be done
+statically by following assignments in function bodies, tracing
+arguments as they are passed between functions and computing a closure
+of the possible set of values for each array identifier. If an
+identifier \aargid{} can get value from the array to be abstracted
+and also from a normal array then our abstraction procedure throws an
+exception. That's because we have to rewrite {\tt foo} to handle the case
+when its argument is an abstract array but we also need to keep it as
+is for the case when it receives a normal array argument. Assuming
+this doesn’t happen we identify the set \arrayids{} of array
+identifiers that need to be abstracted.
+
+\begin{remark}
+Requiring that an array identifier not get values from abstract and normal
+arrays is quite restrictive. But as we are relying on array
+names to keep track of heap objects we necessarily introduce
+imprecision in our method. For a general method we should
+determine if an array is abstract or not using its address, not its
+name.
+\end{remark}
+
+Any variable used to iterate over abstract arrays also needs to be
+replaced with a new variable with reduced range. This is what will
+allow us to shorten the traces CBMC has to explore. An
+intra-procedural closure analysis is performed starting with the set
+\(I_0\) of expressions that directly index into the arrays in
+\arrayids. For each expression we also add it's sub-expressions to the
+set. Any expression (along with it's sub-expressions) that is assigned
+to an expression in \(I_0\) is added to the set \(I_1\) (which is
+initialized to \(I_0\)) and so on till we reach a fix point. Now we
+intersect this with the set of variables appearing in the conditions
+of while loops. Any variable appearing in both sets is added to the
+set \indexids.
+
+For example, consider the following program.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{l}
+    {\tt i = 0;} \\
+    {\tt res = true;} \\
+    {\tt while( i $!=$ len) do \{}  \\
+    \hspace{1cm} {\tt j = i;} \\
+    \hspace{1cm} {\tt res = res \&\& (arr[j] $!=$ 10);} \\
+    \hspace{1cm}  {\tt i = i + 1;} \\
+    \}\\
+    \end{tabular}
+\end{figure}
+      
+\(I_0\) = \{{\tt j}\}, \(I_1 =\) \{{\tt i, i+1, j}\}. Since only i appears in the condition of the while loop \indexids = \{i\}.
+
+As another example consider the following program where only {\tt arr} is being abstracted:
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{l}
+    {\tt i = 0;} \\
+    {\tt res = true;} \\
+    {\tt while( i $!=$ len) do \{}  \\
+    \hspace{1cm} {\tt j = i;} \\
+    \hspace{1cm} {\tt res = res \&\& (arr[arr1[j]] $!=$ 10);} \\
+    \hspace{1cm}  {\tt i = i + 1;} \\
+    \}\\
+    \end{tabular}
+\end{figure}
+
+Here \(I_0\) = \{{\tt arr1[j], j}\}, \(I_1\) = \{{\tt i, j, arr1[j]}\} and \indexids = \{{\tt i}\}.
+
+
+
+\subsection{Program Transformation}
+
+    
+Using \arrayids{} and \indexids{} computed in the preprocessing phase, we
+will describe the program transformation \tr{} that rewrites concrete
+program into an abstract program. The transformation first adds the
+declaration
+\begin{figure}[H]
+  \centering
+      {\tt uint c1, c2;}
+\end{figure}
+
+to represent the free reference variables used in the
+abstraction. For all  in \({\tt var} \in\) \indexids{} we add the declaration
+
+\begin{figure}[H]
+  \centering
+      {\tt type var\$abst}
+\end{figure}
+
+where {\tt type} matches the type of {\tt var} in case of
+\indexids. In case of \({\tt arr} \in\) \arrayids{} it adds 
+
+\begin{figure}[H]
+  \centering
+      {\tt array[5] of uint arr\$abst}
+\end{figure}
+
+That is, we declare a new array variable {\tt arr\$abst} with exactly
+5 cells. The number 5 is determined by the shape \(*c*c*\) we are
+using for the abstraction.
+
+Next \tr{} rewrites each function as follows.
+
+\subsubsection{Rewrites for function declarations}
+
+Every function has a declaration followed by a list of
+instructions. Function declarations are left unchanged:
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{lcl}
+    \tr({\tt type funcname(var)}) & \ra & {\tt type funcname( var)}
+  \end{tabular}
+\end{figure}
+
+If \({\tt var} \in\)
+\indexids{} \(\cup\) \arrayids{} we add the following assignment right after the
+declaration
+
+\begin{figure}[H]
+  \centering
+      {\tt var\$abst} = \(\abst({\tt var})\)
+\end{figure}
+
+\begin{remark}
+As the subsequent rewrite rules show we make sure a function always
+returns a concrete value. The burden of abstracting the
+return value is placed on the instruction containing the function
+call.
+  
+\end{remark}
+
+\subsubsection{Rewrite for instructions}
+
+For rewriting instructions, \tr{} will make use of two helper function
+\trrd, \trwr{} both of which operate on expressions.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{lcl}
+    
+\tr({\tt while cond do instrs}) & \ra & {\tt while(}\trrd{\tt (cond)) do} \tr{\tt (instrs)} \\
+
+\tr({\tt exp1 = exp2}) & \ra &  if {\tt exp1} \(\in\) \indexids{} then \\
+&&                                          {\tt exp1\$abst  =} \(\abst\)(\trrd({\tt exp2})) \\
+      &&                                    else \trwr({\tt exp1}) {\tt =} \trrd({\tt exp2}) \\
+
+\tr({\tt funcname(exps)})  & \ra &   {\tt funcname(}\trrd({\tt exps}){\tt )} \\
+
+\tr({\tt assert(exp)})  & \ra &  {\tt assert(}\trrd ({\tt exp}){\tt )} \\
+
+\tr({\tt assume(exp)})  & \ra & {\tt assume(}\trrd ({\tt exp}){\tt )} \\
+ 
+\tr({\tt return(exp)}) & \ra &  {\tt return(}\trrd ({\tt exp}){\tt )} \\ 
+                                       
+  \end{tabular}
+\end{figure}
+
+
+\subsubsection{Rewrite for expressions}
+
+Expressions are transformed using \trrd{} and \trwr. We assume the
+availability of a function {\tt nondet()} that returns a random value
+from {\tt uint}. We first define \trrd.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{lcl}
+    
+\trrd ({\tt i}) & \ra & if {\tt i} \(\in\) \indexids{} then  \(\conc\){\tt (i\$abst)} else {\tt i} \\
+
+\trrd ({\tt a[exp]}) & \ra & if {\tt a} \(\in\) \arrayids{} then \\
+		&&	 \hspace{0.5cm} {\tt is\_precise(exp’)? a\$abst[exp’] : nondet()} \\
+&&	 \hspace{0.5cm}  where {\tt exp’ = }\(\abst\) (\trrd ({\tt exp})) \\
+%%&& \hspace{0.5cm} {\tt nondet} is a value from {\tt a's} range \\
+		  &&     else {\tt a[}\trrd {\tt (exp)]} \\
+
+\trrd ({\tt exp1 + exp2}) & \ra & \trrd ({\tt exp1}) {\tt +} \trrd ({\tt exp2}) \\
+
+\trrd ({\tt exp1 rel\_op exp2}) & \ra &  \trrd ({\tt exp1}) {\tt rel\_op} \trrd ({\tt exp2}) \\
+
+\trrd ({\tt exp~?~exp1~:~exp2}) & \ra &  \trrd ({\tt exp}) {\tt ?} \trrd ({\tt exp1}) {\tt :} \trrd ({\tt exp2}) \\
+
+\trrd ({\tt funcname(exps)}) & \ra & {\tt funcname}(\trrd ({\tt exps})) \\
+
+  \end{tabular}
+\end{figure}
+
+Function {\tt is\_precise} used above is defined as follows:
+
+{\tt is\_precise(v) = v}\(\in\){\tt \{1,3\}? true : false}
+
+Recall that we are abstracting using \(*c*c*\) and so indices 1, 3 are
+the precise locations. Observe that \trrd{} always returns a concrete
+value, never an abstract value. In case it is applied to an abstracted
+index {\tt i\$abst}, it concretizes it as \(\conc\)({\tt i\$abst}),
+allowing for a set of values all of which are concrete. This is a
+slight abuse of notation as we are replacing a variable {\tt i} by a
+set. The intended meaning is we can non-deterministically pick any
+value from the set.
+ 
+Next \trwr{} which is used to rewrite left hand sides of assign
+instructions is defined.
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{lcl}
+
+    \trwr({\tt i}) & \ra & if {\tt i} \(\in\) \indexids{} then {\tt i\$abst} else {\tt i} \\
+
+\trwr({\tt a[exp]}) & \ra & if {\tt a} \(\in\) \arrayids{} then {\tt a\$abst[}\(\abst\))(\trrd ({\tt exp}){\tt]} \\
+	               &&     else {\tt a[}\trrd({\tt exp}){\tt ]} \\
+
+\trwr({\tt exp1 rel\_op exp2}) & \ra & throw exception (cannot occur on lhs) \\
+
+\trwr({\tt exp1 + exp2}) & \ra & throw exception (cannot occur on lhs) \\
+
+\trwr({\tt exp~?~exp1~:~exp2}) & \ra & throw exception (cannot occur on lhs) \\
+
+\trwr({\tt funcname(exps)}) & \ra & throw exception (func exp cannot be on the lhs) \\
+
+   \end{tabular}
+\end{figure}
+
+
+
+
+
+Like {\tt P} the abstracted program {\tt P\$abst} too has states comprising of
+valuations of variables. The only
+difference is that states of {\tt P\$abst} have abstracted values for
+entities corresponding to \arrayids{} and \indexids. Everything else is
+the same. In particular, the initial state \(Init\) of {\tt P} matches the
+initial state  \(Init\$abst\) of {\tt P\$abst}, except for entities
+in \arrayids{} and \indexids{} which appear abstracted in \({Init\$abst}\).

@@ -1,0 +1,18 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_byte_cursor_left_trim_pred",
+            "name": "aws_byte_cursor_left_trim_pred::1::cur.ptr",
+            "shape": "*c*",
+            "related-entities": [
+                {
+                    "entity": "scalar",
+                    "function": "aws_byte_cursor_left_trim_pred",
+                    "name": "aws_byte_cursor_left_trim_pred::1::cur.len"
+                }
+            ]
+
+        }
+    ]
+}

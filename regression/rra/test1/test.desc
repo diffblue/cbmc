@@ -1,0 +1,9 @@
+CORE
+main.c
+1
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED
+--
+--
+Should lead to assertion failures (out of bounds error).

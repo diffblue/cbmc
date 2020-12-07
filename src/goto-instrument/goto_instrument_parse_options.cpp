@@ -104,6 +104,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "race_check.h"
 #include "reachability_slicer.h"
 #include "remove_function.h"
+#include "rra.h"
+#include "rra_spec.h"
 #include "rw_set.h"
 #include "show_locations.h"
 #include "skip_loops.h"
@@ -1010,6 +1012,33 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else
     options.set_option("simplify", true);
 
+  // use assumptions instead of assertions?
+  if(cmdline.isset("assert-to-assume"))
+    options.set_option("assert-to-assume", true);
+  else
+    options.set_option("assert-to-assume", false);
+
+  if(cmdline.isset("use-rra"))
+  {
+    std::string abs_file = cmdline.get_value("use-rra");
+
+    rra_spect abst_spec(abs_file, ui_message_handler);
+
+    log.status() << "Generating abstract function files" << messaget::eom;
+
+    abst_spec.generate_abstract_function_files();
+
+    log.status() << "Reading in abst funcs goto-model"  << messaget::eom;
+    rrat::link_abst_functions(goto_model, abst_spec, ui_message_handler, options);
+    log.status() << "Abst functions linked to goto-program"  << messaget::eom;
+
+    log.status() << "Analyzing index variables related to the entity" << messaget::eom;
+    rrat::abstract_goto_program(goto_model, abst_spec);
+
+    log.status() << "Removing abstract function files" << messaget::eom;
+    abst_spec.remove_abstract_function_files();
+  }
+
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
@@ -1859,6 +1888,8 @@ void goto_instrument_parse_optionst::help()
     " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
     "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
     "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --use-rra <file>             apply rr-abstraction to the arrays specified in the json file\n"
     HELP_RESTRICT_FUNCTION_POINTER
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS

@@ -1,0 +1,18 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_array_list_get_at_harness",
+            "name": "aws_array_list_get_at_harness::1::list->data",
+            "shape": "*c*c*",
+            "related-entities": [
+                {
+                    "entity": "scalar",
+                    "function": "aws_array_list_get_at_harness",
+                    "name": "aws_array_list_get_at_harness::1::list->length"
+                }
+            ]
+
+        }
+    ]
+}

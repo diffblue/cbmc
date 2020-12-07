@@ -1,0 +1,25 @@
+\section{Conclusion}
+
+We have described an approach to getting unbounded proofs using CBMC
+by reducing replication in arrays to a minimum. This in turn lets us
+bound the number of loop unwindings required for a full proof to a
+small number, usually under 10. Users can increase the precision of
+the abstraction by varying the abstraction shape specified.
+
+In contrast to other approaches to reducing loop bounds in our
+approach we can get spurious counter examples in the abstraction phase
+which have to be removed using manually supplied lemmas during the
+refinement phase. Refinement phase is beyond the scope of this paper
+and will be considered in a future work.
+
+For the next steps we plan to track the heap objects using their
+addresses and not using their names. This will let us handle memory
+accesses using pointers, not just array references, making the tool
+more robust.
+
+Another direction is to try engines other than CBMC to explore the
+abstracted program. We had to impose restrictions such as no loop side
+effects so that we can bound the unwinding number in CBMC. But the
+abstraction is sound even if these assumptions are violated and other
+engines such as BDD based model checkers might still be able to find proofs.
+

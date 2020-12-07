@@ -1,0 +1,3 @@
+Similar to test9: Copies whole array a2 into a1. This should also transfer the spec from a2 to a1. With the additional
+function call, so spec is transferred from a2 to a1 and then across function boundary.
+Currently, we are not handling assigns between arrays fully.

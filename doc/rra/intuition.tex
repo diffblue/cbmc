@@ -1,0 +1,53 @@
+\section{RRA-Intuition}
+
+The problem we see here is an instance of a more general problem that
+is also seen in hardware (HW) and protocol verification. HW designs have large
+memories, register banks, buffers that exhibit a high degree of
+replication. In case of distributed protocols like cache coherence
+protocols there is replication in the agents with multiple identical
+cache agents running in different processes.  Replication reducing
+techniques have been used successfully in HW~\cite{mcmillan} and
+Protocol Verification~\cite{self} to scale Model Checkers to any
+required bound size.
+
+For example, in HW verification Data Type Reduction has been highly
+successful. It is a special case of Abstraction Interpretation~\cite{abstint},
+that has been studied by multiple works such as
+Wolpert~\cite{wolpert}, Long~\cite{long}, McMillan~\cite{mcmillan} and
+others. The idea simply is that a large, potentially unbounded data
+type can be replaced by a small finite abstract data type that tracks
+specific values precisely and the rest are replaced by abstract
+values. For example, a set of indices [1..n] can be replaced by an
+abstract type [{\tt i},\(\bot\)] which tracks a particular index {\tt i} precisely and
+the rest of the indices imprecisely. This abstraction retains enough
+information to decide value of terms like \({\tt i} \neq {\tt j}\) and {\tt a[i]} precisely but
+not those of terms like \({\tt j} \neq {\tt k}\) and {\tt a[k]} where {\tt j,k} are different from {\tt i}.
+
+RRA technique broadly belongs to the same class of
+techniques. Consider \emph{aws\_array\_eq} program again which compares two
+arrays by iterating over them. In each iteration it compares {\tt sc1[i]}
+against {\tt sc2[i]} and entries at different indices don’t interfere with
+one another. A bug in this program will be localized to one particular
+index and what happens at the other indices can be ignored.
+
+If we can guess the precise location ‘c’ at which {\tt sc1} and {\tt
+  sc2} differ we could have collapsed all the entries before ‘c’ into
+one location and all the entries after ‘c’ into another location. The
+reduced {\tt sc1} and {\tt sc2} arrays with just 3 indices would still
+be sufficient to expose the bug in the program.
+
+Because we don’t know the value of ‘c’ upfront, we introduce it as a
+free variable and abstract the arrays {\tt sc1}, {\tt sc2} with respect to
+it. When we run CBMC it will try all possible values for ‘c’ and for
+each value of ‘c’ the abstracted arrays are of length only 3. If there
+is a bug in the original program it will be found in the abstract
+program too. If the abstract program has no bug then we can conclude
+that the original program is bug free as well. Intuitively, the
+original program has a deep state space whereas the abstract program
+has broad but shallow state space. CBMC can completely explore the
+latter but not the former.
+
+We next define the program model and RRA abstraction formally. In the
+section after that we argue the soundness of this abstraction
+technique.
+

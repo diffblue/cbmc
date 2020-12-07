@@ -1,0 +1,28 @@
+{
+    "entries": [
+        {
+            "entity": "array",
+            "function": "aws_array_list_pop_back_harness",
+            "name": "aws_array_list_pop_back_harness::1::list->data",
+            "shape": "*cc*",
+            "related-entities": [
+                {
+                    "entity": "array",
+                    "function": "aws_array_list_pop_back_harness",
+                    "name": "aws_array_list_pop_back_harness::1::old->data"
+                },
+                {
+                    "entity": "scalar",
+                    "function": "aws_array_list_pop_back_harness",
+                    "name": "aws_array_list_pop_back_harness::1::old->length"
+                },
+                {
+                    "entity": "scalar",
+                    "function": "aws_array_list_pop_back_harness",
+                    "name": "aws_array_list_pop_back_harness::1::list->length"
+                }
+            ]
+
+        }
+    ]
+}

@@ -1,0 +1,240 @@
+\section{ Proof of soundness}
+
+Given a program \prog{} and assertion {\tt assert(exp)} we want to
+establish that if the abstracted assertion {\tt assert(\trrd(exp))}
+holds in the abstract program \progabst{} then {\tt assert(exp)} holds
+in \prog. Recall that we are using the shape \(*c*c*\) and by
+definition of \(\abst\) and \(\conc\) functions the arrays being
+abstracted using \(*c*c*\) shape must have lengths greater than 3. All
+the results below implicitly assume this.
+
+In Lemma 2 we prove that any transition from a state \(s_1\)
+to another state \(s_2\) using an instruction {\tt inst} is matched in
+\progabst{} by a transition between \(\hat{s}_1\) to \(\hat{s}_2\),
+where \(\hat{s}_i\) is an abstraction of state \(s_i\), made precise
+in the definition below, using the instruction \(\trns({\tt
+  inst})\). We also establish that \(\hat{s}_i\) is an
+over-approximation of \(s_i\) as made precise by Lemma 1. Together
+Lemma 1 and Lemma 2 imply that any offending trace in \prog{} will
+have a counter part in \progabst{}. Conversely, if there are no
+offending traces in \progabst{} there are none in \prog{} either. That
+is, there exists a \emph{simulation} relation between \prog{} and
+\progabst with traces of former contained in those of the latter. So
+proving via model checking that \progabst{} is correct with respect to
+asserts of interest is enough to guarantee that the same asserts hold in
+\prog{} as well.
+
+First, we
+generalize the abstraction operation \(\abst\) to work on the entire
+state. A state \(s\) of \prog{} is map from variables to their values.
+
+\begin{definition}
+Given a state \(s\) of program {\tt P} it's abstraction, denoted by
+\(\abst(s)\), is obtained by replacing every {\tt id} in \arrayids{}
+\(\cup\) \indexids{} by {\tt id\$abst} and abstracting the value \(s({\tt
+  id})\) by \(\abst\). All other variables and values are left
+unchanged.
+\end{definition}
+
+
+
+We have the following lemma relating \(s\) and \(\abst(s)\) given an
+expression {\tt exp} of {\tt P}.
+
+\begin{lemma}
+
+The value of {\tt exp} in state \(s\) is contained in the set of
+possible values for \(\trnsrd({\tt exp})\) in abstract state
+\(\abst(s)\). Denoting \(\abst(s)\) by \(\hat{s}\) we have \[s({\tt exp}) \in \hat{s}(\trnsrd({\tt exp}))\]
+  
+\end{lemma}
+
+\begin{proof}
+
+We can prove this by case splitting on {\tt exp}. We will show it
+for couple of cases as other cases are similar.
+
+ Consider the case {\tt exp} is {\tt i} where \({\tt i} \in\)
+ \indexids. In {\tt P\$abst}, it will be replaced by {\tt i\$abst} and
+ \(\trnsrd(exp)\) will be \(\conc({\tt i\$abst})\). By definition of
+ concretization function the set of concrete values includes the
+ original value. So we have \(s({\tt exp}) \in \hat{s}(\trnsrd({\tt exp}))\).
+
+ As another case let {\tt exp} be {\tt a[i]} where \({\tt a} \in\)
+ \arrayids{} and \({\tt i} \in\) \indexids. Then \[\trnsrd({\tt
+   a[i]})\] is {\tt is\_precise(i’)? a\$abst[i’] : nondet} where {\tt
+   i’ = }\(\abst\) (\trrd ({\tt i})). If {\tt is\_precise(i’)} holds
+ then we get back the value stored at {\tt a[i]}, and the lemma
+ holds. Otherwise, we get {\tt nondet}, that is any possible value
+ from range of {\tt a}. In this case too the lemma holds.
+
+ Other cases are proved similarly.
+ 
+ \qed
+  
+\end{proof}
+
+\nop{Conversely, given an abstract state \(s’\) corresponding concrete
+  states are obtained by applying \(\conc\) to abstract version of
+  each array in \arrayids and abstract version of each variable in
+  \indexids.  For each abstract entity, the concrete set will have
+  multiple values and we pick some value from each set
+  non-deterministically and independently. Note that \( s \in
+  \conc(\abst(s))\).}
+
+
+Before we prove the theorem, recall that when \tr{} is applied to {\tt
+  P}, it adds new declarations at the beginning of {\tt P} and new
+assignments at beginning of functions if their arguments are in
+\indexids{} \(\cup\) \arrayids. Other than that it doesn’t add any new
+instructions and doesn’t remove any existing
+instructions. Syntactic structure of {\tt P} and {\tt
+  P\$abst} are quite similar. Semantically, we have the following
+lemma relating {\tt P} and {\tt P\$abst}.
+
+\begin{lemma}
+  Given an execution trace \(Init, s_1,....s_n\) of {\tt P}, for each
+  transition \(s_{i-1}\) \(\rightarrow s_{i}\) either
+  \(\abst(s_{i-1})\) \(\rightarrow \abst(s_{i})\) is a valid transition in {\tt
+    P\$abst} or there exists sequence of intermediate states \(int_{1}, int_{2}..\) such that \(\abst(s_{i-1})\)
+  \(\rightarrow int_{1} \rightarrow int_{2} ...\) \(\rightarrow \abst(s_i)\) is a valid
+  sequence of transitions in {\tt P\$abst}.
+\end{lemma}
+
+\begin{proof}
+
+ Assume the statement holds for prefix \(Init, s_1, ...,
+ s_{i-1}\). For the base case \(Init\$abst = \abst(Init)\) is the
+ initial state of {\tt P\$abst} by construction.
+
+ We will prove the inductive step by matching the transition from
+ \(s_{i-1}\) to \(s_i\) in {\tt P\$abst}. Since there are too many
+ sub-cases we will consider only two representative cases here.
+
+ Consider the case where the concrete transition is due to an
+ assignment {\tt e1 = e2} where {\tt e1} is in {\tt V}  but not in \indexids. So
+ \(s_{i-1}\) and \(s_i\) are related by the rule for assignment
+ statements:
+
+\[\rl{\exastar{e2}{s_{i-1}}{\tt v}}{\ex{\tt e1 = e2} {s_{i-1}} {\skp} {\chng{s_{i-1}} {e1} {v}}}\]
+
+with \(s_i\) equal to \({\chng{s_{i-1}} {e1} {v}}\).
+
+The corresponding statement in {\tt P\$abst} is {\tt \trwr({\tt e1}) =
+  \trrd({\tt e2})} which would reduce to {\tt e1} = \trrd({\tt
+  e2}). At state \(\abst(s_{i-1})\) the following rule will apply
+
+\[\rl{\exastar{\tt \trnsrd(e2)}{\abst(s_{i-1})}{\tt v'}} {\ex{\tt e1 = \trnsrd(e2)} {\abst(s_{i-1})} {\skp} {\chng{\abst(s_{i-1})} {e1} {v'}}}\]
+
+By previous lemma, the set of values of \trrd({\tt e2}) in
+\(\abst(s_{i-1})\) contains {\tt v} the value of {\tt e2} in state
+\(s_{i-1}\). So we can have {\tt v' = v} in the above rule. That is, at \(\abst(s_{i-1})\) this rule applies
+
+\[\rl{\exastar{\tt \trnsrd(e2)}{\abst(s_{i-1})}{\tt v}} {\ex{\tt e1 = e2} {\abst(s_{i-1})} {\skp} {\chng{\abst(s_{i-1})} {e1} {v}}}\]
+
+Since {\tt e1} is in {\tt V} but not in \indexids{} it is retained as is in the
+abstract program {\tt P\$abst}. This means \({\tt \chng{\abst(s_{i-1})}
+  {e1} {v}}\) is equal to \(\abst({\tt s_i})\) proving the inductive step in this case.
+
+As another case, suppose {\tt e1} was in \indexids. Then the
+assignment statement in {\tt P\$abst} would be {\tt {e1\$abst} =
+  \(\abst(\)\trrd({\tt e2})\()\)}.
+
+At abstract state \(\abst(s_{i-1})\) expression \(\abst(\)\trrd({\tt
+  e2})\()\) can evaluate to \(\abst(v)\) where \(v\) is the value of
+{\tt e2} in \(s_{i-1}\) (again by the previous lemma). So at \(\abst(s_{i-1})\) the following rule will apply
+
+\[\rl{\exastar{\tt \trnsrd(e2)}{\abst(s_{i-1})}{\abst({\tt v})}}
+     {\ex{\tt e1\$abst = \abst(\trnsrd(e2))} {\abst(s_{i-1})} {\skp} {\chng{\abst(s_{i-1})} {\tt e1\$abst} {\abst({\tt v})}}}\]
+
+By construction \(\chng{\abst(s_{i-1})} {\tt e1\$abst} {\abst({\tt
+    v})}\) is equal to \(\abst(s_i)\). Note that the evaluation
+\({\exastar{\tt \trnsrd(e2)}{\abst(s_{i-1})}{\abst({\tt v})}}\)
+involves function calls in \(\trnsrd\) and will introduce some
+intermediate states \(int_1, int_2...\) as allowed by the statement of
+the lemma. Clearly, the inductive step holds in this case too.
+
+\nop{
+\[\rl{}{\ex{\tt foo(arg)}{s}{{\tt arg = stacktop};{\tt body_{foo}}}{s'}}\]
+
+The semantic rule obtained by replacing \(s\) by \(\abst(s)\) and \(s'\) by \(\abst(s')\)
+in the above rule would clearly be valid in  {\tt P\$abst}.
+
+Consider as another case what happens when the next semantic rule
+dealing with {\tt arg = stacktop} is applied in {\tt P}. The following
+semantic rule then applies:
+
+
+\[\rl{s({\tt stacktop}) = v} { \ex{{\tt arg = stacktop}} {s} {\skp} {\chng{s} {{\tt arg}} {v}}}\]
+
+with \(s' = \chng{s} {{\tt arg}} {v}\)
+
+
+Corresponding rule in {\tt P\$abst} would be
+
+\[\rl{\abst(s)({\tt stacktop}) = v}{\ex{\tt arg = stacktop} {\abst(s)} {\skp} {\chng{\abst(s)} {arg} {v}}}\]
+
+But in case {\tt arg} \(\in\) \indexids{} \(\cup\)
+\arrayids \[\abst(s') \neq \chng{\abst(s)} {{\tt arg}} {v}\] because
+in \(\abst(s')\) the value of {\tt arg\$abst} would be \(\abst(s'({\tt
+  arg})\) and since \(s' = \chng{s} {arg} {v}\) it is equal to
+\(\abst(v)\) or \(\abst(s({\tt stacktop}))\).
+
+To re-establish the correspondence, we need to consider the next
+instruction in {\tt P\$abst} that comes after {\tt arg =
+  stacktop}. Recall that \(\trns\) inserts an assignment \({\tt arg\$abst
+  = \abst(arg)}\) right before the function body begins in case {\tt
+  arg} is a to-be abstracted entity. This assignment is present only
+in {\tt P\$abst}. Setting, \(s_{int} = {\chng{\abst(s)} {\tt arg} {v}}\)
+and using the semantic rule
+\
+
+\[\rl{s_{int}(\abst({\tt arg})) = v}{\ex{\tt arg\$abst = \abst({\tt arg})} {\abst(s)} {\skp} {\chng{s_{int}} {\tt arg\$abst} {v}}}\]
+
+The new state \({\chng{s_{int}} {\tt arg\$abst} {v}}\) is equal
+\(\abst(s')\) and thus letting {\tt P\$abst} match the transition \(s
+\rightarrow s'\) in {\tt P}.
+}
+
+Proof in other cases is similar.
+
+\qed
+
+
+\end{proof}
+
+
+Denote the trace of {\tt P\$abst} so obtained from trace \(t\) by
+\(\abst(t)\). We have the following theorem.
+\nop{
+Consider an assert statement {\tt assert(exp)} appearing in {\tt P}.
+If {\tt exp} involves {\tt arr} then let it read from only two
+locations at the most.}
+  
+\nop{Let \(\phi(c_1,c_2)\) be a safety property of {\tt P} involving only
+the array \aid{} and that too with accesses only at indices \(c_1,
+c_2\). Let \(\phi\$abst(1,3) =\) \tr(\(\phi(c_1,c_2)\)).}
+
+\begin{theorem}[Main]\label{main}
+ 
+If {\tt assert(}\tr({\tt exp}){\tt)} does not fail in {\tt
+  P\$abst} then {\tt assert(exp)} does not fail in {\tt P}
+  
+\end{theorem}
+
+
+
+\begin{proof}[Main]
+
+  Suppose there is a trace \(t = s_0, s_1,...,s_n\) such
+that {\tt assert(exp)} fails in \(s_n\). By above lemma we can construct a trace \(\abst(t)\)
+such that its last state is \(\abst(s_n)\).
+  
+By Lemma 1, if \(s_n\) violates {\tt assert(exp)} then
+\(\abst(s_n)\) will violate\\ {\tt assert(}\tr({\tt exp}){\tt)}. So {\tt
+  P\$abst} will fail the assert which contradicts our premise. This
+establishes that there can be no trace \(t\) in {\tt P} that causes
+the assert to fail.\qed
+
+\end{proof}
+
