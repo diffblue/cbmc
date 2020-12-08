@@ -23,11 +23,6 @@ public:
 
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
-  abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
-
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
@@ -38,10 +33,6 @@ public:
 
   CLONE
 protected:
-  abstract_object_pointert read_dereference(
-    const abstract_environmentt &env,
-    const namespacet &ns) const override;
-
   abstract_object_pointert write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
