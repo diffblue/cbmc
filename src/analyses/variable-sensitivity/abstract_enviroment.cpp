@@ -73,15 +73,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     // Store the abstract object in the pointer
     return pointer_object;
   }
-  else if(simplified_id == ID_array)
-  {
-    return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
-  }
-  else if(simplified_id == ID_struct)
-  {
-    return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
-  }
-  else if(simplified_id == ID_constant)
+  else if(simplified_id == ID_array || simplified_id == ID_struct || simplified_id == ID_constant)
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
