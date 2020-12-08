@@ -83,8 +83,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   }
   else if(simplified_id == ID_constant)
   {
-    return abstract_object_factory(
-      simplified_expr.type(), to_constant_expr(simplified_expr), ns);
+    return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
   else
   {
