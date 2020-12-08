@@ -42,6 +42,28 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  /// Interface for transforms
+  ///
+  /// \param expr: the expression to evaluate and find the result of it.
+  ///              This will be the symbol referred to be op0()
+  /// \param operands: an abstract_object (pointer) that represent
+  ///                  the possible values of each operand
+  /// \param environment: the abstract environment in which the
+  ///                     expression is being evaluated
+  /// \param ns: the current variable namespace
+  ///
+  /// \return Returns the abstract_object representing the result of
+  ///         this expression to the maximum precision available.
+  ///
+  /// To try and resolve different expressions with the maximum level
+  /// of precision available.
+  abstract_object_pointert expression_transform(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
+
   /**
    * A helper function to evaluate an abstract object contained
    * within a container object. More precise abstractions may override this

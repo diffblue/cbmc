@@ -78,11 +78,18 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   }
   else if(simplified_id == ID_index)
   {
-    index_exprt index_expr(to_index_expr(simplified_expr));
-    abstract_object_pointert array_abstract_object =
-      eval(index_expr.array(), ns);
+    auto access_expr = (to_binary_expr(simplified_expr));
+    auto target = eval(access_expr.lhs(), ns);
 
-    return array_abstract_object->read(*this, index_expr, ns);
+    std::vector<abstract_object_pointert> operands;
+
+    for(const auto &op : access_expr.operands())
+    {
+      operands.push_back(eval(op, ns));
+    }
+
+    return target->expression_transform(access_expr, operands, *this, ns);
+    //return target->read(*this, access_expr, ns);
   }
   else if(simplified_id == ID_array)
   {
