@@ -99,11 +99,11 @@ public:
   ///
   /// \return A modified abstract object representing this pointer after it
   ///         has been written to.
-  sharing_ptrt<pointer_abstract_objectt> write_dereference(
+  abstract_object_pointert write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
-    const abstract_object_pointert value,
+    const std::stack<exprt> &stack,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   void get_statistics(

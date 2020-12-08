@@ -46,9 +46,9 @@ abstract_object_pointert array_abstract_objectt::read(
 abstract_object_pointert array_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return this->write_index(
@@ -68,12 +68,12 @@ abstract_object_pointert array_abstract_objectt::read_index(
   return env.abstract_object_factory(subtype, ns, !is_bottom(), is_bottom());
 }
 
-sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
+abstract_object_pointert array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const index_exprt &index_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   // TODO(tkiley): Should this in fact havoc since we can't verify
@@ -82,12 +82,11 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   // havoc and the default should derive from this.
   if(is_top() || is_bottom())
   {
-    return std::dynamic_pointer_cast<const array_abstract_objectt>(clone());
+    return shared_from_this();
   }
   else
   {
-    return sharing_ptrt<array_abstract_objectt>(
-      new array_abstract_objectt(type(), true, false));
+    return std::make_shared<array_abstract_objectt>(type(), true, false);
   }
 }
 

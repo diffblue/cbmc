@@ -137,12 +137,12 @@ protected:
   ///         writing to a specific component. In this case this will
   ///         always be top as we are not tracking the value of this
   ///          struct.
-  sharing_ptrt<struct_abstract_objectt> write_component(
+  abstract_object_pointert write_component(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> &stack,
     const member_exprt &member_expr,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   /// Function: full_struct_abstract_objectt::verify

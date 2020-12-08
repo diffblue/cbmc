@@ -66,7 +66,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
 
   if(did_initialize_values)
   {
-    clear_top();
+    set_not_top();
   }
 
   DATA_INVARIANT(verify(), "Structural invariants maintained");
@@ -104,13 +104,12 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   }
 }
 
-sharing_ptrt<struct_abstract_objectt>
-full_struct_abstract_objectt::write_component(
+abstract_object_pointert full_struct_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
   const member_exprt &member_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
 #ifdef DEBUG
@@ -119,9 +118,8 @@ full_struct_abstract_objectt::write_component(
 
   if(is_bottom())
   {
-    return sharing_ptrt<full_struct_abstract_objectt>(
-      new full_struct_abstract_objectt(
-        member_expr.compound().type(), false, true));
+    return std::make_shared<full_struct_abstract_objectt>(
+      member_expr.compound().type(), false, true);
   }
 
   const auto &result =
@@ -146,7 +144,7 @@ full_struct_abstract_objectt::write_component(
         environment.write(old_value.value(), value, stack, ns, merging_write));
     }
 
-    result->clear_top();
+    result->set_not_top();
     DATA_INVARIANT(result->verify(), "Structural invariants maintained");
     return result;
   }
@@ -190,7 +188,7 @@ full_struct_abstract_objectt::write_component(
       {
         result->map.insert(c, value);
       }
-      result->clear_top();
+      result->set_not_top();
       INVARIANT(!result->is_bottom(), "top != bottom");
     }
 

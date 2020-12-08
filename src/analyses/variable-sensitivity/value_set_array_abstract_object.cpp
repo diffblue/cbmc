@@ -25,9 +25,9 @@ abstract_object_pointert value_set_array_abstract_objectt::read(
 abstract_object_pointert value_set_array_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return array_abstract_objectt::write(
@@ -42,13 +42,12 @@ abstract_object_pointert value_set_array_abstract_objectt::read_index(
   return array_abstract_objectt::read_index(env, index, ns);
 }
 
-sharing_ptrt<array_abstract_objectt>
-value_set_array_abstract_objectt::write_index(
+abstract_object_pointert value_set_array_abstract_objectt::write_index(
   abstract_environmentt &environment,
   const namespacet &ns,
-  std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const index_exprt &index_expr,
-  abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return array_abstract_objectt::write_index(

@@ -107,9 +107,9 @@ protected:
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const exprt &specifier,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   static void output_last_written_locations(

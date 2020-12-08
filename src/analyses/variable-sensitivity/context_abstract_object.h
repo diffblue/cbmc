@@ -55,7 +55,7 @@ public:
   {
   }
 
-  virtual const typet &type() const
+  const typet &type() const override
   {
     return child_abstract_object->type();
   }
@@ -104,8 +104,8 @@ protected:
 
   // These are internal hooks that allow sub-classes to perform additional
   // actions when an abstract_object is set/unset to TOP
-  void make_top_internal() override;
-  void clear_top_internal() override;
+  void set_top_internal() override;
+  void set_not_top_internal() override;
 
   abstract_object_pointert read(
     const abstract_environmentt &env,
@@ -115,9 +115,9 @@ protected:
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const exprt &specifier,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   bool has_been_modified(const abstract_object_pointert before) const override;

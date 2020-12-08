@@ -68,7 +68,7 @@ abstract_object_pointert abstract_objectt::abstract_object_merge(
     return this->abstract_object_merge_internal(other);
 
   internal_abstract_object_pointert merged = mutable_clone();
-  merged->make_top();
+  merged->set_top();
   merged->bottom = false;
   return merged->abstract_object_merge_internal(other);
 }
@@ -147,9 +147,9 @@ abstract_object_pointert abstract_objectt::read(
 abstract_object_pointert abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return environment.abstract_object_factory(type(), ns, true);

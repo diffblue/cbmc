@@ -47,9 +47,9 @@ abstract_object_pointert pointer_abstract_objectt::read(
 abstract_object_pointert pointer_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return write_dereference(environment, ns, stack, value, merging_write);
@@ -65,23 +65,23 @@ abstract_object_pointert pointer_abstract_objectt::read_dereference(
   return env.abstract_object_factory(pointed_to_type, ns, true, false);
 }
 
-sharing_ptrt<pointer_abstract_objectt>
-pointer_abstract_objectt::write_dereference(
+#include <iostream>
+
+abstract_object_pointert pointer_abstract_objectt::write_dereference(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
-  const abstract_object_pointert value,
+  const std::stack<exprt> &stack,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   if(is_top() || is_bottom())
   {
     environment.havoc("Writing to a 2value pointer");
-    return std::dynamic_pointer_cast<const pointer_abstract_objectt>(clone());
+    return shared_from_this();
   }
   else
   {
-    return sharing_ptrt<pointer_abstract_objectt>(
-      new pointer_abstract_objectt(type(), true, false));
+    return std::make_shared<pointer_abstract_objectt>(type(), true, false);
   }
 }
 

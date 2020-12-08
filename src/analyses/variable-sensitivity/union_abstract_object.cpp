@@ -47,9 +47,9 @@ abstract_object_pointert union_abstract_objectt::read(
 abstract_object_pointert union_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return write_component(
@@ -65,21 +65,20 @@ abstract_object_pointert union_abstract_objectt::read_component(
     member_expr.type(), ns, !is_bottom(), is_bottom());
 }
 
-sharing_ptrt<union_abstract_objectt> union_abstract_objectt::write_component(
+abstract_object_pointert union_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
   const member_exprt &member_expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   if(is_top() || is_bottom())
   {
-    return std::dynamic_pointer_cast<const union_abstract_objectt>(clone());
+    return shared_from_this();
   }
   else
   {
-    return sharing_ptrt<union_abstract_objectt>(
-      new union_abstract_objectt(type(), true, false));
+    return std::make_shared<union_abstract_objectt>(type(), true, false);
   }
 }

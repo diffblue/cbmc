@@ -79,9 +79,9 @@ public:
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const exprt &specifier,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   void get_statistics(
@@ -120,11 +120,11 @@ protected:
   ///
   /// \return A modified abstract object representing this pointer after it
   ///         has been written to.
-  virtual sharing_ptrt<pointer_abstract_objectt> write_dereference(
+  virtual abstract_object_pointert write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
-    const abstract_object_pointert value,
+    const std::stack<exprt> &stack,
+    const abstract_object_pointert &value,
     bool merging_write) const;
 };
 

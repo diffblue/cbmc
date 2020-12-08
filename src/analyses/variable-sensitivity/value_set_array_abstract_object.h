@@ -29,9 +29,9 @@ public:
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
-    std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const exprt &specifier,
-    abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   CLONE
@@ -41,12 +41,12 @@ protected:
     const index_exprt &index,
     const namespacet &ns) const override;
 
-  sharing_ptrt<array_abstract_objectt> write_index(
+  abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
-    std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const index_exprt &index_expr,
-    abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 };
 

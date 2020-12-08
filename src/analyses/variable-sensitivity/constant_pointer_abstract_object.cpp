@@ -46,11 +46,11 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   PRECONDITION(expr.type().id() == ID_pointer);
   if(value_stack.is_top_value())
   {
-    make_top();
+    set_top();
   }
   else
   {
-    clear_top();
+    set_not_top();
   }
 }
 
@@ -169,12 +169,11 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
   }
 }
 
-sharing_ptrt<pointer_abstract_objectt>
-constant_pointer_abstract_objectt::write_dereference(
+abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
-  const abstract_object_pointert new_value,
+  const std::stack<exprt> &stack,
+  const abstract_object_pointert &new_value,
   bool merging_write) const
 {
   if(is_top() || is_bottom() || value_stack.is_top_value())

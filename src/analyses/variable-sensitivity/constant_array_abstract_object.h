@@ -110,14 +110,14 @@ protected:
   /// \param value: the value we are trying to assign to that value in the array
   /// \param merging_write: Should this and all future writes be merged with the
   ///                       current value
-  /// \return The array_abstract_objectt representing the result of writing
+  /// \return The abstract_object_pointert representing the result of writing
   ///         to a specific index.
-  sharing_ptrt<array_abstract_objectt> write_index(
+  abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const index_exprt &index_expr,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
   /// Tries to do an array/array merge if merging with a constant array
@@ -138,7 +138,7 @@ protected:
 
   /// \brief Perform any additional structural modifications when setting this
   /// object to TOP
-  void make_top_internal() override;
+  void set_top_internal() override;
 
   /// Evaluates the index and tries to convert it to a constant integer
   ///

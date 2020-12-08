@@ -78,9 +78,9 @@ public:
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
-    const std::stack<exprt> stack,
+    const std::stack<exprt> &stack,
     const exprt &specifier,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const override;
 
 protected:
@@ -118,12 +118,12 @@ protected:
   /// \return The union_abstract_objectt representing the result of writing
   ///         to a specific component. In this case this will always be top
   ///         as we are not tracking the value of this union.
-  virtual sharing_ptrt<union_abstract_objectt> write_component(
+  virtual abstract_object_pointert write_component(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> &stack,
     const member_exprt &member_expr,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     bool merging_write) const;
 };
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_UNION_ABSTRACT_OBJECT_H

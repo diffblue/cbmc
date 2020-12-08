@@ -26,9 +26,9 @@ abstract_object_pointert value_set_pointer_abstract_objectt::read(
 abstract_object_pointert value_set_pointer_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return pointer_abstract_objectt::write(
@@ -47,12 +47,11 @@ abstract_object_pointert value_set_pointer_abstract_objectt::read_dereference(
   return pointer_abstract_objectt::read_dereference(env, ns);
 }
 
-sharing_ptrt<pointer_abstract_objectt>
-value_set_pointer_abstract_objectt::write_dereference(
+abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
   abstract_environmentt &environment,
   const namespacet &ns,
-  std::stack<exprt> stack,
-  abstract_object_pointert value,
+  const std::stack<exprt> &stack,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   return pointer_abstract_objectt::write_dereference(

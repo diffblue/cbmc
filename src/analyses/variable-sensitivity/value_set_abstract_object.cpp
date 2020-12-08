@@ -126,9 +126,9 @@ abstract_object_pointert value_set_abstract_objectt::read(
 abstract_object_pointert value_set_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
-  const std::stack<exprt> stack,
+  const std::stack<exprt> &stack,
   const exprt &specifier,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   bool merging_write) const
 {
   abstract_object_sett new_values;
@@ -174,7 +174,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
     unwrapped_values.size() > max_value_set_size ||
     new_type == abstract_typet::UNSUPPORTED)
   {
-    result->make_top();
+    result->set_top();
   }
   else
   {
