@@ -51,7 +51,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
       return found_symbol_value;
     }
   }
-  else if(simplified_id == ID_member)
+  else if(simplified_id == ID_member || simplified_id == ID_index)
   {
     auto access_expr = simplified_expr;
     auto target = eval(access_expr.operands()[0], ns);
@@ -80,20 +80,6 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
       eval(dereference.pointer(), ns);
 
     return pointer_abstract_object->read(*this, nil_exprt(), ns);
-  }
-  else if(simplified_id == ID_index)
-  {
-    auto access_expr = (to_binary_expr(simplified_expr));
-    auto target = eval(access_expr.lhs(), ns);
-
-    std::vector<abstract_object_pointert> operands;
-
-    for(const auto &op : access_expr.operands())
-    {
-      operands.push_back(eval(op, ns));
-    }
-
-    return target->expression_transform(access_expr, operands, *this, ns);
   }
   else if(simplified_id == ID_array)
   {
