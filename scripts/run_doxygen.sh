@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Running doxygen version $(doxygen --version)"
+
 # Check doxygen version
 EXPECTED_VERSION="1.8.16"
 doxygen --version | grep ^$EXPECTED_VERSION > /dev/null
