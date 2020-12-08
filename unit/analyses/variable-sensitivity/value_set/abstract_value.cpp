@@ -69,11 +69,12 @@ public:
 
 std::unique_ptr<variable_sensitivity_domain_factoryt> domain_factory()
 {
+  auto configuration = vsd_configt{};
   auto vs_object_factory =
-    std::make_shared<variable_sensitivity_object_factoryt>(vsd_configt{});
+    std::make_shared<variable_sensitivity_object_factoryt>(configuration);
 
   return util_make_unique<variable_sensitivity_domain_factoryt>(
-    vs_object_factory);
+    vs_object_factory, configuration);
 }
 
 TEST_CASE(

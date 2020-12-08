@@ -70,13 +70,16 @@
 
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
   explicit variable_sensitivity_domaint(
-    variable_sensitivity_object_factory_ptrt _object_factory)
-    : abstract_state(_object_factory)
+    variable_sensitivity_object_factory_ptrt _object_factory,
+    const vsd_configt &_configuration)
+    : abstract_state(_object_factory),
+      flow_sensitivity(_configuration.flow_sensitivity)
   {
   }
 
@@ -211,6 +214,7 @@ private:
     const namespacet &ns);
 
   abstract_environmentt abstract_state;
+  flow_sensitivityt flow_sensitivity;
 
 #ifdef ENABLE_STATS
 public:
@@ -223,20 +227,23 @@ class variable_sensitivity_domain_factoryt
 {
 public:
   explicit variable_sensitivity_domain_factoryt(
-    variable_sensitivity_object_factory_ptrt _object_factory)
-    : object_factory(_object_factory)
+    variable_sensitivity_object_factory_ptrt _object_factory,
+    const vsd_configt &_configuration)
+    : object_factory(_object_factory), configuration(_configuration)
   {
   }
 
   std::unique_ptr<statet> make(locationt l) const override
   {
-    auto d = util_make_unique<variable_sensitivity_domaint>(object_factory);
+    auto d = util_make_unique<variable_sensitivity_domaint>(
+      object_factory, configuration);
     CHECK_RETURN(d->is_bottom());
     return std::unique_ptr<statet>(d.release());
   }
 
 private:
   variable_sensitivity_object_factory_ptrt object_factory;
+  const vsd_configt configuration;
 };
 
 #ifdef ENABLE_STATS

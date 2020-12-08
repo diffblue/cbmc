@@ -52,6 +52,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_control_flow_history.h>
 #include <analyses/local_may_alias.h>
 #include <analyses/variable-sensitivity/three_way_merge_abstract_interpreter.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
@@ -72,6 +73,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "static_verifier.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
+
+void vsd_options(optionst &options, const cmdlinet &cmdline);
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
@@ -365,29 +368,17 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     else if(cmdline.isset("vsd") || cmdline.isset("variable-sensitivity"))
     {
       options.set_option("vsd", true);
-      options.set_option("domain set", true);
-
-      // Configuration of VSD
-      options.set_option("values", cmdline.get_value("vsd-values"));
-      options.set_option("pointers", cmdline.get_value("vsd-pointers"));
-      options.set_option("arrays", cmdline.get_value("vsd-arrays"));
-      options.set_option("structs", cmdline.get_value("vsd-structs"));
-      options.set_option("unions", cmdline.get_value("vsd-unions"));
       options.set_option(
         "data-dependencies", cmdline.isset("vsd-data-dependencies"));
+
+      vsd_options(options, cmdline);
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
       options.set_option("dependence-graph-vs", true);
-      options.set_option("domain set", true);
-
-      // Configuration of variable sensitivity domain
-      options.set_option("values", cmdline.get_value("vsd-values"));
-      options.set_option("pointers", cmdline.get_value("vsd-pointers"));
-      options.set_option("arrays", cmdline.get_value("vsd-arrays"));
-      options.set_option("structs", cmdline.get_value("vsd-structs"));
-      options.set_option("unions", cmdline.get_value("vsd-unions"));
       options.set_option("data-dependencies", true);
+
+      vsd_options(options, cmdline);
     }
 
     // Reachability questions, when given with a domain swap from specific
@@ -492,7 +483,7 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     else if(options.get_bool_option("vsd"))
     {
       df = util_make_unique<variable_sensitivity_domain_factoryt>(
-        vs_object_factory);
+        vs_object_factory, vsd_config);
     }
     // non-null is not fully supported, despite the historical options
     // dependency-graph is quite heavily tied to the legacy-ait infrastructure
@@ -543,12 +534,12 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
     else if(options.get_bool_option("dependence-graph-vs"))
     {
       return new variable_sensitivity_dependence_grapht(
-        goto_model.goto_functions, ns, vs_object_factory);
+        goto_model.goto_functions, ns, vs_object_factory, vsd_config);
     }
     else if(options.get_bool_option("vsd"))
     {
       auto df = util_make_unique<variable_sensitivity_domain_factoryt>(
-        vs_object_factory);
+        vs_object_factory, vsd_config);
       return new ait<variable_sensitivity_domaint>(std::move(df));
     }
     else if(options.get_bool_option("intervals"))
@@ -998,6 +989,7 @@ void goto_analyzer_parse_optionst::help()
     " --vsd-arrays                 array entry sensitive analysis - top-bottom|every-element\n"
     " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n"
     " --vsd-unions                 union sensitive analysis - top-bottom\n"
+    " --vsd-flow-insensitive       disables flow sensitivity\n"
     " --vsd-data-dependencies      track data dependencies\n"
     "\n"
     "Storage options:\n"
@@ -1063,4 +1055,17 @@ void goto_analyzer_parse_optionst::help()
     HELP_TIMESTAMP
     "\n";
   // clang-format on
+}
+
+void vsd_options(optionst &options, const cmdlinet &cmdline)
+{
+  options.set_option("domain set", true);
+
+  // Configuration of VSD
+  options.set_option("values", cmdline.get_value("vsd-values"));
+  options.set_option("pointers", cmdline.get_value("vsd-pointers"));
+  options.set_option("arrays", cmdline.get_value("vsd-arrays"));
+  options.set_option("structs", cmdline.get_value("vsd-structs"));
+  options.set_option("unions", cmdline.get_value("vsd-unions"));
+  options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive"));
 }

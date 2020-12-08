@@ -1,0 +1,10 @@
+CORE
+main.c
+--variable-sensitivity --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion y != 0: SUCCESS$
+^\[main\.assertion\.2\] .* assertion y == 0: SUCCESS \(unreachable\)$
+^\[main\.assertion\.3\] .* assertion z == 1: SUCCESS$
+--
+^warning: ignoring
