@@ -53,12 +53,17 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   }
   else if(simplified_id == ID_member)
   {
-    member_exprt member_expr(to_member_expr(simplified_expr));
+    auto access_expr = simplified_expr;
+    auto target = eval(access_expr.operands()[0], ns);
 
-    const exprt &parent = member_expr.compound();
+    std::vector<abstract_object_pointert> operands;
 
-    abstract_object_pointert parent_abstract_object = eval(parent, ns);
-    return parent_abstract_object->read(*this, member_expr, ns);
+    for(const auto &op : access_expr.operands())
+    {
+      operands.push_back(eval(op, ns));
+    }
+
+    return target->expression_transform(access_expr, operands, *this, ns);
   }
   else if(simplified_id == ID_address_of)
   {
@@ -89,7 +94,6 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     }
 
     return target->expression_transform(access_expr, operands, *this, ns);
-    //return target->read(*this, access_expr, ns);
   }
   else if(simplified_id == ID_array)
   {
