@@ -27,6 +27,11 @@
 #  include <iostream>
 #endif
 
+std::vector<abstract_object_pointert> eval_operands(
+  const exprt &expr,
+  const abstract_environmentt &env,
+  const namespacet &ns);
+
 abstract_object_pointert
 abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 {
@@ -56,14 +61,11 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     auto access_expr = simplified_expr;
     auto target = eval(access_expr.operands()[0], ns);
 
-    std::vector<abstract_object_pointert> operands;
-
-    for(const auto &op : access_expr.operands())
-    {
-      operands.push_back(eval(op, ns));
-    }
-
-    return target->expression_transform(access_expr, operands, *this, ns);
+    return target->expression_transform(
+      access_expr,
+      eval_operands(access_expr, *this, ns),
+      *this,
+      ns);
   }
   else if(simplified_id == ID_address_of)
   {
@@ -428,14 +430,11 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   abstract_object_pointert eval_obj =
     abstract_object_factory(e.type(), ns, true);
 
-  std::vector<abstract_object_pointert> operands;
-
-  for(const auto &op : e.operands())
-  {
-    operands.push_back(eval(op, ns));
-  }
-
-  return eval_obj->expression_transform(e, operands, *this, ns);
+  return eval_obj->expression_transform(
+    e,
+    eval_operands(e, *this, ns),
+    *this,
+    ns);
 }
 
 void abstract_environmentt::erase(const symbol_exprt &expr)
@@ -507,3 +506,17 @@ abstract_environmentt::gather_statistics(const namespacet &ns) const
   }
   return statistics;
 }
+
+std::vector<abstract_object_pointert> eval_operands(
+  const exprt &expr,
+  const abstract_environmentt &env,
+  const namespacet &ns)
+{
+  std::vector<abstract_object_pointert> operands;
+
+  for(const auto &op : expr.operands())
+    operands.push_back(env.eval(op, ns));
+
+  return operands;
+}
+
