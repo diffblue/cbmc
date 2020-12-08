@@ -14,14 +14,6 @@ value_set_array_abstract_objectt::value_set_array_abstract_objectt(
 {
 }
 
-abstract_object_pointert value_set_array_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return array_abstract_objectt::read(env, specifier, ns);
-}
-
 abstract_object_pointert value_set_array_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -32,14 +24,6 @@ abstract_object_pointert value_set_array_abstract_objectt::write(
 {
   return array_abstract_objectt::write(
     environment, ns, stack, specifier, value, merging_write);
-}
-
-abstract_object_pointert value_set_array_abstract_objectt::read_index(
-  const abstract_environmentt &env,
-  const index_exprt &index,
-  const namespacet &ns) const
-{
-  return array_abstract_objectt::read_index(env, index, ns);
 }
 
 abstract_object_pointert value_set_array_abstract_objectt::write_index(
