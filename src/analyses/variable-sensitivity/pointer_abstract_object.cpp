@@ -36,6 +36,24 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   PRECONDITION(e.type().id() == ID_pointer);
 }
 
+abstract_object_pointert pointer_abstract_objectt::expression_transform(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  if (expr.id() == ID_dereference)
+  {
+    return read(environment, expr, ns);
+  }
+
+  return abstract_objectt::expression_transform(
+    expr,
+    operands,
+    environment,
+    ns);
+}
+
 abstract_object_pointert pointer_abstract_objectt::read(
   const abstract_environmentt &env,
   const exprt &specifier,

@@ -37,21 +37,6 @@ struct_abstract_objectt::struct_abstract_objectt(
   PRECONDITION(ns.follow(e.type()).id() == ID_struct);
 }
 
-/// Interface for transforms
-///
-/// \param expr: the expression to evaluate and find the result of it.
-///              This will be the symbol referred to be op0()
-/// \param operands: an abstract_object (pointer) that represent
-///                  the possible values of each operand
-/// \param environment: the abstract environment in which the
-///                     expression is being evaluated
-/// \param ns: the current variable namespace
-///
-/// \return Returns the abstract_object representing the result of
-///         this expression to the maximum precision available.
-///
-/// To try and resolve different expressions with the maximum level
-/// of precision available.
 abstract_object_pointert struct_abstract_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,

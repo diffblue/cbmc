@@ -51,7 +51,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
       return found_symbol_value;
     }
   }
-  else if(simplified_id == ID_member || simplified_id == ID_index)
+  else if(simplified_id == ID_member || simplified_id == ID_index || simplified_id == ID_dereference)
   {
     auto access_expr = simplified_expr;
     auto target = eval(access_expr.operands()[0], ns);
@@ -72,14 +72,6 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 
     // Store the abstract object in the pointer
     return pointer_object;
-  }
-  else if(simplified_id == ID_dereference)
-  {
-    dereference_exprt dereference(to_dereference_expr(simplified_expr));
-    abstract_object_pointert pointer_abstract_object =
-      eval(dereference.pointer(), ns);
-
-    return pointer_abstract_object->read(*this, nil_exprt(), ns);
   }
   else if(simplified_id == ID_array)
   {
