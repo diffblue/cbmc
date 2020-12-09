@@ -17,10 +17,6 @@
 /home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.h:210: warning: end of comment block while expecting command </tt>
 /home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_object_factory.cpp:1624: warning: documented empty return type of gen_nondet_init
 /home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_object_factory.h:111: warning: documented empty return type of gen_nondet_init
-/home/runner/work/cbmc/cbmc/src/goto-programs/link_to_library.cpp:18: warning: argument 'library' of command @param is not found in the argument list of link_to_library(goto_modelt &goto_model, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
-/home/runner/work/cbmc/cbmc/src/goto-programs/link_to_library.cpp:90: warning: argument 'library' of command @param is not found in the argument list of link_to_library(symbol_tablet &symbol_table, goto_functionst &goto_functions, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
-/home/runner/work/cbmc/cbmc/src/goto-programs/link_to_library.cpp:18: warning: argument 'library' of command @param is not found in the argument list of link_to_library(goto_modelt &goto_model, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
-/home/runner/work/cbmc/cbmc/src/goto-programs/link_to_library.cpp:90: warning: argument 'library' of command @param is not found in the argument list of link_to_library(symbol_tablet &symbol_table, goto_functionst &goto_functions, message_handlert &message_handler, const std::function< void(const std::set< irep_idt > &, symbol_tablet &, message_handlert &) &
 /home/runner/work/cbmc/cbmc/src/goto-programs/remove_unreachable.cpp:64: warning: documented empty return type of remove_unreachable
 /home/runner/work/cbmc/cbmc/src/goto-programs/remove_unreachable.h:19: warning: documented empty return type of remove_unreachable
 /home/runner/work/cbmc/cbmc/src/goto-symex/slice.cpp:217: warning: documented empty return type of collect_open_variables
@@ -30,10 +26,8 @@
 /home/runner/work/cbmc/cbmc/src/solvers/strings/string_constraint_instantiation.h:27: warning: argument 'axiom' from the argument list of instantiate has multiple @param documentation sections
 /home/runner/work/cbmc/cbmc/src/solvers/strings/string_constraint_instantiation.h:27: warning: argument 'str' from the argument list of instantiate has multiple @param documentation sections
 /home/runner/work/cbmc/cbmc/src/solvers/strings/string_constraint_instantiation.h:27: warning: argument 'val' from the argument list of instantiate has multiple @param documentation sections
-/home/runner/work/cbmc/cbmc/src/solvers/strings/string_refinement.cpp:300: warning: documented empty return type of  add_equations_for_symbol_resolution
 /home/runner/work/cbmc/cbmc/src/solvers/strings/string_refinement.cpp:229: warning: Invalid list item found
 /home/runner/work/cbmc/cbmc/src/util/c_types_util.h:120: warning: argument 'type' from the argument list of from_c_boolean_value has multiple @param documentation sections
-/home/runner/work/cbmc/cbmc/src/util/graph.h:562: warning: argument 'for_each_successor' of command @param is not found in the argument list of get_reachable(Container &set, const std::function< void(const typename Container::value_type &, const std::function< void(const typename Container::value_type &)> &) &
 /home/runner/work/cbmc/cbmc/src/util/rename.cpp:27: warning: documented empty return type of get_new_name
 /home/runner/work/cbmc/cbmc/src/util/rename.cpp:19: warning: documented empty return type of get_new_name
 /home/runner/work/cbmc/cbmc/src/util/rename.h:26: warning: documented empty return type of get_new_name
@@ -56,17 +50,52 @@
 /home/runner/work/cbmc/cbmc/src/goto-instrument/dot.cpp:59: warning: documented empty return type of dott::find_next
 /home/runner/work/cbmc/cbmc/src/goto-instrument/dot.cpp:48: warning: documented empty return type of dott::write_dot_subgraph
 /home/runner/work/cbmc/cbmc/src/goto-instrument/dot.cpp:54: warning: documented empty return type of dott::write_edge
-/home/runner/work/cbmc/cbmc/src/goto-cc/goto_cc_mode.h:28: warning: documented empty return type of  goto_cc_modet::usage_error
 /home/runner/work/cbmc/cbmc/src/goto-symex/goto_symex.h:693: warning: argument 'state' from the argument list of goto_symext::symex_cpp_new has multiple @param documentation sections
 /home/runner/work/cbmc/cbmc/src/goto-symex/goto_symex.h:693: warning: argument 'lhs' from the argument list of goto_symext::symex_cpp_new has multiple @param documentation sections
 /home/runner/work/cbmc/cbmc/src/goto-symex/goto_symex.h:693: warning: argument 'code' from the argument list of goto_symext::symex_cpp_new has multiple @param documentation sections
-/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_bytecode_language.h:194: warning: documented empty return type of  java_bytecode_languaget::methods_provided
 /home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.cpp:675: warning: found </tt> tag without matching <tt>
 /home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.cpp:676: warning: found </tt> tag without matching <tt>
 /home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.cpp:677: warning: found </tt> tag without matching <tt>
 /home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.cpp:679: warning: found </tt> tag without matching <tt>
-/home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.h:221: warning: The following parameters of rd_range_domaint::merge(const rd_range_domaint &other, locationt from, locationt to) is not documented:
+/home/runner/work/cbmc/cbmc/src/analyses/reaching_definitions.h:221: warning: The following parameter of rd_range_domaint::merge(const rd_range_domaint &other, locationt from, locationt to) is not documented:
   parameter 'other'
 /home/runner/work/cbmc/cbmc/src/solvers/smt2/smt2_conv.h:113: warning: documented empty return type of smt2_convt::convert_rounding_mode_FPA
 /home/runner/work/cbmc/cbmc/src/goto-symex/symex_slice_class.h:25: warning: documented empty return type of symex_slicet::collect_open_variables
 /home/runner/work/cbmc/cbmc/src/goto-instrument/cover_basic_blocks.h:122: warning: argument 'block.' of command @param is not found in the argument list of cover_basic_blockst::add_block_lines(cover_basic_blockst::block_infot &block, const goto_programt::instructiont &instruction)
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_domain.h:91: warning: The following parameters of variable_sensitivity_domaint::transform(const irep_idt &function_from, trace_ptrt trace_from, const irep_idt &function_to, trace_ptrt trace_to, ai_baset &ai, const namespacet &ns) are not documented:
+  parameter 'trace_from'
+  parameter 'trace_to'
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_domain.h:83: warning: argument 'to' of command @param is not found in the argument list of variable_sensitivity_domaint::transform(const irep_idt &function_from, trace_ptrt trace_from, const irep_idt &function_to, trace_ptrt trace_to, ai_baset &ai, const namespacet &ns)
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_domain.h:83: warning: argument 'from' of command @param is not found in the argument list of variable_sensitivity_domaint::transform(const irep_idt &function_from, trace_ptrt trace_from, const irep_idt &function_to, trace_ptrt trace_to, ai_baset &ai, const namespacet &ns)
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h:87: warning: The following parameters of variable_sensitivity_dependence_domaint::transform(const irep_idt &function_from, trace_ptrt trace_from, const irep_idt &function_to, trace_ptrt trace_to, ai_baset &ai, const namespacet &ns) are not documented:
+  parameter 'trace_from'
+  parameter 'trace_to'
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_dependence_graph.cpp:53: warning: argument 'to' of command @param is not found in the argument list of variable_sensitivity_dependence_domaint::transform(const irep_idt &function_from, trace_ptrt trace_from, const irep_idt &function_to, trace_ptrt trace_to, ai_baset &ai, const namespacet &ns)
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_dependence_graph.cpp:53: warning: argument 'from' of command @param is not found in the argument list of variable_sensitivity_dependence_domaint::transform(const irep_idt &function_from, trace_ptrt trace_from, const irep_idt &function_to, trace_ptrt trace_to, ai_baset &ai, const namespacet &ns)
+/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_class_loader.h:80: warning: The following parameter of java_class_loadert::load_entire_jar(const std::string &jar_path, message_handlert &message_handler) is not documented:
+  parameter 'message_handler'
+/home/runner/work/cbmc/cbmc/src/goto-instrument/cover_basic_blocks.h:123: warning: The following parameter of cover_basic_blockst::add_block_lines(cover_basic_blockst::block_infot &block, const goto_programt::instructiont &instruction) is not documented:
+  parameter 'block'
+/home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_object_factory.cpp:188: warning: The following parameter of initialize_abstract_object(const typet type, bool top, bool bottom, const exprt &e, const abstract_environmentt &environment, const namespacet &ns, const vsd_configt &configuration) is not documented:
+  parameter 'configuration'
+
+warning: Include graph for 'cbmc_parse_options.cpp' not generated, too many nodes (61), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Include graph for 'goto_instrument_parse_options.cpp' not generated, too many nodes (97), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'goto_functions.h' not generated, too many nodes (66), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'goto_model.h' not generated, too many nodes (109), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'arith_tools.h' not generated, too many nodes (181), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'c_types.h' not generated, too many nodes (110), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'config.h' not generated, too many nodes (83), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'exception_utils.h' not generated, too many nodes (61), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'expr.h' not generated, too many nodes (88), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'expr_util.h' not generated, too many nodes (60), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'invariant.h' not generated, too many nodes (187), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'irep.h' not generated, too many nodes (62), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'message.h' not generated, too many nodes (115), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'namespace.h' not generated, too many nodes (111), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'prefix.h' not generated, too many nodes (86), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'simplify_expr.h' not generated, too many nodes (76), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'std_code.h' not generated, too many nodes (78), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'std_expr.h' not generated, too many nodes (245), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'std_types.h' not generated, too many nodes (124), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'symbol_table.h' not generated, too many nodes (95), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
