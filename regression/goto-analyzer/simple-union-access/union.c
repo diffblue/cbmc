@@ -3,8 +3,7 @@
 int main(int argc, char *argv[])
 {
   // Test if we can represent constant structs
-  union union_struct
-  {
+  union union_struct {
     int a;
     int b;
   };

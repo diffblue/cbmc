@@ -41,16 +41,13 @@ abstract_object_pointert array_abstract_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  if (expr.id() == ID_index)
+  if(expr.id() == ID_index)
   {
     return read(environment, expr, ns);
   }
 
   return abstract_objectt::expression_transform(
-      expr,
-      operands,
-      environment,
-      ns);
+    expr, operands, environment, ns);
 }
 
 abstract_object_pointert array_abstract_objectt::read(

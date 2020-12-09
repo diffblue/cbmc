@@ -63,7 +63,6 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
-
   /**
    * A helper function to evaluate an abstract object contained
    * within a container object. More precise abstractions may override this

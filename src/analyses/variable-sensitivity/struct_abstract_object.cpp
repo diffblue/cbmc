@@ -43,16 +43,13 @@ abstract_object_pointert struct_abstract_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  if (expr.id() == ID_member)
+  if(expr.id() == ID_member)
   {
     return read(environment, expr, ns);
   }
 
   return abstract_objectt::expression_transform(
-    expr,
-    operands,
-    environment,
-    ns);
+    expr, operands, environment, ns);
 }
 
 abstract_object_pointert struct_abstract_objectt::read(
