@@ -1,0 +1,24 @@
+name: Create release tag
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.33.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: none
+        # Marking as "DRY_RUN" until confirmed that it works as expected
+        DRY_RUN: true
+    - name: Debug output
+      run: |
+        echo "Newly created tag: $new_tag"
+        echo "Tag after this action: $tag"
+        echo "Updated part: $part"

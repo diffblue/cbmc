@@ -11,12 +11,9 @@ The current process we follow through to make a new release is the following:
 1. At the point in time we want to make the release, we make a change to 
    `src/config.inc`, and update the configuration variable `CBMC_VERSION`.
    This is important as it informs the various tools of the current version
-   of CBMC.
-
-   (This needs to be pushed as a PR, and after it gets merged we move on to:)
-
-2. Then we make a `git tag` out of that commit, and push it to github. The
-   tag needs to be of the form `cbmc-<version>` with version being a version
+   of CBMC. The commit message must then contain one of #major, #minor, or
+   #patch to inform the GitHub action that automatically creates a release tag.
+   The tag is of the form `cbmc-<version>`, with `<version>` being a version
    number of the form of `x.y.z`, with `x` denoting the major version, `y`
    denoting the minor version, and `z` identifying the patch version (useful
    for a hotfix or patch.)
@@ -24,12 +21,12 @@ The current process we follow through to make a new release is the following:
 At this point, the rest of the process is automated, so we don't need to do
 anything more, but the process is described below for reference:
 
-3. `.github/workflows/regular-release.yaml` gets triggered on the `push`
+2. `.github/workflows/regular-release.yaml` gets triggered on the `push`
    of the tag, and creates a Github release of the version that was
    described in thetag pushed (so, tag `cbmc-5.15.20` is going to
    create the release titled `cbmc-5.15.20` on the release page).
 
-4. `.github/workflows/release-packages.yaml` gets triggered automatically
+3. `.github/workflows/release-packages.yaml` gets triggered automatically
    at the creation of the release, and its job is to build packages for
    Windows, Ubuntu 18.04 and Ubuntu 20.04 (for now, we may support more
    specific Ubuntu versions later) and attaches them (after it has finished
