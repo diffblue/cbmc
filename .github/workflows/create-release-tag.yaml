@@ -15,6 +15,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DEFAULT_BUMP: none
+        VERBOSE: false
         # Marking as "DRY_RUN" until confirmed that it works as expected
         DRY_RUN: true
     - name: Debug output
