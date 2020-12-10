@@ -1,0 +1,34 @@
+name: Create release tag
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - name: Compute new tag
+      uses: anothrNick/github-tag-action@1.33.0
+      id: dry_run
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: none
+        RELEASE_BRANCHES: develop
+        VERBOSE: false
+        DRY_RUN: true
+    - if: ${{ steps.dry_run.new_tag != "" }}
+      run: |
+        v=$(grep ^CBMC_VERSION src/config.inc | perl -p -e 's/^CBMC_VERSION\s*=\s*//')
+        echo "CBMC_VERSION: $v"
+        echo "New tag: ${{ steps.dry_run.new_tag }}"
+        test "cbmc-$v" == ${{ steps.dry_run.new_tag }}
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.33.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: none
+        RELEASE_BRANCHES: develop
+        VERBOSE: false
