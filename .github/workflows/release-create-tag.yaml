@@ -1,0 +1,28 @@
+name: Create release tag
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'src/config.inc'
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '0'
+    - name: Get version
+      run: |
+        v=$(grep ^CBMC_VERSION src/config.inc | perl -p -e 's/^CBMC_VERSION\s*=\s*//')
+        echo "CBMC_VERSION=$v" >> $GITHUB_ENV
+    - name: Set new tag
+      uses: anothrNick/github-tag-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_BRANCHES: develop
+        CUSTOM_TAG: cbmc-${{ env.CBMC_VERSION }}
+        VERBOSE: false
+        DRY_RUN: true
