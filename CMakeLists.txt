@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 
+# Build a Release version by default (default build flags for each build type
+# are configured below).
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
+    if (NOT CMAKE_BUILD_TYPE)
+        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+    endif()
+endif()
 
 # Grab the current CBMC version from config.inc
 # We do this so we have a matching cbmc version between the Makefile build and

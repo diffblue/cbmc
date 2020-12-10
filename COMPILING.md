@@ -266,7 +266,8 @@ require manual modification of build files.
    Generally it is not necessary to manually specify individual compiler or
    linker flags, as CMake defines a number of "build modes" including Debug and
    Release modes. To build in a particular mode, add the flag
-   `-DCMAKE_BUILD_TYPE=Debug` (or `Release`) to the initial invocation.
+   `-DCMAKE_BUILD_TYPE=Debug` (or `RelWithDebInfo`) to the initial invocation.
+   The default is to perform an optimized build via the `Release` configuration.
 
    If you *do* need to manually add flags, use `-DCMAKE_CXX_FLAGS=...` and
    `-DCMAKE_EXE_LINKER_FLAGS=...`. This is useful for enabling clang's
