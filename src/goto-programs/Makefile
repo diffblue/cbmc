@@ -68,7 +68,6 @@ SRC = add_malloc_may_fail_variable_initializations.cpp \
       structured_trace_util.cpp \
       system_library_symbols.cpp \
       validate_goto_model.cpp \
-      vcd_goto_trace.cpp \
       wp.cpp \
       write_goto_binary.cpp \
       xml_expr.cpp \
