@@ -1,0 +1,19 @@
+name: doxygen-check
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  check-doxygen:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Fetch dependencies
+      env:
+        # This is needed in addition to -yq to prevent apt-get from asking for
+        # user input
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get install -yq doxygen graphviz
+    - name: Run Doxygen
+      run: ./scripts/run_doxygen.sh
