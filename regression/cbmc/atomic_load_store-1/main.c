@@ -15,6 +15,10 @@ int main()
   assert(__atomic_exchange_n(&x, 42, 0) == x_before);
   __atomic_exchange(&x, &v, &x_before, 0);
 
+  int v2 = x == 0;
+  assert(!__atomic_compare_exchange_n(&x, &v2, 42, 0, 0, 0));
+  assert(v2 == x);
+
   assert(__atomic_compare_exchange_n(&x, &v, 42, 0, 0, 0));
   v = 42;
   assert(__atomic_compare_exchange(&x, &v, &v, 0, 0, 0));
