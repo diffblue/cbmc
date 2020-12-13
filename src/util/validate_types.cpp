@@ -52,6 +52,10 @@ void call_on_type(const typet &type, Args &&... args)
   {
     CALL_ON_TYPE(c_bool_typet);
   }
+  else if(type.id() == ID_array)
+  {
+    CALL_ON_TYPE(array_typet);
+  }
   else
   {
 #ifdef REPORT_UNIMPLEMENTED_TYPE_CHECKS

@@ -984,6 +984,10 @@ public:
   {
     return size().is_nil();
   }
+
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT);
 };
 
 /// Check whether a reference to a typet is a \ref array_typet.

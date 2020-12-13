@@ -263,6 +263,10 @@ bool check_renaming(const exprt &expr)
     if(to_ssa_expr(expr).get_original_expr().type() != type)
       return true;
   }
+  else if(expr.id() == ID_nil)
+  {
+    return expr != nil_exprt{};
+  }
   else
   {
     forall_operands(it, expr)

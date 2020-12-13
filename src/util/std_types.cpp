@@ -18,6 +18,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string2int.h"
 
+void array_typet::check(const typet &type, const validation_modet vm)
+{
+  PRECONDITION(type.id() == ID_array);
+  const array_typet &array_type = static_cast<const array_typet &>(type);
+  if(array_type.size().is_nil())
+  {
+    DATA_CHECK(
+      vm,
+      array_type.size() == nil_exprt{},
+      "nil array size must be exactly nil");
+  }
+}
+
 std::size_t fixedbv_typet::get_integer_bits() const
 {
   const irep_idt integer_bits=get(ID_integer_bits);
