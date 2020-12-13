@@ -1556,6 +1556,19 @@ public:
   {
     set(ID_C_reference, true);
   }
+
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    PRECONDITION(type.id() == ID_pointer);
+    const reference_typet &reference_type =
+      static_cast<const reference_typet &>(type);
+    DATA_CHECK(
+      vm, !reference_type.get(ID_width).empty(), "reference must have width");
+    DATA_CHECK(
+      vm, reference_type.get_width() > 0, "reference must have non-zero width");
+  }
 };
 
 /// Check whether a reference to a typet is a \ref reference_typet.
@@ -1565,12 +1578,6 @@ template <>
 inline bool can_cast_type<reference_typet>(const typet &type)
 {
   return can_cast_type<pointer_typet>(type) && type.get_bool(ID_C_reference);
-}
-
-inline void validate_type(const reference_typet &type)
-{
-  DATA_INVARIANT(!type.get(ID_width).empty(), "reference must have width");
-  DATA_INVARIANT(type.get_width() > 0, "reference must have non-zero width");
 }
 
 /// \brief Cast a typet to a \ref reference_typet
