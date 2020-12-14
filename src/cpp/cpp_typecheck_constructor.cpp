@@ -410,12 +410,12 @@ void cpp_typecheckt::default_assignop_value(
 }
 
 /// Check a constructor initialization-list. An initializer has to be a data
-/// member declared in this class or a direct-parent constructor.
+/// member declared in this class or a direct-parent constructor. If an invalid
+/// initializer is found, then the method outputs an error message and throws
+/// a 0 exception.
 /// \param bases: the parents of the class
 /// \param components: the components of the class
 /// \param initializers: the constructor initializers
-/// \return If an invalid initializer is found, then the method outputs an error
-///   message and throws a 0 exception.
 void cpp_typecheckt::check_member_initializers(
   const struct_typet::basest &bases,
   const struct_typet::componentst &components,
@@ -540,8 +540,7 @@ void cpp_typecheckt::check_member_initializers(
 ///
 ///    Note: The initialization order follows the declaration order.
 /// \param struct_union_type: the class/struct/union
-/// \param initializers: the constructor initializers
-/// \return initializers is updated.
+/// \param [out] initializers: the constructor initializers
 void cpp_typecheckt::full_member_initialization(
   const struct_union_typet &struct_union_type,
   irept &initializers)

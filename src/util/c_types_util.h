@@ -116,7 +116,7 @@ inline bool id2boolean(const std::string &bool_value)
 /// type type.
 /// \param bool_value: A Boolean value.
 /// \param type: The type, the resulting constant is supposed to have.
-/// \return a constant of type \param type with either 0 or 1 as value.
+/// \return a constant of type \p type with either 0 or 1 as value.
 inline constant_exprt from_c_boolean_value(bool bool_value, const typet &type)
 {
   return bool_value ? from_integer(mp_integer(1), type)

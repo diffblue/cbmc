@@ -61,6 +61,7 @@ abstract_object_pointert wrap_with_context_object(
 ///           starting pointer for the abstract object
 /// \param environment: the current abstract environment
 /// \param ns: namespace, used when following the input type
+/// \param configuration: variable sensitivity domain configuration
 ///
 /// \return An abstract object of the appropriate type.
 ///

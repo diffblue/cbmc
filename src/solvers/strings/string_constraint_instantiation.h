@@ -15,13 +15,19 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #include "string_constraint.h"
 #include "string_constraint_generator.h"
 
-/// Substitute `qvar` the universally quantified variable of `axiom`, by
-/// an index `val`, in `axiom`, so that the index used for `str` equals `val`.
+/// Instantiates a string constraint by substituting the quantifiers.
+/// For a string constraint of the form \f$\forall q. P(x)\f$,
+/// substitute `q` the universally quantified variable of `axiom`, by
+/// an `index`, in `axiom`, so that the index used for `str` equals `val`.
 /// For instance, if `axiom` corresponds to \f$\forall q.\ s[q+x]='a' \land
 /// t[q]='b'\f$, `instantiate(axiom,s,v)` would return an expression for
 /// \f$s[v]='a' \land t[v-x]='b'\f$.
+/// If there are several such indexes, the conjunction of the instantiations is
+/// returned, for instance for a formula:
+/// \f$\forall q. s[q+x]='a' \land s[q]=c\f$ we would get
+/// \f$s[v] = 'a' \land s[v-x] = c \land s[v+x] = 'a' \land s[v] = c\f$.
 /// \param axiom: a universally quantified formula
-/// \param str: an array of char variable
+/// \param str: an array of characters
 /// \param val: an index expression
 /// \return `axiom` with substitued `qvar`
 exprt instantiate(

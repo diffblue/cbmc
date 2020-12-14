@@ -589,7 +589,6 @@ void configt::ansi_ct::set_arch_spec_x32()
 }
 
 /// Sets up the widths of variables for the Renesas V850
-/// \return None
 void configt::ansi_ct::set_arch_spec_v850()
 {
   // The Renesas V850 is a 32-bit microprocessor used in

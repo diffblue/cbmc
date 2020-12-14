@@ -206,14 +206,14 @@ public:
     return has_values.is_false();
   }
 
-  /// Implements the `join` operation of two instances `*this` and other`. It
+  /// Implements the "join" operation of two instances `*this` and \p other. It
   /// operates only on `this->values` and `other.values`. The keys in the
-  /// resulting map is the union of variable names in both `this->values` and
-  /// `other.values`. And for each variable `v` appearing in both maps
-  /// `this->values` and `other.values` the resulting mapped set
-  /// of `ID`s is the set union of `this->values[v]` and `other.values[v]`.
-  /// NOTE: The operation actually does not produce a new `join` element. The
-  /// instance `*this` is modified to become the `join` element.
+  /// resulting map are the union of variable names in both `this->values` and
+  /// `other.values`. For each variable `v` appearing in both maps
+  /// `this->values` and `other.values` the resulting mapped set of identifiers
+  /// is the set union of `this->values[v]` and `other.values[v]`.
+  /// Note that the operation actually does not produce a new `join` element.
+  /// The instance `*this` is modified to become the `join` element.
   /// \param other: The instance to be merged into `*this` as the join operation
   /// \param from: Not used at all.
   /// \param to: Not used at all.

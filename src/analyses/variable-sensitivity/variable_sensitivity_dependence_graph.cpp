@@ -55,13 +55,13 @@ void variable_sensitivity_dependence_domaint::eval_data_deps(
  * the data dependencies, this involves calculating all the data
  * dependencies that exist in the 'to' instruction.
  *
- * \param function_from the function of the instruction before the abstract
+ * \param function_from: the function of the instruction before the abstract
  *   domain
- * \param from the instruction before the abstract domain
- * \param function_to the function of the instruction after the abstract domain
- * \param to the instruction after the abstract domain
- * \param ai the abstract interpreter
- * \param ns the namespace
+ * \param trace_from: the instruction before the abstract domain
+ * \param function_to: the function of the instruction after the abstract domain
+ * \param trace_to: the instruction after the abstract domain
+ * \param ai: the abstract interpreter
+ * \param ns: the namespace
  */
 void variable_sensitivity_dependence_domaint::transform(
   const irep_idt &function_from,

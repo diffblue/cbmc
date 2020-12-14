@@ -137,8 +137,7 @@ void symex_slicet::slice_decl(SSA_stept &SSA_step)
 /// Collect the open variables, i.e., variables that are used in RHS but never
 /// written in LHS
 /// \param equation: symex trace
-/// \param open_variables: target set
-/// \return None. But open_variables is modified as a side-effect.
+/// \param [out] open_variables: target set
 void symex_slicet::collect_open_variables(
   const symex_target_equationt &equation,
   symbol_sett &open_variables)
@@ -212,8 +211,7 @@ void slice(symex_target_equationt &equation)
 /// Collect the open variables, i.e. variables that are used in RHS but never
 /// written in LHS
 /// \param equation: symex trace
-/// \param open_variables: target set
-/// \return None. But open_variables is modified as a side-effect.
+/// \param [out] open_variables: target set
 void collect_open_variables(
   const symex_target_equationt &equation,
   symbol_sett &open_variables)
@@ -223,9 +221,8 @@ void collect_open_variables(
 }
 
 /// Slice the symex trace with respect to a list of expressions
-/// \param equation: symex trace to be sliced
+/// \param [out] equation: symex trace to be sliced
 /// \param expressions: list of expressions, targets for slicing
-/// \return None. But equation is modified as a side-effect.
 void slice(
   symex_target_equationt &equation,
   const std::list<exprt> &expressions)

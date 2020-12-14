@@ -177,7 +177,7 @@ static std::string get_enum_id(
          (json["name"].value);
 }
 
-/// Return true iff the argument has a `"@nondetLength": true` entry.
+/// Return true iff the argument has a \c "@nondetLength"<tt>: true</tt> entry.
 /// If such an entry is present on a JSON representation of an array, it means
 /// that the array should be assigned a nondeterministic length, constrained to
 /// be at least the number of elements specified for this array.
@@ -419,9 +419,9 @@ static code_with_references_listt assign_array_data_component_from_json(
 
 /// Declare a non-deterministic length expression
 /// \param[out] allocate: allocation functor
-/// \param[out] code: code block to which code will get appended
 /// \param loc: location for the created code
 /// \return the length expression that has been non-deterministically created
+///   and the code declaring the expression
 static std::pair<symbol_exprt, code_with_references_listt>
 nondet_length(allocate_objectst &allocate, source_locationt loc)
 {
@@ -436,7 +436,7 @@ nondet_length(allocate_objectst &allocate, source_locationt loc)
 }
 
 /// One of the cases in the recursive algorithm: the case where \p expr
-/// represents an array which is not flagged with `@nondetLength`.
+/// represents an array which is not flagged with \c \@nondetLength.
 /// The length of the array is given by symbol \p given_length_expr.
 /// We assume that an array with this symbol as its length has already been
 /// allocated and that \p expr has been assigned to it.
@@ -465,7 +465,7 @@ assign_det_length_array_from_json(
 }
 
 /// One of the cases in the recursive algorithm: the case where \p expr
-/// represents an array which is flagged with @nondetLength.
+/// represents an array which is flagged with \c \@nondetLength.
 /// The length of the array is given by symbol \p given_length_expr.
 /// We assume that an array with this symbol as its length has already been
 /// allocated and that \p expr has been assigned to it.
@@ -714,11 +714,11 @@ struct get_or_create_reference_resultt
 /// Helper function for \ref assign_reference_from_json.
 /// Look up the given \p id in the reference map and gets or creates the symbol
 /// for it.
-/// In the case of arrays, if the first time we see an ID is in a `@ref` object
-/// (rather than `@id`), we do not know what the length of the array will be, so
+/// In the case of arrays, if the first time we see an ID is in a \c \@ref object
+/// (rather than \c \@id), we do not know what the length of the array will be, so
 /// we need to allocate an array of nondeterministic length. The length will
-/// be constrained (in \ref assign_array_from_json) once we find the
-/// corresponding `@id` object.
+/// be constrained (in \ref assign_nondet_length_array_from_json) once we find the
+/// corresponding \c \@id object.
 /// \param expr: expression representing the Java object for which a symbol is
 ///   retrieved or allocated.
 /// \param id: key in the reference map for this object
