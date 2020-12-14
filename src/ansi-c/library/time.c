@@ -17,6 +17,48 @@ time_t time(time_t *tloc)
   return res;
 }
 
+/* FUNCTION: _time64 */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_TIME_H_INCLUDED
+#    include <time.h>
+#    define __CPROVER_TIME_H_INCLUDED
+#  endif
+
+time_t __VERIFIER_nondet_time_t();
+
+time_t _time64(time_t *tloc)
+{
+  time_t res = __VERIFIER_nondet_time_t();
+  if(tloc)
+    *tloc = res;
+  return res;
+}
+
+#endif
+
+/* FUNCTION: _time32 */
+
+#if defined(_WIN32) && defined(_USE_32BIT_TIME_T)
+
+#  ifndef __CPROVER_TIME_H_INCLUDED
+#    include <time.h>
+#    define __CPROVER_TIME_H_INCLUDED
+#  endif
+
+__time32_t __VERIFIER_nondet_time32_t();
+
+__time32_t _time32(__time32_t *tloc)
+{
+  __time32_t res = __VERIFIER_nondet_time32_t();
+  if(tloc)
+    *tloc = res;
+  return res;
+}
+
+#endif
+
 /* FUNCTION: gmtime */
 
 #ifndef __CPROVER_TIME_H_INCLUDED
