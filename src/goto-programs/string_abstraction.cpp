@@ -517,7 +517,7 @@ goto_programt::targett string_abstractiont::abstract_assign(
 
   const typet &type = target->get_assign().lhs().type();
 
-  if(type.id() == ID_pointer)
+  if(type.id() == ID_pointer || type.id() == ID_array)
     return abstract_pointer_assign(dest, target);
   else if(is_char_type(type))
     return abstract_char_assign(dest, target);
@@ -533,29 +533,16 @@ void string_abstractiont::abstract_function_call(
   code_function_callt::argumentst &arguments=call.arguments();
   code_function_callt::argumentst str_args;
 
-  const symbolt &fct_symbol=ns.lookup(call.function().get(ID_identifier));
-  const code_typet::parameterst &formal_params=
-    to_code_type(fct_symbol.type).parameters();
-
-  code_function_callt::argumentst::const_iterator it1=arguments.begin();
-  for(code_typet::parameterst::const_iterator it2=formal_params.begin();
-      it2!=formal_params.end();
-      it2++, it1++)
+  for(const auto &arg : arguments)
   {
-    const typet &abstract_type=build_abstraction_type(it2->type());
+    const typet &abstract_type = build_abstraction_type(arg.type());
     if(abstract_type.is_nil())
       continue;
 
-    if(it1==arguments.end())
-    {
-      throw incorrect_goto_program_exceptiont(
-        "function call: not enough arguments", target->source_location);
-    }
-
     str_args.push_back(exprt());
-    // if function takes void*, build for *it1 will fail if actual parameter
+    // if function takes void*, build for `arg` will fail if actual parameter
     // is of some other pointer type; then just introduce an unknown
-    if(build_wrap(*it1, str_args.back(), false))
+    if(build_wrap(arg, str_args.back(), false))
       str_args.back()=build_unknown(abstract_type, false);
     // array -> pointer translation
     if(str_args.back().type().id()==ID_array &&
@@ -576,9 +563,17 @@ void string_abstractiont::abstract_function_call(
       str_args.back()=address_of_exprt(str_args.back());
   }
 
-  arguments.insert(arguments.end(), str_args.begin(), str_args.end());
+  if(!str_args.empty())
+  {
+    arguments.insert(arguments.end(), str_args.begin(), str_args.end());
 
-  target->set_function_call(call);
+    code_typet::parameterst &parameters =
+      to_code_type(call.function().type()).parameters();
+    for(const auto &arg : str_args)
+      parameters.push_back(code_typet::parametert{arg.type()});
+
+    target->set_function_call(call);
+  }
 }
 
 bool string_abstractiont::has_string_macros(const exprt &expr)
@@ -653,8 +648,11 @@ exprt string_abstractiont::build(
   {
     // adjust for offset
     exprt offset = pointer_offset(pointer);
-    result = minus_exprt(
-      typecast_exprt::conditional_cast(result, offset.type()), offset);
+    typet result_type = result.type();
+    result = typecast_exprt::conditional_cast(
+      minus_exprt(
+        typecast_exprt::conditional_cast(result, offset.type()), offset),
+      result_type);
   }
 
   return result;
@@ -688,7 +686,7 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     return known_entry->second;
 
   ::std::pair<abstraction_types_mapt::iterator, bool> map_entry(
-    abstraction_types_map.insert(::std::make_pair(eff_type, typet())));
+    abstraction_types_map.insert(::std::make_pair(eff_type, typet{ID_nil})));
   if(!map_entry.second)
     return map_entry.first->second;
 
@@ -959,6 +957,15 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
 
   if(current_args.find(symbol.name)!=current_args.end())
     identifier=id2string(symbol.name)+arg_suffix;
+  else if(symbol.is_static_lifetime)
+  {
+    std::string sym_suffix_before = sym_suffix;
+    sym_suffix = "#str";
+    identifier = id2string(symbol.name) + sym_suffix;
+    if(symbol_table.symbols.find(identifier) == symbol_table.symbols.end())
+      build_new_symbol(symbol, identifier, abstract_type);
+    sym_suffix = sym_suffix_before;
+  }
   else
   {
     identifier=id2string(symbol.name)+sym_suffix;
@@ -1052,6 +1059,13 @@ bool string_abstractiont::build_symbol_constant(
 
 void string_abstractiont::move_lhs_arithmetic(exprt &lhs, exprt &rhs)
 {
+  while(lhs.id() == ID_typecast)
+  {
+    typecast_exprt lhs_tc = to_typecast_expr(lhs);
+    rhs = typecast_exprt::conditional_cast(rhs, lhs_tc.op().type());
+    lhs.swap(lhs_tc.op());
+  }
+
   if(lhs.id()==ID_minus)
   {
     // move op1 to rhs
@@ -1059,6 +1073,13 @@ void string_abstractiont::move_lhs_arithmetic(exprt &lhs, exprt &rhs)
     rhs = plus_exprt(rhs, to_minus_expr(lhs).op1());
     rhs.type()=lhs.type();
     lhs=rest;
+  }
+
+  while(lhs.id() == ID_typecast)
+  {
+    typecast_exprt lhs_tc = to_typecast_expr(lhs);
+    rhs = typecast_exprt::conditional_cast(rhs, lhs_tc.op().type());
+    lhs.swap(lhs_tc.op());
   }
 }
 

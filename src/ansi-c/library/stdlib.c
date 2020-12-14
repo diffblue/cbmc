@@ -122,6 +122,7 @@ __CPROVER_HIDE:;
   __CPROVER_memory_leak = record_may_leak ? malloc_res : __CPROVER_memory_leak;
 
 #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assume(__CPROVER_buffer_size(malloc_res) == alloc_size);
   __CPROVER_is_zero_string(malloc_res) = 1;
   __CPROVER_zero_string_length(malloc_res) = 0;
 #endif
@@ -185,6 +186,10 @@ __CPROVER_HIDE:;
   __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_memory_leak = record_may_leak ? malloc_res : __CPROVER_memory_leak;
 
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assume(__CPROVER_buffer_size(malloc_res) == malloc_size);
+#endif
+
   return malloc_res;
 }
 
@@ -211,6 +216,10 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
   // record alloca to detect invalid free
   __CPROVER_bool record_alloca = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_alloca_object = record_alloca ? res : __CPROVER_alloca_object;
+
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assume(__CPROVER_buffer_size(res) == alloca_size);
+#endif
 
   return res;
 }

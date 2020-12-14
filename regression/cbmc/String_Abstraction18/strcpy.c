@@ -1,6 +1,6 @@
 #include <string.h>
 
-void * malloc(unsigned);
+void *malloc(__CPROVER_size_t);
 
 char * make_str() {
   unsigned short len;

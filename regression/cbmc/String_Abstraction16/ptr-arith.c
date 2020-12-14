@@ -1,6 +1,6 @@
 #include <string.h>
 
-void * malloc(unsigned);
+void *malloc(__CPROVER_size_t);
 
 int main(int argc, char* argv[]) {
   char * name;

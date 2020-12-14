@@ -57,7 +57,9 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['sync_lock_release-1', 'symbol_per_type.desc'],
     # this test is marked smt-backend, and would thus fail as we run tests with
     # the SAT back-end only
-    ['integer-assignments1', 'test.desc']
+    ['integer-assignments1', 'test.desc'],
+    # this test is expected to abort, thus producing invalid XML
+    ['String_Abstraction17', 'test.desc']
 ]))
 
 # TODO maybe consider looking them up on PATH, but direct paths are

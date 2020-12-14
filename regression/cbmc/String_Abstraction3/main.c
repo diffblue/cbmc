@@ -1,4 +1,4 @@
-unsigned strlen(const char *);
+__CPROVER_size_t strlen(const char *);
 char *strcpy(char *dest, const char *src);
 
 int main()
