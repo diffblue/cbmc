@@ -117,12 +117,14 @@ typet string_abstractiont::build_type(whatt what)
 {
   typet type;
 
+  // clang-format off
   switch(what)
   {
-  case whatt::IS_ZERO: type=bool_typet(); break;
+  case whatt::IS_ZERO: type=c_bool_type(); break;
   case whatt::LENGTH:  type=size_type(); break;
   case whatt::SIZE:    type=size_type(); break;
   }
+  // clang-format on
 
   return type;
 }
@@ -907,7 +909,7 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
   switch(what)
   {
   case whatt::IS_ZERO:
-    result=false_exprt();
+    result = from_integer(0, type);
     break;
 
   case whatt::LENGTH:
@@ -1039,7 +1041,7 @@ bool string_abstractiont::build_symbol_constant(
 
     {
       struct_exprt value(
-        {true_exprt(),
+        {from_integer(1, build_type(whatt::IS_ZERO)),
          from_integer(zero_length, build_type(whatt::LENGTH)),
          from_integer(buf_size, build_type(whatt::SIZE))},
         string_struct);
@@ -1205,7 +1207,7 @@ goto_programt::targett string_abstractiont::char_assign(
     "failed to create is_zero-component for the left-hand-side");
 
   goto_programt::targett assignment1 = tmp.add(goto_programt::make_assignment(
-    code_assignt(i1, true_exprt()), target->source_location));
+    code_assignt(i1, from_integer(1, i1.type())), target->source_location));
   assignment1->code.add_source_location()=target->source_location;
 
   goto_programt::targett assignment2 = tmp.add(goto_programt::make_assignment(

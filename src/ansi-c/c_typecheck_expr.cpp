@@ -2211,8 +2211,8 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
-    predicate_exprt is_zero_string_expr("is_zero_string");
-    is_zero_string_expr.operands()=expr.arguments();
+    unary_exprt is_zero_string_expr(
+      "is_zero_string", expr.arguments()[0], c_bool_type());
     is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
     is_zero_string_expr.add_source_location()=source_location;
 

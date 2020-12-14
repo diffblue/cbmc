@@ -9,6 +9,8 @@ int main()
   unsigned int i;
 
   f = fopen("asd", "xzy");
+  if(!f)
+    return 1;
 
   if(fgets(buffer, 100, f) != 0)
   {
