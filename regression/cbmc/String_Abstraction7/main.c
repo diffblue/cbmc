@@ -8,11 +8,11 @@ int main()
   char buffer[100];
   unsigned int i;
 
-  f=fopen("asd", "xzy");
+  f = fopen("asd", "xzy");
 
-  if(fgets(buffer, 100, f)!=0)
+  if(fgets(buffer, 100, f) != 0)
   {
-    i=strlen(buffer);
+    i = strlen(buffer);
   }
 
   fclose(f);

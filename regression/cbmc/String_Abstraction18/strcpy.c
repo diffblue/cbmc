@@ -2,9 +2,10 @@
 
 void *malloc(__CPROVER_size_t);
 
-char * make_str() {
+char *make_str()
+{
   unsigned short len;
-  char * str;
+  char *str;
 
   __CPROVER_assume(len > 0);
   str = malloc(len);
@@ -16,9 +17,10 @@ char * make_str() {
   return str;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
   char dest[10];
-  char * name;
+  char *name;
 
   name = make_str();
   // assert(strlen(name) < 10);

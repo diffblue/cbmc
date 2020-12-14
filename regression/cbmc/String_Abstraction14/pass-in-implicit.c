@@ -1,12 +1,14 @@
-void * malloc(unsigned);
+void *malloc(unsigned);
 
-void use_str(char * s) {
+void use_str(char *s)
+{
   assert(__CPROVER_is_zero_string(s));
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
   unsigned short len;
-  char * str;
+  char *str;
   __CPROVER_assume(len > 0);
   str = malloc(len);
   __CPROVER_assume(__CPROVER_buffer_size(str) == len);

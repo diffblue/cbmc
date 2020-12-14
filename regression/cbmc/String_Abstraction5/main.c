@@ -9,16 +9,16 @@ int main()
   __CPROVER_size_t i;
 
   // this should work
-  p=strerror(1);
+  p = strerror(1);
 
   // this should work
-  i=strlen(p);
+  i = strlen(p);
 
   // this should work
-  if(i<sizeof(a))
+  if(i < sizeof(a))
     strcpy(a, p);
 
   // and even this should work
   char ch;
-  ch=*p;
+  ch = *p;
 }

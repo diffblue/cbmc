@@ -5,7 +5,7 @@ int main()
 {
   char a[100], b[101];
 
-  b[100]=0;
+  b[100] = 0;
 
   // this should fail, off by one!
   strcpy(a, b);

@@ -1,6 +1,6 @@
 #include <string.h>
 
-char a [10][100];
+char a[10][100];
 
 struct S
 {
@@ -11,11 +11,11 @@ struct S
 int main()
 {
   strcpy(a[0], "asd");
-  assert(strlen(a[0])==3);
+  assert(strlen(a[0]) == 3);
 
   strcpy(s.x, "asdasd");
-  assert(strlen(s.x)==6);
+  assert(strlen(s.x) == 6);
 
-  s.p=s.x;
-  assert(strlen(s.p)==6);
+  s.p = s.x;
+  assert(strlen(s.p) == 6);
 }
