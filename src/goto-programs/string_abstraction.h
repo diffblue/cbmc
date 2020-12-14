@@ -47,8 +47,6 @@ protected:
   typedef ::std::map< typet, typet > abstraction_types_mapt;
   abstraction_types_mapt abstraction_types_map;
 
-  ::std::set< irep_idt > current_args;
-
   static bool has_string_macros(const exprt &expr);
 
   void replace_string_macros(

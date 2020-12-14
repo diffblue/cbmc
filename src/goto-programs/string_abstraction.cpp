@@ -136,7 +136,6 @@ void string_abstractiont::operator()(goto_functionst &dest)
     sym_suffix = "#str$" + id2string(gf_entry.first);
     add_str_arguments(gf_entry.first, gf_entry.second);
     abstract(gf_entry.second.body);
-    current_args.clear();
   }
 
   // do we have a main?
@@ -188,8 +187,6 @@ void string_abstractiont::add_str_arguments(
       abstract_type,
       id2string(param_symbol.base_name) + arg_suffix,
       id2string(identifier) + arg_suffix);
-
-    current_args.insert(identifier);
   }
 
   for(const auto &new_param : str_args)
@@ -215,7 +212,7 @@ void string_abstractiont::add_argument(
   str_args.back().set_base_name(base_name);
   str_args.back().set_identifier(identifier);
 
-  auxiliary_symbolt new_symbol;
+  parameter_symbolt new_symbol;
   new_symbol.type=final_type;
   new_symbol.value.make_nil();
   new_symbol.location=str_args.back().source_location();
@@ -957,7 +954,7 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
 
   irep_idt identifier;
 
-  if(current_args.find(symbol.name)!=current_args.end())
+  if(symbol.is_parameter)
     identifier=id2string(symbol.name)+arg_suffix;
   else if(symbol.is_static_lifetime)
   {
@@ -977,8 +974,7 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
 
   const symbolt &str_symbol=ns.lookup(identifier);
   dest=str_symbol.symbol_expr();
-  if(current_args.find(symbol.name)!=current_args.end() &&
-      !is_ptr_argument(abstract_type))
+  if(symbol.is_parameter && !is_ptr_argument(abstract_type))
     dest = dereference_exprt{dest};
 
   return false;
