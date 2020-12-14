@@ -1070,8 +1070,9 @@ void jbmc_parse_optionst::help()
     HELP_SHOW_PROPERTIES
     " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
     " --property id                only check one specific property\n"
-    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
+    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
+    "                              (implies --trace)\n"
     HELP_JAVA_TRACE_VALIDATION
     "\n"
     "Program representations:\n"
