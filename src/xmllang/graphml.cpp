@@ -305,7 +305,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.new_element("default").data="false";
   }
 
-  // <key attr.name="cyclehead" attr.type="boolean" for="edge"
+  // <key attr.name="cyclehead" attr.type="boolean" for="node"
   //      id="cyclehead">
   //   <default>false</default>
   // </key>
@@ -313,7 +313,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     xmlt &key = graphml.new_element("key");
     key.set_attribute("attr.name", "cyclehead");
     key.set_attribute("attr.type", "boolean");
-    key.set_attribute("for", "edge");
+    key.set_attribute("for", "node");
     key.set_attribute("id", "cyclehead");
 
     key.new_element("default").data = "false";
@@ -400,6 +400,16 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("attr.type", "string");
     key.set_attribute("for", "graph");
     key.set_attribute("id", "producer");
+  }
+
+  // <key attr.name="creationtime" attr.type="string" for="graph"
+  //      id="creationtime"/>
+  {
+    xmlt &key = graphml.new_element("key");
+    key.set_attribute("attr.name", "creationtime");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "creationtime");
   }
 
   // <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
