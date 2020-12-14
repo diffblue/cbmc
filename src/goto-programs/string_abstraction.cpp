@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
@@ -68,15 +69,6 @@ static inline bool is_ptr_argument(const typet &type)
 void string_abstraction(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  goto_programt &dest)
-{
-  string_abstractiont string_abstraction(symbol_table, message_handler);
-  string_abstraction(dest);
-}
-
-void string_abstraction(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
   goto_functionst &dest)
 {
   string_abstractiont string_abstraction(symbol_table, message_handler);
@@ -87,17 +79,14 @@ void string_abstraction(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  string_abstraction(
-    goto_model.symbol_table,
-    message_handler,
-    goto_model.goto_functions);
+  string_abstractiont{goto_model.symbol_table, message_handler}.apply(
+    goto_model);
 }
 
 string_abstractiont::string_abstractiont(
   symbol_tablet &_symbol_table,
   message_handlert &_message_handler)
-  : arg_suffix("#strarg"),
-    sym_suffix("#str$fcn"),
+  : sym_suffix("#str$fcn"),
     symbol_table(_symbol_table),
     ns(_symbol_table),
     temporary_counter(0),
@@ -129,12 +118,43 @@ typet string_abstractiont::build_type(whatt what)
   return type;
 }
 
+void string_abstractiont::apply(goto_modelt &goto_model)
+{
+  operator()(goto_model.goto_functions);
+}
+
 void string_abstractiont::operator()(goto_functionst &dest)
 {
+  // iterate over all previously known symbols as the body of the loop modifies
+  // the symbol table and can thus invalidate iterators
+  for(auto &sym_name : symbol_table.sorted_symbol_names())
+  {
+    const typet &type = symbol_table.lookup_ref(sym_name).type;
+
+    if(type.id() != ID_code)
+      continue;
+
+    sym_suffix = "#str$" + id2string(sym_name);
+
+    goto_functionst::function_mapt::iterator fct_entry =
+      dest.function_map.find(sym_name);
+    if(fct_entry != dest.function_map.end())
+    {
+      add_str_parameters(
+        symbol_table.get_writeable_ref(sym_name),
+        fct_entry->second.parameter_identifiers);
+    }
+    else
+    {
+      goto_functiont::parameter_identifierst dummy(
+        to_code_type(type).parameters().size(), irep_idt{});
+      add_str_parameters(symbol_table.get_writeable_ref(sym_name), dummy);
+    }
+  }
+
   for(auto &gf_entry : dest.function_map)
   {
     sym_suffix = "#str$" + id2string(gf_entry.first);
-    add_str_arguments(gf_entry.first, gf_entry.second);
     abstract(gf_entry.second.body);
   }
 
@@ -163,66 +183,63 @@ void string_abstractiont::operator()(goto_programt &dest)
   initialization.clear();
 }
 
-void string_abstractiont::add_str_arguments(
-    const irep_idt &name,
-    goto_functionst::goto_functiont &fct)
+void string_abstractiont::add_str_parameters(
+  symbolt &fct_symbol,
+  goto_functiont::parameter_identifierst &parameter_identifiers)
 {
-  symbolt &fct_symbol = symbol_table.get_writeable_ref(name);
+  code_typet &fct_type = to_code_type(fct_symbol.type);
+  PRECONDITION(fct_type.parameters().size() == parameter_identifiers.size());
 
   code_typet::parameterst str_args;
 
-  for(const auto &identifier : fct.parameter_identifiers)
+  goto_functiont::parameter_identifierst::const_iterator param_id_it =
+    parameter_identifiers.begin();
+  for(const auto &parameter : fct_type.parameters())
   {
-    if(identifier.empty())
-      continue; // ignore
-
-    const symbolt &param_symbol = ns.lookup(identifier);
-    const typet &abstract_type = build_abstraction_type(param_symbol.type);
+    const typet &abstract_type = build_abstraction_type(parameter.type());
     if(abstract_type.is_nil())
       continue;
 
-    add_argument(
-      str_args,
-      fct_symbol,
-      abstract_type,
-      id2string(param_symbol.base_name) + arg_suffix,
-      id2string(identifier) + arg_suffix);
+    str_args.push_back(add_parameter(fct_symbol, abstract_type, *param_id_it));
+    ++param_id_it;
   }
 
   for(const auto &new_param : str_args)
-    fct.parameter_identifiers.push_back(new_param.get_identifier());
-  code_typet::parameterst &symb_parameters=
-    to_code_type(fct_symbol.type).parameters();
-  symb_parameters.insert(
-    symb_parameters.end(), str_args.begin(), str_args.end());
+    parameter_identifiers.push_back(new_param.get_identifier());
+  fct_type.parameters().insert(
+    fct_type.parameters().end(), str_args.begin(), str_args.end());
 }
 
-void string_abstractiont::add_argument(
-    code_typet::parameterst &str_args,
-    const symbolt &fct_symbol,
-    const typet &type,
-    const irep_idt &base_name,
-    const irep_idt &identifier)
+code_typet::parametert string_abstractiont::add_parameter(
+  const symbolt &fct_symbol,
+  const typet &type,
+  const irep_idt &identifier)
 {
   typet final_type=is_ptr_argument(type)?
                    type:pointer_type(type);
 
-  str_args.push_back(code_typet::parametert(final_type));
-  str_args.back().add_source_location()=fct_symbol.location;
-  str_args.back().set_base_name(base_name);
-  str_args.back().set_identifier(identifier);
+  symbolt &param_symbol = get_fresh_aux_symbol(
+    final_type,
+    id2string(identifier.empty() ? fct_symbol.name : identifier),
+    id2string(
+      identifier.empty() ? fct_symbol.base_name
+                         : ns.lookup(identifier).base_name) +
+      "#str",
+    fct_symbol.location,
+    fct_symbol.mode,
+    symbol_table);
+  param_symbol.is_parameter = true;
+  param_symbol.value.make_nil();
 
-  parameter_symbolt new_symbol;
-  new_symbol.type=final_type;
-  new_symbol.value.make_nil();
-  new_symbol.location=str_args.back().source_location();
-  new_symbol.name=str_args.back().get_identifier();
-  new_symbol.module=fct_symbol.module;
-  new_symbol.base_name=str_args.back().get_base_name();
-  new_symbol.mode=fct_symbol.mode;
-  new_symbol.pretty_name=str_args.back().get_base_name();
+  code_typet::parametert str_parameter{final_type};
+  str_parameter.add_source_location() = fct_symbol.location;
+  str_parameter.set_base_name(param_symbol.base_name);
+  str_parameter.set_identifier(param_symbol.name);
 
-  symbol_table.insert(std::move(new_symbol));
+  if(!identifier.empty())
+    parameter_map.insert(std::make_pair(identifier, param_symbol.name));
+
+  return str_parameter;
 }
 
 void string_abstractiont::abstract(goto_programt &dest)
@@ -955,7 +972,12 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
   irep_idt identifier;
 
   if(symbol.is_parameter)
-    identifier=id2string(symbol.name)+arg_suffix;
+  {
+    const auto parameter_map_entry = parameter_map.find(symbol.name);
+    if(parameter_map_entry == parameter_map.end())
+      return true;
+    identifier = parameter_map_entry->second;
+  }
   else if(symbol.is_static_lifetime)
   {
     std::string sym_suffix_before = sym_suffix;

@@ -1,7 +1,7 @@
 CORE
 test.c
 --string-abstraction --show-goto-functions
-strlen#return_value = \(.*\)s#strarg->length - POINTER_OFFSET\(s\)\)*;
+strlen#return_value = \(.*\)s#str->length - POINTER_OFFSET\(s\)\)*;
 ^EXIT=0$
 ^SIGNAL=0$
 --

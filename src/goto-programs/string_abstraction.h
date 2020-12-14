@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/bitvector_types.h>
 #include <util/config.h>
+#include <util/deprecate.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -29,15 +30,24 @@ class message_handlert;
 class string_abstractiont
 {
 public:
+  // To be deprecated once the operator() methods have been removed, at which
+  // point a new constructor that only takes a message_handler should be
+  // introduced.
   string_abstractiont(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler);
 
+  DEPRECATED(SINCE(2020, 12, 14, "Use apply(goto_modelt &)"))
   void operator()(goto_programt &dest);
+  DEPRECATED(SINCE(2020, 12, 14, "Use apply(goto_modelt &)"))
   void operator()(goto_functionst &dest);
 
+  /// Apply string abstraction to \p goto_model. If any abstractions are to be
+  /// applied, the affected goto_functions and any affected symbols will be
+  /// modified.
+  void apply(goto_modelt &goto_model);
+
 protected:
-  const std::string arg_suffix;
   std::string sym_suffix;
   symbol_tablet &symbol_table;
   namespacet ns;
@@ -139,18 +149,17 @@ protected:
 
   typedef std::unordered_map<irep_idt, irep_idt> localst;
   localst locals;
+  localst parameter_map;
 
   void abstract(goto_programt &dest);
 
-  void add_str_arguments(
-      const irep_idt &name,
-      goto_functionst::goto_functiont &fct);
+  void add_str_parameters(
+    symbolt &fct_symbol,
+    goto_functiont::parameter_identifierst &parameter_identifiers);
 
-  void add_argument(
-    code_typet::parameterst &str_args,
+  code_typet::parametert add_parameter(
     const symbolt &fct_symbol,
     const typet &type,
-    const irep_idt &base_name,
     const irep_idt &identifier);
 
   void make_decl_and_def(goto_programt &dest, goto_programt::targett ref_instr,
@@ -177,6 +186,8 @@ void string_abstraction(
   goto_modelt &,
   message_handlert &);
 
+DEPRECATED(
+  SINCE(2020, 12, 14, "Use string_abstraction(goto_model, message_handler)"))
 void string_abstraction(
   symbol_tablet &,
   message_handlert &,
