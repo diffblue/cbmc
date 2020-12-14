@@ -252,6 +252,10 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       as_const(address_of_expr).object().type();
     return renamedt<exprt, level>{std::move(expr)};
   }
+  else if(expr.is_nil())
+  {
+    return renamedt<exprt, level>{std::move(expr)};
+  }
   else
   {
     rename<level>(expr.type(), irep_idt(), ns);
