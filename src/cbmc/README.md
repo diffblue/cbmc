@@ -48,7 +48,8 @@ formula using two different possible procedures:
 
 1. When `--stop-on-fail` is passed on the command-line, the formula is solved
    once to find any violated assertion. This is implemented directly in
-   class `bmct`.
+   class `bmct`. If the formula is satisfiable, a counter-example trace is
+   generated.
 2. When `--stop-on-fail` is not passed, BMC is run in "all-properties" mode.
    This categorises the assertions into groups that represent the same property,
    and the solver is run repeatedly to try to satisfy each property at least
