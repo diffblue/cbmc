@@ -131,6 +131,9 @@ protected:
     const abstract_object_pointert &op1,
     const widen_modet &widen_mode) const override;
 
+  bool same_target(abstract_object_pointert other) const override;
+  exprt offset_from(abstract_object_pointert other) const override;
+
   CLONE
 
 private:

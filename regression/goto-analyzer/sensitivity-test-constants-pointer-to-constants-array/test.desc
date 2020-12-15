@@ -12,7 +12,7 @@ sensitivity_test_constants_pointer_to_constants_array.c
 ^\[main\.assertion\.7\] .* q==p\+1: SUCCESS$
 ^\[main\.assertion\.8\] .* \*q==2: SUCCESS$
 ^\[main\.assertion\.9\] .* \*\(q-1\)==1: SUCCESS$
-^\[main\.assertion\.10\] .* q-p==x: UNKNOWN$
+^\[main\.assertion\.10\] .* q-p==x: SUCCESS$
 ^\[main\.assertion\.11\] .* a\[1\]==4: SUCCESS$
 ^\[main\.assertion\.12\] .* a\[1\]==5: SUCCESS$
 ^\[main\.assertion\.13\] .* a\[1\]==6: SUCCESS$
