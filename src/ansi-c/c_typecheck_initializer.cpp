@@ -478,10 +478,21 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       const union_typet::componentst &components=
         union_type.components();
 
-      DATA_INVARIANT(index<components.size(),
-                     "member designator is bounded by components size");
+      if(components.empty())
+      {
+        error().source_location = value.source_location();
+        error() << "union member designator found for empty union" << eom;
+        throw 0;
+      }
+      else if(index >= components.size())
+      {
+        error().source_location = value.source_location();
+        error() << "union member designator " << index << " out of bounds ("
+                << components.size() << ")" << eom;
+        throw 0;
+      }
 
-      const union_typet::componentt &component=union_type.components()[index];
+      const union_typet::componentt &component = components[index];
 
       if(dest->id()==ID_union &&
          dest->get(ID_component_name)==component.get_name())
