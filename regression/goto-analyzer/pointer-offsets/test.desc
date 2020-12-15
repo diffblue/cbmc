@@ -1,0 +1,6 @@
+KNOWNBUG
+main.c
+--variable-sensitivity --vsd-pointers constants --vsd-values constants --show --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+--

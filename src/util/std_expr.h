@@ -928,6 +928,25 @@ inline minus_exprt &to_minus_expr(exprt &expr)
   return ret;
 }
 
+class ptr_diff_exprt : public expr_protectedt
+{
+private:
+  ptr_diff_exprt(const minus_exprt &minus_expr)
+    : expr_protectedt(ID_ptr_diff, minus_expr.type(), minus_expr.operands())
+  {
+    PRECONDITION(op0().type().id() == ID_pointer);
+    PRECONDITION(op1().type().id() == ID_pointer);
+  }
+
+  friend ptr_diff_exprt to_ptr_diff_expr(const minus_exprt &expr);
+};
+
+inline ptr_diff_exprt to_ptr_diff_expr(const minus_exprt &expr)
+{
+  PRECONDITION(expr.lhs().type().id() == ID_pointer);
+  PRECONDITION(expr.rhs().type().id() == ID_pointer);
+  return ptr_diff_exprt(expr);
+}
 
 /// \brief Binary multiplication
 /// Associativity is not specified.
@@ -937,6 +956,16 @@ public:
   mult_exprt(exprt _lhs, exprt _rhs)
     : multi_ary_exprt(std::move(_lhs), ID_mult, std::move(_rhs))
   {
+  }
+
+  const exprt &lhs() const
+  {
+    return op0();
+  }
+
+  const exprt &rhs() const
+  {
+    return op1();
   }
 };
 

@@ -588,9 +588,10 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     operands[1].type().id() == ID_pointer)
   {
     // pointer arithmetic: rewrite "p-p" to "0"
-
     if(operands[0]==operands[1])
       return from_integer(0, minus_expr.type());
+
+    return to_ptr_diff_expr(minus_expr);
   }
 
   return unchanged(expr);
