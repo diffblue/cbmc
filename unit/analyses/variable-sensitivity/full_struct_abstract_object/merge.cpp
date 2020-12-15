@@ -42,7 +42,8 @@ public:
     full_struct_abstract_objectt::constant_struct_pointert struct_object,
     const member_exprt &component) const
   {
-    return struct_object->read(enviroment, component, ns)->to_constant();
+    return struct_object->expression_transform(component, {}, enviroment, ns)
+      ->to_constant();
   }
 
   // At the moment the full_struct_abstract_object does not support

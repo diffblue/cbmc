@@ -65,23 +65,6 @@ public:
     const namespacet &ns);
 
   /**
-   * A helper function to evaluate an abstract object contained
-   * within a container object. More precise abstractions may override this
-   * to return more precise results.
-   *
-   * \param env the abstract environment
-   * \param specifier a modifier expression, such as an array index or field
-   * specifier used to indicate access to a specific component
-   * \param ns the current namespace
-   *
-   * \return the abstract_objectt representing the value of the read component.
-   */
-  abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
-
-  /**
    * A helper function to evaluate writing to a component of an
    * abstract object. More precise abstractions may override this to
    * update what they are storing for a specific component.

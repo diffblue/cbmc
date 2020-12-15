@@ -136,14 +136,6 @@ abstract_object_pointert abstract_objectt::expression_transform(
   return environment.abstract_object_factory(copy.type(), copy, ns);
 }
 
-abstract_object_pointert abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return shared_from_this();
-}
-
 abstract_object_pointert abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,

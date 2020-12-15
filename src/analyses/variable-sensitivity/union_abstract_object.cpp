@@ -36,14 +36,6 @@ union_abstract_objectt::union_abstract_objectt(
   PRECONDITION(ns.follow(expr.type()).id() == ID_union);
 }
 
-abstract_object_pointert union_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return read_component(env, to_member_expr(specifier), ns);
-}
-
 abstract_object_pointert union_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,

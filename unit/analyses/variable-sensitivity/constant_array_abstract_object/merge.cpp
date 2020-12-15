@@ -61,7 +61,8 @@ public:
     constant_array_abstract_object_pointert array_object,
     const index_exprt &index) const
   {
-    return array_object->read(enviroment, index, ns)->to_constant();
+    return array_object->expression_transform(index, {}, enviroment, ns)
+      ->to_constant();
   }
 
 private:

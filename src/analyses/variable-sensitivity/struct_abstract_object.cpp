@@ -45,19 +45,11 @@ abstract_object_pointert struct_abstract_objectt::expression_transform(
 {
   if(expr.id() == ID_member)
   {
-    return read(environment, expr, ns);
+    return read_component(environment, to_member_expr(expr), ns);
   }
 
   return abstract_objectt::expression_transform(
     expr, operands, environment, ns);
-}
-
-abstract_object_pointert struct_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return this->read_component(env, to_member_expr(specifier), ns);
 }
 
 abstract_object_pointert struct_abstract_objectt::write(

@@ -111,18 +111,6 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
   return resolve_new_values(resulting_objects);
 }
 
-abstract_object_pointert value_set_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  abstract_object_sett new_values;
-  for(const auto &st_value : values)
-    new_values.insert(st_value->read(env, specifier, ns));
-
-  return resolve_new_values(new_values);
-}
-
 abstract_object_pointert value_set_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,

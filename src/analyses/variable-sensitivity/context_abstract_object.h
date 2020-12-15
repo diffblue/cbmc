@@ -107,11 +107,6 @@ protected:
   void set_top_internal() override;
   void set_not_top_internal() override;
 
-  abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
-
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
