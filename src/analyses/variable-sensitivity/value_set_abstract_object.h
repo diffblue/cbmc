@@ -89,14 +89,6 @@ public:
   /// either converted to interval or marked as `top`.
   static const size_t max_value_set_size = 10;
 
-  /// \copydoc abstract_objectt::read
-  ///
-  /// Delegate reading to stored values.
-  abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
-
   /// \copydoc abstract_objectt::write
   ///
   /// Delegate writing to stored values.

@@ -37,12 +37,19 @@ struct_abstract_objectt::struct_abstract_objectt(
   PRECONDITION(ns.follow(e.type()).id() == ID_struct);
 }
 
-abstract_object_pointert struct_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
+abstract_object_pointert struct_abstract_objectt::expression_transform(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  return this->read_component(env, to_member_expr(specifier), ns);
+  if(expr.id() == ID_member)
+  {
+    return read_component(environment, to_member_expr(expr), ns);
+  }
+
+  return abstract_objectt::expression_transform(
+    expr, operands, environment, ns);
 }
 
 abstract_object_pointert struct_abstract_objectt::write(

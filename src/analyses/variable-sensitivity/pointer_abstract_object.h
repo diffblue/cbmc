@@ -33,6 +33,27 @@ public:
   /// \param bottom: is the abstract_object starting as bottom
   pointer_abstract_objectt(const typet &type, bool top, bool bottom);
 
+  /// Interface for transforms
+  ///
+  /// \param expr: the expression to evaluate and find the result of it.
+  ///              This will be the symbol referred to be op0()
+  /// \param operands: an abstract_object (pointer) that represent
+  ///                  the possible values of each operand
+  /// \param environment: the abstract environment in which the
+  ///                     expression is being evaluated
+  /// \param ns: the current variable namespace
+  ///
+  /// \return Returns the abstract_object representing the result of
+  ///         this expression to the maximum precision available.
+  ///
+  /// To try and resolve different expressions with the maximum level
+  /// of precision available.
+  abstract_object_pointert expression_transform(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
   /// \param expr: the expression to use as the starting pointer for
   ///              an abstract object
   /// \param environment: the environment in which the pointer is being
@@ -42,23 +63,6 @@ public:
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
-
-  /**
-   * A helper function to evaluate an abstract object contained
-   * within a container object. More precise abstractions may override this
-   * to return more precise results.
-   *
-   * \param env the abstract environment
-   * \param specifier a modifier expression, such as an array index or field
-   * specifier used to indicate access to a specific component
-   * \param ns the current namespace
-   *
-   * \return the abstract_objectt representing the value of the read component.
-   */
-  abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
 
   /**
    * A helper function to evaluate writing to a component of an

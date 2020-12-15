@@ -21,11 +21,6 @@ class value_set_array_abstract_objectt : public array_abstract_objectt
 public:
   explicit value_set_array_abstract_objectt(const typet &type);
 
-  abstract_object_pointert read(
-    const abstract_environmentt &env,
-    const exprt &specifier,
-    const namespacet &ns) const override;
-
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
@@ -36,11 +31,6 @@ public:
 
   CLONE
 protected:
-  abstract_object_pointert read_index(
-    const abstract_environmentt &env,
-    const index_exprt &index,
-    const namespacet &ns) const override;
-
   abstract_object_pointert write_index(
     abstract_environmentt &environment,
     const namespacet &ns,

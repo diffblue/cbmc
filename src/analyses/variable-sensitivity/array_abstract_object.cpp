@@ -35,12 +35,19 @@ array_abstract_objectt::array_abstract_objectt(
   PRECONDITION(e.type().id() == ID_array);
 }
 
-abstract_object_pointert array_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
+abstract_object_pointert array_abstract_objectt::expression_transform(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  return this->read_index(env, to_index_expr(specifier), ns);
+  if(expr.id() == ID_index)
+  {
+    return read_index(environment, to_index_expr(expr), ns);
+  }
+
+  return abstract_objectt::expression_transform(
+    expr, operands, environment, ns);
 }
 
 abstract_object_pointert array_abstract_objectt::write(

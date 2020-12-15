@@ -31,28 +31,6 @@ void context_abstract_objectt::set_not_top_internal()
 }
 
 /**
- * A helper function to evaluate an abstract object contained
- * within a container object. More precise abstractions may override this
- * to return more precise results.
- *
- * \param env the abstract environment
- * \param specifier a modifier expression, such as an array index or field
- * specifier used to indicate access to a specific component
- * \param ns the current namespace
- *
- * \return the abstract_objectt representing the value of the read component.
- * For the dependency context, the operation is simply delegated to the
- * child object
- */
-abstract_object_pointert context_abstract_objectt::read(
-  const abstract_environmentt &env,
-  const exprt &specifier,
-  const namespacet &ns) const
-{
-  return child_abstract_object->read(env, specifier, ns);
-}
-
-/**
  * A helper function to evaluate writing to a component of an
  * abstract object. More precise abstractions may override this to
  * update what they are storing for a specific component.

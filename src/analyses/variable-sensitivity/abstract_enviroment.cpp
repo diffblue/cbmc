@@ -27,6 +27,11 @@
 #  include <iostream>
 #endif
 
+std::vector<abstract_object_pointert> eval_operands(
+  const exprt &expr,
+  const abstract_environmentt &env,
+  const namespacet &ns);
+
 abstract_object_pointert
 abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 {
@@ -51,14 +56,15 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
       return found_symbol_value;
     }
   }
-  else if(simplified_id == ID_member)
+  else if(
+    simplified_id == ID_member || simplified_id == ID_index ||
+    simplified_id == ID_dereference)
   {
-    member_exprt member_expr(to_member_expr(simplified_expr));
+    auto access_expr = simplified_expr;
+    auto target = eval(access_expr.operands()[0], ns);
 
-    const exprt &parent = member_expr.compound();
-
-    abstract_object_pointert parent_abstract_object = eval(parent, ns);
-    return parent_abstract_object->read(*this, member_expr, ns);
+    return target->expression_transform(
+      access_expr, eval_operands(access_expr, *this, ns), *this, ns);
   }
   else if(simplified_id == ID_address_of)
   {
@@ -68,34 +74,11 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     // Store the abstract object in the pointer
     return pointer_object;
   }
-  else if(simplified_id == ID_dereference)
-  {
-    dereference_exprt dereference(to_dereference_expr(simplified_expr));
-    abstract_object_pointert pointer_abstract_object =
-      eval(dereference.pointer(), ns);
-
-    return pointer_abstract_object->read(*this, nil_exprt(), ns);
-  }
-  else if(simplified_id == ID_index)
-  {
-    index_exprt index_expr(to_index_expr(simplified_expr));
-    abstract_object_pointert array_abstract_object =
-      eval(index_expr.array(), ns);
-
-    return array_abstract_object->read(*this, index_expr, ns);
-  }
-  else if(simplified_id == ID_array)
+  else if(
+    simplified_id == ID_array || simplified_id == ID_struct ||
+    simplified_id == ID_constant)
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
-  }
-  else if(simplified_id == ID_struct)
-  {
-    return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
-  }
-  else if(simplified_id == ID_constant)
-  {
-    return abstract_object_factory(
-      simplified_expr.type(), to_constant_expr(simplified_expr), ns);
   }
   else
   {
@@ -448,14 +431,8 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   abstract_object_pointert eval_obj =
     abstract_object_factory(e.type(), ns, true);
 
-  std::vector<abstract_object_pointert> operands;
-
-  for(const auto &op : e.operands())
-  {
-    operands.push_back(eval(op, ns));
-  }
-
-  return eval_obj->expression_transform(e, operands, *this, ns);
+  return eval_obj->expression_transform(
+    e, eval_operands(e, *this, ns), *this, ns);
 }
 
 void abstract_environmentt::erase(const symbol_exprt &expr)
@@ -526,4 +503,17 @@ abstract_environmentt::gather_statistics(const namespacet &ns) const
     }
   }
   return statistics;
+}
+
+std::vector<abstract_object_pointert> eval_operands(
+  const exprt &expr,
+  const abstract_environmentt &env,
+  const namespacet &ns)
+{
+  std::vector<abstract_object_pointert> operands;
+
+  for(const auto &op : expr.operands())
+    operands.push_back(env.eval(op, ns));
+
+  return operands;
 }
