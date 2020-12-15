@@ -5,6 +5,8 @@
 
 #include "goto_model.h"
 
+#include <linking/static_lifetime_init.h>
+
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/irep.h>
@@ -36,7 +38,7 @@ void add_malloc_may_fail_variable_initializations(goto_modelt &goto_model)
     "if malloc_may_fail is in the symbol table then so should "
     "malloc_failure_mode");
 
-  auto const initialize_function_name = CPROVER_PREFIX "initialize";
+  auto const initialize_function_name = INITIALIZE_FUNCTION;
   PRECONDITION(
     goto_model.get_goto_functions().function_map.count(
       initialize_function_name) == 1);
