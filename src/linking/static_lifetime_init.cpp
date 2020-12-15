@@ -65,30 +65,36 @@ static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
     return {}; // do not initialize
   }
 
-  exprt rhs;
+  optionalt<exprt> rhs;
 
   if((symbol.value.is_nil() && symbol.is_extern) ||
      symbol.value.id() == ID_nondet)
   {
     // Nondet initialise if not linked, or if explicitly requested.
     // Compilers would usually complain about the unlinked symbol case.
-    const auto nondet = nondet_initializer(symbol.type, symbol.location, ns);
-    CHECK_RETURN(nondet.has_value());
-    rhs = *nondet;
+    rhs = nondet_initializer(symbol.type, symbol.location, ns);
   }
   else if(symbol.value.is_nil())
   {
-    const auto zero = zero_initializer(symbol.type, symbol.location, ns);
-    CHECK_RETURN(zero.has_value());
-    rhs = *zero;
+    rhs = zero_initializer(symbol.type, symbol.location, ns);
   }
   else
     rhs = symbol.value;
 
-  code_assignt code(symbol.symbol_expr(), rhs);
-  code.add_source_location() = symbol.location;
+  if(rhs.has_value())
+  {
+    code_assignt code(symbol.symbol_expr(), *rhs);
+    code.add_source_location() = symbol.location;
 
-  return std::move(code);
+    return std::move(code);
+  }
+  else
+  {
+    code_expressiont code{typecast_exprt{symbol.symbol_expr(), empty_typet{}}};
+    code.add_source_location() = symbol.location;
+
+    return std::move(code);
+  }
 }
 
 void static_lifetime_init(

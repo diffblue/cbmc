@@ -192,6 +192,14 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
         code_value.add_source_location()=source_location;
         value.add_to_operands(std::move(code_value));
       }
+      else if(
+        c.type().id() == ID_union_tag &&
+        ns.follow_tag(to_union_tag_type(c.type())).components().empty())
+      {
+        union_exprt empty_union{irep_idt{}, nil_exprt{}, c.type()};
+        empty_union.add_source_location() = source_location;
+        value.add_to_operands(std::move(empty_union));
+      }
       else
       {
         const auto member = expr_initializer_rec(c.type(), source_location);
@@ -235,10 +243,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
 
     if(!found)
     {
-      // stupid empty union
-      union_exprt value(irep_idt(), nil_exprt(), type);
-      value.add_source_location() = source_location;
-      return std::move(value);
+      // empty union or no member of known size
+      return {};
     }
     else
     {

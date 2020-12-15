@@ -953,16 +953,21 @@ exprt c_typecheck_baset::do_initializer_list(
      full_type.id()==ID_union ||
      full_type.id()==ID_vector)
   {
-    // start with zero everywhere
-    const auto zero = zero_initializer(type, value.source_location(), *this);
-    if(!zero.has_value())
+    if(
+      full_type.id() != ID_union ||
+      !to_union_type(full_type).components().empty())
     {
-      error().source_location = value.source_location();
-      error() << "cannot zero-initialize '" << to_string(full_type) << "'"
-              << eom;
-      throw 0;
+      // start with zero everywhere
+      const auto zero = zero_initializer(type, value.source_location(), *this);
+      if(!zero.has_value())
+      {
+        error().source_location = value.source_location();
+        error() << "cannot zero-initialize '" << to_string(full_type) << "'"
+                << eom;
+        throw 0;
+      }
+      result = *zero;
     }
-    result = *zero;
   }
   else if(full_type.id()==ID_array)
   {
