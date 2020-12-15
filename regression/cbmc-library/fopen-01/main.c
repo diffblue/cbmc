@@ -1,9 +1,13 @@
-#include <assert.h>
 #include <stdio.h>
 
 int main()
 {
-  fopen();
-  assert(0);
+  FILE *f = fopen("some_file", "r");
+  if(!f)
+    return 1;
+
+  // fopen returns NULL or some pointer that is safe to dereference
+  (void)*f;
+
   return 0;
 }
