@@ -46,6 +46,18 @@ inline int puts(const char *s)
   return ret;
 }
 
+/* FUNCTION: fclose_cleanup */
+
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+inline void fclose_cleanup(void *stream)
+{
+__CPROVER_HIDE:;
+  __CPROVER_assert(
+    !__CPROVER_get_must(stream, "open") || __CPROVER_get_must(stream, "closed"),
+    "resource leak: fopen file not closed");
+}
+#endif
+
 /* FUNCTION: fopen */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -58,16 +70,7 @@ inline int puts(const char *s)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-inline void fclose_cleanup(void *stream)
-{
-  __CPROVER_HIDE:;
-  __CPROVER_assert(!__CPROVER_get_must(stream, "open") ||
-                   __CPROVER_get_must(stream, "closed"),
-                   "resource leak: fopen file not closed");
-}
-#endif
-
+void fclose_cleanup(void *stream);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline FILE *fopen(const char *filename, const char *mode)
@@ -99,6 +102,55 @@ inline FILE *fopen(const char *filename, const char *mode)
 
   return fopen_result;
 }
+
+/* FUNCTION: _fopen */
+
+// This is for Apple; we cannot fall back to fopen as we need
+// header files to have a definition of FILE available; the same
+// header files rename fopen to _fopen and would thus yield
+// unbounded recursion.
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#  include <stdlib.h>
+#  define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
+void fclose_cleanup(void *stream);
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
+#ifdef __APPLE__
+inline FILE *_fopen(const char *filename, const char *mode)
+{
+__CPROVER_HIDE:;
+  (void)*filename;
+  (void)*mode;
+#  ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(
+    __CPROVER_is_zero_string(filename),
+    "fopen zero-termination of 1st argument");
+  __CPROVER_assert(
+    __CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
+#  endif
+
+  FILE *fopen_result;
+
+  __CPROVER_bool fopen_error = __VERIFIER_nondet___CPROVER_bool();
+
+  fopen_result = fopen_error ? NULL : malloc(sizeof(FILE));
+
+#  ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_set_must(fopen_result, "open");
+  __CPROVER_cleanup(fopen_result, fclose_cleanup);
+#  endif
+
+  return fopen_result;
+}
+#endif
 
 /* FUNCTION: freopen */
 
