@@ -633,10 +633,15 @@ void goto_convertt::convert_decl(
     // Decl must be visible before initializer.
     copy(tmp, DECL, dest);
 
-    code_assignt assign(code.op0(), initializer);
-    assign.add_source_location()=tmp.source_location();
+    clean_expr(initializer, dest, mode);
 
-    convert_assign(assign, dest, mode);
+    if(initializer.is_not_nil())
+    {
+      code_assignt assign(code.op0(), initializer);
+      assign.add_source_location() = tmp.source_location();
+
+      convert_assign(assign, dest, mode);
+    }
   }
 
   // now create a 'dead' instruction -- will be added after the
