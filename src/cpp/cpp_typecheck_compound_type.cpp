@@ -212,6 +212,13 @@ void cpp_typecheckt::typecheck_compound_type(
         throw 0;
       }
     }
+    else if(symbol.type.id() != type.id())
+    {
+      error().source_location = type.source_location();
+      error() << "redefinition of '" << symbol.pretty_name << "'"
+              << " as different kind of tag" << eom;
+      throw 0;
+    }
   }
   else
   {

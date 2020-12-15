@@ -847,6 +847,13 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           symbol_table.get_writeable_ref(s_it->first).type.swap(type);
         }
       }
+      else if(s_it->second.type.id() != type.id())
+      {
+        error().source_location = type.source_location();
+        error() << "redefinition of '" << s_it->second.pretty_name << "'"
+                << " as different kind of tag" << eom;
+        throw 0;
+      }
       else if(have_body)
       {
         error().source_location=type.source_location();
