@@ -68,7 +68,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 
   if(
     simplified_id == ID_member || simplified_id == ID_index ||
-    simplified_id == ID_dereference)
+    simplified_id == ID_dereference || simplified_id == ID_ptr_diff)
   {
     auto access_expr = simplified_expr;
     auto target = eval(access_expr.operands()[0], ns);
