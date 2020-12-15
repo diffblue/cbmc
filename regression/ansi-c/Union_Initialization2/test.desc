@@ -1,0 +1,11 @@
+CORE
+main.c
+
+union member designator found for empty union
+^SIGNAL=0$
+^EXIT=(1|64)$
+--
+member designator is bounded by components size
+--
+This test previously failed an internal invariant, which is not the correct
+behaviour the problem can be triggered by user input.
