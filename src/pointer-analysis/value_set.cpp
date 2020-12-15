@@ -425,14 +425,17 @@ optionalt<irep_idt> value_sett::get_index_of_symbol(
     const struct_union_typet &struct_union_type =
       to_struct_union_type(followed_type);
 
-    const irep_idt &first_component_name =
-      struct_union_type.components().front().get_name();
+    if(!struct_union_type.components().empty())
+    {
+      const irep_idt &first_component_name =
+        struct_union_type.components().front().get_name();
 
-    index =
-      id2string(identifier) + "." + id2string(first_component_name) + suffix;
-    entry = find_entry(index);
-    if(entry)
-      return std::move(index);
+      index =
+        id2string(identifier) + "." + id2string(first_component_name) + suffix;
+      entry = find_entry(index);
+      if(entry)
+        return std::move(index);
+    }
   }
 
   // not found? try without suffix
