@@ -1,0 +1,9 @@
+CORE test-c++-front-end
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+assignment 'assign_bitor' not defined for types 'unsigned int' and 'struct( anon-a)?'
+^CONVERSION ERROR$
+--
+Invariant check failed

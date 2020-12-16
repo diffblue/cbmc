@@ -3683,12 +3683,13 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
        o_type0.id()==ID_c_bool)
     {
       implicit_typecast_arithmetic(op0, op1);
-      if(op1.type().id()==ID_bool ||
-         op1.type().id()==ID_c_bool ||
-         op1.type().id()==ID_c_enum_tag ||
-         op1.type().id()==ID_unsignedbv ||
-         op1.type().id()==ID_signedbv)
+      if(
+        op1.type().id() == ID_bool || op1.type().id() == ID_c_bool ||
+        op1.type().id() == ID_c_enum_tag || op1.type().id() == ID_unsignedbv ||
+        op1.type().id() == ID_signedbv || op1.type().id() == ID_c_bit_field)
+      {
         return;
+      }
     }
     else if(o_type0.id()==ID_c_enum_tag ||
             o_type0.id()==ID_unsignedbv ||
@@ -3696,7 +3697,12 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
             o_type0.id()==ID_c_bit_field)
     {
       implicit_typecast_arithmetic(op0, op1);
-      return;
+      if(
+        op1.type().id() == ID_c_enum_tag || op1.type().id() == ID_unsignedbv ||
+        op1.type().id() == ID_signedbv || op1.type().id() == ID_c_bit_field)
+      {
+        return;
+      }
     }
     else if(o_type0.id()==ID_vector &&
             o_type1.id()==ID_vector)
