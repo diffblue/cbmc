@@ -32,3 +32,4 @@ jobs:
         DEFAULT_BUMP: none
         RELEASE_BRANCHES: develop
         VERBOSE: false
+        DRY_RUN: true
