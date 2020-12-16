@@ -1,0 +1,16 @@
+CORE
+main.c
+--dump-c
+signed int x
+signed int y
+const signed int \*p
+^[[:space:]]*s1 = \(struct S\)\{ .* \};
+^EXIT=0$
+^SIGNAL=0$
+--
+const signed int x
+const signed int y
+const p
+--
+This test demonstrates that the constness of struct members has been removed,
+which is necessary as the initialisation is not performed in the declaration.

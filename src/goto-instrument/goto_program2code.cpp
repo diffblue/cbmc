@@ -1591,6 +1591,8 @@ void goto_program2codet::remove_const(typet &type)
         ++it)
       remove_const(it->type());
   }
+  else if(type.id() == ID_c_bit_field)
+    to_c_bit_field_type(type).subtype().remove(ID_C_constant);
 }
 
 static bool has_labels(const codet &code)
