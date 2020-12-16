@@ -38,6 +38,7 @@ elif echo $args | grep -q -- "--dump-c-type-header" ; then
   cat "${name}-mod.gb"
   mv "${name}.gb" "${name}-mod.gb"
 elif echo $args | grep -q -- "--dump-c" ; then
+  cat "${name}-mod.gb"
   mv "${name}-mod.gb" "${name}-mod.c"
 
   if [[ "${is_windows}" == "true" ]]; then
