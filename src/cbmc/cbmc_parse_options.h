@@ -75,7 +75,7 @@ class optionst;
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
   "(nondet-static)" \
-  "(version)"        \
+  "(version)" \
   OPT_COVER \
   "(symex-coverage-report):" \
   "(mm):" \
