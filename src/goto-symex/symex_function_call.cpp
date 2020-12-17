@@ -360,57 +360,42 @@ static void pop_frame(
 {
   PRECONDITION(!state.call_stack().empty());
 
+  const framet &frame = state.call_stack().top();
+
+  // restore program counter
+  symex_transition(state, frame.calling_location.pc, false);
+  state.source.function_id = frame.calling_location.function_id;
+
+  // restore L1 renaming
+  state.level1.restore_from(frame.old_level1);
+
+  // If the program is multi-threaded then the state guard is used to
+  // accumulate assumptions (in symex_assume_l2) and must be left alone.
+  // If however it is single-threaded then we should restore the guard, as the
+  // guard coming out of the function may be more complex (e.g. if the callee
+  // was { if(x) while(true) { } } then the guard may still be `!x`),
+  // but at this point all control-flow paths have either converged or been
+  // proven unviable, so we can stop specifying the callee's constraints when
+  // we generate an assumption or VCC.
+
+  // If we're doing path exploration then we do tail-duplication, and we
+  // actually *are* in a more-restricted context than we were when the
+  // function began.
+  if(state.threads.size() == 1 && !doing_path_exploration)
   {
-    const framet &frame = state.call_stack().top();
+    state.guard = frame.guard_at_function_start;
+  }
 
-    // restore program counter
-    symex_transition(state, frame.calling_location.pc, false);
-    state.source.function_id = frame.calling_location.function_id;
+  for(const irep_idt &l1_o_id : frame.local_objects)
+  {
+    const auto l2_entry_opt = state.get_level2().current_names.find(l1_o_id);
 
-    // restore L1 renaming
-    state.level1.restore_from(frame.old_level1);
-
-    // If the program is multi-threaded then the state guard is used to
-    // accumulate assumptions (in symex_assume_l2) and must be left alone.
-    // If however it is single-threaded then we should restore the guard, as the
-    // guard coming out of the function may be more complex (e.g. if the callee
-    // was { if(x) while(true) { } } then the guard may still be `!x`),
-    // but at this point all control-flow paths have either converged or been
-    // proven unviable, so we can stop specifying the callee's constraints when
-    // we generate an assumption or VCC.
-
-    // If we're doing path exploration then we do tail-duplication, and we
-    // actually *are* in a more-restricted context than we were when the
-    // function began.
-    if(state.threads.size() == 1 && !doing_path_exploration)
+    if(
+      l2_entry_opt.has_value() &&
+      (state.threads.size() == 1 ||
+       !path_storage.dirty(l2_entry_opt->get().first.get_object_name())))
     {
-      state.guard = frame.guard_at_function_start;
-    }
-
-    symex_renaming_levelt::viewt view;
-    state.get_level2().current_names.get_view(view);
-
-    std::vector<irep_idt> keys_to_erase;
-
-    for(const auto &pair : view)
-    {
-      const irep_idt l1_o_id = pair.second.first.get_l1_object_identifier();
-
-      // could use iteration over local_objects as l1_o_id is prefix
-      if(
-        frame.local_objects.find(l1_o_id) == frame.local_objects.end() ||
-        (state.threads.size() > 1 &&
-         path_storage.dirty(pair.second.first.get_object_name())))
-      {
-        continue;
-      }
-
-      keys_to_erase.push_back(pair.first);
-    }
-
-    for(const irep_idt &key : keys_to_erase)
-    {
-      state.drop_existing_l1_name(key);
+      state.drop_existing_l1_name(l1_o_id);
     }
   }
 
