@@ -34,6 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
+#include <deque>
+
 /// Returns true if \p expr is complicated enough that a local definition (using
 /// a let expression) is preferable to repeating it, potentially many times.
 /// Of course this is just a heuristic -- currently we allow any expression that
@@ -139,7 +141,13 @@ exprt value_set_dereferencet::dereference(
     }
   }
 
-  // type of the object
+  return handle_dereference_base_case(pointer, display_points_to_sets);
+}
+
+exprt value_set_dereferencet::handle_dereference_base_case(
+  const exprt &pointer,
+  bool display_points_to_sets)
+{ // type of the object
   const typet &type=pointer.type().subtype();
 
   // collect objects the pointer may point to
@@ -167,95 +175,89 @@ exprt value_set_dereferencet::dereference(
     compare_against_pointer = fresh_binder.symbol_expr();
   }
 
-  std::list<valuet> values =
-    make_range(retained_values).map([&](const exprt &value) {
-      return build_reference_to(value, compare_against_pointer, ns);
+  auto values =
+    make_range(retained_values)
+      .map([&](const exprt &value) {
+        return build_reference_to(value, compare_against_pointer, ns);
+      })
+      .collect<std::deque<valuet>>();
+
+  const bool may_fail =
+    values.empty() ||
+    std::any_of(values.begin(), values.end(), [](const valuet &value) {
+      return value.value.is_nil();
     });
-
-  // can this fail?
-  bool may_fail;
-
-  if(values.empty())
-  {
-    may_fail=true;
-  }
-  else
-  {
-    may_fail=false;
-    for(std::list<valuet>::const_iterator
-        it=values.begin();
-        it!=values.end();
-        it++)
-      if(it->value.is_nil())
-        may_fail=true;
-  }
 
   if(may_fail)
   {
-    // first see if we have a "failed object" for this pointer
-
-    exprt failure_value;
-
-    if(
-      const symbolt *failed_symbol =
-        dereference_callback.get_or_create_failed_symbol(pointer))
-    {
-      // yes!
-      failure_value=failed_symbol->symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
-    }
-    else
-    {
-      // else: produce new symbol
-      symbolt &symbol = get_fresh_aux_symbol(
-        type,
-        "symex",
-        "invalid_object",
-        pointer.source_location(),
-        language_mode,
-        new_symbol_table);
-
-      // make it a lvalue, so we can assign to it
-      symbol.is_lvalue=true;
-
-      failure_value=symbol.symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
-    }
-
-    valuet value;
-    value.value=failure_value;
-    value.pointer_guard=true_exprt();
-    values.push_front(value);
+    values.push_front(get_failure_value(pointer, type));
   }
 
   // now build big case split, but we only do "good" objects
 
-  exprt value=nil_exprt();
+  exprt result_value = nil_exprt{};
 
-  for(std::list<valuet>::const_iterator
-      it=values.begin();
-      it!=values.end();
-      it++)
+  for(const auto &value : values)
   {
-    if(it->value.is_not_nil())
+    if(value.value.is_not_nil())
     {
-      if(value.is_nil()) // first?
-        value=it->value;
+      if(result_value.is_nil()) // first?
+        result_value = value.value;
       else
-        value=if_exprt(it->pointer_guard, it->value, value);
+        result_value = if_exprt(value.pointer_guard, value.value, result_value);
     }
   }
 
   if(compare_against_pointer != pointer)
-    value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
+    result_value =
+      let_exprt(to_symbol_expr(compare_against_pointer), pointer, result_value);
 
   if(display_points_to_sets)
   {
     log.status() << value_set_dereference_stats_to_json(
-      pointer, points_to_set, retained_values, value);
+      pointer, points_to_set, retained_values, result_value);
   }
 
-  return value;
+  return result_value;
+}
+
+value_set_dereferencet::valuet value_set_dereferencet::get_failure_value(
+  const exprt &pointer,
+  const typet &type)
+{
+  // first see if we have a "failed object" for this pointer
+  exprt failure_value;
+
+  if(
+    const symbolt *failed_symbol =
+      dereference_callback.get_or_create_failed_symbol(pointer))
+  {
+    // yes!
+    failure_value = failed_symbol->symbol_expr();
+    failure_value.set(ID_C_invalid_object, true);
+  }
+  else
+  {
+    // else: produce new symbol
+    symbolt &symbol = get_fresh_aux_symbol(
+      type,
+      "symex",
+      "invalid_object",
+      pointer.source_location(),
+      language_mode,
+      new_symbol_table);
+
+    // make it a lvalue, so we can assign to it
+    symbol.is_lvalue = true;
+
+    failure_value = symbol.symbol_expr();
+    failure_value.set(ID_C_invalid_object, true);
+  }
+
+  valuet result{};
+  result.value = failure_value;
+  result.pointer_guard = true_exprt();
+  return result;
 }
 
 /// Check if the two types have matching number of ID_pointer levels, with
