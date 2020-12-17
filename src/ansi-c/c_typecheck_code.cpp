@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/range.h>
+#include <util/string_constant.h>
 
 #include "ansi_c_declaration.h"
 
@@ -102,9 +103,24 @@ void c_typecheck_baset::typecheck_code(codet &code)
   }
   else if(statement==ID_static_assert)
   {
-    assert(code.operands().size()==2);
+    PRECONDITION(code.operands().size() == 2);
+
     typecheck_expr(code.op0());
     typecheck_expr(code.op1());
+
+    implicit_typecast_bool(code.op0());
+    make_constant(code.op0());
+
+    if(code.op0().is_false())
+    {
+      // failed
+      error().source_location = code.find_source_location();
+      error() << "static assertion failed";
+      if(code.op1().id() == ID_string_constant)
+        error() << ": " << to_string_constant(code.op1()).get_value();
+      error() << eom;
+      throw 0;
+    }
   }
   else if(statement==ID_CPROVER_try_catch ||
           statement==ID_CPROVER_try_finally)
@@ -247,7 +263,6 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
   if(declaration.get_is_static_assert())
   {
-    assert(declaration.operands().size()==2);
     codet new_code(ID_static_assert);
     new_code.add_source_location()=code.source_location();
     new_code.operands().swap(declaration.operands());
