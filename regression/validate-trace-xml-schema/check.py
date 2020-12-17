@@ -34,7 +34,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['unknown-argument-suggestion', 'test.desc'],
     # this one produces XML intermingled with main XML output when used with --xml-ui
     ['graphml_witness2', 'test.desc'],
-    # these are producing coverage goals which aren't including in the schema
+    # these are producing coverage goals which aren't included in the schema
     ['cover-failed-assertions', 'test.desc'],
     ['cover-failed-assertions', 'test-no-failed-assertions.desc'],
     # produces intermingled XML on the command line
