@@ -43,10 +43,10 @@ int main()
 
   _Static_assert(__builtin_isnormal(DBL_MIN), "__builtin_isnormal is constant");
 
-  _Static_assert(!__builtin_isinf(0), "__builtin_isinf is constant");
+  _Static_assert(!__builtin_isinf(0.0), "__builtin_isinf is constant");
 
   _Static_assert(
-    __builtin_isinf_sign(0) == 0, "__builtin_isinf_sign is constant");
+    __builtin_isinf_sign(0.0) == 0, "__builtin_isinf_sign is constant");
 
 #endif
 

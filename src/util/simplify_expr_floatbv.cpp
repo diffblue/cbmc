@@ -20,9 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 simplify_exprt::resultt<>
 simplify_exprt::simplify_isinf(const unary_exprt &expr)
 {
-  if(expr.op().type().id() != ID_floatbv)
-    return unchanged(expr);
-
   if(expr.op().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op()));
