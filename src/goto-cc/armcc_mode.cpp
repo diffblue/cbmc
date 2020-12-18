@@ -46,10 +46,11 @@ int armcc_modet::doit()
     has_prefix(base_name, "goto-link");
   #endif
 
-  const auto verbosity = eval_verbosity(
+  const auto verbosity = messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
 
-  debug() << "ARM mode" << eom;
+  messaget log{message_handler};
+  log.debug() << "ARM mode" << messaget::eom;
 
   // model validation
   compiler.validate_goto_model = cmdline.isset("validate-goto-model");
