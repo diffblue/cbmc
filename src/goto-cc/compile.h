@@ -27,13 +27,10 @@ class compilet : public messaget
 {
 public:
   // compilation results
-  namespacet ns;
   goto_modelt goto_model;
 
   // configuration
   bool echo_file_name;
-  std::string working_directory;
-  std::string override_language;
   bool validate_goto_model = false;
 
   enum { PREPROCESS_ONLY, // gcc -E
@@ -48,8 +45,6 @@ public:
   std::list<std::string> source_files;
   std::list<std::string> object_files;
   std::list<std::string> libraries;
-  std::list<std::string> tmp_dirs;
-  std::list<irep_idt> seen_modes;
 
   std::string object_file_extension;
   std::string output_file_executable;
@@ -93,6 +88,14 @@ public:
   }
 
 protected:
+  namespacet ns;
+
+  std::string working_directory;
+  std::string override_language;
+
+  std::list<std::string> tmp_dirs;
+  std::list<irep_idt> seen_modes;
+
   cmdlinet &cmdline;
   bool warning_is_fatal;
 
