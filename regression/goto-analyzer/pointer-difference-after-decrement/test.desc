@@ -5,5 +5,5 @@ main.c
 ^SIGNAL=0$
 ^\[main.assertion.1\] line 10 assertion q - p == 1: SUCCESS
 ^\[main.assertion.2\] line 11 assertion q != p: UNKNOWN
-^\[main.assertion.3\] line 14 assertion q - p == 0: UNKNOWN
-^\[main.assertion.4\] line 15 assertion q == p: UNKNOWN
+^\[main.assertion.3\] line 14 assertion q - p == 0: SUCCESS
+^\[main.assertion.4\] line 15 assertion q == p: SUCCESS

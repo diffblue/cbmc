@@ -453,6 +453,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
       return changed(simplify_plus(result));
     }
 
+    // (T*)p+a - don't simplify any further
+    if(
+      expr.type().id() == ID_pointer && expr.operands().size() == 2 &&
+      is_number(expr.op1().type()))
+    {
+      return unchanged(expr);
+    }
+
     // count the constants
     size_t count=0;
     forall_operands(it, expr)
