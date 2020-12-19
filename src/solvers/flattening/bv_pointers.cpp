@@ -138,7 +138,7 @@ bool bv_pointerst::convert_address_of_rec(
 
     // get size
     auto size = pointer_offset_size(array_type.subtype(), ns);
-    CHECK_RETURN(size.has_value() && *size > 0);
+    CHECK_RETURN(size.has_value() && *size >= 0);
 
     offset_arithmetic(bv, *size, index);
     CHECK_RETURN(bv.size()==bits);
@@ -342,7 +342,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         else
         {
           auto size_opt = pointer_offset_size(pointer_sub_type, ns);
-          CHECK_RETURN(size_opt.has_value() && *size_opt > 0);
+          CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
           size = *size_opt;
         }
       }
