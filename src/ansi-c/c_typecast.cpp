@@ -701,6 +701,11 @@ void c_typecastt::implicit_typecast_arithmetic(
     if(type1==type2)
       return;
   }
+  else if(max_type == OTHER)
+  {
+    errors.push_back("implicit arithmetic conversion not permitted");
+    return;
+  }
 
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
