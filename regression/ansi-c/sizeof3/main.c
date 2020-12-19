@@ -4,6 +4,7 @@
 #define STATIC_ASSERT(condition)                                               \
   int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
+#ifndef _MSC_VER
 struct empty_struct { };
 union empty_union { };
 
@@ -16,6 +17,7 @@ struct combination {
 STATIC_ASSERT(sizeof(struct empty_struct)==0);
 STATIC_ASSERT(sizeof(union empty_union)==0);
 STATIC_ASSERT(sizeof(struct combination)==sizeof(int));
+#endif
 
 int main()
 {

@@ -1,6 +1,9 @@
 // The member without name is a Visual Studio feature
 // https://msdn.microsoft.com/en-us/library/z2cx9y4f.aspx
 
+#ifdef _MSC_VER
+#  include <assert.h>
+
 struct X
 {
   struct
@@ -47,3 +50,8 @@ int main()
   assert(s2.y==1);
   assert(s2.z==1);
 }
+#else
+int main()
+{
+}
+#endif

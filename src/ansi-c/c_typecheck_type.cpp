@@ -934,6 +934,41 @@ void c_typecheck_baset::typecheck_compound_body(
 
         typecheck_type(new_component.type());
 
+        // the rules for anonymous members depend on the type and the compiler,
+        // just bit fields are accepted everywhere
+        if(
+          new_component.get_name().empty() &&
+          new_component.type().id() != ID_c_bit_field)
+        {
+          if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+          {
+            // Visual Studio rejects anything other than a struct or union
+            // declaration, but also accepts those when they introduce a tag
+            if(
+              new_component.type().id() != ID_struct_tag &&
+              new_component.type().id() != ID_union_tag)
+            {
+              error().source_location = source_location;
+              error() << "no members defined" << eom;
+              throw 0;
+            }
+          }
+          else
+          {
+            // GCC and Clang ignore anything other than an untagged struct or
+            // union; we could print a warning, but there isn't any ambiguity in
+            // semantics here. Printing a warning could elevate this to an error
+            // when compiling code with goto-cc with -Werror.
+            if(
+              (new_component.type().id() != ID_struct_tag &&
+               new_component.type().id() != ID_union_tag) ||
+              follow(new_component.type()).find(ID_tag).is_not_nil())
+            {
+              continue;
+            }
+          }
+        }
+
         if(!is_complete_type(new_component.type()) &&
            (new_component.type().id()!=ID_array ||
             !to_array_type(new_component.type()).is_incomplete()))
@@ -1023,20 +1058,6 @@ void c_typecheck_baset::typecheck_compound_body(
   else if(type.id()==ID_union)
     add_padding(to_union_type(type), *this);
 
-  // Now remove zero-width bit-fields, these are just
-  // for adjusting alignment.
-  for(struct_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
-      ) // blank
-  {
-    if(it->type().id()==ID_c_bit_field &&
-       to_c_bit_field_type(it->type()).get_width()==0)
-      it=components.erase(it);
-    else
-      it++;
-  }
-
   // finally, check _Static_assert inside the compound
   for(struct_union_typet::componentst::iterator
       it=components.begin();
@@ -1073,6 +1094,18 @@ void c_typecheck_baset::typecheck_compound_body(
     }
     else
       it++;
+  }
+
+  // Visual Studio strictly follows the C standard and does not permit empty
+  // struct/union declarations
+  if(
+    components.empty() &&
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    error().source_location = type.source_location();
+    error() << "C requires that a struct or union has at least one member"
+            << eom;
+    throw 0;
   }
 }
 

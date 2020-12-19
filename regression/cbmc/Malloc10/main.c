@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 
 void __blast_assert()
@@ -7,6 +8,7 @@ void __blast_assert()
 
 struct list_head
 {
+  int dummy;
 };
 
 struct list_head *elem = (struct list_head *)((void *)0);

@@ -282,10 +282,13 @@ void dump_ct::operator()(std::ostream &os)
 
     if(
       symbol.is_type &&
-      (symbol.type.id() == ID_struct || symbol.type.id() == ID_union))
+      (symbol.type.id() == ID_struct || symbol.type.id() == ID_union) &&
+      !to_struct_union_type(symbol.type).is_incomplete())
+    {
       convert_compound_declaration(
           symbol,
           compound_body_stream);
+    }
   }
 
   // Dump the code to the target stream;
