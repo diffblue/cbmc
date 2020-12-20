@@ -549,11 +549,9 @@ get_contract(const irep_idt &function, const namespacet &ns)
   }
 
   const auto &type = to_code_with_contract_type(contract_sym->type);
-  if(type != function_symbol.type)
-  {
-    throw invalid_input_exceptiont(
-      "Contract of '" + function_str + "' has different signature.");
-  }
+  DATA_INVARIANT(
+    type == function_symbol.type,
+    "front-end should have rejected re-declarations with a different type");
 
   return type;
 }

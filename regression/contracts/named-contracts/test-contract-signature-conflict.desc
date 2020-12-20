@@ -1,8 +1,8 @@
 CORE
 main-contract-signature-conflict.c
 --enforce-contract foo
-^Contract of 'foo' has different signature\.$
-^EXIT=6$
+function symbol 'foo' redefined with a different type
+^EXIT=(64|1)$
 ^SIGNAL=0$
 --
 --
