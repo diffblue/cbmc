@@ -139,7 +139,9 @@ void restrict_function_pointer(
       goto_programt::make_goto(
         else_location,
         notequal_exprt{pointer_symbol,
-                       address_of_exprt{function_pointer_target_symbol_expr}}));
+                       typecast_exprt::conditional_cast(
+                         address_of_exprt{function_pointer_target_symbol_expr},
+                         pointer_symbol.type())}));
   }
 }
 } // namespace
@@ -203,8 +205,14 @@ void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
           "symbol not found: " + id2string(function_pointer_target)};
       }
       auto const &function_pointer_target_type =
-        function_pointer_target_sym->type;
-      if(function_type != function_pointer_target_type)
+        to_code_type(function_pointer_target_sym->type);
+      const auto &function_code_type = to_code_type(function_type);
+      // we accept a difference in has_ellipsis()
+      if(
+        function_code_type.return_type() !=
+          function_pointer_target_type.return_type() ||
+        function_code_type.parameters() !=
+          function_pointer_target_type.parameters())
       {
         throw invalid_restriction_exceptiont{
           "type mismatch: `" + id2string(restriction.first) + "' points to `" +
