@@ -11,6 +11,7 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/simplify_expr_class.h>
 
 #include <algorithm>
 #include <map>
@@ -53,6 +54,8 @@ std::vector<abstract_object_pointert> eval_operands(
   const abstract_environmentt &env,
   const namespacet &ns);
 
+exprt simplify_vsd_expr(exprt src, const namespacet &ns);
+
 abstract_object_pointert
 abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 {
@@ -60,7 +63,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return abstract_object_factory(expr.type(), ns, false, true);
 
   // first try to canonicalise, including constant folding
-  const exprt &simplified_expr = simplify_expr(expr, ns);
+  const exprt &simplified_expr = simplify_vsd_expr(expr, ns);
 
   const irep_idt simplified_id = simplified_expr.id();
   if(simplified_id == ID_symbol)
@@ -823,4 +826,19 @@ exprt assume_greater_than(
     binary_relation_exprt(gt_expr.rhs(), symmetric_op, gt_expr.lhs());
 
   return assume_less_than(env, symmetric_expr, ns);
+}
+
+class simplify_vsd_exprt : public simplify_exprt
+{
+public:
+  simplify_vsd_exprt(const namespacet &_ns) : simplify_exprt(_ns)
+  {
+    vsd_pointers = true;
+  }
+};
+
+exprt simplify_vsd_expr(exprt src, const namespacet &ns)
+{
+  simplify_vsd_exprt(ns).simplify(src);
+  return src;
 }

@@ -117,7 +117,7 @@ abstract_object_pointert abstract_objectt::expression_transform(
     op = const_op.is_nil() ? op : const_op;
   }
 
-  simplify(copy, ns);
+  simplify_vsd_expr(copy, ns);
 
   for(const exprt &op : copy.operands())
   {

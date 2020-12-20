@@ -455,8 +455,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
 
     // (T*)p+a - don't simplify any further
     if(
-      expr.type().id() == ID_pointer && expr.operands().size() == 2 &&
-      is_number(expr.op1().type()))
+      vsd_pointers && expr.type().id() == ID_pointer &&
+      expr.operands().size() == 2 && is_number(expr.op1().type()))
     {
       return unchanged(expr);
     }
@@ -599,7 +599,8 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     if(operands[0]==operands[1])
       return from_integer(0, minus_expr.type());
 
-    return to_ptr_diff_expr(minus_expr);
+    if(vsd_pointers)
+      return to_ptr_diff_expr(minus_expr);
   }
 
   return unchanged(expr);
