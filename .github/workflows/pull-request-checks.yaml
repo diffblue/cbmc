@@ -16,7 +16,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache
+          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache
           make -C src minisat2-download
       - name: Prepare ccache
         uses: actions/cache@v2
@@ -66,7 +66,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -224,7 +224,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -yq clang-format-7
+          sudo apt-get install --no-install-recommends -yq clang-format-7
       - name: Check updated lines of code match clang-format-7 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
@@ -305,7 +305,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+        run: sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
       - name: Prepare ccache
         uses: actions/cache@v2
         with:

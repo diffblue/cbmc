@@ -13,7 +13,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+        run: sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -69,7 +69,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt install g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+        run: sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
