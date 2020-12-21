@@ -396,9 +396,9 @@ bool goto_symex_statet::l2_thread_read_encoding(
         guardt g = guard_in_list;
         g-=guard;
         if(g.is_true())
-          // there has already been a write to l1_identifier within
-          // this atomic section under the same guard, or a guard
-          // that implies the current one
+          // There has already been a write to l1_identifier within this atomic
+          // section under the same guard, or a guard implied by the current
+          // one.
           return false;
 
         write_guard |= guard_in_list;
@@ -418,9 +418,8 @@ bool goto_symex_statet::l2_thread_read_encoding(
       guardt g = a_s_read_guard; // copy
       g-=guard;
       if(g.is_true())
-        // there has already been a read l1_identifier within
-        // this atomic section under the same guard, or a guard
-        // that implies the current one
+        // There has already been a read of l1_identifier within this atomic
+        // section under the same guard, or a guard implied by the current one.
         return false;
 
       read_guard |= a_s_read_guard;
@@ -430,20 +429,29 @@ bool goto_symex_statet::l2_thread_read_encoding(
     if(!no_write.op().is_false())
       cond |= guardt{no_write.op(), guard_manager};
 
-    const renamedt<ssa_exprt, L2> l2_true_case = set_indices<L2>(ssa_l1, ns);
+    // It is safe to perform constant propagation in case we have read or
+    // written this object within the atomic section. We must actually do this,
+    // because goto_state::apply_condition may have placed the latest value in
+    // the propagation map without recording an assignment.
+    auto p_it = propagation.find(ssa_l1.get_identifier());
+    const exprt l2_true_case =
+      p_it.has_value() ? *p_it : set_indices<L2>(ssa_l1, ns).get();
+
+    if(!cond.is_true())
+      level2.increase_generation(l1_identifier, ssa_l1, fresh_l2_name_provider);
 
     if(a_s_read.second.empty())
-    {
-      level2.increase_generation(l1_identifier, ssa_l1, fresh_l2_name_provider);
       a_s_read.first = level2.latest_index(l1_identifier);
-    }
+
     const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
 
     exprt tmp;
     if(cond.is_false())
       tmp = l2_false_case.get();
+    else if(cond.is_true())
+      tmp = l2_true_case;
     else
-      tmp = if_exprt{cond.as_expr(), l2_true_case.get(), l2_false_case.get()};
+      tmp = if_exprt{cond.as_expr(), l2_true_case, l2_false_case.get()};
 
     record_events.push(false);
     ssa_exprt ssa_l2 = assignment(std::move(ssa_l1), tmp, ns, true, true).get();
