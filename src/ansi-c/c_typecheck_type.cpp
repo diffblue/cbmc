@@ -934,6 +934,13 @@ void c_typecheck_baset::typecheck_compound_body(
           throw 0;
         }
 
+        if(new_component.type().id() == ID_empty)
+        {
+          error().source_location = source_location;
+          error() << "void-typed member not permitted" << eom;
+          throw 0;
+        }
+
         components.push_back(new_component);
       }
     }

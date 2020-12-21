@@ -148,6 +148,13 @@ void cpp_typecheckt::convert_non_template_declaration(
       declaration_type, declaration.storage_spec(),
       declaration.member_spec(), declarator);
 
+    if(!symbol.is_type && symbol.type.id() == ID_empty)
+    {
+      error().source_location = symbol.location;
+      error() << "void-typed symbol not permitted" << eom;
+      throw 0;
+    }
+
     // any template instance to remember?
     if(declaration.find(ID_C_template).is_not_nil())
     {

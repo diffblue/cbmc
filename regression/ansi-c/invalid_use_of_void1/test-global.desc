@@ -1,0 +1,9 @@
+CORE test-c++-front-end
+main.c
+-Dvoid_global
+^EXIT=(64|1)$
+^SIGNAL=0$
+void-typed symbol not permitted
+^CONVERSION ERROR$
+--
+Invariant check failed

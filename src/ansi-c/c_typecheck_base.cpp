@@ -103,6 +103,13 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     symbol.pretty_name=new_name;
   }
 
+  if(!symbol.is_type && symbol.type.id() == ID_empty)
+  {
+    error().source_location = symbol.location;
+    error() << "void-typed symbol not permitted" << eom;
+    throw 0;
+  }
+
   // see if we have it already
   symbol_tablet::symbolst::const_iterator old_it=
     symbol_table.symbols.find(symbol.name);
