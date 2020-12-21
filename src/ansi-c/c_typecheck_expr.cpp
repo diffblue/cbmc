@@ -1893,7 +1893,10 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         INVARIANT(
           !parameters.empty(),
           "GCC polymorphic built-ins should have at least one parameter");
-        /// XXX why are we only looking at the type of the first parameter?
+
+        // For all atomic/sync polymorphic built-ins (which are the ones handled
+        // by typecheck_gcc_polymorphic_builtin), looking at the first parameter
+        // suffices to distinguish different implementations.
         if(parameters.front().type().id() == ID_pointer)
         {
           identifier_with_type = id2string(identifier) + "_" +
