@@ -101,7 +101,6 @@ void remove_asmt::gcc_asm_function_call(
   }
 
   code_typet fkt_type({}, empty_typet());
-  fkt_type.make_ellipsis();
 
   symbol_exprt fkt(function_identifier, fkt_type);
 
@@ -150,7 +149,6 @@ void remove_asmt::msc_asm_function_call(
   const typet void_pointer = pointer_type(empty_typet());
 
   code_typet fkt_type({}, empty_typet());
-  fkt_type.make_ellipsis();
 
   symbol_exprt fkt(function_identifier, fkt_type);
 
