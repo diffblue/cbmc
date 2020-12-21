@@ -1259,8 +1259,7 @@ void configt::set_from_symbol_table(
   else
     ansi_c.os=ansi_ct::string_to_os(id2string(string_from_ns(ns, "os")));
 
-  // NULL_is_zero=from_ns("NULL_is_zero");
-  ansi_c.NULL_is_zero=true;
+  ansi_c.NULL_is_zero = unsigned_from_ns(ns, "NULL_is_zero") != 0;
 
   // mode, preprocessor (and all preprocessor command line options),
   // lib, string_abstraction not stored in namespace
