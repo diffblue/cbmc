@@ -1,0 +1,10 @@
+CORE gcc-only
+not_constant.c
+
+expected constant expression
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed

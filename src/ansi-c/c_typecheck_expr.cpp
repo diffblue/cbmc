@@ -2457,6 +2457,15 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
+    const exprt &fp_value = expr.arguments().front();
+
+    if(fp_value.type().id() != ID_floatbv)
+    {
+      error().source_location = fp_value.source_location();
+      error() << "non-floating-point argument for " << identifier << eom;
+      throw 0;
+    }
+
     isinf_exprt isinf_expr(expr.arguments().front());
     isinf_expr.add_source_location()=source_location;
 
@@ -2476,6 +2485,13 @@ exprt c_typecheck_baset::do_special_functions(
     // returns 1 for +inf and -1 for -inf, and 0 otherwise
 
     const exprt &fp_value = expr.arguments().front();
+
+    if(fp_value.type().id() != ID_floatbv)
+    {
+      error().source_location = fp_value.source_location();
+      error() << "non-floating-point argument for " << identifier << eom;
+      throw 0;
+    }
 
     isinf_exprt isinf_expr(fp_value);
     isinf_expr.add_source_location() = source_location;

@@ -852,7 +852,15 @@ or_eq               { return cpp98_keyword(TOK_ORASSIGN); }
 private             { return cpp98_keyword(TOK_PRIVATE); }
 protected           { return cpp98_keyword(TOK_PROTECTED); }
 public              { return cpp98_keyword(TOK_PUBLIC); }
-static_assert       { return cpp11_keyword(TOK_STATIC_ASSERT); } // C++11
+static_assert       { // C++11, but Visual Studio supports it in all modes (and
+                      // doesn't support _Static_assert)
+                      if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+                      {
+                        loc(); return TOK_STATIC_ASSERT;
+                      }
+                      else
+                        return cpp11_keyword(TOK_STATIC_ASSERT);
+                    }
 template            { return cpp98_keyword(TOK_TEMPLATE); }
 this                { return cpp98_keyword(TOK_THIS); }
 thread_local        { return cpp11_keyword(TOK_THREAD_LOCAL); } // C++11

@@ -1036,6 +1036,13 @@ void c_typecheck_baset::typecheck_compound_body(
   {
     if(it->id()==ID_static_assert)
     {
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+      {
+        error().source_location = it->source_location();
+        error() << "static_assert not supported in compound body" << eom;
+        throw 0;
+      }
+
       exprt &assertion = to_binary_expr(*it).op0();
       typecheck_expr(assertion);
       typecheck_expr(to_binary_expr(*it).op1());

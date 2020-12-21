@@ -1,0 +1,10 @@
+CORE gcc-only
+global.c
+
+static assertion failed: must fail
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
