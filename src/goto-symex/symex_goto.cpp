@@ -53,6 +53,9 @@ void goto_symext::apply_goto_condition(
     &jump_not_taken_state.value_set,
     ns);
 
+  if(!symex_config.constant_propagation)
+    return;
+
   jump_taken_state.apply_condition(new_guard, current_state, ns);
 
   // Could use not_exprt + simplify, but let's avoid paying that cost on quite
