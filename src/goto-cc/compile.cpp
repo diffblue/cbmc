@@ -42,6 +42,7 @@ Date: June 2006
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
 
+#include <linking/linking.h>
 #include <linking/static_lifetime_init.h>
 
 #define DOTGRAPHSETTINGS  "color=black;" \
@@ -56,8 +57,6 @@ Date: June 2006
 /// \return true on error, false otherwise
 bool compilet::doit()
 {
-  goto_model.goto_functions.clear();
-
   add_compiler_specific_defines();
 
   // Parse command line for source and object file names
@@ -98,15 +97,15 @@ bool compilet::doit()
   const unsigned warnings_before=
     get_message_handler().get_message_count(messaget::M_WARNING);
 
-  if(!source_files.empty())
-    if(compile())
-      return true;
+  auto symbol_table_opt = compile();
+  if(!symbol_table_opt.has_value())
+    return true;
 
   if(mode==LINK_LIBRARY ||
      mode==COMPILE_LINK ||
      mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(link())
+    if(link(*symbol_table_opt))
       return true;
   }
 
@@ -308,11 +307,14 @@ bool compilet::find_library(const std::string &name)
 
 /// parses object files and links them
 /// \return true on error, false otherwise
-bool compilet::link()
+bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
 {
   // "compile" hitherto uncompiled functions
   statistics() << "Compiling functions" << eom;
-  convert_symbols(goto_model.goto_functions);
+  goto_modelt goto_model;
+  if(symbol_table.has_value())
+    goto_model.symbol_table = std::move(*symbol_table);
+  convert_symbols(goto_model);
 
   // parse object files
   for(const auto &file_name : object_files)
@@ -343,7 +345,7 @@ bool compilet::link()
       return true;
 
     // entry_point may (should) add some more functions.
-    convert_symbols(goto_model.goto_functions);
+    convert_symbols(goto_model);
   }
 
   if(keep_file_local)
@@ -359,11 +361,13 @@ bool compilet::link()
   return add_written_cprover_symbols(goto_model.symbol_table);
 }
 
-/// parses source files and writes object files, or keeps the symbols in the
-/// symbol_table depending on the doLink flag.
-/// \return true on error, false otherwise
-bool compilet::compile()
+/// Parses source files and writes object files, or keeps the symbols in the
+/// symbol_table if not compiling/assembling only.
+/// \return Symbol table, if parsing and type checking succeeded, else empty
+optionalt<symbol_tablet> compilet::compile()
 {
+  symbol_tablet symbol_table;
+
   while(!source_files.empty())
   {
     std::string file_name=source_files.front();
@@ -374,9 +378,9 @@ bool compilet::compile()
     if(echo_file_name)
       std::cout << get_base_name(file_name, false) << '\n' << std::flush;
 
-    bool r=parse_source(file_name); // don't break the program!
+    auto file_symbol_table = parse_source(file_name);
 
-    if(r)
+    if(!file_symbol_table.has_value())
     {
       const std::string &debug_outfile=
         cmdline.get_value("print-rejected-preprocessed-source");
@@ -388,7 +392,7 @@ bool compilet::compile()
         warning() << "Failed sources in " << debug_outfile << eom;
       }
 
-      return true; // parser/typecheck error
+      return {}; // parser/typecheck error
     }
 
     if(mode==COMPILE_ONLY || mode==ASSEMBLE_ONLY)
@@ -396,7 +400,9 @@ bool compilet::compile()
       // output an object file for every source file
 
       // "compile" functions
-      convert_symbols(goto_model.goto_functions);
+      goto_modelt file_goto_model;
+      file_goto_model.symbol_table = std::move(*file_symbol_table);
+      convert_symbols(file_goto_model);
 
       std::string cfn;
 
@@ -416,21 +422,26 @@ bool compilet::compile()
       if(keep_file_local)
       {
         function_name_manglert<file_name_manglert> mangler(
-          get_message_handler(), goto_model, file_local_mangle_suffix);
+          get_message_handler(), file_goto_model, file_local_mangle_suffix);
         mangler.mangle();
       }
 
-      if(write_bin_object_file(cfn, goto_model))
-        return true;
+      if(write_bin_object_file(cfn, file_goto_model))
+        return {};
 
-      if(add_written_cprover_symbols(goto_model.symbol_table))
-        return true;
-
-      goto_model.clear(); // clean symbol table for next source file.
+      if(add_written_cprover_symbols(file_goto_model.symbol_table))
+        return {};
+    }
+    else
+    {
+      if(linking(symbol_table, *file_symbol_table, get_message_handler()))
+      {
+        return {};
+      }
     }
   }
 
-  return false;
+  return std::move(symbol_table);
 }
 
 /// parses a source file (low-level parsing)
@@ -556,32 +567,33 @@ bool compilet::parse_stdin(languaget &language)
   return false;
 }
 
-/// Writes the goto functions of \p src_goto_model to a binary format object
-/// file.
-/// \param file_name: Target file to serialize \p src_goto_model to
-/// \param src_goto_model: goto model to serialize
-/// \return true on error, false otherwise
 bool compilet::write_bin_object_file(
   const std::string &file_name,
-  const goto_modelt &src_goto_model)
+  const goto_modelt &src_goto_model,
+  bool validate_goto_model,
+  message_handlert &message_handler)
 {
+  messaget log(message_handler);
+
   if(validate_goto_model)
   {
-    status() << "Validating goto model" << eom;
+    log.status() << "Validating goto model" << messaget::eom;
     src_goto_model.validate();
   }
 
-  statistics() << "Writing binary format object '" << file_name << "'" << eom;
+  log.statistics() << "Writing binary format object '" << file_name << "'"
+                   << messaget::eom;
 
   // symbols
-  statistics() << "Symbols in table: "
-               << src_goto_model.symbol_table.symbols.size() << eom;
+  log.statistics() << "Symbols in table: "
+                   << src_goto_model.symbol_table.symbols.size()
+                   << messaget::eom;
 
   std::ofstream outfile(file_name, std::ios::binary);
 
   if(!outfile.is_open())
   {
-    error() << "Error opening file '" << file_name << "'" << eom;
+    log.error() << "Error opening file '" << file_name << "'" << messaget::eom;
     return true;
   }
 
@@ -590,47 +602,46 @@ bool compilet::write_bin_object_file(
 
   const auto cnt = function_body_count(src_goto_model.goto_functions);
 
-  statistics() << "Functions: "
-               << src_goto_model.goto_functions.function_map.size() << "; "
-               << cnt << " have a body." << eom;
+  log.statistics() << "Functions: "
+                   << src_goto_model.goto_functions.function_map.size() << "; "
+                   << cnt << " have a body." << messaget::eom;
 
   outfile.close();
-  wrote_object=true;
 
   return false;
 }
 
-/// parses a source file
-/// \return true on error, false otherwise
-bool compilet::parse_source(const std::string &file_name)
+/// Parses and type checks a source file located at \p file_name.
+/// \return A symbol table if, and only if, parsing and type checking succeeded.
+optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
 {
   language_filest language_files;
   language_files.set_message_handler(get_message_handler());
 
   if(parse(file_name, language_files))
-    return true;
+    return {};
 
   // we just typecheck one file here
-  if(language_files.typecheck(goto_model.symbol_table, keep_file_local))
+  symbol_tablet file_symbol_table;
+  if(language_files.typecheck(file_symbol_table, keep_file_local))
   {
     error() << "CONVERSION ERROR" << eom;
-    return true;
+    return {};
   }
 
-  if(language_files.final(goto_model.symbol_table))
+  if(language_files.final(file_symbol_table))
   {
     error() << "CONVERSION ERROR" << eom;
-    return true;
+    return {};
   }
 
-  return false;
+  return std::move(file_symbol_table);
 }
 
 /// constructor
 /// \return nothing
 compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
   : messaget(mh),
-    ns(goto_model.symbol_table),
     cmdline(_cmdline),
     warning_is_fatal(Werror),
     keep_file_local(
@@ -661,8 +672,7 @@ compilet::~compilet()
     delete_directory(dir);
 }
 
-std::size_t
-compilet::function_body_count(const goto_functionst &functions) const
+std::size_t compilet::function_body_count(const goto_functionst &functions)
 {
   std::size_t count = 0;
 
@@ -679,7 +689,7 @@ void compilet::add_compiler_specific_defines() const
     std::string("__GOTO_CC_VERSION__=") + CBMC_VERSION);
 }
 
-void compilet::convert_symbols(goto_functionst &dest)
+void compilet::convert_symbols(goto_modelt &goto_model)
 {
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(goto_model.symbol_table);
@@ -713,7 +723,8 @@ void compilet::convert_symbols(goto_functionst &dest)
         s_it->second.value.is_not_nil())
       {
         debug() << "Compiling " << s_it->first << eom;
-        converter.convert_function(s_it->first, dest.function_map[s_it->first]);
+        converter.convert_function(
+          s_it->first, goto_model.goto_functions.function_map[s_it->first]);
         symbol_table_builder.get_writeable_ref(symbol).set_compiled();
       }
     }

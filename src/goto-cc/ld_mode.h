@@ -40,7 +40,7 @@ protected:
   /// \brief call ld with original command line
   int run_ld();
 
-  int ld_hybrid_binary(compilet &compiler);
+  int ld_hybrid_binary(bool);
 };
 
 #endif // CPROVER_GOTO_CC_LD_MODE_H
