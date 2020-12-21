@@ -17,9 +17,9 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install -y coreutils  build-essential gcc git make flex bison software-properties-common libwww-perl python
-          sudo apt-get install -y bin86 gdb bcc liblzma-dev python-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
-          sudo apt-get install -y libgtk2.0-dev libyajl-dev sudo time
+          sudo apt-get install --no-install-recommends -y coreutils  build-essential gcc git make flex bison software-properties-common libwww-perl python
+          sudo apt-get install --no-install-recommends -y bin86 gdb bcc liblzma-dev python-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
+          sudo apt-get install --no-install-recommends -y libgtk2.0-dev libyajl-dev sudo time
 
       - name: Build CBMC tools
         run: |
