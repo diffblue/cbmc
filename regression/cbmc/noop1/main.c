@@ -1,9 +1,7 @@
-#include <assert.h>
-
 int some_function()
 {
   // this will not be executed
-  assert(0);
+  __CPROVER_assert(0, "not executed");
 }
 
 int main()

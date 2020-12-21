@@ -1885,6 +1885,20 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         // yes, it's a builtin
       }
       else if(
+        identifier == "__noop" &&
+        config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+      {
+        // https://docs.microsoft.com/en-us/cpp/intrinsics/noop
+        // typecheck and discard, just generating 0 instead
+        for(auto &op : expr.arguments())
+          typecheck_expr(op);
+
+        exprt result = from_integer(0, signed_int_type());
+        expr.swap(result);
+
+        return;
+      }
+      else if(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {
