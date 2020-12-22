@@ -1,0 +1,18 @@
+KNOWNBUG
+main.c
+-Dlocals_bug
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+There is a need for further debugging around copying local objects in
+the procedure spawning threads as we generate the following non-sensical
+constraint:
+// 28 file regression/cbmc-concurrency/dirty_local3/main.c line 3 function worker
+(57) CONSTRAINT(z!1@0#2 == z!1@0 || !choice_rf0)
+                ^^^^^^^^^^^^^^^^
+                comparison of L2 and L1 SSA symbols
+// 28 file regression/cbmc-concurrency/dirty_local3/main.c line 3 function worker
+(58) CONSTRAINT(choice_rf0)
