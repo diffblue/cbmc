@@ -38,7 +38,7 @@ void symex_assignt::assign_rec(
   const exprt &rhs,
   exprt::operandst &guard)
 {
-  if(lhs.id() == ID_symbol && lhs.get_bool(ID_C_SSA_symbol))
+  if(is_ssa_expr(lhs))
   {
     assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
   }

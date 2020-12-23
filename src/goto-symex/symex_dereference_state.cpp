@@ -30,8 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 const symbolt *
 symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
 {
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  if(is_ssa_expr(expr))
   {
     const ssa_exprt &ssa_expr=to_ssa_expr(expr);
     if(ssa_expr.get_original_expr().id()!=ID_symbol)

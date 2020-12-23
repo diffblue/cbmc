@@ -33,7 +33,7 @@ exprt field_sensitivityt::apply(
       *it = apply(ns, state, std::move(*it), write);
   }
 
-  if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) && !write)
+  if(is_ssa_expr(expr) && !write)
   {
     return get_fields(ns, state, to_ssa_expr(expr));
   }
@@ -59,8 +59,7 @@ exprt field_sensitivityt::apply(
     member_exprt &member = to_member_expr(expr);
 
     if(
-      member.struct_op().id() == ID_symbol &&
-      member.struct_op().get_bool(ID_C_SSA_symbol) &&
+      is_ssa_expr(member.struct_op()) &&
       (member.struct_op().type().id() == ID_struct ||
        member.struct_op().type().id() == ID_struct_tag))
     {
@@ -88,9 +87,7 @@ exprt field_sensitivityt::apply(
     simplify(index.index(), ns);
 
     if(
-      index.array().id() == ID_symbol &&
-      index.array().get_bool(ID_C_SSA_symbol) &&
-      index.array().type().id() == ID_array &&
+      is_ssa_expr(index.array()) && index.array().type().id() == ID_array &&
       index.index().id() == ID_constant)
     {
       // place the entire index expression, not just the array operand, in an
@@ -252,7 +249,7 @@ void field_sensitivityt::field_assignments_rec(
 {
   if(lhs == lhs_fs)
     return;
-  else if(lhs_fs.id() == ID_symbol && lhs_fs.get_bool(ID_C_SSA_symbol))
+  else if(is_ssa_expr(lhs_fs))
   {
     exprt ssa_rhs = state.rename(lhs, ns).get();
     simplify(ssa_rhs, ns);

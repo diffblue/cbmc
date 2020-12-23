@@ -148,8 +148,7 @@ bool postconditiont::is_used(
   {
     return is_used_address_of(to_address_of_expr(expr).object(), identifier);
   }
-  else if(expr.id()==ID_symbol &&
-          expr.get_bool(ID_C_SSA_symbol))
+  else if(is_ssa_expr(expr))
   {
     return to_ssa_expr(expr).get_object_name()==identifier;
   }

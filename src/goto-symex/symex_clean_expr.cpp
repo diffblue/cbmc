@@ -60,9 +60,8 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     expr.swap(tmp);
     process_array_expr(expr, do_simplify, ns);
   }
-  else if(expr.id()==ID_symbol &&
-          expr.get_bool(ID_C_SSA_symbol) &&
-          to_ssa_expr(expr).get_original_expr().id()==ID_index)
+  else if(
+    is_ssa_expr(expr) && to_ssa_expr(expr).get_original_expr().id() == ID_index)
   {
     const ssa_exprt &ssa=to_ssa_expr(expr);
     const index_exprt &index_expr=to_index_expr(ssa.get_original_expr());

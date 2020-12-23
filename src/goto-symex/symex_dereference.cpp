@@ -139,8 +139,7 @@ exprt goto_symext::address_arithmetic(
 
     // handle field-sensitive SSA symbol
     mp_integer offset=0;
-    if(expr.id()==ID_symbol &&
-       expr.get_bool(ID_C_SSA_symbol))
+    if(is_ssa_expr(expr))
     {
       auto offset_opt = compute_pointer_offset(expr, ns);
       PRECONDITION(offset_opt.has_value());

@@ -157,7 +157,7 @@ exprt get_original_name(exprt expr)
 {
   expr.type() = get_original_name(std::move(expr.type()));
 
-  if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol))
+  if(is_ssa_expr(expr))
     return to_ssa_expr(expr).get_original_expr();
   else
   {
