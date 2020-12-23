@@ -8,7 +8,7 @@ public class A
   // expected verification success
   public void me()
   {
-    int g = CProver.getCurrentThreadID();
+    int g = CProver.getCurrentThreadId();
     assert(g == 0);
   }
 
@@ -40,7 +40,7 @@ public class A
   public void me2()
   {
     CProver.startThread(333);
-    g = CProver.getCurrentThreadID();
+    g = CProver.getCurrentThreadId();
     assert(g == 1);
     CProver.endThread(333);
   }
@@ -51,7 +51,7 @@ public class A
   public void me3()
   {
     CProver.startThread(333);
-    int i = CProver.getCurrentThreadID();
+    int i = CProver.getCurrentThreadId();
     assert(g == 1);
     CProver.endThread(333);
   }
@@ -83,7 +83,7 @@ public class A
 
   public void check()
   {
-    g = CProver.getCurrentThreadID();
+    g = CProver.getCurrentThreadId();
     assert(g == 1);
   }
 }
@@ -94,7 +94,7 @@ class B implements Runnable
   @Override
   public void run()
   {
-    g = CProver.getCurrentThreadID();
+    g = CProver.getCurrentThreadId();
     assert(g == 1);
   }
 }
@@ -106,7 +106,7 @@ class C extends Thread
   @Override
   public void run()
   {
-    g = CProver.getCurrentThreadID();
+    g = CProver.getCurrentThreadId();
     assert(g == 1);
   }
 }

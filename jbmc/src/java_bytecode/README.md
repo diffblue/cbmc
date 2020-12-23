@@ -201,11 +201,11 @@ calls to the these functions are well-formed, more specifically, each call to
 
 The instrumentation process (described here) will transform the aforementioned
 function calls, synchronized blocks/methods and calls to
-`java.lang.Thread.getCurrentThreadID:()I` into appropriate codet. As part of
+`java.lang.Thread.getCurrentThreadId:()I` into appropriate codet. As part of
 this process a new variable per thread  is created  along with a single global
 variable that is used keep track of thread identifiers. These
 variables are needed to handle calls to
-`java.lang.Thread.getCurrentThreadID:()I`.
+`java.lang.Thread.getCurrentThreadId:()I`.
 
 Hold on, how do we go from Java threads to `CProver.startThread:(I)V` and
 `CProver.endThread:(I)V`? Well, two ways
@@ -264,13 +264,13 @@ is transformed into the following codet:
 ```
 
 The ID of the thread is made accessible to the Java program by having calls
-to the function `CProver.getCurrentThreadID()I` replaced by the variable
+to the function `CProver.getCurrentThreadId()I` replaced by the variable
 `__CPROVER__thread_id`.
 
 Example, the following Java code:
 
 ```java
-  int g = java.lang.thead.getCurrentThreadID();
+  int g = java.lang.thead.getCurrentThreadId();
 ```
 
 is transformed into the following codet:

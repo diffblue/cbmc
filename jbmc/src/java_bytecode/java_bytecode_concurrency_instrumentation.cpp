@@ -362,12 +362,12 @@ static void instrument_end_thread(
 }
 
 /// Transforms the codet stored in in \p f_code, which is a call to function
-/// CProver.getCurrentThreadID:()I into a code_assignt as described by the
+/// CProver.getCurrentThreadId:()I into a code_assignt as described by the
 /// documentation of the function convert_thread_block.
 ///
 /// The resulting code_blockt is stored in the output parameter \p code.
 ///
-/// \param f_code: function call to CProver.getCurrentThreadID:()I
+/// \param f_code: function call to CProver.getCurrentThreadId:()I
 /// \param [out] code: resulting transformation
 /// \param symbol_table: a symbol table
 static void instrument_get_current_thread_id(
@@ -409,10 +409,10 @@ static void instrument_get_current_thread_id(
 /// variable __CPROVER__next_thread_id.
 ///
 /// The ID of the thread is made accessible to the Java program by having calls
-/// to the function 'CProver.getCurrentThreadID()I' replaced by the variable
+/// to the function 'CProver.getCurrentThreadId()I' replaced by the variable
 /// __CPROVER__thread_id. We also perform this substitution in here. The
 /// substitution that we perform here assumes that calls to
-/// getCurrentThreadID() are ONLY made in the RHS of an expression.
+/// getCurrentThreadId() are ONLY made in the RHS of an expression.
 ///
 /// Example:
 ///
@@ -495,7 +495,7 @@ void convert_threadblock(symbol_tablet &symbol_table)
           std::placeholders::_1,
           std::placeholders::_2,
           std::placeholders::_3);
-      else if(f_name == "org.cprover.CProver.getCurrentThreadID:()I")
+      else if(f_name == "org.cprover.CProver.getCurrentThreadId:()I")
         cb = std::bind(
           &instrument_get_current_thread_id,
           std::placeholders::_1,
