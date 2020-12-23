@@ -1886,6 +1886,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   }
 
   const auto el_size = pointer_offset_bits(expr.type(), ns);
+  if(el_size.has_value() && *el_size < 0)
+    return unchanged(expr);
 
   // byte_extract(byte_extract(root, offset1), offset2) =>
   // byte_extract(root, offset1+offset2)
