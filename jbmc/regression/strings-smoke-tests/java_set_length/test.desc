@@ -1,6 +1,6 @@
 CORE
 test_set_length
---function test_set_length.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function test_set_length.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 9.* SUCCESS$

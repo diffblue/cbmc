@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test
---function Test.testNoPropagation1 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.testNoPropagation1:(Ljava/lang/StringBuffer;)V.assertion.1'
+--function Test.testNoPropagation1 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --property 'java::Test.testNoPropagation1:(Ljava/lang/StringBuffer;)V.assertion.1'
 ^Generated [0-9]+ VCC\(s\), 1 remaining after simplification$
 ^EXIT=10$
 ^SIGNAL=0$

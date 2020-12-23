@@ -1,6 +1,6 @@
 CORE
 A
---function A.me --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
+--function A.me --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-threading
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL

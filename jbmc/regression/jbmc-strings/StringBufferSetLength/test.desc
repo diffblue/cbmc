@@ -1,6 +1,6 @@
 CORE
 SetLengthTest
---function SetLengthTest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function SetLengthTest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^VERIFICATION SUCCESSFUL$
 ^\[java::SetLengthTest\.main:\(I\)V\.assertion\.1\] line 13 assertion at file SetLengthTest\.java line 13 function java::SetLengthTest\.main:\(I\)V bytecode-index 21: SUCCESS$
 ^\[java::SetLengthTest\.main:\(I\)V\.assertion\.2\] line 16 assertion at file SetLengthTest\.java line 16 function java::SetLengthTest\.main:\(I\)V bytecode-index 35: SUCCESS$

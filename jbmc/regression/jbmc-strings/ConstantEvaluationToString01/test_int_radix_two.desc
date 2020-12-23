@@ -1,6 +1,6 @@
 CORE
 Main
---function Main.testIntToStringWithRadixTwo --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Main.testIntToStringWithRadixTwo --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
 ^EXIT=0$
 ^SIGNAL=0$

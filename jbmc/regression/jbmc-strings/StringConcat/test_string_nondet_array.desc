@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.fromNonDetArray --depth 10000 --unwind 5 --throw-runtime-exceptions  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --trace
+--function Test.fromNonDetArray --depth 10000 --unwind 5 --throw-runtime-exceptions  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --trace
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED

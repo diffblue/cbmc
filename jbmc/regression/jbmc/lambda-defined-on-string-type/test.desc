@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.testme --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Test.testme --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 line 4 assertion at file Test\.java line 4 function java::Test\.testme:\(\)V bytecode-index 9: SUCCESS
 line 5 assertion at file Test\.java line 5 function java::Test\.testme:\(\)V bytecode-index 15: FAILURE
 ^EXIT=10$

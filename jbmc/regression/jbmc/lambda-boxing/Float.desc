@@ -1,6 +1,6 @@
 CORE
 BoxingLambda
---function BoxingLambda.testFloat --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function BoxingLambda.testFloat --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::BoxingLambda\.testFloat:\(\)V\.assertion\.1\] line 125 assertion at file BoxingLambda\.java line 125 function java::BoxingLambda\.testFloat:\(\)V bytecode-index 27: SUCCESS
 \[java::BoxingLambda\.testFloat:\(\)V\.assertion\.2\] line 126 assertion at file BoxingLambda\.java line 126 function java::BoxingLambda\.testFloat:\(\)V bytecode-index 39: SUCCESS
 \[java::BoxingLambda\.testFloat:\(\)V\.assertion\.3\] line 127 assertion at file BoxingLambda\.java line 127 function java::BoxingLambda\.testFloat:\(\)V bytecode-index 53: SUCCESS

@@ -1,6 +1,6 @@
 CORE
 Test
---function Test\.testDoubleToFloat --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Test\.testDoubleToFloat --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::Test\.testDoubleToFloat:\(\)V.assertion\.1\] line 66 assertion at file Test\.java line 66 function java::Test\.testDoubleToFloat:\(\)V bytecode-index 13: SUCCESS
 \[java::Test\.testDoubleToFloat:\(\)V.assertion\.2\] line 67 assertion at file Test\.java line 67 function java::Test\.testDoubleToFloat:\(\)V bytecode-index 19: FAILURE
 ^EXIT=10$

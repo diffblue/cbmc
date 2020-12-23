@@ -1,6 +1,6 @@
 CORE
 Sync
---cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
+--cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-threading
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.test --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Test.test --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^\[java::Test.test:\(CC\)V.assertion\.1\] line 4 .* SUCCESS$
 ^\[java::Test.test:\(CC\)V.assertion\.2\] line 5 .* SUCCESS$
 ^\[java::Test.test:\(CC\)V.assertion\.3\] line 6 .* SUCCESS$

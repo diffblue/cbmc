@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.testBool --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.testBool:(Z)Ljava/lang/String;.assertion.2'
+--function Test.testBool --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --property 'java::Test.testBool:(Z)Ljava/lang/String;.assertion.2'
 ^EXIT=10$
 ^SIGNAL=0$
 line 7 assertion at file Test.java .*: FAILURE

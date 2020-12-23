@@ -1,6 +1,6 @@
 CORE
 Lambdatest
---function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 line 76 assertion.*SUCCESS$
 line 79 assertion.*FAILURE$
 line 81 assertion.*SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 Cart
---cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --trace --java-max-vla-length 96 --java-unwind-enum-static --max-nondet-string-length 200 --unwind 4 --function Cart.checkTax4 --string-printable
+--cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --trace --java-max-vla-length 96 --java-unwind-enum-static --max-nondet-string-length 200 --unwind 4 --function Cart.checkTax4 --string-printable
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

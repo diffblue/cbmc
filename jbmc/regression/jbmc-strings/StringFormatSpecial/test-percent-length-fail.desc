@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.percentLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.percentLength:()Ljava/lang/String;.assertion.1'
+--function Test.percentLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --property 'java::Test.percentLength:()Ljava/lang/String;.assertion.1'
 ^EXIT=10$
 ^SIGNAL=0$
 line 14 assertion at file Test.java .*: FAILURE

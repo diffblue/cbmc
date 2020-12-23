@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.testHexEvalUpper --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --trace
+--function Test.testHexEvalUpper --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --trace
 ^EXIT=10$
 ^SIGNAL=0$
 dynamic_object.*=\{ 'd', 'i', 'F', 'F', 'b', 'l', 'u', 'e' \}

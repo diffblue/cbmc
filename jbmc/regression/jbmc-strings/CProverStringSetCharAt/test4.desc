@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test
---function Test.test4 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.test4:(Z)V.assertion.1' --property 'java::Test.test4:(Z)V.assertion.2'
+--function Test.test4 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --property 'java::Test.test4:(Z)V.assertion.1' --property 'java::Test.test4:(Z)V.assertion.2'
 Generated 2 VCC\(s\), 2 remaining after simplification
 ^EXIT=0$
 ^SIGNAL=0$

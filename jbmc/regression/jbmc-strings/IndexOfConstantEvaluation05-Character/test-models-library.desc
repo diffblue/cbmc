@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Main
---function Main.constantIndexOf --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Main.constantIndexOf --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
