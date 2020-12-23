@@ -119,6 +119,12 @@ public:
   exprt
   apply(const namespacet &ns, goto_symex_statet &state, exprt expr, bool write)
     const;
+  /// \copydoc apply(const namespacet&,goto_symex_statet&,exprt,bool) const
+  exprt apply(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    ssa_exprt expr,
+    bool write) const;
 
   /// Compute an expression representing the individual components of a
   /// field-sensitive SSA representation of \p ssa_expr.
