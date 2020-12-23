@@ -505,9 +505,15 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
 void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 {
-  code_typet &code_type=to_code_type(symbol.type);
+  if(symbol.value.id() != ID_code)
+  {
+    error().source_location = symbol.location;
+    error() << "function '" << symbol.name << "' is initialized with "
+            << symbol.value.id() << eom;
+    throw 0;
+  }
 
-  assert(symbol.value.is_not_nil());
+  code_typet &code_type = to_code_type(symbol.type);
 
   // reset labels
   labels_used.clear();

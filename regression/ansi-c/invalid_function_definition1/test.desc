@@ -1,0 +1,9 @@
+CORE test-c++-front-end
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+function 'a(\(\))?' is initialized with initializer_list
+^CONVERSION ERROR$
+--
+Invariant check failed

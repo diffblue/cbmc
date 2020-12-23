@@ -91,6 +91,14 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(symbol.value.is_nil())
     return;
 
+  if(symbol.value.id() != ID_code)
+  {
+    error().source_location = symbol.location;
+    error() << "function '" << symbol.name << "' is initialized with "
+            << symbol.value.id() << eom;
+    throw 0;
+  }
+
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopet &function_scope=cpp_scopes.set_scope(symbol.name);
