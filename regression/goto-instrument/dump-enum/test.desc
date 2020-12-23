@@ -1,0 +1,13 @@
+CORE
+main.c
+--dump-c
+enum hex \{ .* \};
+h=/\*enum\*/V10;
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test must pass running CBMC on the output generated using dump-c to
+demonstrate that the enum output wouldn't generate A and B (just those
+characters, no quotes or 0x prefix) instead of 10 and 11, respectively.

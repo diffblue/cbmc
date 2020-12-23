@@ -378,21 +378,27 @@ std::string expr2ct::convert_rec(
 
     if(!to_c_enum_type(src).is_incomplete())
     {
+      const c_enum_typet &c_enum_type = to_c_enum_type(src);
+      const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
+      const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
+
       result += '{';
 
       // add members
-      const c_enum_typet::memberst &members = to_c_enum_type(src).members();
+      const c_enum_typet::memberst &members = c_enum_type.members();
 
       for(c_enum_typet::memberst::const_iterator it = members.begin();
           it != members.end();
           it++)
       {
+        mp_integer int_value = bvrep2integer(it->get_value(), width, is_signed);
+
         if(it != members.begin())
           result += ',';
         result += ' ';
         result += id2string(it->get_base_name());
         result += '=';
-        result += id2string(it->get_value());
+        result += integer2string(int_value);
       }
 
       result += " }";
@@ -1703,24 +1709,21 @@ std::string expr2ct::convert_constant(
     if(c_enum_type.id()!=ID_c_enum)
       return convert_norep(src, precedence);
 
-    const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
-    const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
-
-    mp_integer int_value = bvrep2integer(value, width, is_signed);
-    mp_integer i=0;
-
-    irep_idt int_value_string=integer2string(int_value);
-
     const c_enum_typet::memberst &members=
       to_c_enum_type(c_enum_type).members();
 
     for(const auto &member : members)
     {
-      if(member.get_value() == int_value_string)
+      if(member.get_value() == value)
         return "/*enum*/" + id2string(member.get_base_name());
     }
 
     // failed...
+    const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
+    const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
+
+    mp_integer int_value = bvrep2integer(value, width, is_signed);
+
     return "/*enum*/"+integer2string(int_value);
   }
   else if(type.id()==ID_rational)
