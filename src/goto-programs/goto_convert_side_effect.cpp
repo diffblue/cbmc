@@ -128,8 +128,24 @@ void goto_convertt::remove_assignment(
   // revert assignment in the expression to its LHS
   if(result_is_used)
   {
-    exprt lhs;
-    lhs.swap(to_binary_expr(expr).op0());
+    exprt lhs = to_binary_expr(expr).op0();
+    // assign_* statements can have an lhs operand with a different type than
+    // that of the overall expression, because of integer promotion (which may
+    // have introduced casts to the lhs).
+    if(expr.type() != lhs.type())
+    {
+      // Skip over those type casts, but also
+      // make sure the resulting expression has the same type as before.
+      DATA_INVARIANT(
+        lhs.id() == ID_typecast,
+        id2string(expr.id()) +
+          " expression with different operand type expected to have a "
+          "typecast");
+      DATA_INVARIANT(
+        to_typecast_expr(lhs).op().type() == expr.type(),
+        id2string(expr.id()) + " type mismatch in lhs operand");
+      lhs = to_typecast_expr(lhs).op();
+    }
     expr.swap(lhs);
   }
   else
