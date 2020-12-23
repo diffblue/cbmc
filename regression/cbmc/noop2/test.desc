@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
+-win32
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -387,18 +387,6 @@ void goto_convertt::clean_expr(
         return;
       }
     }
-    else if(statement==ID_function_call)
-    {
-      if(to_side_effect_expr_function_call(expr).function().id()==ID_symbol &&
-         to_symbol_expr(
-           to_side_effect_expr_function_call(expr).
-           function()).get_identifier()=="__noop")
-      {
-        // __noop needs special treatment, as arguments are not
-        // evaluated
-        to_side_effect_expr_function_call(expr).arguments().clear();
-      }
-    }
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
