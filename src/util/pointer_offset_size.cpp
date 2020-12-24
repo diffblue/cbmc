@@ -670,13 +670,8 @@ optionalt<exprt> get_subexpression_at_offset(
 
     // no arrays of non-byte-aligned, zero-, or unknown-sized objects
     if(
-      !elem_size_bits.has_value() || *elem_size_bits == 0 ||
-      *elem_size_bits % 8 != 0)
-    {
-      return {};
-    }
-
-    if(*target_size_bits <= *elem_size_bits)
+      elem_size_bits.has_value() && *elem_size_bits > 0 &&
+      *elem_size_bits % 8 == 0 && *target_size_bits <= *elem_size_bits)
     {
       const mp_integer elem_size_bytes = *elem_size_bits / 8;
       const auto offset_inside_elem = offset_bytes % elem_size_bytes;

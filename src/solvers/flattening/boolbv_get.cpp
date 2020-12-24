@@ -126,6 +126,10 @@ exprt boolbvt::bv_get_rec(
         dest.operands().swap(op);
         return dest;
       }
+      else
+      {
+        return array_exprt{{}, to_array_type(type)};
+      }
     }
     else if(type.id()==ID_struct_tag)
     {
