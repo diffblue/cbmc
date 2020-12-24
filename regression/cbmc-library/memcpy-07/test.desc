@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Invariant check failed
+--
+memcpy invocations must not result in generating arrays of negative size, which
+process_array_expr previously generated when trying to access a string literal
+out of bounds.

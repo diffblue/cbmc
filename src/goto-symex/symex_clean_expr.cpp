@@ -113,7 +113,12 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
       exprt subtype_size = typecast_exprt::conditional_cast(
         subtype_size_opt.value(), array_size_type);
       new_offset = div_exprt(new_offset, subtype_size);
-      minus_exprt new_size(prev_array_type.size(), new_offset);
+      minus_exprt subtraction{prev_array_type.size(), new_offset};
+      if_exprt new_size{
+        binary_predicate_exprt{
+          subtraction, ID_ge, from_integer(0, subtraction.type())},
+        subtraction,
+        from_integer(0, subtraction.type())};
       if(do_simplify)
         simplify(new_size, ns);
 
