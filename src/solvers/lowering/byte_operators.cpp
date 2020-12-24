@@ -1072,7 +1072,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     src.id() == ID_byte_extract_big_endian);
   const bool little_endian = src.id() == ID_byte_extract_little_endian;
 
-  // determine an upper bound of the number of bytes we might need
+  // determine an upper bound of the last byte we might need
   auto upper_bound_opt = size_of_expr(src.type(), ns);
   if(upper_bound_opt.has_value())
   {
@@ -1106,6 +1106,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
       auto num_elements = numeric_cast<std::size_t>(array_type.size());
+      // XXX: This can't be right -- unpacked is a byte array, whereas array_type may have larger elements
       if(!num_elements.has_value() && unpacked.op().id() == ID_array)
         num_elements = unpacked.op().operands().size();
 
@@ -1286,11 +1287,10 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     size_bits = op0_bits;
   }
 
-  mp_integer num_elements =
-    (*size_bits) / 8 + (((*size_bits) % 8 == 0) ? 0 : 1);
+  mp_integer num_bytes = (*size_bits) / 8 + (((*size_bits) % 8 == 0) ? 0 : 1);
 
   // get 'width'-many bytes, and concatenate
-  const std::size_t width_bytes = numeric_cast_v<std::size_t>(num_elements);
+  const std::size_t width_bytes = numeric_cast_v<std::size_t>(num_bytes);
   exprt::operandst op;
   op.reserve(width_bytes);
 
