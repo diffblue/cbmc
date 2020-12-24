@@ -33,7 +33,7 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
     CALL_ON_EXPR(plus_exprt);
   }
-  else if(expr.get_bool(ID_C_SSA_symbol))
+  else if(is_ssa_expr(expr))
   {
     CALL_ON_EXPR(ssa_exprt);
   }

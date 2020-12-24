@@ -178,8 +178,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       level == L2,
     "must handle all renaming levels");
 
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  if(is_ssa_expr(expr))
   {
     exprt original_expr = expr;
     ssa_exprt &ssa=to_ssa_expr(expr);
@@ -546,8 +545,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
 template <levelt level>
 void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
 {
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  if(is_ssa_expr(expr))
   {
     ssa_exprt &ssa=to_ssa_expr(expr);
 
@@ -751,8 +749,7 @@ static void get_l1_name(exprt &expr)
 {
   // do not reset the type !
 
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  if(is_ssa_expr(expr))
     to_ssa_expr(expr).remove_level_2();
   else
     Forall_operands(it, expr)
@@ -846,7 +843,7 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
   record_events.push(false);
   exprt expr_l2 = rename(std::move(ssa), ns).get();
   INVARIANT(
-    expr_l2.id() == ID_symbol && expr_l2.get_bool(ID_C_SSA_symbol),
+    is_ssa_expr(expr_l2),
     "symbol to declare should not be replaced by constant propagation");
   ssa = to_ssa_expr(expr_l2);
   record_events.pop();
