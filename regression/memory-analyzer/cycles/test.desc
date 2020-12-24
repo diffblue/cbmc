@@ -1,7 +1,7 @@
 CORE
 cycles.gb
 --breakpoint process_buffer --symbols buffer
-cycle_buffer_entry_t tmp;
+struct cycle_buffer_entry tmp;
 char tmp\$0\[\];
 struct cycle_buffer_entry tmp\$1;
 char tmp\$2\[\];

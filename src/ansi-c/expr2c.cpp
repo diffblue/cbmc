@@ -43,7 +43,9 @@ expr2c_configurationt expr2c_configurationt::default_configuration
   true,
   "TRUE",
   "FALSE",
-  true
+  true,
+  false,
+  false
 };
 
 expr2c_configurationt expr2c_configurationt::clean_configuration
@@ -53,7 +55,9 @@ expr2c_configurationt expr2c_configurationt::clean_configuration
   false,
   "1",
   "0",
-  false
+  false,
+  true,
+  true
 };
 
 // clang-format on
@@ -196,7 +200,7 @@ std::string expr2ct::convert_rec(
 
   std::string d = declarator.empty() ? declarator : " " + declarator;
 
-  if(src.find(ID_C_typedef).is_not_nil())
+  if(!configuration.expand_typedef && src.find(ID_C_typedef).is_not_nil())
   {
     return q+id2string(src.get(ID_C_typedef))+d;
   }
@@ -1709,22 +1713,29 @@ std::string expr2ct::convert_constant(
     if(c_enum_type.id()!=ID_c_enum)
       return convert_norep(src, precedence);
 
-    const c_enum_typet::memberst &members=
-      to_c_enum_type(c_enum_type).members();
-
-    for(const auto &member : members)
+    if(!configuration.print_enum_int_value)
     {
-      if(member.get_value() == value)
-        return "/*enum*/" + id2string(member.get_base_name());
+      const c_enum_typet::memberst &members =
+        to_c_enum_type(c_enum_type).members();
+
+      for(const auto &member : members)
+      {
+        if(member.get_value() == value)
+          return "/*enum*/" + id2string(member.get_base_name());
+      }
     }
 
-    // failed...
+    // lookup failed or enum is to be output as integer
     const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
     const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
 
-    mp_integer int_value = bvrep2integer(value, width, is_signed);
+    std::string value_as_string =
+      integer2string(bvrep2integer(value, width, is_signed));
 
-    return "/*enum*/"+integer2string(int_value);
+    if(configuration.print_enum_int_value)
+      return value_as_string;
+    else
+      return "/*enum*/" + value_as_string;
   }
   else if(type.id()==ID_rational)
     return convert_norep(src, precedence);

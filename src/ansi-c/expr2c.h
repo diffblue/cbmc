@@ -39,19 +39,30 @@ struct expr2c_configurationt final
   /// This is the string that will be printed for null pointers
   bool use_library_macros;
 
+  /// When printing an enum-typed constant, print the integer representation
+  bool print_enum_int_value;
+
+  /// Print the expanded type instead of a typedef name, even when a typedef is
+  /// present
+  bool expand_typedef;
+
   expr2c_configurationt(
     const bool include_struct_padding_components,
     const bool print_struct_body_in_type,
     const bool include_array_size,
     const std::string &true_string,
     const std::string &false_string,
-    const bool use_library_macros)
+    const bool use_library_macros,
+    const bool print_enum_int_value,
+    const bool expand_typedef)
     : include_struct_padding_components(include_struct_padding_components),
       print_struct_body_in_type(print_struct_body_in_type),
       include_array_size(include_array_size),
       true_string(true_string),
       false_string(false_string),
-      use_library_macros(use_library_macros)
+      use_library_macros(use_library_macros),
+      print_enum_int_value(print_enum_int_value),
+      expand_typedef(expand_typedef)
   {
   }
 
