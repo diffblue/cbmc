@@ -1,0 +1,10 @@
+CORE
+main.c
+
+function 'memcpy' is not declared
+parameter "memcpy::dst" type mismatch
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed

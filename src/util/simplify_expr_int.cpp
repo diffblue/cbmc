@@ -1645,14 +1645,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
         }
       }
       else if(
-        expr.op0().id() == ID_typecast &&
-        expr.op0().type().id() == ID_pointer &&
-        (to_typecast_expr(expr.op0()).op().type().id() == ID_pointer ||
-         config.ansi_c.NULL_is_zero))
+        expr.op0().id() == ID_typecast && expr.op0().type().id() == ID_pointer)
       {
+        exprt op = to_typecast_expr(expr.op0()).op();
+        if(
+          op.type().id() != ID_pointer &&
+          (!config.ansi_c.NULL_is_zero || !is_number(op.type()) ||
+           op.type().id() == ID_complex))
+        {
+          return unchanged(expr);
+        }
+
         // (type)ptr == NULL -> ptr == NULL
         // note that 'ptr' may be an integer
-        exprt op = to_typecast_expr(expr.op0()).op();
         auto new_expr = expr;
         new_expr.op0().swap(op);
         if(new_expr.op0().type().id() != ID_pointer)
