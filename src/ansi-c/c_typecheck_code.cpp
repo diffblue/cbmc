@@ -520,7 +520,8 @@ void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
     if(!case_is_allowed)
     {
       error().source_location = code.source_location();
-      error() << "did not expect `case' here" << eom;
+      error() << "did not expect " << quote_begin << "case" << quote_end
+              << " here" << eom;
       throw 0;
     }
 
@@ -537,7 +538,8 @@ void c_typecheck_baset::typecheck_gcc_switch_case_range(
   if(!case_is_allowed)
   {
     error().source_location = code.source_location();
-    error() << "did not expect `case' here" << eom;
+    error() << "did not expect " << quote_begin << "case" << quote_end
+            << " here" << eom;
     throw 0;
   }
 

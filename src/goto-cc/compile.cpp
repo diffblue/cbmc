@@ -664,10 +664,12 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
 
   if(cmdline.isset("export-function-local-symbols"))
   {
-    log.warning()
-      << "The `--export-function-local-symbols` flag is deprecated. "
-         "Please use `--export-file-local-symbols` instead."
-      << messaget::eom;
+    log.warning() << "The " << messaget::quote_begin
+                  << "--export-function-local-symbols" << messaget::quote_end
+                  << " flag is deprecated. "
+                     "Please use "
+                  << messaget::quote_begin << "--export-file-local-symbols"
+                  << messaget::quote_end << " instead." << messaget::eom;
   }
 }
 

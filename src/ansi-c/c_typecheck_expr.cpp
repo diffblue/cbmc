@@ -772,8 +772,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       if(s_it == symbol_table.symbols.end())
       {
         error().source_location = expr.source_location();
-        error() << "failed to find bound symbol `" << identifier
-                << "' in symbol table" << eom;
+        error() << "failed to find bound symbol " << quote_begin << identifier
+                << quote_end << " in symbol table" << eom;
         throw 0;
       }
 

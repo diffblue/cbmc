@@ -485,8 +485,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     if(new_decl.member_spec().is_virtual())
     {
       error().source_location=new_decl.source_location();
-      error() << "invalid use of `virtual' in template declaration"
-              << eom;
+      error() << "invalid use of " << quote_begin << "virtual" << quote_end
+              << " in template declaration" << eom;
       throw 0;
     }
 
