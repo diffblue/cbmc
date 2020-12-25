@@ -64,9 +64,13 @@ bool taint_parser(
     else
     {
       messaget message(message_handler);
-      message.error() << "taint rule must have \"kind\" which is "
-                         "\"source\" or \"sink\" or \"sanitizer\""
-                      << messaget::eom;
+      message.error() << "taint rule must have " << messaget::quote_begin
+                      << "kind" << messaget::quote_end << " which is "
+                      << messaget::quote_begin << "source"
+                      << messaget::quote_end << " or " << messaget::quote_begin
+                      << "sink" << messaget::quote_end << " or "
+                      << messaget::quote_begin << "sanitizer"
+                      << messaget::quote_end << messaget::eom;
       return true;
     }
 
@@ -75,8 +79,8 @@ bool taint_parser(
     if(function.empty())
     {
       messaget message(message_handler);
-      message.error() << "taint rule must have \"function\""
-                      << messaget::eom;
+      message.error() << "taint rule must have " << messaget::quote_begin
+                      << "function" << messaget::quote_end << messaget::eom;
       return true;
     }
     else
@@ -101,10 +105,13 @@ bool taint_parser(
     else
     {
       messaget message(message_handler);
-      message.error() << "taint rule must have \"where\""
-                      << " which is \"return_value\" or \"this\" "
-                      << "or \"parameter1\"..."
-                      << messaget::eom;
+      message.error() << "taint rule must have " << messaget::quote_begin
+                      << "where" << messaget::quote_end << " which is "
+                      << messaget::quote_begin << "return_value"
+                      << messaget::quote_end << " or " << messaget::quote_begin
+                      << "this" << messaget::quote_end << " or "
+                      << messaget::quote_begin << "parameter1"
+                      << messaget::quote_end << "..." << messaget::eom;
       return true;
     }
 

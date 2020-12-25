@@ -1,14 +1,14 @@
 CORE
 Lambdatest
 --verbosity 10 --show-goto-functions --function Lambdatest.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
-lambda function reference lambda\$new\$0 in class \"Lambdatest\"
-lambda function reference lambda\$new\$1 in class \"Lambdatest\"
-lambda function reference lambda\$captureReference\$2 in class \"Lambdatest\"
-lambda function reference lambda\$captureInt\$3 in class \"Lambdatest\"
-lambda function reference lambda\$captureThisPrimitive\$4 in class \"Lambdatest\"
-lambda function reference lambda\$captureThisReference\$5 in class \"Lambdatest\"
-lambda function reference lambda\$captureAndCall\$6 in class \"Lambdatest\"
-lambda function reference lambda\$captureAndAssign\$7 in class \"Lambdatest\"
-lambda function reference lambda\$static\$0 in class \"B\"
+lambda function reference lambda\$new\$0 in class 'Lambdatest'
+lambda function reference lambda\$new\$1 in class 'Lambdatest'
+lambda function reference lambda\$captureReference\$2 in class 'Lambdatest'
+lambda function reference lambda\$captureInt\$3 in class 'Lambdatest'
+lambda function reference lambda\$captureThisPrimitive\$4 in class 'Lambdatest'
+lambda function reference lambda\$captureThisReference\$5 in class 'Lambdatest'
+lambda function reference lambda\$captureAndCall\$6 in class 'Lambdatest'
+lambda function reference lambda\$captureAndAssign\$7 in class 'Lambdatest'
+lambda function reference lambda\$static\$0 in class 'B'
 ^EXIT=0$
 ^SIGNAL=0$
