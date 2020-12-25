@@ -1094,8 +1094,9 @@ static exprt get_char_array_and_concretize(
         const auto array_expr =
           expr_try_dynamic_cast<array_exprt>(*concretized_array))
       {
-        stream << std::string(4, ' ') << "- as_string: \""
-               << string_of_array(*array_expr) << "\"\n";
+        stream << std::string(4, ' ')
+               << "- as_string: " << messaget::quote_begin
+               << string_of_array(*array_expr) << messaget::quote_end << '\n';
       }
       else
         stream << std::string(2, ' ') << "- warning: not an array"
