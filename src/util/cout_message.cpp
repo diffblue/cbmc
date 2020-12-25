@@ -70,6 +70,10 @@ console_message_handlert::console_message_handlert(bool _always_flush)
 /// \param c: ECMA-48 command code
 std::string console_message_handlert::command(unsigned c) const
 {
+  // quote_begin and quote_end
+  if(c == '<' || c == '>')
+    return "'";
+
   if(!use_SGR)
     return std::string();
 
