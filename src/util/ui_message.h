@@ -96,10 +96,74 @@ protected:
 
   std::string command(unsigned c) const override
   {
-    if(message_handler)
-      return message_handler->command(c);
-    else
+    // quote_begin / quote_end render as a single quote on every currently
+    // supported UI. Handled before the message_handler null-check so this
+    // also applies when the handler is constructed via the cmdlinet ctor,
+    // which leaves message_handler null for XML_UI / JSON_UI. We
+    // considered emitting `<quote>` / `</quote>` tags for XML output (see
+    // PR #5696 discussion) but kept single quotes for backwards
+    // compatibility; messages reach the XML serialiser through xmlt::data
+    // and would be escaped, so any tag-based quoting would have to bypass
+    // the message-text plumbing entirely.
+    if(c == '<' || c == '>')
+      return "'";
+
+    if(!message_handler)
       return std::string();
+
+    switch(_ui)
+    {
+    case uit::PLAIN:
+      break;
+    case uit::XML_UI:
+      switch(c)
+      {
+      case 0:  // reset
+      case 1:  // bold
+      case 2:  // faint
+      case 3:  // italic
+      case 4:  // underline
+      case 31: // red
+      case 32: // green
+      case 33: // yellow
+      case 34: // blue
+      case 35: // magenta
+      case 36: // cyan
+      case 91: // bright_red
+      case 92: // bright_green
+      case 93: // bright_yellow
+      case 94: // bright_blue
+      case 95: // bright_magenta
+      case 96: // bright_cyan
+        return std::string();
+      }
+      break;
+    case uit::JSON_UI:
+      switch(c)
+      {
+      case 0:  // reset
+      case 1:  // bold
+      case 2:  // faint
+      case 3:  // italic
+      case 4:  // underline
+      case 31: // red
+      case 32: // green
+      case 33: // yellow
+      case 34: // blue
+      case 35: // magenta
+      case 36: // cyan
+      case 91: // bright_red
+      case 92: // bright_green
+      case 93: // bright_yellow
+      case 94: // bright_blue
+      case 95: // bright_magenta
+      case 96: // bright_cyan
+        return std::string();
+      }
+      break;
+    }
+
+    return message_handler->command(c);
   }
 };
 

@@ -95,6 +95,16 @@ const messaget::commandt messaget::bright_yellow(93);
 const messaget::commandt messaget::bright_blue(94);
 const messaget::commandt messaget::bright_magenta(95);
 const messaget::commandt messaget::bright_cyan(96);
+// quote_begin and quote_end use the ASCII codes for '<' (60) and '>'
+// (62), which happen to fall inside ECMA-48's SGR ideogram-styling
+// parameter range (60..65). The overload is safe today because nothing
+// uses ideogram modes via this same mechanism, but if a future styling
+// command is added with a code in 60..65 there will be a clash with no
+// compile-time signal. Either re-encode quote_begin/quote_end to a
+// value above the SGR range (e.g. >= 256) or pick non-overlapping
+// codes for any new ideogram styles.
+const messaget::commandt messaget::quote_begin('<');
+const messaget::commandt messaget::quote_end('>');
 
 /// Parse a (user-)provided string as a verbosity level and set it as the
 /// verbosity of dest.
