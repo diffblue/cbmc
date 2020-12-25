@@ -390,6 +390,12 @@ public:
   /// render underlined text
   static const commandt underline;
 
+  /// start quoted text
+  static const commandt quote_begin;
+
+  /// start quoted text
+  static const commandt quote_end;
+
   mstreamt &get_mstream(unsigned message_level) const
   {
     mstream.message_level=message_level;
