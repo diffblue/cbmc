@@ -370,11 +370,14 @@ void linking_diagnosticst::error(
   messaget log{message_handler};
   log.error().source_location = new_symbol.location;
 
-  log.error() << msg << " '" << old_symbol.display_name() << "'" << '\n';
-  log.error() << "old definition in module '" << old_symbol.module << "' "
+  log.error() << msg << ' ' << messaget::quote_begin
+              << old_symbol.display_name() << messaget::quote_end << '\n';
+  log.error() << "old definition in module " << messaget::quote_begin
+              << old_symbol.module << messaget::quote_end << ' '
               << old_symbol.location << '\n'
               << type_to_string_verbose(old_symbol) << '\n';
-  log.error() << "new definition in module '" << new_symbol.module << "' "
+  log.error() << "new definition in module " << messaget::quote_begin
+              << new_symbol.module << messaget::quote_end << ' '
               << new_symbol.location << '\n'
               << type_to_string_verbose(new_symbol) << messaget::eom;
 }
@@ -387,11 +390,14 @@ void linking_diagnosticst::warning(
   messaget log{message_handler};
   log.warning().source_location = new_symbol.location;
 
-  log.warning() << msg << " '" << old_symbol.display_name() << "'\n";
-  log.warning() << "old definition in module " << old_symbol.module << " "
+  log.warning() << msg << ' ' << messaget::quote_begin
+                << old_symbol.display_name() << messaget::quote_end << '\n';
+  log.warning() << "old definition in module " << messaget::quote_begin
+                << old_symbol.module << messaget::quote_end << ' '
                 << old_symbol.location << '\n'
                 << type_to_string_verbose(old_symbol) << '\n';
-  log.warning() << "new definition in module " << new_symbol.module << " "
+  log.warning() << "new definition in module " << messaget::quote_begin
+                << new_symbol.module << messaget::quote_end << ' '
                 << new_symbol.location << '\n'
                 << type_to_string_verbose(new_symbol) << messaget::eom;
 }
