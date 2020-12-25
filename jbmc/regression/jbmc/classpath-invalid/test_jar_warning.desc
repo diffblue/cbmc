@@ -3,7 +3,7 @@ Test
 --classpath ./NotHere.jar
 ^EXIT=6$
 ^SIGNAL=0$
-Warning: failed to access JAR file `./NotHere.jar'
+Warning: failed to access JAR file './NotHere.jar'
 Error: Could not find or load main class Test
 --
 --

@@ -34,7 +34,8 @@ void java_class_loader_baset::add_classpath_entry(
     }
     else
     {
-      log.warning() << "Warning: failed to access JAR file `" << path << "'"
+      log.warning() << "Warning: failed to access JAR file "
+                    << messaget::quote_begin << path << messaget::quote_end
                     << messaget::eom;
     }
   }
@@ -47,7 +48,8 @@ void java_class_loader_baset::add_classpath_entry(
     }
     else
     {
-      log.warning() << "Warning: failed to access directory `" << path << "'"
+      log.warning() << "Warning: failed to access directory "
+                    << messaget::quote_begin << path << messaget::quote_end
                     << messaget::eom;
     }
   }
