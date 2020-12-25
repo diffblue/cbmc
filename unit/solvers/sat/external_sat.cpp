@@ -25,6 +25,7 @@ public:
 SCENARIO("external_sat", "[core][solvers][sat][external_sat]")
 {
   console_message_handlert message_handler;
+  message_handler.set_verbosity(0);
 
   GIVEN("External SAT solver is used")
   {
