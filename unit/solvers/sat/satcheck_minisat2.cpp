@@ -20,6 +20,7 @@ Author: Peter Schrammel
 SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
 {
   console_message_handlert message_handler;
+  message_handler.set_verbosity(0);
 
   GIVEN("A satisfiable formula f")
   {
