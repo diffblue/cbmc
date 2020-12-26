@@ -32,7 +32,7 @@ int hybrid_binary(
 
   int result;
 
-#if defined(__linux__) || defined(__FreeBSD_kernel__)
+#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
   // we can use objcopy for both object files and executables
   (void)building_executable;
 
