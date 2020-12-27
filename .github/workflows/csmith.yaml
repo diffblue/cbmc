@@ -1,0 +1,45 @@
+name: Run CSmith
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  CompileXen:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache
+          sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
+          make -C src minisat2-download
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-CSMITH
+          restore-keys: |
+            ${{ runner.os }}-20.04-make-${{ github.ref }}
+            ${{ runner.os }}-20.04-make
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with make
+        run: |
+          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-instrument.dir -j2
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run 10 randomly-generated CSmith tests
+        run: |
+          export PATH=$PWD/src/cbmc:$PWD/src/goto-cc:$PWD/src/goto-instrument:$PATH
+          scripts/csmith.sh 10
