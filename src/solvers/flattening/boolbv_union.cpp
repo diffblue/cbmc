@@ -17,18 +17,15 @@ bvt boolbvt::convert_union(const union_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   const bvt &op_bv=convert_bv(expr.op());
 
   INVARIANT(
-    op_bv.size() <= width,
+    width == 0 || op_bv.size() <= width,
     "operand bitvector width shall not be larger than the width indicated by "
     "the union type");
 
   bvt bv;
-  bv.resize(width);
+  bv.resize(std::max(width, op_bv.size()));
 
   if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN)
   {
