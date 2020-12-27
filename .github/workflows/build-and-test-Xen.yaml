@@ -6,7 +6,7 @@ on:
 
 jobs:
   CompileXen:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -19,12 +19,28 @@ jobs:
         run: |
           sudo apt-get install --no-install-recommends -y coreutils  build-essential gcc git make flex bison software-properties-common libwww-perl python
           sudo apt-get install --no-install-recommends -y bin86 gdb bcc liblzma-dev python-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
-          sudo apt-get install --no-install-recommends -y libgtk2.0-dev libyajl-dev sudo time
+          sudo apt-get install --no-install-recommends -y libgtk2.0-dev libyajl-dev sudo time ccache
 
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-XEN
+          restore-keys: |
+            ${{ runner.os }}-20.04-make-${{ github.ref }}
+            ${{ runner.os }}-20.04-make
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
       - name: Build CBMC tools
         run: |
           make -C src minisat2-download
-          make -C src cbmc.dir goto-cc.dir goto-diff.dir -j2
+          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-diff.dir -j2
+      - name: Print ccache stats
+        run: ccache -s
 
       - name: Get one-line-scan
         run: git clone -b path-addition https://github.com/awslabs/one-line-scan.git
