@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/prefix.h>
@@ -484,6 +485,22 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         error() << "union member designator found for empty union" << eom;
         throw 0;
       }
+      else if(init_it != initializer_list.operands().begin())
+      {
+        if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+        {
+          error().source_location = value.source_location();
+          error() << "too many initializers" << eom;
+          throw 0;
+        }
+        else
+        {
+          warning().source_location = value.source_location();
+          warning() << "excess elements in union initializer" << eom;
+
+          return ++init_it;
+        }
+      }
       else if(index >= components.size())
       {
         error().source_location = value.source_location();
@@ -494,16 +511,20 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       const union_typet::componentt &component = components[index];
 
-      if(dest->id()==ID_union &&
-         dest->get(ID_component_name)==component.get_name())
+      DATA_INVARIANT(
+        dest->id() == ID_union, "union should be zero initialized");
+
+      if(dest->get(ID_component_name) == component.get_name())
       {
         // Already right union component. We can initialize multiple submembers,
         // so do not overwrite this.
       }
       else
       {
-        // Note that gcc issues a warning if the union component is switched.
-        // Build a union expression from given component.
+        // The first component is not the maximum member, which the (default)
+        // zero initializer prepared. Replace this by a component-specific
+        // initializer; other bytes have an unspecified value (C Standard
+        // 6.2.6.1(7)).
         const auto zero =
           zero_initializer(component.type(), value.source_location(), *this);
         if(!zero.has_value())
