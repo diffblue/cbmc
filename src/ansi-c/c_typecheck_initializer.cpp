@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -520,13 +521,15 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       {
         // Already right union component. We can initialize multiple submembers,
         // so do not overwrite this.
+        dest = &(to_union_expr(*dest).op());
       }
       else
       {
         // The first component is not the maximum member, which the (default)
         // zero initializer prepared. Replace this by a component-specific
         // initializer; other bytes have an unspecified value (C Standard
-        // 6.2.6.1(7)).
+        // 6.2.6.1(7)). In practice, objects of static lifetime are fully zero
+        // initialized.
         const auto zero =
           zero_initializer(component.type(), value.source_location(), *this);
         if(!zero.has_value())
@@ -536,12 +539,23 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
                   << to_string(component.type()) << "'" << eom;
           throw 0;
         }
-        union_exprt union_expr(component.get_name(), *zero, type);
-        union_expr.add_source_location()=value.source_location();
-        *dest=union_expr;
-      }
 
-      dest = &(to_union_expr(*dest).op());
+        if(current_symbol.is_static_lifetime)
+        {
+          byte_update_exprt byte_update{
+            byte_update_id(), *dest, from_integer(0, index_type()), *zero};
+          byte_update.add_source_location() = value.source_location();
+          *dest = std::move(byte_update);
+          dest = &(to_byte_update_expr(*dest).op2());
+        }
+        else
+        {
+          union_exprt union_expr(component.get_name(), *zero, type);
+          union_expr.add_source_location() = value.source_location();
+          *dest = std::move(union_expr);
+          dest = &(to_union_expr(*dest).op());
+        }
+      }
     }
     else
       UNREACHABLE;
