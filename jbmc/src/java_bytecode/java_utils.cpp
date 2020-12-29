@@ -545,7 +545,8 @@ const std::unordered_set<std::string> cprover_methods_to_ignore{
   "atomicEnd",
   "startThread",
   "endThread",
-  "getCurrentThreadId"};
+  "getCurrentThreadId",
+  "getMonitorCount"};
 
 /// \param type: type of new symbol
 /// \param basename_prefix: new symbol will be named

@@ -391,6 +391,37 @@ static void instrument_get_current_thread_id(
   code = code_assign;
 }
 
+/// Transforms the codet stored in in \p f_code, which is a call to function
+/// CProver.getMonitorCount:(Ljava/lang/Object;)I into a
+/// code_assignt that assigns the cproverMonitorCount field of the
+/// java.lang.Object argument passed to getMonitorCount.
+///
+/// The resulting codet is stored in the output parameter \p code.
+///
+/// \param f_code: call to CProver.getMonitorCount:(Ljava/lang/Object;)I
+/// \param [out] code: resulting transformation
+/// \param symbol_table: a symbol table
+static void instrument_get_monitor_count(
+  const code_function_callt &f_code,
+  codet &code,
+  symbol_tablet &symbol_table)
+{
+  PRECONDITION(f_code.arguments().size() == 1);
+
+  const namespacet ns(symbol_table);
+  const auto &followed_type =
+    ns.follow(to_pointer_type(f_code.arguments()[0].type()).subtype());
+  const auto &object_type = to_struct_type(followed_type);
+  code_assignt code_assign(
+    f_code.lhs(),
+    member_exprt(
+      dereference_exprt(f_code.arguments()[0]),
+      object_type.get_component("cproverMonitorCount")));
+  code_assign.add_source_location() = f_code.source_location();
+
+  code = code_assign;
+}
+
 /// Iterate through the symbol table to find and appropriately instrument
 /// thread-blocks.
 ///
@@ -498,6 +529,13 @@ void convert_threadblock(symbol_tablet &symbol_table)
       else if(f_name == "org.cprover.CProver.getCurrentThreadId:()I")
         cb = std::bind(
           &instrument_get_current_thread_id,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3);
+      else if(
+        f_name == "org.cprover.CProver.getMonitorCount:(Ljava/lang/Object;)I")
+        cb = std::bind(
+          &instrument_get_monitor_count,
           std::placeholders::_1,
           std::placeholders::_2,
           std::placeholders::_3);
