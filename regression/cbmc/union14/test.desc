@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Value sets do not properly track pointers through byte-extract operations. Thus
+derferencing yields __CPROVER_memory, which results in a spurious verification
+failure.
