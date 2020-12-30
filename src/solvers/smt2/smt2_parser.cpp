@@ -1236,12 +1236,50 @@ void smt2_parsert::setup_expressions()
   expressions["fp.neg"] = [this] { return unary(ID_unary_minus, operands()); };
 }
 
+typet smt2_parsert::functionalsort()
+{
+  bool complete = false;
+  std::vector<typet> domain;
+  // parse sort expressions
+  while(!complete)
+  {
+    switch(next_token())
+    {
+    case smt2_tokenizert::CLOSE:
+      complete = true;
+      break;
+    case smt2_tokenizert::NUMERAL:
+    case smt2_tokenizert::END_OF_FILE:
+    case smt2_tokenizert::OPEN:
+    case smt2_tokenizert::STRING_LITERAL:
+    case smt2_tokenizert::NONE:
+    case smt2_tokenizert::KEYWORD:
+      throw error() << "unexpected token in a sort: '"
+                  << smt2_tokenizer.get_buffer() << '\'';
+      break;
+    case smt2_tokenizert::SYMBOL:
+      const auto &token = smt2_tokenizer.get_buffer();
+      const auto s_it = sorts.find(token);
+      if(s_it == sorts.end())
+        throw error() << "unexpected sort: '" << token << '\'';
+
+      domain.push_back(s_it->second());
+      break;
+    }
+  }
+
+  typet codomain = domain.back();
+  domain.pop_back();
+  return mathematical_function_typet(domain, codomain);
+}
+
 typet smt2_parsert::sort()
 {
-  // a sort is one of the following three cases:
+  // a sort is one of the following four cases:
   // SYMBOL
   // ( _ SYMBOL ...
   // ( SYMBOL ...
+  // (-> SYMBOL SYMBOL SYMBOL..)
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
@@ -1255,6 +1293,12 @@ typet smt2_parsert::sort()
     {
       if(next_token() != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_' in a sort");
+    }
+    if(smt2_tokenizer.get_buffer() == "->")
+    {
+      if(next_token() != smt2_tokenizert::SYMBOL)
+        throw error("expected symbol after '->' in a sort");
+      return functionalsort();
     }
     break;
 
@@ -1335,6 +1379,7 @@ void smt2_parsert::setup_sorts()
       throw error("unsupported array sort");
   };
 }
+
 
 smt2_parsert::signature_with_parameter_idst
 smt2_parsert::function_signature_definition()
