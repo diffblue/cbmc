@@ -1236,6 +1236,32 @@ void smt2_parsert::setup_expressions()
   expressions["fp.neg"] = [this] { return unary(ID_unary_minus, operands()); };
 }
 
+typet smt2_parsert::function_sort()
+{
+  std::vector<typet> sorts;
+
+  //  (-> sort+ sort)
+  // The last sort is the co-domain.
+
+  while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE)
+  {
+    if(smt2_tokenizer.peek() == smt2_tokenizert::END_OF_FILE)
+      throw error() << "unexpected end-of-file in a function sort";
+
+    sorts.push_back(sort()); // recursive call
+  }
+
+  next_token(); // eat the ')'
+
+  if(sorts.size() < 2)
+    throw error() << "expected function sort to have at least 2 type arguments";
+
+  auto codomain = std::move(sorts.back());
+  sorts.pop_back();
+
+  return mathematical_function_typet(std::move(sorts), std::move(codomain));
+}
+
 typet smt2_parsert::sort()
 {
   // a sort is one of the following three cases:
@@ -1334,6 +1360,8 @@ void smt2_parsert::setup_sorts()
     else
       throw error("unsupported array sort");
   };
+
+  sorts["->"] = [this] { return function_sort(); };
 }
 
 smt2_parsert::signature_with_parameter_idst

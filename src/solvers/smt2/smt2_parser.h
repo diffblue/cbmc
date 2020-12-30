@@ -177,6 +177,7 @@ protected:
 
   // sorts
   typet sort();
+  typet function_sort();
   std::unordered_map<std::string, std::function<typet()>> sorts;
   void setup_sorts();
 
