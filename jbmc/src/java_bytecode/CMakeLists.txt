@@ -1,6 +1,3 @@
-# include here the targets defined in library/
-add_subdirectory(library)
-
 # target 'java_bytecode' depends on all .cpp and .h files
 file(GLOB sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
