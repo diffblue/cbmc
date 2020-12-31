@@ -2,15 +2,8 @@ add_subdirectory(regression)
 add_subdirectory(src)
 add_subdirectory(unit)
 
-add_custom_target(java-models-library ALL
-    COMMAND mvn --quiet -Dmaven.test.skip=true package
-    COMMAND ${CMAKE_COMMAND} -E copy target/core-models.jar ${CMAKE_CURRENT_SOURCE_DIR}/src/java_bytecode/library/
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library
-)
-
 cprover_default_properties(
     java_bytecode
-    java-models-library
     jbmc
     jbmc-lib
     janalyzer
@@ -20,4 +13,26 @@ cprover_default_properties(
     java-testing-utils
     java-unit
     miniz
+)
+
+# java models library
+find_program(MAVEN_PROGRAM mvn REQUIRED)
+
+file(GLOB_RECURSE java_models_sources "lib/java-models-library/src/*.java")
+
+add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/core-models.jar"
+    COMMAND ${MAVEN_PROGRAM} --quiet -Dmaven.test.skip=true package
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library
+    DEPENDS ${java_models_sources}
+)
+
+add_custom_target(java-models-library ALL
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/core-models.jar"
+)
+
+install(
+  FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/core-models.jar"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/cprover-api.jar"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
