@@ -1,6 +1,6 @@
 CORE
 TokenTest01
---max-nondet-string-length 1000 --unwind 6  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--max-nondet-string-length 1000 --unwind 6  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

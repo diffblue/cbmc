@@ -1,6 +1,6 @@
 CORE
 BoxingWithOtherConversions
---function BoxingWithOtherConversions.testNarrowParameterTypeToPrimitive --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function BoxingWithOtherConversions.testNarrowParameterTypeToPrimitive --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 \[java::BoxingWithOtherConversions\.testNarrowParameterTypeToPrimitive:\(\)V.assertion.1\] line 17 assertion at file BoxingWithOtherConversions\.java line 17 function java::BoxingWithOtherConversions\.testNarrowParameterTypeToPrimitive:\(\)V bytecode-index 21: SUCCESS

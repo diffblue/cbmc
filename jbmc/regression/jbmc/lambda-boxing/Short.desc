@@ -1,6 +1,6 @@
 CORE
 BoxingLambda
---function BoxingLambda.testShort --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function BoxingLambda.testShort --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::BoxingLambda\.testShort:\(\)V\.assertion\.1\] line 164 assertion at file BoxingLambda\.java line 164 function java::BoxingLambda\.testShort:\(\)V bytecode-index 26: SUCCESS
 \[java::BoxingLambda\.testShort:\(\)V\.assertion\.2\] line 165 assertion at file BoxingLambda\.java line 165 function java::BoxingLambda\.testShort:\(\)V bytecode-index 37: SUCCESS
 \[java::BoxingLambda\.testShort:\(\)V\.assertion\.3\] line 166 assertion at file BoxingLambda\.java line 166 function java::BoxingLambda\.testShort:\(\)V bytecode-index 50: SUCCESS

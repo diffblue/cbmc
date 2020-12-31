@@ -1,6 +1,6 @@
 CORE
 NondetEnumOpaqueReturn
---function NondetEnumOpaqueReturn.canChooseRed --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function NondetEnumOpaqueReturn.canChooseRed --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

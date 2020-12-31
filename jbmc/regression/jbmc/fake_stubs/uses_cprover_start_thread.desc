@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --show-goto-functions
+--function Test.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --show-goto-functions
 org\.cprover\.CProver\.startThread:\(I\)V
 ^EXIT=0$
 ^SIGNAL=0$

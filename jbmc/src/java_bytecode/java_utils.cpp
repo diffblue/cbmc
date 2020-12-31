@@ -529,8 +529,7 @@ bool is_non_null_library_global(const irep_idt &symbolid)
 
 /// Methods belonging to the class org.cprover.CProver that should be ignored
 /// (not converted), leaving the driver program to stub them if it wishes.
-const std::unordered_set<std::string> cprover_methods_to_ignore
-{
+const std::unordered_set<std::string> cprover_methods_to_ignore{
   "nondetBoolean",
   "nondetByte",
   "nondetChar",
@@ -546,8 +545,8 @@ const std::unordered_set<std::string> cprover_methods_to_ignore
   "atomicEnd",
   "startThread",
   "endThread",
-  "getCurrentThreadID"
-};
+  "getCurrentThreadId",
+  "getMonitorCount"};
 
 /// \param type: type of new symbol
 /// \param basename_prefix: new symbol will be named

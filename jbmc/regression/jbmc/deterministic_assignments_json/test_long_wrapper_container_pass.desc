@@ -1,6 +1,6 @@
 CORE
 StaticValues
---unwind 1 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --static-values clinit-state.json --function StaticValues.testLongWrapperContainerPass
+--unwind 1 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --static-values clinit-state.json --function StaticValues.testLongWrapperContainerPass
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

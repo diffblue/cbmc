@@ -1,6 +1,6 @@
 CORE
 test_case
---max-nondet-string-length 1000 --function test_case.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--max-nondet-string-length 1000 --function test_case.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* file test_case.java line 10 .* SUCCESS$

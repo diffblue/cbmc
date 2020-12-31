@@ -1,6 +1,6 @@
 CORE
 ComplexClass
---function ComplexClass.branchCancel --symex-complexity-limit 1 --verbosity 9 --unwind 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function ComplexClass.branchCancel --symex-complexity-limit 1 --verbosity 9 --unwind 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^(\[symex-complexity\] Branch considered too complex|\[symex-complexity\] Loop operations considered too complex)
 ^EXIT=10$
 ^SIGNAL=0$

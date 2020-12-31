@@ -1,6 +1,6 @@
 CORE
 BoxingLambda
---function BoxingLambda.testDouble --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function BoxingLambda.testDouble --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::BoxingLambda\.testDouble:\(\)V\.assertion\.1\] line 112 assertion at file BoxingLambda\.java line 112 function java::BoxingLambda\.testDouble:\(\)V bytecode-index 27: SUCCESS
 \[java::BoxingLambda\.testDouble:\(\)V\.assertion\.2\] line 113 assertion at file BoxingLambda\.java line 113 function java::BoxingLambda\.testDouble:\(\)V bytecode-index 39: SUCCESS
 \[java::BoxingLambda\.testDouble:\(\)V\.assertion\.3\] line 114 assertion at file BoxingLambda\.java line 114 function java::BoxingLambda\.testDouble:\(\)V bytecode-index 53: SUCCESS

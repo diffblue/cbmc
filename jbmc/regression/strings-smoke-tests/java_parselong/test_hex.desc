@@ -1,6 +1,6 @@
 CORE
 Test_hex
---max-nondet-string-length 1000 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --function Test_hex.main
+--max-nondet-string-length 1000 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --function Test_hex.main
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 8.* SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 Nondet
---function Nondet.testPrimitiveArray --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Nondet.testPrimitiveArray --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 line 10 assertion.*FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

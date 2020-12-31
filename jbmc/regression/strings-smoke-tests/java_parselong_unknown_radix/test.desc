@@ -1,6 +1,6 @@
 THOROUGH
 Test
---max-nondet-string-length 10 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --function Test.testMe --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--max-nondet-string-length 10 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --function Test.testMe --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 12.* FAILURE$

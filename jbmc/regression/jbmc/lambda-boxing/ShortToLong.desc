@@ -1,6 +1,6 @@
 CORE
 PrimitiveWideningWithBoxing
---function PrimitiveWideningWithBoxing\.testShortToLong --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function PrimitiveWideningWithBoxing\.testShortToLong --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::PrimitiveWideningWithBoxing\.testShortToLong:\(\)V\.assertion\.1\] line 32 assertion at file PrimitiveWideningWithBoxing\.java line 32 function java::PrimitiveWideningWithBoxing\.testShortToLong:\(\)V bytecode-index 15: SUCCESS
 \[java::PrimitiveWideningWithBoxing\.testShortToLong:\(\)V\.assertion\.2\] line 33 assertion at file PrimitiveWideningWithBoxing\.java line 33 function java::PrimitiveWideningWithBoxing\.testShortToLong:\(\)V bytecode-index 21: FAILURE
 ^EXIT=10$

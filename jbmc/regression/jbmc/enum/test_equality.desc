@@ -1,6 +1,6 @@
 CORE
 Equality
---function Equality.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Equality.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^VERIFICATION FAILED$
 line 7 assertion at file Equality.java.*: FAILURE
 ^EXIT=10$

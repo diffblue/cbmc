@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.test --classpath `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Test.test --classpath `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 \[java::Test\.test:\(\)V\.assertion\.1\] line 17 assertion at file Test\.java line 17 function java::Test\.test:\(\)V bytecode-index 22: SUCCESS

@@ -1,6 +1,6 @@
 CORE
 Test
---function Test\.testLongToInt --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function Test\.testLongToInt --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::Test\.testLongToInt:\(\)V.assertion\.1\] line 84 assertion at file Test\.java line 84 function java::Test\.testLongToInt:\(\)V bytecode-index 13: SUCCESS
 \[java::Test\.testLongToInt:\(\)V.assertion\.2\] line 85 assertion at file Test\.java line 85 function java::Test\.testLongToInt:\(\)V bytecode-index 19: FAILURE
 ^EXIT=10$

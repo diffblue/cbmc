@@ -1,6 +1,6 @@
 CORE
 PrimitiveWideningWithBoxing
---function PrimitiveWideningWithBoxing\.testFloatToDouble --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+--function PrimitiveWideningWithBoxing\.testFloatToDouble --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::PrimitiveWideningWithBoxing\.testFloatToDouble:\(\)V\.assertion\.1\] line 44 assertion at file PrimitiveWideningWithBoxing\.java line 44 function java::PrimitiveWideningWithBoxing\.testFloatToDouble:\(\)V bytecode-index 15: SUCCESS
 \[java::PrimitiveWideningWithBoxing\.testFloatToDouble:\(\)V\.assertion\.2\] line 45 assertion at file PrimitiveWideningWithBoxing\.java line 45 function java::PrimitiveWideningWithBoxing\.testFloatToDouble:\(\)V bytecode-index 21: FAILURE
 ^EXIT=10$
