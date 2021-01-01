@@ -2,7 +2,6 @@ SRC = allocate_objects.cpp \
       arith_tools.cpp \
       array_element_from_pointer.cpp \
       array_name.cpp \
-      base_type.cpp \
       bv_arithmetic.cpp \
       byte_operators.cpp \
       c_types.cpp \
