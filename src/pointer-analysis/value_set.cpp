@@ -1180,10 +1180,9 @@ void value_sett::assign(
 
   const typet &type=ns.follow(lhs.type());
 
-  if(type.id()==ID_struct ||
-     type.id()==ID_union)
+  if(type.id() == ID_struct)
   {
-    for(const auto &c : to_struct_union_type(type).components())
+    for(const auto &c : to_struct_type(type).components())
     {
       const typet &subtype = c.type();
       const irep_idt &name = c.get_name();
@@ -1212,10 +1211,10 @@ void value_sett::assign(
           "rhs.type():\n" +
             rhs.type().pretty() + "\n" + "lhs.type():\n" + lhs.type().pretty());
 
-        const struct_union_typet &rhs_struct_union_type =
-          to_struct_union_type(ns.follow(rhs.type()));
+        const struct_typet &rhs_struct_type =
+          to_struct_type(ns.follow(rhs.type()));
 
-        const typet &rhs_subtype = rhs_struct_union_type.component_type(name);
+        const typet &rhs_subtype = rhs_struct_type.component_type(name);
         rhs_member = simplify_expr(member_exprt{rhs, name, rhs_subtype}, ns);
 
         assign(lhs_member, rhs_member, ns, true, add_to_sets);
@@ -1284,7 +1283,7 @@ void value_sett::assign(
   }
   else
   {
-    // basic type
+    // basic type or union
     object_mapt values_rhs = get_value_set(rhs, ns, is_simplified);
 
     // Permit custom subclass to alter the read values prior to write:
