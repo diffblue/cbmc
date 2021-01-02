@@ -453,10 +453,10 @@ void value_sett::get_value_set_rec(
   const typet &original_type,
   const namespacet &ns) const
 {
-  #if 0
+#ifdef DEBUG
   std::cout << "GET_VALUE_SET_REC EXPR: " << format(expr) << "\n";
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
-  #endif
+#endif
 
   const typet &expr_type=ns.follow(expr.type());
 
@@ -1013,10 +1013,10 @@ void value_sett::get_reference_set_rec(
   object_mapt &dest,
   const namespacet &ns) const
 {
-  #if 0
+#ifdef DEBUG
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << format(expr)
             << '\n';
-  #endif
+#endif
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_dynamic_object ||
@@ -1037,10 +1037,12 @@ void value_sett::get_reference_set_rec(
 
     get_value_set_rec(pointer, dest, "", pointer.type(), ns);
 
-#if 0
-    for(expr_sett::const_iterator it=value_set.begin();
-        it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << format(*it) << '\n';
+#ifdef DEBUG
+    for(const auto &map_entry : dest.read())
+    {
+      std::cout << "VALUE_SET: " << format(object_numbering[map_entry.first])
+                << '\n';
+    }
 #endif
 
     return;
@@ -1169,13 +1171,13 @@ void value_sett::assign(
   bool is_simplified,
   bool add_to_sets)
 {
-#if 0
+#ifdef DEBUG
   std::cout << "ASSIGN LHS: " << format(lhs) << " : "
             << format(lhs.type()) << '\n';
   std::cout << "ASSIGN RHS: " << format(rhs) << " : "
             << format(rhs.type()) << '\n';
   std::cout << "--------------------------------------------\n";
-  output(ns, std::cout);
+  output(std::cout);
 #endif
 
   const typet &type=ns.follow(lhs.type());
@@ -1304,7 +1306,7 @@ void value_sett::assign_rec(
   const namespacet &ns,
   bool add_to_sets)
 {
-  #if 0
+#ifdef DEBUG
   std::cout << "ASSIGN_REC LHS: " << format(lhs) << '\n';
   std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << '\n';
   std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
@@ -1315,7 +1317,7 @@ void value_sett::assign_rec(
     std::cout << "ASSIGN_REC RHS: " <<
       format(object_numbering[it->first]) << '\n';
   std::cout << '\n';
-  #endif
+#endif
 
   if(lhs.id()==ID_symbol)
   {
