@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
+#include "c_types.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -184,26 +185,16 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     if(to_union_expr(op).op().type() == expr.type())
       return to_union_expr(op).op();
 
-    // need to convert!
-    auto target_size = pointer_offset_size(expr.type(), ns);
-
-    if(target_size.has_value())
-    {
-      mp_integer target_bits = target_size.value() * 8;
-      const auto bits = expr2bits(op, true, ns);
-
-      if(bits.has_value() &&
-         mp_integer(bits->size())>=target_bits)
-      {
-        std::string bits_cut =
-          std::string(*bits, 0, numeric_cast_v<std::size_t>(target_bits));
-
-        auto tmp = bits2expr(bits_cut, expr.type(), true, ns);
-
-        if(tmp.has_value())
-          return std::move(*tmp);
-      }
-    }
+    // need to convert, taking endianness into account
+    byte_extract_exprt byte_extract{
+      byte_extract_id(), op, from_integer(0, index_type()), expr.type()};
+    // try to simplify this, but never return the byte_extract expression to
+    // avoid infinite rewrite loops
+    auto result = simplify_byte_extract(byte_extract);
+    if(result.expr.id() != byte_extract_id())
+      return result;
+    else
+      return unchanged(expr);
   }
   else if(op.id() == ID_typecast)
   {

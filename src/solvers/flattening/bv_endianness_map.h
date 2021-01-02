@@ -24,14 +24,14 @@ public:
     const typet &type,
     bool little_endian,
     const namespacet &_ns,
-    boolbv_widtht &_boolbv_width)
+    const boolbv_widtht &_boolbv_width)
     : endianness_mapt(_ns), boolbv_width(_boolbv_width)
   {
     build(type, little_endian);
   }
 
 protected:
-  boolbv_widtht &boolbv_width;
+  const boolbv_widtht &boolbv_width;
 
   virtual void build_little_endian(const typet &type) override;
   virtual void build_big_endian(const typet &type) override;

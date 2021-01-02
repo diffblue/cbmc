@@ -54,9 +54,7 @@ void symex_assignt::assign_rec(
     }
     else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
-      // should have been replaced by byte_extract
-      throw unsupported_operation_exceptiont(
-        "assign_rec: unexpected assignment to union member");
+      assign_union_member(to_member_expr(lhs), full_lhs, rhs, guard);
     }
     else
       throw unsupported_operation_exceptiont(
@@ -341,6 +339,30 @@ void symex_assignt::assign_struct_member(
       full_lhs.compose(expr_skeletont::remove_op0(lhs));
     assign_rec(lhs_struct, new_skeleton, new_rhs, guard);
   }
+}
+
+void symex_assignt::assign_union_member(
+  const member_exprt &lhs,
+  const expr_skeletont &full_lhs,
+  const exprt &rhs,
+  exprt::operandst &guard)
+{
+  // Symbolic execution of a union member assignment.
+
+  // lhs must be member operand, which takes one operand, which must be a union.
+  exprt lhs_union = lhs.op();
+  const irep_idt &component_name = lhs.get_component_name();
+
+  // turn
+  //   a.c=e
+  // into
+  //   a'== { .c=e }
+  // as the front-end guarantees that .c will have the full size of the union
+
+  union_exprt new_rhs{component_name, rhs, lhs_union.type()};
+  const expr_skeletont new_skeleton =
+    full_lhs.compose(expr_skeletont::remove_op0(lhs));
+  assign_rec(lhs_union, new_skeleton, new_rhs, guard);
 }
 
 void symex_assignt::assign_if(

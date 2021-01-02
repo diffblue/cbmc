@@ -40,7 +40,6 @@ Author: Peter Schrammel
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
@@ -341,7 +340,6 @@ bool goto_diff_parse_optionst::process_goto_program(
     remove_returns(goto_model);
     remove_vector(goto_model);
     remove_complex(goto_model);
-    rewrite_union(goto_model);
 
     // add generic checks
     log.status() << "Generic Property Instrumentation" << messaget::eom;

@@ -1,11 +1,11 @@
-CORE broken-smt-backend
+CORE
 main.c
 --big-endian
+Generated 3 VCC\(s\), 0 remaining after simplification
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 --
-This test reports a VERIFICATION ERROR when running with the SMT2 solver on
-Windows only.
+This test can now be fully solved via constant propagation and simplification.

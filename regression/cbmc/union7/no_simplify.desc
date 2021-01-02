@@ -1,0 +1,11 @@
+CORE broken-smt-backend
+main.c
+--big-endian --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Although this test can now be fully solved via constant propagation and
+simplification, it should also succeed without simplification.

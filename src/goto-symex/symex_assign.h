@@ -92,6 +92,12 @@ private:
     const exprt &rhs,
     exprt::operandst &guard);
 
+  void assign_union_member(
+    const member_exprt &lhs,
+    const expr_skeletont &full_lhs,
+    const exprt &rhs,
+    exprt::operandst &guard);
+
   void assign_if(
     const if_exprt &lhs,
     const expr_skeletont &full_lhs,

@@ -20,7 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/string2int.h>
 
 #include "ansi_c_convert_type.h"
 #include "c_qualifiers.h"
@@ -1072,6 +1074,148 @@ void c_typecheck_baset::typecheck_compound_body(
     }
     else
       it++;
+  }
+
+  if(type.id() == ID_union && !components.empty())
+  {
+    const auto widest_member =
+      to_union_type(type).find_widest_union_component(*this);
+    optionalt<exprt> size_expr_opt;
+
+    if(!widest_member.has_value())
+    {
+      // GCC extension: arrays of non-constant size
+      size_expr_opt = size_of_expr(type, *this);
+
+      if(!size_expr_opt.has_value())
+      {
+        error().source_location = type.source_location();
+        error() << "cannot determine size of union" << eom;
+        throw 0;
+      }
+    }
+
+    // ensure non-conflicting member names
+    for(auto &component : components)
+    {
+      if(
+        id2string(component.get_name()).size() > 5 &&
+        has_prefix(id2string(component.get_name()), "$anon"))
+      {
+        const std::string suffix{id2string(component.get_name()), 5};
+        auto int_suffix = string2optional_unsigned(suffix);
+        if(int_suffix.has_value())
+          anon_member_counter = std::max(anon_member_counter, *int_suffix + 1);
+      }
+    }
+
+    for(auto &component : components)
+    {
+      std::vector<typet> padding_types;
+
+      const auto &component_bits = pointer_offset_bits(component.type(), *this);
+      if(
+        component_bits.has_value() &&
+        (!widest_member.has_value() ||
+         *component_bits < widest_member->second) &&
+        *component_bits % 8 != 0)
+      {
+        std::size_t bit_field_padding_width =
+          8 - numeric_cast_v<std::size_t>(*component_bits % 8);
+        padding_types.push_back(c_bit_field_typet{
+          unsignedbv_typet{bit_field_padding_width}, bit_field_padding_width});
+      }
+
+      if(size_expr_opt.has_value())
+      {
+        const auto component_size_expr_opt =
+          size_of_expr(component.type(), *this);
+        CHECK_RETURN(component_size_expr_opt.has_value());
+        // size_of_expr will round up to full bytes, and also works for bit
+        // fields (which C sizeof does not support). Thus, we don't need to
+        // special-case bit_field_padding_opt being set.
+        if_exprt padding_bytes{
+          binary_relation_exprt{
+            *component_size_expr_opt, ID_lt, *size_expr_opt},
+          minus_exprt{*size_expr_opt, *component_size_expr_opt},
+          from_integer(0, size_expr_opt->type())};
+        simplify(padding_bytes, *this);
+
+        if(!padding_bytes.is_zero())
+        {
+          make_index_type(padding_bytes);
+
+          padding_types.push_back(
+            array_typet{unsigned_char_type(), padding_bytes});
+        }
+      }
+      else
+      {
+        CHECK_RETURN(component_bits.has_value());
+        // Truncating division ensures that we don't need to special-case
+        // bit_field_padding_opt being set.
+        std::size_t padding_bytes =
+          numeric_cast_v<std::size_t>(widest_member->second - *component_bits) /
+          8;
+
+        if(padding_bytes != 0)
+        {
+          padding_types.push_back(array_typet{
+            unsigned_char_type(), from_integer(padding_bytes, index_type())});
+        }
+      }
+
+      if(padding_types.empty())
+        continue;
+
+      struct_typet::componentst component_with_padding_type;
+      component_with_padding_type.push_back(component);
+      for(const auto &t : padding_types)
+      {
+        // TODO: perhaps use the same naming as padding.cpp uses
+        component_with_padding_type.push_back(struct_union_typet::componentt{
+          "$anon" + std::to_string(anon_member_counter++), t});
+        // TODO: not sure whether this should be anonymous
+        component_with_padding_type.back().set_anonymous(true);
+        component_with_padding_type.back().set_is_padding(true);
+        component_with_padding_type.back().add_source_location() =
+          component.source_location();
+      }
+
+      struct_union_typet::componentt component_with_padding{
+        "$anon" + std::to_string(anon_member_counter++),
+        struct_typet{component_with_padding_type}};
+      component_with_padding.set_anonymous(true);
+      component_with_padding.add_source_location() =
+        component.source_location();
+
+      // based on typecheck_compound_type, branch
+      // "if(type.find(ID_tag).is_nil())"
+      // produce type symbol
+      type_symbolt compound_symbol{component_with_padding.type()};
+      compound_symbol.location = component_with_padding.source_location();
+
+      std::string typestr = type2name(compound_symbol.type, *this);
+      compound_symbol.base_name = "#anon#" + typestr;
+      compound_symbol.name = "tag-#anon#" + typestr;
+
+      // We might already have the same anonymous struct, and this is simply
+      // ok as those are exactly the same types, just introduced at a
+      // different source location.
+      symbolt *new_symbol = &compound_symbol;
+      if(
+        symbol_table.symbols.find(compound_symbol.name) ==
+        symbol_table.symbols.end())
+      {
+        move_symbol(compound_symbol, new_symbol);
+      }
+
+      struct_tag_typet tag_type{new_symbol->name};
+      tag_type.add_source_location() = component_with_padding.source_location();
+      component_with_padding.type().swap(tag_type);
+
+      component.swap(component_with_padding);
+    }
   }
 }
 
