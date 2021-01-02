@@ -41,9 +41,14 @@ public:
     while(incremental_goto_checker(properties).progress !=
           incremental_goto_checkert::resultt::progresst::DONE)
     {
-      // we've got a trace; store it and link it to the covered goals
-      message_building_error_trace(log);
-      (void)traces.insert_all(incremental_goto_checker.build_full_trace());
+      if(
+        options.get_bool_option("show-test-suite") ||
+        options.get_bool_option("trace"))
+      {
+        // we've got a trace; store it and link it to the covered goals
+        message_building_error_trace(log);
+        (void)traces.insert_all(incremental_goto_checker.build_full_trace());
+      }
 
       ++iterations;
     }

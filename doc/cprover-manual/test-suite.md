@@ -128,10 +128,11 @@ and outputs of interest for generating test suites.
 To demonstrate the automatic test suite generation in CBMC, we call the
 following command:
 
-    cbmc pid.c --cover mcdc --unwind 6 --xml-ui
+    cbmc pid.c --cover mcdc --show-test-suite --unwind 6 --xml-ui
 
 We'll describe those command line options one by one. The option `--cover mcdc`
-specifies the code coverage criterion. There
+specifies the code coverage criterion, and --show-test-suite requests that a
+test suite be printed. There
 are four conditional statements in the PID function: in lines 41,
 44, 48, and 49. To satisfy MC/DC, the test suite has to meet
 multiple requirements. For instance, each conditional statement needs to

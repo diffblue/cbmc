@@ -1,6 +1,6 @@
 CORE
 main.c
---xml-ui --cover branch
+--xml-ui --cover branch --show-test-suite
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
