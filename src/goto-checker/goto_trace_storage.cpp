@@ -43,7 +43,7 @@ const goto_tracet &goto_trace_storaget::insert_all(goto_tracet &&trace)
   return traces.back();
 }
 
-const std::vector<goto_tracet> &goto_trace_storaget::all() const
+const std::list<goto_tracet> &goto_trace_storaget::all() const
 {
   return traces;
 }
@@ -53,8 +53,9 @@ operator[](const irep_idt &property_id) const
 {
   const auto trace_found = property_id_to_trace_index.find(property_id);
   PRECONDITION(trace_found != property_id_to_trace_index.end());
+  CHECK_RETURN(trace_found->second < traces.size());
 
-  return traces.at(trace_found->second);
+  return *(std::next(traces.begin(), trace_found->second));
 }
 
 const namespacet &goto_trace_storaget::get_namespace() const
