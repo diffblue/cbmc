@@ -1,4 +1,4 @@
-KNOWNBUG broken-smt-backend
+THOROUGH
 main.c
 -DEQUALITY
 ^EXIT=0$
@@ -7,4 +7,6 @@ main.c
 --
 ^warning: ignoring
 --
-Times out. See #4337.
+Takes approximately 1000 seconds to complete when using the SAT back-end (and
+Minisat2). The SMT solver completes this task in less than 0.1 seconds.
+See #4337.
