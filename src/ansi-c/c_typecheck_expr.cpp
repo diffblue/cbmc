@@ -1573,7 +1573,14 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
   const typet o_type2=operands[2].type();
 
   implicit_typecast_bool(operands[0]);
-  implicit_typecast_arithmetic(operands[1], operands[2]);
+
+  if(o_type1.id() == ID_empty || o_type2.id() == ID_empty)
+  {
+    operands[1] = typecast_exprt::conditional_cast(operands[1], void_type());
+    operands[2] = typecast_exprt::conditional_cast(operands[2], void_type());
+    expr.type() = void_type();
+    return;
+  }
 
   if(operands[1].type().id()==ID_pointer &&
      operands[2].type().id()!=ID_pointer)
@@ -1629,6 +1636,13 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
   {
     expr.type()=void_type();
     return;
+  }
+
+  if(
+    operands[1].type() != operands[2].type() ||
+    operands[1].type().id() == ID_array)
+  {
+    implicit_typecast_arithmetic(operands[1], operands[2]);
   }
 
   if(operands[1].type() == operands[2].type())
