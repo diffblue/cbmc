@@ -36,7 +36,7 @@ int ms_link_modet::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
 
-  compilet compiler(cmdline, message_handler, false);
+  compilet compiler(cmdline, message_handler, cmdline.isset("WX"));
 
   // determine actions to be undertaken
   compiler.mode = compilet::LINK_LIBRARY;
