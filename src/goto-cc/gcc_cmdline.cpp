@@ -180,6 +180,7 @@ const char *gcc_options_without_argument[]=
   "-O1",
   "-O2",
   "-O3",
+  "-O6",
   "-Os",
   "-Oz", // Apple only
   "-C",
