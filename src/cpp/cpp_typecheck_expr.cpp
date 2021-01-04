@@ -145,7 +145,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       if(!standard_conversion_lvalue_to_rvalue(e1, expr.op1()))
       {
         error().source_location=e1.find_source_location();
-        error() << "error: lvalue to rvalue conversion" << eom;
+        error() << "lvalue to rvalue conversion" << eom;
         throw 0;
       }
     }
@@ -156,7 +156,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       if(!standard_conversion_array_to_pointer(e1, expr.op1()))
       {
         error().source_location=e1.find_source_location();
-        error() << "error: array to pointer conversion" << eom;
+        error() << "array to pointer conversion" << eom;
         throw 0;
       }
     }
@@ -167,7 +167,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       if(!standard_conversion_function_to_pointer(e1, expr.op1()))
       {
         error().source_location=e1.find_source_location();
-        error() << "error: function to pointer conversion" << eom;
+        error() << "function to pointer conversion" << eom;
         throw 0;
       }
     }
@@ -178,7 +178,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       if(!standard_conversion_lvalue_to_rvalue(e2, expr.op2()))
       {
         error().source_location=e2.find_source_location();
-        error() << "error: lvalue to rvalue conversion" << eom;
+        error() << "lvalue to rvalue conversion" << eom;
         throw 0;
       }
     }
@@ -189,7 +189,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       if(!standard_conversion_array_to_pointer(e2, expr.op2()))
       {
         error().source_location=e2.find_source_location();
-        error() << "error: array to pointer conversion" << eom;
+        error() << "array to pointer conversion" << eom;
         throw 0;
       }
     }
@@ -200,7 +200,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       if(!standard_conversion_function_to_pointer(e2, expr.op2()))
       {
         error().source_location=expr.find_source_location();
-        error() << "error: function to pointer conversion" << eom;
+        error() << "function to pointer conversion" << eom;
         throw 0;
       }
     }
@@ -217,7 +217,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     else
     {
       error().source_location=expr.find_source_location();
-      error() << "error: bad types for operands" << eom;
+      error() << "bad types for operands" << eom;
       throw 0;
     }
     return;
@@ -272,7 +272,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     else
     {
       error().source_location=expr.find_source_location();
-      error() << "error: types are incompatible.\n"
+      error() << "types are incompatible.\n"
               << "I got '" << type2cpp(expr.op1().type(), *this) << "' and '"
               << type2cpp(expr.op2().type(), *this) << "'." << eom;
       throw 0;
@@ -706,7 +706,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
       if(code_type.get_bool(ID_C_is_virtual))
       {
         error().source_location=expr.source_location();
-        error() << "error: pointers to virtual methods"
+        error() << "pointers to virtual methods"
                 << " are currently not implemented" << eom;
         throw 0;
       }
@@ -1068,7 +1068,7 @@ void cpp_typecheckt::typecheck_expr_member(
   if(expr.operands().size()!=1)
   {
     error().source_location=expr.find_source_location();
-    error() << "error: member operator expects one operand" << eom;
+    error() << "member operator expects one operand" << eom;
     throw 0;
   }
 
@@ -1097,7 +1097,7 @@ void cpp_typecheckt::typecheck_expr_member(
   if(op0.type().id() != ID_struct_tag && op0.type().id() != ID_union_tag)
   {
     error().source_location=expr.find_source_location();
-    error() << "error: member operator requires struct/union type "
+    error() << "member operator requires struct/union type "
             << "on left hand side but got '" << to_string(op0.type()) << "'"
             << eom;
     throw 0;
@@ -1113,7 +1113,7 @@ void cpp_typecheckt::typecheck_expr_member(
   if(type.is_incomplete())
   {
     error().source_location = expr.find_source_location();
-    error() << "error: member operator got incomplete type "
+    error() << "member operator got incomplete type "
             << "on left hand side" << eom;
     throw 0;
   }
@@ -1161,7 +1161,7 @@ void cpp_typecheckt::typecheck_expr_member(
         to_code_type(symbol_expr.type()).return_type().id() == ID_constructor)
       {
         error().source_location=expr.find_source_location();
-        error() << "error: member '"
+        error() << "member '"
                 << lookup(symbol_expr.get(ID_identifier)).base_name
                 << "' is a constructor" << eom;
         throw 0;
@@ -1175,7 +1175,7 @@ void cpp_typecheckt::typecheck_expr_member(
         if(pcomp.is_nil())
         {
           error().source_location=expr.find_source_location();
-          error() << "error: '" << symbol_expr.get(ID_identifier)
+          error() << "'" << symbol_expr.get(ID_identifier)
                   << "' is not static member "
                   << "of class '" << to_string(op0.type()) << "'" << eom;
           throw 0;
@@ -1217,8 +1217,8 @@ void cpp_typecheckt::typecheck_expr_member(
   else
   {
     error().source_location=expr.find_source_location();
-    error() << "error: member '" << component_name << "' of '"
-            << to_string(type) << "' not found" << eom;
+    error() << "member '" << component_name << "' of '" << to_string(type)
+            << "' not found" << eom;
     throw 0;
   }
 
@@ -1243,7 +1243,7 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
   if(expr.operands().size()!=1)
   {
     error().source_location=expr.find_source_location();
-    error() << "error: ptrmember operator expects one operand" << eom;
+    error() << "ptrmember operator expects one operand" << eom;
     throw 0;
   }
 
@@ -1254,7 +1254,7 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
   if(op.type().id() != ID_pointer)
   {
     error().source_location=expr.find_source_location();
-    error() << "error: ptrmember operator requires pointer type "
+    error() << "ptrmember operator requires pointer type "
             << "on left hand side, but got '" << to_string(op.type()) << "'"
             << eom;
     throw 0;

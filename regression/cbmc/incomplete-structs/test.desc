@@ -1,8 +1,8 @@
 CORE
 typesmain.c
 types1.c types2.c types3.c
-warning: pointer parameter types differ between declaration and definition "bar"
-warning: pointer parameter types differ between declaration and definition "foo"
+^file \S+\.c line \d+: pointer parameter types differ between declaration and definition 'bar'$
+^file \S+\.c line \d+: pointer parameter types differ between declaration and definition 'foo'$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
