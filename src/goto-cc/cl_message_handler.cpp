@@ -27,6 +27,9 @@ void cl_message_handlert::print(
 
   std::ostringstream formatted_message;
 
+  if(level == messaget::M_WARNING && warnings_are_errors)
+    formatted_message << "error: warning treated as error\n";
+
   const irep_idt file = location.get_file();
   const std::string &line = id2string(location.get_line());
   formatted_message << file << '(' << line << "): ";

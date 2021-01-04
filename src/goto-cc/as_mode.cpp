@@ -110,6 +110,7 @@ int as_modet::doit()
     messaget::M_WARNING : messaget::M_ERROR;
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), default_verbosity, message_handler);
+  message_handler.print_warnings_as_errors(cmdline.isset("fatal-warnings"));
 
   if(act_as_as86)
   {
