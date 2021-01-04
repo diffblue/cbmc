@@ -17,6 +17,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
+#include <chrono>
+
 #include "bmc_util.h"
 
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
@@ -71,8 +73,17 @@ operator()(propertiest &properties)
 
 void multi_path_symex_only_checkert::generate_equation()
 {
+  const auto symex_start = std::chrono::steady_clock::now();
+
   symex.symex_from_entry_point_of(
     goto_symext::get_goto_function(goto_model), symex_symbol_table);
+
+  const auto symex_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> symex_runtime =
+    std::chrono::duration<double>(symex_stop - symex_start);
+  log.status() << "Runtime Symex: " << symex_runtime.count() << "s"
+               << messaget::eom;
+
   postprocess_equation(symex, equation, options, ns, ui_message_handler);
 }
 

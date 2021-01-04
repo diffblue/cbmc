@@ -16,6 +16,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/path_storage.h>
 
+#include <chrono>
+
 class symex_bmct;
 
 /// Uses goto-symex to generate a `symex_target_equationt` for each path.
@@ -37,6 +39,7 @@ protected:
   namespacet ns;
   guard_managert guard_manager;
   std::unique_ptr<path_storaget> worklist;
+  std::chrono::duration<double> symex_runtime;
 
   void equation_output(
     const symex_bmct &symex,

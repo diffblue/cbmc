@@ -28,7 +28,8 @@ single_path_symex_only_checkert::single_path_symex_only_checkert(
   : incremental_goto_checkert(options, ui_message_handler),
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
-    worklist(get_path_strategy(options.get_option("exploration-strategy")))
+    worklist(get_path_strategy(options.get_option("exploration-strategy"))),
+    symex_runtime(0)
 {
 }
 
@@ -49,6 +50,9 @@ operator()(propertiest &properties)
 
     worklist->pop();
   }
+
+  log.status() << "Runtime Symex: " << symex_runtime.count() << "s"
+               << messaget::eom;
 
   final_update_properties(properties, result.updated_properties);
 
@@ -82,6 +86,8 @@ bool single_path_symex_only_checkert::has_finished_exploration(
 
 bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
 {
+  const auto symex_start = std::chrono::steady_clock::now();
+
   symex_bmct symex(
     ui_message_handler,
     goto_model.get_symbol_table(),
@@ -96,6 +102,10 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
     path.state,
     &path.equation,
     symex_symbol_table);
+
+  const auto symex_stop = std::chrono::steady_clock::now();
+  symex_runtime += std::chrono::duration<double>(symex_stop - symex_start);
+
   postprocess_equation(symex, path.equation, options, ns, ui_message_handler);
 
   equation_output(symex, path.equation);
