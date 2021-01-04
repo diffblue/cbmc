@@ -30,7 +30,17 @@ public:
     const std::string &message,
     const source_locationt &location) override;
 
+  /// With \p yes set to \c true, prefix warnings with "error:" instead of
+  /// "warning:".
+  /// \param yes: Whether or not to prefix warnings with "error:".
+  void print_warnings_as_errors(bool yes)
+  {
+    warnings_are_errors = yes;
+  }
+
 private:
+  bool warnings_are_errors = false;
+
   /// feed a command into a string
   std::string string(const messaget::commandt &c) const
   {

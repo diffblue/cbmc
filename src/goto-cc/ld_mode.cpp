@@ -75,6 +75,8 @@ int ld_modet::doit()
 
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, gcc_message_handler);
+  gcc_message_handler.print_warnings_as_errors(
+    cmdline.isset("fatal-warnings") && !cmdline.isset("no-fatal-warnings"));
 
   compilet compiler(
     cmdline,
