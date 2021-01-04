@@ -61,6 +61,7 @@ int ms_cl_modet::doit()
                                    : messaget::M_ERROR;
   const auto verbosity = messaget::eval_verbosity(
     cmdline.get_value("verbosity"), default_verbosity, message_handler);
+  message_handler.print_warnings_as_errors(cmdline.isset("WX"));
 
   ms_cl_versiont ms_cl_version;
   ms_cl_version.get("cl.exe");

@@ -29,6 +29,16 @@ public:
     const source_locationt &location) override;
 
   using console_message_handlert::print;
+
+  /// With \p yes set to \c true, prefix warnings with an error message.
+  /// \param yes: Whether or not to prefix warnings.
+  void print_warnings_as_errors(bool yes)
+  {
+    warnings_are_errors = yes;
+  }
+
+private:
+  bool warnings_are_errors = false;
 };
 
 #endif // CPROVER_GOTO_CC_CL_MESSAGE_HANDLER_H
