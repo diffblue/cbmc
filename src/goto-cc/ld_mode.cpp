@@ -76,7 +76,10 @@ int ld_modet::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, gcc_message_handler);
 
-  compilet compiler(cmdline, gcc_message_handler, false);
+  compilet compiler(
+    cmdline,
+    gcc_message_handler,
+    cmdline.isset("fatal-warnings") && !cmdline.isset("no-fatal-warnings"));
 
   // determine actions to be undertaken
   compiler.mode = compilet::LINK_LIBRARY;

@@ -56,8 +56,11 @@ int ms_cl_modet::doit()
     has_prefix(base_name, "goto-link");
   #endif
 
+  const auto default_verbosity = (cmdline.isset("Wall") || cmdline.isset("W4"))
+                                   ? messaget::M_WARNING
+                                   : messaget::M_ERROR;
   const auto verbosity = messaget::eval_verbosity(
-    cmdline.get_value("verbosity"), messaget::M_ERROR, message_handler);
+    cmdline.get_value("verbosity"), default_verbosity, message_handler);
 
   ms_cl_versiont ms_cl_version;
   ms_cl_version.get("cl.exe");
