@@ -210,8 +210,7 @@ void cpp_typecheckt::typecheck_compound_type(
       else
       {
         error().source_location=type.source_location();
-        error() << "error: compound tag '" << base_name
-                << "' declared previously\n"
+        error() << "compound tag '" << base_name << "' declared previously\n"
                 << "location of previous definition: " << symbol.location
                 << eom;
         throw 0;
@@ -1524,9 +1523,8 @@ bool cpp_typecheckt::get_component(
         else
         {
           error().source_location=source_location;
-          error() << "error: member '" << component_name
-                  << "' is not accessible (" << component.get(ID_access) << ")"
-                  << eom;
+          error() << "member '" << component_name << "' is not accessible ("
+                  << component.get(ID_access) << ")" << eom;
           throw 0;
         }
       }
@@ -1560,8 +1558,8 @@ bool cpp_typecheckt::get_component(
           if(check_component_access(component, final_type))
           {
             error().source_location=source_location;
-            error() << "error: member '" << component_name
-                    << "' is not accessible" << eom;
+            error() << "member '" << component_name << "' is not accessible"
+                    << eom;
             throw 0;
           }
 

@@ -652,15 +652,15 @@ void goto_convertt::do_function_call_symbol(
   if(ns.lookup(identifier, symbol))
   {
     error().source_location=function.find_source_location();
-    error() << "error: function '" << identifier << "' not found" << eom;
+    error() << "function '" << identifier << "' not found" << eom;
     throw 0;
   }
 
   if(symbol->type.id()!=ID_code)
   {
     error().source_location=function.find_source_location();
-    error() << "error: function '" << identifier
-            << "' type mismatch: expected code" << eom;
+    error() << "function '" << identifier << "' type mismatch: expected code"
+            << eom;
     throw 0;
   }
 

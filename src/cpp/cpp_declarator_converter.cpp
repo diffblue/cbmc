@@ -175,8 +175,7 @@ symbolt &cpp_declarator_convertert::convert(
       if(symbol_expr.id() != ID_type)
       {
         cpp_typecheck.error().source_location=name.source_location();
-        cpp_typecheck.error() << "error: expected type"
-                              << messaget::eom;
+        cpp_typecheck.error() << "expected type" << messaget::eom;
         throw 0;
       }
 

@@ -3,6 +3,6 @@ main.c
 other.c
 ^EXIT=(64|1)$
 ^SIGNAL=0$
-error: conflicting function declarations 'foo'
+conflicting function declarations 'foo'
 --
 ^warning: ignoring
