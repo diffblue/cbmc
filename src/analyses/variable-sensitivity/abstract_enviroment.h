@@ -236,6 +236,9 @@ protected:
   virtual abstract_object_pointert
   eval_expression(const exprt &e, const namespacet &ns) const;
 
+  abstract_object_pointert
+  resolve_symbol(const exprt &e, const namespacet &ns) const;
+
   sharing_mapt<map_keyt, abstract_object_pointert> map;
 
 private:

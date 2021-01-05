@@ -48,17 +48,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   const irep_idt simplified_id = simplified_expr.id();
   if(simplified_id == ID_symbol)
   {
-    const symbol_exprt &symbol(to_symbol_expr(simplified_expr));
-    const auto &symbol_entry = map.find(symbol.get_identifier());
-    if(!symbol_entry.has_value())
-    {
-      return abstract_object_factory(simplified_expr.type(), ns, true);
-    }
-    else
-    {
-      abstract_object_pointert found_symbol_value = symbol_entry.value();
-      return found_symbol_value;
-    }
+    return resolve_symbol(simplified_expr, ns);
   }
   else if(
     simplified_id == ID_member || simplified_id == ID_index ||
@@ -92,6 +82,18 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     }
   }
 }
+
+abstract_object_pointert
+abstract_environmentt::resolve_symbol(const exprt &expr, const namespacet &ns) const
+{
+  const symbol_exprt &symbol(to_symbol_expr(expr));
+  const auto symbol_entry = map.find(symbol.get_identifier());
+
+  return symbol_entry.has_value()
+    ? symbol_entry.value()
+    : abstract_object_factory(expr.type(), ns, true);
+}
+
 
 bool abstract_environmentt::assign(
   const exprt &expr,
