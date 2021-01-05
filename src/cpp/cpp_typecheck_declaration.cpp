@@ -148,7 +148,7 @@ void cpp_typecheckt::convert_non_template_declaration(
       declaration_type, declaration.storage_spec(),
       declaration.member_spec(), declarator);
 
-    if(!symbol.is_type && symbol.type.id() == ID_empty)
+    if(!symbol.is_type && !symbol.is_extern && symbol.type.id() == ID_empty)
     {
       error().source_location = symbol.location;
       error() << "void-typed symbol not permitted" << eom;

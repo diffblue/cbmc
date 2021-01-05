@@ -1,3 +1,5 @@
+extern void this_is_ok;
+
 struct a
 {
 #ifdef void_member

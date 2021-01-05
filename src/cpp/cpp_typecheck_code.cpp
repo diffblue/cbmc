@@ -448,7 +448,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     if(is_typedef)
       continue;
 
-    if(!symbol.is_type && symbol.type.id() == ID_empty)
+    if(!symbol.is_type && !symbol.is_extern && symbol.type.id() == ID_empty)
     {
       error().source_location = symbol.location;
       error() << "void-typed symbol not permitted" << eom;
