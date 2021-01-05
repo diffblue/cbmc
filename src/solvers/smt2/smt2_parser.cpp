@@ -1470,9 +1470,9 @@ void smt2_parsert::setup_commands()
     add_unique_id(id, exprt(ID_nil, type));
   };
 
-  // declare-var appears to be a synonym for declare-const that is
-  // accepted by Z3 and CVC4
-  commands["declare-var"] = commands["declare-const"];
+  // // declare-var appears to be a synonym for declare-const that is
+  // // accepted by Z3 and CVC4
+  // commands["declare-var"] = commands["declare-const"];
 
   commands["declare-fun"] = [this]() {
     if(next_token() != smt2_tokenizert::SYMBOL)
