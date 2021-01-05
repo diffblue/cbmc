@@ -70,17 +70,9 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return target->expression_transform(
       access_expr, eval_operands(access_expr, *this, ns), *this, ns);
   }
-  else if(simplified_id == ID_address_of)
-  {
-    abstract_object_pointert pointer_object =
-      abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
-
-    // Store the abstract object in the pointer
-    return pointer_object;
-  }
   else if(
     simplified_id == ID_array || simplified_id == ID_struct ||
-    simplified_id == ID_constant)
+    simplified_id == ID_constant || simplified_id == ID_address_of)
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
@@ -432,11 +424,10 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // The value of the temporary abstract object is ignored, its
   // purpose is just to dispatch the expression transform call to
   // a concrete subtype of abstract_objectt.
-  abstract_object_pointert eval_obj =
-    abstract_object_factory(e.type(), ns, true);
+  auto eval_obj = abstract_object_factory(e.type(), ns, true);
+  auto operands = eval_operands(e, *this, ns);
 
-  return eval_obj->expression_transform(
-    e, eval_operands(e, *this, ns), *this, ns);
+  return eval_obj->expression_transform(e, operands, *this, ns);
 }
 
 void abstract_environmentt::erase(const symbol_exprt &expr)
