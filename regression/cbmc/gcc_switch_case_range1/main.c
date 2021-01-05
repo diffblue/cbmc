@@ -1,3 +1,5 @@
+#include <limits.h>
+
 int main()
 {
   int x;
@@ -18,8 +20,11 @@ int main()
 #endif
     __CPROVER_assert(0, "... works");
     break;
-  case 13:
+  case 14:
     __CPROVER_assert(0, "13 works");
+    break;
+  case 15 ... INT_MAX:
+    __CPROVER_assert(0, "large range works");
     break;
   default:
     __CPROVER_assert(0, "default works");
