@@ -47,10 +47,9 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 
   const irep_idt simplified_id = simplified_expr.id();
   if(simplified_id == ID_symbol)
-  {
     return resolve_symbol(simplified_expr, ns);
-  }
-  else if(
+
+  if(
     simplified_id == ID_member || simplified_id == ID_index ||
     simplified_id == ID_dereference)
   {
@@ -60,26 +59,25 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return target->expression_transform(
       access_expr, eval_operands(access_expr, *this, ns), *this, ns);
   }
-  else if(
+
+  if(
     simplified_id == ID_array || simplified_id == ID_struct ||
     simplified_id == ID_constant || simplified_id == ID_address_of)
   {
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
+
+  // No special handling required by the abstract environment
+  // delegate to the abstract object
+  if(simplified_expr.operands().size() > 0)
+  {
+    return eval_expression(simplified_expr, ns);
+  }
   else
   {
-    // No special handling required by the abstract environment
-    // delegate to the abstract object
-    if(simplified_expr.operands().size() > 0)
-    {
-      return eval_expression(simplified_expr, ns);
-    }
-    else
-    {
-      // It is important that this is top as the abstract object may not know
-      // how to handle the expression
-      return abstract_object_factory(simplified_expr.type(), ns, true);
-    }
+    // It is important that this is top as the abstract object may not know
+    // how to handle the expression
+    return abstract_object_factory(simplified_expr.type(), ns, true);
   }
 }
 
