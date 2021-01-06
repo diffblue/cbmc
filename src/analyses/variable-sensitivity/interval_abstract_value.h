@@ -17,10 +17,10 @@
 #include <util/interval.h>
 
 #include "abstract_object_statistics.h"
-#include <analyses/variable-sensitivity/abstract_value.h>
+#include <analyses/variable-sensitivity/abstract_object.h>
 #include <util/std_expr.h>
 
-class interval_abstract_valuet : public abstract_valuet
+class interval_abstract_valuet : public abstract_objectt
 {
 private:
   typedef sharing_ptrt<interval_abstract_valuet>

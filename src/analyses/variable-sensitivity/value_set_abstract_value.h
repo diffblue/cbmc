@@ -14,11 +14,11 @@
 // NOLINTNEXTLINE(whitespace/line_length)
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_VALUE_H
 
-#include "abstract_value.h"
+#include <analyses/variable-sensitivity/abstract_object.h>
 
 #include <unordered_set>
 
-class value_set_abstract_valuet : public abstract_valuet
+class value_set_abstract_valuet : public abstract_objectt
 {
 public:
   using valuest = std::unordered_set<exprt, irep_hash>;

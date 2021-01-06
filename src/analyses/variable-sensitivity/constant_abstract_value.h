@@ -14,10 +14,10 @@
 
 #include <iosfwd>
 
-#include <analyses/variable-sensitivity/abstract_value.h>
+#include <analyses/variable-sensitivity/abstract_object.h>
 #include <util/std_expr.h>
 
-class constant_abstract_valuet : public abstract_valuet
+class constant_abstract_valuet : public abstract_objectt
 {
 private:
   typedef sharing_ptrt<constant_abstract_valuet>

@@ -22,12 +22,12 @@
 #include "constant_abstract_value.h"
 
 constant_abstract_valuet::constant_abstract_valuet(typet t)
-  : abstract_valuet(t), value()
+  : abstract_objectt(t), value()
 {
 }
 
 constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_valuet(t, tp, bttm), value()
+  : abstract_objectt(t, tp, bttm), value()
 {
 }
 
@@ -35,7 +35,7 @@ constant_abstract_valuet::constant_abstract_valuet(
   const exprt e,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : abstract_valuet(e.type(), false, false), value(e)
+  : abstract_objectt(e.type(), false, false), value(e)
 {
 }
 
@@ -182,7 +182,7 @@ constant_abstract_valuet::merge(abstract_object_pointert other) const
   else
   {
     // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return abstract_valuet::merge(other);
+    return abstract_objectt::merge(other);
   }
 }
 
@@ -202,7 +202,7 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
     }
     else
     {
-      return abstract_valuet::merge(other);
+      return abstract_objectt::merge(other);
     }
   }
 }
@@ -213,7 +213,7 @@ void constant_abstract_valuet::get_statistics(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  abstract_valuet::get_statistics(statistics, visited, env, ns);
+  abstract_objectt::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_constants;
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }

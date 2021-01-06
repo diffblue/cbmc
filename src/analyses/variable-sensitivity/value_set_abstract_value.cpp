@@ -15,7 +15,7 @@ value_set_abstract_valuet::value_set_abstract_valuet(
   const typet &type,
   bool top,
   bool bottom)
-  : abstract_valuet{type, top, bottom}, values{}
+  : abstract_objectt{type, top, bottom}, values{}
 {
 }
 
@@ -66,7 +66,7 @@ value_set_abstract_valuet::merge(abstract_object_pointert other) const
 value_set_abstract_valuet::value_set_abstract_valuet(
   const typet &type,
   valuest values)
-  : abstract_valuet{type, values.size() > max_value_set_size, values.empty()},
+  : abstract_objectt{type, values.size() > max_value_set_size, values.empty()},
     values{std::move(values)}
 {
   if(values.size() > max_value_set_size)

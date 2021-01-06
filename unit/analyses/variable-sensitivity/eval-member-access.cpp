@@ -111,7 +111,7 @@ exprt fetch_element(
     return object->to_constant();
 
   const auto unwrapped = object->unwrap_context();
-  auto value = std::dynamic_pointer_cast<const abstract_valuet>(unwrapped);
+  auto value = std::dynamic_pointer_cast<const abstract_objectt>(unwrapped);
   REQUIRE(value);
   return value->to_constant();
 }
@@ -153,6 +153,6 @@ exprt integer_expression(int i)
 exprt top_expression()
 {
   auto top_value =
-    std::make_shared<abstract_valuet>(integer_typet(), true, false);
+    std::make_shared<abstract_objectt>(integer_typet(), true, false);
   return top_value->to_constant();
 }

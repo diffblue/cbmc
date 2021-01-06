@@ -175,12 +175,12 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
 }
 
 interval_abstract_valuet::interval_abstract_valuet(typet t)
-  : abstract_valuet(t), interval(t)
+  : abstract_objectt(t), interval(t)
 {
 }
 
 interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_valuet(t, tp, bttm), interval(t)
+  : abstract_objectt(t, tp, bttm), interval(t)
 {
 }
 
@@ -434,7 +434,7 @@ interval_abstract_valuet::merge(abstract_object_pointert other) const
   }
   else
   {
-    return abstract_valuet::merge(other);
+    return abstract_objectt::merge(other);
   }
 }
 
@@ -479,7 +479,7 @@ interval_abstract_valuet::meet(const abstract_object_pointert &other) const
   }
   else
   {
-    return abstract_valuet::meet(other);
+    return abstract_objectt::meet(other);
   }
 }
 
@@ -531,7 +531,7 @@ interval_abstract_valuet::interval_abstract_valuet(
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt e,
   int merge_count)
-  : abstract_valuet(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
+  : abstract_objectt(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
     interval(e),
     merge_count(merge_count)
 {
@@ -548,7 +548,7 @@ void interval_abstract_valuet::get_statistics(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  abstract_valuet::get_statistics(statistics, visited, env, ns);
+  abstract_objectt::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_interval_abstract_objects;
   if(interval.is_single_value_interval())
   {
