@@ -994,6 +994,29 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
     }
   }
 
+  targets.erase(
+    std::remove_if(
+      targets.begin(),
+      targets.end(),
+      [&](const exprt &target) {
+        auto const sym_to_lookup =
+          target.id() == ID_address_of
+            ?
+            // This is either address of or pointer; in pointer case, we don't
+            // need to do anything. In the address of case, the operand is
+            // a symbol representing a target function.
+            to_symbol_expr(to_address_of_expr(target).object()).get_identifier()
+            : "";
+        // skip referencing globals because the corresponding symbols in the symbol
+        // table are no longer marked as file local.
+        return has_prefix(id2string(sym_to_lookup), FILE_LOCAL_PREFIX) ||
+               (goto_model.get_symbol_table().lookup(sym_to_lookup) &&
+                goto_model.get_symbol_table()
+                  .lookup(sym_to_lookup)
+                  ->is_file_local);
+      }),
+    targets.end());
+
   if(is_nullable)
     targets.push_back(null_pointer_exprt{function_pointer_type});
 
@@ -1002,31 +1025,12 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
   const auto function_pointer_selector =
     get_fresh_local_symexpr("function_pointer_selector");
   body.add(code_declt{function_pointer_selector});
+
   auto function_pointer_index = std::size_t{0};
 
   for(const auto &target : targets)
   {
     auto const assign = code_assignt{dereference_exprt{result}, target};
-    auto const sym_to_lookup =
-      target.id() == ID_address_of
-        ?
-        // This is either address of or pointer; in pointer case, we don't
-        // need to do anything. In the address of case, the operand is
-        // a symbol representing a target function.
-        to_symbol_expr(to_address_of_expr(target).object()).get_identifier()
-        : "";
-    // skip referencing globals because the corresponding symbols in the symbol
-    // table are no longer marked as file local.
-    if(has_prefix(id2string(sym_to_lookup), FILE_LOCAL_PREFIX))
-    {
-      continue;
-    }
-    else if(
-      goto_model.get_symbol_table().lookup(sym_to_lookup) &&
-      goto_model.get_symbol_table().lookup(sym_to_lookup)->is_file_local)
-    {
-      continue;
-    }
 
     if(function_pointer_index != targets.size() - 1)
     {
