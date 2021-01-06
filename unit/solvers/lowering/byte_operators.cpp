@@ -19,7 +19,7 @@
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
-#include <util/simplify_expr_class.h>
+#include <util/simplify_utils.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
@@ -211,8 +211,6 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       complex_typet(s16),
       complex_typet(u64)};
 
-    simplify_exprt simp(ns);
-
     THEN("byte_extract lowering yields the expected value")
     {
       for(const auto &endianness :
@@ -232,10 +230,11 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
           REQUIRE(type_bits);
           const auto type_bits_int = numeric_cast_v<std::size_t>(*type_bits);
           REQUIRE(type_bits_int <= oss.str().size());
-          const auto s = simp.bits2expr(
+          const auto s = bits2expr(
             oss.str().substr(0, type_bits_int),
             t1,
-            endianness == ID_byte_extract_little_endian);
+            endianness == ID_byte_extract_little_endian,
+            ns);
           REQUIRE(s.has_value());
 
           for(const auto &t2 : types)
@@ -258,10 +257,11 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             const auto type_bits_2_int =
               numeric_cast_v<std::size_t>(*type_bits_2);
             REQUIRE(type_bits_2_int <= oss.str().size());
-            const auto r = simp.bits2expr(
+            const auto r = bits2expr(
               oss.str().substr(0, type_bits_2_int),
               t2,
-              endianness == ID_byte_extract_little_endian);
+              endianness == ID_byte_extract_little_endian,
+              ns);
             REQUIRE(r.has_value());
 
             const byte_extract_exprt be(
@@ -362,8 +362,6 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
       // complex_typet(u64)
     };
 
-    simplify_exprt simp(ns);
-
     THEN("byte_update lowering yields the expected value")
     {
       for(const auto &endianness :
@@ -384,8 +382,8 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
           const auto type_bits_int = numeric_cast_v<std::size_t>(*type_bits);
           REQUIRE(type_bits_int <= oss.str().size());
           const std::string s_string = oss.str().substr(0, type_bits_int);
-          const auto s = simp.bits2expr(
-            s_string, t1, endianness == ID_byte_update_little_endian);
+          const auto s = bits2expr(
+            s_string, t1, endianness == ID_byte_update_little_endian, ns);
           REQUIRE(s.has_value());
 
           for(const auto &t2 : types)
@@ -409,14 +407,14 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
               numeric_cast_v<std::size_t>(*type_bits_2);
             REQUIRE(type_bits_2_int <= oss.str().size());
             const std::string u_string = oss.str().substr(0, type_bits_2_int);
-            const auto u = simp.bits2expr(
-              u_string, t2, endianness == ID_byte_update_little_endian);
+            const auto u = bits2expr(
+              u_string, t2, endianness == ID_byte_update_little_endian, ns);
             REQUIRE(u.has_value());
 
             std::string r_string = s_string;
             r_string.replace(16, u_string.size(), u_string);
-            const auto r = simp.bits2expr(
-              r_string, t1, endianness == ID_byte_update_little_endian);
+            const auto r = bits2expr(
+              r_string, t1, endianness == ID_byte_update_little_endian, ns);
             REQUIRE(r.has_value());
 
             const byte_update_exprt bu(

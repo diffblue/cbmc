@@ -236,12 +236,6 @@ public:
            type.id()==ID_bv;
   }
 
-  // bit-level conversions
-  optionalt<exprt>
-  bits2expr(const std::string &bits, const typet &type, bool little_endian);
-
-  optionalt<std::string> expr2bits(const exprt &, bool little_endian);
-
 protected:
   const namespacet &ns;
 #ifdef DEBUG_ON_DEMAND
