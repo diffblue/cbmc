@@ -89,7 +89,7 @@ abstract_environmentt::resolve_symbol(const exprt &expr, const namespacet &ns) c
 
   return symbol_entry.has_value()
     ? symbol_entry.value()
-    : abstract_object_factory(expr.type(), ns, true);
+    : abstract_object_factory(expr.type(), ns, true, false);
 }
 
 
@@ -129,15 +129,7 @@ bool abstract_environmentt::assign(
   if(!lhs_value)
   {
     INVARIANT(s.id() == ID_symbol, "Have a symbol or a stack");
-    const symbol_exprt &symbol_expr(to_symbol_expr(s));
-    if(!map.has_key(symbol_expr.get_identifier()))
-    {
-      lhs_value = abstract_object_factory(symbol_expr.type(), ns, true, false);
-    }
-    else
-    {
-      lhs_value = map.find(symbol_expr.get_identifier()).value();
-    }
+    lhs_value = resolve_symbol(s, ns);
   }
 
   abstract_object_pointert final_value;
@@ -176,6 +168,7 @@ bool abstract_environmentt::assign(
       "\n"
       "rhs_type :" +
       rhs_type.pretty());
+
   // If LHS was directly the symbol
   if(s.id() == ID_symbol)
   {
