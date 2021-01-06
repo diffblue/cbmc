@@ -1238,39 +1238,22 @@ void smt2_parsert::setup_expressions()
 
 typet smt2_parsert::functionalsort()
 {
-  bool complete = false;
   std::vector<typet> domain;
   // parse sort expressions
-  while(!complete)
+  while(1)
   {
-    switch(next_token())
+    if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
     {
-    case smt2_tokenizert::CLOSE:
-      complete = true;
-      break;
-    case smt2_tokenizert::NUMERAL:
-    case smt2_tokenizert::END_OF_FILE:
-    case smt2_tokenizert::OPEN:
-    case smt2_tokenizert::STRING_LITERAL:
-    case smt2_tokenizert::NONE:
-    case smt2_tokenizert::KEYWORD:
-      throw error() << "unexpected token in a sort: '"
-                  << smt2_tokenizer.get_buffer() << '\'';
-      break;
-    case smt2_tokenizert::SYMBOL:
-      const auto &token = smt2_tokenizer.get_buffer();
-      const auto s_it = sorts.find(token);
-      if(s_it == sorts.end())
-        throw error() << "unexpected sort: '" << token << '\'';
-
-      domain.push_back(s_it->second());
-      break;
+      if(domain.size()<2)
+        throw error ("expected functional sort to have at least 2 type arguments");
+      next_token(); // eat the ')'
+      typet codomain = domain.back();
+      domain.pop_back();
+      return mathematical_function_typet(domain, codomain);
     }
+    else
+      domain.push_back(sort());
   }
-
-  typet codomain = domain.back();
-  domain.pop_back();
-  return mathematical_function_typet(domain, codomain);
 }
 
 typet smt2_parsert::sort()
@@ -1296,8 +1279,6 @@ typet smt2_parsert::sort()
     }
     if(smt2_tokenizer.get_buffer() == "->")
     {
-      if(next_token() != smt2_tokenizert::SYMBOL)
-        throw error("expected symbol after '->' in a sort");
       return functionalsort();
     }
     break;
