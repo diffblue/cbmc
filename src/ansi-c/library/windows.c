@@ -51,3 +51,46 @@ inline HANDLE CreateThread(
   return handle;
 }
 #endif
+
+/* FUNCTION: __lzcnt16 */
+
+#ifdef _MSC_VER
+int __builtin_clz(unsigned int x);
+
+unsigned short __lzcnt16(unsigned short value)
+{
+  if(value == 0)
+    return 16;
+
+  return __builtin_clz(value) -
+         (sizeof(unsigned int) - sizeof(unsigned short)) * 8;
+}
+#endif
+
+/* FUNCTION: __lzcnt */
+
+#ifdef _MSC_VER
+int __builtin_clz(unsigned int x);
+
+unsigned int __lzcnt(unsigned int value)
+{
+  if(value == 0)
+    return 32;
+
+  return __builtin_clz(value);
+}
+#endif
+
+/* FUNCTION: __lzcnt64 */
+
+#ifdef _MSC_VER
+int __builtin_clzll(unsigned long long x);
+
+unsigned __int64 __lzcnt64(unsigned __int64 value)
+{
+  if(value == 0)
+    return 64;
+
+  return __builtin_clzll(value);
+}
+#endif
