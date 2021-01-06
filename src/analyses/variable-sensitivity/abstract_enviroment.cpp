@@ -212,33 +212,12 @@ abstract_object_pointert abstract_environmentt::write(
   remaining_stack.pop();
 
   const irep_idt &stack_head_id = next_expr.id();
+  INVARIANT(
+    stack_head_id == ID_index || stack_head_id == ID_member || stack_head_id == ID_dereference,
+    "Write stack expressions must be index, member, or dereference"
+  );
 
-  // Each handler takes the abstract object referenced, copies it,
-  // writes according to the type of expression (e.g. for ID_member)
-  // we would (should!) have an abstract_struct_objectt which has a
-  // write_member which will attempt to update the abstract object for the
-  // relevant member. This modified abstract object is returned and this
-  // is inserted back into the map
-  if(stack_head_id == ID_index)
-  {
-    return lhs->write(
-      *this, ns, remaining_stack, to_index_expr(next_expr), rhs, merge_write);
-  }
-  else if(stack_head_id == ID_member)
-  {
-    return lhs->write(
-      *this, ns, remaining_stack, to_member_expr(next_expr), rhs, merge_write);
-  }
-  else if(stack_head_id == ID_dereference)
-  {
-    return lhs->write(
-      *this, ns, remaining_stack, nil_exprt(), rhs, merge_write);
-  }
-  else
-  {
-    UNREACHABLE;
-    return nullptr;
-  }
+  return lhs->write(*this, ns, remaining_stack, next_expr, rhs, merge_write);
 }
 
 bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
