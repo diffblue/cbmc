@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+For this example, __builtin_clz is fully evaluated in the front-end. The
+_Static_assert ensures this is the case, as type checking fails when
+_Static_assert does not have a compile-time constant value.

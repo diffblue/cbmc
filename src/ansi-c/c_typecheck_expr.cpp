@@ -2591,6 +2591,40 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(popcount_expr);
   }
+  else if(
+    identifier == "__builtin_clz" || identifier == "__builtin_clzl" ||
+    identifier == "__builtin_clzll" || identifier == "__lzcnt16" ||
+    identifier == "__lzcnt" || identifier == "__lzcnt64")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    side_effect_expr_function_callt try_constant{expr};
+    typecheck_function_call_arguments(try_constant);
+    exprt argument = try_constant.arguments().front();
+    simplify(argument, *this);
+    const auto int_constant = numeric_cast<mp_integer>(argument);
+
+    if(
+      !int_constant.has_value() || *int_constant == 0 ||
+      argument.type().id() != ID_unsignedbv)
+    {
+      return nil_exprt{};
+    }
+
+    const std::string binary_value = integer2binary(
+      *int_constant, to_unsignedbv_type(argument.type()).get_width());
+    std::size_t n_leading_zeros = binary_value.find('1');
+    CHECK_RETURN(n_leading_zeros != std::string::npos);
+
+    return from_integer(
+      n_leading_zeros,
+      to_code_type(try_constant.function().type()).return_type());
+  }
   else if(identifier==CPROVER_PREFIX "equal")
   {
     if(expr.arguments().size()!=2)
