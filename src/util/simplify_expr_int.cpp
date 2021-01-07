@@ -1413,9 +1413,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
   }
 }
 
-bool simplify_exprt::eliminate_common_addends(
-  exprt &op0,
-  exprt &op1)
+static bool eliminate_common_addends(exprt &op0, exprt &op1)
 {
   // we can't eliminate zeros
   if(op0.is_zero() ||
