@@ -573,10 +573,12 @@ bool Parser::rDefinition(cpp_itemt &item)
     return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_INLINE && lex.LookAhead(1)==TOK_NAMESPACE)
     return rNamespaceSpec(item.make_namespace_spec());
-  else if(t==TOK_USING &&
-          is_identifier(lex.LookAhead(1)) &&
-          lex.LookAhead(2)=='=')
+  else if(
+    t == TOK_USING && is_identifier(lex.LookAhead(1)) &&
+    lex.LookAhead(2) == '=')
+  {
     return rTypedefUsing(item.make_declaration());
+  }
   else if(t==TOK_USING)
     return rUsing(item.make_using());
   else if(t==TOK_STATIC_ASSERT)
@@ -756,27 +758,19 @@ bool Parser::isTypeSpecifier()
 {
   int t=lex.LookAhead(0);
 
-  if(is_identifier(t) || t==TOK_SCOPE
-       || t==TOK_CONSTEXPR || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
-       || t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG
-       || t==TOK_CHAR16_T || t==TOK_CHAR32_T
-       || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
-       || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
-       || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64
-       || t==TOK_GCC_INT128
-       || t==TOK_PTR32 || t==TOK_PTR64
-       || t==TOK_GCC_FLOAT80 || t==TOK_GCC_FLOAT128
-       || t==TOK_VOID || t==TOK_BOOL || t==TOK_CPROVER_BOOL
-       || t==TOK_CLASS || t==TOK_STRUCT || t==TOK_UNION || t==TOK_ENUM
-       || t==TOK_INTERFACE
-       || t==TOK_TYPENAME
-       || t==TOK_TYPEOF
-       || t==TOK_DECLTYPE
-       || t==TOK_UNDERLYING_TYPE
-     )
-    return true;
-
-  return false;
+  return is_identifier(t) || t == TOK_SCOPE || t == TOK_CONSTEXPR ||
+         t == TOK_CONST || t == TOK_VOLATILE || t == TOK_RESTRICT ||
+         t == TOK_CHAR || t == TOK_INT || t == TOK_SHORT || t == TOK_LONG ||
+         t == TOK_CHAR16_T || t == TOK_CHAR32_T || t == TOK_WCHAR_T ||
+         t == TOK_COMPLEX // new !!!
+         || t == TOK_SIGNED || t == TOK_UNSIGNED || t == TOK_FLOAT ||
+         t == TOK_DOUBLE || t == TOK_INT8 || t == TOK_INT16 || t == TOK_INT32 ||
+         t == TOK_INT64 || t == TOK_GCC_INT128 || t == TOK_PTR32 ||
+         t == TOK_PTR64 || t == TOK_GCC_FLOAT80 || t == TOK_GCC_FLOAT128 ||
+         t == TOK_VOID || t == TOK_BOOL || t == TOK_CPROVER_BOOL ||
+         t == TOK_CLASS || t == TOK_STRUCT || t == TOK_UNION || t == TOK_ENUM ||
+         t == TOK_INTERFACE || t == TOK_TYPENAME || t == TOK_TYPEOF ||
+         t == TOK_DECLTYPE || t == TOK_UNDERLYING_TYPE;
 }
 
 /*
@@ -1247,8 +1241,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     cpp_tokent tk1, tk2;
 
-    if(lex.get_token(tk1)!=TOK_CLASS ||
-       !is_identifier(lex.get_token(tk2)))
+    if(lex.get_token(tk1) != TOK_CLASS || !is_identifier(lex.get_token(tk2)))
       return false;
 
     // Ptree cspec=new PtreeClassSpec(new LeafReserved(tk1),
@@ -1462,9 +1455,12 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
               << '\n';
 #endif
 
-    if(cv_q.is_not_nil() &&
-       ((is_identifier(t) && lex.LookAhead(1)=='=') || t=='*'))
+    if(
+      cv_q.is_not_nil() &&
+      ((is_identifier(t) && lex.LookAhead(1) == '=') || t == '*'))
+    {
       return rConstDeclaration(declaration);
+    }
     else
       return rOtherDeclaration(declaration, storage_spec, member_spec, cv_q);
   }
@@ -3080,8 +3076,9 @@ bool Parser::rDeclarator(
     d_inner.swap(declarator2.type());
     name.swap(declarator2.name());
   }
-  else if(kind!=kCastDeclarator &&
-          (kind==kDeclarator || is_identifier(t) || t==TOK_SCOPE))
+  else if(
+    kind != kCastDeclarator &&
+    (kind == kDeclarator || is_identifier(t) || t == TOK_SCOPE))
   {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 6\n";
@@ -3816,31 +3813,33 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
       break;
 
     case '<':
-      {
-        irept args;
-        if(!rTemplateArgs(args))
-          return false;
+    {
+      irept args;
+      if(!rTemplateArgs(args))
+        return false;
 
-        components.push_back(irept(ID_template_args));
-        components.back().add(ID_arguments).swap(args);
+      components.push_back(irept(ID_template_args));
+      components.back().add(ID_arguments).swap(args);
 
-        if(lex.LookAhead(0)!=TOK_SCOPE)
-          return false;
-      }
+      if(lex.LookAhead(0) != TOK_SCOPE)
+        return false;
+
       break;
+    }
 
     case TOK_GCC_IDENTIFIER:
     case TOK_MSC_IDENTIFIER:
+    {
       lex.get_token(tk);
       components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
 
-      {
-        int t=lex.LookAhead(0);
-        if(t!=TOK_SCOPE && t!='<')
-          return false;
-      }
+      int t = lex.LookAhead(0);
+      if(t != TOK_SCOPE && t != '<')
+        return false;
+
       break;
+    }
 
     case TOK_SCOPE:
       lex.get_token(tk);
@@ -4724,10 +4723,12 @@ bool Parser::rClassMember(cpp_itemt &member)
     return rTypedef(member.make_declaration());
   else if(t==TOK_TEMPLATE)
     return rTemplateDecl(member.make_declaration());
-  else if(t==TOK_USING &&
-          is_identifier(lex.LookAhead(1)) &&
-          lex.LookAhead(2)=='=')
+  else if(
+    t == TOK_USING && is_identifier(lex.LookAhead(1)) &&
+    lex.LookAhead(2) == '=')
+  {
     return rTypedefUsing(member.make_declaration());
+  }
   else if(t==TOK_USING)
     return rUsing(member.make_using());
   else if(t==TOK_STATIC_ASSERT)
@@ -5581,11 +5582,10 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   // TODO -- cruel hack for Clang's type_traits:
   // struct __member_pointer_traits_imp<_Rp (_Class::*)(_Param..., ...),
   //                                    true, false>
-  if(is_identifier(lex.LookAhead(0)) &&
-     lex.LookAhead(1)==TOK_SCOPE &&
-     lex.LookAhead(2)=='*' &&
-     lex.LookAhead(3)==')' &&
-     lex.LookAhead(4)=='(')
+  if(
+    is_identifier(lex.LookAhead(0)) && lex.LookAhead(1) == TOK_SCOPE &&
+    lex.LookAhead(2) == '*' && lex.LookAhead(3) == ')' &&
+    lex.LookAhead(4) == '(')
   {
     lex.get_token();
     lex.get_token();
@@ -5593,19 +5593,18 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
     lex.get_token();
     lex.get_token();
   }
-  else if(is_identifier(lex.LookAhead(0)) &&
-          lex.LookAhead(1)==')' &&
-          lex.LookAhead(2)=='(')
+  else if(
+    is_identifier(lex.LookAhead(0)) && lex.LookAhead(1) == ')' &&
+    lex.LookAhead(2) == '(')
   {
     lex.get_token(op);
     type.set(ID_identifier, op.data.get(ID_C_base_name));
     lex.get_token();
     lex.get_token();
   }
-  else if(lex.LookAhead(0)=='*' &&
-          is_identifier(lex.LookAhead(1)) &&
-          lex.LookAhead(2)==')' &&
-          lex.LookAhead(3)=='(')
+  else if(
+    lex.LookAhead(0) == '*' && is_identifier(lex.LookAhead(1)) &&
+    lex.LookAhead(2) == ')' && lex.LookAhead(3) == '(')
   {
     lex.get_token(op);
     lex.get_token(op);
@@ -7073,7 +7072,7 @@ bool Parser::moreVarName()
   if(lex.LookAhead(0)==TOK_SCOPE)
   {
     int t=lex.LookAhead(1);
-    if(is_identifier(t) || t=='~' || t==TOK_OPERATOR || t==TOK_TEMPLATE)
+    if(is_identifier(t) || t == '~' || t == TOK_OPERATOR || t == TOK_TEMPLATE)
       return true;
   }
 
@@ -7504,8 +7503,7 @@ optionalt<codet> Parser::rStatement()
 
   case TOK_USING:
     {
-      if(is_identifier(lex.LookAhead(1)) &&
-         lex.LookAhead(2)=='=')
+      if(is_identifier(lex.LookAhead(1)) && lex.LookAhead(2) == '=')
       {
         cpp_declarationt declaration;
         if(!rTypedefUsing(declaration))
@@ -8235,8 +8233,9 @@ optionalt<codet> Parser::rDeclarationStatement()
               << "Parser::rDeclarationStatement 3 " << t << '\n';
 #endif
 
-    if(cv_q.is_not_nil() &&
-       ((is_identifier(t) && lex.LookAhead(1)=='=') || t=='*'))
+    if(
+      cv_q.is_not_nil() &&
+      ((is_identifier(t) && lex.LookAhead(1) == '=') || t == '*'))
     {
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ')
