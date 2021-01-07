@@ -1460,6 +1460,30 @@ static bool eliminate_common_addends(exprt &op0, exprt &op1)
   return true;
 }
 
+typedef std::set<mp_integer> value_listt;
+static bool get_values(const exprt &expr, value_listt &value_list)
+{
+  if(expr.is_constant())
+  {
+    mp_integer int_value;
+    if(to_integer(to_constant_expr(expr), int_value))
+      return true;
+
+    value_list.insert(int_value);
+
+    return false;
+  }
+  else if(expr.id() == ID_if)
+  {
+    const auto &if_expr = to_if_expr(expr);
+
+    return get_values(if_expr.true_case(), value_list) ||
+           get_values(if_expr.false_case(), value_list);
+  }
+
+  return true;
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
   const binary_relation_exprt &expr)
 {
@@ -1528,12 +1552,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
 
     // compare possible values
 
-    forall_value_list(it0, values0)
-      forall_value_list(it1, values1)
+    for(const mp_integer &int_value0 : values0)
+    {
+      for(const mp_integer &int_value1 : values1)
       {
         bool tmp;
-        const mp_integer &int_value0=*it0;
-        const mp_integer &int_value1=*it1;
 
         if(expr.id()==ID_ge)
           tmp=(int_value0>=int_value1);
@@ -1556,6 +1579,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
           break;
         }
       }
+    }
 
     if(ok)
     {
