@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
   int *ptr4 = maybe_null;
   goto check;
 
-deref:
+deref:;
   int deref4 = *ptr4;
   goto end_test4;
 
@@ -46,7 +46,7 @@ check:
   __CPROVER_assume(ptr4 != 0);
   goto deref;
 
-end_test4:
+end_test4:;
 
   // Should be judged unsafe by LSPA and safe by value-set filtering
   // (guarded by confluence):

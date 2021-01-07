@@ -410,6 +410,11 @@ protected:
   unsigned int max_errors;
 };
 
+static bool is_identifier(int token)
+{
+  return token == TOK_GCC_IDENTIFIER || token == TOK_MSC_IDENTIFIER;
+}
+
 new_scopet &Parser::add_id(const irept &cpp_name, new_scopet::kindt kind)
 {
   irep_idt id;
@@ -569,7 +574,7 @@ bool Parser::rDefinition(cpp_itemt &item)
   else if(t==TOK_INLINE && lex.LookAhead(1)==TOK_NAMESPACE)
     return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_USING &&
-          lex.LookAhead(1)==TOK_IDENTIFIER &&
+          is_identifier(lex.LookAhead(1)) &&
           lex.LookAhead(2)=='=')
     return rTypedefUsing(item.make_declaration());
   else if(t==TOK_USING)
@@ -642,7 +647,7 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
 
   declaration.type()=typet(ID_typedef);
 
-  if(lex.get_token(tk)!=TOK_IDENTIFIER)
+  if(!is_identifier(lex.get_token(tk)))
     return false;
 
   cpp_declaratort name;
@@ -751,7 +756,7 @@ bool Parser::isTypeSpecifier()
 {
   int t=lex.LookAhead(0);
 
-  if(t==TOK_IDENTIFIER || t==TOK_SCOPE
+  if(is_identifier(t) || t==TOK_SCOPE
        || t==TOK_CONSTEXPR || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
        || t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG
        || t==TOK_CHAR16_T || t==TOK_CHAR32_T
@@ -838,7 +843,7 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   // namespace might be anonymous
   if(lex.LookAhead(0) != '{')
   {
-    if(lex.get_token(tk2)==TOK_IDENTIFIER)
+    if(is_identifier(lex.get_token(tk2)))
       name=tk2.data.get(ID_C_base_name);
     else
       return false;
@@ -1187,7 +1192,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       has_ellipsis=true;
     }
 
-    if(lex.LookAhead(0) == TOK_IDENTIFIER)
+    if(is_identifier(lex.LookAhead(0)))
     {
       cpp_tokent tk2;
       lex.get_token(tk2);
@@ -1243,7 +1248,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     cpp_tokent tk1, tk2;
 
     if(lex.get_token(tk1)!=TOK_CLASS ||
-       lex.get_token(tk2)!=TOK_IDENTIFIER)
+       !is_identifier(lex.get_token(tk2)))
       return false;
 
     // Ptree cspec=new PtreeClassSpec(new LeafReserved(tk1),
@@ -1458,7 +1463,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
 #endif
 
     if(cv_q.is_not_nil() &&
-       ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
+       ((is_identifier(t) && lex.LookAhead(1)=='=') || t=='*'))
       return rConstDeclaration(declaration);
     else
       return rOtherDeclaration(declaration, storage_spec, member_spec, cv_q);
@@ -1872,7 +1877,7 @@ bool Parser::isConstructorDecl()
       return false;        // it's a declarator
     else if(isPtrToMember(1))
       return false;        // declarator (::*)
-    else if(t==TOK_IDENTIFIER)
+    else if(is_identifier(t))
     {
       // Ambiguous. Do some more look-ahead.
       if(lex.LookAhead(2)==')' &&
@@ -1896,7 +1901,7 @@ bool Parser::isPtrToMember(int i)
   if(t0==TOK_SCOPE)
       t0=lex.LookAhead(i++);
 
-  while(t0==TOK_IDENTIFIER)
+  while(is_identifier(t0))
   {
     int t=lex.LookAhead(i++);
     if(t=='<')
@@ -3076,7 +3081,7 @@ bool Parser::rDeclarator(
     name.swap(declarator2.name());
   }
   else if(kind!=kCastDeclarator &&
-          (kind==kDeclarator || t==TOK_IDENTIFIER || t==TOK_SCOPE))
+          (kind==kDeclarator || is_identifier(t) || t==TOK_SCOPE))
   {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 6\n";
@@ -3534,7 +3539,7 @@ bool Parser::rName(irept &name)
 #endif
       lex.get_token(tk);
       // Skip template token, next will be identifier
-      if(lex.LookAhead(0)!=TOK_IDENTIFIER)
+      if(!is_identifier(lex.LookAhead(0)))
         return false;
       break;
 
@@ -3556,7 +3561,8 @@ bool Parser::rName(irept &name)
       }
       break;
 
-    case TOK_IDENTIFIER:
+    case TOK_GCC_IDENTIFIER:
+    case TOK_MSC_IDENTIFIER:
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') << "Parser::rName 5\n";
 #endif
@@ -3588,7 +3594,7 @@ bool Parser::rName(irept &name)
       lex.get_token(tk);
 
       // identifier must be next
-      if(lex.LookAhead(0)!=TOK_IDENTIFIER)
+      if(!is_identifier(lex.LookAhead(0)))
         return false;
 
       components.push_back(irept("~"));
@@ -3805,7 +3811,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
     case TOK_TEMPLATE:
       lex.get_token(tk);
       // Skip template token, next will be identifier
-      if(lex.LookAhead(0)!=TOK_IDENTIFIER)
+      if(!is_identifier(lex.LookAhead(0)))
         return false;
       break;
 
@@ -3823,7 +3829,8 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
       }
       break;
 
-    case TOK_IDENTIFIER:
+    case TOK_GCC_IDENTIFIER:
+    case TOK_MSC_IDENTIFIER:
       lex.get_token(tk);
       components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
@@ -3853,7 +3860,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
         return true;
       }
 
-      if(lex.LookAhead(0) != TOK_IDENTIFIER)
+      if(!is_identifier(lex.LookAhead(0)))
         return false;
 
       break;
@@ -4381,7 +4388,7 @@ bool Parser::rEnumBody(irept &body)
     if(lex.LookAhead(0)=='}')
       return true;
 
-    if(lex.get_token(tk)!=TOK_IDENTIFIER)
+    if(!is_identifier(lex.get_token(tk)))
       return false;
 
     body.get_sub().push_back(irept());
@@ -4718,7 +4725,7 @@ bool Parser::rClassMember(cpp_itemt &member)
   else if(t==TOK_TEMPLATE)
     return rTemplateDecl(member.make_declaration());
   else if(t==TOK_USING &&
-          lex.LookAhead(1)==TOK_IDENTIFIER &&
+          is_identifier(lex.LookAhead(1)) &&
           lex.LookAhead(2)=='=')
     return rTypedefUsing(member.make_declaration());
   else if(t==TOK_USING)
@@ -5574,7 +5581,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   // TODO -- cruel hack for Clang's type_traits:
   // struct __member_pointer_traits_imp<_Rp (_Class::*)(_Param..., ...),
   //                                    true, false>
-  if(lex.LookAhead(0)==TOK_IDENTIFIER &&
+  if(is_identifier(lex.LookAhead(0)) &&
      lex.LookAhead(1)==TOK_SCOPE &&
      lex.LookAhead(2)=='*' &&
      lex.LookAhead(3)==')' &&
@@ -5586,7 +5593,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
     lex.get_token();
     lex.get_token();
   }
-  else if(lex.LookAhead(0)==TOK_IDENTIFIER &&
+  else if(is_identifier(lex.LookAhead(0)) &&
           lex.LookAhead(1)==')' &&
           lex.LookAhead(2)=='(')
   {
@@ -5596,7 +5603,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
     lex.get_token();
   }
   else if(lex.LookAhead(0)=='*' &&
-          lex.LookAhead(1)==TOK_IDENTIFIER &&
+          is_identifier(lex.LookAhead(1)) &&
           lex.LookAhead(2)==')' &&
           lex.LookAhead(3)=='(')
   {
@@ -6974,11 +6981,12 @@ bool Parser::rVarNameCore(exprt &name)
 #endif
       lex.get_token(tk);
       // Skip template token, next will be identifier
-      if(lex.LookAhead(0)!=TOK_IDENTIFIER)
+      if(!is_identifier(lex.LookAhead(0)))
         return false;
       break;
 
-    case TOK_IDENTIFIER:
+    case TOK_GCC_IDENTIFIER:
+    case TOK_MSC_IDENTIFIER:
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 3\n";
 #endif
@@ -7028,7 +7036,7 @@ bool Parser::rVarNameCore(exprt &name)
 
       lex.get_token(tk);
 
-      if(lex.LookAhead(0)!=TOK_IDENTIFIER)
+      if(!is_identifier(lex.LookAhead(0)))
         return false;
 
       components.push_back(irept("~"));
@@ -7065,7 +7073,7 @@ bool Parser::moreVarName()
   if(lex.LookAhead(0)==TOK_SCOPE)
   {
     int t=lex.LookAhead(1);
-    if(t==TOK_IDENTIFIER || t=='~' || t==TOK_OPERATOR || t==TOK_TEMPLATE)
+    if(is_identifier(t) || t=='~' || t==TOK_OPERATOR || t==TOK_TEMPLATE)
       return true;
   }
 
@@ -7386,7 +7394,7 @@ optionalt<codet> Parser::rStatement()
   {
     lex.get_token(tk1);
 
-    if(lex.get_token(tk2)!=TOK_IDENTIFIER)
+    if(!is_identifier(lex.get_token(tk2)))
       return {};
 
     if(lex.get_token(tk3)!=';')
@@ -7473,7 +7481,8 @@ optionalt<codet> Parser::rStatement()
   case TOK_MSC_IF_NOT_EXISTS:
     return rMSC_if_existsStatement();
 
-  case TOK_IDENTIFIER:
+  case TOK_GCC_IDENTIFIER:
+  case TOK_MSC_IDENTIFIER:
     if(lex.LookAhead(1)==':')        // label statement
     {
       // the label
@@ -7495,7 +7504,7 @@ optionalt<codet> Parser::rStatement()
 
   case TOK_USING:
     {
-      if(lex.LookAhead(1)==TOK_IDENTIFIER &&
+      if(is_identifier(lex.LookAhead(1)) &&
          lex.LookAhead(2)=='=')
       {
         cpp_declarationt declaration;
@@ -8227,7 +8236,7 @@ optionalt<codet> Parser::rDeclarationStatement()
 #endif
 
     if(cv_q.is_not_nil() &&
-       ((t==TOK_IDENTIFIER && lex.LookAhead(1)=='=') || t=='*'))
+       ((is_identifier(t) && lex.LookAhead(1)=='=') || t=='*'))
     {
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ')

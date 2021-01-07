@@ -86,7 +86,8 @@ int make_identifier()
   {
     parser_stack(yyansi_clval).id(ID_symbol);
     parser_stack(yyansi_clval).set(ID_C_base_name, final_base_name);
-    return TOK_IDENTIFIER;
+    return PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ?
+      TOK_MSC_IDENTIFIER : TOK_GCC_IDENTIFIER;
   }
   else
   {
@@ -112,7 +113,8 @@ int make_identifier()
     else
     {
       parser_stack(yyansi_clval).id(ID_symbol);
-      return TOK_IDENTIFIER;
+      return PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ?
+        TOK_MSC_IDENTIFIER : TOK_GCC_IDENTIFIER;
     }
   }
 }

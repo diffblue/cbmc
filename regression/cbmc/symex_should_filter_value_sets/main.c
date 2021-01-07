@@ -61,7 +61,7 @@ int main(int argc, char **argv)
   int *p7 = ptr_to_a_or_b;
   goto check7;
 
-divide7:
+divide7:;
   int c7 = *p7;
   goto end_test7;
 
@@ -69,12 +69,12 @@ check7:
   __CPROVER_assume(p7 != &a);
   goto divide7;
 
-end_test7:
+end_test7:;
 
   int *p8 = ptr_to_a_or_b;
   goto check8;
 
-divide8:
+divide8:;
   int c8 = *p8;
   goto end_test8;
 
@@ -82,7 +82,7 @@ check8:
   __CPROVER_assume(*p8 != 2);
   goto divide8;
 
-end_test8:
+end_test8:;
 
   // Should work (value-set filtered by confluence of if and else):
   int *p9 = ptr_to_a_or_b;
