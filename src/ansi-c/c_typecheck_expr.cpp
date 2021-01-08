@@ -1719,24 +1719,32 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
           operands[1].type().id()!=ID_pointer)
     implicit_typecast(operands[1], operands[2].type());
 
+  auto compile_time_null_pointer = [](const exprt &e, const namespacet &ns) {
+    if(!is_compile_time_constantt(ns)(e))
+      return false;
+    auto s = simplify_expr(e, ns);
+    CHECK_RETURN(is_compile_time_constantt(ns)(s));
+    if(!s.is_constant())
+      return false;
+    return is_null_pointer(to_constant_expr(s));
+  };
+
   if(operands[1].type().id()==ID_pointer &&
      operands[2].type().id()==ID_pointer &&
      operands[1].type()!=operands[2].type())
   {
-    exprt tmp1=simplify_expr(operands[1], *this);
-    exprt tmp2=simplify_expr(operands[2], *this);
-
-    // is one of them void * AND null? Convert that to the other.
-    // (at least that's how GCC behaves)
+    // Is one of them void * AND null? Convert that to the other.
+    // (At least that's how GCC, Clang, and Visual Studio behave. Presence of
+    // symbols blocks them from simplifying the expression to NULL.)
     if(
       to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
-      tmp1.is_constant() && is_null_pointer(to_constant_expr(tmp1)))
+      compile_time_null_pointer(operands[1], *this))
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
       to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
-      tmp2.is_constant() && is_null_pointer(to_constant_expr(tmp2)))
+      compile_time_null_pointer(operands[2], *this))
     {
       implicit_typecast(operands[2], operands[1].type());
     }
