@@ -153,6 +153,8 @@ static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
     os << '-';
   else if(src.id() == ID_count_leading_zeros)
     os << "clz";
+  else if(src.id() == ID_count_trailing_zeros)
+    os << "ctz";
   else
     return os << src.pretty();
 

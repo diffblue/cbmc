@@ -125,3 +125,20 @@ exprt count_leading_zeros_exprt::lower() const
     bitnot_exprt{typecast_exprt::conditional_cast(x, op().type())}, type()}
     .lower();
 }
+
+exprt count_trailing_zeros_exprt::lower() const
+{
+  exprt x = op();
+  const auto int_width = to_bitvector_type(x.type()).get_width();
+  CHECK_RETURN(int_width >= 1);
+
+  // popcount(x ^ ((unsigned)x - 1)) - 1
+  const unsignedbv_typet ut{int_width};
+  minus_exprt minus_one{typecast_exprt::conditional_cast(x, ut),
+                        from_integer(1, ut)};
+  popcount_exprt popcount{
+    bitxor_exprt{x, typecast_exprt::conditional_cast(minus_one, x.type())}};
+  minus_exprt result{popcount.lower(), from_integer(1, x.type())};
+
+  return typecast_exprt::conditional_cast(result, type());
+}

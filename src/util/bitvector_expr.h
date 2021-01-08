@@ -825,7 +825,7 @@ inline unary_overflow_exprt &to_unary_overflow_expr(exprt &expr)
 /// \brief The count leading zeros (counting the number of zero bits starting
 /// from the most-significant bit) expression. When \c zero_permitted is set to
 /// false, goto_checkt must generate an assertion that the operand does not
-/// evaluates to zero. The result is always defined, even for zero (where the
+/// evaluate to zero. The result is always defined, even for zero (where the
 /// result is the bit width).
 class count_leading_zeros_exprt : public unary_exprt
 {
@@ -911,6 +911,99 @@ inline count_leading_zeros_exprt &to_count_leading_zeros_expr(exprt &expr)
   PRECONDITION(expr.id() == ID_count_leading_zeros);
   count_leading_zeros_exprt &ret =
     static_cast<count_leading_zeros_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief The count trailing zeros (counting the number of zero bits starting
+/// from the least-significant bit) expression. When \c zero_permitted is set to
+/// false, goto_checkt must generate an assertion that the operand does not
+/// evaluate to zero. The result is always defined, even for zero (where the
+/// result is the bit width).
+class count_trailing_zeros_exprt : public unary_exprt
+{
+public:
+  count_trailing_zeros_exprt(exprt _op, bool _zero_permitted, typet _type)
+    : unary_exprt(ID_count_trailing_zeros, std::move(_op), std::move(_type))
+  {
+    zero_permitted(_zero_permitted);
+  }
+
+  explicit count_trailing_zeros_exprt(const exprt &_op)
+    : count_trailing_zeros_exprt(_op, true, _op.type())
+  {
+  }
+
+  bool zero_permitted() const
+  {
+    return !get_bool(ID_C_bounds_check);
+  }
+
+  void zero_permitted(bool value)
+  {
+    set(ID_C_bounds_check, !value);
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 1,
+      "unary expression must have a single operand");
+    DATA_CHECK(
+      vm,
+      can_cast_type<bitvector_typet>(to_unary_expr(expr).op().type()),
+      "operand must be of bitvector type");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
+  /// Lower a count_trailing_zeros_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<count_trailing_zeros_exprt>(const exprt &base)
+{
+  return base.id() == ID_count_trailing_zeros;
+}
+
+inline void validate_expr(const count_trailing_zeros_exprt &value)
+{
+  validate_operands(value, 1, "count_trailing_zeros must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref count_trailing_zeros_exprt
+///
+/// \a expr must be known to be \ref count_trailing_zeros_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref count_trailing_zeros_exprt
+inline const count_trailing_zeros_exprt &
+to_count_trailing_zeros_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_count_trailing_zeros);
+  const count_trailing_zeros_exprt &ret =
+    static_cast<const count_trailing_zeros_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_count_trailing_zeros_expr(const exprt &)
+inline count_trailing_zeros_exprt &to_count_trailing_zeros_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_count_trailing_zeros);
+  count_trailing_zeros_exprt &ret =
+    static_cast<count_trailing_zeros_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }

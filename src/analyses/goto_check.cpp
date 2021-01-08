@@ -174,7 +174,7 @@ protected:
 
   void bounds_check(const exprt &, const guardt &);
   void bounds_check_index(const index_exprt &, const guardt &);
-  void bounds_check_clz(const count_leading_zeros_exprt &, const guardt &);
+  void bounds_check_bit_count(const unary_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
   void mod_by_zero_check(const mod_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
@@ -1336,8 +1336,11 @@ void goto_checkt::bounds_check(const exprt &expr, const guardt &guard)
 
   if(expr.id() == ID_index)
     bounds_check_index(to_index_expr(expr), guard);
-  else if(expr.id() == ID_count_leading_zeros)
-    bounds_check_clz(to_count_leading_zeros_expr(expr), guard);
+  else if(
+    expr.id() == ID_count_leading_zeros || expr.id() == ID_count_trailing_zeros)
+  {
+    bounds_check_bit_count(to_unary_expr(expr), guard);
+  }
 }
 
 void goto_checkt::bounds_check_index(
@@ -1519,13 +1522,22 @@ void goto_checkt::bounds_check_index(
   }
 }
 
-void goto_checkt::bounds_check_clz(
-  const count_leading_zeros_exprt &expr,
+void goto_checkt::bounds_check_bit_count(
+  const unary_exprt &expr,
   const guardt &guard)
 {
+  std::string name;
+
+  if(expr.id() == ID_count_leading_zeros)
+    name = "leading";
+  else if(expr.id() == ID_count_trailing_zeros)
+    name = "trailing";
+  else
+    PRECONDITION(false);
+
   add_guarded_property(
     notequal_exprt{expr.op(), from_integer(0, expr.op().type())},
-    "count leading zeros argument",
+    "count " + name + " zeros is undefined for value zero",
     "bit count",
     expr.find_source_location(),
     expr,
@@ -1788,7 +1800,8 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   {
     pointer_primitive_check(expr, guard);
   }
-  else if(expr.id() == ID_count_leading_zeros)
+  else if(
+    expr.id() == ID_count_leading_zeros || expr.id() == ID_count_trailing_zeros)
   {
     bounds_check(expr, guard);
   }

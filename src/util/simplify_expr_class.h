@@ -38,6 +38,7 @@ class byte_extract_exprt;
 class byte_update_exprt;
 class concatenation_exprt;
 class count_leading_zeros_exprt;
+class count_trailing_zeros_exprt;
 class dereference_exprt;
 class div_exprt;
 class exprt;
@@ -205,6 +206,9 @@ public:
 
   /// Try to simplify count-leading-zeros to a constant expression.
   NODISCARD resultt<> simplify_clz(const count_leading_zeros_exprt &);
+
+  /// Try to simplify count-trailing-zeros to a constant expression.
+  NODISCARD resultt<> simplify_ctz(const count_trailing_zeros_exprt &);
 
   // auxiliary
   bool simplify_if_implies(
