@@ -149,7 +149,7 @@ public:
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
   NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
-  bool simplify_typecast_preorder(typecast_exprt &);
+  NODISCARD resultt<> simplify_typecast_preorder(const typecast_exprt &);
   NODISCARD resultt<> simplify_extractbit(const extractbit_exprt &);
   NODISCARD resultt<> simplify_extractbits(const extractbits_exprt &);
   NODISCARD resultt<> simplify_concatenation(const concatenation_exprt &);
@@ -163,7 +163,7 @@ public:
   NODISCARD resultt<> simplify_shifts(const shift_exprt &);
   NODISCARD resultt<> simplify_power(const binary_exprt &);
   NODISCARD resultt<> simplify_bitwise(const multi_ary_exprt &);
-  bool simplify_if_preorder(if_exprt &expr);
+  NODISCARD resultt<> simplify_if_preorder(const if_exprt &expr);
   NODISCARD resultt<> simplify_if(const if_exprt &);
   NODISCARD resultt<> simplify_bitnot(const bitnot_exprt &);
   NODISCARD resultt<> simplify_not(const not_exprt &);
@@ -259,8 +259,8 @@ public:
   simplify_inequality_pointer_object(const binary_relation_exprt &);
 
   // main recursion
-  NODISCARD resultt<> simplify_node(exprt);
-  bool simplify_node_preorder(exprt &expr);
+  NODISCARD resultt<> simplify_node(const exprt &);
+  NODISCARD resultt<> simplify_node_preorder(const exprt &);
   NODISCARD resultt<> simplify_rec(const exprt &);
 
   virtual bool simplify(exprt &expr);
