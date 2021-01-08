@@ -1,11 +1,10 @@
-KNOWNBUG test-paths-lifo test-cprover-smt2
+CORE
 main.c
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^Runtime Symex:.*$
 ^Runtime Convert SSA:.*$
-^Runtime Post-process:.*$
 ^Runtime Solver:.*$
 --
 --
