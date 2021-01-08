@@ -794,9 +794,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     // rewrite (T)(bool) to bool?1:0
     auto one = from_integer(1, expr_type);
     auto zero = from_integer(0, expr_type);
-    exprt new_expr = if_exprt(expr.op(), std::move(one), std::move(zero));
-    simplify_if_preorder(to_if_expr(new_expr));
-    return new_expr;
+    return changed(simplify_if_preorder(
+      if_exprt{expr.op(), std::move(one), std::move(zero)}));
   }
 
   // circular casts through types shorter than `int`
@@ -2280,10 +2279,9 @@ simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
     return false_exprt{};
 }
 
-bool simplify_exprt::simplify_node_preorder(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_node_preorder(const exprt &expr)
 {
-  bool result=true;
-
   // The ifs below could one day be replaced by a switch()
 
   if(expr.id()==ID_address_of)
@@ -2291,27 +2289,36 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
     // the argument of this expression needs special treatment
   }
   else if(expr.id()==ID_if)
-    result=simplify_if_preorder(to_if_expr(expr));
-  else
   {
-    if(expr.has_operands())
+    return simplify_if_preorder(to_if_expr(expr));
+  }
+  else if(expr.has_operands())
+  {
+    optionalt<exprt::operandst> new_operands;
+
+    for(std::size_t i = 0; i < expr.operands().size(); ++i)
     {
-      Forall_operands(it, expr)
+      auto r_it = simplify_rec(expr.operands()[i]); // recursive call
+      if(r_it.has_changed())
       {
-        auto r_it = simplify_rec(*it); // recursive call
-        if(r_it.has_changed())
-        {
-          *it = r_it.expr;
-          result=false;
-        }
+        if(!new_operands.has_value())
+          new_operands = expr.operands();
+        (*new_operands)[i] = std::move(r_it.expr);
       }
+    }
+
+    if(new_operands.has_value())
+    {
+      exprt result = expr;
+      std::swap(result.operands(), *new_operands);
+      return result;
     }
   }
 
-  return result;
+  return unchanged(expr);
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
+simplify_exprt::resultt<> simplify_exprt::simplify_node(const exprt &node)
 {
   if(!node.has_operands())
     return unchanged(node); // no change
@@ -2583,49 +2590,49 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
   #endif
 
   // We work on a copy to prevent unnecessary destruction of sharing.
-  exprt tmp=expr;
-  bool no_change = simplify_node_preorder(tmp);
+  auto simplify_node_preorder_result = simplify_node_preorder(expr);
 
-  auto simplify_node_result = simplify_node(tmp);
+  auto simplify_node_result = simplify_node(simplify_node_preorder_result.expr);
 
-  if(simplify_node_result.has_changed())
+  if(
+    !simplify_node_result.has_changed() &&
+    simplify_node_preorder_result.has_changed())
   {
-    no_change = false;
-    tmp = simplify_node_result.expr;
+    simplify_node_result.expr_changed =
+      simplify_node_preorder_result.expr_changed;
   }
 
 #ifdef USE_LOCAL_REPLACE_MAP
-  #if 1
-  replace_mapt::const_iterator it=local_replace_map.find(tmp);
+  exprt tmp = simplify_node_result.expr;
+#  if 1
+  replace_mapt::const_iterator it =
+    local_replace_map.find(simplify_node_result.expr);
   if(it!=local_replace_map.end())
+    simplify_node_result = changed(it->second);
+#  else
+  if(
+    !local_replace_map.empty() &&
+    !replace_expr(local_replace_map, simplify_node_result.expr))
   {
-    tmp=it->second;
-    no_change = false;
+    simplify_node_result = changed(simplify_rec(simplify_node_result.expr));
   }
-  #else
-  if(!local_replace_map.empty() &&
-     !replace_expr(local_replace_map, tmp))
-  {
-    simplify_rec(tmp);
-    no_change = false;
-  }
-  #endif
+#  endif
 #endif
 
-  if(no_change) // no change
+  if(!simplify_node_result.has_changed())
   {
     return unchanged(expr);
   }
-  else // change, new expression is 'tmp'
+  else
   {
-    POSTCONDITION(as_const(tmp).type() == expr.type());
+    POSTCONDITION(as_const(simplify_node_result.expr).type() == expr.type());
 
 #ifdef USE_CACHE
     // save in cache
-    cache_result.first->second = tmp;
+    cache_result.first->second = simplify_node_result.expr;
 #endif
 
-    return std::move(tmp);
+    return simplify_node_result;
   }
 }
 

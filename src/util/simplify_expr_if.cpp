@@ -211,47 +211,66 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
   return no_change;
 }
 
-bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
+static simplify_exprt::resultt<> build_if_expr(
+  const if_exprt &expr,
+  simplify_exprt::resultt<> cond,
+  simplify_exprt::resultt<> truevalue,
+  simplify_exprt::resultt<> falsevalue)
 {
-  exprt &cond = expr.cond();
-  exprt &truevalue = expr.true_case();
-  exprt &falsevalue = expr.false_case();
+  if(
+    !cond.has_changed() && !truevalue.has_changed() &&
+    !falsevalue.has_changed())
+  {
+    return simplify_exprt::resultt<>(
+      simplify_exprt::resultt<>::UNCHANGED, expr);
+  }
+  else
+  {
+    if_exprt result = expr;
+    if(cond.has_changed())
+      result.cond() = std::move(cond.expr);
+    if(truevalue.has_changed())
+      result.true_case() = std::move(truevalue.expr);
+    if(falsevalue.has_changed())
+      result.false_case() = std::move(falsevalue.expr);
+    return result;
+  }
+}
 
-  bool no_change = true;
+simplify_exprt::resultt<>
+simplify_exprt::simplify_if_preorder(const if_exprt &expr)
+{
+  const exprt &cond = expr.cond();
+  const exprt &truevalue = expr.true_case();
+  const exprt &falsevalue = expr.false_case();
 
   // we first want to look at the condition
   auto r_cond = simplify_rec(cond);
-  if(r_cond.has_changed())
-  {
-    cond = r_cond.expr;
-    no_change = false;
-  }
 
   // 1 ? a : b -> a  and  0 ? a : b -> b
-  if(cond.is_constant())
+  if(r_cond.expr.is_constant())
   {
-    exprt tmp = cond.is_true() ? truevalue : falsevalue;
-    tmp = simplify_rec(tmp);
-    expr.swap(tmp);
-    return false;
+    return changed(
+      simplify_rec(r_cond.expr.is_true() ? truevalue : falsevalue));
   }
 
   if(do_simplify_if)
   {
-    if(cond.id() == ID_not)
+    bool swap_branches = false;
+
+    if(r_cond.expr.id() == ID_not)
     {
-      cond = to_not_expr(cond).op();
-      truevalue.swap(falsevalue);
-      no_change = false;
+      r_cond = changed(to_not_expr(r_cond.expr).op());
+      swap_branches = true;
     }
 
 #ifdef USE_LOCAL_REPLACE_MAP
     replace_mapt map_before(local_replace_map);
 
     // a ? b : c  --> a ? b[a/true] : c
-    if(cond.id() == ID_and)
+    if(r_cond.expr.id() == ID_and)
     {
-      forall_operands(it, cond)
+      forall_operands(it, r_cond.expr)
       {
         if(it->id() == ID_not)
           local_replace_map.insert(std::make_pair(it->op0(), false_exprt()));
@@ -260,21 +279,18 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
       }
     }
     else
-      local_replace_map.insert(std::make_pair(cond, true_exprt()));
+      local_replace_map.insert(std::make_pair(r_cond.expr, true_exprt()));
 
-    auto r_truevalue = simplify_rec(truevalue);
-    if(r_truevalue.has_changed())
-    {
-      truevalue = r_truevalue.expr;
-      no_change = false;
-    }
+    auto r_truevalue = simplify_rec(swap_branches ? falsevalue : truevalue);
+    if(swap_branches)
+      r_truevalue.expr_changed = CHANGED;
 
     local_replace_map = map_before;
 
     // a ? b : c  --> a ? b : c[a/false]
-    if(cond.id() == ID_or)
+    if(r_cond.expr.id() == ID_or)
     {
-      forall_operands(it, cond)
+      forall_operands(it, r_cond.expr)
       {
         if(it->id() == ID_not)
           local_replace_map.insert(std::make_pair(it->op0(), true_exprt()));
@@ -283,48 +299,36 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
       }
     }
     else
-      local_replace_map.insert(std::make_pair(cond, false_exprt()));
+      local_replace_map.insert(std::make_pair(r_cond.expr, false_exprt()));
 
-    auto r_falsevalue = simplify_rec(falsevalue);
-    if(r_falsevalue.has_changed())
-    {
-      falsevalue = r_falsevalue.expr;
-      no_change = false;
-    }
+    auto falsevalue = simplify_rec(swap_branches ? falsevalue : truevalue);
+    if(swap_branches)
+      r_falsevalue.expr_changed = CHANGED;
 
     local_replace_map.swap(map_before);
+
+    return build_if_expr(expr, r_cond, r_truevalue, r_falsevalue);
 #else
-    auto r_truevalue = simplify_rec(truevalue);
-    if(r_truevalue.has_changed())
+    if(!swap_branches)
     {
-      truevalue = r_truevalue.expr;
-      no_change = false;
+      return build_if_expr(
+        expr, r_cond, simplify_rec(truevalue), simplify_rec(falsevalue));
     }
-    auto r_falsevalue = simplify_rec(falsevalue);
-    if(r_falsevalue.has_changed())
+    else
     {
-      falsevalue = r_falsevalue.expr;
-      no_change = false;
+      return build_if_expr(
+        expr,
+        r_cond,
+        changed(simplify_rec(falsevalue)),
+        changed(simplify_rec(truevalue)));
     }
 #endif
   }
   else
   {
-    auto r_truevalue = simplify_rec(truevalue);
-    if(r_truevalue.has_changed())
-    {
-      truevalue = r_truevalue.expr;
-      no_change = false;
-    }
-    auto r_falsevalue = simplify_rec(falsevalue);
-    if(r_falsevalue.has_changed())
-    {
-      falsevalue = r_falsevalue.expr;
-      no_change = false;
-    }
+    return build_if_expr(
+      expr, r_cond, simplify_rec(truevalue), simplify_rec(falsevalue));
   }
-
-  return no_change;
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
