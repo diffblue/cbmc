@@ -206,3 +206,22 @@ jobs:
           asset_path: ${{ steps.create_packages.outputs.msi_installer }}
           asset_name: ${{ steps.create_packages.outputs.msi_name }}
           asset_content_type: application/x-msi
+
+  push-docker-image-dockerhub:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout CBMC source
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Get release info
+        id: get_release_info
+        uses: bruceadams/get-release@v1.2.0
+      - name: Set Image Tag
+        run: echo "IMAGE_TAG=diffblue/cbmc:${{ steps.get_release_info.outputs.tag_name }}" >> $GITHUB_ENV
+      - name: Build docker image
+        run: docker build -t $IMAGE_TAG .
+      - name: Push docker image to DockerHub
+        run: |
+          docker login --username=dbcicprover --password=${{ secrets.DOCKERHUB_ACCESS_DB_CI_CPROVER }}
+          docker image push $IMAGE_TAG
