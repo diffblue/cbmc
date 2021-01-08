@@ -22,6 +22,8 @@ Author: Peter Schrammel
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
+#include <goto-instrument/cover.h>
+
 class goto_modelt;
 class optionst;
 
@@ -31,7 +33,7 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   OPT_GOTO_CHECK \
-  "(cover):" \
+  OPT_COVER \
   "(verbosity):(version)" \
   OPT_FLUSH \
   OPT_TIMESTAMP \

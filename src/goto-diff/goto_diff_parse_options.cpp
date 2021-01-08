@@ -411,7 +411,7 @@ void goto_diff_parse_optionst::help()
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
-    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
+    HELP_COVER
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"

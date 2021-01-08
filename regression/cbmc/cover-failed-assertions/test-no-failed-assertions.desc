@@ -1,0 +1,14 @@
+CORE paths-lifo-expected-failure
+test.c
+--cover location --pointer-check --malloc-may-fail --malloc-fail-null
+\[main\.coverage\.4\] file test\.c line \d+ function main block 4 \(lines test\.c:main:17,18\): SATISFIED
+\[main\.coverage\.3\] file test\.c line \d+ function main block 3 \(lines test\.c:main:15\): FAILED
+\[main\.coverage\.2\] file test\.c line \d+ function main block 2 \(lines test\.c:main:5,6,12,14\): SATISFIED
+\[main\.coverage\.1\] file test\.c line \d+ function main block 1 \(lines test\.c:main:5\): SATISFIED
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This is checking that without the --cover-failed-assertions flag we still get the same result as we did before adding
+it in this example.

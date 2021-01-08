@@ -22,6 +22,18 @@ class message_handlert;
 class cmdlinet;
 class optionst;
 
+#define OPT_COVER                                                              \
+  "(cover):"                                                                   \
+  "(cover-failed-assertions)"
+
+#define HELP_COVER                                                             \
+  " --cover CC                   create test-suite with coverage criterion "   \
+  "CC\n"                                                                       \
+  " --cover-failed-assertions    do not stop coverage checking at failed "     \
+  "assertions\n"                                                               \
+  "                              (this is the default for --cover "            \
+  "assertions)\n"
+
 enum class coverage_criteriont
 {
   LOCATION,
@@ -37,6 +49,7 @@ enum class coverage_criteriont
 struct cover_configt
 {
   bool keep_assertions;
+  bool cover_failed_assertions;
   bool traces_must_terminate;
   irep_idt mode;
   function_filterst function_filters;

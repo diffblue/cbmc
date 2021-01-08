@@ -164,6 +164,8 @@ void parse_cover_options(const cmdlinet &cmdline, optionst &options)
   options.set_option(
     "cover-traces-must-terminate",
     cmdline.isset("cover-traces-must-terminate"));
+  options.set_option(
+    "cover-failed-assertions", cmdline.isset("cover-failed-assertions"));
 }
 
 /// Build data structures controlling coverage from command-line options.
@@ -222,6 +224,9 @@ cover_configt get_cover_config(
 
   cover_config.traces_must_terminate =
     options.get_bool_option("cover-traces-must-terminate");
+
+  cover_config.cover_failed_assertions =
+    options.get_bool_option("cover-failed-assertions");
 
   return cover_config;
 }
@@ -285,16 +290,22 @@ static void instrument_cover_goals(
       // Simplify the common case where we have ASSERT(x); ASSUME(x):
       if(i_it->is_assert())
       {
-        auto successor = std::next(i_it);
-        if(
-          successor != function.body.instructions.end() &&
-          successor->is_assume() &&
-          successor->get_condition() == i_it->get_condition())
+        if(!cover_config.cover_failed_assertions)
         {
-          successor->turn_into_skip();
+          auto successor = std::next(i_it);
+          if(
+            successor != function.body.instructions.end() &&
+            successor->is_assume() &&
+            successor->get_condition() == i_it->get_condition())
+          {
+            successor->turn_into_skip();
+          }
+          i_it->type = goto_program_instruction_typet::ASSUME;
         }
-
-        i_it->type = goto_program_instruction_typet::ASSUME;
+        else
+        {
+          i_it->turn_into_skip();
+        }
       }
     }
   }

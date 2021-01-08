@@ -34,6 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <json/json_interface.h>
 #include <xmllang/xml_interface.h>
 
+#include <goto-instrument/cover.h>
+
 class goto_functionst;
 class optionst;
 
@@ -74,7 +76,8 @@ class optionst;
   "(error-label):(verbosity):(no-library)" \
   "(nondet-static)" \
   "(version)" \
-  "(cover):(symex-coverage-report):" \
+  OPT_COVER \
+  "(symex-coverage-report):" \
   "(mm):" \
   OPT_TIMESTAMP \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
