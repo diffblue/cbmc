@@ -38,7 +38,9 @@ void c_typecheck_baset::do_initializer(
                    "any array must have a size");
 
     // we don't allow initialisation with symbols of array type
-    if(result.id() != ID_array && result.id() != ID_array_of)
+    if(
+      result.id() != ID_array && result.id() != ID_array_of &&
+      result.id() != ID_compound_literal)
     {
       error().source_location = result.source_location();
       error() << "invalid array initializer " << to_string(result)
