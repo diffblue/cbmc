@@ -6,6 +6,8 @@ union U { float f; int i; };
 // global scope, static lifetime
 int *global_scope_literal=&(int){ 43 };
 
+int array[3] = (int[3]){1, 2, 3};
+
 int main()
 {
   assert(*global_scope_literal==43);
