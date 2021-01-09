@@ -16,7 +16,7 @@
 
 #include "array_abstract_object.h"
 
-class value_set_array_abstract_objectt : public array_abstract_objectt
+class value_set_array_abstract_objectt : public two_value_array_abstract_objectt
 {
 public:
   explicit value_set_array_abstract_objectt(const typet &type);

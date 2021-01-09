@@ -21,11 +21,13 @@
 class ai_baset;
 class abstract_environmentt;
 
-class constant_array_abstract_objectt : public array_abstract_objectt
+class constant_array_abstract_objectt :
+public abstract_aggregate_objectt<two_value_array_abstract_objectt, array_aggregate_typet>
 {
 public:
   typedef sharing_ptrt<constant_array_abstract_objectt> const
     constant_array_pointert;
+  typedef abstract_aggregate_objectt<two_value_array_abstract_objectt, array_aggregate_typet> abstract_aggregate_baset;
 
   /// \param type: the type the abstract_object is representing
   explicit constant_array_abstract_objectt(typet type);
@@ -47,10 +49,6 @@ public:
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
-
-  virtual ~constant_array_abstract_objectt()
-  {
-  }
 
   /// the current known value about this object. For this array we
   /// print: { [0] - <output of object at index 0... }
@@ -76,12 +74,6 @@ public:
   abstract_object_pointert
   visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
-  void get_statistics(
-    abstract_object_statisticst &statistics,
-    abstract_object_visitedt &visited,
-    const abstract_environmentt &env,
-    const namespacet &ns) const override;
-
 protected:
   CLONE
 
@@ -96,9 +88,9 @@ protected:
   /// \param ns: the namespace
   ///
   /// \return An abstract object representing the value in the array
-  abstract_object_pointert read_index(
+  abstract_object_pointert read_component(
     const abstract_environmentt &env,
-    const index_exprt &index,
+    const exprt &expr,
     const namespacet &ns) const override;
 
   /// A helper function to evaluate writing to a index of an array.
@@ -112,13 +104,19 @@ protected:
   ///                       current value
   /// \return The abstract_object_pointert representing the result of writing
   ///         to a specific index.
-  abstract_object_pointert write_index(
+  abstract_object_pointert write_component(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> &stack,
-    const index_exprt &index_expr,
+    const exprt &expr,
     const abstract_object_pointert &value,
     bool merging_write) const override;
+
+  void statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
 
   /// Tries to do an array/array merge if merging with a constant array
   /// If it can't, falls back to parent merge
@@ -150,7 +148,7 @@ protected:
   /// \return An abstract object pointer of type type().subtype() (i.e. the
   ///         type of the array's values).
   virtual bool eval_index(
-    const index_exprt &index,
+    const exprt &index,
     const abstract_environmentt &env,
     const namespacet &ns,
     mp_integer &out_index) const;

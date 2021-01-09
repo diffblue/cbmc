@@ -10,6 +10,6 @@
 
 value_set_array_abstract_objectt::value_set_array_abstract_objectt(
   const typet &type)
-  : array_abstract_objectt(type)
+  : two_value_array_abstract_objectt(type)
 {
 }

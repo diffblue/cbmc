@@ -225,7 +225,7 @@ value_set_abstract_objectt::get_type(const abstract_object_pointert &other)
 {
   PRECONDITION(
     !std::dynamic_pointer_cast<const context_abstract_objectt>(other));
-  PRECONDITION(!std::dynamic_pointer_cast<const array_abstract_objectt>(other));
+  PRECONDITION(!std::dynamic_pointer_cast<const abstract_aggregate_tag>(other));
   PRECONDITION(!std::dynamic_pointer_cast<const union_abstract_objectt>(other));
   PRECONDITION(
     !std::dynamic_pointer_cast<const value_set_abstract_objectt>(other));

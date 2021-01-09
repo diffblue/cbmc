@@ -47,20 +47,22 @@ static constant_interval_exprt eval_and_get_as_interval(
   return evaluated_index_interval->get_interval();
 }
 
-abstract_object_pointert interval_array_abstract_objectt::write_index(
+abstract_object_pointert interval_array_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
-  const index_exprt &index_expr,
+  const exprt &expr,
   const abstract_object_pointert &value,
   bool merging_write) const
 {
+  const index_exprt &index_expr = to_index_expr(expr);
+
   auto index_interval =
     eval_and_get_as_interval(index_expr.index(), environment, ns);
 
   if(index_interval.is_single_value_interval())
   {
-    return constant_array_abstract_objectt::write_index(
+    return constant_array_abstract_objectt::write_component(
       environment,
       ns,
       stack,
@@ -81,7 +83,7 @@ abstract_object_pointert interval_array_abstract_objectt::write_index(
             .is_false())
     {
       auto array_after_write_at_index =
-        constant_array_abstract_objectt::write_index(
+        constant_array_abstract_objectt::write_component(
           environment,
           ns,
           stack,
@@ -93,16 +95,17 @@ abstract_object_pointert interval_array_abstract_objectt::write_index(
         abstract_objectt::merge(result, array_after_write_at_index, dontcare);
       ix = simplify_expr(plus_exprt(ix, from_integer(1, ix.type())), ns);
     }
-    return std::dynamic_pointer_cast<const array_abstract_objectt>(result);
+    return result;
   }
-  return std::dynamic_pointer_cast<const array_abstract_objectt>(make_top());
+  return make_top();
 }
 
-abstract_object_pointert interval_array_abstract_objectt::read_index(
+abstract_object_pointert interval_array_abstract_objectt::read_component(
   const abstract_environmentt &env,
-  const index_exprt &index,
+  const exprt &expr,
   const namespacet &ns) const
 {
+  const index_exprt& index = to_index_expr(expr);
   auto evaluated_index_value = eval_and_get_as_interval(index.index(), env, ns);
   auto const &index_interval = to_constant_interval_expr(evaluated_index_value);
   if(
@@ -117,7 +120,7 @@ abstract_object_pointert interval_array_abstract_objectt::read_index(
           simplify_expr(binary_relation_exprt(ix, ID_gt, interval_end), ns)
             .is_false())
     {
-      auto value_at_index = constant_array_abstract_objectt::read_index(
+      auto value_at_index = constant_array_abstract_objectt::read_component(
         env, index_exprt(index.array(), ix), ns);
       if(value != nullptr)
       {
@@ -136,11 +139,12 @@ abstract_object_pointert interval_array_abstract_objectt::read_index(
 }
 
 bool interval_array_abstract_objectt::eval_index(
-  const index_exprt &index,
+  const exprt &expr,
   const abstract_environmentt &env,
   const namespacet &ns,
   mp_integer &out_index) const
 {
+  const index_exprt &index = to_index_expr(expr);
   auto index_interval = eval_and_get_as_interval(index.index(), env, ns);
   if(index_interval.is_single_value_interval())
   {
@@ -151,13 +155,13 @@ bool interval_array_abstract_objectt::eval_index(
   return false;
 }
 
-void interval_array_abstract_objectt::get_statistics(
+void interval_array_abstract_objectt::statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  constant_array_abstract_objectt::get_statistics(statistics, visited, env, ns);
+  constant_array_abstract_objectt::statistics(statistics, visited, env, ns);
   statistics.objects_memory_usage += memory_sizet::from_bytes(
     // the size we add by inheriting
     sizeof(*this) - sizeof(constant_array_abstract_objectt));

@@ -7,8 +7,12 @@
 
 class member_exprt;
 
+class abstract_aggregate_tag { };
+
 template<class aggregate_typet, class aggregate_traitst>
-class abstract_aggregate_objectt : public abstract_objectt
+class abstract_aggregate_objectt :
+  public abstract_objectt,
+  public abstract_aggregate_tag
 {
 public:
   explicit abstract_aggregate_objectt(const typet &type)

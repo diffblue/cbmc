@@ -15,7 +15,7 @@
 #include "constant_array_abstract_object.h"
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(typet type)
-  : array_abstract_objectt(type)
+  : abstract_aggregate_baset(type)
 {
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
@@ -24,7 +24,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   typet type,
   bool top,
   bool bottom)
-  : array_abstract_objectt(type, top, bottom)
+  : abstract_aggregate_baset(type, top, bottom)
 {
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
@@ -33,7 +33,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : array_abstract_objectt(expr, environment, ns)
+  : abstract_aggregate_baset(expr, environment, ns)
 {
   if(expr.id() == ID_array)
   {
@@ -52,7 +52,7 @@ bool constant_array_abstract_objectt::verify() const
 {
   // Either the object is top or bottom (=> map empty)
   // or the map is not empty => neither top nor bottom
-  return array_abstract_objectt::verify() &&
+  return abstract_aggregate_baset::verify() &&
          (is_top() || is_bottom()) == map.empty();
 }
 
@@ -75,7 +75,7 @@ constant_array_abstract_objectt::merge(abstract_object_pointert other) const
   else
   {
     // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return array_abstract_objectt::merge(other);
+    return abstract_aggregate_baset::merge(other);
   }
 }
 
@@ -118,7 +118,7 @@ void constant_array_abstract_objectt::output(
 {
   if(is_top() || is_bottom())
   {
-    array_abstract_objectt::output(out, ai, ns);
+    abstract_aggregate_baset::output(out, ai, ns);
   }
   else
   {
@@ -136,20 +136,20 @@ void constant_array_abstract_objectt::output(
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::read_index(
+abstract_object_pointert constant_array_abstract_objectt::read_component(
   const abstract_environmentt &env,
-  const index_exprt &index,
+  const exprt &expr,
   const namespacet &ns) const
 {
   if(is_top())
   {
-    return env.abstract_object_factory(index.type(), ns, true);
+    return env.abstract_object_factory(expr.type(), ns, true);
   }
   else
   {
     PRECONDITION(!is_bottom());
     mp_integer index_value;
-    if(eval_index(index, env, ns, index_value))
+    if(eval_index(expr, env, ns, index_value))
     {
       auto const value = map.find(index_value);
 
@@ -189,18 +189,18 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::write_index(
+abstract_object_pointert constant_array_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
-  const index_exprt &index_expr,
+  const exprt &expr,
   const abstract_object_pointert &value,
   bool merging_write) const
 {
   if(is_bottom())
   {
-    return array_abstract_objectt::write_index(
-      environment, ns, stack, index_expr, value, merging_write);
+    return abstract_aggregate_baset::write_component(
+      environment, ns, stack, expr, value, merging_write);
   }
 
   const auto &result =
@@ -209,7 +209,7 @@ abstract_object_pointert constant_array_abstract_objectt::write_index(
   if(!stack.empty())
   {
     mp_integer index_value;
-    if(eval_index(index_expr, environment, ns, index_value))
+    if(eval_index(expr, environment, ns, index_value))
     {
       // We were able to evaluate the index to a value, which we
       // assume is in bounds...
@@ -258,7 +258,7 @@ abstract_object_pointert constant_array_abstract_objectt::write_index(
   {
     mp_integer index_value;
 
-    if(eval_index(index_expr, environment, ns, index_value))
+    if(eval_index(expr, environment, ns, index_value))
     {
       // We were able to evalute the index expression to a constant
       if(merging_write)
@@ -310,8 +310,8 @@ abstract_object_pointert constant_array_abstract_objectt::write_index(
 
     // try to write to all
     // TODO(tkiley): Merge with each entry
-    return array_abstract_objectt::write_index(
-      environment, ns, stack, index_expr, value, merging_write);
+    return abstract_aggregate_baset::write_component(
+      environment, ns, stack, expr, value, merging_write);
   }
 }
 
@@ -323,11 +323,12 @@ abstract_object_pointert constant_array_abstract_objectt::get_top_entry(
 }
 
 bool constant_array_abstract_objectt::eval_index(
-  const index_exprt &index,
+  const exprt &expr,
   const abstract_environmentt &env,
   const namespacet &ns,
   mp_integer &out_index) const
 {
+  const index_exprt& index = to_index_expr(expr);
   abstract_object_pointert index_abstract_object = env.eval(index.index(), ns);
   exprt value = index_abstract_object->to_constant();
   if(value.is_constant())
@@ -373,13 +374,12 @@ abstract_object_pointert constant_array_abstract_objectt::visit_sub_elements(
   }
 }
 
-void constant_array_abstract_objectt::get_statistics(
+void constant_array_abstract_objectt::statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  array_abstract_objectt::get_statistics(statistics, visited, env, ns);
   shared_array_mapt::viewt view;
   map.get_view(view);
   for(const auto &object : view)
