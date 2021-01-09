@@ -93,7 +93,7 @@ abstract_environmentt::resolve_symbol(const exprt &expr, const namespacet &ns) c
 
 bool abstract_environmentt::assign(
   const exprt &expr,
-  const abstract_object_pointert value,
+  const abstract_object_pointert &value,
   const namespacet &ns)
 {
   PRECONDITION(value);
@@ -182,8 +182,8 @@ bool abstract_environmentt::assign(
 }
 
 abstract_object_pointert abstract_environmentt::write(
-  abstract_object_pointert lhs,
-  abstract_object_pointert rhs,
+  const abstract_object_pointert &lhs,
+  const abstract_object_pointert &rhs,
   std::stack<exprt> remaining_stack,
   const namespacet &ns,
   bool merge_write)

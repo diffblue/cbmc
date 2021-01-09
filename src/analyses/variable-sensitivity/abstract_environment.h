@@ -85,7 +85,7 @@ public:
   /// needed.
   virtual bool assign(
     const exprt &expr,
-    const abstract_object_pointert value,
+    const abstract_object_pointert &value,
     const namespacet &ns);
 
   /// Reduces the domain based on a condition
@@ -125,8 +125,8 @@ public:
   /// this method and the relevant write methods in abstract_struct,
   /// abstract_pointer and abstract_array until the stack is empty
   virtual abstract_object_pointert write(
-    abstract_object_pointert lhs,
-    abstract_object_pointert rhs,
+    const abstract_object_pointert &lhs,
+    const abstract_object_pointert &rhs,
     std::stack<exprt> remaining_stack,
     const namespacet &ns,
     bool merge_write);
