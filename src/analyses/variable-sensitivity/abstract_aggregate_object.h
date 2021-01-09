@@ -70,13 +70,16 @@ public:
 protected:
   virtual abstract_object_pointert read_component(
     const abstract_environmentt &environment,
-    const exprt &member_expr,
+    const exprt &expr,
     const namespacet &ns) const
   {
     // If we are bottom then so are the components
     // otherwise the components could be anything
     return environment.abstract_object_factory(
-      member_expr.type(), ns, !is_bottom(), is_bottom());
+      aggregate_traitst::read_type(expr.type(), type()),
+      ns,
+      !is_bottom(),
+      is_bottom());
   }
 
   virtual abstract_object_pointert write_component(

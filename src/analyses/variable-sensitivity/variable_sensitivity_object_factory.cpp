@@ -152,7 +152,7 @@ variable_sensitivity_object_factoryt::get_abstract_object(
              : initialize_abstract_object<constant_array_abstract_objectt>(
                  followed_type, top, bottom, e, environment, ns, configuration);
   case ARRAY_INSENSITIVE:
-    return initialize_abstract_object<array_abstract_objectt>(
+    return initialize_abstract_object<two_value_array_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case POINTER_SENSITIVE:
     return initialize_abstract_object<constant_pointer_abstract_objectt>(

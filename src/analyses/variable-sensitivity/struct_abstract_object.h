@@ -18,13 +18,16 @@
 struct struct_aggregate_typet {
   static const irep_idt& TYPE_ID() { return ID_struct; }
   static const irep_idt& ACCESS_EXPR_ID() { return ID_member; }
+  static const typet & read_type(const typet &expr_type, const typet &) {
+    return expr_type;
+  }
 
   static void get_statistics(
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
     const abstract_environmentt &env,
     const namespacet &ns) {
-    statistics.number_of_structs++;
+    ++statistics.number_of_structs;
   }
 };
 
