@@ -22,12 +22,12 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const full_struct_abstract_objectt &ao)
-  : struct_abstract_objectt(ao), map(ao.map)
+  : abstract_aggregate_baset(ao), map(ao.map)
 {
 }
 
 full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t)
-  : struct_abstract_objectt(t)
+  : abstract_aggregate_baset(t)
 {
   PRECONDITION(t.id() == ID_struct);
   DATA_INVARIANT(verify(), "Structural invariants maintained");
@@ -37,7 +37,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const typet &t,
   bool top,
   bool bottom)
-  : struct_abstract_objectt(t, top, bottom)
+  : abstract_aggregate_baset(t, top, bottom)
 {
   PRECONDITION(t.id() == ID_struct);
   DATA_INVARIANT(verify(), "Structural invariants maintained");
@@ -47,7 +47,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : struct_abstract_objectt(e, environment, ns)
+  : abstract_aggregate_baset(e, environment, ns)
 {
   PRECONDITION(ns.follow(e.type()).id() == ID_struct);
 
@@ -74,7 +74,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
 
 abstract_object_pointert full_struct_abstract_objectt::read_component(
   const abstract_environmentt &environment,
-  const member_exprt &member_expr,
+  const exprt &expr,
   const namespacet &ns) const
 {
 #ifdef DEBUG
@@ -83,10 +83,11 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
 
   if(is_top())
   {
-    return environment.abstract_object_factory(member_expr.type(), ns, true);
+    return environment.abstract_object_factory(expr.type(), ns, true);
   }
   else
   {
+    const member_exprt &member_expr = to_member_expr(expr);
     PRECONDITION(!is_bottom());
 
     const irep_idt c = member_expr.get_component_name();
@@ -108,13 +109,14 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
-  const member_exprt &member_expr,
+  const exprt &expr,
   const abstract_object_pointert &value,
   bool merging_write) const
 {
 #ifdef DEBUG
   std::cout << "Writing component " << member_expr.get_component_name() << '\n';
 #endif
+  const member_exprt member_expr = to_member_expr(expr);
 
   if(is_bottom())
   {
@@ -248,7 +250,7 @@ full_struct_abstract_objectt::merge(abstract_object_pointert other) const
   else
   {
     // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return struct_abstract_objectt::merge(other);
+    return abstract_aggregate_baset::merge(other);
   }
 }
 
@@ -313,13 +315,12 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   }
 }
 
-void full_struct_abstract_objectt::get_statistics(
+void full_struct_abstract_objectt::statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  struct_abstract_objectt::get_statistics(statistics, visited, env, ns);
   shared_struct_mapt::viewt view;
   map.get_view(view);
   for(auto const &object : view)

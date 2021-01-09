@@ -164,7 +164,7 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     return initialize_abstract_object<full_struct_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case STRUCT_INSENSITIVE:
-    return initialize_abstract_object<struct_abstract_objectt>(
+    return initialize_abstract_object<two_value_struct_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case UNION_INSENSITIVE:
     return initialize_abstract_object<union_abstract_objectt>(
