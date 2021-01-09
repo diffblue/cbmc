@@ -12,7 +12,7 @@
 #include <util/invariant.h>
 #include <util/std_expr.h>
 
-#include "abstract_enviroment.h"
+#include "abstract_environment.h"
 
 #include "context_abstract_object.h"
 #include "interval_abstract_value.h"

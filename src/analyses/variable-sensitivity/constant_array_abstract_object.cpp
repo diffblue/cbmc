@@ -7,7 +7,7 @@
 \*******************************************************************/
 #include <ostream>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>

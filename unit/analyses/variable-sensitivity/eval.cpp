@@ -1,6 +1,6 @@
 // Copyright 2016-2020 Diffblue Limited.
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
 #include <util/arith_tools.h>

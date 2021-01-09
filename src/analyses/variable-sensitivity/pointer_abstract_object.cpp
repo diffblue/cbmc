@@ -8,7 +8,7 @@
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 
 #include "pointer_abstract_object.h"
 

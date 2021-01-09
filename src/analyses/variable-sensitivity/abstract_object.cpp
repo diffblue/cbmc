@@ -9,7 +9,7 @@
 #include <array>
 #include <iostream>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 
 #include <goto-programs/adjust_float_expressions.h>

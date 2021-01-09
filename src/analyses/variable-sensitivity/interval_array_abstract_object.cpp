@@ -7,7 +7,7 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "interval_array_abstract_object.h"
-#include "abstract_enviroment.h"
+#include "abstract_environment.h"
 #include "interval_abstract_value.h"
 #include <util/interval.h>
 

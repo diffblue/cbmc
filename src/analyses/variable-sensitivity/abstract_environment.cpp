@@ -6,10 +6,6 @@
 
 \*******************************************************************/
 
-#include "abstract_enviroment.h"
-
-#include "abstract_object_statistics.h"
-
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
@@ -26,6 +22,8 @@
 #include <map>
 #include <ostream>
 #include <stack>
+#include "abstract_environment.h"
+#include "abstract_object_statistics.h"
 
 #ifdef DEBUG
 #  include <iostream>
@@ -87,9 +85,9 @@ abstract_environmentt::resolve_symbol(const exprt &expr, const namespacet &ns) c
   const symbol_exprt &symbol(to_symbol_expr(expr));
   const auto symbol_entry = map.find(symbol.get_identifier());
 
-  return symbol_entry.has_value()
-    ? symbol_entry.value()
-    : abstract_object_factory(expr.type(), ns, true, false);
+  if (symbol_entry.has_value())
+     return symbol_entry.value();
+  return abstract_object_factory(expr.type(), ns, true, false);
 }
 
 

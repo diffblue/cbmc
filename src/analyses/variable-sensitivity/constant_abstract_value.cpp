@@ -18,7 +18,7 @@
 #include <util/std_expr.h>
 #include <util/type.h>
 
-#include "abstract_enviroment.h"
+#include "abstract_environment.h"
 #include "constant_abstract_value.h"
 
 constant_abstract_valuet::constant_abstract_valuet(typet t)
