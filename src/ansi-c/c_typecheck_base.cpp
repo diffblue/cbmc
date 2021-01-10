@@ -103,7 +103,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     symbol.pretty_name=new_name;
   }
 
-  if(!symbol.is_type && symbol.type.id() == ID_empty)
+  if(!symbol.is_type && !symbol.is_extern && symbol.type.id() == ID_empty)
   {
     error().source_location = symbol.location;
     error() << "void-typed symbol not permitted" << eom;
