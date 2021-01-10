@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Value sets did not properly track pointers through unions. This regression test
+was provided in #5263, including comments about simplifications that make it
+work.
