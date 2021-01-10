@@ -1,9 +1,8 @@
 #include <assert.h>
 
-#ifndef __GNUC__
-int __builtin_clz(unsigned int);
-int __builtin_clzl(unsigned long);
-int __builtin_clzll(unsigned long long);
+#ifdef _MSC_VER
+#  define __builtin_clz(x) __lzcnt(x)
+#  define __builtin_clzll(x) __lzcnt64(x)
 #endif
 
 unsigned int __VERIFIER_nondet_unsigned();
@@ -39,10 +38,16 @@ int nlz2a(unsigned x)
 
 int main()
 {
+#ifdef _MSC_VER
+  unsigned short f = 42;
+  assert(__lzcnt16(f) == 10);
+#endif
   assert(nlz2a(42) == 26);
   assert(__builtin_clz(42) == 26);
+#ifndef _MSC_VER
   assert(
     __builtin_clzl(42) == 26 + (sizeof(unsigned long) - sizeof(unsigned)) * 8);
+#endif
   assert(
     __builtin_clzll(42) ==
     26 + (sizeof(unsigned long long) - sizeof(unsigned)) * 8);
