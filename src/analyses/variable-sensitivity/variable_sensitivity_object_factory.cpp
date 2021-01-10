@@ -139,38 +139,14 @@ variable_sensitivity_object_factoryt::get_abstract_object(
 
   switch(abstract_object_type)
   {
+  case TWO_VALUE:
+    return initialize_abstract_object<abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
   case CONSTANT:
     return initialize_abstract_object<constant_abstract_valuet>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case INTERVAL:
     return initialize_abstract_object<interval_abstract_valuet>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case ARRAY_SENSITIVE:
-    return configuration.value_abstract_type == INTERVAL
-             ? initialize_abstract_object<interval_array_abstract_objectt>(
-                 followed_type, top, bottom, e, environment, ns, configuration)
-             : initialize_abstract_object<constant_array_abstract_objectt>(
-                 followed_type, top, bottom, e, environment, ns, configuration);
-  case ARRAY_INSENSITIVE:
-    return initialize_abstract_object<two_value_array_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case POINTER_SENSITIVE:
-    return initialize_abstract_object<constant_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case POINTER_INSENSITIVE:
-    return initialize_abstract_object<pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case STRUCT_SENSITIVE:
-    return initialize_abstract_object<full_struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case STRUCT_INSENSITIVE:
-    return initialize_abstract_object<two_value_struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case UNION_INSENSITIVE:
-    return initialize_abstract_object<two_value_union_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
-  case TWO_VALUE:
-    return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case VALUE_SET:
     if(configuration.advanced_sensitivities.new_value_set)
@@ -180,6 +156,35 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     }
     return initialize_abstract_object<value_set_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
+
+  case ARRAY_INSENSITIVE:
+    return initialize_abstract_object<two_value_array_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+  case ARRAY_SENSITIVE:
+    return configuration.value_abstract_type == INTERVAL
+             ? initialize_abstract_object<interval_array_abstract_objectt>(
+                 followed_type, top, bottom, e, environment, ns, configuration)
+             : initialize_abstract_object<constant_array_abstract_objectt>(
+                 followed_type, top, bottom, e, environment, ns, configuration);
+
+  case POINTER_INSENSITIVE:
+    return initialize_abstract_object<pointer_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+  case POINTER_SENSITIVE:
+    return initialize_abstract_object<constant_pointer_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+
+  case STRUCT_INSENSITIVE:
+    return initialize_abstract_object<two_value_struct_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+  case STRUCT_SENSITIVE:
+    return initialize_abstract_object<full_struct_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+
+  case UNION_INSENSITIVE:
+    return initialize_abstract_object<two_value_union_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+
   default:
     UNREACHABLE;
     return initialize_abstract_object<abstract_objectt>(
