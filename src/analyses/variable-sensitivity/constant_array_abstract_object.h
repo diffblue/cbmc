@@ -16,17 +16,17 @@
 #include <vector>
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
+#include <analyses/variable-sensitivity/abstract_aggregate_object.h>
 
 class ai_baset;
 
 class constant_array_abstract_objectt :
-public abstract_aggregate_objectt<two_value_array_abstract_objectt, array_aggregate_typet>
+public abstract_aggregate_objectt<constant_array_abstract_objectt, array_aggregate_typet>
 {
 public:
   typedef sharing_ptrt<constant_array_abstract_objectt> const
     constant_array_pointert;
-  typedef abstract_aggregate_objectt<two_value_array_abstract_objectt, array_aggregate_typet> abstract_aggregate_baset;
+  typedef abstract_aggregate_objectt<constant_array_abstract_objectt, array_aggregate_typet> abstract_aggregate_baset;
 
   /// \param type: the type the abstract_object is representing
   explicit constant_array_abstract_objectt(typet type);
