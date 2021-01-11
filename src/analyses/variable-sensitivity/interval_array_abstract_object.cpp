@@ -60,27 +60,15 @@ abstract_object_pointert interval_array_abstract_objectt::write_component(
   auto index_interval =
     eval_and_get_as_interval(index_expr.index(), environment, ns);
 
-  if(index_interval.is_single_value_interval())
-  {
-    return constant_array_abstract_objectt::write_component(
-      environment,
-      ns,
-      stack,
-      index_exprt(index_expr.array(), index_interval.get_lower()),
-      value,
-      merging_write);
-  }
-  else if(
+  if(
     !index_interval.is_top() && !index_interval.is_bottom() &&
     index_interval.get_lower().id() != ID_min &&
     index_interval.get_upper().id() != ID_max)
   {
     auto ix = index_interval.get_lower();
     auto interval_end = index_interval.get_upper();
-    sharing_ptrt<abstract_objectt> result = shared_from_this();
-    while(!result->is_top() &&
-          simplify_expr(binary_predicate_exprt(ix, ID_gt, interval_end), ns)
-            .is_false())
+    sharing_ptrt<abstract_objectt> result = nullptr;
+    do
     {
       auto array_after_write_at_index =
         constant_array_abstract_objectt::write_component(
@@ -91,10 +79,13 @@ abstract_object_pointert interval_array_abstract_objectt::write_component(
           value,
           merging_write);
       bool dontcare;
-      result =
+      result = result == nullptr ? array_after_write_at_index :
         abstract_objectt::merge(result, array_after_write_at_index, dontcare);
       ix = simplify_expr(plus_exprt(ix, from_integer(1, ix.type())), ns);
     }
+    while(!result->is_top() &&
+          simplify_expr(binary_predicate_exprt(ix, ID_gt, interval_end), ns)
+            .is_false());
     return result;
   }
   return make_top();
