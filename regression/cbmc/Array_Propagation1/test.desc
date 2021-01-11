@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 
 ^EXIT=0$
@@ -9,5 +9,4 @@ main.c
 ^warning: ignoring
 --
 This requires field-sensitive SSA encoding of arrays to pass entirely via
-constant propagation (changing the above condition to "1 remaining after
-simplification" would also make it pass, but this isn't the point of the test).
+constant propagation.

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE symex-driven-lazy-loading-expected-failure
 test
 --verbosity 10 --function test.g
 ^EXIT=0$

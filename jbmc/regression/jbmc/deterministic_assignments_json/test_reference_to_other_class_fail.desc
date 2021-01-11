@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 StaticValues
 --unwind 1 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --static-values clinit-state.json --function StaticValues.testReferenceToOtherClassFail
 ^VERIFICATION FAILED$

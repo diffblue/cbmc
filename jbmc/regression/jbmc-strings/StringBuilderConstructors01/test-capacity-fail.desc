@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 StringBuilderConstructors01
 --function StringBuilderConstructors01.capacityFail --max-nondet-string-length 1000
 ^EXIT=10$
