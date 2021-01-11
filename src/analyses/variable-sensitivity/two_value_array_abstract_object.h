@@ -12,26 +12,7 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H
 
-#include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/abstract_aggregate_object.h>
-#include <stack>
-
-struct array_aggregate_typet {
-  static const irep_idt TYPE_ID() { return ID_array; }
-  static const irep_idt ACCESS_EXPR_ID() { return ID_index; }
-  static typet read_type(const typet &, const typet &object_type) {
-    array_typet array_type(to_array_type(object_type));
-    return array_type.subtype();
-  }
-
-  static void get_statistics(
-    abstract_object_statisticst &statistics,
-    abstract_object_visitedt &visited,
-    const abstract_environmentt &env,
-    const namespacet &ns) {
-    ++statistics.number_of_arrays;
-  }
-};
 
 class two_value_array_abstract_objectt :
   public abstract_aggregate_objectt<two_value_array_abstract_objectt, array_aggregate_typet>

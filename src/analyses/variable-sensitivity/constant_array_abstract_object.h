@@ -19,7 +19,6 @@
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 
 class ai_baset;
-class abstract_environmentt;
 
 class constant_array_abstract_objectt :
 public abstract_aggregate_objectt<two_value_array_abstract_objectt, array_aggregate_typet>

@@ -12,13 +12,8 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 
 #include <analyses/variable-sensitivity/abstract_aggregate_object.h>
-#include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
 #include <iosfwd>
-#include <stack>
 #include <util/sharing_map.h>
-
-class abstract_environmentt;
-class member_exprt;
 
 class full_struct_abstract_objectt :
   public abstract_aggregate_objectt<full_struct_abstract_objectt, struct_aggregate_typet>
@@ -111,7 +106,7 @@ protected:
   /// this to return more precise results.
   ///
   /// \param environment: the abstract environment
-  /// \param member_expr: the expression uses to access a specific component
+  /// \param expr: the expression uses to access a specific component
   /// \param ns: the current namespace
   ///
   /// \return The abstract object representing the value of that
@@ -129,7 +124,7 @@ protected:
   /// \param environment: the abstract environment
   /// \param ns: the current namespace
   /// \param stack: the remaining stack of expressions on the LHS to evaluate
-  /// \param member_expr: the expression uses to access a specific component
+  /// \param expr: the expression uses to access a specific component
   /// \param value: the value we are trying to write to the component
   /// \param merging_write: whether to over-write or to merge with the
   ///                       current value.  In other words is there

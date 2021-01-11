@@ -111,4 +111,52 @@ protected:
     const namespacet &ns) const = 0;
 };
 
+struct array_aggregate_typet {
+  static const irep_idt TYPE_ID() { return ID_array; }
+  static const irep_idt ACCESS_EXPR_ID() { return ID_index; }
+  static typet read_type(const typet &, const typet &object_type) {
+    array_typet array_type(to_array_type(object_type));
+    return array_type.subtype();
+  }
+
+  static void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) {
+    ++statistics.number_of_arrays;
+  }
+};
+
+struct struct_aggregate_typet {
+  static const irep_idt& TYPE_ID() { return ID_struct; }
+  static const irep_idt& ACCESS_EXPR_ID() { return ID_member; }
+  static const typet & read_type(const typet &expr_type, const typet &) {
+    return expr_type;
+  }
+
+  static void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) {
+    ++statistics.number_of_structs;
+  }
+};
+
+struct union_aggregate_typet {
+  static const irep_idt TYPE_ID() { return ID_union; }
+  static const irep_idt ACCESS_EXPR_ID() { return ID_member; }
+  static typet read_type(const typet &, const typet &object_type) {
+    return object_type;
+  }
+
+  static void get_statistics(
+    abstract_object_statisticst &statistics,
+    abstract_object_visitedt &visited,
+    const abstract_environmentt &env,
+    const namespacet &ns) {
+  }
+};
+
 #endif //CBMC_ABSTRACT_AGGREGATE_OBJECT_H

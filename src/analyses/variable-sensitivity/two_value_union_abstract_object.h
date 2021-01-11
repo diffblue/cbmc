@@ -12,27 +12,7 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_UNION_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_UNION_ABSTRACT_OBJECT_H
 
-#include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/abstract_aggregate_object.h>
-#include <stack>
-
-class abstract_environmentt;
-class member_exprt;
-
-struct union_aggregate_typet {
-  static const irep_idt TYPE_ID() { return ID_union; }
-  static const irep_idt ACCESS_EXPR_ID() { return ID_member; }
-  static typet read_type(const typet &, const typet &object_type) {
-    return object_type;
-  }
-
-  static void get_statistics(
-    abstract_object_statisticst &statistics,
-    abstract_object_visitedt &visited,
-    const abstract_environmentt &env,
-    const namespacet &ns) {
-  }
-};
 
 class two_value_union_abstract_objectt :
   public abstract_aggregate_objectt<two_value_union_abstract_objectt, union_aggregate_typet>

@@ -12,24 +12,7 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H
 
-#include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/abstract_aggregate_object.h>
-
-struct struct_aggregate_typet {
-  static const irep_idt& TYPE_ID() { return ID_struct; }
-  static const irep_idt& ACCESS_EXPR_ID() { return ID_member; }
-  static const typet & read_type(const typet &expr_type, const typet &) {
-    return expr_type;
-  }
-
-  static void get_statistics(
-    abstract_object_statisticst &statistics,
-    abstract_object_visitedt &visited,
-    const abstract_environmentt &env,
-    const namespacet &ns) {
-    ++statistics.number_of_structs;
-  }
-};
 
 class two_value_struct_abstract_objectt :
   public abstract_aggregate_objectt<two_value_struct_abstract_objectt, struct_aggregate_typet>
