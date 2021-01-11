@@ -15,7 +15,6 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
-#include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/constant_array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
@@ -24,8 +23,9 @@
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
-#include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_union_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <analyses/variable-sensitivity/write_location_context.h>

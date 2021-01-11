@@ -14,7 +14,7 @@
 // NOLINTNEXTLINE(whitespace/line_length)
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ARRAY_ABSTRACT_OBJECT_H
 
-#include "array_abstract_object.h"
+#include "two_value_array_abstract_object.h"
 
 class value_set_array_abstract_objectt : public two_value_array_abstract_objectt
 {

@@ -32,7 +32,6 @@ struct union_aggregate_typet {
     const abstract_environmentt &env,
     const namespacet &ns) {
   }
-
 };
 
 class two_value_union_abstract_objectt :

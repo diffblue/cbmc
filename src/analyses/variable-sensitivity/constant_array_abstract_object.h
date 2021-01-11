@@ -15,8 +15,8 @@
 #include <iosfwd>
 #include <vector>
 
-#include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 
 class ai_baset;
 class abstract_environmentt;

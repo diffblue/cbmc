@@ -9,13 +9,13 @@
 /// \file
 /// Value Set Abstract Object
 
-#include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
-#include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_union_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
