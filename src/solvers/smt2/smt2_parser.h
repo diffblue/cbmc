@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 
 #include <map>
+#include <set>
 #include <unordered_map>
 
 #include <util/mathematical_types.h>
@@ -54,8 +55,24 @@ public:
     exprt definition;
   };
 
+  struct oracle_funt
+  {
+    oracle_funt(std::string _binary, typet & _type)
+      : binary_name(_binary), type(_type)
+    {
+    }
+
+    std::string binary_name;
+    typet type;
+  };
+
+
   using id_mapt=std::map<irep_idt, idt>;
   id_mapt id_map;
+
+  using oracle_fun_mapt=std::map<irep_idt, oracle_funt>;
+  oracle_fun_mapt oracle_symbols;
+
 
   struct named_termt
   {

@@ -1486,6 +1486,29 @@ void smt2_parsert::setup_commands()
     add_unique_id(id, value);
   };
 
+  // declares an oracle symbol, with external implementation
+  commands["declare-oracle-fun"] = [this](){
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error("expected a symbol after declare-oracle-fun");
+    irep_idt id = smt2_tokenizer.get_buffer();
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error("expected a binary name after symbol in declare-oracle-fun");
+    std::string binary = smt2_tokenizer.get_buffer();
+
+    auto type = function_signature_declaration();
+    add_unique_id(id, exprt(ID_nil, type));
+
+    if(!oracle_symbols
+        .emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(id),
+          std::forward_as_tuple(binary, type))
+        .second)
+    {
+      throw error() << "Oracle '" << id << "' defined twice";
+    }
+  };
+
   commands["define-fun"] = [this]() {
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-fun");
