@@ -34,20 +34,16 @@ SRC = ai.cpp \
       uncaught_exceptions_analysis.cpp \
       uninitialized_domain.cpp \
       variable-sensitivity/abstract_object.cpp \
-      variable-sensitivity/abstract_enviroment.cpp \
-      variable-sensitivity/abstract_value.cpp \
-      variable-sensitivity/array_abstract_object.cpp \
+      variable-sensitivity/abstract_environment.cpp \
       variable-sensitivity/constant_abstract_value.cpp \
       variable-sensitivity/constant_pointer_abstract_object.cpp \
       variable-sensitivity/context_abstract_object.cpp \
       variable-sensitivity/write_location_context.cpp \
       variable-sensitivity/pointer_abstract_object.cpp \
-      variable-sensitivity/struct_abstract_object.cpp \
       variable-sensitivity/variable_sensitivity_domain.cpp \
       variable-sensitivity/variable_sensitivity_object_factory.cpp \
       variable-sensitivity/full_struct_abstract_object.cpp \
       variable-sensitivity/constant_array_abstract_object.cpp \
-      variable-sensitivity/union_abstract_object.cpp \
       variable-sensitivity/write_stack.cpp \
       variable-sensitivity/write_stack_entry.cpp \
       variable-sensitivity/data_dependency_context.cpp \
