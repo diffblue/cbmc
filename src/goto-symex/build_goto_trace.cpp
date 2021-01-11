@@ -409,6 +409,15 @@ void build_goto_trace(
         goto_trace_step.cond_value =
           decision_procedure.get(SSA_step.cond_handle).is_true();
       }
+      else if(SSA_step.is_assignment())
+      {
+        goto_trace_step.ssa_lhs = SSA_step.ssa_lhs;
+        goto_trace_step.ssa_rhs = SSA_step.ssa_rhs;
+      }
+      else if(SSA_step.is_decl())
+      {
+        goto_trace_step.ssa_lhs = SSA_step.ssa_lhs;
+      }
 
       if(ssa_step_it == last_step_to_keep)
         return;

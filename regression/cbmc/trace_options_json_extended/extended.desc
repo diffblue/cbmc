@@ -4,4 +4,6 @@ test.c
 ^EXIT=10$
 ^SIGNAL=0$
 rawLhs
+"ssaLhs": "main::argc!0@1#1",
+"ssaRhs": "argc'#0",
 --
