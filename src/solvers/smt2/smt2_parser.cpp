@@ -1496,13 +1496,15 @@ void smt2_parsert::setup_commands()
     std::string binary = smt2_tokenizer.get_buffer();
 
     auto type = function_signature_declaration();
+    if(type.id()!=ID_mathematical_function)
+      throw error("expected functional type for oracle");
     add_unique_id(id, exprt(ID_nil, type));
 
     if(!oracle_symbols
         .emplace(
           std::piecewise_construct,
           std::forward_as_tuple(id),
-          std::forward_as_tuple(binary, type))
+          std::forward_as_tuple(binary, to_mathematical_function_type(type)))
         .second)
     {
       throw error() << "Oracle '" << id << "' defined twice";

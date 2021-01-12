@@ -57,13 +57,13 @@ public:
 
   struct oracle_funt
   {
-    oracle_funt(std::string _binary, typet & _type)
+    oracle_funt(std::string _binary, mathematical_function_typet & _type)
       : binary_name(_binary), type(_type)
     {
     }
 
     std::string binary_name;
-    typet type;
+    mathematical_function_typet type;
   };
 
 
