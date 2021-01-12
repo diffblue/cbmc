@@ -41,6 +41,8 @@ public:
 
   ~interval_abstract_valuet() override = default;
 
+  index_range_ptrt index_range() const override;
+
   exprt to_constant() const override;
 
   /// Interface for transforms

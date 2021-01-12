@@ -17,6 +17,38 @@
 #include "context_abstract_object.h"
 #include "interval_abstract_value.h"
 
+struct interval_index_ranget : index_ranget {
+  interval_index_ranget(
+    const constant_interval_exprt &val,
+    const namespacet &n
+  ) :
+      index(nil_exprt()),
+      next(val.get_lower()),
+      upper(val.get_upper()),
+      ns(n)
+  {
+  }
+
+  const exprt &current() const override { return index; }
+  bool advance_to_next() override {
+    index = next;
+    next = next_element(next, ns);
+    return simplify_expr(
+             binary_predicate_exprt(index, ID_le, upper), ns)
+          .is_true();
+  }
+
+private:
+  static exprt next_element(const exprt &cur, const namespacet& ns) {
+    return simplify_expr(plus_exprt(cur, from_integer(1, cur.type())), ns);
+  }
+
+  exprt index;
+  exprt next;
+  exprt upper;
+  const namespacet &ns;
+};
+
 static inline exprt look_through_casts(exprt e)
 {
   while(e.id() == ID_typecast)
@@ -536,6 +568,17 @@ interval_abstract_valuet::interval_abstract_valuet(
     merge_count(merge_count)
 {
 }
+
+index_range_ptrt interval_abstract_valuet::index_range() const
+{
+  if (is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
+    return std::make_shared<empty_index_ranget>();
+  if (interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
+    return std::make_shared<empty_index_ranget>();
+
+  return std::make_shared<interval_index_ranget>(interval, namespacet(symbol_tablet()));
+}
+
 
 const constant_interval_exprt &interval_abstract_valuet::get_interval() const
 {
