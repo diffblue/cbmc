@@ -1409,6 +1409,7 @@ typet smt2_parsert::function_signature_declaration()
 
   if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
   {
+    // no inputs
     next_token(); // eat the ')'
     return sort();
   }
@@ -1461,7 +1462,6 @@ void smt2_parsert::setup_commands()
 
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = function_signature_declaration();
-
     add_unique_id(id, exprt(ID_nil, type));
   };
 
