@@ -186,12 +186,16 @@ public:
   }
 };
 
+class mathematical_function_typet;
+
 /// \brief Application of (mathematical) function
 class function_application_exprt : public binary_exprt
 {
 public:
   using argumentst = exprt::operandst;
 
+  /// \param _function must be known to have \ref mathematical_function_typet type.
+  /// \param _arguments must match function_type().domain()
   function_application_exprt(const exprt &_function, argumentst _arguments);
 
   exprt &function()
@@ -203,6 +207,9 @@ public:
   {
     return op0();
   }
+
+  /// This helper method provides the type of the expression returned by \ref function.
+  const mathematical_function_typet &function_type() const;
 
   argumentst &arguments()
   {

@@ -18,6 +18,12 @@ function_application_exprt::function_application_exprt(
       tuple_exprt(std::move(_arguments)),
       to_mathematical_function_type(_function.type()).codomain())
 {
-  const auto &domain = to_mathematical_function_type(_function.type()).domain();
+  const auto &domain = function_type().domain();
   PRECONDITION(domain.size() == arguments().size());
+}
+
+const mathematical_function_typet &
+function_application_exprt::function_type() const
+{
+  return to_mathematical_function_type(function().type());
 }
