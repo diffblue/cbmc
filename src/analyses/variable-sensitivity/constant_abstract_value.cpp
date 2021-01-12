@@ -39,6 +39,16 @@ constant_abstract_valuet::constant_abstract_valuet(
 {
 }
 
+index_range_ptrt constant_abstract_valuet::index_range() const {
+  exprt val = to_constant();
+  if(val.is_constant())
+    return std::make_shared<constant_index_ranget>(to_constant_expr(val));
+
+  return std::make_shared<empty_index_ranget>();
+}
+
+
+
 abstract_object_pointert constant_abstract_valuet::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
