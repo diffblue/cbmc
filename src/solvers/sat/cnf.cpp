@@ -413,7 +413,7 @@ bvt cnft::eliminate_duplicates(const bvt &bv)
 
 /// filter 'true' from clause, eliminate duplicates, recognise trivially
 /// satisfied clauses
-bool cnft::process_clause(const bvt &bv, bvt &dest)
+bool cnft::process_clause(const bvt &bv, bvt &dest) const
 {
   dest.clear();
 

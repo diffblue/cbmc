@@ -55,7 +55,7 @@ protected:
 
   size_t _no_variables;
 
-  bool process_clause(const bvt &bv, bvt &dest);
+  bool process_clause(const bvt &bv, bvt &dest) const;
 
   static bool is_all(const bvt &bv, literalt l)
   {
