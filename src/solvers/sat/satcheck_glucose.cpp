@@ -121,8 +121,22 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
 
     solver->addClause_(c);
 
-    with_solver_hardness(
-      [&bv](solver_hardnesst &hardness) { hardness.register_clause(bv); });
+    with_solver_hardness([this, &bv](solver_hardnesst &hardness) {
+      // To map clauses to lines of program code, track clause indices in the
+      // dimacs cnf output. Dimacs output is generated after processing
+      // clauses to remove duplicates and clauses that are trivially true.
+      // Here, a clause is checked to see if it can be thus eliminated. If
+      // not, add the clause index to list of clauses in
+      // solver_hardnesst::register_clause().
+      static size_t cnf_clause_index = 0;
+      bvt cnf;
+      bool clause_removed = process_clause(bv, cnf);
+
+      if(!clause_removed)
+        cnf_clause_index++;
+
+      hardness.register_clause(bv, cnf, cnf_clause_index, !clause_removed);
+    });
 
     clause_counter++;
   }
