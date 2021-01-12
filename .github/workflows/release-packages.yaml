@@ -18,7 +18,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys: |
             ${{ runner.os }}-20.04-Release-${{ github.ref }}
             ${{ runner.os }}-20.04-Release
@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-18.04-Release-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-18.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys: |
             ${{ runner.os }}-18.04-Release-${{ github.ref }}
             ${{ runner.os }}-18.04-Release
@@ -154,7 +154,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys: |
             ${{ runner.os }}-msbuild-${{ github.ref }}
             ${{ runner.os }}-msbuild

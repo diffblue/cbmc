@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
             ${{ runner.os }}-20.04-make-${{ github.ref }}
             ${{ runner.os }}-20.04-make
@@ -71,7 +71,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
             ${{ runner.os }}-20.04-Release-${{ github.ref }}
             ${{ runner.os }}-20.04-Release
@@ -110,7 +110,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
             ${{ runner.os }}-make-${{ github.ref }}
             ${{ runner.os }}-make
@@ -150,7 +150,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
             ${{ runner.os }}-Release-${{ github.ref }}
             ${{ runner.os }}-Release
@@ -191,7 +191,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
             ${{ runner.os }}-msbuild-${{ github.ref }}
             ${{ runner.os }}-msbuild
@@ -270,7 +270,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PKG
           restore-keys: |
             ${{ runner.os }}-msbuild-${{ github.ref }}
             ${{ runner.os }}-msbuild
@@ -310,7 +310,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ runner.os }}-18.04-Release-${{ github.ref }}-${{ github.sha }}
+          key: ${{ runner.os }}-18.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
             ${{ runner.os }}-18.04-Release-${{ github.ref }}
             ${{ runner.os }}-18.04-Release
