@@ -175,12 +175,12 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
 }
 
 interval_abstract_valuet::interval_abstract_valuet(typet t)
-  : abstract_objectt(t), interval(t)
+  : abstract_value_objectt(t), interval(t)
 {
 }
 
 interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_objectt(t, tp, bttm), interval(t)
+  : abstract_value_objectt(t, tp, bttm), interval(t)
 {
 }
 
@@ -531,7 +531,7 @@ interval_abstract_valuet::interval_abstract_valuet(
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt e,
   int merge_count)
-  : abstract_objectt(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
+  : abstract_value_objectt(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
     interval(e),
     merge_count(merge_count)
 {

@@ -14,9 +14,9 @@
 
 #include <unordered_set>
 
-#include <analyses/variable-sensitivity/abstract_object.h>
+#include <analyses/variable-sensitivity/abstract_value_object.h>
 
-class value_set_abstract_objectt : public abstract_objectt
+class value_set_abstract_objectt : public abstract_value_objectt
 {
 public:
   using abstract_object_sett = std::unordered_set<

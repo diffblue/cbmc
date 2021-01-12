@@ -19,7 +19,7 @@
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
-  : abstract_objectt(type), my_type(type_to_abstract_type(type))
+  : abstract_value_objectt(type), my_type(type_to_abstract_type(type))
 {
   switch(my_type)
   {
@@ -39,7 +39,7 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)
-  : abstract_objectt(type, top, bottom), my_type(type_to_abstract_type(type))
+  : abstract_value_objectt(type, top, bottom), my_type(type_to_abstract_type(type))
 {
   switch(my_type)
   {
@@ -61,7 +61,7 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : abstract_objectt(expr.type(), false, false),
+  : abstract_value_objectt(expr.type(), false, false),
     my_type(type_to_abstract_type(expr.type()))
 {
   switch(my_type)

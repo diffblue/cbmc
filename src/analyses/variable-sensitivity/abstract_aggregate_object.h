@@ -5,8 +5,6 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <stack>
 
-class member_exprt;
-
 class abstract_aggregate_tag { };
 
 template<class aggregate_typet, class aggregate_traitst>

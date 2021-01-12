@@ -22,12 +22,12 @@
 #include "constant_abstract_value.h"
 
 constant_abstract_valuet::constant_abstract_valuet(typet t)
-  : abstract_objectt(t), value()
+  : abstract_value_objectt(t), value()
 {
 }
 
 constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_objectt(t, tp, bttm), value()
+  : abstract_value_objectt(t, tp, bttm), value()
 {
 }
 
@@ -35,7 +35,7 @@ constant_abstract_valuet::constant_abstract_valuet(
   const exprt e,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : abstract_objectt(e.type(), false, false), value(e)
+  : abstract_value_objectt(e.type(), false, false), value(e)
 {
 }
 
