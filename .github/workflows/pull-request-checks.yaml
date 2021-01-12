@@ -349,3 +349,24 @@ jobs:
       - uses: actions/checkout@v2
       - name: Check for unused irep ids
         run: ./scripts/string_table_check.sh
+
+  check-docker-image:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Download test dependencies
+        run: sudo apt install openjdk-11-jdk-headless
+      - name: Build docker image
+        run: docker build -t cbmc .
+      - name: Smoke test goto-cc
+        run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-cc -o /mnt/smoke/test.goto /mnt/smoke/test.c
+      - name: Smoke test cbmc
+        run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc cbmc /mnt/smoke/test.goto
+      - name: Smoke test jbmc
+        run: |
+          javac .github/workflows/smoke_test_assets/Test.java
+          docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc jbmc --classpath /mnt/smoke Test
+      - name: Smoke test goto-analyzer
+        run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-analyzer /mnt/smoke/test.goto --unreachable-functions
