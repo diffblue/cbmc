@@ -2503,8 +2503,7 @@ inline bitand_exprt &to_bitand_expr(exprt &expr)
   return static_cast<bitand_exprt &>(expr);
 }
 
-
-/// \brief A base class for shift operators
+/// \brief A base class for shift and rotate operators
 class shift_exprt:public binary_exprt
 {
 public:
@@ -2539,7 +2538,8 @@ public:
 template <>
 inline bool can_cast_expr<shift_exprt>(const exprt &base)
 {
-  return base.id() == ID_shl || base.id() == ID_ashr || base.id() == ID_lshr;
+  return base.id() == ID_shl || base.id() == ID_ashr || base.id() == ID_lshr ||
+         base.id() == ID_ror || base.id() == ID_rol;
 }
 
 inline void validate_expr(const shift_exprt &value)
