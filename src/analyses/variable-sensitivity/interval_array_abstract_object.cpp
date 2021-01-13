@@ -56,39 +56,32 @@ abstract_object_pointert interval_array_abstract_objectt::write_component(
   bool merging_write) const
 {
   const index_exprt &index_expr = to_index_expr(expr);
+  auto evaluated_index = environment.eval(index_expr.index(), ns);
+  auto index_range =
+    (std::dynamic_pointer_cast<const abstract_value_objectt>(
+      evaluated_index->unwrap_context()))->index_range(ns);
 
-  auto index_interval =
-    eval_and_get_as_interval(index_expr.index(), environment, ns);
+  if (!index_range->advance_to_next())
+    return make_top();
 
-  if(
-    !index_interval.is_top() && !index_interval.is_bottom() &&
-    index_interval.get_lower().id() != ID_min &&
-    index_interval.get_upper().id() != ID_max)
+  sharing_ptrt<abstract_objectt> result = nullptr;
+  do
   {
-    auto ix = index_interval.get_lower();
-    auto interval_end = index_interval.get_upper();
-    sharing_ptrt<abstract_objectt> result = nullptr;
-    do
-    {
-      auto array_after_write_at_index =
-        constant_array_abstract_objectt::write_component(
-          environment,
-          ns,
-          stack,
-          index_exprt(index_expr.index(), ix),
-          value,
-          merging_write);
-      bool dontcare;
-      result = result == nullptr ? array_after_write_at_index :
-        abstract_objectt::merge(result, array_after_write_at_index, dontcare);
-      ix = simplify_expr(plus_exprt(ix, from_integer(1, ix.type())), ns);
-    }
-    while(!result->is_top() &&
-          simplify_expr(binary_predicate_exprt(ix, ID_gt, interval_end), ns)
-            .is_false());
-    return result;
+    auto array_after_write_at_index =
+      constant_array_abstract_objectt::write_component(
+        environment,
+        ns,
+        stack,
+        index_exprt(index_expr.array(), index_range->current()),
+        value,
+        merging_write);
+    bool dontcare;
+    result = (result == nullptr)
+               ? array_after_write_at_index
+               : abstract_objectt::merge(result, array_after_write_at_index, dontcare);
   }
-  return make_top();
+  while(!result->is_top() && index_range->advance_to_next());
+  return result;
 }
 
 abstract_object_pointert interval_array_abstract_objectt::read_component(
