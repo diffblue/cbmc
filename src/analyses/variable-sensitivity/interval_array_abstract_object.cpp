@@ -85,41 +85,32 @@ abstract_object_pointert interval_array_abstract_objectt::write_component(
 }
 
 abstract_object_pointert interval_array_abstract_objectt::read_component(
-  const abstract_environmentt &env,
+  const abstract_environmentt &environment,
   const exprt &expr,
   const namespacet &ns) const
 {
-  const index_exprt& index = to_index_expr(expr);
-  auto evaluated_index_value = eval_and_get_as_interval(index.index(), env, ns);
-  auto const &index_interval = to_constant_interval_expr(evaluated_index_value);
-  if(
-    !index_interval.is_top() && !index_interval.is_bottom() &&
-    index_interval.get_lower().id() != ID_min &&
-    index_interval.get_upper().id() != ID_max)
+  const index_exprt &index_expr = to_index_expr(expr);
+  auto evaluated_index = environment.eval(index_expr.index(), ns);
+  auto index_range =
+    (std::dynamic_pointer_cast<const abstract_value_objectt>(
+      evaluated_index->unwrap_context()))->index_range(ns);
+
+  if (!index_range->advance_to_next())
+    return environment.abstract_object_factory(type().subtype(), ns);
+
+  abstract_object_pointert value;
+  do
   {
-    auto ix = index_interval.get_lower();
-    auto interval_end = index_interval.get_upper();
-    abstract_object_pointert value;
-    while((!value || !value->is_top()) &&
-          simplify_expr(binary_relation_exprt(ix, ID_gt, interval_end), ns)
-            .is_false())
-    {
-      auto value_at_index = constant_array_abstract_objectt::read_component(
-        env, index_exprt(index.array(), ix), ns);
-      if(value != nullptr)
-      {
-        bool dont_care;
-        value = abstract_objectt::merge(value, value_at_index, dont_care);
-      }
-      else
-      {
-        value = value_at_index;
-      }
-      ix = simplify_expr(plus_exprt(ix, from_integer(1, ix.type())), ns);
-    }
-    return value;
+    auto value_at_index = constant_array_abstract_objectt::read_component(
+      environment, index_exprt(index_expr.array(), index_range->current()), ns);
+
+    bool dont_care;
+    value = (value == nullptr)
+      ? value_at_index
+      : abstract_objectt::merge(value, value_at_index, dont_care);
   }
-  return env.abstract_object_factory(type().subtype(), ns);
+  while(!value->is_top() && index_range->advance_to_next());
+  return value;
 }
 
 bool interval_array_abstract_objectt::eval_index(
