@@ -623,6 +623,12 @@ static simplify_exprt::resultt<> simplify_string_startswith(
 simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   const function_application_exprt &expr)
 {
+  if(expr.function().id() == ID_lambda)
+  {
+    // expand the function application
+    return to_lambda_expr(expr.function()).application(expr.arguments());
+  }
+
   if(expr.function().id() != ID_symbol)
     return unchanged(expr);
 
@@ -1348,7 +1354,8 @@ bool simplify_exprt::get_values(
   return true;
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_lambda(const exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_lambda(const lambda_exprt &expr)
 {
   return unchanged(expr);
 }
@@ -2092,7 +2099,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   }
   else if(expr.id()==ID_lambda)
   {
-    r = simplify_lambda(expr);
+    r = simplify_lambda(to_lambda_expr(expr));
   }
   else if(expr.id()==ID_with)
   {

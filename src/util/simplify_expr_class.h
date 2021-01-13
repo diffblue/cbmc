@@ -46,6 +46,7 @@ class function_application_exprt;
 class ieee_float_op_exprt;
 class if_exprt;
 class index_exprt;
+class lambda_exprt;
 class member_exprt;
 class minus_exprt;
 class mod_exprt;
@@ -162,7 +163,7 @@ public:
   NODISCARD resultt<> simplify_inequality(const binary_relation_exprt &);
   NODISCARD resultt<>
   simplify_ieee_float_relation(const binary_relation_exprt &);
-  NODISCARD resultt<> simplify_lambda(const exprt &);
+  NODISCARD resultt<> simplify_lambda(const lambda_exprt &);
   NODISCARD resultt<> simplify_with(const with_exprt &);
   NODISCARD resultt<> simplify_update(const update_exprt &);
   NODISCARD resultt<> simplify_index(const index_exprt &);
