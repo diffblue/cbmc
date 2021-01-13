@@ -49,7 +49,7 @@ public:
   {
   }
 
-  index_range_ptrt index_range() const override;
+  index_range_ptrt index_range(const namespacet &ns) const override;
 
   /// Interface for transforms
   ///

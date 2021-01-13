@@ -44,7 +44,7 @@ public:
   {
   }
 
-  virtual index_range_ptrt index_range() const {
+  virtual index_range_ptrt index_range(const namespacet &ns) const {
      return std::make_shared<empty_index_ranget>();
   }
 };

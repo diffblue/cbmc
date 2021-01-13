@@ -26,7 +26,7 @@ SCENARIO(
     auto value_expr = from_integer(int_value, type);
     auto value = std::make_shared<constant_abstract_valuet>(value_expr, env, ns);
 
-    auto range = value->index_range();
+    auto range = value->index_range(ns);
 
     THEN("range should have a value")
     {
@@ -44,7 +44,7 @@ SCENARIO(
   {
     auto value = std::make_shared<constant_abstract_valuet>(type);
 
-    auto range = value->index_range();
+    auto range = value->index_range(ns);
 
     THEN("range should be empty")
     {
@@ -69,7 +69,7 @@ SCENARIO(
   {
     auto value = std::make_shared<interval_abstract_valuet>(type, true, false);
 
-    auto range = value->index_range();
+    auto range = value->index_range(ns);
 
     THEN("range should be empty")
     {
@@ -83,7 +83,7 @@ SCENARIO(
     auto value_expr = from_integer(int_value, type);
     auto value = std::make_shared<interval_abstract_valuet>(value_expr, env, ns);
 
-    auto range = value->index_range();
+    auto range = value->index_range(ns);
 
     THEN("range should have a single value")
     {
@@ -109,7 +109,7 @@ SCENARIO(
       env,
       ns);
 
-    auto range = value->index_range();
+    auto range = value->index_range(ns);
 
     THEN("range should have two values")
     {
@@ -140,7 +140,7 @@ SCENARIO(
       env,
       ns);
 
-    auto range = value->index_range();
+    auto range = value->index_range(ns);
 
     THEN("range should have four values")
     {

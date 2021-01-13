@@ -569,14 +569,14 @@ interval_abstract_valuet::interval_abstract_valuet(
 {
 }
 
-index_range_ptrt interval_abstract_valuet::index_range() const
+index_range_ptrt interval_abstract_valuet::index_range(const namespacet &ns) const
 {
   if (is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
     return std::make_shared<empty_index_ranget>();
   if (interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
     return std::make_shared<empty_index_ranget>();
 
-  return std::make_shared<interval_index_ranget>(interval, namespacet(symbol_tablet()));
+  return std::make_shared<interval_index_ranget>(interval, ns);
 }
 
 
