@@ -33,13 +33,14 @@
 set -e
 
 workdir=$(mktemp -d csmith.XXX)
-print_dir() {
+print_dir_and_seed() {
+  echo "Failed test obtained with random seed $seed"
   echo "CSmith working directory: $workdir"
 }
 
 # Run a single (previously generated) test.
 csmith_test() {
-  trap print_dir ERR
+  trap print_dir_and_seed ERR
 
   local f=$1
   local r=$(cbmc --version)
@@ -98,21 +99,18 @@ csmith_test() {
 
 # Generate and run a number of tests.
 csmith_random_test() {
-  trap print_dir ERR
+  trap print_dir_and_seed ERR
 
   local fixed_seed=$2
 
   for i in `seq 1 $1`; do
-    local seed=`date +%s`
+    seed=`date +%s`
     if [ "x$fixed_seed" != x ] ; then
       seed=$fixed_seed
     fi
     echo "Random seed being used: $seed"
     csmith --seed $seed > t_$i.c
-    if ! csmith_test t_$i.c ; then
-      echo "Failed test obtained with random seed $seed"
-      return 1
-    fi
+    csmith_test t_$i.c
   done
 }
 
@@ -126,14 +124,14 @@ fi
 # A random seed may be provided on the command line. Really only makes sense
 # when N is set to 1
 SEED=$2
-if [ $N != 1 ] ; then
+if [ "x$SEED" != "x" ] && [ $N != 1 ] ; then
   echo "Only running a single test with fixed random seed"
   N=1
 fi
 
 basedir=$PWD
 cd $workdir
-trap print_dir ERR
+trap print_dir_and_seed ERR
 
 csmith_random_test $N $SEED
 
