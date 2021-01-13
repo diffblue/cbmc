@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
+#include <util/simplify_utils.h>
 #include <util/string_expr.h>
 #include <util/string_utils.h>
 

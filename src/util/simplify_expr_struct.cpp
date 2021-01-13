@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
+#include "simplify_utils.h"
 #include "std_expr.h"
 
 simplify_exprt::resultt<>
@@ -189,7 +190,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     if(target_size.has_value())
     {
       mp_integer target_bits = target_size.value() * 8;
-      const auto bits=expr2bits(op, true);
+      const auto bits = expr2bits(op, true, ns);
 
       if(bits.has_value() &&
          mp_integer(bits->size())>=target_bits)
@@ -197,7 +198,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         std::string bits_cut =
           std::string(*bits, 0, numeric_cast_v<std::size_t>(target_bits));
 
-        auto tmp = bits2expr(bits_cut, expr.type(), true);
+        auto tmp = bits2expr(bits_cut, expr.type(), true, ns);
 
         if(tmp.has_value())
           return std::move(*tmp);

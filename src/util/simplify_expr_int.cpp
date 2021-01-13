@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "rational.h"
 #include "rational_tools.h"
+#include "simplify_utils.h"
 #include "std_expr.h"
 
 simplify_exprt::resultt<>
@@ -1054,7 +1055,7 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
 
   if(expr.src().is_constant())
   {
-    const auto svalue = expr2bits(expr.src(), true);
+    const auto svalue = expr2bits(expr.src(), true, ns);
 
     if(!svalue.has_value() || svalue->size() != *width)
       return unchanged(expr);
@@ -1063,7 +1064,7 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
       numeric_cast_v<std::size_t>(*end),
       numeric_cast_v<std::size_t>(*start - *end + 1));
 
-    auto result = bits2expr(extracted_value, expr.type(), true);
+    auto result = bits2expr(extracted_value, expr.type(), true, ns);
     if(!result.has_value())
       return unchanged(expr);
 
