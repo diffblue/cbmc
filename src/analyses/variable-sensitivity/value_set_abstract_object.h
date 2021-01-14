@@ -35,6 +35,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  index_range_ptrt index_range(const namespacet &ns) const override;
+
   /// \copydoc abstract_objectt::to_constant
   exprt to_constant() const override
   {

@@ -18,6 +18,34 @@
 #include <analyses/variable-sensitivity/two_value_union_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
+struct value_set_index_ranget : index_ranget {
+  typedef value_set_abstract_objectt::abstract_object_sett abstract_object_sett;
+  explicit value_set_index_ranget(
+    const abstract_object_sett &vals
+  ) :
+      values(vals),
+      cur(),
+      next(values.begin())
+  {
+    PRECONDITION(!values.empty());
+  }
+
+  const exprt &current() const override { return cur; }
+  bool advance_to_next() override {
+    if (next == values.end())
+      return false;
+
+    cur = (*next)->to_constant();
+    ++next;
+    return true;
+  }
+
+private:
+  const abstract_object_sett &values;
+  exprt cur;
+  abstract_object_sett::const_iterator next;
+};
+
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type), my_type(type_to_abstract_type(type))
 {
@@ -78,6 +106,14 @@ value_set_abstract_objectt::value_set_abstract_objectt(
     UNREACHABLE;
   }
   verify();
+}
+
+index_range_ptrt value_set_abstract_objectt::index_range(const namespacet &ns) const
+{
+  if(!values.empty())
+    return std::make_shared<value_set_index_ranget>(values);
+
+  return std::make_shared<indeterminate_index_ranget>();
 }
 
 abstract_object_pointert value_set_abstract_objectt::expression_transform(

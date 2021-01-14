@@ -1,6 +1,7 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
 #include <util/namespace.h>
@@ -46,7 +47,7 @@ SCENARIO(
 
     auto range = value->index_range(ns);
 
-    THEN("range should be empty")
+    THEN("range should have a nil expr")
     {
       REQUIRE(range->advance_to_next() == true);
 
@@ -156,6 +157,34 @@ SCENARIO(
         to_integer(to_constant_expr(range->current()), index);
         REQUIRE(index == int_value + i);
       }
+
+      REQUIRE(range->advance_to_next() == false);
+    }
+  }
+}
+
+SCENARIO(
+"index_range for value_set_abstract_values"
+"[core][analyses][variable-sensitivity][value_set_abstract_value][index-range]")
+{
+  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+    vsd_configt::intervals());
+  abstract_environmentt env{object_factory};
+  env.make_top();
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  auto type = signedbv_typet(32);
+
+  GIVEN("a value_set is empty")
+  {
+    auto value = std::make_shared<value_set_abstract_objectt>(type, true, false);
+    auto range = value->index_range(ns);
+
+    THEN("range should have a nil expr")
+    {
+      REQUIRE(range->advance_to_next() == true);
+
+      REQUIRE(range->current() == nil_exprt());
 
       REQUIRE(range->advance_to_next() == false);
     }

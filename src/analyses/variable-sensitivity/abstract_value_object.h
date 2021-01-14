@@ -19,6 +19,20 @@ private:
     exprt nil = nil_exprt();
 };
 
+struct indeterminate_index_ranget : index_ranget {
+  explicit indeterminate_index_ranget() : nil(nil_exprt()), available(true) {  }
+  const exprt &current() const override { return nil; }
+  bool advance_to_next() override {
+    bool a = available;
+    available = false;
+    return a;
+  }
+
+private:
+  const exprt nil;
+  bool available;
+};
+
 typedef std::shared_ptr<index_ranget> index_range_ptrt;
 
 class abstract_value_objectt :
@@ -44,9 +58,7 @@ public:
   {
   }
 
-  virtual index_range_ptrt index_range(const namespacet &ns) const {
-     return std::make_shared<empty_index_ranget>();
-  }
+  virtual index_range_ptrt index_range(const namespacet &ns) const = 0;
 };
 
 #endif

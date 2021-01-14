@@ -17,22 +17,8 @@
 #include <analyses/variable-sensitivity/abstract_value_object.h>
 #include <util/std_expr.h>
 
-struct indeterminate_index_ranget : index_ranget {
-  explicit indeterminate_index_ranget() : nil(nil_exprt()), available(true) {  }
-  const exprt &current() const override { return nil; }
-  bool advance_to_next() override {
-    bool a = available;
-    available = false;
-    return a;
-  }
-
-private:
-  const exprt nil;
-  bool available;
-};
-
 struct constant_index_ranget : index_ranget {
-  constant_index_ranget(constant_exprt val) : value(val), available(true) {  }
+  explicit constant_index_ranget(constant_exprt val) : value(val), available(true) {  }
   const exprt &current() const override { return value; }
   bool advance_to_next() override {
     bool a = available;
