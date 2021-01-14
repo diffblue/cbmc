@@ -21,6 +21,18 @@ Author: Michael Tautschnig
 exprt field_sensitivityt::apply(
   const namespacet &ns,
   goto_symex_statet &state,
+  ssa_exprt ssa_expr,
+  bool write) const
+{
+  if(!run_apply || write)
+    return std::move(ssa_expr);
+  else
+    return get_fields(ns, state, ssa_expr);
+}
+
+exprt field_sensitivityt::apply(
+  const namespacet &ns,
+  goto_symex_statet &state,
   exprt expr,
   bool write) const
 {
@@ -33,9 +45,9 @@ exprt field_sensitivityt::apply(
       *it = apply(ns, state, std::move(*it), write);
   }
 
-  if(is_ssa_expr(expr) && !write)
+  if(!write && is_ssa_expr(expr))
   {
-    return get_fields(ns, state, to_ssa_expr(expr));
+    return apply(ns, state, to_ssa_expr(expr), write);
   }
   else if(
     !write && expr.id() == ID_member &&
