@@ -40,7 +40,7 @@ SCENARIO(
     }
   }
 
-  GIVEN("a top constant's range is empty")
+  GIVEN("a top constant's range is has a single nil expression")
   {
     auto value = std::make_shared<constant_abstract_valuet>(type);
 
@@ -48,6 +48,10 @@ SCENARIO(
 
     THEN("range should be empty")
     {
+      REQUIRE(range->advance_to_next() == true);
+
+      REQUIRE(range->current() == nil_exprt());
+
       REQUIRE(range->advance_to_next() == false);
     }
   }
