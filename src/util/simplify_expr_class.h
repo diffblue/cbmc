@@ -205,7 +205,6 @@ public:
   bool simplify_if_disj(exprt &expr, const exprt &cond);
   bool simplify_if_branch(exprt &trueexpr, exprt &falseexpr, const exprt &cond);
   bool simplify_if_cond(exprt &expr);
-  bool eliminate_common_addends(exprt &op0, exprt &op1);
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
   NODISCARD resultt<> simplify_address_of_arg(const exprt &);
