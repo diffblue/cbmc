@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "bv_arithmetic.h"
 #include "namespace.h"
+#include "pointer_offset_size.h"
 #include "std_expr.h"
 #include "string2int.h"
 
@@ -286,4 +287,35 @@ const constant_exprt &vector_typet::size() const
 constant_exprt &vector_typet::size()
 {
   return static_cast<constant_exprt &>(add(ID_size));
+}
+
+optionalt<std::pair<struct_union_typet::componentt, mp_integer>>
+union_typet::find_widest_union_component(const namespacet &ns) const
+{
+  const union_typet::componentst &comps = components();
+
+  optionalt<mp_integer> max_width;
+  typet max_comp_type;
+  irep_idt max_comp_name;
+
+  for(const auto &comp : comps)
+  {
+    auto element_width = pointer_offset_bits(comp.type(), ns);
+
+    if(!element_width.has_value())
+      return {};
+
+    if(max_width.has_value() && *element_width <= *max_width)
+      continue;
+
+    max_width = *element_width;
+    max_comp_type = comp.type();
+    max_comp_name = comp.get_name();
+  }
+
+  if(!max_width.has_value())
+    return {};
+  else
+    return std::make_pair(
+      struct_union_typet::componentt{max_comp_name, max_comp_type}, *max_width);
 }

@@ -400,6 +400,14 @@ public:
     : struct_union_typet(ID_union, std::move(_components))
   {
   }
+
+  /// Determine the member of maximum bit width in a union type. If no member,
+  /// or a member of non-fixed width can be found, return nullopt.
+  /// \param ns: Namespace to resolve tag types.
+  /// \return Pair of a componentt pointing to the maximum fixed bit-width
+  ///   member of the union type and the bit width of that member.
+  optionalt<std::pair<struct_union_typet::componentt, mp_integer>>
+  find_widest_union_component(const namespacet &ns) const;
 };
 
 /// Check whether a reference to a typet is a \ref union_typet.
