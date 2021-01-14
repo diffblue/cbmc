@@ -32,21 +32,6 @@ interval_array_abstract_objectt::interval_array_abstract_objectt(
 {
 }
 
-static constant_interval_exprt eval_and_get_as_interval(
-  const exprt &expr,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  auto evaluated_index = environment.eval(expr, ns);
-  auto evaluated_index_interval =
-    std::dynamic_pointer_cast<const interval_abstract_valuet>(
-      evaluated_index->unwrap_context());
-  INVARIANT(
-    evaluated_index_interval != nullptr,
-    "Expecting expression to evaluate to index");
-  return evaluated_index_interval->get_interval();
-}
-
 abstract_object_pointert interval_array_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -111,23 +96,6 @@ abstract_object_pointert interval_array_abstract_objectt::read_component(
   }
   while(!value->is_top() && index_range->advance_to_next());
   return value;
-}
-
-bool interval_array_abstract_objectt::eval_index(
-  const exprt &expr,
-  const abstract_environmentt &env,
-  const namespacet &ns,
-  mp_integer &out_index) const
-{
-  const index_exprt &index = to_index_expr(expr);
-  auto index_interval = eval_and_get_as_interval(index.index(), env, ns);
-  if(index_interval.is_single_value_interval())
-  {
-    out_index =
-      numeric_cast_v<mp_integer>(to_constant_expr(index_interval.get_lower()));
-    return true;
-  }
-  return false;
 }
 
 void interval_array_abstract_objectt::statistics(

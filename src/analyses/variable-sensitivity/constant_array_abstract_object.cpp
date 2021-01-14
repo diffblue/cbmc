@@ -260,7 +260,7 @@ abstract_object_pointert constant_array_abstract_objectt::write_component(
 
     if(eval_index(expr, environment, ns, index_value))
     {
-      // We were able to evalute the index expression to a constant
+      // We were able to evaluate the index expression to a constant
       if(merging_write)
       {
         if(is_top())

@@ -137,6 +137,7 @@ protected:
   /// object to TOP
   void set_top_internal() override;
 
+private:
   /// Evaluates the index and tries to convert it to a constant integer
   ///
   /// \param index: the index expression showing where to access the array
@@ -146,13 +147,12 @@ protected:
   ///
   /// \return An abstract object pointer of type type().subtype() (i.e. the
   ///         type of the array's values).
-  virtual bool eval_index(
+  bool eval_index(
     const exprt &index,
     const abstract_environmentt &env,
     const namespacet &ns,
     mp_integer &out_index) const;
 
-private:
   // Since we don't store for any index where the value is top
   // we don't use a regular array but instead a map of array indices
   // to the value at that index

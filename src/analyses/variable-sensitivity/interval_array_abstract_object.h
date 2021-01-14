@@ -40,12 +40,6 @@ protected:
     const abstract_object_pointert &value,
     bool merging_write) const override;
 
-  bool eval_index(
-    const exprt &expr,
-    const abstract_environmentt &env,
-    const namespacet &ns,
-    mp_integer &out_index) const override;
-
   void statistics(
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
