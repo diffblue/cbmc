@@ -1065,9 +1065,6 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
       auto num_elements = numeric_cast<std::size_t>(array_type.size());
-      // XXX: This can't be right -- unpacked is a byte array, whereas array_type may have larger elements
-      if(!num_elements.has_value() && unpacked.op().id() == ID_array)
-        num_elements = unpacked.op().operands().size();
 
       if(num_elements.has_value())
       {
