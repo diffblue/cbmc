@@ -223,7 +223,7 @@ jobs:
       - name: Set Image Tag
         run: echo "IMAGE_TAG=diffblue/cbmc:${{ steps.get_release_info.outputs.tag_name }}" >> $GITHUB_ENV
       - name: Build docker image
-        run: docker build -t $IMAGE_TAG .
+        run: docker build -t "$IMAGE_TAG" .
       - name: Push docker image to DockerHub
         run: |
           docker login --username=dbcicprover --password=${{ secrets.DOCKERHUB_ACCESS_DB_CI_CPROVER }}
