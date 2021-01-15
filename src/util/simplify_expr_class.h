@@ -59,7 +59,6 @@ class popcount_exprt;
 class refined_string_exprt;
 class shift_exprt;
 class sign_exprt;
-class tvt;
 class typecast_exprt;
 class unary_exprt;
 class unary_minus_exprt;
@@ -172,10 +171,8 @@ public:
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
   NODISCARD resultt<> simplify_pointer_object(const unary_exprt &);
   NODISCARD resultt<> simplify_object_size(const unary_exprt &);
-  NODISCARD resultt<> simplify_dynamic_size(const unary_exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const unary_exprt &);
   NODISCARD resultt<> simplify_is_invalid_pointer(const unary_exprt &);
-  NODISCARD resultt<> simplify_same_object(const unary_exprt &);
   NODISCARD resultt<> simplify_good_pointer(const unary_exprt &);
   NODISCARD resultt<> simplify_object(const exprt &);
   NODISCARD resultt<> simplify_unary_minus(const unary_minus_exprt &);
@@ -205,8 +202,6 @@ public:
   bool simplify_if_disj(exprt &expr, const exprt &cond);
   bool simplify_if_branch(exprt &trueexpr, exprt &falseexpr, const exprt &cond);
   bool simplify_if_cond(exprt &expr);
-  static tvt objects_equal(const exprt &a, const exprt &b);
-  static tvt objects_equal_address_of(const exprt &a, const exprt &b);
   NODISCARD resultt<> simplify_address_of_arg(const exprt &);
   NODISCARD resultt<>
   simplify_inequality_both_constant(const binary_relation_exprt &);
