@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+--program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+__COUNT__#\d+ == (1 \+ __COUNT__#\d+|__COUNT__#\d+ \+ 1)
+--
+__COUNT__ is guaranteed to have been read within the atomic section, there
+should not be a need to produce a conditional assignment, and therefore the
+value of __COUNT__ can be constant propagated.
