@@ -1460,16 +1460,22 @@ static bool eliminate_common_addends(exprt &op0, exprt &op1)
   return true;
 }
 
-typedef std::set<mp_integer> value_listt;
-static bool get_values(const exprt &expr, value_listt &value_list)
+/// Collect integer-typed constants in \p values when \p expr either itself is a
+/// constant or an if-expression; for an if-expression recursively collect those
+/// values in the true- and false case, respectively.
+/// \param expr: expression to collect constants from
+/// \param [out] values: set of integer constants
+/// \return false, iff all sub-expressions were either integer constants or if
+///   expressions with true/false cases being constants or if expressions.
+static bool collect_constants(const exprt &expr, std::set<mp_integer> &values)
 {
   if(expr.is_constant())
   {
-    mp_integer int_value;
-    if(to_integer(to_constant_expr(expr), int_value))
+    const auto int_value_opt = numeric_cast<mp_integer>(to_constant_expr(expr));
+    if(!int_value_opt.has_value())
       return true;
 
-    value_list.insert(int_value);
+    values.insert(*int_value_opt);
 
     return false;
   }
@@ -1477,8 +1483,8 @@ static bool get_values(const exprt &expr, value_listt &value_list)
   {
     const auto &if_expr = to_if_expr(expr);
 
-    return get_values(if_expr.true_case(), value_list) ||
-           get_values(if_expr.false_case(), value_list);
+    return collect_constants(if_expr.true_case(), values) ||
+           collect_constants(if_expr.false_case(), values);
   }
 
   return true;
@@ -1539,51 +1545,40 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
 
   // try constants
 
-  value_listt values0, values1;
+  std::set<mp_integer> values0, values1;
+  bool ok = !collect_constants(expr.op0(), values0);
+  if(ok)
+    ok = !collect_constants(expr.op1(), values1);
 
-  bool ok0=!get_values(expr.op0(), values0);
-  bool ok1=!get_values(expr.op1(), values1);
-
-  if(ok0 && ok1)
+  if(ok)
   {
-    bool first=true;
-    bool result=false; // dummy initialization to prevent warning
-    bool ok=true;
-
-    // compare possible values
-
-    for(const mp_integer &int_value0 : values0)
+    // We can simplify equality if both sides have exactly one constant value.
+    // This rule most likely never kicks in as we will already have simplified
+    // this case elsewhere (equalities with at least one side being constant are
+    // handled by other functions, and if expressions with multiple branches
+    // having the same value are simplified to remove the if expression).
+    if(expr.id() == ID_equal)
     {
-      for(const mp_integer &int_value1 : values1)
+      if(values0.size() == 1 && values1.size() == 1)
       {
-        bool tmp;
-
-        if(expr.id()==ID_ge)
-          tmp=(int_value0>=int_value1);
-        else if(expr.id()==ID_equal)
-          tmp=(int_value0==int_value1);
-        else
-        {
-          tmp=false;
-          UNREACHABLE;
-        }
-
-        if(first)
-        {
-          result=tmp;
-          first=false;
-        }
-        else if(result!=tmp)
-        {
-          ok=false;
-          break;
-        }
+        return make_boolean_expr(*values0.begin() == *values1.begin());
       }
     }
-
-    if(ok)
+    else
     {
-      return make_boolean_expr(result);
+      // ID_ge, as ensured by the above INVARIANT: the smallest value in values0
+      // must be >= the largest value in values1
+      if(*values0.begin() >= *values1.rbegin())
+      {
+        return make_boolean_expr(true);
+      }
+      // If all entries in values0 are smaller than the smallest entry in
+      // values1 then the result must be false.
+      else if(*values0.rbegin() < *values1.begin())
+      {
+        return make_boolean_expr(false);
+      }
+      // Else we don't know for sure.
     }
   }
 
