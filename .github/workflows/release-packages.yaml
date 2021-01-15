@@ -222,6 +222,7 @@ jobs:
         uses: bruceadams/get-release@v1.2.0
       - name: Set Image Tag
         run: |
+          echo ${{  steps.get_release_info.outputs.tag_name }}
           VERSION = ${{ steps.get_release_info.outputs.tag_name }}
           arrVERSION=(${VERSION//-/ })
           echo "IMAGE_TAG=diffblue/cbmc:${arrVERSION[1]}" >> $GITHUB_ENV
