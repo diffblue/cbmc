@@ -475,24 +475,17 @@ static exprt unpack_array_vector(
         body};
     }
 
-    optionalt<exprt> array_vector_size;
-    if(src.type().id() == ID_vector)
-    {
-      array_vector_size = to_vector_type(src.type()).size();
-    }
-    else
-    {
-      array_vector_size = to_array_type(src.type()).size();
-    }
-
+    const exprt array_vector_size = src.type().id() == ID_vector
+                                      ? to_vector_type(src.type()).size()
+                                      : to_array_type(src.type()).size();
 
     return array_comprehension_exprt{
       std::move(array_comprehension_index),
       std::move(body),
       array_typet{
         bv_typet{8},
-        mult_exprt{*array_vector_size,
-                   from_integer(el_bytes, array_vector_size->type())}}};
+        mult_exprt{array_vector_size,
+                   from_integer(el_bytes, array_vector_size.type())}}};
   }
 
   exprt::operandst byte_operands;
