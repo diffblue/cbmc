@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^\[main.assertion.1\] line 20 should pass: SUCCESS$
+^\[main.assertion.2\] line 21 should fail: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring

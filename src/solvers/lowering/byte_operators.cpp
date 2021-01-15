@@ -476,23 +476,21 @@ static exprt unpack_array_vector(
     }
 
     optionalt<exprt> array_vector_size;
-    optionalt<typet> subtype;
     if(src.type().id() == ID_vector)
     {
       array_vector_size = to_vector_type(src.type()).size();
-      subtype = to_vector_type(src.type()).subtype();
     }
     else
     {
       array_vector_size = to_array_type(src.type()).size();
-      subtype = to_array_type(src.type()).subtype();
     }
+
 
     return array_comprehension_exprt{
       std::move(array_comprehension_index),
       std::move(body),
       array_typet{
-        *subtype,
+        bv_typet{8},
         mult_exprt{*array_vector_size,
                    from_integer(el_bytes, array_vector_size->type())}}};
   }
@@ -1034,6 +1032,9 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   byte_extract_exprt unpacked(src);
   unpacked.op() = unpack_rec(
     src.op(), little_endian, lower_bound_int_opt, upper_bound_int_opt, ns);
+  CHECK_RETURN(
+    to_bitvector_type(to_type_with_subtype(unpacked.op().type()).subtype())
+      .get_width() == 8);
 
   if(src.type().id()==ID_array)
   {
