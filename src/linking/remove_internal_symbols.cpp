@@ -124,9 +124,7 @@ void remove_internal_symbols(
     bool is_file_local=symbol.is_file_local;
     bool is_type=symbol.is_type;
     bool has_body=symbol.value.is_not_nil();
-    bool has_initializer=
-      symbol.value.is_not_nil() &&
-      !symbol.value.get_bool(ID_C_zero_initializer);
+    bool has_initializer = symbol.value.is_not_nil();
 
     // __attribute__((constructor)), __attribute__((destructor))
     if(symbol.mode==ID_C && is_function && is_file_local)
