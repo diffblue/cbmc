@@ -458,30 +458,18 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     // see if we already have one
     if(old_symbol.value.is_not_nil())
     {
-      if(new_symbol.value.get_bool(ID_C_zero_initializer))
+      if(
+        new_symbol.is_macro && final_new.id() == ID_c_enum &&
+        old_symbol.value.is_constant() && new_symbol.value.is_constant() &&
+        old_symbol.value.get(ID_value) == new_symbol.value.get(ID_value))
       {
-        // do nothing
-      }
-      else if(old_symbol.value.get_bool(ID_C_zero_initializer))
-      {
-        old_symbol.value=new_symbol.value;
-        old_symbol.type=new_symbol.type;
+        // ignore
       }
       else
       {
-        if(
-          new_symbol.is_macro && final_new.id() == ID_c_enum &&
-          old_symbol.value.is_constant() && new_symbol.value.is_constant() &&
-          old_symbol.value.get(ID_value) == new_symbol.value.get(ID_value))
-        {
-          // ignore
-        }
-        else
-        {
-          warning().source_location=new_symbol.value.find_source_location();
-          warning() << "symbol '" << new_symbol.display_name()
-                    << "' already has an initial value" << eom;
-        }
+        warning().source_location = new_symbol.value.find_source_location();
+        warning() << "symbol '" << new_symbol.display_name()
+                  << "' already has an initial value" << eom;
       }
     }
     else
