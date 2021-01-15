@@ -1362,6 +1362,46 @@ void smt2_convt::convert_expr(const exprt &expr)
         "unsupported type for " + shift_expr.id_string() + ": " +
         type.id_string());
   }
+  else if(expr.id() == ID_rol || expr.id() == ID_ror)
+  {
+    const shift_exprt &shift_expr = to_shift_expr(expr);
+    const typet &type = shift_expr.type();
+
+    if(
+      type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+      type.id() == ID_bv)
+    {
+      // SMT-LIB offers rotate_left and rotate_right, but these require a
+      // constant distance.
+      if(shift_expr.id() == ID_rol)
+        out << "((_ rotate_left";
+      else if(shift_expr.id() == ID_ror)
+        out << "((_ rotate_right";
+      else
+        UNREACHABLE;
+
+      out << ' ';
+
+      auto distance_int_op = numeric_cast<mp_integer>(shift_expr.distance());
+
+      if(distance_int_op.has_value())
+      {
+        out << distance_int_op.value();
+      }
+      else
+        UNEXPECTEDCASE(
+          "distance type for " + shift_expr.id_string() + "must be constant");
+
+      out << ") ";
+      convert_expr(shift_expr.op());
+
+      out << ")"; // rotate_*
+    }
+    else
+      UNEXPECTEDCASE(
+        "unsupported type for " + shift_expr.id_string() + ": " +
+        type.id_string());
+  }
   else if(expr.id()==ID_with)
   {
     convert_with(to_with_expr(expr));

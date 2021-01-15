@@ -2314,6 +2314,38 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(bswap_expr);
   }
+  else if(
+    identifier == "__builtin_rotateleft8" ||
+    identifier == "__builtin_rotateleft16" ||
+    identifier == "__builtin_rotateleft32" ||
+    identifier == "__builtin_rotateleft64" ||
+    identifier == "__builtin_rotateright8" ||
+    identifier == "__builtin_rotateright16" ||
+    identifier == "__builtin_rotateright32" ||
+    identifier == "__builtin_rotateright64")
+  {
+    // clang only
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    irep_idt id = (identifier == "__builtin_rotateleft8" ||
+                   identifier == "__builtin_rotateleft16" ||
+                   identifier == "__builtin_rotateleft32" ||
+                   identifier == "__builtin_rotateleft64")
+                    ? ID_rol
+                    : ID_ror;
+
+    shift_exprt rotate_expr(expr.arguments()[0], id, expr.arguments()[1]);
+    rotate_expr.add_source_location() = source_location;
+
+    return std::move(rotate_expr);
+  }
   else if(identifier=="__builtin_nontemporal_load")
   {
     if(expr.arguments().size()!=1)
