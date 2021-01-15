@@ -191,7 +191,7 @@ optionalt<exprt> bits2expr(
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_floatbv || type.id() == ID_fixedbv ||
     type.id() == ID_c_bit_field || type.id() == ID_pointer ||
-    type.id() == ID_bv)
+    type.id() == ID_bv || type.id() == ID_c_bool)
   {
     endianness_mapt map(type, little_endian, ns);
 
@@ -385,7 +385,8 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     if(
       type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
       type.id() == ID_floatbv || type.id() == ID_fixedbv ||
-      type.id() == ID_c_bit_field || type.id() == ID_bv)
+      type.id() == ID_c_bit_field || type.id() == ID_bv ||
+      type.id() == ID_c_bool)
     {
       const auto width = to_bitvector_type(type).get_width();
 
