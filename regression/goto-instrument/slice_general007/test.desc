@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--full-slice --add-library
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This is a simplified version of end-to-end regression tests 'general005', 'general006', and 'general007' of the security-scanner.
