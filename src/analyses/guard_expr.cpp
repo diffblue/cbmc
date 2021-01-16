@@ -65,8 +65,42 @@ void guard_exprt::add(const exprt &expr)
 
 guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2)
 {
-  if(g1.expr.id() != ID_and || g2.expr.id() != ID_and)
+  if(g1.expr.id() != ID_and)
+  {
+    if(g2.expr.id() != ID_and)
+    {
+      if(g1.expr == g2.expr)
+        g1.expr = true_exprt{};
+    }
+    else
+    {
+      for(const auto &op : g2.expr.operands())
+      {
+        if(g1.expr == op)
+        {
+          g1.expr = true_exprt{};
+          break;
+        }
+      }
+    }
+
     return g1;
+  }
+
+  if(g2.expr.id() != ID_and)
+  {
+    exprt::operandst &op1 = g1.expr.operands();
+    for(exprt::operandst::iterator it = op1.begin(); it != op1.end(); ++it)
+    {
+      if(g1.expr == g2.expr)
+      {
+        op1.erase(it);
+        break;
+      }
+    }
+
+    return g1;
+  }
 
   sort_and_join(g1.expr);
   exprt g2_sorted = g2.as_expr();
