@@ -151,6 +151,21 @@ private:
     const abstract_object_pointert &value,
     bool merging_write) const;
 
+  abstract_object_pointert write_sub_element(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> &stack,
+    const exprt &expr,
+    const abstract_object_pointert &value,
+    bool merging_write) const;
+
+  abstract_object_pointert write_leaf_element(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const exprt &expr,
+    const abstract_object_pointert &value,
+    bool merging_write) const;
+
   // Since we don't store for any index where the value is top
   // we don't use a regular array but instead a map of array indices
   // to the value at that index

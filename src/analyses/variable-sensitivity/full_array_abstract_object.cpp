@@ -190,7 +190,7 @@ abstract_object_pointert full_array_abstract_objectt::read_component(
 
   return (result != nullptr)
     ? result
-    : environment.abstract_object_factory(type().subtype(), ns);
+    : get_top_entry(environment, ns);
 }
 
 abstract_object_pointert full_array_abstract_objectt::write_component(
@@ -250,9 +250,7 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
 
     // Merge each known element into the TOP value
     for(const auto &element : map.get_view())
-    {
       result = abstract_objectt::merge(result, element.second);
-    }
 
     return result;
   }
@@ -272,112 +270,136 @@ abstract_object_pointert full_array_abstract_objectt::write_element(
       environment, ns, stack, expr, value, merging_write);
   }
 
+  if(!stack.empty())
+    return write_sub_element(environment, ns, stack, expr, value, merging_write);
+
+  return write_leaf_element(environment, ns, expr, value, merging_write);
+}
+
+abstract_object_pointert full_array_abstract_objectt::write_sub_element(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> &stack,
+  const exprt &expr,
+  const abstract_object_pointert &value,
+  bool merging_write) const
+{
   const auto &result =
     std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
   mp_integer index_value;
   bool good_index = eval_index(expr, environment, ns, index_value);
 
-  if(!stack.empty())
+  if(good_index)
   {
-    if(good_index)
-    {
-      // We were able to evaluate the index to a value, which we
-      // assume is in bounds...
-      auto const old_value = map.find(index_value);
+    // We were able to evaluate the index to a value, which we
+    // assume is in bounds...
+    auto const old_value = map.find(index_value);
 
-      if(!old_value.has_value())
-      {
-        result->map.insert(
-          index_value,
-          environment.write(
-            get_top_entry(environment, ns), value, stack, ns, merging_write));
-      }
-      else
-      {
-        result->map.replace(
-          index_value,
-          environment.write(
-            old_value.value(), value, stack, ns, merging_write));
-      }
+    if(!old_value.has_value())
+    {
+      result->map.insert(
+        index_value,
+        environment.write(
+          get_top_entry(environment, ns), value, stack, ns, merging_write));
+    }
+    else
+    {
+      result->map.replace(
+        index_value,
+        environment.write(
+          old_value.value(), value, stack, ns, merging_write));
+    }
+
+    result->set_not_top();
+    DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+    return result;
+  }
+  else
+  {
+    // We were not able to evaluate the index to a value
+    for(const auto &starting_value : map.get_view())
+    {
+      // Merging write since we don't know which index we are writing to
+      result->map.replace(
+        starting_value.first,
+        environment.write(starting_value.second, value, stack, ns, true));
 
       result->set_not_top();
+    }
+
+    DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+    return result;
+  }
+}
+
+abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const exprt &expr,
+  const abstract_object_pointert &value,
+  bool merging_write) const
+{
+  const auto &result =
+    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
+
+  mp_integer index_value;
+  bool good_index = eval_index(expr, environment, ns, index_value);
+
+  if(good_index)
+  {
+    // We were able to evaluate the index expression to a constant
+    if(merging_write)
+    {
+      if(is_top())
+      {
+        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+        return result;
+      }
+
+      INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
+
+      auto const old_value = result->map.find(index_value);
+
+      if(!old_value.has_value()) // Array element is top
+      {
+        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+        return result;
+      }
+
+      result->map.replace(
+        index_value,
+        abstract_objectt::merge(old_value.value(), value));
+
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
     }
     else
     {
-      // We were not able to evaluate the index to a value
-      for(const auto &starting_value : map.get_view())
+      auto const old_value = result->map.find(index_value);
+      if(old_value.has_value())
       {
-        // Merging write since we don't know which index we are writing to
-        result->map.replace(
-          starting_value.first,
-          environment.write(starting_value.second, value, stack, ns, true));
-
-        result->set_not_top();
+        if(value != abstract_object_pointert{old_value.value()})
+        {
+          result->map.replace(index_value, value);
+        }
       }
-
+      else
+      {
+        result->map.insert(index_value, value);
+      }
+      result->set_not_top();
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
     }
   }
-  else
-  {
-    if(good_index)
-    {
-      // We were able to evaluate the index expression to a constant
-      if(merging_write)
-      {
-        if(is_top())
-        {
-          DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-          return result;
-        }
 
-        INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
-
-        auto const old_value = result->map.find(index_value);
-
-        if(!old_value.has_value()) // Array element is top
-        {
-          DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-          return result;
-        }
-
-        result->map.replace(
-          index_value,
-          abstract_objectt::merge(old_value.value(), value));
-
-        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-        return result;
-      }
-      else
-      {
-        auto const old_value = result->map.find(index_value);
-        if(old_value.has_value())
-        {
-          if(value != abstract_object_pointert{old_value.value()})
-          {
-            result->map.replace(index_value, value);
-          }
-        }
-        else
-        {
-          result->map.insert(index_value, value);
-        }
-        result->set_not_top();
-        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-        return result;
-      }
-    }
-
-    // try to write to all
-    // TODO(tkiley): Merge with each entry
-    return abstract_aggregate_baset::write_component(
-      environment, ns, stack, expr, value, merging_write);
-  }
+  // try to write to all
+  // TODO(tkiley): Merge with each entry
+  return abstract_aggregate_baset::write_component(
+    environment, ns, std::stack<exprt>(), expr, value, merging_write);
 }
+
 
 abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   const abstract_environmentt &env,
