@@ -1,30 +1,35 @@
 #include <analyses/variable-sensitivity/abstract_value_object.h>
 
-class empty_index_ranget : public index_ranget {
+class empty_index_ranget : public index_ranget
+{
 public:
-  const exprt &current() const override { return nil; }
-  bool advance_to_next() override { return false; }
+  const exprt &current() const override
+  {
+    return nil;
+  }
+  bool advance_to_next() override
+  {
+    return false;
+  }
 
 private:
   exprt nil = nil_exprt();
 };
 
-class indeterminate_index_ranget : public single_value_index_ranget {
+class indeterminate_index_ranget : public single_value_index_ranget
+{
 public:
-  indeterminate_index_ranget()
-    : single_value_index_ranget(nil_exprt())
+  indeterminate_index_ranget() : single_value_index_ranget(nil_exprt())
   {
   }
 };
 
-
 single_value_index_ranget::single_value_index_ranget(const exprt &val)
-  : value(val),
-    available(true)
+  : value(val), available(true)
 {
 }
 
-const exprt & single_value_index_ranget::current() const
+const exprt &single_value_index_ranget::current() const
 {
   return value;
 }

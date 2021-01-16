@@ -258,9 +258,8 @@ public:
     abstract_object_pointert op1,
     abstract_object_pointert op2,
     bool &out_modifications);
-  static abstract_object_pointert merge(
-    abstract_object_pointert op1,
-    abstract_object_pointert op2);
+  static abstract_object_pointert
+  merge(abstract_object_pointert op1, abstract_object_pointert op2);
 
   /// Interface method for the meet operation. Decides whether to use the base
   /// implementation or if a more precise abstraction is attainable.

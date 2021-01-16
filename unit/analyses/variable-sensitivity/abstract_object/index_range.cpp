@@ -4,19 +4,20 @@
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
 
 SCENARIO(
   "index_range for constant_abstract_values"
-  "[core][analyses][variable-sensitivity][constant_abstract_value][index-range]")
+  "[core][analyses][variable-sensitivity][constant_abstract_value][index-"
+  "range]")
 {
   auto type = signedbv_typet(32);
   auto object_factory = variable_sensitivity_object_factoryt::configured_with(
     vsd_configt::constant_domain());
-  abstract_environmentt env { object_factory };
+  abstract_environmentt env{object_factory};
   env.make_top();
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -25,7 +26,8 @@ SCENARIO(
   {
     auto int_value = 99;
     auto value_expr = from_integer(int_value, type);
-    auto value = std::make_shared<constant_abstract_valuet>(value_expr, env, ns);
+    auto value =
+      std::make_shared<constant_abstract_valuet>(value_expr, env, ns);
 
     auto range = value->index_range(ns);
 
@@ -60,11 +62,12 @@ SCENARIO(
 
 SCENARIO(
   "index_range for interval_abstract_values"
-  "[core][analyses][variable-sensitivity][interval_abstract_value][index-range]")
+  "[core][analyses][variable-sensitivity][interval_abstract_value][index-"
+  "range]")
 {
   auto object_factory = variable_sensitivity_object_factoryt::configured_with(
     vsd_configt::intervals());
-  abstract_environmentt env { object_factory };
+  abstract_environmentt env{object_factory};
   env.make_top();
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -86,7 +89,8 @@ SCENARIO(
   {
     auto int_value = 99;
     auto value_expr = from_integer(int_value, type);
-    auto value = std::make_shared<interval_abstract_valuet>(value_expr, env, ns);
+    auto value =
+      std::make_shared<interval_abstract_valuet>(value_expr, env, ns);
 
     auto range = value->index_range(ns);
 
@@ -108,9 +112,7 @@ SCENARIO(
     auto value_expr = from_integer(int_value, type);
     auto value = std::make_shared<interval_abstract_valuet>(
       constant_interval_exprt(
-        from_integer(int_value, type),
-        from_integer(int_value+1, type),
-        type),
+        from_integer(int_value, type), from_integer(int_value + 1, type), type),
       env,
       ns);
 
@@ -127,7 +129,7 @@ SCENARIO(
       REQUIRE(range->advance_to_next() == true);
 
       to_integer(to_constant_expr(range->current()), index);
-      REQUIRE(index == int_value+1);
+      REQUIRE(index == int_value + 1);
 
       REQUIRE(range->advance_to_next() == false);
     }
@@ -139,9 +141,7 @@ SCENARIO(
     auto value_expr = from_integer(int_value, type);
     auto value = std::make_shared<interval_abstract_valuet>(
       constant_interval_exprt(
-        from_integer(int_value, type),
-        from_integer(int_value+3, type),
-        type),
+        from_integer(int_value, type), from_integer(int_value + 3, type), type),
       env,
       ns);
 
@@ -149,7 +149,7 @@ SCENARIO(
 
     THEN("range should have four values")
     {
-      for (int i = 0; i != 4; ++i)
+      for(int i = 0; i != 4; ++i)
       {
         REQUIRE(range->advance_to_next() == true);
 
@@ -164,8 +164,9 @@ SCENARIO(
 }
 
 SCENARIO(
-"index_range for value_set_abstract_values"
-"[core][analyses][variable-sensitivity][value_set_abstract_value][index-range]")
+  "index_range for value_set_abstract_values"
+  "[core][analyses][variable-sensitivity][value_set_abstract_value][index-"
+  "range]")
 {
   auto object_factory = variable_sensitivity_object_factoryt::configured_with(
     vsd_configt::intervals());
@@ -177,7 +178,8 @@ SCENARIO(
 
   GIVEN("a value_set is empty")
   {
-    auto value = std::make_shared<value_set_abstract_objectt>(type, true, false);
+    auto value =
+      std::make_shared<value_set_abstract_objectt>(type, true, false);
     auto range = value->index_range(ns);
 
     THEN("range should have a nil expr")

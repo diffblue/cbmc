@@ -1,16 +1,17 @@
 #ifndef CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 #define CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 
-#include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/abstract_object.h>
 #include <stack>
 
-class abstract_aggregate_tag { };
+class abstract_aggregate_tag
+{
+};
 
-template<class aggregate_typet, class aggregate_traitst>
-class abstract_aggregate_objectt :
-  public abstract_objectt,
-  public abstract_aggregate_tag
+template <class aggregate_typet, class aggregate_traitst>
+class abstract_aggregate_objectt : public abstract_objectt,
+                                   public abstract_aggregate_tag
 {
 public:
   explicit abstract_aggregate_objectt(const typet &type)
@@ -40,7 +41,7 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override
   {
-    if (expr.id() == aggregate_traitst::ACCESS_EXPR_ID())
+    if(expr.id() == aggregate_traitst::ACCESS_EXPR_ID())
       return read_component(environment, expr, ns);
 
     return abstract_objectt::expression_transform(
@@ -48,12 +49,13 @@ public:
   }
 
   abstract_object_pointert write(
-    abstract_environmentt& environment,
+    abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> &stack,
     const exprt &specifier,
     const abstract_object_pointert &value,
-    bool merging_write) const override {
+    bool merging_write) const override
+  {
     return write_component(
       environment, ns, stack, specifier, value, merging_write);
   }
@@ -117,7 +119,7 @@ protected:
     bool modified = false;
 
     typename sharing_mapt<keyt, abstract_object_pointert, false, hash>::
-    delta_viewt delta_view;
+      delta_viewt delta_view;
     map1.get_delta_view(map2, delta_view, true);
 
     for(auto &item : delta_view)
@@ -136,10 +138,18 @@ protected:
   }
 };
 
-struct array_aggregate_typet {
-  static const irep_idt TYPE_ID() { return ID_array; }
-  static const irep_idt ACCESS_EXPR_ID() { return ID_index; }
-  static typet read_type(const typet &, const typet &object_type) {
+struct array_aggregate_typet
+{
+  static const irep_idt TYPE_ID()
+  {
+    return ID_array;
+  }
+  static const irep_idt ACCESS_EXPR_ID()
+  {
+    return ID_index;
+  }
+  static typet read_type(const typet &, const typet &object_type)
+  {
     array_typet array_type(to_array_type(object_type));
     return array_type.subtype();
   }
@@ -148,15 +158,24 @@ struct array_aggregate_typet {
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
     const abstract_environmentt &env,
-    const namespacet &ns) {
+    const namespacet &ns)
+  {
     ++statistics.number_of_arrays;
   }
 };
 
-struct struct_aggregate_typet {
-  static const irep_idt& TYPE_ID() { return ID_struct; }
-  static const irep_idt& ACCESS_EXPR_ID() { return ID_member; }
-  static const typet & read_type(const typet &expr_type, const typet &) {
+struct struct_aggregate_typet
+{
+  static const irep_idt &TYPE_ID()
+  {
+    return ID_struct;
+  }
+  static const irep_idt &ACCESS_EXPR_ID()
+  {
+    return ID_member;
+  }
+  static const typet &read_type(const typet &expr_type, const typet &)
+  {
     return expr_type;
   }
 
@@ -164,15 +183,24 @@ struct struct_aggregate_typet {
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
     const abstract_environmentt &env,
-    const namespacet &ns) {
+    const namespacet &ns)
+  {
     ++statistics.number_of_structs;
   }
 };
 
-struct union_aggregate_typet {
-  static const irep_idt TYPE_ID() { return ID_union; }
-  static const irep_idt ACCESS_EXPR_ID() { return ID_member; }
-  static typet read_type(const typet &, const typet &object_type) {
+struct union_aggregate_typet
+{
+  static const irep_idt TYPE_ID()
+  {
+    return ID_union;
+  }
+  static const irep_idt ACCESS_EXPR_ID()
+  {
+    return ID_member;
+  }
+  static typet read_type(const typet &, const typet &object_type)
+  {
     return object_type;
   }
 
@@ -180,7 +208,8 @@ struct union_aggregate_typet {
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
     const abstract_environmentt &env,
-    const namespacet &ns) {
+    const namespacet &ns)
+  {
   }
 };
 

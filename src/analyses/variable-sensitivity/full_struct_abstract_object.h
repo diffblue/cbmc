@@ -15,12 +15,16 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <iosfwd>
 #include <util/sharing_map.h>
 
-class full_struct_abstract_objectt :
-  public abstract_aggregate_objectt<full_struct_abstract_objectt, struct_aggregate_typet>
+class full_struct_abstract_objectt : public abstract_aggregate_objectt<
+                                       full_struct_abstract_objectt,
+                                       struct_aggregate_typet>
 {
 public:
   typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
-  typedef abstract_aggregate_objectt<full_struct_abstract_objectt, struct_aggregate_typet> abstract_aggregate_baset;
+  typedef abstract_aggregate_objectt<
+    full_struct_abstract_objectt,
+    struct_aggregate_typet>
+    abstract_aggregate_baset;
 
   /**
    * \brief Explicit copy-constructor to make it clear that the shared_map

@@ -16,20 +16,23 @@
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
-class value_set_index_ranget : public index_ranget {
+class value_set_index_ranget : public index_ranget
+{
 public:
   typedef value_set_abstract_objectt::abstract_object_sett abstract_object_sett;
   explicit value_set_index_ranget(const abstract_object_sett &vals)
-    : values(vals),
-      cur(),
-      next(values.begin())
+    : values(vals), cur(), next(values.begin())
   {
     PRECONDITION(!values.empty());
   }
 
-  const exprt &current() const override { return cur; }
-  bool advance_to_next() override {
-    if (next == values.end())
+  const exprt &current() const override
+  {
+    return cur;
+  }
+  bool advance_to_next() override
+  {
+    if(next == values.end())
       return false;
 
     cur = (*next)->to_constant();
@@ -44,8 +47,8 @@ private:
 };
 
 index_range_ptrt make_value_set_index_range(
-  const value_set_abstract_objectt::abstract_object_sett &vals
-) {
+  const value_set_abstract_objectt::abstract_object_sett &vals)
+{
   return std::make_shared<value_set_index_ranget>(vals);
 }
 
@@ -70,7 +73,8 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)
-  : abstract_value_objectt(type, top, bottom), my_type(type_to_abstract_type(type))
+  : abstract_value_objectt(type, top, bottom),
+    my_type(type_to_abstract_type(type))
 {
   switch(my_type)
   {
@@ -111,7 +115,8 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   verify();
 }
 
-index_range_ptrt value_set_abstract_objectt::index_range(const namespacet &ns) const
+index_range_ptrt
+value_set_abstract_objectt::index_range(const namespacet &ns) const
 {
   if(values.empty())
     return make_indeterminate_index_range();

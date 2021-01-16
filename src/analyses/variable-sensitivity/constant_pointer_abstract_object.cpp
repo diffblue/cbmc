@@ -9,8 +9,8 @@
 #include "constant_pointer_abstract_object.h"
 
 #include <analyses/ai.h>
-#include <util/pointer_expr.h>
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 

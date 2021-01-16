@@ -3,18 +3,23 @@
 
 #include <analyses/variable-sensitivity/abstract_object.h>
 
-class abstract_value_tag { };
+class abstract_value_tag
+{
+};
 
-class index_ranget {
+class index_ranget
+{
 public:
   virtual ~index_ranget() = default;
   virtual const exprt &current() const = 0;
   virtual bool advance_to_next() = 0;
 };
 
-class single_value_index_ranget : public index_ranget {
+class single_value_index_ranget : public index_ranget
+{
 protected:
   explicit single_value_index_ranget(const exprt &val);
+
 public:
   const exprt &current() const override;
   bool advance_to_next() override;
@@ -29,14 +34,11 @@ typedef std::shared_ptr<index_ranget> index_range_ptrt;
 index_range_ptrt make_empty_index_range();
 index_range_ptrt make_indeterminate_index_range();
 
-
-class abstract_value_objectt :
-  public abstract_objectt,
-  public abstract_value_tag
+class abstract_value_objectt : public abstract_objectt,
+                               public abstract_value_tag
 {
 public:
-  explicit abstract_value_objectt(const typet &type)
-    : abstract_objectt(type)
+  explicit abstract_value_objectt(const typet &type) : abstract_objectt(type)
   {
   }
 

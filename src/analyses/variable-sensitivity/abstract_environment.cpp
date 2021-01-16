@@ -7,14 +7,16 @@
 \*******************************************************************/
 
 #include <analyses/ai.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
+#include <analyses/variable-sensitivity/abstract_object_statistics.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-#include <util/pointer_expr.h>
 #include <langapi/language_util.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 
 #include <algorithm>
@@ -22,8 +24,6 @@
 #include <map>
 #include <ostream>
 #include <stack>
-#include "abstract_environment.h"
-#include "abstract_object_statistics.h"
 
 #ifdef DEBUG
 #  include <iostream>
@@ -79,17 +79,17 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   }
 }
 
-abstract_object_pointert
-abstract_environmentt::resolve_symbol(const exprt &expr, const namespacet &ns) const
+abstract_object_pointert abstract_environmentt::resolve_symbol(
+  const exprt &expr,
+  const namespacet &ns) const
 {
   const symbol_exprt &symbol(to_symbol_expr(expr));
   const auto symbol_entry = map.find(symbol.get_identifier());
 
-  if (symbol_entry.has_value())
-     return symbol_entry.value();
+  if(symbol_entry.has_value())
+    return symbol_entry.value();
   return abstract_object_factory(expr.type(), ns, true, false);
 }
-
 
 bool abstract_environmentt::assign(
   const exprt &expr,
@@ -194,9 +194,9 @@ abstract_object_pointert abstract_environmentt::write(
 
   const irep_idt &stack_head_id = next_expr.id();
   INVARIANT(
-    stack_head_id == ID_index || stack_head_id == ID_member || stack_head_id == ID_dereference,
-    "Write stack expressions must be index, member, or dereference"
-  );
+    stack_head_id == ID_index || stack_head_id == ID_member ||
+      stack_head_id == ID_dereference,
+    "Write stack expressions must be index, member, or dereference");
 
   return lhs->write(*this, ns, remaining_stack, next_expr, rhs, merge_write);
 }

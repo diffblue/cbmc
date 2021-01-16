@@ -17,30 +17,34 @@
 #include "context_abstract_object.h"
 #include "interval_abstract_value.h"
 
-class interval_index_ranget : public index_ranget {
+class interval_index_ranget : public index_ranget
+{
 public:
   interval_index_ranget(
     const constant_interval_exprt &interval,
-    const namespacet &n
-  ) :
-      index(nil_exprt()),
+    const namespacet &n)
+    : index(nil_exprt()),
       next(interval.get_lower()),
       upper(interval.get_upper()),
       ns(n)
   {
   }
 
-  const exprt &current() const override { return index; }
-  bool advance_to_next() override {
+  const exprt &current() const override
+  {
+    return index;
+  }
+  bool advance_to_next() override
+  {
     index = next;
     next = next_element(next, ns);
-    return simplify_expr(
-             binary_predicate_exprt(index, ID_le, upper), ns)
-          .is_true();
+    return simplify_expr(binary_predicate_exprt(index, ID_le, upper), ns)
+      .is_true();
   }
 
 private:
-  static exprt next_element(const exprt &cur, const namespacet& ns) {
+  static exprt next_element(const exprt &cur, const namespacet &ns)
+  {
     return simplify_expr(plus_exprt(cur, from_integer(1, cur.type())), ns);
   }
 
@@ -571,17 +575,21 @@ interval_abstract_valuet::interval_abstract_valuet(
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt e,
   int merge_count)
-  : abstract_value_objectt(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
+  : abstract_value_objectt(
+      e.type(),
+      e.is_top() || merge_count > 10,
+      e.is_bottom()),
     interval(e),
     merge_count(merge_count)
 {
 }
 
-index_range_ptrt interval_abstract_valuet::index_range(const namespacet &ns) const
+index_range_ptrt
+interval_abstract_valuet::index_range(const namespacet &ns) const
 {
-  if (is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
+  if(is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
     return make_empty_index_range();
-  if (interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
+  if(interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
     return make_empty_index_range();
 
   return make_interval_index_range(interval, ns);
