@@ -235,7 +235,9 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
   {
     // Here we are assuming it is always in bounds
     auto const value = map.find(index_value);
-    return value.has_value() ? value.value() : get_top_entry(env, ns);
+    if (value.has_value())
+      return value.value();
+    return get_top_entry(env, ns);
   }
   else
   {
@@ -296,19 +298,18 @@ abstract_object_pointert full_array_abstract_objectt::write_sub_element(
     // assume is in bounds...
     auto const old_value = map.find(index_value);
 
-    if(!old_value.has_value())
+    if(old_value.has_value())
+    {
+      result->map.replace(
+        index_value,
+        environment.write(old_value.value(), value, stack, ns, merging_write));
+    }
+    else
     {
       result->map.insert(
         index_value,
         environment.write(
           get_top_entry(environment, ns), value, stack, ns, merging_write));
-    }
-    else
-    {
-      result->map.replace(
-        index_value,
-        environment.write(
-          old_value.value(), value, stack, ns, merging_write));
     }
 
     result->set_not_top();
@@ -359,17 +360,12 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
 
       INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
 
-      auto const old_value = result->map.find(index_value);
-
-      if(!old_value.has_value()) // Array element is top
+      auto old_value = result->map.find(index_value);
+      if(old_value.has_value()) // if not found it's top, so nothing to merge
       {
-        DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-        return result;
+        result->map.replace(
+          index_value, abstract_objectt::merge(old_value.value(), value));
       }
-
-      result->map.replace(
-        index_value,
-        abstract_objectt::merge(old_value.value(), value));
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
@@ -377,14 +373,12 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
     else
     {
       auto old_value = result->map.find(index_value);
+
       if(old_value.has_value())
-      {
         result->map.replace(index_value, value);
-      }
       else
-      {
         result->map.insert(index_value, value);
-      }
+
       result->set_not_top();
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
