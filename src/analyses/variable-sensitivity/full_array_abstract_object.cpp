@@ -158,11 +158,8 @@ void full_array_abstract_objectt::output(
   }
   else
   {
-    shared_array_mapt::sorted_viewt view;
-    map.get_view(view);
-
     out << "{";
-    for(const auto &entry : view)
+    for(const auto &entry : map.get_sorted_view())
     {
       out << "[" << entry.first << "] = ";
       entry.second->output(out, ai, ns);
@@ -267,10 +264,8 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
       abstract_object_pointert result = get_top_entry(env, ns);
 
       // Merge each known element into the TOP value
-      shared_array_mapt::viewt known_elements;
-      map.get_view(known_elements);
       bool dummy;
-      for(const auto &element : known_elements)
+      for(const auto &element : map.get_view())
       {
         result = abstract_objectt::merge(result, element.second, dummy);
       }
@@ -328,10 +323,7 @@ abstract_object_pointert full_array_abstract_objectt::write_element(
     else
     {
       // We were not able to evaluate the index to a value
-      shared_array_mapt::viewt view;
-      map.get_view(view);
-
-      for(const auto &starting_value : view)
+      for(const auto &starting_value : map.get_view())
       {
         // Merging write since we don't know which index we are writing to
         result->map.replace(
@@ -420,11 +412,7 @@ abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
     std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
   bool modified = false;
-
-  shared_array_mapt::viewt view;
-  result->map.get_view(view);
-
-  for(auto &item : view)
+  for(auto &item : result->map.get_view())
   {
     auto newval = visitor.visit(item.second);
     if(newval != item.second)
@@ -450,9 +438,7 @@ void full_array_abstract_objectt::statistics(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  shared_array_mapt::viewt view;
-  map.get_view(view);
-  for(const auto &object : view)
+  for(const auto &object : map.get_view())
   {
     if(visited.find(object.second) == visited.end())
     {

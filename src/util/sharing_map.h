@@ -455,6 +455,12 @@ public:
     get_view(result);
     return result;
   }
+  sorted_viewt get_sorted_view() const
+  {
+    sorted_viewt result;
+    get_view(result);
+    return result;
+  }
 
   /// Get a delta view of the elements in the map
   ///
