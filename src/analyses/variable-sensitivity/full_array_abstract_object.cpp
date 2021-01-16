@@ -20,6 +20,36 @@ bool eval_index(
   const namespacet &ns,
   mp_integer &out_index);
 
+template <typename index_fn>
+abstract_object_pointert apply_to_index_range(
+  const abstract_environmentt &environment,
+  const exprt &expr,
+  const namespacet &ns,
+  index_fn &fn)
+{
+  const index_exprt &index_expr = to_index_expr(expr);
+  auto evaluated_index = environment.eval(index_expr.index(), ns);
+  auto index_range =
+    (std::dynamic_pointer_cast<const abstract_value_objectt>(
+      evaluated_index->unwrap_context()))->index_range(ns);
+
+  if (!index_range->advance_to_next())
+    return nullptr;
+
+  sharing_ptrt<abstract_objectt> result = nullptr;
+  do
+  {
+    auto at_index = fn(index_exprt(index_expr.array(), index_range->current()));
+
+    bool dontcare;
+    result = (result == nullptr)
+             ? at_index
+             : abstract_objectt::merge(result, at_index, dontcare);
+  }
+  while(!result->is_top() && index_range->advance_to_next());
+  return result;
+}
+
 full_array_abstract_objectt::full_array_abstract_objectt(typet type)
   : abstract_aggregate_baset(type)
 {
@@ -147,30 +177,25 @@ abstract_object_pointert full_array_abstract_objectt::read_component(
   const exprt &expr,
   const namespacet &ns) const
 {
-  const index_exprt &index_expr = to_index_expr(expr);
-  auto evaluated_index = environment.eval(index_expr.index(), ns);
-  auto index_range =
-    (std::dynamic_pointer_cast<const abstract_value_objectt>(
-      evaluated_index->unwrap_context()))->index_range(ns);
+  auto read_element_fn =
+    [this, &environment, &ns]
+    (const index_exprt &index_expr) {
+      return this->read_element(
+        environment,
+        index_expr,
+        ns);
+    };
 
-  if (!index_range->advance_to_next())
-    return environment.abstract_object_factory(type().subtype(), ns);
+  auto result = apply_to_index_range(
+    environment,
+    expr,
+    ns,
+    read_element_fn);
 
-  abstract_object_pointert value;
-  do
-  {
-    auto value_at_index = read_element(
-      environment, index_exprt(index_expr.array(), index_range->current()), ns);
-
-    bool dont_care;
-    value = (value == nullptr)
-            ? value_at_index
-            : abstract_objectt::merge(value, value_at_index, dont_care);
-  }
-  while(!value->is_top() && index_range->advance_to_next());
-  return value;
+  return (result != nullptr)
+    ? result
+    : environment.abstract_object_factory(type().subtype(), ns);
 }
-
 
 abstract_object_pointert full_array_abstract_objectt::write_component(
   abstract_environmentt &environment,
@@ -180,33 +205,27 @@ abstract_object_pointert full_array_abstract_objectt::write_component(
   const abstract_object_pointert &value,
   bool merging_write) const
 {
-  const index_exprt &index_expr = to_index_expr(expr);
-  auto evaluated_index = environment.eval(index_expr.index(), ns);
-  auto index_range =
-    (std::dynamic_pointer_cast<const abstract_value_objectt>(
-      evaluated_index->unwrap_context()))->index_range(ns);
-
-  if (!index_range->advance_to_next())
-    return make_top();
-
-  sharing_ptrt<abstract_objectt> result = nullptr;
-  do
-  {
-    auto array_after_write_at_index =
-      write_element(
+  auto write_element_fn =
+    [this, &environment, &ns, &stack, &value, &merging_write]
+    (const index_exprt &index_expr) {
+      return this->write_element(
         environment,
         ns,
         stack,
-        index_exprt(index_expr.array(), index_range->current()),
+        index_expr,
         value,
         merging_write);
-    bool dontcare;
-    result = (result == nullptr)
-             ? array_after_write_at_index
-             : abstract_objectt::merge(result, array_after_write_at_index, dontcare);
-  }
-  while(!result->is_top() && index_range->advance_to_next());
-  return result;
+    };
+
+  auto result = apply_to_index_range(
+    environment,
+    expr,
+    ns,
+    write_element_fn);
+
+  return (result != nullptr)
+    ? result
+    : make_top();
 }
 
 abstract_object_pointert full_array_abstract_objectt::read_element(
