@@ -16,10 +16,10 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/constant_array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/data_dependency_context.h>
+#include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>

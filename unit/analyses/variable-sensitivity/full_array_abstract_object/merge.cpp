@@ -18,13 +18,13 @@
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/constant_array_abstract_object.h>
+#include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 
-typedef constant_array_abstract_objectt::constant_array_pointert
-  constant_array_abstract_object_pointert;
+typedef full_array_abstract_objectt::full_array_pointert
+  full_array_abstract_object_pointert;
 
 // Util
 
@@ -36,29 +36,29 @@ public:
   {
   }
 
-  constant_array_abstract_objectt::constant_array_pointert
+  full_array_abstract_objectt::full_array_pointert
   build_array(const exprt &array_expr)
   {
-    return std::make_shared<constant_array_abstract_objectt>(
+    return std::make_shared<full_array_abstract_objectt>(
       array_expr, enviroment, ns);
   }
 
-  constant_array_abstract_objectt::constant_array_pointert
+  full_array_abstract_objectt::full_array_pointert
   build_top_array(const typet &array_type)
   {
-    return std::make_shared<constant_array_abstract_objectt>(
+    return std::make_shared<full_array_abstract_objectt>(
       array_type, true, false);
   }
 
-  constant_array_abstract_objectt::constant_array_pointert
+  full_array_abstract_objectt::full_array_pointert
   build_bottom_array(const typet &array_type)
   {
-    return std::make_shared<constant_array_abstract_objectt>(
+    return std::make_shared<full_array_abstract_objectt>(
       array_type, false, true);
   }
 
   exprt read_index(
-    constant_array_abstract_object_pointert array_object,
+    full_array_abstract_object_pointert array_object,
     const index_exprt &index) const
   {
     return array_object->expression_transform(index, {}, enviroment, ns)
@@ -122,7 +122,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("The original constant array AO should be returned")
       {
@@ -149,7 +149,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
 
       THEN(
@@ -181,7 +181,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("A new constant array AO set to top should be returned")
       {
@@ -210,7 +210,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("The original const AO should be returned")
       {
@@ -239,7 +239,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("The original constant array AO should be returned")
       {
@@ -268,7 +268,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("The original constant array AO should be returned")
       {
@@ -297,7 +297,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("The original constant array AO should be returned")
       {
@@ -326,7 +326,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("A new AO should be returned with op2s valuee")
       {
@@ -355,7 +355,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("A new constant array AO should be returned set to top ")
       {
@@ -384,7 +384,7 @@ SCENARIO(
       result = abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("The original bottom AO should be returned")
       {
@@ -413,7 +413,7 @@ SCENARIO(
         abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
 
       THEN("We should get a new AO of the same type but set to top")
@@ -443,7 +443,7 @@ SCENARIO(
         abstract_objectt::merge(op1, op2, modified);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
           result);
       THEN("We should get the same constant array AO back")
       {
@@ -486,7 +486,7 @@ SCENARIO(
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
             result);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
@@ -515,7 +515,7 @@ SCENARIO(
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
             result);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
@@ -543,7 +543,7 @@ SCENARIO(
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
             result);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
@@ -570,7 +570,7 @@ SCENARIO(
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
             result);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);

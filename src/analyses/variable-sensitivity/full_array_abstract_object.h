@@ -9,8 +9,8 @@
 /// \file
 /// An abstraction of an array value
 
-#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
-#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H
 
 #include <iosfwd>
 #include <vector>
@@ -20,16 +20,16 @@
 
 class ai_baset;
 
-class constant_array_abstract_objectt :
-public abstract_aggregate_objectt<constant_array_abstract_objectt, array_aggregate_typet>
+class full_array_abstract_objectt :
+  public abstract_aggregate_objectt<full_array_abstract_objectt, array_aggregate_typet>
 {
 public:
-  typedef sharing_ptrt<constant_array_abstract_objectt> const
-    constant_array_pointert;
-  typedef abstract_aggregate_objectt<constant_array_abstract_objectt, array_aggregate_typet> abstract_aggregate_baset;
+  typedef sharing_ptrt<full_array_abstract_objectt> const full_array_pointert;
+  typedef abstract_aggregate_objectt<
+    full_array_abstract_objectt, array_aggregate_typet> abstract_aggregate_baset;
 
   /// \param type: the type the abstract_object is representing
-  explicit constant_array_abstract_objectt(typet type);
+  explicit full_array_abstract_objectt(typet type);
 
   /// Start the abstract object at either top or bottom or neither
   /// Asserts if both top and bottom are true
@@ -37,14 +37,14 @@ public:
   /// \param type: the type the abstract_object is representing
   /// \param top: is the abstract_object starting as top
   /// \param bottom: is the abstract_object starting as bottom
-  constant_array_abstract_objectt(typet type, bool top, bool bottom);
+  full_array_abstract_objectt(typet type, bool top, bool bottom);
 
   /// \param expr: the expression to use as the starting pointer for
   ///              an abstract object
   /// \param environment: the environment the abstract object is
   ///                     being created in
   /// \param ns: the namespace
-  constant_array_abstract_objectt(
+  full_array_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
@@ -205,7 +205,7 @@ private:
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this..
   abstract_object_pointert
-  constant_array_merge(const constant_array_pointert other) const;
+  full_array_merge(const full_array_pointert other) const;
 };
 
-#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H

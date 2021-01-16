@@ -25,8 +25,8 @@
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 
-typedef constant_array_abstract_objectt::constant_array_pointert
-  constant_array_abstract_object_pointert;
+typedef full_array_abstract_objectt::full_array_pointert
+  full_array_abstract_object_pointert;
 
 // Util
 

@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 #include "variable_sensitivity_object_factory.h"
-#include "interval_array_abstract_object.h"
+#include "full_array_abstract_object.h"
 #include "value_set_abstract_value.h"
 
 template <class abstract_object_classt, class context_classt>
@@ -161,11 +161,8 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     return initialize_abstract_object<two_value_array_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case ARRAY_SENSITIVE:
-    return configuration.value_abstract_type == INTERVAL
-             ? initialize_abstract_object<interval_array_abstract_objectt>(
-                 followed_type, top, bottom, e, environment, ns, configuration)
-             : initialize_abstract_object<constant_array_abstract_objectt>(
-                 followed_type, top, bottom, e, environment, ns, configuration);
+    return initialize_abstract_object<full_array_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
 
   case POINTER_INSENSITIVE:
     return initialize_abstract_object<pointer_abstract_objectt>(

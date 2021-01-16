@@ -12,15 +12,15 @@
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
-#include "constant_array_abstract_object.h"
+#include "full_array_abstract_object.h"
 
-constant_array_abstract_objectt::constant_array_abstract_objectt(typet type)
+full_array_abstract_objectt::full_array_abstract_objectt(typet type)
   : abstract_aggregate_baset(type)
 {
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-constant_array_abstract_objectt::constant_array_abstract_objectt(
+full_array_abstract_objectt::full_array_abstract_objectt(
   typet type,
   bool top,
   bool bottom)
@@ -29,7 +29,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-constant_array_abstract_objectt::constant_array_abstract_objectt(
+full_array_abstract_objectt::full_array_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns)
@@ -48,7 +48,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
-bool constant_array_abstract_objectt::verify() const
+bool full_array_abstract_objectt::verify() const
 {
   // Either the object is top or bottom (=> map empty)
   // or the map is not empty => neither top nor bottom
@@ -56,7 +56,7 @@ bool constant_array_abstract_objectt::verify() const
          (is_top() || is_bottom()) == map.empty();
 }
 
-void constant_array_abstract_objectt::set_top_internal()
+void full_array_abstract_objectt::set_top_internal()
 {
   // A structural invariant of constant_array_abstract_objectt is that
   // (is_top() || is_bottom()) => map.empty()
@@ -64,13 +64,13 @@ void constant_array_abstract_objectt::set_top_internal()
 }
 
 abstract_object_pointert
-constant_array_abstract_objectt::merge(abstract_object_pointert other) const
+full_array_abstract_objectt::merge(abstract_object_pointert other) const
 {
   auto cast_other =
-    std::dynamic_pointer_cast<const constant_array_abstract_objectt>(other);
+    std::dynamic_pointer_cast<const full_array_abstract_objectt>(other);
   if(cast_other)
   {
-    return constant_array_merge(cast_other);
+    return full_array_merge(cast_other);
   }
   else
   {
@@ -79,17 +79,17 @@ constant_array_abstract_objectt::merge(abstract_object_pointert other) const
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
-  const constant_array_pointert other) const
+abstract_object_pointert full_array_abstract_objectt::full_array_merge(
+  const full_array_pointert other) const
 {
   if(is_bottom())
   {
-    return std::make_shared<constant_array_abstract_objectt>(*other);
+    return std::make_shared<full_array_abstract_objectt>(*other);
   }
   else
   {
     const auto &result =
-      std::dynamic_pointer_cast<constant_array_abstract_objectt>(
+      std::dynamic_pointer_cast<full_array_abstract_objectt>(
         mutable_clone());
 
     bool modified =
@@ -111,7 +111,7 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   }
 }
 
-void constant_array_abstract_objectt::output(
+void full_array_abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
   const namespacet &ns) const
@@ -136,7 +136,7 @@ void constant_array_abstract_objectt::output(
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::read_component(
+abstract_object_pointert full_array_abstract_objectt::read_component(
   const abstract_environmentt &environment,
   const exprt &expr,
   const namespacet &ns) const
@@ -166,7 +166,7 @@ abstract_object_pointert constant_array_abstract_objectt::read_component(
 }
 
 
-abstract_object_pointert constant_array_abstract_objectt::write_component(
+abstract_object_pointert full_array_abstract_objectt::write_component(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -203,7 +203,7 @@ abstract_object_pointert constant_array_abstract_objectt::write_component(
   return result;
 }
 
-abstract_object_pointert constant_array_abstract_objectt::read_element(
+abstract_object_pointert full_array_abstract_objectt::read_element(
   const abstract_environmentt &env,
   const exprt &expr,
   const namespacet &ns) const
@@ -256,7 +256,7 @@ abstract_object_pointert constant_array_abstract_objectt::read_element(
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::write_element(
+abstract_object_pointert full_array_abstract_objectt::write_element(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -271,7 +271,7 @@ abstract_object_pointert constant_array_abstract_objectt::write_element(
   }
 
   const auto &result =
-    std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
+    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
   if(!stack.empty())
   {
@@ -382,14 +382,14 @@ abstract_object_pointert constant_array_abstract_objectt::write_element(
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::get_top_entry(
+abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
 
-bool constant_array_abstract_objectt::eval_index(
+bool full_array_abstract_objectt::eval_index(
   const exprt &expr,
   const abstract_environmentt &env,
   const namespacet &ns,
@@ -410,11 +410,11 @@ bool constant_array_abstract_objectt::eval_index(
   }
 }
 
-abstract_object_pointert constant_array_abstract_objectt::visit_sub_elements(
+abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
   const auto &result =
-    std::dynamic_pointer_cast<constant_array_abstract_objectt>(mutable_clone());
+    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
   bool modified = false;
 
@@ -441,7 +441,7 @@ abstract_object_pointert constant_array_abstract_objectt::visit_sub_elements(
   }
 }
 
-void constant_array_abstract_objectt::statistics(
+void full_array_abstract_objectt::statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,
   const abstract_environmentt &env,
