@@ -248,7 +248,7 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
       // Here we are assuming it is always in bounds
       if(!value.has_value())
       {
-        return env.abstract_object_factory(type().subtype(), ns, true, false);
+        return get_top_entry(env, ns);
       }
       else
       {
@@ -264,8 +264,7 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
       // that.
 
       // Create a new TOP value of the appropriate element type
-      abstract_object_pointert result =
-        env.abstract_object_factory(type().subtype(), ns, true, false);
+      abstract_object_pointert result = get_top_entry(env, ns);
 
       // Merge each known element into the TOP value
       shared_array_mapt::viewt known_elements;
