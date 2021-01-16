@@ -266,8 +266,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
     const auto &result =
       std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
-    bool modified = abstract_objectt::merge_shared_maps<irep_idt>(
-      map, other->map, result->map);
+    bool modified = merge_shared_maps(map, other->map, result->map);
 
     if(!modified)
     {

@@ -128,10 +128,7 @@ abstract_object_pointert full_array_abstract_objectt::full_array_merge(
       std::dynamic_pointer_cast<full_array_abstract_objectt>(
         mutable_clone());
 
-    bool modified =
-      abstract_objectt::merge_shared_maps<mp_integer, mp_integer_hasht>(
-        map, other->map, result->map);
-
+    bool modified = merge_shared_maps(map, other->map, result->map);
     if(!modified)
     {
       DATA_INVARIANT(verify(), "Structural invariants maintained");
@@ -288,10 +285,12 @@ abstract_object_pointert full_array_abstract_objectt::write_element(
   const auto &result =
     std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
+  mp_integer index_value;
+  bool good_index = eval_index(expr, environment, ns, index_value);
+
   if(!stack.empty())
   {
-    mp_integer index_value;
-    if(eval_index(expr, environment, ns, index_value))
+    if(good_index)
     {
       // We were able to evaluate the index to a value, which we
       // assume is in bounds...
@@ -335,9 +334,7 @@ abstract_object_pointert full_array_abstract_objectt::write_element(
   }
   else
   {
-    mp_integer index_value;
-
-    if(eval_index(expr, environment, ns, index_value))
+    if(good_index)
     {
       // We were able to evaluate the index expression to a constant
       if(merging_write)
