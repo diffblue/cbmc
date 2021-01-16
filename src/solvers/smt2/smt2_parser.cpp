@@ -871,6 +871,12 @@ void smt2_parsert::setup_expressions()
     return binary_predicate(ID_gt, cast_bv_to_signed(operands()));
   };
 
+  expressions["bvcomp"] = [this] {
+    auto b0 = from_integer(0, unsignedbv_typet(1));
+    auto b1 = from_integer(1, unsignedbv_typet(1));
+    return if_exprt(binary_predicate(ID_equal, operands()), b1, b0);
+  };
+
   expressions["bvashr"] = [this] {
     return cast_bv_to_unsigned(binary(ID_ashr, cast_bv_to_signed(operands())));
   };
