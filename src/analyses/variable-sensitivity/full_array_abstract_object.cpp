@@ -174,6 +174,9 @@ abstract_object_pointert full_array_abstract_objectt::read_component(
   const exprt &expr,
   const namespacet &ns) const
 {
+  if(is_top())
+    return environment.abstract_object_factory(expr.type(), ns, true);
+
   auto read_element_fn =
     [this, &environment, &ns]
     (const index_exprt &index_expr) {
@@ -230,48 +233,41 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
   const exprt &expr,
   const namespacet &ns) const
 {
-  if(is_top())
+  PRECONDITION(!is_bottom());
+  mp_integer index_value;
+  if(eval_index(expr, env, ns, index_value))
   {
-    return env.abstract_object_factory(expr.type(), ns, true);
-  }
-  else
-  {
-    PRECONDITION(!is_bottom());
-    mp_integer index_value;
-    if(eval_index(expr, env, ns, index_value))
-    {
-      auto const value = map.find(index_value);
+    auto const value = map.find(index_value);
 
-      // Here we are assuming it is always in bounds
-      if(!value.has_value())
-      {
-        return get_top_entry(env, ns);
-      }
-      else
-      {
-        return value.value();
-      }
+    // Here we are assuming it is always in bounds
+    if(!value.has_value())
+    {
+      return get_top_entry(env, ns);
     }
     else
     {
-      // Although we don't know where we are reading from, and therefore
-      // we should be returning a TOP value, we may still have useful
-      // additional information in elements of the array - such as write
-      // histories so we merge all the known array elements with TOP and return
-      // that.
-
-      // Create a new TOP value of the appropriate element type
-      abstract_object_pointert result = get_top_entry(env, ns);
-
-      // Merge each known element into the TOP value
-      bool dummy;
-      for(const auto &element : map.get_view())
-      {
-        result = abstract_objectt::merge(result, element.second, dummy);
-      }
-
-      return result;
+      return value.value();
     }
+  }
+  else
+  {
+    // Although we don't know where we are reading from, and therefore
+    // we should be returning a TOP value, we may still have useful
+    // additional information in elements of the array - such as write
+    // histories so we merge all the known array elements with TOP and return
+    // that.
+
+    // Create a new TOP value of the appropriate element type
+    abstract_object_pointert result = get_top_entry(env, ns);
+
+    // Merge each known element into the TOP value
+    bool dummy;
+    for(const auto &element : map.get_view())
+    {
+      result = abstract_objectt::merge(result, element.second, dummy);
+    }
+
+    return result;
   }
 }
 
