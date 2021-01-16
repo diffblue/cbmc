@@ -27,24 +27,6 @@ public:
 
 protected:
   CLONE
-  abstract_object_pointert read_component(
-    const abstract_environmentt &env,
-    const exprt &expr,
-    const namespacet &ns) const override;
-
-  abstract_object_pointert write_component(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> &stack,
-    const exprt &expr,
-    const abstract_object_pointert &value,
-    bool merging_write) const override;
-
-  void statistics(
-    abstract_object_statisticst &statistics,
-    abstract_object_visitedt &visited,
-    const abstract_environmentt &env,
-    const namespacet &ns) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ARRAY_ABSTRACT_OBJECT_H

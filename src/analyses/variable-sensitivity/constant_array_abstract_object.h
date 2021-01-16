@@ -138,6 +138,19 @@ protected:
   void set_top_internal() override;
 
 private:
+  abstract_object_pointert read_element(
+    const abstract_environmentt &env,
+    const exprt &expr,
+    const namespacet &ns) const;
+
+  abstract_object_pointert write_element(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> &stack,
+    const exprt &expr,
+    const abstract_object_pointert &value,
+    bool merging_write) const;
+
   /// Evaluates the index and tries to convert it to a constant integer
   ///
   /// \param index: the index expression showing where to access the array
