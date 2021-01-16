@@ -675,7 +675,9 @@ exprt smt2_parsert::function_application()
           }
           else if(id == ID_repeat)
           {
-            return nil_exprt();
+            auto i = from_integer(index, integer_typet());
+            auto width = to_unsignedbv_type(op[0].type()).get_width() * index;
+            return replication_exprt(i, op[0], unsignedbv_typet(width));
           }
           else
             return nil_exprt();
