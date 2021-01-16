@@ -200,6 +200,14 @@ abstract_object_pointert abstract_objectt::merge(
   return result;
 }
 
+abstract_object_pointert abstract_objectt::merge(
+  abstract_object_pointert op1,
+  abstract_object_pointert op2)
+{
+  bool dummy;
+  return merge(op1, op2, dummy);
+}
+
 bool abstract_objectt::should_use_base_merge(
   const abstract_object_pointert other) const
 {

@@ -41,10 +41,9 @@ abstract_object_pointert apply_to_index_range(
   {
     auto at_index = fn(index_exprt(index_expr.array(), index_range->current()));
 
-    bool dontcare;
     result = (result == nullptr)
              ? at_index
-             : abstract_objectt::merge(result, at_index, dontcare);
+             : abstract_objectt::merge(result, at_index);
   }
   while(!result->is_top() && index_range->advance_to_next());
   return result;
@@ -234,17 +233,9 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
   mp_integer index_value;
   if(eval_index(expr, env, ns, index_value))
   {
-    auto const value = map.find(index_value);
-
     // Here we are assuming it is always in bounds
-    if(!value.has_value())
-    {
-      return get_top_entry(env, ns);
-    }
-    else
-    {
-      return value.value();
-    }
+    auto const value = map.find(index_value);
+    return value.has_value() ? value.value() : get_top_entry(env, ns);
   }
   else
   {
@@ -258,10 +249,9 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
     abstract_object_pointert result = get_top_entry(env, ns);
 
     // Merge each known element into the TOP value
-    bool dummy;
     for(const auto &element : map.get_view())
     {
-      result = abstract_objectt::merge(result, element.second, dummy);
+      result = abstract_objectt::merge(result, element.second);
     }
 
     return result;
@@ -355,11 +345,9 @@ abstract_object_pointert full_array_abstract_objectt::write_element(
           return result;
         }
 
-        bool dummy;
-
         result->map.replace(
           index_value,
-          abstract_objectt::merge(old_value.value(), value, dummy));
+          abstract_objectt::merge(old_value.value(), value));
 
         DATA_INVARIANT(result->verify(), "Structural invariants maintained");
         return result;

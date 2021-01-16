@@ -175,10 +175,8 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
         return result;
       }
 
-      bool dummy;
-
       result->map.replace(
-        c, abstract_objectt::merge(old_value.value(), value, dummy));
+        c, abstract_objectt::merge(old_value.value(), value));
     }
     else
     {

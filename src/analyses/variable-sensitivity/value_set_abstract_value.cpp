@@ -141,14 +141,12 @@ static void merge_all_possible_results(
     simplify(expr_with_evaluated_operands_filled_in, ns);
     if(expr_with_evaluated_operands_filled_in.is_constant())
     {
-      bool out_modifications;
       auto post_merge = abstract_objectt::merge(
         out_value,
         std::make_shared<value_set_abstract_valuet>(
           expr.type(),
           value_set_abstract_valuet::valuest{
-            expr_with_evaluated_operands_filled_in}),
-        out_modifications);
+            expr_with_evaluated_operands_filled_in}));
       if(
         auto post_merge_casted =
           std::dynamic_pointer_cast<const value_set_abstract_valuet>(
