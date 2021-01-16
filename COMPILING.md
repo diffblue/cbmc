@@ -21,17 +21,17 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    The GNU Make needs to be version 3.81 or higher.
    On Debian-like distributions, do as root:
    ```
-   apt-get install g++ gcc flex bison make git libwww-perl patch
+   apt-get install g++ gcc flex bison make git curl patch
    ```
    On Red Hat/Fedora or derivates, do as root:
    ```
-   dnf install gcc gcc-c++ flex bison perl-libwww-perl patch
+   dnf install gcc gcc-c++ flex bison curl patch
    ```
    Note that you need g++ version 5.0 or newer.
 
    On Amazon Linux and similar distributions, do as root:
    ```
-   yum install gcc72-c++ flex bison perl-libwww-perl patch tar
+   yum install gcc72-c++ flex bison curl patch tar
    ```
 
    To compile JBMC, you additionally need the JDK and Maven 3. You also
@@ -153,7 +153,7 @@ Follow these instructions:
 
 1. First install Cygwin, then from the Cygwin setup facility install the
    following packages: `flex, bison, tar, gzip, git, make, wget, patch,
-   libwww-perl`.
+   curl`.
 2. Get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
