@@ -5,35 +5,30 @@
 
 class abstract_value_tag { };
 
-struct index_ranget {
+class index_ranget {
+public:
   virtual ~index_ranget() = default;
   virtual const exprt &current() const = 0;
   virtual bool advance_to_next() = 0;
 };
 
-struct empty_index_ranget : index_ranget {
-    const exprt &current() const override { return nil; }
-    bool advance_to_next() override { return false; }
+class single_value_index_ranget : public index_ranget {
+protected:
+  explicit single_value_index_ranget(const exprt &val);
+public:
+  const exprt &current() const override;
+  bool advance_to_next() override;
 
 private:
-    exprt nil = nil_exprt();
-};
-
-struct indeterminate_index_ranget : index_ranget {
-  explicit indeterminate_index_ranget() : nil(nil_exprt()), available(true) {  }
-  const exprt &current() const override { return nil; }
-  bool advance_to_next() override {
-    bool a = available;
-    available = false;
-    return a;
-  }
-
-private:
-  const exprt nil;
+  const exprt value;
   bool available;
 };
 
 typedef std::shared_ptr<index_ranget> index_range_ptrt;
+
+index_range_ptrt make_empty_index_range();
+index_range_ptrt make_indeterminate_index_range();
+
 
 class abstract_value_objectt :
   public abstract_objectt,

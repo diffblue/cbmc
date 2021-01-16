@@ -14,16 +14,13 @@
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
-#include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
-#include <analyses/variable-sensitivity/two_value_union_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
-struct value_set_index_ranget : index_ranget {
+class value_set_index_ranget : public index_ranget {
+public:
   typedef value_set_abstract_objectt::abstract_object_sett abstract_object_sett;
-  explicit value_set_index_ranget(
-    const abstract_object_sett &vals
-  ) :
-      values(vals),
+  explicit value_set_index_ranget(const abstract_object_sett &vals)
+    : values(vals),
       cur(),
       next(values.begin())
   {
@@ -45,6 +42,12 @@ private:
   exprt cur;
   abstract_object_sett::const_iterator next;
 };
+
+index_range_ptrt make_value_set_index_range(
+  const value_set_abstract_objectt::abstract_object_sett &vals
+) {
+  return std::make_shared<value_set_index_ranget>(vals);
+}
 
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type), my_type(type_to_abstract_type(type))
@@ -110,10 +113,10 @@ value_set_abstract_objectt::value_set_abstract_objectt(
 
 index_range_ptrt value_set_abstract_objectt::index_range(const namespacet &ns) const
 {
-  if(!values.empty())
-    return std::make_shared<value_set_index_ranget>(values);
+  if(values.empty())
+    return make_indeterminate_index_range();
 
-  return std::make_shared<indeterminate_index_ranget>();
+  return make_value_set_index_range(values);
 }
 
 abstract_object_pointert value_set_abstract_objectt::expression_transform(

@@ -17,20 +17,6 @@
 #include <analyses/variable-sensitivity/abstract_value_object.h>
 #include <util/std_expr.h>
 
-struct constant_index_ranget : index_ranget {
-  explicit constant_index_ranget(constant_exprt val) : value(val), available(true) {  }
-  const exprt &current() const override { return value; }
-  bool advance_to_next() override {
-    bool a = available;
-    available = false;
-    return a;
-  }
-
-private:
-  exprt value;
-  bool available;
-};
-
 class constant_abstract_valuet : public abstract_value_objectt
 {
 private:

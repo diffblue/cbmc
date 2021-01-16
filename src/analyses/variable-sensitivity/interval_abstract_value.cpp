@@ -17,14 +17,15 @@
 #include "context_abstract_object.h"
 #include "interval_abstract_value.h"
 
-struct interval_index_ranget : index_ranget {
+class interval_index_ranget : public index_ranget {
+public:
   interval_index_ranget(
-    const constant_interval_exprt &val,
+    const constant_interval_exprt &interval,
     const namespacet &n
   ) :
       index(nil_exprt()),
-      next(val.get_lower()),
-      upper(val.get_upper()),
+      next(interval.get_lower()),
+      upper(interval.get_upper()),
       ns(n)
   {
   }
@@ -48,6 +49,13 @@ private:
   exprt upper;
   const namespacet &ns;
 };
+
+index_range_ptrt make_interval_index_range(
+  const constant_interval_exprt &interval,
+  const namespacet &n)
+{
+  return std::make_shared<interval_index_ranget>(interval, n);
+}
 
 static inline exprt look_through_casts(exprt e)
 {
@@ -572,13 +580,12 @@ interval_abstract_valuet::interval_abstract_valuet(
 index_range_ptrt interval_abstract_valuet::index_range(const namespacet &ns) const
 {
   if (is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
-    return std::make_shared<empty_index_ranget>();
+    return make_empty_index_range();
   if (interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
-    return std::make_shared<empty_index_ranget>();
+    return make_empty_index_range();
 
-  return std::make_shared<interval_index_ranget>(interval, ns);
+  return make_interval_index_range(interval, ns);
 }
-
 
 const constant_interval_exprt &interval_abstract_valuet::get_interval() const
 {
