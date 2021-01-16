@@ -14,6 +14,12 @@
 
 #include "full_array_abstract_object.h"
 
+bool eval_index(
+  const exprt &index,
+  const abstract_environmentt &env,
+  const namespacet &ns,
+  mp_integer &out_index);
+
 full_array_abstract_objectt::full_array_abstract_objectt(typet type)
   : abstract_aggregate_baset(type)
 {
@@ -389,27 +395,6 @@ abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
 
-bool full_array_abstract_objectt::eval_index(
-  const exprt &expr,
-  const abstract_environmentt &env,
-  const namespacet &ns,
-  mp_integer &out_index) const
-{
-  const index_exprt& index = to_index_expr(expr);
-  abstract_object_pointert index_abstract_object = env.eval(index.index(), ns);
-  exprt value = index_abstract_object->to_constant();
-  if(value.is_constant())
-  {
-    constant_exprt constant_index = to_constant_expr(value);
-    bool result = to_integer(constant_index, out_index);
-    return !result;
-  }
-  else
-  {
-    return false;
-  }
-}
-
 abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
@@ -457,4 +442,22 @@ void full_array_abstract_objectt::statistics(
     }
   }
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
+}
+
+bool eval_index(
+  const exprt &expr,
+  const abstract_environmentt &env,
+  const namespacet &ns,
+  mp_integer &out_index)
+{
+  const index_exprt& index = to_index_expr(expr);
+  abstract_object_pointert index_abstract_object = env.eval(index.index(), ns);
+  exprt value = index_abstract_object->to_constant();
+
+  if(!value.is_constant())
+    return false;
+
+  constant_exprt constant_index = to_constant_expr(value);
+  bool result = to_integer(constant_index, out_index);
+  return !result;
 }

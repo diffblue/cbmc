@@ -151,21 +151,6 @@ private:
     const abstract_object_pointert &value,
     bool merging_write) const;
 
-  /// Evaluates the index and tries to convert it to a constant integer
-  ///
-  /// \param index: the index expression showing where to access the array
-  /// \param env: the abstract environment
-  /// \param ns: the namespace
-  /// \param out_index: the index if it can be converted to a constant
-  ///
-  /// \return An abstract object pointer of type type().subtype() (i.e. the
-  ///         type of the array's values).
-  bool eval_index(
-    const exprt &index,
-    const abstract_environmentt &env,
-    const namespacet &ns,
-    mp_integer &out_index) const;
-
   // Since we don't store for any index where the value is top
   // we don't use a regular array but instead a map of array indices
   // to the value at that index
