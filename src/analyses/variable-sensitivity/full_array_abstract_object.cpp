@@ -376,13 +376,10 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
     }
     else
     {
-      auto const old_value = result->map.find(index_value);
+      auto old_value = result->map.find(index_value);
       if(old_value.has_value())
       {
-        if(value != abstract_object_pointert{old_value.value()})
-        {
-          result->map.replace(index_value, value);
-        }
+        result->map.replace(index_value, value);
       }
       else
       {
