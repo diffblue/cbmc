@@ -85,7 +85,7 @@ protected:
   /// If we can't resolve the index to a constant, we return top
   ///
   /// \param env: the environment
-  /// \param index: the expression used to access the specific value
+  /// \param expr: the expression used to access the specific value
   ///               in the array
   /// \param ns: the namespace
   ///
@@ -100,7 +100,7 @@ protected:
   /// \param environment: the abstract environment
   /// \param ns: the namespace
   /// \param stack: the remaining stack of expressions on the LHS to evaluate
-  /// \param index_expr: the expression uses to access a specific index
+  /// \param expr: the expression uses to access a specific index
   /// \param value: the value we are trying to assign to that value in the array
   /// \param merging_write: Should this and all future writes be merged with the
   ///                       current value
