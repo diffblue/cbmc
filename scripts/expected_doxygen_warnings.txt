@@ -1,16 +1,16 @@
-/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_glucose.cpp:232: warning: no matching class member found for 
+/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_glucose.cpp:246: warning: no matching class member found for 
   template
   satcheck_glucose_baset< Glucose::Solver >::~satcheck_glucose_baset()
 
-/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_glucose.cpp:238: warning: no matching class member found for 
+/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_glucose.cpp:252: warning: no matching class member found for 
   template
   satcheck_glucose_baset< Glucose::SimpSolver >::~satcheck_glucose_baset()
 
-/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_minisat2.cpp:312: warning: no matching class member found for 
+/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_minisat2.cpp:313: warning: no matching class member found for 
   template
   satcheck_minisat2_baset< Minisat::Solver >::~satcheck_minisat2_baset()
 
-/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_minisat2.cpp:318: warning: no matching class member found for 
+/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_minisat2.cpp:319: warning: no matching class member found for 
   template
   satcheck_minisat2_baset< Minisat::SimpSolver >::~satcheck_minisat2_baset()
 
@@ -87,16 +87,16 @@ warning: Included by graph for 'arith_tools.h' not generated, too many nodes (18
 warning: Included by graph for 'c_types.h' not generated, too many nodes (111), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'config.h' not generated, too many nodes (85), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'exception_utils.h' not generated, too many nodes (61), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'expr.h' not generated, too many nodes (88), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'expr.h' not generated, too many nodes (87), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'expr_util.h' not generated, too many nodes (61), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'invariant.h' not generated, too many nodes (187), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'irep.h' not generated, too many nodes (62), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'message.h' not generated, too many nodes (116), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'namespace.h' not generated, too many nodes (113), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'namespace.h' not generated, too many nodes (110), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'pointer_expr.h' not generated, too many nodes (101), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'prefix.h' not generated, too many nodes (86), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'simplify_expr.h' not generated, too many nodes (77), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'std_code.h' not generated, too many nodes (78), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'std_expr.h' not generated, too many nodes (248), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'std_types.h' not generated, too many nodes (124), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'std_expr.h' not generated, too many nodes (245), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'std_types.h' not generated, too many nodes (122), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'symbol_table.h' not generated, too many nodes (95), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
