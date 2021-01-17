@@ -54,7 +54,6 @@ SRC = ai.cpp \
       variable-sensitivity/value_set_abstract_object.cpp \
       variable-sensitivity/value_set_abstract_value.cpp \
       variable-sensitivity/value_set_pointer_abstract_object.cpp \
-      variable-sensitivity/value_set_array_abstract_object.cpp \
       variable-sensitivity/three_way_merge_abstract_interpreter.cpp \
       variable-sensitivity/variable_sensitivity_configuration.cpp \
       # Empty last line
