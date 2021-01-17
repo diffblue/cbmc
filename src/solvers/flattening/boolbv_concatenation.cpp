@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+#include <util/bitvector_expr.h>
 #include <util/invariant.h>
 
 bvt boolbvt::convert_concatenation(const concatenation_exprt &expr)

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/magic.h>
 #include <util/mp_arith.h>
 #include <util/prefix.h>

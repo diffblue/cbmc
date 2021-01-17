@@ -14,15 +14,16 @@ Date: April 2010
 #include <limits>
 #include <memory>
 
-#include <util/expr_util.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/pointer_offset_size.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
-#include <util/arith_tools.h>
-#include <util/simplify_expr.h>
+#include <util/expr_util.h>
 #include <util/make_unique.h>
+#include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <langapi/language_util.h>
 

@@ -9,6 +9,7 @@ Author: Michael Tautschnig
 #include "expr_lowering.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>

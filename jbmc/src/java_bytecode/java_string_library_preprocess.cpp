@@ -17,8 +17,10 @@ Date:   April 2017
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
 #include <goto-programs/class_identifier.h>
+
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "interpreter_class.h"
 
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>

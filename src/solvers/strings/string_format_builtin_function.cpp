@@ -16,6 +16,8 @@ Author: Romain Brenguier, Joel Allred
 #include "format_specifier.h"
 #include "string_format_builtin_function.h"
 #include "string_refinement_util.h"
+
+#include <util/bitvector_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>

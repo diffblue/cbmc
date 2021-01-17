@@ -26,10 +26,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv_map.h"
 #include "arrays.h"
 
+class array_comprehension_exprt;
+class bswap_exprt;
+class concatenation_exprt;
 class extractbit_exprt;
 class extractbits_exprt;
-class array_comprehension_exprt;
 class member_exprt;
+class replication_exprt;
 
 class boolbvt:public arrayst
 {

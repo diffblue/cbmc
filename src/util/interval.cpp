@@ -18,6 +18,9 @@
 
 #include <ostream>
 #include <sstream>
+
+#include "bitvector_expr.h"
+
 #include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
