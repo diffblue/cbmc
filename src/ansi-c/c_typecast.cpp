@@ -650,24 +650,8 @@ void c_typecastt::implicit_typecast_arithmetic(
 
   if(max_type==LARGE_SIGNED_INT || max_type==LARGE_UNSIGNED_INT)
   {
-    // get the biggest width of both
-    std::size_t width1 = to_bitvector_type(type1).get_width();
-    std::size_t width2 = to_bitvector_type(type2).get_width();
-
     // produce type
-    typet result_type;
-
-    if(width1==width2)
-    {
-      if(max_type==LARGE_SIGNED_INT)
-        result_type=signedbv_typet(width1);
-      else
-        result_type=unsignedbv_typet(width1);
-    }
-    else if(width1>width2)
-      result_type=type1;
-    else // width1<width2
-      result_type=type2;
+    typet result_type = (max_type == c_type1) ? type1 : type2;
 
     do_typecast(expr1, result_type);
     do_typecast(expr2, result_type);

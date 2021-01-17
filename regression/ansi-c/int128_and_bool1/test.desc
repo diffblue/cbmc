@@ -1,0 +1,7 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$

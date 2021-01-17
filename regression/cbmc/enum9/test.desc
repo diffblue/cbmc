@@ -1,0 +1,9 @@
+CORE gcc-only
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^warning: ignoring
