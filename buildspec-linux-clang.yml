@@ -14,7 +14,7 @@ phases:
       - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
       - add-apt-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main'
       - apt-get update -y
-      - apt-get install -y clang-8 flex bison make git libwww-perl patch ccache libc6-dev-i386 jq gdb
+      - apt-get install -y clang-8 flex bison make git curl patch ccache libc6-dev-i386 jq gdb
   build:
     commands:
       - echo Build started on `date`
