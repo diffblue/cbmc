@@ -13,8 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <set>
 
-#include <util/std_expr.h>
 #include <util/byte_operators.h>
+#include <util/floatbv_expr.h>
+#include <util/std_expr.h>
 
 #if !HASH_CODE
 #  include <util/irep_hash_container.h>

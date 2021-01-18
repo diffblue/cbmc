@@ -31,6 +31,8 @@ class bswap_exprt;
 class concatenation_exprt;
 class extractbit_exprt;
 class extractbits_exprt;
+class floatbv_typecast_exprt;
+class ieee_float_op_exprt;
 class member_exprt;
 class replication_exprt;
 

@@ -14,6 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "string_constraint_generator.h"
 
 #include <util/bitvector_expr.h>
+#include <util/floatbv_expr.h>
 
 #include <solvers/floatbv/float_bv.h>
 

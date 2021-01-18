@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
+#include <util/floatbv_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
