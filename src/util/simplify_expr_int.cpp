@@ -570,7 +570,7 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     // rewrite "a-b" to "a+(-b)"
     unary_minus_exprt rhs_negated(operands[1]);
     plus_exprt plus_expr(operands[0], simplify_unary_minus(rhs_negated));
-    return changed(simplify_node(plus_expr));
+    return changed(simplify_plus(plus_expr));
   }
   else if(
     minus_expr.type().id() == ID_pointer &&
@@ -646,10 +646,9 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
       }
 
       new_expr.type()=bool_typet();
-      new_expr = simplify_node(new_expr);
+      new_expr = simplify_boolean(new_expr);
 
-      new_expr = typecast_exprt(new_expr, expr.type());
-      return changed(simplify_node(new_expr));
+      return changed(simplify_typecast(typecast_exprt(new_expr, expr.type())));
     }
   }
 

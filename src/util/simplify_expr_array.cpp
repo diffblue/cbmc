@@ -183,15 +183,16 @@ simplify_exprt::simplify_index(const index_exprt &expr)
         return unchanged(expr);
 
       // add offset to index
-      mult_exprt offset(
-        from_integer(*sub_size, byte_extract_expr.offset().type()), index);
+      exprt offset = simplify_mult(mult_exprt{
+        from_integer(*sub_size, byte_extract_expr.offset().type()), index});
       exprt final_offset =
-        simplify_node(plus_exprt(byte_extract_expr.offset(), offset));
+        simplify_plus(plus_exprt(byte_extract_expr.offset(), offset));
 
-      exprt result_expr(array.id(), expr.type());
-      result_expr.add_to_operands(byte_extract_expr.op(), final_offset);
+      auto result_expr = byte_extract_expr;
+      result_expr.type() = expr.type();
+      result_expr.offset() = final_offset;
 
-      return changed(simplify_rec(result_expr));
+      return changed(simplify_byte_extract(result_expr));
     }
   }
   else if(array.id()==ID_if)

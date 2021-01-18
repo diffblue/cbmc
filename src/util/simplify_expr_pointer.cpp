@@ -281,7 +281,7 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
       auto new_expr = expr;
       new_expr.op() = op;
 
-      return changed(simplify_node(new_expr)); // recursive call
+      return changed(simplify_pointer_offset(new_expr)); // recursive call
     }
     else if(op_type.id()==ID_signedbv ||
             op_type.id()==ID_unsignedbv)
@@ -291,8 +291,7 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
       if(op.is_constant())
       {
         // (T *)0x1234 -> 0x1234
-        exprt tmp = typecast_exprt(op, expr.type());
-        return changed(simplify_node(tmp));
+        return changed(simplify_typecast(typecast_exprt{op, expr.type()}));
       }
       else
       {
@@ -340,7 +339,7 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
       {
         exprt tmp=op;
         if(tmp.type()!=expr.type())
-          tmp = simplify_node(typecast_exprt(tmp, expr.type()));
+          tmp = simplify_typecast(typecast_exprt(tmp, expr.type()));
 
         int_expr.push_back(tmp);
       }
@@ -359,29 +358,23 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
       return unchanged(expr);
 
     // this might change the type of the pointer!
-    exprt pointer_offset_expr = simplify_node(pointer_offset(ptr_expr.front()));
+    exprt pointer_offset_expr =
+      simplify_pointer_offset(to_unary_expr(pointer_offset(ptr_expr.front())));
 
     exprt sum;
 
     if(int_expr.size()==1)
       sum=int_expr.front();
     else
-    {
-      sum=exprt(ID_plus, expr.type());
-      sum.operands()=int_expr;
-    }
-
-    sum = simplify_node(sum);
+      sum = simplify_plus(plus_exprt{int_expr, expr.type()});
 
     exprt size_expr = from_integer(*element_size, expr.type());
 
-    exprt product = mult_exprt(sum, size_expr);
-
-    product = simplify_node(product);
+    exprt product = simplify_mult(mult_exprt{sum, size_expr});
 
     auto new_expr = plus_exprt(pointer_offset_expr, product);
 
-    return changed(simplify_node(new_expr));
+    return changed(simplify_plus(new_expr));
   }
   else if(ptr.id()==ID_constant)
   {
@@ -390,8 +383,7 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
     if(c_ptr.get_value()==ID_NULL ||
        c_ptr.value_is_zero_string())
     {
-      auto new_expr = from_integer(0, expr.type());
-      return changed(simplify_node(new_expr));
+      return from_integer(0, expr.type());
     }
     else
     {
@@ -408,9 +400,7 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
         *pointer_offset_bits(ptr.type(), ns) - config.bv_encoding.object_bits;
       number%=power(2, offset_bits);
 
-      auto new_expr = from_integer(number, expr.type());
-
-      return changed(simplify_node(new_expr));
+      return from_integer(number, expr.type());
     }
   }
 
@@ -679,10 +669,7 @@ simplify_exprt::simplify_object_size(const unary_exprt &expr)
         exprt size = size_opt.value();
 
         if(size.type() != expr_type)
-        {
-          size = typecast_exprt(size, expr_type);
-          size = simplify_node(size);
-        }
+          size = simplify_typecast(typecast_exprt(size, expr_type));
 
         return size;
       }
@@ -708,5 +695,5 @@ simplify_exprt::simplify_good_pointer(const unary_exprt &expr)
   exprt def = good_pointer_def(expr.op(), ns);
 
   // recursive call
-  return changed(simplify_node(def));
+  return changed(simplify_rec(def));
 }

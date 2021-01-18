@@ -795,7 +795,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     auto one = from_integer(1, expr_type);
     auto zero = from_integer(0, expr_type);
     exprt new_expr = if_exprt(expr.op(), std::move(one), std::move(zero));
-    return changed(simplify_rec(new_expr)); // recursive call
+    simplify_if_preorder(to_if_expr(new_expr));
+    return new_expr;
   }
 
   // circular casts through types shorter than `int`
@@ -884,16 +885,17 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       if(sub_size.has_value())
       {
         auto new_expr = expr;
+        exprt offset_expr =
+          simplify_typecast(typecast_exprt(op_plus_expr.op1(), size_type()));
 
         // void*
         if(*sub_size == 0 || *sub_size == 1)
-          new_expr.op() = typecast_exprt(op_plus_expr.op1(), size_type());
+          new_expr.op() = offset_expr;
         else
-          new_expr.op() = mult_exprt(
-            from_integer(*sub_size, size_type()),
-            typecast_exprt(op_plus_expr.op1(), size_type()));
-
-        new_expr.op() = simplify_rec(new_expr.op()); // rec. call
+        {
+          new_expr.op() = simplify_mult(
+            mult_exprt(from_integer(*sub_size, size_type()), offset_expr));
+        }
 
         return changed(simplify_typecast(new_expr)); // rec. call
       }
@@ -965,19 +967,18 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
       for(auto &op : new_expr.op().operands())
       {
-        if(op.type().id()==ID_pointer)
+        exprt new_op = simplify_typecast(typecast_exprt(op, size_t_type));
+        if(op.type().id() != ID_pointer && *step > 1)
         {
-          op = typecast_exprt(op, size_t_type);
+          new_op =
+            simplify_mult(mult_exprt(from_integer(*step, size_t_type), new_op));
         }
-        else
-        {
-          op = typecast_exprt(op, size_t_type);
-          if(*step > 1)
-            op = mult_exprt(from_integer(*step, size_t_type), op);
-        }
+        op = std::move(new_op);
       }
 
-      return changed(simplify_rec(new_expr)); // recursive call
+      new_expr.op() = simplify_plus(to_plus_expr(new_expr.op()));
+
+      return changed(simplify_typecast(new_expr)); // recursive call
     }
   }
 
@@ -1316,7 +1317,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       auto result =
         address_of_exprt(index_exprt(o, from_integer(0, size_type())));
 
-      return changed(simplify_rec(result)); // recursive call
+      return changed(simplify_address_of(result)); // recursive call
     }
   }
 
@@ -1723,9 +1724,9 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       pointer_offset_bits(to_array_of_expr(expr.op()).what().type(), ns))
   {
     auto tmp = expr;
-    tmp.op() = index_exprt(expr.op(), expr.offset());
+    tmp.op() = simplify_index(index_exprt(expr.op(), expr.offset()));
     tmp.offset() = from_integer(0, expr.offset().type());
-    return changed(simplify_rec(tmp));
+    return changed(simplify_byte_extract(tmp));
   }
 
   // extract bits of a constant
@@ -1905,19 +1906,19 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
         {
           const exprt &index=with.where();
           exprt index_offset =
-            simplify_node(mult_exprt(index, from_integer(*i, index.type())));
+            simplify_mult(mult_exprt(index, from_integer(*i, index.type())));
 
           // index_offset may need a typecast
           if(offset.type() != index.type())
           {
             index_offset =
-              simplify_node(typecast_exprt(index_offset, offset.type()));
+              simplify_typecast(typecast_exprt(index_offset, offset.type()));
           }
 
           plus_exprt new_offset(offset, index_offset);
           exprt new_value(with.new_value());
           auto tmp = expr;
-          tmp.set_offset(simplify_node(std::move(new_offset)));
+          tmp.set_offset(simplify_plus(std::move(new_offset)));
           tmp.set_value(std::move(new_value));
           return changed(simplify_byte_update(tmp)); // recursive call
         }
