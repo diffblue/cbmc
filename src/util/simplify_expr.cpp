@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "expr_util.h"
 #include "fixedbv.h"
+#include "floatbv_expr.h"
 #include "invariant.h"
 #include "mathematical_expr.h"
 #include "namespace.h"

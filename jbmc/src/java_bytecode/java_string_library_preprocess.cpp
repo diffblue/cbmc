@@ -23,6 +23,7 @@ Date:   April 2017
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
+#include <util/floatbv_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/refined_string_type.h>
 #include <util/std_code.h>

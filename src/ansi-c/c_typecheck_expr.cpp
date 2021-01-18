@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
 #include <util/ieee_float.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>

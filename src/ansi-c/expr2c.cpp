@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
 #include <util/fixedbv.h>
+#include <util/floatbv_expr.h>
 #include <util/lispexpr.h>
 #include <util/lispirep.h>
 #include <util/namespace.h>
