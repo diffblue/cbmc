@@ -17,6 +17,7 @@ Author: Diffblue Ltd.
 #include <solvers/prop/bdd_expr.h>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/expanding_vector.h>
 #include <util/format_expr.h>
 #include <util/symbol_table.h>

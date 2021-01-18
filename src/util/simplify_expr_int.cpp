@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
 #include "byte_operators.h"
 #include "config.h"
 #include "expr_util.h"

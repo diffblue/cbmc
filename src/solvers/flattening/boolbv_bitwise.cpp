@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "boolbv.h"
+
+#include <util/bitvector_expr.h>
 
 bvt boolbvt::convert_bitwise(const exprt &expr)
 {

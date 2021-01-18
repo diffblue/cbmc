@@ -8,6 +8,7 @@ Author: Michael Tautschnig
 
 #include "boolbv.h"
 
+#include <util/bitvector_expr.h>
 #include <util/invariant.h>
 
 bvt boolbvt::convert_bswap(const bswap_exprt &expr)

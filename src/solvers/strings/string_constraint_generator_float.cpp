@@ -11,9 +11,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for functions generating strings from other
 /// types, in particular int, long, float, double, char, bool
 
-#include <solvers/floatbv/float_bv.h>
-
 #include "string_constraint_generator.h"
+
+#include <util/bitvector_expr.h>
+
+#include <solvers/floatbv/float_bv.h>
 
 /// Gets the unbiased exponent in a floating-point bit-vector
 ///
