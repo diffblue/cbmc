@@ -155,100 +155,56 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 {
   clear();
 
-  while(optstring[0]!=0)
+  parse_optstring(optstring);
+  return parse_arguments(argc, argv);
+}
+
+cmdlinet::option_namest cmdlinet::option_names() const
+{
+  return option_namest{*this};
+}
+void cmdlinet::parse_optstring(const char *optstring)
+{
+  while(optstring[0] != 0)
   {
     optiont option;
 
     DATA_INVARIANT(
       optstring[0] != ':', "cmdlinet::parse: Invalid option string\n");
 
-    if(optstring[0]=='(')
+    if(optstring[0] == '(')
     {
-      option.islong=true;
-      option.optchar=0;
-      option.isset=false;
+      option.islong = true;
+      option.optchar = 0;
+      option.isset = false;
       option.optstring.clear();
 
-      for(optstring++; optstring[0]!=')' && optstring[0]!=0; optstring++)
-        option.optstring+=optstring[0];
+      for(optstring++; optstring[0] != ')' && optstring[0] != 0; optstring++)
+        option.optstring += optstring[0];
 
-      if(optstring[0]==')')
+      if(optstring[0] == ')')
         optstring++;
     }
     else
     {
-      option.islong=false;
-      option.optchar=optstring[0];
+      option.islong = false;
+      option.optchar = optstring[0];
       option.optstring.clear();
-      option.isset=false;
+      option.isset = false;
 
       optstring++;
     }
 
-    if(optstring[0]==':')
+    if(optstring[0] == ':')
     {
-      option.hasval=true;
+      option.hasval = true;
       optstring++;
     }
     else
-      option.hasval=false;
+      option.hasval = false;
 
     options.push_back(option);
   }
-
-  for(int i=1; i<argc; i++)
-  {
-    if(argv[i][0]!='-')
-      args.push_back(argv[i]);
-    else
-    {
-      optionalt<std::size_t> optnr;
-
-      if(argv[i][1]!=0 && argv[i][2]==0)
-        optnr=getoptnr(argv[i][1]); // single-letter option -X
-      else if(argv[i][1]=='-')
-        optnr=getoptnr(argv[i]+2); // multi-letter option with --XXX
-      else
-      {
-        // Multi-letter option -XXX, or single-letter with argument -Xval
-        // We first try single-letter.
-        optnr=getoptnr(argv[i][1]);
-
-        if(!optnr.has_value()) // try multi-letter
-          optnr=getoptnr(argv[i]+1);
-      }
-
-      if(!optnr.has_value())
-      {
-        unknown_arg=argv[i];
-        return true;
-      }
-
-      options[*optnr].isset=true;
-
-      if(options[*optnr].hasval)
-      {
-        if(argv[i][2]==0 || options[*optnr].islong)
-        {
-          i++;
-          if(i==argc)
-            return true;
-          if(argv[i][0]=='-' && argv[i][1]!=0)
-            return true;
-          options[*optnr].values.push_back(argv[i]);
-        }
-        else
-          options[*optnr].values.push_back(argv[i]+2);
-      }
-    }
-  }
-
-  return false;
-}
-
-cmdlinet::option_namest cmdlinet::option_names() const
-{
-  return option_namest{*this};
 }
 
 std::vector<std::string>
@@ -309,6 +265,57 @@ cmdlinet::get_argument_suggestions(const std::string &unknown_argument)
     }
   }
   return final_suggestions;
+}
+
+bool cmdlinet::parse_arguments(int argc, const char **argv)
+{
+  for(int i = 1; i < argc; i++)
+  {
+    if(argv[i][0] != '-')
+      args.push_back(argv[i]);
+    else
+    {
+      optionalt<std::size_t> optnr;
+
+      if(argv[i][1] != 0 && argv[i][2] == 0)
+        optnr = getoptnr(argv[i][1]); // single-letter option -X
+      else if(argv[i][1] == '-')
+        optnr = getoptnr(argv[i] + 2); // multi-letter option with --XXX
+      else
+      {
+        // Multi-letter option -XXX, or single-letter with argument -Xval
+        // We first try single-letter.
+        optnr = getoptnr(argv[i][1]);
+
+        if(!optnr.has_value()) // try multi-letter
+          optnr = getoptnr(argv[i] + 1);
+      }
+
+      if(!optnr.has_value())
+      {
+        unknown_arg = argv[i];
+        return true;
+      }
+
+      options[*optnr].isset = true;
+
+      if(options[*optnr].hasval)
+      {
+        if(argv[i][2] == 0 || options[*optnr].islong)
+        {
+          i++;
+          if(i == argc)
+            return true;
+          if(argv[i][0] == '-' && argv[i][1] != 0)
+            return true;
+          options[*optnr].values.push_back(argv[i]);
+        }
+        else
+          options[*optnr].values.push_back(argv[i] + 2);
+      }
+    }
+  }
+  return false;
 }
 
 cmdlinet::option_namest::option_names_iteratort::option_names_iteratort(

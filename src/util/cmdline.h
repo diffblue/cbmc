@@ -20,6 +20,58 @@ Author: Daniel Kroening, kroening@kroening.com
 class cmdlinet
 {
 public:
+  /// Parses a commandline according to a specification given in \p optstring.
+  /// \param argc How many arguments there are.
+  /// \param argv An array of C strings.
+  ///             The 0th element is assumed to be the name of the command as
+  ///             it was invoked (e.g. /usr/bin/cmake) and is ignored. It is
+  ///             further assumed the array holds \p argc+1 elements with the C
+  ///             string at index argc being a terminating null pointer.
+  ///             This argument is parsed based on \p optstring.
+  /// \param optstring A specification of allowed command line options.
+  ///                  This is a C string container any number of single
+  ///                  characters other than '(', ')' or ':' signifying a
+  ///                  "short" option consisting of just that character, or
+  ///                  names consisting of any characters other than ')'
+  ///                  surrounded by a matching pair of '(' and ')' signifying a
+  ///                  "long" option with the name being the string between '('
+  ///                  and ')', both of which can be optionally followed by a
+  ///                  single ':' indicating that the option takes a argument,
+  ///                  if not present it does not. arguments must be in the
+  ///                  next array element in \p argv , except for short options
+  ///                  whose argument may also be concatenated directly on them.
+  ///
+  ///                  Option names in \p argv must start with either '-' or "--",
+  ///                  no distinction between long and short options is made
+  ///                  here, although it is customary to use only one '-' for
+  ///                  short options and "--" for long options.
+  ///
+  ///                  All options are optional, if some are required it is up
+  ///                  to the user to check that they are present.
+  ///
+  ///                  Examples:
+  ///
+  ///                  argc = 4
+  ///                  argv = `{"name", "-V", "--name", "CProver", nullptr}`
+  ///                  opstring = `"V(version)(name):"`
+  ///
+  ///                  here the argument to "name" would be "CProver", and
+  ///                  "V" is a short option passed without arguments.
+  ///
+  ///                  argc = 3
+  ///                  argv = `{"other-name", "-fFilename", "--trace", nullptr}`
+  ///                  optstring = `"f:(trace)(some-other-option):G"`
+  ///
+  ///                  here the argument to option "f" would be "Filename",
+  ///                  "trace" is a long option with no argument, and
+  ///                  "some-other-option" and "G" are both allowed options that
+  ///                  don’t appear on the commandline (with and without
+  ///                  argument respectively).
+  ///
+  /// \return true if there was an error while parsing argv, false otherwise. If
+  ///              this failed due to an unknown option name being in argv, the
+  ///              public variable cmdlinet::unknown_arg will be non-empty and
+  ///              contain the name of that option.
   virtual bool parse(int argc, const char **argv, const char *optstring);
 
   std::string get_value(char option) const;
@@ -114,6 +166,18 @@ protected:
       optchar(0)
     {}
   };
+
+  /// Parses an optstring and writes the result to cmdlinet::options.
+  /// It is considered a logic error to pass an invalid option string here.
+  /// \see cmdlinet::parse(int,const char**,const char*)
+  ///         for details on the format of the optstring
+  void parse_optstring(const char *optstring);
+
+  /// Parses a commandline according to a previously parsed optstring and
+  /// writes the result to cmdlinet::options.
+  /// \see cmdlinet::parse(int,const char**,const char*)
+  ///         for details the meaning of argc and argv
+  bool parse_arguments(int argc, const char **argv);
 
   std::vector<optiont> options;
 
