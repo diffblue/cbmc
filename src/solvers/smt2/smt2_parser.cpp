@@ -675,7 +675,9 @@ exprt smt2_parsert::function_application()
           }
           else if(id == ID_repeat)
           {
-            return nil_exprt();
+            auto i = from_integer(index, integer_typet());
+            auto width = to_unsignedbv_type(op[0].type()).get_width() * index;
+            return replication_exprt(i, op[0], unsignedbv_typet(width));
           }
           else
             return nil_exprt();
@@ -869,6 +871,12 @@ void smt2_parsert::setup_expressions()
 
   expressions["bvsgt"] = [this] {
     return binary_predicate(ID_gt, cast_bv_to_signed(operands()));
+  };
+
+  expressions["bvcomp"] = [this] {
+    auto b0 = from_integer(0, unsignedbv_typet(1));
+    auto b1 = from_integer(1, unsignedbv_typet(1));
+    return if_exprt(binary_predicate(ID_equal, operands()), b1, b0);
   };
 
   expressions["bvashr"] = [this] {

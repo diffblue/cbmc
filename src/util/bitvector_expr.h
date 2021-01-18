@@ -517,8 +517,12 @@ inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 class replication_exprt : public binary_exprt
 {
 public:
-  replication_exprt(const constant_exprt &_times, const exprt &_src)
-    : binary_exprt(_times, ID_replication, _src)
+  replication_exprt(constant_exprt _times, exprt _src, typet _type)
+    : binary_exprt(
+        std::move(_times),
+        ID_replication,
+        std::move(_src),
+        std::move(_type))
   {
   }
 
