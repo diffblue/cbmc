@@ -139,16 +139,17 @@ void rd_range_domaint::transform(
       goto_rw(to, rw_set);
       const bool is_must_alias=rw_set.get_w_set().size()==1;
 
-      forall_rw_range_set_w_objects(it, rw_set)
+      for(const auto &written_object_entry : rw_set.get_w_set())
       {
-        const irep_idt &identifier=it->first;
+        const irep_idt &identifier = written_object_entry.first;
         // ignore symex::invalid_object
         const symbolt *symbol_ptr;
         if(ns.lookup(identifier, symbol_ptr))
           continue;
         assert(symbol_ptr!=0);
 
-        const range_domaint &ranges=rw_set.get_ranges(it);
+        const range_domaint &ranges =
+          rw_set.get_ranges(written_object_entry.second);
 
         if(is_must_alias &&
            (!rd->get_is_threaded()(from) ||
@@ -345,9 +346,9 @@ void rd_range_domaint::transform_assign(
   goto_rw(function_to, to, rw_set);
   const bool is_must_alias=rw_set.get_w_set().size()==1;
 
-  forall_rw_range_set_w_objects(it, rw_set)
+  for(const auto &written_object_entry : rw_set.get_w_set())
   {
-    const irep_idt &identifier=it->first;
+    const irep_idt &identifier = written_object_entry.first;
     // ignore symex::invalid_object
     const symbolt *symbol_ptr;
     if(ns.lookup(identifier, symbol_ptr))
@@ -357,7 +358,8 @@ void rd_range_domaint::transform_assign(
       nullptr_exceptiont,
       "Symbol is in symbol table");
 
-    const range_domaint &ranges=rw_set.get_ranges(it);
+    const range_domaint &ranges =
+      rw_set.get_ranges(written_object_entry.second);
 
     if(is_must_alias &&
        (!rd.get_is_threaded()(from) ||
