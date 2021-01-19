@@ -67,6 +67,7 @@ public:
   void set_values(const abstract_object_sett &other_values)
   {
     PRECONDITION(!other_values.empty());
+    set_not_top();
     my_type = get_type(*other_values.begin());
     values = other_values;
     verify();
