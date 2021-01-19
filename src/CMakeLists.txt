@@ -5,10 +5,26 @@ find_package(FLEX REQUIRED)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    add_custom_target(doc
-        "${DOXYGEN_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/doxygen.cfg"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    )
+  set(ROOT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/..")
+  set(ROOT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
+  set(ORIGINAL_DOXYFILE "${CMAKE_CURRENT_SOURCE_DIR}/doxyfile")
+  set(CONFIGURED_DOXYFILE "${ROOT_BINARY_DIR}/doxyfile")
+  set(DOC_INPUT_DIRECTORY "${ROOT_SOURCE_DIR}/doc")
+  set(DOC_OUTPUT_DIRECTORY "${ROOT_BINARY_DIR}/doc")
+
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.override.in" "${CONFIGURED_DOXYFILE}")
+  add_custom_target(doc
+      COMMAND "${CMAKE_COMMAND}" -E remove_directory "${DOC_OUTPUT_DIRECTORY}"
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory "${DOC_INPUT_DIRECTORY}" "${DOC_OUTPUT_DIRECTORY}"
+      COMMAND "${DOXYGEN_EXECUTABLE}" "${CONFIGURED_DOXYFILE}"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+  unset(DOC_OUTPUT_DIRECTORY)
+  unset(DOC_INPUT_DIRECTORY)
+  unset(CONFIGURED_DOXYFILE)
+  unset(ORIGINAL_DOXYFILE)
+  unset(ROOT_SOURCE_DIR)
+  unset(ROOT_BINARY_DIR)
 endif(DOXYGEN_FOUND)
 
 #   Add a bison target named 'parser'.

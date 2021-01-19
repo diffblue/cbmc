@@ -1,0 +1,12 @@
+# Overrides for cmake out of source builds specifically, we
+# want to avoid copying files into the main doc directory,
+# instead we should be generating the doxygen docs in our
+# cmake output directory
+
+# Note: This file is intended to be used with cmake
+# configure_file; variables like @this@ are replaced by
+# cmake variables.
+
+@INCLUDE = @ORIGINAL_DOXYFILE@
+
+OUTPUT_DIRECTORY = @DOC_OUTPUT_DIRECTORY@
