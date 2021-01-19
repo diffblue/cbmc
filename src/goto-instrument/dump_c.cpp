@@ -1475,8 +1475,8 @@ void dump_ct::cleanup_expr(exprt &expr)
 
 void dump_ct::cleanup_type(typet &type)
 {
-  Forall_subtypes(it, type)
-    cleanup_type(*it);
+  for(typet &subtype : to_type_with_subtypes(type).subtypes())
+    cleanup_type(subtype);
 
   if(type.id()==ID_code)
   {

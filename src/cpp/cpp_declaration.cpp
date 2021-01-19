@@ -57,7 +57,7 @@ void cpp_declarationt::name_anon_struct_union(typet &dest)
   }
   else if(dest.id()==ID_merged_type)
   {
-    Forall_subtypes(it, dest)
-      name_anon_struct_union(*it);
+    for(typet &subtype : to_type_with_subtypes(dest).subtypes())
+      name_anon_struct_union(subtype);
   }
 }

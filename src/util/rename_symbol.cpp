@@ -129,9 +129,11 @@ bool rename_symbolt::rename(typet &dest) const
     if(!rename(dest.subtype()))
       result=false;
 
-  Forall_subtypes(it, dest)
-    if(!rename(*it))
+  for(typet &subtype : to_type_with_subtypes(dest).subtypes())
+  {
+    if(!rename(subtype))
       result=false;
+  }
 
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
@@ -193,9 +195,11 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
     if(have_to_rename(dest.subtype()))
       return true;
 
-  forall_subtypes(it, dest)
-    if(have_to_rename(*it))
+  for(const typet &subtype : to_type_with_subtypes(dest).subtypes())
+  {
+    if(have_to_rename(subtype))
       return true;
+  }
 
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)

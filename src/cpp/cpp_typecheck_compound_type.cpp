@@ -35,9 +35,11 @@ bool cpp_typecheckt::has_const(const typet &type)
     return true;
   else if(type.id()==ID_merged_type)
   {
-    forall_subtypes(it, type)
-      if(has_const(*it))
+    for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+    {
+      if(has_const(subtype))
         return true;
+    }
 
     return false;
   }
@@ -51,9 +53,11 @@ bool cpp_typecheckt::has_volatile(const typet &type)
     return true;
   else if(type.id()==ID_merged_type)
   {
-    forall_subtypes(it, type)
-      if(has_volatile(*it))
+    for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+    {
+      if(has_volatile(subtype))
         return true;
+    }
 
     return false;
   }
@@ -69,9 +73,11 @@ bool cpp_typecheckt::has_auto(const typet &type)
     type.id() == ID_merged_type || type.id() == ID_frontend_pointer ||
     type.id() == ID_pointer)
   {
-    forall_subtypes(it, type)
-      if(has_auto(*it))
+    for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+    {
+      if(has_auto(subtype))
         return true;
+    }
 
     return false;
   }

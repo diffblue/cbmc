@@ -170,9 +170,11 @@ bool replace_symbolt::replace(typet &dest) const
     if(!replace(dest.subtype()))
       result=false;
 
-  Forall_subtypes(it, dest)
-    if(!replace(*it))
+  for(typet &subtype : to_type_with_subtypes(dest).subtypes())
+  {
+    if(!replace(subtype))
       result=false;
+  }
 
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
@@ -212,9 +214,11 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     if(have_to_replace(dest.subtype()))
       return true;
 
-  forall_subtypes(it, dest)
-    if(have_to_replace(*it))
+  for(const typet &subtype : to_type_with_subtypes(dest).subtypes())
+  {
+    if(have_to_replace(subtype))
       return true;
+  }
 
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)

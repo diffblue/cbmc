@@ -149,14 +149,6 @@ public:
     : typet(std::move(_id), std::move(_subtype))
   {
   }
-
-  #if 0
-  const typet &subtype() const
-  { return (typet &)find(ID_subtype); }
-
-  typet &subtype()
-  { return (typet &)add(ID_subtype); }
-  #endif
 };
 
 inline const type_with_subtypet &to_type_with_subtype(const typet &type)
@@ -212,17 +204,6 @@ inline type_with_subtypest &to_type_with_subtypes(typet &type)
 {
   return static_cast<type_with_subtypest &>(type);
 }
-
-#define forall_subtypes(it, type) \
-  if((type).has_subtypes()) /* NOLINT(readability/braces) */ \
-    for(type_with_subtypest::subtypest::const_iterator it=to_type_with_subtypes(type).subtypes().begin(), \
-        it##_end=to_type_with_subtypes(type).subtypes().end(); \
-        it!=it##_end; ++it)
-
-#define Forall_subtypes(it, type) \
-  if((type).has_subtypes()) /* NOLINT(readability/braces) */ \
-    for(type_with_subtypest::subtypest::iterator it=to_type_with_subtypes(type).subtypes().begin(); \
-        it!=to_type_with_subtypes(type).subtypes().end(); ++it)
 
 /// Remove const qualifier from type (if any).
 /// Returns type as is if there is no const qualifier.

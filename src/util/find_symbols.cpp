@@ -124,8 +124,8 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     if(src.has_subtype())
       find_symbols(kind, to_type_with_subtype(src).subtype(), dest);
 
-    forall_subtypes(it, src)
-      find_symbols(kind, *it, dest);
+    for(const typet &subtype : to_type_with_subtypes(src).subtypes())
+      find_symbols(kind, subtype, dest);
 
     const irep_idt &typedef_name=src.get(ID_C_typedef);
     if(!typedef_name.empty())

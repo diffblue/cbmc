@@ -38,9 +38,7 @@ ForEachMacros: [
   'Forall_operands',
   'forall_expr',
   'Forall_expr',
-  'forall_symbol_base_map',
-  'forall_subtypes',
-  'Forall_subtypes']
+  'forall_symbol_base_map']
 IndentCaseLabels: 'false'
 IndentPPDirectives: AfterHash
 IndentWidth: '2'
