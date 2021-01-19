@@ -28,15 +28,6 @@ public:
   {
   }
 
-  struct map_bitt
-  {
-    map_bitt():is_set(false) { }
-    bool is_set;
-    literalt l;
-  };
-
-  typedef std::vector<map_bitt> literal_mapt;
-
   class map_entryt
   {
   public:
@@ -47,7 +38,8 @@ public:
     std::size_t width;
     bvtypet bvtype;
     typet type;
-    literal_mapt literal_map;
+    bool is_set = false;
+    bvt literal_map;
 
     std::string get_value(const propt &) const;
   };

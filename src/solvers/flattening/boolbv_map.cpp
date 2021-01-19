@@ -20,27 +20,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
 {
+  if(!is_set)
+    return std::string(literal_map.size(), '*');
+
   std::string result;
 
   result.reserve(literal_map.size());
 
-  for(std::size_t i=0; i<literal_map.size(); i++)
+  for(const auto &literal : literal_map)
   {
-    char ch='*';
+    const tvt value = prop.l_get(literal);
 
-    if(literal_map[i].is_set)
-    {
-      tvt value=prop.l_get(literal_map[i].l);
-
-      if(value.is_true())
-        ch='1';
-      else if(value.is_false())
-        ch='0';
-      else
-        ch='?';
-    }
-
-    result=result+ch;
+    result += (value.is_true() ? '1' : (value.is_false() ? '0' : '?'));
   }
 
   return result;
@@ -93,31 +84,26 @@ void boolbv_mapt::get_literals(
     map_entry.literal_map.size() == width,
     "number of literals in the literal map shall equal the bitvector width");
 
-  for(auto it = literals.begin(); it != literals.end(); ++it)
+  if(!map_entry.is_set)
   {
-    literalt &l=*it;
-    const std::size_t bit=it-literals.begin();
-
-    INVARIANT(
-      bit < map_entry.literal_map.size(), "bit index shall be within bounds");
-    map_bitt &mb=map_entry.literal_map[bit];
-
-    if(mb.is_set)
+#ifdef DEBUG
+    std::size_t bit = 0;
+#endif
+    for(auto &literal : map_entry.literal_map)
     {
-      l=mb.l;
-      continue;
+      literal = prop.new_variable();
+
+#ifdef DEBUG
+      std::cout << "NEW: " << identifier << ":" << bit << "=" << literal
+                << '\n';
+      ++bit;
+#endif
     }
 
-    l=prop.new_variable();
-
-    mb.is_set=true;
-    mb.l=l;
-
-    #ifdef DEBUG
-    std::cout << "NEW: " << identifier << ":" << bit
-              << "=" << l << '\n';
-    #endif
+    map_entry.is_set = true;
   }
+
+  literals = map_entry.literal_map;
 }
 
 void boolbv_mapt::set_literals(
@@ -139,17 +125,17 @@ void boolbv_mapt::set_literals(
 
     INVARIANT(
       bit < map_entry.literal_map.size(), "bit index shall be within bounds");
-    map_bitt &mb=map_entry.literal_map[bit];
 
-    if(mb.is_set)
+    if(map_entry.is_set)
     {
-      prop.set_equal(mb.l, literal);
+      prop.set_equal(map_entry.literal_map[bit], literal);
       continue;
     }
 
-    mb.is_set=true;
-    mb.l=literal;
+    map_entry.literal_map[bit] = literal;
   }
+
+  map_entry.is_set = true;
 }
 
 void boolbv_mapt::erase_literals(

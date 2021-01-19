@@ -38,25 +38,16 @@ exprt boolbvt::get(const exprt &expr) const
 
       std::vector<bool> unknown;
       bvt bv;
-      std::size_t width=map_entry.width;
 
-      bv.resize(width);
-      unknown.resize(width);
-
-      for(std::size_t bit_nr=0; bit_nr<width; bit_nr++)
+      if(map_entry.is_set)
       {
-        assert(bit_nr<map_entry.literal_map.size());
-
-        if(map_entry.literal_map[bit_nr].is_set)
-        {
-          unknown[bit_nr]=false;
-          bv[bit_nr]=map_entry.literal_map[bit_nr].l;
-        }
-        else
-        {
-          unknown[bit_nr]=true;
-          bv[bit_nr].clear();
-        }
+        unknown = std::vector<bool>(map_entry.width, false);
+        bv = map_entry.literal_map;
+      }
+      else
+      {
+        unknown = std::vector<bool>(map_entry.width, true);
+        bv = bvt{map_entry.width, literalt{0, false}};
       }
 
       return bv_get_rec(expr, bv, unknown, 0, map_entry.type);
