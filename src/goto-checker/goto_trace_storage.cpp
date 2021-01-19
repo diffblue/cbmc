@@ -27,6 +27,10 @@ const goto_tracet &goto_trace_storaget::insert(goto_tracet &&trace)
     emplace_result.second,
     "cannot associate more than one error trace with property " +
       id2string(last_step.property_id));
+
+  for(auto &step : traces.back().steps)
+    step.merge_ireps(merge_ireps);
+
   return traces.back();
 }
 
@@ -40,6 +44,10 @@ const goto_tracet &goto_trace_storaget::insert_all(goto_tracet &&trace)
   {
     property_id_to_trace_index.emplace(property_id, traces.size() - 1);
   }
+
+  for(auto &step : traces.back().steps)
+    step.merge_ireps(merge_ireps);
+
   return traces.back();
 }
 

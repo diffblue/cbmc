@@ -14,6 +14,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-programs/goto_trace.h>
 
+#include <util/merge_irep.h>
+
 #include <list>
 
 class goto_trace_storaget
@@ -44,6 +46,9 @@ protected:
 
   // maps property ID to index in traces
   std::unordered_map<irep_idt, std::size_t> property_id_to_trace_index;
+
+  /// irep container for shared ireps
+  merge_irept merge_ireps;
 };
 
 #endif // CPROVER_GOTO_CHECKER_GOTO_TRACE_STORAGE_H
