@@ -1331,31 +1331,6 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::get_values(
-  const exprt &expr,
-  value_listt &value_list)
-{
-  if(expr.is_constant())
-  {
-    mp_integer int_value;
-    if(to_integer(to_constant_expr(expr), int_value))
-      return true;
-
-    value_list.insert(int_value);
-
-    return false;
-  }
-  else if(expr.id()==ID_if)
-  {
-    const auto &if_expr = to_if_expr(expr);
-
-    return get_values(if_expr.true_case(), value_list) ||
-           get_values(if_expr.false_case(), value_list);
-  }
-
-  return true;
-}
-
 simplify_exprt::resultt<>
 simplify_exprt::simplify_lambda(const lambda_exprt &expr)
 {

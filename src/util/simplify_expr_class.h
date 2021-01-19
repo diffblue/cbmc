@@ -66,10 +66,6 @@ class unary_plus_exprt;
 class update_exprt;
 class with_exprt;
 
-#define forall_value_list(it, value_list) \
-  for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
-      it!=(value_list).end(); ++it)
-
 class simplify_exprt
 {
 public:
@@ -220,9 +216,6 @@ public:
   NODISCARD resultt<> simplify_rec(const exprt &);
 
   virtual bool simplify(exprt &expr);
-
-  typedef std::set<mp_integer> value_listt;
-  bool get_values(const exprt &expr, value_listt &value_list);
 
   static bool is_bitvector_type(const typet &type)
   {

@@ -1513,56 +1513,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
   if(expr.op0() == expr.op1())
     return true_exprt();
 
-  // try constants
-
-  value_listt values0, values1;
-
-  bool ok0=!get_values(expr.op0(), values0);
-  bool ok1=!get_values(expr.op1(), values1);
-
-  if(ok0 && ok1)
-  {
-    bool first=true;
-    bool result=false; // dummy initialization to prevent warning
-    bool ok=true;
-
-    // compare possible values
-
-    forall_value_list(it0, values0)
-      forall_value_list(it1, values1)
-      {
-        bool tmp;
-        const mp_integer &int_value0=*it0;
-        const mp_integer &int_value1=*it1;
-
-        if(expr.id()==ID_ge)
-          tmp=(int_value0>=int_value1);
-        else if(expr.id()==ID_equal)
-          tmp=(int_value0==int_value1);
-        else
-        {
-          tmp=false;
-          UNREACHABLE;
-        }
-
-        if(first)
-        {
-          result=tmp;
-          first=false;
-        }
-        else if(result!=tmp)
-        {
-          ok=false;
-          break;
-        }
-      }
-
-    if(ok)
-    {
-      return make_boolean_expr(result);
-    }
-  }
-
   // See if we can eliminate common addends on both sides.
   // On bit-vectors, this is only sound on '='.
   if(expr.id()==ID_equal)
