@@ -9,8 +9,11 @@ Author: Diffblue Ltd.
 #include "restrict_function_pointers.h"
 
 #include <ansi-c/expr2c.h>
+
 #include <json/json_parser.h>
+
 #include <util/expr_iterator.h>
+#include <util/pointer_expr.h>
 #include <util/string_utils.h>
 
 #include <algorithm>

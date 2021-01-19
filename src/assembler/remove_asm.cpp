@@ -16,6 +16,7 @@ Date:   December 2014
 #include "remove_asm.h"
 
 #include <util/c_types.h>
+#include <util/pointer_expr.h>
 #include <util/string_constant.h>
 
 #include <goto-programs/goto_model.h>

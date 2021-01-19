@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/union_find.h>
 

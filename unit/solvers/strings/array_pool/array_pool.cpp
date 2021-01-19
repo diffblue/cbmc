@@ -11,6 +11,8 @@ Author: Diffblue Ltd.
 
 #include <solvers/strings/string_constraint_generator.h>
 
+#include <util/pointer_expr.h>
+
 SCENARIO("array_pool", "[core][solvers][strings][string_constraint_generator]")
 {
   const std::size_t pointer_width = 16;

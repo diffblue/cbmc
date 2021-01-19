@@ -10,7 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
-#include <util/arith_tools.h>
+#include "arith_tools.h"
+#include "pointer_expr.h"
 
 /// If \p expr is:
 /// - a symbol_exprt "s" add "s" to the stream \p os

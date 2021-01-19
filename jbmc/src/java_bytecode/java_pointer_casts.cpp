@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_pointer_casts.h"
 
+#include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
-#include <util/namespace.h>
 
 #include "java_types.h"
 

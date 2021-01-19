@@ -5,11 +5,10 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
-#include <algorithm>
-#include <functional>
-#include <map>
-#include <ostream>
-#include <stack>
+
+#include "abstract_enviroment.h"
+
+#include "abstract_object_statistics.h"
 
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
@@ -18,10 +17,15 @@
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 
-#include "abstract_enviroment.h"
-#include "abstract_object_statistics.h"
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <ostream>
+#include <stack>
 
 #ifdef DEBUG
 #  include <iostream>

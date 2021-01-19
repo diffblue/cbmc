@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "global_may_alias.h"
 
+#include <util/pointer_expr.h>
+
 /// Populate list of aliases for a given identifier in a context in
 /// which an object is being written to.
 /// \param lhs: A left hand side expression, containing an identifier.

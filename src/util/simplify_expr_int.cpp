@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "mathematical_types.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "rational.h"
 #include "rational_tools.h"

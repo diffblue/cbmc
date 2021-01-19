@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "endianness_map.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "std_expr.h"
 #include "string_constant.h"

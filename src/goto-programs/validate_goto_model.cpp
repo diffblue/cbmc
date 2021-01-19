@@ -12,6 +12,7 @@ Date: Oct 2018
 #include <set>
 
 #include <util/invariant.h>
+#include <util/pointer_expr.h>
 
 #include "goto_functions.h"
 #include "remove_returns.h"

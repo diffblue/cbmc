@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/range.h>

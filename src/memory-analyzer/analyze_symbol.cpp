@@ -15,6 +15,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <util/c_types_util.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/string2int.h>
 #include <util/string_constant.h>

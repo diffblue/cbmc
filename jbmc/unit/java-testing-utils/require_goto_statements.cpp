@@ -10,13 +10,17 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <algorithm>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
+
 #include <java_bytecode/java_types.h>
+
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/pointer_expr.h>
 #include <util/suffix.h>
+
+#include <algorithm>
 
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up

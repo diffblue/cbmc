@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/invariant.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>

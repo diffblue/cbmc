@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "compute_called_functions.h"
 
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 /// get all functions whose address is taken

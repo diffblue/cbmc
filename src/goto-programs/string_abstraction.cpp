@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/message.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/string_constant.h>
 

@@ -11,6 +11,8 @@ Author: Daniel Poetzl
 
 #include <goto-programs/label_function_pointer_call_sites.h>
 
+#include <util/pointer_expr.h>
+
 TEST_CASE("Label function pointer call sites", "[core]")
 {
   const std::string code = R"(

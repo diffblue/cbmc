@@ -9,12 +9,14 @@ Author: Diffblue Ltd.
 #include "recursive_initialization.h"
 
 #include <goto-programs/name_mangler.h>
+
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/irep.h>
 #include <util/optional_utils.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/rename.h>
 #include <util/std_code.h>

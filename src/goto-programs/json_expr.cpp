@@ -21,6 +21,7 @@ Author: Peter Schrammel
 #include <util/invariant.h>
 #include <util/json.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 #include <langapi/language.h>

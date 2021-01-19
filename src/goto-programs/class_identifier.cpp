@@ -11,9 +11,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "class_identifier.h"
 
-#include <util/std_expr.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
+#include <util/std_expr.h>
 
 /// \par parameters: Struct expression
 /// \return Member expression giving the clsid field of the input, or its

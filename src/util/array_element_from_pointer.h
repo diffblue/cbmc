@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_UTIL_ARRAY_ELEMENT_FROM_POINTER_H
 #define CPROVER_UTIL_ARRAY_ELEMENT_FROM_POINTER_H
 
-#include "std_expr.h"
+#include "pointer_expr.h"
 
 /// Generate statement using pointer arithmetic to access the element at the
 /// given index of a pointer array:

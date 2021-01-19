@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai_domain.h"
 
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 
 jsont ai_domain_baset::output_json(const ai_baset &ai, const namespacet &ns)

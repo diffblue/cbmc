@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 #include <util/arith_tools.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 

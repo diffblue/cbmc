@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/range.h>
 #include <util/std_expr.h>
