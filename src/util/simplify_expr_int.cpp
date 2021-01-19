@@ -1460,36 +1460,6 @@ static bool eliminate_common_addends(exprt &op0, exprt &op1)
   return true;
 }
 
-/// Collect integer-typed constants in \p values when \p expr either itself is a
-/// constant or an if-expression; for an if-expression recursively collect those
-/// values in the true- and false case, respectively.
-/// \param expr: expression to collect constants from
-/// \param [out] values: set of integer constants
-/// \return false, iff all sub-expressions were either integer constants or if
-///   expressions with true/false cases being constants or if expressions.
-static bool collect_constants(const exprt &expr, std::set<mp_integer> &values)
-{
-  if(expr.is_constant())
-  {
-    const auto int_value_opt = numeric_cast<mp_integer>(to_constant_expr(expr));
-    if(!int_value_opt.has_value())
-      return true;
-
-    values.insert(*int_value_opt);
-
-    return false;
-  }
-  else if(expr.id() == ID_if)
-  {
-    const auto &if_expr = to_if_expr(expr);
-
-    return collect_constants(if_expr.true_case(), values) ||
-           collect_constants(if_expr.false_case(), values);
-  }
-
-  return true;
-}
-
 simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
   const binary_relation_exprt &expr)
 {
@@ -1542,45 +1512,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
 
   if(expr.op0() == expr.op1())
     return true_exprt();
-
-  // try constants
-
-  std::set<mp_integer> values0, values1;
-  bool ok = !collect_constants(expr.op0(), values0);
-  if(ok)
-    ok = !collect_constants(expr.op1(), values1);
-
-  if(ok)
-  {
-    // We can simplify equality if both sides have exactly one constant value.
-    // This rule most likely never kicks in as we will already have simplified
-    // this case elsewhere (equalities with at least one side being constant are
-    // handled by other functions, and if expressions with multiple branches
-    // having the same value are simplified to remove the if expression).
-    if(expr.id() == ID_equal)
-    {
-      if(values0.size() == 1 && values1.size() == 1)
-      {
-        return make_boolean_expr(*values0.begin() == *values1.begin());
-      }
-    }
-    else
-    {
-      // ID_ge, as ensured by the above INVARIANT: the smallest value in values0
-      // must be >= the largest value in values1
-      if(*values0.begin() >= *values1.rbegin())
-      {
-        return make_boolean_expr(true);
-      }
-      // If all entries in values0 are smaller than the smallest entry in
-      // values1 then the result must be false.
-      else if(*values0.rbegin() < *values1.begin())
-      {
-        return make_boolean_expr(false);
-      }
-      // Else we don't know for sure.
-    }
-  }
 
   // See if we can eliminate common addends on both sides.
   // On bit-vectors, this is only sound on '='.
