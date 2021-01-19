@@ -217,11 +217,10 @@ jobs:
           submodules: recursive
       - name: Set Image Tag
         run: |
-          echo ${{ github.ref }}
-          echo $GITHUB_REF
-          echo $GITHUB_REF | cut -d "/" -f 3 >> $VERSION
-          arrVERSION=(${VERSION//-/ })
-          echo "IMAGE_TAG=diffblue/cbmc:${arrVERSION[1]}" >> $GITHUB_ENV
+          # Isolate the version number from a reference to a tag, for example,
+          # '5.20.3' from a string like 'refs/tags/cbmc-5.20.3-exp'
+          VERSION=$(echo ${{ github.ref }} | cut -d "/" -f 3 | cut -d "-" -f 2)
+          echo "IMAGE_TAG=diffblue/cbmc:$VERSION" >> $GITHUB_ENV
       - name: Build docker image
         run: docker build -t "$IMAGE_TAG" .
       - name: Push docker image to DockerHub
