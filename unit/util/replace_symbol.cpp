@@ -8,6 +8,7 @@ Author: Michael Tautschnig
 
 #include <testing-utils/use_catch.h>
 
+#include <util/pointer_expr.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 

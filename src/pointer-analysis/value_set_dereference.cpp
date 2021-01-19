@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/json_irep.h>
 #include <util/options.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/range.h>

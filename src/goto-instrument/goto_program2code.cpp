@@ -14,10 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include <util/arith_tools.h>
-#include <util/config.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 

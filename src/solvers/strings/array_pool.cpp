@@ -8,6 +8,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "array_pool.h"
 
+#include <util/pointer_expr.h>
+
 symbol_exprt symbol_generatort::
 operator()(const irep_idt &prefix, const typet &type)
 {

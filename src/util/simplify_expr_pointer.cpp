@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "expr_util.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "pointer_predicates.h"
 #include "prefix.h"

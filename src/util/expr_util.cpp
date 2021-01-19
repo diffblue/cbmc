@@ -11,14 +11,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <unordered_set>
 
+#include "arith_tools.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
+#include "namespace.h"
+#include "pointer_expr.h"
 #include "std_expr.h"
 #include "symbol.h"
-#include "namespace.h"
-#include "arith_tools.h"
 
 bool is_lvalue(const exprt &expr)
 {

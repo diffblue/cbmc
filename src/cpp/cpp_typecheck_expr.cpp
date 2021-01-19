@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/mathematical_types.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 
 #include <ansi-c/c_qualifiers.h>

@@ -20,6 +20,7 @@ Date: April 2010
 #include <util/endianness_map.h>
 #include <util/expr_util.h>
 #include <util/make_unique.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>

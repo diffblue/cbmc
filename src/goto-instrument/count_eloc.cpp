@@ -17,6 +17,7 @@ Date: December 2012
 #include <unordered_set>
 
 #include <util/file_util.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 

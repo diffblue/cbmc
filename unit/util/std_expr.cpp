@@ -13,6 +13,7 @@ Author: Diffblue Ltd
 #include <util/config.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>

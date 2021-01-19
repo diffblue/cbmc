@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_declarator_converter.h"
 
+#include <util/pointer_expr.h>
+
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
 {
   // see if the declaration is empty

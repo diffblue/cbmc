@@ -24,6 +24,7 @@ Date: February 2016
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
 

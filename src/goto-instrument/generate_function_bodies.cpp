@@ -19,6 +19,7 @@ Author: Diffblue Ltd.
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/make_unique.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>

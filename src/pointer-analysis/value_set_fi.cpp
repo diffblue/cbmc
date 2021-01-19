@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>

@@ -16,6 +16,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/magic.h>
+#include <util/pointer_expr.h>
 #include <util/run.h>
 #include <util/tempfile.h>
 

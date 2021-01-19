@@ -15,6 +15,7 @@ Author: Daniel Poetzl
 
 #include "expr.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "ssa_expr.h"
 #include "std_expr.h"
 #include "validate.h"

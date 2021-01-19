@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/rational.h>

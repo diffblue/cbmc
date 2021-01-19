@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_program_dereference.h"
 
 #include <util/expr_util.h>
+#include <util/options.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
-#include <util/options.h>
 
 /// \param expr: expression to check
 /// \return pointer to appropriate failed symbol for \p expr, or nullptr if none

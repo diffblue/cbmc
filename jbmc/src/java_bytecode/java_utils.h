@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/nodiscard.h>
 #include <util/optional.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 

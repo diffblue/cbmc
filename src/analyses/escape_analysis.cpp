@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "escape_analysis.h"
 
 #include <util/cprover_prefix.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 
 bool escape_domaint::is_tracked(const symbol_exprt &symbol)

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr_util.h"
 #include "invariant.h"
+#include "pointer_expr.h"
 #include "std_expr.h"
 #include "std_types.h"
 

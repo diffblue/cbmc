@@ -13,6 +13,7 @@ Date: March 2013
 
 #include "dirty.h"
 
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 void dirtyt::build(const goto_functiont &goto_function)

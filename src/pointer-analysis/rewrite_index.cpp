@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "rewrite_index.h"
 
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 /// rewrite a[i] to *(a+i)

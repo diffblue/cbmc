@@ -12,9 +12,12 @@ Author: Diffblue Ltd.
 #include "create_array_with_type_intrinsic.h"
 
 #include <goto-programs/class_identifier.h>
+
 #include <java_bytecode/java_types.h>
+
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/symbol_table_base.h>
 
 /// Returns the symbol name for `org.cprover.CProver.createArrayWithType`

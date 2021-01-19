@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "c_types.h"
 #include "fresh_symbol.h"
+#include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "string_constant.h"
 

@@ -11,6 +11,8 @@ Author: Diffblue Ltd.
 
 #include <solvers/strings/format_specifier.h>
 #include <solvers/strings/string_format_builtin_function.h>
+
+#include <util/pointer_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/string_expr.h>

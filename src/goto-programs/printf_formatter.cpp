@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/format_constant.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 

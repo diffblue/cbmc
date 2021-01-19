@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 #include "label_function_pointer_call_sites.h"
 
 #include <util/fresh_symbol.h>
+#include <util/pointer_expr.h>
 
 void label_function_pointer_call_sites(goto_modelt &goto_model)
 {

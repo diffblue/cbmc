@@ -13,9 +13,12 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "statement_list_typecheck.h"
 
 #include <goto-programs/goto_functions.h>
+
 #include <linking/static_lifetime_init.h>
+
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 
 /// Name of the CPROVER-specific variable that specifies the rounding mode.

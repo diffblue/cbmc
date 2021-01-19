@@ -13,8 +13,9 @@ Date:   April 2017
 
 #include "mm_io.h"
 
-#include <util/pointer_predicates.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/replace_expr.h>
 
 #include "remove_returns.h"

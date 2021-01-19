@@ -23,6 +23,7 @@ Author: Chris Smowton, chris@smowton.net
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/options.h>
+#include <util/pointer_expr.h>
 
 /// An example customised value_sett. It makes a series of small changes
 /// to the underlying value_sett logic, which can then be verified by the

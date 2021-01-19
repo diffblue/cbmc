@@ -12,13 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rewrite_union.h"
 
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
+#include <util/pointer_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <goto-programs/goto_model.h>
-
-#include <util/c_types.h>
 
 static bool have_to_rewrite_union(const exprt &expr)
 {

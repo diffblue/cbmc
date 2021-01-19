@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/string_container.h>

@@ -13,6 +13,8 @@ Author: Diffblue Ltd
 #define CPROVER_ANALYSES_LOCAL_SAFE_POINTERS_H
 
 #include <goto-programs/goto_program.h>
+
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 /// A very simple, cheap analysis to determine when dereference operations are

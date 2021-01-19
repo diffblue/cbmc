@@ -11,7 +11,6 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
-#include <numeric>
 
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
@@ -22,7 +21,10 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #include <util/config.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
+
+#include <numeric>
 
 /// \class Types used throughout the test. Currently it is impossible to
 /// statically initialize this value, there is a PR to allow this

@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "mathematical_expr.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "pointer_offset_sum.h"
 #include "range.h"

@@ -7,11 +7,15 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <goto-programs/goto_trace.h>
+
 #include <java_bytecode/java_trace_validation.h>
 #include <java_bytecode/java_types.h>
+
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
+
 #include <util/byte_operators.h>
+#include <util/pointer_expr.h>
 
 TEST_CASE("java trace validation", "[core][java_trace_validation]")
 {

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/pointer_expr.h>
 #include <util/string_constant.h>
 
 #include <goto-programs/goto_functions.h>

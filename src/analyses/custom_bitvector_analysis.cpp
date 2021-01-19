@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "custom_bitvector_analysis.h"
 
 #include <util/expr_util.h>
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 #include <util/xml_irep.h>
