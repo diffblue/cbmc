@@ -265,7 +265,6 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
   PRECONDITION(operands.size() == num_operands);
 
   std::vector<sharing_ptrt<interval_abstract_valuet>> interval_operands;
-  interval_operands.reserve(num_operands);
 
   for(const auto &op : operands)
   {
@@ -321,23 +320,43 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
   if(num_operands == 0)
     return environment.abstract_object_factory(type, ns, true);
 
-  if(expr.id() == ID_plus)
+  if(expr.id() == ID_if)
   {
-    constant_exprt zero = constant_interval_exprt::zero(type);
-    constant_interval_exprt interval(zero);
-    INVARIANT(interval.is_zero(), "Starting interval must be zero");
+    const constant_interval_exprt &condition_interval =
+      interval_operands[0]->interval;
+    const constant_interval_exprt &true_interval =
+      interval_operands[1]->interval;
+    const constant_interval_exprt &false_interval =
+      interval_operands[2]->interval;
 
-    for(const auto &iav : interval_operands)
+    // Check the value of the condition interval
+    if(condition_interval.is_definitely_false().is_unknown())
     {
-      const constant_interval_exprt &interval_next = iav->interval;
-      interval = interval.plus(interval_next);
+      // Value of the condition is both true and false, so
+      // combine the intervals of both the true and false expressions
+      return environment.abstract_object_factory(
+        type,
+        constant_interval_exprt(
+          constant_interval_exprt::get_min(
+            true_interval.get_lower(), false_interval.get_lower()),
+          constant_interval_exprt::get_max(
+            true_interval.get_upper(), false_interval.get_upper())),
+        ns);
     }
-
-    INVARIANT(
-      interval.type() == type,
-      "Type of result interval should match expression type");
-
-    return environment.abstract_object_factory(type, interval, ns);
+    if(condition_interval.is_definitely_false().is_true())
+    {
+      // The condition is definitely false, so return only
+      // the interval from the 'false' expression
+      return environment.abstract_object_factory(
+        false_interval.type(), false_interval, ns);
+    }
+    if(condition_interval.is_definitely_true().is_true())
+    {
+      // The condition is definitely true, so return only
+      // the interval from the 'true' expression
+      return environment.abstract_object_factory(
+        true_interval.type(), true_interval, ns);
+    }
   }
   else if(num_operands == 1)
   {
@@ -347,8 +366,7 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
     {
       const typecast_exprt &tce = to_typecast_expr(expr);
 
-      const constant_interval_exprt &new_interval =
-        interval.typecast(tce.type());
+      const constant_interval_exprt &new_interval = interval.typecast(tce.type());
 
       INVARIANT(
         new_interval.type() == type,
@@ -365,59 +383,21 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
       return environment.abstract_object_factory(type, interval_result, ns);
     }
   }
-  else if(num_operands == 2)
+  else
   {
-    const constant_interval_exprt &interval0 = interval_operands[0]->interval;
-    const constant_interval_exprt &interval1 = interval_operands[1]->interval;
+    constant_interval_exprt result = interval_operands[0]->interval;
 
-    constant_interval_exprt interval = interval0.eval(expr.id(), interval1);
+    for (size_t opIndex = 1; opIndex != interval_operands.size(); ++opIndex)
+    {
+      auto &interval_next = interval_operands[opIndex]->interval;
+      result = result.eval(expr.id(), interval_next);
+    }
 
     INVARIANT(
-      interval.type() == type,
+      result.type() == type,
       "Type of result interval should match expression type");
 
-    return environment.abstract_object_factory(type, interval, ns);
-  }
-  else if(num_operands == 3)
-  {
-    if(expr.id() == ID_if)
-    {
-      const constant_interval_exprt &condition_interval =
-        interval_operands[0]->interval;
-      const constant_interval_exprt &true_interval =
-        interval_operands[1]->interval;
-      const constant_interval_exprt &false_interval =
-        interval_operands[2]->interval;
-
-      // Check the value of the condition interval
-      if(condition_interval.is_definitely_false().is_unknown())
-      {
-        // Value of the condition is both true and false, so
-        // combine the intervals of both the true and false expressions
-        return environment.abstract_object_factory(
-          type,
-          constant_interval_exprt(
-            constant_interval_exprt::get_min(
-              true_interval.get_lower(), false_interval.get_lower()),
-            constant_interval_exprt::get_max(
-              true_interval.get_upper(), false_interval.get_upper())),
-          ns);
-      }
-      if(condition_interval.is_definitely_false().is_true())
-      {
-        // The condition is definitely false, so return only
-        // the interval from the 'false' expression
-        return environment.abstract_object_factory(
-          false_interval.type(), false_interval, ns);
-      }
-      if(condition_interval.is_definitely_true().is_true())
-      {
-        // The condition is definitely true, so return only
-        // the interval from the 'true' expression
-        return environment.abstract_object_factory(
-          true_interval.type(), true_interval, ns);
-      }
-    }
+    return environment.abstract_object_factory(type, result, ns);
   }
 
   return environment.abstract_object_factory(type, ns, true);
