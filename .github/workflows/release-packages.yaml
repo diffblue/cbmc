@@ -210,20 +210,16 @@ jobs:
 
   push-docker-image-dockerhub:
     runs-on: ubuntu-20.04
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout CBMC source
         uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Get release info
-        id: get_release_info
-        uses: bruceadams/get-release@v1.2.0
       - name: Set Image Tag
         run: |
-          echo ${{  steps.get_release_info.outputs.tag_name }}
-          VERSION = ${{ steps.get_release_info.outputs.tag_name }}
+          echo ${{ github.ref }}
+          echo $GITHUB_REF
+          echo $GITHUB_REF | cut -d "/" -f 3 >> $VERSION
           arrVERSION=(${VERSION//-/ })
           echo "IMAGE_TAG=diffblue/cbmc:${arrVERSION[1]}" >> $GITHUB_ENV
       - name: Build docker image
