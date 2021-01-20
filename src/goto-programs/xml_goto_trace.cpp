@@ -13,6 +13,7 @@ Author: Daniel Kroening
 
 #include "xml_goto_trace.h"
 
+#include <util/string_constant.h>
 #include <util/symbol.h>
 #include <util/xml_irep.h>
 
@@ -22,6 +23,38 @@ Author: Daniel Kroening
 #include "printf_formatter.h"
 #include "structured_trace_util.h"
 #include "xml_expr.h"
+
+/// Rewrite all string constants to their array counterparts
+static void replace_string_constants_rec(exprt &expr)
+{
+  for(auto &op : expr.operands())
+    replace_string_constants_rec(op);
+
+  if(expr.id() == ID_string_constant)
+    expr = to_string_constant(expr).to_array_expr();
+}
+
+/// Given an expression \p expr, produce a string representation that is
+/// printable in XML 1.0. Produces an empty string if no valid XML 1.0 string
+/// representing \p expr can be generated.
+static std::string
+get_printable_xml(const namespacet &ns, const irep_idt &id, const exprt &expr)
+{
+  std::string result = from_expr(ns, id, expr);
+
+  if(!xmlt::is_printable_xml(result))
+  {
+    exprt new_expr = expr;
+    replace_string_constants_rec(new_expr);
+    result = from_expr(ns, id, new_expr);
+
+    // give up
+    if(!xmlt::is_printable_xml(result))
+      return {};
+  }
+
+  return result;
+}
 
 xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
 {
@@ -34,7 +67,7 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
   const auto &lhs_object = step.get_lhs_object();
   const irep_idt identifier =
     lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
-  value_xml.data = from_expr(ns, identifier, value);
+  value_xml.data = get_printable_xml(ns, identifier, value);
 
   const auto &bv_type = type_try_dynamic_cast<bitvector_typet>(value.type());
   const auto &constant = expr_try_dynamic_cast<constant_exprt>(value);
@@ -121,7 +154,7 @@ void convert(
       std::string full_lhs_string;
 
       if(step.full_lhs.is_not_nil())
-        full_lhs_string = from_expr(ns, identifier, step.full_lhs);
+        full_lhs_string = get_printable_xml(ns, identifier, step.full_lhs);
 
       xml_assignment.new_element("full_lhs").data = full_lhs_string;
       xml_assignment.new_element(full_lhs_value(step, ns));
@@ -158,7 +191,7 @@ void convert(
       for(const auto &arg : step.io_args)
       {
         xml_output.new_element("value").data =
-          from_expr(ns, step.function_id, arg);
+          get_printable_xml(ns, step.function_id, arg);
         xml_output.new_element("value_expression").new_element(xml(arg, ns));
       }
       break;
@@ -176,7 +209,7 @@ void convert(
       for(const auto &arg : step.io_args)
       {
         xml_input.new_element("value").data =
-          from_expr(ns, step.function_id, arg);
+          get_printable_xml(ns, step.function_id, arg);
         xml_input.new_element("value_expression").new_element(xml(arg, ns));
       }
 

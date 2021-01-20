@@ -123,6 +123,13 @@ public:
 
   static void escape_attribute(const std::string &s, std::ostream &out);
 
+  /// Determine whether \p s does not contain any characters that cannot be
+  /// escaped in XML 1.0. See https://www.w3.org/TR/xml/#charsets for details.
+  /// \param s: string to verify
+  /// \return True if, and only if, all characters in \p s are taken from the
+  ///   charset permitted in XML 1.0.
+  static bool is_printable_xml(const std::string &s);
+
 protected:
   static void do_indent(
     std::ostream &out,

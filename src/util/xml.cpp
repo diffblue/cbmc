@@ -101,12 +101,17 @@ void xmlt::escape(const std::string &s, std::ostream &out)
       out << '\n';
       break;
 
+    case 0x9:  // TAB
+    case 0x7F: // DEL
+      out << "&#" << std::to_string((unsigned char)ch) << ';';
+      break;
+
     default:
-      // &#0; isn't allowed, but what shall we do?
-      if((ch>=0 && ch<' ') || ch==127)
-        out << "&#"+std::to_string((unsigned char)ch)+";";
-      else
-        out << ch;
+      DATA_INVARIANT(
+        ch >= ' ',
+        "XML does not support escaping non-printable character " +
+          std::to_string((unsigned char)ch));
+      out << ch;
     }
   }
 }
@@ -135,14 +140,32 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
       out << "&quot;";
       break;
 
+    case 0x9:  // TAB
+    case 0xA:  // LF
+    case 0xD:  // CR
+    case 0x7F: // DEL
+      out << "&#" << std::to_string((unsigned char)ch) << ';';
+      break;
+
     default:
-      // &#0; isn't allowed, but what shall we do?
-      if((ch>=0 && ch<' ') || ch==127)
-        out << "&#"+std::to_string((unsigned char)ch)+";";
-      else
-        out << ch;
+      DATA_INVARIANT(
+        ch >= ' ',
+        "XML does not support escaping non-printable character " +
+          std::to_string((unsigned char)ch));
+      out << ch;
     }
   }
+}
+
+bool xmlt::is_printable_xml(const std::string &s)
+{
+  for(const auto ch : s)
+  {
+    if(ch < 0x20 && ch != 0x9 && ch != 0xA && ch != 0xD)
+      return false;
+  }
+
+  return true;
 }
 
 void xmlt::do_indent(std::ostream &out, unsigned indent)
