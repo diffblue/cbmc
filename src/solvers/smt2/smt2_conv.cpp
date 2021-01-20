@@ -4443,7 +4443,6 @@ void smt2_convt::find_symbols(const exprt &expr)
       id.type = expr.type();
 
       std::string smt2_identifier = convert_identifier(identifier);
-      smt2_identifiers.insert(smt2_identifier);
 
       out << "; find_symbols\n";
       out << "(declare-fun |" << smt2_identifier << "| ";
@@ -4460,6 +4459,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       }
       else
       {
+        smt2_identifiers.insert(smt2_identifier);
         out << "() ";
         convert_type(expr.type());
         out << ")"
