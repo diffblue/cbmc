@@ -148,8 +148,12 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
     collective_operands,
     [&resulting_objects, this, &expr, &environment, &ns](
       const std::vector<abstract_object_pointert> &ops) {
+      auto operands_expr = exprt::operandst { };
+      for (auto v : ops)
+        operands_expr.push_back(v->to_constant());
+      auto rewritten_expr = exprt(expr.id(), expr.type(), std::move(operands_expr));
       resulting_objects.insert(
-        (*values.begin())->expression_transform(expr, ops, environment, ns));
+        (*values.begin())->expression_transform(rewritten_expr, ops, environment, ns));
     });
 
   return resolve_new_values(resulting_objects);
