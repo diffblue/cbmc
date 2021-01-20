@@ -285,6 +285,15 @@ value_set_abstract_objectt::get_type(const abstract_object_pointert &other)
   return abstract_typet::UNSUPPORTED;
 }
 
+void value_set_abstract_objectt::set_values(const abstract_object_sett &other_values)
+{
+  PRECONDITION(!other_values.empty());
+  set_not_top();
+  my_type = get_type(*other_values.begin());
+  values = other_values;
+  verify();
+}
+
 abstract_object_pointert value_set_abstract_objectt::maybe_extract_single_value(
   const abstract_object_pointert &maybe_singleton)
 {

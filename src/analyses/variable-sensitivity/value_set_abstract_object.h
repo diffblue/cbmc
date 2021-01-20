@@ -64,14 +64,7 @@ public:
 
   /// Setter for updating the stored values
   /// \param other_values: the new (non-empty) set of values
-  void set_values(const abstract_object_sett &other_values)
-  {
-    PRECONDITION(!other_values.empty());
-    set_not_top();
-    my_type = get_type(*other_values.begin());
-    values = other_values;
-    verify();
-  }
+  void set_values(const abstract_object_sett &other_values);
 
   /// Distinguish the type of abstract objects stored in this value-set.
   enum class abstract_typet
