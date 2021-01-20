@@ -116,6 +116,10 @@ public:
 protected:
   CLONE
 
+  /// \copydoc abstract_object::merge
+  abstract_object_pointert merge(abstract_object_pointert other) const override;
+
+private:
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
@@ -124,10 +128,6 @@ protected:
   abstract_object_pointert
   resolve_new_values(const abstract_object_sett &new_values) const;
 
-  /// \copydoc abstract_object::merge
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
-
-private:
   // data
   abstract_typet my_type;
   abstract_object_sett values;
