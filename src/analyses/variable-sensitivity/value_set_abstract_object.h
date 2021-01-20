@@ -103,13 +103,6 @@ public:
     const abstract_object_pointert &value,
     bool merging_write) const override;
 
-  /// Enforce casting to interval.
-  /// \return the stored values abstracted to an interval
-  abstract_object_pointert get_as_interval() const
-  {
-    return to_interval(values);
-  }
-
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
