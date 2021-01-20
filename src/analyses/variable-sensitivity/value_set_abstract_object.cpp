@@ -16,10 +16,11 @@
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
+using abstract_object_sett = value_set_abstract_objectt::abstract_object_sett;
+
 class value_set_index_ranget : public index_ranget
 {
 public:
-  typedef value_set_abstract_objectt::abstract_object_sett abstract_object_sett;
   explicit value_set_index_ranget(const abstract_object_sett &vals)
     : values(vals), cur(), next(values.begin())
   {
@@ -47,7 +48,7 @@ private:
 };
 
 index_range_ptrt make_value_set_index_range(
-  const value_set_abstract_objectt::abstract_object_sett &vals)
+  const abstract_object_sett &vals)
 {
   return std::make_shared<value_set_index_ranget>(vals);
 }
@@ -63,6 +64,16 @@ get_type(const abstract_object_pointert &other);
 /// \return the abstract-type of \p type
 value_set_abstract_objectt::abstract_typet
 type_to_abstract_type(const typet &type);
+
+exprt rewrite_expression(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &ops);
+
+std::vector<abstract_object_sett>
+unwrap_operands(const std::vector<abstract_object_pointert> &operands);
+
+abstract_object_sett
+unwrap_and_extract_values(const abstract_object_sett & values);
 
 /// Helper for converting singleton value sets into its only value.
 /// \p maybe_singleton: either a set of abstract values or a single value
@@ -192,30 +203,21 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  std::size_t num_operands = expr.operands().size();
-  PRECONDITION(operands.size() == num_operands);
+  PRECONDITION(operands.size() == expr.operands().size());
 
-  std::vector<abstract_object_sett> collective_operands;
-  collective_operands.reserve(num_operands);
-  for(const auto &op : operands)
-  {
-    auto vsab = std::dynamic_pointer_cast<const value_set_abstract_objectt>(
-      maybe_unwrap_context(op));
-    INVARIANT(vsab, "should be a value set abstract object");
-    collective_operands.push_back(vsab->get_values());
-  }
+  auto collective_operands = unwrap_operands(operands);
 
   abstract_object_sett resulting_objects;
+
+  auto dispatcher = *values.begin();
   for_each_comb(
     collective_operands,
-    [&resulting_objects, this, &expr, &environment, &ns](
+    [&resulting_objects, &dispatcher, &expr, &environment, &ns](
       const std::vector<abstract_object_pointert> &ops) {
-      auto operands_expr = exprt::operandst { };
-      for (auto v : ops)
-        operands_expr.push_back(v->to_constant());
-      auto rewritten_expr = exprt(expr.id(), expr.type(), std::move(operands_expr));
+
+      auto rewritten_expr = rewrite_expression(expr, ops);
       resulting_objects.insert(
-        (*values.begin())->expression_transform(rewritten_expr, ops, environment, ns));
+        dispatcher->expression_transform(rewritten_expr, ops, environment, ns));
     });
 
   return resolve_new_values(resulting_objects);
@@ -246,12 +248,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
   if(new_values == values)
     return shared_from_this();
 
-  abstract_object_sett unwrapped_values;
-  for(auto const &value : new_values)
-  {
-    unwrapped_values.insert(
-      maybe_extract_single_value(maybe_unwrap_context(value)));
-  }
+  auto unwrapped_values = unwrap_and_extract_values(new_values);
 
   abstract_typet new_type = get_type(*unwrapped_values.begin());
   if(
@@ -293,8 +290,8 @@ value_set_abstract_objectt::merge(abstract_object_pointert other) const
       cast_other->get_values().begin(), cast_other->get_values().end());
     return resolve_new_values(union_values);
   }
-  else
-    return abstract_objectt::merge(other);
+
+  return abstract_objectt::merge(other);
 }
 
 abstract_object_pointert value_set_abstract_objectt::to_interval(
@@ -389,21 +386,57 @@ type_to_abstract_type(const typet &type)
   using abstract_typet = value_set_abstract_objectt::abstract_typet;
 
   if(type.id() == ID_pointer)
-  {
     return abstract_typet::POINTER;
-  }
-  else if(
+
+   if(
     type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
     type.id() == ID_fixedbv || type.id() == ID_c_bool ||
     type.id() == ID_bool || type.id() == ID_integer ||
     type.id() == ID_c_bit_field || type.id() == ID_floatbv)
-  {
     return abstract_typet::CONSTANT;
-  }
-  else
+
+  return abstract_typet::UNSUPPORTED;
+}
+
+exprt rewrite_expression(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &ops)
+{
+  auto operands_expr = exprt::operandst { };
+  for (auto v : ops)
+    operands_expr.push_back(v->to_constant());
+  auto rewritten_expr = exprt(expr.id(), expr.type(), std::move(operands_expr));
+  return rewritten_expr;
+}
+
+std::vector<abstract_object_sett>
+  unwrap_operands(const std::vector<abstract_object_pointert> &operands)
+{
+  auto unwrapped =
+    std::vector<abstract_object_sett>{};
+
+  for(const auto &op : operands)
   {
-    return abstract_typet::UNSUPPORTED;
+    auto vsab = std::dynamic_pointer_cast<const value_set_abstract_objectt>(
+      maybe_unwrap_context(op));
+    INVARIANT(vsab, "should be a value set abstract object");
+    unwrapped.push_back(vsab->get_values());
   }
+
+  return unwrapped;
+}
+
+abstract_object_sett
+unwrap_and_extract_values(const abstract_object_sett &values)
+{
+  abstract_object_sett unwrapped_values;
+  for(auto const &value : values)
+  {
+    unwrapped_values.insert(
+      maybe_extract_single_value(maybe_unwrap_context(value)));
+  }
+
+  return unwrapped_values;
 }
 
 abstract_object_pointert
