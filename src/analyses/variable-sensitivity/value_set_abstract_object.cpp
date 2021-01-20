@@ -52,6 +52,32 @@ index_range_ptrt make_value_set_index_range(
   return std::make_shared<value_set_index_ranget>(vals);
 }
 
+/// Determine abstract-type of an abstract object \p other.
+/// \param other: the abstract object to get the type of
+/// \return the abstract-type of \p other
+value_set_abstract_objectt::abstract_typet
+get_type(const abstract_object_pointert &other);
+
+/// Determine abstract-type of an expression-type \p type.
+/// \param type: the expression type to get the abstract-type of
+/// \return the abstract-type of \p type
+value_set_abstract_objectt::abstract_typet
+type_to_abstract_type(const typet &type);
+
+/// Helper for converting singleton value sets into its only value.
+/// \p maybe_singleton: either a set of abstract values or a single value
+/// \return an abstract value without context
+abstract_object_pointert
+maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
+
+/// Helper for converting context objects into its abstract-value children
+/// \p maybe_wrapped: either an abstract value (or a set of those) or one
+///   wrapped in a context
+/// \return an abstract value without context (though it might be as set)
+abstract_object_pointert
+maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
+
+
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type), my_type(type_to_abstract_type(type))
 {
@@ -268,23 +294,6 @@ bool value_set_abstract_objectt::verify() const
   return true;
 }
 
-value_set_abstract_objectt::abstract_typet
-value_set_abstract_objectt::get_type(const abstract_object_pointert &other)
-{
-  PRECONDITION(
-    !std::dynamic_pointer_cast<const context_abstract_objectt>(other));
-  PRECONDITION(!std::dynamic_pointer_cast<const abstract_aggregate_tag>(other));
-  PRECONDITION(
-    !std::dynamic_pointer_cast<const value_set_abstract_objectt>(other));
-
-  if(std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other))
-    return abstract_typet::POINTER;
-  if(std::dynamic_pointer_cast<const constant_abstract_valuet>(other))
-    return abstract_typet::CONSTANT;
-  UNREACHABLE;
-  return abstract_typet::UNSUPPORTED;
-}
-
 void value_set_abstract_objectt::set_values(const abstract_object_sett &other_values)
 {
   PRECONDITION(!other_values.empty());
@@ -292,33 +301,6 @@ void value_set_abstract_objectt::set_values(const abstract_object_sett &other_va
   my_type = get_type(*other_values.begin());
   values = other_values;
   verify();
-}
-
-abstract_object_pointert value_set_abstract_objectt::maybe_extract_single_value(
-  const abstract_object_pointert &maybe_singleton)
-{
-  auto const &value_as_set =
-    std::dynamic_pointer_cast<const value_set_abstract_objectt>(
-      maybe_singleton);
-  if(value_as_set)
-  {
-    PRECONDITION(value_as_set->get_values().size() == 1);
-    PRECONDITION(!std::dynamic_pointer_cast<const context_abstract_objectt>(
-      *value_as_set->get_values().begin()));
-
-    return *value_as_set->get_values().begin();
-  }
-  else
-    return maybe_singleton;
-}
-
-abstract_object_pointert value_set_abstract_objectt::maybe_unwrap_context(
-  const abstract_object_pointert &maybe_wrapped)
-{
-  auto const &context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
-
-  return context_value ? context_value->unwrap_context() : maybe_wrapped;
 }
 
 void value_set_abstract_objectt::output(
@@ -344,4 +326,73 @@ void value_set_abstract_objectt::output(
     }
     out << ":value-set-end";
   }
+}
+
+value_set_abstract_objectt::abstract_typet
+get_type(const abstract_object_pointert &other)
+{
+  using abstract_typet = value_set_abstract_objectt::abstract_typet;
+
+  PRECONDITION(
+    !std::dynamic_pointer_cast<const context_abstract_objectt>(other));
+  PRECONDITION(!std::dynamic_pointer_cast<const abstract_aggregate_tag>(other));
+  PRECONDITION(
+    !std::dynamic_pointer_cast<const value_set_abstract_objectt>(other));
+
+  if(std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other))
+    return abstract_typet::POINTER;
+  if(std::dynamic_pointer_cast<const constant_abstract_valuet>(other))
+    return abstract_typet::CONSTANT;
+  UNREACHABLE;
+  return abstract_typet::UNSUPPORTED;
+}
+
+value_set_abstract_objectt::abstract_typet
+type_to_abstract_type(const typet &type)
+{
+  using abstract_typet = value_set_abstract_objectt::abstract_typet;
+
+  if(type.id() == ID_pointer)
+  {
+    return abstract_typet::POINTER;
+  }
+  else if(
+    type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+    type.id() == ID_fixedbv || type.id() == ID_c_bool ||
+    type.id() == ID_bool || type.id() == ID_integer ||
+    type.id() == ID_c_bit_field || type.id() == ID_floatbv)
+  {
+    return abstract_typet::CONSTANT;
+  }
+  else
+  {
+    return abstract_typet::UNSUPPORTED;
+  }
+}
+
+abstract_object_pointert
+maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
+{
+  auto const &value_as_set =
+    std::dynamic_pointer_cast<const value_set_abstract_objectt>(
+      maybe_singleton);
+  if(value_as_set)
+  {
+    PRECONDITION(value_as_set->get_values().size() == 1);
+    PRECONDITION(!std::dynamic_pointer_cast<const context_abstract_objectt>(
+      *value_as_set->get_values().begin()));
+
+    return *value_as_set->get_values().begin();
+  }
+  else
+    return maybe_singleton;
+}
+
+abstract_object_pointert
+maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
+{
+  auto const &context_value =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
+
+  return context_value ? context_value->unwrap_context() : maybe_wrapped;
 }

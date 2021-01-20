@@ -163,47 +163,6 @@ private:
     std::vector<typename Con::value_type> sub_con;
     apply_comb(super_con, sub_con, f);
   }
-
-  /// Determine abstract-type of an abstract object \p other.
-  /// \param other: the abstract object to get the type of
-  /// \return the abstract-type of \p other
-  static abstract_typet get_type(const abstract_object_pointert &other);
-
-  /// Determine abstract-type of an expression-type \p type.
-  /// \param type: the expression type to get the abstract-type of
-  /// \return the abstract-type of \p type
-  static abstract_typet type_to_abstract_type(const typet &type)
-  {
-    if(type.id() == ID_pointer)
-    {
-      return abstract_typet::POINTER;
-    }
-    else if(
-      type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
-      type.id() == ID_fixedbv || type.id() == ID_c_bool ||
-      type.id() == ID_bool || type.id() == ID_integer ||
-      type.id() == ID_c_bit_field || type.id() == ID_floatbv)
-    {
-      return abstract_typet::CONSTANT;
-    }
-    else
-    {
-      return abstract_typet::UNSUPPORTED;
-    }
-  }
-
-  /// Helper for converting singleton value sets into its only value.
-  /// \p maybe_singleton: either a set of abstract values or a single value
-  /// \return an abstract value without context
-  static abstract_object_pointert
-  maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
-
-  /// Helper for converting context objects into its abstract-value children
-  /// \p maybe_wrapped: either an abstract value (or a set of those) or one
-  ///   wrapped in a context
-  /// \return an abstract value without context (though it might be as set)
-  static abstract_object_pointert
-  maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
