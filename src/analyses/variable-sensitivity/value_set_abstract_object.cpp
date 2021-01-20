@@ -77,6 +77,42 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 abstract_object_pointert
 maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
 
+/// Recursively construct a combination \p sub_con from \p super_con and once
+///   constructed call \p f.
+/// \param super_con: vector of some containers storing the values
+/// \param sub_con: the one combination being currently constructed
+/// \param f: callable with side-effects
+template <typename Con, typename F>
+void apply_comb(
+  const std::vector<Con> &super_con,
+  std::vector<typename Con::value_type> &sub_con,
+  F f)
+{
+  size_t n = sub_con.size();
+  if(n == super_con.size())
+    f(sub_con);
+  else
+  {
+    for(const auto &value : super_con[n])
+    {
+      sub_con.push_back(value);
+      apply_comb(super_con, sub_con, f);
+      sub_con.pop_back();
+    }
+  }
+}
+
+/// Call the function \p f on every combination of elements in \p super_con.
+///   Hence the arity of \p f is `super_con.size()`. <{1,2},{1},{1,2,3}> ->
+///   f(1,1,1), f(1,1,2), f(1,1,3), f(2,1,1), f(2,1,2), f(2,1,3).
+/// \param super_con: vector of some containers storing the values
+/// \param f: callable with side-effects
+template <typename Con, typename F>
+void for_each_comb(const std::vector<Con> &super_con, F f)
+{
+  std::vector<typename Con::value_type> sub_con;
+  apply_comb(super_con, sub_con, f);
+}
 
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type), my_type(type_to_abstract_type(type))
