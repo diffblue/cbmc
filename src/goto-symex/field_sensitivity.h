@@ -10,6 +10,7 @@ Author: Michael Tautschnig
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
 #include <util/magic.h>
+#include <util/nodiscard.h>
 
 class exprt;
 class ssa_exprt;
@@ -116,6 +117,7 @@ public:
   /// \param expr: an expression to be (recursively) transformed.
   /// \param write: set to true if the expression is to be used as an lvalue.
   /// \return the transformed expression
+  NODISCARD
   exprt
   apply(const namespacet &ns, goto_symex_statet &state, exprt expr, bool write)
     const;
