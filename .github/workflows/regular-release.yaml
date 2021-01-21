@@ -33,12 +33,12 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
-          CBMC_TAG: ${{ needs.get-version-information.outputs.version }}
+          CBMC_VERSION: ${{ needs.get-version-information.outputs.version }}
         with:
-          tag_name: ${{ env.CBMC_TAG }}
-          release_name: ${{ env.CBMC_TAG }}
+          tag_name: cbmc-${{ env.CBMC_VERSION }}
+          release_name: cbmc-${{ env.CBMC_VERSION }}
           body: |
-            This is CBMC version ${{ env.CBMC_TAG }}.
+            This is CBMC version ${{ env.CBMC_VERSION }}.
 
             ## MacOS
 
@@ -60,19 +60,19 @@ jobs:
 
             ```sh
             # Ubuntu 18:
-            $ dpkg -i ubuntu-18.04-cbmc-${{ env.CBMC_TAG }}-Linux.deb
+            $ dpkg -i ubuntu-18.04-cbmc-${{ env.CBMC_VERSION }}-Linux.deb
             # Ubuntu 20:
-            $ dpkg -i ubuntu-20.04-cbmc-${{ env.CBMC_TAG }}-Linux.deb
+            $ dpkg -i ubuntu-20.04-cbmc-${{ env.CBMC_VERSION }}-Linux.deb
             ```
 
             ## Windows
 
-            On Windows, install CBMC by downloading the `cbmc-${{ env.CBMC_TAG }}-win64.msi` installer below, double-clicking on the installer to run it, and adding the folder `C:\Program Files\cbmc\bin` in your `PATH` environment variable.
+            On Windows, install CBMC by downloading the `cbmc-${{ env.CBMC_VERSION }}-win64.msi` installer below, double-clicking on the installer to run it, and adding the folder `C:\Program Files\cbmc\bin` in your `PATH` environment variable.
 
             For installation from the windows command prompt, run:
 
             ```sh
-            msiexec /i cbmc-${{ env.CBMC_TAG }}-win64.msi
+            msiexec /i cbmc-${{ env.CBMC_VERSION }}-win64.msi
             PATH="C:\Program Files\cbmc\bin";%PATH%
             ```
 
@@ -87,7 +87,7 @@ jobs:
             set up correctly, and then issue:
 
             ```sh
-            $ docker run -it diffblue/cbmc:${{ env.CBMC-TAG }}
+            $ docker run -it diffblue/cbmc:${{ env.CBMC_VERSION }}
             #
             ```
 
