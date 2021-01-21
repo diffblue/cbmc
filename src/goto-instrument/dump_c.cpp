@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c.h"
 
+#include <util/byte_operators.h>
 #include <util/config.h>
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
@@ -1412,6 +1413,60 @@ void dump_ct::cleanup_expr(exprt &expr)
         expr.remove(ID_C_cformat);
     }
     #endif
+  }
+  else if(
+    expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian)
+  {
+    const byte_update_exprt &bu = to_byte_update_expr(expr);
+
+    if(bu.op().id() == ID_union && bu.offset().is_zero())
+    {
+      const union_exprt &union_expr = to_union_expr(bu.op());
+      const union_typet &union_type =
+        to_union_type(ns.follow(union_expr.type()));
+
+      for(const auto &comp : union_type.components())
+      {
+        if(bu.value().type() == comp.type())
+        {
+          exprt member1{ID_member};
+          member1.set(ID_component_name, union_expr.get_component_name());
+          exprt designated_initializer1{ID_designated_initializer};
+          designated_initializer1.add_to_operands(union_expr.op());
+          designated_initializer1.add(ID_designator).move_to_sub(member1);
+
+          exprt member2{ID_member};
+          member2.set(ID_component_name, comp.get_name());
+          exprt designated_initializer2{ID_designated_initializer};
+          designated_initializer2.add_to_operands(bu.value());
+          designated_initializer2.add(ID_designator).move_to_sub(member2);
+
+          binary_exprt initializer_list{std::move(designated_initializer1),
+                                        ID_initializer_list,
+                                        std::move(designated_initializer2)};
+          expr.swap(initializer_list);
+          break;
+        }
+      }
+    }
+    else if(
+      bu.op().id() == ID_side_effect &&
+      to_side_effect_expr(bu.op()).get_statement() == ID_nondet &&
+      ns.follow(bu.op().type()).id() == ID_union && bu.offset().is_zero())
+    {
+      const union_typet &union_type = to_union_type(ns.follow(bu.op().type()));
+
+      for(const auto &comp : union_type.components())
+      {
+        if(bu.value().type() == comp.type())
+        {
+          union_exprt union_expr{comp.get_name(), bu.value(), bu.op().type()};
+          expr.swap(union_expr);
+          break;
+        }
+      }
+    }
   }
 }
 
