@@ -8,15 +8,20 @@ name: Create Release
 jobs:
   get-version-information:
     name: Get Version Information
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
-      version: ${{ steps.split.outputs._2 }}
+      version: ${{ steps.split-version.outputs._1 }}
     steps:
       - uses: jungwinter/split@v1
         id: split
         with:
           msg: ${{ github.ref }}
           seperator: '/'
+      - uses: jungwinter/split@v1
+        id: split-version
+        with:
+          msg: ${{ steps.split.outputs._2 }}
+          seperator: '-'
   perform-release:
     name: Perform Release
     runs-on: ubuntu-20.04
@@ -55,24 +60,39 @@ jobs:
 
             ```sh
             # Ubuntu 18:
-            $ dpkg -i ubuntu-18.04-${{ env.CBMC_TAG }}-Linux.deb
+            $ dpkg -i ubuntu-18.04-cbmc-${{ env.CBMC_TAG }}-Linux.deb
             # Ubuntu 20:
-            $ dpkg -i ubuntu-20.04-${{ env.CBMC_TAG }}-Linux.deb
+            $ dpkg -i ubuntu-20.04-cbmc-${{ env.CBMC_TAG }}-Linux.deb
             ```
 
             ## Windows
 
-            On Windows, install CBMC by downloading the `${{ env.CBMC_TAG }}-win64.msi` installer below, double-clicking on the installer to run it, and adding the folder `C:\Program Files\cbmc\bin` in your `PATH` environment variable.
+            On Windows, install CBMC by downloading the `cbmc-${{ env.CBMC_TAG }}-win64.msi` installer below, double-clicking on the installer to run it, and adding the folder `C:\Program Files\cbmc\bin` in your `PATH` environment variable.
 
             For installation from the windows command prompt, run:
 
             ```sh
-            msiexec /i ${{ env.CBMC_TAG }}-win64.msi
+            msiexec /i cbmc-${{ env.CBMC_TAG }}-win64.msi
             PATH="C:\Program Files\cbmc\bin";%PATH%
             ```
 
             Note that we depend on the Visual C++ redistributables. You likely already have these, if not please download and run vcredist.x64.exe from Microsoft to install them prior to running cbmc, or make sure you have Visual Studio 2019 installed.
 
             You can download either [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/community/) or the [Visual C++ Redistributables](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) from Microsoft for free.
+
+            ## Docker
+
+            To run the CProver suite of tools under a Docker container, make sure that
+            [Docker](https://www.docker.com/) is already installed in your system and
+            set up correctly, and then issue:
+
+            ```sh
+            $ docker run -it diffblue/cbmc:${{ env.CBMC-TAG }}
+            #
+            ```
+
+            That will initialise an execution of the container based on the image pushed
+            as part of this release. The CProver tools are present in the `$PATH` of the
+            container.
           draft: false
           prerelease: false
