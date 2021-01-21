@@ -1,3 +1,5 @@
+#include <assert.h>
+
 union U {
   int *p;
   unsigned long long p_int;
@@ -5,4 +7,5 @@ union U {
 
 int main()
 {
+  assert(u.p_int == 42);
 }

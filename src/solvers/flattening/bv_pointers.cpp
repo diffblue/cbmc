@@ -308,7 +308,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       encode(pointer_logic.get_null_object(), bv);
     else
     {
-      mp_integer i=string2integer(id2string(value), 2);
+      mp_integer i = bvrep2integer(value, bits, false);
       bv=bv_utils.build_constant(i, bits);
     }
 
