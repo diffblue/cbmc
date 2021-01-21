@@ -90,8 +90,22 @@ void satcheck_ipasirt::lcnf(const bvt &bv)
   }
   ipasir_add(solver, 0); // terminate clause
 
-  with_solver_hardness(
-    [&bv](solver_hardnesst &hardness) { hardness.register_clause(bv); });
+  with_solver_hardness([this, &bv](solver_hardnesst &hardness) {
+    // To map clauses to lines of program code, track clause indices in the
+    // dimacs cnf output. Dimacs output is generated after processing
+    // clauses to remove duplicates and clauses that are trivially true.
+    // Here, a clause is checked to see if it can be thus eliminated. If
+    // not, add the clause index to list of clauses in
+    // solver_hardnesst::register_clause().
+    static size_t cnf_clause_index = 0;
+    bvt cnf;
+    bool clause_removed = process_clause(bv, cnf);
+
+    if(!clause_removed)
+      cnf_clause_index++;
+
+    hardness.register_clause(bv, cnf, cnf_clause_index, !clause_removed);
+  });
 
   clause_counter++;
 }
@@ -103,51 +117,40 @@ propt::resultt satcheck_ipasirt::do_prop_solve()
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
 
-  // use the internal representation, as ipasir does not support reporting the
-  // status
-  if(status==statust::UNSAT)
+  // if assumptions contains false, we need this to be UNSAT
+  bvt::const_iterator it =
+    std::find_if(assumptions.begin(), assumptions.end(), is_false);
+  const bool has_false = it != assumptions.end();
+
+  if(has_false)
   {
-    log.status() << "SAT checker inconsistent: instance is UNSATISFIABLE"
+    log.status() << "got FALSE as assumption: instance is UNSATISFIABLE"
                  << messaget::eom;
   }
   else
   {
-    // if assumptions contains false, we need this to be UNSAT
-    bvt::const_iterator it = std::find_if(assumptions.begin(),
-      assumptions.end(), is_false);
-    const bool has_false = it != assumptions.end();
+    forall_literals(it, assumptions)
+      if(!it->is_false())
+        ipasir_assume(solver, it->dimacs());
 
-    if(has_false)
+    // solve the formula, and handle the return code (10=SAT, 20=UNSAT)
+    int solver_state = ipasir_solve(solver);
+    if(10 == solver_state)
     {
-      log.status() << "got FALSE as assumption: instance is UNSATISFIABLE"
-                   << messaget::eom;
+      log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
+      status = statust::SAT;
+      return resultt::P_SATISFIABLE;
+    }
+    else if(20 == solver_state)
+    {
+      log.status() << "SAT checker: instance is UNSATISFIABLE" << messaget::eom;
     }
     else
     {
-      forall_literals(it, assumptions)
-        if(!it->is_false())
-          ipasir_assume(solver, it->dimacs());
-
-      // solve the formula, and handle the return code (10=SAT, 20=UNSAT)
-      int solver_state=ipasir_solve(solver);
-      if(10==solver_state)
-      {
-        log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
-        status=statust::SAT;
-        return resultt::P_SATISFIABLE;
-      }
-      else if(20==solver_state)
-      {
-        log.status() << "SAT checker: instance is UNSATISFIABLE"
-                     << messaget::eom;
-      }
-      else
-      {
-        log.status() << "SAT checker: solving returned without solution"
-                     << messaget::eom;
-        throw analysis_exceptiont(
-          "solving inside IPASIR SAT solver has been interrupted");
-      }
+      log.status() << "SAT checker: solving returned without solution"
+                   << messaget::eom;
+      throw analysis_exceptiont(
+        "solving inside IPASIR SAT solver has been interrupted");
     }
   }
 

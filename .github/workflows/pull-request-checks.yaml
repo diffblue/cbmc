@@ -16,8 +16,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache
-          make -C src minisat2-download
+          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -34,19 +33,24 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: |
-          make -C src CXX='ccache /usr/bin/g++' -j2
-          make -C unit CXX='ccache /usr/bin/g++' -j2
-          make -C jbmc/src  CXX='ccache /usr/bin/g++' -j2
-          make -C jbmc/unit CXX='ccache /usr/bin/g++' -j2
+          git clone https://github.com/conp-solutions/riss riss.git
+          cmake -Hriss.git -Briss.git/release -DCMAKE_BUILD_TYPE=Release
+          make -C riss.git/release riss-coprocessor-lib-static -j2
+          make -C src -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+          make -C jbmc/src -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+
+          make -C unit -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+
+          make -C jbmc/unit -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
       - name: Print ccache stats
         run: ccache -s
       - name: Run unit tests
         run: |
-          make -C unit test
-          make -C jbmc/unit test
+          make -C unit test IPASIR=$PWD/riss.git/riss
+          make -C jbmc/unit test IPASIR=$PWD/riss.git/riss
           echo "Running expected failure tests"
-          make TAGS="[!shouldfail]" -C unit test
-          make TAGS="[!shouldfail]" -C jbmc/unit test
+          make TAGS="[!shouldfail]" -C unit test IPASIR=$PWD/riss.git/riss
+          make TAGS="[!shouldfail]" -C jbmc/unit test IPASIR=$PWD/riss.git/riss
       - name: Run regression tests
         run: |
           make -C regression test-parallel JOBS=2

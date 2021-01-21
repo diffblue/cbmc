@@ -225,6 +225,9 @@ EXCLUDED_TESTS=expr_undefined_casts.cpp
 ifneq ($(WITH_MEMORY_ANALYZER),1)
 EXCLUDED_TESTS += gdb_api.cpp
 endif
+ifeq ($(MINISAT2),)
+EXCLUDED_TESTS += satcheck_minisat2.cpp
+endif
 
 N_CATCH_TESTS = $(shell \
                   cat $$(find . -name "*.cpp" \
