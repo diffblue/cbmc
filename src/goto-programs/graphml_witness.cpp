@@ -18,6 +18,7 @@ Author: Daniel Kroening
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
+#include <util/string_constant.h>
 #include <util/string_container.h>
 
 #include <langapi/language_util.h>
@@ -56,6 +57,12 @@ void graphml_witnesst::remove_l0_l1(exprt &expr)
     }
 
     return;
+  }
+  else if(expr.id() == ID_string_constant)
+  {
+    std::string output_string = expr_to_string(ns, "", expr);
+    if(!xmlt::is_printable_xml(output_string))
+      expr = to_string_constant(expr).to_array_expr();
   }
 
   Forall_operands(it, expr)
