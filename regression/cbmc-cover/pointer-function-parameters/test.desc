@@ -1,6 +1,6 @@
 CORE
 main.c
---function fun --cover branch
+--function fun --cover branch --show-test-suite
 ^\*\* 5 of 5 covered \(100\.0%\)$
 ^Test suite:$
 ^(tmp(\$\d+)?=[^,]*, a=\(\(signed int \*\)NULL\))|(a=\(\(signed int \*\)NULL\), tmp(\$\d+)?=[^,]*)$

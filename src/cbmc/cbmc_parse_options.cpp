@@ -726,8 +726,11 @@ int cbmc_parse_optionst::doit()
     (void)verifier();
     verifier.report();
 
-    c_test_input_generatort test_generator(ui_message_handler, options);
-    test_generator(verifier.get_traces());
+    if(options.get_bool_option("show-test-suite"))
+    {
+      c_test_input_generatort test_generator(ui_message_handler, options);
+      test_generator(verifier.get_traces());
+    }
 
     return CPROVER_EXIT_SUCCESS;
   }

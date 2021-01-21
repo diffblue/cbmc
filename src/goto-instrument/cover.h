@@ -24,7 +24,8 @@ class optionst;
 
 #define OPT_COVER                                                              \
   "(cover):"                                                                   \
-  "(cover-failed-assertions)"
+  "(cover-failed-assertions)"                                                  \
+  "(show-test-suite)"
 
 #define HELP_COVER                                                             \
   " --cover CC                   create test-suite with coverage criterion "   \
@@ -32,7 +33,9 @@ class optionst;
   " --cover-failed-assertions    do not stop coverage checking at failed "     \
   "assertions\n"                                                               \
   "                              (this is the default for --cover "            \
-  "assertions)\n"
+  "assertions)\n"                                                              \
+  " --show-test-suite            print test suite for coverage criterion "     \
+  "(requires --cover)"
 
 enum class coverage_criteriont
 {

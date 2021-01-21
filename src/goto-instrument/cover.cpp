@@ -166,6 +166,8 @@ void parse_cover_options(const cmdlinet &cmdline, optionst &options)
     cmdline.isset("cover-traces-must-terminate"));
   options.set_option(
     "cover-failed-assertions", cmdline.isset("cover-failed-assertions"));
+
+  options.set_option("show-test-suite", cmdline.isset("show-test-suite"));
 }
 
 /// Build data structures controlling coverage from command-line options.

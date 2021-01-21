@@ -24,6 +24,8 @@ Date: July 2005
 
 #include <goto-programs/goto_program.h>
 
+class merge_irept;
+
 /// Step of the trace of a GOTO program
 ///
 /// A step is either:
@@ -162,6 +164,10 @@ public:
     full_lhs_value.make_nil();
     cond_expr.make_nil();
   }
+
+  /// Use \p dest to establish sharing among ireps.
+  /// \param [out] dest: irep storage container.
+  void merge_ireps(merge_irept &dest);
 };
 
 /// Trace of a GOTO program.

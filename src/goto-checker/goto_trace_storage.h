@@ -14,6 +14,10 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-programs/goto_trace.h>
 
+#include <util/merge_irep.h>
+
+#include <list>
+
 class goto_trace_storaget
 {
 public:
@@ -28,7 +32,7 @@ public:
   ///   are mapped to the given trace.
   const goto_tracet &insert_all(goto_tracet &&);
 
-  const std::vector<goto_tracet> &all() const;
+  const std::list<goto_tracet> &all() const;
   const goto_tracet &operator[](const irep_idt &property_id) const;
 
   const namespacet &get_namespace() const;
@@ -38,10 +42,13 @@ protected:
   const namespacet &ns;
 
   /// stores the traces
-  std::vector<goto_tracet> traces;
+  std::list<goto_tracet> traces;
 
   // maps property ID to index in traces
   std::unordered_map<irep_idt, std::size_t> property_id_to_trace_index;
+
+  /// irep container for shared ireps
+  merge_irept merge_ireps;
 };
 
 #endif // CPROVER_GOTO_CHECKER_GOTO_TRACE_STORAGE_H

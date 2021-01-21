@@ -18,6 +18,7 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/format_expr.h>
+#include <util/merge_irep.h>
 #include <util/range.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>
@@ -133,6 +134,20 @@ void goto_trace_stept::output(
 
   out << '\n';
 }
+
+void goto_trace_stept::merge_ireps(merge_irept &dest)
+{
+  dest(cond_expr);
+  dest(full_lhs);
+  dest(full_lhs_value);
+
+  for(auto &io_arg : io_args)
+    dest(io_arg);
+
+  for(auto &function_arg : function_arguments)
+    dest(function_arg);
+}
+
 /// Returns the numeric representation of an expression, based on
 /// options. The default is binary without a base-prefix. Setting
 /// options.hex_representation to be true outputs hex format. Setting

@@ -27,6 +27,10 @@ const goto_tracet &goto_trace_storaget::insert(goto_tracet &&trace)
     emplace_result.second,
     "cannot associate more than one error trace with property " +
       id2string(last_step.property_id));
+
+  for(auto &step : traces.back().steps)
+    step.merge_ireps(merge_ireps);
+
   return traces.back();
 }
 
@@ -40,10 +44,14 @@ const goto_tracet &goto_trace_storaget::insert_all(goto_tracet &&trace)
   {
     property_id_to_trace_index.emplace(property_id, traces.size() - 1);
   }
+
+  for(auto &step : traces.back().steps)
+    step.merge_ireps(merge_ireps);
+
   return traces.back();
 }
 
-const std::vector<goto_tracet> &goto_trace_storaget::all() const
+const std::list<goto_tracet> &goto_trace_storaget::all() const
 {
   return traces;
 }
@@ -53,8 +61,9 @@ operator[](const irep_idt &property_id) const
 {
   const auto trace_found = property_id_to_trace_index.find(property_id);
   PRECONDITION(trace_found != property_id_to_trace_index.end());
+  CHECK_RETURN(trace_found->second < traces.size());
 
-  return traces.at(trace_found->second);
+  return *(std::next(traces.begin(), trace_found->second));
 }
 
 const namespacet &goto_trace_storaget::get_namespace() const
