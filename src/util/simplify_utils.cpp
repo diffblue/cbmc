@@ -185,8 +185,15 @@ optionalt<exprt> bits2expr(
   // bits start at lowest memory address
   auto type_bits = pointer_offset_bits(type, ns);
 
-  if(!type_bits.has_value() || *type_bits != bits.size())
+  if(
+    !type_bits.has_value() ||
+    (type.id() != ID_union && type.id() != ID_union_tag &&
+     *type_bits != bits.size()) ||
+    ((type.id() == ID_union || type.id() == ID_union_tag) &&
+     *type_bits < bits.size()))
+  {
     return {};
+  }
 
   if(
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
