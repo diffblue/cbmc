@@ -2280,10 +2280,36 @@ std::string expr2ct::convert_designated_initializer(const exprt &src)
     return convert_norep(src, precedence);
   }
 
-  std::string dest=".";
-  // TODO it->find(ID_member)
+  const exprt &value = to_unary_expr(src).op();
+
+  const exprt &designator = static_cast<const exprt &>(src.find(ID_designator));
+  if(designator.operands().size() != 1)
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+
+  const exprt &designator_id = to_unary_expr(designator).op();
+
+  std::string dest;
+
+  if(designator_id.id() == ID_member)
+  {
+    dest = "." + id2string(designator_id.get(ID_component_name));
+  }
+  else if(
+    designator_id.id() == ID_index && designator_id.operands().size() == 1)
+  {
+    dest = "[" + convert(to_unary_expr(designator_id).op()) + "]";
+  }
+  else
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+
   dest+='=';
-  dest += convert(to_unary_expr(src).op());
+  dest += convert(value);
 
   return dest;
 }

@@ -439,12 +439,11 @@ offsetof:
 offsetof_member_designator:
           member_name
         {
-          init($$, ID_designated_initializer);
-          parser_stack($$).operands().resize(1);
-          auto &op = to_unary_expr(parser_stack($$)).op();
-          op.id(ID_member);
+          init($$);
+          exprt op{ID_member};
           op.add_source_location()=parser_stack($1).source_location();
           op.set(ID_component_name, parser_stack($1).get(ID_C_base_name));
+          parser_stack($$).add_to_operands(std::move(op));
         }
         | offsetof_member_designator '.' member_name
         {
