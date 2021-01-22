@@ -1911,12 +1911,8 @@ std::string expr2ct::convert_constant(
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
-    else
+    else if(src.operands().size() == 1)
     {
-      // we prefer the annotation
-      if(src.operands().size()!=1)
-        return convert_norep(src, precedence);
-
       const auto &annotation = to_unary_expr(src).op();
 
       if(annotation.id() == ID_constant)
@@ -1932,6 +1928,12 @@ std::string expr2ct::convert_constant(
       }
       else
         return convert_with_precedence(annotation, precedence);
+    }
+    else
+    {
+      const auto width = to_pointer_type(type).get_width();
+      mp_integer int_value = bvrep2integer(value, width, false);
+      return "(" + convert(type) + ")" + integer2string(int_value);
     }
   }
   else if(type.id()==ID_string)
