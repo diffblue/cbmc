@@ -1753,6 +1753,40 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
     return changed(simplify_byte_extract(be));
   }
 
+  // update bits in a constant
+  const auto offset_int = numeric_cast<mp_integer>(offset);
+  if(
+    root_size.has_value() && *root_size >= 0 && val_size.has_value() &&
+    *val_size >= 0 && offset_int.has_value() && *offset_int >= 0 &&
+    *offset_int + *val_size <= *root_size)
+  {
+    auto root_bits =
+      expr2bits(root, expr.id() == ID_byte_update_little_endian, ns);
+
+    if(root_bits.has_value())
+    {
+      const auto val_bits =
+        expr2bits(value, expr.id() == ID_byte_update_little_endian, ns);
+
+      if(val_bits.has_value())
+      {
+        root_bits->replace(
+          numeric_cast_v<std::size_t>(*offset_int * 8),
+          numeric_cast_v<std::size_t>(*val_size),
+          *val_bits);
+
+        auto tmp = bits2expr(
+          *root_bits,
+          expr.type(),
+          expr.id() == ID_byte_update_little_endian,
+          ns);
+
+        if(tmp.has_value())
+          return std::move(*tmp);
+      }
+    }
+  }
+
   /*
    * byte_update(root, offset,
    *             extract(root, offset) WITH component:=value)
@@ -1836,7 +1870,6 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   }
 
   // the following require a constant offset
-  const auto offset_int = numeric_cast<mp_integer>(offset);
   if(!offset_int.has_value() || *offset_int < 0)
     return unchanged(expr);
 

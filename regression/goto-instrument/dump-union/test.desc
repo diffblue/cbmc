@@ -1,0 +1,13 @@
+CORE
+main.c
+--dump-c
+=(\(signed int \*\))?42
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+irep
+--
+This test must pass compiling the output generated using dump-c, which implies
+that no irep strings can occur.

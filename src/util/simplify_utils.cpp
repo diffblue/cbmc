@@ -185,8 +185,15 @@ optionalt<exprt> bits2expr(
   // bits start at lowest memory address
   auto type_bits = pointer_offset_bits(type, ns);
 
-  if(!type_bits.has_value() || *type_bits != bits.size())
+  if(
+    !type_bits.has_value() ||
+    (type.id() != ID_union && type.id() != ID_union_tag &&
+     *type_bits != bits.size()) ||
+    ((type.id() == ID_union || type.id() == ID_union_tag) &&
+     *type_bits < bits.size()))
+  {
     return {};
+  }
 
   if(
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
@@ -194,6 +201,13 @@ optionalt<exprt> bits2expr(
     type.id() == ID_c_bit_field || type.id() == ID_pointer ||
     type.id() == ID_bv || type.id() == ID_c_bool)
   {
+    if(
+      type.id() == ID_pointer && config.ansi_c.NULL_is_zero &&
+      bits.find('1') == std::string::npos)
+    {
+      return null_pointer_exprt(to_pointer_type(type));
+    }
+
     endianness_mapt map(type, little_endian, ns);
 
     std::string tmp = bits;
@@ -403,7 +417,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     else if(type.id() == ID_pointer)
     {
       if(value == ID_NULL && config.ansi_c.NULL_is_zero)
-        return std::string('0', to_bitvector_type(type).get_width());
+        return std::string(to_bitvector_type(type).get_width(), '0');
       else
         return {};
     }

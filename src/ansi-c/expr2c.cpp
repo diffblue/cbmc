@@ -1911,12 +1911,8 @@ std::string expr2ct::convert_constant(
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
-    else
+    else if(src.operands().size() == 1)
     {
-      // we prefer the annotation
-      if(src.operands().size()!=1)
-        return convert_norep(src, precedence);
-
       const auto &annotation = to_unary_expr(src).op();
 
       if(annotation.id() == ID_constant)
@@ -1932,6 +1928,12 @@ std::string expr2ct::convert_constant(
       }
       else
         return convert_with_precedence(annotation, precedence);
+    }
+    else
+    {
+      const auto width = to_pointer_type(type).get_width();
+      mp_integer int_value = bvrep2integer(value, width, false);
+      return "(" + convert(type) + ")" + integer2string(int_value);
     }
   }
   else if(type.id()==ID_string)
@@ -2280,10 +2282,36 @@ std::string expr2ct::convert_designated_initializer(const exprt &src)
     return convert_norep(src, precedence);
   }
 
-  std::string dest=".";
-  // TODO it->find(ID_member)
+  const exprt &value = to_unary_expr(src).op();
+
+  const exprt &designator = static_cast<const exprt &>(src.find(ID_designator));
+  if(designator.operands().size() != 1)
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+
+  const exprt &designator_id = to_unary_expr(designator).op();
+
+  std::string dest;
+
+  if(designator_id.id() == ID_member)
+  {
+    dest = "." + id2string(designator_id.get(ID_component_name));
+  }
+  else if(
+    designator_id.id() == ID_index && designator_id.operands().size() == 1)
+  {
+    dest = "[" + convert(to_unary_expr(designator_id).op()) + "]";
+  }
+  else
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+
   dest+='=';
-  dest += convert(to_unary_expr(src).op());
+  dest += convert(value);
 
   return dest;
 }
