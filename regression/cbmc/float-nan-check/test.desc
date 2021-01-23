@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --nan-check
 \[main.NaN.1\] line \d+ NaN on \+ in byte_extract_little_endian\(c, (0|0l|0ll), float\) \+ myzero: SUCCESS
