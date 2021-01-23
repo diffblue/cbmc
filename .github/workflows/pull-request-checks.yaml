@@ -332,7 +332,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=cadical
       - name: Build using Ninja
         run: |
           cd build

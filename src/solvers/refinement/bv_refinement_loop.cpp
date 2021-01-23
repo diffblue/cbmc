@@ -123,6 +123,10 @@ void bv_refinementt::check_SAT()
 
   arrays_overapproximated();
 
+  // get values before modifying the formula
+  for(approximationt &approximation : this->approximations)
+    get_values(approximation);
+
   for(approximationt &approximation : this->approximations)
     check_SAT(approximation);
 }
