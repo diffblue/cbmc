@@ -13,10 +13,10 @@ main.c
 \[check_long.assertion.4\] line \d+ assertion !__builtin_ssubl_overflow\(.* / 2l, .* / 2l, &result\): SUCCESS
 \[check_long.assertion.5\] line \d+ assertion result - 1l == .*: SUCCESS
 \[check_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
-\[check_long_long.assertion.1\] line \d+ assertion !__builtin_ssubl_overflow\(1ll, 1ll, &result\): SUCCESS
+\[check_long_long.assertion.1\] line \d+ assertion !__builtin_ssubll_overflow\(1ll, 1ll, &result\): SUCCESS
 \[check_long_long.assertion.2\] line \d+ assertion result == 0ll: SUCCESS
-\[check_long_long.assertion.3\] line \d+ assertion __builtin_ssubl_overflow\(.*, 1ll, &result\): SUCCESS
-\[check_long_long.assertion.4\] line \d+ assertion !__builtin_ssubl_overflow\(.* / 2ll, .* / 2ll, &result\): SUCCESS
+\[check_long_long.assertion.3\] line \d+ assertion __builtin_ssubll_overflow\(.*, 1ll, &result\): SUCCESS
+\[check_long_long.assertion.4\] line \d+ assertion !__builtin_ssubll_overflow\(.* / 2ll, .* / 2ll, &result\): SUCCESS
 \[check_long_long.assertion.5\] line \d+ assertion result - 1ll == .*: SUCCESS
 \[check_long_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
 \[check_unsigned.assertion.1\] line \d+ assertion !__builtin_usub_overflow\(1u, 1u, &result\): SUCCESS

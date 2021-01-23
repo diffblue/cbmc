@@ -26,10 +26,10 @@ void check_long(void)
 void check_long_long(void)
 {
   long result;
-  assert(!__builtin_ssubl_overflow(1ll, 1ll, &result));
+  assert(!__builtin_ssubll_overflow(1ll, 1ll, &result));
   assert(result == 0ll);
-  assert(__builtin_ssubl_overflow(LLONG_MIN, 1ll, &result));
-  assert(!__builtin_ssubl_overflow(LLONG_MIN / 2ll, LLONG_MAX / 2ll, &result));
+  assert(__builtin_ssubll_overflow(LLONG_MIN, 1ll, &result));
+  assert(!__builtin_ssubll_overflow(LLONG_MIN / 2ll, LLONG_MAX / 2ll, &result));
   assert(result - 1ll == LLONG_MIN);
   assert(0 && "reachability");
 }
