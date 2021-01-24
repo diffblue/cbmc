@@ -2,7 +2,7 @@
 #include <math.h>
 
 #ifndef _MSC_VER
-#include <fenv.h>
+#  include <fenv.h>
 #endif
 
 void testAdd(int mode, double f, double g, int sign)
@@ -40,19 +40,19 @@ int main(int argc, char **argv)
   testAdd(FE_TONEAREST, plusZero, minusZero, 0);
   testAdd(FE_TONEAREST, var, -var, 0);
 
-#ifdef FE_UPWARD
+#  ifdef FE_UPWARD
   testAdd(FE_UPWARD, plusZero, plusZero, 0);
   testAdd(FE_UPWARD, minusZero, minusZero, 1);
   testAdd(FE_UPWARD, plusZero, minusZero, 0);
   testAdd(FE_UPWARD, var, -var, 0);
-#endif
+#  endif
 
-#ifdef FE_DOWNWARD
+#  ifdef FE_DOWNWARD
   testAdd(FE_DOWNWARD, plusZero, plusZero, 0);
   testAdd(FE_DOWNWARD, minusZero, minusZero, 1);
   testAdd(FE_DOWNWARD, plusZero, minusZero, 1);
   testAdd(FE_DOWNWARD, var, -var, 1);
-#endif
+#  endif
 
   testAdd(FE_TOWARDZERO, plusZero, plusZero, 0);
   testAdd(FE_TOWARDZERO, minusZero, minusZero, 1);

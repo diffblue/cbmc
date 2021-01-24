@@ -10,7 +10,8 @@
 // generated because one of the values is already NaN the assertion is not
 // produced.
 
-union container {
+union container
+{
   uint32_t u;
   float f;
 };

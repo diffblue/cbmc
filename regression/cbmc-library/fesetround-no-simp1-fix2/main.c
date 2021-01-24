@@ -1,9 +1,9 @@
 // gcc -Wall -W -lm double-to-float-with-rounding-modes.c -o double-to-float-with-rounding-modes -frounding-math -fsignaling-nans -ffp-contract=off -msse2 -mfpmath=sse
 
 #ifdef __GNUC__
-#include <assert.h>
-#include <fenv.h>
-#include <math.h>
+#  include <assert.h>
+#  include <fenv.h>
+#  include <math.h>
 
 float setRoundingModeAndCast(int mode, double d)
 {
