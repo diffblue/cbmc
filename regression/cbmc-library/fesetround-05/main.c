@@ -1,6 +1,6 @@
 #ifdef __GNUC__
-#include <assert.h>
-#include <fenv.h>
+#  include <assert.h>
+#  include <fenv.h>
 
 float nondet_float();
 int nondet_int();
@@ -34,15 +34,15 @@ int main(void)
 
   assert((castWithRounding(FE_TONEAREST, x) == high) == (x == 33554435));
 
-#ifdef FE_UPWARD
+#  ifdef FE_UPWARD
   assert(castWithRounding(FE_UPWARD, x) == high);
   assert(castWithRounding(FE_UPWARD, -x) == -low);
-#endif
+#  endif
 
-#ifdef FE_DOWNWARD
+#  ifdef FE_DOWNWARD
   assert(castWithRounding(FE_DOWNWARD, x) == low);
   assert(castWithRounding(FE_DOWNWARD, -x) == -high);
-#endif
+#  endif
 
   assert(castWithRounding(FE_TOWARDZERO, x) == low);
   assert(castWithRounding(FE_TOWARDZERO, -x) == -low);

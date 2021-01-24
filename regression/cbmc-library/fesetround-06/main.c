@@ -4,7 +4,7 @@
 #if defined(_MSC_VER) && _MSC_VER < 1800
 // don't have fenv.h
 #else
-#include <fenv.h>
+#  include <fenv.h>
 #endif
 
 int main(void)
@@ -12,8 +12,8 @@ int main(void)
 #if defined(_MSC_VER) && _MSC_VER < 1800
 #else
 
-#ifdef FE_UPWARD
-#ifdef FW_DOWNWARD
+#  ifdef FE_UPWARD
+#    ifdef FW_DOWNWARD
   float f;
   float g;
 
@@ -35,8 +35,8 @@ int main(void)
     float h = f + g;
     assert(h >= f);
   }
-#endif
-#endif
+#    endif
+#  endif
 
 #endif
 
