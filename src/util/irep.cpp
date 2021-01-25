@@ -438,13 +438,15 @@ std::size_t irept::hash() const
 
   std::size_t number_of_named_ireps = 0;
 
-  forall_named_irep(it, named_sub)
-    if(!is_comment(it->first)) // this variant ignores comments
+  for(const auto &irep_entry : named_sub)
+  {
+    if(!is_comment(irep_entry.first)) // this variant ignores comments
     {
-      result = hash_combine(result, hash_string(it->first));
-      result = hash_combine(result, it->second.hash());
+      result = hash_combine(result, hash_string(irep_entry.first));
+      result = hash_combine(result, irep_entry.second.hash());
       number_of_named_ireps++;
     }
+  }
 
   result = hash_finalize(result, sub.size() + number_of_named_ireps);
 
@@ -467,10 +469,10 @@ std::size_t irept::full_hash() const
   forall_irep(it, sub) result=hash_combine(result, it->full_hash());
 
   // this variant includes all named_sub elements
-  forall_named_irep(it, named_sub)
+  for(const auto &irep_entry : named_sub)
   {
-    result=hash_combine(result, hash_string(it->first));
-    result=hash_combine(result, it->second.full_hash());
+    result = hash_combine(result, hash_string(irep_entry.first));
+    result = hash_combine(result, irep_entry.second.full_hash());
   }
 
   const std::size_t named_sub_size = named_sub.size();
@@ -498,16 +500,16 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
     indent+=2;
   }
 
-  forall_named_irep(it, get_named_sub())
+  for(const auto &irep_entry : get_named_sub())
   {
     result+="\n";
     indent_str(result, indent);
 
     result+="* ";
-    result+=id2string(it->first);
+    result += id2string(irep_entry.first);
     result+=": ";
 
-    result+=it->second.pretty(indent+2, max_indent);
+    result += irep_entry.second.pretty(indent + 2, max_indent);
   }
 
   std::size_t count=0;

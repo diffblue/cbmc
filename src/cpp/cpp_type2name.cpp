@@ -52,33 +52,37 @@ static std::string irep2name(const irept &irep)
   result+='(';
   bool first=true;
 
-  forall_named_irep(it, irep.get_named_sub())
-    if(!irept::is_comment(it->first))
+  for(const auto &named_sub : irep.get_named_sub())
+  {
+    if(!irept::is_comment(named_sub.first))
     {
       if(first)
         first = false;
       else
         result += ',';
 
-      result += do_prefix(name2string(it->first));
+      result += do_prefix(name2string(named_sub.first));
 
       result += '=';
-      result += irep2name(it->second);
+      result += irep2name(named_sub.second);
     }
+  }
 
-  forall_named_irep(it, irep.get_named_sub())
-    if(it->first==ID_C_constant ||
-       it->first==ID_C_volatile ||
-       it->first==ID_C_restricted)
+  for(const auto &named_sub : irep.get_named_sub())
+  {
+    if(
+      named_sub.first == ID_C_constant || named_sub.first == ID_C_volatile ||
+      named_sub.first == ID_C_restricted)
     {
       if(first)
         first=false;
       else
         result+=',';
-      result+=do_prefix(name2string(it->first));
+      result += do_prefix(name2string(named_sub.first));
       result+='=';
-      result += irep2name(it->second);
+      result += irep2name(named_sub.second);
     }
+  }
 
   forall_irep(it, irep.get_sub())
   {
