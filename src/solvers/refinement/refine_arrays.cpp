@@ -114,9 +114,9 @@ void bv_refinementt::freeze_lazy_constraints()
     for(const auto &symbol : find_symbols(constraint.lazy))
     {
       const bvt bv=convert_bv(symbol);
-      forall_literals(b_it, bv)
-        if(!b_it->is_constant())
-          prop.set_frozen(*b_it);
+      for(const auto &literal : bv)
+        if(!literal.is_constant())
+          prop.set_frozen(literal);
     }
   }
 }

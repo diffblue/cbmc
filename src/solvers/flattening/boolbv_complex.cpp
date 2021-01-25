@@ -31,8 +31,7 @@ bvt boolbvt::convert_complex(const complex_exprt &expr)
   {
     const bvt &tmp = convert_bv(*it, op_width);
 
-    forall_literals(it2, tmp)
-      bv.push_back(*it2);
+    bv.insert(bv.end(), tmp.begin(), tmp.end());
   }
 
   return bv;

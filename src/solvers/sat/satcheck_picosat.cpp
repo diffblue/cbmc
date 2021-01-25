@@ -57,8 +57,8 @@ void satcheck_picosatt::lcnf(const bvt &bv)
 
   picosat_adjust(picosat, _no_variables);
 
-  forall_literals(it, new_bv)
-    picosat_add(picosat, it->dimacs());
+  for(const auto &literal : new_bv)
+    picosat_add(picosat, literal.dimacs());
 
   picosat_add(picosat, 0);
 
@@ -78,8 +78,8 @@ propt::resultt satcheck_picosatt::do_prop_solve()
 
   std::string msg;
 
-  forall_literals(it, assumptions)
-    picosat_assume(picosat, it->dimacs());
+  for(const auto &literal : assumptions)
+    picosat_assume(picosat, literal.dimacs());
 
   const int res=picosat_sat(picosat, -1);
   if(res==PICOSAT_SATISFIABLE)

@@ -52,9 +52,11 @@ void external_satt::write_cnf_file(std::string cnf_file)
     dimacs_cnft::write_dimacs_clause(c, out, false);
 
   // output the assumption clauses
-  forall_literals(it, assumptions)
-    if(!it->is_constant())
-      out << it->dimacs() << " 0\n";
+  for(const auto &literal : assumptions)
+  {
+    if(!literal.is_constant())
+      out << literal.dimacs() << " 0\n";
+  }
 
   out.close();
 }

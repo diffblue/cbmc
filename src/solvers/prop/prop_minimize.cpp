@@ -85,8 +85,8 @@ literalt prop_minimizet::constraint()
   {
     exprt::operandst disjuncts;
     disjuncts.reserve(or_clause.size());
-    forall_literals(it, or_clause)
-      disjuncts.push_back(literal_exprt(*it));
+    for(const auto &literal : or_clause)
+      disjuncts.push_back(literal_exprt(literal));
 
     return prop_conv.convert(disjunction(disjuncts));
   }

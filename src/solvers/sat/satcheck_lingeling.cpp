@@ -55,8 +55,8 @@ void satcheck_lingelingt::lcnf(const bvt &bv)
   if(process_clause(bv, new_bv))
     return;
 
-  forall_literals(it, new_bv)
-    lgladd(solver, it->dimacs());
+  for(const auto &literal : new_bv)
+    lgladd(solver, literal.dimacs());
 
   lgladd(solver, 0);
 
@@ -77,8 +77,8 @@ propt::resultt satcheck_lingelingt::do_prop_solve()
 
   std::string msg;
 
-  forall_literals(it, assumptions)
-    lglassume(solver, it->dimacs());
+  for(const auto &literal : assumptions)
+    lglassume(solver, literal.dimacs());
 
   const int res=lglsat(solver);
   CHECK_RETURN(res == 10 || res == 20);

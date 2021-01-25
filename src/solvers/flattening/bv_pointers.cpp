@@ -243,8 +243,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     bvt bv;
     bv.resize(bits);
 
-    Forall_literals(it, bv)
-      *it=prop.new_variable();
+    for(auto &literal : bv)
+      literal = prop.new_variable();
 
     return bv;
   }

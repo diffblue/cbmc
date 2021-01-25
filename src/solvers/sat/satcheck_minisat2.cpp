@@ -33,9 +33,11 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
     bv.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
   dest.capacity(static_cast<int>(bv.size()));
 
-  forall_literals(it, bv)
-    if(!it->is_false())
-      dest.push(Minisat::mkLit(it->var_no(), it->sign()));
+  for(const auto &literal : bv)
+  {
+    if(!literal.is_false())
+      dest.push(Minisat::mkLit(literal.var_no(), literal.sign()));
+  }
 }
 
 template<typename T>
@@ -120,14 +122,15 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   {
     add_variables();
 
-    forall_literals(it, bv)
+    for(const auto &literal : bv)
     {
-      if(it->is_true())
+      if(literal.is_true())
         return;
-      else if(!it->is_false())
+      else if(!literal.is_false())
       {
         INVARIANT(
-          it->var_no() < (unsigned)solver->nVars(), "variable not added yet");
+          literal.var_no() < (unsigned)solver->nVars(),
+          "variable not added yet");
       }
     }
 

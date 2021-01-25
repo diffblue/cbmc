@@ -28,9 +28,11 @@ void convert(const bvt &bv, Glucose::vec<Glucose::Lit> &dest)
 {
   dest.capacity(bv.size());
 
-  forall_literals(it, bv)
-    if(!it->is_false())
-      dest.push(Glucose::mkLit(it->var_no(), it->sign()));
+  for(const auto &literal : bv)
+  {
+    if(!literal.is_false())
+      dest.push(Glucose::mkLit(literal.var_no(), literal.sign()));
+  }
 }
 
 template<typename T>
@@ -103,13 +105,16 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
   {
     add_variables();
 
-    forall_literals(it, bv)
+    for(const auto &literal : bv)
     {
-      if(it->is_true())
+      if(literal.is_true())
         return;
-      else if(!it->is_false())
+      else if(!literal.is_false())
+      {
         INVARIANT(
-          it->var_no() < (unsigned)solver->nVars(), "variable not added yet");
+          literal.var_no() < (unsigned)solver->nVars(),
+          "variable not added yet");
+      }
     }
 
     Glucose::vec<Glucose::Lit> c;
@@ -171,9 +176,11 @@ propt::resultt satcheck_glucose_baset<T>::do_prop_solve()
       // if assumptions contains false, we need this to be UNSAT
       bool has_false = false;
 
-      forall_literals(it, assumptions)
-        if(it->is_false())
+      for(const auto &literal : assumptions)
+      {
+        if(literal.is_false())
           has_false = true;
+      }
 
       if(has_false)
       {
@@ -271,8 +278,11 @@ void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
 
-  forall_literals(it, assumptions)
-    INVARIANT(!it->is_constant(), "assumption literals must not be constant");
+  for(const auto &literal : assumptions)
+  {
+    INVARIANT(
+      !literal.is_constant(), "assumption literals must not be constant");
+  }
 }
 
 satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert(

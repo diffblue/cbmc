@@ -64,8 +64,7 @@ bool boolbvt::type_conversion(
   {
     if(src_type==dest_type.subtype())
     {
-      forall_literals(it, src)
-      dest.push_back(*it);
+      dest.insert(dest.end(), src.begin(), src.end());
 
       // pad with zeros
       for(std::size_t i=src.size(); i<dest_width; i++)
@@ -208,8 +207,8 @@ bool boolbvt::type_conversion(
           INVARIANT(
             src_width == 1, "bitvector of type boolean shall have width one");
 
-          Forall_literals(it, dest)
-            *it=prop.land(*it, src[0]);
+          for(auto &literal : dest)
+            literal = prop.land(literal, src[0]);
 
           return false;
         }

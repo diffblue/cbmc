@@ -71,21 +71,24 @@ const std::string satcheck_ipasirt::solver_text()
 
 void satcheck_ipasirt::lcnf(const bvt &bv)
 {
-  forall_literals(it, bv)
+  for(const auto &literal : bv)
   {
-    if(it->is_true())
+    if(literal.is_true())
       return;
-    else if(!it->is_false())
-      INVARIANT(it->var_no()<(unsigned)no_variables(),
-             "reject out of bound variables");
+    else if(!literal.is_false())
+    {
+      INVARIANT(
+        literal.var_no() < (unsigned)no_variables(),
+        "reject out of bound variables");
+    }
   }
 
-  forall_literals(it, bv)
+  for(const auto &literal : bv)
   {
-    if(!it->is_false())
+    if(!literal.is_false())
     {
       // add literal with correct sign
-      ipasir_add(solver, it->dimacs());
+      ipasir_add(solver, literal.dimacs());
     }
   }
   ipasir_add(solver, 0); // terminate clause
@@ -129,9 +132,11 @@ propt::resultt satcheck_ipasirt::do_prop_solve()
   }
   else
   {
-    forall_literals(it, assumptions)
-      if(!it->is_false())
-        ipasir_assume(solver, it->dimacs());
+    for(const auto &literal : assumptions)
+    {
+      if(!literal.is_false())
+        ipasir_assume(solver, literal.dimacs());
+    }
 
     // solve the formula, and handle the return code (10=SAT, 20=UNSAT)
     int solver_state = ipasir_solve(solver);

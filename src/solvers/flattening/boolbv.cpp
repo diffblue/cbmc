@@ -142,13 +142,13 @@ boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
   cache_result.first->second = bv;
 
   // check
-  forall_literals(it, cache_result.first->second)
+  for(const auto &literal : cache_result.first->second)
   {
-    if(freeze_all && !it->is_constant())
-      prop.set_frozen(*it);
+    if(freeze_all && !literal.is_constant())
+      prop.set_frozen(literal);
 
     INVARIANT_WITH_DIAGNOSTICS(
-      it->var_no() != literalt::unused_var_no(),
+      literal.var_no() != literalt::unused_var_no(),
       "variable number must be different from the unused variable number",
       expr.find_source_location(),
       irep_pretty_diagnosticst(expr));
