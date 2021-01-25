@@ -4452,7 +4452,10 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << "(";
         auto &func_type = to_mathematical_function_type(expr.type());
         for(const auto &d: func_type.domain())
+        {
           convert_type(d);
+          out <<" ";
+        }
         out <<")";  
         convert_type(func_type.codomain());
         out << ")\n"; 
