@@ -434,7 +434,8 @@ std::size_t irept::hash() const
 
   std::size_t result=hash_string(id());
 
-  forall_irep(it, sub) result=hash_combine(result, it->hash());
+  for(const auto &irep : sub)
+    result = hash_combine(result, irep.hash());
 
   std::size_t number_of_named_ireps = 0;
 
@@ -466,7 +467,8 @@ std::size_t irept::full_hash() const
 
   std::size_t result=hash_string(id());
 
-  forall_irep(it, sub) result=hash_combine(result, it->full_hash());
+  for(const auto &irep : sub)
+    result = hash_combine(result, irep.full_hash());
 
   // this variant includes all named_sub elements
   for(const auto &irep_entry : named_sub)
@@ -514,7 +516,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
 
   std::size_t count=0;
 
-  forall_irep(it, get_sub())
+  for(const auto &irep : get_sub())
   {
     result+="\n";
     indent_str(result, indent);
@@ -522,7 +524,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
     result+=std::to_string(count++);
     result+=": ";
 
-    result+=it->pretty(indent+2, max_indent);
+    result += irep.pretty(indent + 2, max_indent);
   }
 
   return result;

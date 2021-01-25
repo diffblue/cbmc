@@ -44,14 +44,14 @@ void cpp_namet::convert(
   std::string &identifier,
   std::string &base_name) const
 {
-  forall_irep(it, get_sub())
+  for(const auto &irep : get_sub())
   {
-    const irep_idt id=it->id();
+    const irep_idt id = irep.id();
 
     std::string name_component;
 
     if(id==ID_name)
-      name_component=it->get_string(ID_identifier);
+      name_component = irep.get_string(ID_identifier);
     else if(id==ID_template_args)
     {
       std::stringstream ss;
@@ -60,7 +60,7 @@ void cpp_namet::convert(
       throw ss.str();
     }
     else
-      name_component=it->id_string();
+      name_component = irep.id_string();
 
     identifier+=name_component;
 
@@ -76,14 +76,14 @@ std::string cpp_namet::to_string() const
 {
   std::string str;
 
-  forall_irep(it, get_sub())
+  for(const auto &irep : get_sub())
   {
-    if(it->id()=="::")
-      str += it->id_string();
-    else if(it->id()==ID_template_args)
+    if(irep.id() == "::")
+      str += irep.id_string();
+    else if(irep.id() == ID_template_args)
       str += "<...>";
     else
-      str+=it->get_string(ID_identifier);
+      str += irep.get_string(ID_identifier);
   }
 
   return str;

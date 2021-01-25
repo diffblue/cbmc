@@ -129,9 +129,9 @@ void cpp_convert_typet::read_template(const typet &type)
 
   irept &arguments=t.add(ID_arguments);
 
-  Forall_irep(it, arguments.get_sub())
+  for(auto &argument : arguments.get_sub())
   {
-    exprt &decl=static_cast<exprt &>(*it);
+    exprt &decl = static_cast<exprt &>(argument);
 
     // may be type or expression
     bool is_type=decl.get_bool(ID_is_type);

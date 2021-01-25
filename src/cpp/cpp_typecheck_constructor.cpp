@@ -423,9 +423,8 @@ void cpp_typecheckt::check_member_initializers(
 {
   assert(initializers.id()==ID_member_initializers);
 
-  forall_irep(init_it, initializers.get_sub())
+  for(const auto &initializer : initializers.get_sub())
   {
-    const irept &initializer=*init_it;
     assert(initializer.is_not_nil());
 
     const cpp_namet &member_name=
@@ -601,10 +600,8 @@ void cpp_typecheckt::full_member_initialization(
       // explicitly calls the parent constructor.
       bool found=false;
 
-      forall_irep(m_it, initializers.get_sub())
+      for(irept initializer : initializers.get_sub())
       {
-        irept initializer=*m_it;
-
         const cpp_namet &member_name=
           to_cpp_name(initializer.find(ID_member));
 
@@ -715,10 +712,8 @@ void cpp_typecheckt::full_member_initialization(
     // Check if the initialization list of the constructor
     // explicitly initializes the data member
     bool found=false;
-    Forall_irep(m_it, initializers.get_sub())
+    for(auto &initializer : initializers.get_sub())
     {
-      irept &initializer=*m_it;
-
       if(initializer.get(ID_member)!=ID_cpp_name)
         continue;
       cpp_namet &member_name=(cpp_namet&) initializer.add(ID_member);
