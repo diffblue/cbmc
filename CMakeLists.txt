@@ -1,5 +1,20 @@
 cmake_minimum_required(VERSION 3.2)
 
+# If cmake generates files inside of the cbmc source directory this can lead to important files being overwritten, so we prevent that here
+if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+  message(FATAL_ERROR
+    "We have detected that you were trying to invoke cmake with its output"
+    " directory being equal to the source directory.  You may have done this by"
+    " accident by invoking cmake from the cbmc top level directory without"
+    " specifying a build directory.  Since this can lead to cmake overwriting"
+    " files in the source tree, this is prohibited.  Please perform an"
+    " out-of-source build by either creating a separate build directory and"
+    " invoking cmake from there, or specifying a build directory with -B.\n"
+    "(see also: COMPILING.md)\n"
+    "Note that running this command will have created CMakeCache.txt"
+    " and a CMakeFiles directory; You should delete both of them.")
+endif()
+
 # Build a Release version by default (default build flags for each build type
 # are configured below).
 if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
