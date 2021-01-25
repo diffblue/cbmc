@@ -272,15 +272,4 @@ private:
   goto_symex_statet(const goto_symex_statet &other) = default;
 };
 
-inline goto_statet::goto_statet(const class goto_symex_statet &s)
-  : depth(s.depth),
-    level2(s.level2),
-    value_set(s.value_set),
-    guard(s.guard),
-    reachable(s.reachable),
-    propagation(s.propagation),
-    atomic_section_id(s.atomic_section_id)
-{
-}
-
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

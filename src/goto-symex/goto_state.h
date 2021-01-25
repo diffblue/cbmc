@@ -20,6 +20,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "renaming_level.h"
 
+// Forward declaration required since subclass is used explicitly
+// by the parent class.
+class goto_symex_statet;
+
 /// Container for data that varies per program point, e.g. the constant
 /// propagator state, when state needs to branch. This is copied out of
 /// goto_symex_statet at a control-flow fork and then back into it at a
@@ -82,8 +86,6 @@ public:
   goto_statet &operator=(goto_statet &&other) = default;
   goto_statet(const goto_statet &other) = default;
   goto_statet(goto_statet &&other) = default;
-
-  explicit goto_statet(const class goto_symex_statet &s);
 
   explicit goto_statet(guard_managert &guard_manager)
     : guard(true_exprt(), guard_manager), reachable(true)
