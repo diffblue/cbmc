@@ -429,17 +429,13 @@ void rw_range_sett::get_objects_typecast(
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
-  if(object.id() == ID_string_constant ||
-     object.id() == ID_label ||
-     object.id() == ID_array ||
-     object.id() == ID_null_object)
+  if(
+    object.id() == ID_string_constant || object.id() == ID_label ||
+    object.id() == ID_array || object.id() == ID_null_object ||
+    object.id() == ID_symbol)
   {
     // constant, nothing to do
     return;
-  }
-  else if(object.id()==ID_symbol)
-  {
-    get_objects_rec(get_modet::READ, object);
   }
   else if(object.id()==ID_dereference)
   {
