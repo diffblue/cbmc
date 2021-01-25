@@ -1044,18 +1044,20 @@ void shared_bufferst::affected_by_delay(
         local_may
 #endif
       ); // NOLINT(whitespace/parens)
-        for(const auto &w_entry : rw_set.w_entries)
+      for(const auto &w_entry : rw_set.w_entries)
+      {
+        for(const auto &r_entry : rw_set.r_entries)
         {
-          for(const auto &r_entry : rw_set.r_entries)
+          message.debug() << "debug: " << id2string(w_entry.second.object)
+                          << " reads from " << id2string(r_entry.second.object)
+                          << messaget::eom;
+          if(is_buffered_in_general(r_entry.second.symbol_expr, true))
           {
-            message.debug() <<"debug: "<<id2string(w_entry.second.object)
-              <<" reads from "<<id2string(r_entry.second.object)
-              <<messaget::eom;
-            if(is_buffered_in_general(r_entry.second.symbol_expr, true))
-              // shouldn't it be true? false => overapprox
-              affected_by_delay_set.insert(w_entry.second.object);
+            // shouldn't it be true? false => overapprox
+            affected_by_delay_set.insert(w_entry.second.object);
           }
         }
+      }
     }
   }
 }
@@ -1157,10 +1159,14 @@ void shared_bufferst::cfg_visitort::weak_memory(
           {
             for(const auto &r_entry : rw_set.r_entries)
             {
-              if(shared_buffers.is_buffered(ns, r_entry.second.symbol_expr, true))
+              if(shared_buffers.is_buffered(
+                   ns, r_entry.second.symbol_expr, true))
               {
                 shared_buffers.delay_read(
-                  goto_program, i_it, source_location, r_entry.second.object,
+                  goto_program,
+                  i_it,
+                  source_location,
+                  r_entry.second.object,
                   w_entry.second.object);
               }
             }
@@ -1169,8 +1175,11 @@ void shared_bufferst::cfg_visitort::weak_memory(
           if(shared_buffers.is_buffered(ns, w_entry.second.symbol_expr, true))
           {
             shared_buffers.write(
-              goto_program, i_it, source_location,
-              w_entry.second.object, original_instruction,
+              goto_program,
+              i_it,
+              source_location,
+              w_entry.second.object,
+              original_instruction,
               current_thread);
           }
           else
@@ -1180,23 +1189,24 @@ void shared_bufferst::cfg_visitort::weak_memory(
             {
               for(const auto &r_entry : rw_set.r_entries)
               {
-                if(shared_buffers.affected_by_delay_set.find(
-                    r_entry.second.object)!=
-                   shared_buffers.affected_by_delay_set.end())
+                if(
+                  shared_buffers.affected_by_delay_set.find(
+                    r_entry.second.object) !=
+                  shared_buffers.affected_by_delay_set.end())
                 {
-                  shared_buffers.message.debug() << "second: "
-                    << r_entry.second.object << messaget::eom;
-                  const varst &vars=(shared_buffers)(r_entry.second.object);
+                  shared_buffers.message.debug()
+                    << "second: " << r_entry.second.object << messaget::eom;
+                  const varst &vars = (shared_buffers)(r_entry.second.object);
 
-                  shared_buffers.message.debug() << "writer "
-                    <<w_entry.second.object
-                    <<" reads "<<r_entry.second.object<< messaget::eom;
+                  shared_buffers.message.debug()
+                    << "writer " << w_entry.second.object << " reads "
+                    << r_entry.second.object << messaget::eom;
 
                   // TO FIX: how to deal with rhs including calls?
                   // if a read is delayed, use its alias instead of itself
                   // -- or not
-                  symbol_exprt to_replace_expr=symbol_exprt(
-                    r_entry.second.object, vars.type);
+                  symbol_exprt to_replace_expr =
+                    symbol_exprt(r_entry.second.object, vars.type);
                   symbol_exprt new_read_expr=symbol_exprt(
                     vars.read_delayed_var,
                     pointer_type(vars.type));
@@ -1227,16 +1237,22 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     to_replace_expr); // original_instruction.code.op1());
 
                   shared_buffers.assignment(
-                    goto_program, i_it, source_location,
-                    r_entry.second.object, rhs);
+                    goto_program,
+                    i_it,
+                    source_location,
+                    r_entry.second.object,
+                    rhs);
                 }
               }
             }
 
             // normal assignment
             shared_buffers.assignment(
-              goto_program, i_it, source_location,
-              w_entry.second.object, original_instruction.code.op1());
+              goto_program,
+              i_it,
+              source_location,
+              w_entry.second.object,
+              original_instruction.code.op1());
           }
         }
 
@@ -1247,19 +1263,22 @@ void shared_bufferst::cfg_visitort::weak_memory(
         {
           if(shared_buffers.is_buffered(ns, r_entry.second.symbol_expr, false))
           {
-            shared_buffers.message.debug() << "flush restore: "
-              << r_entry.second.object << messaget::eom;
-            const varst vars= (shared_buffers)(r_entry.second.object);
+            shared_buffers.message.debug()
+              << "flush restore: " << r_entry.second.object << messaget::eom;
+            const varst vars = (shared_buffers)(r_entry.second.object);
             const exprt delayed_expr=symbol_exprt(vars.flush_delayed,
               bool_typet());
             const symbol_exprt mem_value_expr=symbol_exprt(vars.mem_tmp,
               vars.type);
-            const exprt cond_expr=if_exprt(delayed_expr, mem_value_expr,
-              r_entry.second.symbol_expr);
+            const exprt cond_expr = if_exprt(
+              delayed_expr, mem_value_expr, r_entry.second.symbol_expr);
 
             shared_buffers.assignment(
-              goto_program, i_it, source_location,
-              r_entry.second.object, cond_expr);
+              goto_program,
+              i_it,
+              source_location,
+              r_entry.second.object,
+              cond_expr);
             shared_buffers.assignment(
               goto_program, i_it, source_location,
               vars.flush_delayed, false_exprt());
