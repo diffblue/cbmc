@@ -24,9 +24,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool goto_convertt::has_function_call(const exprt &expr)
 {
-  forall_operands(it, expr)
-    if(has_function_call(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(has_function_call(op))
       return true;
+  }
 
   if(expr.id()==ID_side_effect &&
      expr.get(ID_statement)==ID_function_call)

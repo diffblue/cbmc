@@ -898,10 +898,10 @@ void smt2_convt::convert_floatbv(const exprt &expr)
       << floatbv_suffix(expr)
       << '|';
 
-  forall_operands(it, expr)
+  for(const auto &op : expr.operands())
   {
     out << ' ';
-    convert_expr(*it);
+    convert_expr(op);
   }
 
   out << ')';
@@ -984,10 +984,10 @@ void smt2_convt::convert_expr(const exprt &expr)
     else if(expr.id()==ID_bitnor)
       out << "bvnor";
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       out << " ";
-      flatten2bv(*it);
+      flatten2bv(op);
     }
 
     out << ")";
@@ -1159,10 +1159,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       "logical and, or, and xor expressions should have at least two operands");
 
     out << "(" << expr.id();
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       out << " ";
-      convert_expr(*it);
+      convert_expr(op);
     }
     out << ")";
   }
@@ -1920,10 +1920,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << "(concat";
 
     // build component-by-component
-    forall_operands(it, vector_expr)
+    for(const auto &op : vector_expr.operands())
     {
       out << " ";
-      convert_expr(*it);
+      convert_expr(op);
     }
 
     out << ")"; // mk-... or concat
@@ -3434,12 +3434,11 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
     for(mp_integer i=0; i!=size; ++i)
     {
       exprt tmp(ID_minus, vector_type.subtype());
-      forall_operands(it, expr)
-        tmp.copy_to_operands(
-          index_exprt(
-            *it,
-            from_integer(size-i-1, index_type),
-            vector_type.subtype()));
+      for(const auto &op : expr.operands())
+      {
+        tmp.copy_to_operands(index_exprt(
+          op, from_integer(size - i - 1, index_type), vector_type.subtype()));
+      }
 
       out << " ";
       convert_expr(tmp);
@@ -3598,10 +3597,10 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
   {
     out << "(*";
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       out << " ";
-      convert_expr(*it);
+      convert_expr(op);
     }
 
     out << ")";
@@ -4242,15 +4241,15 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   if(expr.id()==ID_and && value)
   {
-    forall_operands(it, expr)
-      set_to(*it, true);
+    for(const auto &op : expr.operands())
+      set_to(op, true);
     return;
   }
 
   if(expr.id()==ID_or && !value)
   {
-    forall_operands(it, expr)
-      set_to(*it, false);
+    for(const auto &op : expr.operands())
+      set_to(op, false);
     return;
   }
 
@@ -4399,8 +4398,8 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
 
   // recursive call on operands
-  forall_operands(it, expr)
-    find_symbols(*it);
+  for(const auto &op : expr.operands())
+    find_symbols(op);
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_nondet_symbol)

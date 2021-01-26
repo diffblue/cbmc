@@ -2307,9 +2307,11 @@ bool has_byte_operator(const exprt &src)
      src.id()==ID_byte_extract_big_endian)
     return true;
 
-  forall_operands(it, src)
-    if(has_byte_operator(*it))
+  for(const auto &op : src.operands())
+  {
+    if(has_byte_operator(op))
       return true;
+  }
 
   return false;
 }

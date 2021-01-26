@@ -489,10 +489,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
   PRECONDITION(expr.type().id() == ID_bool);
 
   exprt::operandst new_inequality_ops;
-  forall_operands(it, expr)
+  for(const auto &operand : expr.operands())
   {
-    PRECONDITION(it->id() == ID_pointer_object);
-    const exprt &op = to_unary_expr(*it).op();
+    PRECONDITION(operand.id() == ID_pointer_object);
+    const exprt &op = to_unary_expr(operand).op();
 
     if(op.id()==ID_address_of)
     {

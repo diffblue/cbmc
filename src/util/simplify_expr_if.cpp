@@ -105,9 +105,9 @@ bool simplify_exprt::simplify_if_recursive(
 
 bool simplify_exprt::simplify_if_conj(exprt &expr, const exprt &cond)
 {
-  forall_operands(it, cond)
+  for(const auto &op : cond.operands())
   {
-    if(expr == *it)
+    if(expr == op)
     {
       expr = true_exprt();
       return false;
@@ -124,9 +124,9 @@ bool simplify_exprt::simplify_if_conj(exprt &expr, const exprt &cond)
 
 bool simplify_exprt::simplify_if_disj(exprt &expr, const exprt &cond)
 {
-  forall_operands(it, cond)
+  for(const auto &op : cond.operands())
   {
-    if(expr == *it)
+    if(expr == op)
     {
       expr = false_exprt();
       return false;
@@ -251,12 +251,12 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     // a ? b : c  --> a ? b[a/true] : c
     if(cond.id() == ID_and)
     {
-      forall_operands(it, cond)
+      for(const auto &op : as_const(cond).operands())
       {
-        if(it->id() == ID_not)
-          local_replace_map.insert(std::make_pair(it->op0(), false_exprt()));
+        if(op.id() == ID_not)
+          local_replace_map.insert(std::make_pair(op.op0(), false_exprt()));
         else
-          local_replace_map.insert(std::make_pair(*it, true_exprt()));
+          local_replace_map.insert(std::make_pair(op, true_exprt()));
       }
     }
     else
@@ -274,12 +274,12 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     // a ? b : c  --> a ? b : c[a/false]
     if(cond.id() == ID_or)
     {
-      forall_operands(it, cond)
+      for(const auto &op : as_const(cond).operands())
       {
-        if(it->id() == ID_not)
-          local_replace_map.insert(std::make_pair(it->op0(), true_exprt()));
+        if(op.id() == ID_not)
+          local_replace_map.insert(std::make_pair(op.op0(), true_exprt()));
         else
-          local_replace_map.insert(std::make_pair(*it, false_exprt()));
+          local_replace_map.insert(std::make_pair(op, false_exprt()));
       }
     }
     else

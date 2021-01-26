@@ -325,17 +325,17 @@ void interpretert::evaluate(
       dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
       bool error=false;
 
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        if(it->type().id()==ID_code)
+        if(op.type().id() == ID_code)
           continue;
 
-        mp_integer sub_size=get_size(it->type());
+        mp_integer sub_size = get_size(op.type());
         if(sub_size==0)
           continue;
 
         mp_vectort tmp;
-        evaluate(*it, tmp);
+        evaluate(op, tmp);
 
         if(tmp.size()==sub_size)
         {
@@ -429,19 +429,19 @@ void interpretert::evaluate(
 
     bool error=false;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      if(it->type().id()==ID_code)
+      if(op.type().id() == ID_code)
         continue;
 
-      mp_integer sub_size=get_size(it->type());
+      mp_integer sub_size = get_size(op.type());
       if(sub_size==0)
         continue;
 
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
 
-      if(unbounded_size(it->type()) || tmp.size()==sub_size)
+      if(unbounded_size(op.type()) || tmp.size() == sub_size)
       {
         for(std::size_t i=0; i<tmp.size(); i++)
           dest.push_back(tmp[i]);
@@ -490,10 +490,10 @@ void interpretert::evaluate(
       throw id2string(expr.id())+" expects at least two operands";
 
     mp_integer final=0;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
       if(tmp.size()==1)
         final=bitwise_or(final, tmp.front());
     }
@@ -506,10 +506,10 @@ void interpretert::evaluate(
       throw id2string(expr.id())+" expects at least two operands";
 
     mp_integer final=-1;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
       if(tmp.size()==1)
         final=bitwise_and(final, tmp.front());
     }
@@ -522,10 +522,10 @@ void interpretert::evaluate(
       throw id2string(expr.id())+" expects at least two operands";
 
     mp_integer final=0;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
       if(tmp.size()==1)
         final=bitwise_xor(final, tmp.front());
     }
@@ -659,10 +659,10 @@ void interpretert::evaluate(
 
     bool result=false;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
 
       if(tmp.size()==1 && tmp.front()!=0)
       {
@@ -702,10 +702,10 @@ void interpretert::evaluate(
 
     bool result=true;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
 
       if(tmp.size()==1 && tmp.front()==0)
       {
@@ -732,10 +732,10 @@ void interpretert::evaluate(
   {
     mp_integer result=0;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
       if(tmp.size()==1)
         result+=tmp.front();
     }
@@ -764,17 +764,17 @@ void interpretert::evaluate(
     else
       result=1;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       mp_vectort tmp;
-      evaluate(*it, tmp);
+      evaluate(op, tmp);
       if(tmp.size()==1)
       {
         if(expr.type().id()==ID_fixedbv)
         {
           fixedbvt f1, f2;
           f1.spec=fixedbv_spect(to_fixedbv_type(expr.type()));
-          f2.spec=fixedbv_spect(to_fixedbv_type(it->type()));
+          f2.spec = fixedbv_spect(to_fixedbv_type(op.type()));
           f1.set_value(result);
           f2.set_value(tmp.front());
           f1*=f2;
@@ -783,7 +783,7 @@ void interpretert::evaluate(
         else if(expr.type().id()==ID_floatbv)
         {
           ieee_floatt f1(to_floatbv_type(expr.type()));
-          ieee_floatt f2(to_floatbv_type(it->type()));
+          ieee_floatt f2(to_floatbv_type(op.type()));
           f1.unpack(result);
           f2.unpack(tmp.front());
           f1*=f2;
@@ -982,9 +982,9 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_array)
   {
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      evaluate(*it, dest);
+      evaluate(op, dest);
     }
     return;
   }

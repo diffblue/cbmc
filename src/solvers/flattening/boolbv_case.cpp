@@ -35,9 +35,9 @@ bvt boolbvt::convert_case(const exprt &expr)
   literalt previous_compare=const_literal(false);
   literalt compare_literal=const_literal(false);
 
-  forall_operands(it, expr)
+  for(const auto &operand : expr.operands())
   {
-    bvt op=convert_bv(*it);
+    bvt op = convert_bv(operand);
 
     switch(what)
     {
@@ -51,7 +51,7 @@ bvt boolbvt::convert_case(const exprt &expr)
         compare_bv.size() == op.size(),
         std::string("size of compare operand does not match:\n") +
           "compare operand: " + std::to_string(compare_bv.size()) +
-          "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
+          "\noperand: " + std::to_string(op.size()) + '\n' + operand.pretty());
 
       compare_literal=bv_utils.equal(compare_bv, op);
       compare_literal=prop.land(!previous_compare, compare_literal);
@@ -66,7 +66,7 @@ bvt boolbvt::convert_case(const exprt &expr)
         bv.size() == op.size(),
         std::string("size of value operand does not match:\n") +
           "result size: " + std::to_string(bv.size()) +
-          "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
+          "\noperand: " + std::to_string(op.size()) + '\n' + operand.pretty());
 
       {
         literalt value_literal=bv_utils.equal(bv, op);

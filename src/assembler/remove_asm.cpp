@@ -82,22 +82,22 @@ void remove_asmt::gcc_asm_function_call(
   const typet void_pointer = pointer_type(empty_typet());
 
   // outputs
-  forall_operands(it, code.outputs())
+  for(const auto &op : code.outputs().operands())
   {
-    if(it->operands().size() == 2)
+    if(op.operands().size() == 2)
     {
       arguments.push_back(typecast_exprt(
-        address_of_exprt(to_binary_expr(*it).op1()), void_pointer));
+        address_of_exprt(to_binary_expr(op).op1()), void_pointer));
     }
   }
 
   // inputs
-  forall_operands(it, code.inputs())
+  for(const auto &op : code.inputs().operands())
   {
-    if(it->operands().size() == 2)
+    if(op.operands().size() == 2)
     {
       arguments.push_back(typecast_exprt(
-        address_of_exprt(to_binary_expr(*it).op1()), void_pointer));
+        address_of_exprt(to_binary_expr(op).op1()), void_pointer));
     }
   }
 

@@ -19,8 +19,8 @@ void symex_slicet::get_symbols(const exprt &expr)
 {
   get_symbols(expr.type());
 
-  forall_operands(it, expr)
-    get_symbols(*it);
+  for(const auto &op : expr.operands())
+    get_symbols(op);
 
   if(expr.id()==ID_symbol)
     depends.insert(to_symbol_expr(expr).get_identifier());

@@ -324,9 +324,9 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     {
       change_this_time = false;
 
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        change_this_time |= two_way_propagate_rec(*it, ns, cp);
+        change_this_time |= two_way_propagate_rec(op, ns, cp);
         if(change_this_time)
           change = true;
       }

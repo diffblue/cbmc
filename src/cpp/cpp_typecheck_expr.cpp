@@ -403,9 +403,9 @@ bool cpp_typecheckt::overloadable(const exprt &expr)
 {
   // at least one argument must have class or enumerated type
 
-  forall_operands(it, expr)
+  for(const auto &op : expr.operands())
   {
-    typet t = it->type();
+    typet t = op.type();
 
     if(is_reference(t))
       t=t.subtype();
@@ -636,8 +636,8 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           function_call.arguments().reserve(expr.operands().size());
 
           // now do arguments
-          forall_operands(it, expr)
-            function_call.arguments().push_back(*it);
+          for(const auto &op : as_const(expr).operands())
+            function_call.arguments().push_back(op);
 
           typecheck_side_effect_function_call(function_call);
 
