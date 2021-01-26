@@ -72,10 +72,10 @@ std::string source_locationt::as_string(bool print_cwd) const
 
 void source_locationt::merge(const source_locationt &from)
 {
-  forall_named_irep(it, from.get_named_sub())
+  for(const auto &irep_entry : from.get_named_sub())
   {
-    if(get(it->first).empty())
-      set(it->first, it->second);
+    if(get(irep_entry.first).empty())
+      set(irep_entry.first, irep_entry.second);
   }
 }
 
