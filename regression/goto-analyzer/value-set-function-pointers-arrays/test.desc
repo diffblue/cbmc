@@ -3,11 +3,11 @@ main.c
 --variable-sensitivity --vsd-structs every-field --vsd-arrays every-element --vsd-pointers value-set --vsd-values set-of-constants --show --pointer-check --three-way-merge
 ^file main.c line 29 function main: replacing function pointer by 2 possible targets$
 ^file main.c line 40 function main: replacing function pointer by 2 possible targets$
-^main::1::fun1 \(\) -> value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end$
-^main::1::fun_array3 \(\) -> \{\[0\] = value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end$
+^main::1::fun1 \(\) -> value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end
+^main::1::fun_array3 \(\) -> \{\[0\] = value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
-^main::1::fun1 \(\) -> value-set-begin: .*ptr ->\(h\).* :value-set-end$
-^main::1::fun_array3 \(\) -> \{\[0\] = value-set-begin: .*ptr ->\(h\).* :value-set-end$
+^main::1::fun1 \(\) -> value-set-begin: .*ptr ->\(h\).* :value-set-end
+^main::1::fun_array3 \(\) -> \{\[0\] = value-set-begin: .*ptr ->\(h\).* :value-set-end

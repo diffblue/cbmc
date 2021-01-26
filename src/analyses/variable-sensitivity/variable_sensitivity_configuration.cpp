@@ -41,9 +41,7 @@ vsd_configt vsd_configt::from_options(const optionst &options)
 
   // This should always be on (for efficeny with 3-way merge)
   // Does not work with value set
-  config.context_tracking.last_write_context =
-    (config.value_abstract_type != VALUE_SET) &&
-    (config.pointer_abstract_type != VALUE_SET);
+  config.context_tracking.last_write_context = true;
   config.context_tracking.data_dependency_context =
     options.get_bool_option("data-dependencies");
   config.advanced_sensitivities.new_value_set =

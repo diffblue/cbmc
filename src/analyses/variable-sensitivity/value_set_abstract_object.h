@@ -19,6 +19,9 @@
 class value_set_abstract_objectt : public abstract_value_objectt
 {
 public:
+  using value_set_abstract_object_ptrt = std::shared_ptr<
+    value_set_abstract_objectt>;
+
   using abstract_object_sett = std::unordered_set<
     abstract_object_pointert,
     abstract_hashert,
@@ -118,7 +121,19 @@ private:
   /// \return the abstract object representing \p new_values (either 'this' or
   ///   something new)
   abstract_object_pointert
-  resolve_new_values(const abstract_object_sett &new_values) const;
+  resolve_new_values(
+    const abstract_object_sett &new_values,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+
+  abstract_object_pointert
+  resolve_values(
+    const abstract_object_sett &new_values) const;
+
+  abstract_object_pointert
+  resolve_values(
+    const abstract_object_sett &new_values,
+    const value_set_abstract_object_ptrt &result) const;
 
   // data
   abstract_typet my_type;

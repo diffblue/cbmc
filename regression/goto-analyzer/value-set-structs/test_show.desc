@@ -2,8 +2,8 @@ CORE
 main.c
 --variable-sensitivity --vsd-values set-of-constants --vsd-structs every-field --vsd-arrays every-element --vsd-pointers value-set --show --pointer-check
 activate-multi-line-match
-main::1::s_show \(\) -> \{\.d=value-set-begin: [12]\.0, [12]\.0, :value-set-end, \.str=\{\[0\] = value-set-begin: '[xy]', '[xy]', :value-set-end\n\[1\] = value-set-begin: '\\n', :value-set-end
-main::1::u_show \(\) -> \{\.d=value-set-begin: [123]\.0, [123].0, [123]\.0, :value-set-end, \.str=\{\[0\] = value-set-begin: '[xyz]', '[xyz]', '[xyz]', :value-set-end\n\[1\] = value-set-begin: '\\n', :value-set-end
+main::1::s_show \(\) -> \{\.d=value-set-begin: [12]\.0, [12]\.0, :value-set-end @ \[16\], \.str=\{\[0\] = value-set-begin: '[xy]', '[xy]', :value-set-end @ \[16\]\n\[1\] = value-set-begin: '\\n', :value-set-end
+main::1::u_show \(\) -> \{\.d=value-set-begin: [123]\.0, [123].0, [123]\.0, :value-set-end @ \[49\], \.str=\{\[0\] = value-set-begin: '[xyz]', '[xyz]', '[xyz]', :value-set-end @ \[49\]\n\[1\] = value-set-begin: '\\n', :value-set-end @ \[49\]\n} @ \[49\]} @ \[49\]
 ^EXIT=0$
 ^SIGNAL=0$
 --
