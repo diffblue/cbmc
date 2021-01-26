@@ -125,11 +125,11 @@ void value_set_analysis_fit::add_vars(
   value_set_fit &v=state.value_set;
   v.add_vars(globals);
 
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
     // get the locals
     std::set<irep_idt> locals;
-    get_local_identifiers(f_it->second, locals);
+    get_local_identifiers(gf_entry.second, locals);
 
     for(auto l : locals)
     {

@@ -162,17 +162,22 @@ void mmio(
 {
   // now instrument
 
-  Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->first != INITIALIZE_FUNCTION &&
-       f_it->first!=goto_functionst::entry_point())
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    if(
+      gf_entry.first != INITIALIZE_FUNCTION &&
+      gf_entry.first != goto_functionst::entry_point())
+    {
       mmio(
         value_sets,
         goto_model.symbol_table,
-        f_it->first,
+        gf_entry.first,
 #ifdef LOCAL_MAY
-        f_it->second,
+        gf_entry.second,
 #endif
-        f_it->second.body);
+        gf_entry.second.body);
+    }
+  }
 
   goto_model.goto_functions.update();
 }

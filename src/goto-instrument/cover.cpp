@@ -386,11 +386,11 @@ bool instrument_cover_goals(
     return true;
   }
 
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    const symbolt function_symbol = symbol_table.lookup_ref(f_it->first);
+    const symbolt function_symbol = symbol_table.lookup_ref(gf_entry.first);
     instrument_cover_goals(
-      cover_config, function_symbol, f_it->second, message_handler);
+      cover_config, function_symbol, gf_entry.second, message_handler);
   }
   goto_functions.compute_location_numbers();
 

@@ -121,6 +121,6 @@ void havoc_loops(goto_modelt &goto_model)
 {
   function_modifiest function_modifies(goto_model.goto_functions);
 
-  Forall_goto_functions(it, goto_model.goto_functions)
-    havoc_loopst(function_modifies, it->second);
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+    havoc_loopst(function_modifies, gf_entry.second);
 }

@@ -51,8 +51,8 @@ protected:
     function_is_stubt function_is_stub,
     goto_programt &goto_program);
 
-  bool restore_returns(
-    goto_functionst::function_mapt::iterator f_it);
+  bool
+  restore_returns(const irep_idt &function_id, goto_programt &goto_program);
 
   void undo_function_calls(
     goto_programt &goto_program);
@@ -218,7 +218,7 @@ bool remove_returnst::do_function_calls(
 
 void remove_returnst::operator()(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
     // NOLINTNEXTLINE
     auto function_is_stub = [&goto_functions](const irep_idt &function_id) {
@@ -230,9 +230,9 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
       return !findit->second.body_available();
     };
 
-    replace_returns(it->first, it->second);
-    if(do_function_calls(function_is_stub, it->second.body))
-      goto_functions.compute_location_numbers(it->second.body);
+    replace_returns(gf_entry.first, gf_entry.second);
+    if(do_function_calls(function_is_stub, gf_entry.second.body))
+      goto_functions.compute_location_numbers(gf_entry.second.body);
   }
 }
 
@@ -290,10 +290,9 @@ void remove_returns(goto_modelt &goto_model)
 
 /// turns an assignment to fkt#return_value back into 'return x'
 bool remove_returnst::restore_returns(
-  goto_functionst::function_mapt::iterator f_it)
+  const irep_idt &function_id,
+  goto_programt &goto_program)
 {
-  const irep_idt function_id=f_it->first;
-
   // do we have X#return_value?
   auto rv_name = return_value_identifier(function_id);
   symbol_tablet::symbolst::const_iterator rv_it=
@@ -304,8 +303,6 @@ bool remove_returnst::restore_returns(
   // remove the return_value symbol from the symbol_table
   irep_idt rv_name_id=rv_it->second.name;
   symbol_table.erase(rv_it);
-
-  goto_programt &goto_program=f_it->second.body;
 
   bool did_something = false;
 
@@ -390,13 +387,16 @@ void remove_returnst::restore(goto_functionst &goto_functions)
 {
   // restore all types first
   bool unmodified=true;
-  Forall_goto_functions(it, goto_functions)
-    unmodified=restore_returns(it) && unmodified;
+  for(auto &gf_entry : goto_functions.function_map)
+  {
+    unmodified =
+      restore_returns(gf_entry.first, gf_entry.second.body) && unmodified;
+  }
 
   if(!unmodified)
   {
-    Forall_goto_functions(it, goto_functions)
-      undo_function_calls(it->second.body);
+    for(auto &gf_entry : goto_functions.function_map)
+      undo_function_calls(gf_entry.second.body);
   }
 }
 

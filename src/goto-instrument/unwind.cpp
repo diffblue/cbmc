@@ -317,20 +317,20 @@ void goto_unwindt::operator()(
   const unwindsett &unwindset,
   const unwind_strategyt unwind_strategy)
 {
-  Forall_goto_functions(it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    goto_functionst::goto_functiont &goto_function=it->second;
+    goto_functionst::goto_functiont &goto_function = gf_entry.second;
 
     if(!goto_function.body_available())
       continue;
 
 #ifdef DEBUG
-    std::cout << "Function: " << it->first << '\n';
+    std::cout << "Function: " << gf_entry.first << '\n';
 #endif
 
     goto_programt &goto_program=goto_function.body;
 
-    unwind(it->first, goto_program, unwindset, unwind_strategy);
+    unwind(gf_entry.first, goto_program, unwindset, unwind_strategy);
   }
 }
 

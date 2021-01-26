@@ -59,10 +59,10 @@ void aggressive_slicert::find_functions_that_contain_name_snippet()
 {
   for(const auto &name_snippet : name_snippets)
   {
-    forall_goto_functions(f_it, goto_model.goto_functions)
+    for(const auto &gf_entry : goto_model.goto_functions.function_map)
     {
-      if(id2string(f_it->first).find(name_snippet) != std::string::npos)
-        functions_to_keep.insert(f_it->first);
+      if(id2string(gf_entry.first).find(name_snippet) != std::string::npos)
+        functions_to_keep.insert(gf_entry.first);
     }
   }
 }
@@ -110,9 +110,9 @@ void aggressive_slicert::doit()
   for(const auto &func : functions_to_keep)
     message.debug() << func << messaget::eom;
 
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    if(functions_to_keep.find(f_it->first) == functions_to_keep.end())
-      remove_function(goto_model, f_it->first, message_handler);
+    if(functions_to_keep.find(gf_entry.first) == functions_to_keep.end())
+      remove_function(goto_model, gf_entry.first, message_handler);
   }
 }

@@ -164,6 +164,6 @@ void k_induction(
   bool base_case, bool step_case,
   unsigned k)
 {
-  Forall_goto_functions(it, goto_model.goto_functions)
-    k_inductiont(it->first, it->second, base_case, step_case, k);
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+    k_inductiont(gf_entry.first, gf_entry.second, base_case, step_case, k);
 }

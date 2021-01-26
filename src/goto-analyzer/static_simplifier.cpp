@@ -57,11 +57,11 @@ bool static_simplifier(
   messaget m(message_handler);
   m.status() << "Simplifying program" << messaget::eom;
 
-  Forall_goto_functions(f_it, goto_model.goto_functions)
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    Forall_goto_program_instructions(i_it, f_it->second.body)
+    Forall_goto_program_instructions(i_it, gf_entry.second.body)
     {
-      m.progress() << "Simplifying " << f_it->first << messaget::eom;
+      m.progress() << "Simplifying " << gf_entry.first << messaget::eom;
 
       if(i_it->is_assert())
       {

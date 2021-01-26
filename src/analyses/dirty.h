@@ -90,8 +90,8 @@ public:
   {
     // dirtyts should not be initialized twice
     PRECONDITION(!initialized);
-    forall_goto_functions(it, goto_functions)
-      build(it->second);
+    for(const auto &gf_entry : goto_functions.function_map)
+      build(gf_entry.second);
     initialized = true;
   }
 

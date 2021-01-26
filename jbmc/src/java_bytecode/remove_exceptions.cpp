@@ -619,8 +619,8 @@ void remove_exceptionst::instrument_exceptions(
 
 void remove_exceptionst::operator()(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
-    instrument_exceptions(it->first, it->second.body);
+  for(auto &gf_entry : goto_functions.function_map)
+    instrument_exceptions(gf_entry.first, gf_entry.second.body);
 }
 
 void remove_exceptionst::

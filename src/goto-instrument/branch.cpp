@@ -21,19 +21,19 @@ void branch(
   goto_modelt &goto_model,
   const irep_idt &id)
 {
-  Forall_goto_functions(f_it, goto_model.goto_functions)
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
     // don't instrument our internal functions
-    if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
+    if(has_prefix(id2string(gf_entry.first), CPROVER_PREFIX))
       continue;
 
     // don't instrument the function to be called,
     // or otherwise this will be recursive
-    if(f_it->first==id)
+    if(gf_entry.first == id)
       continue;
 
     // patch in a call to `id' at the branch points
-    goto_programt &body=f_it->second.body;
+    goto_programt &body = gf_entry.second.body;
 
     Forall_goto_program_instructions(i_it, body)
     {

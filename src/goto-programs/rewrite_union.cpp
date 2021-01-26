@@ -116,8 +116,8 @@ void rewrite_union(goto_functionst::goto_functiont &goto_function)
 
 void rewrite_union(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
-    rewrite_union(it->second);
+  for(auto &gf_entry : goto_functions.function_map)
+    rewrite_union(gf_entry.second);
 }
 
 void rewrite_union(goto_modelt &goto_model)

@@ -199,12 +199,12 @@ void loop_analysist<T>::output(std::ostream &out) const
 template <class LoopAnalysis>
 void show_loops(const goto_modelt &goto_model, std::ostream &out)
 {
-  forall_goto_functions(it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    out << "*** " << it->first << '\n';
+    out << "*** " << gf_entry.first << '\n';
 
     LoopAnalysis loop_analysis;
-    loop_analysis(it->second.body);
+    loop_analysis(gf_entry.second.body);
     loop_analysis.output(out);
 
     out << '\n';

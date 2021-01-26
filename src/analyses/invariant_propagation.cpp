@@ -160,13 +160,13 @@ void invariant_propagationt::add_objects(
   object_listt globals;
   get_globals(globals);
 
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
     // get the locals
     std::set<irep_idt> locals;
-    get_local_identifiers(f_it->second, locals);
+    get_local_identifiers(gf_entry.second, locals);
 
-    const goto_programt &goto_program=f_it->second.body;
+    const goto_programt &goto_program = gf_entry.second.body;
 
     // cache the list for the locals to speed things up
     typedef std::unordered_map<irep_idt, object_listt> object_cachet;
@@ -247,8 +247,8 @@ void invariant_propagationt::initialize(
 
 void invariant_propagationt::simplify(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
-    simplify(it->second.body);
+  for(auto &gf_entry : goto_functions.function_map)
+    simplify(gf_entry.second.body);
 }
 
 void invariant_propagationt::simplify(goto_programt &goto_program)

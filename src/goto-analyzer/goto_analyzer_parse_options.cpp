@@ -730,13 +730,13 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   {
     namespacet ns(goto_model.symbol_table);
 
-    forall_goto_functions(it, goto_model.goto_functions)
+    for(const auto &gf_entry : goto_model.goto_functions.function_map)
     {
       std::cout << ">>>>\n";
-      std::cout << ">>>> " << it->first << '\n';
+      std::cout << ">>>> " << gf_entry.first << '\n';
       std::cout << ">>>>\n";
-      local_may_aliast local_may_alias(it->second);
-      local_may_alias.output(std::cout, it->second, ns);
+      local_may_aliast local_may_alias(gf_entry.second);
+      local_may_alias.output(std::cout, gf_entry.second, ns);
       std::cout << '\n';
     }
 

@@ -57,13 +57,13 @@ void thread_exit_instrumentation(goto_modelt &goto_model)
   // we'll look for START THREAD
   std::set<irep_idt> thread_fkts;
 
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    if(has_start_thread(f_it->second.body))
+    if(has_start_thread(gf_entry.second.body))
     {
       // now look for functions called
 
-      for(const auto &instruction : f_it->second.body.instructions)
+      for(const auto &instruction : gf_entry.second.body.instructions)
         if(instruction.is_function_call())
         {
           const exprt &function=
@@ -132,9 +132,11 @@ void mutex_init_instrumentation(goto_modelt &goto_model)
   if(lock_type.id()!=ID_pointer)
     return;
 
-  Forall_goto_functions(f_it, goto_model.goto_functions)
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
     mutex_init_instrumentation(
       goto_model.symbol_table,
-      f_it->second.body,
+      gf_entry.second.body,
       to_pointer_type(lock_type).subtype());
+  }
 }

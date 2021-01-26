@@ -247,17 +247,17 @@ int goto_instrument_parse_optionst::doit()
 
       is_threadedt is_threaded(goto_model);
 
-      forall_goto_functions(f_it, goto_model.goto_functions)
+      for(const auto &gf_entry : goto_model.goto_functions.function_map)
       {
         std::cout << "////\n";
-        std::cout << "//// Function: " << f_it->first << '\n';
+        std::cout << "//// Function: " << gf_entry.first << '\n';
         std::cout << "////\n\n";
 
-        const goto_programt &goto_program=f_it->second.body;
+        const goto_programt &goto_program = gf_entry.second.body;
 
         forall_goto_program_instructions(i_it, goto_program)
         {
-          goto_program.output_instruction(ns, f_it->first, std::cout, *i_it);
+          goto_program.output_instruction(ns, gf_entry.first, std::cout, *i_it);
           std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
                     << "\n\n";
         }
@@ -322,13 +322,13 @@ int goto_instrument_parse_optionst::doit()
 
       namespacet ns(goto_model.symbol_table);
 
-      forall_goto_functions(it, goto_model.goto_functions)
+      for(const auto &gf_entry : goto_model.goto_functions.function_map)
       {
-        local_bitvector_analysist local_bitvector_analysis(it->second, ns);
+        local_bitvector_analysist local_bitvector_analysis(gf_entry.second, ns);
         std::cout << ">>>>\n";
-        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>> " << gf_entry.first << '\n';
         std::cout << ">>>>\n";
-        local_bitvector_analysis.output(std::cout, it->second, ns);
+        local_bitvector_analysis.output(std::cout, gf_entry.second, ns);
         std::cout << '\n';
       }
 
@@ -343,19 +343,19 @@ int goto_instrument_parse_optionst::doit()
 
       namespacet ns(goto_model.symbol_table);
 
-      forall_goto_functions(it, goto_model.goto_functions)
+      for(const auto &gf_entry : goto_model.goto_functions.function_map)
       {
         local_safe_pointerst local_safe_pointers;
-        local_safe_pointers(it->second.body);
+        local_safe_pointers(gf_entry.second.body);
         std::cout << ">>>>\n";
-        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>> " << gf_entry.first << '\n';
         std::cout << ">>>>\n";
         if(cmdline.isset("show-local-safe-pointers"))
-          local_safe_pointers.output(std::cout, it->second.body, ns);
+          local_safe_pointers.output(std::cout, gf_entry.second.body, ns);
         else
         {
           local_safe_pointers.output_safe_dereferences(
-            std::cout, it->second.body, ns);
+            std::cout, gf_entry.second.body, ns);
         }
         std::cout << '\n';
       }
@@ -370,14 +370,14 @@ int goto_instrument_parse_optionst::doit()
 
       namespacet ns(goto_model.symbol_table);
 
-      forall_goto_functions(it, goto_model.goto_functions)
+      for(const auto &gf_entry : goto_model.goto_functions.function_map)
       {
         sese_region_analysist sese_region_analysis;
-        sese_region_analysis(it->second.body);
+        sese_region_analysis(gf_entry.second.body);
         std::cout << ">>>>\n";
-        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>> " << gf_entry.first << '\n';
         std::cout << ">>>>\n";
-        sese_region_analysis.output(std::cout, it->second.body, ns);
+        sese_region_analysis.output(std::cout, gf_entry.second.body, ns);
         std::cout << '\n';
       }
 

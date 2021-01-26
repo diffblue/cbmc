@@ -93,6 +93,6 @@ void interval_analysis(goto_modelt &goto_model)
   const namespacet ns(goto_model.symbol_table);
   interval_analysis(goto_model.goto_functions, ns);
 
-  Forall_goto_functions(f_it, goto_model.goto_functions)
-    instrument_intervals(interval_analysis, f_it->second);
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+    instrument_intervals(interval_analysis, gf_entry.second);
 }

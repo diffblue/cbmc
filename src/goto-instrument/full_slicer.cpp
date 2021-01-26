@@ -258,10 +258,10 @@ void full_slicert::operator()(
 {
   // build the CFG data structure
   cfg(goto_functions);
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    forall_goto_program_instructions(i_it, f_it->second.body)
-      cfg.get_node(i_it).function_id = f_it->first;
+    forall_goto_program_instructions(i_it, gf_entry.second.body)
+      cfg.get_node(i_it).function_id = gf_entry.first;
   }
 
   // fill queue with according to slicing criterion
@@ -305,10 +305,11 @@ void full_slicert::operator()(
   // now replace those instructions that are not needed
   // by skips
 
-  Forall_goto_functions(f_it, goto_functions)
-    if(f_it->second.body_available())
+  for(auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
     {
-      Forall_goto_program_instructions(i_it, f_it->second.body)
+      Forall_goto_program_instructions(i_it, gf_entry.second.body)
       {
         const auto &cfg_node = cfg.get_node(i_it);
         if(
@@ -337,6 +338,7 @@ void full_slicert::operator()(
 #endif
       }
     }
+  }
 
   // remove the skips
   remove_skip(goto_functions);

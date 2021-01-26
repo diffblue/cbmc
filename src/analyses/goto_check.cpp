@@ -289,9 +289,9 @@ void goto_checkt::collect_allocations(
   if(!enable_pointer_check && !enable_bounds_check)
     return;
 
-  forall_goto_functions(itf, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    for(const auto &instruction : itf->second.body.instructions)
+    for(const auto &instruction : gf_entry.second.body.instructions)
     {
       if(!instruction.is_function_call())
         continue;
@@ -2291,9 +2291,9 @@ void goto_check(
 
   goto_check.collect_allocations(goto_functions);
 
-  Forall_goto_functions(it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    goto_check.goto_check(it->first, it->second);
+    goto_check.goto_check(gf_entry.first, gf_entry.second);
   }
 }
 

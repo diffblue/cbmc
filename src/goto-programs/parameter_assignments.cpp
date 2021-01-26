@@ -86,8 +86,8 @@ void parameter_assignmentst::do_function_calls(
 
 void parameter_assignmentst::operator()(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
-    do_function_calls(it->second.body);
+  for(auto &gf_entry : goto_functions.function_map)
+    do_function_calls(gf_entry.second.body);
 }
 
 /// removes returns

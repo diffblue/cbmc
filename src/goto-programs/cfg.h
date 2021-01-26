@@ -540,9 +540,11 @@ template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges(
   const goto_functionst &goto_functions)
 {
-  forall_goto_functions(it, goto_functions)
-    if(it->second.body_available())
-      compute_edges(goto_functions, it->second.body);
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
+      compute_edges(goto_functions, gf_entry.second.body);
+  }
 }
 
 #endif // CPROVER_GOTO_PROGRAMS_CFG_H

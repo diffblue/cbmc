@@ -52,7 +52,8 @@ class goto_program_coverage_recordt : public coverage_recordt
 public:
   goto_program_coverage_recordt(
     const namespacet &ns,
-    goto_functionst::function_mapt::const_iterator gf_it,
+    const irep_idt &function_id,
+    const goto_programt &goto_program,
     const symex_coveraget::coveraget &coverage);
 
   const irep_idt &get_file() const
@@ -126,16 +127,16 @@ rate_detailed(std::size_t covered, std::size_t total, bool per_cent = false)
 
 goto_program_coverage_recordt::goto_program_coverage_recordt(
   const namespacet &ns,
-  goto_functionst::function_mapt::const_iterator gf_it,
+  const irep_idt &function_id,
+  const goto_programt &goto_program,
   const symex_coveraget::coveraget &coverage)
   : coverage_recordt("method")
 {
-  PRECONDITION(gf_it->second.body_available());
+  PRECONDITION(!goto_program.instructions.empty());
 
   // identify the file name, inlined functions aren't properly
   // accounted for
-  goto_programt::const_targett end_function =
-    --gf_it->second.body.instructions.end();
+  goto_programt::const_targett end_function = --goto_program.instructions.end();
   DATA_INVARIANT(
     end_function->is_end_function(),
     "last instruction in a function body is end function");
@@ -144,7 +145,7 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
 
   // compute the maximum coverage of individual source-code lines
   coverage_lines_mapt coverage_lines_map;
-  compute_coverage_lines(gf_it->second.body, coverage, coverage_lines_map);
+  compute_coverage_lines(goto_program, coverage, coverage_lines_map);
 
   // <method name="foo" signature="int(int)" line-rate="1.0" branch-rate="1.0">
   //   <lines>
@@ -158,10 +159,10 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   //     <line number="30" hits="1" branch="false"/>
   //   </lines>
   // </method>
-  xml.set_attribute("name", id2string(gf_it->first));
+  xml.set_attribute("name", id2string(function_id));
 
   xml.set_attribute(
-    "signature", from_type(ns, gf_it->first, ns.lookup(gf_it->first).type));
+    "signature", from_type(ns, function_id, ns.lookup(function_id).type));
 
   xml.set_attribute("line-rate", rate_detailed(lines_covered, lines_total));
   xml.set_attribute("branch-rate", rate(branches_covered, branches_total));
@@ -294,15 +295,18 @@ void symex_coveraget::compute_overall_coverage(
   typedef std::map<irep_idt, coverage_recordt> file_recordst;
   file_recordst file_records;
 
-  forall_goto_functions(gf_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
     if(
-      !gf_it->second.body_available() ||
-      gf_it->first == goto_functions.entry_point() ||
-      gf_it->first == INITIALIZE_FUNCTION)
+      !gf_entry.second.body_available() ||
+      gf_entry.first == goto_functions.entry_point() ||
+      gf_entry.first == INITIALIZE_FUNCTION)
+    {
       continue;
+    }
 
-    goto_program_coverage_recordt func_cov(ns, gf_it, coverage);
+    goto_program_coverage_recordt func_cov(
+      ns, gf_entry.first, gf_entry.second.body, coverage);
 
     std::pair<file_recordst::iterator, bool> entry = file_records.insert(
       std::make_pair(func_cov.get_file(), coverage_recordt("class")));

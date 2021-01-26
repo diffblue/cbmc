@@ -336,10 +336,11 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
   // now replace those instructions that do not reach any assertions
   // by assume(false)
 
-  Forall_goto_functions(f_it, goto_functions)
-    if(f_it->second.body_available())
+  for(auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
     {
-      Forall_goto_program_instructions(i_it, f_it->second.body)
+      Forall_goto_program_instructions(i_it, gf_entry.second.body)
       {
         cfgt::nodet &e = cfg.get_node(i_it);
         if(
@@ -352,8 +353,9 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
       }
 
       // replace unreachable code by skip
-      remove_unreachable(f_it->second.body);
+      remove_unreachable(gf_entry.second.body);
     }
+  }
 
   // remove the skips
   remove_skip(goto_functions);

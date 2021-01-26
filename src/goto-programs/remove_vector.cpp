@@ -232,8 +232,8 @@ void remove_vector(goto_functionst::goto_functiont &goto_function)
 /// removes vector data type
 static void remove_vector(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
-    remove_vector(it->second);
+  for(auto &gf_entry : goto_functions.function_map)
+    remove_vector(gf_entry.second);
 }
 
 /// removes vector data type

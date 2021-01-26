@@ -293,15 +293,20 @@ void race_check(
 {
   w_guardst w_guards(goto_model.symbol_table);
 
-  Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->first!=goto_functionst::entry_point() &&
-       f_it->first != INITIALIZE_FUNCTION)
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    if(
+      gf_entry.first != goto_functionst::entry_point() &&
+      gf_entry.first != INITIALIZE_FUNCTION)
+    {
       race_check(
         value_sets,
         goto_model.symbol_table,
-        f_it->first,
-        L_M_ARG(f_it->second) f_it->second.body,
+        gf_entry.first,
+        L_M_ARG(gf_entry.second) gf_entry.second.body,
         w_guards);
+    }
+  }
 
   // get "main"
   goto_functionst::function_mapt::iterator

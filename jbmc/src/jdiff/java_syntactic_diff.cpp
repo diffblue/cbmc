@@ -16,25 +16,25 @@ Author: Peter Schrammel
 
 bool java_syntactic_difft::operator()()
 {
-  forall_goto_functions(it, goto_model1.goto_functions)
+  for(const auto &gf_entry : goto_model1.goto_functions.function_map)
   {
-    if(!it->second.body_available())
+    if(!gf_entry.second.body_available())
       continue;
 
     goto_functionst::function_mapt::const_iterator f_it =
-      goto_model2.goto_functions.function_map.find(it->first);
+      goto_model2.goto_functions.function_map.find(gf_entry.first);
     if(
       f_it == goto_model2.goto_functions.function_map.end() ||
       !f_it->second.body_available())
     {
-      deleted_functions.insert(it->first);
+      deleted_functions.insert(gf_entry.first);
       continue;
     }
 
     // check access qualifiers
-    const symbolt *fun1 = goto_model1.symbol_table.lookup(it->first);
+    const symbolt *fun1 = goto_model1.symbol_table.lookup(gf_entry.first);
     CHECK_RETURN(fun1 != nullptr);
-    const symbolt *fun2 = goto_model2.symbol_table.lookup(it->first);
+    const symbolt *fun2 = goto_model2.symbol_table.lookup(gf_entry.first);
     CHECK_RETURN(fun2 != nullptr);
     const optionalt<irep_idt> class_name = declaring_class(*fun1);
     bool function_access_changed =
@@ -67,29 +67,29 @@ bool java_syntactic_difft::operator()()
     }
     if(function_access_changed || class_access_changed || field_access_changed)
     {
-      modified_functions.insert(it->first);
+      modified_functions.insert(gf_entry.first);
       continue;
     }
 
-    if(!it->second.body.equals(f_it->second.body))
+    if(!gf_entry.second.body.equals(f_it->second.body))
     {
-      modified_functions.insert(it->first);
+      modified_functions.insert(gf_entry.first);
       continue;
     }
   }
-  forall_goto_functions(it, goto_model2.goto_functions)
+  for(const auto &gf_entry : goto_model2.goto_functions.function_map)
   {
-    if(!it->second.body_available())
+    if(!gf_entry.second.body_available())
       continue;
 
     total_functions_count++;
 
     goto_functionst::function_mapt::const_iterator f_it =
-      goto_model1.goto_functions.function_map.find(it->first);
+      goto_model1.goto_functions.function_map.find(gf_entry.first);
     if(
       f_it == goto_model1.goto_functions.function_map.end() ||
       !f_it->second.body_available())
-      new_functions.insert(it->first);
+      new_functions.insert(gf_entry.first);
   }
 
   return !(

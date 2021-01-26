@@ -642,11 +642,11 @@ void accelerate_functions(
   bool use_z3,
   guard_managert &guard_manager)
 {
-  Forall_goto_functions(it, goto_model.goto_functions)
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    std::cout << "Accelerating function " << it->first << '\n';
+    std::cout << "Accelerating function " << gf_entry.first << '\n';
     acceleratet accelerate(
-      it->second.body, goto_model, message_handler, use_z3, guard_manager);
+      gf_entry.second.body, goto_model, message_handler, use_z3, guard_manager);
 
     int num_accelerated=accelerate.accelerate_loops();
 

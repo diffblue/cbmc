@@ -119,8 +119,8 @@ operator()(goto_programt &goto_program, const goto_functionst &goto_functions)
 /// \param goto_functions: goto functions to operate on
 void remove_calls_no_bodyt::operator()(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    (*this)(f_it->second.body, goto_functions);
+    (*this)(gf_entry.second.body, goto_functions);
   }
 }

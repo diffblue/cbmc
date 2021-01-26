@@ -193,11 +193,13 @@ void remove_skip(goto_programt &goto_program)
 /// remove unnecessary skip statements
 void remove_skip(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
+  {
     remove_skip(
-      f_it->second.body,
-      f_it->second.body.instructions.begin(),
-      f_it->second.body.instructions.end());
+      gf_entry.second.body,
+      gf_entry.second.body.instructions.begin(),
+      gf_entry.second.body.instructions.end());
+  }
 
   // we may remove targets
   goto_functions.update();

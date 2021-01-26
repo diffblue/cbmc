@@ -274,9 +274,9 @@ void document_propertiest::doit()
   typedef std::map<source_locationt, doc_claimt> claim_sett;
   claim_sett claim_set;
 
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    const goto_programt &goto_program=f_it->second.body;
+    const goto_programt &goto_program = gf_entry.second.body;
 
     for(const auto &instruction : goto_program.instructions)
     {

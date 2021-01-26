@@ -298,8 +298,8 @@ static void remove_complex(
 /// removes complex data type
 static void remove_complex(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(it, goto_functions)
-    remove_complex(it->second);
+  for(auto &gf_entry : goto_functions.function_map)
+    remove_complex(gf_entry.second);
 }
 
 /// removes complex data type
