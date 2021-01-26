@@ -89,11 +89,11 @@ void slice_global_inits(goto_modelt &goto_model)
     fixed_point_reached = true;
 
     std::vector<bool>::iterator seen_it = seen.begin();
-    forall_goto_program_instructions(i_it, goto_program)
+    for(const auto &instruction : goto_program.instructions)
     {
-      if(!*seen_it && i_it->is_assign())
+      if(!*seen_it && instruction.is_assign())
       {
-        const code_assignt &code_assign = i_it->get_assign();
+        const code_assignt &code_assign = instruction.get_assign();
         const irep_idt id = to_symbol_expr(code_assign.lhs()).get_identifier();
 
         // if we are to keep the left-hand side, then we also need to keep all
@@ -115,11 +115,11 @@ void slice_global_inits(goto_modelt &goto_model)
   }
 
   // now remove unnecessary initializations
-  Forall_goto_program_instructions(i_it, goto_program)
+  for(auto &instruction : goto_program.instructions)
   {
-    if(i_it->is_assign())
+    if(instruction.is_assign())
     {
-      const code_assignt &code_assign = i_it->get_assign();
+      const code_assignt &code_assign = instruction.get_assign();
       const symbol_exprt &symbol_expr=to_symbol_expr(code_assign.lhs());
       const irep_idt id=symbol_expr.get_identifier();
 
@@ -127,7 +127,7 @@ void slice_global_inits(goto_modelt &goto_model)
         !has_prefix(id2string(id), CPROVER_PREFIX) &&
         symbols_to_keep.find(id) == symbols_to_keep.end())
       {
-        i_it->turn_into_skip();
+        instruction.turn_into_skip();
       }
     }
   }

@@ -92,10 +92,8 @@ bool write_goto_binary(
       write_gb_string(out, id2string(fct.first)); // name
       write_gb_word(out, fct.second.body.instructions.size()); // # instructions
 
-      forall_goto_program_instructions(i_it, fct.second.body)
+      for(const auto &instruction : fct.second.body.instructions)
       {
-        const goto_programt::instructiont &instruction = *i_it;
-
         irepconverter.reference_convert(instruction.code, out);
         irepconverter.reference_convert(instruction.source_location, out);
         write_gb_word(out, (long)instruction.type);

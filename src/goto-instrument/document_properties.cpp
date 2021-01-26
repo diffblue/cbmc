@@ -278,18 +278,19 @@ void document_propertiest::doit()
   {
     const goto_programt &goto_program=f_it->second.body;
 
-    forall_goto_program_instructions(i_it, goto_program)
+    for(const auto &instruction : goto_program.instructions)
     {
-      if(i_it->is_assert())
+      if(instruction.is_assert())
       {
+        const auto &source_location = instruction.source_location;
         source_locationt new_source_location;
 
-        new_source_location.set_file(i_it->source_location.get_file());
-        new_source_location.set_line(i_it->source_location.get_line());
-        new_source_location.set_function(i_it->source_location.get_function());
+        new_source_location.set_file(source_location.get_file());
+        new_source_location.set_line(source_location.get_line());
+        new_source_location.set_function(source_location.get_function());
 
-        claim_set[new_source_location].comment_set.
-          insert(i_it->source_location.get_comment());
+        claim_set[new_source_location].comment_set.insert(
+          source_location.get_comment());
       }
     }
   }

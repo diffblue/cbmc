@@ -71,11 +71,11 @@ void find_used_functions(
 
     if(f_it!=functions.function_map.end())
     {
-      forall_goto_program_instructions(it, f_it->second.body)
+      for(const auto &instruction : f_it->second.body.instructions)
       {
-        if(it->type==FUNCTION_CALL)
+        if(instruction.type == FUNCTION_CALL)
         {
-          const code_function_callt &call = it->get_function_call();
+          const code_function_callt &call = instruction.get_function_call();
 
           const irep_idt &identifier =
             to_symbol_expr(call.function()).get_identifier();

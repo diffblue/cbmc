@@ -151,8 +151,8 @@ bool model_argc_argv(
     message_handler,
     main_symbol.mode);
 
-  Forall_goto_program_instructions(it, init_instructions)
-    it->source_location.set_file("<built-in-library>");
+  for(auto &instruction : init_instructions.instructions)
+    instruction.source_location.set_file("<built-in-library>");
 
   goto_functionst::function_mapt::iterator start_entry=
     goto_model.goto_functions.function_map.find(

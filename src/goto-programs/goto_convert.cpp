@@ -56,20 +56,22 @@ static void finish_catch_push_targets(goto_programt &dest)
   }
 
   // in the second pass set the targets
-  Forall_goto_program_instructions(it, dest)
+  for(auto &instruction : dest.instructions)
   {
-    if(it->is_catch() && it->code.get_statement()==ID_push_catch)
+    if(
+      instruction.is_catch() &&
+      instruction.code.get_statement() == ID_push_catch)
     {
       // Populate `targets` with a GOTO instruction target per
       // exception handler if it isn't already populated.
       // (Java handlers, for example, need this finish step; C++
       //  handlers will already be populated by now)
 
-      if(it->targets.empty())
+      if(instruction.targets.empty())
       {
         bool handler_added=true;
-        const code_push_catcht::exception_listt &handler_list=
-          to_code_push_catch(it->code).exception_list();
+        const code_push_catcht::exception_listt &handler_list =
+          to_code_push_catch(instruction.code).exception_list();
 
         for(const auto &handler : handler_list)
         {
@@ -86,7 +88,7 @@ static void finish_catch_push_targets(goto_programt &dest)
           continue;
 
         for(const auto &handler : handler_list)
-          it->targets.push_back(label_targets.at(handler.get_label()));
+          instruction.targets.push_back(label_targets.at(handler.get_label()));
       }
     }
   }

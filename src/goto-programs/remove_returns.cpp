@@ -113,25 +113,25 @@ void remove_returnst::replace_returns(
 
   goto_programt &goto_program = function.body;
 
-  Forall_goto_program_instructions(i_it, goto_program)
+  for(auto &instruction : goto_program.instructions)
   {
-    if(i_it->is_return())
+    if(instruction.is_return())
     {
       INVARIANT(
-        i_it->code.operands().size() == 1,
+        instruction.code.operands().size() == 1,
         "return instructions should have one operand");
 
       if(return_symbol.has_value())
       {
         // replace "return x;" by "fkt#return_value=x;"
-        code_assignt assignment(*return_symbol, i_it->code.op0());
+        code_assignt assignment(*return_symbol, instruction.code.op0());
 
         // now turn the `return' into `assignment'
-        *i_it =
-          goto_programt::make_assignment(assignment, i_it->source_location);
+        instruction = goto_programt::make_assignment(
+          assignment, instruction.source_location);
       }
       else
-        i_it->turn_into_skip();
+        instruction.turn_into_skip();
     }
   }
 }
@@ -309,11 +309,11 @@ bool remove_returnst::restore_returns(
 
   bool did_something = false;
 
-  Forall_goto_program_instructions(i_it, goto_program)
+  for(auto &instruction : goto_program.instructions)
   {
-    if(i_it->is_assign())
+    if(instruction.is_assign())
     {
-      const auto &assign = i_it->get_assign();
+      const auto &assign = instruction.get_assign();
 
       if(assign.lhs().id()!=ID_symbol ||
          to_symbol_expr(assign.lhs()).get_identifier()!=rv_name_id)
@@ -321,8 +321,8 @@ bool remove_returnst::restore_returns(
 
       // replace "fkt#return_value=x;" by "return x;"
       const exprt rhs = assign.rhs();
-      *i_it =
-        goto_programt::make_return(code_returnt(rhs), i_it->source_location);
+      instruction = goto_programt::make_return(
+        code_returnt(rhs), instruction.source_location);
       did_something = true;
     }
   }

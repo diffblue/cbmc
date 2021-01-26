@@ -190,17 +190,17 @@ symbol_exprt remove_exceptionst::get_inflight_exception_global()
 bool remove_exceptionst::function_or_callees_may_throw(
   const goto_programt &goto_program) const
 {
-  forall_goto_program_instructions(instr_it, goto_program)
+  for(const auto &instruction : goto_program.instructions)
   {
-    if(instr_it->is_throw())
+    if(instruction.is_throw())
     {
       return true;
     }
 
-    if(instr_it->is_function_call())
+    if(instruction.is_function_call())
     {
-      const exprt &function_expr=
-        to_code_function_call(instr_it->code).function();
+      const exprt &function_expr =
+        to_code_function_call(instruction.code).function();
       DATA_INVARIANT(
         function_expr.id()==ID_symbol,
         "identifier expected to be a symbol");

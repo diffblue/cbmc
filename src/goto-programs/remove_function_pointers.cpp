@@ -425,15 +425,17 @@ void remove_function_pointerst::remove_function_pointer(
   new_code.destructive_append(final_skip);
 
   // set locations
-  Forall_goto_program_instructions(it, new_code)
+  for(auto &instruction : new_code.instructions)
   {
-    irep_idt property_class=it->source_location.get_property_class();
-    irep_idt comment=it->source_location.get_comment();
-    it->source_location=target->source_location;
+    source_locationt &source_location = instruction.source_location;
+
+    irep_idt property_class = source_location.get_property_class();
+    irep_idt comment = source_location.get_comment();
+    source_location = target->source_location;
     if(!property_class.empty())
-      it->source_location.set_property_class(property_class);
+      source_location.set_property_class(property_class);
     if(!comment.empty())
-      it->source_location.set_comment(comment);
+      source_location.set_comment(comment);
   }
 
   goto_programt::targett next_target=target;

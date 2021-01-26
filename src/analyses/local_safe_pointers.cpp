@@ -191,14 +191,14 @@ void local_safe_pointerst::output(
   const goto_programt &goto_program,
   const namespacet &ns)
 {
-  forall_goto_program_instructions(i_it, goto_program)
+  for(const auto &instruction : goto_program.instructions)
   {
-    out << "**** " << i_it->location_number << " "
-        << i_it->source_location << "\n";
+    out << "**** " << instruction.location_number << " "
+        << instruction.source_location << "\n";
 
     out << "Non-null expressions: ";
 
-    auto findit = non_null_expressions.find(i_it->location_number);
+    auto findit = non_null_expressions.find(instruction.location_number);
     if(findit == non_null_expressions.end())
       out << "{}";
     else
@@ -216,7 +216,7 @@ void local_safe_pointerst::output(
     }
 
     out << '\n';
-    goto_program.output_instruction(ns, irep_idt(), out, *i_it);
+    goto_program.output_instruction(ns, irep_idt(), out, instruction);
     out << '\n';
   }
 }
@@ -235,21 +235,21 @@ void local_safe_pointerst::output_safe_dereferences(
   const goto_programt &goto_program,
   const namespacet &ns)
 {
-  forall_goto_program_instructions(i_it, goto_program)
+  for(const auto &instruction : goto_program.instructions)
   {
-    out << "**** " << i_it->location_number << " "
-        << i_it->source_location << "\n";
+    out << "**** " << instruction.location_number << " "
+        << instruction.source_location << "\n";
 
     out << "Safe (known-not-null) dereferences: ";
 
-    auto findit = non_null_expressions.find(i_it->location_number);
+    auto findit = non_null_expressions.find(instruction.location_number);
     if(findit == non_null_expressions.end())
       out << "{}";
     else
     {
       out << "{";
       bool first = true;
-      i_it->apply([&first, &out](const exprt &e) {
+      instruction.apply([&first, &out](const exprt &e) {
         for(auto subexpr_it = e.depth_begin(), subexpr_end = e.depth_end();
             subexpr_it != subexpr_end;
             ++subexpr_it)
@@ -267,7 +267,7 @@ void local_safe_pointerst::output_safe_dereferences(
     }
 
     out << '\n';
-    goto_program.output_instruction(ns, irep_idt(), out, *i_it);
+    goto_program.output_instruction(ns, irep_idt(), out, instruction);
     out << '\n';
   }
 }

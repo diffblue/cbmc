@@ -34,10 +34,8 @@ void list_undefined_functions(
 void undefined_function_abort_path(goto_modelt &goto_model)
 {
   Forall_goto_functions(it, goto_model.goto_functions)
-    Forall_goto_program_instructions(iit, it->second.body)
+    for(auto &ins : it->second.body.instructions)
     {
-      goto_programt::instructiont &ins=*iit;
-
       if(!ins.is_function_call())
         continue;
 

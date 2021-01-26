@@ -216,10 +216,10 @@ void sat_path_enumeratort::build_fixed()
 
   fixed.copy_from(goto_program);
 
-  Forall_goto_program_instructions(it, fixed)
+  for(auto &instruction : fixed.instructions)
   {
-    if(it->is_assert())
-      it->type=ASSUME;
+    if(instruction.is_assert())
+      instruction.type = ASSUME;
   }
 
   // We're only interested in paths that loop back to the loop header.

@@ -102,19 +102,19 @@ bool trivial_functions_filtert::operator()(
 {
   (void)function; // unused parameter
   unsigned long count_assignments = 0, count_goto = 0;
-  forall_goto_program_instructions(i_it, goto_function.body)
+  for(const auto &instruction : goto_function.body.instructions)
   {
-    if(i_it->is_goto())
+    if(instruction.is_goto())
     {
       if((++count_goto) >= 2)
         return true;
     }
-    else if(i_it->is_assign())
+    else if(instruction.is_assign())
     {
       if((++count_assignments) >= 5)
         return true;
     }
-    else if(i_it->is_decl())
+    else if(instruction.is_decl())
       return true;
   }
 

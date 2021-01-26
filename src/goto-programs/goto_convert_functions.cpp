@@ -75,11 +75,13 @@ void goto_convert_functionst::goto_convert(goto_functionst &functions)
 
 bool goto_convert_functionst::hide(const goto_programt &goto_program)
 {
-  forall_goto_program_instructions(i_it, goto_program)
+  for(const auto &instruction : goto_program.instructions)
   {
-    for(const auto &label : i_it->labels)
+    for(const auto &label : instruction.labels)
+    {
       if(label == CPROVER_PREFIX "HIDE")
         return true;
+    }
   }
 
   return false;
@@ -213,10 +215,10 @@ void goto_convert_functionst::convert_function(
     goto_programt::targett a_end =
       f.body.add(goto_programt::make_atomic_end(end_location));
 
-    Forall_goto_program_instructions(i_it, f.body)
+    for(auto &instruction : f.body.instructions)
     {
-      if(i_it->is_goto() && i_it->get_target()->is_end_function())
-        i_it->set_target(a_end);
+      if(instruction.is_goto() && instruction.get_target()->is_end_function())
+        instruction.set_target(a_end);
     }
   }
 

@@ -1271,13 +1271,15 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
 
     Forall_goto_functions(f_it, goto_functions)
     {
-      forall_goto_program_instructions(p_it, f_it->second.body)
-        if(p_it->source_location==current_location)
+      for(const auto &instruction : f_it->second.body.instructions)
+      {
+        if(instruction.source_location == current_location)
         {
           current_po=&f_it->second.body;
           thread_found=true;
           break;
         }
+      }
 
       if(thread_found)
         break;
@@ -1345,28 +1347,32 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
 
   /* if a goto points to a label outside from this interleaving, replace it
      by an assert 0 */
-  Forall_goto_program_instructions(int_it, interleaving)
-    if(int_it->is_goto())
+  for(auto &instruction : interleaving.instructions)
+  {
+    if(instruction.is_goto())
     {
-      for(const auto &t : int_it->targets)
+      for(const auto &t : instruction.targets)
       {
         bool target_in_cycle=false;
 
         forall_goto_program_instructions(targ, interleaving)
+        {
           if(targ==t)
           {
             target_in_cycle=true;
             break;
           }
+        }
 
         if(!target_in_cycle)
         {
-          *int_it = goto_programt::make_assertion(
-            false_exprt(), int_it->source_location);
+          instruction = goto_programt::make_assertion(
+            false_exprt(), instruction.source_location);
           break;
         }
       }
     }
+  }
 
   /* now test whether this part of the code can exist */
   goto_functionst::function_mapt map;

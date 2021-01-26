@@ -230,17 +230,17 @@ std::ostream &goto_programt::output_instruction(
 void goto_programt::get_decl_identifiers(
   decl_identifierst &decl_identifiers) const
 {
-  forall_goto_program_instructions(it, (*this))
+  for(const auto &instruction : instructions)
   {
-    if(it->is_decl())
+    if(instruction.is_decl())
     {
       DATA_INVARIANT(
-        it->code.get_statement() == ID_decl,
+        instruction.code.get_statement() == ID_decl,
         "expected statement to be declaration statement");
       DATA_INVARIANT(
-        it->code.operands().size() == 1,
+        instruction.code.operands().size() == 1,
         "declaration statement expects one operand");
-      const symbol_exprt &symbol_expr=to_symbol_expr(it->code.op0());
+      const symbol_exprt &symbol_expr = to_symbol_expr(instruction.code.op0());
       decl_identifiers.insert(symbol_expr.get_identifier());
     }
   }

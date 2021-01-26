@@ -90,20 +90,26 @@ void goto_program2codet::build_dead_map()
   dead_map.clear();
 
   // record last dead X
-  forall_goto_program_instructions(target, goto_program)
-    if(target->is_dead())
-      dead_map[target->get_dead().get_identifier()] = target->location_number;
+  for(const auto &instruction : goto_program.instructions)
+  {
+    if(instruction.is_dead())
+    {
+      dead_map[instruction.get_dead().get_identifier()] =
+        instruction.location_number;
+    }
+  }
 }
 
 void goto_program2codet::scan_for_varargs()
 {
   va_list_expr.clear();
 
-  forall_goto_program_instructions(target, goto_program)
-    if(target->is_assign())
+  for(const auto &instruction : goto_program.instructions)
+  {
+    if(instruction.is_assign())
     {
-      const exprt &l = target->get_assign().lhs();
-      const exprt &r = target->get_assign().rhs();
+      const exprt &l = instruction.get_assign().lhs();
+      const exprt &r = instruction.get_assign().rhs();
 
       // find va_start
       if(
@@ -120,6 +126,7 @@ void goto_program2codet::scan_for_varargs()
               to_typecast_expr(r).op().id()==ID_address_of)
         va_list_expr.insert(l);
     }
+  }
 
   if(!va_list_expr.empty())
     system_headers.insert("stdarg.h");

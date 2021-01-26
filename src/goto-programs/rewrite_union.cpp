@@ -101,15 +101,15 @@ void rewrite_union(exprt &expr)
 
 void rewrite_union(goto_functionst::goto_functiont &goto_function)
 {
-  Forall_goto_program_instructions(it, goto_function.body)
+  for(auto &instruction : goto_function.body.instructions)
   {
-    rewrite_union(it->code);
+    rewrite_union(instruction.code);
 
-    if(it->has_condition())
+    if(instruction.has_condition())
     {
-      exprt c = it->get_condition();
+      exprt c = instruction.get_condition();
       rewrite_union(c);
-      it->set_condition(c);
+      instruction.set_condition(c);
     }
   }
 }
