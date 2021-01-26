@@ -85,6 +85,12 @@ protected:
   meet(const abstract_object_pointert &other) const override;
 
 private:
+  abstract_object_pointert evaluate_conditional(
+    const typet &type,
+    std::vector<sharing_ptrt<interval_abstract_valuet>> interval_operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+
   abstract_object_pointert
   merge_intervals(interval_abstract_value_pointert other) const;
   abstract_object_pointert
