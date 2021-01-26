@@ -262,8 +262,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
     function_call.arguments().push_back(this_expr);
 
-    forall_operands(it, code)
-      function_call.arguments().push_back(*it);
+    for(const auto &op : as_const(code).operands())
+      function_call.arguments().push_back(op);
 
     // done building the expression, check the argument types
     typecheck_function_call_arguments(function_call);

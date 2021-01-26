@@ -185,8 +185,8 @@ void _rw_set_loct::read_write_rec(
   }
   else
   {
-    forall_operands(it, expr)
-      read_write_rec(*it, r, w, suffix, guard_conjuncts);
+    for(const auto &op : expr.operands())
+      read_write_rec(op, r, w, suffix, guard_conjuncts);
   }
 }
 

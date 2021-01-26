@@ -687,9 +687,11 @@ bool custom_bitvector_domaint::has_get_must_or_may(const exprt &src)
   if(src.id() == ID_get_must || src.id() == ID_get_may)
     return true;
 
-  forall_operands(it, src)
-    if(has_get_must_or_may(*it))
+  for(const auto &op : src.operands())
+  {
+    if(has_get_must_or_may(op))
       return true;
+  }
 
   return false;
 }

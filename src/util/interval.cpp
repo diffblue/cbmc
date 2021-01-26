@@ -1826,16 +1826,16 @@ bool constant_interval_exprt::is_max(const constant_interval_exprt &a)
 
 bool constant_interval_exprt::contains_extreme(const exprt expr)
 {
-  forall_operands(it, expr)
+  for(const auto &op : expr.operands())
   {
-    if(is_extreme(*it))
+    if(is_extreme(op))
     {
       return true;
     }
 
-    if(it->has_operands())
+    if(op.has_operands())
     {
-      return contains_extreme(*it);
+      return contains_extreme(op);
     }
   }
 

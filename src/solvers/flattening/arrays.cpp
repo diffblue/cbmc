@@ -95,7 +95,8 @@ void arrayst::collect_indices(const exprt &expr)
       array_comprehension_args.insert(
         to_array_comprehension_expr(expr).arg().get_identifier());
 
-    forall_operands(op, expr) collect_indices(*op);
+    for(const auto &op : expr.operands())
+      collect_indices(op);
   }
   else
   {

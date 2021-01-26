@@ -35,9 +35,9 @@ inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
   }
   else if(expr.id()==ID_mult)
   {
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      const auto t = c_sizeof_type_rec(*it);
+      const auto t = c_sizeof_type_rec(op);
       if(t.has_value())
         return t;
     }

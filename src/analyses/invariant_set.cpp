@@ -409,8 +409,8 @@ void invariant_sett::strengthen_rec(const exprt &expr)
   }
   else if(expr.id()==ID_and)
   {
-    forall_operands(it, expr)
-      strengthen_rec(*it);
+    for(const auto &op : expr.operands())
+      strengthen_rec(op);
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt)
@@ -424,10 +424,10 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     {
       const exprt &bitand_op = rel.op1();
 
-      forall_operands(it, bitand_op)
+      for(const auto &op : bitand_op.operands())
       {
         auto tmp(rel);
-        tmp.op1()=*it;
+        tmp.op1() = op;
         strengthen_rec(tmp);
       }
 
@@ -499,10 +499,10 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     {
       const exprt &bitand_op = equal_expr.op1();
 
-      forall_operands(it, bitand_op)
+      for(const auto &op : bitand_op.operands())
       {
         auto tmp(equal_expr);
-        tmp.op1()=*it;
+        tmp.op1() = op;
         tmp.id(ID_le);
         strengthen_rec(tmp);
       }
@@ -602,17 +602,21 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
   }
   else if(expr.id()==ID_and)
   {
-    forall_operands(it, expr)
-      if(implies_rec(*it)!=tvt(true))
+    for(const auto &op : expr.operands())
+    {
+      if(implies_rec(op) != tvt(true))
         return tvt::unknown();
+    }
 
     return tvt(true);
   }
   else if(expr.id()==ID_or)
   {
-    forall_operands(it, expr)
-      if(implies_rec(*it)==tvt(true))
+    for(const auto &op : expr.operands())
+    {
+      if(implies_rec(op) == tvt(true))
         return tvt(true);
+    }
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt ||
@@ -1049,8 +1053,8 @@ void invariant_sett::apply_code(const codet &code)
 
   if(statement==ID_block)
   {
-    forall_operands(it, code)
-      apply_code(to_code(*it));
+    for(const auto &op : code.operands())
+      apply_code(to_code(op));
   }
   else if(statement==ID_assign)
   {

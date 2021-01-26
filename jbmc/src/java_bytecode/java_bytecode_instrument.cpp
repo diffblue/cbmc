@@ -451,9 +451,9 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {
   code_blockt result;
   // First check our operands:
-  forall_operands(it, expr)
+  for(const auto &op : expr.operands())
   {
-    if(optionalt<codet> op_result = instrument_expr(*it))
+    if(optionalt<codet> op_result = instrument_expr(op))
       result.add(std::move(*op_result));
   }
 

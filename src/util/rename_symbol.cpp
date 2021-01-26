@@ -98,9 +98,11 @@ bool rename_symbolt::have_to_rename(const exprt &dest) const
     return expr_map.find(identifier) != expr_map.end();
   }
 
-  forall_operands(it, dest)
-    if(have_to_rename(*it))
+  for(const auto &op : dest.operands())
+  {
+    if(have_to_rename(op))
       return true;
+  }
 
   const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
 

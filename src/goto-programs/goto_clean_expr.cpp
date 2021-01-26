@@ -90,9 +90,11 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
   if(expr.id()==ID_forall || expr.id()==ID_exists)
     return false;
 
-  forall_operands(it, expr)
-    if(needs_cleaning(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(needs_cleaning(op))
       return true;
+  }
 
   return false;
 }

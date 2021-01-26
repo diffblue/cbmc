@@ -32,9 +32,11 @@ static bool have_to_rewrite_union(const exprt &expr)
   else if(expr.id()==ID_union)
     return true;
 
-  forall_operands(it, expr)
-    if(have_to_rewrite_union(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(have_to_rewrite_union(op))
       return true;
+  }
 
   return false;
 }

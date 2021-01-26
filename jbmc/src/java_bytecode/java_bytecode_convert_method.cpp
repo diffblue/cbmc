@@ -978,8 +978,8 @@ static void gather_symbol_live_ranges(
   }
   else
   {
-    forall_operands(it, e)
-      gather_symbol_live_ranges(pc, *it, result);
+    for(const auto &op : e.operands())
+      gather_symbol_live_ranges(pc, op, result);
   }
 }
 

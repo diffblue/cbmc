@@ -44,8 +44,8 @@ void dirtyt::search_other(const goto_programt::instructiont &instruction)
       statement == ID_array_replace || statement == ID_havoc_object ||
       statement == ID_input || statement == ID_output)
     {
-      forall_operands(it, code)
-        find_dirty(*it);
+      for(const auto &op : code.operands())
+        find_dirty(op);
     }
     // other possible cases according to goto_programt::instructiont::output
     // and goto_symext::symex_other:
@@ -66,8 +66,8 @@ void dirtyt::find_dirty(const exprt &expr)
     return;
   }
 
-  forall_operands(it, expr)
-    find_dirty(*it);
+  for(const auto &op : expr.operands())
+    find_dirty(op);
 }
 
 void dirtyt::find_dirty_address_of(const exprt &expr)

@@ -120,9 +120,9 @@ optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
   {
     if(expr.type().id() == ID_bool && expr.operands().size() >= 1)
     {
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        auto tmp = get_bool(*it);
+        auto tmp = get_bool(op);
         if(!tmp.has_value())
           return {};
 
@@ -240,8 +240,8 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     std::vector<literalt> op_bv;
     op_bv.reserve(op.size());
 
-    forall_operands(it, expr)
-      op_bv.push_back(convert(*it));
+    for(const auto &op : expr.operands())
+      op_bv.push_back(convert(op));
 
     // add constraints
 
@@ -367,8 +367,8 @@ void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
 
         if(expr.id() == ID_and)
         {
-          forall_operands(it, expr)
-            add_constraints_to_prop(*it, true);
+          for(const auto &op : expr.operands())
+            add_constraints_to_prop(op, true);
 
           return;
         }
@@ -382,8 +382,8 @@ void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
             bvt bv;
             bv.reserve(expr.operands().size());
 
-            forall_operands(it, expr)
-              bv.push_back(convert(*it));
+            for(const auto &op : expr.operands())
+              bv.push_back(convert(op));
 
             prop.lcnf(bv);
             return;
@@ -416,8 +416,8 @@ void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
         }
         else if(expr.id() == ID_or) // !(a || b)  ==  (!a && !b)
         {
-          forall_operands(it, expr)
-            add_constraints_to_prop(*it, false);
+          for(const auto &op : expr.operands())
+            add_constraints_to_prop(op, false);
           return;
         }
       }

@@ -257,13 +257,13 @@ std::string trace_numeric_value(
   {
     std::string result;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       if(result.empty())
         result="{ ";
       else
         result+=", ";
-      result+=trace_numeric_value(*it, ns, options);
+      result += trace_numeric_value(op, ns, options);
     }
 
     return result+" }";

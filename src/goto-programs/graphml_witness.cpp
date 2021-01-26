@@ -105,13 +105,13 @@ std::string graphml_witnesst::convert_assign_rec(
     const array_typet &type = to_array_type(assign.rhs().type());
 
     unsigned i=0;
-    forall_operands(it, assign.rhs())
+    for(const auto &op : assign.rhs().operands())
     {
       index_exprt index(
         assign.lhs(), from_integer(i++, c_index_type()), type.element_type());
       if(!result.empty())
         result+=' ';
-      result+=convert_assign_rec(identifier, code_assignt(index, *it));
+      result += convert_assign_rec(identifier, code_assignt(index, op));
     }
   }
   else if(assign.rhs().id()==ID_struct ||
@@ -277,9 +277,9 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
     return true;
   }
 
-  forall_operands(it, expr)
+  for(const auto &op : expr.operands())
   {
-    if(contains_symbol_prefix(*it, prefix))
+    if(contains_symbol_prefix(op, prefix))
       return true;
   }
   return false;

@@ -68,9 +68,11 @@ static bool have_to_remove_complex(const exprt &expr)
   if(have_to_remove_complex(expr.type()))
      return true;
 
-  forall_operands(it, expr)
-    if(have_to_remove_complex(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(have_to_remove_complex(op))
       return true;
+  }
 
   return false;
 }

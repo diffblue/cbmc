@@ -173,9 +173,13 @@ bool postconditiont::is_used(
     return false;
   }
   else
-    forall_operands(it, expr)
-      if(is_used(*it, identifier))
+  {
+    for(const auto &op : expr.operands())
+    {
+      if(is_used(op, identifier))
         return true;
+    }
+  }
 
   return false;
 }
