@@ -93,7 +93,7 @@ void boolbv_mapt::get_literals(
     map_entry.literal_map.size() == width,
     "number of literals in the literal map shall equal the bitvector width");
 
-  Forall_literals(it, literals)
+  for(auto it = literals.begin(); it != literals.end(); ++it)
   {
     literalt &l=*it;
     const std::size_t bit=it-literals.begin();
@@ -127,7 +127,7 @@ void boolbv_mapt::set_literals(
 {
   map_entryt &map_entry=get_map_entry(identifier, type);
 
-  forall_literals(it, literals)
+  for(auto it = literals.begin(); it != literals.end(); ++it)
   {
     const literalt &literal=*it;
 

@@ -34,8 +34,8 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
     literalt cond_literal=const_literal(false);
 
     // make it free variables
-    Forall_literals(it, bv)
-      *it=prop.new_variable();
+    for(auto &literal : bv)
+      literal = prop.new_variable();
 
     forall_operands(it, expr)
     {
