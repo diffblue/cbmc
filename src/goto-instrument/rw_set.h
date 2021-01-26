@@ -107,14 +107,6 @@ inline std::ostream &operator<<(
   return out;
 }
 
-#define forall_rw_set_r_entries(it, rw_set) \
-  for(rw_set_baset::entriest::const_iterator it=(rw_set).r_entries.begin(); \
-      it!=(rw_set).r_entries.end(); it++)
-
-#define forall_rw_set_w_entries(it, rw_set) \
-  for(rw_set_baset::entriest::const_iterator it=(rw_set).w_entries.begin(); \
-      it!=(rw_set).w_entries.end(); it++)
-
 // a producer of read/write sets
 
 class _rw_set_loct:public rw_set_baset

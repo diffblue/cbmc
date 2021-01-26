@@ -24,9 +24,9 @@ static bool potential_race_on_read(
   const rw_set_baset &isr_rw_set)
 {
   // R/W race?
-  forall_rw_set_r_entries(e_it, code_rw_set)
+  for(const auto &r_entry : code_rw_set.r_entries)
   {
-    if(isr_rw_set.has_w_entry(e_it->first))
+    if(isr_rw_set.has_w_entry(r_entry.first))
       return true;
   }
 
@@ -38,12 +38,12 @@ static bool potential_race_on_write(
   const rw_set_baset &isr_rw_set)
 {
   // W/R or W/W?
-  forall_rw_set_w_entries(e_it, code_rw_set)
+  for(const auto &w_entry : code_rw_set.w_entries)
   {
-    if(isr_rw_set.has_r_entry(e_it->first))
+    if(isr_rw_set.has_r_entry(w_entry.first))
       return true;
 
-    if(isr_rw_set.has_w_entry(e_it->first))
+    if(isr_rw_set.has_w_entry(w_entry.first))
       return true;
   }
 
