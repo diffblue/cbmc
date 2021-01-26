@@ -207,6 +207,9 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
 
   auto collective_operands = unwrap_operands(operands);
 
+  if(expr.id() == ID_if)
+    return evaluate_conditional(expr.type(), collective_operands, environment, ns);
+
   abstract_object_sett resulting_objects;
 
   auto dispatcher = *values.begin();
@@ -220,6 +223,37 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
         dispatcher->expression_transform(rewritten_expr, ops, environment, ns));
     });
 
+  return resolve_new_values(resulting_objects);
+}
+
+abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
+  const typet &type,
+  std::vector<abstract_object_sett> operands,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  auto const condition = operands[0];
+
+  auto const true_result = operands[1];
+  auto const false_result = operands[2];
+
+  auto all_true = true;
+  auto all_false = true;
+  for (auto v : condition) {
+    auto expr = v->to_constant();
+    all_true = all_true && expr.is_true();
+    all_false = all_false && expr.is_false();
+  }
+
+  if (all_true)
+    return resolve_new_values(true_result);
+  if (all_false)
+    return resolve_new_values(false_result);
+
+  // indeterminate
+  abstract_object_sett resulting_objects;
+  resulting_objects.insert(true_result.begin(), true_result.end());
+  resulting_objects.insert(false_result.begin(), false_result.end());
   return resolve_new_values(resulting_objects);
 }
 

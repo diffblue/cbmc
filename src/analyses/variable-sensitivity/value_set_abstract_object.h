@@ -106,6 +106,12 @@ protected:
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
 private:
+  abstract_object_pointert evaluate_conditional(
+    const typet &type,
+    std::vector<abstract_object_sett> operands,
+    const abstract_environmentt &env,
+    const namespacet &ns) const;
+
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
