@@ -4,6 +4,7 @@ test.c
 "symbolTable": \{
 "main": \{
 "main::1::x": \{
+"__CPROVER_architecture_NULL_is_zero": \{
 ^EXIT=0$
 ^SIGNAL=0$
 --
