@@ -118,6 +118,7 @@ private:
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
+  /// \param environment: the abstract environment
   /// \return the abstract object representing \p new_values (either 'this' or
   ///   something new)
   abstract_object_pointert
@@ -125,6 +126,11 @@ private:
     const abstract_object_sett &new_values,
     const abstract_environmentt &environment) const;
 
+  /// Update the set of stored values to \p new_values. Build a new abstract
+  ///   object of the right type if necessary.
+  /// \param new_values: potentially new set of values
+  /// \return the abstract object representing \p new_values (either 'this' or
+  ///   something new)
   abstract_object_pointert
   resolve_values(
     const abstract_object_sett &new_values) const;

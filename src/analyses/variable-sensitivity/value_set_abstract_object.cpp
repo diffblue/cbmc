@@ -349,7 +349,7 @@ abstract_object_pointert value_set_abstract_objectt::to_interval(
   {
     const auto &value_expr = value->to_constant();
     lower_expr = constant_interval_exprt::get_min(lower_expr, value_expr);
-    upper_expr = constant_interval_exprt::get_min(upper_expr, value_expr);
+    upper_expr = constant_interval_exprt::get_max(upper_expr, value_expr);
   }
   return std::make_shared<interval_abstract_valuet>(
     constant_interval_exprt(lower_expr, upper_expr));

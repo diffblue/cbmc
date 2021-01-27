@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::a .* value-set-begin: 3, 1, 6, 0, 2, 5, 4, :value-set-end @ \[1, 12, 15, 18, 21, 24, 26\]
+main::1::b .* value-set-begin: 23, 21, 20, 22, 24, :value-set-end @ \[3, 13, 16, 19, 22\]
+main::1::c .* \[14, 1E\] @ \[30\]
+--
