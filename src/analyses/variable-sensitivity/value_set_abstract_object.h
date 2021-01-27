@@ -111,7 +111,7 @@ protected:
 private:
   abstract_object_pointert evaluate_conditional(
     const typet &type,
-    std::vector<abstract_object_sett> operands,
+    const std::vector<abstract_object_sett> &operands,
     const abstract_environmentt &env,
     const namespacet &ns) const;
 

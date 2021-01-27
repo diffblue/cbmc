@@ -228,7 +228,7 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
 
 abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
   const typet &type,
-  std::vector<abstract_object_sett> operands,
+  const std::vector<abstract_object_sett> &operands,
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
@@ -244,16 +244,13 @@ abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
     all_true = all_true && expr.is_true();
     all_false = all_false && expr.is_false();
   }
+  auto indeterminate = !all_true && !all_false;
 
-  if (all_true)
-    return resolve_new_values(true_result, env, ns);
-  if (all_false)
-    return resolve_new_values(false_result, env, ns);
-
-  // indeterminate
   abstract_object_sett resulting_objects;
-  resulting_objects.insert(true_result.begin(), true_result.end());
-  resulting_objects.insert(false_result.begin(), false_result.end());
+  if (all_true || indeterminate)
+    resulting_objects.insert(true_result.begin(), true_result.end());
+  if (all_false || indeterminate)
+    resulting_objects.insert(false_result.begin(), false_result.end());
   return resolve_new_values(resulting_objects, env, ns);
 }
 
