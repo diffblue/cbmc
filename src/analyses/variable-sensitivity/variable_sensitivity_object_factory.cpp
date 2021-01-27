@@ -185,3 +185,10 @@ variable_sensitivity_object_factoryt::get_abstract_object(
       followed_type, top, bottom, e, environment, ns, configuration);
   }
 }
+
+abstract_object_pointert
+variable_sensitivity_object_factoryt::wrap_with_context(
+  const abstract_object_pointert &abstract_object) const
+{
+  return wrap_with_context_object(abstract_object, configuration);
+}

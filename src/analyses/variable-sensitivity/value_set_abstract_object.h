@@ -123,17 +123,11 @@ private:
   abstract_object_pointert
   resolve_new_values(
     const abstract_object_sett &new_values,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const;
+    const abstract_environmentt &environment) const;
 
   abstract_object_pointert
   resolve_values(
     const abstract_object_sett &new_values) const;
-
-  abstract_object_pointert
-  resolve_values(
-    const abstract_object_sett &new_values,
-    const value_set_abstract_object_ptrt &result) const;
 
   // data
   abstract_typet my_type;

@@ -279,6 +279,12 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
     type, top, bottom, e, environment, ns);
 }
 
+abstract_object_pointert abstract_environmentt::add_object_context(
+  const abstract_object_pointert &abstract_object) const
+{
+  return object_factory->wrap_with_context(abstract_object);
+}
+
 bool abstract_environmentt::merge(const abstract_environmentt &env)
 {
   // for each entry in the incoming environment we need to either add it

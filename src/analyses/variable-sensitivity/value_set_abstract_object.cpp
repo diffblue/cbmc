@@ -223,7 +223,7 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
         dispatcher->expression_transform(rewritten_expr, ops, environment, ns));
     });
 
-  return resolve_new_values(resulting_objects, environment, ns);
+  return resolve_new_values(resulting_objects, environment);
 }
 
 abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
@@ -251,7 +251,7 @@ abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
     resulting_objects.insert(true_result.begin(), true_result.end());
   if (all_false || indeterminate)
     resulting_objects.insert(false_result.begin(), false_result.end());
-  return resolve_new_values(resulting_objects, env, ns);
+  return resolve_new_values(resulting_objects, env);
 }
 
 abstract_object_pointert value_set_abstract_objectt::write(
@@ -268,38 +268,20 @@ abstract_object_pointert value_set_abstract_objectt::write(
     new_values.insert(
       st_value->write(environment, ns, stack, specifier, value, merging_write));
   }
-  return resolve_new_values(new_values, environment, ns);
+  return resolve_new_values(new_values, environment);
 }
 
 abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
   const abstract_object_sett &new_values,
-  const abstract_environmentt &environment,
-  const namespacet &ns) const
+  const abstract_environmentt &environment) const
 {
-  auto result = environment.abstract_object_factory(type(), ns, true);
-  auto unwrapped = maybe_unwrap_context(result);
-  const auto const_value_set_ptr =
-    std::dynamic_pointer_cast<const value_set_abstract_objectt>(unwrapped);
-  const auto value_set_ptr =
-    std::const_pointer_cast<value_set_abstract_objectt>(const_value_set_ptr);
-  resolve_values(new_values, value_set_ptr);
-  return result;
+  auto result = resolve_values(new_values);
+  return environment.add_object_context(result);
 }
 
 abstract_object_pointert
 value_set_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
-{
-  const auto &result =
-    std::dynamic_pointer_cast<value_set_abstract_objectt>(mutable_clone());
-
-  return resolve_values(new_values, result);
-}
-
-abstract_object_pointert
-value_set_abstract_objectt::resolve_values(
-  const abstract_object_sett &new_values,
-  const value_set_abstract_object_ptrt &result) const
 {
   PRECONDITION(!new_values.empty());
 
@@ -319,6 +301,9 @@ value_set_abstract_objectt::resolve_values(
   {
     return (*unwrapped_values.begin());
   }
+
+  auto result =
+    std::dynamic_pointer_cast<value_set_abstract_objectt>(mutable_clone());
 
   if(
     unwrapped_values.size() > max_value_set_size ||
