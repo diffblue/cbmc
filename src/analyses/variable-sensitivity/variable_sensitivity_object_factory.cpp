@@ -29,12 +29,10 @@ abstract_object_pointert create_abstract_object(
   const namespacet &ns)
 {
   if(top || bottom)
-    return abstract_object_pointert(
-      new abstract_object_classt { type, top, bottom });
+    return std::make_shared<abstract_object_classt>(type, top, bottom);
 
   PRECONDITION(type == ns.follow(e.type()));
-  return abstract_object_pointert(
-    new abstract_object_classt { e, environment, ns });
+  return std::make_shared<abstract_object_classt>(e, environment, ns);
 }
 
 abstract_object_pointert wrap_with_context_object(

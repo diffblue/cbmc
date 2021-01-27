@@ -6,5 +6,5 @@ main.c
 main::1::p .* value-set-begin: 2, 3, :value-set-end
 main::1::q .* value-set-begin: 5, 10, :value-set-end
 main::1::r .* value-set-begin: 20, 30, :value-set-end
-main::1::t .* value-set-begin: 37, 32, 42, 28, 38, 27, 43, 33, :value-set-end
+main::1::t .* value-set-begin: 37, 32, 42, 27, 43, 28, 38, 33, :value-set-end
 --
