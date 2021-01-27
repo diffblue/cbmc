@@ -9,8 +9,18 @@
 #include "full_array_abstract_object.h"
 #include "value_set_abstract_value.h"
 
-template <class abstract_object_classt, class context_classt>
-abstract_object_pointert initialize_context_abstract_object(
+template <class context_classt>
+abstract_object_pointert create_context_abstract_object(
+  const abstract_object_pointert &abstract_object)
+{
+  return abstract_object_pointert(new context_classt {
+    abstract_object,
+    abstract_object->type()
+  });
+}
+
+template <class abstract_object_classt>
+abstract_object_pointert create_abstract_object(
   const typet type,
   bool top,
   bool bottom,
@@ -19,22 +29,27 @@ abstract_object_pointert initialize_context_abstract_object(
   const namespacet &ns)
 {
   if(top || bottom)
-  {
-    return abstract_object_pointert(new context_classt{
-      abstract_object_pointert(new abstract_object_classt{type, top, bottom}),
-      type,
-      top,
-      bottom});
-  }
-  else
-  {
-    PRECONDITION(type == ns.follow(e.type()));
-    return abstract_object_pointert(new context_classt{
-      abstract_object_pointert(new abstract_object_classt{e, environment, ns}),
-      e,
-      environment,
-      ns});
-  }
+    return abstract_object_pointert(
+      new abstract_object_classt { type, top, bottom });
+
+  PRECONDITION(type == ns.follow(e.type()));
+  return abstract_object_pointert(
+    new abstract_object_classt { e, environment, ns });
+}
+
+abstract_object_pointert wrap_with_context_object(
+  const abstract_object_pointert &abstract_object,
+  const vsd_configt &configuration)
+{
+  if(configuration.context_tracking.data_dependency_context)
+    return create_context_abstract_object<
+      data_dependency_contextt>(abstract_object);
+
+  if(configuration.context_tracking.last_write_context)
+    return create_context_abstract_object<
+      write_location_contextt>(abstract_object);
+
+  return abstract_object;
 }
 
 /// Function: variable_sensitivity_object_factoryt::initialize_abstract_object
@@ -62,28 +77,10 @@ abstract_object_pointert initialize_abstract_object(
   const namespacet &ns,
   const vsd_configt &configuration)
 {
-  if(configuration.context_tracking.data_dependency_context)
-    return initialize_context_abstract_object<
-      abstract_object_classt,
-      data_dependency_contextt>(type, top, bottom, e, environment, ns);
-  if(configuration.context_tracking.last_write_context)
-    return initialize_context_abstract_object<
-      abstract_object_classt,
-      write_location_contextt>(type, top, bottom, e, environment, ns);
-  else
-  {
-    if(top || bottom)
-    {
-      return abstract_object_pointert(
-        new abstract_object_classt{type, top, bottom});
-    }
-    else
-    {
-      PRECONDITION(type == ns.follow(e.type()));
-      return abstract_object_pointert(
-        new abstract_object_classt{e, environment, ns});
-    }
-  }
+  auto abstract_object = create_abstract_object<abstract_object_classt>(
+    type, top, bottom, e, environment, ns);
+
+  return wrap_with_context_object(abstract_object, configuration);
 }
 
 ABSTRACT_OBJECT_TYPET
