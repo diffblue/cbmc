@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+ Module: analyses variable-sensitivity
+
+ Author: Jez Higgins, jez@jezuk.co.uk
+
+\*******************************************************************/
+
 #include <analyses/variable-sensitivity/abstract_value_object.h>
 
 class empty_index_ranget : public index_ranget

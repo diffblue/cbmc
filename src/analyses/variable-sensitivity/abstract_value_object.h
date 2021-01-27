@@ -1,3 +1,14 @@
+/*******************************************************************\
+
+ Module: analyses variable-sensitivity
+
+ Author: Jez Higgins, jez@jezuk.co.uk
+
+\*******************************************************************/
+
+/// \file
+/// Common behaviour for abstract objects modelling values -
+/// constants, intervals, etc.
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_OBJECT_H
 

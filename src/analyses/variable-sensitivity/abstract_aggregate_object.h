@@ -1,3 +1,14 @@
+/*******************************************************************\
+
+ Module: analyses variable-sensitivity
+
+ Author: Jez Higgins, jez@jezuk.co.uk
+
+\*******************************************************************/
+
+/// \file
+/// Common behaviour for abstract objects modelling aggregate values -
+/// arrays, structs, etc.
 #ifndef CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 #define CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 

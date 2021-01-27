@@ -455,6 +455,10 @@ public:
     get_view(result);
     return result;
   }
+  /// Convenience function to get a sorted view of the map elements
+  ///
+  /// A view is a list of pairs with the components being const references to
+  /// the keys and values in the map.
   sorted_viewt get_sorted_view() const
   {
     sorted_viewt result;
