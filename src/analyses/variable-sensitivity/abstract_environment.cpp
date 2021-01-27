@@ -15,7 +15,6 @@
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-#include <langapi/language_util.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 
