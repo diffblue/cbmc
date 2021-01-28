@@ -226,7 +226,6 @@ property_statust &operator&=(property_statust &a, property_statust const &b)
   switch(a)
   {
   case property_statust::ERROR:
-    a = b;
     return a;
   case property_statust::FAIL:
     a = (b == property_statust::ERROR ? b : a);
