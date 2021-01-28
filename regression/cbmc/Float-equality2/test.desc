@@ -1,0 +1,11 @@
+CORE
+main.c
+
+(Starting CEGAR Loop|VCC\(s\), 0 remaining after simplification$)
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This requires simplification of commutative, but not associative operations.

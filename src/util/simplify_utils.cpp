@@ -105,7 +105,7 @@ struct saj_tablet
   { irep_idt(), { irep_idt() }}
 };
 
-static bool sort_and_join(
+static bool is_associative_and_commutative_for_type(
   const struct saj_tablet &saj_entry,
   const irep_idt &type_id)
 {
@@ -116,21 +116,23 @@ static bool sort_and_join(
   return false;
 }
 
-static const struct saj_tablet &sort_and_join(
-  const irep_idt &id,
-  const irep_idt &type_id)
+static const struct saj_tablet &
+get_sort_and_join_table_entry(const irep_idt &id, const irep_idt &type_id)
 {
   unsigned i=0;
 
   for( ; !saj_table[i].id.empty(); i++)
-    if(id==saj_table[i].id &&
-       sort_and_join(saj_table[i], type_id))
+  {
+    if(
+      id == saj_table[i].id &&
+      is_associative_and_commutative_for_type(saj_table[i], type_id))
       return saj_table[i];
+  }
 
   return saj_table[i];
 }
 
-bool sort_and_join(exprt &expr)
+static bool sort_and_join(exprt &expr, bool do_sort)
 {
   bool no_change = true;
 
@@ -138,20 +140,20 @@ bool sort_and_join(exprt &expr)
     return true;
 
   const struct saj_tablet &saj_entry =
-    sort_and_join(expr.id(), as_const(expr).type().id());
+    get_sort_and_join_table_entry(expr.id(), as_const(expr).type().id());
   if(saj_entry.id.empty())
     return true;
 
   // check operand types
 
   forall_operands(it, expr)
-    if(!sort_and_join(saj_entry, it->type().id()))
+    if(!is_associative_and_commutative_for_type(saj_entry, it->type().id()))
       return true;
 
   // join expressions
 
   exprt::operandst new_ops;
-  new_ops.reserve(expr.operands().size());
+  new_ops.reserve(as_const(expr).operands().size());
 
   forall_operands(it, expr)
   {
@@ -169,11 +171,23 @@ bool sort_and_join(exprt &expr)
   }
 
   // sort it
+  if(do_sort)
+    no_change = sort_operands(new_ops) && no_change;
 
-  no_change = sort_operands(new_ops) && no_change;
-  expr.operands().swap(new_ops);
+  if(!no_change)
+    expr.operands().swap(new_ops);
 
   return no_change;
+}
+
+bool sort_and_join(exprt &expr)
+{
+  return sort_and_join(expr, true);
+}
+
+bool join_operands(exprt &expr)
+{
+  return sort_and_join(expr, false);
 }
 
 optionalt<exprt> bits2expr(

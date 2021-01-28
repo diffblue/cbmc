@@ -2,6 +2,8 @@ CORE
 Main
 --function Main.noprop --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^Generated [1-9]\d* VCC\(s\), [1-9]\d* remaining after simplification$
+line 29 assertion at file Main.java line 29 .*: FAILURE$
+^\*\* 1 of \d+ failed
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

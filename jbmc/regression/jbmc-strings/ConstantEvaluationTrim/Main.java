@@ -24,8 +24,10 @@ public class Main {
     }
 
     public void noprop(String str) {
-        str = str.trim();
-        assert str.equals("abc");
+        if(str != null) {
+          str = str.trim();
+          assert str.equals("abc");
+        }
     }
 
     public void empty() {

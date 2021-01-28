@@ -20,6 +20,8 @@ class namespacet;
 
 bool sort_operands(exprt::operandst &operands);
 
+bool join_operands(exprt &expr);
+
 bool sort_and_join(exprt &expr);
 
 // bit-level conversions
