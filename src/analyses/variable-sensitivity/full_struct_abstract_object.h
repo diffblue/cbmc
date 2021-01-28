@@ -11,19 +11,20 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 
-#include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <analyses/variable-sensitivity/abstract_aggregate_object.h>
 #include <iosfwd>
-#include <stack>
 #include <util/sharing_map.h>
 
-class abstract_environmentt;
-class member_exprt;
-
-class full_struct_abstract_objectt : public struct_abstract_objectt
+class full_struct_abstract_objectt : public abstract_aggregate_objectt<
+                                       full_struct_abstract_objectt,
+                                       struct_aggregate_typet>
 {
 public:
   typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
+  typedef abstract_aggregate_objectt<
+    full_struct_abstract_objectt,
+    struct_aggregate_typet>
+    abstract_aggregate_baset;
 
   /**
    * \brief Explicit copy-constructor to make it clear that the shared_map
@@ -79,7 +80,7 @@ public:
   abstract_object_pointert
   visit_sub_elements(const abstract_object_visitort &visitor) const override;
 
-  void get_statistics(
+  void statistics(
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
     const abstract_environmentt &env,
@@ -109,7 +110,7 @@ protected:
   /// this to return more precise results.
   ///
   /// \param environment: the abstract environment
-  /// \param member_expr: the expression uses to access a specific component
+  /// \param expr: the expression uses to access a specific component
   /// \param ns: the current namespace
   ///
   /// \return The abstract object representing the value of that
@@ -117,7 +118,7 @@ protected:
   ///         since we are not tracking the struct.
   abstract_object_pointert read_component(
     const abstract_environmentt &environment,
-    const member_exprt &member_expr,
+    const exprt &expr,
     const namespacet &ns) const override;
 
   /// A helper function to evaluate writing to a component of a
@@ -127,7 +128,7 @@ protected:
   /// \param environment: the abstract environment
   /// \param ns: the current namespace
   /// \param stack: the remaining stack of expressions on the LHS to evaluate
-  /// \param member_expr: the expression uses to access a specific component
+  /// \param expr: the expression uses to access a specific component
   /// \param value: the value we are trying to write to the component
   /// \param merging_write: whether to over-write or to merge with the
   ///                       current value.  In other words is there
@@ -141,7 +142,7 @@ protected:
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> &stack,
-    const member_exprt &member_expr,
+    const exprt &expr,
     const abstract_object_pointert &value,
     bool merging_write) const override;
 

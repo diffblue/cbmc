@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/arith_tools.h>
 #include <util/expr.h>

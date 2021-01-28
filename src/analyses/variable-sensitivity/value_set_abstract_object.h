@@ -14,9 +14,9 @@
 
 #include <unordered_set>
 
-#include <analyses/variable-sensitivity/abstract_value.h>
+#include <analyses/variable-sensitivity/abstract_value_object.h>
 
-class value_set_abstract_objectt : public abstract_valuet
+class value_set_abstract_objectt : public abstract_value_objectt
 {
 public:
   using abstract_object_sett = std::unordered_set<
@@ -34,6 +34,8 @@ public:
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
+
+  index_range_ptrt index_range(const namespacet &ns) const override;
 
   /// \copydoc abstract_objectt::to_constant
   exprt to_constant() const override

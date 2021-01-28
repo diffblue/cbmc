@@ -12,10 +12,54 @@
 #include <util/invariant.h>
 #include <util/std_expr.h>
 
-#include "abstract_enviroment.h"
+#include "abstract_environment.h"
 
 #include "context_abstract_object.h"
 #include "interval_abstract_value.h"
+
+class interval_index_ranget : public index_ranget
+{
+public:
+  interval_index_ranget(
+    const constant_interval_exprt &interval,
+    const namespacet &n)
+    : index(nil_exprt()),
+      next(interval.get_lower()),
+      upper(interval.get_upper()),
+      ns(n)
+  {
+  }
+
+  const exprt &current() const override
+  {
+    return index;
+  }
+  bool advance_to_next() override
+  {
+    index = next;
+    next = next_element(next, ns);
+    return simplify_expr(binary_predicate_exprt(index, ID_le, upper), ns)
+      .is_true();
+  }
+
+private:
+  static exprt next_element(const exprt &cur, const namespacet &ns)
+  {
+    return simplify_expr(plus_exprt(cur, from_integer(1, cur.type())), ns);
+  }
+
+  exprt index;
+  exprt next;
+  exprt upper;
+  const namespacet &ns;
+};
+
+index_range_ptrt make_interval_index_range(
+  const constant_interval_exprt &interval,
+  const namespacet &n)
+{
+  return std::make_shared<interval_index_ranget>(interval, n);
+}
 
 static inline exprt look_through_casts(exprt e)
 {
@@ -175,12 +219,12 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
 }
 
 interval_abstract_valuet::interval_abstract_valuet(typet t)
-  : abstract_valuet(t), interval(t)
+  : abstract_value_objectt(t), interval(t)
 {
 }
 
 interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_valuet(t, tp, bttm), interval(t)
+  : abstract_value_objectt(t, tp, bttm), interval(t)
 {
 }
 
@@ -434,7 +478,7 @@ interval_abstract_valuet::merge(abstract_object_pointert other) const
   }
   else
   {
-    return abstract_valuet::merge(other);
+    return abstract_objectt::merge(other);
   }
 }
 
@@ -479,7 +523,7 @@ interval_abstract_valuet::meet(const abstract_object_pointert &other) const
   }
   else
   {
-    return abstract_valuet::meet(other);
+    return abstract_objectt::meet(other);
   }
 }
 
@@ -531,10 +575,24 @@ interval_abstract_valuet::interval_abstract_valuet(
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt e,
   int merge_count)
-  : abstract_valuet(e.type(), e.is_top() || merge_count > 10, e.is_bottom()),
+  : abstract_value_objectt(
+      e.type(),
+      e.is_top() || merge_count > 10,
+      e.is_bottom()),
     interval(e),
     merge_count(merge_count)
 {
+}
+
+index_range_ptrt
+interval_abstract_valuet::index_range(const namespacet &ns) const
+{
+  if(is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
+    return make_empty_index_range();
+  if(interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
+    return make_empty_index_range();
+
+  return make_interval_index_range(interval, ns);
 }
 
 const constant_interval_exprt &interval_abstract_valuet::get_interval() const
@@ -548,7 +606,7 @@ void interval_abstract_valuet::get_statistics(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  abstract_valuet::get_statistics(statistics, visited, env, ns);
+  abstract_objectt::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_interval_abstract_objects;
   if(interval.is_single_value_interval())
   {

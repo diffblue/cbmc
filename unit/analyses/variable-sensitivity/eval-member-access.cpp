@@ -1,8 +1,8 @@
 #include <testing-utils/use_catch.h>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/constant_array_abstract_object.h>
+#include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
@@ -111,7 +111,7 @@ exprt fetch_element(
     return object->to_constant();
 
   const auto unwrapped = object->unwrap_context();
-  auto value = std::dynamic_pointer_cast<const abstract_valuet>(unwrapped);
+  auto value = std::dynamic_pointer_cast<const abstract_objectt>(unwrapped);
   REQUIRE(value);
   return value->to_constant();
 }
@@ -131,7 +131,7 @@ exprt make_array(
   }
 
   auto populate_array = array_exprt(array_elements, array_type);
-  auto array_value = std::make_shared<constant_array_abstract_objectt>(
+  auto array_value = std::make_shared<full_array_abstract_objectt>(
     populate_array, environment, ns);
   REQUIRE_FALSE(array_value->is_top());
   REQUIRE_FALSE(array_value->is_bottom());
@@ -153,6 +153,6 @@ exprt integer_expression(int i)
 exprt top_expression()
 {
   auto top_value =
-    std::make_shared<abstract_valuet>(integer_typet(), true, false);
+    std::make_shared<abstract_objectt>(integer_typet(), true, false);
   return top_value->to_constant();
 }

@@ -6,8 +6,6 @@
 
 \*******************************************************************/
 
-#include <ostream>
-
 #include <array>
 #include <goto-programs/adjust_float_expressions.h>
 #include <langapi/language_util.h>
@@ -18,16 +16,30 @@
 #include <util/std_expr.h>
 #include <util/type.h>
 
-#include "abstract_enviroment.h"
+#include "abstract_environment.h"
 #include "constant_abstract_value.h"
 
+class constant_index_ranget : public single_value_index_ranget
+{
+public:
+  explicit constant_index_ranget(const exprt &val)
+    : single_value_index_ranget(val)
+  {
+  }
+};
+
+index_range_ptrt make_constant_index_range(const exprt &val)
+{
+  return std::make_shared<constant_index_ranget>(val);
+}
+
 constant_abstract_valuet::constant_abstract_valuet(typet t)
-  : abstract_valuet(t), value()
+  : abstract_value_objectt(t), value()
 {
 }
 
 constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_valuet(t, tp, bttm), value()
+  : abstract_value_objectt(t, tp, bttm), value()
 {
 }
 
@@ -35,8 +47,18 @@ constant_abstract_valuet::constant_abstract_valuet(
   const exprt e,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : abstract_valuet(e.type(), false, false), value(e)
+  : abstract_value_objectt(e.type(), false, false), value(e)
 {
+}
+
+index_range_ptrt
+constant_abstract_valuet::index_range(const namespacet &ns) const
+{
+  exprt val = to_constant();
+  if(!val.is_constant())
+    return make_indeterminate_index_range();
+
+  return make_constant_index_range(val);
 }
 
 abstract_object_pointert constant_abstract_valuet::expression_transform(
@@ -182,7 +204,7 @@ constant_abstract_valuet::merge(abstract_object_pointert other) const
   else
   {
     // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return abstract_valuet::merge(other);
+    return abstract_objectt::merge(other);
   }
 }
 
@@ -202,7 +224,7 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
     }
     else
     {
-      return abstract_valuet::merge(other);
+      return abstract_objectt::merge(other);
     }
   }
 }
@@ -213,7 +235,7 @@ void constant_abstract_valuet::get_statistics(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  abstract_valuet::get_statistics(statistics, visited, env, ns);
+  abstract_objectt::get_statistics(statistics, visited, env, ns);
   ++statistics.number_of_constants;
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }

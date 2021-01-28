@@ -9,8 +9,7 @@
 #include "constant_pointer_abstract_object.h"
 
 #include <analyses/ai.h>
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
-
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -196,9 +195,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
       if(merging_write)
       {
         abstract_object_pointert pointed_value = environment.eval(value, ns);
-        bool modifications;
         abstract_object_pointert merged_value =
-          abstract_objectt::merge(pointed_value, new_value, modifications);
+          abstract_objectt::merge(pointed_value, new_value);
         environment.assign(value, merged_value, ns);
       }
       else

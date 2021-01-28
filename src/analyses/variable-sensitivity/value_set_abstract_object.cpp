@@ -9,17 +9,51 @@
 /// \file
 /// Value Set Abstract Object
 
-#include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/struct_abstract_object.h>
-#include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
+class value_set_index_ranget : public index_ranget
+{
+public:
+  typedef value_set_abstract_objectt::abstract_object_sett abstract_object_sett;
+  explicit value_set_index_ranget(const abstract_object_sett &vals)
+    : values(vals), cur(), next(values.begin())
+  {
+    PRECONDITION(!values.empty());
+  }
+
+  const exprt &current() const override
+  {
+    return cur;
+  }
+  bool advance_to_next() override
+  {
+    if(next == values.end())
+      return false;
+
+    cur = (*next)->to_constant();
+    ++next;
+    return true;
+  }
+
+private:
+  const abstract_object_sett &values;
+  exprt cur;
+  abstract_object_sett::const_iterator next;
+};
+
+index_range_ptrt make_value_set_index_range(
+  const value_set_abstract_objectt::abstract_object_sett &vals)
+{
+  return std::make_shared<value_set_index_ranget>(vals);
+}
+
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
-  : abstract_valuet(type), my_type(type_to_abstract_type(type))
+  : abstract_value_objectt(type), my_type(type_to_abstract_type(type))
 {
   switch(my_type)
   {
@@ -39,7 +73,8 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)
-  : abstract_valuet(type, top, bottom), my_type(type_to_abstract_type(type))
+  : abstract_value_objectt(type, top, bottom),
+    my_type(type_to_abstract_type(type))
 {
   switch(my_type)
   {
@@ -61,7 +96,7 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : abstract_valuet(expr.type(), false, false),
+  : abstract_value_objectt(expr.type(), false, false),
     my_type(type_to_abstract_type(expr.type()))
 {
   switch(my_type)
@@ -78,6 +113,15 @@ value_set_abstract_objectt::value_set_abstract_objectt(
     UNREACHABLE;
   }
   verify();
+}
+
+index_range_ptrt
+value_set_abstract_objectt::index_range(const namespacet &ns) const
+{
+  if(values.empty())
+    return make_indeterminate_index_range();
+
+  return make_value_set_index_range(values);
 }
 
 abstract_object_pointert value_set_abstract_objectt::expression_transform(
@@ -225,10 +269,7 @@ value_set_abstract_objectt::get_type(const abstract_object_pointert &other)
 {
   PRECONDITION(
     !std::dynamic_pointer_cast<const context_abstract_objectt>(other));
-  PRECONDITION(!std::dynamic_pointer_cast<const array_abstract_objectt>(other));
-  PRECONDITION(
-    !std::dynamic_pointer_cast<const struct_abstract_objectt>(other));
-  PRECONDITION(!std::dynamic_pointer_cast<const union_abstract_objectt>(other));
+  PRECONDITION(!std::dynamic_pointer_cast<const abstract_aggregate_tag>(other));
   PRECONDITION(
     !std::dynamic_pointer_cast<const value_set_abstract_objectt>(other));
 

@@ -9,7 +9,7 @@
 #include <array>
 #include <iostream>
 
-#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 
 #include <goto-programs/adjust_float_expressions.h>
@@ -198,6 +198,14 @@ abstract_object_pointert abstract_objectt::merge(
   out_modifications = result != op1;
 
   return result;
+}
+
+abstract_object_pointert abstract_objectt::merge(
+  abstract_object_pointert op1,
+  abstract_object_pointert op2)
+{
+  bool dummy;
+  return merge(op1, op2, dummy);
 }
 
 bool abstract_objectt::should_use_base_merge(

@@ -14,10 +14,10 @@
 
 #include <iosfwd>
 
-#include <analyses/variable-sensitivity/abstract_value.h>
+#include <analyses/variable-sensitivity/abstract_value_object.h>
 #include <util/std_expr.h>
 
-class constant_abstract_valuet : public abstract_valuet
+class constant_abstract_valuet : public abstract_value_objectt
 {
 private:
   typedef sharing_ptrt<constant_abstract_valuet>
@@ -34,6 +34,8 @@ public:
   virtual ~constant_abstract_valuet()
   {
   }
+
+  index_range_ptrt index_range(const namespacet &ns) const override;
 
   /// Interface for transforms
   ///
