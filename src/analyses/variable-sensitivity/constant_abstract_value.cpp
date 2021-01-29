@@ -33,18 +33,18 @@ index_range_ptrt make_constant_index_range(const exprt &val)
   return std::make_shared<constant_index_ranget>(val);
 }
 
-constant_abstract_valuet::constant_abstract_valuet(typet t)
+constant_abstract_valuet::constant_abstract_valuet(const typet &t)
   : abstract_value_objectt(t), value()
 {
 }
 
-constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm)
+constant_abstract_valuet::constant_abstract_valuet(const typet &t, bool tp, bool bttm)
   : abstract_value_objectt(t, tp, bttm), value()
 {
 }
 
 constant_abstract_valuet::constant_abstract_valuet(
-  const exprt e,
+  const exprt &e,
   const abstract_environmentt &environment,
   const namespacet &ns)
   : abstract_value_objectt(e.type(), false, false), value(e)
@@ -209,7 +209,7 @@ constant_abstract_valuet::merge(abstract_object_pointert other) const
 }
 
 abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
-  constant_abstract_value_pointert other) const
+  const constant_abstract_value_pointert &other) const
 {
   if(is_bottom())
   {
