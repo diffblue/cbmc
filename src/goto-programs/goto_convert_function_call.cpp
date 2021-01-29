@@ -53,8 +53,8 @@ void goto_convertt::do_function_call(
 
   clean_expr(new_function, dest, mode);
 
-  Forall_expr(it, new_arguments)
-    clean_expr(*it, dest, mode);
+  for(auto &new_argument : new_arguments)
+    clean_expr(new_argument, dest, mode);
 
   // split on the function
 

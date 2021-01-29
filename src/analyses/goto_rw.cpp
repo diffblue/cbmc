@@ -745,9 +745,11 @@ static void goto_rw(
   rw_set.get_objects_rec(
     function, target, rw_range_sett::get_modet::READ, function_call.function());
 
-  forall_expr(it, function_call.arguments())
+  for(const auto &argument : function_call.arguments())
+  {
     rw_set.get_objects_rec(
-      function, target, rw_range_sett::get_modet::READ, *it);
+      function, target, rw_range_sett::get_modet::READ, argument);
+  }
 }
 
 void goto_rw(

@@ -105,8 +105,8 @@ void remove_function_pointer(
   if(call_type.has_ellipsis() && call_type.parameters().empty())
   {
     call_type.remove_ellipsis();
-    forall_expr(it, code.arguments())
-      call_type.parameters().push_back(code_typet::parametert(it->type()));
+    for(const auto &argument : code.arguments())
+      call_type.parameters().push_back(code_typet::parametert(argument.type()));
   }
 
   const exprt &pointer = to_dereference_expr(function).pointer();

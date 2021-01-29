@@ -1059,8 +1059,8 @@ void goto_convertt::do_function_call_symbol(
 
     codet fence(ID_fence);
 
-    forall_expr(it, arguments)
-      fence.set(get_string_constant(*it), true);
+    for(const auto &argument : arguments)
+      fence.set(get_string_constant(argument), true);
 
     dest.add(goto_programt::make_other(fence, function.source_location()));
   }
