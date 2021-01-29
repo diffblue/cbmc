@@ -39,9 +39,9 @@ public:
 
   abstract_environmentt() = delete;
 
-  abstract_environmentt(
+  explicit abstract_environmentt(
     variable_sensitivity_object_factory_ptrt _object_factory)
-    : bottom(true), object_factory(_object_factory)
+    : bottom(true), object_factory(std::move(_object_factory))
   {
   }
 
