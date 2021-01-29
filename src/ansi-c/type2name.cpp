@@ -258,9 +258,9 @@ static std::string type2name(
   if(type.has_subtypes())
   {
     result+='$';
-    forall_subtypes(it, type)
+    for(const typet &subtype : to_type_with_subtypes(type).subtypes())
     {
-      result+=type2name(*it, ns, symbol_number);
+      result += type2name(subtype, ns, symbol_number);
       result+='|';
     }
     result[result.size()-1]='$';

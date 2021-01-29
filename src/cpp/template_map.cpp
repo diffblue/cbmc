@@ -62,8 +62,8 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_merged_type)
   {
-    Forall_subtypes(it, type)
-      apply(*it);
+    for(typet &subtype : to_type_with_subtypes(type).subtypes())
+      apply(subtype);
   }
 }
 

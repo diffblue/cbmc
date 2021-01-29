@@ -16,8 +16,8 @@ void c_storage_spect::read(const typet &type)
   if(type.id()==ID_merged_type ||
      type.id()==ID_code)
   {
-    forall_subtypes(it, type)
-      read(*it);
+    for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+      read(subtype);
   }
   else if(type.id()==ID_static)
     is_static=true;
