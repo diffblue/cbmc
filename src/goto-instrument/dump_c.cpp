@@ -436,15 +436,16 @@ void dump_ct::convert_compound(
 
   const irept &bases = type.find(ID_bases);
   std::stringstream base_decls;
-  forall_irep(parent_it, bases.get_sub())
+  for(const auto &parent : bases.get_sub())
   {
     UNREACHABLE;
-    /*
-    assert(parent_it->id() == ID_base);
-    assert(parent_it->get(ID_type) == ID_struct_tag);
+    (void)parent;
+#if 0
+    assert(parent.id() == ID_base);
+    assert(parent.get(ID_type) == ID_struct_tag);
 
     const irep_idt &base_id=
-      parent_it->find(ID_type).get(ID_identifier);
+      parent.find(ID_type).get(ID_identifier);
     const irep_idt &renamed_base_id=global_renaming[base_id];
     const symbolt &parsymb=ns.lookup(renamed_base_id);
 
@@ -452,10 +453,10 @@ void dump_ct::convert_compound(
 
     base_decls << id2string(renamed_base_id) +
       (parent_it+1==bases.get_sub().end()?"":", ");
-      */
+#endif
   }
 
-  /*
+#if 0
   // for the constructor
   string constructor_args;
   string constructor_body;
@@ -471,7 +472,7 @@ void dump_ct::convert_compound(
   constructor_args += "const " + type_to_string(compo.type()) + "& " + component_name;
 
   constructor_body += indent + indent + "this->"+component_name + " = " + component_name + ";\n";
-  */
+#endif
 
   std::stringstream struct_body;
 

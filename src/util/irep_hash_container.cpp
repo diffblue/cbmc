@@ -66,8 +66,8 @@ void irep_hash_container_baset::pack(
     packed.push_back(irep_id_hash()(irep.id()));
 
     packed.push_back(sub.size());
-    forall_irep(it, sub)
-      packed.push_back(number(*it));
+    for(const auto &sub_irep : sub)
+      packed.push_back(number(sub_irep));
 
     packed.push_back(named_sub_size);
     for(const auto &sub_irep : named_sub)
@@ -88,8 +88,8 @@ void irep_hash_container_baset::pack(
     packed.push_back(irep_id_hash()(irep.id()));
 
     packed.push_back(sub.size());
-    forall_irep(it, sub)
-      packed.push_back(number(*it));
+    for(const auto &sub_irep : sub)
+      packed.push_back(number(sub_irep));
 
     packed.push_back(non_comment_count);
     for(const auto &sub_irep : named_sub)

@@ -84,13 +84,13 @@ static std::string irep2name(const irept &irep)
     }
   }
 
-  forall_irep(it, irep.get_sub())
+  for(const auto &sub : irep.get_sub())
   {
     if(first)
       first=false;
     else
       result+=',';
-    result += irep2name(*it);
+    result += irep2name(sub);
   }
 
   result+=')';

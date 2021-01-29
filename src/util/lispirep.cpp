@@ -61,7 +61,7 @@ void irep2lisp(const irept &src, lispexprt &dest)
 
   // reserve objects for extra performance
 
-  forall_irep(it, src.get_sub())
+  for(const auto &irep : src.get_sub())
   {
     lispexprt name;
     name.type=lispexprt::String;
@@ -70,7 +70,7 @@ void irep2lisp(const irept &src, lispexprt &dest)
 
     lispexprt sub;
 
-    irep2lisp(*it, sub);
+    irep2lisp(irep, sub);
     dest.push_back(sub);
   }
 

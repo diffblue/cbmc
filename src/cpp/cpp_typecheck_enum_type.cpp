@@ -30,13 +30,13 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 
   mp_integer i=0;
 
-  Forall_irep(it, components)
+  for(auto &component : components)
   {
-    const irep_idt &name=it->get(ID_name);
+    const irep_idt &name = component.get(ID_name);
 
-    if(it->find(ID_value).is_not_nil())
+    if(component.find(ID_value).is_not_nil())
     {
-      exprt &value=static_cast<exprt &>(it->add(ID_value));
+      exprt &value = static_cast<exprt &>(component.add(ID_value));
       typecheck_expr(value);
       implicit_typecast(value, c_enum_type.subtype());
       make_constant(value);
@@ -56,8 +56,8 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.name=id2string(enum_symbol.name)+"::"+id2string(name);
     symbol.base_name=name;
     symbol.value=value_expr;
-    symbol.location=
-      static_cast<const source_locationt &>(it->find(ID_C_source_location));
+    symbol.location = static_cast<const source_locationt &>(
+      component.find(ID_C_source_location));
     symbol.mode = enum_symbol.mode;
     symbol.module=module;
     symbol.type=enum_tag_type;

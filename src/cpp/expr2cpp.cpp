@@ -232,7 +232,7 @@ std::string expr2cppt::convert_rec(
 
     const irept::subt &arguments=src.find(ID_arguments).get_sub();
 
-    forall_irep(it, arguments)
+    for(auto it = arguments.begin(); it != arguments.end(); ++it)
     {
       if(it!=arguments.begin())
         dest+=", ";

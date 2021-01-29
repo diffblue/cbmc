@@ -108,9 +108,11 @@ public:
 
   bool is_qualified() const
   {
-    forall_irep(it, get_sub())
-      if(it->id()=="::")
+    for(const auto &irep : get_sub())
+    {
+      if(irep.id() == "::")
         return true;
+    }
     return false;
   }
 
@@ -121,9 +123,11 @@ public:
 
   bool has_template_args() const
   {
-    forall_irep(it, get_sub())
-      if(it->id()==ID_template_args)
+    for(const auto &irep : get_sub())
+    {
+      if(irep.id() == ID_template_args)
         return true;
+    }
 
     return false;
   }

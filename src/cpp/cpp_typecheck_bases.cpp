@@ -22,10 +22,9 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
   irept::subt &bases_irep=type.add(ID_bases).get_sub();
 
-  Forall_irep(base_it, bases_irep)
+  for(auto &base : bases_irep)
   {
-    const cpp_namet &name=
-      to_cpp_name(base_it->find(ID_name));
+    const cpp_namet &name = to_cpp_name(base.find(ID_name));
 
     exprt base_symbol_expr=
       resolve(
@@ -68,8 +67,8 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       throw 0;
     }
 
-    bool virtual_base = base_it->get_bool(ID_virtual);
-    irep_idt class_access = base_it->get(ID_protection);
+    bool virtual_base = base.get_bool(ID_virtual);
+    irep_idt class_access = base.get(ID_protection);
 
     if(class_access.empty())
       class_access = default_class_access;
@@ -80,7 +79,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     if(virtual_base)
       base_symbol_expr.set(ID_virtual, true);
 
-    base_it->swap(base_symbol_expr);
+    base.swap(base_symbol_expr);
 
     // Add base scopes as parents to the current scope
     cpp_scopes.current_scope().add_secondary_scope(

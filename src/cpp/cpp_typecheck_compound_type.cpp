@@ -1257,9 +1257,10 @@ void cpp_typecheckt::move_member_initializers(
       value = code_blockt{{to_code(value)}};
 
     exprt::operandst::iterator o_it=value.operands().begin();
-    forall_irep(it, initializers.get_sub())
+    for(const auto &initializer : initializers.get_sub())
     {
-      o_it=value.operands().insert(o_it, static_cast<const exprt &>(*it));
+      o_it =
+        value.operands().insert(o_it, static_cast<const exprt &>(initializer));
       o_it++;
     }
   }
@@ -1620,10 +1621,8 @@ bool cpp_typecheckt::check_component_access(
   // check friendship
   const irept::subt &friends = struct_union_type.find(ID_C_friends).get_sub();
 
-  forall_irep(f_it, friends)
+  for(const auto &friend_symb : friends)
   {
-    const irept &friend_symb=*f_it;
-
     const cpp_scopet &friend_scope =
       cpp_scopes.get_scope(friend_symb.get(ID_identifier));
 

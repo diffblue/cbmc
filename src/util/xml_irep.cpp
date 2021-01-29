@@ -23,10 +23,10 @@ void convert(
   if(irep.id()!=ID_nil)
     xml.new_element("id").data=irep.id_string();
 
-  forall_irep(it, irep.get_sub())
+  for(const auto &sub_irep : irep.get_sub())
   {
     xmlt &x_sub=xml.new_element("sub");
-    convert(*it, x_sub);
+    convert(sub_irep, x_sub);
   }
 
   for(const auto &irep_entry : irep.get_named_sub())

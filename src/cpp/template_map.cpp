@@ -54,10 +54,10 @@ void template_mapt::apply(typet &type) const
 
     irept::subt &parameters=type.add(ID_parameters).get_sub();
 
-    Forall_irep(it, parameters)
+    for(auto &parameter : parameters)
     {
-      if(it->id()==ID_parameter)
-        apply(static_cast<typet &>(it->add(ID_type)));
+      if(parameter.id() == ID_parameter)
+        apply(static_cast<typet &>(parameter.add(ID_type)));
     }
   }
   else if(type.id()==ID_merged_type)
