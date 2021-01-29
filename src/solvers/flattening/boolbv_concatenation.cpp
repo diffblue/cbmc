@@ -27,9 +27,9 @@ bvt boolbvt::convert_concatenation(const concatenation_exprt &expr)
   bvt bv;
   bv.resize(width);
 
-  forall_expr(it, operands)
+  for(const auto &operand : operands)
   {
-    const bvt &op=convert_bv(*it);
+    const bvt &op = convert_bv(operand);
 
     INVARIANT(
       op.size() <= offset,

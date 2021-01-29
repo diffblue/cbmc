@@ -292,8 +292,8 @@ std::list<exprt> expressions_read(
   case FUNCTION_CALL:
   {
     const code_function_callt &function_call = instruction.get_function_call();
-    forall_expr(it, function_call.arguments())
-      dest.push_back(*it);
+    for(const auto &argument : function_call.arguments())
+      dest.push_back(argument);
     if(function_call.lhs().is_not_nil())
       parse_lhs_read(function_call.lhs(), dest);
     break;

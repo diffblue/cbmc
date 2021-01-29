@@ -32,9 +32,9 @@ bvt boolbvt::convert_array(const exprt &expr)
     bvt bv;
     bv.reserve(width);
 
-    forall_expr(it, operands)
+    for(const auto &op : operands)
     {
-      const bvt &tmp = convert_bv(*it, op_width);
+      const bvt &tmp = convert_bv(op, op_width);
 
       bv.insert(bv.end(), tmp.begin(), tmp.end());
     }

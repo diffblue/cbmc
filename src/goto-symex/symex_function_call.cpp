@@ -200,8 +200,8 @@ void goto_symext::symex_function_call_symbol(
 
   code.function() = clean_expr(std::move(code.function()), state, false);
 
-  Forall_expr(it, code.arguments())
-    *it = clean_expr(std::move(*it), state, false);
+  for(auto &argument : code.arguments())
+    argument = clean_expr(std::move(argument), state, false);
 
   target.location(state.guard.as_expr(), state.source);
 

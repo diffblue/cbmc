@@ -73,15 +73,15 @@ with_exprt make_with_expr(const update_exprt &src)
   with_exprt result{exprt{}, exprt{}, exprt{}};
   exprt *dest=&result;
 
-  forall_expr(it, designator)
+  for(const auto &expr : designator)
   {
     with_exprt tmp{exprt{}, exprt{}, exprt{}};
 
-    if(it->id()==ID_index_designator)
+    if(expr.id() == ID_index_designator)
     {
-      tmp.where()=to_index_designator(*it).index();
+      tmp.where() = to_index_designator(expr).index();
     }
-    else if(it->id()==ID_member_designator)
+    else if(expr.id() == ID_member_designator)
     {
       // irep_idt component_name=
       //  to_member_designator(*it).get_component_name();
