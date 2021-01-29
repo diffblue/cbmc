@@ -129,7 +129,7 @@ abstract_object_pointert abstract_objectt::expression_transform(
 
     if(const_op.is_nil())
     {
-      return environment.abstract_object_factory(copy.type(), ns, true);
+      return environment.abstract_object_factory(copy.type(), ns, true, false);
     }
   }
 
@@ -144,7 +144,7 @@ abstract_object_pointert abstract_objectt::write(
   const abstract_object_pointert &value,
   bool merging_write) const
 {
-  return environment.abstract_object_factory(type(), ns, true);
+  return environment.abstract_object_factory(type(), ns, true, false);
 }
 
 bool abstract_objectt::is_top() const

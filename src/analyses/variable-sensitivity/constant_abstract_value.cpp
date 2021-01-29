@@ -159,7 +159,7 @@ constant_abstract_valuet::try_transform_expr_with_all_rounding_modes(
     auto current = possible_result->to_constant();
     if(current.is_nil() || current != first)
     {
-      return environment.abstract_object_factory(expr.type(), ns);
+      return environment.abstract_object_factory(expr.type(), ns, true, false);
     }
   }
   return possible_results.front();

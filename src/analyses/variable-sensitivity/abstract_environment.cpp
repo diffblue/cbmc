@@ -74,7 +74,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   {
     // It is important that this is top as the abstract object may not know
     // how to handle the expression
-    return abstract_object_factory(simplified_expr.type(), ns, true);
+    return abstract_object_factory(simplified_expr.type(), ns, true, false);
   }
 }
 
@@ -389,7 +389,7 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // The value of the temporary abstract object is ignored, its
   // purpose is just to dispatch the expression transform call to
   // a concrete subtype of abstract_objectt.
-  auto eval_obj = abstract_object_factory(e.type(), ns, true);
+  auto eval_obj = abstract_object_factory(e.type(), ns, true, false);
   auto operands = eval_operands(e, *this, ns);
 
   return eval_obj->expression_transform(e, operands, *this, ns);

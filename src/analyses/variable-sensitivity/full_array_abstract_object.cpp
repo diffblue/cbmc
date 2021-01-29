@@ -168,7 +168,7 @@ abstract_object_pointert full_array_abstract_objectt::read_component(
   const namespacet &ns) const
 {
   if(is_top())
-    return environment.abstract_object_factory(expr.type(), ns, true);
+    return environment.abstract_object_factory(expr.type(), ns, true, false);
 
   auto read_element_fn =
     [this, &environment, &ns](const index_exprt &index_expr) {

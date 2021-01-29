@@ -304,7 +304,7 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
         if(op_as_constant.is_nil())
         {
           auto top_object =
-            environment.abstract_object_factory(expr.type(), ns, true);
+            environment.abstract_object_factory(expr.type(), ns, true, false);
           auto top_context_object =
             std::dynamic_pointer_cast<const context_abstract_objectt>(
               top_object);
@@ -340,7 +340,7 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
   }
 
   if(num_operands == 0)
-    return environment.abstract_object_factory(expr.type(), ns, true);
+    return environment.abstract_object_factory(expr.type(), ns, true, false);
 
   if(expr.id() == ID_if)
     return evaluate_conditional(expr, interval_operands, environment, ns);
