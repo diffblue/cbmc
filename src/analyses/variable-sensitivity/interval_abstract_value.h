@@ -27,15 +27,14 @@ private:
     interval_abstract_value_pointert;
 
 public:
-  explicit interval_abstract_valuet(typet t);
-  interval_abstract_valuet(typet t, bool tp, bool bttm);
+  explicit interval_abstract_valuet(const typet &t);
+  interval_abstract_valuet(const typet &t, bool tp, bool bttm);
 
-  interval_abstract_valuet(const constant_interval_exprt e, int merge_count);
-
-  explicit interval_abstract_valuet(const constant_interval_exprt e);
+  explicit interval_abstract_valuet(const constant_interval_exprt &e);
+  interval_abstract_valuet(const constant_interval_exprt &e, int merge_count);
 
   interval_abstract_valuet(
-    const exprt e,
+    const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns);
 

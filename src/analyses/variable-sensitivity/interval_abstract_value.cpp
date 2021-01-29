@@ -218,19 +218,43 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
     the_constant_part_of_the_relation, the_constant_part_of_the_relation);
 }
 
-interval_abstract_valuet::interval_abstract_valuet(typet t)
-  : abstract_value_objectt(t), interval(t)
+interval_abstract_valuet::interval_abstract_valuet(const typet &t)
+  : abstract_value_objectt(t), interval(t), merge_count(0)
 {
 }
 
-interval_abstract_valuet::interval_abstract_valuet(typet t, bool tp, bool bttm)
-  : abstract_value_objectt(t, tp, bttm), interval(t)
+interval_abstract_valuet::interval_abstract_valuet(const typet &t, bool tp, bool bttm)
+  : abstract_value_objectt(t, tp, bttm), interval(t), merge_count(0)
 {
 }
 
 interval_abstract_valuet::interval_abstract_valuet(
-  const constant_interval_exprt e)
+  const constant_interval_exprt &e)
   : interval_abstract_valuet(e, 0)
+{
+}
+
+interval_abstract_valuet::interval_abstract_valuet(
+  const constant_interval_exprt &e,
+  int merge_count)
+  : abstract_value_objectt(
+  e.type(),
+  e.is_top() || merge_count > 10,
+  e.is_bottom()),
+    interval(e),
+    merge_count(merge_count)
+{
+}
+
+interval_abstract_valuet::interval_abstract_valuet(
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+  : interval_abstract_valuet(
+  represents_interval(e)
+  ? make_interval_expr(e)
+  : (e.operands().size() == 2 ? interval_from_relation(e)
+                              : constant_interval_exprt(e.type())))
 {
 }
 
@@ -533,30 +557,6 @@ abstract_object_pointert interval_abstract_valuet::meet_intervals(
       constant_interval_exprt(lower_bound, upper_bound),
       std::max(merge_count, other->merge_count) + 1);
   }
-}
-
-interval_abstract_valuet::interval_abstract_valuet(
-  const exprt e,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-  : interval_abstract_valuet(
-      represents_interval(e)
-        ? make_interval_expr(e)
-        : (e.operands().size() == 2 ? interval_from_relation(e)
-                                    : constant_interval_exprt(e.type())))
-{
-}
-
-interval_abstract_valuet::interval_abstract_valuet(
-  const constant_interval_exprt e,
-  int merge_count)
-  : abstract_value_objectt(
-      e.type(),
-      e.is_top() || merge_count > 10,
-      e.is_bottom()),
-    interval(e),
-    merge_count(merge_count)
-{
 }
 
 index_range_ptrt
