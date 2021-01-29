@@ -1223,18 +1223,7 @@ typet smt2_parsert::function_signature_declaration()
   mathematical_function_typet::domaint domain;
 
   while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE)
-  {
-    if(next_token() != smt2_tokenizert::OPEN)
-      throw error("expected '(' at beginning of parameter");
-
-    if(next_token() != smt2_tokenizert::SYMBOL)
-      throw error("expected symbol in parameter");
-
     domain.push_back(sort());
-
-    if(next_token() != smt2_tokenizert::CLOSE)
-      throw error("expected ')' at end of parameter");
-  }
 
   next_token(); // eat the ')'
 
