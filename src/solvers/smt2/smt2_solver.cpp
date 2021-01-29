@@ -102,18 +102,22 @@ void smt2_solvert::expand_function_applications(exprt &expr)
           domain.size() == app.arguments().size(),
           "number of parameters must match number of arguments");
 
-        replace_symbolt replace_symbol;
-
-        for(std::size_t i = 0; i < domain.size(); i++)
+        // Does it have a definition? It's otherwise uninterpreted.
+        if(!f.definition.is_nil())
         {
-          replace_symbol.insert(
-            symbol_exprt(f.parameters[i], domain[i]), app.arguments()[i]);
-        }
+          replace_symbolt replace_symbol;
 
-        exprt body = f.definition;
-        replace_symbol(body);
-        expand_function_applications(body);
-        expr = body;
+          for(std::size_t i = 0; i < domain.size(); i++)
+          {
+            replace_symbol.insert(
+              symbol_exprt(f.parameters[i], domain[i]), app.arguments()[i]);
+          }
+
+          exprt body = f.definition;
+          replace_symbol(body);
+          expand_function_applications(body);
+          expr = body;
+        }
       }
     }
   }
