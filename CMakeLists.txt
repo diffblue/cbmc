@@ -136,7 +136,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
             COMMAND ${CODE_COVERAGE_LCOV} ${LCOV_FLAGS} --remove ${CODE_COVERAGE_INFO_FILE} '/usr/*' --output-file ${CODE_COVERAGE_INFO_FILE}
             COMMAND ${CODE_COVERAGE_GENHTML} ${CODE_COVERAGE_INFO_FILE} --output-directory ${CODE_COVERAGE_OUTPUT_DIR}
             DEPENDS
-              java-models-library
               "$<TARGET_FILE:java-unit>"
               "$<TARGET_FILE:unit>"
               "$<TARGET_FILE:goto-harness>"

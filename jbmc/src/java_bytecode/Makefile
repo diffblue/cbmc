@@ -68,13 +68,17 @@ all: library java_bytecode$(LIBEXT)
 
 clean: clean_library
 
+LIBRARY_DIR = ../../lib/java-models-library
+
 .PHONY: clean_library
 clean_library:
-	$(MAKE) clean -C library
+	if [ -d $(LIBRARY_DIR) ]; then cd $(LIBRARY_DIR); mvn --quiet clean; fi
 
 .PHONY: library
 library:
-	$(MAKE) -C library
+	if [ -d $(LIBRARY_DIR) ]; then \
+		(cd $(LIBRARY_DIR); mvn --quiet -Dmaven.test.skip=true package); \
+	fi
 
 ###############################################################################
 

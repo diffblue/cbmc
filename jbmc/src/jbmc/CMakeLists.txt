@@ -31,3 +31,6 @@ target_link_libraries(jbmc-lib
 add_executable(jbmc jbmc_main.cpp)
 target_link_libraries(jbmc jbmc-lib)
 install(TARGETS jbmc DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# make sure java-models-library is built at least once
+add_dependencies(jbmc java-models-library)
