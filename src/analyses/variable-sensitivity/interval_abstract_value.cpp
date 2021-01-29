@@ -54,7 +54,7 @@ private:
   const namespacet &ns;
 };
 
-index_range_ptrt make_interval_index_range(
+static index_range_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
   const namespacet &n)
 {
@@ -315,63 +315,34 @@ abstract_object_pointert interval_abstract_valuet::expression_transform(
     interval_operands.push_back(iav);
   }
 
-  const typet &type = expr.type();
-
   if(num_operands == 0)
-    return environment.abstract_object_factory(type, ns, true);
+    return environment.abstract_object_factory(expr.type(), ns, true);
 
   if(expr.id() == ID_if)
-    return evaluate_conditional(type, interval_operands, environment, ns);
+    return evaluate_conditional(expr, interval_operands, environment, ns);
 
   if(num_operands == 1)
+    return evaluate_unary_expr(expr, interval_operands, environment, ns);
+
+  constant_interval_exprt result = interval_operands[0]->interval;
+
+  for (size_t opIndex = 1; opIndex != interval_operands.size(); ++opIndex)
   {
-    const constant_interval_exprt &interval = interval_operands[0]->interval;
-
-    if(expr.id() == ID_typecast)
-    {
-      const typecast_exprt &tce = to_typecast_expr(expr);
-
-      const constant_interval_exprt &new_interval = interval.typecast(tce.type());
-
-      INVARIANT(
-        new_interval.type() == type,
-        "Type of result interval should match expression type");
-
-      return environment.abstract_object_factory(tce.type(), new_interval, ns);
-    }
-    else
-    {
-      const constant_interval_exprt &interval_result = interval.eval(expr.id());
-      INVARIANT(
-        interval_result.type() == type,
-        "Type of result interval should match expression type");
-      return environment.abstract_object_factory(type, interval_result, ns);
-    }
-  }
-  else
-  {
-    constant_interval_exprt result = interval_operands[0]->interval;
-
-    for (size_t opIndex = 1; opIndex != interval_operands.size(); ++opIndex)
-    {
-      auto &interval_next = interval_operands[opIndex]->interval;
-      result = result.eval(expr.id(), interval_next);
-    }
-
-    INVARIANT(
-      result.type() == type,
-      "Type of result interval should match expression type");
-    return environment.abstract_object_factory(type, result, ns);
+    auto &interval_next = interval_operands[opIndex]->interval;
+    result = result.eval(expr.id(), interval_next);
   }
 
-  return environment.abstract_object_factory(type, ns, true);
+  INVARIANT(
+    result.type() == expr.type(),
+    "Type of result interval should match expression type");
+  return environment.abstract_object_factory(expr.type(), result, ns);
 }
 
 abstract_object_pointert interval_abstract_valuet::evaluate_conditional(
-  const typet &type,
-  std::vector<sharing_ptrt<interval_abstract_valuet>> interval_operands,
+  const exprt &expr,
+  const std::vector<interval_abstract_value_pointert>& interval_operands,
   const abstract_environmentt &env,
-  const namespacet &ns) const
+  const namespacet &ns)
 {
   auto const &condition_interval = interval_operands[0]->interval;
   auto const &true_interval = interval_operands[1]->interval;
@@ -384,7 +355,7 @@ abstract_object_pointert interval_abstract_valuet::evaluate_conditional(
     // Value of the condition is both true and false, so
     // combine the intervals of both the true and false expressions
     return env.abstract_object_factory(
-      type,
+      expr.type(),
       constant_interval_exprt(
         constant_interval_exprt::get_min(
           true_interval.get_lower(), false_interval.get_lower()),
@@ -397,6 +368,35 @@ abstract_object_pointert interval_abstract_valuet::evaluate_conditional(
     ? env.abstract_object_factory(true_interval.type(), true_interval, ns)
     : env.abstract_object_factory(false_interval.type(), false_interval, ns);
 }
+
+abstract_object_pointert interval_abstract_valuet::evaluate_unary_expr(
+  const exprt &expr,
+  const std::vector<interval_abstract_value_pointert>& interval_operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+{
+  const constant_interval_exprt &operand_expr = interval_operands[0]->interval;
+
+  if(expr.id() == ID_typecast)
+  {
+    const typecast_exprt &tce = to_typecast_expr(expr);
+
+    const constant_interval_exprt &new_interval = operand_expr.typecast(tce.type());
+
+    INVARIANT(
+      new_interval.type() == expr.type(),
+      "Type of result interval should match expression type");
+
+    return environment.abstract_object_factory(tce.type(), new_interval, ns);
+  }
+
+  const constant_interval_exprt &interval_result = operand_expr.eval(expr.id());
+  INVARIANT(
+    interval_result.type() == expr.type(),
+    "Type of result interval should match expression type");
+  return environment.abstract_object_factory(expr.type(), interval_result, ns);
+}
+
 
 void interval_abstract_valuet::output(
   std::ostream &out,
