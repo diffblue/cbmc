@@ -565,6 +565,11 @@ literalt boolbvt::convert_rest(const exprt &expr)
     else if(op.type().id() == ID_fixedbv)
       return const_literal(true);
   }
+  else if(expr.id() == ID_function_application)
+  {
+    functions.record(to_function_application_expr(expr));
+    return prop.new_variable();
+  }
 
   return SUB::convert_rest(expr);
 }
