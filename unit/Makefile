@@ -24,7 +24,6 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
        analyses/variable-sensitivity/value_set/abstract_value.cpp \
-       analyses/variable-sensitivity/value_set/pointer_abstract_object.cpp \
        ansi-c/max_malloc_size.cpp \
        ansi-c/type2name.cpp \
        big-int/big-int.cpp \

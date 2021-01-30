@@ -13,10 +13,10 @@
 
 #include <iosfwd>
 
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/abstract_pointer_object.h>
 #include <analyses/variable-sensitivity/write_stack.h>
 
-class constant_pointer_abstract_objectt : public pointer_abstract_objectt
+class constant_pointer_abstract_objectt : public abstract_pointer_objectt
 {
 private:
   typedef sharing_ptrt<constant_pointer_abstract_objectt>
@@ -134,8 +134,8 @@ private:
   /// \return Returns a new abstract object that is the result of the merge
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this.
-  abstract_object_pointert
-  merge_constant_pointers(const constant_pointer_abstract_pointert other) const;
+  abstract_object_pointert merge_constant_pointers(
+    const constant_pointer_abstract_pointert &other) const;
 
   write_stackt value_stack;
 };

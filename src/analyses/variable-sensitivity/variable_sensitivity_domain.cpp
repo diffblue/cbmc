@@ -10,7 +10,7 @@ Date: April 2016
 
 #include <ostream>
 
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_pointer_abstract_object.h>
 #include <util/message.h>
 #include <util/simplify_expr.h>
 

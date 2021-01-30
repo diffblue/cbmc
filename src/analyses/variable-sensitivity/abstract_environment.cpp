@@ -11,8 +11,8 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/abstract_object_statistics.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/pointer_expr.h>
