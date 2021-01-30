@@ -17,10 +17,10 @@ Date: March 2013
 
 void localst::build(const goto_functiont &goto_function)
 {
-  forall_goto_program_instructions(it, goto_function.body)
+  for(const auto &instruction : goto_function.body.instructions)
   {
-    if(it->is_decl())
-      locals.insert(it->get_decl().get_identifier());
+    if(instruction.is_decl())
+      locals.insert(instruction.get_decl().get_identifier());
   }
 
   locals.insert(

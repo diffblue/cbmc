@@ -240,17 +240,17 @@ void goto_unwindt::unwind(
     unwind_log.insert(t_skip, loop_head->location_number);
 
     // redirect gotos into loop body
-    Forall_goto_program_instructions(i_it, goto_program)
+    for(auto &instruction : goto_program.instructions)
     {
-      if(!i_it->is_goto())
+      if(!instruction.is_goto())
         continue;
 
-      goto_programt::const_targett t=i_it->get_target();
+      goto_programt::const_targett t = instruction.get_target();
 
       if(t->location_number>=loop_head->location_number &&
          t->location_number<loop_exit->location_number)
       {
-        i_it->set_target(t_skip);
+        instruction.set_target(t_skip);
       }
     }
 

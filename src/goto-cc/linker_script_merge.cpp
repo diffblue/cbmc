@@ -259,9 +259,10 @@ int linker_script_merget::pointerize_linker_defined_symbols(
   for(auto &gf : goto_model.goto_functions.function_map)
   {
     goto_programt &program=gf.second.body;
-    Forall_goto_program_instructions(iit, program)
+    for(auto &instruction : program.instructions)
     {
-      for(exprt *insts : std::list<exprt *>({&(iit->code), &(iit->guard)}))
+      for(exprt *insts :
+          std::list<exprt *>({&(instruction.code), &(instruction.guard)}))
       {
         std::list<symbol_exprt> to_pointerize;
         symbols_to_pointerize(linker_values, *insts, to_pointerize);
@@ -277,7 +278,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
           log.error() << " Could not pointerize '" << sym.get_identifier()
                       << "' in function " << gf.first << ". Pretty:\n"
                       << sym.pretty() << "\n";
-          log.error().source_location = iit->source_location;
+          log.error().source_location = instruction.source_location;
         }
         log.error() << messaget::eom;
       }

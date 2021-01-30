@@ -87,24 +87,20 @@ void nondet_static(
 
   goto_programt &init = fct_entry->second.body;
 
-  Forall_goto_program_instructions(i_it, init)
+  for(auto &instruction : init.instructions)
   {
-    const goto_programt::instructiont &instruction=*i_it;
-
     if(instruction.is_assign())
     {
-      const symbol_exprt &sym=to_symbol_expr(
-          to_code_assign(instruction.code).lhs());
+      const symbol_exprt sym =
+        to_symbol_expr(to_code_assign(as_const(instruction.code)).lhs());
 
       if(is_nondet_initializable_static(sym, ns))
       {
-        const goto_programt::instructiont original_instruction = instruction;
-        *i_it = goto_programt::make_assignment(
+        const auto source_location = instruction.source_location;
+        instruction = goto_programt::make_assignment(
           code_assignt(
-            sym,
-            side_effect_expr_nondett(
-              sym.type(), original_instruction.source_location)),
-          original_instruction.source_location);
+            sym, side_effect_expr_nondett(sym.type(), source_location)),
+          source_location);
       }
     }
     else if(instruction.is_function_call())

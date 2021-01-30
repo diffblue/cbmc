@@ -32,15 +32,15 @@ void show_loop_ids(
   {
     case ui_message_handlert::uit::PLAIN:
     {
-      forall_goto_program_instructions(it, goto_program)
+      for(const auto &instruction : goto_program.instructions)
       {
-        if(it->is_backwards_goto())
+        if(instruction.is_backwards_goto())
         {
-          std::cout << "Loop " << goto_programt::loop_id(function_id, *it)
-                    << ":"
+          std::cout << "Loop "
+                    << goto_programt::loop_id(function_id, instruction) << ":"
                     << "\n";
 
-          std::cout << "  " << it->source_location << "\n";
+          std::cout << "  " << instruction.source_location << "\n";
           std::cout << "\n";
         }
       }
@@ -48,15 +48,16 @@ void show_loop_ids(
     }
     case ui_message_handlert::uit::XML_UI:
     {
-      forall_goto_program_instructions(it, goto_program)
+      for(const auto &instruction : goto_program.instructions)
       {
-        if(it->is_backwards_goto())
+        if(instruction.is_backwards_goto())
         {
-          std::string id = id2string(goto_programt::loop_id(function_id, *it));
+          std::string id =
+            id2string(goto_programt::loop_id(function_id, instruction));
 
           xmlt xml_loop("loop", {{"name", id}}, {});
           xml_loop.new_element("loop-id").data=id;
-          xml_loop.new_element()=xml(it->source_location);
+          xml_loop.new_element() = xml(instruction.source_location);
           std::cout << xml_loop << "\n";
         }
       }
@@ -75,15 +76,16 @@ void show_loop_ids_json(
 {
   PRECONDITION(ui == ui_message_handlert::uit::JSON_UI); // use function above
 
-  forall_goto_program_instructions(it, goto_program)
+  for(const auto &instruction : goto_program.instructions)
   {
-    if(it->is_backwards_goto())
+    if(instruction.is_backwards_goto())
     {
-      std::string id = id2string(goto_programt::loop_id(function_id, *it));
+      std::string id =
+        id2string(goto_programt::loop_id(function_id, instruction));
 
       loops.push_back(
         json_objectt({{"name", json_stringt(id)},
-                      {"sourceLocation", json(it->source_location)}}));
+                      {"sourceLocation", json(instruction.source_location)}}));
     }
   }
 }

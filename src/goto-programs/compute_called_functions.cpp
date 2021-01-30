@@ -110,13 +110,12 @@ compute_called_functions(const goto_functionst &goto_functions)
 
     compute_address_taken_functions(program, working_queue);
 
-    forall_goto_program_instructions(i_it, program)
+    for(const auto &instruction : program.instructions)
     {
-      if(i_it->is_function_call())
+      if(instruction.is_function_call())
       {
         compute_functions(
-          to_code_function_call(i_it->code).function(),
-          working_queue);
+          to_code_function_call(instruction.code).function(), working_queue);
       }
     }
   }

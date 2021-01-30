@@ -36,14 +36,17 @@ static void collect_eloc(
 {
   forall_goto_functions(f_it, goto_model.goto_functions)
   {
-    forall_goto_program_instructions(it, f_it->second.body)
+    for(const auto &instruction : f_it->second.body.instructions)
     {
-      filest &files=dest[it->source_location.get_working_directory()];
-      const irep_idt &file=it->source_location.get_file();
+      const auto &source_location = instruction.source_location;
 
-      if(!file.empty() &&
-         !it->source_location.is_built_in())
-        files[file].insert(it->source_location.get_line());
+      filest &files = dest[source_location.get_working_directory()];
+      const irep_idt &file = source_location.get_file();
+
+      if(!file.empty() && !source_location.is_built_in())
+      {
+        files[file].insert(source_location.get_line());
+      }
     }
   }
 }

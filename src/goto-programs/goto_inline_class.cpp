@@ -296,16 +296,16 @@ void goto_inlinet::insert_function_body(
 
   if(adjust_function)
   {
-    Forall_goto_program_instructions(it, tmp)
+    for(auto &instruction : tmp.instructions)
     {
-      replace_location(it->source_location, target->source_location);
-      replace_location(it->code, target->source_location);
+      replace_location(instruction.source_location, target->source_location);
+      replace_location(instruction.code, target->source_location);
 
-      if(it->has_condition())
+      if(instruction.has_condition())
       {
-        exprt c = it->get_condition();
+        exprt c = instruction.get_condition();
         replace_location(c, target->source_location);
-        it->set_condition(c);
+        instruction.set_condition(c);
       }
     }
   }

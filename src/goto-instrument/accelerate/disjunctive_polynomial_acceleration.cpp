@@ -858,11 +858,11 @@ void disjunctive_polynomial_accelerationt::build_fixed()
 
   fixed.copy_from(goto_program);
 
-  Forall_goto_program_instructions(it, fixed)
+  for(auto &instruction : fixed.instructions)
   {
-    if(it->is_assert())
+    if(instruction.is_assert())
     {
-      it->type=ASSUME;
+      instruction.type = ASSUME;
     }
   }
 

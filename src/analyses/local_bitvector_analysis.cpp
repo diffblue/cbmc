@@ -363,9 +363,9 @@ void local_bitvector_analysist::output(
 {
   unsigned l=0;
 
-  forall_goto_program_instructions(i_it, goto_function.body)
+  for(const auto &instruction : goto_function.body.instructions)
   {
-    out << "**** " << i_it->source_location << "\n";
+    out << "**** " << instruction.source_location << "\n";
 
     const auto &loc_info=loc_infos[l];
 
@@ -381,7 +381,7 @@ void local_bitvector_analysist::output(
     }
 
     out << "\n";
-    goto_function.body.output_instruction(ns, irep_idt(), out, *i_it);
+    goto_function.body.output_instruction(ns, irep_idt(), out, instruction);
     out << "\n";
 
     l++;

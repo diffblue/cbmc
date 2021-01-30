@@ -272,12 +272,12 @@ static void list_calls_and_arguments(
   const namespacet &ns,
   const goto_programt &goto_program)
 {
-  forall_goto_program_instructions(i_it, goto_program)
+  for(const auto &instruction : goto_program.instructions)
   {
-    if(!i_it->is_function_call())
+    if(!instruction.is_function_call())
       continue;
 
-    const code_function_callt &call = to_code_function_call(i_it->code);
+    const code_function_callt &call = to_code_function_call(instruction.code);
 
     const exprt &f=call.function();
 

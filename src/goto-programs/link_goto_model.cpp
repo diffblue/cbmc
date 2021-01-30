@@ -34,17 +34,15 @@ static void rename_symbols_in_function(
       identifier = entry->second;
   }
 
-  goto_programt &program=function.body;
-
-  Forall_goto_program_instructions(iit, program)
+  for(auto &instruction : function.body.instructions)
   {
-    rename_symbol(iit->code);
+    rename_symbol(instruction.code);
 
-    if(iit->has_condition())
+    if(instruction.has_condition())
     {
-      exprt c = iit->get_condition();
+      exprt c = instruction.get_condition();
       rename_symbol(c);
-      iit->set_condition(c);
+      instruction.set_condition(c);
     }
   }
 }
@@ -147,13 +145,15 @@ static bool link_functions(
   if(!object_type_updates.empty())
   {
     Forall_goto_functions(dest_it, dest_functions)
-      Forall_goto_program_instructions(iit, dest_it->second.body)
+    {
+      for(auto &instruction : dest_it->second.body.instructions)
       {
-        iit->transform([&object_type_updates](exprt expr) {
+        instruction.transform([&object_type_updates](exprt expr) {
           object_type_updates(expr);
           return expr;
         });
       }
+    }
   }
 
   return false;

@@ -290,9 +290,9 @@ void goto_checkt::collect_allocations(
     return;
 
   forall_goto_functions(itf, goto_functions)
-    forall_goto_program_instructions(it, itf->second.body)
+  {
+    for(const auto &instruction : itf->second.body.instructions)
     {
-      const goto_programt::instructiont &instruction=*it;
       if(!instruction.is_function_call())
         continue;
 
@@ -313,6 +313,7 @@ void goto_checkt::collect_allocations(
       assert(args[0].type()==args[1].type());
       allocations.push_back({args[0], args[1]});
     }
+  }
 }
 
 void goto_checkt::invalidate(const exprt &lhs)
@@ -2092,28 +2093,33 @@ void goto_checkt::goto_check(
       }
     }
 
-    Forall_goto_program_instructions(i_it, new_code)
+    for(auto &instruction : new_code.instructions)
     {
-      if(i_it->source_location.is_nil())
+      if(instruction.source_location.is_nil())
       {
-        i_it->source_location.id(irep_idt());
+        instruction.source_location.id(irep_idt());
 
         if(!it->source_location.get_file().empty())
-          i_it->source_location.set_file(it->source_location.get_file());
+          instruction.source_location.set_file(it->source_location.get_file());
 
         if(!it->source_location.get_line().empty())
-          i_it->source_location.set_line(it->source_location.get_line());
+          instruction.source_location.set_line(it->source_location.get_line());
 
         if(!it->source_location.get_function().empty())
-          i_it->source_location.set_function(
+          instruction.source_location.set_function(
             it->source_location.get_function());
 
         if(!it->source_location.get_column().empty())
-          i_it->source_location.set_column(it->source_location.get_column());
+        {
+          instruction.source_location.set_column(
+            it->source_location.get_column());
+        }
 
         if(!it->source_location.get_java_bytecode_index().empty())
-          i_it->source_location.set_java_bytecode_index(
+        {
+          instruction.source_location.set_java_bytecode_index(
             it->source_location.get_java_bytecode_index());
+        }
       }
     }
 

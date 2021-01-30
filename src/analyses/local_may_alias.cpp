@@ -474,9 +474,9 @@ void local_may_aliast::output(
 {
   unsigned l=0;
 
-  forall_goto_program_instructions(i_it, goto_function.body)
+  for(const auto &instruction : goto_function.body.instructions)
   {
-    out << "**** " << i_it->source_location << "\n";
+    out << "**** " << instruction.source_location << "\n";
 
     const loc_infot &loc_info=loc_infos[l];
 
@@ -502,7 +502,7 @@ void local_may_aliast::output(
     }
 
     out << "\n";
-    goto_function.body.output_instruction(ns, irep_idt(), out, *i_it);
+    goto_function.body.output_instruction(ns, irep_idt(), out, instruction);
     out << "\n";
 
     l++;
