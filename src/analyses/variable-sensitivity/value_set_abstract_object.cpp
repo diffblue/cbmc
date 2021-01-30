@@ -15,6 +15,7 @@
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <util/string_utils.h>
 
 using abstract_object_sett = value_set_abstract_objectt::abstract_object_sett;
 
@@ -376,6 +377,15 @@ void value_set_abstract_objectt::set_values(const abstract_object_sett &other_va
   verify();
 }
 
+bool by_length(const std::string &lhs, const std::string &rhs)
+{
+  if (lhs.size() < rhs.size())
+    return true;
+  if (lhs.size() > rhs.size())
+    return false;
+  return lhs < rhs;
+}
+
 void value_set_abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -392,12 +402,19 @@ void value_set_abstract_objectt::output(
   else
   {
     out << "value-set-begin: ";
-    for(auto const &value : values)
+
+    std::vector<std::string> output_values;
+    for(const auto &value : values)
     {
-      value->output(out, ai, ns);
-      out << ", ";
+      std::ostringstream ss;
+      value->output(ss, ai, ns);
+      output_values.emplace_back(ss.str());
     }
-    out << ":value-set-end";
+    std::sort(output_values.begin(), output_values.end(), by_length);
+
+    join_strings(out, output_values.begin(), output_values.end(), ", ");
+
+    out << " :value-set-end";
   }
 }
 

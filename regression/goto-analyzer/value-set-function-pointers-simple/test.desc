@@ -7,10 +7,10 @@ main.c
 ^file main.c line 41 function main: replacing function pointer by 2 possible targets$
 ^file main.c line 49 function main: replacing function pointer by 2 possible targets$
 ^main::1::fun0 \(\) -> TOP
-^main::1::fun1 \(\) -> value-set-begin: ptr ->\(f\), :value-set-end
-^main::1::fun2_show \(\) -> value-set-begin: (TOP, )?ptr ->\([fg]\), (TOP, )?ptr ->\([fg]\), (TOP, )?:value-set-end
-^main::1::fun3_show \(\) -> value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end
-^fun_global_show \(\) -> value-set-begin: (TOP, )?ptr ->\([fg]\), (TOP, )?ptr ->\([fg]\), (TOP, )?:value-set-end
+^main::1::fun1 \(\) -> value-set-begin: ptr ->\(f\) :value-set-end
+^main::1::fun2_show \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
+^main::1::fun3_show \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
+^fun_global_show \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
 ^EXIT=0$
 ^SIGNAL=0$
 --

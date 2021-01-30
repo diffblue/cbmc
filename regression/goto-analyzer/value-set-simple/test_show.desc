@@ -1,9 +1,9 @@
 CORE
 main.c
 --variable-sensitivity --vsd-values set-of-constants --vsd-structs every-field --vsd-arrays every-element --vsd-pointers value-set --show --pointer-check
-^global_int_show \(\) -> value-set-begin: [12], [12], :value-set-end
-^main::1::local_double_show \(\) -> value-set-begin: [12]\.0, [12]\.0, :value-set-end
-^main::1::local_double_ptr_show \(\) -> value-set-begin: ptr ->\(main::1::d[12]\), ptr ->\(main::1::d[12]\), :value-set-end
+^global_int_show \(\) -> value-set-begin: 1, 2 :value-set-end
+^main::1::local_double_show \(\) -> value-set-begin: 1\.0, 2\.0 :value-set-end
+^main::1::local_double_ptr_show \(\) -> value-set-begin: ptr ->\(main::1::d1\), ptr ->\(main::1::d2\) :value-set-end
 ^EXIT=0$
 ^SIGNAL=0$
 --

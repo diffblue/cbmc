@@ -1,6 +1,7 @@
 int unknown();
 
-int main(int argc, char argv[]) {
+int main(int argc, char argv[]) 
+{
   int p;
   int q;
   int r = 20;;

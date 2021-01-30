@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::p .* value-set-begin: 0, 1, -1 :value-set-end
+main::1::q .* value-set-begin: 0, 1 :value-set-end
+--
