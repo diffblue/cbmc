@@ -86,12 +86,12 @@ protected:
 private:
   static abstract_object_pointert evaluate_conditional(
     const exprt &expr,
-    const std::vector<interval_abstract_value_pointert>& interval_operands,
+    const std::vector<interval_abstract_value_pointert> &interval_operands,
     const abstract_environmentt &environment,
     const namespacet &ns);
   static abstract_object_pointert evaluate_unary_expr(
     const exprt &expr,
-    const std::vector<interval_abstract_value_pointert>& interval_operands,
+    const std::vector<interval_abstract_value_pointert> &interval_operands,
     const abstract_environmentt &environment,
     const namespacet &ns);
 

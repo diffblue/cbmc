@@ -1,13 +1,17 @@
 int unknown();
 
-int main(int argc, char argv[]) {
+int main(int argc, char argv[])
+{
   int p;
   int q;
 
-  if (unknown()) {
+  if(unknown())
+  {
     p = 2;
     q = 5;
-  } else {
+  }
+  else
+  {
     p = 3;
     q = 10;
   }

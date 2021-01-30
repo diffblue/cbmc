@@ -48,8 +48,7 @@ private:
   abstract_object_sett::const_iterator next;
 };
 
-index_range_ptrt make_value_set_index_range(
-  const abstract_object_sett &vals)
+index_range_ptrt make_value_set_index_range(const abstract_object_sett &vals)
 {
   return std::make_shared<value_set_index_ranget>(vals);
 }
@@ -74,7 +73,7 @@ std::vector<abstract_object_sett>
 unwrap_operands(const std::vector<abstract_object_pointert> &operands);
 
 abstract_object_sett
-unwrap_and_extract_values(const abstract_object_sett & values);
+unwrap_and_extract_values(const abstract_object_sett &values);
 
 /// Helper for converting singleton value sets into its only value.
 /// \p maybe_singleton: either a set of abstract values or a single value
@@ -209,7 +208,8 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
   auto collective_operands = unwrap_operands(operands);
 
   if(expr.id() == ID_if)
-    return evaluate_conditional(expr.type(), collective_operands, environment, ns);
+    return evaluate_conditional(
+      expr.type(), collective_operands, environment, ns);
 
   abstract_object_sett resulting_objects;
 
@@ -218,7 +218,6 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
     collective_operands,
     [&resulting_objects, &dispatcher, &expr, &environment, &ns](
       const std::vector<abstract_object_pointert> &ops) {
-
       auto rewritten_expr = rewrite_expression(expr, ops);
       resulting_objects.insert(
         dispatcher->expression_transform(rewritten_expr, ops, environment, ns));
@@ -240,7 +239,8 @@ abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
 
   auto all_true = true;
   auto all_false = true;
-  for (auto v : condition) {
+  for(auto v : condition)
+  {
     auto expr = v->to_constant();
     all_true = all_true && expr.is_true();
     all_false = all_false && expr.is_false();
@@ -248,9 +248,9 @@ abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
   auto indeterminate = !all_true && !all_false;
 
   abstract_object_sett resulting_objects;
-  if (all_true || indeterminate)
+  if(all_true || indeterminate)
     resulting_objects.insert(true_result.begin(), true_result.end());
-  if (all_false || indeterminate)
+  if(all_false || indeterminate)
     resulting_objects.insert(false_result.begin(), false_result.end());
   return resolve_new_values(resulting_objects, env);
 }
@@ -280,8 +280,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
   return environment.add_object_context(result);
 }
 
-abstract_object_pointert
-value_set_abstract_objectt::resolve_values(
+abstract_object_pointert value_set_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
 {
   PRECONDITION(!new_values.empty());
@@ -368,7 +367,8 @@ bool value_set_abstract_objectt::verify() const
   return true;
 }
 
-void value_set_abstract_objectt::set_values(const abstract_object_sett &other_values)
+void value_set_abstract_objectt::set_values(
+  const abstract_object_sett &other_values)
 {
   PRECONDITION(!other_values.empty());
   set_not_top();
@@ -379,9 +379,9 @@ void value_set_abstract_objectt::set_values(const abstract_object_sett &other_va
 
 bool by_length(const std::string &lhs, const std::string &rhs)
 {
-  if (lhs.size() < rhs.size())
+  if(lhs.size() < rhs.size())
     return true;
-  if (lhs.size() > rhs.size())
+  if(lhs.size() > rhs.size())
     return false;
   return lhs < rhs;
 }
@@ -445,11 +445,11 @@ type_to_abstract_type(const typet &type)
   if(type.id() == ID_pointer)
     return abstract_typet::POINTER;
 
-   if(
+  if(
     type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
-    type.id() == ID_fixedbv || type.id() == ID_c_bool ||
-    type.id() == ID_bool || type.id() == ID_integer ||
-    type.id() == ID_c_bit_field || type.id() == ID_floatbv)
+    type.id() == ID_fixedbv || type.id() == ID_c_bool || type.id() == ID_bool ||
+    type.id() == ID_integer || type.id() == ID_c_bit_field ||
+    type.id() == ID_floatbv)
     return abstract_typet::CONSTANT;
 
   return abstract_typet::UNSUPPORTED;
@@ -459,18 +459,17 @@ exprt rewrite_expression(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &ops)
 {
-  auto operands_expr = exprt::operandst { };
-  for (auto v : ops)
+  auto operands_expr = exprt::operandst{};
+  for(auto v : ops)
     operands_expr.push_back(v->to_constant());
   auto rewritten_expr = exprt(expr.id(), expr.type(), std::move(operands_expr));
   return rewritten_expr;
 }
 
 std::vector<abstract_object_sett>
-  unwrap_operands(const std::vector<abstract_object_pointert> &operands)
+unwrap_operands(const std::vector<abstract_object_pointert> &operands)
 {
-  auto unwrapped =
-    std::vector<abstract_object_sett>{};
+  auto unwrapped = std::vector<abstract_object_sett>{};
 
   for(const auto &op : operands)
   {

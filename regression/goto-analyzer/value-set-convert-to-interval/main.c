@@ -6,7 +6,7 @@ int main(void)
 {
   int a = 0;
   int b = 20;
-  switch (x) 
+  switch(x)
   {
   case 1:
     a = 1;

@@ -38,7 +38,10 @@ constant_abstract_valuet::constant_abstract_valuet(const typet &t)
 {
 }
 
-constant_abstract_valuet::constant_abstract_valuet(const typet &t, bool tp, bool bttm)
+constant_abstract_valuet::constant_abstract_valuet(
+  const typet &t,
+  bool tp,
+  bool bttm)
   : abstract_value_objectt(t, tp, bttm), value()
 {
 }

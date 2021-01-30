@@ -10,13 +10,11 @@
 #include "value_set_abstract_value.h"
 
 template <class context_classt>
-abstract_object_pointert create_context_abstract_object(
-  const abstract_object_pointert &abstract_object)
+abstract_object_pointert
+create_context_abstract_object(const abstract_object_pointert &abstract_object)
 {
-  return abstract_object_pointert(new context_classt {
-    abstract_object,
-    abstract_object->type()
-  });
+  return abstract_object_pointert(
+    new context_classt{abstract_object, abstract_object->type()});
 }
 
 template <class abstract_object_classt>
@@ -40,12 +38,12 @@ abstract_object_pointert wrap_with_context_object(
   const vsd_configt &configuration)
 {
   if(configuration.context_tracking.data_dependency_context)
-    return create_context_abstract_object<
-      data_dependency_contextt>(abstract_object);
+    return create_context_abstract_object<data_dependency_contextt>(
+      abstract_object);
 
   if(configuration.context_tracking.last_write_context)
-    return create_context_abstract_object<
-      write_location_contextt>(abstract_object);
+    return create_context_abstract_object<write_location_contextt>(
+      abstract_object);
 
   return abstract_object;
 }

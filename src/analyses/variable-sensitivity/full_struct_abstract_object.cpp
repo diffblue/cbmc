@@ -100,7 +100,8 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
     }
     else
     {
-      return environment.abstract_object_factory(member_expr.type(), ns, true, false);
+      return environment.abstract_object_factory(
+        member_expr.type(), ns, true, false);
     }
   }
 }

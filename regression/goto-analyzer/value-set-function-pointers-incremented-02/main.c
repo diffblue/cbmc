@@ -25,9 +25,9 @@ int main(void)
 
   // function pointer incremented should be top
   fptr_t fun_incremented = f;
-  if (i)
+  if(i)
     ++fun_incremented;
-  else 
+  else
     fun_incremented = h;
   fun_incremented(5);
   fptr_t fun_incremented_show = fun_incremented;

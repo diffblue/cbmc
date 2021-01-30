@@ -1,8 +1,9 @@
-int main(int argc, char argv[]) {
+int main(int argc, char argv[])
+{
   int unknown;
   int p;
 
-  switch (unknown)
+  switch(unknown)
   {
   case 0:
     p = 0;

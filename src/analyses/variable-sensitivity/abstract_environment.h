@@ -180,8 +180,8 @@ public:
   /// the appropriate wrapper object around the supplied object
   /// If no such configuration is enabled, the supplied object will be
   /// returned unchanged
-  virtual abstract_object_pointert add_object_context(
-    const abstract_object_pointert &abstract_object) const;
+  virtual abstract_object_pointert
+  add_object_context(const abstract_object_pointert &abstract_object) const;
 
   /// Computes the join between "this" and "b"
   ///
