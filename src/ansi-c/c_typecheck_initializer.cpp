@@ -72,10 +72,7 @@ exprt c_typecheck_baset::do_initializer_rec(
   }
 
   if(value.id()==ID_initializer_list)
-  {
-    return simplify_expr(
-      do_initializer_list(value, type, force_constant), *this);
-  }
+    return do_initializer_list(value, type, force_constant);
 
   if(
     value.id() == ID_array && value.get_bool(ID_C_string_constant) &&

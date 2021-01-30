@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/byte_operators.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
@@ -1465,6 +1466,24 @@ void dump_ct::cleanup_expr(exprt &expr)
         if(bu.value().type() == comp.type())
         {
           union_exprt union_expr{comp.get_name(), bu.value(), bu.op().type()};
+          expr.swap(union_expr);
+          break;
+        }
+      }
+    }
+    else if(
+      ns.follow(bu.type()).id() == ID_union &&
+      bu.source_location().get_function().empty() &&
+      bu.op() == zero_initializer(bu.op().type(), source_locationt{}, ns)
+                   .value_or(nil_exprt{}))
+    {
+      const union_typet &union_type = to_union_type(ns.follow(bu.type()));
+
+      for(const auto &comp : union_type.components())
+      {
+        if(bu.value().type() == comp.type())
+        {
+          union_exprt union_expr{comp.get_name(), bu.value(), bu.type()};
           expr.swap(union_expr);
           break;
         }
