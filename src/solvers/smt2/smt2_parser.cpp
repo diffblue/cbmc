@@ -1034,6 +1034,14 @@ void smt2_parsert::setup_expressions()
   expressions["bvadd"] = [this] { return multi_ary(ID_plus, operands()); };
   expressions["+"] = [this] { return multi_ary(ID_plus, operands()); };
   expressions["bvsub"] = [this] { return binary(ID_minus, operands()); };
+
+  expressions["-"] = [this] {
+    auto ops=operands();
+    if(ops.size()==1)
+      return unary(ID_minus, ops);
+    else
+      return binary(ID_minus, ops); };
+
   expressions["bvmul"] = [this] { return binary(ID_mult, operands()); };
   expressions["*"] = [this] { return binary(ID_mult, operands()); };
 
