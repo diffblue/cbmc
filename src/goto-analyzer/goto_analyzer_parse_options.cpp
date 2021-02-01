@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -867,6 +868,9 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options)
 {
+  // Common removal of types and complex constructs
+  ::process_goto_program(goto_model, options, log);
+
   {
     #if 0
     // Remove inline assembler; this needs to happen before
