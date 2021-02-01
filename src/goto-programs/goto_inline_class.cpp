@@ -469,11 +469,11 @@ void goto_inlinet::goto_inline(
 {
   PRECONDITION(check_inline_map(inline_map));
 
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    const irep_idt identifier=f_it->first;
+    const irep_idt identifier = gf_entry.first;
     DATA_INVARIANT(!identifier.empty(), "function name must not be empty");
-    goto_functiont &goto_function=f_it->second;
+    goto_functiont &goto_function = gf_entry.second;
 
     if(!goto_function.body_available())
       continue;
@@ -668,9 +668,9 @@ bool goto_inlinet::check_inline_map(
 
 bool goto_inlinet::check_inline_map(const inline_mapt &inline_map) const
 {
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    if(!check_inline_map(f_it->first, inline_map))
+    if(!check_inline_map(gf_entry.first, inline_map))
       return false;
   }
 

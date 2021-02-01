@@ -71,16 +71,16 @@ void static_analysis_baset::output(
   const goto_functionst &goto_functions,
   std::ostream &out) const
 {
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    if(f_it->second.body_available())
+    if(gf_entry.second.body_available())
     {
       out << "////\n";
-      out << "//// Function: " << f_it->first << "\n";
+      out << "//// Function: " << gf_entry.first << "\n";
       out << "////\n";
       out << "\n";
 
-      output(f_it->second.body, f_it->first, out);
+      output(gf_entry.second.body, gf_entry.first, out);
     }
   }
 }
@@ -107,8 +107,8 @@ void static_analysis_baset::output(
 void static_analysis_baset::generate_states(
   const goto_functionst &goto_functions)
 {
-  forall_goto_functions(f_it, goto_functions)
-    generate_states(f_it->second.body);
+  for(const auto &gf_entry : goto_functions.function_map)
+    generate_states(gf_entry.second.body);
 }
 
 void static_analysis_baset::generate_states(
@@ -121,8 +121,8 @@ void static_analysis_baset::generate_states(
 void static_analysis_baset::update(
   const goto_functionst &goto_functions)
 {
-  forall_goto_functions(f_it, goto_functions)
-    update(f_it->second.body);
+  for(const auto &gf_entry : goto_functions.function_map)
+    update(gf_entry.second.body);
 }
 
 void static_analysis_baset::update(
@@ -438,9 +438,11 @@ void static_analysis_baset::sequential_fixedpoint(
 {
   // do each function at least once
 
-  forall_goto_functions(it, goto_functions)
-    if(functions_done.insert(it->first).second)
-      fixedpoint(it->first, it->second.body, goto_functions);
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    if(functions_done.insert(gf_entry.first).second)
+      fixedpoint(gf_entry.first, gf_entry.second.body, goto_functions);
+  }
 }
 
 void static_analysis_baset::concurrent_fixedpoint(
@@ -478,21 +480,24 @@ void static_analysis_baset::concurrent_fixedpoint(
   typedef std::list<wl_entryt> thread_wlt;
   thread_wlt thread_wl;
 
-  forall_goto_functions(it, goto_functions)
-    forall_goto_program_instructions(t_it, it->second.body)
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    forall_goto_program_instructions(t_it, gf_entry.second.body)
     {
       if(is_threaded(t_it))
       {
-        thread_wl.push_back(wl_entryt(it->first, it->second.body, t_it));
+        thread_wl.push_back(
+          wl_entryt(gf_entry.first, gf_entry.second.body, t_it));
 
-        goto_programt::const_targett l_end=
-          it->second.body.instructions.end();
+        goto_programt::const_targett l_end =
+          gf_entry.second.body.instructions.end();
         --l_end;
 
         const statet &end_state=get_state(l_end);
         merge_shared(shared_state, end_state, sh_target);
       }
     }
+  }
 
   // new feed in the shared state into all concurrently executing
   // functions, and iterate until the shared state stabilizes

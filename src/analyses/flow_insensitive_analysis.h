@@ -172,10 +172,6 @@ protected:
     const goto_programt &goto_program,
     const goto_functionst &goto_functions);
 
-  bool fixedpoint(
-    goto_functionst::function_mapt::const_iterator it,
-    const goto_functionst &goto_functions);
-
   void fixedpoint(
     const goto_functionst &goto_functions);
 

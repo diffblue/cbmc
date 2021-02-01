@@ -63,6 +63,6 @@ void remove_unreachable(goto_programt &goto_program)
 /// \return None.
 void remove_unreachable(goto_functionst &goto_functions)
 {
-  Forall_goto_functions(f_it, goto_functions)
-    remove_unreachable(f_it->second.body);
+  for(auto &gf_entry : goto_functions.function_map)
+    remove_unreachable(gf_entry.second.body);
 }

@@ -181,10 +181,10 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
   {
     change=false;
     // add all the functions to the worklist
-    forall_goto_functions(current_function, goto_functions)
+    for(const auto &gf_entry : goto_functions.function_map)
     {
       domain.make_top();
-      const goto_programt &goto_program=current_function->second.body;
+      const goto_programt &goto_program = gf_entry.second.body;
 
       if(goto_program.empty())
         continue;
@@ -195,10 +195,10 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
       }
       // did our estimation for the current function improve?
       const std::set<irep_idt> &elements=domain.get_elements();
-      if(exceptions_map[current_function->first].size()<elements.size())
+      if(exceptions_map[gf_entry.first].size() < elements.size())
       {
         change=true;
-        exceptions_map[current_function->first]=elements;
+        exceptions_map[gf_entry.first] = elements;
       }
     }
   }
@@ -211,9 +211,9 @@ void uncaught_exceptions_analysist::output(
 {
   (void)goto_functions; // unused parameter
 #ifdef DEBUG
-  forall_goto_functions(it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    const auto fn=it->first;
+    const auto fn = gf_entry.first;
     const exceptions_mapt::const_iterator found=exceptions_map.find(fn);
     // Functions like __CPROVER_assert and __CPROVER_assume are replaced by
     // explicit GOTO instructions and will not show up in exceptions_map.

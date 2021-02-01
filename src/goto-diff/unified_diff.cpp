@@ -332,10 +332,18 @@ bool unified_difft::operator()()
 
   function_mapt old_funcs, new_funcs;
 
-  forall_goto_functions(it, old_goto_functions)
+  for(auto it = old_goto_functions.function_map.begin();
+      it != old_goto_functions.function_map.end();
+      ++it)
+  {
     old_funcs.insert(std::make_pair(it->first, it));
-  forall_goto_functions(it, new_goto_functions)
+  }
+  for(auto it = new_goto_functions.function_map.begin();
+      it != new_goto_functions.function_map.end();
+      ++it)
+  {
     new_funcs.insert(std::make_pair(it->first, it));
+  }
 
   goto_programt empty;
 

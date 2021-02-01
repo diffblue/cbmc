@@ -741,8 +741,8 @@ void constant_propagator_ait::replace(
   goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  Forall_goto_functions(f_it, goto_functions)
-    replace(f_it->second, ns);
+  for(auto &gf_entry : goto_functions.function_map)
+    replace(gf_entry.second, ns);
 }
 
 

@@ -108,8 +108,8 @@ void set_properties(
 
   property_set.insert(properties.begin(), properties.end());
 
-  Forall_goto_functions(it, goto_functions)
-    set_properties(it->second.body, property_set);
+  for(auto &gf_entry : goto_functions.function_map)
+    set_properties(gf_entry.second.body, property_set);
 
   if(!property_set.empty())
     throw invalid_command_line_argument_exceptiont(

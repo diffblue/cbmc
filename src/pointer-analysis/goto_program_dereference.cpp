@@ -284,8 +284,8 @@ void remove_pointers(
     goto_program_dereference(
       ns, goto_model.symbol_table, options, value_sets);
 
-  Forall_goto_functions(it, goto_model.goto_functions)
-    goto_program_dereference.dereference_program(it->second.body);
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+    goto_program_dereference.dereference_program(gf_entry.second.body);
 }
 
 /// Remove dereferences in `expr` using `value_sets` to determine to what

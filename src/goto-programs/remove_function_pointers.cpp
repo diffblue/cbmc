@@ -123,8 +123,11 @@ remove_function_pointerst::remove_function_pointerst(
   compute_address_taken_functions(goto_functions, address_taken);
 
   // build type map
-  forall_goto_functions(f_it, goto_functions)
-    type_map.emplace(f_it->first, to_code_type(ns.lookup(f_it->first).type));
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    type_map.emplace(
+      gf_entry.first, to_code_type(ns.lookup(gf_entry.first).type));
+  }
 }
 
 bool remove_function_pointerst::arg_is_type_compatible(

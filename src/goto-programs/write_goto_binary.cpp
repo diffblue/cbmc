@@ -76,9 +76,11 @@ bool write_goto_binary(
   // now write functions, but only those with body
 
   unsigned cnt=0;
-  forall_goto_functions(it, goto_functions)
-    if(it->second.body_available())
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
       cnt++;
+  }
 
   write_gb_word(out, cnt);
 

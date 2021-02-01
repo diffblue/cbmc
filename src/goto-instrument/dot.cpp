@@ -267,9 +267,11 @@ void dott::output(std::ostream &out)
   out << "digraph G {\n";
   out << DOTGRAPHSETTINGS << '\n';
 
-  forall_goto_functions(it, goto_model.goto_functions)
-    if(it->second.body_available())
-      write_dot_subgraph(out, it->first, it->second.body);
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
+      write_dot_subgraph(out, gf_entry.first, gf_entry.second.body);
+  }
 
   do_dot_function_calls(out);
 

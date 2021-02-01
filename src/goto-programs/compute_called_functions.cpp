@@ -68,8 +68,8 @@ void compute_address_taken_functions(
   const goto_functionst &goto_functions,
   std::unordered_set<irep_idt> &address_taken)
 {
-  forall_goto_functions(it, goto_functions)
-    compute_address_taken_functions(it->second.body, address_taken);
+  for(const auto &gf_entry : goto_functions.function_map)
+    compute_address_taken_functions(gf_entry.second.body, address_taken);
 }
 
 /// get all functions whose address is taken

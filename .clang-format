@@ -30,8 +30,6 @@ DerivePointerAlignment: 'false'
 DisableFormat: 'false'
 ExperimentalAutoDetectBinPacking: 'false'
 ForEachMacros: [
-  'forall_goto_functions',
-  'Forall_goto_functions',
   'forall_goto_program_instructions',
   'Forall_goto_program_instructions',
   'forall_operands',

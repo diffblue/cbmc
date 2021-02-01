@@ -28,10 +28,10 @@ public:
     bool include_forward_reachability)
   {
     cfg(goto_functions);
-    forall_goto_functions(f_it, goto_functions)
+    for(const auto &gf_entry : goto_functions.function_map)
     {
-      forall_goto_program_instructions(i_it, f_it->second.body)
-        cfg[cfg.entry_map[i_it]].function_id = f_it->first;
+      forall_goto_program_instructions(i_it, gf_entry.second.body)
+        cfg[cfg.entry_map[i_it]].function_id = gf_entry.first;
     }
 
     is_threadedt is_threaded(goto_functions);

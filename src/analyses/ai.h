@@ -706,20 +706,23 @@ protected:
     typedef std::list<wl_entryt> thread_wlt;
     thread_wlt thread_wl;
 
-    forall_goto_functions(it, goto_functions)
-      forall_goto_program_instructions(t_it, it->second.body)
+    for(const auto &gf_entry : goto_functions.function_map)
+    {
+      forall_goto_program_instructions(t_it, gf_entry.second.body)
       {
         if(is_threaded(t_it))
         {
-          thread_wl.push_back(wl_entryt(it->first, it->second.body, t_it));
+          thread_wl.push_back(
+            wl_entryt(gf_entry.first, gf_entry.second.body, t_it));
 
           goto_programt::const_targett l_end =
-            it->second.body.instructions.end();
+            gf_entry.second.body.instructions.end();
           --l_end;
 
           merge_shared(shared_state, l_end, sh_target, ns);
         }
       }
+    }
 
     // now feed in the shared state into all concurrently executing
     // functions, and iterate until the shared state stabilizes

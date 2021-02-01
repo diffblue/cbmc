@@ -62,14 +62,14 @@ void goto_inline(
   // copying that goto_inlinet would do otherwise
   goto_inlinet::inline_mapt inline_map;
 
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    goto_functiont &goto_function=f_it->second;
+    goto_functiont &goto_function = gf_entry.second;
 
     if(!goto_function.body_available())
       continue;
 
-    goto_inlinet::call_listt &call_list=inline_map[f_it->first];
+    goto_inlinet::call_listt &call_list = inline_map[gf_entry.first];
 
     goto_programt &goto_program=goto_function.body;
 
@@ -86,11 +86,11 @@ void goto_inline(
     goto_functionst::entry_point(), entry_function, inline_map, true);
 
   // clean up
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    if(f_it->first!=goto_functionst::entry_point())
+    if(gf_entry.first != goto_functionst::entry_point())
     {
-      goto_functiont &goto_function=f_it->second;
+      goto_functiont &goto_function = gf_entry.second;
       goto_function.body.clear();
     }
   }
@@ -145,20 +145,22 @@ void goto_partial_inline(
   // gather all calls
   goto_inlinet::inline_mapt inline_map;
 
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
-    goto_functiont &goto_function=f_it->second;
+    goto_functiont &goto_function = gf_entry.second;
 
     if(!goto_function.body_available())
       continue;
 
-    if(f_it->first==goto_functions.entry_point())
+    if(gf_entry.first == goto_functions.entry_point())
+    {
       // Don't inline any function calls made from the _start function.
       continue;
+    }
 
     goto_programt &goto_program=goto_function.body;
 
-    goto_inlinet::call_listt &call_list=inline_map[f_it->first];
+    goto_inlinet::call_listt &call_list = inline_map[gf_entry.first];
 
     Forall_goto_program_instructions(i_it, goto_program)
     {

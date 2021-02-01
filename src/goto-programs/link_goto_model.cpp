@@ -62,13 +62,13 @@ static bool link_functions(
   namespacet src_ns(src_symbol_table);
 
   // merge functions
-  Forall_goto_functions(src_it, src_functions)
+  for(auto &gf_entry : src_functions.function_map)
   {
     // the function might have been renamed
-    rename_symbolt::expr_mapt::const_iterator e_it=
-      rename_symbol.expr_map.find(src_it->first);
+    rename_symbolt::expr_mapt::const_iterator e_it =
+      rename_symbol.expr_map.find(gf_entry.first);
 
-    irep_idt final_id=src_it->first;
+    irep_idt final_id = gf_entry.first;
 
     if(e_it!=rename_symbol.expr_map.end())
       final_id=e_it->second;
@@ -77,7 +77,7 @@ static bool link_functions(
     goto_functionst::function_mapt::iterator dest_f_it=
       dest_functions.function_map.find(final_id);
 
-    goto_functionst::goto_functiont &src_func = src_it->second;
+    goto_functionst::goto_functiont &src_func = gf_entry.second;
     if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
       rename_symbols_in_function(src_func, final_id, rename_symbol);
@@ -97,8 +97,9 @@ static bool link_functions(
         in_dest_symbol_table.parameter_identifiers.swap(
           src_func.parameter_identifiers);
       }
-      else if(src_func.body.instructions.empty() ||
-              src_ns.lookup(src_it->first).is_weak)
+      else if(
+        src_func.body.instructions.empty() ||
+        src_ns.lookup(gf_entry.first).is_weak)
       {
         // just keep the old one in dest
       }
@@ -136,17 +137,19 @@ static bool link_functions(
   }
 
   if(!macro_application.expr_map.empty())
-    Forall_goto_functions(dest_it, dest_functions)
+  {
+    for(auto &gf_entry : dest_functions.function_map)
     {
-      irep_idt final_id=dest_it->first;
-      rename_symbols_in_function(dest_it->second, final_id, macro_application);
+      irep_idt final_id = gf_entry.first;
+      rename_symbols_in_function(gf_entry.second, final_id, macro_application);
     }
+  }
 
   if(!object_type_updates.empty())
   {
-    Forall_goto_functions(dest_it, dest_functions)
+    for(auto &gf_entry : dest_functions.function_map)
     {
-      for(auto &instruction : dest_it->second.body.instructions)
+      for(auto &instruction : gf_entry.second.body.instructions)
       {
         instruction.transform([&object_type_updates](exprt expr) {
           object_type_updates(expr);

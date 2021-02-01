@@ -83,11 +83,16 @@ void stack_depth(
 
   const exprt depth_expr(from_integer(depth, sym.type()));
 
-  Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->second.body_available() &&
-        f_it->first != INITIALIZE_FUNCTION &&
-        f_it->first!=goto_functionst::entry_point())
-      stack_depth(f_it->second.body, sym, depth, depth_expr);
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    if(
+      gf_entry.second.body_available() &&
+      gf_entry.first != INITIALIZE_FUNCTION &&
+      gf_entry.first != goto_functionst::entry_point())
+    {
+      stack_depth(gf_entry.second.body, sym, depth, depth_expr);
+    }
+  }
 
   // initialize depth to 0
   goto_functionst::function_mapt::iterator i_it =

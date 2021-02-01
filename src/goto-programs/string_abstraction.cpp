@@ -129,11 +129,11 @@ typet string_abstractiont::build_type(whatt what)
 
 void string_abstractiont::operator()(goto_functionst &dest)
 {
-  Forall_goto_functions(it, dest)
+  for(auto &gf_entry : dest.function_map)
   {
-    sym_suffix="#str$"+id2string(it->first);
-    add_str_arguments(it->first, it->second);
-    abstract(it->second.body);
+    sym_suffix = "#str$" + id2string(gf_entry.first);
+    add_str_arguments(gf_entry.first, gf_entry.second);
+    abstract(gf_entry.second.body);
     current_args.clear();
   }
 

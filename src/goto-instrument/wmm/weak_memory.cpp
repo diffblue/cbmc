@@ -134,15 +134,23 @@ void weak_memory(
   message.status() << "--------" << messaget::eom;
 
   // all access to shared variables is pushed into assignments
-  Forall_goto_functions(f_it, goto_model.goto_functions)
-    if(f_it->first != INITIALIZE_FUNCTION &&
-      f_it->first!=goto_functionst::entry_point())
-      introduce_temporaries(value_sets, goto_model.symbol_table, f_it->first,
-        f_it->second.body,
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    if(
+      gf_entry.first != INITIALIZE_FUNCTION &&
+      gf_entry.first != goto_functionst::entry_point())
+    {
+      introduce_temporaries(
+        value_sets,
+        goto_model.symbol_table,
+        gf_entry.first,
+        gf_entry.second.body,
 #ifdef LOCAL_MAY
-        f_it->second,
+        gf_entry.second,
 #endif
         message);
+    }
+  }
 
   message.status() << "Temp added" << messaget::eom;
 

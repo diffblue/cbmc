@@ -39,10 +39,10 @@ call_grapht::call_grapht(
   const goto_functionst &goto_functions, bool collect_callsites):
   collect_callsites(collect_callsites)
 {
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    const irep_idt &function_name = f_it->first;
-    const goto_programt &body = f_it->second.body;
+    const irep_idt &function_name = gf_entry.first;
+    const goto_programt &body = gf_entry.second.body;
     nodes.insert(function_name);
     add(function_name, body);
   }

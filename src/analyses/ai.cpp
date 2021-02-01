@@ -24,16 +24,16 @@ void ai_baset::output(
   const goto_functionst &goto_functions,
   std::ostream &out) const
 {
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    if(f_it->second.body_available())
+    if(gf_entry.second.body_available())
     {
       out << "////\n";
-      out << "//// Function: " << f_it->first << "\n";
+      out << "//// Function: " << gf_entry.first << "\n";
       out << "////\n";
       out << "\n";
 
-      output(ns, f_it->first, f_it->second.body, out);
+      output(ns, gf_entry.first, gf_entry.second.body, out);
     }
   }
 }
@@ -64,16 +64,16 @@ jsont ai_baset::output_json(
 {
   json_objectt result;
 
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
-    if(f_it->second.body_available())
+    if(gf_entry.second.body_available())
     {
-      result[id2string(f_it->first)] =
-        output_json(ns, f_it->first, f_it->second.body);
+      result[id2string(gf_entry.first)] =
+        output_json(ns, gf_entry.first, gf_entry.second.body);
     }
     else
     {
-      result[id2string(f_it->first)]=json_arrayt();
+      result[id2string(gf_entry.first)] = json_arrayt();
     }
   }
 
@@ -111,17 +111,18 @@ xmlt ai_baset::output_xml(
 {
   xmlt program("program");
 
-  forall_goto_functions(f_it, goto_functions)
+  for(const auto &gf_entry : goto_functions.function_map)
   {
     xmlt function(
       "function",
-      {{"name", id2string(f_it->first)},
-       {"body_available", f_it->second.body_available() ? "true" : "false"}},
+      {{"name", id2string(gf_entry.first)},
+       {"body_available", gf_entry.second.body_available() ? "true" : "false"}},
       {});
 
-    if(f_it->second.body_available())
+    if(gf_entry.second.body_available())
     {
-      function.new_element(output_xml(ns, f_it->first, f_it->second.body));
+      function.new_element(
+        output_xml(ns, gf_entry.first, gf_entry.second.body));
     }
 
     program.new_element(function);
@@ -194,8 +195,8 @@ void ai_baset::initialize(const irep_idt &, const goto_programt &goto_program)
 
 void ai_baset::initialize(const goto_functionst &goto_functions)
 {
-  forall_goto_functions(it, goto_functions)
-    initialize(it->first, it->second);
+  for(const auto &gf_entry : goto_functions.function_map)
+    initialize(gf_entry.first, gf_entry.second);
 }
 
 void ai_baset::finalize()

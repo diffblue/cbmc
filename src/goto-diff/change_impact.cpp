@@ -99,10 +99,11 @@ void full_slicert::operator()(
   // now replace those instructions that are not needed
   // by skips
 
-  Forall_goto_functions(f_it, goto_functions)
-    if(f_it->second.body_available())
+  for(auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
     {
-      Forall_goto_program_instructions(i_it, f_it->second.body)
+      Forall_goto_program_instructions(i_it, gf_entry.second.body)
       {
         const auto &node = cfg.get_node(i_it);
         if(!i_it->is_end_function() && // always retained
@@ -128,6 +129,7 @@ void full_slicert::operator()(
 #endif
       }
     }
+  }
 
   // remove the skips
   remove_skip(goto_functions);
@@ -494,10 +496,18 @@ void change_impactt::operator()()
 
   function_mapt old_funcs, new_funcs;
 
-  forall_goto_functions(it, old_goto_functions)
+  for(auto it = old_goto_functions.function_map.begin();
+      it != old_goto_functions.function_map.end();
+      ++it)
+  {
     old_funcs.insert(std::make_pair(it->first, it));
-  forall_goto_functions(it, new_goto_functions)
+  }
+  for(auto it = new_goto_functions.function_map.begin();
+      it != new_goto_functions.function_map.end();
+      ++it)
+  {
     new_funcs.insert(std::make_pair(it->first, it));
+  }
 
   function_mapt::const_iterator ito=old_funcs.begin();
   for(function_mapt::const_iterator itn=new_funcs.begin();

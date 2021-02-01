@@ -161,17 +161,17 @@ void unreachable_instructions(
 
   const namespacet ns(goto_model.symbol_table);
 
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    if(!f_it->second.body_available())
+    if(!gf_entry.second.body_available())
       continue;
 
-    const goto_programt &goto_program=f_it->second.body;
+    const goto_programt &goto_program = gf_entry.second.body;
     dead_mapt dead_map;
 
-    const symbolt &decl=ns.lookup(f_it->first);
+    const symbolt &decl = ns.lookup(gf_entry.first);
 
-    // f_it->first may be a link-time renamed version, use the
+    // gf_entry.first may be a link-time renamed version, use the
     // base_name instead; do not list inlined functions
     if(
       called.find(decl.base_name) != called.end() ||
@@ -185,9 +185,9 @@ void unreachable_instructions(
     if(!dead_map.empty())
     {
       if(!json)
-        output_dead_plain(ns, f_it->first, goto_program, dead_map, os);
+        output_dead_plain(ns, gf_entry.first, goto_program, dead_map, os);
       else
-        add_to_json(ns, f_it->first, goto_program, dead_map, json_result);
+        add_to_json(ns, gf_entry.first, goto_program, dead_map, json_result);
     }
   }
 
@@ -206,12 +206,12 @@ bool static_unreachable_instructions(
 
   const namespacet ns(goto_model.symbol_table);
 
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    if(!f_it->second.body_available())
+    if(!gf_entry.second.body_available())
       continue;
 
-    const goto_programt &goto_program=f_it->second.body;
+    const goto_programt &goto_program = gf_entry.second.body;
     dead_mapt dead_map;
     build_dead_map_from_ai(goto_program, ai, dead_map);
 
@@ -219,16 +219,18 @@ bool static_unreachable_instructions(
     {
       if(options.get_bool_option("json"))
       {
-        add_to_json(ns, f_it->first, f_it->second.body, dead_map, json_result);
+        add_to_json(
+          ns, gf_entry.first, gf_entry.second.body, dead_map, json_result);
       }
       else if(options.get_bool_option("xml"))
       {
-        add_to_xml(f_it->first, f_it->second.body, dead_map, xml_result);
+        add_to_xml(gf_entry.first, gf_entry.second.body, dead_map, xml_result);
       }
       else
       {
         // text or console
-        output_dead_plain(ns, f_it->first, f_it->second.body, dead_map, out);
+        output_dead_plain(
+          ns, gf_entry.first, gf_entry.second.body, dead_map, out);
       }
     }
   }
@@ -292,11 +294,11 @@ static void list_functions(
 
   const namespacet ns(goto_model.symbol_table);
 
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    const symbolt &decl=ns.lookup(f_it->first);
+    const symbolt &decl = ns.lookup(gf_entry.first);
 
-    // f_it->first may be a link-time renamed version, use the
+    // gf_entry.first may be a link-time renamed version, use the
     // base_name instead; do not list inlined functions
     if(
       unreachable == (called.find(decl.base_name) != called.end() ||
@@ -308,9 +310,9 @@ static void list_functions(
     source_locationt first_location=decl.location;
 
     source_locationt last_location;
-    if(f_it->second.body_available())
+    if(gf_entry.second.body_available())
     {
-      const goto_programt &goto_program=f_it->second.body;
+      const goto_programt &goto_program = gf_entry.second.body;
 
       goto_programt::const_targett end_function=
         goto_program.instructions.end();
@@ -404,15 +406,15 @@ std::unordered_set<irep_idt> compute_called_functions_from_ai(
 {
   std::unordered_set<irep_idt> called;
 
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    if(!f_it->second.body_available())
+    if(!gf_entry.second.body_available())
       continue;
 
-    const goto_programt &p = f_it->second.body;
+    const goto_programt &p = gf_entry.second.body;
 
     if(!ai.abstract_state_before(p.instructions.begin())->is_bottom())
-      called.insert(f_it->first);
+      called.insert(gf_entry.first);
   }
 
   return called;

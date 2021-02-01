@@ -34,9 +34,9 @@ static void collect_eloc(
   const goto_modelt &goto_model,
   working_dirst &dest)
 {
-  forall_goto_functions(f_it, goto_model.goto_functions)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
-    for(const auto &instruction : f_it->second.body.instructions)
+    for(const auto &instruction : gf_entry.second.body.instructions)
     {
       const auto &source_location = instruction.source_location;
 
@@ -121,11 +121,14 @@ void print_path_lengths(const goto_modelt &goto_model)
             << " instructions\n";
 
   std::size_t n_loops=0, loop_ins=0;
-  forall_goto_functions(gf_it, goto_model.goto_functions)
-    forall_goto_program_instructions(i_it, gf_it->second.body)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    forall_goto_program_instructions(i_it, gf_entry.second.body)
+    {
       // loops or recursion
-      if(i_it->is_backwards_goto() ||
-         i_it==gf_it->second.body.instructions.begin())
+      if(
+        i_it->is_backwards_goto() ||
+        i_it == gf_entry.second.body.instructions.begin())
       {
         const cfgt::entryt &node = cfg.get_node_index(i_it);
         cfgt::patht loop;
@@ -137,6 +140,8 @@ void print_path_lengths(const goto_modelt &goto_model)
           loop_ins+=loop.size()-1;
         }
       }
+    }
+  }
 
   if(n_loops>0)
     std::cout << "Loop information: " << n_loops << " loops, "

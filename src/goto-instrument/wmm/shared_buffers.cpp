@@ -1026,18 +1026,18 @@ void shared_bufferst::affected_by_delay(
 {
   namespacet ns(symbol_table);
 
-  Forall_goto_functions(f_it, goto_functions)
+  for(auto &gf_entry : goto_functions.function_map)
   {
 #ifdef LOCAL_MAY
-    local_may_aliast local_may(f_it->second);
+    local_may_aliast local_may(gf_entry.second);
 #endif
 
-    Forall_goto_program_instructions(i_it, f_it->second.body)
+    Forall_goto_program_instructions(i_it, gf_entry.second.body)
     {
       rw_set_loct rw_set(
         ns,
         value_sets,
-        f_it->first,
+        gf_entry.first,
         i_it
 #ifdef LOCAL_MAY
         ,

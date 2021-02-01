@@ -105,11 +105,13 @@ void is_threadedt::compute(const goto_functionst &goto_functions)
 
   is_threaded_analysis(goto_functions, ns);
 
-  forall_goto_functions(f_it, goto_functions)
-    forall_goto_program_instructions(i_it, f_it->second.body)
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    forall_goto_program_instructions(i_it, gf_entry.second.body)
     {
       auto domain_ptr = is_threaded_analysis.abstract_state_before(i_it);
       if(static_cast<const is_threaded_domaint &>(*domain_ptr).is_threaded)
         is_threaded_set.insert(i_it);
     }
+  }
 }

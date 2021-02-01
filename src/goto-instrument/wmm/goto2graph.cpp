@@ -1269,13 +1269,13 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
     goto_programt *current_po=nullptr;
     bool thread_found=false;
 
-    Forall_goto_functions(f_it, goto_functions)
+    for(auto &gf_entry : goto_functions.function_map)
     {
-      for(const auto &instruction : f_it->second.body.instructions)
+      for(const auto &instruction : gf_entry.second.body.instructions)
       {
         if(instruction.source_location == current_location)
         {
-          current_po=&f_it->second.body;
+          current_po = &gf_entry.second.body;
           thread_found=true;
           break;
         }
