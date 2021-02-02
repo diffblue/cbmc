@@ -272,6 +272,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     c_typecheck_baset::typecheck_type(type);
   }
+  else if(type.id() == ID_gcc_attribute_mode)
+  {
+    c_typecheck_baset::typecheck_type(type);
+  }
   else
   {
     error().source_location=type.source_location();
