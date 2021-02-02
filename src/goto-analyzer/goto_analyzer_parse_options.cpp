@@ -872,11 +872,11 @@ bool goto_analyzer_parse_optionst::process_goto_program(
   ::process_goto_program(goto_model, options, log);
 
   {
-    #if 0
     // Remove inline assembler; this needs to happen before
     // adding the library.
     remove_asm(goto_model);
 
+#if 0
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << messaget::eom;
     link_to_library(
