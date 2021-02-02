@@ -14,16 +14,6 @@ vsd_configt vsd_configt::from_options(const optionst &options)
 {
   vsd_configt config{};
 
-  if(
-    options.get_bool_option("value-set") &&
-    options.get_bool_option("data-dependencies"))
-  {
-    throw invalid_command_line_argument_exceptiont{
-      "Value set is not currently supported with data dependency analysis",
-      "--value-set --data-dependencies",
-      "--data-dependencies"};
-  }
-
   config.value_abstract_type =
     option_to_abstract_type(options, "values", value_option_mappings, CONSTANT);
 
@@ -39,8 +29,7 @@ vsd_configt vsd_configt::from_options(const optionst &options)
   config.union_abstract_type = option_to_abstract_type(
     options, "unions", union_option_mappings, UNION_INSENSITIVE);
 
-  // This should always be on (for efficeny with 3-way merge)
-  // Does not work with value set
+  // This should always be on (for efficiency with 3-way merge)
   config.context_tracking.last_write_context = true;
   config.context_tracking.data_dependency_context =
     options.get_bool_option("data-dependencies");
