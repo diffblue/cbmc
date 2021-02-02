@@ -2,75 +2,39 @@
 
  Module: analyses variable-sensitivity
 
- Author: diffblue
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
 /// \file
-/// Value Set Abstract Object
+/// Value Set of Pointer Abstract Object
 
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include "abstract_aggregate_object.h"
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
-#include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
-#include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
 
-class value_set_index_ranget : public index_ranget
-{
-public:
-  explicit value_set_index_ranget(const abstract_object_sett &vals)
-    : values(vals), cur(), next(values.begin())
-  {
-    PRECONDITION(!values.empty());
-  }
-
-  const exprt &current() const override
-  {
-    return cur;
-  }
-  bool advance_to_next() override
-  {
-    if(next == values.end())
-      return false;
-
-    cur = (*next)->to_constant();
-    ++next;
-    return true;
-  }
-
-private:
-  const abstract_object_sett &values;
-  exprt cur;
-  abstract_object_sett::const_iterator next;
-};
-
-index_range_ptrt make_value_set_index_range(const abstract_object_sett &vals)
-{
-  return std::make_shared<value_set_index_ranget>(vals);
-}
-
-exprt rewrite_expression(
+static exprt rewrite_expression(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &ops);
 
-std::vector<abstract_object_sett>
+static std::vector<abstract_object_sett>
 unwrap_operands(const std::vector<abstract_object_pointert> &operands);
 
-abstract_object_sett
+static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values);
 
 /// Helper for converting singleton value sets into its only value.
 /// \p maybe_singleton: either a set of abstract values or a single value
 /// \return an abstract value without context
-abstract_object_pointert
+static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
 /// Helper for converting context objects into its abstract-value children
 /// \p maybe_wrapped: either an abstract value (or a set of those) or one
 ///   wrapped in a context
 /// \return an abstract value without context (though it might be as set)
-abstract_object_pointert
+static abstract_object_pointert
 maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
 
 /// Recursively construct a combination \p sub_con from \p super_con and once
@@ -110,44 +74,35 @@ void for_each_comb(const std::vector<Con> &super_con, F f)
   apply_comb(super_con, sub_con, f);
 }
 
-value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
-  : abstract_value_objectt(type)
+value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
+  const typet &type)
+  : abstract_pointer_objectt(type)
 {
-  values.insert(std::make_shared<constant_abstract_valuet>(type));
-  verify();
+  values.insert(std::make_shared<constant_pointer_abstract_objectt>(type));
 }
 
-value_set_abstract_objectt::value_set_abstract_objectt(
+value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)
-  : abstract_value_objectt(type, top, bottom)
+  : abstract_pointer_objectt(type, top, bottom)
 {
-  values.insert(std::make_shared<constant_abstract_valuet>(type, top, bottom));
-  verify();
+  values.insert(
+    std::make_shared<constant_pointer_abstract_objectt>(type, top, bottom));
 }
 
-value_set_abstract_objectt::value_set_abstract_objectt(
+value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : abstract_value_objectt(expr.type(), false, false)
+  : abstract_pointer_objectt(expr.type(), false, false)
 {
   values.insert(
-    std::make_shared<constant_abstract_valuet>(expr, environment, ns));
-  verify();
+    std::make_shared<constant_pointer_abstract_objectt>(expr, environment, ns));
 }
 
-index_range_ptrt
-value_set_abstract_objectt::index_range(const namespacet &ns) const
-{
-  if(values.empty())
-    return make_indeterminate_index_range();
-
-  return make_value_set_index_range(values);
-}
-
-abstract_object_pointert value_set_abstract_objectt::expression_transform(
+abstract_object_pointert
+value_set_pointer_abstract_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
@@ -176,7 +131,8 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
   return resolve_new_values(resulting_objects, environment);
 }
 
-abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
+abstract_object_pointert
+value_set_pointer_abstract_objectt::evaluate_conditional(
   const typet &type,
   const std::vector<abstract_object_sett> &operands,
   const abstract_environmentt &env,
@@ -205,7 +161,7 @@ abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
   return resolve_new_values(resulting_objects, env);
 }
 
-abstract_object_pointert value_set_abstract_objectt::write(
+abstract_object_pointert value_set_pointer_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -222,7 +178,7 @@ abstract_object_pointert value_set_abstract_objectt::write(
   return resolve_new_values(new_values, environment);
 }
 
-abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
+abstract_object_pointert value_set_pointer_abstract_objectt::resolve_new_values(
   const abstract_object_sett &new_values,
   const abstract_environmentt &environment) const
 {
@@ -230,7 +186,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
   return environment.add_object_context(result);
 }
 
-abstract_object_pointert value_set_abstract_objectt::resolve_values(
+abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
 {
   PRECONDITION(!new_values.empty());
@@ -240,23 +196,22 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 
   auto unwrapped_values = unwrap_and_extract_values(new_values);
 
+  auto result = std::dynamic_pointer_cast<value_set_pointer_abstract_objectt>(
+    mutable_clone());
+
   if(unwrapped_values.size() > max_value_set_size)
   {
-    return to_interval(unwrapped_values);
+    result->set_top();
   }
-  //if(unwrapped_values.size() == 1)
-  //{
-  //  return (*unwrapped_values.begin());
-  //}
-
-  auto result =
-    std::dynamic_pointer_cast<value_set_abstract_objectt>(mutable_clone());
-  result->set_values(unwrapped_values);
+  else
+  {
+    result->set_values(unwrapped_values);
+  }
   return result;
 }
 
 abstract_object_pointert
-value_set_abstract_objectt::merge(abstract_object_pointert other) const
+value_set_pointer_abstract_objectt::merge(abstract_object_pointert other) const
 {
   auto cast_other = std::dynamic_pointer_cast<const value_set_tag>(other);
   if(cast_other)
@@ -269,33 +224,15 @@ value_set_abstract_objectt::merge(abstract_object_pointert other) const
   return abstract_objectt::merge(other);
 }
 
-abstract_object_pointert value_set_abstract_objectt::to_interval(
-  const abstract_object_sett &other_values) const
-{
-  PRECONDITION(!other_values.empty());
-
-  exprt lower_expr = (*other_values.begin())->to_constant();
-  exprt upper_expr = (*other_values.begin())->to_constant();
-  for(const auto &value : other_values)
-  {
-    const auto &value_expr = value->to_constant();
-    lower_expr = constant_interval_exprt::get_min(lower_expr, value_expr);
-    upper_expr = constant_interval_exprt::get_max(upper_expr, value_expr);
-  }
-  return std::make_shared<interval_abstract_valuet>(
-    constant_interval_exprt(lower_expr, upper_expr));
-}
-
-void value_set_abstract_objectt::set_values(
+void value_set_pointer_abstract_objectt::set_values(
   const abstract_object_sett &other_values)
 {
   PRECONDITION(!other_values.empty());
   set_not_top();
   values = other_values;
-  verify();
 }
 
-void value_set_abstract_objectt::output(
+void value_set_pointer_abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
   const namespacet &ns) const

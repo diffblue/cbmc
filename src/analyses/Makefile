@@ -35,6 +35,7 @@ SRC = ai.cpp \
       uninitialized_domain.cpp \
       variable-sensitivity/abstract_environment.cpp \
       variable-sensitivity/abstract_object.cpp \
+      variable-sensitivity/abstract_object_set.cpp \
       variable-sensitivity/abstract_pointer_object.cpp \
       variable-sensitivity/abstract_value_object.cpp \
       variable-sensitivity/constant_abstract_value.cpp \
@@ -47,6 +48,7 @@ SRC = ai.cpp \
       variable-sensitivity/three_way_merge_abstract_interpreter.cpp \
       variable-sensitivity/value_set_abstract_object.cpp \
       variable-sensitivity/value_set_abstract_value.cpp \
+      variable-sensitivity/value_set_pointer_abstract_object.cpp \
       variable-sensitivity/variable_sensitivity_configuration.cpp \
       variable-sensitivity/variable_sensitivity_dependence_graph.cpp \
       variable-sensitivity/variable_sensitivity_domain.cpp \

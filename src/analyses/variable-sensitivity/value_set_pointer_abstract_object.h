@@ -2,35 +2,33 @@
 
  Module: analyses variable-sensitivity
 
- Author: diffblue
+ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
 /// \file
-/// Value Set Abstract Object
+/// Value Set of Pointer Abstract Object
 
-#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
-#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_POINTER_ABSTRACT_OBJECT_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_POINTER_ABSTRACT_OBJECT_H
 
 #include <analyses/variable-sensitivity/abstract_object_set.h>
-#include <analyses/variable-sensitivity/abstract_value_object.h>
+#include <analyses/variable-sensitivity/abstract_pointer_object.h>
 
-class value_set_abstract_objectt : public abstract_value_objectt,
-                                   public value_set_tag
+class value_set_pointer_abstract_objectt : public abstract_pointer_objectt,
+                                           public value_set_tag
 {
 public:
   /// \copydoc abstract_objectt::abstract_objectt(const typet&)
-  explicit value_set_abstract_objectt(const typet &type);
+  explicit value_set_pointer_abstract_objectt(const typet &type);
 
   /// \copydoc abstract_objectt::abstract_objectt(const typet &, bool, bool)
-  value_set_abstract_objectt(const typet &type, bool top, bool bottom);
+  value_set_pointer_abstract_objectt(const typet &type, bool top, bool bottom);
 
-  value_set_abstract_objectt(
+  value_set_pointer_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
-
-  index_range_ptrt index_range(const namespacet &ns) const override;
 
   /// \copydoc abstract_objectt::to_constant
   exprt to_constant() const override
@@ -52,7 +50,7 @@ public:
 
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
-  const abstract_object_sett &get_values() const override
+  const abstract_object_sett &get_values() const
   {
     return values;
   }
@@ -112,12 +110,6 @@ private:
 
   // data
   abstract_object_sett values;
-
-  /// Cast the set of values \p other_values to an interval.
-  /// \param other_values: the value-set to be abstracted into an interval
-  /// \return the interval-abstract-object containing \p other_values
-  abstract_object_pointert
-  to_interval(const abstract_object_sett &other_values) const;
 };
 
-#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_POINTER_ABSTRACT_OBJECT_H

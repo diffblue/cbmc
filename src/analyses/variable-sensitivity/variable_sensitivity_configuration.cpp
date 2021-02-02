@@ -58,7 +58,7 @@ vsd_configt vsd_configt::value_set()
 {
   vsd_configt config{};
   config.value_abstract_type = VALUE_SET;
-  config.pointer_abstract_type = VALUE_SET;
+  config.pointer_abstract_type = VALUE_SET_OF_POINTERS;
   config.struct_abstract_type = STRUCT_SENSITIVE;
   config.array_abstract_type = ARRAY_SENSITIVE;
   return config;
@@ -83,7 +83,7 @@ const vsd_configt::option_mappingt vsd_configt::value_option_mappings = {
 const vsd_configt::option_mappingt vsd_configt::pointer_option_mappings = {
   {"top-bottom", POINTER_INSENSITIVE},
   {"constants", POINTER_SENSITIVE},
-  {"value-set", VALUE_SET}};
+  {"value-set", VALUE_SET_OF_POINTERS}};
 
 const vsd_configt::option_mappingt vsd_configt::struct_option_mappings = {
   {"top-bottom", STRUCT_INSENSITIVE},
