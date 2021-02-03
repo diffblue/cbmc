@@ -38,19 +38,9 @@ public:
                               : abstract_objectt::to_constant();
   }
 
-  /// \copydoc abstract_objectt::expression_transform
-  ///
-  /// Transforms the \p expr for every combination of \p operands (since these
-  /// can be value-sets as well).
-  abstract_object_pointert expression_transform(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const override;
-
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
-  const abstract_object_sett &get_values() const
+  const abstract_object_sett &get_values() const override
   {
     return values;
   }
@@ -63,16 +53,9 @@ public:
   /// either converted to interval or marked as `top`.
   static const size_t max_value_set_size = 10;
 
-  /// \copydoc abstract_objectt::write
-  ///
-  /// Delegate writing to stored values.
-  abstract_object_pointert write(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> &stack,
-    const exprt &specifier,
-    const abstract_object_pointert &value,
-    bool merging_write) const override;
+  abstract_object_pointert read_dereference(
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
 
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
@@ -84,12 +67,6 @@ protected:
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
 private:
-  abstract_object_pointert evaluate_conditional(
-    const typet &type,
-    const std::vector<abstract_object_sett> &operands,
-    const abstract_environmentt &env,
-    const namespacet &ns) const;
-
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
