@@ -73,7 +73,6 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const;
 
-protected:
   /// Evaluate writing to a pointer's value. More precise abstractions
   /// may override this provide more precise results.
   ///

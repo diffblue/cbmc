@@ -57,6 +57,13 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
+  abstract_object_pointert write_dereference(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> &stack,
+    const abstract_object_pointert &new_value,
+    bool merging_write) const override;
+
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 

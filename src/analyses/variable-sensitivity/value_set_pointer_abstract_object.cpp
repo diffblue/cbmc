@@ -115,6 +115,30 @@ abstract_object_pointert value_set_pointer_abstract_objectt::read_dereference(
   return results.first();
 }
 
+abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> &stack,
+  const abstract_object_pointert &new_value,
+  bool merging_write) const
+{
+  if(is_top() || is_bottom())
+  {
+    return abstract_pointer_objectt::write_dereference(
+      environment, ns, stack, new_value, merging_write);
+  }
+
+  for(auto value : values)
+  {
+    auto pointer =
+      std::dynamic_pointer_cast<const abstract_pointer_objectt>(value);
+    pointer->write_dereference(
+      environment, ns, stack, new_value, merging_write);
+  }
+
+  return shared_from_this();
+}
+
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_new_values(
   const abstract_object_sett &new_values,
   const abstract_environmentt &environment) const
