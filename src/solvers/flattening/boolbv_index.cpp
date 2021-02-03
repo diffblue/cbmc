@@ -57,8 +57,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
           final_array.id() == ID_symbol || final_array.id() == ID_nondet_symbol)
         {
           std::size_t width = boolbv_width(array_type);
-          bvt unused(width);
-          map.get_literals(final_array.get(ID_identifier), array_type, unused);
+          (void)map.get_literals(
+            final_array.get(ID_identifier), array_type, width);
         }
 
         // make sure we have the index in the cache
@@ -77,8 +77,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
         if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
         {
           std::size_t width = boolbv_width(array_type);
-          bvt unused(width);
-          map.get_literals(array.get(ID_identifier), array_type, unused);
+          (void)map.get_literals(array.get(ID_identifier), array_type, width);
         }
 
         // make sure we have the index in the cache

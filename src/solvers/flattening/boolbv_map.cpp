@@ -38,10 +38,10 @@ void boolbv_mapt::show(std::ostream &out) const
     out << pair.first << "=" << pair.second.get_value(prop) << '\n';
 }
 
-void boolbv_mapt::get_literals(
+const bvt &boolbv_mapt::get_literals(
   const irep_idt &identifier,
   const typet &type,
-  bvt &literals)
+  std::size_t width)
 {
   std::pair<mappingt::iterator, bool> result=
     mapping.insert(std::pair<irep_idt, map_entryt>(
@@ -52,9 +52,9 @@ void boolbv_mapt::get_literals(
   if(result.second)
   { // actually inserted
     map_entry.type=type;
-    map_entry.literal_map.reserve(literals.size());
+    map_entry.literal_map.reserve(width);
 
-    for(std::size_t bit = 0; bit < literals.size(); ++bit)
+    for(std::size_t bit = 0; bit < width; ++bit)
     {
       map_entry.literal_map.push_back(prop.new_variable());
 
@@ -66,10 +66,10 @@ void boolbv_mapt::get_literals(
   }
 
   INVARIANT(
-    map_entry.literal_map.size() == literals.size(),
+    map_entry.literal_map.size() == width,
     "number of literals in the literal map shall equal the bitvector width");
 
-  literals = map_entry.literal_map;
+  return map_entry.literal_map;
 }
 
 void boolbv_mapt::set_literals(

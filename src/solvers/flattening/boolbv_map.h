@@ -37,10 +37,10 @@ public:
 
   void show(std::ostream &out) const;
 
-  void get_literals(
+  const bvt &get_literals(
     const irep_idt &identifier,
     const typet &type,
-    bvt &literals);
+    std::size_t width);
 
   void set_literals(
     const irep_idt &identifier,

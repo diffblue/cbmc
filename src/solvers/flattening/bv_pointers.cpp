@@ -231,12 +231,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
     const typet &type=expr.type();
 
-    bvt bv;
-    bv.resize(bits);
-
-    map.get_literals(identifier, type, bv);
-
-    return bv;
+    return map.get_literals(identifier, type, bits);
   }
   else if(expr.id()==ID_nondet_symbol)
   {

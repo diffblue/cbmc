@@ -300,13 +300,10 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   const typet &type=expr.type();
   std::size_t width=boolbv_width(type);
 
-  bvt bv;
-  bv.resize(width);
-
   const irep_idt &identifier = expr.get(ID_identifier);
   CHECK_RETURN(!identifier.empty());
 
-  map.get_literals(identifier, type, bv);
+  bvt bv = map.get_literals(identifier, type, width);
 
   INVARIANT_WITH_DIAGNOSTICS(
     std::all_of(
