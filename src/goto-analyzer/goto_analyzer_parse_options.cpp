@@ -147,6 +147,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_values("error-label"));
 #endif
 
+  // all checks supported by goto_check
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
+
   // The user should either select:
   //  1. a specific analysis, or
   //  2. a tuple of task / analyser options / outputs
@@ -894,7 +897,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     log.status() << "Removing function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
-      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+      ui_message_handler, goto_model, options.get_bool_option("pointer-check"));
 
     // instrument library preconditions
     instrument_preconditions(goto_model);

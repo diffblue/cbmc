@@ -340,7 +340,7 @@ bool goto_diff_parse_optionst::process_goto_program(
     log.status() << "Removal of function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
-      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+      ui_message_handler, goto_model, options.get_bool_option("pointer-check"));
 
     mm_io(goto_model);
 
