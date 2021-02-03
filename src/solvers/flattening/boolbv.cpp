@@ -131,15 +131,13 @@ boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
   // Iterators into hash_maps supposedly stay stable
   // even though we are inserting more elements recursively.
 
-  const bvt &bv = convert_bitvector(expr);
+  cache_result.first->second = convert_bitvector(expr);
 
   INVARIANT_WITH_DIAGNOSTICS(
-    !expected_width || bv.size() == *expected_width,
+    !expected_width || cache_result.first->second.size() == *expected_width,
     "bitvector width shall match the indicated expected width",
     expr.find_source_location(),
     irep_pretty_diagnosticst(expr));
-
-  cache_result.first->second = bv;
 
   // check
   for(const auto &literal : cache_result.first->second)
