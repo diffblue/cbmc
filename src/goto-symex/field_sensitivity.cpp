@@ -170,11 +170,10 @@ exprt field_sensitivityt::get_fields(
 
     for(const auto &comp : components)
     {
-      const member_exprt member(struct_op, comp.get_name(), comp.type());
       ssa_exprt tmp = ssa_expr;
       bool was_l2 = !tmp.get_level_2().empty();
       tmp.remove_level_2();
-      tmp.set_expression(member);
+      tmp.set_expression(member_exprt{struct_op, comp.get_name(), comp.type()});
       if(was_l2)
       {
         fields.push_back(state.rename(get_fields(ns, state, tmp), ns).get());

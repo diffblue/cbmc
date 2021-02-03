@@ -122,9 +122,9 @@ address_of_exprt::address_of_exprt(const exprt &_op)
 {
 }
 
-const exprt &object_descriptor_exprt::root_object() const
+const exprt &object_descriptor_exprt::root_object(const exprt &expr)
 {
-  const exprt *p = &object();
+  const exprt *p = &expr;
 
   while(true)
   {

@@ -412,14 +412,10 @@ bvt cnft::new_variables(std::size_t width)
 /// \return set of literals, duplicates removed
 bvt cnft::eliminate_duplicates(const bvt &bv)
 {
-  std::set<literalt> s;
-
-  bvt dest;
-  dest.reserve(bv.size());
-
-  for(const auto &l : bv)
-    if(s.insert(l).second)
-      dest.push_back(l);
+  bvt dest = bv;
+  std::sort(dest.begin(), dest.end());
+  auto last = std::unique(dest.begin(), dest.end());
+  dest.erase(last, dest.end());
 
   return dest;
 }

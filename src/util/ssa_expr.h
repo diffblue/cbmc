@@ -38,7 +38,7 @@ public:
   /// Replace the underlying, original expression by \p expr while maintaining
   /// SSA indices.
   /// \param expr: expression to store
-  void set_expression(const exprt &expr);
+  void set_expression(exprt expr);
 
   irep_idt get_object_name() const;
 
