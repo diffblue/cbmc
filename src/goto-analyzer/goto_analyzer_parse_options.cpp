@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
@@ -876,24 +877,22 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // adding the library.
     remove_asm(goto_model);
 
-#if 0
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << messaget::eom;
     link_to_library(
       goto_model, ui_message_handler, cprover_cpp_library_factory);
     link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
 
-    // these are commented out as well because without the library
-    // this initialization code doesn’t make any sense
     add_malloc_may_fail_variable_initializations(goto_model);
-
-#endif
 
     // remove function pointers
     log.status() << "Removing function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
       ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+
+    // instrument library preconditions
+    instrument_preconditions(goto_model);
 
     // do partial inlining
     log.status() << "Partial Inlining" << messaget::eom;
