@@ -35,11 +35,7 @@ exprt boolbvt::get(const exprt &expr) const
       // the mapping
       PRECONDITION(expr.type() == typet() || expr.type() == map_entry.type);
 
-      std::vector<bool> unknown =
-        std::vector<bool>(map_entry.literal_map.size(), false);
-
-      return bv_get_rec(
-        expr, map_entry.literal_map, unknown, 0, map_entry.type);
+      return bv_get_rec(expr, map_entry.literal_map, 0, map_entry.type);
     }
   }
 
@@ -49,30 +45,23 @@ exprt boolbvt::get(const exprt &expr) const
 exprt boolbvt::bv_get_rec(
   const exprt &expr,
   const bvt &bv,
-  const std::vector<bool> &unknown,
   std::size_t offset,
   const typet &type) const
 {
   std::size_t width=boolbv_width(type);
 
-  assert(bv.size()==unknown.size());
   assert(bv.size()>=offset+width);
 
   if(type.id()==ID_bool)
   {
-    if(!unknown[offset])
+    // clang-format off
+    switch(prop.l_get(bv[offset]).get_value())
     {
-      // clang-format off
-      switch(prop.l_get(bv[offset]).get_value())
-      {
-      case tvt::tv_enumt::TV_FALSE: return false_exprt();
-      case tvt::tv_enumt::TV_TRUE:  return true_exprt();
-      case tvt::tv_enumt::TV_UNKNOWN: return false_exprt(); // default
-      }
-      // clang-format on
+    case tvt::tv_enumt::TV_FALSE: return false_exprt();
+    case tvt::tv_enumt::TV_TRUE:  return true_exprt();
+    case tvt::tv_enumt::TV_UNKNOWN: return false_exprt(); // default
     }
-
-    return false_exprt{}; // default
+    // clang-format on
   }
 
   bvtypet bvtype=get_bvtype(type);
@@ -98,8 +87,7 @@ exprt boolbvt::bv_get_rec(
         {
           const index_exprt index{
             expr, from_integer(new_offset / sub_width, index_type())};
-          op.push_back(
-            bv_get_rec(index, bv, unknown, offset + new_offset, subtype));
+          op.push_back(bv_get_rec(index, bv, offset + new_offset, subtype));
         }
 
         exprt dest=exprt(ID_array, type);
@@ -113,15 +101,15 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_struct_tag)
     {
-      exprt result = bv_get_rec(
-        expr, bv, unknown, offset, ns.follow_tag(to_struct_tag_type(type)));
+      exprt result =
+        bv_get_rec(expr, bv, offset, ns.follow_tag(to_struct_tag_type(type)));
       result.type() = type;
       return result;
     }
     else if(type.id()==ID_union_tag)
     {
-      exprt result = bv_get_rec(
-        expr, bv, unknown, offset, ns.follow_tag(to_union_tag_type(type)));
+      exprt result =
+        bv_get_rec(expr, bv, offset, ns.follow_tag(to_union_tag_type(type)));
       result.type() = type;
       return result;
     }
@@ -138,8 +126,7 @@ exprt boolbvt::bv_get_rec(
         const typet &subtype = c.type();
 
         const member_exprt member{expr, c.get_name(), subtype};
-        op.push_back(
-          bv_get_rec(member, bv, unknown, offset + new_offset, subtype));
+        op.push_back(bv_get_rec(member, bv, offset + new_offset, subtype));
 
         std::size_t sub_width = boolbv_width(subtype);
         if(sub_width!=0)
@@ -164,7 +151,7 @@ exprt boolbvt::bv_get_rec(
         expr, components[component_nr].get_name(), subtype};
       return union_exprt(
         components[component_nr].get_name(),
-        bv_get_rec(member, bv, unknown, offset, subtype),
+        bv_get_rec(member, bv, offset, subtype),
         union_type);
     }
     else if(type.id()==ID_vector)
@@ -182,7 +169,7 @@ exprt boolbvt::bv_get_rec(
         {
           const index_exprt index{expr, from_integer(i, index_type())};
           value.operands().push_back(
-            bv_get_rec(index, bv, unknown, i * sub_width, subtype));
+            bv_get_rec(index, bv, i * sub_width, subtype));
         }
 
         return std::move(value);
@@ -196,10 +183,8 @@ exprt boolbvt::bv_get_rec(
       if(sub_width!=0 && width==sub_width*2)
       {
         const complex_exprt value(
-          bv_get_rec(
-            complex_real_exprt{expr}, bv, unknown, 0 * sub_width, subtype),
-          bv_get_rec(
-            complex_imag_exprt{expr}, bv, unknown, 1 * sub_width, subtype),
+          bv_get_rec(complex_real_exprt{expr}, bv, 0 * sub_width, subtype),
+          bv_get_rec(complex_imag_exprt{expr}, bv, 1 * sub_width, subtype),
           to_complex_type(type));
 
         return value;
@@ -213,16 +198,14 @@ exprt boolbvt::bv_get_rec(
   for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
     char ch = '0';
-    if(!unknown[bit_nr])
+    // clang-format off
+    switch(prop.l_get(bv[bit_nr]).get_value())
     {
-      switch(prop.l_get(bv[bit_nr]).get_value())
-      {
-       case tvt::tv_enumt::TV_FALSE: ch='0'; break;
-       case tvt::tv_enumt::TV_TRUE:  ch='1'; break;
-       case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
-       default: UNREACHABLE;
-      }
+    case tvt::tv_enumt::TV_FALSE: ch = '0'; break;
+    case tvt::tv_enumt::TV_TRUE: ch = '1'; break;
+    case tvt::tv_enumt::TV_UNKNOWN: ch = '0'; break;
     }
+    // clang-format on
 
     value=ch+value;
   }
@@ -279,9 +262,7 @@ exprt boolbvt::bv_get_rec(
 
 exprt boolbvt::bv_get(const bvt &bv, const typet &type) const
 {
-  std::vector<bool> unknown;
-  unknown.resize(bv.size(), false);
-  return bv_get_rec(nil_exprt{}, bv, unknown, 0, type);
+  return bv_get_rec(nil_exprt{}, bv, 0, type);
 }
 
 exprt boolbvt::bv_get_cache(const exprt &expr) const

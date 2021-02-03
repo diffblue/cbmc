@@ -593,12 +593,11 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 exprt bv_pointerst::bv_get_rec(
   const exprt &expr,
   const bvt &bv,
-  const std::vector<bool> &unknown,
   std::size_t offset,
   const typet &type) const
 {
   if(type.id()!=ID_pointer)
-    return SUB::bv_get_rec(expr, bv, unknown, offset, type);
+    return SUB::bv_get_rec(expr, bv, offset, type);
 
   std::string value_addr, value_offset, value;
 
@@ -607,18 +606,14 @@ exprt bv_pointerst::bv_get_rec(
     char ch=0;
     std::size_t bit_nr=i+offset;
 
-    if(unknown[bit_nr])
-      ch='0';
-    else
+    // clang-format off
+    switch(prop.l_get(bv[bit_nr]).get_value())
     {
-      switch(prop.l_get(bv[bit_nr]).get_value())
-      {
-       case tvt::tv_enumt::TV_FALSE: ch='0'; break;
-       case tvt::tv_enumt::TV_TRUE:  ch='1'; break;
-       case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
-       default: UNREACHABLE;
-      }
+    case tvt::tv_enumt::TV_FALSE: ch = '0'; break;
+    case tvt::tv_enumt::TV_TRUE: ch = '1'; break;
+    case tvt::tv_enumt::TV_UNKNOWN: ch = '0'; break;
     }
+    // clang-format on
 
     value=ch+value;
 
