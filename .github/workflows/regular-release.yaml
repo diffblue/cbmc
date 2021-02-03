@@ -82,6 +82,8 @@ jobs:
 
             ## Docker
 
+            We are also releasing new versions as images in [Dockerhub](https://hub.docker.com/r/diffblue/cbmc).
+
             To run the CProver suite of tools under a Docker container, make sure that
             [Docker](https://www.docker.com/) is already installed in your system and
             set up correctly, and then issue:
