@@ -37,10 +37,20 @@ std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
   return result;
 }
 
-boolbv_mapt::map_entryt &boolbv_mapt::get_map_entry(
-  const irep_idt &identifier,
-  const typet &type)
+void boolbv_mapt::show(std::ostream &out) const
 {
+  for(const auto &pair : mapping)
+    out << pair.first << "=" << pair.second.get_value(prop) << '\n';
+}
+
+void boolbv_mapt::get_literals(
+  const irep_idt &identifier,
+  const typet &type,
+  const std::size_t width,
+  bvt &literals)
+{
+  PRECONDITION(literals.size() == width);
+
   std::pair<mappingt::iterator, bool> result=
     mapping.insert(std::pair<irep_idt, map_entryt>(
       identifier, map_entryt()));
@@ -52,56 +62,24 @@ boolbv_mapt::map_entryt &boolbv_mapt::get_map_entry(
     map_entry.type=type;
     map_entry.width=boolbv_width(type);
     map_entry.bvtype=get_bvtype(type);
-    map_entry.literal_map.resize(map_entry.width);
-  }
+    map_entry.literal_map.reserve(map_entry.width);
 
-  INVARIANT(
-    map_entry.literal_map.size() == map_entry.width,
-    "number of literals in the literal map shall equal the bitvector width");
-
-  return map_entry;
-}
-
-void boolbv_mapt::show() const
-{
-  for(mappingt::const_iterator it=mapping.begin();
-      it!=mapping.end();
-      it++)
-  {
-  }
-}
-
-void boolbv_mapt::get_literals(
-  const irep_idt &identifier,
-  const typet &type,
-  const std::size_t width,
-  bvt &literals)
-{
-  map_entryt &map_entry=get_map_entry(identifier, type);
-
-  PRECONDITION(literals.size() == width);
-  INVARIANT(
-    map_entry.literal_map.size() == width,
-    "number of literals in the literal map shall equal the bitvector width");
-
-  if(!map_entry.is_set)
-  {
-#ifdef DEBUG
-    std::size_t bit = 0;
-#endif
-    for(auto &literal : map_entry.literal_map)
+    for(std::size_t bit = 0; bit < map_entry.width; ++bit)
     {
-      literal = prop.new_variable();
+      map_entry.literal_map.push_back(prop.new_variable());
 
 #ifdef DEBUG
-      std::cout << "NEW: " << identifier << ":" << bit << "=" << literal
-                << '\n';
-      ++bit;
+      std::cout << "NEW: " << identifier << ":" << bit << "="
+                << map_entry.literal_map.back() << '\n';
 #endif
     }
 
     map_entry.is_set = true;
   }
+
+  INVARIANT(
+    map_entry.literal_map.size() == width,
+    "number of literals in the literal map shall equal the bitvector width");
 
   literals = map_entry.literal_map;
 }
@@ -111,31 +89,51 @@ void boolbv_mapt::set_literals(
   const typet &type,
   const bvt &literals)
 {
-  map_entryt &map_entry=get_map_entry(identifier, type);
+  std::pair<mappingt::iterator, bool> result =
+    mapping.insert(std::pair<irep_idt, map_entryt>(identifier, map_entryt()));
 
-  for(auto it = literals.begin(); it != literals.end(); ++it)
-  {
-    const literalt &literal=*it;
+  map_entryt &map_entry = result.first->second;
 
-    INVARIANT(
-      literal.is_constant() || literal.var_no() < prop.no_variables(),
-      "variable number of non-constant literals shall be within bounds");
+  if(result.second)
+  { // actually inserted
+    map_entry.type = type;
+    map_entry.width = boolbv_width(type);
+    map_entry.bvtype = get_bvtype(type);
 
-    const std::size_t bit = it - literals.begin();
-
-    INVARIANT(
-      bit < map_entry.literal_map.size(), "bit index shall be within bounds");
-
-    if(map_entry.is_set)
+    for(const auto &literal : literals)
     {
-      prop.set_equal(map_entry.literal_map[bit], literal);
-      continue;
+      INVARIANT(
+        literal.is_constant() || literal.var_no() < prop.no_variables(),
+        "variable number of non-constant literals shall be within bounds");
     }
 
-    map_entry.literal_map[bit] = literal;
-  }
+    PRECONDITION(literals.size() == map_entry.width);
+    map_entry.literal_map = literals;
 
-  map_entry.is_set = true;
+    map_entry.is_set = true;
+  }
+  else
+  {
+    INVARIANT(
+      map_entry.literal_map.size() == map_entry.width,
+      "number of literals in the literal map shall equal the bitvector width");
+
+    for(auto it = literals.begin(); it != literals.end(); ++it)
+    {
+      const literalt &literal = *it;
+
+      INVARIANT(
+        literal.is_constant() || literal.var_no() < prop.no_variables(),
+        "variable number of non-constant literals shall be within bounds");
+
+      const std::size_t bit = it - literals.begin();
+
+      INVARIANT(
+        bit < map_entry.literal_map.size(), "bit index shall be within bounds");
+
+      prop.set_equal(map_entry.literal_map[bit], literal);
+    }
+  }
 }
 
 void boolbv_mapt::erase_literals(

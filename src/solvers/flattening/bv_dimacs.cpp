@@ -47,7 +47,7 @@ bool bv_dimacst::write_dimacs(std::ostream &out)
   }
 
   // dump mapping for selected bit-vectors
-  for(const auto &m : get_map().mapping)
+  for(const auto &m : get_map().get_mapping())
   {
     const auto &literal_map = m.second.literal_map;
 

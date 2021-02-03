@@ -24,12 +24,11 @@ exprt boolbvt::get(const exprt &expr) const
   {
     const irep_idt &identifier=expr.get(ID_identifier);
 
-    boolbv_mapt::mappingt::const_iterator it=
-      map.mapping.find(identifier);
+    const auto map_entry_opt = map.get_map_entry(identifier);
 
-    if(it!=map.mapping.end())
+    if(map_entry_opt.has_value())
     {
-      const boolbv_mapt::map_entryt &map_entry=it->second;
+      const boolbv_mapt::map_entryt &map_entry = *map_entry_opt;
       // an input expression must either be untyped (this is used for obtaining
       // the value of clock symbols, which do not have a fixed type as the clock
       // type is computed during symbolic execution) or match the type stored in

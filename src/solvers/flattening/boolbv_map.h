@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 
+#include <iosfwd>
 #include <vector>
 
 #include <util/type.h>
@@ -45,13 +46,8 @@ public:
   };
 
   typedef std::unordered_map<irep_idt, map_entryt> mappingt;
-  mappingt mapping;
 
-  void show() const;
-
-  map_entryt &get_map_entry(
-    const irep_idt &identifier,
-    const typet &type);
+  void show(std::ostream &out) const;
 
   void get_literals(
     const irep_idt &identifier,
@@ -68,7 +64,23 @@ public:
     const irep_idt &identifier,
     const typet &type);
 
+  optionalt<std::reference_wrapper<const map_entryt>>
+  get_map_entry(const irep_idt &identifier) const
+  {
+    const auto entry = mapping.find(identifier);
+    if(entry == mapping.end())
+      return {};
+
+    return optionalt<std::reference_wrapper<const map_entryt>>(entry->second);
+  }
+
+  const mappingt &get_mapping() const
+  {
+    return mapping;
+  }
+
 protected:
+  mappingt mapping;
   propt &prop;
   const boolbv_widtht &boolbv_width;
 };
