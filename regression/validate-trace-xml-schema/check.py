@@ -43,6 +43,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['coverage_report1', 'paths.desc'],
     ['graphml_witness1', 'test.desc'],
     ['switch8', 'program-only.desc'],
+    ['Failing_Assert1', 'dimacs.desc'],
     # this uses json-ui (fails for a different reason actually, but should also
     #   fail because of command line incompatibility)
     ['json1', 'test.desc'],

@@ -1,0 +1,10 @@
+CORE
+main.c
+--dimacs
+^Runtime decision procedure: [0-9]+(\.[0-9]+(e-[0-9]+)?)?s$
+^c main::1::i!0@1#1
+^c main::1::j!0@1#1
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
