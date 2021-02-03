@@ -130,53 +130,8 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("propagation", true);
 
-  // check array bounds
-  if(cmdline.isset("bounds-check"))
-    options.set_option("bounds-check", true);
-  else
-    options.set_option("bounds-check", false);
-
-  // check division by zero
-  if(cmdline.isset("div-by-zero-check"))
-    options.set_option("div-by-zero-check", true);
-  else
-    options.set_option("div-by-zero-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("signed-overflow-check"))
-    options.set_option("signed-overflow-check", true);
-  else
-    options.set_option("signed-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("unsigned-overflow-check"))
-    options.set_option("unsigned-overflow-check", true);
-  else
-    options.set_option("unsigned-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("float-overflow-check"))
-    options.set_option("float-overflow-check", true);
-  else
-    options.set_option("float-overflow-check", false);
-
-  // check for NaN (not a number)
-  if(cmdline.isset("nan-check"))
-    options.set_option("nan-check", true);
-  else
-    options.set_option("nan-check", false);
-
-  // check pointers
-  if(cmdline.isset("pointer-check"))
-    options.set_option("pointer-check", true);
-  else
-    options.set_option("pointer-check", false);
-
-  // check for memory leaks
-  if(cmdline.isset("memory-leak-check"))
-    options.set_option("memory-leak-check", true);
-  else
-    options.set_option("memory-leak-check", false);
+  // all checks supported by goto_check
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
