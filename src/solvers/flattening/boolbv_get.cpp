@@ -35,7 +35,8 @@ exprt boolbvt::get(const exprt &expr) const
       // the mapping
       PRECONDITION(expr.type() == typet() || expr.type() == map_entry.type);
 
-      std::vector<bool> unknown = std::vector<bool>(map_entry.width, false);
+      std::vector<bool> unknown =
+        std::vector<bool>(map_entry.literal_map.size(), false);
 
       return bv_get_rec(
         expr, map_entry.literal_map, unknown, 0, map_entry.type);

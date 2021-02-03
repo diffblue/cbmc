@@ -234,7 +234,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     bvt bv;
     bv.resize(bits);
 
-    map.get_literals(identifier, type, bits, bv);
+    map.get_literals(identifier, type, bv);
 
     return bv;
   }

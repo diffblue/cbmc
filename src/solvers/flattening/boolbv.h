@@ -49,7 +49,7 @@ public:
       boolbv_width(_ns),
       bv_utils(_prop),
       functions(*this),
-      map(_prop, boolbv_width)
+      map(_prop)
   {
   }
 

@@ -306,7 +306,7 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   const irep_idt &identifier = expr.get(ID_identifier);
   CHECK_RETURN(!identifier.empty());
 
-  map.get_literals(identifier, type, width, bv);
+  map.get_literals(identifier, type, bv);
 
   INVARIANT_WITH_DIAGNOSTICS(
     std::all_of(

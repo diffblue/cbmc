@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/prop/prop.h>
 
-#include "boolbv_width.h"
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -43,11 +41,8 @@ void boolbv_mapt::show(std::ostream &out) const
 void boolbv_mapt::get_literals(
   const irep_idt &identifier,
   const typet &type,
-  const std::size_t width,
   bvt &literals)
 {
-  PRECONDITION(literals.size() == width);
-
   std::pair<mappingt::iterator, bool> result=
     mapping.insert(std::pair<irep_idt, map_entryt>(
       identifier, map_entryt()));
@@ -57,11 +52,9 @@ void boolbv_mapt::get_literals(
   if(result.second)
   { // actually inserted
     map_entry.type=type;
-    map_entry.width=boolbv_width(type);
-    map_entry.bvtype=get_bvtype(type);
-    map_entry.literal_map.reserve(map_entry.width);
+    map_entry.literal_map.reserve(literals.size());
 
-    for(std::size_t bit = 0; bit < map_entry.width; ++bit)
+    for(std::size_t bit = 0; bit < literals.size(); ++bit)
     {
       map_entry.literal_map.push_back(prop.new_variable());
 
@@ -73,7 +66,7 @@ void boolbv_mapt::get_literals(
   }
 
   INVARIANT(
-    map_entry.literal_map.size() == width,
+    map_entry.literal_map.size() == literals.size(),
     "number of literals in the literal map shall equal the bitvector width");
 
   literals = map_entry.literal_map;
@@ -92,8 +85,6 @@ void boolbv_mapt::set_literals(
   if(result.second)
   { // actually inserted
     map_entry.type = type;
-    map_entry.width = boolbv_width(type);
-    map_entry.bvtype = get_bvtype(type);
 
     for(const auto &literal : literals)
     {
@@ -102,15 +93,10 @@ void boolbv_mapt::set_literals(
         "variable number of non-constant literals shall be within bounds");
     }
 
-    PRECONDITION(literals.size() == map_entry.width);
     map_entry.literal_map = literals;
   }
   else
   {
-    INVARIANT(
-      map_entry.literal_map.size() == map_entry.width,
-      "number of literals in the literal map shall equal the bitvector width");
-
     for(auto it = literals.begin(); it != literals.end(); ++it)
     {
       const literalt &literal = *it;
