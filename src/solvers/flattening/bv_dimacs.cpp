@@ -60,9 +60,7 @@ bool bv_dimacst::write_dimacs(std::ostream &out)
     {
       out << ' ';
 
-      if(!m.second.is_set)
-        out << '?';
-      else if(lit.is_constant())
+      if(lit.is_constant())
         out << (lit.is_true() ? "TRUE" : "FALSE");
       else
         out << lit.dimacs();

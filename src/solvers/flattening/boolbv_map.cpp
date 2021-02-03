@@ -20,9 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
 {
-  if(!is_set)
-    return std::string(literal_map.size(), '*');
-
   std::string result;
 
   result.reserve(literal_map.size());
@@ -73,8 +70,6 @@ void boolbv_mapt::get_literals(
                 << map_entry.literal_map.back() << '\n';
 #endif
     }
-
-    map_entry.is_set = true;
   }
 
   INVARIANT(
@@ -109,8 +104,6 @@ void boolbv_mapt::set_literals(
 
     PRECONDITION(literals.size() == map_entry.width);
     map_entry.literal_map = literals;
-
-    map_entry.is_set = true;
   }
   else
   {

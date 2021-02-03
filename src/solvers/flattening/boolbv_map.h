@@ -39,7 +39,6 @@ public:
     std::size_t width;
     bvtypet bvtype;
     typet type;
-    bool is_set = false;
     bvt literal_map;
 
     std::string get_value(const propt &) const;

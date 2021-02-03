@@ -35,21 +35,10 @@ exprt boolbvt::get(const exprt &expr) const
       // the mapping
       PRECONDITION(expr.type() == typet() || expr.type() == map_entry.type);
 
-      std::vector<bool> unknown;
-      bvt bv;
+      std::vector<bool> unknown = std::vector<bool>(map_entry.width, false);
 
-      if(map_entry.is_set)
-      {
-        unknown = std::vector<bool>(map_entry.width, false);
-        bv = map_entry.literal_map;
-      }
-      else
-      {
-        unknown = std::vector<bool>(map_entry.width, true);
-        bv = bvt{map_entry.width, literalt{0, false}};
-      }
-
-      return bv_get_rec(expr, bv, unknown, 0, map_entry.type);
+      return bv_get_rec(
+        expr, map_entry.literal_map, unknown, 0, map_entry.type);
     }
   }
 
