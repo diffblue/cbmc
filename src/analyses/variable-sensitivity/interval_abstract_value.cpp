@@ -219,7 +219,7 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
 }
 
 interval_abstract_valuet::interval_abstract_valuet(const typet &t)
-  : abstract_value_objectt(t), interval(t), merge_count(0)
+  : abstract_value_objectt(t), interval(t)
 {
 }
 
@@ -227,25 +227,13 @@ interval_abstract_valuet::interval_abstract_valuet(
   const typet &t,
   bool tp,
   bool bttm)
-  : abstract_value_objectt(t, tp, bttm), interval(t), merge_count(0)
+  : abstract_value_objectt(t, tp, bttm), interval(t)
 {
 }
 
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt &e)
-  : interval_abstract_valuet(e, 0)
-{
-}
-
-interval_abstract_valuet::interval_abstract_valuet(
-  const constant_interval_exprt &e,
-  int merge_count)
-  : abstract_value_objectt(
-      e.type(),
-      e.is_top() || merge_count > 10,
-      e.is_bottom()),
-    interval(e),
-    merge_count(merge_count)
+  : abstract_value_objectt(e.type(), e.is_top(), e.is_bottom()), interval(e)
 {
 }
 
@@ -506,13 +494,11 @@ abstract_object_pointert interval_abstract_valuet::merge_intervals(
   }
   else
   {
-    return std::make_shared<interval_abstract_valuet>(
-      constant_interval_exprt(
-        constant_interval_exprt::get_min(
-          interval.get_lower(), other->interval.get_lower()),
-        constant_interval_exprt::get_max(
-          interval.get_upper(), other->interval.get_upper())),
-      std::max(merge_count, other->merge_count) + 1);
+    return std::make_shared<interval_abstract_valuet>(constant_interval_exprt(
+      constant_interval_exprt::get_min(
+        interval.get_lower(), other->interval.get_lower()),
+      constant_interval_exprt::get_max(
+        interval.get_upper(), other->interval.get_upper())));
   }
 }
 
@@ -559,8 +545,7 @@ abstract_object_pointert interval_abstract_valuet::meet_intervals(
       return std::make_shared<interval_abstract_valuet>(
         interval.type(), false, true);
     return std::make_shared<interval_abstract_valuet>(
-      constant_interval_exprt(lower_bound, upper_bound),
-      std::max(merge_count, other->merge_count) + 1);
+      constant_interval_exprt(lower_bound, upper_bound));
   }
 }
 
