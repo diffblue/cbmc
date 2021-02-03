@@ -43,6 +43,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
+#include <goto-programs/string_abstraction.h>
+#include <goto-programs/string_instrumentation.h>
 #include <goto-programs/validate_goto_model.h>
 
 #include <analyses/call_stack_history.h>
@@ -884,6 +886,9 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
 
     add_malloc_may_fail_variable_initializations(goto_model);
+
+    if(options.get_bool_option("string-abstraction"))
+      string_instrumentation(goto_model);
 
     // remove function pointers
     log.status() << "Removing function pointers and virtual functions"

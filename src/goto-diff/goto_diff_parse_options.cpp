@@ -333,6 +333,9 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     add_malloc_may_fail_variable_initializations(goto_model);
 
+    if(options.get_bool_option("string-abstraction"))
+      string_instrumentation(goto_model);
+
     // remove function pointers
     log.status() << "Removal of function pointers and virtual functions"
                  << messaget::eom;
