@@ -24,6 +24,7 @@ Author: Peter Schrammel
 
 #include <langapi/language.h>
 
+#include <goto-programs/add_malloc_may_fail_variable_initializations.h>
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
@@ -329,6 +330,8 @@ bool goto_diff_parse_optionst::process_goto_program(
     link_to_library(
       goto_model, ui_message_handler, cprover_cpp_library_factory);
     link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+
+    add_malloc_may_fail_variable_initializations(goto_model);
 
     // remove function pointers
     log.status() << "Removal of function pointers and virtual functions"
