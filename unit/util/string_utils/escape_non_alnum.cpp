@@ -14,8 +14,10 @@ Author: Diffblue Ltd.
 
 #include <string>
 
+// test split into two halves to avoid a GCC warning ("variable tracking size
+// limit exceeded with -fvar-tracking-assignments, retrying without")
 TEST_CASE(
-  "escape_non_alnum should work with any single byte signed character.",
+  "escape_non_alnum should work with any single byte signed character (part 1)",
   "[core][utils][string_utils][escape_non_alnum]")
 {
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x00)}) == "_00");
@@ -147,6 +149,12 @@ TEST_CASE(
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x7D)}) == "_7d");
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x7E)}) == "_7e");
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x7F)}) == "_7f");
+}
+
+TEST_CASE(
+  "escape_non_alnum should work with any single byte signed character (part 2)",
+  "[core][utils][string_utils][escape_non_alnum]")
+{
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x80)}) == "_80");
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x81)}) == "_81");
   CHECK(escape_non_alnum(std::string{static_cast<signed char>(0x82)}) == "_82");
