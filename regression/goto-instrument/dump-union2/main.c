@@ -19,6 +19,13 @@ union U6 {
 
 union U6 g_1197 = {1L};
 
+union U4 {
+  signed f0 : 6;
+  int f3;
+};
+
+union U4 g_1408 = {-1L};
+
 int main()
 {
   assert(g_2110.f0 == 53747);
