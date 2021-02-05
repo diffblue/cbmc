@@ -20,6 +20,10 @@ and passing the resulting equation to a decision procedure.
 
 For full information see [cprover.org](http://www.cprover.org/cbmc).
 
+For an overview of the various tools that are part of CProver and
+how to use them see [TOOLS_OVERVIEW.md](TOOLS_OVERVIEW.md).
+
+
 Versions
 ========
 
