@@ -897,7 +897,8 @@ static exprt unpack_rec(
     auto bits_opt = pointer_offset_bits(src.type(), ns);
     DATA_INVARIANT(bits_opt.has_value(), "basic type should have a fixed size");
 
-    mp_integer last_bit = *bits_opt;
+    const mp_integer total_bits = *bits_opt;
+    mp_integer last_bit = total_bits;
     mp_integer bit_offset = 0;
 
     if(max_bytes.has_value())
@@ -914,7 +915,7 @@ static exprt unpack_rec(
     }
 
     auto const src_as_bitvector = typecast_exprt::conditional_cast(
-      src, bv_typet{numeric_cast_v<std::size_t>(last_bit)});
+      src, bv_typet{numeric_cast_v<std::size_t>(total_bits)});
     auto const byte_type = bv_typet{8};
     exprt::operandst byte_operands;
     for(; bit_offset < last_bit; bit_offset += 8)

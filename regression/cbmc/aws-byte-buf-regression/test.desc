@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is testing for a cbmc regression that caused an error in the aws-c-common
+repository in Jan 2021
+
+See https://github.com/diffblue/cbmc/issues/5797
