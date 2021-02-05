@@ -784,6 +784,11 @@ void value_sett::get_value_set_rec(
         get_value_set_rec(*it, dest, suffix, original_type, ns);
     }
   }
+  else if(expr.id() == ID_union)
+  {
+    get_value_set_rec(
+      to_union_expr(expr).op(), dest, suffix, original_type, ns);
+  }
   else if(expr.id()==ID_with)
   {
     const with_exprt &with_expr = to_with_expr(expr);

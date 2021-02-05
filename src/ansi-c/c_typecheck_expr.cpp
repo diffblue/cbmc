@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/floatbv_expr.h>
 #include <util/ieee_float.h>
@@ -1104,6 +1105,36 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
         expr=union_expr;
         expr.set(ID_C_lvalue, true);
         return;
+      }
+      else if(c.get_anonymous() && c.type().id() == ID_struct_tag)
+      {
+        // we also look into anonymous members as we might have wrapped a
+        // non-maximal member in such a struct
+        const struct_typet &struct_type =
+          follow_tag(to_struct_tag_type(c.type()));
+        if(
+          !struct_type.components().empty() &&
+          struct_type.components().front().type() == op.type())
+        {
+          auto nondet =
+            nondet_initializer(c.type(), expr.source_location(), *this);
+          if(!nondet.has_value())
+          {
+            error().source_location = expr.source_location();
+            error() << "cannot nondet-initialize union component of type '"
+                    << to_string(c.type()) << "'" << eom;
+            throw 0;
+          }
+          CHECK_RETURN(nondet->id() == ID_struct);
+          CHECK_RETURN(!nondet->operands().empty());
+
+          nondet->operands().front() = op;
+          union_exprt union_expr(c.get_name(), *nondet, expr.type());
+          union_expr.add_source_location() = expr.source_location();
+          expr = union_expr;
+          expr.set(ID_C_lvalue, true);
+          return;
+        }
       }
     }
 
