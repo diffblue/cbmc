@@ -913,15 +913,17 @@ static exprt unpack_rec(
       }
     }
 
+    auto const src_as_bitvector = typecast_exprt::conditional_cast(
+      src, bv_typet{numeric_cast_v<std::size_t>(last_bit)});
+    auto const byte_type = bv_typet{8};
     exprt::operandst byte_operands;
     for(; bit_offset < last_bit; bit_offset += 8)
     {
       extractbits_exprt extractbits(
-        typecast_exprt::conditional_cast(
-          src, bv_typet{numeric_cast_v<std::size_t>(last_bit)}),
+        src_as_bitvector,
         from_integer(bit_offset + 7, index_type()),
         from_integer(bit_offset, index_type()),
-        bv_typet{8});
+        byte_type);
 
       // endianness_mapt should be the point of reference for mapping out
       // endianness, but we need to work on elements here instead of
