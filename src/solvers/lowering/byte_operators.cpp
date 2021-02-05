@@ -897,27 +897,34 @@ static exprt unpack_rec(
     auto bits_opt = pointer_offset_bits(src.type(), ns);
     DATA_INVARIANT(bits_opt.has_value(), "basic type should have a fixed size");
 
-    mp_integer bits = *bits_opt;
-    mp_integer i = 0;
+    const mp_integer total_bits = *bits_opt;
+    mp_integer last_bit = total_bits;
+    mp_integer bit_offset = 0;
 
     if(max_bytes.has_value())
     {
       const auto max_bits = *max_bytes * 8;
       if(little_endian)
-        bits = std::min(bits, max_bits);
+      {
+        last_bit = std::min(last_bit, max_bits);
+      }
       else
-        i = std::max(mp_integer{0}, bits - max_bits);
+      {
+        bit_offset = std::max(mp_integer{0}, last_bit - max_bits);
+      }
     }
 
+    auto const src_as_bitvector = typecast_exprt::conditional_cast(
+      src, bv_typet{numeric_cast_v<std::size_t>(total_bits)});
+    auto const byte_type = bv_typet{8};
     exprt::operandst byte_operands;
-    for(; i < bits; i += 8)
+    for(; bit_offset < last_bit; bit_offset += 8)
     {
       extractbits_exprt extractbits(
-        typecast_exprt::conditional_cast(
-          src, bv_typet{numeric_cast_v<std::size_t>(bits)}),
-        from_integer(i + 7, index_type()),
-        from_integer(i, index_type()),
-        bv_typet{8});
+        src_as_bitvector,
+        from_integer(bit_offset + 7, index_type()),
+        from_integer(bit_offset, index_type()),
+        byte_type);
 
       // endianness_mapt should be the point of reference for mapping out
       // endianness, but we need to work on elements here instead of
