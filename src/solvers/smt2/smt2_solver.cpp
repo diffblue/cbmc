@@ -307,7 +307,7 @@ void smt2_solvert::setup_commands()
         const symbol_tablet symbol_table;
         const namespacet ns(symbol_table);
         exprt e_simplified = simplify_expr(e, ns);
-        std::cout << smt2_format(e) << '\n';
+        std::cout << smt2_format(e_simplified) << '\n';
       }
     };
   }
