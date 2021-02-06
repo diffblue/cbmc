@@ -258,11 +258,20 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 abstract_object_pointert
 value_set_abstract_objectt::merge(abstract_object_pointert other) const
 {
-  auto cast_other = std::dynamic_pointer_cast<const value_set_tag>(other);
-  if(cast_other)
+  auto other_value_set = std::dynamic_pointer_cast<const value_set_tag>(other);
+  if(other_value_set)
   {
     auto union_values = values;
-    union_values.insert(cast_other->get_values());
+    union_values.insert(other_value_set->get_values());
+    return resolve_values(union_values);
+  }
+
+  auto other_value =
+    std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
+  if(other_value)
+  {
+    auto union_values = values;
+    union_values.insert(other_value);
     return resolve_values(union_values);
   }
 
