@@ -41,6 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
@@ -610,6 +611,7 @@ int goto_analyzer_parse_optionst::doit()
 
   // Perserve backwards compatability in processing
   options.set_option("partial-inline", true);
+  options.set_option("rewrite-union", false);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
@@ -919,6 +921,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_returns(goto_model);
     remove_vector(goto_model);
     remove_complex(goto_model);
+    if(options.get_bool_option("rewrite-union"))
+      rewrite_union(goto_model);
 
 #if 0
     // add generic checks

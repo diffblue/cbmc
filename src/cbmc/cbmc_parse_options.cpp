@@ -531,6 +531,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-points-to-sets", true);
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
+
+  // Options for process_goto_program
+  options.set_option("rewrite-union", true);
 }
 
 /// invoke main modules
@@ -958,7 +961,8 @@ bool cbmc_parse_optionst::process_goto_program(
   remove_returns(goto_model);
   remove_vector(goto_model);
   remove_complex(goto_model);
-  rewrite_union(goto_model);
+  if(options.get_bool_option("rewrite-union"))
+    rewrite_union(goto_model);
 
   // add generic checks
   log.status() << "Generic Property Instrumentation" << messaget::eom;
