@@ -302,6 +302,13 @@ bool goto_diff_parse_optionst::process_goto_program(
     // instrument library preconditions
     instrument_preconditions(goto_model);
 
+    // do partial inlining
+    if(options.get_bool_option("partial-inline"))
+    {
+      log.status() << "Partial Inlining" << messaget::eom;
+      goto_partial_inline(goto_model, ui_message_handler);
+    }
+
     // remove returns, gcc vectors, complex
     remove_returns(goto_model);
     remove_vector(goto_model);

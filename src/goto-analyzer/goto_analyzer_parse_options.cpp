@@ -608,6 +608,9 @@ int goto_analyzer_parse_optionst::doit()
 
   goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
+  // Perserve backwards compatability in processing
+  options.set_option("partial-inline", true);
+
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
 
@@ -906,8 +909,11 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     instrument_preconditions(goto_model);
 
     // do partial inlining
-    log.status() << "Partial Inlining" << messaget::eom;
-    goto_partial_inline(goto_model, ui_message_handler);
+    if(options.get_bool_option("partial-inline"))
+    {
+      log.status() << "Partial Inlining" << messaget::eom;
+      goto_partial_inline(goto_model, ui_message_handler);
+    }
 
     // remove returns, gcc vectors, complex
     remove_returns(goto_model);
