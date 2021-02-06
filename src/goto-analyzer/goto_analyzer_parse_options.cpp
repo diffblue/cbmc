@@ -131,24 +131,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     config.cpp.set_cpp11();
 #endif
 
-#if 0
-  // check assertions
-  if(cmdline.isset("no-assertions"))
-    options.set_option("assertions", false);
-  else
-    options.set_option("assertions", true);
-
-  // use assumptions
-  if(cmdline.isset("no-assumptions"))
-    options.set_option("assumptions", false);
-  else
-    options.set_option("assumptions", true);
-
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
-#endif
-
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 

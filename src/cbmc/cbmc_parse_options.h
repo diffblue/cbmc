@@ -53,7 +53,6 @@ class optionst;
   "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
   "(object-bits):" \
   OPT_GOTO_CHECK \
-  "(no-assertions)(no-assumptions)" \
   "(malloc-fail-assert)(malloc-fail-null)" \
   "(malloc-may-fail)" \
   OPT_XML_INTERFACE \
@@ -73,7 +72,7 @@ class optionst;
   "(drop-unused-functions)" \
   "(havoc-undefined-functions)" \
   "(property):(stop-on-fail)(trace)" \
-  "(error-label):(verbosity):(no-library)" \
+  "(verbosity):(no-library)" \
   "(nondet-static)" \
   "(version)" \
   OPT_COVER \

@@ -114,8 +114,6 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
 void cbmc_parse_optionst::set_default_options(optionst &options)
 {
   // Default true
-  options.set_option("assertions", true);
-  options.set_option("assumptions", true);
   options.set_option("built-in-assertions", true);
   options.set_option("pretty-names", true);
   options.set_option("propagation", true);
@@ -312,18 +310,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  // check assertions
-  if(cmdline.isset("no-assertions"))
-    options.set_option("assertions", false);
-
-  // use assumptions
-  if(cmdline.isset("no-assumptions"))
-    options.set_option("assumptions", false);
-
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
   if(cmdline.isset("unwinding-assertions"))
@@ -1135,9 +1121,6 @@ void cbmc_parse_optionst::help()
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
-    " --no-assertions              ignore user assertions\n"
-    " --no-assumptions             ignore user assumptions\n"
-    " --error-label label          check that label is unreachable\n"
     HELP_COVER
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     // NOLINTNEXTLINE(whitespace/line_length)
