@@ -69,7 +69,12 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     }
     else if(expr_type.id() == ID_integer)
     {
-      out << value;
+      // negative numbers need to be encoded using a unary minus expression
+      auto int_value = numeric_cast_v<mp_integer>(constant_expr);
+      if(int_value < 0)
+        out << "(- " << -int_value << ')';
+      else
+        out << int_value;
     }
     else if(expr_type.id() == ID_string)
     {
