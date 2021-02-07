@@ -910,6 +910,9 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     log.status() << "Generic Property Instrumentation" << messaget::eom;
     goto_check(options, goto_model);
 
+    // checks don't know about adjusted float expressions
+    adjust_float_expressions(goto_model);
+
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
 
