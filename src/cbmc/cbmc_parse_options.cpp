@@ -963,6 +963,12 @@ bool cbmc_parse_optionst::process_goto_program(
     string_abstraction(goto_model, log.get_message_handler());
   }
 
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
+
+  // add loop ids
+  goto_model.goto_functions.compute_loop_numbers();
+
   // ignore default/user-specified initialization
   // of variables with static lifetime
   if(options.get_bool_option("nondet-static"))
@@ -976,12 +982,6 @@ bool cbmc_parse_optionst::process_goto_program(
   // add failed symbols
   // needs to be done before pointer analysis
   add_failed_symbols(goto_model.symbol_table);
-
-  // recalculate numbers, etc.
-  goto_model.goto_functions.update();
-
-  // add loop ids
-  goto_model.goto_functions.compute_loop_numbers();
 
   if(options.get_bool_option("drop-unused-functions"))
   {
