@@ -957,6 +957,12 @@ bool cbmc_parse_optionst::process_goto_program(
   // checks don't know about adjusted float expressions
   adjust_float_expressions(goto_model);
 
+  if(options.get_bool_option("string-abstraction"))
+  {
+    log.status() << "String Abstraction" << messaget::eom;
+    string_abstraction(goto_model, log.get_message_handler());
+  }
+
   // ignore default/user-specified initialization
   // of variables with static lifetime
   if(options.get_bool_option("nondet-static"))
@@ -965,12 +971,6 @@ bool cbmc_parse_optionst::process_goto_program(
                     "of static/global variables"
                  << messaget::eom;
     nondet_static(goto_model);
-  }
-
-  if(options.get_bool_option("string-abstraction"))
-  {
-    log.status() << "String Abstraction" << messaget::eom;
-    string_abstraction(goto_model, log.get_message_handler());
   }
 
   // add failed symbols
