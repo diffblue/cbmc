@@ -216,7 +216,7 @@ given as a command line argument:
 cbmc binsearch.c --function binsearch --unwind 6 --bounds-check --unwinding-assertions
 ```
 
-CBMC verifies that verifies the array accesses are within the bounds;
+CBMC verifies that the array accesses are within the bounds;
 note that this actually depends on the result of the right shift. In
 addition, as CBMC is given the option `--unwinding-assertions`, it also
 checks that enough unwinding is done, i.e., it proves a run-time bound.
