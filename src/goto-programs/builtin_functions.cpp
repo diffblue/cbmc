@@ -610,6 +610,32 @@ exprt make_va_list(const exprt &expr)
   return result;
 }
 
+void goto_convertt::do_enum_is_in_range(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  PRECONDITION(arguments.size() == 1);
+  const auto enum_expr = arguments.front();
+  const auto enum_type =
+    type_try_dynamic_cast<c_enum_tag_typet>(enum_expr.type());
+  PRECONDITION(enum_type);
+  const c_enum_typet &c_enum_type = ns.follow_tag(*enum_type);
+  const c_enum_typet::memberst enum_values = c_enum_type.members();
+
+  exprt::operandst disjuncts;
+  for(const auto &enum_value : enum_values)
+  {
+    constant_exprt val{enum_value.get_value(), *enum_type};
+    disjuncts.push_back(equal_exprt(enum_expr, std::move(val)));
+  }
+
+  code_assignt assignment(lhs, disjunction(disjuncts));
+  assignment.add_source_location() = function.source_location();
+  copy(assignment, ASSIGN, dest);
+}
+
 /// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
@@ -733,6 +759,10 @@ void goto_convertt::do_function_call_symbol(
       error() << identifier << " expected not to have LHS" << eom;
       throw 0;
     }
+  }
+  else if(identifier == CPROVER_PREFIX "enum_is_in_range")
+  {
+    do_enum_is_in_range(lhs, function, arguments, dest);
   }
   else if(
     identifier == CPROVER_PREFIX "assert" ||
