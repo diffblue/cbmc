@@ -1,0 +1,12 @@
+CORE
+enum_test10.c
+
+^EXIT=(6|70)$
+^SIGNAL=0$
+^file enum_test10.c line \d+ function main: __CPROVER_enum_is_in_range expects enum, but \(i\) has type `signed int`$
+--
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(i\): SUCCESS$
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(i\): FAILURE$
+^\*\*\*\* WARNING: no body for function __CPROVER_enum_is_in_range$
+--
+This test the type checking of argument for __CPROVER_enum_is_in_range

@@ -1,0 +1,11 @@
+CORE
+enum_test3.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(ev1\): SUCCESS
+--
+^\*\*\*\* WARNING: no body for function __CPROVER_enum_is_in_range
+--
+This test is for the enum_is_in_range working properly, the negation
+is if the function is not defined.

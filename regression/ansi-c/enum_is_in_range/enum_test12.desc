@@ -1,0 +1,12 @@
+CORE
+enum_test12.c
+
+^EXIT=(6|70)$
+^SIGNAL=0$
+^file enum_test12.c line \d+ function main: __CPROVER_enum_is_in_range takes exactly 1 argument, but 2 were provided$
+--
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(.*\): SUCCESS$
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(.*\): FAILURE$
+^\*\*\*\* WARNING: no body for function __CPROVER_enum_is_in_range$
+--
+This test the type checking of argument for __CPROVER_enum_is_in_range
