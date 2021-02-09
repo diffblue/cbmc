@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Procedure-local variables must be copied into a newly created thread, and must
+not be lost when merging goto states.
