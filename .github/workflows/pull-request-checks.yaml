@@ -385,3 +385,34 @@ jobs:
           docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc jbmc --classpath /mnt/smoke Test
       - name: Smoke test goto-analyzer
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-analyzer /mnt/smoke/test.goto --unreachable-functions
+
+  codecov-coverage-report:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Download testing and coverage dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov
+      - name: Configure CMake CBMC build with coverage instrumentation parameters
+        run: cmake -S . -Bbuild -Denable_coverage=1 -Dparallel_tests=2 -DCMAKE_CXX_COMPILER=/usr/bin/g++
+      - name: Execute CMake CBMC build
+        run: cmake --build build --target coverage -- -j2
+      - name: Collect coverage statistics
+        run: |
+          lcov --capture --directory build --output-file lcov.info
+          lcov --remove lcov.info '/usr/*' --output-file lcov.info
+      - name: Upload coverage statistics to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./lcov.info
+          fail_ci_if_error: true
+          verbose: true
