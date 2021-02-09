@@ -125,6 +125,38 @@ stored in the given arrays are equal. The function
 the array **dest**. The function **\_\_CPROVER\_array\_set** initializes
 the array **dest** with the given value.
 
+
+#### \_\_CPROVER\_enum\_is\_in\_range
+
+```C
+__CPROVER_bool __CPROVER_enum_is_in_range();
+```
+
+The function **\_\_CPROVER\_enum\_is\_in\_range** is used to check
+that an enumeration has one of the defined enumeration values. In
+the following example `__CPROVER_enum_is_in_range(ev1)` will return
+true and the assertion will pass
+```C
+enum my_enum { first, second };
+
+int main()
+{
+  enum my_enum ev1 = second;
+  assert(__CPROVER_enum_is_in_range(ev1));
+}
+```
+However, in the example below the assertion will fail
+```C
+enum my_enum { first, second };
+
+int main()
+{
+  enum my_enum ev1 = second + 1;
+  assert(__CPROVER_enum_is_in_range(ev1));
+}
+```
+
+
 #### Uninterpreted Functions
 
 Uninterpreted functions are documented [here](./modeling-nondeterminism.md)).
