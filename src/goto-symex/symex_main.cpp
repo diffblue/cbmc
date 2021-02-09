@@ -292,6 +292,7 @@ switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
   // get new PC
   state.source.thread_nr = thread_nb;
   state.source.pc = state.threads[thread_nb].pc;
+  state.source.function_id = state.threads[thread_nb].function_id;
 
   state.guard = state.threads[thread_nb].guard;
   // A thread's initial state is certainly reachable:
