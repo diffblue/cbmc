@@ -45,6 +45,7 @@ void goto_symext::symex_start_thread(statet &state)
   // statet::threadt &cur_thread=state.threads[state.source.thread_nr];
   statet::threadt &new_thread=state.threads.back();
   new_thread.pc=thread_target;
+  new_thread.function_id = state.source.function_id;
   new_thread.guard=state.guard;
   new_thread.call_stack.push_back(state.call_stack().top());
   new_thread.call_stack.back().local_objects.clear();
