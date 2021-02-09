@@ -114,9 +114,27 @@ void goto_symext::symex_assign(
         return;
     }
 
+    // We may end up reading (and writing) all components of an object composed
+    // of multiple fields. In such cases, we must do so atomically to avoid
+    // overwriting components modified by another thread. Note that this also
+    // implies multiple shared reads on the rhs being treated as atomic.
+    const bool maybe_divisible =
+      lhs.id() == ID_index ||
+      (is_ssa_expr(lhs) &&
+       state.field_sensitivity.is_divisible(to_ssa_expr(lhs)));
+    const bool need_atomic_section = maybe_divisible &&
+                                     state.threads.size() > 1 &&
+                                     state.atomic_section_id == 0;
+
+    if(need_atomic_section)
+      symex_atomic_begin(state);
+
     exprt::operandst lhs_if_then_else_conditions;
     symex_assign.assign_rec(
       lhs, expr_skeletont{}, rhs, lhs_if_then_else_conditions);
+
+    if(need_atomic_section)
+      symex_atomic_end(state);
   }
 }
 
