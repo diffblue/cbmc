@@ -1,0 +1,11 @@
+CORE test-c++-front-end
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+assignment 'assign_shl' not defined for types 'signed int \*' and 'unsigned (long (long )?)?int'
+^CONVERSION ERROR$
+--
+EXIT=0
+--
+This test must not pass as shifts involving pointers should not be permitted.
