@@ -47,6 +47,13 @@ int main()
   assert(z.members[2]==~x.members[2]);
   assert(z.members[3]==~x.members[3]);
 
+  z = x;
+  z.v <<= (v4si){1, 2, 3, 4};
+  assert(z.members[0] == (x.members[0] << 1));
+  assert(z.members[1] == (x.members[1] << 2));
+  assert(z.members[2] == (x.members[2] << 3));
+  assert(z.members[3] == (x.members[3] << 4));
+
   // vector operator scalar
   z=x;
   z.v=z.v+1;
@@ -54,6 +61,41 @@ int main()
   assert(z.members[1]==x.members[1]+1);
   assert(z.members[2]==x.members[2]+1);
   assert(z.members[3]==x.members[3]+1);
+
+  z = x;
+  z.v += 1;
+  assert(z.members[0] == x.members[0] + 1);
+  assert(z.members[1] == x.members[1] + 1);
+  assert(z.members[2] == x.members[2] + 1);
+  assert(z.members[3] == x.members[3] + 1);
+
+  z = x;
+  z.v = z.v & 1;
+  assert(z.members[0] == (x.members[0] & 1));
+  assert(z.members[1] == (x.members[1] & 1));
+  assert(z.members[2] == (x.members[2] & 1));
+  assert(z.members[3] == (x.members[3] & 1));
+
+  z = x;
+  z.v &= 1;
+  assert(z.members[0] == (x.members[0] & 1));
+  assert(z.members[1] == (x.members[1] & 1));
+  assert(z.members[2] == (x.members[2] & 1));
+  assert(z.members[3] == (x.members[3] & 1));
+
+  z = x;
+  z.v = z.v << 2;
+  assert(z.members[0] == (x.members[0] << 2));
+  assert(z.members[1] == (x.members[1] << 2));
+  assert(z.members[2] == (x.members[2] << 2));
+  assert(z.members[3] == (x.members[3] << 2));
+
+  z = x;
+  z.v <<= 2;
+  assert(z.members[0] == (x.members[0] << 2));
+  assert(z.members[1] == (x.members[1] << 2));
+  assert(z.members[2] == (x.members[2] << 2));
+  assert(z.members[3] == (x.members[3] << 2));
 
   // unary operators on vectors
   z=x;

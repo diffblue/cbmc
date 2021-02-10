@@ -25,11 +25,14 @@ static bool have_to_remove_vector(const exprt &expr)
 {
   if(expr.type().id()==ID_vector)
   {
-    if(expr.id()==ID_plus || expr.id()==ID_minus ||
-       expr.id()==ID_mult || expr.id()==ID_div ||
-       expr.id()==ID_mod  || expr.id()==ID_bitxor ||
-       expr.id()==ID_bitand || expr.id()==ID_bitor)
+    if(
+      expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
+      expr.id() == ID_div || expr.id() == ID_mod || expr.id() == ID_bitxor ||
+      expr.id() == ID_bitand || expr.id() == ID_bitor || expr.id() == ID_shl ||
+      expr.id() == ID_lshr || expr.id() == ID_ashr)
+    {
       return true;
+    }
     else if(expr.id()==ID_unary_minus || expr.id()==ID_bitnot)
       return true;
     else if(expr.id()==ID_vector)
@@ -77,10 +80,11 @@ static void remove_vector(exprt &expr)
 
   if(expr.type().id()==ID_vector)
   {
-    if(expr.id()==ID_plus || expr.id()==ID_minus ||
-       expr.id()==ID_mult || expr.id()==ID_div ||
-       expr.id()==ID_mod  || expr.id()==ID_bitxor ||
-       expr.id()==ID_bitand || expr.id()==ID_bitor)
+    if(
+      expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
+      expr.id() == ID_div || expr.id() == ID_mod || expr.id() == ID_bitxor ||
+      expr.id() == ID_bitand || expr.id() == ID_bitor || expr.id() == ID_shl ||
+      expr.id() == ID_lshr || expr.id() == ID_ashr)
     {
       // FIXME plus, mult, bitxor, bitand and bitor are defined as n-ary
       //      operations rather than binary. This code assumes that they
