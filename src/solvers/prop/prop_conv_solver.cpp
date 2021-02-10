@@ -57,21 +57,6 @@ exprt prop_conv_solvert::handle(const exprt &expr)
   return literal_exprt(l);
 }
 
-bool prop_conv_solvert::literal(const symbol_exprt &expr, literalt &dest) const
-{
-  PRECONDITION(expr.type().id() == ID_bool);
-
-  const irep_idt &identifier = expr.get_identifier();
-
-  symbolst::const_iterator result = symbols.find(identifier);
-
-  if(result == symbols.end())
-    return true;
-
-  dest = result->second;
-  return false;
-}
-
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 {
   auto result =

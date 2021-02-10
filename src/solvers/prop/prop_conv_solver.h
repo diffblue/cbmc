@@ -69,9 +69,6 @@ public:
 
   void pop() override;
 
-  // get literal for expression, if available
-  bool literal(const symbol_exprt &expr, literalt &literal) const;
-
   bool use_cache = true;
   bool equality_propagation = true;
   bool freeze_all = false; // freezing variables (for incremental solving)

@@ -77,12 +77,6 @@ public:
     SUB::post_process();
   }
 
-  // get literals for variables/expressions, if available
-  virtual bool literal(
-    const exprt &expr,
-    std::size_t bit,
-    literalt &literal) const;
-
   enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
   unbounded_arrayt unbounded_array;
 
