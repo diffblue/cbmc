@@ -88,12 +88,12 @@ public:
 
     const irep_idt &get_base_name() const
     {
-      return get(ID_base_name);
+      return get(ID_C_base_name);
     }
 
     void set_base_name(const irep_idt &base_name)
     {
-      return set(ID_base_name, base_name);
+      return set(ID_C_base_name, base_name);
     }
 
     const irep_idt &get_access() const
@@ -108,12 +108,12 @@ public:
 
     const irep_idt &get_pretty_name() const
     {
-      return get(ID_pretty_name);
+      return get(ID_C_pretty_name);
     }
 
     void set_pretty_name(const irep_idt &name)
     {
-      return set(ID_pretty_name, name);
+      return set(ID_C_pretty_name, name);
     }
 
     bool get_anonymous() const
