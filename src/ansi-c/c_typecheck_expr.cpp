@@ -3360,6 +3360,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
     is_number(o_type1))
   {
     // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
+    op1 = typecast_exprt(op1, o_type0);
     expr.type()=op0.type();
     return;
   }
@@ -3586,6 +3587,21 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   else if(statement==ID_assign_shl ||
           statement==ID_assign_shr)
   {
+    if(o_type0.id() == ID_vector)
+    {
+      if(
+        o_type1.id() == ID_vector && o_type0.subtype() == o_type1.subtype() &&
+        is_number(o_type0.subtype()))
+      {
+        return;
+      }
+      else if(is_number(o_type0.subtype()) && is_number(o_type1))
+      {
+        op1 = typecast_exprt(op1, o_type0);
+        return;
+      }
+    }
+
     implicit_typecast_arithmetic(op0);
     implicit_typecast_arithmetic(op1);
 
@@ -3650,6 +3666,16 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
         return;
       }
     }
+    else if(
+      o_type0.id() == ID_vector &&
+      (o_type1.id() == ID_bool || o_type1.id() == ID_c_bool ||
+       o_type1.id() == ID_c_enum_tag || o_type1.id() == ID_unsignedbv ||
+       o_type1.id() == ID_signedbv))
+    {
+      implicit_typecast_arithmetic(op1);
+      op1 = typecast_exprt(op1, o_type0);
+      return;
+    }
   }
   else
   {
@@ -3667,6 +3693,18 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
            to_vector_type(o_type0), to_vector_type(o_type1)))
       {
         op1 = typecast_exprt::conditional_cast(op1, o_type0);
+        return;
+      }
+    }
+    else if(o_type0.id() == ID_vector)
+    {
+      implicit_typecast_arithmetic(op1);
+
+      if(
+        is_number(op1.type()) || op1.type().id() == ID_bool ||
+        op1.type().id() == ID_c_bool || op1.type().id() == ID_c_enum_tag)
+      {
+        op1 = typecast_exprt(op1, o_type0);
         return;
       }
     }
