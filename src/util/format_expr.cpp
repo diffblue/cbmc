@@ -217,81 +217,145 @@ std::ostream &fallback_format_rec(std::ostream &os, const exprt &expr)
   return os;
 }
 
-// The below generates a string in a generic syntax
+class format_expr_configt
+{
+public:
+  format_expr_configt()
+  {
+    setup();
+  }
+
+  using formattert =
+    std::function<std::ostream &(std::ostream &, const exprt &)>;
+  using expr_mapt = std::unordered_map<irep_idt, formattert>;
+
+  expr_mapt expr_map;
+
+  /// find the formatter for a given expression
+  const formattert &find_formatter(const exprt &);
+
+private:
+  /// setup the expressions we can format
+  void setup();
+
+  formattert fallback;
+};
+
+// The below generates textual output in a generic syntax
 // that is inspired by C/C++/Java, and is meant for debugging
 // purposes.
-std::ostream &format_rec(std::ostream &os, const exprt &expr)
+void format_expr_configt::setup()
 {
-  const auto &id = expr.id();
-
-  if(
-    id == ID_plus || id == ID_mult || id == ID_and || id == ID_or ||
-    id == ID_xor)
-  {
+  auto multi_ary_expr =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_multi_ary_expr(expr));
-  }
-  else if(
-    id == ID_lt || id == ID_gt || id == ID_ge || id == ID_le || id == ID_div ||
-    id == ID_minus || id == ID_implies || id == ID_equal || id == ID_notequal)
-  {
+  };
+
+  expr_map[ID_plus] = multi_ary_expr;
+  expr_map[ID_mult] = multi_ary_expr;
+  expr_map[ID_and] = multi_ary_expr;
+  expr_map[ID_or] = multi_ary_expr;
+  expr_map[ID_xor] = multi_ary_expr;
+
+  auto binary_expr = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_binary_expr(expr));
-  }
-  else if(id == ID_not || id == ID_unary_minus)
+  };
+
+  expr_map[ID_lt] = binary_expr;
+  expr_map[ID_gt] = binary_expr;
+  expr_map[ID_ge] = binary_expr;
+  expr_map[ID_le] = binary_expr;
+  expr_map[ID_div] = binary_expr;
+  expr_map[ID_minus] = binary_expr;
+  expr_map[ID_implies] = binary_expr;
+  expr_map[ID_equal] = binary_expr;
+  expr_map[ID_notequal] = binary_expr;
+
+  auto unary_expr = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_unary_expr(expr));
-  else if(id == ID_constant)
+  };
+
+  expr_map[ID_not] = unary_expr;
+  expr_map[ID_unary_minus] = unary_expr;
+
+  expr_map[ID_constant] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_constant_expr(expr));
-  else if(id == ID_typecast)
+  };
+
+  expr_map[ID_typecast] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << "cast(" << format(to_typecast_expr(expr).op()) << ", "
               << format(expr.type()) << ')';
-  else if(
-    id == ID_byte_extract_little_endian || id == ID_byte_extract_big_endian)
-  {
+  };
+
+  auto byte_extract =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &byte_extract_expr = to_byte_extract_expr(expr);
-    return os << id << '(' << format(byte_extract_expr.op()) << ", "
+    return os << expr.id() << '(' << format(byte_extract_expr.op()) << ", "
               << format(byte_extract_expr.offset()) << ", "
               << format(byte_extract_expr.type()) << ')';
-  }
-  else if(id == ID_byte_update_little_endian || id == ID_byte_update_big_endian)
-  {
+  };
+
+  expr_map[ID_byte_extract_little_endian] = byte_extract;
+  expr_map[ID_byte_extract_big_endian] = byte_extract;
+
+  auto byte_update = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &byte_update_expr = to_byte_update_expr(expr);
-    return os << id << '(' << format(byte_update_expr.op()) << ", "
+    return os << expr.id() << '(' << format(byte_update_expr.op()) << ", "
               << format(byte_update_expr.offset()) << ", "
               << format(byte_update_expr.value()) << ", "
               << format(byte_update_expr.type()) << ')';
-  }
-  else if(id == ID_member)
+  };
+
+  expr_map[ID_byte_update_little_endian] = byte_update;
+  expr_map[ID_byte_update_big_endian] = byte_update;
+
+  expr_map[ID_member] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << format(to_member_expr(expr).op()) << '.'
               << to_member_expr(expr).get_component_name();
-  else if(id == ID_symbol)
+  };
+
+  expr_map[ID_symbol] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << to_symbol_expr(expr).get_identifier();
-  else if(id == ID_index)
-  {
+  };
+
+  expr_map[ID_index] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &index_expr = to_index_expr(expr);
     return os << format(index_expr.array()) << '[' << format(index_expr.index())
               << ']';
-  }
-  else if(id == ID_type)
+  };
+
+  expr_map[ID_type] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, expr.type());
-  else if(id == ID_forall)
-  {
+  };
+
+  expr_map[ID_forall] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << u8"\u2200 " << format(to_quantifier_expr(expr).symbol())
               << " : " << format(to_quantifier_expr(expr).symbol().type())
               << " . " << format(to_quantifier_expr(expr).where());
-  }
-  else if(id == ID_exists)
-  {
+  };
+
+  expr_map[ID_exists] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << u8"\u2203 " << format(to_quantifier_expr(expr).symbol())
               << " : " << format(to_quantifier_expr(expr).symbol().type())
               << " . " << format(to_quantifier_expr(expr).where());
-  }
-  else if(id == ID_let)
-  {
+  };
+
+  expr_map[ID_let] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << "LET " << format(to_let_expr(expr).symbol()) << " = "
               << format(to_let_expr(expr).value()) << " IN "
               << format(to_let_expr(expr).where());
-  }
-  else if(id == ID_lambda)
-  {
+  };
+
+  expr_map[ID_lambda] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &lambda_expr = to_lambda_expr(expr);
 
     os << u8"\u03bb ";
@@ -309,9 +373,9 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     }
 
     return os << " . " << format(lambda_expr.where());
-  }
-  else if(id == ID_array || id == ID_struct)
-  {
+  };
+
+  auto compound = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     os << "{ ";
 
     bool first = true;
@@ -327,16 +391,20 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     }
 
     return os << " }";
-  }
-  else if(id == ID_if)
-  {
+  };
+
+  expr_map[ID_array] = compound;
+  expr_map[ID_struct] = compound;
+
+  expr_map[ID_if] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &if_expr = to_if_expr(expr);
     return os << '(' << format(if_expr.cond()) << " ? "
               << format(if_expr.true_case()) << " : "
               << format(if_expr.false_case()) << ')';
-  }
-  else if(id == ID_code)
-  {
+  };
+
+  expr_map[ID_code] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &code = to_code(expr);
     const irep_idt &statement = code.get_statement();
 
@@ -377,7 +445,27 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     }
     else
       return fallback_format_rec(os, expr);
-  }
-  else
+  };
+
+  fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return fallback_format_rec(os, expr);
+  };
+}
+
+const format_expr_configt::formattert &
+format_expr_configt::find_formatter(const exprt &expr)
+{
+  auto m_it = expr_map.find(expr.id());
+  if(m_it == expr_map.end())
+    return fallback;
+  else
+    return m_it->second;
+}
+
+format_expr_configt format_expr_config;
+
+std::ostream &format_rec(std::ostream &os, const exprt &expr)
+{
+  auto &formatter = format_expr_config.find_formatter(expr);
+  return formatter(os, expr);
 }
