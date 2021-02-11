@@ -1450,7 +1450,8 @@ void dump_ct::cleanup_expr(exprt &expr)
                                         ID_initializer_list,
                                         std::move(designated_initializer2)};
           expr.swap(initializer_list);
-          break;
+
+          return;
         }
       }
     }
@@ -1467,11 +1468,13 @@ void dump_ct::cleanup_expr(exprt &expr)
         {
           union_exprt union_expr{comp.get_name(), bu.value(), bu.op().type()};
           expr.swap(union_expr);
-          break;
+
+          return;
         }
       }
     }
-    else if(
+
+    if(
       ns.follow(bu.type()).id() == ID_union &&
       bu.source_location().get_function().empty() &&
       bu.op() == zero_initializer(bu.op().type(), source_locationt{}, ns)
@@ -1485,9 +1488,14 @@ void dump_ct::cleanup_expr(exprt &expr)
         {
           union_exprt union_expr{comp.get_name(), bu.value(), bu.type()};
           expr.swap(union_expr);
-          break;
+
+          return;
         }
       }
+
+      // we still haven't found a suitable component, so just ignore types and
+      // build an initializer list without designators
+      expr = unary_exprt{ID_initializer_list, bu.value()};
     }
   }
 }
