@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---harness-type initialise-with-memory-snapshot --memory-snapshot snapshot.json --initial-goto-location main:0
+harness.gb --harness-type initialise-with-memory-snapshot --memory-snapshot snapshot.json --initial-goto-location main:0
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

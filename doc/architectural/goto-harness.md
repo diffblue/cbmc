@@ -20,7 +20,7 @@ $ goto-cc program.c -o program.gb
 # Run goto-harness to produce harness file
 $ goto-harness --harness-type call-function --harness-function-name generated_harness_test_function --function test_function program.gb harness.c
 # Run the checks targetting the generated harness
-$ cbmc --pointer-check harness.c --function generated_harness_test_function
+$ cbmc --pointer-check harness.c program.c --function generated_harness_test_function
 ```
 
 ## Detailed Usage
@@ -32,11 +32,9 @@ without having any information about the program state.
 * The `memory-snapshot` harness, which loads an existing program state (in form
 of a JSON file) and selectively _havoc-ing_ some variables.
 
-**NOTE**: Due to a [bug](https://github.com/diffblue/cbmc/issues/5351), the
-`memory-snapshot` harness is currently inoperable. We are working to fix this.
-
-It is used similarly to how `goto-instrument` is used by modifying an existing
-GOTO binary, as produced by `goto-cc`.
+The harness generator can either produce the harness (i.e., the function
+environment) as C code, or a full GOTO binary. C code is generated when the
+output file name ends in ".c".
 
 ### The function call harness generator
 
@@ -363,12 +361,6 @@ VERIFICATION SUCCESSFUL
 ```
 
 ## The memory snapshot harness
-
-***NOTE:*** The memory snapshot harness is temporarily inoperable because of
-a bug that occured when we changed the implementation of `goto-harness` to
-produce C files instead of `goto` binaries. The bug is being tracked
-[here](https://github.com/diffblue/cbmc/issues/5351). We are sorry for the
-inconvenience, and hope to get it back to working properly soon.
 
 The `function-call` harness is used in situations in which we want to analyze a
 function in an arbitrary environment. If we want to analyze a function starting

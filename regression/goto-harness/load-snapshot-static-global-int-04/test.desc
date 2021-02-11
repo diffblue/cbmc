@@ -1,10 +1,8 @@
-KNOWNBUG
+CORE
 main.c
---harness-type initialise-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-int-x-1-snapshot.json --initial-goto-location main:1
+harness.gb --harness-type initialise-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-int-x-1-snapshot.json --initial-goto-location main:1
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL
 --
 ^warning: ignoring
---
-More information can be found in github#5351.
