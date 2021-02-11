@@ -37,14 +37,13 @@ static void EXPECT(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values);
 
+static void
+EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result);
+
 static void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
-  const std::vector<exprt> &expected_values)
-{
-  CHECK_FALSE(modified);
-  EXPECT(result, expected_values);
-}
+  const std::vector<exprt> &expected_values);
 
 SCENARIO(
   "merging two value_set_abstract_objects",
@@ -214,6 +213,76 @@ SCENARIO(
   }
 }
 
+SCENARIO(
+  "merging a value_set with a TOP value",
+  "[core][analyses][variable-sensitivity][value_set_abstract_object][merge]")
+{
+  GIVEN("A value set and a TOP constant")
+  {
+    const exprt val1 = from_integer(1, integer_typet());
+    const exprt val2 = from_integer(2, integer_typet());
+
+    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+      vsd_configt::value_set());
+    auto environment = abstract_environmentt{object_factory};
+    environment.make_top();
+    auto symbol_table = symbol_tablet{};
+    auto ns = namespacet{symbol_table};
+
+    WHEN("merging { 1, 2 } with TOP constant")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op2 = std::make_shared<constant_abstract_valuet>(val1.type());
+      REQUIRE(op2->is_top());
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      auto value_set_result = as_value_set(result);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(value_set_result);
+      }
+    }
+
+    WHEN("merging { 1, 2 } with TOP interval")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op2 =
+        std::make_shared<interval_abstract_valuet>(unsignedbv_typet(32));
+      REQUIRE(op2->is_top());
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      auto value_set_result = as_value_set(result);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(value_set_result);
+      }
+    }
+
+    WHEN("merging { 1, 2 } with TOP value-set")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op2 = std::make_shared<value_set_abstract_objectt>(val1.type());
+      REQUIRE(op2->is_top());
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      auto value_set_result = as_value_set(result);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(value_set_result);
+      }
+    }
+  }
+}
+
 static std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
 {
@@ -255,7 +324,7 @@ static bool set_contains(const abstract_object_sett &set, const exprt &val)
   return i != set.end();
 }
 
-std::string expr_to_str(const exprt &expr)
+static std::string expr_to_str(const exprt &expr)
 {
   auto st = symbol_tablet{};
   auto ns = namespacet{st};
@@ -285,4 +354,25 @@ static void EXPECT(
     INFO("Expect result to include " + expr_to_str(ev));
     REQUIRE(set_contains(values, ev));
   }
+}
+
+static void EXPECT_UNMODIFIED(
+  std::shared_ptr<const value_set_abstract_objectt> &result,
+  bool modified,
+  const std::vector<exprt> &expected_values)
+{
+  CHECK_FALSE(modified);
+  EXPECT(result, expected_values);
+}
+
+static void
+EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result)
+{
+  REQUIRE(result);
+
+  REQUIRE(result->is_top());
+  REQUIRE_FALSE(result->is_bottom());
+
+  auto values = result->get_values();
+  REQUIRE(values.empty());
 }

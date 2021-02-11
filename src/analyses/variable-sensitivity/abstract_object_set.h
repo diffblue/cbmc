@@ -67,6 +67,11 @@ public:
     return values == rhs.values;
   }
 
+  void clear()
+  {
+    values.clear();
+  }
+
   void
   output(std::ostream &out, const ai_baset &ai, const namespacet &ns) const;
 

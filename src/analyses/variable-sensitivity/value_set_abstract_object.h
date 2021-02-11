@@ -118,6 +118,11 @@ private:
   /// \return the interval-abstract-object containing \p other_values
   abstract_object_pointert
   to_interval(const abstract_object_sett &other_values) const;
+
+  virtual void set_top_internal()
+  {
+    values.clear();
+  }
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
