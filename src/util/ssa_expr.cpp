@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
-#include "arith_tools.h"
 #include "pointer_expr.h"
 
 /// If \p expr is:
@@ -29,8 +28,7 @@ initialize_ssa_identifier(std::ostream &os, const exprt &expr)
   }
   if(auto index = expr_try_dynamic_cast<index_exprt>(expr))
   {
-    const auto idx =
-      numeric_cast_v<mp_integer>(to_constant_expr(index->index()));
+    const irep_idt &idx = to_constant_expr(index->index()).get_value();
     return initialize_ssa_identifier(os, index->array()) << "[[" << idx << "]]";
   }
   if(auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
@@ -77,8 +75,7 @@ static void build_ssa_identifier_rec(
 
     build_ssa_identifier_rec(index.array(), l0, l1, l2, os, l1_object_os);
 
-    const mp_integer idx =
-      numeric_cast_v<mp_integer>(to_constant_expr(index.index()));
+    const irep_idt &idx = to_constant_expr(index.index()).get_value();
     os << "[[" << idx << "]]";
     l1_object_os << "[[" << idx << "]]";
   }
