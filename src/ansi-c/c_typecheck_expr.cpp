@@ -3605,7 +3605,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     implicit_typecast_arithmetic(op0);
     implicit_typecast_arithmetic(op1);
 
-    if(is_number(op1.type()))
+    if(is_number(op0.type()) && is_number(op1.type()))
     {
       if(statement==ID_assign_shl)
       {
