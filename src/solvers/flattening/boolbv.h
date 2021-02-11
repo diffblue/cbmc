@@ -49,7 +49,7 @@ public:
       boolbv_width(_ns),
       bv_utils(_prop),
       functions(*this),
-      map(_prop, boolbv_width)
+      map(_prop)
   {
   }
 
@@ -230,7 +230,6 @@ protected:
   virtual exprt bv_get_rec(
     const exprt &expr,
     const bvt &bv,
-    const std::vector<bool> &unknown,
     std::size_t offset,
     const typet &type) const;
 

@@ -300,31 +300,20 @@ bvt boolbvt::convert_symbol(const exprt &expr)
   const typet &type=expr.type();
   std::size_t width=boolbv_width(type);
 
-  bvt bv;
-  bv.resize(width);
-
   const irep_idt &identifier = expr.get(ID_identifier);
   CHECK_RETURN(!identifier.empty());
 
-  if(width==0)
-  {
-    // just put in map
-    map.get_map_entry(identifier, type);
-  }
-  else
-  {
-    map.get_literals(identifier, type, width, bv);
+  bvt bv = map.get_literals(identifier, type, width);
 
-    INVARIANT_WITH_DIAGNOSTICS(
-      std::all_of(
-        bv.begin(),
-        bv.end(),
-        [this](const literalt &l) {
-          return l.var_no() < prop.no_variables() || l.is_constant();
-        }),
-      "variable number of non-constant literals should be within bounds",
-      id2string(identifier));
-  }
+  INVARIANT_WITH_DIAGNOSTICS(
+    std::all_of(
+      bv.begin(),
+      bv.end(),
+      [this](const literalt &l) {
+        return l.var_no() < prop.no_variables() || l.is_constant();
+      }),
+    "variable number of non-constant literals should be within bounds",
+    id2string(identifier));
 
   return bv;
 }
@@ -575,8 +564,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
 void boolbvt::print_assignment(std::ostream &out) const
 {
   arrayst::print_assignment(out);
-  for(const auto &pair : map.mapping)
-    out << pair.first << "=" << pair.second.get_value(prop) << '\n';
+  map.show(out);
 }
 
 boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)

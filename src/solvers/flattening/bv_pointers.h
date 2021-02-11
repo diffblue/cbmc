@@ -46,7 +46,6 @@ protected:
   exprt bv_get_rec(
     const exprt &expr,
     const bvt &bv,
-    const std::vector<bool> &unknown,
     std::size_t offset,
     const typet &type) const override;
 
