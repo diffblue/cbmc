@@ -616,6 +616,11 @@ format_expr_configt::find_formatter(const exprt &expr)
 
 format_expr_configt format_expr_config;
 
+void add_format_hook(irep_idt id, format_expr_configt::formattert formatter)
+{
+  format_expr_config.expr_map[id] = std::move(formatter);
+}
+
 std::ostream &format_rec(std::ostream &os, const exprt &expr)
 {
   auto &formatter = format_expr_config.find_formatter(expr);

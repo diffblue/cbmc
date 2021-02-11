@@ -135,6 +135,7 @@ SRC += analyses/ai/ai.cpp \
        util/expr_iterator.cpp \
        util/file_util.cpp \
        util/format.cpp \
+       util/format_expr.cpp \
        util/format_number_range.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
