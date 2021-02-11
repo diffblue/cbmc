@@ -16,6 +16,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
+          sudo apt-get update
           sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake
       - name: Prepare ccache
         uses: actions/cache@v2
@@ -70,6 +71,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
+          sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen
       - name: Prepare ccache
         uses: actions/cache@v2
@@ -232,6 +234,7 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
+          sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang-format-7
       - name: Check updated lines of code match clang-format-7 style
         env:
@@ -313,7 +316,9 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+        run: | 
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -365,7 +370,9 @@ jobs:
         with:
           submodules: recursive
       - name: Download test dependencies
-        run: sudo apt install openjdk-11-jdk-headless
+        run: |
+          sudo apt update
+          sudo apt install openjdk-11-jdk-headless
       - name: Build docker image
         run: docker build -t cbmc .
       - name: Smoke test goto-cc
