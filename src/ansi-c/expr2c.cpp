@@ -1550,13 +1550,13 @@ std::string expr2ct::convert_member(
 
   if(!component_name.empty())
   {
-    const exprt &comp_expr = struct_union_type.get_component(component_name);
+    const auto &comp_expr = struct_union_type.get_component(component_name);
 
     if(comp_expr.is_nil())
       return convert_norep(src, precedence);
 
-    if(!comp_expr.get(ID_pretty_name).empty())
-      dest+=comp_expr.get_string(ID_pretty_name);
+    if(!comp_expr.get_pretty_name().empty())
+      dest += id2string(comp_expr.get_pretty_name());
     else
       dest+=id2string(component_name);
 
@@ -1568,9 +1568,12 @@ std::string expr2ct::convert_member(
   if(n>=struct_union_type.components().size())
     return convert_norep(src, precedence);
 
-  const exprt &comp_expr = struct_union_type.components()[n];
+  const auto &comp_expr = struct_union_type.components()[n];
 
-  dest+=comp_expr.get_string(ID_pretty_name);
+  if(!comp_expr.get_pretty_name().empty())
+    dest += id2string(comp_expr.get_pretty_name());
+  else
+    dest += id2string(comp_expr.get_name());
 
   return dest;
 }

@@ -12,7 +12,7 @@ Author: CM Wintersteiger
 #ifndef CPROVER_GOTO_PROGRAMS_WRITE_GOTO_BINARY_H
 #define CPROVER_GOTO_PROGRAMS_WRITE_GOTO_BINARY_H
 
-#define GOTO_BINARY_VERSION 5
+#define GOTO_BINARY_VERSION 6
 
 #include <iosfwd>
 #include <string>
