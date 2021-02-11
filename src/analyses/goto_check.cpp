@@ -1157,8 +1157,13 @@ void goto_checkt::pointer_overflow_check(
     expr.operands().size() == 2,
     "pointer arithmetic expected to have exactly 2 operands");
 
+  // check for address space overflow by checking for overflow on integers
   exprt overflow("overflow-" + expr.id_string(), bool_typet());
-  overflow.operands() = expr.operands();
+  for(const auto &op : expr.operands())
+  {
+    overflow.add_to_operands(
+      typecast_exprt::conditional_cast(op, pointer_diff_type()));
+  }
 
   add_guarded_property(
     not_exprt(overflow),
