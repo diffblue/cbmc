@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+Invariant check failed
+--
+This example previously failed the invariant "mp_integer should be convertible
+to target integral type".
