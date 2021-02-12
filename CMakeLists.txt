@@ -149,6 +149,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
               "$<TARGET_FILE:jbmc>"
               "$<TARGET_FILE:jdiff>"
               "$<TARGET_FILE:smt2_solver>"
+              "$<TARGET_FILE:symtab2gb>"
+              "libour_archive.a"
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
     endif()
