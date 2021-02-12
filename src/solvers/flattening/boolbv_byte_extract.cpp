@@ -121,7 +121,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
       if(offset + i < 0 || offset + i >= op_bv.size())
         bv[i]=prop.new_variable();
       else
-        bv[i] = op_bv[numeric_cast_v<std::size_t>(offset) + i];
+        bv[i] = op_bv[numeric_cast_v<std::size_t>(offset + i)];
   }
   else
   {
