@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 main.i
 --32 --little-endian
 ^EXIT=0$
@@ -6,3 +6,5 @@ main.i
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Takes around 2 minutes to run.

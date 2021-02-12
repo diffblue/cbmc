@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 
-
 #include "boolbv.h"
 #include "pointer_logic.h"
 
@@ -30,6 +29,10 @@ protected:
 
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
+
+  typedef std::map<std::size_t, bvt> pointer_bitst;
+  pointer_bitst pointer_bits;
+  bool need_address_bounds;
 
   void encode(std::size_t object, bvt &bv);
 
@@ -53,8 +56,6 @@ protected:
 
   void offset_arithmetic(bvt &bv, const mp_integer &x);
   void offset_arithmetic(bvt &bv, const mp_integer &factor, const exprt &index);
-  void offset_arithmetic(
-    bvt &bv, const mp_integer &factor, const bvt &index_bv);
 
   struct postponedt
   {
@@ -65,7 +66,30 @@ protected:
   typedef std::list<postponedt> postponed_listt;
   postponed_listt postponed_list;
 
-  void do_postponed(const postponedt &postponed);
+  void do_postponed_non_typecast(const postponedt &postponed);
+  typedef std::map<std::size_t, std::pair<bvt, bvt>> bounds_mapt;
+  void encode_object_bounds(bounds_mapt &dest);
+  void
+  do_postponed_typecast(const postponedt &postponed, const bounds_mapt &bounds);
+
+  void object_bv(bvt &bv, const pointer_typet &type) const
+  {
+    bv.resize(boolbv_width.get_object_width(type));
+  }
+
+  void offset_bv(bvt &bv, const pointer_typet &type) const
+  {
+    bv.erase(bv.begin(), bv.begin() + boolbv_width.get_object_width(type));
+    bv.resize(boolbv_width.get_offset_width(type));
+  }
+
+  void address_bv(bvt &bv, const pointer_typet &type) const
+  {
+    bv.erase(
+      bv.begin(),
+      bv.begin() + boolbv_width.get_object_width(type) +
+        boolbv_width.get_offset_width(type));
+  }
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
