@@ -18,67 +18,93 @@ class abstract_value_tag
 {
 };
 
+class index_range_implementationt;
+
+using index_range_implementation_ptrt =
+  std::unique_ptr<index_range_implementationt>;
+
+class index_range_implementationt
+{
+public:
+  virtual ~index_range_implementationt() = default;
+
+  virtual index_range_implementation_ptrt reset() const = 0;
+
+  virtual const exprt &current() const = 0;
+  virtual bool advance_to_next() = 0;
+};
+
+class index_range_iteratort
+{
+public:
+  const exprt &operator*() const
+  {
+    return range->current();
+  }
+  void operator++()
+  {
+    active = range->advance_to_next();
+  }
+  bool operator==(const index_range_iteratort &other) const
+  {
+    if(!active && !other.active)
+      return true;
+    return false;
+  }
+  bool operator!=(const index_range_iteratort &other) const
+  {
+    return !operator==(other);
+  }
+
+  index_range_iteratort(index_range_iteratort &&rhs)
+    : range(std::move(rhs.range)), active(rhs.active)
+  {
+  }
+  index_range_iteratort(const index_range_iteratort &) = delete;
+  ~index_range_iteratort() = default;
+
+private:
+  index_range_iteratort() : range(nullptr), active(false)
+  {
+  }
+  explicit index_range_iteratort(index_range_implementation_ptrt &&r)
+    : range(std::move(r)), active(true)
+  {
+    active = range->advance_to_next();
+  }
+
+  index_range_implementation_ptrt range;
+  bool active;
+
+  friend class index_ranget;
+};
+
 class index_ranget
 {
 public:
-  class iterator
+  explicit index_ranget(index_range_implementation_ptrt r) : range(r.release())
   {
-  public:
-    const exprt &operator*() const
-    {
-      return range->current();
-    }
-    void operator++()
-    {
-      active = range->advance_to_next();
-    }
-    bool operator==(const iterator &other) const
-    {
-      if(!active && !other.active)
-        return true;
-      return false;
-    }
-    bool operator!=(const iterator &other) const
-    {
-      return !operator==(other);
-    }
-
-    iterator(iterator &&rhs) : range(rhs.range), active(rhs.active)
-    {
-    }
-    iterator(const iterator &) = delete;
-    ~iterator() = default;
-
-  private:
-    iterator() : range(nullptr), active(false)
-    {
-    }
-    explicit iterator(index_ranget *r) : range(r), active(true)
-    {
-      active = range->advance_to_next();
-    }
-
-    index_ranget *range;
-    bool active;
-
-    friend class index_ranget;
-  };
-
-  virtual ~index_ranget() = default;
-  virtual const exprt &current() const = 0;
-  virtual bool advance_to_next() = 0;
-
-  iterator begin()
-  {
-    return iterator{this};
   }
-  iterator end() const
+  index_ranget(index_ranget &&rhs) : range(rhs.range.release())
+  {
+  }
+  index_ranget(const index_ranget &) = delete;
+  ~index_ranget() = default;
+
+  index_range_iteratort begin() const
+  {
+    return index_range_iteratort{range->reset()};
+  }
+  index_range_iteratort end() const
   {
     return {};
   }
+
+private:
+  index_range_implementation_ptrt range;
 };
 
-class single_value_index_ranget : public index_ranget
+class single_value_index_ranget : public index_range_implementationt
 {
 protected:
   explicit single_value_index_ranget(const exprt &val);
@@ -87,15 +113,15 @@ public:
   const exprt &current() const override;
   bool advance_to_next() override;
 
-private:
+protected:
   const exprt value;
+
+private:
   bool available;
 };
 
-using index_range_ptrt = std::shared_ptr<index_ranget>;
-
-index_range_ptrt make_empty_index_range();
-index_range_ptrt make_indeterminate_index_range();
+index_range_implementation_ptrt make_empty_index_range();
+index_range_implementation_ptrt make_indeterminate_index_range();
 
 class abstract_value_objectt : public abstract_objectt,
                                public abstract_value_tag
@@ -118,7 +144,14 @@ public:
   {
   }
 
-  virtual index_range_ptrt index_range(const namespacet &ns) const = 0;
+  virtual index_ranget index_range(const namespacet &ns) const
+  {
+    return index_ranget(range_implementation(ns));
+  }
+
+protected:
+  virtual index_range_implementation_ptrt
+  range_implementation(const namespacet &ns) const = 0;
 };
 
 #endif

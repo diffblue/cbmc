@@ -15,8 +15,12 @@
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <util/make_unique.h>
 
-class value_set_index_ranget : public index_ranget
+static index_range_implementation_ptrt
+make_value_set_index_range(const abstract_object_sett &vals);
+
+class value_set_index_ranget : public index_range_implementationt
 {
 public:
   explicit value_set_index_ranget(const abstract_object_sett &vals)
@@ -38,6 +42,10 @@ public:
     ++next;
     return true;
   }
+  index_range_implementation_ptrt reset() const override
+  {
+    return make_value_set_index_range(values);
+  }
 
 private:
   const abstract_object_sett &values;
@@ -45,9 +53,10 @@ private:
   abstract_object_sett::const_iterator next;
 };
 
-index_range_ptrt make_value_set_index_range(const abstract_object_sett &vals)
+static index_range_implementation_ptrt
+make_value_set_index_range(const abstract_object_sett &vals)
 {
-  return std::make_shared<value_set_index_ranget>(vals);
+  return util_make_unique<value_set_index_ranget>(vals);
 }
 
 exprt rewrite_expression(
@@ -138,8 +147,8 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   verify();
 }
 
-index_range_ptrt
-value_set_abstract_objectt::index_range(const namespacet &ns) const
+index_range_implementation_ptrt
+value_set_abstract_objectt::range_implementation(const namespacet &ns) const
 {
   if(values.empty())
     return make_indeterminate_index_range();

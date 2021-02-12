@@ -19,6 +19,9 @@
 #include "abstract_environment.h"
 #include "constant_abstract_value.h"
 
+static index_range_implementation_ptrt
+make_constant_index_range(const exprt &val);
+
 class constant_index_ranget : public single_value_index_ranget
 {
 public:
@@ -26,11 +29,17 @@ public:
     : single_value_index_ranget(val)
   {
   }
+
+  index_range_implementation_ptrt reset() const override
+  {
+    return make_constant_index_range(value);
+  }
 };
 
-index_range_ptrt make_constant_index_range(const exprt &val)
+static index_range_implementation_ptrt
+make_constant_index_range(const exprt &val)
 {
-  return std::make_shared<constant_index_ranget>(val);
+  return util_make_unique<constant_index_ranget>(val);
 }
 
 constant_abstract_valuet::constant_abstract_valuet(const typet &t)
@@ -54,8 +63,8 @@ constant_abstract_valuet::constant_abstract_valuet(
 {
 }
 
-index_range_ptrt
-constant_abstract_valuet::index_range(const namespacet &ns) const
+index_range_implementation_ptrt
+constant_abstract_valuet::range_implementation(const namespacet &ns) const
 {
   exprt val = to_constant();
   if(!val.is_constant())

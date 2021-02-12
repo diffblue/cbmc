@@ -10,6 +10,7 @@
 #include <ostream>
 
 #include <util/invariant.h>
+#include <util/make_unique.h>
 #include <util/std_expr.h>
 
 #include "abstract_environment.h"
@@ -17,13 +18,18 @@
 #include "context_abstract_object.h"
 #include "interval_abstract_value.h"
 
-class interval_index_ranget : public index_ranget
+static index_range_implementation_ptrt make_interval_index_range(
+  const constant_interval_exprt &interval,
+  const namespacet &n);
+
+class interval_index_ranget : public index_range_implementationt
 {
 public:
   interval_index_ranget(
-    const constant_interval_exprt &interval,
+    const constant_interval_exprt &interval_,
     const namespacet &n)
-    : index(nil_exprt()),
+    : interval(interval_),
+      index(nil_exprt()),
       next(interval.get_lower()),
       upper(interval.get_upper()),
       ns(n)
@@ -42,23 +48,29 @@ public:
       .is_true();
   }
 
+  index_range_implementation_ptrt reset() const override
+  {
+    return make_interval_index_range(interval, ns);
+  }
+
 private:
   static exprt next_element(const exprt &cur, const namespacet &ns)
   {
     return simplify_expr(plus_exprt(cur, from_integer(1, cur.type())), ns);
   }
 
+  const constant_interval_exprt &interval;
   exprt index;
   exprt next;
   exprt upper;
   const namespacet &ns;
 };
 
-static index_range_ptrt make_interval_index_range(
+static index_range_implementation_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
   const namespacet &n)
 {
-  return std::make_shared<interval_index_ranget>(interval, n);
+  return util_make_unique<interval_index_ranget>(interval, n);
 }
 
 static inline exprt look_through_casts(exprt e)
@@ -549,8 +561,8 @@ abstract_object_pointert interval_abstract_valuet::meet_intervals(
   }
 }
 
-index_range_ptrt
-interval_abstract_valuet::index_range(const namespacet &ns) const
+index_range_implementation_ptrt
+interval_abstract_valuet::range_implementation(const namespacet &ns) const
 {
   if(is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
     return make_empty_index_range();

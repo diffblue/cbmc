@@ -7,8 +7,9 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_value_object.h>
+#include <util/make_unique.h>
 
-class empty_index_ranget : public index_ranget
+class empty_index_ranget : public index_range_implementationt
 {
 public:
   const exprt &current() const override
@@ -18,6 +19,10 @@ public:
   bool advance_to_next() override
   {
     return false;
+  }
+  index_range_implementation_ptrt reset() const override
+  {
+    return make_empty_index_range();
   }
 
 private:
@@ -29,6 +34,11 @@ class indeterminate_index_ranget : public single_value_index_ranget
 public:
   indeterminate_index_ranget() : single_value_index_ranget(nil_exprt())
   {
+  }
+
+  index_range_implementation_ptrt reset() const override
+  {
+    return make_indeterminate_index_range();
   }
 };
 
@@ -49,12 +59,12 @@ bool single_value_index_ranget::advance_to_next()
   return a;
 }
 
-index_range_ptrt make_empty_index_range()
+index_range_implementation_ptrt make_empty_index_range()
 {
-  return std::make_shared<empty_index_ranget>();
+  return util_make_unique<empty_index_ranget>();
 }
 
-index_range_ptrt make_indeterminate_index_range()
+index_range_implementation_ptrt make_indeterminate_index_range()
 {
-  return std::make_shared<indeterminate_index_ranget>();
+  return util_make_unique<indeterminate_index_ranget>();
 }
