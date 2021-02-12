@@ -11,8 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/std_types.h>
 
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
@@ -21,6 +23,24 @@ boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
 
 boolbv_widtht::~boolbv_widtht()
 {
+}
+
+std::size_t boolbv_widtht::get_object_width(const pointer_typet &type) const
+{
+  return config.bv_encoding.object_bits;
+}
+
+std::size_t boolbv_widtht::get_offset_width(const pointer_typet &type) const
+{
+  const std::size_t pointer_width = type.get_width();
+  const std::size_t object_width = get_object_width(type);
+  PRECONDITION(pointer_width >= object_width);
+  return pointer_width - object_width;
+}
+
+std::size_t boolbv_widtht::get_address_width(const pointer_typet &type) const
+{
+  return type.get_width();
 }
 
 const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
@@ -182,7 +202,11 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     CHECK_RETURN(entry.total_width > 0);
   }
   else if(type_id==ID_pointer)
-    entry.total_width = type_checked_cast<pointer_typet>(type).get_width();
+  {
+    entry.total_width =
+      get_address_width(type_checked_cast<pointer_typet>(type));
+    DATA_INVARIANT(entry.total_width != 0, "pointer must have width");
+  }
   else if(type_id==ID_struct_tag)
     entry=get_entry(ns.follow_tag(to_struct_tag_type(type)));
   else if(type_id==ID_union_tag)
