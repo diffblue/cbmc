@@ -70,9 +70,15 @@ public:
 
   void get_dynamic_objects(std::vector<std::size_t> &objects) const;
 
+  bool get_null_is_zero() const
+  {
+    return null_is_zero_address;
+  }
+
 protected:
   const namespacet &ns;
   std::size_t null_object, invalid_object;
+  bool null_is_zero_address;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
