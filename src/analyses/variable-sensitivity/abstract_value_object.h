@@ -21,9 +21,61 @@ class abstract_value_tag
 class index_ranget
 {
 public:
+  class iterator
+  {
+  public:
+    const exprt &operator*() const
+    {
+      return range->current();
+    }
+    void operator++()
+    {
+      active = range->advance_to_next();
+    }
+    bool operator==(const iterator &other) const
+    {
+      if(!active && !other.active)
+        return true;
+      return false;
+    }
+    bool operator!=(const iterator &other) const
+    {
+      return !operator==(other);
+    }
+
+    iterator(iterator &&rhs) : range(rhs.range), active(rhs.active)
+    {
+    }
+    iterator(const iterator &) = delete;
+    ~iterator() = default;
+
+  private:
+    iterator() : range(nullptr), active(false)
+    {
+    }
+    explicit iterator(index_ranget *r) : range(r), active(true)
+    {
+      active = range->advance_to_next();
+    }
+
+    index_ranget *range;
+    bool active;
+
+    friend class index_ranget;
+  };
+
   virtual ~index_ranget() = default;
   virtual const exprt &current() const = 0;
   virtual bool advance_to_next() = 0;
+
+  iterator begin()
+  {
+    return iterator{this};
+  }
+  iterator end() const
+  {
+    return {};
+  }
 };
 
 class single_value_index_ranget : public index_ranget
@@ -40,7 +92,7 @@ private:
   bool available;
 };
 
-typedef std::shared_ptr<index_ranget> index_range_ptrt;
+using index_range_ptrt = std::shared_ptr<index_ranget>;
 
 index_range_ptrt make_empty_index_range();
 index_range_ptrt make_indeterminate_index_range();

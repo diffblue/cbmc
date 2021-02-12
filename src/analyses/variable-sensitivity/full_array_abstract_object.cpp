@@ -33,17 +33,17 @@ abstract_object_pointert apply_to_index_range(
                         evaluated_index->unwrap_context()))
                        ->index_range(ns);
 
-  if(!index_range->advance_to_next())
-    return nullptr;
-
   sharing_ptrt<abstract_objectt> result = nullptr;
-  do
+  for(const auto &index : *index_range)
   {
-    auto at_index = fn(index_exprt(index_expr.array(), index_range->current()));
+    auto at_index = fn(index_exprt(index_expr.array(), index));
 
     result = (result == nullptr) ? at_index
                                  : abstract_objectt::merge(result, at_index);
-  } while(!result->is_top() && index_range->advance_to_next());
+
+    if(result->is_top()) // no point in continuing once we've gone top
+      break;
+  }
   return result;
 }
 

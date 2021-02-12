@@ -41,6 +41,18 @@ SCENARIO(
 
       REQUIRE(range->advance_to_next() == false);
     }
+    THEN("iterator has a single value")
+    {
+      auto i = range->begin();
+      REQUIRE(i != range->end());
+
+      mp_integer index;
+      to_integer(to_constant_expr(*i), index);
+      REQUIRE(index == int_value);
+
+      ++i;
+      REQUIRE(i == range->end());
+    }
   }
 
   GIVEN("a top constant's range is has a single nil expression")
@@ -147,18 +159,18 @@ SCENARIO(
 
     auto range = value->index_range(ns);
 
-    THEN("range should have four values")
+    THEN("range has four values")
     {
-      for(int i = 0; i != 4; ++i)
+      int i = 0;
+      for(const auto &e : *range)
       {
-        REQUIRE(range->advance_to_next() == true);
-
         mp_integer index;
-        to_integer(to_constant_expr(range->current()), index);
+        to_integer(to_constant_expr(e), index);
         REQUIRE(index == int_value + i);
+        ++i;
       }
 
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(i == 4);
     }
   }
 }
