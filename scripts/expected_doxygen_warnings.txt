@@ -79,10 +79,9 @@
 /home/runner/work/cbmc/cbmc/src/analyses/variable-sensitivity/variable_sensitivity_object_factory.cpp:188: warning: The following parameter of initialize_abstract_object(const typet type, bool top, bool bottom, const exprt &e, const abstract_environmentt &environment, const namespacet &ns, const vsd_configt &configuration) is not documented:
   parameter 'configuration'
 
-warning: Include graph for 'cbmc_parse_options.cpp' not generated, too many nodes (61), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Include graph for 'goto_instrument_parse_options.cpp' not generated, too many nodes (97), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'goto_functions.h' not generated, too many nodes (66), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'goto_model.h' not generated, too many nodes (109), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'goto_model.h' not generated, too many nodes (110), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'arith_tools.h' not generated, too many nodes (181), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'c_types.h' not generated, too many nodes (110), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'config.h' not generated, too many nodes (85), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
@@ -91,7 +90,7 @@ warning: Included by graph for 'expr.h' not generated, too many nodes (87), thre
 warning: Included by graph for 'expr_util.h' not generated, too many nodes (61), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'invariant.h' not generated, too many nodes (187), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'irep.h' not generated, too many nodes (62), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'message.h' not generated, too many nodes (116), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'message.h' not generated, too many nodes (117), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'namespace.h' not generated, too many nodes (109), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'pointer_expr.h' not generated, too many nodes (101), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'prefix.h' not generated, too many nodes (86), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
