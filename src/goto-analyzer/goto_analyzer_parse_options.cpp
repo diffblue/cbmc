@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/mm_io.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
@@ -898,6 +899,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
                  << messaget::eom;
     remove_function_pointers(
       ui_message_handler, goto_model, options.get_bool_option("pointer-check"));
+
+    mm_io(goto_model);
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
