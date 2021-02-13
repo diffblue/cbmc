@@ -882,7 +882,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
       string_instrumentation(goto_model);
 
     // remove function pointers
-    log.status() << "Removing function pointers and virtual functions"
+    log.status() << "Removal of function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
       ui_message_handler, goto_model, options.get_bool_option("pointer-check"));

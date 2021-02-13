@@ -1,7 +1,7 @@
 CORE
 main.c
 --show-goto-functions --pointer-check
-^Removing function pointers and virtual functions$
+^Removal of function pointers and virtual functions$
 ^\s*IF \*container_container\.container == f1 THEN GOTO [0-9]$
 ^\s*IF \*container_container\.container == f2 THEN GOTO [0-9]$
 ^\s*IF \*container_container\.container == f3 THEN GOTO [0-9]$
