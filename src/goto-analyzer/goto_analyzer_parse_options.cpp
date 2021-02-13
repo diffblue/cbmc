@@ -27,26 +27,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <jsil/jsil_language.h>
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
-#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
-#include <goto-programs/mm_io.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
 #include <goto-programs/validate_goto_model.h>
 
 #include <analyses/call_stack_history.h>
@@ -626,7 +616,6 @@ int goto_analyzer_parse_optionst::doit()
 /// Depending on the command line mode, run one of the analysis tasks
 int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 {
-  adjust_float_expressions(goto_model);
   if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
@@ -862,69 +851,22 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options)
 {
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(goto_model);
+
+  // add the library
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
+  link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+
+  add_malloc_may_fail_variable_initializations(goto_model);
+
   // Common removal of types and complex constructs
-  ::process_goto_program(goto_model, options, log);
+  if(::process_goto_program(goto_model, options, log))
+    return true;
 
-  {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_model);
-
-    // add the library
-    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << messaget::eom;
-    link_to_library(
-      goto_model, ui_message_handler, cprover_cpp_library_factory);
-    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
-
-    add_malloc_may_fail_variable_initializations(goto_model);
-
-    if(options.get_bool_option("string-abstraction"))
-      string_instrumentation(goto_model);
-
-    // remove function pointers
-    log.status() << "Removal of function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      ui_message_handler, goto_model, options.get_bool_option("pointer-check"));
-
-    mm_io(goto_model);
-
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
-
-    // do partial inlining
-    if(options.get_bool_option("partial-inline"))
-    {
-      log.status() << "Partial Inlining" << messaget::eom;
-      goto_partial_inline(goto_model, ui_message_handler);
-    }
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-    if(options.get_bool_option("rewrite-union"))
-      rewrite_union(goto_model);
-
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
-
-    if(options.get_bool_option("string-abstraction"))
-    {
-      log.status() << "String Abstraction" << messaget::eom;
-      string_abstraction(goto_model, log.get_message_handler());
-    }
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-  }
   return false;
 }
 

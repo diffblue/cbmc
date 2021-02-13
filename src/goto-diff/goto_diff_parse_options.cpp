@@ -258,93 +258,44 @@ bool goto_diff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(goto_model);
+
+  // add the library
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
+  link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+
+  add_malloc_may_fail_variable_initializations(goto_model);
+
   // Common removal of types and complex constructs
-  ::process_goto_program(goto_model, options, log);
+  if(::process_goto_program(goto_model, options, log))
+    return true;
 
+  // instrument cover goals
+  if(cmdline.isset("cover"))
   {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_model);
-
-    // add the library
-    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
-                 << messaget::eom;
-    link_to_library(
-      goto_model, ui_message_handler, cprover_cpp_library_factory);
-    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
-
-    add_malloc_may_fail_variable_initializations(goto_model);
-
-    if(options.get_bool_option("string-abstraction"))
-      string_instrumentation(goto_model);
-
-    // remove function pointers
-    log.status() << "Removal of function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      ui_message_handler, goto_model, options.get_bool_option("pointer-check"));
-
-    mm_io(goto_model);
-
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
-
-    // do partial inlining
-    if(options.get_bool_option("partial-inline"))
-    {
-      log.status() << "Partial Inlining" << messaget::eom;
-      goto_partial_inline(goto_model, ui_message_handler);
-    }
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-    if(options.get_bool_option("rewrite-union"))
-      rewrite_union(goto_model);
-
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
-
-    if(options.get_bool_option("string-abstraction"))
-    {
-      log.status() << "String Abstraction" << messaget::eom;
-      string_abstraction(goto_model, log.get_message_handler());
-    }
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-
-    // instrument cover goals
-    if(cmdline.isset("cover"))
-    {
-      // remove skips such that trivial GOTOs are deleted and not considered
-      // for coverage annotation:
-      remove_skip(goto_model);
-
-      const auto cover_config =
-        get_cover_config(options, goto_model.symbol_table, ui_message_handler);
-      if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
-        return true;
-    }
-
-    // label the assertions
-    // This must be done after adding assertions and
-    // before using the argument of the "property" option.
-    // Do not re-label after using the property slicer because
-    // this would cause the property identifiers to change.
-    label_properties(goto_model);
-
-    // remove any skips introduced since coverage instrumentation
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
     remove_skip(goto_model);
+
+    const auto cover_config =
+      get_cover_config(options, goto_model.symbol_table, ui_message_handler);
+    if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
+      return true;
   }
+
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
+
+  // remove any skips introduced since coverage instrumentation
+  remove_skip(goto_model);
 
   return false;
 }
