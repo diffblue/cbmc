@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --vsd-structs every-field --vsd-arrays every-element --vsd-pointers value-set --show --pointer-check
+^file main.c line 32 function main: replacing function pointer by 3 possible targets$
+^main::1::fun_incremented_show \(\) -> value-set-begin: TOP, ptr ->\(h\) :value-set-end
+^EXIT=0$
+^SIGNAL=0$
+--

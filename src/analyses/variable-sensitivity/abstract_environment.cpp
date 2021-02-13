@@ -66,7 +66,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 
   // No special handling required by the abstract environment
   // delegate to the abstract object
-  if(simplified_expr.operands().size() > 0)
+  if(!simplified_expr.operands().empty())
   {
     return eval_expression(simplified_expr, ns);
   }
@@ -74,7 +74,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   {
     // It is important that this is top as the abstract object may not know
     // how to handle the expression
-    return abstract_object_factory(simplified_expr.type(), ns, true);
+    return abstract_object_factory(simplified_expr.type(), ns, true, false);
   }
 }
 
@@ -146,7 +146,7 @@ bool abstract_environmentt::assign(
     // to be none of that.
     if(s.id() != ID_symbol)
     {
-      throw "invalid l-value";
+      throw std::runtime_error("invalid l-value");
     }
     // We can assign the AO directly to the symbol
     final_value = value;
@@ -252,11 +252,11 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet &type,
   const namespacet &ns,
   bool top,
-  bool bottom) const
+  bool bttm) const
 {
   exprt empty_constant_expr = nil_exprt();
   return abstract_object_factory(
-    type, top, bottom, empty_constant_expr, *this, ns);
+    type, top, bttm, empty_constant_expr, *this, ns);
 }
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
@@ -270,13 +270,19 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet &type,
   bool top,
-  bool bottom,
+  bool bttm,
   const exprt &e,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
   return object_factory->get_abstract_object(
-    type, top, bottom, e, environment, ns);
+    type, top, bttm, e, environment, ns);
+}
+
+abstract_object_pointert abstract_environmentt::add_object_context(
+  const abstract_object_pointert &abstract_object) const
+{
+  return object_factory->wrap_with_context(abstract_object);
 }
 
 bool abstract_environmentt::merge(const abstract_environmentt &env)
@@ -383,7 +389,7 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // The value of the temporary abstract object is ignored, its
   // purpose is just to dispatch the expression transform call to
   // a concrete subtype of abstract_objectt.
-  auto eval_obj = abstract_object_factory(e.type(), ns, true);
+  auto eval_obj = abstract_object_factory(e.type(), ns, true, false);
   auto operands = eval_operands(e, *this, ns);
 
   return eval_obj->expression_transform(e, operands, *this, ns);

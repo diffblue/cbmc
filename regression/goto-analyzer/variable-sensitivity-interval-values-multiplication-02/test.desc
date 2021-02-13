@@ -1,0 +1,11 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values intervals --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::r \(\) -> \[2, 2\] @ \[1\]
+main::1::s \(\) -> \[3, 3\] @ \[3\]
+main::1::t \(\) -> \[4, 4\] @ \[5\]
+main::1::x \(\) -> \[9, 9\] @ \[7\]
+main::1::y \(\) -> \[C, C\] @ \[9\]
+main::1::z \(\) -> \[18, 18\] @ \[11\]

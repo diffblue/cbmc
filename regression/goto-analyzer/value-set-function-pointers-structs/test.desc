@@ -4,13 +4,13 @@ main.c
 ^file main.c line 38 function main: replacing function pointer by 2 possible targets$
 ^file main.c line 46 function main: replacing function pointer by 2 possible targets$
 ^file main.c line 54 function main: replacing function pointer by 2 possible targets$
-^main::1::fun1 \(\) -> value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end$
-^main::1::s2 \(\) -> \{\.fptr=value-set-begin: ptr ->\([fg]\), ptr ->\([fg]\), :value-set-end\}$
-^main::1::fun2 \(\) -> value-set-begin: ptr ->\(g\), :value-set-end$
+^main::1::fun1 \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
+^main::1::s2 \(\) -> \{\.fptr=value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end @ \[23, 25\]} @ \[23, 25\]
+^main::1::fun2 \(\) -> value-set-begin: ptr ->\(g\) :value-set-end
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
-^main::1::fun1 \(\) -> value-set-begin: .*ptr ->\(h\).* :value-set-end$
-^main::1::s2 \(\) -> \{\.fptr=value-set-begin: .*ptr ->\(h\).* :value-set-end\}$
-^main::1::fun2 \(\) -> value-set-begin: .*ptr ->\(h\).* :value-set-end$
+^main::1::fun1 \(\) -> value-set-begin: .*ptr ->\(h\).* :value-set-end
+^main::1::s2 \(\) -> \{\.fptr=value-set-begin: .*ptr ->\(h\).* :value-set-end\}
+^main::1::fun2 \(\) -> value-set-begin: .*ptr ->\(h\).* :value-set-end

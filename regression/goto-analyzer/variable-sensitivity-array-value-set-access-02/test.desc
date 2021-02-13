@@ -1,0 +1,7 @@
+CORE
+main.c
+--show --variable-sensitivity --vsd-values set-of-constants --vsd-arrays every-element
+^EXIT=0$
+^SIGNAL=0$
+main::1::t \(\) -> value-set-begin: 1, 2, 3 :value-set-end
+main::1::p \(\) -> value-set-begin: 0, 1 :value-set-end

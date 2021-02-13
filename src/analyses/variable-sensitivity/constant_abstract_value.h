@@ -24,16 +24,14 @@ private:
     constant_abstract_value_pointert;
 
 public:
-  explicit constant_abstract_valuet(typet t);
-  constant_abstract_valuet(typet t, bool tp, bool bttm);
+  explicit constant_abstract_valuet(const typet &t);
+  constant_abstract_valuet(const typet &t, bool tp, bool bttm);
   constant_abstract_valuet(
-    const exprt e,
+    const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  virtual ~constant_abstract_valuet()
-  {
-  }
+  ~constant_abstract_valuet() override = default;
 
   index_range_ptrt index_range(const namespacet &ns) const override;
 
@@ -107,7 +105,7 @@ private:
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this.
   abstract_object_pointert
-  merge_constant_constant(constant_abstract_value_pointert other) const;
+  merge_constant_constant(const constant_abstract_value_pointert &other) const;
 
   exprt value;
 };

@@ -1,0 +1,12 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values intervals --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::b1 \(\) -> \[1, 1\] @ \[2\]
+main::1::b2 \(\) -> \[0, 0\] @ \[3\]
+main::1::b3 \(\) -> \[0, 1\] @ \[5\]
+main::1::i \(\) -> \[A, A\] @ \[7\]
+main::1::j \(\) -> \[14, 14\] @ \[9\]
+main::1::k \(\) -> \[A, 14\] @ \[11\]
+--

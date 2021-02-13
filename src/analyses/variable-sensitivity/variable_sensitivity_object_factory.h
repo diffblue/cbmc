@@ -71,6 +71,9 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const;
 
+  abstract_object_pointert
+  wrap_with_context(const abstract_object_pointert &abstract_object) const;
+
   variable_sensitivity_object_factoryt() = delete;
   variable_sensitivity_object_factoryt(
     const variable_sensitivity_object_factoryt &) = delete;

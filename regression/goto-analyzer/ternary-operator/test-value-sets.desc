@@ -1,0 +1,12 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::b1 \(\) -> value-set-begin: TRUE :value-set-end
+main::1::b2 \(\) -> value-set-begin: FALSE :value-set-end
+main::1::b3 \(\) -> value-set-begin: TRUE, FALSE :value-set-end
+main::1::i \(\) -> value-set-begin: 10 :value-set-end
+main::1::j \(\) -> value-set-begin: 20 :value-set-end
+main::1::k \(\) -> value-set-begin: 10, 20 :value-set-end
+--

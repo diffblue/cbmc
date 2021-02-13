@@ -39,9 +39,9 @@ public:
 
   abstract_environmentt() = delete;
 
-  abstract_environmentt(
+  explicit abstract_environmentt(
     variable_sensitivity_object_factory_ptrt _object_factory)
-    : bottom(true), object_factory(_object_factory)
+    : bottom(true), object_factory(std::move(_object_factory))
   {
   }
 
@@ -150,8 +150,8 @@ public:
   virtual abstract_object_pointert abstract_object_factory(
     const typet &type,
     const namespacet &ns,
-    bool top = true,
-    bool bottom = false) const;
+    bool top,
+    bool bottom) const;
 
   /// For converting constants in the program
   ///
@@ -169,6 +169,19 @@ public:
     const typet &type,
     const exprt &e,
     const namespacet &ns) const;
+
+  /// Wraps an existing object in any configured context object
+  ///
+  /// \param abstract_object: The object to be wrapped
+  ///
+  /// \return The wrapped abstract object
+  ///
+  /// Look at the configuration context dependency, and constructs
+  /// the appropriate wrapper object around the supplied object
+  /// If no such configuration is enabled, the supplied object will be
+  /// returned unchanged
+  virtual abstract_object_pointert
+  add_object_context(const abstract_object_pointert &abstract_object) const;
 
   /// Computes the join between "this" and "b"
   ///
