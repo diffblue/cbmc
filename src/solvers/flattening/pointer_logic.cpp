@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -159,6 +160,8 @@ pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
 
   // add INVALID
   invalid_object=objects.number(exprt("INVALID"));
+
+  null_is_zero_address = config.ansi_c.NULL_is_zero;
 }
 
 pointer_logict::~pointer_logict()

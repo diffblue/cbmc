@@ -210,10 +210,9 @@ void smt2_convt::define_object_size(
   PRECONDITION(expr.id() == ID_object_size);
   const exprt &ptr = to_unary_expr(expr).op();
   std::size_t size_width = boolbv_width(expr.type());
-  std::size_t pointer_width = boolbv_width(ptr.type());
   std::size_t number = 0;
-  std::size_t h=pointer_width-1;
-  std::size_t l=pointer_width-config.bv_encoding.object_bits;
+  std::size_t object_bits =
+    boolbv_width.get_object_width(to_pointer_type(ptr.type()));
 
   for(const auto &o : pointer_logic.objects)
   {
@@ -230,12 +229,12 @@ void smt2_convt::define_object_size(
       continue;
     }
 
-    out << "(assert (implies (= " <<
-      "((_ extract " << h << " " << l << ") ";
+    out << "(assert (implies (= "
+        << "((_ extract " << object_bits - 1 << " 0) ";
     convert_expr(ptr);
-    out << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
-        << "(= " << id << " (_ bv" << *object_size << " " << size_width
-        << "))))\n";
+    out << ") (_ bv" << number << " " << object_bits << "))"
+        << "(= " << id << " (_ bv" << object_size->to_ulong() << " "
+        << size_width << "))))\n";
 
     ++number;
   }
@@ -568,10 +567,14 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
     mp_integer v = numeric_cast_v<mp_integer>(bv_expr);
 
     // split into object and offset
-    mp_integer pow=power(2, width-config.bv_encoding.object_bits);
+    std::size_t object_bits =
+      boolbv_width.get_object_width(to_pointer_type(type));
+    std::size_t offset_bits =
+      boolbv_width.get_offset_width(to_pointer_type(type));
+    mp_integer pow = power(2, object_bits);
     pointer_logict::pointert ptr;
-    ptr.object = numeric_cast_v<std::size_t>(v / pow);
-    ptr.offset=v%pow;
+    ptr.object = numeric_cast_v<std::size_t>(v % pow);
+    ptr.offset = (v % power(2, object_bits + offset_bits)) / pow;
     return pointer_logic.pointer_expr(ptr, to_pointer_type(type));
   }
   else if(type.id()==ID_struct)
@@ -614,12 +617,18 @@ void smt2_convt::convert_address_of_rec(
      expr.id()==ID_string_constant ||
      expr.id()==ID_label)
   {
-    out
-      << "(concat (_ bv"
-      << pointer_logic.add_object(expr) << " "
-      << config.bv_encoding.object_bits << ")"
-      << " (_ bv0 "
-      << boolbv_width(result_type)-config.bv_encoding.object_bits << "))";
+    std::string addr =
+      expr.id() == ID_symbol
+        ? expr.get_string(ID_identifier) + "$address"
+        : "(_ bv0 " +
+            std::to_string(boolbv_width.get_address_width(result_type)) + ")";
+
+    out << "(concat "
+        << "(concat "
+        << "(_ bv" << pointer_logic.add_object(expr) << " "
+        << boolbv_width.get_object_width(result_type) << ") "
+        << "(_ bv0 " << boolbv_width.get_offset_width(result_type) << ")) "
+        << addr << ")";
   }
   else if(expr.id()==ID_index)
   {
@@ -1424,23 +1433,21 @@ void smt2_convt::convert_expr(const exprt &expr)
       op.type().id() == ID_pointer,
       "operand of pointer offset expression shall be of pointer type");
 
+    std::size_t object_bits =
+      boolbv_width.get_object_width(to_pointer_type(op.type()));
     std::size_t offset_bits =
-      boolbv_width(op.type()) - config.bv_encoding.object_bits;
-    std::size_t result_width=boolbv_width(expr.type());
+      boolbv_width.get_offset_width(to_pointer_type(op.type()));
+    std::size_t ext = boolbv_width(expr.type()) - offset_bits;
 
-    // max extract width
-    if(offset_bits>result_width)
-      offset_bits=result_width;
+    if(ext > 0)
+      out << "((_ zero_extend " << ext << ") ";
 
-    // too few bits?
-    if(result_width>offset_bits)
-      out << "((_ zero_extend " << result_width-offset_bits << ") ";
-
-    out << "((_ extract " << offset_bits-1 << " 0) ";
+    out << "((_ extract " << object_bits + offset_bits - 1 << " " << object_bits
+        << ") ";
     convert_expr(op);
     out << ")";
 
-    if(result_width>offset_bits)
+    if(ext > 0)
       out << ")"; // zero_extend
   }
   else if(expr.id()==ID_pointer_object)
@@ -1451,15 +1458,14 @@ void smt2_convt::convert_expr(const exprt &expr)
       op.type().id() == ID_pointer,
       "pointer object expressions should be of pointer type");
 
-    std::size_t ext=boolbv_width(expr.type())-config.bv_encoding.object_bits;
-    std::size_t pointer_width = boolbv_width(op.type());
+    std::size_t object_bits =
+      boolbv_width.get_object_width(to_pointer_type(op.type()));
+    std::size_t ext = boolbv_width(expr.type()) - object_bits;
 
     if(ext>0)
       out << "((_ zero_extend " << ext << ") ";
 
-    out << "((_ extract "
-        << pointer_width-1 << " "
-        << pointer_width-config.bv_encoding.object_bits << ") ";
+    out << "((_ extract " << object_bits - 1 << " 0) ";
     convert_expr(op);
     out << ")";
 
@@ -1472,14 +1478,13 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id() == ID_is_invalid_pointer)
   {
-    const auto &op = to_unary_expr(expr).op();
-    std::size_t pointer_width = boolbv_width(op.type());
-    out << "(= ((_ extract "
-        << pointer_width-1 << " "
-        << pointer_width-config.bv_encoding.object_bits << ") ";
-    convert_expr(op);
-    out << ") (_ bv" << pointer_logic.get_invalid_object()
-        << " " << config.bv_encoding.object_bits << "))";
+    std::size_t object_bits = boolbv_width.get_object_width(
+      to_pointer_type(to_unary_expr(expr).op().type()));
+
+    out << "(= ((_ extract " << object_bits - 1 << " 0) ";
+    convert_expr(to_unary_expr(expr).op());
+    out << ") (_ bv" << pointer_logic.get_invalid_object() << " " << object_bits
+        << "))";
   }
   else if(expr.id()==ID_string_constant)
   {
@@ -2956,30 +2961,28 @@ void smt2_convt::convert_is_dynamic_object(const unary_exprt &expr)
   std::vector<std::size_t> dynamic_objects;
   pointer_logic.get_dynamic_objects(dynamic_objects);
 
+  std::size_t object_bits =
+    boolbv_width.get_object_width(to_pointer_type(expr.op().type()));
+
   if(dynamic_objects.empty())
     out << "false";
   else
   {
-    std::size_t pointer_width = boolbv_width(expr.op().type());
-
-    out << "(let ((?obj ((_ extract "
-        << pointer_width-1 << " "
-        << pointer_width-config.bv_encoding.object_bits << ") ";
+    out << "(let ((?obj ((_ extract " << object_bits << " 0) ";
     convert_expr(expr.op());
     out << "))) ";
 
     if(dynamic_objects.size()==1)
     {
-      out << "(= (_ bv" << dynamic_objects.front()
-          << " " << config.bv_encoding.object_bits << ") ?obj)";
+      out << "(= (_ bv" << dynamic_objects.front() << " " << object_bits
+          << ") ?obj)";
     }
     else
     {
       out << "(or";
 
       for(const auto &object : dynamic_objects)
-        out << " (= (_ bv" << object
-            << " " << config.bv_encoding.object_bits << ") ?obj)";
+        out << " (= (_ bv" << object << " " << object_bits << ") ?obj)";
 
       out << ")"; // or
     }
