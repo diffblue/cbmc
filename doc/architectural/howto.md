@@ -76,10 +76,10 @@ If you built using CMake on Unix, you should be able to run the
 Find or write a moderately-interesting C program; we'll call it `main.c`.
 Run the following commands:
 
-    goto-gcc -o main.goto main.c
+    goto-gcc -o main.gb main.c
     cc -o main.exe main.c
 
-Invoke `./main.goto` and `./main.exe` and observe that they run identically.
+Invoke `./main.gb` and `./main.exe` and observe that they run identically.
 The version that was compiled with `goto-gcc` is larger, though:
 
     du -hs *.{goto,exe}
@@ -95,7 +95,7 @@ is (informally) called a *goto-program*.
 `goto-instrument` is a Swiss army knife for viewing goto-programs and
 performing single program analyses on them.  Run the following command:
 
-    goto-instrument --show-goto-functions main.goto
+    goto-instrument --show-goto-functions main.gb
 
 Many of the instructions in the goto-program intermediate representation
 are similar to their C counterparts.  `if` and `goto` statements replace
@@ -105,7 +105,7 @@ Find or write a small C program (2 or 3 functions, each containing a few
 varied statements).  Compile it using `goto-gcc` as above into an object
 file called `main`. You can write the diagram to a file and then view it:
 
-    goto-instrument --dot main.goto | tail -n +2 | dot -Tpng > main.png
+    goto-instrument --dot main.gb | tail -n +2 | dot -Tpng > main.png
     open main.png
 
 (the invocation of `tail` is used to filter out the first line of
@@ -143,7 +143,7 @@ At some point in that function, there will be a long sequence of `if` statements
 **Task:** Add a `--greet` switch to `goto-instrument`, taking an optional
 argument, with the following behaviour:
 
-    $ goto-instrument --greet main.goto
+    $ goto-instrument --greet main.gb
     hello, world!
     $ goto-instrument --greet Leperina main
     hello, Leperina!
