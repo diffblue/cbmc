@@ -27,7 +27,7 @@ public:
 
   std::size_t boolbv_width(const typet &type) const override
   {
-    return bv_width(type);
+    return bv_pointers_width(type);
   }
 
   endianness_mapt
@@ -36,12 +36,25 @@ public:
 protected:
   pointer_logict pointer_logic;
 
+  class bv_pointers_widtht : public boolbv_widtht
+  {
+  public:
+    explicit bv_pointers_widtht(const namespacet &_ns) : boolbv_widtht(_ns)
+    {
+    }
+
+    std::size_t operator()(const typet &type) const override;
+
+    std::size_t get_object_width(const pointer_typet &type) const;
+    std::size_t get_offset_width(const pointer_typet &type) const;
+    std::size_t get_address_width(const pointer_typet &type) const;
+  };
+  bv_pointers_widtht bv_pointers_width;
+
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
 
-  unsigned object_bits, offset_bits, bits;
-
-  void encode(std::size_t object, bvt &bv);
+  void encode(std::size_t object, const pointer_typet &type, bvt &bv) const;
 
   virtual bvt convert_pointer_type(const exprt &expr);
 
@@ -61,10 +74,18 @@ protected:
     const exprt &expr,
     bvt &bv);
 
-  void offset_arithmetic(bvt &bv, const mp_integer &x);
-  void offset_arithmetic(bvt &bv, const mp_integer &factor, const exprt &index);
+  void
+  offset_arithmetic(const pointer_typet &type, bvt &bv, const mp_integer &x);
   void offset_arithmetic(
-    bvt &bv, const mp_integer &factor, const bvt &index_bv);
+    const pointer_typet &type,
+    bvt &bv,
+    const mp_integer &factor,
+    const exprt &index);
+  void offset_arithmetic(
+    const pointer_typet &type,
+    bvt &bv,
+    const mp_integer &factor,
+    const bvt &index_bv);
 
   struct postponedt
   {
