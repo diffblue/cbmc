@@ -950,7 +950,23 @@ void smt2_parsert::setup_expressions()
 
   expressions["distinct"] = [this] {
     // pair-wise different constraint, multi-ary
-    return multi_ary("distinct", operands());
+    auto op = operands();
+    if(op.size() == 2)
+      return binary_predicate(ID_notequal, op);
+    else
+    {
+      std::vector<exprt> pairwise_constraints;
+      for(std::size_t i = 0; i < op.size(); i++)
+      {
+        for(std::size_t j = i; j < op.size(); j++)
+        {
+          if(i != j)
+            pairwise_constraints.push_back(
+              binary_exprt(op[i], ID_notequal, op[j], bool_typet()));
+        }
+      }
+      return multi_ary(ID_and, pairwise_constraints);
+    }
   };
 
   expressions["ite"] = [this] {
