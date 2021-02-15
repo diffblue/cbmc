@@ -107,14 +107,14 @@ elseif("${sat_impl}" STREQUAL "cadical")
     message(STATUS "Building solvers with cadical")
 
     download_project(PROJ cadical
-        URL https://github.com/arminbiere/cadical/archive/rel-1.3.0.tar.gz
+        URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
-        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s -j
-        URL_MD5 5bd15d1e198d2e904a8af8b7873dd341
+        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++14
+        URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 
     message(STATUS "Building CaDiCaL")
-    execute_process(COMMAND make WORKING_DIRECTORY ${cadical_SOURCE_DIR})
+    execute_process(COMMAND make -j WORKING_DIRECTORY ${cadical_SOURCE_DIR})
 
     target_compile_definitions(solvers PUBLIC
         SATCHECK_CADICAL HAVE_CADICAL
@@ -137,10 +137,10 @@ elseif("${sat_impl}" STREQUAL "ipasir-cadical")
     message(STATUS "Building with IPASIR solver linking against: CaDiCaL")
 
     download_project(PROJ cadical
-        URL https://github.com/arminbiere/cadical/archive/rel-1.4.0.tar.gz
+        URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
         COMMAND ./configure CXX=g++
-        URL_MD5 9bad586a82995a1d95d1197d445a353a
+        URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 
     message(STATUS "Building CaDiCaL")
