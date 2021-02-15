@@ -65,7 +65,7 @@ void bv_endianness_mapt::build_big_endian(const typet &src)
 endianness_mapt
 bv_pointerst::endianness_map(const typet &type, bool little_endian) const
 {
-  return bv_endianness_mapt{type, little_endian, ns, boolbv_width};
+  return bv_endianness_mapt{type, little_endian, ns, bv_width};
 }
 
 literalt bv_pointerst::convert_rest(const exprt &expr)

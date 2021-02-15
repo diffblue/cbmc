@@ -25,6 +25,11 @@ public:
 
   void post_process() override;
 
+  std::size_t boolbv_width(const typet &type) const override
+  {
+    return bv_width(type);
+  }
+
   endianness_mapt
   endianness_map(const typet &type, bool little_endian) const override;
 

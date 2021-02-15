@@ -47,7 +47,7 @@ public:
     bool get_array_constraints = false)
     : arrayst(_ns, _prop, message_handler, get_array_constraints),
       unbounded_array(unbounded_arrayt::U_NONE),
-      boolbv_width(_ns),
+      bv_width(_ns),
       bv_utils(_prop),
       functions(*this),
       map(_prop)
@@ -93,15 +93,19 @@ public:
     return map;
   }
 
+  virtual std::size_t boolbv_width(const typet &type) const
+  {
+    return bv_width(type);
+  }
+
   virtual endianness_mapt
   endianness_map(const typet &type, bool little_endian) const
   {
     return endianness_mapt{type, little_endian, ns};
   }
 
-  boolbv_widtht boolbv_width;
-
 protected:
+  boolbv_widtht bv_width;
   bv_utilst bv_utils;
 
   // uninterpreted functions
