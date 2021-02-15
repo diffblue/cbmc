@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/config.h>
 
-#include "bv_endianness_map.h"
-
 bvt boolbvt::convert_union(const union_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
@@ -45,8 +43,8 @@ bvt boolbvt::convert_union(const union_exprt &expr)
       config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_BIG_ENDIAN,
       "endianness should be set to either little endian or big endian");
 
-    bv_endianness_mapt map_u(expr.type(), false, ns, boolbv_width);
-    bv_endianness_mapt map_op(expr.op().type(), false, ns, boolbv_width);
+    endianness_mapt map_u = endianness_map(expr.type(), false);
+    endianness_mapt map_op = endianness_map(expr.op().type(), false);
 
     for(std::size_t i=0; i<op_bv.size(); i++)
       bv[map_u.map_bit(i)]=op_bv[map_op.map_bit(i)];

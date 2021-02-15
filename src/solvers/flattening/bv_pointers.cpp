@@ -16,6 +16,58 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 
+/// Map bytes according to the configured endianness. The key difference to
+/// endianness_mapt is that bv_endianness_mapt is aware of the bit-level
+/// encoding of types, which need not co-incide with the bit layout at
+/// source-code level.
+class bv_endianness_mapt : public endianness_mapt
+{
+public:
+  bv_endianness_mapt(
+    const typet &type,
+    bool little_endian,
+    const namespacet &_ns,
+    const boolbv_widtht &_boolbv_width)
+    : endianness_mapt(_ns), boolbv_width(_boolbv_width)
+  {
+    build(type, little_endian);
+  }
+
+protected:
+  const boolbv_widtht &boolbv_width;
+
+  void build_little_endian(const typet &type) override;
+  void build_big_endian(const typet &type) override;
+};
+
+void bv_endianness_mapt::build_little_endian(const typet &src)
+{
+  const std::size_t width = boolbv_width(src);
+
+  if(width == 0)
+    return;
+
+  const std::size_t new_size = map.size() + width;
+  map.reserve(new_size);
+
+  for(std::size_t i = map.size(); i < new_size; ++i)
+    map.push_back(i);
+}
+
+void bv_endianness_mapt::build_big_endian(const typet &src)
+{
+  if(src.id() == ID_pointer)
+    build_little_endian(src);
+  else
+    endianness_mapt::build_big_endian(src);
+}
+
+endianness_mapt
+bv_pointerst::endianness_map(const typet &type, bool little_endian) const
+{
+  return bv_endianness_mapt{type, little_endian, ns, boolbv_width};
+}
+
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);

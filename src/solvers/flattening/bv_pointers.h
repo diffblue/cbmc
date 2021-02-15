@@ -25,6 +25,9 @@ public:
 
   void post_process() override;
 
+  endianness_mapt
+  endianness_map(const typet &type, bool little_endian) const override;
+
 protected:
   pointer_logict pointer_logic;
 

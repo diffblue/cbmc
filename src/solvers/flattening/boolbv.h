@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 //
 
 #include <util/byte_operators.h>
+#include <util/endianness_map.h>
 #include <util/expr.h>
 #include <util/mp_arith.h>
 #include <util/optional.h>
@@ -90,6 +91,12 @@ public:
   const boolbv_mapt &get_map() const
   {
     return map;
+  }
+
+  virtual endianness_mapt
+  endianness_map(const typet &type, bool little_endian) const
+  {
+    return endianness_mapt{type, little_endian, ns};
   }
 
   boolbv_widtht boolbv_width;
