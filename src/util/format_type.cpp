@@ -9,7 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_type.h"
 #include "c_types.h"
 #include "format_expr.h"
+#include "mathematical_types.h"
 #include "pointer_expr.h"
+#include "std_types.h"
 
 #include <ostream>
 
@@ -98,6 +100,21 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "\xe2\x84\x95"; // u+2115, 'N'
   else if(id == ID_rational)
     return os << "\xe2\x84\x9a"; // u+211A, 'Q'
+  else if(id == ID_mathematical_function)
+  {
+    const auto &mathematical_function = to_mathematical_function_type(type);
+    bool first = true;
+    for(const auto &domain : mathematical_function.domain())
+    {
+      if(first)
+        first = false;
+      else
+        os << u8" \u00d7 "; // ×
+      os << format(domain);
+    }
+    os << u8" \u2192 "; // → -- we don't use ⟶  since that doesn't render well
+    return os << format(mathematical_function.codomain());
+  }
   else
     return os << id;
 }
