@@ -129,8 +129,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       {
         const pointer_typet &type = to_pointer_type(operands[0].type());
 
-        bvt invalid_bv;
-        encode(pointer_logic.get_invalid_object(), type, invalid_bv);
+        bvt invalid_bv = encode(pointer_logic.get_invalid_object(), type);
 
         const std::size_t object_bits =
           bv_pointers_width.get_object_width(type);
@@ -195,25 +194,20 @@ bv_pointerst::bv_pointerst(
 {
 }
 
-bool bv_pointerst::convert_address_of_rec(
-  const exprt &expr,
-  bvt &bv)
+optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
 {
   if(expr.id()==ID_symbol)
   {
-    add_addr(expr, bv);
-    return false;
+    return add_addr(expr);
   }
   else if(expr.id()==ID_label)
   {
-    add_addr(expr, bv);
-    return false;
+    return add_addr(expr);
   }
   else if(expr.id() == ID_null_object)
   {
     pointer_typet pt = pointer_type(expr.type());
-    encode(pointer_logic.get_null_object(), pt, bv);
-    return false;
+    return encode(pointer_logic.get_null_object(), pt);
   }
   else if(expr.id()==ID_index)
   {
@@ -225,6 +219,8 @@ bool bv_pointerst::convert_address_of_rec(
     pointer_typet type = pointer_type(expr.type());
     const std::size_t bits = boolbv_width(type);
 
+    bvt bv;
+
     // recursive call
     if(array_type.id()==ID_pointer)
     {
@@ -235,8 +231,10 @@ bool bv_pointerst::convert_address_of_rec(
     else if(array_type.id()==ID_array ||
             array_type.id()==ID_string_constant)
     {
-      if(convert_address_of_rec(array, bv))
-        return true;
+      auto bv_opt = convert_address_of_rec(array);
+      if(!bv_opt.has_value())
+        return {};
+      bv = std::move(*bv_opt);
       CHECK_RETURN(bv.size()==bits);
     }
     else
@@ -246,9 +244,10 @@ bool bv_pointerst::convert_address_of_rec(
     auto size = pointer_offset_size(array_type.subtype(), ns);
     CHECK_RETURN(size.has_value() && *size >= 0);
 
-    offset_arithmetic(type, bv, *size, index);
+    bv = offset_arithmetic(type, bv, *size, index);
     CHECK_RETURN(bv.size()==bits);
-    return false;
+
+    return std::move(bv);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -256,16 +255,17 @@ bool bv_pointerst::convert_address_of_rec(
     const auto &byte_extract_expr=to_byte_extract_expr(expr);
 
     // recursive call
-    if(convert_address_of_rec(byte_extract_expr.op(), bv))
-      return true;
+    auto bv_opt = convert_address_of_rec(byte_extract_expr.op());
+    if(!bv_opt.has_value())
+      return {};
 
     pointer_typet type = pointer_type(expr.type());
     const std::size_t bits = boolbv_width(type);
-    CHECK_RETURN(bv.size()==bits);
+    CHECK_RETURN(bv_opt->size() == bits);
 
-    offset_arithmetic(type, bv, 1, byte_extract_expr.offset());
+    bvt bv = offset_arithmetic(type, *bv_opt, 1, byte_extract_expr.offset());
     CHECK_RETURN(bv.size()==bits);
-    return false;
+    return std::move(bv);
   }
   else if(expr.id()==ID_member)
   {
@@ -274,9 +274,11 @@ bool bv_pointerst::convert_address_of_rec(
     const typet &struct_op_type=ns.follow(struct_op.type());
 
     // recursive call
-    if(convert_address_of_rec(struct_op, bv))
-      return true;
+    auto bv_opt = convert_address_of_rec(struct_op);
+    if(!bv_opt.has_value())
+      return {};
 
+    bvt bv = std::move(*bv_opt);
     if(struct_op_type.id()==ID_struct)
     {
       auto offset = member_offset(
@@ -285,7 +287,7 @@ bool bv_pointerst::convert_address_of_rec(
 
       // add offset
       pointer_typet type = pointer_type(expr.type());
-      offset_arithmetic(type, bv, *offset);
+      bv = offset_arithmetic(type, bv, *offset);
     }
     else
     {
@@ -295,14 +297,13 @@ bool bv_pointerst::convert_address_of_rec(
       // nothing to do, all members have offset 0
     }
 
-    return false;
+    return std::move(bv);
   }
   else if(expr.id()==ID_constant ||
           expr.id()==ID_string_constant ||
           expr.id()==ID_array)
   { // constant
-    add_addr(expr, bv);
-    return false;
+    return add_addr(expr);
   }
   else if(expr.id()==ID_if)
   {
@@ -312,18 +313,18 @@ bool bv_pointerst::convert_address_of_rec(
 
     bvt bv1, bv2;
 
-    if(convert_address_of_rec(ifex.true_case(), bv1))
-      return true;
+    auto bv1_opt = convert_address_of_rec(ifex.true_case());
+    if(!bv1_opt.has_value())
+      return {};
 
-    if(convert_address_of_rec(ifex.false_case(), bv2))
-      return true;
+    auto bv2_opt = convert_address_of_rec(ifex.false_case());
+    if(!bv2_opt.has_value())
+      return {};
 
-    bv=bv_utils.select(cond, bv1, bv2);
-
-    return false;
+    return bv_utils.select(cond, *bv1_opt, *bv2_opt);
   }
 
-  return true;
+  return {};
 }
 
 bvt bv_pointerst::convert_pointer_type(const exprt &expr)
@@ -385,34 +386,29 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     const address_of_exprt &address_of_expr = to_address_of_expr(expr);
 
-    bvt bv;
-    bv.resize(bits);
-
-    if(convert_address_of_rec(address_of_expr.op(), bv))
+    auto bv_opt = convert_address_of_rec(address_of_expr.op());
+    if(!bv_opt.has_value())
     {
+      bvt bv;
+      bv.resize(bits);
       conversion_failed(address_of_expr, bv);
       return bv;
     }
 
-    CHECK_RETURN(bv.size()==bits);
-    return bv;
+    CHECK_RETURN(bv_opt->size() == bits);
+    return *bv_opt;
   }
   else if(expr.id()==ID_constant)
   {
     irep_idt value=to_constant_expr(expr).get_value();
 
-    bvt bv;
-    bv.resize(bits);
-
     if(value==ID_NULL)
-      encode(pointer_logic.get_null_object(), type, bv);
+      return encode(pointer_logic.get_null_object(), type);
     else
     {
       mp_integer i = bvrep2integer(value, bits, false);
-      bv=bv_utils.build_constant(i, bits);
+      return bv_utils.build_constant(i, bits);
     }
-
-    return bv;
   }
   else if(expr.id()==ID_plus)
   {
@@ -486,9 +482,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       sum=bv_utils.add(sum, op);
     }
 
-    offset_arithmetic(type, bv, size, sum);
-
-    return bv;
+    return offset_arithmetic(type, bv, size, sum);
   }
   else if(expr.id()==ID_minus)
   {
@@ -511,7 +505,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     const unary_minus_exprt neg_op1(minus_expr.rhs());
 
-    bvt bv = convert_bv(minus_expr.lhs());
+    const bvt &bv = convert_bv(minus_expr.lhs());
 
     typet pointer_sub_type = minus_expr.rhs().type().subtype();
     mp_integer element_size;
@@ -529,9 +523,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       element_size = *element_size_opt;
     }
 
-    offset_arithmetic(type, bv, element_size, neg_op1);
-
-    return bv;
+    return offset_arithmetic(type, bv, element_size, neg_op1);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -743,26 +735,28 @@ exprt bv_pointerst::bv_get_rec(
   return std::move(result);
 }
 
-void bv_pointerst::encode(std::size_t addr, const pointer_typet &type, bvt &bv)
-  const
+bvt bv_pointerst::encode(std::size_t addr, const pointer_typet &type) const
 {
   const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
   const std::size_t object_bits = bv_pointers_width.get_object_width(type);
 
-  bv.resize(boolbv_width(type));
+  bvt bv;
+  bv.reserve(boolbv_width(type));
 
   // set offset to zero
   for(std::size_t i=0; i<offset_bits; i++)
-    bv[i]=const_literal(false);
+    bv.push_back(const_literal(false));
 
   // set variable part
   for(std::size_t i=0; i<object_bits; i++)
-    bv[offset_bits+i]=const_literal((addr&(std::size_t(1)<<i))!=0);
+    bv.push_back(const_literal((addr & (std::size_t(1) << i)) != 0));
+
+  return bv;
 }
 
-void bv_pointerst::offset_arithmetic(
+bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
-  bvt &bv,
+  const bvt &bv,
   const mp_integer &x)
 {
   const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
@@ -775,13 +769,16 @@ void bv_pointerst::offset_arithmetic(
   bvt tmp=bv_utils.add(bv1, bv2);
 
   // copy offset bits
+  bvt result = bv;
   for(std::size_t i=0; i<offset_bits; i++)
-    bv[i]=tmp[i];
+    result[i] = tmp[i];
+
+  return result;
 }
 
-void bv_pointerst::offset_arithmetic(
+bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
-  bvt &bv,
+  const bvt &bv,
   const mp_integer &factor,
   const exprt &index)
 {
@@ -794,12 +791,12 @@ void bv_pointerst::offset_arithmetic(
   const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
   bv_index=bv_utils.extension(bv_index, offset_bits, rep);
 
-  offset_arithmetic(type, bv, factor, bv_index);
+  return offset_arithmetic(type, bv, factor, bv_index);
 }
 
-void bv_pointerst::offset_arithmetic(
+bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
-  bvt &bv,
+  const bvt &bv,
   const mp_integer &factor,
   const bvt &index)
 {
@@ -818,12 +815,15 @@ void bv_pointerst::offset_arithmetic(
   bvt bv_tmp=bv_utils.add(bv, bv_index);
 
   // copy lower parts of result
+  bvt result = bv;
   const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
   for(std::size_t i=0; i<offset_bits; i++)
-    bv[i]=bv_tmp[i];
+    result[i] = bv_tmp[i];
+
+  return result;
 }
 
-void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
+bvt bv_pointerst::add_addr(const exprt &expr)
 {
   std::size_t a=pointer_logic.add_object(expr);
 
@@ -838,7 +838,7 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
       "); " +
       "use the `--object-bits n` option to increase the maximum number");
 
-  encode(a, type, bv);
+  return encode(a, type);
 }
 
 void bv_pointerst::do_postponed(
@@ -859,9 +859,8 @@ void bv_pointerst::do_postponed(
       bool is_dynamic=pointer_logic.is_dynamic_object(expr);
 
       // only compare object part
-      bvt bv;
       pointer_typet pt = pointer_type(expr.type());
-      encode(number, pt, bv);
+      bvt bv = encode(number, pt);
 
       bv.erase(bv.begin(), bv.begin()+offset_bits);
 
@@ -904,9 +903,8 @@ void bv_pointerst::do_postponed(
         size_expr.value(), postponed.expr.type());
 
       // only compare object part
-      bvt bv;
       pointer_typet pt = pointer_type(expr.type());
-      encode(number, pt, bv);
+      bvt bv = encode(number, pt);
 
       bv.erase(bv.begin(), bv.begin()+offset_bits);
 
