@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 
+#include <util/nodiscard.h>
 
 #include "boolbv.h"
 #include "pointer_logic.h"
@@ -54,11 +55,13 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
 
-  void encode(std::size_t object, const pointer_typet &type, bvt &bv) const;
+  NODISCARD
+  bvt encode(std::size_t object, const pointer_typet &type) const;
 
   virtual bvt convert_pointer_type(const exprt &expr);
 
-  virtual void add_addr(const exprt &expr, bvt &bv);
+  NODISCARD
+  virtual bvt add_addr(const exprt &expr);
 
   // overloading
   literalt convert_rest(const exprt &expr) override;
@@ -70,20 +73,24 @@ protected:
     std::size_t offset,
     const typet &type) const override;
 
-  bool convert_address_of_rec(
-    const exprt &expr,
-    bvt &bv);
+  NODISCARD
+  optionalt<bvt> convert_address_of_rec(const exprt &expr);
 
-  void
-  offset_arithmetic(const pointer_typet &type, bvt &bv, const mp_integer &x);
-  void offset_arithmetic(
+  NODISCARD
+  bvt offset_arithmetic(
     const pointer_typet &type,
-    bvt &bv,
+    const bvt &bv,
+    const mp_integer &x);
+  NODISCARD
+  bvt offset_arithmetic(
+    const pointer_typet &type,
+    const bvt &bv,
     const mp_integer &factor,
     const exprt &index);
-  void offset_arithmetic(
+  NODISCARD
+  bvt offset_arithmetic(
     const pointer_typet &type,
-    bvt &bv,
+    const bvt &bv,
     const mp_integer &factor,
     const bvt &index_bv);
 
