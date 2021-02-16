@@ -357,8 +357,11 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     else if(statement == ID_decl)
     {
       const auto &declaration_symb = to_code_decl(code).symbol();
-      return os << "decl " << format(declaration_symb.type()) << " "
-                << format(declaration_symb) << ";";
+      os << "decl " << format(declaration_symb.type()) << " "
+         << format(declaration_symb);
+      if(code.operands().size() > 1)
+        os << " = " << format(code.op1());
+      return os << ";";
     }
     else if(statement == ID_function_call)
     {
