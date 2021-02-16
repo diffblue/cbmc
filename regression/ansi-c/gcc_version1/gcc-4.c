@@ -1,4 +1,5 @@
-// None of these types should be defined when emulating gcc-4:
+// None of these types should be defined when emulating gcc-4, which clang on
+// macOS also emulates:
 
 typedef float _Float32;
 typedef double _Float32x;
