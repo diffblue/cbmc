@@ -11,15 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_WIDTH_H
 
 #include <util/std_types.h>
-#include <util/namespace.h>
+
+class namespacet;
 
 class boolbv_widtht
 {
 public:
   explicit boolbv_widtht(const namespacet &_ns);
-  ~boolbv_widtht();
+  virtual ~boolbv_widtht() = default;
 
-  std::size_t operator()(const typet &type) const
+  virtual std::size_t operator()(const typet &type) const
   {
     return get_entry(type).total_width;
   }

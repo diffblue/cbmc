@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 //
 
 #include <util/byte_operators.h>
+#include <util/endianness_map.h>
 #include <util/expr.h>
 #include <util/mp_arith.h>
 #include <util/optional.h>
@@ -46,7 +47,7 @@ public:
     bool get_array_constraints = false)
     : arrayst(_ns, _prop, message_handler, get_array_constraints),
       unbounded_array(unbounded_arrayt::U_NONE),
-      boolbv_width(_ns),
+      bv_width(_ns),
       bv_utils(_prop),
       functions(*this),
       map(_prop)
@@ -92,9 +93,19 @@ public:
     return map;
   }
 
-  boolbv_widtht boolbv_width;
+  virtual std::size_t boolbv_width(const typet &type) const
+  {
+    return bv_width(type);
+  }
+
+  virtual endianness_mapt
+  endianness_map(const typet &type, bool little_endian) const
+  {
+    return endianness_mapt{type, little_endian, ns};
+  }
 
 protected:
+  boolbv_widtht bv_width;
   bv_utilst bv_utils;
 
   // uninterpreted functions

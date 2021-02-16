@@ -13,13 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/std_types.h>
 
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
-{
-}
-
-boolbv_widtht::~boolbv_widtht()
 {
 }
 
@@ -184,11 +181,11 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_pointer)
     entry.total_width = type_checked_cast<pointer_typet>(type).get_width();
   else if(type_id==ID_struct_tag)
-    entry=get_entry(ns.follow_tag(to_struct_tag_type(type)));
+    entry.total_width = operator()(ns.follow_tag(to_struct_tag_type(type)));
   else if(type_id==ID_union_tag)
-    entry=get_entry(ns.follow_tag(to_union_tag_type(type)));
+    entry.total_width = operator()(ns.follow_tag(to_union_tag_type(type)));
   else if(type_id==ID_c_enum_tag)
-    entry=get_entry(ns.follow_tag(to_c_enum_tag_type(type)));
+    entry.total_width = operator()(ns.follow_tag(to_c_enum_tag_type(type)));
   else if(type_id==ID_c_bit_field)
   {
     entry.total_width=to_c_bit_field_type(type).get_width();

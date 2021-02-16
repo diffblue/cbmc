@@ -17,9 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/lowering/expr_lowering.h>
 
-#include "bv_endianness_map.h"
-
-bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
+bvt map_bv(const endianness_mapt &map, const bvt &src)
 {
   PRECONDITION(map.number_of_bits() == src.size());
   bvt result;
@@ -101,11 +99,11 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   const bool little_endian = expr.id() == ID_byte_extract_little_endian;
 
   // first do op0
-  const bv_endianness_mapt op_map(op.type(), little_endian, ns, boolbv_width);
+  const endianness_mapt op_map = endianness_map(op.type(), little_endian);
   const bvt op_bv=map_bv(op_map, convert_bv(op));
 
   // do result
-  bv_endianness_mapt result_map(expr.type(), little_endian, ns, boolbv_width);
+  endianness_mapt result_map = endianness_map(expr.type(), little_endian);
   bvt bv;
   bv.resize(width);
 

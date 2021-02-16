@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/lowering/expr_lowering.h>
 
-#include "bv_endianness_map.h"
-
 bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {
   // if we update (from) an unbounded array, lower the expression as the array
@@ -67,8 +65,8 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
       }
       else
       {
-        bv_endianness_mapt map_op(op.type(), false, ns, boolbv_width);
-        bv_endianness_mapt map_value(value.type(), false, ns, boolbv_width);
+        endianness_mapt map_op = endianness_map(op.type(), false);
+        endianness_mapt map_value = endianness_map(value.type(), false);
 
         const std::size_t offset_i = numeric_cast_v<std::size_t>(offset);
 
@@ -99,8 +97,8 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
       offset_expr, from_integer(offset / byte_width, offset_expr.type()));
     literalt equal=convert(equality);
 
-    bv_endianness_mapt map_op(op.type(), little_endian, ns, boolbv_width);
-    bv_endianness_mapt map_value(value.type(), little_endian, ns, boolbv_width);
+    endianness_mapt map_op = endianness_map(op.type(), little_endian);
+    endianness_mapt map_value = endianness_map(value.type(), little_endian);
 
     for(std::size_t bit=0; bit<update_width; bit++)
       if(offset+bit<bv.size())

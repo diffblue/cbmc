@@ -130,7 +130,6 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/boolbv_width.cpp \
       flattening/boolbv_with.cpp \
       flattening/bv_dimacs.cpp \
-      flattening/bv_endianness_map.cpp \
       flattening/bv_minimize.cpp \
       flattening/bv_pointers.cpp \
       flattening/bv_utils.cpp \

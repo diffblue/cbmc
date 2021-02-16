@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/config.h>
 
-#include "bv_endianness_map.h"
-
 bvt boolbvt::convert_with(const with_exprt &expr)
 {
   bvt bv = convert_bv(expr.old());
@@ -248,8 +246,8 @@ void boolbvt::convert_with_union(
     assert(
       config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
 
-    bv_endianness_mapt map_u(type, false, ns, boolbv_width);
-    bv_endianness_mapt map_op2(op2.type(), false, ns, boolbv_width);
+    endianness_mapt map_u = endianness_map(type, false);
+    endianness_mapt map_op2 = endianness_map(op2.type(), false);
 
     for(std::size_t i=0; i<op2_bv.size(); i++)
       next_bv[map_u.map_bit(i)]=op2_bv[map_op2.map_bit(i)];
