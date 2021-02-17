@@ -480,16 +480,16 @@ bool generate_ansi_c_start_function(
       const std::string main_signature = type2c(symbol.type, ns);
       messaget message(message_handler);
       message.error().source_location = symbol.location;
-      message.error()
-        << "'main' with signature '" << main_signature
-        << "' found,"
-        << " but expecting one of:\n"
-        << "   int main(void)\n"
-        << "   int main(int argc, char *argv[])\n"
-        << "   int main(int argc, char *argv[], char *envp[])\n"
-        << "If this is a non-standard main entry point please provide a custom\n"
-        << "entry function and use --function instead"
-        << messaget::eom;
+      message.error() << "'main' with signature '" << main_signature
+                      << "' found,"
+                      << " but expecting one of:\n"
+                      << "   int main(void)\n"
+                      << "   int main(int argc, char *argv[])\n"
+                      << "   int main(int argc, char *argv[], char *envp[])\n"
+                      << "If this is a non-standard main entry point please "
+                         "provide a custom\n"
+                      << "entry function and use --function instead"
+                      << messaget::eom;
       return true;
     }
   }
