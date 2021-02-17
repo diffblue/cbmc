@@ -103,3 +103,6 @@ __CPROVER_bool __CPROVER_overflow_mult();
 __CPROVER_bool __CPROVER_overflow_plus();
 __CPROVER_bool __CPROVER_overflow_shl();
 __CPROVER_bool __CPROVER_overflow_unary_minus();
+
+// enumerations
+__CPROVER_bool __CPROVER_enum_is_in_range();

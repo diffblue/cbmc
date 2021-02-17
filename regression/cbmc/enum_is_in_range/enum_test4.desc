@@ -1,0 +1,13 @@
+CORE
+enum_test4.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(ev1\): FAILURE$
+--
+^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(ev1\): SUCCESS$
+^\*\*\*\* WARNING: no body for function __CPROVER_enum_is_in_range$
+--
+This test is for the enum_is_in_range working properly and detecting
+when the enum is not in range. The negation tests are to ensure the
+out of range is detected, and if the function is not defined.

@@ -1,0 +1,16 @@
+CORE
+enum_test5.c
+--enum-range-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main.enum-range-check.6\] line \d+ enum range check in ev3: SUCCESS$
+^\[main.enum-range-check.7\] line \d+ enum range check in ev2: FAILURE$
+--
+^\[main.enum-range-check.6\] line \d+ enum range check in ev3: FAILURE$
+^\*\*\*\* WARNING: no body for function __CPROVER_enum_is_in_range$
+--
+This test is for the enum_is_in_range working in assume statements
+(and also value passing through assignments of enums). The failure
+test case is checking that range checks do work on enums.
+The negation tests are to ensure the assumption is taken into account
+for ev1 and thus ev3, and if the function is not defined.

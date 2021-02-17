@@ -2961,6 +2961,33 @@ exprt c_typecheck_baset::do_special_functions(
     overflow.type() = bool_typet{};
     return overflow;
   }
+  else if(identifier == CPROVER_PREFIX "enum_is_in_range")
+  {
+    // Check correct number of arguments
+    if(expr.arguments().size() != 1)
+    {
+      std::ostringstream error_message;
+      error_message << expr.source_location().as_string() << ": " << identifier
+                    << " takes exactly 1 argument, but "
+                    << expr.arguments().size() << " were provided";
+      throw invalid_source_file_exceptiont{error_message.str()};
+    }
+    auto arg1 = expr.arguments()[0];
+    typecheck_expr(arg1);
+    if(!can_cast_type<c_enum_tag_typet>(arg1.type()))
+    {
+      // Can't enum range check a non-enum
+      std::ostringstream error_message;
+      error_message << expr.source_location().as_string() << ": " << identifier
+                    << " expects enum, but (" << expr2c(arg1, *this)
+                    << ") has type `" << type2c(arg1.type(), *this) << '`';
+      throw invalid_source_file_exceptiont{error_message.str()};
+    }
+    else
+    {
+      return expr;
+    }
+  }
   else if(
     identifier == "__builtin_add_overflow" ||
     identifier == "__builtin_sub_overflow" ||
