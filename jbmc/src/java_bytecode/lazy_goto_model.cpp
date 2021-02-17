@@ -152,14 +152,14 @@ void lazy_goto_modelt::initialize(
 
     if(dynamic_cast<java_bytecode_languaget &>(language).parse())
     {
-      throw invalid_source_file_exceptiont("PARSING ERROR");
+      throw invalid_input_exceptiont("PARSING ERROR");
     }
 
     msg.status() << "Converting" << messaget::eom;
 
     if(language_files.typecheck(symbol_table))
     {
-      throw invalid_source_file_exceptiont("CONVERSION ERROR");
+      throw invalid_input_exceptiont("CONVERSION ERROR");
     }
   }
   else

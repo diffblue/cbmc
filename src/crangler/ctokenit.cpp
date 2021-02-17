@@ -46,7 +46,7 @@ ctokenitt match_bracket(ctokenitt t, char open, char close)
   while(true)
   {
     if(!t)
-      throw invalid_source_file_exceptiont("expected " + std::string(1, close));
+      throw invalid_input_exceptiont("expected " + std::string(1, close));
 
     const auto &token = *(t++);
 
