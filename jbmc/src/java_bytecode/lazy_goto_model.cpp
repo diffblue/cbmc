@@ -5,17 +5,17 @@
 
 #include "lazy_goto_model.h"
 
-#include "java_bytecode_language.h"
-
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/rebuild_goto_start_function.h>
-
-#include <langapi/mode.h>
-
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
 #include <util/options.h>
+
+#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/read_goto_binary.h>
+
+#include <langapi/mode.h>
+
+#include "java_bytecode_language.h"
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>
@@ -164,93 +164,20 @@ void lazy_goto_modelt::initialize(
   }
   else
   {
-    for(const auto &filename : sources)
-    {
-#ifdef _MSC_VER
-      std::ifstream infile(widen(filename));
-#else
-      std::ifstream infile(filename);
-#endif
-
-      if(!infile)
-      {
-        throw system_exceptiont(
-          "failed to open input file '" + filename + '\'');
-      }
-
-      language_filet &lf = add_language_file(filename);
-      lf.language = get_language_from_filename(filename);
-
-      if(lf.language == nullptr)
-      {
-        throw invalid_source_file_exceptiont(
-          "failed to figure out type of file '" + filename + '\'');
-      }
-
-      languaget &language = *lf.language;
-      language.set_message_handler(message_handler);
-      language.set_language_options(options);
-
-      msg.status() << "Parsing " << filename << messaget::eom;
-
-      if(language.parse(infile, filename))
-      {
-        throw invalid_source_file_exceptiont("PARSING ERROR");
-      }
-
-      lf.get_modules();
-    }
-
-    msg.status() << "Converting" << messaget::eom;
-
-    if(language_files.typecheck(symbol_table))
-    {
-      throw invalid_source_file_exceptiont("CONVERSION ERROR");
-    }
+    initialize_from_source_files(
+      sources, options, language_files, symbol_table, message_handler);
   }
 
   if(read_objects_and_link(binaries, *goto_model, message_handler))
     throw incorrect_goto_program_exceptiont{"failed to read/link goto model"};
 
-  bool binaries_provided_start =
-    symbol_table.has_symbol(goto_functionst::entry_point());
-
-  bool entry_point_generation_failed = false;
-
-  if(binaries_provided_start && options.is_set("function"))
-  {
-    // The goto binaries provided already contain a __CPROVER_start
-    // function that may be tied to a different entry point `function`.
-    // Hence, we will rebuild the __CPROVER_start function.
-
-    // Get the language annotation of the existing __CPROVER_start function.
-    std::unique_ptr<languaget> language =
-      get_entry_point_language(symbol_table, options, message_handler);
-
-    // To create a new entry point we must first remove the old one
-    remove_existing_entry_point(symbol_table);
-
-    // Create the new entry-point
-    entry_point_generation_failed =
-      language->generate_support_functions(symbol_table);
-
-    // Remove the function from the goto functions so it is copied back in
-    // from the symbol table during goto_convert
-    if(!entry_point_generation_failed)
-      unload(goto_functionst::entry_point());
-  }
-  else if(!binaries_provided_start)
-  {
-    // Allow all language front-ends to try to provide the user-specified
-    // (--function) entry-point, or some language-specific default:
-    entry_point_generation_failed =
-      language_files.generate_support_functions(symbol_table);
-  }
-
-  if(entry_point_generation_failed)
-  {
-    throw invalid_source_file_exceptiont("SUPPORT FUNCTION GENERATION ERROR");
-  }
+  set_up_custom_entry_point(
+    language_files,
+    symbol_table,
+    [this](const irep_idt &id) { goto_functions.unload(id); },
+    options,
+    false,
+    message_handler);
 
   // stupid hack
   config.set_object_bits_from_symbol_table(symbol_table);
