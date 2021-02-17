@@ -318,7 +318,7 @@ void java_bytecode_languaget::initialize_class_loader()
 
 static void throwMainClassLoadingError(const std::string &main_class)
 {
-  throw invalid_source_file_exceptiont(
+  throw system_exceptiont(
     "Error: Could not find or load main class " + main_class);
 }
 
@@ -392,8 +392,7 @@ bool java_bytecode_languaget::parse(
     std::ifstream jar_file(path);
     if(!jar_file.good())
     {
-      throw invalid_source_file_exceptiont(
-        "Error: Unable to access jarfile " + path);
+      throw system_exceptiont("Error: Unable to access jarfile " + path);
     }
 
     // build an object to potentially limit which classes are loaded

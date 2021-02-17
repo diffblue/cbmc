@@ -95,6 +95,16 @@ std::string analysis_exceptiont::what() const
   return reason;
 }
 
+invalid_input_exceptiont::invalid_input_exceptiont(std::string reason)
+  : m_reason(std::move(reason))
+{
+}
+
+std::string invalid_input_exceptiont::what() const
+{
+  return m_reason;
+}
+
 invalid_source_file_exceptiont::invalid_source_file_exceptiont(
   std::string reason)
   : reason(std::move(reason))
