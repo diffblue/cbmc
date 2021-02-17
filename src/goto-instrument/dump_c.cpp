@@ -654,7 +654,7 @@ void dump_ct::cleanup_decl(
 
   if(value)
   {
-    decl.operands().resize(1);
+    decl.set_initial_value({});
   }
 
   goto_programt tmp;

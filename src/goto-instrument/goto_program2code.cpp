@@ -477,7 +477,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
     {
       if(next->is_assign())
       {
-        d.copy_to_operands(next->get_assign().rhs());
+        d.set_initial_value({next->get_assign().rhs()});
       }
       else
       {
