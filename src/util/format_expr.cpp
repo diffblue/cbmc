@@ -354,13 +354,13 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     {
       return os << "dead " << format(to_code_dead(code).symbol()) << ";";
     }
-    else if(statement == ID_decl)
+    else if(const auto decl = expr_try_dynamic_cast<code_declt>(code))
     {
-      const auto &declaration_symb = to_code_decl(code).symbol();
+      const auto &declaration_symb = decl->symbol();
       os << "decl " << format(declaration_symb.type()) << " "
          << format(declaration_symb);
-      if(code.operands().size() > 1)
-        os << " = " << format(code.op1());
+      if(const optionalt<exprt> initial_value = decl->initial_value())
+        os << " = " << format(*initial_value);
       return os << ";";
     }
     else if(statement == ID_function_call)
