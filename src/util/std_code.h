@@ -420,6 +420,15 @@ public:
     return symbol().get_identifier();
   }
 
+  /// Returns the initial value to which the declared variable is initialized,
+  /// or empty in the case where no initialisation is included.
+  optionalt<exprt> initial_value() const
+  {
+    if(operands().size() < 2)
+      return {};
+    return {op1()};
+  }
+
   static void check(
     const codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
