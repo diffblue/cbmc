@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check
+^\[main.pointer.1\] line 6 same object violation in array - other_array: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
