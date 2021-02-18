@@ -32,13 +32,13 @@ exprt convert_character_literal(
 
     std::basic_string<unsigned int> value=
       unescape_wide_string(std::string(src, 2, src.size()-3));
+    // the parser rejects empty character constants
+    CHECK_RETURN(!value.empty());
 
     // L is wchar_t, u is char16_t, U is char32_t
     typet type=wchar_t_type();
 
-    if(value.empty())
-      throw "empty wide character literal";
-    else if(value.size()==1)
+    if(value.size() == 1)
     {
       result=from_integer(value[0], type);
     }
@@ -69,10 +69,10 @@ exprt convert_character_literal(
 
     std::string value=
       unescape_string(std::string(src, 1, src.size()-2));
+    // the parser rejects empty character constants
+    CHECK_RETURN(!value.empty());
 
-    if(value.empty())
-      throw "empty character literal";
-    else if(value.size()==1)
+    if(value.size() == 1)
     {
       typet type=force_integer_type?signed_int_type():char_type();
       result=from_integer(value[0], type);
