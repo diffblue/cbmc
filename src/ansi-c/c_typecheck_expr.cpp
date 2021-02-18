@@ -3170,10 +3170,10 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size() != 1)
     {
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " takes exactly 1 argument, but "
+      error_message << identifier << " takes exactly 1 argument, but "
                     << expr.arguments().size() << " were provided";
-      throw invalid_source_file_exceptiont{error_message.str()};
+      throw invalid_source_file_exceptiont{
+        error_message.str(), expr.source_location()};
     }
     auto arg1 = expr.arguments()[0];
     typecheck_expr(arg1);
@@ -3181,10 +3181,11 @@ exprt c_typecheck_baset::do_special_functions(
     {
       // Can't enum range check a non-enum
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " expects enum, but (" << expr2c(arg1, *this)
-                    << ") has type `" << type2c(arg1.type(), *this) << '`';
-      throw invalid_source_file_exceptiont{error_message.str()};
+      error_message << identifier << " expects enum, but ("
+                    << expr2c(arg1, *this) << ") has type `"
+                    << type2c(arg1.type(), *this) << '`';
+      throw invalid_source_file_exceptiont{
+        error_message.str(), expr.source_location()};
     }
     else
     {
@@ -3237,9 +3238,9 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size() != 1)
     {
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string()
-                    << ": error: " << identifier << " expects one operand";
-      throw invalid_source_file_exceptiont{error_message.str()};
+      error_message << "error: " << identifier << " expects one operand";
+      throw invalid_source_file_exceptiont{
+        error_message.str(), expr.source_location()};
     }
 
     typecheck_function_call_arguments(expr);
@@ -3264,10 +3265,10 @@ exprt c_typecheck_baset::typecheck_builtin_overflow(
   if(expr.arguments().size() != 3)
   {
     std::ostringstream error_message;
-    error_message << expr.source_location().as_string() << ": " << identifier
-                  << " takes exactly 3 arguments, but "
+    error_message << identifier << " takes exactly 3 arguments, but "
                   << expr.arguments().size() << " were provided";
-    throw invalid_source_file_exceptiont{error_message.str()};
+    throw invalid_source_file_exceptiont{
+      error_message.str(), expr.source_location()};
   }
 
   typecheck_function_call_arguments(expr);
@@ -3283,14 +3284,14 @@ exprt c_typecheck_baset::typecheck_builtin_overflow(
       [this, identifier](
         const exprt &wrong_argument, std::size_t argument_number, bool _p) {
         std::ostringstream error_message;
-        error_message << wrong_argument.source_location().as_string() << ": "
-                      << identifier << " has signature " << identifier
-                      << "(integral, integral, integral" << (_p ? "" : "*")
-                      << "), "
+        error_message << "error: " << identifier << " has signature "
+                      << identifier << "(integral, integral, integral"
+                      << (_p ? "" : "*") << "), "
                       << "but argument " << argument_number << " ("
                       << expr2c(wrong_argument, *this) << ") has type `"
                       << type2c(wrong_argument.type(), *this) << '`';
-        throw invalid_source_file_exceptiont{error_message.str()};
+        throw invalid_source_file_exceptiont{
+          error_message.str(), wrong_argument.source_location()};
       };
     for(int arg_index = 0; arg_index <= (!is__p_variant ? 1 : 2); ++arg_index)
     {
@@ -3326,10 +3327,11 @@ exprt c_typecheck_baset::typecheck_saturating_arithmetic(
   if(expr.arguments().size() != 2)
   {
     std::ostringstream error_message;
-    error_message << expr.source_location().as_string() << ": " << identifier
+    error_message << "error: " << identifier
                   << " takes exactly two arguments, but "
                   << expr.arguments().size() << " were provided";
-    throw invalid_source_file_exceptiont{error_message.str()};
+    throw invalid_source_file_exceptiont{
+      error_message.str(), expr.source_location()};
   }
 
   exprt result;

@@ -20,7 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt convert_character_literal(
   const std::string &src,
-  bool force_integer_type)
+  bool force_integer_type,
+  const source_locationt &source_location)
 {
   assert(src.size()>=2);
 
@@ -60,8 +61,10 @@ exprt convert_character_literal(
       result=from_integer(x, type);
     }
     else
-      throw "wide literals with "+std::to_string(value.size())+
-            " characters are not supported";
+      throw invalid_source_file_exceptiont{
+        "wide literals with " + std::to_string(value.size()) +
+          " characters are not supported",
+        source_location};
   }
   else
   {
@@ -93,9 +96,12 @@ exprt convert_character_literal(
       result=from_integer(x, signed_int_type());
     }
     else
-      throw "literals with "+std::to_string(value.size())+
-            " characters are not supported";
+      throw invalid_source_file_exceptiont{
+        "literals with " + std::to_string(value.size()) +
+          " characters are not supported",
+        source_location};
   }
 
+  result.add_source_location() = source_location;
   return result;
 }

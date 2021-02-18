@@ -1198,10 +1198,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     if(!is_signed_or_unsigned_bitvector(underlying_type))
     {
       std::ostringstream msg;
-      msg << source_location << ": non-integral type '"
-          << underlying_type.get(ID_C_c_type)
+      msg << "non-integral type '" << underlying_type.get(ID_C_c_type)
           << "' is an invalid underlying type";
-      throw invalid_source_file_exceptiont{msg.str()};
+      throw invalid_source_file_exceptiont{msg.str(), source_location};
     }
   }
 
@@ -1260,11 +1259,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       if(value < tmp.smallest() || value > tmp.largest())
       {
         std::ostringstream msg;
-        msg
-          << v.source_location()
-          << ": enumerator value is not representable in the underlying type '"
-          << constant_type.get(ID_C_c_type) << "'";
-        throw invalid_source_file_exceptiont{msg.str()};
+        msg << "enumerator value is not representable in the underlying type '"
+            << constant_type.get(ID_C_c_type) << "'";
+        throw invalid_source_file_exceptiont{msg.str(), v.source_location()};
       }
     }
     else

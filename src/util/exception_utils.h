@@ -168,10 +168,26 @@ public:
 /// Thrown when we can't handle something in an input source file.
 /// For example, if we get C source code that is not syntactically valid
 /// or that has type errors.
-class invalid_source_file_exceptiont : public cprover_exception_baset
+class invalid_source_file_exceptiont : public invalid_input_exceptiont
 {
 public:
-  explicit invalid_source_file_exceptiont(std::string reason);
+  invalid_source_file_exceptiont(
+    std::string reason,
+    source_locationt source_location);
+  std::string what() const override;
+
+  const std::string &get_reason() const
+  {
+    return reason;
+  }
+
+  const source_locationt &get_source_location() const
+  {
+    return source_location;
+  }
+
+private:
+  source_locationt source_location;
 };
 
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H

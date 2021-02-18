@@ -111,6 +111,15 @@ int goto_cc_modet::main(int argc, const char **argv)
     log.error() << "Out of memory" << messaget::eom;
     return EX_SOFTWARE;
   }
+
+  catch(const invalid_source_file_exceptiont &e)
+  {
+    messaget log{message_handler};
+    log.error().source_location = e.get_source_location();
+    log.error() << e.get_reason() << messaget::eom;
+    return EX_SOFTWARE;
+  }
+
   catch(const cprover_exception_baset &e)
   {
     messaget log{message_handler};

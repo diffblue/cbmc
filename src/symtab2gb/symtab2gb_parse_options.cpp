@@ -77,14 +77,18 @@ static void run_symtab2gb(
     auto &symtab_file = symtab_files[ix];
     if(failed(symtab_language->parse(symtab_file, symtab_filename)))
     {
+      source_locationt source_location;
+      source_location.set_file(symtab_filename);
       throw invalid_source_file_exceptiont{
-        "failed to parse symbol table from file '" + symtab_filename + "'"};
+        "failed to parse symbol table", source_location};
     }
     symbol_tablet symtab{};
     if(failed(symtab_language->typecheck(symtab, "<unused>")))
     {
+      source_locationt source_location;
+      source_location.set_file(symtab_filename);
       throw invalid_source_file_exceptiont{
-        "failed to typecheck symbol table from file '" + symtab_filename + "'"};
+        "failed to typecheck symbol table", source_location};
     }
     config.set_from_symbol_table(symtab);
 

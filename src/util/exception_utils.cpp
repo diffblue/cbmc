@@ -86,7 +86,14 @@ invalid_input_exceptiont::invalid_input_exceptiont(std::string reason)
 }
 
 invalid_source_file_exceptiont::invalid_source_file_exceptiont(
-  std::string reason)
-  : cprover_exception_baset(std::move(reason))
+  std::string reason,
+  source_locationt source_location)
+  : invalid_input_exceptiont(std::move(reason)),
+    source_location(std::move(source_location))
 {
+}
+
+std::string invalid_source_file_exceptiont::what() const
+{
+  return source_location.as_string() + ": " + reason;
 }

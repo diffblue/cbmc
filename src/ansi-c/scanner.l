@@ -307,9 +307,9 @@ void ansi_c_scanner_init()
 }
 
 <GRAMMAR>{char_lit} {
-                  newstack(yyansi_clval);
-                  parser_stack(yyansi_clval)=convert_character_literal(yytext, true);
-                  PARSER.set_source_location(parser_stack(yyansi_clval));
+                  loc();
+                  source_locationt l=parser_stack(yyansi_clval).source_location();
+                  parser_stack(yyansi_clval)=convert_character_literal(yytext, true, l);
                   return TOK_CHARACTER;
                 }
 
