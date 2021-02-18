@@ -75,7 +75,7 @@ bvt bv_utilst::extract_lsb(const bvt &a, std::size_t n)
   return result;
 }
 
-bvt bv_utilst::concatenate(const bvt &a, const bvt &b) const
+bvt bv_utilst::concatenate(const bvt &a, const bvt &b)
 {
   bvt result;
 
