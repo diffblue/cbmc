@@ -10,7 +10,6 @@
 /// Value Set Abstract Object
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
@@ -59,27 +58,69 @@ make_value_set_index_range(const abstract_object_sett &vals)
   return util_make_unique<value_set_index_ranget>(vals);
 }
 
-exprt rewrite_expression(
+static value_range_implementation_ptrt
+make_value_set_value_range(const abstract_object_sett &vals);
+
+class value_set_value_ranget : public value_range_implementationt
+{
+public:
+  explicit value_set_value_ranget(const abstract_object_sett &vals)
+    : values(vals), cur(), next(values.begin())
+  {
+    PRECONDITION(!values.empty());
+  }
+
+  const abstract_object_pointert &current() const override
+  {
+    return cur;
+  }
+  bool advance_to_next() override
+  {
+    if(next == values.end())
+      return false;
+
+    cur = *next;
+    ++next;
+    return true;
+  }
+  value_range_implementation_ptrt reset() const override
+  {
+    return make_value_set_value_range(values);
+  }
+
+private:
+  const abstract_object_sett &values;
+  abstract_object_pointert cur;
+  abstract_object_sett::const_iterator next;
+};
+
+static value_range_implementation_ptrt
+make_value_set_value_range(const abstract_object_sett &vals)
+{
+  return util_make_unique<value_set_value_ranget>(vals);
+}
+
+static exprt rewrite_expression(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &ops);
 
-std::vector<abstract_object_sett>
+static std::vector<value_ranget>
 unwrap_operands(const std::vector<abstract_object_pointert> &operands);
 
-abstract_object_sett
+static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values);
 
 /// Helper for converting singleton value sets into its only value.
 /// \p maybe_singleton: either a set of abstract values or a single value
 /// \return an abstract value without context
-abstract_object_pointert
+static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
 /// Helper for converting context objects into its abstract-value children
 /// \p maybe_wrapped: either an abstract value (or a set of those) or one
 ///   wrapped in a context
 /// \return an abstract value without context (though it might be as set)
-abstract_object_pointert
+static abstract_object_pointert
 maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
 
 /// Recursively construct a combination \p sub_con from \p super_con and once
@@ -157,6 +198,12 @@ value_set_abstract_objectt::index_range_implementation(
   return make_value_set_index_range(values);
 }
 
+value_range_implementation_ptrt
+value_set_abstract_objectt::value_range_implementation() const
+{
+  return make_value_set_value_range(values);
+}
+
 abstract_object_pointert value_set_abstract_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -188,14 +235,14 @@ abstract_object_pointert value_set_abstract_objectt::expression_transform(
 
 abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
   const typet &type,
-  const std::vector<abstract_object_sett> &operands,
+  const std::vector<value_ranget> &operands,
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  auto const condition = operands[0];
+  auto const &condition = operands[0];
 
-  auto const true_result = operands[1];
-  auto const false_result = operands[2];
+  auto const &true_result = operands[1];
+  auto const &false_result = operands[2];
 
   auto all_true = true;
   auto all_false = true;
@@ -337,7 +384,7 @@ void value_set_abstract_objectt::output(
   }
 }
 
-exprt rewrite_expression(
+static exprt rewrite_expression(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &ops)
 {
@@ -348,23 +395,26 @@ exprt rewrite_expression(
   return rewritten_expr;
 }
 
-std::vector<abstract_object_sett>
+static std::vector<value_ranget>
 unwrap_operands(const std::vector<abstract_object_pointert> &operands)
 {
-  auto unwrapped = std::vector<abstract_object_sett>{};
+  auto unwrapped = std::vector<value_ranget>{};
 
   for(const auto &op : operands)
   {
-    auto vsab =
-      std::dynamic_pointer_cast<const value_set_tag>(maybe_unwrap_context(op));
-    INVARIANT(vsab, "should be a value set abstract object");
-    unwrapped.push_back(vsab->get_values());
+    auto av = std::dynamic_pointer_cast<const abstract_value_objectt>(
+      maybe_unwrap_context(op));
+    // INVARIANT(av, "should be an abstract value object");
+    if(av)
+      unwrapped.emplace_back(av->value_range());
+    else // Forthcoming work will eliminate this line
+      unwrapped.emplace_back(value_ranget{make_single_value_range(op)});
   }
 
   return unwrapped;
 }
 
-abstract_object_sett
+static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values)
 {
   abstract_object_sett unwrapped_values;
@@ -377,7 +427,7 @@ unwrap_and_extract_values(const abstract_object_sett &values)
   return unwrapped_values;
 }
 
-abstract_object_pointert
+static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
 {
   auto const &value_as_set =
@@ -394,7 +444,7 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
     return maybe_singleton;
 }
 
-abstract_object_pointert
+static abstract_object_pointert
 maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
 {
   auto const &context_value =

@@ -38,6 +38,11 @@ public:
   {
     values.insert(rhs.begin(), rhs.end());
   }
+  void insert(const value_ranget &rhs)
+  {
+    for(auto const &value : rhs)
+      insert(value);
+  }
 
   abstract_object_pointert first() const
   {

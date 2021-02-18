@@ -68,3 +68,37 @@ index_range_implementation_ptrt make_indeterminate_index_range()
 {
   return util_make_unique<indeterminate_index_ranget>();
 }
+
+class single_value_value_ranget : public value_range_implementationt
+{
+public:
+  explicit single_value_value_ranget(const abstract_object_pointert &val)
+    : value(val), available(true)
+  {
+  }
+
+  const abstract_object_pointert &current() const override
+  {
+    return value;
+  }
+  bool advance_to_next() override
+  {
+    bool a = available;
+    available = false;
+    return a;
+  }
+  value_range_implementation_ptrt reset() const override
+  {
+    return make_single_value_range(value);
+  }
+
+private:
+  const abstract_object_pointert value;
+  bool available;
+};
+
+value_range_implementation_ptrt
+make_single_value_range(const abstract_object_pointert &value)
+{
+  return util_make_unique<single_value_value_ranget>(value);
+}

@@ -9,6 +9,7 @@
 #include "value_set_test_helpers.h"
 #include <ansi-c/ansi_c_language.h>
 #include <testing-utils/use_catch.h>
+#include <util/string_utils.h>
 
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
@@ -63,6 +64,31 @@ std::string expr_to_str(const exprt &expr)
   return expr_str;
 }
 
+template <class Container, typename UnaryOp>
+std::string container_to_str(const Container &con, UnaryOp unaryOp)
+{
+  auto as_str = std::vector<std::string>{};
+  std::transform(con.begin(), con.end(), std::back_inserter(as_str), unaryOp);
+  auto out = std::ostringstream{};
+  out << "{ ";
+  join_strings(out, as_str.begin(), as_str.end(), ", ");
+  out << " }";
+  return out.str();
+}
+
+std::string set_to_str(const abstract_object_sett &set)
+{
+  return container_to_str(set, [](const abstract_object_pointert &lhs) {
+    return expr_to_str(lhs->to_constant());
+  });
+}
+
+std::string exprs_to_str(const std::vector<exprt> &values)
+{
+  return container_to_str(
+    values, [](const exprt &lhs) { return expr_to_str(lhs); });
+}
+
 void EXPECT(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values)
@@ -76,9 +102,12 @@ void EXPECT(
   auto values = result->get_values();
   REQUIRE(values.size() == expected_values.size());
 
+  auto value_string = set_to_str(values);
+  auto expected_string = exprs_to_str(expected_values);
+
   for(auto &ev : expected_values)
   {
-    INFO("Expect result to include " + expr_to_str(ev));
+    INFO("Expect " + value_string + " to include " + expected_string);
     REQUIRE(set_contains(values, ev));
   }
 }

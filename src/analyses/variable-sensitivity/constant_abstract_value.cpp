@@ -73,6 +73,12 @@ constant_abstract_valuet::index_range_implementation(const namespacet &ns) const
   return make_constant_index_range(val);
 }
 
+value_range_implementation_ptrt
+constant_abstract_valuet::value_range_implementation() const
+{
+  return make_single_value_range(shared_from_this());
+}
+
 abstract_object_pointert constant_abstract_valuet::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,

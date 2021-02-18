@@ -33,6 +33,8 @@ public:
   index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const override;
 
+  value_range_implementation_ptrt value_range_implementation() const override;
+
   /// \copydoc abstract_objectt::to_constant
   exprt to_constant() const override
   {
@@ -89,7 +91,7 @@ protected:
 private:
   abstract_object_pointert evaluate_conditional(
     const typet &type,
-    const std::vector<abstract_object_sett> &operands,
+    const std::vector<value_ranget> &operands,
     const abstract_environmentt &env,
     const namespacet &ns) const;
 
