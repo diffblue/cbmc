@@ -16,23 +16,24 @@ SCENARIO(
   "adding two value_set_abstract_objects",
   "[core][analyses][variable-sensitivity][value_set_abstract_object][merge]")
 {
+  const exprt val1 = from_integer(1, integer_typet());
+  const exprt val2 = from_integer(2, integer_typet());
+  const exprt val3 = from_integer(3, integer_typet());
+  const exprt val4 = from_integer(4, integer_typet());
+  const exprt val5 = from_integer(5, integer_typet());
+
+  auto config = vsd_configt::value_set();
+  config.context_tracking.data_dependency_context = false;
+  config.context_tracking.last_write_context = false;
+  auto object_factory =
+    variable_sensitivity_object_factoryt::configured_with(config);
+  auto environment = abstract_environmentt{object_factory};
+  environment.make_top();
+  auto symbol_table = symbol_tablet{};
+  auto ns = namespacet{symbol_table};
+
   GIVEN("Two value sets")
   {
-    const exprt val1 = from_integer(1, integer_typet());
-    const exprt val2 = from_integer(2, integer_typet());
-    const exprt val3 = from_integer(3, integer_typet());
-    const exprt val4 = from_integer(4, integer_typet());
-
-    auto config = vsd_configt::value_set();
-    config.context_tracking.data_dependency_context = false;
-    config.context_tracking.last_write_context = false;
-    auto object_factory =
-      variable_sensitivity_object_factoryt::configured_with(config);
-    auto environment = abstract_environmentt{object_factory};
-    environment.make_top();
-    auto symbol_table = symbol_tablet{};
-    auto ns = namespacet{symbol_table};
-
     WHEN("{ 1 } + { 1 }")
     {
       auto op1 = make_value_set(val1, environment, ns);

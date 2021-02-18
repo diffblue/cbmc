@@ -144,14 +144,14 @@ public:
   {
   }
 
-  virtual index_ranget index_range(const namespacet &ns) const
+  index_ranget index_range(const namespacet &ns) const
   {
-    return index_ranget(range_implementation(ns));
+    return index_ranget(index_range_implementation(ns));
   }
 
 protected:
   virtual index_range_implementation_ptrt
-  range_implementation(const namespacet &ns) const = 0;
+  index_range_implementation(const namespacet &ns) const = 0;
 };
 
 #endif

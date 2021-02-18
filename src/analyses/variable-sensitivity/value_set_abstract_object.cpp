@@ -148,7 +148,8 @@ value_set_abstract_objectt::value_set_abstract_objectt(
 }
 
 index_range_implementation_ptrt
-value_set_abstract_objectt::range_implementation(const namespacet &ns) const
+value_set_abstract_objectt::index_range_implementation(
+  const namespacet &ns) const
 {
   if(values.empty())
     return make_indeterminate_index_range();

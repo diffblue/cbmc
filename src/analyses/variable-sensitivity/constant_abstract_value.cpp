@@ -64,7 +64,7 @@ constant_abstract_valuet::constant_abstract_valuet(
 }
 
 index_range_implementation_ptrt
-constant_abstract_valuet::range_implementation(const namespacet &ns) const
+constant_abstract_valuet::index_range_implementation(const namespacet &ns) const
 {
   exprt val = to_constant();
   if(!val.is_constant())

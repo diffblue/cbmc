@@ -562,7 +562,7 @@ abstract_object_pointert interval_abstract_valuet::meet_intervals(
 }
 
 index_range_implementation_ptrt
-interval_abstract_valuet::range_implementation(const namespacet &ns) const
+interval_abstract_valuet::index_range_implementation(const namespacet &ns) const
 {
   if(is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
     return make_empty_index_range();
