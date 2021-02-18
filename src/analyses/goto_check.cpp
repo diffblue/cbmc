@@ -1128,18 +1128,15 @@ void goto_checkt::pointer_rel_check(
   {
     // add same-object subgoal
 
-    if(enable_pointer_check)
-    {
-      exprt same_object=::same_object(expr.op0(), expr.op1());
+    exprt same_object = ::same_object(expr.op0(), expr.op1());
 
-      add_guarded_property(
-        same_object,
-        "same object violation",
-        "pointer",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
+    add_guarded_property(
+      same_object,
+      "same object violation",
+      "pointer",
+      expr.find_source_location(),
+      expr,
+      guard);
   }
 }
 
