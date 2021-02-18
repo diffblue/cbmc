@@ -160,6 +160,8 @@ void for_each_comb(const std::vector<Con> &super_con, F f)
   apply_comb(super_con, sub_con, f);
 }
 
+static bool are_any_top(const abstract_object_sett &set);
+
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type)
 {
@@ -352,12 +354,25 @@ abstract_object_pointert value_set_abstract_objectt::to_interval(
     constant_interval_exprt(lower_expr, upper_expr));
 }
 
+void value_set_abstract_objectt::set_top_internal()
+{
+  values.clear();
+  values.insert(std::make_shared<constant_abstract_valuet>(type()));
+}
+
 void value_set_abstract_objectt::set_values(
   const abstract_object_sett &other_values)
 {
   PRECONDITION(!other_values.empty());
-  set_not_top();
-  values = other_values;
+  if(are_any_top(other_values))
+  {
+    set_top();
+  }
+  else
+  {
+    set_not_top();
+    values = other_values;
+  }
   verify();
 }
 
@@ -451,4 +466,12 @@ maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
     std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
 
   return context_value ? context_value->unwrap_context() : maybe_wrapped;
+}
+
+static bool are_any_top(const abstract_object_sett &set)
+{
+  return std::find_if(
+           set.begin(), set.end(), [](const abstract_object_pointert &value) {
+             return value->is_top();
+           }) != set.end();
 }

@@ -156,6 +156,35 @@ SCENARIO(
       }
     }
   }
+  GIVEN("adding a value_set and TOP")
+  {
+    WHEN("{ 1, 2 } + TOP constant")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op2 = std::make_shared<constant_abstract_valuet>(val1.type());
+      REQUIRE(op2->is_top());
+
+      auto result = add_values(op1, op2, environment, ns);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("{ 1, 2 } + TOP value_set")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op2 = std::make_shared<value_set_abstract_objectt>(val1.type());
+      REQUIRE(op2->is_top());
+
+      auto result = add_values(op1, op2, environment, ns);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+  }
 }
 
 static std::shared_ptr<const value_set_abstract_objectt> add_values(

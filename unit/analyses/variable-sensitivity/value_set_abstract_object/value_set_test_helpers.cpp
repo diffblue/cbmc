@@ -129,5 +129,7 @@ void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result)
   REQUIRE_FALSE(result->is_bottom());
 
   auto values = result->get_values();
-  REQUIRE(values.empty());
+  REQUIRE(values.size() == 1);
+  REQUIRE(values.first()->is_top());
+  REQUIRE_FALSE(values.first()->is_bottom());
 }

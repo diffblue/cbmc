@@ -122,10 +122,7 @@ private:
   abstract_object_pointert
   to_interval(const abstract_object_sett &other_values) const;
 
-  virtual void set_top_internal()
-  {
-    values.clear();
-  }
+  void set_top_internal() override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
