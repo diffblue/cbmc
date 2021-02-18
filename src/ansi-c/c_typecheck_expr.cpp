@@ -2967,10 +2967,10 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size() != 1)
     {
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " takes exactly 1 argument, but "
+      error_message << identifier << " takes exactly 1 argument, but "
                     << expr.arguments().size() << " were provided";
-      throw invalid_source_file_exceptiont{error_message.str()};
+      throw invalid_source_file_exceptiont{error_message.str(),
+                                           expr.source_location()};
     }
     auto arg1 = expr.arguments()[0];
     typecheck_expr(arg1);
@@ -2978,10 +2978,11 @@ exprt c_typecheck_baset::do_special_functions(
     {
       // Can't enum range check a non-enum
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " expects enum, but (" << expr2c(arg1, *this)
-                    << ") has type `" << type2c(arg1.type(), *this) << '`';
-      throw invalid_source_file_exceptiont{error_message.str()};
+      error_message << identifier << " expects enum, but ("
+                    << expr2c(arg1, *this) << ") has type `"
+                    << type2c(arg1.type(), *this) << '`';
+      throw invalid_source_file_exceptiont{error_message.str(),
+                                           expr.source_location()};
     }
     else
     {
@@ -2997,10 +2998,10 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size() != 3)
     {
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " takes exactly 3 arguments, but "
+      error_message << identifier << " takes exactly 3 arguments, but "
                     << expr.arguments().size() << " were provided";
-      throw invalid_source_file_exceptiont{error_message.str()};
+      throw invalid_source_file_exceptiont{error_message.str(),
+                                           expr.source_location()};
     }
 
     auto lhs = expr.arguments()[0];
@@ -3016,13 +3017,13 @@ exprt c_typecheck_baset::do_special_functions(
         [this,
          identifier](const exprt &wrong_argument, std::size_t argument_number) {
           std::ostringstream error_message;
-          error_message << wrong_argument.source_location().as_string() << ": "
-                        << identifier << " has signature " << identifier
+          error_message << identifier << " has signature " << identifier
                         << "(integral, integral, integral*), "
                         << "but argument " << argument_number << " ("
                         << expr2c(wrong_argument, *this) << ") has type `"
                         << type2c(wrong_argument.type(), *this) << '`';
-          throw invalid_source_file_exceptiont{error_message.str()};
+          throw invalid_source_file_exceptiont{
+            error_message.str(), wrong_argument.source_location()};
         };
       for(auto const arg_index : {0, 1})
       {
