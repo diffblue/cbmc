@@ -104,6 +104,49 @@ protected:
   postponed_listt postponed_list;
 
   void do_postponed(const postponedt &postponed);
+
+  /// Given a pointer encoded in \p bv, extract the literals identifying the
+  /// object that the pointer points to.
+  /// \param bv: Encoded pointer
+  /// \param type: Type of the encoded pointer
+  /// \return Vector of literals identifying the object part of \p bv
+  bvt object_literals(const bvt &bv, const pointer_typet &type) const
+  {
+    const std::size_t offset_width = bv_pointers_width.get_offset_width(type);
+    const std::size_t object_width = bv_pointers_width.get_object_width(type);
+    PRECONDITION(bv.size() >= offset_width + object_width);
+
+    return bvt(
+      bv.begin() + offset_width, bv.begin() + offset_width + object_width);
+  }
+
+  /// Given a pointer encoded in \p bv, extract the literals representing the
+  /// offset into an object that the pointer points to.
+  /// \param bv: Encoded pointer
+  /// \param type: Type of the encoded pointer
+  /// \return Vector of literals identifying the offset part of \p bv
+  bvt offset_literals(const bvt &bv, const pointer_typet &type) const
+  {
+    const std::size_t offset_width = bv_pointers_width.get_offset_width(type);
+    PRECONDITION(bv.size() >= offset_width);
+
+    return bvt(bv.begin(), bv.begin() + offset_width);
+  }
+
+  /// Construct a pointer encoding from given encodings of \p object and \p
+  /// offset.
+  /// \param object: Encoded object
+  /// \param offset: Encoded offset
+  /// \return Pointer encoding
+  static bvt object_offset_encoding(const bvt &object, const bvt &offset)
+  {
+    bvt result;
+    result.reserve(offset.size() + object.size());
+    result.insert(result.end(), offset.begin(), offset.end());
+    result.insert(result.end(), object.begin(), object.end());
+
+    return result;
+  }
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
