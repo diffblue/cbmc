@@ -67,4 +67,18 @@ SCENARIO(
       }
     }
   }
+  GIVEN("adding a constant and a value set")
+  {
+    WHEN("1 + { 2 }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set(val2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= { 3 }")
+      {
+        EXPECT(result, {val3});
+      }
+    }
+  }
 }
