@@ -14,10 +14,8 @@
 #include <testing-utils/use_catch.h>
 #include <typeinfo>
 #include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
-#include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 struct constant_merge_result

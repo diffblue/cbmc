@@ -58,3 +58,21 @@ void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
   const std::vector<exprt> &expected_values);
+
+std::shared_ptr<const constant_abstract_valuet> add_as_constant(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns);
+
+std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns);
+std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  const abstract_object_pointert &op3,
+  abstract_environmentt &environment,
+  namespacet &ns);

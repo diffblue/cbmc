@@ -12,21 +12,10 @@
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 
-static std::shared_ptr<const value_set_abstract_objectt> add_values(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  abstract_environmentt &environment,
-  namespacet &ns);
-static std::shared_ptr<const value_set_abstract_objectt> add_values(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  const abstract_object_pointert &op3,
-  abstract_environmentt &environment,
-  namespacet &ns);
-
 SCENARIO(
   "value_set expression evaluation",
-  "[core][analyses][variable-sensitivity][value_set_abstract_object]")
+  "[core][analyses][variable-sensitivity][value_set_abstract_object]["
+  "expression_transform]")
 {
   const exprt val1 = from_integer(1, integer_typet());
   const exprt val2 = from_integer(2, integer_typet());
@@ -50,7 +39,7 @@ SCENARIO(
     {
       auto op1 = make_value_set(val1, environment, ns);
       auto op2 = make_value_set(val1, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 2 }")
       {
@@ -61,7 +50,7 @@ SCENARIO(
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_value_set(val1, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 2, 3 }")
       {
@@ -72,7 +61,7 @@ SCENARIO(
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_value_set(val1, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 2, 3 }")
       {
@@ -83,7 +72,7 @@ SCENARIO(
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_value_set(val1, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 2, 3 }")
       {
@@ -94,7 +83,7 @@ SCENARIO(
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_value_set({val1, val2, val3}, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 2, 3, 4, 5 }")
       {
@@ -108,7 +97,7 @@ SCENARIO(
     {
       auto op1 = make_value_set(val1, environment, ns);
       auto op2 = make_constant(val1, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 2 }")
       {
@@ -119,7 +108,7 @@ SCENARIO(
     {
       auto op1 = make_value_set({val2, val3, val4}, environment, ns);
       auto op2 = make_constant(val1, environment, ns);
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("= { 3, 4, 5 }")
       {
@@ -135,7 +124,7 @@ SCENARIO(
       auto op2 = make_constant(val1, environment, ns);
       auto op3 = make_constant(val1, environment, ns);
 
-      auto result = add_values(op1, op2, op3, environment, ns);
+      auto result = add_as_value_set(op1, op2, op3, environment, ns);
 
       THEN("= { 3, 4, 5 }")
       {
@@ -148,7 +137,7 @@ SCENARIO(
       auto op2 = make_value_set(val1, environment, ns);
       auto op3 = make_constant(val1, environment, ns);
 
-      auto result = add_values(op1, op2, op3, environment, ns);
+      auto result = add_as_value_set(op1, op2, op3, environment, ns);
 
       THEN("= { 3, 4, 5 }")
       {
@@ -164,7 +153,7 @@ SCENARIO(
       auto op2 = std::make_shared<constant_abstract_valuet>(val1.type());
       REQUIRE(op2->is_top());
 
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("the result is top")
       {
@@ -177,7 +166,7 @@ SCENARIO(
       auto op2 = std::make_shared<value_set_abstract_objectt>(val1.type());
       REQUIRE(op2->is_top());
 
-      auto result = add_values(op1, op2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
 
       THEN("the result is top")
       {
@@ -185,40 +174,4 @@ SCENARIO(
       }
     }
   }
-}
-
-static std::shared_ptr<const value_set_abstract_objectt> add_values(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  abstract_environmentt &environment,
-  namespacet &ns)
-{
-  auto op1_sym = symbol_exprt("op1", op1->type());
-  auto op2_sym = symbol_exprt("op2", op2->type());
-  environment.assign(op1_sym, op1, ns);
-  environment.assign(op2_sym, op2, ns);
-
-  auto result = environment.eval(plus_exprt(op1_sym, op2_sym), ns);
-
-  return as_value_set(result);
-}
-
-static std::shared_ptr<const value_set_abstract_objectt> add_values(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  const abstract_object_pointert &op3,
-  abstract_environmentt &environment,
-  namespacet &ns)
-{
-  auto op1_sym = symbol_exprt("op1", op1->type());
-  auto op2_sym = symbol_exprt("op2", op2->type());
-  auto op3_sym = symbol_exprt("op3", op3->type());
-  environment.assign(op1_sym, op1, ns);
-  environment.assign(op2_sym, op2, ns);
-  environment.assign(op3_sym, op3, ns);
-
-  auto result =
-    environment.eval(plus_exprt(plus_exprt(op1_sym, op2_sym), op3_sym), ns);
-
-  return as_value_set(result);
 }

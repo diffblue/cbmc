@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include "variable_sensitivity_test_helpers.h"
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <ansi-c/ansi_c_language.h>
 #include <testing-utils/use_catch.h>
 #include <util/string_utils.h>
@@ -107,11 +108,14 @@ void EXPECT(
 {
   REQUIRE(result);
 
-  // Correctness of merge
   REQUIRE_FALSE(result->is_top());
   REQUIRE_FALSE(result->is_bottom());
 
-  REQUIRE(result->to_constant() == expected_value);
+  auto result_expr = result->to_constant();
+  INFO(
+    "Expect " + expr_to_str(result_expr) + " to equal " +
+    expr_to_str(expected_value));
+  REQUIRE(result_expr == expected_value);
 }
 
 void EXPECT(
@@ -120,7 +124,6 @@ void EXPECT(
 {
   REQUIRE(result);
 
-  // Correctness of merge
   REQUIRE_FALSE(result->is_top());
   REQUIRE_FALSE(result->is_bottom());
 
@@ -189,4 +192,72 @@ void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result)
 
   REQUIRE_FALSE(result->is_top());
   REQUIRE(result->is_bottom());
+}
+
+static std::shared_ptr<const abstract_objectt> add(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto op1_sym = symbol_exprt("op1", op1->type());
+  auto op2_sym = symbol_exprt("op2", op2->type());
+  environment.assign(op1_sym, op1, ns);
+  environment.assign(op2_sym, op2, ns);
+
+  auto result = environment.eval(plus_exprt(op1_sym, op2_sym), ns);
+
+  return result;
+}
+
+std::shared_ptr<const constant_abstract_valuet> add_as_constant(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto result = add(op1, op2, environment, ns);
+  auto cv = as_constant(result);
+
+  INFO("Result should be a constant")
+  REQUIRE(cv);
+  return cv;
+}
+
+std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto result = add(op1, op2, environment, ns);
+  auto vs = as_value_set(result);
+
+  INFO("Result should be a value set")
+  REQUIRE(vs);
+  return vs;
+}
+
+std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  const abstract_object_pointert &op3,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto op1_sym = symbol_exprt("op1", op1->type());
+  auto op2_sym = symbol_exprt("op2", op2->type());
+  auto op3_sym = symbol_exprt("op3", op3->type());
+  environment.assign(op1_sym, op1, ns);
+  environment.assign(op2_sym, op2, ns);
+  environment.assign(op3_sym, op3, ns);
+
+  auto result =
+    environment.eval(plus_exprt(plus_exprt(op1_sym, op2_sym), op3_sym), ns);
+
+  auto vs = as_value_set(result);
+
+  INFO("Result should be a value set")
+  REQUIRE(vs);
+  return vs;
 }
