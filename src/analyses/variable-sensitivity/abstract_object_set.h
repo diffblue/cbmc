@@ -80,6 +80,11 @@ public:
   void
   output(std::ostream &out, const ai_baset &ai, const namespacet &ns) const;
 
+  /// Cast the set of values \p other_values to an interval.
+  /// \param other_values: the value-set to be abstracted into an interval
+  /// \return the interval-abstract-object containing \p other_values
+  abstract_object_pointert to_interval();
+
 private:
   value_sett values;
 };

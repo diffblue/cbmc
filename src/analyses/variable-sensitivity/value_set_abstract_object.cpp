@@ -100,13 +100,6 @@ make_value_set_value_range(const abstract_object_sett &vals)
   return util_make_unique<value_set_value_ranget>(vals);
 }
 
-static exprt rewrite_expression(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &ops);
-
-static std::vector<value_ranget>
-unwrap_operands(const std::vector<abstract_object_pointert> &operands);
-
 static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values);
 
@@ -115,50 +108,6 @@ unwrap_and_extract_values(const abstract_object_sett &values);
 /// \return an abstract value without context
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
-
-/// Helper for converting context objects into its abstract-value children
-/// \p maybe_wrapped: either an abstract value (or a set of those) or one
-///   wrapped in a context
-/// \return an abstract value without context (though it might be as set)
-static abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
-
-/// Recursively construct a combination \p sub_con from \p super_con and once
-///   constructed call \p f.
-/// \param super_con: vector of some containers storing the values
-/// \param sub_con: the one combination being currently constructed
-/// \param f: callable with side-effects
-template <typename Con, typename F>
-void apply_comb(
-  const std::vector<Con> &super_con,
-  std::vector<typename Con::value_type> &sub_con,
-  F f)
-{
-  size_t n = sub_con.size();
-  if(n == super_con.size())
-    f(sub_con);
-  else
-  {
-    for(const auto &value : super_con[n])
-    {
-      sub_con.push_back(value);
-      apply_comb(super_con, sub_con, f);
-      sub_con.pop_back();
-    }
-  }
-}
-
-/// Call the function \p f on every combination of elements in \p super_con.
-///   Hence the arity of \p f is `super_con.size()`. <{1,2},{1},{1,2,3}> ->
-///   f(1,1,1), f(1,1,2), f(1,1,3), f(2,1,1), f(2,1,2), f(2,1,3).
-/// \param super_con: vector of some containers storing the values
-/// \param f: callable with side-effects
-template <typename Con, typename F>
-void for_each_comb(const std::vector<Con> &super_con, F f)
-{
-  std::vector<typename Con::value_type> sub_con;
-  apply_comb(super_con, sub_con, f);
-}
 
 static bool are_any_top(const abstract_object_sett &set);
 
@@ -206,64 +155,6 @@ value_set_abstract_objectt::value_range_implementation() const
   return make_value_set_value_range(values);
 }
 
-abstract_object_pointert value_set_abstract_objectt::expression_transform(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &operands,
-  const abstract_environmentt &environment,
-  const namespacet &ns) const
-{
-  PRECONDITION(operands.size() == expr.operands().size());
-
-  auto collective_operands = unwrap_operands(operands);
-
-  if(expr.id() == ID_if)
-    return evaluate_conditional(
-      expr.type(), collective_operands, environment, ns);
-
-  abstract_object_sett resulting_objects;
-
-  auto dispatcher = values.first();
-  for_each_comb(
-    collective_operands,
-    [&resulting_objects, &dispatcher, &expr, &environment, &ns](
-      const std::vector<abstract_object_pointert> &ops) {
-      auto rewritten_expr = rewrite_expression(expr, ops);
-      resulting_objects.insert(
-        dispatcher->expression_transform(rewritten_expr, ops, environment, ns));
-    });
-
-  return resolve_new_values(resulting_objects, environment);
-}
-
-abstract_object_pointert value_set_abstract_objectt::evaluate_conditional(
-  const typet &type,
-  const std::vector<value_ranget> &operands,
-  const abstract_environmentt &env,
-  const namespacet &ns) const
-{
-  auto const &condition = operands[0];
-
-  auto const &true_result = operands[1];
-  auto const &false_result = operands[2];
-
-  auto all_true = true;
-  auto all_false = true;
-  for(auto v : condition)
-  {
-    auto expr = v->to_constant();
-    all_true = all_true && expr.is_true();
-    all_false = all_false && expr.is_false();
-  }
-  auto indeterminate = !all_true && !all_false;
-
-  abstract_object_sett resulting_objects;
-  if(all_true || indeterminate)
-    resulting_objects.insert(true_result);
-  if(all_false || indeterminate)
-    resulting_objects.insert(false_result);
-  return resolve_new_values(resulting_objects, env);
-}
-
 abstract_object_pointert value_set_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -301,7 +192,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 
   if(unwrapped_values.size() > max_value_set_size)
   {
-    return to_interval(unwrapped_values);
+    return unwrapped_values.to_interval();
   }
   //if(unwrapped_values.size() == 1)
   //{
@@ -335,23 +226,6 @@ value_set_abstract_objectt::merge(abstract_object_pointert other) const
   }
 
   return abstract_objectt::merge(other);
-}
-
-abstract_object_pointert value_set_abstract_objectt::to_interval(
-  const abstract_object_sett &other_values) const
-{
-  PRECONDITION(!other_values.empty());
-
-  exprt lower_expr = (*other_values.begin())->to_constant();
-  exprt upper_expr = (*other_values.begin())->to_constant();
-  for(const auto &value : other_values)
-  {
-    const auto &value_expr = value->to_constant();
-    lower_expr = constant_interval_exprt::get_min(lower_expr, value_expr);
-    upper_expr = constant_interval_exprt::get_max(upper_expr, value_expr);
-  }
-  return std::make_shared<interval_abstract_valuet>(
-    constant_interval_exprt(lower_expr, upper_expr));
 }
 
 void value_set_abstract_objectt::set_top_internal()
@@ -399,34 +273,13 @@ void value_set_abstract_objectt::output(
   }
 }
 
-static exprt rewrite_expression(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &ops)
+static abstract_object_pointert
+maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
 {
-  auto operands_expr = exprt::operandst{};
-  for(auto v : ops)
-    operands_expr.push_back(v->to_constant());
-  auto rewritten_expr = exprt(expr.id(), expr.type(), std::move(operands_expr));
-  return rewritten_expr;
-}
+  auto const &context_value =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
 
-static std::vector<value_ranget>
-unwrap_operands(const std::vector<abstract_object_pointert> &operands)
-{
-  auto unwrapped = std::vector<value_ranget>{};
-
-  for(const auto &op : operands)
-  {
-    auto av = std::dynamic_pointer_cast<const abstract_value_objectt>(
-      maybe_unwrap_context(op));
-    // INVARIANT(av, "should be an abstract value object");
-    if(av)
-      unwrapped.emplace_back(av->value_range());
-    else // Forthcoming work will eliminate this line
-      unwrapped.emplace_back(value_ranget{make_single_value_range(op)});
-  }
-
-  return unwrapped;
+  return context_value ? context_value->unwrap_context() : maybe_wrapped;
 }
 
 static abstract_object_sett
@@ -457,15 +310,6 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
   }
   else
     return maybe_singleton;
-}
-
-static abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
-{
-  auto const &context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
-
-  return context_value ? context_value->unwrap_context() : maybe_wrapped;
 }
 
 static bool are_any_top(const abstract_object_sett &set)

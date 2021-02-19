@@ -7,6 +7,8 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_object_set.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
+#include <util/interval.h>
 #include <util/string_utils.h>
 
 static bool by_length(const std::string &lhs, const std::string &rhs)
@@ -33,4 +35,20 @@ void abstract_object_sett::output(
   std::sort(output_values.begin(), output_values.end(), by_length);
 
   join_strings(out, output_values.begin(), output_values.end(), ", ");
+}
+
+abstract_object_pointert abstract_object_sett::to_interval()
+{
+  PRECONDITION(!values.empty());
+
+  exprt lower_expr = first()->to_constant();
+  exprt upper_expr = first()->to_constant();
+  for(const auto &value : values)
+  {
+    const auto &value_expr = value->to_constant();
+    lower_expr = constant_interval_exprt::get_min(lower_expr, value_expr);
+    upper_expr = constant_interval_exprt::get_max(upper_expr, value_expr);
+  }
+  return std::make_shared<interval_abstract_valuet>(
+    constant_interval_exprt(lower_expr, upper_expr));
 }

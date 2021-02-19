@@ -43,16 +43,6 @@ public:
                               : abstract_objectt::to_constant();
   }
 
-  /// \copydoc abstract_objectt::expression_transform
-  ///
-  /// Transforms the \p expr for every combination of \p operands (since these
-  /// can be value-sets as well).
-  abstract_object_pointert expression_transform(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const override;
-
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
   const abstract_object_sett &get_values() const override
@@ -89,12 +79,6 @@ protected:
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
 private:
-  abstract_object_pointert evaluate_conditional(
-    const typet &type,
-    const std::vector<value_ranget> &operands,
-    const abstract_environmentt &env,
-    const namespacet &ns) const;
-
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
@@ -115,12 +99,6 @@ private:
 
   // data
   abstract_object_sett values;
-
-  /// Cast the set of values \p other_values to an interval.
-  /// \param other_values: the value-set to be abstracted into an interval
-  /// \return the interval-abstract-object containing \p other_values
-  abstract_object_pointert
-  to_interval(const abstract_object_sett &other_values) const;
 
   void set_top_internal() override;
 };
