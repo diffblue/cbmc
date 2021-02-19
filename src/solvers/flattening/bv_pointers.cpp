@@ -506,7 +506,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     const bvt &bv = convert_bv(minus_expr.lhs());
 
-    typet pointer_sub_type = minus_expr.rhs().type().subtype();
+    typet pointer_sub_type = minus_expr.lhs().type().subtype();
     mp_integer element_size;
 
     if(pointer_sub_type.id()==ID_empty)

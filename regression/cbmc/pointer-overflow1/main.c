@@ -11,8 +11,8 @@ int main()
   p2 = p - other1;
   p2 = p - other2 - other1;
 
-  p2 = p + sizeof(int);
-  p2 = p + sizeof(int) + sizeof(int);
+  p2 = (char *)p + sizeof(int);
+  p2 = (char *)p + sizeof(int) + sizeof(int);
 
   return 0;
 }
