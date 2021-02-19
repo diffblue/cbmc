@@ -72,7 +72,6 @@ __CPROVER_HIDE:;
     ch = src[j];
     dst[i] = ch;
   }
-  dst[i] = '\0';
 #endif
   return dst;
 }
@@ -122,7 +121,8 @@ __CPROVER_HIDE:;
     ch = src[j];
     dst[i] = ch;
   }
-  dst[i] = '\0';
+  if(ch != (char)0)
+    dst[i] = '\0';
 #endif
   return dst;
 }
@@ -288,7 +288,6 @@ __CPROVER_HIDE:;
     ch = src[j];
     dst[i] = ch;
   }
-  dst[i] = '\0';
 #endif
   return dst;
 }
@@ -342,7 +341,8 @@ __CPROVER_HIDE:;
     ch = src[j];
     dst[i] = ch;
   }
-  dst[i] = '\0';
+  if(ch != (char)0)
+    dst[i] = '\0';
 #endif
   return dst;
 }

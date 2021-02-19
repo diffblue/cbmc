@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+--unwind 10 --pointer-check --bounds-check
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
+\[main.assertion.4\] .* assertion strlen\(A3\) == 4: FAILURE
+\*\* 1 of \d+ failed
 --
 ^warning: ignoring
