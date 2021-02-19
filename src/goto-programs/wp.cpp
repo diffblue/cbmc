@@ -213,6 +213,14 @@ exprt wp_assign(
   return pre;
 }
 
+exprt wp_assert(
+  const code_assertt &code,
+  const exprt &post,
+  const namespacet &)
+{
+  return and_exprt(code.assertion(), post);
+}
+
 exprt wp_assume(
   const code_assumet &code,
   const exprt &post,
@@ -250,7 +258,7 @@ exprt wp(
   else if(statement==ID_decl)
     return wp_decl(to_code_decl(code), post, ns);
   else if(statement==ID_assert)
-    return post;
+    return wp_assert(to_code_assert(code), post, ns);
   else if(statement==ID_expression)
     return post;
   else if(statement==ID_printf)
