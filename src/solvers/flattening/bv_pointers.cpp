@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 
 /// Map bytes according to the configured endianness. The key difference to
 /// endianness_mapt is that bv_endianness_mapt is aware of the bit-level
@@ -555,43 +556,82 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
   if(is_pointer_subtraction(expr))
   {
-    // pointer minus pointer
-    const auto &minus_expr = to_minus_expr(expr);
-    bvt lhs = convert_bv(minus_expr.lhs());
-    bvt rhs = convert_bv(minus_expr.rhs());
-
     std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       return conversion_failed(expr);
 
-    // we do a zero extension
-    lhs = bv_utils.zero_extension(lhs, width);
-    rhs = bv_utils.zero_extension(rhs, width);
+    // pointer minus pointer is subtraction over the offset divided by element
+    // size, iff the pointers point to the same object
+    const auto &minus_expr = to_minus_expr(expr);
 
-    bvt bv = bv_utils.sub(lhs, rhs);
+    // do the same-object-test via an expression as this may permit re-using
+    // already cached encodings of the equality test
+    const exprt same_object = ::same_object(minus_expr.lhs(), minus_expr.rhs());
+    const bvt &same_object_bv = convert_bv(same_object);
+    CHECK_RETURN(same_object_bv.size() == 1);
 
-    typet pointer_sub_type = minus_expr.lhs().type().subtype();
-    mp_integer element_size;
+    // compute the object size (again, possibly using cached results)
+    const exprt object_size = ::object_size(minus_expr.lhs());
+    const bvt object_size_bv =
+      bv_utils.zero_extension(convert_bv(object_size), width);
 
-    if(pointer_sub_type.id()==ID_empty)
+    bvt bv;
+    bv.reserve(width);
+
+    for(std::size_t i = 0; i < width; ++i)
+      bv.push_back(prop.new_variable());
+
+    if(!same_object_bv[0].is_false())
     {
-      // This is a gcc extension.
+      const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
+      const bvt &lhs = convert_bv(minus_expr.lhs());
+      const bvt lhs_offset =
+        bv_utils.sign_extension(offset_literals(lhs, lhs_pt), width);
+
+      const literalt lhs_in_bounds = prop.land(
+        !bv_utils.sign_bit(lhs_offset),
+        bv_utils.rel(
+          lhs_offset,
+          ID_le,
+          object_size_bv,
+          bv_utilst::representationt::UNSIGNED));
+
+      const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
+      const bvt &rhs = convert_bv(minus_expr.rhs());
+      const bvt rhs_offset =
+        bv_utils.sign_extension(offset_literals(rhs, rhs_pt), width);
+
+      const literalt rhs_in_bounds = prop.land(
+        !bv_utils.sign_bit(rhs_offset),
+        bv_utils.rel(
+          rhs_offset,
+          ID_le,
+          object_size_bv,
+          bv_utilst::representationt::UNSIGNED));
+
+      bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
+
+      // Support for void* is a gcc extension, with the size treated as 1 byte
+      // (no division required below).
       // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      element_size = 1;
-    }
-    else
-    {
-      auto element_size_opt = pointer_offset_size(pointer_sub_type, ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
-      element_size = *element_size_opt;
-    }
+      if(lhs_pt.subtype().id() != ID_empty)
+      {
+        auto element_size_opt = pointer_offset_size(lhs_pt.subtype(), ns);
+        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
 
-    if(element_size != 1)
-    {
-      bvt element_size_bv = bv_utils.build_constant(element_size, bv.size());
-      bv=bv_utils.divider(
-        bv, element_size_bv, bv_utilst::representationt::SIGNED);
+        if(*element_size_opt != 1)
+        {
+          bvt element_size_bv =
+            bv_utils.build_constant(*element_size_opt, width);
+          difference = bv_utils.divider(
+            difference, element_size_bv, bv_utilst::representationt::SIGNED);
+        }
+      }
+
+      prop.l_set_to_true(prop.limplies(
+        prop.land(same_object_bv[0], prop.land(lhs_in_bounds, rhs_in_bounds)),
+        bv_utils.equal(difference, bv)));
     }
 
     return bv;
@@ -794,11 +834,11 @@ bvt bv_pointerst::offset_arithmetic(
   else
   {
     bvt bv_factor=bv_utils.build_constant(factor, index.size());
-    bv_index=bv_utils.unsigned_multiplier(index, bv_factor);
+    bv_index = bv_utils.signed_multiplier(index, bv_factor);
   }
 
   const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
-  bv_index = bv_utils.zero_extension(bv_index, offset_bits);
+  bv_index = bv_utils.sign_extension(bv_index, offset_bits);
 
   bvt offset_bv = offset_literals(bv, type);
 

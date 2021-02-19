@@ -6,6 +6,5 @@ main.c
 ^VERIFICATION FAILED$
 \[main.precondition_instance.1\] .* memcpy src/dst overlap: FAILURE
 \[main.precondition_instance.3\] .* memcpy destination region writeable: FAILURE
-\*\* 2 of 14 failed
 --
 ^warning: ignoring

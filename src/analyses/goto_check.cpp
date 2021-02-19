@@ -178,7 +178,7 @@ protected:
   void mod_overflow_check(const mod_exprt &, const guardt &);
   void enum_range_check(const exprt &, const guardt &);
   void undefined_shift_check(const shift_exprt &, const guardt &);
-  void pointer_rel_check(const binary_relation_exprt &, const guardt &);
+  void pointer_rel_check(const binary_exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
@@ -1117,7 +1117,7 @@ void goto_checkt::nan_check(
 }
 
 void goto_checkt::pointer_rel_check(
-  const binary_relation_exprt &expr,
+  const binary_exprt &expr,
   const guardt &guard)
 {
   if(!enable_pointer_check)
@@ -1128,17 +1128,33 @@ void goto_checkt::pointer_rel_check(
   {
     // add same-object subgoal
 
-    if(enable_pointer_check)
-    {
-      exprt same_object=::same_object(expr.op0(), expr.op1());
+    exprt same_object = ::same_object(expr.op0(), expr.op1());
 
-      add_guarded_property(
-        same_object,
-        "same object violation",
-        "pointer",
-        expr.find_source_location(),
-        expr,
-        guard);
+    add_guarded_property(
+      same_object,
+      "same object violation",
+      "pointer",
+      expr.find_source_location(),
+      expr,
+      guard);
+
+    for(const auto &pointer : expr.operands())
+    {
+      // just this particular byte must be within object bounds or one past the
+      // end
+      const auto size = from_integer(0, size_type());
+      auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
+
+      for(const auto &c : conditions)
+      {
+        add_guarded_property(
+          c.assertion,
+          "pointer relation: " + c.description,
+          "pointer arithmetic",
+          expr.find_source_location(),
+          pointer,
+          guard);
+      }
     }
   }
 }
@@ -1650,6 +1666,14 @@ void goto_checkt::check_rec_arithmetic_op(const exprt &expr, guardt &guard)
   if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
   {
     integer_overflow_check(expr, guard);
+
+    if(
+      expr.operands().size() == 2 && expr.id() == ID_minus &&
+      expr.operands()[0].type().id() == ID_pointer &&
+      expr.operands()[1].type().id() == ID_pointer)
+    {
+      pointer_rel_check(to_binary_expr(expr), guard);
+    }
   }
   else if(expr.type().id() == ID_floatbv)
   {

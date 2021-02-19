@@ -1,0 +1,18 @@
+CORE broken-smt-backend
+main.c
+--pointer-check
+^\[main.assertion.1\] line 6 correct: SUCCESS
+^\[main.pointer.1\] line 8 same object violation in array - other_array: FAILURE$
+^\[main.assertion.2\] line 11 undefined behavior: FAILURE$
+^\[main.assertion.3\] line 13 undefined behavior: FAILURE$
+^\[main.assertion.7\] line 26 end plus 2 is nondet: FAILURE$
+^\[main.pointer_arithmetic.\d+\] line 26 pointer relation: pointer outside object bounds in p: FAILURE$
+^\[main.assertion.8\] line 28 end plus 2 is nondet: FAILURE$
+^\[main.pointer_arithmetic.\d+\] line 28 pointer relation: pointer outside object bounds in p: FAILURE$
+^\*\* 7 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
