@@ -1,12 +1,12 @@
 /*******************************************************************\
 
- Module: Unit tests helpers for value_set_abstract_objects
+ Module: Unit tests helpers for abstract objects
 
  Author: Jez Higgins, jez@jezuk.co.uk
 
 \*******************************************************************/
 
-#include "value_set_test_helpers.h"
+#include "variable_sensitivity_test_helpers.h"
 #include <ansi-c/ansi_c_language.h>
 #include <testing-utils/use_catch.h>
 #include <util/string_utils.h>
@@ -23,6 +23,12 @@ make_constant(exprt val, abstract_environmentt &env, namespacet &ns)
   return std::make_shared<constant_abstract_valuet>(val, env, ns);
 }
 
+std::shared_ptr<const constant_abstract_valuet>
+make_constant(exprt val, bool top)
+{
+  return std::make_shared<constant_abstract_valuet>(val.type(), top, !top);
+}
+
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
@@ -34,6 +40,12 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
   auto vs = make_value_set(vals[0], env, ns);
   vs->set_values(initial_values);
   return vs;
+}
+
+std::shared_ptr<const constant_abstract_valuet>
+as_constant(const abstract_object_pointert &aop)
+{
+  return std::dynamic_pointer_cast<const constant_abstract_valuet>(aop);
 }
 
 std::shared_ptr<const value_set_abstract_objectt>
@@ -90,6 +102,19 @@ std::string exprs_to_str(const std::vector<exprt> &values)
 }
 
 void EXPECT(
+  std::shared_ptr<const constant_abstract_valuet> &result,
+  exprt expected_value)
+{
+  REQUIRE(result);
+
+  // Correctness of merge
+  REQUIRE_FALSE(result->is_top());
+  REQUIRE_FALSE(result->is_bottom());
+
+  REQUIRE(result->to_constant() == expected_value);
+}
+
+void EXPECT(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values)
 {
@@ -113,12 +138,36 @@ void EXPECT(
 }
 
 void EXPECT_UNMODIFIED(
+  std::shared_ptr<const abstract_objectt> &result,
+  bool modified)
+{
+  CHECK_FALSE(modified);
+}
+
+void EXPECT_UNMODIFIED(
+  std::shared_ptr<const constant_abstract_valuet> &result,
+  bool modified,
+  exprt expected_value)
+{
+  CHECK_FALSE(modified);
+  EXPECT(result, expected_value);
+}
+
+void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
   const std::vector<exprt> &expected_values)
 {
   CHECK_FALSE(modified);
   EXPECT(result, expected_values);
+}
+
+void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result)
+{
+  REQUIRE(result);
+
+  REQUIRE(result->is_top());
+  REQUIRE_FALSE(result->is_bottom());
 }
 
 void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result)
@@ -132,4 +181,12 @@ void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result)
   REQUIRE(values.size() == 1);
   REQUIRE(values.first()->is_top());
   REQUIRE_FALSE(values.first()->is_bottom());
+}
+
+void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result)
+{
+  REQUIRE(result);
+
+  REQUIRE_FALSE(result->is_top());
+  REQUIRE(result->is_bottom());
 }

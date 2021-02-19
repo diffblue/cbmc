@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include "value_set_test_helpers.h"
+#include "../variable_sensitivity_test_helpers.h"
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
 #include <util/arith_tools.h>
