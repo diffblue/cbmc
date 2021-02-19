@@ -286,8 +286,12 @@ protected:
 void goto_checkt::collect_allocations(
   const goto_functionst &goto_functions)
 {
-  if(!enable_pointer_check && !enable_bounds_check)
+  if(
+    !enable_pointer_check && !enable_bounds_check &&
+    !enable_pointer_overflow_check)
+  {
     return;
+  }
 
   for(const auto &gf_entry : goto_functions.function_map)
   {
@@ -1188,6 +1192,21 @@ void goto_checkt::pointer_overflow_check(
     expr.find_source_location(),
     expr,
     guard);
+
+  // the result must be within object bounds or one past the end
+  const auto size = from_integer(0, size_type());
+  auto conditions = get_pointer_dereferenceable_conditions(expr, size);
+
+  for(const auto &c : conditions)
+  {
+    add_guarded_property(
+      c.assertion,
+      "pointer arithmetic: " + c.description,
+      "pointer arithmetic",
+      expr.find_source_location(),
+      expr,
+      guard);
+  }
 }
 
 void goto_checkt::pointer_validity_check(
