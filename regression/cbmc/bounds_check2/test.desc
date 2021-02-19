@@ -1,0 +1,11 @@
+CORE
+main.c
+--bounds-check --retain-trivial-checks
+^Generated \d+ VCC\(s\), 0 remaining after simplification$
+^\[main.array_bounds.1\] line 4 array 'A' lower bound in A\[\(signed (long (long )?)?int\)1\]: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Generated 0 VCC\(s\), 0 remaining after simplification$

@@ -70,7 +70,7 @@ public:
       _options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
     enable_nan_check=_options.get_bool_option("nan-check");
-    retain_trivial=_options.get_bool_option("retain-trivial");
+    retain_trivial = _options.get_bool_option("retain-trivial-checks");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
     enable_built_in_assertions=_options.get_bool_option("built-in-assertions");
