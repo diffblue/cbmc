@@ -1,0 +1,13 @@
+CORE
+main.c
+--function foo --bounds-check --pointer-check
+^\[foo.assertion.1\] line \d+ assertion it->cas\[0\] == 0: FAILURE$
+^\[foo.array_bounds.3\] line \d+ array.cas upper bound in it->cas\[\(.*\)0\]: FAILURE$
+^\[foo.array_bounds.2\] line \d+ array.cas dynamic object upper bound in it->cas\[\(.*\)0\]: FAILURE$
+^\[foo.pointer_dereference.2\] line \d+ dereference failure: pointer invalid in it->cas: SUCCESS$
+^\[foo.pointer_dereference.6\] line \d+ dereference failure: pointer outside object bounds in it->cas: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
