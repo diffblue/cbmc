@@ -172,86 +172,81 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   return transform(expr, operands, environment, ns);
 }
 
-// constant_abstract_value expresion transfrom
-static abstract_object_pointert try_transform_expr_with_all_rounding_modes(
-  const exprt &expr,
-  const abstract_environmentt &environment,
-  const namespacet &ns);
-
-abstract_object_pointert constants_expression_transform(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &operands,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
+// constant_abstract_value expression transfrom
+class constants_evaluator
 {
-  // try finding the rounding mode. If it's not constant, try
-  // seeing if we can get the same result with all rounding modes
-  auto rounding_mode_symbol =
-    symbol_exprt(CPROVER_PREFIX "rounding_mode", signedbv_typet(32));
-  auto rounding_mode_value = environment.eval(rounding_mode_symbol, ns);
-  auto rounding_mode_constant = rounding_mode_value->to_constant();
-  if(rounding_mode_constant.is_nil())
+public:
+  constants_evaluator(
+    const exprt &e,
+    const abstract_environmentt &env,
+    const namespacet &n)
+    : expression(e), environment(env), ns(n)
   {
-    return try_transform_expr_with_all_rounding_modes(expr, environment, ns);
   }
 
-  exprt adjusted_expr = expr;
-  adjust_float_expressions(adjusted_expr, ns);
-  exprt constant_replaced_expr = adjusted_expr;
-  constant_replaced_expr.operands().clear();
-
-  // Two passes over the expression - one for simplification,
-  // another to check if there are any top subexpressions left
-  for(const exprt &op : adjusted_expr.operands())
+  abstract_object_pointert operator()() const
   {
-    abstract_object_pointert lhs_abstract_object = environment.eval(op, ns);
-    const exprt &lhs_value = lhs_abstract_object->to_constant();
-    if(lhs_value.is_nil())
+    // try finding the rounding mode. If it's not constant, try
+    // seeing if we can get the same result with all rounding modes
+    if(rounding_mode_is_not_set())
+      return try_transform_expr_with_all_rounding_modes();
+
+    return transform();
+  }
+
+private:
+  abstract_object_pointert transform() const
+  {
+    exprt expr = adjust_expression_for_rounding_mode();
+    auto operands = expr.operands();
+    expr.operands().clear();
+
+    // Two passes over the expression - one for simplification,
+    // another to check if there are any top subexpressions left
+    for(const exprt &op : operands)
     {
+      auto lhs_value = eval_constant(op);
+
       // do not give up if a sub-expression is not a constant,
       // because the whole expression may still be simplified in some cases
-      constant_replaced_expr.operands().push_back(op);
+      expr.operands().push_back(lhs_value.is_nil() ? op : lhs_value);
     }
-    else
-    {
-      // rebuild the operands list with constant versions of
-      // any symbols
-      constant_replaced_expr.operands().push_back(lhs_value);
-    }
-  }
-  exprt simplified = simplify_expr(constant_replaced_expr, ns);
 
-  for(const exprt &op : simplified.operands())
+    exprt simplified = simplify_expr(expr, ns);
+    for(const exprt &op : simplified.operands())
+    {
+      auto lhs_value = eval_constant(op);
+      if(lhs_value.is_nil())
+        return top(simplified.type());
+    }
+
+    // the expression is fully simplified
+    return environment.abstract_object_factory(
+      simplified.type(), simplified, ns);
+  }
+
+  abstract_object_pointert try_transform_expr_with_all_rounding_modes() const
   {
-    abstract_object_pointert lhs_abstract_object = environment.eval(op, ns);
-    const exprt &lhs_value = lhs_abstract_object->to_constant();
-    if(lhs_value.is_nil())
+    std::vector<abstract_object_pointert> possible_results;
+    for(auto rounding_mode : all_rounding_modes)
     {
-      return environment.abstract_object_factory(
-        simplified.type(), ns, true, false);
+      auto child_env(environment_with_rounding_mode(rounding_mode));
+      possible_results.push_back(
+        constants_evaluator(expression, child_env, ns)());
     }
+
+    auto first = possible_results.front()->to_constant();
+    for(auto const &possible_result : possible_results)
+    {
+      auto current = possible_result->to_constant();
+      if(current.is_nil() || current != first)
+        return top(expression.type());
+    }
+    return possible_results.front();
   }
 
-  return environment.abstract_object_factory(simplified.type(), simplified, ns);
-}
-
-static abstract_object_pointert try_transform_expr_with_all_rounding_modes(
-  const exprt &expr,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  const symbol_exprt rounding_mode_symbol =
-    symbol_exprt(CPROVER_PREFIX "rounding_mode", signedbv_typet(32));
-  // NOLINTNEXTLINE (whitespace/braces)
-  auto rounding_modes = std::array<ieee_floatt::rounding_modet, 4>{
-    // NOLINTNEXTLINE (whitespace/braces)
-    {ieee_floatt::ROUND_TO_EVEN,
-     ieee_floatt::ROUND_TO_ZERO,
-     ieee_floatt::ROUND_TO_MINUS_INF,
-     // NOLINTNEXTLINE (whitespace/braces)
-     ieee_floatt::ROUND_TO_PLUS_INF}};
-  std::vector<abstract_object_pointert> possible_results;
-  for(auto current_rounding_mode : rounding_modes)
+  abstract_environmentt
+  environment_with_rounding_mode(ieee_floatt::rounding_modet rm) const
   {
     abstract_environmentt child_env(environment);
     child_env.assign(
@@ -259,26 +254,62 @@ static abstract_object_pointert try_transform_expr_with_all_rounding_modes(
       child_env.abstract_object_factory(
         signedbv_typet(32),
         from_integer(
-          mp_integer(static_cast<unsigned long>(current_rounding_mode)),
-          signedbv_typet(32)),
+          mp_integer(static_cast<unsigned long>(rm)), signedbv_typet(32)),
         ns),
       ns);
+    return child_env;
+  }
 
-    // Dummy vector as the called expression_transform() ignores it
-    std::vector<abstract_object_pointert> dummy;
-    possible_results.push_back(
-      constants_expression_transform(expr, dummy, child_env, ns));
-  }
-  auto first = possible_results.front()->to_constant();
-  for(auto const &possible_result : possible_results)
+  exprt adjust_expression_for_rounding_mode() const
   {
-    auto current = possible_result->to_constant();
-    if(current.is_nil() || current != first)
-    {
-      return environment.abstract_object_factory(expr.type(), ns, true, false);
-    }
+    exprt adjusted_expr = expression;
+    adjust_float_expressions(adjusted_expr, ns);
+    return adjusted_expr;
   }
-  return possible_results.front();
+
+  exprt eval_constant(const exprt &op) const
+  {
+    return environment.eval(op, ns)->to_constant();
+  }
+
+  abstract_object_pointert top(const typet &type) const
+  {
+    return environment.abstract_object_factory(type, ns, true, false);
+  }
+
+  bool rounding_mode_is_not_set() const
+  {
+    auto rounding_mode = eval_constant(rounding_mode_symbol);
+    return rounding_mode.is_nil();
+  }
+
+  const exprt &expression;
+  const abstract_environmentt &environment;
+  const namespacet &ns;
+
+  static const symbol_exprt rounding_mode_symbol;
+
+  using rounding_modes = std::vector<ieee_floatt::rounding_modet>;
+  static const rounding_modes all_rounding_modes;
+};
+
+const symbol_exprt constants_evaluator::rounding_mode_symbol =
+  symbol_exprt(CPROVER_PREFIX "rounding_mode", signedbv_typet(32));
+
+const constants_evaluator::rounding_modes
+  constants_evaluator::all_rounding_modes{ieee_floatt::ROUND_TO_EVEN,
+                                          ieee_floatt::ROUND_TO_ZERO,
+                                          ieee_floatt::ROUND_TO_MINUS_INF,
+                                          ieee_floatt::ROUND_TO_PLUS_INF};
+
+abstract_object_pointert constants_expression_transform(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+{
+  auto evaluator = constants_evaluator(expr, environment, ns);
+  return evaluator();
 }
 
 ///////////////////////////////////////////////////////
@@ -660,13 +691,7 @@ resolve_values(const abstract_object_sett &new_values)
   auto unwrapped_values = unwrap_and_extract_values(new_values);
 
   if(unwrapped_values.size() > value_set_abstract_objectt::max_value_set_size)
-  {
     return unwrapped_values.to_interval();
-  }
-  //if(unwrapped_values.size() == 1)
-  //{
-  //  return (*unwrapped_values.begin());
-  //}
 
   const auto &type = new_values.first()->type();
   auto result = std::make_shared<value_set_abstract_objectt>(type);

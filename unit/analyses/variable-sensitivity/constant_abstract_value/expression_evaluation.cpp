@@ -80,5 +80,16 @@ SCENARIO(
         EXPECT(result, {val3});
       }
     }
+    WHEN("1 + { 1, 2 }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= { 2, 3 }")
+      {
+        EXPECT(result, {val2, val3});
+      }
+    }
   }
 }
