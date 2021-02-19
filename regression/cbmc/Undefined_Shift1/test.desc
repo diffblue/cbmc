@@ -4,11 +4,12 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*\] line 4 shift operand is negative in .*: SUCCESS$
+^\[.*\] line 5 shift operand is negative in .*: SUCCESS$
 ^\[.*\] line 7 shift distance too large in .*: FAILURE$
 ^\[.*\] line 15 shift distance is negative in .*: FAILURE$
 ^\[.*\] line 15 shift distance too large in .*: SUCCESS$
 ^\[.*\] line 20 shift operand is negative in .*: FAILURE$
-^\*\* 3 of 5 failed
+^\*\* 3 of 6 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
