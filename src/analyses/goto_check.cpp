@@ -70,7 +70,7 @@ public:
       _options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
     enable_nan_check=_options.get_bool_option("nan-check");
-    retain_trivial=_options.get_bool_option("retain-trivial");
+    retain_trivial = _options.get_bool_option("retain-trivial-checks");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
     enable_built_in_assertions=_options.get_bool_option("built-in-assertions");
@@ -242,7 +242,7 @@ protected:
     const guardt &guard);
 
   goto_programt new_code;
-  typedef std::set<exprt> assertionst;
+  typedef std::set<std::pair<exprt, exprt>> assertionst;
   assertionst assertions;
 
   /// Remove all assertions containing the symbol in \p lhs as well as all
@@ -333,8 +333,12 @@ void goto_checkt::invalidate(const exprt &lhs)
 
     for(auto it = assertions.begin(); it != assertions.end();)
     {
-      if(has_symbol(*it, find_symbols_set) || has_subexpr(*it, ID_dereference))
+      if(
+        has_symbol(it->second, find_symbols_set) ||
+        has_subexpr(it->second, ID_dereference))
+      {
         it = assertions.erase(it);
+      }
       else
         ++it;
     }
@@ -1545,7 +1549,7 @@ void goto_checkt::add_guarded_property(
       ? std::move(simplified_expr)
       : implies_exprt{guard.as_expr(), std::move(simplified_expr)};
 
-  if(assertions.insert(guarded_expr).second)
+  if(assertions.insert(std::make_pair(src_expr, guarded_expr)).second)
   {
     auto t = new_code.add(
       enable_assert_to_assume ? goto_programt::make_assumption(
