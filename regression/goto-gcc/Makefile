@@ -39,4 +39,4 @@ clean:
 	find -name '*.out' -execdir $(RM) '{}' \;
 	find -name '*.gb' -execdir $(RM) '{}' \;
 	find -name '*.goto-cc-saved' -execdir $(RM) '{}' \;
-	$(RM) tests.log archives/lib_ourarchive.a archives/foo.o
+	$(RM) tests.log archives/libour_archive.a archives/foo.o
