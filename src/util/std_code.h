@@ -420,6 +420,38 @@ public:
     return symbol().get_identifier();
   }
 
+  /// Returns the initial value to which the declared variable is initialized,
+  /// or empty in the case where no initialisation is included.
+  /// \note: Initial values may be present in the front end but they must be
+  ///   separated into a separate assignment when used in a `goto_instructiont`.
+  optionalt<exprt> initial_value() const
+  {
+    if(operands().size() < 2)
+      return {};
+    return {op1()};
+  }
+
+  /// Sets the value to which this declaration initializes the declared
+  /// variable. Empty optional maybe passed to remove existing initialisation.
+  /// \note: Initial values may be present in the front end but they must be
+  ///   separated into a separate assignment when used in a `goto_instructiont`.
+  void set_initial_value(optionalt<exprt> initial_value)
+  {
+    if(!initial_value)
+    {
+      operands().resize(1);
+    }
+    else if(operands().size() < 2)
+    {
+      PRECONDITION(operands().size() == 1);
+      add_to_operands(std::move(*initial_value));
+    }
+    else
+    {
+      op1() = std::move(*initial_value);
+    }
+  }
+
   static void check(
     const codet &code,
     const validation_modet vm = validation_modet::INVARIANT)

@@ -650,19 +650,14 @@ void dump_ct::cleanup_decl(
   std::list<irep_idt> &local_static,
   std::list<irep_idt> &local_type_decls)
 {
-  exprt value=nil_exprt();
-
-  if(decl.operands().size()==2)
-  {
-    value=decl.op1();
-    decl.operands().resize(1);
-  }
-
   goto_programt tmp;
   tmp.add(goto_programt::make_decl(decl.symbol()));
 
-  if(value.is_not_nil())
-    tmp.add(goto_programt::make_assignment(decl.symbol(), value));
+  if(optionalt<exprt> value = decl.initial_value())
+  {
+    decl.set_initial_value({});
+    tmp.add(goto_programt::make_assignment(decl.symbol(), std::move(*value)));
+  }
 
   tmp.add(goto_programt::make_end_function());
 

@@ -422,11 +422,14 @@ void format_expr_configt::setup()
     {
       return os << "dead " << format(to_code_dead(code).symbol()) << ";";
     }
-    else if(statement == ID_decl)
+    else if(const auto decl = expr_try_dynamic_cast<code_declt>(code))
     {
-      const auto &declaration_symb = to_code_decl(code).symbol();
-      return os << "decl " << format(declaration_symb.type()) << " "
-                << format(declaration_symb) << ";";
+      const auto &declaration_symb = decl->symbol();
+      os << "decl " << format(declaration_symb.type()) << " "
+         << format(declaration_symb);
+      if(const optionalt<exprt> initial_value = decl->initial_value())
+        os << " = " << format(*initial_value);
+      return os << ";";
     }
     else if(statement == ID_function_call)
     {

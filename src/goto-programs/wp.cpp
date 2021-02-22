@@ -226,6 +226,7 @@ exprt wp_decl(
   const exprt &post,
   const namespacet &ns)
 {
+  PRECONDITION(!code.initial_value());
   // Model decl(var) as var = nondet()
   const exprt &var = code.symbol();
   side_effect_expr_nondett nondet(var.type(), source_locationt());

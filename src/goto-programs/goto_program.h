@@ -199,13 +199,21 @@ public:
     const code_declt &get_decl() const
     {
       PRECONDITION(is_decl());
-      return to_code_decl(code);
+      const auto &decl = expr_checked_cast<code_declt>(code);
+      INVARIANT(
+        !decl.initial_value(),
+        "code_declt in goto program may not contain initialization.");
+      return decl;
     }
 
     /// Set the declaration for DECL
     void set_decl(code_declt c)
     {
       PRECONDITION(is_decl());
+      INVARIANT(
+        !c.initial_value(),
+        "Initialization must be separated from code_declt before adding to "
+        "goto_instructiont.");
       code = std::move(c);
     }
 
