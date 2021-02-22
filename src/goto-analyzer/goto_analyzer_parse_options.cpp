@@ -581,7 +581,7 @@ int goto_analyzer_parse_optionst::doit()
 
   goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
-  // Perserve backwards compatability in processing
+  // Preserve backwards compatibility in processing
   options.set_option("partial-inline", true);
   options.set_option("rewrite-union", false);
 
