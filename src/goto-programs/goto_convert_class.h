@@ -102,11 +102,13 @@ protected:
     side_effect_exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
-    bool result_is_used);
+    bool result_is_used,
+    bool address_taken);
   void remove_assignment(
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used,
+    bool address_taken,
     const irep_idt &mode);
   void remove_pre(
     side_effect_exprt &expr,
