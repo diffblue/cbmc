@@ -146,11 +146,11 @@ ifeq ($(origin CXX),default)
   CXX = cl
 endif
 ifeq ($(origin YACC),default)
-  YACC   = bison -y
+  YACC   = win_bison -y
 endif
   YFLAGS ?= -v
 ifeq ($(origin LEX),default)
-  LEX    = flex
+  LEX    = win_flex
 endif
 
 
