@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/config.h>
 #include <util/floatbv_expr.h>
 #include <util/magic.h>
 #include <util/mp_arith.h>
@@ -31,6 +32,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/floatbv/float_utils.h>
 #include <solvers/lowering/expr_lowering.h>
+
+endianness_mapt boolbvt::endianness_map(const typet &type) const
+{
+  const bool little_endian =
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+  return endianness_map(type, little_endian);
+}
 
 /// Convert expression to vector of literalts, using an internal
 /// cache to speed up conversion if available. Also assert the resultant

@@ -104,6 +104,8 @@ public:
     return endianness_mapt{type, little_endian, ns};
   }
 
+  virtual endianness_mapt endianness_map(const typet &type) const;
+
 protected:
   boolbv_widtht bv_width;
   bv_utilst bv_utils;

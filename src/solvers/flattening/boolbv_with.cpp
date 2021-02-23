@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
@@ -237,20 +236,9 @@ void boolbvt::convert_with_union(
     "convert_with_union: unexpected operand op2 width",
     irep_pretty_diagnosticst{type});
 
-  if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN)
-  {
-    for(std::size_t i=0; i<op2_bv.size(); i++)
-      next_bv[i]=op2_bv[i];
-  }
-  else
-  {
-    assert(
-      config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
+  endianness_mapt map_u = endianness_map(type);
+  endianness_mapt map_op2 = endianness_map(op2.type());
 
-    endianness_mapt map_u = endianness_map(type, false);
-    endianness_mapt map_op2 = endianness_map(op2.type(), false);
-
-    for(std::size_t i=0; i<op2_bv.size(); i++)
-      next_bv[map_u.map_bit(i)]=op2_bv[map_op2.map_bit(i)];
-  }
+  for(std::size_t i = 0; i < op2_bv.size(); i++)
+    next_bv[map_u.map_bit(i)] = op2_bv[map_op2.map_bit(i)];
 }
