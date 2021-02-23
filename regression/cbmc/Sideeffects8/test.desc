@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant check failed
+^warning: ignoring
+--
+Assignments can affect dereferences occuring with the LHS, and thus may require
+introducing temporaries.
