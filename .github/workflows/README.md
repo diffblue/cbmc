@@ -1,56 +1,48 @@
-# CBMC packages
+# CBMC CI infrastructure
 
-This project builds installation packages for the tip of the develop
-branch for MacOS, Windows, and Ubuntu.
+This folder contains implementation and configuration files for
+our CI infrastructure on top of Github Actions. Aside from CI,
+it also contains packaging and automated release scripts.
 
-There exist installation packages for the latest stable releases of
-CBMC on MacOS and Ubuntu.
+The files in this folder correspond to:
 
-On MacOS:
-* brew install cbmc
+* `build-and-test-Xen.yaml` -> Build Xen using CBMC tools.
+* `csmith.yaml` -> Run 10 randomly generated CSmith tests per Pull Request.
+* `doxygen-check.yaml` -> Build project doxygen documentation per Pull Request.
+* `pull-request-check-cpplint.sh` -> Script that's called per Pull Request to execute
+  `cpplint` over changes.
+* `pull-request-check-clang-format.sh` -> Script that's called per Pull Request
+  to execute `clang-format` over changes.
+* `pull-request-checks.yaml` -> Configuration file for the Github Actions CI jobs
+  for the various platforms.
+* `regular-release.yaml` -> Configuration file for performing an automated release
+  every time a tag of a specific form (`cbmc-x.y.z`) is pushed.
+* `release-packages.yaml` -> Configuration file for performing building of build
+  artifacts that are attached to release when it's being made. Invoked when a
+  regular release is performed.
 
-On Ubuntu:
-* sudo apt-get install software-properties-common
-* sudo add-apt-repository ppa:mt-debian/cbmc-backports
-* sudo apt-get update
-* sudo apt-get install cbmc
+## CI Platforms
 
-This project uses GitHub Actions to build installation packages for
-the tip of the develop branch for MacOS, Windows, and Ubuntu each time
-new commits is added to develop.  The packages reside on GitHub as
-artifacts that can be listed using the GitHub Actions API.
+We are currently building and testing CBMC under the following configurations:
 
-A separate project implements a web page hosted on GitHub Pages that makes
-it easy to find the installation package for the tip of develop.
+* `make` * `gcc` * `linux` (ubuntu 20.04)
+* `make` * `clang` * `linux` (ubuntu 20.04)
+* `cmake` * `gcc` * `linux` (ubuntu 20.04)
+* `make` * `clang` * `macos` (10.15)
+* `cmake` * `clang` * `macos` (10.15)
+* `cmake` * `vs` * `windows` (vs2019)
 
-The stable installation packages describe above for MacOS and Ubuntu
-install into the local operating system's equivalent of
-/usr/local/bin.
-This project builds two kinds of packages:
-* cbmc installs into the equvalent of /usr/local/bin
-* cbmc-latest installs into the equivalent of /usr/local/cbmc-latest/bin,
-  and makes it possible to have two copies of cbmc --- a stable release
-  and a tip of develop --- side-by-side on the same machine.
+Aside from the main platform builds for testing, we are also performing
+some auxiliary builds that test packaging support to be up-to-date. We
+do that for:
 
-For each operatin system:
-* The MacOS package is just a tar file of a directory containing the
-  binaries. The directory should be unpacked and placed in the search
-  path. Using Homebrew, "brew install cbmc" will install the latest
-  stable release.  These tar files are intended only to distribute the
-  development versions between stable releases (Homebrew repository
-  updates of the stable versions are quick).
+* a `docker` image
+* an `ubuntu-20.04` package
+* an `ubuntu-18.04` package
+* a `windows-msi` installer package
 
-* The Windows package is an Microsoft Installer (msi) for Windows 10
-  with Visual Studio 2019.  It can be installed by double-clicking on the
-  installer or runnin `msexec /i <filename>`.
-
-* The Ubuntu package is a Debian package that can be installed with
-  `dpkg -i <filename>`. There are packages for Ubuntu 18 and Ubuntu 16.
-  These packages are intended to distribute the development versions
-  between stable releases, but also to produce the stable packages uploaded
-  to a Debian or Ubuntu PPA.
-
-The file packages.yaml defines the workflow for GitHub Actions to build the
-packages. Each package is defined by a job that runs in its own
-container. The subdirectories contain files and data needed to build
-each of the packages.
+Last but not least, we are also performing a coverage statistics collection
+job, which builds CBMC with coverage information on, and then runs the tests,
+finally uploading the results to [Codecov](https://about.codecov.io) which
+then updates pull request with coverage statistics after the job has finished
+running.

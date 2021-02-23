@@ -1,4 +1,4 @@
-name: pull-request-checks
+name: Build and Test CBMC
 on:
   pull_request:
     branches: [ develop ]
