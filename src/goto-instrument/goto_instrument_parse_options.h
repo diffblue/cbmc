@@ -52,8 +52,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(no-nan-check)" \
   "(remove-pointers)" \
   "(no-simplify)" \
-  "(assert-to-assume)" \
-  "(no-assertions)(no-assumptions)(uninitialized-check)" \
+  "(uninitialized-check)" \
   "(race-check)(scc)(one-event-per-cycle)" \
   "(minimum-interference)" \
   "(mm):(my-events)" \
@@ -92,7 +91,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
-  "(error-label):(string-abstraction)" \
+  "(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \
   "(accelerate)(constant-propagator)" \
   "(k-induction):(step-case)(base-case)" \

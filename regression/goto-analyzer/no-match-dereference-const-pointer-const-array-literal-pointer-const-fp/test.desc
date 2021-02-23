@@ -1,7 +1,7 @@
 CORE
 main.c
 --show-goto-functions --pointer-check
-^Removing function pointers and virtual functions$
+^Removal of function pointers and virtual functions$
 ^\s*IF \*container_ptr->fp_tbl\[.*1\] == f1 THEN GOTO [0-9]$
 ^\s*IF \*container_ptr->fp_tbl\[.*1\] == f2 THEN GOTO [0-9]$
 ^\s*IF \*container_ptr->fp_tbl\[.*1\] == f3 THEN GOTO [0-9]$

@@ -27,16 +27,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <jsil/jsil_language.h>
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
-#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
@@ -125,23 +121,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     config.cpp.set_cpp11();
 #endif
 
-#if 0
-  // check assertions
-  if(cmdline.isset("no-assertions"))
-    options.set_option("assertions", false);
-  else
-    options.set_option("assertions", true);
-
-  // use assumptions
-  if(cmdline.isset("no-assumptions"))
-    options.set_option("assumptions", false);
-  else
-    options.set_option("assumptions", true);
-
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
-#endif
+  // all checks supported by goto_check
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // The user should either select:
   //  1. a specific analysis, or
@@ -600,6 +581,10 @@ int goto_analyzer_parse_optionst::doit()
 
   goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
+  // Preserve backwards compatibility in processing
+  options.set_option("partial-inline", true);
+  options.set_option("rewrite-union", false);
+
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
 
@@ -631,7 +616,6 @@ int goto_analyzer_parse_optionst::doit()
 /// Depending on the command line mode, run one of the analysis tasks
 int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 {
-  adjust_float_expressions(goto_model);
   if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
@@ -867,53 +851,22 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options)
 {
-  {
-    #if 0
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_model);
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(goto_model);
 
-    // add the library
-    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << messaget::eom;
-    link_to_library(
-      goto_model, ui_message_handler, cprover_cpp_library_factory);
-    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+  // add the library
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
+  link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
 
-    // these are commented out as well because without the library
-    // this initialization code doesn’t make any sense
-    add_malloc_may_fail_variable_initializations(goto_model);
+  add_malloc_may_fail_variable_initializations(goto_model);
 
-#endif
+  // Common removal of types and complex constructs
+  if(::process_goto_program(goto_model, options, log))
+    return true;
 
-    // remove function pointers
-    log.status() << "Removing function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
-
-    // do partial inlining
-    log.status() << "Partial Inlining" << messaget::eom;
-    goto_partial_inline(goto_model, ui_message_handler);
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-
-#if 0
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-#else
-    (void)options; // unused parameter
-#endif
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-  }
   return false;
 }
 

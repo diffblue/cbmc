@@ -24,6 +24,7 @@ Author: Peter Schrammel
 
 #include <langapi/language.h>
 
+#include <goto-programs/add_malloc_may_fail_variable_initializations.h>
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
@@ -32,6 +33,7 @@ Author: Peter Schrammel
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/mm_io.h>
+#include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -128,69 +130,8 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("propagation", true);
 
-  // check array bounds
-  if(cmdline.isset("bounds-check"))
-    options.set_option("bounds-check", true);
-  else
-    options.set_option("bounds-check", false);
-
-  // check division by zero
-  if(cmdline.isset("div-by-zero-check"))
-    options.set_option("div-by-zero-check", true);
-  else
-    options.set_option("div-by-zero-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("signed-overflow-check"))
-    options.set_option("signed-overflow-check", true);
-  else
-    options.set_option("signed-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("unsigned-overflow-check"))
-    options.set_option("unsigned-overflow-check", true);
-  else
-    options.set_option("unsigned-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("float-overflow-check"))
-    options.set_option("float-overflow-check", true);
-  else
-    options.set_option("float-overflow-check", false);
-
-  // check for NaN (not a number)
-  if(cmdline.isset("nan-check"))
-    options.set_option("nan-check", true);
-  else
-    options.set_option("nan-check", false);
-
-  // check pointers
-  if(cmdline.isset("pointer-check"))
-    options.set_option("pointer-check", true);
-  else
-    options.set_option("pointer-check", false);
-
-  // check for memory leaks
-  if(cmdline.isset("memory-leak-check"))
-    options.set_option("memory-leak-check", true);
-  else
-    options.set_option("memory-leak-check", false);
-
-  // check assertions
-  if(cmdline.isset("no-assertions"))
-    options.set_option("assertions", false);
-  else
-    options.set_option("assertions", true);
-
-  // use assumptions
-  if(cmdline.isset("no-assumptions"))
-    options.set_option("assumptions", false);
-  else
-    options.set_option("assumptions", true);
-
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
+  // all checks supported by goto_check
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // generate unwinding assertions
   if(cmdline.isset("cover"))
@@ -212,6 +153,9 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   }
 
   options.set_option("show-properties", cmdline.isset("show-properties"));
+
+  // Options for process_goto_program
+  options.set_option("rewrite-union", true);
 }
 
 /// invoke main modules
@@ -314,71 +258,44 @@ bool goto_diff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(goto_model);
+
+  // add the library
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
+  link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+
+  add_malloc_may_fail_variable_initializations(goto_model);
+
+  // Common removal of types and complex constructs
+  if(::process_goto_program(goto_model, options, log))
+    return true;
+
+  // instrument cover goals
+  if(cmdline.isset("cover"))
   {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_model);
-
-    // add the library
-    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
-                 << messaget::eom;
-    link_to_library(
-      goto_model, ui_message_handler, cprover_cpp_library_factory);
-    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
-
-    // remove function pointers
-    log.status() << "Removal of function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
-
-    mm_io(goto_model);
-
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-    rewrite_union(goto_model);
-
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-
-    // instrument cover goals
-    if(cmdline.isset("cover"))
-    {
-      // remove skips such that trivial GOTOs are deleted and not considered
-      // for coverage annotation:
-      remove_skip(goto_model);
-
-      const auto cover_config =
-        get_cover_config(options, goto_model.symbol_table, ui_message_handler);
-      if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
-        return true;
-    }
-
-    // label the assertions
-    // This must be done after adding assertions and
-    // before using the argument of the "property" option.
-    // Do not re-label after using the property slicer because
-    // this would cause the property identifiers to change.
-    label_properties(goto_model);
-
-    // remove any skips introduced since coverage instrumentation
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
     remove_skip(goto_model);
+
+    const auto cover_config =
+      get_cover_config(options, goto_model.symbol_table, ui_message_handler);
+    if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
+      return true;
   }
+
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
+
+  // remove any skips introduced since coverage instrumentation
+  remove_skip(goto_model);
 
   return false;
 }

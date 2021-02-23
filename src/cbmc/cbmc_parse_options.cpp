@@ -49,26 +49,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
-#include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/mm_io.h>
+#include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
-#include <goto-programs/remove_vector.h>
-#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
 #include <goto-programs/validate_goto_model.h>
 
 #include <goto-instrument/cover.h>
@@ -112,8 +104,6 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
 void cbmc_parse_optionst::set_default_options(optionst &options)
 {
   // Default true
-  options.set_option("assertions", true);
-  options.set_option("assumptions", true);
   options.set_option("built-in-assertions", true);
   options.set_option("pretty-names", true);
   options.set_option("propagation", true);
@@ -310,18 +300,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  // check assertions
-  if(cmdline.isset("no-assertions"))
-    options.set_option("assertions", false);
-
-  // use assumptions
-  if(cmdline.isset("no-assumptions"))
-    options.set_option("assumptions", false);
-
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
 
   // generate unwinding assertions
   if(cmdline.isset("unwinding-assertions"))
@@ -529,6 +507,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-points-to-sets", true);
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
+
+  // Options for process_goto_program
+  options.set_option("rewrite-union", true);
 }
 
 /// invoke main modules
@@ -926,34 +907,9 @@ bool cbmc_parse_optionst::process_goto_program(
 
   add_malloc_may_fail_variable_initializations(goto_model);
 
-  if(options.get_bool_option("string-abstraction"))
-    string_instrumentation(goto_model);
-
-  // remove function pointers
-  log.status() << "Removal of function pointers and virtual functions"
-               << messaget::eom;
-  remove_function_pointers(
-    log.get_message_handler(),
-    goto_model,
-    options.get_bool_option("pointer-check"));
-
-  mm_io(goto_model);
-
-  // instrument library preconditions
-  instrument_preconditions(goto_model);
-
-  // remove returns, gcc vectors, complex
-  remove_returns(goto_model);
-  remove_vector(goto_model);
-  remove_complex(goto_model);
-  rewrite_union(goto_model);
-
-  // add generic checks
-  log.status() << "Generic Property Instrumentation" << messaget::eom;
-  goto_check(options, goto_model);
-
-  // checks don't know about adjusted float expressions
-  adjust_float_expressions(goto_model);
+  // Common removal of types and complex constructs
+  if(::process_goto_program(goto_model, options, log))
+    return true;
 
   // ignore default/user-specified initialization
   // of variables with static lifetime
@@ -965,21 +921,9 @@ bool cbmc_parse_optionst::process_goto_program(
     nondet_static(goto_model);
   }
 
-  if(options.get_bool_option("string-abstraction"))
-  {
-    log.status() << "String Abstraction" << messaget::eom;
-    string_abstraction(goto_model, log.get_message_handler());
-  }
-
   // add failed symbols
   // needs to be done before pointer analysis
   add_failed_symbols(goto_model.symbol_table);
-
-  // recalculate numbers, etc.
-  goto_model.goto_functions.update();
-
-  // add loop ids
-  goto_model.goto_functions.compute_loop_numbers();
 
   if(options.get_bool_option("drop-unused-functions"))
   {
@@ -1119,9 +1063,6 @@ void cbmc_parse_optionst::help()
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
-    " --no-assertions              ignore user assertions\n"
-    " --no-assumptions             ignore user assumptions\n"
-    " --error-label label          check that label is unreachable\n"
     HELP_COVER
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     // NOLINTNEXTLINE(whitespace/line_length)

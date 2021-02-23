@@ -384,6 +384,8 @@ void _check_with_strategy(
 
   optionst options;
   cbmc_parse_optionst::set_default_options(options);
+  options.set_option("assertions", true);
+  options.set_option("assumptions", true);
   options.set_option("paths", true);
   options.set_option("exploration-strategy", strategy);
   REQUIRE(is_valid_path_strategy(strategy));
