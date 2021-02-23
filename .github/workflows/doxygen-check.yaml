@@ -1,4 +1,4 @@
-name: doxygen-check
+name: Build Doxygen Documentation
 on:
   pull_request:
     branches: [ develop ]
