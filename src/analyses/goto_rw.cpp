@@ -775,16 +775,8 @@ void goto_rw(
     break;
 
   case RETURN:
-    {
-      const code_returnt &code_return=
-        to_code_return(target->code);
-      if(code_return.has_return_value())
-        rw_set.get_objects_rec(
-          function,
-          target,
-          rw_range_sett::get_modet::READ,
-          code_return.return_value());
-    }
+    rw_set.get_objects_rec(
+      function, target, rw_range_sett::get_modet::READ, target->return_value());
     break;
 
   case OTHER:

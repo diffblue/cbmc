@@ -54,11 +54,10 @@ void validate_nondet_method_removed(
 
     if(inst.is_return())
     {
-      const code_returnt &ret_expr = to_code_return(inst.code);
-      if(ret_expr.return_value().id() == ID_side_effect)
+      const auto &return_value = inst.return_value();
+      if(return_value.id() == ID_side_effect)
       {
-        const side_effect_exprt &see =
-          to_side_effect_expr(ret_expr.return_value());
+        const side_effect_exprt &see = to_side_effect_expr(return_value);
         if(see.get_statement() == ID_nondet)
         {
           replacement_nondet_exists = true;

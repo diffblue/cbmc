@@ -165,7 +165,7 @@ static bool is_return_with_variable(
   {
     return false;
   }
-  const auto &rhs = to_code_return(instr.code).return_value();
+  const auto &rhs = instr.return_value();
   return is_symbol_with_id(rhs, identifier) ||
          is_typecast_with_id(rhs, identifier);
 }
@@ -276,8 +276,7 @@ static goto_programt::targett check_and_replace_target(
 
   if(target_instruction->is_return())
   {
-    const auto &nondet_var =
-      to_code_return(target_instruction->code).return_value();
+    const auto &nondet_var = target_instruction->return_value();
 
     side_effect_expr_nondett inserted_expr(
       nondet_var.type(), target_instruction->source_location);

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
+#include <util/deprecate.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
@@ -232,13 +233,29 @@ public:
     }
 
     /// Get the return statement for READ
+    DEPRECATED(SINCE(2021, 2, 24, "Use return_value instead"))
     const code_returnt &get_return() const
     {
       PRECONDITION(is_return());
       return to_code_return(code);
     }
 
+    /// Get the return value of a RETURN instruction
+    const exprt &return_value() const
+    {
+      PRECONDITION(is_return());
+      return to_code_return(code).return_value();
+    }
+
+    /// Get the return value of a RETURN instruction
+    exprt &return_value()
+    {
+      PRECONDITION(is_return());
+      return to_code_return(code).return_value();
+    }
+
     /// Set the return statement for READ
+    DEPRECATED(SINCE(2021, 2, 24, "Use return_value instead"))
     void set_return(code_returnt c)
     {
       PRECONDITION(is_return());

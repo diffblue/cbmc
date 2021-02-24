@@ -285,8 +285,7 @@ std::list<exprt> expressions_read(
     break;
 
   case RETURN:
-    if(instruction.get_return().return_value().is_not_nil())
-      dest.push_back(instruction.get_return().return_value());
+    dest.push_back(instruction.return_value());
     break;
 
   case FUNCTION_CALL:
@@ -928,13 +927,9 @@ void goto_programt::instructiont::transform(
 
   case RETURN:
   {
-    auto new_return_value = f(get_return().return_value());
+    auto new_return_value = f(return_value());
     if(new_return_value.has_value())
-    {
-      auto new_return = get_return();
-      new_return.return_value() = *new_return_value;
-      set_return(new_return);
-    }
+      return_value() = *new_return_value;
   }
   break;
 
@@ -1037,7 +1032,7 @@ void goto_programt::instructiont::apply(
     break;
 
   case RETURN:
-    f(get_return().return_value());
+    f(return_value());
     break;
 
   case ASSIGN:
