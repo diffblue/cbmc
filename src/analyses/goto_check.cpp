@@ -1998,22 +1998,18 @@ void goto_checkt::goto_check(
     }
     else if(i.is_return())
     {
-      if(i.code.operands().size()==1)
-      {
-        const code_returnt &code_return = to_code_return(i.code);
-        check(code_return.return_value());
-        // the return value invalidate any assertion
-        invalidate(code_return.return_value());
+      check(i.return_value());
+      // the return value invalidate any assertion
+      invalidate(i.return_value());
 
-        if(has_subexpr(code_return.return_value(), [](const exprt &expr) {
-             return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
-           }))
-        {
-          exprt &return_value = to_code_return(i.code).return_value();
-          auto rw_ok_cond = rw_ok_check(return_value);
-          if(rw_ok_cond.has_value())
-            return_value = *rw_ok_cond;
-        }
+      if(has_subexpr(i.return_value(), [](const exprt &expr) {
+           return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+         }))
+      {
+        exprt &return_value = i.return_value();
+        auto rw_ok_cond = rw_ok_check(return_value);
+        if(rw_ok_cond.has_value())
+          return_value = *rw_ok_cond;
       }
     }
     else if(i.is_throw())

@@ -418,14 +418,12 @@ goto_programt::const_targett goto_program2codet::convert_return(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  const code_returnt &ret = target->get_return();
-
   // add return instruction unless original code was missing a return
-  if(!ret.has_return_value() ||
-     ret.return_value().id()!=ID_side_effect ||
-     to_side_effect_expr(ret.return_value()).get_statement()!=ID_nondet)
+  if(
+    target->return_value().id() != ID_side_effect ||
+    to_side_effect_expr(target->return_value()).get_statement() != ID_nondet)
   {
-    dest.add(ret);
+    dest.add(code_returnt{target->return_value()});
   }
 
   // all v3 (or later) goto programs have an explicit GOTO after return

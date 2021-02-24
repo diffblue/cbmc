@@ -228,13 +228,7 @@ void goto_program_dereferencet::dereference_instruction(
   }
   else if(i.is_return())
   {
-    auto r = i.get_return();
-
-    if(r.return_value().is_not_nil())
-    {
-      dereference_expr(r.return_value(), checks_only);
-      i.set_return(r);
-    }
+    dereference_expr(i.return_value(), checks_only);
   }
   else if(i.is_other())
   {

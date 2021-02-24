@@ -300,11 +300,10 @@ void interpretert::step()
     if(call_stack.empty())
       throw "RETURN without call"; // NOLINT(readability/throw)
 
-    if(pc->code.operands().size()==1 &&
-       call_stack.top().return_value_address!=0)
+    if(call_stack.top().return_value_address != 0)
     {
       mp_vectort rhs;
-      evaluate(pc->code.op0(), rhs);
+      evaluate(pc->return_value(), rhs);
       assign(call_stack.top().return_value_address, rhs);
     }
 
