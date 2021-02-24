@@ -669,7 +669,7 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
   {
     if(instruction_iterator->is_decl())
     {
-      freely_assignable_exprs.insert(instruction_iterator->get_decl().symbol());
+      freely_assignable_exprs.insert(instruction_iterator->decl_symbol());
     }
     else if(instruction_iterator->is_assign())
     {

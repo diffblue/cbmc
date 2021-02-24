@@ -822,13 +822,9 @@ void goto_rw(
     break;
 
   case DECL:
+    rw_set.get_objects_rec(function, target, target->decl_symbol().type());
     rw_set.get_objects_rec(
-      function, target, to_code_decl(target->code).symbol().type());
-    rw_set.get_objects_rec(
-      function,
-      target,
-      rw_range_sett::get_modet::LHS_W,
-      to_code_decl(target->code).symbol());
+      function, target, rw_range_sett::get_modet::LHS_W, target->decl_symbol());
     break;
 
   case FUNCTION_CALL:

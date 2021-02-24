@@ -120,11 +120,8 @@ void global_may_alias_domaint::transform(
   }
 
   case DECL:
-  {
-    const code_declt &code_decl = to_code_decl(instruction.code);
-    aliases.isolate(code_decl.get_identifier());
+    aliases.isolate(instruction.decl_symbol().get_identifier());
     break;
-  }
 
   case DEAD:
   {

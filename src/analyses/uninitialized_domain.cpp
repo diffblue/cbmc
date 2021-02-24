@@ -33,7 +33,7 @@ void uninitialized_domaint::transform(
 
   if(from->is_decl())
   {
-    const irep_idt &identifier = to_code_decl(from->code).get_identifier();
+    const irep_idt &identifier = from->decl_symbol().get_identifier();
     const symbolt &symbol = ns.lookup(identifier);
 
     if(!symbol.is_static_lifetime)

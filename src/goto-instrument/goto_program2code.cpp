@@ -450,7 +450,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  code_declt d = target->get_decl();
+  code_declt d = code_declt{target->decl_symbol()};
   symbol_exprt &symbol = d.symbol();
 
   goto_programt::const_targett next=target;

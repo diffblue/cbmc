@@ -46,10 +46,9 @@ void variable_sensitivity_domaint::transform(
     abstract_object_pointert top_object =
       abstract_state
         .abstract_object_factory(
-          to_code_decl(instruction.code).symbol().type(), ns, true, false)
+          instruction.decl_symbol().type(), ns, true, false)
         ->update_location_context(write_location, true);
-    abstract_state.assign(
-      to_code_decl(instruction.code).symbol(), top_object, ns);
+    abstract_state.assign(instruction.decl_symbol(), top_object, ns);
   }
   // We now store top.
   break;

@@ -20,7 +20,7 @@ void localst::build(const goto_functiont &goto_function)
   for(const auto &instruction : goto_function.body.instructions)
   {
     if(instruction.is_decl())
-      locals.insert(instruction.get_decl().get_identifier());
+      locals.insert(instruction.decl_symbol().get_identifier());
   }
 
   locals.insert(

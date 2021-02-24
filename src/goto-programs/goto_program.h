@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
+#include <util/deprecate.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
@@ -196,6 +197,7 @@ public:
     }
 
     /// Get the declaration for DECL
+    DEPRECATED(SINCE(2021, 2, 24, "Use decl_symbol instead"))
     const code_declt &get_decl() const
     {
       PRECONDITION(is_decl());
@@ -206,7 +208,30 @@ public:
       return decl;
     }
 
+    /// Get the declared symbol for DECL
+    const symbol_exprt &decl_symbol() const
+    {
+      PRECONDITION(is_decl());
+      auto &decl = expr_checked_cast<code_declt>(code);
+      INVARIANT(
+        !decl.initial_value(),
+        "code_declt in goto program may not contain initialization.");
+      return decl.symbol();
+    }
+
+    /// Get the declared symbol for DECL
+    symbol_exprt &decl_symbol()
+    {
+      PRECONDITION(is_decl());
+      auto &decl = expr_checked_cast<code_declt>(code);
+      INVARIANT(
+        !decl.initial_value(),
+        "code_declt in goto program may not contain initialization.");
+      return decl.symbol();
+    }
+
     /// Set the declaration for DECL
+    DEPRECATED(SINCE(2021, 2, 24, "Use decl_symbol instead"))
     void set_decl(code_declt c)
     {
       PRECONDITION(is_decl());

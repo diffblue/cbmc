@@ -282,15 +282,12 @@ void local_bitvector_analysist::build()
     }
 
     case DECL:
-    {
-      const code_declt &code_decl = to_code_decl(instruction.code);
       assign_lhs(
-        code_decl.symbol(),
+        instruction.decl_symbol(),
         exprt(ID_uninitialized),
         loc_info_src,
         loc_info_dest);
       break;
-    }
 
     case DEAD:
     {
