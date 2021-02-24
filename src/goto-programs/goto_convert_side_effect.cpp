@@ -181,6 +181,7 @@ void goto_convertt::remove_pre(
   side_effect_exprt &expr,
   goto_programt &dest,
   bool result_is_used,
+  bool address_taken,
   const irep_idt &mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
@@ -234,6 +235,11 @@ void goto_convertt::remove_pre(
   rhs.add_to_operands(op, std::move(constant));
   rhs.type() = op.type();
 
+  const bool cannot_use_lhs =
+    result_is_used && !address_taken && needs_cleaning(op);
+  if(cannot_use_lhs)
+    make_temp_symbol(rhs, "pre", dest, mode);
+
   code_assignt assignment(op, rhs);
   assignment.add_source_location()=expr.find_source_location();
 
@@ -241,9 +247,14 @@ void goto_convertt::remove_pre(
 
   if(result_is_used)
   {
-    // revert to argument of pre-inc/pre-dec
-    exprt tmp = op;
-    expr.swap(tmp);
+    if(cannot_use_lhs)
+      expr.swap(rhs);
+    else
+    {
+      // revert to argument of pre-inc/pre-dec
+      exprt tmp = op;
+      expr.swap(tmp);
+    }
   }
   else
     expr.make_nil();
@@ -607,7 +618,7 @@ void goto_convertt::remove_side_effect(
     remove_post(expr, dest, mode, result_is_used);
   else if(statement==ID_preincrement ||
           statement==ID_predecrement)
-    remove_pre(expr, dest, result_is_used, mode);
+    remove_pre(expr, dest, result_is_used, address_taken, mode);
   else if(statement==ID_cpp_new ||
           statement==ID_cpp_new_array)
     remove_cpp_new(expr, dest, result_is_used);

@@ -374,6 +374,16 @@ void goto_convertt::clean_expr(
         clean_expr(side_effect_assign.lhs(), dest, mode);
         exprt lhs = side_effect_assign.lhs();
 
+        const bool must_use_rhs = needs_cleaning(lhs);
+        if(must_use_rhs)
+        {
+          remove_function_call(
+            to_side_effect_expr_function_call(side_effect_assign.rhs()),
+            dest,
+            mode,
+            true);
+        }
+
         // turn into code
         code_assignt assignment;
         assignment.lhs()=lhs;
@@ -382,7 +392,7 @@ void goto_convertt::clean_expr(
         convert_assign(assignment, dest, mode);
 
         if(result_is_used)
-          expr.swap(lhs);
+          expr = must_use_rhs ? side_effect_assign.rhs() : lhs;
         else
           expr.make_nil();
         return;

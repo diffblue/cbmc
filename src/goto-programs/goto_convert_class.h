@@ -114,6 +114,7 @@ protected:
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used,
+    bool address_taken,
     const irep_idt &mode);
   void remove_post(
     side_effect_exprt &expr,
