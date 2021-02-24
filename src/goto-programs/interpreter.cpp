@@ -739,10 +739,12 @@ void interpretert::execute_assert()
 
 void interpretert::execute_function_call()
 {
-  const code_function_callt &function_call = pc->get_function_call();
+  const auto &call_lhs = pc->call_lhs();
+  const auto &call_function = pc->call_function();
+  const auto &call_arguments = pc->call_arguments();
 
   // function to be called
-  mp_integer address=evaluate_address(function_call.function());
+  mp_integer address = evaluate_address(call_function);
 
   if(address==0)
     throw "function call to NULL";
@@ -767,19 +769,18 @@ void interpretert::execute_function_call()
   // return value
   mp_integer return_value_address;
 
-  if(function_call.lhs().is_not_nil())
-    return_value_address=
-      evaluate_address(function_call.lhs());
+  if(call_lhs.is_not_nil())
+    return_value_address = evaluate_address(call_lhs);
   else
     return_value_address=0;
 
   // values of the arguments
   std::vector<mp_vectort> argument_values;
 
-  argument_values.resize(function_call.arguments().size());
+  argument_values.resize(call_arguments.size());
 
-  for(std::size_t i=0; i<function_call.arguments().size(); i++)
-    evaluate(function_call.arguments()[i], argument_values[i]);
+  for(std::size_t i = 0; i < call_arguments.size(); i++)
+    evaluate(call_arguments[i], argument_values[i]);
 
   // do the call
 
@@ -821,8 +822,8 @@ void interpretert::execute_function_call()
   }
   else
   {
-    list_input_varst::iterator it = function_input_vars.find(
-      to_symbol_expr(function_call.function()).get_identifier());
+    list_input_varst::iterator it =
+      function_input_vars.find(to_symbol_expr(call_function).get_identifier());
 
     if(it!=function_input_vars.end())
     {

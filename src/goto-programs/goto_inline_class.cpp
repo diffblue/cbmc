@@ -436,11 +436,9 @@ void goto_inlinet::get_call(
 {
   PRECONDITION(it->is_function_call());
 
-  const code_function_callt &call = it->get_function_call();
-
-  lhs=call.lhs();
-  function=call.function();
-  arguments=call.arguments();
+  lhs = it->call_lhs();
+  function = it->call_function();
+  arguments = it->call_arguments();
 }
 
 /// Inline all of the given call locations.

@@ -192,8 +192,7 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_function_call())
   {
-    const auto &function_call = from->get_function_call();
-    const exprt &function=function_call.function();
+    const exprt &function = from->call_function();
 
     if(function.id()==ID_symbol)
     {
@@ -231,8 +230,8 @@ void constant_propagator_domaint::transform(
         const code_typet &code_type=to_code_type(symbol.type);
         const code_typet::parameterst &parameters=code_type.parameters();
 
-        const code_function_callt::argumentst &arguments=
-          function_call.arguments();
+        const code_function_callt::argumentst &arguments =
+          from->call_arguments();
 
         code_typet::parameterst::const_iterator p_it=parameters.begin();
         for(const auto &arg : arguments)
@@ -777,22 +776,11 @@ void constant_propagator_ait::replace(
     }
     else if(it->is_function_call())
     {
-      auto call = it->get_function_call();
+      constant_propagator_domaint::partial_evaluate(
+        d.values, it->call_function(), ns);
 
-      bool call_changed = false;
-
-      if(!constant_propagator_domaint::partial_evaluate(
-           d.values, call.function(), ns))
-      {
-        call_changed = true;
-      }
-
-      for(auto &arg : call.arguments())
-        if(!constant_propagator_domaint::partial_evaluate(d.values, arg, ns))
-          call_changed = true;
-
-      if(call_changed)
-        it->set_function_call(call);
+      for(auto &arg : it->call_arguments())
+        constant_propagator_domaint::partial_evaluate(d.values, arg, ns);
     }
     else if(it->is_other())
     {

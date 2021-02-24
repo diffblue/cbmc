@@ -170,9 +170,8 @@ void validate_goto_modelt::check_called_functions()
       // check functions that are called
       if(instr.is_function_call())
       {
-        const auto &function_call = instr.get_function_call();
         const irep_idt &identifier =
-          to_symbol_expr(function_call.function()).get_identifier();
+          to_symbol_expr(instr.call_function()).get_identifier();
 
         DATA_CHECK(
           vm,

@@ -44,14 +44,12 @@ void parameter_assignmentst::do_function_calls(
   {
     if(i_it->is_function_call())
     {
-      const code_function_callt &function_call = i_it->get_function_call();
-
       // add x=y for f(y) where x is the parameter
 
-      PRECONDITION(function_call.function().id() == ID_symbol);
+      PRECONDITION(i_it->call_function().id() == ID_symbol);
 
-      const irep_idt &identifier=
-        to_symbol_expr(function_call.function()).get_identifier();
+      const irep_idt &identifier =
+        to_symbol_expr(i_it->call_function()).get_identifier();
 
       // see if we have it
       const namespacet ns(symbol_table);
@@ -67,12 +65,12 @@ void parameter_assignmentst::do_function_calls(
         if(p_identifier.empty())
           continue;
 
-        if(nr<function_call.arguments().size())
+        if(nr < i_it->call_arguments().size())
         {
           const symbolt &lhs_symbol=ns.lookup(p_identifier);
           symbol_exprt lhs=lhs_symbol.symbol_expr();
           exprt rhs = typecast_exprt::conditional_cast(
-            function_call.arguments()[nr], lhs.type());
+            i_it->call_arguments()[nr], lhs.type());
           tmp.add(goto_programt::make_assignment(
             code_assignt(lhs, rhs), i_it->source_location));
         }
