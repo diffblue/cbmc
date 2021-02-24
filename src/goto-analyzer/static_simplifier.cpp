@@ -107,26 +107,21 @@ bool static_simplifier(
       }
       else if(i_it->is_assign())
       {
-        auto assign = i_it->get_assign();
-
         // Simplification needs to be aware of which side of the
         // expression it is handling as:
         // <i=0, j=1>  i=j
         // should simplify to i=1, not to 0=1.
 
-        bool unchanged_lhs =
-          ai.abstract_state_before(i_it)->ai_simplify_lhs(assign.lhs(), ns);
+        bool unchanged_lhs = ai.abstract_state_before(i_it)->ai_simplify_lhs(
+          i_it->assign_lhs_nonconst(), ns);
 
-        bool unchanged_rhs =
-          ai.abstract_state_before(i_it)->ai_simplify(assign.rhs(), ns);
+        bool unchanged_rhs = ai.abstract_state_before(i_it)->ai_simplify(
+          i_it->assign_rhs_nonconst(), ns);
 
         if(unchanged_lhs && unchanged_rhs)
           unmodified.assigns++;
         else
-        {
           simplified.assigns++;
-          i_it->set_assign(assign);
-        }
       }
       else if(i_it->is_function_call())
       {

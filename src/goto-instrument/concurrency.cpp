@@ -108,8 +108,7 @@ void concurrency_instrumentationt::instrument(
   {
     if(it->is_assign())
     {
-      code_assignt &code = to_code_assign(it->code_nonconst());
-      instrument(code.rhs());
+      instrument(it->assign_rhs_nonconst());
     }
     else if(it->is_assume() || it->is_assert() || it->is_goto())
     {

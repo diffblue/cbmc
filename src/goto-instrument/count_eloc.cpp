@@ -173,9 +173,8 @@ void print_global_state_size(const goto_modelt &goto_model)
     {
       if(ins.is_assign())
       {
-        const code_assignt &code_assign = ins.get_assign();
         object_descriptor_exprt ode;
-        ode.build(code_assign.lhs(), ns);
+        ode.build(ins.assign_lhs(), ns);
 
         if(ode.root_object().id() == ID_symbol)
         {

@@ -68,10 +68,9 @@ TEST_CASE("Label function pointer call sites", "[core]")
         REQUIRE(fp_symbol == "h.function_pointer_call.2");
 
         auto it_prev = std::prev(it);
-        const auto &assign = it_prev->get_assign();
 
-        const auto &lhs = assign.lhs();
-        const auto &rhs = assign.rhs();
+        const auto &lhs = it_prev->assign_lhs();
+        const auto &rhs = it_prev->assign_rhs();
 
         REQUIRE(
           to_symbol_expr(lhs).get_identifier() == "h.function_pointer_call.2");

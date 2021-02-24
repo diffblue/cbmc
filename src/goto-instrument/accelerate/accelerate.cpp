@@ -365,7 +365,7 @@ void acceleratet::add_dirty_checks()
     // variables is clean _before_ clearing any dirty flags.
     if(it->is_assign())
     {
-      const exprt &lhs = it->get_assign().lhs();
+      const exprt &lhs = it->assign_lhs();
       expr_mapt::iterator dirty_var=dirty_vars_map.find(lhs);
 
       if(dirty_var!=dirty_vars_map.end())
@@ -385,7 +385,7 @@ void acceleratet::add_dirty_checks()
 
     if(it->is_assign())
     {
-      find_symbols_or_nexts(it->get_assign().rhs(), read);
+      find_symbols_or_nexts(it->assign_rhs(), read);
     }
 
     for(find_symbols_sett::iterator jt=read.begin();

@@ -365,14 +365,12 @@ goto_programt::targett remove_java_newt::lower_java_new(
   if(!target->is_assign())
     return target;
 
-  if(as_const(*target).get_assign().rhs().id() == ID_side_effect)
+  if(as_const(*target).assign_rhs().id() == ID_side_effect)
   {
     // we make a copy, as we intend to destroy the assignment
     // inside lower_java_new and lower_java_new_array
-    const auto code_assign = target->get_assign();
-
-    const exprt &lhs = code_assign.lhs();
-    const exprt &rhs = code_assign.rhs();
+    exprt lhs = target->assign_lhs();
+    exprt rhs = target->assign_rhs();
 
     const auto &side_effect_expr = to_side_effect_expr(rhs);
     const auto &statement = side_effect_expr.get_statement();

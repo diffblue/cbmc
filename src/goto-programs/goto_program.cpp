@@ -295,12 +295,9 @@ std::list<exprt> expressions_read(
   }
 
   case ASSIGN:
-  {
-    const code_assignt &assignment = instruction.get_assign();
-    dest.push_back(assignment.rhs());
-    parse_lhs_read(assignment.lhs(), dest);
+    dest.push_back(instruction.assign_rhs());
+    parse_lhs_read(instruction.assign_lhs(), dest);
     break;
-  }
 
   case CATCH:
   case THROW:
@@ -339,7 +336,7 @@ std::list<exprt> expressions_written(
     break;
 
   case ASSIGN:
-    dest.push_back(instruction.get_assign().lhs());
+    dest.push_back(instruction.assign_lhs());
     break;
 
   case CATCH:
@@ -931,15 +928,12 @@ void goto_programt::instructiont::transform(
 
   case ASSIGN:
   {
-    auto new_assign_lhs = f(get_assign().lhs());
-    auto new_assign_rhs = f(get_assign().rhs());
-    if(new_assign_lhs.has_value() || new_assign_rhs.has_value())
-    {
-      auto new_assignment = get_assign();
-      new_assignment.lhs() = new_assign_lhs.value_or(new_assignment.lhs());
-      new_assignment.rhs() = new_assign_rhs.value_or(new_assignment.rhs());
-      set_assign(new_assignment);
-    }
+    auto new_assign_lhs = f(assign_lhs());
+    auto new_assign_rhs = f(assign_rhs());
+    if(new_assign_lhs.has_value())
+      assign_lhs_nonconst() = new_assign_lhs.value();
+    if(new_assign_rhs.has_value())
+      assign_rhs_nonconst() = new_assign_rhs.value();
   }
   break;
 
@@ -1031,8 +1025,8 @@ void goto_programt::instructiont::apply(
     break;
 
   case ASSIGN:
-    f(get_assign().lhs());
-    f(get_assign().rhs());
+    f(assign_lhs());
+    f(assign_rhs());
     break;
 
   case DECL:

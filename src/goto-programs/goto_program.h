@@ -194,13 +194,43 @@ public:
     }
 
     /// Get the assignment for ASSIGN
+    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
     const code_assignt &get_assign() const
     {
       PRECONDITION(is_assign());
       return to_code_assign(code);
     }
 
+    /// Get the lhs of the assignment for ASSIGN
+    const exprt &assign_lhs() const
+    {
+      PRECONDITION(is_assign());
+      return to_code_assign(code).lhs();
+    }
+
+    /// Get the lhs of the assignment for ASSIGN
+    exprt &assign_lhs_nonconst()
+    {
+      PRECONDITION(is_assign());
+      return to_code_assign(code).lhs();
+    }
+
+    /// Get the rhs of the assignment for ASSIGN
+    const exprt &assign_rhs() const
+    {
+      PRECONDITION(is_assign());
+      return to_code_assign(code).rhs();
+    }
+
+    /// Get the rhs of the assignment for ASSIGN
+    exprt &assign_rhs_nonconst()
+    {
+      PRECONDITION(is_assign());
+      return to_code_assign(code).rhs();
+    }
+
     /// Set the assignment for ASSIGN
+    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
     void set_assign(code_assignt c)
     {
       PRECONDITION(is_assign());

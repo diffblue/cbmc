@@ -667,8 +667,7 @@ void goto_symext::execute_next_instruction(
 
   case ASSIGN:
     if(state.reachable)
-      symex_assign(
-        state, instruction.get_assign().lhs(), instruction.get_assign().rhs());
+      symex_assign(state, instruction.assign_lhs(), instruction.assign_rhs());
 
     symex_transition(state);
     break;

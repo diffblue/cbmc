@@ -107,8 +107,8 @@ void goto_program2codet::scan_for_varargs()
   {
     if(instruction.is_assign())
     {
-      const exprt &l = instruction.get_assign().lhs();
-      const exprt &r = instruction.get_assign().rhs();
+      const exprt &l = instruction.assign_lhs();
+      const exprt &r = instruction.assign_rhs();
 
       // find va_start
       if(
@@ -286,7 +286,7 @@ goto_programt::const_targett goto_program2codet::convert_assign(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  const code_assignt &a = target->get_assign();
+  const code_assignt a{target->assign_lhs(), target->assign_rhs()};
 
   if(va_list_expr.find(a.lhs())!=va_list_expr.end())
     return convert_assign_varargs(target, upper_bound, dest);
@@ -301,10 +301,8 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  const code_assignt &assign = target->get_assign();
-
-  const exprt this_va_list_expr=assign.lhs();
-  const exprt &r=skip_typecast(assign.rhs());
+  const exprt this_va_list_expr = target->assign_lhs();
+  const exprt &r = skip_typecast(target->assign_rhs());
 
   if(r.id()==ID_constant &&
      (r.is_zero() || to_constant_expr(r).get_value()==ID_NULL))
@@ -347,12 +345,12 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     if(next!=upper_bound &&
        next->is_assign())
     {
-      const exprt &n_r = next->get_assign().rhs();
+      const exprt &n_r = next->assign_rhs();
       if(
         n_r.id() == ID_dereference &&
         skip_typecast(to_dereference_expr(n_r).pointer()) == this_va_list_expr)
       {
-        f.lhs() = next->get_assign().lhs();
+        f.lhs() = next->assign_lhs();
 
         type_of.arguments().push_back(f.lhs());
         f.arguments().push_back(type_of);
@@ -467,14 +465,14 @@ goto_programt::const_targett goto_program2codet::convert_decl(
      !next->is_target() &&
      (next->is_assign() || next->is_function_call()))
   {
-    exprt lhs = next->is_assign() ? next->get_assign().lhs()
-                                  : next->get_function_call().lhs();
+    exprt lhs =
+      next->is_assign() ? next->assign_lhs() : next->get_function_call().lhs();
     if(lhs==symbol &&
        va_list_expr.find(lhs)==va_list_expr.end())
     {
       if(next->is_assign())
       {
-        d.set_initial_value({next->get_assign().rhs()});
+        d.set_initial_value({next->assign_rhs()});
       }
       else
       {
