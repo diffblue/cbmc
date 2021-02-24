@@ -1399,25 +1399,10 @@ void goto_checkt::bounds_check(
 
     binary_relation_exprt inequality(effective_offset, ID_lt, size_casted);
 
-    exprt::operandst alloc_disjuncts;
-    for(const auto &a : allocations)
-    {
-      typecast_exprt int_ptr{pointer, a.first.type()};
-
-      binary_relation_exprt lower_bound_check{a.first, ID_le, int_ptr};
-
-      plus_exprt upper_bound{
-        int_ptr,
-        typecast_exprt::conditional_cast(ode.offset(), int_ptr.type())};
-
-      binary_relation_exprt upper_bound_check{
-        std::move(upper_bound), ID_lt, plus_exprt{a.first, a.second}};
-
-      alloc_disjuncts.push_back(
-        and_exprt{std::move(lower_bound_check), std::move(upper_bound_check)});
-    }
-
-    exprt in_bounds_of_some_explicit_allocation = disjunction(alloc_disjuncts);
+    exprt in_bounds_of_some_explicit_allocation =
+      is_in_bounds_of_some_explicit_allocation(
+        pointer,
+        plus_exprt{ode.offset(), from_integer(1, ode.offset().type())});
 
     or_exprt precond(
       std::move(in_bounds_of_some_explicit_allocation),
@@ -2299,11 +2284,14 @@ exprt goto_checkt::is_in_bounds_of_some_explicit_allocation(
 
     binary_relation_exprt lb_check(a.first, ID_le, int_ptr);
 
-    plus_exprt ub{int_ptr, size};
+    plus_exprt upper_bound{
+      int_ptr, typecast_exprt::conditional_cast(size, int_ptr.type())};
 
-    binary_relation_exprt ub_check(ub, ID_le, plus_exprt(a.first, a.second));
+    binary_relation_exprt ub_check{
+      std::move(upper_bound), ID_le, plus_exprt{a.first, a.second}};
 
-    alloc_disjuncts.push_back(and_exprt(lb_check, ub_check));
+    alloc_disjuncts.push_back(
+      and_exprt{std::move(lb_check), std::move(ub_check)});
   }
   return disjunction(alloc_disjuncts);
 }
