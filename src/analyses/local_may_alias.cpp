@@ -390,11 +390,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     }
 
     case DEAD:
-    {
-      const code_deadt &code_dead = to_code_dead(instruction.code);
-      assign_lhs(code_dead.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
+      assign_lhs(
+        instruction.dead_symbol(), nil_exprt(), loc_info_src, loc_info_dest);
       break;
-    }
 
     case FUNCTION_CALL:
     {

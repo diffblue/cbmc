@@ -19,9 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_symext::symex_dead(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
-
-  const code_deadt &code = instruction.get_dead();
-  symex_dead(state, code.symbol());
+  symex_dead(state, instruction.dead_symbol());
 }
 
 void goto_symext::symex_dead(statet &state, const symbol_exprt &symbol_expr)

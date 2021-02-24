@@ -883,9 +883,9 @@ void goto_programt::instructiont::validate(
       source_location);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      !ns.lookup(get_dead().get_identifier(), table_symbol),
+      !ns.lookup(dead_symbol().get_identifier(), table_symbol),
       "removed symbols should be known",
-      id2string(get_dead().get_identifier()),
+      id2string(dead_symbol().get_identifier()),
       source_location);
     break;
   case FUNCTION_CALL:
@@ -961,13 +961,9 @@ void goto_programt::instructiont::transform(
 
   case DEAD:
   {
-    auto new_symbol = f(get_dead().symbol());
+    auto new_symbol = f(dead_symbol());
     if(new_symbol.has_value())
-    {
-      auto new_dead = get_dead();
-      new_dead.symbol() = to_symbol_expr(*new_symbol);
-      set_dead(new_dead);
-    }
+      dead_symbol() = to_symbol_expr(*new_symbol);
   }
   break;
 
@@ -1045,7 +1041,7 @@ void goto_programt::instructiont::apply(
     break;
 
   case DEAD:
-    f(get_dead().symbol());
+    f(dead_symbol());
     break;
 
   case FUNCTION_CALL:

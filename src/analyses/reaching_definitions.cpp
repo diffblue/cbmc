@@ -169,7 +169,7 @@ void rd_range_domaint::transform_dead(
   const namespacet &,
   locationt from)
 {
-  const irep_idt &identifier = to_code_dead(from->code).get_identifier();
+  const irep_idt &identifier = from->dead_symbol().get_identifier();
 
   valuest::iterator entry=values.find(identifier);
 

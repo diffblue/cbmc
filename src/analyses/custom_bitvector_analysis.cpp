@@ -304,14 +304,11 @@ void custom_bitvector_domaint::transform(
     break;
 
   case DEAD:
-    {
-      const code_deadt &code_dead=to_code_dead(instruction.code);
-      assign_lhs(code_dead.symbol(), vectorst());
+    assign_lhs(instruction.dead_symbol(), vectorst());
 
-      // is it a pointer?
-      if(code_dead.symbol().type().id()==ID_pointer)
-        assign_lhs(dereference_exprt(code_dead.symbol()), vectorst());
-    }
+    // is it a pointer?
+    if(instruction.dead_symbol().type().id() == ID_pointer)
+      assign_lhs(dereference_exprt(instruction.dead_symbol()), vectorst());
     break;
 
   case FUNCTION_CALL:

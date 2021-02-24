@@ -191,8 +191,7 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_dead())
   {
-    const auto &code_dead = from->get_dead();
-    values.set_to_top(code_dead.symbol());
+    values.set_to_top(from->dead_symbol());
   }
   else if(from->is_function_call())
   {

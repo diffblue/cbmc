@@ -84,7 +84,7 @@ void full_slicert::operator()(
     }
     else if(instruction->is_dead())
     {
-      const auto &s=to_code_dead(instruction->code).symbol();
+      const auto &s=instruction->dead_symbol();
       decl_dead[s.get_identifier()].push(instruction_node_index);
     }
   }

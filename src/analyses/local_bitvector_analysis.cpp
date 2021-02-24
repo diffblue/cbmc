@@ -293,15 +293,12 @@ void local_bitvector_analysist::build()
     }
 
     case DEAD:
-    {
-      const code_deadt &code_dead = to_code_dead(instruction.code);
       assign_lhs(
-        code_dead.symbol(),
+        instruction.dead_symbol(),
         exprt(ID_uninitialized),
         loc_info_src,
         loc_info_dest);
       break;
-    }
 
     case FUNCTION_CALL:
     {
