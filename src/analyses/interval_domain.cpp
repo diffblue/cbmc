@@ -75,7 +75,7 @@ void interval_domaint::transform(
     break;
 
   case DEAD:
-    havoc_rec(to_code_dead(instruction.code).symbol());
+    havoc_rec(instruction.dead_symbol());
     break;
 
   case ASSIGN:

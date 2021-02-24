@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
+#include <util/deprecate.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
@@ -218,13 +219,29 @@ public:
     }
 
     /// Get the dead statement for DEAD
+    DEPRECATED(SINCE(2021, 2, 24, "Use dead_symbol instead"))
     const code_deadt &get_dead() const
     {
       PRECONDITION(is_dead());
       return to_code_dead(code);
     }
 
+    /// Get the symbol for DEAD
+    const symbol_exprt &dead_symbol() const
+    {
+      PRECONDITION(is_dead());
+      return to_code_dead(code).symbol();
+    }
+
+    /// Get the symbol for DEAD
+    symbol_exprt &dead_symbol()
+    {
+      PRECONDITION(is_dead());
+      return to_code_dead(code).symbol();
+    }
+
     /// Set the dead statement for DEAD
+    DEPRECATED(SINCE(2021, 2, 24, "Use dead_symbol instead"))
     void set_dead(code_deadt c)
     {
       PRECONDITION(is_dead());

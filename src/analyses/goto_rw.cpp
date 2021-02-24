@@ -815,10 +815,7 @@ void goto_rw(
 
   case DEAD:
     rw_set.get_objects_rec(
-      function,
-      target,
-      rw_range_sett::get_modet::LHS_W,
-      to_code_dead(target->code).symbol());
+      function, target, rw_range_sett::get_modet::LHS_W, target->dead_symbol());
     break;
 
   case DECL:

@@ -94,7 +94,7 @@ void goto_program2codet::build_dead_map()
   {
     if(instruction.is_dead())
     {
-      dead_map[instruction.get_dead().get_identifier()] =
+      dead_map[instruction.dead_symbol().get_identifier()] =
         instruction.location_number;
     }
   }
