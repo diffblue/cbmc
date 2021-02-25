@@ -508,8 +508,9 @@ protected:
   /// Symbolically execute an ASSIGN instruction or simulate such an execution
   /// for a synthetic assignment
   /// \param state: Symbolic execution state for current instruction
-  /// \param code: The assignment to execute
-  void symex_assign(statet &state, const code_assignt &code);
+  /// \param lhs: The lhs of the assignment to execute
+  /// \param rhs: The rhs of the assignment to execute
+  void symex_assign(statet &state, const exprt &lhs, const exprt &rhs);
 
   /// Attempt to constant propagate side effects of the assignment (if any)
   ///

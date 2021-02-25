@@ -165,7 +165,7 @@ void goto_symext::parameter_assignments(
 
       state.call_stack().top().parameter_names.push_back(va_arg.name);
 
-      symex_assign(state, code_assignt{va_arg.symbol_expr(), *it1});
+      symex_assign(state, va_arg.symbol_expr(), *it1);
     }
   }
   else if(it1!=arguments.end())
@@ -287,8 +287,7 @@ void goto_symext::symex_function_call_code(
     {
       const auto rhs =
         side_effect_expr_nondett(call.lhs().type(), call.source_location());
-      code_assignt code(call.lhs(), rhs);
-      symex_assign(state, code);
+      symex_assign(state, call.lhs(), rhs);
     }
 
     if(symex_config.havoc_undefined_functions)
