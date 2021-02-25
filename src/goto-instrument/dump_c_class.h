@@ -14,10 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 #include <string>
-#include <memory> // unique_ptr
-
-#include <langapi/language.h>
-#include <langapi/mode.h>
 
 #include <goto-programs/system_library_symbols.h>
 
@@ -116,13 +112,13 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    language_factoryt factory,
+    const irep_idt &mode,
     const dump_c_configurationt config)
     : goto_functions(_goto_functions),
       copied_symbol_table(_ns.get_symbol_table()),
       ns(copied_symbol_table),
       dump_c_config(config),
-      language(factory()),
+      mode(mode),
       harness(include_harness),
       system_symbols(use_system_headers)
   {
@@ -135,14 +131,14 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    language_factoryt factory)
+    const irep_idt &mode)
     : dump_ct(
         _goto_functions,
         use_system_headers,
         use_all_headers,
         include_harness,
         _ns,
-        factory,
+        mode,
         dump_c_configurationt::default_configuration)
   {
   }
@@ -156,7 +152,7 @@ protected:
   symbol_tablet copied_symbol_table;
   const namespacet ns;
   const dump_c_configurationt dump_c_config;
-  std::unique_ptr<languaget> language;
+  const irep_idt mode;
   const bool harness;
 
   typedef std::unordered_set<irep_idt> convertedt;
