@@ -97,7 +97,7 @@ void symex_transition(
     for(const auto &i_e : instruction.incoming_edges)
     {
       if(
-        i_e->is_goto() && i_e->is_backwards_goto() &&
+        i_e->is_backwards_goto() && i_e->get_target() == to &&
         (!is_backwards_goto ||
          state.source.pc->location_number > i_e->location_number))
       {

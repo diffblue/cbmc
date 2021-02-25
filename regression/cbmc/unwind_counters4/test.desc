@@ -1,0 +1,11 @@
+CORE
+main.c
+--unwind 2
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\** 2 of 2 failed
+--
+--
+Loop unwinding must terminate despite the existence of multiple loop entry
+points.
