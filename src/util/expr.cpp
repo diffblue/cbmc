@@ -146,7 +146,9 @@ bool exprt::is_one() const
         CHECK_RETURN(false);
       return rat_value.is_one();
     }
-    else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
+    else if(
+      type_id == ID_unsignedbv || type_id == ID_signedbv ||
+      type_id == ID_c_bool || type_id == ID_c_bit_field)
     {
       const auto width = to_bitvector_type(type()).get_width();
       mp_integer int_value =
