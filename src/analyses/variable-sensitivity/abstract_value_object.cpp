@@ -169,7 +169,15 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  return transform(expr, operands, environment, ns);
+  auto result = transform(expr, operands, environment, ns);
+  return environment.add_object_context(result);
+}
+
+// evaluation helpers
+template <class representation_type>
+abstract_object_pointert make_top(const typet &type)
+{
+  return std::make_shared<representation_type>(type, true, false);
 }
 
 // constant_abstract_value expression transfrom
@@ -221,8 +229,8 @@ private:
     }
 
     // the expression is fully simplified
-    return environment.abstract_object_factory(
-      simplified.type(), simplified, ns);
+    return std::make_shared<constant_abstract_valuet>(
+      simplified, environment, ns);
   }
 
   abstract_object_pointert try_transform_expr_with_all_rounding_modes() const
@@ -274,7 +282,7 @@ private:
 
   abstract_object_pointert top(const typet &type) const
   {
-    return environment.abstract_object_factory(type, ns, true, false);
+    return make_top<constant_abstract_valuet>(type);
   }
 
   bool rounding_mode_is_not_set() const
@@ -351,8 +359,7 @@ private:
     }
 
     if(num_operands == 0)
-      return environment.abstract_object_factory(
-        expression.type(), ns, true, false);
+      return make_top<interval_abstract_valuet>(expression.type());
 
     if(expression.id() == ID_if)
       return interval_evaluate_conditional(interval_operands);
@@ -371,7 +378,7 @@ private:
     INVARIANT(
       result.type() == expression.type(),
       "Type of result interval should match expression type");
-    return make_interval(expression.type(), result);
+    return make_interval(result);
   }
 
   std::vector<interval_abstract_value_pointert> operands_as_intervals() const
@@ -391,18 +398,7 @@ private:
           if(op_as_constant.is_nil())
             return std::vector<interval_abstract_value_pointert>();
 
-          const auto ivop =
-            environment.abstract_object_factory(op->type(), op_as_constant, ns);
-          const auto ivop_context =
-            std::dynamic_pointer_cast<const context_abstract_objectt>(ivop);
-          if(ivop_context)
-          {
-            iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(
-              ivop_context->get_child());
-          }
-          else
-            iav =
-              std::dynamic_pointer_cast<const interval_abstract_valuet>(ivop);
+          iav = make_interval(op_as_constant);
         }
         CHECK_RETURN(
           !std::dynamic_pointer_cast<const context_abstract_objectt>(iav));
@@ -429,18 +425,15 @@ private:
     {
       // Value of the condition is both true and false, so
       // combine the intervals of both the true and false expressions
-      return make_interval(
-        expression.type(),
-        constant_interval_exprt(
-          constant_interval_exprt::get_min(
-            true_interval.get_lower(), false_interval.get_lower()),
-          constant_interval_exprt::get_max(
-            true_interval.get_upper(), false_interval.get_upper())));
+      return make_interval(constant_interval_exprt(
+        constant_interval_exprt::get_min(
+          true_interval.get_lower(), false_interval.get_lower()),
+        constant_interval_exprt::get_max(
+          true_interval.get_upper(), false_interval.get_upper())));
     }
 
-    return condition_result.is_true()
-             ? make_interval(true_interval.type(), true_interval)
-             : make_interval(false_interval.type(), false_interval);
+    return condition_result.is_true() ? make_interval(true_interval)
+                                      : make_interval(false_interval);
   }
 
   abstract_object_pointert interval_evaluate_unary_expr(
@@ -461,7 +454,7 @@ private:
         new_interval.type() == expression.type(),
         "Type of result interval should match expression type");
 
-      return make_interval(tce.type(), new_interval);
+      return make_interval(new_interval);
     }
 
     const constant_interval_exprt &interval_result =
@@ -469,13 +462,12 @@ private:
     INVARIANT(
       interval_result.type() == expression.type(),
       "Type of result interval should match expression type");
-    return make_interval(expression.type(), interval_result);
+    return make_interval(interval_result);
   }
 
-  abstract_object_pointert
-  make_interval(const typet &type, const exprt &expr) const
+  interval_abstract_value_pointert make_interval(const exprt &expr) const
   {
-    return environment.abstract_object_factory(type, expr, ns);
+    return std::make_shared<interval_abstract_valuet>(expr, environment, ns);
   }
 
   const exprt &expression;
@@ -524,7 +516,7 @@ private:
 
     auto resulting_objects = evaluate_each_combination(collective_operands);
 
-    return resolve_new_values(resulting_objects);
+    return resolve_values(resulting_objects);
   }
 
   /// Evaluate expression for every combination of values in \p value_ranges.
@@ -618,13 +610,6 @@ private:
       return maybe_singleton;
   }
 
-  abstract_object_pointert
-  resolve_new_values(const abstract_object_sett &new_values) const
-  {
-    auto result = resolve_values(new_values);
-    return environment.add_object_context(result);
-  }
-
   static abstract_object_pointert
   resolve_values(const abstract_object_sett &new_values)
   {
@@ -635,14 +620,20 @@ private:
     if(unwrapped_values.size() > value_set_abstract_objectt::max_value_set_size)
       return unwrapped_values.to_interval();
 
-    const auto &type = new_values.first()->type();
-    auto result = std::make_shared<value_set_abstract_objectt>(type);
-    result->set_values(unwrapped_values);
-    return result;
+    return make_value_set(unwrapped_values);
   }
 
-  abstract_object_pointert
-  value_set_evaluate_conditional(const std::vector<value_ranget> &ops) const
+  static abstract_object_pointert
+  make_value_set(const abstract_object_sett &values)
+  {
+    const auto &type = values.first()->type();
+    auto value_set = std::make_shared<value_set_abstract_objectt>(type);
+    value_set->set_values(values);
+    return value_set;
+  }
+
+  static abstract_object_pointert
+  value_set_evaluate_conditional(const std::vector<value_ranget> &ops)
   {
     auto const &condition = ops[0];
 
@@ -664,7 +655,7 @@ private:
       resulting_objects.insert(true_result);
     if(all_false || indeterminate)
       resulting_objects.insert(false_result);
-    return resolve_new_values(resulting_objects);
+    return resolve_values(resulting_objects);
   }
 
   const exprt &expression;
