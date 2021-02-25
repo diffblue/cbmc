@@ -69,8 +69,7 @@ void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
         null_pointer_exprt(pointer_type),
         address_of_expr);
 
-      code_assignt assignment(expr, rhs);
-      symex_assign(state, assignment);
+      symex_assign(state, expr, rhs);
     }
   }
 }

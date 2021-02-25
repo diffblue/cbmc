@@ -36,10 +36,13 @@ void goto_symext::do_simplify(exprt &expr)
     simplify(expr, ns);
 }
 
-void goto_symext::symex_assign(statet &state, const code_assignt &code)
+void goto_symext::symex_assign(
+  statet &state,
+  const exprt &o_lhs,
+  const exprt &o_rhs)
 {
-  exprt lhs = clean_expr(code.lhs(), state, true);
-  exprt rhs = clean_expr(code.rhs(), state, false);
+  exprt lhs = clean_expr(o_lhs, state, true);
+  exprt rhs = clean_expr(o_rhs, state, false);
 
   DATA_INVARIANT(
     lhs.type() == rhs.type(), "assignments must be type consistent");

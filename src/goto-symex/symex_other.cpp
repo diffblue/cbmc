@@ -31,12 +31,10 @@ void goto_symext::havoc_rec(
       lhs=if_exprt(
         guard.as_expr(), dest, exprt(ID_null_object, dest.type()));
 
-    code_assignt assignment;
-    assignment.lhs()=lhs;
-    assignment.rhs() =
+    auto rhs =
       side_effect_expr_nondett(dest.type(), state.source.pc->source_location);
 
-    symex_assign(state, assignment);
+    symex_assign(state, lhs, rhs);
   }
   else if(dest.id()==ID_byte_extract_little_endian ||
           dest.id()==ID_byte_extract_big_endian)
@@ -167,8 +165,7 @@ void goto_symext::symex_other(
       }
     }
 
-    code_assignt assignment(dest_array, src_array);
-    symex_assign(state, assignment);
+    symex_assign(state, dest_array, src_array);
   }
   else if(statement==ID_array_set)
   {
@@ -211,8 +208,7 @@ void goto_symext::symex_other(
     if(array_type.subtype() != value.type())
       value = typecast_exprt(value, array_type.subtype());
 
-    code_assignt assignment(array_expr, array_of_exprt(value, array_type));
-    symex_assign(state, assignment);
+    symex_assign(state, array_expr, array_of_exprt(value, array_type));
   }
   else if(statement==ID_array_equal)
   {
@@ -236,13 +232,13 @@ void goto_symext::symex_other(
     process_array_expr(state, array1);
     process_array_expr(state, array2);
 
-    code_assignt assignment(code.op2(), equal_exprt(array1, array2));
+    exprt rhs = equal_exprt(array1, array2);
 
     // check for size (or type) mismatch
     if(array1.type() != array2.type())
-      assignment.rhs() = false_exprt();
+      rhs = false_exprt();
 
-    symex_assign(state, assignment);
+    symex_assign(state, code.op2(), rhs);
   }
   else if(statement==ID_user_specified_predicate ||
           statement==ID_user_specified_parameter_predicates ||

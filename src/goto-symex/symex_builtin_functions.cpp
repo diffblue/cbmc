@@ -150,10 +150,10 @@ void goto_symext::symex_allocate(
 
       state.symbol_table.add(size_symbol);
 
-      code_assignt assignment(size_symbol.symbol_expr(), array_size);
-      array_size = assignment.lhs();
+      auto array_size_rhs = array_size;
+      array_size = size_symbol.symbol_expr();
 
-      symex_assign(state, assignment);
+      symex_assign(state, size_symbol.symbol_expr(), array_size_rhs);
     }
   }
 
@@ -181,15 +181,14 @@ void goto_symext::symex_allocate(
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);
     CHECK_RETURN(zero_value.has_value());
-    code_assignt assignment(value_symbol.symbol_expr(), *zero_value);
-    symex_assign(state, assignment);
+    symex_assign(state, value_symbol.symbol_expr(), *zero_value);
   }
   else
   {
-    const code_assignt assignment{
-      value_symbol.symbol_expr(),
-      path_storage.build_symex_nondet(*object_type, code.source_location())};
-    symex_assign(state, assignment);
+    auto lhs = value_symbol.symbol_expr();
+    auto rhs =
+      path_storage.build_symex_nondet(*object_type, code.source_location());
+    symex_assign(state, lhs, rhs);
   }
 
   exprt rhs;
@@ -207,9 +206,7 @@ void goto_symext::symex_allocate(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
   }
 
-  symex_assign(
-    state,
-    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
+  symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 }
 
 /// Construct an entry for the var args array. Visual Studio complicates this as
@@ -297,14 +294,12 @@ void goto_symext::symex_va_start(
   array = clean_expr(std::move(array), state, false);
   array = state.rename(std::move(array), ns).get();
   do_simplify(array);
-  symex_assign(state, code_assignt{va_array.symbol_expr(), std::move(array)});
+  symex_assign(state, va_array.symbol_expr(), std::move(array));
 
   exprt rhs = address_of_exprt{
     index_exprt{va_array.symbol_expr(), from_integer(0, index_type())}};
   rhs = state.rename(std::move(rhs), ns).get();
-  symex_assign(
-    state,
-    code_assignt{lhs, typecast_exprt::conditional_cast(rhs, lhs.type())});
+  symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 }
 
 static irep_idt get_string_argument_rec(const exprt &src)
@@ -533,7 +528,7 @@ void goto_symext::symex_cpp_new(
   else
     rhs.copy_to_operands(symbol.symbol_expr());
 
-  symex_assign(state, code_assignt(lhs, rhs));
+  symex_assign(state, lhs, rhs);
 }
 
 void goto_symext::symex_cpp_delete(
