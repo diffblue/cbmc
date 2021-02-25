@@ -128,26 +128,26 @@ static abstract_object_pointert value_set_expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns);
 
-bool any_value_sets(const std::vector<abstract_object_pointert> &operands)
+template <class representation_type>
+bool any_of_type(const std::vector<abstract_object_pointert> &operands)
 {
   return std::find_if(
            operands.begin(),
            operands.end(),
            [](const abstract_object_pointert &p) {
-             return std::dynamic_pointer_cast<const value_set_abstract_objectt>(
-                      p) != nullptr;
+             return std::dynamic_pointer_cast<const representation_type>(p) !=
+                    nullptr;
            }) != operands.end();
+}
+
+bool any_value_sets(const std::vector<abstract_object_pointert> &operands)
+{
+  return any_of_type<value_set_abstract_objectt>(operands);
 }
 
 bool any_intervals(const std::vector<abstract_object_pointert> &operands)
 {
-  return std::find_if(
-           operands.begin(),
-           operands.end(),
-           [](const abstract_object_pointert &p) {
-             return std::dynamic_pointer_cast<const interval_abstract_valuet>(
-                      p) != nullptr;
-           }) != operands.end();
+  return any_of_type<interval_abstract_valuet>(operands);
 }
 
 static abstract_object_pointert transform(
