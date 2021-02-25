@@ -314,18 +314,175 @@ abstract_object_pointert constants_expression_transform(
 
 ///////////////////////////////////////////////////////
 // intervals expression transform
-using interval_abstract_value_pointert = sharing_ptrt<interval_abstract_valuet>;
+class interval_evaluator
+{
+public:
+  interval_evaluator(
+    const exprt &e,
+    const std::vector<abstract_object_pointert> &ops,
+    const abstract_environmentt &env,
+    const namespacet &n)
+    : expression(e), operands(ops), environment(env), ns(n)
+  {
+    PRECONDITION(expression.operands().size() == operands.size());
+  }
 
-static abstract_object_pointert interval_evaluate_conditional(
-  const exprt &expr,
-  const std::vector<interval_abstract_value_pointert> &interval_operands,
-  const abstract_environmentt &env,
-  const namespacet &ns);
-static abstract_object_pointert interval_evaluate_unary_expr(
-  const exprt &expr,
-  const std::vector<interval_abstract_value_pointert> &interval_operands,
-  const abstract_environmentt &environment,
-  const namespacet &ns);
+  abstract_object_pointert operator()() const
+  {
+    return transform();
+  }
+
+private:
+  using interval_abstract_value_pointert =
+    sharing_ptrt<const interval_abstract_valuet>;
+
+  abstract_object_pointert transform() const
+  {
+    auto interval_operands = operands_as_intervals();
+    auto num_operands = interval_operands.size();
+
+    if(num_operands != operands.size())
+    {
+      // We could not convert all operands into intervals,
+      // e.g. if its type is not something we can represent as an interval,
+      // try dispatching the expression_transform under that type instead.
+      return constants_expression_transform(
+        expression, operands, environment, ns);
+    }
+
+    if(num_operands == 0)
+      return environment.abstract_object_factory(
+        expression.type(), ns, true, false);
+
+    if(expression.id() == ID_if)
+      return interval_evaluate_conditional(interval_operands);
+
+    if(num_operands == 1)
+      return interval_evaluate_unary_expr(interval_operands);
+
+    constant_interval_exprt result = interval_operands[0]->to_interval();
+
+    for(size_t opIndex = 1; opIndex != interval_operands.size(); ++opIndex)
+    {
+      auto &interval_next = interval_operands[opIndex]->to_interval();
+      result = result.eval(expression.id(), interval_next);
+    }
+
+    INVARIANT(
+      result.type() == expression.type(),
+      "Type of result interval should match expression type");
+    return make_interval(expression.type(), result);
+  }
+
+  std::vector<interval_abstract_value_pointert> operands_as_intervals() const
+  {
+    std::vector<interval_abstract_value_pointert> interval_operands;
+
+    for(const auto &op : operands)
+    {
+      auto iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(op);
+      if(!iav)
+      {
+        // The operand isn't an interval - if it's an integral constant we can
+        // convert it into an interval.
+        if(constant_interval_exprt::is_int(op->type()))
+        {
+          const auto op_as_constant = op->to_constant();
+          if(op_as_constant.is_nil())
+            return std::vector<interval_abstract_value_pointert>();
+
+          const auto ivop =
+            environment.abstract_object_factory(op->type(), op_as_constant, ns);
+          const auto ivop_context =
+            std::dynamic_pointer_cast<const context_abstract_objectt>(ivop);
+          if(ivop_context)
+          {
+            iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(
+              ivop_context->get_child());
+          }
+          else
+            iav =
+              std::dynamic_pointer_cast<const interval_abstract_valuet>(ivop);
+        }
+        CHECK_RETURN(
+          !std::dynamic_pointer_cast<const context_abstract_objectt>(iav));
+      }
+
+      if(iav)
+        interval_operands.push_back(iav);
+    }
+
+    return interval_operands;
+  }
+
+  abstract_object_pointert interval_evaluate_conditional(
+    const std::vector<interval_abstract_value_pointert> &interval_operands)
+    const
+  {
+    auto const &condition_interval = interval_operands[0]->to_interval();
+    auto const &true_interval = interval_operands[1]->to_interval();
+    auto const &false_interval = interval_operands[2]->to_interval();
+
+    auto condition_result = condition_interval.is_definitely_true();
+
+    if(condition_result.is_unknown())
+    {
+      // Value of the condition is both true and false, so
+      // combine the intervals of both the true and false expressions
+      return make_interval(
+        expression.type(),
+        constant_interval_exprt(
+          constant_interval_exprt::get_min(
+            true_interval.get_lower(), false_interval.get_lower()),
+          constant_interval_exprt::get_max(
+            true_interval.get_upper(), false_interval.get_upper())));
+    }
+
+    return condition_result.is_true()
+             ? make_interval(true_interval.type(), true_interval)
+             : make_interval(false_interval.type(), false_interval);
+  }
+
+  abstract_object_pointert interval_evaluate_unary_expr(
+    const std::vector<interval_abstract_value_pointert> &interval_operands)
+    const
+  {
+    const constant_interval_exprt &operand_expr =
+      interval_operands[0]->to_interval();
+
+    if(expression.id() == ID_typecast)
+    {
+      const typecast_exprt &tce = to_typecast_expr(expression);
+
+      const constant_interval_exprt &new_interval =
+        operand_expr.typecast(tce.type());
+
+      INVARIANT(
+        new_interval.type() == expression.type(),
+        "Type of result interval should match expression type");
+
+      return make_interval(tce.type(), new_interval);
+    }
+
+    const constant_interval_exprt &interval_result =
+      operand_expr.eval(expression.id());
+    INVARIANT(
+      interval_result.type() == expression.type(),
+      "Type of result interval should match expression type");
+    return make_interval(expression.type(), interval_result);
+  }
+
+  abstract_object_pointert
+  make_interval(const typet &type, const exprt &expr) const
+  {
+    return environment.abstract_object_factory(type, expr, ns);
+  }
+
+  const exprt &expression;
+  const std::vector<abstract_object_pointert> &operands;
+  const abstract_environmentt &environment;
+  const namespacet &ns;
+};
 
 abstract_object_pointert intervals_expression_transform(
   const exprt &expr,
@@ -333,151 +490,8 @@ abstract_object_pointert intervals_expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns)
 {
-  std::size_t num_operands = expr.operands().size();
-  PRECONDITION(operands.size() == num_operands);
-
-  std::vector<sharing_ptrt<interval_abstract_valuet>> interval_operands;
-
-  for(const auto &op : operands)
-  {
-    auto iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(op);
-    if(!iav)
-    {
-      // The operand isn't an interval - if it's an integral constant we can
-      // convert it into an interval.
-
-      if(constant_interval_exprt::is_int(op->type()))
-      {
-        const auto op_as_constant = op->to_constant();
-        if(op_as_constant.is_nil())
-        {
-          auto top_object =
-            environment.abstract_object_factory(expr.type(), ns, true, false);
-          auto top_context_object =
-            std::dynamic_pointer_cast<const context_abstract_objectt>(
-              top_object);
-          CHECK_RETURN(top_context_object);
-          return top_context_object->get_child();
-        }
-        const auto ivop =
-          environment.abstract_object_factory(op->type(), op_as_constant, ns);
-        const auto ivop_context =
-          std::dynamic_pointer_cast<const context_abstract_objectt>(ivop);
-        if(ivop_context)
-        {
-          iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(
-            ivop_context->get_child());
-        }
-        else
-          iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(ivop);
-      }
-      CHECK_RETURN(
-        !std::dynamic_pointer_cast<const context_abstract_objectt>(iav));
-
-      if(!iav)
-      {
-        // If we could not convert the operand into an interval,
-        // e.g. if its type is not something we can represent as an interval,
-        // try dispatching the expression_transform under that type instead.
-        if(
-          std::dynamic_pointer_cast<const constant_abstract_valuet>(op) !=
-          nullptr)
-          return constants_expression_transform(
-            expr, operands, environment, ns);
-        return op->expression_transform(expr, operands, environment, ns);
-      }
-    }
-
-    INVARIANT(iav, "Should be an interval abstract value");
-    interval_operands.push_back(iav);
-  }
-
-  if(num_operands == 0)
-    return environment.abstract_object_factory(expr.type(), ns, true, false);
-
-  if(expr.id() == ID_if)
-    return interval_evaluate_conditional(
-      expr, interval_operands, environment, ns);
-
-  if(num_operands == 1)
-    return interval_evaluate_unary_expr(
-      expr, interval_operands, environment, ns);
-
-  constant_interval_exprt result = interval_operands[0]->to_interval();
-
-  for(size_t opIndex = 1; opIndex != interval_operands.size(); ++opIndex)
-  {
-    auto &interval_next = interval_operands[opIndex]->to_interval();
-    result = result.eval(expr.id(), interval_next);
-  }
-
-  INVARIANT(
-    result.type() == expr.type(),
-    "Type of result interval should match expression type");
-  return environment.abstract_object_factory(expr.type(), result, ns);
-}
-
-abstract_object_pointert interval_evaluate_conditional(
-  const exprt &expr,
-  const std::vector<interval_abstract_value_pointert> &interval_operands,
-  const abstract_environmentt &env,
-  const namespacet &ns)
-{
-  auto const &condition_interval = interval_operands[0]->to_interval();
-  auto const &true_interval = interval_operands[1]->to_interval();
-  auto const &false_interval = interval_operands[2]->to_interval();
-
-  auto condition_result = condition_interval.is_definitely_true();
-
-  if(condition_result.is_unknown())
-  {
-    // Value of the condition is both true and false, so
-    // combine the intervals of both the true and false expressions
-    return env.abstract_object_factory(
-      expr.type(),
-      constant_interval_exprt(
-        constant_interval_exprt::get_min(
-          true_interval.get_lower(), false_interval.get_lower()),
-        constant_interval_exprt::get_max(
-          true_interval.get_upper(), false_interval.get_upper())),
-      ns);
-  }
-
-  return condition_result.is_true()
-           ? env.abstract_object_factory(
-               true_interval.type(), true_interval, ns)
-           : env.abstract_object_factory(
-               false_interval.type(), false_interval, ns);
-}
-
-abstract_object_pointert interval_evaluate_unary_expr(
-  const exprt &expr,
-  const std::vector<interval_abstract_value_pointert> &interval_operands,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  const constant_interval_exprt &operand_expr =
-    interval_operands[0]->to_interval();
-
-  if(expr.id() == ID_typecast)
-  {
-    const typecast_exprt &tce = to_typecast_expr(expr);
-
-    const constant_interval_exprt &new_interval =
-      operand_expr.typecast(tce.type());
-
-    INVARIANT(
-      new_interval.type() == expr.type(),
-      "Type of result interval should match expression type");
-
-    return environment.abstract_object_factory(tce.type(), new_interval, ns);
-  }
-
-  const constant_interval_exprt &interval_result = operand_expr.eval(expr.id());
-  INVARIANT(
-    interval_result.type() == expr.type(),
-    "Type of result interval should match expression type");
-  return environment.abstract_object_factory(expr.type(), interval_result, ns);
+  auto evaluator = interval_evaluator(expr, operands, environment, ns);
+  return evaluator();
 }
 
 /////////////////////////////////////////////////////////
