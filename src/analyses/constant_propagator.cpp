@@ -751,8 +751,10 @@ void constant_propagator_ait::replace(
 {
   Forall_goto_program_instructions(it, goto_function.body)
   {
-    // Works because this is a location (but not history) sensitive domain
-    const constant_propagator_domaint &d = (*this)[it];
+    auto const current_domain_ptr =
+      std::dynamic_pointer_cast<const constant_propagator_domaint>(
+        this->abstract_state_before(it));
+    const constant_propagator_domaint &d = *current_domain_ptr;
 
     if(d.is_bottom())
       continue;
