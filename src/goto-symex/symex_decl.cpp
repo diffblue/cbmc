@@ -16,14 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_symext::symex_decl(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
-
-  const auto &code = instruction.get_decl();
-
-  // two-operand decl not supported here
-  // we handle the decl with only one operand
-  PRECONDITION(code.operands().size() == 1);
-
-  symex_decl(state, code.symbol());
+  symex_decl(state, instruction.decl_symbol());
 }
 
 void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)

@@ -202,11 +202,8 @@ void escape_domaint::transform(
     break;
 
   case DECL:
-    {
-      const code_declt &code_decl=to_code_decl(instruction.code);
-      aliases.isolate(code_decl.get_identifier());
-      assign_lhs_cleanup(code_decl.symbol(), std::set<irep_idt>());
-    }
+    aliases.isolate(instruction.decl_symbol().get_identifier());
+    assign_lhs_cleanup(instruction.decl_symbol(), std::set<irep_idt>());
     break;
 
   case DEAD:

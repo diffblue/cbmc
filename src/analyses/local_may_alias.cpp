@@ -383,11 +383,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     }
 
     case DECL:
-    {
-      const code_declt &code_decl = to_code_decl(instruction.code);
-      assign_lhs(code_decl.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
+      assign_lhs(
+        instruction.decl_symbol(), nil_exprt(), loc_info_src, loc_info_dest);
       break;
-    }
 
     case DEAD:
       assign_lhs(

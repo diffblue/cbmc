@@ -251,7 +251,7 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
       // same name may exist several times due to inlining, make sure the first
       // declaration is used
       available_decls.insert(
-        std::make_pair(it->get_decl().get_identifier(), it));
+        std::make_pair(it->decl_symbol().get_identifier(), it));
 
   // declare (and, if necessary, define) locals
   for(const auto &l : locals)

@@ -109,8 +109,7 @@ void uninitializedt::add_assertions(
       // if we track it, add declaration and assignment
       // for tracking variable!
 
-      const irep_idt &identifier=
-        to_code_decl(instruction.code).get_identifier();
+      const irep_idt &identifier = instruction.decl_symbol().get_identifier();
 
       if(tracking.find(identifier)!=tracking.end())
       {

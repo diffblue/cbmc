@@ -240,8 +240,7 @@ void goto_programt::get_decl_identifiers(
       DATA_INVARIANT(
         instruction.code.operands().size() == 1,
         "declaration statement expects one operand");
-      const symbol_exprt &symbol_expr = to_symbol_expr(instruction.code.op0());
-      decl_identifiers.insert(symbol_expr.get_identifier());
+      decl_identifiers.insert(instruction.decl_symbol().get_identifier());
     }
   }
 }
@@ -870,9 +869,9 @@ void goto_programt::instructiont::validate(
       source_location);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      !ns.lookup(get_decl().get_identifier(), table_symbol),
+      !ns.lookup(decl_symbol().get_identifier(), table_symbol),
       "declared symbols should be known",
-      id2string(get_decl().get_identifier()),
+      id2string(decl_symbol().get_identifier()),
       source_location);
     break;
   case DEAD:
@@ -949,13 +948,9 @@ void goto_programt::instructiont::transform(
 
   case DECL:
   {
-    auto new_symbol = f(get_decl().symbol());
+    auto new_symbol = f(decl_symbol());
     if(new_symbol.has_value())
-    {
-      auto new_decl = get_decl();
-      new_decl.symbol() = to_symbol_expr(*new_symbol);
-      set_decl(new_decl);
-    }
+      decl_symbol() = to_symbol_expr(*new_symbol);
   }
   break;
 
@@ -1037,7 +1032,7 @@ void goto_programt::instructiont::apply(
     break;
 
   case DECL:
-    f(get_decl().symbol());
+    f(decl_symbol());
     break;
 
   case DEAD:

@@ -294,12 +294,12 @@ void custom_bitvector_domaint::transform(
 
   case DECL:
     {
-      const code_declt &code_decl=to_code_decl(instruction.code);
-      assign_lhs(code_decl.symbol(), vectorst());
+      const auto &decl_symbol = instruction.decl_symbol();
+      assign_lhs(decl_symbol, vectorst());
 
       // is it a pointer?
-      if(code_decl.symbol().type().id()==ID_pointer)
-        assign_lhs(dereference_exprt(code_decl.symbol()), vectorst());
+      if(decl_symbol.type().id() == ID_pointer)
+        assign_lhs(dereference_exprt(decl_symbol), vectorst());
     }
     break;
 

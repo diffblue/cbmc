@@ -512,8 +512,7 @@ void remove_exceptionst::instrument_exceptions(
   {
     if(instr_it->is_decl())
     {
-      code_declt decl = instr_it->get_decl();
-      locals.push_back(decl.symbol());
+      locals.push_back(instr_it->decl_symbol());
     }
     // Is it a handler push/pop or catch landing-pad?
     else if(instr_it->type==CATCH)

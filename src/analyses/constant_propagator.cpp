@@ -158,8 +158,7 @@ void constant_propagator_domaint::transform(
 
   if(from->is_decl())
   {
-    const auto &code_decl = from->get_decl();
-    const symbol_exprt &symbol = code_decl.symbol();
+    const symbol_exprt &symbol = from->decl_symbol();
     values.set_to_top(symbol);
   }
   else if(from->is_assign())
