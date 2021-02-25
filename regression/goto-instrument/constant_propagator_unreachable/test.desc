@@ -1,0 +1,11 @@
+CORE
+test.c
+--constant-propagator
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+failed to find state
+--
+This is testing for a previous regression that caused constant propagation to
+fail in unreachable code
