@@ -496,58 +496,6 @@ abstract_object_pointert intervals_expression_transform(
 
 /////////////////////////////////////////////////////////
 // value_set expression transform
-static exprt rewrite_expression(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &ops);
-
-/// Recursively construct a combination \p sub_con from \p super_con and once
-///   constructed call \p f.
-/// \param super_con: vector of some containers storing the values
-/// \param sub_con: the one combination being currently constructed
-/// \param f: callable with side-effects
-void apply_comb(
-  abstract_object_sett &results,
-  const std::vector<value_ranget> &super_con,
-  std::vector<abstract_object_pointert> &sub_con,
-  const exprt &expr,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  size_t n = sub_con.size();
-  if(n == super_con.size())
-  {
-    auto rewritten_expr = rewrite_expression(expr, sub_con);
-    auto combination = transform(rewritten_expr, sub_con, environment, ns);
-    results.insert(combination);
-  }
-  else
-  {
-    for(const auto &value : super_con[n])
-    {
-      sub_con.push_back(value);
-      apply_comb(results, super_con, sub_con, expr, environment, ns);
-      sub_con.pop_back();
-    }
-  }
-}
-
-/// Call the function \p f on every combination of elements in \p super_con.
-///   Hence the arity of \p f is `super_con.size()`. <{1,2},{1},{1,2,3}> ->
-///   f(1,1,1), f(1,1,2), f(1,1,3), f(2,1,1), f(2,1,2), f(2,1,3).
-/// \param super_con: vector of some containers storing the values
-/// \param f: callable with side-effects
-abstract_object_sett evaluate_each_combination(
-  const std::vector<value_ranget> &super_con,
-  const exprt &expr,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  abstract_object_sett results;
-  std::vector<abstract_object_pointert> sub_con;
-  apply_comb(results, super_con, sub_con, expr, environment, ns);
-  return results;
-}
-
 class value_set_evaluator
 {
 public:
@@ -574,10 +522,55 @@ private:
     if(expression.id() == ID_if)
       return value_set_evaluate_conditional(collective_operands);
 
-    auto resulting_objects = evaluate_each_combination(
-      collective_operands, expression, environment, ns);
+    auto resulting_objects = evaluate_each_combination(collective_operands);
 
     return resolve_new_values(resulting_objects);
+  }
+
+  /// Evaluate expression for every combination of values in \p value_ranges.
+  /// <{1,2},{1},{1,2,3}> ->
+  ///   eval(1,1,1), eval(1,1,2), eval(1,1,3), eval(2,1,1), eval(2,1,2), eval(2,1,3).
+  abstract_object_sett
+  evaluate_each_combination(const std::vector<value_ranget> &value_ranges) const
+  {
+    abstract_object_sett results;
+    std::vector<abstract_object_pointert> combination;
+    evaluate_combination(results, value_ranges, combination);
+    return results;
+  }
+
+  void evaluate_combination(
+    abstract_object_sett &results,
+    const std::vector<value_ranget> &value_ranges,
+    std::vector<abstract_object_pointert> &combination) const
+  {
+    size_t n = combination.size();
+    if(n == value_ranges.size())
+    {
+      auto rewritten_expr = rewrite_expression(combination);
+      auto result = ::transform(rewritten_expr, combination, environment, ns);
+      results.insert(result);
+    }
+    else
+    {
+      for(const auto &value : value_ranges[n])
+      {
+        combination.push_back(value);
+        evaluate_combination(results, value_ranges, combination);
+        combination.pop_back();
+      }
+    }
+  }
+
+  exprt
+  rewrite_expression(const std::vector<abstract_object_pointert> &ops) const
+  {
+    auto operands_expr = exprt::operandst{};
+    for(auto v : ops)
+      operands_expr.push_back(v->to_constant());
+    auto rewritten_expr =
+      exprt(expression.id(), expression.type(), std::move(operands_expr));
+    return rewritten_expr;
   }
 
   std::vector<value_ranget> unwrap_operands() const
@@ -688,15 +681,4 @@ static abstract_object_pointert value_set_expression_transform(
 {
   auto evaluator = value_set_evaluator(expr, operands, environment, ns);
   return evaluator();
-}
-
-static exprt rewrite_expression(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &ops)
-{
-  auto operands_expr = exprt::operandst{};
-  for(auto v : ops)
-    operands_expr.push_back(v->to_constant());
-  auto rewritten_expr = exprt(expr.id(), expr.type(), std::move(operands_expr));
-  return rewritten_expr;
 }
