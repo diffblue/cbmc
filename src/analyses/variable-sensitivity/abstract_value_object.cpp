@@ -521,21 +521,27 @@ static exprt rewrite_expression(
 /// \param super_con: vector of some containers storing the values
 /// \param sub_con: the one combination being currently constructed
 /// \param f: callable with side-effects
-template <typename Con, typename F>
 void apply_comb(
-  const std::vector<Con> &super_con,
-  std::vector<typename Con::value_type> &sub_con,
-  F f)
+  abstract_object_sett &results,
+  const std::vector<value_ranget> &super_con,
+  std::vector<abstract_object_pointert> &sub_con,
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
 {
   size_t n = sub_con.size();
   if(n == super_con.size())
-    f(sub_con);
+  {
+    auto rewritten_expr = rewrite_expression(expr, sub_con);
+    auto combination = transform(rewritten_expr, sub_con, environment, ns);
+    results.insert(combination);
+  }
   else
   {
     for(const auto &value : super_con[n])
     {
       sub_con.push_back(value);
-      apply_comb(super_con, sub_con, f);
+      apply_comb(results, super_con, sub_con, expr, environment, ns);
       sub_con.pop_back();
     }
   }
@@ -546,11 +552,16 @@ void apply_comb(
 ///   f(1,1,1), f(1,1,2), f(1,1,3), f(2,1,1), f(2,1,2), f(2,1,3).
 /// \param super_con: vector of some containers storing the values
 /// \param f: callable with side-effects
-template <typename Con, typename F>
-void for_each_comb(const std::vector<Con> &super_con, F f)
+abstract_object_sett evaluate_each_combination(
+  const std::vector<value_ranget> &super_con,
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
 {
-  std::vector<typename Con::value_type> sub_con;
-  apply_comb(super_con, sub_con, f);
+  abstract_object_sett results;
+  std::vector<abstract_object_pointert> sub_con;
+  apply_comb(results, super_con, sub_con, expr, environment, ns);
+  return results;
 }
 
 static abstract_object_pointert resolve_new_values(
@@ -578,15 +589,8 @@ static abstract_object_pointert value_set_expression_transform(
     return value_set_evaluate_conditional(
       expr.type(), collective_operands, environment, ns);
 
-  abstract_object_sett resulting_objects;
-
-  for_each_comb(
-    collective_operands,
-    [&resulting_objects, &expr, &environment, &ns](
-      const std::vector<abstract_object_pointert> &ops) {
-      auto rewritten_expr = rewrite_expression(expr, ops);
-      resulting_objects.insert(transform(rewritten_expr, ops, environment, ns));
-    });
+  auto resulting_objects =
+    evaluate_each_combination(collective_operands, expr, environment, ns);
 
   return resolve_new_values(resulting_objects, environment);
 }
