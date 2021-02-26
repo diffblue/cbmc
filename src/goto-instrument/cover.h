@@ -35,7 +35,7 @@ class optionst;
   "                              (this is the default for --cover "            \
   "assertions)\n"                                                              \
   " --show-test-suite            print test suite for coverage criterion "     \
-  "(requires --cover)"
+  "(requires --cover)\n"
 
 enum class coverage_criteriont
 {

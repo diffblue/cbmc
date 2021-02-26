@@ -43,8 +43,8 @@ void json_interface(cmdlinet &, message_handlert &);
   "(json-interface)"
 
 #define HELP_JSON_INTERFACE \
-  " --json-ui                     use JSON-formatted output\n" \
-  " --json-interface              bi-directional JSON interface\n"
+  " --json-ui                    use JSON-formatted output\n" \
+  " --json-interface             bi-directional JSON interface\n"
 // clang-format on
 
 #endif // CPROVER_JSON_JSON_INTERFACE_H

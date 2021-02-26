@@ -202,7 +202,7 @@ void run_property_decider(
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
   " --show-symex-strategies      list strategies for use with --paths\n" \
-  " --show-goto-symex-steps      show which steps symex travels, includes " \
+  " --show-goto-symex-steps      show which steps symex travels, includes\n" \
   "                              diagnostic information\n" \
   " --show-points-to-sets        show points-to sets for\n" \
   "                              pointer dereference. Requires --json-ui.\n" \
@@ -243,8 +243,7 @@ void run_property_decider(
   " --no-self-loops-to-assumptions\n" \
   "                              do not simplify while(1){} to assume(0)\n" \
   " --no-pretty-names            do not simplify identifiers\n" \
-  " --symex-complexity-limit N" \
-  "                              how complex (N) a path can become before\n" \
+  " --symex-complexity-limit N   how complex (N) a path can become before\n" \
   "                              symex abandons it. Currently uses guard\n" \
   "                              size to calculate complexity. \n" \
   " --symex-complexity-failed-child-loops-limit N\n" \

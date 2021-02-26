@@ -329,6 +329,7 @@ void goto_diff_parse_optionst::help()
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     HELP_COVER
+    "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"

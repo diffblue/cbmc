@@ -40,15 +40,18 @@ Author: Diffblue Ltd.
   "(" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT "):"
 
 #define HELP_RESTRICT_FUNCTION_POINTER                                         \
-  "--" RESTRICT_FUNCTION_POINTER_OPT                                           \
+  " --" RESTRICT_FUNCTION_POINTER_OPT                                          \
   " <pointer_name>/<target[,targets]*>\n"                                      \
-  "           restrict a function pointer to a set of possible targets\n"      \
-  "           targets must all exist in the symbol table with a matching "     \
-  "type\n"                                                                     \
-  "           works for globals and function parameters right now\n"           \
-  "--" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                 \
+  "                              restrict a function pointer to a set of "     \
+  "possible targets\n"                                                         \
+  "                              targets must all exist in the symbol table"   \
+  " with a matching type\n"                                                    \
+  "                              works for globals and function parameters"    \
+  " right now\n"                                                               \
+  " --" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                \
   " <file_name>\n"                                                             \
-  "           add function pointer restrictions from file"
+  "                              add function pointer restrictions from "      \
+  "file\n"
 
 void parse_function_pointer_restriction_options_from_cmdline(
   const cmdlinet &cmdline,
