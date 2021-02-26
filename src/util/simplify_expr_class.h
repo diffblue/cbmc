@@ -185,6 +185,16 @@ public:
   NODISCARD resultt<> simplify_popcount(const popcount_exprt &);
   NODISCARD resultt<> simplify_complex(const unary_exprt &);
 
+  /// Try to simplify overflow-+, overflow-*, overflow--, overflow-shl.
+  /// Simplification will be possible when the operands are constants or the
+  /// types of the operands have infinite domains.
+  NODISCARD resultt<> simplify_overflow_binary(const binary_exprt &);
+
+  /// Try to simplify overflow-unary-.
+  /// Simplification will be possible when the operand is constants or the
+  /// type of the operand has an infinite domain.
+  NODISCARD resultt<> simplify_overflow_unary(const unary_exprt &);
+
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.
   NODISCARD resultt<>
