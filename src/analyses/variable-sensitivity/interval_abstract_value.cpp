@@ -427,11 +427,6 @@ interval_abstract_valuet::index_range_implementation(const namespacet &ns) const
   return make_interval_index_range(interval, ns);
 }
 
-const constant_interval_exprt &interval_abstract_valuet::get_interval() const
-{
-  return interval;
-}
-
 void interval_abstract_valuet::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

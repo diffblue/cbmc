@@ -49,8 +49,6 @@ public:
     const class ai_baset &ai,
     const class namespacet &ns) const override;
 
-  const constant_interval_exprt &get_interval() const;
-
   void get_statistics(
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,

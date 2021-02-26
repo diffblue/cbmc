@@ -362,16 +362,16 @@ private:
       return make_top<interval_abstract_valuet>(expression.type());
 
     if(expression.id() == ID_if)
-      return interval_evaluate_conditional(interval_operands);
+      return evaluate_conditional(interval_operands);
 
     if(num_operands == 1)
-      return interval_evaluate_unary_expr(interval_operands);
+      return evaluate_unary_expr(interval_operands);
 
-    constant_interval_exprt result = interval_operands[0]->to_interval();
+    constant_interval_exprt result = interval_operands[0];
 
     for(size_t opIndex = 1; opIndex != interval_operands.size(); ++opIndex)
     {
-      auto &interval_next = interval_operands[opIndex]->to_interval();
+      auto &interval_next = interval_operands[opIndex];
       result = result.eval(expression.id(), interval_next);
     }
 
@@ -381,22 +381,22 @@ private:
     return make_interval(result);
   }
 
-  std::vector<interval_abstract_value_pointert> operands_as_intervals() const
+  std::vector<constant_interval_exprt> operands_as_intervals() const
   {
-    std::vector<interval_abstract_value_pointert> interval_operands;
+    std::vector<constant_interval_exprt> interval_operands;
 
     for(const auto &op : operands)
     {
       auto iav = std::dynamic_pointer_cast<const interval_abstract_valuet>(op);
       if(!iav)
       {
-        // The operand isn't an interval - if it's an integral constant we can
-        // convert it into an interval.
+        // The operand isn't an interval
+        // if it's an integral constant we can convert it into an interval.
         if(constant_interval_exprt::is_int(op->type()))
         {
           const auto op_as_constant = op->to_constant();
           if(op_as_constant.is_nil())
-            return std::vector<interval_abstract_value_pointert>();
+            return std::vector<constant_interval_exprt>();
 
           iav = make_interval(op_as_constant);
         }
@@ -405,19 +405,18 @@ private:
       }
 
       if(iav)
-        interval_operands.push_back(iav);
+        interval_operands.push_back(iav->to_interval());
     }
 
     return interval_operands;
   }
 
-  abstract_object_pointert interval_evaluate_conditional(
-    const std::vector<interval_abstract_value_pointert> &interval_operands)
-    const
+  abstract_object_pointert evaluate_conditional(
+    const std::vector<constant_interval_exprt> &interval_operands) const
   {
-    auto const &condition_interval = interval_operands[0]->to_interval();
-    auto const &true_interval = interval_operands[1]->to_interval();
-    auto const &false_interval = interval_operands[2]->to_interval();
+    auto const &condition_interval = interval_operands[0];
+    auto const &true_interval = interval_operands[1];
+    auto const &false_interval = interval_operands[2];
 
     auto condition_result = condition_interval.is_definitely_true();
 
@@ -436,12 +435,10 @@ private:
                                       : make_interval(false_interval);
   }
 
-  abstract_object_pointert interval_evaluate_unary_expr(
-    const std::vector<interval_abstract_value_pointert> &interval_operands)
-    const
+  abstract_object_pointert evaluate_unary_expr(
+    const std::vector<constant_interval_exprt> &interval_operands) const
   {
-    const constant_interval_exprt &operand_expr =
-      interval_operands[0]->to_interval();
+    const constant_interval_exprt &operand_expr = interval_operands[0];
 
     if(expression.id() == ID_typecast)
     {
@@ -509,12 +506,12 @@ public:
 private:
   abstract_object_pointert transform() const
   {
-    auto collective_operands = unwrap_operands();
+    auto ranges = operands_as_ranges();
 
     if(expression.id() == ID_if)
-      return value_set_evaluate_conditional(collective_operands);
+      return evaluate_conditional(ranges);
 
-    auto resulting_objects = evaluate_each_combination(collective_operands);
+    auto resulting_objects = evaluate_each_combination(ranges);
 
     return resolve_values(resulting_objects);
   }
@@ -565,7 +562,7 @@ private:
     return rewritten_expr;
   }
 
-  std::vector<value_ranget> unwrap_operands() const
+  std::vector<value_ranget> operands_as_ranges() const
   {
     auto unwrapped = std::vector<value_ranget>{};
 
@@ -633,7 +630,7 @@ private:
   }
 
   static abstract_object_pointert
-  value_set_evaluate_conditional(const std::vector<value_ranget> &ops)
+  evaluate_conditional(const std::vector<value_ranget> &ops)
   {
     auto const &condition = ops[0];
 

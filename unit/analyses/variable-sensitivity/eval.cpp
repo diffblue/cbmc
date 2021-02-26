@@ -56,10 +56,10 @@ SCENARIO(
           std::dynamic_pointer_cast<const interval_abstract_valuet>(unwrapped);
         REQUIRE(result_as_interval);
         REQUIRE(
-          result_as_interval->get_interval().get_lower() ==
+          result_as_interval->to_interval().get_lower() ==
           from_integer(0, number_type));
         REQUIRE(
-          result_as_interval->get_interval().get_upper() ==
+          result_as_interval->to_interval().get_upper() ==
           from_integer(1, number_type));
       }
 

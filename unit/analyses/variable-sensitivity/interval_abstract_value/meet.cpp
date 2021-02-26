@@ -76,7 +76,7 @@ SCENARIO(
         REQUIRE_FALSE(modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(cast_result->get_interval() == interval1_10);
+        REQUIRE(cast_result->to_interval() == interval1_10);
 
         // Is optimal
         REQUIRE(result == op1);
@@ -143,7 +143,7 @@ SCENARIO(
         REQUIRE_FALSE(cast_result->is_bottom());
 
         // Intersection should have this exact value
-        REQUIRE(cast_result->get_interval() == interval2_10);
+        REQUIRE(cast_result->to_interval() == interval2_10);
       }
     }
     WHEN(
@@ -178,7 +178,7 @@ SCENARIO(
         REQUIRE_FALSE(cast_result->is_bottom());
 
         // Intersection should have this exact value
-        REQUIRE(cast_result->get_interval() == interval2_10);
+        REQUIRE(cast_result->to_interval() == interval2_10);
       }
     }
     WHEN(
@@ -213,7 +213,7 @@ SCENARIO(
         REQUIRE_FALSE(cast_result->is_bottom());
 
         // Intersection should have this exact value
-        REQUIRE(cast_result->get_interval() == interval11_15);
+        REQUIRE(cast_result->to_interval() == interval11_15);
       }
     }
     WHEN(
@@ -249,7 +249,7 @@ SCENARIO(
         REQUIRE_FALSE(cast_result->is_bottom());
 
         // Intersection should have this exact value
-        REQUIRE(cast_result->get_interval() == intervalmax_max);
+        REQUIRE(cast_result->to_interval() == intervalmax_max);
       }
     }
     WHEN(
