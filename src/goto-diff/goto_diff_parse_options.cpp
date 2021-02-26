@@ -97,24 +97,6 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
 
-  if(cmdline.isset("c89"))
-    config.ansi_c.set_c89();
-
-  if(cmdline.isset("c99"))
-    config.ansi_c.set_c99();
-
-  if(cmdline.isset("c11"))
-    config.ansi_c.set_c11();
-
-  if(cmdline.isset("cpp98"))
-    config.cpp.set_cpp98();
-
-  if(cmdline.isset("cpp03"))
-    config.cpp.set_cpp03();
-
-  if(cmdline.isset("cpp11"))
-    config.cpp.set_cpp11();
-
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 

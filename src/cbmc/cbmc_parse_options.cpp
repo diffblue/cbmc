@@ -203,9 +203,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
 
-  if(cmdline.isset("c89"))
-    config.ansi_c.set_c89();
-
   if(cmdline.isset("symex-complexity-limit"))
     options.set_option(
       "symex-complexity-limit", cmdline.get_value("symex-complexity-limit"));
@@ -214,21 +211,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(
       "symex-complexity-failed-child-loops-limit",
       cmdline.get_value("symex-complexity-failed-child-loops-limit"));
-
-  if(cmdline.isset("c99"))
-    config.ansi_c.set_c99();
-
-  if(cmdline.isset("c11"))
-    config.ansi_c.set_c11();
-
-  if(cmdline.isset("cpp98"))
-    config.cpp.set_cpp98();
-
-  if(cmdline.isset("cpp03"))
-    config.cpp.set_cpp03();
-
-  if(cmdline.isset("cpp11"))
-    config.cpp.set_cpp11();
 
   if(cmdline.isset("property"))
     options.set_option("property", cmdline.get_values("property"));
