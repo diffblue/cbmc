@@ -1765,6 +1765,71 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       return std::move(*tmp);
   }
 
+  // push byte extracts into struct or union expressions, just like
+  // lower_byte_extract does (this is the same code, except recursive calls use
+  // simplify rather than lower_byte_extract)
+  if(expr.op().id() == ID_struct || expr.op().id() == ID_union)
+  {
+    if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
+    {
+      const struct_typet &struct_type = to_struct_type(ns.follow(expr.type()));
+      const struct_typet::componentst &components = struct_type.components();
+
+      bool failed = false;
+      struct_exprt s({}, expr.type());
+
+      for(const auto &comp : components)
+      {
+        auto component_bits = pointer_offset_bits(comp.type(), ns);
+
+        // the next member would be misaligned, abort
+        if(
+          !component_bits.has_value() || *component_bits == 0 ||
+          *component_bits % 8 != 0)
+        {
+          failed = true;
+          break;
+        }
+
+        auto member_offset_opt =
+          member_offset_expr(struct_type, comp.get_name(), ns);
+
+        if(!member_offset_opt.has_value())
+        {
+          failed = true;
+          break;
+        }
+
+        exprt new_offset = simplify_rec(
+          plus_exprt{expr.offset(),
+                     typecast_exprt::conditional_cast(
+                       member_offset_opt.value(), expr.offset().type())});
+
+        byte_extract_exprt tmp = expr;
+        tmp.type() = comp.type();
+        tmp.offset() = new_offset;
+
+        s.add_to_operands(simplify_byte_extract(tmp));
+      }
+
+      if(!failed)
+        return s;
+    }
+    else if(expr.type().id() == ID_union || expr.type().id() == ID_union_tag)
+    {
+      const union_typet &union_type = to_union_type(ns.follow(expr.type()));
+      auto widest_member_opt = union_type.find_widest_union_component(ns);
+      if(widest_member_opt.has_value())
+      {
+        byte_extract_exprt be = expr;
+        be.type() = widest_member_opt->first.type();
+        return union_exprt{widest_member_opt->first.get_name(),
+                           simplify_byte_extract(be),
+                           expr.type()};
+      }
+    }
+  }
+
   // try to refine it down to extracting from a member or an index in an array
   auto subexpr =
     get_subexpression_at_offset(expr.op(), *offset, expr.type(), ns);
