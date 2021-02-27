@@ -942,35 +942,11 @@ void goto_analyzer_parse_optionst::help()
     " --taint file_name            perform taint analysis using rules in given file\n"
     "\n"
     "C/C++ frontend options:\n"
-    " -I path                      set include path (C/C++)\n"
-    " -D macro                     define preprocessor macro (C/C++)\n"
-    " --arch X                     set architecture (default: "
-                                   << configt::this_architecture() << ")\n"
-    " --os                         set operating system (default: "
-                                   << configt::this_operating_system() << ")\n"
-    " --c89/99/11                  set C language standard (default: "
-                                   << (configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C89?"c89":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C99?"c99":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?
-                                         "c11":"") << ")\n"
-    " --cpp98/03/11                set C++ language standard (default: "
-                                   << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?
-                                         "cpp98":
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?
-                                         "cpp03":
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?
-                                         "cpp11":"") << ")\n"
-    #ifdef _WIN32
-    " --gcc                        use GCC as preprocessor\n"
-    #endif
-    " --no-library                 disable built-in abstract C library\n"
+    HELP_CONFIG_C_CPP
     HELP_FUNCTIONS
+    "\n"
+    "Platform options:\n"
+    HELP_CONFIG_PLATFORM
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -980,6 +956,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
+    HELP_CONFIG_LIBRARY
     "\n"
     "Other options:\n"
     HELP_VALIDATE

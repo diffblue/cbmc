@@ -998,45 +998,13 @@ void cbmc_parse_optionst::help()
     "                              (implies --trace)\n"
     "\n"
     "C/C++ frontend options:\n"
-    " -I path                      set include path (C/C++)\n"
-    " -D macro                     define preprocessor macro (C/C++)\n"
     " --preprocess                 stop after preprocessing\n"
-    " --16, --32, --64             set width of int\n"
-    " --LP64, --ILP64, --LLP64,\n"
-    "   --ILP32, --LP32            set width of int, long and pointers\n"
-    " --little-endian              allow little-endian word-byte conversions\n"
-    " --big-endian                 allow big-endian word-byte conversions\n"
-    " --unsigned-char              make \"char\" unsigned by default\n"
-    " --mm model                   set memory model (default: sc)\n"
-    " --arch                       set architecture (default: "
-                                   << configt::this_architecture() << ")\n"
-    " --os                         set operating system (default: "
-                                   << configt::this_operating_system() << ")\n"
-    " --c89/99/11                  set C language standard (default: "
-                                   << (configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C89?"c89":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C99?"c99":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n" // NOLINT(*)
-    " --cpp98/03/11                set C++ language standard (default: "
-                                   << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?"cpp98": // NOLINT(*)
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?"cpp03": // NOLINT(*)
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n" // NOLINT(*)
-    #ifdef _WIN32
-    " --gcc                        use GCC as preprocessor\n"
-    #endif
-    " --no-arch                    don't set up an architecture\n"
-    " --no-library                 disable built-in abstract C library\n"
-    " --round-to-nearest           rounding towards nearest even (default)\n"
-    " --round-to-plus-inf          rounding towards plus infinity\n"
-    " --round-to-minus-inf         rounding towards minus infinity\n"
-    " --round-to-zero              rounding towards zero\n"
+    HELP_CONFIG_C_CPP
     HELP_ANSI_C_LANGUAGE
     HELP_FUNCTIONS
+    "\n"
+    "Platform options:\n"
+    HELP_CONFIG_PLATFORM
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -1046,12 +1014,8 @@ void cbmc_parse_optionst::help()
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     HELP_COVER
-    " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"
-    " --malloc-fail-null           set malloc failure mode to return null\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --malloc-may-fail            allow malloc calls to return a null pointer\n"
+    " --mm MM                      memory consistency model for concurrent programs (default: sc)\n" // NOLINT(*)
+    HELP_CONFIG_LIBRARY
     HELP_REACHABILITY_SLICER
     HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
@@ -1068,7 +1032,7 @@ void cbmc_parse_optionst::help()
     HELP_BMC
     "\n"
     "Backend options:\n"
-    " --object-bits n              number of bits used for object addresses\n"
+    HELP_CONFIG_BACKEND
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"

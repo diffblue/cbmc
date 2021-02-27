@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
 
+#include <util/config.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -50,11 +51,11 @@ class optionst;
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "(write-solver-stats-to):"  \
   "(show-array-constraints)"  \
-  "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
-  "(object-bits):" \
+  OPT_CONFIG_C_CPP \
+  OPT_CONFIG_PLATFORM \
+  OPT_CONFIG_BACKEND \
+  OPT_CONFIG_LIBRARY \
   OPT_GOTO_CHECK \
-  "(malloc-fail-assert)(malloc-fail-null)" \
-  "(malloc-may-fail)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
@@ -64,8 +65,6 @@ class optionst;
   "(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
   OPT_STRING_REFINEMENT_CBMC \
-  "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
-  "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   "(show-symbol-table)(show-parse-tree)" \
@@ -79,11 +78,7 @@ class optionst;
   "(symex-coverage-report):" \
   "(mm):" \
   OPT_TIMESTAMP \
-  "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
-  "(ppc-macos)(unsigned-char)" \
   "(arrays-uf-always)(arrays-uf-never)" \
-  "(string-abstraction)(no-arch)(arch):" \
-  "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   OPT_FLUSH \
   "(localize-faults)" \
   OPT_GOTO_TRACE \

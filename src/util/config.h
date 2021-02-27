@@ -20,6 +20,86 @@ class cmdlinet;
 class symbol_tablet;
 class namespacet;
 
+// Configt is the one place beyond *_parse_options where options are ... parsed.
+// Options that are handled by configt are documented here.
+
+// clang-format off
+#define OPT_CONFIG_C_CPP                                                       \
+  "D:I:(include)(function)"                                                    \
+  "(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)"                                       \
+  "(unsigned-char)"                                                            \
+  "(round-to-even)(round-to-nearest)"                                          \
+  "(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)"                     \
+  "(no-library)"                                                               \
+
+#define HELP_CONFIG_C_CPP                                                      \
+  " -I path                      set include path (C/C++)\n"                   \
+  " -D macro                     define preprocessor macro (C/C++)\n"          \
+  " --c89/99/11                  set C language standard (default: "           \
+                                 << (configt::ansi_ct::default_c_standard()==  \
+                                     configt::ansi_ct::c_standardt::C89?"c89": \
+                                     configt::ansi_ct::default_c_standard()==  \
+                                     configt::ansi_ct::c_standardt::C99?"c99": \
+                                     configt::ansi_ct::default_c_standard()==  \
+                          configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"\
+  " --cpp98/03/11                set C++ language standard (default: "         \
+                                 << (configt::cppt::default_cpp_standard()==   \
+                                   configt::cppt::cpp_standardt::CPP98?"cpp98":\
+                                     configt::cppt::default_cpp_standard()==   \
+                                   configt::cppt::cpp_standardt::CPP03?"cpp03":\
+                                     configt::cppt::default_cpp_standard()==   \
+                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"\
+  " --unsigned-char              make \"char\" unsigned by default\n"          \
+  " --round-to-nearest           rounding towards nearest even (default)\n"    \
+  " --round-to-plus-inf          rounding towards plus infinity\n"             \
+  " --round-to-minus-inf         rounding towards minus infinity\n"            \
+  " --round-to-zero              rounding towards zero\n"                      \
+  " --no-library                 disable built-in abstract C library\n"        \
+
+
+#define OPT_CONFIG_LIBRARY                                                     \
+  "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \
+  "(string-abstraction)"                                                       \
+
+#define HELP_CONFIG_LIBRARY                                                    \
+" --malloc-may-fail            allow malloc calls to return a null pointer\n"  \
+" --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"\
+" --malloc-fail-null           set malloc failure mode to return null\n"       \
+
+
+#define OPT_CONFIG_JAVA                                                        \
+  "(classpath)(cp)(main-class)"                                                \
+
+
+#define OPT_CONFIG_PLATFORM                                                    \
+  "(arch):(os):"                                                               \
+  "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)"                              \
+  "(little-endian)(big-endian)"                                                \
+  "(i386-linux)"                                                               \
+  "(i386-win32)(win32)(winx64)"                                                \
+  "(i386-macos)(ppc-macos)"                                                    \
+  "(gcc)"                                                                      \
+
+#define HELP_CONFIG_PLATFORM \
+  " --arch                       set architecture (default: "                  \
+                                 << configt::this_architecture() << ")\n"      \
+  " --os                         set operating system (default: "              \
+                                 << configt::this_operating_system() << ")\n"  \
+  " --16, --32, --64             set width of int\n"                           \
+  " --LP64, --ILP64, --LLP64,\n"                                               \
+  "   --ILP32, --LP32            set width of int, long and pointers\n"        \
+  " --little-endian              allow little-endian word-byte conversions\n"  \
+  " --big-endian                 allow big-endian word-byte conversions\n"     \
+  " --gcc                        use GCC as preprocessor\n"                    \
+
+#define OPT_CONFIG_BACKEND                                                     \
+  "(object-bits):"                                                             \
+
+#define HELP_CONFIG_BACKEND                                                    \
+  " --object-bits n              number of bits used for object addresses\n"
+
+// clang-format on
+
 /*! \brief Globally accessible architectural configuration
 */
 class configt

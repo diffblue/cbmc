@@ -89,6 +89,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 
+#include <util/config.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -157,10 +158,8 @@ class optionst;
 
 #define GOTO_ANALYSER_OPTIONS \
   OPT_FUNCTIONS \
-  "D:I:(std89)(std99)(std11)" \
-  "(classpath):(cp):(main-class):" \
-  "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
-  "(little-endian)(big-endian)" \
+  OPT_CONFIG_C_CPP \
+  OPT_CONFIG_PLATFORM \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   OPT_GOTO_CHECK \
@@ -168,7 +167,6 @@ class optionst;
   "(show-symbol-table)(show-parse-tree)" \
   "(show-reachable-properties)(property):" \
   "(verbosity):(version)" \
-  "(gcc)(arch):" \
   OPT_FLUSH \
   OPT_TIMESTAMP \
   OPT_VALIDATE \
