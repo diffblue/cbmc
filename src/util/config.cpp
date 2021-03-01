@@ -1127,6 +1127,24 @@ bool configt::set(const cmdlinet &cmdline)
 
   ansi_c.malloc_may_fail = cmdline.isset("malloc-may-fail");
 
+  if(cmdline.isset("c89"))
+    ansi_c.set_c89();
+
+  if(cmdline.isset("c99"))
+    ansi_c.set_c99();
+
+  if(cmdline.isset("c11"))
+    ansi_c.set_c11();
+
+  if(cmdline.isset("cpp98"))
+    cpp.set_cpp98();
+
+  if(cmdline.isset("cpp03"))
+    cpp.set_cpp03();
+
+  if(cmdline.isset("cpp11"))
+    cpp.set_cpp11();
+
   return false;
 }
 

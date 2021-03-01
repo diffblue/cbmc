@@ -61,6 +61,7 @@ regression/**/tests-*.log
 regression/**/*.goto-cc-saved
 regression/**/*.gb
 regression/**/*.smt2
+regression/solver-hardness/solver-hardness-simple/solver_hardness.json
 jbmc/regression/**/tests.log
 jbmc/regression/**/tests-symex-driven-loading.log
 
