@@ -5,20 +5,17 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
-#include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/abstract_pointer_object.h>
 
-#include "pointer_abstract_object.h"
-
-pointer_abstract_objectt::pointer_abstract_objectt(const typet &t)
+abstract_pointer_objectt::abstract_pointer_objectt(const typet &t)
   : abstract_objectt(t)
 {
   PRECONDITION(t.id() == ID_pointer);
 }
 
-pointer_abstract_objectt::pointer_abstract_objectt(
+abstract_pointer_objectt::abstract_pointer_objectt(
   const typet &type,
   bool top,
   bool bottom)
@@ -27,7 +24,7 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   PRECONDITION(type.id() == ID_pointer);
 }
 
-pointer_abstract_objectt::pointer_abstract_objectt(
+abstract_pointer_objectt::abstract_pointer_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
   const namespacet &ns)
@@ -36,22 +33,20 @@ pointer_abstract_objectt::pointer_abstract_objectt(
   PRECONDITION(e.type().id() == ID_pointer);
 }
 
-abstract_object_pointert pointer_abstract_objectt::expression_transform(
+abstract_object_pointert abstract_pointer_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
   if(expr.id() == ID_dereference)
-  {
     return read_dereference(environment, ns);
-  }
 
   return abstract_objectt::expression_transform(
     expr, operands, environment, ns);
 }
 
-abstract_object_pointert pointer_abstract_objectt::write(
+abstract_object_pointert abstract_pointer_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -62,7 +57,7 @@ abstract_object_pointert pointer_abstract_objectt::write(
   return write_dereference(environment, ns, stack, value, merging_write);
 }
 
-abstract_object_pointert pointer_abstract_objectt::read_dereference(
+abstract_object_pointert abstract_pointer_objectt::read_dereference(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
@@ -72,10 +67,8 @@ abstract_object_pointert pointer_abstract_objectt::read_dereference(
   return env.abstract_object_factory(pointed_to_type, ns, true, false);
 }
 
-#include <iostream>
-
-abstract_object_pointert pointer_abstract_objectt::write_dereference(
-  abstract_environmentt &environment,
+abstract_object_pointert abstract_pointer_objectt::write_dereference(
+  abstract_environmentt &env,
   const namespacet &ns,
   const std::stack<exprt> &stack,
   const abstract_object_pointert &value,
@@ -83,16 +76,14 @@ abstract_object_pointert pointer_abstract_objectt::write_dereference(
 {
   if(is_top() || is_bottom())
   {
-    environment.havoc("Writing to a 2value pointer");
+    env.havoc("Writing to a 2value pointer");
     return shared_from_this();
   }
-  else
-  {
-    return std::make_shared<pointer_abstract_objectt>(type(), true, false);
-  }
+
+  return std::make_shared<abstract_pointer_objectt>(type(), true, false);
 }
 
-void pointer_abstract_objectt::get_statistics(
+void abstract_pointer_objectt::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,
   const abstract_environmentt &env,

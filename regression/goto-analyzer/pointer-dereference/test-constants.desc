@@ -1,0 +1,7 @@
+CORE
+main.c
+--verify --variable-sensitivity --vsd-pointers constants
+^\[main.assertion.1\] line 10 assertion q == a: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+--

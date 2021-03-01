@@ -1,0 +1,7 @@
+CORE
+main.c
+--verify --variable-sensitivity --vsd-values intervals --vsd-pointers top-bottom
+^\[main.assertion.1\] line 16 assertion \*p == b: UNKNOWN
+^EXIT=0$
+^SIGNAL=0$
+--

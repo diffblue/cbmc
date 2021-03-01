@@ -18,7 +18,7 @@
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &type)
-  : pointer_abstract_objectt(type)
+  : abstract_pointer_objectt(type)
 {
   PRECONDITION(type.id() == ID_pointer);
 }
@@ -27,14 +27,14 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)
-  : pointer_abstract_objectt(type, top, bottom)
+  : abstract_pointer_objectt(type, top, bottom)
 {
   PRECONDITION(type.id() == ID_pointer);
 }
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const constant_pointer_abstract_objectt &old)
-  : pointer_abstract_objectt(old), value_stack(old.value_stack)
+  : abstract_pointer_objectt(old), value_stack(old.value_stack)
 {
 }
 
@@ -42,7 +42,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns)
-  : pointer_abstract_objectt(expr, environment, ns),
+  : abstract_pointer_objectt(expr, environment, ns),
     value_stack(expr, environment, ns)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
@@ -68,13 +68,13 @@ constant_pointer_abstract_objectt::merge(abstract_object_pointert other) const
   else
   {
     // TODO(tkiley): How do we set the result to be toppish?
-    return pointer_abstract_objectt::merge(other);
+    return abstract_pointer_objectt::merge(other);
   }
 }
 
 abstract_object_pointert
 constant_pointer_abstract_objectt::merge_constant_pointers(
-  const constant_pointer_abstract_pointert other) const
+  const constant_pointer_abstract_pointert &other) const
 {
   if(is_bottom())
   {
@@ -91,7 +91,7 @@ constant_pointer_abstract_objectt::merge_constant_pointers(
     }
     else
     {
-      return pointer_abstract_objectt::merge(other);
+      return abstract_pointer_objectt::merge(other);
     }
   }
 }
@@ -100,7 +100,7 @@ exprt constant_pointer_abstract_objectt::to_constant() const
 {
   if(is_top() || is_bottom())
   {
-    return pointer_abstract_objectt::to_constant();
+    return abstract_pointer_objectt::to_constant();
   }
   else
   {
@@ -117,7 +117,7 @@ void constant_pointer_abstract_objectt::output(
 {
   if(is_top() || is_bottom() || value_stack.is_top_value())
   {
-    pointer_abstract_objectt::output(out, ai, ns);
+    abstract_pointer_objectt::output(out, ai, ns);
   }
   else
   {
@@ -180,7 +180,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
 {
   if(is_top() || is_bottom() || value_stack.is_top_value())
   {
-    return pointer_abstract_objectt::write_dereference(
+    return abstract_pointer_objectt::write_dereference(
       environment, ns, stack, new_value, merging_write);
   }
   else
@@ -225,7 +225,7 @@ void constant_pointer_abstract_objectt::get_statistics(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  pointer_abstract_objectt::get_statistics(statistics, visited, env, ns);
+  abstract_pointer_objectt::get_statistics(statistics, visited, env, ns);
   // don't bother following nullptr
   if(!is_top() && !is_bottom() && !value_stack.is_top_value())
   {

@@ -22,8 +22,8 @@
 #include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
+#include <analyses/variable-sensitivity/two_value_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_union_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
