@@ -1,0 +1,17 @@
+CORE
+main.c
+--no-simplify --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+byte_extract_little_endian\(\{ 1, 2 \}, 0, struct tag-small\)\.x = 1
+--
+^warning: ignoring
+--
+Pin that with the struct-prefix shortcut removed from
+value_set_dereferencet::dereference_type_compare, the assertion VCC
+for `p->x == 1` is encoded via byte_extract_little_endian rather
+than a struct-to-struct typecast (which boolbvt::conversion_failed
+would silently drop with a "warning: ignoring"). --no-simplify keeps
+the SSA shape from being folded away before --show-vcc dumps it. A
+future revert of the fix would restore the typecast encoding and
+this regex would no longer match.

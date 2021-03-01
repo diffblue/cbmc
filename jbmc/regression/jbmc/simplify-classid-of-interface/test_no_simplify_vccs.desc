@@ -3,9 +3,13 @@ Test
 --function Test.main --no-simplify --unwind 10 --show-vcc -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
-"java::Impl1" = cast\(\{ \{ "java::Impl1" \}, 0 \}, struct (\{ struct \{ string @class_identifier \} @java.lang.Object \}|java::Intf)\)\.@java.lang.Object\.@class_identifier
+"java::Impl1" = byte_extract_little_endian\(\{ \{ "java::Impl1" \}, 0 \}, 0, struct java::Intf\)\.@java.lang.Object\.@class_identifier
 --
 ^warning: ignoring
 --
 This checks that the test generates the VCC testing the class-id that we're
-intending to simplify away in the main test.
+intending to simplify away in the main test. Following the removal of the
+struct-prefix shortcut from value_set_dereferencet::dereference_type_compare
+the encoding of the Intf/Impl1 cast in the VCC is via byte_extract_little_endian
+rather than a struct-to-struct cast (which boolbvt::conversion_failed would
+silently drop with a "warning: ignoring").
