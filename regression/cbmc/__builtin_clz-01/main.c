@@ -56,5 +56,9 @@ int main()
   __CPROVER_assume(u != 0);
   assert(nlz2a(u) == __builtin_clz(u));
 
+#undef __builtin_clz
+  // a failing assertion should be generated as __builtin_clz is undefined for 0
+  __builtin_clz(0U);
+
   return 0;
 }

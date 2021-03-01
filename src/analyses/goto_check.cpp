@@ -172,7 +172,9 @@ protected:
 
   using conditionst = std::list<conditiont>;
 
-  void bounds_check(const index_exprt &, const guardt &);
+  void bounds_check(const exprt &, const guardt &);
+  void bounds_check_index(const index_exprt &, const guardt &);
+  void bounds_check_clz(const count_leading_zeros_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
   void mod_by_zero_check(const mod_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
@@ -1321,9 +1323,7 @@ std::string goto_checkt::array_name(const exprt &expr)
   return ::array_name(ns, expr);
 }
 
-void goto_checkt::bounds_check(
-  const index_exprt &expr,
-  const guardt &guard)
+void goto_checkt::bounds_check(const exprt &expr, const guardt &guard)
 {
   if(!enable_bounds_check)
     return;
@@ -1335,6 +1335,16 @@ void goto_checkt::bounds_check(
     return;
   }
 
+  if(expr.id() == ID_index)
+    bounds_check_index(to_index_expr(expr), guard);
+  else if(expr.id() == ID_count_leading_zeros)
+    bounds_check_clz(to_count_leading_zeros_expr(expr), guard);
+}
+
+void goto_checkt::bounds_check_index(
+  const index_exprt &expr,
+  const guardt &guard)
+{
   typet array_type = expr.array().type();
 
   if(array_type.id()==ID_pointer)
@@ -1508,6 +1518,19 @@ void goto_checkt::bounds_check(
       expr,
       guard);
   }
+}
+
+void goto_checkt::bounds_check_clz(
+  const count_leading_zeros_exprt &expr,
+  const guardt &guard)
+{
+  add_guarded_property(
+    notequal_exprt{expr.op(), from_integer(0, expr.op().type())},
+    "count leading zeros argument",
+    "bit count",
+    expr.find_source_location(),
+    expr,
+    guard);
 }
 
 void goto_checkt::add_guarded_property(
@@ -1729,7 +1752,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
 
   if(expr.id()==ID_index)
   {
-    bounds_check(to_index_expr(expr), guard);
+    bounds_check(expr, guard);
   }
   else if(expr.id()==ID_div)
   {
@@ -1765,6 +1788,10 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   else if(is_pointer_primitive(expr))
   {
     pointer_primitive_check(expr, guard);
+  }
+  else if(expr.id() == ID_count_leading_zeros)
+  {
+    bounds_check(expr, guard);
   }
 }
 

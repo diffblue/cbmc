@@ -1,0 +1,10 @@
+CORE
+main.c
+--bounds-check
+^\[main.bit_count.\d+\] line 61 count leading zeros argument in __builtin_clz\(0u\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring

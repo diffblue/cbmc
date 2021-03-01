@@ -33,64 +33,6 @@ inline void __sync_synchronize(void)
   #endif
 }
 
-/* FUNCTION: __builtin_clz */
-
-int __builtin_popcount(unsigned int);
-
-inline int __builtin_clz(unsigned int x)
-{
-  __CPROVER_precondition(x != 0, "__builtin_clz(0) is undefined");
-
-  x = x | (x >> 1);
-  x = x | (x >> 2);
-  x = x | (x >> 4);
-  x = x | (x >> 8);
-  if(sizeof(x) >= 4)
-    x = x | (x >> 16);
-
-  return __builtin_popcount(~x);
-}
-
-/* FUNCTION: __builtin_clzl */
-
-int __builtin_popcountl(unsigned long int);
-
-inline int __builtin_clzl(unsigned long int x)
-{
-  __CPROVER_precondition(x != 0, "__builtin_clzl(0) is undefined");
-
-  x = x | (x >> 1);
-  x = x | (x >> 2);
-  x = x | (x >> 4);
-  x = x | (x >> 8);
-  if(sizeof(x) >= 4)
-    x = x | (x >> 16);
-  if(sizeof(x) >= 8)
-    x = x | (x >> 32);
-
-  return __builtin_popcountl(~x);
-}
-
-/* FUNCTION: __builtin_clzll */
-
-int __builtin_popcountll(unsigned long long int);
-
-inline int __builtin_clzll(unsigned long long int x)
-{
-  __CPROVER_precondition(x != 0, "__builtin_clzll(0) is undefined");
-
-  x = x | (x >> 1);
-  x = x | (x >> 2);
-  x = x | (x >> 4);
-  x = x | (x >> 8);
-  if(sizeof(x) >= 4)
-    x = x | (x >> 16);
-  if(sizeof(x) >= 8)
-    x = x | (x >> 32);
-
-  return __builtin_popcountll(~x);
-}
-
 /* FUNCTION: __builtin_ffs */
 
 int __builtin_clz(unsigned int x);

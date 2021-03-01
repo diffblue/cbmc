@@ -87,3 +87,41 @@ exprt popcount_exprt::lower() const
   // the result is restricted to the result type
   return typecast_exprt::conditional_cast(x, type());
 }
+
+exprt count_leading_zeros_exprt::lower() const
+{
+  // x = x | (x >> 1);
+  // x = x | (x >> 2);
+  // x = x | (x >> 4);
+  // x = x | (x >> 8);
+  // etc.
+  // return popcount(~x);
+
+  // make sure the operand width is a power of two
+  exprt x = op();
+  const auto x_width = to_bitvector_type(x.type()).get_width();
+  CHECK_RETURN(x_width >= 1);
+  const std::size_t bits = address_bits(x_width);
+  const std::size_t new_width = numeric_cast_v<std::size_t>(power(2, bits));
+
+  const bool need_typecast =
+    new_width > x_width || x.type().id() != ID_unsignedbv;
+
+  if(need_typecast)
+    x = typecast_exprt(x, unsignedbv_typet(new_width));
+
+  // repeatedly compute x = x | (x >> shift)
+  for(std::size_t shift = 1; shift < new_width; shift <<= 1)
+  {
+    // x >> shift
+    lshr_exprt shifted_x(
+      x, from_integer(shift, unsignedbv_typet(address_bits(shift) + 1)));
+    // build the expression
+    x = bitor_exprt{x, shifted_x};
+  }
+
+  // the result is restricted to the result type
+  return popcount_exprt{
+    bitnot_exprt{typecast_exprt::conditional_cast(x, op().type())}, type()}
+    .lower();
+}
