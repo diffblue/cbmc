@@ -71,6 +71,34 @@ bool is_object_field_element(const exprt &expr)
     return false;
 }
 
+/// Returns true if struct \p a is a prefix of \p b, i.e., if this struct has
+/// n components then the component types and names of this struct must match
+/// the first n components of \p b.
+/// \param a: Struct type that may be a prefix.
+/// \param b: Struct type to compare with.
+static bool struct_is_prefix_of(const struct_typet &a, const struct_typet &b)
+{
+  const struct_typet::componentst &ot_components = b.components();
+  const struct_typet::componentst &tt_components = a.components();
+
+  if(ot_components.size() < tt_components.size())
+    return false;
+
+  struct_typet::componentst::const_iterator ot_it = ot_components.begin();
+
+  for(const auto &tt_c : tt_components)
+  {
+    if(ot_it->type() != tt_c.type() || ot_it->get_name() != tt_c.get_name())
+    {
+      return false; // they just don't match
+    }
+
+    ot_it++;
+  }
+
+  return true; // ok, a is a prefix of b
+}
+
 bool prefix_of(const typet &a, const typet &b, const namespacet &ns)
 {
   if(a == b)
@@ -88,7 +116,8 @@ bool prefix_of(const typet &a, const typet &b, const namespacet &ns)
   const auto &a_struct = to_struct_type(a);
   const auto &b_struct = to_struct_type(b);
 
-  return a_struct.is_prefix_of(b_struct) || b_struct.is_prefix_of(a_struct);
+  return struct_is_prefix_of(a_struct, b_struct) ||
+         struct_is_prefix_of(b_struct, a_struct);
 }
 
 static std::optional<object_address_exprt> find_object(const exprt &expr)
