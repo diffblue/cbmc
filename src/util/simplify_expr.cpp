@@ -2047,6 +2047,117 @@ simplify_exprt::simplify_complex(const unary_exprt &expr)
   return unchanged(expr);
 }
 
+simplify_exprt::resultt<>
+simplify_exprt::simplify_overflow_binary(const binary_exprt &expr)
+{
+  // zero is a neutral element for all operations supported here
+  if(
+    expr.op1().is_zero() ||
+    (expr.op0().is_zero() && expr.id() != ID_overflow_minus))
+  {
+    return false_exprt{};
+  }
+
+  // we only handle the case of same operand types
+  if(expr.op0().type() != expr.op1().type())
+    return unchanged(expr);
+
+  // catch some cases over mathematical types
+  const irep_idt &op_type_id = expr.op0().type().id();
+  if(
+    op_type_id == ID_integer || op_type_id == ID_rational ||
+    op_type_id == ID_real)
+  {
+    return false_exprt{};
+  }
+
+  if(op_type_id == ID_natural && expr.id() != ID_overflow_minus)
+    return false_exprt{};
+
+  // we only handle constants over signedbv/unsignedbv for the remaining cases
+  if(op_type_id != ID_signedbv && op_type_id != ID_unsignedbv)
+    return unchanged(expr);
+
+  if(!expr.op0().is_constant() || !expr.op1().is_constant())
+    return unchanged(expr);
+
+  const auto op0_value = numeric_cast<mp_integer>(expr.op0());
+  const auto op1_value = numeric_cast<mp_integer>(expr.op1());
+  if(!op0_value.has_value() || !op1_value.has_value())
+    return unchanged(expr);
+
+  mp_integer no_overflow_result;
+  if(expr.id() == ID_overflow_plus)
+    no_overflow_result = *op0_value + *op1_value;
+  else if(expr.id() == ID_overflow_minus)
+    no_overflow_result = *op0_value - *op1_value;
+  else if(expr.id() == ID_overflow_mult)
+    no_overflow_result = *op0_value * *op1_value;
+  else if(expr.id() == ID_overflow_shl)
+    no_overflow_result = *op0_value << *op1_value;
+  else
+    UNREACHABLE;
+
+  const std::size_t width = to_bitvector_type(expr.op0().type()).get_width();
+  const integer_bitvector_typet bv_type{op_type_id, width};
+  if(
+    no_overflow_result < bv_type.smallest() ||
+    no_overflow_result > bv_type.largest())
+  {
+    return true_exprt{};
+  }
+  else
+    return false_exprt{};
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_overflow_unary(const unary_exprt &expr)
+{
+  // zero is a neutral element for all operations supported here
+  if(expr.op().is_zero())
+    return false_exprt{};
+
+  // catch some cases over mathematical types
+  const irep_idt &op_type_id = expr.op().type().id();
+  if(
+    op_type_id == ID_integer || op_type_id == ID_rational ||
+    op_type_id == ID_real)
+  {
+    return false_exprt{};
+  }
+
+  if(op_type_id == ID_natural)
+    return true_exprt{};
+
+  // we only handle constants over signedbv/unsignedbv for the remaining cases
+  if(op_type_id != ID_signedbv && op_type_id != ID_unsignedbv)
+    return unchanged(expr);
+
+  if(!expr.op().is_constant())
+    return unchanged(expr);
+
+  const auto op_value = numeric_cast<mp_integer>(expr.op());
+  if(!op_value.has_value())
+    return unchanged(expr);
+
+  mp_integer no_overflow_result;
+  if(expr.id() == ID_overflow_unary_minus)
+    no_overflow_result = -*op_value;
+  else
+    UNREACHABLE;
+
+  const std::size_t width = to_bitvector_type(expr.op().type()).get_width();
+  const integer_bitvector_typet bv_type{op_type_id, width};
+  if(
+    no_overflow_result < bv_type.smallest() ||
+    no_overflow_result > bv_type.largest())
+  {
+    return true_exprt{};
+  }
+  else
+    return false_exprt{};
+}
+
 bool simplify_exprt::simplify_node_preorder(exprt &expr)
 {
   bool result=true;
@@ -2289,6 +2400,16 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
   {
     r = simplify_complex(to_unary_expr(expr));
+  }
+  else if(
+    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_minus ||
+    expr.id() == ID_overflow_mult || expr.id() == ID_overflow_shl)
+  {
+    r = simplify_overflow_binary(to_binary_expr(expr));
+  }
+  else if(expr.id() == ID_overflow_unary_minus)
+  {
+    r = simplify_overflow_unary(to_unary_expr(expr));
   }
 
   if(!no_change_join_operands)
