@@ -239,8 +239,6 @@ public:
   {
   }
 
-  bool is_prefix_of(const struct_typet &other) const;
-
   /// A struct may be a class, where members may have access restrictions.
   bool is_class() const
   {

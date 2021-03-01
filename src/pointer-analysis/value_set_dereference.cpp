@@ -369,19 +369,6 @@ bool value_set_dereferencet::dereference_type_compare(
   if(object_type == dereference_type)
     return true; // ok, they just match
 
-  // check for struct prefixes
-
-  const typet ot_base=ns.follow(object_type),
-              dt_base=ns.follow(dereference_type);
-
-  if(ot_base.id()==ID_struct &&
-     dt_base.id()==ID_struct)
-  {
-    if(to_struct_type(dt_base).is_prefix_of(
-         to_struct_type(ot_base)))
-      return true; // ok, dt is a prefix of ot
-  }
-
   // we are generous about code pointers
   if(dereference_type.id()==ID_code &&
      object_type.id()==ID_code)
