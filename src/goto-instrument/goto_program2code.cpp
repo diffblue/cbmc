@@ -1893,14 +1893,6 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
     else if(expr.type().id()==ID_pointer)
       add_local_types(expr.type());
-    else if(expr.type().id()==ID_bool ||
-            expr.type().id()==ID_c_bool)
-    {
-      expr = typecast_exprt(
-        from_integer(
-          expr.is_true() ? 1 : 0, signedbv_typet(config.ansi_c.int_width)),
-        bool_typet());
-    }
 
     const irept &c_sizeof_type=expr.find(ID_C_c_sizeof_type);
 

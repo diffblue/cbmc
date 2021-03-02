@@ -20,8 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_symbol.h>
 #include <util/string_utils.h>
 
-#include <ansi-c/ansi_c_language.h>
-#include <cpp/cpp_language.h>
+#include <ansi-c/expr2c.h>
+#include <cpp/expr2cpp.h>
 
 #include <linking/static_lifetime_init.h>
 
@@ -526,7 +526,7 @@ void dump_ct::convert_compound(
       if(t.get_width()<=config.ansi_c.long_long_int_width)
         struct_body << "long long int " << comp_name
           << " : " << t.get_width();
-      else if(language->id()=="cpp")
+      else if(mode == ID_cpp)
         struct_body << "__signedbv<" << t.get_width() << "> "
           << comp_name;
       else
@@ -538,7 +538,7 @@ void dump_ct::convert_compound(
       if(t.get_width()<=config.ansi_c.long_long_int_width)
         struct_body << "unsigned long long " << comp_name
           << " : " << t.get_width();
-      else if(language->id()=="cpp")
+      else if(mode == ID_cpp)
         struct_body << "__unsignedbv<" << t.get_width() << "> "
           << comp_name;
       else
@@ -573,7 +573,7 @@ void dump_ct::convert_compound(
   os << type_to_string(unresolved_clean);
   if(!base_decls.str().empty())
   {
-    PRECONDITION(language->id()=="cpp");
+    PRECONDITION(mode == ID_cpp);
     os << ": " << base_decls.str();
   }
   os << '\n';
@@ -1469,11 +1469,18 @@ void dump_ct::cleanup_expr(exprt &expr)
       }
     }
 
+    optionalt<exprt> clean_init;
     if(
       ns.follow(bu.type()).id() == ID_union &&
-      bu.source_location().get_function().empty() &&
-      bu.op() == zero_initializer(bu.op().type(), source_locationt{}, ns)
-                   .value_or(nil_exprt{}))
+      bu.source_location().get_function().empty())
+    {
+      clean_init = zero_initializer(bu.op().type(), source_locationt{}, ns)
+                     .value_or(nil_exprt{});
+      if(clean_init->id() != ID_struct || clean_init->has_operands())
+        cleanup_expr(*clean_init);
+    }
+
+    if(clean_init.has_value() && bu.op() == *clean_init)
     {
       const union_typet &union_type = to_union_type(ns.follow(bu.type()));
 
@@ -1521,13 +1528,35 @@ void dump_ct::cleanup_type(typet &type)
     !type.get(ID_tag).empty());
 }
 
+static expr2c_configurationt expr2c_configuration()
+{
+  // future TODO: with C++20 we can actually use designated initializers as
+  // commented out below
+  static expr2c_configurationt configuration{
+    /* .include_struct_padding_components = */ true,
+    /* .print_struct_body_in_type = */ true,
+    /* .include_array_size = */ true,
+    /* .true_string = */ "1",
+    /* .false_string = */ "0",
+    /* .use_library_macros = */ true,
+    /* .print_enum_int_value = */ false,
+    /* .expand_typedef = */ false};
+
+  return configuration;
+}
+
 std::string dump_ct::type_to_string(const typet &type)
 {
   std::string ret;
   typet t=type;
   cleanup_type(t);
-  language->from_type(t, ret, ns);
-  return ret;
+
+  if(mode == ID_C)
+    return type2c(t, ns, expr2c_configuration());
+  else if(mode == ID_cpp)
+    return type2cpp(t, ns);
+  else
+    UNREACHABLE;
 }
 
 std::string dump_ct::expr_to_string(const exprt &expr)
@@ -1535,8 +1564,13 @@ std::string dump_ct::expr_to_string(const exprt &expr)
   std::string ret;
   exprt e=expr;
   cleanup_expr(e);
-  language->from_expr(e, ret, ns);
-  return ret;
+
+  if(mode == ID_C)
+    return expr2c(e, ns, expr2c_configuration());
+  else if(mode == ID_cpp)
+    return expr2cpp(e, ns);
+  else
+    UNREACHABLE;
 }
 
 void dump_c(
@@ -1548,12 +1582,7 @@ void dump_c(
   std::ostream &out)
 {
   dump_ct goto2c(
-    src,
-    use_system_headers,
-    use_all_headers,
-    include_harness,
-    ns,
-    new_ansi_c_language);
+    src, use_system_headers, use_all_headers, include_harness, ns, ID_C);
   out << goto2c;
 }
 
@@ -1566,12 +1595,7 @@ void dump_cpp(
   std::ostream &out)
 {
   dump_ct goto2cpp(
-    src,
-    use_system_headers,
-    use_all_headers,
-    include_harness,
-    ns,
-    new_cpp_language);
+    src, use_system_headers, use_all_headers, include_harness, ns, ID_cpp);
   out << goto2cpp;
 }
 
@@ -1616,7 +1640,7 @@ void dump_c_type_header(
     use_all_headers,
     include_harness,
     new_ns,
-    new_ansi_c_language,
+    ID_C,
     dump_c_configurationt::type_header_configuration);
   out << goto2c;
 }

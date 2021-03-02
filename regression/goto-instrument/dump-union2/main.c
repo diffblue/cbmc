@@ -12,6 +12,7 @@ union U10 {
 };
 
 union U10 g_2110 = {.f0 = 53747};
+union U10 g_1256 = {-6L};
 
 union U6 {
   signed f0 : 3;
