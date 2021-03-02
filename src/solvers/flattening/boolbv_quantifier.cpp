@@ -134,7 +134,8 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
 static optionalt<exprt>
 instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
 {
-  const symbol_exprt &var_expr = expr.symbol();
+  PRECONDITION(expr.variables().size() == 1);
+  const symbol_exprt &var_expr = expr.variables()[0];
 
   /**
    * We need to rewrite the forall/exists quantifier into

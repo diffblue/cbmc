@@ -208,7 +208,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
   {
     auto const &op_as_exists = to_exists_expr(op);
     forall_exprt rewritten_op(
-      op_as_exists.symbol(), not_exprt(op_as_exists.where()));
+      op_as_exists.variables(), not_exprt(op_as_exists.where()));
     rewritten_op.where() = simplify_node(rewritten_op.where());
     return std::move(rewritten_op);
   }
@@ -216,7 +216,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
   {
     auto const &op_as_forall = to_forall_expr(op);
     exists_exprt rewritten_op(
-      op_as_forall.symbol(), not_exprt(op_as_forall.where()));
+      op_as_forall.variables(), not_exprt(op_as_forall.where()));
     rewritten_op.where() = simplify_node(rewritten_op.where());
     return std::move(rewritten_op);
   }

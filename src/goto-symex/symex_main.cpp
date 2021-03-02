@@ -263,10 +263,12 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
     // for assumptions we can rewrite "exists X. P" to "P"
     // we keep the quantified variable unique by means of L2 renaming
     auto &quant_expr = to_quantifier_expr(expr);
-    symbol_exprt tmp0 =
-      to_symbol_expr(to_ssa_expr(quant_expr.symbol()).get_original_expr());
-    symex_decl(state, tmp0);
-    instruction_local_symbols.push_back(tmp0);
+    for(const auto &sym : quant_expr.variables())
+    {
+      symbol_exprt tmp0 = to_symbol_expr(to_ssa_expr(sym).get_original_expr());
+      symex_decl(state, tmp0);
+      instruction_local_symbols.push_back(tmp0);
+    }
     exprt tmp = quant_expr.where();
     rewrite_quantifiers(tmp, state);
     quant_expr.swap(tmp);

@@ -275,22 +275,6 @@ public:
     : binding_exprt(_id, _variables, std::move(_where), bool_typet())
   {
   }
-
-  // for the special case of one variable
-  symbol_exprt &symbol()
-  {
-    auto &variables = this->variables();
-    PRECONDITION(variables.size() == 1);
-    return variables.front();
-  }
-
-  // for the special case of one variable
-  const symbol_exprt &symbol() const
-  {
-    auto &variables = this->variables();
-    PRECONDITION(variables.size() == 1);
-    return variables.front();
-  }
 };
 
 template <>
@@ -338,6 +322,11 @@ public:
     : quantifier_exprt(ID_forall, _symbol, _where)
   {
   }
+
+  forall_exprt(const binding_exprt::variablest &_variables, const exprt &_where)
+    : quantifier_exprt(ID_forall, _variables, _where)
+  {
+  }
 };
 
 inline const forall_exprt &to_forall_expr(const exprt &expr)
@@ -362,6 +351,11 @@ class exists_exprt : public quantifier_exprt
 public:
   exists_exprt(const symbol_exprt &_symbol, const exprt &_where)
     : quantifier_exprt(ID_exists, _symbol, _where)
+  {
+  }
+
+  exists_exprt(const binding_exprt::variablest &_variables, const exprt &_where)
+    : quantifier_exprt(ID_exists, _variables, _where)
   {
   }
 };
