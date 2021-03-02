@@ -870,10 +870,10 @@ int goto_instrument_parse_optionst::doit()
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
-        horn_encoding(goto_model, out);
+        horn_encoding(goto_model, horn_formatt::SMT2, out);
       }
       else
-        horn_encoding(goto_model, std::cout);
+        horn_encoding(goto_model, horn_formatt::SMT2, std::cout);
 
       return CPROVER_EXIT_SUCCESS;
     }
