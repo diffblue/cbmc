@@ -1008,4 +1008,81 @@ inline count_trailing_zeros_exprt &to_count_trailing_zeros_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Returns one plus the index of the least-significant one bit, or zero
+/// if the operand is zero.
+class find_first_set_exprt : public unary_exprt
+{
+public:
+  find_first_set_exprt(exprt _op, typet _type)
+    : unary_exprt(ID_find_first_set, std::move(_op), std::move(_type))
+  {
+  }
+
+  explicit find_first_set_exprt(const exprt &_op)
+    : find_first_set_exprt(_op, _op.type())
+  {
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 1,
+      "unary expression must have a single operand");
+    DATA_CHECK(
+      vm,
+      can_cast_type<bitvector_typet>(to_unary_expr(expr).op().type()),
+      "operand must be of bitvector type");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
+  /// Lower a find_first_set_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<find_first_set_exprt>(const exprt &base)
+{
+  return base.id() == ID_find_first_set;
+}
+
+inline void validate_expr(const find_first_set_exprt &value)
+{
+  validate_operands(value, 1, "find_first_set must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref find_first_set_exprt
+///
+/// \a expr must be known to be \ref find_first_set_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref find_first_set_exprt
+inline const find_first_set_exprt &to_find_first_set_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_find_first_set);
+  const find_first_set_exprt &ret =
+    static_cast<const find_first_set_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_find_first_set_expr(const exprt &)
+inline find_first_set_exprt &to_find_first_set_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_find_first_set);
+  find_first_set_exprt &ret = static_cast<find_first_set_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_BITVECTOR_EXPR_H

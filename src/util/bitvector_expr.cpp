@@ -142,3 +142,20 @@ exprt count_trailing_zeros_exprt::lower() const
 
   return typecast_exprt::conditional_cast(result, type());
 }
+
+exprt find_first_set_exprt::lower() const
+{
+  exprt x = op();
+  const auto int_width = to_bitvector_type(x.type()).get_width();
+  CHECK_RETURN(int_width >= 1);
+
+  // bitwidth(x) - clz(x & ~((unsigned)x - 1));
+  const unsignedbv_typet ut{int_width};
+  minus_exprt minus_one{typecast_exprt::conditional_cast(x, ut),
+                        from_integer(1, ut)};
+  count_leading_zeros_exprt clz{bitand_exprt{
+    x, bitnot_exprt{typecast_exprt::conditional_cast(minus_one, x.type())}}};
+  minus_exprt result{from_integer(int_width, x.type()), clz.lower()};
+
+  return typecast_exprt::conditional_cast(result, type());
+}
