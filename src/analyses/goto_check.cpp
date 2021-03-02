@@ -1328,9 +1328,12 @@ void goto_checkt::bounds_check(
   if(!enable_bounds_check)
     return;
 
-  if(expr.find("bounds_check").is_not_nil() &&
-     !expr.get_bool("bounds_check"))
+  if(
+    expr.find(ID_C_bounds_check).is_not_nil() &&
+    !expr.get_bool(ID_C_bounds_check))
+  {
     return;
+  }
 
   typet array_type = expr.array().type();
 
