@@ -1469,11 +1469,18 @@ void dump_ct::cleanup_expr(exprt &expr)
       }
     }
 
+    optionalt<exprt> clean_init;
     if(
       ns.follow(bu.type()).id() == ID_union &&
-      bu.source_location().get_function().empty() &&
-      bu.op() == zero_initializer(bu.op().type(), source_locationt{}, ns)
-                   .value_or(nil_exprt{}))
+      bu.source_location().get_function().empty())
+    {
+      clean_init = zero_initializer(bu.op().type(), source_locationt{}, ns)
+                     .value_or(nil_exprt{});
+      if(clean_init->id() != ID_struct || clean_init->has_operands())
+        cleanup_expr(*clean_init);
+    }
+
+    if(clean_init.has_value() && bu.op() == *clean_init)
     {
       const union_typet &union_type = to_union_type(ns.follow(bu.type()));
 
