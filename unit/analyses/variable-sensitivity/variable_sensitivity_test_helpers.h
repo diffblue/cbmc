@@ -21,6 +21,7 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
   exprt valh,
   abstract_environmentt &env,
   namespacet &ns);
+std::shared_ptr<const interval_abstract_valuet> make_top_interval();
 
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
@@ -75,6 +76,12 @@ void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
   const std::vector<exprt> &expected_values);
+
+std::shared_ptr<const abstract_objectt> add(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns);
 
 std::shared_ptr<const constant_abstract_valuet> add_as_constant(
   const abstract_object_pointert &op1,

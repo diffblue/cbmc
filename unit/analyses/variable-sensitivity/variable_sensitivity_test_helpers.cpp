@@ -47,6 +47,11 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
   return std::make_shared<interval_abstract_valuet>(interval, env, ns);
 }
 
+std::shared_ptr<const interval_abstract_valuet> make_top_interval()
+{
+  return std::make_shared<interval_abstract_valuet>(
+    signedbv_typet(32), true, false);
+}
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
@@ -240,7 +245,7 @@ void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result)
   REQUIRE(result->is_bottom());
 }
 
-static std::shared_ptr<const abstract_objectt> add(
+std::shared_ptr<const abstract_objectt> add(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,

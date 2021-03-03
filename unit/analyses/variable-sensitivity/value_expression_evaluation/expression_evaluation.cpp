@@ -61,6 +61,17 @@ SCENARIO(
         EXPECT_TOP(result);
       }
     }
+    WHEN("1 + TOP interval")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_top_interval();
+      auto result = add_as_constant(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
     WHEN("1 + TOP value_set")
     {
       auto op1 = make_constant(val1, environment, ns);
@@ -75,6 +86,17 @@ SCENARIO(
     WHEN("TOP constant + 1")
     {
       auto op1 = make_top_constant();
+      auto op2 = make_constant(val1, environment, ns);
+      auto result = add_as_constant(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP interval + 1")
+    {
+      auto op1 = make_top_interval();
       auto op2 = make_constant(val1, environment, ns);
       auto result = add_as_constant(op1, op2, environment, ns);
 
@@ -143,6 +165,75 @@ SCENARIO(
       THEN("= [2,4]")
       {
         EXPECT(result, val2, val4);
+      }
+    }
+  }
+  GIVEN("adding an interval and TOP")
+  {
+    WHEN("[1,2] + TOP constant")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto op2 = make_top_constant();
+      auto result = add(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("[1,2] + TOP interval")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto op2 = make_top_interval();
+      auto result = add(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("[1,2] + TOP value_set")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto op2 = make_top_value_set();
+      auto result = add(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP constant + [1,2]")
+    {
+      auto op1 = make_top_constant();
+      auto op2 = make_interval(val1, val2, environment, ns);
+      auto result = add(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP interval + [1,2]")
+    {
+      auto op1 = make_top_interval();
+      auto op2 = make_interval(val1, val2, environment, ns);
+      auto result = add(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP value_set + [1,2]")
+    {
+      auto op1 = make_top_value_set();
+      auto op2 = make_interval(val1, val2, environment, ns);
+      auto result = add(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
       }
     }
   }
@@ -265,7 +356,18 @@ SCENARIO(
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_top_constant();
-      REQUIRE(op2->is_top());
+
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("{ 1, 2 } + TOP interval")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op2 = make_top_interval();
 
       auto result = add_as_value_set(op1, op2, environment, ns);
 
@@ -278,7 +380,42 @@ SCENARIO(
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_top_value_set();
-      REQUIRE(op2->is_top());
+
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP constant + { 1, 2 }")
+    {
+      auto op1 = make_top_constant();
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP interval + { 1, 2 }")
+    {
+      auto op1 = make_top_interval();
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("the result is top")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP value_set + { 1, 2 }")
+    {
+      auto op1 = make_top_value_set();
+      auto op2 = make_value_set({val1, val2}, environment, ns);
 
       auto result = add_as_value_set(op1, op2, environment, ns);
 
