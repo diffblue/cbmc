@@ -135,8 +135,9 @@ bool any_of_type(const std::vector<abstract_object_pointert> &operands)
            operands.begin(),
            operands.end(),
            [](const abstract_object_pointert &p) {
-             return std::dynamic_pointer_cast<const representation_type>(p) !=
-                    nullptr;
+             return (!p->is_top()) &&
+                    (std::dynamic_pointer_cast<const representation_type>(p) !=
+                     nullptr);
            }) != operands.end();
 }
 

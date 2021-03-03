@@ -52,7 +52,18 @@ SCENARIO(
     WHEN("1 + TOP constant")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_constant(val2, true);
+      auto op2 = make_top_constant();
+      auto result = add_as_constant(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("1 + TOP value_set")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_top_value_set();
       auto result = add_as_constant(op1, op2, environment, ns);
 
       THEN("= TOP")
@@ -63,6 +74,17 @@ SCENARIO(
     WHEN("TOP constant + 1")
     {
       auto op1 = make_top_constant();
+      auto op2 = make_constant(val1, environment, ns);
+      auto result = add_as_constant(op1, op2, environment, ns);
+
+      THEN("= TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("TOP value_set + 1")
+    {
+      auto op1 = make_top_value_set();
       auto op2 = make_constant(val1, environment, ns);
       auto result = add_as_constant(op1, op2, environment, ns);
 
