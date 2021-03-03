@@ -9,6 +9,7 @@
 #include "variable_sensitivity_test_helpers.h"
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <ansi-c/ansi_c_language.h>
+#include <util/mathematical_types.h>
 #include <testing-utils/use_catch.h>
 #include <util/string_utils.h>
 
@@ -30,6 +31,11 @@ make_constant(exprt val, bool top)
   return std::make_shared<constant_abstract_valuet>(val.type(), top, !top);
 }
 
+std::shared_ptr<const constant_abstract_valuet> make_top_constant()
+{
+  return std::make_shared<constant_abstract_valuet>(integer_typet());
+}
+
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
@@ -41,6 +47,11 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
   auto vs = make_value_set(vals[0], env, ns);
   vs->set_values(initial_values);
   return vs;
+}
+
+std::shared_ptr<value_set_abstract_objectt> make_top_value_set()
+{
+  return std::make_shared<value_set_abstract_objectt>(integer_typet());
 }
 
 std::shared_ptr<const constant_abstract_valuet>

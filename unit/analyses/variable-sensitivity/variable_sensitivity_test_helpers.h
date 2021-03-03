@@ -9,19 +9,23 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
-std::shared_ptr<value_set_abstract_objectt>
-make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
-
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns);
 
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, bool top);
 
+std::shared_ptr<const constant_abstract_valuet> make_top_constant();
+
+std::shared_ptr<value_set_abstract_objectt>
+make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
+
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
   namespacet &ns);
+
+std::shared_ptr<value_set_abstract_objectt> make_top_value_set();
 
 std::shared_ptr<const constant_abstract_valuet>
 as_constant(const abstract_object_pointert &aop);
