@@ -25,15 +25,16 @@ make_constant(exprt val, abstract_environmentt &env, namespacet &ns)
   return std::make_shared<constant_abstract_valuet>(val, env, ns);
 }
 
-std::shared_ptr<const constant_abstract_valuet>
-make_constant(exprt val, bool top)
-{
-  return std::make_shared<constant_abstract_valuet>(val.type(), top, !top);
-}
-
 std::shared_ptr<const constant_abstract_valuet> make_top_constant()
 {
-  return std::make_shared<constant_abstract_valuet>(integer_typet());
+  return std::make_shared<constant_abstract_valuet>(
+    integer_typet(), true, false);
+}
+
+std::shared_ptr<const constant_abstract_valuet> make_bottom_constant()
+{
+  return std::make_shared<constant_abstract_valuet>(
+    integer_typet(), false, true);
 }
 
 std::shared_ptr<value_set_abstract_objectt> make_value_set(

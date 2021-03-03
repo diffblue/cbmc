@@ -12,10 +12,8 @@
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns);
 
-std::shared_ptr<const constant_abstract_valuet>
-make_constant(exprt val, bool top);
-
 std::shared_ptr<const constant_abstract_valuet> make_top_constant();
+std::shared_ptr<const constant_abstract_valuet> make_bottom_constant();
 
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
