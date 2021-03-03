@@ -17,8 +17,12 @@ std::shared_ptr<const constant_abstract_valuet> make_top_constant();
 std::shared_ptr<const constant_abstract_valuet> make_bottom_constant();
 
 std::shared_ptr<const interval_abstract_valuet> make_interval(
-  exprt vall,
-  exprt valh,
+  const exprt &vall,
+  const exprt &valh,
+  abstract_environmentt &env,
+  namespacet &ns);
+std::shared_ptr<const interval_abstract_valuet> make_interval(
+  const constant_interval_exprt &val,
   abstract_environmentt &env,
   namespacet &ns);
 std::shared_ptr<const interval_abstract_valuet> make_top_interval();

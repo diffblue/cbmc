@@ -13,12 +13,6 @@
 #include <util/mathematical_types.h>
 #include <util/string_utils.h>
 
-std::shared_ptr<value_set_abstract_objectt>
-make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
-{
-  return std::make_shared<value_set_abstract_objectt>(val, env, ns);
-}
-
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns)
 {
@@ -38,13 +32,21 @@ std::shared_ptr<const constant_abstract_valuet> make_bottom_constant()
 }
 
 std::shared_ptr<const interval_abstract_valuet> make_interval(
-  exprt vall,
-  exprt valh,
+  const exprt &vall,
+  const exprt &valh,
   abstract_environmentt &env,
   namespacet &ns)
 {
   auto interval = constant_interval_exprt(vall, valh);
-  return std::make_shared<interval_abstract_valuet>(interval, env, ns);
+  return make_interval(interval, env, ns);
+}
+
+std::shared_ptr<const interval_abstract_valuet> make_interval(
+  const constant_interval_exprt &val,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  return std::make_shared<interval_abstract_valuet>(val, env, ns);
 }
 
 std::shared_ptr<const interval_abstract_valuet> make_top_interval()
@@ -52,6 +54,14 @@ std::shared_ptr<const interval_abstract_valuet> make_top_interval()
   return std::make_shared<interval_abstract_valuet>(
     signedbv_typet(32), true, false);
 }
+
+std::shared_ptr<value_set_abstract_objectt>
+make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
+{
+  auto vals = std::vector<exprt>{val};
+  return make_value_set(vals, env, ns);
+}
+
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
@@ -59,8 +69,14 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
 {
   auto initial_values = abstract_object_sett{};
   for(auto v : vals)
-    initial_values.insert(make_constant(v, env, ns));
-  auto vs = make_value_set(vals[0], env, ns);
+  {
+    if(v.id() == ID_constant_interval)
+      initial_values.insert(
+        std::make_shared<interval_abstract_valuet>(v, env, ns));
+    else
+      initial_values.insert(make_constant(v, env, ns));
+  }
+  auto vs = std::make_shared<value_set_abstract_objectt>(vals[0], env, ns);
   vs->set_values(initial_values);
   return vs;
 }
