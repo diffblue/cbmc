@@ -117,6 +117,31 @@ SCENARIO(
       }
     }
   }
+  GIVEN("adding a constant and an interval")
+  {
+    WHEN("1 + [2,2]")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_interval(val2, val2, environment, ns);
+      auto result = add_as_interval(op1, op2, environment, ns);
+
+      THEN("= [3,3]")
+      {
+        EXPECT(result, val3, val3);
+      }
+    }
+    WHEN("1 + [2,4]")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_interval(val2, val4, environment, ns);
+      auto result = add_as_interval(op1, op2, environment, ns);
+
+      THEN("= [3,5]")
+      {
+        EXPECT(result, val3, val5);
+      }
+    }
+  }
   GIVEN("adding a constant and a value set")
   {
     WHEN("1 + { 2 }")
@@ -234,6 +259,31 @@ SCENARIO(
       THEN("= TOP")
       {
         EXPECT_TOP(result);
+      }
+    }
+  }
+  GIVEN("adding an interval and a constant")
+  {
+    WHEN("[2,2] + 1")
+    {
+      auto op1 = make_interval(val2, val2, environment, ns);
+      auto op2 = make_constant(val1, environment, ns);
+      auto result = add_as_interval(op1, op2, environment, ns);
+
+      THEN("= [3,3]")
+      {
+        EXPECT(result, val3, val3);
+      }
+    }
+    WHEN("[2,4] + 1")
+    {
+      auto op1 = make_interval(val2, val4, environment, ns);
+      auto op2 = make_constant(val1, environment, ns);
+      auto result = add_as_interval(op1, op2, environment, ns);
+
+      THEN("= [3,5]")
+      {
+        EXPECT(result, val3, val5);
       }
     }
   }

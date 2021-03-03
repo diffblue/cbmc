@@ -9,8 +9,8 @@
 #include "variable_sensitivity_test_helpers.h"
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <ansi-c/ansi_c_language.h>
-#include <util/mathematical_types.h>
 #include <testing-utils/use_catch.h>
+#include <util/mathematical_types.h>
 #include <util/string_utils.h>
 
 std::shared_ptr<value_set_abstract_objectt>
@@ -163,9 +163,6 @@ void EXPECT(
 
   auto expected_interval = constant_interval_exprt(lower_value, upper_value);
   auto result_expr = result->to_interval();
-  INFO(
-    "Expect " + expr_to_str(result_expr) + " to equal " +
-    expr_to_str(expected_interval));
   REQUIRE(result_expr == expected_interval);
 }
 
