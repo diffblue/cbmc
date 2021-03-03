@@ -17,11 +17,12 @@ SCENARIO(
   "[core][analyses][variable-sensitivity][constant_abstract_value][value_set_"
   "abstract_object][expression_transform]")
 {
-  const exprt val1 = from_integer(1, integer_typet());
-  const exprt val2 = from_integer(2, integer_typet());
-  const exprt val3 = from_integer(3, integer_typet());
-  const exprt val4 = from_integer(4, integer_typet());
-  const exprt val5 = from_integer(5, integer_typet());
+  const typet type = signedbv_typet(32);
+  const exprt val1 = from_integer(1, type);
+  const exprt val2 = from_integer(2, type);
+  const exprt val3 = from_integer(3, type);
+  const exprt val4 = from_integer(4, type);
+  const exprt val5 = from_integer(5, type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;
@@ -116,6 +117,32 @@ SCENARIO(
       THEN("= { 3, 4, 5 }")
       {
         EXPECT(result, {val3, val4, val5});
+      }
+    }
+  }
+
+  GIVEN("adding two intervals")
+  {
+    WHEN("[1,1] + [2,2]")
+    {
+      auto op1 = make_interval(val1, val1, environment, ns);
+      auto op2 = make_interval(val2, val2, environment, ns);
+      auto result = add_as_interval(op1, op2, environment, ns);
+
+      THEN("= [3,3]")
+      {
+        EXPECT(result, val3, val3);
+      }
+    }
+    WHEN("[1,2] + [1,2]")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto op2 = make_interval(val1, val2, environment, ns);
+      auto result = add_as_interval(op1, op2, environment, ns);
+
+      THEN("= [2,4]")
+      {
+        EXPECT(result, val2, val4);
       }
     }
   }

@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
 std::shared_ptr<const constant_abstract_valuet>
@@ -14,6 +15,12 @@ make_constant(exprt val, abstract_environmentt &env, namespacet &ns);
 
 std::shared_ptr<const constant_abstract_valuet> make_top_constant();
 std::shared_ptr<const constant_abstract_valuet> make_bottom_constant();
+
+std::shared_ptr<const interval_abstract_valuet> make_interval(
+  exprt vall,
+  exprt valh,
+  abstract_environmentt &env,
+  namespacet &ns);
 
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
@@ -28,6 +35,9 @@ std::shared_ptr<value_set_abstract_objectt> make_top_value_set();
 std::shared_ptr<const constant_abstract_valuet>
 as_constant(const abstract_object_pointert &aop);
 
+std::shared_ptr<const interval_abstract_valuet>
+as_interval(const abstract_object_pointert &aop);
+
 std::shared_ptr<const value_set_abstract_objectt>
 as_value_set(const abstract_object_pointert &aop);
 
@@ -36,6 +46,11 @@ bool set_contains(const abstract_object_sett &set, const exprt &val);
 void EXPECT(
   std::shared_ptr<const constant_abstract_valuet> &result,
   exprt expected_value);
+
+void EXPECT(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value);
 
 void EXPECT(
   std::shared_ptr<const value_set_abstract_objectt> &result,
@@ -62,6 +77,12 @@ void EXPECT_UNMODIFIED(
   const std::vector<exprt> &expected_values);
 
 std::shared_ptr<const constant_abstract_valuet> add_as_constant(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns);
+
+std::shared_ptr<const interval_abstract_valuet> add_as_interval(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,

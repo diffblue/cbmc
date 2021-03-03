@@ -37,6 +37,16 @@ std::shared_ptr<const constant_abstract_valuet> make_bottom_constant()
     integer_typet(), false, true);
 }
 
+std::shared_ptr<const interval_abstract_valuet> make_interval(
+  exprt vall,
+  exprt valh,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  auto interval = constant_interval_exprt(vall, valh);
+  return std::make_shared<interval_abstract_valuet>(interval, env, ns);
+}
+
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
@@ -59,6 +69,12 @@ std::shared_ptr<const constant_abstract_valuet>
 as_constant(const abstract_object_pointert &aop)
 {
   return std::dynamic_pointer_cast<const constant_abstract_valuet>(aop);
+}
+
+std::shared_ptr<const interval_abstract_valuet>
+as_interval(const abstract_object_pointert &aop)
+{
+  return std::dynamic_pointer_cast<const interval_abstract_valuet>(aop);
 }
 
 std::shared_ptr<const value_set_abstract_objectt>
@@ -128,6 +144,24 @@ void EXPECT(
     "Expect " + expr_to_str(result_expr) + " to equal " +
     expr_to_str(expected_value));
   REQUIRE(result_expr == expected_value);
+}
+
+void EXPECT(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value)
+{
+  REQUIRE(result);
+
+  REQUIRE_FALSE(result->is_top());
+  REQUIRE_FALSE(result->is_bottom());
+
+  auto expected_interval = constant_interval_exprt(lower_value, upper_value);
+  auto result_expr = result->to_interval();
+  INFO(
+    "Expect " + expr_to_str(result_expr) + " to equal " +
+    expr_to_str(expected_interval));
+  REQUIRE(result_expr == expected_interval);
 }
 
 void EXPECT(
@@ -234,6 +268,20 @@ std::shared_ptr<const constant_abstract_valuet> add_as_constant(
   INFO("Result should be a constant")
   REQUIRE(cv);
   return cv;
+}
+
+std::shared_ptr<const interval_abstract_valuet> add_as_interval(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto result = add(op1, op2, environment, ns);
+  auto i = as_interval(result);
+
+  INFO("Result should be an interval")
+  REQUIRE(i);
+  return i;
 }
 
 std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
