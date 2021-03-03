@@ -93,13 +93,22 @@ bool set_contains(const abstract_object_sett &set, const exprt &val)
   auto i = std::find_if(
     set.begin(), set.end(), [&val](const abstract_object_pointert &lhs) {
       auto l = lhs->to_constant();
+      auto interval =
+        std::dynamic_pointer_cast<const interval_abstract_valuet>(lhs);
+      if(interval)
+        l = interval->to_interval();
       return l == val;
     });
   return i != set.end();
 }
 
-std::string expr_to_str(const exprt &expr)
+static std::string interval_to_str(const constant_interval_exprt &expr);
+
+static std::string expr_to_str(const exprt &expr)
 {
+  if(expr.id() == ID_constant_interval)
+    return interval_to_str(to_constant_interval_expr(expr));
+
   auto st = symbol_tablet{};
   auto ns = namespacet{st};
   auto expr_str = std::string{};
@@ -108,6 +117,13 @@ std::string expr_to_str(const exprt &expr)
   lang->from_expr(expr, expr_str, ns);
 
   return expr_str;
+}
+
+static std::string interval_to_str(const constant_interval_exprt &expr)
+{
+  auto lower = expr_to_str(expr.get_lower());
+  auto upper = expr_to_str(expr.get_upper());
+  return "[" + lower + "," + upper + "]";
 }
 
 template <class Container, typename UnaryOp>
@@ -125,7 +141,9 @@ std::string container_to_str(const Container &con, UnaryOp unaryOp)
 std::string set_to_str(const abstract_object_sett &set)
 {
   return container_to_str(set, [](const abstract_object_pointert &lhs) {
-    return expr_to_str(lhs->to_constant());
+    auto i = std::dynamic_pointer_cast<const interval_abstract_valuet>(lhs);
+    return i ? interval_to_str(i->to_interval())
+             : expr_to_str(lhs->to_constant());
   });
 }
 

@@ -556,11 +556,23 @@ private:
   rewrite_expression(const std::vector<abstract_object_pointert> &ops) const
   {
     auto operands_expr = exprt::operandst{};
-    for(auto v : ops)
-      operands_expr.push_back(v->to_constant());
+    for(size_t i = 0; i != expression.operands().size(); ++i)
+    {
+      const auto &v = ops[i];
+      if(is_constant_value(v))
+        operands_expr.push_back(v->to_constant());
+      else
+        operands_expr.push_back(expression.operands()[i]);
+    }
     auto rewritten_expr =
       exprt(expression.id(), expression.type(), std::move(operands_expr));
     return rewritten_expr;
+  }
+
+  static bool is_constant_value(const abstract_object_pointert &v)
+  {
+    return std::dynamic_pointer_cast<const constant_abstract_valuet>(v) !=
+           nullptr;
   }
 
   std::vector<value_ranget> operands_as_ranges() const

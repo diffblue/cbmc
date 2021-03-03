@@ -287,6 +287,46 @@ SCENARIO(
       }
     }
   }
+  GIVEN("adding an interval and a value-set of constants")
+  {
+    WHEN("[2,2] + { 1 }")
+    {
+      auto op1 = make_interval(val2, val2, environment, ns);
+      auto op2 = make_value_set(val1, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= {[3,3]}")
+      {
+        EXPECT(result, {constant_interval_exprt(val3, val3)});
+      }
+    }
+    WHEN("[2,4] + { 1 }")
+    {
+      auto op1 = make_interval(val2, val4, environment, ns);
+      auto op2 = make_value_set(val1, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= {[3,5]}")
+      {
+        EXPECT(result, {constant_interval_exprt(val3, val5)});
+      }
+    }
+    WHEN("[1,2] + { 1, 2, 3 }")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto op2 = make_value_set({val1, val2, val3}, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= {[2,3], [3,4], [4,5]}")
+      {
+        EXPECT(
+          result,
+          {constant_interval_exprt(val2, val3),
+           constant_interval_exprt(val3, val4),
+           constant_interval_exprt(val4, val5)});
+      }
+    }
+  }
 
   GIVEN("adding two value_sets")
   {
@@ -368,6 +408,46 @@ SCENARIO(
       THEN("= { 3, 4, 5 }")
       {
         EXPECT(result, {val3, val4, val5});
+      }
+    }
+  }
+  GIVEN("adding a value-set of constants and an interval")
+  {
+    WHEN("{ 1 } + [2,2]")
+    {
+      auto op1 = make_value_set(val1, environment, ns);
+      auto op2 = make_interval(val2, val2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= {[3,3]}")
+      {
+        EXPECT(result, {constant_interval_exprt(val3, val3)});
+      }
+    }
+    WHEN("{ 1 } + [2,4]")
+    {
+      auto op1 = make_value_set(val1, environment, ns);
+      auto op2 = make_interval(val2, val4, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= {[3,5]}")
+      {
+        EXPECT(result, {constant_interval_exprt(val3, val5)});
+      }
+    }
+    WHEN("{ 1, 2, 3 } + [1,2]")
+    {
+      auto op1 = make_value_set({val1, val2, val3}, environment, ns);
+      auto op2 = make_interval(val1, val2, environment, ns);
+      auto result = add_as_value_set(op1, op2, environment, ns);
+
+      THEN("= {[2,3], [3,4], [4,5]}")
+      {
+        EXPECT(
+          result,
+          {constant_interval_exprt(val2, val3),
+           constant_interval_exprt(val3, val4),
+           constant_interval_exprt(val4, val5)});
       }
     }
   }
