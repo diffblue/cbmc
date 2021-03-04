@@ -27,6 +27,10 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
 # In addition, we depend on gcc for preprocessing
 set(CPACK_DEBIAN_PACKAGE_DEPENDS gcc)
 
+# Enable debug output so that we can see the dependencies being generated in the
+# logs
+set(CPACK_DEBIAN_PACKAGE_DEBUG YES)
+
 # For windows we need to set up product and update GUID
 # See: https://docs.microsoft.com/en-us/windows/win32/msi/productcode
 # and  https://docs.microsoft.com/en-us/windows/win32/msi/upgradecode
