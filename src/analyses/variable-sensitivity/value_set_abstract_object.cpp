@@ -11,18 +11,17 @@
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
-#include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <util/make_unique.h>
 
 static index_range_implementation_ptrt
-make_value_set_index_range(const abstract_object_sett &vals);
+make_value_set_index_range(const std::set<exprt> &vals);
 
 class value_set_index_ranget : public index_range_implementationt
 {
 public:
-  explicit value_set_index_ranget(const abstract_object_sett &vals)
+  explicit value_set_index_ranget(const std::set<exprt> &vals)
     : values(vals), cur(), next(values.begin())
   {
     PRECONDITION(!values.empty());
@@ -37,7 +36,7 @@ public:
     if(next == values.end())
       return false;
 
-    cur = (*next)->to_constant();
+    cur = *next;
     ++next;
     return true;
   }
@@ -47,13 +46,13 @@ public:
   }
 
 private:
-  const abstract_object_sett &values;
+  std::set<exprt> values;
   exprt cur;
-  abstract_object_sett::const_iterator next;
+  std::set<exprt>::const_iterator next;
 };
 
 static index_range_implementation_ptrt
-make_value_set_index_range(const abstract_object_sett &vals)
+make_value_set_index_range(const std::set<exprt> &vals)
 {
   return util_make_unique<value_set_index_ranget>(vals);
 }
@@ -146,7 +145,15 @@ value_set_abstract_objectt::index_range_implementation(
   if(values.empty())
     return make_indeterminate_index_range();
 
-  return make_value_set_index_range(values);
+  std::set<exprt> flattened;
+  for(const auto &o : values)
+  {
+    const auto &v = std::dynamic_pointer_cast<const abstract_value_objectt>(o);
+    for(auto e : v->index_range(ns))
+      flattened.insert(e);
+  }
+
+  return make_value_set_index_range(flattened);
 }
 
 value_range_implementation_ptrt

@@ -61,6 +61,10 @@ void EXPECT(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values);
 
+void EXPECT(
+  const std::vector<exprt> &values,
+  const std::vector<exprt> &expected_values);
+
 void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result);
 
 void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result);

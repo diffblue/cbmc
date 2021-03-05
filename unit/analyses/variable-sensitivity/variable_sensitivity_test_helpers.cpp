@@ -104,6 +104,13 @@ as_value_set(const abstract_object_pointert &aop)
   return std::dynamic_pointer_cast<const value_set_abstract_objectt>(aop);
 }
 
+bool set_contains(const std::vector<exprt> &set, const exprt &val)
+{
+  auto i = std::find_if(
+    set.begin(), set.end(), [&val](const exprt &lhs) { return lhs == val; });
+  return i != set.end();
+}
+
 bool set_contains(const abstract_object_sett &set, const exprt &val)
 {
   auto i = std::find_if(
@@ -210,14 +217,31 @@ void EXPECT(
   REQUIRE_FALSE(result->is_bottom());
 
   auto values = result->get_values();
-  REQUIRE(values.size() == expected_values.size());
-
   auto value_string = set_to_str(values);
   auto expected_string = exprs_to_str(expected_values);
 
+  INFO("Expect " + value_string + " to match " + expected_string);
+  REQUIRE(values.size() == expected_values.size());
+
   for(auto &ev : expected_values)
   {
-    INFO("Expect " + value_string + " to include " + expected_string);
+    INFO("Expect " + value_string + " to match " + expected_string);
+    REQUIRE(set_contains(values, ev));
+  }
+}
+
+void EXPECT(
+  const std::vector<exprt> &values,
+  const std::vector<exprt> &expected_values)
+{
+  auto value_string = exprs_to_str(values);
+  auto expected_string = exprs_to_str(expected_values);
+  INFO("Expect " + value_string + " to match " + expected_string);
+  REQUIRE(values.size() == expected_values.size());
+
+  for(auto &ev : expected_values)
+  {
+    INFO("Expect " + value_string + " to match " + expected_string);
     REQUIRE(set_contains(values, ev));
   }
 }
