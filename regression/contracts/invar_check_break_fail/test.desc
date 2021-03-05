@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion r == 0: FAILURE$
+^VERIFICATION FAILED$
+--
+This test is expected to fail along the code path where r is an even integer
+before entering the loop.
+The program is simply incompatible with the desired property in this case --
+there is no loop invariant that can establish the required assertion.

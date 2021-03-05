@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.4\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.2\] .* Check loop invariant before entry: SUCCESS$
+^\[main.3\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion s == n: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+This test checks that nested loops, `for` loops,
+and loop-local declarations of the index variable are correctly handled.
