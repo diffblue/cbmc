@@ -933,6 +933,8 @@ bool code_contractst::enforce_contracts()
   {
     if(has_contract(goto_function.first))
       funs_to_enforce.insert(id2string(goto_function.first));
+    else
+      apply_loop_contract(goto_function.second);
   }
   return enforce_contracts(funs_to_enforce);
 }
@@ -943,12 +945,22 @@ bool code_contractst::enforce_contracts(
   bool fail = false;
   for(const auto &fun : funs_to_enforce)
   {
-    if(!has_contract(fun))
+    auto goto_function = goto_functions.function_map.find(fun);
+    if(goto_function == goto_functions.function_map.end())
     {
       fail = true;
       log.error() << "Could not find function '" << fun
                   << "' in goto-program; not enforcing contracts."
                   << messaget::eom;
+      continue;
+    }
+    apply_loop_contract(goto_function->second);
+
+    if(!has_contract(fun))
+    {
+      fail = true;
+      log.error() << "Could not find any contracts within function '" << fun
+                  << "'; nothing to enforce." << messaget::eom;
       continue;
     }
 
