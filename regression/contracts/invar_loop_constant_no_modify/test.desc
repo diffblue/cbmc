@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion r == 0: SUCCESS$
+^\[main.assertion.2\] .* assertion s == 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+This test checks that variables that are not modified within the loop
+are not unnecessarily havoced by `check_apply_invariant`.
