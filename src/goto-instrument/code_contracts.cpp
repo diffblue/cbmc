@@ -69,15 +69,12 @@ static void check_apply_invariants(
   PRECONDITION(!loop.empty());
 
   // find the last back edge
-  goto_programt::targett loop_end=loop_head;
-  for(loopt::const_iterator
-      it=loop.begin();
-      it!=loop.end();
-      ++it)
-    if((*it)->is_goto() &&
-       (*it)->get_target()==loop_head &&
-       (*it)->location_number>loop_end->location_number)
-      loop_end=*it;
+  goto_programt::targett loop_end = loop_head;
+  for(const auto &t : loop)
+    if(
+      t->is_goto() && t->get_target() == loop_head &&
+      t->location_number > loop_end->location_number)
+      loop_end = t;
 
   // see whether we have an invariant
   exprt invariant = static_cast<const exprt &>(
@@ -107,7 +104,7 @@ static void check_apply_invariants(
   {
     goto_programt::targett a = havoc_code.add(
       goto_programt::make_assertion(invariant, loop_head->source_location));
-    a->source_location.set_comment("Loop invariant violated before entry");
+    a->source_location.set_comment("Check loop invariant before entry");
   }
 
   // havoc variables being written to
@@ -125,15 +122,15 @@ static void check_apply_invariants(
       side_effect_expr_nondett(bool_typet(), loop_head->source_location)));
   }
 
-  // Now havoc at the loop head. Use insert_swap to
-  // preserve jumps to loop head.
+  // Now havoc at the loop head.
+  // Use insert_before_swap to preserve jumps to loop head.
   goto_function.body.insert_before_swap(loop_head, havoc_code);
 
   // assert the invariant at the end of the loop body
   {
     goto_programt::instructiont a =
       goto_programt::make_assertion(invariant, loop_end->source_location);
-    a.source_location.set_comment("Loop invariant not preserved");
+    a.source_location.set_comment("Check that loop invariant is preserved");
     goto_function.body.insert_before_swap(loop_end, a);
     ++loop_end;
   }
@@ -306,12 +303,9 @@ void code_contractst::apply_loop_contract(
   natural_loops_mutablet natural_loops(goto_function.body);
 
   // iterate over the (natural) loops in the function
-  for(natural_loops_mutablet::loop_mapt::const_iterator l_it =
-        natural_loops.loop_map.begin();
-      l_it != natural_loops.loop_map.end();
-      l_it++)
+  for(const auto &loop : natural_loops.loop_map)
     check_apply_invariants(
-      goto_function, local_may_alias, l_it->first, l_it->second);
+      goto_function, local_may_alias, loop.first, loop.second);
 }
 
 const symbolt &code_contractst::new_tmp_symbol(
@@ -959,7 +953,7 @@ bool code_contractst::enforce_contracts(
     }
 
     if(!fail)
-      fail |= enforce_contract(fun);
+      fail = enforce_contract(fun);
   }
   return fail;
 }
