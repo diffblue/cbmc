@@ -158,7 +158,7 @@ bool code_contractst::has_contract(const irep_idt fun_name)
          type.find(ID_C_spec_ensures).is_not_nil();
 }
 
-bool code_contractst::apply_contract(
+bool code_contractst::apply_function_contract(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -299,7 +299,7 @@ bool code_contractst::apply_contract(
   return false;
 }
 
-void code_contractst::code_contracts(
+void code_contractst::apply_loop_contract(
   goto_functionst::goto_functiont &goto_function)
 {
   local_may_aliast local_may_alias(goto_function);
@@ -312,11 +312,6 @@ void code_contractst::code_contracts(
       l_it++)
     check_apply_invariants(
       goto_function, local_may_alias, l_it->first, l_it->second);
-
-  // look at all function calls
-  Forall_goto_program_instructions(ins, goto_function.body)
-    if(ins->is_function_call())
-      apply_contract(goto_function.body, ins);
 }
 
 const symbolt &code_contractst::new_tmp_symbol(
@@ -910,7 +905,7 @@ bool code_contractst::replace_calls(
         if(found == funs_to_replace.end())
           continue;
 
-        fail |= apply_contract(goto_function.second.body, ins);
+        fail |= apply_function_contract(goto_function.second.body, ins);
       }
     }
   }

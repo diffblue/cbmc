@@ -133,13 +133,14 @@ protected:
     goto_programt &created_decls,
     std::vector<exprt> &created_references);
 
-  void code_contracts(goto_functionst::goto_functiont &goto_function);
+  void apply_loop_contract(goto_functionst::goto_functiont &goto_function);
 
   /// \brief Does the named function have a contract?
   bool has_contract(const irep_idt);
 
-  bool
-  apply_contract(goto_programt &goto_program, goto_programt::targett target);
+  bool apply_function_contract(
+    goto_programt &goto_program,
+    goto_programt::targett target);
 
   void
   add_contract_check(const irep_idt &, const irep_idt &, goto_programt &dest);
