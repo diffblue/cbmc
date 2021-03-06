@@ -33,27 +33,10 @@ public:
 
   ~constant_abstract_valuet() override = default;
 
-  index_range_ptrt index_range(const namespacet &ns) const override;
+  index_range_implementation_ptrt
+  index_range_implementation(const namespacet &ns) const override;
 
-  /// Interface for transforms
-  ///
-  /// \param expr: the expression to evaluate and find the result of it.
-  ///              This will be the symbol referred to be op0()
-  /// \param operands: an abstract_object (pointer) that represent
-  ///                  the possible values of each operand
-  /// \param environment: the abstract environment in which the
-  ///                     expression is being evaluated
-  /// \param ns: the current variable namespace
-  ///
-  /// \return Returns the abstract_object representing the result of
-  ///         this expression to the maximum precision available.
-  ///
-  /// Uses the rewriter to constant fold expressions where possible.
-  abstract_object_pointert expression_transform(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const override;
+  value_range_implementation_ptrt value_range_implementation() const override;
 
   exprt to_constant() const override;
 
@@ -90,11 +73,6 @@ protected:
   ///
   /// \return Returns the result of the merge
   abstract_object_pointert merge(abstract_object_pointert other) const override;
-
-  abstract_object_pointert try_transform_expr_with_all_rounding_modes(
-    const exprt &expr,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const;
 
 private:
   /// Merges another constant abstract value into this one

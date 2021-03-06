@@ -10,573 +10,366 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
 #include <typeinfo>
 #include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
-#include <util/std_expr.h>
 #include <util/symbol_table.h>
+
+struct constant_merge_result
+{
+  bool modified;
+  std::shared_ptr<const constant_abstract_valuet> result;
+};
+
+static constant_merge_result merge(
+  std::shared_ptr<const abstract_objectt> op1,
+  std::shared_ptr<const abstract_objectt> op2)
+{
+  bool modified;
+  auto result = abstract_objectt::merge(op1, op2, modified);
+
+  return {modified, as_constant(result)};
+}
+
+static abstract_object_pointert make_bottom_object()
+{
+  return std::make_shared<abstract_objectt>(integer_typet(), false, true);
+}
+
+static abstract_object_pointert make_top_object()
+{
+  return std::make_shared<abstract_objectt>(integer_typet(), true, false);
+}
 
 SCENARIO(
   "merge_constant_abstract_value",
   "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
 {
-  GIVEN("An environment with two values: 1 and 2")
+  const exprt val1 = from_integer(1, integer_typet());
+  const exprt val2 = from_integer(2, integer_typet());
+
+  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+    vsd_configt::constant_domain());
+  abstract_environmentt environment{object_factory};
+  environment.make_top();
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  GIVEN("merging two constants")
   {
-    const exprt val1 = from_integer(1, integer_typet());
-    const exprt val2 = from_integer(2, integer_typet());
-
-    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-      vsd_configt::constant_domain());
-    abstract_environmentt enviroment{object_factory};
-    enviroment.make_top();
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
-
-    WHEN(
-      "merging constant AO with value "
-      "with a constant AO with the same value")
+    WHEN("merging 1 with 1")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, environment, ns);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto merged = merge(op1, op2);
 
-      const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-
-      THEN("The original abstract object should be returned unchanged")
+      THEN("the result 1 is unchanged")
       {
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(cast_result->to_constant() == val1);
-
-        // Is optimal
-        REQUIRE(result == op1);
+        EXPECT_UNMODIFIED(merged.result, merged.modified, val1);
       }
     }
-    WHEN(
-      "merging constant AO with value "
-      "with a constant AO with the different value")
+    WHEN("merging 1 with 2")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val2, enviroment, ns);
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val2, environment, ns);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto merged = merge(op1, op2);
 
-      const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-
-      THEN("A new constant abstract object set to top should be returned")
+      THEN("result should be TOP")
       {
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE(modified);
-        REQUIRE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-
-        // We currently don't require the value has any reasonable value
-
-        // Since it has modified, we definitely shouldn't be reusing the pointer
-        REQUIRE_FALSE(result == op1);
+        EXPECT_TOP(merged.result);
       }
     }
-    WHEN("merging constant AO with value with a constant AO set to top")
+    WHEN("merging 1 with TOP")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, true);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto merged = merge(op1, op2);
 
-      const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-
-      THEN("A new AO of the same type set to top ")
+      THEN("result should be TOP")
       {
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE(modified);
-        REQUIRE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-
-        // We currently don't require the value has any reasonable value
-
-        // Since it has modified, we definitely shouldn't be reusing the pointer
-        REQUIRE_FALSE(result == op1);
+        EXPECT_TOP(merged.result);
       }
     }
-    WHEN("merging constant AO with value with a constant AO set to bottom")
+    WHEN("merging 1 with BOTTOM")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, false);
+
+      auto merged = merge(op1, op2);
+
+      THEN("the result 1 is unchanged")
+      {
+        EXPECT_UNMODIFIED(merged.result, merged.modified, val1);
+      }
+    }
+    WHEN("merging TOP with 1")
+    {
+      auto op1 = make_constant(val1, true);
+      auto op2 = make_constant(val1, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result should be TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging TOP with TOP")
+    {
+      auto op1 = make_constant(val1, true);
+      auto op2 = make_constant(val1, true);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result should be TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging TOP with BOTTOM")
+    {
+      auto op1 = make_constant(val1, true);
+      auto op2 = make_constant(val1, false);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result should be TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging BOTTOM with 1")
+    {
+      auto op1 = make_constant(val1, false);
+      auto op2 = make_constant(val1, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("the result is 1")
+      {
+        EXPECT(merged.result, val1);
+      }
+    }
+    WHEN("merging BOTTOM with TOP")
+    {
+      auto op1 = make_constant(val1, false);
+      auto op2 = make_constant(val1, true);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result should be TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging BOTTOM with BOTTOM")
+    {
+      auto op1 = make_constant(val1, false);
+      auto op2 = make_constant(val1, false);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is BOTTOM")
+      {
+        EXPECT_BOTTOM(merged.result);
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "merging a constant with an abstract object",
+  "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
+{
+  const exprt val1 = from_integer(1, integer_typet());
+  const exprt val2 = from_integer(2, integer_typet());
+
+  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+    vsd_configt::constant_domain());
+  abstract_environmentt environment{object_factory};
+  environment.make_top();
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  GIVEN("merging a constant and an abstract object")
+  {
+    WHEN("merging 1 with TOP")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_top_object();
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging 1 with BOTTOM")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_bottom_object();
+
+      auto merged = merge(op1, op2);
+
+      THEN("the result 1 is unchanged")
+      {
+        EXPECT_UNMODIFIED(merged.result, merged.modified, val1);
+      }
+    }
+    WHEN("merging constant TOP with TOP")
+    {
+      auto op1 = make_constant(val1, true);
+      auto op2 = make_top_object();
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging constant TOP with BOTTOM")
+    {
+      auto op1 = make_constant(val1, true);
+      auto op2 = make_bottom_object();
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging constant BOTTOM with TOP")
+    {
+      auto op1 = make_constant(val1, false);
+      auto op2 = make_top_object();
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is TOP")
+      {
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging constant BOTTOM with BOTTOM")
+    {
+      auto op1 = make_constant(val1, false);
+      auto op2 = make_bottom_object();
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is TOP")
+      {
+        EXPECT_BOTTOM(merged.result);
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "merging an abstract object with a constant",
+  "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
+{
+  const exprt val1 = from_integer(1, integer_typet());
+  const exprt val2 = from_integer(2, integer_typet());
+
+  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+    vsd_configt::constant_domain());
+  abstract_environmentt environment{object_factory};
+  environment.make_top();
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  GIVEN("an abstract object and a constant")
+  {
+    WHEN("merging TOP with 1")
+    {
+      auto op1 = make_top_object();
+      auto op2 = make_constant(val1, environment, ns);
 
       bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, modified);
 
-      const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
+      THEN("the result is TOP")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging TOP with constant TOP")
+    {
+      auto op1 = make_top_object();
+      auto op2 = make_constant(val1, true);
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      THEN("the result is TOP")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging TOP with constant BOTTOM")
+    {
+      auto op1 = make_top_object();
+      auto op2 = make_constant(val1, false);
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      THEN("the result is TOP")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging BOTTOM with 1")
+    {
+      auto op1 = make_bottom_object();
+      auto op2 = make_constant(val1, environment, ns);
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      THEN("the result is TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging BOTTOM with constant TOP")
+    {
+      auto op1 = make_bottom_object();
+      auto op2 = make_constant(val1, true);
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      THEN("the result is TOP")
+      {
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging BOTTOM with constant BOTTOM")
+    {
+      auto op1 = make_bottom_object();
+      auto op2 = make_constant(val1, false);
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
 
       THEN("The original AO should be returned")
       {
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(cast_result->to_constant() == val1);
-
-        // Is optimal
-        REQUIRE(result == op1);
-      }
-    }
-    WHEN("merging constant AO set to top with a constant AO with a value")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("WE should return the same value")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-      }
-    }
-    WHEN("merging constant AO set to top with a constant AO set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("WE should return the same value")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-      }
-    }
-    WHEN("merging constant AO set to top with a constant AO set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("WE should return the same value")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-      }
-    }
-    WHEN("merging constant AO set to bottom with a constant AO with a value")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("We should get an abstract object that has the same value as op2")
-      {
-        // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-        REQUIRE(result->to_constant() == val1);
-      }
-    }
-    WHEN("merging constant AO set to bottom with a constant AO set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("We should get a top abstract object back")
-      {
-        // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-      }
-    }
-    WHEN("merging constant AO set to bottom with a constant AO set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("We should get the same (bottom) AO back")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE(result->is_bottom());
-
-        // Optimization correctness
-        REQUIRE(result == op1);
-      }
-    }
-    WHEN("merging constant AO with value with a abstract object set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-      abstract_object_pointert op2 =
-        std::make_shared<abstract_objectt>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-
-      THEN("We should get a new AO of the same type but set to top")
-      {
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE(modified);
-        REQUIRE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-
-        // We currently don't require the value has any reasonable value
-
-        // Since it has modified, we definitely shouldn't be reusing the pointer
-        REQUIRE_FALSE(result == op1);
-      }
-    }
-    WHEN("merging constant AO with value with a abstract object set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-      abstract_object_pointert op2 =
-        std::make_shared<abstract_objectt>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      const auto &cast_result =
-        std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-      THEN("We should get the same constant AO back")
-      {
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(cast_result->to_constant() == val1);
-
-        // Is optimal
-        REQUIRE(result == op1);
-      }
-    }
-    WHEN("merging constant AO set to top with a abstract object set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<abstract_objectt>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("We should get the same abstract object back")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-
-        // Is type still correct
-        const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-      }
-    }
-    WHEN("merging constant AO set to top with a abstract object set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<abstract_objectt>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-      THEN("Should get the same abstract object back")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-
-        // Is type still correct
-        const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-      }
-    }
-    WHEN("merging constant AO set to bottom with a abstract object set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<abstract_objectt>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-      THEN("Return a new top abstract object of the same type")
-      {
-        // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // We don't optimize for returning the second parameter if we can
-
-        // Is type still correct
-        const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-      }
-    }
-    WHEN("merging constant AO set to bottom with a AO set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<abstract_objectt>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-      THEN("Return the original abstract object")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE(result->is_bottom());
-
-        // Optimization check
-        REQUIRE(result == op1);
-
-        // Is type still correct
-        const auto &cast_result =
-          std::dynamic_pointer_cast<const constant_abstract_valuet>(result);
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-      }
-    }
-    WHEN("merging AO set to top with a constant AO with a value")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<abstract_objectt>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-
-      bool modified;
-
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-      THEN("The original AO should be returned")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-      }
-    }
-    WHEN("merging AO set to top with a constant AO set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<abstract_objectt>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-      THEN("The original AO should be returned")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-      }
-    }
-    WHEN("merging AO set to top with a constant AO set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<abstract_objectt>(val1.type(), true, false);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-      THEN("The original AO should be returned")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
-      }
-    }
-    WHEN("merging AO set to bottom with a constant AO with a value")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<abstract_objectt>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1, enviroment, ns);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("The a new top AO should be returned")
-      {
-        // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(typeid(result.get()) == typeid(const abstract_objectt *));
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-      }
-
-      // We don't optimize for returning the second parameter if we can
-    }
-    WHEN("merging AO set to bottom with a constant AO set to top")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<abstract_objectt>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), true, false);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("The a new top AO should be returned")
-      {
-        // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // We don't optimize for returning the second parameter if we can
-      }
-    }
-    WHEN("merging AO set to bottom with a constant AO set to bottom")
-    {
-      abstract_object_pointert op1 =
-        std::make_shared<abstract_objectt>(val1.type(), false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<constant_abstract_valuet>(val1.type(), false, true);
-
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
-
-      THEN("The original AO should be returned")
-      {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE(result->is_bottom());
-
-        REQUIRE(result == op1);
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_BOTTOM(result);
       }
     }
   }

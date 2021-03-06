@@ -22,10 +22,6 @@
 
 class interval_abstract_valuet : public abstract_value_objectt
 {
-private:
-  typedef sharing_ptrt<interval_abstract_valuet>
-    interval_abstract_value_pointert;
-
 public:
   explicit interval_abstract_valuet(const typet &t);
   interval_abstract_valuet(const typet &t, bool tp, bool bttm);
@@ -39,36 +35,19 @@ public:
 
   ~interval_abstract_valuet() override = default;
 
-  index_range_ptrt index_range(const namespacet &ns) const override;
+  index_range_implementation_ptrt
+  index_range_implementation(const namespacet &ns) const override;
 
   exprt to_constant() const override;
-
-  /// Interface for transforms
-  ///
-  /// \param expr: the expression to evaluate and find the result of it.
-  ///              This will be the symbol referred to be op0()
-  /// \param operands: an abstract_object (pointer) that represent
-  ///                  the possible values of each operand
-  /// \param environment: the abstract environment in which the
-  ///                     expression is being evaluated
-  /// \param ns: the current variable namespace
-  ///
-  /// \return Returns the abstract_object representing the result of
-  ///         this expression to the maximum precision available.
-  ///
-  /// Perform the interval transforms
-  abstract_object_pointert expression_transform(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const override;
+  const constant_interval_exprt &to_interval() const
+  {
+    return interval;
+  }
 
   void output(
     std::ostream &out,
     const class ai_baset &ai,
     const class namespacet &ns) const override;
-
-  const constant_interval_exprt &get_interval() const;
 
   void get_statistics(
     abstract_object_statisticst &statistics,
@@ -83,16 +62,8 @@ protected:
   meet(const abstract_object_pointert &other) const override;
 
 private:
-  static abstract_object_pointert evaluate_conditional(
-    const exprt &expr,
-    const std::vector<interval_abstract_value_pointert> &interval_operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns);
-  static abstract_object_pointert evaluate_unary_expr(
-    const exprt &expr,
-    const std::vector<interval_abstract_value_pointert> &interval_operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns);
+  using interval_abstract_value_pointert =
+    sharing_ptrt<interval_abstract_valuet>;
 
   abstract_object_pointert
   merge_intervals(interval_abstract_value_pointert other) const;

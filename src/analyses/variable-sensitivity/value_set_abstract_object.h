@@ -30,7 +30,10 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  index_range_ptrt index_range(const namespacet &ns) const override;
+  index_range_implementation_ptrt
+  index_range_implementation(const namespacet &ns) const override;
+
+  value_range_implementation_ptrt value_range_implementation() const override;
 
   /// \copydoc abstract_objectt::to_constant
   exprt to_constant() const override
@@ -39,16 +42,6 @@ public:
     return values.size() == 1 ? (*values.begin())->to_constant()
                               : abstract_objectt::to_constant();
   }
-
-  /// \copydoc abstract_objectt::expression_transform
-  ///
-  /// Transforms the \p expr for every combination of \p operands (since these
-  /// can be value-sets as well).
-  abstract_object_pointert expression_transform(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const override;
 
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
@@ -86,12 +79,6 @@ protected:
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
 private:
-  abstract_object_pointert evaluate_conditional(
-    const typet &type,
-    const std::vector<abstract_object_sett> &operands,
-    const abstract_environmentt &env,
-    const namespacet &ns) const;
-
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
@@ -113,11 +100,7 @@ private:
   // data
   abstract_object_sett values;
 
-  /// Cast the set of values \p other_values to an interval.
-  /// \param other_values: the value-set to be abstracted into an interval
-  /// \return the interval-abstract-object containing \p other_values
-  abstract_object_pointert
-  to_interval(const abstract_object_sett &other_values) const;
+  void set_top_internal() override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H

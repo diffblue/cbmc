@@ -33,13 +33,27 @@ SCENARIO(
 
     THEN("range should have a value")
     {
-      REQUIRE(range->advance_to_next() == true);
+      auto i = range.begin();
+      REQUIRE(i != range.end());
 
       mp_integer index;
-      to_integer(to_constant_expr(range->current()), index);
+      to_integer(to_constant_expr(*i), index);
       REQUIRE(index == int_value);
 
-      REQUIRE(range->advance_to_next() == false);
+      ++i;
+      REQUIRE(i == range.end());
+    }
+    THEN("iterator has a single value")
+    {
+      auto i = range.begin();
+      REQUIRE(i != range.end());
+
+      mp_integer index;
+      to_integer(to_constant_expr(*i), index);
+      REQUIRE(index == int_value);
+
+      ++i;
+      REQUIRE(i == range.end());
     }
   }
 
@@ -51,11 +65,13 @@ SCENARIO(
 
     THEN("range should have a nil expr")
     {
-      REQUIRE(range->advance_to_next() == true);
+      auto i = range.begin();
+      REQUIRE(i != range.end());
 
-      REQUIRE(range->current() == nil_exprt());
+      REQUIRE(*i == nil_exprt());
+      ++i;
 
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(i == range.end());
     }
   }
 }
@@ -81,7 +97,7 @@ SCENARIO(
 
     THEN("range should be empty")
     {
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(range.begin() == range.end());
     }
   }
 
@@ -96,13 +112,15 @@ SCENARIO(
 
     THEN("range should have a single value")
     {
-      REQUIRE(range->advance_to_next() == true);
+      auto i = range.begin();
+      REQUIRE(i != range.end());
 
       mp_integer index;
-      to_integer(to_constant_expr(range->current()), index);
+      to_integer(to_constant_expr(*i), index);
       REQUIRE(index == int_value);
+      ++i;
 
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(i == range.end());
     }
   }
 
@@ -120,18 +138,21 @@ SCENARIO(
 
     THEN("range should have two values")
     {
-      REQUIRE(range->advance_to_next() == true);
+      auto i = range.begin();
+      REQUIRE(i != range.end());
 
       mp_integer index;
-      to_integer(to_constant_expr(range->current()), index);
+      to_integer(to_constant_expr(*i), index);
       REQUIRE(index == int_value);
+      ++i;
 
-      REQUIRE(range->advance_to_next() == true);
+      REQUIRE(i != range.end());
 
-      to_integer(to_constant_expr(range->current()), index);
+      to_integer(to_constant_expr(*i), index);
       REQUIRE(index == int_value + 1);
+      ++i;
 
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(i == range.end());
     }
   }
 
@@ -147,18 +168,18 @@ SCENARIO(
 
     auto range = value->index_range(ns);
 
-    THEN("range should have four values")
+    THEN("range has four values")
     {
-      for(int i = 0; i != 4; ++i)
+      int i = 0;
+      for(const auto &e : range)
       {
-        REQUIRE(range->advance_to_next() == true);
-
         mp_integer index;
-        to_integer(to_constant_expr(range->current()), index);
+        to_integer(to_constant_expr(e), index);
         REQUIRE(index == int_value + i);
+        ++i;
       }
 
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(i == 4);
     }
   }
 }
@@ -184,11 +205,13 @@ SCENARIO(
 
     THEN("range should have a nil expr")
     {
-      REQUIRE(range->advance_to_next() == true);
+      auto i = range.begin();
+      REQUIRE(i != range.end());
 
-      REQUIRE(range->current() == nil_exprt());
+      REQUIRE(*i == nil_exprt());
+      ++i;
 
-      REQUIRE(range->advance_to_next() == false);
+      REQUIRE(i == range.end());
     }
   }
 }
