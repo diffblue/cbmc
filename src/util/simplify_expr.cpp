@@ -1007,21 +1007,6 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     }
   }
 
-  #if 0
-  // (T)(a?b:c) --> a?(T)b:(T)c
-  if(expr.op().id()==ID_if &&
-     expr.op().operands().size()==3)
-  {
-    typecast_exprt tmp_op1(expr.op().op1(), expr_type);
-    typecast_exprt tmp_op2(expr.op().op2(), expr_type);
-    simplify_typecast(tmp_op1);
-    simplify_typecast(tmp_op2);
-    auto new_expr=if_exprt(expr.op().op0(), tmp_op1, tmp_op2, expr_type);
-    simplify_if(new_expr);
-    return std::move(new_expr);
-  }
-  #endif
-
   const irep_idt &expr_type_id=expr_type.id();
   const exprt &operand = expr.op();
   const irep_idt &op_type_id=op_type.id();
@@ -1347,6 +1332,35 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   return unchanged(expr);
+}
+
+bool simplify_exprt::simplify_typecast_preorder(typecast_exprt &expr)
+{
+  const typet &expr_type = as_const(expr).type();
+  const typet &op_type = as_const(expr).op().type();
+
+  // (T)(a?b:c) --> a?(T)b:(T)c; don't do this for floating-point type casts as
+  // the type cast itself may be costly
+  if(
+    as_const(expr).op().id() == ID_if && expr_type.id() != ID_floatbv &&
+    op_type.id() != ID_floatbv)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    simplify_if_preorder(if_expr);
+    expr.swap(if_expr);
+    return false;
+  }
+  else
+  {
+    auto r_it = simplify_rec(expr.op()); // recursive call
+    if(r_it.has_changed())
+    {
+      expr.op() = r_it.expr;
+      return false;
+    }
+    else
+      return true;
+  }
 }
 
 simplify_exprt::resultt<>
@@ -2616,6 +2630,8 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
   }
   else if(expr.id()==ID_if)
     result=simplify_if_preorder(to_if_expr(expr));
+  else if(expr.id() == ID_typecast)
+    result = simplify_typecast_preorder(to_typecast_expr(expr));
   else
   {
     if(expr.has_operands())

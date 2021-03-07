@@ -147,6 +147,7 @@ public:
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
   NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
+  bool simplify_typecast_preorder(typecast_exprt &);
   NODISCARD resultt<> simplify_extractbit(const extractbit_exprt &);
   NODISCARD resultt<> simplify_extractbits(const extractbits_exprt &);
   NODISCARD resultt<> simplify_concatenation(const concatenation_exprt &);
