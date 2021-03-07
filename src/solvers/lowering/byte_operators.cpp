@@ -1429,7 +1429,7 @@ static exprt lower_byte_update_byte_array_vector(
 /// \param non_const_update_bound: Constrain updates such
 ///   as to at most update \p non_const_update_bound elements
 /// \param initial_bytes: Number of bytes from \p value_as_byte_array to use to
-///   update the the array/vector element at \p first_index
+///   update the array/vector element at \p first_index
 /// \param first_index: Lowest index into the target array/vector of the update
 /// \param first_update_value: Combined value of partially old and updated bytes
 ///   to use at \p first_index
@@ -1477,14 +1477,15 @@ static exprt lower_byte_update_array_vector_unbounded(
     mult_exprt{subtype_size,
                minus_exprt{typecast_exprt::conditional_cast(
                              array_comprehension_index, first_index.type()),
-                           first_index}}};
+                           plus_exprt{first_index,
+                                      from_integer(1, first_index.type())}}}};
   exprt update_value = lower_byte_extract(
     byte_extract_exprt{
       extract_opcode, value_as_byte_array, std::move(offset_expr), subtype},
     ns);
 
   // The number of target array/vector elements being replaced, not including
-  // a possible partial update a the end of the updated range, which is handled
+  // a possible partial update at the end of the updated range, which is handled
   // below: (non_const_update_bound + (subtype_size - 1)) / subtype_size to
   // round up to the nearest multiple of subtype_size.
   div_exprt updated_elements{
