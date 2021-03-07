@@ -715,6 +715,14 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
         it = new_expr.operands().erase(it);
         no_change = false;
       }
+      else if(
+        it->is_constant() && it->type().id() == ID_bv &&
+        to_constant_expr(*it).value_is_zero_string() &&
+        new_expr.operands().size() > 1)
+      {
+        it = new_expr.operands().erase(it);
+        no_change = false;
+      }
       else
         it++;
     }
