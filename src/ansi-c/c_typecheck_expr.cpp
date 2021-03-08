@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "anonymous_member.h"
 #include "builtin_factory.h"
+#include "c_expr.h"
 #include "c_qualifiers.h"
 #include "c_typecast.h"
 #include "expr2c.h"
@@ -3023,13 +3024,11 @@ exprt c_typecheck_baset::do_special_functions(
       throw invalid_source_file_exceptiont{error_message.str()};
     }
 
+    typecheck_function_call_arguments(expr);
+
     auto lhs = expr.arguments()[0];
     auto rhs = expr.arguments()[1];
     auto result_ptr = expr.arguments()[2];
-
-    typecheck_expr(lhs);
-    typecheck_expr(rhs);
-    typecheck_expr(result_ptr);
 
     {
       auto const raise_wrong_argument_error =
@@ -3061,48 +3060,16 @@ exprt c_typecheck_baset::do_special_functions(
       }
     }
 
-    // actual logic implementing the operators
-    auto const make_operation = [&identifier](exprt lhs, exprt rhs) -> exprt {
-      if(identifier == "__builtin_add_overflow")
-      {
-        return plus_exprt{lhs, rhs};
-      }
-      else if(identifier == "__builtin_sub_overflow")
-      {
-        return minus_exprt{lhs, rhs};
-      }
-      else
-      {
-        INVARIANT(
-          identifier == "__builtin_mul_overflow",
-          "the three overflow operations are add, sub and mul");
-        return mult_exprt{lhs, rhs};
-      }
-    };
+    irep_idt kind =
+      (identifier == "__builtin_add_overflow")
+        ? ID_plus
+        : (identifier == "__builtin_sub_overflow") ? ID_minus : ID_mult;
 
-    // we’re basically generating this expression
-    // (*result = (result_type)((integer)lhs OP (integer)rhs)),
-    //   ((integer)result == (integer)lhs OP (integer)rhs)
-    // i.e. perform the operation (+, -, *) on arbitrary length integer,
-    // cast to result type, check if the casted result is still equivalent
-    // to the arbitrary length result.
-    auto operation = make_operation(
-      typecast_exprt{lhs, integer_typet{}},
-      typecast_exprt{rhs, integer_typet{}});
-
-    auto operation_result =
-      typecast_exprt{operation, result_ptr.type().subtype()};
-    typecheck_expr_typecast(operation_result);
-    auto overflow_check = notequal_exprt{
-      typecast_exprt{dereference_exprt{result_ptr}, integer_typet{}},
-      operation};
-    typecheck_expr(overflow_check);
-    return exprt{ID_comma,
-                 bool_typet{},
-                 {side_effect_expr_assignt{dereference_exprt{result_ptr},
-                                           operation_result,
-                                           expr.source_location()},
-                  overflow_check}};
+    return side_effect_expr_overflowt{kind,
+                                      std::move(lhs),
+                                      std::move(rhs),
+                                      std::move(result_ptr),
+                                      expr.source_location()};
   }
   else
     return nil_exprt();
