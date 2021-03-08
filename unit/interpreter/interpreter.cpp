@@ -10,9 +10,11 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/interpreter_class.h>
+
 #include <util/message.h>
 #include <util/mp_arith.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 
 typedef interpretert::mp_vectort mp_vectort;
 

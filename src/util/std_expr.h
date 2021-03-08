@@ -2746,17 +2746,6 @@ inline bool can_cast_expr<nil_exprt>(const exprt &base)
   return base.id() == ID_nil;
 }
 
-/// \brief The null pointer constant
-class null_pointer_exprt:public constant_exprt
-{
-public:
-  explicit null_pointer_exprt(pointer_typet type)
-    : constant_exprt(ID_NULL, std::move(type))
-  {
-  }
-};
-
-
 /// \brief An expression denoting infinity
 class infinity_exprt : public nullary_exprt
 {
