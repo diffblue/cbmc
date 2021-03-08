@@ -10,8 +10,9 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <goto-symex/goto_symex_is_constant.h>
+
+#include <util/bitvector_types.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 SCENARIO("goto-symex-is-constant", "[core][goto-symex][is_constant]")
 {

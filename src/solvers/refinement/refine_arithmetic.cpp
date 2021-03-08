@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_refinement.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/bv_arithmetic.h>
 #include <util/expr_util.h>
 #include <util/floatbv_expr.h>

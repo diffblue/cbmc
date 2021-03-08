@@ -13,6 +13,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "converters/statement_list_types.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/ieee_float.h>
 
 /// String to indicate that there is no value.

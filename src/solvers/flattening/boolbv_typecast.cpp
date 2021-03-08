@@ -8,12 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <util/std_types.h>
-
-#include <solvers/floatbv/float_utils.h>
-
 #include "boolbv_type.h"
 #include "c_bit_field_replacement_type.h"
+
+#include <util/bitvector_types.h>
+
+#include <solvers/floatbv/float_utils.h>
 
 bvt boolbvt::convert_bv_typecast(const typecast_exprt &expr)
 {

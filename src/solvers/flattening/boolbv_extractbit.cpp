@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/exception_utils.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>

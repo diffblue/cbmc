@@ -11,9 +11,10 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_returns.h>
+
+#include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 TEST_CASE("Return-value removal", "[core][goto-programs][remove_returns]")

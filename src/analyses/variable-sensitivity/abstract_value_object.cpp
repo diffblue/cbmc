@@ -12,8 +12,11 @@
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+
 #include <goto-programs/adjust_float_expressions.h>
+
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/ieee_float.h>
 #include <util/make_unique.h>
 #include <util/simplify_expr.h>

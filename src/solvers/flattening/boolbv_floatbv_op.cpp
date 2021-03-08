@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <iostream>
 
+#include <util/bitvector_types.h>
 #include <util/floatbv_expr.h>
-#include <util/std_types.h>
 
 #include <solvers/floatbv/float_utils.h>
 

@@ -13,10 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
-#include <util/arith_tools.h>
 
 mp_integer alignment(const typet &type, const namespacet &ns)
 {

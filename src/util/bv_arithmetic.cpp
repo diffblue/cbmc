@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "string2int.h"
 #include "arith_tools.h"
-#include "std_types.h"
+#include "bitvector_types.h"
 #include "std_expr.h"
+#include "string2int.h"
 
 typet bv_spect::to_type() const
 {

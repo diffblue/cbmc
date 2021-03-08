@@ -14,6 +14,7 @@ Date: November 2011
 #include "stack_depth.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 
 #include <goto-programs/goto_model.h>
 

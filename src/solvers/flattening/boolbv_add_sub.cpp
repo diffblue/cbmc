@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+#include <util/bitvector_types.h>
 #include <util/invariant.h>
-#include <util/std_types.h>
 
 #include <solvers/floatbv/float_utils.h>
 

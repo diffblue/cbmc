@@ -13,6 +13,8 @@
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
+#include <util/bitvector_types.h>
+
 SCENARIO(
   "meet_interval_abstract_value",
   "[core][analyses][variable-sensitivity][interval_abstract_value][meet]")

@@ -11,6 +11,8 @@ Author: Daiva Naudziuniene, daivan@amazon.com
 
 #include "jsil_types.h"
 
+#include <util/bitvector_types.h>
+
 #include <algorithm>
 
 typet jsil_any_type()

@@ -8,9 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "fixedbv.h"
 
-#include "std_types.h"
-#include "std_expr.h"
 #include "arith_tools.h"
+#include "bitvector_types.h"
+#include "std_expr.h"
+#include "std_types.h"
 
 fixedbv_spect::fixedbv_spect(const fixedbv_typet &type)
 {

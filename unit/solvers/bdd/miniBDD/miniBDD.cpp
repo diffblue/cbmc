@@ -18,6 +18,7 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/expanding_vector.h>
 #include <util/format_expr.h>
 #include <util/symbol_table.h>

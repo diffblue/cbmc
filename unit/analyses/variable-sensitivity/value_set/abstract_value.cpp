@@ -7,15 +7,19 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "value_set_test_common.h"
+
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/value_set_abstract_value.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+
 #include <ansi-c/expr2c.h>
 
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
+
 #include <sstream>
 #include <string>
-#include <util/arith_tools.h>
 #include <vector>
 
 namespace

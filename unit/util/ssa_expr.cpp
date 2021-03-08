@@ -9,8 +9,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/ssa_expr.h>
-#include <util/symbol_table.h>
 
 TEST_CASE("Constructor of ssa_exprt", "[unit][util][ssa_expr]")
 {

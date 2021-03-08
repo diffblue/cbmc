@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // clang-format off
 #include "arith_tools.h"
+#include "bitvector_types.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"

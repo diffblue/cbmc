@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_GCC_TYPES_H
 #define CPROVER_ANSI_C_GCC_TYPES_H
 
-#include <util/std_types.h>
+#include <util/bitvector_types.h>
 
 // These are gcc-specific; most are not implemented by clang
 // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
