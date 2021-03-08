@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "std_types.h"
-#include "pointer_offset_size.h"
 #include "arith_tools.h"
+#include "c_types.h"
 #include "namespace.h"
+#include "pointer_offset_size.h"
 
 void endianness_mapt::output(std::ostream &out) const
 {

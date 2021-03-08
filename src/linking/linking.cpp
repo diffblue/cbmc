@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <util/base_type.h>
+#include <util/c_types.h>
 #include <util/find_symbols.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>

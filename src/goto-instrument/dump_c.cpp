@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c.h"
 
-#include <util/bitvector_types.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/find_symbols.h>

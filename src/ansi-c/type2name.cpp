@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "type2name.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>

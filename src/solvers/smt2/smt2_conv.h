@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/floatbv_expr.h>
 #include <util/std_expr.h>
 

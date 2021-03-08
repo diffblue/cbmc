@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "find_symbols.h"
 
+#include "c_types.h"
 #include "expr_iterator.h"
 #include "range.h"
 #include "std_expr.h"

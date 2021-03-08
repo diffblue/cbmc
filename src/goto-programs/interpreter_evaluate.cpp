@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
 #include <util/pointer_expr.h>

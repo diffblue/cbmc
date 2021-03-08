@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <cstring>
 
+#include <util/c_types.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>

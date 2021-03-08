@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 
+#include "c_types.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "invariant.h"
-#include "pointer_expr.h"
 #include "std_expr.h"
 #include "std_types.h"
 

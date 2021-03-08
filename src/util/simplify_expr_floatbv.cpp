@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
-#include "bitvector_types.h"
+#include "c_types.h"
 #include "expr.h"
 #include "expr_util.h"
 #include "floatbv_expr.h"

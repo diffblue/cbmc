@@ -12,6 +12,7 @@ Author: Peter Schrammel
 #include "json_expr.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr.h>
 #include <util/expr_util.h>
