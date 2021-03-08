@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_C_TYPES_H
 #define CPROVER_UTIL_C_TYPES_H
 
+#include "pointer_expr.h"
 #include "std_types.h"
 
 bitvector_typet index_type();

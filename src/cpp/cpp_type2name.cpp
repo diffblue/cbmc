@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <string>
 
 #include <util/cprover_prefix.h>
-#include <util/std_types.h>
+#include <util/pointer_expr.h>
 #include <util/type.h>
 
 static std::string do_prefix(const std::string &s)

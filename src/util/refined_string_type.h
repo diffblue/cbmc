@@ -20,7 +20,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_UTIL_REFINED_STRING_TYPE_H
 
 #include "cprover_prefix.h"
-#include "std_types.h"
+#include "pointer_expr.h"
 
 // Internal type used for string refinement
 class refined_string_typet: public struct_typet
