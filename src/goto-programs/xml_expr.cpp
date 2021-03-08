@@ -20,7 +20,7 @@ Author: Daniel Kroening
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
-#include <util/std_expr.h>
+#include <util/pointer_expr.h>
 #include <util/xml.h>
 
 xmlt xml(const typet &type, const namespacet &ns)

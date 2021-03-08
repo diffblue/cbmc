@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/pointer_expr.h>
+
 bool cpp_typecheckt::cpp_is_pod(const typet &type) const
 {
   if(type.id()==ID_struct)

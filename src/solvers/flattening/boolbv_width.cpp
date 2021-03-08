@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_types.h>
 
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)

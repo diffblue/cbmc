@@ -8,12 +8,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "expr2cpp.h"
 
-#include <util/std_types.h>
+#include <util/lispexpr.h>
+#include <util/lispirep.h>
+#include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-#include <util/lispirep.h>
-#include <util/lispexpr.h>
-#include <util/namespace.h>
 
 #include <ansi-c/c_misc.h>
 #include <ansi-c/c_qualifiers.h>

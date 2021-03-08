@@ -13,7 +13,7 @@ Author: Daniel Poetzl
 #endif
 
 #include "namespace.h"
-#include "std_types.h"
+#include "pointer_expr.h"
 #include "type.h"
 #include "validate.h"
 #include "validate_helpers.h"

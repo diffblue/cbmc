@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "format_type.h"
 #include "format_expr.h"
+#include "pointer_expr.h"
 #include "std_types.h"
 
 #include <ostream>

@@ -9,6 +9,8 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_pointer_object.h>
 
+#include <util/pointer_expr.h>
+
 abstract_pointer_objectt::abstract_pointer_objectt(const typet &t)
   : abstract_objectt(t)
 {

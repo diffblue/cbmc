@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "std_types.h"
 #include "symbol.h"
 #include "union_find.h"
