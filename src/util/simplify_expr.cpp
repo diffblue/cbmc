@@ -2048,7 +2048,7 @@ simplify_exprt::simplify_complex(const unary_exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_overflow_binary(const binary_exprt &expr)
+simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
 {
   // zero is a neutral element for all operations supported here
   if(
@@ -2111,7 +2111,7 @@ simplify_exprt::simplify_overflow_binary(const binary_exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_overflow_unary(const unary_exprt &expr)
+simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
 {
   // zero is a neutral element for all operations supported here
   if(expr.op().is_zero())
@@ -2405,11 +2405,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
     expr.id() == ID_overflow_plus || expr.id() == ID_overflow_minus ||
     expr.id() == ID_overflow_mult || expr.id() == ID_overflow_shl)
   {
-    r = simplify_overflow_binary(to_binary_expr(expr));
+    r = simplify_overflow_binary(to_binary_overflow_expr(expr));
   }
   else if(expr.id() == ID_overflow_unary_minus)
   {
-    r = simplify_overflow_unary(to_unary_expr(expr));
+    r = simplify_overflow_unary(to_unary_overflow_expr(expr));
   }
 
   if(!no_change_join_operands)

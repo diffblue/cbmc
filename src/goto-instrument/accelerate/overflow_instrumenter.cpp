@@ -13,10 +13,11 @@ Author: Matt Lewis
 
 #include <iostream>
 
-#include <util/std_expr.h>
-#include <util/std_code.h>
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -211,38 +212,25 @@ void overflow_instrumentert::overflow_expr(
           expr.id()==ID_mult)
   {
     // A generic arithmetic operation.
-    multi_ary_exprt overflow(
-      "overflow-" + expr.id_string(), expr.operands(), bool_typet());
-
-    if(expr.operands().size()>=3)
+    // The overflow checks are binary.
+    for(std::size_t i = 1; i < expr.operands().size(); i++)
     {
-      // The overflow checks are binary.
-      for(std::size_t i=1; i<expr.operands().size(); i++)
+      exprt tmp;
+
+      if(i == 1)
       {
-        exprt tmp;
-
-        if(i==1)
-        {
-          tmp = to_multi_ary_expr(expr).op0();
-        }
-        else
-        {
-          tmp=expr;
-          tmp.operands().resize(i);
-        }
-
-        overflow.operands().resize(2);
-        overflow.op0()=tmp;
-        overflow.op1()=expr.operands()[i];
-
-        fix_types(to_binary_expr(overflow));
-
-        cases.insert(overflow);
+        tmp = to_multi_ary_expr(expr).op0();
       }
-    }
-    else
-    {
-      fix_types(to_binary_expr(overflow));
+      else
+      {
+        tmp = expr;
+        tmp.operands().resize(i);
+      }
+
+      binary_overflow_exprt overflow{tmp, expr.id(), expr.operands()[i]};
+
+      fix_types(overflow);
+
       cases.insert(overflow);
     }
   }

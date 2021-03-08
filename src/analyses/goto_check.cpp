@@ -872,15 +872,11 @@ void goto_checkt::integer_overflow_check(
         tmp.operands().resize(i);
       }
 
-      overflow.operands().resize(2);
-      overflow.op0()=tmp;
-      overflow.op1()=expr.operands()[i];
-
       std::string kind=
         type.id()==ID_unsignedbv?"unsigned":"signed";
 
       add_guarded_property(
-        not_exprt(overflow),
+        not_exprt{binary_overflow_exprt{tmp, expr.id(), expr.operands()[i]}},
         "arithmetic overflow on " + kind + " " + expr.id_string(),
         "overflow",
         expr.find_source_location(),
@@ -888,13 +884,28 @@ void goto_checkt::integer_overflow_check(
         guard);
     }
   }
+  else if(expr.operands().size() == 2)
+  {
+    std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
+
+    const binary_exprt &bexpr = to_binary_expr(expr);
+    add_guarded_property(
+      not_exprt{binary_overflow_exprt{bexpr.lhs(), expr.id(), bexpr.rhs()}},
+      "arithmetic overflow on " + kind + " " + expr.id_string(),
+      "overflow",
+      expr.find_source_location(),
+      expr,
+      guard);
+  }
   else
   {
+    PRECONDITION(expr.id() == ID_unary_minus);
+
     std::string kind=
       type.id()==ID_unsignedbv?"unsigned":"signed";
 
     add_guarded_property(
-      not_exprt(overflow),
+      not_exprt{unary_overflow_exprt{expr.id(), to_unary_expr(expr).op()}},
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
       expr.find_source_location(),

@@ -2925,8 +2925,7 @@ exprt c_typecheck_baset::do_special_functions(
     identifier == CPROVER_PREFIX "overflow_minus" ||
     identifier == CPROVER_PREFIX "overflow_mult" ||
     identifier == CPROVER_PREFIX "overflow_plus" ||
-    identifier == CPROVER_PREFIX "overflow_shl" ||
-    identifier == CPROVER_PREFIX "overflow_unary_minus")
+    identifier == CPROVER_PREFIX "overflow_shl")
   {
     exprt overflow{identifier, typet{}, exprt::operandst{expr.arguments()}};
     overflow.add_source_location() = f_op.source_location();
@@ -2951,15 +2950,22 @@ exprt c_typecheck_baset::do_special_functions(
       overflow.id(ID_shl);
       typecheck_expr_shifts(to_shift_expr(overflow));
     }
-    else if(identifier == CPROVER_PREFIX "overflow_unary_minus")
-    {
-      overflow.id(ID_unary_minus);
-      typecheck_expr_unary_arithmetic(overflow);
-    }
 
-    overflow.id("overflow-" + overflow.id_string());
-    overflow.type() = bool_typet{};
-    return overflow;
+    binary_overflow_exprt of{
+      overflow.operands()[0], overflow.id(), overflow.operands()[1]};
+    of.add_source_location() = overflow.source_location();
+    return std::move(of);
+  }
+  else if(identifier == CPROVER_PREFIX "overflow_unary_minus")
+  {
+    exprt tmp{ID_unary_minus, typet{}, exprt::operandst{expr.arguments()}};
+    tmp.add_source_location() = f_op.source_location();
+
+    typecheck_expr_unary_arithmetic(tmp);
+
+    unary_overflow_exprt overflow{ID_unary_minus, tmp.operands().front()};
+    overflow.add_source_location() = tmp.source_location();
+    return std::move(overflow);
   }
   else if(identifier == CPROVER_PREFIX "enum_is_in_range")
   {
