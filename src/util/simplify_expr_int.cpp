@@ -1550,10 +1550,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
   if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() = simplify_inequality_rhs_is_constant(
-      to_binary_relation_expr(if_expr.true_case()));
-    if_expr.false_case() = simplify_inequality_rhs_is_constant(
-      to_binary_relation_expr(if_expr.false_case()));
+    if_expr.true_case() =
+      simplify_inequality(to_binary_relation_expr(if_expr.true_case()));
+    if_expr.false_case() =
+      simplify_inequality(to_binary_relation_expr(if_expr.false_case()));
     return changed(simplify_if(if_expr));
   }
 

@@ -516,3 +516,27 @@ TEST_CASE("Simplify bitor", "[core][util]")
     REQUIRE(simplify_expr(bitor_exprt{b, zero}, ns) == b);
   }
 }
+
+TEST_CASE("Simplify inequality", "[core][util]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  {
+    // This checks that 3 < (B ? 4 : 5) simplifies to true, just like (B ? 4 :
+    // 5) > 3 simplifies to true.
+    signedbv_typet sbv{4};
+    symbol_exprt b{"B", bool_typet{}};
+    if_exprt if_b{b, from_integer(4, sbv), from_integer(5, sbv)};
+
+    binary_relation_exprt comparison_gt{if_b, ID_gt, from_integer(3, sbv)};
+    exprt simp = simplify_expr(comparison_gt, ns);
+
+    REQUIRE(simp == true_exprt{});
+
+    binary_relation_exprt comparison_lt{from_integer(3, sbv), ID_lt, if_b};
+    simp = simplify_expr(comparison_lt, ns);
+
+    REQUIRE(simp == true_exprt{});
+  }
+}
