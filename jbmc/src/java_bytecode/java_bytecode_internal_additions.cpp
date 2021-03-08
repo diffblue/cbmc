@@ -12,9 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "remove_exceptions.h"
 
-#include <util/std_types.h>
-#include <util/cprover_prefix.h>
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/pointer_expr.h>
+#include <util/std_types.h>
 
 void java_internal_additions(symbol_table_baset &dest)
 {

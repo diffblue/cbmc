@@ -19,6 +19,7 @@ Author: Diffblue Ltd.
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>

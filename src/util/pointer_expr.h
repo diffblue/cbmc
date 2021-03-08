@@ -326,4 +326,14 @@ inline dereference_exprt &to_dereference_expr(exprt &expr)
   return ret;
 }
 
+/// \brief The null pointer constant
+class null_pointer_exprt : public constant_exprt
+{
+public:
+  explicit null_pointer_exprt(pointer_typet type)
+    : constant_exprt(ID_NULL, std::move(type))
+  {
+  }
+};
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H

@@ -10,7 +10,9 @@ Author: Diffblue Ltd.
 #include <java-testing-utils/load_java_class.h>
 #include <testing-utils/use_catch.h>
 
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
+
 #include <goto-programs/remove_virtual_functions.h>
 
 /// Try to resolve a classid comparison `expr`, assuming that any accessed

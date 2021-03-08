@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "cprover_prefix.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "std_expr.h"
 #include "symbol.h"
