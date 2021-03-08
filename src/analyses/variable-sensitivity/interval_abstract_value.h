@@ -38,6 +38,8 @@ public:
   index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const override;
 
+  value_range_implementation_ptrt value_range_implementation() const override;
+
   exprt to_constant() const override;
   const constant_interval_exprt &to_interval() const
   {

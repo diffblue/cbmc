@@ -87,7 +87,7 @@ SCENARIO(
     WHEN("merging 1 with TOP")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_constant(val1, true);
+      auto op2 = make_top_constant();
 
       auto merged = merge(op1, op2);
 
@@ -99,7 +99,7 @@ SCENARIO(
     WHEN("merging 1 with BOTTOM")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_constant(val1, false);
+      auto op2 = make_bottom_constant();
 
       auto merged = merge(op1, op2);
 
@@ -110,7 +110,7 @@ SCENARIO(
     }
     WHEN("merging TOP with 1")
     {
-      auto op1 = make_constant(val1, true);
+      auto op1 = make_top_constant();
       auto op2 = make_constant(val1, environment, ns);
 
       auto merged = merge(op1, op2);
@@ -122,8 +122,8 @@ SCENARIO(
     }
     WHEN("merging TOP with TOP")
     {
-      auto op1 = make_constant(val1, true);
-      auto op2 = make_constant(val1, true);
+      auto op1 = make_top_constant();
+      auto op2 = make_top_constant();
 
       auto merged = merge(op1, op2);
 
@@ -134,8 +134,8 @@ SCENARIO(
     }
     WHEN("merging TOP with BOTTOM")
     {
-      auto op1 = make_constant(val1, true);
-      auto op2 = make_constant(val1, false);
+      auto op1 = make_top_constant();
+      auto op2 = make_bottom_constant();
 
       auto merged = merge(op1, op2);
 
@@ -146,7 +146,7 @@ SCENARIO(
     }
     WHEN("merging BOTTOM with 1")
     {
-      auto op1 = make_constant(val1, false);
+      auto op1 = make_bottom_constant();
       auto op2 = make_constant(val1, environment, ns);
 
       auto merged = merge(op1, op2);
@@ -158,8 +158,8 @@ SCENARIO(
     }
     WHEN("merging BOTTOM with TOP")
     {
-      auto op1 = make_constant(val1, false);
-      auto op2 = make_constant(val1, true);
+      auto op1 = make_bottom_constant();
+      auto op2 = make_top_constant();
 
       auto merged = merge(op1, op2);
 
@@ -170,8 +170,8 @@ SCENARIO(
     }
     WHEN("merging BOTTOM with BOTTOM")
     {
-      auto op1 = make_constant(val1, false);
-      auto op2 = make_constant(val1, false);
+      auto op1 = make_bottom_constant();
+      auto op2 = make_bottom_constant();
 
       auto merged = merge(op1, op2);
 
@@ -225,7 +225,7 @@ SCENARIO(
     }
     WHEN("merging constant TOP with TOP")
     {
-      auto op1 = make_constant(val1, true);
+      auto op1 = make_top_constant();
       auto op2 = make_top_object();
 
       auto merged = merge(op1, op2);
@@ -237,7 +237,7 @@ SCENARIO(
     }
     WHEN("merging constant TOP with BOTTOM")
     {
-      auto op1 = make_constant(val1, true);
+      auto op1 = make_top_constant();
       auto op2 = make_bottom_object();
 
       auto merged = merge(op1, op2);
@@ -249,7 +249,7 @@ SCENARIO(
     }
     WHEN("merging constant BOTTOM with TOP")
     {
-      auto op1 = make_constant(val1, false);
+      auto op1 = make_bottom_constant();
       auto op2 = make_top_object();
 
       auto merged = merge(op1, op2);
@@ -261,7 +261,7 @@ SCENARIO(
     }
     WHEN("merging constant BOTTOM with BOTTOM")
     {
-      auto op1 = make_constant(val1, false);
+      auto op1 = make_bottom_constant();
       auto op2 = make_bottom_object();
 
       auto merged = merge(op1, op2);
@@ -307,7 +307,7 @@ SCENARIO(
     WHEN("merging TOP with constant TOP")
     {
       auto op1 = make_top_object();
-      auto op2 = make_constant(val1, true);
+      auto op2 = make_top_constant();
 
       bool modified;
       auto result = abstract_objectt::merge(op1, op2, modified);
@@ -321,7 +321,7 @@ SCENARIO(
     WHEN("merging TOP with constant BOTTOM")
     {
       auto op1 = make_top_object();
-      auto op2 = make_constant(val1, false);
+      auto op2 = make_bottom_constant();
 
       bool modified;
       auto result = abstract_objectt::merge(op1, op2, modified);
@@ -348,7 +348,7 @@ SCENARIO(
     WHEN("merging BOTTOM with constant TOP")
     {
       auto op1 = make_bottom_object();
-      auto op2 = make_constant(val1, true);
+      auto op2 = make_top_constant();
 
       bool modified;
       auto result = abstract_objectt::merge(op1, op2, modified);
@@ -361,7 +361,7 @@ SCENARIO(
     WHEN("merging BOTTOM with constant BOTTOM")
     {
       auto op1 = make_bottom_object();
-      auto op2 = make_constant(val1, false);
+      auto op2 = make_bottom_constant();
 
       bool modified;
       auto result = abstract_objectt::merge(op1, op2, modified);

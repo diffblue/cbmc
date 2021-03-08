@@ -10,13 +10,8 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <ansi-c/ansi_c_language.h>
 #include <testing-utils/use_catch.h>
+#include <util/mathematical_types.h>
 #include <util/string_utils.h>
-
-std::shared_ptr<value_set_abstract_objectt>
-make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
-{
-  return std::make_shared<value_set_abstract_objectt>(val, env, ns);
-}
 
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns)
@@ -24,10 +19,47 @@ make_constant(exprt val, abstract_environmentt &env, namespacet &ns)
   return std::make_shared<constant_abstract_valuet>(val, env, ns);
 }
 
-std::shared_ptr<const constant_abstract_valuet>
-make_constant(exprt val, bool top)
+std::shared_ptr<const constant_abstract_valuet> make_top_constant()
 {
-  return std::make_shared<constant_abstract_valuet>(val.type(), top, !top);
+  return std::make_shared<constant_abstract_valuet>(
+    integer_typet(), true, false);
+}
+
+std::shared_ptr<const constant_abstract_valuet> make_bottom_constant()
+{
+  return std::make_shared<constant_abstract_valuet>(
+    integer_typet(), false, true);
+}
+
+std::shared_ptr<const interval_abstract_valuet> make_interval(
+  const exprt &vall,
+  const exprt &valh,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  auto interval = constant_interval_exprt(vall, valh);
+  return make_interval(interval, env, ns);
+}
+
+std::shared_ptr<const interval_abstract_valuet> make_interval(
+  const constant_interval_exprt &val,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  return std::make_shared<interval_abstract_valuet>(val, env, ns);
+}
+
+std::shared_ptr<const interval_abstract_valuet> make_top_interval()
+{
+  return std::make_shared<interval_abstract_valuet>(
+    signedbv_typet(32), true, false);
+}
+
+std::shared_ptr<value_set_abstract_objectt>
+make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
+{
+  auto vals = std::vector<exprt>{val};
+  return make_value_set(vals, env, ns);
 }
 
 std::shared_ptr<value_set_abstract_objectt> make_value_set(
@@ -37,10 +69,21 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
 {
   auto initial_values = abstract_object_sett{};
   for(auto v : vals)
-    initial_values.insert(make_constant(v, env, ns));
-  auto vs = make_value_set(vals[0], env, ns);
+  {
+    if(v.id() == ID_constant_interval)
+      initial_values.insert(
+        std::make_shared<interval_abstract_valuet>(v, env, ns));
+    else
+      initial_values.insert(make_constant(v, env, ns));
+  }
+  auto vs = std::make_shared<value_set_abstract_objectt>(vals[0], env, ns);
   vs->set_values(initial_values);
   return vs;
+}
+
+std::shared_ptr<value_set_abstract_objectt> make_top_value_set()
+{
+  return std::make_shared<value_set_abstract_objectt>(integer_typet());
 }
 
 std::shared_ptr<const constant_abstract_valuet>
@@ -49,10 +92,23 @@ as_constant(const abstract_object_pointert &aop)
   return std::dynamic_pointer_cast<const constant_abstract_valuet>(aop);
 }
 
+std::shared_ptr<const interval_abstract_valuet>
+as_interval(const abstract_object_pointert &aop)
+{
+  return std::dynamic_pointer_cast<const interval_abstract_valuet>(aop);
+}
+
 std::shared_ptr<const value_set_abstract_objectt>
 as_value_set(const abstract_object_pointert &aop)
 {
   return std::dynamic_pointer_cast<const value_set_abstract_objectt>(aop);
+}
+
+bool set_contains(const std::vector<exprt> &set, const exprt &val)
+{
+  auto i = std::find_if(
+    set.begin(), set.end(), [&val](const exprt &lhs) { return lhs == val; });
+  return i != set.end();
 }
 
 bool set_contains(const abstract_object_sett &set, const exprt &val)
@@ -60,13 +116,22 @@ bool set_contains(const abstract_object_sett &set, const exprt &val)
   auto i = std::find_if(
     set.begin(), set.end(), [&val](const abstract_object_pointert &lhs) {
       auto l = lhs->to_constant();
+      auto interval =
+        std::dynamic_pointer_cast<const interval_abstract_valuet>(lhs);
+      if(interval)
+        l = interval->to_interval();
       return l == val;
     });
   return i != set.end();
 }
 
-std::string expr_to_str(const exprt &expr)
+static std::string interval_to_str(const constant_interval_exprt &expr);
+
+static std::string expr_to_str(const exprt &expr)
 {
+  if(expr.id() == ID_constant_interval)
+    return interval_to_str(to_constant_interval_expr(expr));
+
   auto st = symbol_tablet{};
   auto ns = namespacet{st};
   auto expr_str = std::string{};
@@ -75,6 +140,13 @@ std::string expr_to_str(const exprt &expr)
   lang->from_expr(expr, expr_str, ns);
 
   return expr_str;
+}
+
+static std::string interval_to_str(const constant_interval_exprt &expr)
+{
+  auto lower = expr_to_str(expr.get_lower());
+  auto upper = expr_to_str(expr.get_upper());
+  return "[" + lower + "," + upper + "]";
 }
 
 template <class Container, typename UnaryOp>
@@ -92,7 +164,9 @@ std::string container_to_str(const Container &con, UnaryOp unaryOp)
 std::string set_to_str(const abstract_object_sett &set)
 {
   return container_to_str(set, [](const abstract_object_pointert &lhs) {
-    return expr_to_str(lhs->to_constant());
+    auto i = std::dynamic_pointer_cast<const interval_abstract_valuet>(lhs);
+    return i ? interval_to_str(i->to_interval())
+             : expr_to_str(lhs->to_constant());
   });
 }
 
@@ -119,6 +193,21 @@ void EXPECT(
 }
 
 void EXPECT(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value)
+{
+  REQUIRE(result);
+
+  REQUIRE_FALSE(result->is_top());
+  REQUIRE_FALSE(result->is_bottom());
+
+  auto expected_interval = constant_interval_exprt(lower_value, upper_value);
+  auto result_expr = result->to_interval();
+  REQUIRE(result_expr == expected_interval);
+}
+
+void EXPECT(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values)
 {
@@ -128,14 +217,31 @@ void EXPECT(
   REQUIRE_FALSE(result->is_bottom());
 
   auto values = result->get_values();
-  REQUIRE(values.size() == expected_values.size());
-
   auto value_string = set_to_str(values);
   auto expected_string = exprs_to_str(expected_values);
 
+  INFO("Expect " + value_string + " to match " + expected_string);
+  REQUIRE(values.size() == expected_values.size());
+
   for(auto &ev : expected_values)
   {
-    INFO("Expect " + value_string + " to include " + expected_string);
+    INFO("Expect " + value_string + " to match " + expected_string);
+    REQUIRE(set_contains(values, ev));
+  }
+}
+
+void EXPECT(
+  const std::vector<exprt> &values,
+  const std::vector<exprt> &expected_values)
+{
+  auto value_string = exprs_to_str(values);
+  auto expected_string = exprs_to_str(expected_values);
+  INFO("Expect " + value_string + " to match " + expected_string);
+  REQUIRE(values.size() == expected_values.size());
+
+  for(auto &ev : expected_values)
+  {
+    INFO("Expect " + value_string + " to match " + expected_string);
     REQUIRE(set_contains(values, ev));
   }
 }
@@ -194,7 +300,7 @@ void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result)
   REQUIRE(result->is_bottom());
 }
 
-static std::shared_ptr<const abstract_objectt> add(
+std::shared_ptr<const abstract_objectt> add(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
@@ -222,6 +328,20 @@ std::shared_ptr<const constant_abstract_valuet> add_as_constant(
   INFO("Result should be a constant")
   REQUIRE(cv);
   return cv;
+}
+
+std::shared_ptr<const interval_abstract_valuet> add_as_interval(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto result = add(op1, op2, environment, ns);
+  auto i = as_interval(result);
+
+  INFO("Result should be an interval")
+  REQUIRE(i);
+  return i;
 }
 
 std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(

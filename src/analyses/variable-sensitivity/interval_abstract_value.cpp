@@ -427,6 +427,12 @@ interval_abstract_valuet::index_range_implementation(const namespacet &ns) const
   return make_interval_index_range(interval, ns);
 }
 
+value_range_implementation_ptrt
+interval_abstract_valuet::value_range_implementation() const
+{
+  return make_single_value_range(shared_from_this());
+}
+
 void interval_abstract_valuet::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

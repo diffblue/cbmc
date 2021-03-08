@@ -287,10 +287,8 @@ protected:
   virtual index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const = 0;
 
-  virtual value_range_implementation_ptrt value_range_implementation() const
-  {
-    return util_make_unique<empty_value_ranget>();
-  }
+  virtual value_range_implementation_ptrt
+  value_range_implementation() const = 0;
 };
 
 #endif
