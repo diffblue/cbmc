@@ -501,3 +501,18 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
     REQUIRE(simplified_expr == expr);
   }
 }
+
+TEST_CASE("Simplify bitor", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  SECTION("Simplification for raw bitvector")
+  {
+    bv_typet bv{4};
+    constant_exprt zero = from_integer(0, bv);
+    symbol_exprt b{"B", bv};
+
+    REQUIRE(simplify_expr(bitor_exprt{b, zero}, ns) == b);
+  }
+}
