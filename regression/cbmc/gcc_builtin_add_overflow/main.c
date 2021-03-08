@@ -110,6 +110,15 @@ void check_generic(void)
   assert(0 && "reachability");
 }
 
+void check_non_const()
+{
+  int a, b, c, d, r;
+  // this may overflow (negated assertion fails)
+  assert(!__builtin_add_overflow(a, b, &r));
+  // but need not overflow (assertion fails)
+  assert(__builtin_add_overflow(c, d, &c));
+}
+
 int main(void)
 {
   check_int();
@@ -119,4 +128,5 @@ int main(void)
   check_unsigned_long();
   check_unsigned_long_long();
   check_generic();
+  check_non_const();
 }

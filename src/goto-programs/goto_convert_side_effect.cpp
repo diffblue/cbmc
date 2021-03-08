@@ -601,46 +601,71 @@ void goto_convertt::remove_overflow(
   const exprt &rhs = expr.rhs();
   const exprt &result_ptr = expr.result();
 
-  // actual logic implementing the operators
+  // actual logic implementing the operators: perform operations on signed
+  // bitvector types of sufficiently large size to hold the result
   auto const make_operation = [&statement](exprt lhs, exprt rhs) -> exprt {
+    std::size_t lhs_ssize = to_bitvector_type(lhs.type()).get_width();
+    if(lhs.type().id() == ID_unsignedbv)
+      ++lhs_ssize;
+    std::size_t rhs_ssize = to_bitvector_type(rhs.type()).get_width();
+    if(rhs.type().id() == ID_unsignedbv)
+      ++rhs_ssize;
+
     if(statement == ID_overflow_plus)
     {
-      return plus_exprt{lhs, rhs};
+      std::size_t ssize = std::max(lhs_ssize, rhs_ssize) + 1;
+      integer_bitvector_typet ssize_type{ID_signedbv, ssize};
+      return plus_exprt{typecast_exprt{lhs, ssize_type},
+                        typecast_exprt{rhs, ssize_type}};
     }
     else if(statement == ID_overflow_minus)
     {
-      return minus_exprt{lhs, rhs};
+      std::size_t ssize = std::max(lhs_ssize, rhs_ssize) + 1;
+      integer_bitvector_typet ssize_type{ID_signedbv, ssize};
+      return minus_exprt{typecast_exprt{lhs, ssize_type},
+                         typecast_exprt{rhs, ssize_type}};
     }
     else
     {
       INVARIANT(
         statement == ID_overflow_mult,
         "the three overflow operations are add, sub and mul");
-      return mult_exprt{lhs, rhs};
+      std::size_t ssize = lhs_ssize + rhs_ssize;
+      integer_bitvector_typet ssize_type{ID_signedbv, ssize};
+      return mult_exprt{typecast_exprt{lhs, ssize_type},
+                        typecast_exprt{rhs, ssize_type}};
     }
   };
 
-  // we’re basically generating this expression
-  // (*result = (result_type)((integer)lhs OP (integer)rhs)),
-  //   ((integer)result == (integer)lhs OP (integer)rhs)
-  // i.e. perform the operation (+, -, *) on arbitrary length integer,
-  // cast to result type, check if the casted result is still equivalent
-  // to the arbitrary length result.
-  auto operation = make_operation(
-    typecast_exprt{lhs, integer_typet{}}, typecast_exprt{rhs, integer_typet{}});
+  // Generating the following sequence of statements:
+  // large_signedbv tmp = (large_signedbv)lhs OP (large_signedbv)rhs;
+  // *result = (result_type)tmp;
+  // (large_signedbv)*result != tmp;
+  // This performs the operation (+, -, *) on a signed bitvector type of
+  // sufficiently large width to store the precise result, cast to result
+  // type, check if the cast result is not equivalent to the full-length
+  // result.
+  auto operation = make_operation(lhs, rhs);
+  // Disable overflow checks as the operation cannot overflow on the larger
+  // type
+  operation.add_source_location() = expr.source_location();
+  operation.add_source_location().add_pragma("disable:signed-overflow-check");
 
-  typecast_exprt operation_result{operation, result_ptr.type().subtype()};
+  make_temp_symbol(operation, "large_bv", dest, mode);
 
-  code_assignt assign{dereference_exprt{result_ptr},
-                      std::move(operation_result),
-                      expr.source_location()};
-  convert_assign(assign, dest, mode);
+  const auto &result_type = to_pointer_type(result_ptr.type()).subtype();
+  code_assignt result_assignment{dereference_exprt{result_ptr},
+                                 typecast_exprt{operation, result_type},
+                                 expr.source_location()};
+  convert_assign(result_assignment, dest, mode);
 
   if(result_is_used)
   {
     notequal_exprt overflow_check{
-      typecast_exprt{dereference_exprt{result_ptr}, integer_typet{}},
+      typecast_exprt{dereference_exprt{result_ptr}, operation.type()},
       operation};
+    overflow_check.add_source_location() = expr.source_location();
+
     expr.swap(overflow_check);
   }
   else
