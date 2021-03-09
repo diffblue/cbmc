@@ -10,7 +10,7 @@ else
 endif
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only
+	excluded_tests = -X gcc-only -X winbug
 else
 	# In MacOS, a change in the assert.h header file
 	# is causing template errors when exercising the
