@@ -30,6 +30,7 @@ class abs_exprt;
 class address_of_exprt;
 class array_exprt;
 class binary_exprt;
+class binary_overflow_exprt;
 class binary_relation_exprt;
 class bitnot_exprt;
 class bswap_exprt;
@@ -62,6 +63,7 @@ class sign_exprt;
 class typecast_exprt;
 class unary_exprt;
 class unary_minus_exprt;
+class unary_overflow_exprt;
 class unary_plus_exprt;
 class update_exprt;
 class with_exprt;
@@ -188,12 +190,12 @@ public:
   /// Try to simplify overflow-+, overflow-*, overflow--, overflow-shl.
   /// Simplification will be possible when the operands are constants or the
   /// types of the operands have infinite domains.
-  NODISCARD resultt<> simplify_overflow_binary(const binary_exprt &);
+  NODISCARD resultt<> simplify_overflow_binary(const binary_overflow_exprt &);
 
   /// Try to simplify overflow-unary-.
   /// Simplification will be possible when the operand is constants or the
   /// type of the operand has an infinite domain.
-  NODISCARD resultt<> simplify_overflow_unary(const unary_exprt &);
+  NODISCARD resultt<> simplify_overflow_unary(const unary_overflow_exprt &);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.

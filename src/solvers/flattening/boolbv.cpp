@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/floatbv_expr.h>
 #include <util/magic.h>
 #include <util/mp_arith.h>
-#include <util/prefix.h>
 #include <util/replace_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -413,8 +412,13 @@ literalt boolbvt::convert_rest(const exprt &expr)
     return convert_reduction(to_unary_expr(expr));
   else if(expr.id()==ID_onehot || expr.id()==ID_onehot0)
     return convert_onehot(to_unary_expr(expr));
-  else if(has_prefix(expr.id_string(), "overflow-"))
+  else if(
+    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_mult ||
+    expr.id() == ID_overflow_minus || expr.id() == ID_overflow_shl ||
+    expr.id() == ID_overflow_unary_minus)
+  {
     return convert_overflow(expr);
+  }
   else if(expr.id()==ID_isnan)
   {
     const auto &op = to_unary_expr(expr).op();

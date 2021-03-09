@@ -677,4 +677,145 @@ inline popcount_exprt &to_popcount_expr(exprt &expr)
   return ret;
 }
 
+/// \brief A Boolean expression returning true, iff operation \c kind would
+/// result in an overflow when applied to operands \c lhs and \c rhs.
+class binary_overflow_exprt : public binary_predicate_exprt
+{
+public:
+  binary_overflow_exprt(exprt _lhs, const irep_idt &kind, exprt _rhs)
+    : binary_predicate_exprt(
+        std::move(_lhs),
+        "overflow-" + id2string(kind),
+        std::move(_rhs))
+  {
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_exprt::check(expr, vm);
+
+    if(expr.id() != ID_overflow_shl)
+    {
+      const binary_exprt &binary_expr = to_binary_expr(expr);
+      DATA_CHECK(
+        vm,
+        binary_expr.lhs().type() == binary_expr.rhs().type(),
+        "operand types must match");
+    }
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+};
+
+template <>
+inline bool can_cast_expr<binary_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_plus || base.id() == ID_overflow_mult ||
+         base.id() == ID_overflow_minus || base.id() == ID_overflow_shl;
+}
+
+inline void validate_expr(const binary_overflow_exprt &value)
+{
+  validate_operands(
+    value, 2, "binary overflow expression must have two operands");
+}
+
+/// \brief Cast an exprt to a \ref binary_overflow_exprt
+///
+/// \a expr must be known to be \ref binary_overflow_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref binary_overflow_exprt
+inline const binary_overflow_exprt &to_binary_overflow_expr(const exprt &expr)
+{
+  PRECONDITION(
+    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_mult ||
+    expr.id() == ID_overflow_minus || expr.id() == ID_overflow_shl);
+  const binary_overflow_exprt &ret =
+    static_cast<const binary_overflow_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_binary_overflow_expr(const exprt &)
+inline binary_overflow_exprt &to_binary_overflow_expr(exprt &expr)
+{
+  PRECONDITION(
+    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_mult ||
+    expr.id() == ID_overflow_minus || expr.id() == ID_overflow_shl);
+  binary_overflow_exprt &ret = static_cast<binary_overflow_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief A Boolean expression returning true, iff operation \c kind would
+/// result in an overflow when applied to the (single) operand.
+class unary_overflow_exprt : public unary_predicate_exprt
+{
+public:
+  unary_overflow_exprt(const irep_idt &kind, exprt _op)
+    : unary_predicate_exprt("overflow-" + id2string(kind), std::move(_op))
+  {
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    unary_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+};
+
+template <>
+inline bool can_cast_expr<unary_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_unary_minus;
+}
+
+inline void validate_expr(const unary_overflow_exprt &value)
+{
+  validate_operands(
+    value, 1, "unary overflow expression must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref unary_overflow_exprt
+///
+/// \a expr must be known to be \ref unary_overflow_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref unary_overflow_exprt
+inline const unary_overflow_exprt &to_unary_overflow_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_overflow_unary_minus);
+  const unary_overflow_exprt &ret =
+    static_cast<const unary_overflow_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_unary_overflow_expr(const exprt &)
+inline unary_overflow_exprt &to_unary_overflow_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_overflow_unary_minus);
+  unary_overflow_exprt &ret = static_cast<unary_overflow_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_BITVECTOR_EXPR_H
