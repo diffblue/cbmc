@@ -10,6 +10,7 @@
 
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <langapi/language_util.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -70,6 +71,35 @@ constant_pointer_abstract_objectt::merge(abstract_object_pointert other) const
     // TODO(tkiley): How do we set the result to be toppish?
     return abstract_pointer_objectt::merge(other);
   }
+}
+
+bool constant_pointer_abstract_objectt::same_target(
+  abstract_object_pointert other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
+
+  if(value_stack.is_top_value() || cast_other->value_stack.is_top_value())
+    return false;
+
+  bool matching_pointer = value_stack.target_expression() ==
+                          cast_other->value_stack.target_expression();
+
+  return matching_pointer;
+}
+
+exprt constant_pointer_abstract_objectt::offset_from(
+  abstract_object_pointert other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
+
+  if(value_stack.is_top_value() || cast_other->value_stack.is_top_value())
+    return nil_exprt();
+
+  return minus_exprt(
+    value_stack.offset_expression(),
+    cast_other->value_stack.offset_expression());
 }
 
 abstract_object_pointert

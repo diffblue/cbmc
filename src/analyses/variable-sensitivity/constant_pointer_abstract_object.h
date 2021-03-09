@@ -123,6 +123,9 @@ protected:
   /// \return Returns the result of the merge.
   abstract_object_pointert merge(abstract_object_pointert op1) const override;
 
+  bool same_target(abstract_object_pointert other) const override;
+  exprt offset_from(abstract_object_pointert other) const override;
+
   CLONE
 
 private:

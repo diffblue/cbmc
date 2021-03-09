@@ -44,6 +44,15 @@ abstract_object_pointert abstract_pointer_objectt::expression_transform(
   if(expr.id() == ID_dereference)
     return read_dereference(environment, ns);
 
+  if(expr.id() == ID_ptr_diff)
+  {
+    auto &rhs = operands[1];
+    if(same_target(rhs))
+    {
+      return environment.eval(offset_from(rhs), ns);
+    }
+  }
+
   return abstract_objectt::expression_transform(
     expr, operands, environment, ns);
 }

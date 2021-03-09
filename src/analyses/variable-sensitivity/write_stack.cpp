@@ -14,10 +14,10 @@
 
 #include <unordered_set>
 
+#include <langapi/language_util.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
-#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 /// Build a topstack
@@ -191,7 +191,7 @@ exprt write_stackt::to_expression() const
       }
       new_expr.operands()[0] = access_expr;
 
-      // If neccesary, complete the type of the new access expression
+      // If necessary, complete the type of the new access expression
       entry->adjust_access_type(new_expr);
 
       access_expr = new_expr;
@@ -199,6 +199,18 @@ exprt write_stackt::to_expression() const
   }
   address_of_exprt top_expr(access_expr);
   return std::move(top_expr);
+}
+
+exprt write_stackt::target_expression() const
+{
+  PRECONDITION(!is_top_value());
+  return stack[0]->get_access_expr();
+}
+
+exprt write_stackt::offset_expression() const
+{
+  PRECONDITION(!is_top_value());
+  return stack[1]->get_access_expr().operands()[1];
 }
 
 /// Is the stack representing an unknown value and hence can't be written to

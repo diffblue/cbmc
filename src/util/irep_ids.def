@@ -841,6 +841,7 @@ IREP_ID_ONE(statement_list_instructions)
 IREP_ID_ONE(max)
 IREP_ID_ONE(min)
 IREP_ID_ONE(constant_interval)
+IREP_ID_ONE(ptr_diff)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

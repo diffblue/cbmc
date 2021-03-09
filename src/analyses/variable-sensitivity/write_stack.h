@@ -29,6 +29,8 @@ public:
     const namespacet &ns);
 
   exprt to_expression() const;
+  exprt target_expression() const;
+  exprt offset_expression() const;
   bool is_top_value() const;
 
 private:

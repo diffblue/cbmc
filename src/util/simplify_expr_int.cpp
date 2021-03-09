@@ -453,6 +453,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
       return changed(simplify_plus(result));
     }
 
+    // (T*)p+a - don't simplify any further
+    if(
+      vsd_pointers && expr.type().id() == ID_pointer &&
+      expr.operands().size() == 2 && is_number(expr.op1().type()))
+    {
+      return unchanged(expr);
+    }
+
     // count the constants
     size_t count=0;
     forall_operands(it, expr)
@@ -588,9 +596,11 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     operands[1].type().id() == ID_pointer)
   {
     // pointer arithmetic: rewrite "p-p" to "0"
-
     if(operands[0]==operands[1])
       return from_integer(0, minus_expr.type());
+
+    if(vsd_pointers)
+      return to_ptr_diff_expr(minus_expr);
   }
 
   return unchanged(expr);

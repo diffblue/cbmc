@@ -28,6 +28,8 @@
 #include <util/sharing_map.h>
 #include <util/std_expr.h>
 
+exprt simplify_vsd_expr(exprt src, const namespacet &ns);
+
 class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =
   std::shared_ptr<variable_sensitivity_object_factoryt>;

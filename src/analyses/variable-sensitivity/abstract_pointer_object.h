@@ -62,7 +62,16 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
-  /// Evaluate reading the pointer's value. More precise
+  virtual bool same_target(abstract_object_pointert other) const
+  {
+    return false;
+  }
+  virtual exprt offset_from(abstract_object_pointert other) const
+  {
+    return nil_exprt();
+  }
+
+  /// A helper function to read elements from an array. More precise
   /// abstractions may override this to provide more precise results.
   ///
   /// \param env: the environment
