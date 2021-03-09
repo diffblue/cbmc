@@ -36,20 +36,20 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
   output(ns, "scratch", std::cout);
 #endif
 
-  symex_state = util_make_unique<goto_symex_statet>(
-    symex_targett::sourcet(goto_functionst::entry_point(), *this),
-    DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
-    guard_manager,
-    [this](const irep_idt &id) {
-      return path_storage.get_unique_l2_index(id);
-    });
-
-  symex.symex_with_state(
-    *symex_state,
-    [this](const irep_idt &key) -> const goto_functionst::goto_functiont & {
+  goto_functiont this_goto_function;
+  this_goto_function.body.copy_from(*this);
+  auto get_goto_function =
+    [this, &this_goto_function](
+      const irep_idt &key) -> const goto_functionst::goto_functiont & {
+    if(key == goto_functionst::entry_point())
+      return this_goto_function;
+    else
       return functions.function_map.at(key);
-    },
-    symex_symbol_table);
+  };
+
+  symex_state = symex.initialize_entry_point_state(get_goto_function);
+
+  symex.symex_with_state(*symex_state, get_goto_function, symex_symbol_table);
 
   if(do_slice)
   {

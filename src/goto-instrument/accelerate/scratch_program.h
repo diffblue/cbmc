@@ -33,6 +33,33 @@ Author: Matt Lewis
 
 #include "path.h"
 
+// Wrapper around goto_symext to make initialize_entry_point_state available.
+struct scratch_program_symext : public goto_symext
+{
+  scratch_program_symext(
+    message_handlert &mh,
+    const symbol_tablet &outer_symbol_table,
+    symex_target_equationt &_target,
+    const optionst &options,
+    path_storaget &path_storage,
+    guard_managert &guard_manager)
+    : goto_symext(
+        mh,
+        outer_symbol_table,
+        _target,
+        options,
+        path_storage,
+        guard_manager)
+  {
+  }
+
+  std::unique_ptr<statet>
+  initialize_entry_point_state(const get_goto_functiont &get_goto_function)
+  {
+    return goto_symext::initialize_entry_point_state(get_goto_function);
+  }
+};
+
 class scratch_programt:public goto_programt
 {
 public:
@@ -85,7 +112,7 @@ protected:
   symex_target_equationt equation;
   path_fifot path_storage;
   optionst options;
-  goto_symext symex;
+  scratch_program_symext symex;
 
   std::unique_ptr<propt> satcheck;
   bv_pointerst satchecker;

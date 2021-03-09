@@ -27,6 +27,7 @@ DIRS = cbmc \
        statement-list \
        systemc \
        contracts \
+       acceleration \
        goto-harness \
        goto-harness-multi-file-project \
        goto-cc-file-local \

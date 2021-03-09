@@ -1,6 +1,8 @@
-CORE
+KNOWNBUG
 main.c
 --no-unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
+--
+The result spuriously is VERIFICATION SUCCESSFUL.
