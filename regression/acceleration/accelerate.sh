@@ -2,20 +2,30 @@
 
 cleanup()
 {
-  rm -f $ofile $accfile $instrfile
+  rm -rf "$target_dir"
 }
 
 trap cleanup EXIT
 
-bindir=`dirname $0`
-goto_cc="$bindir/../../goto-cc/goto-cc"
-goto_instrument="$bindir/../goto-instrument"
-cbmc="$bindir/../../cbmc/cbmc"
+set -e
+
+goto_cc=$1
+goto_instrument=$2
+cbmc=$3
+is_windows=$4
+shift 4
+
 cfile=""
 cbmcargs=""
-ofile=`mktemp`
-instrfile=`mktemp`
-accfile=`mktemp`
+
+# create the temporary directory relative to the current directory, thus
+# avoiding file names that start with a "/", which confuses goto-cl (Windows)
+# when running in git-bash.
+target_dir="$(TMPDIR=. mktemp -d)"
+
+ofile="$target_dir/compiled.gb"
+instrfile="$target_dir/instrumented.gb"
+accfile="$target_dir/accelerated.gb"
 
 for a in "$@"
 do
@@ -29,7 +39,12 @@ case $a in
 esac
 done
 
-$goto_cc $cfile -o $ofile || exit 1
-$goto_instrument --inline --remove-pointers $ofile $instrfile || exit 1
-timeout 5 $goto_instrument --accelerate $instrfile $accfile
-timeout 5 $cbmc --unwind 5 --z3 $cbmcargs $accfile
+if [[ "${is_windows}" == "true" ]]; then
+  $goto_cc "$cfile" "/Fe$ofile"
+else
+  $goto_cc -o "$ofile" "$cfile"
+fi
+
+"$goto_instrument" --inline --remove-pointers "$ofile" "$instrfile"
+"$goto_instrument" --accelerate "$instrfile" "$accfile"
+"$cbmc" --unwind 5 $cbmcargs "$accfile"
