@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-contract f1 --replace-call-with-contract f2_out
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This confirms the accuracy of the preconditions of f2_out (called from f1) and of the postconditions of f1.
+
+Recursion:
+The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).

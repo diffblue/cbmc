@@ -1,0 +1,18 @@
+KNOWNBUG
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This confirms the accuracy of the postconditions of f1, f2_out and f2_in.
+
+Test should fail:
+The postcondition of f2 is incorrect, considering the recursion particularity. 
+
+Recursion:
+The base case for the recursive call to f2 provides different behavior than the general case (given the pre-conditions).
+
+Known bug:
+This test requires the "--unwind 20 --unwinding-assertions" flag for the cbmc call in "chain.sh", which is currently not handled.
