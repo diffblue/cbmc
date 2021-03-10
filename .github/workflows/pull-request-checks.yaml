@@ -189,8 +189,8 @@ jobs:
       - name: Build using Make
         run: |
           make -C src minisat2-download
-          make -C src -j2 CXX="ccache clang++"
-          make -C jbmc/src -j2 CXX="ccache clang++"
+          make -C src -j3 CXX="ccache clang++"
+          make -C jbmc/src -j3 CXX="ccache clang++"
           make -C unit "CXX=ccache clang++"
           make -C jbmc/unit "CXX=ccache clang++"
       - name: Print ccache stats
@@ -200,9 +200,9 @@ jobs:
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
       - name: Run regression tests
-        run: make -C regression test-parallel JOBS=2
+        run: make -C regression test-parallel JOBS=3
       - name: Run JBMC regression tests
-        run: make -C jbmc/regression test-parallel JOBS=2
+        run: make -C jbmc/regression test-parallel JOBS=3
 
   check-macos-10_15-cmake-clang:
     runs-on: macos-10.15
@@ -232,11 +232,11 @@ jobs:
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -Dsat_impl=glucose
       - name: Build with Ninja
-        run: cd build; ninja -j2
+        run: cd build; ninja -j3
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest
-        run: cd build; ctest -V -L CORE . -j2
+        run: cd build; ctest -V -L CORE . -j3
 
   check-vs-2019-build-and-test:
     runs-on: windows-2019
