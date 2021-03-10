@@ -86,9 +86,9 @@ public:
   /// Compute the abstract transformer for a single instruction
   ///
   /// \param function_from: the name of the function containing from
-  /// \param from: the instruction before the abstract domain
+  /// \param trace_from: the instruction before the abstract domain
   /// \param function_to: the name of the function containing to
-  /// \param to: the instruction after the abstract domain
+  /// \param trace_to: the instruction after the abstract domain
   /// \param ai: the abstract interpreter
   /// \param ns: the namespace
   void transform(

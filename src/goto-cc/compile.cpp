@@ -644,7 +644,6 @@ optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
 }
 
 /// constructor
-/// \return nothing
 compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
   : log(mh),
     cmdline(_cmdline),
@@ -671,7 +670,6 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
 }
 
 /// cleans up temporary files
-/// \return nothing
 compilet::~compilet()
 {
   // clean up temp dirs

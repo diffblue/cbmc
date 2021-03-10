@@ -209,6 +209,7 @@ java_class_loadert::get_parse_tree(
 
 /// Load all class files from a .jar file
 /// \param jar_path: the path for the .jar to load
+/// \param message_handler: message handler
 std::vector<irep_idt> java_class_loadert::load_entire_jar(
   const std::string &jar_path,
   message_handlert &message_handler)

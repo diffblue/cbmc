@@ -142,6 +142,7 @@ At some point in that function, there will be a long sequence of `if` statements
 <div class=memdoc>
 **Task:** Add a `--greet` switch to `goto-instrument`, taking an optional
 argument, with the following behaviour:
+</div>
 
     $ goto-instrument --greet main.gb
     hello, world!
@@ -153,7 +154,6 @@ You will also need to add the `greet` option to the
 Notice that in the `.h` file, options that take an argument are followed
 by a colon (like `(property):`), while simple switches have no colon.
 Make sure that you `return 0;` after printing the message.
-</div>
 
 The idea behind `goto-instrument` is that it parses a goto-program and
 then performs one single analysis on that goto-program, and then
@@ -194,6 +194,7 @@ type \ref codet.
 switch should use the `codet::pretty()` function to pretty-print every
 \ref codet in the entire program.  The strings that `pretty()` generates
 for a codet look like this:
+</div>
 
     index
       * type: unsignedbv
@@ -212,7 +213,6 @@ for a codet look like this:
                   * width: 8
                   * #c_type: char
     ...
-</div>
 
 The sub-nodes of a particular node in the pretty representation are
 numbered, starting from 0.  They can be accessed through the `op0()`,
@@ -235,7 +235,7 @@ function `to_symbol_expr`.
 
 <div class=memdoc>
 **Task:** Add flags to `goto-instrument` to print out the following information:
+</div>
 * the name of every function that is *called* in the program;
 * the value of every constant in the program;
 * the value of every symbol in the program.
-</div>

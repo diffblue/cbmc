@@ -699,8 +699,7 @@ If [lazy_methods_mode](\ref java_bytecode_language_optionst::lazy_methods_mode) 
 \ref lazy_methods_modet::LAZY_METHODS_MODE_CONTEXT_INSENSITIVE then
 context-insensitive lazy loading is used. Under this stragegy
 \ref java_bytecode_languaget::do_ci_lazy_method_conversion is called to do all
-conversion. This calls
-\ref ci_lazy_methodst::operator()(symbol_tablet &, method_bytecodet &, const method_convertert &),
+conversion. This calls `operator()` of \ref ci_lazy_methodst,
 which creates a work list of methods to check, starting with the entry point,
 and classes, starting with the types of any class-typed parameters to the entry
 point. For each method in the work list it calls

@@ -18,10 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // #define VERBOSE
 
-/// Tseitin encoding of conjunction of two literals
+/// Tseitin encoding of conjunction of two literals. Side effect: add clauses
+/// that encodes relation between inputs/output via lcnf.
 /// \par parameters: Two input signals to the AND gate, one output
-/// \return Side effect: add clauses that encodes relation between inputs/output
-///   via lcnf
 void cnft::gate_and(literalt a, literalt b, literalt o)
 {
   // a*b=c <==> (a + o')( b + o')(a'+b'+o)

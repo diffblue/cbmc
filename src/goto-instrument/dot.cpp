@@ -67,7 +67,6 @@ protected:
 /// \param out: output stream
 /// \param function_id: name of \p goto_program
 /// \param goto_program: goto program the dot graph of which is written
-/// \return true on error, false otherwise
 void dott::write_dot_subgraph(
   std::ostream &out,
   const irep_idt &function_id,
@@ -278,8 +277,8 @@ void dott::output(std::ostream &out)
   out << "}\n";
 }
 
-/// escapes a string. beware, this might not work for all kinds of strings.
-/// \par parameters: a string
+/// Escapes a string. beware, this might not work for all kinds of strings.
+/// \param str: a string
 /// \return the escaped string
 std::string &dott::escape(std::string &str)
 {
@@ -309,7 +308,6 @@ std::string &dott::escape(std::string &str)
 /// finds an instructions successors (for goto graphs)
 /// \par parameters: instructions, instruction iterator, true results and
 /// false results
-/// \return none
 void dott::find_next(
   const goto_programt::instructionst &instructions,
   const goto_programt::const_targett &it,
@@ -333,7 +331,6 @@ void dott::find_next(
 /// writes an edge from the from node to the to node and with the given label to
 /// the output stream (dot format)
 /// \par parameters: output stream, from, to and a label
-/// \return none
 void dott::write_edge(
   std::ostream &out,
   const goto_programt::instructiont &from,

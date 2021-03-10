@@ -34,7 +34,8 @@ codet &codet::first_statement()
   return *this;
 }
 
-/// \copydoc first_statement()
+/// In the case of a `codet` type that represents multiple statements, return
+/// the first of them. Otherwise return the `codet` itself.
 const codet &codet::first_statement() const
 {
   const irep_idt &statement=get_statement();
@@ -67,7 +68,8 @@ codet &codet::last_statement()
   return *this;
 }
 
-/// \copydoc last_statement()
+/// In the case of a `codet` type that represents multiple statements, return
+/// the last of them. Otherwise return the `codet` itself.
 const codet &codet::last_statement() const
 {
   const irep_idt &statement=get_statement();

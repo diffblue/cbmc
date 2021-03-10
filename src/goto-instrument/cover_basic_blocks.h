@@ -119,7 +119,7 @@ private:
   /// map block numbers to block information
   std::vector<block_infot> block_infos;
 
-  /// Adds the lines which \param instruction spans to \param block.
+  /// Adds the lines which \p instruction spans to \p block.
   static void add_block_lines(
     cover_basic_blockst::block_infot &block,
     const goto_programt::instructiont &instruction);

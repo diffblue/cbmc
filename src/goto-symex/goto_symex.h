@@ -755,11 +755,11 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   /// \param code: The cleaned up CPP `delete` instruction
   virtual void symex_cpp_delete(statet &state, const codet &code);
-  /// Symbolically execute an assignment instruction that has a CPP `new` or
-  /// `new array` or a Java `new array` on the right hand side
-  /// \param state: Symbolic execution state for current instruction
-  /// \param lhs: The expression to assign to
-  /// \param code: The `new` expression
+  /// Handles side effects of type 'new' for C++ and 'new array'
+  /// for C++ and Java language modes
+  /// \param state: Symex state
+  /// \param lhs: left-hand side of assignment
+  /// \param code: right-hand side containing side effect
   virtual void
   symex_cpp_new(statet &state, const exprt &lhs, const side_effect_exprt &code);
   /// Symbolically execute a FUNCTION_CALL instruction for a function whose

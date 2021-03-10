@@ -3190,9 +3190,8 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 }
 
 /// Converting a constant or symbolic rounding mode to SMT-LIB. Only called when
-/// use_FPA_theory is enabled
+/// use_FPA_theory is enabled. SMT-LIB output to is sent to `out`.
 /// \par parameters: The expression representing the rounding mode.
-/// \return SMT-LIB output to out.
 void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
 {
   PRECONDITION(use_FPA_theory);

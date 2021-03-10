@@ -165,21 +165,6 @@ std::string linear_functiont::format()
   return stream.str();
 }
 
-/// Instantiates a string constraint by substituting the quantifiers.
-/// For a string constraint of the form `forall q. P(x)`,
-/// substitute `q` the universally quantified variable of `axiom`, by
-/// an `index`, in `axiom`, so that the index used for `str` equals `val`.
-/// For instance, if `axiom` is `forall q. s[q+x] = 'a' && t[q] = 'b'`,
-/// `instantiate(axiom,s,v)` would return the expression
-/// `s[v] = 'a' && t[v-x] = 'b'`.
-/// If there are several such indexes, the conjunction of the instantiations is
-/// returned, for instance for a formula:
-/// `forall q. s[q+x]='a' && s[q]=c` we would get
-/// `s[v] = 'a' && s[v-x] = c && s[v+x] = 'a' && s[v] = c`.
-/// \param axiom: a universally quantified formula
-/// \param str: an array of characters
-/// \param val: an index expression
-/// \return instantiated formula
 exprt instantiate(
   const string_constraintt &axiom,
   const exprt &str,

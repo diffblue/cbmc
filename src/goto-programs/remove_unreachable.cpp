@@ -58,9 +58,8 @@ void remove_unreachable(goto_programt &goto_program)
 }
 
 /// Removes unreachable instructions from all functions.
-/// \par parameters: The goto functions from which the unreachable functions are
-/// to be removed.
-/// \return None.
+/// \param [out] goto_functions: The goto functions from which the unreachable
+///   functions are to be removed.
 void remove_unreachable(goto_functionst &goto_functions)
 {
   for(auto &gf_entry : goto_functions.function_map)

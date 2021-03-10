@@ -1617,10 +1617,6 @@ exprt object_factory(
 ///   and MUST_ cases.
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 /// \param log: used to report object construction warnings and failures
-/// \return `init_code` gets an instruction sequence to initialize or
-///   reinitialize `expr` and child objects it refers to. `symbol_table` is
-///   modified with any new symbols created. This includes any necessary
-///   temporaries, and if `create_dyn_objs` is false, any allocated objects.
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,

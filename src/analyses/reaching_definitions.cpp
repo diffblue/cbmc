@@ -673,7 +673,6 @@ bool rd_range_domaint::merge_inner(
   return more;
 }
 
-/// \return returns true iff there is something new
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
   locationt,
