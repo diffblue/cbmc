@@ -10,4 +10,4 @@ This confirms the accuracy of the postconditions of both f1 and f2.
 
 Known bug:
 Enforce flag not handled correctly for function calls within functions.
-This bug is fixed in PR #5583.
+This bug is fixed in PR #5538.
