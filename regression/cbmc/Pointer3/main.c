@@ -5,10 +5,10 @@ int main()
   int x, y;
 
   unsigned i;
-  __CPROVER_assume(i<10);
+  __CPROVER_assume(i < 10);
 
-  a[i]=&x;
-  a[5]=&y;
+  a[i] = &x;
+  a[5] = &y;
 
-  assert(*(a[i])==x);
+  assert(*(a[i]) == x);
 }

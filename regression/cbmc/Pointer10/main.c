@@ -12,13 +12,13 @@ main()
   struct S s;
   int *p;
 
-  p=&(s.array[4]);
-  *p=5;
+  p = &(s.array[4]);
+  *p = 5;
 
-  assert(s.array[4]==5);
+  assert(s.array[4] == 5);
 
-  p=&s.z;
-  *p=6;
+  p = &s.z;
+  *p = 6;
 
-  assert(s.z==6);
+  assert(s.z == 6);
 }

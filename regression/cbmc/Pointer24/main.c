@@ -4,7 +4,7 @@ int main()
 {
   char *p, *q;
 
-  q=p;
+  q = p;
 
   __CPROVER_assume(!__CPROVER_same_object(p, 0));
 

@@ -1,8 +1,10 @@
-struct tag1 {
+struct tag1
+{
   int f;
 };
 
-int main() {
+int main()
+{
   struct tag1 x;
   struct tag1 *px;
 

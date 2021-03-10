@@ -7,7 +7,8 @@ void dummy()
 
 int x = 5;
 
-int f() {
+int f()
+{
   int x = 3;
   {
     extern int x;
@@ -20,7 +21,7 @@ int main()
 {
   int ret;
 
-  ret=f();
+  ret = f();
 
-  assert(ret==5);
+  assert(ret == 5);
 }

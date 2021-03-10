@@ -1,6 +1,7 @@
 typedef unsigned B[8];
 
-void fun(B b) {
+void fun(B b)
+{
 }
 
 int main(void)

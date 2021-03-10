@@ -21,13 +21,13 @@ int main(void)
 
   if(b)
   {
-    struct S1 *p=my_malloc(sizeof(struct S1));
-    p->x=1;
+    struct S1 *p = my_malloc(sizeof(struct S1));
+    p->x = 1;
   }
   else
   {
-    struct S2 *p=my_malloc(sizeof(struct S2));
-    p->y=1;
+    struct S2 *p = my_malloc(sizeof(struct S2));
+    p->y = 1;
   }
 
   return 0;

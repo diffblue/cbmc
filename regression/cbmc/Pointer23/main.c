@@ -1,6 +1,6 @@
 int main()
 {
   // should fail
-  int *p=p;
-  *p=0;
+  int *p = p;
+  *p = 0;
 }

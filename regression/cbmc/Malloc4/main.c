@@ -2,8 +2,9 @@
 
 int nondet_int();
 
-typedef struct {
-    int i;
+typedef struct
+{
+  int i;
 } s;
 
 typedef s *s_t;

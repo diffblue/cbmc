@@ -3,10 +3,10 @@ void f(const int *p)
   int *q;
 
   // this is ok
-  q=(int *)p;
+  q = (int *)p;
 
   // this, too!
-  *q=1;
+  *q = 1;
 }
 
 main()

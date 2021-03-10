@@ -1,14 +1,16 @@
 #define NULL ((void *)0)
-typedef struct tag {
-	int field;
+typedef struct tag
+{
+  int field;
 } StructTag;
 
 StructTag *TagTbl[2];
 
-int main() {
+int main()
+{
   unsigned int i;
-  assume(i<2);
+  assume(i < 2);
 
-	if(TagTbl[i] != NULL)
-		TagTbl[i]->field = 1;
+  if(TagTbl[i] != NULL)
+    TagTbl[i]->field = 1;
 }

@@ -1,5 +1,6 @@
 int nondet_int();
 
-int main() {
+int main()
+{
   nondet_int();
 }

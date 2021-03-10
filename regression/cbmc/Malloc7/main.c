@@ -14,11 +14,11 @@ int main()
   struct X x;
   int *q;
 
-  p=malloc(sizeof(struct X));
-  q=&(p->i);
+  p = malloc(sizeof(struct X));
+  q = &(p->i);
 
-  *q=1;
+  *q = 1;
 
   // should pass
-  assert(p->i==1);
+  assert(p->i == 1);
 }

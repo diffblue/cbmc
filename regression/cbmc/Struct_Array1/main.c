@@ -1,5 +1,7 @@
-int main() {
-  struct a {
+int main()
+{
+  struct a
+  {
     int f;
   } x[1];
 

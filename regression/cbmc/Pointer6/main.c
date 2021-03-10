@@ -9,9 +9,9 @@ int main()
 {
   int z, k, *q;
 
-  array[0].p=&k;
+  array[0].p = &k;
 
-  q=array[0].p;
+  q = array[0].p;
 
-  z=*q;
+  z = *q;
 }

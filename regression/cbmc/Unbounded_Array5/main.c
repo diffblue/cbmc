@@ -1,6 +1,6 @@
 int mem[__CPROVER_constant_infinity_uint];
 
-int  main()
+int main()
 {
   int i, j, mem_j;
 
@@ -13,8 +13,8 @@ int  main()
 
   mem[i] = mem[mem_j];
 
-  unsigned xxxi=mem[i];
-  unsigned xxx1=mem[1];
+  unsigned xxxi = mem[i];
+  unsigned xxx1 = mem[1];
 
   __CPROVER_assert(xxxi == xxx1, "Check infinite mem");
 }

@@ -4,7 +4,7 @@ int main()
   int *q;
   int c;
 
-  p=(c?p:0);
+  p = (c ? p : 0);
 
-  p=(int * const)0;
+  p = (int *const)0;
 }

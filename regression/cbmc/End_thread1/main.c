@@ -1,6 +1,6 @@
 #ifdef _WIN32
 
-#include "windows.h"
+#  include "windows.h"
 
 #else
 
@@ -12,14 +12,14 @@ int main()
 {
   int i;
 
-  if(i==100)
+  if(i == 100)
   {
-    #ifdef _WIN32
+#ifdef _WIN32
     ExitThread(0);
-    #else
+#else
     pthread_exit(0);
-    #endif
+#endif
   }
 
-  assert(i!=100);
+  assert(i != 100);
 }

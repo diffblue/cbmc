@@ -21,8 +21,8 @@ int main()
 
   b.i = 1;
 
-  assert((* ((struct A*)&b)).i == 1); // This works fine.
+  assert((*((struct A *)&b)).i == 1); // This works fine.
 
-  x=func( * ((struct A*)&b));
+  x = func(*((struct A *)&b));
   assert(x == 1);
 }

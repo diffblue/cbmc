@@ -3,19 +3,21 @@ int nondet_int();
 int *p;
 int global;
 
-void f() {
+void f()
+{
   int local;
   int input;
 
-  input=nondet_int();
+  input = nondet_int();
 
-  p=input?&local:&global;
+  p = input ? &local : &global;
 }
 
-int main() {
+int main()
+{
   int z;
 
   f();
 
-  z=*p;
+  z = *p;
 }

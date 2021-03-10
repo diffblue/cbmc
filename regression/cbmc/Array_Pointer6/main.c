@@ -7,10 +7,10 @@ a_type *q;
 
 int main()
 {
-  p=array;
-  q=&array;
+  p = array;
+  q = &array;
   q++;
   q--;
 
-  assert(**q==*p);
+  assert(**q == *p);
 }

@@ -5,14 +5,14 @@ int global;
 
 int main()
 {
-  p=&global;
+  p = &global;
 
-  for(int i=0; i<10; i++)
+  for(int i = 0; i < 10; i++)
   {
-    *p=1;
+    *p = 1;
 
     // this is not allowed!
     int local;
-    p=&local;
+    p = &local;
   }
 }

@@ -17,6 +17,6 @@ int main()
 
   // Assignment with (dummy) cast.
   // The array should be zero-initialized.
-  p=(int *)a;
-  assert(*p==0);
+  p = (int *)a;
+  assert(*p == 0);
 }

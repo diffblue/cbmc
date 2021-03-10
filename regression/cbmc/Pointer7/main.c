@@ -1,9 +1,9 @@
 int main()
 {
-  unsigned char u=255;
+  unsigned char u = 255;
   signed char *p;
 
-  p=(signed char *)&u;
+  p = (signed char *)&u;
 
-  assert(*p==-1);
+  assert(*p == -1);
 }

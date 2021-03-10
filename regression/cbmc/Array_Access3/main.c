@@ -6,15 +6,15 @@ int main()
   int i;
 
   // normal
-  a[1]=1;
+  a[1] = 1;
 
   // not normal
-  2[a]=2;
+  2 [a] = 2;
 
-  assert(a[2]==2);
+  assert(a[2] == 2);
 
-  p=a;
+  p = a;
 
   // also a bit strange
-  assert(2[p]==2);
+  assert(2 [p] == 2);
 }
