@@ -146,7 +146,7 @@ static bool is_assignment_from(
   {
     return false;
   }
-  const auto &rhs = to_code_assign(instr.code).rhs();
+  const auto &rhs = instr.get_assign().rhs();
   return is_symbol_with_id(rhs, identifier) ||
          is_typecast_with_id(rhs, identifier);
 }
@@ -227,8 +227,7 @@ static goto_programt::targett check_and_replace_target(
       "either have a variable for the return value in its lhs() or the next "
       "instruction should be an assignment of the return value to a temporary "
       "variable");
-    const exprt &return_value_assignment =
-      to_code_assign(next_instr->code).lhs();
+    const exprt &return_value_assignment = next_instr->get_assign().lhs();
 
     // If the assignment is null, return.
     if(
@@ -290,7 +289,7 @@ static goto_programt::targett check_and_replace_target(
   else if(target_instruction->is_assign())
   {
     // Assume that the LHS of *this* assignment is the actual nondet variable
-    const auto &nondet_var = to_code_assign(target_instruction->code).lhs();
+    const auto &nondet_var = target_instruction->get_assign().lhs();
 
     side_effect_expr_nondett inserted_expr(
       nondet_var.type(), target_instruction->source_location);

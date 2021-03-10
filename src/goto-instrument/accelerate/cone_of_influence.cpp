@@ -127,7 +127,7 @@ void cone_of_influencet::cone_of_influence(
 
   if(i.is_assign())
   {
-    const code_assignt &assignment=to_code_assign(i.code);
+    const code_assignt &assignment = i.get_assign();
     expr_sett lhs_syms;
     bool care=false;
 

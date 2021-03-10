@@ -787,7 +787,7 @@ exprt polynomial_acceleratort::precondition(patht &path)
     if(t->is_assign())
     {
       // XXX Need to check for aliasing...
-      const code_assignt &assignment=to_code_assign(t->code);
+      const code_assignt &assignment = t->get_assign();
       const exprt &lhs=assignment.lhs();
       const exprt &rhs=assignment.rhs();
 

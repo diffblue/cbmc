@@ -40,7 +40,7 @@ std::pair<bool, source_locationt> does_remove_constt::operator()() const
       continue;
     }
 
-    const code_assignt &assign=to_code_assign(instruction.code);
+    const code_assignt &assign = instruction.get_assign();
     const typet &rhs_type=assign.rhs().type();
     const typet &lhs_type=assign.lhs().type();
 

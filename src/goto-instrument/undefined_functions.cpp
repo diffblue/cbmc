@@ -41,7 +41,7 @@ void undefined_function_abort_path(goto_modelt &goto_model)
       if(!ins.is_function_call())
         continue;
 
-      const code_function_callt &call=to_code_function_call(ins.code);
+      const code_function_callt &call = ins.get_function_call();
 
       if(call.function().id()!=ID_symbol)
         continue;

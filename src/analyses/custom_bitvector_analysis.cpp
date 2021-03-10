@@ -287,7 +287,7 @@ void custom_bitvector_domaint::transform(
   {
   case ASSIGN:
     {
-      const code_assignt &code_assign=to_code_assign(instruction.code);
+      const code_assignt &code_assign = instruction.get_assign();
       assign_struct_rec(from, code_assign.lhs(), code_assign.rhs(), cba, ns);
     }
     break;
@@ -313,8 +313,8 @@ void custom_bitvector_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call=
-        to_code_function_call(instruction.code);
+      const code_function_callt &code_function_call =
+        instruction.get_function_call();
       const exprt &function=code_function_call.function();
 
       if(function.id()==ID_symbol)
