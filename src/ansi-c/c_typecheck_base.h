@@ -203,6 +203,8 @@ protected:
   virtual code_blockt instantiate_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const symbol_exprt &function_symbol);
+  virtual exprt
+  typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);
 
   virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);
