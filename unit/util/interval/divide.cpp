@@ -4,9 +4,10 @@
 \*******************************************************************/
 
 #include <testing-utils/use_catch.h>
+
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/interval.h>
-#include <util/std_types.h>
 
 int value_of(const constant_interval_exprt &interval)
 {

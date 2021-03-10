@@ -32,20 +32,6 @@ void array_typet::check(const typet &type, const validation_modet vm)
   }
 }
 
-std::size_t fixedbv_typet::get_integer_bits() const
-{
-  const irep_idt integer_bits=get(ID_integer_bits);
-  DATA_INVARIANT(!integer_bits.empty(), "integer bits should be set");
-  return unsafe_string2unsigned(id2string(integer_bits));
-}
-
-std::size_t floatbv_typet::get_f() const
-{
-  const irep_idt &f=get(ID_f);
-  DATA_INVARIANT(!f.empty(), "the mantissa should be set");
-  return unsafe_string2unsigned(id2string(f));
-}
-
 /// Return the sequence number of the component with given name.
 std::size_t struct_union_typet::component_number(
   const irep_idt &component_name) const
@@ -175,31 +161,6 @@ mp_integer range_typet::get_from() const
 mp_integer range_typet::get_to() const
 {
   return string2integer(get_string(ID_to));
-}
-
-mp_integer integer_bitvector_typet::smallest() const
-{
-  return bv_spect(*this).min_value();
-}
-
-mp_integer integer_bitvector_typet::largest() const
-{
-  return bv_spect(*this).max_value();
-}
-
-constant_exprt integer_bitvector_typet::zero_expr() const
-{
-  return from_integer(0, *this);
-}
-
-constant_exprt integer_bitvector_typet::smallest_expr() const
-{
-  return from_integer(smallest(), *this);
-}
-
-constant_exprt integer_bitvector_typet::largest_expr() const
-{
-  return from_integer(largest(), *this);
 }
 
 /// Identify whether a given type is constant itself or contains constant

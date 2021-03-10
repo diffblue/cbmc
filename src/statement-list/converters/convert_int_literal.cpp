@@ -13,10 +13,11 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "convert_dint_literal.h"
 #include "statement_list_types.h"
 
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
+
 #include <algorithm>
 #include <stdexcept>
-#include <util/arith_tools.h>
-#include <util/std_types.h>
 
 /// Maximum value of integer literals.
 #define STL_INT_MAX_VALUE 32767LL

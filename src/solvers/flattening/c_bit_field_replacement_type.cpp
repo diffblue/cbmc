@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_bit_field_replacement_type.h"
 
+#include <util/bitvector_types.h>
 #include <util/invariant.h>
 
 typet c_bit_field_replacement_type(

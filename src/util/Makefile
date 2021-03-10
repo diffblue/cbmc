@@ -4,6 +4,7 @@ SRC = allocate_objects.cpp \
       array_name.cpp \
       base_type.cpp \
       bitvector_expr.cpp \
+      bitvector_types.cpp \
       bv_arithmetic.cpp \
       byte_operators.cpp \
       c_types.cpp \

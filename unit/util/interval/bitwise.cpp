@@ -6,9 +6,8 @@
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/interval.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")

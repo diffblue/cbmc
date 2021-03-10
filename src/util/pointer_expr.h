@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/pointer_expr.h
 /// API to expression classes for Pointers
 
+#include "bitvector_types.h"
 #include "std_expr.h"
 
 class namespacet;

@@ -9,9 +9,9 @@
 #include <limits.h>
 #include <ostream>
 
+#include <util/bitvector_types.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
-#include <util/std_expr.h>
 
 #include "abstract_environment.h"
 

@@ -10,9 +10,9 @@ Author: Michael Tautschnig
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
-#include <util/std_expr.h>
 
 exprt lower_popcount(const popcount_exprt &expr, const namespacet &ns)
 {

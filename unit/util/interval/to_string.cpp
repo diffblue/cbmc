@@ -4,9 +4,9 @@
 \*******************************************************************/
 
 #include <testing-utils/use_catch.h>
-#include <util/arith_tools.h>
+
+#include <util/bitvector_types.h>
 #include <util/interval.h>
-#include <util/std_types.h>
 
 TEST_CASE("interval::to_string", "[core][analyses][interval]")
 {

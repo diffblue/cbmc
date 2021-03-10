@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "boolbv.h"
+
+#include <util/bitvector_types.h>
 
 bvt boolbvt::convert_not(const not_exprt &expr)
 {

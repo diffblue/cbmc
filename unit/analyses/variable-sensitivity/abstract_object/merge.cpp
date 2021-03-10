@@ -9,7 +9,8 @@
 #include <testing-utils/use_catch.h>
 
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <util/std_types.h>
+
+#include <util/bitvector_types.h>
 
 SCENARIO(
   "merge_abstract_object",

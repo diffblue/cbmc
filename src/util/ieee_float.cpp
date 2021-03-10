@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <limits>
 
 #include "arith_tools.h"
+#include "bitvector_types.h"
 #include "invariant.h"
 #include "std_expr.h"
 #include "std_types.h"

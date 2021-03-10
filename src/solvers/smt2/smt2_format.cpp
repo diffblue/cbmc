@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2_format.h"
 
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
+#include <util/bitvector_types.h>
 
 std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
 {

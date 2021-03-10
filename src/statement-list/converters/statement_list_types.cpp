@@ -10,8 +10,9 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Statement List Type Helper
 
 #include "statement_list_types.h"
+
+#include <util/bitvector_types.h>
 #include <util/ieee_float.h>
-#include <util/std_types.h>
 
 signedbv_typet get_int_type()
 {

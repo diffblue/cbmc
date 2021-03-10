@@ -14,6 +14,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <limits>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/simplify_expr.h>
 
 partial_order_concurrencyt::partial_order_concurrencyt(

@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <util/std_types.h>
+#include <util/bitvector_types.h>
 
 bvt boolbvt::convert_div(const div_exprt &expr)
 {

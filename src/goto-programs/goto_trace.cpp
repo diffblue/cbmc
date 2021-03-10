@@ -16,6 +16,7 @@ Author: Daniel Kroening
 #include <ostream>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/byte_operators.h>
 #include <util/format_expr.h>
 #include <util/merge_irep.h>

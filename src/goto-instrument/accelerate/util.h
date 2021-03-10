@@ -12,7 +12,7 @@ Author: Matt Lewis
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_UTIL_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_UTIL_H
 
-#include <util/std_types.h>
+#include <util/bitvector_types.h>
 
 signedbv_typet signed_poly_type();
 unsignedbv_typet unsigned_poly_type();

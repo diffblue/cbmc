@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "boolbv.h"
+
+#include <util/bitvector_types.h>
 
 literalt boolbvt::convert_reduction(const unary_exprt &expr)
 {

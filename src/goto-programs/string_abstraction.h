@@ -12,9 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
-#include <util/symbol_table.h>
+#include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include "goto_model.h"
 

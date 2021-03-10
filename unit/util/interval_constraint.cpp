@@ -9,9 +9,9 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
+#include <util/bitvector_types.h>
 #include <util/interval_constraint.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 SCENARIO(
   "interval_constraint with characters",

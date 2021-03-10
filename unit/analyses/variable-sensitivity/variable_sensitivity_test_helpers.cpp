@@ -7,9 +7,14 @@
 \*******************************************************************/
 
 #include "variable_sensitivity_test_helpers.h"
+
 #include <analyses/variable-sensitivity/abstract_environment.h>
+
 #include <ansi-c/ansi_c_language.h>
+
 #include <testing-utils/use_catch.h>
+
+#include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 #include <util/string_utils.h>
 

@@ -17,7 +17,9 @@
 #include "statement_list_parser.h"
 #include "converters/convert_string_value.h"
 #include "converters/statement_list_types.h"
-#include <util/std_expr.h>
+
+#include <util/bitvector_types.h>
+
 #include <iterator>
 
 int yystatement_listlex();

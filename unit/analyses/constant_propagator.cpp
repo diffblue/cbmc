@@ -14,6 +14,7 @@ Author: Diffblue Ltd
 #include <goto-programs/goto_convert_functions.h>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 #include <util/prefix.h>
 
