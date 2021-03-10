@@ -641,6 +641,10 @@ public:
     : unary_exprt(ID_popcount, _op, _op.type())
   {
   }
+
+  /// Lower a popcount_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
 };
 
 template <>
