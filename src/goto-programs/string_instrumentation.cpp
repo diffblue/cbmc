@@ -27,12 +27,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-predicate_exprt is_zero_string(const exprt &what, bool write)
+exprt is_zero_string(const exprt &what, bool write)
 {
-  predicate_exprt result("is_zero_string");
+  unary_exprt result{"is_zero_string", what, c_bool_type()};
   result.copy_to_operands(what);
   result.set("lhs", write);
-  return result;
+  return notequal_exprt{result, from_integer(0, c_bool_type())};
 }
 
 exprt zero_string_length(
@@ -784,7 +784,9 @@ void string_instrumentationt::do_strerror(
 
   // make that zero-terminated
   tmp.add(goto_programt::make_assignment(
-    is_zero_string(ptr, true), true_exprt(), it->source_location));
+    unary_exprt{"is_zero_string", ptr, c_bool_type()},
+    from_integer(1, c_bool_type()),
+    it->source_location));
 
   // assign address
   {

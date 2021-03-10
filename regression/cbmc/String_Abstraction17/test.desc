@@ -1,0 +1,11 @@
+CORE
+strcpy-no-decl.c
+--string-abstraction --validate-goto-model
+Condition: strlen type inconsistency
+^EXIT=(127|134)$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+While this test currently passes when omitting --validate-goto-model, we should
+expect a report of type inconsistencies as no forward declarations are present.

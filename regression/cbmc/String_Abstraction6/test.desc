@@ -1,6 +1,6 @@
-CORE
+KNOWNBUG
 main.c
---string-abstraction
+--string-abstraction --pointer-check --bounds-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

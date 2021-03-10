@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--string-abstraction --pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Multi-dimensional arrays are not yet handled properly.

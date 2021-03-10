@@ -36,6 +36,14 @@ void get_local_identifiers(
 void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
   const
 {
+  for(const auto &identifier : parameter_identifiers)
+  {
+    DATA_CHECK(
+      vm,
+      identifier.empty() || ns.lookup(identifier).is_parameter,
+      "parameter should be marked 'is_parameter' in the symbol table");
+  }
+
   // function body must end with an END_FUNCTION instruction
   if(body_available())
   {
