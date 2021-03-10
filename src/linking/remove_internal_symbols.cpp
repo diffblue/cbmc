@@ -57,6 +57,30 @@ static void get_symbols(
         if(!ns.lookup(p.get_identifier(), s))
           working_set.push_back(s);
       }
+
+      // check for contract definitions
+      const exprt ensures =
+        static_cast<const exprt &>(code_type.find(ID_C_spec_ensures));
+      const exprt requires =
+        static_cast<const exprt &>(code_type.find(ID_C_spec_requires));
+
+      find_symbols_sett new_symbols;
+      find_type_and_expr_symbols(ensures, new_symbols);
+      find_type_and_expr_symbols(requires, new_symbols);
+
+      for(const auto &s : new_symbols)
+      {
+        // keep functions called in contracts within scope.
+        // should we keep local variables from the contract as well?
+        const symbolt *new_symbol = nullptr;
+        if(!ns.lookup(s, new_symbol))
+        {
+          if(new_symbol->type.id() == ID_code)
+          {
+            working_set.push_back(new_symbol);
+          }
+        }
+      }
     }
   }
 }
