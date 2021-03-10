@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/magic.h>
 #include <util/mp_arith.h>
 #include <util/replace_expr.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string2int.h>
@@ -227,7 +228,12 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_power)
      return convert_power(to_binary_expr(expr));
   else if(expr.id() == ID_popcount)
-    return convert_bv(lower_popcount(to_popcount_expr(expr), ns));
+    return convert_bv(simplify_expr(to_popcount_expr(expr).lower(), ns));
+  else if(expr.id() == ID_count_leading_zeros)
+  {
+    return convert_bv(
+      simplify_expr(to_count_leading_zeros_expr(expr).lower(), ns));
+  }
 
   return conversion_failed(expr);
 }

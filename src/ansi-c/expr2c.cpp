@@ -3896,6 +3896,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_type)
     return convert(src.type());
 
+  else if(src.id() == ID_count_leading_zeros)
+    return convert_function(src, "__builtin_clz");
+
   // no C language expression for internal representation
   return convert_norep(src, precedence);
 }

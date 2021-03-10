@@ -151,6 +151,8 @@ static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
     os << u8"\u00ac"; // neg, U+00AC
   else if(src.id() == ID_unary_minus)
     os << '-';
+  else if(src.id() == ID_count_leading_zeros)
+    os << "clz";
   else
     return os << src.pretty();
 

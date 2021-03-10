@@ -570,7 +570,7 @@ void string_abstractiont::abstract_function_call(
 
       index_exprt idx(str_args.back(), from_integer(0, index_type()));
       // disable bounds check on that one
-      idx.set("bounds_check", false);
+      idx.set(ID_C_bounds_check, false);
 
       str_args.back()=address_of_exprt(idx);
     }

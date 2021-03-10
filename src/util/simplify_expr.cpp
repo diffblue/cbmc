@@ -148,6 +148,30 @@ simplify_exprt::simplify_popcount(const popcount_exprt &expr)
   return unchanged(expr);
 }
 
+simplify_exprt::resultt<>
+simplify_exprt::simplify_clz(const count_leading_zeros_exprt &expr)
+{
+  const auto const_bits_opt = expr2bits(
+    expr.op(), byte_extract_id() == ID_byte_extract_little_endian, ns);
+
+  if(!const_bits_opt.has_value())
+    return unchanged(expr);
+
+  // expr2bits generates a bit string starting with the least-significant bit
+  std::size_t n_leading_zeros = const_bits_opt->rfind('1');
+  if(n_leading_zeros == std::string::npos)
+  {
+    if(!expr.zero_permitted())
+      return unchanged(expr);
+
+    n_leading_zeros = const_bits_opt->size();
+  }
+  else
+    n_leading_zeros = const_bits_opt->size() - n_leading_zeros - 1;
+
+  return from_integer(n_leading_zeros, expr.type());
+}
+
 /// Simplify String.endsWith function when arguments are constant
 /// \param expr: the expression to simplify
 /// \param ns: namespace
@@ -2392,6 +2416,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   else if(expr.id() == ID_popcount)
   {
     r = simplify_popcount(to_popcount_expr(expr));
+  }
+  else if(expr.id() == ID_count_leading_zeros)
+  {
+    r = simplify_clz(to_count_leading_zeros_expr(expr));
   }
   else if(expr.id() == ID_function_application)
   {

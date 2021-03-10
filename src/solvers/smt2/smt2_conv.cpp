@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string2int.h>
@@ -1984,8 +1985,11 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id() == ID_popcount)
   {
-    exprt lowered = lower_popcount(to_popcount_expr(expr), ns);
-    convert_expr(lowered);
+    convert_expr(simplify_expr(to_popcount_expr(expr).lower(), ns));
+  }
+  else if(expr.id() == ID_count_leading_zeros)
+  {
+    convert_expr(simplify_expr(to_count_leading_zeros_expr(expr).lower(), ns));
   }
   else
     INVARIANT_WITH_DIAGNOSTICS(
