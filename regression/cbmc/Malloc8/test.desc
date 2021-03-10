@@ -1,0 +1,8 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main.pointer_dereference.\d+\] line 27 dereference failure: pointer invalid in \*ptr_ptr_p2: FAILURE$
+--

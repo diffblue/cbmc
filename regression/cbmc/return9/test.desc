@@ -1,0 +1,8 @@
+CORE
+tcas_v23_523.c
+--bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[ALIM.array_bounds.2\] line 68 array 'Positive_RA_Alt_Thresh' upper bound in Positive_RA_Alt_Thresh\[\(signed (long (long )?)?int\)Alt_Layer_Value\]: FAILURE$
+--
