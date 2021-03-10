@@ -61,7 +61,7 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
 
         goto_function.second.body.insert_before_swap(it, assign_instruction);
         const auto next = std::next(it);
-        to_code_function_call(next->code).function() =
+        to_code_function_call(next->code_nonconst()).function() =
           dereference_exprt{new_function_pointer};
         // we need to increment the iterator once more (in addition to the
         // increment already done by for_each_goto_function_if()). This is

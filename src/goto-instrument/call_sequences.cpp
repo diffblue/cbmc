@@ -47,7 +47,7 @@ void show_call_sequences(
       continue; // seen it already
     if(t->is_function_call())
     {
-      const exprt &callee=to_code_function_call(t->code).function();
+      const exprt &callee = t->get_function_call().function();
       if(callee.id()==ID_symbol)
       {
         std::cout << caller << " -> "
@@ -199,7 +199,7 @@ void check_call_sequencet::operator()()
     }
     else if(e.pc->is_function_call())
     {
-      const exprt &function=to_code_function_call(e.pc->code).function();
+      const exprt &function = e.pc->get_function_call().function();
       if(function.id()==ID_symbol)
       {
         irep_idt identifier=to_symbol_expr(function).get_identifier();
@@ -277,7 +277,7 @@ static void list_calls_and_arguments(
     if(!instruction.is_function_call())
       continue;
 
-    const code_function_callt &call = to_code_function_call(instruction.code);
+    const code_function_callt &call = instruction.get_function_call();
 
     const exprt &f=call.function();
 

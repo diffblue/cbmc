@@ -278,7 +278,7 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    out << format(instruction.code);
+    out << format(instruction.get_code());
     break;
 
   case ASSUME:
@@ -308,32 +308,32 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
 
     {
       const irept::subt &exception_list =
-        instruction.code.find(ID_exception_list).get_sub();
+        instruction.get_code().find(ID_exception_list).get_sub();
 
       for(const auto &ex : exception_list)
         out << " " << ex.id();
     }
 
-    if(instruction.code.operands().size() == 1)
-      out << ": " << format(instruction.code.op0());
+    if(instruction.get_code().operands().size() == 1)
+      out << ": " << format(instruction.get_code().op0());
 
     break;
 
   case CATCH:
   {
-    if(instruction.code.get_statement() == ID_exception_landingpad)
+    if(instruction.get_code().get_statement() == ID_exception_landingpad)
     {
-      const auto &landingpad = to_code_landingpad(instruction.code);
+      const auto &landingpad = to_code_landingpad(instruction.get_code());
       out << "EXCEPTION LANDING PAD (" << format(landingpad.catch_expr().type())
           << ' ' << format(landingpad.catch_expr()) << ")";
     }
-    else if(instruction.code.get_statement() == ID_push_catch)
+    else if(instruction.get_code().get_statement() == ID_push_catch)
     {
       out << "CATCH-PUSH ";
 
       unsigned i = 0;
       const irept::subt &exception_list =
-        instruction.code.find(ID_exception_list).get_sub();
+        instruction.get_code().find(ID_exception_list).get_sub();
       DATA_INVARIANT(
         instruction.targets.size() == exception_list.size(),
         "unexpected discrepancy between sizes of instruction"
@@ -347,7 +347,7 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
         out << exception_list[i].id() << "->" << (*gt_it)->target_number;
       }
     }
-    else if(instruction.code.get_statement() == ID_pop_catch)
+    else if(instruction.get_code().get_statement() == ID_pop_catch)
     {
       out << "CATCH-POP";
     }

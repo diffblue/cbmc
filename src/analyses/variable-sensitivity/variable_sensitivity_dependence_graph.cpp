@@ -140,7 +140,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   domain_data_deps.clear();
   if(to->is_assign())
   {
-    const code_assignt &inst = to_code_assign(to->code);
+    const code_assignt &inst = to->get_assign();
     const exprt &rhs = inst.rhs();
 
     // Handle return value of a 'no body' function
@@ -151,7 +151,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
       {
         if(from->is_function_call())
         {
-          const code_function_callt &cfc = to_code_function_call(from->code);
+          const code_function_callt &cfc = from->get_function_call();
           const exprt &call = cfc.function();
 
           if(call.id() == ID_symbol)
@@ -189,7 +189,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   }
   else if(to->is_function_call())
   {
-    const code_function_callt &call = to_code_function_call(to->code);
+    const code_function_callt &call = to->get_function_call();
     const code_function_callt::argumentst &args = call.arguments();
     for(const auto &arg : args)
     {

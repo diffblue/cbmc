@@ -92,7 +92,7 @@ void nondet_static(
     if(instruction.is_assign())
     {
       const symbol_exprt sym =
-        to_symbol_expr(to_code_assign(as_const(instruction.code)).lhs());
+        to_symbol_expr(as_const(instruction).get_assign().lhs());
 
       if(is_nondet_initializable_static(sym, ns))
       {
@@ -105,7 +105,7 @@ void nondet_static(
     }
     else if(instruction.is_function_call())
     {
-      const code_function_callt &fct=to_code_function_call(instruction.code);
+      const code_function_callt &fct = instruction.get_function_call();
       const symbol_exprt &fsym=to_symbol_expr(fct.function());
 
       if(has_prefix(id2string(fsym.get_identifier()), "#ini#"))

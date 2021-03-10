@@ -88,11 +88,11 @@ is_nondet_returning_object(const code_function_callt &function_call)
 static nondet_instruction_infot
 get_nondet_instruction_info(const goto_programt::const_targett &instr)
 {
-  if(!(instr->is_function_call() && instr->code.id() == ID_code))
+  if(!(instr->is_function_call() && instr->get_code().id() == ID_code))
   {
     return nondet_instruction_infot();
   }
-  const auto &code = instr->code;
+  const auto &code = instr->get_code();
   INVARIANT(
     code.get_statement() == ID_function_call,
     "function_call should have ID_function_call");
@@ -209,14 +209,13 @@ static goto_programt::targett check_and_replace_target(
   // If we haven't removed returns yet, our function call will have a variable
   // on its left hand side.
   const bool remove_returns_not_run =
-    to_code_function_call(target->code).lhs().is_not_nil();
+    target->get_function_call().lhs().is_not_nil();
 
   irep_idt return_identifier;
   if(remove_returns_not_run)
   {
     return_identifier =
-      to_symbol_expr(to_code_function_call(target->code).lhs())
-        .get_identifier();
+      to_symbol_expr(target->get_function_call().lhs()).get_identifier();
   }
   else
   {
@@ -282,8 +281,8 @@ static goto_programt::targett check_and_replace_target(
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
-    target_instruction->code = code_returnt(inserted_expr);
-    target_instruction->code.add_source_location() =
+    target_instruction->code_nonconst() = code_returnt(inserted_expr);
+    target_instruction->code_nonconst().add_source_location() =
       target_instruction->source_location;
   }
   else if(target_instruction->is_assign())
@@ -296,8 +295,9 @@ static goto_programt::targett check_and_replace_target(
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
-    target_instruction->code = code_assignt(nondet_var, inserted_expr);
-    target_instruction->code.add_source_location() =
+    target_instruction->code_nonconst() =
+      code_assignt(nondet_var, inserted_expr);
+    target_instruction->code_nonconst().add_source_location() =
       target_instruction->source_location;
   }
 

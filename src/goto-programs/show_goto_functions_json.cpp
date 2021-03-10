@@ -73,10 +73,10 @@ json_objectt show_goto_functions_jsont::convert(
         json_objectt instruction_entry{
           {"instructionId", json_stringt(instruction.to_string())}};
 
-        if(instruction.code.source_location().is_not_nil())
+        if(instruction.get_code().source_location().is_not_nil())
         {
-          instruction_entry["sourceLocation"]=
-            json(instruction.code.source_location());
+          instruction_entry["sourceLocation"] =
+            json(instruction.get_code().source_location());
         }
 
         std::ostringstream instruction_builder;
@@ -86,10 +86,10 @@ json_objectt show_goto_functions_jsont::convert(
         instruction_entry["instruction"]=
           json_stringt(instruction_builder.str());
 
-        if(!instruction.code.operands().empty())
+        if(!instruction.get_code().operands().empty())
         {
           json_arrayt operand_array;
-          for(const exprt &operand : instruction.code.operands())
+          for(const exprt &operand : instruction.get_code().operands())
           {
             json_objectt operand_object=
               no_comments_irep_converter.convert_from_irep(

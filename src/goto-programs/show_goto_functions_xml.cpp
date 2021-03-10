@@ -78,10 +78,10 @@ xmlt show_goto_functions_xmlt::convert(
         instruction_entry.set_attribute(
           "instruction_id", instruction.to_string());
 
-        if(instruction.code.source_location().is_not_nil())
+        if(instruction.get_code().source_location().is_not_nil())
         {
           instruction_entry.new_element(
-            xml(instruction.code.source_location()));
+            xml(instruction.get_code().source_location()));
         }
 
         std::ostringstream instruction_builder;

@@ -88,7 +88,7 @@ void value_set_domain_templatet<VST>::transform(
   case ASSIGN:
   case DECL:
   case DEAD:
-    value_set.apply_code(from_l->code, ns);
+    value_set.apply_code(from_l->get_code(), ns);
     break;
 
   case ASSUME:
@@ -97,7 +97,7 @@ void value_set_domain_templatet<VST>::transform(
 
   case FUNCTION_CALL:
   {
-    const code_function_callt &code = to_code_function_call(from_l->code);
+    const code_function_callt &code = from_l->get_function_call();
 
     value_set.do_function_call(function_to, code.arguments(), ns);
   }

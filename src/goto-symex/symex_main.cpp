@@ -517,12 +517,13 @@ void goto_symext::print_symex_step(statet &state)
   if(
     !symex_config.show_symex_steps || !state.reachable ||
     state.source.pc->type == DEAD ||
-    (state.source.pc->code.is_nil() && state.source.pc->type != END_FUNCTION))
+    (state.source.pc->get_code().is_nil() &&
+     state.source.pc->type != END_FUNCTION))
   {
     return;
   }
 
-  if(state.source.pc->code.is_not_nil())
+  if(state.source.pc->get_code().is_not_nil())
   {
     auto guard_expression = state.guard.as_expr();
     std::size_t size = 0;
@@ -534,7 +535,7 @@ void goto_symext::print_symex_step(statet &state)
     }
 
     log.status() << "[Guard size: " << size << "] "
-                 << format(state.source.pc->code);
+                 << format(state.source.pc->get_code());
 
     if(
       state.source.pc->source_location.is_not_nil() &&
@@ -581,8 +582,7 @@ void goto_symext::print_symex_step(statet &state)
       print_callstack_entry(state.source) << messaget::eom;
 
       // Add the method we're about to enter with no location number.
-      log.status() << format(
-                        to_code_function_call(state.source.pc->code).function())
+      log.status() << format(state.source.pc->get_function_call().function())
                    << messaget::eom << messaget::eom;
     }
   }

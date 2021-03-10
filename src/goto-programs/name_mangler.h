@@ -106,7 +106,7 @@ public:
         continue;
       for(auto &ins : fun.second.body.instructions)
       {
-        rename(ins.code);
+        rename(ins.code_nonconst());
         rename(ins.guard);
       }
     }

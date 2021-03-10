@@ -235,14 +235,14 @@ static bool implicit(goto_programt::const_targett target)
 {
   // some variables are used during symbolic execution only
 
-  const irep_idt &statement=target->code.get_statement();
+  const irep_idt &statement = target->get_code().get_statement();
   if(statement==ID_array_copy)
     return true;
 
   if(!target->is_assign())
     return false;
 
-  const code_assignt &a=to_code_assign(target->code);
+  const code_assignt &a = target->get_assign();
   if(a.lhs().id()!=ID_symbol)
     return false;
 

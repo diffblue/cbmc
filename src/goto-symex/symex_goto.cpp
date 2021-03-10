@@ -328,7 +328,7 @@ void goto_symext::symex_goto(statet &state)
     DATA_INVARIANT(
       instruction.targets.size() > 0,
       "Instruction is an unconditional goto with no target: " +
-        instruction.code.pretty());
+        instruction.get_code().pretty());
     symex_transition(state, instruction.get_target(), true);
     return;
   }
@@ -371,13 +371,13 @@ void goto_symext::symex_goto(statet &state)
       "Tried to explore the other path of a branch, but the next "
       "instruction along that path is not the same as the instruction "
       "that we saved at the branch point. Saved instruction is " +
-        state.saved_target->code.pretty() +
+        state.saved_target->get_code().pretty() +
         "\nwe were intending "
         "to explore " +
-        new_state_pc->code.pretty() +
+        new_state_pc->get_code().pretty() +
         "\nthe "
         "instruction we think we saw on a previous path exploration is " +
-        state_pc->code.pretty());
+        state_pc->get_code().pretty());
     goto_programt::const_targett tmp = new_state_pc;
     new_state_pc = state_pc;
     state_pc = tmp;

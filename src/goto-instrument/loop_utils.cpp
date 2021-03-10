@@ -51,7 +51,7 @@ void build_havoc_code(
     goto_programt::targett t = dest.add(goto_programt::make_assignment(
       code_assignt(std::move(lhs), std::move(rhs)),
       loop_head->source_location));
-    t->code.add_source_location()=loop_head->source_location;
+    t->code_nonconst().add_source_location() = loop_head->source_location;
   }
 }
 
@@ -97,12 +97,12 @@ void get_modifies(
 
     if(instruction.is_assign())
     {
-      const exprt &lhs=to_code_assign(instruction.code).lhs();
+      const exprt &lhs = instruction.get_assign().lhs();
       get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
     }
     else if(instruction.is_function_call())
     {
-      const exprt &lhs=to_code_function_call(instruction.code).lhs();
+      const exprt &lhs = instruction.get_function_call().lhs();
       get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
     }
   }

@@ -302,8 +302,7 @@ void goto_checkt::collect_allocations(
       if(!instruction.is_function_call())
         continue;
 
-      const code_function_callt &call=
-        to_code_function_call(instruction.code);
+      const code_function_callt &call = instruction.get_function_call();
       if(call.function().id()!=ID_symbol ||
          to_symbol_expr(call.function()).get_identifier()!=
          CPROVER_PREFIX "allocated_memory")
@@ -1973,7 +1972,7 @@ void goto_checkt::goto_check(
     }
     else if(i.is_assign())
     {
-      const code_assignt &code_assign=to_code_assign(i.code);
+      const code_assignt &code_assign = i.get_assign();
 
       // Reset the no_enum_check with the flag reset for exception
       // safety
@@ -1991,16 +1990,19 @@ void goto_checkt::goto_check(
            return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
          }))
       {
-        exprt &rhs = to_code_assign(i.code).rhs();
+        const exprt &rhs = i.get_assign().rhs();
         auto rw_ok_cond = rw_ok_check(rhs);
         if(rw_ok_cond.has_value())
-          rhs = *rw_ok_cond;
+        {
+          auto new_assign = i.get_assign(); // copy
+          new_assign.rhs() = *rw_ok_cond;
+          i.set_assign(new_assign);
+        }
       }
     }
     else if(i.is_function_call())
     {
-      const code_function_callt &code_function_call=
-        to_code_function_call(i.code);
+      const code_function_callt &code_function_call = i.get_function_call();
 
       // for Java, need to check whether 'this' is null
       // on non-static method invocations
@@ -2055,13 +2057,14 @@ void goto_checkt::goto_check(
     }
     else if(i.is_throw())
     {
-      if(i.code.get_statement()==ID_expression &&
-         i.code.operands().size()==1 &&
-         i.code.op0().operands().size()==1)
+      if(
+        i.get_code().get_statement() == ID_expression &&
+        i.get_code().operands().size() == 1 &&
+        i.get_code().op0().operands().size() == 1)
       {
         // must not throw NULL
 
-        exprt pointer = to_unary_expr(i.code.op0()).op();
+        exprt pointer = to_unary_expr(i.get_code().op0()).op();
 
         const notequal_exprt not_eq_null(
           pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
@@ -2102,8 +2105,7 @@ void goto_checkt::goto_check(
     {
       if(enable_pointer_check || enable_pointer_primitive_check)
       {
-        assert(i.code.operands().size()==1);
-        const symbol_exprt &variable=to_symbol_expr(i.code.op0());
+        const symbol_exprt &variable = i.dead_symbol();
 
         // is it dirty?
         if(local_bitvector_analysis->dirty(variable))
@@ -2119,7 +2121,7 @@ void goto_checkt::goto_check(
           goto_programt::targett t =
             new_code.add(goto_programt::make_assignment(
               std::move(lhs), std::move(rhs), i.source_location));
-          t->code.add_source_location()=i.source_location;
+          t->code_nonconst().add_source_location() = i.source_location;
         }
       }
     }

@@ -625,7 +625,7 @@ void generate_function_bodies(
       if(instruction.is_function_call())
       {
         auto &called_function =
-          to_code_function_call(instruction.code).function();
+          to_code_function_call(instruction.code_nonconst()).function();
         if(is_havoc_function_call(called_function))
         {
           if(++counter == *call_site_number)

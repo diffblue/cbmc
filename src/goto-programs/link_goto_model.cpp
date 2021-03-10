@@ -36,7 +36,7 @@ static void rename_symbols_in_function(
 
   for(auto &instruction : function.body.instructions)
   {
-    rename_symbol(instruction.code);
+    rename_symbol(instruction.code_nonconst());
 
     if(instruction.has_condition())
     {

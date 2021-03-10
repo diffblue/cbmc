@@ -275,7 +275,7 @@ void local_bitvector_analysist::build()
     {
     case ASSIGN:
     {
-      const code_assignt &code_assign = to_code_assign(instruction.code);
+      const code_assignt &code_assign = instruction.get_assign();
       assign_lhs(
         code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
       break;
@@ -300,7 +300,7 @@ void local_bitvector_analysist::build()
     case FUNCTION_CALL:
     {
       const code_function_callt &code_function_call =
-        to_code_function_call(instruction.code);
+        instruction.get_function_call();
       if(code_function_call.lhs().is_not_nil())
         assign_lhs(
           code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);

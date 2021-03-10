@@ -125,7 +125,7 @@ void restrict_function_pointer(
     // can't use get_function_call because that'll return a const ref
     const symbol_exprt &function_pointer_target_symbol_expr =
       goto_model.symbol_table.lookup_ref(restriction_target).symbol_expr();
-    to_code_function_call(new_instruction.code).function() =
+    to_code_function_call(new_instruction.code_nonconst()).function() =
       function_pointer_target_symbol_expr;
     auto const goto_end_if_location = goto_function.body.insert_before(
       else_location,

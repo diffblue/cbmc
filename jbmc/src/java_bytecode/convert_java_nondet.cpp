@@ -93,7 +93,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
   // We only expect to find nondets in the rhs of an assignments, and in return
   // statements if remove_returns has not been run, but we do a more general
   // check on all operands in case this changes
-  for(exprt &op : target->code.operands())
+  for(exprt &op : target->code_nonconst().operands())
   {
     if(!is_nondet_pointer(op))
     {

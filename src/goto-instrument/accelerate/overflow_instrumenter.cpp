@@ -54,7 +54,7 @@ void overflow_instrumentert::add_overflow_checks(
 
   if(t->is_assign())
   {
-    code_assignt &assignment=to_code_assign(t->code);
+    code_assignt &assignment = to_code_assign(t->code_nonconst());
 
     if(assignment.lhs()==overflow_var)
     {

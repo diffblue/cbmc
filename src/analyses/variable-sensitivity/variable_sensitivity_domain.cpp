@@ -62,7 +62,7 @@ void variable_sensitivity_domaint::transform(
   case ASSIGN:
   {
     // TODO : check return values
-    const code_assignt &inst = to_code_assign(instruction.code);
+    const code_assignt &inst = instruction.get_assign();
     const abstract_objectt::locationst write_location = {from};
     abstract_object_pointert rhs =
       abstract_state.eval(inst.rhs(), ns)
@@ -264,7 +264,7 @@ void variable_sensitivity_domaint::transform_function_call(
 {
   PRECONDITION(from->type == FUNCTION_CALL);
 
-  const code_function_callt &function_call = to_code_function_call(from->code);
+  const code_function_callt &function_call = from->get_function_call();
   const exprt &function = function_call.function();
 
   const locationt next = std::next(from);

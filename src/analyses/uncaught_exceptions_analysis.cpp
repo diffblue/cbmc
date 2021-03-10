@@ -66,7 +66,7 @@ void uncaught_exceptions_domaint::transform(
   {
   case THROW:
   {
-    const exprt &exc_symbol=get_exception_symbol(instruction.code);
+    const exprt &exc_symbol = get_exception_symbol(instruction.get_code());
     // retrieve the static type of the thrown exception
     const irep_idt &type_id=get_exception_type(exc_symbol.type());
     join(type_id);
@@ -79,15 +79,15 @@ void uncaught_exceptions_domaint::transform(
   }
   case CATCH:
   {
-    if(!instruction.code.has_operands())
+    if(!instruction.get_code().has_operands())
     {
       if(!instruction.targets.empty()) // push
       {
         std::set<irep_idt> caught;
         stack_caught.push_back(caught);
         std::set<irep_idt> &last_caught=stack_caught.back();
-        const irept::subt &exception_list=
-          instruction.code.find(ID_exception_list).get_sub();
+        const irept::subt &exception_list =
+          instruction.get_code().find(ID_exception_list).get_sub();
 
         for(const auto &exc : exception_list)
         {
@@ -114,8 +114,7 @@ void uncaught_exceptions_domaint::transform(
   }
   case FUNCTION_CALL:
   {
-    const exprt &function_expr=
-      to_code_function_call(instruction.code).function();
+    const exprt &function_expr = instruction.get_function_call().function();
     DATA_INVARIANT(
       function_expr.id()==ID_symbol,
       "identifier expected to be a symbol");

@@ -884,5 +884,5 @@ void string_instrumentationt::invalidate_buffer(
   const side_effect_expr_nondett nondet(
     buf_type.subtype(), target->source_location);
 
-  invalidate->code=code_assignt(deref, nondet);
+  invalidate->code_nonconst() = code_assignt(deref, nondet);
 }
