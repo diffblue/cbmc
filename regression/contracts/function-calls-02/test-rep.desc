@@ -1,0 +1,9 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This confirms the accuracy of the preconditions of f1 (called from main).
