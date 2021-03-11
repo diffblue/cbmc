@@ -71,15 +71,6 @@ public:
   /// Threads
   unsigned atomic_section_id = 0;
 
-  /// Get the complexity for this state. Used to short-circuit states if they
-  /// have become too computationally complex.
-  inline std::size_t complexity()
-  {
-    // TODO: This isn't too efficent for BDDs, try using a different size
-    // like DAG size.
-    return guard.as_expr().size();
-  }
-
   /// Constructors
   goto_statet() = delete;
   goto_statet &operator=(const goto_statet &other) = delete;

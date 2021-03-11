@@ -136,7 +136,7 @@ complexity_limitert::check_complexity(goto_symex_statet &state)
   if(!complexity_limits_active() || !state.reachable)
     return complexity_violationt::NONE;
 
-  std::size_t complexity = state.complexity();
+  std::size_t complexity = state.guard.as_expr().bounded_size(max_complexity);
   if(complexity == 0)
     return complexity_violationt::NONE;
 
