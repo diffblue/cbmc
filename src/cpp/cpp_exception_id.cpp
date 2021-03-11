@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_exception_id.h"
 
+#include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/std_types.h>
 

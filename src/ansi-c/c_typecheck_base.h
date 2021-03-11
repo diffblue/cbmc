@@ -13,10 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 
 #include <util/bitvector_expr.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/symbol_table.h>
 #include <util/typecheck.h>
 

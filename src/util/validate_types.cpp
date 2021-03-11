@@ -12,9 +12,9 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
+#include "c_types.h"
 #include "namespace.h"
 #include "pointer_expr.h"
-#include "type.h"
 #include "validate.h"
 #include "validate_helpers.h"
 

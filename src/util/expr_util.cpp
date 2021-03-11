@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include "arith_tools.h"
+#include "c_types.h"
 #include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"

@@ -9,7 +9,7 @@ Author: Diffblue Ltd
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
-#include <util/bitvector_types.h>
+#include <util/c_types.h>
 #include <util/expr.h>
 #include <util/std_types.h>
 

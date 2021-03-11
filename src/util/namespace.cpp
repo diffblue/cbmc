@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include "c_types.h"
 #include "prefix.h"
 #include "std_expr.h"
 #include "std_types.h"

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/namespace.h>

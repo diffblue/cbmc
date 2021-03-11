@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "expr2cpp.h"
 
+#include <util/c_types.h>
 #include <util/lispexpr.h>
 #include <util/lispirep.h>
 #include <util/namespace.h>

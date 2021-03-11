@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 
 bvt boolbvt::convert_update(const update_exprt &expr)
 {

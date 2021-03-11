@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include "xml_expr.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr.h>
 #include <util/fixedbv.h>

@@ -12,8 +12,7 @@ Author: Daiva Naudziuniene, daivan@amazon.com
 #ifndef CPROVER_JSIL_JSIL_TYPES_H
 #define CPROVER_JSIL_JSIL_TYPES_H
 
-#include <util/type.h>
-#include <util/std_types.h>
+#include <util/c_types.h>
 
 typet jsil_kind();
 typet jsil_any_type();

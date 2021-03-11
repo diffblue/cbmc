@@ -8,10 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 bvt boolbvt::convert_with(const with_exprt &expr)
 {

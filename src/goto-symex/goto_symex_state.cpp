@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/as_const.h>
 #include <util/base_exceptions.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/format.h>
