@@ -6,4 +6,7 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This confirms the accuracy of the preconditions.
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | asserted | assumed

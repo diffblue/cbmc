@@ -6,7 +6,13 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This confirms the accuracy of the preconditions of f1 (called from main).
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | asserted | assumed
+  f2       | n/a      | n/a
+
+Note: the call to f2 does not occur because the call to f1 is replaced by its contracts.
 
 Recursion:
 The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).

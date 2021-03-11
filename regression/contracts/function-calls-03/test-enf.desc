@@ -1,19 +1,19 @@
 KNOWNBUG
 main.c
---enforce-all-contracts
+--enforce-all-contracts _ --unwind 20 --unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This confirms the accuracy of the postconditions of both f1 and f2.
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | assumed  | asserted
+  f2       | assumed  | asserted
 
 Recursion:
 The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).
 
-Known bug 1:
+Known bug:
 Enforce flag not handled correctly for function calls within functions.
-This bug is fixed in PR #5538.
-
-Known bug 2:
-This test requires the "--unwind 20 --unwinding-assertions" flag for the cbmc call in "chain.sh", which is currently not handled.

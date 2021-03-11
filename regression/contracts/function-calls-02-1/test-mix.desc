@@ -6,4 +6,8 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This confirms the accuracy of the preconditions of f2 (called from f1) and of the postcondition of f1.
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | assumed  | asserted
+  f2       | asserted | assumed
