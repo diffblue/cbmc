@@ -1,4 +1,17 @@
-ifneq ($(BUILD_ENV_),MSVC)
+default: tests.log
+
+include ../../src/config.inc
+include ../../src/common
+
+ifeq ($(BUILD_ENV_),MSVC)
+	exe = ../../../src/goto-cc/goto-cl
+else
+	exe = ../../../src/goto-cc/goto-cc
+endif
+
+ifeq ($(BUILD_ENV_),MSVC)
+	excluded_tests = -X gcc-only -X winbug
+else
 	# In MacOS, a change in the assert.h header file
 	# is causing template errors when exercising the
 	# C++ front end (because of a transitive include

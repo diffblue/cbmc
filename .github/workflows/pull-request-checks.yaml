@@ -277,6 +277,59 @@ jobs:
           Set-Location build
           ctest -V -L CORE -C Release . -j2
 
+  check-vs-2019-make-build-and-test:
+    runs-on: windows-2019
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: |
+          choco install winflexbison3 strawberryperl
+          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
+          echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
+          echo "c:\Strawberry\" >> $env:GITHUB_PATH
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Initialise Developer Command Line
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-msbuild-make-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-msbuild-make-${{ github.ref }}
+            ${{ runner.os }}-msbuild-make
+      - name: ccache environment
+        run: |
+          echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
+          echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
+      - name: Download minisat with make
+        run: make -C src minisat2-download
+      - name: Build CBMC with make
+        run: make CXX=clcache BUILD_ENV=MSVC -j2 -C src
+      - name: Build unit tests with make
+        run: make CXX=clcache BUILD_ENV=MSVC -j2 -C unit all
+      - name: Build jbmc with make
+        run: |
+          make CXX=clcache -j2 -C jbmc/src setup-submodules
+          make CXX=clcache BUILD_ENV=MSVC -j2 -C jbmc/src
+      - name: Build JBMC unit tests
+        run: make CXX=clcache BUILD_ENV=MSVC -j2 -C jbmc/unit all
+      - name: Print ccache stats
+        run: clcache -s
+      - name: Run CBMC and JBMC unit tests
+        run: |
+          make CXX=clcache BUILD_ENV=MSVC -C unit      test
+          make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
+      - name: Run CBMC regression tests
+        run: make CXX=clcache BUILD_ENV=MSVC -C regression test
+        
+
   check-clang-format:
     runs-on: ubuntu-20.04
     steps:
