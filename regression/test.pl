@@ -76,7 +76,7 @@ sub load($$) {
   my @data = grep { !/^\/\// } <FILE>;
   close FILE;
 
-  chomp @data;
+  s/\R$// for @data;
   if($exit_signal_checks) {
     grep { /^\^EXIT=[\(\|\d]*\d+\)?\$$/ } @data or die "$fname: Missing EXIT test\n";
     grep { /^\^SIGNAL=\d+\$$/ } @data or die "$fname: Missing SIGNAL test\n";
