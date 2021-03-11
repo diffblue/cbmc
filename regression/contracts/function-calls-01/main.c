@@ -1,5 +1,4 @@
-int f1(int *x1)
-  __CPROVER_requires(*x1 > 1 && *x1 < 10000)
+int f1(int *x1) __CPROVER_requires(*x1 > 1 && *x1 < 10000)
   __CPROVER_ensures(__CPROVER_return_value == *x1 + 1)
 {
   return *x1 + 1;
