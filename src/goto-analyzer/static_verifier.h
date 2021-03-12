@@ -44,4 +44,7 @@ enum class ai_verifier_statust
   UNKNOWN
 };
 
+std::string as_string(const ai_verifier_statust &);
+
+
 #endif // CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H

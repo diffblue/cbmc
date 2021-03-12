@@ -20,7 +20,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <analyses/ai.h>
 
 /// Makes a status message string from a status.
-static const char *message(const ai_verifier_statust &status)
+std::string as_string(const ai_verifier_statust &status)
 {
   switch(status)
   {
@@ -55,7 +55,7 @@ struct static_verifier_resultt
       false_json.push_back(trace_ptr->output_json());
 
     return json_objectt{
-      {"status", json_stringt{message(this->status)}},
+      {"status", json_stringt{as_string(this->status)}},
       {"sourceLocation", json(this->source_location)},
       {"unknownHistories", unknown_json},
       {"falseHistories", false_json},
@@ -66,7 +66,7 @@ struct static_verifier_resultt
   {
     xmlt x("result");
 
-    x.set_attribute("status", message(this->status));
+    x.set_attribute("status", as_string(this->status));
 
     // DEPRECATED(SINCE(2020, 12, 2, "Remove and use the structured version"));
     // Unstructed partial output of source location is not great...
@@ -336,7 +336,7 @@ static void static_verifier_text(
     if(!result.source_location.get_comment().empty())
       out << ", " << result.source_location.get_comment();
 
-    out << ": " << message(result.status) << '\n';
+    out << ": " << as_string(result.status) << '\n';
   }
 }
 
