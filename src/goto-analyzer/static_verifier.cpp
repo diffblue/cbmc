@@ -26,9 +26,9 @@ std::string as_string(const ai_verifier_statust &status)
   {
   case ai_verifier_statust::TRUE:
     return "SUCCESS";
-  case ai_verifier_statust::FALSE:
+  case ai_verifier_statust::FALSE_IF_REACHABLE:
     return "FAILURE (if reachable)";
-  case ai_verifier_statust::BOTTOM:
+  case ai_verifier_statust::NOT_REACHABLE:
     return "SUCCESS (unreachable)";
   case ai_verifier_statust::UNKNOWN:
     return "UNKNOWN";
@@ -88,7 +88,7 @@ check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
 {
   if(domain.is_bottom())
   {
-    return ai_verifier_statust::BOTTOM;
+    return ai_verifier_statust::NOT_REACHABLE;
   }
 
   domain.ai_simplify(e, ns);
@@ -98,7 +98,7 @@ check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
   }
   else if(e.is_false())
   {
-    return ai_verifier_statust::FALSE;
+    return ai_verifier_statust::FALSE_IF_REACHABLE;
   }
   else
   {
@@ -128,14 +128,14 @@ static static_verifier_resultt check_assertion(
 
   if(trace_set.size() == 0) // i.e. unreachable
   {
-    result.status = ai_verifier_statust::BOTTOM;
+    result.status = ai_verifier_statust::NOT_REACHABLE;
   }
   else if(trace_set.size() == 1)
   {
     auto dp = ai.abstract_state_before(assert_location);
 
     result.status = check_assertion(*dp, e, ns);
-    if(result.status == ai_verifier_statust::FALSE)
+    if(result.status == ai_verifier_statust::FALSE_IF_REACHABLE)
     {
       result.false_histories = trace_set;
     }
@@ -159,13 +159,13 @@ static static_verifier_resultt check_assertion(
       result.status = check_assertion(*dp, e, ns);
       switch(result.status)
       {
-      case ai_verifier_statust::BOTTOM:
+      case ai_verifier_statust::NOT_REACHABLE:
         ++unreachable_traces;
         break;
       case ai_verifier_statust::TRUE:
         ++true_traces;
         break;
-      case ai_verifier_statust::FALSE:
+      case ai_verifier_statust::FALSE_IF_REACHABLE:
         ++false_traces;
         result.false_histories.insert(trace_ptr);
         break;
@@ -195,7 +195,7 @@ static static_verifier_resultt check_assertion(
           INVARIANT(
             unreachable_traces == trace_set.size(),
             "All traces must not reach the assertion");
-          result.status = ai_verifier_statust::BOTTOM;
+          result.status = ai_verifier_statust::NOT_REACHABLE;
         }
         else
         {
@@ -210,7 +210,7 @@ static static_verifier_resultt check_assertion(
         if(true_traces == 0)
         {
           // All traces that (may) reach it are false
-          result.status = ai_verifier_statust::FALSE;
+          result.status = ai_verifier_statust::FALSE_IF_REACHABLE;
         }
         else
         {
@@ -222,7 +222,7 @@ static static_verifier_resultt check_assertion(
           // Given that all results of FAILURE from this analysis are
           // caveated with some reachability questions, the following is not
           // entirely unreasonable.
-          result.status = ai_verifier_statust::FALSE;
+          result.status = ai_verifier_statust::FALSE_IF_REACHABLE;
         }
       }
     }
@@ -255,11 +255,11 @@ void static_verifier(
       // if the condition simplifies to true the assertion always succeeds
       property_status = property_statust::PASS;
       break;
-    case ai_verifier_statust::FALSE:
+    case ai_verifier_statust::FALSE_IF_REACHABLE:
       // if the condition simplifies to false the assertion always fails
       property_status = property_statust::FAIL;
       break;
-    case ai_verifier_statust::BOTTOM:
+    case ai_verifier_statust::NOT_REACHABLE:
       // if the domain state is bottom then the assertion is definitely
       // unreachable
       property_status = property_statust::NOT_REACHABLE;
@@ -381,11 +381,11 @@ static void static_verifier_console(
       m.result() << m.green << "SUCCESS" << m.reset;
       break;
 
-    case ai_verifier_statust::FALSE:
+    case ai_verifier_statust::FALSE_IF_REACHABLE:
       m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
       break;
 
-    case ai_verifier_statust::BOTTOM:
+    case ai_verifier_statust::NOT_REACHABLE:
       m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
       break;
 
@@ -442,13 +442,13 @@ bool static_verifier(
 
       switch(results.back().status)
       {
-      case ai_verifier_statust::BOTTOM:
+      case ai_verifier_statust::NOT_REACHABLE:
         ++pass;
         break;
       case ai_verifier_statust::TRUE:
         ++pass;
         break;
-      case ai_verifier_statust::FALSE:
+      case ai_verifier_statust::FALSE_IF_REACHABLE:
         ++fail;
         break;
       case ai_verifier_statust::UNKNOWN:

@@ -41,8 +41,8 @@ void static_verifier(
 enum class ai_verifier_statust
 {
   TRUE,
-  FALSE,
-  BOTTOM,
+  FALSE_IF_REACHABLE,
+  NOT_REACHABLE,
   UNKNOWN
 };
 
