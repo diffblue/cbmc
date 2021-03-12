@@ -85,10 +85,9 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 {
   const constant_exprt *constant_expr =
     expr_try_dynamic_cast<constant_exprt>(other_operand);
-  const exprt other_without_typecast = skip_typecast(other_operand);
 
   if(
-    other_without_typecast.id() != ID_address_of &&
+    skip_typecast(other_operand).id() != ID_address_of &&
     (!constant_expr || constant_expr->get_value() != ID_NULL))
   {
     return {};
@@ -129,11 +128,24 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
         value_set_dereferencet::build_reference_to(
           value_set_element, symbol_expr, ns);
 
-      if(skip_typecast(value.pointer) == other_without_typecast)
+      // use the simplifier to test equality as we need to skip over typecasts
+      // and cannot rely on canonical representations, which would permit a
+      // simple syntactic equality test
+      exprt test_equal = simplify_expr(
+        equal_exprt{
+          typecast_exprt::conditional_cast(value.pointer, other_operand.type()),
+          other_operand},
+        ns);
+      if(test_equal.is_true())
       {
         constant_found = true;
         // We can't break because we have to make sure we find any instances of
         // ID_unknown or ID_invalid
+      }
+      else if(!test_equal.is_false())
+      {
+        // We can't conclude anything about the value-set
+        return {};
       }
     }
   }
