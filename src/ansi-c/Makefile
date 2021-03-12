@@ -58,6 +58,7 @@ BUILTIN_FILES = \
   gcc_builtin_headers_ia32-2.inc \
   gcc_builtin_headers_ia32-3.inc \
   gcc_builtin_headers_ia32-4.inc \
+  gcc_builtin_headers_ia32-5.inc \
   gcc_builtin_headers_ia32.inc \
   gcc_builtin_headers_math.inc \
   gcc_builtin_headers_mem_string.inc \
