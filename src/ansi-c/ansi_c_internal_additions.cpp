@@ -63,6 +63,9 @@ const char gcc_builtin_headers_ia32_3[]=
 const char gcc_builtin_headers_ia32_4[]=
 #include "gcc_builtin_headers_ia32-4.inc"
 ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_5[] =
+#include "gcc_builtin_headers_ia32-5.inc"
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[]=
 "# 1 \"gcc_builtin_headers_alpha.h\"\n"

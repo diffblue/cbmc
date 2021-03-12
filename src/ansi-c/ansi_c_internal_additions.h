@@ -28,6 +28,7 @@ extern const char gcc_builtin_headers_ia32[];
 extern const char gcc_builtin_headers_ia32_2[];
 extern const char gcc_builtin_headers_ia32_3[];
 extern const char gcc_builtin_headers_ia32_4[];
+extern const char gcc_builtin_headers_ia32_5[];
 extern const char gcc_builtin_headers_alpha[];
 extern const char gcc_builtin_headers_arm[];
 extern const char gcc_builtin_headers_mips[];
