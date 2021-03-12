@@ -70,8 +70,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 
-void vsd_options(optionst &options, const cmdlinet &cmdline);
-
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv)
@@ -329,17 +327,17 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     else if(cmdline.isset("vsd") || cmdline.isset("variable-sensitivity"))
     {
       options.set_option("vsd", true);
-      options.set_option(
-        "data-dependencies", cmdline.isset("vsd-data-dependencies"));
+      options.set_option("domain set", true);
 
-      vsd_options(options, cmdline);
+      PARSE_OPTIONS_VSD(cmdline, options);
     }
     else if(cmdline.isset("dependence-graph-vs"))
     {
       options.set_option("dependence-graph-vs", true);
-      options.set_option("data-dependencies", true);
+      options.set_option("domain set", true);
 
-      vsd_options(options, cmdline);
+      PARSE_OPTIONS_VSD(cmdline, options);
+      options.set_option("data-dependencies", true); // Always set
     }
 
     // Reachability questions, when given with a domain swap from specific
@@ -917,13 +915,7 @@ void goto_analyzer_parse_optionst::help()
     " --dependence-graph-vs        dependencies between instructions using VSD\n" // NOLINT(*)
     "\n"
     "Variable sensitivity domain (VSD) options:\n"
-    " --vsd-values                 value tracking - constants|intervals|set-of-constants\n"
-    " --vsd-structs                struct field sensitive analysis - top-bottom|every-field\n"
-    " --vsd-arrays                 array entry sensitive analysis - top-bottom|every-element\n"
-    " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n"
-    " --vsd-unions                 union sensitive analysis - top-bottom\n"
-    " --vsd-flow-insensitive       disables flow sensitivity\n"
-    " --vsd-data-dependencies      track data dependencies\n"
+    HELP_VSD
     "\n"
     "Storage options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -965,17 +957,4 @@ void goto_analyzer_parse_optionst::help()
     HELP_TIMESTAMP
     "\n";
   // clang-format on
-}
-
-void vsd_options(optionst &options, const cmdlinet &cmdline)
-{
-  options.set_option("domain set", true);
-
-  // Configuration of VSD
-  options.set_option("values", cmdline.get_value("vsd-values"));
-  options.set_option("pointers", cmdline.get_value("vsd-pointers"));
-  options.set_option("arrays", cmdline.get_value("vsd-arrays"));
-  options.set_option("structs", cmdline.get_value("vsd-structs"));
-  options.set_option("unions", cmdline.get_value("vsd-unions"));
-  options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive"));
 }

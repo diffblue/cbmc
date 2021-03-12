@@ -72,6 +72,37 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 
+#define OPT_VSD                                                                \
+  "(vsd-values):"                                                              \
+  "(vsd-structs):"                                                             \
+  "(vsd-arrays):"                                                              \
+  "(vsd-pointers):"                                                            \
+  "(vsd-unions):"                                                              \
+  "(vsd-flow-insensitive)"                                                     \
+  "(vsd-data-dependencies)"
+
+// clang-format off
+#define HELP_VSD \
+    " --vsd-values                 value tracking - constants|intervals|set-of-constants\n" /* NOLINT(whitespace/line_length) */ \
+    " --vsd-structs                struct field sensitive analysis - top-bottom|every-field\n" /* NOLINT(whitespace/line_length) */ \
+    " --vsd-arrays                 array entry sensitive analysis - top-bottom|every-element\n" /* NOLINT(whitespace/line_length) */ \
+    " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n" /* NOLINT(whitespace/line_length) */ \
+    " --vsd-unions                 union sensitive analysis - top-bottom\n" \
+    " --vsd-flow-insensitive       disables flow sensitivity\n" \
+    " --vsd-data-dependencies      track data dependencies\n" \
+
+// cland-format on
+
+#define PARSE_OPTIONS_VSD(cmdline, options) \
+  options.set_option("values", cmdline.get_value("vsd-values")); \
+  options.set_option("pointers", cmdline.get_value("vsd-pointers")); \
+  options.set_option("arrays", cmdline.get_value("vsd-arrays")); \
+  options.set_option("structs", cmdline.get_value("vsd-structs")); \
+  options.set_option("unions", cmdline.get_value("vsd-unions")); \
+  options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive")); /* NOLINT(whitespace/line_length) */ \
+  options.set_option("data-dependencies", cmdline.isset("vsd-data-dependencies")); /* NOLINT(whitespace/line_length) */ \
+  (void)0
+
 class variable_sensitivity_domaint : public ai_domain_baset
 {
 public:
