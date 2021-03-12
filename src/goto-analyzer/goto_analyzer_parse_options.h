@@ -193,8 +193,6 @@ protected:
   virtual bool process_goto_program(const optionst &options);
 
   virtual int perform_analysis(const optionst &options);
-
-  ai_baset *build_analyzer(const optionst &, const namespacet &ns);
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
