@@ -58,6 +58,12 @@ public:
   ai_history_baset::trace_sett unknown_histories;
   ai_history_baset::trace_sett false_histories;
 
+  static_verifier_resultt(
+    const ai_baset &ai,
+    goto_programt::const_targett assert_location,
+    irep_idt func_id,
+    const namespacet &ns);
+
   jsont output_json(void) const;
   xmlt output_xml(void) const;
 };

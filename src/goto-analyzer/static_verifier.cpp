@@ -108,14 +108,12 @@ check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
   UNREACHABLE;
 }
 
-static static_verifier_resultt check_assertion(
+static_verifier_resultt::static_verifier_resultt(
   const ai_baset &ai,
   goto_programt::const_targett assert_location,
-  irep_idt function_id,
+  irep_idt func_id,
   const namespacet &ns)
 {
-  static_verifier_resultt result;
-
   PRECONDITION(assert_location->is_assert());
   exprt e(assert_location->get_condition());
 
@@ -128,20 +126,20 @@ static static_verifier_resultt check_assertion(
 
   if(trace_set.size() == 0) // i.e. unreachable
   {
-    result.status = ai_verifier_statust::NOT_REACHABLE;
+    status = ai_verifier_statust::NOT_REACHABLE;
   }
   else if(trace_set.size() == 1)
   {
     auto dp = ai.abstract_state_before(assert_location);
 
-    result.status = check_assertion(*dp, e, ns);
-    if(result.status == ai_verifier_statust::FALSE_IF_REACHABLE)
+    status = check_assertion(*dp, e, ns);
+    if(status == ai_verifier_statust::FALSE_IF_REACHABLE)
     {
-      result.false_histories = trace_set;
+      false_histories = trace_set;
     }
-    else if(result.status == ai_verifier_statust::UNKNOWN)
+    else if(status == ai_verifier_statust::UNKNOWN)
     {
-      result.unknown_histories = trace_set;
+      unknown_histories = trace_set;
     }
   }
   else
@@ -156,8 +154,8 @@ static static_verifier_resultt check_assertion(
     {
       auto dp = ai.abstract_state_before(trace_ptr);
 
-      result.status = check_assertion(*dp, e, ns);
-      switch(result.status)
+      status = check_assertion(*dp, e, ns);
+      switch(status)
       {
       case ai_verifier_statust::NOT_REACHABLE:
         ++unreachable_traces;
@@ -167,11 +165,11 @@ static static_verifier_resultt check_assertion(
         break;
       case ai_verifier_statust::FALSE_IF_REACHABLE:
         ++false_traces;
-        result.false_histories.insert(trace_ptr);
+        false_histories.insert(trace_ptr);
         break;
       case ai_verifier_statust::UNKNOWN:
         ++unknown_traces;
-        result.unknown_histories.insert(trace_ptr);
+        unknown_histories.insert(trace_ptr);
         break;
       default:
         UNREACHABLE;
@@ -182,7 +180,7 @@ static static_verifier_resultt check_assertion(
     if(unknown_traces != 0)
     {
       // If any trace is unknown, the final result must be unknown
-      result.status = ai_verifier_statust::UNKNOWN;
+      status = ai_verifier_statust::UNKNOWN;
     }
     else
     {
@@ -195,13 +193,13 @@ static static_verifier_resultt check_assertion(
           INVARIANT(
             unreachable_traces == trace_set.size(),
             "All traces must not reach the assertion");
-          result.status = ai_verifier_statust::NOT_REACHABLE;
+          status = ai_verifier_statust::NOT_REACHABLE;
         }
         else
         {
           // At least one trace (may) reach it.
           // All traces that reach it are safe.
-          result.status = ai_verifier_statust::TRUE;
+          status = ai_verifier_statust::TRUE;
         }
       }
       else
@@ -210,7 +208,7 @@ static static_verifier_resultt check_assertion(
         if(true_traces == 0)
         {
           // All traces that (may) reach it are false
-          result.status = ai_verifier_statust::FALSE_IF_REACHABLE;
+          status = ai_verifier_statust::FALSE_IF_REACHABLE;
         }
         else
         {
@@ -222,16 +220,14 @@ static static_verifier_resultt check_assertion(
           // Given that all results of FAILURE from this analysis are
           // caveated with some reachability questions, the following is not
           // entirely unreasonable.
-          result.status = ai_verifier_statust::FALSE_IF_REACHABLE;
+          status = ai_verifier_statust::FALSE_IF_REACHABLE;
         }
       }
     }
   }
 
-  result.source_location = assert_location->source_location;
-  result.function_id = function_id;
-
-  return result;
+  source_location = assert_location->source_location;
+  function_id = func_id;
 }
 
 void static_verifier(
@@ -247,7 +243,7 @@ void static_verifier(
     auto &property_status = property.second.status;
     const goto_programt::const_targett &property_location = property.second.pc;
 
-    auto result = check_assertion(ai, property_location, "unused", ns);
+    static_verifier_resultt result(ai, property_location, "unused", ns);
 
     switch(result.status)
     {
@@ -438,7 +434,7 @@ bool static_verifier(
       if(!i_it->is_assert())
         continue;
 
-      results.push_back(check_assertion(ai, i_it, f.first, ns));
+      results.push_back(static_verifier_resultt(ai, i_it, f.first, ns));
 
       switch(results.back().status)
       {
