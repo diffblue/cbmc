@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_forall
+in __CPROVER_ensures clauses. By using the --enforce-all-contracts
+flag, goto-instrument will transform the __CPROVER_ensures clauses into an
+assertion and the verification remains sound when using __CPROVER_forall.

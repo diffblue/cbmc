@@ -1,0 +1,19 @@
+KNOWNBUG
+main.c
+--replace-all-calls-with-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_exists
+in __CPROVER_requires clauses. By using the --replace-all-calls-with-contracts
+flag, goto-instrument will transform the __CPROVER_requires clauses into an
+assertion and the verification remains sound when using __CPROVER_exists.
+
+Known Bug:
+We expect verification to fail because arr[i] is never equal to 1 for
+[0 <= i < 10]. In fact, we expect the (0 <= i && i < 10) statement to act as a
+range for i. However, in the current implementation of quantifier handling,
+the (0 <= i && i < 10) statement is not interpreted as an explicit range, but
+instead, as part of a logic formula, which causes verification to succeed.

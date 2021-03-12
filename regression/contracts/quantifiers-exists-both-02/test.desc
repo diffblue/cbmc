@@ -1,0 +1,19 @@
+KNOWNBUG
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_exists
+in a negative context (which is currently not always the case). By using the
+--enforce-all-contracts flag, this test assumes the statement in 
+__CPROVER_requires, then asserts the same statement (in __CPROVER_ensures),
+thus, verification should be successful.
+
+Known bug:
+The current implementation cannot handle a structure such as
+__CPROVER_assume(__CPROVER_exists(int i; pred(i))), where i is
+not explicitly bounded to a predefined range (i.e. if at least
+one of its bound is only declared and not defined).
