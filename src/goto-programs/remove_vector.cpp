@@ -64,6 +64,18 @@ static bool have_to_remove_vector(const typet &type)
       if(have_to_remove_vector(c.type()))
         return true;
   }
+  else if(type.id() == ID_code)
+  {
+    const code_typet &code_type = to_code_type(type);
+
+    if(have_to_remove_vector(code_type.return_type()))
+      return true;
+    for(auto &parameter : code_type.parameters())
+    {
+      if(have_to_remove_vector(parameter.type()))
+        return true;
+    }
+  }
   else if(type.id()==ID_pointer ||
           type.id()==ID_complex ||
           type.id()==ID_array)
@@ -255,6 +267,14 @@ static void remove_vector(typet &type)
     {
       remove_vector(it->type());
     }
+  }
+  else if(type.id() == ID_code)
+  {
+    code_typet &code_type = to_code_type(type);
+
+    remove_vector(code_type.return_type());
+    for(auto &parameter : code_type.parameters())
+      remove_vector(parameter.type());
   }
   else if(type.id()==ID_pointer ||
           type.id()==ID_complex ||
