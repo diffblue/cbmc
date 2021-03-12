@@ -9,7 +9,9 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #ifndef CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H
 #define CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H
 
+#include <analyses/ai.h>
 #include <goto-checker/properties.h>
+
 #include <iosfwd>
 
 class abstract_goto_modelt;
@@ -46,5 +48,18 @@ enum class ai_verifier_statust
 
 std::string as_string(const ai_verifier_statust &);
 
+/// The result of verifying a single assertion
+class static_verifier_resultt
+{
+public:
+  ai_verifier_statust status;
+  source_locationt source_location;
+  irep_idt function_id;
+  ai_history_baset::trace_sett unknown_histories;
+  ai_history_baset::trace_sett false_histories;
+
+  jsont output_json(void) const;
+  xmlt output_xml(void) const;
+};
 
 #endif // CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H

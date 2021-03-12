@@ -36,61 +36,52 @@ std::string as_string(const ai_verifier_statust &status)
   UNREACHABLE;
 }
 
-struct static_verifier_resultt
+jsont static_verifier_resultt::output_json(void) const
 {
-  ai_verifier_statust status;
-  source_locationt source_location;
-  irep_idt function_id;
-  ai_history_baset::trace_sett unknown_histories;
-  ai_history_baset::trace_sett false_histories;
+  json_arrayt unknown_json;
+  for(const auto &trace_ptr : this->unknown_histories)
+    unknown_json.push_back(trace_ptr->output_json());
 
-  jsont output_json(void) const
-  {
-    json_arrayt unknown_json;
-    for(const auto &trace_ptr : this->unknown_histories)
-      unknown_json.push_back(trace_ptr->output_json());
+  json_arrayt false_json;
+  for(const auto &trace_ptr : this->false_histories)
+    false_json.push_back(trace_ptr->output_json());
 
-    json_arrayt false_json;
-    for(const auto &trace_ptr : this->false_histories)
-      false_json.push_back(trace_ptr->output_json());
+  return json_objectt{
+    {"status", json_stringt{as_string(this->status)}},
+    {"sourceLocation", json(this->source_location)},
+    {"unknownHistories", unknown_json},
+    {"falseHistories", false_json},
+  };
+}
 
-    return json_objectt{
-      {"status", json_stringt{as_string(this->status)}},
-      {"sourceLocation", json(this->source_location)},
-      {"unknownHistories", unknown_json},
-      {"falseHistories", false_json},
-    };
-  }
+xmlt static_verifier_resultt::output_xml(void) const
+{
+  xmlt x("result");
 
-  xmlt output_xml(void) const
-  {
-    xmlt x("result");
+  x.set_attribute("status", as_string(this->status));
 
-    x.set_attribute("status", as_string(this->status));
+  // DEPRECATED(SINCE(2020, 12, 2, "Remove and use the structured version"));
+  // Unstructed partial output of source location is not great...
+  x.set_attribute("file", id2string(this->source_location.get_file()));
+  x.set_attribute("line", id2string(this->source_location.get_line()));
 
-    // DEPRECATED(SINCE(2020, 12, 2, "Remove and use the structured version"));
-    // Unstructed partial output of source location is not great...
-    x.set_attribute("file", id2string(this->source_location.get_file()));
-    x.set_attribute("line", id2string(this->source_location.get_line()));
+  // ... this is better
+  x.new_element(xml(source_location));
 
-    // ... this is better
-    x.new_element(xml(source_location));
+  // ( get_comment is not output as part of xml(source_location) )
+  x.set_attribute(
+    "description", id2string(this->source_location.get_comment()));
 
-    // ( get_comment is not output as part of xml(source_location) )
-    x.set_attribute(
-      "description", id2string(this->source_location.get_comment()));
+  xmlt &unknown_xml = x.new_element("unknown");
+  for(const auto &trace_ptr : this->unknown_histories)
+    unknown_xml.new_element(trace_ptr->output_xml());
 
-    xmlt &unknown_xml = x.new_element("unknown");
-    for(const auto &trace_ptr : this->unknown_histories)
-      unknown_xml.new_element(trace_ptr->output_xml());
+  xmlt &false_xml = x.new_element("false");
+  for(const auto &trace_ptr : this->false_histories)
+    false_xml.new_element(trace_ptr->output_xml());
 
-    xmlt &false_xml = x.new_element("false");
-    for(const auto &trace_ptr : this->false_histories)
-      false_xml.new_element(trace_ptr->output_xml());
-
-    return x;
-  }
-};
+  return x;
+}
 
 static ai_verifier_statust
 check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
