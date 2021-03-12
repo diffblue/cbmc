@@ -513,10 +513,28 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov
+          sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-20.04-Coverage-${{ github.ref }}
+            ${{ runner.os }}-20.04-Coverage
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure CMake CBMC build with coverage instrumentation parameters
         run: cmake -S . -Bbuild -Denable_coverage=1 -Dparallel_tests=2 -DCMAKE_CXX_COMPILER=/usr/bin/g++
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=4G
       - name: Execute CMake CBMC build
+        run: cmake --build build -- -j2
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run CTest
         run: cmake --build build --target coverage -- -j2
       - name: Collect coverage statistics
         run: |
