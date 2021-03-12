@@ -36,4 +36,12 @@ void static_verifier(
   const ai_baset &ai,
   propertiest &properties);
 
+enum class ai_verifier_statust
+{
+  TRUE,
+  FALSE,
+  BOTTOM,
+  UNKNOWN
+};
+
 #endif // CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H

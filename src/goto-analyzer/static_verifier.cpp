@@ -19,22 +19,18 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <analyses/ai.h>
 
-// clang-format off
-enum class statust { TRUE, FALSE, BOTTOM, UNKNOWN };
-// clang-format on
-
 /// Makes a status message string from a status.
-static const char *message(const statust &status)
+static const char *message(const ai_verifier_statust &status)
 {
   switch(status)
   {
-  case statust::TRUE:
+  case ai_verifier_statust::TRUE:
     return "SUCCESS";
-  case statust::FALSE:
+  case ai_verifier_statust::FALSE:
     return "FAILURE (if reachable)";
-  case statust::BOTTOM:
+  case ai_verifier_statust::BOTTOM:
     return "SUCCESS (unreachable)";
-  case statust::UNKNOWN:
+  case ai_verifier_statust::UNKNOWN:
     return "UNKNOWN";
   }
   UNREACHABLE;
@@ -42,7 +38,7 @@ static const char *message(const statust &status)
 
 struct static_verifier_resultt
 {
-  statust status;
+  ai_verifier_statust status;
   source_locationt source_location;
   irep_idt function_id;
   ai_history_baset::trace_sett unknown_histories;
@@ -96,26 +92,26 @@ struct static_verifier_resultt
   }
 };
 
-static statust
+static ai_verifier_statust
 check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
 {
   if(domain.is_bottom())
   {
-    return statust::BOTTOM;
+    return ai_verifier_statust::BOTTOM;
   }
 
   domain.ai_simplify(e, ns);
   if(e.is_true())
   {
-    return statust::TRUE;
+    return ai_verifier_statust::TRUE;
   }
   else if(e.is_false())
   {
-    return statust::FALSE;
+    return ai_verifier_statust::FALSE;
   }
   else
   {
-    return statust::UNKNOWN;
+    return ai_verifier_statust::UNKNOWN;
   }
 
   UNREACHABLE;
@@ -141,18 +137,18 @@ static static_verifier_resultt check_assertion(
 
   if(trace_set.size() == 0) // i.e. unreachable
   {
-    result.status = statust::BOTTOM;
+    result.status = ai_verifier_statust::BOTTOM;
   }
   else if(trace_set.size() == 1)
   {
     auto dp = ai.abstract_state_before(assert_location);
 
     result.status = check_assertion(*dp, e, ns);
-    if(result.status == statust::FALSE)
+    if(result.status == ai_verifier_statust::FALSE)
     {
       result.false_histories = trace_set;
     }
-    else if(result.status == statust::UNKNOWN)
+    else if(result.status == ai_verifier_statust::UNKNOWN)
     {
       result.unknown_histories = trace_set;
     }
@@ -172,17 +168,17 @@ static static_verifier_resultt check_assertion(
       result.status = check_assertion(*dp, e, ns);
       switch(result.status)
       {
-      case statust::BOTTOM:
+      case ai_verifier_statust::BOTTOM:
         ++unreachable_traces;
         break;
-      case statust::TRUE:
+      case ai_verifier_statust::TRUE:
         ++true_traces;
         break;
-      case statust::FALSE:
+      case ai_verifier_statust::FALSE:
         ++false_traces;
         result.false_histories.insert(trace_ptr);
         break;
-      case statust::UNKNOWN:
+      case ai_verifier_statust::UNKNOWN:
         ++unknown_traces;
         result.unknown_histories.insert(trace_ptr);
         break;
@@ -195,7 +191,7 @@ static static_verifier_resultt check_assertion(
     if(unknown_traces != 0)
     {
       // If any trace is unknown, the final result must be unknown
-      result.status = statust::UNKNOWN;
+      result.status = ai_verifier_statust::UNKNOWN;
     }
     else
     {
@@ -208,13 +204,13 @@ static static_verifier_resultt check_assertion(
           INVARIANT(
             unreachable_traces == trace_set.size(),
             "All traces must not reach the assertion");
-          result.status = statust::BOTTOM;
+          result.status = ai_verifier_statust::BOTTOM;
         }
         else
         {
           // At least one trace (may) reach it.
           // All traces that reach it are safe.
-          result.status = statust::TRUE;
+          result.status = ai_verifier_statust::TRUE;
         }
       }
       else
@@ -223,7 +219,7 @@ static static_verifier_resultt check_assertion(
         if(true_traces == 0)
         {
           // All traces that (may) reach it are false
-          result.status = statust::FALSE;
+          result.status = ai_verifier_statust::FALSE;
         }
         else
         {
@@ -235,7 +231,7 @@ static static_verifier_resultt check_assertion(
           // Given that all results of FAILURE from this analysis are
           // caveated with some reachability questions, the following is not
           // entirely unreasonable.
-          result.status = statust::FALSE;
+          result.status = ai_verifier_statust::FALSE;
         }
       }
     }
@@ -264,20 +260,20 @@ void static_verifier(
 
     switch(result.status)
     {
-    case statust::TRUE:
+    case ai_verifier_statust::TRUE:
       // if the condition simplifies to true the assertion always succeeds
       property_status = property_statust::PASS;
       break;
-    case statust::FALSE:
+    case ai_verifier_statust::FALSE:
       // if the condition simplifies to false the assertion always fails
       property_status = property_statust::FAIL;
       break;
-    case statust::BOTTOM:
+    case ai_verifier_statust::BOTTOM:
       // if the domain state is bottom then the assertion is definitely
       // unreachable
       property_status = property_statust::NOT_REACHABLE;
       break;
-    case statust::UNKNOWN:
+    case ai_verifier_statust::UNKNOWN:
       // if the condition isn't definitely true, false or unreachable
       // we don't know whether or not it may fail
       property_status = property_statust::UNKNOWN;
@@ -390,19 +386,19 @@ static void static_verifier_console(
 
     switch(result.status)
     {
-    case statust::TRUE:
+    case ai_verifier_statust::TRUE:
       m.result() << m.green << "SUCCESS" << m.reset;
       break;
 
-    case statust::FALSE:
+    case ai_verifier_statust::FALSE:
       m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
       break;
 
-    case statust::BOTTOM:
+    case ai_verifier_statust::BOTTOM:
       m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
       break;
 
-    case statust::UNKNOWN:
+    case ai_verifier_statust::UNKNOWN:
       m.result() << m.yellow << "UNKNOWN" << m.reset;
       break;
     }
@@ -455,16 +451,16 @@ bool static_verifier(
 
       switch(results.back().status)
       {
-      case statust::BOTTOM:
+      case ai_verifier_statust::BOTTOM:
         ++pass;
         break;
-      case statust::TRUE:
+      case ai_verifier_statust::TRUE:
         ++pass;
         break;
-      case statust::FALSE:
+      case ai_verifier_statust::FALSE:
         ++fail;
         break;
-      case statust::UNKNOWN:
+      case ai_verifier_statust::UNKNOWN:
         ++unknown;
         break;
       default:
