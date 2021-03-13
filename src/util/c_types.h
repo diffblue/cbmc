@@ -327,6 +327,88 @@ inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
   return static_cast<c_enum_tag_typet &>(type);
 }
 
+class code_with_contract_typet : public code_typet
+{
+public:
+  /// Constructs a new 'code with contract' type, i.e., a function type
+  /// decorated with a function contract.
+  /// \param _parameters: The vector of function parameters.
+  /// \param _return_type: The return type.
+  code_with_contract_typet(parameterst _parameters, typet _return_type)
+    : code_typet(std::move(_parameters), std::move(_return_type))
+  {
+  }
+
+  bool has_contract() const
+  {
+    return assigns().is_not_nil() || requires().is_not_nil() ||
+           ensures().is_not_nil();
+  }
+
+  const exprt &assigns() const
+  {
+    return static_cast<const exprt &>(find(ID_C_spec_assigns));
+  }
+
+  exprt &assigns()
+  {
+    return static_cast<exprt &>(add(ID_C_spec_assigns));
+  }
+
+  const exprt &requires() const
+  {
+    return static_cast<const exprt &>(find(ID_C_spec_requires));
+  }
+
+  exprt &requires()
+  {
+    return static_cast<exprt &>(add(ID_C_spec_requires));
+  }
+
+  const exprt &ensures() const
+  {
+    return static_cast<const exprt &>(find(ID_C_spec_ensures));
+  }
+
+  exprt &ensures()
+  {
+    return static_cast<exprt &>(add(ID_C_spec_ensures));
+  }
+};
+
+/// Check whether a reference to a typet is a \ref code_typet.
+/// \param type: Source type.
+/// \return True if \p type is a \ref code_typet.
+template <>
+inline bool can_cast_type<code_with_contract_typet>(const typet &type)
+{
+  return type.id() == ID_code;
+}
+
+/// \brief Cast a typet to a \ref code_with_contract_typet
+///
+/// This is an unchecked conversion. \a type must be known to be \ref
+/// code_with_contract_typet. Will fail with a precondition violation if type
+/// doesn't match.
+///
+/// \param type: Source type.
+/// \return Object of type \ref code_with_contract_typet.
+inline const code_with_contract_typet &
+to_code_with_contract_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<code_with_contract_typet>(type));
+  code_with_contract_typet::check(type);
+  return static_cast<const code_with_contract_typet &>(type);
+}
+
+/// \copydoc to_code_type(const typet &)
+inline code_with_contract_typet &to_code_with_contract_type(typet &type)
+{
+  PRECONDITION(can_cast_type<code_with_contract_typet>(type));
+  code_with_contract_typet::check(type);
+  return static_cast<code_with_contract_typet &>(type);
+}
+
 bitvector_typet index_type();
 bitvector_typet enum_constant_type();
 signedbv_typet signed_int_type();

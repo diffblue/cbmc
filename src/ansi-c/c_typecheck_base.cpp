@@ -754,15 +754,19 @@ void c_typecheck_baset::typecheck_declaration(
       typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_ensures);
       parameter_map.clear();
 
-      irept assigns_to_add = contract.find(ID_C_spec_assigns);
+      exprt assigns_to_add =
+        static_cast<const exprt &>(contract.find(ID_C_spec_assigns));
       if(assigns_to_add.is_not_nil())
-        new_symbol.type.add(ID_C_spec_assigns) = assigns_to_add;
-      irept requires_to_add = contract.find(ID_C_spec_requires);
+        to_code_with_contract_type(new_symbol.type).assigns() = assigns_to_add;
+      exprt requires_to_add =
+        static_cast<const exprt &>(contract.find(ID_C_spec_requires));
       if(requires_to_add.is_not_nil())
-        new_symbol.type.add(ID_C_spec_requires) = requires_to_add;
-      irept ensures_to_add = contract.find(ID_C_spec_ensures);
+        to_code_with_contract_type(new_symbol.type).requires() =
+          requires_to_add;
+      exprt ensures_to_add =
+        static_cast<const exprt &>(contract.find(ID_C_spec_ensures));
       if(ensures_to_add.is_not_nil())
-        new_symbol.type.add(ID_C_spec_ensures) = ensures_to_add;
+        to_code_with_contract_type(new_symbol.type).ensures() = ensures_to_add;
     }
   }
 }
