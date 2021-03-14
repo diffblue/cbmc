@@ -243,7 +243,7 @@ void static_verifier(
     auto &property_status = property.second.status;
     const goto_programt::const_targett &property_location = property.second.pc;
 
-    static_verifier_resultt result(ai, property_location, "unused", ns);
+    const static_verifier_resultt result(ai, property_location, "unused", ns);
 
     switch(result.status)
     {
