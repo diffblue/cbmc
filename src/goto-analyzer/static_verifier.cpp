@@ -61,7 +61,7 @@ xmlt static_verifier_resultt::output_xml(void) const
   x.set_attribute("status", as_string(this->status));
 
   // DEPRECATED(SINCE(2020, 12, 2, "Remove and use the structured version"));
-  // Unstructed partial output of source location is not great...
+  // Unstructured partial output of source location is not great...
   x.set_attribute("file", id2string(this->source_location.get_file()));
   x.set_attribute("line", id2string(this->source_location.get_line()));
 
