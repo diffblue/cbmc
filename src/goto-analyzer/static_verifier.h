@@ -38,17 +38,30 @@ void static_verifier(
   const ai_baset &ai,
   propertiest &properties);
 
+/// An ai_baset contains zero or more histories that reach a location.
+/// In a given history, a Boolean expression can be true, false or unknown.
+/// If we only care about "does there exist a history that make the condition
+/// true/false/unknown" then that means there are 8 possible statuses.
+/// In practice not all of them are usefully distinguishable, so we only
+/// consider 4 of them.
+/// Also note that because abstract interpretation is an over-approximate
+/// analysis, the existence of a history does not necessarily mean that there
+/// is an actual executation trace that makes the condition true/false.
 enum class ai_verifier_statust
 {
-  TRUE,
-  FALSE_IF_REACHABLE,
-  NOT_REACHABLE,
-  UNKNOWN
+  TRUE,               // true : 1+, unknown :  0, false :  0
+  FALSE_IF_REACHABLE, // true : 0+, unknown :  0, false : 1+
+  NOT_REACHABLE,      // true :  0, unknown :  0, false :  0
+  UNKNOWN             // true : 0+, unknown : 1+, false : 0+
 };
 
 std::string as_string(const ai_verifier_statust &);
 
 /// The result of verifying a single assertion
+/// As well as the status of the assertion (see above), it also contains the
+/// location (source_location and function_id) and the set of histories
+/// in which the assertion is unknown or false, so that more detailed
+/// post-processing or error output can be done.
 class static_verifier_resultt
 {
 public:
