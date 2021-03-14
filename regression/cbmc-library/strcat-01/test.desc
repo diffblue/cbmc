@@ -1,10 +1,8 @@
 CORE
 main.c
---unwind 10
-^EXIT=10$
+--unwind 10 --pointer-check --bounds-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
-\[main.assertion.6\] .* assertion strlen\(A3\) == 4: FAILURE
-\*\* 1 of 9 failed
 --
 ^warning: ignoring
