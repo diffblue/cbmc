@@ -7,6 +7,7 @@ SRC = goto_analyzer_main.cpp \
       static_show_domain.cpp \
       static_simplifier.cpp \
       static_verifier.cpp \
+      build_analyzer.cpp \
       # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \

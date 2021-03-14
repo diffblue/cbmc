@@ -103,6 +103,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/ai.h>
 #include <analyses/goto_check.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 class goto_functionst;
 class optionst;
@@ -134,15 +135,6 @@ class optionst;
   "(dependence-graph)" \
   "(vsd)(variable-sensitivity)" \
   "(dependence-graph-vs)" \
-
-#define GOTO_ANALYSER_OPTIONS_VSD \
-  "(vsd-values):" \
-  "(vsd-structs):" \
-  "(vsd-arrays):" \
-  "(vsd-pointers):" \
-  "(vsd-unions):" \
-  "(vsd-flow-insensitive)" \
-  "(vsd-data-dependencies)"
 
 #define GOTO_ANALYSER_OPTIONS_STORAGE \
   "(one-domain-per-history)" \
@@ -177,7 +169,7 @@ class optionst;
   "(location-sensitive)(concurrent)" \
   GOTO_ANALYSER_OPTIONS_HISTORY \
   GOTO_ANALYSER_OPTIONS_DOMAIN \
-  GOTO_ANALYSER_OPTIONS_VSD \
+  OPT_VSD \
   GOTO_ANALYSER_OPTIONS_STORAGE  \
   GOTO_ANALYSER_OPTIONS_OUTPUT \
   GOTO_ANALYSER_OPTIONS_SPECIFIC_ANALYSES \
@@ -201,8 +193,6 @@ protected:
   virtual bool process_goto_program(const optionst &options);
 
   virtual int perform_analysis(const optionst &options);
-
-  ai_baset *build_analyzer(const optionst &, const namespacet &ns);
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
