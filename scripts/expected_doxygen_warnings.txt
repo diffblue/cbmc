@@ -20,7 +20,7 @@
 /home/runner/work/cbmc/cbmc/src/util/rename.h:23: warning: documented empty return type of get_new_name
 warning: Include graph for 'goto_instrument_parse_options.cpp' not generated, too many nodes (97), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'goto_functions.h' not generated, too many nodes (66), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'goto_model.h' not generated, too many nodes (110), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'goto_model.h' not generated, too many nodes (111), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'arith_tools.h' not generated, too many nodes (181), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'c_types.h' not generated, too many nodes (141), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'config.h' not generated, too many nodes (87), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
@@ -30,7 +30,7 @@ warning: Included by graph for 'expr_util.h' not generated, too many nodes (61),
 warning: Included by graph for 'invariant.h' not generated, too many nodes (186), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'irep.h' not generated, too many nodes (62), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'message.h' not generated, too many nodes (117), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
-warning: Included by graph for 'namespace.h' not generated, too many nodes (109), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
+warning: Included by graph for 'namespace.h' not generated, too many nodes (110), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'pointer_expr.h' not generated, too many nodes (116), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'prefix.h' not generated, too many nodes (85), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'simplify_expr.h' not generated, too many nodes (79), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
