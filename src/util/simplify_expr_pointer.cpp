@@ -426,12 +426,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
 
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
 
-  exprt tmp0=expr.op0();
-
   // skip over the typecast
-  if(tmp0.id()==ID_typecast)
-    tmp0 = to_typecast_expr(tmp0).op();
-
+  exprt tmp0 = skip_typecast(expr.op0());
   PRECONDITION(tmp0.id() == ID_address_of);
 
   auto &tmp0_address_of = to_address_of_expr(tmp0);
@@ -444,12 +440,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
       address_of_exprt(to_index_expr(tmp0_address_of.object()).array());
   }
 
-  exprt tmp1=expr.op1();
-
   // skip over the typecast
-  if(tmp1.id()==ID_typecast)
-    tmp1 = to_typecast_expr(tmp1).op();
-
+  exprt tmp1 = skip_typecast(expr.op1());
   PRECONDITION(tmp1.id() == ID_address_of);
 
   auto &tmp1_address_of = to_address_of_expr(tmp1);
