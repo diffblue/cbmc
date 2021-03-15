@@ -1,3 +1,4 @@
+// clang-format off
 void __builtin___bnd_chk_ptr_bounds(const void*, __CPROVER_size_t);
 void __builtin___bnd_chk_ptr_lbounds(const void*);
 void __builtin___bnd_chk_ptr_ubounds(const void*);
@@ -116,3 +117,4 @@ char* __builtin_strstr(const char*, const char*);
 int __builtin_toascii(int);
 int __builtin_tolower(int);
 int __builtin_toupper(int);
+// clang-format on

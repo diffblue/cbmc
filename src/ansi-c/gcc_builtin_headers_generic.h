@@ -1,3 +1,4 @@
+// clang-format off
 // stdarg
 void* __builtin_apply_args();
 void __builtin_ms_va_end(void *ap);
@@ -92,3 +93,4 @@ void __builtin_return(void*);
 void* __builtin_saveregs();
 int __builtin_setjmp(void*);
 void __builtin_update_setjmp_buf(void*);
+// clang-format on

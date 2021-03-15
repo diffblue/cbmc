@@ -1,3 +1,4 @@
+// clang-format off
 __gcc_v32hi __builtin_ia32_loaddquhi512_mask(const short*, __gcc_v32hi, unsigned);
 __gcc_v64qi __builtin_ia32_loaddquqi512_mask(const char*, __gcc_v64qi, unsigned long long);
 void __builtin_ia32_storedquhi512_mask(short*, __gcc_v32hi, unsigned);
@@ -664,3 +665,4 @@ unsigned char __builtin_ia32_ptestnmd128(__gcc_v4si, __gcc_v4si, unsigned char);
 unsigned char __builtin_ia32_ptestnmd256(__gcc_v8si, __gcc_v8si, unsigned char);
 unsigned char __builtin_ia32_ptestnmq128(__gcc_v2di, __gcc_v2di, unsigned char);
 unsigned char __builtin_ia32_ptestnmq256(__gcc_v4di, __gcc_v4di, unsigned char);
+// clang-format on

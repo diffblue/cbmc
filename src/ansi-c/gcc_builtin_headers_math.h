@@ -1,3 +1,4 @@
+// clang-format off
 int __builtin_abs(int);
 double __builtin_acos(double);
 float __builtin_acosf(float);
@@ -377,3 +378,4 @@ long double __builtin_y1l(long double);
 double __builtin_yn(int, double);
 float __builtin_ynf(int, float);
 long double __builtin_ynl(int, long double);
+// clang-format on

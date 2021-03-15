@@ -1,3 +1,4 @@
+// clang-format off
 // from
 // http://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/X86-Built_002din-Functions.html
 
@@ -1165,3 +1166,4 @@ double __builtin_ia32_vec_ext_v2df(__gcc_v2df, int);
 __gcc_di __builtin_ia32_vec_ext_v2di(__gcc_v2di, int);
 float __builtin_ia32_vec_ext_v4sf(__gcc_v4sf, int);
 int __builtin_ia32_vec_ext_v4si(__gcc_v4si, int);
+// clang-format on

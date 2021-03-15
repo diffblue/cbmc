@@ -1,3 +1,4 @@
+// clang-format off
 void __builtin___asan_init();
 void __builtin___asan_version_mismatch_check_v8();
 void __builtin___asan_report_load1(void*);
@@ -90,3 +91,4 @@ void __builtin___ubsan_handle_nonnull_return_abort(void*);
 void __builtin___ubsan_handle_dynamic_type_cache_miss(void*, void*, void*);
 void __builtin___ubsan_handle_dynamic_type_cache_miss_abort(void*, void*, void*);
 void __builtin___sanitizer_cov_trace_pc();
+// clang-format on
