@@ -1,10 +1,21 @@
 default: tests.log
 
-test:
-	@../test.pl -c ../chain.sh
+include ../../src/config.inc
+include ../../src/common
 
-tests.log: ../test.pl
-	@../test.pl -c ../chain.sh
+ifeq ($(BUILD_ENV_),MSVC)
+	exe=../../../src/goto-cc/goto-cl
+	is_windows=true
+else
+	exe=../../../src/goto-cc/goto-cc
+	is_windows=false
+endif
+
+test:
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/cbmc/cbmc $(is_windows)'
+
+tests.log:
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/cbmc/cbmc $(is_windows)'
 
 show:
 	@for dir in *; do \
