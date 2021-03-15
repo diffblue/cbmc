@@ -2675,10 +2675,9 @@ cprover_exception_statement:
 
 volatile_or_goto_opt:
           /* nothing */
-        | TOK_VOLATILE
-        | TOK_GOTO
-        | TOK_GOTO TOK_VOLATILE
-        | TOK_VOLATILE TOK_GOTO
+        | volatile_or_goto_opt TOK_VOLATILE
+        | volatile_or_goto_opt TOK_GOTO
+        | volatile_or_goto_opt TOK_INLINE
         ;
 
 /* asm ( assembler template
