@@ -1,9 +1,13 @@
 #!/bin/bash
 
-src=../../../src
-goto_cc=$src/goto-cc/goto-cc
-goto_instrument=$src/goto-instrument/goto-instrument
-cbmc=$src/cbmc/cbmc
+set -e
+
+goto_cc=$1
+goto_instrument=$2
+cbmc=$3
+is_windows=$4
+
+shift 4
 
 function usage() {
   echo "Usage: chain architecture [strategy] test_file.c"
@@ -24,8 +28,8 @@ else
   usage
 fi
 
-arch=${arch,,}
-strategy=${strategy,,}
+arch=$(echo $arch | tr A-Z a-z)
+strategy=$(echo $strategy | tr A-Z a-z)
 
 if [[ "tso|pso|rmo|power|arm|sc|cav11|" =~ "$arch|" ]]
 then
@@ -54,6 +58,10 @@ else
   flag=
 fi
 
-timeout 180.0s $goto_cc -o $name.gb $name.c
-timeout 180.0s $goto_instrument $flag $name.gb ${name}_$arch.gb $strat
-timeout 180.0s $cbmc ${name}_$arch.gb
+if [[ "${is_windows}" == "true" ]]; then
+  $goto_cc "${name}.c" "/Fe${name}.gb"
+else
+  $goto_cc -o "${name}.gb" "${name}.c"
+fi
+perl -e 'alarm shift @ARGV; exec @ARGV' 180 "$goto_instrument" $flag "$name.gb" "${name}_$arch.gb" $strat
+perl -e 'alarm shift @ARGV; exec @ARGV' 180 "$cbmc" "${name}_$arch.gb"
