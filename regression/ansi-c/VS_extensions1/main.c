@@ -20,6 +20,11 @@ __declspec(thread) int thread_local;
 
 struct __declspec(dllimport) some_struct_tag { int x; };
 
+typedef union __declspec(intrin_type) __declspec(align(8)) u {
+  int x;
+  int y;
+} u2;
+
 //__delegate int GetDayOfWeek();
 
 // __event

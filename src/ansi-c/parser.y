@@ -1440,7 +1440,20 @@ msc_declspec_opt:
         {
           init($$, ID_nil);
         }
-        | msc_declspec
+        | msc_declspec_opt msc_declspec
+        {
+          if(parser_stack($1).is_not_nil())
+          {
+            $$ = $1;
+            exprt::operandst &operands = parser_stack($1).operands();
+            operands.insert(
+              operands.end(),
+              parser_stack($2).operands().begin(),
+              parser_stack($2).operands().end());
+          }
+          else
+            $$ = $2;
+        }
         ;
 
 storage_class:
