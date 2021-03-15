@@ -1655,6 +1655,11 @@ gcc_attribute:
         {
           init($$);
         }
+        | TOK_GCC_ATTRIBUTE_FALLTHROUGH
+        {
+          // attribute ignored
+          init($$);
+        }
         | gcc_type_attribute
         ;
 
@@ -2320,19 +2325,7 @@ declaration_statement:
         ;
 
 labeled_statement:
-          identifier_or_typedef_name ':' gcc_attribute_specifier ';'
-        {
-          /* Only semicolons permitted after the attribute:
-             https://gcc.gnu.org/onlinedocs/gcc/Label-Attributes.html */
-          $$=$2;
-          statement($$, ID_label);
-          irep_idt identifier=PARSER.lookup_label(parser_stack($1).get(ID_C_base_name));
-          parser_stack($$).set(ID_label, identifier);
-          // attribute ignored
-          statement($3, ID_skip);
-          mto($$, $3);
-        }
-        | identifier_or_typedef_name ':' statement
+        identifier_or_typedef_name ':' statement
         {
           $$=$2;
           statement($$, ID_label);
@@ -2367,10 +2360,14 @@ labeled_statement:
         ;
 
 statement_attribute:
-          TOK_GCC_ATTRIBUTE '(' '(' TOK_GCC_ATTRIBUTE_FALLTHROUGH ')' ')' ';' labeled_statement
+        gcc_attribute_specifier ';'
         {
-          // attribute ignored
-          $$=$8;
+          // Really should only be TOK_GCC_ATTRIBUTE_FALLTHROUGH or a label
+          // attribute. Only semicolons permitted after the attribute:
+          // https://gcc.gnu.org/onlinedocs/gcc/Label-Attributes.html
+          // We ignore all such attributes.
+          $$=$1;
+          statement($$, ID_skip);
         }
         ;
 

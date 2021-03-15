@@ -7,13 +7,20 @@ int main()
   int x;
   switch(x)
   {
-    case 1:
-      x = 2;
+  case 1:
+    x = 2;
 #ifdef __GNUC__
-      __attribute__((fallthrough));
+    __attribute__((fallthrough));
 #endif
-    case 2:
-      x = 3;
+  case 2:
+  {
+    x = 3;
+#ifdef __GNUC__
+    __attribute__((__fallthrough__));
+#endif
+  }
+  case 3:
+    break;
   }
 
   return 0;
