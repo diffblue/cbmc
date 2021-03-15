@@ -1,0 +1,8 @@
+KNOWNBUG winbug macos-assert-broken
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

@@ -1,0 +1,8 @@
+CORE winbug macos-assert-broken
+main.cpp
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
