@@ -1,3 +1,4 @@
+// clang-format off
 long __builtin_alpha_implver(void);
 long __builtin_alpha_rpcc(void);
 long __builtin_alpha_amask(long);
@@ -44,3 +45,4 @@ long __builtin_alpha_ctlz(long);
 long __builtin_alpha_ctpop(long);
 void *__builtin_thread_pointer(void);
 void __builtin_set_thread_pointer(void *);
+// clang-format on

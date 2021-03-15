@@ -1,3 +1,4 @@
+// clang-format off
 int __builtin_omp_get_thread_num();
 int __builtin_omp_get_num_threads();
 int __builtin_omp_get_team_num();
@@ -88,3 +89,4 @@ void __builtin_GOMP_target_end_data();
 void __builtin_GOMP_target_update_ext(int, __CPROVER_size_t, void*, void*, void*, unsigned, void*);
 void __builtin_GOMP_target_enter_exit_data(int, __CPROVER_size_t, void*, void*, void*, unsigned, void*);
 void __builtin_GOMP_teams(unsigned, unsigned);
+// clang-format on

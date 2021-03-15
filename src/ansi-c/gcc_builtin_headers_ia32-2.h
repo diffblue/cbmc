@@ -1,3 +1,4 @@
+// clang-format off
 void __builtin_ia32_emms();
 __gcc_v2si __builtin_ia32_pmaddwd(__gcc_v4hi, __gcc_v4hi);
 __gcc_v2si __builtin_ia32_vec_init_v2si(int, int);
@@ -651,3 +652,4 @@ void __builtin_ia32_scatterpfdpd(char, __gcc_v8si,const long*, int, int);
 void __builtin_ia32_scatterpfdps( short, __gcc_v16si, const int*, int, int);
 void __builtin_ia32_scatterpfqpd(char, __gcc_v8di,const long*, int, int);
 void __builtin_ia32_scatterpfqps(char, __gcc_v8di, const int*, int, int);
+// clang-format on

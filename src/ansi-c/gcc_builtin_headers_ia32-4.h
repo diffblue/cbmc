@@ -1,3 +1,4 @@
+// clang-format off
 __gcc_v2di __builtin_ia32_broadcastmb128(unsigned char);
 __gcc_v4di __builtin_ia32_broadcastmb256(unsigned char);
 __gcc_v4si __builtin_ia32_broadcastmw128(unsigned short);
@@ -339,3 +340,4 @@ __gcc_v8di __builtin_ia32_vpopcountq_v8di(__gcc_v8di);
 __gcc_v8di __builtin_ia32_vpopcountq_v8di_mask(__gcc_v8di, __gcc_v8di, unsigned char);
 unsigned __builtin_ia32_rdpid();
 unsigned long __builtin_ia32_sizeof(void);
+// clang-format on

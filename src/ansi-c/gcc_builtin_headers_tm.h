@@ -1,3 +1,4 @@
+// clang-format off
 unsigned __builtin__ITM_beginTransaction(unsigned, ...);
 void __builtin__ITM_commitTransaction();
 void __builtin__ITM_commitTransactionEH(void*);
@@ -42,3 +43,4 @@ long double __builtin__ITM_RE(volatile void*);
 long double __builtin__ITM_RaRE(volatile void*);
 long double __builtin__ITM_RaWE(volatile void*);
 long double __builtin__ITM_RfWE(volatile void*);
+// clang-format on

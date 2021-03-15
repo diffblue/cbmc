@@ -1,3 +1,4 @@
+// clang-format off
 int __builtin_arm_getwcx(int);
 void __builtin_arm_setwcx(int, int);
 int __builtin_arm_textrmsb(__gcc_v8qi, int);
@@ -132,3 +133,4 @@ __gcc_v4hi __builtin_arm_wunpckilh(__gcc_v4hi, __gcc_v4hi);
 __gcc_v2si __builtin_arm_wunpckilw(__gcc_v2si, __gcc_v2si);
 long long __builtin_arm_wxor(long long, long long);
 long long __builtin_arm_wzero();
+// clang-format on
