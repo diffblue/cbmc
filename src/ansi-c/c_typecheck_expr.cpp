@@ -950,7 +950,14 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   }
   else
   {
-    type.swap(to_unary_expr(expr).op().type());
+    const exprt &op = to_unary_expr(as_const(expr)).op();
+    // This is one of the few places where it's detectable
+    // that we are using "bool" for boolean operators instead
+    // of "int". We convert for this reason.
+    if(op.type().id() == ID_bool)
+      type = signed_int_type();
+    else
+      type = op.type();
   }
 
   exprt new_expr;
