@@ -1,9 +1,9 @@
-CORE
+CORE paths-lifo-expected-failure broken-smt-backend
 main.c
 --localize-faults --stop-on-fail
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\]:
+^\[main.assertion.[12]\]:
 line . function main$
 ^VERIFICATION FAILED$
 --

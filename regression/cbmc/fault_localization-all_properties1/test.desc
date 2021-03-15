@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+--localize-faults
+^EXIT=10$
+^SIGNAL=0$
+line 7 function main$
+line 9 function main$
+^VERIFICATION FAILED$
+--
+--
+With --localize-faults, CBMC only reports the first assertion as failing.
+Without --localize-faults, CBMC correctly reports both assertions as failing.
