@@ -24,6 +24,7 @@ DIRS = cbmc \
        goto-cc-cbmc-shared-options \
        cbmc-cpp \
        goto-cc-goto-analyzer \
+       goto-analyzer-simplify \
        statement-list \
        systemc \
        contracts \

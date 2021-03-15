@@ -1,14 +1,12 @@
 #!/bin/bash
 
-src_dir=../../../src
+set -e
 
-goto_analyzer=$src_dir/goto-analyzer/goto-analyzer
+goto_analyzer=$1
 
-options=$1
-file_name=${2%.c}
+options=${*:2:$#-2}
+name=${*:$#}
+name=${name%.c}
 
-echo options: $options
-echo file name : $file_name
-
-$goto_analyzer $file_name.c $options --simplify $file_name_simp.out
-$goto_analyzer $file_name_simp.out --show-goto-functions
+"${goto_analyzer}" "${name}.c" ${options} --simplify "${name}.gb"
+"${goto_analyzer}" "${name}.gb" --show-goto-functions

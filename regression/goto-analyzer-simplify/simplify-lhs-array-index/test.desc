@@ -1,7 +1,9 @@
 CORE
 main.c
-"--variable-sensitivity --vsd-arrays"
-
-arr\[0l\] =
-arr\[1l\] =
-arr\[\(signed long int\)nondet\] =
+--vsd --vsd-arrays every-element
+arr\[0l?l?\] =
+arr\[1l?l?\] =
+arr\[\(signed (long (long )?)?int\)nondet\] =
+^SIGNAL=0$
+^EXIT=0$
+--

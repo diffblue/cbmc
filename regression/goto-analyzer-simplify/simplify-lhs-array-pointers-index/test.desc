@@ -1,8 +1,10 @@
 CORE
 main.c
-"--variable-sensitivity --vsd-arrays --vsd-pointers"
-
+--vsd --vsd-arrays every-element --vsd-pointers value-set
 symbol_a = 1
 symbol_b = 2
-\*arr\[2l\] = 3;
-\*arr\[\(signed long int\)nondet_index\] = 4;
+\*arr\[2l?l?\] = 3;
+\*arr\[\(signed (long (long )?)?int\)nondet_index\] = 4;
+^SIGNAL=0$
+^EXIT=0$
+--
