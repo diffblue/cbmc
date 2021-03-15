@@ -364,7 +364,8 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          pip install unidiff
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq python3-unidiff
       - name: Check updated lines of code meet linting standards
         env:
           BASE_BRANCH: ${{ github.base_ref }}
