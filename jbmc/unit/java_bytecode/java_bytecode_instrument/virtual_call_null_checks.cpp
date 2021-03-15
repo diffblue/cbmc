@@ -22,7 +22,7 @@ static bool is_expected_virtualmethod_call(
 {
   if(instruction.type != FUNCTION_CALL)
     return false;
-  const auto &virtual_call = to_code_function_call(instruction.code);
+  const auto &virtual_call = instruction.get_function_call();
   const auto &called_function = virtual_call.function();
   if(!can_cast_expr<class_method_descriptor_exprt>(called_function))
     return false;
@@ -81,9 +81,10 @@ SCENARIO(
               instrend = main_function.body.instructions.end();
             instrit != instrend; ++instrit)
         {
-          for(auto it = instrit->code.depth_begin(),
-                itend = instrit->code.depth_end();
-              it != itend; ++it)
+          for(auto it = instrit->get_code().depth_begin(),
+                   itend = instrit->get_code().depth_end();
+              it != itend;
+              ++it)
           {
             if(it->id() == ID_dereference)
             {

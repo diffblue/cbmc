@@ -171,8 +171,7 @@ bool model_argc_argv(
   {
     if(main_call->is_function_call())
     {
-      const exprt &func=
-        to_code_function_call(main_call->code).function();
+      const exprt &func = main_call->get_function_call().function();
       if(func.id()==ID_symbol &&
          to_symbol_expr(func).get_identifier()==main_symbol.name)
         break;

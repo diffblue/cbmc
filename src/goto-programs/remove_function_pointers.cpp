@@ -451,7 +451,7 @@ void remove_function_pointerst::remove_function_pointer(
   // further pointer-related errors.
   code_expressiont code_expression(function);
   code_expression.add_source_location()=function.source_location();
-  target->code.swap(code_expression);
+  target->code_nonconst().swap(code_expression);
   target->type=OTHER;
 
   // report statistics

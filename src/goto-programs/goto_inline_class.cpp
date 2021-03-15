@@ -56,7 +56,7 @@ void goto_inlinet::parameter_assignments(
 
     goto_programt::targett decl =
       dest.add(goto_programt::make_decl(symbol.symbol_expr(), source_location));
-    decl->code.add_source_location() = source_location;
+    decl->code_nonconst().add_source_location() = source_location;
 
     // this is the actual parameter
     exprt actual;
@@ -149,7 +149,7 @@ void goto_inlinet::parameter_destruction(
 
       goto_programt::targett dead = dest.add(
         goto_programt::make_dead(symbol.symbol_expr(), source_location));
-      dead->code.add_source_location()=source_location;
+      dead->code_nonconst().add_source_location() = source_location;
     }
   }
 }
@@ -169,7 +169,7 @@ void goto_inlinet::replace_return(
       {
         // a typecast may be necessary if the declared return type at the call
         // site differs from the defined return type
-        it->code = code_assignt(
+        it->code_nonconst() = code_assignt(
           lhs,
           typecast_exprt::conditional_cast(it->return_value(), lhs.type()));
         it->type=ASSIGN;
@@ -178,7 +178,7 @@ void goto_inlinet::replace_return(
       }
       else
       {
-        it->code = code_expressiont(it->return_value());
+        it->code_nonconst() = code_expressiont(it->return_value());
         it->type=OTHER;
         it++;
       }
@@ -288,7 +288,7 @@ void goto_inlinet::insert_function_body(
     for(auto &instruction : tmp.instructions)
     {
       replace_location(instruction.source_location, target->source_location);
-      replace_location(instruction.code, target->source_location);
+      replace_location(instruction.code_nonconst(), target->source_location);
 
       if(instruction.has_condition())
       {
@@ -301,7 +301,7 @@ void goto_inlinet::insert_function_body(
 
   // kill call
   target->type=LOCATION;
-  target->code.clear();
+  target->code_nonconst().clear();
   target++;
 
   dest.destructive_insert(target, tmp);

@@ -652,8 +652,8 @@ int goto_instrument_parse_optionst::doit()
       for(auto const &pair : goto_model.goto_functions.function_map)
         for(auto const &ins : pair.second.body.instructions)
         {
-          if(ins.code.is_not_nil())
-            log.status() << ins.code.pretty() << messaget::eom;
+          if(ins.get_code().is_not_nil())
+            log.status() << ins.get_code().pretty() << messaget::eom;
           if(ins.has_condition())
           {
             log.status() << "[guard] " << ins.get_condition().pretty()

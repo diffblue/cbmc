@@ -45,8 +45,7 @@ exprt static_analysis_baset::get_return_lhs(locationt to)
   // must be the function call
   assert(to->is_function_call());
 
-  const code_function_callt &code=
-    to_code_function_call(to->code);
+  const code_function_callt &code = to->get_function_call();
 
   return code.lhs();
 }
@@ -212,8 +211,7 @@ bool static_analysis_baset::visit(
     if(l->is_function_call())
     {
       // this is a big special case
-      const code_function_callt &code=
-        to_code_function_call(l->code);
+      const code_function_callt &code = l->get_function_call();
 
       do_function_call_rec(
         function_identifier,

@@ -94,7 +94,7 @@ public:
   {
     if(!i.is_assign())
       return false;
-    const code_assignt &assign = to_code_assign(i.code);
+    const code_assignt &assign = i.get_assign();
     return
       assign.lhs().id() == ID_symbol &&
       id2string(to_symbol_expr(assign.lhs()).get_identifier()).find('y') !=

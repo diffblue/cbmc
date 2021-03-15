@@ -162,7 +162,7 @@ void cover_basic_blockst::add_block_lines(
     }
   };
   add_location(instruction.source_location);
-  instruction.code.visit_pre(
+  instruction.get_code().visit_pre(
     [&](const exprt &expr) { add_location(expr.source_location()); });
 }
 

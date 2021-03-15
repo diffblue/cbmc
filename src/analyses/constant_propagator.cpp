@@ -758,7 +758,7 @@ void constant_propagator_ait::replace(
     if(d.is_bottom())
       continue;
 
-    replace_types_rec(d.values.replace_const, it->code);
+    replace_types_rec(d.values.replace_const, it->code_nonconst());
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {

@@ -31,7 +31,7 @@ bool is_skip(
     return false;
 
   if(it->is_skip())
-    return !it->code.get_bool(ID_explicit);
+    return !it->get_code().get_bool(ID_explicit);
 
   if(it->is_goto())
   {
@@ -60,7 +60,8 @@ bool is_skip(
       return true;
     else if(statement==ID_expression)
     {
-      const code_expressiont &code_expression=to_code_expression(it->code);
+      const code_expressiont &code_expression =
+        to_code_expression(it->get_code());
       const exprt &expr=code_expression.expression();
       if(expr.id()==ID_typecast &&
          expr.type().id()==ID_empty &&

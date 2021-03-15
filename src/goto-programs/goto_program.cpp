@@ -109,7 +109,7 @@ std::ostream &goto_programt::output_instruction(
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    out << from_expr(ns, identifier, instruction.code) << '\n';
+    out << from_expr(ns, identifier, instruction.get_code()) << '\n';
     break;
 
   case ASSUME:
@@ -146,37 +146,37 @@ std::ostream &goto_programt::output_instruction(
     out << "THROW";
 
     {
-      const irept::subt &exception_list=
-        instruction.code.find(ID_exception_list).get_sub();
+      const irept::subt &exception_list =
+        instruction.get_code().find(ID_exception_list).get_sub();
 
       for(const auto &ex : exception_list)
         out << " " << ex.id();
     }
 
-    if(instruction.code.operands().size()==1)
-      out << ": " << from_expr(ns, identifier, instruction.code.op0());
+    if(instruction.get_code().operands().size() == 1)
+      out << ": " << from_expr(ns, identifier, instruction.get_code().op0());
 
     out << '\n';
     break;
 
   case CATCH:
   {
-    if(instruction.code.get_statement()==ID_exception_landingpad)
+    if(instruction.get_code().get_statement() == ID_exception_landingpad)
     {
-      const auto &landingpad=to_code_landingpad(instruction.code);
+      const auto &landingpad = to_code_landingpad(instruction.get_code());
       out << "EXCEPTION LANDING PAD ("
           << from_type(ns, identifier, landingpad.catch_expr().type())
           << ' '
           << from_expr(ns, identifier, landingpad.catch_expr())
           << ")";
     }
-    else if(instruction.code.get_statement()==ID_push_catch)
+    else if(instruction.get_code().get_statement() == ID_push_catch)
     {
       out << "CATCH-PUSH ";
 
       unsigned i=0;
-      const irept::subt &exception_list=
-        instruction.code.find(ID_exception_list).get_sub();
+      const irept::subt &exception_list =
+        instruction.get_code().find(ID_exception_list).get_sub();
       DATA_INVARIANT(
         instruction.targets.size() == exception_list.size(),
         "unexpected discrepancy between sizes of instruction"
@@ -192,7 +192,7 @@ std::ostream &goto_programt::output_instruction(
             << (*gt_it)->target_number;
       }
     }
-    else if(instruction.code.get_statement()==ID_pop_catch)
+    else if(instruction.get_code().get_statement() == ID_pop_catch)
     {
       out << "CATCH-POP";
     }
@@ -235,10 +235,10 @@ void goto_programt::get_decl_identifiers(
     if(instruction.is_decl())
     {
       DATA_INVARIANT(
-        instruction.code.get_statement() == ID_decl,
+        instruction.get_code().get_statement() == ID_decl,
         "expected statement to be declaration statement");
       DATA_INVARIANT(
-        instruction.code.operands().size() == 1,
+        instruction.get_code().operands().size() == 1,
         "declaration statement expects one operand");
       decl_identifiers.insert(instruction.decl_symbol().get_identifier());
     }
@@ -470,7 +470,7 @@ std::string as_string(
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    return from_expr(ns, function, i.code);
+    return from_expr(ns, function, i.get_code());
 
   case ASSUME:
   case ASSERT:

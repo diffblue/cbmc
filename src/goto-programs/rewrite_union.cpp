@@ -103,7 +103,7 @@ void rewrite_union(goto_functionst::goto_functiont &goto_function)
 {
   for(auto &instruction : goto_function.body.instructions)
   {
-    rewrite_union(instruction.code);
+    rewrite_union(instruction.code_nonconst());
 
     if(instruction.has_condition())
     {

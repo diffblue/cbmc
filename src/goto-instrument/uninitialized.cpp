@@ -123,11 +123,11 @@ void uninitializedt::add_assertions(
         symbol_exprt symbol_expr(new_identifier, bool_typet());
         i1->type=DECL;
         i1->source_location=instruction.source_location;
-        i1->code=code_declt(symbol_expr);
+        i1->code_nonconst() = code_declt(symbol_expr);
 
         i2->type=ASSIGN;
         i2->source_location=instruction.source_location;
-        i2->code=code_assignt(symbol_expr, false_exprt());
+        i2->code_nonconst() = code_assignt(symbol_expr, false_exprt());
       }
     }
     else
@@ -182,7 +182,7 @@ void uninitializedt::add_assertions(
 
             goto_programt::instructiont assignment;
             assignment.type=ASSIGN;
-            assignment.code=code_assignt(
+            assignment.code_nonconst() = code_assignt(
               symbol_exprt(new_identifier, bool_typet()), true_exprt());
             assignment.source_location=instruction.source_location;
 

@@ -100,7 +100,7 @@ static bool read_bin_goto_object(
       goto_programt::targett itarget = f.body.add_instruction();
       goto_programt::instructiont &instruction=*itarget;
 
-      instruction.code =
+      instruction.code_nonconst() =
         static_cast<const codet &>(irepconverter.reference_convert(in));
       instruction.source_location = static_cast<const source_locationt &>(
         irepconverter.reference_convert(in));

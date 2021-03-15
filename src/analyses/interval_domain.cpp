@@ -79,7 +79,7 @@ void interval_domaint::transform(
     break;
 
   case ASSIGN:
-    assign(to_code_assign(instruction.code));
+    assign(instruction.get_assign());
     break;
 
   case GOTO:
@@ -105,7 +105,7 @@ void interval_domaint::transform(
   case FUNCTION_CALL:
   {
     const code_function_callt &code_function_call =
-      to_code_function_call(instruction.code);
+      instruction.get_function_call();
     if(code_function_call.lhs().is_not_nil())
       havoc_rec(code_function_call.lhs());
     break;

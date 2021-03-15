@@ -105,7 +105,7 @@ void acceleration_utilst::find_modified(
 {
   if(t->is_assign())
   {
-    code_assignt assignment=to_code_assign(t->code);
+    code_assignt assignment = t->get_assign();
     modified.insert(assignment.lhs());
   }
 }
@@ -247,7 +247,7 @@ exprt acceleration_utilst::precondition(patht &path)
     if(t->is_assign())
     {
       // XXX Need to check for aliasing...
-      const code_assignt &assignment=to_code_assign(t->code);
+      const code_assignt &assignment = t->get_assign();
       const exprt &lhs=assignment.lhs();
       const exprt &rhs=assignment.rhs();
 
@@ -511,7 +511,7 @@ acceleration_utilst::expr_pairst acceleration_utilst::gather_array_assignments(
     if(r_it->is_assign())
     {
       // Is this an array assignment?
-      code_assignt assignment=to_code_assign(r_it->code);
+      code_assignt assignment = r_it->get_assign();
 
       if(assignment.lhs().id()==ID_index)
       {

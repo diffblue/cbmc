@@ -629,7 +629,7 @@ void polynomial_acceleratort::cone_of_influence(
       // A[i]=0;
       // or
       // *p=x;
-      code_assignt assignment=to_code_assign(r_it->code);
+      code_assignt assignment = r_it->get_assign();
       expr_sett lhs_syms;
 
       utils.gather_rvalues(assignment.lhs(), lhs_syms);
@@ -787,7 +787,7 @@ exprt polynomial_acceleratort::precondition(patht &path)
     if(t->is_assign())
     {
       // XXX Need to check for aliasing...
-      const code_assignt &assignment=to_code_assign(t->code);
+      const code_assignt &assignment = t->get_assign();
       const exprt &lhs=assignment.lhs();
       const exprt &rhs=assignment.rhs();
 

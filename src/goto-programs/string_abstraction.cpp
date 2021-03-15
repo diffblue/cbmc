@@ -302,7 +302,7 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
 
   goto_programt::targett decl1 =
     dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location));
-  decl1->code.add_source_location()=ref_instr->source_location;
+  decl1->code_nonconst().add_source_location() = ref_instr->source_location;
 
   exprt val=symbol.value;
   // initialize pointers with suitable objects
@@ -318,7 +318,8 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
     goto_programt::targett assignment1 =
       dest.add(goto_programt::make_assignment(
         code_assignt(sym_expr, val), ref_instr->source_location));
-    assignment1->code.add_source_location()=ref_instr->source_location;
+    assignment1->code_nonconst().add_source_location() =
+      ref_instr->source_location;
   }
 }
 
@@ -377,7 +378,8 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
         goto_programt::targett assignment1 =
           dest.add(goto_programt::make_assignment(
             code_assignt(member, sym_expr), ref_instr->source_location));
-        assignment1->code.add_source_location()=ref_instr->source_location;
+        assignment1->code_nonconst().add_source_location() =
+          ref_instr->source_location;
       }
 
       ++seen;
@@ -422,7 +424,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   // make sure it is declared before the recursive call
   goto_programt::targett decl =
     dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location));
-  decl->code.add_source_location()=ref_instr->source_location;
+  decl->code_nonconst().add_source_location() = ref_instr->source_location;
 
   // set the value - may be nil
   if(
@@ -448,7 +450,8 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
     goto_programt::targett assignment1 =
       dest.add(goto_programt::make_assignment(
         code_assignt(sym_expr, new_symbol.value), ref_instr->source_location));
-    assignment1->code.add_source_location()=ref_instr->source_location;
+    assignment1->code_nonconst().add_source_location() =
+      ref_instr->source_location;
   }
 
   symbol_table.insert(std::move(new_symbol));
@@ -1134,7 +1137,7 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
     goto_programt::instructiont assignment;
     assignment = goto_programt::make_assignment(
       code_assignt(new_lhs, new_rhs), target->source_location);
-    assignment.code.add_source_location()=target->source_location;
+    assignment.code_nonconst().add_source_location() = target->source_location;
     dest.insert_before_swap(target, assignment);
 
     return std::next(target);
@@ -1226,15 +1229,14 @@ goto_programt::targett string_abstractiont::char_assign(
 
   goto_programt::targett assignment1 = tmp.add(goto_programt::make_assignment(
     code_assignt(i1, from_integer(1, i1.type())), target->source_location));
-  assignment1->code.add_source_location()=target->source_location;
+  assignment1->code_nonconst().add_source_location() = target->source_location;
 
   goto_programt::targett assignment2 = tmp.add(goto_programt::make_assignment(
     code_assignt(lhs, rhs), target->source_location));
-  assignment2->code.add_source_location()=target->source_location;
+  assignment2->code_nonconst().add_source_location() = target->source_location;
 
   move_lhs_arithmetic(
-      assignment2->code.op0(),
-      assignment2->code.op1());
+    assignment2->code_nonconst().op0(), assignment2->code_nonconst().op1());
 
   dest.insert_before_swap(target, tmp);
   ++target;
@@ -1334,7 +1336,7 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
       member(lhs, whatt::IS_ZERO),
       member(rhs, whatt::IS_ZERO),
       target->source_location));
-    assignment->code.add_source_location()=target->source_location;
+    assignment->code_nonconst().add_source_location() = target->source_location;
   }
 
   {
@@ -1342,7 +1344,7 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
       member(lhs, whatt::LENGTH),
       member(rhs, whatt::LENGTH),
       target->source_location));
-    assignment->code.add_source_location()=target->source_location;
+    assignment->code_nonconst().add_source_location() = target->source_location;
   }
 
   {
@@ -1350,7 +1352,7 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
       member(lhs, whatt::SIZE),
       member(rhs, whatt::SIZE),
       target->source_location));
-    assignment->code.add_source_location()=target->source_location;
+    assignment->code_nonconst().add_source_location() = target->source_location;
   }
 
   goto_programt::targett last=target;

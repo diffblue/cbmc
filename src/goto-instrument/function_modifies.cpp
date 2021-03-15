@@ -24,13 +24,13 @@ void function_modifiest::get_modifies(
 
   if(instruction.is_assign())
   {
-    const exprt &lhs=to_code_assign(instruction.code).lhs();
+    const exprt &lhs = instruction.get_assign().lhs();
     get_modifies_lhs(local_may_alias, i_it, lhs, modifies);
   }
   else if(instruction.is_function_call())
   {
-    const code_function_callt &code_function_call=
-      to_code_function_call(instruction.code);
+    const code_function_callt &code_function_call =
+      instruction.get_function_call();
     const exprt &lhs=code_function_call.lhs();
 
     // return value assignment

@@ -60,8 +60,7 @@ void _rw_set_loct::compute()
   }
   else if(target->is_function_call())
   {
-    const code_function_callt &code_function_call=
-      to_code_function_call(target->code);
+    const code_function_callt &code_function_call = target->get_function_call();
 
     read(code_function_call.function());
 

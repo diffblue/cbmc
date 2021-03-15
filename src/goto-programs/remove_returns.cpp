@@ -118,13 +118,13 @@ void remove_returnst::replace_returns(
     if(instruction.is_return())
     {
       INVARIANT(
-        instruction.code.operands().size() == 1,
+        instruction.get_code().operands().size() == 1,
         "return instructions should have one operand");
 
       if(return_symbol.has_value())
       {
         // replace "return x;" by "fkt#return_value=x;"
-        code_assignt assignment(*return_symbol, instruction.code.op0());
+        code_assignt assignment(*return_symbol, instruction.return_value());
 
         // now turn the `return' into `assignment'
         instruction = goto_programt::make_assignment(

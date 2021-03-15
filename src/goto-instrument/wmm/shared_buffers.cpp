@@ -176,8 +176,8 @@ void shared_bufferst::assignment(
 
     t=goto_program.insert_before(t);
     t->type=ASSIGN;
-    t->code=code_assignt(symbol, value);
-    t->code.add_source_location()=source_location;
+    t->code_nonconst() = code_assignt(symbol, value);
+    t->code_nonconst().add_source_location() = source_location;
     t->source_location=source_location;
 
     // instrumentations.insert((const irep_idt) (t->code.id()));
@@ -296,8 +296,11 @@ void shared_bufferst::write(
   // We rotate the write buffers for anything that is written.
   assignment(goto_program, target, source_location, vars.w_buff1, vars.w_buff0);
   assignment(
-    goto_program, target, source_location, vars.w_buff0,
-    original_instruction.code.op1());
+    goto_program,
+    target,
+    source_location,
+    vars.w_buff0,
+    original_instruction.get_code().op1());
 
   // We update the used flags
   assignment(
@@ -1234,7 +1237,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
                       choice1_expr,
                       dereference_exprt{new_read_expr},
                       to_replace_expr),
-                    to_replace_expr); // original_instruction.code.op1());
+                    to_replace_expr); // original_instruction.get_code().op1());
 
                   shared_buffers.assignment(
                     goto_program,
@@ -1252,7 +1255,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
               i_it,
               source_location,
               w_entry.second.object,
-              original_instruction.code.op1());
+              original_instruction.get_code().op1());
           }
         }
 
@@ -1298,13 +1301,14 @@ void shared_bufferst::cfg_visitort::weak_memory(
           << messaget::eom;
       }
     }
-    else if(is_fence(instruction, ns) ||
-            (instruction.is_other() &&
-             instruction.code.get_statement()==ID_fence &&
-             (instruction.code.get_bool("WRfence") ||
-              instruction.code.get_bool("WWfence") ||
-              instruction.code.get_bool("RWfence") ||
-              instruction.code.get_bool("RRfence"))))
+    else if(
+      is_fence(instruction, ns) ||
+      (instruction.is_other() &&
+       instruction.get_code().get_statement() == ID_fence &&
+       (instruction.get_code().get_bool("WRfence") ||
+        instruction.get_code().get_bool("WWfence") ||
+        instruction.get_code().get_bool("RWfence") ||
+        instruction.get_code().get_bool("RRfence"))))
     {
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -1338,7 +1342,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     }
     else if(instruction.is_function_call())
     {
-      const exprt &fun=to_code_function_call(instruction.code).function();
+      const exprt &fun = instruction.get_function_call().function();
       weak_memory(value_sets, to_symbol_expr(fun).get_identifier(), model);
     }
   }

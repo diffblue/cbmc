@@ -56,22 +56,22 @@ void invariant_set_domaint::transform(
 
   case ASSIGN:
     {
-      const code_assignt &assignment=to_code_assign(from_l->code);
+      const code_assignt &assignment = from_l->get_assign();
       invariant_set.assignment(assignment.lhs(), assignment.rhs());
     }
     break;
 
   case OTHER:
     if(from_l->get_other().is_not_nil())
-      invariant_set.apply_code(from_l->code);
+      invariant_set.apply_code(from_l->get_code());
     break;
 
   case DECL:
-    invariant_set.apply_code(from_l->code);
+    invariant_set.apply_code(from_l->get_code());
     break;
 
   case FUNCTION_CALL:
-    invariant_set.apply_code(from_l->code);
+    invariant_set.apply_code(from_l->get_code());
     break;
 
   case START_THREAD:

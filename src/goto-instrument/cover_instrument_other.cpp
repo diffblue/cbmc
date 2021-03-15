@@ -54,8 +54,7 @@ void cover_cover_instrumentert::instrument(
   // turn __CPROVER_cover(x) into 'assert(!x)'
   if(i_it->is_function_call())
   {
-    const code_function_callt &code_function_call =
-      to_code_function_call(i_it->code);
+    const code_function_callt &code_function_call = i_it->get_function_call();
     if(
       code_function_call.function().id() == ID_symbol &&
       to_symbol_expr(code_function_call.function()).get_identifier() ==

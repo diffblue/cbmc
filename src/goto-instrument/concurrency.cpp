@@ -108,7 +108,7 @@ void concurrency_instrumentationt::instrument(
   {
     if(it->is_assign())
     {
-      code_assignt &code=to_code_assign(it->code);
+      code_assignt &code = to_code_assign(it->code_nonconst());
       instrument(code.rhs());
     }
     else if(it->is_assume() || it->is_assert() || it->is_goto())
@@ -119,7 +119,7 @@ void concurrency_instrumentationt::instrument(
     }
     else if(it->is_function_call())
     {
-      code_function_callt &code=to_code_function_call(it->code);
+      code_function_callt &code = to_code_function_call(it->code_nonconst());
       instrument(code.function());
 
       // instrument(code.lhs(), LHS);

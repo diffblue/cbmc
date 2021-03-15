@@ -234,8 +234,9 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       /* propagation */
       visit_cfg_skip(i_it);
     }
-    else if(instruction.is_other()
-      && instruction.code.get_statement()==ID_fence)
+    else if(
+      instruction.is_other() &&
+      instruction.get_code().get_statement() == ID_fence)
     {
       visit_cfg_asm_fence(i_it, function_id);
     }
@@ -692,7 +693,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
 {
   const goto_programt::instructiont &instruction=*i_it;
 
-  const exprt &fun=to_code_function_call(instruction.code).function();
+  const exprt &fun = instruction.get_function_call().function();
   const irep_idt &fun_id=to_symbol_expr(fun).get_identifier();
   /* ignore recursive calls -- underapproximation */
   try
@@ -789,13 +790,13 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   const irep_idt &function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  bool WRfence=instruction.code.get_bool(ID_WRfence);
-  bool WWfence=instruction.code.get_bool(ID_WWfence);
-  bool RRfence=instruction.code.get_bool(ID_RRfence);
-  bool RWfence=instruction.code.get_bool(ID_RWfence);
-  bool WWcumul=instruction.code.get_bool(ID_WWcumul);
-  bool RRcumul=instruction.code.get_bool(ID_RRcumul);
-  bool RWcumul=instruction.code.get_bool(ID_RWcumul);
+  bool WRfence = instruction.get_code().get_bool(ID_WRfence);
+  bool WWfence = instruction.get_code().get_bool(ID_WWfence);
+  bool RRfence = instruction.get_code().get_bool(ID_RRfence);
+  bool RWfence = instruction.get_code().get_bool(ID_RWfence);
+  bool WWcumul = instruction.get_code().get_bool(ID_WWcumul);
+  bool RRcumul = instruction.get_code().get_bool(ID_RRcumul);
+  bool RWcumul = instruction.get_code().get_bool(ID_RWcumul);
   const abstract_eventt new_fence_event(
     abstract_eventt::operationt::ASMfence,
     thread,

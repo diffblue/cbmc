@@ -66,8 +66,7 @@ void thread_exit_instrumentation(goto_modelt &goto_model)
       for(const auto &instruction : gf_entry.second.body.instructions)
         if(instruction.is_function_call())
         {
-          const exprt &function=
-            to_code_function_call(instruction.code).function();
+          const exprt &function = instruction.get_function_call().function();
           if(function.id()==ID_symbol)
             thread_fkts.insert(to_symbol_expr(function).get_identifier());
         }
@@ -95,8 +94,7 @@ void mutex_init_instrumentation(
   {
     if(it->is_assign())
     {
-      const code_assignt &code_assign=
-       to_code_assign(it->code);
+      const code_assignt &code_assign = it->get_assign();
 
       if(code_assign.lhs().type()==lock_type)
       {

@@ -93,7 +93,7 @@ void remove_function_pointer(
   const std::set<symbol_exprt> &functions,
   goto_modelt &goto_model)
 {
-  const code_function_callt &code = to_code_function_call(target->code);
+  const code_function_callt &code = target->get_function_call();
 
   const exprt &function = code.function();
   PRECONDITION(function.id() == ID_dereference);
@@ -125,13 +125,13 @@ void remove_function_pointer(
     // call function
     goto_programt::targett t1 =
       new_code_calls.add(goto_programt::make_function_call(code));
-    to_code_function_call(t1->code).function() = fun;
+    to_code_function_call(t1->code_nonconst()).function() = fun;
 
     // the signature of the function might not match precisely
     const namespacet ns(goto_model.symbol_table);
-    fix_argument_types(to_code_function_call(t1->code), ns);
+    fix_argument_types(to_code_function_call(t1->code_nonconst()), ns);
     fix_return_type(
-      to_code_function_call(t1->code), new_code_calls, goto_model);
+      to_code_function_call(t1->code_nonconst()), new_code_calls, goto_model);
 
     // goto final
     new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
@@ -179,7 +179,7 @@ void remove_function_pointer(
   // further pointer-related errors.
   code_expressiont code_expression(function);
   code_expression.add_source_location() = function.source_location();
-  target->code.swap(code_expression);
+  target->code_nonconst().swap(code_expression);
   target->type = OTHER;
 }
 
@@ -205,7 +205,7 @@ void value_set_fi_fp_removal(
     {
       if(target->is_function_call())
       {
-        const auto &call = to_code_function_call(target->code);
+        const auto &call = target->get_function_call();
         if(call.function().id() == ID_dereference)
         {
           message.status() << "CALL at " << target->source_location << ":"

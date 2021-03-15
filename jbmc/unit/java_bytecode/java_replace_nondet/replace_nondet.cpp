@@ -41,7 +41,7 @@ void validate_nondet_method_removed(
     // Check that our NONDET(<type>) exists on a rhs somewhere.
     if(inst.is_assign())
     {
-      const code_assignt &assignment = to_code_assign(inst.code);
+      const code_assignt &assignment = inst.get_assign();
       if(assignment.rhs().id() == ID_side_effect)
       {
         const side_effect_exprt &see = to_side_effect_expr(assignment.rhs());
@@ -68,8 +68,7 @@ void validate_nondet_method_removed(
     // And check to see that our nondet method call has been removed.
     if(inst.is_function_call())
     {
-      const code_function_callt &function_call =
-        to_code_function_call(inst.code);
+      const code_function_callt &function_call = inst.get_function_call();
 
       // Small check to make sure the instruction is a symbol.
       if(function_call.function().id() != ID_symbol)
@@ -101,9 +100,8 @@ void validate_nondets_converted(
     // Check that our NONDET(<type>) exists on a rhs somewhere.
     exprt target_expression =
       (inst.is_assign()
-         ? to_code_assign(inst.code).rhs()
-         : inst.is_return() ? to_code_return(inst.code).return_value()
-                            : inst.code);
+         ? inst.get_assign().rhs()
+         : inst.is_return() ? inst.return_value() : inst.get_code());
 
     if(
       const auto side_effect =

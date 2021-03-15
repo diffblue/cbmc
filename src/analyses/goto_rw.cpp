@@ -802,7 +802,7 @@ void goto_rw(
     break;
 
   case ASSIGN:
-    goto_rw(function, target, to_code_assign(target->code), rw_set);
+    goto_rw(function, target, target->get_assign(), rw_set);
     break;
 
   case DEAD:
@@ -817,7 +817,7 @@ void goto_rw(
     break;
 
   case FUNCTION_CALL:
-    goto_rw(function, target, to_code_function_call(target->code), rw_set);
+    goto_rw(function, target, target->get_function_call(), rw_set);
     break;
   }
 }

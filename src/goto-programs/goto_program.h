@@ -178,9 +178,22 @@ public:
   ///     shall be empty
   class instructiont final
   {
-  public:
+  protected:
     /// Do not read or modify directly -- use get_X() instead
     codet code;
+
+  public:
+    /// Get the code represented by this instruction
+    const codet &get_code() const
+    {
+      return code;
+    }
+
+    /// Set the code represented by this instruction
+    codet &code_nonconst()
+    {
+      return code;
+    }
 
     /// Get the assignment for ASSIGN
     const code_assignt &get_assign() const

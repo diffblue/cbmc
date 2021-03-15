@@ -226,16 +226,22 @@ void nondet_volatilet::nondet_volatile(
     if(instruction.is_assign())
     {
       nondet_volatile_rhs(
-        symbol_table, to_code_assign(instruction.code).rhs(), pre, post);
+        symbol_table,
+        to_code_assign(instruction.code_nonconst()).rhs(),
+        pre,
+        post);
       nondet_volatile_lhs(
-        symbol_table, to_code_assign(instruction.code).lhs(), pre, post);
+        symbol_table,
+        to_code_assign(instruction.code_nonconst()).lhs(),
+        pre,
+        post);
     }
     else if(instruction.is_function_call())
     {
       // these have arguments and a return LHS
 
-      code_function_callt &code_function_call=
-        to_code_function_call(instruction.code);
+      code_function_callt &code_function_call =
+        to_code_function_call(instruction.code_nonconst());
 
       // do arguments
       for(exprt::operandst::iterator

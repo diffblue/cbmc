@@ -189,7 +189,7 @@ void escape_domaint::transform(
   {
   case ASSIGN:
     {
-      const code_assignt &code_assign=to_code_assign(instruction.code);
+      const code_assignt &code_assign = instruction.get_assign();
 
       std::set<irep_idt> cleanup_functions;
       get_rhs_cleanup(code_assign.rhs(), cleanup_functions);
@@ -213,8 +213,8 @@ void escape_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call=
-        to_code_function_call(instruction.code);
+      const code_function_callt &code_function_call =
+        instruction.get_function_call();
       const exprt &function=code_function_call.function();
 
       if(function.id()==ID_symbol)
@@ -467,7 +467,7 @@ void escape_analysist::instrument(
 
       if(instruction.type == ASSIGN)
       {
-        const code_assignt &code_assign = to_code_assign(instruction.code);
+        const code_assignt &code_assign = instruction.get_assign();
 
         std::set<irep_idt> cleanup_functions;
         operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);

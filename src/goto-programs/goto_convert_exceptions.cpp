@@ -113,7 +113,7 @@ void goto_convertt::convert_try_catch(
   // add the CATCH-pop to the end of the 'try' block
   goto_programt::targett catch_pop_instruction =
     dest.add(goto_programt::make_catch());
-  catch_pop_instruction->code = code_pop_catcht();
+  catch_pop_instruction->code_nonconst() = code_pop_catcht();
 
   // add a goto to the end of the 'try' block
   dest.add(goto_programt::make_goto(end_target));
@@ -135,7 +135,7 @@ void goto_convertt::convert_try_catch(
     dest.add(goto_programt::make_goto(end_target));
   }
 
-  catch_push_instruction->code=push_catch_code;
+  catch_push_instruction->code_nonconst() = push_catch_code;
 
   // add the end-target
   dest.destructive_append(end);

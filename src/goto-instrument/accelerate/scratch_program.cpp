@@ -133,7 +133,7 @@ void scratch_programt::fix_types()
   {
     if(it->is_assign())
     {
-      code_assignt &code=to_code_assign(it->code);
+      code_assignt &code = to_code_assign(it->code_nonconst());
 
       if(code.lhs().type()!=code.rhs().type())
       {

@@ -115,7 +115,7 @@ compute_called_functions(const goto_functionst &goto_functions)
       if(instruction.is_function_call())
       {
         compute_functions(
-          to_code_function_call(instruction.code).function(), working_queue);
+          instruction.get_function_call().function(), working_queue);
       }
     }
   }
