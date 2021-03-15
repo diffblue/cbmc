@@ -182,17 +182,14 @@ function(cprover_default_properties)
      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY})
 endfunction()
 
-option(WITH_MEMORY_ANALYZER OFF
-  "build the memory analyzer")
-
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 set(WITH_MEMORY_ANALYZER_DEFAULT ON)
 else()
 set(WITH_MEMORY_ANALYZER_DEFAULT OFF)
 endif()
 
-option(WITH_MEMORY_ANALYZER ${WITH_MEMORY_ANALYZER_DEFAULT}
-  "build the memory analyzer")
+option(WITH_MEMORY_ANALYZER
+  "build the memory analyzer" ${WITH_MEMORY_ANALYZER_DEFAULT})
 
 add_subdirectory(src)
 add_subdirectory(regression)
