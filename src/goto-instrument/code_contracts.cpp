@@ -147,12 +147,8 @@ static void check_apply_invariants(
 bool code_contractst::has_contract(const irep_idt fun_name)
 {
   const symbolt &function_symbol = ns.lookup(fun_name);
-  const code_typet &type = to_code_type(function_symbol.type);
-  if(type.find(ID_C_spec_assigns).is_not_nil())
-    return true;
-
-  return type.find(ID_C_spec_requires).is_not_nil() ||
-         type.find(ID_C_spec_ensures).is_not_nil();
+  const auto &type = to_code_with_contract_type(function_symbol.type);
+  return type.has_contract();
 }
 
 bool code_contractst::apply_function_contract(
@@ -171,12 +167,12 @@ bool code_contractst::apply_function_contract(
   // components.
   const irep_idt &function = to_symbol_expr(call.function()).get_identifier();
   const symbolt &function_symbol = ns.lookup(function);
-  const code_typet &type = to_code_type(function_symbol.type);
+  const auto &type = to_code_with_contract_type(function_symbol.type);
 
   // Isolate each component of the contract.
-  exprt assigns = static_cast<const exprt &>(type.find(ID_C_spec_assigns));
-  exprt requires = static_cast<const exprt &>(type.find(ID_C_spec_requires));
-  exprt ensures = static_cast<const exprt &>(type.find(ID_C_spec_ensures));
+  exprt assigns = type.assigns();
+  exprt requires = type.requires();
+  exprt ensures = type.ensures();
 
   // Check to see if the function  contract actually constrains its effect on
   // the program state; if not, return.
@@ -359,9 +355,8 @@ void code_contractst::populate_assigns_references(
   goto_programt &created_decls,
   std::vector<exprt> &created_references)
 {
-  const code_typet &type = to_code_type(function_symbol.type);
-  const exprt &assigns =
-    static_cast<const exprt &>(type.find(ID_C_spec_assigns));
+  const auto &type = to_code_with_contract_type(function_symbol.type);
+  const exprt &assigns = type.assigns();
 
   const exprt::operandst &targets = assigns.operands();
   for(const exprt &curr_op : targets)
@@ -475,7 +470,7 @@ void code_contractst::instrument_call_statement(
     }
 
     exprt called_assigns =
-      static_cast<const exprt &>(called_sym.type.find(ID_C_spec_assigns));
+      to_code_with_contract_type(called_sym.type).assigns();
     if(called_assigns.is_nil()) // Called function has no assigns clause
     {
       // Fail if called function has no assigns clause.
@@ -618,9 +613,9 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
 
   const irep_idt function_id(function_name);
   const symbolt &function_symbol = ns.lookup(function_id);
-  const code_typet &type = to_code_type(function_symbol.type);
+  const auto &type = to_code_with_contract_type(function_symbol.type);
 
-  exprt assigns = static_cast<const exprt &>(type.find(ID_C_spec_assigns));
+  exprt assigns = type.assigns();
 
   // Return if there are no reference checks to perform.
   if(assigns.is_nil())
@@ -752,14 +747,11 @@ void code_contractst::add_contract_check(
   PRECONDITION(!dest.instructions.empty());
 
   const symbolt &function_symbol = ns.lookup(mangled_fun);
-  const code_typet &code_type = to_code_type(function_symbol.type);
+  const auto &code_type = to_code_with_contract_type(function_symbol.type);
 
-  const exprt &assigns =
-    static_cast<const exprt &>(code_type.find(ID_C_spec_assigns));
-  const exprt &requires =
-    static_cast<const exprt &>(code_type.find(ID_C_spec_requires));
-  const exprt &ensures =
-    static_cast<const exprt &>(code_type.find(ID_C_spec_ensures));
+  const exprt &assigns = code_type.assigns();
+  const exprt &requires = code_type.requires();
+  const exprt &ensures = code_type.ensures();
   INVARIANT(
     ensures.is_not_nil() || assigns.is_not_nil(),
     "Code contract enforcement is trivial without an ensures or assigns "
