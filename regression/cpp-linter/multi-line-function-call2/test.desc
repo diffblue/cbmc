@@ -1,11 +1,14 @@
 CORE
 main.cpp
 
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The following patters are disabled as the corresponding checks in cpplint.py
+were commented out in 56aea470fd6 for they yield too many false positives:
 ^main\.cpp:24:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
 ^main\.cpp:29:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
 ^main\.cpp:60:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
 ^main\.cpp:65:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
-^Total errors found: 4$
-^EXIT=1$
-^SIGNAL=0$
---
+^# Total errors found: 4$

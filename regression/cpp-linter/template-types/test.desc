@@ -1,7 +1,11 @@
-CORE
+FUTURE
 main.cpp
 
 ^main\.cpp:29:  Remove spaces around >  \[whitespace/operators\] \[4\]$
-^Total errors found: 1$
+^# Total errors found: 1$
+^EXIT=1$
 ^SIGNAL=0$
 --
+--
+Test disabled (marked as "FUTURE") as the corresponding checks in cpplint.py
+were commented out in 56aea470fd6 for they yield too many false positives.

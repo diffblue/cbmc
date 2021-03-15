@@ -69,6 +69,7 @@ add_subdirectory(validate-trace-xml-schema)
 add_subdirectory(cbmc-primitives)
 add_subdirectory(goto-interpreter)
 add_subdirectory(cbmc-sequentialization)
+add_subdirectory(cpp-linter)
 
 if(WITH_MEMORY_ANALYZER)
   add_subdirectory(snapshot-harness)
