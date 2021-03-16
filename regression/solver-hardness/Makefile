@@ -22,5 +22,5 @@ show:
 	done;
 
 clean:
-	find -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) tests.log

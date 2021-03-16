@@ -13,6 +13,6 @@ show:
 	done;
 
 clean:
-	find -name '*.out' -execdir $(RM) '{}' \;
-	find -name '*.smt2' -execdir $(RM) '{}' \;
+	find . -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.smt2' -execdir $(RM) '{}' \;
 	$(RM) tests.log

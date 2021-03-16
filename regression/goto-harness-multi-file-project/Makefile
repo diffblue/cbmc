@@ -21,5 +21,5 @@ tests.log: ../test.pl
 	@../test.pl -e -p -c "../chain.sh $(GOTO_CC_EXE) $(GOTO_HARNESS_EXE) $(CBMC_EXE) $(is_windows)"
 
 clean:
-	find -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) tests.log
