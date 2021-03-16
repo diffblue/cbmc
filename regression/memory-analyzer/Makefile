@@ -4,9 +4,9 @@ GOTO_GCC_EXE=../../../src/goto-cc/goto-gcc
 MEMORY_ANALYZER_EXE=../../../src/memory-analyzer/memory-analyzer
 
 clean:
-	find -name '*.gb' -execdir $(RM) '{}' \;
-	find -name '*.exe' -execdir $(RM) '{}' \;
-	find -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.gb' -execdir $(RM) '{}' \;
+	find . -name '*.exe' -execdir $(RM) '{}' \;
+	find . -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) tests.log
 
 test:
