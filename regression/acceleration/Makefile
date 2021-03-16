@@ -29,4 +29,5 @@ show:
 
 clean:
 	$(RM) tests.log
-	$(RM) */main.out
+	find . -name '*.gb' -execdir $(RM) '{}' \;
+	find . -name '*.out' -execdir $(RM) '{}' \;

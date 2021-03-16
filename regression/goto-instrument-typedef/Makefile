@@ -25,11 +25,6 @@ show:
 	done;
 
 clean:
-	@for dir in *; do \
-		rm -f tests.log; \
-		if [ -d "$$dir" ]; then \
-			cd "$$dir"; \
-			rm -f *.out *.gb; \
-			cd ..; \
-		fi \
-	done
+	find . -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.gb' -execdir $(RM) '{}' \;
+	$(RM) tests.log

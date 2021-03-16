@@ -27,6 +27,6 @@ driver$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
 clean:
-	find -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) driver$(EXEEXT) driver$(DEPEXT) driver$(OBJEXT)
 	$(RM) tests.log
