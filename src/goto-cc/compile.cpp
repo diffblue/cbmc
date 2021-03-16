@@ -745,6 +745,9 @@ bool compilet::add_written_cprover_symbols(const symbol_tablet &symbol_table)
     if(!(has_prefix(id2string(name), CPROVER_PREFIX) && new_type.id()==ID_code))
       continue;
 
+    if(has_prefix(id2string(name), FILE_LOCAL_PREFIX))
+      continue;
+
     bool inserted;
     std::map<irep_idt, symbolt>::iterator old;
     std::tie(old, inserted)=written_macros.insert({name, pair.second});
