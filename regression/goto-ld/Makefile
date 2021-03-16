@@ -30,4 +30,4 @@ clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;
 	find . -name '*.goto-cc-saved' -execdir $(RM) '{}' \;
-	find . -name '*.log' -execdir $(RM) '{}' \;
+	$(RM) tests.log

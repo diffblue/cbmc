@@ -28,6 +28,6 @@ show:
 	done;
 
 clean:
-	find . -name '*.log' -execdir $(RM) '{}' \;
+	$(RM) tests.log
 	find . -name '*.gb' -execdir $(RM) '{}' \;
 	find . -name '*.out' -execdir $(RM) '{}' \;

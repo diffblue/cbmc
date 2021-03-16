@@ -27,4 +27,4 @@ show:
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;
-	find . -name '*.log' -execdir $(RM) '{}' \;
+	$(RM) tests.log

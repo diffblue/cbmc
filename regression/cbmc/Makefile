@@ -30,4 +30,4 @@ show:
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.smt2' -execdir $(RM) '{}' \;
-	find . -name '*.log' -execdir $(RM) '{}' \;
+	$(RM) tests.log tests-paths-lifo.log tests-cprover-smt2.log
