@@ -105,6 +105,20 @@ int main()
   assert(z.members[2]==-x.members[2]);
   assert(z.members[3]==-x.members[3]);
 
+  // Boolean operators on vectors
+  z = x;
+  y.v = z.v == x.v;
+  assert(y.members[0]);
+  assert(y.members[1]);
+  assert(y.members[2]);
+  assert(y.members[3]);
+
+  y.v = x.v <= z.v;
+  assert(y.members[0]);
+  assert(y.members[1]);
+  assert(y.members[2]);
+  assert(y.members[3]);
+
   // build vector with typecast
   z.v=(v4si){ 0, 1, 2, 3 };
   assert(z.members[0]==0 && z.members[1]==1 && z.members[2]==2 && z.members[3]==3);

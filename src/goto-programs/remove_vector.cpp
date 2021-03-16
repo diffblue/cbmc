@@ -35,6 +35,13 @@ static bool have_to_remove_vector(const exprt &expr)
     }
     else if(expr.id()==ID_unary_minus || expr.id()==ID_bitnot)
       return true;
+    else if(
+      expr.id() == ID_vector_equal || expr.id() == ID_vector_notequal ||
+      expr.id() == ID_vector_lt || expr.id() == ID_vector_le ||
+      expr.id() == ID_vector_gt || expr.id() == ID_vector_ge)
+    {
+      return true;
+    }
     else if(expr.id()==ID_vector)
       return true;
   }
@@ -142,6 +149,66 @@ static void remove_vector(exprt &expr)
       }
 
       expr=array_expr;
+    }
+    else if(
+      expr.id() == ID_vector_equal || expr.id() == ID_vector_notequal ||
+      expr.id() == ID_vector_lt || expr.id() == ID_vector_le ||
+      expr.id() == ID_vector_gt || expr.id() == ID_vector_ge)
+    {
+      // component-wise and generate 0 (false) or -1 (true)
+      // x ~ y -> vector(x[0] ~ y[0] ? -1 : 0, x[1] ~ y[1] ? -1 : 0, ...)
+
+      auto const &binary_expr = to_binary_expr(expr);
+      const vector_typet &vector_type = to_vector_type(expr.type());
+      const auto dimension = numeric_cast_v<std::size_t>(vector_type.size());
+
+      const typet &subtype = vector_type.subtype();
+      PRECONDITION(subtype.id() == ID_signedbv);
+      exprt minus_one = from_integer(-1, subtype);
+      exprt zero = from_integer(0, subtype);
+
+      exprt::operandst operands;
+      operands.reserve(dimension);
+
+      const bool is_float =
+        binary_expr.lhs().type().subtype().id() == ID_floatbv;
+      irep_idt new_id;
+      if(binary_expr.id() == ID_vector_notequal)
+      {
+        if(is_float)
+          new_id = ID_ieee_float_notequal;
+        else
+          new_id = ID_notequal;
+      }
+      else if(binary_expr.id() == ID_vector_equal)
+      {
+        if(is_float)
+          new_id = ID_ieee_float_equal;
+        else
+          new_id = ID_equal;
+      }
+      else
+      {
+        // just strip the "vector-" prefix
+        new_id = id2string(binary_expr.id()).substr(7);
+      }
+
+      for(std::size_t i = 0; i < dimension; ++i)
+      {
+        exprt index = from_integer(i, vector_type.size().type());
+
+        operands.push_back(
+          if_exprt{binary_relation_exprt{index_exprt{binary_expr.lhs(), index},
+                                         new_id,
+                                         index_exprt{binary_expr.rhs(), index}},
+                   minus_one,
+                   zero});
+      }
+
+      source_locationt source_location = expr.source_location();
+      expr = array_exprt{std::move(operands),
+                         array_typet{subtype, vector_type.size()}};
+      expr.add_source_location() = std::move(source_location);
     }
     else if(expr.id()==ID_vector)
     {
