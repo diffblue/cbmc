@@ -95,3 +95,4 @@ clean:
 			$(MAKE) -C "$$dir" clean; \
 		fi; \
 	done;
+	$(RM) tests.log
