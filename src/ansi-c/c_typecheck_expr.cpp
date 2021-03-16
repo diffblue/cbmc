@@ -1417,18 +1417,12 @@ void c_typecheck_baset::typecheck_expr_rel(
   throw 0;
 }
 
-void c_typecheck_baset::typecheck_expr_rel_vector(
-  binary_relation_exprt &expr)
+void c_typecheck_baset::typecheck_expr_rel_vector(binary_exprt &expr)
 {
-  exprt &op0=expr.op0();
-  exprt &op1=expr.op1();
+  const typet &o_type0 = as_const(expr).op0().type();
+  const typet &o_type1 = as_const(expr).op1().type();
 
-  const typet o_type0 = op0.type();
-  const typet o_type1 = op1.type();
-
-  if(
-    o_type0.id() != ID_vector || o_type1.id() != ID_vector ||
-    o_type0.subtype() != o_type1.subtype())
+  if(o_type0.id() != ID_vector || o_type0 != o_type1)
   {
     error().source_location = expr.source_location();
     error() << "vector operator '" << expr.id() << "' not defined for types '"
@@ -1437,9 +1431,18 @@ void c_typecheck_baset::typecheck_expr_rel_vector(
     throw 0;
   }
 
-  // Comparisons between vectors produce a vector
-  // of integers with the same dimension.
-  expr.type()=vector_typet(signed_int_type(), to_vector_type(o_type0).size());
+  // Comparisons between vectors produce a vector of integers of the same width
+  // with the same dimension.
+  auto subtype_width = to_bitvector_type(o_type0.subtype()).get_width();
+  expr.type() =
+    vector_typet{signedbv_typet{subtype_width}, to_vector_type(o_type0).size()};
+
+  // Replace the id as the semantics of these are point-wise application (and
+  // the result is not of bool type).
+  if(expr.id() == ID_notequal)
+    expr.id(ID_vector_notequal);
+  else
+    expr.id("vector-" + id2string(expr.id()));
 }
 
 void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
