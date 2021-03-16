@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^SIGNAL=0$
+^EXIT=10$
+^VERIFICATION FAILED$
+^\[analyze_this.pointer_dereference.5\] line 19 dereference failure: pointer outside dynamic object bounds in p->i: FAILURE$
+--
+^warning: ignoring
