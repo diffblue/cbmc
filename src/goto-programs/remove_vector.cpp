@@ -103,6 +103,7 @@ static void remove_vector(exprt &expr)
       // x+y -> vector(x[0]+y[0],x[1]+y[1],...)
       array_exprt array_expr({}, array_type);
       array_expr.operands().resize(numeric_cast_v<std::size_t>(dimension));
+      array_expr.add_source_location() = expr.source_location();
 
       for(std::size_t i=0; i<array_expr.operands().size(); i++)
       {
@@ -130,6 +131,7 @@ static void remove_vector(exprt &expr)
       // -x -> vector(-x[0],-x[1],...)
       array_exprt array_expr({}, array_type);
       array_expr.operands().resize(numeric_cast_v<std::size_t>(dimension));
+      array_expr.add_source_location() = expr.source_location();
 
       for(std::size_t i=0; i<array_expr.operands().size(); i++)
       {
@@ -158,7 +160,9 @@ static void remove_vector(exprt &expr)
           numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
         exprt casted_op =
           typecast_exprt::conditional_cast(op, array_type.subtype());
+        source_locationt source_location = expr.source_location();
         expr = array_exprt(exprt::operandst(dimension, casted_op), array_type);
+        expr.add_source_location() = std::move(source_location);
       }
     }
   }
