@@ -1,22 +1,15 @@
-
 default: tests.log
 
 test:
-	@if ! ../test.pl -c ../chain.sh ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -e -p -c "../chain.sh ../../../src/goto-analyzer/goto-analyzer"
 
-tests.log:
-	@if ! ../test.pl -c ../chain.sh ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+tests.log: ../test.pl
+	@../test.pl -e -p -c "../chain.sh ../../../src/goto-analyzer/goto-analyzer"
 
 show:
 	@for dir in *; do \
 		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
+			vim -o "$$dir/*.java" "$$dir/*.out"; \
 		fi; \
 	done;
 

@@ -1,6 +1,9 @@
 CORE
 main.c
-"--variable-sensitivity --vsd-arrays --vsd-pointers"
-array\[0l\] = 5
-array\[\(signed long int\)nondet\] = 6
-new_array\[1l\] = 7
+--vsd --vsd-arrays every-element --vsd-pointers value-set
+array\[0l?l?\] = 5
+array\[\(signed (long (long )?)?int\)nondet\] = 6
+new_array\[1l?l?\] = 7
+^SIGNAL=0$
+^EXIT=0$
+--

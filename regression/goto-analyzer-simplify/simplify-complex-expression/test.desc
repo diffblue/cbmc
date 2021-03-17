@@ -1,9 +1,9 @@
 CORE
 main.c
---variable-sensitivity
+--vsd
 r == 2
 ^SIGNAL=0$
-^EXIT=6$
+^EXIT=0$
 --
 --
 
