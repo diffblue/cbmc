@@ -1,15 +1,14 @@
 class A
 {
-  public:
+public:
   int i;
 };
 
-class B: A
+class B : A
 {
-
 };
 
-void set_one(A& a)
+void set_one(A &a)
 {
   a.i = 1;
 }

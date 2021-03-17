@@ -1,6 +1,6 @@
 int main()
 {
   char c = 'c';
-  int& i = c;  // ill-formed
+  int &i = c; // ill-formed
   i++;
 }

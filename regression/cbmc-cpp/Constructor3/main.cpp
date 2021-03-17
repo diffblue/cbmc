@@ -7,11 +7,15 @@ public:
   int i;
 };
 
-x::x():i(1) { }
-x::x(int z):i(z) { }
+x::x() : i(1)
+{
+}
+x::x(int z) : i(z)
+{
+}
 
 int main()
 {
   x a(5);
-  assert(a.i==5);
+  assert(a.i == 5);
 }

@@ -1,12 +1,14 @@
-struct B {
+struct B
+{
   int i;
-  bool operator == (int b)
+  bool operator==(int b)
   {
     return i == b;
   }
 };
 
-struct A {
+struct A
+{
   int i;
   operator B() const
   {
@@ -16,8 +18,9 @@ struct A {
   }
 };
 
-int main() {
+int main()
+{
   A a;
   a.i = 10;
-  assert( a.operator B() == 10 );
+  assert(a.operator B() == 10);
 }

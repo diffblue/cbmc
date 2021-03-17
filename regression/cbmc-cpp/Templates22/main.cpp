@@ -1,9 +1,15 @@
 #include <cassert>
-template<class T>
-T func(T* t) {return *t;}
+template <class T>
+T func(T *t)
+{
+  return *t;
+}
 
-template<class T>
-T func(T t) { return t;}
+template <class T>
+T func(T t)
+{
+  return t;
+}
 
 int main()
 {

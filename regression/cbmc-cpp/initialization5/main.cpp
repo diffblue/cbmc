@@ -1,7 +1,8 @@
 #include <cassert>
 int a[__CPROVER::constant_infinity_uint];
 
-struct A {
+struct A
+{
   int i[__CPROVER::constant_infinity_uint];
 };
 

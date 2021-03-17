@@ -6,12 +6,12 @@ struct x
   x();
 };
 
-x::x():q(0)
+x::x() : q(0)
 {
 }
 
 int main()
 {
   x a;
-  assert(a.q==0);
+  assert(a.q == 0);
 }

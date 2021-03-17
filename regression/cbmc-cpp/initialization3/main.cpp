@@ -1,13 +1,15 @@
 #include <cassert>
 class A
 {
-  public:
+public:
   int i;
-  A(){}
+  A()
+  {
+  }
 };
 
 int main()
 {
   A a;
-  assert(a.i==0);
+  assert(a.i == 0);
 }

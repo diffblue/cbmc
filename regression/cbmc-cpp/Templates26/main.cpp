@@ -1,11 +1,12 @@
 #include <cassert>
 
-template<int C>
-struct A{
+template <int C>
+struct A
+{
   int func();
 };
 
-template<int C>
+template <int C>
 int A<C>::func()
 {
   return C;

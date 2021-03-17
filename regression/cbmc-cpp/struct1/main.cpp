@@ -8,15 +8,18 @@ struct IUnknown
 
 int f(IUnknown *This);
 
-struct AA {
+struct AA
+{
   int i;
 };
 
-struct BBB {
+struct BBB
+{
   struct asd *p;
 } abc;
 
-struct AAA {
+struct AAA
+{
   struct asd *q;
 } fff;
 
@@ -27,13 +30,12 @@ struct asd
 
 void f()
 {
-  abc.p=fff.q;
+  abc.p = fff.q;
 }
 
 int main()
 {
   int z;
 
-  z=sizeof(struct AA);
-
+  z = sizeof(struct AA);
 }

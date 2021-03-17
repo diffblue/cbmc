@@ -7,10 +7,10 @@ public:
 
 void A::f()
 {
-  i=1;
+  i = 1;
 }
 
-class B:public A
+class B : public A
 {
 public:
   int i;
@@ -30,7 +30,7 @@ int main()
   b.A::i = 10;
 
   b.f();
-  assert(b.i    == 2);
+  assert(b.i == 2);
   assert(b.A::i == 11);
 
   b.A::f();

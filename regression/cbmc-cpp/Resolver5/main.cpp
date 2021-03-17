@@ -1,11 +1,15 @@
 namespace n1
 {
-  struct A {
-    int i;
-  };
+struct A
+{
+  int i;
+};
 
-  int func(A a) {return a.i;}
+int func(A a)
+{
+  return a.i;
 }
+} // namespace n1
 
 int main()
 {

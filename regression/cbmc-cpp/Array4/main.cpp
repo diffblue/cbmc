@@ -1,4 +1,4 @@
-char my_string[]="abc";
+char my_string[] = "abc";
 
 void elsewhere();
 

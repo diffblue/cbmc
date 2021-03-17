@@ -11,11 +11,11 @@ public:
 
 int X::f()
 {
-  g=10;
-  m=1;
+  g = 10;
+  m = 1;
 }
 
-class Y:public X
+class Y : public X
 {
 };
 
@@ -25,5 +25,5 @@ int main()
 
   y.f();
 
-  assert(g==10);
+  assert(g == 10);
 }

@@ -1,13 +1,17 @@
 class A
 {
-  public:
+public:
   int ar[2];
-  A(){ar[0]=0; ar[1]=1;}
+  A()
+  {
+    ar[0] = 0;
+    ar[1] = 1;
+  }
 };
 
 class B
 {
-  public:
+public:
   A as[2];
 };
 
@@ -20,7 +24,7 @@ int main()
   b1.as[1].ar[1] += 2;
 
   B b2(b1);
-  assert(b2.as[0].ar[0]== 1);
+  assert(b2.as[0].ar[0] == 1);
   assert(b2.as[0].ar[1] == 2);
   assert(b2.as[1].ar[0] == 2);
   assert(b2.as[1].ar[1] == 3);

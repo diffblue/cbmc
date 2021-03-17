@@ -4,7 +4,7 @@ struct A
   static int i;
 };
 
-struct B: public A
+struct B : public A
 {
   static int i;
 };
@@ -21,5 +21,4 @@ int main()
   assert(B::i == 2);
   obj.A::i++;
   assert(A::i == 1);
-
 }

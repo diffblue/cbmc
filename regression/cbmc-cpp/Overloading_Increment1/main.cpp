@@ -9,7 +9,7 @@ struct A
     return obj;
   }
 
-  A& operator++()
+  A &operator++()
   {
     a++;
     return *this;
@@ -22,7 +22,7 @@ struct A
     return obj;
   }
 
-  A& operator--()
+  A &operator--()
   {
     a--;
     return *this;
@@ -34,11 +34,11 @@ int main()
   A obj;
   obj.a = 0;
   A obj2 = obj++;
-  assert(obj2.a == 0 && obj.a==1);
+  assert(obj2.a == 0 && obj.a == 1);
   obj2 = ++obj;
-  assert(obj2.a == 2 && obj.a==2);
+  assert(obj2.a == 2 && obj.a == 2);
   obj2 = obj--;
-  assert(obj2.a == 2 && obj.a==1);
+  assert(obj2.a == 2 && obj.a == 1);
   obj2 = --obj;
-  assert(obj2.a == 0  && obj.a==0);
+  assert(obj2.a == 0 && obj.a == 0);
 }

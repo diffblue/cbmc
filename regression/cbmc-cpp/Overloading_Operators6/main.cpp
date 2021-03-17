@@ -1,13 +1,30 @@
 struct A
 {
   int i;
-  A():i(1) {}
+  A() : i(1)
+  {
+  }
 
-  int& operator* () {return i;}
-  int operator+ (int j) {return i+j;}
-  int operator~ () {return ~i;}
-  int operator[] (int k) {return i;}
-  int operator== (int k) {return i=i;}
+  int &operator*()
+  {
+    return i;
+  }
+  int operator+(int j)
+  {
+    return i + j;
+  }
+  int operator~()
+  {
+    return ~i;
+  }
+  int operator[](int k)
+  {
+    return i;
+  }
+  int operator==(int k)
+  {
+    return i = i;
+  }
 
   void func1()
   {
@@ -28,9 +45,7 @@ struct A
     assert((*this)[2] == *(*this));
     assert((*this) == 1);
   }
-
 };
-
 
 int main()
 {

@@ -9,10 +9,10 @@ public:
 
 void b::f()
 {
-  x=1;
+  x = 1;
 }
 
-class t:public b
+class t : public b
 {
 public:
 };
@@ -21,5 +21,5 @@ int main()
 {
   t instance;
   instance.f();
-  assert(instance.x==1);
+  assert(instance.x == 1);
 }

@@ -20,6 +20,6 @@ int func<char>()
 int main()
 {
   assert(func<bool>() == 0);
-  assert(func<int>()  == 1);
+  assert(func<int>() == 1);
   assert(func<char>() == 2);
 }

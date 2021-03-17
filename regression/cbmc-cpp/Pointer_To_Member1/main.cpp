@@ -1,11 +1,14 @@
 class A
 {
-  public:
-  int f(char i){return i+1;}
+public:
+  int f(char i)
+  {
+    return i + 1;
+  }
 };
 
 A a;
-int (A::* paf)(char) = &A::f;
+int (A::*paf)(char) = &A::f;
 int main()
 {
   int v1 = (a.*paf)(0);

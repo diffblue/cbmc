@@ -1,9 +1,12 @@
 #include <cassert>
-bool func() {return true;}
+bool func()
+{
+  return true;
+}
 
 bool func(int i)
 {
-  if(i==0)
+  if(i == 0)
     return false;
   return func();
 }

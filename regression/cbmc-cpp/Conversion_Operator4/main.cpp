@@ -1,8 +1,8 @@
 #include <cassert>
 struct A
 {
-  static const int* const i = 0;
-  operator const int* const ()const
+  static const int *const i = 0;
+  operator const int *const() const
   {
     return i;
   }
@@ -11,5 +11,5 @@ struct A
 int main()
 {
   A a;
-  assert((const int* const)a == A::i);
+  assert((const int *const)a == A::i);
 }

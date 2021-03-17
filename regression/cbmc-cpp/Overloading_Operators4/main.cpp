@@ -1,16 +1,15 @@
 struct X
 {
-  X():i(1), j(2)
+  X() : i(1), j(2)
   {
   }
 
   int i;
   int j;
 
-  bool operator == (const struct X &o)
+  bool operator==(const struct X &o)
   {
-    return i==o.i &&
-           j==o.j;
+    return i == o.i && j == o.j;
   }
 
   bool func()
@@ -25,7 +24,7 @@ void doit()
 {
   X a, b;
 
-  assert(a==b);
+  assert(a == b);
 }
 
 int main()

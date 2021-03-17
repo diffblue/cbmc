@@ -1,11 +1,17 @@
 #include <cassert>
-struct A{
-        int x;
-  A(){}
+struct A
+{
+  int x;
+  A()
+  {
+  }
 };
 
-struct B: public A{
-  B(){}
+struct B : public A
+{
+  B()
+  {
+  }
 };
 
 int main()

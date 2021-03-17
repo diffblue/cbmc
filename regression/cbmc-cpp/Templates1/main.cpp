@@ -7,7 +7,7 @@ void f(T x)
 template <int i>
 void eq(int z)
 {
-  assert(i==z);
+  assert(i == z);
 }
 
 int main()

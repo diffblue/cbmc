@@ -1,31 +1,36 @@
 #include <cassert>
 
 template <class T>
-struct A {
+struct A
+{
   static const int a = 0;
 };
 
 // specialization to int
 template <>
-struct A<int> {
+struct A<int>
+{
   static const int a = 1;
 };
 
 // specialization to char
 template <>
-struct A<char> {
+struct A<char>
+{
   static const int a = 2;
 };
 
 // specialization to signed char
 template <>
-struct A<signed char> {
+struct A<signed char>
+{
   static const int a = 3;
 };
 
 // specialization to unsigned char
 template <>
-struct A<unsigned char> {
+struct A<unsigned char>
+{
   static const int a = 4;
 };
 

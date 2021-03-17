@@ -2,5 +2,5 @@ int main()
 {
   const int *p;
 
-  p=(int *)0;
+  p = (int *)0;
 }

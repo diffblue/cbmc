@@ -9,5 +9,5 @@ int main()
 {
   double x;
   // the literal types select the function
-  x=pow(2.0f, 3);
+  x = pow(2.0f, 3);
 }

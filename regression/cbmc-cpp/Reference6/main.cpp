@@ -4,7 +4,7 @@ class X
 public:
   int x;
 
-  X():x(0)
+  X() : x(0)
   {
   }
 };
@@ -18,9 +18,9 @@ X &r()
 
 int main()
 {
-  y.x=10;
+  y.x = 10;
 
-  r()=y;
+  r() = y;
 
-  assert(g.x==10);
+  assert(g.x == 10);
 }

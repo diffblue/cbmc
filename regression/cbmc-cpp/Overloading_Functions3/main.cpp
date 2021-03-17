@@ -56,14 +56,14 @@ int f(long double)
 
 int main()
 {
-  assert(f((char)0)==1);
-  assert(f((unsigned char)0)==2);
-  assert(f((short int)0)==3);
-  assert(f((int)0)==4);
-  assert(f((unsigned int)0)==5);
-  assert(f((long int)0)==6);
-  assert(f((long long)0)==7);
-  assert(f((float)0)==8);
-  assert(f((double)0)==9);
-  assert(f((long double)0)==10);
+  assert(f((char)0) == 1);
+  assert(f((unsigned char)0) == 2);
+  assert(f((short int)0) == 3);
+  assert(f((int)0) == 4);
+  assert(f((unsigned int)0) == 5);
+  assert(f((long int)0) == 6);
+  assert(f((long long)0) == 7);
+  assert(f((float)0) == 8);
+  assert(f((double)0) == 9);
+  assert(f((long double)0) == 10);
 }

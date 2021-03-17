@@ -1,10 +1,10 @@
 #include <cassert>
 
-template<class T>
+template <class T>
 struct A
 {
   T t;
-  bool eq(const A<T>& ref) const
+  bool eq(const A<T> &ref) const
   {
     return ref.t == t;
   }

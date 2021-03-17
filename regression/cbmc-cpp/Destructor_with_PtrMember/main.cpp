@@ -1,19 +1,24 @@
 #include <cassert>
 int global;
 
-class test_class {
+class test_class
+{
 public:
-  ~test_class() { global=1; }
+  ~test_class()
+  {
+    global = 1;
+  }
 };
 
-int main() {
+int main()
+{
   test_class c, *p;
 
-  p=&c;
+  p = &c;
 
-  p -> ~test_class();
+  p->~test_class();
 
-  assert(global==1);
+  assert(global == 1);
 
   // The notation for explicit calls to destructors can be used regardless
   // of whether the type defines a destructor.  This allows you to make such

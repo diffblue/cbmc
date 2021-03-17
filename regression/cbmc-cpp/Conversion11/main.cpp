@@ -1,1 +1,4 @@
-char* func() {return (void*)0; }
+char *func()
+{
+  return (void *)0;
+}

@@ -2,13 +2,15 @@
 
 namespace N
 {
-  template <class T>
-  struct A
+template <class T>
+struct A
+{
+  T t;
+  A(T t) : t(t)
   {
-    T t;
-    A(T t):t(t) { }
-  };
-}
+  }
+};
+} // namespace N
 
 using N::A;
 

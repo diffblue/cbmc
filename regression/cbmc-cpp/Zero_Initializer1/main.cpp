@@ -6,7 +6,8 @@ struct
   int m;
 } s;
 
-struct B {
+struct B
+{
   static int x;
 };
 
@@ -16,9 +17,9 @@ char a[10];
 
 int main()
 {
-  assert(g==0);
-  assert(p==0);
-  assert(s.m==0);
-  assert(a[3]==0);
-  assert(B::x==0);
+  assert(g == 0);
+  assert(p == 0);
+  assert(s.m == 0);
+  assert(a[3] == 0);
+  assert(B::x == 0);
 }

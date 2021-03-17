@@ -19,9 +19,9 @@ int main()
 
   int temp;
 
-  temp=x+2;
-  assert(temp==2);
+  temp = x + 2;
+  assert(temp == 2);
 
-  temp=x-3;
-  assert(temp==-3);
+  temp = x - 3;
+  assert(temp == -3);
 }

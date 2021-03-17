@@ -1,30 +1,39 @@
 #include <cassert>
 
-template<typename T>
+template <typename T>
 class X
 {
 public:
   // the :: should trigger elaboration of Z<int>
-  enum { e = T::e };
+  enum
+  {
+    e = T::e
+  };
 };
 
-template<typename T>
-class Y:public X<T>
+template <typename T>
+class Y : public X<T>
 {
 public:
-  enum { e = X<T>::e } ;
+  enum
+  {
+    e = X<T>::e
+  };
 };
 
-template<typename T>
+template <typename T>
 class Z
 {
 public:
-  enum { e = 1 };
+  enum
+  {
+    e = 1
+  };
 };
 
-Y<Z<int> > y;
+Y<Z<int>> y;
 
 int main()
 {
-  assert(y.e==1);
+  assert(y.e == 1);
 }

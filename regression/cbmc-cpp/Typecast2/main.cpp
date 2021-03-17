@@ -3,7 +3,7 @@ struct myA
   int i;
 };
 
-struct myB: myA
+struct myB : myA
 {
   int j;
 };

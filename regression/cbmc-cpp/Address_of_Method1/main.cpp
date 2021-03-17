@@ -12,7 +12,7 @@ void x::f()
 
 int main()
 {
-  assert(&x::f!=0);
+  assert(&x::f != 0);
 
-  assert(&x::i!=0);
+  assert(&x::i != 0);
 }

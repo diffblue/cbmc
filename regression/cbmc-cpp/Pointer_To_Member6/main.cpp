@@ -1,14 +1,16 @@
 struct A
 {
   int i;
-  void func(){i  = 10;}
+  void func()
+  {
+    i = 10;
+  }
 };
 
-struct B: public A
+struct B : public A
 {
-  void (A::* pmeth)();
-  B():
-    pmeth(&A::func)
+  void (A::*pmeth)();
+  B() : pmeth(&A::func)
   {
     (this->*pmeth)();
   }

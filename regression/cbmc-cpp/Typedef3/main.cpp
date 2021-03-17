@@ -1,7 +1,10 @@
 
 struct B
 {
-  typedef struct { typedef int INT; } A;
+  typedef struct
+  {
+    typedef int INT;
+  } A;
 };
 
 int main()

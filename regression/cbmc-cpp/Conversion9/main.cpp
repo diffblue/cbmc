@@ -2,7 +2,9 @@ struct A
 {
 };
 
-struct B: A {};
+struct B : A
+{
+};
 
 int main()
 {

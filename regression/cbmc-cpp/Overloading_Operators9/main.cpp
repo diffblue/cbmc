@@ -7,7 +7,7 @@ struct C
 struct B
 {
   C c;
-  C* operator->()
+  C *operator->()
   {
     return &c;
   }
@@ -16,7 +16,7 @@ struct B
 struct A
 {
   B b;
-  B& operator->()
+  B &operator->()
   {
     return b;
   }
@@ -26,5 +26,5 @@ int main()
 {
   A a;
   a->d = 2;
-  assert(a.b.c.d==2);
+  assert(a.b.c.d == 2);
 }

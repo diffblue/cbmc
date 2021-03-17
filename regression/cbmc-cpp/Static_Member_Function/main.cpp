@@ -4,7 +4,9 @@ class t
 {
 public:
   int i;
-  static void f() { }
+  static void f()
+  {
+  }
 };
 
 int main()

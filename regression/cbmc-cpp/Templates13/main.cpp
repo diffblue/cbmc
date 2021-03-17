@@ -1,7 +1,7 @@
 #include <cassert>
-template
-<class T>
-bool func() {
+template <class T>
+bool func()
+{
   return func<bool>();
 }
 

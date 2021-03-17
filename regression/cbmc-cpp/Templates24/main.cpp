@@ -1,12 +1,16 @@
 #include <cassert>
 
 template <class T>
-struct A {
+struct A
+{
   bool True();
 };
 
 template <class t>
-bool A<t>::True() { return true; }
+bool A<t>::True()
+{
+  return true;
+}
 
 int main()
 {

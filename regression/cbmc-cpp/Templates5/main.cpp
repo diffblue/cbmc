@@ -1,18 +1,22 @@
-template<class T> class Y {
+template <class T>
+class Y
+{
 public:
-       void f() {
-           T::A++;   // T::A is not a type name!
+  void f()
+  {
+    T::A++; // T::A is not a type name!
   }
 };
 
 class B
 {
-  public:
+public:
   static int A;
 };
 
 int B::A = 0;
-int main() {
+int main()
+{
   Y<B> y;
   y.f();
   assert(B::A == 1);

@@ -1,5 +1,5 @@
 #include <cassert>
-template<unsigned int size>
+template <unsigned int size>
 class int_array
 {
 public:
@@ -7,7 +7,7 @@ public:
 
   int read(unsigned int x)
   {
-    assert(x<size);
+    assert(x < size);
     return array[x];
   }
 };

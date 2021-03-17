@@ -4,12 +4,12 @@ int main()
 {
   unsigned a = 6;
   unsigned b = 12;
-  unsigned a21 =  a.range(2, 1);
-        unsigned b32  = b.range(3, 2);
-  assert( a21 == b32);
+  unsigned a21 = a.range(2, 1);
+  unsigned b32 = b.range(3, 2);
+  assert(a21 == b32);
 
   a.range(4, 3) = a.range(2, 1);
-  assert( a.range(4, 3) == b.range(3, 2));
+  assert(a.range(4, 3) == b.range(3, 2));
 
   a[0] = b.range(3, 3);
   bool a0 = a[0];

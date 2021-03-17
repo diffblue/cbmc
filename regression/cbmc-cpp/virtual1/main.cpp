@@ -5,7 +5,7 @@ class A
 public:
   virtual void f()
   {
-    g=1;
+    g = 1;
   }
 
   int mA;
@@ -17,18 +17,18 @@ A::A()
 {
 }
 
-class B: public A
+class B : public A
 {
 public:
   B()
   {
-    mB=1;
+    mB = 1;
   }
 
   virtual void f()
   {
-    g=2;
-    mB=3;
+    g = 2;
+    mB = 3;
   }
 
   int mB;
@@ -39,10 +39,10 @@ int main()
   B b;
   A *p;
 
-  p=&b;
+  p = &b;
 
   p->f();
 
-  assert(g==2);
-  assert(b.mB==3);
+  assert(g == 2);
+  assert(b.mB == 3);
 }

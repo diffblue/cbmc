@@ -8,13 +8,13 @@ public:
   t1(int z);
 };
 
-t1::t1():i(1)
+t1::t1() : i(1)
 {
 }
 
 t1::t1(int z)
 {
-  i=z;
+  i = z;
 }
 
 class t2
@@ -26,7 +26,7 @@ public:
   t2(int z);
 };
 
-t2::t2():i(1)
+t2::t2() : i(1)
 {
 }
 
@@ -37,5 +37,5 @@ t2::t2(int z)
 int main()
 {
   t1 instance1(5);
-  assert(instance1.i==5);
+  assert(instance1.i == 5);
 }

@@ -9,7 +9,9 @@ struct A
 struct B
 {
   int i;
-  B():i(0) { }
+  B() : i(0)
+  {
+  }
 };
 
 int main()

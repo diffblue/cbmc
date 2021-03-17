@@ -4,7 +4,8 @@ public:
   typedef int T;
 };
 
-template<class Z> class Y
+template <class Z>
+class Y
 {
 public:
   typename X::T g;
@@ -12,7 +13,6 @@ public:
   void f()
   {
     typename X::T l;
-
   }
 };
 
@@ -20,5 +20,5 @@ int main()
 {
   Y<int> o;
 
-  o.g=1;
+  o.g = 1;
 }

@@ -1,3 +1,4 @@
-class A{
-  int& a;
+class A
+{
+  int &a;
 };

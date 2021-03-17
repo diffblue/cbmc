@@ -1,21 +1,27 @@
 struct A
 {
-  protected:
+protected:
   int i;
-  int get_i() {return i;}
+  int get_i()
+  {
+    return i;
+  }
 
-  A(int i):i(i){}
-
+  A(int i) : i(i)
+  {
+  }
 };
 
-struct B: A
+struct B : A
 {
-  B():A(0){}
+  B() : A(0)
+  {
+  }
 };
 
 B b;
 
 int main()
 {
-  assert(b.get_i()==0);
+  assert(b.get_i() == 0);
 }

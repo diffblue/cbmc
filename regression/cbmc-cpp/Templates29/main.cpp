@@ -1,16 +1,23 @@
-namespace N {
+namespace N
+{
 template <class T>
 struct A
 {
   T i;
-  A(T i):i(i){}
+  A(T i) : i(i)
+  {
+  }
 };
-}
+} // namespace N
 
 struct B : N::A<int>
 {
-  B(int i): N::A<int>(i) {}
-  void  func() {}
+  B(int i) : N::A<int>(i)
+  {
+  }
+  void func()
+  {
+  }
   int b;
 };
 

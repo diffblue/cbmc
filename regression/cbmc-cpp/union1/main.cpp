@@ -3,8 +3,7 @@
 int main()
 {
   // anonymous union
-  union
-  {
+  union {
     int a;
     char b;
   };

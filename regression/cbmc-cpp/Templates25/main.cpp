@@ -1,6 +1,9 @@
 #include <cassert>
 template <class, int>
-bool True() {return true;}
+bool True()
+{
+  return true;
+}
 
 int main()
 {

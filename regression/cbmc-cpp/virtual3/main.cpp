@@ -1,17 +1,20 @@
-class B{
-  public:
-  virtual int f(){ return 0; }
+class B
+{
+public:
+  virtual int f()
+  {
+    return 0;
+  }
 };
 
-
-void toBr(B& b)
+void toBr(B &b)
 {
-  assert(b.f()==0);
+  assert(b.f() == 0);
 }
 
 int main()
 {
   B b;
-//   assert(b.f()==0);
+  //   assert(b.f()==0);
   toBr(b);
 }

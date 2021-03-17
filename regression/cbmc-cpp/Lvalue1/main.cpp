@@ -1,10 +1,17 @@
-struct A {
+struct A
+{
   int i;
-  A():i(0) {}
-  int get_i(){return i;}
+  A() : i(0)
+  {
+  }
+  int get_i()
+  {
+    return i;
+  }
 };
 
-A factory() {
+A factory()
+{
   return A();
 }
 
@@ -22,5 +29,4 @@ int main()
   // Is the compatibility with gcc more important?
 
   assert(factory().get_i() == 0);
-
 }

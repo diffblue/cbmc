@@ -1,18 +1,27 @@
 struct A
 {
-  bool True(){return true;}
+  bool True()
+  {
+    return true;
+  }
 };
 
 struct B
 {
   A a;
-  A* operator->(){return &a;}
+  A *operator->()
+  {
+    return &a;
+  }
 };
 
 struct C
 {
   B b;
-  B& operator->(){return b;}
+  B &operator->()
+  {
+    return b;
+  }
 };
 
 int main()

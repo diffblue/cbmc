@@ -1,4 +1,4 @@
 int main()
 {
-  int *&* p; // parsing error
+  int *&*p; // parsing error
 }

@@ -2,14 +2,26 @@
 
 struct A
 {
-  A* operator->() { return this; }
-  int one() { return 1; }
-  int one(int &i){ i = 1;}
+  A *operator->()
+  {
+    return this;
+  }
+  int one()
+  {
+    return 1;
+  }
+  int one(int &i)
+  {
+    i = 1;
+  }
 };
 
-struct B: public A
+struct B : public A
 {
-  A* operator->(){ return this; }
+  A *operator->()
+  {
+    return this;
+  }
 };
 
 int main()

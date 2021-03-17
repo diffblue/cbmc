@@ -2,19 +2,23 @@ struct A
 {
   int i;
   A(){};
-  protected:
-  A(int i):i(i){}
 
+protected:
+  A(int i) : i(i)
+  {
+  }
 };
 
-struct B: A
+struct B : A
 {
-  B():A(0){}
+  B() : A(0)
+  {
+  }
 };
 
 B b;
 
 int main()
 {
-  assert(b.i==0);
+  assert(b.i == 0);
 }

@@ -1,11 +1,11 @@
 class T
 {
 public:
-  T():x(0)
+  T() : x(0)
   {
   }
 
-  T(int i, int j):x(i)
+  T(int i, int j) : x(i)
   {
   }
 
@@ -15,10 +15,10 @@ public:
 int main()
 {
   // alternate forms of conversion
-  assert(unsigned(-1)==(unsigned)-1);
+  assert(unsigned(-1) == (unsigned)-1);
 
   assert(bool(10));
 
-  T t=T(2, 3);
-  assert(t.x==2);
+  T t = T(2, 3);
+  assert(t.x == 2);
 }

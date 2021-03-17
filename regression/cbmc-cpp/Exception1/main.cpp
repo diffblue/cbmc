@@ -3,7 +3,9 @@
 class whatnot
 {
 public:
-  whatnot(int _i):i(_i) { }
+  whatnot(int _i) : i(_i)
+  {
+  }
   int i;
 };
 
@@ -13,7 +15,7 @@ int main()
 
   try
   {
-    throw (int)0;
+    throw(int) 0;
     assert(0);
   }
 
@@ -34,7 +36,7 @@ int main()
 
   try
   {
-    throw (char)0;
+    throw(char) 0;
     assert(0);
   }
 
@@ -68,6 +70,6 @@ int main()
   }
   catch(whatnot w)
   {
-    assert(w.i==1);
+    assert(w.i == 1);
   }
 }

@@ -1,10 +1,17 @@
-struct A {};
-
-struct B {
-   explicit B(A&){}
+struct A
+{
 };
 
-void test(const B& b) {}
+struct B
+{
+  explicit B(A &)
+  {
+  }
+};
+
+void test(const B &b)
+{
+}
 
 int main()
 {

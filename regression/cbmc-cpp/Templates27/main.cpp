@@ -1,9 +1,12 @@
 #include <cassert>
 
 template <class T1, class T2 = int>
-struct C {
+struct C
+{
   T2 i;
-  C():i(10) { }
+  C() : i(10)
+  {
+  }
 };
 
 template <class T, int v = 9>

@@ -1,13 +1,16 @@
-enum foo {NOT_AFFECTED, FATAL_AFFECT, WARNING};
+enum foo
+{
+  NOT_AFFECTED,
+  FATAL_AFFECT,
+  WARNING
+};
 
-typedef struct {
+typedef struct
+{
   foo SeverityType;
 } BitDatabaseRecordStruct;
 
-const BitDatabaseRecordStruct BitDataBase [1] =
-{
-  {NOT_AFFECTED}
-};
+const BitDatabaseRecordStruct BitDataBase[1] = {{NOT_AFFECTED}};
 
 int main()
 {

@@ -1,5 +1,8 @@
 #include <cassert>
-int func(int i = 0) {return i;}
+int func(int i = 0)
+{
+  return i;
+}
 
 int main()
 {

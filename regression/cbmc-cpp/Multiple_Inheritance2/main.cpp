@@ -1,10 +1,17 @@
-struct A{
+struct A
+{
   int i;
   A(){};
 };
-struct B: virtual A{};
-struct C: virtual A{};
-struct D: B, C {};
+struct B : virtual A
+{
+};
+struct C : virtual A
+{
+};
+struct D : B, C
+{
+};
 
 int main()
 {

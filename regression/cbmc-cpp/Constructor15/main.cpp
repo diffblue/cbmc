@@ -1,16 +1,16 @@
 class A
 {
-  public:
+public:
   A(){};
-  private:
-  A(const A&);               // disabled
-  A& operator=(const A&);    // disabled
+
+private:
+  A(const A &);            // disabled
+  A &operator=(const A &); // disabled
 };
 
-class B: public A
+class B : public A
 {
 };
-
 
 int main()
 {

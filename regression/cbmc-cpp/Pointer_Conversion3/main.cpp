@@ -1,6 +1,6 @@
-struct A {
+struct A
+{
   int i;
-
 };
 
 struct B
@@ -11,7 +11,7 @@ struct B
 
 int main()
 {
-  A* pa;
-  B* pb;
-  pb = static_cast<B*>(pa);  // ill-formed
+  A *pa;
+  B *pb;
+  pb = static_cast<B *>(pa); // ill-formed
 }

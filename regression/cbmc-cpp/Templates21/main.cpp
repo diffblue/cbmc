@@ -1,12 +1,16 @@
 #include <cassert>
 
 template <class T>
-struct A{
+struct A
+{
   T i;
-  void write(T i){this->i = i;}
+  void write(T i)
+  {
+    this->i = i;
+  }
 };
 
-struct B: A<bool>
+struct B : A<bool>
 {
   void write(bool i)
   {

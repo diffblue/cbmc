@@ -5,8 +5,10 @@ struct A
   T1 t;
 
   template <class T2>
-  void set(T2 t){ this->t = t; }
-
+  void set(T2 t)
+  {
+    this->t = t;
+  }
 };
 
 int main()

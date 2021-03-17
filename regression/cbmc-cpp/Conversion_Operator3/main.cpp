@@ -1,11 +1,13 @@
 #include <cassert>
-struct A {
+struct A
+{
   int i;
 };
 
-struct B {
+struct B
+{
   int i;
-  operator A ()
+  operator A()
   {
     A tmp;
     tmp.i = i++;
@@ -18,6 +20,6 @@ int main()
   B b;
   b.i = 1;
   A a = b;
-  assert(a.i==1);
-  assert(b.i==2);
+  assert(a.i == 1);
+  assert(b.i == 2);
 }

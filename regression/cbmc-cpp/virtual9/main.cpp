@@ -1,7 +1,10 @@
 #include <cassert>
 struct A
 {
-  virtual int& func(int& i){return i;}
+  virtual int &func(int &i)
+  {
+    return i;
+  }
 };
 
 int main()
@@ -11,5 +14,5 @@ int main()
   int j = 1;
 
   a.func(i) = j;
-  assert(i==j);
+  assert(i == j);
 }

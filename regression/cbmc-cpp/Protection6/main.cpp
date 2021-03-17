@@ -1,5 +1,8 @@
-class A {
-  static void func(){}
+class A
+{
+  static void func()
+  {
+  }
 };
 
 int main()

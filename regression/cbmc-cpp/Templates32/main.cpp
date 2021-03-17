@@ -1,18 +1,24 @@
 #include <cassert>
 
-enum argt { ONE, TWO };
+enum argt
+{
+  ONE,
+  TWO
+};
 
-template < argt V = TWO, class T = argt >
+template <argt V = TWO, class T = argt>
 class A
 {
-  public:
-  A():v(V) {}
+public:
+  A() : v(V)
+  {
+  }
   T v;
 };
 
 int main()
 {
   A<> a;
-  assert (a.v == TWO);
+  assert(a.v == TWO);
   return 0;
 }

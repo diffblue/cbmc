@@ -1,10 +1,13 @@
 #include <cassert>
-struct A { int i;};
+struct A
+{
+  int i;
+};
 
 struct B
 {
   int i;
-  B& operator = (const B& b)
+  B &operator=(const B &b)
   {
     i = b.i;
     return *this;
@@ -17,7 +20,6 @@ A funcA()
   a.i = 10;
   return a;
 }
-
 
 B funcB()
 {
@@ -34,5 +36,5 @@ int main()
 
   B b;
   b.i = 20;
-  assert((funcB() = b).i == 20);  // legal
+  assert((funcB() = b).i == 20); // legal
 }

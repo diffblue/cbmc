@@ -5,5 +5,5 @@ struct A
 
 int main()
 {
-  int i = (int) A::f;
+  int i = (int)A::f;
 }

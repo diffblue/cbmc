@@ -9,7 +9,7 @@ struct A
 template <unsigned N>
 struct B
 {
-  A<0+N> a;
+  A<0 + N> a;
 };
 
 int main()

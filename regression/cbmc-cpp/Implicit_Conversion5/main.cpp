@@ -2,6 +2,6 @@ void f(int);
 
 int main()
 {
-  char* pc;
+  char *pc;
   f(pc); // invalid conversion
 }

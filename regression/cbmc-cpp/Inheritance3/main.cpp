@@ -1,9 +1,10 @@
 #include <cassert>
-struct A {
+struct A
+{
   typedef int INT;
 };
 
-struct B: public A
+struct B : public A
 {
   INT i;
   void set(INT i)
@@ -17,5 +18,5 @@ int main()
   B b;
   b.i = 0;
   b.i++;
-  assert(b.i==1);
+  assert(b.i == 1);
 }

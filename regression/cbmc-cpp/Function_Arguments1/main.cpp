@@ -1,4 +1,4 @@
-inline void *memchr(void* __p, int __c, int __n)
+inline void *memchr(void *__p, int __c, int __n)
 {
   __p++;
 }

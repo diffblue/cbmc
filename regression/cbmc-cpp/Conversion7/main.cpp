@@ -1,15 +1,17 @@
-struct A{
+struct A
+{
   int i;
 };
 
-struct B: public A{
+struct B : public A
+{
 };
 
 int main()
 {
   B b;
-  b.i=4;
+  b.i = 4;
 
   A(b).i++; // Not a lvalue?
-  assert(b.i==4);
+  assert(b.i == 4);
 }

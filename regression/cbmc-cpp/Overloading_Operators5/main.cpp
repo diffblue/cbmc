@@ -9,12 +9,12 @@ struct X
   int i;
   int j;
 
-  X &operator= (const struct X &r);
+  X &operator=(const struct X &r);
 };
 
-X &X::operator= (const struct X &r)
+X &X::operator=(const struct X &r)
 {
-  g=2;
+  g = 2;
   return *this;
 }
 
@@ -22,11 +22,11 @@ void doit()
 {
   X a, b;
 
-  g=1;
+  g = 1;
 
-  a=b;
+  a = b;
 
-  assert(g==2);
+  assert(g == 2);
 }
 
 int main()

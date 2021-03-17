@@ -7,6 +7,6 @@ int main()
 {
   int z;
 
-  x=z;
-  assert(f()==z);
+  x = z;
+  assert(f() == z);
 }

@@ -15,5 +15,6 @@ int main()
   vector<int>::iterator it;
 
   for(it = v.begin(); it != v.end(); it++)
-    if(*it == 10) v.erase(it);
+    if(*it == 10)
+      v.erase(it);
 }

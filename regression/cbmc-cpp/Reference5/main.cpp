@@ -1,5 +1,7 @@
 class A
 {
-    int & a;
-    A():a(){}
+  int &a;
+  A() : a()
+  {
+  }
 };
