@@ -71,7 +71,21 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
   std::cout << "Finished symex, invoking decision procedure.\n";
 #endif
 
-  return ((*checker)() == decision_proceduret::resultt::D_SATISFIABLE);
+  switch((*checker)())
+  {
+  case decision_proceduret::resultt::D_ERROR:
+    throw "error running the SMT solver";
+
+  case decision_proceduret::resultt::D_SATISFIABLE:
+    return true;
+
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
+    return false;
+
+    UNREACHABLE;
+  }
+
+  UNREACHABLE;
 }
 
 exprt scratch_programt::eval(const exprt &e)
