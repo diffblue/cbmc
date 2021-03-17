@@ -497,50 +497,6 @@ loop_invariant_opt:
         { $$=$3; }
         ;
 
-requires_opt:
-        /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_REQUIRES '(' ACSL_binding_expression ')'
-        { $$=$3; }
-        ;
-
-ensures_opt:
-        /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
-        { $$=$3; }
-        ;
-
-assigns_opt:
-        /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_ASSIGNS '(' target_list ')'
-        { $$=$3; }
-        ;
-
-target_list:
-          target
-        {
-          init($$, ID_target_list);
-          mto($$, $1);
-        }
-        | target_list ',' target
-        {
-          $$=$1;
-          mto($$, $3);
-        }
-        ;
-
-target:
-          identifier
-        | '*' target
-        {
-          $$=$1;
-          set($$, ID_dereference);
-          mto($$, $2);
-        }
-        ;
-
 statement_expression: '(' compound_statement ')'
         { 
           $$=$1;
@@ -2901,21 +2857,8 @@ asm_definition:
 
 function_definition:
           function_head
-          assigns_opt
-          requires_opt
-          ensures_opt
           function_body
         {
-
-          // Capture assigns clause
-          if(parser_stack($2).is_not_nil())
-            parser_stack($1).add(ID_C_spec_assigns).swap(parser_stack($2));
-
-          // Capture code contract
-          if(parser_stack($3).is_not_nil())
-            parser_stack($1).add(ID_C_spec_requires).swap(parser_stack($3));
-          if(parser_stack($4).is_not_nil())
-            parser_stack($1).add(ID_C_spec_ensures).swap(parser_stack($4));
           // The head is a declaration with one declarator,
           // and the body becomes the 'value'.
           $$=$1;
@@ -2923,7 +2866,7 @@ function_definition:
             to_ansi_c_declaration(parser_stack($$));
             
           assert(ansi_c_declaration.declarators().size()==1);
-          ansi_c_declaration.add_initializer(parser_stack($5));
+          ansi_c_declaration.add_initializer(parser_stack($2));
           
           // Kill the scope that 'function_head' creates.
           PARSER.pop_scope();
@@ -3065,6 +3008,7 @@ function_head:
         {
           init($$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
+          $2=merge($3, $2);
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
           create_function_scope($$);
         }
@@ -3072,6 +3016,7 @@ function_head:
         {
           init($$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
+          $2=merge($3, $2);
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
           create_function_scope($$);
         }
@@ -3285,6 +3230,43 @@ parameter_abstract_declarator:
         | parameter_postfix_abstract_declarator
         ;
 
+cprover_contract:
+          TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_ensures);
+          mto($$, $3);
+        }
+        | TOK_CPROVER_REQUIRES '(' ACSL_binding_expression ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_requires);
+          mto($$, $3);
+        }
+        | TOK_CPROVER_ASSIGNS '(' argument_expression_list ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_assigns);
+          parser_stack($3).id(ID_target_list);
+          mto($$, $3);
+        }
+        ;
+
+cprover_contract_sequence:
+          cprover_contract
+        | cprover_contract_sequence cprover_contract
+        {
+          $$=$1;
+          merge($$, $2);
+        }
+        ;
+
+cprover_contract_sequence_opt:
+          /* nothing */
+          { init($$); }
+        | cprover_contract_sequence
+        ;
+
 postfixing_abstract_declarator:
           parameter_postfixing_abstract_declarator
         /* The following two rules implement K&R headers! */
@@ -3323,11 +3305,12 @@ postfixing_abstract_declarator:
 parameter_postfixing_abstract_declarator:
           array_abstract_declarator
         | '(' ')'
+          cprover_contract_sequence_opt
         {
-          $$=$1;
-          set($$, ID_code);
-          stack_type($$).add(ID_parameters);
-          stack_type($$).subtype()=typet(ID_abstract);
+          set($1, ID_code);
+          stack_type($1).add(ID_parameters);
+          stack_type($1).subtype()=typet(ID_abstract);
+          $$ = merge($3, $1);
         }
         | '('
           {
@@ -3337,12 +3320,13 @@ parameter_postfixing_abstract_declarator:
               id2string(PARSER.current_scope().last_declarator)+"::");
           }
           parameter_type_list
-          ')' KnR_parameter_header_opt
+          ')'
+          KnR_parameter_header_opt
+          cprover_contract_sequence_opt
         {
-          $$=$1;
-          set($$, ID_code);
-          stack_type($$).subtype()=typet(ID_abstract);
-          stack_type($$).add(ID_parameters).get_sub().
+          set($1, ID_code);
+          stack_type($1).subtype()=typet(ID_abstract);
+          stack_type($1).add(ID_parameters).get_sub().
             swap((irept::subt &)(to_type_with_subtypes(stack_type($3)).subtypes()));
           PARSER.pop_scope();
 
@@ -3351,6 +3335,8 @@ parameter_postfixing_abstract_declarator:
             adjust_KnR_parameters(parser_stack($$).add(ID_parameters), parser_stack($5));
             parser_stack($$).set(ID_C_KnR, true);
           }
+
+          $$ = merge($6, $1);
         }
         ;
 

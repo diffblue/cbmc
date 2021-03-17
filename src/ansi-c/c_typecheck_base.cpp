@@ -644,19 +644,6 @@ void c_typecheck_baset::typecheck_declaration(
     // mark as 'already typechecked'
     already_typechecked_typet::make_already_typechecked(declaration.type());
 
-    irept contract;
-
-    {
-      exprt spec_assigns = declaration.spec_assigns();
-      contract.add(ID_C_spec_assigns).swap(spec_assigns);
-
-      exprt spec_ensures = declaration.spec_ensures();
-      contract.add(ID_C_spec_ensures).swap(spec_ensures);
-
-      exprt spec_requires = declaration.spec_requires();
-      contract.add(ID_C_spec_requires).swap(spec_requires);
-    }
-
     // Now do declarators, if any.
     for(auto &declarator : declaration.declarators())
     {
@@ -728,45 +715,45 @@ void c_typecheck_baset::typecheck_declaration(
       irep_idt identifier=symbol.name;
       declarator.set_name(identifier);
 
-      // If the declarator is for a function definition, typecheck it.
-      if(can_cast_type<code_typet>(declarator.type()))
-      {
-        typecheck_assigns(to_code_type(declarator.type()), contract);
-      }
-
       typecheck_symbol(symbol);
 
-      // add code contract (if any); we typecheck this after the
-      // function body done above, so as to have parameter symbols
-      // available
+      // check the contract, if any
       symbolt &new_symbol = symbol_table.get_writeable_ref(identifier);
+      if(new_symbol.type.id() == ID_code)
+      {
+        // We typecheck this after the
+        // function body done above, so as to have parameter symbols
+        // available
+        auto &code_type = to_code_with_contract_type(new_symbol.type);
 
-      typecheck_assigns_exprs(
-        static_cast<codet &>(contract), ID_C_spec_assigns);
-      typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_requires);
+        if(as_const(code_type).requires().is_not_nil())
+        {
+          auto &requires = code_type.requires();
+          typecheck_expr(requires);
+          implicit_typecast_bool(requires);
+        }
 
-      typet ret_type = void_type();
-      if(new_symbol.type.id()==ID_code)
-        ret_type=to_code_type(new_symbol.type).return_type();
-      assert(parameter_map.empty());
-      if(ret_type.id()!=ID_empty)
-        parameter_map[CPROVER_PREFIX "return_value"] = ret_type;
-      typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_ensures);
-      parameter_map.clear();
+        if(as_const(code_type).assigns().is_not_nil())
+        {
+          for(auto &op : code_type.assigns().operands())
+            typecheck_expr(op);
+        }
 
-      exprt assigns_to_add =
-        static_cast<const exprt &>(contract.find(ID_C_spec_assigns));
-      if(assigns_to_add.is_not_nil())
-        to_code_with_contract_type(new_symbol.type).assigns() = assigns_to_add;
-      exprt requires_to_add =
-        static_cast<const exprt &>(contract.find(ID_C_spec_requires));
-      if(requires_to_add.is_not_nil())
-        to_code_with_contract_type(new_symbol.type).requires() =
-          requires_to_add;
-      exprt ensures_to_add =
-        static_cast<const exprt &>(contract.find(ID_C_spec_ensures));
-      if(ensures_to_add.is_not_nil())
-        to_code_with_contract_type(new_symbol.type).ensures() = ensures_to_add;
+        if(as_const(code_type).ensures().is_not_nil())
+        {
+          const auto &return_type = code_type.return_type();
+
+          if(return_type.id() != ID_empty)
+            parameter_map[CPROVER_PREFIX "return_value"] = return_type;
+
+          auto &ensures = code_type.ensures();
+          typecheck_expr(ensures);
+          implicit_typecast_bool(ensures);
+
+          if(return_type.id() != ID_empty)
+            parameter_map.erase(CPROVER_PREFIX "return_value");
+        }
+      }
     }
   }
 }

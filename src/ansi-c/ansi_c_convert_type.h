@@ -45,6 +45,9 @@ public:
   exprt msc_based; // this is Visual Studio
   bool constructor, destructor;
 
+  // contracts
+  exprt requires, assigns, ensures;
+
   // storage spec
   c_storage_spect c_storage_spec;
 
@@ -81,6 +84,10 @@ public:
     fraction_width.make_nil();
     msc_based.make_nil();
     gcc_attribute_mode.make_nil();
+
+    requires.make_nil();
+    assigns.make_nil();
+    ensures.make_nil();
 
     packed=aligned=constructor=destructor=false;
 
