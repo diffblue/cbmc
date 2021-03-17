@@ -1,0 +1,8 @@
+KNOWNBUG
+safe043.c
+SC SAFE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
