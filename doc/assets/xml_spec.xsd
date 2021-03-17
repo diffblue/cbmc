@@ -183,6 +183,27 @@
 
   <xs:element name="refinement-iteration" type="xs:integer"/>
 
+  <xs:element name="fault-localization">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="diagnosis">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="result">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="location"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="property" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="program" type="xs:string"/>
   <xs:element name="cprover-status" type="xs:string"/>
   <xs:element name="cprover">
@@ -193,6 +214,7 @@
         <xs:element ref="message"/>
         <xs:element ref="result"/>
         <xs:element ref="refinement-iteration"/>
+        <xs:element ref="fault-localization"/>
        </xs:choice>
       <xs:element ref="cprover-status" minOccurs="0"/>
       </xs:sequence>
