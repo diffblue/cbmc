@@ -17,7 +17,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake
+          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -75,7 +75,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache
+          sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
           make -C src minisat2-download
           cpanm Thread::Pool::Simple
       - name: Prepare ccache
@@ -128,7 +128,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -171,7 +171,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install maven flex bison parallel ccache
+        run: brew install maven flex bison parallel ccache z3
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -211,7 +211,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install cmake ninja maven flex bison ccache
+        run: brew install cmake ninja maven flex bison ccache z3
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -248,7 +248,7 @@ jobs:
           submodules: recursive
       - name: Fetch dependencies
         run: |
-          choco install winflexbison3
+          choco install winflexbison3 z3
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup Visual Studio environment
@@ -513,7 +513,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache
+          sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache z3
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
