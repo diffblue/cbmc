@@ -35,7 +35,7 @@ exprt polynomialt::to_expr()
         t_it!=m_it->terms.end();
         ++t_it)
     {
-      if(itype.has_value())
+      if(!itype.has_value())
       {
         itype=t_it->var.type();
       }
