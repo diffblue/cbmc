@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Checks whether verification fails when an array is assigned via a
+function call which assigns a pointer to an element out of the
+allowable range.

@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether verification succeeds when a member of formal parameter
+(with type of pointer to struct) outside of the assigns clause is assigned
+after being pointed at the location of a member sub-struct of a freshly
+allocated struct before being assigned. This is meant to show that all
+contained members (and their contained members) of assignable structs
+are valid to assign.

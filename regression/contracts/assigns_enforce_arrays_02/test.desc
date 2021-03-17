@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether the instrumentation process does not duplicate function calls
+used as part of array-index operations, i.e., if a function call is used in
+the computation of the index of an array assignment, then instrumenting that
+statement with an assigns clause will not result in multiple function calls.

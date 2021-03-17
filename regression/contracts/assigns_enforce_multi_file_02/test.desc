@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test replicates the behavior of assigns_enforce_structs_03, but separates
+the structs, function headers, and contracts into a separate file header.h.

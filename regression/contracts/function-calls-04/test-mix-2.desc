@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --enforce-contract f1 --enforce-contract f2_out --replace-call-with-contract f2_in
 ^EXIT=0$
@@ -17,6 +17,3 @@ Recursion
 (1) This test checks the mutualy recursive f2_out and f2-in functions by enforcing f2_out and replacing the internal f2_in call with its contract.
 (2) This test does not require unwinding.
 (3) The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).
-
-Known bug:
-Enforce flag not handled correctly for function calls within functions.

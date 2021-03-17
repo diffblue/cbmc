@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --enforce-all-contracts
 ^EXIT=0$
@@ -11,6 +11,3 @@ Verification:
   ---------|----------|----------
   f1       | assumed  | asserted
   f2       | assumed  | asserted
-
-Known bug:
-Enforce flag not handled correctly for function calls within functions.

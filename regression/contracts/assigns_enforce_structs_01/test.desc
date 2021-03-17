@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether verification succeeds when a formal parameter pointer outside
+of the assigns clause is instead pointed at the location of a member of a
+freshly allocated struct before being assigned.
