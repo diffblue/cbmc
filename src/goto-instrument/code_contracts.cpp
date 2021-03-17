@@ -11,8 +11,9 @@ Date: February 2016
 /// \file
 /// Verify and use annotated invariants and pre/post-conditions
 
+#include "code_contracts.h"
+
 #include <algorithm>
-#include <unordered_set>
 
 #include <analyses/local_may_alias.h>
 
@@ -20,15 +21,17 @@ Date: February 2016
 
 #include <linking/static_lifetime_init.h>
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/format_type.h>
 #include <util/fresh_symbol.h>
+#include <util/mathematical_types.h>
 #include <util/message.h>
-#include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
 
-#include "code_contracts.h"
 #include "loop_utils.h"
 
 /// Predicate to be used with the exprt::visit() function. The function
@@ -37,7 +40,7 @@ Date: February 2016
 class return_value_visitort : public const_expr_visitort
 {
 public:
-  return_value_visitort() : const_expr_visitort()
+  return_value_visitort() : const_expr_visitort(), found(false)
   {
   }
 
@@ -59,6 +62,15 @@ public:
 protected:
   bool found;
 };
+
+exprt get_size(const typet &type, const namespacet &ns, messaget &log)
+{
+  auto size_of_opt = size_of_expr(type, ns);
+  CHECK_RETURN(size_of_opt.has_value());
+  exprt result = size_of_opt.value();
+  result.add(ID_C_c_sizeof_type) = type;
+  return result;
+}
 
 static void check_apply_invariants(
   goto_functionst::goto_functiont &goto_function,
@@ -152,6 +164,7 @@ bool code_contractst::has_contract(const irep_idt fun_name)
 }
 
 bool code_contractst::apply_function_contract(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -159,9 +172,7 @@ bool code_contractst::apply_function_contract(
 
   // Return if the function is not named in the call; currently we don't handle
   // function pointers.
-  // TODO: handle function pointers.
-  if(call.function().id() != ID_symbol)
-    return false;
+  PRECONDITION(call.function().id() == ID_symbol);
 
   // Retrieve the function type, which is needed to extract the contract
   // components.
@@ -251,28 +262,14 @@ bool code_contractst::apply_function_contract(
   // in the assigns clause.
   if(assigns.is_not_nil())
   {
-    goto_programt assigns_havoc;
-    modifiest assigns_tgts;
-    const exprt::operandst &targets = assigns.operands();
-    for(const exprt &curr_op : targets)
-    {
-      if(curr_op.id() == ID_symbol || curr_op.id() == ID_dereference)
-      {
-        assigns_tgts.insert(curr_op);
-      }
-      else
-      {
-        log.error() << "Unable to apply assigns clause for expression of type '"
-                    << curr_op.id() << "'; not enforcing assigns clause."
-                    << messaget::eom;
-        return true;
-      }
-    }
-    build_havoc_code(target, assigns_tgts, assigns_havoc);
+    assigns_clauset assigns_cause(assigns, *this, function_id, log);
+    goto_programt assigns_havoc = assigns_cause.havoc_code(
+      function_symbol.location, function_id, function_symbol.mode);
 
     // Insert the non-deterministic assignment immediately before the call site.
+    std::size_t lines_to_iterate = assigns_havoc.instructions.size();
     goto_program.insert_before_swap(target, assigns_havoc);
-    std::advance(target, assigns_tgts.size());
+    std::advance(target, lines_to_iterate);
   }
 
   // To remove the function call, replace it with an assumption statement
@@ -319,133 +316,104 @@ const symbolt &code_contractst::new_tmp_symbol(
     symbol_table);
 }
 
-static exprt create_alias_expression(
-  const exprt &assigns,
+exprt code_contractst::create_alias_expression(
   const exprt &lhs,
   std::vector<exprt> &aliasable_references)
 {
-  bool first_iter = true;
-  exprt running = false_exprt();
+  exprt::operandst operands;
+  operands.reserve(aliasable_references.size());
   for(auto aliasable : aliasable_references)
   {
-    exprt left_ptr = address_of_exprt{lhs};
-    exprt right_ptr = aliasable;
-    exprt same = same_object(left_ptr, right_ptr);
-
-    if(first_iter)
-    {
-      running = same;
-      first_iter = false;
-    }
-    else
-    {
-      exprt::operandst disjuncts;
-      disjuncts.push_back(same);
-      disjuncts.push_back(running);
-      running = disjunction(disjuncts);
-    }
+    operands.push_back(equal_exprt(lhs, typecast_exprt(aliasable, lhs.type())));
   }
-
-  return running;
+  return disjunction(operands);
 }
 
-void code_contractst::populate_assigns_references(
-  const symbolt &function_symbol,
-  const irep_idt &function_id,
-  goto_programt &created_decls,
-  std::vector<exprt> &created_references)
-{
-  const auto &type = to_code_with_contract_type(function_symbol.type);
-  const exprt &assigns = type.assigns();
-
-  const exprt::operandst &targets = assigns.operands();
-  for(const exprt &curr_op : targets)
-  {
-    // Declare a new symbol to stand in for the reference
-    symbol_exprt standin = new_tmp_symbol(
-                             pointer_type(curr_op.type()),
-                             function_symbol.location,
-                             function_id,
-                             function_symbol.mode)
-                             .symbol_expr();
-
-    created_decls.add(
-      goto_programt::make_decl(standin, function_symbol.location));
-
-    created_decls.add(goto_programt::make_assignment(
-      code_assignt(standin, std::move(address_of_exprt{curr_op})),
-      function_symbol.location));
-
-    // Add a map entry from the original operand to the new symbol
-    created_references.push_back(standin);
-  }
-}
-
-void code_contractst::instrument_assigns_statement(
+void code_contractst::instrument_assign_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,
   exprt &assigns,
-  std::vector<exprt> &assigns_references,
-  std::set<exprt> &freely_assignable_exprs)
+  std::set<irep_idt> &freely_assignable_symbols,
+  assigns_clauset &assigns_clause)
 {
   INVARIANT(
     instruction_iterator->is_assign(),
-    "The first argument of instrument_assigns_statement should always be"
+    "The first instruction of instrument_assign_statement should always be"
     " an assignment");
+
   const exprt &lhs = instruction_iterator->get_assign().lhs();
-  if(freely_assignable_exprs.find(lhs) != freely_assignable_exprs.end())
+
+  if(
+    lhs.id() == ID_symbol &&
+    freely_assignable_symbols.find(to_symbol_expr(lhs).get_identifier()) !=
+      freely_assignable_symbols.end())
   {
     return;
   }
-  exprt alias_expr = create_alias_expression(assigns, lhs, assigns_references);
 
   goto_programt alias_assertion;
   alias_assertion.add(goto_programt::make_assertion(
-    alias_expr, instruction_iterator->source_location));
+    assigns_clause.alias_expression(lhs),
+    instruction_iterator->source_location));
+
+  int lines_to_iterate = alias_assertion.instructions.size();
   program.insert_before_swap(instruction_iterator, alias_assertion);
-  ++instruction_iterator;
+  std::advance(instruction_iterator, lines_to_iterate);
 }
 
 void code_contractst::instrument_call_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,
   exprt &assigns,
-  std::vector<exprt> &aliasable_references,
-  std::set<exprt> &freely_assignable_exprs)
+  const irep_idt &function_id,
+  std::set<irep_idt> &freely_assignable_symbols,
+  assigns_clauset &assigns_clause)
 {
   INVARIANT(
     instruction_iterator->is_function_call(),
     "The first argument of instrument_call_statement should always be "
     "a function call");
+
   code_function_callt call = instruction_iterator->get_function_call();
   const irep_idt &called_name =
     to_symbol_expr(call.function()).get_identifier();
 
-  // Malloc allocates memory which is not part of the caller's memory
-  // frame, so we want to capture the newly-allocated memory and
-  // treat it as assignable.
   if(called_name == "malloc")
   {
-    aliasable_references.push_back(call.lhs());
-
-    // Make the variable, where result of malloc is stored, freely assignable.
     goto_programt::instructionst::iterator local_instruction_iterator =
       instruction_iterator;
+    // malloc statments return a void pointer, which is then cast and assigned
+    // to a result variable. We iterate one line forward to grab the result of
+    // the malloc once it is cast.
     local_instruction_iterator++;
-    if(
-      local_instruction_iterator->is_assign() &&
-      local_instruction_iterator->get_assign().lhs().is_not_nil())
+    if(local_instruction_iterator->is_assign())
     {
-      freely_assignable_exprs.insert(
-        local_instruction_iterator->get_assign().lhs());
+      const exprt &rhs = local_instruction_iterator->get_assign().rhs();
+      INVARIANT(
+        rhs.id() == ID_typecast,
+        "malloc is called but the result is not cast. Excluding result from "
+        "the assignable memory frame.");
+      typet cast_type = rhs.type();
+
+      // Make freshly allocated memory assignable, if we can determine its type.
+      assigns_clause_targett *new_target =
+        assigns_clause.add_pointer_target(rhs);
+      goto_programt &pointer_capture = new_target->get_init_block();
+
+      int lines_to_iterate = pointer_capture.instructions.size();
+      program.insert_before_swap(local_instruction_iterator, pointer_capture);
+      std::advance(instruction_iterator, lines_to_iterate + 1);
     }
-    return; // assume malloc edits no currently-existing memory objects.
+    return; // assume malloc edits no pre-existing memory objects.
   }
 
-  if(call.lhs().is_not_nil())
+  if(
+    call.lhs().is_not_nil() && call.lhs().id() == ID_symbol &&
+    freely_assignable_symbols.find(
+      to_symbol_expr(call.lhs()).get_identifier()) ==
+      freely_assignable_symbols.end())
   {
-    exprt alias_expr =
-      create_alias_expression(assigns, call.lhs(), aliasable_references);
+    exprt alias_expr = assigns_clause.alias_expression(call.lhs());
 
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
@@ -454,41 +422,24 @@ void code_contractst::instrument_call_statement(
     ++instruction_iterator;
   }
 
-  // TODO we don't handle function pointers
-  if(call.function().id() == ID_symbol)
+  PRECONDITION(call.function().id() == ID_symbol);
+  const symbolt &called_symbol = ns.lookup(called_name);
+  const code_typet &called_type = to_code_type(called_symbol.type);
+
+  exprt called_assigns =
+    to_code_with_contract_type(called_symbol.type).assigns();
+  if(called_assigns.is_nil()) // Called function has no assigns clause
   {
-    const symbolt &called_sym = ns.lookup(called_name);
-    const code_typet &called_type = to_code_type(called_sym.type);
+    // Create a false assertion, so the analysis
+    // will fail if this function is called.
+    goto_programt failing_assertion;
+    failing_assertion.add(goto_programt::make_assertion(
+      false_exprt(), instruction_iterator->source_location));
+    program.insert_before_swap(instruction_iterator, failing_assertion);
+    ++instruction_iterator;
 
-    auto called_func = goto_functions.function_map.find(called_name);
-    if(called_func == goto_functions.function_map.end())
-    {
-      log.error() << "Could not find function '" << called_name
-                  << "' in goto-program; not enforcing assigns clause."
-                  << messaget::eom;
-      return;
-    }
-
-    exprt called_assigns =
-      to_code_with_contract_type(called_sym.type).assigns();
-    if(called_assigns.is_nil()) // Called function has no assigns clause
-    {
-      // Fail if called function has no assigns clause.
-      log.error() << "No assigns specification found for function '"
-                  << called_name
-                  << "' in goto-program; not enforcing assigns clause."
-                  << messaget::eom;
-
-      // Create a false assertion, so the analysis will fail if this function
-      // is called.
-      goto_programt failing_assertion;
-      failing_assertion.add(goto_programt::make_assertion(
-        false_exprt(), instruction_iterator->source_location));
-      program.insert_before_swap(instruction_iterator, failing_assertion);
-      ++instruction_iterator;
-
-      return;
-    }
+    return;
+  }
     else // Called function has assigns clause
     {
       replace_symbolt replace;
@@ -509,28 +460,18 @@ void code_contractst::instrument_call_statement(
       }
 
       replace(called_assigns);
-      for(exprt::operandst::const_iterator called_op_it =
-            called_assigns.operands().begin();
-          called_op_it != called_assigns.operands().end();
-          called_op_it++)
-      {
-        if(
-          freely_assignable_exprs.find(*called_op_it) !=
-          freely_assignable_exprs.end())
-        {
-          continue;
-        }
-        exprt alias_expr =
-          create_alias_expression(assigns, *called_op_it, aliasable_references);
 
-        goto_programt alias_assertion;
-        alias_assertion.add(goto_programt::make_assertion(
-          alias_expr, instruction_iterator->source_location));
-        program.insert_before_swap(instruction_iterator, alias_assertion);
-        ++instruction_iterator;
-      }
+      // check compatibility of assigns clause with the called function
+      assigns_clauset called_assigns_clause(
+        called_assigns, *this, function_id, log);
+      exprt compatible =
+        assigns_clause.compatible_expression(called_assigns_clause);
+      goto_programt alias_assertion;
+      alias_assertion.add(goto_programt::make_assertion(
+        compatible, instruction_iterator->source_location));
+      program.insert_before_swap(instruction_iterator, alias_assertion);
+      ++instruction_iterator;
     }
-  }
 }
 
 bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
@@ -539,7 +480,7 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
   std::vector<goto_programt::instructiont> back_gotos;
   std::vector<goto_programt::instructiont> malloc_calls;
 
-  int idx = 0;
+  int index = 0;
   for(goto_programt::instructiont instruction : program.instructions)
   {
     if(instruction.is_backwards_goto())
@@ -557,10 +498,10 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
         malloc_calls.push_back(instruction);
       }
     }
-    idx++;
+    index++;
   }
-  // Make sure there are no gotos that go back such that a malloc is between
-  // the goto and its destination (possible loop).
+  // Make sure there are no gotos that go back such that a malloc
+  // is between the goto and its destination (possible loop).
   for(auto goto_entry : back_gotos)
   {
     for(const auto &target : goto_entry.targets)
@@ -571,14 +512,6 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
           malloc_entry.location_number >= target->location_number &&
           malloc_entry.location_number < goto_entry.location_number)
         {
-          // In order to statically keep track of all the memory we should
-          //   be able to assign, we need to create ghost variables to store
-          //   references to that memory.
-          // If a malloc is in a loop, we can't generally determine how many
-          //   times it will run in order to create an appropriate number of
-          //   references for the assignable memory.
-          // So, if we have a malloc in a loop, we can't statically create the
-          //   assertion statements needed to enforce the assigns clause.
           log.error() << "Call to malloc at location "
                       << malloc_entry.location_number << " falls between goto "
                       << "source location " << goto_entry.location_number
@@ -615,32 +548,32 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
   const symbolt &function_symbol = ns.lookup(function_id);
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
-  exprt assigns = type.assigns();
-
+  exprt assigns_expr = type.assigns();
   // Return if there are no reference checks to perform.
-  if(assigns.is_nil())
+  if(assigns_expr.is_nil())
     return false;
 
-  goto_programt::instructionst::iterator instruction_iterator =
+  assigns_clauset assigns(assigns_expr, *this, function_id, log);
+
+  goto_programt::instructionst::iterator instruction_it =
     program.instructions.begin();
 
-  // Create temporary variables to hold the assigns clause targets before
-  // they can be modified.
-  goto_programt standin_decls;
-  std::vector<exprt> original_references;
-  populate_assigns_references(
-    function_symbol, function_id, standin_decls, original_references);
+  // Create temporary variables to hold the assigns
+  // clause targets before they can be modified.
+  goto_programt standin_decls = assigns.init_block(function_symbol.location);
+  goto_programt mark_dead = assigns.dead_stmts(
+    function_symbol.location, function_name, function_symbol.mode);
 
   // Create a list of variables that are okay to assign.
-  std::set<exprt> freely_assignable_exprs;
+  std::set<irep_idt> freely_assignable_symbols;
   for(code_typet::parametert param : type.parameters())
   {
-    freely_assignable_exprs.insert(param);
+    freely_assignable_symbols.insert(param.get_identifier());
   }
 
   int lines_to_iterate = standin_decls.instructions.size();
-  program.insert_before_swap(instruction_iterator, standin_decls);
-  std::advance(instruction_iterator, lines_to_iterate);
+  program.insert_before_swap(instruction_it, standin_decls);
+  std::advance(instruction_it, lines_to_iterate);
 
   if(check_for_looped_mallocs(program))
   {
@@ -648,39 +581,62 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
   }
 
   // Insert aliasing assertions
-  for(; instruction_iterator != program.instructions.end();
-      ++instruction_iterator)
+  for(; instruction_it != program.instructions.end(); ++instruction_it)
   {
-    if(instruction_iterator->is_decl())
+    if(instruction_it->is_decl())
     {
-      freely_assignable_exprs.insert(instruction_iterator->decl_symbol());
+      freely_assignable_symbols.insert(
+        instruction_it->get_decl().symbol().get_identifier());
+
+      assigns_clause_targett *new_target =
+        assigns.add_target(instruction_it->get_decl().symbol());
+      goto_programt &pointer_capture = new_target->get_init_block();
+
+      lines_to_iterate = pointer_capture.instructions.size();
+      for(auto in : pointer_capture.instructions)
+      {
+        program.insert_after(instruction_it, in);
+        ++instruction_it;
+      }
     }
-    else if(instruction_iterator->is_assign())
+    else if(instruction_it->is_assign())
     {
-      instrument_assigns_statement(
-        instruction_iterator,
+      instrument_assign_statement(
+        instruction_it,
         program,
-        assigns,
-        original_references,
-        freely_assignable_exprs);
+        assigns_expr,
+        freely_assignable_symbols,
+        assigns);
     }
-    else if(instruction_iterator->is_function_call())
+    else if(instruction_it->is_function_call())
     {
       instrument_call_statement(
-        instruction_iterator,
+        instruction_it,
         program,
-        assigns,
-        original_references,
-        freely_assignable_exprs);
+        assigns_expr,
+        function_id,
+        freely_assignable_symbols,
+        assigns);
     }
   }
+
+  // Walk the iterator back to the last statement
+  while(!instruction_it->is_end_function())
+  {
+    --instruction_it;
+  }
+
+  // Make sure the temporary symbols are marked dead
+  lines_to_iterate = mark_dead.instructions.size();
+  program.insert_before_swap(instruction_it, mark_dead);
+
   return false;
 }
 
 bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
 {
-  // Add statements to the source function to ensure assigns clause is
-  // respected.
+  // Add statements to the source function
+  // to ensure assigns clause is respected.
   add_pointer_checks(fun_to_enforce);
 
   // Rename source function
@@ -773,17 +729,12 @@ void code_contractst::add_contract_check(
 
   goto_programt check;
 
-  // if(nondet)
-  check.add(goto_programt::make_goto(
-    skip,
-    side_effect_expr_nondett(bool_typet(), skip->source_location),
-    skip->source_location));
-
   // prepare function call including all declarations
   code_function_callt call(function_symbol.symbol_expr());
   replace_symbolt replace;
 
   // decl ret
+  code_returnt return_stmt;
   if(code_type.return_type() != empty_typet())
   {
     symbol_exprt r = new_tmp_symbol(
@@ -795,6 +746,7 @@ void code_contractst::add_contract_check(
     check.add(goto_programt::make_decl(r, skip->source_location));
 
     call.lhs()=r;
+    return_stmt = code_returnt(r);
 
     symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
     replace.insert(ret_val, r);
@@ -818,6 +770,8 @@ void code_contractst::add_contract_check(
                        parameter_symbol.mode)
                        .symbol_expr();
     check.add(goto_programt::make_decl(p, skip->source_location));
+    check.add(goto_programt::make_assignment(
+      p, parameter_symbol.symbol_expr(), skip->source_location));
 
     call.arguments().push_back(p);
 
@@ -847,6 +801,11 @@ void code_contractst::add_contract_check(
   {
     check.add(
       goto_programt::make_assertion(ensures_cond, ensures.source_location()));
+  }
+
+  if(code_type.return_type() != empty_typet())
+  {
+    check.add(goto_programt::make_return(return_stmt, skip->source_location));
   }
 
   // prepend the new code to dest
@@ -880,18 +839,22 @@ bool code_contractst::replace_calls(
       {
         const code_function_callt &call = ins->get_function_call();
 
-        // TODO we don't handle function pointers
+        PRECONDITION(call.function().id() != ID_dereference);
+
         if(call.function().id() != ID_symbol)
           continue;
 
-        const irep_idt &fun_name =
+        const irep_idt &function_name =
           to_symbol_expr(call.function()).get_identifier();
         auto found = std::find(
-          funs_to_replace.begin(), funs_to_replace.end(), id2string(fun_name));
+          funs_to_replace.begin(),
+          funs_to_replace.end(),
+          id2string(function_name));
         if(found == funs_to_replace.end())
           continue;
 
-        fail |= apply_function_contract(goto_function.second.body, ins);
+        fail |= apply_function_contract(
+          function_name, goto_function.second.body, ins);
       }
     }
   }
@@ -960,4 +923,610 @@ bool code_contractst::enforce_contracts(
       fail = enforce_contract(fun);
   }
   return fail;
+}
+
+assigns_clause_scalar_targett::assigns_clause_scalar_targett(
+  const exprt &object_ptr,
+  code_contractst &contract,
+  messaget &log_parameter,
+  const irep_idt &function_id)
+  : assigns_clause_targett(
+      Scalar,
+      pointer_for(object_ptr),
+      contract,
+      log_parameter),
+    local_standin_variable(typet())
+{
+  const symbolt &function_symbol = contract.ns.lookup(function_id);
+
+  // Declare a new symbol to stand in for the reference
+  symbolt standin_symbol = contract.new_tmp_symbol(
+    pointer_object.type(),
+    function_symbol.location,
+    function_id,
+    function_symbol.mode);
+
+  local_standin_variable = standin_symbol.symbol_expr();
+
+  // Build standin variable initialization block
+  init_block.add(
+    goto_programt::make_decl(local_standin_variable, function_symbol.location));
+  init_block.add(goto_programt::make_assignment(
+    code_assignt(local_standin_variable, pointer_object),
+    function_symbol.location));
+}
+
+std::vector<symbol_exprt>
+assigns_clause_scalar_targett::temporary_declarations() const
+{
+  std::vector<symbol_exprt> result;
+  result.push_back(local_standin_variable);
+  return result;
+}
+
+exprt assigns_clause_scalar_targett::alias_expression(const exprt &ptr)
+{
+  return same_object(ptr, local_standin_variable);
+}
+
+exprt assigns_clause_scalar_targett::compatible_expression(
+  const assigns_clause_targett &called_target)
+{
+  if(called_target.target_type == Scalar)
+  {
+    return alias_expression(called_target.get_direct_pointer());
+  }
+  else // Struct or Array
+  {
+    return false_exprt();
+  }
+}
+
+goto_programt
+assigns_clause_scalar_targett::havoc_code(source_locationt location) const
+{
+  goto_programt assigns_havoc;
+
+  exprt lhs = dereference_exprt(pointer_object);
+  side_effect_expr_nondett rhs(lhs.type(), location);
+
+  goto_programt::targett target =
+    assigns_havoc.add(goto_programt::make_assignment(
+      code_assignt(std::move(lhs), std::move(rhs)), location));
+  target->code_nonconst().add_source_location() = location;
+
+  return assigns_havoc;
+}
+
+assigns_clause_struct_targett::assigns_clause_struct_targett(
+  const exprt &object_ptr,
+  code_contractst &contract,
+  messaget &log_parameter,
+  const irep_idt &function_id)
+  : assigns_clause_targett(
+      Struct,
+      pointer_for(object_ptr),
+      contract,
+      log_parameter),
+    main_struct_standin(typet())
+{
+  const symbolt &struct_symbol =
+    contract.ns.lookup(to_tag_type(object_ptr.type()));
+  const symbolt &function_symbol = contract.ns.lookup(function_id);
+
+  // Declare a new symbol to stand in for the reference
+  symbolt struct_temp_symbol = contract.new_tmp_symbol(
+    pointer_object.type(),
+    function_symbol.location,
+    function_id,
+    function_symbol.mode);
+  main_struct_standin = struct_temp_symbol.symbol_expr();
+  local_standin_variables.push_back(main_struct_standin);
+
+  // Build standin variable initialization block
+  init_block.add(
+    goto_programt::make_decl(main_struct_standin, function_symbol.location));
+  init_block.add(goto_programt::make_assignment(
+    code_assignt(main_struct_standin, pointer_object),
+    function_symbol.location));
+
+  // Handle component members
+  std::vector<exprt> component_members;
+  const struct_typet &struct_type = to_struct_type(struct_symbol.type);
+  for(struct_union_typet::componentt component : struct_type.components())
+  {
+    exprt current_member = member_exprt(object_ptr, component);
+    component_members.push_back(current_member);
+  }
+
+  while(!component_members.empty())
+  {
+    exprt current_operation = component_members.front();
+    exprt operation_address = pointer_for(current_operation);
+
+    // Declare a new symbol to stand in for the reference
+    symbolt standin_symbol = contract.new_tmp_symbol(
+      operation_address.type(),
+      function_symbol.location,
+      function_id,
+      function_symbol.mode);
+
+    symbol_exprt current_standin = standin_symbol.symbol_expr();
+    local_standin_variables.push_back(current_standin);
+
+    // Add to standin variable initialization block
+    init_block.add(
+      goto_programt::make_decl(current_standin, function_symbol.location));
+    init_block.add(goto_programt::make_assignment(
+      code_assignt(current_standin, operation_address),
+      function_symbol.location));
+
+    if(current_operation.type().id() == ID_struct_tag)
+    {
+      const symbolt &current_struct_symbol =
+        contract.ns.lookup(to_tag_type(current_operation.type()));
+
+      const struct_typet &curr_struct_t =
+        to_struct_type(current_struct_symbol.type);
+      for(struct_union_typet::componentt component : curr_struct_t.components())
+      {
+        exprt current_member = member_exprt(current_operation, component);
+        component_members.push_back(current_member);
+      }
+    }
+    component_members.erase(component_members.begin());
+  }
+}
+
+std::vector<symbol_exprt>
+assigns_clause_struct_targett::temporary_declarations() const
+{
+  return local_standin_variables;
+}
+
+exprt assigns_clause_struct_targett::alias_expression(const exprt &ptr)
+{
+  exprt::operandst disjuncts;
+  disjuncts.reserve(local_standin_variables.size());
+  for(symbol_exprt symbol : local_standin_variables)
+  {
+    const typet &ptr_concrete_type = to_pointer_type(ptr.type()).subtype();
+    auto left_size = size_of_expr(ptr_concrete_type, contract.ns);
+    const typet &standin_concrete_type =
+      to_pointer_type(symbol.type()).subtype();
+    auto right_size = size_of_expr(standin_concrete_type, contract.ns);
+    INVARIANT(left_size.has_value(), "Unable to determine size of type (lhs).");
+    INVARIANT(
+      right_size.has_value(), "Unable to determine size of type (rhs).");
+    if(*left_size == *right_size)
+    {
+      exprt same_obj = same_object(ptr, symbol);
+      exprt same_offset =
+        equal_exprt(pointer_offset(ptr), pointer_offset(symbol));
+
+      disjuncts.push_back(and_exprt{same_obj, same_offset});
+    }
+  }
+
+  return disjunction(disjuncts);
+}
+
+exprt assigns_clause_struct_targett::compatible_expression(
+  const assigns_clause_targett &called_target)
+{
+  if(called_target.target_type == Scalar)
+  {
+    return alias_expression(called_target.get_direct_pointer());
+  }
+  else if(called_target.target_type == Struct)
+  {
+    const assigns_clause_struct_targett &struct_target =
+      static_cast<const assigns_clause_struct_targett &>(called_target);
+
+    exprt same_obj =
+      same_object(this->main_struct_standin, struct_target.pointer_object);
+    // the size of the called struct should be less than or
+    // equal to that of the assignable target struct.
+    exprt current_size =
+      get_size(this->pointer_object.type(), contract.ns, log);
+    exprt curr_upper_offset =
+      pointer_offset(plus_exprt(this->main_struct_standin, current_size));
+    exprt called_size =
+      get_size(struct_target.pointer_object.type(), contract.ns, log);
+    exprt called_upper_offset =
+      pointer_offset(plus_exprt(struct_target.pointer_object, called_size));
+
+    exprt in_range_lower = binary_predicate_exprt(
+      pointer_offset(struct_target.pointer_object),
+      ID_ge,
+      pointer_offset(this->main_struct_standin));
+    exprt in_range_upper =
+      binary_predicate_exprt(curr_upper_offset, ID_ge, called_upper_offset);
+
+    exprt in_range = and_exprt(in_range_lower, in_range_upper);
+    return and_exprt(same_obj, in_range);
+  }
+  else // Array
+  {
+    return false_exprt();
+  }
+}
+
+goto_programt
+assigns_clause_struct_targett::havoc_code(source_locationt location) const
+{
+  goto_programt assigns_havoc;
+
+  exprt lhs = dereference_exprt(pointer_object);
+  side_effect_expr_nondett rhs(lhs.type(), location);
+
+  goto_programt::targett target =
+    assigns_havoc.add(goto_programt::make_assignment(
+      code_assignt(std::move(lhs), std::move(rhs)), location));
+  target->code_nonconst().add_source_location() = location;
+
+  return assigns_havoc;
+}
+
+assigns_clause_array_targett::assigns_clause_array_targett(
+  const exprt &object_ptr,
+  code_contractst &contract,
+  messaget &log_parameter,
+  const irep_idt &function_id)
+  : assigns_clause_targett(Array, object_ptr, contract, log_parameter),
+    lower_offset_object(),
+    upper_offset_object(),
+    array_standin_variable(typet()),
+    lower_offset_variable(typet()),
+    upper_offset_variable(typet())
+{
+  const symbolt &function_symbol = contract.ns.lookup(function_id);
+
+  // Declare a new symbol to stand in for the reference
+  symbolt standin_symbol = contract.new_tmp_symbol(
+    pointer_object.type(),
+    function_symbol.location,
+    function_id,
+    function_symbol.mode);
+
+  array_standin_variable = standin_symbol.symbol_expr();
+
+  // Add array temp to variable initialization block
+  init_block.add(
+    goto_programt::make_decl(array_standin_variable, function_symbol.location));
+  init_block.add(goto_programt::make_assignment(
+    code_assignt(array_standin_variable, pointer_object),
+    function_symbol.location));
+
+  if(object_ptr.id() == ID_address_of)
+  {
+    exprt constant_size =
+      get_size(object_ptr.type().subtype(), contract.ns, log);
+    lower_offset_object = typecast_exprt(
+      mult_exprt(
+        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
+      signed_int_type());
+
+    // Declare a new symbol to stand in for the reference
+    symbolt lower_standin_symbol = contract.new_tmp_symbol(
+      lower_offset_object.type(),
+      function_symbol.location,
+      function_id,
+      function_symbol.mode);
+
+    lower_offset_variable = lower_standin_symbol.symbol_expr();
+
+    // Add array temp to variable initialization block
+    init_block.add(goto_programt::make_decl(
+      lower_offset_variable, function_symbol.location));
+    init_block.add(goto_programt::make_assignment(
+      code_assignt(lower_offset_variable, lower_offset_object),
+      function_symbol.location));
+
+    upper_offset_object = typecast_exprt(
+      mult_exprt(
+        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
+      signed_int_type());
+
+    // Declare a new symbol to stand in for the reference
+    symbolt upper_standin_symbol = contract.new_tmp_symbol(
+      upper_offset_object.type(),
+      function_symbol.location,
+      function_id,
+      function_symbol.mode);
+
+    upper_offset_variable = upper_standin_symbol.symbol_expr();
+
+    // Add array temp to variable initialization block
+    init_block.add(goto_programt::make_decl(
+      upper_offset_variable, function_symbol.location));
+    init_block.add(goto_programt::make_assignment(
+      code_assignt(upper_offset_variable, upper_offset_object),
+      function_symbol.location));
+  }
+}
+
+std::vector<symbol_exprt>
+assigns_clause_array_targett::temporary_declarations() const
+{
+  std::vector<symbol_exprt> result;
+  result.push_back(array_standin_variable);
+  result.push_back(lower_offset_variable);
+  result.push_back(upper_offset_variable);
+
+  return result;
+}
+
+goto_programt
+assigns_clause_array_targett::havoc_code(source_locationt location) const
+{
+  goto_programt assigns_havoc;
+
+  modifiest assigns_tgts;
+  typet lower_type = lower_offset_variable.type();
+  exprt array_type_size =
+    get_size(pointer_object.type().subtype(), contract.ns, log);
+
+  for(mp_integer i = lower_bound; i < upper_bound; ++i)
+  {
+    irep_idt offset_string(from_integer(i, integer_typet()).get_value());
+    irep_idt offset_irep(offset_string);
+    constant_exprt val_const(offset_irep, lower_type);
+    dereference_exprt array_deref(plus_exprt(
+      pointer_object, typecast_exprt(val_const, signed_long_int_type())));
+
+    assigns_tgts.insert(array_deref);
+  }
+
+  for(auto lhs : assigns_tgts)
+  {
+    side_effect_expr_nondett rhs(lhs.type(), location);
+
+    goto_programt::targett target =
+      assigns_havoc.add(goto_programt::make_assignment(
+        code_assignt(std::move(lhs), std::move(rhs)), location));
+    target->code_nonconst().add_source_location() = location;
+  }
+
+  return assigns_havoc;
+}
+
+exprt assigns_clause_array_targett::alias_expression(const exprt &ptr)
+{
+  exprt ptr_offset = pointer_offset(ptr);
+  exprt::operandst conjuncts;
+
+  conjuncts.push_back(same_object(ptr, array_standin_variable));
+  conjuncts.push_back(binary_predicate_exprt(
+    ptr_offset,
+    ID_ge,
+    typecast_exprt(lower_offset_variable, ptr_offset.type())));
+  conjuncts.push_back(binary_predicate_exprt(
+    typecast_exprt(upper_offset_variable, ptr_offset.type()),
+    ID_ge,
+    ptr_offset));
+
+  return conjunction(conjuncts);
+}
+
+exprt assigns_clause_array_targett::compatible_expression(
+  const assigns_clause_targett &called_target)
+{
+  if(called_target.target_type == Scalar)
+  {
+    return alias_expression(called_target.get_direct_pointer());
+  }
+  else if(called_target.target_type == Array)
+  {
+    const assigns_clause_array_targett &array_target =
+      static_cast<const assigns_clause_array_targett &>(called_target);
+    exprt same_obj =
+      same_object(this->array_standin_variable, array_target.pointer_object);
+    exprt in_range_lower = binary_predicate_exprt(
+      array_target.lower_offset_object, ID_ge, this->lower_offset_variable);
+    exprt in_range_upper = binary_predicate_exprt(
+      this->upper_offset_variable, ID_ge, array_target.upper_offset_object);
+    exprt in_range = and_exprt(in_range_lower, in_range_upper);
+    return and_exprt(same_obj, in_range);
+  }
+  else // Struct
+  {
+    return false_exprt();
+  }
+}
+
+assigns_clauset::assigns_clauset(
+  const exprt &assigns,
+  code_contractst &contract,
+  const irep_idt function_id,
+  messaget log_parameter)
+  : assigns_expr(assigns),
+    parent(contract),
+    function_id(function_id),
+    log(log_parameter)
+{
+  for(exprt current_operation : assigns_expr.operands())
+  {
+    add_target(current_operation);
+  }
+}
+assigns_clauset::~assigns_clauset()
+{
+  for(assigns_clause_targett *target : targets)
+  {
+    delete target;
+  }
+}
+
+assigns_clause_targett *assigns_clauset::add_target(exprt current_operation)
+{
+  if(current_operation.id() == ID_address_of)
+  {
+    assigns_clause_array_targett *array_target =
+      new assigns_clause_array_targett(
+        current_operation, parent, log, function_id);
+    targets.push_back(array_target);
+    return array_target;
+  }
+  else if(current_operation.type().id() == ID_struct_tag)
+  {
+    assigns_clause_struct_targett *struct_target =
+      new assigns_clause_struct_targett(
+        current_operation, parent, log, function_id);
+    targets.push_back(struct_target);
+    return struct_target;
+  }
+  else
+  {
+    assigns_clause_scalar_targett *scalar_target =
+      new assigns_clause_scalar_targett(
+        current_operation, parent, log, function_id);
+    targets.push_back(scalar_target);
+    return scalar_target;
+  }
+}
+
+assigns_clause_targett *
+assigns_clauset::add_pointer_target(exprt current_operation)
+{
+  return add_target(dereference_exprt(current_operation));
+}
+
+goto_programt assigns_clauset::init_block(source_locationt location)
+{
+  goto_programt result;
+  for(assigns_clause_targett *target : targets)
+  {
+    for(goto_programt::instructiont inst :
+        target->get_init_block().instructions)
+    {
+      result.add(goto_programt::instructiont(inst));
+    }
+  }
+  return result;
+}
+
+goto_programt &assigns_clauset::temporary_declarations(
+  source_locationt location,
+  irep_idt function_name,
+  irep_idt language_mode)
+{
+  if(standin_declarations.empty())
+  {
+    for(assigns_clause_targett *target : targets)
+    {
+      for(symbol_exprt symbol : target->temporary_declarations())
+      {
+        standin_declarations.add(
+          goto_programt::make_decl(symbol, symbol.source_location()));
+      }
+    }
+  }
+  return standin_declarations;
+}
+
+goto_programt assigns_clauset::dead_stmts(
+  source_locationt location,
+  irep_idt function_name,
+  irep_idt language_mode)
+{
+  goto_programt dead_statements;
+  for(assigns_clause_targett *target : targets)
+  {
+    for(symbol_exprt symbol : target->temporary_declarations())
+    {
+      dead_statements.add(
+        goto_programt::make_dead(symbol, symbol.source_location()));
+    }
+  }
+  return dead_statements;
+}
+
+goto_programt assigns_clauset::havoc_code(
+  source_locationt location,
+  irep_idt function_name,
+  irep_idt language_mode)
+{
+  goto_programt havoc_statements;
+  for(assigns_clause_targett *target : targets)
+  {
+    for(goto_programt::instructiont instruction :
+        target->havoc_code(location).instructions)
+    {
+      havoc_statements.add(std::move(instruction));
+    }
+  }
+  return havoc_statements;
+}
+
+exprt assigns_clauset::alias_expression(const exprt &lhs)
+{
+  if(targets.empty())
+  {
+    return false_exprt();
+  }
+
+  exprt left_ptr = assigns_clause_targett::pointer_for(lhs);
+
+  bool first_iter = true;
+  exprt result = false_exprt();
+  for(assigns_clause_targett *target : targets)
+  {
+    if(first_iter)
+    {
+      result = target->alias_expression(left_ptr);
+      first_iter = false;
+    }
+    else
+    {
+      result = or_exprt(result, target->alias_expression(left_ptr));
+    }
+  }
+  return result;
+}
+
+exprt assigns_clauset::compatible_expression(
+  const assigns_clauset &called_assigns)
+{
+  if(called_assigns.targets.empty())
+  {
+    return true_exprt();
+  }
+
+  bool first_clause = true;
+  exprt result = true_exprt();
+  for(assigns_clause_targett *called_target : called_assigns.targets)
+  {
+    bool first_iter = true;
+    exprt current_target_compatible = false_exprt();
+    for(assigns_clause_targett *target : targets)
+    {
+      if(first_iter)
+      {
+        current_target_compatible =
+          target->compatible_expression(*called_target);
+        first_iter = false;
+      }
+      else
+      {
+        current_target_compatible = or_exprt(
+          current_target_compatible,
+          target->compatible_expression(*called_target));
+      }
+    }
+    if(first_clause)
+    {
+      result = current_target_compatible;
+      first_clause = false;
+    }
+    else
+    {
+      exprt::operandst conjuncts;
+      conjuncts.push_back(result);
+      conjuncts.push_back(current_target_compatible);
+      result = conjunction(conjuncts);
+    }
+  }
+
+  return result;
 }
