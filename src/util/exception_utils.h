@@ -164,17 +164,42 @@ private:
   std::string reason;
 };
 
+/// Thrown when user-provided input cannot be processed. Use
+/// \ref invalid_source_file_exceptiont when the precise location of erroneous
+/// input is known.
+class invalid_input_exceptiont : public cprover_exception_baset
+{
+public:
+  explicit invalid_input_exceptiont(std::string reason);
+  std::string what() const override;
+
+protected:
+  std::string m_reason;
+};
+
 /// Thrown when we can't handle something in an input source file.
 /// For example, if we get C source code that is not syntactically valid
 /// or that has type errors.
-class invalid_source_file_exceptiont : public cprover_exception_baset
+class invalid_source_file_exceptiont : public invalid_input_exceptiont
 {
 public:
-  explicit invalid_source_file_exceptiont(std::string reason);
+  invalid_source_file_exceptiont(
+    std::string reason,
+    source_locationt source_location);
   std::string what() const override;
 
+  const std::string &reason() const
+  {
+    return m_reason;
+  }
+
+  const source_locationt &source_location() const
+  {
+    return m_source_location;
+  }
+
 private:
-  std::string reason;
+  source_locationt m_source_location;
 };
 
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H

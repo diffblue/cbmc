@@ -183,11 +183,6 @@ public:
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions() const;
 
-  void unload(const irep_idt &name) const
-  {
-    goto_functions.unload(name);
-  }
-
   language_filet &add_language_file(const std::string &filename)
   {
     return language_files.add_file(filename);

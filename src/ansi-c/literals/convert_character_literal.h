@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt convert_character_literal(
   const std::string &src,
-  bool force_integer_type);
+  bool force_integer_type,
+  const source_locationt &source_location);
 
 #endif // CPROVER_ANSI_C_LITERALS_CONVERT_CHARACTER_LITERAL_H

@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt convert_character_literal(
   const std::string &src,
-  bool force_integer_type)
+  bool force_integer_type,
+  const source_locationt &source_location)
 {
   assert(src.size()>=2);
 
@@ -32,13 +33,13 @@ exprt convert_character_literal(
 
     std::basic_string<unsigned int> value=
       unescape_wide_string(std::string(src, 2, src.size()-3));
+    // the parser rejects empty character constants
+    CHECK_RETURN(!value.empty());
 
     // L is wchar_t, u is char16_t, U is char32_t
     typet type=wchar_t_type();
 
-    if(value.empty())
-      throw "empty wide character literal";
-    else if(value.size()==1)
+    if(value.size() == 1)
     {
       result=from_integer(value[0], type);
     }
@@ -59,8 +60,10 @@ exprt convert_character_literal(
       result=from_integer(x, type);
     }
     else
-      throw "wide literals with "+std::to_string(value.size())+
-            " characters are not supported";
+      throw invalid_source_file_exceptiont{"wide literals with " +
+                                             std::to_string(value.size()) +
+                                             " characters are not supported",
+                                           source_location};
   }
   else
   {
@@ -69,10 +72,10 @@ exprt convert_character_literal(
 
     std::string value=
       unescape_string(std::string(src, 1, src.size()-2));
+    // the parser rejects empty character constants
+    CHECK_RETURN(!value.empty());
 
-    if(value.empty())
-      throw "empty character literal";
-    else if(value.size()==1)
+    if(value.size() == 1)
     {
       typet type=force_integer_type?signed_int_type():char_type();
       result=from_integer(value[0], type);
@@ -92,9 +95,12 @@ exprt convert_character_literal(
       result=from_integer(x, signed_int_type());
     }
     else
-      throw "literals with "+std::to_string(value.size())+
-            " characters are not supported";
+      throw invalid_source_file_exceptiont{"literals with " +
+                                             std::to_string(value.size()) +
+                                             " characters are not supported",
+                                           source_location};
   }
 
+  result.add_source_location() = source_location;
   return result;
 }

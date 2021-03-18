@@ -2,7 +2,7 @@ CORE
 main.c
 
 'main' with signature .* found
-^EXIT=6$
+^EXIT=(1|64)$
 ^SIGNAL=0$
 --
 Invariant check failed
