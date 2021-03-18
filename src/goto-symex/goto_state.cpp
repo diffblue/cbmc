@@ -12,6 +12,27 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/format_expr.h>
 
+optionalt<symbol_exprt>
+dereference_cachet::lookup(const exprt &dereference) const
+{
+  auto it = cache.find(dereference);
+  if(it == cache.end())
+  {
+    return nullopt;
+  }
+  else
+  {
+    return {it->second};
+  }
+}
+
+void dereference_cachet::insert(
+  exprt new_cached_expr,
+  symbol_exprt new_cache_symbol)
+{
+  cache.emplace(std::move(new_cached_expr), std::move(new_cache_symbol));
+}
+
 /// Print the constant propagation map in a human-friendly format.
 /// This is primarily for use from the debugger; please don't delete me just
 /// because there aren't any current callers.

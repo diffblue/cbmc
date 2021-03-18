@@ -299,7 +299,12 @@ protected:
   exprt make_auto_object(const typet &, statet &);
   virtual void dereference(exprt &, statet &, bool write);
 
-  void dereference_rec(exprt &, statet &, bool write);
+  symbol_exprt cache_dereference(exprt &dereference_result, statet &state);
+  void dereference_rec(
+    exprt &expr,
+    statet &state,
+    bool write,
+    bool is_in_quantifier);
   exprt address_arithmetic(
     const exprt &,
     statet &,
