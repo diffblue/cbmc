@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-contract f1 --replace-call-with-contract f2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | assumed  | asserted
+  f2       | asserted | assumed

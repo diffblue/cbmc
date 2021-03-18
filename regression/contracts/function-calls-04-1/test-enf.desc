@@ -1,0 +1,20 @@
+CORE
+main.c
+--enforce-all-contracts _ --unwind 20 --unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | assumed  | asserted
+  f2_out   | assumed  | asserted
+  f2_in    | assumed  | asserted
+
+Test should fail:
+The postcondition of f2 is incorrect, considering the recursion particularity. 
+
+Recursion:
+The base case for the recursive call to f2 provides different behavior than the general case (given the pre-conditions).

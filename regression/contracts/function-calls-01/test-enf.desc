@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | assumed  | asserted

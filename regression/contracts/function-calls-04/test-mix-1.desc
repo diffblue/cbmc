@@ -1,0 +1,19 @@
+CORE
+main.c
+--enforce-contract f1 --replace-call-with-contract f2_out
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | assumed  | asserted
+  f2_out   | asserted | assumed
+  f2_in    | n/a      | n/a
+
+Note: the calls to f2_in does not occur because the call to f2_out is replaced by its contracts.
+
+Recursion:
+The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).

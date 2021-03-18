@@ -11,6 +11,14 @@ name=${*:$#}
 name=${name%.c}
 
 args=${*:5:$#-5}
+if [[ "$args" != *" _ "* ]]
+then
+  args_inst=$args
+  args_cbmc=""
+else
+  args_inst="${args%%" _ "*}"
+  args_cbmc="${args#*" _ "}"
+fi
 
 if [[ "${is_windows}" == "true" ]]; then
   $goto_cc "${name}.c"
@@ -20,10 +28,10 @@ else
 fi
 
 rm -f "${name}-mod.gb"
-$goto_instrument ${args} "${name}.gb" "${name}-mod.gb"
+$goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"
 if [ ! -e "${name}-mod.gb" ] ; then
   cp "$name.gb" "${name}-mod.gb"
-elif echo $args | grep -q -- "--dump-c" ; then
+elif echo $args_inst | grep -q -- "--dump-c" ; then
   mv "${name}-mod.gb" "${name}-mod.c"
 
   if [[ "${is_windows}" == "true" ]]; then
@@ -36,4 +44,4 @@ elif echo $args | grep -q -- "--dump-c" ; then
   rm "${name}-mod.c"
 fi
 $goto_instrument --show-goto-functions "${name}-mod.gb"
-$cbmc "${name}-mod.gb"
+$cbmc "${name}-mod.gb" ${args_cbmc}

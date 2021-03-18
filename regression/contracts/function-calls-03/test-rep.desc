@@ -1,0 +1,18 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f1       | asserted | assumed
+  f2       | n/a      | n/a
+
+Note: the call to f2 does not occur because the call to f1 is replaced by its contracts.
+
+Recursion:
+The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).
