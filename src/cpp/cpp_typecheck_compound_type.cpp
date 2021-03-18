@@ -791,7 +791,8 @@ void cpp_typecheckt::check_fixed_size_array(typet &type)
           array_type.size() = symbol.value;
       }
 
-      make_constant_index(array_type.size());
+      implicit_typecast(array_type.size(), size_type());
+      make_constant(array_type.size());
     }
 
     // recursive call for multi-dimensional arrays

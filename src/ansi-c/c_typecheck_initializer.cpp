@@ -1021,7 +1021,7 @@ exprt c_typecheck_baset::do_initializer_list(
     // make complete by setting array size
     size_t size=result.operands().size();
     result.type().id(ID_array);
-    result.type().set(ID_size, from_integer(size, index_type()));
+    result.type().set(ID_size, from_integer(size, size_type()));
   }
 
   return result;

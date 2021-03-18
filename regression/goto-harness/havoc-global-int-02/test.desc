@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---harness-type initialise-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-int-x-y-snapshot.json --initial-goto-location main:7 --havoc-variables y
+--harness-type initialise-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-int-x-y-snapshot.json --initial-goto-location main:5 --havoc-variables y
 ^\[main.assertion.1\] line \d+ assertion y \+ 2 > y: FAILURE$
 ^\[main.assertion.2\] line \d+ assertion 0: FAILURE$
 ^EXIT=10$

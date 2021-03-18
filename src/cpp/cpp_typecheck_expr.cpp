@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -760,10 +761,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     exprt &size=to_array_type(expr.type()).size();
     typecheck_expr(size);
 
-    bool size_is_unsigned=(size.type().id()==ID_unsignedbv);
-    bitvector_typet integer_type(
-      size_is_unsigned ? ID_unsignedbv : ID_signedbv, config.ansi_c.int_width);
-    implicit_typecast(size, integer_type);
+    implicit_typecast(size, size_type());
+    simplify(size, *this);
 
     expr.set(ID_statement, ID_cpp_new_array);
 
