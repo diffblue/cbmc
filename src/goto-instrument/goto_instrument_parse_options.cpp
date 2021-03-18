@@ -296,6 +296,13 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
+    if(cmdline.isset("condescending-linter"))
+    {
+      considered_harmfult ewd(goto_model, ui_message_handler);
+      ewd();
+      return CPROVER_EXIT_SUCCESS;
+    }
+
     if(cmdline.isset("show-global-may-alias"))
     {
       do_indirect_call_and_rtti_removal();

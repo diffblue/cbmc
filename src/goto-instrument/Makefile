@@ -51,6 +51,7 @@ SRC = accelerate/accelerate.cpp \
       nondet_static.cpp \
       nondet_volatile.cpp \
       object_id.cpp \
+      opinionated_linter.cpp \
       points_to.cpp \
       race_check.cpp \
       reachability_slicer.cpp \

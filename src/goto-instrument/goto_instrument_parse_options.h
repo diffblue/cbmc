@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"
 #include "replace_calls.h"
+#include "opinionated_linter.h"
 
 #include "count_eloc.h"
 
@@ -47,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(dump-c)(dump-cpp)(no-system-headers)(use-all-headers)(dot)(xml)" \
   "(harness)" \
   OPT_GOTO_CHECK \
+  OPT_OPINIONATED_LINTER \
   /* no-X-check are deprecated and ignored */ \
   "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \
   "(no-nan-check)" \
