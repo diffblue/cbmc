@@ -10,6 +10,9 @@ DIRS = cbmc \
        cbmc-concurrency \
        cbmc-cover \
        cbmc-incr-oneloop \
+       cbmc-incr \
+       cbmc-with-incr \
+       array-refinement-with-incr \
        goto-instrument-typedef \
        smt2_solver \
        smt2_strings \
