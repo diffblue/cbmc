@@ -748,11 +748,15 @@ void c_typecheck_baset::typecheck_declaration(
       typet ret_type = void_type();
       if(new_symbol.type.id()==ID_code)
         ret_type=to_code_type(new_symbol.type).return_type();
-      assert(parameter_map.empty());
       if(ret_type.id()!=ID_empty)
+      {
+        DATA_INVARIANT(
+          parameter_map.empty(), "parameter map should be cleared");
         parameter_map[CPROVER_PREFIX "return_value"] = ret_type;
+      }
       typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_ensures);
-      parameter_map.clear();
+      if(ret_type.id() != ID_empty)
+        parameter_map.clear();
 
       exprt assigns_to_add =
         static_cast<const exprt &>(contract.find(ID_C_spec_assigns));
