@@ -18,13 +18,6 @@ tests.log:
 	pwd
 	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/cbmc/cbmc $(is_windows)'
 
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
-
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;

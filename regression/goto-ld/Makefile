@@ -19,13 +19,6 @@ tests.log: ../test.pl ../../src/goto-cc/goto-ld
 	@ln -sf goto-cc ../../src/goto-cc/goto-ld
 endif
 
-show:
-	@for dir in *; do \
-	  if [ -d "$$dir" ]; then \
-	    vim -o "$$dir/*.c" "$$dir/*.out"; \
-	  fi; \
-	done;
-
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;

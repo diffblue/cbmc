@@ -16,13 +16,6 @@ test: driver$(EXEEXT)
 tests.log: ../test.pl driver$(EXEEXT)
 	@../test.pl -e -p -c ../driver
 
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
-
 driver$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 

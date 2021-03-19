@@ -35,10 +35,3 @@ clean:
 	find . -name '*.dot' -execdir $(RM) '{}' \;
 	find . -mindepth 2 -name '*.txt' -execdir $(RM) '{}' \;
 	$(RM) tests.log
-
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;

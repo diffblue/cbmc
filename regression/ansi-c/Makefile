@@ -35,13 +35,6 @@ ifneq ($(BUILD_ENV_),MSVC)
 	@../test.pl -e -p -c "$(exe) -xc++ -D_Bool=bool" -I test-c++-front-end -s c++-front-end $(excluded_tests)
 endif
 
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
-
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;

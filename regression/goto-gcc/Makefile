@@ -28,13 +28,6 @@ archives/libour_archive.a: archives/foo.c ../../src/goto-cc/goto-gcc
 		$(AR) rcs libour_archive.a foo.o
 endif
 
-show:
-	@for dir in *; do \
-	  if [ -d "$$dir" ]; then \
-	    vim -o "$$dir/*.c" "$$dir/*.out"; \
-	  fi; \
-	done;
-
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;

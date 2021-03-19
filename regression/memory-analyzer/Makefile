@@ -14,10 +14,3 @@ test:
 
 tests.log: ../test.pl
 	@../test.pl -e -p -c "../chain.sh $(MEMORY_ANALYZER_EXE) $(GOTO_GCC_EXE)"
-
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
