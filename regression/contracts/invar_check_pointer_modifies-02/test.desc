@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion data == copy: SUCCESS$
+^\[main.assertion.2\] .* assertion \*copy = 42: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^\[main.pointer_dereference.*\] line .* dereference failure: pointer NULL in \*data: FAILURE
+--
+This test checks that modifications to aliased pointers are correctly handled.
