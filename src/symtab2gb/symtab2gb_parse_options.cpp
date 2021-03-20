@@ -17,6 +17,8 @@ Author: Diffblue Ltd.
 #include <goto-programs/link_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 #include <json-symtab-language/json_symtab_language.h>
+
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
@@ -81,6 +83,7 @@ static void run_symtab2gb(
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table from file '" + symtab_filename + "'"};
     }
+    config.set_from_symbol_table(symtab);
     goto_modelt goto_model{};
     goto_model.symbol_table = symtab;
     goto_convert(goto_model, message_handler);
@@ -110,6 +113,7 @@ int symtab2gb_parse_optionst::doit()
   {
     gb_filename = cmdline.get_value(SYMTAB2GB_OUT_FILE_OPT);
   }
+  config.set(cmdline);
   run_symtab2gb(symtab_filenames, gb_filename);
   return CPROVER_EXIT_SUCCESS;
 }
