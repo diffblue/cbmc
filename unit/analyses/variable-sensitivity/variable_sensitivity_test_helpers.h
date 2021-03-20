@@ -85,6 +85,24 @@ void EXPECT_UNMODIFIED(
   std::shared_ptr<const abstract_objectt> &result,
   bool modified);
 
+template <class abstract_typet>
+void EXPECT_UNMODIFIED(merge_result<const abstract_typet> &result)
+{
+  auto ao = std::dynamic_pointer_cast<const abstract_objectt>(result.result);
+  EXPECT_UNMODIFIED(ao, result.modified);
+}
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const abstract_objectt> &result,
+  bool modified);
+
+template <class abstract_typet>
+void EXPECT_MODIFIED(merge_result<const abstract_typet> &result)
+{
+  auto ao = std::dynamic_pointer_cast<const abstract_objectt>(result.result);
+  EXPECT_MODIFIED(ao, result.modified);
+}
+
 void EXPECT_UNMODIFIED(
   std::shared_ptr<const constant_abstract_valuet> &result,
   bool modified,

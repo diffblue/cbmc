@@ -268,6 +268,13 @@ void EXPECT_UNMODIFIED(
   CHECK_FALSE(modified);
 }
 
+void EXPECT_MODIFIED(
+  std::shared_ptr<const abstract_objectt> &result,
+  bool modified)
+{
+  CHECK(modified);
+}
+
 void EXPECT_UNMODIFIED(
   std::shared_ptr<const constant_abstract_valuet> &result,
   bool modified,

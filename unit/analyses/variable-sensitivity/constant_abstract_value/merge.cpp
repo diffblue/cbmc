@@ -48,7 +48,7 @@ SCENARIO(
 
       auto merged = merge(op1, op2);
 
-      THEN("the result 1 is unchanged")
+      THEN("result is unmodified 1")
       {
         EXPECT_UNMODIFIED(merged, val1);
       }
@@ -60,8 +60,9 @@ SCENARIO(
 
       auto merged = merge(op1, op2);
 
-      THEN("result should be TOP")
+      THEN("result is modified TOP")
       {
+        EXPECT_MODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -72,8 +73,9 @@ SCENARIO(
 
       auto merged = merge(op1, top2);
 
-      THEN("result should be TOP")
+      THEN("result is modified TOP")
       {
+        EXPECT_MODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -84,7 +86,7 @@ SCENARIO(
 
       auto merged = merge(op1, bottom2);
 
-      THEN("the result 1 is unchanged")
+      THEN("result is unmodified 1")
       {
         EXPECT_UNMODIFIED(merged, val1);
       }
@@ -96,8 +98,9 @@ SCENARIO(
 
       auto merged = merge(top1, op2);
 
-      THEN("result should be TOP")
+      THEN("result is unmodified TOP")
       {
+        EXPECT_UNMODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -108,8 +111,9 @@ SCENARIO(
 
       auto merged = merge(top1, top2);
 
-      THEN("result should be TOP")
+      THEN("result is unmodified TOP")
       {
+        EXPECT_UNMODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -120,8 +124,9 @@ SCENARIO(
 
       auto merged = merge(top1, bottom2);
 
-      THEN("result should be TOP")
+      THEN("result is unmodified TOP")
       {
+        EXPECT_UNMODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -132,7 +137,7 @@ SCENARIO(
 
       auto merged = merge(bottom1, op2);
 
-      THEN("the result is 1")
+      THEN("result is modified 1")
       {
         EXPECT_MODIFIED(merged, val1);
       }
@@ -144,8 +149,9 @@ SCENARIO(
 
       auto merged = merge(bottom1, top2);
 
-      THEN("result should be TOP")
+      THEN("result is modified TOP")
       {
+        EXPECT_MODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -156,32 +162,13 @@ SCENARIO(
 
       auto merged = merge(bottom1, bottom2);
 
-      THEN("result is BOTTOM")
+      THEN("result is unmodified BOTTOM")
       {
-        CHECK_FALSE(merged.modified);
+        EXPECT_UNMODIFIED(merged);
         EXPECT_BOTTOM(merged.result);
       }
     }
   }
-}
-
-SCENARIO(
-  "merge constant_abstract_value with an abstract object",
-  "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
-{
-  const typet type = signedbv_typet(32);
-  const exprt val1 = from_integer(1, type);
-  const exprt val2 = from_integer(2, type);
-
-  auto config = vsd_configt::constant_domain();
-  config.context_tracking.data_dependency_context = false;
-  config.context_tracking.last_write_context = false;
-  auto object_factory =
-    variable_sensitivity_object_factoryt::configured_with(config);
-  abstract_environmentt environment{object_factory};
-  environment.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
 
   GIVEN("merging a constant and an abstract object")
   {
@@ -192,8 +179,9 @@ SCENARIO(
 
       auto merged = merge(op1, top2);
 
-      THEN("result is TOP")
+      THEN("result is modified TOP")
       {
+        EXPECT_MODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -204,7 +192,7 @@ SCENARIO(
 
       auto merged = merge(op1, bottom2);
 
-      THEN("the result 1 is unchanged")
+      THEN("result is unmodified 1")
       {
         EXPECT_UNMODIFIED(merged, val1);
       }
@@ -216,8 +204,9 @@ SCENARIO(
 
       auto merged = merge(top1, top2);
 
-      THEN("result is TOP")
+      THEN("result is unmodified TOP")
       {
+        EXPECT_UNMODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -228,8 +217,9 @@ SCENARIO(
 
       auto merged = merge(top1, bottom2);
 
-      THEN("result is TOP")
+      THEN("result is unmodified TOP")
       {
+        EXPECT_UNMODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -240,8 +230,9 @@ SCENARIO(
 
       auto merged = merge(bottom1, top2);
 
-      THEN("result is TOP")
+      THEN("result is modified TOP")
       {
+        EXPECT_MODIFIED(merged);
         EXPECT_TOP(merged.result);
       }
     }
@@ -252,115 +243,12 @@ SCENARIO(
 
       auto merged = merge(bottom1, top2);
 
-      THEN("result is TOP")
+      THEN("result is unmodified BOTTOM")
       {
+        EXPECT_UNMODIFIED(merged);
         EXPECT_BOTTOM(merged.result);
       }
     }
   }
 }
 
-SCENARIO(
-  "merging an abstract object with a constant",
-  "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
-{
-  const typet type = signedbv_typet(32);
-  const exprt val1 = from_integer(1, type);
-  const exprt val2 = from_integer(2, type);
-
-  auto config = vsd_configt::constant_domain();
-  config.context_tracking.data_dependency_context = false;
-  config.context_tracking.last_write_context = false;
-  auto object_factory =
-    variable_sensitivity_object_factoryt::configured_with(config);
-  abstract_environmentt environment{object_factory};
-  environment.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
-  GIVEN("an abstract object and a constant")
-  {
-    WHEN("merging TOP with 1")
-    {
-      auto top1 = make_top_object();
-      auto op2 = make_constant(val1, environment, ns);
-
-      bool modified;
-      auto result = abstract_objectt::merge(top1, op2, modified);
-
-      THEN("the result is TOP")
-      {
-        EXPECT_UNMODIFIED(result, modified);
-        EXPECT_TOP(result);
-      }
-    }
-    WHEN("merging TOP with TOP constant")
-    {
-      auto top1 = make_top_object();
-      auto top2 = make_top_constant();
-
-      bool modified;
-      auto result = abstract_objectt::merge(top1, top2, modified);
-
-      THEN("the result is TOP")
-      {
-        EXPECT_UNMODIFIED(result, modified);
-        EXPECT_TOP(result);
-      }
-    }
-    WHEN("merging TOP with BOTTOM constant")
-    {
-      auto top1 = make_top_object();
-      auto bottom2 = make_bottom_constant();
-
-      bool modified;
-      auto result = abstract_objectt::merge(top1, bottom2, modified);
-
-      THEN("the result is TOP")
-      {
-        EXPECT_UNMODIFIED(result, modified);
-        EXPECT_TOP(result);
-      }
-    }
-    WHEN("merging BOTTOM with 1")
-    {
-      auto op1 = make_bottom_object();
-      auto op2 = make_constant(val1, environment, ns);
-
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
-
-      THEN("the result is TOP")
-      {
-        EXPECT_TOP(result);
-      }
-    }
-    WHEN("merging BOTTOM with TOP constant")
-    {
-      auto op1 = make_bottom_object();
-      auto top2 = make_top_constant();
-
-      bool modified;
-      auto result = abstract_objectt::merge(op1, top2, modified);
-
-      THEN("the result is TOP")
-      {
-        EXPECT_TOP(result);
-      }
-    }
-    WHEN("merging BOTTOM with BOTTOM constant")
-    {
-      auto bottom1 = make_bottom_object();
-      auto bottom2 = make_bottom_constant();
-
-      bool modified;
-      auto result = abstract_objectt::merge(bottom1, bottom2, modified);
-
-      THEN("The original AO should be returned")
-      {
-        EXPECT_UNMODIFIED(result, modified);
-        EXPECT_BOTTOM(result);
-      }
-    }
-  }
-}
