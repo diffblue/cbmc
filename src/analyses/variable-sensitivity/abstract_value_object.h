@@ -291,4 +291,6 @@ protected:
   value_range_implementation() const = 0;
 };
 
+using abstract_value_pointert = sharing_ptrt<const abstract_value_objectt>;
+
 #endif

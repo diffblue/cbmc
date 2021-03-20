@@ -250,5 +250,234 @@ SCENARIO(
       }
     }
   }
-}
 
+  GIVEN("merging a constant and an interval")
+  {
+    WHEN("merging 1 with [1, 1]")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_interval(val1, val1, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is unmodified 1")
+      {
+        EXPECT_UNMODIFIED(merged, val1);
+      }
+    }
+    WHEN("merging 1 with [1, 2]")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_interval(val1, val2, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging 1 with [2, 2]")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_interval(val2, val2, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging BOTTOM with [1, 1]")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 = make_interval(val1, val1, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified 1")
+      {
+        EXPECT_MODIFIED(merged, val1);
+      }
+    }
+    WHEN("merging BOTTOM with [1, 2]")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 = make_interval(val1, val2, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+  }
+
+  GIVEN("merging a constant and a value set")
+  {
+    WHEN("merging 1 with { 1 }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set(val1, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is unmodified 1")
+      {
+        EXPECT_UNMODIFIED(merged, val1);
+      }
+    }
+    WHEN("merging 1 with { 2 }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set(val2, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging 1 with { 1, 2 }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging 1 with { [ 1, 1 ] }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 =
+        make_value_set(constant_interval_exprt(val1, val1), environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is unmodified 1")
+      {
+        EXPECT_UNMODIFIED(merged, val1);
+      }
+    }
+    WHEN("merging 1 with { [ 2, 2 ] }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 =
+        make_value_set(constant_interval_exprt(val2, val2), environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging 1 with { [ 1, 2 ] }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 =
+        make_value_set(constant_interval_exprt(val1, val2), environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging 1 with { 1, [ 1, 2 ] }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set(
+        {val1, constant_interval_exprt(val1, val2)}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging BOTTOM with { 1 }")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 = make_value_set(val1, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified 1")
+      {
+        EXPECT_MODIFIED(merged, val1);
+      }
+    }
+    WHEN("merging BOTTOM with { 1, 2 }")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging BOTTOM with { [ 1, 1 ] }")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 =
+        make_value_set(constant_interval_exprt(val1, val1), environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified 1")
+      {
+        EXPECT_MODIFIED(merged, val1);
+      }
+    }
+    WHEN("merging BOTTOM with { [ 1, 2 ] }")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 =
+        make_value_set(constant_interval_exprt(val1, val2), environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+    WHEN("merging BOTTOM with { 1, [ 1, 2 ] }")
+    {
+      auto op1 = make_bottom_constant();
+      auto op2 = make_value_set(
+        {val1, constant_interval_exprt(val1, val2)}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED(merged);
+        EXPECT_TOP(merged.result);
+      }
+    }
+  }
+}

@@ -19,12 +19,9 @@
 
 class constant_abstract_valuet : public abstract_value_objectt
 {
-private:
-  typedef sharing_ptrt<constant_abstract_valuet>
-    constant_abstract_value_pointert;
-
 public:
   explicit constant_abstract_valuet(const typet &t);
+  explicit constant_abstract_valuet(const exprt &t);
   constant_abstract_valuet(const typet &t, bool tp, bool bttm);
   constant_abstract_valuet(
     const exprt &e,
@@ -75,7 +72,7 @@ protected:
   abstract_object_pointert merge(abstract_object_pointert other) const override;
 
 private:
-  /// Merges another constant abstract value into this one
+  /// Merges another abstract value into this one
   ///
   /// \param other: the abstract object to merge with
   ///
@@ -83,7 +80,7 @@ private:
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this.
   abstract_object_pointert
-  merge_constant_constant(const constant_abstract_value_pointert &other) const;
+  merge_constant_constant(const abstract_value_pointert &other) const;
 
   exprt value;
 };
