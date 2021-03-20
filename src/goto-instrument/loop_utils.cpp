@@ -65,10 +65,9 @@ void get_modifies_lhs(
     modifies.insert(lhs);
   else if(lhs.id()==ID_dereference)
   {
-    modifiest m=local_may_alias.get(t, to_dereference_expr(lhs).pointer());
-    for(modifiest::const_iterator m_it=m.begin();
-        m_it!=m.end(); m_it++)
-      get_modifies_lhs(local_may_alias, t, *m_it, modifies);
+    const auto &pointer = to_dereference_expr(lhs).pointer();
+    for(const auto &mod : local_may_alias.get(t, pointer))
+      modifies.insert(dereference_exprt{mod});
   }
   else if(lhs.id()==ID_member)
   {
