@@ -6,27 +6,14 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
-#include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
-#include <typeinfo>
-#include <util/arith_tools.h>
-#include <util/mathematical_types.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
 
-struct constant_merge_result
-{
-  bool modified;
-  std::shared_ptr<const constant_abstract_valuet> result;
-};
+#include <util/bitvector_types.h>
 
-static constant_merge_result merge(
-  std::shared_ptr<const abstract_objectt> op1,
-  std::shared_ptr<const abstract_objectt> op2)
+static merge_result<const constant_abstract_valuet>
+merge(abstract_object_pointert op1, abstract_object_pointert op2)
 {
   bool modified;
   auto result = abstract_objectt::merge(op1, op2, modified);
@@ -34,25 +21,19 @@ static constant_merge_result merge(
   return {modified, as_constant(result)};
 }
 
-static abstract_object_pointert make_bottom_object()
-{
-  return std::make_shared<abstract_objectt>(integer_typet(), false, true);
-}
-
-static abstract_object_pointert make_top_object()
-{
-  return std::make_shared<abstract_objectt>(integer_typet(), true, false);
-}
-
 SCENARIO(
-  "merge_constant_abstract_value",
+  "merge constant_abstract_value",
   "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
 {
-  const exprt val1 = from_integer(1, integer_typet());
-  const exprt val2 = from_integer(2, integer_typet());
+  const typet type = signedbv_typet(32);
+  const exprt val1 = from_integer(1, type);
+  const exprt val2 = from_integer(2, type);
 
-  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-    vsd_configt::constant_domain());
+  auto config = vsd_configt::constant_domain();
+  config.context_tracking.data_dependency_context = false;
+  config.context_tracking.last_write_context = false;
+  auto object_factory =
+    variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
   symbol_tablet symbol_table;
@@ -69,7 +50,7 @@ SCENARIO(
 
       THEN("the result 1 is unchanged")
       {
-        EXPECT_UNMODIFIED(merged.result, merged.modified, val1);
+        EXPECT_UNMODIFIED(merged, val1);
       }
     }
     WHEN("merging 1 with 2")
@@ -87,9 +68,9 @@ SCENARIO(
     WHEN("merging 1 with TOP")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_top_constant();
+      auto top2 = make_top_constant();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(op1, top2);
 
       THEN("result should be TOP")
       {
@@ -99,21 +80,21 @@ SCENARIO(
     WHEN("merging 1 with BOTTOM")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_bottom_constant();
+      auto bottom2 = make_bottom_constant();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(op1, bottom2);
 
       THEN("the result 1 is unchanged")
       {
-        EXPECT_UNMODIFIED(merged.result, merged.modified, val1);
+        EXPECT_UNMODIFIED(merged, val1);
       }
     }
     WHEN("merging TOP with 1")
     {
-      auto op1 = make_top_constant();
+      auto top1 = make_top_constant();
       auto op2 = make_constant(val1, environment, ns);
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(top1, op2);
 
       THEN("result should be TOP")
       {
@@ -122,10 +103,10 @@ SCENARIO(
     }
     WHEN("merging TOP with TOP")
     {
-      auto op1 = make_top_constant();
-      auto op2 = make_top_constant();
+      auto top1 = make_top_constant();
+      auto top2 = make_top_constant();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(top1, top2);
 
       THEN("result should be TOP")
       {
@@ -134,10 +115,10 @@ SCENARIO(
     }
     WHEN("merging TOP with BOTTOM")
     {
-      auto op1 = make_top_constant();
-      auto op2 = make_bottom_constant();
+      auto top1 = make_top_constant();
+      auto bottom2 = make_bottom_constant();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(top1, bottom2);
 
       THEN("result should be TOP")
       {
@@ -146,22 +127,22 @@ SCENARIO(
     }
     WHEN("merging BOTTOM with 1")
     {
-      auto op1 = make_bottom_constant();
+      auto bottom1 = make_bottom_constant();
       auto op2 = make_constant(val1, environment, ns);
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(bottom1, op2);
 
       THEN("the result is 1")
       {
-        EXPECT(merged.result, val1);
+        EXPECT_MODIFIED(merged, val1);
       }
     }
     WHEN("merging BOTTOM with TOP")
     {
-      auto op1 = make_bottom_constant();
-      auto op2 = make_top_constant();
+      auto bottom1 = make_bottom_constant();
+      auto top2 = make_top_constant();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(bottom1, top2);
 
       THEN("result should be TOP")
       {
@@ -170,13 +151,14 @@ SCENARIO(
     }
     WHEN("merging BOTTOM with BOTTOM")
     {
-      auto op1 = make_bottom_constant();
-      auto op2 = make_bottom_constant();
+      auto bottom1 = make_bottom_constant();
+      auto bottom2 = make_bottom_constant();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(bottom1, bottom2);
 
       THEN("result is BOTTOM")
       {
+        CHECK_FALSE(merged.modified);
         EXPECT_BOTTOM(merged.result);
       }
     }
@@ -184,14 +166,18 @@ SCENARIO(
 }
 
 SCENARIO(
-  "merging a constant with an abstract object",
+  "merge constant_abstract_value with an abstract object",
   "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
 {
-  const exprt val1 = from_integer(1, integer_typet());
-  const exprt val2 = from_integer(2, integer_typet());
+  const typet type = signedbv_typet(32);
+  const exprt val1 = from_integer(1, type);
+  const exprt val2 = from_integer(2, type);
 
-  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-    vsd_configt::constant_domain());
+  auto config = vsd_configt::constant_domain();
+  config.context_tracking.data_dependency_context = false;
+  config.context_tracking.last_write_context = false;
+  auto object_factory =
+    variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
   symbol_tablet symbol_table;
@@ -202,9 +188,9 @@ SCENARIO(
     WHEN("merging 1 with TOP")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_top_object();
+      auto top2 = make_top_object();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(op1, top2);
 
       THEN("result is TOP")
       {
@@ -214,57 +200,57 @@ SCENARIO(
     WHEN("merging 1 with BOTTOM")
     {
       auto op1 = make_constant(val1, environment, ns);
-      auto op2 = make_bottom_object();
+      auto bottom2 = make_bottom_object();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(op1, bottom2);
 
       THEN("the result 1 is unchanged")
       {
-        EXPECT_UNMODIFIED(merged.result, merged.modified, val1);
+        EXPECT_UNMODIFIED(merged, val1);
       }
     }
-    WHEN("merging constant TOP with TOP")
+    WHEN("merging TOP constant with TOP")
     {
-      auto op1 = make_top_constant();
-      auto op2 = make_top_object();
+      auto top1 = make_top_constant();
+      auto top2 = make_top_object();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(top1, top2);
 
       THEN("result is TOP")
       {
         EXPECT_TOP(merged.result);
       }
     }
-    WHEN("merging constant TOP with BOTTOM")
+    WHEN("merging TOP constant with BOTTOM")
     {
-      auto op1 = make_top_constant();
-      auto op2 = make_bottom_object();
+      auto top1 = make_top_constant();
+      auto bottom2 = make_bottom_object();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(top1, bottom2);
 
       THEN("result is TOP")
       {
         EXPECT_TOP(merged.result);
       }
     }
-    WHEN("merging constant BOTTOM with TOP")
+    WHEN("merging BOTTOM constant with TOP")
     {
-      auto op1 = make_bottom_constant();
-      auto op2 = make_top_object();
+      auto bottom1 = make_bottom_constant();
+      auto top2 = make_top_object();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(bottom1, top2);
 
       THEN("result is TOP")
       {
         EXPECT_TOP(merged.result);
       }
     }
-    WHEN("merging constant BOTTOM with BOTTOM")
+    WHEN("merging BOTTOM constant with BOTTOM")
     {
-      auto op1 = make_bottom_constant();
-      auto op2 = make_bottom_object();
+      auto bottom1 = make_bottom_constant();
+      auto top2 = make_bottom_object();
 
-      auto merged = merge(op1, op2);
+      auto merged = merge(bottom1, top2);
 
       THEN("result is TOP")
       {
@@ -278,11 +264,15 @@ SCENARIO(
   "merging an abstract object with a constant",
   "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
 {
-  const exprt val1 = from_integer(1, integer_typet());
-  const exprt val2 = from_integer(2, integer_typet());
+  const typet type = signedbv_typet(32);
+  const exprt val1 = from_integer(1, type);
+  const exprt val2 = from_integer(2, type);
 
-  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-    vsd_configt::constant_domain());
+  auto config = vsd_configt::constant_domain();
+  config.context_tracking.data_dependency_context = false;
+  config.context_tracking.last_write_context = false;
+  auto object_factory =
+    variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
   symbol_tablet symbol_table;
@@ -292,11 +282,11 @@ SCENARIO(
   {
     WHEN("merging TOP with 1")
     {
-      auto op1 = make_top_object();
+      auto top1 = make_top_object();
       auto op2 = make_constant(val1, environment, ns);
 
       bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(top1, op2, modified);
 
       THEN("the result is TOP")
       {
@@ -304,13 +294,13 @@ SCENARIO(
         EXPECT_TOP(result);
       }
     }
-    WHEN("merging TOP with constant TOP")
+    WHEN("merging TOP with TOP constant")
     {
-      auto op1 = make_top_object();
-      auto op2 = make_top_constant();
+      auto top1 = make_top_object();
+      auto top2 = make_top_constant();
 
       bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(top1, top2, modified);
 
       THEN("the result is TOP")
       {
@@ -318,13 +308,13 @@ SCENARIO(
         EXPECT_TOP(result);
       }
     }
-    WHEN("merging TOP with constant BOTTOM")
+    WHEN("merging TOP with BOTTOM constant")
     {
-      auto op1 = make_top_object();
-      auto op2 = make_bottom_constant();
+      auto top1 = make_top_object();
+      auto bottom2 = make_bottom_constant();
 
       bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(top1, bottom2, modified);
 
       THEN("the result is TOP")
       {
@@ -345,26 +335,26 @@ SCENARIO(
         EXPECT_TOP(result);
       }
     }
-    WHEN("merging BOTTOM with constant TOP")
+    WHEN("merging BOTTOM with TOP constant")
     {
       auto op1 = make_bottom_object();
-      auto op2 = make_top_constant();
+      auto top2 = make_top_constant();
 
       bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, top2, modified);
 
       THEN("the result is TOP")
       {
         EXPECT_TOP(result);
       }
     }
-    WHEN("merging BOTTOM with constant BOTTOM")
+    WHEN("merging BOTTOM with BOTTOM constant")
     {
-      auto op1 = make_bottom_object();
-      auto op2 = make_bottom_constant();
+      auto bottom1 = make_bottom_object();
+      auto bottom2 = make_bottom_constant();
 
       bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(bottom1, bottom2, modified);
 
       THEN("The original AO should be returned")
       {

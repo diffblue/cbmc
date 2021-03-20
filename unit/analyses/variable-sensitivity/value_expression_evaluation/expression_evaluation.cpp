@@ -6,17 +6,17 @@
 
 \*******************************************************************/
 
-#include "analyses/variable-sensitivity/variable_sensitivity_test_helpers.h"
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
 SCENARIO(
-  "constants expression evaluation",
+  "value expression evaluation",
   "[core][analyses][variable-sensitivity][constant_abstract_value][value_set_"
-  "abstract_object][expression_transform]")
+  "abstract_object][interval_abstract_value][expression_transform]")
 {
   const typet type = signedbv_typet(32);
   const exprt val1 = from_integer(1, type);

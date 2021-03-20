@@ -37,6 +37,9 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
 
 std::shared_ptr<value_set_abstract_objectt> make_top_value_set();
 
+abstract_object_pointert make_bottom_object();
+abstract_object_pointert make_top_object();
+
 std::shared_ptr<const constant_abstract_valuet>
 as_constant(const abstract_object_pointert &aop);
 
@@ -71,6 +74,13 @@ void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result);
 
 void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result);
 
+template <class value_typet>
+struct merge_result
+{
+  bool modified;
+  std::shared_ptr<const value_typet> result;
+};
+
 void EXPECT_UNMODIFIED(
   std::shared_ptr<const abstract_objectt> &result,
   bool modified);
@@ -81,8 +91,34 @@ void EXPECT_UNMODIFIED(
   exprt expected_value);
 
 void EXPECT_UNMODIFIED(
+  merge_result<const constant_abstract_valuet> &result,
+  exprt expected_value);
+
+void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
+  const std::vector<exprt> &expected_values);
+
+void EXPECT_UNMODIFIED(
+  merge_result<const value_set_abstract_objectt> &result,
+  const std::vector<exprt> &expected_values);
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const constant_abstract_valuet> &result,
+  bool modified,
+  exprt expected_value);
+
+void EXPECT_MODIFIED(
+  merge_result<const constant_abstract_valuet> &result,
+  exprt expected_value);
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const value_set_abstract_objectt> &result,
+  bool modified,
+  const std::vector<exprt> &expected_values);
+
+void EXPECT_MODIFIED(
+  merge_result<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values);
 
 std::shared_ptr<const abstract_objectt> add(
