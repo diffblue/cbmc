@@ -1,11 +1,15 @@
 CORE
 main.cpp
 
-^main\.cpp:24:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
-^main\.cpp:26:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
-^main\.cpp:26:  Else if should be on a new line after closing brace  \[readability/braces\] \[5\]$
-^main\.cpp:28:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
-^main\.cpp:28:  Else should be on a new line after closing brace  \[readability/braces\] \[5\]$
-^Total errors found: 5$
+^regression/cpp-linter/if-else1/main\.cpp:26:  Else if should be on a new line after closing brace  \[readability/braces\] \[5\]$
+^regression/cpp-linter/if-else1/main\.cpp:28:  Else should be on a new line after closing brace  \[readability/braces\] \[5\]$
+^# Total errors found: 2$
+^EXIT=1$
 ^SIGNAL=0$
 --
+--
+The following patters are disabled as the corresponding checks in cpplint.py
+were removed in 692c4f377 for they are covered by clang-format:
+^regression/cpp-linter/if-else1/main\.cpp:24:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
+^regression/cpp-linter/if-else1/main\.cpp:26:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
+^regression/cpp-linter/if-else1/main\.cpp:28:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$

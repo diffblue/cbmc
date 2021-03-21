@@ -1,9 +1,14 @@
-CORE
+KNOWNBUG
 main.cpp
 
 main\.cpp:15:  Function header for fun missing Inputs:  \[readability/function_comment\] \[4\]
 main\.cpp:15:  Function header for fun missing Outputs:  \[readability/function_comment\] \[4\]
 main\.cpp:15:  Function header for fun missing Purpose:  \[readability/function_comment\] \[4\]
-^Total errors found: 3$
+^# Total errors found: 3$
+^EXIT=1$
 ^SIGNAL=0$
 --
+--
+The checking code in cpplint.py was broken in 7302e56a348, where a wrong indent
+caused the check to never take place. That's fine, however, as we don't use
+these function headers anymore.

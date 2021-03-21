@@ -1,7 +1,10 @@
 CORE
 main.cpp
 
-^main\.cpp:26:  while statement of do...while loop should be on a separate line to the closing brace  \[readability/braces\] \[4\]
-^Total errors found: 1$
+^EXIT=0$
 ^SIGNAL=0$
 --
+--
+Test was marked as disabled-by-default in a00edd3e6c54.
+^main\.cpp:26:  while statement of do...while loop should be on a separate line to the closing brace  \[readability/braces\] \[4\]
+^# Total errors found: 1$

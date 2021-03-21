@@ -7,6 +7,7 @@ main\.cpp:26:  Do not include brackets when throwing an error  \[readability/thr
 main\.cpp:28:  First character of throw error message should be lower case  \[readability/throw\] \[4\]
 main\.cpp:29:  Do not include brackets when throwing an error  \[readability/throw\] \[4\]
 main\.cpp:29:  First character of throw error message should be lower case  \[readability/throw\] \[4\]
-^Total errors found: 6$
+^# Total errors found: 6$
+^EXIT=1$
 ^SIGNAL=0$
 --

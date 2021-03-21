@@ -1,13 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from __future__ import print_function
+import sys
+
+def eprint(*args, **kwargs):
+  print(*args, file=sys.stderr, **kwargs)
 
 def diff_to_added_lines(diff_file, repository_root, out_stream):
 
   try:
     import unidiff
   except ImportError:
-    print("diff_to_added_lines.py requires unidiff, use `pip install --user unidiff` to install")
+    eprint("diff_to_added_lines.py requires unidiff, use `pip install --user unidiff` to install")
     sys.exit(1)
 
   import os.path
@@ -36,12 +39,9 @@ def diff_to_added_lines(diff_file, repository_root, out_stream):
   json.dump(added_lines, out_stream)
 
 if __name__ == "__main__":
-
-  import sys
-
   if len(sys.argv) != 3:
-    print("diff_to_added_lines.py: converts a unified-diff file into a JSON dictionary mapping filenames onto an array of added or modified line numbers", file=sys.stderr)
-    print("Usage: diff_to_added_lines.py diff.patch repository_root_directory", file=sys.stderr)
+    eprint("diff_to_added_lines.py: converts a unified-diff file into a JSON dictionary mapping filenames onto an array of added or modified line numbers")
+    eprint("Usage: diff_to_added_lines.py diff.patch repository_root_directory")
 
     sys.exit(1)
 

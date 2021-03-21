@@ -1,8 +1,9 @@
 CORE
 main.cpp
 
-^main\.cpp:31:  Empty loop bodies should use \{\} or continue  \[whitespace/empty_loop_body\] \[5\]$
-^main\.cpp:38:  Empty loop bodies should use \{\} or continue  \[whitespace/empty_loop_body\] \[5\]$
-^Total errors found: 2$
+^regression/cpp-linter/do-while1/main\.cpp:31:  Empty loop bodies should use \{\} or continue  \[whitespace/empty_loop_body\] \[5\]$
+^regression/cpp-linter/do-while1/main\.cpp:38:  Empty loop bodies should use \{\} or continue  \[whitespace/empty_loop_body\] \[5\]$
+^# Total errors found: 2$
+^EXIT=1$
 ^SIGNAL=0$
 --

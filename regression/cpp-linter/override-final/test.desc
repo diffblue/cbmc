@@ -1,6 +1,7 @@
 CORE
 main.cpp
 
-^EXIT=0$
+^regression/cpp-linter/override-final/main\.cpp:12:  "virtual" is redundant since function is already declared as "override"  \[readability/inheritance\] \[4\]$
+^EXIT=1$
 ^SIGNAL=0$
 --

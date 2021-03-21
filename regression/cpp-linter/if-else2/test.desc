@@ -1,9 +1,13 @@
 CORE
 main.cpp
 
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The following patters are disabled as the corresponding checks in cpplint.py
+were removed in 692c4f377 for they are covered by clang-format:
 ^main\.cpp:23:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
 ^main\.cpp:26:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
 ^main\.cpp:29:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
-^Total errors found: 3$
-^SIGNAL=0$
---
+^# Total errors found: 3$
