@@ -550,6 +550,25 @@ std::string expr2ct::convert_rec(
         dest.resize(dest.size()-1);
     }
 
+    // contract, if any
+    if(to_code_with_contract_type(src).requires().is_not_nil())
+    {
+      dest += " [[requires " +
+              convert(to_code_with_contract_type(src).requires()) + "]]";
+    }
+
+    if(!to_code_with_contract_type(src).assigns().operands().empty())
+    {
+      dest += " [[assigns " +
+              convert(to_code_with_contract_type(src).assigns()) + "]]";
+    }
+
+    if(to_code_with_contract_type(src).ensures().is_not_nil())
+    {
+      dest += " [[ensures " +
+              convert(to_code_with_contract_type(src).ensures()) + "]]";
+    }
+
     return dest;
   }
   else if(src.id()==ID_vector)

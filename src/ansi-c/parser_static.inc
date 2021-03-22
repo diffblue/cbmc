@@ -341,12 +341,21 @@ static void create_function_scope(const YYSTYPE d)
                      id2string(function_name)+"::";
   PARSER.new_scope(prefix);
 
+  // We look at the last type in case of a merged declarator type.
+  typet *declarator_type = &declarator.type();
+  if(declarator_type->id()==ID_merged_type)
+  {
+    // we want the last one
+    auto &merged_type = to_merged_type(*declarator_type);
+    declarator_type = &merged_type.last_type();
+  }
+
   // The grammar doesn't actually enforce that a function type
   // is used to define a function body. We will complain in the
   // type checker about it.
-  if(declarator.type().id()==ID_code)
+  if(declarator_type->id()==ID_code)
   {
-    code_typet &code_type=to_code_type(declarator.type());
+    code_typet &code_type=to_code_type(*declarator_type);
 
     code_typet::parameterst &parameters=code_type.parameters();
 

@@ -140,8 +140,11 @@ void ansi_c_declarationt::to_symbol(
   symbol.is_weak=get_is_weak();
 
   // is it a function?
+  const typet &type = symbol.type.id() == ID_merged_type
+                        ? to_merged_type(symbol.type).last_type()
+                        : symbol.type;
 
-  if(symbol.type.id()==ID_code && !symbol.is_type)
+  if(type.id() == ID_code && !symbol.is_type)
   {
     symbol.is_static_lifetime=false;
     symbol.is_thread_local=false;

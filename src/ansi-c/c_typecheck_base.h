@@ -145,11 +145,6 @@ protected:
   virtual void typecheck_dowhile(code_dowhilet &code);
   virtual void typecheck_start_thread(codet &code);
   virtual void typecheck_spec_expr(codet &code, const irep_idt &spec);
-  virtual void
-  typecheck_assigns(const code_typet &function_declarator, const irept &spec);
-  virtual void
-  typecheck_assigns(const ansi_c_declaratort &declarator, const exprt &assigns);
-  virtual void typecheck_assigns_exprs(codet &code, const irep_idt &spec);
 
   bool break_is_allowed;
   bool continue_is_allowed;
