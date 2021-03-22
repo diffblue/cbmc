@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant check failed
+--
+This test previously failed an internal invariant:
+File: ../src/ansi-c/c_typecheck_initializer.cpp:517 function: do_designated_initializer
+Condition: dest->id() == ID_union
+Reason: union should be zero initialized

@@ -514,22 +514,22 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       const union_typet::componentt &component = components[index];
 
-      DATA_INVARIANT(
-        dest->id() == ID_union, "union should be zero initialized");
-
-      if(dest->get(ID_component_name) == component.get_name())
+      if(
+        dest->id() == ID_union &&
+        to_union_expr(*dest).get_component_name() == component.get_name())
       {
         // Already right union component. We can initialize multiple submembers,
         // so do not overwrite this.
         dest = &(to_union_expr(*dest).op());
       }
-      else
+      else if(dest->id() == ID_union)
       {
-        // The first component is not the maximum member, which the (default)
-        // zero initializer prepared. Replace this by a component-specific
-        // initializer; other bytes have an unspecified value (C Standard
-        // 6.2.6.1(7)). In practice, objects of static lifetime are fully zero
-        // initialized.
+        // The designated initializer does not initialize the maximum member,
+        // which the (default) zero initializer prepared. Replace this by a
+        // component-specific initializer; other bytes have an unspecified value
+        // (C Standard 6.2.6.1(7)). In practice, objects of static lifetime are
+        // fully zero initialized, so we just byte-update on top of the existing
+        // zero initializer.
         const auto zero =
           zero_initializer(component.type(), value.source_location(), *this);
         if(!zero.has_value())
@@ -555,6 +555,15 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
           *dest = std::move(union_expr);
           dest = &(to_union_expr(*dest).op());
         }
+      }
+      else if(
+        dest->id() == ID_byte_update_big_endian ||
+        dest->id() == ID_byte_update_little_endian)
+      {
+        // handle the byte update introduced by an earlier initializer (if
+        // current_symbol.is_static_lifetime)
+        byte_update_exprt &byte_update = to_byte_update_expr(*dest);
+        dest = &byte_update.op2();
       }
     }
     else
