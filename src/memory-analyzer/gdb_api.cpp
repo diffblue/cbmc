@@ -132,13 +132,13 @@ void gdb_apit::create_gdb_process()
 
     // Only reachable, if execvp failed
     int errno_value = errno;
-    dprintf(pipe_output[1], "errno in child: %s\n", strerror(errno_value));
+    dprintf(pipe_output[1], "Starting gdb failed: %s\n", strerror(errno_value));
+    dprintf(pipe_output[1], "(gdb) \n");
+    throw gdb_interaction_exceptiont("could not run gdb");
   }
   else
   {
     // parent process
-    gdb_state = gdb_statet::CREATED;
-
     close(pipe_input[0]);
     close(pipe_output[1]);
 
@@ -149,6 +149,11 @@ void gdb_apit::create_gdb_process()
     command_stream = fdopen(pipe_input[1], "w");
 
     std::string line = read_most_recent_line();
+    if(has_prefix(line, "Starting gdb failed:"))
+      throw gdb_interaction_exceptiont(line);
+
+    gdb_state = gdb_statet::CREATED;
+
     CHECK_RETURN(
       has_prefix(line, R"(~"done)") ||
       has_prefix(line, R"(~"Reading)"));
