@@ -25,9 +25,3 @@ double_deref_with_cast.desc -- a double-deref with an intervening cast (*(int*)*
 double_deref_with_member.desc -- a double-deref with an intervening member expression (p->field1->field2), should use a let-expression
 double_deref_with_pointer_arithmetic.desc -- a double-deref with intervening pointer arithmetic (p[idx1][idx2]), should use a let-expression
 *_single_alias.desc -- variants of the above where the first dereference points to a single possible object, so no let-expression is necessary
-
-Why no-dereference-cache?
--------------------------
-
-Because these tests test for specific VCCs to do with multiple nested complex
-dereferences and the dereference caching rewrites these.

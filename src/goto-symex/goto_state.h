@@ -12,7 +12,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_STATE_H
 
-#include <unordered_map>
 #include <util/sharing_map.h>
 
 #include <analyses/guard.h>

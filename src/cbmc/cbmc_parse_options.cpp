@@ -342,6 +342,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       "max-node-refinement",
       cmdline.get_value("max-node-refinement"));
 
+  options.set_option(
+    "symex-cache-dereferences", cmdline.isset("symex-cache-dereferences"));
+
   if(cmdline.isset("incremental-loop"))
   {
     options.set_option(

@@ -425,6 +425,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("validate-goto-model", true);
   }
 
+  options.set_option(
+    "symex-cache-dereferences", cmdline.isset("symex-cache-dereferences"));
+
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 
   if(cmdline.isset("no-lazy-methods"))

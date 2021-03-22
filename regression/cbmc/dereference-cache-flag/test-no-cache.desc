@@ -1,0 +1,14 @@
+CORE
+test.c
+--show-vcc
+\(main::1::p!0@1#2 = address_of
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is just checking that the --symex-cache-dereferences flag actually turns
+dereference caching on and off.
+
+I would like to match the expression more precisely, but the order of
+comparisons for address of depends on platform-specific logic (unordered_xxx),
+and the corresponding regex would look ridiculous.

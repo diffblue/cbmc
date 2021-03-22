@@ -55,6 +55,14 @@ struct symex_configt final
   /// enables certain analyses that otherwise aren't run.
   bool complexity_limits_active;
 
+  /// \brief Whether or not to replace multiple occurrences of the same
+  ///   dereference with a single symbol that contains the result of that
+  ///   dereference. Can sometimes lead to a significant performance
+  ///   improvement, but sometimes also makes things worse.
+  ///   See https://github.com/diffblue/cbmc/pull/5964 for performance data.
+  ///   Used in goto_symext::dereference_rec
+  bool cache_dereferences;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);

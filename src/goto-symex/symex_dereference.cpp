@@ -221,7 +221,7 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
     "symex",
     "dereference_cache",
     dereference_result.source_location(),
-    ID_C,
+    language_mode,
     ns,
     state.symbol_table);
 
@@ -230,18 +230,18 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
   auto cache_value = cache_key;
   lift_lets(state, cache_value);
 
-  exprt::operandst guard{};
   auto assign = symex_assignt{
     state, symex_targett::assignment_typet::STATE, ns, symex_config, target};
 
+  auto cache_symbol_expr = cache_symbol.symbol_expr();
   assign.assign_symbol(
-    to_ssa_expr(state.rename<L1>(cache_symbol.symbol_expr(), ns).get()),
+    to_ssa_expr(state.rename<L1>(cache_symbol_expr, ns).get()),
     expr_skeletont{},
     cache_value,
-    guard);
+    {});
 
-  state.dereference_cache.insert(cache_key, cache_symbol.symbol_expr());
-  return cache_symbol.symbol_expr();
+  state.dereference_cache.insert(cache_key, cache_symbol_expr);
+  return cache_symbol_expr;
 }
 
 /// If \p expr is a \ref dereference_exprt, replace it with explicit references
@@ -249,6 +249,10 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
 /// \p expr's operands, with special cases for address-of (handled by \ref
 /// goto_symext::address_arithmetic) and certain common expression patterns
 /// such as `&struct.flexible_array[0]` (see inline comments in code).
+/// Note that \p write is used to alter behaviour when this function is
+/// operating on the LHS of an assignment. Similarly \p is_in_quantifier
+/// indicates when the dereference is inside a quantifier (related to scoping
+/// when dereference caching is enabled).
 /// For full details of this method's pointer replacement and potential side-
 /// effects see \ref goto_symext::dereference
 void goto_symext::dereference_rec(
@@ -332,24 +336,24 @@ void goto_symext::dereference_rec(
     // this may yield a new auto-object
     trigger_auto_object(tmp2, state);
 
-    // If the dereference result is not a complicated expression
-    // (i.e. of the form
-    //   [let p = <expr> in ]
-    //   (p == &something ? something : ...))
-    // we should just return it unchanged.
-    // also if we are on the lhs of an assignment we should also not attempt to
-    // go to the cache we cannot do this for quantified expressions because this
-    // would result in us referencing quantifier variables outside the scope of
-    // the quantifier.
+    // Check various conditions for when we should try to cache the expression.
+    // 1. Caching dereferences must be enabled.
+    // 2. Do not cache inside LHS of writes.
+    // 3. Do not cache inside quantifiers (references variables outside their
+    //    scope).
+    // 4. Only cache "complicated" expressions, i.e. of the form
+    //     [let p = <expr> in ]
+    //     (p == &something ? something : ...))
+    // Otherwise we should just return it unchanged.
     if(
-      !write && !is_in_quantifier &&
+      symex_config.cache_dereferences && !write && !is_in_quantifier &&
       (tmp2.id() == ID_if || tmp2.id() == ID_let))
     {
       expr = cache_dereference(tmp2, state);
     }
     else
     {
-      expr = tmp2;
+      expr = std::move(tmp2);
     }
   }
   else if(
