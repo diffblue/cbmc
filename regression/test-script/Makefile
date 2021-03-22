@@ -16,13 +16,6 @@ tests.log:
 
 	@../test.pl -e -p -c ../program_runner.sh -K
 
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
-
 clean:
 	@for dir in *; do \
 		$(RM) tests.log; \

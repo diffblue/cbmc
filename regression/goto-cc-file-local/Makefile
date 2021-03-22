@@ -17,13 +17,6 @@ test:
 tests.log:
 	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/cbmc/cbmc $(is_windows)'
 
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
-
 clean:
 	@for dir in *; do \
 		$(RM) tests.log; \

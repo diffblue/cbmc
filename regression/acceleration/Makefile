@@ -20,13 +20,6 @@ test:
 tests.log: ../test.pl
 	@../test.pl -e -p -c "../accelerate.sh $(GOTO_CC_EXE) $(GOTO_INSTRUMENT_EXE) $(CBMC_EXE) $(is_windows)"
 
-show:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			vim -o "$$dir/*.c" "$$dir/*.out"; \
-		fi; \
-	done;
-
 clean:
 	$(RM) tests.log
 	find . -name '*.gb' -execdir $(RM) '{}' \;
