@@ -16,6 +16,34 @@ file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
 if(NOT WITH_MEMORY_ANALYZER)
     file(GLOB_RECURSE memory_analyzer_sources "memory-analyzer/*.cpp")
     list(REMOVE_ITEM sources ${memory_analyzer_sources})
+else()
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer"
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer
+    )
+    function(make_mm_inc input output)
+        add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer/${output}"
+            COMMAND $<TARGET_FILE:file_converter>
+                "${CMAKE_CURRENT_SOURCE_DIR}/memory-analyzer/${input}" >
+                "${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer/${output}"
+            DEPENDS
+              "${CMAKE_CURRENT_SOURCE_DIR}/memory-analyzer/${input}"
+              "${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer"
+              $<TARGET_FILE:file_converter>
+        )
+    endfunction(make_mm_inc)
+
+    make_mm_inc(input.txt input.inc)
+    make_mm_inc(test.c test.inc)
+
+    set(generated_mm_files
+      "${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer/input.inc"
+      "${CMAKE_CURRENT_BINARY_DIR}/memory-analyzer/test.inc"
+    )
+    set_source_files_properties(
+        "${CMAKE_CURRENT_SOURCE_DIR}/memory-analyzer/gdb_api.cpp"
+        PROPERTIES
+        OBJECT_DEPENDS "${generated_mm_files}"
+    )
 endif()
 
 list(REMOVE_ITEM sources
@@ -44,6 +72,7 @@ target_include_directories(unit
     ${CBMC_BINARY_DIR}
     ${CBMC_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CUDD_INCLUDE}
 )
 target_link_libraries(

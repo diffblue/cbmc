@@ -18,13 +18,28 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <iostream>
 
 #include <memory-analyzer/gdb_api.cpp>
-#include <util/run.h>
 
-void compile_test_file()
+#include <util/run.h>
+#include <util/tempfile.h>
+
+struct compile_test_filet
 {
-  REQUIRE(
-    run("gcc", {"gcc", "-g", "-o", "test", "memory-analyzer/test.c"}) == 0);
-}
+  compile_test_filet() : compiled("test", "")
+  {
+    temporary_filet tmp("test", ".c");
+    std::ofstream of(tmp().c_str());
+    REQUIRE(of.is_open());
+
+    of <<
+#include <memory-analyzer/test.inc>
+      ; // NOLINT(whitespace/semicolon)
+    of.close();
+
+    REQUIRE(run("gcc", {"gcc", "-g", "-o", compiled(), tmp()}) == 0);
+  }
+
+  temporary_filet compiled;
+};
 
 void check_for_gdb()
 {
@@ -46,10 +61,10 @@ public:
 void gdb_api_internals_test()
 {
   check_for_gdb();
-  compile_test_file();
+  compile_test_filet test_file;
 
   std::vector<std::string> args;
-  args.push_back("test");
+  args.push_back(test_file.compiled());
 
   SECTION("parse gdb output record")
   {
@@ -67,9 +82,18 @@ void gdb_api_internals_test()
 
   SECTION("read a line from an input stream")
   {
+    temporary_filet tmp("input", ".txt");
+    std::ofstream of(tmp().c_str());
+    REQUIRE(of.is_open());
+
+    of <<
+#include <memory-analyzer/input.inc>
+      ; // NOLINT(whitespace/semicolon)
+    of.close();
+
     gdb_api_testt gdb_api(args);
 
-    FILE *f = fopen("memory-analyzer/input.txt", "r");
+    FILE *f = fopen(tmp().c_str(), "r");
     gdb_api.response_stream = f;
 
     std::string line = gdb_api.read_next_line();
@@ -79,7 +103,7 @@ void gdb_api_internals_test()
     REQUIRE(line == std::string(1120, 'a') + "\n");
 
     line = gdb_api.read_next_line();
-    REQUIRE(line == "xyz");
+    REQUIRE(line == "xyz\n");
   }
 
   SECTION("start and exit gdb")
@@ -102,10 +126,10 @@ TEST_CASE("gdb api internals test", "[core][memory-analyzer]")
 TEST_CASE("gdb api test", "[core][memory-analyzer]")
 {
   check_for_gdb();
-  compile_test_file();
+  compile_test_filet test_file;
 
   std::vector<std::string> args;
-  args.push_back("test");
+  args.push_back(test_file.compiled());
 
   {
     gdb_apit gdb_api(args, true);
