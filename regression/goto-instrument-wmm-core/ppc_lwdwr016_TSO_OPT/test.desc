@@ -1,6 +1,7 @@
-CORE
+CORE glpk
 lwdwr016.c
 TSO OPT
+^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --

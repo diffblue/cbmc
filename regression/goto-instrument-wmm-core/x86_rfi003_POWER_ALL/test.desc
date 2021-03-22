@@ -1,0 +1,8 @@
+THOROUGH
+rfi003.c
+POWER ALL
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

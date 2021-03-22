@@ -425,13 +425,15 @@ bool event_grapht::graph_explorert::backtrack(
     if(!no_comm)
     {
       /* we then visit via com transitions, if existing */
+      std::set<event_idt> edges_to_remove;
+
       for(wmm_grapht::edgest::const_iterator
           w_it=egraph.com_out(vertex).begin();
           w_it!=egraph.com_out(vertex).end(); w_it++)
       {
         const event_idt w=w_it->first;
         if(w < source)
-          egraph.remove_com_edge(vertex, w);
+          edges_to_remove.insert(w);
         else if(w==source && point_stack.size()>=4 &&
                 (unsafe_met_updated ||
                  this_vertex.unsafe_pair(egraph[source], model)))
@@ -473,6 +475,9 @@ bool event_grapht::graph_explorert::backtrack(
             irep_idt(),
             model);
       }
+
+      for(const event_idt e : edges_to_remove)
+        egraph.remove_com_edge(vertex, e);
     }
 
     if(f)

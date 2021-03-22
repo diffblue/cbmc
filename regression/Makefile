@@ -13,6 +13,7 @@ DIRS = cbmc \
        cbmc-incr \
        cbmc-with-incr \
        array-refinement-with-incr \
+       goto-instrument-wmm-core \
        goto-instrument-typedef \
        smt2_solver \
        smt2_strings \
