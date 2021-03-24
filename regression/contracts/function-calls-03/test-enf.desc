@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --enforce-all-contracts _ --unwind 20 --unwinding-assertions
 ^EXIT=0$
@@ -14,6 +14,3 @@ Verification:
 
 Recursion:
 The base case for the recursive call to f2 provides the same behavior as the common case (given the pre-conditions).
-
-Known bug:
-Enforce flag not handled correctly for function calls within functions.
