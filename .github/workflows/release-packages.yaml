@@ -153,7 +153,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Setup code sign environment
         run: |
-          echo "$(Split-Path -Path $(Get-ChildItem -Path ${env:ProgramFiles(x86)} -Recurse -Filter 'signtool.exe' | Where-Object FullName -like '*10.0.19041.0\x64\signtool.exe').FullName)" >> $env:GITHUB_PATH
+          echo "$(Split-Path -Path $(Get-ChildItem -Path ${env:ProgramFiles(x86)} -Recurse -Filter 'signtool.exe' | Where-Object FullName -like '*10.0.*\x64\signtool.exe').FullName)" >> $env:GITHUB_PATH
           echo "pfxcert=$([string](Get-Location)+'\CodeSignCertificate.pfx')" >> $env:GITHUB_ENV
       - name: Prepare ccache
         uses: actions/cache@v2
