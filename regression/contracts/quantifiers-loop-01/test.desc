@@ -1,0 +1,15 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] line .* Check loop invariant before entry: SUCCESS
+^\[main.2\] line .* Check that loop invariant is preserved: SUCCESS
+^\[main.assertion.1\] line .* assertion a\[10\] == 1: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test case checks the handling of a `forall` quantifier within a loop invariant.
+
+This test case uses explicit constant bounds on the quantified variable,
+so that it can be unrolled (to conjunctions) with the SAT backend.

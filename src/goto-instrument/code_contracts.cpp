@@ -114,9 +114,21 @@ void code_contractst::check_apply_invariants(
   // build the havocking code
   goto_programt havoc_code;
 
-  // assert the invariant
+  // process quantified variables correctly (introduce a fresh temporary)
+  // and return a copy of the invariant
+  const auto &invariant_expr = [&]() {
+    auto invariant_copy = invariant;
+    replace_symbolt replace;
+    code_contractst::add_quantified_variable(invariant_copy, replace, mode);
+    replace(invariant_copy);
+    return invariant_copy;
+  };
+
+  // Generate: assert(invariant) just before the loop
+  // We use a block scope to create a temporary assertion,
+  // and immediately convert it to goto instructions.
   {
-    code_assertt assertion{invariant};
+    code_assertt assertion{invariant_expr()};
     assertion.add_source_location() = loop_head->source_location;
     converter.goto_convert(assertion, havoc_code, mode);
     havoc_code.instructions.back().source_location.set_comment(
@@ -126,10 +138,14 @@ void code_contractst::check_apply_invariants(
   // havoc variables being written to
   build_havoc_code(loop_head, modifies, havoc_code);
 
-  // assume the invariant
-  code_assumet assumption{invariant};
-  assumption.add_source_location() = loop_head->source_location;
-  converter.goto_convert(assumption, havoc_code, mode);
+  // Generate: assume(invariant) just after havocing
+  // We use a block scope to create a temporary assumption,
+  // and immediately convert it to goto instructions.
+  {
+    code_assumet assumption{invariant_expr()};
+    assumption.add_source_location() = loop_head->source_location;
+    converter.goto_convert(assumption, havoc_code, mode);
+  }
 
   // non-deterministically skip the loop if it is a do-while loop
   if(!loop_head->is_goto())
@@ -143,9 +159,11 @@ void code_contractst::check_apply_invariants(
   // Use insert_before_swap to preserve jumps to loop head.
   goto_function.body.insert_before_swap(loop_head, havoc_code);
 
-  // assert the invariant at the end of the loop body
+  // Generate: assert(invariant) just after the loop exits
+  // We use a block scope to create a temporary assertion,
+  // and immediately convert it to goto instructions.
   {
-    code_assertt assertion{invariant};
+    code_assertt assertion{invariant_expr()};
     assertion.add_source_location() = loop_end->source_location;
     converter.goto_convert(assertion, havoc_code, mode);
     havoc_code.instructions.back().source_location.set_comment(

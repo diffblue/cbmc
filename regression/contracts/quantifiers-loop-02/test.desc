@@ -1,0 +1,21 @@
+KNOWNBUG smt-backend broken-cprover-smt-backend
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] line .* Check loop invariant before entry: SUCCESS
+^\[main.2\] line .* Check that loop invariant is preserved: SUCCESS
+^\[main.assertion.1\] line .* assertion .*: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test case checks the handling of a universal quantifier, with a symbolic
+upper bound, within a loop invariant.
+
+The test is tagged:
+- `smt-backend`:
+  because the SAT backend does not support (simply ignores) `forall` in negative (e.g. assume) contexts.
+- `broken-cprover-smt-backend`:
+  because the CPROVER SMT2 solver cannot handle (errors out on) `forall` in negative (e.g. assume) contexts.
+
+It has been tagged `KNOWNBUG` for now since `contracts` regression tests are not run with SMT backend yet.
