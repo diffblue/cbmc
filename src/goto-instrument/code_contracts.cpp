@@ -1173,13 +1173,26 @@ assigns_clause_array_targett::assigns_clause_array_targett(
   code_contractst &contract,
   messaget &log_parameter,
   const irep_idt &function_id)
-  : assigns_clause_targett(Array, object_ptr, contract, log_parameter),
+  : assigns_clause_targett(
+      Array,
+      to_range_exprt(object_ptr).lower(),
+      contract,
+      log_parameter),
     lower_offset_object(),
     upper_offset_object(),
     array_standin_variable(typet()),
     lower_offset_variable(typet()),
     upper_offset_variable(typet())
 {
+  const exprt &array = to_range_exprt(object_ptr).lower();
+  const exprt &range = to_range_exprt(object_ptr).upper();
+
+  // If the range doesn't have operands, it is just a single value
+  const exprt &lower_operand =
+    range.has_operands() ? to_range_exprt(range).lower() : range;
+  const exprt &upper_operand =
+    range.has_operands() ? to_range_exprt(range).upper() : range;
+
   const symbolt &function_symbol = contract.ns.lookup(function_id);
 
   // Declare a new symbol to stand in for the reference
@@ -1198,13 +1211,24 @@ assigns_clause_array_targett::assigns_clause_array_targett(
     code_assignt(array_standin_variable, pointer_object),
     function_symbol.location));
 
-  if(object_ptr.id() == ID_address_of)
+  if(lower_operand.id() == ID_constant)
   {
-    exprt constant_size =
-      get_size(object_ptr.type().subtype(), contract.ns, log);
+    int lowerbase = std::stoi(
+      to_constant_expr(lower_operand).get(ID_C_base).c_str(), nullptr, 10);
+    lower_bound = std::stoi(
+      to_constant_expr(lower_operand).get_value().c_str(), nullptr, lowerbase);
+
+    irep_idt lower_const_string(
+      from_integer(lower_bound, integer_typet()).get_value());
+    irep_idt lower_const_irep(lower_const_string);
+    constant_exprt lower_val_const(lower_const_irep, lower_operand.type());
+
+    exprt lower_constant_size =
+      get_size(array.type().subtype(), contract.ns, log);
     lower_offset_object = typecast_exprt(
       mult_exprt(
-        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
+        typecast_exprt(lower_val_const, unsigned_long_int_type()),
+        lower_constant_size),
       signed_int_type());
 
     // Declare a new symbol to stand in for the reference
@@ -1222,10 +1246,78 @@ assigns_clause_array_targett::assigns_clause_array_targett(
     init_block.add(goto_programt::make_assignment(
       code_assignt(lower_offset_variable, lower_offset_object),
       function_symbol.location));
+  }
+  else
+  {
+    exprt lower_constant_size =
+      get_size(array.type().subtype(), contract.ns, log);
+    lower_offset_object = typecast_exprt(
+      mult_exprt(
+        typecast_exprt(lower_operand, unsigned_long_int_type()),
+        lower_constant_size),
+      signed_int_type());
 
+    // Declare a new symbol to stand in for the reference
+    symbolt lower_standin_symbol = contract.new_tmp_symbol(
+      lower_offset_object.type(),
+      function_symbol.location,
+      function_id,
+      function_symbol.mode);
+
+    lower_offset_variable = lower_standin_symbol.symbol_expr();
+
+    // Add array temp to variable initialization block
+    init_block.add(goto_programt::make_decl(
+      lower_offset_variable, function_symbol.location));
+    init_block.add(goto_programt::make_assignment(
+      code_assignt(lower_offset_variable, lower_offset_object),
+      function_symbol.location));
+  }
+
+  if(upper_operand.id() == ID_constant)
+  {
+    int upperbase = std::stoi(
+      to_constant_expr(upper_operand).get(ID_C_base).c_str(), nullptr, 10);
+    upper_bound = std::stoi(
+      to_constant_expr(upper_operand).get_value().c_str(), nullptr, upperbase);
+
+    irep_idt upper_const_string(
+      from_integer(upper_bound, integer_typet()).get_value());
+    irep_idt upper_const_irep(upper_const_string);
+    constant_exprt upper_val_const(upper_const_irep, upper_operand.type());
+
+    exprt upper_constant_size =
+      get_size(array.type().subtype(), contract.ns, log);
     upper_offset_object = typecast_exprt(
       mult_exprt(
-        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
+        typecast_exprt(upper_val_const, unsigned_long_int_type()),
+        upper_constant_size),
+      signed_int_type());
+
+    // Declare a new symbol to stand in for the reference
+    symbolt upper_standin_symbol = contract.new_tmp_symbol(
+      upper_offset_object.type(),
+      function_symbol.location,
+      function_id,
+      function_symbol.mode);
+
+    upper_offset_variable = upper_standin_symbol.symbol_expr();
+
+    // Add array temp to variable initialization block
+    init_block.add(goto_programt::make_decl(
+      upper_offset_variable, function_symbol.location));
+    init_block.add(goto_programt::make_assignment(
+      code_assignt(upper_offset_variable, upper_offset_object),
+      function_symbol.location));
+  }
+  else
+  {
+    exprt upper_constant_size =
+      get_size(array.type().subtype(), contract.ns, log);
+    upper_offset_object = typecast_exprt(
+      mult_exprt(
+        typecast_exprt(upper_operand, unsigned_long_int_type()),
+        upper_constant_size),
       signed_int_type());
 
     // Declare a new symbol to stand in for the reference
@@ -1267,7 +1359,7 @@ assigns_clause_array_targett::havoc_code(source_locationt location) const
   exprt array_type_size =
     get_size(pointer_object.type().subtype(), contract.ns, log);
 
-  for(mp_integer i = lower_bound; i < upper_bound; ++i)
+  for(mp_integer i = lower_bound; i <= upper_bound; ++i)
   {
     irep_idt offset_string(from_integer(i, integer_typet()).get_value());
     irep_idt offset_irep(offset_string);
@@ -1360,7 +1452,7 @@ assigns_clauset::~assigns_clauset()
 
 assigns_clause_targett *assigns_clauset::add_target(exprt current_operation)
 {
-  if(current_operation.id() == ID_address_of)
+  if(current_operation.id() == ID_range)
   {
     assigns_clause_array_targett *array_target =
       new assigns_clause_array_targett(
