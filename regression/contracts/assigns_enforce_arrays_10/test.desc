@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Checks whether verification fails when an array is assigned past the upper
+bound of its assignable array range, using the symbol of the upper bound,
+after it has been incremented. This is intended to show that the bounds
+are determined at the time the function is called.

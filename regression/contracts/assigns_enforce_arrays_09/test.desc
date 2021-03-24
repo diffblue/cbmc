@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether verification succeeds when an array is assigned at the upper
+bounds of its assignable array range, when the range has a non-constant bound.

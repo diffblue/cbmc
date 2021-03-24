@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test replicates the behavior of assigns_enforce_arrays_04, but separates
+the function headers and contracts into a separate file header.h.

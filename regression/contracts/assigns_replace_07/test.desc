@@ -6,5 +6,5 @@ main.c
 ^VERIFICATION FAILED$
 --
 --
-Checks whether the value inside a single-index array assigns target is
-havocked when calling the associated function.
+Checks whether the values inside an array range specified by the assigns
+target are havocked when calling the associated function.

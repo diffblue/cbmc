@@ -8,7 +8,9 @@ int nextIdx() __CPROVER_assigns(idx)
   return idx;
 }
 
-void f1(int a[], int len)
+/* clang-format off */
+void f1(int a[], int len) __CPROVER_assigns(idx, a[2 .. 5])
+/* clang-format on */
 {
   a[nextIdx()] = 5;
 }

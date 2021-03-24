@@ -1,8 +1,6 @@
 #include <assert.h>
 
-/* clang-format off */
-void foo(char c[]) __CPROVER_assigns(c[2 .. 4])
-/* clang-format on */
+void bar(char d[]) __CPROVER_assigns(d[7])
 {
 }
 
@@ -19,8 +17,8 @@ int main()
   b[7] = 'h';
   b[8] = 'i';
   b[9] = 'j';
-  foo(b);
-  assert(b[2] == 'c' || b[3] == 'd' || b[4] == 'e');
+  bar(b);
+  assert(b[7] == 'h');
 
   return 0;
 }

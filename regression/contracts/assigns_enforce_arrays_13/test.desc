@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether verification succeeds when an array is assigned via a
+function call which assigns a pointer to one of its elements.

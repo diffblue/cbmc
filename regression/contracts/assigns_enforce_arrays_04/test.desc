@@ -6,6 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-Checks whether verification succeeds when an array is assigned through
-calls to functions with array assigns clauses which are compatible with
-that of the caller.
+Checks whether verification succeeds when an array is assigned at both upper
+and lower bounds of its assignable array range. Single-value array range
+assignment is checked as well.

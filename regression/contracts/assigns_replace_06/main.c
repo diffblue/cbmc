@@ -1,10 +1,12 @@
 #include <assert.h>
 
-void foo(char c[]) __CPROVER_assigns(c)
+/* clang-format off */
+void foo(char c[]) __CPROVER_assigns(c[2 .. 4])
+/* clang-format on */
 {
 }
 
-void bar(char d[]) __CPROVER_assigns(d)
+void bar(char d[]) __CPROVER_assigns(d[7])
 {
 }
 

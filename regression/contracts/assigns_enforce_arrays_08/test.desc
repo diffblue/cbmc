@@ -7,4 +7,4 @@ main.c
 --
 --
 Checks whether verification fails when an array is assigned at an index
-below its lower bound.
+above its allowed index.
