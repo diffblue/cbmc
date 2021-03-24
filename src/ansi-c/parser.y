@@ -102,6 +102,7 @@ extern char *yyansi_ctext;
 %token TOK_ANDAND    "&&"
 %token TOK_OROR      "||"
 %token TOK_ELLIPSIS  "..."
+%token TOK_RANGE     ".."
 
 /*** modifying assignment operators ***/
 
@@ -3243,13 +3244,83 @@ cprover_contract:
           set($$, ID_C_spec_requires);
           mto($$, $3);
         }
-        | TOK_CPROVER_ASSIGNS '(' argument_expression_list ')'
+        | TOK_CPROVER_ASSIGNS '(' target_list ')'
         {
           $$=$1;
           set($$, ID_C_spec_assigns);
           parser_stack($3).id(ID_target_list);
           mto($$, $3);
         }
+        ;
+
+target_list:
+          target
+        {
+          init($$, ID_target_list);
+          mto($$, $1);
+        }
+        | target_list ',' target
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+target:
+          deref_target
+        | target '[' array_index ']'
+        { binary($$, $1, $2, ID_range, $3); }
+        | target '[' array_range ']'
+        { binary($$, $1, $2, ID_range, $3); }
+        ;
+
+array_index:
+          identifier
+        | integer
+        ;
+
+array_range:
+        array_index TOK_RANGE array_index
+        {
+          $$=$2;
+          set($$, ID_range);
+          mto($$, $1);
+          mto($$, $3);
+        }
+        ;
+
+deref_target:
+          member_target
+        | '*' deref_target
+        {
+          $$=$1;
+          set($$, ID_dereference);
+          mto($$, $2);
+        }
+        ;
+
+member_target:
+          primary_target
+        | member_target '.' member_name
+        {
+          $$=$2;
+          set($$, ID_member);
+          mto($$, $1);
+          parser_stack($$).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
+        }
+        | member_target TOK_ARROW member_name
+        {
+          $$=$2;
+          set($$, ID_ptrmember);
+          mto($$, $1);
+          parser_stack($$).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
+        }
+        ;
+
+primary_target:
+          identifier
+        | '(' target ')'
+        { $$ = $2; }
         ;
 
 cprover_contract_sequence:

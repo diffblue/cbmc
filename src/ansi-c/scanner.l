@@ -1517,6 +1517,7 @@ __decltype          { if(PARSER.cpp98 &&
 "&&"            { loc(); return TOK_ANDAND; }
 "||"            { loc(); return TOK_OROR; }
 "..."           { loc(); return TOK_ELLIPSIS; }
+".."            { loc(); return TOK_RANGE; }
 
 "*="            { loc(); return TOK_MULTASSIGN; }
 "/="            { loc(); return TOK_DIVASSIGN; }

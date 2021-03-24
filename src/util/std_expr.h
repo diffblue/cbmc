@@ -824,6 +824,67 @@ inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
   return static_cast<multi_ary_exprt &>(expr);
 }
 
+/// \brief A base class for int-range expressions
+class range_exprt : public expr_protectedt
+{
+public:
+  range_exprt(exprt &lower, exprt &upper, typet _type)
+    : expr_protectedt(
+        ID_range,
+        std::move(_type),
+        {std::move(lower), std::move(upper)})
+  {
+  }
+
+  exprt &lower()
+  {
+    return op0();
+  }
+
+  const exprt &lower() const
+  {
+    return op0();
+  }
+
+  exprt &upper()
+  {
+    return op1();
+  }
+
+  const exprt &upper() const
+  {
+    return op1();
+  }
+
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
+};
+
+/// \brief Cast an exprt to a \ref range_exprt
+///
+/// \a expr must be known to be \ref range_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref range_exprt
+inline const range_exprt &to_range_exprt(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_range);
+  return static_cast<const range_exprt &>(expr);
+}
+
+/// \brief Cast an exprt to a \ref range_exprt
+///
+/// \a expr must be known to be \ref range_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref range_exprt
+inline range_exprt &to_range_exprt(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_range);
+  return static_cast<range_exprt &>(expr);
+}
 
 /// \brief The plus expression
 /// Associativity is not specified.

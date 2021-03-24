@@ -163,6 +163,7 @@ protected:
   virtual void typecheck_expr_operands(exprt &expr);
   virtual void typecheck_expr_comma(exprt &expr);
   virtual void typecheck_expr_constant(exprt &expr);
+  virtual void typecheck_expr_range(exprt &expr);
   virtual void typecheck_expr_side_effect(side_effect_exprt &expr);
   virtual void typecheck_expr_unary_arithmetic(exprt &expr);
   virtual void typecheck_expr_unary_boolean(exprt &expr);

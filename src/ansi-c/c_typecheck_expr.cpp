@@ -491,12 +491,26 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // already type checked
   }
+  else if(expr.id() == ID_range)
+  {
+    typecheck_expr_range(expr);
+  }
   else
   {
     error().source_location = expr.source_location();
     error() << "unexpected expression: " << expr.pretty() << eom;
     throw 0;
   }
+}
+
+void c_typecheck_baset::typecheck_expr_range(exprt &expr)
+{
+  // Already type checked
+  exprt &lower = to_range_exprt(expr).lower();
+  exprt &upper = to_range_exprt(expr).upper();
+
+  implicit_typecast_arithmetic(lower);
+  implicit_typecast_arithmetic(upper);
 }
 
 void c_typecheck_baset::typecheck_expr_comma(exprt &expr)
