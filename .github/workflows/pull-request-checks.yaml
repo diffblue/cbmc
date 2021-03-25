@@ -287,7 +287,7 @@ jobs:
           submodules: recursive
       - name: Fetch dependencies
         run: |
-          choco install winflexbison3 strawberryperl
+          choco install winflexbison3 strawberryperl z3
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
