@@ -54,6 +54,7 @@ smt2_convt::smt2_convt(
   solvert _solver,
   std::ostream &_out)
   : use_FPA_theory(false),
+    use_as_const(false),
     use_datatypes(false),
     use_array_of_bool(false),
     emit_set_logic(true),
@@ -79,6 +80,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::CPROVER_SMT2:
+    use_as_const = true;
     use_array_of_bool = true;
     emit_set_logic = false;
     break;
@@ -87,6 +89,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::CVC4:
+    use_as_const = true;
     break;
 
   case solvert::MATHSAT:
@@ -96,6 +99,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::Z3:
+    use_as_const = true;
     use_array_of_bool = true;
     emit_set_logic = false;
     use_datatypes = true;
@@ -1276,18 +1280,29 @@ void smt2_convt::convert_expr(const exprt &expr)
     convert_address_of_rec(
       address_of_expr.object(), to_pointer_type(address_of_expr.type()));
   }
-  else if(expr.id()==ID_array_of)
+  else if(expr.id() == ID_array_of)
   {
-    const array_of_exprt &array_of_expr = to_array_of_expr(expr);
+    const auto &array_of_expr = to_array_of_expr(expr);
 
     DATA_INVARIANT(
       array_of_expr.type().id() == ID_array,
       "array of expression shall have array type");
 
-    defined_expressionst::const_iterator it =
-      defined_expressions.find(array_of_expr);
-    CHECK_RETURN(it != defined_expressions.end());
-    out << it->second;
+    if(use_as_const)
+    {
+      out << "((as const ";
+      convert_type(array_of_expr.type());
+      out << ") ";
+      convert_expr(array_of_expr.what());
+      out << ")";
+    }
+    else
+    {
+      defined_expressionst::const_iterator it =
+        defined_expressions.find(array_of_expr);
+      CHECK_RETURN(it != defined_expressions.end());
+      out << it->second;
+    }
   }
   else if(expr.id()==ID_index)
   {
@@ -4367,27 +4382,30 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")" << "\n";
     }
   }
-  else if(expr.id()==ID_array_of)
+  else if(expr.id() == ID_array_of)
   {
-    if(defined_expressions.find(expr)==defined_expressions.end())
+    if(!use_as_const)
     {
-      const irep_idt id =
-        "array_of." + std::to_string(defined_expressions.size());
-      out << "; the following is a substitute for lambda i. x" << "\n";
-      out << "(declare-fun " << id << " () ";
-      convert_type(expr.type());
-      out << ")" << "\n";
+      if(defined_expressions.find(expr) == defined_expressions.end())
+      {
+        const auto &array_of = to_array_of_expr(expr);
 
-      // use a quantifier instead of the lambda
-      #if 0 // not really working in any solver yet!
-      out << "(assert (forall ((i ";
-      convert_type(array_index_type());
-      out << ")) (= (select " << id << " i) ";
-      convert_expr(expr.op0());
-      out << ")))" << "\n";
-      #endif
+        const irep_idt id =
+          "array_of." + std::to_string(defined_expressions.size());
+        out << "; the following is a substitute for lambda i. x\n";
+        out << "(declare-fun " << id << " () ";
+        convert_type(array_of.type());
+        out << ")\n";
 
-      defined_expressions[expr]=id;
+        // use a quantifier-based initialization instead of lambda
+        out << "(assert (forall ((i ";
+        convert_type(array_of.type().size().type());
+        out << ")) (= (select " << id << " i) ";
+        convert_expr(array_of.what());
+        out << ")))\n";
+
+        defined_expressions[expr] = id;
+      }
     }
   }
   else if(expr.id()==ID_array)
