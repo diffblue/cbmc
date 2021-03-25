@@ -169,6 +169,9 @@ protected:
     const exprt &src, const std::string &symbol,
     unsigned precedence);
 
+  /// Returns a string if \p src is a function with a known conversion, else
+  /// returns nullopt.
+  optionalt<std::string> convert_function(const exprt &src);
   std::string convert_function(const exprt &src, const std::string &symbol);
 
   std::string convert_complex(

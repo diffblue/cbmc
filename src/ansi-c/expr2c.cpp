@@ -3415,21 +3415,6 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_unary_plus)
     return convert_unary(to_unary_expr(src), "+", precedence = 15);
 
-  else if(src.id()==ID_floatbv_plus)
-    return convert_function(src, "FLOAT+");
-
-  else if(src.id()==ID_floatbv_minus)
-    return convert_function(src, "FLOAT-");
-
-  else if(src.id()==ID_floatbv_mult)
-    return convert_function(src, "FLOAT*");
-
-  else if(src.id()==ID_floatbv_div)
-    return convert_function(src, "FLOAT/");
-
-  else if(src.id()==ID_floatbv_rem)
-    return convert_function(src, "FLOAT%");
-
   else if(src.id()==ID_floatbv_typecast)
   {
     const auto &floatbv_typecast = to_floatbv_typecast_expr(src);
@@ -3479,21 +3464,6 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "__builtin_popcount");
   }
 
-  else if(src.id() == ID_r_ok)
-    return convert_function(src, "R_OK");
-
-  else if(src.id() == ID_w_ok)
-    return convert_function(src, "W_OK");
-
-  else if(src.id() == ID_is_invalid_pointer)
-    return convert_function(src, "IS_INVALID_POINTER");
-
-  else if(src.id()==ID_good_pointer)
-    return convert_function(src, "GOOD_POINTER");
-
-  else if(src.id()==ID_object_size)
-    return convert_function(src, "OBJECT_SIZE");
-
   else if(src.id()=="pointer_arithmetic")
     return convert_pointer_arithmetic(src, precedence=16);
 
@@ -3511,84 +3481,17 @@ std::string expr2ct::convert_with_precedence(
     return id2string(src.id());
   }
 
-  else if(src.id()==ID_infinity)
-    return convert_function(src, "INFINITY");
-
   else if(src.id()=="builtin-function")
     return src.get_string(ID_identifier);
 
-  else if(src.id()==ID_pointer_object)
-    return convert_function(src, "POINTER_OBJECT");
-
-  else if(src.id() == ID_get_must)
-    return convert_function(src, CPROVER_PREFIX "get_must");
-
-  else if(src.id() == ID_get_may)
-    return convert_function(src, CPROVER_PREFIX "get_may");
-
-  else if(src.id()=="object_value")
-    return convert_function(src, "OBJECT_VALUE");
-
   else if(src.id()==ID_array_of)
     return convert_array_of(src, precedence=16);
-
-  else if(src.id()==ID_pointer_offset)
-    return convert_function(src, "POINTER_OFFSET");
-
-  else if(src.id()=="pointer_base")
-    return convert_function(src, "POINTER_BASE");
-
-  else if(src.id()=="pointer_cons")
-    return convert_function(src, "POINTER_CONS");
-
-  else if(src.id() == ID_is_invalid_pointer)
-    return convert_function(src, CPROVER_PREFIX "is_invalid_pointer");
-
-  else if(src.id() == ID_dynamic_object)
-    return convert_function(src, "DYNAMIC_OBJECT");
-
-  else if(src.id() == ID_is_dynamic_object)
-    return convert_function(src, "IS_DYNAMIC_OBJECT");
-
-  else if(src.id()=="is_zero_string")
-    return convert_function(src, "IS_ZERO_STRING");
-
-  else if(src.id()=="zero_string")
-    return convert_function(src, "ZERO_STRING");
-
-  else if(src.id()=="zero_string_length")
-    return convert_function(src, "ZERO_STRING_LENGTH");
-
-  else if(src.id()=="buffer_size")
-    return convert_function(src, "BUFFER_SIZE");
-
-  else if(src.id()==ID_isnan)
-    return convert_function(src, "isnan");
-
-  else if(src.id()==ID_isfinite)
-    return convert_function(src, "isfinite");
-
-  else if(src.id()==ID_isinf)
-    return convert_function(src, "isinf");
 
   else if(src.id()==ID_bswap)
     return convert_function(
       src,
       "__builtin_bswap" + integer2string(*pointer_offset_bits(
                             to_unary_expr(src).op().type(), ns)));
-
-  else if(src.id()==ID_isnormal)
-    return convert_function(src, "isnormal");
-
-  else if(src.id()==ID_builtin_offsetof)
-    return convert_function(src, "builtin_offsetof");
-
-  else if(src.id()==ID_gcc_builtin_va_arg)
-    return convert_function(src, "gcc_builtin_va_arg");
-
-  else if(src.id()==ID_alignof)
-    // C uses "_Alignof", C++ uses "alignof"
-    return convert_function(src, "alignof");
 
   else if(has_prefix(src.id_string(), "byte_extract"))
     return convert_byte_extract(to_byte_extract_expr(src), precedence = 16);
@@ -3733,27 +3636,6 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id()==ID_equal)
     return convert_binary(to_equal_expr(src), "==", precedence = 9, true);
-
-  else if(src.id()==ID_ieee_float_equal)
-    return convert_function(src, "IEEE_FLOAT_EQUAL");
-
-  else if(src.id()==ID_width)
-    return convert_function(src, "WIDTH");
-
-  else if(src.id()==ID_concatenation)
-    return convert_function(src, "CONCATENATION");
-
-  else if(src.id()==ID_ieee_float_notequal)
-    return convert_function(src, "IEEE_FLOAT_NOTEQUAL");
-
-  else if(src.id()==ID_abs)
-    return convert_function(src, "abs");
-
-  else if(src.id()==ID_complex_real)
-    return convert_function(src, "__real__");
-
-  else if(src.id()==ID_complex_imag)
-    return convert_function(src, "__imag__");
 
   else if(src.id()==ID_complex)
     return convert_complex(src, precedence=16);
@@ -3915,11 +3797,64 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_type)
     return convert(src.type());
 
-  else if(src.id() == ID_count_leading_zeros)
-    return convert_function(src, "__builtin_clz");
+  auto function_string_opt = convert_function(src);
+  if(function_string_opt.has_value())
+    return *function_string_opt;
 
   // no C language expression for internal representation
   return convert_norep(src, precedence);
+}
+
+optionalt<std::string> expr2ct::convert_function(const exprt &src)
+{
+  static const std::map<irep_idt, std::string> function_names = {
+    {"buffer_size", "BUFFER_SIZE"},
+    {"is_zero_string", "IS_ZERO_STRING"},
+    {"object_value", "OBJECT_VALUE"},
+    {"pointer_base", "POINTER_BASE"},
+    {"pointer_cons", "POINTER_CONS"},
+    {"zero_string", "ZERO_STRING"},
+    {"zero_string_length", "ZERO_STRING_LENGTH"},
+    {ID_abs, "abs"},
+    {ID_alignof, "alignof"}, // C uses "_Alignof", C++ uses "alignof"
+    {ID_builtin_offsetof, "builtin_offsetof"},
+    {ID_complex_imag, "__imag__"},
+    {ID_complex_real, "__real__"},
+    {ID_concatenation, "CONCATENATION"},
+    {ID_count_leading_zeros, "__builtin_clz"},
+    {ID_dynamic_object, "DYNAMIC_OBJECT"},
+    {ID_floatbv_div, "FLOAT/"},
+    {ID_floatbv_minus, "FLOAT-"},
+    {ID_floatbv_mult, "FLOAT*"},
+    {ID_floatbv_plus, "FLOAT+"},
+    {ID_floatbv_rem, "FLOAT%"},
+    {ID_gcc_builtin_va_arg, "gcc_builtin_va_arg"},
+    {ID_get_may, CPROVER_PREFIX "get_may"},
+    {ID_get_must, CPROVER_PREFIX "get_must"},
+    {ID_good_pointer, "GOOD_POINTER"},
+    {ID_ieee_float_equal, "IEEE_FLOAT_EQUAL"},
+    {ID_ieee_float_notequal, "IEEE_FLOAT_NOTEQUAL"},
+    {ID_infinity, "INFINITY"},
+    {ID_is_dynamic_object, "IS_DYNAMIC_OBJECT"},
+    {ID_is_invalid_pointer, "IS_INVALID_POINTER"},
+    {ID_is_invalid_pointer, CPROVER_PREFIX "is_invalid_pointer"},
+    {ID_isfinite, "isfinite"},
+    {ID_isinf, "isinf"},
+    {ID_isnan, "isnan"},
+    {ID_isnormal, "isnormal"},
+    {ID_object_size, "OBJECT_SIZE"},
+    {ID_pointer_object, "POINTER_OBJECT"},
+    {ID_pointer_offset, "POINTER_OFFSET"},
+    {ID_r_ok, "R_OK"},
+    {ID_w_ok, "W_OK"},
+    {ID_width, "WIDTH"},
+  };
+
+  const auto function_entry = function_names.find(src.id());
+  if(function_entry == function_names.end())
+    return nullopt;
+
+  return convert_function(src, function_entry->second);
 }
 
 std::string expr2ct::convert(const exprt &src)
