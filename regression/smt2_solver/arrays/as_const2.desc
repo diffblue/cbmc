@@ -1,0 +1,8 @@
+CORE
+as_const2.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^\(\(sample \(_ bv16 8\)\)\)$
+--
