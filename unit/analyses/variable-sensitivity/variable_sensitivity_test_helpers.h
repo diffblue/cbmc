@@ -6,6 +6,9 @@
 
 \*******************************************************************/
 
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_TEST_HELPERS_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_TEST_HELPERS_H
+
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
@@ -36,6 +39,7 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
   abstract_environmentt &env,
   namespacet &ns);
 
+std::shared_ptr<value_set_abstract_objectt> make_bottom_value_set();
 std::shared_ptr<value_set_abstract_objectt> make_top_value_set();
 
 abstract_object_pointert make_bottom_object();
@@ -215,3 +219,5 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   const abstract_object_pointert &op3,
   abstract_environmentt &environment,
   namespacet &ns);
+
+#endif

@@ -456,6 +456,10 @@ protected:
     top = false;
     this->set_not_top_internal();
   }
+  void set_not_bottom()
+  {
+    bottom = false;
+  }
 };
 
 struct abstract_hashert

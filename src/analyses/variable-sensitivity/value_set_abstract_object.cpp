@@ -229,19 +229,19 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 abstract_object_pointert
 value_set_abstract_objectt::merge(abstract_object_pointert other) const
 {
+  auto union_values = !is_bottom() ? values : abstract_object_sett{};
+
   auto other_value_set = std::dynamic_pointer_cast<const value_set_tag>(other);
   if(other_value_set)
   {
-    auto union_values = values;
     union_values.insert(other_value_set->get_values());
     return resolve_values(union_values);
   }
 
   auto other_value =
-    std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(other_value)
   {
-    auto union_values = values;
     union_values.insert(other_value);
     return resolve_values(union_values);
   }
@@ -268,6 +268,7 @@ void value_set_abstract_objectt::set_values(
     set_not_top();
     values = other_values;
   }
+  set_not_bottom();
   verify();
 }
 

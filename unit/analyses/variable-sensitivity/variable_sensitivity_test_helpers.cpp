@@ -92,6 +92,12 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
   return vs;
 }
 
+std::shared_ptr<value_set_abstract_objectt> make_bottom_value_set()
+{
+  return std::make_shared<value_set_abstract_objectt>(
+    integer_typet(), false, true);
+}
+
 std::shared_ptr<value_set_abstract_objectt> make_top_value_set()
 {
   return std::make_shared<value_set_abstract_objectt>(integer_typet());

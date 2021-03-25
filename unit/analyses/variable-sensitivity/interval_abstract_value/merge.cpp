@@ -453,6 +453,32 @@ SCENARIO(
         EXPECT_MODIFIED(merged, val1, val4);
       }
     }
+    WHEN("merging [3, 4] with { [4, 6] }")
+    {
+      auto op1 = make_interval(val3, val4, environment, ns);
+      auto op2 =
+        make_value_set({constant_interval_exprt(val4, val6)}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified [3, 6]")
+      {
+        EXPECT_MODIFIED(merged, val3, val6);
+      }
+    }
+    WHEN("merging [3, 4] with { 1, [3, 3] }")
+    {
+      auto op1 = make_interval(val3, val4, environment, ns);
+      auto op2 = make_value_set(
+        {val1, constant_interval_exprt(val3, val3)}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified [1, 4]")
+      {
+        EXPECT_MODIFIED(merged, val1, val4);
+      }
+    }
     WHEN("merging BOTTOM with { 3 }")
     {
       auto op1 = make_bottom_interval();
