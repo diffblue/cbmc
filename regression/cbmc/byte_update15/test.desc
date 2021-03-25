@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-cprover-smt-backend
 main.c
 
 ^EXIT=0$
@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test currently does not pass with CPROVER SMT2 backend
+because the solver does not fully support quantified expressions.

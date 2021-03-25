@@ -62,6 +62,7 @@ public:
   bool use_as_const;
   bool use_datatypes;
   bool use_array_of_bool;
+  bool use_lambda_for_array;
   bool emit_set_logic;
 
   exprt handle(const exprt &expr) override;
