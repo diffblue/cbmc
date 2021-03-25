@@ -690,6 +690,40 @@ exprt smt2_parsert::function_application()
                         << smt2_tokenizer.get_buffer() << '\'';
         }
       }
+      else if(smt2_tokenizer.get_buffer() == "as")
+      {
+        // This is an extension understood by Z3 and CVC4.
+        if(
+          smt2_tokenizer.peek() == smt2_tokenizert::SYMBOL &&
+          smt2_tokenizer.get_buffer() == "const")
+        {
+          next_token(); // eat the "const"
+          auto sort = this->sort();
+
+          if(sort.id() != ID_array)
+          {
+            throw error()
+              << "unexpected 'as const' expression expects array type";
+          }
+
+          const auto &array_sort = to_array_type(sort);
+
+          if(smt2_tokenizer.next_token() != smt2_tokenizert::CLOSE)
+            throw error() << "expecting ')' after sort in 'as const'";
+
+          auto value = expression();
+
+          if(value.type() != array_sort.subtype())
+            throw error() << "unexpected 'as const' with wrong element type";
+
+          if(smt2_tokenizer.next_token() != smt2_tokenizert::CLOSE)
+            throw error() << "expecting ')' at the end of 'as const'";
+
+          return array_of_exprt(value, array_sort);
+        }
+        else
+          throw error() << "unexpected 'as' expression";
+      }
       else
       {
         // just double parentheses
