@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <atomic>
 
+#include "c_expr.h"
+
 static symbol_exprt typecheck_sync_with_pointer_parameter(
   const irep_idt &identifier,
   const exprt::operandst &arguments,
@@ -1376,4 +1378,129 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
     statement.add_source_location() = source_location;
 
   return block;
+}
+
+exprt c_typecheck_baset::typecheck_shuffle_vector(
+  const side_effect_expr_function_callt &expr)
+{
+  const exprt &f_op = expr.function();
+  const source_locationt &source_location = expr.source_location();
+  const irep_idt &identifier = to_symbol_expr(f_op).get_identifier();
+
+  exprt::operandst arguments = expr.arguments();
+
+  if(identifier == "__builtin_shuffle")
+  {
+    // https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html and
+    // https://github.com/OpenCL/man/blob/master/shuffle.adoc
+    if(arguments.size() != 2 && arguments.size() != 3)
+    {
+      error().source_location = f_op.source_location();
+      error() << "__builtin_shuffle expects two or three arguments" << eom;
+      throw 0;
+    }
+
+    for(exprt &arg : arguments)
+    {
+      if(arg.type().id() != ID_vector)
+      {
+        error().source_location = f_op.source_location();
+        error() << "__builtin_shuffle expects vector arguments" << eom;
+        throw 0;
+      }
+    }
+
+    const exprt &arg0 = arguments[0];
+    const vector_typet &input_vec_type = to_vector_type(arg0.type());
+
+    optionalt<exprt> arg1;
+    if(arguments.size() == 3)
+    {
+      if(arguments[1].type() != input_vec_type)
+      {
+        error().source_location = f_op.source_location();
+        error() << "__builtin_shuffle expects input vectors of the same type"
+                << eom;
+        throw 0;
+      }
+      arg1 = arguments[1];
+    }
+    const exprt &indices = arguments.back();
+    const vector_typet &indices_type = to_vector_type(indices.type());
+    const std::size_t indices_size =
+      numeric_cast_v<std::size_t>(indices_type.size());
+
+    exprt::operandst operands;
+    operands.reserve(indices_size);
+
+    auto input_size = numeric_cast<mp_integer>(input_vec_type.size());
+    CHECK_RETURN(input_size.has_value());
+    if(arg1.has_value())
+      input_size = *input_size * 2;
+    constant_exprt size = from_integer(*input_size, indices_type.subtype());
+
+    for(std::size_t i = 0; i < indices_size; ++i)
+    {
+      // only the least significant bits of each mask element are considered
+      mod_exprt mod_index{index_exprt{indices, from_integer(i, index_type())},
+                          size};
+      mod_index.add_source_location() = source_location;
+      operands.push_back(std::move(mod_index));
+    }
+
+    return shuffle_vector_exprt{arg0, arg1, std::move(operands)}.lower();
+  }
+  else if(identifier == "__builtin_shufflevector")
+  {
+    // https://clang.llvm.org/docs/LanguageExtensions.html#langext-builtin-shufflevector
+    if(arguments.size() < 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "__builtin_shufflevector expects two or more arguments" << eom;
+      throw 0;
+    }
+
+    exprt::operandst operands;
+    operands.reserve(arguments.size() - 2);
+
+    for(std::size_t i = 0; i < arguments.size(); ++i)
+    {
+      exprt &arg_i = arguments[i];
+
+      if(i <= 1 && arg_i.type().id() != ID_vector)
+      {
+        error().source_location = f_op.source_location();
+        error() << "__builtin_shufflevector expects two vectors as argument"
+                << eom;
+        throw 0;
+      }
+      else if(i > 1)
+      {
+        if(!is_signed_or_unsigned_bitvector(arg_i.type()))
+        {
+          error().source_location = f_op.source_location();
+          error() << "__builtin_shufflevector expects integer index" << eom;
+          throw 0;
+        }
+
+        make_constant(arg_i);
+
+        const auto int_index = numeric_cast<mp_integer>(arg_i);
+        CHECK_RETURN(int_index.has_value());
+
+        if(*int_index == -1)
+        {
+          operands.push_back(from_integer(0, arg_i.type()));
+          operands.back().add_source_location() = source_location;
+        }
+        else
+          operands.push_back(arg_i);
+      }
+    }
+
+    return shuffle_vector_exprt{arguments[0], arguments[1], std::move(operands)}
+      .lower();
+  }
+  else
+    UNREACHABLE;
 }

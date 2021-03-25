@@ -1928,6 +1928,24 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         return;
       }
       else if(
+        identifier == "__builtin_shuffle" &&
+        config.ansi_c.mode == configt::ansi_ct::flavourt::GCC)
+      {
+        exprt result = typecheck_shuffle_vector(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
+        identifier == "__builtin_shufflevector" &&
+        config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
+      {
+        exprt result = typecheck_shuffle_vector(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {

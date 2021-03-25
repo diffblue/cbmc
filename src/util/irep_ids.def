@@ -849,6 +849,7 @@ IREP_ID_TWO(vector_ge, vector->=)
 IREP_ID_TWO(vector_le, vector-<=)
 IREP_ID_TWO(vector_gt, vector->)
 IREP_ID_TWO(vector_lt, vector-<)
+IREP_ID_ONE(shuffle_vector)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
