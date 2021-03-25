@@ -595,9 +595,9 @@ SCENARIO(
       auto op2 = make_value_set({interval12, val1}, environment, ns);
       auto result = add_as_value_set(op1, op2, environment, ns);
 
-      THEN("= { [2,4], [2,3], [2,3], 2 }")
-      { // duplicate interval ok as first pass. Will be eliminated in due course.
-        EXPECT(result, {interval24, interval23, interval23, val2});
+      THEN("= { [2,4], [2,3], 2 }")
+      {
+        EXPECT(result, {interval24, interval23, val2});
       }
     }
   }

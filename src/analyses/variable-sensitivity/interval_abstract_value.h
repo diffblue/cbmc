@@ -46,6 +46,9 @@ public:
     return interval;
   }
 
+  size_t internal_hash() const override;
+  bool internal_equality(const abstract_object_pointert &other) const override;
+
   void output(
     std::ostream &out,
     const class ai_baset &ai,

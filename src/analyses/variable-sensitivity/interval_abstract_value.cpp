@@ -282,6 +282,19 @@ exprt interval_abstract_valuet::to_constant() const
 #endif
 }
 
+size_t interval_abstract_valuet::internal_hash() const
+{
+  return std::hash<std::string>{}(interval.pretty());
+}
+
+bool interval_abstract_valuet::internal_equality(
+  const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const interval_abstract_valuet>(other);
+  return cast_other && interval == cast_other->interval;
+}
+
 void interval_abstract_valuet::output(
   std::ostream &out,
   const ai_baset &ai,
