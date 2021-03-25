@@ -88,7 +88,7 @@ protected:
   std::size_t parenthesis_level;
   smt2_tokenizert::tokent next_token();
 
-  // for let/quantifier bindings, function parameters
+  // for let/lambda/quantifier bindings, function parameters
   using renaming_mapt=std::map<irep_idt, irep_idt>;
   renaming_mapt renaming_map;
   using renaming_counterst=std::map<irep_idt, unsigned>;
@@ -138,7 +138,7 @@ protected:
   exprt unary(irep_idt, const exprt::operandst &);
 
   exprt let_expression();
-  exprt quantifier_expression(irep_idt);
+  exprt binding_expression(irep_idt);
   exprt function_application(
     const symbol_exprt &function,
     const exprt::operandst &op);

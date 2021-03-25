@@ -1,0 +1,8 @@
+KNOWNBUG
+arrays1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^\(\(some_sample \(_ bv16 #x1234\)\)\)$
+--

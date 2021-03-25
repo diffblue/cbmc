@@ -241,12 +241,12 @@ exprt smt2_parsert::let_expression()
   return let_exprt(variables, values, where);
 }
 
-exprt smt2_parsert::quantifier_expression(irep_idt id)
+exprt smt2_parsert::binding_expression(irep_idt id)
 {
   if(next_token() != smt2_tokenizert::OPEN)
     throw error() << "expected bindings after " << id;
 
-  std::vector<symbol_exprt> bindings;
+  binding_exprt::variablest bindings;
 
   while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
   {
@@ -285,8 +285,6 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error() << "expected ')' after " << id;
 
-  exprt result=expr;
-
   // remove bindings from id_map
   for(const auto &b : bindings)
     id_map.erase(b.get_identifier());
@@ -294,14 +292,26 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   // restore renaming map
   renaming_map = old_renaming_map;
 
-  // go backwards, build quantified expression
-  for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
+  if(id == ID_lambda)
   {
-    quantifier_exprt quantifier(id, *r_it, result);
-    result=quantifier;
+    return lambda_exprt(bindings, expr);
   }
+  else
+  {
+    if(expr.type().id() != ID_bool)
+      throw error() << "expression for " << id << " must be Boolean";
 
-  return result;
+    exprt result = expr;
+
+    // go backwards, build quantified expression
+    for(auto r_it = bindings.rbegin(); r_it != bindings.rend(); r_it++)
+    {
+      quantifier_exprt quantifier(id, *r_it, result);
+      result = quantifier;
+    }
+
+    return result;
+  }
 }
 
 exprt smt2_parsert::function_application(
@@ -839,8 +849,9 @@ void smt2_parsert::setup_expressions()
   };
 
   expressions["let"] = [this] { return let_expression(); };
-  expressions["exists"] = [this] { return quantifier_expression(ID_exists); };
-  expressions["forall"] = [this] { return quantifier_expression(ID_forall); };
+  expressions["exists"] = [this] { return binding_expression(ID_exists); };
+  expressions["forall"] = [this] { return binding_expression(ID_forall); };
+  expressions["lambda"] = [this] { return binding_expression(ID_lambda); };
   expressions["and"] = [this] { return multi_ary(ID_and, operands()); };
   expressions["or"] = [this] { return multi_ary(ID_or, operands()); };
   expressions["xor"] = [this] { return multi_ary(ID_xor, operands()); };
