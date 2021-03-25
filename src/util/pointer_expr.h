@@ -462,4 +462,69 @@ public:
   }
 };
 
+/// \brief A base class for a predicate that indicates that an
+/// address range is ok to read or write
+class r_or_w_ok_exprt : public binary_predicate_exprt
+{
+public:
+  explicit r_or_w_ok_exprt(irep_idt id, exprt pointer, exprt size)
+    : binary_predicate_exprt(std::move(pointer), id, std::move(size))
+  {
+  }
+
+  const exprt &pointer() const
+  {
+    return op0();
+  }
+
+  const exprt &size() const
+  {
+    return op1();
+  }
+};
+
+inline const r_or_w_ok_exprt &to_r_or_w_ok_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_r_ok || expr.id() == ID_w_ok);
+  auto &ret = static_cast<const r_or_w_ok_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief A predicate that indicates that an address range is ok to read
+class r_ok_exprt : public r_or_w_ok_exprt
+{
+public:
+  explicit r_ok_exprt(exprt pointer, exprt size)
+    : r_or_w_ok_exprt(ID_r_ok, std::move(pointer), std::move(size))
+  {
+  }
+};
+
+inline const r_ok_exprt &to_r_ok_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_r_ok);
+  const r_ok_exprt &ret = static_cast<const r_ok_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief A predicate that indicates that an address range is ok to write
+class w_ok_exprt : public r_or_w_ok_exprt
+{
+public:
+  explicit w_ok_exprt(exprt pointer, exprt size)
+    : r_or_w_ok_exprt(ID_w_ok, std::move(pointer), std::move(size))
+  {
+  }
+};
+
+inline const w_ok_exprt &to_w_ok_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_w_ok);
+  const w_ok_exprt &ret = static_cast<const w_ok_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H

@@ -1261,7 +1261,7 @@ void goto_checkt::pointer_primitive_check(
     return;
 
   const exprt pointer = (expr.id() == ID_r_ok || expr.id() == ID_w_ok)
-                          ? to_binary_expr(expr).lhs()
+                          ? to_r_or_w_ok_expr(expr).pointer()
                           : to_unary_expr(expr).op();
 
   CHECK_RETURN(pointer.type().id() == ID_pointer);
@@ -1822,7 +1822,7 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
       expr.operands().size() == 2, "r/w_ok must have two operands");
 
     const auto conditions = get_pointer_dereferenceable_conditions(
-      to_binary_expr(expr).op0(), to_binary_expr(expr).op1());
+      to_r_or_w_ok_expr(expr).pointer(), to_r_or_w_ok_expr(expr).size());
 
     exprt::operandst conjuncts;
 
