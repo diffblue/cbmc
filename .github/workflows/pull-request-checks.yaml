@@ -18,6 +18,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -78,6 +80,8 @@ jobs:
           sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
           make -C src minisat2-download
           cpanm Thread::Pool::Simple
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -129,6 +133,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -172,6 +178,8 @@ jobs:
           submodules: recursive
       - name: Fetch dependencies
         run: brew install maven flex bison parallel ccache z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -212,6 +220,8 @@ jobs:
           submodules: recursive
       - name: Fetch dependencies
         run: brew install cmake ninja maven flex bison ccache z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -254,6 +264,8 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Prepare ccache
@@ -298,6 +310,8 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Initialise Developer Command Line
@@ -439,6 +453,8 @@ jobs:
           target=$(dpkg-query -W --showformat='${Version}\n' gcc-8-base | head -n 1)
           # libgcc1 uses an epoch, thus the extra 1:
           sudo apt-get install -y --allow-downgrades --reinstall gcc g++ libgcc-s1- libstdc++6=$target liblsan0=$target libtsan0=$target libcc1-0=$target libgcc1=1:$target
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -521,6 +537,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
