@@ -24,16 +24,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
-std::size_t exprt::size() const
+/// Returns the size of the exprt added to count without searching significantly
+/// beyond the supplied limit.
+std::size_t exprt::bounded_size(std::size_t count, std::size_t limit) const
 {
-  // Initial size of 1 to count self.
-  std::size_t size = 1;
-  for(const auto &op : operands())
+  const auto &ops = operands();
+  count += ops.size();
+  for(const auto &op : ops)
   {
-    size += op.size();
+    if(count >= limit)
+    {
+      return count;
+    }
+    count = op.bounded_size(count, limit);
   }
+  return count;
+}
 
-  return size;
+/// Returns the size of the exprt without significantly searching beyond the
+/// supplied limit.
+std::size_t exprt::bounded_size(std::size_t limit) const
+{
+  return bounded_size(1, limit);
 }
 
 /// Return whether the expression is a constant.
