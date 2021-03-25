@@ -329,8 +329,8 @@ void interval_abstract_valuet::output(
 abstract_object_pointert
 interval_abstract_valuet::merge(abstract_object_pointert other) const
 {
-  interval_abstract_value_pointert cast_other =
-    std::dynamic_pointer_cast<const interval_abstract_valuet>(other);
+  abstract_value_pointert cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(cast_other)
   {
     return merge_intervals(cast_other);
@@ -342,31 +342,31 @@ interval_abstract_valuet::merge(abstract_object_pointert other) const
 }
 
 /// Merge another interval abstract object with this one
-/// \param other The interval abstract object to merge with
+/// \param other The abstract value object to merge with
 /// \return This if the other interval is subsumed by this,
 ///          other if this is subsumed by other.
 ///          Otherwise, a new interval abstract object
 ///          with the smallest interval that subsumes both
 ///          this and other
-abstract_object_pointert interval_abstract_valuet::merge_intervals(
-  interval_abstract_value_pointert other) const
+abstract_object_pointert
+interval_abstract_valuet::merge_intervals(abstract_value_pointert &other) const
 {
-  if(is_bottom() || other->interval.contains(interval))
-  {
-    return other;
-  }
-  else if(other->is_bottom() || interval.contains(other->interval))
-  {
+  if(other->is_bottom())
     return shared_from_this();
-  }
-  else
-  {
-    return std::make_shared<interval_abstract_valuet>(constant_interval_exprt(
-      constant_interval_exprt::get_min(
-        interval.get_lower(), other->interval.get_lower()),
-      constant_interval_exprt::get_max(
-        interval.get_upper(), other->interval.get_upper())));
-  }
+
+  auto other_interval = other->to_interval();
+
+  if(is_bottom())
+    return std::make_shared<interval_abstract_valuet>(other_interval);
+
+  if(interval.contains(other_interval))
+    return shared_from_this();
+
+  return std::make_shared<interval_abstract_valuet>(constant_interval_exprt(
+    constant_interval_exprt::get_min(
+      interval.get_lower(), other_interval.get_lower()),
+    constant_interval_exprt::get_max(
+      interval.get_upper(), other_interval.get_upper())));
 }
 
 abstract_object_pointert

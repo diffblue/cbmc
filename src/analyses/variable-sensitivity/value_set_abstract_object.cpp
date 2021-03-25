@@ -9,6 +9,7 @@
 /// \file
 /// Value Set Abstract Object
 
+#include "interval_abstract_value.h"
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
@@ -162,6 +163,18 @@ value_set_abstract_objectt::value_range_implementation() const
   return make_value_set_value_range(values);
 }
 
+exprt value_set_abstract_objectt::to_constant() const
+{
+  verify();
+  return values.size() == 1 ? (*values.begin())->to_constant()
+                            : abstract_objectt::to_constant();
+}
+
+constant_interval_exprt value_set_abstract_objectt::to_interval() const
+{
+  return values.to_interval();
+}
+
 abstract_object_pointert value_set_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -199,7 +212,8 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 
   if(unwrapped_values.size() > max_value_set_size)
   {
-    return unwrapped_values.to_interval();
+    return std::make_shared<interval_abstract_valuet>(
+      unwrapped_values.to_interval());
   }
   //if(unwrapped_values.size() == 1)
   //{

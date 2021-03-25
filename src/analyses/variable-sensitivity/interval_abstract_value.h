@@ -41,7 +41,7 @@ public:
   value_range_implementation_ptrt value_range_implementation() const override;
 
   exprt to_constant() const override;
-  const constant_interval_exprt &to_interval() const
+  constant_interval_exprt to_interval() const override
   {
     return interval;
   }
@@ -68,7 +68,7 @@ private:
     sharing_ptrt<interval_abstract_valuet>;
 
   abstract_object_pointert
-  merge_intervals(interval_abstract_value_pointert other) const;
+  merge_intervals(abstract_value_pointert &other) const;
   abstract_object_pointert
   meet_intervals(interval_abstract_value_pointert other) const;
 

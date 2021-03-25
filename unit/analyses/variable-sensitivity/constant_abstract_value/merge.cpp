@@ -62,8 +62,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with TOP")
@@ -75,8 +74,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with BOTTOM")
@@ -100,8 +98,7 @@ SCENARIO(
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_UNMODIFIED_TOP(merged);
       }
     }
     WHEN("merging TOP with TOP")
@@ -113,8 +110,7 @@ SCENARIO(
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_UNMODIFIED_TOP(merged);
       }
     }
     WHEN("merging TOP with BOTTOM")
@@ -126,8 +122,7 @@ SCENARIO(
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_UNMODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM with 1")
@@ -151,8 +146,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM with BOTTOM")
@@ -164,8 +158,7 @@ SCENARIO(
 
       THEN("result is unmodified BOTTOM")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_BOTTOM(merged.result);
+        EXPECT_UNMODIFIED_BOTTOM(merged);
       }
     }
   }
@@ -181,8 +174,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with BOTTOM")
@@ -206,8 +198,7 @@ SCENARIO(
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_UNMODIFIED_TOP(merged);
       }
     }
     WHEN("merging TOP constant with BOTTOM")
@@ -219,8 +210,7 @@ SCENARIO(
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_UNMODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM constant with TOP")
@@ -232,8 +222,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM constant with BOTTOM")
@@ -245,8 +234,7 @@ SCENARIO(
 
       THEN("result is unmodified BOTTOM")
       {
-        EXPECT_UNMODIFIED(merged);
-        EXPECT_BOTTOM(merged.result);
+        EXPECT_UNMODIFIED_BOTTOM(merged);
       }
     }
   }
@@ -274,8 +262,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with [2, 2]")
@@ -287,8 +274,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM with [1, 1]")
@@ -312,8 +298,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
   }
@@ -341,8 +326,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with { 1, 2 }")
@@ -354,8 +338,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with { [ 1, 1 ] }")
@@ -381,8 +364,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with { [ 1, 2 ] }")
@@ -395,8 +377,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging 1 with { 1, [ 1, 2 ] }")
@@ -409,8 +390,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM with { 1 }")
@@ -434,8 +414,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM with { [ 1, 1 ] }")
@@ -461,8 +440,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
     WHEN("merging BOTTOM with { 1, [ 1, 2 ] }")
@@ -475,8 +453,7 @@ SCENARIO(
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(merged);
-        EXPECT_TOP(merged.result);
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
   }

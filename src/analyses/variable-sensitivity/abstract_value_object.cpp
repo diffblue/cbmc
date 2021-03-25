@@ -631,9 +631,15 @@ private:
     auto unwrapped_values = unwrap_and_extract_values(new_values);
 
     if(unwrapped_values.size() > value_set_abstract_objectt::max_value_set_size)
-      return unwrapped_values.to_interval();
+      return make_interval(unwrapped_values);
 
     return make_value_set(unwrapped_values);
+  }
+
+  static abstract_object_pointert
+  make_interval(const abstract_object_sett &values)
+  {
+    return std::make_shared<interval_abstract_valuet>(values.to_interval());
   }
 
   static abstract_object_pointert

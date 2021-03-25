@@ -60,6 +60,12 @@ std::shared_ptr<const interval_abstract_valuet> make_top_interval()
     signedbv_typet(32), true, false);
 }
 
+std::shared_ptr<const interval_abstract_valuet> make_bottom_interval()
+{
+  return std::make_shared<interval_abstract_valuet>(
+    signedbv_typet(32), false, true);
+}
+
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
 {
@@ -292,6 +298,24 @@ void EXPECT_UNMODIFIED(
 }
 
 void EXPECT_UNMODIFIED(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  bool modified,
+  exprt lower_value,
+  exprt upper_value)
+{
+  CHECK_FALSE(modified);
+  EXPECT(result, lower_value, upper_value);
+}
+
+void EXPECT_UNMODIFIED(
+  merge_result<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value)
+{
+  EXPECT_UNMODIFIED(result.result, result.modified, lower_value, upper_value);
+}
+
+void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
   const std::vector<exprt> &expected_values)
@@ -321,6 +345,24 @@ void EXPECT_MODIFIED(
   exprt expected_value)
 {
   EXPECT_MODIFIED(result.result, result.modified, expected_value);
+}
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  bool modified,
+  exprt lower_value,
+  exprt upper_value)
+{
+  CHECK(modified);
+  EXPECT(result, lower_value, upper_value);
+}
+
+void EXPECT_MODIFIED(
+  merge_result<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value)
+{
+  EXPECT_MODIFIED(result.result, result.modified, lower_value, upper_value);
 }
 
 void EXPECT_MODIFIED(

@@ -91,6 +91,11 @@ exprt constant_abstract_valuet::to_constant() const
   }
 }
 
+constant_interval_exprt constant_abstract_valuet::to_interval() const
+{
+  return constant_interval_exprt(value, value);
+}
+
 void constant_abstract_valuet::output(
   std::ostream &out,
   const ai_baset &ai,

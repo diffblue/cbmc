@@ -36,6 +36,7 @@ public:
   value_range_implementation_ptrt value_range_implementation() const override;
 
   exprt to_constant() const override;
+  constant_interval_exprt to_interval() const override;
 
   void output(
     std::ostream &out,

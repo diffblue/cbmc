@@ -36,12 +36,8 @@ public:
   value_range_implementation_ptrt value_range_implementation() const override;
 
   /// \copydoc abstract_objectt::to_constant
-  exprt to_constant() const override
-  {
-    verify();
-    return values.size() == 1 ? (*values.begin())->to_constant()
-                              : abstract_objectt::to_constant();
-  }
+  exprt to_constant() const override;
+  constant_interval_exprt to_interval() const override;
 
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object

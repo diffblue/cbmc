@@ -37,7 +37,7 @@ void abstract_object_sett::output(
   join_strings(out, output_values.begin(), output_values.end(), ", ");
 }
 
-abstract_object_pointert abstract_object_sett::to_interval()
+constant_interval_exprt abstract_object_sett::to_interval() const
 {
   PRECONDITION(!values.empty());
 
@@ -49,6 +49,5 @@ abstract_object_pointert abstract_object_sett::to_interval()
     lower_expr = constant_interval_exprt::get_min(lower_expr, value_expr);
     upper_expr = constant_interval_exprt::get_max(upper_expr, value_expr);
   }
-  return std::make_shared<interval_abstract_valuet>(
-    constant_interval_exprt(lower_expr, upper_expr));
+  return constant_interval_exprt(lower_expr, upper_expr);
 }

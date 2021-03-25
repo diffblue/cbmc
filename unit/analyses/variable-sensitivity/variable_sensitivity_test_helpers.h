@@ -26,6 +26,7 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
   abstract_environmentt &env,
   namespacet &ns);
 std::shared_ptr<const interval_abstract_valuet> make_top_interval();
+std::shared_ptr<const interval_abstract_valuet> make_bottom_interval();
 
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
@@ -92,6 +93,30 @@ void EXPECT_UNMODIFIED(merge_result<const abstract_typet> &result)
   EXPECT_UNMODIFIED(ao, result.modified);
 }
 
+template <class abstract_typet>
+void EXPECT_UNMODIFIED_TOP(merge_result<const abstract_typet> &result)
+{
+  auto ao = std::dynamic_pointer_cast<const abstract_objectt>(result.result);
+  EXPECT_UNMODIFIED(ao, result.modified);
+  EXPECT_TOP(result.result);
+}
+
+template <class abstract_typet>
+void EXPECT_UNMODIFIED_BOTTOM(merge_result<const abstract_typet> &result)
+{
+  auto ao = std::dynamic_pointer_cast<const abstract_objectt>(result.result);
+  EXPECT_UNMODIFIED(ao, result.modified);
+  EXPECT_BOTTOM(result.result);
+}
+
+template <class abstract_typet>
+void EXPECT_MODIFIED_TOP(merge_result<const abstract_typet> &result)
+{
+  auto ao = std::dynamic_pointer_cast<const abstract_objectt>(result.result);
+  EXPECT_MODIFIED(ao, result.modified);
+  EXPECT_TOP(result.result);
+}
+
 void EXPECT_MODIFIED(
   std::shared_ptr<const abstract_objectt> &result,
   bool modified);
@@ -113,6 +138,17 @@ void EXPECT_UNMODIFIED(
   exprt expected_value);
 
 void EXPECT_UNMODIFIED(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  bool modified,
+  exprt lower_value,
+  exprt upper_value);
+
+void EXPECT_UNMODIFIED(
+  merge_result<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value);
+
+void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
   const std::vector<exprt> &expected_values);
@@ -129,6 +165,17 @@ void EXPECT_MODIFIED(
 void EXPECT_MODIFIED(
   merge_result<const constant_abstract_valuet> &result,
   exprt expected_value);
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  bool modified,
+  exprt lower_value,
+  exprt upper_value);
+
+void EXPECT_MODIFIED(
+  merge_result<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value);
 
 void EXPECT_MODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
