@@ -107,4 +107,97 @@ inline shuffle_vector_exprt &to_shuffle_vector_expr(exprt &expr)
   return ret;
 }
 
+/// \brief A Boolean expression returning true, iff the result of performing
+/// operation \c kind on operands \c lhs and \c rhs in infinite-precision
+/// arithmetic cannot be represented in the type of the object that \c result
+/// points to.
+/// If \c result is a pointer, the result of the operation is stored in the
+/// object pointed to by \c result.
+class side_effect_expr_overflowt : public side_effect_exprt
+{
+public:
+  side_effect_expr_overflowt(
+    const irep_idt &kind,
+    exprt _lhs,
+    exprt _rhs,
+    exprt _result,
+    const source_locationt &loc)
+    : side_effect_exprt(
+        "overflow-" + id2string(kind),
+        {std::move(_lhs), std::move(_rhs), std::move(_result)},
+        bool_typet{},
+        loc)
+  {
+  }
+
+  exprt &lhs()
+  {
+    return op0();
+  }
+
+  const exprt &lhs() const
+  {
+    return op0();
+  }
+
+  exprt &rhs()
+  {
+    return op1();
+  }
+
+  const exprt &rhs() const
+  {
+    return op1();
+  }
+
+  exprt &result()
+  {
+    return op2();
+  }
+
+  const exprt &result() const
+  {
+    return op2();
+  }
+};
+
+template <>
+inline bool can_cast_expr<side_effect_expr_overflowt>(const exprt &base)
+{
+  if(base.id() != ID_side_effect)
+    return false;
+
+  const irep_idt &statement = to_side_effect_expr(base).get_statement();
+  return statement == ID_overflow_plus || statement == ID_overflow_mult ||
+         statement == ID_overflow_minus;
+}
+
+/// \brief Cast an exprt to a \ref side_effect_expr_overflowt
+///
+/// \a expr must be known to be \ref side_effect_expr_overflowt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref side_effect_expr_overflowt
+inline const side_effect_expr_overflowt &
+to_side_effect_expr_overflow(const exprt &expr)
+{
+  const auto &side_effect_expr = to_side_effect_expr(expr);
+  PRECONDITION(
+    side_effect_expr.get_statement() == ID_overflow_plus ||
+    side_effect_expr.get_statement() == ID_overflow_mult ||
+    side_effect_expr.get_statement() == ID_overflow_minus);
+  return static_cast<const side_effect_expr_overflowt &>(side_effect_expr);
+}
+
+/// \copydoc to_side_effect_expr_overflow(const exprt &)
+inline side_effect_expr_overflowt &to_side_effect_expr_overflow(exprt &expr)
+{
+  auto &side_effect_expr = to_side_effect_expr(expr);
+  PRECONDITION(
+    side_effect_expr.get_statement() == ID_overflow_plus ||
+    side_effect_expr.get_statement() == ID_overflow_mult ||
+    side_effect_expr.get_statement() == ID_overflow_minus);
+  return static_cast<side_effect_expr_overflowt &>(side_effect_expr);
+}
+
 #endif // CPROVER_ANSI_C_C_EXPR_H

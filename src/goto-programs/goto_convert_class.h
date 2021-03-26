@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_program.h"
 #include "destructor_tree.h"
 
+class side_effect_expr_overflowt;
+
 class goto_convertt:public messaget
 {
 public:
@@ -149,6 +151,11 @@ protected:
   void remove_gcc_conditional_expression(
     exprt &expr,
     goto_programt &dest,
+    const irep_idt &mode);
+  void remove_overflow(
+    side_effect_expr_overflowt &expr,
+    goto_programt &dest,
+    bool result_is_used,
     const irep_idt &mode);
 
   virtual void do_cpp_new(

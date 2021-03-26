@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
+#include <ansi-c/c_expr.h>
+
 bool goto_convertt::has_function_call(const exprt &expr)
 {
   forall_operands(it, expr)
@@ -588,6 +590,63 @@ void goto_convertt::remove_statement_expression(
   static_cast<exprt &>(expr)=tmp_symbol_expr;
 }
 
+void goto_convertt::remove_overflow(
+  side_effect_expr_overflowt &expr,
+  goto_programt &dest,
+  bool result_is_used,
+  const irep_idt &mode)
+{
+  const irep_idt &statement = expr.get_statement();
+  const exprt &lhs = expr.lhs();
+  const exprt &rhs = expr.rhs();
+  const exprt &result_ptr = expr.result();
+
+  // actual logic implementing the operators
+  auto const make_operation = [&statement](exprt lhs, exprt rhs) -> exprt {
+    if(statement == ID_overflow_plus)
+    {
+      return plus_exprt{lhs, rhs};
+    }
+    else if(statement == ID_overflow_minus)
+    {
+      return minus_exprt{lhs, rhs};
+    }
+    else
+    {
+      INVARIANT(
+        statement == ID_overflow_mult,
+        "the three overflow operations are add, sub and mul");
+      return mult_exprt{lhs, rhs};
+    }
+  };
+
+  // we’re basically generating this expression
+  // (*result = (result_type)((integer)lhs OP (integer)rhs)),
+  //   ((integer)result == (integer)lhs OP (integer)rhs)
+  // i.e. perform the operation (+, -, *) on arbitrary length integer,
+  // cast to result type, check if the casted result is still equivalent
+  // to the arbitrary length result.
+  auto operation = make_operation(
+    typecast_exprt{lhs, integer_typet{}}, typecast_exprt{rhs, integer_typet{}});
+
+  typecast_exprt operation_result{operation, result_ptr.type().subtype()};
+
+  code_assignt assign{dereference_exprt{result_ptr},
+                      std::move(operation_result),
+                      expr.source_location()};
+  convert_assign(assign, dest, mode);
+
+  if(result_is_used)
+  {
+    notequal_exprt overflow_check{
+      typecast_exprt{dereference_exprt{result_ptr}, integer_typet{}},
+      operation};
+    expr.swap(overflow_check);
+  }
+  else
+    expr.make_nil();
+}
+
 void goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
   goto_programt &dest,
@@ -650,6 +709,13 @@ void goto_convertt::remove_side_effect(
 
     // the result can't be used, these are void
     expr.make_nil();
+  }
+  else if(
+    statement == ID_overflow_plus || statement == ID_overflow_minus ||
+    statement == ID_overflow_mult)
+  {
+    remove_overflow(
+      to_side_effect_expr_overflow(expr), dest, result_is_used, mode);
   }
   else
   {
