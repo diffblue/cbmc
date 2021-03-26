@@ -108,9 +108,9 @@ inline shuffle_vector_exprt &to_shuffle_vector_expr(exprt &expr)
 }
 
 /// \brief A Boolean expression returning true, iff the result of performing
-/// operation \c kind on operands \c lhs and \c rhs in infinite-precision
-/// arithmetic cannot be represented in the type of the object that \c result
-/// points to.
+/// operation \c kind on operands \c a and \c b in infinite-precision arithmetic
+/// cannot be represented in the type of the object that \c result points to (or
+/// the type of \c result, if it is not a pointer).
 /// If \c result is a pointer, the result of the operation is stored in the
 /// object pointed to by \c result.
 class side_effect_expr_overflowt : public side_effect_exprt
