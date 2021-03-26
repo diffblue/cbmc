@@ -974,6 +974,13 @@ void goto_programt::instructiont::transform(
       change = true;
     }
 
+    auto new_function = f(new_call.function());
+    if(new_function.has_value())
+    {
+      new_call.function() = *new_function;
+      change = true;
+    }
+
     for(auto &a : new_call.arguments())
     {
       auto new_a = f(a);

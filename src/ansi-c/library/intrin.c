@@ -342,3 +342,45 @@ inline char _InterlockedCompareExchange8(char volatile *p, char v1, char v2)
   __CPROVER_atomic_end();
   return old;
 }
+
+/* FUNCTION: _mm_set_epi32 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_set_epi32(int e3, int e2, int e1, int e0)
+{
+  return (__m128i){.m128i_i32 = {e0, e1, e2, e3}};
+}
+#endif
+
+/* FUNCTION: _mm_setr_epi32 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_setr_epi32(int e3, int e2, int e1, int e0)
+{
+  return (__m128i){.m128i_i32 = {e3, e2, e1, e0}};
+}
+#endif
+
+/* FUNCTION: _mm_extract_epi32 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline int _mm_extract_epi32(__m128i a, const int imm8)
+{
+  return a.m128i_i32[imm8];
+}
+#endif

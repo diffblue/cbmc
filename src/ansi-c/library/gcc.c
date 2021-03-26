@@ -191,3 +191,39 @@ __CPROVER_HIDE:;
   (void)ptr;
   return size <= sizeof(__CPROVER_size_t);
 }
+
+/* FUNCTION: __builtin_ia32_vec_ext_v4si */
+
+typedef int __gcc_v4si __attribute__((__vector_size__(16)));
+
+int __builtin_ia32_vec_ext_v4si(__gcc_v4si vec, int offset)
+{
+  return *((int *)&vec + offset);
+}
+
+/* FUNCTION: __builtin_ia32_vec_ext_v2di */
+
+typedef long long __gcc_v2di __attribute__((__vector_size__(16)));
+
+long long __builtin_ia32_vec_ext_v2di(__gcc_v2di vec, int offset)
+{
+  return *((long long *)&vec + offset);
+}
+
+/* FUNCTION: __builtin_ia32_vec_ext_v16qi */
+
+typedef char __gcc_v16qi __attribute__((__vector_size__(16)));
+
+int __builtin_ia32_vec_ext_v16qi(__gcc_v16qi vec, int offset)
+{
+  return *((char *)&vec + offset);
+}
+
+/* FUNCTION: __builtin_ia32_vec_ext_v4sf */
+
+typedef float __gcc_v4sf __attribute__((__vector_size__(16)));
+
+float __builtin_ia32_vec_ext_v4sf(__gcc_v4sf vec, int offset)
+{
+  return *((float *)&vec + offset);
+}

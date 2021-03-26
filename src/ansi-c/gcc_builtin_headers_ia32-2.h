@@ -377,8 +377,8 @@ __gcc_v8di __builtin_ia32_pternlogq512_mask(__gcc_v8di, __gcc_v8di, __gcc_v8di, 
 __gcc_v8di __builtin_ia32_pternlogq512_maskz(__gcc_v8di, __gcc_v8di, __gcc_v8di, int, unsigned char);
 __gcc_v16sf __builtin_ia32_copysignps512(__gcc_v16sf, __gcc_v16sf);
 __gcc_v8df __builtin_ia32_copysignpd512(__gcc_v8df, __gcc_v8df);
-__gcc_v8df __builtin_ia32_sqrtpd512(__gcc_v8df);
-__gcc_v16sf __builtin_ia32_sqrtps512(__gcc_v16sf);
+__gcc_v8df __builtin_ia32_sqrtpd512(__gcc_v8df, ...);
+__gcc_v16sf __builtin_ia32_sqrtps512(__gcc_v16sf, ...);
 __gcc_v16sf __builtin_ia32_exp2ps(__gcc_v16sf);
 __gcc_v16si __builtin_ia32_roundpd_az_vec_pack_sfix512(__gcc_v8df, __gcc_v8df);
 __gcc_v16si __builtin_ia32_floorpd_vec_pack_sfix512(__gcc_v8df, __gcc_v8df, const int);
