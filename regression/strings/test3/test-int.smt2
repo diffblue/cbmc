@@ -1,5 +1,5 @@
 (set-option :produce-models true)
-(set-logic ALL_SUPPORTED)
+(set-logic ALL)
 
 (declare-fun s () String)
 (declare-fun s2 () String)
