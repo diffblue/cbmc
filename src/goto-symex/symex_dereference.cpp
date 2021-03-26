@@ -211,7 +211,7 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
     return cache_key;
   }();
 
-  if(auto cached = state.dereference_cache.lookup(cache_key))
+  if(auto cached = state.dereference_cache.find(cache_key))
   {
     return *cached;
   }

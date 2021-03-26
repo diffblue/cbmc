@@ -24,19 +24,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 // by the parent class.
 class goto_symex_statet;
 
-/// This is used for eliminating repeated complicated dereferences.
-/// This is pretty much just a simple wrapper around a map.
-/// \see goto_symext::dereference_rec
-struct dereference_cachet
-{
-private:
-  std::unordered_map<exprt, symbol_exprt, irep_hash> cache;
-
-public:
-  optionalt<symbol_exprt> lookup(const exprt &pointer) const;
-  void insert(exprt new_cached_pointer_expr, symbol_exprt new_cache_symbol);
-};
-
 /// Container for data that varies per program point, e.g. the constant
 /// propagator state, when state needs to branch. This is copied out of
 /// goto_symex_statet at a control-flow fork and then back into it at a
@@ -51,7 +38,9 @@ protected:
   symex_level2t level2;
 
 public:
-  dereference_cachet dereference_cache;
+  /// This is used for eliminating repeated complicated dereferences.
+  /// \see goto_symext::dereference_rec
+  sharing_mapt<exprt, symbol_exprt, false, irep_hash> dereference_cache;
 
   const symex_level2t &get_level2() const
   {
