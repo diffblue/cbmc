@@ -166,8 +166,15 @@ value_set_abstract_objectt::value_range_implementation() const
 exprt value_set_abstract_objectt::to_constant() const
 {
   verify();
-  return values.size() == 1 ? (*values.begin())->to_constant()
-                            : abstract_objectt::to_constant();
+
+  if(values.size() == 1)
+    return values.first()->to_constant();
+
+  auto interval = to_interval();
+  if(interval.is_single_value_interval())
+    return interval.get_lower();
+
+  return abstract_objectt::to_constant();
 }
 
 constant_interval_exprt value_set_abstract_objectt::to_interval() const

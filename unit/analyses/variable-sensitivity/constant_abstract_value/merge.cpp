@@ -354,6 +354,19 @@ SCENARIO(
         EXPECT_UNMODIFIED(merged, val1);
       }
     }
+    WHEN("merging 1 with { 1, [1, 1] }")
+    {
+      auto op1 = make_constant(val1, environment, ns);
+      auto op2 = make_value_set(
+        {val1, constant_interval_exprt(val1, val1)}, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is unmodified 1")
+      {
+        EXPECT_UNMODIFIED(merged, val1);
+      }
+    }
     WHEN("merging 1 with { [ 2, 2 ] }")
     {
       auto op1 = make_constant(val1, environment, ns);
