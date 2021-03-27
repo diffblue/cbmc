@@ -33,10 +33,7 @@ public:
 
   // overloading
 
-  bool merge(
-    const invariant_set_domaint &other,
-    locationt,
-    locationt)
+  bool merge(const invariant_set_domaint &other, trace_ptrt, trace_ptrt)
   {
     bool changed=invariant_set.make_union(other.invariant_set) ||
                  has_values.is_false();

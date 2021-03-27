@@ -638,8 +638,8 @@ bool constant_propagator_domaint::valuest::meet(
 /// \return Return true if "this" has changed.
 bool constant_propagator_domaint::merge(
   const constant_propagator_domaint &other,
-  locationt,
-  locationt)
+  trace_ptrt,
+  trace_ptrt)
 {
   return values.merge(other.values);
 }

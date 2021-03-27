@@ -71,10 +71,7 @@ public:
     return has_values.is_true();
   }
 
-  bool merge(
-    const custom_bitvector_domaint &b,
-    locationt from,
-    locationt to);
+  bool merge(const custom_bitvector_domaint &b, trace_ptrt from, trace_ptrt to);
 
   typedef unsigned long long bit_vectort;
 

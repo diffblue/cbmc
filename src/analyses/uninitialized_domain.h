@@ -74,10 +74,8 @@ public:
   }
 
   // returns true iff there is something new
-  bool merge(
-    const uninitialized_domaint &other,
-    locationt from,
-    locationt to);
+  bool
+  merge(const uninitialized_domaint &other, trace_ptrt from, trace_ptrt to);
 
 private:
   tvt has_values;

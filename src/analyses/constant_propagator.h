@@ -48,8 +48,8 @@ public:
 
   bool merge(
     const constant_propagator_domaint &other,
-    locationt from,
-    locationt to);
+    trace_ptrt from,
+    trace_ptrt to);
 
   virtual bool ai_simplify(
     exprt &condition,

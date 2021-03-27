@@ -326,10 +326,7 @@ void escape_domaint::output(
   }
 }
 
-bool escape_domaint::merge(
-  const escape_domaint &b,
-  locationt,
-  locationt)
+bool escape_domaint::merge(const escape_domaint &b, trace_ptrt, trace_ptrt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

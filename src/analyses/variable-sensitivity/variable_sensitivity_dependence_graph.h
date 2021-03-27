@@ -134,8 +134,8 @@ public:
 
   bool merge(
     const variable_sensitivity_domaint &b,
-    locationt from,
-    locationt to) override;
+    trace_ptrt from,
+    trace_ptrt to) override;
 
   void merge_three_way_function_return(
     const ai_domain_baset &function_call,

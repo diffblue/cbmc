@@ -80,8 +80,8 @@ void uninitialized_domaint::output(
 /// \return returns true iff there is something new
 bool uninitialized_domaint::merge(
   const uninitialized_domaint &other,
-  locationt,
-  locationt)
+  trace_ptrt,
+  trace_ptrt)
 {
   auto old_uninitialized=uninitialized.size();
 

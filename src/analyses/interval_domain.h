@@ -48,10 +48,7 @@ protected:
   bool join(const interval_domaint &b);
 
 public:
-  bool merge(
-    const interval_domaint &b,
-    locationt,
-    locationt)
+  bool merge(const interval_domaint &b, trace_ptrt, trace_ptrt)
   {
     return join(b);
   }

@@ -675,8 +675,8 @@ bool rd_range_domaint::merge_inner(
 
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
-  locationt,
-  locationt)
+  trace_ptrt,
+  trace_ptrt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

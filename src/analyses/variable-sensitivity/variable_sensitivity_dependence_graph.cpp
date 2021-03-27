@@ -399,8 +399,8 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
  */
 bool variable_sensitivity_dependence_domaint::merge(
   const variable_sensitivity_domaint &b,
-  locationt from,
-  locationt to)
+  trace_ptrt from,
+  trace_ptrt to)
 {
   bool changed = false;
 
