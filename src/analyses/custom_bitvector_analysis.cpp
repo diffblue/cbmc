@@ -609,8 +609,8 @@ void custom_bitvector_domaint::output(
 
 bool custom_bitvector_domaint::merge(
   const custom_bitvector_domaint &b,
-  locationt,
-  locationt)
+  trace_ptrt,
+  trace_ptrt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

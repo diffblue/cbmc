@@ -197,8 +197,8 @@ void global_may_alias_domaint::output(
 
 bool global_may_alias_domaint::merge(
   const global_may_alias_domaint &b,
-  locationt,
-  locationt)
+  trace_ptrt,
+  trace_ptrt)
 {
   bool changed=has_values.is_false();
   has_values=tvt::unknown();

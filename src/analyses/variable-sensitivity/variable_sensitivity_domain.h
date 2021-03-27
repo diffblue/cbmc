@@ -157,7 +157,7 @@ public:
   ///
   /// \return true if something has changed.
   virtual bool
-  merge(const variable_sensitivity_domaint &b, locationt from, locationt to);
+  merge(const variable_sensitivity_domaint &b, trace_ptrt from, trace_ptrt to);
 
   /// Perform a context aware merge of the changes that have been applied
   /// between function_start and the current state. Anything that has not been

@@ -73,10 +73,7 @@ public:
   {
   }
 
-  bool merge(
-    const dep_graph_domaint &src,
-    goto_programt::const_targett from,
-    goto_programt::const_targett to);
+  bool merge(const dep_graph_domaint &src, trace_ptrt from, trace_ptrt to);
 
   void transform(
     const irep_idt &function_from,

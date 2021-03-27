@@ -48,10 +48,7 @@ public:
     const namespacet &ns) const final override;
 
   /// Abstract Interpretation domain merge function.
-  bool merge(
-    const global_may_alias_domaint &b,
-    locationt from,
-    locationt to);
+  bool merge(const global_may_alias_domaint &b, trace_ptrt from, trace_ptrt to);
 
   /// Clear list of aliases, and mark domain as bottom.
   void make_bottom() final override

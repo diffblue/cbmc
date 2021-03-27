@@ -214,9 +214,7 @@ public:
   {
     // For backwards compatability, use the location version
     return static_cast<domainT &>(dest).merge(
-      static_cast<const domainT &>(src),
-      from->current_location(),
-      to->current_location());
+      static_cast<const domainT &>(src), from, to);
   }
 };
 

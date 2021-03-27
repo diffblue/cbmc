@@ -41,10 +41,7 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final override;
 
-  bool merge(
-    const escape_domaint &b,
-    locationt from,
-    locationt to);
+  bool merge(const escape_domaint &b, trace_ptrt from, trace_ptrt to);
 
   void make_bottom() final override
   {

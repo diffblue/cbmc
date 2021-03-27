@@ -28,10 +28,7 @@ public:
     // this is bottom
   }
 
-  bool merge(
-    const is_threaded_domaint &src,
-    locationt,
-    locationt)
+  bool merge(const is_threaded_domaint &src, trace_ptrt, trace_ptrt)
   {
     INVARIANT(src.reachable,
               "Abstract states are only merged at reachable locations");

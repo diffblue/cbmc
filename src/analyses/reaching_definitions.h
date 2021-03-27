@@ -218,10 +218,7 @@ public:
   /// \param from: Not used at all.
   /// \param to: Not used at all.
   /// \return Returns true iff there is something new
-  bool merge(
-    const rd_range_domaint &other,
-    locationt from,
-    locationt to);
+  bool merge(const rd_range_domaint &other, trace_ptrt from, trace_ptrt to);
 
   bool merge_shared(
     const rd_range_domaint &other,

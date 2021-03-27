@@ -197,8 +197,8 @@ void variable_sensitivity_domaint::make_entry()
 
 bool variable_sensitivity_domaint::merge(
   const variable_sensitivity_domaint &b,
-  locationt from,
-  locationt to)
+  trace_ptrt from,
+  trace_ptrt to)
 {
 #ifdef DEBUG
   std::cout << "Merging from/to:\n " << from->location_number << " --> "

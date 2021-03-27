@@ -21,8 +21,8 @@ Date: August 2013
 
 bool dep_graph_domaint::merge(
   const dep_graph_domaint &src,
-  goto_programt::const_targett,
-  goto_programt::const_targett)
+  trace_ptrt,
+  trace_ptrt)
 {
   // An abstract state at location `to` may be non-bottom even if
   // `merge(..., `to`) has not been called so far. This is due to the special
