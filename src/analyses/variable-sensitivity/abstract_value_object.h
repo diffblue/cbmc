@@ -13,6 +13,7 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_OBJECT_H
 
 #include <analyses/variable-sensitivity/abstract_object.h>
+#include <util/interval.h>
 
 class abstract_value_tag
 {
@@ -265,6 +266,8 @@ public:
     return value_ranget(value_range_implementation());
   }
 
+  virtual constant_interval_exprt to_interval() const = 0;
+
   /// Interface for transforms
   ///
   /// \param expr: the expression to evaluate and find the result of it.
@@ -290,5 +293,7 @@ protected:
   virtual value_range_implementation_ptrt
   value_range_implementation() const = 0;
 };
+
+using abstract_value_pointert = sharing_ptrt<const abstract_value_objectt>;
 
 #endif

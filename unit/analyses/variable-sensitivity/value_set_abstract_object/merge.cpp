@@ -16,239 +16,384 @@
 #include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 
+static merge_result<const value_set_abstract_objectt>
+merge(abstract_object_pointert op1, abstract_object_pointert op2)
+{
+  bool modified;
+  auto result = abstract_objectt::merge(op1, op2, modified);
+
+  return {modified, as_value_set(result)};
+}
+
 SCENARIO(
-  "merging two value_set_abstract_objects",
+  "merging value sets",
   "[core][analyses][variable-sensitivity][value_set_abstract_object][merge]")
 {
-  GIVEN("Two value sets")
+  const typet type = signedbv_typet(32);
+  const exprt val1 = from_integer(1, type);
+  const exprt val2 = from_integer(2, type);
+  const exprt val3 = from_integer(3, type);
+  const exprt val4 = from_integer(4, type);
+  const exprt val5 = from_integer(5, type);
+  const exprt val6 = from_integer(6, type);
+
+  auto object_factory = variable_sensitivity_object_factoryt::configured_with(
+    vsd_configt::value_set());
+  auto environment = abstract_environmentt{object_factory};
+  environment.make_top();
+  auto symbol_table = symbol_tablet{};
+  auto ns = namespacet{symbol_table};
+
+  GIVEN("merging two value sets")
   {
-    const exprt val1 = from_integer(1, integer_typet());
-    const exprt val2 = from_integer(2, integer_typet());
-    const exprt val3 = from_integer(3, integer_typet());
-    const exprt val4 = from_integer(4, integer_typet());
-
-    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-      vsd_configt::value_set());
-    auto environment = abstract_environmentt{object_factory};
-    environment.make_top();
-    auto symbol_table = symbol_tablet{};
-    auto ns = namespacet{symbol_table};
-
     WHEN("merging { 1 } with { 1 }")
     {
       auto op1 = make_value_set(val1, environment, ns);
       auto op2 = make_value_set(val1, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result { 1 } is unchanged ")
+      THEN("result is unmodified { 1 }")
       {
-        EXPECT_UNMODIFIED(value_set_result, modified, {val1});
+        EXPECT_UNMODIFIED(result, {val1});
       }
     }
-
     WHEN("merging { 1 } with { 2 }")
     {
       auto op1 = make_value_set(val1, environment, ns);
       auto op2 = make_value_set(val2, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is { 1, 2 }")
+      THEN("result is modified { 1, 2 }")
       {
-        EXPECT(value_set_result, {val1, val2});
+        EXPECT_MODIFIED(result, {val1, val2});
       }
     }
-
     WHEN("merging { 1, 2 } with { 2 }")
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_value_set(val2, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result { 1, 2 } is unchanged")
+      THEN("result unmodified { 1, 2 }")
       {
-        EXPECT_UNMODIFIED(value_set_result, modified, {val1, val2});
+        EXPECT_UNMODIFIED(result, {val1, val2});
       }
     }
-
     WHEN("merging { 1, 2 } with { 3, 4 }")
     {
       auto op1 = make_value_set({val1, val2}, environment, ns);
       auto op2 = make_value_set({val3, val4}, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is { 1, 2, 3, 4 }")
+      THEN("result is modified { 1, 2, 3, 4 }")
       {
-        EXPECT(value_set_result, {val1, val2, val3, val4});
+        EXPECT_MODIFIED(result, {val1, val2, val3, val4});
       }
     }
-
     WHEN("merging { 1, 2, 3 } with { 1, 3, 4 }")
     {
       auto op1 = make_value_set({val1, val2, val3}, environment, ns);
       auto op2 = make_value_set({val1, val3, val4}, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is { 1, 2, 3, 4 }")
+      THEN("result is modified { 1, 2, 3, 4 }")
       {
-        EXPECT(value_set_result, {val1, val2, val3, val4});
+        EXPECT_MODIFIED(result, {val1, val2, val3, val4});
+      }
+    }
+    WHEN("merging {1, 2} with TOP")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto top2 = make_top_value_set();
+
+      auto merged = merge(op1, top2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging {1, 2} with BOTTOM")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto bottom2 = make_bottom_value_set();
+
+      auto merged = merge(op1, bottom2);
+
+      THEN("result is unmodified {1, 2}")
+      {
+        EXPECT_UNMODIFIED(merged, {val1, val2});
+      }
+    }
+    WHEN("merging TOP with {1, 2}")
+    {
+      auto top1 = make_top_value_set();
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+
+      auto merged = merge(top1, op2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging TOP with TOP")
+    {
+      auto top1 = make_top_value_set();
+      auto top2 = make_top_value_set();
+
+      auto merged = merge(top1, top2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging TOP with BOTTOM")
+    {
+      auto top1 = make_top_value_set();
+      auto bottom2 = make_bottom_value_set();
+
+      auto merged = merge(top1, bottom2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM with {1, 2}")
+    {
+      auto bottom1 = make_bottom_value_set();
+      auto op2 = make_value_set({val1, val2}, environment, ns);
+
+      auto merged = merge(bottom1, op2);
+
+      THEN("result is modified {1, 2}")
+      {
+        EXPECT_MODIFIED(merged, {val1, val2});
+      }
+    }
+    WHEN("merging BOTTOM with TOP")
+    {
+      auto bottom1 = make_bottom_value_set();
+      auto top2 = make_top_value_set();
+
+      auto merged = merge(bottom1, top2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM with BOTTOM")
+    {
+      auto bottom1 = make_bottom_value_set();
+      auto bottom2 = make_bottom_value_set();
+
+      auto merged = merge(bottom1, bottom2);
+
+      THEN("result is unmodified BOTTOM")
+      {
+        EXPECT_UNMODIFIED_BOTTOM(merged);
       }
     }
   }
-}
 
-SCENARIO(
-  "merging a value_set with a constant",
-  "[core][analyses][variable-sensitivity][value_set_abstract_object][merge]")
-{
-  GIVEN("A value set and a constant")
+  GIVEN("merging a value_set and an abstract object")
   {
-    const exprt val1 = from_integer(1, integer_typet());
-    const exprt val2 = from_integer(2, integer_typet());
-    const exprt val3 = from_integer(3, integer_typet());
-    const exprt val4 = from_integer(4, integer_typet());
+    WHEN("merging {1, 2} with TOP")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto top2 = make_top_object();
 
-    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-      vsd_configt::value_set());
-    auto environment = abstract_environmentt{object_factory};
-    environment.make_top();
-    auto symbol_table = symbol_tablet{};
-    auto ns = namespacet{symbol_table};
+      auto merged = merge(op1, top2);
 
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging {1, 2} with BOTTOM")
+    {
+      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto bottom2 = make_bottom_object();
+
+      auto merged = merge(op1, bottom2);
+
+      THEN("result is unmodified {1, 2}")
+      {
+        EXPECT_UNMODIFIED(merged, {val1, val2});
+      }
+    }
+    WHEN("merging TOP value set with TOP")
+    {
+      auto top1 = make_top_value_set();
+      auto top2 = make_top_object();
+
+      auto merged = merge(top1, top2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging TOP value set with BOTTOM")
+    {
+      auto top1 = make_top_value_set();
+      auto bottom2 = make_bottom_object();
+
+      auto merged = merge(top1, bottom2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM value set with TOP")
+    {
+      auto bottom1 = make_bottom_value_set();
+      auto top2 = make_top_object();
+
+      auto merged = merge(bottom1, top2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM value set with BOTTOM")
+    {
+      auto bottom1 = make_bottom_value_set();
+      auto top2 = make_bottom_object();
+
+      auto merged = merge(bottom1, top2);
+
+      THEN("result is unmodified BOTTOM")
+      {
+        EXPECT_UNMODIFIED_BOTTOM(merged);
+      }
+    }
+  }
+
+  GIVEN("merging a value set and a constant")
+  {
     WHEN("merging { 1 } with 1")
     {
       auto op1 = make_value_set(val1, environment, ns);
       auto op2 = make_constant(val1, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result { 1 } is unchanged ")
+      THEN("result unmodified { 1 }")
       {
-        EXPECT_UNMODIFIED(value_set_result, modified, {val1});
+        EXPECT_UNMODIFIED(result, {val1});
       }
     }
-
     WHEN("merging { 1 } with 2")
     {
       auto op1 = make_value_set(val1, environment, ns);
       auto op2 = make_constant(val2, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is { 1, 2 }")
+      THEN("result is modified { 1, 2 }")
       {
-        EXPECT(value_set_result, {val1, val2});
+        EXPECT_MODIFIED(result, {val1, val2});
       }
     }
-
-    WHEN("merging { 1, 2 } with 2")
+    WHEN("merging { 1, 2, 3 } with 2")
     {
-      auto op1 = make_value_set({val1, val2}, environment, ns);
+      auto op1 = make_value_set({val1, val2, val3}, environment, ns);
       auto op2 = make_constant(val2, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result { 1, 2 } is unchanged")
+      THEN("result is unmodified { 1, 2, 3 }")
       {
-        EXPECT_UNMODIFIED(value_set_result, modified, {val1, val2});
+        EXPECT_UNMODIFIED(result, {val1, val2, val3});
+      }
+    }
+    WHEN("merging { 1, 3 } with 2")
+    {
+      auto op1 = make_value_set({val1, val3}, environment, ns);
+      auto op2 = make_constant(val2, environment, ns);
+
+      auto result = merge(op1, op2);
+
+      THEN("result is modified { 1, 2, 3 }")
+      {
+        EXPECT_MODIFIED(result, {val1, val2, val3});
+      }
+    }
+    WHEN("merging BOTTOM with 2")
+    {
+      auto op1 = make_bottom_value_set();
+      auto op2 = make_constant(val2, environment, ns);
+
+      auto result = merge(op1, op2);
+
+      THEN("result is modified { 2 }")
+      {
+        EXPECT_MODIFIED(result, {val2});
       }
     }
   }
-}
 
-SCENARIO(
-  "merging a value_set with a TOP value",
-  "[core][analyses][variable-sensitivity][value_set_abstract_object][merge]")
-{
-  GIVEN("A value set and a TOP constant")
+  GIVEN("merging a value_set and an interval")
   {
-    const exprt val1 = from_integer(1, integer_typet());
-    const exprt val2 = from_integer(2, integer_typet());
+    auto interval_1_5 = constant_interval_exprt(val1, val5);
 
-    auto object_factory = variable_sensitivity_object_factoryt::configured_with(
-      vsd_configt::value_set());
-    auto environment = abstract_environmentt{object_factory};
-    environment.make_top();
-    auto symbol_table = symbol_tablet{};
-    auto ns = namespacet{symbol_table};
-
-    WHEN("merging { 1, 2 } with TOP constant")
+    WHEN("merging { 1, 2, 3 } with [1, 5]")
     {
-      auto op1 = make_value_set({val1, val2}, environment, ns);
-      auto op2 = std::make_shared<constant_abstract_valuet>(val1.type());
-      REQUIRE(op2->is_top());
+      auto op1 = make_value_set({val1, val3, val5}, environment, ns);
+      auto op2 = make_interval(val1, val5, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto merged = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is top")
+      THEN("result is modified { 1, 3, 5, [1, 5]}")
       {
-        EXPECT_TOP(value_set_result);
+        EXPECT_MODIFIED(merged, {val1, val3, val5, interval_1_5});
       }
     }
-
-    WHEN("merging { 1, 2 } with TOP interval")
+    WHEN("merging { [1, 5] } with [1, 5]")
     {
-      auto op1 = make_value_set({val1, val2}, environment, ns);
-      auto op2 =
-        std::make_shared<interval_abstract_valuet>(unsignedbv_typet(32));
-      REQUIRE(op2->is_top());
+      auto op1 = make_value_set(interval_1_5, environment, ns);
+      auto op2 = make_interval(val1, val5, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto merged = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is top")
+      THEN("result is unmodified {[1, 5]}")
       {
-        EXPECT_TOP(value_set_result);
+        EXPECT_UNMODIFIED(merged, {interval_1_5});
       }
     }
-
-    WHEN("merging { 1, 2 } with TOP value-set")
+    WHEN("merging { 1, 2, [1, 5] } with [1, 5]")
     {
-      auto op1 = make_value_set({val1, val2}, environment, ns);
-      auto op2 = std::make_shared<value_set_abstract_objectt>(val1.type());
-      REQUIRE(op2->is_top());
+      auto op1 = make_value_set({val1, val2, interval_1_5}, environment, ns);
+      auto op2 = make_interval(val1, val5, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto merged = merge(op1, op2);
 
-      auto value_set_result = as_value_set(result);
-
-      THEN("the result is top")
+      THEN("result is unmodified { 1, 2, [1, 5]}")
       {
-        EXPECT_TOP(value_set_result);
+        EXPECT_UNMODIFIED(merged, {val1, val2, interval_1_5});
+      }
+    }
+    WHEN("merging BOTTOM with [1, 5]")
+    {
+      auto op1 = make_bottom_value_set();
+      auto op2 = make_interval(val1, val5, environment, ns);
+
+      auto merged = merge(op1, op2);
+
+      THEN("result is modified {[1, 5]}")
+      {
+        EXPECT_MODIFIED(merged, {interval_1_5});
       }
     }
   }

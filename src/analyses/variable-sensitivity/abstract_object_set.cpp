@@ -37,18 +37,24 @@ void abstract_object_sett::output(
   join_strings(out, output_values.begin(), output_values.end(), ", ");
 }
 
-abstract_object_pointert abstract_object_sett::to_interval()
+constant_interval_exprt abstract_object_sett::to_interval() const
 {
   PRECONDITION(!values.empty());
 
-  exprt lower_expr = first()->to_constant();
-  exprt upper_expr = first()->to_constant();
+  const auto &initial =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(first());
+
+  exprt lower_expr = initial->to_interval().get_lower();
+  exprt upper_expr = initial->to_interval().get_upper();
   for(const auto &value : values)
   {
-    const auto &value_expr = value->to_constant();
-    lower_expr = constant_interval_exprt::get_min(lower_expr, value_expr);
-    upper_expr = constant_interval_exprt::get_max(upper_expr, value_expr);
+    const auto &v =
+      std::dynamic_pointer_cast<const abstract_value_objectt>(value);
+    const auto &value_expr = v->to_interval();
+    lower_expr =
+      constant_interval_exprt::get_min(lower_expr, value_expr.get_lower());
+    upper_expr =
+      constant_interval_exprt::get_max(upper_expr, value_expr.get_upper());
   }
-  return std::make_shared<interval_abstract_valuet>(
-    constant_interval_exprt(lower_expr, upper_expr));
+  return constant_interval_exprt(lower_expr, upper_expr);
 }

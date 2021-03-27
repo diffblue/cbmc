@@ -6,17 +6,17 @@
 
 \*******************************************************************/
 
-#include "analyses/variable-sensitivity/variable_sensitivity_test_helpers.h"
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
 SCENARIO(
-  "constants expression evaluation",
+  "value expression evaluation",
   "[core][analyses][variable-sensitivity][constant_abstract_value][value_set_"
-  "abstract_object][expression_transform]")
+  "abstract_object][interval_abstract_value][expression_transform]")
 {
   const typet type = signedbv_typet(32);
   const exprt val1 = from_integer(1, type);
@@ -595,9 +595,9 @@ SCENARIO(
       auto op2 = make_value_set({interval12, val1}, environment, ns);
       auto result = add_as_value_set(op1, op2, environment, ns);
 
-      THEN("= { [2,4], [2,3], [2,3], 2 }")
-      { // duplicate interval ok as first pass. Will be eliminated in due course.
-        EXPECT(result, {interval24, interval23, interval23, val2});
+      THEN("= { [2,4], [2,3], 2 }")
+      {
+        EXPECT(result, {interval24, interval23, val2});
       }
     }
   }

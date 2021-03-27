@@ -60,6 +60,12 @@ std::shared_ptr<const interval_abstract_valuet> make_top_interval()
     signedbv_typet(32), true, false);
 }
 
+std::shared_ptr<const interval_abstract_valuet> make_bottom_interval()
+{
+  return std::make_shared<interval_abstract_valuet>(
+    signedbv_typet(32), false, true);
+}
+
 std::shared_ptr<value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
 {
@@ -86,9 +92,25 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
   return vs;
 }
 
+std::shared_ptr<value_set_abstract_objectt> make_bottom_value_set()
+{
+  return std::make_shared<value_set_abstract_objectt>(
+    integer_typet(), false, true);
+}
+
 std::shared_ptr<value_set_abstract_objectt> make_top_value_set()
 {
   return std::make_shared<value_set_abstract_objectt>(integer_typet());
+}
+
+abstract_object_pointert make_bottom_object()
+{
+  return std::make_shared<abstract_objectt>(integer_typet(), false, true);
+}
+
+abstract_object_pointert make_top_object()
+{
+  return std::make_shared<abstract_objectt>(integer_typet(), true, false);
 }
 
 std::shared_ptr<const constant_abstract_valuet>
@@ -258,6 +280,13 @@ void EXPECT_UNMODIFIED(
   CHECK_FALSE(modified);
 }
 
+void EXPECT_MODIFIED(
+  std::shared_ptr<const abstract_objectt> &result,
+  bool modified)
+{
+  CHECK(modified);
+}
+
 void EXPECT_UNMODIFIED(
   std::shared_ptr<const constant_abstract_valuet> &result,
   bool modified,
@@ -268,12 +297,94 @@ void EXPECT_UNMODIFIED(
 }
 
 void EXPECT_UNMODIFIED(
+  merge_result<const constant_abstract_valuet> &result,
+  exprt expected_value)
+{
+  EXPECT_UNMODIFIED(result.result, result.modified, expected_value);
+}
+
+void EXPECT_UNMODIFIED(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  bool modified,
+  exprt lower_value,
+  exprt upper_value)
+{
+  CHECK_FALSE(modified);
+  EXPECT(result, lower_value, upper_value);
+}
+
+void EXPECT_UNMODIFIED(
+  merge_result<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value)
+{
+  EXPECT_UNMODIFIED(result.result, result.modified, lower_value, upper_value);
+}
+
+void EXPECT_UNMODIFIED(
   std::shared_ptr<const value_set_abstract_objectt> &result,
   bool modified,
   const std::vector<exprt> &expected_values)
 {
   CHECK_FALSE(modified);
   EXPECT(result, expected_values);
+}
+
+void EXPECT_UNMODIFIED(
+  merge_result<const value_set_abstract_objectt> &result,
+  const std::vector<exprt> &expected_values)
+{
+  EXPECT_UNMODIFIED(result.result, result.modified, expected_values);
+}
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const constant_abstract_valuet> &result,
+  bool modified,
+  exprt expected_value)
+{
+  CHECK(modified);
+  EXPECT(result, expected_value);
+}
+
+void EXPECT_MODIFIED(
+  merge_result<const constant_abstract_valuet> &result,
+  exprt expected_value)
+{
+  EXPECT_MODIFIED(result.result, result.modified, expected_value);
+}
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const interval_abstract_valuet> &result,
+  bool modified,
+  exprt lower_value,
+  exprt upper_value)
+{
+  CHECK(modified);
+  EXPECT(result, lower_value, upper_value);
+}
+
+void EXPECT_MODIFIED(
+  merge_result<const interval_abstract_valuet> &result,
+  exprt lower_value,
+  exprt upper_value)
+{
+  EXPECT_MODIFIED(result.result, result.modified, lower_value, upper_value);
+}
+
+void EXPECT_MODIFIED(
+  std::shared_ptr<const value_set_abstract_objectt> &result,
+  bool modified,
+  const std::vector<exprt> &expected_values)
+{
+  CHECK(modified);
+  EXPECT(result, expected_values);
+}
+
+void EXPECT_MODIFIED(
+  merge_result<const value_set_abstract_objectt> &result,
+  const std::vector<exprt> &expected_values)
+{
+  EXPECT_MODIFIED(result.result, result.modified, expected_values);
 }
 
 void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result)

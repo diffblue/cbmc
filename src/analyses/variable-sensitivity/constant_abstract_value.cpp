@@ -42,6 +42,11 @@ constant_abstract_valuet::constant_abstract_valuet(const typet &t)
 {
 }
 
+constant_abstract_valuet::constant_abstract_valuet(const exprt &e)
+  : abstract_value_objectt(e.type(), false, false), value(e)
+{
+}
+
 constant_abstract_valuet::constant_abstract_valuet(
   const typet &t,
   bool tp,
@@ -86,6 +91,11 @@ exprt constant_abstract_valuet::to_constant() const
   }
 }
 
+constant_interval_exprt constant_abstract_valuet::to_interval() const
+{
+  return constant_interval_exprt(value, value);
+}
+
 void constant_abstract_valuet::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -104,38 +114,25 @@ void constant_abstract_valuet::output(
 abstract_object_pointert
 constant_abstract_valuet::merge(abstract_object_pointert other) const
 {
-  constant_abstract_value_pointert cast_other =
-    std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(cast_other)
-  {
     return merge_constant_constant(cast_other);
-  }
-  else
-  {
-    // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return abstract_objectt::merge(other);
-  }
+
+  return abstract_objectt::merge(other);
 }
 
 abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
-  const constant_abstract_value_pointert &other) const
+  const abstract_value_pointert &other) const
 {
-  if(is_bottom())
-  {
-    return std::make_shared<constant_abstract_valuet>(*other);
-  }
-  else
-  {
-    // Can we actually merge these value
-    if(value == other->value)
-    {
-      return shared_from_this();
-    }
-    else
-    {
-      return abstract_objectt::merge(other);
-    }
-  }
+  auto other_expr = other->to_constant();
+  if(is_bottom() && other_expr.is_constant())
+    return std::make_shared<constant_abstract_valuet>(other_expr);
+
+  if(value == other_expr) // Can we actually merge these value
+    return shared_from_this();
+
+  return abstract_objectt::merge(other);
 }
 
 void constant_abstract_valuet::get_statistics(

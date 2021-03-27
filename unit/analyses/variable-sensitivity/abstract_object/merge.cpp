@@ -10,102 +10,172 @@
 
 #include <analyses/variable-sensitivity/abstract_object.h>
 
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <util/bitvector_types.h>
 
 SCENARIO(
-  "merge_abstract_object",
+  "merge abstract object",
   "[core][analyses][variable-sensitivity][abstract_object][merge]")
 {
-  GIVEN("Two abstract objects of type pointer")
+  GIVEN("merging two abstract objects")
   {
-    const typet object_type = signedbv_typet(32);
-    WHEN("Both are top")
+    WHEN("merging TOP with TOP")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<const abstract_objectt>(object_type, true, false);
+      abstract_object_pointert op1 = make_top_object();
+      abstract_object_pointert op2 = make_top_object();
 
-      abstract_object_pointert op2 =
-        std::make_shared<const abstract_objectt>(object_type, true, false);
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
 
-      bool modifications;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modifications);
-
-      THEN("The result is the original abstract object")
+      THEN("result is unmodified TOP")
       {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modifications);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
       }
     }
-    WHEN("The first is top, the second is bottom")
+    WHEN("merging TOP with BOTTOM")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<const abstract_objectt>(object_type, true, false);
+      abstract_object_pointert op1 = make_top_object();
+      abstract_object_pointert op2 = make_bottom_object();
 
-      abstract_object_pointert op2 =
-        std::make_shared<const abstract_objectt>(object_type, false, true);
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
 
-      bool modifications;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modifications);
-
-      THEN("The result is the original abstract object")
+      THEN("result is unmodified TOP")
       {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modifications);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1 == result);
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
       }
     }
-    WHEN("The first is bottom and the second is top")
+    WHEN("merging BOTTOM with TOP")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<const abstract_objectt>(object_type, false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<const abstract_objectt>(object_type, true, false);
+      abstract_object_pointert op1 = make_bottom_object();
+      abstract_object_pointert op2 = make_top_object();
 
-      bool modifications;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modifications);
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
 
-      THEN("The result is top and a new abstract object")
+      THEN("result is modified TOP")
       {
-        // Simple correctness of merge
-        REQUIRE(modifications);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        REQUIRE_FALSE(op1 == result);
+        EXPECT_MODIFIED(result, modified);
+        EXPECT_TOP(result);
       }
     }
-    WHEN("Both are bottom")
+    WHEN("merging BOTTOM with BOTTOM")
     {
-      abstract_object_pointert op1 =
-        std::make_shared<const abstract_objectt>(object_type, false, true);
-      abstract_object_pointert op2 =
-        std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op1 = make_bottom_object();
+      abstract_object_pointert op2 = make_bottom_object();
 
-      bool modifications;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modifications);
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
 
-      THEN("The result is the original abstract object")
+      THEN("result is unmodified BOTTOM")
       {
-        // Simple correctness of merge
-        REQUIRE_FALSE(modifications);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE(result->is_bottom());
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_BOTTOM(result);
+      }
+    }
+  }
 
-        // Is optimal
-        REQUIRE(op1 == result);
+  GIVEN("an abstract object and a constant")
+  {
+    const typet type = signedbv_typet(32);
+    const exprt val1 = from_integer(1, type);
+    const exprt val2 = from_integer(2, type);
+
+    auto config = vsd_configt::constant_domain();
+    config.context_tracking.data_dependency_context = false;
+    config.context_tracking.last_write_context = false;
+    auto object_factory =
+      variable_sensitivity_object_factoryt::configured_with(config);
+    abstract_environmentt environment{object_factory};
+    environment.make_top();
+    symbol_tablet symbol_table;
+    namespacet ns(symbol_table);
+
+    WHEN("merging TOP with 1")
+    {
+      auto top1 = make_top_object();
+      auto op2 = make_constant(val1, environment, ns);
+
+      bool modified;
+      auto result = abstract_objectt::merge(top1, op2, modified);
+
+      THEN("the result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging TOP with TOP constant")
+    {
+      auto top1 = make_top_object();
+      auto top2 = make_top_constant();
+
+      bool modified;
+      auto result = abstract_objectt::merge(top1, top2, modified);
+
+      THEN("the result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging TOP with BOTTOM constant")
+    {
+      auto top1 = make_top_object();
+      auto bottom2 = make_bottom_constant();
+
+      bool modified;
+      auto result = abstract_objectt::merge(top1, bottom2, modified);
+
+      THEN("the result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging BOTTOM with 1")
+    {
+      auto op1 = make_bottom_object();
+      auto op2 = make_constant(val1, environment, ns);
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, op2, modified);
+
+      THEN("the result is modified TOP")
+      {
+        EXPECT_MODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging BOTTOM with TOP constant")
+    {
+      auto op1 = make_bottom_object();
+      auto top2 = make_top_constant();
+
+      bool modified;
+      auto result = abstract_objectt::merge(op1, top2, modified);
+
+      THEN("the result is modified TOP")
+      {
+        EXPECT_MODIFIED(result, modified);
+        EXPECT_TOP(result);
+      }
+    }
+    WHEN("merging BOTTOM with BOTTOM constant")
+    {
+      auto bottom1 = make_bottom_object();
+      auto bottom2 = make_bottom_constant();
+
+      bool modified;
+      auto result = abstract_objectt::merge(bottom1, bottom2, modified);
+
+      THEN("result is unmodified BOTTOM")
+      {
+        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_BOTTOM(result);
       }
     }
   }

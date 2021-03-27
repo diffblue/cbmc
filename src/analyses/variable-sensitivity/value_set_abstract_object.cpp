@@ -9,6 +9,7 @@
 /// \file
 /// Value Set Abstract Object
 
+#include "interval_abstract_value.h"
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
@@ -162,6 +163,25 @@ value_set_abstract_objectt::value_range_implementation() const
   return make_value_set_value_range(values);
 }
 
+exprt value_set_abstract_objectt::to_constant() const
+{
+  verify();
+
+  if(values.size() == 1)
+    return values.first()->to_constant();
+
+  auto interval = to_interval();
+  if(interval.is_single_value_interval())
+    return interval.get_lower();
+
+  return abstract_objectt::to_constant();
+}
+
+constant_interval_exprt value_set_abstract_objectt::to_interval() const
+{
+  return values.to_interval();
+}
+
 abstract_object_pointert value_set_abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
@@ -199,7 +219,8 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 
   if(unwrapped_values.size() > max_value_set_size)
   {
-    return unwrapped_values.to_interval();
+    return std::make_shared<interval_abstract_valuet>(
+      unwrapped_values.to_interval());
   }
   //if(unwrapped_values.size() == 1)
   //{
@@ -215,19 +236,19 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 abstract_object_pointert
 value_set_abstract_objectt::merge(abstract_object_pointert other) const
 {
+  auto union_values = !is_bottom() ? values : abstract_object_sett{};
+
   auto other_value_set = std::dynamic_pointer_cast<const value_set_tag>(other);
   if(other_value_set)
   {
-    auto union_values = values;
     union_values.insert(other_value_set->get_values());
     return resolve_values(union_values);
   }
 
   auto other_value =
-    std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(other_value)
   {
-    auto union_values = values;
     union_values.insert(other_value);
     return resolve_values(union_values);
   }
@@ -254,6 +275,7 @@ void value_set_abstract_objectt::set_values(
     set_not_top();
     values = other_values;
   }
+  set_not_bottom();
   verify();
 }
 
