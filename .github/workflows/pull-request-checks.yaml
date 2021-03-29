@@ -177,7 +177,11 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install maven flex bison parallel ccache z3
+        run: |
+          brew install maven flex bison parallel ccache
+          # The commit hash below pins z3 to version 4.8.10
+          wget https://raw.githubusercontent.com/Homebrew/homebrew-core/e2c833d326c45d9aaf4e26af6dd8b2f31564dc04/Formula/z3.rb
+          brew install --HEAD -s z3.rb
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Prepare ccache
@@ -219,7 +223,11 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install cmake ninja maven flex bison ccache z3
+        run: |
+          brew install cmake ninja maven flex bison ccache
+          # The commit hash below pins z3 to version 4.8.10
+          wget https://raw.githubusercontent.com/Homebrew/homebrew-core/e2c833d326c45d9aaf4e26af6dd8b2f31564dc04/Formula/z3.rb
+          brew install --HEAD -s z3.rb
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Prepare ccache
