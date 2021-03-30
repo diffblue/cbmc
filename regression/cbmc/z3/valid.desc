@@ -1,0 +1,13 @@
+CORE
+valid.c
+--trace --smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+line 6 assertion non_det \* non_det != 12u: SUCCESS
+VERIFICATION SUCCESSFUL
+--
+line 6 assertion non_det \* non_det != 12u: ERROR
+error running SMT2 solver
+--
+Run cbmc with the --z3 option to confirm that support for the Z3 solver is
+available and working for a valid program.
