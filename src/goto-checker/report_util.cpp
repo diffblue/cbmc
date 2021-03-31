@@ -34,6 +34,7 @@ void report_success(ui_message_handlert &ui_message_handler)
 {
   messaget msg(ui_message_handler);
   msg.result() << "VERIFICATION SUCCESSFUL" << messaget::eom;
+  msg.clout() << u8"😆👍🎉" << messaget::eom;
 
   switch(ui_message_handler.get_ui())
   {
@@ -62,6 +63,7 @@ void report_failure(ui_message_handlert &ui_message_handler)
 {
   messaget msg(ui_message_handler);
   msg.result() << "VERIFICATION FAILED" << messaget::eom;
+  msg.clout() << u8"😩🐜💥" << messaget::eom;
 
   switch(ui_message_handler.get_ui())
   {
