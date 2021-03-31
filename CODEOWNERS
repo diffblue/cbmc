@@ -2,7 +2,7 @@
 # approval within two weeks.
 #
 # These owners will be the default owners for everything in the repo.
-*       @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue @hannes-steffenhagen-diffblue
+*       @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
 
 # These files should rarely change
 
@@ -42,12 +42,12 @@
 
 # These files change frequently and changes are medium-risk
 
-/src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel @hannes-steffenhagen-diffblue
-/src/goto-harness/ @martin-cs @chrisr-diffblue @peterschrammel @hannes-steffenhagen-diffblue
-/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @hannes-steffenhagen-diffblue @smowton
+/src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel
+/src/goto-harness/ @martin-cs @chrisr-diffblue @peterschrammel
+/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @smowton
 /src/goto-diff/ @tautschnig @peterschrammel
 /src/jsil/ @kroening @tautschnig
-/src/memory-analyzer/ @tautschnig @hannes-steffenhagen-diffblue
+/src/memory-analyzer/ @tautschnig @chrisr-diffblue
 /jbmc/src/jbmc/ @smowton @peterschrammel @romainbrenguier
 /jbmc/src/janalyzer/ @smowton @peterschrammel @romainbrenguier
 /jbmc/src/jdiff/ @smowton @peterschrammel
@@ -55,8 +55,8 @@
 /src/solvers/smt2 @kroening @martin-cs @tautschnig @peterschrammel @allredj @romainbrenguier
 /src/statement-list/ @kroening @tautschnig @peterschrammel @pkesseli
 
-/cmake/        @hannes-steffenhagen-diffblue
-CMakeLists.txt @hannes-steffenhagen-diffblue
+/cmake/        @diffblue/diffblue-opensource
+CMakeLists.txt @diffblue/diffblue-opensource
 
 # These files change frequently and changes are low-risk
 
