@@ -69,6 +69,12 @@ public:
     complexity_violationt complexity_violation,
     goto_symex_statet &current_state);
 
+  /// Amount of nodes in \p expr approximately bounded by limit.
+  /// This is the size of the actual tree, ignoring memory/sub-tree sharing.
+  /// Expressions that make substantial use of sharing may result in excessive
+  /// run time.
+  static std::size_t bounded_expr_size(const exprt &expr, std::size_t limit);
+
 protected:
   mutable messaget log;
 

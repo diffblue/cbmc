@@ -85,10 +85,6 @@ public:
     return static_cast<const typet &>(find(ID_type));
   }
 
-  /// Amount of nodes in this expression tree approximately bounded by limit.
-  /// This is the size of the actual tree, ignoring memory/sub-tree sharing.
-  std::size_t bounded_size(std::size_t limit) const;
-
   /// Return true if there is at least one operand.
   bool has_operands() const
   { return !operands().empty(); }
@@ -123,10 +119,6 @@ protected:
 
   const exprt &op3() const
   { return operands()[3]; }
-
-  /// Amount of nodes this expression tree contains, with a bound on how far
-  /// to search. Starts with an existing count.
-  std::size_t bounded_size(std::size_t count, std::size_t limit) const;
 
 public:
   void reserve_operands(operandst::size_type n)
