@@ -132,7 +132,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Prepare ccache
@@ -448,7 +448,7 @@ jobs:
       - name: Fetch dependencies
         run: | 
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
+          sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
           # remove libgcc-s1, which isn't normally available in Ubuntu 18.04
           target=$(dpkg-query -W --showformat='${Version}\n' gcc-8-base | head -n 1)
           # libgcc1 uses an epoch, thus the extra 1:
@@ -536,7 +536,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y g++ gcc binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache z3
+          sudo apt-get install --no-install-recommends -y g++ gcc gdb binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Prepare ccache

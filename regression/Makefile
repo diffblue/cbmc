@@ -64,7 +64,8 @@ endif
 
 ifeq ($(WITH_MEMORY_ANALYZER),1)
   DIRS += snapshot-harness \
-          memory-analyzer
+          memory-analyzer \
+          extract_type_header
 endif
 
 # Run all test directories in sequence

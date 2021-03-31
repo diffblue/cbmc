@@ -242,7 +242,16 @@ N_CATCH_TESTS = $(shell \
                 $$(printf ' -not -name %s ' $(EXCLUDED_TESTS))) | \
                   grep -E "(SCENARIO|TEST_CASE)" | grep -c -v '\[\.\]')
 
-CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT)
+memory-analyzer/input.inc: memory-analyzer/input.txt
+	../src/ansi-c/file_converter$(EXEEXT) $< > $@
+
+memory-analyzer/test.inc: memory-analyzer/test.c
+	../src/ansi-c/file_converter$(EXEEXT) $< > $@
+
+memory-analyzer/gdb_api$(OBJEXT): memory-analyzer/input.inc memory-analyzer/test.inc
+
+CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT) \
+             memory-analyzer/input.inc memory-analyzer/test.inc
 
 # only add a dependency for libraries to avoid triggering implicit rules, which
 # would cause unnecessary rebuilds
