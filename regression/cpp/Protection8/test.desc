@@ -1,0 +1,9 @@
+CORE
+main.cpp
+
+member 'A::A\(this,signed_int\)' is not accessible \(protected\)$
+^EXIT=(1|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
