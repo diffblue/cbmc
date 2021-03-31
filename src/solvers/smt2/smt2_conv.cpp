@@ -57,6 +57,7 @@ smt2_convt::smt2_convt(
     use_as_const(false),
     use_datatypes(false),
     use_array_of_bool(false),
+    use_lambda_for_array(false),
     emit_set_logic(true),
     ns(_ns),
     out(_out),
@@ -101,6 +102,7 @@ smt2_convt::smt2_convt(
   case solvert::Z3:
     use_as_const = true;
     use_array_of_bool = true;
+    use_lambda_for_array = true;
     emit_set_logic = false;
     use_datatypes = true;
     break;
@@ -1300,6 +1302,31 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       defined_expressionst::const_iterator it =
         defined_expressions.find(array_of_expr);
+      CHECK_RETURN(it != defined_expressions.end());
+      out << it->second;
+    }
+  }
+  else if(expr.id() == ID_array_comprehension)
+  {
+    const auto &array_comprehension = to_array_comprehension_expr(expr);
+
+    DATA_INVARIANT(
+      array_comprehension.type().id() == ID_array,
+      "array_comprehension expression shall have array type");
+
+    if(use_lambda_for_array)
+    {
+      out << "(lambda ((";
+      convert_expr(array_comprehension.arg());
+      out << " ";
+      convert_type(array_comprehension.type().size().type());
+      out << ")) ";
+      convert_expr(array_comprehension.body());
+      out << ")";
+    }
+    else
+    {
+      const auto &it = defined_expressions.find(array_comprehension);
       CHECK_RETURN(it != defined_expressions.end());
       out << it->second;
     }
@@ -4403,6 +4430,44 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << ")) (= (select " << id << " i) ";
         convert_expr(array_of.what());
         out << ")))\n";
+
+        defined_expressions[expr] = id;
+      }
+    }
+  }
+  else if(expr.id() == ID_array_comprehension)
+  {
+    if(!use_lambda_for_array)
+    {
+      if(defined_expressions.find(expr) == defined_expressions.end())
+      {
+        const auto &array_comprehension = to_array_comprehension_expr(expr);
+        const auto &array_size = array_comprehension.type().size();
+
+        const irep_idt id =
+          "array_comprehension." + std::to_string(defined_expressions.size());
+        out << "(declare-fun " << id << " () ";
+        convert_type(array_comprehension.type());
+        out << ")\n";
+
+        out << "; the following is a substitute for lambda i . x(i)\n";
+        out << "; universally quantified initialization of the array\n";
+        out << "(assert (forall ((";
+        convert_expr(array_comprehension.arg());
+        out << " ";
+        convert_type(array_size.type());
+        out << ")) (=> (and (bvule (_ bv0 " << boolbv_width(array_size.type())
+            << ") ";
+        convert_expr(array_comprehension.arg());
+        out << ") (bvult ";
+        convert_expr(array_comprehension.arg());
+        out << " ";
+        convert_expr(array_size);
+        out << ")) (= (select " << id << " ";
+        convert_expr(array_comprehension.arg());
+        out << ") ";
+        convert_expr(array_comprehension.body());
+        out << "))))\n";
 
         defined_expressions[expr] = id;
       }
