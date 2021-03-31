@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <string.h>
 
 #include "message.h"
 
@@ -110,17 +111,24 @@ unsigned messaget::eval_verbosity(
 
   if(!user_input.empty())
   {
-    v = unsafe_string2unsigned(user_input);
+    if(!strncmp(user_input.c_str(), u8"💯", 1))
+    {
+      v = messaget::M_GEN_Z;
+    }
+    else
+    {
+      v = unsafe_string2unsigned(user_input);
+    }
 
-    if(v > messaget::M_DEBUG)
+    if(v > messaget::M_GEN_Z)
     {
       dest.print(
         messaget::M_WARNING,
         "verbosity value " + user_input + " out of range, using debug-level (" +
-          std::to_string(messaget::M_DEBUG) + ") verbosity",
+          std::to_string(messaget::M_GEN_Z) + ") verbosity",
         source_locationt());
 
-      v = messaget::M_DEBUG;
+      v = messaget::M_GEN_Z;
     }
   }
 

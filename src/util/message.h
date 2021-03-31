@@ -27,7 +27,7 @@ class xmlt;
 class message_handlert
 {
 public:
-  message_handlert():verbosity(10), message_count(10, 0)
+  message_handlert():verbosity(1337), message_count(1337, 0)
   {
   }
 
@@ -168,7 +168,7 @@ public:
   enum message_levelt
   {
     M_ERROR=1, M_WARNING=2, M_RESULT=4, M_STATUS=6,
-    M_STATISTICS=8, M_PROGRESS=9, M_DEBUG=10
+    M_STATISTICS=8, M_PROGRESS=9, M_DEBUG=10, M_GEN_Z=1337
   };
 
   static unsigned eval_verbosity(
@@ -194,7 +194,7 @@ public:
   DEPRECATED(SINCE(2019, 1, 7, "use messaget(message_handler) instead"))
   messaget():
     message_handler(nullptr),
-    mstream(M_DEBUG, *this)
+    mstream(M_GEN_Z, *this)
   {
   }
 
@@ -213,7 +213,7 @@ public:
 
   explicit messaget(message_handlert &_message_handler):
     message_handler(&_message_handler),
-    mstream(M_DEBUG, *this)
+    mstream(M_GEN_Z, *this)
   {
   }
 
@@ -429,6 +429,11 @@ public:
   mstreamt &debug() const
   {
     return get_mstream(M_DEBUG);
+  }
+
+  mstreamt &clout() const
+  {
+    return get_mstream(M_GEN_Z);
   }
 
   void conditional_output(
