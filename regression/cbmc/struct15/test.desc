@@ -1,0 +1,11 @@
+CORE
+main.c
+--trace --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^map::at:
+key not found
+--
+This test checks the encoding of C `struct`s using SMT2 data types.

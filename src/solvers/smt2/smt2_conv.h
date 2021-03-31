@@ -209,8 +209,10 @@ protected:
 
   identifier_mapt identifier_map;
 
-  // for modeling structs as Z3 datatype, enabled when
-  // use_datatype is set
+  // for modeling structs as SMT datatype when use_datatype is set
+  //
+  // it maintains a map of `struct_typet` or `struct_tag_typet`
+  // to datatype names declared in SMT
   typedef std::map<typet, std::string> datatype_mapt;
   datatype_mapt datatype_map;
 

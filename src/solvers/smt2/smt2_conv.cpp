@@ -4890,8 +4890,10 @@ void smt2_convt::find_symbols_rec(
 
     if(recstack.find(id) == recstack.end())
     {
+      const auto &base_struct = ns.follow_tag(struct_tag);
       recstack.insert(id);
-      find_symbols_rec(ns.follow_tag(struct_tag), recstack);
+      find_symbols_rec(base_struct, recstack);
+      datatype_map[type] = datatype_map[base_struct];
     }
   }
   else if(type.id() == ID_union_tag)
