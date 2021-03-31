@@ -20,7 +20,7 @@ add_test_pl_profile(
 add_test_pl_profile(
     "cbmc-cprover-smt2"
     "$<TARGET_FILE:cbmc> --cprover-smt2"
-    "-C;-X;broken-smt-backend;-X;thorough-smt-backend;${gcc_only_string}-s;cprover-smt2"
+    "-C;-X;broken-smt-backend;-X;thorough-smt-backend;-X;broken-cprover-smt-backend;-X;thorough-cprover-smt-backend;${gcc_only_string}-s;cprover-smt2"
     "CORE"
 )
 
