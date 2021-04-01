@@ -1,3 +1,5 @@
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
+
 default: test
 
 include ../../src/config.inc
@@ -11,6 +13,8 @@ endif
 
 test:
 	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" -X smt-backend $(GCC_ONLY)
+	@$(MAKE) -f $(THIS_FILE) test-paths-lifo
+	@$(MAKE) -f $(THIS_FILE) test-cprover-smt2
 
 test-cprover-smt2:
 	@../test.pl -e -p -c "../../../src/cbmc/cbmc --cprover-smt2" \

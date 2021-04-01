@@ -85,7 +85,7 @@ test:
 .PHONY: $(DIRS)
 $(DIRS):
 	@echo "Running $@..." ;
-	$(MAKE) -C "$@" test || exit 1;
+	$(MAKE) -C "$@" || exit 1;
 
 # Run all test directories using GNU Parallel
 .PHONY: test-parallel
