@@ -24,6 +24,13 @@ add_test_pl_profile(
     "CORE"
 )
 
+add_test_pl_profile(
+    "cbmc-z3"
+    "$<TARGET_FILE:cbmc> --z3"
+    "-C;-X;broken-smt-backend;-X;thorough-smt-backend;-X;broken-z3-smt-backend;-X;thorough-z3-smt-backend;${gcc_only_string}-s;z3"
+    "CORE"
+)
+
 # solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set_property(
