@@ -98,7 +98,7 @@ void full_array_abstract_objectt::set_top_internal()
 }
 
 abstract_object_pointert
-full_array_abstract_objectt::merge(abstract_object_pointert other) const
+full_array_abstract_objectt::merge(const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const full_array_abstract_objectt>(other);

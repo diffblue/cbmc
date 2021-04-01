@@ -248,11 +248,12 @@ public:
   ///         first parameter. out_modifications will be true if the resulting
   ///         abstract object is different from op1
   static abstract_object_pointert merge(
-    abstract_object_pointert op1,
-    abstract_object_pointert op2,
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2,
     bool &out_modifications);
-  static abstract_object_pointert
-  merge(abstract_object_pointert op1, abstract_object_pointert op2);
+  static abstract_object_pointert merge(
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2);
 
   /// Interface method for the meet operation. Decides whether to use the base
   /// implementation or if a more precise abstraction is attainable.
@@ -377,7 +378,7 @@ private:
    * \return the result of the merge
    */
   virtual abstract_object_pointert
-  abstract_object_merge_internal(const abstract_object_pointert other) const;
+  abstract_object_merge_internal(const abstract_object_pointert &other) const;
 
   /// Helper function for base meet, in case additional work was needed. Base
   /// implementation simply return pointer to itself.
@@ -423,7 +424,8 @@ protected:
   /// \param other: The object to merge with this
   ///
   /// \return Returns the result of the merge.
-  virtual abstract_object_pointert merge(abstract_object_pointert other) const;
+  virtual abstract_object_pointert
+  merge(const abstract_object_pointert &other) const;
 
   /// Helper function for base meet. Two cases: return itself (if trivially
   /// contained in other); return BOTTOM otherwise.

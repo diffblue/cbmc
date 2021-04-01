@@ -72,7 +72,8 @@ protected:
   CLONE
 
   /// \copydoc abstract_object::merge
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
 
 private:
   /// Update the set of stored values to \p new_values. Build a new abstract

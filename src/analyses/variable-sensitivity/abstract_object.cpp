@@ -49,7 +49,7 @@ const typet &abstract_objectt::type() const
 }
 
 abstract_object_pointert
-abstract_objectt::merge(abstract_object_pointert other) const
+abstract_objectt::merge(const abstract_object_pointert &other) const
 {
   return abstract_object_merge(other);
 }
@@ -67,7 +67,7 @@ abstract_object_pointert abstract_objectt::abstract_object_merge(
 }
 
 abstract_object_pointert abstract_objectt::abstract_object_merge_internal(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   // Default implementation
   return shared_from_this();
@@ -180,8 +180,8 @@ void abstract_objectt::output(
 }
 
 abstract_object_pointert abstract_objectt::merge(
-  abstract_object_pointert op1,
-  abstract_object_pointert op2,
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
   bool &out_modifications)
 {
   abstract_object_pointert result = op1->should_use_base_merge(op2)
@@ -194,8 +194,8 @@ abstract_object_pointert abstract_objectt::merge(
 }
 
 abstract_object_pointert abstract_objectt::merge(
-  abstract_object_pointert op1,
-  abstract_object_pointert op2)
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2)
 {
   bool dummy;
   return merge(op1, op2, dummy);

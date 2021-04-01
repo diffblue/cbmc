@@ -238,7 +238,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 }
 
 abstract_object_pointert
-value_set_abstract_objectt::merge(abstract_object_pointert other) const
+value_set_abstract_objectt::merge(const abstract_object_pointert &other) const
 {
   auto union_values = !is_bottom() ? values : abstract_object_sett{};
 

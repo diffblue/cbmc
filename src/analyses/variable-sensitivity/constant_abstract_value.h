@@ -69,7 +69,8 @@ protected:
   /// \param other: the abstract object to merge with
   ///
   /// \return Returns the result of the merge
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
 
 private:
   /// Merges another abstract value into this one

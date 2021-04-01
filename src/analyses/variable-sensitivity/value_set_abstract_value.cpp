@@ -30,7 +30,7 @@ value_set_abstract_valuet::get_values() const
 }
 
 abstract_object_pointert
-value_set_abstract_valuet::merge(abstract_object_pointert other) const
+value_set_abstract_valuet::merge(const abstract_object_pointert &other) const
 {
   if(is_top())
   {

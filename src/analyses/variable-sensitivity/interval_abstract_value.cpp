@@ -339,7 +339,7 @@ void interval_abstract_valuet::output(
 }
 
 abstract_object_pointert
-interval_abstract_valuet::merge(abstract_object_pointert other) const
+interval_abstract_valuet::merge(const abstract_object_pointert &other) const
 {
   abstract_value_pointert cast_other =
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);

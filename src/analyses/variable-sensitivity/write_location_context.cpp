@@ -107,7 +107,7 @@ abstract_object_pointert write_location_contextt::write(
  * the current abstract object
  */
 abstract_object_pointert
-write_location_contextt::merge(abstract_object_pointert other) const
+write_location_contextt::merge(const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const write_location_contextt>(other);
@@ -162,7 +162,7 @@ write_location_contextt::merge(abstract_object_pointert other) const
  */
 abstract_object_pointert
 write_location_contextt::abstract_object_merge_internal(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   auto other_context =
     std::dynamic_pointer_cast<const write_location_contextt>(other);

@@ -121,7 +121,8 @@ protected:
   /// \param op1: the pointer being merged
   ///
   /// \return Returns the result of the merge.
-  abstract_object_pointert merge(abstract_object_pointert op1) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &op1) const override;
 
   CLONE
 

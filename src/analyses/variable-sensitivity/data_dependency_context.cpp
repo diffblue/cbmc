@@ -235,7 +235,7 @@ abstract_object_pointert data_dependency_contextt::update_location_context(
  * the current abstract object
  */
 abstract_object_pointert
-data_dependency_contextt::merge(abstract_object_pointert other) const
+data_dependency_contextt::merge(const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const data_dependency_contextt>(other);
@@ -293,7 +293,7 @@ data_dependency_contextt::merge(abstract_object_pointert other) const
  */
 abstract_object_pointert
 data_dependency_contextt::abstract_object_merge_internal(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   auto other_context =
     std::dynamic_pointer_cast<const data_dependency_contextt>(other);

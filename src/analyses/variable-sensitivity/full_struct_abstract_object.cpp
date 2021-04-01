@@ -236,7 +236,7 @@ bool full_struct_abstract_objectt::verify() const
 }
 
 abstract_object_pointert
-full_struct_abstract_objectt::merge(abstract_object_pointert other) const
+full_struct_abstract_objectt::merge(const abstract_object_pointert &other) const
 {
   constant_struct_pointert cast_other =
     std::dynamic_pointer_cast<const full_struct_abstract_objectt>(other);

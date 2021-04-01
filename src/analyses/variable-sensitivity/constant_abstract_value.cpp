@@ -112,7 +112,7 @@ void constant_abstract_valuet::output(
 }
 
 abstract_object_pointert
-constant_abstract_valuet::merge(abstract_object_pointert other) const
+constant_abstract_valuet::merge(const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);
