@@ -15,19 +15,20 @@ Author: Diffblue Ltd.
 #include <unordered_set>
 #include <utility>
 
+#include <util/config.h>
+#include <util/exception_utils.h>
+#include <util/exit_codes.h>
+#include <util/expr_iterator.h>
+#include <util/invariant.h>
+#include <util/suffix.h>
+#include <util/version.h>
+
 #include <goto-instrument/dump_c.h>
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/write_goto_binary.h>
-#include <langapi/mode.h>
-#include <util/config.h>
-#include <util/exception_utils.h>
-#include <util/exit_codes.h>
-#include <util/expr_iterator.h>
-#include <util/invariant.h>
-#include <util/version.h>
 
 #include "function_call_harness_generator.h"
 #include "goto_harness_generator_factory.h"
@@ -145,15 +146,23 @@ int goto_harness_parse_optionst::doit()
   harness_generator->generate(
     goto_model, got_harness_config.harness_function_name);
 
-  filter_goto_model(goto_model, goto_model_without_harness_symbols);
-  auto harness_out = std::ofstream{got_harness_config.out_file};
-  dump_c(
-    goto_model.goto_functions,
-    true,
-    true,
-    false,
-    namespacet{goto_model.get_symbol_table()},
-    harness_out);
+  if(has_suffix(got_harness_config.out_file, ".c"))
+  {
+    filter_goto_model(goto_model, goto_model_without_harness_symbols);
+    auto harness_out = std::ofstream{got_harness_config.out_file};
+    dump_c(
+      goto_model.goto_functions,
+      true,
+      true,
+      false,
+      namespacet{goto_model.get_symbol_table()},
+      harness_out);
+  }
+  else
+  {
+    write_goto_binary(
+      got_harness_config.out_file, goto_model, log.get_message_handler());
+  }
 
   return CPROVER_EXIT_SUCCESS;
 }
@@ -174,8 +183,12 @@ void goto_harness_parse_optionst::help()
     << " goto-harness <in> <out> --harness-function-name <name> --harness-type "
        "<harness-type> [harness options]\n"
     << "\n"
-    << "<in>                       goto binaries to read from\n"
-    << "<out>                      C file to write the harness to\n"
+    << "<in>                       goto binary to read from\n"
+    << "<out>                      file to write the harness to\n"
+    << "                           the harness is printed as C code, if <out> "
+       "has a .c suffix,\n"
+       "                           else a goto binary including the harness is "
+       "generated\n"
     << "--harness-function-name    the name of the harness function to "
        "generate\n"
     << "--harness-type             one of the harness types listed below\n"
@@ -205,9 +218,9 @@ goto_harness_parse_optionst::handle_common_options()
   {
     help();
     throw invalid_command_line_argument_exceptiont{
-      "need to specify both input and output goto binary file names (may be "
+      "need to specify both input and output file names (may be "
       "the same)",
-      "<in goto binary> <out goto binary>"};
+      "<in goto binary> <output C file or goto binary>"};
   }
 
   goto_harness_config.in_file = cmdline.args[0];
