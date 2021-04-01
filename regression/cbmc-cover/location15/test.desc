@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 10 function main block 1.*: SATISFIED$
-^\[main.coverage.2\] file main.c line 11 function main block 2.*: SATISFIED$
+^\[main.coverage.2\] file main.c line 10 function main block 2.*: SATISFIED$
 ^\[main.coverage.3\] file main.c line 13 function main block 3.*: FAILED$
 ^\[main.coverage.4\] file main.c line 16 function main block 4.*: SATISFIED$
 ^\[foo.coverage.1\] file main.c line 5 function foo block 1.*: FAILED$
