@@ -511,3 +511,4 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   REQUIRE(vs);
   return vs;
 }
+
