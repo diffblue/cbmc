@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[main\.assertion\.1\] assertion sizeof\(ull\) != sizeof\(unsigned int\) && pop4\(ull\) == __builtin_popcount\(ull\): FAILURE$
+\[main\.assertion\.\d+\] line 39 assertion sizeof\(ull\) != sizeof\(unsigned int\) && pop4\(ull\) == __builtin_popcount\(ull\): FAILURE$
 ^\*\* 1 of 3 failed
 --
 ^warning: ignoring
