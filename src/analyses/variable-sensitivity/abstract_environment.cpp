@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/abstract_object_statistics.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/simplify_expr.h>
 
@@ -196,21 +197,16 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // We should only attempt to assume Boolean things
   // This should be enforced by the well-structured-ness of the
   // goto-program and the way assume is used.
-
   PRECONDITION(expr.type().id() == ID_bool);
 
-  // Evaluate the expression
-  abstract_object_pointert res = eval(expr, ns);
+  exprt assumption = do_assume(expr, ns, true);
 
-  exprt possibly_constant = res->to_constant();
-
-  if(possibly_constant.id() != ID_nil) // I.E. actually a value
+  if(assumption.id() != ID_nil) // I.E. actually a value
   {
     // Should be of the right type
-    INVARIANT(
-      possibly_constant.type().id() == ID_bool, "simplication preserves type");
+    INVARIANT(assumption.type().id() == ID_bool, "simplification preserves type");
 
-    if(possibly_constant.is_false())
+    if(assumption.is_false())
     {
       bool currently_bottom = is_bottom();
       make_bottom();
@@ -218,25 +214,16 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
     }
   }
 
-  /* TODO : full implementation here
-   * Note that this is *very* syntax dependent so some normalisation would help
-   * 1. split up conjuncts, handle each part separately
-   * 2. check how many variables the term contains
-   *     0 = this should have been simplified away
-   *    2+ = ignore as this is a non-relational domain
-   *     1 = extract the expression for the variable,
-   *         care must be taken for things like a[i]
-   *         which can be used if i can be resolved to a constant
-   * 3. use abstract_object_factory to build an abstract_objectt
-   *    of the correct type (requires a little extension)
-   *    This allows constant domains to handle x==23,
-   *    intervals to handle x < 4, etc.
-   * 4. eval the current value of the variable
-   * 5. compute the meet (not merge!) of the two abstract_objectt's
-   * 6. assign the new value back to the environment.
-   */
-
   return false;
+}
+
+exprt abstract_environmentt::do_assume(
+  exprt expr,
+  const namespacet &ns,
+  bool assumeTrue)
+{
+  auto result = eval(expr, ns);
+  return result->to_constant();
 }
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
@@ -468,3 +455,4 @@ std::vector<abstract_object_pointert> eval_operands(
 
   return operands;
 }
+
