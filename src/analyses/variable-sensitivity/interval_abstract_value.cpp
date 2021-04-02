@@ -14,12 +14,20 @@
 #include <util/make_unique.h>
 #include <util/simplify_expr.h>
 
+#include "abstract_environment.h"
 #include "abstract_object_statistics.h"
 #include "interval_abstract_value.h"
 
 static index_range_implementation_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
   const namespacet &n);
+
+template <typename... Args>
+std::shared_ptr<interval_abstract_valuet> make_interval(Args &&... args)
+{
+  return std::make_shared<interval_abstract_valuet>(
+    std::forward<Args>(args)...);
+}
 
 class interval_index_ranget : public index_range_implementationt
 {
@@ -345,7 +353,7 @@ interval_abstract_valuet::merge(const abstract_object_pointert &other) const
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(cast_other)
   {
-    return merge_intervals(cast_other);
+    return merge_with_value(cast_other);
   }
   else
   {
@@ -360,8 +368,8 @@ interval_abstract_valuet::merge(const abstract_object_pointert &other) const
 ///          Otherwise, a new interval abstract object
 ///          with the smallest interval that subsumes both
 ///          this and other
-abstract_object_pointert
-interval_abstract_valuet::merge_intervals(abstract_value_pointert &other) const
+abstract_object_pointert interval_abstract_valuet::merge_with_value(
+  const abstract_value_pointert &other) const
 {
   if(other->is_bottom())
     return shared_from_this();
@@ -369,12 +377,12 @@ interval_abstract_valuet::merge_intervals(abstract_value_pointert &other) const
   auto other_interval = other->to_interval();
 
   if(is_bottom())
-    return std::make_shared<interval_abstract_valuet>(other_interval);
+    return make_interval(other_interval);
 
   if(interval.contains(other_interval))
     return shared_from_this();
 
-  return std::make_shared<interval_abstract_valuet>(constant_interval_exprt(
+  return make_interval(constant_interval_exprt(
     constant_interval_exprt::get_min(
       interval.get_lower(), other_interval.get_lower()),
     constant_interval_exprt::get_max(
@@ -384,16 +392,12 @@ interval_abstract_valuet::merge_intervals(abstract_value_pointert &other) const
 abstract_object_pointert
 interval_abstract_valuet::meet(const abstract_object_pointert &other) const
 {
-  interval_abstract_value_pointert cast_other =
-    std::dynamic_pointer_cast<const interval_abstract_valuet>(other);
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(cast_other)
-  {
-    return meet_intervals(cast_other);
-  }
-  else
-  {
-    return abstract_objectt::meet(other);
-  }
+    return meet_with_value(cast_other);
+
+  return abstract_objectt::meet(other);
 }
 
 /// Meet another interval abstract object with this one
@@ -402,30 +406,27 @@ interval_abstract_valuet::meet(const abstract_object_pointert &other) const
 ///          other if this subsumes other.
 ///          Otherwise, a new interval abstract object
 ///          with the intersection interval (of this and other)
-abstract_object_pointert interval_abstract_valuet::meet_intervals(
-  interval_abstract_value_pointert other) const
+abstract_object_pointert interval_abstract_valuet::meet_with_value(
+  const abstract_value_pointert &other) const
 {
-  if(is_bottom() || other->interval.contains(interval))
-  {
-    return shared_from_this();
-  }
-  else if(other->is_bottom() || interval.contains(other->interval))
-  {
-    return other;
-  }
-  else
-  {
-    auto lower_bound = constant_interval_exprt::get_max(
-      interval.get_lower(), other->interval.get_lower());
-    auto upper_bound = constant_interval_exprt::get_min(
-      interval.get_upper(), other->interval.get_upper());
+  auto other_interval = other->to_interval();
 
-    if(constant_interval_exprt::less_than(upper_bound, lower_bound))
-      return std::make_shared<interval_abstract_valuet>(
-        interval.type(), false, true);
-    return std::make_shared<interval_abstract_valuet>(
-      constant_interval_exprt(lower_bound, upper_bound));
-  }
+  if(other_interval.contains(interval))
+    return shared_from_this();
+
+  if(interval.contains(other_interval))
+    return make_interval(other_interval);
+
+  auto lower_bound = constant_interval_exprt::get_max(
+    interval.get_lower(), other_interval.get_lower());
+  auto upper_bound = constant_interval_exprt::get_min(
+    interval.get_upper(), other_interval.get_upper());
+
+  // if the interval is valid, we have a meet!
+  if(constant_interval_exprt::less_than_or_equal(lower_bound, upper_bound))
+    return make_interval(constant_interval_exprt(lower_bound, upper_bound));
+
+  return make_interval(interval.type(), false, true);
 }
 
 index_range_implementation_ptrt

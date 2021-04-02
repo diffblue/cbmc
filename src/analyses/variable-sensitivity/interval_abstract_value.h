@@ -70,9 +70,9 @@ private:
     sharing_ptrt<interval_abstract_valuet>;
 
   abstract_object_pointert
-  merge_intervals(abstract_value_pointert &other) const;
+  merge_with_value(const abstract_value_pointert &other) const;
   abstract_object_pointert
-  meet_intervals(interval_abstract_value_pointert other) const;
+  meet_with_value(const abstract_value_pointert &other) const;
 
   constant_interval_exprt interval;
 };
