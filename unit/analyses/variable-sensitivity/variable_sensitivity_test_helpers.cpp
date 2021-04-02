@@ -430,7 +430,8 @@ void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result)
   REQUIRE(result->is_bottom());
 }
 
-std::shared_ptr<const abstract_objectt> add(
+template<class expression_type>
+std::shared_ptr<const abstract_objectt> eval_binary_expression(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
@@ -444,6 +445,15 @@ std::shared_ptr<const abstract_objectt> add(
   auto result = environment.eval(plus_exprt(op1_sym, op2_sym), ns);
 
   return result;
+}
+
+std::shared_ptr<const abstract_objectt> add(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  return eval_binary_expression<plus_exprt>(op1, op2, environment, ns);
 }
 
 std::shared_ptr<const constant_abstract_valuet> add_as_constant(
@@ -511,4 +521,3 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   REQUIRE(vs);
   return vs;
 }
-
