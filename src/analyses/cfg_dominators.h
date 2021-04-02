@@ -163,6 +163,27 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
       ++s_it)
     worklist.push_back(cfg[s_it->first].PC);
 
+  // A program may have multiple "exit" nodes when self loops or assume(false)
+  // instructions are present.
+  if(post_dom)
+  {
+    for(auto &cfg_entry : cfg.entry_map)
+    {
+      if(cfg[cfg_entry.second].PC == entry_node)
+        continue;
+
+      typename cfgt::nodet &n_it = cfg[cfg_entry.second];
+      if(
+        n_it.out.empty() ||
+        (n_it.out.size() == 1 && n_it.out.begin()->first == cfg_entry.second))
+      {
+        n_it.dominators.insert(cfg[cfg_entry.second].PC);
+        for(const auto &predecessor : n_it.in)
+          worklist.push_back(cfg[predecessor.first].PC);
+      }
+    }
+  }
+
   while(!worklist.empty())
   {
     // get node from worklist
