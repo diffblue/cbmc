@@ -82,6 +82,9 @@ abstract_objectt::meet(const abstract_object_pointert &other) const
 abstract_object_pointert abstract_objectt::abstract_object_meet(
   const abstract_object_pointert &other) const
 {
+  if(is_top())
+    return other;
+
   if(is_bottom() || other->top)
     return this->abstract_object_meet_internal(other);
 
@@ -224,7 +227,7 @@ abstract_object_pointert abstract_objectt::meet(
 bool abstract_objectt::should_use_base_meet(
   const abstract_object_pointert &other) const
 {
-  return is_bottom() || other->is_bottom() || other->is_top();
+  return is_bottom() || is_top() || other->is_bottom() || other->is_top();
 }
 
 abstract_object_pointert abstract_objectt::update_location_context(
