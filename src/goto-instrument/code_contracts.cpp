@@ -163,6 +163,43 @@ bool code_contractst::has_contract(const irep_idt fun_name)
   return type.has_contract();
 }
 
+void code_contractst::add_quantified_variable(
+  exprt expression,
+  replace_symbolt &replace,
+  irep_idt mode)
+{
+  // If the expression is a quantified expression, this function adds
+  // the quantified variable to the symbol table and to the expression map
+
+  // TODO Currently only works if the contract contains only a single
+  // quantified formula
+  // i.e. (1) the top-level element is a quantifier formula
+  // and (2) there are no inner quantifier formulae
+  // This TODO is handled in PR #5968
+
+  if(expression.id() == ID_exists || expression.id() == ID_forall)
+  {
+    // get quantified symbol
+    exprt tuple = expression.operands().front();
+    exprt quantified_variable = tuple.operands().front();
+    symbol_exprt quantified_symbol = to_symbol_expr(quantified_variable);
+
+    // create fresh symbol
+    symbolt new_symbol = get_fresh_aux_symbol(
+      quantified_symbol.type(),
+      id2string(quantified_symbol.get_identifier()),
+      "tmp",
+      quantified_symbol.source_location(),
+      mode,
+      symbol_table);
+
+    // add created fresh symbol to expression map
+    symbol_exprt q(
+      quantified_symbol.get_identifier(), quantified_symbol.type());
+    replace.insert(q, new_symbol.symbol_expr());
+  }
+}
+
 bool code_contractst::apply_function_contract(
   const irep_idt &function_id,
   goto_programt &goto_program,
@@ -242,6 +279,11 @@ bool code_contractst::apply_function_contract(
       replace.insert(p, *a_it);
     }
   }
+
+  // Add quantified variables in contracts to the symbol map
+  irep_idt mode = symbol_table.lookup_ref(function).mode;
+  code_contractst::add_quantified_variable(ensures, replace, mode);
+  code_contractst::add_quantified_variable(requires, replace, mode);
 
   // Replace expressions in the contract components.
   replace(assigns);
@@ -777,6 +819,12 @@ void code_contractst::add_contract_check(
 
     replace.insert(parameter_symbol.symbol_expr(), p);
   }
+
+  // Add quantified variables in contracts to the symbol map
+  code_contractst::add_quantified_variable(
+    ensures, replace, function_symbol.mode);
+  code_contractst::add_quantified_variable(
+    requires, replace, function_symbol.mode);
 
   // assume(requires)
   if(requires.is_not_nil())

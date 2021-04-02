@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---check-code-contracts
+--enforce-all-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

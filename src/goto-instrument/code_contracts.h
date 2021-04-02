@@ -25,6 +25,7 @@ Date: February 2016
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/replace_symbol.h>
 
 class messaget;
 class assigns_clauset;
@@ -165,6 +166,13 @@ protected:
 
   void
   add_contract_check(const irep_idt &, const irep_idt &, goto_programt &dest);
+
+  /// If the expression is a quantified expression, this function adds
+  /// the quantified variable to the symbol table and to the expression map
+  void add_quantified_variable(
+    exprt expression,
+    replace_symbolt &replace,
+    irep_idt mode);
 };
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
