@@ -55,7 +55,7 @@ abstract_objectt::merge(const abstract_object_pointert &other) const
 }
 
 abstract_object_pointert abstract_objectt::abstract_object_merge(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   if(is_top() || other->bottom)
     return this->abstract_object_merge_internal(other);
@@ -202,14 +202,14 @@ abstract_object_pointert abstract_objectt::merge(
 }
 
 bool abstract_objectt::should_use_base_merge(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   return is_top() || other->is_bottom() || other->is_top();
 }
 
 abstract_object_pointert abstract_objectt::meet(
-  abstract_object_pointert op1,
-  abstract_object_pointert op2,
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
   bool &out_modifications)
 {
   abstract_object_pointert result = op1->should_use_base_meet(op2)

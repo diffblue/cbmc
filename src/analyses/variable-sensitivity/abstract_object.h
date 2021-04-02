@@ -263,8 +263,8 @@ public:
   /// (result is not op1)
   /// \return resulting object after meet
   static abstract_object_pointert meet(
-    abstract_object_pointert op1,
-    abstract_object_pointert op2,
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2,
     bool &out_modifications);
 
   /// Base implementation of the meet operation: only used if no more precise
@@ -407,7 +407,7 @@ protected:
   ///
   /// \return Returns the result of the abstract object.
   abstract_object_pointert
-  abstract_object_merge(const abstract_object_pointert other) const;
+  abstract_object_merge(const abstract_object_pointert &other) const;
 
   /// To detect the cases where the base merge is sufficient to do a merge
   /// We can't do if this->is_bottom() since we want the specific
@@ -416,7 +416,7 @@ protected:
   ///
   /// \return Returns true if the base class is capable of doing
   ///         a complete merge
-  bool should_use_base_merge(const abstract_object_pointert other) const;
+  bool should_use_base_merge(const abstract_object_pointert &other) const;
 
   /// Create a new abstract object that is the result of the merge, unless
   /// the object would be unchanged, then would return itself.
