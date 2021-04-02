@@ -60,7 +60,6 @@ void goto_check(
   " --nan-check                  check floating-point for NaN\n" \
   " --enum-range-check           checks that all enum type expressions have values in the enum range\n" /* NOLINT(whitespace/line_length) */ \
   " --pointer-primitive-check    checks that all pointers in pointer primitives are valid or null\n" /* NOLINT(whitespace/line_length) */ \
-  " --no-built-in-assertions     ignore assertions in built-in library\n" \
   " --retain-trivial-checks      include checks that are trivially true\n" \
   " --error-label label          check that label is unreachable\n" \
   " --no-built-in-assertions     ignore assertions in built-in library\n" \
