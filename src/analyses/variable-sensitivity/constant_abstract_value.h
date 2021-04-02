@@ -71,6 +71,8 @@ protected:
   /// \return Returns the result of the merge
   abstract_object_pointert
   merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const override;
 
 private:
   /// Merges another abstract value into this one
@@ -81,7 +83,9 @@ private:
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this.
   abstract_object_pointert
-  merge_constant_constant(const abstract_value_pointert &other) const;
+  merge_with_value(const abstract_value_pointert &other) const;
+  abstract_object_pointert
+  meet_with_value(const abstract_value_pointert &other) const;
 
   exprt value;
 };
