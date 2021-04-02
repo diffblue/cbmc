@@ -1,0 +1,9 @@
+CORE
+main.cpp
+
+member 'A::i' is not accessible \(private\)$
+^EXIT=(1|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
