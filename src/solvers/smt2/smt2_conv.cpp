@@ -237,8 +237,8 @@ void smt2_convt::define_object_size(
       continue;
     }
 
-    out << "(assert (implies (= " <<
-      "((_ extract " << h << " " << l << ") ";
+    out << "(assert (=> (= "
+        << "((_ extract " << h << " " << l << ") ";
     convert_expr(ptr);
     out << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
         << "(= " << id << " (_ bv" << *object_size << " " << size_width
