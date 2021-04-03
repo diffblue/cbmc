@@ -48,11 +48,12 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   #if 0
   if(expr.id()==ID_byte_extract_big_endian &&
      expr.type().id()==ID_c_bit_field &&
-     (width%8)!=0)
+     (width%expr.get_bits_per_byte())!=0)
   {
     byte_extract_exprt tmp=expr;
     // round up
-    to_c_bit_field_type(tmp.type()).set_width(width+8-width%8);
+    to_c_bit_field_type(tmp.type()).set_width(
+      width+expr.get_bits_per_byte()-width%expr.get_bits_per_byte());
     convert_byte_extract(tmp, bv);
     bv.resize(width); // chop down
     return;
@@ -83,6 +84,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
       expr.id(),
       o.root_object(),
       plus_exprt(o.offset(), expr.offset()),
+      expr.get_bits_per_byte(),
       expr.type());
 
     return convert_bv(be);
@@ -104,11 +106,9 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   bv.resize(width);
 
   // see if the byte number is constant
-  unsigned byte_width=8;
-
   if(index.has_value())
   {
-    const mp_integer offset = *index * byte_width;
+    const mp_integer offset = *index * expr.get_bits_per_byte();
 
     for(std::size_t i=0; i<width; i++)
       // out of bounds?
@@ -119,7 +119,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   }
   else
   {
-    std::size_t bytes=op_bv.size()/byte_width;
+    std::size_t bytes = op_bv.size() / expr.get_bits_per_byte();
 
     if(prop.has_set_to())
     {
@@ -136,7 +136,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
       for(std::size_t i=0; i<bytes; i++)
       {
-        std::size_t offset=i*byte_width;
+        std::size_t offset = i * expr.get_bits_per_byte();
 
         for(std::size_t j=0; j<width; j++)
           if(offset+j<op_bv.size())
@@ -159,7 +159,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
         literalt e =
           convert(equal_exprt(expr.offset(), from_integer(i, constant_type)));
 
-        std::size_t offset=i*byte_width;
+        std::size_t offset = i * expr.get_bits_per_byte();
 
         for(std::size_t j=0; j<width; j++)
         {

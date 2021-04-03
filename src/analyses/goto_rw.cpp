@@ -161,7 +161,7 @@ void rw_range_sett::get_objects_byte_extract(
   }
   else
   {
-    *index *= 8;
+    *index *= be.get_bits_per_byte();
     if(*index >= *object_size_bits_opt)
       return;
 

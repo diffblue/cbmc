@@ -6,17 +6,18 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <util/byte_operators.h>
+#include <util/pointer_expr.h>
+#include <util/symbol_table.h>
+
 #include <goto-programs/goto_trace.h>
 
 #include <java_bytecode/java_trace_validation.h>
 #include <java_bytecode/java_types.h>
-
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
-#include <util/byte_operators.h>
-#include <util/pointer_expr.h>
-#include <util/symbol_table.h>
+#include <climits>
 
 TEST_CASE("java trace validation", "[core][java_trace_validation]")
 {
@@ -36,9 +37,9 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
   const index_exprt index_plain =
     index_exprt(exprt(ID_nil, array_typet(typet(), nil_exprt())), exprt());
   const byte_extract_exprt byte_little_endian = byte_extract_exprt(
-    ID_byte_extract_little_endian, exprt(), exprt(), typet());
-  const byte_extract_exprt byte_big_endian =
-    byte_extract_exprt(ID_byte_extract_big_endian, exprt(), exprt(), typet());
+    ID_byte_extract_little_endian, exprt(), exprt(), CHAR_BIT, typet());
+  const byte_extract_exprt byte_big_endian = byte_extract_exprt(
+    ID_byte_extract_big_endian, exprt(), exprt(), CHAR_BIT, typet());
   const address_of_exprt valid_address = address_of_exprt(valid_symbol_expr);
   const address_of_exprt invalid_address = address_of_exprt(exprt());
   const struct_exprt struct_plain =

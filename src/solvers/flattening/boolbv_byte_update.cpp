@@ -38,7 +38,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 
   const bvt &value_bv=convert_bv(value);
   std::size_t update_width=value_bv.size();
-  std::size_t byte_width=8;
+  std::size_t byte_width = expr.get_bits_per_byte();
 
   if(update_width>bv.size())
     update_width=bv.size();
@@ -49,7 +49,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   if(index.has_value())
   {
     // yes!
-    const mp_integer offset = *index * 8;
+    const mp_integer offset = *index * byte_width;
 
     if(offset+update_width>mp_integer(bv.size()) || offset<0)
     {
