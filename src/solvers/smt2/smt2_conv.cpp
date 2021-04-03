@@ -1613,17 +1613,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     INVARIANT(
       false, "byte_update ops should be lowered in prepare_for_convert_expr");
   }
-  else if(expr.id()==ID_width)
-  {
-    std::size_t result_width=boolbv_width(expr.type());
-    CHECK_RETURN(result_width != 0);
-
-    std::size_t op_width = boolbv_width(to_unary_expr(expr).op().type());
-    CHECK_RETURN(op_width != 0);
-
-    out << "(_ bv" << op_width/8
-        << " " << result_width << ")";
-  }
   else if(expr.id()==ID_abs)
   {
     const abs_exprt &abs_expr = to_abs_expr(expr);
