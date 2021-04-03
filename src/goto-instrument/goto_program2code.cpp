@@ -192,11 +192,23 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return convert_decl(target, upper_bound, dest);
 
     case ASSERT:
+    {
       system_headers.insert("assert.h");
       dest.add(code_assertt(target->get_condition()));
       dest.statements().back().add_source_location().set_comment(
         target->source_location().get_comment());
+
+      goto_programt::const_targett next = target;
+      ++next;
+      CHECK_RETURN(next != goto_program.instructions.end());
+      if(
+        next != upper_bound && next->is_assume() &&
+        target->get_condition() == next->get_condition())
+      {
+        ++target;
+      }
       return target;
+    }
 
     case ASSUME:
       dest.add(code_assumet(target->guard));

@@ -849,6 +849,12 @@ void goto_convertt::do_function_call_symbol(
       error() << identifier << " expected not to have LHS" << eom;
       throw 0;
     }
+
+    // The C standard mandates that a failing assertion causes execution to
+    // abort:
+    dest.add(goto_programt::make_assumption(
+      typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
+      function.source_location()));
   }
   else if(identifier == CPROVER_PREFIX "enum_is_in_range")
   {
@@ -1092,6 +1098,11 @@ void goto_convertt::do_function_call_symbol(
     t->source_location_nonconst().set_property_class(ID_assertion);
     t->source_location_nonconst().set_comment(description);
     // we ignore any LHS
+
+    // The C standard mandates that a failing assertion causes execution to
+    // abort:
+    dest.add(goto_programt::make_assumption(
+      false_exprt(), function.source_location()));
   }
   else if(identifier=="__assert_rtn" ||
           identifier=="__assert")
@@ -1130,6 +1141,11 @@ void goto_convertt::do_function_call_symbol(
     t->source_location_nonconst().set_property_class(ID_assertion);
     t->source_location_nonconst().set_comment(description);
     // we ignore any LHS
+
+    // The C standard mandates that a failing assertion causes execution to
+    // abort:
+    dest.add(goto_programt::make_assumption(
+      false_exprt(), function.source_location()));
   }
   else if(identifier=="__assert_func")
   {
@@ -1164,6 +1180,11 @@ void goto_convertt::do_function_call_symbol(
     t->source_location_nonconst().set_property_class(ID_assertion);
     t->source_location_nonconst().set_comment(description);
     // we ignore any LHS
+
+    // The C standard mandates that a failing assertion causes execution to
+    // abort:
+    dest.add(goto_programt::make_assumption(
+      false_exprt(), function.source_location()));
   }
   else if(identifier==CPROVER_PREFIX "fence")
   {
