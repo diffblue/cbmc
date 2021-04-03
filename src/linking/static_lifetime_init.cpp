@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/prefix.h>

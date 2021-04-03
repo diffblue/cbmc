@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "gcc_types.h"
 
-#include <util/config.h>
 #include <util/c_types.h>
+#include <util/ieee_float.h>
 
 floatbv_typet gcc_float16_type()
 {

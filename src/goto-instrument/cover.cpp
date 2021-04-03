@@ -13,7 +13,6 @@ Date: May 2016
 
 #include "cover.h"
 
-#include <util/config.h>
 #include <util/message.h>
 #include <util/make_unique.h>
 #include <util/cmdline.h>

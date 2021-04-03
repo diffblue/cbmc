@@ -8,7 +8,6 @@ Author: Diffblue Ltd.
 
 #include <algorithm>
 #include <functional>
-#include <util/config.h>
 
 #include <java-testing-utils/require_parse_tree.h>
 

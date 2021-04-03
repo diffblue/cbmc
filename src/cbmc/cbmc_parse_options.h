@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
 
-#include <util/config.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>

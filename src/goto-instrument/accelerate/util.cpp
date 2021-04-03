@@ -14,17 +14,17 @@ Author: Matt Lewis
 #include <iostream>
 #include <algorithm>
 
+#include <util/c_types.h>
 #include <util/std_types.h>
-#include <util/config.h>
 
 signedbv_typet signed_poly_type()
 {
-  return signedbv_typet(config.ansi_c.int_width);
+  return signed_int_type();
 }
 
 unsignedbv_typet unsigned_poly_type()
 {
-  return unsignedbv_typet(config.ansi_c.int_width);
+  return unsigned_int_type();
 }
 
 /**
