@@ -312,17 +312,41 @@ bool generate_ansi_c_start_function(
         init_code.add(code_assumet(std::move(ge)));
       }
 
+      // On Windows, CreateProcess accepts no more than 32767 characters, so
+      // make that a hard limit.
+      if(config.ansi_c.os == configt::ansi_ct::ost::OS_WIN)
       {
-        // assume argc is at most MAX/8-1
-        mp_integer upper_bound=
-          power(2, config.ansi_c.int_width-4);
-
-        exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
+        exprt bound_expr = from_integer(32767, argc_symbol.type);
 
         binary_relation_exprt le(
           argc_symbol.symbol_expr(), ID_le, std::move(bound_expr));
 
         init_code.add(code_assumet(std::move(le)));
+      }
+      else
+      {
+        // For other systems assume argc is no larger than the what would make
+        // argv consume all available memory space:
+        // 2^pointer_width / (pointer_width / char_width)
+        // is the maximum number of argv elements
+        // sysconf(ARG_MAX) is likely much lower than this, but we don't know
+        // that value for the verification target platform.
+        const auto pointer_bits_2log =
+          address_bits(config.ansi_c.pointer_width / config.ansi_c.char_width);
+        if(
+          config.ansi_c.pointer_width - pointer_bits_2log <=
+          config.ansi_c.int_width)
+        {
+          mp_integer upper_bound =
+            power(2, config.ansi_c.int_width - pointer_bits_2log);
+
+          exprt bound_expr = from_integer(upper_bound, argc_symbol.type);
+
+          binary_relation_exprt le(
+            argc_symbol.symbol_expr(), ID_le, std::move(bound_expr));
+
+          init_code.add(code_assumet(std::move(le)));
+        }
       }
 
       // record argc as an input
