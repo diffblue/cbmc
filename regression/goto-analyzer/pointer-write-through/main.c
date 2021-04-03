@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int main()
 {
   int a = 10;
@@ -7,5 +5,5 @@ int main()
 
   *p = 15;
 
-  assert(a == 15);
+  __CPROVER_assert(a == 15, "assertion a == 15");
 }

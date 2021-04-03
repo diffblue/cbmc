@@ -1,8 +1,6 @@
-#include <assert.h>
-
 int bar(int other)
 {
-  assert(other == 4);
+  __CPROVER_assert(other == 4, "assertion other == 4");
   return other + 1;
 }
 
@@ -10,5 +8,5 @@ int main()
 {
   int x = 3;
   int y = bar(x + 1);
-  assert(y == 5);
+  __CPROVER_assert(y == 5, "assertion y == 5");
 }

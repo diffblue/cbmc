@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdarg.h>
 
 int bar(int size, ...)
@@ -19,8 +18,8 @@ int bar(int size, ...)
 int main()
 {
   int y = bar(4, 1, 2, 2, 1);
-  assert(y == 6);
+  __CPROVER_assert(y == 6, "assertion y == 6");
 
   int z = bar(0);
-  assert(z == 0);
+  __CPROVER_assert(z == 0, "assertion z == 0");
 }

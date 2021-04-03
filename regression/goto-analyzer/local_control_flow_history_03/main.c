@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int main(int argc, char **argv)
 {
   int total = 0;
@@ -11,7 +9,8 @@ int main(int argc, char **argv)
     total += i;
   }
 
-  assert(total == (n * (n - 1) / 2));
+  __CPROVER_assert(
+    total == (n * (n - 1) / 2), "assertion total == (n * (n - 1) / 2)");
 
   return 0;
 }

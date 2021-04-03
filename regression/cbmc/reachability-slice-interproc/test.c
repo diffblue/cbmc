@@ -1,5 +1,3 @@
-#include <assert.h>
-
 // After a reachability slice based on the assertion in `target`, we should
 // retain both its possible callers (...may_call_target_1, ...may_call_target_2)
 // and their callees, but should be more precise concerning before_target and
@@ -22,7 +20,7 @@ void target()
   const char *local = "target_kept";
 
   before_target();
-  assert(0);
+  __CPROVER_assert(0, "assertion 0");
   after_target();
 }
 

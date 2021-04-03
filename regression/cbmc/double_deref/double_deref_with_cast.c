@@ -1,5 +1,3 @@
-
-#include <assert.h>
 #include <stdlib.h>
 
 int main(int argc, char **argv)
@@ -12,5 +10,5 @@ int main(int argc, char **argv)
 
   pptr = (argc == 1 ? &ptr1 : &ptr2);
 
-  assert(*(int *)*pptr == argc);
+  __CPROVER_assert(*(int *)*pptr == argc, "assertion *(int *)*pptr == argc");
 }

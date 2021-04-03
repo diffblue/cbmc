@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int main(int argc, char **argv)
 {
   int nondet1;
@@ -22,7 +20,7 @@ int main(int argc, char **argv)
     // because x is non-deterministic
   }
 
-  assert(x);
+  __CPROVER_assert(x, "assertion x");
 
   return 0;
 }

@@ -1,5 +1,3 @@
-#include <assert.h>
-
 #define CODE_BLOCK                                                             \
   int i;                                                                       \
   float flotal = 0;                                                            \
@@ -7,7 +5,8 @@
   {                                                                            \
     flotal += i;                                                               \
   }                                                                            \
-  assert(flotal == (n * (n - 1) / 2))
+  __CPROVER_assert(                                                            \
+    flotal == (n * (n - 1) / 2), "assertion flotal == (n * (n - 1) / 2)")
 
 void do_the_loop(int n)
 {

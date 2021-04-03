@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int main(int argc, char **argv)
 {
   int branch;
@@ -15,7 +13,7 @@ int main(int argc, char **argv)
   }
 
   // Merging a constant domain here will make this unprovable
-  assert(x != 0);
+  __CPROVER_assert(x != 0, "assertion x != 0");
 
   // Some subtle points here...
   // The history tracks paths, it is up to the domain to track the
@@ -30,11 +28,11 @@ int main(int argc, char **argv)
   // one with branch == 0, x == 1.
   if(branch)
   {
-    assert(x == 1);
+    __CPROVER_assert(x == 1, "assertion x == 1");
   }
   else
   {
-    assert(x == -1);
+    __CPROVER_assert(x == -1, "assertion x == -1");
   }
 
   // Working around the domain issues...
@@ -49,7 +47,7 @@ int main(int argc, char **argv)
   }
 
   // Should be true in all 3 paths
-  assert(x == 0);
+  __CPROVER_assert(x == 0, "assertion x == 0");
 
   return 0;
 }

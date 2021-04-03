@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <string.h>
 
 struct S
 {
@@ -18,18 +18,22 @@ int main(void)
   int unchanged_parameter = 10;
   struct S my_struct = {.i = 10, .j = "10"};
   touches_parameter(&parameter, &unchanged_parameter, &my_struct, 4);
-  assert(parameter == 10);
-  assert(unchanged_parameter == 10);
-  assert(my_struct.i == 10);
-  assert(my_struct.j == "10");
+  __CPROVER_assert(parameter == 10, "assertion parameter == 10");
+  __CPROVER_assert(
+    unchanged_parameter == 10, "assertion unchanged_parameter == 10");
+  __CPROVER_assert(my_struct.i == 10, "assertion my_struct.i == 10");
+  __CPROVER_assert(
+    strncmp(my_struct.j, "10", 3) == 0, "assertion my_struct.j == \"10\"");
 
   parameter = 10;
   unchanged_parameter = 10;
   my_struct.i = 10;
   my_struct.j = "10";
   touches_parameter(&parameter, &unchanged_parameter, &my_struct, 4);
-  assert(parameter == 10);
-  assert(unchanged_parameter == 10);
-  assert(my_struct.i == 10);
-  assert(my_struct.j == "10");
+  __CPROVER_assert(parameter == 10, "assertion parameter == 10");
+  __CPROVER_assert(
+    unchanged_parameter == 10, "assertion unchanged_parameter == 10");
+  __CPROVER_assert(my_struct.i == 10, "assertion my_struct.i == 10");
+  __CPROVER_assert(
+    strncmp(my_struct.j, "10", 3) == 0, "assertion my_struct.j == \"10\"");
 }

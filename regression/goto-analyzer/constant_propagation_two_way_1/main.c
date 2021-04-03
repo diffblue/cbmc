@@ -1,11 +1,9 @@
-#include <assert.h>
-
 int main()
 {
   int x;
   if(x == 0)
   {
-    assert(!x);
+    __CPROVER_assert(!x, "assertion !x");
   }
   return 0;
 }

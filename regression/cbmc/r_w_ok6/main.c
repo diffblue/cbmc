@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdlib.h>
 
 void main()
@@ -15,12 +14,12 @@ void main()
     p = malloc(3);
   }
 
-  assert(__CPROVER_r_ok(p, 2));
-  assert(!__CPROVER_r_ok(p, 2));
+  __CPROVER_assert(__CPROVER_r_ok(p, 2), "assertion __CPROVER_r_ok(p, 2)");
+  __CPROVER_assert(!__CPROVER_r_ok(p, 2), "assertion !__CPROVER_r_ok(p, 2)");
 
-  assert(__CPROVER_r_ok(p, 3));
-  assert(!__CPROVER_r_ok(p, 3));
+  __CPROVER_assert(__CPROVER_r_ok(p, 3), "assertion __CPROVER_r_ok(p, 3)");
+  __CPROVER_assert(!__CPROVER_r_ok(p, 3), "assertion !__CPROVER_r_ok(p, 3)");
 
-  assert(__CPROVER_r_ok(p, 4));
-  assert(!__CPROVER_r_ok(p, 4));
+  __CPROVER_assert(__CPROVER_r_ok(p, 4), "assertion __CPROVER_r_ok(p, 4)");
+  __CPROVER_assert(!__CPROVER_r_ok(p, 4), "assertion !__CPROVER_r_ok(p, 4)");
 }

@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int bar(int other)
 {
   if(other > 0)
@@ -43,14 +41,17 @@ int main()
 {
   int x=3;
   int y=bar(x+1);
-  assert(y==4); // Unknown in the constants domain
+  __CPROVER_assert(y == 4, "assertion y==4"); // Unknown in the constants domain
 
   int y2 = bar(0);
-  assert(y2==0); // Unknown since we are not sensitive to call domain
+  __CPROVER_assert(
+    y2 == 0,
+    "assertion y2==0"); // Unknown since we are not sensitive to call domain
 
   int z = bar_clean(0);
-  assert(z==0); // Unknown as the function has parameter as top
+  __CPROVER_assert(
+    z == 0, "assertion z==0"); // Unknown as the function has parameter as top
 
   int w = fun(5, 18);
-  assert(w==18);
+  __CPROVER_assert(w == 18, "assertion w==18");
 }
