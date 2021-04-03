@@ -109,25 +109,6 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_with(to_with_expr(expr));
   else if(expr.id()==ID_update)
     return convert_update(to_update_expr(expr));
-  else if(expr.id()==ID_width)
-  {
-    std::size_t result_width=boolbv_width(expr.type());
-
-    if(result_width==0)
-      return conversion_failed(expr);
-
-    if(expr.operands().size()!=1)
-      return conversion_failed(expr);
-
-    std::size_t op_width = boolbv_width(to_unary_expr(expr).op().type());
-
-    if(op_width==0)
-      return conversion_failed(expr);
-
-    if(expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_signedbv)
-      return bv_utils.build_constant(op_width/8, result_width);
-  }
   else if(expr.id()==ID_case)
     return convert_case(expr);
   else if(expr.id()==ID_cond)
