@@ -1146,6 +1146,29 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("cpp11"))
     cpp.set_cpp11();
 
+  // set the upper bound for argc
+  if(os == "windows")
+  {
+    // On Windows, CreateProcess accepts no more than 32767 characters, so make
+    // that a hard limit.
+    ansi_c.max_argc = mp_integer{32767};
+  }
+  else
+  {
+    // For other systems assume argc is no larger than the what would make argv
+    // consume all available memory space:
+    // 2^pointer_width / (pointer_width / char_width) is the maximum number of
+    // argv elements sysconf(ARG_MAX) is likely much lower than this, but we
+    // don't know that value for the verification target platform.
+    const auto pointer_bits_2log =
+      address_bits(ansi_c.pointer_width / ansi_c.char_width);
+    if(ansi_c.pointer_width - pointer_bits_2log <= ansi_c.int_width)
+    {
+      ansi_c.max_argc = power(2, config.ansi_c.int_width - pointer_bits_2log);
+    }
+    // otherwise we leave argc unconstrained
+  }
+
   return false;
 }
 
