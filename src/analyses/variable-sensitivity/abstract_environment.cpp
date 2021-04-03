@@ -9,6 +9,7 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object_statistics.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 
 #include <algorithm>
@@ -19,6 +20,8 @@
 #ifdef DEBUG
 #  include <iostream>
 #endif
+
+exprt assume_eq(abstract_environmentt &env, exprt expr, const namespacet &ns);
 
 std::vector<abstract_object_pointert> eval_operands(
   const exprt &expr,
@@ -222,6 +225,10 @@ exprt abstract_environmentt::do_assume(
   const namespacet &ns,
   bool assumeTrue)
 {
+  auto expr_id = expr.id();
+  if (expr_id == ID_equal)
+    return assume_eq(*this, expr, ns);
+
   auto result = eval(expr, ns);
   return result->to_constant();
 }
@@ -454,5 +461,27 @@ std::vector<abstract_object_pointert> eval_operands(
     operands.push_back(env.eval(op, ns));
 
   return operands;
+}
+
+///////////
+exprt assume_eq(abstract_environmentt &env, exprt expr, const namespacet &ns)
+{
+  PRECONDITION(can_cast_expr<equal_exprt>(expr));
+
+  auto equal_expr = to_equal_expr(expr);
+
+  auto left = env.eval(equal_expr.lhs(), ns);
+  auto right = env.eval(equal_expr.rhs(), ns);
+
+  auto meet = left->meet(right);
+
+  if (meet->is_bottom())
+    return false_exprt();
+
+  if (is_lvalue(equal_expr.lhs()))
+    env.assign(equal_expr.lhs(), meet, ns);
+  if (is_lvalue(equal_expr.rhs()))
+    env.assign(equal_expr.rhs(), meet, ns);
+  return true_exprt();
 }
 
