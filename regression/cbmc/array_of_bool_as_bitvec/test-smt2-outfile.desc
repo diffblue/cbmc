@@ -1,0 +1,31 @@
+CORE broken-smt-backend
+main.c
+--smt2 --outfile -
+\(= \(select array_of\.2 i\) \(ite false #b1 #b0\)\)
+\(= \(select array\.3 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1\)
+\(= \(select array\.3 \(_ bv\d+ 64\)\) \(ite false #b1 #b0\)\)
+^EXIT=0$
+^SIGNAL=0$
+--
+\(= \(select array_of\.2 i\) false\)
+\(= \(select array\.3 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1 #b0\)
+\(= \(select array\.3 \(_ bv\d+ 64\)\) false\)
+--
+This test checks for correctness of BitVec-array encoding of Boolean arrays.
+
+Ideally, we shouldn't have to check the SMT output, but should run with backend
+SMT solvers. However, we currently cannot because of #5977 (also see #6005).
+
+For now, we tag this test as `broken-smt-backend` to avoid running main.c
+with `--z3` or `--cprover-smt2`, both of which encode Boolean arrays directly.
+Instead, we generate a generic SMT encoding with `--smt2` and check the output.
+
+Explanation of regexes:
+line 4,10: array.2 elements should be BitVec not Bool
+line 5,11: equality operator (=) should have 2 arguments not 3
+line 6,12: array.3 elements should be BitVec not Bool
+
+Once #5977 and #6005 are resolved, we should:
+- remove `broken-smt-backend` tag
+- run with `--smt2 --cprover-smt2` and `--smt2 --z3`
+- check for successful verification
