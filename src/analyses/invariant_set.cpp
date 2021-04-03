@@ -364,6 +364,8 @@ void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
   {
     std::size_t op_width=to_unsignedbv_type(type).get_width();
 
+    // TODO - 8 appears to be a magic number here -- or perhaps this should say
+    // ">=" instead, and is meant to restrict types larger than a single byte?
     if(op_width<=8)
     {
       unsigned a;
