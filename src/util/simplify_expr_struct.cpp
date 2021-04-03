@@ -161,7 +161,11 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         simplify_node(plus_exprt(struct_offset, member_offset));
 
       byte_extract_exprt result(
-        op.id(), byte_extract_expr.op(), final_offset, expr.type());
+        op.id(),
+        byte_extract_expr.op(),
+        final_offset,
+        byte_extract_expr.get_bits_per_byte(),
+        expr.type());
 
       return changed(simplify_rec(result)); // recursive call
     }

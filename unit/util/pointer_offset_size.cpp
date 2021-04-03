@@ -63,6 +63,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
                           byte_extract_id(),
                           index_exprt(a, from_integer(0, index_type())),
                           from_integer(1, index_type()),
+                          config.ansi_c.char_width,
                           small_t));
   }
 
@@ -73,9 +74,12 @@ TEST_CASE("Build subexpression to access element at offset into array")
     // not enough to fill a 16 bit int, so this cannot be transformed in an
     // index_exprt.
     REQUIRE(
-      result.value() ==
-      byte_extract_exprt(
-        byte_extract_id(), a, from_integer(3, index_type()), int16_t));
+      result.value() == byte_extract_exprt(
+                          byte_extract_id(),
+                          a,
+                          from_integer(3, index_type()),
+                          config.ansi_c.char_width,
+                          int16_t));
   }
 }
 
@@ -125,6 +129,7 @@ TEST_CASE("Build subexpression to access element at offset into struct")
                           byte_extract_id(),
                           member_exprt(s, "foo", t),
                           from_integer(1, index_type()),
+                          config.ansi_c.char_width,
                           small_t));
   }
 }

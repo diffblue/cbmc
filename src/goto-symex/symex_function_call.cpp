@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -113,6 +114,7 @@ void goto_symext::parameter_assignments(
               byte_extract_id(),
               rhs,
               from_integer(0, index_type()),
+              config.ansi_c.char_width,
               parameter_type);
         }
         // clang-format on

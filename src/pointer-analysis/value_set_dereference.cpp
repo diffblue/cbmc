@@ -534,6 +534,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
           byte_extract_id(),
           symbol_expr,
           pointer_offset(pointer_expr),
+          config.ansi_c.char_width,
           dereference_type);
         result.pointer = address_of_exprt{result.value};
       }
@@ -768,7 +769,8 @@ bool value_set_dereferencet::memory_model_bytes(
   else
   {
     // no, use 'byte_extract'
-    result = byte_extract_exprt(byte_extract_id(), value, offset, to_type);
+    result = byte_extract_exprt(
+      byte_extract_id(), value, offset, config.ansi_c.char_width, to_type);
   }
 
   value=result;

@@ -79,7 +79,11 @@ TEST_CASE("Simplify byte extract", "[core][util]")
   // object
   symbol_exprt s("foo", size_type());
   byte_extract_exprt be(
-    byte_extract_id(), s, from_integer(0, index_type()), size_type());
+    byte_extract_id(),
+    s,
+    from_integer(0, index_type()),
+    config.ansi_c.char_width,
+    size_type());
 
   exprt simp = simplify_expr(be, ns);
 

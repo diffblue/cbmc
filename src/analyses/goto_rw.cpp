@@ -157,7 +157,7 @@ void rw_range_sett::get_objects_byte_extract(
     get_objects_rec(mode, be.op(), -1, size);
   else
   {
-    *index *= 8;
+    *index *= be.get_bits_per_byte();
     if(*index >= *pointer_offset_bits(be.op().type(), ns))
       return;
 

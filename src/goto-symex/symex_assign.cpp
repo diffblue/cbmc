@@ -11,12 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_assign.h"
 
-#include "expr_skeleton.h"
-#include "goto_symex.h"
-#include "goto_symex_state.h"
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
+
+#include "expr_skeleton.h"
+#include "goto_symex.h"
+#include "goto_symex_state.h"
 
 // We can either use with_exprt or update_exprt when building expressions that
 // modify components of an array or a struct. Set USE_UPDATE to use
@@ -377,7 +378,8 @@ void symex_assignt::assign_byte_extract(
   else
     UNREACHABLE;
 
-  const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
+  const byte_update_exprt new_rhs{
+    byte_update_id, lhs.op(), lhs.offset(), rhs, lhs.get_bits_per_byte()};
   const expr_skeletont new_skeleton =
     full_lhs.compose(expr_skeletont::remove_op0(lhs));
   assign_rec(lhs.op(), new_skeleton, new_rhs, guard);

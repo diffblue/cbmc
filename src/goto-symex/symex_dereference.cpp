@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
@@ -96,7 +97,11 @@ exprt goto_symext::address_arithmetic(
     ode.build(expr, ns);
 
     const byte_extract_exprt be(
-      byte_extract_id(), ode.root_object(), ode.offset(), expr.type());
+      byte_extract_id(),
+      ode.root_object(),
+      ode.offset(),
+      config.ansi_c.char_width,
+      expr.type());
 
     // recursive call
     result = address_arithmetic(be, state, keep_array);
@@ -155,6 +160,7 @@ exprt goto_symext::address_arithmetic(
         byte_extract_id(),
         to_ssa_expr(expr).get_l1_object(),
         from_integer(offset, index_type()),
+        config.ansi_c.char_width,
         expr.type());
 
       result = address_arithmetic(be, state, keep_array);

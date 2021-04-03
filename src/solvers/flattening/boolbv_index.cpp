@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -347,7 +348,11 @@ bvt boolbvt::convert_index(
       ns);
 
     byte_extract_exprt be(
-      byte_extract_id(), o.root_object(), new_offset, array_type.subtype());
+      byte_extract_id(),
+      o.root_object(),
+      new_offset,
+      config.ansi_c.char_width,
+      array_type.subtype());
 
     return convert_bv(be);
   }

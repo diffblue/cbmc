@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_iterator.h>
 #include <util/nodiscard.h>
 #include <util/pointer_offset_size.h>
@@ -46,6 +47,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
         byte_extract_id(),
         if_expr.false_case(),
         from_integer(0, index_type()),
+        config.ansi_c.char_width,
         if_expr.true_case().type());
 
       if_expr.false_case().swap(be);
@@ -95,6 +97,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
           byte_extract_id(),
           expr,
           from_integer(0, index_type()),
+          config.ansi_c.char_width,
           array_typet(char_type(), array_size.value()));
       }
 
@@ -123,12 +126,12 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 
       array_typet new_array_type(subtype, new_size);
 
-      expr =
-        byte_extract_exprt(
-          byte_extract_id(),
-          expr,
-          ode.offset(),
-          new_array_type);
+      expr = byte_extract_exprt(
+        byte_extract_id(),
+        expr,
+        ode.offset(),
+        config.ansi_c.char_width,
+        new_array_type);
     }
   }
 }

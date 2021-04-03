@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "c_types.h"
+#include "config.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "simplify_expr.h"
@@ -686,6 +687,7 @@ optionalt<exprt> get_subexpression_at_offset(
     byte_extract_id(),
     expr,
     from_integer(offset_bytes, index_type()),
+    config.ansi_c.char_width,
     target_type_raw);
 }
 
