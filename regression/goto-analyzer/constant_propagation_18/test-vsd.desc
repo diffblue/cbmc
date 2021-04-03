@@ -3,6 +3,6 @@ main.c
 --variable-sensitivity --verify --vsd-pointers constants
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] line 7 assertion \*p == 1: SUCCESS$
+^\[main.assertion.1\] line 5 assertion \*p == 1: SUCCESS$
 --
 ^warning: ignoring

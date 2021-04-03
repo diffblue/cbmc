@@ -9,5 +9,3 @@ main.c
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^\[main\.coverage\..\] .* function main block .*: FAILED$
---
-On Windows/Visual Studio, "assert" does not introduce any branching.

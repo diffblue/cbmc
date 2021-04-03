@@ -3,7 +3,7 @@ CORE
 < test.xml
 ^EXIT=10$
 ^SIGNAL=0$
-Not unwinding loop foo\.0 iteration 3 file main\.c line 5 function foo thread 0
+Not unwinding loop foo\.0 iteration 3 file main\.c line 3 function foo thread 0
 <result property="foo\.assertion\.3" status="SUCCESS"/>
 <result property="foo\.assertion\.1" status="FAILURE">
 <goto_trace>
