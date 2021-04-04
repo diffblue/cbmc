@@ -73,7 +73,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     #   Ensure NDEBUG is not set for release builds
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
     #   Enable lots of warnings
     set(CMAKE_CXX_FLAGS
@@ -214,6 +214,10 @@ function(cprover_default_properties)
      CXX_STANDARD ${CBMC_CXX_STANDARD}
      CXX_STANDARD_REQUIRED ${CBMC_CXX_STANDARD_REQUIRED}
      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY})
+
+    if(ipo_supported)
+      set_property(TARGET ${ARGN} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+    endif()
 endfunction()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux AND
@@ -226,6 +230,22 @@ endif()
 
 option(WITH_MEMORY_ANALYZER
   "build the memory analyzer" ${WITH_MEMORY_ANALYZER_DEFAULT})
+
+# Our requirement is 3.8
+if((CMAKE_MAJOR_VERSION GREATER_EQUAL 4 OR CMAKE_MINOR_VERSION GREATER_EQUAL 9)
+   AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+  cmake_policy(SET CMP0069 NEW)
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT ipo_supported OUTPUT error LANGUAGES CXX)
+endif()
+
+if(ipo_supported)
+  message(STATUS "IPO / LTO enabled")
+  set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+  add_definitions(-DLTO)
+else()
+  message(STATUS "IPO / LTO not supported: <${error}>")
+endif()
 
 add_subdirectory(src)
 add_subdirectory(regression)

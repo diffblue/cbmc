@@ -58,6 +58,9 @@ list(REMOVE_ITEM sources
 )
 
 add_library(solvers ${sources})
+if(ipo_supported)
+  set_property(TARGET solvers PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
 
 include("${CBMC_SOURCE_DIR}/cmake/DownloadProject.cmake")
 
@@ -177,6 +180,9 @@ foreach(SOLVER ${sat_impl})
         )
 
         add_library(cadical_ipasir STATIC IMPORTED)
+        if(ipo_supported)
+          set_property(TARGET cadical_ipasir PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+        endif()
         set_property(TARGET cadical_ipasir
             PROPERTY IMPORTED_LOCATION ${cadical_SOURCE_DIR}/build/libcadical.a
         )
@@ -222,6 +228,9 @@ foreach(SOLVER ${sat_impl})
         )
 
         add_library(ipasir_custom STATIC IMPORTED)
+        if(ipo_supported)
+          set_property(TARGET cadical_custom PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+        endif()
         set_property(TARGET ipasir_custom
             PROPERTY IMPORTED_LOCATION ${IPASIR_LIB}
         )
@@ -247,5 +256,8 @@ endif()
 # Executable
 add_executable(smt2_solver smt2/smt2_solver.cpp)
 target_link_libraries(smt2_solver solvers)
+if(ipo_supported)
+  set_property(TARGET smt2_solver PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
 
 generic_includes(solvers)
