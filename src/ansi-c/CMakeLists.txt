@@ -10,6 +10,10 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
     DEPENDS converter ${ansi_c_library_sources})
 
 add_executable(file_converter file_converter.cpp)
+if(ipo_supported)
+    set_property(TARGET converter PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+    set_property(TARGET file_converter PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
 
 function(make_inc name)
     get_filename_component(inc_path "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc" DIRECTORY)
@@ -53,9 +57,10 @@ add_custom_command(
 )
 
 if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  if(NOT ipo_supported)
     add_custom_target(c_library_check
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
-)
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp)
+  endif()
 endif()
 
 ################################################################################
