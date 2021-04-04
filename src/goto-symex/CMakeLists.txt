@@ -8,3 +8,8 @@ if(CMAKE_USE_CUDD)
 endif()
 
 target_link_libraries(goto-symex util)
+
+if(ipo_supported)
+    set_property(TARGET goto-symex PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
+

@@ -10,6 +10,10 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
     DEPENDS converter ${ansi_c_library_sources})
 
 add_executable(file_converter file_converter.cpp)
+if(ipo_supported)
+    set_property(TARGET converter PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+    set_property(TARGET file_converter PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
 
 function(make_inc name)
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"

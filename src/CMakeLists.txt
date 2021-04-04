@@ -93,6 +93,12 @@ macro(add_if_library target name)
         string(REGEX REPLACE "-" "_" define ${upper_name})
 
         target_compile_definitions(${target} PUBLIC HAVE_${define})
+        if(ipo_supported)
+          set_property(TARGET ${name} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+        endif()
+    endif()
+    if(ipo_supported)
+      set_property(TARGET ${target} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
     endif()
 endmacro(add_if_library)
 

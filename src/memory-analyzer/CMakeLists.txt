@@ -16,6 +16,7 @@ target_link_libraries(memory-analyzer-lib
 
 # Executable
 add_executable(memory-analyzer memory_analyzer_main.cpp)
+
 target_link_libraries(memory-analyzer memory-analyzer-lib)
 
 cprover_default_properties(memory-analyzer memory-analyzer-lib)

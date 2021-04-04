@@ -54,6 +54,9 @@ list(REMOVE_ITEM sources
 )
 
 add_library(solvers ${sources})
+if(ipo_supported)
+  set_property(TARGET solvers PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
 
 include("${CBMC_SOURCE_DIR}/../cmake/DownloadProject.cmake")
 
@@ -104,7 +107,7 @@ elseif("${sat_impl}" STREQUAL "cadical")
     download_project(PROJ cadical
         URL https://github.com/arminbiere/cadical/archive/rel-1.3.0.tar.gz
         PATCH_COMMAND true
-        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s -j
+        COMMAND CXX="${CMAKE_CXX_COMPILER}" CXXFLAGS="${CMAKE_CXX_FLAGS}" ./configure -O3 -s -j
         URL_MD5 5bd15d1e198d2e904a8af8b7873dd341
     )
 
@@ -117,6 +120,9 @@ elseif("${sat_impl}" STREQUAL "cadical")
 
     add_library(cadical STATIC IMPORTED)
 
+    if(ipo_supported)
+      set_property(TARGET cadical PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+    endif()
     set_target_properties(
         cadical
         PROPERTIES IMPORTED_LOCATION ${cadical_SOURCE_DIR}/build/libcadical.a
@@ -143,5 +149,8 @@ endif()
 # Executable
 add_executable(smt2_solver smt2/smt2_solver.cpp)
 target_link_libraries(smt2_solver solvers)
+if(ipo_supported)
+  set_property(TARGET smt2_solver PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
 
 generic_includes(solvers)

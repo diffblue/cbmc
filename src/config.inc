@@ -14,8 +14,11 @@ ifeq ($(CPROVER_WITH_PROFILING),1)
 endif
 
 # Select optimisation or debug info
-#CXXFLAGS += -O2 -DNDEBUG
+#CXXFLAGS += -O3 -DNDEBUG -flto -DLTO
 #CXXFLAGS += -O0 -g
+
+# Matching -flto above
+#LINKFLAGS = -ftlo
 
 # With GCC this adds function names in stack backtraces
 #LINKFLAGS = -rdynamic

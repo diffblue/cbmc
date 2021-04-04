@@ -14,6 +14,10 @@ set_target_properties(
     XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
 )
 
+if(ipo_supported)
+    set_property(TARGET minisat2-condensed PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     target_compile_options(minisat2-condensed PUBLIC /w)
 endif()
