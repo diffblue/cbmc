@@ -94,8 +94,7 @@ void validate_lambda_assignment(
   REQUIRE_THAT(
     parents,
     // NOLINTNEXTLINE(whitespace/braces)
-    Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
-      test_data.lambda_interface});
+    Catch::Matchers::VectorContains(test_data.lambda_interface));
 
   const auto &interface_children =
     class_hierarchy.get_children_trans(test_data.lambda_interface);
@@ -103,8 +102,7 @@ void validate_lambda_assignment(
   REQUIRE_THAT(
     interface_children,
     // NOLINTNEXTLINE(whitespace/braces)
-    Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
-      tmp_class_identifier});
+    Catch::Matchers::VectorContains(tmp_class_identifier));
 
   THEN("The function in the class should call the lambda method")
   {
@@ -145,7 +143,7 @@ void validate_lambda_assignment(
 
     REQUIRE_THAT(
       function_call.arguments(),
-      Catch::Matchers::Vector::EqualsMatcher<exprt>{expected_args});
+      Catch::Matchers::Equals(std::vector<exprt>(expected_args)));
 
     if(test_data.should_return_value)
     {

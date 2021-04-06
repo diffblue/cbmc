@@ -42,8 +42,8 @@ void run_on_all_variants(
       REQUIRE_THAT(
         result,
         // NOLINTNEXTLINE(whitespace/braces)
-        Catch::Matchers::Vector::EqualsMatcher<std::string>{
-          expected_results.no_strip_no_remove});
+        Catch::Matchers::Equals(
+          std::vector<std::string>(expected_results.no_strip_no_remove)));
     }
   }
   WHEN("Not stripping, removing empty")
@@ -56,8 +56,8 @@ void run_on_all_variants(
       REQUIRE_THAT(
         result,
         // NOLINTNEXTLINE(whitespace/braces)
-        Catch::Matchers::Vector::EqualsMatcher<std::string>{
-          expected_results.no_strip_remove_empty});
+        Catch::Matchers::Equals(
+          std::vector<std::string>(expected_results.no_strip_remove_empty)));
     }
   }
   WHEN("Stripping, not removing empty")
@@ -70,8 +70,8 @@ void run_on_all_variants(
       REQUIRE_THAT(
         result,
         // NOLINTNEXTLINE(whitespace/braces)
-        Catch::Matchers::Vector::EqualsMatcher<std::string>{
-          expected_results.strip_no_remove});
+        Catch::Matchers::Equals(
+          std::vector<std::string>(expected_results.strip_no_remove)));
     }
   }
   WHEN("Stripping and removing empty")
@@ -84,8 +84,8 @@ void run_on_all_variants(
       REQUIRE_THAT(
         result,
         // NOLINTNEXTLINE(whitespace/braces)
-        Catch::Matchers::Vector::EqualsMatcher<std::string>{
-          expected_results.strip_remove_empty});
+        Catch::Matchers::Equals(
+          std::vector<std::string>(expected_results.strip_remove_empty)));
     }
   }
 }
@@ -146,9 +146,7 @@ SCENARIO("split_string", "[core][utils][string_utils][split_string]")
       THEN("Should get expected vector")
       {
         std::vector<std::string> expected_result = {"a", "b", "c"};
-        REQUIRE_THAT(
-          result,
-          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
+        REQUIRE_THAT(result, Catch::Matchers::Equals(expected_result));
       }
     }
     WHEN("Not stripping, removing empty")
@@ -159,9 +157,7 @@ SCENARIO("split_string", "[core][utils][string_utils][split_string]")
       THEN("Should get expected vector")
       {
         std::vector<std::string> expected_result = {"a", "b", "c"};
-        REQUIRE_THAT(
-          result,
-          Catch::Matchers::Vector::EqualsMatcher<std::string>{expected_result});
+        REQUIRE_THAT(result, Catch::Matchers::Equals(expected_result));
       }
     }
     // TODO(tkiley): here we should check what happens when trying to enable
