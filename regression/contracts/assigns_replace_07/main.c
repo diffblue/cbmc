@@ -1,6 +1,6 @@
 #include <assert.h>
 
-void bar(char d[]) __CPROVER_assigns(d[7])
+void bar(char d[]) __CPROVER_assigns(*d)
 {
 }
 
@@ -18,7 +18,7 @@ int main()
   b[8] = 'i';
   b[9] = 'j';
   bar(b);
-  assert(b[7] == 'h');
+  assert(b[0] == 'a');
 
   return 0;
 }
