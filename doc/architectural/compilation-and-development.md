@@ -302,3 +302,22 @@ each function; and the "call graph", which includes context, and tells you how
 much time was spent within each call stack. For more information see online
 tutorials, like
 https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_chapter/gprof_5.html
+
+\section compilation-and-development-section-max-performance Maximum Performance
+
+On Intel with gcc-compatible compilers (i.e. gcc, clang, icc) you may
+use the `-Denable_marchnative=1` option, to pass `-march=native` to cc
+and c++.
+
+    CXXFLAGS="-O3" CFLAGS="-O3" cmake -S . -Bbuild-native -Denable_marchnative=1
+    make -j4 -C build-native
+
+enable_marchnative will be about 10% faster on top of -O3.
+
+On MSVC there is no `/O3`, but you might try adding `/O2
+/favor:INTEL64` or `/O2 /favor:AMD64` as CXXFLAGS.
+
+Using `-flto` IPO optimizations are not yet supported.
+
+TODO: Which SAT solver is the fastest?
+
