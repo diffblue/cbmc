@@ -18,7 +18,6 @@
 #include <langapi/mode.h>
 
 #include <util/cmdline.h>
-#include <util/config.h>
 #include <util/message.h>
 #include <util/options.h>
 #include <util/symbol_table.h>

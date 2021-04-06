@@ -15,7 +15,6 @@ Author: Daniel Kroening
 
 #include <langapi/language_util.h>
 #include <util/arith_tools.h>
-#include <util/config.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
 

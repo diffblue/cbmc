@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 #include <util/prefix.h>
-#include <util/config.h>
 
 #include "expr2java.h"
 

@@ -20,7 +20,6 @@ Author: Diffblue Ltd.
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/replace_java_nondet.h>
 
-#include <util/config.h>
 #include <util/options.h>
 
 #include <goto-instrument/cover.h>

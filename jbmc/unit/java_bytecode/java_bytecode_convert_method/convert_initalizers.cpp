@@ -10,7 +10,6 @@ Author: Diffblue Limited.
 
 #include <memory>
 
-#include <util/config.h>
 #include <util/symbol_table.h>
 
 #include <java_bytecode/java_bytecode_language.h>

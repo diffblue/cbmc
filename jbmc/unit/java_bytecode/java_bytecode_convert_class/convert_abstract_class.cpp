@@ -11,7 +11,6 @@ Author: Diffblue Ltd.
 #include <istream>
 #include <memory>
 
-#include <util/config.h>
 #include <util/message.h>
 
 #include <java_bytecode/java_bytecode_language.h>
