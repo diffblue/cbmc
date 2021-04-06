@@ -14,7 +14,7 @@ if(GIT_FOUND)
       OUTPUT_STRIP_TRAILING_WHITESPACE
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
-    configure_file(\${CUR}/version.cpp.in version.cpp)
+    configure_file(\${CUR}/version.cpp.in \${CBMC_SOURCE_DIR}/util/version.cpp)
     "
   )
 else()
@@ -24,7 +24,7 @@ else()
       config_inc_v REGEX \"CBMC_VERSION *= *[0-9\.]+\")
     string(REGEX REPLACE \"^CBMC_VERSION *= *\" \"\" CBMC_RELEASE \${config_inc_v})
     set(GIT_INFO \"n/a\")
-    configure_file(\${CUR}/version.cpp.in version.cpp)
+    configure_file(\${CUR}/version.cpp.in \${CBMC_SOURCE_DIR}/util/version.cpp)
     "
   )
 endif()
@@ -33,7 +33,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.in
   "const char *CBMC_VERSION=\"@CBMC_RELEASE@ (@GIT_INFO@)\";\n")
 add_custom_target(
   generate_version_cpp
-  BYPRODUCTS version.cpp
+  BYPRODUCTS ${CBMC_SOURCE_DIR}/util/version.cpp
   COMMAND ${CMAKE_COMMAND}
     -D CBMC_SOURCE_DIR=${CBMC_SOURCE_DIR}
     -D CUR=${CMAKE_CURRENT_BINARY_DIR}
