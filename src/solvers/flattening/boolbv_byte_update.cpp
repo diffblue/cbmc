@@ -58,31 +58,23 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
     }
     else
     {
-      if(little_endian)
+      endianness_mapt map_op = endianness_map(op.type(), little_endian);
+      endianness_mapt map_value = endianness_map(value.type(), little_endian);
+
+      const std::size_t offset_i = numeric_cast_v<std::size_t>(offset);
+
+      for(std::size_t i = 0; i < update_width; i++)
       {
-        for(std::size_t i=0; i<update_width; i++)
-          bv[numeric_cast_v<std::size_t>(offset + i)] = value_bv[i];
-      }
-      else
-      {
-        endianness_mapt map_op = endianness_map(op.type(), false);
-        endianness_mapt map_value = endianness_map(value.type(), false);
+        size_t index_op = map_op.map_bit(offset_i + i);
+        size_t index_value = map_value.map_bit(i);
 
-        const std::size_t offset_i = numeric_cast_v<std::size_t>(offset);
+        INVARIANT(
+          index_op < bv.size(), "bit vector index shall be within bounds");
+        INVARIANT(
+          index_value < value_bv.size(),
+          "bit vector index shall be within bounds");
 
-        for(std::size_t i=0; i<update_width; i++)
-        {
-          size_t index_op=map_op.map_bit(offset_i+i);
-          size_t index_value=map_value.map_bit(i);
-
-          INVARIANT(
-            index_op < bv.size(), "bit vector index shall be within bounds");
-          INVARIANT(
-            index_value < value_bv.size(),
-            "bit vector index shall be within bounds");
-
-          bv[index_op]=value_bv[index_value];
-        }
+        bv[index_op] = value_bv[index_value];
       }
     }
 
