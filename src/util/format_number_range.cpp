@@ -73,74 +73,77 @@ std::string format_number_range(const std::vector<unsigned> &input_numbers)
 }
 
 /// Appends \p number resp. numbers \p begin_range ... \p number to \p numbers
-static void append_numbers_and_reset(
+static void append_numbers(
   const std::string &number_range,
   std::vector<unsigned> &numbers,
-  optionalt<unsigned> &begin_range,
-  optionalt<unsigned> &number)
+  bool last_number_is_set,
+  bool is_range)
 {
-  if(!number.has_value() && begin_range.has_value())
+  if(!last_number_is_set && is_range)
   {
     throw deserialization_exceptiont(
-      "unterminated number range '" + std::to_string(*begin_range) + "-'");
+      "unterminated number range '" + std::to_string(*(++numbers.rbegin())) +
+      "-'");
   }
 
-  if(!number.has_value())
+  if(!last_number_is_set)
   {
     throw deserialization_exceptiont(
       "invalid number range '" + number_range + "'");
   }
 
-  if(number.has_value() && begin_range.has_value())
+  if(is_range)
   {
-    if(*begin_range > *number)
+    unsigned end_range = numbers.back();
+    numbers.pop_back();
+    unsigned begin_range = numbers.back();
+    numbers.pop_back();
+    if(begin_range > end_range)
     {
       throw deserialization_exceptiont(
         "lower bound must not be larger than upper bound '" +
-        std::to_string(*begin_range) + "-" + std::to_string(*number) + "'");
+        std::to_string(begin_range) + "-" + std::to_string(end_range) + "'");
     }
-    for(unsigned i = *begin_range; i < *number; ++i)
+    for(unsigned i = begin_range; i < end_range; ++i)
       numbers.push_back(i);
     // add upper bound separately to avoid
     // potential overflow issues in the loop above
-    numbers.push_back(*number);
-    begin_range = {};
-    number = {};
-  }
-  else if(number.has_value() && !begin_range.has_value())
-  {
-    numbers.push_back(*number);
-    number = {};
+    numbers.push_back(end_range);
   }
 }
 
 std::vector<unsigned> parse_number_range(const std::string &number_range)
 {
-  std::vector<unsigned> numbers;
+  std::vector<unsigned> numbers(1, 0);
+  bool last_number_is_set = false;
+  bool is_range = false;
 
-  optionalt<unsigned> begin_range;
-  optionalt<unsigned> number;
   for(char c : number_range)
   {
     if('0' <= c && c <= '9')
     {
-      if(!number.has_value())
-        number = 0;
-      *number = 10 * *number + (c - '0');
+      numbers.back() *= 10;
+      numbers.back() += c - '0';
+      last_number_is_set = true;
     }
     else if(c == ',')
     {
-      append_numbers_and_reset(number_range, numbers, begin_range, number);
+      append_numbers(number_range, numbers, last_number_is_set, is_range);
+
+      numbers.push_back(0);
+      last_number_is_set = false;
+      is_range = false;
     }
     else if(c == '-')
     {
-      if(!number.has_value())
+      if(!last_number_is_set)
       {
         throw deserialization_exceptiont(
           "lower bound missing in number range '" + number_range + "'");
       }
-      begin_range = number;
-      number = {};
+      numbers.push_back(0);
+      last_number_is_set = false;
+      is_range = true;
     }
     else
     {
@@ -148,7 +151,7 @@ std::vector<unsigned> parse_number_range(const std::string &number_range)
         std::string("character '") + c + "' not allowed in number range");
     }
   }
-  append_numbers_and_reset(number_range, numbers, begin_range, number);
+  append_numbers(number_range, numbers, last_number_is_set, is_range);
 
   return numbers;
 }
