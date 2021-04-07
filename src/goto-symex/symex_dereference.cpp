@@ -17,11 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 
 #include <pointer-analysis/value_set_dereference.h>
 
+#include "expr_skeleton.h"
+#include "symex_assign.h"
 #include "symex_dereference_state.h"
 
 /// Transforms an lvalue expression by replacing any dereference operations it
@@ -71,7 +74,7 @@ exprt goto_symext::address_arithmetic(
 
     // there could be further dereferencing in the offset
     exprt offset=be.offset();
-    dereference_rec(offset, state, false);
+    dereference_rec(offset, state, false, false);
 
     result=plus_exprt(result, offset);
 
@@ -107,14 +110,14 @@ exprt goto_symext::address_arithmetic(
     // just grab the pointer, but be wary of further dereferencing
     // in the pointer itself
     result=to_dereference_expr(expr).pointer();
-    dereference_rec(result, state, false);
+    dereference_rec(result, state, false, false);
   }
   else if(expr.id()==ID_if)
   {
     if_exprt if_expr=to_if_expr(expr);
 
     // the condition is not an address
-    dereference_rec(if_expr.cond(), state, false);
+    dereference_rec(if_expr.cond(), state, false, false);
 
     // recursive call
     if_expr.true_case() =
@@ -131,7 +134,7 @@ exprt goto_symext::address_arithmetic(
   {
     // give up, just dereference
     result=expr;
-    dereference_rec(result, state, false);
+    dereference_rec(result, state, false, false);
 
     // turn &array into &array[0]
     if(result.type().id() == ID_array && !keep_array)
@@ -191,14 +194,72 @@ exprt goto_symext::address_arithmetic(
   return result;
 }
 
+symbol_exprt
+goto_symext::cache_dereference(exprt &dereference_result, statet &state)
+{
+  auto const cache_key = [&] {
+    auto cache_key =
+      state.field_sensitivity.apply(ns, state, dereference_result, false);
+    if(auto let_expr = expr_try_dynamic_cast<let_exprt>(dereference_result))
+    {
+      let_expr->value() = state.rename<L2>(let_expr->value(), ns).get();
+    }
+    else
+    {
+      cache_key = state.rename<L2>(cache_key, ns).get();
+    }
+    return cache_key;
+  }();
+
+  if(auto cached = state.dereference_cache.find(cache_key))
+  {
+    return *cached;
+  }
+
+  auto const &cache_symbol = get_fresh_aux_symbol(
+    cache_key.type(),
+    "symex",
+    "dereference_cache",
+    dereference_result.source_location(),
+    language_mode,
+    ns,
+    state.symbol_table);
+
+  // we need to lift possible lets
+  // (come from the value set to avoid repeating complex pointer comparisons)
+  auto cache_value = cache_key;
+  lift_lets(state, cache_value);
+
+  auto assign = symex_assignt{
+    state, symex_targett::assignment_typet::STATE, ns, symex_config, target};
+
+  auto cache_symbol_expr = cache_symbol.symbol_expr();
+  assign.assign_symbol(
+    to_ssa_expr(state.rename<L1>(cache_symbol_expr, ns).get()),
+    expr_skeletont{},
+    cache_value,
+    {});
+
+  state.dereference_cache.insert(cache_key, cache_symbol_expr);
+  return cache_symbol_expr;
+}
+
 /// If \p expr is a \ref dereference_exprt, replace it with explicit references
 /// to the objects it may point to. Otherwise recursively apply this function to
 /// \p expr's operands, with special cases for address-of (handled by \ref
 /// goto_symext::address_arithmetic) and certain common expression patterns
 /// such as `&struct.flexible_array[0]` (see inline comments in code).
+/// Note that \p write is used to alter behaviour when this function is
+/// operating on the LHS of an assignment. Similarly \p is_in_quantifier
+/// indicates when the dereference is inside a quantifier (related to scoping
+/// when dereference caching is enabled).
 /// For full details of this method's pointer replacement and potential side-
 /// effects see \ref goto_symext::dereference
-void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
+void goto_symext::dereference_rec(
+  exprt &expr,
+  statet &state,
+  bool write,
+  bool is_in_quantifier)
 {
   if(expr.id()==ID_dereference)
   {
@@ -221,7 +282,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
     tmp1.swap(to_dereference_expr(expr).pointer());
 
     // first make sure there are no dereferences in there
-    dereference_rec(tmp1, state, false);
+    dereference_rec(tmp1, state, false, is_in_quantifier);
 
     // Depending on the nature of the pointer expression, the recursive deref
     // operation might have introduced a construct such as
@@ -271,10 +332,29 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
       dereference.dereference(tmp1, symex_config.show_points_to_sets);
     // std::cout << "**** " << format(tmp2) << '\n';
 
-    expr.swap(tmp2);
 
     // this may yield a new auto-object
-    trigger_auto_object(expr, state);
+    trigger_auto_object(tmp2, state);
+
+    // Check various conditions for when we should try to cache the expression.
+    // 1. Caching dereferences must be enabled.
+    // 2. Do not cache inside LHS of writes.
+    // 3. Do not cache inside quantifiers (references variables outside their
+    //    scope).
+    // 4. Only cache "complicated" expressions, i.e. of the form
+    //     [let p = <expr> in ]
+    //     (p == &something ? something : ...))
+    // Otherwise we should just return it unchanged.
+    if(
+      symex_config.cache_dereferences && !write && !is_in_quantifier &&
+      (tmp2.id() == ID_if || tmp2.id() == ID_let))
+    {
+      expr = cache_dereference(tmp2, state);
+    }
+    else
+    {
+      expr = std::move(tmp2);
+    }
   }
   else if(
     expr.id() == ID_index && to_index_expr(expr).array().id() == ID_member &&
@@ -293,7 +373,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
     tmp.add_source_location()=expr.source_location();
 
     // recursive call
-    dereference_rec(tmp, state, write);
+    dereference_rec(tmp, state, write, is_in_quantifier);
 
     expr.swap(tmp);
   }
@@ -331,17 +411,18 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
             to_address_of_expr(tc_op).object(),
             from_integer(0, index_type())));
 
-      dereference_rec(expr, state, write);
+      dereference_rec(expr, state, write, is_in_quantifier);
     }
     else
     {
-      dereference_rec(tc_op, state, write);
+      dereference_rec(tc_op, state, write, is_in_quantifier);
     }
   }
   else
   {
+    bool is_quantifier = expr.id() == ID_forall || expr.id() == ID_exists;
     Forall_operands(it, expr)
-      dereference_rec(*it, state, write);
+      dereference_rec(*it, state, write, is_in_quantifier || is_quantifier);
   }
 }
 
@@ -409,7 +490,7 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
   });
 
   // start the recursion!
-  dereference_rec(expr, state, write);
+  dereference_rec(expr, state, write, false);
   // dereferencing may introduce new symbol_exprt
   // (like __CPROVER_memory)
   expr = state.rename<L1>(std::move(expr), ns).get();

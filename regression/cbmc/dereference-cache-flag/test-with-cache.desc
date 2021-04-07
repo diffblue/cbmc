@@ -1,0 +1,10 @@
+CORE
+test.c
+--show-vcc --symex-cache-dereferences
+symex::dereference_cache!0#1 = 0
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is just checking that the --symex-cache-dereferences flag actually
+turns dereference caching on.

@@ -38,6 +38,10 @@ protected:
   symex_level2t level2;
 
 public:
+  /// This is used for eliminating repeated complicated dereferences.
+  /// \see goto_symext::dereference_rec
+  sharing_mapt<exprt, symbol_exprt, false, irep_hash> dereference_cache;
+
   const symex_level2t &get_level2() const
   {
     return level2;

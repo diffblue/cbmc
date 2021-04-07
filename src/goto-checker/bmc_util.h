@@ -197,7 +197,8 @@ void run_property_decider(
   "(incremental-loop):" \
   "(unwind-min):" \
   "(unwind-max):" \
-  "(ignore-properties-before-unwind-min)"
+  "(ignore-properties-before-unwind-min)" \
+  "(symex-cache-dereferences)" \
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -251,7 +252,8 @@ void run_property_decider(
   "                              iteration are allowed to fail due to\n" \
   "                              complexity violations before the loop\n" \
   "                              gets blacklisted\n" \
-  " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
+  " --graphml-witness filename   write the witness in GraphML format to filename\n" /* NOLINT(*) */ \
+  " --symex-cache-dereferences   enable caching of repeated dereferences" \
 // clang-format on
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H
