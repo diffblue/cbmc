@@ -25,7 +25,7 @@ meet(abstract_object_pointert const &op1, abstract_object_pointert const &op2)
   return as_interval(result);
 }
 
-void THEN_BOTTOM(std::shared_ptr<const interval_abstract_valuet> &result)
+static void THEN_BOTTOM(std::shared_ptr<const interval_abstract_valuet> &result)
 {
   THEN("result is BOTTOM")
   {
@@ -33,7 +33,7 @@ void THEN_BOTTOM(std::shared_ptr<const interval_abstract_valuet> &result)
   }
 }
 
-void THEN_TOP(std::shared_ptr<const interval_abstract_valuet> &result)
+static void THEN_TOP(std::shared_ptr<const interval_abstract_valuet> &result)
 {
   THEN("result is TOP")
   {
@@ -41,7 +41,7 @@ void THEN_TOP(std::shared_ptr<const interval_abstract_valuet> &result)
   }
 }
 
-void THEN_INTERVAL(
+static void THEN_INTERVAL(
   std::shared_ptr<const interval_abstract_valuet> &result,
   exprt lower,
   exprt upper)
@@ -52,7 +52,7 @@ void THEN_INTERVAL(
   }
 }
 
-void THEN_ONE(std::shared_ptr<const interval_abstract_valuet> &result)
+static void THEN_ONE(std::shared_ptr<const interval_abstract_valuet> &result)
 {
   const typet type = signedbv_typet(32);
   const exprt val1 = from_integer(1, type);

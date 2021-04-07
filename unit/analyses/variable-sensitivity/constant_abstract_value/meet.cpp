@@ -21,7 +21,7 @@ meet(abstract_object_pointert const &op1, abstract_object_pointert const &op2)
   return as_constant(result);
 }
 
-void THEN_BOTTOM(std::shared_ptr<const constant_abstract_valuet> &result)
+static void THEN_BOTTOM(std::shared_ptr<const constant_abstract_valuet> &result)
 {
   THEN("result is BOTTOM")
   {
@@ -29,7 +29,7 @@ void THEN_BOTTOM(std::shared_ptr<const constant_abstract_valuet> &result)
   }
 }
 
-void THEN_TOP(std::shared_ptr<const constant_abstract_valuet> &result)
+static void THEN_TOP(std::shared_ptr<const constant_abstract_valuet> &result)
 {
   THEN("result is TOP")
   {
@@ -37,7 +37,7 @@ void THEN_TOP(std::shared_ptr<const constant_abstract_valuet> &result)
   }
 }
 
-void THEN_ONE(std::shared_ptr<const constant_abstract_valuet> &result)
+static void THEN_ONE(std::shared_ptr<const constant_abstract_valuet> &result)
 {
   THEN("result is 1")
   {

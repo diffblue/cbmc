@@ -203,6 +203,58 @@ abstract_object_pointert value_set_abstract_objectt::write(
   return resolve_new_values(new_values, environment);
 }
 
+abstract_object_pointert value_set_abstract_objectt::merge_with_value(
+  const abstract_value_pointert &other) const
+{
+  auto union_values = !is_bottom() ? values : abstract_object_sett{};
+
+  auto other_value_set = std::dynamic_pointer_cast<const value_set_tag>(other);
+  if(other_value_set)
+    union_values.insert(other_value_set->get_values());
+  else
+    union_values.insert(other);
+
+  return resolve_values(union_values);
+}
+
+abstract_object_pointert value_set_abstract_objectt::meet_with_value(
+  const abstract_value_pointert &other) const
+{
+  if(other->is_bottom())
+    return shared_from_this();
+
+  auto meet_values = abstract_object_sett{};
+
+  if(is_bottom())
+    meet_values.insert(other);
+  else
+  {
+    auto this_interval = to_interval();
+    auto other_interval = other->to_interval();
+
+    auto lower_bound = constant_interval_exprt::get_max(
+      this_interval.get_lower(), other_interval.get_lower());
+    auto upper_bound = constant_interval_exprt::get_min(
+      this_interval.get_upper(), other_interval.get_upper());
+
+    // if the interval is valid, we have a meet!
+    if(constant_interval_exprt::less_than_or_equal(lower_bound, upper_bound))
+    {
+      auto meet_interval = constant_interval_exprt(lower_bound, upper_bound);
+      abstract_object_pointert meet_value =
+        std::make_shared<interval_abstract_valuet>(meet_interval);
+      if(meet_interval.is_single_value_interval())
+        meet_value = std::make_shared<constant_abstract_valuet>(lower_bound);
+      meet_values.insert(meet_value);
+    }
+  }
+
+  if(meet_values.empty()) // no meet :(
+    return std::make_shared<value_set_abstract_objectt>(type(), false, true);
+
+  return resolve_values(meet_values);
+}
+
 abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
   const abstract_object_sett &new_values,
   const abstract_environmentt &environment) const
@@ -240,24 +292,23 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 abstract_object_pointert
 value_set_abstract_objectt::merge(const abstract_object_pointert &other) const
 {
-  auto union_values = !is_bottom() ? values : abstract_object_sett{};
-
-  auto other_value_set = std::dynamic_pointer_cast<const value_set_tag>(other);
-  if(other_value_set)
-  {
-    union_values.insert(other_value_set->get_values());
-    return resolve_values(union_values);
-  }
-
   auto other_value =
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(other_value)
-  {
-    union_values.insert(other_value);
-    return resolve_values(union_values);
-  }
+    return merge_with_value(other_value);
 
   return abstract_objectt::merge(other);
+}
+
+abstract_object_pointert
+value_set_abstract_objectt::meet(const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  if(cast_other)
+    return meet_with_value(cast_other);
+
+  return abstract_objectt::meet(other);
 }
 
 void value_set_abstract_objectt::set_top_internal()

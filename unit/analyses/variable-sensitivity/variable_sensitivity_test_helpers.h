@@ -231,5 +231,6 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   namespacet &ns);
 
 std::string expr_to_str(const exprt &expr);
+std::string exprs_to_str(const std::vector<exprt> &values);
 
 #endif
