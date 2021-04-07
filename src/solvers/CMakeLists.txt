@@ -112,7 +112,15 @@ elseif("${sat_impl}" STREQUAL "cadical")
     )
 
     message(STATUS "Building CaDiCaL")
-    execute_process(COMMAND make WORKING_DIRECTORY ${cadical_SOURCE_DIR})
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+      execute_process(COMMAND make CXXFLAGS="${CMAKE_CXX_FLAGS_RELEASE}"
+                      WORKING_DIRECTORY "${cadical_SOURCE_DIR}")
+    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+      execute_process(COMMAND make CXXFLAGS="${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
+                      WORKING_DIRECTORY "${cadical_SOURCE_DIR}")
+    else()
+      execute_process(COMMAND make WORKING_DIRECTORY ${cadical_SOURCE_DIR})
+    endif()
 
     target_compile_definitions(solvers PUBLIC
         SATCHECK_CADICAL HAVE_CADICAL
