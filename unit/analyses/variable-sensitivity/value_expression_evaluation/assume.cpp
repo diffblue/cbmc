@@ -28,15 +28,6 @@ exprt binary_expression(
   return expression_type(op1_sym, op2_sym);
 }
 
-static exprt compare_equal(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  abstract_environmentt &environment,
-  namespacet &ns)
-{
-  return binary_expression<equal_exprt>(op1, op2, environment, ns);
-}
-
 static void ASSUME_TRUE(
   abstract_environmentt &env,
   const exprt &expr,
@@ -53,22 +44,38 @@ std::vector<exprt> numbersToExprs(std::vector<std::string> const &numbers);
 class assume_tester
 {
 public:
-  void equality_test(bool is_true, std::vector<std::string> const &tests)
+  void operator()(bool is_true, std::vector<std::string> const &tests)
   {
     for(auto test : tests)
-      equality_test(is_true, test);
+    {
+      if(is_test(test, "=="))
+        test_fn<equal_exprt>(is_true, test, "==");
+      else if(is_test(test, "!="))
+        test_fn<notequal_exprt>(is_true, test, "!=");
+      else
+        FAIL("Unknown test: " + test);
+    }
   }
-  void equality_test(bool is_true, std::string const &test)
+
+  bool is_test(std::string const &test, std::string const &delimiter)
+  {
+    return test.find(delimiter) != std::string::npos;
+  }
+
+  template <class expression_type>
+  void
+  test_fn(bool is_true, std::string const &test, std::string const &delimiter)
   {
     WHEN(test)
     {
-      auto operands = split(test, "==");
+      auto operands = split(test, delimiter);
       REQUIRE(operands.size() == 2);
 
       auto op1 = build_op(operands[0]);
       auto op2 = build_op(operands[1]);
 
-      auto equals = compare_equal(op1, op2, environment, ns);
+      auto equals =
+        binary_expression<expression_type>(op1, op2, environment, ns);
 
       if(is_true)
         ASSUME_TRUE(environment, equals, ns);
@@ -147,9 +154,9 @@ SCENARIO(
 
   assume_tester assumeTester(environment, ns);
 
-  GIVEN("expected equal")
+  GIVEN("expected equality")
   {
-    assumeTester.equality_test(
+    assumeTester(
       true,
       {"2 == 2",
        "[1, 1] == 1",
@@ -177,9 +184,9 @@ SCENARIO(
        "{ 1, 2 } == { 1, 3 }",
        "{ 1, 2 } == { 2, 5 }"});
   }
-  GIVEN("expected not equal")
+  GIVEN("expected not equality")
   {
-    assumeTester.equality_test(
+    assumeTester(
       false,
       {"1 == 2",
        "[2, 3] == 1",
@@ -187,6 +194,48 @@ SCENARIO(
        "{ 2, 3 } == 1",
        "{ 1, 2, 3 } == [ 6, 10 ]",
        "{ 2, 3 } == { 4, 5 }"});
+  }
+
+  GIVEN("expected inequality")
+  {
+    assumeTester(
+      true,
+      {"1 != 2",
+       "[2, 3] != 1",
+       "[2, 3] != [1, 1]",
+       "{ 2, 3 } != 1",
+       "{ 1, 2, 3 } != [ 6, 10 ]",
+       "{ 2, 3 } != { 4, 5 }"});
+  }
+  GIVEN("expected not inequality")
+  {
+    assumeTester(
+      false,
+      {"2 != 2",
+       "[1, 1] != 1",
+       "[1, 1] != [1, 1]",
+       "[1, 1] != { 1 }",
+       "[1, 2] != 1",
+       "[1, 2] != [1, 1]",
+       "[1, 2] != { 1 }",
+       "[1, 2] != 2",
+       "[1, 2] != [2, 2]",
+       "[1, 2] != [1, 2]",
+       "[1, 2] != {1, 2}",
+       "[1, 3] != 2",
+       "[1, 3] != [2, 2]",
+       "[1, 3] != { 2 }",
+       "{ 1 } != 1",
+       "{ 1, 2 } != 1",
+       "{ 1, 2 } != [ 1, 1 ]",
+       "{ 1, 2 } != [ 1, 2 ]",
+       "{ 1, 2 } != [ 1, 3 ]",
+       "{ 1, 2 } != [ 2, 5 ]",
+       "{ 1, 2 } != { 1 }",
+       "{ 1, 2 } != { 2 }",
+       "{ 1, 2 } != { 1, 2 }",
+       "{ 1, 2 } != { 1, 3 }",
+       "{ 1, 2 } != { 2, 5 }"});
   }
 }
 
