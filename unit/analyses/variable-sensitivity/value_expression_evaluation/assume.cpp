@@ -74,13 +74,13 @@ public:
       auto op1 = build_op(operands[0]);
       auto op2 = build_op(operands[1]);
 
-      auto equals =
+      auto test_expr =
         binary_expression<expression_type>(op1, op2, environment, ns);
 
       if(is_true)
-        ASSUME_TRUE(environment, equals, ns);
+        ASSUME_TRUE(environment, test_expr, ns);
       else
-        ASSUME_FALSE(environment, equals, ns);
+        ASSUME_FALSE(environment, test_expr, ns);
     }
   }
 
@@ -153,6 +153,57 @@ SCENARIO(
   namespacet ns(symbol_table);
 
   assume_tester assumeTester(environment, ns);
+
+  GIVEN("true or false")
+  {
+    WHEN("true")
+    {
+      ASSUME_TRUE(environment, true_exprt(), ns);
+    }
+    WHEN("false")
+    {
+      ASSUME_FALSE(environment, false_exprt(), ns);
+    }
+    WHEN("!true")
+    {
+      ASSUME_FALSE(environment, not_exprt(true_exprt()), ns);
+    }
+    WHEN("!false")
+    {
+      ASSUME_TRUE(environment, not_exprt(false_exprt()), ns);
+    }
+
+    auto type = signedbv_typet(32);
+    auto val1 = from_integer(1, type);
+    auto val2 = from_integer(2, type);
+    auto constant = make_constant(val1, environment, ns);
+    auto interval12 = make_interval(val1, val2, environment, ns);
+
+    WHEN("1 == 1")
+    {
+      auto is_equal =
+        binary_expression<equal_exprt>(constant, constant, environment, ns);
+      ASSUME_TRUE(environment, is_equal, ns);
+    }
+    WHEN("!(1 == 1)")
+    {
+      auto is_equal =
+        binary_expression<equal_exprt>(constant, constant, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_equal), ns);
+    }
+    WHEN("[1,2] == 1")
+    {
+      auto is_equal =
+        binary_expression<equal_exprt>(interval12, constant, environment, ns);
+      ASSUME_TRUE(environment, is_equal, ns);
+    }
+    WHEN("!([1,2] == 1)")
+    {
+      auto is_equal =
+        binary_expression<equal_exprt>(interval12, constant, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_equal), ns);
+    }
+  }
 
   GIVEN("expected equality")
   {
@@ -287,7 +338,7 @@ split(std::string const &s, std::string const &delimiter)
 
 std::vector<exprt> numbersToExprs(std::vector<std::string> const &numbers)
 {
-  const typet type = signedbv_typet(32);
+  auto type = signedbv_typet(32);
   auto exprs = std::vector<exprt>{};
   for(auto number : numbers)
   {

@@ -27,6 +27,9 @@ exprt assume_noteq(
   exprt expr,
   const namespacet &ns);
 
+abstract_value_pointert as_value(const abstract_object_pointert &obj);
+bool is_value(const abstract_object_pointert &obj);
+
 std::vector<abstract_object_pointert> eval_operands(
   const exprt &expr,
   const abstract_environmentt &env,
@@ -231,13 +234,23 @@ exprt abstract_environmentt::do_assume(
   bool assumeTrue)
 {
   auto expr_id = expr.id();
+
+  if(expr_id == ID_not)
+  {
+    auto not_expr = to_not_expr(expr);
+    auto result = do_assume(not_expr.op(), ns, true);
+    if(result.is_boolean())
+      result = result.is_true() ? exprt(false_exprt()) : true_exprt();
+    return result;
+  }
+
   if(expr_id == ID_equal)
     return assume_eq(*this, expr, ns);
   if(expr_id == ID_notequal)
     return assume_noteq(*this, expr, ns);
 
-  auto result = eval(expr, ns);
-  return result->to_constant();
+  auto result = eval(expr, ns)->to_constant();
+  return result;
 }
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
@@ -471,14 +484,30 @@ std::vector<abstract_object_pointert> eval_operands(
 }
 
 ///////////
+abstract_value_pointert as_value(const abstract_object_pointert &obj)
+{
+  auto context_value = std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
+
+  return context_value ? as_value(context_value->unwrap_context()) :
+                       std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+}
+
+bool is_value(const abstract_object_pointert &obj)
+{
+  return as_value(obj) != nullptr;
+}
+
 exprt assume_eq(abstract_environmentt &env, exprt expr, const namespacet &ns)
 {
-  PRECONDITION(can_cast_expr<equal_exprt>(expr));
-
-  auto equal_expr = to_equal_expr(expr);
+  auto equal_expr = to_binary_expr(expr);
 
   auto left = env.eval(equal_expr.lhs(), ns);
   auto right = env.eval(equal_expr.rhs(), ns);
+
+  if (left->is_top() || right->is_top())
+    return nil_exprt();
+  if (!is_value(left) || !is_value(right))
+    return nil_exprt();
 
   auto meet = left->meet(right);
 
@@ -494,12 +523,15 @@ exprt assume_eq(abstract_environmentt &env, exprt expr, const namespacet &ns)
 
 exprt assume_noteq(abstract_environmentt &env, exprt expr, const namespacet &ns)
 {
-  PRECONDITION(can_cast_expr<notequal_exprt>(expr));
-
-  auto notequal_expr = to_notequal_expr(expr);
+  auto notequal_expr = to_binary_expr(expr);
 
   auto left = env.eval(notequal_expr.lhs(), ns);
   auto right = env.eval(notequal_expr.rhs(), ns);
+
+  if (left->is_top() || right->is_top())
+    return nil_exprt();
+  if (!is_value(left) || !is_value(right))
+    return nil_exprt();
 
   auto meet = left->meet(right);
 
@@ -508,3 +540,4 @@ exprt assume_noteq(abstract_environmentt &env, exprt expr, const namespacet &ns)
 
   return false_exprt();
 }
+

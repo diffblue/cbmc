@@ -101,6 +101,8 @@ protected:
 
   abstract_object_pointert
   merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const override;
 
   abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert &other) const override;
