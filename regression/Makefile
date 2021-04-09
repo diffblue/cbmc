@@ -78,14 +78,14 @@ endif
 .PHONY: test
 test:
 	@for dir in $(DIRS); do \
-		$(MAKE) "$$dir" || exit 1; \
+		$(MAKE) "$$dir" test || exit 1; \
 	done;
 
 # Pattern to execute a single test suite directory
 .PHONY: $(DIRS)
 $(DIRS):
 	@echo "Running $@..." ;
-	$(MAKE) -C "$@" || exit 1;
+	$(MAKE) -C "$@" test || exit 1;
 
 # Run all test directories using GNU Parallel
 .PHONY: test-parallel
