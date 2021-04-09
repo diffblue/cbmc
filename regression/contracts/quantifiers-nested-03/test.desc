@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+This test case checks the handling of an exists expression
+nested within a conjunction.

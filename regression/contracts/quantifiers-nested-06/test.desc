@@ -1,0 +1,11 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+This test case checks the handling of forall and exists expressions
+nested within ternary ITE expressions (condition ? true : false).

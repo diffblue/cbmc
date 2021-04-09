@@ -167,8 +167,10 @@ protected:
   void
   add_contract_check(const irep_idt &, const irep_idt &, goto_programt &dest);
 
-  /// If the expression is a quantified expression, this function adds
-  /// the quantified variable to the symbol table and to the expression map
+  /// This function recursively searches the expression to find nested or
+  /// non-nested quantified expressions. When a quantified expression is found,
+  /// the quantified variable is added to the symbol table
+  /// and to the expression map.
   void add_quantified_variable(
     exprt expression,
     replace_symbolt &replace,

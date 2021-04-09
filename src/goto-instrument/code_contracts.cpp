@@ -26,6 +26,7 @@ Date: February 2016
 #include <util/expr_util.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
+#include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
@@ -168,35 +169,68 @@ void code_contractst::add_quantified_variable(
   replace_symbolt &replace,
   irep_idt mode)
 {
-  // If the expression is a quantified expression, this function adds
-  // the quantified variable to the symbol table and to the expression map
-
-  // TODO Currently only works if the contract contains only a single
-  // quantified formula
-  // i.e. (1) the top-level element is a quantifier formula
-  // and (2) there are no inner quantifier formulae
-  // This TODO is handled in PR #5968
-
-  if(expression.id() == ID_exists || expression.id() == ID_forall)
+  if(expression.id() == ID_not || expression.id() == ID_typecast)
   {
-    // get quantified symbol
-    exprt tuple = expression.operands().front();
-    exprt quantified_variable = tuple.operands().front();
-    symbol_exprt quantified_symbol = to_symbol_expr(quantified_variable);
+    // For unary connectives, recursively check for
+    // nested quantified formulae in the term
+    const auto &unary_expression = to_unary_expr(expression);
+    add_quantified_variable(unary_expression.op(), replace, mode);
+  }
+  if(expression.id() == ID_notequal || expression.id() == ID_implies)
+  {
+    // For binary connectives, recursively check for
+    // nested quantified formulae in the left and right terms
+    const auto &binary_expression = to_binary_expr(expression);
+    add_quantified_variable(binary_expression.lhs(), replace, mode);
+    add_quantified_variable(binary_expression.rhs(), replace, mode);
+  }
+  if(expression.id() == ID_if)
+  {
+    // For ternary connectives, recursively check for
+    // nested quantified formulae in all three terms
+    const auto &if_expression = to_if_expr(expression);
+    add_quantified_variable(if_expression.cond(), replace, mode);
+    add_quantified_variable(if_expression.true_case(), replace, mode);
+    add_quantified_variable(if_expression.false_case(), replace, mode);
+  }
+  if(expression.id() == ID_and || expression.id() == ID_or)
+  {
+    // For multi-ary connectives, recursively check for
+    // nested quantified formulae in all terms
+    const auto &multi_ary_expression = to_multi_ary_expr(expression);
+    for(const auto &operand : multi_ary_expression.operands())
+    {
+      add_quantified_variable(operand, replace, mode);
+    }
+  }
+  else if(expression.id() == ID_exists || expression.id() == ID_forall)
+  {
+    // When a quantifier expression is found,
+    // 1. get quantified variables
+    const auto &quantifier_expression = to_quantifier_expr(expression);
+    const auto &quantified_variables = quantifier_expression.variables();
+    for(const auto &quantified_variable : quantified_variables)
+    {
+      // for each quantified variable...
+      const auto &quantified_symbol = to_symbol_expr(quantified_variable);
 
-    // create fresh symbol
-    symbolt new_symbol = get_fresh_aux_symbol(
-      quantified_symbol.type(),
-      id2string(quantified_symbol.get_identifier()),
-      "tmp",
-      quantified_symbol.source_location(),
-      mode,
-      symbol_table);
+      // 1.1 create fresh symbol
+      symbolt new_symbol = get_fresh_aux_symbol(
+        quantified_symbol.type(),
+        id2string(quantified_symbol.get_identifier()),
+        "tmp",
+        quantified_symbol.source_location(),
+        mode,
+        symbol_table);
 
-    // add created fresh symbol to expression map
-    symbol_exprt q(
-      quantified_symbol.get_identifier(), quantified_symbol.type());
-    replace.insert(q, new_symbol.symbol_expr());
+      // 1.2 add created fresh symbol to expression map
+      symbol_exprt q(
+        quantified_symbol.get_identifier(), quantified_symbol.type());
+      replace.insert(q, new_symbol.symbol_expr());
+
+      // 1.3 recursively check for nested quantified formulae
+      add_quantified_variable(quantifier_expression.where(), replace, mode);
+    }
   }
 }
 
