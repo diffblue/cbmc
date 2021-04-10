@@ -26,6 +26,7 @@ exprt assume_noteq(
   abstract_environmentt &env,
   exprt expr,
   const namespacet &ns);
+exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns);
 
 abstract_value_pointert as_value(const abstract_object_pointert &obj);
 bool is_value(const abstract_object_pointert &obj);
@@ -209,7 +210,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // goto-program and the way assume is used.
   PRECONDITION(expr.type().id() == ID_bool);
 
-  exprt assumption = do_assume(expr, ns, true);
+  exprt assumption = do_assume(expr, ns);
 
   if(assumption.id() != ID_nil) // I.E. actually a value
   {
@@ -228,17 +229,14 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   return false;
 }
 
-exprt abstract_environmentt::do_assume(
-  exprt expr,
-  const namespacet &ns,
-  bool assumeTrue)
+exprt abstract_environmentt::do_assume(exprt expr, const namespacet &ns)
 {
   auto expr_id = expr.id();
 
   if(expr_id == ID_not)
   {
     auto not_expr = to_not_expr(expr);
-    auto result = do_assume(not_expr.op(), ns, true);
+    auto result = do_assume(not_expr.op(), ns);
     if(result.is_boolean())
       result = result.is_true() ? exprt(false_exprt()) : true_exprt();
     return result;
@@ -248,6 +246,8 @@ exprt abstract_environmentt::do_assume(
     return assume_eq(*this, expr, ns);
   if(expr_id == ID_notequal)
     return assume_noteq(*this, expr, ns);
+  if(expr_id == ID_le)
+    return assume_le(*this, expr, ns);
 
   auto result = eval(expr, ns)->to_constant();
   return result;
@@ -486,10 +486,12 @@ std::vector<abstract_object_pointert> eval_operands(
 ///////////
 abstract_value_pointert as_value(const abstract_object_pointert &obj)
 {
-  auto context_value = std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
+  auto context_value =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
 
-  return context_value ? as_value(context_value->unwrap_context()) :
-                       std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+  return context_value
+           ? as_value(context_value->unwrap_context())
+           : std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
 }
 
 bool is_value(const abstract_object_pointert &obj)
@@ -504,9 +506,9 @@ exprt assume_eq(abstract_environmentt &env, exprt expr, const namespacet &ns)
   auto left = env.eval(equal_expr.lhs(), ns);
   auto right = env.eval(equal_expr.rhs(), ns);
 
-  if (left->is_top() || right->is_top())
+  if(left->is_top() || right->is_top())
     return nil_exprt();
-  if (!is_value(left) || !is_value(right))
+  if(!is_value(left) || !is_value(right))
     return nil_exprt();
 
   auto meet = left->meet(right);
@@ -528,9 +530,9 @@ exprt assume_noteq(abstract_environmentt &env, exprt expr, const namespacet &ns)
   auto left = env.eval(notequal_expr.lhs(), ns);
   auto right = env.eval(notequal_expr.rhs(), ns);
 
-  if (left->is_top() || right->is_top())
+  if(left->is_top() || right->is_top())
     return nil_exprt();
-  if (!is_value(left) || !is_value(right))
+  if(!is_value(left) || !is_value(right))
     return nil_exprt();
 
   auto meet = left->meet(right);
@@ -541,3 +543,24 @@ exprt assume_noteq(abstract_environmentt &env, exprt expr, const namespacet &ns)
   return false_exprt();
 }
 
+exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns)
+{
+  auto lessthan_or_equal_expr = to_binary_expr(expr);
+
+  auto left = env.eval(lessthan_or_equal_expr.lhs(), ns);
+  auto right = env.eval(lessthan_or_equal_expr.rhs(), ns);
+
+  if(left->is_top() || right->is_top())
+    return nil_exprt();
+  auto left_value = as_value(left);
+  auto right_value = as_value(right);
+
+  if(left_value == nullptr || right_value == nullptr)
+    return nil_exprt();
+
+  auto left_lower = left_value->to_interval().get_lower();
+  auto right_upper = right_value->to_interval().get_upper();
+
+  auto reduced_le_expr = binary_relation_exprt(left_lower, ID_le, right_upper);
+  return env.eval(reduced_le_expr, ns)->to_constant();
+}

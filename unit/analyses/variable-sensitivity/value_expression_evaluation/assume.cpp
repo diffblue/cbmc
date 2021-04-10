@@ -13,8 +13,8 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
-template <class expression_type>
 exprt binary_expression(
+  dstringt const &exprId,
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
@@ -25,7 +25,7 @@ exprt binary_expression(
   environment.assign(op1_sym, op1, ns);
   environment.assign(op2_sym, op2, ns);
 
-  return expression_type(op1_sym, op2_sym);
+  return binary_relation_exprt(op1_sym, exprId, op2_sym);
 }
 
 static void ASSUME_TRUE(
@@ -49,9 +49,11 @@ public:
     for(auto test : tests)
     {
       if(is_test(test, "=="))
-        test_fn<equal_exprt>(is_true, test, "==");
+        test_fn(ID_equal, is_true, test, "==");
       else if(is_test(test, "!="))
-        test_fn<notequal_exprt>(is_true, test, "!=");
+        test_fn(ID_notequal, is_true, test, "!=");
+      else if(is_test(test, "<="))
+        test_fn(ID_le, is_true, test, "<=");
       else
         FAIL("Unknown test: " + test);
     }
@@ -62,9 +64,11 @@ public:
     return test.find(delimiter) != std::string::npos;
   }
 
-  template <class expression_type>
-  void
-  test_fn(bool is_true, std::string const &test, std::string const &delimiter)
+  void test_fn(
+    dstringt const &exprId,
+    bool is_true,
+    std::string const &test,
+    std::string const &delimiter)
   {
     WHEN(test)
     {
@@ -74,8 +78,7 @@ public:
       auto op1 = build_op(operands[0]);
       auto op2 = build_op(operands[1]);
 
-      auto test_expr =
-        binary_expression<expression_type>(op1, op2, environment, ns);
+      auto test_expr = binary_expression(exprId, op1, op2, environment, ns);
 
       if(is_true)
         ASSUME_TRUE(environment, test_expr, ns);
@@ -176,32 +179,108 @@ SCENARIO(
     auto type = signedbv_typet(32);
     auto val1 = from_integer(1, type);
     auto val2 = from_integer(2, type);
-    auto constant = make_constant(val1, environment, ns);
+    auto val3 = from_integer(3, type);
+    auto val4 = from_integer(4, type);
+    auto val5 = from_integer(4, type);
+    auto constant1 = make_constant(val1, environment, ns);
+    auto constant3 = make_constant(val3, environment, ns);
     auto interval12 = make_interval(val1, val2, environment, ns);
 
     WHEN("1 == 1")
     {
       auto is_equal =
-        binary_expression<equal_exprt>(constant, constant, environment, ns);
+        binary_expression(ID_equal, constant1, constant1, environment, ns);
       ASSUME_TRUE(environment, is_equal, ns);
     }
     WHEN("!(1 == 1)")
     {
       auto is_equal =
-        binary_expression<equal_exprt>(constant, constant, environment, ns);
+        binary_expression(ID_equal, constant1, constant1, environment, ns);
       ASSUME_FALSE(environment, not_exprt(is_equal), ns);
     }
     WHEN("[1,2] == 1")
     {
       auto is_equal =
-        binary_expression<equal_exprt>(interval12, constant, environment, ns);
+        binary_expression(ID_equal, interval12, constant1, environment, ns);
       ASSUME_TRUE(environment, is_equal, ns);
     }
     WHEN("!([1,2] == 1)")
     {
       auto is_equal =
-        binary_expression<equal_exprt>(interval12, constant, environment, ns);
+        binary_expression(ID_equal, interval12, constant1, environment, ns);
       ASSUME_FALSE(environment, not_exprt(is_equal), ns);
+    }
+    WHEN("1 != 3")
+    {
+      auto is_not_equal =
+        binary_expression(ID_notequal, constant1, constant3, environment, ns);
+      ASSUME_TRUE(environment, is_not_equal, ns);
+    }
+    WHEN("!(1 != 3)")
+    {
+      auto is_not_equal =
+        binary_expression(ID_notequal, constant1, constant3, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_not_equal), ns);
+    }
+    WHEN("[1,2] != 3")
+    {
+      auto is_not_equal =
+        binary_expression(ID_notequal, interval12, constant3, environment, ns);
+      ASSUME_TRUE(environment, is_not_equal, ns);
+    }
+    WHEN("!([1,2] != 3)")
+    {
+      auto is_not_equal =
+        binary_expression(ID_notequal, interval12, constant3, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_not_equal), ns);
+    }
+    WHEN("1 <= 3")
+    {
+      auto is_le =
+        binary_expression(ID_le, constant1, constant3, environment, ns);
+      ASSUME_TRUE(environment, is_le, ns);
+    }
+    WHEN("!(1 <= 3)")
+    {
+      auto is_le =
+        binary_expression(ID_le, constant1, constant3, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_le), ns);
+    }
+    WHEN("[1,2] <= 3")
+    {
+      auto is_le =
+        binary_expression(ID_le, interval12, constant3, environment, ns);
+      ASSUME_TRUE(environment, is_le, ns);
+    }
+    WHEN("!([1,2] <= 3)")
+    {
+      auto is_le =
+        binary_expression(ID_le, interval12, constant3, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_le), ns);
+    }
+    WHEN("3 > 1")
+    {
+      auto is_le =
+        binary_expression(ID_gt, constant3, constant1, environment, ns);
+      ASSUME_TRUE(environment, is_le, ns);
+    }
+    WHEN("!(3 > 1)")
+    {
+      auto is_le =
+        binary_expression(ID_gt, constant3, constant1, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_le), ns);
+    }
+    WHEN("3 > [1,2]")
+    {
+      auto is_le =
+        binary_expression(ID_gt, constant3, interval12, environment, ns);
+      ASSUME_TRUE(environment, is_le, ns);
+    }
+    WHEN("!(3 > [1,2])")
+    {
+      auto is_le =
+        binary_expression(ID_gt, constant3, interval12, environment, ns);
+      ASSUME_FALSE(environment, not_exprt(is_le), ns);
     }
   }
 
@@ -288,6 +367,59 @@ SCENARIO(
        "{ 1, 2 } != { 1, 3 }",
        "{ 1, 2 } != { 2, 5 }"});
   }
+  GIVEN("expected less than or equal to")
+  {
+    assumeTester(
+      true,
+      {
+        "1 <= 1",
+        "1 <= 2",
+        "1 <= [1, 2]",
+        "1 <= [0, 2]",
+        "1 <= { 0, 1 }",
+        "1 <= { 1 }",
+        "[1, 2] <= 1",
+        "[1, 2] <= 2",
+        "[1, 2] <= 5",
+        "[1, 5] <= [1, 2]",
+        "[1, 5] <= [1, 5]",
+        "[1, 5] <= [1, 7]",
+        "[1, 5] <= [0, 7]",
+        "[1, 5] <= [0, 3]",
+        "[1, 5] <= { 1, 2 }",
+        "[1, 5] <= { 1, 5 }",
+        "[1, 5] <= { 1, 7 }",
+        "[1, 5] <= { 0, 7 }",
+        "[1, 5] <= { 0, 3 }",
+        "[1, 5] <= { 0, 1 }",
+        "{ 1, 2 } <= 1",
+        "{ 1, 2 } <= 2",
+        "{ 1, 2 } <= 5",
+        "{ 1, 5 } <= [1, 2]",
+        "{ 1, 5 } <= [1, 5]",
+        "{ 1, 5 } <= [1, 7]",
+        "{ 1, 5 } <= [0, 7]",
+        "{ 1, 5 } <= [0, 3]",
+        "{ 1, 5 } <= { 1, 2 }",
+        "{ 1, 5 } <= { 1, 5 }",
+        "{ 1, 5 } <= { 1, 7 }",
+        "{ 1, 5 } <= { 0, 7 }",
+        "{ 1, 5 } <= { 0, 3 }",
+        "{ 1, 5 } <= { 0, 1 }",
+      });
+  }
+  GIVEN("expected not less than or equal to")
+  {
+    assumeTester(
+      false,
+      {"2 <= 1",
+       "[2, 3] <= 1",
+       "[2, 3] <= [0, 1]",
+       "[2, 3] <= { 0, 1 }",
+       "{ 2, 3, 4 } <= 1",
+       "{ 2, 4 } <= [0, 1]",
+       "{ 2, 4 } <= { 0, 1 }"});
+  }
 }
 
 void ASSUME_TRUE(
@@ -297,7 +429,7 @@ void ASSUME_TRUE(
 {
   THEN("assume is true")
   {
-    auto assumption = env.do_assume(expr, ns, true);
+    auto assumption = env.do_assume(expr, ns);
     REQUIRE(assumption.id() != ID_nil);
     REQUIRE(assumption.type().id() == ID_bool);
     REQUIRE(assumption.is_true());
@@ -311,7 +443,7 @@ void ASSUME_FALSE(
 {
   THEN("assume is false")
   {
-    auto assumption = env.do_assume(expr, ns, true);
+    auto assumption = env.do_assume(expr, ns);
     REQUIRE(assumption.id() != ID_nil);
     REQUIRE(assumption.type().id() == ID_bool);
     REQUIRE(assumption.is_false());
