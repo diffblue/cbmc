@@ -255,6 +255,17 @@ exprt abstract_environmentt::do_assume(exprt expr, const namespacet &ns)
       result = result.is_true() ? exprt(false_exprt()) : true_exprt();
     return result;
   }
+  if(expr_id == ID_and)
+  {
+    auto and_expr = to_and_expr(expr);
+    for(auto const &operand : and_expr.operands())
+    {
+      auto result = do_assume(operand, ns);
+      if(result.is_nil() || result.is_false())
+        return result;
+    }
+    return true_exprt();
+  }
 
   auto fn = assume_functions[expr_id];
 
