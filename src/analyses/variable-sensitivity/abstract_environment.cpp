@@ -31,6 +31,7 @@ exprt assume_noteq(
   const namespacet &ns);
 exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns);
 exprt assume_lt(abstract_environmentt &env, exprt expr, const namespacet &ns);
+exprt assume_ge(abstract_environmentt &env, exprt expr, const namespacet &ns);
 
 abstract_value_pointert as_value(const abstract_object_pointert &obj);
 bool is_value(const abstract_object_pointert &obj);
@@ -237,7 +238,8 @@ static auto assume_functions =
   std::map<dstringt, assume_function>{{ID_equal, assume_eq},
                                       {ID_notequal, assume_noteq},
                                       {ID_le, assume_le},
-                                      {ID_lt, assume_lt}};
+                                      {ID_lt, assume_lt},
+                                      {ID_ge, assume_ge}};
 
 exprt abstract_environmentt::do_assume(exprt expr, const namespacet &ns)
 {
@@ -610,4 +612,17 @@ exprt assume_lt(abstract_environmentt &env, exprt expr, const namespacet &ns)
 
   auto reduced_lt_expr = binary_relation_exprt(left_lower, ID_lt, right_upper);
   return env.eval(reduced_lt_expr, ns)->to_constant();
+}
+
+exprt assume_ge(abstract_environmentt &env, exprt expr, const namespacet &ns)
+{
+  auto operands = eval_operands_as_values(env, expr, ns);
+  if(!operands.are_good())
+    return nil_exprt();
+
+  auto left_upper = operands.left_interval().get_upper();
+  auto right_lower = operands.right_interval().get_lower();
+
+  auto reduced_le_expr = binary_relation_exprt(left_upper, ID_ge, right_lower);
+  return env.eval(reduced_le_expr, ns)->to_constant();
 }
