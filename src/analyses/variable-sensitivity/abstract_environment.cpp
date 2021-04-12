@@ -32,6 +32,7 @@ exprt assume_noteq(
 exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns);
 exprt assume_lt(abstract_environmentt &env, exprt expr, const namespacet &ns);
 exprt assume_ge(abstract_environmentt &env, exprt expr, const namespacet &ns);
+exprt assume_gt(abstract_environmentt &env, exprt expr, const namespacet &ns);
 
 abstract_value_pointert as_value(const abstract_object_pointert &obj);
 bool is_value(const abstract_object_pointert &obj);
@@ -239,7 +240,8 @@ static auto assume_functions =
                                       {ID_notequal, assume_noteq},
                                       {ID_le, assume_le},
                                       {ID_lt, assume_lt},
-                                      {ID_ge, assume_ge}};
+                                      {ID_ge, assume_ge},
+                                      {ID_gt, assume_gt}};
 
 exprt abstract_environmentt::do_assume(exprt expr, const namespacet &ns)
 {
@@ -623,6 +625,19 @@ exprt assume_ge(abstract_environmentt &env, exprt expr, const namespacet &ns)
   auto left_upper = operands.left_interval().get_upper();
   auto right_lower = operands.right_interval().get_lower();
 
-  auto reduced_le_expr = binary_relation_exprt(left_upper, ID_ge, right_lower);
-  return env.eval(reduced_le_expr, ns)->to_constant();
+  auto reduced_ge_expr = binary_relation_exprt(left_upper, ID_ge, right_lower);
+  return env.eval(reduced_ge_expr, ns)->to_constant();
+}
+
+exprt assume_gt(abstract_environmentt &env, exprt expr, const namespacet &ns)
+{
+  auto operands = eval_operands_as_values(env, expr, ns);
+  if(!operands.are_good())
+    return nil_exprt();
+
+  auto left_upper = operands.left_interval().get_upper();
+  auto right_lower = operands.right_interval().get_lower();
+
+  auto reduced_gt_expr = binary_relation_exprt(left_upper, ID_gt, right_lower);
+  return env.eval(reduced_gt_expr, ns)->to_constant();
 }
