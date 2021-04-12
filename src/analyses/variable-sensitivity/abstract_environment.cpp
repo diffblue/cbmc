@@ -27,6 +27,7 @@ exprt assume_noteq(
   exprt expr,
   const namespacet &ns);
 exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns);
+exprt assume_lt(abstract_environmentt &env, exprt expr, const namespacet &ns);
 
 abstract_value_pointert as_value(const abstract_object_pointert &obj);
 bool is_value(const abstract_object_pointert &obj);
@@ -248,6 +249,8 @@ exprt abstract_environmentt::do_assume(exprt expr, const namespacet &ns)
     return assume_noteq(*this, expr, ns);
   if(expr_id == ID_le)
     return assume_le(*this, expr, ns);
+  if(expr_id == ID_lt)
+    return assume_lt(*this, expr, ns);
 
   auto result = eval(expr, ns)->to_constant();
   return result;
@@ -563,4 +566,26 @@ exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns)
 
   auto reduced_le_expr = binary_relation_exprt(left_lower, ID_le, right_upper);
   return env.eval(reduced_le_expr, ns)->to_constant();
+}
+
+exprt assume_lt(abstract_environmentt &env, exprt expr, const namespacet &ns)
+{
+  auto lessthan_expr = to_binary_expr(expr);
+
+  auto left = env.eval(lessthan_expr.lhs(), ns);
+  auto right = env.eval(lessthan_expr.rhs(), ns);
+
+  if(left->is_top() || right->is_top())
+    return nil_exprt();
+  auto left_value = as_value(left);
+  auto right_value = as_value(right);
+
+  if(left_value == nullptr || right_value == nullptr)
+    return nil_exprt();
+
+  auto left_lower = left_value->to_interval().get_lower();
+  auto right_upper = right_value->to_interval().get_upper();
+
+  auto reduced_lt_expr = binary_relation_exprt(left_lower, ID_lt, right_upper);
+  return env.eval(reduced_lt_expr, ns)->to_constant();
 }
