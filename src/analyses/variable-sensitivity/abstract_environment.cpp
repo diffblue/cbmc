@@ -550,23 +550,50 @@ exprt assume_noteq(abstract_environmentt &env, exprt expr, const namespacet &ns)
   return false_exprt();
 }
 
-exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns)
+struct left_and_right_values
 {
-  auto lessthan_or_equal_expr = to_binary_expr(expr);
+  abstract_value_pointert left;
+  abstract_value_pointert right;
 
-  auto left = env.eval(lessthan_or_equal_expr.lhs(), ns);
-  auto right = env.eval(lessthan_or_equal_expr.rhs(), ns);
+  constant_interval_exprt left_interval() const
+  {
+    return left->to_interval();
+  }
+  constant_interval_exprt right_interval() const
+  {
+    return right->to_interval();
+  }
+
+  bool are_good() const
+  {
+    return left != nullptr && right != nullptr;
+  }
+};
+
+left_and_right_values eval_operands_as_values(
+  abstract_environmentt &env,
+  exprt expr,
+  const namespacet &ns)
+{
+  auto relationship_expr = to_binary_expr(expr);
+
+  auto left = env.eval(relationship_expr.lhs(), ns);
+  auto right = env.eval(relationship_expr.rhs(), ns);
 
   if(left->is_top() || right->is_top())
-    return nil_exprt();
-  auto left_value = as_value(left);
-  auto right_value = as_value(right);
+    return {};
 
-  if(left_value == nullptr || right_value == nullptr)
+  return {as_value(left), as_value(right)};
+}
+
+exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns)
+{
+  auto operands = eval_operands_as_values(env, expr, ns);
+  if(!operands.are_good())
     return nil_exprt();
 
-  auto left_lower = left_value->to_interval().get_lower();
-  auto right_upper = right_value->to_interval().get_upper();
+  auto left_lower = operands.left_interval().get_lower();
+  auto right_upper = operands.right_interval().get_upper();
 
   auto reduced_le_expr = binary_relation_exprt(left_lower, ID_le, right_upper);
   return env.eval(reduced_le_expr, ns)->to_constant();
@@ -574,21 +601,12 @@ exprt assume_le(abstract_environmentt &env, exprt expr, const namespacet &ns)
 
 exprt assume_lt(abstract_environmentt &env, exprt expr, const namespacet &ns)
 {
-  auto lessthan_expr = to_binary_expr(expr);
-
-  auto left = env.eval(lessthan_expr.lhs(), ns);
-  auto right = env.eval(lessthan_expr.rhs(), ns);
-
-  if(left->is_top() || right->is_top())
-    return nil_exprt();
-  auto left_value = as_value(left);
-  auto right_value = as_value(right);
-
-  if(left_value == nullptr || right_value == nullptr)
+  auto operands = eval_operands_as_values(env, expr, ns);
+  if(!operands.are_good())
     return nil_exprt();
 
-  auto left_lower = left_value->to_interval().get_lower();
-  auto right_upper = right_value->to_interval().get_upper();
+  auto left_lower = operands.left_interval().get_lower();
+  auto right_upper = operands.right_interval().get_upper();
 
   auto reduced_lt_expr = binary_relation_exprt(left_lower, ID_lt, right_upper);
   return env.eval(reduced_lt_expr, ns)->to_constant();
