@@ -43,7 +43,7 @@ std::vector<std::string>
 split(std::string const &s, std::string const &delimiter);
 std::vector<exprt> numbersToExprs(std::vector<std::string> const &numbers);
 
-class assume_tester
+class assume_testert
 {
 public:
   void operator()(bool is_true, std::vector<std::string> const &tests)
@@ -95,7 +95,7 @@ public:
     }
   }
 
-  assume_tester(abstract_environmentt &env, namespacet &n)
+  assume_testert(abstract_environmentt &env, namespacet &n)
     : environment(env), ns(n)
   {
   }
@@ -163,7 +163,7 @@ SCENARIO(
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
-  assume_tester assumeTester(environment, ns);
+  assume_testert assumeTester(environment, ns);
 
   GIVEN("true or false")
   {
@@ -189,7 +189,7 @@ SCENARIO(
     auto val2 = from_integer(2, type);
     auto val3 = from_integer(3, type);
     auto val4 = from_integer(4, type);
-    auto val5 = from_integer(4, type);
+    auto val5 = from_integer(5, type);
     auto constant1 = make_constant(val1, environment, ns);
     auto constant3 = make_constant(val3, environment, ns);
     auto interval12 = make_interval(val1, val2, environment, ns);
@@ -667,6 +667,77 @@ SCENARIO(
       auto and_expr = and_exprt(expr0, expr1);
 
       ASSUME_FALSE(environment, and_expr, ns);
+    }
+  }
+  GIVEN("or expressions")
+  {
+    auto type = signedbv_typet(32);
+    auto val1 = from_integer(1, type);
+    auto val2 = from_integer(2, type);
+    auto val3 = from_integer(3, type);
+    auto val4 = from_integer(4, type);
+    auto val5 = from_integer(5, type);
+
+    auto v12 = make_value_set({val1, val2}, environment, ns);
+    auto v23 = make_value_set({val2, val3}, environment, ns);
+    auto v34 = make_value_set({val3, val4}, environment, ns);
+    auto v45 = make_value_set({val4, val5}, environment, ns);
+
+    auto c1_sym = symbol_exprt("c1", v12->type());
+    auto c2_sym = symbol_exprt("c2", v23->type());
+    auto c3_sym = symbol_exprt("c3", v23->type());
+    auto c4_sym = symbol_exprt("c4", v23->type());
+    environment.assign(c1_sym, v12, ns);
+    environment.assign(c2_sym, v23, ns);
+    environment.assign(c3_sym, v34, ns);
+    environment.assign(c4_sym, v45, ns);
+
+    WHEN("{ 1, 2 } == { 2, 3 } || { 3, 4 } == { 4, 5 }")
+    {
+      auto lhs_expr = equal_exprt(c1_sym, c2_sym);
+      auto rhs_expr = equal_exprt(c3_sym, c4_sym);
+
+      auto or_expr = or_exprt(lhs_expr, rhs_expr);
+
+      ASSUME_TRUE(environment, or_expr, ns);
+    }
+    WHEN("{ 1, 2 } == { 2, 3 } || { 3, 4 } == { 4, 5 } || { 1, 2 } != { 3, 4 }")
+    {
+      auto expr0 = equal_exprt(c1_sym, c2_sym);
+      auto expr1 = equal_exprt(c3_sym, c4_sym);
+      auto expr2 = notequal_exprt(c1_sym, c4_sym);
+
+      auto or_expr = or_exprt(expr0, expr1, expr2);
+
+      ASSUME_TRUE(environment, or_expr, ns);
+    }
+    WHEN("{ 1, 2 } == { 2, 3 } && { 3, 4 } != { 4, 5 }")
+    {
+      auto expr0 = equal_exprt(c1_sym, c2_sym);
+      auto expr1 = notequal_exprt(c3_sym, c4_sym);
+
+      auto or_expr = or_exprt(expr0, expr1);
+
+      ASSUME_TRUE(environment, or_expr, ns);
+    }
+    WHEN("unknown == { 2, 3 } || { 3, 4 } == { 4, 5 }")
+    {
+      auto unknown = symbol_exprt("unknown", v23->type());
+      auto lhs_expr = equal_exprt(unknown, c2_sym);
+      auto rhs_expr = equal_exprt(c3_sym, c4_sym);
+
+      auto or_expr = or_exprt(lhs_expr, rhs_expr);
+
+      ASSUME_NIL(environment, or_expr, ns);
+    }
+    WHEN("{ 1, 2 } == { 4, 5 } || { 3, 4 } == { 1, 2 }")
+    {
+      auto expr0 = equal_exprt(c1_sym, c4_sym);
+      auto expr1 = equal_exprt(c3_sym, c1_sym);
+
+      auto or_expr = or_exprt(expr0, expr1);
+
+      ASSUME_FALSE(environment, or_expr, ns);
     }
   }
 }
