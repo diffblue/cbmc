@@ -1,5 +1,7 @@
 <!---
 Thank you for your contribution. Please make sure your pull request fulfils all of the below requirements. If you cannot currently tick all the boxes, but would still like to create a PR, then add the label "work in progress" and assign the PR to yourself.
+
+If your PR fixes a bug, include the regression test(s) in the same commit as the bug fix. Else, keep commits small and orthogonal, possibly placing tests in commits of their own.
 --->
 
 - [ ] Each commit message has a non-empty body, explaining why the change was made.
