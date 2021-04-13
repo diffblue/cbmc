@@ -93,7 +93,7 @@ std::string get_temporary_directory(const std::string &name_template)
   errno = 0;
   char *wd = realpath(td, nullptr);
 
-  if(wd == nullptr || errno != 0)
+  if(wd == nullptr)
     throw system_exceptiont(
       std::string("realpath failed: ") + std::strerror(errno));
 

@@ -54,7 +54,7 @@ std::string get_current_working_directory()
   errno=0;
   char *wd=realpath(".", nullptr);
 
-  if(wd == nullptr || errno != 0)
+  if(wd == nullptr)
     throw system_exceptiont(
       std::string("realpath failed: ") + std::strerror(errno));
 
