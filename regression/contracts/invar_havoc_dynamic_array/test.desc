@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion data\[5\] == 0: FAILURE$
+^\[main.assertion.2\] .* assertion data\[5\] == 1: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Test case related to issue #6020: it checks that arrays are correctly havoced
+when enforcing loop invariant contracts.
+The `data[5] == 0` assertion is expected to fail since `data` is havoced.
+The `data[5] == 1` assertion is also expected to fail since the invariant does
+not reestablish the value for `data[5]`.
