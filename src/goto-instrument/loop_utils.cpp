@@ -61,16 +61,13 @@ void get_modifies_lhs(
   const exprt &lhs,
   modifiest &modifies)
 {
-  if(lhs.id()==ID_symbol)
+  if(lhs.id() == ID_symbol || lhs.id() == ID_member)
     modifies.insert(lhs);
   else if(lhs.id()==ID_dereference)
   {
     const auto &pointer = to_dereference_expr(lhs).pointer();
     for(const auto &mod : local_may_alias.get(t, pointer))
       modifies.insert(dereference_exprt{mod});
-  }
-  else if(lhs.id()==ID_member)
-  {
   }
   else if(lhs.id()==ID_index)
   {

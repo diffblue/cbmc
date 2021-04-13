@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion t.x == 0 || t.x == 2: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+This test checks that members of statically allocated are correctly havoced
+when enforcing loop invariants.
+The `t.x == 0 || t.x == 2` assertion is expected to fail when `t.x` is correctly
+havoced (so would be set to a nondet value).
+However, it `t.x` is not havoced then it stays at value `0` and would satisfy
+the assertion when the loop is replaced by a single nondet iteration.
