@@ -10,8 +10,8 @@ main.c
 ^VERIFICATION FAILED$
 --
 --
-Test case related to issue #6020: it checks that arrays are correctly havoced
-when enforcing loop invariant contracts.
+Test case related to issue #6020: it checks that dynamically allocated arrays
+are correctly havoced when enforcing loop invariant contracts.
 The `data[1] == 0 || data[1] == 1` assertion is expected to fail since `data[1]`
 is havoced and the invariant does not reestablish the value of `data[1]`.
 However, the `data[4] == 0` assertion is expected to pass -- we should not havoc
