@@ -333,7 +333,7 @@ void ms_link_cmdlinet::process_link_option(const std::string &s)
     return;
   }
 
-  for(const std::string &ms_link_option : ms_link_options)
+  for(const std::string ms_link_option : ms_link_options)
   {
     // These are case insensitive.
     if(
