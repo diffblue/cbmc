@@ -1,0 +1,20 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.1\] .* assertion data\[1\]\[2\]\[3\] == 0: FAILURE$
+^\[main.assertion.2\] .* assertion data\[4\]\[5\]\[6\] == 0: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Test case related to issue #6020: it checks that multi dimensional arrays
+are correctly havoced when enforcing invariant contracts.
+
+Here, both assertions are expected to fail -- the entire `data` array should
+be havoced since we are assigning to a non-constant index.
+We _could_ do a more precise analysis in future where we only havoc
+`data[4][5][6]` but not `data[1][2][3]` since the latter clearly cannot be
+modified in the given loop.
