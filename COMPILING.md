@@ -373,3 +373,50 @@ compilation flag:
     cmake -S . -Bbuild -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
     ```
     and then `cmake --build build`
+
+## Compiling with alternative SAT solvers
+
+For the packaged builds of CBMC on our release page we currently build CBMC
+with the MiniSat2 SAT solver statically linked at compile time. However it is
+also possible to build CBMC using alternative SAT solvers.
+
+### Compiling with Riss
+
+The [Riss](https://github.com/conp-solutions/riss) solver supports the
+[IPASIR](https://github.com/biotomas/ipasir) C interface to incremental SAT
+solvers, which is also supported by CBMC. So the process for producing a CBMC
+with Riss build is to build Riss as a static library then compile CBMC with the
+IPASIR build options and link to the Riss static library. The following
+instructions have been confirmed to work on Ubuntu 20 at the time of writing.
+They can also be made to work on Ubuntu 18, by using a debug build of Riss. Riss
+uses Linux specific functionality / API calls. Therefore it can't be compiled
+successfully on Windows or macOS.
+
+1. Download Riss:
+   ```
+   git clone https://github.com/conp-solutions/riss riss
+   ```
+   This will clone the Riss repository into a `riss` subdirectory.
+
+2. Build Riss:
+   ```
+   cd riss
+   cmake -H. -Brelease -DCMAKE_BUILD_TYPE=Release
+   cd release
+   make riss-coprocessor-lib-static
+   cd ../..
+   ```
+   This will create a build directory called `release` inside the clone of the
+   Riss repository and build the static library in
+   `riss/release/lib/libriss-coprocessor.a`.
+
+3. Build CBMC:
+   ```
+   make -C src LIBS="$PWD/riss/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss/riss
+   ```
+   This links the Riss library and the pthreads library. The pthreads library is
+   needed because the Riss library uses it for multithreading. Passing the
+   IPASIR parameter tells the build system to build for the IPASIR interface.
+   The argument for the IPASIR parameter gives the build system the location for
+   the IPASIR headers, which is needed for the cbmc includes of `ipasir.h`. The
+   compiled binary will be placed in `cbmc/src/cbmc/cbmc`.
