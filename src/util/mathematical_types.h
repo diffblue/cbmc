@@ -53,6 +53,29 @@ public:
   }
 };
 
+class uninterpreted_typet : public typet
+{
+public:
+  explicit uninterpreted_typet() : typet(ID_uninterpreted_type)
+  {
+  }
+
+  uninterpreted_typet(std::size_t arity) 
+  {
+    set_arity(arity);
+  }
+
+  std::size_t get_arity() const
+  {
+    return get_size_t(ID_arity);
+  }
+
+  void set_arity(std::size_t arity)
+  {
+    set(ID_arity, narrow_cast<long long>(arity));
+  }
+};
+
 /// A type for mathematical functions (do not confuse with functions/methods
 /// in code)
 class mathematical_function_typet : public type_with_subtypest

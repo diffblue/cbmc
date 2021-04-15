@@ -73,6 +73,7 @@ public:
   using oracle_fun_mapt=std::map<irep_idt, oracle_funt>;
   oracle_fun_mapt oracle_symbols;
 
+  std::map<irep_idt,typet> type_map;  
 
   struct named_termt
   {
@@ -114,6 +115,10 @@ protected:
   // add the given identifier to the id_map but
   // complain if that identifier is used already
   void add_unique_id(irep_idt, exprt);
+
+  // add the given identifier to the id_map but
+  // complain if that identifier is used already
+  void add_unique_type_id(const irep_idt &, const typet &);
 
   struct signature_with_parameter_idst
   {
