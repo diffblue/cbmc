@@ -3162,18 +3162,29 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         p.type().id() == ID_pointer,
         "one of the operands should have pointer type");
 
-      const auto element_size = pointer_offset_size(expr.type().subtype(), ns);
-      CHECK_RETURN(element_size.has_value() && *element_size >= 1);
+      mp_integer element_size;
+      if(expr.type().subtype().id() == ID_empty)
+      {
+        // This is a gcc extension.
+        // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+        element_size = 1;
+      }
+      else
+      {
+        auto element_size_opt = pointer_offset_size(expr.type().subtype(), ns);
+        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 1);
+        element_size = *element_size_opt;
+      }
 
       out << "(bvadd ";
       convert_expr(p);
       out << " ";
 
-      if(*element_size >= 2)
+      if(element_size >= 2)
       {
         out << "(bvmul ";
         convert_expr(i);
-        out << " (_ bv" << *element_size << " " << boolbv_width(expr.type())
+        out << " (_ bv" << element_size << " " << boolbv_width(expr.type())
             << "))";
       }
       else
