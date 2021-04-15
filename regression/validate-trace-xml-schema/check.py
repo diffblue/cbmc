@@ -12,6 +12,8 @@ test_base_dir = os.path.abspath(os.path.join(this_script_dir, '..', 'cbmc'))
 
 # some tests in the cbmc suite don't work for the trace checks for one reason or another
 ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
+    # these tests dump the raw SMT2 output (using --outfile)
+    ['array_of_bool_as_bitvec', 'test-smt2-outfile.desc'],
     # these tests expect input from stdin
     ['json-interface1', 'test_wrong_option.desc'],
     ['json-interface1', 'test.desc'],

@@ -3871,7 +3871,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
         out << " ";
         convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
         out << ")";
-        out << " #b1 #b0)";
+        out << " #b1)";
       }
       else
       {
@@ -4405,19 +4405,29 @@ void smt2_convt::find_symbols(const exprt &expr)
       if(defined_expressions.find(expr) == defined_expressions.end())
       {
         const auto &array_of = to_array_of_expr(expr);
+        const auto &array_type = array_of.type();
 
         const irep_idt id =
           "array_of." + std::to_string(defined_expressions.size());
         out << "; the following is a substitute for lambda i. x\n";
         out << "(declare-fun " << id << " () ";
-        convert_type(array_of.type());
+        convert_type(array_type);
         out << ")\n";
 
         // use a quantifier-based initialization instead of lambda
         out << "(assert (forall ((i ";
-        convert_type(array_of.type().size().type());
+        convert_type(array_type.size().type());
         out << ")) (= (select " << id << " i) ";
-        convert_expr(array_of.what());
+        if(array_type.subtype().id() == ID_bool && !use_array_of_bool)
+        {
+          out << "(ite ";
+          convert_expr(array_of.what());
+          out << " #b1 #b0)";
+        }
+        else
+        {
+          convert_expr(array_of.what());
+        }
         out << ")))\n";
 
         defined_expressions[expr] = id;
@@ -4431,12 +4441,13 @@ void smt2_convt::find_symbols(const exprt &expr)
       if(defined_expressions.find(expr) == defined_expressions.end())
       {
         const auto &array_comprehension = to_array_comprehension_expr(expr);
-        const auto &array_size = array_comprehension.type().size();
+        const auto &array_type = array_comprehension.type();
+        const auto &array_size = array_type.size();
 
         const irep_idt id =
           "array_comprehension." + std::to_string(defined_expressions.size());
         out << "(declare-fun " << id << " () ";
-        convert_type(array_comprehension.type());
+        convert_type(array_type);
         out << ")\n";
 
         out << "; the following is a substitute for lambda i . x(i)\n";
@@ -4455,7 +4466,16 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << ")) (= (select " << id << " ";
         convert_expr(array_comprehension.arg());
         out << ") ";
-        convert_expr(array_comprehension.body());
+        if(array_type.subtype().id() == ID_bool && !use_array_of_bool)
+        {
+          out << "(ite ";
+          convert_expr(array_comprehension.body());
+          out << " #b1 #b0)";
+        }
+        else
+        {
+          convert_expr(array_comprehension.body());
+        }
         out << "))))\n";
 
         defined_expressions[expr] = id;
@@ -4479,7 +4499,16 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << "(assert (= (select " << id << " ";
         convert_expr(from_integer(i, array_type.size().type()));
         out << ") "; // select
-        convert_expr(expr.operands()[i]);
+        if(array_type.subtype().id() == ID_bool && !use_array_of_bool)
+        {
+          out << "(ite ";
+          convert_expr(expr.operands()[i]);
+          out << " #b1 #b0)";
+        }
+        else
+        {
+          convert_expr(expr.operands()[i]);
+        }
         out << "))" << "\n"; // =, assert
       }
 
