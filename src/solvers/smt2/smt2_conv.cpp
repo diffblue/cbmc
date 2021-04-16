@@ -54,9 +54,10 @@ smt2_convt::smt2_convt(
   solvert _solver,
   std::ostream &_out)
   : use_FPA_theory(false),
-    use_as_const(false),
-    use_datatypes(false),
     use_array_of_bool(false),
+    use_as_const(false),
+    use_check_sat_assuming(false),
+    use_datatypes(false),
     use_lambda_for_array(false),
     emit_set_logic(true),
     ns(_ns),
@@ -81,8 +82,9 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::CPROVER_SMT2:
-    use_as_const = true;
     use_array_of_bool = true;
+    use_as_const = true;
+    use_check_sat_assuming = true;
     emit_set_logic = false;
     break;
 
@@ -100,8 +102,9 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::Z3:
-    use_as_const = true;
     use_array_of_bool = true;
+    use_as_const = true;
+    use_check_sat_assuming = true;
     use_lambda_for_array = true;
     emit_set_logic = false;
     use_datatypes = true;
@@ -173,26 +176,36 @@ void smt2_convt::write_footer(std::ostream &os)
 {
   os << "\n";
 
-  // add the assumptions, if any
-  if(!assumptions.empty())
-  {
-    os << "; assumptions\n";
-
-    for(const auto &assumption : assumptions)
-    {
-      os << "(assert ";
-      convert_literal(to_literal_expr(assumption).get_literal());
-      os << ")"
-         << "\n";
-    }
-  }
-
   // fix up the object sizes
   for(const auto &object : object_sizes)
     define_object_size(object.second, object.first);
 
-  os << "(check-sat)"
-     << "\n";
+  if(use_check_sat_assuming && !assumptions.empty())
+  {
+    os << "(check-sat-assuming (";
+    for(const auto &assumption : assumptions)
+      convert_literal(to_literal_expr(assumption).get_literal());
+    os << "))\n";
+  }
+  else
+  {
+    // add the assumptions, if any
+    if(!assumptions.empty())
+    {
+      os << "; assumptions\n";
+
+      for(const auto &assumption : assumptions)
+      {
+        os << "(assert ";
+        convert_literal(to_literal_expr(assumption).get_literal());
+        os << ")"
+           << "\n";
+      }
+    }
+
+    os << "(check-sat)\n";
+  }
+
   os << "\n";
 
   if(solver!=solvert::BOOLECTOR)
