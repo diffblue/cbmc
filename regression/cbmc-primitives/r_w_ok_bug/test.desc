@@ -1,9 +1,11 @@
-KNOWNBUG
+CORE
 main.c
 --pointer-check --no-simplify --no-propagation
-^EXIT=0$
+^\[main.pointer_dereference.\d+\] line 8 dereference failure: pointer outside dynamic object bounds in \*p1: FAILURE$
+^\[main.pointer_dereference.\d+\] line 8 dereference failure: pointer outside object bounds in \*p1: FAILURE$
+^\*\* 2 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
---
-Crashes during the flattening, issue #5328
