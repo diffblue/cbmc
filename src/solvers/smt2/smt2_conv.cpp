@@ -4247,6 +4247,11 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   if(expr.id() == ID_equal && value)
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
+    if(equal_expr.lhs().type().id() == ID_empty)
+    {
+      // ignore equality checking over expressions with empty (void) type
+      return;
+    }
 
     if(equal_expr.lhs().id()==ID_symbol)
     {
