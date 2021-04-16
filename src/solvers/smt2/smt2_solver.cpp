@@ -25,14 +25,14 @@ Author: Daniel Kroening, kroening@kroening.com
 class smt2_solvert:public smt2_parsert
 {
 public:
-  smt2_solvert(std::istream &_in, decision_proceduret &_solver)
+  smt2_solvert(std::istream &_in, stack_decision_proceduret &_solver)
     : smt2_parsert(_in), solver(_solver), status(NOT_SOLVED)
   {
     setup_commands();
   }
 
 protected:
-  decision_proceduret &solver;
+  stack_decision_proceduret &solver;
 
   void setup_commands();
   void define_constants();
@@ -158,7 +158,47 @@ void smt2_solvert::setup_commands()
     };
 
     commands["check-sat-assuming"] = [this]() {
-      throw error("not yet implemented");
+      std::vector<exprt> assumptions;
+
+      if(next_token() != smt2_tokenizert::OPEN)
+        throw error("check-sat-assuming expects list as argument");
+
+      while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE &&
+            smt2_tokenizer.peek() != smt2_tokenizert::END_OF_FILE)
+      {
+        auto e = expression(); // any term
+        expand_function_applications(e);
+        assumptions.push_back(solver.handle(e));
+      }
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("check-sat-assuming expects ')' at end of list");
+
+      // add constant definitions as constraints
+      define_constants();
+
+      // add the assumptions
+      solver.push(assumptions);
+
+      switch(solver())
+      {
+      case decision_proceduret::resultt::D_SATISFIABLE:
+        std::cout << "sat\n";
+        status = SAT;
+        break;
+
+      case decision_proceduret::resultt::D_UNSATISFIABLE:
+        std::cout << "unsat\n";
+        status = UNSAT;
+        break;
+
+      case decision_proceduret::resultt::D_ERROR:
+        std::cout << "error\n";
+        status = NOT_SOLVED;
+      }
+
+      // remove the assumptions again
+      solver.pop();
     };
 
     commands["display"] = [this]() {
@@ -166,6 +206,10 @@ void smt2_solvert::setup_commands()
       exprt e = expression();
       if(e.is_not_nil())
         std::cout << smt2_format(e) << '\n';
+    };
+
+    commands["get-unsat-assumptions"] = [this]() {
+      throw error("not yet implemented");
     };
 
     commands["get-value"] = [this]() {
