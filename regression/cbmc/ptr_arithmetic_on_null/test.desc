@@ -1,0 +1,17 @@
+CORE
+main.c
+
+^\[main.assertion.1\] line .* assertion \(void \*\)0 != \(void \*\)0 \+ \(.*\)1: SUCCESS$
+^\[main.assertion.2\] line .* assertion \(void \*\)0 != \(void \*\)0 - \(.*\)1: SUCCESS$
+^\[main.assertion.3\] line .* assertion \(void \*\)0 != \(void \*\)0 \+ \(.*\)offset: SUCCESS$
+^\[main.assertion.4\] line .* assertion \(void \*\)0 - \(void \*\)0 == \(.*\)0: SUCCESS$
+^\[main.assertion.5\] line .* assertion ptr - \(void \*\)0 == \(.*\)0: FAILURE$
+^\[main.assertion.6\] line .* assertion \(ptr - \(.*\)1\) \+ \(.*\)1 == \(\(.* \*\)NULL\): SUCCESS$
+^\[main.assertion.7\] line .* assertion \(ptr - \(.*\)1\) \+ \(.*\)1 == \(\(.* \*\)NULL\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test case checks that pointer arithmetic on NULL pointers are correctly
+encoded by the SMT2 translation routines.

@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^\[main.precondition_instance.1\] line .* memset destination region writeable: FAILURE$
+^\[main.precondition_instance.2\] line .* memset destination region writeable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test case checks that byte operations (e.g. memset) oninvalid and `NULL`
+pointers are correctly encoded in SMT2.
