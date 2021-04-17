@@ -227,7 +227,8 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // goto-program and the way assume is used.
   PRECONDITION(expr.type().id() == ID_bool);
 
-  exprt assumption = do_assume(expr, ns);
+  auto simplified = simplify_expr(expr, ns);
+  auto assumption = do_assume(simplified, ns);
 
   if(assumption.id() != ID_nil) // I.E. actually a value
   {
@@ -520,12 +521,38 @@ bool is_value(const abstract_object_pointert &obj)
   return as_value(obj) != nullptr;
 }
 
+static auto inverse_operations =
+  std::map<irep_idt, irep_idt>{{ID_equal, ID_notequal},
+                               {ID_notequal, ID_equal},
+                               {ID_le, ID_gt},
+                               {ID_lt, ID_ge},
+                               {ID_ge, ID_lt},
+                               {ID_gt, ID_le}};
+
+exprt invert_expr(const exprt &expr)
+{
+  auto expr_id = expr.id();
+  auto inverse_operation = inverse_operations.find(expr_id);
+  if(inverse_operation == inverse_operations.end())
+    return nil_exprt();
+
+  auto relation_expr = to_binary_relation_expr(expr);
+  auto inverse_op = inverse_operation->second;
+  return binary_relation_exprt(
+    relation_expr.lhs(), inverse_op, relation_expr.rhs());
+}
+
 exprt assume_not(
   abstract_environmentt &env,
   const exprt &expr,
   const namespacet &ns)
 {
   auto not_expr = to_not_expr(expr);
+
+  auto inverse_expression = invert_expr(not_expr.op());
+  if(inverse_expression.is_not_nil())
+    return env.do_assume(inverse_expression, ns);
+
   auto result = env.do_assume(not_expr.op(), ns);
   if(result.is_boolean())
     result =
