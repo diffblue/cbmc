@@ -312,7 +312,9 @@ abstract_object_pointert abstract_environmentt::add_object_context(
   return object_factory->wrap_with_context(abstract_object);
 }
 
-bool abstract_environmentt::merge(const abstract_environmentt &env)
+bool abstract_environmentt::merge(
+  const abstract_environmentt &env,
+  wident widen_mode)
 {
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present
