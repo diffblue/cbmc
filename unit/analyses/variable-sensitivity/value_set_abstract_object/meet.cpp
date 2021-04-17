@@ -20,9 +20,8 @@
 static std::shared_ptr<const value_set_abstract_objectt>
 meet(abstract_object_pointert const &op1, abstract_object_pointert const &op2)
 {
-  bool modified;
-  auto result = abstract_objectt::meet(op1, op2, modified);
-  return as_value_set(result);
+  auto result = abstract_objectt::meet(op1, op2);
+  return as_value_set(result.object);
 }
 
 static void

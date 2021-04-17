@@ -409,6 +409,11 @@ void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result)
   REQUIRE_FALSE(result->is_bottom());
 }
 
+void EXPECT_TOP(abstract_objectt::combine_result const &result)
+{
+  EXPECT_TOP(result.object);
+}
+
 void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result)
 {
   REQUIRE(result);
@@ -428,6 +433,11 @@ void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result)
 
   REQUIRE_FALSE(result->is_top());
   REQUIRE(result->is_bottom());
+}
+
+void EXPECT_BOTTOM(abstract_objectt::combine_result const &result)
+{
+  EXPECT_BOTTOM(result.object);
 }
 
 std::shared_ptr<const abstract_objectt> add(

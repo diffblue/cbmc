@@ -182,26 +182,15 @@ void abstract_objectt::output(
   }
 }
 
-abstract_object_pointert abstract_objectt::merge(
+abstract_objectt::combine_result abstract_objectt::merge(
   const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  bool &out_modifications)
+  const abstract_object_pointert &op2)
 {
   abstract_object_pointert result = op1->should_use_base_merge(op2)
                                       ? op1->abstract_object_merge(op2)
                                       : op1->merge(op2);
   // If no modifications, we will return the original pointer
-  out_modifications = result != op1;
-
-  return result;
-}
-
-abstract_object_pointert abstract_objectt::merge(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2)
-{
-  bool dummy;
-  return merge(op1, op2, dummy);
+  return {result, result != op1};
 }
 
 bool abstract_objectt::should_use_base_merge(
@@ -210,18 +199,15 @@ bool abstract_objectt::should_use_base_merge(
   return is_top() || other->is_bottom() || other->is_top();
 }
 
-abstract_object_pointert abstract_objectt::meet(
+abstract_objectt::combine_result abstract_objectt::meet(
   const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2,
-  bool &out_modifications)
+  const abstract_object_pointert &op2)
 {
   abstract_object_pointert result = op1->should_use_base_meet(op2)
                                       ? op1->abstract_object_meet(op2)
                                       : op1->meet(op2);
   // If no modifications, we will return the original pointer
-  out_modifications = result != op1;
-
-  return result;
+  return {result, result != op1};
 }
 
 bool abstract_objectt::should_use_base_meet(

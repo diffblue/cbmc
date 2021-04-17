@@ -122,10 +122,9 @@ protected:
   virtual abstract_objectt::locationst get_last_written_locations() const;
 
 private:
-  using combine_fn = abstract_object_pointert (*)(
+  using combine_fn = abstract_objectt::combine_result (*)(
     const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2,
-    bool &out_modifications);
+    const abstract_object_pointert &op2);
   using write_location_context_ptrt =
     std::shared_ptr<const write_location_contextt>;
 

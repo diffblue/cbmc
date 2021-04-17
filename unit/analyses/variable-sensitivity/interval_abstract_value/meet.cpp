@@ -20,9 +20,8 @@
 static std::shared_ptr<const interval_abstract_valuet>
 meet(abstract_object_pointert const &op1, abstract_object_pointert const &op2)
 {
-  bool modified;
-  auto result = abstract_objectt::meet(op1, op2, modified);
-  return as_interval(result);
+  auto result = abstract_objectt::meet(op1, op2);
+  return as_interval(result.object);
 }
 
 static void THEN_BOTTOM(std::shared_ptr<const interval_abstract_valuet> &result)

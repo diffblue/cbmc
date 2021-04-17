@@ -244,14 +244,15 @@ public:
   /// \param op2: the second abstract object to merge
   /// \param out_modifications: reference to a flag indicating modification
   ///
-  /// \return The merged abstract object with the same sensitivity as the
-  ///         first parameter. out_modifications will be true if the resulting
-  ///         abstract object is different from op1
-  static abstract_object_pointert merge(
-    const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2,
-    bool &out_modifications);
-  static abstract_object_pointert merge(
+  /// \return A pair containing the merged abstract object with the same
+  ///         sensitivity as op1, and a modified flag which
+  ///         will be true if the merged abstract object is different from op1
+  struct combine_result
+  {
+    abstract_object_pointert object;
+    bool modified;
+  };
+  static combine_result merge(
     const abstract_object_pointert &op1,
     const abstract_object_pointert &op2);
 
@@ -259,13 +260,12 @@ public:
   /// implementation or if a more precise abstraction is attainable.
   /// \param op1 lhs object for meet
   /// \param op2 rhs object for meet
-  /// \param out_modifications reference to a flag indicating modification
-  /// (result is not op1)
-  /// \return resulting object after meet
-  static abstract_object_pointert meet(
+  /// \return A pair containing the merged abstract object with the same
+  ///         sensitivity as op1, and a modified flag which
+  ///         will be true if the returned object is different from op1
+  static combine_result meet(
     const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2,
-    bool &out_modifications);
+    const abstract_object_pointert &op2);
 
   /// Base implementation of the meet operation: only used if no more precise
   /// abstraction can be used, can only result in {TOP, BOTTOM, one of the

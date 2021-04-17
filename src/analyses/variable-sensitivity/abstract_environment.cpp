@@ -337,11 +337,10 @@ bool abstract_environmentt::merge(
     env.map.get_delta_view(map, delta_view);
     for(const auto &entry : delta_view)
     {
-      bool object_modified = false;
-      abstract_object_pointert new_object = abstract_objectt::merge(
-        entry.get_other_map_value(), entry.m, object_modified);
-      modified |= object_modified;
-      map.replace(entry.k, new_object);
+      auto merge_result =
+        abstract_objectt::merge(entry.get_other_map_value(), entry.m);
+      modified |= merge_result.modified;
+      map.replace(entry.k, merge_result.object);
     }
 
     return modified;

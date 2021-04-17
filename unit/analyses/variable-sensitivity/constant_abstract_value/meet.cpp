@@ -16,9 +16,8 @@
 static std::shared_ptr<const constant_abstract_valuet>
 meet(abstract_object_pointert const &op1, abstract_object_pointert const &op2)
 {
-  bool modified;
-  auto result = abstract_objectt::meet(op1, op2, modified);
-  return as_constant(result);
+  auto result = abstract_objectt::meet(op1, op2);
+  return as_constant(result.object);
 }
 
 static void THEN_BOTTOM(std::shared_ptr<const constant_abstract_valuet> &result)

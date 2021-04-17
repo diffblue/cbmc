@@ -39,8 +39,9 @@ abstract_object_pointert apply_to_index_range(
   {
     auto at_index = fn(index_exprt(index_expr.array(), index));
 
-    result = (result == nullptr) ? at_index
-                                 : abstract_objectt::merge(result, at_index);
+    result = (result == nullptr)
+               ? at_index
+               : abstract_objectt::merge(result, at_index).object;
 
     if(result->is_top()) // no point in continuing once we've gone top
       break;
@@ -229,7 +230,7 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
 
     // Merge each known element into the TOP value
     for(const auto &element : map.get_view())
-      result = abstract_objectt::merge(result, element.second);
+      result = abstract_objectt::merge(result, element.second).object;
 
     return result;
   }
@@ -342,7 +343,8 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
       if(old_value.has_value()) // if not found it's top, so nothing to merge
       {
         result->map.replace(
-          index_value, abstract_objectt::merge(old_value.value(), value));
+          index_value,
+          abstract_objectt::merge(old_value.value(), value).object);
       }
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");

@@ -85,9 +85,13 @@ void EXPECT(
 
 void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result);
 
+void EXPECT_TOP(abstract_objectt::combine_result const &result);
+
 void EXPECT_TOP(std::shared_ptr<const value_set_abstract_objectt> &result);
 
 void EXPECT_BOTTOM(std::shared_ptr<const abstract_objectt> result);
+
+void EXPECT_BOTTOM(abstract_objectt::combine_result const &result);
 
 template <class value_typet>
 struct merge_result
@@ -171,6 +175,13 @@ void EXPECT_UNMODIFIED(
   merge_result<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values);
 
+template <class value_typet = abstract_objectt>
+void EXPECT_UNMODIFIED(abstract_objectt::combine_result const &result)
+{
+  auto object = std::dynamic_pointer_cast<const value_typet>(result.object);
+  EXPECT_UNMODIFIED(object, result.modified);
+}
+
 void EXPECT_MODIFIED(
   std::shared_ptr<const constant_abstract_valuet> &result,
   bool modified,
@@ -199,6 +210,13 @@ void EXPECT_MODIFIED(
 void EXPECT_MODIFIED(
   merge_result<const value_set_abstract_objectt> &result,
   const std::vector<exprt> &expected_values);
+
+template <class value_typet = abstract_objectt>
+void EXPECT_MODIFIED(abstract_objectt::combine_result const &result)
+{
+  auto object = std::dynamic_pointer_cast<const value_typet>(result.object);
+  EXPECT_MODIFIED(object, result.modified);
+}
 
 std::shared_ptr<const abstract_objectt> add(
   const abstract_object_pointert &op1,

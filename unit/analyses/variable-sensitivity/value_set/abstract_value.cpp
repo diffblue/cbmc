@@ -18,6 +18,7 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -163,12 +164,11 @@ TEST_CASE(
   auto const value_set2 =
     std::make_shared<value_set_abstract_valuet>(type, valuest{value2});
 
-  bool out_modifications;
   auto const merged_abstract_object =
-    abstract_objectt::merge(value_set1, value_set2, out_modifications);
+    abstract_objectt::merge(value_set1, value_set2);
   auto const merged_value_set =
     std::dynamic_pointer_cast<const value_set_abstract_valuet>(
-      merged_abstract_object);
+      merged_abstract_object.object);
 
   REQUIRE(merged_value_set != nullptr);
   REQUIRE(!merged_value_set->is_top());
@@ -192,12 +192,11 @@ TEST_CASE(
   auto const value_set2 =
     std::make_shared<value_set_abstract_valuet>(type, valuest{value2, value3});
 
-  bool out_modifications;
   auto const merged_abstracted_object =
-    abstract_objectt::merge(value_set1, value_set2, out_modifications);
+    abstract_objectt::merge(value_set1, value_set2);
   auto const merged_value_set =
     std::dynamic_pointer_cast<const value_set_abstract_valuet>(
-      merged_abstracted_object);
+      merged_abstracted_object.object);
 
   REQUIRE(merged_value_set != nullptr);
   REQUIRE(!merged_value_set->is_top());
@@ -231,12 +230,11 @@ TEST_CASE(
     type, valuest{straw_that_broke_the_camels_back});
   REQUIRE(!value_set2->is_top());
 
-  bool out_modifications;
   auto const merged_abstract_object =
-    abstract_objectt::merge(value_set1, value_set2, out_modifications);
+    abstract_objectt::merge(value_set1, value_set2);
   auto const merged_value_set =
     std::dynamic_pointer_cast<const value_set_abstract_valuet>(
-      merged_abstract_object);
+      merged_abstract_object.object);
 
   REQUIRE(merged_value_set != nullptr);
   REQUIRE(merged_value_set->is_top());
@@ -254,12 +252,10 @@ TEST_CASE(
     std::make_shared<value_set_abstract_valuet>(type, valuest{value});
   auto const value_set2 = std::make_shared<value_set_abstract_valuet>(type);
 
-  bool out_modifications;
   auto const merged_abstract_object =
-    abstract_objectt::merge(value_set1, value_set2, out_modifications);
+    abstract_objectt::merge(value_set1, value_set2);
 
-  REQUIRE(merged_abstract_object->is_top());
-  REQUIRE(!merged_abstract_object->is_bottom());
+  EXPECT_TOP(merged_abstract_object);
 }
 
 TEST_CASE(

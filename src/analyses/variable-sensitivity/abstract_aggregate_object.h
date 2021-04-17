@@ -137,13 +137,11 @@ protected:
 
     for(auto &item : delta_view)
     {
-      bool changes = false;
-      abstract_object_pointert v_new =
-        abstract_objectt::merge(item.m, item.get_other_map_value(), changes);
-      if(changes)
+      auto v_new = abstract_objectt::merge(item.m, item.get_other_map_value());
+      if(v_new.modified)
       {
         modified = true;
-        out_map.replace(item.k, v_new);
+        out_map.replace(item.k, v_new.object);
       }
     }
 

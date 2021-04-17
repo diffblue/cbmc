@@ -196,7 +196,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
       {
         abstract_object_pointert pointed_value = environment.eval(value, ns);
         abstract_object_pointert merged_value =
-          abstract_objectt::merge(pointed_value, new_value);
+          abstract_objectt::merge(pointed_value, new_value).object;
         environment.assign(value, merged_value, ns);
       }
       else
