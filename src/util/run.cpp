@@ -448,43 +448,10 @@ int run(
 #endif
 }
 
+#ifndef _WIN32
 /// quote a string for bash and CMD
 static std::string shell_quote(const std::string &src)
 {
-  #ifdef _WIN32
-  // first check if quoting is needed at all
-
-  if(src.find(' ')==std::string::npos &&
-     src.find('"')==std::string::npos &&
-     src.find('&')==std::string::npos &&
-     src.find('|')==std::string::npos &&
-     src.find('(')==std::string::npos &&
-     src.find(')')==std::string::npos &&
-     src.find('<')==std::string::npos &&
-     src.find('>')==std::string::npos &&
-     src.find('^')==std::string::npos)
-  {
-    // seems fine -- return as is
-    return src;
-  }
-
-  std::string result;
-
-  result+='"';
-
-  for(const char ch : src)
-  {
-    if(ch=='"')
-      result+='"'; // quotes are doubled
-    result+=ch;
-  }
-
-  result+='"';
-
-  return result;
-
-  #else
-
   // first check if quoting is needed at all
 
   if(src.find(' ')==std::string::npos &&
@@ -519,8 +486,8 @@ static std::string shell_quote(const std::string &src)
   result+='\'';
 
   return result;
-  #endif
 }
+#endif
 
 int run(
   const std::string &what,
