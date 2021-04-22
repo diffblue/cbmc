@@ -1073,6 +1073,12 @@ void smt2_parsert::setup_expressions()
     return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(operands())));
   };
 
+    expressions["mod"] = [this] {
+    // 2's complement signed remainder (sign follows divisor)
+    // We don't have that.
+    return binary(ID_mod, operands());
+  };
+
   expressions["bvurem"] = [this] { return binary(ID_mod, operands()); };
 
   expressions["%"] = [this] { return binary(ID_mod, operands()); };
