@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test also ensures that assigns clauses correctly check for global
+variables modified by subcalls. In this case, since the assigns clause
+doesn't include the modified global variable, the verification should failed.

@@ -8,7 +8,7 @@ int nextIdx() __CPROVER_assigns(idx)
   return idx;
 }
 
-void f1(int a[], int len) __CPROVER_assigns(*a, idx)
+void f1(int a[], int len) __CPROVER_assigns(*a)
 {
   a[nextIdx()] = 5;
 }

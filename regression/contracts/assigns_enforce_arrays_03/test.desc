@@ -6,5 +6,5 @@ main.c
 ^VERIFICATION FAILED$
 --
 --
-Checks whether verification fails when an array is assigned at an index
-below its lower bound.
+Checks whether verification fails when an assigns clause contains pointer,
+but function only modifies its content.
