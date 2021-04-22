@@ -17,6 +17,7 @@ Date: February 2016
 
 #include <analyses/local_may_alias.h>
 
+#include <goto-programs/goto_convert_class.h>
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>
@@ -155,6 +156,15 @@ static void check_apply_invariants(
     loop_end->set_condition(false_exprt());
   else
     loop_end->set_condition(boolean_negate(loop_end->get_condition()));
+}
+
+void code_contractst::convert_to_goto(
+  const codet &code,
+  const irep_idt &mode,
+  goto_programt &program)
+{
+  goto_convertt converter(symbol_table, log.get_message_handler());
+  converter.goto_convert(code, program, mode);
 }
 
 bool code_contractst::has_contract(const irep_idt fun_name)
@@ -327,11 +337,14 @@ bool code_contractst::apply_function_contract(
   // Insert assertion of the precondition immediately before the call site.
   if(requires.is_not_nil())
   {
-    goto_programt::instructiont a =
-      goto_programt::make_assertion(requires, target->source_location);
-
-    goto_program.insert_before_swap(target, a);
-    ++target;
+    goto_programt assertion;
+    convert_to_goto(
+      code_assertt(requires),
+      symbol_table.lookup_ref(function).mode,
+      assertion);
+    auto lines_to_iterate = assertion.instructions.size();
+    goto_program.insert_before_swap(target, assertion);
+    std::advance(target, lines_to_iterate);
   }
 
   // Create a series of non-deterministic assignments to havoc the variables
@@ -353,12 +366,16 @@ bool code_contractst::apply_function_contract(
   // function call with a SKIP statement.
   if(ensures.is_not_nil())
   {
-    *target = goto_programt::make_assumption(ensures, target->source_location);
+    goto_programt assumption;
+    convert_to_goto(
+      code_assumet(ensures),
+      symbol_table.lookup_ref(function).mode,
+      assumption);
+    auto lines_to_iterate = assumption.instructions.size();
+    goto_program.insert_before_swap(target, assumption);
+    std::advance(target, lines_to_iterate);
   }
-  else
-  {
-    *target = goto_programt::make_skip();
-  }
+  *target = goto_programt::make_skip();
 
   // Add this function to the set of replaced functions.
   summarized.insert(function);
@@ -418,14 +435,6 @@ void code_contractst::instrument_assign_statement(
     " an assignment");
 
   const exprt &lhs = instruction_iterator->get_assign().lhs();
-
-  if(
-    lhs.id() == ID_symbol &&
-    freely_assignable_symbols.find(to_symbol_expr(lhs).get_identifier()) !=
-      freely_assignable_symbols.end())
-  {
-    return;
-  }
 
   goto_programt alias_assertion;
   alias_assertion.add(goto_programt::make_assertion(
@@ -838,7 +847,6 @@ void code_contractst::add_contract_check(
   {
     PRECONDITION(!parameter.empty());
     const symbolt &parameter_symbol = ns.lookup(parameter);
-
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
                        skip->source_location,
@@ -867,8 +875,10 @@ void code_contractst::add_contract_check(
     exprt requires_cond = requires;
     replace(requires_cond);
 
-    check.add(goto_programt::make_assumption(
-      requires_cond, requires.source_location()));
+    goto_programt assumption;
+    convert_to_goto(
+      code_assumet(requires_cond), function_symbol.mode, assumption);
+    check.destructive_append(assumption);
   }
 
   // ret=mangled_fun(parameter1, ...)
@@ -881,8 +891,10 @@ void code_contractst::add_contract_check(
   // assert(ensures)
   if(ensures.is_not_nil())
   {
-    check.add(
-      goto_programt::make_assertion(ensures_cond, ensures.source_location()));
+    goto_programt assertion;
+    convert_to_goto(
+      code_assertt(ensures_cond), function_symbol.mode, assertion);
+    check.destructive_append(assertion);
   }
 
   if(code_type.return_type() != empty_typet())
@@ -920,8 +932,6 @@ bool code_contractst::replace_calls(
       if(ins->is_function_call())
       {
         const code_function_callt &call = ins->get_function_call();
-
-        PRECONDITION(call.function().id() != ID_dereference);
 
         if(call.function().id() != ID_symbol)
           continue;
