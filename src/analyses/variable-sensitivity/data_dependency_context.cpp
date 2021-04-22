@@ -230,12 +230,14 @@ abstract_object_pointert data_dependency_contextt::update_location_context(
  * object with a given abstract_object
  *
  * \param other the abstract object to merge with
+ * \param widen_mode: Indicates if this is a widening merge
  *
  * \return the result of the merge, or 'this' if the merge would not change
  * the current abstract object
  */
-abstract_object_pointert
-data_dependency_contextt::merge(const abstract_object_pointert &other) const
+abstract_object_pointert data_dependency_contextt::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const data_dependency_contextt>(other);
@@ -244,12 +246,12 @@ data_dependency_contextt::merge(const abstract_object_pointert &other) const
   {
     const auto merged_parent =
       std::dynamic_pointer_cast<const data_dependency_contextt>(
-        this->write_location_contextt::merge(other));
+        this->write_location_contextt::merge(other, widen_mode));
 
     return combine(cast_other, merged_parent);
   }
 
-  return abstract_objectt::merge(other);
+  return abstract_objectt::merge(other, widen_mode);
 }
 
 abstract_object_pointert

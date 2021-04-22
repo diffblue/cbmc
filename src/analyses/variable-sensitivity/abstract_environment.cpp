@@ -318,33 +318,27 @@ bool abstract_environmentt::merge(
 {
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present
-
   if(bottom)
   {
     *this = env;
     return !env.bottom;
   }
-  else if(env.bottom)
-  {
-    return false;
-  }
-  else
-  {
-    // For each element in the intersection of map and env.map merge
-    // If the result of the merge is top, remove from the map
-    bool modified = false;
-    decltype(env.map)::delta_viewt delta_view;
-    env.map.get_delta_view(map, delta_view);
-    for(const auto &entry : delta_view)
-    {
-      auto merge_result =
-        abstract_objectt::merge(entry.get_other_map_value(), entry.m);
-      modified |= merge_result.modified;
-      map.replace(entry.k, merge_result.object);
-    }
 
-    return modified;
+  if(env.bottom)
+    return false;
+
+  // For each element in the intersection of map and env.map merge
+  // If the result of the merge is top, remove from the map
+  bool modified = false;
+  for(const auto &entry : env.map.get_delta_view(map))
+  {
+    auto merge_result =
+      abstract_objectt::merge(entry.get_other_map_value(), entry.m, widen_mode);
+    modified |= merge_result.modified;
+    map.replace(entry.k, merge_result.object);
   }
+
+  return modified;
 }
 
 void abstract_environmentt::havoc(const std::string &havoc_string)

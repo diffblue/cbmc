@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include "value_set_abstract_value.h"
+#include <analyses/variable-sensitivity/abstract_environment.h>
 
 #include <ansi-c/expr2c.h>
 #include <util/simplify_expr.h>
@@ -29,8 +30,9 @@ value_set_abstract_valuet::get_values() const
   return values;
 }
 
-abstract_object_pointert
-value_set_abstract_valuet::merge(const abstract_object_pointert &other) const
+abstract_object_pointert value_set_abstract_valuet::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
 {
   if(is_top())
   {
@@ -62,7 +64,7 @@ value_set_abstract_valuet::merge(const abstract_object_pointert &other) const
     return std::make_shared<value_set_abstract_valuet>(
       type(), std::move(merged_values));
   }
-  return abstract_objectt::merge(other);
+  return abstract_objectt::merge(other, widen_mode);
 }
 
 value_set_abstract_valuet::value_set_abstract_valuet(
@@ -145,7 +147,8 @@ static void merge_all_possible_results(
                           std::make_shared<value_set_abstract_valuet>(
                             expr.type(),
                             value_set_abstract_valuet::valuest{
-                              expr_with_evaluated_operands_filled_in}))
+                              expr_with_evaluated_operands_filled_in}),
+                          wident::no)
                           .object;
       if(
         auto post_merge_casted =

@@ -36,6 +36,7 @@
 class abstract_environmentt;
 class namespacet;
 struct abstract_object_statisticst;
+enum class wident;
 
 #define CLONE                                                                  \
   internal_abstract_object_pointert mutable_clone() const override             \
@@ -254,7 +255,8 @@ public:
   };
   static combine_result merge(
     const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2);
+    const abstract_object_pointert &op2,
+    const wident &widen_mode);
 
   /// Interface method for the meet operation. Decides whether to use the base
   /// implementation or if a more precise abstraction is attainable.
@@ -422,10 +424,11 @@ protected:
   /// the object would be unchanged, then would return itself.
   ///
   /// \param other: The object to merge with this
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns the result of the merge.
   virtual abstract_object_pointert
-  merge(const abstract_object_pointert &other) const;
+  merge(const abstract_object_pointert &other, const wident &widen_mode) const;
 
   /// Helper function for base meet. Two cases: return itself (if trivially
   /// contained in other); return BOTTOM otherwise.

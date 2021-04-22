@@ -346,30 +346,29 @@ void interval_abstract_valuet::output(
   }
 }
 
-abstract_object_pointert
-interval_abstract_valuet::merge(const abstract_object_pointert &other) const
+abstract_object_pointert interval_abstract_valuet::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
 {
   abstract_value_pointert cast_other =
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(cast_other)
-  {
-    return merge_with_value(cast_other);
-  }
-  else
-  {
-    return abstract_objectt::merge(other);
-  }
+    return merge_with_value(cast_other, widen_mode);
+
+  return abstract_objectt::merge(other, widen_mode);
 }
 
 /// Merge another interval abstract object with this one
 /// \param other The abstract value object to merge with
+/// \param widen_mode: Indicates if this is a widening merge
 /// \return This if the other interval is subsumed by this,
 ///          other if this is subsumed by other.
 ///          Otherwise, a new interval abstract object
 ///          with the smallest interval that subsumes both
 ///          this and other
 abstract_object_pointert interval_abstract_valuet::merge_with_value(
-  const abstract_value_pointert &other) const
+  const abstract_value_pointert &other,
+  const wident &widen_mode) const
 {
   if(other->is_bottom())
     return shared_from_this();

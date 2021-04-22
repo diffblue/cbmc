@@ -95,12 +95,14 @@ private:
   /// Performs an element wise merge of the map for each struct
   ///
   /// \param other: the other object being merged
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns a new abstract object that is the result of the merge
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this.
-  abstract_object_pointert
-  merge_constant_structs(constant_struct_pointert other) const;
+  abstract_object_pointert merge_constant_structs(
+    constant_struct_pointert other,
+    const wident &widen_mode) const;
 
 protected:
   CLONE
@@ -161,10 +163,12 @@ protected:
   /// Otherwise we call back to the parent merge.
   ///
   /// \param other: the other object being merged
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return  Returns the result of the merge.
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H

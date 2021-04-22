@@ -16,7 +16,7 @@
 static merge_result<const interval_abstract_valuet>
 merge(abstract_object_pointert op1, abstract_object_pointert op2)
 {
-  auto result = abstract_objectt::merge(op1, op2);
+  auto result = abstract_objectt::merge(op1, op2, wident::no);
 
   return {result.modified, as_interval(result.object)};
 }

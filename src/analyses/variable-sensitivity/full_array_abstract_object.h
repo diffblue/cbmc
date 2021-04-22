@@ -122,10 +122,12 @@ protected:
   /// If it can't, falls back to parent merge
   ///
   /// \param other: The object to merge in
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns the result of the merge.
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const override;
 
   /// To validate that the struct object is in a valid state.
   /// This means either it is top or bottom, or if neither of those
@@ -202,12 +204,14 @@ private:
   /// Merges an array into this array
   ///
   /// \param other: The object to merge in
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns a new abstract object that is the result of the merge
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this..
-  abstract_object_pointert
-  full_array_merge(const full_array_pointert other) const;
+  abstract_object_pointert full_array_merge(
+    const full_array_pointert &other,
+    const wident &widen_mode) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H

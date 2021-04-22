@@ -18,7 +18,7 @@
 static merge_result<const value_set_abstract_objectt>
 merge(abstract_object_pointert op1, abstract_object_pointert op2)
 {
-  auto result = abstract_objectt::merge(op1, op2);
+  auto result = abstract_objectt::merge(op1, op2, wident::no);
 
   return {result.modified, as_value_set(result.object)};
 }

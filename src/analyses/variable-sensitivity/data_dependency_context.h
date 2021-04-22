@@ -69,8 +69,9 @@ public:
 protected:
   CLONE
 
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 

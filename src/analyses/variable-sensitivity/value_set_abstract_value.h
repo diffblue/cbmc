@@ -54,8 +54,9 @@ public:
     const override;
 
 protected:
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const override;
 
 private:
   /// If BOTTOM then empty.

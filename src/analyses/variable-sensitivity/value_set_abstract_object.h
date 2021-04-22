@@ -75,8 +75,9 @@ protected:
   CLONE
 
   /// \copydoc abstract_object::merge
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 
@@ -99,8 +100,9 @@ private:
   abstract_object_pointert
   resolve_values(const abstract_object_sett &new_values) const;
 
-  abstract_object_pointert
-  merge_with_value(const abstract_value_pointert &other) const;
+  abstract_object_pointert merge_with_value(
+    const abstract_value_pointert &other,
+    const wident &widen_mode) const;
   abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const;
 

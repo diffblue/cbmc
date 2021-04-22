@@ -63,8 +63,9 @@ public:
 
 protected:
   CLONE
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 
@@ -72,8 +73,9 @@ private:
   using interval_abstract_value_pointert =
     sharing_ptrt<interval_abstract_valuet>;
 
-  abstract_object_pointert
-  merge_with_value(const abstract_value_pointert &other) const;
+  abstract_object_pointert merge_with_value(
+    const abstract_value_pointert &other,
+    const wident &widen_mode) const;
   abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const;
 

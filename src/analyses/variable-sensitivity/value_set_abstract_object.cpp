@@ -204,7 +204,8 @@ abstract_object_pointert value_set_abstract_objectt::write(
 }
 
 abstract_object_pointert value_set_abstract_objectt::merge_with_value(
-  const abstract_value_pointert &other) const
+  const abstract_value_pointert &other,
+  const wident &widen_mode) const
 {
   auto union_values = !is_bottom() ? values : abstract_object_sett{};
 
@@ -289,14 +290,15 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
   return result;
 }
 
-abstract_object_pointert
-value_set_abstract_objectt::merge(const abstract_object_pointert &other) const
+abstract_object_pointert value_set_abstract_objectt::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
 {
   auto other_value = as_value(other);
   if(other_value)
-    return merge_with_value(other_value);
+    return merge_with_value(other_value, widen_mode);
 
-  return abstract_objectt::merge(other);
+  return abstract_objectt::merge(other, widen_mode);
 }
 
 abstract_object_pointert

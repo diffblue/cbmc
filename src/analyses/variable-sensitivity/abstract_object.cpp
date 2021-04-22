@@ -48,8 +48,9 @@ const typet &abstract_objectt::type() const
   return t;
 }
 
-abstract_object_pointert
-abstract_objectt::merge(const abstract_object_pointert &other) const
+abstract_object_pointert abstract_objectt::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
 {
   return abstract_object_merge(other);
 }
@@ -184,11 +185,12 @@ void abstract_objectt::output(
 
 abstract_objectt::combine_result abstract_objectt::merge(
   const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2)
+  const abstract_object_pointert &op2,
+  const wident &widen_mode)
 {
   abstract_object_pointert result = op1->should_use_base_merge(op2)
                                       ? op1->abstract_object_merge(op2)
-                                      : op1->merge(op2);
+                                      : op1->merge(op2, widen_mode);
   // If no modifications, we will return the original pointer
   return {result, result != op1};
 }

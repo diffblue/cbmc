@@ -165,7 +165,7 @@ TEST_CASE(
     std::make_shared<value_set_abstract_valuet>(type, valuest{value2});
 
   auto const merged_abstract_object =
-    abstract_objectt::merge(value_set1, value_set2);
+    abstract_objectt::merge(value_set1, value_set2, wident::no);
   auto const merged_value_set =
     std::dynamic_pointer_cast<const value_set_abstract_valuet>(
       merged_abstract_object.object);
@@ -193,7 +193,7 @@ TEST_CASE(
     std::make_shared<value_set_abstract_valuet>(type, valuest{value2, value3});
 
   auto const merged_abstracted_object =
-    abstract_objectt::merge(value_set1, value_set2);
+    abstract_objectt::merge(value_set1, value_set2, wident::no);
   auto const merged_value_set =
     std::dynamic_pointer_cast<const value_set_abstract_valuet>(
       merged_abstracted_object.object);
@@ -231,7 +231,7 @@ TEST_CASE(
   REQUIRE(!value_set2->is_top());
 
   auto const merged_abstract_object =
-    abstract_objectt::merge(value_set1, value_set2);
+    abstract_objectt::merge(value_set1, value_set2, wident::no);
   auto const merged_value_set =
     std::dynamic_pointer_cast<const value_set_abstract_valuet>(
       merged_abstract_object.object);
@@ -253,7 +253,7 @@ TEST_CASE(
   auto const value_set2 = std::make_shared<value_set_abstract_valuet>(type);
 
   auto const merged_abstract_object =
-    abstract_objectt::merge(value_set1, value_set2);
+    abstract_objectt::merge(value_set1, value_set2, wident::no);
 
   EXPECT_TOP(merged_abstract_object);
 }

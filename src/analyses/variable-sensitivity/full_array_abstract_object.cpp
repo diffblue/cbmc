@@ -41,7 +41,7 @@ abstract_object_pointert apply_to_index_range(
 
     result = (result == nullptr)
                ? at_index
-               : abstract_objectt::merge(result, at_index).object;
+               : abstract_objectt::merge(result, at_index, wident::no).object;
 
     if(result->is_top()) // no point in continuing once we've gone top
       break;
@@ -98,47 +98,40 @@ void full_array_abstract_objectt::set_top_internal()
   map.clear();
 }
 
-abstract_object_pointert
-full_array_abstract_objectt::merge(const abstract_object_pointert &other) const
+abstract_object_pointert full_array_abstract_objectt::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const full_array_abstract_objectt>(other);
   if(cast_other)
-  {
-    return full_array_merge(cast_other);
-  }
-  else
-  {
-    // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return abstract_aggregate_baset::merge(other);
-  }
+    return full_array_merge(cast_other, widen_mode);
+
+  return abstract_aggregate_baset::merge(other, widen_mode);
 }
 
 abstract_object_pointert full_array_abstract_objectt::full_array_merge(
-  const full_array_pointert other) const
+  const full_array_pointert &other,
+  const wident &widen_mode) const
 {
   if(is_bottom())
-  {
     return std::make_shared<full_array_abstract_objectt>(*other);
+
+  const auto &result =
+    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
+
+  bool modified = merge_shared_maps(map, other->map, result->map, widen_mode);
+  if(!modified)
+  {
+    DATA_INVARIANT(verify(), "Structural invariants maintained");
+    return shared_from_this();
   }
   else
   {
-    const auto &result =
-      std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
-
-    bool modified = merge_shared_maps(map, other->map, result->map);
-    if(!modified)
-    {
-      DATA_INVARIANT(verify(), "Structural invariants maintained");
-      return shared_from_this();
-    }
-    else
-    {
-      INVARIANT(!result->is_top(), "Merge of maps will not generate top");
-      INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
-      DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-      return result;
-    }
+    INVARIANT(!result->is_top(), "Merge of maps will not generate top");
+    INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
+    DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+    return result;
   }
 }
 
@@ -230,7 +223,8 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
 
     // Merge each known element into the TOP value
     for(const auto &element : map.get_view())
-      result = abstract_objectt::merge(result, element.second).object;
+      result =
+        abstract_objectt::merge(result, element.second, wident::no).object;
 
     return result;
   }
@@ -344,7 +338,7 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
       {
         result->map.replace(
           index_value,
-          abstract_objectt::merge(old_value.value(), value).object);
+          abstract_objectt::merge(old_value.value(), value, wident::no).object);
       }
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
