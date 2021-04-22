@@ -22,6 +22,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 // clang-format off
 #include <windows.h>
 #include <dbghelp.h>
+#include <imagehlp.h>
 // clang-format on
 #endif
 
@@ -117,9 +118,9 @@ void print_backtrace(
   // for the rationale behind the size of 'symbol'
   const auto max_name_len = 255;
   auto symbol = static_cast<SYMBOL_INFO *>(
-    calloc(sizeof SYMBOL_INFO + (max_name_len - 1) * sizeof(TCHAR), 1));
+    calloc(sizeof(SYMBOL_INFO) + (max_name_len - 1) * sizeof(TCHAR), 1));
   symbol->MaxNameLen = max_name_len;
-  symbol->SizeOfStruct = sizeof SYMBOL_INFO;
+  symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
   for(std::size_t i = 0; i < number_of_frames; i++)
   {
