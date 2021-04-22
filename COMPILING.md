@@ -389,7 +389,7 @@ with CaDiCaL build is to build CaDiCaL as a static library then compile CBMC
 with the IPASIR build options and link to the CaDiCaL static library.
 
 Note that at the time of writing this has been tested to work with the CaDiCaL
-1.4.0 on Ubuntu 18.04 & 20.04.
+1.4.0 on Ubuntu 18.04 & 20.04 and MacOS.
 
 1. Download CaDiCaL:
    ```
