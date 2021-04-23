@@ -800,7 +800,7 @@ ssa_exprt goto_symex_statet::add_object(
 
   const renamedt<ssa_exprt, L0> renamed = rename_ssa<L0>(ssa_exprt{expr}, ns);
   const irep_idt l0_name = renamed.get_identifier();
-  const auto l1_index = narrow_cast<unsigned>(index_generator(l0_name));
+  const std::size_t l1_index = index_generator(l0_name);
 
   if(const auto old_value = level1.insert_or_replace(renamed, l1_index))
   {
