@@ -4,6 +4,7 @@ void f1(int a[], int len) __CPROVER_assigns(a)
   a = b;
   int *indr = a + 2;
   *indr = 5;
+  a[5] = 2;
 }
 
 int main()

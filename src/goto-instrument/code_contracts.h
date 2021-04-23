@@ -104,6 +104,12 @@ protected:
   /// \brief Enforce contract of a single function
   bool enforce_contract(const std::string &);
 
+  /// \brief Create goto instructions based on code and add them to program.
+  void convert_to_goto(
+    const codet &code,
+    const irep_idt &mode,
+    goto_programt &program);
+
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
   bool add_pointer_checks(const std::string &);

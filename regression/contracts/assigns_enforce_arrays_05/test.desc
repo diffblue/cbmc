@@ -6,6 +6,6 @@ main.c
 ^VERIFICATION FAILED$
 --
 --
-Checks whether verification fails when an array is assigned via a
-function call which assigns a pointer to an element out of the
-allowable range.
+Checks whether verification fails when an assigns clause of a function
+indicates the pointer might change, but one of its internal function only
+modified its content.

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-int f1(int *a, int *b) __CPROVER_assigns(*a)
+int f1(int *a, int *b) __CPROVER_assigns(*a, b)
 {
   b = (int *)malloc(sizeof(int));
   *b = 5;
