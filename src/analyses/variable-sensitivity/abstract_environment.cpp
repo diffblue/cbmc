@@ -503,12 +503,8 @@ std::vector<abstract_object_pointert> eval_operands(
 ///////////
 abstract_value_pointert as_value(const abstract_object_pointert &obj)
 {
-  auto context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
-
-  return context_value
-           ? as_value(context_value->unwrap_context())
-           : std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+  return std::dynamic_pointer_cast<const abstract_value_objectt>(
+    obj->unwrap_context());
 }
 
 bool is_value(const abstract_object_pointert &obj)

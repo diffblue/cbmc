@@ -254,10 +254,6 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
     return std::make_shared<interval_abstract_valuet>(
       unwrapped_values.to_interval());
   }
-  //if(unwrapped_values.size() == 1)
-  //{
-  //  return (*unwrapped_values.begin());
-  //}
 
   auto result =
     std::dynamic_pointer_cast<value_set_abstract_objectt>(mutable_clone());
@@ -335,23 +331,13 @@ void value_set_abstract_objectt::output(
   }
 }
 
-static abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
-{
-  auto const &context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
-
-  return context_value ? context_value->unwrap_context() : maybe_wrapped;
-}
-
 static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values)
 {
   abstract_object_sett unwrapped_values;
   for(auto const &value : values)
   {
-    unwrapped_values.insert(
-      maybe_extract_single_value(maybe_unwrap_context(value)));
+    unwrapped_values.insert(maybe_extract_single_value(value));
   }
 
   return unwrapped_values;
@@ -360,8 +346,8 @@ unwrap_and_extract_values(const abstract_object_sett &values)
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
 {
-  auto const &value_as_set =
-    std::dynamic_pointer_cast<const value_set_tag>(maybe_singleton);
+  auto const &value_as_set = std::dynamic_pointer_cast<const value_set_tag>(
+    maybe_singleton->unwrap_context());
   if(value_as_set)
   {
     PRECONDITION(value_as_set->get_values().size() == 1);

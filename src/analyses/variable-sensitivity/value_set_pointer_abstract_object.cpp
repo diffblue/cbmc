@@ -24,13 +24,6 @@ unwrap_and_extract_values(const abstract_object_sett &values);
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
-/// Helper for converting context objects into its abstract-value children
-/// \p maybe_wrapped: either an abstract value (or a set of those) or one
-///   wrapped in a context
-/// \return an abstract value without context (though it might be as set)
-static abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
-
 /// Recursively construct a combination \p sub_con from \p super_con and once
 ///   constructed call \p f.
 /// \param super_con: vector of some containers storing the values
@@ -216,8 +209,7 @@ unwrap_and_extract_values(const abstract_object_sett &values)
   abstract_object_sett unwrapped_values;
   for(auto const &value : values)
   {
-    unwrapped_values.insert(
-      maybe_extract_single_value(maybe_unwrap_context(value)));
+    unwrapped_values.insert(maybe_extract_single_value(value));
   }
 
   return unwrapped_values;
@@ -226,8 +218,8 @@ unwrap_and_extract_values(const abstract_object_sett &values)
 abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
 {
-  auto const &value_as_set =
-    std::dynamic_pointer_cast<const value_set_tag>(maybe_singleton);
+  auto const &value_as_set = std::dynamic_pointer_cast<const value_set_tag>(
+    maybe_singleton->unwrap_context());
   if(value_as_set)
   {
     PRECONDITION(value_as_set->get_values().size() == 1);
@@ -238,13 +230,4 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
   }
   else
     return maybe_singleton;
-}
-
-abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
-{
-  auto const &context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
-
-  return context_value ? context_value->unwrap_context() : maybe_wrapped;
 }
