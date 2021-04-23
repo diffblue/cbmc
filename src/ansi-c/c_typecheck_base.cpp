@@ -729,6 +729,7 @@ void c_typecheck_baset::typecheck_declaration(
           auto &requires = code_type.requires();
           typecheck_expr(requires);
           implicit_typecast_bool(requires);
+          disallow_history_variables(requires);
         }
 
         if(as_const(code_type).assigns().is_not_nil())

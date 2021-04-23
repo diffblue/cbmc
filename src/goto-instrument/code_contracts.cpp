@@ -14,8 +14,11 @@ Date: February 2016
 #include "code_contracts.h"
 
 #include <algorithm>
+#include <map>
 
 #include <analyses/local_may_alias.h>
+
+#include <ansi-c/c_expr.h>
 
 #include <goto-programs/goto_convert_class.h>
 #include <goto-programs/remove_skip.h>
@@ -241,6 +244,92 @@ void code_contractst::add_quantified_variable(
   }
 }
 
+void code_contractst::replace_old_parameter(
+  exprt &expr,
+  std::map<exprt, exprt> &parameter2history,
+  source_locationt location,
+  const irep_idt &function,
+  const irep_idt &mode,
+  goto_programt &history)
+{
+  for(auto &op : expr.operands())
+  {
+    replace_old_parameter(
+      op, parameter2history, location, function, mode, history);
+  }
+
+  if(expr.id() == ID_old)
+  {
+    DATA_INVARIANT(
+      expr.operands().size() == 1, CPROVER_PREFIX "old must have one operand");
+
+    const auto &parameter = to_old_expr(expr).expression();
+
+    // TODO: generalize below
+    if(parameter.id() == ID_dereference)
+    {
+      const auto &dereference_expr = to_dereference_expr(parameter);
+
+      auto it = parameter2history.find(dereference_expr);
+
+      if(it == parameter2history.end())
+      {
+        // 1. Create a temporary symbol expression that represents the
+        // history variable
+        symbol_exprt tmp_symbol =
+          new_tmp_symbol(dereference_expr.type(), location, function, mode)
+            .symbol_expr();
+
+        // 2. Associate the above temporary variable to it's corresponding
+        // expression
+        parameter2history[dereference_expr] = tmp_symbol;
+
+        // 3. Add the required instructions to the instructions list
+        // 3.1 Declare the newly created temporary variable
+        history.add(goto_programt::make_decl(tmp_symbol, location));
+
+        // 3.2 Add an assignment such that the value pointed to by the new
+        // temporary variable is equal to the value of the corresponding
+        // parameter
+        history.add(goto_programt::make_assignment(
+          tmp_symbol, dereference_expr, location));
+      }
+
+      expr = parameter2history[dereference_expr];
+    }
+    else
+    {
+      log.error() << CPROVER_PREFIX "old does not currently support "
+                  << parameter.id() << " expressions." << messaget::eom;
+      throw 0;
+    }
+  }
+}
+
+std::pair<goto_programt, goto_programt>
+code_contractst::create_ensures_instruction(
+  codet &expression,
+  source_locationt location,
+  const irep_idt &function,
+  const irep_idt &mode)
+{
+  std::map<exprt, exprt> parameter2history;
+  goto_programt history;
+
+  // Find and replace "old" expression in the "expression" variable
+  replace_old_parameter(
+    expression, parameter2history, location, function, mode, history);
+
+  // Create instructions corresponding to the ensures clause
+  goto_programt ensures_program;
+  convert_to_goto(expression, mode, ensures_program);
+
+  // return a pair containing:
+  // 1. instructions corresponding to the ensures clause
+  // 2. instructions related to initializing the history variables
+  return std::make_pair(std::move(ensures_program), std::move(history));
+}
+
 bool code_contractst::apply_function_contract(
   const irep_idt &function_id,
   goto_programt &goto_program,
@@ -344,6 +433,25 @@ bool code_contractst::apply_function_contract(
     std::advance(target, lines_to_iterate);
   }
 
+  // Gather all the instructions required to handle history variables
+  // as well as the ensures clause
+  std::pair<goto_programt, goto_programt> ensures_pair;
+  if(ensures.is_not_nil())
+  {
+    auto assumption = code_assumet(ensures);
+    ensures_pair = create_ensures_instruction(
+      assumption,
+      ensures.source_location(),
+      function,
+      symbol_table.lookup_ref(function).mode);
+
+    // add all the history variable initialization instructions
+    // to the goto program
+    auto lines_to_iterate = ensures_pair.second.instructions.size();
+    goto_program.insert_before_swap(target, ensures_pair.second);
+    std::advance(target, lines_to_iterate);
+  }
+
   // Create a series of non-deterministic assignments to havoc the variables
   // in the assigns clause.
   if(assigns.is_not_nil())
@@ -363,13 +471,8 @@ bool code_contractst::apply_function_contract(
   // function call with a SKIP statement.
   if(ensures.is_not_nil())
   {
-    goto_programt assumption;
-    convert_to_goto(
-      code_assumet(ensures),
-      symbol_table.lookup_ref(function).mode,
-      assumption);
-    auto lines_to_iterate = assumption.instructions.size();
-    goto_program.insert_before_swap(target, assumption);
+    auto lines_to_iterate = ensures_pair.first.instructions.size();
+    goto_program.insert_before_swap(target, ensures_pair.first);
     std::advance(target, lines_to_iterate);
   }
   *target = goto_programt::make_skip();
@@ -784,6 +887,7 @@ void code_contractst::add_contract_check(
   // if(nondet)
   //   decl ret
   //   decl parameter1 ...
+  //   decl history_parameter1 ... [optional]
   //   assume(requires)  [optional]
   //   ret=function(parameter1, ...)
   //   assert(ensures)
@@ -812,7 +916,7 @@ void code_contractst::add_contract_check(
                        .symbol_expr();
     check.add(goto_programt::make_decl(r, skip->source_location));
 
-    call.lhs()=r;
+    call.lhs() = r;
     return_stmt = code_returnt(r);
 
     symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
@@ -850,6 +954,10 @@ void code_contractst::add_contract_check(
   code_contractst::add_quantified_variable(
     requires, replace, function_symbol.mode);
 
+  // rewrite any use of __CPROVER_return_value
+  exprt ensures_cond = ensures;
+  replace(ensures_cond);
+
   // assume(requires)
   if(requires.is_not_nil())
   {
@@ -863,20 +971,27 @@ void code_contractst::add_contract_check(
     check.destructive_append(assumption);
   }
 
+  // Prepare the history variables handling
+  std::pair<goto_programt, goto_programt> ensures_pair;
+
+  if(ensures.is_not_nil())
+  {
+    // get all the relevant instructions related to history variables
+    auto assertion = code_assertt(ensures_cond);
+    ensures_pair = create_ensures_instruction(
+      assertion, ensures.source_location(), wrapper_fun, function_symbol.mode);
+
+    // add all the history variable initializations
+    check.destructive_append(ensures_pair.second);
+  }
+
   // ret=mangled_fun(parameter1, ...)
   check.add(goto_programt::make_function_call(call, skip->source_location));
-
-  // rewrite any use of __CPROVER_return_value
-  exprt ensures_cond = ensures;
-  replace(ensures_cond);
 
   // assert(ensures)
   if(ensures.is_not_nil())
   {
-    goto_programt assertion;
-    convert_to_goto(
-      code_assertt(ensures_cond), function_symbol.mode, assertion);
-    check.destructive_append(assertion);
+    check.destructive_append(ensures_pair.first);
   }
 
   if(code_type.return_type() != empty_typet())

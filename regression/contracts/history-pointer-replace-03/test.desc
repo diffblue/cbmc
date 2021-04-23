@@ -1,0 +1,12 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=(1|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+error: __CPROVER_old expressions are not allowed in __CPROVER_requires clauses
+--
+--
+Verification:
+This test checks that history variables cannot be used as part of the
+pre-condition contract. In this case, verification should fail.
