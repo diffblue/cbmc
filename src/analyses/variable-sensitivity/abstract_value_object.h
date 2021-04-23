@@ -290,6 +290,14 @@ public:
   virtual sharing_ptrt<const abstract_value_objectt>
   constrain(const exprt &lower, const exprt &upper) const = 0;
 
+  abstract_object_pointert write(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> &stack,
+    const exprt &specifier,
+    const abstract_object_pointert &value,
+    bool merging_write) const final;
+
 protected:
   using abstract_value_pointert = sharing_ptrt<const abstract_value_objectt>;
 

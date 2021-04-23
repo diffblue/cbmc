@@ -178,6 +178,17 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   return transform(expr, operands, environment, ns);
 }
 
+abstract_object_pointert abstract_value_objectt::write(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> &stack,
+  const exprt &specifier,
+  const abstract_object_pointert &value,
+  bool merging_write) const
+{
+  UNREACHABLE; // Should not ever call write on a value;
+}
+
 abstract_object_pointert abstract_value_objectt::merge(
   const abstract_object_pointert &other,
   const wident &widen_mode) const

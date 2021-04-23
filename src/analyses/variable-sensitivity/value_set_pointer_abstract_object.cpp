@@ -140,14 +140,6 @@ abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
   return shared_from_this();
 }
 
-abstract_object_pointert value_set_pointer_abstract_objectt::resolve_new_values(
-  const abstract_object_sett &new_values,
-  const abstract_environmentt &environment) const
-{
-  auto result = resolve_values(new_values);
-  return environment.add_object_context(result);
-}
-
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
 {

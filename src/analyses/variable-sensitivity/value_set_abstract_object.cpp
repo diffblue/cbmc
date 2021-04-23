@@ -186,23 +186,6 @@ constant_interval_exprt value_set_abstract_objectt::to_interval() const
   return values.to_interval();
 }
 
-abstract_object_pointert value_set_abstract_objectt::write(
-  abstract_environmentt &environment,
-  const namespacet &ns,
-  const std::stack<exprt> &stack,
-  const exprt &specifier,
-  const abstract_object_pointert &value,
-  bool merging_write) const
-{
-  abstract_object_sett new_values;
-  for(const auto &st_value : values)
-  {
-    new_values.insert(
-      st_value->write(environment, ns, stack, specifier, value, merging_write));
-  }
-  return resolve_new_values(new_values, environment);
-}
-
 abstract_object_pointert value_set_abstract_objectt::merge_with_value(
   const abstract_value_pointert &other,
   const wident &widen_mode) const
@@ -254,14 +237,6 @@ abstract_object_pointert value_set_abstract_objectt::meet_with_value(
     return std::make_shared<value_set_abstract_objectt>(type(), false, true);
 
   return resolve_values(meet_values);
-}
-
-abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
-  const abstract_object_sett &new_values,
-  const abstract_environmentt &environment) const
-{
-  auto result = resolve_values(new_values);
-  return environment.add_object_context(result);
 }
 
 abstract_object_pointert value_set_abstract_objectt::resolve_values(

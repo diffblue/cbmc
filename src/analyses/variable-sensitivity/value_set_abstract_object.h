@@ -57,17 +57,6 @@ public:
   /// either converted to interval or marked as `top`.
   static const size_t max_value_set_size = 10;
 
-  /// \copydoc abstract_objectt::write
-  ///
-  /// Delegate writing to stored values.
-  abstract_object_pointert write(
-    abstract_environmentt &environment,
-    const namespacet &ns,
-    const std::stack<exprt> &stack,
-    const exprt &specifier,
-    const abstract_object_pointert &value,
-    bool merging_write) const override;
-
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
@@ -82,16 +71,6 @@ protected:
   meet_with_value(const abstract_value_pointert &other) const override;
 
 private:
-  /// Update the set of stored values to \p new_values. Build a new abstract
-  ///   object of the right type if necessary.
-  /// \param new_values: potentially new set of values
-  /// \param environment: the abstract environment
-  /// \return the abstract object representing \p new_values (either 'this' or
-  ///   something new)
-  abstract_object_pointert resolve_new_values(
-    const abstract_object_sett &new_values,
-    const abstract_environmentt &environment) const;
-
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values
