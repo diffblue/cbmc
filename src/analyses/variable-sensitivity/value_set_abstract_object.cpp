@@ -290,27 +290,6 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
   return result;
 }
 
-abstract_object_pointert value_set_abstract_objectt::merge(
-  const abstract_object_pointert &other,
-  const wident &widen_mode) const
-{
-  auto other_value = as_value(other);
-  if(other_value)
-    return merge_with_value(other_value, widen_mode);
-
-  return abstract_objectt::merge(other, widen_mode);
-}
-
-abstract_object_pointert
-value_set_abstract_objectt::meet(const abstract_object_pointert &other) const
-{
-  auto other_value = as_value(other);
-  if(other_value)
-    return meet_with_value(other_value);
-
-  return abstract_objectt::meet(other);
-}
-
 void value_set_abstract_objectt::set_top_internal()
 {
   values.clear();

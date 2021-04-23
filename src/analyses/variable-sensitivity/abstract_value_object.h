@@ -291,6 +291,29 @@ public:
   constrain(const exprt &lower, const exprt &upper) const = 0;
 
 protected:
+  using abstract_value_pointert = sharing_ptrt<const abstract_value_objectt>;
+
+  /// Attempts to do a value/value merge if both are constants,
+  /// otherwise falls back to the parent merge
+  ///
+  /// \param other: the abstract object to merge with
+  /// \param widen_mode: Indicates if this is a widening merge
+  ///
+  /// \return Returns the result of the merge
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const wident &widen_mode) const final;
+
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const final;
+
+  virtual abstract_object_pointert merge_with_value(
+    const abstract_value_pointert &other,
+    const wident &widen_mode) const = 0;
+
+  virtual abstract_object_pointert
+  meet_with_value(const abstract_value_pointert &other) const = 0;
+
   virtual index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const = 0;
 

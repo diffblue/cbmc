@@ -178,6 +178,29 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   return transform(expr, operands, environment, ns);
 }
 
+abstract_object_pointert abstract_value_objectt::merge(
+  const abstract_object_pointert &other,
+  const wident &widen_mode) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  if(cast_other)
+    return merge_with_value(cast_other, widen_mode);
+
+  return abstract_objectt::merge(other, widen_mode);
+}
+
+abstract_object_pointert
+abstract_value_objectt::meet(const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  if(cast_other)
+    return meet_with_value(cast_other);
+
+  return abstract_objectt::meet(other);
+}
+
 // evaluation helpers
 template <class representation_type>
 abstract_object_pointert make_top(const typet &type)
