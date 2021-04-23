@@ -30,6 +30,10 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  value_set_abstract_objectt(
+    const typet &type,
+    abstract_object_sett initial_values);
+
   index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const override;
 

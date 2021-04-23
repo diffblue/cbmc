@@ -143,6 +143,15 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   verify();
 }
 
+value_set_abstract_objectt::value_set_abstract_objectt(
+  const typet &type,
+  abstract_object_sett initial_values)
+  : abstract_value_objectt(type, false, false),
+    values(std::move(initial_values))
+{
+  verify();
+}
+
 index_range_implementation_ptrt
 value_set_abstract_objectt::index_range_implementation(
   const namespacet &ns) const
@@ -249,16 +258,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 
   auto unwrapped_values = unwrap_and_extract_values(new_values);
 
-  if(unwrapped_values.size() > max_value_set_size)
-  {
-    return std::make_shared<interval_abstract_valuet>(
-      unwrapped_values.to_interval());
-  }
-
-  auto result =
-    std::dynamic_pointer_cast<value_set_abstract_objectt>(mutable_clone());
-  result->set_values(unwrapped_values);
-  return result;
+  return std::make_shared<value_set_abstract_objectt>(type(), unwrapped_values);
 }
 
 void value_set_abstract_objectt::set_top_internal()
