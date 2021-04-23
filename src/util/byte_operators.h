@@ -71,9 +71,6 @@ inline void validate_expr(const byte_extract_exprt &value)
   validate_operands(value, 2, "Byte extract must have two operands");
 }
 
-irep_idt byte_extract_id();
-irep_idt byte_update_id();
-
 /// Expression corresponding to \c op() where the bytes starting at
 /// position \c offset (given in number of bytes) have been updated with
 /// \c value.
@@ -128,5 +125,15 @@ inline byte_update_exprt &to_byte_update_expr(exprt &expr)
   PRECONDITION(expr.operands().size() == 3);
   return static_cast<byte_update_exprt &>(expr);
 }
+
+/// Construct a byte_extract_exprt with endianness and byte width matching the
+/// current configuration.
+byte_extract_exprt
+make_byte_extract(const exprt &_op, const exprt &_offset, const typet &_type);
+
+/// Construct a byte_update_exprt with endianness and byte width matching the
+/// current configuration.
+byte_update_exprt
+make_byte_update(const exprt &_op, const exprt &_offset, const exprt &_value);
 
 #endif // CPROVER_UTIL_BYTE_OPERATORS_H

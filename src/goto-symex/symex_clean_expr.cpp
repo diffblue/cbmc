@@ -42,8 +42,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 
     if(if_expr.true_case() != if_expr.false_case())
     {
-      byte_extract_exprt be(
-        byte_extract_id(),
+      byte_extract_exprt be = make_byte_extract(
         if_expr.false_case(),
         from_integer(0, index_type()),
         if_expr.true_case().type());
@@ -91,8 +90,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
         CHECK_RETURN(array_size.has_value());
         if(do_simplify)
           simplify(array_size.value(), ns);
-        expr = byte_extract_exprt(
-          byte_extract_id(),
+        expr = make_byte_extract(
           expr,
           from_integer(0, index_type()),
           array_typet(char_type(), array_size.value()));
@@ -123,12 +121,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 
       array_typet new_array_type(subtype, new_size);
 
-      expr =
-        byte_extract_exprt(
-          byte_extract_id(),
-          expr,
-          ode.offset(),
-          new_array_type);
+      expr = make_byte_extract(expr, ode.offset(), new_array_type);
     }
   }
 }

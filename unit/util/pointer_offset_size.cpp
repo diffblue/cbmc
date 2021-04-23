@@ -59,8 +59,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
     const signedbv_typet small_t(8);
     const auto result = get_subexpression_at_offset(a, 1, small_t, ns);
     REQUIRE(
-      result.value() == byte_extract_exprt(
-                          byte_extract_id(),
+      result.value() == make_byte_extract(
                           index_exprt(a, from_integer(0, index_type())),
                           from_integer(1, index_type()),
                           small_t));
@@ -74,8 +73,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
     // index_exprt.
     REQUIRE(
       result.value() ==
-      byte_extract_exprt(
-        byte_extract_id(), a, from_integer(3, index_type()), int16_t));
+      make_byte_extract(a, from_integer(3, index_type()), int16_t));
   }
 }
 
@@ -121,10 +119,8 @@ TEST_CASE("Build subexpression to access element at offset into struct")
     const signedbv_typet small_t(8);
     const auto result = get_subexpression_at_offset(s, 1, small_t, ns);
     REQUIRE(
-      result.value() == byte_extract_exprt(
-                          byte_extract_id(),
-                          member_exprt(s, "foo", t),
-                          from_integer(1, index_type()),
-                          small_t));
+      result.value() ==
+      make_byte_extract(
+        member_exprt(s, "foo", t), from_integer(1, index_type()), small_t));
   }
 }

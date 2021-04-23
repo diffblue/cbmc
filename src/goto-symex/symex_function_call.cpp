@@ -107,15 +107,11 @@ void goto_symext::parameter_assignments(
            rhs_type.id() == ID_pointer ||
            rhs_type.id() == ID_union ||
            rhs_type.id() == ID_union_tag))
-        {
-          rhs=
-            byte_extract_exprt(
-              byte_extract_id(),
-              rhs,
-              from_integer(0, index_type()),
-              parameter_type);
-        }
         // clang-format on
+        {
+          rhs = make_byte_extract(
+            rhs, from_integer(0, index_type()), parameter_type);
+        }
         else
         {
           std::ostringstream error;

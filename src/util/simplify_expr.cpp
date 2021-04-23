@@ -152,7 +152,9 @@ simplify_exprt::resultt<>
 simplify_exprt::simplify_clz(const count_leading_zeros_exprt &expr)
 {
   const auto const_bits_opt = expr2bits(
-    expr.op(), byte_extract_id() == ID_byte_extract_little_endian, ns);
+    expr.op(),
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
+    ns);
 
   if(!const_bits_opt.has_value())
     return unchanged(expr);
@@ -1634,7 +1636,13 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
   // don't do any of the following if endianness doesn't match, as
   // bytes need to be swapped
-  if(*offset == 0 && byte_extract_id() == expr.id())
+  if(
+    *offset == 0 && ((expr.id() == ID_byte_extract_little_endian &&
+                      config.ansi_c.endianness ==
+                        configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN) ||
+                     (expr.id() == ID_byte_extract_big_endian &&
+                      config.ansi_c.endianness ==
+                        configt::ansi_ct::endiannesst::IS_BIG_ENDIAN)))
   {
     // byte extract of full object is object
     if(expr.type() == expr.op().type())
@@ -1658,7 +1666,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   {
     const auto const_bits_opt = expr2bits(
       to_array_of_expr(expr.op()).op(),
-      byte_extract_id() == ID_byte_extract_little_endian,
+      config.ansi_c.endianness ==
+        configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
       ns);
 
     if(!const_bits_opt.has_value())
@@ -2023,11 +2032,11 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           bytes_req = (*val_size) / 8 - val_offset;
 
         byte_extract_exprt new_val(
-          byte_extract_id(),
+          ID_byte_extract_little_endian,
           value,
           from_integer(val_offset, offset.type()),
-          array_typet(unsignedbv_typet(8),
-                      from_integer(bytes_req, offset.type())));
+          array_typet(
+            unsignedbv_typet(8), from_integer(bytes_req, offset.type())));
 
         *it = byte_update_exprt(
           expr.id(),

@@ -78,8 +78,8 @@ TEST_CASE("Simplify byte extract", "[core][util]")
   // byte-extracting type T at offset 0 from an object of type T yields the
   // object
   symbol_exprt s("foo", size_type());
-  byte_extract_exprt be(
-    byte_extract_id(), s, from_integer(0, index_type()), size_type());
+  byte_extract_exprt be =
+    make_byte_extract(s, from_integer(0, index_type()), size_type());
 
   exprt simp = simplify_expr(be, ns);
 

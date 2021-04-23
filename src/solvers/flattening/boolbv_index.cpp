@@ -338,8 +338,8 @@ bvt boolbvt::convert_index(
         o.offset(), from_integer(index * (*subtype_bytes_opt), o.offset().type())),
       ns);
 
-    byte_extract_exprt be(
-      byte_extract_id(), o.root_object(), new_offset, array_type.subtype());
+    byte_extract_exprt be =
+      make_byte_extract(o.root_object(), new_offset, array_type.subtype());
 
     return convert_bv(be);
   }

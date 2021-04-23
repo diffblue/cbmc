@@ -530,11 +530,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       }
       else
       {
-        result.value = byte_extract_exprt(
-          byte_extract_id(),
-          symbol_expr,
-          pointer_offset(pointer_expr),
-          dereference_type);
+        result.value = make_byte_extract(
+          symbol_expr, pointer_offset(pointer_expr), dereference_type);
         result.pointer = address_of_exprt{result.value};
       }
     }
@@ -627,7 +624,10 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         root_object_subexpression, o.offset(), dereference_type, ns);
       if(subexpr.has_value())
         simplify(subexpr.value(), ns);
-      if(subexpr.has_value() && subexpr.value().id() != byte_extract_id())
+      if(
+        subexpr.has_value() &&
+        subexpr.value().id() != ID_byte_extract_little_endian &&
+        subexpr.value().id() != ID_byte_extract_big_endian)
       {
         // Successfully found a member, array index, or combination thereof
         // that matches the desired type and offset:
@@ -768,7 +768,7 @@ bool value_set_dereferencet::memory_model_bytes(
   else
   {
     // no, use 'byte_extract'
-    result = byte_extract_exprt(byte_extract_id(), value, offset, to_type);
+    result = make_byte_extract(value, offset, to_type);
   }
 
   value=result;
