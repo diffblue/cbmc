@@ -148,6 +148,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: 'latest'
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
