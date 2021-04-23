@@ -273,7 +273,7 @@ public:
 
   void set_integer_bits(std::size_t b)
   {
-    set(ID_integer_bits, narrow_cast<long long>(b));
+    set_size_t(ID_integer_bits, b);
   }
 
   static void check(
@@ -335,7 +335,7 @@ public:
 
   void set_f(std::size_t b)
   {
-    set(ID_f, narrow_cast<long long>(b));
+    set_size_t(ID_f, b);
   }
 
   static void check(

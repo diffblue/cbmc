@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr_cast.h"
 #include "invariant.h"
-#include "narrow.h"
 #include "std_types.h"
 
 /// An expression without operands
@@ -1539,7 +1538,7 @@ public:
 
   void set_component_number(std::size_t component_number)
   {
-    set(ID_component_number, narrow_cast<long long>(component_number));
+    set_size_t(ID_component_number, component_number);
   }
 };
 

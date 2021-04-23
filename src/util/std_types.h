@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "mp_arith.h"
 #include "validate.h"
-#include <util/narrow.h>
 
 #include <unordered_map>
 
@@ -842,7 +841,7 @@ public:
 
   void set_width(std::size_t width)
   {
-    set(ID_width, narrow_cast<long long>(width));
+    set_size_t(ID_width, width);
   }
 
   static void check(

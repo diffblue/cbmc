@@ -37,7 +37,7 @@ public:
 
   void set_bits_per_byte(std::size_t bits_per_byte)
   {
-    set(ID_bits_per_byte, narrow_cast<long long>(bits_per_byte));
+    set_size_t(ID_bits_per_byte, bits_per_byte);
   }
 };
 
