@@ -28,7 +28,6 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume_prune.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/expression_evaluation.cpp \
-       analyses/variable-sensitivity/value_set/abstract_value.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/meet.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/merge.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \

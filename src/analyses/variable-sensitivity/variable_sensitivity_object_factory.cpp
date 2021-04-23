@@ -7,7 +7,6 @@
 \*******************************************************************/
 #include "variable_sensitivity_object_factory.h"
 #include "full_array_abstract_object.h"
-#include "value_set_abstract_value.h"
 #include "value_set_pointer_abstract_object.h"
 
 template <class context_classt>
@@ -144,11 +143,6 @@ variable_sensitivity_object_factoryt::get_abstract_object(
     return initialize_abstract_object<interval_abstract_valuet>(
       followed_type, top, bottom, e, environment, ns, configuration);
   case VALUE_SET:
-    if(configuration.advanced_sensitivities.new_value_set)
-    {
-      return initialize_abstract_object<value_set_abstract_valuet>(
-        followed_type, top, bottom, e, environment, ns, configuration);
-    }
     return initialize_abstract_object<value_set_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
 

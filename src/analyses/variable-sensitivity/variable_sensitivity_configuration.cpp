@@ -35,8 +35,6 @@ vsd_configt vsd_configt::from_options(const optionst &options)
   config.context_tracking.last_write_context = true;
   config.context_tracking.data_dependency_context =
     options.get_bool_option("data-dependencies");
-  config.advanced_sensitivities.new_value_set =
-    options.get_bool_option("new-value-set");
 
   config.flow_sensitivity = (options.get_bool_option("flow-insensitive"))
                               ? flow_sensitivityt::insensitive
