@@ -534,9 +534,7 @@ exprt boolbvt::make_free_bv_expr(const typet &type)
 {
   const std::size_t width = boolbv_width(type);
   PRECONDITION(width != 0);
-  bvt bv(width);
-  for(auto &lit : bv)
-    lit = prop.new_variable();
+  bvt bv = prop.new_variables(width);
   return make_bv_expr(type, bv);
 }
 

@@ -936,14 +936,8 @@ void bv_utilst::unsigned_divider(
   literalt is_not_zero=prop.lor(op1);
 
   // free variables for result of division
-
-  res.resize(width);
-  rem.resize(width);
-  for(std::size_t i=0; i<width; i++)
-  {
-    res[i]=prop.new_variable();
-    rem[i]=prop.new_variable();
-  }
+  res = prop.new_variables(width);
+  rem = prop.new_variables(width);
 
   // add implications
 
@@ -1166,9 +1160,7 @@ literalt bv_utilst::lt_or_le(
     size_t start;
     size_t i;
 
-    compareBelow.resize(bv0.size());
-    for(auto &literal : compareBelow)
-      literal = prop.new_variable();
+    compareBelow = prop.new_variables(bv0.size());
     result = prop.new_variable();
 
     if(rep==SIGNED)

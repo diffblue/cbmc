@@ -20,9 +20,9 @@ void propt::set_equal(literalt a, literalt b)
 bvt propt::new_variables(std::size_t width)
 {
   bvt result;
-  result.resize(width);
+  result.reserve(width);
   for(std::size_t i=0; i<width; i++)
-    result[i]=new_variable();
+    result.push_back(new_variable());
   return result;
 }
 
