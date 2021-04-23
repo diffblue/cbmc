@@ -67,9 +67,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       else
       {
         // free variables
-        bv.reserve(width);
-        for(std::size_t i = 0; i < width; i++)
-          bv.push_back(prop.new_variable());
+        bv = prop.new_variables(width);
 
         record_array_index(expr);
 
@@ -219,10 +217,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     if(prop.has_set_to())
     {
       // free variables
-
-      bv.resize(width);
-      for(std::size_t i=0; i<width; i++)
-        bv[i]=prop.new_variable();
+      bv = prop.new_variables(width);
 
       // add implications
 
@@ -297,9 +292,6 @@ bvt boolbvt::convert_index(
   if(width==0)
     return conversion_failed(array);
 
-  bvt bv;
-  bv.resize(width);
-
   // TODO: If the underlying array can use one of the
   // improvements given above then it may be better to use
   // the array theory for short chains of updates and then
@@ -325,8 +317,8 @@ bvt boolbvt::convert_index(
     //       array.id()!=ID_array);
     // If not there are large improvements possible as above
 
-    for(std::size_t i=0; i<width; i++)
-      bv[i] = tmp[numeric_cast_v<std::size_t>(offset + i)];
+    std::size_t offset_int = numeric_cast_v<std::size_t>(offset);
+    return bvt(tmp.begin() + offset_int, tmp.begin() + offset_int + width);
   }
   else if(
     array.id() == ID_member || array.id() == ID_index ||
@@ -354,9 +346,6 @@ bvt boolbvt::convert_index(
   else
   {
     // out of bounds
-    for(std::size_t i=0; i<width; i++)
-      bv[i]=prop.new_variable();
+    return prop.new_variables(width);
   }
-
-  return bv;
 }

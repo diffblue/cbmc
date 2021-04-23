@@ -341,13 +341,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   }
   else if(expr.id()==ID_nondet_symbol)
   {
-    bvt bv;
-    bv.resize(bits);
-
-    for(auto &literal : bv)
-      literal = prop.new_variable();
-
-    return bv;
+    return prop.new_variables(bits);
   }
   else if(expr.id()==ID_typecast)
   {
@@ -576,11 +570,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     const bvt object_size_bv =
       bv_utils.zero_extension(convert_bv(object_size), width);
 
-    bvt bv;
-    bv.reserve(width);
-
-    for(std::size_t i = 0; i < width; ++i)
-      bv.push_back(prop.new_variable());
+    bvt bv = prop.new_variables(width);
 
     if(!same_object_bv[0].is_false())
     {
@@ -660,11 +650,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     // we postpone until we know the objects
     std::size_t width=boolbv_width(expr.type());
 
-    bvt bv;
-    bv.resize(width);
-
-    for(std::size_t i=0; i<width; i++)
-      bv[i]=prop.new_variable();
+    bvt bv = prop.new_variables(width);
 
     postponed_list.push_back(postponedt());
 

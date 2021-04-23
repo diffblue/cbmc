@@ -385,12 +385,26 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
 /// \return New variable as literal
 literalt cnft::new_variable()
 {
-  literalt l;
-  l.set(_no_variables, false);
+  literalt l(_no_variables, false);
 
   set_no_variables(_no_variables+1);
 
   return l;
+}
+
+/// Generate a vector of new variables.
+/// \return Vector of new variables.
+bvt cnft::new_variables(std::size_t width)
+{
+  bvt result;
+  result.reserve(width);
+
+  for(std::size_t i = _no_variables; i < _no_variables + width; ++i)
+    result.emplace_back(i, false);
+
+  set_no_variables(_no_variables + width);
+
+  return result;
 }
 
 /// eliminate duplicates from given vector of literals

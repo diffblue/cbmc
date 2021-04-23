@@ -92,7 +92,7 @@ public:
   virtual literalt new_variable()=0;
   virtual void set_variable_name(literalt, const irep_idt &) { }
   virtual size_t no_variables() const=0;
-  bvt new_variables(std::size_t width);
+  virtual bvt new_variables(std::size_t width);
 
   // solving
   virtual const std::string solver_text()=0;

@@ -110,11 +110,7 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
   eq_bvs.resize(no_elements);
 
   for(std::size_t i=0; i<no_elements; i++)
-  {
-    eq_bvs[i].resize(bits);
-    for(std::size_t j=0; j<bits; j++)
-      eq_bvs[i][j]=prop.new_variable();
-  }
+    eq_bvs[i] = prop.new_variables(bits);
 
   // generate equality constraints
 

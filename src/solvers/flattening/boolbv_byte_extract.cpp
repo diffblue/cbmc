@@ -128,8 +128,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     if(prop.has_set_to())
     {
       // free variables
-      for(std::size_t i=0; i<width; i++)
-        bv[i]=prop.new_variable();
+      bv = prop.new_variables(width);
 
       // add implications
 

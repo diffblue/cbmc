@@ -38,6 +38,7 @@ public:
   // a?b:c
   virtual literalt lselect(literalt a, literalt b, literalt c) override;
   virtual literalt new_variable() override;
+  bvt new_variables(std::size_t width) override;
   virtual size_t no_variables() const override { return _no_variables; }
   virtual void set_no_variables(size_t no) { _no_variables=no; }
   virtual size_t no_clauses() const=0;

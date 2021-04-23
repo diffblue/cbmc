@@ -21,12 +21,8 @@ bvt boolbvt::convert_case(const exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  bvt bv;
-  bv.resize(width);
-
   // make it free variables
-  for(auto &literal : bv)
-    literal = prop.new_variable();
+  bvt bv = prop.new_variables(width);
 
   DATA_INVARIANT(
     operands.size() >= 3, "case should have at least three operands");

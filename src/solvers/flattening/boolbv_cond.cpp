@@ -20,7 +20,6 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
     return conversion_failed(expr);
 
   bvt bv;
-  bv.resize(width);
 
   DATA_INVARIANT(operands.size() >= 2, "cond must have at least two operands");
 
@@ -34,8 +33,7 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
     literalt cond_literal=const_literal(false);
 
     // make it free variables
-    for(auto &literal : bv)
-      literal = prop.new_variable();
+    bv = prop.new_variables(width);
 
     forall_operands(it, expr)
     {
@@ -60,6 +58,8 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
   }
   else
   {
+    bv.resize(width);
+
     // functional version -- go backwards
     for(std::size_t i=expr.operands().size(); i!=0; i-=2)
     {
