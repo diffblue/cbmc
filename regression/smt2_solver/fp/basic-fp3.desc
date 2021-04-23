@@ -1,0 +1,10 @@
+CORE
+basic-fp3.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+\(define-fun a \(\) \(_ FloatingPoint 5 11\) .*\)
+\(define-fun b \(\) \(_ FloatingPoint 8 24\) .*\)
+\(define-fun c \(\) \(_ FloatingPoint 11 53\) .*\)
+\(define-fun d \(\) \(_ FloatingPoint 15 113\) .*\)
+--
