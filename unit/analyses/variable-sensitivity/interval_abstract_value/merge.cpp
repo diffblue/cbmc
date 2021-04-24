@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: Unit tests for intervalabstract_valuet::merge
+ Module: Unit tests for interval_abstract_valuet::merge
 
  Author: Jez Higgins.
 

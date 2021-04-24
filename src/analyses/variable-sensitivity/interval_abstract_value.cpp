@@ -257,6 +257,13 @@ interval_abstract_valuet::interval_abstract_valuet(
 }
 
 interval_abstract_valuet::interval_abstract_valuet(
+  const exprt &lower,
+  const exprt &upper)
+  : interval_abstract_valuet(constant_interval_exprt(lower, upper))
+{
+}
+
+interval_abstract_valuet::interval_abstract_valuet(
   const exprt &e,
   const abstract_environmentt &environment,
   const namespacet &ns)
@@ -346,14 +353,34 @@ void interval_abstract_valuet::output(
   }
 }
 
-/// Merge another interval abstract object with this one
-/// \param other The abstract value object to merge with
-/// \param widen_mode: Indicates if this is a widening merge
-/// \return This if the other interval is subsumed by this,
-///          other if this is subsumed by other.
-///          Otherwise, a new interval abstract object
-///          with the smallest interval that subsumes both
-///          this and other
+abstract_object_pointert widening_merge(
+  const constant_interval_exprt &lhs,
+  const constant_interval_exprt &rhs)
+{
+  auto lower_bound =
+    constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
+  auto upper_bound =
+    constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
+  auto range = plus_exprt(
+    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
+
+  auto dummy_symbol_table = symbol_tablet{};
+  auto dummy_namespace = namespacet{dummy_symbol_table};
+
+  // should extend lower bound?
+  if(rhs.get_lower() < lhs.get_lower())
+    lower_bound =
+      simplify_expr(minus_exprt(lower_bound, range), dummy_namespace);
+  // should extend upper bound?
+  if(lhs.get_upper() < rhs.get_upper())
+    upper_bound =
+      simplify_expr(plus_exprt(upper_bound, range), dummy_namespace);
+
+  // new interval ...
+  auto new_interval = constant_interval_exprt(lower_bound, upper_bound);
+  return make_interval(new_interval);
+}
+
 abstract_object_pointert interval_abstract_valuet::merge_with_value(
   const abstract_value_pointert &other,
   const widen_modet &widen_mode) const
@@ -369,19 +396,17 @@ abstract_object_pointert interval_abstract_valuet::merge_with_value(
   if(interval.contains(other_interval))
     return shared_from_this();
 
-  return make_interval(constant_interval_exprt(
-    constant_interval_exprt::get_min(
-      interval.get_lower(), other_interval.get_lower()),
-    constant_interval_exprt::get_max(
-      interval.get_upper(), other_interval.get_upper())));
+  if(widen_mode == widen_modet::could_widen)
+    return widening_merge(interval, other_interval);
+
+  auto lower_bound = constant_interval_exprt::get_min(
+    interval.get_lower(), other_interval.get_lower());
+  auto upper_bound = constant_interval_exprt::get_max(
+    interval.get_upper(), other_interval.get_upper());
+
+  return make_interval(lower_bound, upper_bound);
 }
 
-/// Meet another interval abstract object with this one
-/// \param other The interval abstract object to meet with
-/// \return This if the other interval subsumes this,
-///          other if this subsumes other.
-///          Otherwise, a new interval abstract object
-///          with the intersection interval (of this and other)
 abstract_object_pointert interval_abstract_valuet::meet_with_value(
   const abstract_value_pointert &other) const
 {
