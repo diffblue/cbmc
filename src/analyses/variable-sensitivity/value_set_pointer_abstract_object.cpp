@@ -159,7 +159,7 @@ abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
 
 abstract_object_pointert value_set_pointer_abstract_objectt::merge(
   const abstract_object_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto cast_other = std::dynamic_pointer_cast<const value_set_tag>(other);
   if(cast_other)

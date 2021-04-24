@@ -58,7 +58,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
 
 abstract_object_pointert constant_pointer_abstract_objectt::merge(
   const abstract_object_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
@@ -71,7 +71,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::merge(
 abstract_object_pointert
 constant_pointer_abstract_objectt::merge_constant_pointers(
   const constant_pointer_abstract_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   if(is_bottom())
     return std::make_shared<constant_pointer_abstract_objectt>(*other);
@@ -185,7 +185,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
       {
         abstract_object_pointert pointed_value = environment.eval(value, ns);
         abstract_object_pointert merged_value =
-          abstract_objectt::merge(pointed_value, new_value, wident::no).object;
+          abstract_objectt::merge(pointed_value, new_value, widen_modet::no)
+            .object;
         environment.assign(value, merged_value, ns);
       }
       else

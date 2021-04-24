@@ -177,7 +177,8 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
 
       result->map.replace(
         c,
-        abstract_objectt::merge(old_value.value(), value, wident::no).object);
+        abstract_objectt::merge(old_value.value(), value, widen_modet::no)
+          .object);
     }
     else
     {
@@ -239,7 +240,7 @@ bool full_struct_abstract_objectt::verify() const
 
 abstract_object_pointert full_struct_abstract_objectt::merge(
   const abstract_object_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   constant_struct_pointert cast_other =
     std::dynamic_pointer_cast<const full_struct_abstract_objectt>(other);
@@ -251,7 +252,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge(
 
 abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   constant_struct_pointert other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   if(is_bottom())
     return std::make_shared<full_struct_abstract_objectt>(*other);

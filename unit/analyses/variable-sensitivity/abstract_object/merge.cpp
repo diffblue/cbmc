@@ -27,7 +27,7 @@ SCENARIO(
       abstract_object_pointert op1 = make_top_object();
       abstract_object_pointert op2 = make_top_object();
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is unmodified TOP")
       {
@@ -40,7 +40,7 @@ SCENARIO(
       abstract_object_pointert op1 = make_top_object();
       abstract_object_pointert op2 = make_bottom_object();
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is unmodified TOP")
       {
@@ -53,7 +53,7 @@ SCENARIO(
       abstract_object_pointert op1 = make_bottom_object();
       abstract_object_pointert op2 = make_top_object();
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is modified TOP")
       {
@@ -66,7 +66,7 @@ SCENARIO(
       abstract_object_pointert op1 = make_bottom_object();
       abstract_object_pointert op2 = make_bottom_object();
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is unmodified BOTTOM")
       {
@@ -97,7 +97,7 @@ SCENARIO(
       auto top1 = make_top_object();
       auto op2 = make_constant(val1, environment, ns);
 
-      auto result = abstract_objectt::merge(top1, op2, wident::no);
+      auto result = abstract_objectt::merge(top1, op2, widen_modet::no);
 
       THEN("the result is unmodified TOP")
       {
@@ -110,7 +110,7 @@ SCENARIO(
       auto top1 = make_top_object();
       auto top2 = make_top_constant();
 
-      auto result = abstract_objectt::merge(top1, top2, wident::no);
+      auto result = abstract_objectt::merge(top1, top2, widen_modet::no);
 
       THEN("the result is unmodified TOP")
       {
@@ -123,7 +123,7 @@ SCENARIO(
       auto top1 = make_top_object();
       auto bottom2 = make_bottom_constant();
 
-      auto result = abstract_objectt::merge(top1, bottom2, wident::no);
+      auto result = abstract_objectt::merge(top1, bottom2, widen_modet::no);
 
       THEN("the result is unmodified TOP")
       {
@@ -136,7 +136,7 @@ SCENARIO(
       auto op1 = make_bottom_object();
       auto op2 = make_constant(val1, environment, ns);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("the result is modified TOP")
       {
@@ -149,7 +149,7 @@ SCENARIO(
       auto op1 = make_bottom_object();
       auto top2 = make_top_constant();
 
-      auto result = abstract_objectt::merge(op1, top2, wident::no);
+      auto result = abstract_objectt::merge(op1, top2, widen_modet::no);
 
       THEN("the result is modified TOP")
       {
@@ -162,7 +162,7 @@ SCENARIO(
       auto bottom1 = make_bottom_object();
       auto bottom2 = make_bottom_constant();
 
-      auto result = abstract_objectt::merge(bottom1, bottom2, wident::no);
+      auto result = abstract_objectt::merge(bottom1, bottom2, widen_modet::no);
 
       THEN("result is unmodified BOTTOM")
       {

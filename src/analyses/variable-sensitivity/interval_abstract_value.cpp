@@ -356,7 +356,7 @@ void interval_abstract_valuet::output(
 ///          this and other
 abstract_object_pointert interval_abstract_valuet::merge_with_value(
   const abstract_value_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   if(other->is_bottom())
     return shared_from_this();

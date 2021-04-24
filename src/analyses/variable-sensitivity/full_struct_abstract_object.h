@@ -102,7 +102,7 @@ private:
   ///         case it returns this.
   abstract_object_pointert merge_constant_structs(
     constant_struct_pointert other,
-    const wident &widen_mode) const;
+    const widen_modet &widen_mode) const;
 
 protected:
   CLONE
@@ -168,7 +168,7 @@ protected:
   /// \return  Returns the result of the merge.
   abstract_object_pointert merge(
     const abstract_object_pointert &other,
-    const wident &widen_mode) const override;
+    const widen_modet &widen_mode) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H

@@ -109,7 +109,7 @@ abstract_object_pointert write_location_contextt::write(
  */
 abstract_object_pointert write_location_contextt::merge(
   const abstract_object_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const write_location_contextt>(other);

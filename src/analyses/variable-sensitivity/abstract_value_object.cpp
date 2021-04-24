@@ -191,7 +191,7 @@ abstract_object_pointert abstract_value_objectt::write(
 
 abstract_object_pointert abstract_value_objectt::merge(
   const abstract_object_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);

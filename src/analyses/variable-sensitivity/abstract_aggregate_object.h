@@ -128,7 +128,7 @@ protected:
     const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map1,
     const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map2,
     sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map,
-    const wident &widen_mode)
+    const widen_modet &widen_mode)
   {
     bool modified = false;
 

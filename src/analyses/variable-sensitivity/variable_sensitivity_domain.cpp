@@ -201,7 +201,8 @@ bool variable_sensitivity_domaint::merge(
   std::cout << "Merging from/to:\n " << from->location_number << " --> "
             << to->location_number << '\n';
 #endif
-  auto widen_mode = from->should_widen(*to) ? wident::should_widen : wident::no;
+  auto widen_mode =
+    from->should_widen(*to) ? widen_modet::could_widen : widen_modet::no;
   // Use the abstract_environment merge
   bool any_changes = abstract_state.merge(b.abstract_state, widen_mode);
 

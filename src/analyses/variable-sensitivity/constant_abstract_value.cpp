@@ -113,7 +113,7 @@ void constant_abstract_valuet::output(
 
 abstract_object_pointert constant_abstract_valuet::merge_with_value(
   const abstract_value_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto other_expr = other->to_constant();
   if(is_bottom() && other_expr.is_constant())

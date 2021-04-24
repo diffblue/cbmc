@@ -124,7 +124,7 @@ protected:
   /// \return Returns the result of the merge.
   abstract_object_pointert merge(
     const abstract_object_pointert &op1,
-    const wident &widen_mode) const override;
+    const widen_modet &widen_mode) const override;
 
   CLONE
 
@@ -140,7 +140,7 @@ private:
   ///         case it returns this.
   abstract_object_pointert merge_constant_pointers(
     const constant_pointer_abstract_pointert &other,
-    const wident &widen_mode) const;
+    const widen_modet &widen_mode) const;
 
   write_stackt value_stack;
 };

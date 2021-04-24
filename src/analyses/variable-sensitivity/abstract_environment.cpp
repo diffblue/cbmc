@@ -314,7 +314,7 @@ abstract_object_pointert abstract_environmentt::add_object_context(
 
 bool abstract_environmentt::merge(
   const abstract_environmentt &env,
-  wident widen_mode)
+  widen_modet widen_mode)
 {
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present

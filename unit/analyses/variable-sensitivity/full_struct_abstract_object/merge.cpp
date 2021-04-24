@@ -139,7 +139,7 @@ SCENARIO(
       auto op1 = util.build_struct(val1);
       auto op2 = util.build_struct(val1);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -166,7 +166,7 @@ SCENARIO(
       auto op1 = util.build_struct(val1);
       auto op2 = util.build_struct(val2);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -198,7 +198,7 @@ SCENARIO(
       auto op1 = util.build_struct(val1);
       auto op2 = util.build_top_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -228,7 +228,7 @@ SCENARIO(
       auto op1 = util.build_struct(val1);
       auto op2 = util.build_bottom_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -258,7 +258,7 @@ SCENARIO(
       auto op1 = util.build_top_struct(struct_type);
       auto op2 = util.build_struct(val1);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -288,7 +288,7 @@ SCENARIO(
       auto op1 = util.build_top_struct(struct_type);
       auto op2 = util.build_top_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -318,7 +318,7 @@ SCENARIO(
       auto op1 = util.build_top_struct(struct_type);
       auto op2 = util.build_bottom_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -348,7 +348,7 @@ SCENARIO(
       auto op1 = util.build_bottom_struct(struct_type);
       auto op2 = util.build_struct(val1);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -378,7 +378,7 @@ SCENARIO(
       auto op1 = util.build_bottom_struct(struct_type);
       auto op2 = util.build_top_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -408,7 +408,7 @@ SCENARIO(
       auto op1 = util.build_bottom_struct(struct_type);
       auto op2 = util.build_bottom_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -436,7 +436,7 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), true, false);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -464,7 +464,7 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), false, true);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
         std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
@@ -495,7 +495,7 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), true, false);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("We should get the same abstract object back")
       {
@@ -523,7 +523,7 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), false, true);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("Should get the same abstract object back")
       {
         // Simple correctness of merge
@@ -550,7 +550,7 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), true, false);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("Return a new top abstract object of the same type")
       {
         // Simple correctness of merge
@@ -574,7 +574,7 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), false, true);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("Return the original abstract object")
       {
         // Simple correctness of merge
@@ -600,7 +600,7 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), true, false);
       const auto &op2 = util.build_struct(val1);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
@@ -618,7 +618,7 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), true, false);
       const auto &op2 = util.build_top_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
@@ -636,7 +636,7 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), true, false);
       const auto &op2 = util.build_bottom_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
@@ -654,7 +654,7 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), false, true);
       const auto &op2 = util.build_struct(val1);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("The a new top AO should be returned")
       {
@@ -674,7 +674,7 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), false, true);
       const auto &op2 = util.build_top_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("The a new top AO should be returned")
       {
@@ -692,7 +692,7 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), false, true);
       const auto &op2 = util.build_bottom_struct(struct_type);
 
-      auto result = abstract_objectt::merge(op1, op2, wident::no);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("The original AO should be returned")
       {

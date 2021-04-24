@@ -127,7 +127,7 @@ protected:
   /// \return Returns the result of the merge.
   abstract_object_pointert merge(
     const abstract_object_pointert &other,
-    const wident &widen_mode) const override;
+    const widen_modet &widen_mode) const override;
 
   /// To validate that the struct object is in a valid state.
   /// This means either it is top or bottom, or if neither of those
@@ -211,7 +211,7 @@ private:
   ///         case it returns this..
   abstract_object_pointert full_array_merge(
     const full_array_pointert &other,
-    const wident &widen_mode) const;
+    const widen_modet &widen_mode) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H

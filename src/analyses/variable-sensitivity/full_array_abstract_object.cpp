@@ -39,9 +39,10 @@ abstract_object_pointert apply_to_index_range(
   {
     auto at_index = fn(index_exprt(index_expr.array(), index));
 
-    result = (result == nullptr)
-               ? at_index
-               : abstract_objectt::merge(result, at_index, wident::no).object;
+    result =
+      (result == nullptr)
+        ? at_index
+        : abstract_objectt::merge(result, at_index, widen_modet::no).object;
 
     if(result->is_top()) // no point in continuing once we've gone top
       break;
@@ -100,7 +101,7 @@ void full_array_abstract_objectt::set_top_internal()
 
 abstract_object_pointert full_array_abstract_objectt::merge(
   const abstract_object_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const full_array_abstract_objectt>(other);
@@ -112,7 +113,7 @@ abstract_object_pointert full_array_abstract_objectt::merge(
 
 abstract_object_pointert full_array_abstract_objectt::full_array_merge(
   const full_array_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   if(is_bottom())
     return std::make_shared<full_array_abstract_objectt>(*other);
@@ -224,7 +225,7 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
     // Merge each known element into the TOP value
     for(const auto &element : map.get_view())
       result =
-        abstract_objectt::merge(result, element.second, wident::no).object;
+        abstract_objectt::merge(result, element.second, widen_modet::no).object;
 
     return result;
   }
@@ -338,7 +339,8 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
       {
         result->map.replace(
           index_value,
-          abstract_objectt::merge(old_value.value(), value, wident::no).object);
+          abstract_objectt::merge(old_value.value(), value, widen_modet::no)
+            .object);
       }
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");

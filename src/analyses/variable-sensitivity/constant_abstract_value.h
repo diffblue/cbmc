@@ -76,7 +76,7 @@ protected:
   ///         case it returns this.
   abstract_object_pointert merge_with_value(
     const abstract_value_pointert &other,
-    const wident &widen_mode) const override;
+    const widen_modet &widen_mode) const override;
 
   abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const override;

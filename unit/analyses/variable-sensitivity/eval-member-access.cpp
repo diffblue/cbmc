@@ -1,3 +1,10 @@
+/*******************************************************************\
+
+ Module: Array Access Unit Tests
+
+ Author: Jez Higgins
+
+\*******************************************************************/
 #include <testing-utils/use_catch.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>

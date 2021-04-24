@@ -310,14 +310,14 @@ protected:
   /// \return Returns the result of the merge
   abstract_object_pointert merge(
     const abstract_object_pointert &other,
-    const wident &widen_mode) const final;
+    const widen_modet &widen_mode) const final;
 
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const final;
 
   virtual abstract_object_pointert merge_with_value(
     const abstract_value_pointert &other,
-    const wident &widen_mode) const = 0;
+    const widen_modet &widen_mode) const = 0;
 
   virtual abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const = 0;

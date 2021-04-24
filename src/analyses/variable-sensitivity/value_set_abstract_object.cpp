@@ -197,7 +197,7 @@ constant_interval_exprt value_set_abstract_objectt::to_interval() const
 
 abstract_object_pointert value_set_abstract_objectt::merge_with_value(
   const abstract_value_pointert &other,
-  const wident &widen_mode) const
+  const widen_modet &widen_mode) const
 {
   auto union_values = !is_bottom() ? values : abstract_object_sett{};
 
