@@ -437,6 +437,7 @@ public:
     add(name, std::move(irep));
   }
   void set(const irep_namet &name, const long long value);
+  void set_size_t(const irep_namet &name, const std::size_t value);
 
   void remove(const irep_namet &name);
   void move_to_sub(irept &irep);

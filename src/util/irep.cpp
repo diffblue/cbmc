@@ -90,6 +90,15 @@ void irept::set(const irep_namet &name, const long long value)
 #endif
 }
 
+void irept::set_size_t(const irep_namet &name, const std::size_t value)
+{
+#ifdef USE_DSTRING
+  add(name).id(to_dstring(value));
+#else
+  add(name).id(std::to_string(value));
+#endif
+}
+
 void irept::remove(const irep_namet &name)
 {
 #if NAMED_SUB_IS_FORWARD_LIST
