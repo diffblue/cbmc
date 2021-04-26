@@ -1,0 +1,53 @@
+name: Build Linux partially with CPROVER tools
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  CompileLinux:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Install Packages
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+          sudo apt-get install --no-install-recommends -y libssl-dev libelf-dev libudev-dev libpci-dev libiberty-dev autoconf
+          sudo apt-get install --no-install-recommends -y gawk jq
+
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-KERNEL
+          restore-keys: |
+            ${{ runner.os }}-20.04-make-${{ github.ref }}
+            ${{ runner.os }}-20.04-make
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build CBMC tools
+        run: |
+          make -C src minisat2-download
+          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-diff.dir -j2
+      - name: Print ccache stats
+        run: ccache -s
+
+      - name: Run (Docker Based) Linux Build test
+        run: integration/linux/compile_linux.sh
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: CPROVER-faultyInput
+          path: CPROVER/faultyInput/*
