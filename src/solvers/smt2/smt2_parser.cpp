@@ -19,9 +19,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
-#include <util/ieee_float.h>
+#include <ansi-c/literals/parse_float.h>
 
 #include <numeric>
+
+ieee_floatt::rounding_modet smt2_parsert::parse_rounding_mode(const std::string &mode_string)
+{
+  if(mode_string=="roundNearestTiesToEven")
+    return ieee_floatt::ROUND_TO_EVEN;
+  else if(mode_string=="roundTowardPositive")
+    return ieee_floatt::ROUND_TO_PLUS_INF;
+  else if(mode_string=="roundTowardNegative")
+    return ieee_floatt::ROUND_TO_MINUS_INF;
+  else if(mode_string=="roundTowardZero")
+    return ieee_floatt::ROUND_TO_ZERO;
+  else
+    throw error("unsupported rounding mode");
+  
+  return ieee_floatt::ROUND_TO_ZERO;
+}
 
 smt2_tokenizert::tokent smt2_parsert::next_token()
 {
@@ -41,7 +57,7 @@ void smt2_parsert::skip_to_end_of_list()
     if(next_token() == smt2_tokenizert::END_OF_FILE)
       return;
 }
-
+#include <iostream>
 void smt2_parsert::command_sequence()
 {
   exit=false;
@@ -62,7 +78,7 @@ void smt2_parsert::command_sequence()
       ignore_command();
       throw error("expected symbol as command");
     }
-
+    std::cout <<"BUffer "<< smt2_tokenizer.get_buffer()<<std::endl;
     command(smt2_tokenizer.get_buffer());
 
     switch(next_token())
@@ -473,12 +489,12 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
   const auto width_e = to_unsignedbv_type(op[1].type()).get_width();
   const auto width_f = to_unsignedbv_type(op[2].type()).get_width();
 
-  // stitch the bits together
+  // stitch the bits together. NB width_f *includes* this hidden bit
   return typecast_exprt(
-    concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e + 1)),
-    ieee_float_spect(width_f, width_e).to_type());
+    concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e)),
+    ieee_float_spect(width_f-1, width_e).to_type());
 }
-
+#include <iostream>
 exprt smt2_parsert::function_application()
 {
   switch(next_token())
@@ -489,6 +505,11 @@ exprt smt2_parsert::function_application()
       // indexed identifier
       if(next_token() != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_'");
+      std::cout<<"buffer is "<< smt2_tokenizer.get_buffer();
+      if(smt2_tokenizer.get_buffer()=="to_fp")
+        std::cout<<"whcih is equal to to_fp"<<std::endl;
+      else
+        std::cout<<"whcih is not equal to to_fp"<<std::endl;
 
       // copy, the reference won't be stable
       const auto id = smt2_tokenizer.get_buffer();
@@ -1223,6 +1244,32 @@ void smt2_parsert::setup_expressions()
     return isnormal_exprt(op[0]);
   };
 
+  expressions["fp.isNegative"] = [this]{
+    auto ops = operands();
+    if(ops.size() != 1)
+      throw error("fp.isNegative takes one operand");
+
+    if(ops[0].type().id() != ID_floatbv)
+      throw error("fp.isNegative takes FloatingPoint operand");
+    
+    ops.push_back(from_integer(0,ops[0].type()));
+
+    return binary_predicate(ID_lt, ops);
+  };
+
+  expressions["fp.isPositive"] = [this]{
+    auto ops = operands();
+    if(ops.size() != 1)
+      throw error("fp.isPositive takes one operand");
+
+    if(ops[0].type().id() != ID_floatbv)
+      throw error("fp.isPositive takes FloatingPoint operand");
+    
+    ops.push_back(from_integer(0,ops[0].type()));
+
+    return binary_predicate(ID_ge, ops);
+  };
+
   expressions["fp"] = [this] { return function_application_fp(operands()); };
 
   expressions["fp.add"] = [this] {
@@ -1502,10 +1549,8 @@ void smt2_parsert::setup_commands()
   };
 
   commands["declare-sort"] = [this]() {
-    const auto s = smt2_tokenizer.get_buffer();
-
     if(next_token() != smt2_tokenizert::SYMBOL)
-      throw error() << "expected a symbol after " << s;
+      throw error() << "expected a symbol after declare sort";
 
     irep_idt id = smt2_tokenizer.get_buffer();
     
@@ -1523,12 +1568,17 @@ void smt2_parsert::setup_commands()
   };
 
   commands["define-sort"] = [this]() {
-    const auto s = smt2_tokenizer.get_buffer();
 
     if(next_token() != smt2_tokenizert::SYMBOL)
-      throw error() << "expected a symbol after " << s;
-
+      throw error() << "expected a symbol after define-sort";
     irep_idt id = smt2_tokenizer.get_buffer();
+
+    if(next_token() != smt2_tokenizert::OPEN)
+      throw error() << "expected a '(' after sort declaration";
+    
+    if(next_token() != smt2_tokenizert::CLOSE)
+     throw error() << "parameterised sorts are not supported";
+
     const auto type = sort();
      add_unique_type_id(id, type);
   };

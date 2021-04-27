@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
-
+#include <util/ieee_float.h>
 #include "smt2_tokenizer.h"
 
 class smt2_parsert
@@ -205,6 +205,8 @@ protected:
 
   // hashtable for all commands
   std::unordered_map<std::string, std::function<void()>> commands;
+
+  ieee_floatt::rounding_modet parse_rounding_mode(const std::string &mode_string);
 
   void command_sequence();
   void command(const std::string &);
