@@ -76,14 +76,14 @@ std::shared_ptr<const interval_abstract_valuet> make_bottom_interval()
     signedbv_typet(32), false, true);
 }
 
-std::shared_ptr<value_set_abstract_objectt>
+std::shared_ptr<const value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns)
 {
   auto vals = std::vector<exprt>{val};
   return make_value_set(vals, env, ns);
 }
 
-std::shared_ptr<value_set_abstract_objectt> make_value_set(
+std::shared_ptr<const value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
   namespacet &ns)
@@ -97,20 +97,20 @@ std::shared_ptr<value_set_abstract_objectt> make_value_set(
     else
       initial_values.insert(make_constant(v, env, ns));
   }
-  auto vs = std::make_shared<value_set_abstract_objectt>(vals[0], env, ns);
-  vs->set_values(initial_values);
-  return vs;
+
+  auto vs = value_set_abstract_objectt::make_value_set(initial_values);
+  return std::dynamic_pointer_cast<const value_set_abstract_objectt>(vs);
 }
 
-std::shared_ptr<value_set_abstract_objectt> make_bottom_value_set()
+std::shared_ptr<const value_set_abstract_objectt> make_bottom_value_set()
 {
-  return std::make_shared<value_set_abstract_objectt>(
+  return std::make_shared<const value_set_abstract_objectt>(
     integer_typet(), false, true);
 }
 
-std::shared_ptr<value_set_abstract_objectt> make_top_value_set()
+std::shared_ptr<const value_set_abstract_objectt> make_top_value_set()
 {
-  return std::make_shared<value_set_abstract_objectt>(integer_typet());
+  return std::make_shared<const value_set_abstract_objectt>(integer_typet());
 }
 
 abstract_object_pointert make_bottom_object()

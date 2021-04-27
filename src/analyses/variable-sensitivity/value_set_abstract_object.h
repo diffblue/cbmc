@@ -30,9 +30,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  value_set_abstract_objectt(
-    const typet &type,
-    abstract_object_sett initial_values);
+  static abstract_object_pointert
+  make_value_set(const abstract_object_sett &initial_values);
 
   index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const override;
@@ -53,10 +52,6 @@ public:
     return values;
   }
 
-  /// Setter for updating the stored values
-  /// \param other_values: the new (non-empty) set of values
-  void set_values(const abstract_object_sett &other_values);
-
   /// The threshold size for value-sets: past this threshold the object is
   /// either converted to interval or marked as `top`.
   static const size_t max_value_set_size = 10;
@@ -75,6 +70,10 @@ protected:
   meet_with_value(const abstract_value_pointert &other) const override;
 
 private:
+  /// Setter for updating the stored values
+  /// \param other_values: the new (non-empty) set of values
+  void set_values(const abstract_object_sett &other_values);
+
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values

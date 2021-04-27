@@ -41,16 +41,16 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
 std::shared_ptr<const interval_abstract_valuet> make_top_interval();
 std::shared_ptr<const interval_abstract_valuet> make_bottom_interval();
 
-std::shared_ptr<value_set_abstract_objectt>
+std::shared_ptr<const value_set_abstract_objectt>
 make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
 
-std::shared_ptr<value_set_abstract_objectt> make_value_set(
+std::shared_ptr<const value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
   namespacet &ns);
 
-std::shared_ptr<value_set_abstract_objectt> make_bottom_value_set();
-std::shared_ptr<value_set_abstract_objectt> make_top_value_set();
+std::shared_ptr<const value_set_abstract_objectt> make_bottom_value_set();
+std::shared_ptr<const value_set_abstract_objectt> make_top_value_set();
 
 abstract_object_pointert make_bottom_object();
 abstract_object_pointert make_top_object();

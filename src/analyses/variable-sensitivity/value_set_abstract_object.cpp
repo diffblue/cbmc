@@ -143,13 +143,18 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   verify();
 }
 
-value_set_abstract_objectt::value_set_abstract_objectt(
-  const typet &type,
-  abstract_object_sett initial_values)
-  : abstract_value_objectt(type, false, false),
-    values(std::move(initial_values))
+abstract_object_pointert value_set_abstract_objectt::make_value_set(
+  const abstract_object_sett &initial_values)
 {
-  verify();
+  PRECONDITION(!initial_values.empty());
+
+  auto values = unwrap_and_extract_values(initial_values);
+
+  const auto &type = values.first()->type();
+  auto value_set =
+    std::make_shared<value_set_abstract_objectt>(type, false, false);
+  value_set->set_values(values);
+  return value_set;
 }
 
 index_range_implementation_ptrt
@@ -256,9 +261,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
   if(new_values == values)
     return shared_from_this();
 
-  auto unwrapped_values = unwrap_and_extract_values(new_values);
-
-  return std::make_shared<value_set_abstract_objectt>(type(), unwrapped_values);
+  return make_value_set(new_values);
 }
 
 void value_set_abstract_objectt::set_top_internal()
@@ -336,9 +339,7 @@ unwrap_and_extract_values(const abstract_object_sett &values)
 {
   abstract_object_sett unwrapped_values;
   for(auto const &value : values)
-  {
     unwrapped_values.insert(maybe_extract_single_value(value));
-  }
 
   return unwrapped_values;
 }
