@@ -115,6 +115,8 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
 static bool are_any_top(const abstract_object_sett &set);
 
+static abstract_object_sett compact_values(const abstract_object_sett &values);
+
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type)
 {
@@ -149,6 +151,8 @@ abstract_object_pointert value_set_abstract_objectt::make_value_set(
   PRECONDITION(!initial_values.empty());
 
   auto values = unwrap_and_extract_values(initial_values);
+
+  values = compact_values(values);
 
   const auto &type = values.first()->type();
   auto value_set =
@@ -367,4 +371,66 @@ static bool are_any_top(const abstract_object_sett &set)
            set.begin(), set.end(), [](const abstract_object_pointert &value) {
              return value->is_top();
            }) != set.end();
+}
+
+/////////////////
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values);
+static bool value_is_not_contained_in(
+  const abstract_object_pointert &object,
+  const std::vector<constant_interval_exprt> &intervals);
+
+static abstract_object_sett compact_values(const abstract_object_sett &values)
+{
+  if(values.size() <= value_set_abstract_objectt::max_value_set_size)
+    return values;
+
+  return non_destructive_compact(values);
+}
+
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values)
+{
+  auto intervals = std::vector<constant_interval_exprt>{};
+  for(auto const &object : values)
+  {
+    auto value =
+      std::dynamic_pointer_cast<const abstract_value_objectt>(object);
+    auto as_expr = value->to_interval();
+    if(!as_expr.is_single_value_interval())
+      intervals.push_back(as_expr);
+  }
+
+  if(intervals.empty())
+    return values;
+
+  auto compacted = abstract_object_sett{};
+  // for each value, including the intervals
+  // keep it if it is not in any of the intervals
+  std::copy_if(
+    values.begin(),
+    values.end(),
+    std::back_inserter(compacted),
+    [&intervals](const abstract_object_pointert &object) {
+      return value_is_not_contained_in(object, intervals);
+    });
+
+  return compacted;
+}
+
+static bool value_is_not_contained_in(
+  const abstract_object_pointert &object,
+  const std::vector<constant_interval_exprt> &intervals)
+{
+  auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(object);
+  auto as_expr = value->to_interval();
+
+  return std::none_of(
+    intervals.begin(),
+    intervals.end(),
+    [&as_expr](const constant_interval_exprt &interval) {
+      if(interval == as_expr)
+        return false;
+      return interval.contains(as_expr);
+    });
 }
