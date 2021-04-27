@@ -6,10 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "expr_lowering.h"
-
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
@@ -17,9 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/endianness_map.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
+#include <util/narrow.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
+
+#include "expr_lowering.h"
+
+#include <algorithm>
 
 static exprt bv_to_expr(
   const exprt &bitvector_expr,
