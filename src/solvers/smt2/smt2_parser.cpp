@@ -684,6 +684,60 @@ exprt smt2_parsert::function_application()
           else
             return nil_exprt();
         }
+        else if(id == "to_fp")
+        {
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected number after to_fp");
+
+          auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected second number after to_fp");
+
+          auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error("expected ')' after to_fp");
+
+          auto rounding_mode = expression();
+
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected number after to_fp");
+
+          auto real_number = smt2_tokenizer.get_buffer();
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error("expected ')' at the end of to_fp");
+
+          mp_integer significand, exponent;
+
+          auto dot_pos = real_number.find('.');
+          if(dot_pos == std::string::npos)
+          {
+            exponent = 0;
+            significand = string2integer(real_number);
+          }
+          else
+          {
+            // remove the '.', if any
+            std::string significand_str;
+            significand_str.reserve(real_number.size());
+            for(auto ch : real_number)
+              if(ch != '.')
+                significand_str += ch;
+
+            exponent = mp_integer(dot_pos) - mp_integer(real_number.size()) + 1;
+            significand = string2integer(significand_str);
+          }
+
+          // width_f *includes* the hidden bit
+          ieee_float_spect spec(width_f - 1, width_e);
+          ieee_floatt a(spec);
+          a.rounding_mode = static_cast<ieee_floatt::rounding_modet>(
+            numeric_cast_v<int>(to_constant_expr(rounding_mode)));
+          a.from_base10(significand, exponent);
+          return a.to_expr();
+        }
         else
         {
           throw error() << "unknown indexed identifier '"
