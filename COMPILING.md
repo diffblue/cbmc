@@ -380,7 +380,89 @@ For the packaged builds of CBMC on our release page we currently build CBMC
 with the MiniSat2 SAT solver statically linked at compile time. However it is
 also possible to build CBMC using alternative SAT solvers.
 
-### Compiling with Riss
+### Compiling CBMC Using Solver Native Interfaces
+
+The following solvers are supported by CBMC using custom interfaces and can
+by downloaded and compiled by the build process: MiniSAT2, CaDiCaL, and Glucose.
+
+For `make` alternatives to the default (i.e. not MiniSAT) can be built with the
+following commands for CaDiCaL:
+```
+make -C src cadical-download
+make -C src CADICAL=../../cadical
+```
+and for glucose
+```
+make -C src glucose-download
+make -C src GLUCOSE=../../glucose-syrup
+```
+
+For `cmake` the alternatives can be built with the following arguments to `cmake`
+for CaDiCaL `-Dsat_impl=cadical` and for glucose `-Dsat_impl=glucose`.
+
+
+### Compiling with IPASIR Interface
+
+The below compiling instructions allow linking of an arbitrary IPASIR
+compatible SAT solver when compiling CBMC.
+
+The general command using `make` is to compile with
+```
+make -C src LIBS="$PWD/SATOBJ SATLINKFLAGS" IPASIR=$PWD/SATPATH
+```
+Where `SATOBJ` is the pre-compiled IPASIR compatible SAT binary,
+`SATLINKFLAGS` are any flags required by the SAT object file, and
+`SATPATH` is the path to the SAT interface.
+
+The rest of this section provides detailed instructions for some example
+SAT solvers.
+
+#### Compiling with CaDiCaL via IPASIR
+
+Note that CaDiCaL can also be built using CBMC's CaDiCaL native interface
+as described above. This section is to use CaDiCaL with the IPASIR
+interface in CBMC.
+
+The [CaDiCaL](https://github.com/arminbiere/cadical) solver supports the
+[IPASIR](https://github.com/biotomas/ipasir) C interface to incremental SAT
+solvers, which is also supported by CBMC. So the process for producing a CBMC
+with CaDiCaL build is to build CaDiCaL as a static library then compile CBMC
+with the IPASIR build options and link to the CaDiCaL static library.
+
+Note that at the time of writing this has been tested to work with the CaDiCaL
+1.4.0 on Ubuntu 18.04 & 20.04 and MacOS.
+
+1. Download CaDiCaL:
+   ```
+   git clone --branch rel-1.4.0 https://github.com/arminbiere/cadical.git
+   ```
+   This will clone the CaDiCaL repository into a `cadical` subdirectory and
+   checkout release 1.4.0, which has been checked for compatibility with CBMC at
+   the time these instructions were written.
+
+2. Build CaDiCaL:
+   ```
+   cd cadical
+   ./configure
+   make cadical
+   cd ..
+   ```
+   This will create a build directory called `build` inside the clone of the
+   CaDiCaL repository. The `cadical` make target is specified in this example in
+   order to avoid building targets which are not required by CBMC. The built
+   static library will be placed in `cadical/build/libcadical.a`.
+
+3. Build CBMC:
+   ```
+   make -C src LIBS="$PWD/cadical/build/libcadical.a" IPASIR=$PWD/cadical/src
+   ```
+   This links the CaDiCaL library as part of the build. Passing the IPASIR
+   parameter tells the build system to build for the IPASIR interface. The
+   argument for the IPASIR parameter gives the build system the location for
+   the IPASIR headers, which is needed for the cbmc includes of `ipasir.h`. The
+   compiled binary will be placed in `cbmc/src/cbmc/cbmc`.
+
+#### Compiling with Riss via IPASIR
 
 The [Riss](https://github.com/conp-solutions/riss) solver supports the
 [IPASIR](https://github.com/biotomas/ipasir) C interface to incremental SAT
