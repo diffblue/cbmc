@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+ Module: Unit tests for variable/sensitivity/abstract_object::index_range
+
+ Author: Jez Higgins, jez@jezuk.co.uk
+
+\*******************************************************************/
+
 #include "analyses/variable-sensitivity/variable_sensitivity_test_helpers.h"
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
