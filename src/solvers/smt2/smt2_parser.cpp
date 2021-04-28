@@ -78,7 +78,6 @@ void smt2_parsert::command_sequence()
       ignore_command();
       throw error("expected symbol as command");
     }
-    std::cout <<"BUffer "<< smt2_tokenizer.get_buffer()<<std::endl;
     command(smt2_tokenizer.get_buffer());
 
     switch(next_token())
@@ -494,7 +493,7 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
     concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e)),
     ieee_float_spect(width_f-1, width_e).to_type());
 }
-#include <iostream>
+
 exprt smt2_parsert::function_application()
 {
   switch(next_token())
@@ -505,11 +504,6 @@ exprt smt2_parsert::function_application()
       // indexed identifier
       if(next_token() != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_'");
-      std::cout<<"buffer is "<< smt2_tokenizer.get_buffer();
-      if(smt2_tokenizer.get_buffer()=="to_fp")
-        std::cout<<"whcih is equal to to_fp"<<std::endl;
-      else
-        std::cout<<"whcih is not equal to to_fp"<<std::endl;
 
       // copy, the reference won't be stable
       const auto id = smt2_tokenizer.get_buffer();
