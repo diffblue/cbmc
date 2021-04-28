@@ -380,7 +380,7 @@ For the packaged builds of CBMC on our release page we currently build CBMC
 with the MiniSat2 SAT solver statically linked at compile time. However it is
 also possible to build CBMC using alternative SAT solvers.
 
-### Compiling with CBMC Wrapper
+### Compiling CBMC Using Solver Native Interfaces
 
 The following solvers are supported by CBMC using custom interfaces and can
 by downloaded and compiled by the build process: MiniSAT2, CaDiCaL, and Glucose.
@@ -417,7 +417,11 @@ Where `SATOBJ` is the pre-compiled IPASIR compatible SAT binary,
 The rest of this section provides detailed instructions for some example
 SAT solvers.
 
-#### Compiling with CaDiCaL
+#### Compiling with CaDiCaL via IPASIR
+
+Note that CaDiCaL can also be built using CBMC's CaDiCaL native interface
+as described above. This section is to use CaDiCaL with the IPASIR
+interface in CBMC.
 
 The [CaDiCaL](https://github.com/arminbiere/cadical) solver supports the
 [IPASIR](https://github.com/biotomas/ipasir) C interface to incremental SAT
@@ -458,7 +462,7 @@ Note that at the time of writing this has been tested to work with the CaDiCaL
    the IPASIR headers, which is needed for the cbmc includes of `ipasir.h`. The
    compiled binary will be placed in `cbmc/src/cbmc/cbmc`.
 
-#### Compiling with Riss
+#### Compiling with Riss via IPASIR
 
 The [Riss](https://github.com/conp-solutions/riss) solver supports the
 [IPASIR](https://github.com/biotomas/ipasir) C interface to incremental SAT
