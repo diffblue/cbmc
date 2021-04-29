@@ -134,10 +134,10 @@ static void update_identifier(ssa_exprt &ssa)
   ssa.set(ID_L1_object_identifier, idpair.second);
 }
 
-void ssa_exprt::set_expression(const exprt &expr)
+void ssa_exprt::set_expression(exprt expr)
 {
-  type() = expr.type();
-  add(ID_expression, expr);
+  type() = as_const(expr).type();
+  add(ID_expression, std::move(expr));
   ::update_identifier(*this);
 }
 
@@ -148,8 +148,8 @@ irep_idt ssa_exprt::get_object_name() const
   if(original_expr.id() == ID_symbol)
     return to_symbol_expr(original_expr).get_identifier();
 
-  object_descriptor_exprt ode(original_expr);
-  return to_symbol_expr(ode.root_object()).get_identifier();
+  return to_symbol_expr(object_descriptor_exprt::root_object(original_expr))
+    .get_identifier();
 }
 
 const ssa_exprt ssa_exprt::get_l1_object() const

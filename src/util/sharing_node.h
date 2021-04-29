@@ -346,8 +346,13 @@ public:
     const to_mapt &m = get_to_map();
     typename to_mapt::const_iterator it = m.find(n);
 
+#if SN_SMALL_MAP == 1
+    if(it != m.end())
+      return &it.get_value();
+#else
     if(it != m.end())
       return &it->second;
+#endif
 
     return nullptr;
   }

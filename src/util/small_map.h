@@ -265,6 +265,15 @@ public:
       return std::make_shared<valuet>(idx, *(m.p + ii));
     }
 
+    /// Non-standard direct access to the underlying value instead of creating a
+    /// \c valuet object. Avoids creating a very short-lived \c valuet object
+    /// when only the value is needed.
+    /// \return Reference to value stored in the map.
+    const T &get_value() const
+    {
+      return *(m.p + ii);
+    }
+
     const_iterator operator++()
     {
       idx++;

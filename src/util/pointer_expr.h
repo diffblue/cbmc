@@ -180,7 +180,11 @@ public:
     return op0();
   }
 
-  const exprt &root_object() const;
+  static const exprt &root_object(const exprt &expr);
+  const exprt &root_object() const
+  {
+    return root_object(object());
+  }
 
   exprt &offset()
   {

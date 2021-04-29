@@ -100,12 +100,7 @@ bvt boolbvt::conversion_failed(const exprt &expr)
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
   if(expr.type().id()==ID_bool)
-  {
-    bvt bv;
-    bv.resize(1);
-    bv[0]=convert(expr);
-    return bv;
-  }
+    return {convert(expr)};
 
   if(expr.id()==ID_index)
     return convert_index(to_index_expr(expr));
