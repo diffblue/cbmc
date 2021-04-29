@@ -72,6 +72,7 @@ jobs:
           submodules: recursive
       - name: Fetch dependencies
         run: |
+          sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
           # remove libgcc-s1, which isn't normally available in Ubuntu 18.04
           target=$(dpkg-query -W --showformat='${Version}\n' gcc-8-base | head -n 1)
