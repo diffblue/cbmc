@@ -10,27 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include "symbol.h"
 #include "namespace.h"
 
-/// automated variable renaming
-/// \par parameters: symbol to be renamed, namespace
-/// \return new symbol
-void get_new_name(symbolt &symbol, const namespacet &ns)
-{
-  get_new_name(symbol.name, ns);
-}
-
-/// automated variable renaming
-/// \par parameters: symbol to be renamed, namespace
-/// \return new symbol
-void get_new_name(irep_idt &new_name, const namespacet &ns, char delimiter)
+irep_idt
+get_new_name(const irep_idt &name, const namespacet &ns, char delimiter)
 {
   const symbolt *symbol;
-  if(ns.lookup(new_name, symbol))
-    return; // name not taken yet
+  if(ns.lookup(name, symbol))
+    return name;
 
-  std::string prefix = id2string(new_name) + delimiter;
+  std::string prefix = id2string(name) + delimiter;
 
-  new_name = prefix + std::to_string(ns.smallest_unused_suffix(prefix));
+  return prefix + std::to_string(ns.smallest_unused_suffix(prefix));
 }

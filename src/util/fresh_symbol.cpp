@@ -45,7 +45,7 @@ symbolt &get_fresh_aux_symbol(
     identifier = name_prefix + "::" + basename_prefix;
     prefix_size = name_prefix.size() + 2;
   }
-  get_new_name(identifier, ns, '$');
+  identifier = get_new_name(identifier, ns, '$');
   std::string basename = id2string(identifier).substr(prefix_size);
 
   auxiliary_symbolt new_symbol(basename, type);
