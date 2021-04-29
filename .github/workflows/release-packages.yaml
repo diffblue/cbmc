@@ -150,7 +150,7 @@ jobs:
           submodules: recursive
       - uses: nuget/setup-nuget@v1
         with:
-          nuget-version: 'latest'
+          nuget-version: '5.8.x'
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
