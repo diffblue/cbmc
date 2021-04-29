@@ -122,6 +122,43 @@ address_of_exprt::address_of_exprt(const exprt &_op)
 {
 }
 
+object_address_exprt::object_address_exprt(const symbol_exprt &object)
+  : nullary_exprt(ID_object_address, pointer_type(object.type()))
+{
+  set(ID_identifier, object.get_identifier());
+}
+
+symbol_exprt object_address_exprt::object_expr() const
+{
+  return symbol_exprt(object_identifier(), to_pointer_type(type()).subtype());
+}
+
+field_address_exprt::field_address_exprt(
+  exprt base,
+  const irep_idt &component_name,
+  pointer_typet _type)
+  : unary_exprt(ID_field_address, std::move(base), std::move(_type))
+{
+  const auto &base_type = base.type();
+  PRECONDITION(base_type.id() == ID_pointer);
+  const auto &base_sub_type = base_type.subtype();
+  PRECONDITION(
+    base_sub_type.id() == ID_struct || base_sub_type.id() == ID_struct_tag ||
+    base_sub_type.id() == ID_union || base_sub_type.id() == ID_union_tag);
+  set(ID_component_name, component_name);
+}
+
+element_address_exprt::element_address_exprt(exprt base, exprt index)
+  : binary_exprt(
+      std::move(base),
+      ID_element_address,
+      std::move(index),
+      pointer_typet(
+        to_array_type(base.type()).subtype(),
+        to_pointer_type(base.type()).get_width()))
+{
+}
+
 const exprt &object_descriptor_exprt::root_object(const exprt &expr)
 {
   const exprt *p = &expr;
