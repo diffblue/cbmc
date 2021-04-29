@@ -558,9 +558,8 @@ const symbolt &recursive_initializationt::get_fresh_fun_symbol(
   const std::string &fun_name,
   const typet &fun_type)
 {
-  irep_idt fresh_name(fun_name);
-
-  get_new_name(fresh_name, namespacet{goto_model.symbol_table}, '_');
+  irep_idt fresh_name =
+    get_new_name(fun_name, namespacet{goto_model.symbol_table}, '_');
 
   // create the function symbol
   symbolt function_symbol{};
