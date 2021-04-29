@@ -136,7 +136,8 @@ complexity_limitert::check_complexity(goto_symex_statet &state)
   if(!complexity_limits_active() || !state.reachable)
     return complexity_violationt::NONE;
 
-  std::size_t complexity = state.guard.as_expr().bounded_size(max_complexity);
+  std::size_t complexity =
+    bounded_expr_size(state.guard.as_expr(), max_complexity);
   if(complexity == 1)
     return complexity_violationt::NONE;
 
@@ -210,4 +211,30 @@ void complexity_limitert::run_transformations(
   else
     for(auto transform_lambda : violation_transformations)
       transform_lambda.transform(complexity_violation, current_state);
+}
+
+/// Amount of nodes \p expr contains, with a bound on how far to search.
+/// Starts with an existing count.
+/// \return Size of \p expr added to count without searching significantly
+/// beyond the supplied limit.
+static std::size_t
+bounded_expr_size(const exprt &expr, std::size_t count, std::size_t limit)
+{
+  const auto &ops = expr.operands();
+  count += ops.size();
+  for(const auto &op : ops)
+  {
+    if(count >= limit)
+    {
+      return count;
+    }
+    count = bounded_expr_size(op, count, limit);
+  }
+  return count;
+}
+
+std::size_t
+complexity_limitert::bounded_expr_size(const exprt &expr, std::size_t limit)
+{
+  return ::bounded_expr_size(expr, 1, limit);
 }
