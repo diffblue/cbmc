@@ -32,6 +32,14 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  template <typename... Args>
+  static std::shared_ptr<interval_abstract_valuet>
+  make_interval(Args &&... args)
+  {
+    return std::make_shared<interval_abstract_valuet>(
+      std::forward<Args>(args)...);
+  }
+
   ~interval_abstract_valuet() override = default;
 
   index_range_implementation_ptrt

@@ -503,7 +503,7 @@ private:
 
   interval_abstract_value_pointert make_interval(const exprt &expr) const
   {
-    return std::make_shared<interval_abstract_valuet>(expr, environment, ns);
+    return interval_abstract_valuet::make_interval(expr, environment, ns);
   }
 
   const exprt &expression;

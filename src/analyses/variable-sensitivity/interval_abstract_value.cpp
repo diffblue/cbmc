@@ -22,13 +22,6 @@ static index_range_implementation_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
   const namespacet &n);
 
-template <typename... Args>
-std::shared_ptr<interval_abstract_valuet> make_interval(Args &&... args)
-{
-  return std::make_shared<interval_abstract_valuet>(
-    std::forward<Args>(args)...);
-}
-
 class interval_index_ranget : public index_range_implementationt
 {
 public:
@@ -378,7 +371,7 @@ abstract_object_pointert widening_merge(
 
   // new interval ...
   auto new_interval = constant_interval_exprt(lower_bound, upper_bound);
-  return make_interval(new_interval);
+  return interval_abstract_valuet::make_interval(new_interval);
 }
 
 abstract_object_pointert interval_abstract_valuet::merge_with_value(
