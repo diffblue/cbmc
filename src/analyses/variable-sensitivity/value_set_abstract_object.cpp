@@ -397,8 +397,13 @@ static abstract_object_sett compact_values(const abstract_object_sett &values)
   return compacted;
 }
 
-static abstract_object_sett
-non_destructive_compact(const abstract_object_sett &values)
+static exprt eval_expr(const exprt &e);
+static bool is_le(const exprt &lhs, const exprt &rhs);
+static void
+collapse_overlapping_intervals(std::vector<constant_interval_exprt> &intervals);
+
+static std::vector<constant_interval_exprt>
+collect_intervals(const abstract_object_sett &values)
 {
   auto intervals = std::vector<constant_interval_exprt>{};
   for(auto const &object : values)
@@ -410,6 +415,45 @@ non_destructive_compact(const abstract_object_sett &values)
       intervals.push_back(as_expr);
   }
 
+  collapse_overlapping_intervals(intervals);
+
+  return intervals;
+}
+
+void collapse_overlapping_intervals(
+  std::vector<constant_interval_exprt> &intervals)
+{
+  std::sort(
+    intervals.begin(),
+    intervals.end(),
+    [](constant_interval_exprt const &lhs, constant_interval_exprt const &rhs) {
+      return is_le(lhs.get_lower(), rhs.get_lower());
+    });
+
+  size_t index = 1;
+  while(index < intervals.size())
+  {
+    auto &lhs = intervals[index - 1];
+    auto &rhs = intervals[index];
+
+    bool overlap = is_le(rhs.get_lower(), lhs.get_upper());
+    if(overlap)
+    {
+      auto upper = is_le(lhs.get_upper(), rhs.get_upper()) ? rhs.get_upper()
+                                                           : lhs.get_upper();
+      auto expanded = constant_interval_exprt(lhs.get_lower(), upper);
+      lhs = expanded;
+      intervals.erase(intervals.begin() + index);
+    }
+    else
+      ++index;
+  }
+}
+
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values)
+{
+  auto intervals = collect_intervals(values);
   if(intervals.empty())
     return values;
 
@@ -423,16 +467,14 @@ non_destructive_compact(const abstract_object_sett &values)
     [&intervals](const abstract_object_pointert &object) {
       return value_is_not_contained_in(object, intervals);
     });
-
+  std::transform(
+    intervals.begin(),
+    intervals.end(),
+    std::back_inserter(compacted),
+    [](const constant_interval_exprt &interval) {
+      return interval_abstract_valuet::make_interval(interval);
+    });
   return compacted;
-}
-
-exprt eval_expr(exprt e)
-{
-  auto dummy_symbol_table = symbol_tablet{};
-  auto dummy_namespace = namespacet{dummy_symbol_table};
-
-  return simplify_expr(e, dummy_namespace);
 }
 
 static abstract_object_sett
@@ -444,10 +486,16 @@ destructive_compact(abstract_object_sett values, int slice)
     minus_exprt(width.get_upper(), width.get_lower()),
     from_integer(slice, width.type())));
 
-  auto lower_slice = constant_interval_exprt(
-    width.get_lower(), eval_expr(plus_exprt(width.get_lower(), slice_width)));
-  auto upper_slice = constant_interval_exprt(
-    eval_expr(minus_exprt(width.get_upper(), slice_width)), width.get_upper());
+  auto lower_boundary = eval_expr(plus_exprt(width.get_lower(), slice_width));
+  auto upper_start = eval_expr(minus_exprt(width.get_upper(), slice_width));
+  if(
+    lower_boundary ==
+    upper_start) // adjust so the intervals are not immediately combined
+    upper_start = eval_expr(
+      plus_exprt(upper_start, from_integer(1, lower_boundary.type())));
+
+  auto lower_slice = constant_interval_exprt(width.get_lower(), lower_boundary);
+  auto upper_slice = constant_interval_exprt(upper_start, width.get_upper());
 
   values.insert(interval_abstract_valuet::make_interval(lower_slice));
   values.insert(interval_abstract_valuet::make_interval(upper_slice));
@@ -470,8 +518,20 @@ static bool value_is_not_contained_in(
     intervals.begin(),
     intervals.end(),
     [&as_expr](const constant_interval_exprt &interval) {
-      if(interval == as_expr)
-        return false;
       return interval.contains(as_expr);
     });
+}
+
+static exprt eval_expr(const exprt &e)
+{
+  auto symbol_table = symbol_tablet{};
+  auto ns = namespacet{symbol_table};
+
+  return simplify_expr(e, ns);
+}
+
+static bool is_le(const exprt &lhs, const exprt &rhs)
+{
+  auto is_le_expr = binary_relation_exprt(lhs, ID_le, rhs);
+  return eval_expr(is_le_expr).is_true();
 }

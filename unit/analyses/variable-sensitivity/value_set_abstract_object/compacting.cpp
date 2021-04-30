@@ -167,7 +167,70 @@ SCENARIO(
     }
   }
 
-  GIVEN("compact values to create new intervals")
+  GIVEN("compact overlapping interval together")
+  {
+    auto interval_1_2 = constant_interval_exprt(val1, val2);
+    auto interval_2_3 = constant_interval_exprt(val2, val3);
+    auto interval_3_4 = constant_interval_exprt(val3, val4);
+    auto interval_4_5 = constant_interval_exprt(val4, val5);
+    auto interval_8_10 = constant_interval_exprt(val8, val10);
+    auto interval_9_12 = constant_interval_exprt(val9, val12);
+    auto val13 = from_integer(13, type);
+    auto val14 = from_integer(14, type);
+    auto val15 = from_integer(15, type);
+
+    WHEN(
+      "compacting { 0, [1, 2], [2, 3], [3, 4], [4, 5], 6, 7, [8, 10], [9, 12], "
+      "13, 14, 15 }")
+    {
+      auto value_set = make_value_set(
+        {val0,
+         interval_1_2,
+         interval_2_3,
+         interval_3_4,
+         interval_4_5,
+         val6,
+         val7,
+         interval_8_10,
+         interval_9_12,
+         val13,
+         val14,
+         val15},
+        environment,
+        ns);
+      THEN("{ 0, [1, 5], 6, 7, [9, 12], 13, 14, 15 }")
+      {
+        auto interval_1_5 = constant_interval_exprt(val1, val5);
+        auto interval_8_12 = constant_interval_exprt(val8, val12);
+        EXPECT(
+          value_set,
+          {val0, interval_1_5, val6, val7, interval_8_12, val13, val14, val15});
+      }
+    }
+    WHEN(
+      "compacting { [1, 2], [2, 3], [3, 4], [4, 5], [8, 10], [9, 12], 0, 1, 2, "
+      "3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }")
+    {
+      auto value_set = make_value_set(
+        {val0,          val1,         val2,         val3,         val4,
+         val5,          val6,         val7,         val8,         val9,
+         val10,         val11,        val12,        val13,        val14,
+         val15,         interval_1_2, interval_2_3, interval_3_4, interval_4_5,
+         interval_8_10, interval_9_12},
+        environment,
+        ns);
+      THEN("{ 0, [1, 5], 6, 7, [9, 12], 13, 14, 15 }")
+      {
+        auto interval_1_5 = constant_interval_exprt(val1, val5);
+        auto interval_8_12 = constant_interval_exprt(val8, val12);
+        EXPECT(
+          value_set,
+          {val0, interval_1_5, val6, val7, interval_8_12, val13, val14, val15});
+      }
+    }
+  }
+
+  GIVEN("compact values into new intervals")
   {
     WHEN("compacting { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }")
     {
@@ -217,11 +280,11 @@ SCENARIO(
          val100},
         environment,
         ns);
-      THEN("{ [-100, 0], [0, 100] }")
+      THEN("{ [-100, 0], [1, 100] }")
       {
         auto interval_100minus_0 = constant_interval_exprt(val100minus, val0);
-        auto interval_0_100 = constant_interval_exprt(val0, val100);
-        EXPECT(value_set, {interval_100minus_0, interval_0_100});
+        auto interval_1_100 = constant_interval_exprt(val1, val100);
+        EXPECT(value_set, {interval_100minus_0, interval_1_100});
       }
     }
   }
