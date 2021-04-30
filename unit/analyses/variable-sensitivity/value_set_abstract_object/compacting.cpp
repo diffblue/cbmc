@@ -4,16 +4,15 @@
 
  Compacting occurs when the value_set get 'large', and takes two forms
  non-destructive (eg, can we merge constants into an existing interval
- with no loss of precision) and desctructive (creating intervals from
+ with no loss of precision) and destructive (creating intervals from
  the constants, or merging existing intervals).
 
  Author: Jez Higgins, jez@jezuk.co.uk
 
 \*******************************************************************/
 
-#include "../variable_sensitivity_test_helpers.h"
-
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 
 #include <testing-utils/use_catch.h>
 
@@ -26,20 +25,21 @@ SCENARIO(
   "[core][analysis][variable-sensitivity][value_set_abstract_object][compact]")
 {
   const typet type = signedbv_typet(32);
-  const exprt val1 = from_integer(1, type);
-  const exprt val2 = from_integer(2, type);
-  const exprt val3 = from_integer(3, type);
-  const exprt val4 = from_integer(4, type);
-  const exprt val5 = from_integer(5, type);
-  const exprt val6 = from_integer(6, type);
-  const exprt val7 = from_integer(7, type);
-  const exprt val8 = from_integer(8, type);
-  const exprt val9 = from_integer(9, type);
-  const exprt val10 = from_integer(10, type);
-  const exprt val11 = from_integer(11, type);
-  const exprt val12 = from_integer(12, type);
-  const exprt interval_5_10 = constant_interval_exprt(val5, val10);
-  const exprt interval_1_10 = constant_interval_exprt(val1, val10);
+  auto val0 = from_integer(0, type);
+  auto val1 = from_integer(1, type);
+  auto val2 = from_integer(2, type);
+  auto val3 = from_integer(3, type);
+  auto val4 = from_integer(4, type);
+  auto val5 = from_integer(5, type);
+  auto val6 = from_integer(6, type);
+  auto val7 = from_integer(7, type);
+  auto val8 = from_integer(8, type);
+  auto val9 = from_integer(9, type);
+  auto val10 = from_integer(10, type);
+  auto val11 = from_integer(11, type);
+  auto val12 = from_integer(12, type);
+  auto interval_5_10 = constant_interval_exprt(val5, val10);
+  auto interval_1_10 = constant_interval_exprt(val1, val10);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;
@@ -169,9 +169,6 @@ SCENARIO(
 
   GIVEN("compact values to create new intervals")
   {
-    const exprt interval_1_4 = constant_interval_exprt(val1, val4);
-    const exprt interval_9_12 = constant_interval_exprt(val9, val12);
-
     WHEN("compacting { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }")
     {
       auto value_set = make_value_set(
@@ -191,8 +188,40 @@ SCENARIO(
         ns);
       THEN("{ [1, 4], 5, 6, 7, 8, [9, 12] }")
       {
+        auto interval_1_4 = constant_interval_exprt(val1, val4);
+        auto interval_9_12 = constant_interval_exprt(val9, val12);
+
         EXPECT(
           value_set, {val5, val6, val7, val8, interval_1_4, interval_9_12});
+      }
+    }
+
+    WHEN(
+      "compacting { -100, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 100 } - pathalogical "
+      "case with outliers")
+    {
+      auto val100minus = from_integer(-100, type);
+      auto val100 = from_integer(100, type);
+      auto value_set = make_value_set(
+        {val100minus,
+         val2,
+         val3,
+         val4,
+         val5,
+         val6,
+         val7,
+         val8,
+         val9,
+         val10,
+         val11,
+         val100},
+        environment,
+        ns);
+      THEN("{ [-100, 0], [0, 100] }")
+      {
+        auto interval_100minus_0 = constant_interval_exprt(val100minus, val0);
+        auto interval_0_100 = constant_interval_exprt(val0, val100);
+        EXPECT(value_set, {interval_100minus_0, interval_0_100});
       }
     }
   }

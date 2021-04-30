@@ -377,7 +377,8 @@ static bool are_any_top(const abstract_object_sett &set)
 /////////////////
 static abstract_object_sett
 non_destructive_compact(const abstract_object_sett &values);
-static abstract_object_sett destructive_compact(abstract_object_sett values);
+static abstract_object_sett
+destructive_compact(abstract_object_sett values, int slice = 3);
 static bool value_is_not_contained_in(
   const abstract_object_pointert &object,
   const std::vector<constant_interval_exprt> &intervals);
@@ -434,12 +435,14 @@ exprt eval_expr(exprt e)
   return simplify_expr(e, dummy_namespace);
 }
 
-static abstract_object_sett destructive_compact(abstract_object_sett values)
+static abstract_object_sett
+destructive_compact(abstract_object_sett values, int slice)
 {
+  auto value_count = values.size();
   auto width = values.to_interval();
   auto slice_width = eval_expr(div_exprt(
     minus_exprt(width.get_upper(), width.get_lower()),
-    from_integer(3, width.type())));
+    from_integer(slice, width.type())));
 
   auto lower_slice = constant_interval_exprt(
     width.get_lower(), eval_expr(plus_exprt(width.get_lower(), slice_width)));
@@ -449,7 +452,11 @@ static abstract_object_sett destructive_compact(abstract_object_sett values)
   values.insert(interval_abstract_valuet::make_interval(lower_slice));
   values.insert(interval_abstract_valuet::make_interval(upper_slice));
 
-  return non_destructive_compact(values);
+  auto compacted = non_destructive_compact(values);
+  if(compacted.size() == value_count)
+    return destructive_compact(compacted, --slice);
+
+  return compacted;
 } // destructive_compact
 
 static bool value_is_not_contained_in(
