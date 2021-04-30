@@ -312,18 +312,6 @@ satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
 {
 }
 
-template<>
-satcheck_minisat2_baset<Minisat::Solver>::~satcheck_minisat2_baset()
-{
-  delete solver;
-}
-
-template<>
-satcheck_minisat2_baset<Minisat::SimpSolver>::~satcheck_minisat2_baset()
-{
-  delete solver;
-}
-
 template<typename T>
 bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
@@ -359,12 +347,22 @@ satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert(
 {
 }
 
+satcheck_minisat_no_simplifiert::~satcheck_minisat_no_simplifiert()
+{
+  delete solver;
+}
+
 satcheck_minisat_simplifiert::satcheck_minisat_simplifiert(
   message_handlert &message_handler)
   : satcheck_minisat2_baset<Minisat::SimpSolver>(
       new Minisat::SimpSolver,
       message_handler)
 {
+}
+
+satcheck_minisat_simplifiert::~satcheck_minisat_simplifiert()
+{
+  delete solver;
 }
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)

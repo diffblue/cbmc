@@ -30,7 +30,6 @@ class satcheck_glucose_baset : public cnf_solvert, public hardness_collectort
 {
 public:
   satcheck_glucose_baset(T *, message_handlert &message_handler);
-  virtual ~satcheck_glucose_baset();
 
   tvt l_get(literalt a) const override;
 
@@ -68,6 +67,10 @@ public:
   }
 
 protected:
+  // This class needs to be inherited from, and inheriting classes need to
+  // delete `solver` in their destructor.
+  virtual ~satcheck_glucose_baset() = default;
+
   resultt do_prop_solve() override;
 
   T *solver;
@@ -83,6 +86,7 @@ class satcheck_glucose_no_simplifiert:
 {
 public:
   explicit satcheck_glucose_no_simplifiert(message_handlert &message_handler);
+  ~satcheck_glucose_no_simplifiert() override;
   const std::string solver_text() override;
 };
 
@@ -91,6 +95,7 @@ class satcheck_glucose_simplifiert:
 {
 public:
   explicit satcheck_glucose_simplifiert(message_handlert &message_handler);
+  ~satcheck_glucose_simplifiert() override;
   const std::string solver_text() override;
   void set_frozen(literalt a) override;
   bool is_eliminated(literalt a) const;

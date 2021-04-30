@@ -249,18 +249,6 @@ satcheck_glucose_baset<T>::satcheck_glucose_baset(
 {
 }
 
-template<>
-satcheck_glucose_baset<Glucose::Solver>::~satcheck_glucose_baset()
-{
-  delete solver;
-}
-
-template<>
-satcheck_glucose_baset<Glucose::SimpSolver>::~satcheck_glucose_baset()
-{
-  delete solver;
-}
-
 template<typename T>
 bool satcheck_glucose_baset<T>::is_in_conflict(literalt a) const
 {
@@ -293,12 +281,22 @@ satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert(
 {
 }
 
+satcheck_glucose_no_simplifiert::~satcheck_glucose_no_simplifiert()
+{
+  delete solver;
+}
+
 satcheck_glucose_simplifiert::satcheck_glucose_simplifiert(
   message_handlert &message_handler)
   : satcheck_glucose_baset<Glucose::SimpSolver>(
       new Glucose::SimpSolver,
       message_handler)
 {
+}
+
+satcheck_glucose_simplifiert::~satcheck_glucose_simplifiert()
+{
+  delete solver;
 }
 
 void satcheck_glucose_simplifiert::set_frozen(literalt a)
