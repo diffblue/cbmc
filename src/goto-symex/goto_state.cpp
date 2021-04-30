@@ -141,6 +141,9 @@ void goto_statet::apply_condition(
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
+    if(!is_ssa_expr(lhs) || !goto_symex_is_constantt()(rhs))
+      return;
+
     if(rhs.is_true())
       apply_condition(equal_exprt{lhs, false_exprt{}}, previous_state, ns);
     else if(rhs.is_false())
