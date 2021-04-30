@@ -8,10 +8,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "string2int.h"
 
-#include <cerrno>
 #include <cstdlib>
-#include <cstring>
-#include <limits>
 #include <stdexcept>
 
 #include "invariant.h"

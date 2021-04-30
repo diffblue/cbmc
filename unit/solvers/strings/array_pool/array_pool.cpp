@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <solvers/strings/string_constraint_generator.h>
+#include <solvers/strings/array_pool.h>
 
 #include <util/pointer_expr.h>
 

@@ -9,8 +9,6 @@ Author: Daniel Poetzl
 #define SM_INTERNAL_CHECKS
 #define SN_INTERNAL_CHECKS
 
-#include <climits>
-#include <random>
 #include <set>
 
 #include <testing-utils/use_catch.h>

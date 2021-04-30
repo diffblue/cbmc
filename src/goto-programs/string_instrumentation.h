@@ -12,11 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
 
-#include "goto_functions.h"
-
 #include <util/exception_utils.h>
 
+class exprt;
+class goto_functionst;
 class goto_modelt;
+class goto_programt;
+class symbol_tablet;
 
 class incorrect_source_program_exceptiont : public cprover_exception_baset
 {

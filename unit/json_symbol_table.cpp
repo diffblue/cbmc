@@ -2,25 +2,17 @@
 
 /// \file json symbol table read/write consistency
 
-#include <ansi-c/ansi_c_language.h>
-
-#include <cbmc/cbmc_parse_options.h>
-
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
-#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/show_symbol_table.h>
 
 #include <json-symtab-language/json_symbol_table.h>
 #include <json/json_parser.h>
 
-#include <langapi/language_file.h>
-#include <langapi/mode.h>
-
 #include <util/cmdline.h>
+#include <util/json_stream.h>
 #include <util/message.h>
-#include <util/options.h>
 #include <util/symbol_table.h>
+#include <util/ui_message.h>
 
 #include <testing-utils/get_goto_model_from_c.h>
 #include <testing-utils/message.h>

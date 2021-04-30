@@ -12,11 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "language.h"
 
 #include <util/expr.h>
-#include <util/symbol.h>
-#include <util/symbol_table.h>
-#include <util/prefix.h>
-#include <util/cprover_prefix.h>
-#include <util/std_types.h>
 
 bool languaget::final(symbol_table_baset &)
 {

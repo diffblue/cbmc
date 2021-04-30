@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_enum_type.h"
 
-#include <util/c_types.h>
-
 cpp_enum_typet::cpp_enum_typet():typet(ID_c_enum)
 {
 }

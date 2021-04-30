@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include <util/object_factory_parameters.h>
-
 #include "language.h"
 
 language_filet::language_filet(const language_filet &rhs):

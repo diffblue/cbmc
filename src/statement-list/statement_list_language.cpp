@@ -19,6 +19,8 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 #include <util/get_base_name.h>
+#include <util/make_unique.h>
+#include <util/symbol_table.h>
 
 void statement_list_languaget::set_language_options(const optionst &options)
 {

@@ -11,12 +11,13 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_ANALYSES_DOES_REMOVE_CONST_H
 #define CPROVER_ANALYSES_DOES_REMOVE_CONST_H
 
-#include <util/type.h>
-#include <util/namespace.h>
+#include <utility>
 
 class goto_programt;
 class namespacet;
 class exprt;
+class source_locationt;
+class typet;
 
 class does_remove_constt
 {

@@ -10,13 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "precondition.h"
-#include "goto_symex_state.h"
 
 #include <util/find_symbols.h>
+#include <util/pointer_expr.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
 
-#include <goto-programs/goto_model.h>
+#include "renaming_level.h"
+#include "symex_target_equation.h"
 
 class preconditiont
 {

@@ -4,9 +4,10 @@
 #define CPROVER_TESTING_UTILS_INVARIANT_H
 
 #include <testing-utils/use_catch.h>
-#include <util/invariant.h>
 
 #include <string>
+
+class invariant_failedt;
 
 class invariant_failure_containingt
   : public Catch::MatcherBase<invariant_failedt>

@@ -14,7 +14,6 @@ Date: January 2010
 #include "uninitialized.h"
 
 #include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 #include <analyses/uninitialized_domain.h>

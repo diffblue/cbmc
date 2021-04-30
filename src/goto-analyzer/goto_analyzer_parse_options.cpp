@@ -28,18 +28,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <jsil/jsil_language.h>
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/validate_goto_model.h>
 
+#include <analyses/ai.h>
 #include <analyses/local_may_alias.h>
 
 #include <langapi/mode.h>
@@ -49,7 +45,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/options.h>
-#include <util/unicode.h>
 #include <util/version.h>
 
 #include "build_analyzer.h"

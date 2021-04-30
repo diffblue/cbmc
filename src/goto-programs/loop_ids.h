@@ -14,7 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 
-#include "goto_model.h"
+class goto_functionst;
+class goto_modelt;
+class goto_programt;
 
 void show_loop_ids(
   ui_message_handlert::uit,

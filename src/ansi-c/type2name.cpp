@@ -17,8 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <regex>
 

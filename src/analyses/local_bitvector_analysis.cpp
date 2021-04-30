@@ -11,16 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "local_bitvector_analysis.h"
 
-#include <iterator>
 #include <algorithm>
 
-#include <util/c_types.h>
-#include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
-
-#include <langapi/language_util.h>
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {

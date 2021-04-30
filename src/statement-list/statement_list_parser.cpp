@@ -11,11 +11,9 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_parser.h"
 
-#include "converters/statement_list_types.h"
 #include "statement_list_parse_tree.h"
 #include "statement_list_parse_tree_io.h"
 #include <algorithm>
-#include <cmath>
 #include <iostream>
 #include <iterator>
 #include <util/string_constant.h>

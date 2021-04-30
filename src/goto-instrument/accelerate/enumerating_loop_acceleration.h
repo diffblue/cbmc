@@ -22,7 +22,6 @@ Author: Matt Lewis
 
 #include "polynomial_accelerator.h"
 #include "path_enumerator.h"
-#include "all_paths_enumerator.h"
 #include "sat_path_enumerator.h"
 
 

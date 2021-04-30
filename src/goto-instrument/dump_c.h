@@ -12,7 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_DUMP_C_H
 #define CPROVER_GOTO_INSTRUMENT_DUMP_C_H
 
-#include <goto-programs/goto_functions.h>
+#include <iosfwd>
+#include <string>
+
+class goto_functionst;
+class namespacet;
 
 void dump_c(
   const goto_functionst &src,

@@ -11,6 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "incremental_goto_checker.h"
 
+#include <util/ui_message.h>
+
 incremental_goto_checkert::incremental_goto_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler)

@@ -14,7 +14,6 @@ Author: Daniel Kroening
 #include <langapi/language_util.h>
 
 #include "cover_util.h"
-#include "cover_basic_blocks.h"
 
 void cover_condition_instrumentert::instrument(
   const irep_idt &function_id,

@@ -17,8 +17,10 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_model.h>
 
-#include <langapi/language.h>
-#include <util/cmdline.h>
+#include <memory>
+
+class cmdlinet;
+class languaget;
 
 symbol_tablet load_java_class(
   const std::string &java_class_name,

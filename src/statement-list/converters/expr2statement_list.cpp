@@ -10,10 +10,11 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <ansi-c/expr2c.h>
 
+#include <util/namespace.h>
+#include <util/std_expr.h>
 #include <util/suffix.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
-#include <algorithm>
 #include <cstring>
 #include <iostream>
 

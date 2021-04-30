@@ -14,8 +14,9 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <unordered_map>
 
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_program.h>
 
+class abstract_goto_modelt;
 class json_objectt;
 class json_stream_objectt;
 class xmlt;

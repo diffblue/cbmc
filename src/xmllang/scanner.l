@@ -15,8 +15,6 @@
 #endif
 
 #include <cctype>
-#include <cstring>
-#include <cstdlib>
 
 #include "xml_parser.h"
 #include "xml_y.tab.h"

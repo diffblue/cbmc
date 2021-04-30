@@ -14,16 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/arith_tools.h>
-#include <util/base_exceptions.h>
 #include <util/byte_operators.h>
-#include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/std_code.h>
 
 #include <langapi/language_util.h>
 

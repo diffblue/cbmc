@@ -11,17 +11,11 @@ Author: Peter Schrammel
 
 #include "show_goto_functions.h"
 
-#include <util/xml.h>
-#include <util/json.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
+#include <util/ui_message.h>
 
-#include <langapi/language_util.h>
-#include <goto-programs/show_goto_functions_json.h>
-#include <goto-programs/show_goto_functions_xml.h>
-
-#include "goto_functions.h"
 #include "goto_model.h"
+#include "show_goto_functions_json.h"
+#include "show_goto_functions_xml.h"
 
 void show_goto_functions(
   const namespacet &ns,

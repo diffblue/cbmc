@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_class_loader_base.h"
 
 #include "jar_file.h"
+#include "java_bytecode_parse_tree.h"
 #include "java_bytecode_parser.h"
 
 #include <util/file_util.h>

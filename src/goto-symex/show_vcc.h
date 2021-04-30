@@ -12,10 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SHOW_VCC_H
 #define CPROVER_GOTO_SYMEX_SHOW_VCC_H
 
-#include <util/ui_message.h>
-
 class optionst;
 class symex_target_equationt;
+class ui_message_handlert;
 
 /// Output equations from \p equation to a file or to the standard output.
 /// The name of the output file is given by the `outfile` option from

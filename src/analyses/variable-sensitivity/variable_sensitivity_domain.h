@@ -65,10 +65,9 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
 
 #include <iosfwd>
-#include <map>
 #include <memory>
 
-#include <analyses/ai.h>
+#include <analyses/ai_domain.h>
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 

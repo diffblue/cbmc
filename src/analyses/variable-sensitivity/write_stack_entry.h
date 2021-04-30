@@ -12,12 +12,10 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_STACK_ENTRY_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_STACK_ENTRY_H
 
-#include <memory>
-#include <stack>
+#include "abstract_object.h"
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
-#include <util/namespace.h>
-#include <util/std_expr.h>
+class abstract_environmentt;
+class namespacet;
 
 class write_stack_entryt
 {

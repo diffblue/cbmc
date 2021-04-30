@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "array_name.h"
 
 #include "expr.h"
-#include "invariant.h"
 #include "namespace.h"
 #include "ssa_expr.h"
 #include "symbol.h"

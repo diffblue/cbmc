@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_convert_type.h"
-#include "expr2cpp.h"
+#include "cpp_typecheck_fargs.h"
 
 void cpp_typecheckt::typecheck_type(typet &type)
 {

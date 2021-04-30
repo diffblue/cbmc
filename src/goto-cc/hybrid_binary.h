@@ -14,9 +14,9 @@ Date: May 2018
 #ifndef CPROVER_GOTO_CC_HYBRID_BINARY_H
 #define CPROVER_GOTO_CC_HYBRID_BINARY_H
 
-#include <util/message.h>
-
 #include <string>
+
+class message_handlert;
 
 /// \brief Merges a goto binary into an object file (e.g. ELF)
 /// \param compiler_or_linker: The name of the gcc or ld executable, used to

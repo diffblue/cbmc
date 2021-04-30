@@ -187,8 +187,6 @@ public:
   }
 };
 
-class mathematical_function_typet;
-
 /// \brief Application of (mathematical) function
 class function_application_exprt : public binary_exprt
 {

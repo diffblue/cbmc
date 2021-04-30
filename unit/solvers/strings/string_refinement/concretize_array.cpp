@@ -11,10 +11,8 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/symbol_table.h>
 
-#include <solvers/strings/string_refinement.h>
+#include <solvers/strings/string_refinement_util.h>
 
 SCENARIO(
   "concretize_array_expression",

@@ -13,53 +13,36 @@ Author: Peter Schrammel
 
 #include <climits>
 #include <cstdlib> // exit()
-#include <fstream>
 #include <iostream>
-#include <memory>
 
 #include <util/config.h>
 #include <util/exit_codes.h>
-#include <util/make_unique.h>
 #include <util/options.h>
 #include <util/version.h>
 
-#include <langapi/language.h>
-
 #include <goto-programs/adjust_float_expressions.h>
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/mm_io.h>
-#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
-#include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
 
 #include <goto-instrument/cover.h>
-
-#include <pointer-analysis/add_failed_symbols.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
 
-#include <langapi/mode.h>
-
 #include "java_syntactic_diff.h"
 #include <goto-diff/change_impact.h>
-#include <goto-diff/goto_diff.h>
 #include <goto-diff/unified_diff.h>
 
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)

@@ -10,8 +10,6 @@ Author: Diffblue Ltd
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/expr.h>
-#include <util/std_types.h>
 
 SCENARIO("bitfield-expr-is-zero", "[core][util][expr]")
 {

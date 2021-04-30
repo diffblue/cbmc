@@ -12,10 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_SYMBOL_TABLE_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_SYMBOL_TABLE_H
 
-#include <util/ui_message.h>
-
-class symbol_tablet;
 class goto_modelt;
+class symbol_tablet;
+class ui_message_handlert;
 
 void show_symbol_table(
   const symbol_tablet &,

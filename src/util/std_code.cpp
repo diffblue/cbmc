@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "c_types.h"
 #include "pointer_expr.h"
-#include "std_expr.h"
 #include "string_constant.h"
 
 /// In the case of a `codet` type that represents multiple statements, return

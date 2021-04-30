@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/integer_interval.h>
 #include <util/interval_template.h>
 
-#include "ai.h"
+#include "ai_domain.h"
 
 typedef interval_templatet<ieee_floatt> ieee_float_intervalt;
 

@@ -11,6 +11,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_RENAMED_H
 #define CPROVER_GOTO_SYMEX_RENAMED_H
 
+#include <util/expr_iterator.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+
+class ssa_exprt;
+
 /// Symex renaming level names.
 enum levelt
 {

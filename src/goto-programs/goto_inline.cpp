@@ -11,12 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_inline.h"
 
-#include <util/prefix.h>
-#include <util/cprover_prefix.h>
-#include <util/std_code.h>
 #include <util/std_expr.h>
 
 #include "goto_inline_class.h"
+#include "goto_model.h"
 
 void goto_inline(
   goto_modelt &goto_model,

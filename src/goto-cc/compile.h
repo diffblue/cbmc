@@ -14,14 +14,18 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_COMPILE_H
 #define CPROVER_GOTO_CC_COMPILE_H
 
-#include <util/cmdline.h>
 #include <util/message.h>
-#include <util/rename_symbol.h>
+#include <util/std_types.h>
+#include <util/symbol.h>
 
-#include <goto-programs/goto_model.h>
+#include <map>
 
+class cmdlinet;
+class goto_functionst;
+class goto_modelt;
 class language_filest;
 class languaget;
+class symbol_tablet;
 
 class compilet
 {

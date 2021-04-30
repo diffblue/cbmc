@@ -16,7 +16,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/config.h>
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")

@@ -14,9 +14,10 @@ Date: June 2003
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
 
-#include "goto_model.h"
 #include "goto_convert_class.h"
 #include "goto_functions.h"
+
+class goto_modelt;
 
 // convert it all!
 void goto_convert(

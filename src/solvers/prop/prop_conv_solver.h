@@ -14,12 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr.h>
 #include <util/message.h>
-#include <util/std_expr.h>
 
 #include <solvers/conflict_provider.h>
 #include <solvers/hardness_collector.h>
 
-#include "literal_expr.h"
 #include "prop.h"
 #include "prop_conv.h"
 #include "solver_resource_limits.h"

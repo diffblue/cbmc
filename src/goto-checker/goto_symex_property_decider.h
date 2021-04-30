@@ -12,12 +12,12 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_GOTO_SYMEX_PROPERTY_DECIDER_H
 #define CPROVER_GOTO_CHECKER_GOTO_SYMEX_PROPERTY_DECIDER_H
 
-#include <util/ui_message.h>
-
 #include <goto-symex/symex_target_equation.h>
 
 #include "properties.h"
 #include "solver_factory.h"
+
+class ui_message_handlert;
 
 /// Provides management of goal variables that encode properties
 class goto_symex_property_decidert

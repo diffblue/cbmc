@@ -14,7 +14,12 @@ Date: March 2013
 #ifndef CPROVER_ANALYSES_LOCALS_H
 #define CPROVER_ANALYSES_LOCALS_H
 
-#include <goto-programs/goto_function.h>
+#include <iosfwd>
+#include <unordered_set>
+
+#include <util/irep.h>
+
+class goto_functiont;
 
 class localst
 {

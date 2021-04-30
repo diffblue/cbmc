@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "source_location.h"
 #include "std_expr.h"
-#include "string_utils.h"
 #include "suffix.h"
 
 /// Dump the state of a symbol object to a given output stream.

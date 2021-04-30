@@ -17,9 +17,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/string_utils.h>
+#include <util/symbol_table_base.h>
 #include <util/unicode.h>
 
-#include <iomanip>
 #include <sstream>
 
 /// Convert UCS-2 or UTF-16 to an array expression.

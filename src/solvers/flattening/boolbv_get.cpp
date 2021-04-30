@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/threeval.h>
 
 #include "boolbv_type.h"

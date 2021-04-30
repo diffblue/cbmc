@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/symbol.h>
 
-#include "java_types.h"
-
 /// Create components to an object of the root class (usually java.lang.Object)
 /// Specifically, we add a new component, '\@class_identifier'. This used
 /// primary to replace an expression like 'e instanceof A' with

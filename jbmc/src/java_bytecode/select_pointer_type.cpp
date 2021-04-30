@@ -11,7 +11,10 @@ Author: Diffblue Ltd.
 /// classes to concrete versions).
 
 #include "select_pointer_type.h"
+
+#include "generic_parameter_specialization_map.h"
 #include "java_types.h"
+
 #include <util/std_types.h>
 
 pointer_typet select_pointer_typet::convert_pointer_type(

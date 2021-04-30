@@ -11,6 +11,8 @@ Author: Diffblue Ltd.
 #include <solvers/sat/satcheck.h>
 #include <util/symbol_table.h>
 
+#include <solvers/flattening/boolbv.h>
+
 /// Runs a solver instance to verify whether an expression can only be
 /// non-negative.
 /// \param expr: the expression to check for negativity

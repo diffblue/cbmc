@@ -13,7 +13,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <chrono>
 
-#include <goto-symex/memory_model_pso.h>
+#include <util/ui_message.h>
+
 #include <goto-symex/path_storage.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>

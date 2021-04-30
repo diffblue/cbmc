@@ -18,7 +18,6 @@ Author: Peter Schrammel
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 
-#include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 

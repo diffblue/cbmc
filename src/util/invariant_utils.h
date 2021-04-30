@@ -10,9 +10,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #define CPROVER_UTIL_INVARIANT_TYPES_H
 
 #include "invariant.h"
-#include "irep.h"
 
 #include <string>
+
+class irept;
 
 /// Produces a plain string error description from an irep and some
 /// explanatory text. If `problem_node` is nil, returns `description`.

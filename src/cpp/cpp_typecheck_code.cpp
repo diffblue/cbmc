@@ -12,14 +12,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
 
-#include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
-#include "cpp_template_type.h"
-#include "cpp_util.h"
 #include "cpp_exception_id.h"
+#include "cpp_typecheck_fargs.h"
+#include "cpp_util.h"
 
 void cpp_typecheckt::typecheck_code(codet &code)
 {

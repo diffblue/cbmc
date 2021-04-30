@@ -12,9 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <memory>
 
-#include "cout_message.h"
-#include "json_stream.h"
+#include "message.h"
 #include "timestamper.h"
+
+class console_message_handlert;
+class json_stream_arrayt;
 
 class ui_message_handlert : public message_handlert
 {

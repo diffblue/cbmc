@@ -11,8 +11,11 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 
+#include <map>
+
 #include <util/exception_utils.h>
-#include <util/options.h>
+
+class optionst;
 
 enum ABSTRACT_OBJECT_TYPET
 {

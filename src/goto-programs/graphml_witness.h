@@ -14,9 +14,11 @@ Author: Daniel Kroening
 
 #include <xmllang/graphml.h>
 
-#include <goto-symex/symex_target_equation.h>
-
-#include "goto_trace.h"
+class code_assignt;
+class exprt;
+class goto_tracet;
+class namespacet;
+class symex_target_equationt;
 
 class graphml_witnesst
 {

@@ -10,7 +10,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_GOTO_PROGRAMS_LABEL_FUNCTION_POINTER_CALL_SITES_H
 #define CPROVER_GOTO_PROGRAMS_LABEL_FUNCTION_POINTER_CALL_SITES_H
 
-#include "goto_model.h"
+class goto_modelt;
 
 /// This ensures that call instructions can be only one of two things:
 ///

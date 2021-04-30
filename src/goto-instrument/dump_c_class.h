@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <string>
 
+#include <util/symbol_table.h>
+
 #include <goto-programs/system_library_symbols.h>
 
 /// Used for configuring the behaviour of dump_c

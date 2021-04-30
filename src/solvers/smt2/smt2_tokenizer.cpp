@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
-#include <istream>
-
 bool smt2_tokenizert::is_simple_symbol_character(char ch)
 {
   // any non-empty sequence of letters, digits and the characters

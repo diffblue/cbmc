@@ -16,7 +16,6 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/simplify_expr.h>
-#include <util/threeval.h>
 
 #include <goto-programs/goto_functions.h>
 

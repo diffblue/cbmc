@@ -15,7 +15,6 @@ Author: Matt Lewis
 #include <algorithm>
 
 #include <util/std_expr.h>
-#include <util/replace_expr.h>
 #include <util/arith_tools.h>
 
 #include "util.h"

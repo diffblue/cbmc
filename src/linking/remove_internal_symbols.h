@@ -12,9 +12,7 @@ Author: Daniel Kroening
 #ifndef CPROVER_LINKING_REMOVE_INTERNAL_SYMBOLS_H
 #define CPROVER_LINKING_REMOVE_INTERNAL_SYMBOLS_H
 
-#include <util/message.h>
-
-#include <string>
+class message_handlert;
 
 void remove_internal_symbols(
   class symbol_tablet &symbol_table,

@@ -21,14 +21,12 @@ Date: February 2016
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
 
-#include <util/c_types.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/replace_symbol.h>
 
-class messaget;
 class assigns_clauset;
+class replace_symbolt;
 
 class code_contractst
 {

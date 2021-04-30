@@ -10,6 +10,8 @@
 /// domain abstractions are used, flow sensitivity, etc
 #include "variable_sensitivity_configuration.h"
 
+#include <util/options.h>
+
 vsd_configt vsd_configt::from_options(const optionst &options)
 {
   vsd_configt config{};

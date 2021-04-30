@@ -11,15 +11,19 @@ Author: Diffblue Ltd.
 #include "ci_lazy_methods_needed.h"
 #include "code_with_references.h"
 #include "java_static_initializers.h"
-#include "java_string_library_preprocess.h"
 #include "java_string_literals.h"
+#include "java_types.h"
 #include "java_utils.h"
 
 #include <goto-programs/class_identifier.h>
+
 #include <util/allocate_objects.h>
+#include <util/arith_tools.h>
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
-#include <util/prefix.h>
+#include <util/ieee_float.h>
+#include <util/json.h>
+#include <util/symbol_table_base.h>
 #include <util/unicode.h>
 
 /// Values passed around between most functions of the recursive deterministic

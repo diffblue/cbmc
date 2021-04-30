@@ -16,7 +16,10 @@
 #include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
 #include <util/options.h>
-#include <util/unicode.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <langapi/language.h>
 

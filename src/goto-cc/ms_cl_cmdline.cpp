@@ -13,7 +13,6 @@ Author: Daniel Kroening
 
 #include <climits>
 #include <cstdlib>
-#include <cstring>
 #include <fstream>
 #include <iostream>
 

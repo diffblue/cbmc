@@ -25,7 +25,6 @@ Author: CM Wintersteiger, 2006
 #include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/message.h>
-#include <util/prefix.h>
 
 #include "compile.h"
 #include "ms_cl_version.h"

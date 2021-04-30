@@ -14,13 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <chrono>
 
-#include <util/format_expr.h>
 #include <util/std_expr.h>
 
 #include <solvers/decision_procedure.h>
 #include <solvers/hardness_collector.h>
 
-#include "goto_symex_state.h"
 #include "ssa_step.h"
 
 static hardness_collectort::handlert

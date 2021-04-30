@@ -6,9 +6,10 @@
 #define CPROVER_COMPOUND_BLOCK_LOCATIONS_H
 
 #include <util/irep.h>
-#include <util/std_expr.h>
 
 #include <string>
+
+class exprt;
 
 class compound_block_locationst
 {

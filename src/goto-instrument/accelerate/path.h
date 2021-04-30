@@ -16,7 +16,6 @@ Author: Matt Lewis
 #include <list>
 
 #include <util/std_expr.h>
-#include <util/namespace.h>
 
 #include <goto-programs/goto_program.h>
 

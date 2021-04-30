@@ -25,7 +25,6 @@ Date: April 2016
 
 class goto_functionst;
 class goto_modelt;
-class goto_programt;
 
 class unified_difft
 {

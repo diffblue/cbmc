@@ -12,12 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_types.h"
 
-#include "arith_tools.h"
-#include "bv_arithmetic.h"
 #include "namespace.h"
-#include "pointer_offset_size.h"
 #include "std_expr.h"
-#include "string2int.h"
 
 void array_typet::check(const typet &type, const validation_modet vm)
 {

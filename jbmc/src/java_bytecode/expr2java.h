@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_JAVA_BYTECODE_EXPR2JAVA_H
 
 #include <cmath>
-#include <limits>
-#include <numeric>
 #include <sstream>
 #include <string>
 

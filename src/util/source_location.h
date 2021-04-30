@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_SOURCE_LOCATION_H
 #define CPROVER_UTIL_SOURCE_LOCATION_H
 
-#include "invariant.h"
 #include "irep.h"
 #include "optional.h"
 

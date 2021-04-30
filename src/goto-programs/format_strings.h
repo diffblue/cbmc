@@ -15,8 +15,11 @@ Author: CM Wintersteiger
 #include <string>
 #include <list>
 
-#include <util/expr.h>
+#include <util/irep.h>
 #include <util/mp_arith.h>
+#include <util/optional.h>
+
+class typet;
 
 class format_tokent
 {

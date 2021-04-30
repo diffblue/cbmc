@@ -11,8 +11,6 @@ Author: Matt Lewis
 
 #include "scratch_program.h"
 
-#include <util/fixedbv.h>
-
 #include <solvers/decision_procedure.h>
 
 #include <goto-symex/slice.h>

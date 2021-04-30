@@ -7,7 +7,6 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <sstream>
-#include <string.h>
 #include <testing-utils/use_catch.h>
 #include <util/message.h>
 

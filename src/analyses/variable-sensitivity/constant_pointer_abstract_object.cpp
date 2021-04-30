@@ -8,13 +8,13 @@
 
 #include "constant_pointer_abstract_object.h"
 
-#include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include <ostream>
+
+#include "abstract_object_statistics.h"
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &type)

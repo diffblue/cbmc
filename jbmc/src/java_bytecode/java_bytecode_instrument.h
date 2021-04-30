@@ -11,11 +11,15 @@ Date:   June 2017
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_INSTRUMENT_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_INSTRUMENT_H
 
-#include <util/symbol_table.h>
-#include <util/message.h>
-#include <util/irep.h>
+#include <string>
+#include <vector>
 
 class code_blockt;
+class message_handlert;
+class symbol_table_baset;
+class symbol_tablet;
+class symbolt;
+class source_locationt;
 
 void java_bytecode_instrument_symbol(
   symbol_table_baset &symbol_table,

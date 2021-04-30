@@ -12,10 +12,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 #define CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 
-#include "cpp_typecheck_fargs.h"
-#include "cpp_name.h"
+#include <util/std_types.h>
+
 #include "cpp_template_args.h"
 #include "cpp_scopes.h"
+
+class cpp_namet;
+class cpp_typecheck_fargst;
 
 class cpp_typecheck_resolvet
 {

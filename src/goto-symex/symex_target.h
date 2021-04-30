@@ -14,10 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
-#include "renaming_level.h"
+#include "renamed.h"
 
 class ssa_exprt;
-class symbol_exprt;
 
 /// The interface of the target _container_ for symbolic execution to record its
 /// symbolic steps into. Presently, \ref symex_target_equationt is the only

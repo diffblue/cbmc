@@ -12,18 +12,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "guard_bdd.h"
 
 #include <algorithm>
-#include <ostream>
-#include <set>
 
-#include <solvers/bdd/bdd.h>
 #include <solvers/prop/bdd_expr.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
-#include <util/namespace.h>
-#include <util/simplify_utils.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 guard_bddt::guard_bddt(const exprt &e, bdd_exprt &manager)
   : manager(manager), bdd(manager.from_expr(e))

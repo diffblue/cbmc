@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_LETIFY_H
 #define CPROVER_SOLVERS_SMT2_LETIFY_H
 
-#include <util/irep_hash_container.h>
 #include <util/std_expr.h>
 
 /// Introduce LET for common subexpressions

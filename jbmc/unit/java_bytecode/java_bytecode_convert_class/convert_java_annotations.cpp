@@ -12,6 +12,8 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_types.h>
 #include <testing-utils/use_catch.h>
 
+#include <util/arith_tools.h>
+
 SCENARIO(
   "java_bytecode_convert_annotations",
   "[core][java_bytecode][java_bytecode_convert_class]")

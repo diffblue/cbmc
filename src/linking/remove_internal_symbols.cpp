@@ -13,6 +13,7 @@ Author: Daniel Kroening
 
 #include <util/config.h>
 #include <util/find_symbols.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>

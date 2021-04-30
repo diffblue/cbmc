@@ -7,13 +7,13 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "ci_lazy_methods.h"
-#include "java_entry_point.h"
+#include "java_bytecode_language.h"
 #include "java_class_loader.h"
-#include "java_utils.h"
-#include "java_string_library_preprocess.h"
+#include "java_entry_point.h"
 #include "remove_exceptions.h"
 
 #include <util/expr_iterator.h>
+#include <util/namespace.h>
 #include <util/suffix.h>
 
 #include <goto-programs/resolve_inherited_component.h>

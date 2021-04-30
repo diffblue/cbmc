@@ -12,15 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H
 
-#include <util/ui_message.h>
+#include <util/irep.h>
 #include <util/optional.h>
 
+class json_arrayt;
 class namespacet;
 class goto_modelt;
-class symbol_tablet;
 class goto_programt;
 class goto_functionst;
-class message_handlert;
+class source_locationt;
+class ui_message_handlert;
 
 // clang-format off
 #define OPT_SHOW_PROPERTIES \

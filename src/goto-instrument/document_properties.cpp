@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 
-#include <ansi-c/expr2c.h>
-
 #include <goto-programs/goto_model.h>
 
 #define MAXWIDTH 62

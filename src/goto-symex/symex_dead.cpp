@@ -14,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
 
-#include <pointer-analysis/add_failed_symbols.h>
-
 void goto_symext::symex_dead(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;

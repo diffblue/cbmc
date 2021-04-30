@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_scope.h"
 
-#include "cpp_typecheck.h"
-
 std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 {
   switch(kind)

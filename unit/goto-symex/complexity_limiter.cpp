@@ -9,6 +9,7 @@ Author: Diffblue Ltd
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 
 #include <goto-symex/complexity_limiter.h>
 

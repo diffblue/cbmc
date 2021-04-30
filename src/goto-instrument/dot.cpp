@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dot.h"
 
-#include <iostream>
-#include <fstream>
 #include <sstream>
+
+#include <goto-programs/goto_model.h>
 
 #include <langapi/language_util.h>
 

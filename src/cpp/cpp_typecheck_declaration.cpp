@@ -13,7 +13,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_declarator_converter.h"
 
-#include <util/pointer_expr.h>
+#include <util/c_types.h>
+
+#include "cpp_util.h"
 
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
 {

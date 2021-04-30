@@ -14,8 +14,6 @@
 #pragma warning(disable:4005)
 #endif
 
-#include <util/expr.h>
-
 #include <ansi-c/literals/convert_float_literal.h>
 #include <ansi-c/literals/convert_string_literal.h>
 

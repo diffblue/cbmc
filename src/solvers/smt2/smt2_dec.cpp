@@ -8,13 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_dec.h"
 
-#include <util/arith_tools.h>
-#include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/message.h>
 #include <util/run.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/tempfile.h>
 
 #include "smt2irep.h"

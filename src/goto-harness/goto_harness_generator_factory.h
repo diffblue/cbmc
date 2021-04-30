@@ -10,11 +10,13 @@ Author: Diffblue Ltd.
 #define CPROVER_GOTO_HARNESS_GOTO_HARNESS_GENERATOR_FACTORY_H
 
 #include <functional>
+#include <list>
 #include <map>
 #include <memory>
 #include <string>
 
-#include "goto_harness_generator.h"
+class goto_harness_generatort;
+class goto_modelt;
 
 #define GOTO_HARNESS_GENERATOR_TYPE_OPT "harness-type"
 #define GOTO_HARNESS_GENERATOR_HARNESS_FUNCTION_NAME_OPT "harness-function-name"

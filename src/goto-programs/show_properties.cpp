@@ -11,16 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_properties.h"
 
-#include <iostream>
-
 #include <util/json_irep.h>
+#include <util/ui_message.h>
 #include <util/xml_irep.h>
 
 #include <langapi/language_util.h>
 
-#include "goto_functions.h"
 #include "goto_model.h"
-
 
 optionalt<source_locationt> find_property(
     const irep_idt &property,

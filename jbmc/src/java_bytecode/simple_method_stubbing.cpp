@@ -12,13 +12,15 @@ Author: Diffblue Ltd.
 #include "simple_method_stubbing.h"
 
 #include <java_bytecode/java_object_factory.h>
+#include <java_bytecode/java_object_factory_parameters.h>
 #include <java_bytecode/java_pointer_casts.h>
+#include <java_bytecode/java_types.h>
 
 #include "java_utils.h"
 #include <util/invariant_utils.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
+#include <util/symbol_table_base.h>
 
 class java_simple_method_stubst
 {

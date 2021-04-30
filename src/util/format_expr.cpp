@@ -13,24 +13,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
-#include "expr.h"
-#include "expr_iterator.h"
-#include "fixedbv.h"
 #include "format_type.h"
 #include "ieee_float.h"
-#include "invariant.h"
 #include "mathematical_expr.h"
 #include "mp_arith.h"
-#include "rational.h"
-#include "rational_tools.h"
 #include "std_code.h"
-#include "std_expr.h"
-#include "string2int.h"
 #include "string_utils.h"
 
 #include <map>
 #include <ostream>
-#include <stack>
 
 // expressions that are rendered with infix operators
 struct infix_opt

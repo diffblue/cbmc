@@ -14,11 +14,13 @@ Author: Daniel Kroening
 
 #include <unordered_set>
 
-#include <util/message.h>
+#include <util/optional.h>
 
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_program.h>
 
 #include "source_lines.h"
+
+class message_handlert;
 
 class cover_blocks_baset
 {

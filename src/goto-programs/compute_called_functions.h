@@ -12,7 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_COMPUTE_CALLED_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_COMPUTE_CALLED_FUNCTIONS_H
 
-#include "goto_model.h"
+#include <unordered_set>
+
+#include <util/irep.h>
+
+class exprt;
+class goto_functionst;
+class goto_programt;
+class goto_modelt;
 
 // compute the set of functions whose address is taken
 

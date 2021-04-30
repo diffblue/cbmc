@@ -13,9 +13,10 @@ Author: Diffblue Ltd.
 #include <langapi/mode.h>
 #include <testing-utils/use_catch.h>
 #include <util/c_types.h>
-#include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
+
+#include <regex>
 
 refined_string_exprt convert_exprt_to_string_exprt_unit_test(
   java_string_library_preprocesst &preprocess,

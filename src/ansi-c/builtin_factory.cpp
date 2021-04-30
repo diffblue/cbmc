@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/string_utils.h>
 
-#include <ostream>
 #include <sstream>
 
 static bool find_pattern(

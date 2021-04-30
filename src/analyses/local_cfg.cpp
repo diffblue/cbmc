@@ -11,19 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "local_cfg.h"
 
-#if 0
-#include <iterator>
-#include <algorithm>
-
-#include <util/std_expr.h>
-#include <util/std_code.h>
-#include <util/expr_util.h>
-
-#include <util/c_types.h>
-#include <langapi/language_util.h>
-
-#endif
-
 void local_cfgt::build(const goto_programt &goto_program)
 {
   nodes.resize(goto_program.instructions.size());

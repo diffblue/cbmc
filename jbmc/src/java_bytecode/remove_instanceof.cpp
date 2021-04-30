@@ -10,17 +10,14 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Remove Instance-of Operators
 
 #include "remove_instanceof.h"
-#include "java_utils.h"
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/class_identifier.h>
-#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_model.h>
 
 #include <java_bytecode/java_types.h>
 
 #include <util/arith_tools.h>
-
-#include <sstream>
 
 class remove_instanceoft
 {

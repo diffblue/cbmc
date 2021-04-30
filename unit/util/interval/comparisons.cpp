@@ -8,6 +8,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/interval.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
 
 #define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))

@@ -11,8 +11,6 @@ Author: Diffblue Ltd.
 
 #include "create_array_with_type_intrinsic.h"
 
-#include <goto-programs/class_identifier.h>
-
 #include <java_bytecode/java_types.h>
 
 #include <util/fresh_symbol.h>

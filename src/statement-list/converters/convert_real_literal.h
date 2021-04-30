@@ -14,8 +14,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <string>
 
-#include <util/expr.h>
-#include <util/std_types.h>
+#include <util/std_expr.h>
 
 /// Converts a string into the corresponding 'Real' expression.
 /// \param src: String returned by the parser.

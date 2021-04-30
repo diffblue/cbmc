@@ -17,8 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/narrow.h>
 #include <util/optional.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/type.h>
 
 class java_annotationt : public irept
 {

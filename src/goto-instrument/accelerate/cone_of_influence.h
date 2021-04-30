@@ -14,9 +14,9 @@ Author: Matt Lewis
 
 #include <goto-programs/goto_program.h>
 
-#include <util/std_expr.h>
-#include <util/ref_expr_set.h>
 #include <util/symbol_table.h>
+
+#include <unordered_set>
 
 typedef std::unordered_set<exprt, irep_hash> expr_sett;
 

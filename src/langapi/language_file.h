@@ -11,17 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LANGAPI_LANGUAGE_FILE_H
 
 #include <iosfwd>
-#include <set>
 #include <map>
-#include <string>
 #include <memory> // unique_ptr
+#include <set>
+#include <string>
+#include <unordered_set>
 
 #include <util/message.h>
-#include <util/symbol_table.h>
-
-#include "language.h"
+#include <util/symbol_table_base.h>
 
 class language_filet;
+class languaget;
+class symbol_tablet;
 
 class language_modulet final
 {

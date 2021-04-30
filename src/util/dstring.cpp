@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dstring.h"
 
-#include <ostream>
-
 std::ostream &dstringt::operator<<(std::ostream &out) const
 {
   return out << as_string();

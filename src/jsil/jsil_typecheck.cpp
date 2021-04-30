@@ -13,7 +13,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <util/bitvector_types.h>
 #include <util/prefix.h>
-#include <util/std_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include "expr2jsil.h"

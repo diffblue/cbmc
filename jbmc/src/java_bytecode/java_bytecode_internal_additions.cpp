@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
+#include <util/symbol_table_base.h>
 
 void java_internal_additions(symbol_table_baset &dest)
 {

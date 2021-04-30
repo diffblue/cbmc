@@ -11,6 +11,12 @@ Author: Peter Schrammel
 
 #include "goto_symex_fault_localizer.h"
 
+#include <util/ui_message.h>
+
+#include <goto-symex/symex_target_equation.h>
+
+#include <solvers/stack_decision_procedure.h>
+
 goto_symex_fault_localizert::goto_symex_fault_localizert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,

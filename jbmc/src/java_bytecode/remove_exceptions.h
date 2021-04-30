@@ -14,10 +14,13 @@ Date:   December 2016
 #ifndef CPROVER_JAVA_BYTECODE_REMOVE_EXCEPTIONS_H
 #define CPROVER_JAVA_BYTECODE_REMOVE_EXCEPTIONS_H
 
-#include <goto-programs/class_hierarchy.h>
-#include <goto-programs/goto_model.h>
+#include <util/irep.h>
 
-#include <util/message.h>
+class class_hierarchyt;
+class goto_modelt;
+class goto_programt;
+class message_handlert;
+class symbol_table_baset;
 
 #define INFLIGHT_EXCEPTION_VARIABLE_BASENAME "@inflight_exception"
 #define INFLIGHT_EXCEPTION_VARIABLE_NAME \

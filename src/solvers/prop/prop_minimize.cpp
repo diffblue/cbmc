@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 
 #include "literal_expr.h"
+#include "prop_conv.h"
 
 prop_minimizet::prop_minimizet(
   prop_convt &_prop_conv,

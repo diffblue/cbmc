@@ -17,8 +17,9 @@
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
-#include <util/simplify_expr.h>
 #include <util/std_expr.h>
+
+#include "abstract_environment.h"
 
 /// Build a topstack
 write_stackt::write_stackt() : stack(), top_stack(true)

@@ -13,12 +13,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_CPP_CPP_TYPECHECK_H
 
 #include <list>
-#include <map>
 #include <set>
 #include <unordered_set>
 
 #include <util/std_code.h>
-#include <util/std_types.h>
 
 #include <ansi-c/c_typecheck_base.h>
 
@@ -26,9 +24,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_scopes.h"
 #include "cpp_typecheck_resolve.h"
 #include "template_map.h"
-#include "cpp_member_spec.h"
-#include "cpp_template_type.h"
-#include "cpp_util.h"
 
 bool cpp_typecheck(
   cpp_parse_treet &cpp_parse_tree,

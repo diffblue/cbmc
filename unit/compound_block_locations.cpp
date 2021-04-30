@@ -25,7 +25,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <util/cmdline.h>
 #include <util/config.h>
-#include <util/cout_message.h>
 #include <util/options.h>
 #include <util/tempfile.h>
 

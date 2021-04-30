@@ -14,9 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 #include <map>
+#include <unordered_set>
 
-#include <goto-programs/goto_model.h>
 #include <util/graph.h>
+
+#include <goto-programs/goto_program.h>
+
+class goto_functionst;
+class goto_modelt;
 
 /// A call graph (https://en.wikipedia.org/wiki/Call_graph) for a GOTO model
 /// or GOTO functions collection.

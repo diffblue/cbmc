@@ -13,9 +13,7 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 
 #include <util/byte_operators.h>
 #include <util/mathematical_expr.h>
-#include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 SCENARIO("expr_dynamic_cast",
   "[core][utils][expr_cast][expr_dynamic_cast]")

@@ -23,22 +23,24 @@ Date: June 2006
 #include <util/get_base_name.h>
 #include <util/prefix.h>
 #include <util/run.h>
-#include <util/suffix.h>
 #include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
 #include <util/tempfile.h>
-#include <util/unicode.h>
 #include <util/version.h>
 
-#include <ansi-c/ansi_c_entry_point.h>
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
-#include <goto-programs/goto_convert.h>
+#include <ansi-c/ansi_c_entry_point.h>
+#include <ansi-c/c_object_factory_parameters.h>
+
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/name_mangler.h>
 #include <goto-programs/read_goto_binary.h>
-#include <goto-programs/validate_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <langapi/language.h>
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
 

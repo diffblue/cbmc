@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "boolbv_type.h"
+
+#include <util/type.h>
 
 bvtypet get_bvtype(const typet &type)
 {

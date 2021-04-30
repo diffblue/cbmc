@@ -21,6 +21,8 @@ Date: September 2011
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/goto_model.h>
+
 class nondet_volatilet
 {
 public:

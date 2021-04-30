@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include <util/byte_operators.h>
-#include <util/exit_codes.h>
 #include <util/json_irep.h>
 #include <util/ui_message.h>
 

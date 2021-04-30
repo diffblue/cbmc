@@ -8,12 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_arithmetic.h"
 
-#include <ostream>
-
 #include "arith_tools.h"
 #include "bitvector_types.h"
 #include "std_expr.h"
-#include "string2int.h"
 
 typet bv_spect::to_type() const
 {

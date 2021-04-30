@@ -13,16 +13,16 @@ Date: April 2010
 #define CPROVER_ANALYSES_GOTO_RW_H
 
 #include <iosfwd>
-#include <limits>
 #include <map>
 #include <memory> // unique_ptr
 
 #include "guard.h"
 
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_program.h>
+
+class goto_functionst;
 
 class rw_range_sett;
-class goto_modelt;
 
 void goto_rw(
   const irep_idt &function,
@@ -91,15 +91,9 @@ public:
   void push_back(sub_typet::value_type &&v) { data.push_back(std::move(v)); }
 };
 
-class array_exprt;
 class byte_extract_exprt;
 class dereference_exprt;
-class if_exprt;
-class index_exprt;
-class member_exprt;
 class shift_exprt;
-class struct_exprt;
-class typecast_exprt;
 
 class rw_range_sett
 {

@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_qualifiers.h"
 
-#include <ostream>
 #include <util/make_unique.h>
+#include <util/type.h>
 
 c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
 {

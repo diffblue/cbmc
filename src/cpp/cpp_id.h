@@ -12,17 +12,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_ID_H
 #define CPROVER_CPP_CPP_ID_H
 
-#include <list>
 #include <map>
 #include <string>
-#include <set>
 #include <iosfwd>
 
 #include <util/expr.h>
 #include <util/invariant.h>
-#include <util/std_types.h>
-
-class cpp_scopet;
 
 class cpp_idt
 {

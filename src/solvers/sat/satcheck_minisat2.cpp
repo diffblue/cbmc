@@ -8,14 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_minisat2.h"
 
-#ifndef _MSC_VER
-#include <inttypes.h>
-#include <signal.h>
-#include <unistd.h>
+#ifndef _WIN32
+#  include <signal.h>
+#  include <unistd.h>
 #endif
 
 #include <limits>
-#include <stack>
 
 #include <util/invariant.h>
 #include <util/make_unique.h>

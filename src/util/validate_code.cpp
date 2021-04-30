@@ -12,9 +12,7 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
-#include "namespace.h"
 #include "std_code.h"
-#include "validate.h"
 #include "validate_helpers.h"
 
 #define CALL_ON_CODE(code_type)                                                \

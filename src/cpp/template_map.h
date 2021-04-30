@@ -17,8 +17,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/expr.h>
 
-#include "cpp_template_type.h"
 #include "cpp_template_args.h"
+
+struct template_parametert;
+class template_typet;
 
 class template_mapt
 {

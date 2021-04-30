@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/invariant.h>
 
-#include "cpp_scope.h"
-
 cpp_idt::cpp_idt():
   is_member(false),
   is_method(false),

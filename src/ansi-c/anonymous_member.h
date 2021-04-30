@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_ANONYMOUS_MEMBER_H
 
 #include <util/expr.h>
-#include <util/namespace.h>
+
+class namespacet;
 
 exprt get_component_rec(
   const exprt &struct_union,

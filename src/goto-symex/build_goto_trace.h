@@ -15,7 +15,6 @@ Date: July 2005
 #define CPROVER_GOTO_SYMEX_BUILD_GOTO_TRACE_H
 
 #include "symex_target_equation.h"
-#include "goto_symex_state.h"
 
 /// Build a trace by going through the steps of \p target and stopping at the
 /// first failing assertion

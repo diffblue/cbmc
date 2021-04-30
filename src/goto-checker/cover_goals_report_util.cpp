@@ -15,6 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/json.h>
 #include <util/json_irep.h>
+#include <util/json_stream.h>
 #include <util/ui_message.h>
 #include <util/xml.h>
 #include <util/xml_irep.h>

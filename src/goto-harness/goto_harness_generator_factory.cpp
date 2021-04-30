@@ -10,14 +10,9 @@ Author: Diffblue Ltd.
 
 #include <util/exception_utils.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/string_utils.h>
 
-#include <algorithm>
-#include <functional>
-#include <iterator>
-#include <sstream>
-#include <string>
+#include "goto_harness_generator.h"
 
 void goto_harness_generator_factoryt::register_generator(
   std::string generator_name,

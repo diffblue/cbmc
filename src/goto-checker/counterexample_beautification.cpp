@@ -11,10 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "counterexample_beautification.h"
 
-#include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/symbol.h>
-#include <util/threeval.h>
 
 #include <solvers/prop/prop_minimize.h>
 

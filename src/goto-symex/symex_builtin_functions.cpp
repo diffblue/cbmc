@@ -17,13 +17,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant_utils.h>
-#include <util/optional.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/simplify_expr.h>
-#include <util/string2int.h>
 #include <util/string_constant.h>
+
+#include "path_storage.h"
 
 inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
 {

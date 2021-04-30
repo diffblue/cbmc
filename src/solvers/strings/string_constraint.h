@@ -20,13 +20,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 
-#include "string_refinement_invariant.h"
-
-#include <solvers/refinement/bv_refinement.h>
-
 #include <util/format_expr.h>
-#include <util/format_type.h>
-#include <util/refined_string_type.h>
 #include <util/string_expr.h>
 #include <util/union_find_replace.h>
 

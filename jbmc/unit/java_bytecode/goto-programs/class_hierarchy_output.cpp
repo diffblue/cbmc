@@ -12,7 +12,6 @@ Author: Diffblue Ltd.
 #include <goto-programs/class_hierarchy.h>
 
 #include <iostream>
-#include <sstream>
 
 void require_parent_child_relationship(
   const std::string &parent_raw,

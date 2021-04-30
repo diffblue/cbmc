@@ -11,6 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_verifier.h"
 
+#include <util/ui_message.h>
+
 goto_verifiert::goto_verifiert(
   const optionst &_options,
   ui_message_handlert &ui_message_handler)

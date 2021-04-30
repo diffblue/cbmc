@@ -12,11 +12,10 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_H
 
-#include <util/ui_message.h>
-
 class namespacet;
 class goto_modelt;
 class goto_functionst;
+class ui_message_handlert;
 
 // clang-format off
 #define OPT_SHOW_GOTO_FUNCTIONS \

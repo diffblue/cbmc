@@ -13,12 +13,11 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-
-#include "goto_functions.h"
 
 #define LOG(message, irep)                                                     \
   do                                                                           \

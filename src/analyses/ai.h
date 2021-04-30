@@ -46,11 +46,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_AI_H
 
 #include <iosfwd>
-#include <map>
 #include <memory>
 
 #include <util/deprecate.h>
-#include <util/expr.h>
 #include <util/json.h>
 #include <util/make_unique.h>
 #include <util/xml.h>

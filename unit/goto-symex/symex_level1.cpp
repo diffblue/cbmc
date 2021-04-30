@@ -6,12 +6,13 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
-#include <goto-symex/goto_symex_state.h>
 #include <goto-symex/renaming_level.h>
+
+#include <util/bitvector_types.h>
 #include <util/namespace.h>
+#include <util/ssa_expr.h>
 #include <util/symbol_table.h>
 
 SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")

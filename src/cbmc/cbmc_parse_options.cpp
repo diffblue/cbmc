@@ -18,12 +18,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/config.h>
-#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
-#include <util/unicode.h>
 #include <util/version.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <langapi/language.h>
 
@@ -50,7 +52,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
-#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
@@ -62,7 +63,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/validate_goto_model.h>
 
 #include <goto-instrument/cover.h>
 #include <goto-instrument/full_slicer.h>

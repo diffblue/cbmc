@@ -6,19 +6,12 @@
 
 \*******************************************************************/
 
-#include <array>
 #include <iostream>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
 
-#include <goto-programs/adjust_float_expressions.h>
-#include <util/arith_tools.h>
-#include <util/ieee_float.h>
-#include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/type.h>
 
 #include "abstract_object.h"
 

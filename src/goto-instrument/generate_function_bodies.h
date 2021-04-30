@@ -12,13 +12,13 @@ Author: Diffblue Ltd.
 #include <memory>
 #include <regex>
 
-#include <ansi-c/c_object_factory_parameters.h>
-#include <goto-programs/goto_function.h>
-#include <goto-programs/goto_model.h>
-#include <util/cmdline.h>
-#include <util/message.h>
-#include <util/std_code.h>
-#include <util/std_types.h>
+#include <util/irep.h>
+
+class goto_functiont;
+class goto_modelt;
+class message_handlert;
+class symbol_tablet;
+struct c_object_factory_parameterst;
 
 /// Base class for replace_function_body implementations
 class generate_function_bodiest

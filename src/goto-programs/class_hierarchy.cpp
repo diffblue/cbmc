@@ -19,6 +19,7 @@ Date: April 2016
 #include <util/json_stream.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
+#include <util/ui_message.h>
 
 /// Populate the class hierarchy graph, such that there is a node for every
 /// struct type in the symbol table and an edge representing each superclass

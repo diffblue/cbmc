@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_ANSI_C_DECLARATION_H
 
 #include <util/std_expr.h>
-#include <util/symbol.h>
+
+class symbolt;
 
 class ansi_c_declaratort : public nullary_exprt
 {

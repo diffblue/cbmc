@@ -15,11 +15,8 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/irep_ids.h>
-
-#include <memory>
-
 #include "java_object_factory.h" // gen_nondet_init
+#include "java_object_factory_parameters.h"
 #include "java_utils.h"
 
 /// Returns true if `expr` is a nondet pointer that isn't a function pointer or

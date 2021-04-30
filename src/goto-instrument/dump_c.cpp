@@ -18,7 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/replace_symbol.h>
+#include <util/std_code.h>
 #include <util/string_utils.h>
 
 #include <ansi-c/expr2c.h>

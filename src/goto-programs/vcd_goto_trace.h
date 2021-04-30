@@ -16,9 +16,8 @@ Date: June 2011
 
 #include <iosfwd>
 
-#include <util/namespace.h>
-
-#include "goto_trace.h"
+class goto_tracet;
+class namespacet;
 
 void output_vcd(
   const namespacet &ns,

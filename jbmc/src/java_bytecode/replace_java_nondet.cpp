@@ -11,7 +11,6 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 #include "replace_java_nondet.h"
 
-#include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 

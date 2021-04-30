@@ -20,11 +20,18 @@ Author: Diffblue Ltd.
 #include <unordered_map>
 #include <unordered_set>
 
-#include <util/cmdline.h>
+#include <util/exception_utils.h>
 #include <util/irep.h>
+#include <util/optional.h>
 
-#include <goto-programs/goto_model.h>
-#include <util/options.h>
+#include "goto_program.h"
+
+class cmdlinet;
+class goto_functiont;
+class goto_modelt;
+class jsont;
+class message_handlert;
+class optionst;
 
 #define RESTRICT_FUNCTION_POINTER_OPT "restrict-function-pointer"
 #define RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                \
@@ -56,9 +63,6 @@ Author: Diffblue Ltd.
 void parse_function_pointer_restriction_options_from_cmdline(
   const cmdlinet &cmdline,
   optionst &options);
-
-class jsont;
-class message_handlert;
 
 class function_pointer_restrictionst
 {

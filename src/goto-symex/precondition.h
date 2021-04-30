@@ -12,9 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_PRECONDITION_H
 #define CPROVER_GOTO_SYMEX_PRECONDITION_H
 
-#include <pointer-analysis/value_sets.h>
+#include "goto-programs/goto_program.h"
 
-#include "symex_target_equation.h"
+class exprt;
+class namespacet;
+class symex_target_equationt;
+class value_setst;
 
 void precondition(
   const namespacet &ns,

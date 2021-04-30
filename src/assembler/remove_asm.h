@@ -52,8 +52,7 @@ Date:   December 2014
 #ifndef CPROVER_ASSEMBLER_REMOVE_ASM_H
 #define CPROVER_ASSEMBLER_REMOVE_ASM_H
 
-#include <goto-programs/goto_functions.h>
-
+class goto_functionst;
 class goto_modelt;
 class symbol_tablet;
 

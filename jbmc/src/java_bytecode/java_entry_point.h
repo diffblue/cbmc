@@ -10,11 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 #define CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 
-#include "java_bytecode_language.h"
-#include "select_pointer_type.h"
-
 #include <util/irep.h>
 #include <util/symbol.h>
+
+class code_blockt;
+class select_pointer_typet;
+class symbol_table_baset;
+struct java_object_factory_parameterst;
 
 #define JAVA_ENTRY_POINT_RETURN_SYMBOL "return'"
 #define JAVA_ENTRY_POINT_EXCEPTION_SYMBOL "uncaught_exception'"

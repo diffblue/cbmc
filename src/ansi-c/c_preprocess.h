@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <string>
 
-#include <util/message.h>
+class message_handlert;
 
 bool c_preprocess(
   const std::string &path,

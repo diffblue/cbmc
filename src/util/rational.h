@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mp_arith.h"
 
-class constant_exprt;
-
 class rationalt
 {
 protected:

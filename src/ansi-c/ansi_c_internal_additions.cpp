@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_internal_additions.h"
 
-#include <limits>
-
 #include <util/c_types.h>
 #include <util/config.h>
 

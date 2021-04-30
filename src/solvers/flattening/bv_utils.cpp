@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_utils.h"
 
-#include <util/arith_tools.h>
-
 bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
 {
   std::string n_str=integer2binary(n, width);

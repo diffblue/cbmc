@@ -18,10 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "deprecate.h"
 #include "invariant.h"
 #include "source_location.h"
-#include "structured_data.h"
 
 class json_objectt;
 class jsont;
+class structured_datat;
 class xmlt;
 
 class message_handlert

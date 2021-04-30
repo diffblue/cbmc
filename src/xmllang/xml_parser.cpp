@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_parser.h"
 
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
 
 xml_parsert xml_parser;

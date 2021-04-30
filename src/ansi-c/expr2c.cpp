@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/string_constant.h>
 #include <util/string_utils.h>

@@ -14,7 +14,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_parse_tree.h"
 #include <langapi/language.h>
-#include <util/make_unique.h>
+
 #include <util/object_factory_parameters.h>
 
 /// Implements the language interface for the Statement List language.

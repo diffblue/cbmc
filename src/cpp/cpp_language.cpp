@@ -12,11 +12,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_language.h"
 
 #include <cstring>
-#include <sstream>
 #include <fstream>
 
 #include <util/config.h>
-#include <util/replace_symbol.h>
 #include <util/get_base_name.h>
 
 #include <linking/linking.h>

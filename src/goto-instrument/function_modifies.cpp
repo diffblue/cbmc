@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
+#include <analyses/local_may_alias.h>
+
 #include "loop_utils.h"
 
 void function_modifiest::get_modifies(

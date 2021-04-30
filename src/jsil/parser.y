@@ -11,7 +11,6 @@ extern char *yyjsiltext;
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1
 
-#include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/string_constant.h>
 

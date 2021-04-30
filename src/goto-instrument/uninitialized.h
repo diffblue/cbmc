@@ -16,7 +16,7 @@ Date: January 2010
 
 #include <iosfwd>
 
-#include <goto-programs/goto_model.h>
+class goto_modelt;
 
 void add_uninitialized_locals_assertions(goto_modelt &);
 

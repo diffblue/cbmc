@@ -13,7 +13,10 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_LOAD_METHOD_BY_REGEX_H
 #define CPROVER_JAVA_BYTECODE_LOAD_METHOD_BY_REGEX_H
 
-#include <java_bytecode/ci_lazy_methods.h>
+#include <util/irep.h>
+
+#include <functional>
+#include <vector>
 
 class symbol_tablet;
 

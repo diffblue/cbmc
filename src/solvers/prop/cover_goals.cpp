@@ -12,9 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cover_goals.h"
 
 #include <util/message.h>
-#include <util/threeval.h>
-
-#include "literal_expr.h"
+#include <util/std_expr.h>
 
 cover_goalst::~cover_goalst()
 {

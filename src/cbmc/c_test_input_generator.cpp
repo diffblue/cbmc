@@ -16,11 +16,11 @@ Author: Daniel Kroening, Peter Schrammel
 #include <langapi/language_util.h>
 
 #include <util/json.h>
-#include <util/json_irep.h>
+#include <util/json_stream.h>
 #include <util/options.h>
 #include <util/string_utils.h>
+#include <util/ui_message.h>
 #include <util/xml.h>
-#include <util/xml_irep.h>
 
 #include <goto-programs/json_expr.h>
 #include <goto-programs/json_goto_trace.h>

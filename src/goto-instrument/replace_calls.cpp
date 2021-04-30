@@ -13,14 +13,14 @@ Author: Daniel Poetzl
 
 #include "replace_calls.h"
 
-#include <goto-programs/remove_returns.h>
-
 #include <util/base_type.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
-#include <util/irep.h>
+#include <util/namespace.h>
 #include <util/string_utils.h>
-#include <util/suffix.h>
+
+#include <goto-programs/goto_model.h>
+#include <goto-programs/remove_returns.h>
 
 /// Replace function calls with calls to other functions
 /// \param goto_model: goto model to modify

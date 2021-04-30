@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <set>
 
+#include "cpp_typecheck_fargs.h"
+
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
   std::set<irep_idt> bases;

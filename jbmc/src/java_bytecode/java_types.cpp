@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iterator>
 
 #include <util/prefix.h>
-#include <util/std_types.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/ieee_float.h>

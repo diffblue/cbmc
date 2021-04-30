@@ -10,7 +10,6 @@ Author: Romain Brenguier, Joel Allred
 ///  Built-in function for String.format
 
 #include <iterator>
-#include <math.h>
 #include <string>
 
 #include "format_specifier.h"
@@ -18,9 +17,9 @@ Author: Romain Brenguier, Joel Allred
 #include "string_refinement_util.h"
 
 #include <util/bitvector_expr.h>
+#include <util/message.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
 
 static exprt format_arg_from_string(
   const array_string_exprt &string,

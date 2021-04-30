@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/prefix.h>
-#include <util/simplify_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 

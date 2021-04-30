@@ -13,8 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_GOTO_CHECK_H
 
 #include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_model.h>
 
+class goto_modelt;
 class namespacet;
 class optionst;
 

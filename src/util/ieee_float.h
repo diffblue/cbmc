@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mp_arith.h"
 #include "format_spec.h"
-#include "irep.h"
 #include "cprover_prefix.h"
 
 class constant_exprt;

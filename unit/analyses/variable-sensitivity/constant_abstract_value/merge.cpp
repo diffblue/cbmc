@@ -10,6 +10,7 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
 static merge_result<const constant_abstract_valuet>

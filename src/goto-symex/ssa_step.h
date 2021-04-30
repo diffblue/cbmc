@@ -9,6 +9,8 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 #ifndef CPROVER_GOTO_SYMEX_SSA_STEP_H
 #define CPROVER_GOTO_SYMEX_SSA_STEP_H
 
+#include <util/ssa_expr.h>
+
 #include <goto-programs/goto_trace.h>
 
 #include "symex_target.h"

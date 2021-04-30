@@ -14,7 +14,6 @@ Author: CM Wintersteiger
 #include <fstream>
 
 #include <util/exception_utils.h>
-#include <util/invariant.h>
 #include <util/irep_serialization.h>
 #include <util/message.h>
 #include <util/symbol_table.h>

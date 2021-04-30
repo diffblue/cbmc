@@ -10,11 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
-#include "expr.h"
 #include "expr_util.h"
-#include "invariant.h"
 #include "mathematical_expr.h"
-#include "namespace.h"
 #include "std_expr.h"
 
 simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)

@@ -9,7 +9,6 @@ Author: Diffblue Ltd
 #include "mz_zip_archive.h"
 #include <stdexcept>
 #include <string>
-#include <vector>
 #include <algorithm>
 #define _LARGEFILE64_SOURCE 1
 #include <miniz/miniz.h>

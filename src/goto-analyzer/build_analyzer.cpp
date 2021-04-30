@@ -12,11 +12,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <analyses/call_stack_history.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
-#include <analyses/goto_check.h>
 #include <analyses/interval_domain.h>
-#include <analyses/is_threaded.h>
 #include <analyses/local_control_flow_history.h>
-#include <analyses/local_may_alias.h>
 #include <analyses/variable-sensitivity/three_way_merge_abstract_interpreter.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
@@ -25,7 +22,6 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <goto-programs/goto_model.h>
 
-#include <util/namespace.h>
 #include <util/options.h>
 
 /// Ideally this should be a pure function of options.

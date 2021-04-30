@@ -13,10 +13,8 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H
 
 #include <iosfwd>
-#include <vector>
 
 #include <analyses/variable-sensitivity/abstract_aggregate_object.h>
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
 
 class ai_baset;
 

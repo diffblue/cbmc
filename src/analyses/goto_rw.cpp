@@ -10,8 +10,6 @@ Date: April 2010
 
 #include "goto_rw.h"
 
-#include <algorithm>
-#include <limits>
 #include <memory>
 
 #include <util/arith_tools.h>
@@ -24,7 +22,6 @@ Date: April 2010
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 #include <langapi/language_util.h>
 

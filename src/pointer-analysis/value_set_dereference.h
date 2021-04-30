@@ -12,16 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 
-#include <unordered_set>
-
-#include <util/message.h>
 #include <util/std_expr.h>
 
-#include "dereference_callback.h"
-
+class dereference_callbackt;
+class messaget;
 class symbol_tablet;
-class optionst;
-class symbolt;
 
 /// Wrapper for a function dereferencing pointer expressions using a value set.
 class value_set_dereferencet final

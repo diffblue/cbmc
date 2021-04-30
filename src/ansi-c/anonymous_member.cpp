@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "anonymous_member.h"
 
-#include <util/std_types.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
 
 static member_exprt make_member_expr(

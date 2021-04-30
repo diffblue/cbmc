@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 #include <util/c_types.h>
 #include <langapi/language_util.h>

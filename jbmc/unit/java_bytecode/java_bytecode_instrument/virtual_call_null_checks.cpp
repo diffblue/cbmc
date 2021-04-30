@@ -13,7 +13,6 @@ Author: Diffblue Limited.
 
 #include <analyses/local_safe_pointers.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <java_bytecode/java_bytecode_language.h>
 #include <util/expr_iterator.h>
 
 // We're expecting a call "something->field . B.virtualmethod()":

@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/mathematical_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 class qualifierst;
 class namespacet;

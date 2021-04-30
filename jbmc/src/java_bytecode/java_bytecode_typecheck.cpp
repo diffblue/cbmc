@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_typecheck.h"
 
-#include <util/std_types.h>
-#include <util/prefix.h>
-
 #include "expr2java.h"
 
 std::string java_bytecode_typecheckt::to_string(const exprt &expr)

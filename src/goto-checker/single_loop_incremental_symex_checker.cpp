@@ -15,6 +15,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <chrono>
 
+#include <util/structured_data.h>
+
 #include <goto-symex/slice.h>
 
 #include "bmc_util.h"

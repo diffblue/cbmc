@@ -12,16 +12,12 @@ Author: Thomas Kiley
 #include "show_goto_functions_json.h"
 
 #include <iostream>
-#include <sstream>
 
 #include <util/json_irep.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
-#include <langapi/language_util.h>
-
 #include "goto_functions.h"
-#include "goto_model.h"
 
 /// For outputting the GOTO program in a readable JSON format.
 /// \param _ns: the namespace to use to resolve names with

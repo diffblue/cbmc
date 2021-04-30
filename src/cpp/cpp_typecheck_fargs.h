@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_FARGS_H
 #define CPROVER_CPP_CPP_TYPECHECK_FARGS_H
 
-#include <util/std_code.h>
+#include <util/expr.h>
 
-class cpp_typecheckt;
 class code_typet;
+class cpp_typecheckt;
+class side_effect_expr_function_callt;
 
 class cpp_typecheck_fargst // for function overloading
 {

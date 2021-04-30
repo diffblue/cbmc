@@ -10,10 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_C_TYPECAST_H
 #define CPROVER_ANSI_C_C_TYPECAST_H
 
-#include <util/namespace.h>
-#include <util/expr.h>
-
 #include <list>
+#include <string>
+
+class exprt;
+class namespacet;
+class typet;
 
 // try a type cast from expr.type() to type
 //

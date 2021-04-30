@@ -13,6 +13,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <chrono>
 
+#include <util/ui_message.h>
+
 #include <solvers/hardness_collector.h>
 
 #include "bmc_util.h"

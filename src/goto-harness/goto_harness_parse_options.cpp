@@ -8,7 +8,6 @@ Author: Diffblue Ltd.
 
 #include "goto_harness_parse_options.h"
 
-#include <cstddef>
 #include <fstream>
 #include <set>
 #include <string>
@@ -18,16 +17,14 @@ Author: Diffblue Ltd.
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
-#include <util/expr_iterator.h>
 #include <util/invariant.h>
+#include <util/make_unique.h>
 #include <util/suffix.h>
 #include <util/version.h>
 
 #include <goto-instrument/dump_c.h>
-#include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
-#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include "function_call_harness_generator.h"

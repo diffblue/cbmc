@@ -8,6 +8,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,8 @@ Author: Diffblue Ltd.
 
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
+
+#include <util/symbol.h>
 
 SCENARIO("Test that the generic signature delimiter lookup works reliably",
          "[core][java_util_test]")

@@ -12,9 +12,11 @@
 #include "interval_abstract_value.h"
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
-#include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+
 #include <util/make_unique.h>
+
+#include "abstract_environment.h"
 
 static index_range_implementation_ptrt
 make_value_set_index_range(const std::set<exprt> &vals);

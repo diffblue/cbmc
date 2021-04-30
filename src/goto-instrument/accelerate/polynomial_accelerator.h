@@ -18,15 +18,14 @@ Author: Matt Lewis
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
 
-#include "scratch_program.h"
 #include "polynomial.h"
 #include "path.h"
-#include "accelerator.h"
 #include "acceleration_utils.h"
 #include "cone_of_influence.h"
-#include "overflow_instrumenter.h"
+
+class path_acceleratort;
+class overflow_instrumentert;
 
 class polynomial_acceleratort
 {

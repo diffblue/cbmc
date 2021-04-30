@@ -9,12 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include <algorithm>
-#include <map>
-#include <set>
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/byte_operators.h>
 #include <util/config.h>
 #include <util/floatbv_expr.h>
 #include <util/magic.h>
@@ -22,16 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/string2int.h>
 #include <util/string_constant.h>
-#include <util/symbol.h>
-#include <util/threeval.h>
-
-#include "boolbv_type.h"
 
 #include <solvers/floatbv/float_utils.h>
-#include <solvers/lowering/expr_lowering.h>
 
 endianness_mapt boolbvt::endianness_map(const typet &type) const
 {

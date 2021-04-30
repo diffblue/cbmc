@@ -14,7 +14,7 @@ Author:
 
 #include <iosfwd>
 
-#include <goto-programs/goto_model.h>
+class goto_modelt;
 
 void horn_encoding(
   const goto_modelt &,

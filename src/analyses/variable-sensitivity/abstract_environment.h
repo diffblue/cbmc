@@ -17,16 +17,9 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 
-#include <iosfwd>
-#include <map>
 #include <memory>
-#include <stack>
-#include <vector>
 
-#include "abstract_object_statistics.h"
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <util/sharing_map.h>
-#include <util/std_expr.h>
 
 class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =

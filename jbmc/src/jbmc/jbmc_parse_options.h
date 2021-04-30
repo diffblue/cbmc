@@ -27,17 +27,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/show_properties.h>
 
-#include <goto-symex/path_storage.h>
-
 #include <solvers/strings/string_refinement.h>
 
 #include <java_bytecode/java_bytecode_language.h>
-#include <java_bytecode/lazy_goto_model.h>
+#include <java_bytecode/java_trace_validation.h>
 
 #include <json/json_interface.h>
 #include <xmllang/xml_interface.h>
 
-class goto_functionst;
+class goto_functiont;
+class goto_model_functiont;
 class optionst;
 
 // clang-format off

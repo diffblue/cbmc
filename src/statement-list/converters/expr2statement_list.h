@@ -10,10 +10,19 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #define CPROVER_STATEMENT_LIST_CONVERTERS_EXPR2STATEMENT_LIST_H
 
 #include <util/irep.h>
-#include <util/namespace.h>
-#include <util/std_expr.h>
 
 #include <string>
+
+class and_exprt;
+class equal_exprt;
+class exprt;
+class namespacet;
+class notequal_exprt;
+class not_exprt;
+class or_exprt;
+class symbol_exprt;
+class typet;
+class xor_exprt;
 
 /// Converts a given expression to human-readable STL code.
 /// \param expr: Expression to be converted.

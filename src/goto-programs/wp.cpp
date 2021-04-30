@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 #include <util/invariant.h>
 

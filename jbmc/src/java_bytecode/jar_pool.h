@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <string>
 
-class jar_filet;
+#include "jar_file.h"
 
 /// A chache for jar_filet objects, by file name
 class jar_poolt

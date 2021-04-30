@@ -12,17 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 
-#include "java_types.h"
-
 #include <set>
-#include <map>
 
 #include <util/journalling_symbol_table.h>
 #include <util/typecheck.h>
 #include <util/namespace.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
+
+class codet;
+class side_effect_exprt;
 
 bool java_bytecode_typecheck(
   symbol_table_baset &symbol_table,

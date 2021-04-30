@@ -12,13 +12,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   types, in particular int, long, float, double, char, bool
 
 #include "string_constraint_generator.h"
-#include "string_refinement_invariant.h"
 
 #include <util/deprecate.h>
+#include <util/mathematical_expr.h>
 #include <util/simplify_expr.h>
 
 #include <cmath>
-#include <solvers/floatbv/float_bv.h>
 
 /// If the expression is a constant expression then we get the value of it as
 /// an unsigned long. If not we return a default value.

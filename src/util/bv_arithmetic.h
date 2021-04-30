@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_spec.h"
 
 class constant_exprt;
-class exprt;
 class typet;
 
 class bv_spect

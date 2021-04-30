@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "add_failed_symbols.h"
 
-#include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/symbol_table_base.h>
 
 #include <list>
 

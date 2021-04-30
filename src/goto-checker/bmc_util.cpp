@@ -11,7 +11,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "bmc_util.h"
 
-#include <fstream>
 #include <iostream>
 
 #include <goto-programs/graphml_witness.h>
@@ -27,6 +26,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <solvers/decision_procedure.h>
 
+#include <util/json_stream.h>
 #include <util/make_unique.h>
 #include <util/ui_message.h>
 

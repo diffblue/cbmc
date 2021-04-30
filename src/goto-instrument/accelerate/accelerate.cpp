@@ -19,16 +19,14 @@ Author: Matt Lewis
 #include <util/arith_tools.h>
 #include <util/find_symbols.h>
 
-#include <ansi-c/expr2c.h>
-
 #include <iostream>
 #include <list>
 
-#include "path.h"
-#include "polynomial_accelerator.h"
+#include "accelerator.h"
 #include "enumerating_loop_acceleration.h"
-#include "disjunctive_polynomial_acceleration.h"
 #include "overflow_instrumenter.h"
+#include "path.h"
+#include "scratch_program.h"
 #include "util.h"
 
 goto_programt::targett acceleratet::find_back_jump(

@@ -11,7 +11,6 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include <cstdlib>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <type_traits>
 

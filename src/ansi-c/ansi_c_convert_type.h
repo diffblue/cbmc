@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
+#include <util/expr.h>
 #include <util/message.h>
 
 #include "c_qualifiers.h"

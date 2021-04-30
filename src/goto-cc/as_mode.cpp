@@ -21,8 +21,8 @@ Author: Michael Tautschnig
 
 #include <fstream>
 #include <iostream>
-#include <cstring>
 
+#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
 #include <util/get_base_name.h>
@@ -31,6 +31,7 @@ Author: Michael Tautschnig
 #include <util/version.h>
 
 #include "compile.h"
+#include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
 
 static std::string assembler_name(

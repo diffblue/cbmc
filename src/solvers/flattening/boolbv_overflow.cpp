@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include <util/invariant.h>
-#include <util/prefix.h>
-#include <util/string2int.h>
 
 literalt boolbvt::convert_overflow(const exprt &expr)
 {

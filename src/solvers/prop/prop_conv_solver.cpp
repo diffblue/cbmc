@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <chrono>
 
+#include "literal_expr.h"
+
 bool prop_conv_solvert::is_in_conflict(const exprt &expr) const
 {
   return prop.is_in_conflict(to_literal_expr(expr).get_literal());

@@ -6,15 +6,15 @@
 #define CPROVER_GOTO_CC_LINKER_SCRIPT_MERGE_H
 
 #include <functional>
+#include <map>
 
-#include <util/json.h>
 #include <util/message.h>
-#include <util/std_expr.h>
 
-#include "gcc_cmdline.h"
-
+class cmdlinet;
+class exprt;
 class goto_modelt;
 class goto_programt;
+class symbol_exprt;
 class symbol_tablet;
 
 /// \brief Patterns of expressions that should be replaced

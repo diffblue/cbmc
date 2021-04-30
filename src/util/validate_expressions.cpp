@@ -13,12 +13,8 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
-#include "expr.h"
-#include "namespace.h"
 #include "pointer_expr.h"
 #include "ssa_expr.h"
-#include "std_expr.h"
-#include "validate.h"
 
 #define CALL_ON_EXPR(expr_type)                                                \
   C<exprt, expr_type>()(expr, std::forward<Args>(args)...)

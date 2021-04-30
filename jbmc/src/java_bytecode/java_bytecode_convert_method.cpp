@@ -24,9 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 #include "lambda_synthesis.h"
 #include "pattern.h"
-#include "remove_exceptions.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/floatbv_expr.h>
@@ -34,24 +34,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
-#include <util/simplify_expr.h>
+#include <util/prefix_filter.h>
 #include <util/std_expr.h>
-#include <util/string2int.h>
 #include <util/threeval.h>
 
-#include <goto-programs/cfg.h>
-#include <goto-programs/class_hierarchy.h>
-#include <goto-programs/remove_returns.h>
 #include <goto-programs/resolve_inherited_component.h>
 
-#include <analyses/cfg_dominators.h>
 #include <analyses/uncaught_exceptions_analysis.h>
 
 #include <algorithm>
-#include <functional>
 #include <limits>
-#include <regex>
-#include <unordered_set>
 
 /// Iterates through the parameters of the function type \p ftype, finds a new
 /// new name for each parameter and renames them in `ftype.parameters()` as

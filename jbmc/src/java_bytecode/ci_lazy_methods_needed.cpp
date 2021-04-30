@@ -15,10 +15,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <util/namespace.h>
 #include <util/std_types.h>
+#include <util/symbol_table.h>
 
-#include <string>
-
+#include "generic_parameter_specialization_map.h"
 #include "java_static_initializers.h"
+#include "java_types.h"
 #include "select_pointer_type.h"
 
 /// Notes `method_symbol_name` is referenced from some reachable function, and

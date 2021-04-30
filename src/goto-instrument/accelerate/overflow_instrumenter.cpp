@@ -15,9 +15,7 @@ Author: Matt Lewis
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
-#include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 #include <goto-programs/goto_program.h>
 

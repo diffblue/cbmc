@@ -12,7 +12,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 ///
 /// Implementation of the GDB/MI API for extracting values of expressions.
 
-#include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
@@ -21,8 +20,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <iostream>
 
 #include "gdb_api.h"
-
-#include <goto-programs/goto_model.h>
 
 #include <util/prefix.h>
 #include <util/string2int.h>

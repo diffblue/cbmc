@@ -11,15 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
-#include <util/cprover_prefix.h>
-#include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
-#include <util/simplify_expr.h>
 #include <util/std_expr.h>
-
-#include <util/c_types.h>
 
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,

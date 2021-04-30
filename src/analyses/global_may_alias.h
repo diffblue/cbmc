@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai.h"
 
-class global_may_alias_analysist;
-
 class global_may_alias_domaint:public ai_domain_baset
 {
 public:

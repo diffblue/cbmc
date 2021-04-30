@@ -12,32 +12,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 
-#include <util/options.h>
 #include <util/message.h>
 
-#include <goto-programs/abstract_goto_model.h>
-
 #include "complexity_limiter.h"
-#include "path_storage.h"
 #include "symex_config.h"
 
-class byte_extract_exprt;
-class function_application_exprt;
-class typet;
-class code_typet;
-class symbol_tablet;
-class code_assignt;
+class address_of_exprt;
 class code_function_callt;
-class exprt;
+class function_application_exprt;
 class goto_symex_statet;
-class if_exprt;
-class index_exprt;
-class symbol_exprt;
-class member_exprt;
-class namespacet;
+class path_storaget;
 class side_effect_exprt;
 class symex_assignt;
-class typecast_exprt;
+class typet;
 
 /// \brief The main class for the forward symbolic simulator
 /// \remarks

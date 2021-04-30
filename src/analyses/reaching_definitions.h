@@ -25,7 +25,6 @@ Date: February 2013
 #ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
-#include <util/base_exceptions.h>
 #include <util/threeval.h>
 
 #include "ai.h"

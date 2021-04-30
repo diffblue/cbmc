@@ -14,9 +14,9 @@ Date: November 2005
 #ifndef CPROVER_GOTO_PROGRAMS_XML_GOTO_TRACE_H
 #define CPROVER_GOTO_PROGRAMS_XML_GOTO_TRACE_H
 
-#include <util/xml.h>
-
-#include "goto_trace.h"
+class goto_tracet;
+class namespacet;
+class xmlt;
 
 void convert(
   const namespacet &ns,

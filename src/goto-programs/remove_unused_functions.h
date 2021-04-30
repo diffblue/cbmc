@@ -19,7 +19,6 @@ Author: CM Wintersteiger
 class goto_functionst;
 class goto_modelt;
 class message_handlert;
-class symbol_tablet;
 
 void remove_unused_functions(
   goto_functionst &,

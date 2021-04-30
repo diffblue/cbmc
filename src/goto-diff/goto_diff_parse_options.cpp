@@ -15,45 +15,22 @@ Author: Peter Schrammel
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
-#include <memory>
 
 #include <util/config.h>
 #include <util/exit_codes.h>
-#include <util/make_unique.h>
 #include <util/options.h>
 #include <util/version.h>
 
-#include <langapi/language.h>
-
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
-#include <goto-programs/adjust_float_expressions.h>
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/mm_io.h>
 #include <goto-programs/process_goto_program.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_unused_functions.h>
-#include <goto-programs/remove_vector.h>
-#include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
-#include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
 
 #include <goto-instrument/cover.h>
-
-#include <pointer-analysis/add_failed_symbols.h>
-
-#include <langapi/mode.h>
 
 #include <ansi-c/cprover_library.h>
 
@@ -61,7 +38,6 @@ Author: Peter Schrammel
 
 #include <cpp/cprover_library.h>
 
-#include "goto_diff.h"
 #include "syntactic_diff.h"
 #include "unified_diff.h"
 #include "change_impact.h"

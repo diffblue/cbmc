@@ -24,11 +24,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/strings/string_constraint.h>
 #include <util/constexpr.def>
 #include <util/deprecate.h>
+#include <util/namespace.h>
 #include <util/refined_string_type.h>
 #include <util/replace_expr.h>
 #include <util/string_expr.h>
 
 #include "array_pool.h"
+
+class function_application_exprt;
 
 /// Collection of constraints of different types: existential formulas,
 /// universal formulas, and "not contains" (universal with one alternation).

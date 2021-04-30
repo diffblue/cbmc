@@ -12,11 +12,9 @@ Author: Peter Schrammel
 #ifndef CPROVER_JAVA_BYTECODE_REMOVE_JAVA_NEW_H
 #define CPROVER_JAVA_BYTECODE_REMOVE_JAVA_NEW_H
 
-#include <util/symbol_table.h>
-
 #include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_model.h>
 
+class goto_modelt;
 class message_handlert;
 
 void remove_java_new(

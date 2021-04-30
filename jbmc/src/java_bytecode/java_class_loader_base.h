@@ -9,10 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_BASE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_BASE_H
 
+#include <util/irep.h>
+#include <util/optional.h>
+
 #include "jar_pool.h"
-#include "java_bytecode_parse_tree.h"
 
 class message_handlert;
+struct java_bytecode_parse_treet;
 
 /// Base class for maintaining classpath.
 class java_class_loader_baset

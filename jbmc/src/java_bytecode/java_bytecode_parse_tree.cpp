@@ -14,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 
-#include <langapi/language_util.h>
-
 #include "expr2java.h"
 
 void java_bytecode_parse_treet::output(std::ostream &out) const

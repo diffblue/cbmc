@@ -8,9 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_on_source.h"
 
-#include <util/file_util.h>
 #include <util/message.h>
-#include <util/unicode.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <analyses/ai.h>
 

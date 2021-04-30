@@ -24,17 +24,14 @@ Date:   April 2017
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/floatbv_expr.h>
-#include <util/fresh_symbol.h>
 #include <util/refined_string_type.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/string_expr.h>
 
 #include "java_types.h"
 #include "java_utils.h"
 
 #include "java_string_library_preprocess.h"
-#include "java_root_class.h"
 
 /// \return tag of a struct prefixed by "java::" or symbolic tag
 ///   empty string if not symbol or struct

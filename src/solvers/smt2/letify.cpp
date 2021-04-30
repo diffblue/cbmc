@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "letify.h"
 
-#include <util/irep_hash_container.h>
 #include <util/std_expr.h>
 
 void letifyt::collect_bindings(

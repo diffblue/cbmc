@@ -14,9 +14,6 @@ Date: May 2018
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_FUNCTION_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_FUNCTION_H
 
-#include <iosfwd>
-
-#include <util/find_symbols.h>
 #include <util/std_types.h>
 
 #include "goto_program.h"

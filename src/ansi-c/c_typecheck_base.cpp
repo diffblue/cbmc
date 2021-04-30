@@ -13,13 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/invariant.h>
-#include <util/prefix.h>
 #include <util/std_types.h>
 
+#include "ansi_c_declaration.h"
 #include "c_storage_spec.h"
 #include "expr2c.h"
-#include "type2name.h"
 
 std::string c_typecheck_baset::to_string(const exprt &expr)
 {

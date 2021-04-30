@@ -13,11 +13,8 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
 
-//#include <util/arith_tools.h>
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
-//#include <util/mathematical_types.h>
-//#include <util/namespace.h>
-//#include <util/symbol_table.h>
 
 SCENARIO(
   "index_range for constant_abstract_values"

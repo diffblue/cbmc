@@ -8,7 +8,6 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/interval.h>
-#include <util/symbol_table.h>
 
 SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
 {

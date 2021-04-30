@@ -15,7 +15,6 @@ Date: July 2018
 #define CPROVER_GOTO_CC_MS_LINK_MODE_H
 
 #include "cl_message_handler.h"
-#include "compile.h"
 #include "goto_cc_mode.h"
 
 class ms_link_modet : public goto_cc_modet

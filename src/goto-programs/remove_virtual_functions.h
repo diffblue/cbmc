@@ -18,9 +18,9 @@ Date: April 2016
 #include <util/optional.h>
 #include <util/std_expr.h>
 
-#include "class_hierarchy.h"
 #include "goto_program.h"
 
+class class_hierarchyt;
 class goto_functionst;
 class goto_model_functiont;
 class goto_modelt;

@@ -14,20 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <functional>
 #include <memory>
-#include <unordered_set>
 
 #include <analyses/guard.h>
 
-#include <goto-programs/goto_function.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/nodiscard.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 
 #include "call_stack.h"
 #include "field_sensitivity.h"
-#include "frame.h"
 #include "goto_state.h"
 #include "renaming_level.h"
 #include "symex_target_equation.h"

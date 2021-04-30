@@ -27,9 +27,7 @@
 static int isatty(int) { return 0; }
 #endif
 
-#include <util/prefix.h>
 #include <util/string_constant.h>
-#include <util/suffix.h>
 #include <util/unicode.h>
 
 #include "preprocessor_line.h"

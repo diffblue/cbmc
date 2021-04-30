@@ -15,8 +15,6 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include "irep.h"
 #include "json.h"
 
-#include <algorithm>
-
 /// To convert to JSON from an irep structure by recursively generating JSON
 /// for the different sub trees.
 /// \param _include_comments: when writing JSON, should the comments

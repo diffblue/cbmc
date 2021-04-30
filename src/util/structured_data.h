@@ -9,7 +9,7 @@ Author: Thomas Kiley
 #define CPROVER_UTIL_STRUCTURED_DATA_H
 
 #include "json.h"
-#include "xml.h"
+
 #include <string>
 #include <vector>
 

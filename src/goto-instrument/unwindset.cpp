@@ -10,10 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/string_utils.h>
-#include <util/unicode.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <fstream>
-#include <sstream>
 
 void unwindsett::parse_unwind(const std::string &unwind)
 {

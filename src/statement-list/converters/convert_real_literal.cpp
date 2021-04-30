@@ -14,7 +14,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <util/bitvector_types.h>
 #include <util/ieee_float.h>
-#include <util/std_expr.h>
 
 constant_exprt convert_real_literal(const std::string &src)
 {

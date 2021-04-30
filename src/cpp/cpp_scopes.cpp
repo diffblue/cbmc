@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_scopes.h"
 
+#include <util/symbol.h>
+
 #include <ostream>
 
 cpp_scopet &cpp_scopest::new_block_scope()

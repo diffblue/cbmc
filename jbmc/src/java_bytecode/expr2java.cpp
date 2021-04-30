@@ -8,12 +8,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "expr2java.h"
 
-#include <sstream>
-
 #include <util/namespace.h>
-#include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/symbol.h>
 #include <util/unicode.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>

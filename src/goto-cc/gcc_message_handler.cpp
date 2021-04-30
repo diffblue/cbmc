@@ -8,7 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "gcc_message_handler.h"
 
-#include <util/unicode.h>
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <fstream>
 #include <iostream>

@@ -15,7 +15,6 @@ Author: CM Wintersteiger
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include <cctype>
 

@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_ANSI_C_TYPECHECK_H
 
 #include "c_typecheck_base.h"
-#include "ansi_c_parse_tree.h"
+
+class ansi_c_parse_treet;
 
 bool ansi_c_typecheck(
   ansi_c_parse_treet &parse_tree,

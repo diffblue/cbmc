@@ -8,11 +8,13 @@ Author: Diffblue Limited
 
 #include <java_bytecode/java_entry_point.h>
 #include <java_bytecode/java_string_literals.h>
-#include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 #include <linking/static_lifetime_init.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
+
+#include <util/message.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 TEST_CASE(

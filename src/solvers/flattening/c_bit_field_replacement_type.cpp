@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 
 typet c_bit_field_replacement_type(
   const c_bit_field_typet &src,

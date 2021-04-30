@@ -10,7 +10,6 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <solvers/strings/string_constraint_generator.h>
-#include <util/std_types.h>
 
 /// Get the string length needed to print any value of the given type with the
 /// given radix.

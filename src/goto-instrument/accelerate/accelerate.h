@@ -13,19 +13,15 @@ Author: Matt Lewis
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H
 
 #include <util/namespace.h>
-#include <util/expr.h>
-#include <util/message.h>
 
 #include <analyses/natural_loops.h>
 
-#include <goto-programs/goto_functions.h>
-
 #include "path.h"
-#include "accelerator.h"
 #include "trace_automaton.h"
 #include "subsumed.h"
-#include "scratch_program.h"
 #include "acceleration_utils.h"
+
+class path_acceleratort;
 
 class acceleratet
 {

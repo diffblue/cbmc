@@ -14,7 +14,9 @@ Date:   April 2017
 #ifndef CPROVER_GOTO_PROGRAMS_MM_IO_H
 #define CPROVER_GOTO_PROGRAMS_MM_IO_H
 
-#include <goto-programs/goto_model.h>
+class goto_functionst;
+class goto_modelt;
+class symbol_tablet;
 
 void mm_io(const symbol_tablet &, goto_functionst &);
 void mm_io(goto_modelt &);

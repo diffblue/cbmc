@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include <util/config.h>
+#include <util/symbol_table.h>
 
 #include "ansi_c_language.h"
 

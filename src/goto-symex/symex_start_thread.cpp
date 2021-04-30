@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_initializer.h>
 
 #include "expr_skeleton.h"
+#include "path_storage.h"
 #include "symex_assign.h"
 
 void goto_symext::symex_start_thread(statet &state)

@@ -19,33 +19,18 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <algorithm>
-#include <cstddef>
-#include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <iterator>
-#include <numeric>
-#include <sstream>
 
-#include <json/json_parser.h>
-
-#include <util/arith_tools.h>
-#include <util/c_types.h>
+#include <util/cmdline.h>
 #include <util/config.h>
-#include <util/expr.h>
-#include <util/get_base_name.h>
+#include <util/file_util.h>
 #include <util/invariant.h>
-#include <util/prefix.h>
-#include <util/replace_symbol.h>
 #include <util/run.h>
-#include <util/suffix.h>
-#include <util/tempdir.h>
-#include <util/tempfile.h>
 
-#include <goto-programs/read_goto_binary.h>
-
+#include "compile.h"
+#include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
 #include "linker_script_merge.h"
 

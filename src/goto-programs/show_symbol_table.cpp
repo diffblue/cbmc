@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include <util/json_irep.h>
+#include <util/json_stream.h>
+#include <util/ui_message.h>
 
 #include "goto_model.h"
 

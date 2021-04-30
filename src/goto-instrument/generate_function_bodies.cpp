@@ -9,13 +9,12 @@ Author: Diffblue Ltd.
 #include "generate_function_bodies.h"
 
 #include <ansi-c/c_nondet_symbol_factory.h>
-#include <ansi-c/c_object_factory_parameters.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/arith_tools.h>
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/make_unique.h>

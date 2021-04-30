@@ -2,9 +2,7 @@
 /// Unit tests for calling external SAT solver
 /// \author Francis Botero <fbbotero@amazon.com>
 
-#include <solvers/prop/literal.h>
 #include <solvers/sat/external_sat.h>
-#include <solvers/sat/satcheck_minisat2.h>
 #include <testing-utils/use_catch.h>
 #include <util/cout_message.h>
 

@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_iterator.h"
 #include "range.h"
 #include "std_expr.h"
-#include "std_types.h"
 
 enum class kindt { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH };
 

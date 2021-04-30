@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>

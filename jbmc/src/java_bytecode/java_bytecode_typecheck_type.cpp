@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/std_types.h>
 
+#include "java_types.h"
+
 void java_bytecode_typecheckt::typecheck_type(typet &type)
 {
   if(type.id() == ID_struct_tag)

@@ -18,9 +18,7 @@ Date: July 2005
 #include <vector>
 
 #include <util/message.h>
-#include <util/namespace.h>
 #include <util/options.h>
-#include <util/ssa_expr.h>
 
 #include <goto-programs/goto_program.h>
 

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "irep.h"
 
-class symbol_tablet;
 class exprt;
 class symbolt;
 class typet;

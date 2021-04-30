@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // convert expression to boolean formula
 //
 
-#include <util/byte_operators.h>
 #include <util/endianness_map.h>
 #include <util/expr.h>
 #include <util/mp_arith.h>
@@ -29,6 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class array_comprehension_exprt;
 class bswap_exprt;
+class byte_extract_exprt;
+class byte_update_exprt;
 class concatenation_exprt;
 class extractbit_exprt;
 class extractbits_exprt;

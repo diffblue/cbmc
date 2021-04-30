@@ -6,10 +6,12 @@ Author: Owen Mansel-Chan, owen.mansel-chan@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
-#include <goto-symex/goto_symex.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
+
+#include <goto-symex/goto_symex_state.h>
 
 static void add_to_symbol_table(
   symbol_tablet &symbol_table,

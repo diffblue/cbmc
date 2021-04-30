@@ -9,13 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_OBJECT_FACTORY_PARAMETERS_H
 #define CPROVER_UTIL_OBJECT_FACTORY_PARAMETERS_H
 
-#include <cstdint>
-#include <limits>
 #include <list>
 
 #include <util/irep.h>
 #include <util/magic.h>
-#include <util/optional.h>
 
 class cmdlinet;
 class optionst;

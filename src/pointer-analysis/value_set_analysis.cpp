@@ -11,11 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_analysis.h"
 
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
 #include <util/xml_irep.h>
-
-#include <langapi/language_util.h>
 
 void value_sets_to_xml(
   const std::function<const value_sett &(goto_programt::const_targett)>

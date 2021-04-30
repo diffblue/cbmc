@@ -9,10 +9,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STRING_LITERALS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STRING_LITERALS_H
 
-#include <util/symbol_table.h>
 #include <util/std_expr.h>
 
 class java_string_literal_exprt;
+class symbol_table_baset;
 
 /// Creates or gets an existing constant global symbol for a given string
 /// literal.

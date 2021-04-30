@@ -10,17 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Representation
 
-// clang-format off
 #include "arith_tools.h"
 #include "bitvector_types.h"
-#include "expr.h"
 #include "expr_iterator.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_expr.h"
-// clang-format on
 
 #include <stack>
 

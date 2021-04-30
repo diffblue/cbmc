@@ -11,11 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 
 #include <iosfwd>
-#include <vector>
 
 #include <util/type.h>
 
-#include <solvers/prop/prop.h>
+#include <solvers/prop/literal.h>
+
+class propt;
 
 class boolbv_mapt
 {

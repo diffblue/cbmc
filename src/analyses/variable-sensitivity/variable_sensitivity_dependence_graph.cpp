@@ -9,8 +9,8 @@
 #include "variable_sensitivity_dependence_graph.h"
 #include "data_dependency_context.h"
 
-#include <goto-programs/json_expr.h>
 #include <langapi/language_util.h>
+#include <util/container_utils.h>
 #include <util/json.h>
 #include <util/json_irep.h>
 

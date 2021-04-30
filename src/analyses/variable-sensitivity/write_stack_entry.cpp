@@ -11,8 +11,7 @@
 
 #include <unordered_set>
 
-#include <util/std_expr.h>
-
+#include "abstract_environment.h"
 #include "write_stack_entry.h"
 
 /// Try to combine a new stack element with the current top of the stack

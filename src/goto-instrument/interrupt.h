@@ -14,9 +14,10 @@ Date: September 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_INTERRUPT_H
 #define CPROVER_GOTO_INSTRUMENT_INTERRUPT_H
 
-class goto_modelt;
+#include <util/irep.h>
 
-#include "rw_set.h"
+class goto_modelt;
+class value_setst;
 
 void interrupt(
   value_setst &,

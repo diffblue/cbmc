@@ -13,10 +13,10 @@ Author: Daniel Kroening
 
 #include "json_goto_trace.h"
 
-#include <langapi/language_util.h>
-#include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
+
+#include <langapi/language_util.h>
 
 #include "goto_trace.h"
 #include "json_expr.h"

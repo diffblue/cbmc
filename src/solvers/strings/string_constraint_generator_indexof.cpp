@@ -12,6 +12,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   functions
 
 #include "string_constraint_generator.h"
+
+#include <util/mathematical_expr.h>
+
 #include "string_refinement_invariant.h"
 
 /// Add axioms stating that the returned value is the index within `haystack`

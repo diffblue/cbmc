@@ -12,13 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "initialize_goto_model.h"
 
 #include <fstream>
-#include <iostream>
 
 #include <util/config.h>
 #include <util/message.h>
-#include <util/object_factory_parameters.h>
 #include <util/options.h>
-#include <util/unicode.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <langapi/language.h>
 #include <langapi/language_file.h>

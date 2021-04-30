@@ -11,6 +11,8 @@ Author: Diffblue Ltd.
 
 #include "ensure_one_backedge_per_target.h"
 
+#include "goto_model.h"
+
 static bool location_number_less_than(
   const goto_programt::targett &a,
   const goto_programt::targett &b)

@@ -8,6 +8,8 @@ Author: Diffblue Ltd.
 
 #include "require_parse_tree.h"
 
+#include <testing-utils/use_catch.h>
+
 #include <iterator>
 
 /// Find in the parsed class a specific entry within the

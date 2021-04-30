@@ -13,7 +13,6 @@ Author: Diffblue Ltd.
 
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 /// Get the simplified return value of is_digit_with_radix called with a radix

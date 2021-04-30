@@ -14,6 +14,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "incremental_goto_checker.h"
 
+#include <goto-symex/path_storage.h>
+
 #include "symex_bmc.h"
 
 class multi_path_symex_only_checkert : public incremental_goto_checkert

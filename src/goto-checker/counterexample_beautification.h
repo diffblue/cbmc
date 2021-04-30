@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_CHECKER_COUNTEREXAMPLE_BEAUTIFICATION_H
 #define CPROVER_GOTO_CHECKER_COUNTEREXAMPLE_BEAUTIFICATION_H
 
-#include <util/namespace.h>
-
 #include <goto-symex/symex_target_equation.h>
 
 #include <solvers/flattening/bv_minimize.h>

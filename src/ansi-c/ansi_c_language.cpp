@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
-#include <cstring>
-#include <sstream>
 #include <fstream>
 
 #include <util/config.h>

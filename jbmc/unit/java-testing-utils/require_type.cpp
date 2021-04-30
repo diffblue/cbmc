@@ -9,8 +9,6 @@ Author: Diffblue Ltd.
 #include "require_type.h"
 
 #include <testing-utils/use_catch.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
 
 /// Checks a type is a pointer type optionally with a specific subtype
 /// \param type: The type to check

@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/format.h>
+#include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/mathematical_expr.h>
@@ -26,10 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/symbol_table.h>
 
-#include <util/format.h>
-#include <util/format_expr.h>
-#include <util/format_type.h>
-#include <util/std_types.h>
+#include "path_storage.h"
 
 symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),

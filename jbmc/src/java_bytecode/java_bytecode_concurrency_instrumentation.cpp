@@ -11,11 +11,13 @@ Author: Kurt Degiogrio, kurt.degiorgio@diffblue.com
 #include "java_types.h"
 #include "java_utils.h"
 
-#include <util/expr_iterator.h>
-#include <util/namespace.h>
-#include <util/cprover_prefix.h>
-#include <util/std_types.h>
 #include <util/arith_tools.h>
+#include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
+#include <util/message.h>
+#include <util/namespace.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 // Disable linter to allow an std::string constant.
 const std::string next_thread_id = CPROVER_PREFIX "_next_thread_id";// NOLINT(*)

@@ -14,8 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include <util/config.h>
-#include <util/std_types.h>
 #include <util/invariant.h>
+#include <util/std_types.h>
+#include <util/symbol.h>
 
 #include "merged_type.h"
 

@@ -13,8 +13,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 #ifndef CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
 
+#include <util/message.h>
 #include <util/parse_options.h>
-#include <util/ui_message.h>
 
 // clang-format off
 #define MEMORY_ANALYZER_OPTIONS \

@@ -21,8 +21,6 @@ Author: Diffblue Ltd.
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
-#include <util/invariant.h>
-#include <util/optional.h>
 #include <util/version.h>
 
 symtab2gb_parse_optionst::symtab2gb_parse_optionst(int argc, const char *argv[])

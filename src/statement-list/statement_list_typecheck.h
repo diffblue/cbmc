@@ -12,10 +12,12 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #ifndef CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
 #define CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
 
-#include <util/symbol_table.h>
 #include <util/typecheck.h>
 
 #include "statement_list_parse_tree.h"
+
+class symbol_tablet;
+class symbolt;
 
 /// Create a new statement_list_typecheckt object and perform a type check to
 /// fill the symbol table.

@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 #include <memory>
+#include <string>
 
-#include <util/expr.h>
+class typet;
 
 class qualifierst
 {

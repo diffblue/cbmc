@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "compute_called_functions.h"
 #include "goto_convert_functions.h"
+#include "goto_model.h"
 
 /// Complete missing function definitions using the \p library.
 /// \param goto_model: goto model that may contain function calls and symbols

@@ -8,7 +8,6 @@ Author: Daniel Kroening, 2018
 
 #include "gcc_version.h"
 
-#include <util/prefix.h>
 #include <util/run.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>

@@ -12,12 +12,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 
-#include <util/namespace.h>
+#include <util/message.h>
 
-#include <goto-programs/goto_model.h>
-
-#include "value_sets.h"
+#include "dereference_callback.h"
 #include "value_set_dereference.h"
+
+class exprt;
+class goto_functionst;
+class goto_modelt;
+class namespacet;
+class optionst;
+class symbol_tablet;
+class symbolt;
+class value_setst;
 
 /// Wrapper for functions removing dereferences in expressions contained in
 /// a goto program.

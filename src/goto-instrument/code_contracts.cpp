@@ -20,12 +20,9 @@ Date: February 2016
 #include <goto-programs/goto_convert_class.h>
 #include <goto-programs/remove_skip.h>
 
-#include <linking/static_lifetime_init.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
-#include <util/format_type.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>

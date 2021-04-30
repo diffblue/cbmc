@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expanding_vector.h>
 #include <util/message.h>
-#include <util/std_types.h>
 #include <util/std_expr.h>
 
 #include <analyses/cfg_dominators.h>
@@ -26,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <list>
 
+class class_hierarchyt;
+class prefix_filtert;
 class symbol_tablet;
 class symbolt;
 

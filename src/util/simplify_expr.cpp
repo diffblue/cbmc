@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "pointer_offset_sum.h"
-#include "range.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "simplify_utils.h"

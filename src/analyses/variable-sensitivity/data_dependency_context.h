@@ -14,7 +14,6 @@ Author: Diffblue Ltd
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DATA_DEPENDENCY_CONTEXT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DATA_DEPENDENCY_CONTEXT_H
 
-#include "variable_sensitivity_domain.h"
 #include "write_location_context.h"
 
 class data_dependency_contextt : public write_location_contextt

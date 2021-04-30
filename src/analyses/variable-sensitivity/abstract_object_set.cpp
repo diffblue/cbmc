@@ -7,7 +7,6 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_object_set.h>
-#include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <util/interval.h>
 #include <util/string_utils.h>
 

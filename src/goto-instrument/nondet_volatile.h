@@ -12,9 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H
 #define CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H
 
-#include <goto-programs/goto_model.h>
+#include <functional>
 
 class cmdlinet;
+class exprt;
+class goto_modelt;
 class optionst;
 
 // clang-format off

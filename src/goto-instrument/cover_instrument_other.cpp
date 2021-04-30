@@ -11,9 +11,9 @@ Author: Daniel Kroening
 
 #include "cover_instrument.h"
 
-#include <langapi/language_util.h>
+#include <util/cprover_prefix.h>
 
-#include "cover_util.h"
+#include <langapi/language_util.h>
 
 void cover_path_instrumentert::instrument(
   const irep_idt &,

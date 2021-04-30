@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_QBF_QDIMACS_CNF_H
 #define CPROVER_SOLVERS_QBF_QDIMACS_CNF_H
 
-#include <set>
 #include <iosfwd>
 
 #include <solvers/sat/dimacs_cnf.h>

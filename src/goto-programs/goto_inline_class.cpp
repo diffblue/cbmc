@@ -16,16 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <util/cprover_prefix.h>
-#include <util/expr_util.h>
 #include <util/invariant.h>
-#include <util/prefix.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
-
-#include <langapi/language_util.h>
-
-#include "remove_skip.h"
-#include "goto_inline.h"
 
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,

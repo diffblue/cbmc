@@ -8,13 +8,6 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <istream>
-#include <memory>
-
-#include <util/message.h>
-
-#include <java_bytecode/java_bytecode_language.h>
-
 #include <java-testing-utils/load_java_class.h>
 
 SCENARIO("java_bytecode_convert_abstract_class",

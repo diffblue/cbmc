@@ -9,9 +9,15 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_TEST_HELPERS_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_TEST_HELPERS_H
 
-#include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/interval_abstract_value.h>
-#include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <memory>
+
+#include <analyses/variable-sensitivity/abstract_object.h>
+
+class abstract_object_sett;
+class constant_abstract_valuet;
+class constant_interval_exprt;
+class interval_abstract_valuet;
+class value_set_abstract_objectt;
 
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns);

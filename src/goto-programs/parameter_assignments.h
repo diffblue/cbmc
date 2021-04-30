@@ -14,7 +14,9 @@ Date:   September 2015
 #ifndef CPROVER_GOTO_PROGRAMS_PARAMETER_ASSIGNMENTS_H
 #define CPROVER_GOTO_PROGRAMS_PARAMETER_ASSIGNMENTS_H
 
-#include <goto-programs/goto_model.h>
+class goto_functionst;
+class goto_modelt;
+class symbol_tablet;
 
 void parameter_assignments(symbol_tablet &, goto_functionst &);
 

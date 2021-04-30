@@ -6,7 +6,6 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <java-testing-utils/load_java_class.h>
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_bytecode_parser.h>
 #include <testing-utils/message.h>

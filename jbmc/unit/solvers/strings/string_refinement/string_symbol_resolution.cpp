@@ -12,12 +12,9 @@ Author: Diffblue Ltd.
 
 #include <solvers/strings/string_refinement.h>
 
-#include <iostream>
 #include <java_bytecode/java_bytecode_language.h>
 #include <langapi/mode.h>
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>

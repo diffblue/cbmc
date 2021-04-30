@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/pointer_arithmetic.h>
 
-#include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
 
 class loop_utils_is_constantt : public is_constantt
