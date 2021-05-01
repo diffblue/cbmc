@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_offset_size.h>
 
 void goto_symext::havoc_rec(
@@ -148,6 +149,7 @@ void goto_symext::symex_other(
           byte_extract_id(),
           src_array,
           from_integer(0, index_type()),
+          config.ansi_c.char_width,
           dest_array.type());
         src_array.swap(be);
         do_simplify(src_array);
@@ -159,6 +161,7 @@ void goto_symext::symex_other(
           byte_extract_id(),
           dest_array,
           from_integer(0, index_type()),
+          config.ansi_c.char_width,
           src_array.type());
         dest_array.swap(be);
         do_simplify(dest_array);
@@ -200,6 +203,7 @@ void goto_symext::symex_other(
         byte_extract_id(),
         array_expr,
         from_integer(0, index_type()),
+        config.ansi_c.char_width,
         array_typet(char_type(), array_size.value()));
     }
 

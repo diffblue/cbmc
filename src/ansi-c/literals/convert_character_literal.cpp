@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/std_expr.h>
 
 #include "unescape_string.h"
@@ -51,7 +52,7 @@ exprt convert_character_literal(
       for(unsigned i=0; i<value.size(); i++)
       {
         mp_integer z=(unsigned char)(value[i]);
-        z=z<<((value.size()-i-1)*8);
+        z = z << ((value.size() - i - 1) * config.ansi_c.char_width);
         x+=z;
       }
 
@@ -84,7 +85,7 @@ exprt convert_character_literal(
       for(unsigned i=0; i<value.size(); i++)
       {
         mp_integer z=(unsigned char)(value[i]);
-        z=z<<((value.size()-i-1)*8);
+        z = z << ((value.size() - i - 1) * config.ansi_c.char_width);
         x+=z;
       }
 

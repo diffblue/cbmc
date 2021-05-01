@@ -149,6 +149,7 @@ SCENARIO("expr_dynamic_cast",
       ID_byte_extract_little_endian,
       symbol_exprt(typet()),
       constant_exprt("0", typet()),
+      1, // arbitrary integer
       typet());
     THEN("try_expr_dynamic_cast<byte_extract_expr> returns non-empty")
     {
@@ -161,6 +162,7 @@ SCENARIO("expr_dynamic_cast",
       ID_byte_extract_big_endian,
       symbol_exprt(typet()),
       constant_exprt("0", typet()),
+      1, // arbitrary integer
       typet());
     THEN("try_expr_dynamic_cast<byte_extract_expr> returns non-empty")
     {
@@ -185,6 +187,7 @@ SCENARIO("can_cast_expr", "[core][utils][expr_cast][can_cast_expr]")
       ID_byte_extract_little_endian,
       symbol_exprt(typet()),
       constant_exprt("0", typet()),
+      1, // arbitrary integer
       typet());
     THEN("can_expr_expr<byte_extract_expr> returns true")
     {
@@ -197,6 +200,7 @@ SCENARIO("can_cast_expr", "[core][utils][expr_cast][can_cast_expr]")
       ID_byte_extract_big_endian,
       symbol_exprt(typet()),
       constant_exprt("0", typet()),
+      1, // arbitrary integer
       typet());
     THEN("can_expr_expr<byte_extract_expr> returns true")
     {

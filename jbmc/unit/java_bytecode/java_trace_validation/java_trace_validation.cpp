@@ -17,6 +17,8 @@ Author: Diffblue Ltd.
 #include <util/byte_operators.h>
 #include <util/pointer_expr.h>
 
+#include <climits>
+
 TEST_CASE("java trace validation", "[core][java_trace_validation]")
 {
   const exprt plain_expr = exprt();
@@ -33,9 +35,9 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     index_exprt(valid_symbol_expr, valid_constant);
   const index_exprt index_plain = index_exprt(exprt(), exprt());
   const byte_extract_exprt byte_little_endian = byte_extract_exprt(
-    ID_byte_extract_little_endian, exprt(), exprt(), typet());
-  const byte_extract_exprt byte_big_endian =
-    byte_extract_exprt(ID_byte_extract_big_endian, exprt(), exprt(), typet());
+    ID_byte_extract_little_endian, exprt(), exprt(), CHAR_BIT, typet());
+  const byte_extract_exprt byte_big_endian = byte_extract_exprt(
+    ID_byte_extract_big_endian, exprt(), exprt(), CHAR_BIT, typet());
   const address_of_exprt valid_address = address_of_exprt(valid_symbol_expr);
   const address_of_exprt invalid_address = address_of_exprt(exprt());
   const struct_exprt struct_plain =

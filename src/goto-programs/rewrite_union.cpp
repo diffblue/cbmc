@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -84,7 +85,8 @@ void rewrite_union(exprt &expr)
     if(op.type().id() == ID_union_tag || op.type().id() == ID_union)
     {
       exprt offset=from_integer(0, index_type());
-      byte_extract_exprt tmp(byte_extract_id(), op, offset, expr.type());
+      byte_extract_exprt tmp(
+        byte_extract_id(), op, offset, config.ansi_c.char_width, expr.type());
       expr=tmp;
     }
   }
@@ -94,7 +96,11 @@ void rewrite_union(exprt &expr)
     exprt offset=from_integer(0, index_type());
     side_effect_expr_nondett nondet(expr.type(), expr.source_location());
     byte_update_exprt tmp(
-      byte_update_id(), nondet, offset, union_expr.op());
+      byte_update_id(),
+      nondet,
+      offset,
+      union_expr.op(),
+      config.ansi_c.char_width);
     expr=tmp;
   }
 }

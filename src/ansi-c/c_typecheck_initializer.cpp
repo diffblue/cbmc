@@ -542,8 +542,11 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
         if(current_symbol.is_static_lifetime)
         {
-          byte_update_exprt byte_update{
-            byte_update_id(), *dest, from_integer(0, index_type()), *zero};
+          byte_update_exprt byte_update{byte_update_id(),
+                                        *dest,
+                                        from_integer(0, index_type()),
+                                        *zero,
+                                        config.ansi_c.char_width};
           byte_update.add_source_location() = value.source_location();
           *dest = std::move(byte_update);
           dest = &(to_byte_update_expr(*dest).op2());

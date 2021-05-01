@@ -41,7 +41,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       ID_byte_extract_little_endian,
       deadbeef,
       from_integer(1, index_type()),
-      signedbv_typet(8));
+      config.ansi_c.char_width,
+      signedbv_typet(config.ansi_c.char_width));
 
     THEN("byte_extract lowering yields the expected value")
     {
@@ -70,6 +71,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       ID_byte_extract_little_endian,
       deadbeef,
       from_integer(1, index_type()),
+      config.ansi_c.char_width,
       struct_typet(
         {{"unbounded_array",
           array_typet(
@@ -98,6 +100,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       ID_byte_extract_little_endian,
       deadbeef,
       from_integer(1, index_type()),
+      config.ansi_c.char_width,
       union_typet(
         {{"unbounded_array",
           array_typet(
@@ -126,6 +129,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       ID_byte_extract_little_endian,
       deadbeef,
       from_integer(1, index_type()),
+      config.ansi_c.char_width,
       union_typet{});
 
     THEN("byte_extract lowering does not raise an exception")
@@ -151,6 +155,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       ID_byte_extract_little_endian,
       s,
       from_integer(1, index_type()),
+      config.ansi_c.char_width,
       unsignedbv_typet(16));
 
     THEN("byte_extract lowering yields the expected value")
@@ -265,7 +270,11 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             REQUIRE(r.has_value());
 
             const byte_extract_exprt be(
-              endianness, *s, from_integer(2, index_type()), t2);
+              endianness,
+              *s,
+              from_integer(2, index_type()),
+              config.ansi_c.char_width,
+              t2);
 
             const exprt lower_be = lower_byte_extract(be, ns);
             const exprt lower_be_s = simplify_expr(lower_be, ns);
@@ -299,7 +308,8 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
       ID_byte_update_little_endian,
       deadbeef,
       from_integer(1, index_type()),
-      from_integer(0x42, unsignedbv_typet(8)));
+      from_integer(0x42, unsignedbv_typet(8)),
+      config.ansi_c.char_width);
 
     THEN("byte_update lowering yields the expected value")
     {
@@ -418,7 +428,11 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
             REQUIRE(r.has_value());
 
             const byte_update_exprt bu(
-              endianness, *s, from_integer(2, index_type()), *u);
+              endianness,
+              *s,
+              from_integer(2, index_type()),
+              *u,
+              config.ansi_c.char_width);
 
             const exprt lower_bu = lower_byte_operators(bu, ns);
             const exprt lower_bu_s = simplify_expr(lower_bu, ns);

@@ -189,8 +189,9 @@ simplify_exprt::simplify_index(const index_exprt &expr)
       exprt final_offset =
         simplify_node(plus_exprt(byte_extract_expr.offset(), offset));
 
-      exprt result_expr(array.id(), expr.type());
-      result_expr.add_to_operands(byte_extract_expr.op(), final_offset);
+      byte_extract_exprt result_expr = byte_extract_expr;
+      result_expr.offset() = final_offset;
+      result_expr.type() = expr.type();
 
       return changed(simplify_rec(result_expr));
     }
