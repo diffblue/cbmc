@@ -381,6 +381,237 @@ inline address_of_exprt &to_address_of_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Operator to return the address of an object
+class object_address_exprt : public nullary_exprt
+{
+public:
+  explicit object_address_exprt(const symbol_exprt &);
+
+  irep_idt object_identifier() const
+  {
+    return get(ID_identifier);
+  }
+
+  const pointer_typet &type() const
+  {
+    return static_cast<const pointer_typet &>(exprt::type());
+  }
+
+  pointer_typet &type()
+  {
+    return static_cast<pointer_typet &>(exprt::type());
+  }
+
+  /// returns the type of the object whose address is represented
+  const typet &object_type() const
+  {
+    return type().subtype();
+  }
+
+  symbol_exprt object_expr() const;
+};
+
+template <>
+inline bool can_cast_expr<object_address_exprt>(const exprt &base)
+{
+  return base.id() == ID_object_address;
+}
+
+inline void validate_expr(const object_address_exprt &value)
+{
+  validate_operands(value, 1, "object_address must have one operand");
+}
+
+/// \brief Cast an exprt to an \ref object_address_exprt
+///
+/// \a expr must be known to be \ref object_address_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref object_address_exprt
+inline const object_address_exprt &to_object_address_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_object_address);
+  const object_address_exprt &ret =
+    static_cast<const object_address_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_object_address_expr(const exprt &)
+inline object_address_exprt &to_object_address_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_object_address);
+  object_address_exprt &ret = static_cast<object_address_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief Operator to return the address of a field relative
+/// to a base address
+class field_address_exprt : public unary_exprt
+{
+public:
+  /// constructor for field addresses.
+  /// The base address must be a pointer to a compound type.
+  field_address_exprt(
+    exprt base,
+    const irep_idt &component_name,
+    pointer_typet type);
+
+  exprt &base()
+  {
+    return op0();
+  }
+
+  const exprt &base() const
+  {
+    return op0();
+  }
+
+  const pointer_typet &type() const
+  {
+    return static_cast<const pointer_typet &>(exprt::type());
+  }
+
+  pointer_typet &type()
+  {
+    return static_cast<pointer_typet &>(exprt::type());
+  }
+
+  /// returns the type of the field whose address is represented
+  const typet &field_type() const
+  {
+    return type().subtype();
+  }
+
+  const typet &compound_type() const
+  {
+    return to_pointer_type(base().type()).subtype();
+  }
+
+  const irep_idt &component_name() const
+  {
+    return get(ID_component_name);
+  }
+};
+
+template <>
+inline bool can_cast_expr<field_address_exprt>(const exprt &expr)
+{
+  return expr.id() == ID_field_address;
+}
+
+inline void validate_expr(const field_address_exprt &value)
+{
+  validate_operands(value, 1, "field_address must have one operand");
+}
+
+/// \brief Cast an exprt to an \ref field_address_exprt
+///
+/// \a expr must be known to be \ref field_address_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref field_address_exprt
+inline const field_address_exprt &to_field_address_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_field_address);
+  const field_address_exprt &ret =
+    static_cast<const field_address_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_field_address_expr(const exprt &)
+inline field_address_exprt &to_field_address_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_field_address);
+  field_address_exprt &ret = static_cast<field_address_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief Operator to return the address of an array element
+/// relative to a base address
+class element_address_exprt : public binary_exprt
+{
+public:
+  /// constructor for element addresses.
+  /// The base address must be a pointer to an element.
+  /// The index is expected to have an integer type.
+  element_address_exprt(exprt base, exprt index);
+
+  const pointer_typet &type() const
+  {
+    return static_cast<const pointer_typet &>(exprt::type());
+  }
+
+  pointer_typet &type()
+  {
+    return static_cast<pointer_typet &>(exprt::type());
+  }
+
+  /// returns the type of the array element whose address is represented
+  const typet &element_type() const
+  {
+    return type().subtype();
+  }
+
+  exprt &base()
+  {
+    return op0();
+  }
+
+  const exprt &base() const
+  {
+    return op0();
+  }
+
+  exprt &index()
+  {
+    return op1();
+  }
+
+  const exprt &index() const
+  {
+    return op1();
+  }
+};
+
+template <>
+inline bool can_cast_expr<element_address_exprt>(const exprt &expr)
+{
+  return expr.id() == ID_element_address;
+}
+
+inline void validate_expr(const element_address_exprt &value)
+{
+  validate_operands(value, 2, "element_address must have two operands");
+}
+
+/// \brief Cast an exprt to an \ref element_address_exprt
+///
+/// \a expr must be known to be \ref element_address_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref element_address_exprt
+inline const element_address_exprt &to_element_address_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_element_address);
+  const element_address_exprt &ret =
+    static_cast<const element_address_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_element_address_expr(const exprt &)
+inline element_address_exprt &to_element_address_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_element_address);
+  element_address_exprt &ret = static_cast<element_address_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 /// \brief Operator to dereference a pointer
 class dereference_exprt : public unary_exprt
 {
