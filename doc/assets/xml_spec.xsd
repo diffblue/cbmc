@@ -181,6 +181,8 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="refinement-iteration" type="xs:integer"/>
+
   <xs:element name="program" type="xs:string"/>
   <xs:element name="cprover-status" type="xs:string"/>
   <xs:element name="cprover">
@@ -190,6 +192,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="message"/>
         <xs:element ref="result"/>
+        <xs:element ref="refinement-iteration"/>
        </xs:choice>
       <xs:element ref="cprover-status" minOccurs="0"/>
       </xs:sequence>
