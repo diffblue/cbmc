@@ -79,9 +79,12 @@ void output_error_trace(
 
   case ui_message_handlert::uit::XML_UI:
   {
-    xmlt xml;
-    convert(ns, goto_trace, xml);
-    msg.status() << xml;
+    const goto_trace_stept &last_step = goto_trace.get_last_step();
+    property_infot info{
+      last_step.pc, last_step.comment, property_statust::FAIL};
+    xmlt xml_result = xml(last_step.property_id, info);
+    convert(ns, goto_trace, xml_result.new_element());
+    msg.result() << xml_result;
   }
   break;
 
@@ -89,11 +92,9 @@ void output_error_trace(
   {
     json_stream_objectt &json_result =
       ui_message_handler.get_json_stream().push_back_stream_object();
-    const goto_trace_stept &step = goto_trace.steps.back();
-    json_result["property"] =
-      json_stringt(step.pc->source_location.get_property_id());
-    json_result["description"] =
-      json_stringt(step.pc->source_location.get_comment());
+    const goto_trace_stept &step = goto_trace.get_last_step();
+    json_result["property"] = json_stringt(step.property_id);
+    json_result["description"] = json_stringt(step.comment);
     json_result["status"] = json_stringt("failed");
     json_stream_arrayt &json_trace =
       json_result.push_back_stream_array("trace");
