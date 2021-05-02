@@ -34,6 +34,7 @@ SRC += analyses/ai/ai.cpp \
        compound_block_locations.cpp \
        get_goto_model_from_c_test.cpp \
        goto-cc/armcc_cmdline.cpp \
+       goto-checker/properties/property_status.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
