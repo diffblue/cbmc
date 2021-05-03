@@ -4,5 +4,5 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::1::i .* value-set-begin: 5 :value-set-end @ \[6\]
-^main::1::p .* value-set-begin: 2, 17, 32 :value-set-end @ \[5\]
+^main::1::p .* value-set-begin: 2, \[11, 1F9\] :value-set-end @ \[5\]
 --

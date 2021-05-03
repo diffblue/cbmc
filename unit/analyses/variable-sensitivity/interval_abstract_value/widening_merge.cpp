@@ -80,6 +80,106 @@ SCENARIO(
     }
   }
 
+  GIVEN("widening merges with TOP or BOTTOM")
+  {
+    WHEN("merging [1, 2] with TOP")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto top2 = make_top_interval();
+
+      auto merged = widening_merge(op1, top2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging [1, 2] with BOTTOM")
+    {
+      auto op1 = make_interval(val1, val2, environment, ns);
+      auto bottom2 = make_bottom_interval();
+
+      auto merged = widening_merge(op1, bottom2);
+
+      THEN("result is unmodified [1, 2]")
+      {
+        EXPECT_UNMODIFIED(merged, val1, val2);
+      }
+    }
+    WHEN("merging TOP with [1, 2]")
+    {
+      auto top1 = make_top_interval();
+      auto op2 = make_interval(val1, val2, environment, ns);
+
+      auto merged = widening_merge(top1, op2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM with [1, 2]")
+    {
+      auto bottom1 = make_bottom_interval();
+      auto op2 = make_interval(val1, val2, environment, ns);
+
+      auto merged = widening_merge(bottom1, op2);
+
+      THEN("result is modified [1, 2]")
+      {
+        EXPECT_MODIFIED(merged, val1, val2);
+      }
+    }
+    WHEN("merging TOP with TOP")
+    {
+      auto top1 = make_top_interval();
+      auto top2 = make_top_interval();
+
+      auto merged = widening_merge(top1, top2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging TOP with BOTTOM")
+    {
+      auto top1 = make_top_interval();
+      auto bottom2 = make_bottom_interval();
+
+      auto merged = widening_merge(top1, bottom2);
+
+      THEN("result is unmodified TOP")
+      {
+        EXPECT_UNMODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM with TOP")
+    {
+      auto bottom1 = make_bottom_interval();
+      auto top2 = make_top_interval();
+
+      auto merged = widening_merge(bottom1, top2);
+
+      THEN("result is modified TOP")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging BOTTOM with BOTTOM")
+    {
+      auto bottom1 = make_bottom_interval();
+      auto bottom2 = make_bottom_interval();
+
+      auto merged = widening_merge(bottom1, bottom2);
+
+      THEN("result is unmodified BOTTOM")
+      {
+        EXPECT_UNMODIFIED_BOTTOM(merged);
+      }
+    }
+  }
+
   GIVEN("interval merges which do widen")
   {
     WHEN("merging [1, 3] with [2, 4]")
@@ -200,106 +300,6 @@ SCENARIO(
       THEN("result is widen both bounds - [-10, 4]")
       {
         EXPECT_MODIFIED(merged, val10minus, val4);
-      }
-    }
-  }
-
-  GIVEN("widening merges with TOP or BOTTOM")
-  {
-    WHEN("merging [1, 2] with TOP")
-    {
-      auto op1 = make_interval(val1, val2, environment, ns);
-      auto top2 = make_top_interval();
-
-      auto merged = widening_merge(op1, top2);
-
-      THEN("result is modified TOP")
-      {
-        EXPECT_MODIFIED_TOP(merged);
-      }
-    }
-    WHEN("merging [1, 2] with BOTTOM")
-    {
-      auto op1 = make_interval(val1, val2, environment, ns);
-      auto bottom2 = make_bottom_interval();
-
-      auto merged = widening_merge(op1, bottom2);
-
-      THEN("result is unmodified [1, 2]")
-      {
-        EXPECT_UNMODIFIED(merged, val1, val2);
-      }
-    }
-    WHEN("merging TOP with [1, 2]")
-    {
-      auto top1 = make_top_interval();
-      auto op2 = make_interval(val1, val2, environment, ns);
-
-      auto merged = widening_merge(top1, op2);
-
-      THEN("result is unmodified TOP")
-      {
-        EXPECT_UNMODIFIED_TOP(merged);
-      }
-    }
-    WHEN("merging BOTTOM with [1, 2]")
-    {
-      auto bottom1 = make_bottom_interval();
-      auto op2 = make_interval(val1, val2, environment, ns);
-
-      auto merged = widening_merge(bottom1, op2);
-
-      THEN("result is modified [1, 2]")
-      {
-        EXPECT_MODIFIED(merged, val1, val2);
-      }
-    }
-    WHEN("merging TOP with TOP")
-    {
-      auto top1 = make_top_interval();
-      auto top2 = make_top_interval();
-
-      auto merged = widening_merge(top1, top2);
-
-      THEN("result is unmodified TOP")
-      {
-        EXPECT_UNMODIFIED_TOP(merged);
-      }
-    }
-    WHEN("merging TOP with BOTTOM")
-    {
-      auto top1 = make_top_interval();
-      auto bottom2 = make_bottom_interval();
-
-      auto merged = widening_merge(top1, bottom2);
-
-      THEN("result is unmodified TOP")
-      {
-        EXPECT_UNMODIFIED_TOP(merged);
-      }
-    }
-    WHEN("merging BOTTOM with TOP")
-    {
-      auto bottom1 = make_bottom_interval();
-      auto top2 = make_top_interval();
-
-      auto merged = widening_merge(bottom1, top2);
-
-      THEN("result is modified TOP")
-      {
-        EXPECT_MODIFIED_TOP(merged);
-      }
-    }
-    WHEN("merging BOTTOM with BOTTOM")
-    {
-      auto bottom1 = make_bottom_interval();
-      auto bottom2 = make_bottom_interval();
-
-      auto merged = widening_merge(bottom1, bottom2);
-
-      THEN("result is unmodified BOTTOM")
-      {
-        EXPECT_UNMODIFIED_BOTTOM(merged);
       }
     }
   }

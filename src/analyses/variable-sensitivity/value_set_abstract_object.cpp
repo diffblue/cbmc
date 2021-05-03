@@ -117,6 +117,11 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 static bool are_any_top(const abstract_object_sett &set);
 
 static abstract_object_sett compact_values(const abstract_object_sett &values);
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values);
+static abstract_object_sett widen_value_set(
+  const constant_interval_exprt &lhs,
+  const constant_interval_exprt &rhs);
 
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type)
@@ -216,6 +221,18 @@ abstract_object_pointert value_set_abstract_objectt::merge_with_value(
     union_values.insert(other_value_set->get_values());
   else
     union_values.insert(other);
+
+  auto has_values = [](const abstract_object_pointert &v) {
+    return !v->is_top() && !v->is_bottom();
+  };
+
+  if(
+    widen_mode == widen_modet::could_widen && has_values(shared_from_this()) &&
+    has_values(other))
+  {
+    union_values.insert(widen_value_set(to_interval(), other->to_interval()));
+    union_values = non_destructive_compact(union_values);
+  }
 
   return resolve_values(union_values);
 }
@@ -490,7 +507,7 @@ destructive_compact(abstract_object_sett values, int slice)
   auto upper_start = eval_expr(minus_exprt(width.get_upper(), slice_width));
   if(
     lower_boundary ==
-    upper_start) // adjust so the intervals are not immediately combined
+    upper_start) // adjust boundary so intervals aren't immediately combined
     upper_start = eval_expr(
       plus_exprt(upper_start, from_integer(1, lower_boundary.type())));
 
@@ -534,4 +551,43 @@ static bool is_le(const exprt &lhs, const exprt &rhs)
 {
   auto is_le_expr = binary_relation_exprt(lhs, ID_le, rhs);
   return eval_expr(is_le_expr).is_true();
+}
+
+static abstract_object_sett widen_value_set(
+  const constant_interval_exprt &lhs,
+  const constant_interval_exprt &rhs)
+{
+  auto widened_ends = abstract_object_sett{};
+
+  if(lhs.contains(rhs))
+    return widened_ends;
+
+  auto lower_bound =
+    constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
+  auto upper_bound =
+    constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
+  auto range = plus_exprt(
+    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
+
+  auto symbol_table = symbol_tablet{};
+  auto ns = namespacet{symbol_table};
+
+  // should extend lower bound?
+  if(rhs.get_lower() < lhs.get_lower())
+  {
+    auto widened_lower_bound =
+      simplify_expr(minus_exprt(lower_bound, range), ns);
+    widened_ends.insert(interval_abstract_valuet::make_interval(
+      constant_interval_exprt(widened_lower_bound, lower_bound)));
+  }
+  // should extend upper bound?
+  if(lhs.get_upper() < rhs.get_upper())
+  {
+    auto widened_upper_bound =
+      simplify_expr(plus_exprt(upper_bound, range), ns);
+    widened_ends.insert(interval_abstract_valuet::make_interval(
+      constant_interval_exprt(upper_bound, widened_upper_bound)));
+  }
+
+  return widened_ends;
 }
