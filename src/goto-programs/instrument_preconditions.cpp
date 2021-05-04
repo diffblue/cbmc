@@ -139,6 +139,12 @@ void instrument_preconditions(goto_modelt &goto_model)
   // now remove the preconditions
   for(auto &f_it : goto_model.goto_functions.function_map)
     remove_preconditions(f_it.second.body);
+  // The above may leave some locations uninitialized, this update is a
+  // sanity to check to ensure the goto model and functions are correct
+  // for later passes.
+  // Note that only the first loop is the one known to leave locations
+  // uninitialized.
+  goto_model.goto_functions.update();
 }
 
 void remove_preconditions(goto_functiont &goto_function)
