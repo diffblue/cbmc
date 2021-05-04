@@ -160,6 +160,38 @@ elseif("${sat_impl}" STREQUAL "ipasir-cadical")
         ${cadical_SOURCE_DIR}/src
     )
     target_link_libraries(solvers cadical_ipasir)
+elseif("${sat_impl}" STREQUAL "ipasir-custom")
+    message(STATUS "Building with IPASIR solver linking: custom solver provided")
+
+    if (NOT DEFINED IPASIR)
+        message(FATAL_ERROR
+          "IPASIR solver source code not provided. Please use -DIPASIR=<location> "
+          "with <location> being the path to the IPASIR solver source code."
+        )
+    endif()
+
+    if (NOT DEFINED IPASIR_LIB)
+        message(FATAL_ERROR
+            "IPASIR solver library not provided. Please use -DIPASIR_LIB=<location> "
+            "with <location> being the path to the IPASIR solver precompiled static "
+            "library."
+        )
+    endif()
+
+    target_compile_definitions(solvers PUBLIC
+        SATCHECK_IPASIR HAVE_IPASIR IPASIR=${IPASIR}
+    )
+
+    add_library(ipasir_custom STATIC IMPORTED)
+    set_property(TARGET ipasir_custom
+        PROPERTY IMPORTED_LOCATION ${IPASIR_LIB}
+    )
+
+    target_include_directories(solvers
+        PUBLIC
+        ${IPASIR}
+    )
+    target_link_libraries(solvers ipasir_custom pthread)
 endif()
 
 if(CMAKE_USE_CUDD)
