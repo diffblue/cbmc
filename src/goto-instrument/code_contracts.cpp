@@ -1524,10 +1524,39 @@ goto_programt assigns_clauset::havoc_code(
   goto_programt havoc_statements;
   for(assigns_clause_targett *target : targets)
   {
+    // (1) If the assigned target is not a dereference,
+    // only include the havoc_statement
+
+    // (2) If the assigned target is a dereference, do the following:
+
+    // if(!__CPROVER_w_ok(target, 0)) goto z;
+    //      havoc_statements
+    // z: skip
+
+    // create the z label
+    goto_programt tmp_z;
+    goto_programt::targett z = tmp_z.add(goto_programt::make_skip(location));
+
+    const auto &target_ptr = target->get_direct_pointer();
+    if(to_address_of_expr(target_ptr).object().id() == ID_dereference)
+    {
+      // create the condition
+      exprt condition =
+        not_exprt(w_ok_exprt(target_ptr, from_integer(0, integer_typet())));
+      havoc_statements.add(goto_programt::make_goto(z, condition, location));
+    }
+
+    // create havoc_statements
     for(goto_programt::instructiont instruction :
         target->havoc_code(location).instructions)
     {
       havoc_statements.add(std::move(instruction));
+    }
+
+    if(to_address_of_expr(target_ptr).object().id() == ID_dereference)
+    {
+      // add the z label instruction
+      havoc_statements.destructive_append(tmp_z);
     }
   }
   return havoc_statements;
@@ -1577,8 +1606,28 @@ exprt assigns_clauset::compatible_expression(
     {
       if(first_iter)
       {
-        current_target_compatible =
-          target->compatible_expression(*called_target);
+        // TODO: Optimize the validation below and remove code duplication
+        // See GitHub issue #6105 for further details
+
+        // Validating the called target through __CPROVER_w_ok() is
+        // only useful when the called target is a dereference
+        const auto &called_target_ptr = called_target->get_direct_pointer();
+        if(
+          to_address_of_expr(called_target_ptr).object().id() == ID_dereference)
+        {
+          // or_exprt is short-circuited, therefore
+          // target->compatible_expression(*called_target) would not be
+          // checked on invalid called_targets.
+          current_target_compatible = or_exprt(
+            not_exprt(
+              w_ok_exprt(called_target_ptr, from_integer(0, integer_typet()))),
+            target->compatible_expression(*called_target));
+        }
+        else
+        {
+          current_target_compatible =
+            target->compatible_expression(*called_target);
+        }
         first_iter = false;
       }
       else
