@@ -40,7 +40,14 @@ protected:
   /// \brief call ld with original command line
   int run_ld();
 
-  int ld_hybrid_binary(bool);
+  /// Build an ELF or Mach-O binary containing a goto-cc section.
+  /// \param building_executable: set to true iff the target file is an
+  ///   executable
+  /// \param object_files: object files to be linked
+  /// \return zero, unless an error occurred
+  int ld_hybrid_binary(
+    bool building_executable,
+    const std::list<std::string> &object_files);
 };
 
 #endif // CPROVER_GOTO_CC_LD_MODE_H
