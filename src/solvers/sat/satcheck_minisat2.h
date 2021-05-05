@@ -29,7 +29,7 @@ template <typename T>
 class satcheck_minisat2_baset : public cnf_solvert, public hardness_collectort
 {
 public:
-  satcheck_minisat2_baset(T *, message_handlert &message_handler);
+  explicit satcheck_minisat2_baset(message_handlert &message_handler);
   virtual ~satcheck_minisat2_baset();
 
   tvt l_get(literalt a) const override final;
@@ -94,7 +94,7 @@ class satcheck_minisat_no_simplifiert:
   public satcheck_minisat2_baset<Minisat::Solver>
 {
 public:
-  explicit satcheck_minisat_no_simplifiert(message_handlert &message_handler);
+  using satcheck_minisat2_baset<Minisat::Solver>::satcheck_minisat2_baset;
   const std::string solver_text() override;
 };
 
@@ -102,7 +102,7 @@ class satcheck_minisat_simplifiert:
   public satcheck_minisat2_baset<Minisat::SimpSolver>
 {
 public:
-  explicit satcheck_minisat_simplifiert(message_handlert &message_handler);
+  using satcheck_minisat2_baset<Minisat::SimpSolver>::satcheck_minisat2_baset;
   const std::string solver_text() override final;
   void set_frozen(literalt a) override final;
   bool is_eliminated(literalt a) const;
