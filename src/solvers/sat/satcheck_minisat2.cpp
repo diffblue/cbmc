@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/invariant.h>
+#include <util/make_unique.h>
 #include <util/threeval.h>
 
 #include <minisat/core/Solver.h>
@@ -227,7 +228,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
 
     if(time_limit_seconds != 0)
     {
-      solver_to_interrupt = solver;
+      solver_to_interrupt = solver.get();
       old_handler = signal(SIGALRM, interrupt_solver);
       if(old_handler == SIG_ERR)
         log.warning() << "Failed to set solver time limit" << messaget::eom;
@@ -241,7 +242,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
     {
       alarm(0);
       signal(SIGALRM, old_handler);
-      solver_to_interrupt = solver;
+      solver_to_interrupt = solver.get();
     }
 
 #else // _WIN32
@@ -309,21 +310,14 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 template <typename T>
 satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
   message_handlert &message_handler)
-  : cnf_solvert(message_handler), solver(new T), time_limit_seconds(0)
+  : cnf_solvert(message_handler),
+    solver(util_make_unique<T>()),
+    time_limit_seconds(0)
 {
 }
 
-template<>
-satcheck_minisat2_baset<Minisat::Solver>::~satcheck_minisat2_baset()
-{
-  delete solver;
-}
-
-template<>
-satcheck_minisat2_baset<Minisat::SimpSolver>::~satcheck_minisat2_baset()
-{
-  delete solver;
-}
+template <typename T>
+satcheck_minisat2_baset<T>::~satcheck_minisat2_baset() = default;
 
 template<typename T>
 bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
