@@ -243,9 +243,8 @@ void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
 
 template <typename T>
 satcheck_glucose_baset<T>::satcheck_glucose_baset(
-  T *_solver,
   message_handlert &message_handler)
-  : cnf_solvert(message_handler), solver(_solver)
+  : cnf_solvert(message_handler), solver(new T)
 {
 }
 
@@ -285,21 +284,8 @@ void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
   }
 }
 
-satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert(
-  message_handlert &message_handler)
-  : satcheck_glucose_baset<Glucose::Solver>(
-      new Glucose::Solver,
-      message_handler)
-{
-}
-
-satcheck_glucose_simplifiert::satcheck_glucose_simplifiert(
-  message_handlert &message_handler)
-  : satcheck_glucose_baset<Glucose::SimpSolver>(
-      new Glucose::SimpSolver,
-      message_handler)
-{
-}
+template class satcheck_glucose_baset<Glucose::Solver>;
+template class satcheck_glucose_baset<Glucose::SimpSolver>;
 
 void satcheck_glucose_simplifiert::set_frozen(literalt a)
 {
