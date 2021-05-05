@@ -1,11 +1,3 @@
-/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_glucose.cpp:246: warning: no matching class member found for 
-  template
-  satcheck_glucose_baset< Glucose::Solver >::~satcheck_glucose_baset()
-
-/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_glucose.cpp:252: warning: no matching class member found for 
-  template
-  satcheck_glucose_baset< Glucose::SimpSolver >::~satcheck_glucose_baset()
-
 warning: Include graph for 'goto_instrument_parse_options.cpp' not generated, too many nodes (97), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'goto_functions.h' not generated, too many nodes (66), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.
 warning: Included by graph for 'goto_model.h' not generated, too many nodes (111), threshold is 60. Consider increasing DOT_GRAPH_MAX_NODES.

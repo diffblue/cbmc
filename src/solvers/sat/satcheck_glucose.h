@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/hardness_collector.h>
 
+#include <memory>
+
 // Select one: basic solver or with simplification.
 // Note that the solver with simplifier isn't really robust
 // when used incrementally, as variables may disappear
@@ -30,6 +32,8 @@ class satcheck_glucose_baset : public cnf_solvert, public hardness_collectort
 {
 public:
   explicit satcheck_glucose_baset(message_handlert &message_handler);
+  /// A default destructor defined in the `.cpp` is used to ensure the
+  /// unique_ptr to the solver is correctly destroyed.
   ~satcheck_glucose_baset() override;
 
   tvt l_get(literalt a) const override;
@@ -70,7 +74,7 @@ public:
 protected:
   resultt do_prop_solve() override;
 
-  T *solver;
+  std::unique_ptr<T> solver;
 
   void add_variables();
   bvt assumptions;
