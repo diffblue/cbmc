@@ -30,7 +30,7 @@ class satcheck_minisat2_baset : public cnf_solvert, public hardness_collectort
 {
 public:
   explicit satcheck_minisat2_baset(message_handlert &message_handler);
-  virtual ~satcheck_minisat2_baset();
+  ~satcheck_minisat2_baset() override;
 
   tvt l_get(literalt a) const override final;
 
