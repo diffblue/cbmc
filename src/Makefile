@@ -139,6 +139,15 @@ minisat2-download:
 	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
 	@rm minisat2_2.2.1.orig.tar.gz
 
+mergesat_version = 4.0-rc
+mergesat-download:
+	@echo "Downloading MergeSat $(mergesat_version)"
+	@$(DOWNLOADER) https://github.com/conp-solutions/mergesat/archive/$(mergesat_version).tar.gz
+	@$(TAR) xfz $(mergesat_version).tar.gz
+	@rm -Rf ../mergesat
+	@mv mergesat-$(mergesat_version) ../mergesat
+	@$(RM) $(mergesat_version).tar.gz
+
 cudd-download:
 	@echo "Downloading Cudd 3.0.0"
 	@$(DOWNLOADER) https://sourceforge.net/projects/cudd-mirror/files/cudd-3.0.0.tar.gz/download cudd-3.0.0.tar.gz
