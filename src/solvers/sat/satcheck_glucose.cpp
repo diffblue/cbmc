@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/invariant.h>
+#include <util/make_unique.h>
 #include <util/threeval.h>
 
 #include <core/Solver.h>
@@ -243,23 +244,13 @@ void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
 
 template <typename T>
 satcheck_glucose_baset<T>::satcheck_glucose_baset(
-  T *_solver,
   message_handlert &message_handler)
-  : cnf_solvert(message_handler), solver(_solver)
+  : cnf_solvert(message_handler), solver(util_make_unique<T>())
 {
 }
 
-template<>
-satcheck_glucose_baset<Glucose::Solver>::~satcheck_glucose_baset()
-{
-  delete solver;
-}
-
-template<>
-satcheck_glucose_baset<Glucose::SimpSolver>::~satcheck_glucose_baset()
-{
-  delete solver;
-}
+template <typename T>
+satcheck_glucose_baset<T>::~satcheck_glucose_baset() = default;
 
 template<typename T>
 bool satcheck_glucose_baset<T>::is_in_conflict(literalt a) const
@@ -285,21 +276,8 @@ void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
   }
 }
 
-satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert(
-  message_handlert &message_handler)
-  : satcheck_glucose_baset<Glucose::Solver>(
-      new Glucose::Solver,
-      message_handler)
-{
-}
-
-satcheck_glucose_simplifiert::satcheck_glucose_simplifiert(
-  message_handlert &message_handler)
-  : satcheck_glucose_baset<Glucose::SimpSolver>(
-      new Glucose::SimpSolver,
-      message_handler)
-{
-}
+template class satcheck_glucose_baset<Glucose::Solver>;
+template class satcheck_glucose_baset<Glucose::SimpSolver>;
 
 void satcheck_glucose_simplifiert::set_frozen(literalt a)
 {
