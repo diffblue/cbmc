@@ -119,19 +119,18 @@ DOWNLOADER = curl -L --remote-name
 TAR = tar
 
 minisat2-download:
-	@echo "Downloading Minisat 2.2.1"
+	@echo "Downloading MergeSat (replacing Minisat 2.2.1)"
 	@for i in $$(seq 1 3) ; do \
 	  $(DOWNLOADER) \
-	    http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz && \
+	    https://github.com/conp-solutions/mergesat/archive/refs/tags/v3.0.tar.gz && \
 	    exit 0 ; \
-		$(RM) minisat2_2.2.1.orig.tar.gz ; \
+		$(RM) v3.0.tar.gz ; \
 	  if [ $$i -lt 3 ] ; then echo "Re-trying in 10 seconds" 1>&2 ; sleep 10 ; fi ; \
 	done ; exit 1
-	@$(TAR) xfz minisat2_2.2.1.orig.tar.gz
+	@$(TAR) xfz v3.0.tar.gz # will create mergesat-3.0
 	@rm -Rf ../minisat-2.2.1
-	@mv minisat2-2.2.1 ../minisat-2.2.1
-	@(cd ../minisat-2.2.1; patch -p1 < ../scripts/minisat-2.2.1-patch)
-	@rm minisat2_2.2.1.orig.tar.gz
+	@mv mergesat-3.0 ../minisat-2.2.1
+	@rm v3.0.tar.gz
 
 cudd-download:
 	@echo "Downloading Cudd 3.0.0"
