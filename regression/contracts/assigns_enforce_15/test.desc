@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[bar.1\] line \d+ .*: FAILURE$
+^\[baz.1\] line \d+ .*: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks whether verification fails when enforcing a contract
+for functions, without assigns clauses, that modify an input.

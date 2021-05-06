@@ -513,50 +513,38 @@ void code_contractst::instrument_call_statement(
 
   exprt called_assigns =
     to_code_with_contract_type(called_symbol.type).assigns();
-  if(called_assigns.is_nil()) // Called function has no assigns clause
+  if(!called_assigns.is_nil()) // Called function has assigns clause
   {
-    // Create a false assertion, so the analysis
-    // will fail if this function is called.
-    goto_programt failing_assertion;
-    failing_assertion.add(goto_programt::make_assertion(
-      false_exprt(), instruction_iterator->source_location));
-    program.insert_before_swap(instruction_iterator, failing_assertion);
-    ++instruction_iterator;
-
-    return;
-  }
-    else // Called function has assigns clause
+    replace_symbolt replace;
+    // Replace formal parameters
+    code_function_callt::argumentst::const_iterator a_it =
+      call.arguments().begin();
+    for(code_typet::parameterst::const_iterator p_it =
+          called_type.parameters().begin();
+        p_it != called_type.parameters().end() &&
+        a_it != call.arguments().end();
+        ++p_it, ++a_it)
     {
-      replace_symbolt replace;
-      // Replace formal parameters
-      code_function_callt::argumentst::const_iterator a_it =
-        call.arguments().begin();
-      for(code_typet::parameterst::const_iterator p_it =
-            called_type.parameters().begin();
-          p_it != called_type.parameters().end() &&
-          a_it != call.arguments().end();
-          ++p_it, ++a_it)
+      if(!p_it->get_identifier().empty())
       {
-        if(!p_it->get_identifier().empty())
-        {
-          symbol_exprt p(p_it->get_identifier(), p_it->type());
-          replace.insert(p, *a_it);
-        }
+        symbol_exprt p(p_it->get_identifier(), p_it->type());
+        replace.insert(p, *a_it);
       }
-
-      replace(called_assigns);
-
-      // check compatibility of assigns clause with the called function
-      assigns_clauset called_assigns_clause(
-        called_assigns, *this, function_id, log);
-      exprt compatible =
-        assigns_clause.compatible_expression(called_assigns_clause);
-      goto_programt alias_assertion;
-      alias_assertion.add(goto_programt::make_assertion(
-        compatible, instruction_iterator->source_location));
-      program.insert_before_swap(instruction_iterator, alias_assertion);
-      ++instruction_iterator;
     }
+
+    replace(called_assigns);
+
+    // check compatibility of assigns clause with the called function
+    assigns_clauset called_assigns_clause(
+      called_assigns, *this, function_id, log);
+    exprt compatible =
+      assigns_clause.compatible_expression(called_assigns_clause);
+    goto_programt alias_assertion;
+    alias_assertion.add(goto_programt::make_assertion(
+      compatible, instruction_iterator->source_location));
+    program.insert_before_swap(instruction_iterator, alias_assertion);
+    ++instruction_iterator;
+  }
 }
 
 bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
@@ -634,9 +622,6 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
   exprt assigns_expr = type.assigns();
-  // Return if there are no reference checks to perform.
-  if(assigns_expr.is_nil())
-    return false;
 
   assigns_clauset assigns(assigns_expr, *this, function_id, log);
 
