@@ -1014,9 +1014,6 @@ void invariant_sett::modifies(const exprt &lhs)
   else if(lhs.id()=="valid_object")
   {
   }
-  else if(lhs.id()=="dynamic_size")
-  {
-  }
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
   {

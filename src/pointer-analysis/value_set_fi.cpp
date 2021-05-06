@@ -1219,7 +1219,6 @@ void value_set_fit::assign_rec(
       recursion_set);
   }
   else if(lhs.id()=="valid_object" ||
-          lhs.id()=="dynamic_size" ||
           lhs.id()=="dynamic_type")
   {
     // we ignore this here
