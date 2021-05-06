@@ -40,14 +40,6 @@ exprt pointer_offset(const exprt &pointer)
   return unary_exprt(ID_pointer_offset, pointer, signed_size_type());
 }
 
-exprt malloc_object(const exprt &pointer, const namespacet &ns)
-{
-  // we check __CPROVER_malloc_object!
-  const symbolt &malloc_object_symbol=ns.lookup(CPROVER_PREFIX "malloc_object");
-
-  return same_object(pointer, malloc_object_symbol.symbol_expr());
-}
-
 exprt deallocated(const exprt &pointer, const namespacet &ns)
 {
   // we check __CPROVER_deallocated!

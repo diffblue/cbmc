@@ -30,18 +30,9 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 {
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
-
-  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object = record_malloc ? malloc_res : __CPROVER_malloc_object;
-
   return malloc_res;
 }
 ```
-
-The internal variable `__CPROVER_malloc_object`
-is initialized to 0 in the `__CPROVER_initialize()` function of a goto program.
-The nondeterministic switch controls whether the address of the memory
-block allocated in this particular invocation of `malloc()` is recorded.
 
 When the option `--pointer-check` is used, cbmc generates the following
 verification condition for each pointer dereference expression (e.g.,
@@ -73,8 +64,7 @@ int main()
 ```
 
 Here the verification condition generated for the pointer dereference should
-fail. In the approach outlined above it indeed can, as one can choose true for
-`__VERIFIER_nondet___CPROVER_bool()` in the first call
-to `malloc()`, and false for `__VERIFIER_nondet___CPROVER_bool()` in the second
-call to `malloc()`. Thus, the object address of the first call to
-`malloc()` is recorded in `__CPROVER_malloc_object`.
+fail: for `p1` in `*p1`, `__CPROVER_POINTER_OFFSET` will evaluate to 1 (owing to
+the increment `p1++`, and `__CPROVER_OBJECT_SIZE` will also evaluate to 1.
+Consequently, the less-than comparison in the verification condition evaluates
+to false.

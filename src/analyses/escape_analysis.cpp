@@ -19,7 +19,6 @@ bool escape_domaint::is_tracked(const symbol_exprt &symbol)
   const irep_idt &identifier=symbol.get_identifier();
   if(
     identifier == CPROVER_PREFIX "memory_leak" ||
-    identifier == CPROVER_PREFIX "malloc_object" ||
     identifier == CPROVER_PREFIX "dead_object" ||
     identifier == CPROVER_PREFIX "deallocated")
   {
