@@ -21,10 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "cmdline.h"
+#include "config.h"
 #include "exception_utils.h"
 #include "exit_codes.h"
 #include "signal_catcher.h"
 #include "string_utils.h"
+#include "version.h"
 
 parse_options_baset::parse_options_baset(
   const std::string &_optstring,
@@ -145,6 +147,15 @@ int parse_options_baset::main()
     log.error() << "Unknown exception type!" << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
+}
+
+void parse_options_baset::log_version_and_architecture(
+  const std::string &front_end)
+{
+  log.status() << front_end << " version " << CBMC_VERSION << " "
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
+               << config.this_operating_system() << messaget::eom;
 }
 
 std::string align_center_with_border(const std::string &text)

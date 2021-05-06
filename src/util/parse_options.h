@@ -35,6 +35,9 @@ public:
   virtual int main();
   virtual ~parse_options_baset() { }
 
+  /// Write version and system architecture to log.status().
+  void log_version_and_architecture(const std::string &front_end);
+
 private:
   bool parse_result;
 

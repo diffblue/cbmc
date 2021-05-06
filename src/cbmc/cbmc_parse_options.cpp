@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cbmc_parse_options.h"
 
-#include <climits>
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
@@ -517,13 +516,7 @@ int cbmc_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
-  //
-  // Print a banner
-  //
-  log.status() << "CBMC version " << CBMC_VERSION << " "
-               << sizeof(void *) * CHAR_BIT << "-bit "
-               << config.this_architecture() << " "
-               << config.this_operating_system() << messaget::eom;
+  log_version_and_architecture("CBMC");
 
   //
   // Unwinding of transition systems is done by hw-cbmc.

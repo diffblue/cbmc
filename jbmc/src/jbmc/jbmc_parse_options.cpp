@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jbmc_parse_options.h"
 
-#include <climits>
 #include <cstdlib> // exit()
 #include <iostream>
 #include <memory>
@@ -478,13 +477,7 @@ int jbmc_parse_optionst::doit()
   optionst options;
   get_command_line_options(options);
 
-  //
-  // Print a banner
-  //
-  log.status() << "JBMC version " << CBMC_VERSION << " "
-               << sizeof(void *) * CHAR_BIT << "-bit "
-               << config.this_architecture() << " "
-               << config.this_operating_system() << messaget::eom;
+  log_version_and_architecture("JBMC");
 
   // output the options
   switch(ui_message_handler.get_ui())
