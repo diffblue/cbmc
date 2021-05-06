@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "janalyzer_parse_options.h"
 
+#include <climits>
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
@@ -357,8 +358,9 @@ int janalyzer_parse_optionst::doit()
   // Print a banner
   //
   log.status() << "JANALYZER version " << CBMC_VERSION << " "
-               << sizeof(void *) * 8 << "-bit " << config.this_architecture()
-               << " " << config.this_operating_system() << messaget::eom;
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
+               << config.this_operating_system() << messaget::eom;
 
   register_languages();
 

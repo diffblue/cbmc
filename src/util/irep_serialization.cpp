@@ -13,8 +13,9 @@ Date: May 2007
 
 #include "irep_serialization.h"
 
-#include <sstream>
+#include <climits>
 #include <iostream>
+#include <sstream>
 
 #include "exception_utils.h"
 #include "string_hash.h"
@@ -161,7 +162,7 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
 
   while(in.good())
   {
-    if(shift_distance >= sizeof(res) * 8)
+    if(shift_distance >= sizeof(res) * CHAR_BIT)
       throw deserialization_exceptiont("input number too large");
 
     unsigned char ch=static_cast<unsigned char>(in.get());

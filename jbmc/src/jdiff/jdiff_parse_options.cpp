@@ -11,6 +11,7 @@ Author: Peter Schrammel
 
 #include "jdiff_parse_options.h"
 
+#include <climits>
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
@@ -194,8 +195,9 @@ int jdiff_parse_optionst::doit()
   //
   // Print a banner
   //
-  log.status() << "JDIFF version " << CBMC_VERSION << " " << sizeof(void *) * 8
-               << "-bit " << config.this_architecture() << " "
+  log.status() << "JDIFF version " << CBMC_VERSION << " "
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
                << config.this_operating_system() << messaget::eom;
 
   if(cmdline.args.size() != 2)

@@ -7,8 +7,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
-#include <cstdlib>
-
 #include "analyze_symbol.h"
 
 #include <util/c_types.h>
@@ -19,6 +17,9 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <util/string2int.h>
 #include <util/string_constant.h>
 #include <util/string_utils.h>
+
+#include <climits>
+#include <cstdlib>
 
 gdb_value_extractort::gdb_value_extractort(
   const symbol_tablet &symbol_table,
@@ -102,7 +103,7 @@ mp_integer gdb_value_extractort::get_type_size(const typet &type) const
 {
   const auto maybe_size = pointer_offset_bits(type, ns);
   CHECK_RETURN(maybe_size.has_value());
-  return *maybe_size / 8;
+  return *maybe_size / CHAR_BIT;
 }
 
 void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)

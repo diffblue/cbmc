@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <cctype>
+#include <climits>
 #include <cstdlib>
 #include <limits>
 #include <ostream>
@@ -122,7 +123,7 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   if(n.empty())
     return 0;
 
-  if(n.size()<=(sizeof(unsigned long)*8))
+  if(n.size() <= (sizeof(unsigned long) * CHAR_BIT))
   {
     // this is a tuned implementation for short integers
 
@@ -264,10 +265,8 @@ mp_integer arith_left_shift(
   ullong_t shift=b.to_ulong();
 
   llong_t result=a.to_long()<<shift;
-  llong_t mask=
-    true_size<(sizeof(llong_t)*8) ?
-    (1LL << true_size) - 1 :
-    -1;
+  llong_t mask =
+    true_size < (sizeof(llong_t) * CHAR_BIT) ? (1LL << true_size) - 1 : -1;
   return result&mask;
 }
 
@@ -303,7 +302,7 @@ mp_integer logic_left_shift(
 
   ullong_t shift=b.to_ulong();
   llong_t result=a.to_long()<<shift;
-  if(true_size<(sizeof(llong_t)*8))
+  if(true_size < (sizeof(llong_t) * CHAR_BIT))
   {
     const llong_t sign = (1LL << (true_size - 1)) & result;
     const llong_t mask = (1LL << true_size) - 1;

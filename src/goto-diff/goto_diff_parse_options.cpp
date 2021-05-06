@@ -11,6 +11,7 @@ Author: Peter Schrammel
 
 #include "goto_diff_parse_options.h"
 
+#include <climits>
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
@@ -162,8 +163,9 @@ int goto_diff_parse_optionst::doit()
   // Print a banner
   //
   log.status() << "GOTO-DIFF version " << CBMC_VERSION << " "
-               << sizeof(void *) * 8 << "-bit " << config.this_architecture()
-               << " " << config.this_operating_system() << messaget::eom;
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
+               << config.this_operating_system() << messaget::eom;
 
   if(cmdline.args.size()!=2)
   {

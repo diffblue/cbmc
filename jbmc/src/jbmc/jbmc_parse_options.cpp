@@ -11,8 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jbmc_parse_options.h"
 
-#include <fstream>
+#include <climits>
 #include <cstdlib> // exit()
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -484,8 +485,9 @@ int jbmc_parse_optionst::doit()
   //
   // Print a banner
   //
-  log.status() << "JBMC version " << CBMC_VERSION << " " << sizeof(void *) * 8
-               << "-bit " << config.this_architecture() << " "
+  log.status() << "JBMC version " << CBMC_VERSION << " "
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
                << config.this_operating_system() << messaget::eom;
 
   // output the options
