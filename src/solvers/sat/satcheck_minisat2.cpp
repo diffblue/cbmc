@@ -77,7 +77,7 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   try
   {
     add_variables();
-    solver->setPolarity(a.var_no(), value ? l_True : l_False);
+    solver->setPolarity(a.var_no(), value); // ? l_True : l_False);
   }
   catch(Minisat::OutOfMemoryException)
   {
