@@ -2232,7 +2232,7 @@ goto_checkt::get_pointer_points_to_valid_memory_conditions(
       "dead object"));
   }
 
-  if(unknown || flags.is_dynamic_heap())
+  if(flags.is_dynamic_heap())
   {
     const or_exprt object_bounds_violation(
       object_lower_bound(address, nil_exprt()),
@@ -2241,8 +2241,7 @@ goto_checkt::get_pointer_points_to_valid_memory_conditions(
     conditions.push_back(conditiont(
       or_exprt(
         in_bounds_of_some_explicit_allocation,
-        implies_exprt(
-          dynamic_object(address), not_exprt(object_bounds_violation))),
+        not_exprt(object_bounds_violation)),
       "pointer outside dynamic object bounds"));
   }
 
@@ -2255,9 +2254,7 @@ goto_checkt::get_pointer_points_to_valid_memory_conditions(
     conditions.push_back(conditiont(
       or_exprt(
         in_bounds_of_some_explicit_allocation,
-        implies_exprt(
-          not_exprt(dynamic_object(address)),
-          not_exprt(object_bounds_violation))),
+        not_exprt(object_bounds_violation)),
       "pointer outside object bounds"));
   }
 

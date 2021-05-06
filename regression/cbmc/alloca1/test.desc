@@ -5,6 +5,6 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 free called for stack-allocated object: FAILURE$
-^\*\* 1 of 13 failed
+^\*\* 1 of 12 failed
 --
 ^warning: ignoring

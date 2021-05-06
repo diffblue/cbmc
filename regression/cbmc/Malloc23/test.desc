@@ -3,10 +3,10 @@ main.c
 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-pointer outside dynamic object bounds in \*p: FAILURE
-pointer outside dynamic object bounds in \*p: FAILURE
-pointer outside dynamic object bounds in p2\[.*1\]: FAILURE
-pointer outside dynamic object bounds in p2\[.*0\]: FAILURE
+pointer outside object bounds in \*p: FAILURE
+pointer outside object bounds in \*p: FAILURE
+pointer outside object bounds in p2\[.*1\]: FAILURE
+pointer outside object bounds in p2\[.*0\]: FAILURE
 \*\* 4 of [0-9]+ failed
 --
 ^warning: ignoring

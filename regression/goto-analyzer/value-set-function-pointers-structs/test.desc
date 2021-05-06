@@ -5,7 +5,7 @@ main.c
 ^file main.c line 46 function main: replacing function pointer by 2 possible targets$
 ^file main.c line 54 function main: replacing function pointer by 2 possible targets$
 ^main::1::fun1 \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
-^main::1::s2 \(\) -> \{\.fptr=value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end @ \[30, 32\]} @ \[30, 32\]
+^main::1::s2 \(\) -> \{\.fptr=value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end @ \[29, 31\]} @ \[29, 31\]
 ^main::1::fun2 \(\) -> value-set-begin: ptr ->\(g\) :value-set-end
 ^EXIT=0$
 ^SIGNAL=0$
