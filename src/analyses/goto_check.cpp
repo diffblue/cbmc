@@ -1347,7 +1347,7 @@ void goto_checkt::bounds_check_index(
   const index_exprt &expr,
   const guardt &guard)
 {
-  typet array_type = expr.array().type();
+  const typet &array_type = expr.array().type();
 
   if(array_type.id()==ID_pointer)
     throw "index got pointer as array type";
@@ -1382,9 +1382,10 @@ void goto_checkt::bounds_check_index(
         {
           exprt p_offset=pointer_offset(
             to_dereference_expr(ode.root_object()).pointer());
-          assert(p_offset.type()==effective_offset.type());
 
-          effective_offset=plus_exprt(p_offset, effective_offset);
+          effective_offset = plus_exprt{p_offset,
+                                        typecast_exprt::conditional_cast(
+                                          effective_offset, p_offset.type())};
         }
 
         exprt zero=from_integer(0, ode.offset().type());
@@ -1404,26 +1405,21 @@ void goto_checkt::bounds_check_index(
     }
   }
 
-  exprt type_matches_size=true_exprt();
-
   if(ode.root_object().id()==ID_dereference)
   {
     const exprt &pointer=
       to_dereference_expr(ode.root_object()).pointer();
 
-    const if_exprt size(
-      dynamic_object(pointer),
-      typecast_exprt(dynamic_size(ns), object_size(pointer).type()),
-      object_size(pointer));
+    const plus_exprt effective_offset{
+      ode.offset(),
+      typecast_exprt::conditional_cast(
+        pointer_offset(pointer), ode.offset().type())};
 
-    const plus_exprt effective_offset(ode.offset(), pointer_offset(pointer));
-
-    assert(effective_offset.op0().type()==effective_offset.op1().type());
-
-    const auto size_casted =
-      typecast_exprt::conditional_cast(size, effective_offset.type());
-
-    binary_relation_exprt inequality(effective_offset, ID_lt, size_casted);
+    binary_relation_exprt inequality{
+      effective_offset,
+      ID_lt,
+      typecast_exprt::conditional_cast(
+        object_size(pointer), effective_offset.type())};
 
     exprt in_bounds_of_some_explicit_allocation =
       is_in_bounds_of_some_explicit_allocation(
@@ -1432,7 +1428,6 @@ void goto_checkt::bounds_check_index(
 
     or_exprt precond(
       std::move(in_bounds_of_some_explicit_allocation),
-      and_exprt(dynamic_object(pointer), not_exprt(malloc_object(pointer, ns))),
       inequality);
 
     add_guarded_property(
@@ -1443,25 +1438,7 @@ void goto_checkt::bounds_check_index(
       expr,
       guard);
 
-    auto type_size_opt = size_of_expr(ode.root_object().type(), ns);
-
-    if(type_size_opt.has_value())
-    {
-      // Build a predicate that evaluates to true iff the size reported by
-      // sizeof (i.e., compile-time size) matches the actual run-time size. The
-      // run-time size for a dynamic (i.e., heap-allocated) object is determined
-      // by the dynamic_size(ns) expression, which can only be used when
-      // malloc_object(pointer, ns) evaluates to true for a given pointer.
-      type_matches_size = if_exprt{
-        dynamic_object(pointer),
-        and_exprt{malloc_object(pointer, ns),
-                  equal_exprt{typecast_exprt::conditional_cast(
-                                dynamic_size(ns), type_size_opt->type()),
-                              *type_size_opt}},
-        equal_exprt{typecast_exprt::conditional_cast(
-                      object_size(pointer), type_size_opt->type()),
-                    *type_size_opt}};
-    }
+    return;
   }
 
   const exprt &size=array_type.id()==ID_array ?
@@ -1497,7 +1474,7 @@ void goto_checkt::bounds_check_index(
       type_size_opt.value());
 
     add_guarded_property(
-      implies_exprt(type_matches_size, inequality),
+      inequality,
       name + " upper bound",
       "array bounds",
       expr.find_source_location(),
@@ -1506,14 +1483,11 @@ void goto_checkt::bounds_check_index(
   }
   else
   {
-    binary_relation_exprt inequality(index, ID_lt, size);
-
-    // typecast size
-    inequality.op1() = typecast_exprt::conditional_cast(
-      inequality.op1(), inequality.op0().type());
+    binary_relation_exprt inequality{
+      typecast_exprt::conditional_cast(index, size.type()), ID_lt, size};
 
     add_guarded_property(
-      implies_exprt(type_matches_size, inequality),
+      inequality,
       name + " upper bound",
       "array bounds",
       expr.find_source_location(),
