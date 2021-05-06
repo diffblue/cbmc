@@ -12,14 +12,11 @@ typedef struct
   Union List[1];
 } __attribute__((packed)) Struct3;
 
-extern size_t __CPROVER_malloc_size;
-
 int main()
 {
   Struct3 *p = malloc (sizeof (int) + 2 * sizeof(Union));
   p->Count = 3;
   int po=0;
-  size_t m=__CPROVER_malloc_size;
 
   // this should be fine
   p->List[0].a = 555;
