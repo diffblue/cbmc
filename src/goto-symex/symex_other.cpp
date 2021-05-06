@@ -144,23 +144,15 @@ void goto_symext::symex_other(
     {
       if(statement==ID_array_copy)
       {
-        byte_extract_exprt be(
-          byte_extract_id(),
-          src_array,
-          from_integer(0, index_type()),
-          dest_array.type());
-        src_array.swap(be);
+        src_array = make_byte_extract(
+          src_array, from_integer(0, index_type()), dest_array.type());
         do_simplify(src_array);
       }
       else
       {
         // ID_array_replace
-        byte_extract_exprt be(
-          byte_extract_id(),
-          dest_array,
-          from_integer(0, index_type()),
-          src_array.type());
-        dest_array.swap(be);
+        dest_array = make_byte_extract(
+          dest_array, from_integer(0, index_type()), src_array.type());
         do_simplify(dest_array);
       }
     }
@@ -196,8 +188,7 @@ void goto_symext::symex_other(
       auto array_size = size_of_expr(array_expr.type(), ns);
       CHECK_RETURN(array_size.has_value());
       do_simplify(array_size.value());
-      array_expr = byte_extract_exprt(
-        byte_extract_id(),
+      array_expr = make_byte_extract(
         array_expr,
         from_integer(0, index_type()),
         array_typet(char_type(), array_size.value()));

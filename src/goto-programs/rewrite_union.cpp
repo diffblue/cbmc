@@ -84,8 +84,7 @@ void rewrite_union(exprt &expr)
     if(op.type().id() == ID_union_tag || op.type().id() == ID_union)
     {
       exprt offset=from_integer(0, index_type());
-      byte_extract_exprt tmp(byte_extract_id(), op, offset, expr.type());
-      expr=tmp;
+      expr = make_byte_extract(op, offset, expr.type());
     }
   }
   else if(expr.id()==ID_union)
@@ -93,9 +92,7 @@ void rewrite_union(exprt &expr)
     const union_exprt &union_expr=to_union_expr(expr);
     exprt offset=from_integer(0, index_type());
     side_effect_expr_nondett nondet(expr.type(), expr.source_location());
-    byte_update_exprt tmp(
-      byte_update_id(), nondet, offset, union_expr.op());
-    expr=tmp;
+    expr = make_byte_update(nondet, offset, union_expr.op());
   }
 }
 

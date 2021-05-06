@@ -682,11 +682,8 @@ optionalt<exprt> get_subexpression_at_offset(
     }
   }
 
-  return byte_extract_exprt(
-    byte_extract_id(),
-    expr,
-    from_integer(offset_bytes, index_type()),
-    target_type_raw);
+  return make_byte_extract(
+    expr, from_integer(offset_bytes, index_type()), target_type_raw);
 }
 
 optionalt<exprt> get_subexpression_at_offset(

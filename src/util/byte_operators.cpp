@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "config.h"
 
-irep_idt byte_extract_id()
+static irep_idt byte_extract_id()
 {
   switch(config.ansi_c.endianness)
   {
@@ -27,7 +27,7 @@ irep_idt byte_extract_id()
   UNREACHABLE;
 }
 
-irep_idt byte_update_id()
+static irep_idt byte_update_id()
 {
   switch(config.ansi_c.endianness)
   {
@@ -42,4 +42,16 @@ irep_idt byte_update_id()
   }
 
   UNREACHABLE;
+}
+
+byte_extract_exprt
+make_byte_extract(const exprt &_op, const exprt &_offset, const typet &_type)
+{
+  return byte_extract_exprt{byte_extract_id(), _op, _offset, _type};
+}
+
+byte_update_exprt
+make_byte_update(const exprt &_op, const exprt &_offset, const exprt &_value)
+{
+  return byte_update_exprt{byte_update_id(), _op, _offset, _value};
 }

@@ -118,9 +118,13 @@ exprt pointer_logict::pointer_expr(
   CHECK_RETURN(deep_object_opt.has_value());
   exprt deep_object = deep_object_opt.value();
   simplify(deep_object, ns);
-  if(deep_object.id() != byte_extract_id())
+  if(
+    deep_object.id() != ID_byte_extract_little_endian &&
+    deep_object.id() != ID_byte_extract_big_endian)
+  {
     return typecast_exprt::conditional_cast(
       address_of_exprt(deep_object), type);
+  }
 
   const byte_extract_exprt &be = to_byte_extract_expr(deep_object);
   const address_of_exprt base(be.op());
