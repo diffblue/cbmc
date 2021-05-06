@@ -1391,7 +1391,6 @@ void value_sett::assign_rec(
       add_to_sets);
   }
   else if(lhs.id()=="valid_object" ||
-          lhs.id()=="dynamic_size" ||
           lhs.id()=="dynamic_type" ||
           lhs.id()=="is_zero_string" ||
           lhs.id()=="zero_string" ||
