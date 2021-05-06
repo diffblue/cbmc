@@ -91,8 +91,7 @@ exprt good_pointer_def(
   const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
   CHECK_RETURN(size_of_expr_opt.has_value());
 
-  const or_exprt good_dynamic(
-    not_exprt(dynamic_object(pointer)), not_exprt(deallocated(pointer, ns)));
+  const exprt good_dynamic = not_exprt{deallocated(pointer, ns)};
 
   const not_exprt not_null(null_pointer(pointer));
 
