@@ -252,19 +252,67 @@ SCENARIO(
         EXPECT_MODIFIED(merged, {interval_4minus_1, val2, val4, val4});
       }
     }
-    /*
-    WHEN("merging [2, 3] with [1, 5]")
+    WHEN("merging {[1, 3]} with {2, 4}")
     {
-      auto op1 = make_value_set(val2, val3, environment, ns);
-      auto op2 = make_value_set(val1, val5, environment, ns);
+      auto interval_1_3 = constant_interval_exprt(val1, val3);
+      auto op1 = make_value_set(interval_1_3, environment, ns);
+      auto op2 = make_value_set({val2, val4}, environment, ns);
 
       auto merged = widening_merge(op1, op2);
 
-      THEN("result is widen both bounds - [-4, 10]")
+      THEN("widen upper-bound, {[1, 3], 2 [4, 8]}")
       {
-        EXPECT_MODIFIED(merged, val4minus, val10);
+        auto interval_4_8 = constant_interval_exprt(val4, val8);
+        EXPECT_MODIFIED(merged, {interval_1_3, val2, interval_4_8});
       }
     }
+    WHEN("merging {[1, 3]} with {[2, 4]}")
+    {
+      auto interval_1_3 = constant_interval_exprt(val1, val3);
+      auto interval_2_4 = constant_interval_exprt(val2, val4);
+      auto op1 = make_value_set(interval_1_3, environment, ns);
+      auto op2 = make_value_set(interval_2_4, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("widen upper-bound, {[1, 3], [2, 8]}")
+      {
+        auto interval_2_8 = constant_interval_exprt(val2, val8);
+        EXPECT_MODIFIED(merged, {interval_1_3, interval_2_8});
+      }
+    }
+    WHEN("merging {[2, 4]} with {1, 3}")
+    {
+      auto interval_2_4 = constant_interval_exprt(val2, val4);
+      auto op1 = make_value_set(interval_2_4, environment, ns);
+      auto op2 = make_value_set({val1, val3}, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("widen lower bound - {[-3, 1], 3, [2, 4]}")
+      {
+        auto interval_3minus_1 =
+          constant_interval_exprt(from_integer(-3, type), val1);
+        EXPECT_MODIFIED(merged, {interval_2_4, val3, interval_3minus_1});
+      }
+    }
+    WHEN("merging {[2, 4]} with {[1, 3]}")
+    {
+      auto interval_2_4 = constant_interval_exprt(val2, val4);
+      auto interval_1_3 = constant_interval_exprt(val1, val3);
+      auto op1 = make_value_set(interval_2_4, environment, ns);
+      auto op2 = make_value_set(interval_1_3, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("widen lower bound - {[-3, 3], [2, 4]}")
+      {
+        auto interval_3minus_3 =
+          constant_interval_exprt(from_integer(-3, type), val3);
+        EXPECT_MODIFIED(merged, {interval_3minus_3, interval_2_4});
+      }
+    }
+    /*
     WHEN("merging [-3, -1] with [-4, -2]")
     {
       auto op1 = make_value_set(val3minus, val1minus, environment, ns);

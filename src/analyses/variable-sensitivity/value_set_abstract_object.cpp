@@ -117,9 +117,8 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 static bool are_any_top(const abstract_object_sett &set);
 
 static abstract_object_sett compact_values(const abstract_object_sett &values);
-static abstract_object_sett
-non_destructive_compact(const abstract_object_sett &values);
 static abstract_object_sett widen_value_set(
+  const abstract_object_sett &values,
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs);
 
@@ -230,8 +229,8 @@ abstract_object_pointert value_set_abstract_objectt::merge_with_value(
     widen_mode == widen_modet::could_widen && has_values(shared_from_this()) &&
     has_values(other))
   {
-    union_values.insert(widen_value_set(to_interval(), other->to_interval()));
-    union_values = non_destructive_compact(union_values);
+    union_values =
+      widen_value_set(union_values, to_interval(), other->to_interval());
   }
 
   return resolve_values(union_values);
@@ -416,6 +415,9 @@ static abstract_object_sett compact_values(const abstract_object_sett &values)
 
 static exprt eval_expr(const exprt &e);
 static bool is_le(const exprt &lhs, const exprt &rhs);
+static abstract_object_sett collapse_values_in_intervals(
+  const abstract_object_sett &values,
+  const std::vector<constant_interval_exprt> &intervals);
 static void
 collapse_overlapping_intervals(std::vector<constant_interval_exprt> &intervals);
 
@@ -474,24 +476,31 @@ non_destructive_compact(const abstract_object_sett &values)
   if(intervals.empty())
     return values;
 
-  auto compacted = abstract_object_sett{};
+  return collapse_values_in_intervals(values, intervals);
+}
+
+static abstract_object_sett collapse_values_in_intervals(
+  const abstract_object_sett &values,
+  const std::vector<constant_interval_exprt> &intervals)
+{
+  auto collapsed = abstract_object_sett{};
   // for each value, including the intervals
   // keep it if it is not in any of the intervals
   std::copy_if(
     values.begin(),
     values.end(),
-    std::back_inserter(compacted),
+    std::back_inserter(collapsed),
     [&intervals](const abstract_object_pointert &object) {
       return value_is_not_contained_in(object, intervals);
     });
   std::transform(
     intervals.begin(),
     intervals.end(),
-    std::back_inserter(compacted),
+    std::back_inserter(collapsed),
     [](const constant_interval_exprt &interval) {
       return interval_abstract_valuet::make_interval(interval);
     });
-  return compacted;
+  return collapsed;
 }
 
 static abstract_object_sett
@@ -554,13 +563,14 @@ static bool is_le(const exprt &lhs, const exprt &rhs)
 }
 
 static abstract_object_sett widen_value_set(
+  const abstract_object_sett &values,
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs)
 {
-  auto widened_ends = abstract_object_sett{};
-
   if(lhs.contains(rhs))
-    return widened_ends;
+    return values;
+
+  auto widened_ends = std::vector<constant_interval_exprt>{};
 
   auto lower_bound =
     constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
@@ -575,19 +585,32 @@ static abstract_object_sett widen_value_set(
   // should extend lower bound?
   if(rhs.get_lower() < lhs.get_lower())
   {
-    auto widened_lower_bound =
-      simplify_expr(minus_exprt(lower_bound, range), ns);
-    widened_ends.insert(interval_abstract_valuet::make_interval(
-      constant_interval_exprt(widened_lower_bound, lower_bound)));
+    auto widened_lower_bound = constant_interval_exprt(
+      simplify_expr(minus_exprt(lower_bound, range), ns), lower_bound);
+    widened_ends.push_back(widened_lower_bound);
+    for(auto &obj : values)
+    {
+      auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+      auto as_expr = value->to_interval();
+      if(is_le(as_expr.get_lower(), lower_bound))
+        widened_ends.push_back(as_expr);
+    }
   }
   // should extend upper bound?
   if(lhs.get_upper() < rhs.get_upper())
   {
-    auto widened_upper_bound =
-      simplify_expr(plus_exprt(upper_bound, range), ns);
-    widened_ends.insert(interval_abstract_valuet::make_interval(
-      constant_interval_exprt(upper_bound, widened_upper_bound)));
+    auto widened_upper_bound = constant_interval_exprt(
+      upper_bound, simplify_expr(plus_exprt(upper_bound, range), ns));
+    widened_ends.push_back(widened_upper_bound);
+    for(auto &obj : values)
+    {
+      auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+      auto as_expr = value->to_interval();
+      if(is_le(upper_bound, as_expr.get_upper()))
+        widened_ends.push_back(as_expr);
+    }
   }
 
-  return widened_ends;
+  collapse_overlapping_intervals(widened_ends);
+  return collapse_values_in_intervals(values, widened_ends);
 }
