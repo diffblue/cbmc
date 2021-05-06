@@ -4,10 +4,16 @@
 // A known bug (resolved in PR #2278) causes the use of quantifiers
 // in ensures to fail.
 
+// clang-format off
 int initialize(int *arr)
+  __CPROVER_assigns(*arr)
   __CPROVER_ensures(
-    __CPROVER_forall {int i; (0 <= i && i < 10) ==> arr[i] == i}
+    __CPROVER_forall {
+      int i;
+      (0 <= i && i < 10) ==> arr[i] == i
+    }
   )
+// clang-format on
 {
   for(int i = 0; i < 10; i++)
   {

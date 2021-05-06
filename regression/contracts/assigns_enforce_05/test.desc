@@ -1,9 +1,11 @@
 CORE
 main.c
 --enforce-all-contracts
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^\[f1.1\] line \d+ .*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that verification fails when a function with an assigns clause calls a function without an assigns clause.
+This test checks that verification succeeds when enforcing a contract
+for functions, without assigns clauses, that don't modify anything.
