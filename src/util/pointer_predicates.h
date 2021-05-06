@@ -20,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &);
 exprt dead_object(const exprt &pointer, const namespacet &);
-DEPRECATED(SINCE(2021, 5, 6, "Use object_size instead"))
-exprt dynamic_size(const namespacet &);
 exprt pointer_offset(const exprt &pointer);
 exprt pointer_object(const exprt &pointer);
 DEPRECATED(SINCE(2021, 5, 6, "Unnecessary, remove any use"))
@@ -34,15 +32,6 @@ exprt good_pointer_def(const exprt &pointer, const namespacet &);
 exprt null_object(const exprt &pointer);
 exprt null_pointer(const exprt &pointer);
 exprt integer_address(const exprt &pointer);
-DEPRECATED(SINCE(2021, 5, 6, "Use object_lower_bound instead"))
-exprt dynamic_object_lower_bound(
-  const exprt &pointer,
-  const exprt &offset);
-DEPRECATED(SINCE(2021, 5, 6, "Use object_upper_bound instead"))
-exprt dynamic_object_upper_bound(
-  const exprt &pointer,
-  const namespacet &,
-  const exprt &access_size);
 exprt object_lower_bound(
   const exprt &pointer,
   const exprt &offset);
