@@ -12,9 +12,8 @@ main.c
 ^\[main.pointer_dereference.7\] .* dereference failure: pointer invalid in \*s: FAILURE$
 ^\[main.pointer_dereference.8\] .* dereference failure: deallocated dynamic object in \*s: FAILURE$
 ^\[main.pointer_dereference.9\] .* dereference failure: dead object in \*s: FAILURE$
-^\[main.pointer_dereference.10\] .* dereference failure: pointer outside dynamic object bounds in \*s: FAILURE$
-^\[main.pointer_dereference.11\] .* dereference failure: pointer outside object bounds in \*s: FAILURE$
-^\[main.pointer_dereference.12\] .* dereference failure: invalid integer address in \*s: FAILURE$
+^\[main.pointer_dereference.10\] .* dereference failure: pointer outside object bounds in \*s: FAILURE$
+^\[main.pointer_dereference.11\] .* dereference failure: invalid integer address in \*s: FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
