@@ -64,11 +64,6 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
-exprt dynamic_size(const namespacet &ns)
-{
-  return ns.lookup(CPROVER_PREFIX "malloc_size").symbol_expr();
-}
-
 exprt dynamic_object(const exprt &pointer)
 {
   exprt dynamic_expr(ID_is_dynamic_object, bool_typet());
@@ -121,42 +116,6 @@ exprt null_pointer(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(pointer, null_pointer);
-}
-
-exprt dynamic_object_lower_bound(
-  const exprt &pointer,
-  const exprt &offset)
-{
-  return object_lower_bound(pointer, offset);
-}
-
-exprt dynamic_object_upper_bound(
-  const exprt &pointer,
-  const namespacet &ns,
-  const exprt &access_size)
-{
-  // this is
-  // POINTER_OFFSET(p)+access_size>__CPROVER_malloc_size
-
-  exprt malloc_size=dynamic_size(ns);
-
-  exprt object_offset=pointer_offset(pointer);
-
-  // need to add size
-  irep_idt op=ID_ge;
-  exprt sum=object_offset;
-
-  if(access_size.is_not_nil())
-  {
-    op=ID_gt;
-
-    sum = plus_exprt(
-      typecast_exprt::conditional_cast(object_offset, access_size.type()),
-      access_size);
-  }
-
-  return binary_relation_exprt(
-    typecast_exprt::conditional_cast(sum, malloc_size.type()), op, malloc_size);
 }
 
 exprt object_upper_bound(
