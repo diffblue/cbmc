@@ -16,6 +16,9 @@ Date: August 2012
 #include <string>
 #include <vector>
 
+/// This performs shell quoting if necessary on input \p src.
+std::string shell_quote(const std::string &src);
+
 int run(const std::string &what, const std::vector<std::string> &argv);
 
 /// This runs the executable given by the file name \p what.

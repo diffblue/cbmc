@@ -449,7 +449,7 @@ int run(
 }
 
 /// quote a string for bash and CMD
-static std::string shell_quote(const std::string &src)
+std::string shell_quote(const std::string &src)
 {
   #ifdef _WIN32
   // first check if quoting is needed at all
