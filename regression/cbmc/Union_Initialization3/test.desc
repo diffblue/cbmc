@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+CBMC would previously report "warning: ignoring nil" and eventually fail an
+invariant in src/solvers/flattening/boolbv_width.cpp:199 function: get_entry.
