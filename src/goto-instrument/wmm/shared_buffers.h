@@ -159,12 +159,8 @@ public:
   irep_idt choice(const irep_idt &function_id, const std::string &suffix)
   {
     const auto maybe_symbol = symbol_table.lookup(function_id);
-    const std::string function_base_name =
-      maybe_symbol
-        ? id2string(maybe_symbol->base_name)
-        : "main";
-    return add(function_base_name+"_weak_choice",
-      function_base_name+"_weak_choice", suffix, bool_typet());
+    CHECK_RETURN(maybe_symbol);
+    return add(*maybe_symbol, "_weak_choice" + suffix, bool_typet());
   }
 
   bool is_buffered(
@@ -244,29 +240,24 @@ protected:
   messaget &message;
 
   irep_idt add(
-    const irep_idt &object,
-    const irep_idt &base_name,
+    const symbolt &object,
     const std::string &suffix,
     const typet &type,
     bool added_as_instrumentation);
 
-  irep_idt add(
-    const irep_idt &object,
-    const irep_idt &base_name,
-    const std::string &suffix,
-    const typet &type)
+  irep_idt
+  add(const symbolt &object, const std::string &suffix, const typet &type)
   {
-    return add(object, base_name, suffix, type, true);
+    return add(object, suffix, type, true);
   }
 
   /* inserting a non-instrumenting, fresh variable */
   irep_idt add_fresh_var(
-    const irep_idt &object,
-    const irep_idt &base_name,
+    const symbolt &object,
     const std::string &suffix,
     const typet &type)
   {
-    return add(object, base_name, suffix, type, false);
+    return add(object, suffix, type, false);
   }
 
   void add_initialization(goto_programt &goto_program);
