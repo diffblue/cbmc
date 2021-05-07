@@ -52,10 +52,9 @@ goto_modelt get_goto_model_from_c(std::istream &in)
   CHECK_RETURN(language_file.language);
 
   languaget &language = *language_file.language;
-  language.set_message_handler(null_message_handler);
 
   {
-    const bool error = language.parse(in, "");
+    const bool error = language.parse(in, "", null_message_handler);
 
     if(error)
       throw invalid_source_file_exceptiont("parsing failed");

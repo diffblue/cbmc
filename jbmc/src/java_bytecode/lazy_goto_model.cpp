@@ -147,12 +147,11 @@ void lazy_goto_modelt::initialize(
     CHECK_RETURN(lf.language != nullptr);
 
     languaget &language = *lf.language;
-    language.set_message_handler(message_handler);
-    language.set_language_options(options);
+    language.set_language_options(options, message_handler);
 
     msg.status() << "Parsing ..." << messaget::eom;
 
-    if(dynamic_cast<java_bytecode_languaget &>(language).parse())
+    if(dynamic_cast<java_bytecode_languaget &>(language).parse(message_handler))
     {
       throw invalid_source_file_exceptiont("PARSING ERROR");
     }
@@ -190,12 +189,11 @@ void lazy_goto_modelt::initialize(
       }
 
       languaget &language = *lf.language;
-      language.set_message_handler(message_handler);
-      language.set_language_options(options);
+      language.set_language_options(options, message_handler);
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
-      if(language.parse(infile, filename))
+      if(language.parse(infile, filename, message_handler))
       {
         throw invalid_source_file_exceptiont("PARSING ERROR");
       }
@@ -244,7 +242,7 @@ void lazy_goto_modelt::initialize(
 
     // Create the new entry-point
     entry_point_generation_failed =
-      language->generate_support_functions(symbol_table);
+      language->generate_support_functions(symbol_table, message_handler);
 
     // Remove the function from the goto functions so it is copied back in
     // from the symbol table during goto_convert

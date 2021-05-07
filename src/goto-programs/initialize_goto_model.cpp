@@ -52,9 +52,9 @@ static bool generate_entry_point_for_function(
   PRECONDITION(!entry_function_sym->mode.empty());
   auto const entry_language = get_language_from_mode(entry_function_sym->mode);
   CHECK_RETURN(entry_language != nullptr);
-  entry_language->set_message_handler(message_handler);
-  entry_language->set_language_options(options);
-  return entry_language->generate_support_functions(goto_model.symbol_table);
+  entry_language->set_language_options(options, message_handler);
+  return entry_language->generate_support_functions(
+    goto_model.symbol_table, message_handler);
 }
 
 goto_modelt initialize_goto_model(
@@ -114,12 +114,11 @@ goto_modelt initialize_goto_model(
       }
 
       languaget &language=*lf.language;
-      language.set_message_handler(message_handler);
-      language.set_language_options(options);
+      language.set_language_options(options, message_handler);
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
-      if(language.parse(infile, filename))
+      if(language.parse(infile, filename, message_handler))
       {
         throw invalid_source_file_exceptiont("PARSING ERROR");
       }
@@ -161,8 +160,8 @@ goto_modelt initialize_goto_model(
     remove_existing_entry_point(goto_model.symbol_table);
 
     // Create the new entry-point
-    entry_point_generation_failed =
-      language->generate_support_functions(goto_model.symbol_table);
+    entry_point_generation_failed = language->generate_support_functions(
+      goto_model.symbol_table, message_handler);
 
     // Remove the function from the goto functions so it is copied back in
     // from the symbol table during goto_convert

@@ -37,15 +37,16 @@ void language_filet::get_modules()
 
 void language_filet::convert_lazy_method(
   const irep_idt &id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  language->convert_lazy_method(id, symbol_table);
+  language->convert_lazy_method(id, symbol_table, message_handler);
 }
 
 void language_filest::show_parse(std::ostream &out)
 {
   for(const auto &file : file_map)
-    file.second.language->show_parse(out);
+    file.second.language->show_parse(out, get_message_handler());
 }
 
 bool language_filest::parse()
@@ -66,7 +67,7 @@ bool language_filest::parse()
 
     languaget &language=*(file.second.language);
 
-    if(language.parse(infile, file.first))
+    if(language.parse(infile, file.first, get_message_handler()))
     {
       error() << "Parsing of " << file.first << " failed" << eom;
       return true;
@@ -88,7 +89,7 @@ bool language_filest::typecheck(
 
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table, get_message_handler()))
       return true;
   }
 
@@ -131,12 +132,14 @@ bool language_filest::typecheck(
     {
       if(file.second.language->can_keep_file_local())
       {
-        if(file.second.language->typecheck(symbol_table, "", keep_file_local))
+        if(file.second.language->typecheck(
+             symbol_table, "", get_message_handler(), keep_file_local))
           return true;
       }
       else
       {
-        if(file.second.language->typecheck(symbol_table, ""))
+        if(file.second.language->typecheck(
+             symbol_table, "", get_message_handler()))
           return true;
       }
       // register lazy methods.
@@ -168,7 +171,8 @@ bool language_filest::generate_support_functions(
   for(auto &file : file_map)
   {
     if(languages.insert(file.second.language->id()).second)
-      if(file.second.language->generate_support_functions(symbol_table))
+      if(file.second.language->generate_support_functions(
+           symbol_table, get_message_handler()))
         return true;
   }
 
@@ -194,7 +198,7 @@ bool language_filest::interfaces(
 {
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table, get_message_handler()))
       return true;
   }
 
@@ -262,12 +266,12 @@ bool language_filest::typecheck_module(
   if(module.file->language->can_keep_file_local())
   {
     module.in_progress = !module.file->language->typecheck(
-      symbol_table, module.name, keep_file_local);
+      symbol_table, module.name, get_message_handler(), keep_file_local);
   }
   else
   {
-    module.in_progress =
-      !module.file->language->typecheck(symbol_table, module.name);
+    module.in_progress = !module.file->language->typecheck(
+      symbol_table, module.name, get_message_handler());
   }
 
   if(!module.in_progress)

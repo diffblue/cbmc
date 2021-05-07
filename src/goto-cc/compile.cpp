@@ -477,8 +477,6 @@ bool compilet::parse(
     return true;
   }
 
-  languagep->set_message_handler(log.get_message_handler());
-
   if(file_name == "-")
     return parse_stdin(*languagep);
 
@@ -518,13 +516,13 @@ bool compilet::parse(
       }
     }
 
-    lf.language->preprocess(infile, file_name, *os);
+    lf.language->preprocess(infile, file_name, *os, log.get_message_handler());
   }
   else
   {
     log.statistics() << "Parsing: " << file_name << messaget::eom;
 
-    if(lf.language->parse(infile, file_name))
+    if(lf.language->parse(infile, file_name, log.get_message_handler()))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
       return true;
@@ -560,11 +558,11 @@ bool compilet::parse_stdin(languaget &language)
       }
     }
 
-    language.preprocess(std::cin, "", *os);
+    language.preprocess(std::cin, "", *os, log.get_message_handler());
   }
   else
   {
-    if(language.parse(std::cin, ""))
+    if(language.parse(std::cin, "", log.get_message_handler()))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
       return true;
