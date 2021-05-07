@@ -180,7 +180,7 @@ void link_goto_model(
 
   if(linking.typecheck_main())
   {
-    throw invalid_source_file_exceptiont("typechecking main failed");
+    throw invalid_input_exceptiont("typechecking main failed");
   }
   if(link_functions(
        dest.symbol_table,
@@ -191,6 +191,6 @@ void link_goto_model(
        weak_symbols,
        linking.object_type_updates))
   {
-    throw invalid_source_file_exceptiont("linking failed");
+    throw invalid_input_exceptiont("linking failed");
   }
 }
