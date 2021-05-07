@@ -81,8 +81,8 @@ void print_struct_alignment_problems(
                   << symbol_pair.second.location << '\n';
             }
 
-            out << "members " << it_mem->get_pretty_name() << " and "
-                << it_next->get_pretty_name() << " might interfere\n";
+            out << "members " << it_mem->get_name() << " and "
+                << it_next->get_name() << " might interfere\n";
           }
         }
       }
