@@ -14,10 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <map>
 
 #include <util/c_types.h>
-#include <util/expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
 #include <ansi-c/merged_type.h>

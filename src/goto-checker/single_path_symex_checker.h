@@ -14,12 +14,9 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <chrono>
 
-#include <util/optional.h>
-
 #include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "single_path_symex_only_checker.h"
-#include "solver_factory.h"
 #include "witness_provider.h"
 
 /// Uses goto-symex to symbolically execute each path in the

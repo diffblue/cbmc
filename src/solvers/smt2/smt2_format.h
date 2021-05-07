@@ -9,7 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_FORMAT_H
 #define CPROVER_SOLVERS_SMT2_SMT2_FORMAT_H
 
-#include <util/expr.h>
+#include <iosfwd>
+
+class exprt;
+class typet;
 
 template <typename T>
 struct smt2_format_containert

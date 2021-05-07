@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_analyzer_parse_options.h"
 
-#include <util/unicode.h>
-
 #ifdef _MSC_VER
+#  include <util/unicode.h>
+
 int wmain(int argc, const wchar_t **argv_wide)
 {
   auto vec=narrow_argv(argc, argv_wide);

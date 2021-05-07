@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/invariant.h>
 #include <util/namespace.h>
+#include <util/symbol.h>
 
 struct language_entryt
 {

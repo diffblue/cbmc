@@ -11,7 +11,6 @@ Author:
 
 #include "osx_fat_reader.h"
 
-#include <cstdlib>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 

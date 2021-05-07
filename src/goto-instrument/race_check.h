@@ -14,8 +14,10 @@ Date: February 2006
 #ifndef CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
 #define CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
 
-#include <pointer-analysis/value_sets.h>
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_functions.h>
+
+class goto_modelt;
+class value_setst;
 
 void race_check(
   value_setst &,

@@ -12,11 +12,12 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_GOTO_VERIFIER_H
 #define CPROVER_GOTO_CHECKER_GOTO_VERIFIER_H
 
-#include <util/optional.h>
-#include <util/options.h>
-#include <util/ui_message.h>
-
 #include "properties.h"
+
+#include <util/message.h>
+
+class optionst;
+class ui_message_handlert;
 
 /// An implementation of `goto_verifiert` checks all properties in
 /// a goto model. It typically uses, but doesn't have to use, an

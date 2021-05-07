@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STRING_LITERAL_EXPR_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STRING_LITERAL_EXPR_H
 
-#include <util/expr.h>
+#include <util/expr_cast.h>
 
 class java_string_literal_exprt : public exprt
 {

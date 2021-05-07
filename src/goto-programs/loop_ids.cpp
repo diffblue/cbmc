@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json_irep.h>
 #include <util/xml_irep.h>
 
+#include "goto_model.h"
+
 void show_loop_ids(
   ui_message_handlert::uit ui,
   const goto_modelt &goto_model)

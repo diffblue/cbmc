@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
+#include "path_storage.h"
+
 void goto_symext::symex_decl(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;

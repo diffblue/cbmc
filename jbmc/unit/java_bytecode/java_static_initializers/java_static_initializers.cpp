@@ -8,11 +8,16 @@ Author: Diffblue Ltd.
 
 #include <java_bytecode/java_static_initializers.h>
 
-#include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/ci_lazy_methods_needed.h>
+#include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
+
 #include <testing-utils/expr_query.h>
 #include <testing-utils/use_catch.h>
+
+#include <util/arith_tools.h>
 #include <util/json.h>
+#include <util/symbol_table.h>
 
 SCENARIO("is_clinit_function", "[core][java_static_initializers]")
 {

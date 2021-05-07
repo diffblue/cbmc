@@ -10,7 +10,6 @@ Author: Diffblue Ltd
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
 #include <unordered_map>
-#include <memory>
 #include <string>
 #include <vector>
 

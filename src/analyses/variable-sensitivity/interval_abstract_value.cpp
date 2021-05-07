@@ -6,16 +6,15 @@
 
 \*******************************************************************/
 
-#include <limits.h>
 #include <ostream>
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
+#include <util/simplify_expr.h>
 
-#include "abstract_environment.h"
-
-#include "context_abstract_object.h"
+#include "abstract_object_statistics.h"
 #include "interval_abstract_value.h"
 
 static index_range_implementation_ptrt make_interval_index_range(

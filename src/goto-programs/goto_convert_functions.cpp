@@ -10,7 +10,6 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 
-#include <util/fresh_symbol.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
@@ -18,7 +17,7 @@ Date: June 2003
 
 #include <linking/static_lifetime_init.h>
 
-#include "goto_inline.h"
+#include "goto_model.h"
 
 goto_convert_functionst::goto_convert_functionst(
   symbol_table_baset &_symbol_table,

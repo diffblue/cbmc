@@ -11,8 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "guard_expr.h"
 
-#include <ostream>
-
+#include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>

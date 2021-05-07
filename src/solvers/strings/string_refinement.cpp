@@ -19,13 +19,13 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include "string_refinement.h"
 
-#include <iomanip>
-#include <numeric>
 #include <solvers/sat/satcheck.h>
 #include <stack>
 #include <unordered_set>
+
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/format_type.h>
 #include <util/magic.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
@@ -33,6 +33,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include "equation_symbol_mapping.h"
 #include "string_constraint_instantiation.h"
 #include "string_dependencies.h"
+#include "string_refinement_invariant.h"
 
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,

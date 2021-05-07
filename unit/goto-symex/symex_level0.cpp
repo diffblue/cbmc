@@ -6,11 +6,12 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <goto-symex/goto_symex_state.h>
 #include <goto-symex/renaming_level.h>
+
+#include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 

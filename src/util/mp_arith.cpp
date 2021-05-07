@@ -11,10 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <cctype>
 #include <climits>
-#include <cstdlib>
-#include <limits>
-#include <ostream>
-#include <sstream>
 #include <vector>
 
 #include "arith_tools.h"

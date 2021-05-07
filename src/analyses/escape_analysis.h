@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai.h"
 
-class escape_analysist;
-
 class escape_domaint:public ai_domain_baset
 {
 public:

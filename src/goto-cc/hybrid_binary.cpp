@@ -12,6 +12,7 @@ Author: Michael Tautschnig, 2018
 #include "hybrid_binary.h"
 
 #include <util/file_util.h>
+#include <util/message.h>
 #include <util/run.h>
 #include <util/suffix.h>
 

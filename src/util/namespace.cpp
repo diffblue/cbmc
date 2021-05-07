@@ -14,10 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include "c_types.h"
-#include "prefix.h"
 #include "std_expr.h"
-#include "std_types.h"
-#include "string2int.h"
 #include "symbol_table.h"
 
 namespace_baset::~namespace_baset()

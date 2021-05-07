@@ -12,7 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H
 #define CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H
 
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_program.h>
+
+class goto_functionst;
+class goto_modelt;
 
 void full_slicer(
   goto_functionst &,

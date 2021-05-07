@@ -11,9 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "multi_path_symex_only_checker.h"
 
-#include <util/invariant.h>
+#include <util/ui_message.h>
 
-#include <goto-symex/memory_model.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 

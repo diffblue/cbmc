@@ -15,7 +15,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
-#include <algorithm>
 #include <stdexcept>
 
 /// Minimum value of double integer literals.

@@ -9,12 +9,9 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <solvers/strings/string_refinement.h>
-
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
+#include <util/union_find_replace.h>
 
 SCENARIO("union_find_replace", "[core][solvers][strings][string_refinement]")
 {

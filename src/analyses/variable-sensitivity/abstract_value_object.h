@@ -13,7 +13,8 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_OBJECT_H
 
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <util/interval.h>
+
+class constant_interval_exprt;
 
 class abstract_value_tag
 {

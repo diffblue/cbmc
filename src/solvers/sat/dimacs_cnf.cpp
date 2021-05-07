@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/magic.h>
 
 #include <iostream>
-#include <sstream>
 
 dimacs_cnft::dimacs_cnft(message_handlert &message_handler)
   : cnf_clause_listt(message_handler), break_lines(false)

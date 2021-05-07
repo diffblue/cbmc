@@ -10,7 +10,6 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/name_mangler.h>
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
@@ -20,12 +19,13 @@ Author: Diffblue Ltd.
 #include <util/pointer_offset_size.h>
 #include <util/rename.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 
-#include <functional>
 #include <iterator>
+
+#include "common_harness_generator_options.h"
+#include "goto_harness_generator.h"
 
 bool recursive_initialization_configt::handle_option(
   const std::string &option,

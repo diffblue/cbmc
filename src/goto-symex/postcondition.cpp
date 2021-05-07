@@ -12,9 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "postcondition.h"
 
 #include <util/find_symbols.h>
+#include <util/pointer_expr.h>
+#include <util/range.h>
 #include <util/std_expr.h>
 
-#include "goto_symex_state.h"
+#include <pointer-analysis/value_set.h>
+
+#include "renaming_level.h"
+#include "symex_target_equation.h"
 
 class postconditiont
 {

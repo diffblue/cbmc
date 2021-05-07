@@ -15,9 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <chrono>
 #include <memory>
 
-#include <goto-programs/safety_checker.h>
 #include <goto-symex/build_goto_trace.h>
-#include <goto-symex/path_storage.h>
 
 #include "incremental_goto_checker.h"
 #include "properties.h"

@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 
-#include <util/irep.h>
 #include <util/optional.h>
 
+class irept;
 class message_handlert;
 
 /// returns an irep for an SMT-LIB2 expression read from a given stream

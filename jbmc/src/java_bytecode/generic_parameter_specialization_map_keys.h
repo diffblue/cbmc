@@ -3,8 +3,7 @@
 #ifndef CPROVER_JAVA_BYTECODE_GENERIC_PARAMETER_SPECIALIZATION_MAP_KEYS_H
 #define CPROVER_JAVA_BYTECODE_GENERIC_PARAMETER_SPECIALIZATION_MAP_KEYS_H
 
-#include "select_pointer_type.h"
-#include "java_types.h"
+#include "generic_parameter_specialization_map.h"
 
 /// \file
 /// Generic-parameter-specialization-map entries owner class.

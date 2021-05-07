@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "object_id.h"
 
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 
 enum class get_modet { LHS_R, LHS_W, READ };
 

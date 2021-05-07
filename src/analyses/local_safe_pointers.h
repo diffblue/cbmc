@@ -15,7 +15,6 @@ Author: Diffblue Ltd
 #include <goto-programs/goto_program.h>
 
 #include <util/pointer_expr.h>
-#include <util/std_expr.h>
 
 /// A very simple, cheap analysis to determine when dereference operations are
 /// trivially guarded by a check against a null pointer access.

@@ -16,7 +16,6 @@ Date:   December 2016
 #include <analyses/call_graph.h>
 
 #include <util/find_symbols.h>
-#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -24,6 +23,7 @@ Date:   December 2016
 #include <util/invariant.h>
 
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>

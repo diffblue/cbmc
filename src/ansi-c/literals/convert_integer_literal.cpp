@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/config.h>
-#include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
 

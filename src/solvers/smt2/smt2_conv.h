@@ -10,28 +10,27 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 #define CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 
-#include <sstream>
+#include <map>
 #include <set>
+#include <sstream>
 
-#include <util/byte_operators.h>
-#include <util/c_types.h>
-#include <util/floatbv_expr.h>
 #include <util/std_expr.h>
+#include <util/threeval.h>
 
 #if !HASH_CODE
 #  include <util/irep_hash_container.h>
 #endif
 
-#include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
+#include <solvers/prop/literal.h>
+#include <solvers/stack_decision_procedure.h>
 
 #include "letify.h"
 
-class typecast_exprt;
-class constant_exprt;
-class index_exprt;
-class member_exprt;
+class floatbv_typecast_exprt;
+class ieee_float_op_exprt;
+class union_typet;
 
 class smt2_convt : public stack_decision_proceduret
 {

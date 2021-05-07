@@ -7,7 +7,9 @@ Author: Thomas Kiley
 \*******************************************************************/
 
 #include <testing-utils/use_catch.h>
+
 #include <util/structured_data.h>
+#include <util/xml.h>
 
 TEST_CASE("label", "[core][util][structured_data][label]")
 {

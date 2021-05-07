@@ -11,7 +11,7 @@ Author: Matt Lewis
 
 #include "enumerating_loop_acceleration.h"
 
-#include <iostream>
+#include "accelerator.h"
 
 bool enumerating_loop_accelerationt::accelerate(
   path_acceleratort &accelerator)

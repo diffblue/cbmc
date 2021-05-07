@@ -18,7 +18,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/invariant_utils.h>
 #include <util/irep.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 /// An example of structured invariants-- this contains fields to
 /// describe the error to a catcher, and also produces a human-readable

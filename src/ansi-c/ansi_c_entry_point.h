@@ -10,9 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_ENTRY_POINT_H
 #define CPROVER_ANSI_C_ANSI_C_ENTRY_POINT_H
 
-#include <ansi-c/c_object_factory_parameters.h>
-#include <util/message.h>
-#include <util/symbol_table.h>
+class message_handlert;
+class symbol_tablet;
+class symbolt;
+struct c_object_factory_parameterst;
 
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,

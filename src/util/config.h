@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class cmdlinet;
 class symbol_tablet;
-class namespacet;
 
 // Configt is the one place beyond *_parse_options where options are ... parsed.
 // Options that are handled by configt are documented here.

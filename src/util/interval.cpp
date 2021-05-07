@@ -17,14 +17,14 @@
 #include "interval.h"
 
 #include <ostream>
-#include <sstream>
-
-#include "bitvector_expr.h"
 
 #include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
+
+#include "bitvector_expr.h"
+#include "simplify_expr.h"
 
 const exprt &constant_interval_exprt::get_lower() const
 {

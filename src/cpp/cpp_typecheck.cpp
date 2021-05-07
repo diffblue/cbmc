@@ -13,17 +13,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 
-#include <util/arith_tools.h>
-#include <util/expr_initializer.h>
 #include <util/source_location.h>
 #include <util/symbol.h>
 
 #include <ansi-c/builtin_factory.h>
-#include <ansi-c/c_typecast.h>
 
-#include "expr2cpp.h"
-#include "cpp_convert_type.h"
 #include "cpp_declarator.h"
+#include "cpp_util.h"
+#include "expr2cpp.h"
 
 void cpp_typecheckt::convert(cpp_itemt &item)
 {

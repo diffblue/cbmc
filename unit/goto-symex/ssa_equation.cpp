@@ -9,7 +9,6 @@ Author: Diffblue Ltd.
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
-#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
 #include <goto-symex/symex_target_equation.h>

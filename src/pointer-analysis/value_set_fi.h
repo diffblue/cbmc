@@ -19,12 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <util/mp_arith.h>
-#include <util/namespace.h>
 #include <util/reference_counting.h>
 
 #include "object_numbering.h"
 
 class codet;
+class namespacet;
 
 class value_set_fit
 {

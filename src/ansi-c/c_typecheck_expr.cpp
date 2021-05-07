@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -34,10 +35,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/adjust_float_expressions.h>
 
 #include "anonymous_member.h"
+#include "ansi_c_declaration.h"
 #include "builtin_factory.h"
 #include "c_expr.h"
 #include "c_qualifiers.h"
-#include "c_typecast.h"
 #include "expr2c.h"
 #include "padding.h"
 #include "type2name.h"

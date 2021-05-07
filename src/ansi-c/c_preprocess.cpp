@@ -10,11 +10,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/message.h>
 #include <util/prefix.h>
 #include <util/run.h>
 #include <util/suffix.h>
 #include <util/tempfile.h>
-#include <util/unicode.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <fstream>
 

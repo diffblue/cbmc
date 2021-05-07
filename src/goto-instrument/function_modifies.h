@@ -12,8 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H
 #define CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H
 
-#include <goto-programs/goto_functions.h>
-#include <analyses/local_may_alias.h>
+#include <goto-programs/goto_program.h>
+
+class goto_functionst;
+class local_may_aliast;
 
 class function_modifiest
 {

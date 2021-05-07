@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "nodiscard.h"
 
-class exprt;
 class namespacet;
 
 /// Build and identifier not yet present in the namespace \p ns based on \p

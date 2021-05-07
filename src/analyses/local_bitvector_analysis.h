@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/expanding_vector.h>
+#include <util/numbering.h>
 
 #include "locals.h"
 #include "dirty.h"

@@ -12,11 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_CHECKER_SYMEX_BMC_H
 #define CPROVER_GOTO_CHECKER_SYMEX_BMC_H
 
-#include <util/message.h>
 #include <util/threeval.h>
 
 #include <goto-symex/goto_symex.h>
-#include <goto-symex/path_storage.h>
 
 #include <goto-instrument/unwindset.h>
 

@@ -16,7 +16,6 @@
 #include "variable_sensitivity_domain.h"
 
 #include <analyses/cfg_dominators.h>
-#include <util/container_utils.h>
 #include <util/graph.h>
 
 #include <ostream>

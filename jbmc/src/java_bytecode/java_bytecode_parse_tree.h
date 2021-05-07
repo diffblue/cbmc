@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/optional.h>
-#include <util/std_code.h>
 #include <util/std_types.h>
 
 #include "bytecode_info.h"

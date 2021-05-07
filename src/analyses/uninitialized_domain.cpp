@@ -14,7 +14,6 @@ Date: January 2010
 #include "uninitialized_domain.h"
 
 #include <util/std_expr.h>
-#include <util/std_code.h>
 
 #include <list>
 

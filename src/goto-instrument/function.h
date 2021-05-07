@@ -12,7 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_FUNCTION_H
 #define CPROVER_GOTO_INSTRUMENT_FUNCTION_H
 
-#include <goto-programs/goto_model.h>
+#include <util/irep.h>
+
+class goto_modelt;
+class symbol_tablet;
 
 class code_function_callt function_to_call(
   symbol_tablet &,

@@ -17,8 +17,7 @@ Author:
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_convert_functions.h>
-
-
+#include <goto-programs/goto_model.h>
 
 SCENARIO("call_graph",
   "[core][util][call_graph]")

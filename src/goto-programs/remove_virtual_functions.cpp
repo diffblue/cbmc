@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
 
+#include "class_hierarchy.h"
 #include "class_identifier.h"
 #include "goto_model.h"
 #include "remove_skip.h"

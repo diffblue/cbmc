@@ -12,7 +12,6 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H
 #define CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H
 
-#include <cstddef> // size_t
 #include <util/irep.h>
 
 class goto_functionst;

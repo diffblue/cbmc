@@ -7,19 +7,15 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "string_refinement_util.h"
-#include "string_format_builtin_function.h"
+
 #include <algorithm>
-#include <functional>
 #include <iostream>
 #include <numeric>
-#include <unordered_set>
+
 #include <util/arith_tools.h>
-#include <util/expr_iterator.h>
 #include <util/expr_util.h>
-#include <util/graph.h>
 #include <util/magic.h>
-#include <util/make_unique.h>
-#include <util/ssa_expr.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/unicode.h>
 

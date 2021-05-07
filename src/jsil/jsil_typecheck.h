@@ -15,12 +15,18 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <unordered_set>
 
 #include <util/namespace.h>
-#include <util/std_code.h>
-#include <util/symbol_table_base.h>
 #include <util/typecheck.h>
 
-class symbol_exprt;
+class code_assignt;
+class code_function_callt;
+class code_ifthenelset;
+class code_returnt;
+class code_try_catcht;
 class codet;
+class message_handlert;
+class side_effect_expr_throwt;
+class symbol_exprt;
+class symbol_tablet;
 
 bool jsil_typecheck(
   symbol_tablet &symbol_table,

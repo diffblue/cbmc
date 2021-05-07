@@ -12,10 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include "cmdline.h"
+#include "cout_message.h"
 #include "json.h"
 #include "json_irep.h"
 #include "json_stream.h"
 #include "make_unique.h"
+#include "structured_data.h"
 #include "xml.h"
 #include "xml_irep.h"
 

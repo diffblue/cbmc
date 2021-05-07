@@ -17,18 +17,18 @@ Author: Matt Lewis
 #include <set>
 
 #include <util/symbol_table.h>
-#include <util/message.h>
 
 #include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
 
+#include <analyses/guard.h>
 #include <analyses/natural_loops.h>
 
-#include "scratch_program.h"
 #include "polynomial.h"
 #include "path.h"
-#include "accelerator.h"
 #include "cone_of_influence.h"
+
+class message_handlert;
+class scratch_programt;
 
 typedef std::unordered_map<exprt, exprt, irep_hash> expr_mapt;
 typedef std::list<exprt> expr_listt;

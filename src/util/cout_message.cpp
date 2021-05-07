@@ -10,6 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
+// clang-format off
+// clang-format must not re-order includes here to avoid pragma_push/pragma_pop
+// being moved around
 #ifdef _WIN32
 #include <util/pragma_push.def>
 #ifdef _MSC_VER
@@ -23,11 +26,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <io.h>
 #include <cstdio>
 #include <util/pragma_pop.def>
+#include "unicode.h"
+// clang-format on
 #else
 #include <unistd.h>
 #endif
-
-#include "unicode.h"
 
 cout_message_handlert::cout_message_handlert():
   stream_message_handlert(std::cout)

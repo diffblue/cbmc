@@ -9,10 +9,11 @@
 /// \file
 /// Value Set of Pointer Abstract Object
 
-#include "abstract_aggregate_object.h"
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
+
+#include "abstract_environment.h"
 
 static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values);

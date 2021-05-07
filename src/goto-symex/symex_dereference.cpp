@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
-#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -24,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/value_set_dereference.h>
 
 #include "expr_skeleton.h"
+#include "path_storage.h"
 #include "symex_assign.h"
 #include "symex_dereference_state.h"
 

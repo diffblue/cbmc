@@ -13,7 +13,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_utils.h"
 
 #include <util/invariant.h>
+#include <util/ssa_expr.h>
 #include <util/suffix.h>
+
+#include <goto-symex/call_stack.h>
 
 /// Check if we may be in a function that loops over the cases of an
 /// enumeration (note we return a candidate function that matches a pattern;

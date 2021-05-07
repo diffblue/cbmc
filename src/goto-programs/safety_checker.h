@@ -18,7 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 #include "goto_trace.h"
-#include "goto_functions.h"
+
+class goto_functionst;
 
 class safety_checkert:public messaget
 {

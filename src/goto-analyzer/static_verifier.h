@@ -9,10 +9,11 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #ifndef CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H
 #define CPROVER_GOTO_ANALYZER_STATIC_VERIFIER_H
 
-#include <analyses/ai.h>
 #include <goto-checker/properties.h>
 
 #include <iosfwd>
+
+#include <analyses/ai_history.h>
 
 class abstract_goto_modelt;
 class ai_baset;

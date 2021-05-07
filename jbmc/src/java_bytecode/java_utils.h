@@ -9,18 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 
-#include "java_types.h"
-
 #include <unordered_set>
 
-#include <util/message.h>
 #include <util/nodiscard.h>
-#include <util/optional.h>
 #include <util/pointer_expr.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/resolve_inherited_component.h>
+
+class java_class_typet;
+class java_method_typet;
+class message_handlert;
+class symbol_table_baset;
 
 /// Returns true iff the argument represents a string type (CharSequence,
 /// StringBuilder, StringBuffer or String).

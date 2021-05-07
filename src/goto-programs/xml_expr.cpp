@@ -16,7 +16,6 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/expr.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>

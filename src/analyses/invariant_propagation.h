@@ -12,12 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_INVARIANT_PROPAGATION_H
 #define CPROVER_ANALYSES_INVARIANT_PROPAGATION_H
 
-#include <pointer-analysis/value_sets.h>
-
 #include "ai.h"
 #include "invariant_set_domain.h"
 
 class invariant_set_domain_factoryt;
+class value_setst;
 
 class invariant_propagationt:public
   ait<invariant_set_domaint>

@@ -14,13 +14,14 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <iosfwd>
 
-#include <util/ui_message.h>
+#include <util/xml.h>
 
 class goto_tracet;
 class goto_trace_storaget;
 class json_objectt;
 class namespacet;
 class optionst;
+class ui_message_handlert;
 
 class test_inputst
 {

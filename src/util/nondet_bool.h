@@ -13,7 +13,6 @@ Author: Chris Smowton, chris@smowton.net
 #define CPROVER_UTIL_NONDET_BOOL_H
 
 #include "std_expr.h"
-#include "std_types.h"
 
 /// \param type: desired type (C_bool or plain bool)
 /// \param source_location: source location

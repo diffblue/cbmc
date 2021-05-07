@@ -19,14 +19,16 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
-#include <util/string_container.h>
 
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
 
+#include <goto-symex/symex_target_equation.h>
+
 #include <ansi-c/expr2c.h>
 
 #include "goto_program.h"
+#include "goto_trace.h"
 
 static std::string
 expr_to_string(const namespacet &ns, const irep_idt &id, const exprt &expr)

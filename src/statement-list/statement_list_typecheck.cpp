@@ -12,16 +12,13 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "statement_list_typecheck.h"
 #include "converters/statement_list_types.h"
 
-#include <iostream>
-
-#include <util/ieee_float.h>
+#include <util/cprover_prefix.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 /// Size of pointers in Siemens TIA.
 #define STATEMENT_LIST_PTR_WIDTH 64

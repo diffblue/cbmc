@@ -7,11 +7,11 @@
 \*******************************************************************/
 
 #include <langapi/language_util.h>
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/type.h>
 
-#include "abstract_environment.h"
+#include <util/interval.h>
+#include <util/std_expr.h>
+
+#include "abstract_object_statistics.h"
 #include "constant_abstract_value.h"
 
 static index_range_implementation_ptrt

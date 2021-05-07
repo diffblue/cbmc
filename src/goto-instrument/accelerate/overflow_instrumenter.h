@@ -12,7 +12,6 @@ Author: Matt Lewis
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
 
-#include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 

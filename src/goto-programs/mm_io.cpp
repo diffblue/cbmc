@@ -18,7 +18,10 @@ Date:   April 2017
 #include <util/pointer_predicates.h>
 #include <util/replace_expr.h>
 
+#include "goto_model.h"
 #include "remove_returns.h"
+
+#include <set>
 
 void collect_deref_expr(
   const exprt &src,

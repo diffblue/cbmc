@@ -18,8 +18,10 @@ Date: May 2016
 #include "cover_instrument.h"
 #include "util/make_unique.h"
 
-class message_handlert;
 class cmdlinet;
+class goto_modelt;
+class goto_model_functiont;
+class message_handlert;
 class optionst;
 
 #define OPT_COVER                                                              \

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <analyses/guard_expr.h>
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
@@ -22,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/range.h>
 
 #include "expr_skeleton.h"
+#include "path_storage.h"
 #include "symex_assign.h"
 
 static void locality(

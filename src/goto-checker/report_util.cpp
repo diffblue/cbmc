@@ -15,12 +15,11 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/json.h>
 #include <util/json_irep.h>
+#include <util/json_stream.h>
 #include <util/string2int.h>
 #include <util/ui_message.h>
 #include <util/xml.h>
 #include <util/xml_irep.h>
-
-#include <goto-symex/build_goto_trace.h>
 
 #include <goto-programs/json_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rename_symbol.h"
 
 #include "expr_iterator.h"
-#include "std_types.h"
 #include "std_expr.h"
 
 rename_symbolt::rename_symbolt()

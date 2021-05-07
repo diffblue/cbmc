@@ -15,9 +15,10 @@ Author: Diffblue Ltd.
 #include <langapi/mode.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
-#include <util/expr.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
+
+#include <regex>
 
 SCENARIO(
   "Generate string object",

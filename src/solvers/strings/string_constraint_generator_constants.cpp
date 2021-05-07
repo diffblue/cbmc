@@ -11,7 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "string_constraint_generator.h"
 
-#include <util/prefix.h>
+#include <util/mathematical_expr.h>
 #include <util/unicode.h>
 
 /// Add axioms ensuring that the provided string expression and constant are

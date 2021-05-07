@@ -17,7 +17,6 @@ Author: Thomas Kiley
 #include <set>
 #include <string>
 #include <util/irep.h>
-#include <util/type.h>
 
 class symbolt;
 class typet;

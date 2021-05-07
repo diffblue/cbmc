@@ -21,12 +21,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
-#include <util/unicode.h>
 #include <util/version.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/ensure_one_backedge_per_target.h>
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/interpreter.h>
 #include <goto-programs/label_function_pointer_call_sites.h>
@@ -47,15 +49,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/slice_global_inits.h>
 #include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
-#include <goto-programs/validate_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
 #include <pointer-analysis/value_set_analysis.h>
-#include <pointer-analysis/value_set_analysis_fi.h>
 
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
@@ -113,6 +112,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "uninitialized.h"
 #include "unwind.h"
+#include "unwindset.h"
 #include "value_set_fi_fp_removal.h"
 #include "wmm/weak_memory.h"
 

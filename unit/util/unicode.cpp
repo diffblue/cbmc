@@ -8,7 +8,6 @@ Author: Vojtech Forejt, forejtv@diffblue.com
 
 #include <testing-utils/use_catch.h>
 
-#include <vector>
 #include <string>
 #include <codecvt>
 #include <locale>

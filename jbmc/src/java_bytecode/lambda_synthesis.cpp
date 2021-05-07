@@ -11,15 +11,16 @@ Author: Diffblue Ltd.
 
 #include "lambda_synthesis.h"
 
+#include "jar_file.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_parse_tree.h"
+#include "java_static_initializers.h"
 #include "java_types.h"
 #include "java_utils.h"
 #include "synthetic_methods_map.h"
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/prefix.h>
 #include <util/symbol_table.h>
 
 #include <string.h>

@@ -5,13 +5,14 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
+
 #include <ostream>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/arith_tools.h>
-#include <util/namespace.h>
 #include <util/std_expr.h>
 
+#include "abstract_value_object.h"
 #include "full_array_abstract_object.h"
 
 bool eval_index(

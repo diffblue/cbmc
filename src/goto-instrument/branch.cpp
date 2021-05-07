@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/prefix.h>
 
+#include <goto-programs/goto_model.h>
+
 #include "function.h"
 
 void branch(

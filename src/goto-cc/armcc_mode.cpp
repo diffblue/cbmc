@@ -22,7 +22,6 @@ Author: CM Wintersteiger, 2006
 #include <iostream>
 
 #include <util/message.h>
-#include <util/prefix.h>
 #include <util/config.h>
 
 #include "compile.h"

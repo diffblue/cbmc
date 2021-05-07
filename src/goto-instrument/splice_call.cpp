@@ -16,14 +16,9 @@ Date: July 2017
 #include "splice_call.h"
 
 #include <util/message.h>
-#include <util/string2int.h>
 #include <util/string_utils.h>
 
-#include <langapi/language.h>
-
 #include <goto-programs/goto_functions.h>
-
-#include <algorithm>
 
 // split the argument in caller/ callee two-position vector
 // expect input as a string of two names glued with comma: "caller,callee"

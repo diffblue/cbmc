@@ -17,15 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
-#include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
 
 #include <analyses/does_remove_const.h>
 
-#include "remove_skip.h"
 #include "compute_called_functions.h"
+#include "goto_model.h"
 #include "remove_const_function_pointers.h"
+#include "remove_skip.h"
 
 class remove_function_pointerst
 {

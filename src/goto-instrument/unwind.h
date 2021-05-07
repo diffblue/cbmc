@@ -13,12 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_UNWIND_H
 #define CPROVER_GOTO_INSTRUMENT_UNWIND_H
 
-#include "unwindset.h"
-
 #include <util/json.h>
 #include <goto-programs/goto_model.h>
 
-class goto_modelt;
+class unwindsett;
 
 class goto_unwindt
 {

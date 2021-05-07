@@ -12,10 +12,9 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
+#include "bitvector_types.h"
 #include "c_types.h"
-#include "namespace.h"
 #include "pointer_expr.h"
-#include "validate.h"
 #include "validate_helpers.h"
 
 #define CALL_ON_TYPE(type_type)                                                \

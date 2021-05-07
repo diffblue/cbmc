@@ -13,11 +13,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 
-#include <ansi-c/c_qualifiers.h>
-
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
-#include "cpp_util.h"
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &current_mode,

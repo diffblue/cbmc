@@ -12,22 +12,21 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H
 #define CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H
 
-#include "ci_lazy_methods_needed.h"
 #include "java_bytecode_parse_tree.h"
-#include "java_class_loader.h"
-#include "select_pointer_type.h"
 #include "synthetic_methods_map.h"
 
-#include <map>
 #include <functional>
+#include <map>
+#include <unordered_set>
 
 #include <util/irep.h>
-#include <util/symbol_table.h>
-#include <util/message.h>
 
 #include <goto-programs/class_hierarchy.h>
 
-class java_string_library_preprocesst;
+class ci_lazy_methods_neededt;
+class java_class_loadert;
+class message_handlert;
+class select_pointer_typet;
 
 // Map from method id to class_method_and_bytecodet
 class method_bytecodet

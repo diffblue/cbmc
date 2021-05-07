@@ -12,10 +12,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_ENUM_STATIC_INIT_UNWIND_HANDLER_H
 #define CPROVER_JAVA_BYTECODE_JAVA_ENUM_STATIC_INIT_UNWIND_HANDLER_H
 
-#include <goto-symex/goto_symex_state.h>
-
-#include <util/symbol_table.h>
 #include <util/threeval.h>
+
+class call_stackt;
+class symbol_tablet;
 
 tvt java_enum_static_init_unwind_handler(
   const call_stackt &context,

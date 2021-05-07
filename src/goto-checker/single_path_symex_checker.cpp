@@ -11,6 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "single_path_symex_checker.h"
 
+#include <util/ui_message.h>
+
 #include "bmc_util.h"
 #include "counterexample_beautification.h"
 #include "symex_bmc.h"

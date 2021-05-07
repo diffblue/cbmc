@@ -14,7 +14,6 @@ Date: March 2016
 #include "symex_coverage.h"
 
 #include <chrono>
-#include <ctime>
 #include <fstream>
 #include <iostream>
 
@@ -24,7 +23,6 @@ Date: March 2016
 #include <langapi/language_util.h>
 
 #include <goto-programs/goto_functions.h>
-#include <goto-programs/remove_returns.h>
 
 #include <linking/static_lifetime_init.h>
 

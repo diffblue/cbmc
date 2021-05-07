@@ -8,10 +8,9 @@ Author: Peter Schrammel, Daniel Kroening, kroening@kroening.com
 
 #include <limits>
 
-#include <util/source_location.h>
-#include <util/xml.h>
-
 #include "symex_bmc_incremental_one_loop.h"
+
+#include <util/structured_data.h>
 
 symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
   message_handlert &message_handler,

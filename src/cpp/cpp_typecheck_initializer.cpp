@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_offset_size.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_typecheck_fargs.h"
 
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)

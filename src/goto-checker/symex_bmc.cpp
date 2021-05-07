@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_bmc.h"
 
-#include <goto-symex/symex_target_equation.h>
-
 #include <limits>
 
 #include <util/simplify_expr.h>

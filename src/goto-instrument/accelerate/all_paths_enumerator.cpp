@@ -11,8 +11,6 @@ Author: Matt Lewis
 
 #include "all_paths_enumerator.h"
 
-#include <iostream>
-
 bool all_paths_enumeratort::next(patht &path)
 {
   if(last_path.empty())

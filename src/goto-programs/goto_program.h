@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <set>
 #include <limits>
-#include <sstream>
 #include <string>
 
 #include <util/deprecate.h>
@@ -23,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/source_location.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 enum class validation_modet;

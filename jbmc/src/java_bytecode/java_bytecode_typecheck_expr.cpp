@@ -11,17 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_typecheck.h"
 
-#include <util/arith_tools.h>
-#include <util/expr_initializer.h>
+#include <util/cprover_prefix.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
-#include <util/unicode.h>
+#include <util/std_code.h>
 
 #include "java_pointer_casts.h"
-#include "java_root_class.h"
-#include "java_string_library_preprocess.h"
 #include "java_string_literal_expr.h"
-#include "java_types.h"
-#include "java_utils.h"
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {

@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "renaming_level.h"
 
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/ssa_expr.h>
 #include <util/symbol.h>
 

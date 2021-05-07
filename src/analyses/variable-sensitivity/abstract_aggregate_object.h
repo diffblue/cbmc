@@ -16,6 +16,8 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <stack>
 
+#include "abstract_object_statistics.h"
+
 class abstract_aggregate_tag
 {
 };

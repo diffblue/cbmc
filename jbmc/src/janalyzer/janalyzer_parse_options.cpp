@@ -19,14 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
@@ -36,7 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dependence_graph.h>
 #include <analyses/goto_check.h>
 #include <analyses/interval_domain.h>
-#include <analyses/is_threaded.h>
 #include <analyses/local_may_alias.h>
 
 #include <java_bytecode/java_bytecode_language.h>
@@ -52,7 +45,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/options.h>
-#include <util/unicode.h>
 #include <util/version.h>
 
 #include <goto-analyzer/static_show_domain.h>

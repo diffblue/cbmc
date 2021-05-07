@@ -20,7 +20,6 @@ Author: Peter Schrammel
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
-#include <util/find_symbols.h>
 #include <util/ieee_float.h>
 #include <util/mathematical_types.h>
 #include <util/simplify_expr.h>

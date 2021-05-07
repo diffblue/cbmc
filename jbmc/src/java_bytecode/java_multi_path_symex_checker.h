@@ -12,10 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_MULTI_PATH_SYMEX_CHECKER_H
 #define CPROVER_JAVA_BYTECODE_JAVA_MULTI_PATH_SYMEX_CHECKER_H
 
-#include <goto-checker/bmc_util.h>
-#include <goto-checker/counterexample_beautification.h>
 #include <goto-checker/multi_path_symex_checker.h>
-#include <goto-symex/build_goto_trace.h>
 
 #include "java_bmc_util.h"
 

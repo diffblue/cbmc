@@ -15,7 +15,6 @@ Date:   September 2014
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include "goto_model.h"
 

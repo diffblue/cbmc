@@ -11,16 +11,16 @@ Author: Diffblue Ltd.
 
 #include <map>
 #include <set>
+#include <unordered_set>
 
-#include <goto-programs/goto_model.h>
-#include <util/expr.h>
-#include <util/message.h>
+#include <util/cprover_prefix.h>
 #include <util/optional.h>
 #include <util/prefix.h>
-#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/symbol.h>
 
-#include "function_harness_generator_options.h"
-#include "goto_harness_generator.h"
+class code_blockt;
+class goto_modelt;
 
 #define GOTO_HARNESS_PREFIX "__GOTO_HARNESS"
 struct recursive_initialization_configt

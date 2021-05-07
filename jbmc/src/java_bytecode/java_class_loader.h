@@ -11,15 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
 
 #include <map>
-#include <regex>
-#include <set>
 
 #include <util/fixed_keys_map_wrapper.h>
 
-#include "jar_file.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_class_loader_base.h"
-#include "java_class_loader_limit.h"
+
+class java_class_loader_limitt;
+class message_handlert;
 
 /// Class responsible to load .class files. Either directly from a specific
 /// file, from a classpath specification or from a Java archive (JAR) file.

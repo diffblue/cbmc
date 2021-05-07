@@ -100,11 +100,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/ai.h>
 #include <analyses/goto_check.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
-class goto_functionst;
 class optionst;
 
 // clang-format off

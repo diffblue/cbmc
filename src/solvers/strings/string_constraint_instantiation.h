@@ -12,8 +12,12 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
 
-#include "string_constraint.h"
-#include "string_constraint_generator.h"
+#include <set>
+
+#include <util/std_expr.h>
+
+class string_constraintt;
+struct string_not_contains_constraintt;
 
 /// Instantiates a string constraint by substituting the quantifiers.
 /// For a string constraint of the form \f$\forall q. P(x)\f$,

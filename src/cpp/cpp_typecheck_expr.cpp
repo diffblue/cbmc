@@ -27,6 +27,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_exception_id.h"
 #include "cpp_type2name.h"
+#include "cpp_typecheck_fargs.h"
+#include "cpp_util.h"
 #include "expr2cpp.h"
 
 bool cpp_typecheckt::find_parent(

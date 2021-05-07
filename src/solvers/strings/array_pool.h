@@ -14,7 +14,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_STRINGS_ARRAY_POOL_H
 #define CPROVER_SOLVERS_STRINGS_ARRAY_POOL_H
 
-#include <set>
 #include <util/std_expr.h>
 #include <util/string_expr.h>
 

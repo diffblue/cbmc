@@ -11,15 +11,12 @@ Date:   June 2017
 #include "java_bytecode_instrument.h"
 
 #include <util/arith_tools.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/c_types.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
 
-#include <goto-programs/goto_functions.h>
-
-#include "java_bytecode_convert_class.h"
-#include "java_entry_point.h"
 #include "java_expr.h"
+#include "java_types.h"
 #include "java_utils.h"
 
 class java_bytecode_instrumentt

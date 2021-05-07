@@ -11,11 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_convert_type.h"
 
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/namespace.h>
-#include <util/simplify_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 

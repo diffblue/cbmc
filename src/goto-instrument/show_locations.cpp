@@ -14,9 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/xml.h>
-#include <util/xml_irep.h>
-
-#include <langapi/language_util.h>
 
 #include <goto-programs/goto_model.h>
 

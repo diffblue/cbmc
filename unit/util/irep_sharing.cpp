@@ -114,8 +114,6 @@ SCENARIO("irept_sharing", "[core][utils][irept]")
   }
 }
 
-#include <util/expr.h>
-
 SCENARIO("exprt_sharing_trade_offs", "[core][utils][exprt]" XFAIL)
 {
   GIVEN("An expression created with add_to_operands(std::move(...))")

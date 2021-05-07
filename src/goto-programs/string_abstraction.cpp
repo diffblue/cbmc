@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
@@ -23,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/string_constant.h>
 
+#include "goto_model.h"
 #include "pointer_arithmetic.h"
 
 bool string_abstractiont::build_wrap(

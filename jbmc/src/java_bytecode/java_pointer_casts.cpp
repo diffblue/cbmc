@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include "java_types.h"
 

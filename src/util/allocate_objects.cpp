@@ -8,12 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "allocate_objects.h"
 
-#include "arith_tools.h"
 #include "c_types.h"
 #include "fresh_symbol.h"
 #include "pointer_expr.h"
 #include "pointer_offset_size.h"
-#include "string_constant.h"
+#include "symbol.h"
 
 /// Allocates a new object, either by creating a local variable with automatic
 /// lifetime, a global variable with static lifetime, or by dynamically

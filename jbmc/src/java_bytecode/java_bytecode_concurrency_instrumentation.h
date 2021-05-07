@@ -8,8 +8,8 @@ Author: Kurt Degiogrio, kurt.degiorgio@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONCURRENCY_INSTRUMENTATION_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONCURRENCY_INSTRUMENTATION_H
 
-#include <util/symbol_table.h>
-#include <util/message.h>
+class message_handlert;
+class symbol_tablet;
 
 void convert_threadblock(symbol_tablet &symbol_table);
 void convert_synchronized_methods(

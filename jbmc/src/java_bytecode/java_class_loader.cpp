@@ -9,12 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_class_loader.h"
 
 #include <stack>
-#include <fstream>
 
+#include <util/message.h>
 #include <util/suffix.h>
-#include <util/prefix.h>
 
-#include "java_bytecode_parser.h"
+#include "java_class_loader_limit.h"
 
 java_class_loadert::parse_tree_with_overlayst &java_class_loadert::
 operator()(const irep_idt &class_name, message_handlert &message_handler)

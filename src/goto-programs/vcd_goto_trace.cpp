@@ -19,6 +19,8 @@ Date: June 2011
 #include <util/numbering.h>
 #include <util/pointer_offset_size.h>
 
+#include "goto_trace.h"
+
 std::string as_vcd_binary(
   const exprt &expr,
   const namespacet &ns)

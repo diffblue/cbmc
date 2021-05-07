@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cprover_prefix.h>
 
-class message_handlert;
 class source_locationt;
 class symbol_tablet;
 

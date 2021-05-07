@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant_propagation.h"
 
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
 #include <util/std_expr.h>
 
 /// Pass the necessary arguments to the invariant_set_domaint's when constructed

@@ -12,12 +12,14 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_INCREMENTAL_GOTO_CHECKER_H
 #define CPROVER_GOTO_CHECKER_INCREMENTAL_GOTO_CHECKER_H
 
-#include <util/ui_message.h>
+#include <unordered_set>
 
 #include "properties.h"
 
-class goto_tracet;
+#include <util/message.h>
+
 class optionst;
+class ui_message_handlert;
 
 /// An implementation of `incremental_goto_checkert` provides functionality for
 /// checking a set of properties and returning counterexamples

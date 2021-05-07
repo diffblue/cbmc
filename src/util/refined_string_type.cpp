@@ -18,8 +18,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "refined_string_type.h"
 
-#include "std_expr.h"
-
 refined_string_typet::refined_string_typet(
   const typet &index_type,
   const pointer_typet &content_type)

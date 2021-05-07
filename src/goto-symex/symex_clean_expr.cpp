@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 #include "expr_skeleton.h"
+#include "path_storage.h"
 #include "symex_assign.h"
 #include "symex_dereference_state.h"
 

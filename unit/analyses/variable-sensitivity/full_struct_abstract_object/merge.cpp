@@ -9,19 +9,15 @@
 #include <testing-utils/use_catch.h>
 #include <typeinfo>
 #include <util/namespace.h>
-#include <util/options.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-#include <analyses/ai.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
-
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
+#include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
-#include <iostream>
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 

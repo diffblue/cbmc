@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_utils.h"
 
 #include "arith_tools.h"
-#include "byte_operators.h"
 #include "c_types.h"
 #include "config.h"
 #include "endianness_map.h"

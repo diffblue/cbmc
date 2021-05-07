@@ -12,15 +12,15 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_GOTO_SYMEX_FAULT_LOCALIZER_H
 #define CPROVER_GOTO_CHECKER_GOTO_SYMEX_FAULT_LOCALIZER_H
 
-#include <util/options.h>
 #include <util/threeval.h>
-#include <util/ui_message.h>
-
-#include <goto-symex/symex_target_equation.h>
-
-#include <solvers/stack_decision_procedure.h>
 
 #include "fault_localization_provider.h"
+
+class optionst;
+class stack_decision_proceduret;
+class symex_target_equationt;
+class SSA_stept;
+class ui_message_handlert;
 
 class goto_symex_fault_localizert
 {

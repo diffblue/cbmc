@@ -17,12 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/message.h>
 
 #include "wmm.h"
 
-class symbol_tablet;
 class goto_functionst;
+class messaget;
 class value_setst;
 
 class shared_bufferst

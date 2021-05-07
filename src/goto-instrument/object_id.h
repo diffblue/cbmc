@@ -16,7 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/std_expr.h>
-#include <util/std_code.h>
+
+class code_assignt;
 
 class object_idt
 {

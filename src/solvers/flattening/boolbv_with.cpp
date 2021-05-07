@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 bvt boolbvt::convert_with(const with_exprt &expr)
 {

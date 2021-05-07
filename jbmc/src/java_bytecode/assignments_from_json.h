@@ -12,7 +12,6 @@ Author: Diffblue Ltd.
 #define CPROVER_JAVA_BYTECODE_ASSIGNMENTS_FROM_JSON_H
 
 #include "code_with_references.h"
-#include <util/std_code.h>
 
 class jsont;
 class symbol_table_baset;

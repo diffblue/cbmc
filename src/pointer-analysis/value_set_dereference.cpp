@@ -16,26 +16,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <util/arith_tools.h>
-#include <util/array_name.h>
 #include <util/byte_operators.h>
-#include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
-#include <util/format_type.h>
 #include <util/fresh_symbol.h>
-#include <util/json_irep.h>
-#include <util/options.h>
+#include <util/json.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
-#include <util/ssa_expr.h>
 
 #include <deque>
+
+#include "dereference_callback.h"
 
 /// Returns true if \p expr is complicated enough that a local definition (using
 /// a let expression) is preferable to repeating it, potentially many times.

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/std_types.h>
 
 /// turns a type into a list of relevant exception IDs

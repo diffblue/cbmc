@@ -13,6 +13,8 @@ Date:   September 2017
 
 #include <util/replace_symbol.h>
 
+#include "goto_model.h"
+
 std::vector<goto_programt::const_targett> get_preconditions(
   const symbol_exprt &function,
   const goto_functionst &goto_functions)

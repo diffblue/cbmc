@@ -6,12 +6,7 @@ Author: Norbert Manthey, nmanthey@amazon.com
 
 \*******************************************************************/
 
-#ifndef _MSC_VER
-#include <inttypes.h>
-#endif
-
 #include <algorithm>
-#include <stack>
 
 #include <util/exception_utils.h>
 #include <util/invariant.h>

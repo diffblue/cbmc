@@ -16,6 +16,9 @@ Author: Daniel Kroening
 #include <util/config.h>
 #include <util/get_base_name.h>
 
+#include "compile.h"
+#include "goto_cc_cmdline.h"
+
 ms_link_modet::ms_link_modet(goto_cc_cmdlinet &_cmdline)
   : goto_cc_modet(_cmdline, "link", message_handler)
 {

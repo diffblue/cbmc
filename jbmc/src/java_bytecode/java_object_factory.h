@@ -71,14 +71,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 #define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 
-#include "java_bytecode_language.h"
-#include "select_pointer_type.h"
-
 #include <util/allocate_objects.h>
-#include <util/message.h>
 #include <util/nondet.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+
+class message_handlert;
+class select_pointer_typet;
+class symbol_tablet;
+struct java_object_factory_parameterst;
 
 exprt object_factory(
   const typet &type,

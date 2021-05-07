@@ -15,10 +15,7 @@ Author: Daniel Kroening
 #include <regex>
 #include <memory>
 
-#include <util/invariant.h>
-#include <util/symbol.h>
-
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_functions.h>
 
 /// Base class for filtering functions
 class function_filter_baset

@@ -18,7 +18,6 @@ Date: April 2016
 
 class ai_baset;
 class goto_modelt;
-class message_handlert;
 class optionst;
 
 void unreachable_instructions(

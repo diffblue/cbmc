@@ -16,7 +16,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
-#include <algorithm>
 #include <stdexcept>
 
 /// Maximum value of integer literals.

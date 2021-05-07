@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 
-#include "goto_model.h"
-
+class goto_functionst;
+class goto_modelt;
 class message_handlert;
+class namespacet;
 
 // do a full inlining
 

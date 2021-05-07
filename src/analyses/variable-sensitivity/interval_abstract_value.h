@@ -16,9 +16,7 @@
 
 #include <util/interval.h>
 
-#include "abstract_object_statistics.h"
 #include <analyses/variable-sensitivity/abstract_value_object.h>
-#include <util/std_expr.h>
 
 class interval_abstract_valuet : public abstract_value_objectt
 {

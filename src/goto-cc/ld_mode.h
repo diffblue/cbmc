@@ -14,11 +14,8 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_LD_MODE_H
 #define CPROVER_GOTO_CC_LD_MODE_H
 
-#include "compile.h"
 #include "gcc_message_handler.h"
 #include "goto_cc_mode.h"
-
-#include <set>
 
 class ld_modet : public goto_cc_modet
 {

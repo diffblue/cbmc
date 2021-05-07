@@ -26,7 +26,6 @@ Date: February 2006
 #include <analyses/local_may_alias.h>
 #endif
 
-class namespacet;
 class value_setst;
 
 // a container for read/write sets

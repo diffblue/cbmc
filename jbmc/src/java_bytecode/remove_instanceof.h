@@ -79,12 +79,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_REMOVE_INSTANCEOF_H
 #define CPROVER_JAVA_BYTECODE_REMOVE_INSTANCEOF_H
 
-#include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_model.h>
 
-#include <util/message.h>
-#include <util/symbol_table.h>
+class class_hierarchyt;
+class goto_modelt;
+class message_handlert;
 
 void remove_instanceof(
   const irep_idt &function_identifier,

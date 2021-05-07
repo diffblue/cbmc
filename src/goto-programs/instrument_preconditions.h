@@ -12,7 +12,8 @@ Date:   September 2017
 #ifndef CPROVER_GOTO_PROGRAMS_INSTRUMENT_PRECONDITIONS_H
 #define CPROVER_GOTO_PROGRAMS_INSTRUMENT_PRECONDITIONS_H
 
-#include <goto-programs/goto_model.h>
+class goto_functiont;
+class goto_modelt;
 
 void instrument_preconditions(goto_modelt &);
 void remove_preconditions(goto_modelt &);

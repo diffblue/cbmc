@@ -12,11 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include "expr.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_expr.h"
-#include "std_types.h"
 #include "validate.h"
 #include "validate_code.h"
 

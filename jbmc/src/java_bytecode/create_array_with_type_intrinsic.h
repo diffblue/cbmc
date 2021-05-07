@@ -12,9 +12,10 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_CREATE_ARRAY_WITH_TYPE_INTRINSIC_H
 #define CPROVER_JAVA_BYTECODE_CREATE_ARRAY_WITH_TYPE_INTRINSIC_H
 
-#include <util/message.h>
 #include <util/std_code.h>
-#include <util/symbol_table_base.h>
+
+class message_handlert;
+class symbol_table_baset;
 
 irep_idt get_create_array_with_type_name();
 

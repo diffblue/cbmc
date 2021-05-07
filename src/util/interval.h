@@ -8,18 +8,10 @@
 #ifndef CPROVER_UTIL_INTERVAL_H
 #define CPROVER_UTIL_INTERVAL_H
 
-#include <util/arith_tools.h>
-#include <util/expr.h>
-#include <util/namespace.h>
-#include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/symbol_table.h>
 #include <util/threeval.h>
 
 #include <iostream>
-#include <ostream>
-#include <sstream>
 
 /// +∞ upper bound for intervals
 class max_exprt : public exprt

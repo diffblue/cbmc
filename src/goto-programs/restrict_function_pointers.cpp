@@ -12,14 +12,15 @@ Author: Diffblue Ltd.
 
 #include <json/json_parser.h>
 
-#include <util/expr_iterator.h>
+#include <util/cmdline.h>
+#include <util/options.h>
 #include <util/pointer_expr.h>
 #include <util/string_utils.h>
 
+#include "goto_model.h"
+
 #include <algorithm>
 #include <fstream>
-#include <functional>
-#include <iostream>
 
 namespace
 {

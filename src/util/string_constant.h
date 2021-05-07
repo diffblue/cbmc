@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_STRING_CONSTANT_H
 
 #include "std_expr.h"
-#include "expr.h"
 
 class string_constantt : public nullary_exprt
 {

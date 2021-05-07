@@ -11,6 +11,8 @@
 
 #include <util/pointer_expr.h>
 
+#include "abstract_object_statistics.h"
+
 abstract_pointer_objectt::abstract_pointer_objectt(const typet &t)
   : abstract_objectt(t)
 {

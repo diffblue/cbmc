@@ -12,7 +12,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include "memory_analyzer_parse_options.h"
 #include "analyze_symbol.h"
-#include "gdb_api.h"
 
 #include <algorithm>
 #include <fstream>

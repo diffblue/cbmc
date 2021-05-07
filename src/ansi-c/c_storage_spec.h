@@ -10,7 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_C_STORAGE_SPEC_H
 #define CPROVER_ANSI_C_C_STORAGE_SPEC_H
 
-#include <util/type.h>
+#include <util/irep.h>
+
+class typet;
 
 class c_storage_spect
 {

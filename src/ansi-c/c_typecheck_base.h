@@ -12,16 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 #define CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 
-#include <util/bitvector_expr.h>
-#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/typecheck.h>
 
-#include "ansi_c_declaration.h"
 #include "designator.h"
+
+class ansi_c_declarationt;
+class c_bit_field_typet;
+class shift_exprt;
 
 class c_typecheck_baset:
   public typecheckt,

@@ -13,20 +13,15 @@ Author: Matt Lewis
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SAT_PATH_ENUMERATOR_H
 
 #include <map>
-#include <set>
 
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
 
 #include <analyses/natural_loops.h>
 
 #include "path_enumerator.h"
-#include "scratch_program.h"
-#include "polynomial.h"
 #include "path.h"
-#include "accelerator.h"
 #include "cone_of_influence.h"
 #include "acceleration_utils.h"
 

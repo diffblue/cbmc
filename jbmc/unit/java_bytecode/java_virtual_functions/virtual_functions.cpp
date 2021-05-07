@@ -15,7 +15,6 @@ Author: Diffblue Ltd.
 #include <util/config.h>
 #include <goto-instrument/cover.h>
 #include <util/options.h>
-#include <iostream>
 
 void check_function_call(
   const equal_exprt &eq_expr,

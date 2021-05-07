@@ -13,7 +13,6 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_program.h>
 #include <util/type.h>
-#include <util/expr.h>
 #include <util/std_code.h>
 #include <util/base_type.h>
 

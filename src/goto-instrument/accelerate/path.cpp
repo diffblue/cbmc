@@ -11,8 +11,6 @@ Author: Matt Lewis
 
 #include "path.h"
 
-#include <iostream>
-
 #include <goto-programs/goto_program.h>
 
 void output_path(

@@ -17,9 +17,7 @@
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/data_dependency_context.h>
-#include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/two_value_array_abstract_object.h>
@@ -29,7 +27,8 @@
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <analyses/variable-sensitivity/write_location_context.h>
-#include <util/namespace.h>
+
+#include "abstract_object.h"
 
 class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =

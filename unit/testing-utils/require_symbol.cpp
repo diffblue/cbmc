@@ -9,6 +9,8 @@ Author: Diffblue Limited.
 #include "require_symbol.h"
 #include "use_catch.h"
 
+#include <util/symbol_table.h>
+
 /// Verify whether a given identifier is found in the symbol table and return it
 /// \param symbol_table: The symbol table to look in
 /// \param symbol_identifier: The name of the symbol

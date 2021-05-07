@@ -14,9 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <string>
 
-#include <util/type.h>
-
 class exprt;
+class typet;
 
 std::string cpp_type2name(const typet &type);
 std::string cpp_expr2name(const exprt &expr);

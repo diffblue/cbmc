@@ -13,9 +13,9 @@ Author: Diffblue Ltd.
 #include <memory>
 #include <string>
 
-#include <util/ui_message.h>
-
 #include "goto_harness_generator.h"
+
+class ui_message_handlert;
 
 /// Function harness generator that for a specified goto-function
 /// generates a harness that sets up its arguments and calls it.

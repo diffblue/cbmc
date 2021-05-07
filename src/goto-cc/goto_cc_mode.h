@@ -14,9 +14,10 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_GOTO_CC_MODE_H
 #define CPROVER_GOTO_CC_GOTO_CC_MODE_H
 
-#include "goto_cc_cmdline.h"
+#include <string>
 
 class message_handlert;
+class goto_cc_cmdlinet;
 
 class goto_cc_modet
 {

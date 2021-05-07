@@ -15,7 +15,6 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_TESTING_UTILS_REQUIRE_EXPR_H
 #define CPROVER_TESTING_UTILS_REQUIRE_EXPR_H
 
-#include <util/std_expr.h>
 #include <util/std_code.h>
 
 // NOLINTNEXTLINE(readability/namespace)

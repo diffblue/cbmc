@@ -13,11 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
 
 #include <unordered_set>
-#include <util/symbol_table.h>
-#include <util/message.h>
 
 #include "java_bytecode_parse_tree.h"
-#include "java_bytecode_language.h"
+#include "java_class_loader.h"
+
+class java_string_library_preprocesst;
+class method_bytecodet;
+class symbol_tablet;
 
 /// See class \ref java_bytecode_convert_classt
 bool java_bytecode_convert_class(

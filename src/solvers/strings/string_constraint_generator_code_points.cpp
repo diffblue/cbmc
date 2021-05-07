@@ -12,6 +12,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "string_constraint_generator.h"
 
+#include <util/mathematical_expr.h>
+
 /// add axioms for the conversion of an integer representing a java
 /// code point to a utf-16 string
 /// \param res: array of characters corresponding to the result fo the function

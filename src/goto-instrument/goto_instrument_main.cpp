@@ -9,9 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Main Module
 
-#include "goto_instrument_parse_options.h"
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
-#include <util/unicode.h>
+#include "goto_instrument_parse_options.h"
 
 #ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)

@@ -6,8 +6,6 @@
 #include <util/invariant.h>
 #include <util/validate.h>
 
-#include <set>
-
 /// Move or copy a new symbol to the symbol table.
 /// \remarks This is a nicer interface than move and achieves the same
 ///   result as both move and add.

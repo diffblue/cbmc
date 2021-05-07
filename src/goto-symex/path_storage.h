@@ -5,10 +5,7 @@
 #ifndef CPROVER_GOTO_SYMEX_PATH_STORAGE_H
 #define CPROVER_GOTO_SYMEX_PATH_STORAGE_H
 
-#include <util/cmdline.h>
 #include <util/invariant.h>
-#include <util/message.h>
-#include <util/options.h>
 
 #include <analyses/dirty.h>
 #include <analyses/local_safe_pointers.h>
@@ -17,6 +14,9 @@
 
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
+
+class cmdlinet;
+class optionst;
 
 /// Functor generating fresh nondet symbols
 class symex_nondet_generatort

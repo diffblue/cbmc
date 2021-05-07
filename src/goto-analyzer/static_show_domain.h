@@ -13,7 +13,6 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 class ai_baset;
 class goto_modelt;
-class message_handlert;
 class optionst;
 
 void static_show_domain(

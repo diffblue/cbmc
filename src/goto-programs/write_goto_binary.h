@@ -17,10 +17,10 @@ Author: CM Wintersteiger
 #include <iosfwd>
 #include <string>
 
-#include "goto_functions.h"
-
+class goto_functionst;
 class goto_modelt;
 class message_handlert;
+class symbol_tablet;
 
 bool write_goto_binary(
   std::ostream &out,

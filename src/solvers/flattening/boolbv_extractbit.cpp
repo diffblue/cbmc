@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/bitvector_types.h>
 #include <util/exception_utils.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 {

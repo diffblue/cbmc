@@ -26,14 +26,15 @@ Author: CM Wintersteiger
 #include <cstring>
 #include <vector>
 
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
+// clang-format off
+#if defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
     defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
 #endif
+// clang-format on
 
 #include "exception_utils.h"
 #include "file_util.h"

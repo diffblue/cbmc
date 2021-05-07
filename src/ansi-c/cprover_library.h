@@ -12,8 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <util/symbol_table.h>
-#include <util/message.h>
+#include <util/irep.h>
+
+class message_handlert;
+class symbol_tablet;
 
 struct cprover_library_entryt
 {

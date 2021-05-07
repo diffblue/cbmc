@@ -21,12 +21,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "string_refinement_invariant.h"
 
 #include <iterator>
-#include <limits>
 
 #include <util/arith_tools.h>
 #include <util/deprecate.h>
 #include <util/interval_constraint.h>
-#include <util/pointer_predicates.h>
+#include <util/mathematical_expr.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>

@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/ieee_float.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/string2int.h>
 
 #include <ansi-c/gcc_types.h>
 

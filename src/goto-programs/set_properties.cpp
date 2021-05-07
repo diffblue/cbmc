@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 
+#include "goto_model.h"
+
 #include <algorithm>
 #include <unordered_set>
 

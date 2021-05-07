@@ -13,9 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/parser.h>
-#include <util/expr.h>
-#include <util/string_hash.h>
-#include <util/mp_arith.h>
 #include <util/config.h>
 
 #include "ansi_c_parse_tree.h"

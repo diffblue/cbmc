@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
-#include "namespace.h"
 #include "pointer_offset_size.h"
 #include "replace_expr.h"
 #include "std_expr.h"

@@ -22,6 +22,8 @@ Date: August 2012
 #include <process.h>
 #include <windows.h>
 #include <util/pragma_pop.def>
+#include "tempfile.h"
+#include "unicode.h"
 // clang-format on
 #else
 
@@ -33,7 +35,6 @@ Date: August 2012
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -43,8 +44,6 @@ Date: August 2012
 
 #include "invariant.h"
 #include "signal_catcher.h"
-#include "tempfile.h"
-#include "unicode.h"
 
 int run(const std::string &what, const std::vector<std::string> &argv)
 {

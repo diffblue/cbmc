@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/json.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>

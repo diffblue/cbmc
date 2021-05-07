@@ -14,7 +14,6 @@ Date: 2012
 #include "data_dp.h"
 
 #include <util/invariant.h>
-#include <util/message.h>
 
 #include "abstract_event.h"
 

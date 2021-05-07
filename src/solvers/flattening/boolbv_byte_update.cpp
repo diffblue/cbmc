@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
-#include <util/expr_util.h>
 #include <util/invariant.h>
 
 #include <solvers/lowering/expr_lowering.h>

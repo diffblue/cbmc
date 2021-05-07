@@ -9,6 +9,9 @@
 #include "variable_sensitivity_test_helpers.h"
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/constant_abstract_value.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
+#include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
 #include <ansi-c/ansi_c_language.h>
 

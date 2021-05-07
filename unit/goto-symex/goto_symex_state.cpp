@@ -6,7 +6,6 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <analyses/dirty.h>

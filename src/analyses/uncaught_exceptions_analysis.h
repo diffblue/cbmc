@@ -12,11 +12,14 @@ Author: Cristina David
 #ifndef CPROVER_ANALYSES_UNCAUGHT_EXCEPTIONS_ANALYSIS_H
 #define CPROVER_ANALYSES_UNCAUGHT_EXCEPTIONS_ANALYSIS_H
 
-#include <algorithm>
 #include <map>
 #include <set>
-#include <goto-programs/goto_functions.h>
+
 #include <goto-programs/class_hierarchy.h>
+#include <goto-programs/goto_program.h>
+
+class goto_functionst;
+class namespacet;
 
 /// defines the domain used by the uncaught  exceptions analysis
 class uncaught_exceptions_analysist;

@@ -8,11 +8,11 @@ Author: Michael Tautschnig
 
 #include "cl_message_handler.h"
 
-#include <util/unicode.h>
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <fstream>
-#include <iostream>
-#include <sstream>
 
 void cl_message_handlert::print(
   unsigned level,

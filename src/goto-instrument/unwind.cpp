@@ -18,11 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/std_expr.h>
-#include <util/string_utils.h>
 
 #include <goto-programs/goto_functions.h>
 
-#include "loop_utils.h"
+#include "unwindset.h"
 
 void goto_unwindt::copy_segment(
   const goto_programt::const_targett start,

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 
 #include <linking/static_lifetime_init.h>

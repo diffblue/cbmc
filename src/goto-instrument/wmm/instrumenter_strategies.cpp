@@ -13,7 +13,6 @@ Date: 2012
 
 #include "goto2graph.h"
 
-#include <string>
 #include <fstream>
 
 #ifdef HAVE_GLPK

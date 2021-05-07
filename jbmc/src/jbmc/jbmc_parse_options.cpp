@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <climits>
 #include <cstdlib> // exit()
-#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -21,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
-#include <util/unicode.h>
 #include <util/version.h>
 #include <util/xml.h>
 
@@ -37,7 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_inline.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/remove_returns.h>
@@ -63,7 +60,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <java_bytecode/java_enum_static_init_unwind_handler.h>
 #include <java_bytecode/java_multi_path_symex_checker.h>
 #include <java_bytecode/java_multi_path_symex_only_checker.h>
 #include <java_bytecode/java_single_path_symex_checker.h>

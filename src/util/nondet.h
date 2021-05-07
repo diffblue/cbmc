@@ -10,7 +10,6 @@ Author: Diffblue Ltd.
 #define CPROVER_JAVA_BYTECODE_NONDET_H
 
 #include "std_code.h"
-#include "std_expr.h"
 
 class allocate_objectst;
 class symbol_table_baset;

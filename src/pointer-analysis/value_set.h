@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 
-#include <set>
-#include <type_traits>
 #include <unordered_set>
 
 #include <util/mp_arith.h>

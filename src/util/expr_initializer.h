@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_EXPR_INITIALIZER_H
 #define CPROVER_UTIL_EXPR_INITIALIZER_H
 
-#include "expr.h"
 #include "optional.h"
 
-class message_handlert;
+class exprt;
 class namespacet;
 class source_locationt;
+class typet;
 
 optionalt<exprt>
 zero_initializer(const typet &, const source_locationt &, const namespacet &);

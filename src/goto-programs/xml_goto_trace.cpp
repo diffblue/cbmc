@@ -13,13 +13,14 @@ Author: Daniel Kroening
 
 #include "xml_goto_trace.h"
 
+#include <util/arith_tools.h>
 #include <util/string_constant.h>
 #include <util/symbol.h>
 #include <util/xml_irep.h>
 
 #include <langapi/language_util.h>
-#include <util/arith_tools.h>
 
+#include "goto_trace.h"
 #include "printf_formatter.h"
 #include "structured_trace_util.h"
 #include "xml_expr.h"

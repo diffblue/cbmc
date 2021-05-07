@@ -13,10 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cctype>
 #include <cstdio>
-#include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <cstring>
 
 #include <util/c_types.h>
 #include <util/fixedbv.h>
@@ -26,16 +24,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/string2int.h>
 #include <util/string_container.h>
 #include <util/symbol_table.h>
 
-#include <json/json_parser.h>
-
+#include "goto_model.h"
 #include "interpreter_class.h"
 #include "json_goto_trace.h"
-#include "remove_returns.h"
 
 const std::size_t interpretert::npos=std::numeric_limits<size_t>::max();
 

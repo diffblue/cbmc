@@ -12,7 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 #define CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 
-#include "goto_model.h"
+#include <list>
+#include <string>
+
+class goto_functionst;
+class goto_modelt;
+class goto_programt;
 
 void set_properties(
   goto_functionst &goto_functions,

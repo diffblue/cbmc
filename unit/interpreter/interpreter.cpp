@@ -13,7 +13,6 @@ Author: Diffblue Ltd.
 
 #include <util/message.h>
 #include <util/mp_arith.h>
-#include <util/namespace.h>
 #include <util/pointer_expr.h>
 
 typedef interpretert::mp_vectort mp_vectort;

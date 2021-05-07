@@ -12,10 +12,9 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/make_unique.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/ui_message.h>
 
@@ -27,7 +26,7 @@ Author: Diffblue Ltd.
 #include <set>
 
 #include "function_harness_generator_options.h"
-#include "goto_harness_parse_options.h"
+#include "goto_harness_generator_factory.h"
 #include "recursive_initialization.h"
 
 /// This contains implementation details of

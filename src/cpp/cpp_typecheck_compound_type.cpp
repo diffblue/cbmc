@@ -18,16 +18,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <algorithm>
 
 #include <util/arith_tools.h>
-#include <util/simplify_expr.h>
 #include <util/std_types.h>
 #include <util/c_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
-#include "cpp_type2name.h"
 #include "cpp_declarator_converter.h"
-#include "cpp_convert_type.h"
 #include "cpp_name.h"
+#include "cpp_type2name.h"
+#include "cpp_util.h"
 
 bool cpp_typecheckt::has_const(const typet &type)
 {

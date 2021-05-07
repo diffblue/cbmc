@@ -7,7 +7,6 @@ Author: Diffblue Ltd
 \*******************************************************************/
 
 #include "object_factory_parameters.h"
-#include "string2int.h"
 
 #include <util/cmdline.h>
 #include <util/options.h>

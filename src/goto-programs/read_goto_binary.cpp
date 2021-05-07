@@ -12,13 +12,14 @@ Author:
 #include "read_goto_binary.h"
 
 #include <fstream>
-#include <unordered_set>
 
-#include <util/message.h>
-#include <util/unicode.h>
-#include <util/tempfile.h>
-#include <util/rename_symbol.h>
 #include <util/config.h>
+#include <util/message.h>
+#include <util/tempfile.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include "goto_model.h"
 #include "link_goto_model.h"

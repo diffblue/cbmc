@@ -12,13 +12,10 @@ Author: Diffblue Ltd.
 #include <solvers/prop/literal.h>
 
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-#include <iostream>
 
 #include <goto-programs/goto_program.h>
 

@@ -11,15 +11,12 @@ Author: Diffblue Ltd.
 /// \file
 /// Handle selection of correct pointer type (for example changing abstract
 /// classes to concrete versions).
-#include "generic_parameter_specialization_map.h"
-#include "java_types.h"
 
-#include <vector>
+#include <set>
 
-#include "java_types.h"
-#include <util/optional.h>
-#include <util/std_types.h>
+#include <util/pointer_expr.h>
 
+class generic_parameter_specialization_mapt;
 class namespacet;
 
 class select_pointer_typet

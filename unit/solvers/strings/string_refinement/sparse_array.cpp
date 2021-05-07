@@ -9,14 +9,10 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <solvers/strings/string_refinement.h>
-
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/symbol_table.h>
 
-#include <iostream>
+#include <solvers/strings/string_refinement_util.h>
 
 SCENARIO("sparse_array", "[core][solvers][strings][string_refinement]")
 {

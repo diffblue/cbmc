@@ -23,11 +23,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class constant_exprt;
 class exprt;
-class symbol_exprt;
 class update_exprt;
 class with_exprt;
 class if_exprt;
-class symbolt;
 class typet;
 class namespacet;
 

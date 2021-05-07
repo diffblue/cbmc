@@ -12,16 +12,12 @@ Author: Thomas Kiley
 #include "show_goto_functions_xml.h"
 
 #include <iostream>
-#include <sstream>
 
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/xml_irep.h>
 
-#include <langapi/language_util.h>
-
 #include "goto_functions.h"
-#include "goto_model.h"
 
 /// For outputting the GOTO program in a readable xml format.
 /// \param _ns: the namespace to use to resolve names with

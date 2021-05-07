@@ -14,8 +14,7 @@ Author: Peter Schrammel
 
 #include <memory>
 
-#include <goto-programs/goto_model.h>
-#include <util/message.h>
+#include <goto-programs/goto_program.h>
 
 enum class coverage_criteriont;
 class cover_blocks_baset;

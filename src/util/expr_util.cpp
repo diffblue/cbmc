@@ -13,14 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
-#include "expr.h"
 #include "expr_iterator.h"
-#include "fixedbv.h"
-#include "ieee_float.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "std_expr.h"
-#include "symbol.h"
 
 bool is_lvalue(const exprt &expr)
 {

@@ -9,14 +9,12 @@ Author: Diffblue Ltd.
 /// \file
 /// Utilties for inspecting goto functions
 
-#include <util/irep.h>
-#include <util/expr.h>
 #include <util/optional.h>
 #include <util/std_code.h>
-#include <util/std_types.h>
-#include <goto-programs/goto_program.h>
 
 #include <regex>
+
+class symbol_tablet;
 
 #ifndef CPROVER_JAVA_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
 #define CPROVER_JAVA_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H

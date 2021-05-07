@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
-#include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
@@ -27,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include "format_strings.h"
-#include "class_identifier.h"
 
 void goto_convertt::do_prob_uniform(
   const exprt &lhs,

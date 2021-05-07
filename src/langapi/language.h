@@ -20,14 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/message.h>
-#include <util/std_types.h>
-#include <util/symbol.h>
-#include <util/symbol_table_base.h>
 
-class symbol_tablet;
 class exprt;
 class namespacet;
 class optionst;
+class symbol_table_baset;
+class symbol_tablet;
 class typet;
 
 #define OPT_FUNCTIONS \

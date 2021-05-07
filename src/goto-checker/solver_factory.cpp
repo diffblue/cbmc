@@ -16,7 +16,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/exception_utils.h>
 #include <util/make_unique.h>
 #include <util/message.h>
-#include <util/namespace.h>
 #include <util/options.h>
 #include <util/version.h>
 
@@ -28,7 +27,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <solvers/flattening/bv_dimacs.h>
 #include <solvers/prop/prop.h>
-#include <solvers/prop/prop_conv.h>
 #include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>

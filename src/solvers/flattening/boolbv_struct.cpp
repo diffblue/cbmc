@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <util/arith_tools.h>
-
 bvt boolbvt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));

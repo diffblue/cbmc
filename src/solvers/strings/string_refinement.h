@@ -20,16 +20,12 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
-#include <limits>
-#include <util/magic.h>
-#include <util/replace_expr.h>
-#include <util/string_expr.h>
 #include <util/union_find_replace.h>
 
-#include "string_constraint.h"
+#include <solvers/refinement/bv_refinement.h>
+
 #include "string_constraint_generator.h"
 #include "string_dependencies.h"
-#include "string_refinement_invariant.h"
 #include "string_refinement_util.h"
 
 // clang-format off

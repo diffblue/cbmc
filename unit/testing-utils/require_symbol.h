@@ -9,8 +9,10 @@ Author: Diffblue Limited.
 #ifndef CPROVER_TESTING_UTILS_REQUIRE_SYMBOL_H
 #define CPROVER_TESTING_UTILS_REQUIRE_SYMBOL_H
 
-#include <util/symbol.h>
-#include <util/symbol_table.h>
+#include <util/irep.h>
+
+class symbol_tablet;
+class symbolt;
 
 /// \file
 /// Helper functions for getting symbols from the symbol table during unit tests

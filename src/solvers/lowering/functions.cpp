@@ -9,7 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "functions.h"
 
 #include <util/std_expr.h>
-#include <util/std_types.h>
+
+#include <solvers/decision_procedure.h>
 
 void functionst::record(const function_application_exprt &function_application)
 {

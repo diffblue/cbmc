@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
-#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 

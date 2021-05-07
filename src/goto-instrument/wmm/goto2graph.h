@@ -16,7 +16,6 @@ Date: 2012
 
 #include <map>
 
-#include <util/graph.h>
 #include <util/namespace.h>
 #include <util/message.h>
 
@@ -25,9 +24,7 @@ Date: 2012
 #include "event_graph.h"
 #include "wmm.h"
 
-class goto_modelt;
 class value_setst;
-class local_may_aliast;
 
 class instrumentert
 {

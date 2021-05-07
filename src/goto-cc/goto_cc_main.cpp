@@ -14,8 +14,11 @@ Date: May 2006
 #include <algorithm>
 #include <iostream>
 
-#include <util/unicode.h>
 #include <util/get_base_name.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include "armcc_cmdline.h"
 #include "as86_cmdline.h"

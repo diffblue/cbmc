@@ -15,7 +15,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/invariant.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
+
+#include "cpp_template_parameter.h"
+#include "cpp_template_type.h"
 
 void template_mapt::apply(typet &type) const
 {

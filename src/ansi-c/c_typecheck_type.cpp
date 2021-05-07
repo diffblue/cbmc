@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 #include "ansi_c_convert_type.h"
+#include "ansi_c_declaration.h"
 #include "c_qualifiers.h"
 #include "gcc_types.h"
 #include "padding.h"

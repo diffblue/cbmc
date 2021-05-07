@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/range.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 bvt boolbvt::convert_let(const let_exprt &expr)
 {

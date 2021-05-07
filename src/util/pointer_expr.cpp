@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "byte_operators.h"
 #include "c_types.h"
 #include "expr_util.h"
-#include "namespace.h"
 #include "pointer_offset_size.h"
 #include "simplify_expr.h"
 

@@ -12,7 +12,7 @@ Author: Daniel Kroening
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_UTIL_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_UTIL_H
 
-#include <goto-programs/goto_model.h>
+#include <goto-programs/goto_program.h>
 
 bool is_condition(const exprt &src);
 

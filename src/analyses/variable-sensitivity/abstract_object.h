@@ -26,23 +26,16 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 
-#include <algorithm>
-#include <iosfwd>
-#include <iterator>
-#include <map>
 #include <memory>
 #include <set>
 #include <stack>
 
-#include "abstract_object_statistics.h"
 #include <goto-programs/goto_program.h>
-#include <util/expr.h>
 #include <util/sharing_map.h>
 
-class typet;
-class constant_exprt;
 class abstract_environmentt;
 class namespacet;
+struct abstract_object_statisticst;
 
 #define CLONE                                                                  \
   internal_abstract_object_pointert mutable_clone() const override             \

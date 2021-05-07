@@ -15,36 +15,20 @@ Author: Matt Lewis
 #include <map>
 #include <set>
 #include <string>
-#include <sstream>
-#include <algorithm>
-#include <ctime>
 
 #include <goto-programs/goto_program.h>
-#include <goto-programs/wp.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/goto_functions.h>
 
-#include <goto-symex/goto_symex.h>
-#include <goto-symex/symex_target_equation.h>
-
-#include <analyses/goto_check.h>
-
-#include <ansi-c/expr2c.h>
-
-#include <util/symbol_table.h>
-#include <util/options.h>
-#include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/find_symbols.h>
 #include <util/simplify_expr.h>
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
 
-#include "polynomial_accelerator.h"
 #include "accelerator.h"
-#include "util.h"
 #include "cone_of_influence.h"
-#include "overflow_instrumenter.h"
+#include "polynomial_accelerator.h"
+#include "scratch_program.h"
+#include "util.h"
 
 bool disjunctive_polynomial_accelerationt::accelerate(
   path_acceleratort &accelerator)

@@ -15,8 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/rename_symbol.h>
 #include <util/replace_symbol.h>
-#include <util/typecheck.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/typecheck.h>
 
 class casting_replace_symbolt : public replace_symbolt
 {

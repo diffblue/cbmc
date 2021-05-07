@@ -8,9 +8,10 @@ Author: CM Wintersteiger
 
 #include "qdimacs_core.h"
 
-#include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/std_expr.h>
+
+#include <set>
 
 void qdimacs_coret::simplify_extractbits(exprt &expr) const
 {

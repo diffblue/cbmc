@@ -14,9 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
-
-#include <goto-symex/symex_target_equation.h>
 
 #include <util/exception_utils.h>
 #include <util/format_expr.h>

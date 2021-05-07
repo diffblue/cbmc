@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_PRINTF_FORMATTER_H
 
 #include <util/expr.h>
-#include <util/namespace.h>
 
 #include <list>
 

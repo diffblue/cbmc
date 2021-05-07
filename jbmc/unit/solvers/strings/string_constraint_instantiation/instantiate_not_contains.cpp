@@ -12,10 +12,13 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
 
-#include <langapi/language_util.h>
 #include <langapi/mode.h>
 
+#include <solvers/decision_procedure.h>
+#include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/satcheck.h>
+#include <solvers/strings/array_pool.h>
+#include <solvers/strings/string_constraint_generator.h>
 #include <solvers/strings/string_constraint_instantiation.h>
 
 #include <util/config.h>

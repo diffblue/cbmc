@@ -6,9 +6,13 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <algorithm>
-
 #include "resolve_inherited_component.h"
+
+#include <util/range.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
+
+#include <algorithm>
 
 /// See the operator() method comment
 /// \param symbol_table: The symbol table to resolve the component against

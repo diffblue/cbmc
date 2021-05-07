@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
+#include <util/ssa_expr.h>
 #include <util/string_container.h>
 
 #include <langapi/language_util.h>

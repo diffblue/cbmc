@@ -11,14 +11,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_convert_type.h"
 
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/invariant.h>
 #include <util/std_types.h>
 
 #include <ansi-c/ansi_c_convert_type.h>
-#include <ansi-c/gcc_types.h>
 
 #include "cpp_declaration.h"
 #include "cpp_name.h"

@@ -15,10 +15,8 @@ Date: May 2007
 
 #include <climits>
 #include <iostream>
-#include <sstream>
 
 #include "exception_utils.h"
-#include "string_hash.h"
 
 void irep_serializationt::write_irep(
   std::ostream &out,

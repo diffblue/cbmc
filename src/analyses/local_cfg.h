@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_LOCAL_CFG_H
 #define CPROVER_ANALYSES_LOCAL_CFG_H
 
-#include <util/numbering.h>
-
 #include <goto-programs/goto_program.h>
 
 class local_cfgt

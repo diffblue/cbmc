@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <iosfwd>
 
-#include <util/message.h>
 #include <util/irep.h>
+
+class message_handlert;
 
 class taint_parse_treet
 {

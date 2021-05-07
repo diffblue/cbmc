@@ -14,6 +14,8 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SINGLE_LOOP_INCREMENTAL_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_SINGLE_LOOP_INCREMENTAL_SYMEX_CHECKER_H
 
+#include <goto-symex/path_storage.h>
+
 #include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "incremental_goto_checker.h"

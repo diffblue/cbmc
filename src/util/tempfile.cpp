@@ -8,6 +8,8 @@ Author: Daniel Kroening
 
 #include "tempfile.h"
 
+// clang-format off
+// clang-format must not re-order includes here to avoid pragma_push/pragma_pop
 #ifdef _WIN32
 #include <util/pragma_push.def>
 #ifdef _MSC_VER
@@ -16,6 +18,7 @@ Author: Daniel Kroening
 #pragma warning(disable : 5039)
 // pointer or reference to potentially throwing function passed to extern C
 #endif
+#include <fcntl.h>
 #include <process.h>
 #include <sys/stat.h>
 #include <windows.h>
@@ -26,11 +29,9 @@ Author: Daniel Kroening
 #define close _close
 #include <util/pragma_pop.def>
 #endif
-
-#include <fcntl.h>
+// clang-format on
 
 #include <cstdlib>
-#include <cstdio>
 #include <cstring>
 
 #include "exception_utils.h"

@@ -8,17 +8,12 @@ Author: Diffblue Ltd.
 
 #include "solver_hardness.h"
 
-#include <algorithm>
 #include <iomanip>
-#include <iostream>
-
-#include <cstdint>
 
 #include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/json_irep.h>
 #include <util/json_stream.h>
-#include <util/string2int.h>
 
 solver_hardnesst::sat_hardnesst &solver_hardnesst::sat_hardnesst::
 operator+=(const solver_hardnesst::sat_hardnesst &other)

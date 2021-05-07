@@ -11,7 +11,10 @@ Author: Daniel Kroening
 #include <util/exception_utils.h>
 #include <util/file_util.h>
 #include <util/tempdir.h>
-#include <util/unicode.h>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 #include <fstream>
 

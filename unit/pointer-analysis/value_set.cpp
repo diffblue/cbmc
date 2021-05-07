@@ -14,7 +14,6 @@ Author: Diffblue Ltd.
 #include <pointer-analysis/value_set.h>
 
 #include <util/arith_tools.h>
-#include <util/byte_operators.h>
 #include <util/pointer_expr.h>
 
 static bool object_descriptor_matches(

@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
-#include <util/find_symbols.h>
 #include <util/ieee_float.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>

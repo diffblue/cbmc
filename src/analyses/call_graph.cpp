@@ -11,8 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "call_graph.h"
 
-#include <util/std_expr.h>
 #include <util/xml.h>
+
+#include <goto-programs/goto_model.h>
 
 /// Create empty call graph
 /// \param collect_callsites: if true, then each added graph edge will have

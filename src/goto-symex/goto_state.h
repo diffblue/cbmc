@@ -15,7 +15,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/sharing_map.h>
 
 #include <analyses/guard.h>
-#include <analyses/local_safe_pointers.h>
+
 #include <pointer-analysis/value_set.h>
 
 #include "renaming_level.h"

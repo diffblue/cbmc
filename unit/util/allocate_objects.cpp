@@ -8,7 +8,6 @@ Author: Diffblue Ltd
 
 #include <util/allocate_objects.h>
 #include <util/c_types.h>
-#include <util/irep_ids.h>
 #include <util/source_location.h>
 #include <util/symbol_table.h>
 

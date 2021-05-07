@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 class exprt;
-class namespacet;
-class goto_functionst;
 class goto_modelt;
 
 void rewrite_union(exprt &);

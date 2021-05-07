@@ -18,6 +18,7 @@ Date: May 2016
 #include <util/cmdline.h>
 #include <util/options.h>
 
+#include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
 #include "cover_basic_blocks.h"

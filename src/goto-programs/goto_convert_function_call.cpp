@@ -11,15 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
-
-#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
-#include <util/prefix.h>
-#include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
-
-#include <util/c_types.h>
 
 void goto_convertt::convert_function_call(
   const code_function_callt &function_call,

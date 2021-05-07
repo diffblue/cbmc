@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
 
 cpp_declarator_convertert::cpp_declarator_convertert(
   class cpp_typecheckt &_cpp_typecheck):

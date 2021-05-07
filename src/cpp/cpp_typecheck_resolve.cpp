@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <cstdlib>
 #include <algorithm>
 
 #include <util/arith_tools.h>
@@ -24,17 +23,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/string_constant.h>
 
 #include <ansi-c/anonymous_member.h>
 #include <ansi-c/merged_type.h>
 
-#include "cpp_typecheck.h"
-#include "cpp_template_type.h"
-#include "cpp_type2name.h"
-#include "cpp_util.h"
 #include "cpp_convert_type.h"
+#include "cpp_type2name.h"
+#include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
+#include "cpp_util.h"
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck):
   cpp_typecheck(_cpp_typecheck),

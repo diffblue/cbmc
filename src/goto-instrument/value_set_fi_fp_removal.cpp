@@ -9,19 +9,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set_fi_fp_removal.h"
 
 #include <goto-programs/goto_model.h>
-#include <goto-programs/remove_function_pointers.h>
 
 #include <pointer-analysis/value_set_analysis_fi.h>
 
-#include <util/base_type.h>
 #include <util/c_types.h>
-#include <util/expanding_vector.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/union_find.h>
 
 #ifdef USE_STD_STRING
 #  include <util/dstring.h>

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 
 #include <ansi-c/ansi_c_language.h>
-#include <ansi-c/c_object_factory_parameters.h>
 
 #include <util/parse_options.h>
 #include <util/timestamper.h>
@@ -25,8 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 
 #include <goto-checker/bmc_util.h>
-#include <goto-checker/solver_factory.h>
 
+#include <goto-programs/goto_model.h>
 #include <goto-programs/goto_trace.h>
 
 #include <solvers/strings/string_refinement.h>
@@ -36,7 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-instrument/cover.h>
 
-class goto_functionst;
 class optionst;
 
 // clang-format off

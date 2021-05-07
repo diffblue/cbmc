@@ -8,17 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_lifetime_init.h"
 
-#include <cstdlib>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
-#include <goto-programs/goto_functions.h>
+#include <set>
 
 static optionalt<codet>
 static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)

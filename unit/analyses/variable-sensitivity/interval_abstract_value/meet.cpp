@@ -13,6 +13,7 @@
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
 SCENARIO(

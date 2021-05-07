@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/journalling_symbol_table.h>
-#include <util/string_constant.h>
+#include <util/nondet.h>
 #include <util/suffix.h>
 
 #include <goto-programs/class_identifier.h>
@@ -20,11 +20,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/static_lifetime_init.h>
 
 #include "java_bytecode_instrument.h"
+#include "java_bytecode_language.h"
 #include "java_object_factory.h"
 #include "java_string_literals.h"
+#include "java_types.h"
 #include "java_utils.h"
-#include <util/fresh_symbol.h>
-#include <util/nondet.h>
+
+#include <cstring>
 
 #define JAVA_MAIN_METHOD "main:([Ljava/lang/String;)V"
 

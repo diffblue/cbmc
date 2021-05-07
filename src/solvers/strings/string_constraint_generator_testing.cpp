@@ -11,9 +11,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for string functions that return Boolean values
 
 #include "string_constraint_generator.h"
-#include "string_refinement_invariant.h"
 
 #include <util/deprecate.h>
+#include <util/mathematical_expr.h>
 
 /// Add axioms stating that the returned expression is true exactly when the
 /// offset is greater or equal to 0 and the first string is a prefix of the

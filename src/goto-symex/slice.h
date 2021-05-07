@@ -12,9 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SLICE_H
 #define CPROVER_GOTO_SYMEX_SLICE_H
 
-#include "symex_target_equation.h"
-
 #include <list>
+#include <unordered_set>
+
+#include <util/irep.h>
+
+class exprt;
+class symex_target_equationt;
 
 // slice an equation with respect to the assertions contained therein
 void slice(symex_target_equationt &equation);

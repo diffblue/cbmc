@@ -15,6 +15,8 @@ Author: Diffblue Limited.
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
 
+#include <goto-programs/class_hierarchy.h>
+
 #include <java_bytecode/java_bytecode_convert_method.h>
 #include <java_bytecode/java_bytecode_convert_method_class.h>
 #include <java_bytecode/java_utils.h>

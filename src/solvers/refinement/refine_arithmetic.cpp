@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 
 #include <solvers/floatbv/float_utils.h>
+#include <solvers/prop/literal_expr.h>
 
 // Parameters
 #define MAX_INTEGER_UNDERAPPROX 3

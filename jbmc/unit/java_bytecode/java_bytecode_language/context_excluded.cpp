@@ -11,7 +11,8 @@ Author: Diffblue Limited.
 #include <util/symbol_table.h>
 
 #include <java-testing-utils/load_java_class.h>
-#include <java-testing-utils/require_type.h>
+
+#include <java_bytecode/java_types.h>
 
 SCENARIO(
   "Exclude a method using context-include/exclude",

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 
-#include <goto-programs/goto_model.h>
+class goto_modelt;
 
 void dot(
   const goto_modelt &,

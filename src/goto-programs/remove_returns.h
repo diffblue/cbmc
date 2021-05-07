@@ -71,11 +71,11 @@ Date:   September 2009
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 
+#include <util/irep.h>
+
 #include <functional>
 
-#include <util/std_code.h>
-#include <util/std_types.h>
-
+class code_function_callt;
 class goto_functionst;
 class goto_model_functiont;
 class goto_modelt;

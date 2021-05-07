@@ -14,10 +14,10 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <memory>
 
-#include <goto-programs/goto_model.h>
-
 #include <util/json.h>
 #include <util/xml.h>
+
+#include <goto-programs/goto_program.h>
 
 /// A history object is an abstraction / representation of the control-flow
 /// part of a set of traces.  The simplest example is a single

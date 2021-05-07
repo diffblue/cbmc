@@ -10,9 +10,6 @@ Author: Diffblue Ltd.
 
 #include "allocate_objects.h"
 #include "arith_tools.h"
-#include "c_types.h"
-#include "fresh_symbol.h"
-#include "symbol.h"
 
 symbol_exprt generate_nondet_int(
   const exprt &min_value_expr,

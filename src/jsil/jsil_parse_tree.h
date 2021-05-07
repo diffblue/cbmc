@@ -15,7 +15,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <iosfwd>
 #include <list>
 
-#include <util/std_expr.h>
 #include <util/std_code.h>
 
 class symbolt;

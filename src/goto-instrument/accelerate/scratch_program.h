@@ -13,10 +13,8 @@ Author: Matt Lewis
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 
 #include <memory>
-#include <string>
 
 #include <util/make_unique.h>
-#include <util/message.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>

@@ -12,10 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_GUARD_EXPR_H
 #define CPROVER_ANALYSES_GUARD_EXPR_H
 
-#include <iosfwd>
-
-#include <util/expr_util.h>
-#include <util/std_expr.h>
+#include <util/expr.h>
 
 /// This is unused by this implementation of guards, but can be used by other
 /// implementations of the same interface.

@@ -12,8 +12,9 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_GOTO_PROGRAMS_ENSURE_ONE_BACKEDGE_PER_TARGET_H
 #define CPROVER_GOTO_PROGRAMS_ENSURE_ONE_BACKEDGE_PER_TARGET_H
 
-#include "goto_model.h"
-#include "goto_program.h"
+class goto_programt;
+class goto_modelt;
+class goto_model_functiont;
 
 /// Try to force the given \p goto_program into a form such that each backedge
 /// (branch going backwards in lexical program order) has a unique target. This

@@ -15,15 +15,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "reachability_slicer.h"
 
-#include <stack>
-
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 
 #include <util/exception_utils.h>
-#include <util/message.h>
 
 #include "full_slicer_class.h"
 #include "reachability_slicer_class.h"

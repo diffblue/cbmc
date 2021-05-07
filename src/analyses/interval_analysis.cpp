@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/find_symbols.h>
 
+#include "ai.h"
 #include "interval_domain.h"
 
 /// Instruments all "post-branch" instructions with assumptions about variable

@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex_state.h"
 #include "goto_symex_is_constant.h"
 
-#include <cstdlib>
 #include <iostream>
 
 #include <util/as_const.h>
@@ -21,11 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
-#include <util/format.h>
-#include <util/format_expr.h>
+#include <util/find_symbols.h>
 #include <util/invariant.h>
-#include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>

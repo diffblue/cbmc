@@ -16,15 +16,13 @@ Author: Elizabeth Polgreen, polgreen@amazon.com
 
 #include <list>
 #include <string>
-#include <unordered_set>
 
 #include <util/irep.h>
 
 #include <analyses/call_graph.h>
 
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/goto_model.h>
 
-class goto_modelt;
 class message_handlert;
 
 /// \brief The aggressive slicer removes the body of all the functions except

@@ -11,17 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_fi.h"
 
-#include <iterator>
 #include <ostream>
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <langapi/language_util.h>
 #include <util/c_types.h>

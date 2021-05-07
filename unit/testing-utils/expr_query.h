@@ -14,7 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_TESTING_UTILS_EXPR_QUERY_H
 
 #include <testing-utils/use_catch.h>
-#include <util/expr.h>
+
 #include <util/expr_cast.h>
 
 /// Wrapper for optionalt<exprt> with useful method for queries to be used in

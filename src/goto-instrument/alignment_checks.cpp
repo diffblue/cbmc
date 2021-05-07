@@ -15,6 +15,7 @@ Author:
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include <ostream>
 

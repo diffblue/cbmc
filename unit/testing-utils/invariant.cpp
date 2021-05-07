@@ -2,6 +2,8 @@
 
 #include "invariant.h"
 
+#include <util/invariant.h>
+
 #include <utility>
 
 invariant_failure_containingt invariant_failure_containing(std::string expected)

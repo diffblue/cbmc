@@ -7,9 +7,6 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <java-testing-utils/load_java_class.h>
-#include <java_bytecode/java_bytecode_convert_class.h>
-#include <java_bytecode/java_bytecode_convert_method.h>
-#include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>
 #include <testing-utils/use_catch.h>
 

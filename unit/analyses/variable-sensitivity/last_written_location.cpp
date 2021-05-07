@@ -12,20 +12,14 @@
 
 #include <testing-utils/use_catch.h>
 
-#include <iostream>
-#include <string>
-
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/arith_tools.h>
-#include <util/expr.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
-#include <util/type.h>
 
 // #include <src/ansi-c/c_to_expr.h>
 

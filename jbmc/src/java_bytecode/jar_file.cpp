@@ -10,11 +10,7 @@ Author: Diffblue Ltd
 
 #include <algorithm>
 #include <cctype>
-
-#include <util/invariant.h>
-#include <util/suffix.h>
-
-#include "java_class_loader_limit.h"
+#include <sstream>
 
 void jar_filet::initialize_file_index()
 {

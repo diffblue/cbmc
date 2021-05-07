@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/std_types.h>
 
-#include <ansi-c/c_qualifiers.h>
-
 #include "cpp_typecheck.h"
 
 bool cpp_typecheck_fargst::has_class_type() const

@@ -32,11 +32,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 #include <langapi/language.h>
 #include <langapi/mode.h>
 
+#include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
 #include "guard.h"

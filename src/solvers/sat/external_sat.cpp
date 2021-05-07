@@ -7,7 +7,6 @@
 
 #include "dimacs_cnf.h"
 
-#include <util/exception_utils.h>
 #include <util/run.h>
 #include <util/string_utils.h>
 #include <util/tempfile.h>
@@ -15,7 +14,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 external_satt::external_satt(message_handlert &message_handler, std::string cmd)

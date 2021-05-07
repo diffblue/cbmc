@@ -8,7 +8,6 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
 #include <goto-programs/goto_function.h>

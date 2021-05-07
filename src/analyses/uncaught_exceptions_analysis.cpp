@@ -14,6 +14,10 @@ Author: Cristina David
 #endif
 #include "uncaught_exceptions_analysis.h"
 
+#include <util/namespace.h>
+
+#include <goto-programs/goto_functions.h>
+
 /// Returns the compile type of an exception
 irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 {

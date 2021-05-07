@@ -13,13 +13,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_ANALYSES_GUARD_BDD_H
 #define CPROVER_ANALYSES_GUARD_BDD_H
 
-#include <iosfwd>
-#include <memory>
-
 #include <solvers/bdd/bdd.h>
-#include <solvers/prop/bdd_expr.h>
-#include <util/make_unique.h>
-#include <util/std_expr.h>
+
+class bdd_exprt;
+class exprt;
 
 class guard_bddt
 {

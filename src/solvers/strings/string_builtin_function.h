@@ -5,13 +5,12 @@
 #define CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
 
 #include "string_constraint_generator.h"
+
+#include <util/mathematical_expr.h>
 #include <util/optional.h>
 #include <util/string_expr.h>
-#include <vector>
 
-class array_poolt;
-struct string_constraintst;
-class string_constraint_generatort;
+#include <vector>
 
 #define CHARACTER_FOR_UNKNOWN '?'
 

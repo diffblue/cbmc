@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/options.h>
 #include <util/pointer_expr.h>
-#include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/goto_model.h>
 
 /// \param expr: expression to check
 /// \return pointer to appropriate failed symbol for \p expr, or nullptr if none

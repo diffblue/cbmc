@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 exprt flow_insensitive_abstract_domain_baset::get_guard(
   locationt from,

@@ -10,6 +10,10 @@ Author: Diffblue Limited
 #include <testing-utils/require_vectors_equal_unordered.h>
 #include <testing-utils/use_catch.h>
 
+#include <util/symbol_table.h>
+
+#include <java_bytecode/java_types.h>
+
 SCENARIO(
   "load_method_by_regex::does_pattern_miss_descriptor",
   "[core][java_bytecode][load_method_by_regex]")

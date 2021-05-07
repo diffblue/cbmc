@@ -8,6 +8,8 @@ Author: Michael Tautschnig
 
 #include "cpp_storage_spec.h"
 
+#include <util/type.h>
+
 void cpp_storage_spect::read(const typet &type)
 {
   if(type.id() == ID_merged_type || type.id() == ID_function_type)

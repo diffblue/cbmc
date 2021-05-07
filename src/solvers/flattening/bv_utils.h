@@ -10,9 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 
-#include <map>
-#include <set>
-
 #include <util/mp_arith.h>
 
 #include <solvers/prop/prop.h>

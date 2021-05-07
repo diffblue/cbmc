@@ -13,7 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "string_constraint_generator.h"
 
-#include <util/deprecate.h>
+#include <util/mathematical_expr.h>
 
 /// Equality of the content of two strings
 ///

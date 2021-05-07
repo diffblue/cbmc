@@ -12,9 +12,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   taking one string and returning another
 
 #include "string_constraint_generator.h"
-#include "string_refinement_invariant.h"
 
 #include <util/arith_tools.h>
+#include <util/mathematical_expr.h>
 
 /// Reduce or extend a string to have the given length
 ///

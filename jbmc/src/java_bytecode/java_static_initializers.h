@@ -9,17 +9,22 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 
-#include "assignments_from_json.h"
-#include "ci_lazy_methods_needed.h"
-#include "java_object_factory_parameters.h"
-#include "select_pointer_type.h"
 #include "synthetic_methods_map.h"
 
 #include <unordered_set>
 
-#include <util/message.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
+
+#include "code_with_references.h"
+
+class ci_lazy_methods_neededt;
+class json_objectt;
+class message_handlert;
+class select_pointer_typet;
+class symbol_table_baset;
+class symbol_tablet;
+struct java_object_factory_parameterst;
 
 irep_idt clinit_wrapper_name(const irep_idt &class_name);
 irep_idt user_specified_clinit_name(const irep_idt &class_name);

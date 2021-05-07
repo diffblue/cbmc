@@ -26,7 +26,6 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 
-#include <util/bitvector_types.h>
 #include <util/message.h>
 #include <util/options.h>
 

@@ -13,10 +13,11 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H
 #define CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H
 
-#include <util/symbol_table.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
-#include <goto-programs/class_hierarchy.h>
+#include <util/irep.h>
+#include <util/optional.h>
+
+class symbolt;
+class symbol_tablet;
 
 class resolve_inherited_componentt
 {

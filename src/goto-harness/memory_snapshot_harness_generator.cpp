@@ -21,14 +21,9 @@ Author: Daniel Poetzl
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
-#include <util/message.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
-
-#include <linking/static_lifetime_init.h>
-
-#include "goto_harness_generator_factory.h"
 
 void memory_snapshot_harness_generatort::handle_option(
   const std::string &option,

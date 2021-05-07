@@ -12,14 +12,12 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 #define CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 
-#include "c_object_factory_parameters.h"
-
 #include <set>
-#include <vector>
 
 #include <util/allocate_objects.h>
-#include <util/std_code.h>
 #include <util/symbol_table.h>
+
+struct c_object_factory_parameterst;
 
 class symbol_factoryt
 {

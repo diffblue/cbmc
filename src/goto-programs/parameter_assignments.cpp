@@ -16,6 +16,8 @@ Date:   September 2015
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include "goto_model.h"
+
 class parameter_assignmentst
 {
 public:

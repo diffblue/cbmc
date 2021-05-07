@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_expr.h"
 #include "pointer_offset_size.h"
 #include "pointer_offset_sum.h"
-#include "range.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "simplify_utils.h"
@@ -178,7 +177,9 @@ simplify_exprt::resultt<>
 simplify_exprt::simplify_ctz(const count_trailing_zeros_exprt &expr)
 {
   const auto const_bits_opt = expr2bits(
-    expr.op(), byte_extract_id() == ID_byte_extract_little_endian, ns);
+    expr.op(),
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
+    ns);
 
   if(!const_bits_opt.has_value())
     return unchanged(expr);

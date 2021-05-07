@@ -11,9 +11,7 @@ Author: Diffblue Ltd.
 
 #include <string>
 
-#include <goto-programs/goto_model.h>
 #include <util/parse_options.h>
-#include <util/ui_message.h>
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator_factory.h"

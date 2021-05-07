@@ -12,8 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_H
 #define CPROVER_GOTO_PROGRAMS_INTERPRETER_H
 
-#include "goto_model.h"
-
+class goto_modelt;
 class message_handlert;
 
 void interpreter(

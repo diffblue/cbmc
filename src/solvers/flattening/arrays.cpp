@@ -9,15 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arrays.h"
 
 #include <util/arith_tools.h>
-#include <util/format_expr.h>
-#include <util/json_irep.h>
+#include <util/json.h>
 #include <util/message.h>
-#include <util/namespace.h>
 #include <util/replace_expr.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
-#include <util/ui_message.h>
 
+#include <solvers/prop/literal_expr.h>
 #include <solvers/prop/prop.h>
 
 #ifdef DEBUG

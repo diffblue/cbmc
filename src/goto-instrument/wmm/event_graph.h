@@ -27,7 +27,6 @@ Date: 2012
 #include "wmm.h"
 
 class messaget;
-class namespacet;
 
 typedef grapht<abstract_eventt> wmm_grapht;
 typedef wmm_grapht::node_indext event_idt;

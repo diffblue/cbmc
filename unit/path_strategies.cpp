@@ -22,6 +22,8 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 #include <goto-checker/goto_symex_property_decider.h>
 #include <goto-checker/symex_bmc.h>
 
+#include <goto-symex/path_storage.h>
+
 #include <langapi/mode.h>
 
 #include <util/cmdline.h>

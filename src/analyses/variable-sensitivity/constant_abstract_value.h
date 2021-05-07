@@ -15,7 +15,6 @@
 #include <iosfwd>
 
 #include <analyses/variable-sensitivity/abstract_value_object.h>
-#include <util/std_expr.h>
 
 class constant_abstract_valuet : public abstract_value_objectt
 {

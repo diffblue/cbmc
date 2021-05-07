@@ -13,7 +13,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #define CPROVER_STATEMENT_LIST_STATEMENT_LIST_PARSE_TREE_H
 
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 /// Intermediate representation of a parsed Statement List file before
 /// converting it into a goto program. Contains all data structures that are

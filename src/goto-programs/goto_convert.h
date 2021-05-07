@@ -12,10 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
 
-#include <util/message.h>
-#include <util/std_code.h>
+#include <util/irep.h>
 
-#include "goto_program.h"
+class codet;
+class goto_programt;
+class message_handlert;
+class symbol_table_baset;
 
 // start from given code
 void goto_convert(

@@ -11,10 +11,8 @@ Author: Thomas Kiley, thomas@diffblue.com
 
 #include "rebuild_goto_start_function.h"
 
-#include <util/symbol.h>
-#include <util/symbol_table.h>
 #include <util/prefix.h>
-#include <util/cmdline.h>
+#include <util/symbol.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>

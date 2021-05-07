@@ -8,17 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
-#include <util/namespace.h>
-
-#include "arith_tools.h"
-#include "byte_operators.h"
-#include "c_types.h"
-#include "expr_util.h"
-#include "mathematical_types.h"
 #include "namespace.h"
-#include "pointer_offset_size.h"
 #include "range.h"
-#include "simplify_expr.h"
 
 bool constant_exprt::value_is_zero_string() const
 {

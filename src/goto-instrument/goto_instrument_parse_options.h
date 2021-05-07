@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/validation_interface.h>
 
 #include <goto-programs/class_hierarchy.h>
-#include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_const_function_pointers.h>
 #include <goto-programs/restrict_function_pointers.h>

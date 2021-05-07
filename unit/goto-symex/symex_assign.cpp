@@ -11,13 +11,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <analyses/dirty.h>
 #include <analyses/guard.h>
+
 #include <goto-symex/expr_skeleton.h>
-#include <goto-symex/goto_symex.h>
 #include <goto-symex/goto_symex_state.h>
 #include <goto-symex/symex_assign.h>
+#include <goto-symex/symex_config.h>
 #include <goto-symex/symex_target.h>
+
 #include <util/arith_tools.h>
-#include <util/c_types.h>
+#include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 

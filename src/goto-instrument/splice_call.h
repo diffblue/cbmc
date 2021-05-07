@@ -15,8 +15,11 @@ Date: July 2017
 #ifndef CPROVER_GOTO_INSTRUMENT_SPLICE_CALL_H
 #define CPROVER_GOTO_INSTRUMENT_SPLICE_CALL_H
 
-#include <goto-programs/goto_functions.h>
+#include <string>
+
+class goto_functionst;
 class message_handlert;
+class symbol_tablet;
 
 bool splice_call(
     goto_functionst &goto_functions,

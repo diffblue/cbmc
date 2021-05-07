@@ -11,21 +11,15 @@ Author: Diffblue Ltd.
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
+#include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_virtual_functions.h>
 
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_object_factory_parameters.h>
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/replace_java_nondet.h>
-
-#include <util/options.h>
-
-#include <goto-instrument/cover.h>
-
-#include <iostream>
-#include <java-testing-utils/load_java_class.h>
 
 void validate_nondet_method_removed(
   std::list<goto_programt::instructiont> instructions)

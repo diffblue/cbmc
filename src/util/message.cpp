@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "json.h"
 #include "string2int.h"
+#include "structured_data.h"
 
 void message_handlert::print(
   unsigned level,

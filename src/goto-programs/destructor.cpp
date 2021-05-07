@@ -11,8 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
-#include <util/std_expr.h>
-#include <util/std_types.h>
+#include <util/namespace.h>
 #include <util/std_code.h>
 
 code_function_callt get_destructor(

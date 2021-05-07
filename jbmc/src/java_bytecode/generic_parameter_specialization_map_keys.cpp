@@ -2,8 +2,6 @@
 
 #include "generic_parameter_specialization_map_keys.h"
 
-#include <util/range.h>
-
 /// Add the parameters and their types for each generic parameter of the
 /// given generic pointer type to the map.
 /// Own the keys and pop from their stack on destruction.

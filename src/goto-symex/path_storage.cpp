@@ -10,6 +10,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>
 
 #include <sstream>
 
+#include <util/cmdline.h>
 #include <util/exit_codes.h>
 #include <util/make_unique.h>
 

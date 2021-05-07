@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/threeval.h>
 
-#include "ai.h"
+#include "ai_domain.h"
 #include "invariant_set.h"
 
 class invariant_set_domaint:public ai_domain_baset

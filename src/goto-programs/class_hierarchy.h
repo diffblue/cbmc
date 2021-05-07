@@ -20,7 +20,6 @@ Date: April 2016
 
 #include <util/graph.h>
 #include <util/irep.h>
-#include <util/ui_message.h>
 
 // clang-format off
 #define OPT_SHOW_CLASS_HIERARCHY \
@@ -32,6 +31,7 @@ Date: April 2016
 
 class symbol_tablet;
 class json_stream_arrayt;
+class ui_message_handlert;
 
 /// Non-graph-based representation of the class hierarchy.
 /// \deprecated `class_hierarchy_grapht` is a more advanced graph-based

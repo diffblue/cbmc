@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/std_code.h>
-#include <util/std_expr.h>
 
 void ai_baset::output(
   const namespacet &ns,

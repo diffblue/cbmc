@@ -20,7 +20,6 @@ Author: Daniel Poetzl
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/message.h>
-#include <util/options.h>
 #include <util/symbol_table.h>
 
 #include <testing-utils/message.h>

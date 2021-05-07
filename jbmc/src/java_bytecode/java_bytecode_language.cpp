@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/journalling_symbol_table.h>
 #include <util/options.h>
 #include <util/prefix.h>
-#include <util/string2int.h>
 #include <util/suffix.h>
 #include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
@@ -36,9 +35,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_instrument.h"
 #include "java_bytecode_internal_additions.h"
-#include "java_bytecode_parser.h"
 #include "java_bytecode_typecheck.h"
 #include "java_class_loader.h"
+#include "java_class_loader_limit.h"
 #include "java_entry_point.h"
 #include "java_static_initializers.h"
 #include "java_string_literal_expr.h"

@@ -13,8 +13,9 @@ Author: John Dumbell
 #define CPROVER_GOTO_SYMEX_COMPLEXITY_LIMITER_H
 
 #include "complexity_violation.h"
-#include "goto_symex_state.h"
 #include "symex_complexity_limit_exceeded_action.h"
+
+class optionst;
 
 /// Symex complexity module.
 ///

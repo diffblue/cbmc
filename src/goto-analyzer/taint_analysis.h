@@ -12,10 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H
 #define CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H
 
-#include <util/message.h>
-#include <util/namespace.h>
+#include <string>
 
-#include <goto-programs/goto_model.h>
+#include <util/optional.h>
+
+class goto_modelt;
+class message_handlert;
 
 bool taint_analysis(
   goto_modelt &,

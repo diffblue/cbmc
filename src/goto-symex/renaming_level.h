@@ -12,15 +12,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_RENAMING_LEVEL_H
 #define CPROVER_GOTO_SYMEX_RENAMING_LEVEL_H
 
-#include <map>
-#include <unordered_set>
-
-#include <util/expr_iterator.h>
 #include <util/irep.h>
-#include <util/range.h>
 #include <util/sharing_map.h>
-#include <util/simplify_expr.h>
-#include <util/ssa_expr.h>
 
 #include "renamed.h"
 

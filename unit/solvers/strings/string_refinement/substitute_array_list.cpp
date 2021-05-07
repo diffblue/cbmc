@@ -9,11 +9,9 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <iostream>
 #include <solvers/strings/string_refinement.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/std_types.h>
 
 SCENARIO("substitute_array_list", "[core][solvers][strings][string_refinement]")
 {

@@ -13,7 +13,6 @@ Author: Michael Tautschnig, Daniel Kroening
 
 #include <unordered_set>
 
-#include <util/base_type.h>
 #include <util/symbol.h>
 #include <util/rename_symbol.h>
 

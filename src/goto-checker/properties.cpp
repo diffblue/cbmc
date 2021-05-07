@@ -17,6 +17,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/json_stream.h>
 #include <util/xml.h>
 
+#include <goto-programs/abstract_goto_model.h>
+
 std::string as_string(resultt result)
 {
   switch(result)

@@ -12,7 +12,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #ifndef CPROVER_STATEMENT_LIST_CONVERTERS_CONVERT_INT_LITERAL_H
 #define CPROVER_STATEMENT_LIST_CONVERTERS_CONVERT_INT_LITERAL_H
 
-#include <util/expr.h>
 #include <util/std_expr.h>
 
 /// Converts a string into the corresponding 'Int' or 'DInt' expression.

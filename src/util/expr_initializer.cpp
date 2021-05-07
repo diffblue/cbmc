@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_code.h"
-#include "std_expr.h"
 
 template <bool nondet>
 class expr_initializert

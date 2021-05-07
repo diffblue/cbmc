@@ -15,11 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/deprecate.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
-#include "goto_model.h"
+#include "goto_function.h"
 
+class goto_functionst;
+class goto_modelt;
 class message_handlert;
 
 /// Replace all uses of `char *` by a struct that carries that string, and also

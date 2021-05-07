@@ -11,15 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "irep.h"
 
-#include <ostream>
-
 #include "string2int.h"
 #include "string_hash.h"
 #include "irep_hash.h"
-
-#ifdef IREP_DEBUG
-#include <iostream>
-#endif
 
 irept nil_rep_storage;
 

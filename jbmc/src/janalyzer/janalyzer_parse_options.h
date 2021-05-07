@@ -102,21 +102,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/parse_options.h>
 #include <util/timestamper.h>
-#include <util/ui_message.h>
 
 #include <langapi/language.h>
 
-#include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/ai.h>
 #include <analyses/goto_check.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
-class bmct;
-class goto_functionst;
+class abstract_goto_modelt;
+class ai_baset;
+class goto_model_functiont;
 class optionst;
 
 // clang-format off

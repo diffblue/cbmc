@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "pointer_expr.h"
 #include "std_expr.h"
-#include "std_types.h"
 
 replace_symbolt::replace_symbolt()
 {

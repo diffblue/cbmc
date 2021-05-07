@@ -8,11 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 
+#include <util/arith_tools.h>
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
+#include <util/message.h>
 #include <util/nondet.h>
 #include <util/nondet_bool.h>
-#include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 
 #include <goto-programs/class_identifier.h>
@@ -20,9 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/interval_constraint.h>
 
 #include "generic_parameter_specialization_map_keys.h"
-#include "java_root_class.h"
+#include "java_object_factory_parameters.h"
+#include "java_static_initializers.h"
+#include "java_string_library_preprocess.h"
 #include "java_string_literals.h"
 #include "java_utils.h"
+#include "select_pointer_type.h"
 
 class java_object_factoryt
 {

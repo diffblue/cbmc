@@ -15,8 +15,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/bitvector_expr.h>
 #include <util/floatbv_expr.h>
-
-#include <solvers/floatbv/float_bv.h>
+#include <util/ieee_float.h>
+#include <util/mathematical_expr.h>
 
 /// Gets the unbiased exponent in a floating-point bit-vector
 ///
