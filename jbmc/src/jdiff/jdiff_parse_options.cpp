@@ -11,7 +11,6 @@ Author: Peter Schrammel
 
 #include "jdiff_parse_options.h"
 
-#include <climits>
 #include <cstdlib> // exit()
 #include <iostream>
 
@@ -175,13 +174,7 @@ int jdiff_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
-  //
-  // Print a banner
-  //
-  log.status() << "JDIFF version " << CBMC_VERSION << " "
-               << sizeof(void *) * CHAR_BIT << "-bit "
-               << config.this_architecture() << " "
-               << config.this_operating_system() << messaget::eom;
+  log_version_and_architecture("JDIFF");
 
   if(cmdline.args.size() != 2)
   {

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_analyzer_parse_options.h"
 
-#include <climits>
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
@@ -394,13 +393,7 @@ int goto_analyzer_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
-  //
-  // Print a banner
-  //
-  log.status() << "GOTO-ANALYSER version " << CBMC_VERSION << " "
-               << sizeof(void *) * CHAR_BIT << "-bit "
-               << config.this_architecture() << " "
-               << config.this_operating_system() << messaget::eom;
+  log_version_and_architecture("GOTO-ANALYZER");
 
   register_languages();
 

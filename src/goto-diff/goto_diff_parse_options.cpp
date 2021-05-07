@@ -11,7 +11,6 @@ Author: Peter Schrammel
 
 #include "goto_diff_parse_options.h"
 
-#include <climits>
 #include <cstdlib> // exit()
 #include <fstream>
 #include <iostream>
@@ -135,13 +134,7 @@ int goto_diff_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
-  //
-  // Print a banner
-  //
-  log.status() << "GOTO-DIFF version " << CBMC_VERSION << " "
-               << sizeof(void *) * CHAR_BIT << "-bit "
-               << config.this_architecture() << " "
-               << config.this_operating_system() << messaget::eom;
+  log_version_and_architecture("GOTO-DIFF");
 
   if(cmdline.args.size()!=2)
   {
