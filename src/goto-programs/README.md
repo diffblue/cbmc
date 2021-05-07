@@ -567,15 +567,6 @@ deserialises the passed file into a temporary `::goto_modelt` instance, and
 then it performs 'linking' of the temporary into a passed destination
 `::goto_modelt` instance.
 
-Details about linking of `::goto_modelt` instances can be found
-[here](\ref section-linking-goto-models).
-
-\section section-linking-goto-models Linking Goto Models
-
-C++ modules:
-  - `link_goto_model.h`
-  - `link_goto_model.cpp`
-
 Dependencies:
   - [linking folder](\ref linking).
   - [typecheck](\ref section-goto-typecheck).

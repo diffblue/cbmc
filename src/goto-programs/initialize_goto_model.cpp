@@ -71,9 +71,7 @@ goto_modelt initialize_goto_model(
       "one or more paths to program files");
   }
 
-  std::vector<std::string> binaries, sources;
-  binaries.reserve(files.size());
-  sources.reserve(files.size());
+  std::list<std::string> binaries, sources;
 
   for(const auto &file : files)
   {
@@ -135,15 +133,10 @@ goto_modelt initialize_goto_model(
     }
   }
 
-  for(const auto &file : binaries)
+  if(read_objects_and_link(binaries, goto_model, message_handler))
   {
-    msg.status() << "Reading GOTO program from file" << messaget::eom;
-
-    if(read_object_and_link(file, goto_model, message_handler))
-    {
-      throw invalid_source_file_exceptiont(
-        "failed to read object or link in file '" + file + '\'');
-    }
+    throw invalid_source_file_exceptiont{
+      "failed to read object or link in files"};
   }
 
   bool binaries_provided_start=
