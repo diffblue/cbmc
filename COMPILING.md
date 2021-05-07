@@ -462,6 +462,27 @@ Note that at the time of writing this has been tested to work with the CaDiCaL
    the IPASIR headers, which is needed for the cbmc includes of `ipasir.h`. The
    compiled binary will be placed in `cbmc/src/cbmc/cbmc`.
 
+---
+
+It's also possible to build CBMC using CaDiCaL through IPASIR via `cmake`,
+controlled with the flag `-Dsat_impl=ipasir-cadical`, like so:
+
+```sh
+$ cmake -Bbuild_ipasir -S. -Dsat_impl=ipasir-cadical
+```
+
+An advanced user may also take a more adventurous route, trying to link
+CBMC against any solver supporthing the IPASIR interface. To do that,
+an invocation like this is needed:
+
+```sh
+$ cmake -Bbuild_ipasir -S . -Dsat_impl=ipasir-custom -DIPASIR=<source_location> -DIPASIR_LIB=<lib_location>
+```
+
+with `<source_location>` being the absolute path to the folder containing
+the solver implementation and `<lib_location>` being the absolute path that
+contains a precompiled static library of the solver (`.a` file).
+
 #### Compiling with Riss via IPASIR
 
 The [Riss](https://github.com/conp-solutions/riss) solver supports the

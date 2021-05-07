@@ -38,6 +38,10 @@ set(booleforce_source
 set(minibdd_source
     ${CMAKE_CURRENT_SOURCE_DIR}/bdd/miniBDD/example.cpp
 )
+set(ipasir_source
+    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_ipasir.cpp
+)
+
 
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
@@ -51,6 +55,7 @@ list(REMOVE_ITEM sources
     ${lingeling_source}
     ${booleforce_source}
     ${minibdd_source}
+    # ${ipasir_source}
 )
 
 add_library(solvers ${sources})
@@ -128,6 +133,65 @@ elseif("${sat_impl}" STREQUAL "cadical")
     )
 
     target_link_libraries(solvers cadical)
+elseif("${sat_impl}" STREQUAL "ipasir-cadical")
+    message(STATUS "Building with IPASIR solver linking against: CaDiCaL")
+
+    download_project(PROJ cadical
+        URL https://github.com/arminbiere/cadical/archive/rel-1.4.0.tar.gz
+        PATCH_COMMAND true
+        COMMAND ./configure CXX=g++
+        URL_MD5 9bad586a82995a1d95d1197d445a353a
+    )
+
+    message(STATUS "Building CaDiCaL")
+    execute_process(COMMAND make WORKING_DIRECTORY ${cadical_SOURCE_DIR})
+
+    target_compile_definitions(solvers PUBLIC
+        SATCHECK_IPASIR HAVE_IPASIR IPASIR=${cadical_SOURCE_DIR}/src
+    )
+
+    add_library(cadical_ipasir STATIC IMPORTED)
+    set_property(TARGET cadical_ipasir
+        PROPERTY IMPORTED_LOCATION ${cadical_SOURCE_DIR}/build/libcadical.a
+    )
+
+    target_include_directories(solvers
+        PUBLIC
+        ${cadical_SOURCE_DIR}/src
+    )
+    target_link_libraries(solvers cadical_ipasir)
+elseif("${sat_impl}" STREQUAL "ipasir-custom")
+    message(STATUS "Building with IPASIR solver linking: custom solver provided")
+
+    if (NOT DEFINED IPASIR)
+        message(FATAL_ERROR
+          "IPASIR solver source code not provided. Please use -DIPASIR=<location> "
+          "with <location> being the path to the IPASIR solver source code."
+        )
+    endif()
+
+    if (NOT DEFINED IPASIR_LIB)
+        message(FATAL_ERROR
+            "IPASIR solver library not provided. Please use -DIPASIR_LIB=<location> "
+            "with <location> being the path to the IPASIR solver precompiled static "
+            "library."
+        )
+    endif()
+
+    target_compile_definitions(solvers PUBLIC
+        SATCHECK_IPASIR HAVE_IPASIR IPASIR=${IPASIR}
+    )
+
+    add_library(ipasir_custom STATIC IMPORTED)
+    set_property(TARGET ipasir_custom
+        PROPERTY IMPORTED_LOCATION ${IPASIR_LIB}
+    )
+
+    target_include_directories(solvers
+        PUBLIC
+        ${IPASIR}
+    )
+    target_link_libraries(solvers ipasir_custom pthread)
 endif()
 
 if(CMAKE_USE_CUDD)
