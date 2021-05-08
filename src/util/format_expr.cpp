@@ -474,6 +474,23 @@ void format_expr_configt::setup()
     return os << '"' << expr.get_string(ID_value) << '"';
   };
 
+  expr_map[ID_function_application] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &function_application_expr = to_function_application_expr(expr);
+    os << format(function_application_expr.function()) << '(';
+    bool first = true;
+    for(auto &argument : function_application_expr.arguments())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+      os << format(argument);
+    }
+    os << ')';
+    return os;
+  };
+
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return fallback_format_rec(os, expr);
   };
