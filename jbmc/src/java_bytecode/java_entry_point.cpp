@@ -261,34 +261,40 @@ void java_static_lifetime_init(
   // external. Iterate over a copy of the symtab, as its iterators are
   // invalidated by object_factory:
 
-  std::list<irep_idt> symbol_names;
+  // sort alphabetically for reproducible results
+  std::set<std::string> symbol_names;
   for(const auto &entry : symbol_table.symbols)
-    symbol_names.push_back(entry.first);
+    symbol_names.insert(id2string(entry.first));
 
-  // Don't use a for-each loop here because the loop extends the list, and the
-  // for-each loop may only read `.end()` once.
-  for(
-    auto symbol_it = symbol_names.begin();
-    symbol_it != symbol_names.end();
-    ++symbol_it)
+  std::set<std::string> additional_symbols;
+  while(!symbol_names.empty() || !additional_symbols.empty())
   {
-    const symbolt &sym = symbol_table.lookup_ref(*symbol_it);
-    if(should_init_symbol(sym))
+    if(!additional_symbols.empty())
+      symbol_names.swap(additional_symbols);
+
+    for(const auto &symbol_name : symbol_names)
     {
-      auto new_symbols = init_symbol(
-        sym,
-        code_block,
-        symbol_table,
-        source_location,
-        assume_init_pointers_not_null,
-        object_factory_parameters,
-        pointer_type_selector,
-        string_refinement_enabled,
-        message_handler);
-      symbol_names.insert(
-        symbol_names.end(), new_symbols.begin(), new_symbols.end());
+      const symbolt &sym = symbol_table.lookup_ref(symbol_name);
+      if(should_init_symbol(sym))
+      {
+        auto new_symbols = init_symbol(
+          sym,
+          code_block,
+          symbol_table,
+          source_location,
+          assume_init_pointers_not_null,
+          object_factory_parameters,
+          pointer_type_selector,
+          string_refinement_enabled,
+          message_handler);
+        for(const auto &new_symbol_name : new_symbols)
+          additional_symbols.insert(id2string(new_symbol_name));
+      }
     }
+
+    symbol_names.clear();
   }
+
   initialize_symbol.value = std::move(code_block);
 }
 
