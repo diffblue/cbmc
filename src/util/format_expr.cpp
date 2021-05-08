@@ -469,6 +469,11 @@ void format_expr_configt::setup()
       return fallback_format_rec(os, expr);
   };
 
+  expr_map[ID_string_constant] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << '"' << expr.get_string(ID_value) << '"';
+  };
+
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return fallback_format_rec(os, expr);
   };
