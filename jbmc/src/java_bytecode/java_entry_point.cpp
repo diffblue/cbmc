@@ -106,6 +106,125 @@ static constant_exprt constant_bool(bool val)
   return from_integer(val ? 1 : 0, java_boolean_type());
 }
 
+static std::unordered_set<irep_idt> init_symbol(
+  const symbolt &sym,
+  code_blockt &code_block,
+  symbol_table_baset &symbol_table,
+  const source_locationt &source_location,
+  bool assume_init_pointers_not_null,
+  const java_object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector,
+  bool string_refinement_enabled,
+  message_handlert &message_handler)
+{
+  std::unordered_set<irep_idt> additional_symbols;
+
+  if(
+    const symbolt *class_literal_init_method =
+      get_class_literal_initializer(sym, symbol_table))
+  {
+    const std::string &name_str = id2string(sym.name);
+    irep_idt class_name =
+      name_str.substr(0, name_str.size() - strlen(JAVA_CLASS_MODEL_SUFFIX));
+    const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
+
+    bool class_is_array = is_java_array_tag(sym.name);
+
+    journalling_symbol_tablet journalling_table =
+      journalling_symbol_tablet::wrap(symbol_table);
+
+    symbol_exprt class_name_literal = get_or_create_string_literal_symbol(
+      to_class_type(class_symbol.type).get_tag(),
+      journalling_table,
+      string_refinement_enabled);
+
+    // If that created any new symbols make sure we initialise those too:
+    additional_symbols = journalling_table.get_inserted();
+
+    // Call the literal initializer method instead of a nondet initializer:
+
+    // For arguments we can't parse yet:
+    side_effect_expr_nondett nondet_bool(java_boolean_type(), sym.location);
+
+    const auto &java_class_type = to_java_class_type(class_symbol.type);
+
+    // Argument order is: name, isAnnotation, isArray, isInterface,
+    // isSynthetic, isLocalClass, isMemberClass, isEnum
+
+    code_function_callt initializer_call(
+      class_literal_init_method->symbol_expr(),
+      {// this:
+       address_of_exprt(sym.symbol_expr()),
+       // name:
+       address_of_exprt(class_name_literal),
+       // isAnnotation:
+       constant_bool(java_class_type.get_is_annotation()),
+       // isArray:
+       constant_bool(class_is_array),
+       // isInterface:
+       constant_bool(java_class_type.get_interface()),
+       // isSynthetic:
+       constant_bool(java_class_type.get_synthetic()),
+       // isLocalClass:
+       nondet_bool,
+       // isMemberClass:
+       nondet_bool,
+       // isEnum:
+       constant_bool(java_class_type.get_is_enumeration())});
+
+    // First initialize the object as prior to a constructor:
+    namespacet ns(symbol_table);
+
+    auto zero_object = zero_initializer(sym.type, source_locationt(), ns);
+    if(!zero_object.has_value())
+    {
+      messaget message(message_handler);
+      message.error() << "failed to zero-initialize " << sym.name
+                      << messaget::eom;
+      throw 0;
+    }
+    set_class_identifier(
+      to_struct_expr(*zero_object), ns, to_struct_tag_type(sym.type));
+
+    code_block.add(
+      std::move(code_frontend_assignt(sym.symbol_expr(), *zero_object)));
+
+    // Then call the init function:
+    code_block.add(std::move(initializer_call));
+  }
+  else if(sym.value.is_nil() && sym.type != java_void_type())
+  {
+    const bool is_class_model = has_suffix(id2string(sym.name), "@class_model");
+    const bool not_allow_null = is_java_string_literal_id(sym.name) ||
+                                is_non_null_library_global(sym.name) ||
+                                assume_init_pointers_not_null;
+
+    java_object_factory_parameterst parameters = object_factory_parameters;
+    if(not_allow_null && !is_class_model)
+      parameters.min_null_tree_depth = 1;
+
+    gen_nondet_init(
+      sym.symbol_expr(),
+      code_block,
+      symbol_table,
+      source_location,
+      false,
+      lifetimet::STATIC_GLOBAL,
+      parameters,
+      pointer_type_selector,
+      update_in_placet::NO_UPDATE_IN_PLACE,
+      message_handler);
+  }
+  else if(sym.value.is_not_nil())
+  {
+    code_frontend_assignt assignment(sym.symbol_expr(), sym.value);
+    assignment.add_source_location() = source_location;
+    code_block.add(assignment);
+  }
+
+  return additional_symbols;
+}
+
 void java_static_lifetime_init(
   symbol_table_baset &symbol_table,
   const source_locationt &source_location,
@@ -153,114 +272,21 @@ void java_static_lifetime_init(
     symbol_it != symbol_names.end();
     ++symbol_it)
   {
-    const auto &symname = *symbol_it;
-    const symbolt &sym = symbol_table.lookup_ref(symname);
+    const symbolt &sym = symbol_table.lookup_ref(*symbol_it);
     if(should_init_symbol(sym))
     {
-      if(const symbolt *class_literal_init_method =
-         get_class_literal_initializer(sym, symbol_table))
-      {
-        const std::string &name_str = id2string(sym.name);
-        irep_idt class_name =
-          name_str.substr(0, name_str.size() - strlen(JAVA_CLASS_MODEL_SUFFIX));
-        const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
-
-        bool class_is_array = is_java_array_tag(sym.name);
-
-        journalling_symbol_tablet journalling_table =
-          journalling_symbol_tablet::wrap(symbol_table);
-
-        symbol_exprt class_name_literal = get_or_create_string_literal_symbol(
-          to_class_type(class_symbol.type).get_tag(),
-          journalling_table,
-          string_refinement_enabled);
-
-        // If that created any new symbols make sure we initialise those too:
-        const auto &new_symbols = journalling_table.get_inserted();
-        symbol_names.insert(
-          symbol_names.end(), new_symbols.begin(), new_symbols.end());
-
-        // Call the literal initializer method instead of a nondet initializer:
-
-        // For arguments we can't parse yet:
-        side_effect_expr_nondett nondet_bool(java_boolean_type(), sym.location);
-
-        const auto &java_class_type = to_java_class_type(class_symbol.type);
-
-        // Argument order is: name, isAnnotation, isArray, isInterface,
-        // isSynthetic, isLocalClass, isMemberClass, isEnum
-
-        code_function_callt initializer_call(
-          class_literal_init_method->symbol_expr(),
-          {// this:
-           address_of_exprt(sym.symbol_expr()),
-           // name:
-           address_of_exprt(class_name_literal),
-           // isAnnotation:
-           constant_bool(java_class_type.get_is_annotation()),
-           // isArray:
-           constant_bool(class_is_array),
-           // isInterface:
-           constant_bool(java_class_type.get_interface()),
-           // isSynthetic:
-           constant_bool(java_class_type.get_synthetic()),
-           // isLocalClass:
-           nondet_bool,
-           // isMemberClass:
-           nondet_bool,
-           // isEnum:
-           constant_bool(java_class_type.get_is_enumeration())});
-
-        // First initialize the object as prior to a constructor:
-        namespacet ns(symbol_table);
-
-        auto zero_object = zero_initializer(sym.type, source_locationt(), ns);
-        if(!zero_object.has_value())
-        {
-          messaget message(message_handler);
-          message.error() << "failed to zero-initialize " << sym.name
-                          << messaget::eom;
-          throw 0;
-        }
-        set_class_identifier(
-          to_struct_expr(*zero_object), ns, to_struct_tag_type(sym.type));
-
-        code_block.add(
-          std::move(code_frontend_assignt(sym.symbol_expr(), *zero_object)));
-
-        // Then call the init function:
-        code_block.add(std::move(initializer_call));
-      }
-      else if(sym.value.is_nil() && sym.type != java_void_type())
-      {
-        const bool is_class_model =
-          has_suffix(id2string(sym.name), "@class_model");
-        const bool not_allow_null = is_java_string_literal_id(sym.name) ||
-                                    is_non_null_library_global(sym.name) ||
-                                    assume_init_pointers_not_null;
-
-        java_object_factory_parameterst parameters = object_factory_parameters;
-        if(not_allow_null && !is_class_model)
-          parameters.min_null_tree_depth = 1;
-
-        gen_nondet_init(
-          sym.symbol_expr(),
-          code_block,
-          symbol_table,
-          source_location,
-          false,
-          lifetimet::STATIC_GLOBAL,
-          parameters,
-          pointer_type_selector,
-          update_in_placet::NO_UPDATE_IN_PLACE,
-          message_handler);
-      }
-      else if(sym.value.is_not_nil())
-      {
-        code_frontend_assignt assignment(sym.symbol_expr(), sym.value);
-        assignment.add_source_location()=source_location;
-        code_block.add(assignment);
-      }
+      auto new_symbols = init_symbol(
+        sym,
+        code_block,
+        symbol_table,
+        source_location,
+        assume_init_pointers_not_null,
+        object_factory_parameters,
+        pointer_type_selector,
+        string_refinement_enabled,
+        message_handler);
+      symbol_names.insert(
+        symbol_names.end(), new_symbols.begin(), new_symbols.end());
     }
   }
   initialize_symbol.value = std::move(code_block);
