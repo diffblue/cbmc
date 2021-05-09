@@ -13,6 +13,8 @@ Author: Diffblue Ltd.
 
 #include "goto_model.h"
 
+#include <algorithm>
+
 static bool location_number_less_than(
   const goto_programt::targett &a,
   const goto_programt::targett &b)

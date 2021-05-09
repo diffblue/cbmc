@@ -7,8 +7,11 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_object_set.h>
+
 #include <util/interval.h>
 #include <util/string_utils.h>
+
+#include <algorithm>
 
 static bool by_length(const std::string &lhs, const std::string &rhs)
 {

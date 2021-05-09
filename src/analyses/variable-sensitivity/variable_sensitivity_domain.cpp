@@ -12,6 +12,8 @@ Date: April 2016
 
 #include <util/cprover_prefix.h>
 
+#include <algorithm>
+
 #ifdef DEBUG
 #  include <iostream>
 #endif

@@ -10,6 +10,8 @@
 
 #include "abstract_object_statistics.h"
 
+#include <algorithm>
+
 abstract_object_pointert context_abstract_objectt::get_child() const
 {
   return child_abstract_object;

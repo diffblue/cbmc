@@ -21,6 +21,8 @@
 #include <util/make_unique.h>
 #include <util/simplify_expr.h>
 
+#include <algorithm>
+
 class empty_index_ranget : public index_range_implementationt
 {
 public:
