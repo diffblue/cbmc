@@ -491,6 +491,17 @@ void format_expr_configt::setup()
     return os;
   };
 
+  expr_map[ID_dereference] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &dereference_expr = to_dereference_expr(expr);
+    os << '*';
+    if(dereference_expr.pointer().id() != ID_symbol)
+      os << '(' << format(dereference_expr.pointer()) << ')';
+    else
+      os << format(dereference_expr.pointer());
+    return os;
+  };
+
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return fallback_format_rec(os, expr);
   };
