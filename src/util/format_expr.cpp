@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ieee_float.h"
 #include "mathematical_expr.h"
 #include "mp_arith.h"
+#include "pointer_expr.h"
+#include "prefix.h"
 #include "std_code.h"
 #include "string_utils.h"
 
@@ -177,8 +179,30 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     return os << '"' << escape(id2string(src.get_value())) << '"';
   else if(type == ID_floatbv)
     return os << ieee_floatt(src);
-  else if(type == ID_pointer && src.is_zero())
-    return os << src.get_value();
+  else if(type == ID_pointer)
+  {
+    if(src.is_zero())
+      return os << ID_NULL;
+    else if(has_prefix(id2string(src.get_value()), "INVALID-"))
+    {
+      return os << "INVALID-POINTER";
+    }
+    else if(src.operands().size() == 1)
+    {
+      const auto &unary_expr = to_unary_expr(src);
+      const auto &pointer_type = to_pointer_type(src.type());
+      return os << "pointer(" << format(unary_expr.op()) << ", "
+                << format(pointer_type.subtype()) << ')';
+    }
+    else
+    {
+      const auto &pointer_type = to_pointer_type(src.type());
+      const auto width = pointer_type.get_width();
+      auto int_value = bvrep2integer(src.get_value(), width, false);
+      return os << "pointer(0x" << integer2string(int_value, 16) << ", "
+                << format(pointer_type.subtype()) << ')';
+    }
+  }
   else
     return os << src.pretty();
 }
@@ -443,6 +467,39 @@ void format_expr_configt::setup()
     }
     else
       return fallback_format_rec(os, expr);
+  };
+
+  expr_map[ID_string_constant] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << '"' << expr.get_string(ID_value) << '"';
+  };
+
+  expr_map[ID_function_application] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &function_application_expr = to_function_application_expr(expr);
+    os << format(function_application_expr.function()) << '(';
+    bool first = true;
+    for(auto &argument : function_application_expr.arguments())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+      os << format(argument);
+    }
+    os << ')';
+    return os;
+  };
+
+  expr_map[ID_dereference] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &dereference_expr = to_dereference_expr(expr);
+    os << '*';
+    if(dereference_expr.pointer().id() != ID_symbol)
+      os << '(' << format(dereference_expr.pointer()) << ')';
+    else
+      os << format(dereference_expr.pointer());
+    return os;
   };
 
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
