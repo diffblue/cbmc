@@ -3,7 +3,9 @@ main.c
 
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main\.assertion\.4\] .* assertion data\[1\] == 31: FAILURE$
-^\*\* 1 of 5 failed
+^\[main\.assertion\.1\] line 22 EMFILE: FAILURE$
+^\[main\.assertion\.2\] line 23 ENFILE: FAILURE$
+^\[main\.assertion\.6\] .* assertion data\[1\] == 31: FAILURE$
+^\*\* 3 of 7 failed
 --
 ^warning: ignoring

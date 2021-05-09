@@ -59,7 +59,7 @@ int pipe(int fildes[2])
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   if(error)
   {
-    errno=error==1 ? EMFILE : ENFILE;
+    errno = __VERIFIER_nondet___CPROVER_bool() ? EMFILE : ENFILE;
     return -1;
   }
 
