@@ -9,7 +9,7 @@ else
 GCC_ONLY =
 endif
 
-test:
+test: test-cprover-smt2 test-paths-lifo
 	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" -X smt-backend $(GCC_ONLY)
 
 test-cprover-smt2:

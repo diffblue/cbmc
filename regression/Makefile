@@ -72,7 +72,7 @@ endif
 .PHONY: test
 test:
 	@for dir in $(DIRS); do \
-		$(MAKE) "$$dir" || exit 1; \
+		$(MAKE) "$$dir" test || exit 1; \
 	done;
 
 # Pattern to execute a single test suite directory
