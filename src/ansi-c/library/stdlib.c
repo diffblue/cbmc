@@ -109,14 +109,6 @@ __CPROVER_HIDE:;
   __CPROVER_deallocated =
     (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
 
-  // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object =
-    record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? alloc_size : __CPROVER_malloc_size;
-  __CPROVER_malloc_is_new_array =
-    record_malloc ? 0 : __CPROVER_malloc_is_new_array;
-
   // detect memory leaks
   __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_memory_leak = record_may_leak ? malloc_res : __CPROVER_memory_leak;
@@ -174,14 +166,6 @@ __CPROVER_HIDE:;
   __CPROVER_deallocated =
     (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
 
-  // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object =
-    record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? malloc_size : __CPROVER_malloc_size;
-  __CPROVER_malloc_is_new_array =
-    record_malloc ? 0 : __CPROVER_malloc_is_new_array;
-
   // detect memory leaks
   __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_memory_leak = record_may_leak ? malloc_res : __CPROVER_memory_leak;
@@ -206,12 +190,6 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 
   // make sure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
-
-  // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
-  __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
-  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // record alloca to detect invalid free
   __CPROVER_bool record_alloca = __VERIFIER_nondet___CPROVER_bool();
@@ -241,6 +219,7 @@ __CPROVER_HIDE:;
 #undef free
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __CPROVER_uninterpreted_is_new_array(const void *);
 extern void *__CPROVER_alloca_object;
 
 inline void free(void *ptr)
@@ -261,10 +240,10 @@ inline void free(void *ptr)
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
-  __CPROVER_precondition(ptr==0 ||
-                         __CPROVER_malloc_object!=ptr ||
-                         !__CPROVER_malloc_is_new_array,
-                         "free called for new[] object");
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_new_object != ptr ||
+      !__CPROVER_uninterpreted_is_new_array(ptr),
+    "free called for new[] object");
 
   // catch people who try to use free(...) with alloca
   __CPROVER_precondition(

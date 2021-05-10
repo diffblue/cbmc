@@ -176,9 +176,7 @@ void ansi_c_internal_additions(std::string &code)
     // malloc
     "const void *" CPROVER_PREFIX "deallocated=0;\n"
     "const void *" CPROVER_PREFIX "dead_object=0;\n"
-    "const void *" CPROVER_PREFIX "malloc_object=0;\n"
-    CPROVER_PREFIX "size_t " CPROVER_PREFIX "malloc_size;\n"
-    CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_is_new_array=0;\n" // for C++
+    "const void *" CPROVER_PREFIX "new_object=0;\n" // for C++
     "const void *" CPROVER_PREFIX "memory_leak=0;\n"
     "void *" CPROVER_PREFIX "allocate("
       CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);\n"

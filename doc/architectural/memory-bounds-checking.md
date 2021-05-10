@@ -30,31 +30,21 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 {
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
-
-  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object = record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? malloc_size : __CPROVER_malloc_size;
-
   return malloc_res;
 }
 ```
-
-Both internal variables `__CPROVER_malloc_object` and `__CPROVER_malloc_size`
-are initialized to 0 in the `__CPROVER_initialize()` function of a goto program.
-The nondeterministic switch controls whether the address and size of the memory
-block allocated in this particular invocation of `malloc()` are recorded.
 
 When the option `--pointer-check` is used, cbmc generates the following
 verification condition for each pointer dereference expression (e.g.,
 `*pointer`):
 
 ```C
-__CPROVER_POINTER_OBJECT(pointer) == __CPROVER_POINTER_OBJECT(__CPROVER_malloc_object) ==>
-__CPROVER_POINTER_OFFSET(pointer) >= 0 && __CPROVER_POINTER_OFFSET(pointer) < __CPROVER_malloc_size
+__CPROVER_POINTER_OFFSET(pointer) >= 0 &&
+__CPROVER_POINTER_OFFSET(pointer) < __CPROVER_OBJECT_SIZE(pointer)
 ```
 
-The primitives `__CPROVER_POINTER_OBJECT()` and `__CPROVER_POINTER_OFFSET()` extract
-the object id, and pointer offset, respectively. Similar conditions are
+The primitives `__CPROVER_POINTER_OFFSET()` and `__CPROVER_OBJECT_SIZE()` extract
+the pointer offset and size of the object pointed to, respectively. Similar conditions are
 generated for `assert(__CPROVER_r_ok(pointer, size))` and
 `assert(__CPROVER_w_ok(pointer, size))`.
 
@@ -74,12 +64,7 @@ int main()
 ```
 
 Here the verification condition generated for the pointer dereference should
-fail. In the approach outlined above it indeed can, as one can choose true for
-`__VERIFIER_nondet___CPROVER_bool()` in the first call
-to `malloc()`, and false for `__VERIFIER_nondet___CPROVER_bool()` in the second
-call to `malloc()`. Thus, the object address and size of the first call to
-`malloc()` are recorded in `__CPROVER_malloc_object` and `__CPROVER_malloc_size`
-respectively. Thus, the premise of the implication in the verification condition
-above is true, while the conclusion is false, hence the overall condition is
-false.
-
+fail: for `p1` in `*p1`, `__CPROVER_POINTER_OFFSET` will evaluate to 1 (owing to
+the increment `p1++`, and `__CPROVER_OBJECT_SIZE` will also evaluate to 1.
+Consequently, the less-than comparison in the verification condition evaluates
+to false.
