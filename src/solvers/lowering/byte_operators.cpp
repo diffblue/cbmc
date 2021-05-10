@@ -2057,11 +2057,7 @@ static exprt lower_byte_update(
       subtype = to_array_type(src.type()).subtype();
 
     auto element_width = pointer_offset_bits(*subtype, ns);
-    CHECK_RETURN(element_width.has_value());
-    CHECK_RETURN(*element_width > 0);
-    CHECK_RETURN(*element_width % 8 == 0);
-
-    if(*element_width == 8)
+    if(element_width.has_value() && *element_width == 8)
     {
       if(value_as_byte_array.id() != ID_array)
       {
