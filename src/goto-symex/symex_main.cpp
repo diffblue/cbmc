@@ -56,7 +56,9 @@ symex_configt::symex_configt(const optionst &options)
             : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
     complexity_limits_active(
       options.get_signed_int_option("symex-complexity-limit") > 0),
-    cache_dereferences{options.get_bool_option("symex-cache-dereferences")}
+    cache_dereferences{options.get_bool_option("symex-cache-dereferences")},
+    updates_across_member_bounds{
+      options.get_bool_option("symex-no-member-bounds")}
 {
 }
 

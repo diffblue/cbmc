@@ -63,6 +63,10 @@ struct symex_configt final
   ///   Used in goto_symext::dereference_rec
   bool cache_dereferences;
 
+  /// Handle assignments beyond the bounds prescribed by a struct or array
+  /// access path. See tests in regression/cbmc/member_bounds* for examples.
+  bool updates_across_member_bounds;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);

@@ -345,6 +345,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   options.set_option(
     "symex-cache-dereferences", cmdline.isset("symex-cache-dereferences"));
 
+  options.set_option(
+    "symex-no-member-bounds", cmdline.isset("symex-no-member-bounds"));
+
   if(cmdline.isset("incremental-loop"))
   {
     options.set_option(
