@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 --json-interface
 < test_wrong_flag.json
 ^EXIT=6$

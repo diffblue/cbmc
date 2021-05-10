@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 --json-interface
 < test_wrong_option.json
 ^EXIT=6$
