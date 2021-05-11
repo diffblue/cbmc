@@ -321,11 +321,10 @@ bvt boolbvt::convert_index(
     std::size_t offset_int = numeric_cast_v<std::size_t>(offset);
     return bvt(tmp.begin() + offset_int, tmp.begin() + offset_int + width);
   }
-  else if(
-    array.id() == ID_member || array.id() == ID_index ||
-    array.id() == ID_byte_extract_big_endian ||
-    array.id() == ID_byte_extract_little_endian)
+  else if(array.id() == ID_member || array.id() == ID_index)
   {
+    // out of bounds for the component, but not necessarily outside the bounds
+    // of the underlying object
     object_descriptor_exprt o;
     o.build(array, ns);
     CHECK_RETURN(o.offset().id() != ID_unknown);
@@ -341,6 +340,30 @@ bvt boolbvt::convert_index(
 
     byte_extract_exprt be =
       make_byte_extract(o.root_object(), new_offset, array_type.subtype());
+
+    return convert_bv(be);
+  }
+  else if(
+    array.id() == ID_byte_extract_big_endian ||
+    array.id() == ID_byte_extract_little_endian)
+  {
+    const byte_extract_exprt &byte_extract_expr = to_byte_extract_expr(array);
+
+    const auto subtype_bytes_opt =
+      pointer_offset_size(array_type.subtype(), ns);
+    CHECK_RETURN(subtype_bytes_opt.has_value());
+
+    // add offset to index
+    exprt new_offset = simplify_expr(
+      plus_exprt{
+        byte_extract_expr.offset(),
+        from_integer(
+          index * (*subtype_bytes_opt), byte_extract_expr.offset().type())},
+      ns);
+
+    byte_extract_exprt be = byte_extract_expr;
+    be.offset() = new_offset;
+    be.type() = array_type.subtype();
 
     return convert_bv(be);
   }
