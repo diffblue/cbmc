@@ -1,0 +1,7 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --vsd-arrays every-element --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::a .* value-set-begin: 4, 5, 6, 11, 12, \[0, 3\], \[7, A\] :value-set-end @ \[1, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38\]
+--
