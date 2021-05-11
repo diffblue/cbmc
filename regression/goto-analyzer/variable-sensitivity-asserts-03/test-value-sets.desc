@@ -1,0 +1,14 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --verify
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] line 13 x != y: UNKNOWN
+\[main.assertion.2\] line 14 y != x: UNKNOWN
+\[main.assertion.3\] line 15 !\(x != y\): UNKNOWN
+\[main.assertion.4\] line 16 !\(y != x\): UNKNOWN
+\[main.assertion.5\] line 17 x == y: UNKNOWN
+\[main.assertion.6\] line 18 y == x: UNKNOWN
+\[main.assertion.7\] line 19 !\(x == y\): UNKNOWN
+\[main.assertion.8\] line 20 !\(y == x\): UNKNOWN
+--
