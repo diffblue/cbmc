@@ -2088,8 +2088,8 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     debug() << "lambda function reference "
             << id2string(lambda_method_handle->get_method_descriptor()
                            .base_method_name())
-            << " in class \"" << parse_tree.parsed_class.name << "\""
-            << "\n  interface type is "
+            << " in class " << quote_begin << parse_tree.parsed_class.name
+            << quote_end << "\n  interface type is "
             << id2string(pool_entry(interface_type_argument.ref1).s)
             << "\n  method type is "
             << id2string(pool_entry(method_type_argument.ref1).s) << eom;

@@ -177,8 +177,8 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       {
         messaget log{message_handler};
         log.error() << "SMT2 solver returned error message:\n"
-                    << "\t\"" << parsed.get_sub()[1].id() << "\""
-                    << messaget::eom;
+                    << "\t" << messaget::quote_begin << parsed.get_sub()[1].id()
+                    << messaget::quote_end << messaget::eom;
         return decision_proceduret::resultt::D_ERROR;
       }
     }
