@@ -106,7 +106,9 @@ files.
    ```
    This command tells CMake to invoke the correct tool to run the build in the
    `build` directory. You can also use the build back-end directly by invoking
-   `make`, `ninja`, or opening the generated IDE project as appropriate.
+   `make`, `ninja`, or opening the generated IDE project as appropriate. The
+   complete set of built binaries can be found in `./build/bin` once the build
+   is complete.
 
 # Building using hand-written make files.
 
