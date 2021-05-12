@@ -19,6 +19,7 @@ Date: February 2016
 #include <string>
 #include <unordered_set>
 
+#include <goto-programs/goto_convert_class.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
 
@@ -36,8 +37,9 @@ public:
     : ns(goto_model.symbol_table),
       symbol_table(goto_model.symbol_table),
       goto_functions(goto_model.goto_functions),
-      temporary_counter(0),
-      log(log)
+      log(log),
+      converter(symbol_table, log.get_message_handler())
+
   {
   }
 
@@ -95,19 +97,13 @@ protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 
-  unsigned temporary_counter;
   messaget &log;
+  goto_convertt converter;
 
   std::unordered_set<irep_idt> summarized;
 
   /// \brief Enforce contract of a single function
   bool enforce_contract(const std::string &);
-
-  /// \brief Create goto instructions based on code and add them to program.
-  void convert_to_goto(
-    const codet &code,
-    const irep_idt &mode,
-    goto_programt &program);
 
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.

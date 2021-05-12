@@ -158,15 +158,6 @@ static void check_apply_invariants(
     loop_end->set_condition(boolean_negate(loop_end->get_condition()));
 }
 
-void code_contractst::convert_to_goto(
-  const codet &code,
-  const irep_idt &mode,
-  goto_programt &program)
-{
-  goto_convertt converter(symbol_table, log.get_message_handler());
-  converter.goto_convert(code, program, mode);
-}
-
 bool code_contractst::has_contract(const irep_idt fun_name)
 {
   const symbolt &function_symbol = ns.lookup(fun_name);
@@ -322,7 +313,7 @@ code_contractst::create_ensures_instruction(
 
   // Create instructions corresponding to the ensures clause
   goto_programt ensures_program;
-  convert_to_goto(expression, mode, ensures_program);
+  converter.goto_convert(expression, ensures_program, mode);
 
   // return a pair containing:
   // 1. instructions corresponding to the ensures clause
@@ -424,10 +415,10 @@ bool code_contractst::apply_function_contract(
   if(requires.is_not_nil())
   {
     goto_programt assertion;
-    convert_to_goto(
+    converter.goto_convert(
       code_assertt(requires),
-      symbol_table.lookup_ref(function).mode,
-      assertion);
+      assertion,
+      symbol_table.lookup_ref(function).mode);
     auto lines_to_iterate = assertion.instructions.size();
     goto_program.insert_before_swap(target, assertion);
     std::advance(target, lines_to_iterate);
@@ -966,8 +957,8 @@ void code_contractst::add_contract_check(
     replace(requires_cond);
 
     goto_programt assumption;
-    convert_to_goto(
-      code_assumet(requires_cond), function_symbol.mode, assumption);
+    converter.goto_convert(
+      code_assumet(requires_cond), assumption, function_symbol.mode);
     check.destructive_append(assumption);
   }
 
