@@ -253,7 +253,27 @@ Maven 3 manually.
    gmake -C jbmc/src
    ```
 
-# WORKING WITH ECLIPSE
+# Working with IDEs
+
+## Working with Visual Studio on Windows
+
+Follow these instructions to work on Windows with Visual Studio:
+
+1. Open the `cbmc` folder in Visual Studio. Visual Studio 2017 and
+   later have automated support for CMake projects, so you need to
+   give sometime to Visual Studio to index the project and load its
+   own plugins, and then it's going to be ready to build `cbmc`.
+2. Once indexing and plugin loading has finished, a menu `Build`
+   should have appeared on the top bar. From there, select `Build All`.
+3. After the build has finished, there should be a folder `out` present.
+   Navigating `out/build/<build_parameters>/bin` should get you to the
+   binaries and other artifacts built, with `<build_parameters>` corresponding
+   to something like `x64-Debug (Default)` or whatever the equivalent is
+   for your system.
+
+The above instructions have been tested against Visual Studio 2019.
+
+## Working with Eclipse
 
 To work with Eclipse, do the following:
 
