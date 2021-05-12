@@ -1,14 +1,19 @@
 # WHAT ARCHITECTURE?
 
-CPROVER now needs a C++11 compliant compiler and works in the following
-environments:
+CPROVER now needs a C++11 compliant compiler and is known to work in the
+following environments:
 
 - Linux
 - MacOS X
+- Microsoft Visual Studio
+
+The above environments are currently tested as part of our continuous
+integration system. The environments below have been used successfully in the
+past, but are not actively tested:
+
 - Solaris 11
 - FreeBSD 11
 - Cygwin
-- Microsoft Visual Studio
 
 The rest of this document is split up into three parts: compilation on Linux,
 MacOS, Windows.  Please read the section appropriate for your machine.
