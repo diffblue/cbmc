@@ -1260,9 +1260,10 @@ void goto_checkt::pointer_primitive_check(
   if(expr.source_location().is_built_in())
     return;
 
-  const exprt pointer = (expr.id() == ID_r_ok || expr.id() == ID_w_ok)
-                          ? to_r_or_w_ok_expr(expr).pointer()
-                          : to_unary_expr(expr).op();
+  const exprt pointer =
+    (expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok)
+      ? to_r_or_w_ok_expr(expr).pointer()
+      : to_unary_expr(expr).op();
 
   CHECK_RETURN(pointer.type().id() == ID_pointer);
 
@@ -1301,7 +1302,8 @@ bool goto_checkt::is_pointer_primitive(const exprt &expr)
   // during typechecking (see c_typecheck_expr.cpp)
   return expr.id() == ID_pointer_object || expr.id() == ID_pointer_offset ||
          expr.id() == ID_object_size || expr.id() == ID_r_ok ||
-         expr.id() == ID_w_ok || expr.id() == ID_is_dynamic_object;
+         expr.id() == ID_w_ok || expr.id() == ID_rw_ok ||
+         expr.id() == ID_is_dynamic_object;
 }
 
 goto_checkt::conditionst goto_checkt::get_pointer_dereferenceable_conditions(
@@ -1787,7 +1789,7 @@ void goto_checkt::check(const exprt &expr)
   check_rec(expr, guard);
 }
 
-/// expand the r_ok and w_ok predicates
+/// expand the r_ok, w_ok and rw_ok predicates
 optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
 {
   bool modified = false;
@@ -1802,7 +1804,7 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
     }
   }
 
-  if(expr.id() == ID_r_ok || expr.id() == ID_w_ok)
+  if(expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok)
   {
     // these get an address as first argument and a size as second
     DATA_INVARIANT(
@@ -1917,7 +1919,8 @@ void goto_checkt::goto_check(
       check(i.get_condition());
 
       if(has_subexpr(i.get_condition(), [](const exprt &expr) {
-           return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+           return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
+                  expr.id() == ID_rw_ok;
          }))
       {
         auto rw_ok_cond = rw_ok_check(i.get_condition());
@@ -1974,7 +1977,8 @@ void goto_checkt::goto_check(
       invalidate(code_assign.lhs());
 
       if(has_subexpr(code_assign.rhs(), [](const exprt &expr) {
-           return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+           return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
+                  expr.id() == ID_rw_ok;
          }))
       {
         const exprt &rhs = i.get_assign().rhs();
@@ -2033,7 +2037,8 @@ void goto_checkt::goto_check(
       invalidate(i.return_value());
 
       if(has_subexpr(i.return_value(), [](const exprt &expr) {
-           return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+           return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
+                  expr.id() == ID_rw_ok;
          }))
       {
         exprt &return_value = i.return_value();

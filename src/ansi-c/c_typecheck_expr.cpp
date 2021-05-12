@@ -2558,20 +2558,65 @@ exprt c_typecheck_baset::do_special_functions(
     return std::move(malloc_expr);
   }
   else if(
-    identifier == CPROVER_PREFIX "r_ok" || identifier == CPROVER_PREFIX "w_ok")
+    identifier == CPROVER_PREFIX "r_ok" ||
+    identifier == CPROVER_PREFIX "w_ok" || identifier == CPROVER_PREFIX "rw_ok")
   {
-    if(expr.arguments().size() != 2)
+    if(expr.arguments().size() != 1 && expr.arguments().size() != 2)
     {
       error().source_location = f_op.source_location();
-      error() << identifier << " expects two operands" << eom;
+      error() << identifier << " expects one or two operands" << eom;
       throw 0;
     }
 
     typecheck_function_call_arguments(expr);
 
-    irep_idt id = identifier == CPROVER_PREFIX "r_ok" ? ID_r_ok : ID_w_ok;
+    // the first argument must be a pointer
+    const auto &pointer_expr = expr.arguments()[0];
+    if(pointer_expr.type().id() != ID_pointer)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects a pointer as first argument" << eom;
+      throw 0;
+    }
 
-    r_or_w_ok_exprt ok_expr(id, expr.arguments()[0], expr.arguments()[1]);
+    // The second argument, when given, is a size_t.
+    // When not given, use the pointer subtype.
+    exprt size_expr;
+
+    if(expr.arguments().size() == 2)
+    {
+      implicit_typecast(expr.arguments()[1], size_type());
+      size_expr = expr.arguments()[1];
+    }
+    else
+    {
+      // Won't do void *
+      const auto &subtype = to_pointer_type(pointer_expr.type()).subtype();
+      if(subtype.id() == ID_empty)
+      {
+        error().source_location = f_op.source_location();
+        error() << identifier << " expects a size when given a void pointer"
+                << eom;
+        throw 0;
+      }
+
+      auto size_expr_opt = size_of_expr(subtype, *this);
+      if(!size_expr_opt.has_value())
+      {
+        error().source_location = f_op.source_location();
+        error() << identifier << " was given object pointer without size"
+                << eom;
+        throw 0;
+      }
+
+      size_expr = std::move(size_expr_opt.value());
+    }
+
+    irep_idt id = identifier == CPROVER_PREFIX "r_ok"
+                    ? ID_r_ok
+                    : identifier == CPROVER_PREFIX "w_ok" ? ID_w_ok : ID_rw_ok;
+
+    r_or_w_ok_exprt ok_expr(id, pointer_expr, size_expr);
     ok_expr.add_source_location() = source_location;
 
     return std::move(ok_expr);
