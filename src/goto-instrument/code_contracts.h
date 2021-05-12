@@ -27,7 +27,10 @@ Date: February 2016
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 
+#include "loop_utils.h"
+
 class assigns_clauset;
+class local_may_aliast;
 class replace_symbolt;
 
 class code_contractst
@@ -89,6 +92,13 @@ public:
     const typet &type,
     const source_locationt &source_location,
     const irep_idt &function_id,
+    const irep_idt &mode);
+
+  void check_apply_invariants(
+    goto_functionst::goto_functiont &goto_function,
+    const local_may_aliast &local_may_alias,
+    const goto_programt::targett loop_head,
+    const loopt &loop,
     const irep_idt &mode);
 
   namespacet ns;
@@ -155,7 +165,9 @@ protected:
     const exprt &lhs,
     std::vector<exprt> &aliasable_references);
 
-  void apply_loop_contract(goto_functionst::goto_functiont &goto_function);
+  void apply_loop_contract(
+    const irep_idt &function_name,
+    goto_functionst::goto_functiont &goto_function);
 
   /// \brief Does the named function have a contract?
   bool has_contract(const irep_idt);

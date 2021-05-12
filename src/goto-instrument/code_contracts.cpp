@@ -20,7 +20,6 @@ Date: February 2016
 
 #include <ansi-c/c_expr.h>
 
-#include <goto-programs/goto_convert_class.h>
 #include <goto-programs/remove_skip.h>
 
 #include <util/arith_tools.h>
@@ -33,8 +32,6 @@ Date: February 2016
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
-
-#include "loop_utils.h"
 
 /// Predicate to be used with the exprt::visit() function. The function
 /// found_return_value() will return `true` iff this predicate is called on an
@@ -74,11 +71,12 @@ exprt get_size(const typet &type, const namespacet &ns, messaget &log)
   return result;
 }
 
-static void check_apply_invariants(
+void code_contractst::check_apply_invariants(
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
   const goto_programt::targett loop_head,
-  const loopt &loop)
+  const loopt &loop,
+  const irep_idt &mode)
 {
   PRECONDITION(!loop.empty());
 
@@ -96,16 +94,18 @@ static void check_apply_invariants(
   if(invariant.is_nil())
     return;
 
-  // change H: loop; E: ...
+  // change
+  //   H: loop;
+  //   E: ...
   // to
-  // H: assert(invariant);
-  // havoc;
-  // assume(invariant);
-  // if(guard) goto E:
-  // loop;
-  // assert(invariant);
-  // assume(false);
-  // E: ...
+  //   H: assert(invariant);
+  //   havoc;
+  //   assume(invariant);
+  //   if(guard) goto E:
+  //   loop;
+  //   assert(invariant);
+  //   assume(false);
+  //   E: ...
 
   // find out what can get changed in the loop
   modifiest modifies;
@@ -116,17 +116,20 @@ static void check_apply_invariants(
 
   // assert the invariant
   {
-    goto_programt::targett a = havoc_code.add(
-      goto_programt::make_assertion(invariant, loop_head->source_location));
-    a->source_location.set_comment("Check loop invariant before entry");
+    code_assertt assertion{invariant};
+    assertion.add_source_location() = loop_head->source_location;
+    converter.goto_convert(assertion, havoc_code, mode);
+    havoc_code.instructions.back().source_location.set_comment(
+      "Check loop invariant before entry");
   }
 
   // havoc variables being written to
   build_havoc_code(loop_head, modifies, havoc_code);
 
   // assume the invariant
-  havoc_code.add(
-    goto_programt::make_assumption(invariant, loop_head->source_location));
+  code_assumet assumption{invariant};
+  assumption.add_source_location() = loop_head->source_location;
+  converter.goto_convert(assumption, havoc_code, mode);
 
   // non-deterministically skip the loop if it is a do-while loop
   if(!loop_head->is_goto())
@@ -142,11 +145,14 @@ static void check_apply_invariants(
 
   // assert the invariant at the end of the loop body
   {
-    goto_programt::instructiont a =
-      goto_programt::make_assertion(invariant, loop_end->source_location);
-    a.source_location.set_comment("Check that loop invariant is preserved");
-    goto_function.body.insert_before_swap(loop_end, a);
-    ++loop_end;
+    code_assertt assertion{invariant};
+    assertion.add_source_location() = loop_end->source_location;
+    converter.goto_convert(assertion, havoc_code, mode);
+    havoc_code.instructions.back().source_location.set_comment(
+      "Check that loop invariant is preserved");
+    auto offset = havoc_code.instructions.size();
+    goto_function.body.insert_before_swap(loop_end, havoc_code);
+    std::advance(loop_end, offset);
   }
 
   // change the back edge into assume(false) or assume(guard)
@@ -474,15 +480,21 @@ bool code_contractst::apply_function_contract(
 }
 
 void code_contractst::apply_loop_contract(
+  const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function)
 {
   local_may_aliast local_may_alias(goto_function);
   natural_loops_mutablet natural_loops(goto_function.body);
 
-  // iterate over the (natural) loops in the function
+  // Iterate over the (natural) loops in the function,
+  // and apply any invariant annotations that we find.
   for(const auto &loop : natural_loops.loop_map)
     check_apply_invariants(
-      goto_function, local_may_alias, loop.first, loop.second);
+      goto_function,
+      local_may_alias,
+      loop.first,
+      loop.second,
+      symbol_table.lookup_ref(function_name).mode);
 }
 
 const symbolt &code_contractst::new_tmp_symbol(
@@ -1069,7 +1081,7 @@ bool code_contractst::enforce_contracts()
     if(has_contract(goto_function.first))
       funs_to_enforce.insert(id2string(goto_function.first));
     else
-      apply_loop_contract(goto_function.second);
+      apply_loop_contract(goto_function.first, goto_function.second);
   }
   return enforce_contracts(funs_to_enforce);
 }
@@ -1089,7 +1101,7 @@ bool code_contractst::enforce_contracts(
                   << messaget::eom;
       continue;
     }
-    apply_loop_contract(goto_function->second);
+    apply_loop_contract(goto_function->first, goto_function->second);
 
     if(!has_contract(fun))
     {
