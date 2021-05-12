@@ -42,7 +42,7 @@ files.
      ```
      xcode-select --install
      ```
-     You shoud also install [Homebrew](https://brew.sh), after which you can
+     You should also install [Homebrew](https://brew.sh), after which you can
      run `brew install cmake` to install CMake.
    - On platforms where installing the Java Development Kit and Maven is
      difficult, you can avoid needing these dependencies by not building
