@@ -891,34 +891,47 @@ void value_sett::get_value_set_rec(
 
     bool found=false;
 
-    exprt op1 = byte_extract_expr.op1();
-    if(eval_pointer_offset(op1, ns))
-      simplify(op1, ns);
-
-    const auto op1_offset = numeric_cast<mp_integer>(op1);
     const typet &op_type = ns.follow(byte_extract_expr.op().type());
-    if(op1_offset.has_value() && op_type.id() == ID_struct)
+    if(op_type.id() == ID_struct)
     {
+      exprt offset = byte_extract_expr.offset();
+      if(eval_pointer_offset(offset, ns))
+        simplify(offset, ns);
+
+      const auto offset_int = numeric_cast<mp_integer>(offset);
+      const auto type_size = pointer_offset_size(expr.type(), ns);
+
       const struct_typet &struct_type = to_struct_type(op_type);
 
       for(const auto &c : struct_type.components())
       {
         const irep_idt &name = c.get_name();
 
-        auto comp_offset = member_offset(struct_type, name, ns);
+        if(offset_int.has_value())
+        {
+          auto comp_offset = member_offset(struct_type, name, ns);
+          if(comp_offset.has_value())
+          {
+            if(
+              type_size.has_value() && *offset_int + *type_size <= *comp_offset)
+            {
+              break;
+            }
 
-        if(!comp_offset.has_value())
-          continue;
-        else if(*comp_offset > *op1_offset)
-          break;
-        else if(*comp_offset != *op1_offset)
-          continue;
+            auto member_size = pointer_offset_size(c.type(), ns);
+            if(
+              member_size.has_value() &&
+              *offset_int >= *comp_offset + *member_size)
+            {
+              continue;
+            }
+          }
+        }
 
         found=true;
 
         member_exprt member(byte_extract_expr.op(), c);
         get_value_set_rec(member, dest, suffix, original_type, ns);
-        break;
       }
     }
 
