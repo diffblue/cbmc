@@ -19,6 +19,8 @@ public class Test {
   }
 
   public int check(String s, char ch, int fromIndex) {
+    if(s.length() <= fromIndex)
+      return -1;
     int reference = referenceLastIndexOf(s, ch, fromIndex);
     int jbmc_result = s.lastIndexOf(ch, fromIndex);
     assert(reference == jbmc_result);

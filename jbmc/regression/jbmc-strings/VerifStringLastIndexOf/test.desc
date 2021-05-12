@@ -1,7 +1,6 @@
 THOROUGH
 Test
---function Test.check --max-nondet-string-length 50 --unwind 50 --java-assume-inputs-non-null
-^EXIT=10$
+--function Test.check --max-nondet-string-length 50 --unwind 50 --java-assume-inputs-non-null  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+VERIFICATION SUCCESSFUL
+^EXIT=0$
 ^SIGNAL=0$
-assertion at file Test.java line 32 .* SUCCESS$
-assertion at file Test.java line 34 .* FAILURE$
