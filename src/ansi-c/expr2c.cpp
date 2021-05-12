@@ -3847,6 +3847,7 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_pointer_offset, "POINTER_OFFSET"},
     {ID_r_ok, "R_OK"},
     {ID_w_ok, "W_OK"},
+    {ID_rw_ok, "RW_OK"},
     {ID_width, "WIDTH"},
   };
 

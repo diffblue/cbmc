@@ -698,7 +698,7 @@ public:
 };
 
 /// \brief A base class for a predicate that indicates that an
-/// address range is ok to read or write
+/// address range is ok to read or write or both
 class r_or_w_ok_exprt : public binary_predicate_exprt
 {
 public:
@@ -720,7 +720,8 @@ public:
 
 inline const r_or_w_ok_exprt &to_r_or_w_ok_expr(const exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_r_ok || expr.id() == ID_w_ok);
+  PRECONDITION(
+    expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok);
   auto &ret = static_cast<const r_or_w_ok_exprt &>(expr);
   validate_expr(ret);
   return ret;

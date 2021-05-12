@@ -33,8 +33,9 @@ void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 _Bool __CPROVER_is_zero_string(const void *);
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);
 __CPROVER_size_t __CPROVER_buffer_size(const void *);
-__CPROVER_bool __CPROVER_r_ok(const void *, __CPROVER_size_t);
-__CPROVER_bool __CPROVER_w_ok(const void *, __CPROVER_size_t);
+__CPROVER_bool __CPROVER_r_ok();
+__CPROVER_bool __CPROVER_w_ok();
+__CPROVER_bool __CPROVER_rw_ok();
 
 #if 0
 __CPROVER_bool __CPROVER_equal();

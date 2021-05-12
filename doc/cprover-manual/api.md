@@ -191,16 +191,25 @@ option to verify the preconditions of the primitives.
 ```C
 __CPROVER_size_t __CPROVER_OBJECT_SIZE(const void *p);
 _Bool __CPROVER_DYNAMIC_OBJECT(const void *p);
+void __CPROVER_r_ok(const T *p);
 void __CPROVER_r_ok(const void *p, size_t size);
+void __CPROVER_w_ok(const T *p);
 void __CPROVER_w_ok(const void *p, size_t size);
+void __CPROVER_rw_ok(const T *p);
+void __CPROVER_rw_ok(const void *p, size_t size);
 ```
 
 The function **\_\_CPROVER_\_OBJECT\_SIZE** returns the size of the object the
 given pointer points to. The function **\_\_CPROVER\_DYNAMIC\_OBJECT** returns
 true if the pointer passed as an argument points to a dynamically allocated
-object. The function **\_\_CPROVER\_r_ok** returns true if reading the piece of
-memory starting at the given pointer with the given size is safe.
-**\_\_CPROVER\_w_ok** does the same with writing.
+object.
+
+The function **\_\_CPROVER\_r_ok** returns true if reading the piece of
+memory starting at the given pointer with the given size is safe. 
+**\_\_CPROVER\_w_ok** does the same with writing, and **\_\_CPROVER\_rw_ok**
+returns true when it is safe to do both.  These predicates can be given an
+optional size; when the size argument is not given, the size of the subtype
+(which must not be **void**) of the pointer type is used.
 
 ### Predefined Types and Symbols
 
