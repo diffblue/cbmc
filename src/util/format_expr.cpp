@@ -186,7 +186,9 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
   {
     if(is_null_pointer(src))
       return os << ID_NULL;
-    else if(has_prefix(id2string(src.get_value()), "INVALID-"))
+    else if(
+      src.get_value() == "INVALID" ||
+      has_prefix(id2string(src.get_value()), "INVALID-"))
     {
       return os << "INVALID-POINTER";
     }
