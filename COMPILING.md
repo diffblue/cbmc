@@ -5,7 +5,7 @@ following environments:
 
 - Linux
 - MacOS X
-- Microsoft Visual Studio
+- Microsoft Visual Studio 2019
 
 The above environments are currently tested as part of our continuous
 integration system. The environments below have been used successfully in the
@@ -18,7 +18,7 @@ past, but are not actively tested:
 # Building using CMAKE
 
 Building with CMake is supported across Linux, MacOS X and Windows with Visual
-Studio. There are also hand-written make files which can be used to build
+Studio 2019. There are also hand-written make files which can be used to build
 separate binaries independently. Usage of the hand-written make files is
 explained in a separate section. The CMake build can build the complete
 repository in fewer steps and supports better integration with various IDEs and
@@ -47,15 +47,14 @@ files.
    - On platforms where installing the Java Development Kit and Maven is
      difficult, you can avoid needing these dependencies by not building
      JBMC. Just pass `-DWITH_JBMC=OFF` to cmake in step (4) below.
-   - On Windows, ensure you have Visual Studio 2015 or later installed.
-     Then, download CMake from the [official download
-     page](https://cmake.org/download).
-     You'll also need `git` and `patch`, which are both provided by the
-     [git for Windows](git-scm.com/download/win) package.
-     Finally, Windows builds of flex and bison should be installed from
-     [the sourceforge page](sourceforge.net/projects/winflexbison).
-     The easiest way to 'install' these executables is to unzip them and to
-     drop the entire unzipped package into the CBMC source directory.
+   - On Windows, ensure you have Visual Studio 2019 or later installed. The
+     developer command line that comes with Visual Studio 2019 has cmake
+     already available. You will also need to ensure that you have winflexbison
+     installed and available in the path. winflexbison is available from
+     [the github release page](https://github.com/lexxmark/winflexbison/releases/)
+     or through
+     [the chocolatey package manager.](https://community.chocolatey.org/packages/winflexbison3)
+     Installing strawberryperl is advised if you want to run tests on Windows.
    - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
      be possible to install CMake from the system package manager or the
      [official download page](https://cmake.org/download) on those systems.
