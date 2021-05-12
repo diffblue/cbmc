@@ -41,41 +41,25 @@ const shared_bufferst::varst &shared_bufferst::operator()(
 
   vars.type=symbol.type;
 
-  vars.w_buff0=add(object, symbol.base_name, "$w_buff0", symbol.type);
-  vars.w_buff1=add(object, symbol.base_name, "$w_buff1", symbol.type);
+  vars.w_buff0 = add(symbol, "$w_buff0", symbol.type);
+  vars.w_buff1 = add(symbol, "$w_buff1", symbol.type);
 
-  vars.w_buff0_used=add(object, symbol.base_name, "$w_buff0_used",
-    bool_typet());
-  vars.w_buff1_used=add(object, symbol.base_name, "$w_buff1_used",
-    bool_typet());
+  vars.w_buff0_used = add(symbol, "$w_buff0_used", bool_typet());
+  vars.w_buff1_used = add(symbol, "$w_buff1_used", bool_typet());
 
-  vars.mem_tmp=add(object, symbol.base_name, "$mem_tmp", symbol.type);
-  vars.flush_delayed=add(object, symbol.base_name, "$flush_delayed",
-    bool_typet());
+  vars.mem_tmp = add(symbol, "$mem_tmp", symbol.type);
+  vars.flush_delayed = add(symbol, "$flush_delayed", bool_typet());
 
-  vars.read_delayed=
-    add(object, symbol.base_name, "$read_delayed", bool_typet());
-  vars.read_delayed_var=
-    add(
-      object,
-      symbol.base_name,
-      "$read_delayed_var",
-      pointer_type(symbol.type));
+  vars.read_delayed = add(symbol, "$read_delayed", bool_typet());
+  vars.read_delayed_var =
+    add(symbol, "$read_delayed_var", pointer_type(symbol.type));
 
   for(unsigned cnt=0; cnt<nb_threads; cnt++)
   {
-    vars.r_buff0_thds.push_back(
-      shared_bufferst::add(
-        object,
-        symbol.base_name,
-        "$r_buff0_thd"+std::to_string(cnt),
-        bool_typet()));
-    vars.r_buff1_thds.push_back(
-      shared_bufferst::add(
-        object,
-        symbol.base_name,
-        "$r_buff1_thd"+std::to_string(cnt),
-        bool_typet()));
+    vars.r_buff0_thds.push_back(shared_bufferst::add(
+      symbol, "$r_buff0_thd" + std::to_string(cnt), bool_typet()));
+    vars.r_buff1_thds.push_back(shared_bufferst::add(
+      symbol, "$r_buff1_thd" + std::to_string(cnt), bool_typet()));
   }
 
   return vars;
@@ -85,8 +69,7 @@ const shared_bufferst::varst &shared_bufferst::operator()(
 /// \par parameters: var, suffix, type of the var, added as an instrumentation
 /// \return identifier of the new var
 irep_idt shared_bufferst::add(
-  const irep_idt &object,
-  const irep_idt &base_name,
+  const symbolt &object,
   const std::string &suffix,
   const typet &type,
   bool instrument)
@@ -95,10 +78,10 @@ irep_idt shared_bufferst::add(
 
   symbolt &new_symbol = get_fresh_aux_symbol(
     type,
-    id2string(object) + suffix,
-    id2string(base_name) + suffix,
-    ns.lookup(object).location,
-    ns.lookup(object).mode,
+    id2string(object.name) + suffix,
+    id2string(object.base_name) + suffix,
+    object.location,
+    object.mode,
     symbol_table);
   new_symbol.is_static_lifetime=true;
   new_symbol.value.make_nil();
