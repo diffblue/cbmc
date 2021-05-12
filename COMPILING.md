@@ -171,57 +171,6 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    make -C jbmc/src
    ```
 
-## COMPILATION ON SOLARIS 11
-
-We assume Solaris 11.4 or newer.  To build JBMC, you'll need to install
-Maven 3 manually.
-
-1. As root, get the necessary development tools:
-   ```
-   pkg install gcc-c++-7 bison flex
-   ```
-2. As a user, get the CBMC source via
-   ```
-   git clone https://github.com/diffblue/cbmc cbmc-git
-   cd cbmc-git
-   ```
-3. To compile CBMC, type
-   ```
-   gmake -C src minisat2-download DOWNLOADER=wget TAR=gtar
-   gmake -C src
-   ```
-4. To compile JBMC, type
-   ```
-   gmake -C jbmc/src setup-submodules
-   gmake -C jbmc/src
-   ```
-
-## COMPILATION ON FREEBSD 11
-
-1. As root, get the necessary tools:
-   ```
-   pkg install bash gmake git www/p5-libwww patch flex bison
-   ```
-   To compile JBMC, additionally install
-   ```
-   pkg install openjdk8 wget maven3
-   ```
-2. As a user, get the CBMC source via
-   ```
-   git clone https://github.com/diffblue/cbmc cbmc-git
-   cd cbmc-git
-   ```
-3. To compile CBMC, do
-   ```
-   gmake -C src minisat2-download
-   gmake -C src
-   ```
-4. To compile JBMC, do
-   ```
-   gmake -C jbmc/src setup-submodules
-   gmake -C jbmc/src
-   ```
-
 ## COMPILATION ON MACOS X
 
 Follow these instructions:
@@ -308,6 +257,57 @@ Follow these instructions:
 helpful for GUI-based tasks, e.g., the class viewer, debugging, etc., and can
 be used for building with MSBuild.  Note that you still need to run flex/bison
 using "make generated_files" before opening the project.
+
+## COMPILATION ON SOLARIS 11
+
+We assume Solaris 11.4 or newer.  To build JBMC, you'll need to install
+Maven 3 manually.
+
+1. As root, get the necessary development tools:
+   ```
+   pkg install gcc-c++-7 bison flex
+   ```
+2. As a user, get the CBMC source via
+   ```
+   git clone https://github.com/diffblue/cbmc cbmc-git
+   cd cbmc-git
+   ```
+3. To compile CBMC, type
+   ```
+   gmake -C src minisat2-download DOWNLOADER=wget TAR=gtar
+   gmake -C src
+   ```
+4. To compile JBMC, type
+   ```
+   gmake -C jbmc/src setup-submodules
+   gmake -C jbmc/src
+   ```
+
+## COMPILATION ON FREEBSD 11
+
+1. As root, get the necessary tools:
+   ```
+   pkg install bash gmake git www/p5-libwww patch flex bison
+   ```
+   To compile JBMC, additionally install
+   ```
+   pkg install openjdk8 wget maven3
+   ```
+2. As a user, get the CBMC source via
+   ```
+   git clone https://github.com/diffblue/cbmc cbmc-git
+   cd cbmc-git
+   ```
+3. To compile CBMC, do
+   ```
+   gmake -C src minisat2-download
+   gmake -C src
+   ```
+4. To compile JBMC, do
+   ```
+   gmake -C jbmc/src setup-submodules
+   gmake -C jbmc/src
+   ```
 
 # WORKING WITH ECLIPSE
 
