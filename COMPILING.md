@@ -198,7 +198,7 @@ Follow these instructions:
    make -C jbmc/src
    ```
 
-## COMPILATION ON WINDOWS
+## COMPILATION ON WINDOWS WITH CYGWIN
 
 There are two options: the Visual Studio compiler with version 14 (2015) or
 later, or the MinGW cross compiler with version 5.4 or later.
