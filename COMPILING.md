@@ -8,7 +8,11 @@ following environments:
 - Microsoft Visual Studio 2019
 
 The above environments are currently tested as part of our continuous
-integration system. The environments below have been used successfully in the
+integration system. It separately tests both the CMake build system and the
+hand-written make files. The latest build steps being used in CI can be
+[referenced here](https://github.com/diffblue/cbmc/blob/develop/.github/workflows/pull-request-checks.yaml).
+
+The environments below have been used successfully in the
 past, but are not actively tested:
 
 - Solaris 11
