@@ -165,14 +165,11 @@ void goto_inlinet::replace_return(
           lhs,
           typecast_exprt::conditional_cast(it->return_value(), lhs.type()));
         it->type=ASSIGN;
-
-        it++;
       }
       else
       {
         it->code_nonconst() = code_expressiont(it->return_value());
         it->type=OTHER;
-        it++;
       }
     }
   }

@@ -1,0 +1,9 @@
+CORE
+main.c
+--inline --pointer-check
+dereference failure: dead object in \*ptr: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
