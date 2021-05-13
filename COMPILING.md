@@ -58,7 +58,7 @@ files.
      [the github release page](https://github.com/lexxmark/winflexbison/releases/)
      or through
      [the chocolatey package manager.](https://community.chocolatey.org/packages/winflexbison3)
-     Installing strawberryperl is advised if you want to run tests on Windows.
+     Installing `strawberryperl` is advised if you want to run tests on Windows.
    - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
      be possible to install CMake from the system package manager or the
      [official download page](https://cmake.org/download) on those systems.
