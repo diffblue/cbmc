@@ -1,9 +1,12 @@
 #include <assert.h>
-#include <unistd.h>
+#ifndef _WIN32
+#  include <unistd.h>
+#else
+unsigned sleep(unsigned);
+#endif
 
 int main()
 {
-  sleep();
-  assert(0);
+  assert(sleep(42) <= 42);
   return 0;
 }
