@@ -1,19 +1,129 @@
 # WHAT ARCHITECTURE?
 
-CPROVER now needs a C++11 compliant compiler and works in the following
-environments:
+CPROVER now needs a C++11 compliant compiler and is known to work in the
+following environments:
 
 - Linux
 - MacOS X
+- Windows
+
+The above environments are currently tested as part of our continuous
+integration system. It separately tests both the CMake build system and the
+hand-written make files. The latest build steps being used in CI can be
+[referenced here](https://github.com/diffblue/cbmc/blob/develop/.github/workflows/pull-request-checks.yaml).
+
+The environments below have been used successfully in the
+past, but are not actively tested:
+
 - Solaris 11
 - FreeBSD 11
-- Cygwin
-- Microsoft Visual Studio
 
-The rest of this document is split up into three parts: compilation on Linux,
-MacOS, Windows.  Please read the section appropriate for your machine.
+# Building using CMake
 
-# COMPILATION ON LINUX
+Building with CMake is supported across Linux, MacOS X and Windows with Visual
+Studio 2019. There are also hand-written make files which can be used to build
+separate binaries independently. Usage of the hand-written make files is
+explained in a separate section. The CMake build can build the complete
+repository in fewer steps and supports better integration with various IDEs and
+static-analysis tools. On Windows, the CMake build has the advantage of not
+depending on Cygwin or MinGW, and doesn't require manual modification of build
+files.
+
+1. Ensure you have all the build dependencies installed. Build dependencies are
+   the same as for the makefile build, but with the addition of CMake version
+   3.2 or higher. The installed CMake version can be queried with `cmake
+   --version`. To install CMake:
+   - On Debian-like distributions, do
+     ```
+     apt-get install g++ gcc flex bison make git curl patch cmake
+     ```
+   - On Red Hat/Fedora or derivates, do
+     ```
+     dnf install gcc gcc-c++ flex bison curl patch cmake
+     ```
+   - On macOS, do
+     ```
+     xcode-select --install
+     ```
+     You should also install [Homebrew](https://brew.sh), after which you can
+     run `brew install cmake` to install CMake.
+   - On platforms where installing the Java Development Kit and Maven is
+     difficult, you can avoid needing these dependencies by not building
+     JBMC. Just pass `-DWITH_JBMC=OFF` to `cmake` in step (4) below.
+   - On Windows, ensure you have Visual Studio 2019 or later installed. The
+     developer command line that comes with Visual Studio 2019 has CMake
+     already available. You will also need to ensure that you have winflexbison
+     installed and available in the path. winflexbison is available from
+     [the github release page](https://github.com/lexxmark/winflexbison/releases/)
+     or through
+     [the chocolatey package manager.](https://community.chocolatey.org/packages/winflexbison3)
+     Installing `strawberryperl` is advised if you want to run tests on Windows.
+     This is available from
+     [the Strawberry Perl website](https://strawberryperl.com/) or through the
+     [the chocolatey package manager.](https://community.chocolatey.org/packages/StrawberryPerl)
+   - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
+     be possible to install CMake from the system package manager or the
+     [official download page](https://cmake.org/download) on those systems.
+     The dependencies (as listed in the relevant sections above) will also be
+     required, and should be installed using the suggested methods.
+2. Navigate to the *top level* folder of the project. This is different from
+   the Makefile build, which requires you to navigate to the `src` directory
+   first.
+3. Update git submodules:
+   ```
+   git submodule update --init
+   ```
+4. Generate build files with CMake:
+   ```
+   cmake -S . -Bbuild
+   ```
+   This command tells CMake to use the configuration in the current directory,
+   and to generate build files into the `build` directory.  This is the point
+   to specify custom build settings, such as compilers and build back-ends. You
+   can use clang (for example) by adding the argument
+   `-DCMAKE_CXX_COMPILER=clang++` to the command line. You can also tell CMake
+   to generate IDE projects by supplying the `-G` flag.  Run `cmake -G` for a
+   comprehensive list of supported back-ends.
+
+   On macOS >10.14, the build will fail unless you explicitly specify
+   the full path to the compiler. This issue is being tracked
+   [here](https://github.com/diffblue/cbmc/issues/4956). The invocation thus
+   looks like this:
+   ```
+   cmake -S. -Bbuild -DCMAKE_C_COMPILER=/usr/bin/clang
+   ```
+
+   Generally it is not necessary to manually specify individual compiler or
+   linker flags, as CMake defines a number of "build modes" including Debug and
+   Release modes. To build in a particular mode, add the flag
+   `-DCMAKE_BUILD_TYPE=Debug` (or `RelWithDebInfo`) to the initial invocation.
+   The default is to perform an optimized build via the `Release` configuration.
+
+   If you *do* need to manually add flags, use `-DCMAKE_CXX_FLAGS=...` and
+   `-DCMAKE_EXE_LINKER_FLAGS=...`. This is useful for enabling clang's
+   sanitizers.
+
+   Finally, to enable building universal binaries on macOS, you can pass the
+   flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
+   the built binaries will only work on the architecture of the machine being
+   used to do the build.
+
+5. Run the build:
+   ```
+   cmake --build build
+   ```
+   This command tells CMake to invoke the correct tool to run the build in the
+   `build` directory. You can also use the build back-end directly by invoking
+   `make`, `ninja`, or opening the generated IDE project as appropriate. The
+   complete set of built binaries can be found in `./build/bin` once the build
+   is complete.
+
+# Building using hand-written make files.
+
+The rest of this section is split up based on the platform being built on. 
+Please read the section appropriate for your machine.
+
+## COMPILATION ON LINUX
 
 We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
@@ -65,58 +175,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    make -C jbmc/src
    ```
 
-# COMPILATION ON SOLARIS 11
-
-We assume Solaris 11.4 or newer.  To build JBMC, you'll need to install
-Maven 3 manually.
-
-1. As root, get the necessary development tools:
-   ```
-   pkg install gcc-c++-7 bison flex
-   ```
-2. As a user, get the CBMC source via
-   ```
-   git clone https://github.com/diffblue/cbmc cbmc-git
-   cd cbmc-git
-   ```
-3. To compile CBMC, type
-   ```
-   gmake -C src minisat2-download DOWNLOADER=wget TAR=gtar
-   gmake -C src
-   ```
-4. To compile JBMC, type
-   ```
-   gmake -C jbmc/src setup-submodules
-   gmake -C jbmc/src
-   ```
-
-# COMPILATION ON FREEBSD 11
-
-1. As root, get the necessary tools:
-   ```
-   pkg install bash gmake git www/p5-libwww patch flex bison
-   ```
-   To compile JBMC, additionally install
-   ```
-   pkg install openjdk8 wget maven3
-   ```
-2. As a user, get the CBMC source via
-   ```
-   git clone https://github.com/diffblue/cbmc cbmc-git
-   cd cbmc-git
-   ```
-3. To compile CBMC, do
-   ```
-   gmake -C src minisat2-download
-   gmake -C src
-   ```
-4. To compile JBMC, do
-   ```
-   gmake -C jbmc/src setup-submodules
-   gmake -C jbmc/src
-   ```
-
-# COMPILATION ON MACOS X
+## COMPILATION ON MACOS X
 
 Follow these instructions:
 
@@ -143,156 +202,56 @@ Follow these instructions:
    make -C jbmc/src
    ```
 
-# COMPILATION ON WINDOWS
+## COMPILATION ON SOLARIS 11
 
-There are two options: the Visual Studio compiler with version 14 (2015) or
-later, or the MinGW cross compiler with version 5.4 or later.
-We recommend Visual Studio.
+We assume Solaris 11.4 or newer.  To build JBMC, you'll need to install
+Maven 3 manually.
 
-Follow these instructions:
-
-1. First install Cygwin, then from the Cygwin setup facility install the
-   following packages: `flex, bison, tar, gzip, git, make, wget, patch,
-   curl`.
-2. Get the CBMC source via
+1. As root, get the necessary development tools:
+   ```
+   pkg install gcc-c++-7 bison flex
+   ```
+2. As a user, get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
    cd cbmc-git
    ```
-3. Depending on your choice of compiler:
-   1. To compile with Visual Studio, change the second line of `src/config.inc`
-      to
-      ```
-      BUILD_ENV = MSVC
-      ```
-      Open the Developer Command Prompt for Visual Studio, then start the
-      Cygwin shell with
-      ```
-      bash.exe -login
-      ```
-      Please note that this might open a different shell instead, especially if
-      you have installed other Linux subsystems previously. To verify that you
-      are in the correct shell, make sure that the Windows file system can be
-      accessed via the folder`/cygdrive`. If the command above does not open
-      the Cygwin shell, you can also access it by using its absolute path,
-      `C:\cygwin64\bin\bash.exe` by default. In the Developer Command Prompt, 
-      simply type
-      ```
-      C:\cygwin64\bin\bash.exe -login
-      ```
-   2. To compile with MinGW, use Cygwin setup to install a mingw g++ compiler
-      package, i.e. one of `mingw{32,64}-{x86_64,i686}-gcc-g++`. You may also
-      have to adjust the section in `src/common` that defines `CC` and `CXX`
-      for BUILD_ENV = Cygwin.
-      Then start the Cygwin shell.
-4. To compile CMBC, open the Cygwin shell and type
+3. To compile CBMC, type
    ```
-   make -C src DOWNLOADER=wget minisat2-download
-   make -C src
+   gmake -C src minisat2-download DOWNLOADER=wget TAR=gtar
+   gmake -C src
    ```
-5. To compile JBMC, you additionally need the JDK and Maven 3, which have
-   to be installed manually. Then open the Cygwin shell and type
+4. To compile JBMC, type
    ```
-   make -C jbmc/src setup-submodules
-   make -C jbmc/src
+   gmake -C jbmc/src setup-submodules
+   gmake -C jbmc/src
    ```
 
-(Optional) A Visual Studio project file can be generated with the script
-"generate_vcxproj" that is in the subdirectory "scripts".  The project file is
-helpful for GUI-based tasks, e.g., the class viewer, debugging, etc., and can
-be used for building with MSBuild.  Note that you still need to run flex/bison
-using "make generated_files" before opening the project.
+## COMPILATION ON FREEBSD 11
 
-# WORKING WITH CMAKE
-
-There is also a build based on CMake instead of hand-written
-makefiles. It should work on a wider variety of systems than the standard
-makefile build, and can integrate better with IDEs and static-analysis tools.
-On Windows, the CMake build does not depend on Cygwin or MinGW, and doesn't
-require manual modification of build files.
-
-1. Ensure you have all the build dependencies installed. Build dependencies are
-   the same as for the makefile build, but with the addition of CMake version
-   3.2 or higher. The installed CMake version can be queried with `cmake
-   --version`. To install cmake:
-   - On Debian-like distributions, do
-     ```
-     apt-get install cmake
-     ```
-   - On Red Hat/Fedora or derivates, do
-     ```
-     dnf install cmake
-     ```
-   - On macOS, do
-     ```
-     xcode-select --install
-     ```
-     You shoud also install [Homebrew](https://brew.sh), after which you can
-     run `brew install cmake` to install CMake.
-   - On platforms where installing the Java Development Kit and Maven is
-     difficult, you can avoid needing these dependencies by not building
-     JBMC. Just pass `-DWITH_JBMC=OFF` to cmake in step (4) below.
-   - On Windows, ensure you have Visual Studio 2015 or later installed.
-     Then, download CMake from the [official download
-     page](https://cmake.org/download).
-     You'll also need `git` and `patch`, which are both provided by the
-     [git for Windows](git-scm.com/download/win) package.
-     Finally, Windows builds of flex and bison should be installed from
-     [the sourceforge page](sourceforge.net/projects/winflexbison).
-     The easiest way to 'install' these executables is to unzip them and to
-     drop the entire unzipped package into the CBMC source directory.
-   - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
-     be possible to install CMake from the system package manager or the
-     [official download page](https://cmake.org/download) on those systems.
-     The dependencies (as listed in the relevant sections above) will also be
-     required, and should be installed using the suggested methods.
-2. Navigate to the *top level* folder of the project. This is different from
-   the Makefile build, which requires you to navigate to the `src` directory
-   first.
-3. Update git submodules:
+1. As root, get the necessary tools:
    ```
-   git submodule update --init
+   pkg install bash gmake git www/p5-libwww patch flex bison
    ```
-4. Generate build files with CMake:
+   To compile JBMC, additionally install
    ```
-   cmake -S . -Bbuild
+   pkg install openjdk8 wget maven3
    ```
-   This command tells CMake to use the configuration in the current directory,
-   and to generate build files into the `build` directory.  This is the point
-   to specify custom build settings, such as compilers and build back-ends. You
-   can use clang (for example) by adding the argument
-   `-DCMAKE_CXX_COMPILER=clang++` to the command line. You can also tell CMake
-   to generate IDE projects by supplying the `-G` flag.  Run `cmake -G` for a
-   comprehensive list of supported back-ends.
-
-   On macOS >10.14, the build will fail unless you explicitly specify
-   the full path to the compiler. This issue is being tracked
-   [here](https://github.com/diffblue/cbmc/issues/4956). The invocation thus
-   looks like this:
+2. As a user, get the CBMC source via
    ```
-   cmake -S. -Bbuild -DCMAKE_C_COMPILER=/usr/bin/clang
+   git clone https://github.com/diffblue/cbmc cbmc-git
+   cd cbmc-git
    ```
-
-   Generally it is not necessary to manually specify individual compiler or
-   linker flags, as CMake defines a number of "build modes" including Debug and
-   Release modes. To build in a particular mode, add the flag
-   `-DCMAKE_BUILD_TYPE=Debug` (or `RelWithDebInfo`) to the initial invocation.
-   The default is to perform an optimized build via the `Release` configuration.
-
-   If you *do* need to manually add flags, use `-DCMAKE_CXX_FLAGS=...` and
-   `-DCMAKE_EXE_LINKER_FLAGS=...`. This is useful for enabling clang's
-   sanitizers.
-
-   Finally, to enable building universal binaries on macOS, you can pass the
-   flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
-   the build will just be for the architecture of your machine.
-5. Run the build:
+3. To compile CBMC, do
    ```
-   cmake --build build
+   gmake -C src minisat2-download
+   gmake -C src
    ```
-   This command tells CMake to invoke the correct tool to run the build in the
-   `build` directory. You can also use the build back-end directly by invoking
-   `make`, `ninja`, or opening the generated IDE project as appropriate.
+4. To compile JBMC, do
+   ```
+   gmake -C jbmc/src setup-submodules
+   gmake -C jbmc/src
+   ```
 
 # WORKING WITH ECLIPSE
 
@@ -343,7 +302,7 @@ If compiling with make:
 2. Uncomment the definition of `CUDD` in the file `src/config.inc`.
 3. Compile with `make -C src`
 
-If compiling with cmake:
+If compiling with CMake:
 
 1. Add the `-DCMAKE_USE_CUDD=true` flag to the `cmake` configuration phase.
    For instance:
@@ -397,7 +356,7 @@ make -C src glucose-download
 make -C src GLUCOSE=../../glucose-syrup
 ```
 
-For `cmake` the alternatives can be built with the following arguments to `cmake`
+For CMake the alternatives can be built with the following arguments to `cmake`
 for CaDiCaL `-Dsat_impl=cadical` and for glucose `-Dsat_impl=glucose`.
 
 
