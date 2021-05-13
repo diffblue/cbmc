@@ -19,7 +19,7 @@ past, but are not actively tested:
 - FreeBSD 11
 - Cygwin
 
-# Building using CMAKE
+# Building using CMake
 
 Building with CMake is supported across Linux, MacOS X and Windows with Visual
 Studio 2019. There are also hand-written make files which can be used to build
@@ -33,7 +33,7 @@ files.
 1. Ensure you have all the build dependencies installed. Build dependencies are
    the same as for the makefile build, but with the addition of CMake version
    3.2 or higher. The installed CMake version can be queried with `cmake
-   --version`. To install cmake:
+   --version`. To install CMake:
    - On Debian-like distributions, do
      ```
      apt-get install g++ gcc flex bison make git curl patch cmake
@@ -52,7 +52,7 @@ files.
      difficult, you can avoid needing these dependencies by not building
      JBMC. Just pass `-DWITH_JBMC=OFF` to cmake in step (4) below.
    - On Windows, ensure you have Visual Studio 2019 or later installed. The
-     developer command line that comes with Visual Studio 2019 has cmake
+     developer command line that comes with Visual Studio 2019 has CMake
      already available. You will also need to ensure that you have winflexbison
      installed and available in the path. winflexbison is available from
      [the github release page](https://github.com/lexxmark/winflexbison/releases/)
@@ -358,7 +358,7 @@ If compiling with make:
 2. Uncomment the definition of `CUDD` in the file `src/config.inc`.
 3. Compile with `make -C src`
 
-If compiling with cmake:
+If compiling with CMake:
 
 1. Add the `-DCMAKE_USE_CUDD=true` flag to the `cmake` configuration phase.
    For instance:
@@ -412,7 +412,7 @@ make -C src glucose-download
 make -C src GLUCOSE=../../glucose-syrup
 ```
 
-For `cmake` the alternatives can be built with the following arguments to `cmake`
+For CMake the alternatives can be built with the following arguments to `cmake`
 for CaDiCaL `-Dsat_impl=cadical` and for glucose `-Dsat_impl=glucose`.
 
 
