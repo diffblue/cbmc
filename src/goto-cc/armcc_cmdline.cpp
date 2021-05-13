@@ -25,7 +25,7 @@ Author: Daniel Kroening
 /// \return none
 // see
 // http://infocenter.arm.com/help/topic/com.arm.doc.dui0472c/Cchbggjb.html
-
+// clang-format off
 static const char *options_no_arg[]=
 {
   // goto-cc-specific
@@ -44,6 +44,9 @@ static const char *options_no_arg[]=
   "--no-arch",
   "--no-library",
   "--string-abstraction",
+  "--validate-goto-model",
+  "-?",
+  "--export-file-local-symbols",
 
   // armcc
   "--help",
@@ -201,7 +204,6 @@ static const char *options_no_arg[]=
   nullptr
 };
 
-// clang-format off
 static const std::vector<std::string> options_with_prefix
 {
   "--project=",
@@ -256,6 +258,9 @@ static const std::vector<std::string> options_with_arg
   // goto-cc specific
   "--verbosity",
   "--function",
+  "--print-rejected-preprocessed-source",
+  "--mangle-suffix",
+  "--object-bits",
 
   // armcc-specific
   "-D",
