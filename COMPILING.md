@@ -106,7 +106,9 @@ files.
 
    Finally, to enable building universal binaries on macOS, you can pass the
    flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
-   the build will just be for the architecture of your machine.
+   the built binaries will only work on the architecture of the machine being
+   used to do the build.
+
 5. Run the build:
    ```
    cmake --build build
