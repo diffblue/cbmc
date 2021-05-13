@@ -1,0 +1,29 @@
+CORE
+main.c
+--enforce-contract foo --replace-call-with-contract bar --replace-call-with-contract baz
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+SUCCESS
+// bar
+ASSERT \*x > 0
+IF !\(\*x == 3\) THEN GOTO \d
+IF !\(\(signed int \*\)\(void \*\)0 == \(\(signed int \*\)NULL\)\) THEN GOTO \d
+tmp_if_expr = \*\(\(signed int \*\)\(void \*\)0\) == 5 \? TRUE \: FALSE;
+tmp_if_expr\$\d = tmp_if_expr \? TRUE : FALSE;
+ASSUME tmp_if_expr\$\d
+// baz
+IF !\(z == \(\(signed int \*\)NULL\)\) THEN GOTO \d
+tmp_if_expr\$\d = \*z == 7 \? TRUE : FALSE;
+ASSUME tmp_if_expr\$\d
+// foo
+ASSUME \*tmp_cc\$\d > 0
+ASSERT \*tmp_cc\$\d == 3
+--
+\[3\] file main\.c line 6 assertion: FAILURE
+--
+Verification:
+This test checks support for a NULL pointer that is assigned to by
+a function (bar and baz). Both functions bar and baz are being replaced by
+their function contracts, while the calling function foo is being checked
+(by enforcing it's function contracts).
