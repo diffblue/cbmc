@@ -50,7 +50,7 @@ files.
      run `brew install cmake` to install CMake.
    - On platforms where installing the Java Development Kit and Maven is
      difficult, you can avoid needing these dependencies by not building
-     JBMC. Just pass `-DWITH_JBMC=OFF` to cmake in step (4) below.
+     JBMC. Just pass `-DWITH_JBMC=OFF` to `cmake` in step (4) below.
    - On Windows, ensure you have Visual Studio 2019 or later installed. The
      developer command line that comes with Visual Studio 2019 has CMake
      already available. You will also need to ensure that you have winflexbison
