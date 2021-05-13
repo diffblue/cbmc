@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^Generated 1 VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The len member should constant propagate with the help of simplification.

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "invariant.h"
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "simplify_expr.h"
 #include "ssa_expr.h"
 #include "std_expr.h"
@@ -678,6 +679,27 @@ optionalt<exprt> get_subexpression_at_offset(
           offset_inside_elem,
           target_type_raw,
           ns);
+      }
+    }
+  }
+  else if(
+    object_descriptor_exprt(expr).root_object().id() == ID_union &&
+    source_type.id() == ID_union)
+  {
+    const union_typet &union_type = to_union_type(source_type);
+
+    for(const auto &component : union_type.components())
+    {
+      const auto m_size_bits = pointer_offset_bits(component.type(), ns);
+      if(!m_size_bits.has_value())
+        continue;
+
+      // if this member completely contains the target, recurse into it
+      if(offset_bytes * 8 + *target_size_bits <= *m_size_bits)
+      {
+        const member_exprt member(expr, component.get_name(), component.type());
+        return get_subexpression_at_offset(
+          member, offset_bytes, target_type_raw, ns);
       }
     }
   }
