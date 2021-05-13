@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+ASSERT \*tmp_cc\$\d < tmp_cc\$\d \+ 5
+--
+--
+Verification:
+This test checks that history variables are supported for parameters of the
+the function under test. By using the --enforce-all-contracts flag,
+the post-condition (which contains the history variable) is asserted.
+In this case, this assertion should fail.

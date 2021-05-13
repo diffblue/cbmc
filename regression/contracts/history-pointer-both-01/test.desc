@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-contract foo --replace-call-with-contract bar
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+ASSUME tmp_cc\$\d != \(\(signed int \*\)NULL\)
+ASSERT n != \(\(signed int \*\)NULL\)
+ASSUME tmp_cc == \*n
+ASSERT tmp_cc\$\d == \*tmp_cc\$\d
+--
+--
+Verification:
+This test checks that history variables are supported for parameters of the
+the function under test. By using the --enforce-all-contracts flag,
+the post-condition (which contains the history variable) is asserted.
+In this case, this assertion should pass.

@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+ASSERT tmp_if_expr\$\d
+--
+--
+Verification:
+This test checks that history variables are supported in the case where a
+history variable is referred to multiple times within an ensures clause.
+By using the --enforce-all-contracts flag, the post-condition (which contains
+the history variable) is asserted. In this case, this assertion should pass.

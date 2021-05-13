@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+warning: ignoring old
+--
+--
+Verification:
+This test checks that history variables are not supported when referred to from
+a function body. In such a case, verification should fail.

@@ -14,6 +14,7 @@ Date: February 2016
 #ifndef CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
 #define CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
 
+#include <map>
 #include <set>
 #include <string>
 #include <unordered_set>
@@ -179,6 +180,25 @@ protected:
     exprt expression,
     replace_symbolt &replace,
     irep_idt mode);
+
+  /// This function recursively identifies the "old" expressions within expr
+  /// and replaces them with correspoding history variables.
+  void replace_old_parameter(
+    exprt &expr,
+    std::map<exprt, exprt> &parameter2history,
+    source_locationt location,
+    const irep_idt &function,
+    const irep_idt &mode,
+    goto_programt &history);
+
+  /// This function creates and returns an instruction that corresponds to the
+  /// ensures clause. It also returns a list of instructions related to
+  /// initializing history variables, if required.
+  std::pair<goto_programt, goto_programt> create_ensures_instruction(
+    codet &expression,
+    source_locationt location,
+    const irep_idt &function,
+    const irep_idt &mode);
 };
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"

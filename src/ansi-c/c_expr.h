@@ -200,4 +200,27 @@ inline side_effect_expr_overflowt &to_side_effect_expr_overflow(exprt &expr)
   return static_cast<side_effect_expr_overflowt &>(side_effect_expr);
 }
 
+/// \brief A class for an expression that indicates the pre-function-call
+/// value of an expression passed as a parameter to a function
+class old_exprt : public unary_exprt
+{
+public:
+  explicit old_exprt(exprt variable) : unary_exprt(ID_old, std::move(variable))
+  {
+  }
+
+  const exprt &expression() const
+  {
+    return op0();
+  }
+};
+
+inline const old_exprt &to_old_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_old);
+  auto &ret = static_cast<const old_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_ANSI_C_C_EXPR_H

@@ -1,0 +1,15 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+ASSERT \*\(&n\) > 0
+ASSUME \*\(&n\) == tmp_cc[\$\d]? \+ 2
+--
+--
+Verification:
+This test checks that history variables are supported with the use of the
+--replace-all-calls-with-contracts flag. In this case, the pre-condition
+becomes an assertion and the post-condition (which contains the history
+variable) becomes an assumption.

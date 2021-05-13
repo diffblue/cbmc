@@ -2621,6 +2621,20 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ok_expr);
   }
+  else if(identifier == CPROVER_PREFIX "old")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    old_exprt old_expr(expr.arguments()[0]);
+    old_expr.add_source_location() = source_location;
+
+    return std::move(old_expr);
+  }
   else if(identifier==CPROVER_PREFIX "isinff" ||
           identifier==CPROVER_PREFIX "isinfd" ||
           identifier==CPROVER_PREFIX "isinfld" ||
@@ -3859,6 +3873,23 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   {
     error().source_location=expr.find_source_location();
     error() << "conversion to integer constant failed" << eom;
+    throw 0;
+  }
+}
+
+void c_typecheck_baset::disallow_history_variables(const exprt &expr) const
+{
+  for(auto &op : expr.operands())
+  {
+    disallow_history_variables(op);
+  }
+
+  if(expr.id() == ID_old)
+  {
+    error().source_location = expr.source_location();
+    error() << CPROVER_PREFIX
+      "old expressions are not allowed in " CPROVER_PREFIX "requires clauses"
+            << eom;
     throw 0;
   }
 }
