@@ -59,6 +59,9 @@ files.
      or through
      [the chocolatey package manager.](https://community.chocolatey.org/packages/winflexbison3)
      Installing `strawberryperl` is advised if you want to run tests on Windows.
+     This is available from
+     [the Strawberry Perl website](https://strawberryperl.com/) or through the
+     [the chocolatey package manager.](https://community.chocolatey.org/packages/StrawberryPerl)
    - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
      be possible to install CMake from the system package manager or the
      [official download page](https://cmake.org/download) on those systems.
