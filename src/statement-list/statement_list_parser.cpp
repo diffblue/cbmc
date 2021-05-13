@@ -248,7 +248,7 @@ static exprt find_network_instructions(const exprt &network)
   UNREACHABLE; // Network expression should always have an instruction list
 }
 
-/// Adds all valid  instructions to the given network.
+/// Adds all valid instructions to the given network.
 /// \param network: The network to which the instructions belong.
 /// \param instructions: The root expression of a valid instruction list.
 static void find_instructions(
@@ -258,13 +258,24 @@ static void find_instructions(
   for(const exprt &instruction_expr : instructions.operands())
   {
     statement_list_parse_treet::instructiont instruction;
+
     codet code_token(to_multi_ary_expr(instruction_expr).op0().id());
-    for(const exprt &operand : instruction_expr.operands())
+    string_constantt label{ID_nil};
+    for(auto op_it = std::next(instruction_expr.operands().begin());
+        op_it != end(instruction_expr.operands());
+        ++op_it)
     {
-      if(operand.is_not_nil() && operand.id() != code_token.get_statement())
-        code_token.add_to_operands(operand);
+      if(op_it->get(ID_statement_list_type) == ID_label)
+        label = to_string_constant(*op_it);
+      else if(op_it->is_not_nil())
+        code_token.add_to_operands(*op_it);
     }
-    instruction.add_token(code_token);
+
+    if(label.get_value() == ID_nil)
+      instruction.add_token(code_token);
+    else
+      instruction.add_token(code_labelt{label.get_value(), code_token});
+
     network.add_instruction(instruction);
   }
 }

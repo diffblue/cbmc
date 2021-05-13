@@ -35,6 +35,29 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Name of the RLO symbol used in some operations.
 #define CPROVER_TEMP_RLO CPROVER_PREFIX "temp_rlo"
 
+static const std::vector<irep_idt> logic_sequence_initializers = {
+  ID_statement_list_and,
+  ID_statement_list_and_not,
+  ID_statement_list_or,
+  ID_statement_list_or_not,
+  ID_statement_list_xor,
+  ID_statement_list_xor_not,
+  ID_statement_list_and_nested,
+  ID_statement_list_and_not_nested,
+  ID_statement_list_or_nested,
+  ID_statement_list_or_not_nested,
+  ID_statement_list_xor_nested,
+  ID_statement_list_xor_not_nested,
+};
+
+static const std::vector<irep_idt> logic_sequence_terminators = {
+  ID_statement_list_set_rlo,
+  ID_statement_list_clr_rlo,
+  ID_statement_list_set,
+  ID_statement_list_reset,
+  ID_statement_list_assign,
+};
+
 /// Creates the artificial data block parameter with a generic name and the
 /// specified type.
 /// \param data_block_type: Type of the data block.
@@ -70,6 +93,22 @@ statement_list_typecheckt::nesting_stack_entryt::nesting_stack_entryt(
   bool or_bit,
   codet function_code)
   : rlo_bit(rlo_bit), or_bit(or_bit), function_code(function_code)
+{
+}
+
+statement_list_typecheckt::stl_label_locationt::stl_label_locationt(
+  size_t nesting_depth,
+  bool jumps_permitted,
+  bool fc_false_required)
+  : nesting_depth(nesting_depth),
+    jumps_permitted(jumps_permitted),
+    fc_false_required(fc_false_required)
+{
+}
+statement_list_typecheckt::stl_jump_locationt::stl_jump_locationt(
+  size_t nesting_depth,
+  bool sets_fc_false)
+  : nesting_depth(nesting_depth), sets_fc_false(sets_fc_false)
 {
 }
 
@@ -304,14 +343,30 @@ void statement_list_typecheckt::typecheck_statement_list_networks(
   if(tia_symbol.value.is_nil())
     tia_symbol.value = code_blockt{};
 
+  clear_module_state();
   typecheck_temp_var_decls(tia_module, tia_symbol);
 
   for(const auto &network : tia_module.networks)
   {
-    // Set RLO to true each time a new network is entered (TIA behaviour).
-    rlo_bit = true_exprt();
+    clear_network_state();
     for(const auto &instruction : network.instructions)
       typecheck_statement_list_instruction(instruction, tia_symbol);
+  }
+  typecheck_label_references();
+}
+
+void statement_list_typecheckt::typecheck_label_references()
+{
+  if(!label_references.empty())
+  {
+    error() << "Unable to find the labels:";
+    for(auto pair : label_references)
+    {
+      error() << "\n";
+      error() << id2string(pair.first);
+    }
+    error() << eom;
+    throw TYPECHECK_ERROR;
   }
 }
 
@@ -320,119 +375,258 @@ void statement_list_typecheckt::typecheck_statement_list_instruction(
   symbolt &tia_element)
 {
   const codet &op_code{instruction.tokens.back()};
-  const irep_idt statement{op_code.get_statement()};
+  typecheck_code(op_code, tia_element);
+}
 
-  if(ID_statement_list_load == statement)
-    typecheck_statement_list_load(op_code, tia_element);
+void statement_list_typecheckt::typecheck_code(
+  const codet &instruction,
+  symbolt &tia_element)
+{
+  const irep_idt statement{instruction.get_statement()};
+
+  if(ID_label == statement)
+    typecheck_label(instruction, tia_element);
+  else if(ID_statement_list_load == statement)
+    typecheck_statement_list_load(instruction, tia_element);
   else if(ID_statement_list_transfer == statement)
-    typecheck_statement_list_transfer(op_code, tia_element);
+    typecheck_statement_list_transfer(instruction, tia_element);
   else if(ID_statement_list_accu_int_add == statement)
-    typecheck_statement_list_accu_int_add(op_code);
+    typecheck_statement_list_accu_int_add(instruction);
   else if(ID_statement_list_accu_int_sub == statement)
-    typecheck_statement_list_accu_int_sub(op_code);
+    typecheck_statement_list_accu_int_sub(instruction);
   else if(ID_statement_list_accu_int_mul == statement)
-    typecheck_statement_list_accu_int_mul(op_code);
+    typecheck_statement_list_accu_int_mul(instruction);
   else if(ID_statement_list_accu_int_div == statement)
-    typecheck_statement_list_accu_int_div(op_code);
+    typecheck_statement_list_accu_int_div(instruction);
   else if(ID_statement_list_accu_int_eq == statement)
-    typecheck_statement_list_accu_int_eq(op_code);
+    typecheck_statement_list_accu_int_eq(instruction);
   else if(ID_statement_list_accu_int_neq == statement)
-    typecheck_statement_list_accu_int_neq(op_code);
+    typecheck_statement_list_accu_int_neq(instruction);
   else if(ID_statement_list_accu_int_lt == statement)
-    typecheck_statement_list_accu_int_lt(op_code);
+    typecheck_statement_list_accu_int_lt(instruction);
   else if(ID_statement_list_accu_int_gt == statement)
-    typecheck_statement_list_accu_int_gt(op_code);
+    typecheck_statement_list_accu_int_gt(instruction);
   else if(ID_statement_list_accu_int_lte == statement)
-    typecheck_statement_list_accu_int_lte(op_code);
+    typecheck_statement_list_accu_int_lte(instruction);
   else if(ID_statement_list_accu_int_gte == statement)
-    typecheck_statement_list_accu_int_gte(op_code);
+    typecheck_statement_list_accu_int_gte(instruction);
   else if(ID_statement_list_accu_dint_add == statement)
-    typecheck_statement_list_accu_dint_add(op_code);
+    typecheck_statement_list_accu_dint_add(instruction);
   else if(ID_statement_list_accu_dint_sub == statement)
-    typecheck_statement_list_accu_dint_sub(op_code);
+    typecheck_statement_list_accu_dint_sub(instruction);
   else if(ID_statement_list_accu_dint_mul == statement)
-    typecheck_statement_list_accu_dint_mul(op_code);
+    typecheck_statement_list_accu_dint_mul(instruction);
   else if(ID_statement_list_accu_dint_div == statement)
-    typecheck_statement_list_accu_dint_div(op_code);
+    typecheck_statement_list_accu_dint_div(instruction);
   else if(ID_statement_list_accu_dint_eq == statement)
-    typecheck_statement_list_accu_dint_eq(op_code);
+    typecheck_statement_list_accu_dint_eq(instruction);
   else if(ID_statement_list_accu_dint_neq == statement)
-    typecheck_statement_list_accu_dint_neq(op_code);
+    typecheck_statement_list_accu_dint_neq(instruction);
   else if(ID_statement_list_accu_dint_lt == statement)
-    typecheck_statement_list_accu_dint_lt(op_code);
+    typecheck_statement_list_accu_dint_lt(instruction);
   else if(ID_statement_list_accu_dint_gt == statement)
-    typecheck_statement_list_accu_dint_gt(op_code);
+    typecheck_statement_list_accu_dint_gt(instruction);
   else if(ID_statement_list_accu_dint_lte == statement)
-    typecheck_statement_list_accu_dint_lte(op_code);
+    typecheck_statement_list_accu_dint_lte(instruction);
   else if(ID_statement_list_accu_dint_gte == statement)
-    typecheck_statement_list_accu_dint_gte(op_code);
+    typecheck_statement_list_accu_dint_gte(instruction);
   else if(ID_statement_list_accu_real_add == statement)
-    typecheck_statement_list_accu_real_add(op_code);
+    typecheck_statement_list_accu_real_add(instruction);
   else if(ID_statement_list_accu_real_sub == statement)
-    typecheck_statement_list_accu_real_sub(op_code);
+    typecheck_statement_list_accu_real_sub(instruction);
   else if(ID_statement_list_accu_real_mul == statement)
-    typecheck_statement_list_accu_real_mul(op_code);
+    typecheck_statement_list_accu_real_mul(instruction);
   else if(ID_statement_list_accu_real_div == statement)
-    typecheck_statement_list_accu_real_div(op_code);
+    typecheck_statement_list_accu_real_div(instruction);
   else if(ID_statement_list_accu_real_eq == statement)
-    typecheck_statement_list_accu_real_eq(op_code);
+    typecheck_statement_list_accu_real_eq(instruction);
   else if(ID_statement_list_accu_real_neq == statement)
-    typecheck_statement_list_accu_real_neq(op_code);
+    typecheck_statement_list_accu_real_neq(instruction);
   else if(ID_statement_list_accu_real_lt == statement)
-    typecheck_statement_list_accu_real_lt(op_code);
+    typecheck_statement_list_accu_real_lt(instruction);
   else if(ID_statement_list_accu_real_gt == statement)
-    typecheck_statement_list_accu_real_gt(op_code);
+    typecheck_statement_list_accu_real_gt(instruction);
   else if(ID_statement_list_accu_real_lte == statement)
-    typecheck_statement_list_accu_real_lte(op_code);
+    typecheck_statement_list_accu_real_lte(instruction);
   else if(ID_statement_list_accu_real_gte == statement)
-    typecheck_statement_list_accu_real_gte(op_code);
+    typecheck_statement_list_accu_real_gte(instruction);
   else if(ID_statement_list_not == statement)
-    typecheck_statement_list_not(op_code);
+    typecheck_statement_list_not(instruction);
   else if(ID_statement_list_and == statement)
-    typecheck_statement_list_and(op_code, tia_element);
+    typecheck_statement_list_and(instruction, tia_element);
   else if(ID_statement_list_and_not == statement)
-    typecheck_statement_list_and_not(op_code, tia_element);
+    typecheck_statement_list_and_not(instruction, tia_element);
   else if(ID_statement_list_or == statement)
-    typecheck_statement_list_or(op_code, tia_element);
+    typecheck_statement_list_or(instruction, tia_element);
   else if(ID_statement_list_or_not == statement)
-    typecheck_statement_list_or_not(op_code, tia_element);
+    typecheck_statement_list_or_not(instruction, tia_element);
   else if(ID_statement_list_xor == statement)
-    typecheck_statement_list_xor(op_code, tia_element);
+    typecheck_statement_list_xor(instruction, tia_element);
   else if(ID_statement_list_xor_not == statement)
-    typecheck_statement_list_xor_not(op_code, tia_element);
+    typecheck_statement_list_xor_not(instruction, tia_element);
   else if(ID_statement_list_and_nested == statement)
-    typecheck_statement_list_nested_and(op_code);
+    typecheck_statement_list_nested_and(instruction);
   else if(ID_statement_list_and_not_nested == statement)
-    typecheck_statement_list_nested_and_not(op_code);
+    typecheck_statement_list_nested_and_not(instruction);
   else if(ID_statement_list_or_nested == statement)
-    typecheck_statement_list_nested_or(op_code);
+    typecheck_statement_list_nested_or(instruction);
   else if(ID_statement_list_or_not_nested == statement)
-    typecheck_statement_list_nested_or_not(op_code);
+    typecheck_statement_list_nested_or_not(instruction);
   else if(ID_statement_list_xor_nested == statement)
-    typecheck_statement_list_nested_xor(op_code);
+    typecheck_statement_list_nested_xor(instruction);
   else if(ID_statement_list_xor_not_nested == statement)
-    typecheck_statement_list_nested_xor_not(op_code);
+    typecheck_statement_list_nested_xor_not(instruction);
   else if(ID_statement_list_nesting_closed == statement)
-    typecheck_statement_list_nesting_closed(op_code);
+    typecheck_statement_list_nesting_closed(instruction);
   else if(ID_statement_list_assign == statement)
-    typecheck_statement_list_assign(op_code, tia_element);
+    typecheck_statement_list_assign(instruction, tia_element);
   else if(ID_statement_list_set_rlo == statement)
-    typecheck_statement_list_set_rlo(op_code);
+    typecheck_statement_list_set_rlo(instruction);
   else if(ID_statement_list_clr_rlo == statement)
-    typecheck_statement_list_clr_rlo(op_code);
+    typecheck_statement_list_clr_rlo(instruction);
   else if(ID_statement_list_set == statement)
-    typecheck_statement_list_set(op_code, tia_element);
+    typecheck_statement_list_set(instruction, tia_element);
   else if(ID_statement_list_reset == statement)
-    typecheck_statement_list_reset(op_code, tia_element);
+    typecheck_statement_list_reset(instruction, tia_element);
+  else if(ID_statement_list_jump_unconditional == statement)
+    typecheck_statement_list_jump_unconditional(instruction, tia_element);
+  else if(ID_statement_list_jump_conditional == statement)
+    typecheck_statement_list_jump_conditional(instruction, tia_element);
+  else if(ID_statement_list_jump_conditional_not == statement)
+    typecheck_statement_list_jump_conditional_not(instruction, tia_element);
   else if(ID_statement_list_nop == statement)
     return;
   else if(ID_statement_list_call == statement)
-    typecheck_statement_list_call(op_code, tia_element);
+    typecheck_statement_list_call(instruction, tia_element);
   else
   {
-    error() << "OP code of instruction not found: " << op_code.get_statement()
+    error() << "OP code of instruction not found: "
+            << instruction.get_statement() << eom;
+    throw TYPECHECK_ERROR;
+  }
+}
+
+void statement_list_typecheckt::typecheck_label(
+  const codet &instruction,
+  symbolt &tia_element)
+{
+  const code_labelt &label = to_code_label(instruction);
+
+  // Check if label is duplicate (not allowed in STL).
+  if(stl_labels.find(label.get_label()) != end(stl_labels))
+  {
+    error() << "Multiple definitions of label " << id2string(label.get_label())
             << eom;
     throw TYPECHECK_ERROR;
+  }
+
+  // Determine the properties of this location in the code.
+  stl_label_locationt location = typecheck_label_location(label);
+
+  // Store the implicit RLO in order to correctly separate the different
+  // blocks of logic.
+  if(location.jumps_permitted)
+    save_rlo_state(tia_element);
+
+  // Now check if there are any jumps that referenced that label before and
+  // validate these.
+  typecheck_jump_locations(label, location);
+
+  // Only add the label to the code if jumps are permitted. Proceed as normal
+  // if they are not. An added label will always point at an empty code
+  // location due to the way how the typecheck works.
+  if(location.jumps_permitted)
+    tia_element.value.add_to_operands(
+      code_labelt{label.get_label(), code_skipt{}});
+
+  // Recursive call to check the label target.
+  typecheck_code(label.code(), tia_element);
+}
+
+statement_list_typecheckt::stl_label_locationt
+statement_list_typecheckt::typecheck_label_location(const code_labelt &label)
+{
+  // Jumps to a label are only allowed if one of the following conditions
+  // applies:
+  //
+  // a) The /FC bit is false when encountering the instruction (pointing at the
+  //    beginning of a logic sequence or no sequence at all).
+  // b) The /FC bit is set to false after processing the instruction (pointing
+  //    at the termination of a logic sequence). This excludes nesting-open
+  //    operations since although they terminate the current sequence, it will
+  //    be resumed later.
+  //
+  // Labels at locations where this does not hold true compile, but actual
+  // jumps to them do not.
+  //
+  // Additionally, jumps to instructions that mark the beginning of a logic
+  // sequence are only allowed if the jump instruction itself sets the /FC bit
+  // to false.
+
+  bool jumps_permitted = false;
+  bool fc_false_required = false;
+  if(!fc_bit)
+  {
+    jumps_permitted = true;
+    // Check if label points to new logic sequence.
+    for(const irep_idt &op_code : logic_sequence_initializers)
+      if(op_code == label.code().get_statement())
+      {
+        fc_false_required = true;
+        break;
+      }
+  }
+  else // Check if the label's instruction terminates the logic sequence.
+  {
+    for(const irep_idt &op_code : logic_sequence_terminators)
+      if(op_code == label.code().get_statement())
+      {
+        jumps_permitted = true;
+        break;
+      }
+  }
+
+  // Add the label to map.
+  stl_label_locationt location{
+    nesting_stack.size(), jumps_permitted, fc_false_required};
+  stl_labels.emplace(label.get_label(), location);
+  return location;
+}
+
+void statement_list_typecheckt::typecheck_jump_locations(
+  const code_labelt &label,
+  const statement_list_typecheckt::stl_label_locationt &location)
+{
+  // Now check if there are any jumps that referenced that label before and
+  // validate these.
+  auto reference_it = label_references.find(label.get_label());
+  if(reference_it != end(label_references))
+  {
+    if(!location.jumps_permitted)
+    {
+      error() << "Not allowed to jump to label " << id2string(label.get_label())
+              << eom;
+      throw TYPECHECK_ERROR;
+    }
+    for(auto jump_location_it = begin(reference_it->second);
+        jump_location_it != end(reference_it->second);
+        ++jump_location_it)
+    {
+      if(location.fc_false_required && !jump_location_it->sets_fc_false)
+      {
+        error() << "Jump to label " << id2string(label.get_label())
+                << " can not be unconditional" << eom;
+        throw TYPECHECK_ERROR;
+      }
+      if(nesting_stack.size() != jump_location_it->nesting_depth)
+      {
+        error() << "Jump to label " << id2string(label.get_label())
+                << " violates brace scope" << eom;
+        throw TYPECHECK_ERROR;
+      }
+    }
+    // Remove entry after validation.
+    label_references.erase(label.get_label());
   }
 }
 
@@ -758,14 +952,8 @@ void statement_list_typecheckt::typecheck_statement_list_not(
   const codet &op_code)
 {
   typecheck_instruction_without_operand(op_code);
-  if(fc_bit)
-  {
-    const not_exprt unsimplified{rlo_bit};
-    rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
-    or_bit = false;
-  }
-  else
-    initialize_bit_expression(false_exprt{});
+  const not_exprt unsimplified{rlo_bit};
+  rlo_bit = simplify_expr(unsimplified, namespacet(symbol_table));
 }
 
 void statement_list_typecheckt::typecheck_statement_list_and(
@@ -1111,6 +1299,55 @@ void statement_list_typecheckt::typecheck_statement_list_call(
   or_bit = false;
 }
 
+void statement_list_typecheckt::typecheck_statement_list_jump_unconditional(
+  const codet &op_code,
+  symbolt &tia_element)
+{
+  const symbol_exprt &label{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  typecheck_label_reference(label.get_identifier(), false);
+
+  save_rlo_state(tia_element);
+  code_gotot unconditional{label.get_identifier()};
+  tia_element.value.add_to_operands(unconditional);
+}
+
+void statement_list_typecheckt::typecheck_statement_list_jump_conditional(
+  const codet &op_code,
+  symbolt &tia_element)
+{
+  const symbol_exprt &label{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  typecheck_label_reference(label.get_identifier(), true);
+
+  save_rlo_state(tia_element);
+  code_gotot jump{label.get_identifier()};
+  code_ifthenelset conditional{rlo_bit, jump};
+  tia_element.value.add_to_operands(conditional);
+
+  fc_bit = false;
+  or_bit = false;
+  rlo_bit = true_exprt{};
+}
+
+void statement_list_typecheckt::typecheck_statement_list_jump_conditional_not(
+  const codet &op_code,
+  symbolt &tia_element)
+{
+  const symbol_exprt &label{
+    typecheck_instruction_with_non_const_operand(op_code)};
+  typecheck_label_reference(label.get_identifier(), true);
+
+  save_rlo_state(tia_element);
+  code_gotot jump{label.get_identifier()};
+  code_ifthenelset not_conditional{not_exprt{rlo_bit}, jump};
+  tia_element.value.add_to_operands(not_conditional);
+
+  fc_bit = false;
+  or_bit = false;
+  rlo_bit = true_exprt{};
+}
+
 void statement_list_typecheckt::typecheck_statement_list_accu_int_arith(
   const codet &op_code)
 {
@@ -1178,6 +1415,51 @@ void statement_list_typecheckt::typecheck_accumulator_compare_instruction(
   // STL behaviour: ACCU2 is lhs, ACCU1 is rhs.
   const binary_relation_exprt operation{accu2, comparison, accu1};
   rlo_bit = operation;
+}
+
+void statement_list_typecheckt::typecheck_label_reference(
+  const irep_idt &label,
+  bool sets_fc_false)
+{
+  // If the label is already present in the list, check if it matches the
+  // criteria.
+  auto label_it = stl_labels.find(label);
+  if(label_it != end(stl_labels))
+  {
+    if(!label_it->second.jumps_permitted)
+    {
+      error() << "Not allowed to jump to label " << id2string(label_it->first)
+              << eom;
+      throw TYPECHECK_ERROR;
+    }
+
+    if(label_it->second.fc_false_required && !sets_fc_false)
+    {
+      error() << "Jump to label " << id2string(label_it->first)
+              << " can not be unconditional" << eom;
+      throw TYPECHECK_ERROR;
+    }
+
+    if(label_it->second.nesting_depth != nesting_stack.size())
+    {
+      error() << "Jump to label " << id2string(label_it->first)
+              << " violates brace scope" << eom;
+      throw TYPECHECK_ERROR;
+    }
+  }
+  else // If it was not encountered yet, create a new reference entry.
+  {
+    stl_jump_locationt location{nesting_stack.size(), sets_fc_false};
+    auto reference_it = label_references.find(label);
+    if(reference_it == end(label_references))
+    {
+      std::vector<stl_jump_locationt> locations;
+      locations.push_back(location);
+      label_references.emplace(label, locations);
+    }
+    else
+      reference_it->second.push_back(location);
+  }
 }
 
 const symbol_exprt &
@@ -1520,6 +1802,21 @@ void statement_list_typecheckt::initialize_bit_expression(const exprt &op)
   fc_bit = true;
   or_bit = false;
   rlo_bit = op;
+}
+
+void statement_list_typecheckt::clear_network_state()
+{
+  rlo_bit = true_exprt{};
+  fc_bit = false;
+  or_bit = false;
+  nesting_stack.clear();
+}
+
+void statement_list_typecheckt::clear_module_state()
+{
+  clear_network_state();
+  label_references.clear();
+  stl_labels.clear();
 }
 
 void statement_list_typecheckt::save_rlo_state(symbolt &tia_element)

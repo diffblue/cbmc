@@ -128,6 +128,9 @@ extern char *yystatement_listtext;
 %token TOK_ACCU_DINT_GTE        ">=D"
 %token TOK_ACCU_DINT_LTE        "<=D"
 %token TOK_ASSIGNMENT           ":="
+%token TOK_JUMP_UNCONDITIONAL   "JU"
+%token TOK_JUMP_CONDITIONAL     "JC"
+%token TOK_JUMP_CONDITIONAL_NOT "JCN"
 
 /*** Value tokens ***/
 %token TOK_INT_LITERAL
@@ -668,7 +671,7 @@ Opt_Instruction_List:
     }
     ;
     
-// Structured Text grammar
+// Statement List grammar
 Instruction_List: 
     Oom_IL_Instruction
     ;
@@ -688,7 +691,7 @@ Oom_IL_Instruction:
     ;
 
 IL_Instruction: 
-    Opt_Label Opt_Instruction ';'
+    Opt_Label Instruction ';'
     {
       $$ = $2;
       parser_stack($$).add_to_operands(std::move(parser_stack($1)));
@@ -708,14 +711,9 @@ IL_Label:
     TOK_LABEL
     ;
 
-Opt_Instruction:
+Instruction:
     IL_Simple_Operation
     | IL_Invocation
-    | /* nothing */
-    {
-      newstack($$);
-      parser_stack($$).id(ID_statement_list_instruction);
-    }
     ;
 
 IL_Simple_Operation: 
@@ -932,12 +930,12 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor);
-    }  
+    }
     | TOK_XOR_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_not);
-    } 
+    }
     | TOK_AND_NESTED 
     {
       $$ = $1;
@@ -947,22 +945,22 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_and_not_nested);
-    } 
+    }
     | TOK_OR_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_nested);
-    } 
+    }
     | TOK_OR_NOT_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_not_nested);
-    }  
+    }
     | TOK_XOR_NESTED 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_nested);
-    }  
+    }
     | TOK_XOR_NOT_NESTED
     {
       $$ = $1;
@@ -972,7 +970,7 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_nesting_closed);
-    }  
+    }
     | TOK_ASSIGN
     {
       $$ = $1;
@@ -987,7 +985,7 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_clr_rlo);
-    } 
+    }
     | TOK_SET
     {
       $$ = $1;
@@ -997,12 +995,27 @@ IL_Simple_Operator:
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_reset);
-    } 
+    }
     | TOK_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_not);
-    }  
+    }
+    | TOK_JUMP_UNCONDITIONAL
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_jump_unconditional);
+    }
+    | TOK_JUMP_CONDITIONAL
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_jump_conditional);
+    }
+    | TOK_JUMP_CONDITIONAL_NOT
+    {
+      $$ = $1;
+      parser_stack($$).id(ID_statement_list_jump_conditional_not);
+    }
     ;
 
 IL_Operand:

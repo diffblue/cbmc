@@ -28,7 +28,7 @@ class symbolt;
 /// \param module: Name of the file that has been parsed.
 /// \param message_handler: Used to provide debug information and error
 ///   messages.
-/// \return: False if no errors occurred, true otherwise.
+/// \return False if no errors occurred, true otherwise.
 bool statement_list_typecheck(
   const statement_list_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
@@ -113,6 +113,66 @@ private:
   /// occurs and popped upon returning.
   nesting_stackt nesting_stack;
 
+  /// Holds information about the instruction and the nesting depth to which a
+  /// label points.
+  struct stl_label_locationt
+  {
+    /// The size of the nesting stack at the label location, used for checking
+    /// scope violations.
+    const size_t nesting_depth;
+
+    /// States if jumps to this location are permitted or if the location is
+    /// invalid.
+    const bool jumps_permitted;
+
+    /// States if jump instructions to this location need to set the /FC bit to
+    /// false.
+    const bool fc_false_required;
+
+    /// Constructs a new location with the specified properties.
+    /// \param nesting_depth: Scope of the label.
+    /// \param jumps_permitted: States whether jumps to the label are possible
+    ///   in general.
+    /// \param fc_false_required: States whether a jump instruction to this
+    ///   label needs to set the /FC bit.
+    stl_label_locationt(
+      size_t nesting_depth,
+      bool jumps_permitted,
+      bool fc_false_required);
+  };
+  using stl_labelst = std::unordered_map<irep_idt, stl_label_locationt>;
+
+  /// Data structure that contains data about the labels of the current module.
+  stl_labelst stl_labels;
+
+  /// Holds information about the properties of a jump instruction.
+  struct stl_jump_locationt
+  {
+    // TODO: Add source location to the structure.
+    // Requires the source location to be added to the parser in general.
+
+    /// The size of the nesting stack at the label location, used for checking
+    /// scope violations.
+    const size_t nesting_depth;
+
+    /// States if the jump instruction sets the /FC bit to false.
+    const bool sets_fc_false;
+
+    /// Constructs a new location with the specified properties.
+    /// \param nesting_depth: Scope of the jump instruction.
+    /// \param sets_fc_false: States whether the jump instruction modifies the
+    ///   /FC bit.
+    stl_jump_locationt(size_t nesting_depth, bool sets_fc_false);
+  };
+  using label_referencest =
+    std::unordered_map<irep_idt, std::vector<stl_jump_locationt>>;
+
+  /// Holds associations between labels and jumps that are referencing it.
+  /// This list should be empty after a successful typecheck. A new entry is
+  /// added only if a jump is encountered that references an unknown label. It
+  /// is removed once the label is encountered and the jump is valid.
+  label_referencest label_references;
+
   // High level checks
 
   /// Performs a typecheck on a function declaration inside of the parse tree
@@ -138,7 +198,7 @@ private:
   /// Creates a data block type for the given function block.
   /// \param function_block: Function block with an interface that should be
   /// converted to a data block.
-  /// \return: A type representation of an instance data block for the
+  /// \return A type representation of an instance data block for the
   ///   function block.
   struct_typet create_instance_data_block_type(
     const statement_list_parse_treet::function_blockt &function_block);
@@ -184,6 +244,9 @@ private:
     const statement_list_parse_treet::tia_modulet &tia_module,
     symbolt &tia_symbol);
 
+  /// Checks if all jumps reference labels that exist.
+  void typecheck_label_references();
+
   /// Performs a typecheck on a single instruction and saves the result to the
   /// given symbol body if necessary.
   /// \param instruction: Instruction that should be checked.
@@ -191,6 +254,16 @@ private:
   void typecheck_statement_list_instruction(
     const statement_list_parse_treet::instructiont &instruction,
     symbolt &tia_element);
+
+  /// Performs a typecheck for the specified instruction in code form.
+  /// \param instruction: Code to check.
+  /// \param [out] tia_element: Symbol representation of the TIA module.
+  void typecheck_code(const codet &instruction, symbolt &tia_element);
+
+  /// Performs a typecheck for the given label in code form.
+  /// \param instruction: Label to check.
+  /// \param [out] tia_element: Symbol representation of the TIA module.
+  void typecheck_label(const codet &instruction, symbolt &tia_element);
 
   // Load and Transfer instructions
 
@@ -488,16 +561,55 @@ private:
   void
   typecheck_statement_list_reset(const codet &op_code, symbolt &tia_element);
 
-  // Control instructions
+  // Program Control instructions
 
   /// Performs a typecheck on a STL Call instruction and saves the result
-  /// to the given symbol. Modifies the OR and FC bit.
+  /// to the given symbol. Modifies the OR and /FC bit.
   /// \param op_code: OP code of the instruction.
   /// \param [out] tia_element: Symbol representation of the TIA element.
   void
   typecheck_statement_list_call(const codet &op_code, symbolt &tia_element);
 
+  // Logic Control instructions
+
+  /// Performs a typecheck on an unconditional jump instruction (JU) and adds
+  /// the jump to the given symbol.
+  /// \param op_code: OP code of the instruction.
+  /// \param [out] tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_jump_unconditional(
+    const codet &op_code,
+    symbolt &tia_element);
+
+  /// Performs a typecheck on a conditional jump instruction (JC) and adds it
+  /// to the given symbol. Modifies the /FC, RLO and OR bits.
+  /// \param op_code: OP code of the instruction.
+  /// \param [out] tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_jump_conditional(
+    const codet &op_code,
+    symbolt &tia_element);
+
+  /// Performs a typecheck on a inverted conditional jump instruction (JCN) and
+  /// adds it to the given symbol. Modifies the /FC, RLO and OR bits.
+  /// \param op_code: OP code of the instruction.
+  /// \param [out] tia_element: Symbol representation of the TIA element.
+  void typecheck_statement_list_jump_conditional_not(
+    const codet &op_code,
+    symbolt &tia_element);
+
   // Low level checks
+
+  /// Converts the properties of the current typecheck state to a label
+  /// location.
+  /// \param label: Label to check the properties for.
+  /// \return Encoded location information for the given label.
+  stl_label_locationt typecheck_label_location(const code_labelt &label);
+
+  /// Performs a typecheck on all references for the given label.
+  /// \param label: Label to check.
+  /// \param location: Data about the location of the label.
+  void typecheck_jump_locations(
+    const code_labelt &label,
+    const stl_label_locationt &location);
 
   /// Performs a typecheck on a STL Accumulator instruction for integers.
   /// \param op_code: OP code of the instruction.
@@ -515,7 +627,7 @@ private:
   /// Performs a typecheck on a STL instruction with an additional operand that
   /// should be no constant.
   /// \param op_code: OP code of the instruction.
-  /// \return: Reference to the operand.
+  /// \return Reference to the operand.
   const symbol_exprt &
   typecheck_instruction_with_non_const_operand(const codet &op_code);
 
@@ -543,7 +655,7 @@ private:
   /// \param tia_element: Symbol representation of the TIA element.
   /// \param negate: Whether the operand should be negated (e.g. for the
   ///   `AND NOT` expression).
-  /// \return: Typechecked operand.
+  /// \return Typechecked operand.
   exprt typecheck_simple_boolean_instruction_operand(
     const codet &op_code,
     const symbolt &tia_element,
@@ -554,10 +666,18 @@ private:
   ///   the RLO.
   void typecheck_accumulator_compare_instruction(const irep_idt &comparison);
 
+  /// Checks if the given label is already present and compares the current
+  /// state with it. If there is no entry for the label, a new jump location
+  /// is added to the typecheck for later verification.
+  /// \param label: Label to check.
+  /// \param sets_fc_false: Whether the encountered jump instruction sets the
+  ///   /FC bit to false.
+  void typecheck_label_reference(const irep_idt &label, bool sets_fc_false);
+
   /// Performs a typecheck on the given identifier and returns its symbol.
   /// \param identifier: Identifier that should be checked.
   /// \param tia_element: Symbol representation of the current TIA module.
-  /// \return: Expression including the symbol's name and type.
+  /// \return Expression including the symbol's name and type.
   exprt
   typecheck_identifier(const symbolt &tia_element, const irep_idt &identifier);
 
@@ -597,7 +717,7 @@ private:
   /// \param assignments: Assignment list of the function call.
   /// \param param: Parameter that should be checked.
   /// \param tia_element: Symbol representation of the TIA element.
-  /// \return: Expression including the assigned symbol's name and type.
+  /// \return Expression including the assigned symbol's name and type.
   exprt typecheck_function_call_arguments(
     const std::vector<equal_exprt> &assignments,
     const code_typet::parametert &param,
@@ -607,7 +727,7 @@ private:
   /// returns the typechecked version.
   /// \param tia_element: Symbol representation of the TIA element.
   /// \param rhs: Expression that the function parameter got assigned to.
-  /// \return: Expression of either a symbol or a constant.
+  /// \return Expression of either a symbol or a constant.
   exprt typecheck_function_call_argument_rhs(
     const symbolt &tia_element,
     const exprt &rhs);
@@ -618,7 +738,7 @@ private:
   /// \param assignments: Assignment list of the function call.
   /// \param return_type: Type of the return value.
   /// \param tia_element: Symbol representation of the TIA element.
-  /// \return: Expression including the assigned symbol's name and type.
+  /// \return Expression including the assigned symbol's name and type.
   exprt typecheck_return_value_assignment(
     const std::vector<equal_exprt> &assignments,
     const typet &return_type,
@@ -635,6 +755,16 @@ private:
   /// instruction was encontered.
   /// \param op: Operand of the encountered instruction.
   void initialize_bit_expression(const exprt &op);
+
+  /// Modifies the state of the typecheck to resemble the beginning of a new
+  /// module. All changes to the implicit typecheck fields are close to the
+  /// original TIA behaviour.
+  void clear_module_state();
+
+  /// Modifies the state of the typecheck to resemble the beginning of a new
+  /// network. All changes to the implicit typecheck fields are close to the
+  /// original TIA behaviour.
+  void clear_network_state();
 
   /// Saves the current RLO bit to a temporary variable to prevent false
   /// overrides when modifying boolean variables.

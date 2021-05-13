@@ -32,7 +32,7 @@ string_constantt convert_version(const std::string &src);
 
 /// Converts a string into a Statement List label.
 /// \param src: String returned by the parser.
-/// \return Code label expression representing the label.
-code_labelt convert_label(const std::string &src);
+/// \return String constant representing the label.
+string_constantt convert_label(const std::string &src);
 
 #endif // CPROVER_STATEMENT_LIST_CONVERTERS_CONVERT_STRING_VALUE_H

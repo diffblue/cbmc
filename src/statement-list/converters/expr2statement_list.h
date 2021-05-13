@@ -62,7 +62,7 @@ public:
   /// recursively in the process.
   /// \param expr: Expression to convert. Operands of this expression will be
   ///   converted as well via recursion.
-  /// \return: String containing human-readable STL code for the expression.
+  /// \return String containing human-readable STL code for the expression.
   std::string convert(const exprt &expr);
 
 private:
@@ -147,7 +147,7 @@ private:
   /// Returns the given identifier in a form that is compatible with STL by
   /// looking up the symbol or cutting the scope when needed.
   /// \param identifier: Identifier that should be converted.
-  /// \return: Converted identifier.
+  /// \return Converted identifier.
   irep_idt id_shorthand(const irep_idt &identifier);
 };
 
