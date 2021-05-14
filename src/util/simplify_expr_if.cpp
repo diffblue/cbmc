@@ -357,24 +357,24 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
       else if(falsevalue.is_false())
       {
         // a?b:0 <-> a AND b
-        return changed(simplify_node(and_exprt(cond, truevalue)));
+        return changed(simplify_boolean(and_exprt(cond, truevalue)));
       }
       else if(falsevalue.is_true())
       {
         // a?b:1 <-> !a OR b
         return changed(
-          simplify_node(or_exprt(simplify_not(not_exprt(cond)), truevalue)));
+          simplify_boolean(or_exprt(simplify_not(not_exprt(cond)), truevalue)));
       }
       else if(truevalue.is_true())
       {
         // a?1:b <-> a||(!a && b) <-> a OR b
-        return changed(simplify_node(or_exprt(cond, falsevalue)));
+        return changed(simplify_boolean(or_exprt(cond, falsevalue)));
       }
       else if(truevalue.is_false())
       {
         // a?0:b <-> !a && b
-        return changed(
-          simplify_node(and_exprt(simplify_not(not_exprt(cond)), falsevalue)));
+        return changed(simplify_boolean(
+          and_exprt(simplify_not(not_exprt(cond)), falsevalue)));
       }
     }
   }

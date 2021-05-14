@@ -47,11 +47,8 @@ simplify_exprt::simplify_member(const member_exprt &expr)
           DATA_INVARIANT(
             op2.type() == expr.type(),
             "member expression type must match component type");
-          exprt tmp;
-          tmp.swap(op2);
 
-          // do this recursively
-          return changed(simplify_rec(tmp));
+          return op2;
         }
         else // something else, get rid of it
           new_operands.resize(new_operands.size() - 2);
@@ -71,10 +68,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       if(with_expr.where().get(ID_component_name)==component_name)
       {
         // WITH(s, .m, v).m -> v
-        auto tmp = with_expr.new_value();
-
-        // do this recursively
-        return changed(simplify_rec(tmp));
+        return with_expr.new_value();
       }
     }
   }
@@ -93,10 +87,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         if(designator.front().get(ID_component_name)==component_name)
         {
           // UPDATE(s, .m, v).m -> v
-          exprt tmp=update_expr.new_value();
-
-          // do this recursively
-          return changed(simplify_rec(tmp));
+          return update_expr.new_value();
         }
         // the following optimization only works on structs,
         // and not on unions
@@ -107,7 +98,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
           new_expr.struct_op() = update_expr.old();
 
           // do this recursively
-          return changed(simplify_rec(new_expr));
+          return changed(simplify_member(new_expr));
         }
       }
     }
@@ -158,12 +149,12 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       const exprt &struct_offset = byte_extract_expr.offset();
       exprt member_offset = from_integer(*offset_int, struct_offset.type());
       exprt final_offset =
-        simplify_node(plus_exprt(struct_offset, member_offset));
+        simplify_plus(plus_exprt(struct_offset, member_offset));
 
       byte_extract_exprt result(
         op.id(), byte_extract_expr.op(), final_offset, expr.type());
 
-      return changed(simplify_rec(result)); // recursive call
+      return changed(simplify_byte_extract(result)); // recursive call
     }
     else if(op_type.id() == ID_union)
     {
