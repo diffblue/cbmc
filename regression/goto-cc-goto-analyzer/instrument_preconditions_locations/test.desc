@@ -1,0 +1,16 @@
+CORE
+test.c
+--verify
+^EXIT=0$
+^SIGNAL=0$
+Checking assertions
+^\[EVP_MD_CTX_free.precondition_instance.1\] line \d+ free argument must be NULL or valid pointer: SUCCESS
+--
+Invariant check failed
+--
+This test checks that after building the goto binary (see test.sh)
+that there is no errors that lead to invariant violations.
+This was created after a bug was found due to the
+instrument_preconditions code not correctly fixing locations and
+the invariant check of partial inlining detecting this location
+inconsistency.
