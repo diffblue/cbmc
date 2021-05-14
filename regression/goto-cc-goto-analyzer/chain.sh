@@ -9,12 +9,17 @@ is_windows=$3
 options=${*:4:$#-4}
 name=${*:$#}
 name=${name%.c}
+buildgoto=${name}.sh
 
-if [[ "${is_windows}" == "true" ]]; then
-  "${goto_cc}" "${name}.c"
-  mv "${name}.exe" "${name}.gb"
+if test -f ${buildgoto}; then
+  ./${buildgoto} ${goto_cc} ${is_windows}
 else
-  "${goto_cc}" "${name}.c" -o "${name}.gb"
+  if [[ "${is_windows}" == "true" ]]; then
+    "${goto_cc}" "${name}.c"
+    mv "${name}.exe" "${name}.gb"
+  else
+    "${goto_cc}" "${name}.c" -o "${name}.gb"
+  fi
 fi
 
 "${goto_analyzer}" "${name}.gb" ${options}
