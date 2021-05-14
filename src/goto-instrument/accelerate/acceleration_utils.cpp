@@ -905,8 +905,8 @@ bool acceleration_utilst::do_nonrecursive(
   {
     if(it->is_assign())
     {
-      exprt lhs = it->get_assign().lhs();
-      exprt rhs = it->get_assign().rhs();
+      exprt lhs = it->assign_lhs();
+      exprt rhs = it->assign_rhs();
 
       if(lhs.id()==ID_dereference)
       {

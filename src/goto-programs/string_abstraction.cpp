@@ -517,10 +517,8 @@ goto_programt::targett string_abstractiont::abstract_assign(
   goto_programt::targett target)
 {
   {
-    code_assignt assign = target->get_assign();
-
-    exprt &lhs = assign.lhs();
-    exprt &rhs = assign.rhs();
+    exprt &lhs = target->assign_lhs_nonconst();
+    exprt &rhs = target->assign_rhs_nonconst();
 
     if(has_string_macros(lhs))
     {
@@ -530,11 +528,9 @@ goto_programt::targett string_abstractiont::abstract_assign(
 
     if(has_string_macros(rhs))
       replace_string_macros(rhs, false, target->source_location);
-
-    target->set_assign(assign);
   }
 
-  const typet &type = target->get_assign().lhs().type();
+  const typet &type = target->assign_lhs().type();
 
   if(type.id() == ID_pointer || type.id() == ID_array)
     return abstract_pointer_assign(dest, target);
@@ -1110,11 +1106,9 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
   goto_programt &dest,
   const goto_programt::targett target)
 {
-  const code_assignt &assign = target->get_assign();
-
-  const exprt &lhs = assign.lhs();
-  const exprt rhs = assign.rhs();
-  const exprt *rhsp = &(assign.rhs());
+  const exprt &lhs = target->assign_lhs();
+  const exprt rhs = target->assign_rhs();
+  const exprt *rhsp = &(target->assign_rhs());
 
   while(rhsp->id()==ID_typecast)
     rhsp = &(to_typecast_expr(*rhsp).op());
@@ -1152,10 +1146,8 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  const code_assignt &assign = target->get_assign();
-
-  const exprt &lhs = assign.lhs();
-  const exprt *rhsp = &(assign.rhs());
+  const exprt &lhs = target->assign_lhs();
+  const exprt *rhsp = &(target->assign_rhs());
 
   while(rhsp->id()==ID_typecast)
     rhsp = &(to_typecast_expr(*rhsp).op());

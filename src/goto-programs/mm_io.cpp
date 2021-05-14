@@ -48,8 +48,9 @@ void mm_io(
 
     if(it->is_assign())
     {
-      auto a = it->get_assign();
-      collect_deref_expr(a.rhs(), deref_expr_r);
+      auto &a_lhs = it->assign_lhs();
+      auto &a_rhs = it->assign_rhs_nonconst();
+      collect_deref_expr(a_rhs, deref_expr_r);
 
       if(mm_io_r.is_not_nil())
       {
@@ -62,8 +63,7 @@ void mm_io(
           irep_idt identifier=to_symbol_expr(mm_io_r).get_identifier();
           auto return_value = return_value_symbol(identifier, ns);
           if_exprt if_expr(integer_address(d.pointer()), return_value, d);
-          if(!replace_expr(d, if_expr, a.rhs()))
-            it->set_assign(a);
+          replace_expr(d, if_expr, a_rhs);
 
           const typet &pt=ct.parameters()[0].type();
           const typet &st=ct.parameters()[1].type();
@@ -81,9 +81,9 @@ void mm_io(
 
       if(mm_io_w.is_not_nil())
       {
-        if(a.lhs().id()==ID_dereference)
+        if(a_lhs.id() == ID_dereference)
         {
-          const dereference_exprt &d=to_dereference_expr(a.lhs());
+          const dereference_exprt &d = to_dereference_expr(a_lhs);
           source_locationt source_location=it->source_location;
           const code_typet &ct=to_code_type(mm_io_w.type());
           const typet &pt=ct.parameters()[0].type();
@@ -95,7 +95,7 @@ void mm_io(
             mm_io_w,
             {typecast_exprt(d.pointer(), pt),
              typecast_exprt(size_opt.value(), st),
-             typecast_exprt(a.rhs(), vt)});
+             typecast_exprt(a_rhs, vt)});
           goto_function.body.insert_before_swap(it);
           *it = goto_programt::make_function_call(fc, source_location);
           it++;

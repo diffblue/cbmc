@@ -208,10 +208,8 @@ void goto_program_dereferencet::dereference_instruction(
 
   if(i.is_assign())
   {
-    auto assignment = i.get_assign();
-    dereference_expr(assignment.lhs(), checks_only);
-    dereference_expr(assignment.rhs(), checks_only);
-    i.set_assign(assignment);
+    dereference_expr(i.assign_lhs_nonconst(), checks_only);
+    dereference_expr(i.assign_rhs_nonconst(), checks_only);
   }
   else if(i.is_function_call())
   {

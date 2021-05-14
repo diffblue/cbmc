@@ -47,8 +47,7 @@ void _rw_set_loct::compute()
 {
   if(target->is_assign())
   {
-    const auto &assignment = target->get_assign();
-    assign(assignment.lhs(), assignment.rhs());
+    assign(target->assign_lhs(), target->assign_rhs());
   }
   else if(target->is_goto() ||
           target->is_assume() ||

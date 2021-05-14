@@ -228,15 +228,9 @@ void nondet_volatilet::nondet_volatile(
     if(instruction.is_assign())
     {
       nondet_volatile_rhs(
-        symbol_table,
-        to_code_assign(instruction.code_nonconst()).rhs(),
-        pre,
-        post);
+        symbol_table, instruction.assign_rhs_nonconst(), pre, post);
       nondet_volatile_lhs(
-        symbol_table,
-        to_code_assign(instruction.code_nonconst()).lhs(),
-        pre,
-        post);
+        symbol_table, instruction.assign_lhs_nonconst(), pre, post);
     }
     else if(instruction.is_function_call())
     {

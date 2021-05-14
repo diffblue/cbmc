@@ -93,8 +93,8 @@ void slice_global_inits(goto_modelt &goto_model)
     {
       if(!*seen_it && instruction.is_assign())
       {
-        const code_assignt &code_assign = instruction.get_assign();
-        const irep_idt id = to_symbol_expr(code_assign.lhs()).get_identifier();
+        const irep_idt id =
+          to_symbol_expr(instruction.assign_lhs()).get_identifier();
 
         // if we are to keep the left-hand side, then we also need to keep all
         // symbols occurring in the right-hand side
@@ -103,7 +103,7 @@ void slice_global_inits(goto_modelt &goto_model)
           symbols_to_keep.find(id) != symbols_to_keep.end())
         {
           fixed_point_reached = false;
-          find_symbols(code_assign.rhs(), symbols_to_keep, true, false);
+          find_symbols(instruction.assign_rhs(), symbols_to_keep, true, false);
           *seen_it = true;
         }
       }
@@ -119,8 +119,8 @@ void slice_global_inits(goto_modelt &goto_model)
   {
     if(instruction.is_assign())
     {
-      const code_assignt &code_assign = instruction.get_assign();
-      const symbol_exprt &symbol_expr=to_symbol_expr(code_assign.lhs());
+      const symbol_exprt &symbol_expr =
+        to_symbol_expr(instruction.assign_lhs());
       const irep_idt id=symbol_expr.get_identifier();
 
       if(

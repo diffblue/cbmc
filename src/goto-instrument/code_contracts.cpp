@@ -534,7 +534,7 @@ void code_contractst::instrument_assign_statement(
     "The first instruction of instrument_assign_statement should always be"
     " an assignment");
 
-  const exprt &lhs = instruction_iterator->get_assign().lhs();
+  const exprt &lhs = instruction_iterator->assign_lhs();
 
   goto_programt alias_assertion;
   alias_assertion.add(goto_programt::make_assertion(
@@ -573,7 +573,7 @@ void code_contractst::instrument_call_statement(
     local_instruction_iterator++;
     if(local_instruction_iterator->is_assign())
     {
-      const exprt &rhs = local_instruction_iterator->get_assign().rhs();
+      const exprt &rhs = local_instruction_iterator->assign_rhs();
       INVARIANT(
         rhs.id() == ID_typecast,
         "malloc is called but the result is not cast. Excluding result from "

@@ -100,8 +100,7 @@ void replace_callst::operator()(
       goto_programt::const_targett next_it = std::next(it);
       if(next_it != goto_program.instructions.end() && next_it->is_assign())
       {
-        const code_assignt &ca = next_it->get_assign();
-        const exprt &rhs = ca.rhs();
+        const exprt &rhs = next_it->assign_rhs();
 
         INVARIANT(
           rhs != return_value_symbol(id, ns),

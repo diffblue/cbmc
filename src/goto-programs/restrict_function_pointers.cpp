@@ -414,17 +414,15 @@ function_pointer_restrictionst::get_by_name_restriction(
 
   const goto_programt::const_targett it = std::prev(location);
 
-  const code_assignt &assign = it->get_assign();
-
   INVARIANT(
-    to_symbol_expr(assign.lhs()).get_identifier() ==
+    to_symbol_expr(it->assign_lhs()).get_identifier() ==
       function_pointer_call_site.get_identifier(),
     "called function pointer must have been assigned at the previous location");
 
-  if(!can_cast_expr<symbol_exprt>(assign.rhs()))
+  if(!can_cast_expr<symbol_exprt>(it->assign_rhs()))
     return {};
 
-  const auto &rhs = to_symbol_expr(assign.rhs());
+  const auto &rhs = to_symbol_expr(it->assign_rhs());
 
   const auto restriction = by_name_restrictions.find(rhs.get_identifier());
 

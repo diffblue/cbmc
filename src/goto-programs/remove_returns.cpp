@@ -310,14 +310,15 @@ bool remove_returnst::restore_returns(
   {
     if(instruction.is_assign())
     {
-      const auto &assign = instruction.get_assign();
-
-      if(assign.lhs().id()!=ID_symbol ||
-         to_symbol_expr(assign.lhs()).get_identifier()!=rv_name_id)
+      if(
+        instruction.assign_lhs().id() != ID_symbol ||
+        to_symbol_expr(instruction.assign_lhs()).get_identifier() != rv_name_id)
+      {
         continue;
+      }
 
       // replace "fkt#return_value=x;" by "return x;"
-      const exprt rhs = assign.rhs();
+      const exprt rhs = instruction.assign_rhs();
       instruction = goto_programt::make_return(
         code_returnt(rhs), instruction.source_location);
       did_something = true;
@@ -360,14 +361,12 @@ void remove_returnst::undo_function_calls(
       if(!next->is_assign())
         continue;
 
-      const code_assignt &assign = next->get_assign();
-
       const auto rv_symbol = return_value_symbol(function_id, ns);
-      if(assign.rhs() != rv_symbol)
+      if(next->assign_rhs() != rv_symbol)
         continue;
 
       // restore the previous assignment
-      function_call.lhs()=assign.lhs();
+      function_call.lhs() = next->assign_lhs();
 
       i_it->set_function_call(function_call);
 
