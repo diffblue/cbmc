@@ -1,0 +1,12 @@
+CORE
+main.c
+-Dlocals_bug
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+We previously missed SHARED_WRITE events in program order in a newly-spawned
+thread for dirty locals, resulting in spurious failures as reading from initial
+values seemed possible.
