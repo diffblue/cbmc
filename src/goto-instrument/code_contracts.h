@@ -185,9 +185,9 @@ protected:
   /// the quantified variable is added to the symbol table
   /// and to the expression map.
   void add_quantified_variable(
-    exprt expression,
+    const exprt &expression,
     replace_symbolt &replace,
-    irep_idt mode);
+    const irep_idt &mode);
 
   /// This function recursively identifies the "old" expressions within expr
   /// and replaces them with correspoding history variables.

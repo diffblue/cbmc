@@ -352,7 +352,10 @@ public:
 
   exprt &assigns()
   {
-    return static_cast<exprt &>(add(ID_C_spec_assigns));
+    auto &result = static_cast<exprt &>(add(ID_C_spec_assigns));
+    if(result.id().empty()) // not initialized?
+      result.make_nil();
+    return result;
   }
 
   const exprt &requires() const
@@ -362,7 +365,10 @@ public:
 
   exprt &requires()
   {
-    return static_cast<exprt &>(add(ID_C_spec_requires));
+    auto &result = static_cast<exprt &>(add(ID_C_spec_requires));
+    if(result.id().empty()) // not initialized?
+      result.make_nil();
+    return result;
   }
 
   const exprt &ensures() const
@@ -372,7 +378,10 @@ public:
 
   exprt &ensures()
   {
-    return static_cast<exprt &>(add(ID_C_spec_ensures));
+    auto &result = static_cast<exprt &>(add(ID_C_spec_ensures));
+    if(result.id().empty()) // not initialized?
+      result.make_nil();
+    return result;
   }
 };
 
