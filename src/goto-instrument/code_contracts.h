@@ -19,6 +19,7 @@ Date: February 2016
 #include <string>
 #include <unordered_set>
 
+#include <goto-programs/goto_convert_class.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
 
@@ -26,7 +27,10 @@ Date: February 2016
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 
+#include "loop_utils.h"
+
 class assigns_clauset;
+class local_may_aliast;
 class replace_symbolt;
 
 class code_contractst
@@ -36,8 +40,9 @@ public:
     : ns(goto_model.symbol_table),
       symbol_table(goto_model.symbol_table),
       goto_functions(goto_model.goto_functions),
-      temporary_counter(0),
-      log(log)
+      log(log),
+      converter(symbol_table, log.get_message_handler())
+
   {
   }
 
@@ -89,25 +94,26 @@ public:
     const irep_idt &function_id,
     const irep_idt &mode);
 
+  void check_apply_invariants(
+    goto_functionst::goto_functiont &goto_function,
+    const local_may_aliast &local_may_alias,
+    const goto_programt::targett loop_head,
+    const loopt &loop,
+    const irep_idt &mode);
+
   namespacet ns;
 
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 
-  unsigned temporary_counter;
   messaget &log;
+  goto_convertt converter;
 
   std::unordered_set<irep_idt> summarized;
 
   /// \brief Enforce contract of a single function
   bool enforce_contract(const std::string &);
-
-  /// \brief Create goto instructions based on code and add them to program.
-  void convert_to_goto(
-    const codet &code,
-    const irep_idt &mode,
-    goto_programt &program);
 
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
@@ -159,7 +165,9 @@ protected:
     const exprt &lhs,
     std::vector<exprt> &aliasable_references);
 
-  void apply_loop_contract(goto_functionst::goto_functiont &goto_function);
+  void apply_loop_contract(
+    const irep_idt &function_name,
+    goto_functionst::goto_functiont &goto_function);
 
   /// \brief Does the named function have a contract?
   bool has_contract(const irep_idt);

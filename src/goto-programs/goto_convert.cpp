@@ -868,13 +868,11 @@ void goto_convertt::convert_loop_invariant(
   if(invariant.is_nil())
     return;
 
-  goto_programt no_sideeffects;
-  clean_expr(invariant, no_sideeffects, mode);
-
-  INVARIANT_WITH_DIAGNOSTICS(
-    no_sideeffects.instructions.empty(),
-    "loop invariant is not side-effect free",
-    code.find_source_location());
+  if(has_subexpr(invariant, ID_side_effect))
+  {
+    throw incorrect_goto_program_exceptiont(
+      "Loop invariant is not side-effect free.", code.find_source_location());
+  }
 
   PRECONDITION(loop->is_goto());
   loop->guard.add(ID_C_spec_loop_invariant).swap(invariant);
