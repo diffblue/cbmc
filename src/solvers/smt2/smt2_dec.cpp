@@ -31,6 +31,7 @@ std::string smt2_dect::decision_procedure_text() const
   // clang-format on
 }
 
+#include <iostream>
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
   ++number_of_solver_calls;
@@ -44,6 +45,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     std::ofstream problem_out(
       temp_file_problem(), std::ios_base::out | std::ios_base::trunc);
     problem_out << stringstream.str();
+    std::cout<<stringstream.str() << std::endl;
     write_footer(problem_out);
   }
 
@@ -74,7 +76,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
-    argv = {"cvc4", "-L", "smt2", temp_file_problem()};
+    argv = {"cvc4", "-L", "smt2", "--produce-models", "--nl-ext-tplanes", temp_file_problem()};
     break;
 
   case solvert::MATHSAT:
