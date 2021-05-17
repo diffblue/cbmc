@@ -192,6 +192,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2/smt2_parser.cpp \
       smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
+      smt2_incremental/smt2_incremental_decision_procedure.cpp \
       # Empty last line
 
 include ../common
