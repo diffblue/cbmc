@@ -1,4 +1,4 @@
-# WHAT ARCHITECTURE?
+#WHAT ARCHITECTURE ?
 
 CPROVER now needs a C++11 compliant compiler and is known to work in the
 following environments:
@@ -18,7 +18,7 @@ past, but are not actively tested:
 - Solaris 11
 - FreeBSD 11
 
-# Building using CMake
+#Building using CMake
 
 Building with CMake is supported across Linux, MacOS X and Windows with Visual
 Studio 2019. There are also hand-written make files which can be used to build
@@ -119,11 +119,11 @@ files.
    complete set of built binaries can be found in `build/bin/` once the build
    is complete.
 
-   *Parellel building*: You can pass `-j<numjobs>` to `make` to indicate how many
+   *Parallel building*: You can pass `-j<numjobs>` to `make` to indicate how many
    jobs to run simultaneously. `ninja` defaults to building with `# of cores + 2`
    jobs at the same time.
 
-# Building using Make
+#Building using Make
 
 The rest of this section is split up based on the platform being built on.
 Please read the section appropriate for your platform.
@@ -258,7 +258,7 @@ Maven 3 manually.
    gmake -C jbmc/src
    ```
 
-# Working with IDEs and Docker
+#Working with IDEs and Docker
 
 ## Working with Visual Studio on Windows
 
@@ -311,7 +311,7 @@ To compile and run the tools in a Docker container, do the following:
    In the resulting container, the files present in the local file system under
    `local/path/with/files` will be present under `/mnt/analysis`.
 
-# Compilation options and configuration
+#Compilation options and configuration
 
 ## Compiling with CUDD
 
@@ -507,3 +507,48 @@ successfully on Windows or macOS.
    The argument for the IPASIR parameter gives the build system the location for
    the IPASIR headers, which is needed for the cbmc includes of `ipasir.h`. The
    compiled binary will be placed in `cbmc/src/cbmc/cbmc`.
+This document assumes you have already been able to build CPROVER on
+your chosen architecture.
+
+#RUNNING REGRESSION AND UNIT TESTS
+
+Regression and unit tests can be run using cmake or make. Your choice here
+should be the same as the compiling of the project itself.
+
+Note that running all regression and unit tests can be slow when a debug
+build of CPROVER is used.
+
+## CMAKE
+
+This can be done by changing to the directory you built the
+project in with cmake and running ctest as follows.
+```
+cd <build_dir>
+ctest . -V -L CORE
+```
+You can also specify a pattern of tests to run as follows.
+```
+ctest . -V -L CORE -R <pattern>
+```
+For example
+```
+ctest . -V -L CORE -R goto
+```
+that will run all CORE tests that include `goto` in their
+name.
+
+## MAKE
+
+The regression and unit tests are handled differently in the
+make system. To run the regressions tests change to the
+`regression` directory and simply running make as follows.
+```
+cd regression
+make test
+```
+To run the unit tests, change into the `unit` directory and
+then run make as follows.
+```
+cd unit
+make test
+```
