@@ -409,6 +409,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("smt2", true);
   }
 
+  if(cmdline.isset("incremental-smt2-solver"))
+  {
+    options.set_option(
+      "incremental-smt2-solver", cmdline.get_value("incremental-smt2-solver")),
+      solver_set = true;
+  }
+
   if(cmdline.isset("external-sat-solver"))
   {
     options.set_option(
@@ -1042,6 +1049,9 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --incremental-smt2-solver cmd\n"
+    "                              command to invoke external SMT solver for\n"
+    "                              incremental solving (experimental)\n"
     " --external-sat-solver cmd    command to invoke SAT solver process\n"
     HELP_STRING_REFINEMENT_CBMC
     " --outfile filename           output formula to given file\n"
