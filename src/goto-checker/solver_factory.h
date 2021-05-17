@@ -23,7 +23,7 @@ class propt;
 class decision_proceduret;
 class stack_decision_proceduret;
 
-class solver_factoryt
+class solver_factoryt final
 {
 public:
   /// Note: The solver returned will hold a reference to the namespace `ns`.
@@ -35,7 +35,7 @@ public:
 
   // The solver class,
   // which owns a variety of allocated objects.
-  class solvert
+  class solvert final
   {
   public:
     solvert() = default;
