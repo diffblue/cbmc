@@ -490,8 +490,8 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
 
   // stitch the bits together. NB width_f *includes* this hidden bit
   return typecast_exprt(
-    concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e)),
-    ieee_float_spect(width_f-1, width_e).to_type());
+    concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e + 1)),
+    ieee_float_spect(width_f, width_e).to_type());
 }
 
 exprt smt2_parsert::function_application()
@@ -947,7 +947,16 @@ exprt smt2_parsert::expression()
     }
     else
     {
-      return constant_exprt(buffer, integer_typet());
+      auto real_number = buffer;
+      auto dot_pos = real_number.find('.');
+      if(dot_pos == std::string::npos)
+      {
+        return constant_exprt(buffer, integer_typet());
+      }
+      else
+      {
+        return constant_exprt(buffer, real_typet());
+      }
     }
   }
 
@@ -1212,6 +1221,15 @@ void smt2_parsert::setup_expressions()
       throw error("fp.isNaN takes FloatingPoint operand");
 
     return unary_predicate_exprt(ID_isnan, op[0]);
+  };
+
+  expressions["fp.to_real"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.to_real takes one operand");
+
+    return typecast_exprt(op[0], real_typet());
   };
 
   expressions["fp.isInf"] = [this] {

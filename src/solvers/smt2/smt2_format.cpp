@@ -121,6 +121,10 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
             << "#b" << binaryString.substr(1 + e, f - 1) << ")";
       }
     }
+    else if(expr_type.id() == ID_real)
+    {
+      out << value;
+    }
     else
       DATA_INVARIANT(false, "unhandled constant: " + expr_type.id_string());
   }
