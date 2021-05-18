@@ -172,6 +172,15 @@ exprt abstract_objectt::to_constant() const
   return nil_exprt();
 }
 
+exprt abstract_objectt::to_predicate(exprt name) const
+{
+  if(is_top())
+    return true_exprt();
+  if(is_bottom())
+    return false_exprt();
+  return nil_exprt();
+}
+
 void abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,
