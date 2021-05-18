@@ -917,9 +917,14 @@ exprt smt2_parsert::expression()
         symbol_exprt symbol_expr(identifier, id_it->second.type);
         if(smt2_tokenizer.token_is_quoted_symbol())
           symbol_expr.set(ID_C_quoted, true);
-        return std::move(symbol_expr);
-      }
-
+        if(symbol_expr.type().id() == ID_mathematical_function &&
+           to_mathematical_function_type(symbol_expr.type()).domain().empty())
+        {
+          return function_application_exprt(symbol_expr, {});
+        }
+        else
+          return std::move(symbol_expr);
+       }
       // don't know, give up
       throw error() << "unknown expression '" << identifier << '\'';
     }
