@@ -445,8 +445,8 @@ exprt smt2_parsert::function_application_ieee_float_op(
   if(op.size() != 3)
     throw error() << id << " takes three operands";
 
-  if(op[1].type().id() != ID_floatbv || op[2].type().id() != ID_floatbv)
-    throw error() << id << " takes FloatingPoint operands";
+  if(op[1].type().id() != ID_floatbv || op[2].type().id() != ID_floatbv )
+    throw error() << id << " takes FloatingPoint operands but got " << smt2_format(op[1].type()) <<" and "<<  smt2_format(op[2].type());
 
   if(op[1].type() != op[2].type())
   {
@@ -1229,7 +1229,7 @@ void smt2_parsert::setup_expressions()
     if(op.size() != 1)
       throw error("fp.to_real takes one operand");
 
-    return typecast_exprt(op[0], real_typet());
+    return floatbv_typecast_exprt(op[0], from_integer(0,unsignedbv_typet(32)), real_typet());
   };
 
   expressions["fp.isInf"] = [this] {

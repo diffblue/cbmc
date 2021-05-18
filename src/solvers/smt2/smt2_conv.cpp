@@ -2576,16 +2576,6 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       else
         convert_expr(src);
     }
-    else if(src_type.id() == ID_real)
-    {
-      ieee_float_spect float_spec;
-      float_spec.from_type(to_floatbv_type(dest_type));
-      out << "((_ to_fp " << integer2string(float_spec.e) << " "
-          << integer2string(float_spec.f + 1) << ")";
-      out << " roundNearestTiesToEven ";
-      convert_expr(src);
-      out << ")";
-    }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
   }
@@ -2725,6 +2715,22 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
           src,
           ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
       convert_floatbv_typecast(tmp);
+    }
+    else if(src_type.id()==ID_real)
+    {
+      if(use_FPA_theory)
+      {
+        const floatbv_typet &dst=to_floatbv_type(dest_type);
+        out << "((_ to_fp " << dst.get_e() << " "
+            << dst.get_f() + 1 << ") ";
+        convert_rounding_mode_FPA(expr.op1());
+        out << " ";
+        convert_expr(src);
+        out << ")";
+      }
+      else
+        UNEXPECTEDCASE(
+        "TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());    
     }
     else
       UNEXPECTEDCASE(
