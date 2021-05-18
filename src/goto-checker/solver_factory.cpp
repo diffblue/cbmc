@@ -411,7 +411,7 @@ void solver_factoryt::no_incremental_check()
 {
   const bool all_properties = options.get_bool_option("all-properties");
   const bool cover = options.is_set("cover");
-  const bool incremental_check = options.is_set("incremental-check");
+  const bool incremental_loop = options.is_set("incremental-loop");
 
   if(all_properties)
   {
@@ -424,10 +424,10 @@ void solver_factoryt::no_incremental_check()
     throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support incremental solving", "--cover");
   }
-  else if(incremental_check)
+  else if(incremental_loop)
   {
     throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support incremental solving",
-      "--incremental-check");
+      "--incremental-loop");
   }
 }

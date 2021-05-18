@@ -1,0 +1,14 @@
+CORE
+main.c
+--incremental-loop main.0 --unwinding-assertions --dimacs
+^Invalid User Input$
+^Option: --incremental-loop$
+^Reason: the chosen solver does not support incremental solving$
+^EXIT=1$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Unwinding loop
+--
+Test that an appropriate error is shown when using --incremental-loop in
+combination with a solver which does not support incremental solving.
