@@ -1,7 +1,17 @@
+// This file is highly reduced from some open source projects.
+// The following four lines are adapted from the openssl library
+// Full repository here:
+// Exact file adapted from here: https://github.com/openssl/openssl/tree/master
+// https://github.com/openssl/openssl/blob/master/crypto/evp/evp_local.h
 struct evp_md_ctx_st
 {
   const void *digest;
 };
+// The rest of this file is adapted from, various files in the
+// AWS s2n library. Full repository and licence information is
+// available here: https://github.com/aws/s2n-tls
+// Note that this is a highly cut down synthesis of many files
+// with most of their content and structure reduced.
 struct s2n_evp_digest
 {
   const void *ctx;
