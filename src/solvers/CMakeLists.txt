@@ -139,7 +139,7 @@ elseif("${sat_impl}" STREQUAL "ipasir-cadical")
     download_project(PROJ cadical
         URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
-        COMMAND ./configure CXX=g++
+        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++14
         URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 
