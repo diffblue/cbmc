@@ -13,17 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/std_types.h>
+#include <util/message.h>
+#include <util/pointer_expr.h>
 #include <util/string_constant.h>
 
 #include "gcc_types.h"
-
-void ansi_c_convert_typet::read(const typet &type)
-{
-  clear();
-  source_location=type.source_location();
-  read_rec(type);
-}
 
 void ansi_c_convert_typet::read_rec(const typet &type)
 {
@@ -266,6 +260,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
 
 void ansi_c_convert_typet::write(typet &type)
 {
+  messaget log{message_handler};
+
   type.clear();
 
   // first, do "other"
@@ -282,8 +278,8 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float128_cnt || gcc_float128x_cnt ||
        gcc_int128_cnt || bv_cnt)
     {
-      error().source_location=source_location;
-      error() << "illegal type modifier for defined type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for defined type" << messaget::eom;
       throw 0;
     }
 
@@ -298,8 +294,8 @@ void ansi_c_convert_typet::write(typet &type)
 
     if(other.size()!=1)
     {
-      error().source_location=source_location;
-      error() << "illegal combination of defined types" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal combination of defined types" << messaget::eom;
       throw 0;
     }
 
@@ -319,9 +315,9 @@ void ansi_c_convert_typet::write(typet &type)
     {
       if(constructor && destructor)
       {
-        error().source_location=source_location;
-        error() << "combining constructor and destructor not supported"
-                << eom;
+        log.error().source_location = source_location;
+        log.error() << "combining constructor and destructor not supported"
+                    << messaget::eom;
         throw 0;
       }
 
@@ -331,9 +327,9 @@ void ansi_c_convert_typet::write(typet &type)
 
       else if(type_p->id()!=ID_empty)
       {
-        error().source_location=source_location;
-        error() << "constructor and destructor required to be type void, "
-                << "found " << type_p->pretty() << eom;
+        log.error().source_location = source_location;
+        log.error() << "constructor and destructor required to be type void, "
+                    << "found " << type_p->pretty() << messaget::eom;
         throw 0;
       }
 
@@ -342,9 +338,9 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(constructor || destructor)
   {
-    error().source_location=source_location;
-    error() << "constructor and destructor required to be type void, "
-            << "found " << type.pretty() << eom;
+    log.error().source_location = source_location;
+    log.error() << "constructor and destructor required to be type void, "
+                << "found " << type.pretty() << messaget::eom;
     throw 0;
   }
   else if(gcc_float16_cnt ||
@@ -357,8 +353,9 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_int128_cnt || bv_cnt ||
        short_cnt || char_cnt)
     {
-      error().source_location=source_location;
-      error() << "cannot combine integer type with floating-point type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "cannot combine integer type with floating-point type"
+                  << messaget::eom;
       throw 0;
     }
 
@@ -368,8 +365,8 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float64_cnt+gcc_float64x_cnt+
        gcc_float128_cnt+gcc_float128x_cnt>=2)
     {
-      error().source_location=source_location;
-      error() << "conflicting type modifiers" << eom;
+      log.error().source_location = source_location;
+      log.error() << "conflicting type modifiers" << messaget::eom;
       throw 0;
     }
 
@@ -398,15 +395,16 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_int128_cnt|| bv_cnt ||
        short_cnt || char_cnt)
     {
-      error().source_location=source_location;
-      error() << "cannot combine integer type with floating-point type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "cannot combine integer type with floating-point type"
+                  << messaget::eom;
       throw 0;
     }
 
     if(double_cnt && float_cnt)
     {
-      error().source_location=source_location;
-      error() << "conflicting type modifiers" << eom;
+      log.error().source_location = source_location;
+      log.error() << "conflicting type modifiers" << messaget::eom;
       throw 0;
     }
 
@@ -423,15 +421,15 @@ void ansi_c_convert_typet::write(typet &type)
         type=long_double_type();
       else
       {
-        error().source_location=source_location;
-        error() << "conflicting type modifiers" << eom;
+        log.error().source_location = source_location;
+        log.error() << "conflicting type modifiers" << messaget::eom;
         throw 0;
       }
     }
     else
     {
-      error().source_location=source_location;
-      error() << "illegal type modifier for float" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for float" << messaget::eom;
       throw 0;
     }
   }
@@ -442,8 +440,9 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float128_cnt || bv_cnt || proper_bool_cnt ||
        char_cnt || long_cnt)
     {
-      error().source_location=source_location;
-      error() << "illegal type modifier for C boolean type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for C boolean type"
+                  << messaget::eom;
       throw 0;
     }
 
@@ -456,8 +455,9 @@ void ansi_c_convert_typet::write(typet &type)
        gcc_float128_cnt || bv_cnt ||
        char_cnt || long_cnt)
     {
-      error().source_location=source_location;
-      error() << "illegal type modifier for proper boolean type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for proper boolean type"
+                  << messaget::eom;
       throw 0;
     }
 
@@ -475,15 +475,15 @@ void ansi_c_convert_typet::write(typet &type)
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
        gcc_float128_cnt || bv_cnt || proper_bool_cnt)
     {
-      error().source_location=source_location;
-      error() << "illegal type modifier for char type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for char type" << messaget::eom;
       throw 0;
     }
 
     if(signed_cnt && unsigned_cnt)
     {
-      error().source_location=source_location;
-      error() << "conflicting type modifiers" << eom;
+      log.error().source_location = source_location;
+      log.error() << "conflicting type modifiers" << messaget::eom;
       throw 0;
     }
     else if(unsigned_cnt)
@@ -501,8 +501,8 @@ void ansi_c_convert_typet::write(typet &type)
 
     if(signed_cnt && unsigned_cnt)
     {
-      error().source_location=source_location;
-      error() << "conflicting type modifiers" << eom;
+      log.error().source_location = source_location;
+      log.error() << "conflicting type modifiers" << messaget::eom;
       throw 0;
     }
     else if(unsigned_cnt)
@@ -514,8 +514,8 @@ void ansi_c_convert_typet::write(typet &type)
     {
       if(long_cnt || char_cnt || short_cnt || gcc_int128_cnt || bv_cnt)
       {
-        error().source_location=source_location;
-        error() << "conflicting type modifiers" << eom;
+        log.error().source_location = source_location;
+        log.error() << "conflicting type modifiers" << messaget::eom;
         throw 0;
       }
 
@@ -571,8 +571,8 @@ void ansi_c_convert_typet::write(typet &type)
     {
       if(long_cnt || char_cnt)
       {
-        error().source_location=source_location;
-        error() << "conflicting type modifiers" << eom;
+        log.error().source_location = source_location;
+        log.error() << "conflicting type modifiers" << messaget::eom;
         throw 0;
       }
 
@@ -604,8 +604,8 @@ void ansi_c_convert_typet::write(typet &type)
     }
     else
     {
-      error().source_location=source_location;
-      error() << "illegal type modifier for integer type" << eom;
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for integer type" << messaget::eom;
       throw 0;
     }
   }
