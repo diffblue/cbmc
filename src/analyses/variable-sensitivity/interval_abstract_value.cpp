@@ -463,6 +463,17 @@ abstract_value_pointert interval_abstract_valuet::constrain(
     make_interval(constant_interval_exprt(lower_bound, upper_bound)));
 }
 
+exprt interval_abstract_valuet::to_predicate_internal(const exprt &name) const
+{
+  if(interval.is_single_value_interval())
+    return equal_exprt(name, interval.get_lower());
+
+  auto lower_bound = binary_relation_exprt(interval.get_lower(), ID_le, name);
+  auto upper_bound = binary_relation_exprt(name, ID_le, interval.get_upper());
+
+  return and_exprt(lower_bound, upper_bound);
+}
+
 void interval_abstract_valuet::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

@@ -26,6 +26,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/interval_abstract_value/extremes-go-top.cpp \
        analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
        analyses/variable-sensitivity/interval_abstract_value/merge.cpp \
+       analyses/variable-sensitivity/interval_abstract_value/to_predicate.cpp \
        analyses/variable-sensitivity/interval_abstract_value/widening_merge.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
