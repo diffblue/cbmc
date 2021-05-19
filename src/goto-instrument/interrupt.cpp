@@ -13,6 +13,8 @@ Date: September 2011
 
 #include "interrupt.h"
 
+#include <util/range.h>
+
 #include <linking/static_lifetime_init.h>
 
 #ifdef LOCAL_MAY
@@ -152,11 +154,12 @@ get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
 {
   std::list<symbol_exprt> matches;
 
-  forall_symbol_base_map(m_it, symbol_table.symbol_base_map, interrupt_handler)
+  for(const auto &symbol_name_entry :
+      equal_range(symbol_table.symbol_base_map, interrupt_handler))
   {
     // look it up
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(m_it->second);
+    symbol_tablet::symbolst::const_iterator s_it =
+      symbol_table.symbols.find(symbol_name_entry.second);
 
     if(s_it==symbol_table.symbols.end())
       continue;
