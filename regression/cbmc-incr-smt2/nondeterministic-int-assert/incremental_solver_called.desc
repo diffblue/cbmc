@@ -1,0 +1,11 @@
+CORE
+test.c
+--incremental-smt2-solver z3
+Passing problem to incremental SMT2 solving via "z3"
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--
+--
+Test that running cbmc with the `--incremental-smt2-solver` argument causes the
+incremental smt2 solving to be used. Note that at the time of adding this test,
+an invariant violation is expected due to the unimplemented solving.

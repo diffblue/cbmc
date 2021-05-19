@@ -10,6 +10,7 @@ DIRS = cbmc \
        cbmc-concurrency \
        cbmc-cover \
        cbmc-incr-oneloop \
+       cbmc-incr-smt2 \
        cbmc-incr \
        cbmc-with-incr \
        array-refinement-with-incr \
