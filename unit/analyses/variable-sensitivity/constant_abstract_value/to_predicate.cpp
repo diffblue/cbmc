@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: Tests for abstract_objectt::to_predicate
+ Module: Tests for constant_abstract_valuet::to_predicate
 
  Author: Jez Higgins
 
@@ -9,17 +9,34 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
-#include <util/mathematical_types.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 
 SCENARIO(
-  "constant_abstract_object to predicate",
-  "[core][analyses][variable-sensitivity][constant_abstract_value][to_predicate]")
+  "constant_abstract_value to predicate",
+  "[core][analyses][variable-sensitivity][constant_abstract_value][to_"
+  "predicate]")
 {
-  GIVEN("an abstract object")
+  const typet type = signedbv_typet(32);
+  const exprt val2 = from_integer(2, type);
+
+  const exprt x_name = symbol_exprt(dstringt("x"), type);
+
+  auto config = vsd_configt::constant_domain();
+  config.context_tracking.data_dependency_context = false;
+  config.context_tracking.last_write_context = false;
+  auto object_factory =
+    variable_sensitivity_object_factoryt::configured_with(config);
+  abstract_environmentt environment{object_factory};
+  environment.make_top();
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  GIVEN("constant_abstract_value")
   {
     WHEN("it is TOP")
     {
-      auto obj = make_top_object();
+      auto obj = make_top_constant();
       auto pred = obj->to_predicate(nil_exprt());
       THEN("predicate is true")
       {
@@ -28,21 +45,21 @@ SCENARIO(
     }
     WHEN("it is BOTTOM")
     {
-      auto obj = make_bottom_object();
+      auto obj = make_bottom_constant();
       auto pred = obj->to_predicate(nil_exprt());
       THEN("predicate is false")
       {
         REQUIRE(pred == false_exprt());
       }
     }
-    WHEN("it is neither TOP nor BOTTOM")
+    WHEN("x = 2")
     {
-      auto obj =
-        std::make_shared<abstract_objectt>(integer_typet(), false, false);
-      auto pred = obj->to_predicate(nil_exprt());
-      THEN("predicate is nil")
+      auto obj = make_constant(val2, environment, ns);
+      auto pred = obj->to_predicate(x_name);
+      THEN("predicate is x == 2")
       {
-        REQUIRE(pred == nil_exprt());
+        auto repr = expr_to_str(pred);
+        REQUIRE(repr == "x == 2");
       }
     }
   }

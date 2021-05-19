@@ -19,6 +19,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/abstract_object/to_predicate.cpp \
        analyses/variable-sensitivity/constant_abstract_value/meet.cpp \
        analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
+       analyses/variable-sensitivity/constant_abstract_value/to_predicate.cpp \
        analyses/variable-sensitivity/full_array_abstract_object/merge.cpp \
        analyses/variable-sensitivity/eval.cpp \
        analyses/variable-sensitivity/eval-member-access.cpp \

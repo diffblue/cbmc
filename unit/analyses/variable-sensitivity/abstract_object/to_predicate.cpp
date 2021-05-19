@@ -6,13 +6,12 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
 #include <util/mathematical_types.h>
 
 SCENARIO(
-  "abstract object to predicate",
+  "constant  to predicate",
   "[core][analyses][variable-sensitivity][abstract_object][to_predicate]")
 {
   GIVEN("an abstract object")
@@ -37,7 +36,8 @@ SCENARIO(
     }
     WHEN("it is neither TOP nor BOTTOM")
     {
-      auto obj = std::make_shared<abstract_objectt>(integer_typet(), false, false);
+      auto obj =
+        std::make_shared<abstract_objectt>(integer_typet(), false, false);
       auto pred = obj->to_predicate(nil_exprt());
       THEN("predicate is nil")
       {
