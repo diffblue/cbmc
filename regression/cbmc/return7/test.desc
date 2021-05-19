@@ -1,0 +1,9 @@
+CORE
+main.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+Reason: Check return value
+^warning: ignoring
