@@ -119,6 +119,8 @@ static bool are_any_top(const abstract_object_sett &set);
 static bool is_set_extreme(const typet &type, const abstract_object_sett &set);
 
 static abstract_object_sett compact_values(const abstract_object_sett &values);
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values);
 static abstract_object_sett widen_value_set(
   const abstract_object_sett &values,
   const constant_interval_exprt &lhs,
@@ -332,6 +334,24 @@ abstract_value_pointert value_set_abstract_objectt::constrain(
   }
 
   return as_value(resolve_values(constrained_values));
+}
+
+exprt value_set_abstract_objectt::to_predicate_internal(const exprt &name) const
+{
+  auto compacted = non_destructive_compact(values);
+  if(compacted.size() == 1)
+    return compacted.first()->to_predicate(name);
+
+  auto all_predicates = exprt::operandst{};
+  std::transform(
+    compacted.begin(),
+    compacted.end(),
+    std::back_inserter(all_predicates),
+    [&name](const abstract_object_pointert &value) {
+      return value->to_predicate(name);
+    });
+
+  return or_exprt(all_predicates);
 }
 
 void value_set_abstract_objectt::output(

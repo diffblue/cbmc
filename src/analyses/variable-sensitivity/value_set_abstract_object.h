@@ -82,10 +82,12 @@ private:
   abstract_object_pointert
   resolve_values(const abstract_object_sett &new_values) const;
 
+  void set_top_internal() override;
+
+  exprt to_predicate_internal(const exprt &name) const override;
+
   // data
   abstract_object_sett values;
-
-  void set_top_internal() override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H
