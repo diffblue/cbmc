@@ -46,9 +46,11 @@ bool has_symbol(
     return symbols.count(src.get(ID_identifier))!=0;
   else
   {
-    forall_operands(it, src)
-      if(has_symbol(*it, symbols, current, next))
+    for(const auto &op : src.operands())
+    {
+      if(has_symbol(op, symbols, current, next))
         return true;
+    }
   }
 
   return false;
@@ -92,8 +94,8 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest);
 
 void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
 {
-  forall_operands(it, src)
-    find_symbols(kind, *it, dest);
+  for(const auto &op : src.operands())
+    find_symbols(kind, op, dest);
 
   find_symbols(kind, src.type(), dest);
 

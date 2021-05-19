@@ -21,8 +21,8 @@ void compute_address_taken_functions(
   const exprt &src,
   std::unordered_set<irep_idt> &address_taken)
 {
-  forall_operands(it, src)
-    compute_address_taken_functions(*it, address_taken);
+  for(const auto &op : src.operands())
+    compute_address_taken_functions(op, address_taken);
 
   if(src.id() == ID_address_of)
   {
@@ -44,8 +44,8 @@ void compute_functions(
   const exprt &src,
   std::unordered_set<irep_idt> &address_taken)
 {
-  forall_operands(it, src)
-    compute_functions(*it, address_taken);
+  for(const auto &op : src.operands())
+    compute_functions(op, address_taken);
 
   if(src.type().id()==ID_code &&
      src.id()==ID_symbol)

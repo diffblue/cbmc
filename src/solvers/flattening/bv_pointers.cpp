@@ -415,15 +415,15 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     mp_integer size=0;
     std::size_t count=0;
 
-    forall_operands(it, plus_expr)
+    for(const auto &op : plus_expr.operands())
     {
-      if(it->type().id()==ID_pointer)
+      if(op.type().id() == ID_pointer)
       {
         count++;
-        bv=convert_bv(*it);
+        bv = convert_bv(op);
         CHECK_RETURN(bv.size()==bits);
 
-        typet pointer_sub_type=it->type().subtype();
+        typet pointer_sub_type = op.type().subtype();
 
         if(pointer_sub_type.id()==ID_empty)
         {
@@ -446,24 +446,25 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     bvt sum=bv_utils.build_constant(0, bits);
 
-    forall_operands(it, plus_expr)
+    for(const auto &operand : plus_expr.operands())
     {
-      if(it->type().id()==ID_pointer)
+      if(operand.type().id() == ID_pointer)
         continue;
 
-      if(it->type().id()!=ID_unsignedbv &&
-         it->type().id()!=ID_signedbv)
+      if(
+        operand.type().id() != ID_unsignedbv &&
+        operand.type().id() != ID_signedbv)
       {
         bvt failed_bv;
         conversion_failed(plus_expr, failed_bv);
         return failed_bv;
       }
 
-      bv_utilst::representationt rep=
-        it->type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
-                                     bv_utilst::representationt::UNSIGNED;
+      bv_utilst::representationt rep = operand.type().id() == ID_signedbv
+                                         ? bv_utilst::representationt::SIGNED
+                                         : bv_utilst::representationt::UNSIGNED;
 
-      bvt op=convert_bv(*it);
+      bvt op = convert_bv(operand);
       CHECK_RETURN(!op.empty());
 
       // we cut any extra bits off

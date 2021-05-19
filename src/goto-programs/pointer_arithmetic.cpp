@@ -23,12 +23,12 @@ void pointer_arithmetict::read(const exprt &src)
 {
   if(src.id()==ID_plus)
   {
-    forall_operands(it, src)
+    for(const auto &op : src.operands())
     {
-      if(it->type().id()==ID_pointer)
-        read(*it);
+      if(op.type().id() == ID_pointer)
+        read(op);
       else
-        add_to_offset(*it);
+        add_to_offset(op);
     }
   }
   else if(src.id()==ID_minus)

@@ -1731,8 +1731,8 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
       return;
   }
 
-  forall_operands(it, expr)
-    check_rec(*it, guard);
+  for(const auto &op : expr.operands())
+    check_rec(op, guard);
 
   if(expr.type().id() == ID_c_enum_tag)
     enum_range_check(expr, guard);

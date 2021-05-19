@@ -31,8 +31,8 @@ void dirtyt::find_dirty(const exprt &expr)
     return;
   }
 
-  forall_operands(it, expr)
-    find_dirty(*it);
+  for(const auto &op : expr.operands())
+    find_dirty(op);
 }
 
 void dirtyt::find_dirty_address_of(const exprt &expr)

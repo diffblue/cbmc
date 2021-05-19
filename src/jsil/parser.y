@@ -131,9 +131,9 @@ procedure_decl: TOK_PROCEDURE proc_ident '(' parameters_opt ')'
               {
                 symbol_exprt proc(to_symbol_expr(parser_stack($2)));
                 code_typet::parameterst parameters;
-                forall_operands(it, parser_stack($4))
+                for(const auto &op : as_const(parser_stack($4)).operands())
                 {
-                  symbol_exprt s(to_symbol_expr(*it));
+                  symbol_exprt s(to_symbol_expr(op));
                   code_typet::parametert p(typet{});
                   p.set_identifier(s.get_identifier());
                   parameters.push_back(p);

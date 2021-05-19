@@ -27,9 +27,9 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
     std::size_t op_width=width/expr.operands().size();
     std::size_t offset=0;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      const bvt &tmp=convert_bv(*it);
+      const bvt &tmp = convert_bv(op);
 
       DATA_INVARIANT_WITH_DIAGNOSTICS(
         tmp.size() == op_width,
