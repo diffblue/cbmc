@@ -197,6 +197,7 @@ void run_property_decider(
   "(unwind-max):" \
   "(ignore-properties-before-unwind-min)" \
   "(symex-cache-dereferences)" \
+  "(symex-no-member-bounds)" \
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -252,6 +253,7 @@ void run_property_decider(
   "                              gets blacklisted\n" \
   " --graphml-witness filename   write the witness in GraphML format to filename\n" /* NOLINT(*) */ \
   " --symex-cache-dereferences   enable caching of repeated dereferences" \
+  " --symex-no-member-bounds     support updates beyond bounds of a compound member" /* NOLINT(*) */ \
 // clang-format on
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H

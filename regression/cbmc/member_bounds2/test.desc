@@ -1,0 +1,13 @@
+KNOWNBUG
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Field sensitivity makes it (currently) impossible to update bytes outside the
+particular field. One possible way to address this is rewriting subscripted
+array accesses to pointer dereferencing, as the C standard describes. Here, this
+would amount to using *(&su.u.a[0] + 2) instead of su.u.a[2].

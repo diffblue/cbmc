@@ -1,0 +1,13 @@
+CORE broken-smt-backend
+main.c
+--no-simplify --symex-no-member-bounds
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test passes when using the simplifier, but results in "WITH" expressions
+that update elements outside their bounds without the simplifier.
+--symex-no-member-bounds ensures that such expressions are rewritten by
+goto-symex.

@@ -11,12 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_assign.h"
 
-#include "expr_skeleton.h"
-#include "goto_symex_state.h"
+#include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
+#include <util/pointer_offset_size.h>
 #include <util/range.h>
 
+#include "expr_skeleton.h"
+#include "goto_symex_state.h"
 #include "symex_config.h"
 
 // We can either use with_exprt or update_exprt when building expressions that
@@ -253,11 +255,100 @@ void symex_assignt::assign_array(
 {
   const exprt &lhs_array=lhs.array();
   const exprt &lhs_index=lhs.index();
-  const typet &lhs_index_type = lhs_array.type();
+  const array_typet &lhs_array_type = to_array_type(lhs_array.type());
 
-  PRECONDITION(lhs_index_type.id() == ID_array);
+  const bool may_be_out_of_bounds =
+    symex_config.updates_across_member_bounds &&
+    [&lhs_index, &lhs_array_type]() {
+      if(
+        lhs_index.id() != ID_constant ||
+        lhs_array_type.size().id() != ID_constant)
+      {
+        return true;
+      }
 
-  if(use_update)
+      const auto lhs_index_int =
+        numeric_cast_v<mp_integer>(to_constant_expr(lhs_index));
+
+      return lhs_index_int < 0 ||
+             lhs_index_int >= numeric_cast_v<mp_integer>(
+                                to_constant_expr(lhs_array_type.size()));
+    }();
+
+  if(
+    may_be_out_of_bounds &&
+    (lhs_array.id() == ID_member || lhs_array.id() == ID_index))
+  {
+    const auto subtype_bytes_opt = size_of_expr(lhs_array.type().subtype(), ns);
+    CHECK_RETURN(subtype_bytes_opt.has_value());
+
+    exprt new_offset = mult_exprt{
+      lhs_index,
+      typecast_exprt::conditional_cast(*subtype_bytes_opt, lhs_index.type())};
+
+    exprt parent;
+    if(lhs_array.id() == ID_member)
+    {
+      const member_exprt &member = to_member_expr(lhs_array);
+      const auto member_offset = member_offset_expr(member, ns);
+      CHECK_RETURN(member_offset.has_value());
+
+      parent = member.compound();
+      new_offset = plus_exprt{
+        typecast_exprt::conditional_cast(*member_offset, new_offset.type()),
+        new_offset};
+    }
+    else
+    {
+      const index_exprt &index = to_index_expr(lhs_array);
+
+      const auto element_size_opt =
+        size_of_expr(to_array_type(index.array().type()).subtype(), ns);
+      CHECK_RETURN(element_size_opt.has_value());
+
+      parent = index.array();
+      new_offset =
+        plus_exprt{mult_exprt{typecast_exprt::conditional_cast(
+                                *element_size_opt, new_offset.type()),
+                              typecast_exprt::conditional_cast(
+                                index.index(), new_offset.type())},
+                   new_offset};
+    }
+
+    if(symex_config.simplify_opt)
+      simplify(new_offset, ns);
+
+    const byte_update_exprt new_rhs = make_byte_update(parent, new_offset, rhs);
+    const expr_skeletont new_skeleton =
+      full_lhs.compose(expr_skeletont::remove_op0(lhs_array));
+    assign_rec(parent, new_skeleton, new_rhs, guard);
+  }
+  else if(
+    may_be_out_of_bounds && (lhs_array.id() == ID_byte_extract_big_endian ||
+                             lhs_array.id() == ID_byte_extract_little_endian))
+  {
+    const byte_extract_exprt &byte_extract = to_byte_extract_expr(lhs_array);
+
+    const auto subtype_bytes_opt = size_of_expr(lhs_array.type().subtype(), ns);
+    CHECK_RETURN(subtype_bytes_opt.has_value());
+
+    exprt new_offset =
+      plus_exprt{mult_exprt{lhs_index,
+                            typecast_exprt::conditional_cast(
+                              *subtype_bytes_opt, lhs_index.type())},
+                 typecast_exprt::conditional_cast(
+                   byte_extract.offset(), lhs_index.type())};
+
+    if(symex_config.simplify_opt)
+      simplify(new_offset, ns);
+
+    byte_extract_exprt new_lhs = byte_extract;
+    new_lhs.offset() = new_offset;
+    new_lhs.type() = rhs.type();
+
+    assign_rec(new_lhs, full_lhs, rhs, guard);
+  }
+  else if(use_update)
   {
     // turn
     //   a[i]=e
@@ -378,8 +469,70 @@ void symex_assignt::assign_byte_extract(
   else
     UNREACHABLE;
 
-  const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
-  const expr_skeletont new_skeleton =
-    full_lhs.compose(expr_skeletont::remove_op0(lhs));
-  assign_rec(lhs.op(), new_skeleton, new_rhs, guard);
+  const bool may_be_out_of_bounds =
+    symex_config.updates_across_member_bounds && [&lhs, this]() {
+      if(lhs.offset().id() != ID_constant)
+        return true;
+      const auto extract_size_opt = pointer_offset_size(lhs.type(), ns);
+      if(!extract_size_opt.has_value())
+        return true;
+      const auto object_size_opt = pointer_offset_size(lhs.op().type(), ns);
+      if(!object_size_opt.has_value())
+        return true;
+      const auto lhs_offset_int =
+        numeric_cast_v<mp_integer>(to_constant_expr(lhs.offset()));
+      return lhs_offset_int < 0 ||
+             lhs_offset_int + *extract_size_opt > *object_size_opt;
+    }();
+
+  if(
+    may_be_out_of_bounds &&
+    (lhs.op().id() == ID_member || lhs.op().id() == ID_index))
+  {
+    exprt new_offset = lhs.offset();
+    exprt parent;
+    if(lhs.op().id() == ID_member)
+    {
+      const member_exprt &member = to_member_expr(lhs.op());
+      const auto member_offset = member_offset_expr(member, ns);
+      CHECK_RETURN(member_offset.has_value());
+
+      parent = member.compound();
+      new_offset = plus_exprt{
+        typecast_exprt::conditional_cast(*member_offset, new_offset.type()),
+        new_offset};
+    }
+    else
+    {
+      const index_exprt &index = to_index_expr(lhs.op());
+
+      const auto element_size_opt =
+        size_of_expr(to_array_type(index.array().type()).subtype(), ns);
+      CHECK_RETURN(element_size_opt.has_value());
+
+      parent = index.array();
+      new_offset =
+        plus_exprt{mult_exprt{typecast_exprt::conditional_cast(
+                                *element_size_opt, new_offset.type()),
+                              typecast_exprt::conditional_cast(
+                                index.index(), new_offset.type())},
+                   new_offset};
+    }
+
+    if(symex_config.simplify_opt)
+      simplify(new_offset, ns);
+
+    const byte_update_exprt new_rhs{byte_update_id, parent, new_offset, rhs};
+    const expr_skeletont new_skeleton =
+      full_lhs.compose(expr_skeletont::remove_op0(lhs.op()));
+    assign_rec(parent, new_skeleton, new_rhs, guard);
+  }
+  else
+  {
+    const byte_update_exprt new_rhs{
+      byte_update_id, lhs.op(), lhs.offset(), rhs};
+    const expr_skeletont new_skeleton =
+      full_lhs.compose(expr_skeletont::remove_op0(lhs));
+    assign_rec(lhs.op(), new_skeleton, new_rhs, guard);
+  }
 }
