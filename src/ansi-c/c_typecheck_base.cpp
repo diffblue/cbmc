@@ -325,6 +325,17 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     code_typet &old_ct=to_code_type(old_symbol.type);
     code_typet &new_ct=to_code_type(new_symbol.type);
 
+    if(
+      old_ct.return_type() != new_ct.return_type() &&
+      !old_ct.get_bool(ID_C_incomplete))
+    {
+      error().source_location = new_symbol.location;
+      error() << "function symbol '" << new_symbol.display_name()
+              << "' redefined with a different type:\n"
+              << "Original: " << to_string(old_symbol.type) << "\n"
+              << "     New: " << to_string(new_symbol.type) << eom;
+      throw 0;
+    }
     const bool inlined = old_ct.get_inlined() || new_ct.get_inlined();
 
     if(old_ct.has_ellipsis() && !new_ct.has_ellipsis())
@@ -539,6 +550,12 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     symbolt *new_p_symbol;
     move_symbol(p_symbol, new_p_symbol);
   }
+
+  // A function declaration int foo(); does not specify the parameter list, but
+  // a function definition int foo() { ... } does fix the parameter list to be
+  // empty.
+  if(code_type.parameters().empty() && code_type.has_ellipsis())
+    code_type.remove_ellipsis();
 
   // typecheck the body code
   typecheck_code(to_code(symbol.value));

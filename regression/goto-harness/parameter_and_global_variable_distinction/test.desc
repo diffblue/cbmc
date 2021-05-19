@@ -5,6 +5,6 @@ test.c
 ^SIGNAL=0$
 \[function.assertion.1\] line \d+ assertion f\(\) == call_f\(\): SUCCESS
 \[function.assertion.2\] line \d+ assertion f != \(\(void \*\)0\): FAILURE
-\[call_f.assertion.1\] line \d+ assertion f != \(\(void \*\)0\): SUCCESS
+\[call_f.assertion.1\] line \d+ assertion f == \(\(void \*\)0\): SUCCESS
 --
 ^warning: ignoring
