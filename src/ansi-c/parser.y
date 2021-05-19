@@ -118,7 +118,8 @@ extern char *yyansi_ctext;
 
 /*** scanner parsed tokens (these have a value!) ***/
 
-%token TOK_IDENTIFIER
+%token TOK_GCC_IDENTIFIER
+%token TOK_MSC_IDENTIFIER
 %token TOK_TYPEDEFNAME
 %token TOK_INTEGER
 %token TOK_FLOATING
@@ -291,7 +292,8 @@ grammar:
 /*** Token with values **************************************************/
 
 identifier:
-          TOK_IDENTIFIER
+          TOK_GCC_IDENTIFIER
+        | TOK_MSC_IDENTIFIER
         | TOK_CPROVER_ID TOK_STRING
         {
           $$=$1;
@@ -1333,7 +1335,7 @@ atomic_type_specifier:
         ;
 
 msc_decl_identifier:
-          TOK_IDENTIFIER
+          TOK_MSC_IDENTIFIER
         {
           parser_stack($$).id(parser_stack($$).get(ID_identifier));
         }
@@ -2256,9 +2258,14 @@ designator:
 /*** Statements *********************************************************/
 
 statement:
+          declaration_statement
+        | statement_attribute
+        | stmt_not_decl_or_attr
+        ;
+
+stmt_not_decl_or_attr:
           labeled_statement
         | compound_statement
-        | declaration_statement
         | expression_statement
         | selection_statement
         | iteration_statement
@@ -2268,7 +2275,6 @@ statement:
         | msc_asm_statement
         | msc_seh_statement
         | cprover_exception_statement
-        | statement_attribute
         ;
 
 declaration_statement:
@@ -2280,8 +2286,30 @@ declaration_statement:
         }
         ;
 
+gcc_attribute_specifier_opt:
+          /* empty */
+        {
+          init($$);
+        }
+        | gcc_attribute_specifier
+        ;
+
+msc_label_identifier:
+          TOK_MSC_IDENTIFIER
+        | TOK_TYPEDEFNAME
+        ;
+
 labeled_statement:
-        identifier_or_typedef_name ':' statement
+          TOK_GCC_IDENTIFIER ':' gcc_attribute_specifier_opt stmt_not_decl_or_attr
+        {
+          // we ignore the GCC attribute
+          $$=$2;
+          statement($$, ID_label);
+          irep_idt identifier=PARSER.lookup_label(parser_stack($1).get(ID_C_base_name));
+          parser_stack($$).set(ID_label, identifier);
+          mto($$, $4);
+        }
+        | msc_label_identifier ':' statement
         {
           $$=$2;
           statement($$, ID_label);

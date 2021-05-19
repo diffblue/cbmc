@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
   int *ptr4 = &x;
   goto check;
 
-deref:
+deref:;
   int deref4 = *ptr4;
   goto end_test4;
 
@@ -38,7 +38,7 @@ check:
   __CPROVER_assume(ptr4 != 0);
   goto deref;
 
-end_test4:
+end_test4:;
 
   // Shouldn't work yet despite being safe (guarded by confluence):
   int *ptr5 = &x;

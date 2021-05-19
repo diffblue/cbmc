@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
 
   const float *pc = (const float []){1e0, 1e1, 1e2};
 
-start:
+start:;
   test newAlloc0 = {0};
   if(argv[0])
   {
@@ -20,7 +20,7 @@ start:
     if (argv[2])
     {
       test newAlloc3 = {3};
-nested_if:
+    nested_if:;
       test newAlloc5 = {5};
       if (argv[3])
       {
