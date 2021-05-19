@@ -1,8 +1,9 @@
 CORE gcc-only
 main.c
-
+-Wall
 ^EXIT=0$
 ^SIGNAL=0$
 --
+'extern' symbol 'my_ids_table' should not have an initializer
 ^warning: ignoring
 ^CONVERSION ERROR$
