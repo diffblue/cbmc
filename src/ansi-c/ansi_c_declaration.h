@@ -195,16 +195,6 @@ public:
     set(ID_is_weak, is_weak);
   }
 
-  bool get_is_used() const
-  {
-    return get_bool(ID_is_used);
-  }
-
-  void set_is_used(bool is_used)
-  {
-    set(ID_is_used, is_used);
-  }
-
   void to_symbol(
     const ansi_c_declaratort &,
     symbolt &symbol) const;

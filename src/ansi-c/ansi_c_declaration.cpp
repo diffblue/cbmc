@@ -171,10 +171,6 @@ void ansi_c_declarationt::to_symbol(
         else  if(get_is_extern()) // traditional GCC
           symbol.is_file_local=true;
       }
-
-      // GCC __attribute__((__used__)) - do not treat those as file-local
-      if(get_is_used())
-        symbol.is_file_local = false;
     }
   }
   else // non-function
@@ -188,10 +184,8 @@ void ansi_c_declarationt::to_symbol(
       (!symbol.is_static_lifetime && !get_is_extern()) ||
       get_is_thread_local();
 
-    symbol.is_file_local=
-      symbol.is_macro ||
-      (!get_is_global() && !get_is_extern()) ||
-      (get_is_global() && get_is_static() && !get_is_used()) ||
-      symbol.is_parameter;
+    symbol.is_file_local =
+      symbol.is_macro || (!get_is_global() && !get_is_extern()) ||
+      (get_is_global() && get_is_static()) || symbol.is_parameter;
   }
 }
