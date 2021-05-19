@@ -7,9 +7,11 @@ int __builtin_ffsl(long);
 int __builtin_ffsll(long long);
 #endif
 
+#ifdef _MSC_VER
+#  define _Static_assert(x, m) static_assert(x, m)
+#endif
+
 int __VERIFIER_nondet_int();
-long __VERIFIER_nondet_long();
-long long __VERIFIER_nondet_long_long();
 
 // http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
 static const int multiply_de_bruijn_bit_position[32] = {
@@ -18,14 +20,14 @@ static const int multiply_de_bruijn_bit_position[32] = {
 
 int main()
 {
-  assert(__builtin_ffs(0) == 0);
-  assert(__builtin_ffs(-1) == 1);
-  assert(__builtin_ffs(INT_MIN) == sizeof(int) * 8);
-  assert(__builtin_ffsl(INT_MIN) == sizeof(int) * 8);
-  assert(__builtin_ffsl(LONG_MIN) == sizeof(long) * 8);
-  assert(__builtin_ffsll(INT_MIN) == sizeof(int) * 8);
-  assert(__builtin_ffsll(LLONG_MIN) == sizeof(long long) * 8);
-  assert(__builtin_ffs(INT_MAX) == 1);
+  _Static_assert(__builtin_ffs(0) == 0, "");
+  _Static_assert(__builtin_ffs(-1) == 1, "");
+  _Static_assert(__builtin_ffs(INT_MIN) == sizeof(int) * 8, "");
+  _Static_assert(__builtin_ffsl(INT_MIN) == sizeof(int) * 8, "");
+  _Static_assert(__builtin_ffsl(LONG_MIN) == sizeof(long) * 8, "");
+  _Static_assert(__builtin_ffsll(INT_MIN) == sizeof(int) * 8, "");
+  _Static_assert(__builtin_ffsll(LLONG_MIN) == sizeof(long long) * 8, "");
+  _Static_assert(__builtin_ffs(INT_MAX) == 1, "");
 
   int i = __VERIFIER_nondet_int();
   __CPROVER_assume(i != 0);

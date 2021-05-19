@@ -148,6 +148,8 @@ static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
     os << "clz";
   else if(src.id() == ID_count_trailing_zeros)
     os << "ctz";
+  else if(src.id() == ID_find_first_set)
+    os << "ffs";
   else
     return os << src.pretty();
 

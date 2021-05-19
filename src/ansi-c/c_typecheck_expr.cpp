@@ -2820,6 +2820,24 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ctz);
   }
+  else if(
+    identifier == "__builtin_ffs" || identifier == "__builtin_ffsl" ||
+    identifier == "__builtin_ffsll")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    find_first_set_exprt ffs{expr.arguments().front(), expr.type()};
+    ffs.add_source_location() = source_location;
+
+    return std::move(ffs);
+  }
   else if(identifier==CPROVER_PREFIX "equal")
   {
     if(expr.arguments().size()!=2)

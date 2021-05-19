@@ -33,57 +33,6 @@ inline void __sync_synchronize(void)
   #endif
 }
 
-/* FUNCTION: __builtin_ffs */
-
-int __builtin_clz(unsigned int x);
-
-inline int __builtin_ffs(int x)
-{
-  if(x == 0)
-    return 0;
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "conversion"
-  unsigned int u = (unsigned int)x;
-#pragma CPROVER check pop
-
-  return sizeof(int) * 8 - __builtin_clz(u & ~(u - 1));
-}
-
-/* FUNCTION: __builtin_ffsl */
-
-int __builtin_clzl(unsigned long x);
-
-inline int __builtin_ffsl(long x)
-{
-  if(x == 0)
-    return 0;
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "conversion"
-  unsigned long u = (unsigned long)x;
-#pragma CPROVER check pop
-
-  return sizeof(long) * 8 - __builtin_clzl(u & ~(u - 1));
-}
-
-/* FUNCTION: __builtin_ffsll */
-
-int __builtin_clzll(unsigned long long x);
-
-inline int __builtin_ffsll(long long x)
-{
-  if(x == 0)
-    return 0;
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "conversion"
-  unsigned long long u = (unsigned long long)x;
-#pragma CPROVER check pop
-
-  return sizeof(long long) * 8 - __builtin_clzll(u & ~(u - 1));
-}
-
 /* FUNCTION: __atomic_test_and_set */
 
 void __atomic_thread_fence(int memorder);

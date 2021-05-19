@@ -3823,6 +3823,7 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_count_leading_zeros, "__builtin_clz"},
     {ID_count_trailing_zeros, "__builtin_ctz"},
     {ID_dynamic_object, "DYNAMIC_OBJECT"},
+    {ID_find_first_set, "__builtin_ffs"},
     {ID_floatbv_div, "FLOAT/"},
     {ID_floatbv_minus, "FLOAT-"},
     {ID_floatbv_mult, "FLOAT*"},

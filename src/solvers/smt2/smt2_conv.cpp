@@ -2042,6 +2042,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_expr(simplify_expr(to_count_trailing_zeros_expr(expr).lower(), ns));
   }
+  else if(expr.id() == ID_find_first_set)
+  {
+    convert_expr(simplify_expr(to_find_first_set_expr(expr).lower(), ns));
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,

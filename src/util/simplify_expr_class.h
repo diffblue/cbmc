@@ -44,6 +44,7 @@ class div_exprt;
 class exprt;
 class extractbit_exprt;
 class extractbits_exprt;
+class find_first_set_exprt;
 class floatbv_typecast_exprt;
 class function_application_exprt;
 class ieee_float_op_exprt;
@@ -209,6 +210,9 @@ public:
 
   /// Try to simplify count-trailing-zeros to a constant expression.
   NODISCARD resultt<> simplify_ctz(const count_trailing_zeros_exprt &);
+
+  /// Try to simplify find-first-set to a constant expression.
+  NODISCARD resultt<> simplify_ffs(const find_first_set_exprt &);
 
   // auxiliary
   bool simplify_if_implies(

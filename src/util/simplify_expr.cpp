@@ -197,6 +197,27 @@ simplify_exprt::simplify_ctz(const count_trailing_zeros_exprt &expr)
   return from_integer(n_trailing_zeros, expr.type());
 }
 
+simplify_exprt::resultt<>
+simplify_exprt::simplify_ffs(const find_first_set_exprt &expr)
+{
+  const auto const_bits_opt = expr2bits(
+    expr.op(),
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
+    ns);
+
+  if(!const_bits_opt.has_value())
+    return unchanged(expr);
+
+  // expr2bits generates a bit string starting with the least-significant bit
+  std::size_t first_one_bit = const_bits_opt->find('1');
+  if(first_one_bit == std::string::npos)
+    first_one_bit = 0;
+  else
+    ++first_one_bit;
+
+  return from_integer(first_one_bit, expr.type());
+}
+
 /// Simplify String.endsWith function when arguments are constant
 /// \param expr: the expression to simplify
 /// \param ns: namespace
@@ -2522,6 +2543,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   else if(expr.id() == ID_count_trailing_zeros)
   {
     r = simplify_ctz(to_count_trailing_zeros_expr(expr));
+  }
+  else if(expr.id() == ID_find_first_set)
+  {
+    r = simplify_ffs(to_find_first_set_expr(expr));
   }
   else if(expr.id() == ID_function_application)
   {
