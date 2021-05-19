@@ -10,7 +10,7 @@ following environments:
 The above environments are currently tested as part of our continuous
 integration system. It separately tests both the CMake build system and the
 hand-written make files. The latest build steps being used in CI can be
-[referenced here](https://github.com/diffblue/cbmc/blob/develop/.github/workflows/pull-request-checks.yaml).
+[found here](https://github.com/diffblue/cbmc/blob/develop/.github/workflows/pull-request-checks.yaml).
 
 The environments below have been used successfully in the
 past, but are not actively tested:
@@ -22,7 +22,7 @@ past, but are not actively tested:
 
 Building with CMake is supported across Linux, MacOS X and Windows with Visual
 Studio 2019. There are also hand-written make files which can be used to build
-separate binaries independently. Usage of the hand-written make files is
+separate targets independently. Usage of the hand-written make files is
 explained in a separate section. The CMake build can build the complete
 repository in fewer steps and supports better integration with various IDEs and
 static-analysis tools. On Windows, the CMake build has the advantage of not
@@ -47,9 +47,6 @@ files.
      ```
      You should also install [Homebrew](https://brew.sh), after which you can
      run `brew install cmake` to install CMake.
-   - On platforms where installing the Java Development Kit and Maven is
-     difficult, you can avoid needing these dependencies by not building
-     JBMC. Just pass `-DWITH_JBMC=OFF` to `cmake` in step (4) below.
    - On Windows, ensure you have Visual Studio 2019 or later installed. The
      developer command line that comes with Visual Studio 2019 has CMake
      already available. You will also need to ensure that you have winflexbison
@@ -103,6 +100,10 @@ files.
    `-DCMAKE_EXE_LINKER_FLAGS=...`. This is useful for enabling clang's
    sanitizers.
 
+   **Note: Building without JBMC**: On platforms where installing the Java
+   Development Kit and Maven is difficult, you can avoid needing these
+   dependencies by not building JBMC. Just pass `-DWITH_JBMC=OFF` to `cmake`.
+
    Finally, to enable building universal binaries on macOS, you can pass the
    flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
    the built binaries will only work on the architecture of the machine being
@@ -115,15 +116,19 @@ files.
    This command tells CMake to invoke the correct tool to run the build in the
    `build` directory. You can also use the build back-end directly by invoking
    `make`, `ninja`, or opening the generated IDE project as appropriate. The
-   complete set of built binaries can be found in `./build/bin` once the build
+   complete set of built binaries can be found in `build/bin/` once the build
    is complete.
 
-# Building using hand-written make files.
+   *Parellel building*: You can pass `-j<numjobs>` to `make` to indicate how many
+   jobs to run simultaneously. `ninja` defaults to building with `# of cores + 2`
+   jobs at the same time.
 
-The rest of this section is split up based on the platform being built on. 
-Please read the section appropriate for your machine.
+# Building using Make
 
-## COMPILATION ON LINUX
+The rest of this section is split up based on the platform being built on.
+Please read the section appropriate for your platform.
+
+## Compiling with Make on Linux
 
 We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
@@ -175,7 +180,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    make -C jbmc/src
    ```
 
-## COMPILATION ON MACOS X
+## Compiling with Make on MacOS
 
 Follow these instructions:
 
@@ -202,7 +207,7 @@ Follow these instructions:
    make -C jbmc/src
    ```
 
-## COMPILATION ON SOLARIS 11
+## Compiling with Make on Solaris
 
 We assume Solaris 11.4 or newer.  To build JBMC, you'll need to install
 Maven 3 manually.
@@ -227,7 +232,7 @@ Maven 3 manually.
    gmake -C jbmc/src
    ```
 
-## COMPILATION ON FREEBSD 11
+## Compiling with Make on FreeBSD
 
 1. As root, get the necessary tools:
    ```
@@ -253,7 +258,27 @@ Maven 3 manually.
    gmake -C jbmc/src
    ```
 
-# WORKING WITH ECLIPSE
+# Working with IDEs and Docker
+
+## Working with Visual Studio on Windows
+
+Follow these instructions to work on Windows with Visual Studio:
+
+1. Open the `cbmc` folder in Visual Studio. Visual Studio 2017 and
+   later have automated support for CMake projects, so you need to
+   give sometime to Visual Studio to index the project and load its
+   own plugins, and then it's going to be ready to build `cbmc`.
+2. Once indexing and plugin loading has finished, a menu `Build`
+   should have appeared on the top bar. From there, select `Build All`.
+3. After the build has finished, there should be a folder `out` present.
+   Navigating `out/build/<build_parameters>/bin` should get you to the
+   binaries and other artifacts built, with `<build_parameters>` corresponding
+   to something like `x64-Debug (Default)` or whatever the equivalent is
+   for your system.
+
+The above instructions have been tested against Visual Studio 2019.
+
+## Working with Eclipse
 
 To work with Eclipse, do the following:
 
@@ -270,23 +295,23 @@ the need to integrate JBMC as a separate project. Be aware that you need to
 change the build location (Select project in Eclipse -> Properties -> C/C++ 
 Build) to one of the src directories.
 
-# WORKING WITH DOCKER
+## Working with Docker
 
 To compile and run the tools in a Docker container, do the following:
 
 1. From the root folder of the project, run `$ docker build -t cbmc .`
-2. After the building phase has finished, there should be a new 
+2. After the building phase has finished, there should be a new
    image with the CProver binaries installed under `/usr/local/bin/`.
 
    To start a container using that image as a base, run `$ docker run -i -t cbmc`
    This will result in dropping you to a new terminal inside the container. To
    load files for analysis into the container, one way is by mounting the folder
    that contains the tests to the container. A possible invocation that does that
-   is: `$ docker run --mount type=bind,source=local/path/with/files,target=/mnt/analysis -i t cbmc`. In the
-   resulting container, the files present in the local file system under
-   `local/path/with/files` will be present under `/mnt/analysis`. 
+   is: `$ docker run --mount type=bind,source=local/path/with/files,target=/mnt/analysis -i t cbmc`.
+   In the resulting container, the files present in the local file system under
+   `local/path/with/files` will be present under `/mnt/analysis`.
 
-# OPTIONS AND VARIABLES
+# Compilation options and configuration
 
 ## Compiling with CUDD
 
