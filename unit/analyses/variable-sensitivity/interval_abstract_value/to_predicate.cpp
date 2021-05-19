@@ -39,40 +39,22 @@ SCENARIO(
     WHEN("it is TOP")
     {
       auto obj = make_top_interval();
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is true")
-      {
-        REQUIRE(pred == true_exprt());
-      }
+      THEN_PREDICATE(obj, "TRUE");
     }
     WHEN("it is BOTTOM")
     {
       auto obj = make_bottom_interval();
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is false")
-      {
-        REQUIRE(pred == false_exprt());
-      }
+      THEN_PREDICATE(obj, "FALSE");
     }
     WHEN("[ 2 ]")
     {
       auto obj = make_interval(val2, val2, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "x == 2");
-      }
+      THEN_PREDICATE(obj, "x == 2");
     }
     WHEN("[ 0, 2 ]")
     {
       auto obj = make_interval(val0, val2, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 2");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 2");
     }
   }
 }

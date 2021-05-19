@@ -44,40 +44,28 @@ SCENARIO(
     WHEN("it is TOP")
     {
       auto obj = make_top_value_set();
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is true")
-      {
-        REQUIRE(pred == true_exprt());
-      }
+      THEN_PREDICATE(obj, "TRUE");
     }
     WHEN("it is BOTTOM")
     {
       auto obj = make_bottom_value_set();
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is false")
-      {
-        REQUIRE(pred == false_exprt());
-      }
+      THEN_PREDICATE(obj, "FALSE");
     }
     WHEN("{ 2 }")
     {
       auto obj = make_value_set(val2, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "x == 2");
-      }
+      THEN_PREDICATE(obj, "x == 2");
+    }
+    WHEN("{ [2, 2] }")
+    {
+      auto obj =
+        make_value_set(constant_interval_exprt(val2, val2), environment, ns);
+      THEN_PREDICATE(obj, "x == 2");
     }
     WHEN("{ 0, 2 }")
     {
       auto obj = make_value_set({val0, val2}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is x == 0 || x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "x == 0 || x == 2");
-      }
+      THEN_PREDICATE(obj, "x == 0 || x == 2");
     }
     WHEN("{ 0, 1, 2 }")
     {
@@ -92,72 +80,37 @@ SCENARIO(
     WHEN("{ [0, 1] }")
     {
       auto obj = make_value_set(interval_0_1, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 1")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 1");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 1");
     }
     WHEN("{ [0, 1], 2 }")
     {
       auto obj = make_value_set({interval_0_1, val2}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 1 || x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 1 || x == 2");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 1 || x == 2");
     }
     WHEN("{ [0, 1], 2, 3 }")
     {
       auto obj = make_value_set({interval_0_1, val2, val3}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 1 || x == 3 || x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 1 || x == 3 || x == 2");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 1 || x == 3 || x == 2");
     }
     WHEN("{ [0, 1], 1, 2 }")
     {
       auto obj = make_value_set({interval_0_1, val1, val2}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 1 || x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 1 || x == 2");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 1 || x == 2");
     }
     WHEN("{ [0, 1], [1, 2] }")
     {
       auto obj = make_value_set({interval_0_1, interval_1_2}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 2");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 2");
     }
     WHEN("{ [0, 2], [1, 2] }")
     {
       auto obj = make_value_set({interval_0_1, interval_1_2}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "0 <= x && x <= 2");
-      }
+      THEN_PREDICATE(obj, "0 <= x && x <= 2");
     }
     WHEN("{ [0, 1], [2, 3] }")
     {
       auto obj = make_value_set({interval_0_1, interval_2_3}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is 0 <= x && x <= 1 || 2 <= x && x <= 3")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "2 <= x && x <= 3 || 0 <= x && x <= 1");
-      }
+      THEN_PREDICATE(obj, "2 <= x && x <= 3 || 0 <= x && x <= 1");
     }
   }
 }

@@ -521,3 +521,14 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   REQUIRE(vs);
   return vs;
 }
+
+void THEN_PREDICATE(const abstract_object_pointert &obj, const std::string &out)
+{
+  const auto x_name = symbol_exprt(dstringt("x"), obj->type());
+  auto pred = obj->to_predicate(x_name);
+  THEN("predicate is " + out)
+  {
+    auto repr = expr_to_str(pred);
+    REQUIRE(repr == out);
+  }
+}

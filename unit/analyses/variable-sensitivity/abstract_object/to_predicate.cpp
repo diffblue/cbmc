@@ -19,20 +19,12 @@ SCENARIO(
     WHEN("it is TOP")
     {
       auto obj = make_top_object();
-      auto pred = obj->to_predicate(nil_exprt());
-      THEN("predicate is true")
-      {
-        REQUIRE(pred == true_exprt());
-      }
+      THEN_PREDICATE(obj, "TRUE");
     }
     WHEN("it is BOTTOM")
     {
       auto obj = make_bottom_object();
-      auto pred = obj->to_predicate(nil_exprt());
-      THEN("predicate is false")
-      {
-        REQUIRE(pred == false_exprt());
-      }
+      THEN_PREDICATE(obj, "FALSE");
     }
     WHEN("it is neither TOP nor BOTTOM")
     {
