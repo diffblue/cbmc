@@ -32,12 +32,15 @@ public:
     irep_idt _id,
     const exprt &_op,
     const exprt &_offset,
+    std::size_t bits_per_byte,
     const typet &_type)
     : binary_exprt(_op, _id, _offset, _type)
   {
     INVARIANT(
       _id == ID_byte_extract_little_endian || _id == ID_byte_extract_big_endian,
       "byte_extract_exprt: Invalid ID");
+
+    set_bits_per_byte(bits_per_byte);
   }
 
   exprt &op() { return op0(); }
@@ -45,6 +48,16 @@ public:
 
   const exprt &op() const { return op0(); }
   const exprt &offset() const { return op1(); }
+
+  std::size_t get_bits_per_byte() const
+  {
+    return get_size_t(ID_bits_per_byte);
+  }
+
+  void set_bits_per_byte(std::size_t bits_per_byte)
+  {
+    set_size_t(ID_bits_per_byte, bits_per_byte);
+  }
 };
 
 template <>
@@ -81,12 +94,15 @@ public:
     irep_idt _id,
     const exprt &_op,
     const exprt &_offset,
-    const exprt &_value)
+    const exprt &_value,
+    std::size_t bits_per_byte)
     : ternary_exprt(_id, _op, _offset, _value, _op.type())
   {
     INVARIANT(
       _id == ID_byte_update_little_endian || _id == ID_byte_update_big_endian,
       "byte_update_exprt: Invalid ID");
+
+    set_bits_per_byte(bits_per_byte);
   }
 
   void set_op(exprt e)
@@ -105,6 +121,16 @@ public:
   const exprt &op() const { return op0(); }
   const exprt &offset() const { return op1(); }
   const exprt &value() const { return op2(); }
+
+  std::size_t get_bits_per_byte() const
+  {
+    return get_size_t(ID_bits_per_byte);
+  }
+
+  void set_bits_per_byte(std::size_t bits_per_byte)
+  {
+    set_size_t(ID_bits_per_byte, bits_per_byte);
+  }
 };
 
 template <>
