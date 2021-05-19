@@ -1573,7 +1573,14 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
   const typet o_type2=operands[2].type();
 
   implicit_typecast_bool(operands[0]);
-  implicit_typecast_arithmetic(operands[1], operands[2]);
+
+  if(o_type1.id() == ID_empty || o_type2.id() == ID_empty)
+  {
+    operands[1] = typecast_exprt::conditional_cast(operands[1], void_type());
+    operands[2] = typecast_exprt::conditional_cast(operands[2], void_type());
+    expr.type() = void_type();
+    return;
+  }
 
   if(operands[1].type().id()==ID_pointer &&
      operands[2].type().id()!=ID_pointer)
@@ -1629,6 +1636,13 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
   {
     expr.type()=void_type();
     return;
+  }
+
+  if(
+    operands[1].type() != operands[2].type() ||
+    operands[1].type().id() == ID_array)
+  {
+    implicit_typecast_arithmetic(operands[1], operands[2]);
   }
 
   if(operands[1].type() == operands[2].type())
@@ -3742,12 +3756,13 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
        o_type0.id()==ID_c_bool)
     {
       implicit_typecast_arithmetic(op0, op1);
-      if(op1.type().id()==ID_bool ||
-         op1.type().id()==ID_c_bool ||
-         op1.type().id()==ID_c_enum_tag ||
-         op1.type().id()==ID_unsignedbv ||
-         op1.type().id()==ID_signedbv)
+      if(
+        op1.type().id() == ID_bool || op1.type().id() == ID_c_bool ||
+        op1.type().id() == ID_c_enum_tag || op1.type().id() == ID_unsignedbv ||
+        op1.type().id() == ID_signedbv || op1.type().id() == ID_c_bit_field)
+      {
         return;
+      }
     }
     else if(o_type0.id()==ID_c_enum_tag ||
             o_type0.id()==ID_unsignedbv ||
@@ -3755,7 +3770,12 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
             o_type0.id()==ID_c_bit_field)
     {
       implicit_typecast_arithmetic(op0, op1);
-      return;
+      if(
+        op1.type().id() == ID_c_enum_tag || op1.type().id() == ID_unsignedbv ||
+        op1.type().id() == ID_signedbv || op1.type().id() == ID_c_bit_field)
+      {
+        return;
+      }
     }
     else if(o_type0.id()==ID_vector &&
             o_type1.id()==ID_vector)

@@ -45,10 +45,43 @@ void c_typecheck_baset::implicit_typecast_arithmetic(
 {
   c_typecastt c_typecast(*this);
   c_typecast.implicit_typecast_arithmetic(expr1, expr2);
+
+  for(const auto &tc_error : c_typecast.errors)
+  {
+    error().source_location = expr1.find_source_location();
+    error() << "in expression '" << to_string(expr1) << "':\n"
+            << "conversion from '" << to_string(expr1.type()) << "' to '"
+            << to_string(expr2.type()) << "': " << tc_error << eom;
+  }
+
+  if(!c_typecast.errors.empty())
+    throw 0; // give up
+
+  for(const auto &tc_warning : c_typecast.warnings)
+  {
+    warning().source_location = expr1.find_source_location();
+    warning() << "conversion from '" << to_string(expr1.type()) << "' to '"
+              << to_string(expr2.type()) << "': " << tc_warning << eom;
+  }
 }
 
 void c_typecheck_baset::implicit_typecast_arithmetic(exprt &expr)
 {
   c_typecastt c_typecast(*this);
   c_typecast.implicit_typecast_arithmetic(expr);
+
+  for(const auto &tc_error : c_typecast.errors)
+  {
+    error().source_location = expr.find_source_location();
+    error() << tc_error << eom;
+  }
+
+  if(!c_typecast.errors.empty())
+    throw 0; // give up
+
+  for(const auto &tc_warning : c_typecast.warnings)
+  {
+    warning().source_location = expr.find_source_location();
+    warning() << tc_warning << eom;
+  }
 }
