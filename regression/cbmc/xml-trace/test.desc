@@ -7,7 +7,7 @@ VERIFICATION FAILED
 <assignment assignment_type="state" base_name="u" display_name="test::u" hidden="false" identifier="test::u" mode="C" step_nr="\d+" thread="0">
 <location file=".*" function="test" line="\d+" working-directory=".*"/>
 <type>union myunion</type>
-<full_lhs>byte_extract_little_endian\(u, 0ll?, .*int.*\)</full_lhs>
+<full_lhs>u</full_lhs>
 <full_lhs_value binary="[01]+">\d+ll?</full_lhs_value>
 <value>\{ \.i=\d+ll? \}</value>
 <value_expression>

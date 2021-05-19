@@ -21,6 +21,8 @@ Author: Daniel Kroening
 
 #include <solvers/decision_procedure.h>
 
+#include <goto-programs/rewrite_union.h>
+
 #include "partial_order_concurrency.h"
 
 static exprt build_full_lhs_rec(
@@ -377,6 +379,7 @@ void build_goto_trace(
             SSA_step.ssa_full_lhs),
           ns);
         replace_nondet_in_type(goto_trace_step.full_lhs, decision_procedure);
+        restore_union(goto_trace_step.full_lhs, ns);
       }
 
       if(SSA_step.ssa_full_lhs.is_not_nil())
@@ -407,6 +410,13 @@ void build_goto_trace(
 
         goto_trace_step.cond_value =
           decision_procedure.get(SSA_step.cond_handle).is_true();
+      }
+
+      if(SSA_step.source.pc->is_assert() || SSA_step.source.pc->is_assume())
+      {
+        goto_trace_step.original_condition =
+          SSA_step.source.pc->get_condition();
+        restore_union(goto_trace_step.original_condition, ns);
       }
 
       if(ssa_step_it == last_step_to_keep)
