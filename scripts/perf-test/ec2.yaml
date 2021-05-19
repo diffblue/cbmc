@@ -11,7 +11,10 @@ Parameters:
     SnapshotId:
         Type: String
 
-    AvailabilityZone:
+    DefaultVPC:
+        Type: String
+
+    Subnet:
         Type: String
 
     S3Bucket:
@@ -42,6 +45,9 @@ Parameters:
         Type: String
 
     CompareTo:
+        Type: String
+
+    UsePerf:
         Type: String
 
 Conditions:
@@ -123,69 +129,86 @@ Resources:
         DependsOn: EC2Role
         Properties:
             GroupDescription: SSH access
+            VpcId: !Ref DefaultVPC
             SecurityGroupIngress:
                 - IpProtocol: tcp
                   FromPort: 22
                   ToPort: 22
                   CidrIp: '0.0.0.0/0'
 
-    LaunchConfiguration:
-        Type: "AWS::AutoScaling::LaunchConfiguration"
+    LaunchTemplate:
+        Type: "AWS::EC2::LaunchTemplate"
         Properties:
-            BlockDeviceMappings:
-                - DeviceName: "/dev/sdf"
-                  Ebs:
-                      DeleteOnTermination: True
-                      SnapshotId: !Ref SnapshotId
-                      VolumeSize: 64
-            IamInstanceProfile: !Ref EC2InstanceProfile
-            ImageId: !Ref Ami
-            InstanceType: !Ref InstanceType
-            KeyName:
-                !If [UseKey, !Ref SSHKeyName, !Ref "AWS::NoValue"]
-            SecurityGroups:
-                - !Ref SecurityGroupInSSHWorld
-            SpotPrice:
-                !If [UseSpot, !Ref MaxPrice, !Ref "AWS::NoValue"]
-            UserData:
-                Fn::Base64: !Sub |
-                    #!/bin/bash
-                    set -x -e
+            LaunchTemplateData:
+                BlockDeviceMappings:
+                    - DeviceName: "/dev/sdf"
+                      Ebs:
+                          DeleteOnTermination: True
+                          SnapshotId: !Ref SnapshotId
+                          VolumeSize: 400
+                IamInstanceProfile:
+                    Name: !Ref EC2InstanceProfile
+                ImageId: !Ref Ami
+                InstanceType: !Ref InstanceType
+                KeyName:
+                    !If [UseKey, !Ref SSHKeyName, !Ref "AWS::NoValue"]
+                NetworkInterfaces:
+                    - AssociatePublicIpAddress: True
+                      DeviceIndex: 0
+                      Groups:
+                          - !Ref SecurityGroupInSSHWorld
+                UserData:
+                    Fn::Base64: !Sub |
+                        #!/bin/bash
+                        set -x -e
 
-                    # install awscli
-                    apt-get -y update
-                    apt-get install -y awscli
+                        # install awscli
+                        apt-get -y update
+                        apt-get install -y awscli
 
-                    # AWS Sig-v4 access
-                    aws configure set s3.signature_version s3v4
+                        # AWS Sig-v4 access
+                        aws configure set s3.signature_version s3v4
 
-                    aws s3 cp s3://${S3Bucket}/ec2-terminate.sh /etc/init.d/ec2-terminate
-                    sed -i 's/#SNSTOPIC#/${SnsTopic}/g' /etc/init.d/ec2-terminate
-                    sed -i 's/#MAXPRICE#/${MaxPrice}/g' /etc/init.d/ec2-terminate
-                    sed -i 's/#S3BUCKET#/${S3Bucket}/g' /etc/init.d/ec2-terminate
-                    sed -i 's/#PERFTESTID#/${PerfTestId}/g' /etc/init.d/ec2-terminate
-                    chmod a+x /etc/init.d/ec2-terminate
-                    update-rc.d ec2-terminate defaults
-                    systemctl start ec2-terminate
+                        aws s3 cp s3://${S3Bucket}/ec2-terminate.sh /etc/init.d/ec2-terminate
+                        sed -i 's/#SNSTOPIC#/${SnsTopic}/g' /etc/init.d/ec2-terminate
+                        sed -i 's/#MAXPRICE#/${MaxPrice}/g' /etc/init.d/ec2-terminate
+                        sed -i 's/#S3BUCKET#/${S3Bucket}/g' /etc/init.d/ec2-terminate
+                        sed -i 's/#PERFTESTID#/${PerfTestId}/g' /etc/init.d/ec2-terminate
+                        chmod a+x /etc/init.d/ec2-terminate
+                        update-rc.d ec2-terminate defaults
+                        systemctl start ec2-terminate
 
-                    aws s3 cp s3://${S3Bucket}/run-on-ec2.sh /root/run-on-ec2.sh
-                    sed -i 's#:WITNESSCHECK:#${WitnessCheck}#g' /root/run-on-ec2.sh
-                    sed -i 's#:AWSREGION:#${AWS::Region}#g' /root/run-on-ec2.sh
-                    sed -i 's#:SNSTOPIC:#${SnsTopic}#g' /root/run-on-ec2.sh
-                    sed -i 's#:SQSURL:#${SqsUrl}#g' /root/run-on-ec2.sh
-                    sed -i 's#:S3BUCKET:#${S3Bucket}#g' /root/run-on-ec2.sh
-                    sed -i 's#:PERFTESTID:#${PerfTestId}#g' /root/run-on-ec2.sh
-                    sed -i 's#:INSTANCETYPE:#${InstanceType}#g' /root/run-on-ec2.sh
-                    sed -i 's#:COMPARETO:#${CompareTo}#g' /root/run-on-ec2.sh
-                    . /root/run-on-ec2.sh
+                        aws s3 cp s3://${S3Bucket}/run-on-ec2.sh /root/run-on-ec2.sh
+                        sed -i 's#:WITNESSCHECK:#${WitnessCheck}#g' /root/run-on-ec2.sh
+                        sed -i 's#:AWSREGION:#${AWS::Region}#g' /root/run-on-ec2.sh
+                        sed -i 's#:SNSTOPIC:#${SnsTopic}#g' /root/run-on-ec2.sh
+                        sed -i 's#:SQSURL:#${SqsUrl}#g' /root/run-on-ec2.sh
+                        sed -i 's#:S3BUCKET:#${S3Bucket}#g' /root/run-on-ec2.sh
+                        sed -i 's#:PERFTESTID:#${PerfTestId}#g' /root/run-on-ec2.sh
+                        sed -i 's#:INSTANCETYPE:#${InstanceType}#g' /root/run-on-ec2.sh
+                        sed -i 's#:COMPARETO:#${CompareTo}#g' /root/run-on-ec2.sh
+                        sed -i 's#:USE_PERF:#${UsePerf}#g' /root/run-on-ec2.sh
+                        . /root/run-on-ec2.sh
 
     AutoScalingGroup:
         Type: "AWS::AutoScaling::AutoScalingGroup"
         Properties:
-            AvailabilityZones:
-                - !Ref AvailabilityZone
+            VPCZoneIdentifier:
+                - !Ref Subnet
             DesiredCapacity: !Ref FleetSize
-            LaunchConfigurationName: !Ref LaunchConfiguration
+            MixedInstancesPolicy:
+                InstancesDistribution:
+                    SpotMaxPrice:
+                        !If [UseSpot, !Ref MaxPrice, !Ref "AWS::NoValue"]
+                    OnDemandPercentageAboveBaseCapacity:
+                        !If [UseSpot, 0, 100]
+                    SpotAllocationStrategy: capacity-optimized
+                LaunchTemplate:
+                    LaunchTemplateSpecification:
+                        LaunchTemplateId: !Ref LaunchTemplate
+                        Version: !GetAtt
+                            - LaunchTemplate
+                            - LatestVersionNumber
             MaxSize: !Ref FleetSize
             MinSize: 1
 

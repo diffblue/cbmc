@@ -67,13 +67,15 @@ def parse_args():
                         default='quick',
                         help='Subset of tasks to run (quick, full; ' +
                              'default: quick; or regex of SV-COMP task(s))')
-    parser.add_argument('-B', '--code-build', type=str,
-                        default=same_dir('codebuild.yaml'),
-                        help='Non-default CodeBuild template to use')
+    parser.add_argument('-B', '--build', type=str,
+                        default=same_dir('build.yaml'),
+                        help='Non-default build template to use')
     parser.add_argument('-W', '--witness-check', action='store_true',
                         help='Run witness checks after benchmarking')
     parser.add_argument('-C', '--compare-to', default=[], action='append',
                         help='Include past results in tables [may repeat]')
+    parser.add_argument('-P', '--use-perf', action='store_true',
+                        help='Use Linux Perf for profiling')
 
     args = parser.parse_args()
 
@@ -82,7 +84,7 @@ def parse_args():
     assert(not args.ssh_key or args.ssh_key_name)
     if args.ssh_key:
         assert(os.path.isfile(args.ssh_key))
-    assert(os.path.isfile(args.code_build))
+    assert(os.path.isfile(args.build))
 
     return args
 
@@ -208,6 +210,36 @@ def prepare_sns_s3(session, email, bucket_name):
     return instance_terminated_arn
 
 
+def get_default_vpc(session, region, az):
+    # find the id of the default VPC in the chosen region
+    logger = logging.getLogger('perf_test')
+
+    ec2 = session.client('ec2', region_name=region)
+
+    res = ec2.describe_vpcs(Filters=[{'Name': 'isDefault', 'Values': ['true']}])
+    vpc = res['Vpcs'][0]['VpcId']
+    logger.info(region + ': default VPC: ' + vpc)
+
+    res = ec2.describe_subnets(
+            Filters=[
+                {'Name': 'vpc-id', 'Values': [vpc]},
+                {'Name': 'default-for-az', 'Values': ['true']}
+            ])
+    subnets = ','.join(s['SubnetId'] for s in res['Subnets'])
+    logger.info(region + ': default subnets: ' + subnets)
+
+    res = ec2.describe_subnets(
+            Filters=[
+                {'Name': 'vpc-id', 'Values': [vpc]},
+                {'Name': 'availability-zone', 'Values': [az]},
+                {'Name': 'default-for-az', 'Values': ['true']}
+            ])
+    subnet_for_az = res['Subnets'][0]['SubnetId']
+    logger.info(region + ': default subnet for ' + az + ': ' + subnet_for_az)
+
+    return (vpc, subnets, subnet_for_az)
+
+
 def select_region(session, mode, region, instance_type):
     # find the region and az with the lowest spot price for the chosen instance
     # type
@@ -265,7 +297,7 @@ def select_region(session, mode, region, instance_type):
             ec2 = session.client('ec2', region_name=r)
             res = ec2.describe_spot_price_history(
                     InstanceTypes=[instance_type],
-                    ProductDescriptions=['Linux/UNIX'],
+                    ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
                     StartTime=datetime.datetime.now())
             history = res['SpotPriceHistory']
             for az in history:
@@ -278,26 +310,33 @@ def select_region(session, mode, region, instance_type):
             min_region, min_az, min_price))
 
     # https://cloud-images.ubuntu.com/locator/ec2/
-    # 20181124 - Ubuntu 18.04 LTS (bionic) - hvm:ebs-ssd
+    # 20201120 - Ubuntu 20.04 LTS (focal) - hvm:ebs-ssd
     AMI_ids = {
         "Mappings": {
             "RegionMap": {
-                "ap-northeast-1": { "64": "ami-0fd02119f1653c976" },
-                "ap-northeast-2": { "64": "ami-096560874cb404a4d" },
-                "ap-northeast-3": { "64": "ami-064d6dc91cdb4daa8" },
-                "ap-south-1": { "64": "ami-01187fe59c07cd350" },
-                "ap-southeast-1": { "64": "ami-0efb24bbbf33a2fd7" },
-                "ap-southeast-2": { "64": "ami-03932cb7d3a1a69af" },
-                "ca-central-1": { "64": "ami-0388b9f812caf5c3f" },
-                "eu-central-1": { "64": "ami-080d06f90eb293a27" },
-                "eu-west-1": { "64": "ami-02790d1ebf3b5181d" },
-                "eu-west-2": { "64": "ami-06328f1e652dc7605" },
-                "eu-west-3": { "64": "ami-0697abcfa8916e673" },
-                "sa-east-1": { "64": "ami-04fb8967affdf73b6" },
-                "us-east-1": { "64": "ami-0d2505740b82f7948" },
-                "us-east-2": { "64": "ami-0cf8cc36b8c81c6de" },
-                "us-west-1": { "64": "ami-09c5eca75eed8245a" },
-                "us-west-2": { "64": "ami-0f05ad41860678734" }
+		"af-south-1": { "64": "ami-0196a23f828d6e619" },
+		"ap-east-1": { "64": "ami-f6511c87" },
+		"ap-northeast-1": { "64": "ami-0e40a27db137d33cb" },
+		"ap-northeast-2": { "64": "ami-01ff1255cee8004b8" },
+		"ap-northeast-3": { "64": "ami-0b58a665b8d0d720c" },
+		"ap-south-1": { "64": "ami-0cecfffd8cae9481c" },
+		"ap-southeast-1": { "64": "ami-0dbb8181cd0ce9cff" },
+		"ap-southeast-2": { "64": "ami-0f150e4544fb95045" },
+		"ca-central-1": { "64": "ami-03060448f5c8f2199" },
+		"cn-north-1": { "64": "ami-00cc446c1f9e0b72a" },
+		"cn-northwest-1": { "64": "ami-05b363127143238ba" },
+		"eu-central-1": { "64": "ami-09f14afb2e15caab5" },
+		"eu-north-1": { "64": "ami-01450210d4ebb3bab" },
+		"eu-south-1": { "64": "ami-0e3c0649c89ccddc9" },
+		"eu-west-1": { "64": "ami-048309a44dad514df" },
+		"eu-west-2": { "64": "ami-099ae17a6a688b1cc" },
+		"eu-west-3": { "64": "ami-098efdd0afb686fd5" },
+		"me-south-1": { "64": "ami-098b94183f8e74ecc" },
+		"sa-east-1": { "64": "ami-0cc03bf224d6eb2fc" },
+		"us-east-1": { "64": "ami-08306577a6694f5e7" },
+		"us-east-2": { "64": "ami-0be9fcdb56a1f1226" },
+		"us-west-1": { "64": "ami-04d12df4da18327bd" },
+		"us-west-2": { "64": "ami-082e4f383a98efbe9" },
             }
         }
     }
@@ -307,7 +346,7 @@ def select_region(session, mode, region, instance_type):
     return (min_region, min_az, min_price, ami)
 
 
-def prepare_ebs(session, region, az, ami):
+def prepare_ebs(session, region, az, ami, ssh_key_name):
     # create an ebs volume that contains the benchmark sources
     logger = logging.getLogger('perf_test')
     ec2 = session.client('ec2', region_name=region)
@@ -338,6 +377,10 @@ def prepare_ebs(session, region, az, ami):
                     {
                         'ParameterKey': 'AvailabilityZone',
                         'ParameterValue': az
+                    },
+                    {
+                        'ParameterKey': 'SSHKeyName',
+                        'ParameterValue': ssh_key_name
                     }
                 ])
 
@@ -347,7 +390,12 @@ def prepare_ebs(session, region, az, ami):
         logger.info(region + ': Waiting for EBS snapshot preparation on ' +
                     instance_id)
         waiter = ec2.get_waiter('instance_stopped')
-        waiter.wait(InstanceIds=[instance_id])
+        waiter.wait(
+                InstanceIds=[instance_id],
+                WaiterConfig={
+                    'Delay': 30,
+                    'MaxAttempts': 120
+                })
         stack.delete()
         waiter = cfn.meta.client.get_waiter('stack_delete_complete')
         waiter.wait(StackName='perf-test-build-ebs')
@@ -365,76 +413,86 @@ def prepare_ebs(session, region, az, ami):
     return snapshots['Snapshots'][0]['SnapshotId']
 
 
-def build(session, repository, commit_id, bucket_name, perf_test_id,
-        codebuild_file):
-    # build the chosen commit in CodeBuild
+def build(session, region, ami, subnet, repository, commit_id, bucket_name,
+        perf_test_id, build_file, use_perf):
+    # build the chosen commit
     logger = logging.getLogger('perf_test')
 
-    if repository.startswith('https://github.com/'):
-        repo_type = 'GITHUB'
-    else:
-        repo_type = 'CODECOMMIT'
-
-    cfn = session.resource('cloudformation', region_name='us-east-1')
-    stack_name = 'perf-test-codebuild-' + perf_test_id
-    with open(codebuild_file) as f:
-        CFN_codebuild = f.read()
+    cfn = session.resource('cloudformation', region_name=region)
+    with open(build_file) as f:
+        CFN_build = f.read()
+    stack_name = 'perf-test-build-' + perf_test_id
     stack = cfn.create_stack(
             StackName=stack_name,
-            TemplateBody=CFN_codebuild,
+            TemplateBody=CFN_build,
             Parameters=[
+                {
+                    'ParameterKey': 'Ami',
+                    'ParameterValue': ami
+                },
                 {
                     'ParameterKey': 'S3Bucket',
                     'ParameterValue': bucket_name
+                },
+                {
+                    'ParameterKey': 'Subnet',
+                    'ParameterValue': subnet
                 },
                 {
                     'ParameterKey': 'PerfTestId',
                     'ParameterValue': perf_test_id
                 },
                 {
-                    'ParameterKey': 'RepoType',
-                    'ParameterValue': repo_type
-                },
-                {
                     'ParameterKey': 'Repository',
                     'ParameterValue': repository
-                }
+                },
+                {
+                    'ParameterKey': 'CommitId',
+                    'ParameterValue': commit_id
+                },
+                {
+                    'ParameterKey': 'UsePerf',
+                    'ParameterValue': str(use_perf)
+                },
             ],
             Capabilities=['CAPABILITY_NAMED_IAM'])
 
     waiter = cfn.meta.client.get_waiter('stack_create_complete')
     waiter.wait(StackName=stack_name)
-    logger.info('us-east-1: CodeBuild configuration complete')
+    release_instance_id = stack.outputs[0]['OutputValue']
+    profiling_instance_id = stack.outputs[1]['OutputValue']
 
-    codebuild = session.client('codebuild', region_name='us-east-1')
-    rel_build = codebuild.start_build(
-            projectName='perf-test-release-build-' + perf_test_id,
-            sourceVersion=commit_id)['build']['id']
-    prof_build = codebuild.start_build(
-            projectName='perf-test-profiling-build-' + perf_test_id,
-            sourceVersion=commit_id)['build']['id']
-
-    logger.info('us-east-1: Waiting for builds to complete')
-    all_complete = False
-    completed = {}
-    while not all_complete:
-        time.sleep(10)
-        response = codebuild.batch_get_builds(ids=[rel_build, prof_build])
-        all_complete = True
-        for b in response['builds']:
-            if b['buildStatus'] == 'IN_PROGRESS':
-                all_complete = False
-                break
-            elif not completed.get(b['projectName']):
-                logger.info('us-east-1: Build {} ended: {}'.format(
-                    b['projectName'], b['buildStatus']))
-                assert(b['buildStatus'] == 'SUCCEEDED')
-                completed[b['projectName']] = True
+    logger.info(region + ': Waiting for release build on ' +
+                release_instance_id)
+    logger.info(region + ': Waiting for profiling build on ' +
+                release_instance_id)
+    ec2 = session.client('ec2', region_name=region)
+    waiter = ec2.get_waiter('instance_stopped')
+    waiter.wait(
+            InstanceIds=[release_instance_id, profiling_instance_id],
+            WaiterConfig={
+                'Delay': 30,
+                'MaxAttempts': 120
+            })
 
     stack.delete()
     waiter = cfn.meta.client.get_waiter('stack_delete_complete')
     waiter.wait(StackName=stack_name)
-    logger.info('us-east-1: CodeBuild complete and stack cleaned')
+
+    s3 = session.client('s3', region_name='us-east-1')
+    try:
+        s3.head_object(Bucket=bucket_name, Key=perf_test_id + '/release/cbmc')
+        s3.head_object(Bucket=bucket_name, Key=perf_test_id + '/release/goto-cc')
+    except :
+        logger.error(region + ': Release build failed')
+        raise
+    try:
+        s3.head_object(Bucket=bucket_name, Key=perf_test_id + '/profiling/cbmc')
+        s3.head_object(Bucket=bucket_name, Key=perf_test_id + '/profiling/goto-cc')
+    except :
+        logger.error(region + ': Profiling build failed')
+        raise
+    logger.info(region + ': builds completed and stack cleaned')
 
 
 def prepare_sqs(session, region, perf_test_id, tasks):
@@ -485,12 +543,21 @@ def seed_queue(session, region, queue, task_set):
                  'MemSafety-Other',
                  'NoOverflows-BitVectors', 'NoOverflows-Other',
                  'ReachSafety-Arrays', 'ReachSafety-BitVectors',
+                 'ReachSafety-Combinations',
                  'ReachSafety-ControlFlow', 'ReachSafety-ECA',
                  'ReachSafety-Floats', 'ReachSafety-Heap',
                  'ReachSafety-Loops', 'ReachSafety-ProductLines',
                  'ReachSafety-Recursive', 'ReachSafety-Sequentialized',
-                 'Systems_BusyBox_MemSafety', 'Systems_BusyBox_NoOverflows',
-                 'Systems_DeviceDriversLinux64_ReachSafety',
+                 'ReachSafety-XCSP',
+                 'SoftwareSystems-AWS-C-Common-ReachSafety',
+                 'SoftwareSystems-BusyBox-MemSafety',
+                 'SoftwareSystems-BusyBox-NoOverflows',
+                 'SoftwareSystems-DeviceDriversLinux64-ReachSafety',
+                 'SoftwareSystems-DeviceDriversLinux64Large-ReachSafety',
+                 'SoftwareSystems-OpenBSD-MemSafety',
+                 'SoftwareSystems-uthash-MemSafety',
+                 'SoftwareSystems-uthash-NoOverflows',
+                 'SoftwareSystems-uthash-ReachSafety',
                  'Termination-MainControlFlow', 'Termination-MainHeap',
                  'Termination-Other']
 
@@ -517,9 +584,10 @@ def seed_queue(session, region, queue, task_set):
 
 
 def run_perf_test(
-        session, mode, region, az, ami, instance_type, sqs_arn, sqs_url,
+        session, mode, region, vpc, subnets, ami, instance_type,
+        sqs_arn, sqs_url,
         parallel, snapshot_id, instance_terminated_arn, bucket_name,
-        perf_test_id, price, ssh_key_name, witness_check, compare_to):
+        perf_test_id, price, ssh_key_name, witness_check, compare_to, use_perf):
     # create an EC2 instance and trigger benchmarking
     logger = logging.getLogger('perf_test')
 
@@ -545,8 +613,12 @@ def run_perf_test(
                     'ParameterValue': ami
                 },
                 {
-                    'ParameterKey': 'AvailabilityZone',
-                    'ParameterValue': az
+                    'ParameterKey': 'DefaultVPC',
+                    'ParameterValue': vpc
+                },
+                {
+                    'ParameterKey': 'Subnet',
+                    'ParameterValue': subnets
                 },
                 {
                     'ParameterKey': 'InstanceType',
@@ -595,7 +667,11 @@ def run_perf_test(
                 {
                     'ParameterKey': 'CompareTo',
                     'ParameterValue': ':'.join(compare_to)
-                }
+                },
+                {
+                    'ParameterKey': 'UsePerf',
+                    'ParameterValue': str(use_perf)
+                },
             ],
             Capabilities=['CAPABILITY_NAMED_IAM'])
 
@@ -665,33 +741,44 @@ def main():
     # target storage name
     account_id = session.client('sts').get_caller_identity()['Account']
     bucket_name = "perf-test-" + account_id
-
     # configuration set, let's create the infrastructure
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as e:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as e:
         session1 = boto3.session.Session()
-        sns_s3_future = e.submit(
-                prepare_sns_s3, session1, args.email, bucket_name)
+        vpc_future = e.submit(
+                get_default_vpc, session1, region, az)
         session2 = boto3.session.Session()
+        sns_s3_future = e.submit(
+                prepare_sns_s3, session2, args.email, bucket_name)
+
+    (vpc, subnets, subnet_for_az) = vpc_future.result()
+    instance_terminated_arn = sns_s3_future.result()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as e:
+        session1 = boto3.session.Session()
         build_future = e.submit(
-                build, session2, args.repository, args.commit_id, bucket_name,
-                perf_test_id, args.code_build)
+                build, session1, region, ami, subnet_for_az,
+                args.repository, args.commit_id, bucket_name, perf_test_id,
+                args.build, args.use_perf)
+        session2 = boto3.session.Session()
+        ebs_future = e.submit(
+                prepare_ebs, session2, region, az, ami,
+                args.ssh_key_name)
         session3 = boto3.session.Session()
-        ebs_future = e.submit(prepare_ebs, session3, region, az, ami)
-        session4 = boto3.session.Session()
         sqs_future = e.submit(
-                prepare_sqs, session4, region, perf_test_id, args.tasks)
+                prepare_sqs, session3, region, perf_test_id, args.tasks)
 
     # wait for all preparation steps to complete
-    instance_terminated_arn = sns_s3_future.result()
     build_future.result()
     snapshot_id = ebs_future.result()
     (queue, sqs_arn, sqs_url) = sqs_future.result()
 
     run_perf_test(
-            session, args.mode, region, az, ami, args.instance_type,
+            session, args.mode, region, vpc, subnets, ami,
+            args.instance_type,
             sqs_arn, sqs_url, args.parallel, snapshot_id,
             instance_terminated_arn, bucket_name, perf_test_id, price,
-            args.ssh_key_name, args.witness_check, args.compare_to)
+            args.ssh_key_name, args.witness_check, args.compare_to,
+            args.use_perf)
 
     return 0
 
