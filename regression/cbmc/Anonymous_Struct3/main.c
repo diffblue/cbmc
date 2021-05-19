@@ -1,5 +1,3 @@
-#include <assert.h>
-
 // The member without name is a Visual Studio feature
 // https://msdn.microsoft.com/en-us/library/z2cx9y4f.aspx
 typedef union my_U {
@@ -19,7 +17,7 @@ int main()
   x.f1 = 1;
 
   if(*(char *)&word==1)
-    assert(x.raw==2); // little endian
+    __CPROVER_assert(x.raw == 2, "little endian");
   else
-    assert(x.raw==64); // big endian
+    __CPROVER_assert(x.raw == 64, "big endian");
 }

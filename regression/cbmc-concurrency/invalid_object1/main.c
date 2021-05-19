@@ -134,6 +134,7 @@ struct OpenEthState
 
 struct device
 {
+  int dummy;
 };
 
 struct napi_struct

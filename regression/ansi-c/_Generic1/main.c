@@ -13,6 +13,7 @@
                 struct some: 5 \
              )
 
+#ifdef __GNUC__
 struct some
 {
 } s;
@@ -22,7 +23,6 @@ char ch;
 long double ld;
 short sh;
 
-#ifdef __GNUC__
 STATIC_ASSERT(G(i)==3);
 STATIC_ASSERT(G(sh)==10);
 STATIC_ASSERT(G(ld)==1);

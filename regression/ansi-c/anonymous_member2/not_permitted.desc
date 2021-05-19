@@ -1,0 +1,9 @@
+CORE gcc-only
+main.c
+-Dnot_permitted
+cannot initialize 'void \*' with an initializer list
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+^warning: ignoring
