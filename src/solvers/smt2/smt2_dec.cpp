@@ -45,7 +45,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     std::ofstream problem_out(
       temp_file_problem(), std::ios_base::out | std::ios_base::trunc);
     problem_out << stringstream.str();
-    std::cout<<stringstream.str() << std::endl;
+    // std::cout<<stringstream.str() << std::endl;
     write_footer(problem_out);
   }
 
