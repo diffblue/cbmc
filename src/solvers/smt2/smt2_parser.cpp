@@ -699,44 +699,83 @@ exprt smt2_parsert::function_application()
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after to_fp");
 
+          // width_f *includes* the hidden bit
+          const ieee_float_spect spec(width_f - 1, width_e);
+
           auto rounding_mode = expression();
 
-          if(next_token() != smt2_tokenizert::NUMERAL)
-            throw error("expected number after to_fp");
-
-          auto real_number = smt2_tokenizer.get_buffer();
+          auto source_op = expression();
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' at the end of to_fp");
 
-          mp_integer significand, exponent;
-
-          auto dot_pos = real_number.find('.');
-          if(dot_pos == std::string::npos)
+          // There are several options for the source operand:
+          // 1) real or integer
+          // 2) bit-vector, which is interpreted as signed 2's complement
+          // 3) another floating-point format
+          if(
+            source_op.type().id() == ID_real ||
+            source_op.type().id() == ID_integer)
           {
-            exponent = 0;
-            significand = string2integer(real_number);
+            // For now, we can only do this when
+            // the source operand is a constant.
+            if(source_op.id() == ID_constant)
+            {
+              mp_integer significand, exponent;
+
+              const auto &real_number =
+                id2string(to_constant_expr(source_op).get_value());
+              auto dot_pos = real_number.find('.');
+              if(dot_pos == std::string::npos)
+              {
+                exponent = 0;
+                significand = string2integer(real_number);
+              }
+              else
+              {
+                // remove the '.'
+                std::string significand_str;
+                significand_str.reserve(real_number.size());
+                for(auto ch : real_number)
+                {
+                  if(ch != '.')
+                    significand_str += ch;
+                }
+
+                exponent =
+                  mp_integer(dot_pos) - mp_integer(real_number.size()) + 1;
+                significand = string2integer(significand_str);
+              }
+
+              ieee_floatt a(
+                spec,
+                static_cast<ieee_floatt::rounding_modet>(
+                  numeric_cast_v<int>(to_constant_expr(rounding_mode))));
+              a.from_base10(significand, exponent);
+              return a.to_expr();
+            }
+            else
+              throw error()
+                << "to_fp for non-constant real expressions is not implemented";
+          }
+          else if(source_op.type().id() == ID_unsignedbv)
+          {
+            // The operand is hard-wired to be interpreted as a signed number.
+            return floatbv_typecast_exprt(
+              typecast_exprt(
+                source_op,
+                signedbv_typet(
+                  to_unsignedbv_type(source_op.type()).get_width())),
+              rounding_mode,
+              spec.to_type());
+          }
+          else if(source_op.type().id() == ID_floatbv)
+          {
+            return floatbv_typecast_exprt(
+              source_op, rounding_mode, spec.to_type());
           }
           else
-          {
-            // remove the '.', if any
-            std::string significand_str;
-            significand_str.reserve(real_number.size());
-            for(auto ch : real_number)
-              if(ch != '.')
-                significand_str += ch;
-
-            exponent = mp_integer(dot_pos) - mp_integer(real_number.size()) + 1;
-            significand = string2integer(significand_str);
-          }
-
-          // width_f *includes* the hidden bit
-          ieee_float_spect spec(width_f - 1, width_e);
-          ieee_floatt a(spec);
-          a.rounding_mode = static_cast<ieee_floatt::rounding_modet>(
-            numeric_cast_v<int>(to_constant_expr(rounding_mode)));
-          a.from_base10(significand, exponent);
-          return a.to_expr();
+            throw error() << "unexpected sort given as operand to to_fp";
         }
         else
         {
