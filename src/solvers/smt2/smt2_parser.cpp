@@ -500,7 +500,10 @@ exprt smt2_parsert::function_application()
       if(next_token() != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_'");
 
-      if(has_prefix(smt2_tokenizer.get_buffer(), "bv"))
+      // copy, the reference won't be stable
+      const auto id = smt2_tokenizer.get_buffer();
+
+      if(has_prefix(id, "bv"))
       {
         mp_integer i = string2integer(
           std::string(smt2_tokenizer.get_buffer(), 2, std::string::npos));
@@ -515,10 +518,36 @@ exprt smt2_parsert::function_application()
 
         return from_integer(i, unsignedbv_typet(width));
       }
+      else if(id == "+oo" || id == "-oo" || id == "NaN")
+      {
+        // These are the "plus infinity", "minus infinity" and NaN
+        // floating-point literals.
+        if(next_token() != smt2_tokenizert::NUMERAL)
+          throw error() << "expected number after " << id;
+
+        auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+
+        if(next_token() != smt2_tokenizert::NUMERAL)
+          throw error() << "expected second number after " << id;
+
+        auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+
+        if(next_token() != smt2_tokenizert::CLOSE)
+          throw error() << "expected ')' after " << id;
+
+        // width_f *includes* the hidden bit
+        const ieee_float_spect spec(width_f - 1, width_e);
+
+        if(id == "+oo")
+          return ieee_floatt::plus_infinity(spec).to_expr();
+        else if(id == "-oo")
+          return ieee_floatt::minus_infinity(spec).to_expr();
+        else // NaN
+          return ieee_floatt::NaN(spec).to_expr();
+      }
       else
       {
-        throw error() << "unknown indexed identifier "
-                      << smt2_tokenizer.get_buffer();
+        throw error() << "unknown indexed identifier " << id;
       }
     }
     else if(smt2_tokenizer.get_buffer() == "!")
