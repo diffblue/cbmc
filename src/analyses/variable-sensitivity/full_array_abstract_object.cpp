@@ -10,6 +10,7 @@
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/arith_tools.h>
+#include <util/mathematical_types.h>
 #include <util/std_expr.h>
 
 #include "abstract_value_object.h"
@@ -399,6 +400,28 @@ abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
   {
     return shared_from_this();
   }
+}
+
+exprt full_array_abstract_objectt::to_predicate_internal(
+  const exprt &name) const
+{
+  auto all_predicates = exprt::operandst{};
+
+  for(auto field : map.get_sorted_view())
+  {
+    auto ii = from_integer(field.first.to_long(), integer_typet());
+    auto index = index_exprt(name, ii);
+    auto field_expr = field.second->to_predicate(index);
+
+    if(!field_expr.is_true())
+      all_predicates.push_back(field_expr);
+  }
+
+  if(all_predicates.empty())
+    return true_exprt();
+  if(all_predicates.size() == 1)
+    return all_predicates.front();
+  return and_exprt(all_predicates);
 }
 
 void full_array_abstract_objectt::statistics(

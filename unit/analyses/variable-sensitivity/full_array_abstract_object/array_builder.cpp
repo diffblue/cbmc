@@ -9,7 +9,7 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_array_abstract_object/array_builder.h>
-#include <arith_tools.h>
+#include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 
 full_array_abstract_objectt::full_array_pointert build_array(
@@ -32,7 +32,12 @@ full_array_abstract_objectt::full_array_pointert build_array(
   exprt::operandst element_ops;
 
   for(auto element : array)
-    element_ops.push_back(from_integer(element, integer_typet()));
+  {
+    if(element != TOP_MEMBER)
+      element_ops.push_back(from_integer(element, integer_typet()));
+    else
+      element_ops.push_back(nil_exprt());
+  }
 
   auto array_expr = array_exprt(element_ops, array_type);
   return build_array(array_expr, environment, ns);

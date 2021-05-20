@@ -15,6 +15,7 @@ full_array_abstract_objectt::full_array_pointert build_array(
   abstract_environmentt &environment,
   const namespacet &ns);
 
+const int TOP_MEMBER = std::numeric_limits<int>::max();
 full_array_abstract_objectt::full_array_pointert build_array(
   const std::vector<int> &array,
   abstract_environmentt &environment,
