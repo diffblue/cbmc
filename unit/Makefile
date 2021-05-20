@@ -29,6 +29,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/interval_abstract_value/to_predicate.cpp \
        analyses/variable-sensitivity/interval_abstract_value/widening_merge.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/full_struct_abstract_object/struct_builder.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume_prune.cpp \
