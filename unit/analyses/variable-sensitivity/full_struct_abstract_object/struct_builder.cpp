@@ -53,8 +53,10 @@ full_struct_abstract_objectt::constant_struct_pointert build_struct(
       struct_union_typet::componentt(member.first, integer_typet());
     struct_type.components().push_back(component);
 
-    auto value = from_integer(member.second, integer_typet());
-    val1_op.push_back(value);
+    if(member.second != TOP_MEMBER)
+      val1_op.push_back(from_integer(member.second, integer_typet()));
+    else
+      val1_op.push_back(nil_exprt());
   }
 
   auto val1 = struct_exprt(val1_op, struct_type);
