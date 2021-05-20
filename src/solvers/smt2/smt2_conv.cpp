@@ -406,7 +406,7 @@ constant_exprt smt2_convt::parse_literal(
   {
     std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
     std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
-    return ieee_floatt::plus_infinity(ieee_float_spect(s, e)).to_expr();
+    return ieee_floatt::plus_infinity(ieee_float_spect(s - 1, e)).to_expr();
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="_" &&
@@ -414,7 +414,7 @@ constant_exprt smt2_convt::parse_literal(
   {
     std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
     std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
-    return ieee_floatt::minus_infinity(ieee_float_spect(s, e)).to_expr();
+    return ieee_floatt::minus_infinity(ieee_float_spect(s - 1, e)).to_expr();
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="_" &&
@@ -422,7 +422,7 @@ constant_exprt smt2_convt::parse_literal(
   {
     std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
     std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
-    return ieee_floatt::NaN(ieee_float_spect(s, e)).to_expr();
+    return ieee_floatt::NaN(ieee_float_spect(s - 1, e)).to_expr();
   }
 
   if(type.id()==ID_signedbv ||
