@@ -69,6 +69,8 @@ protected:
   abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const override;
 
+  exprt to_predicate_internal(const exprt &name) const override;
+
 private:
   /// Setter for updating the stored values
   /// \param other_values: the new (non-empty) set of values
@@ -83,8 +85,6 @@ private:
   resolve_values(const abstract_object_sett &new_values) const;
 
   void set_top_internal() override;
-
-  exprt to_predicate_internal(const exprt &name) const override;
 
   // data
   abstract_object_sett values;

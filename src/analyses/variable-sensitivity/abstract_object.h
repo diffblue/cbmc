@@ -363,6 +363,11 @@ public:
     return shared_from_this() == other;
   }
 
+  /// to_predicate implementation - derived classes will override
+  /// \param name - the variable name to substitute into the expression
+  /// \return Returns an exprt representing the object as an invariant.
+  virtual exprt to_predicate_internal(const exprt &name) const;
+
 private:
   /// To enforce copy-on-write these are private and have read-only accessors
   typet t;
@@ -377,11 +382,6 @@ private:
   virtual void set_not_top_internal()
   {
   }
-
-  /// to_predicate implementation - derived classes will override
-  /// \param name - the variable name to substitute into the expression
-  /// \return Returns an exprt representing the object as an invariant.
-  virtual exprt to_predicate_internal(const exprt &name) const;
 
   /**
    * Helper function for abstract_objectt::abstract_object_merge to perform any
