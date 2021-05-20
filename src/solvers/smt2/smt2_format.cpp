@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/ieee_float.h>
 
 std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
 {
@@ -92,7 +93,33 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     }
     else if(expr_type.id() == ID_floatbv)
     {
-      out << value;
+      const ieee_floatt v = ieee_floatt(constant_expr);
+      const size_t e = v.spec.e;
+      const size_t f = v.spec.f + 1; // SMT-LIB counts the hidden bit
+
+      if(v.is_NaN())
+      {
+        out << "(_ NaN " << e << " " << f << ")";
+      }
+      else if(v.is_infinity())
+      {
+        if(v.get_sign())
+          out << "(_ -oo " << e << " " << f << ")";
+        else
+          out << "(_ +oo " << e << " " << f << ")";
+      }
+      else
+      {
+        // Zero, normal or subnormal
+
+        mp_integer binary = v.pack();
+        std::string binaryString(integer2binary(v.pack(), v.spec.width()));
+
+        out << "(fp "
+            << "#b" << binaryString.substr(0, 1) << " "
+            << "#b" << binaryString.substr(1, e) << " "
+            << "#b" << binaryString.substr(1 + e, f - 1) << ")";
+      }
     }
     else
       DATA_INVARIANT(false, "unhandled constant: " + expr_type.id_string());
