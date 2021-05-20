@@ -6,7 +6,7 @@
 
 smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
   std::string solver_command)
-  : solver_command{std::move(solver_command)}
+  : solver_command{std::move(solver_command)}, number_of_solver_calls{0}
 {
 }
 
@@ -37,8 +37,7 @@ smt2_incremental_decision_proceduret::decision_procedure_text() const
 std::size_t
 smt2_incremental_decision_proceduret::get_number_of_solver_calls() const
 {
-  UNIMPLEMENTED;
-  return 0;
+  return number_of_solver_calls;
 }
 
 void smt2_incremental_decision_proceduret::set_to(const exprt &expr, bool value)
@@ -64,6 +63,7 @@ void smt2_incremental_decision_proceduret::pop()
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
+  ++number_of_solver_calls;
   UNIMPLEMENTED;
   return decision_proceduret::resultt::D_SATISFIABLE;
 }

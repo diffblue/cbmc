@@ -35,6 +35,7 @@ protected:
 
   /// This is where we store the solver command for reporting the solver used.
   std::string solver_command;
+  size_t number_of_solver_calls;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
