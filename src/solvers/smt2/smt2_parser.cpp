@@ -1106,6 +1106,18 @@ void smt2_parsert::setup_expressions()
     return with_exprt(op[0], op[1], op[2]);
   };
 
+  expressions["fp.abs"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.abs takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.abs takes FloatingPoint operand");
+
+    return abs_exprt(op[0]);
+  };
+
   expressions["fp.isNaN"] = [this] {
     auto op = operands();
 
