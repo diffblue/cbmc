@@ -114,9 +114,21 @@ void code_contractst::check_apply_invariants(
   // build the havocking code
   goto_programt havoc_code;
 
-  // assert the invariant
+  // process quantified variables correctly (introduce a fresh temporary)
+  // and return a copy of the invariant
+  const auto &invariant_expr = [&]() {
+    auto invariant_copy = invariant;
+    replace_symbolt replace;
+    code_contractst::add_quantified_variable(invariant_copy, replace, mode);
+    replace(invariant_copy);
+    return invariant_copy;
+  };
+
+  // Generate: assert(invariant) just before the loop
+  // We use a block scope to create a temporary assertion,
+  // and immediately convert it to goto instructions.
   {
-    code_assertt assertion{invariant};
+    code_assertt assertion{invariant_expr()};
     assertion.add_source_location() = loop_head->source_location;
     converter.goto_convert(assertion, havoc_code, mode);
     havoc_code.instructions.back().source_location.set_comment(
@@ -126,10 +138,14 @@ void code_contractst::check_apply_invariants(
   // havoc variables being written to
   build_havoc_code(loop_head, modifies, havoc_code);
 
-  // assume the invariant
-  code_assumet assumption{invariant};
-  assumption.add_source_location() = loop_head->source_location;
-  converter.goto_convert(assumption, havoc_code, mode);
+  // Generate: assume(invariant) just after havocing
+  // We use a block scope to create a temporary assumption,
+  // and immediately convert it to goto instructions.
+  {
+    code_assumet assumption{invariant_expr()};
+    assumption.add_source_location() = loop_head->source_location;
+    converter.goto_convert(assumption, havoc_code, mode);
+  }
 
   // non-deterministically skip the loop if it is a do-while loop
   if(!loop_head->is_goto())
@@ -143,9 +159,11 @@ void code_contractst::check_apply_invariants(
   // Use insert_before_swap to preserve jumps to loop head.
   goto_function.body.insert_before_swap(loop_head, havoc_code);
 
-  // assert the invariant at the end of the loop body
+  // Generate: assert(invariant) just after the loop exits
+  // We use a block scope to create a temporary assertion,
+  // and immediately convert it to goto instructions.
   {
-    code_assertt assertion{invariant};
+    code_assertt assertion{invariant_expr()};
     assertion.add_source_location() = loop_end->source_location;
     converter.goto_convert(assertion, havoc_code, mode);
     havoc_code.instructions.back().source_location.set_comment(
@@ -172,9 +190,9 @@ bool code_contractst::has_contract(const irep_idt fun_name)
 }
 
 void code_contractst::add_quantified_variable(
-  exprt expression,
+  const exprt &expression,
   replace_symbolt &replace,
-  irep_idt mode)
+  const irep_idt &mode)
 {
   if(expression.id() == ID_not || expression.id() == ID_typecast)
   {
@@ -213,15 +231,13 @@ void code_contractst::add_quantified_variable(
   else if(expression.id() == ID_exists || expression.id() == ID_forall)
   {
     // When a quantifier expression is found,
-    // 1. get quantified variables
+    // for each quantified variable ...
     const auto &quantifier_expression = to_quantifier_expr(expression);
-    const auto &quantified_variables = quantifier_expression.variables();
-    for(const auto &quantified_variable : quantified_variables)
+    for(const auto &quantified_variable : quantifier_expression.variables())
     {
-      // for each quantified variable...
       const auto &quantified_symbol = to_symbol_expr(quantified_variable);
 
-      // 1.1 create fresh symbol
+      // 1. create fresh symbol
       symbolt new_symbol = get_fresh_aux_symbol(
         quantified_symbol.type(),
         id2string(quantified_symbol.get_identifier()),
@@ -230,12 +246,12 @@ void code_contractst::add_quantified_variable(
         mode,
         symbol_table);
 
-      // 1.2 add created fresh symbol to expression map
+      // 2. add created fresh symbol to expression map
       symbol_exprt q(
         quantified_symbol.get_identifier(), quantified_symbol.type());
       replace.insert(q, new_symbol.symbol_expr());
 
-      // 1.3 recursively check for nested quantified formulae
+      // 3. recursively check for nested quantified formulae
       add_quantified_variable(quantifier_expression.where(), replace, mode);
     }
   }
@@ -356,7 +372,8 @@ bool code_contractst::apply_function_contract(
 
   // Create a replace_symbolt object, for replacing expressions in the callee
   // with expressions from the call site (e.g. the return value).
-  replace_symbolt replace;
+  // This object tracks replacements that are common to ENSURES and REQUIRES.
+  replace_symbolt common_replace;
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
@@ -367,7 +384,7 @@ bool code_contractst::apply_function_contract(
       // rewrite calls to foo as follows:
       // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
       symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
-      replace.insert(ret_val, call.lhs());
+      common_replace.insert(ret_val, call.lhs());
     }
     else
     {
@@ -388,38 +405,37 @@ bool code_contractst::apply_function_contract(
           ns,
           symbol_table);
         symbol_exprt ret_val(CPROVER_PREFIX "return_value", type.return_type());
-        replace.insert(ret_val, fresh.symbol_expr());
+        common_replace.insert(ret_val, fresh.symbol_expr());
       }
     }
   }
 
   // Replace formal parameters
-  code_function_callt::argumentst::const_iterator a_it=
-    call.arguments().begin();
-  for(code_typet::parameterst::const_iterator p_it = type.parameters().begin();
+  auto a_it = call.arguments().begin();
+  for(auto p_it = type.parameters().begin();
       p_it != type.parameters().end() && a_it != call.arguments().end();
       ++p_it, ++a_it)
   {
     if(!p_it->get_identifier().empty())
     {
       symbol_exprt p(p_it->get_identifier(), p_it->type());
-      replace.insert(p, *a_it);
+      common_replace.insert(p, *a_it);
     }
   }
 
-  // Add quantified variables in contracts to the symbol map
-  irep_idt mode = symbol_table.lookup_ref(function).mode;
-  code_contractst::add_quantified_variable(ensures, replace, mode);
-  code_contractst::add_quantified_variable(requires, replace, mode);
+  // ASSIGNS clause should not refer to any quantified variables,
+  // and only refer to the common symbols to be replaced.
+  common_replace(assigns);
 
-  // Replace expressions in the contract components.
-  replace(assigns);
-  replace(requires);
-  replace(ensures);
+  const auto &mode = symbol_table.lookup_ref(function).mode;
 
   // Insert assertion of the precondition immediately before the call site.
   if(requires.is_not_nil())
   {
+    replace_symbolt replace(common_replace);
+    code_contractst::add_quantified_variable(requires, replace, mode);
+    replace(requires);
+
     goto_programt assertion;
     converter.goto_convert(
       code_assertt(requires),
@@ -435,6 +451,10 @@ bool code_contractst::apply_function_contract(
   std::pair<goto_programt, goto_programt> ensures_pair;
   if(ensures.is_not_nil())
   {
+    replace_symbolt replace(common_replace);
+    code_contractst::add_quantified_variable(ensures, replace, mode);
+    replace(ensures);
+
     auto assumption = code_assumet(ensures);
     ensures_pair = create_ensures_instruction(
       assumption,
@@ -616,14 +636,11 @@ void code_contractst::instrument_call_statement(
 
   exprt called_assigns =
     to_code_with_contract_type(called_symbol.type).assigns();
-  if(!called_assigns.is_nil()) // Called function has assigns clause
+  if(called_assigns.is_not_nil())
   {
-    replace_symbolt replace;
-    // Replace formal parameters
-    code_function_callt::argumentst::const_iterator a_it =
-      call.arguments().begin();
-    for(code_typet::parameterst::const_iterator p_it =
-          called_type.parameters().begin();
+    replace_symbolt replace_formal_params;
+    auto a_it = call.arguments().begin();
+    for(auto p_it = called_type.parameters().begin();
         p_it != called_type.parameters().end() &&
         a_it != call.arguments().end();
         ++p_it, ++a_it)
@@ -631,11 +648,10 @@ void code_contractst::instrument_call_statement(
       if(!p_it->get_identifier().empty())
       {
         symbol_exprt p(p_it->get_identifier(), p_it->type());
-        replace.insert(p, *a_it);
+        replace_formal_params.insert(p, *a_it);
       }
     }
-
-    replace(called_assigns);
+    replace_formal_params(called_assigns);
 
     // check compatibility of assigns clause with the called function
     assigns_clauset called_assigns_clause(
@@ -876,11 +892,12 @@ void code_contractst::add_contract_check(
   PRECONDITION(!dest.instructions.empty());
 
   const symbolt &function_symbol = ns.lookup(mangled_fun);
-  const auto &code_type = to_code_with_contract_type(function_symbol.type);
+  auto code_type = to_code_with_contract_type(function_symbol.type);
 
-  const exprt &assigns = code_type.assigns();
-  const exprt &requires = code_type.requires();
-  const exprt &ensures = code_type.ensures();
+  exprt &assigns = code_type.assigns();
+  exprt &requires = code_type.requires();
+  exprt &ensures = code_type.ensures();
+
   INVARIANT(
     ensures.is_not_nil() || assigns.is_not_nil(),
     "Code contract enforcement is trivial without an ensures or assigns "
@@ -905,7 +922,11 @@ void code_contractst::add_contract_check(
 
   // prepare function call including all declarations
   code_function_callt call(function_symbol.symbol_expr());
-  replace_symbolt replace;
+
+  // Create a replace_symbolt object, for replacing expressions in the callee
+  // with expressions from the call site (e.g. the return value).
+  // This object tracks replacements that are common to ENSURES and REQUIRES.
+  replace_symbolt common_replace;
 
   // decl ret
   code_returnt return_stmt;
@@ -923,7 +944,7 @@ void code_contractst::add_contract_check(
     return_stmt = code_returnt(r);
 
     symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
-    replace.insert(ret_val, r);
+    common_replace.insert(ret_val, r);
   }
 
   // decl parameter1 ...
@@ -948,39 +969,40 @@ void code_contractst::add_contract_check(
 
     call.arguments().push_back(p);
 
-    replace.insert(parameter_symbol.symbol_expr(), p);
+    common_replace.insert(parameter_symbol.symbol_expr(), p);
   }
 
-  // Add quantified variables in contracts to the symbol map
-  code_contractst::add_quantified_variable(
-    ensures, replace, function_symbol.mode);
-  code_contractst::add_quantified_variable(
-    requires, replace, function_symbol.mode);
-
-  // rewrite any use of __CPROVER_return_value
-  exprt ensures_cond = ensures;
-  replace(ensures_cond);
-
-  // assume(requires)
+  // Generate: assume(requires)
   if(requires.is_not_nil())
   {
-    // rewrite any use of parameters
-    exprt requires_cond = requires;
-    replace(requires_cond);
+    // extend common_replace with quantified variables in REQUIRES,
+    // and then do the replacement
+    replace_symbolt replace(common_replace);
+    code_contractst::add_quantified_variable(
+      requires, replace, function_symbol.mode);
+    replace(requires);
 
     goto_programt assumption;
     converter.goto_convert(
-      code_assumet(requires_cond), assumption, function_symbol.mode);
+      code_assumet(requires), assumption, function_symbol.mode);
     check.destructive_append(assumption);
   }
 
   // Prepare the history variables handling
   std::pair<goto_programt, goto_programt> ensures_pair;
 
+  // Generate: copies for history variables
   if(ensures.is_not_nil())
   {
+    // extend common_replace with quantified variables in ENSURES,
+    // and then do the replacement
+    replace_symbolt replace(common_replace);
+    code_contractst::add_quantified_variable(
+      ensures, replace, function_symbol.mode);
+    replace(ensures);
+
     // get all the relevant instructions related to history variables
-    auto assertion = code_assertt(ensures_cond);
+    auto assertion = code_assertt(ensures);
     ensures_pair = create_ensures_instruction(
       assertion, ensures.source_location(), wrapper_fun, function_symbol.mode);
 
@@ -991,7 +1013,7 @@ void code_contractst::add_contract_check(
   // ret=mangled_fun(parameter1, ...)
   check.add(goto_programt::make_function_call(call, skip->source_location));
 
-  // assert(ensures)
+  // Generate: assert(ensures)
   if(ensures.is_not_nil())
   {
     check.destructive_append(ensures_pair.first);
