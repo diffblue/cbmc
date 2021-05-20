@@ -139,6 +139,17 @@ public:
   {
   }
 
+  explicit ieee_floatt(ieee_float_spect __spec, rounding_modet __rounding_mode)
+    : rounding_mode(__rounding_mode),
+      spec(std::move(__spec)),
+      sign_flag(false),
+      exponent(0),
+      fraction(0),
+      NaN_flag(false),
+      infinity_flag(false)
+  {
+  }
+
   explicit ieee_floatt(const floatbv_typet &type):
     rounding_mode(ROUND_TO_EVEN),
     spec(ieee_float_spect(type)),
