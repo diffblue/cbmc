@@ -16,6 +16,8 @@
 
 #include <util/make_unique.h>
 
+#include <algorithm>
+
 #include "abstract_environment.h"
 
 static index_range_implementation_ptrt

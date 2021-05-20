@@ -15,6 +15,8 @@ Author: Daniel Kroening
 
 #include <langapi/language_util.h>
 
+#include <algorithm>
+
 void cover_path_instrumentert::instrument(
   const irep_idt &,
   goto_programt &,

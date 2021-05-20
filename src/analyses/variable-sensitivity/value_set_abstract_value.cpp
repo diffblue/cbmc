@@ -11,6 +11,8 @@
 #include <ansi-c/expr2c.h>
 #include <util/simplify_expr.h>
 
+#include <algorithm>
+
 value_set_abstract_valuet::value_set_abstract_valuet(
   const typet &type,
   bool top,

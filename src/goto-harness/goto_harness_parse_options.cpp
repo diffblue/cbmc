@@ -8,6 +8,7 @@ Author: Diffblue Ltd.
 
 #include "goto_harness_parse_options.h"
 
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <string>

@@ -8,6 +8,8 @@
 
 #include "write_location_context.h"
 
+#include <algorithm>
+
 /**
  * Update the location context for an abstract object, potentially
  * propagating the update to any children of this abstract object.
