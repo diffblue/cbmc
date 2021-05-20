@@ -3022,13 +3022,21 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
                    << value.substr(pos+1) << ".0)";
     }
   }
-  else if(expr_type.id()==ID_integer)
+  else if(expr_type.id()==ID_integer || expr_type.id()==ID_real)
   {
-    out << expr.get_value();
-  }
-  else if(expr_type.id()==ID_real)
-  {
-    out << expr.get_value();
+    std::string value = id2string(expr.get_value());
+    auto pos = value.find('-');
+    if(pos!=std::string::npos)
+    {
+      std::string number_str;
+      number_str.reserve(value.size());
+      for (auto ch : value)
+        if (ch != '-')
+          number_str += ch;
+      out << "(- " << number_str  << ")";
+    }
+    else
+      out << id2string(expr.get_value());
   }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
