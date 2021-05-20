@@ -8,28 +8,17 @@
 
 #include <testing-utils/use_catch.h>
 #include <typeinfo>
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/full_array_abstract_object.h>
-#include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object/struct_builder.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
-#include <util/arith_tools.h>
+
 #include <util/mathematical_types.h>
-
-typedef full_array_abstract_objectt::full_array_pointert
-  full_array_abstract_object_pointert;
-
-exprt to_expr(int v)
-{
-  return from_integer(v, integer_typet());
-}
+#include <util/namespace.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 SCENARIO(
   "merge_full_struct_abstract_object",

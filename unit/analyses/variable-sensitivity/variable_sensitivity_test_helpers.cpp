@@ -17,6 +17,7 @@
 
 #include <testing-utils/use_catch.h>
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 #include <util/string_utils.h>
@@ -163,6 +164,11 @@ bool set_contains(const abstract_object_sett &set, const exprt &val)
 }
 
 static std::string interval_to_str(const constant_interval_exprt &expr);
+
+exprt to_expr(int v)
+{
+  return from_integer(v, integer_typet());
+}
 
 std::string expr_to_str(const exprt &expr)
 {
