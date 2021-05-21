@@ -1,5 +1,3 @@
-
-#include <assert.h>
 #include <stdlib.h>
 
 struct container
@@ -18,5 +16,5 @@ int main(int argc, char **argv)
 
   cptr = (argc == 1 ? &container1 : &container2);
 
-  assert(*(cptr->iptr) == argc);
+  __CPROVER_assert(*(cptr->iptr) == argc, "assertion *(cptr->iptr) == argc");
 }

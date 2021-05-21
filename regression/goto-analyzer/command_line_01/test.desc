@@ -1,8 +1,8 @@
 CORE
 main.c
 --verify --recursive-interprocedural --ahistorical --constants --one-domain-per-history
-\[main.assertion.1\] line 13 assertion v != 0: FAILURE \(if reachable\)
-\[f00.assertion.1\] line 5 assertion x != 0: FAILURE \(if reachable\)
+\[main.assertion.1\] line 11 assertion v != 0: FAILURE \(if reachable\)
+\[f00.assertion.1\] line 3 assertion x != 0: FAILURE \(if reachable\)
 Summary: 0 pass, 2 fail if reachable, 0 unknown
 ^EXIT=0$
 ^SIGNAL=0$

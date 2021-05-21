@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int fun(int other)
 {
   if(other > 0)
@@ -16,5 +14,7 @@ int fun(int other)
 int main(int argc, char *argv[])
 {
   int z = fun(0);
-  assert(z == 0); // Success because flow-sensitivity blocks the branch
+  __CPROVER_assert(
+    z == 0,
+    "assertion z == 0"); // Success because flow-sensitivity blocks the branch
 }

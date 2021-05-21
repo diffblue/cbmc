@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <fenv.h>
 #include <stdio.h>
 
@@ -15,13 +14,18 @@ int main(void)
   // be greater or smaller than 0.1
 
   // definitely not smaller than -0.1
-  assert((1.0f / 10.0f) - f < -0.1f);
+  __CPROVER_assert(
+    (1.0f / 10.0f) - f < -0.1f, "assertion (1.0f / 10.0f) - f < -0.1f");
   // might be smaller than 0
-  assert((1.0f / 10.0f) - f < 0.0f);
+  __CPROVER_assert(
+    (1.0f / 10.0f) - f < 0.0f, "assertion (1.0f / 10.0f) - f < 0.0f");
   // definitely smaller or equal to 0
-  assert((1.0f / 10.0f) - f <= 0.0f);
+  __CPROVER_assert(
+    (1.0f / 10.0f) - f <= 0.0f, "assertion (1.0f / 10.0f) - f <= 0.0f");
   // might be greater or equal to 0
-  assert((1.0f / 10.0f) - f >= 0.0f);
+  __CPROVER_assert(
+    (1.0f / 10.0f) - f >= 0.0f, "assertion (1.0f / 10.0f) - f >= 0.0f");
   // definitely not greater than 0
-  assert((1.0f / 10.0f) - f > 0.0f);
+  __CPROVER_assert(
+    (1.0f / 10.0f) - f > 0.0f, "assertion (1.0f / 10.0f) - f > 0.0f");
 }
