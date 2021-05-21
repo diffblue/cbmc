@@ -17,14 +17,13 @@ exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
 
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
-  UNIMPLEMENTED;
-  return exprt();
+  UNIMPLEMENTED_FEATURE("`get` of:\n  " + expr.pretty(2, 0));
 }
 
 void smt2_incremental_decision_proceduret::print_assignment(
   std::ostream &out) const
 {
-  UNIMPLEMENTED;
+  UNIMPLEMENTED_FEATURE("printing of assignments.");
 }
 
 std::string
@@ -41,28 +40,34 @@ smt2_incremental_decision_proceduret::get_number_of_solver_calls() const
 
 void smt2_incremental_decision_proceduret::set_to(const exprt &expr, bool value)
 {
-  UNIMPLEMENTED;
+  UNIMPLEMENTED_FEATURE(
+    "`set_to` (" + std::string{value ? "true" : "false"} + "):\n  " +
+    expr.pretty(2, 0));
 }
 
 void smt2_incremental_decision_proceduret::push(
   const std::vector<exprt> &assumptions)
 {
-  UNIMPLEMENTED;
+  for(const auto &assumption : assumptions)
+  {
+    UNIMPLEMENTED_FEATURE(
+      "pushing of assumption:\n  " + assumption.pretty(2, 0));
+  }
+  UNIMPLEMENTED_FEATURE("`push` of empty assumptions.");
 }
 
 void smt2_incremental_decision_proceduret::push()
 {
-  UNIMPLEMENTED;
+  UNIMPLEMENTED_FEATURE("`push`.");
 }
 
 void smt2_incremental_decision_proceduret::pop()
 {
-  UNIMPLEMENTED;
+  UNIMPLEMENTED_FEATURE("`pop`.");
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  UNIMPLEMENTED;
-  return decision_proceduret::resultt::D_SATISFIABLE;
+  UNIMPLEMENTED_FEATURE("solving.");
 }
