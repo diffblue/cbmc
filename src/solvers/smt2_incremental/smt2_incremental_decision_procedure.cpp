@@ -12,8 +12,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
 {
-  UNIMPLEMENTED;
-  return exprt();
+  return expr;
 }
 
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
