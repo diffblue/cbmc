@@ -1242,7 +1242,8 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
   // see if we are comparing pointers that are address_of
   if(
     skip_typecast(tmp0).id() == ID_address_of &&
-    skip_typecast(tmp1).id() == ID_address_of)
+    skip_typecast(tmp1).id() == ID_address_of &&
+    (expr.id() == ID_equal || expr.id() == ID_notequal))
   {
     return simplify_inequality_address_of(expr);
   }
