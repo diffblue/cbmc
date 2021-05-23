@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Inlining
+/// This is a class that encapsulates the state and functionality needed
+/// to do inline multiple function calls.
+/// goto_inline.h provides a number of more convenient interfaces.
 
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
@@ -20,6 +25,13 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_inlinet
 {
 public:
+  /// Sets up the class with the program to operate on.
+  ///
+  /// \param goto_functions : The map of functions to work on
+  /// \param ns : The corresponding namespace
+  /// \param message_handler : Used to log what is being inlined
+  /// \param adjust_function: Replace location in caller location.
+  /// \param caching : cache functions when in transitive mode
   goto_inlinet(
     goto_functionst &goto_functions,
     const namespacet &ns,

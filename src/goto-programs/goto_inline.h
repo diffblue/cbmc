@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// \file
 /// Function Inlining
+/// This gives a number of different interfaces to the function
+/// inlining functionality of goto_inlinet.
 
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H
