@@ -98,6 +98,11 @@ protected:
   {
     bvt bv, op;
     exprt expr;
+
+    postponedt(bvt _bv, bvt _op, exprt _expr)
+      : bv(std::move(_bv)), op(std::move(_op)), expr(std::move(_expr))
+    {
+    }
   };
 
   typedef std::list<postponedt> postponed_listt;
