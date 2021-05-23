@@ -1473,6 +1473,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
   if(expr.op0().type().id() == ID_floatbv)
     return unchanged(expr);
 
+  // simplifications below require same-object, which we don't check for
+  if(
+    expr.op0().type().id() == ID_pointer && expr.id() != ID_equal &&
+    expr.id() != ID_notequal)
+  {
+    return unchanged(expr);
+  }
+
   // eliminate strict inequalities
   if(expr.id()==ID_notequal)
   {

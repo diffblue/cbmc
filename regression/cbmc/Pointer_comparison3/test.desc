@@ -1,8 +1,11 @@
 CORE
 main.c
 
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main.assertion.3\] line 21 always false for different objects: FAILURE$
+^\[main.assertion.4\] line 23 always false for different objects: FAILURE$
+^\*\* 2 of 7 failed
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
