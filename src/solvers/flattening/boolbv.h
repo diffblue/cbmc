@@ -124,11 +124,6 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   typedef arrayst SUB;
 
-  void conversion_failed(const exprt &expr, bvt &bv)
-  {
-    bv=conversion_failed(expr);
-  }
-
   bvt conversion_failed(const exprt &expr);
 
   typedef std::unordered_map<const exprt, bvt, irep_hash> bv_cachet;

@@ -382,12 +382,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     auto bv_opt = convert_address_of_rec(address_of_expr.op());
     if(!bv_opt.has_value())
-    {
-      bvt bv;
-      bv.resize(bits);
-      conversion_failed(address_of_expr, bv);
-      return bv;
-    }
+      return conversion_failed(address_of_expr);
 
     CHECK_RETURN(bv_opt->size() == bits);
     return *bv_opt;
@@ -454,9 +449,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       if(it->type().id()!=ID_unsignedbv &&
          it->type().id()!=ID_signedbv)
       {
-        bvt failed_bv;
-        conversion_failed(plus_expr, failed_bv);
-        return failed_bv;
+        return conversion_failed(plus_expr);
       }
 
       bv_utilst::representationt rep=
@@ -492,9 +485,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       minus_expr.rhs().type().id() != ID_unsignedbv &&
       minus_expr.rhs().type().id() != ID_signedbv)
     {
-      bvt bv;
-      conversion_failed(minus_expr, bv);
-      return bv;
+      return conversion_failed(minus_expr);
     }
 
     const unary_minus_exprt neg_op1(minus_expr.rhs());
