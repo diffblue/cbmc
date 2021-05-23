@@ -444,7 +444,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       count == 1,
       "there should be exactly one pointer-type operand in a pointer-type sum");
 
-    bvt sum=bv_utils.build_constant(0, bits);
+    const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
+    bvt sum = bv_utils.build_constant(0, offset_bits);
 
     forall_operands(it, plus_expr)
     {
@@ -466,12 +467,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       bvt op=convert_bv(*it);
       CHECK_RETURN(!op.empty());
 
-      // we cut any extra bits off
-
-      if(op.size()>bits)
-        op.resize(bits);
-      else if(op.size()<bits)
-        op=bv_utils.extension(op, bits, rep);
+      op = bv_utils.extension(op, offset_bits, rep);
 
       sum=bv_utils.add(sum, op);
     }
