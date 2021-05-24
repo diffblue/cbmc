@@ -1,6 +1,6 @@
 CORE macos-assert-broken
 main.cpp
-
+-std=c++14
 ^EXIT=0$
 ^SIGNAL=0$
 --
