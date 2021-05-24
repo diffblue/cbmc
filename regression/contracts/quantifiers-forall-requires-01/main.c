@@ -1,15 +1,24 @@
+#include <stdbool.h>
+
 // clang-format off
-int f1(int *arr) __CPROVER_requires(__CPROVER_forall {
-  int i;
-  (0 <= i && i < 10) ==> arr[i] == i
-}) __CPROVER_ensures(__CPROVER_return_value == 0)
+bool f1(int *arr)
+  __CPROVER_requires(__CPROVER_forall {
+    int i;
+    (0 <= i && i < 10) ==> arr[i] == i
+  })
+  __CPROVER_ensures(
+    __CPROVER_return_value == true
+  )
 // clang-format on
 {
-  return 0;
+  bool is_identity = true;
+  for(int i = 0; i < 10; ++i)
+    is_identity &= (arr[i] == i);
+  return is_identity;
 }
 
 int main()
 {
-  int arr[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  int arr[10];
   f1(arr);
 }

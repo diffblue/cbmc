@@ -1,22 +1,30 @@
+#include <stdlib.h>
+
+#define MAX_LEN 16
+
 // clang-format off
-int f1(int *arr)
+int f1(int *arr, int len)
   __CPROVER_assigns(*arr)
   __CPROVER_ensures(__CPROVER_forall {
     int i;
-    (0 <= i && i < 10) ==> arr[i] == 0
+    // test enforcement with symbolic bound
+    (0 <= i && i < len) ==> arr[i] == 0
   })
 // clang-format on
 {
-  for(int i = 0; i < 10; i++)
+  for(int i = 0; i < MAX_LEN; i++)
   {
-    arr[i] = 0;
+    if(i < len)
+      arr[i] = 0;
   }
-
   return 0;
 }
 
 int main()
 {
-  int arr[10];
-  f1(arr);
+  int len;
+  __CPROVER_assume(0 <= len && len <= MAX_LEN);
+
+  int *arr = malloc(len * sizeof(int));
+  f1(arr, len);
 }

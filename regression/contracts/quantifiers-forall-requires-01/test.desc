@@ -1,12 +1,16 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--enforce-all-contracts
 ^EXIT=0$
 ^SIGNAL=0$
+^\[1\] assertion: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
+^warning: ignoring
 --
 The purpose of this test is to ensure that we can safely use __CPROVER_forall
-in __CPROVER_requires clauses. By using the --replace-all-calls-with-contracts
-flag, goto-instrument will transform the __CPROVER_requires clauses into an
-assertion and the verification remains sound when using __CPROVER_forall.
+within negative contexts (enforced REQUIRES clauses).
+
+With the SAT backend universal quantifiers within a negative context,
+e.g., the REQUIRES clause being enforced in this case,
+are supported only if the quantifier is bound to a constant range.

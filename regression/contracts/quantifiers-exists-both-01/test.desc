@@ -3,11 +3,14 @@ main.c
 --enforce-all-contracts
 ^EXIT=0$
 ^SIGNAL=0$
+^\[1\] assertion: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
+^warning: ignoring
 --
-The purpose of this test is to ensure that we can safely use __CPROVER_exists
-in a negative context (which is currently not always the case). By using the
---enforce-all-contracts flag, this test assumes the statement in 
-__CPROVER_requires, then asserts the same statement (in __CPROVER_ensures),
-thus, verification should be successful.
+The purpose of this test is to ensure that we can safely use __CPROVER_exists within both
+positive and negative contexts (ENSURES and REQUIRES clauses).
+
+With the SAT backend existential quantifiers in a positive context,
+e.g., the ENSURES clause being enforced in this case,
+are supported only if the quantifier is bound to a constant range.
