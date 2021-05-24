@@ -157,10 +157,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       // we postpone
       literalt l=prop.new_variable();
 
-      postponed_list.push_back(postponedt());
-      postponed_list.back().op = convert_bv(operands[0]);
-      postponed_list.back().bv.push_back(l);
-      postponed_list.back().expr = expr;
+      postponed_list.emplace_back(bvt{1, l}, convert_bv(operands[0]), expr);
 
       return l;
     }
@@ -646,15 +643,10 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     // we postpone until we know the objects
     std::size_t width=boolbv_width(expr.type());
 
-    bvt bv = prop.new_variables(width);
+    postponed_list.emplace_back(
+      prop.new_variables(width), convert_bv(to_unary_expr(expr).op()), expr);
 
-    postponed_list.push_back(postponedt());
-
-    postponed_list.back().op = convert_bv(to_unary_expr(expr).op());
-    postponed_list.back().bv=bv;
-    postponed_list.back().expr=expr;
-
-    return bv;
+    return postponed_list.back().bv;
   }
   else if(
     expr.id() == ID_pointer_object &&
