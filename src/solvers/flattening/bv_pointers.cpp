@@ -809,13 +809,8 @@ bvt bv_pointerst::offset_arithmetic(
 {
   const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
 
-  bvt bv1 = offset_literals(bv, type);
-
-  bvt bv2=bv_utils.build_constant(x, offset_bits);
-
-  bvt tmp=bv_utils.add(bv1, bv2);
-
-  return object_offset_encoding(object_literals(bv, type), tmp);
+  return offset_arithmetic(
+    type, bv, 1, bv_utils.build_constant(x, offset_bits));
 }
 
 bvt bv_pointerst::offset_arithmetic(
