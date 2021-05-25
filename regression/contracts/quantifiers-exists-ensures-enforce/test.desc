@@ -3,6 +3,8 @@ main.c
 --enforce-all-contracts
 ^EXIT=10$
 ^SIGNAL=0$
+^\[1\] assertion: FAILURE$
+^\[2\] assertion: SUCCESS$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
