@@ -566,12 +566,16 @@ exprt assume_and(
   const namespacet &ns)
 {
   auto and_expr = to_and_expr(expr);
+  bool nil = false;
   for(auto const &operand : and_expr.operands())
   {
     auto result = env.do_assume(operand, ns);
-    if(result.is_nil() || result.is_false())
+    if(result.is_false())
       return result;
+    nil |= result.is_nil();
   }
+  if(nil)
+    return nil_exprt();
   return true_exprt();
 }
 

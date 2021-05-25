@@ -659,6 +659,37 @@ SCENARIO(
 
       ASSUME_NIL(environment, and_expr, ns);
     }
+    WHEN("{ 3, 4 } == { 4, 5 } && unknown == { 2, 3 }")
+    {
+      auto unknown = symbol_exprt("unknown", v23->type());
+      auto lhs_expr = equal_exprt(c3_sym, c4_sym);
+      auto rhs_expr = equal_exprt(unknown, c2_sym);
+
+      auto and_expr = and_exprt(lhs_expr, rhs_expr);
+
+      ASSUME_NIL(environment, and_expr, ns);
+    }
+    WHEN("unknown == { 2, 3 } && mystery == { 1, 2 }")
+    {
+      auto unknown = symbol_exprt("unknown", v23->type());
+      auto lhs_expr = equal_exprt(unknown, c2_sym);
+      auto mystery = symbol_exprt("mystery", v23->type());
+      auto rhs_expr = equal_exprt(mystery, c1_sym);
+
+      auto and_expr = and_exprt(lhs_expr, rhs_expr);
+
+      ASSUME_NIL(environment, and_expr, ns);
+    }
+    WHEN("unknown == { 2, 3 } && { 3, 4 } == { 1, 2 }")
+    {
+      auto unknown = symbol_exprt("unknown", v23->type());
+      auto lhs_expr = equal_exprt(unknown, c2_sym);
+      auto rhs_expr = equal_exprt(c3_sym, c1_sym);
+
+      auto and_expr = and_exprt(lhs_expr, rhs_expr);
+
+      ASSUME_FALSE(environment, and_expr, ns);
+    }
     WHEN("{ 1, 2 } == { 4, 5 } && { 3, 4 } == { 1, 2 }")
     {
       auto expr0 = equal_exprt(c1_sym, c4_sym);
