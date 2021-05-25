@@ -546,8 +546,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     // do the same-object-test via an expression as this may permit re-using
     // already cached encodings of the equality test
     const exprt same_object = ::same_object(minus_expr.lhs(), minus_expr.rhs());
-    const bvt &same_object_bv = convert_bv(same_object);
-    CHECK_RETURN(same_object_bv.size() == 1);
+    const literalt same_object_lit = convert(same_object);
 
     // compute the object size (again, possibly using cached results)
     const exprt object_size = ::object_size(minus_expr.lhs());
@@ -556,7 +555,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     bvt bv = prop.new_variables(width);
 
-    if(!same_object_bv[0].is_false())
+    if(!same_object_lit.is_false())
     {
       const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
       const bvt &lhs = convert_bv(minus_expr.lhs());
@@ -604,7 +603,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       }
 
       prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_bv[0], prop.land(lhs_in_bounds, rhs_in_bounds)),
+        prop.land(same_object_lit, prop.land(lhs_in_bounds, rhs_in_bounds)),
         bv_utils.equal(difference, bv)));
     }
 
