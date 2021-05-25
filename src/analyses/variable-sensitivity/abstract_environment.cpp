@@ -529,9 +529,20 @@ static auto inverse_operations =
                                {ID_ge, ID_lt},
                                {ID_gt, ID_le}};
 
+exprt invert_result(const exprt &result)
+{
+  if(!result.is_boolean())
+    return result;
+
+  if(result.is_true())
+    return false_exprt();
+  return true_exprt();
+}
+
 exprt invert_expr(const exprt &expr)
 {
   auto expr_id = expr.id();
+
   auto inverse_operation = inverse_operations.find(expr_id);
   if(inverse_operation == inverse_operations.end())
     return nil_exprt();
@@ -554,10 +565,7 @@ exprt assume_not(
     return env.do_assume(inverse_expression, ns);
 
   auto result = env.do_assume(not_expr.op(), ns);
-  if(result.is_boolean())
-    result =
-      result.is_true() ? static_cast<exprt>(false_exprt()) : true_exprt();
-  return result;
+  return invert_result(result);
 }
 
 exprt assume_and(
@@ -584,17 +592,14 @@ exprt assume_or(
   const exprt &expr,
   const namespacet &ns)
 {
-  exprt or_result = false_exprt();
   auto or_expr = to_or_expr(expr);
+
+  auto negated_operands = exprt::operandst{};
   for(auto const &operand : or_expr.operands())
-  {
-    auto result = env.do_assume(operand, ns);
-    if(result.is_nil())
-      return result;
-    if(result.is_true())
-      or_result = true_exprt();
-  }
-  return or_result;
+    negated_operands.push_back(invert_expr(operand));
+
+  auto result = assume_and(env, and_exprt(negated_operands), ns);
+  return invert_result(result);
 }
 
 exprt assume_eq(

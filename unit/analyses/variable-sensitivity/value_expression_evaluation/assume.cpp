@@ -759,6 +759,16 @@ SCENARIO(
 
       auto or_expr = or_exprt(lhs_expr, rhs_expr);
 
+      ASSUME_TRUE(environment, or_expr, ns);
+    }
+    WHEN("unknown == { 2, 3 } || { 3, 4 } != { 4, 5 }")
+    {
+      auto unknown = symbol_exprt("unknown", v23->type());
+      auto lhs_expr = equal_exprt(unknown, c2_sym);
+      auto rhs_expr = notequal_exprt(c3_sym, c4_sym);
+
+      auto or_expr = or_exprt(lhs_expr, rhs_expr);
+
       ASSUME_NIL(environment, or_expr, ns);
     }
     WHEN("{ 1, 2 } == { 4, 5 } || { 3, 4 } == { 1, 2 }")
