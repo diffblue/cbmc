@@ -446,6 +446,19 @@ interval_abstract_valuet::value_range_implementation() const
   return make_single_value_range(shared_from_this());
 }
 
+abstract_value_pointert interval_abstract_valuet::constrain(
+  const exprt &lower,
+  const exprt &upper) const
+{
+  auto lower_bound =
+    constant_interval_exprt::get_max(lower, interval.get_lower());
+  auto upper_bound =
+    constant_interval_exprt::get_min(upper, interval.get_upper());
+
+  return as_value(
+    make_interval(constant_interval_exprt(lower_bound, upper_bound)));
+}
+
 void interval_abstract_valuet::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

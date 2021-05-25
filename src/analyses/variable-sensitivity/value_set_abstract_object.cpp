@@ -153,7 +153,7 @@ value_set_abstract_objectt::index_range_implementation(
   std::set<exprt> flattened;
   for(const auto &o : values)
   {
-    const auto &v = std::dynamic_pointer_cast<const abstract_value_objectt>(o);
+    const auto &v = as_value(o);
     for(auto e : v->index_range(ns))
       flattened.insert(e);
   }
@@ -292,8 +292,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 abstract_object_pointert
 value_set_abstract_objectt::merge(const abstract_object_pointert &other) const
 {
-  auto other_value =
-    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  auto other_value = as_value(other);
   if(other_value)
     return merge_with_value(other_value);
 
@@ -303,10 +302,9 @@ value_set_abstract_objectt::merge(const abstract_object_pointert &other) const
 abstract_object_pointert
 value_set_abstract_objectt::meet(const abstract_object_pointert &other) const
 {
-  auto cast_other =
-    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
-  if(cast_other)
-    return meet_with_value(cast_other);
+  auto other_value = as_value(other);
+  if(other_value)
+    return meet_with_value(other_value);
 
   return abstract_objectt::meet(other);
 }
@@ -332,6 +330,30 @@ void value_set_abstract_objectt::set_values(
   }
   set_not_bottom();
   verify();
+}
+
+abstract_value_pointert value_set_abstract_objectt::constrain(
+  const exprt &lower,
+  const exprt &upper) const
+{
+  using cie = constant_interval_exprt;
+
+  auto constrained_values = abstract_object_sett{};
+
+  for(auto const &value : unwrap_and_extract_values(values))
+  {
+    auto constrained = as_value(value)->constrain(lower, upper);
+    auto constrained_interval = constrained->to_interval();
+
+    if(cie::less_than(constrained_interval.get_lower(), lower))
+      continue;
+    if(cie::greater_than(constrained_interval.get_upper(), upper))
+      continue;
+
+    constrained_values.insert(constrained);
+  }
+
+  return as_value(resolve_values(constrained_values));
 }
 
 void value_set_abstract_objectt::output(

@@ -287,12 +287,18 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const final;
 
+  virtual sharing_ptrt<const abstract_value_objectt>
+  constrain(const exprt &lower, const exprt &upper) const = 0;
+
 protected:
   virtual index_range_implementation_ptrt
   index_range_implementation(const namespacet &ns) const = 0;
 
   virtual value_range_implementation_ptrt
   value_range_implementation() const = 0;
+
+  sharing_ptrt<const abstract_value_objectt>
+  as_value(const abstract_object_pointert &obj) const;
 };
 
 using abstract_value_pointert = sharing_ptrt<const abstract_value_objectt>;

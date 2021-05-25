@@ -39,6 +39,9 @@ public:
   exprt to_constant() const override;
   constant_interval_exprt to_interval() const override;
 
+  abstract_value_pointert
+  constrain(const exprt &lower, const exprt &upper) const override;
+
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
   const abstract_object_sett &get_values() const override

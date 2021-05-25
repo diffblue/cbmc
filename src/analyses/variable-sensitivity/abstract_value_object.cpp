@@ -694,3 +694,9 @@ static abstract_object_pointert value_set_expression_transform(
   auto evaluator = value_set_evaluator(expr, operands, environment, ns);
   return evaluator();
 }
+
+abstract_value_pointert
+abstract_value_objectt::as_value(const abstract_object_pointert &obj) const
+{
+  return std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+}

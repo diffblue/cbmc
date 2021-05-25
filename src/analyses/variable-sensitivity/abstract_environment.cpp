@@ -553,6 +553,19 @@ exprt invert_expr(const exprt &expr)
     relation_expr.lhs(), inverse_op, relation_expr.rhs());
 }
 
+void prune_assign(
+  abstract_environmentt &env,
+  const exprt &destination,
+  abstract_object_pointert obj,
+  const namespacet &ns)
+{
+  auto context_value =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
+  if(context_value == nullptr)
+    obj = env.add_object_context(obj);
+  env.assign(destination, obj, ns);
+}
+
 exprt assume_not(
   abstract_environmentt &env,
   const exprt &expr,
@@ -623,9 +636,9 @@ exprt assume_eq(
     return false_exprt();
 
   if(is_lvalue(equal_expr.lhs()))
-    env.assign(equal_expr.lhs(), meet, ns);
+    prune_assign(env, equal_expr.lhs(), meet, ns);
   if(is_lvalue(equal_expr.rhs()))
-    env.assign(equal_expr.rhs(), meet, ns);
+    prune_assign(env, equal_expr.rhs(), meet, ns);
   return true_exprt();
 }
 
@@ -654,6 +667,8 @@ exprt assume_noteq(
 
 struct left_and_right_valuest
 {
+  exprt lhs;
+  exprt rhs;
   abstract_value_pointert left;
   abstract_value_pointert right;
 
@@ -679,13 +694,15 @@ left_and_right_valuest eval_operands_as_values(
 {
   auto const &relationship_expr = to_binary_expr(expr);
 
-  auto left = env.eval(relationship_expr.lhs(), ns);
-  auto right = env.eval(relationship_expr.rhs(), ns);
+  auto lhs = relationship_expr.lhs();
+  auto rhs = relationship_expr.rhs();
+  auto left = env.eval(lhs, ns);
+  auto right = env.eval(rhs, ns);
 
   if(left->is_top() || right->is_top())
     return {};
 
-  return {as_value(left), as_value(right)};
+  return {lhs, rhs, as_value(left), as_value(right)};
 }
 
 exprt assume_less_than(
@@ -697,12 +714,33 @@ exprt assume_less_than(
   if(!operands.are_good())
     return nil_exprt();
 
-  auto left_lower = operands.left_interval().get_lower();
-  auto right_upper = operands.right_interval().get_upper();
+  auto left_interval = operands.left_interval();
+  auto right_interval = operands.right_interval();
+
+  const auto &left_lower = left_interval.get_lower();
+  const auto &right_upper = right_interval.get_upper();
 
   auto reduced_le_expr =
     binary_relation_exprt(left_lower, expr.id(), right_upper);
-  return env.eval(reduced_le_expr, ns)->to_constant();
+  auto result = env.eval(reduced_le_expr, ns)->to_constant();
+  if(result.is_true())
+  {
+    if(is_lvalue(operands.lhs))
+    {
+      auto pruned_upper = constant_interval_exprt::get_min(
+        left_interval.get_upper(), right_upper);
+      auto constrained = operands.left->constrain(left_lower, pruned_upper);
+      prune_assign(env, operands.lhs, constrained, ns);
+    }
+    if(is_lvalue(operands.rhs))
+    {
+      auto pruned_lower = constant_interval_exprt::get_max(
+        left_lower, right_interval.get_lower());
+      auto constrained = operands.right->constrain(pruned_lower, right_upper);
+      prune_assign(env, operands.rhs, constrained, ns);
+    }
+  }
+  return result;
 }
 
 exprt assume_greater_than(

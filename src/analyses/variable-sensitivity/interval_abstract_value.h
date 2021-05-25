@@ -44,6 +44,9 @@ public:
     return interval;
   }
 
+  abstract_value_pointert
+  constrain(const exprt &lower, const exprt &upper) const override;
+
   size_t internal_hash() const override;
   bool internal_equality(const abstract_object_pointert &other) const override;
 

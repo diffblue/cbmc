@@ -158,6 +158,13 @@ abstract_object_pointert constant_abstract_valuet::meet_with_value(
   return abstract_objectt::meet(other);
 }
 
+abstract_value_pointert constant_abstract_valuet::constrain(
+  const exprt &lower,
+  const exprt &upper) const
+{
+  return as_value(mutable_clone());
+}
+
 void constant_abstract_valuet::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

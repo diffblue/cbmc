@@ -37,6 +37,9 @@ public:
   exprt to_constant() const override;
   constant_interval_exprt to_interval() const override;
 
+  abstract_value_pointert
+  constrain(const exprt &lower, const exprt &upper) const override;
+
   void output(
     std::ostream &out,
     const class ai_baset &ai,
