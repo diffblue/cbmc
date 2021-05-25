@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS
+\[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS
+\[foo.\d+\] line \d+ Check that x\[\(.* int\)5\] is assignable: SUCCESS
+\[foo.\d+\] line \d+ Check that x\[\(.* int\)9\] is assignable: SUCCESS
+\[foo.\d+\] line \d+ Check that y is assignable: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether __CPROVER_is_fresh behaves correctly for arrays both in
+requires and ensures clauses. In the ensures clause, the __CPROVER_is_fresh
+is unnecessary. By negating the predicate in the ensures clause, the test
+proves that `x` is not fresh at end of the function.

@@ -18,12 +18,17 @@ Date: February 2016
 
 #include <analyses/local_may_alias.h>
 
+#include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_expr.h>
+#include <ansi-c/expr2c.h>
 
 #include <goto-programs/remove_skip.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
@@ -31,36 +36,72 @@ Date: February 2016
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/replace_symbol.h>
 
-/// Predicate to be used with the exprt::visit() function. The function
-/// found_return_value() will return `true` iff this predicate is called on an
-/// expr that contains `__CPROVER_return_value`.
-class return_value_visitort : public const_expr_visitort
+bool return_value_visitort::found_return_value()
 {
-public:
-  return_value_visitort() : const_expr_visitort(), found(false)
-  {
-  }
+  return found;
+}
 
-  // \brief Has this object been passed to exprt::visit() on an exprt whose
-  //        descendants contain __CPROVER_return_value?
-  bool found_return_value()
-  {
-    return found;
-  }
+void return_value_visitort::operator()(const exprt &exp)
+{
+  if(exp.id() != ID_symbol)
+    return;
+  const symbol_exprt &sym = to_symbol_expr(exp);
+  found |= sym.get_identifier() == CPROVER_PREFIX "return_value";
+}
 
-  void operator()(const exprt &exp) override
-  {
-    if(exp.id() != ID_symbol)
-      return;
-    const symbol_exprt &sym = to_symbol_expr(exp);
-    found |= sym.get_identifier() == CPROVER_PREFIX "return_value";
-  }
+std::set<irep_idt> &functions_in_scope_visitort::function_calls()
+{
+  return function_set;
+}
 
-protected:
-  bool found;
-};
+void functions_in_scope_visitort::operator()(const goto_programt &prog)
+{
+  forall_goto_program_instructions(ins, prog)
+  {
+    if(ins->is_function_call())
+    {
+      const code_function_callt &call = ins->get_function_call();
+
+      if(call.function().id() != ID_symbol)
+      {
+        log.error().source_location = call.find_source_location();
+        log.error() << "Function pointer used in function invoked by "
+                       "function contract: "
+                    << messaget::eom;
+        throw 0;
+      }
+      else
+      {
+        const irep_idt &fun_name =
+          to_symbol_expr(call.function()).get_identifier();
+        if(function_set.find(fun_name) == function_set.end())
+        {
+          function_set.insert(fun_name);
+          auto called_fun = goto_functions.function_map.find(fun_name);
+          if(called_fun == goto_functions.function_map.end())
+          {
+            log.warning() << "Could not find function '" << fun_name
+                          << "' in goto-program." << messaget::eom;
+            throw 0;
+          }
+          if(called_fun->second.body_available())
+          {
+            const goto_programt &program = called_fun->second.body;
+            (*this)(program);
+          }
+          else
+          {
+            log.warning() << "No body for function: " << fun_name
+                          << "invoked from function contract." << messaget::eom;
+          }
+        }
+      }
+    }
+  }
+}
 
 exprt get_size(const typet &type, const namespacet &ns, messaget &log)
 {
@@ -429,6 +470,9 @@ bool code_contractst::apply_function_contract(
 
   const auto &mode = symbol_table.lookup_ref(function).mode;
 
+  is_fresh_replacet is_fresh(*this, log, function);
+  is_fresh.create_declarations();
+
   // Insert assertion of the precondition immediately before the call site.
   if(requires.is_not_nil())
   {
@@ -441,11 +485,12 @@ bool code_contractst::apply_function_contract(
       code_assertt(requires),
       assertion,
       symbol_table.lookup_ref(function).mode);
-    assertion.instructions.front().source_location = requires.source_location();
+    assertion.instructions.back().source_location = requires.source_location();
     assertion.instructions.back().source_location.set_comment(
       "Check requires clause");
-    assertion.instructions.front().source_location.set_property_class(
+    assertion.instructions.back().source_location.set_property_class(
       ID_precondition);
+    is_fresh.update_requires(assertion);
     auto lines_to_iterate = assertion.instructions.size();
     goto_program.insert_before_swap(target, assertion);
     std::advance(target, lines_to_iterate);
@@ -488,11 +533,11 @@ bool code_contractst::apply_function_contract(
     std::advance(target, lines_to_iterate);
   }
 
-  // To remove the function call, replace it with an assumption statement
-  // assuming the postcondition, if there is one. Otherwise, replace the
-  // function call with a SKIP statement.
+  // To remove the function call, insert statements related to the assumption.
+  // Then, replace the function call with a SKIP statement.
   if(ensures.is_not_nil())
   {
+    is_fresh.update_ensures(ensures_pair.first);
     auto lines_to_iterate = ensures_pair.first.instructions.size();
     goto_program.insert_before_swap(target, ensures_pair.first);
     std::advance(target, lines_to_iterate);
@@ -535,6 +580,21 @@ const symbolt &code_contractst::new_tmp_symbol(
     source_location,
     mode,
     symbol_table);
+}
+
+const namespacet &code_contractst::get_namespace() const
+{
+  return ns;
+}
+
+symbol_tablet &code_contractst::get_symbol_table()
+{
+  return symbol_table;
+}
+
+goto_functionst &code_contractst::get_goto_functions()
+{
+  return goto_functions;
 }
 
 exprt code_contractst::create_alias_expression(
@@ -892,6 +952,7 @@ bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
   wrapper.parameter_identifiers = mangled_fun->second.parameter_identifiers;
   wrapper.body.add(goto_programt::make_end_function(sl));
   add_contract_check(original, mangled, wrapper.body);
+
   return false;
 }
 
@@ -983,6 +1044,9 @@ void code_contractst::add_contract_check(
     common_replace.insert(parameter_symbol.symbol_expr(), p);
   }
 
+  is_fresh_enforcet visitor(*this, log, wrapper_fun);
+  visitor.create_declarations();
+
   // Generate: assume(requires)
   if(requires.is_not_nil())
   {
@@ -996,6 +1060,7 @@ void code_contractst::add_contract_check(
     goto_programt assumption;
     converter.goto_convert(
       code_assumet(requires), assumption, function_symbol.mode);
+    visitor.update_requires(assumption);
     check.destructive_append(assumption);
   }
 
@@ -1019,10 +1084,11 @@ void code_contractst::add_contract_check(
       assertion, ensures.source_location(), wrapper_fun, function_symbol.mode);
     ensures_pair.first.instructions.back().source_location.set_comment(
       "Check ensures clause");
-    ensures_pair.first.instructions.front().source_location.set_property_class(
+    ensures_pair.first.instructions.back().source_location.set_property_class(
       ID_postcondition);
 
     // add all the history variable initializations
+    visitor.update_ensures(ensures_pair.first);
     check.destructive_append(ensures_pair.second);
   }
 
@@ -1808,4 +1874,278 @@ exprt assigns_clauset::compatible_expression(
   }
 
   return result;
+}
+
+std::set<goto_programt::targett> &find_is_fresh_calls_visitort::is_fresh_calls()
+{
+  return function_set;
+}
+
+void find_is_fresh_calls_visitort::clear_set()
+{
+  function_set.clear();
+}
+
+void find_is_fresh_calls_visitort::operator()(goto_programt &prog)
+{
+  Forall_goto_program_instructions(ins, prog)
+  {
+    if(ins->is_function_call())
+    {
+      const code_function_callt &call = ins->get_function_call();
+
+      if(call.function().id() == ID_symbol)
+      {
+        const irep_idt &fun_name =
+          to_symbol_expr(call.function()).get_identifier();
+
+        if(fun_name == (CPROVER_PREFIX + std::string("is_fresh")))
+        {
+          function_set.insert(ins);
+        }
+      }
+    }
+  }
+}
+
+void is_fresh_baset::update_requires(goto_programt &requires)
+{
+  find_is_fresh_calls_visitort requires_visitor;
+  requires_visitor(requires);
+  for(auto it : requires_visitor.is_fresh_calls())
+  {
+    create_requires_fn_call(it);
+  }
+}
+
+void is_fresh_baset::update_ensures(goto_programt &ensures)
+{
+  find_is_fresh_calls_visitort ensures_visitor;
+  ensures_visitor(ensures);
+  for(auto it : ensures_visitor.is_fresh_calls())
+  {
+    create_ensures_fn_call(it);
+  }
+}
+
+//
+//
+// Code largely copied from model_argc_argv.cpp
+//
+//
+
+void is_fresh_baset::add_declarations(const std::string &decl_string)
+{
+  log.debug() << "Creating declarations: \n" << decl_string << "\n";
+
+  std::istringstream iss(decl_string);
+
+  ansi_c_languaget ansi_c_language;
+  ansi_c_language.set_message_handler(log.get_message_handler());
+  configt::ansi_ct::preprocessort pp = config.ansi_c.preprocessor;
+  config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::NONE;
+  ansi_c_language.parse(iss, "");
+  config.ansi_c.preprocessor = pp;
+
+  symbol_tablet tmp_symbol_table;
+  ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
+  exprt value = nil_exprt();
+
+  goto_functionst tmp_functions;
+
+  // Add the new functions into the goto functions table.
+  parent.get_goto_functions().function_map[ensures_fn_name].copy_from(
+    tmp_functions.function_map[ensures_fn_name]);
+
+  parent.get_goto_functions().function_map[requires_fn_name].copy_from(
+    tmp_functions.function_map[requires_fn_name]);
+
+  for(const auto &symbol_pair : tmp_symbol_table.symbols)
+  {
+    if(
+      symbol_pair.first == memmap_name ||
+      symbol_pair.first == ensures_fn_name ||
+      symbol_pair.first == requires_fn_name || symbol_pair.first == "malloc")
+    {
+      this->parent.get_symbol_table().insert(symbol_pair.second);
+    }
+    // Parameters are stored as scoped names in the symbol table.
+    else if(
+      (has_prefix(
+         id2string(symbol_pair.first), id2string(ensures_fn_name) + "::") ||
+       has_prefix(
+         id2string(symbol_pair.first), id2string(requires_fn_name) + "::")) &&
+      parent.get_symbol_table().add(symbol_pair.second))
+    {
+      UNREACHABLE;
+    }
+  }
+
+  // We have to set the global memory map array to
+  // all zeros for this to work properly
+  const array_typet ty =
+    to_array_type(tmp_symbol_table.lookup_ref(memmap_name).type);
+  constant_exprt initial_value(irep_idt(dstringt("0")), ty.subtype());
+  array_of_exprt memmap_init(initial_value, ty);
+  goto_programt::instructiont a =
+    goto_programt::make_assignment(symbol_exprt(memmap_name, ty), memmap_init);
+
+  // insert the assignment into the initialize function.
+  auto called_func =
+    parent.get_goto_functions().function_map.find(INITIALIZE_FUNCTION);
+  goto_programt &body = called_func->second.body;
+  auto target = body.get_end_function();
+  body.insert_before(target, a);
+}
+
+void is_fresh_baset::update_fn_call(
+  goto_programt::targett &ins,
+  const std::string &fn_name,
+  bool add_address_of)
+{
+  const code_function_callt &const_call = ins->get_function_call();
+  code_function_callt call(
+    exprt(const_call.lhs()),
+    exprt(const_call.function()),
+    code_function_callt::argumentst(const_call.arguments()));
+
+  // adjusting the expression for the first argument, if required
+  if(add_address_of)
+  {
+    INVARIANT(call.arguments().size() > 0, "Function must have arguments");
+    call.arguments()[0] = address_of_exprt(call.arguments()[0]);
+  }
+
+  // fixing the function name.
+  to_symbol_expr(call.function()).set_identifier(fn_name);
+  log.debug() << "printing updated call expression: "
+              << expr2c(call, parent.get_namespace()) << "\n";
+
+  ins->set_function_call(call);
+}
+
+/* Declarations for contract enforcement */
+
+is_fresh_enforcet::is_fresh_enforcet(
+  code_contractst &_parent,
+  messaget _log,
+  irep_idt _fun_id)
+  : is_fresh_baset(_parent, _log, _fun_id)
+{
+  std::stringstream ssreq, ssensure, ssmemmap;
+  ssreq << CPROVER_PREFIX << fun_id << "_requires_is_fresh";
+  this->requires_fn_name = ssreq.str();
+
+  ssensure << CPROVER_PREFIX << fun_id << "_ensures_is_fresh";
+  this->ensures_fn_name = ssensure.str();
+
+  ssmemmap << CPROVER_PREFIX << fun_id << "_memory_map";
+  this->memmap_name = ssmemmap.str();
+}
+
+void is_fresh_enforcet::create_declarations()
+{
+  std::ostringstream oss;
+  std::string cprover_prefix(CPROVER_PREFIX);
+  oss << "static _Bool " << memmap_name
+      << "[" + cprover_prefix + "constant_infinity_uint]; \n"
+      << "\n"
+      << "_Bool " << requires_fn_name
+      << "(void **elem, " + cprover_prefix + "size_t size) { \n"
+      << "   *elem = malloc(size); \n"
+      << "   if (!*elem || " << memmap_name
+      << "[" + cprover_prefix + "POINTER_OBJECT(*elem)]) return 0; \n"
+      << "   " << memmap_name << "[" + cprover_prefix
+      << "POINTER_OBJECT(*elem)] = 1; \n"
+      << "   return 1; \n"
+      << "} \n"
+      << "\n"
+      << "_Bool " << ensures_fn_name
+      << "(void *elem, " + cprover_prefix + "size_t size) { \n"
+      << "   _Bool ok = (!" << memmap_name
+      << "[" + cprover_prefix + "POINTER_OBJECT(elem)] && "
+      << cprover_prefix + "r_ok(elem, size)); \n"
+      << "   " << memmap_name << "[" + cprover_prefix
+      << "POINTER_OBJECT(elem)] = 1; \n"
+      << "   return ok; \n"
+      << "}";
+
+  add_declarations(oss.str());
+}
+
+void is_fresh_enforcet::create_requires_fn_call(goto_programt::targett &ins)
+{
+  update_fn_call(ins, requires_fn_name, true);
+}
+
+void is_fresh_enforcet::create_ensures_fn_call(goto_programt::targett &ins)
+{
+  update_fn_call(ins, ensures_fn_name, false);
+}
+
+/* Declarations for contract replacement: note that there may be several
+   instances of the same function called in a particular context, so care must be taken
+   that the 'call' functions and global data structure are unique for each instance.
+   This is why we check that the symbols are unique for each such declaration.  */
+
+std::string unique_symbol(const symbol_tablet &tbl, const std::string &original)
+{
+  auto size = tbl.next_unused_suffix(original);
+  return original + std::to_string(size);
+}
+
+is_fresh_replacet::is_fresh_replacet(
+  code_contractst &_parent,
+  messaget _log,
+  irep_idt _fun_id)
+  : is_fresh_baset(_parent, _log, _fun_id)
+{
+  std::stringstream ssreq, ssensure, ssmemmap;
+  ssreq /* << CPROVER_PREFIX */ << fun_id << "_call_requires_is_fresh";
+  this->requires_fn_name =
+    unique_symbol(parent.get_symbol_table(), ssreq.str());
+
+  ssensure /* << CPROVER_PREFIX */ << fun_id << "_call_ensures_is_fresh";
+  this->ensures_fn_name =
+    unique_symbol(parent.get_symbol_table(), ssensure.str());
+
+  ssmemmap /* << CPROVER_PREFIX */ << fun_id << "_memory_map";
+  this->memmap_name = unique_symbol(parent.get_symbol_table(), ssmemmap.str());
+}
+
+void is_fresh_replacet::create_declarations()
+{
+  std::ostringstream oss;
+  std::string cprover_prefix(CPROVER_PREFIX);
+  oss << "static _Bool " << memmap_name
+      << "[" + cprover_prefix + "constant_infinity_uint]; \n"
+      << "\n"
+      << "static _Bool " << requires_fn_name
+      << "(void *elem, " + cprover_prefix + "size_t size) { \n"
+      << "  _Bool r_ok = " + cprover_prefix + "r_ok(elem, size); \n"
+      << "  if (" << memmap_name
+      << "[" + cprover_prefix + "POINTER_OBJECT(elem)]"
+      << " != 0 || !r_ok)  return 0; \n"
+      << "  " << memmap_name << "["
+      << cprover_prefix + "POINTER_OBJECT(elem)] = 1; \n"
+      << "  return 1; \n"
+      << "} \n"
+      << " \n"
+      << "_Bool " << ensures_fn_name
+      << "(void **elem, " + cprover_prefix + "size_t size) { \n"
+      << "  *elem = malloc(size); \n"
+      << "  return (*elem != 0); \n"
+      << "} \n";
+
+  add_declarations(oss.str());
+}
+
+void is_fresh_replacet::create_requires_fn_call(goto_programt::targett &ins)
+{
+  update_fn_call(ins, requires_fn_name, false);
+}
+
+void is_fresh_replacet::create_ensures_fn_call(goto_programt::targett &ins)
+{
+  update_fn_call(ins, ensures_fn_name, true);
 }

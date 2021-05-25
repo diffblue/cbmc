@@ -1,0 +1,11 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+\[precondition.\d+\] file main.c line \d+ Check requires clause: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether __CPROVER_is_fresh can be used conditionally,
+in order to allow possibly-aliased arguments.

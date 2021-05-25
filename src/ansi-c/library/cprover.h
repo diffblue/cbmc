@@ -36,7 +36,6 @@ __CPROVER_size_t __CPROVER_buffer_size(const void *);
 __CPROVER_bool __CPROVER_r_ok();
 __CPROVER_bool __CPROVER_w_ok();
 __CPROVER_bool __CPROVER_rw_ok();
-void __CPROVER_old();
 
 #if 0
 __CPROVER_bool __CPROVER_equal();
