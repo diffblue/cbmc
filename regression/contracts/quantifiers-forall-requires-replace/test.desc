@@ -1,0 +1,14 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[1\] assertion: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_forall
+within positive contexts (replaced REQUIRES clauses).
+
+This is fully supported (without requiring full unrolling) with the SAT backend.

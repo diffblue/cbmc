@@ -1,12 +1,16 @@
 // clang-format off
-int f1(int *arr) __CPROVER_requires(__CPROVER_forall {
-  int i;
-  0 <= i && i < 9 ==> __CPROVER_forall
-  {
-    int j;
-    (i <= j && j < 10) ==> arr[i] <= arr[j]
-  }
-}) __CPROVER_ensures(__CPROVER_return_value == 0)
+int f1(int *arr)
+  __CPROVER_requires(
+    __CPROVER_forall {
+    int i;
+    (0 <= i && i < 9) ==> __CPROVER_forall {
+      int j;
+      (i <= j && j < 10) ==> arr[i] <= arr[j]
+    }}
+  )
+  __CPROVER_ensures(
+    __CPROVER_return_value == 0
+  )
 // clang-format on
 {
   return 0;

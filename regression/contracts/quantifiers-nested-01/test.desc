@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+^warning: ignoring
 --
-Verification:
 This test case checks the handling of a forall expression
 nested within another forall expression.

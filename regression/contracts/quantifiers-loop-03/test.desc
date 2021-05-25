@@ -8,6 +8,7 @@ main.c
 ^\[main.assertion.1\] line .* assertion .*: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
+^warning: ignoring
 --
 This test case checks the handling of an existential quantifier, with a symbolic
 upper bound, within a loop invariant.

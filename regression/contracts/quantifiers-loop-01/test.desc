@@ -8,6 +8,7 @@ main.c
 ^\[main.assertion.1\] line .* assertion a\[10\] == 1: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
+^warning: ignoring
 --
 This test case checks the handling of a `forall` quantifier within a loop invariant.
 

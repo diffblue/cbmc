@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[1\] assertion: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_exists
+within both negative contexts (enforced REQUIRES clauses).
+
+This is fully supported (without requiring full unrolling) with the SAT backend.
