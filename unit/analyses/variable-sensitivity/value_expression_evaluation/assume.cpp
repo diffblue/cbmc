@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: Unit tests for abstract_value_objectt::expression_transform
+ Module: Unit tests for abstract_environmentt::assume
 
  Author: Jez Higgins, jez@jezuk.co.uk
 
