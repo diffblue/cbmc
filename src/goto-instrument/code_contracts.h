@@ -23,6 +23,8 @@ Date: February 2016
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
 
+#include <langapi/language_util.h>
+
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
