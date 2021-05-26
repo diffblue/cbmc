@@ -181,6 +181,7 @@ public:
   struct threadt
   {
     goto_programt::const_targett pc;
+    irep_idt function_id;
     guardt guard;
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
