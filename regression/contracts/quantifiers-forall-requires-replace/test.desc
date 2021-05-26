@@ -3,7 +3,7 @@ main.c
 --replace-all-calls-with-contracts
 ^EXIT=0$
 ^SIGNAL=0$
-^\[1\] assertion: SUCCESS$
+^\[precondition.\d+\] file main.c line \d+ Check requires clause: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
