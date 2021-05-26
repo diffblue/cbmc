@@ -775,8 +775,12 @@ static void merge_names(
   // only later be removed from level2.current_names by pop_frame
   // once the thread is executed)
   const irep_idt level_0 = ssa.get_level_0();
-  if(!level_0.empty() && level_0 != std::to_string(dest_state.source.thread_nr))
+  if(
+    !level_0.empty() &&
+    level_0 != std::to_string(dest_state.source.thread_nr) && dest_count != 0)
+  {
     return;
+  }
 
   exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
 
