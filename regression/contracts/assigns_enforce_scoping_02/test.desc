@@ -3,8 +3,8 @@ main.c
 --enforce-all-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-assertion: SUCCESS$
-assertion: FAILURE$
+^\[f1.\d+\] line \d+ Check that \*b is assignable: SUCCESS$
+^\[f1.\d+\] line \d+ Check that \*b is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

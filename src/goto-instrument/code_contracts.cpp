@@ -441,6 +441,11 @@ bool code_contractst::apply_function_contract(
       code_assertt(requires),
       assertion,
       symbol_table.lookup_ref(function).mode);
+    assertion.instructions.front().source_location = requires.source_location();
+    assertion.instructions.back().source_location.set_comment(
+      "Check requires clause");
+    assertion.instructions.front().source_location.set_property_class(
+      ID_precondition);
     auto lines_to_iterate = assertion.instructions.size();
     goto_program.insert_before_swap(target, assertion);
     std::advance(target, lines_to_iterate);
@@ -563,7 +568,8 @@ void code_contractst::instrument_assign_statement(
   alias_assertion.add(goto_programt::make_assertion(
     assigns_clause.alias_expression(lhs),
     instruction_iterator->source_location));
-
+  alias_assertion.instructions.back().source_location.set_comment(
+    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
   int lines_to_iterate = alias_assertion.instructions.size();
   program.insert_before_swap(instruction_iterator, alias_assertion);
   std::advance(instruction_iterator, lines_to_iterate);
@@ -626,6 +632,9 @@ void code_contractst::instrument_call_statement(
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
       alias_expr, instruction_iterator->source_location));
+    alias_assertion.instructions.back().source_location.set_comment(
+      "Check that " + from_expr(ns, alias_expr.id(), alias_expr) +
+      " is assignable");
     program.insert_before_swap(instruction_iterator, alias_assertion);
     ++instruction_iterator;
   }
@@ -661,6 +670,8 @@ void code_contractst::instrument_call_statement(
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
       compatible, instruction_iterator->source_location));
+    alias_assertion.instructions.back().source_location.set_comment(
+      "Check compatibility of assigns clause with the called function");
     program.insert_before_swap(instruction_iterator, alias_assertion);
     ++instruction_iterator;
   }
@@ -1003,8 +1014,13 @@ void code_contractst::add_contract_check(
 
     // get all the relevant instructions related to history variables
     auto assertion = code_assertt(ensures);
+    assertion.add_source_location() = ensures.source_location();
     ensures_pair = create_ensures_instruction(
       assertion, ensures.source_location(), wrapper_fun, function_symbol.mode);
+    ensures_pair.first.instructions.back().source_location.set_comment(
+      "Check ensures clause");
+    ensures_pair.first.instructions.front().source_location.set_property_class(
+      ID_postcondition);
 
     // add all the history variable initializations
     check.destructive_append(ensures_pair.second);
