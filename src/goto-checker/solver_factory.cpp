@@ -32,6 +32,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/dimacs_cnf.h>
 #include <solvers/sat/external_sat.h>
 #include <solvers/sat/satcheck.h>
+#include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/strings/string_refinement.h>
 
 solver_factoryt::solver_factoryt(
@@ -140,6 +141,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
   }
   else if(options.get_bool_option("refine-strings"))
     return get_string_refinement();
+  const auto incremental_smt2_solver =
+    options.get_option("incremental-smt2-solver");
+  if(!incremental_smt2_solver.empty())
+    return get_incremental_smt2(incremental_smt2_solver);
   if(options.get_bool_option("smt2"))
     return get_smt2(get_smt2_solver_type());
   return get_default();
@@ -319,6 +324,16 @@ solver_factoryt::get_string_refinement()
   set_decision_procedure_time_limit(*decision_procedure);
   return util_make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
+}
+
+std::unique_ptr<solver_factoryt::solvert>
+solver_factoryt::get_incremental_smt2(std::string solver_command)
+{
+  no_beautification();
+
+  return util_make_unique<solvert>(
+    util_make_unique<smt2_incremental_decision_proceduret>(
+      std::move(solver_command)));
 }
 
 std::unique_ptr<solver_factoryt::solvert>

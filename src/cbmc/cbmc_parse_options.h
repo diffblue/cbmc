@@ -57,6 +57,7 @@ class optionst;
   OPT_JSON_INTERFACE \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
   "(cprover-smt2)" \
+  "(incremental-smt2-solver):" \
   "(external-sat-solver):" \
   "(no-sat-preprocessor)" \
   "(beautify)" \
