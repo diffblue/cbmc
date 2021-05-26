@@ -743,19 +743,19 @@ exprt assume_less_than(
   return result;
 }
 
+static auto symmetric_operations =
+  std::map<irep_idt, irep_idt>{{ID_ge, ID_le}, {ID_gt, ID_lt}};
+
 exprt assume_greater_than(
   abstract_environmentt &env,
   const exprt &expr,
   const namespacet &ns)
 {
-  auto operands = eval_operands_as_values(env, expr, ns);
-  if(!operands.are_good())
-    return nil_exprt();
+  auto const &gt_expr = to_binary_expr(expr);
 
-  auto left_upper = operands.left_interval().get_upper();
-  auto right_lower = operands.right_interval().get_lower();
+  auto symmetric_op = symmetric_operations[gt_expr.id()];
+  auto symmetric_expr =
+    binary_relation_exprt(gt_expr.rhs(), symmetric_op, gt_expr.lhs());
 
-  auto reduced_ge_expr =
-    binary_relation_exprt(left_upper, expr.id(), right_lower);
-  return env.eval(reduced_ge_expr, ns)->to_constant();
+  return assume_less_than(env, symmetric_expr, ns);
 }

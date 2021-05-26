@@ -13,6 +13,52 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
+static void ASSUME_TRUE(
+  symbol_exprt const &x,
+  const irep_idt &id,
+  symbol_exprt const &y,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  auto assumption = env.do_assume(binary_relation_exprt(x, id, y), ns);
+
+  REQUIRE(assumption.id() != ID_nil);
+  REQUIRE(assumption.type().id() == ID_bool);
+  REQUIRE(assumption.is_true());
+}
+
+static void EXPECT_RESULT(
+  symbol_exprt const &x,
+  const std::vector<exprt> &x_expected,
+  symbol_exprt const &y,
+  const std::vector<exprt> &y_expected,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  auto x_result = as_value_set(env.eval(x, ns));
+  auto y_result = as_value_set(env.eval(y, ns));
+
+  EXPECT(x_result, x_expected);
+  EXPECT(y_result, y_expected);
+}
+
+static void EXPECT_RESULT(
+  symbol_exprt const &x,
+  exprt const &x_lower,
+  exprt const &x_upper,
+  symbol_exprt const &y,
+  exprt const &y_lower,
+  exprt const &y_upper,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  auto x_result = as_interval(env.eval(x, ns));
+  auto y_result = as_interval(env.eval(y, ns));
+
+  EXPECT(x_result, x_lower, x_upper);
+  EXPECT(y_result, y_lower, y_upper);
+}
+
 SCENARIO(
   "assume value expressions, pruning",
   "[core][analyses][variable-sensitivity][constant_abstract_value][value_set_"
@@ -29,6 +75,7 @@ SCENARIO(
   namespacet ns(symbol_table);
 
   auto type = signedbv_typet(32);
+  auto val0 = from_integer(0, type);
   auto val1 = from_integer(1, type);
   auto val2 = from_integer(2, type);
   auto val3 = from_integer(3, type);
@@ -57,16 +104,9 @@ SCENARIO(
 
     THEN("x == y and their values are pruned to { 2 }")
     {
-      auto assumption = environment.do_assume(equal_exprt(x, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_equal, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val2});
-      EXPECT(rhs_result, {val2});
+      EXPECT_RESULT(x, {val2}, y, {val2}, environment, ns);
     }
   }
   WHEN("x == y when x = [ 1, 2 ], y = [ 2, 5 ]")
@@ -76,16 +116,9 @@ SCENARIO(
 
     THEN("x == y and their values are pruned to { 2 }")
     {
-      auto assumption = environment.do_assume(equal_exprt(x, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_equal, y, environment, ns);
 
-      auto lhs_result = as_interval(environment.eval(x, ns));
-      auto rhs_result = as_interval(environment.eval(y, ns));
-
-      EXPECT(lhs_result, val2, val2);
-      EXPECT(rhs_result, val2, val2);
+      EXPECT_RESULT(x, val2, val2, y, val2, val2, environment, ns);
     }
   }
   WHEN("x == y when x = { 1, 2 }, y = [ 2, 5 ]")
@@ -95,16 +128,9 @@ SCENARIO(
 
     THEN("x == y and their values are pruned to { 2 }")
     {
-      auto assumption = environment.do_assume(equal_exprt(x, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_equal, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val2});
-      EXPECT(rhs_result, {val2});
+      EXPECT_RESULT(x, {val2}, y, {val2}, environment, ns);
     }
   }
   WHEN("x == y when x = [ 1, 2 ], y = { 2, 5 }")
@@ -114,16 +140,9 @@ SCENARIO(
 
     THEN("x == y and their values are pruned to [ 2 ]")
     {
-      auto assumption = environment.do_assume(equal_exprt(x, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_equal, y, environment, ns);
 
-      auto lhs_result = as_interval(environment.eval(x, ns));
-      auto rhs_result = as_interval(environment.eval(y, ns));
-
-      EXPECT(lhs_result, val2, val2);
-      EXPECT(rhs_result, val2, val2);
+      EXPECT_RESULT(x, val2, val2, y, val2, val2, environment, ns);
     }
   }
 
@@ -134,17 +153,9 @@ SCENARIO(
 
     THEN("x < y and x and y are unchanged")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val1, val3});
-      EXPECT(rhs_result, {val2, val5});
+      EXPECT_RESULT(x, {val1, val3}, y, {val2, val5}, environment, ns);
     }
   }
   WHEN(" x < y when x = { 2, 3 }, y = { 1, 5 }")
@@ -154,17 +165,9 @@ SCENARIO(
 
     THEN("x < y and y lower bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val2, val3});
-      EXPECT(rhs_result, {val5});
+      EXPECT_RESULT(x, {val2, val3}, y, {val5}, environment, ns);
     }
   }
   WHEN(" x < y when x = { 1, 5 }, y = { 2, 3 }")
@@ -174,17 +177,9 @@ SCENARIO(
 
     THEN("x < y and x upper bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val1});
-      EXPECT(rhs_result, {val2, val3});
+      EXPECT_RESULT(x, {val1}, y, {val2, val3}, environment, ns);
     }
   }
   WHEN(" x < y when x = { 2, 5 }, y = { 1, 3 }")
@@ -194,17 +189,9 @@ SCENARIO(
 
     THEN("x < y and x upper bound is pruned, y lower bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val2});
-      EXPECT(rhs_result, {val3});
+      EXPECT_RESULT(x, {val2}, y, {val3}, environment, ns);
     }
   }
   WHEN(" x < y when x = [ 1, 3 ], y = [ 2, 5 ]")
@@ -214,17 +201,9 @@ SCENARIO(
 
     THEN("x < y and x and y are unchanged")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_interval(environment.eval(x, ns));
-      auto rhs_result = as_interval(environment.eval(y, ns));
-
-      EXPECT(lhs_result, val1, val3);
-      EXPECT(rhs_result, val2, val5);
+      EXPECT_RESULT(x, val1, val3, y, val2, val5, environment, ns);
     }
   }
   WHEN(" x < y when x = [ 2, 3 ], y = [ 1, 5 ]")
@@ -234,17 +213,9 @@ SCENARIO(
 
     THEN("x < y and y lower bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_interval(environment.eval(x, ns));
-      auto rhs_result = as_interval(environment.eval(y, ns));
-
-      EXPECT(lhs_result, val2, val3);
-      EXPECT(rhs_result, val2, val5);
+      EXPECT_RESULT(x, val2, val3, y, val2, val5, environment, ns);
     }
   }
   WHEN(" x < y when x = [ 1, 5 ], y = [ 2, 3 ]")
@@ -254,17 +225,9 @@ SCENARIO(
 
     THEN("x < y and x upper bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_interval(environment.eval(x, ns));
-      auto rhs_result = as_interval(environment.eval(y, ns));
-
-      EXPECT(lhs_result, val1, val3);
-      EXPECT(rhs_result, val2, val3);
+      EXPECT_RESULT(x, val1, val3, y, val2, val3, environment, ns);
     }
   }
   WHEN(" x < y when x = [ 2, 5 ], y = [ 1, 3 ]")
@@ -274,17 +237,9 @@ SCENARIO(
 
     THEN("x < y and x upper bound is pruned, u lower bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_interval(environment.eval(x, ns));
-      auto rhs_result = as_interval(environment.eval(y, ns));
-
-      EXPECT(lhs_result, val2, val3);
-      EXPECT(rhs_result, val2, val3);
+      EXPECT_RESULT(x, val2, val3, y, val2, val3, environment, ns);
     }
   }
 
@@ -297,17 +252,15 @@ SCENARIO(
 
     THEN("x < y and y lower bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val2, val3});
-      EXPECT(rhs_result, {constant_interval_exprt(val2, val5)});
+      EXPECT_RESULT(
+        x,
+        {val2, val3},
+        y,
+        {constant_interval_exprt(val2, val5)},
+        environment,
+        ns);
     }
   }
   WHEN(" x < y when x = { 1, [2, 5] }, y = { 2, 3 }")
@@ -319,17 +272,15 @@ SCENARIO(
 
     THEN("x < y and x upper bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
-
-      EXPECT(lhs_result, {val1, constant_interval_exprt(val2, val3)});
-      EXPECT(rhs_result, {val2, val3});
+      EXPECT_RESULT(
+        x,
+        {val1, constant_interval_exprt(val2, val3)},
+        y,
+        {val2, val3},
+        environment,
+        ns);
     }
   }
   WHEN(" x < y when x = { [2, 4], 5 }, y = { 1, [2, 3] }")
@@ -343,17 +294,202 @@ SCENARIO(
 
     THEN("x < y and x upper bound is pruned, y lower bound is pruned")
     {
-      auto assumption =
-        environment.do_assume(binary_relation_exprt(x, ID_lt, y), ns);
-      REQUIRE(assumption.id() != ID_nil);
-      REQUIRE(assumption.type().id() == ID_bool);
-      REQUIRE(assumption.is_true());
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
 
-      auto lhs_result = as_value_set(environment.eval(x, ns));
-      auto rhs_result = as_value_set(environment.eval(y, ns));
+      EXPECT_RESULT(
+        x,
+        {constant_interval_exprt(val2, val3)},
+        y,
+        {constant_interval_exprt(val2, val3)},
+        environment,
+        ns);
+    }
+  }
 
-      EXPECT(lhs_result, {constant_interval_exprt(val2, val3)});
-      EXPECT(rhs_result, {constant_interval_exprt(val2, val3)});
+  WHEN(" y > x when x = { 1, 3 }, y = { 2, 5 }")
+  {
+    environment.assign(x, v13, ns);
+    environment.assign(y, v25, ns);
+
+    THEN("y > x and x and y are unchanged")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, {val1, val3}, y, {val2, val5}, environment, ns);
+    }
+  }
+  WHEN(" y > x when x = { 2, 3 }, y = { 1, 5 }")
+  {
+    environment.assign(x, v23, ns);
+    environment.assign(y, v15, ns);
+
+    THEN("y > x and y lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, {val2, val3}, y, {val5}, environment, ns);
+    }
+  }
+  WHEN(" y > x when x = { 1, 5 }, y = { 2, 3 }")
+  {
+    environment.assign(x, v15, ns);
+    environment.assign(y, v23, ns);
+
+    THEN("y > x and x upper bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, {val1}, y, {val2, val3}, environment, ns);
+    }
+  }
+  WHEN(" y > x when x = { 2, 5 }, y = { 1, 3 }")
+  {
+    environment.assign(x, v25, ns);
+    environment.assign(y, v13, ns);
+
+    THEN("y > x and x upper bound is pruned, y lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, {val2}, y, {val3}, environment, ns);
+    }
+  }
+
+  WHEN(" y > x when x = [ 1, 3 ], y = [ 2, 5 ]")
+  {
+    environment.assign(x, i13, ns);
+    environment.assign(y, i25, ns);
+
+    THEN("y > x and x and y are unchanged")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, val1, val3, y, val2, val5, environment, ns);
+    }
+  }
+  WHEN(" y > x when x = [ 2, 3 ], y = [ 1, 5 ]")
+  {
+    environment.assign(x, i23, ns);
+    environment.assign(y, i15, ns);
+
+    THEN("y > x and y lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, val2, val3, y, val2, val5, environment, ns);
+    }
+  }
+  WHEN(" y > x when x = [ 1, 5 ], y = [ 2, 3 ]")
+  {
+    environment.assign(x, i15, ns);
+    environment.assign(y, i23, ns);
+
+    THEN("y > x and x upper bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, val1, val3, y, val2, val3, environment, ns);
+    }
+  }
+  WHEN(" y > x when x = [ 2, 5 ], y = [ 1, 3 ]")
+  {
+    environment.assign(x, i25, ns);
+    environment.assign(y, i13, ns);
+
+    THEN("y > x and x upper bound is pruned, u lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(x, val2, val3, y, val2, val3, environment, ns);
+    }
+  }
+
+  WHEN(" y > x when x = { 2, 3 }, y = { 1, [2, 5] }")
+  {
+    auto v1i25 = make_value_set(
+      {val1, constant_interval_exprt(val2, val5)}, environment, ns);
+    environment.assign(x, v23, ns);
+    environment.assign(y, v1i25, ns);
+
+    THEN("y > x and y lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(
+        x,
+        {val2, val3},
+        y,
+        {constant_interval_exprt(val2, val5)},
+        environment,
+        ns);
+    }
+  }
+  WHEN(" y > x when x = { 1, [2, 5] }, y = { 2, 3 }")
+  {
+    auto v1i25 = make_value_set(
+      {val1, constant_interval_exprt(val2, val5)}, environment, ns);
+    environment.assign(x, v1i25, ns);
+    environment.assign(y, v23, ns);
+
+    THEN("y > x and x upper bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(
+        x,
+        {val1, constant_interval_exprt(val2, val3)},
+        y,
+        {val2, val3},
+        environment,
+        ns);
+    }
+  }
+  WHEN(" y > x when x = { [2, 4], 5 }, y = { 1, [2, 3] }")
+  {
+    auto i24v5 = make_value_set(
+      {val5, constant_interval_exprt(val2, val4)}, environment, ns);
+    environment.assign(x, i24v5, ns);
+    auto v1i23 = make_value_set(
+      {val1, constant_interval_exprt(val2, val3)}, environment, ns);
+    environment.assign(y, v1i23, ns);
+
+    THEN("y > x and x upper bound is pruned, y lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(
+        x,
+        {constant_interval_exprt(val2, val3)},
+        y,
+        {constant_interval_exprt(val2, val3)},
+        environment,
+        ns);
+    }
+  }
+
+  WHEN(" y > x when x = { [2, 4], 5 }, y = { [0, 1], [2, 3] }")
+  {
+    auto i24v5 = make_value_set(
+      {val5, constant_interval_exprt(val2, val4)}, environment, ns);
+    environment.assign(x, i24v5, ns);
+    auto i11i23 = make_value_set(
+      {constant_interval_exprt(val0, val1),
+       constant_interval_exprt(val2, val3)},
+      environment,
+      ns);
+    environment.assign(y, i11i23, ns);
+
+    THEN("y > x and x upper bound is pruned, y lower bound is pruned")
+    {
+      ASSUME_TRUE(y, ID_gt, x, environment, ns);
+
+      EXPECT_RESULT(
+        x,
+        {constant_interval_exprt(val2, val3)},
+        y,
+        {constant_interval_exprt(val2, val3)},
+        environment,
+        ns);
     }
   }
 }
