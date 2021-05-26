@@ -332,7 +332,7 @@ jobs:
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
 
-  check-vs-2019-build-and-test:
+  check-vs-2019-cmake-build-and-test:
     runs-on: windows-2019
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
