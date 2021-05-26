@@ -514,6 +514,9 @@ CBMC_NORETURN void report_invariant_failure(
 #define DATA_INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                    \
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
+#define UNIMPLEMENTED_FEATURE(FEATURE)                                         \
+  INVARIANT(false, std::string{"Reached unimplemented "} + (FEATURE))
+
 // Legacy annotations
 
 // The following should not be used in new code and are only intended
