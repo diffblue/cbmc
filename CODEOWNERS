@@ -2,7 +2,7 @@
 # approval within two weeks.
 #
 # These owners will be the default owners for everything in the repo.
-*       @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
+*       @kroening @tautschnig @peterschrammel @chrisr-diffblue
 
 # These files should rarely change
 
@@ -13,45 +13,45 @@
 /src/linking/ @kroening @tautschnig @chrisr-diffblue
 /src/memory-models/ @kroening @tautschnig
 /src/goto-checker/ @kroening @tautschnig @peterschrammel
-/src/goto-symex/ @kroening @tautschnig @peterschrammel @smowton @romainbrenguier
+/src/goto-symex/ @kroening @tautschnig @peterschrammel @romainbrenguier
 /src/json/ @kroening @tautschnig @peterschrammel
-/src/json-symtab-language/ @martin-cs @smowton
+/src/json-symtab-language/ @martin-cs
 /src/langapi/ @kroening @tautschnig @peterschrammel
 /src/xmllang/ @kroening @tautschnig @peterschrammel
-/src/nonstd/ @smowton @peterschrammel
+/src/nonstd/ @peterschrammel
 /src/solvers/flattening @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/floatbv @martin-cs @kroening
 /src/solvers/miniBDD @tautschnig @kroening
 /src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
-/src/symtab2gb/ @martin-cs @smowton
-/jbmc/src/miniz/ @smowton @peterschrammel
+/src/symtab2gb/ @martin-cs
+/jbmc/src/miniz/ @peterschrammel
 
 
 # These files change frequently and changes are high-risk
 
-/src/cbmc/ @smowton @kroening @tautschnig @peterschrammel
-/src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel
-/src/util/ @smowton @kroening @tautschnig @peterschrammel
+/src/cbmc/ @kroening @tautschnig @peterschrammel
+/src/goto-programs/ @kroening @tautschnig @peterschrammel
+/src/util/ @kroening @tautschnig @peterschrammel
 /src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
 /src/solvers/strings @martin-cs @romainbrenguier @peterschrammel
-/jbmc/src/java_bytecode/ @smowton @romainbrenguier @peterschrammel
-/src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @smowton
-/src/pointer-analysis/ @martin-cs @peterschrammel @chrisr-diffblue @smowton
+/jbmc/src/java_bytecode/ @romainbrenguier @peterschrammel
+/src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue
+/src/pointer-analysis/ @martin-cs @peterschrammel @chrisr-diffblue
 
 
 # These files change frequently and changes are medium-risk
 
 /src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel
 /src/goto-harness/ @martin-cs @chrisr-diffblue @peterschrammel
-/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @smowton
+/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel
 /src/goto-instrument/code_contracts.* @tautschnig @feliperodri @SaswatPadhi
 /src/goto-diff/ @tautschnig @peterschrammel
 /src/jsil/ @kroening @tautschnig
 /src/memory-analyzer/ @tautschnig @chrisr-diffblue
-/jbmc/src/jbmc/ @smowton @peterschrammel @romainbrenguier
-/jbmc/src/janalyzer/ @smowton @peterschrammel @romainbrenguier
-/jbmc/src/jdiff/ @smowton @peterschrammel
+/jbmc/src/jbmc/ @peterschrammel @romainbrenguier
+/jbmc/src/janalyzer/ @peterschrammel @romainbrenguier
+/jbmc/src/jdiff/ @peterschrammel
 /src/cpp/ @kroening @tautschnig @peterschrammel
 /src/solvers/smt2 @kroening @martin-cs @tautschnig @peterschrammel @allredj @romainbrenguier
 /src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB @chrisr-diffblue
