@@ -134,6 +134,10 @@ jobs:
         # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
         # strip that here
         run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
+      - name: Configure git user name and email
+        uses: Homebrew/actions/git-user-config@07da0794847043a11761f14c97cc682577c74d5d
+        with:
+          username: db-ci-cprover
       - name: Create homebrew PR
         run: |
           brew update-reset
