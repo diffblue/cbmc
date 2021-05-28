@@ -312,6 +312,7 @@ public:
 
   std::list<node_indext> topsort() const;
 
+  std::vector<node_indext> get_predecessors(const node_indext &n) const;
   std::vector<node_indext> get_successors(const node_indext &n) const;
   void output_dot(std::ostream &out) const;
   void for_each_successor(
@@ -932,6 +933,19 @@ void output_dot_generic(
       out << node_to_string(i) << " -> " << node_to_string(n) << '\n';
     });
   });
+}
+
+template <class N>
+std::vector<typename grapht<N>::node_indext>
+grapht<N>::get_predecessors(const node_indext &n) const
+{
+  std::vector<node_indext> result;
+  std::transform(
+    nodes[n].in.begin(),
+    nodes[n].in.end(),
+    std::back_inserter(result),
+    [&](const std::pair<node_indext, edget> &edge) { return edge.first; });
+  return result;
 }
 
 template <class N>
