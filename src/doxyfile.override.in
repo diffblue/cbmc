@@ -7,6 +7,6 @@
 # configure_file; variables like @this@ are replaced by
 # cmake variables.
 
-@INCLUDE = @ORIGINAL_DOXYFILE@
+@INCLUDE = @CMAKE_SOURCE_DIR@/src/doxyfile
 
 OUTPUT_DIRECTORY = @DOC_OUTPUT_DIRECTORY@
