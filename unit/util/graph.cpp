@@ -310,3 +310,25 @@ SCENARIO("graph-connected-subgraphs",
     }
   }
 }
+
+SCENARIO("predecessors-successors-graph", "[core][util][graph]")
+{
+  GIVEN("A graph")
+  {
+    simple_grapht graph;
+    simple_grapht::node_indext indices[2];
+
+    for(int i = 0; i < 2; ++i)
+      indices[i] = graph.add_node();
+
+    graph.add_edge(indices[0], indices[1]);
+
+    THEN("Nodes should have correct successors and predecessors")
+    {
+      REQUIRE(graph.get_predecessors(indices[0]).size() == 0);
+      REQUIRE(graph.get_successors(indices[0]).size() == 1);
+      REQUIRE(graph.get_predecessors(indices[1]).size() == 1);
+      REQUIRE(graph.get_successors(indices[1]).size() == 0);
+    }
+  }
+}
