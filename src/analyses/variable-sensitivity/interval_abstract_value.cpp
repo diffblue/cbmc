@@ -332,7 +332,7 @@ void interval_abstract_valuet::output(
     else
     {
       INVARIANT(
-        interval.get_lower().id() == ID_constant,
+        interval.get_upper().id() == ID_constant,
         "We only support constant limits");
       upper_string =
         id2string(to_constant_expr(interval.get_upper()).get_value());
