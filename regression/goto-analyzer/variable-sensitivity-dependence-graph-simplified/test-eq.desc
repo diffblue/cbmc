@@ -1,0 +1,10 @@
+CORE
+main.c
+--dependence-graph-vs --show 
+^EXIT=0$
+^SIGNAL=0$
+^Data dependencies: 0 \[in\]$
+^Data dependencies: 2 \[a\]$
+^Data dependencies: 2 \[a\], 9 \[a\]$
+--
+^warning: ignoring

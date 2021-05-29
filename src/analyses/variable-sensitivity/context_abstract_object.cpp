@@ -65,14 +65,7 @@ abstract_object_pointert context_abstract_objectt::write(
   if(updated_child == child_abstract_object)
     return shared_from_this();
 
-  // Need to ensure the result of the write is still wrapped in a context
-  const auto &result =
-    std::dynamic_pointer_cast<context_abstract_objectt>(mutable_clone());
-
-  // Update the child and record the updated write locations
-  result->set_child(updated_child);
-
-  return result;
+  return envelop(updated_child);
 }
 
 /**
@@ -108,8 +101,23 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
       return p->child_abstract_object;
     });
 
-  return child_abstract_object->expression_transform(
+  auto result = child_abstract_object->expression_transform(
     expr, child_operands, environment, ns);
+  return envelop(result);
+}
+
+abstract_object_pointert
+context_abstract_objectt::envelop(abstract_object_pointert &object) const
+{
+  if(
+    std::dynamic_pointer_cast<const context_abstract_objectt>(object) !=
+    nullptr)
+    return object;
+
+  const auto &envelope =
+    std::dynamic_pointer_cast<context_abstract_objectt>(mutable_clone());
+  envelope->set_child(object);
+  return envelope;
 }
 
 /**
@@ -137,7 +145,7 @@ void context_abstract_objectt::output(
   * to 'before', false otherwise.
   */
 bool context_abstract_objectt::has_been_modified(
-  const abstract_object_pointert before) const
+  const abstract_object_pointert &before) const
 {
   // Default implementation, with no other information to go on
   // falls back to relying on copy-on-write and pointer inequality
@@ -145,8 +153,7 @@ bool context_abstract_objectt::has_been_modified(
   auto before_context =
     std::dynamic_pointer_cast<const context_abstract_objectt>(before);
 
-  return this->child_abstract_object.get() !=
-         before_context->child_abstract_object.get();
+  return this->child_abstract_object != before_context->child_abstract_object;
 }
 
 abstract_object_pointert context_abstract_objectt::unwrap_context() const

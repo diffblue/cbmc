@@ -555,14 +555,15 @@ exprt invert_expr(const exprt &expr)
 
 void prune_assign(
   abstract_environmentt &env,
+  abstract_object_pointert previous,
   const exprt &destination,
   abstract_object_pointert obj,
   const namespacet &ns)
 {
-  auto context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
-  if(context_value == nullptr)
-    obj = env.add_object_context(obj);
+  auto context =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(previous);
+  if(context != nullptr)
+    obj = context->envelop(obj);
   env.assign(destination, obj, ns);
 }
 
@@ -636,9 +637,9 @@ exprt assume_eq(
     return false_exprt();
 
   if(is_lvalue(equal_expr.lhs()))
-    prune_assign(env, equal_expr.lhs(), meet, ns);
+    prune_assign(env, left, equal_expr.lhs(), meet, ns);
   if(is_lvalue(equal_expr.rhs()))
-    prune_assign(env, equal_expr.rhs(), meet, ns);
+    prune_assign(env, right, equal_expr.rhs(), meet, ns);
   return true_exprt();
 }
 
@@ -669,21 +670,26 @@ struct left_and_right_valuest
 {
   exprt lhs;
   exprt rhs;
-  abstract_value_pointert left;
-  abstract_value_pointert right;
+  abstract_object_pointert left;
+  abstract_object_pointert right;
 
   constant_interval_exprt left_interval() const
   {
-    return left->to_interval();
+    return as_value(left)->to_interval();
   }
   constant_interval_exprt right_interval() const
   {
-    return right->to_interval();
+    return as_value(right)->to_interval();
   }
 
   bool are_good() const
   {
     return left != nullptr && right != nullptr;
+  }
+
+  bool are_known() const
+  {
+    return !left->is_top() && !right->is_top();
   }
 };
 
@@ -699,10 +705,37 @@ left_and_right_valuest eval_operands_as_values(
   auto left = env.eval(lhs, ns);
   auto right = env.eval(rhs, ns);
 
-  if(left->is_top() || right->is_top())
+  if(left->is_top() && right->is_top())
     return {};
 
-  return {lhs, rhs, as_value(left), as_value(right)};
+  return {lhs, rhs, left, right};
+}
+
+exprt assume_less_than_unbounded(
+  abstract_environmentt &env,
+  const left_and_right_valuest &operands,
+  const namespacet &ns)
+{
+  if(operands.left->is_top() && is_lvalue(operands.lhs))
+  {
+    // TOP < x, so prune range is min->right.upper
+    auto pruned_expr = constant_interval_exprt(
+      min_exprt(operands.left->type()), operands.right_interval().get_upper());
+    auto constrained =
+      std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
+    prune_assign(env, operands.left, operands.lhs, constrained, ns);
+  }
+  if(operands.right->is_top() && is_lvalue(operands.rhs))
+  {
+    // x < TOP, so prune range is left.lower->max
+    auto pruned_expr = constant_interval_exprt(
+      operands.left_interval().get_lower(), max_exprt(operands.right->type()));
+    auto constrained =
+      std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
+    prune_assign(env, operands.right, operands.rhs, constrained, ns);
+  }
+
+  return true_exprt();
 }
 
 exprt assume_less_than(
@@ -713,6 +746,9 @@ exprt assume_less_than(
   auto operands = eval_operands_as_values(env, expr, ns);
   if(!operands.are_good())
     return nil_exprt();
+
+  if(!operands.are_known())
+    return assume_less_than_unbounded(env, operands, ns);
 
   auto left_interval = operands.left_interval();
   auto right_interval = operands.right_interval();
@@ -729,15 +765,17 @@ exprt assume_less_than(
     {
       auto pruned_upper = constant_interval_exprt::get_min(
         left_interval.get_upper(), right_upper);
-      auto constrained = operands.left->constrain(left_lower, pruned_upper);
-      prune_assign(env, operands.lhs, constrained, ns);
+      auto constrained =
+        as_value(operands.left)->constrain(left_lower, pruned_upper);
+      prune_assign(env, operands.left, operands.lhs, constrained, ns);
     }
     if(is_lvalue(operands.rhs))
     {
       auto pruned_lower = constant_interval_exprt::get_max(
         left_lower, right_interval.get_lower());
-      auto constrained = operands.right->constrain(pruned_lower, right_upper);
-      prune_assign(env, operands.rhs, constrained, ns);
+      auto constrained =
+        as_value(operands.right)->constrain(pruned_lower, right_upper);
+      prune_assign(env, operands.right, operands.rhs, constrained, ns);
     }
   }
   return result;

@@ -175,8 +175,7 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  auto result = transform(expr, operands, environment, ns);
-  return environment.add_object_context(result);
+  return transform(expr, operands, environment, ns);
 }
 
 // evaluation helpers

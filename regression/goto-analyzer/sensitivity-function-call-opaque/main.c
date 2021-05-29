@@ -4,7 +4,7 @@ int global_value;
 
 int opaque(int other, int *side_effect);
 
-int main(int argc, char *argv[])
+int main()
 {
   int x = 3;
   int y = 4;

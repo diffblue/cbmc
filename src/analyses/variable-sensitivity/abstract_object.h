@@ -228,7 +228,7 @@ public:
    * \return true if 'this' is considered to have been modified in comparison
    * to 'before', false otherwise.
    */
-  virtual bool has_been_modified(const abstract_object_pointert before) const
+  virtual bool has_been_modified(const abstract_object_pointert &before) const
   {
     /// Default implementation, with no other information to go on
     /// falls back to relying on copy-on-write and pointer inequality

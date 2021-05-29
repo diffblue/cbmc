@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-values constants --verify
+--variable-sensitivity --vsd-values intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line .* assertion x < 20: SUCCESS

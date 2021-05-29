@@ -84,6 +84,7 @@ public:
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 
+  abstract_object_pointert envelop(abstract_object_pointert &child) const;
   abstract_object_pointert unwrap_context() const override;
 
   void get_statistics(
@@ -115,7 +116,7 @@ protected:
     const abstract_object_pointert &value,
     bool merging_write) const override;
 
-  bool has_been_modified(const abstract_object_pointert before) const override;
+  bool has_been_modified(const abstract_object_pointert &before) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONTEXT_ABSTRACT_OBJECT_H

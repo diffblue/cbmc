@@ -1,6 +1,6 @@
 int unknown();
 
-int main(int argc, char argv[])
+int main()
 {
   int array[2] = {1, 2};
   int p;

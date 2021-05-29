@@ -242,7 +242,6 @@ SCENARIO(
       EXPECT_RESULT(x, val2, val3, y, val2, val3, environment, ns);
     }
   }
-
   WHEN(" x < y when x = { 2, 3 }, y = { 1, [2, 5] }")
   {
     auto v1i25 = make_value_set(
@@ -303,6 +302,34 @@ SCENARIO(
         {constant_interval_exprt(val2, val3)},
         environment,
         ns);
+    }
+  }
+
+  WHEN(" x < y when x is TOP, y = [1, 5]")
+  {
+    auto top = std::make_shared<constant_abstract_valuet>(type, true, false);
+    environment.assign(x, top, ns);
+    environment.assign(y, i15, ns);
+
+    THEN("x < y and x upper bound is pruned")
+    {
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
+
+      EXPECT_RESULT(x, min_exprt(type), val5, y, val1, val5, environment, ns);
+    }
+  }
+
+  WHEN(" x > y when x is [1, 5], y = TOP")
+  {
+    auto top = std::make_shared<constant_abstract_valuet>(type, true, false);
+    environment.assign(x, i15, ns);
+    environment.assign(y, top, ns);
+
+    THEN("x < y and y lower bound is pruned")
+    {
+      ASSUME_TRUE(x, ID_lt, y, environment, ns);
+
+      EXPECT_RESULT(x, val1, val5, y, val1, max_exprt(type), environment, ns);
     }
   }
 

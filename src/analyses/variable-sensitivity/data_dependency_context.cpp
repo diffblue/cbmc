@@ -26,7 +26,7 @@ Author: Diffblue Ltd
  * to 'before', false otherwise.
  */
 bool data_dependency_contextt::has_been_modified(
-  const abstract_object_pointert before) const
+  const abstract_object_pointert &before) const
 {
   if(this->write_location_contextt::has_been_modified(before))
     return true;
@@ -38,6 +38,11 @@ bool data_dependency_contextt::has_been_modified(
   {
     // The other context is not something we understand, so must assume
     // that the abstract_object has been modified
+    return true;
+  }
+
+  if(get_child() != cast_before->get_child())
+  {
     return true;
   }
 
@@ -246,36 +251,61 @@ data_dependency_contextt::merge(const abstract_object_pointert &other) const
       std::dynamic_pointer_cast<const data_dependency_contextt>(
         this->write_location_contextt::merge(other));
 
-    const auto updated_parent =
-      std::dynamic_pointer_cast<const data_dependency_contextt>(
-        merged_parent->insert_data_deps(cast_other->data_deps));
-
-    const auto &result = std::dynamic_pointer_cast<data_dependency_contextt>(
-      updated_parent->mutable_clone());
-
-    // On a merge, data_dominators are the intersection of this object and the
-    // other object. In other words, the dominators at this merge point are
-    // those dominators that exist in all possible execution paths to this
-    // merge point.
-    result->data_dominators.clear();
-    std::set_intersection(
-      data_dominators.begin(),
-      data_dominators.end(),
-      cast_other->data_dominators.begin(),
-      cast_other->data_dominators.end(),
-      std::inserter(result->data_dominators, result->data_dominators.end()),
-      location_ordert());
-
-    // It is critically important that we only return a newly constructed result
-    // abstract object *iff* the data has actually changed, otherwise AI may
-    // never reach a fixpoint
-    if(has_been_modified(result))
-      return result;
-    else
-      return shared_from_this();
+    return combine(cast_other, merged_parent);
   }
 
   return abstract_objectt::merge(other);
+}
+
+abstract_object_pointert
+data_dependency_contextt::meet(const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const data_dependency_contextt>(other);
+
+  if(cast_other)
+  {
+    const auto meet_parent =
+      std::dynamic_pointer_cast<const data_dependency_contextt>(
+        this->write_location_contextt::meet(other));
+
+    return combine(cast_other, meet_parent);
+  }
+
+  return abstract_objectt::meet(other);
+}
+
+abstract_object_pointert data_dependency_contextt::combine(
+  const data_dependency_context_ptrt &other,
+  const data_dependency_context_ptrt &parent) const
+{
+  const auto updated_parent =
+    std::dynamic_pointer_cast<const data_dependency_contextt>(
+      parent->insert_data_deps(other->data_deps));
+
+  const auto &result = std::dynamic_pointer_cast<data_dependency_contextt>(
+    updated_parent->mutable_clone());
+
+  // On a merge, data_dominators are the intersection of this object and the
+  // other object. In other words, the dominators at this merge point are
+  // those dominators that exist in all possible execution paths to this
+  // merge point.
+  result->data_dominators.clear();
+  std::set_intersection(
+    data_dominators.begin(),
+    data_dominators.end(),
+    other->data_dominators.begin(),
+    other->data_dominators.end(),
+    std::inserter(result->data_dominators, result->data_dominators.end()),
+    location_ordert());
+
+  // It is critically important that we only return a newly constructed result
+  // abstract object *iff* the data has actually changed, otherwise AI may
+  // never reach a fixpoint
+  if(has_been_modified(result))
+    return result;
+  else
+    return shared_from_this();
 }
 
 /**

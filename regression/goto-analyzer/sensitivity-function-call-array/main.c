@@ -2,7 +2,7 @@
 
 int *bar(int *arr_unmodified, int *arr_modified);
 
-int main(int argc, char *argv[])
+int main()
 {
   int arr_x[] = {1, 2, 3, 4};
   int arr_y[] = {1, 2, 3, 4};
