@@ -329,6 +329,17 @@ SCENARIO("predecessors-successors-graph", "[core][util][graph]")
       REQUIRE(graph.get_successors(indices[0]).size() == 1);
       REQUIRE(graph.get_predecessors(indices[1]).size() == 1);
       REQUIRE(graph.get_successors(indices[1]).size() == 0);
+
+      int count = 0;
+      graph.for_each_predecessor(
+        indices[1], [&](const simple_grapht::node_indext &n) { count++; });
+      REQUIRE(count == 1);
+
+      // Refresh counter.
+      count = 0;
+      graph.for_each_successor(
+        indices[1], [&](const simple_grapht::node_indext &n) { count++; });
+      REQUIRE(count == 0);
     }
   }
 }
