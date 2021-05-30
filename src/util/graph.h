@@ -315,6 +315,9 @@ public:
   std::vector<node_indext> get_predecessors(const node_indext &n) const;
   std::vector<node_indext> get_successors(const node_indext &n) const;
   void output_dot(std::ostream &out) const;
+  void for_each_predecessor(
+    const node_indext &n,
+    std::function<void(const node_indext &)> f) const;
   void for_each_successor(
     const node_indext &n,
     std::function<void(const node_indext &)> f) const;
@@ -959,6 +962,17 @@ grapht<N>::get_successors(const node_indext &n) const
     std::back_inserter(result),
     [&](const std::pair<node_indext, edget> &edge) { return edge.first; });
   return result;
+}
+
+template <class N>
+void grapht<N>::for_each_predecessor(
+  const node_indext &n,
+  std::function<void(const node_indext &)> f) const
+{
+  std::for_each(
+    nodes[n].in.begin(),
+    nodes[n].in.end(),
+    [&](const std::pair<node_indext, edget> &edge) { f(edge.first); });
 }
 
 template <class N>
