@@ -1,3 +1,4 @@
+// clang-format off
 typedef void ** __builtin_va_list;
 typedef void ** __builtin_ms_va_list;
 
@@ -31,3 +32,4 @@ typedef unsigned long long __gcc_di;
 enum __gcc_atomic_memmodels {
   __ATOMIC_RELAXED, __ATOMIC_CONSUME, __ATOMIC_ACQUIRE, __ATOMIC_RELEASE, __ATOMIC_ACQ_REL, __ATOMIC_SEQ_CST
 };
+// clang-format on
