@@ -1698,7 +1698,7 @@ goto_programt assigns_clauset::havoc_code(
     {
       // create the condition
       exprt condition =
-        not_exprt(w_ok_exprt(target_ptr, from_integer(0, integer_typet())));
+        not_exprt(w_ok_exprt(target_ptr, from_integer(0, unsigned_int_type())));
       havoc_statements.add(goto_programt::make_goto(z, condition, location));
     }
 
@@ -1775,8 +1775,8 @@ exprt assigns_clauset::compatible_expression(
           // target->compatible_expression(*called_target) would not be
           // checked on invalid called_targets.
           current_target_compatible = or_exprt(
-            not_exprt(
-              w_ok_exprt(called_target_ptr, from_integer(0, integer_typet()))),
+            not_exprt(w_ok_exprt(
+              called_target_ptr, from_integer(0, unsigned_int_type()))),
             target->compatible_expression(*called_target));
         }
         else

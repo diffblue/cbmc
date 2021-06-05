@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --replace-all-calls-with-contracts
 ^EXIT=0$
@@ -7,7 +7,3 @@ main.c
 --
 --
 This test checks that a havocked variable can be constrained by a function post-condition.
-
-Known Bug:
-Currently, there is a bug when char variables are being passed to
-__CPROVER_w_ok(). See GitHub issue #6106 for further details.
