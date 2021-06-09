@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --show
+^main::1::fun2 \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
+^main::1::fun3 \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
+^EXIT=0$
+^SIGNAL=0$
+--

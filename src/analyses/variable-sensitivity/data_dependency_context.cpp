@@ -41,11 +41,6 @@ bool data_dependency_contextt::has_been_modified(
     return true;
   }
 
-  if(get_child() != cast_before->get_child())
-  {
-    return true;
-  }
-
   // Check whether the data dependencies have changed as well
   abstract_objectt::locationst intersection;
   std::set_intersection(
@@ -302,7 +297,8 @@ abstract_object_pointert data_dependency_contextt::combine(
   // It is critically important that we only return a newly constructed result
   // abstract object *iff* the data has actually changed, otherwise AI may
   // never reach a fixpoint
-  if(has_been_modified(result))
+  bool value_change = get_child() != result->get_child();
+  if(value_change || has_been_modified(result))
     return result;
   else
     return shared_from_this();

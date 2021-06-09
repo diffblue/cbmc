@@ -91,10 +91,7 @@ exprt value_set_abstract_valuet::to_constant() const
   {
     return *values.begin();
   }
-  else
-  {
-    return nil_exprt{};
-  }
+  return abstract_objectt::to_constant();
 }
 
 void value_set_abstract_valuet::output(

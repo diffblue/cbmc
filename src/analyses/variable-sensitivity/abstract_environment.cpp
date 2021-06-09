@@ -555,7 +555,7 @@ exprt invert_expr(const exprt &expr)
 
 void prune_assign(
   abstract_environmentt &env,
-  abstract_object_pointert previous,
+  const abstract_object_pointert &previous,
   const exprt &destination,
   abstract_object_pointert obj,
   const namespacet &ns)
@@ -616,30 +616,97 @@ exprt assume_or(
   return invert_result(result);
 }
 
+struct left_and_right_valuest
+{
+  exprt lhs;
+  exprt rhs;
+  abstract_object_pointert left;
+  abstract_object_pointert right;
+
+  constant_interval_exprt left_interval() const
+  {
+    return as_value(left)->to_interval();
+  }
+  constant_interval_exprt right_interval() const
+  {
+    return as_value(right)->to_interval();
+  }
+
+  bool are_bad() const
+  {
+    return left == nullptr || right == nullptr ||
+           (left->is_top() && right->is_top()) || !is_value(left) ||
+           !is_value(right);
+  }
+
+  bool has_top() const
+  {
+    return left->is_top() || right->is_top();
+  }
+};
+
+left_and_right_valuest eval_operands_as_values(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto const &relationship_expr = to_binary_expr(expr);
+
+  auto lhs = relationship_expr.lhs();
+  auto rhs = relationship_expr.rhs();
+  auto left = env.eval(lhs, ns);
+  auto right = env.eval(rhs, ns);
+
+  if(left->is_top() && right->is_top())
+    return {};
+
+  return {lhs, rhs, left, right};
+}
+
+exprt assume_eq_unbounded(
+  abstract_environmentt &env,
+  const left_and_right_valuest &operands,
+  const namespacet &ns)
+{
+  if(operands.left->is_top() && is_lvalue(operands.lhs))
+  {
+    // TOP == x
+    auto constrained = std::make_shared<interval_abstract_valuet>(
+      operands.right_interval(), env, ns);
+    prune_assign(env, operands.left, operands.lhs, constrained, ns);
+  }
+  if(operands.right->is_top() && is_lvalue(operands.rhs))
+  {
+    // x == TOP
+    auto constrained = std::make_shared<interval_abstract_valuet>(
+      operands.left_interval(), env, ns);
+    prune_assign(env, operands.right, operands.rhs, constrained, ns);
+  }
+  return true_exprt();
+}
+
 exprt assume_eq(
   abstract_environmentt &env,
   const exprt &expr,
   const namespacet &ns)
 {
-  auto const &equal_expr = to_binary_expr(expr);
+  auto operands = eval_operands_as_values(env, expr, ns);
 
-  auto left = env.eval(equal_expr.lhs(), ns);
-  auto right = env.eval(equal_expr.rhs(), ns);
-
-  if(left->is_top() || right->is_top())
-    return nil_exprt();
-  if(!is_value(left) || !is_value(right))
+  if(operands.are_bad())
     return nil_exprt();
 
-  auto meet = left->meet(right);
+  if(operands.has_top())
+    return assume_eq_unbounded(env, operands, ns);
+
+  auto meet = operands.left->meet(operands.right);
 
   if(meet->is_bottom())
     return false_exprt();
 
-  if(is_lvalue(equal_expr.lhs()))
-    prune_assign(env, left, equal_expr.lhs(), meet, ns);
-  if(is_lvalue(equal_expr.rhs()))
-    prune_assign(env, right, equal_expr.rhs(), meet, ns);
+  if(is_lvalue(operands.lhs))
+    prune_assign(env, operands.left, operands.lhs, meet, ns);
+  if(is_lvalue(operands.rhs))
+    prune_assign(env, operands.right, operands.rhs, meet, ns);
   return true_exprt();
 }
 
@@ -666,51 +733,6 @@ exprt assume_noteq(
   return false_exprt();
 }
 
-struct left_and_right_valuest
-{
-  exprt lhs;
-  exprt rhs;
-  abstract_object_pointert left;
-  abstract_object_pointert right;
-
-  constant_interval_exprt left_interval() const
-  {
-    return as_value(left)->to_interval();
-  }
-  constant_interval_exprt right_interval() const
-  {
-    return as_value(right)->to_interval();
-  }
-
-  bool are_good() const
-  {
-    return left != nullptr && right != nullptr;
-  }
-
-  bool are_known() const
-  {
-    return !left->is_top() && !right->is_top();
-  }
-};
-
-left_and_right_valuest eval_operands_as_values(
-  abstract_environmentt &env,
-  const exprt &expr,
-  const namespacet &ns)
-{
-  auto const &relationship_expr = to_binary_expr(expr);
-
-  auto lhs = relationship_expr.lhs();
-  auto rhs = relationship_expr.rhs();
-  auto left = env.eval(lhs, ns);
-  auto right = env.eval(rhs, ns);
-
-  if(left->is_top() && right->is_top())
-    return {};
-
-  return {lhs, rhs, left, right};
-}
-
 exprt assume_less_than_unbounded(
   abstract_environmentt &env,
   const left_and_right_valuest &operands,
@@ -720,7 +742,9 @@ exprt assume_less_than_unbounded(
   {
     // TOP < x, so prune range is min->right.upper
     auto pruned_expr = constant_interval_exprt(
-      min_exprt(operands.left->type()), operands.right_interval().get_upper());
+      min_exprt(operands.left->type()),
+      operands.right_interval().get_upper(),
+      operands.left->type());
     auto constrained =
       std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
     prune_assign(env, operands.left, operands.lhs, constrained, ns);
@@ -729,7 +753,9 @@ exprt assume_less_than_unbounded(
   {
     // x < TOP, so prune range is left.lower->max
     auto pruned_expr = constant_interval_exprt(
-      operands.left_interval().get_lower(), max_exprt(operands.right->type()));
+      operands.left_interval().get_lower(),
+      max_exprt(operands.right->type()),
+      operands.right->type());
     auto constrained =
       std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
     prune_assign(env, operands.right, operands.rhs, constrained, ns);
@@ -744,10 +770,10 @@ exprt assume_less_than(
   const namespacet &ns)
 {
   auto operands = eval_operands_as_values(env, expr, ns);
-  if(!operands.are_good())
+  if(operands.are_bad())
     return nil_exprt();
 
-  if(!operands.are_known())
+  if(operands.has_top())
     return assume_less_than_unbounded(env, operands, ns);
 
   auto left_interval = operands.left_interval();

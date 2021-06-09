@@ -114,7 +114,7 @@ SCENARIO(
     environment.assign(x, i12, ns);
     environment.assign(y, i25, ns);
 
-    THEN("x == y and their values are pruned to { 2 }")
+    THEN("x == y and their values are pruned to [ 2 ]")
     {
       ASSUME_TRUE(x, ID_equal, y, environment, ns);
 
@@ -143,6 +143,19 @@ SCENARIO(
       ASSUME_TRUE(x, ID_equal, y, environment, ns);
 
       EXPECT_RESULT(x, val2, val2, y, val2, val2, environment, ns);
+    }
+  }
+  WHEN("x == y when x = [ 1, 2 ], and y is TOP")
+  {
+    environment.assign(x, i12, ns);
+    environment.assign(
+      y, std::make_shared<constant_abstract_valuet>(y.type(), true, false), ns);
+
+    THEN("x == y and their values are pruned to [ 1, 2 ]")
+    {
+      ASSUME_TRUE(x, ID_equal, y, environment, ns);
+
+      EXPECT_RESULT(x, val1, val2, y, val1, val2, environment, ns);
     }
   }
 

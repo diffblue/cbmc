@@ -657,7 +657,7 @@ SCENARIO(
 
       auto and_expr = and_exprt(lhs_expr, rhs_expr);
 
-      ASSUME_NIL(environment, and_expr, ns);
+      ASSUME_TRUE(environment, and_expr, ns);
     }
     WHEN("{ 3, 4 } == { 4, 5 } && unknown == { 2, 3 }")
     {
@@ -667,7 +667,7 @@ SCENARIO(
 
       auto and_expr = and_exprt(lhs_expr, rhs_expr);
 
-      ASSUME_NIL(environment, and_expr, ns);
+      ASSUME_TRUE(environment, and_expr, ns);
     }
     WHEN("unknown == { 2, 3 } && mystery == { 1, 2 }")
     {
@@ -678,7 +678,7 @@ SCENARIO(
 
       auto and_expr = and_exprt(lhs_expr, rhs_expr);
 
-      ASSUME_NIL(environment, and_expr, ns);
+      ASSUME_TRUE(environment, and_expr, ns);
     }
     WHEN("unknown == { 2, 3 } && { 3, 4 } == { 1, 2 }")
     {
