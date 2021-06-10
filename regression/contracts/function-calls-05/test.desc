@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=0$
+^SIGNAL=0$
+\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS
+\[foo.\d+\] line \d+ Check that sum is assignable: SUCCESS
+\[main.assertion.\d+\] line \d+ assertion foo\(\&x, \&y\) \=\= 10: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether function contracts are properly propagated to function pointers.
