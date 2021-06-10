@@ -1,0 +1,13 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=0$
+^SIGNAL=0$
+\[precondition.\d+\] file main.c line \d+ Check requires clause: SUCCESS
+\[main.assertion.\d+\] line \d+ assertion rval \=\= x-\>baz \+ x-\>qux: SUCCESS
+\[main.assertion.\d+\] line \d+ assertion \*x \=\= \*y: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether asserting __CPROVER_is_fresh will guarantee that objects
+mapped to distinct objetcs (for structs).
