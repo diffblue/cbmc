@@ -47,7 +47,7 @@ public:
     message_handlert &message_handler,
     bool get_array_constraints = false)
     : arrayst(_ns, _prop, message_handler, get_array_constraints),
-      unbounded_array(unbounded_arrayt::U_NONE),
+      unbounded_array(unbounded_arrayt::U_AUTO),
       bv_width(_ns),
       bv_utils(_prop),
       functions(*this),
