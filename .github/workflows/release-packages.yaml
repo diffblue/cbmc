@@ -204,7 +204,16 @@ jobs:
       - name: Sign the installer
         id: code_sign
         run: |
-          & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr http://ts.ssl.com ${{ steps.create_packages.outputs.msi_installer }}
+          $servers = @('http://ts.ssl.com', 'http://timestamp.digicert.com', 'http://timestamp.sectigo.com')
+          foreach($ts_server in $servers)
+          {
+            & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr $ts_server ${{ steps.create_packages.outputs.msi_installer }}
+            if ($LastExitCode -eq "0")
+            {
+              # Stop if code-signing the binary using this server was successful.
+              break
+            }
+          }
       - name: Remove signing certificate
         id: remove_certificate
         run: |
