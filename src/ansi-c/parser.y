@@ -203,6 +203,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_FINALLY "__CPROVER_finally"
 %token TOK_CPROVER_ID  "__CPROVER_ID"
 %token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
+%token TOK_CPROVER_DECREASES "__CPROVER_decreases"
 %token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
@@ -494,6 +495,13 @@ loop_invariant_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
         | TOK_CPROVER_LOOP_INVARIANT '(' ACSL_binding_expression ')'
+        { $$=$3; }
+        ;
+
+cprover_decreases_opt:
+        /* nothing */
+        { init($$); parser_stack($$).make_nil(); }
+        | TOK_CPROVER_DECREASES '(' ACSL_binding_expression ')'
         { $$=$3; }
         ;
 
@@ -2418,17 +2426,21 @@ declaration_or_expression_statement:
 
 iteration_statement:
         TOK_WHILE '(' comma_expression_opt ')'
-          loop_invariant_opt statement
+          loop_invariant_opt cprover_decreases_opt 
+          statement
         {
           $$=$1;
           statement($$, ID_while);
-          parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($6)));
+          parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($7)));
 
           if(parser_stack($5).is_not_nil())
             parser_stack($$).add(ID_C_spec_loop_invariant).swap(parser_stack($5));
+
+          if(parser_stack($6).is_not_nil())
+            parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($6));
         }
         | TOK_DO statement TOK_WHILE '(' comma_expression ')'
-          loop_invariant_opt ';'
+          loop_invariant_opt cprover_decreases_opt ';'
         {
           $$=$1;
           statement($$, ID_dowhile);
@@ -2436,6 +2448,9 @@ iteration_statement:
 
           if(parser_stack($7).is_not_nil())
             parser_stack($$).add(ID_C_spec_loop_invariant).swap(parser_stack($7));
+
+          if(parser_stack($8).is_not_nil())
+            parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($8));
         }
         | TOK_FOR
           {
@@ -2449,7 +2464,7 @@ iteration_statement:
           '(' declaration_or_expression_statement
               comma_expression_opt ';'
               comma_expression_opt ')'
-              loop_invariant_opt
+              loop_invariant_opt cprover_decreases_opt
           statement
         {
           $$=$1;
@@ -2458,10 +2473,13 @@ iteration_statement:
           mto($$, $4);
           mto($$, $5);
           mto($$, $7);
-          mto($$, $10);
+          mto($$, $11);
 
           if(parser_stack($9).is_not_nil())
             parser_stack($$).add(ID_C_spec_loop_invariant).swap(parser_stack($9));
+
+          if(parser_stack($10).is_not_nil())
+            parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($10));
 
           if(PARSER.for_has_scope)
             PARSER.pop_scope(); // remove the C99 for-scope

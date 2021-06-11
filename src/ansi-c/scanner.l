@@ -1281,6 +1281,7 @@ __decltype          { if(PARSER.cpp98 &&
 {CPROVER_PREFIX}"finally"      { loc(); return TOK_CPROVER_FINALLY; }
 {CPROVER_PREFIX}"ID"           { loc(); return TOK_CPROVER_ID; }
 {CPROVER_PREFIX}"loop_invariant" { loc(); return TOK_CPROVER_LOOP_INVARIANT; }
+{CPROVER_PREFIX}"decreases"    { loc(); return TOK_CPROVER_DECREASES; }
 {CPROVER_PREFIX}"requires"     { loc(); return TOK_CPROVER_REQUIRES; }
 {CPROVER_PREFIX}"ensures"      { loc(); return TOK_CPROVER_ENSURES; }
 {CPROVER_PREFIX}"assigns"      { loc(); return TOK_CPROVER_ASSIGNS; }

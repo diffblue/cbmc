@@ -8,7 +8,10 @@ void main()
 
   unsigned i;
   while(i > 0)
+    // clang-format off
     __CPROVER_loop_invariant(*data == 42)
+    __CPROVER_decreases(i)
+    // clang-format on
     {
       *data = 42;
       i--;

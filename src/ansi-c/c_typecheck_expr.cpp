@@ -51,7 +51,7 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
     return;
   }
 
-  // fist do sub-nodes
+  // first do sub-nodes
   typecheck_expr_operands(expr);
 
   // now do case-split
