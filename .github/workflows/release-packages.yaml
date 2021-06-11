@@ -204,7 +204,7 @@ jobs:
       - name: Sign the installer
         id: code_sign
         run: |
-          & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr http://tsa.starfieldtech.com ${{ steps.create_packages.outputs.msi_installer }}
+          & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr http://ts.ssl.com ${{ steps.create_packages.outputs.msi_installer }}
       - name: Remove signing certificate
         id: remove_certificate
         run: |
