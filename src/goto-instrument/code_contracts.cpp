@@ -649,8 +649,16 @@ void code_contractst::instrument_call_statement(
     "a function call");
 
   code_function_callt call = instruction_iterator->get_function_call();
-  const irep_idt &called_name =
-    to_symbol_expr(call.function()).get_identifier();
+  irep_idt called_name;
+  if(call.function().id() == ID_dereference)
+  {
+    called_name = to_symbol_expr(to_dereference_expr(call.function()).pointer())
+                    .get_identifier();
+  }
+  else
+  {
+    called_name = to_symbol_expr(call.function()).get_identifier();
+  }
 
   if(called_name == "malloc")
   {
@@ -699,12 +707,15 @@ void code_contractst::instrument_call_statement(
     ++instruction_iterator;
   }
 
-  PRECONDITION(call.function().id() == ID_symbol);
   const symbolt &called_symbol = ns.lookup(called_name);
-  const code_typet &called_type = to_code_type(called_symbol.type);
-
+  // Called symbol might be a function pointer.
+  const typet &called_symbol_type = (called_symbol.type.id() == ID_pointer)
+                                      ? called_symbol.type.subtype()
+                                      : called_symbol.type;
   exprt called_assigns =
-    to_code_with_contract_type(called_symbol.type).assigns();
+    to_code_with_contract_type(called_symbol_type).assigns();
+  const code_typet &called_type = to_code_type(called_symbol_type);
+
   if(called_assigns.is_not_nil())
   {
     replace_symbolt replace_formal_params;
@@ -753,8 +764,17 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
     if(instruction.is_function_call())
     {
       code_function_callt call = instruction.get_function_call();
-      const irep_idt &called_name =
-        to_symbol_expr(call.function()).get_identifier();
+      irep_idt called_name;
+      if(call.function().id() == ID_dereference)
+      {
+        called_name =
+          to_symbol_expr(to_dereference_expr(call.function()).pointer())
+            .get_identifier();
+      }
+      else
+      {
+        called_name = to_symbol_expr(call.function()).get_identifier();
+      }
 
       if(called_name == "malloc")
       {
