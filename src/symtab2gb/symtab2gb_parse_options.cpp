@@ -17,6 +17,7 @@ Author: Diffblue Ltd.
 #include <goto-programs/link_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 #include <json-symtab-language/json_symtab_language.h>
+#include <langapi/mode.h>
 
 #include <util/config.h>
 #include <util/exception_utils.h>
@@ -111,6 +112,7 @@ int symtab2gb_parse_optionst::doit()
   {
     gb_filename = cmdline.get_value(SYMTAB2GB_OUT_FILE_OPT);
   }
+  register_language(new_json_symtab_language);
   config.set(cmdline);
   run_symtab2gb(symtab_filenames, gb_filename);
   return CPROVER_EXIT_SUCCESS;
