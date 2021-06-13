@@ -724,12 +724,14 @@ void c_typecheck_baset::typecheck_declaration(
         // available
         auto &code_type = to_code_with_contract_type(new_symbol.type);
 
-        if(as_const(code_type).requires().is_not_nil())
+        if(!as_const(code_type).requires().empty())
         {
-          auto &requires = code_type.requires();
-          typecheck_expr(requires);
-          implicit_typecast_bool(requires);
-          disallow_history_variables(requires);
+          for(auto &requires : code_type.requires())
+          {
+            typecheck_expr(requires);
+            implicit_typecast_bool(requires);
+            disallow_history_variables(requires);
+          }
         }
 
         if(as_const(code_type).assigns().is_not_nil())
@@ -738,16 +740,18 @@ void c_typecheck_baset::typecheck_declaration(
             typecheck_expr(op);
         }
 
-        if(as_const(code_type).ensures().is_not_nil())
+        if(!as_const(code_type).ensures().empty())
         {
           const auto &return_type = code_type.return_type();
 
           if(return_type.id() != ID_empty)
             parameter_map[CPROVER_PREFIX "return_value"] = return_type;
 
-          auto &ensures = code_type.ensures();
-          typecheck_expr(ensures);
-          implicit_typecast_bool(ensures);
+          for(auto &ensures : code_type.ensures())
+          {
+            typecheck_expr(ensures);
+            implicit_typecast_bool(ensures);
+          }
 
           if(return_type.id() != ID_empty)
             parameter_map.erase(CPROVER_PREFIX "return_value");

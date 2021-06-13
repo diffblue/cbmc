@@ -8,7 +8,8 @@ static int add_operator(const int *a, const int *b)
 
 // clang-format off
 int foo(int *x, int *y)
-  __CPROVER_requires(x != NULL &&  y != NULL)
+  __CPROVER_requires(x != NULL)
+  __CPROVER_requires(y != NULL)
   __CPROVER_ensures(__CPROVER_return_value == 10)
 // clang-format on
 {
