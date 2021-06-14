@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions
+HAVOC_OBJECT \(void \*\)a
+^SIGNAL=0$
+^EXIT=0$
+--
+irep\("\(.* \(\\"havoc_object\\"\)\)"\)

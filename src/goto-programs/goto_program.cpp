@@ -100,8 +100,20 @@ std::ostream &goto_programt::output_instruction(
     out << '\n';
     break;
 
-  case RETURN:
   case OTHER:
+    if(instruction.get_other().id() == ID_code)
+    {
+      const auto &code = to_code(instruction.get_other());
+      if(code.get_statement() == ID_havoc_object)
+      {
+        out << "HAVOC_OBJECT " << from_expr(ns, identifier, code.op0()) << '\n';
+        break;
+      }
+      // fallthrough
+    }
+    // fallthrough
+
+  case RETURN:
   case DECL:
   case DEAD:
   case FUNCTION_CALL:
