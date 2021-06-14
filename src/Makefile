@@ -152,14 +152,14 @@ glucose-download:
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@rm glucose-syrup.tgz
 
-cadical_release = rel-1.3.0
+cadical_release = sc2021
 cadical-download:
 	@echo "Downloading CaDiCaL $(cadical_release)"
 	@$(DOWNLOADER) https://github.com/arminbiere/cadical/archive/$(cadical_release).tar.gz
 	@$(TAR) xfz $(cadical_release).tar.gz
 	@rm -Rf ../cadical
 	@mv cadical-$(cadical_release) ../cadical
-	@cd ../cadical && CXX=$(CXX) ./configure -O3 -s -j && make
+	@cd ../cadical && CXX=$(CXX) ./configure -O3 -s && make -j
 	@$(RM) $(cadical_release).tar.gz
 
 doc :
