@@ -550,10 +550,9 @@ std::string expr2ct::convert_rec(
     }
 
     // contract, if any
-    if(to_code_with_contract_type(src).requires().is_not_nil())
+    for(auto &requires : to_code_with_contract_type(src).requires())
     {
-      dest += " [[requires " +
-              convert(to_code_with_contract_type(src).requires()) + "]]";
+      dest += " [[requires " + convert(requires) + "]]";
     }
 
     if(!to_code_with_contract_type(src).assigns().operands().empty())
@@ -562,10 +561,9 @@ std::string expr2ct::convert_rec(
               convert(to_code_with_contract_type(src).assigns()) + "]]";
     }
 
-    if(to_code_with_contract_type(src).ensures().is_not_nil())
+    for(auto &ensures : to_code_with_contract_type(src).ensures())
     {
-      dest += " [[ensures " +
-              convert(to_code_with_contract_type(src).ensures()) + "]]";
+      dest += " [[ensures " + convert(ensures) + "]]";
     }
 
     return dest;

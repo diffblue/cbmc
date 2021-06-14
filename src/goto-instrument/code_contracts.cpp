@@ -402,13 +402,13 @@ bool code_contractst::apply_function_contract(
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
   // Isolate each component of the contract.
-  exprt assigns = type.assigns();
-  exprt requires = type.requires();
-  exprt ensures = type.ensures();
+  auto assigns = type.assigns();
+  auto requires = conjunction(type.requires());
+  auto ensures = conjunction(type.ensures());
 
-  // Check to see if the function  contract actually constrains its effect on
+  // Check to see if the function contract actually constrains its effect on
   // the program state; if not, return.
-  if(ensures.is_nil() && assigns.is_nil())
+  if(ensures.is_true() && assigns.is_nil())
     return false;
 
   // Create a replace_symbolt object, for replacing expressions in the callee
@@ -984,14 +984,14 @@ void code_contractst::add_contract_check(
   PRECONDITION(!dest.instructions.empty());
 
   const symbolt &function_symbol = ns.lookup(mangled_fun);
-  auto code_type = to_code_with_contract_type(function_symbol.type);
+  const auto &code_type = to_code_with_contract_type(function_symbol.type);
 
-  exprt &assigns = code_type.assigns();
-  exprt &requires = code_type.requires();
-  exprt &ensures = code_type.ensures();
+  exprt assigns = code_type.assigns();
+  exprt requires = conjunction(code_type.requires());
+  exprt ensures = conjunction(code_type.ensures());
 
   INVARIANT(
-    ensures.is_not_nil() || assigns.is_not_nil(),
+    !ensures.is_true() || assigns.is_not_nil(),
     "Code contract enforcement is trivial without an ensures or assigns "
     "clause.");
 

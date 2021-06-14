@@ -341,8 +341,7 @@ public:
 
   bool has_contract() const
   {
-    return assigns().is_not_nil() || requires().is_not_nil() ||
-           ensures().is_not_nil();
+    return assigns().is_not_nil() || !requires().empty() || !ensures().empty();
   }
 
   const exprt &assigns() const
@@ -358,30 +357,24 @@ public:
     return result;
   }
 
-  const exprt &requires() const
+  const exprt::operandst &requires() const
   {
-    return static_cast<const exprt &>(find(ID_C_spec_requires));
+    return static_cast<const exprt &>(find(ID_C_spec_requires)).operands();
   }
 
-  exprt &requires()
+  exprt::operandst &requires()
   {
-    auto &result = static_cast<exprt &>(add(ID_C_spec_requires));
-    if(result.id().empty()) // not initialized?
-      result.make_nil();
-    return result;
+    return static_cast<exprt &>(add(ID_C_spec_requires)).operands();
   }
 
-  const exprt &ensures() const
+  const exprt::operandst &ensures() const
   {
-    return static_cast<const exprt &>(find(ID_C_spec_ensures));
+    return static_cast<const exprt &>(find(ID_C_spec_ensures)).operands();
   }
 
-  exprt &ensures()
+  exprt::operandst &ensures()
   {
-    auto &result = static_cast<exprt &>(add(ID_C_spec_ensures));
-    if(result.id().empty()) // not initialized?
-      result.make_nil();
-    return result;
+    return static_cast<exprt &>(add(ID_C_spec_ensures)).operands();
   }
 };
 
