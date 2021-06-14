@@ -81,8 +81,9 @@ class WarningsList(object):
 def ignore_too_many_nodes(all_lines):
     """Filter out lines about graphs with too many nodes."""
     too_many_nodes_expr = re.compile(
-        r'warning: Include(d by)? graph for .* not generated, too many nodes. '
-        + r'Consider increasing DOT_GRAPH_MAX_NODES.')
+        r'warning: Include(d by)? graph for .* not generated, too many '
+        + r'nodes( \(\d+\), threshold is 60)?\. Consider increasing '
+        + r'DOT_GRAPH_MAX_NODES\.')
     return [x for x in all_lines if not too_many_nodes_expr.match(x)]
 
 
