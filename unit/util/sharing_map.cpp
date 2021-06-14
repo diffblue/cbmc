@@ -257,7 +257,7 @@ void sharing_map_internals_test()
       delta_view.clear();
       sm2.get_delta_view(sm1, delta_view, false);
       REQUIRE(delta_view.size() == 1);
-      REQUIRE(delta_view[0].k == (1 << (2 * chunk)));
+      REQUIRE(delta_view[0].k == (unsigned)(1 << (2 * chunk)));
     }
   }
 }
@@ -675,12 +675,12 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
         REQUIRE(delta_view[0].m == "a");
         REQUIRE(delta_view[0].get_other_map_value() == "c");
 
-        REQUIRE(delta_view[1].k == 1 << (2 * chunk));
+        REQUIRE(delta_view[1].k == (unsigned)1 << (2 * chunk));
         REQUIRE(delta_view[1].m == "b");
       }
       else
       {
-        REQUIRE(delta_view[0].k == 1 << (2 * chunk));
+        REQUIRE(delta_view[0].k == (unsigned)1 << (2 * chunk));
         REQUIRE(delta_view[0].m == "b");
 
         REQUIRE(delta_view[1].k == 0);
