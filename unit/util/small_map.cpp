@@ -46,7 +46,7 @@ void small_map_test()
 
   SECTION("Iterator")
   {
-    small_mapt<int> m;
+    small_mapt<unsigned int> m;
 
     m[0] = 0;
     m[3] = 3;

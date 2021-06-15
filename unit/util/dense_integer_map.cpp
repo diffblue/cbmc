@@ -124,7 +124,7 @@ TEST_CASE("iterators", "[core][util][dense_integer_map]")
   REQUIRE(map.begin() != std::next(map.begin()));
   REQUIRE(map.begin() == map.begin());
   REQUIRE(map.size() == 2);
-  REQUIRE(std::distance(map.begin(), map.end()) == map.size());
+  REQUIRE(std::distance(map.begin(), map.end()) == (ptrdiff_t)map.size());
 
   {
     const auto &const_map = map;

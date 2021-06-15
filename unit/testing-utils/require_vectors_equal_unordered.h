@@ -22,7 +22,7 @@ void require_vectors_equal_unordered(
   const std::vector<T> &expected)
 {
   REQUIRE(actual.size() == expected.size());
-  REQUIRE_THAT(actual, Catch::Matchers::Vector::ContainsMatcher<T>{expected});
+  REQUIRE_THAT(actual, Catch::Matchers::UnorderedEquals(expected));
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_VECTORS_EQUAL_UNORDERED_H
