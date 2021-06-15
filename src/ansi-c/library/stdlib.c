@@ -564,3 +564,30 @@ long random(void)
   __CPROVER_assume(result>=0 && result<=2147483647);
   return result;
 }
+
+/* FUNCTION: rand */
+
+int __VERIFIER_nondet_int();
+
+int rand(void)
+{
+__CPROVER_HIDE:;
+  // We return a non-deterministic value instead of a random one.
+  int result = __VERIFIER_nondet_int();
+  __CPROVER_assume(result >= 0);
+  return result;
+}
+
+/* FUNCTION: rand_r */
+
+int __VERIFIER_nondet_int();
+
+int rand_r(unsigned int *seed)
+{
+__CPROVER_HIDE:;
+  // We return a non-deterministic value instead of a random one.
+  (void)*seed;
+  int result = __VERIFIER_nondet_int();
+  __CPROVER_assume(result >= 0);
+  return result;
+}
