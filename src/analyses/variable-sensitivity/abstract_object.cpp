@@ -49,13 +49,13 @@ const typet &abstract_objectt::type() const
 }
 
 abstract_object_pointert
-abstract_objectt::merge(abstract_object_pointert other) const
+abstract_objectt::merge(const abstract_object_pointert &other) const
 {
   return abstract_object_merge(other);
 }
 
 abstract_object_pointert abstract_objectt::abstract_object_merge(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   if(is_top() || other->bottom)
     return this->abstract_object_merge_internal(other);
@@ -67,7 +67,7 @@ abstract_object_pointert abstract_objectt::abstract_object_merge(
 }
 
 abstract_object_pointert abstract_objectt::abstract_object_merge_internal(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   // Default implementation
   return shared_from_this();
@@ -82,6 +82,9 @@ abstract_objectt::meet(const abstract_object_pointert &other) const
 abstract_object_pointert abstract_objectt::abstract_object_meet(
   const abstract_object_pointert &other) const
 {
+  if(is_top())
+    return other;
+
   if(is_bottom() || other->top)
     return this->abstract_object_meet_internal(other);
 
@@ -180,8 +183,8 @@ void abstract_objectt::output(
 }
 
 abstract_object_pointert abstract_objectt::merge(
-  abstract_object_pointert op1,
-  abstract_object_pointert op2,
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
   bool &out_modifications)
 {
   abstract_object_pointert result = op1->should_use_base_merge(op2)
@@ -194,22 +197,22 @@ abstract_object_pointert abstract_objectt::merge(
 }
 
 abstract_object_pointert abstract_objectt::merge(
-  abstract_object_pointert op1,
-  abstract_object_pointert op2)
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2)
 {
   bool dummy;
   return merge(op1, op2, dummy);
 }
 
 bool abstract_objectt::should_use_base_merge(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   return is_top() || other->is_bottom() || other->is_top();
 }
 
 abstract_object_pointert abstract_objectt::meet(
-  abstract_object_pointert op1,
-  abstract_object_pointert op2,
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
   bool &out_modifications)
 {
   abstract_object_pointert result = op1->should_use_base_meet(op2)
@@ -224,7 +227,7 @@ abstract_object_pointert abstract_objectt::meet(
 bool abstract_objectt::should_use_base_meet(
   const abstract_object_pointert &other) const
 {
-  return is_bottom() || other->is_bottom() || other->is_top();
+  return is_bottom() || is_top() || other->is_bottom() || other->is_top();
 }
 
 abstract_object_pointert abstract_objectt::update_location_context(

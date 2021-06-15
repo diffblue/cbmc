@@ -2,7 +2,7 @@
 
 int *bar(int *unmodified, int *modifed);
 
-int main(int argc, char *argv[])
+int main()
 {
   int x = 3;
   int y = 4;

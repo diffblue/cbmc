@@ -16,7 +16,7 @@ int bar(int size, ...)
   return total;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
   int y = bar(4, 1, 2, 2, 1);
   assert(y == 6);

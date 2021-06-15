@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values intervals --loop-unwind 10 --three-way-merge --show
+^EXIT=0$
+^SIGNAL=0$
+^main::1::1::i .* \[5, 5\] @ \[6\]
+^main::1::p .* \[20, 20\] @ \[5\]
+--

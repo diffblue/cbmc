@@ -65,7 +65,7 @@ public:
 
   // Standard abstract_objectt interface
 
-  bool has_been_modified(const abstract_object_pointert before) const override;
+  bool has_been_modified(const abstract_object_pointert &before) const override;
 
   abstract_object_pointert update_location_context(
     const abstract_objectt::locationst &locations,
@@ -99,10 +99,13 @@ public:
 protected:
   CLONE
 
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const override;
 
   abstract_object_pointert abstract_object_merge_internal(
-    const abstract_object_pointert other) const override;
+    const abstract_object_pointert &other) const override;
 
   abstract_object_pointert write(
     abstract_environmentt &environment,
@@ -119,6 +122,16 @@ protected:
   virtual abstract_objectt::locationst get_last_written_locations() const;
 
 private:
+  using combine_fn = abstract_object_pointert (*)(
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2,
+    bool &out_modifications);
+  using write_location_context_ptrt =
+    std::shared_ptr<const write_location_contextt>;
+
+  abstract_object_pointert
+  combine(const write_location_context_ptrt &other, combine_fn fn) const;
+
   // To enforce copy-on-write these are private and have read-only accessors
   abstract_objectt::locationst last_written_locations;
 

@@ -16,16 +16,20 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        analyses/variable-sensitivity/abstract_object/merge.cpp \
        analyses/variable-sensitivity/abstract_object/index_range.cpp \
+       analyses/variable-sensitivity/constant_abstract_value/meet.cpp \
        analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
        analyses/variable-sensitivity/full_array_abstract_object/merge.cpp \
        analyses/variable-sensitivity/eval.cpp \
        analyses/variable-sensitivity/eval-member-access.cpp \
-       analyses/variable-sensitivity/interval_abstract_value/merge.cpp \
        analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
+       analyses/variable-sensitivity/interval_abstract_value/merge.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
+       analyses/variable-sensitivity/value_expression_evaluation/assume.cpp \
+       analyses/variable-sensitivity/value_expression_evaluation/assume_prune.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/expression_evaluation.cpp \
        analyses/variable-sensitivity/value_set/abstract_value.cpp \
+       analyses/variable-sensitivity/value_set_abstract_object/meet.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/merge.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
        ansi-c/max_malloc_size.cpp \

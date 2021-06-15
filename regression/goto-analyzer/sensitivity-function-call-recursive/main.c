@@ -39,7 +39,7 @@ int fun(int changing, int constant)
   }
 }
 
-int main(int argc, char *argv[])
+int main()
 {
   int x=3;
   int y=bar(x+1);

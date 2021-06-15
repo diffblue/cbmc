@@ -58,7 +58,7 @@ public:
     const abstract_objectt::locationst &locations,
     const bool update_sub_elements) const override;
 
-  bool has_been_modified(const abstract_object_pointert before) const override;
+  bool has_been_modified(const abstract_object_pointert &before) const override;
 
   std::set<goto_programt::const_targett> get_data_dependencies() const;
   std::set<goto_programt::const_targett> get_data_dominators() const;
@@ -69,12 +69,22 @@ public:
 protected:
   CLONE
 
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const override;
 
   abstract_object_pointert abstract_object_merge_internal(
-    const abstract_object_pointert other) const override;
+    const abstract_object_pointert &other) const override;
 
 private:
+  using data_dependency_context_ptrt =
+    std::shared_ptr<const data_dependency_contextt>;
+
+  abstract_object_pointert combine(
+    const data_dependency_context_ptrt &other,
+    const data_dependency_context_ptrt &parent) const;
+
   class location_ordert
   {
   public:

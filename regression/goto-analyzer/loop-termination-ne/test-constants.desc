@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values constants --show
+^EXIT=0$
+^SIGNAL=0$
+^main::1::1::i .* TOP @ \[3, 6\]
+^main::1::p .* TOP @ \[1, 5\]
+--

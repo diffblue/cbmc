@@ -39,6 +39,9 @@ public:
   exprt to_constant() const override;
   constant_interval_exprt to_interval() const override;
 
+  abstract_value_pointert
+  constrain(const exprt &lower, const exprt &upper) const override;
+
   /// Getter for the set of stored abstract objects.
   /// \return the values represented by this abstract object
   const abstract_object_sett &get_values() const override
@@ -72,7 +75,10 @@ protected:
   CLONE
 
   /// \copydoc abstract_object::merge
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert
+  meet(const abstract_object_pointert &other) const override;
 
 private:
   /// Update the set of stored values to \p new_values. Build a new abstract
@@ -92,6 +98,11 @@ private:
   ///   something new)
   abstract_object_pointert
   resolve_values(const abstract_object_sett &new_values) const;
+
+  abstract_object_pointert
+  merge_with_value(const abstract_value_pointert &other) const;
+  abstract_object_pointert
+  meet_with_value(const abstract_value_pointert &other) const;
 
   // data
   abstract_object_sett values;

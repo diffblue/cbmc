@@ -228,7 +228,7 @@ public:
    * \return true if 'this' is considered to have been modified in comparison
    * to 'before', false otherwise.
    */
-  virtual bool has_been_modified(const abstract_object_pointert before) const
+  virtual bool has_been_modified(const abstract_object_pointert &before) const
   {
     /// Default implementation, with no other information to go on
     /// falls back to relying on copy-on-write and pointer inequality
@@ -248,11 +248,12 @@ public:
   ///         first parameter. out_modifications will be true if the resulting
   ///         abstract object is different from op1
   static abstract_object_pointert merge(
-    abstract_object_pointert op1,
-    abstract_object_pointert op2,
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2,
     bool &out_modifications);
-  static abstract_object_pointert
-  merge(abstract_object_pointert op1, abstract_object_pointert op2);
+  static abstract_object_pointert merge(
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2);
 
   /// Interface method for the meet operation. Decides whether to use the base
   /// implementation or if a more precise abstraction is attainable.
@@ -262,8 +263,8 @@ public:
   /// (result is not op1)
   /// \return resulting object after meet
   static abstract_object_pointert meet(
-    abstract_object_pointert op1,
-    abstract_object_pointert op2,
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2,
     bool &out_modifications);
 
   /// Base implementation of the meet operation: only used if no more precise
@@ -377,7 +378,7 @@ private:
    * \return the result of the merge
    */
   virtual abstract_object_pointert
-  abstract_object_merge_internal(const abstract_object_pointert other) const;
+  abstract_object_merge_internal(const abstract_object_pointert &other) const;
 
   /// Helper function for base meet, in case additional work was needed. Base
   /// implementation simply return pointer to itself.
@@ -406,7 +407,7 @@ protected:
   ///
   /// \return Returns the result of the abstract object.
   abstract_object_pointert
-  abstract_object_merge(const abstract_object_pointert other) const;
+  abstract_object_merge(const abstract_object_pointert &other) const;
 
   /// To detect the cases where the base merge is sufficient to do a merge
   /// We can't do if this->is_bottom() since we want the specific
@@ -415,7 +416,7 @@ protected:
   ///
   /// \return Returns true if the base class is capable of doing
   ///         a complete merge
-  bool should_use_base_merge(const abstract_object_pointert other) const;
+  bool should_use_base_merge(const abstract_object_pointert &other) const;
 
   /// Create a new abstract object that is the result of the merge, unless
   /// the object would be unchanged, then would return itself.
@@ -423,7 +424,8 @@ protected:
   /// \param other: The object to merge with this
   ///
   /// \return Returns the result of the merge.
-  virtual abstract_object_pointert merge(abstract_object_pointert other) const;
+  virtual abstract_object_pointert
+  merge(const abstract_object_pointert &other) const;
 
   /// Helper function for base meet. Two cases: return itself (if trivially
   /// contained in other); return BOTTOM otherwise.

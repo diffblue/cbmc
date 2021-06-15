@@ -31,6 +31,10 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
   abstract_environmentt &env,
   namespacet &ns);
 std::shared_ptr<const interval_abstract_valuet> make_interval(
+  const binary_relation_exprt &val,
+  abstract_environmentt &env,
+  namespacet &ns);
+std::shared_ptr<const interval_abstract_valuet> make_interval(
   const constant_interval_exprt &val,
   abstract_environmentt &env,
   namespacet &ns);
@@ -225,5 +229,8 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   const abstract_object_pointert &op3,
   abstract_environmentt &environment,
   namespacet &ns);
+
+std::string expr_to_str(const exprt &expr);
+std::string exprs_to_str(const std::vector<exprt> &values);
 
 #endif

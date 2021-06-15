@@ -56,8 +56,8 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   }
 }
 
-abstract_object_pointert
-constant_pointer_abstract_objectt::merge(abstract_object_pointert other) const
+abstract_object_pointert constant_pointer_abstract_objectt::merge(
+  const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);

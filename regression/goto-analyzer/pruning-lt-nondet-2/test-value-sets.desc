@@ -1,0 +1,7 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --verify
+^EXIT=0$
+^SIGNAL=0$
+\[main\.assertion\.1\] line .* assertion 5 < x: SUCCESS
+--

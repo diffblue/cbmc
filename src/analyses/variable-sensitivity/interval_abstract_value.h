@@ -44,6 +44,9 @@ public:
     return interval;
   }
 
+  abstract_value_pointert
+  constrain(const exprt &lower, const exprt &upper) const override;
+
   size_t internal_hash() const override;
   bool internal_equality(const abstract_object_pointert &other) const override;
 
@@ -60,7 +63,8 @@ public:
 
 protected:
   CLONE
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 
@@ -69,9 +73,9 @@ private:
     sharing_ptrt<interval_abstract_valuet>;
 
   abstract_object_pointert
-  merge_intervals(abstract_value_pointert &other) const;
+  merge_with_value(const abstract_value_pointert &other) const;
   abstract_object_pointert
-  meet_intervals(interval_abstract_value_pointert other) const;
+  meet_with_value(const abstract_value_pointert &other) const;
 
   constant_interval_exprt interval;
 };

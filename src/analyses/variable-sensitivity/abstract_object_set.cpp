@@ -43,11 +43,16 @@ constant_interval_exprt abstract_object_sett::to_interval() const
 {
   PRECONDITION(!values.empty());
 
-  const auto &initial =
-    std::dynamic_pointer_cast<const abstract_value_objectt>(first());
+  auto initial =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(first())
+      ->to_interval();
 
-  exprt lower_expr = initial->to_interval().get_lower();
-  exprt upper_expr = initial->to_interval().get_upper();
+  if(initial.is_boolean() && values.size() == 2) // must be both true and false
+    return constant_interval_exprt(false_exprt(), true_exprt());
+
+  exprt lower_expr = initial.get_lower();
+  exprt upper_expr = initial.get_upper();
+
   for(const auto &value : values)
   {
     const auto &v =

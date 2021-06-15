@@ -1,28 +1,29 @@
 #include <assert.h>
 
-int main(int argc, char *argv[])
+int main()
 {
+  int nondet;
   // Test how well we can represent arrays of pointers
-  int a0=0;
-  int a1=1;
-  int a2=2;
-  int a3=3;
-  int b0=10;
-  int b1=11;
-  int b2=12;
-  int b3=13;
-  int c0=20;
-  int c1=21;
-  int c2=22;
-  int c3=23;
-  int d0=30;
-  int d1=31;
-  int d2=32;
-  int d3=33;
+  int a0 = 0;
+  int a1 = 1;
+  int a2 = 2;
+  int a3 = 3;
+  int b0 = 10;
+  int b1 = 11;
+  int b2 = 12;
+  int b3 = 13;
+  int c0 = 20;
+  int c1 = 21;
+  int c2 = 22;
+  int c3 = 23;
+  int d0 = 30;
+  int d1 = 31;
+  int d2 = 32;
+  int d3 = 33;
   // A uniform constant array
-  int *a[3]={&a0, &a0, &a0};
+  int *a[3] = {&a0, &a0, &a0};
   // A non-uniform constant array
-  int *b[3]={&b0, &b1, &b2};
+  int *b[3] = {&b0, &b1, &b2};
 
   // Test if we can represent uniform constant arrays
   __CPROVER_assert(a[1] == &a0, "a[1]==&a0");
@@ -53,12 +54,12 @@ int main(int argc, char *argv[])
   // c and d are arrays whose values requiring merging paths in the CFG. For
   // c[0] there is only one possibility after merging and for d[0] there are
   // two.
-  int *c[3]={&c0, &c1, &c2};
-  int *d[3]={&d0, &d1, &d2};
-  if(argc>2)
+  int *c[3] = {&c0, &c1, &c2};
+  int *d[3] = {&d0, &d1, &d2};
+  if(nondet > 2)
   {
-    c[0]=&c3;
-    d[0]=&d3;
+    c[0] = &c3;
+    d[0] = &d3;
   }
 
   // Test how well we can deal with merging for an array value
@@ -76,14 +77,14 @@ int main(int argc, char *argv[])
   // both paths, which is a valid index. The rest can each take two different
   // values. For j both of these values are valid indexes. For k one is and one
   // isn't.
-  int i=0;
-  int j=0;
-  int k=0;
-  if(argc>3)
+  int i = 0;
+  int j = 0;
+  int k = 0;
+  if(nondet > 3)
   {
-    i=0;
-    j=1;
-    k=100;
+    i = 0;
+    j = 1;
+    k = 100;
   }
 
   // Test how well we can deal with merging for an index on a uniform array
@@ -111,16 +112,16 @@ int main(int argc, char *argv[])
   __CPROVER_assert(*a[100] == 2, "*a[100]==2");
 
   // Test how we deal with writing off the end of an array
-  a[100]=&a2;
+  a[100] = &a2;
   __CPROVER_assert(b[1] == &b1, "b[1]==&b1");
   __CPROVER_assert(*b[1] == 11, "*b[1]==11");
 
   // Test how we deal with merging for an index with one possible value when
   // writing to an array
-  int ei0=40;
-  int ei1=41;
-  int *ei[3]={&ei0, &ei0, &ei0};
-  ei[i]=&ei1;
+  int ei0 = 40;
+  int ei1 = 41;
+  int *ei[3] = {&ei0, &ei0, &ei0};
+  ei[i] = &ei1;
   __CPROVER_assert(ei[0] == &ei1, "ei[0]==&ei1");
   __CPROVER_assert(ei[0] == &ei0, "ei[0]==&ei0");
   __CPROVER_assert(ei[2] == &ei0, "ei[2]==&ei0");
@@ -132,10 +133,10 @@ int main(int argc, char *argv[])
 
   // Test how we deal with merging for an index with two possible values when
   // writing to an array
-  int ej0=50;
-  int ej1=51;
-  int *ej[3]={&ej0, &ej0, &ej0};
-  ej[j]=&ej1;
+  int ej0 = 50;
+  int ej1 = 51;
+  int *ej[3] = {&ej0, &ej0, &ej0};
+  ej[j] = &ej1;
   __CPROVER_assert(ej[0] == &ej0, "ej[0]==&ej0");
   __CPROVER_assert(ej[2] == &ej0, "ej[2]==&ej0");
   __CPROVER_assert(ej[2] == &ej1, "ej[2]==&ej1");
@@ -145,10 +146,10 @@ int main(int argc, char *argv[])
 
   // Test how we deal with merging for an index with two possible values when
   // it means writing to an array element that may be out of bounds
-  int ek0=60;
-  int ek1=61;
-  int *ek[3]={&ek0, &ek0, &ek0};
-  ek[k]=&ek1;
+  int ek0 = 60;
+  int ek1 = 61;
+  int *ek[3] = {&ek0, &ek0, &ek0};
+  ek[k] = &ek1;
   __CPROVER_assert(ek[0] == &ek0, "ek[0]==&ek0");
   __CPROVER_assert(*ek[0] == 60, "*ek[0]==60");
 
@@ -157,7 +158,7 @@ int main(int argc, char *argv[])
   int y = 5;
   int *ps[2] = {&x, &y};
   int i;
-  if(argc > 2)
+  if(nondet > 2)
   {
     i = 0;
   }

@@ -96,6 +96,7 @@ public:
   /// The better the implementation the more precise the results
   /// will be.
   virtual bool assume(const exprt &expr, const namespacet &ns);
+  exprt do_assume(const exprt &e, const namespacet &ns);
 
   /// Used within assign to do the actual dispatch
   ///

@@ -243,6 +243,8 @@ private:
     const variable_sensitivity_domaint &target,
     const namespacet &ns);
 
+  void assume(exprt expr, namespacet ns);
+
   abstract_environmentt abstract_state;
   flow_sensitivityt flow_sensitivity;
 

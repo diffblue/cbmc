@@ -124,7 +124,8 @@ protected:
   /// \param other: The object to merge in
   ///
   /// \return Returns the result of the merge.
-  abstract_object_pointert merge(abstract_object_pointert other) const override;
+  abstract_object_pointert
+  merge(const abstract_object_pointert &other) const override;
 
   /// To validate that the struct object is in a valid state.
   /// This means either it is top or bottom, or if neither of those

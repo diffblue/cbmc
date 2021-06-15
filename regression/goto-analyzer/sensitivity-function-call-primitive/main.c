@@ -6,7 +6,7 @@ int bar(int other)
   return other + 1;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
   int x = 3;
   int y = bar(x + 1);

@@ -81,13 +81,13 @@ void variable_sensitivity_domaint::transform(
         if(to == from->get_target())
         {
           // The AI is exploring the branch where the jump is taken
-          abstract_state.assume(instruction.guard, ns);
+          assume(instruction.guard, ns);
         }
         else
         {
           // Exploring the path where the jump is not taken - therefore assume
           // the condition is false
-          abstract_state.assume(not_exprt(instruction.guard), ns);
+          assume(not_exprt(instruction.guard), ns);
         }
       }
       // ignore jumps to the next line, we can assume nothing
@@ -96,7 +96,7 @@ void variable_sensitivity_domaint::transform(
   break;
 
   case ASSUME:
-    abstract_state.assume(instruction.guard, ns);
+    assume(instruction.guard, ns);
     break;
 
   case FUNCTION_CALL:
@@ -433,6 +433,12 @@ void variable_sensitivity_domaint::apply_domain(
     abstract_object_pointert value = source.abstract_state.eval(symbol, ns);
     abstract_state.assign(symbol, value, ns);
   }
+}
+
+void variable_sensitivity_domaint::assume(exprt expr, namespacet ns)
+{
+  ai_simplify(expr, ns);
+  abstract_state.assume(expr, ns);
 }
 
 #ifdef ENABLE_STATS

@@ -50,6 +50,13 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
 }
 
 std::shared_ptr<const interval_abstract_valuet> make_interval(
+  const binary_relation_exprt &val,
+  abstract_environmentt &env,
+  namespacet &ns)
+{
+  return std::make_shared<interval_abstract_valuet>(val, env, ns);
+}
+std::shared_ptr<const interval_abstract_valuet> make_interval(
   const constant_interval_exprt &val,
   abstract_environmentt &env,
   namespacet &ns)
@@ -157,10 +164,14 @@ bool set_contains(const abstract_object_sett &set, const exprt &val)
 
 static std::string interval_to_str(const constant_interval_exprt &expr);
 
-static std::string expr_to_str(const exprt &expr)
+std::string expr_to_str(const exprt &expr)
 {
   if(expr.id() == ID_constant_interval)
     return interval_to_str(to_constant_interval_expr(expr));
+  if(expr.id() == ID_max)
+    return "max";
+  if(expr.id() == ID_min)
+    return "min";
 
   auto st = symbol_tablet{};
   auto ns = namespacet{st};

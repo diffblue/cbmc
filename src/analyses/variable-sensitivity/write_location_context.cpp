@@ -107,44 +107,61 @@ abstract_object_pointert write_location_contextt::write(
  * the current abstract object
  */
 abstract_object_pointert
-write_location_contextt::merge(abstract_object_pointert other) const
+write_location_contextt::merge(const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const write_location_contextt>(other);
 
   if(cast_other)
-  {
-    bool child_modified = false;
-
-    auto merged_child = abstract_objectt::merge(
-      child_abstract_object, cast_other->child_abstract_object, child_modified);
-
-    abstract_objectt::locationst location_union =
-      get_location_union(cast_other->get_last_written_locations());
-    // If the union is larger than the initial set, then update.
-    bool merge_locations =
-      location_union.size() > get_last_written_locations().size();
-
-    if(child_modified || merge_locations)
-    {
-      const auto &result =
-        std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
-      if(child_modified)
-      {
-        result->set_child(merged_child);
-      }
-      if(merge_locations)
-      {
-        result->set_last_written_locations(location_union);
-      }
-
-      return result;
-    }
-
-    return shared_from_this();
-  }
+    return combine(cast_other, abstract_objectt::merge);
 
   return abstract_objectt::merge(other);
+}
+
+abstract_object_pointert
+write_location_contextt::meet(const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const write_location_contextt>(other);
+
+  if(cast_other)
+    return combine(cast_other, abstract_objectt::meet);
+
+  return abstract_objectt::meet(other);
+}
+
+abstract_object_pointert write_location_contextt::combine(
+  const write_location_context_ptrt &other,
+  combine_fn fn) const
+{
+  bool child_modified = false;
+
+  auto merged_child =
+    fn(child_abstract_object, other->child_abstract_object, child_modified);
+
+  abstract_objectt::locationst location_union =
+    get_location_union(other->get_last_written_locations());
+  // If the union is larger than the initial set, then update.
+  bool merge_locations =
+    location_union.size() > get_last_written_locations().size();
+
+  if(child_modified || merge_locations)
+  {
+    const auto &result =
+      std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+    if(child_modified)
+    {
+      result->set_child(merged_child);
+    }
+    if(merge_locations)
+    {
+      result->set_last_written_locations(location_union);
+    }
+
+    return result;
+  }
+
+  return shared_from_this();
 }
 
 /**
@@ -162,7 +179,7 @@ write_location_contextt::merge(abstract_object_pointert other) const
  */
 abstract_object_pointert
 write_location_contextt::abstract_object_merge_internal(
-  const abstract_object_pointert other) const
+  const abstract_object_pointert &other) const
 {
   auto other_context =
     std::dynamic_pointer_cast<const write_location_contextt>(other);
@@ -241,7 +258,7 @@ write_location_contextt::get_location_union(const locationst &locations) const
  * to 'before', false otherwise.
  */
 bool write_location_contextt::has_been_modified(
-  const abstract_object_pointert before) const
+  const abstract_object_pointert &before) const
 {
   if(this == before.get())
   {

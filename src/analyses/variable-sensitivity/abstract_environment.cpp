@@ -7,7 +7,9 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/abstract_object_statistics.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 
 #include <algorithm>
@@ -18,6 +20,33 @@
 #ifdef DEBUG
 #  include <iostream>
 #endif
+
+typedef exprt (
+  *assume_function)(abstract_environmentt &, const exprt &, const namespacet &);
+
+static exprt
+assume_not(abstract_environmentt &env, const exprt &expr, const namespacet &ns);
+static exprt
+assume_or(abstract_environmentt &env, const exprt &expr, const namespacet &ns);
+static exprt
+assume_and(abstract_environmentt &env, const exprt &expr, const namespacet &ns);
+static exprt
+assume_eq(abstract_environmentt &env, const exprt &expr, const namespacet &ns);
+static exprt assume_noteq(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns);
+static exprt assume_less_than(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns);
+static exprt assume_greater_than(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns);
+
+abstract_value_pointert as_value(const abstract_object_pointert &obj);
+bool is_value(const abstract_object_pointert &obj);
 
 std::vector<abstract_object_pointert> eval_operands(
   const exprt &expr,
@@ -196,21 +225,18 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // We should only attempt to assume Boolean things
   // This should be enforced by the well-structured-ness of the
   // goto-program and the way assume is used.
-
   PRECONDITION(expr.type().id() == ID_bool);
 
-  // Evaluate the expression
-  abstract_object_pointert res = eval(expr, ns);
+  auto simplified = simplify_expr(expr, ns);
+  auto assumption = do_assume(simplified, ns);
 
-  exprt possibly_constant = res->to_constant();
-
-  if(possibly_constant.id() != ID_nil) // I.E. actually a value
+  if(assumption.id() != ID_nil) // I.E. actually a value
   {
     // Should be of the right type
     INVARIANT(
-      possibly_constant.type().id() == ID_bool, "simplication preserves type");
+      assumption.type().id() == ID_bool, "simplification preserves type");
 
-    if(possibly_constant.is_false())
+    if(assumption.is_false())
     {
       bool currently_bottom = is_bottom();
       make_bottom();
@@ -218,25 +244,35 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
     }
   }
 
-  /* TODO : full implementation here
-   * Note that this is *very* syntax dependent so some normalisation would help
-   * 1. split up conjuncts, handle each part separately
-   * 2. check how many variables the term contains
-   *     0 = this should have been simplified away
-   *    2+ = ignore as this is a non-relational domain
-   *     1 = extract the expression for the variable,
-   *         care must be taken for things like a[i]
-   *         which can be used if i can be resolved to a constant
-   * 3. use abstract_object_factory to build an abstract_objectt
-   *    of the correct type (requires a little extension)
-   *    This allows constant domains to handle x==23,
-   *    intervals to handle x < 4, etc.
-   * 4. eval the current value of the variable
-   * 5. compute the meet (not merge!) of the two abstract_objectt's
-   * 6. assign the new value back to the environment.
-   */
-
   return false;
+}
+
+static auto assume_functions =
+  std::map<irep_idt, assume_function>{{ID_not, assume_not},
+                                      {ID_and, assume_and},
+                                      {ID_or, assume_or},
+                                      {ID_equal, assume_eq},
+                                      {ID_notequal, assume_noteq},
+                                      {ID_le, assume_less_than},
+                                      {ID_lt, assume_less_than},
+                                      {ID_ge, assume_greater_than},
+                                      {ID_gt, assume_greater_than}};
+
+// do_assume attempts to reduce the expression
+// returns
+//   true_exprt when the assumption does not hold
+//   false_exprt if the assumption does not hold & the domain should go bottom
+//   nil_exprt if the assumption can't be evaluated & we should give up
+exprt abstract_environmentt::do_assume(const exprt &expr, const namespacet &ns)
+{
+  auto expr_id = expr.id();
+
+  auto fn = assume_functions[expr_id];
+
+  if(fn)
+    return fn(*this, expr, ns);
+
+  return eval(expr, ns)->to_constant();
 }
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
@@ -467,4 +503,323 @@ std::vector<abstract_object_pointert> eval_operands(
     operands.push_back(env.eval(op, ns));
 
   return operands;
+}
+
+///////////
+abstract_value_pointert as_value(const abstract_object_pointert &obj)
+{
+  auto context_value =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
+
+  return context_value
+           ? as_value(context_value->unwrap_context())
+           : std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+}
+
+bool is_value(const abstract_object_pointert &obj)
+{
+  return as_value(obj) != nullptr;
+}
+
+static auto inverse_operations =
+  std::map<irep_idt, irep_idt>{{ID_equal, ID_notequal},
+                               {ID_notequal, ID_equal},
+                               {ID_le, ID_gt},
+                               {ID_lt, ID_ge},
+                               {ID_ge, ID_lt},
+                               {ID_gt, ID_le}};
+
+exprt invert_result(const exprt &result)
+{
+  if(!result.is_boolean())
+    return result;
+
+  if(result.is_true())
+    return false_exprt();
+  return true_exprt();
+}
+
+exprt invert_expr(const exprt &expr)
+{
+  auto expr_id = expr.id();
+
+  auto inverse_operation = inverse_operations.find(expr_id);
+  if(inverse_operation == inverse_operations.end())
+    return nil_exprt();
+
+  auto relation_expr = to_binary_relation_expr(expr);
+  auto inverse_op = inverse_operation->second;
+  return binary_relation_exprt(
+    relation_expr.lhs(), inverse_op, relation_expr.rhs());
+}
+
+void prune_assign(
+  abstract_environmentt &env,
+  const abstract_object_pointert &previous,
+  const exprt &destination,
+  abstract_object_pointert obj,
+  const namespacet &ns)
+{
+  auto context =
+    std::dynamic_pointer_cast<const context_abstract_objectt>(previous);
+  if(context != nullptr)
+    obj = context->envelop(obj);
+  env.assign(destination, obj, ns);
+}
+
+exprt assume_not(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto not_expr = to_not_expr(expr);
+
+  auto inverse_expression = invert_expr(not_expr.op());
+  if(inverse_expression.is_not_nil())
+    return env.do_assume(inverse_expression, ns);
+
+  auto result = env.do_assume(not_expr.op(), ns);
+  return invert_result(result);
+}
+
+exprt assume_and(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto and_expr = to_and_expr(expr);
+  bool nil = false;
+  for(auto const &operand : and_expr.operands())
+  {
+    auto result = env.do_assume(operand, ns);
+    if(result.is_false())
+      return result;
+    nil |= result.is_nil();
+  }
+  if(nil)
+    return nil_exprt();
+  return true_exprt();
+}
+
+exprt assume_or(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto or_expr = to_or_expr(expr);
+
+  auto negated_operands = exprt::operandst{};
+  for(auto const &operand : or_expr.operands())
+    negated_operands.push_back(invert_expr(operand));
+
+  auto result = assume_and(env, and_exprt(negated_operands), ns);
+  return invert_result(result);
+}
+
+struct left_and_right_valuest
+{
+  exprt lhs;
+  exprt rhs;
+  abstract_object_pointert left;
+  abstract_object_pointert right;
+
+  constant_interval_exprt left_interval() const
+  {
+    return as_value(left)->to_interval();
+  }
+  constant_interval_exprt right_interval() const
+  {
+    return as_value(right)->to_interval();
+  }
+
+  bool are_bad() const
+  {
+    return left == nullptr || right == nullptr ||
+           (left->is_top() && right->is_top()) || !is_value(left) ||
+           !is_value(right);
+  }
+
+  bool has_top() const
+  {
+    return left->is_top() || right->is_top();
+  }
+};
+
+left_and_right_valuest eval_operands_as_values(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto const &relationship_expr = to_binary_expr(expr);
+
+  auto lhs = relationship_expr.lhs();
+  auto rhs = relationship_expr.rhs();
+  auto left = env.eval(lhs, ns);
+  auto right = env.eval(rhs, ns);
+
+  if(left->is_top() && right->is_top())
+    return {};
+
+  return {lhs, rhs, left, right};
+}
+
+exprt assume_eq_unbounded(
+  abstract_environmentt &env,
+  const left_and_right_valuest &operands,
+  const namespacet &ns)
+{
+  if(operands.left->is_top() && is_lvalue(operands.lhs))
+  {
+    // TOP == x
+    auto constrained = std::make_shared<interval_abstract_valuet>(
+      operands.right_interval(), env, ns);
+    prune_assign(env, operands.left, operands.lhs, constrained, ns);
+  }
+  if(operands.right->is_top() && is_lvalue(operands.rhs))
+  {
+    // x == TOP
+    auto constrained = std::make_shared<interval_abstract_valuet>(
+      operands.left_interval(), env, ns);
+    prune_assign(env, operands.right, operands.rhs, constrained, ns);
+  }
+  return true_exprt();
+}
+
+exprt assume_eq(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto operands = eval_operands_as_values(env, expr, ns);
+
+  if(operands.are_bad())
+    return nil_exprt();
+
+  if(operands.has_top())
+    return assume_eq_unbounded(env, operands, ns);
+
+  auto meet = operands.left->meet(operands.right);
+
+  if(meet->is_bottom())
+    return false_exprt();
+
+  if(is_lvalue(operands.lhs))
+    prune_assign(env, operands.left, operands.lhs, meet, ns);
+  if(is_lvalue(operands.rhs))
+    prune_assign(env, operands.right, operands.rhs, meet, ns);
+  return true_exprt();
+}
+
+exprt assume_noteq(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto const &notequal_expr = to_binary_expr(expr);
+
+  auto left = env.eval(notequal_expr.lhs(), ns);
+  auto right = env.eval(notequal_expr.rhs(), ns);
+
+  if(left->is_top() || right->is_top())
+    return nil_exprt();
+  if(!is_value(left) || !is_value(right))
+    return nil_exprt();
+
+  auto meet = left->meet(right);
+
+  if(meet->is_bottom())
+    return true_exprt();
+
+  return false_exprt();
+}
+
+exprt assume_less_than_unbounded(
+  abstract_environmentt &env,
+  const left_and_right_valuest &operands,
+  const namespacet &ns)
+{
+  if(operands.left->is_top() && is_lvalue(operands.lhs))
+  {
+    // TOP < x, so prune range is min->right.upper
+    auto pruned_expr = constant_interval_exprt(
+      min_exprt(operands.left->type()),
+      operands.right_interval().get_upper(),
+      operands.left->type());
+    auto constrained =
+      std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
+    prune_assign(env, operands.left, operands.lhs, constrained, ns);
+  }
+  if(operands.right->is_top() && is_lvalue(operands.rhs))
+  {
+    // x < TOP, so prune range is left.lower->max
+    auto pruned_expr = constant_interval_exprt(
+      operands.left_interval().get_lower(),
+      max_exprt(operands.right->type()),
+      operands.right->type());
+    auto constrained =
+      std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
+    prune_assign(env, operands.right, operands.rhs, constrained, ns);
+  }
+
+  return true_exprt();
+}
+
+exprt assume_less_than(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto operands = eval_operands_as_values(env, expr, ns);
+  if(operands.are_bad())
+    return nil_exprt();
+
+  if(operands.has_top())
+    return assume_less_than_unbounded(env, operands, ns);
+
+  auto left_interval = operands.left_interval();
+  auto right_interval = operands.right_interval();
+
+  const auto &left_lower = left_interval.get_lower();
+  const auto &right_upper = right_interval.get_upper();
+
+  auto reduced_le_expr =
+    binary_relation_exprt(left_lower, expr.id(), right_upper);
+  auto result = env.eval(reduced_le_expr, ns)->to_constant();
+  if(result.is_true())
+  {
+    if(is_lvalue(operands.lhs))
+    {
+      auto pruned_upper = constant_interval_exprt::get_min(
+        left_interval.get_upper(), right_upper);
+      auto constrained =
+        as_value(operands.left)->constrain(left_lower, pruned_upper);
+      prune_assign(env, operands.left, operands.lhs, constrained, ns);
+    }
+    if(is_lvalue(operands.rhs))
+    {
+      auto pruned_lower = constant_interval_exprt::get_max(
+        left_lower, right_interval.get_lower());
+      auto constrained =
+        as_value(operands.right)->constrain(pruned_lower, right_upper);
+      prune_assign(env, operands.right, operands.rhs, constrained, ns);
+    }
+  }
+  return result;
+}
+
+static auto symmetric_operations =
+  std::map<irep_idt, irep_idt>{{ID_ge, ID_le}, {ID_gt, ID_lt}};
+
+exprt assume_greater_than(
+  abstract_environmentt &env,
+  const exprt &expr,
+  const namespacet &ns)
+{
+  auto const &gt_expr = to_binary_expr(expr);
+
+  auto symmetric_op = symmetric_operations[gt_expr.id()];
+  auto symmetric_expr =
+    binary_relation_exprt(gt_expr.rhs(), symmetric_op, gt_expr.lhs());
+
+  return assume_less_than(env, symmetric_expr, ns);
 }

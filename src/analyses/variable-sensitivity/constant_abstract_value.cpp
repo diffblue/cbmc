@@ -112,17 +112,17 @@ void constant_abstract_valuet::output(
 }
 
 abstract_object_pointert
-constant_abstract_valuet::merge(abstract_object_pointert other) const
+constant_abstract_valuet::merge(const abstract_object_pointert &other) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const abstract_value_objectt>(other);
   if(cast_other)
-    return merge_constant_constant(cast_other);
+    return merge_with_value(cast_other);
 
   return abstract_objectt::merge(other);
 }
 
-abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
+abstract_object_pointert constant_abstract_valuet::merge_with_value(
   const abstract_value_pointert &other) const
 {
   auto other_expr = other->to_constant();
@@ -133,6 +133,36 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
     return shared_from_this();
 
   return abstract_objectt::merge(other);
+}
+
+abstract_object_pointert
+constant_abstract_valuet::meet(const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  if(cast_other)
+    return meet_with_value(cast_other);
+
+  return abstract_objectt::meet(other);
+}
+
+abstract_object_pointert constant_abstract_valuet::meet_with_value(
+  const abstract_value_pointert &other) const
+{
+  auto value_as_interval = constant_interval_exprt(value, value);
+  auto other_interval = other->to_interval();
+
+  if(other_interval.contains(value_as_interval)) // Do they actually meet
+    return shared_from_this();
+
+  return abstract_objectt::meet(other);
+}
+
+abstract_value_pointert constant_abstract_valuet::constrain(
+  const exprt &lower,
+  const exprt &upper) const
+{
+  return as_value(mutable_clone());
 }
 
 void constant_abstract_valuet::get_statistics(
