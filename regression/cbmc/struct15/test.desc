@@ -1,4 +1,4 @@
-CORE
+CORE smt-backend
 main.c
 --trace --z3
 ^EXIT=0$

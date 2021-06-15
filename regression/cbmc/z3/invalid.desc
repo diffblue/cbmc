@@ -1,4 +1,4 @@
-CORE
+CORE smt-backend
 invalid.c
 --trace --smt2 --z3
 ^EXIT=10$
