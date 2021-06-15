@@ -3250,6 +3250,12 @@ cprover_contract:
           parser_stack($3).id(ID_target_list);
           mto($$, $3);
         }
+        | TOK_CPROVER_ASSIGNS '(' ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_assigns);
+          parser_stack($$).add_to_operands(exprt(ID_target_list));
+        }
         ;
 
 cprover_contract_sequence:
