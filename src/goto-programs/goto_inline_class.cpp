@@ -296,6 +296,8 @@ void goto_inlinet::insert_function_body(
   dest.destructive_insert(target, tmp);
 }
 
+/// Inlines a single function call
+/// Calls out to goto_inline_transitive or goto_inline_nontransitive
 void goto_inlinet::expand_function_call(
   goto_programt &dest,
   const inline_mapt &inline_map,
@@ -441,6 +443,11 @@ void goto_inlinet::get_call(
   arguments=call.arguments();
 }
 
+/// Inline all of the given call locations.
+/// This is the highest-level interface and calls the other goto_inline
+/// \param inline_map : which call locations to inline.
+/// \param force_full : true to break recursion with a SKIP,
+///   false means detecting recursion is an error.
 void goto_inlinet::goto_inline(
   const inline_mapt &inline_map,
   const bool force_full)
@@ -460,6 +467,13 @@ void goto_inlinet::goto_inline(
   }
 }
 
+/// Inline all of the chosen calls in a given function.
+/// This is main entry point for the functionality
+/// \param identifier : the name of the caller function.
+/// \param goto_function : the caller function itself.
+/// \param inline_map : which call locations to inline.
+/// \param force_full : true to break recursion with a SKIP,
+///   false means detecting recursion is an error.
 void goto_inlinet::goto_inline(
   const irep_idt identifier,
   goto_functiont &goto_function,

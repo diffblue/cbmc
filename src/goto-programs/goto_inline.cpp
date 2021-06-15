@@ -16,6 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_inline_class.h"
 #include "goto_model.h"
 
+/// Inline every function call into the entry_point() function.
+/// Then delete the bodies of all of the other functions.
+/// This is pretty drastic and can result in a very large program.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
+/// \param goto_model: Source of the symbol table and function map to use.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param adjust_function: Replace location in inlined function with call site.
 void goto_inline(
   goto_modelt &goto_model,
   message_handlert &message_handler,
@@ -29,6 +36,14 @@ void goto_inline(
     adjust_function);
 }
 
+/// Inline every function call into the entry_point() function.
+/// Then delete the bodies of all of the other functions.
+/// This is pretty drastic and can result in a very large program.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
+/// \param goto_functions: The function map to use.
+/// \param ns : The namespace to use.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param adjust_function: Replace location in inlined function with call site.
 void goto_inline(
   goto_functionst &goto_functions,
   const namespacet &ns,
@@ -96,11 +111,14 @@ void goto_inline(
 
 /// Inline all function calls to functions either marked as "inlined" or
 /// smaller than smallfunc_limit (by instruction count).
+/// Unlike the goto_inline functions, this doesn't remove function
+/// bodies after inlining.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
 /// \param goto_model: Source of the symbol table and function map to use.
 /// \param message_handler: Message handler used by goto_inlinet.
 /// \param smallfunc_limit: The maximum number of instructions in functions to
 ///   be inlined.
-/// \param adjust_function: Tell goto_inlinet to adjust function.
+/// \param adjust_function: Replace location in inlined function with call site.
 void goto_partial_inline(
   goto_modelt &goto_model,
   message_handlert &message_handler,
@@ -118,13 +136,16 @@ void goto_partial_inline(
 
 /// Inline all function calls to functions either marked as "inlined" or
 /// smaller than smallfunc_limit (by instruction count).
+/// Unlike the goto_inline functions, this doesn't remove function
+/// bodies after inlining.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
 /// \param goto_functions: The function map to use to find functions containing
 ///   calls and function bodies.
 /// \param ns: Namespace used by goto_inlinet.
 /// \param message_handler: Message handler used by goto_inlinet.
 /// \param smallfunc_limit: The maximum number of instructions in functions to
 ///   be inlined.
-/// \param adjust_function: Tell goto_inlinet to adjust function.
+/// \param adjust_function: Replace location in inlined function with call site.
 void goto_partial_inline(
   goto_functionst &goto_functions,
   const namespacet &ns,
@@ -153,6 +174,9 @@ void goto_partial_inline(
     if(gf_entry.first == goto_functions.entry_point())
     {
       // Don't inline any function calls made from the _start function.
+      // This is so that the convention of __CPROVER_start
+      // calling __CPROVER_initialize is maintained, so these can be
+      // augmented / replaced by later passes.
       continue;
     }
 
@@ -205,11 +229,12 @@ void goto_partial_inline(
   goto_inline.goto_inline(inline_map, false);
 }
 
-/// Inline all function calls made from a particular function
+/// Transitively inline all function calls made from a particular function.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
 /// \param goto_model: Source of the symbol table and function map to use.
 /// \param function: The function whose calls to inline.
 /// \param message_handler: Message handler used by goto_inlinet.
-/// \param adjust_function: Tell goto_inlinet to adjust function.
+/// \param adjust_function: Replace location in inlined function with call site.
 /// \param caching: Tell goto_inlinet to cache.
 void goto_function_inline(
   goto_modelt &goto_model,
@@ -228,12 +253,13 @@ void goto_function_inline(
     caching);
 }
 
-/// Inline all function calls made from a particular function
+/// Transitively inline all function calls made from a particular function.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
 /// \param goto_functions: The function map to use to find function bodies.
 /// \param function: The function whose calls to inline.
 /// \param ns: Namespace used by goto_inlinet.
 /// \param message_handler: Message handler used by goto_inlinet.
-/// \param adjust_function: Tell goto_inlinet to adjust function.
+/// \param adjust_function: Replace location in inlined function with call site.
 /// \param caching: Tell goto_inlinet to cache.
 void goto_function_inline(
   goto_functionst &goto_functions,
