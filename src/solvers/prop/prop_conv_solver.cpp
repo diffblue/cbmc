@@ -172,8 +172,8 @@ literalt prop_conv_solvert::convert(const exprt &expr)
   literalt literal = convert_bool(expr);
 
   // insert into cache
-
   result.first->second = literal;
+
   if(freeze_all && !literal.is_constant())
     prop.set_frozen(literal);
 
@@ -293,41 +293,6 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     {
       literalt tmp1 = convert(op[0]), tmp2 = convert(op[1]);
       return equal ? prop.lequal(tmp1, tmp2) : prop.lxor(tmp1, tmp2);
-    }
-  }
-  else if(expr.id() == ID_let)
-  {
-    const let_exprt &let_expr = to_let_expr(expr);
-    const auto &variables = let_expr.variables();
-    const auto &values = let_expr.values();
-
-    // first check whether this is all boolean
-    const bool all_boolean =
-      let_expr.where().type().id() == ID_bool &&
-      std::all_of(values.begin(), values.end(), [](const exprt &e) {
-        return e.type().id() == ID_bool;
-      });
-
-    if(all_boolean)
-    {
-      for(auto &binding : make_range(variables).zip(values))
-      {
-        literalt value_converted = convert(binding.second);
-
-        // We expect the identifier of the bound symbols to be unique,
-        // and thus, these can go straight into the symbol map.
-        // This property also allows us to cache any subexpressions.
-        const irep_idt &id = binding.first.get_identifier();
-        symbols[id] = value_converted;
-      }
-
-      literalt result = convert(let_expr.where());
-
-      // remove again
-      for(auto &variable : variables)
-        symbols.erase(variable.get_identifier());
-
-      return result;
     }
   }
 
