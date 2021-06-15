@@ -166,4 +166,34 @@ SCENARIO(
       }
     }
   }
+
+  GIVEN("compact values to create new intervals")
+  {
+    const exprt interval_1_4 = constant_interval_exprt(val1, val4);
+    const exprt interval_9_12 = constant_interval_exprt(val9, val12);
+
+    WHEN("compacting { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }")
+    {
+      auto value_set = make_value_set(
+        {val1,
+         val2,
+         val3,
+         val4,
+         val5,
+         val6,
+         val7,
+         val8,
+         val9,
+         val10,
+         val11,
+         val12},
+        environment,
+        ns);
+      THEN("{ [1, 4], 5, 6, 7, 8, [9, 12] }")
+      {
+        EXPECT(
+          value_set, {val5, val6, val7, val8, interval_1_4, interval_9_12});
+      }
+    }
+  }
 }

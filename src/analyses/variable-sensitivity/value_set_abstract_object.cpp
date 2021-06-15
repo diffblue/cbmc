@@ -9,16 +9,17 @@
 /// \file
 /// Value Set Abstract Object
 
-#include "interval_abstract_value.h"
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
+#include <util/arith_tools.h>
 #include <util/make_unique.h>
+#include <util/simplify_expr.h>
 
 #include <algorithm>
-
-#include "abstract_environment.h"
 
 static index_range_implementation_ptrt
 make_value_set_index_range(const std::set<exprt> &vals);
@@ -376,6 +377,7 @@ static bool are_any_top(const abstract_object_sett &set)
 /////////////////
 static abstract_object_sett
 non_destructive_compact(const abstract_object_sett &values);
+static abstract_object_sett destructive_compact(abstract_object_sett values);
 static bool value_is_not_contained_in(
   const abstract_object_pointert &object,
   const std::vector<constant_interval_exprt> &intervals);
@@ -385,7 +387,13 @@ static abstract_object_sett compact_values(const abstract_object_sett &values)
   if(values.size() <= value_set_abstract_objectt::max_value_set_size)
     return values;
 
-  return non_destructive_compact(values);
+  auto compacted = non_destructive_compact(values);
+  if(compacted.size() <= value_set_abstract_objectt::max_value_set_size)
+    return compacted;
+
+  compacted = destructive_compact(values);
+
+  return compacted;
 }
 
 static abstract_object_sett
@@ -417,6 +425,32 @@ non_destructive_compact(const abstract_object_sett &values)
 
   return compacted;
 }
+
+exprt eval_expr(exprt e)
+{
+  auto dummy_symbol_table = symbol_tablet{};
+  auto dummy_namespace = namespacet{dummy_symbol_table};
+
+  return simplify_expr(e, dummy_namespace);
+}
+
+static abstract_object_sett destructive_compact(abstract_object_sett values)
+{
+  auto width = values.to_interval();
+  auto slice_width = eval_expr(div_exprt(
+    minus_exprt(width.get_upper(), width.get_lower()),
+    from_integer(3, width.type())));
+
+  auto lower_slice = constant_interval_exprt(
+    width.get_lower(), eval_expr(plus_exprt(width.get_lower(), slice_width)));
+  auto upper_slice = constant_interval_exprt(
+    eval_expr(minus_exprt(width.get_upper(), slice_width)), width.get_upper());
+
+  values.insert(interval_abstract_valuet::make_interval(lower_slice));
+  values.insert(interval_abstract_valuet::make_interval(upper_slice));
+
+  return non_destructive_compact(values);
+} // destructive_compact
 
 static bool value_is_not_contained_in(
   const abstract_object_pointert &object,
