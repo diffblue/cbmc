@@ -197,6 +197,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2_incremental/smt_options.cpp \
       smt2_incremental/smt_sorts.cpp \
       smt2_incremental/smt_terms.cpp \
+      smt2_incremental/smt_to_string.cpp \
       smt2_incremental/smt2_incremental_decision_procedure.cpp \
       # Empty last line
 
