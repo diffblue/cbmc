@@ -34,7 +34,7 @@ void c_typecheck_baset::implicit_typecast(
   for(const auto &tc_warning : c_typecast.warnings)
   {
     warning().source_location=expr.find_source_location();
-    warning() << "warning: conversion from '" << to_string(src_type) << "' to '"
+    warning() << "conversion from '" << to_string(src_type) << "' to '"
               << to_string(dest_type) << "': " << tc_warning << eom;
   }
 }

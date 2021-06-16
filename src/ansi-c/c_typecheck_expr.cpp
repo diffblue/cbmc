@@ -1833,7 +1833,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
     if(type0.get_bool(ID_C_constant))
     {
       error().source_location = op0.source_location();
-      error() << "error: '" << to_string(op0) << "' is constant" << eom;
+      error() << "'" << to_string(op0) << "' is constant" << eom;
       throw 0;
     }
 

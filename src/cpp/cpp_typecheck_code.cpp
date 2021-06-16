@@ -276,10 +276,10 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       if(access == ID_private || access == ID_noaccess)
       {
         #if 0
-        error().source_location=code.source_location());
-        str << "error: constructor of '"
-            << to_string(symbol_expr)
-            << "' is not accessible";
+        error().source_location=code.find_source_location();
+        error() << "constructor of '"
+                << to_string(symbol_expr)
+                << "' is not accessible" << eom;
         throw 0;
         #endif
       }

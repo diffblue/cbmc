@@ -55,8 +55,12 @@ void gcc_message_handlert::print(
       else
         out << column << ": ";
 
-      if(level == messaget::M_ERROR)
+      if(
+        level == messaget::M_ERROR ||
+        (level == messaget::M_WARNING && warnings_are_errors))
+      {
         out << string(messaget::red) << "error: ";
+      }
       else if(level == messaget::M_WARNING)
         out << string(messaget::bright_magenta) << "warning: ";
 

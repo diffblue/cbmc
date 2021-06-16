@@ -322,6 +322,8 @@ int gcc_modet::doit()
     messaget::M_WARNING : messaget::M_ERROR;
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), default_verbosity, gcc_message_handler);
+  gcc_message_handler.print_warnings_as_errors(
+    cmdline.isset("Werror") && !cmdline.isset("Wno-error"));
 
   bool act_as_bcc=
     base_name=="bcc" ||

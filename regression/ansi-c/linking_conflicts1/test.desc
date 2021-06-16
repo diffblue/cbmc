@@ -3,7 +3,7 @@ main.c
 other.c
 ^EXIT=(64|1)$
 ^SIGNAL=0$
-error: conflicting function declarations 'bar'
-error: conflicting function declarations 'bar2'
+conflicting function declarations 'bar'
+conflicting function declarations 'bar2'
 --
 ^warning: ignoring

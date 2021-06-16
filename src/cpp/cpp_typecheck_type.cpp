@@ -59,7 +59,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(symbol_expr.id()!=ID_type)
     {
       error().source_location=type.source_location();
-      error() << "error: expected type" << eom;
+      error() << "expected type" << eom;
       throw 0;
     }
 

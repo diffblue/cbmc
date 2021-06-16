@@ -135,8 +135,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     if(has_body)
     {
       error().source_location=type.source_location();
-      error() << "error: enum symbol '" << base_name
-              << "' declared previously\n"
+      error() << "enum symbol '" << base_name << "' declared previously\n"
               << "location of previous definition: " << symbol.location << eom;
       throw 0;
     }
