@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts --pointer-check
+--apply-loop-contracts --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$

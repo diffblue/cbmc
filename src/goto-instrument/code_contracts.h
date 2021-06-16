@@ -90,6 +90,8 @@ public:
   /// \return `true` on failure, `false` otherwise
   bool replace_calls();
 
+  void apply_loop_contracts();
+
   const symbolt &new_tmp_symbol(
     const typet &type,
     const source_locationt &source_location,
@@ -215,6 +217,11 @@ protected:
     const irep_idt &function,
     const irep_idt &mode);
 };
+
+#define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
+#define HELP_LOOP_CONTRACTS                                                    \
+  " --apply-loop-contracts\n"                                                  \
+  "                              check and use loop contracts when provided\n"
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \

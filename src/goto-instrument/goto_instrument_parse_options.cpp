@@ -1149,7 +1149,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   }
 
   if(
-    cmdline.isset(FLAG_REPLACE_CALL) || cmdline.isset(FLAG_REPLACE_ALL_CALLS) ||
+    cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
+    cmdline.isset(FLAG_REPLACE_ALL_CALLS) ||
     cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
     cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
   {
@@ -1180,6 +1181,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     if(cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
       if(cont.enforce_contracts())
         exit(CPROVER_EXIT_USAGE_ERROR);
+
+    if(cmdline.isset(FLAG_LOOP_CONTRACTS))
+      cont.apply_loop_contracts();
   }
 
   if(cmdline.isset("value-set-fi-fp-removal"))
@@ -1868,7 +1872,8 @@ void goto_instrument_parse_optionst::help()
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     HELP_REPLACE_CALLS
     "\n"
-    "Function contracts and invariants:\n"
+    "Code contracts:\n"
+    HELP_LOOP_CONTRACTS
     HELP_REPLACE_CALL
     HELP_REPLACE_ALL_CALLS
     HELP_ENFORCE_CONTRACT
