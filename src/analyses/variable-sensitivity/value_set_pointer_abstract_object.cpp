@@ -24,13 +24,6 @@ unwrap_and_extract_values(const abstract_object_sett &values);
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
-/// Helper for converting context objects into its abstract-value children
-/// \p maybe_wrapped: either an abstract value (or a set of those) or one
-///   wrapped in a context
-/// \return an abstract value without context (though it might be as set)
-static abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped);
-
 /// Recursively construct a combination \p sub_con from \p super_con and once
 ///   constructed call \p f.
 /// \param super_con: vector of some containers storing the values
@@ -140,14 +133,6 @@ abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
   return shared_from_this();
 }
 
-abstract_object_pointert value_set_pointer_abstract_objectt::resolve_new_values(
-  const abstract_object_sett &new_values,
-  const abstract_environmentt &environment) const
-{
-  auto result = resolve_values(new_values);
-  return environment.add_object_context(result);
-}
-
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
 {
@@ -173,7 +158,8 @@ abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
 }
 
 abstract_object_pointert value_set_pointer_abstract_objectt::merge(
-  const abstract_object_pointert &other) const
+  const abstract_object_pointert &other,
+  const widen_modet &widen_mode) const
 {
   auto cast_other = std::dynamic_pointer_cast<const value_set_tag>(other);
   if(cast_other)
@@ -183,7 +169,7 @@ abstract_object_pointert value_set_pointer_abstract_objectt::merge(
     return resolve_values(union_values);
   }
 
-  return abstract_objectt::merge(other);
+  return abstract_objectt::merge(other, widen_mode);
 }
 
 void value_set_pointer_abstract_objectt::set_values(
@@ -223,8 +209,7 @@ unwrap_and_extract_values(const abstract_object_sett &values)
   abstract_object_sett unwrapped_values;
   for(auto const &value : values)
   {
-    unwrapped_values.insert(
-      maybe_extract_single_value(maybe_unwrap_context(value)));
+    unwrapped_values.insert(maybe_extract_single_value(value));
   }
 
   return unwrapped_values;
@@ -233,8 +218,8 @@ unwrap_and_extract_values(const abstract_object_sett &values)
 abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
 {
-  auto const &value_as_set =
-    std::dynamic_pointer_cast<const value_set_tag>(maybe_singleton);
+  auto const &value_as_set = std::dynamic_pointer_cast<const value_set_tag>(
+    maybe_singleton->unwrap_context());
   if(value_as_set)
   {
     PRECONDITION(value_as_set->get_values().size() == 1);
@@ -245,13 +230,4 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
   }
   else
     return maybe_singleton;
-}
-
-abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
-{
-  auto const &context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
-
-  return context_value ? context_value->unwrap_context() : maybe_wrapped;
 }

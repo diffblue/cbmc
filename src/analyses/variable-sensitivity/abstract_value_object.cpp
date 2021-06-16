@@ -178,6 +178,40 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   return transform(expr, operands, environment, ns);
 }
 
+abstract_object_pointert abstract_value_objectt::write(
+  abstract_environmentt &environment,
+  const namespacet &ns,
+  const std::stack<exprt> &stack,
+  const exprt &specifier,
+  const abstract_object_pointert &value,
+  bool merging_write) const
+{
+  UNREACHABLE; // Should not ever call write on a value;
+}
+
+abstract_object_pointert abstract_value_objectt::merge(
+  const abstract_object_pointert &other,
+  const widen_modet &widen_mode) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  if(cast_other)
+    return merge_with_value(cast_other, widen_mode);
+
+  return abstract_objectt::merge(other, widen_mode);
+}
+
+abstract_object_pointert
+abstract_value_objectt::meet(const abstract_object_pointert &other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const abstract_value_objectt>(other);
+  if(cast_other)
+    return meet_with_value(cast_other);
+
+  return abstract_objectt::meet(other);
+}
+
 // evaluation helpers
 template <class representation_type>
 abstract_object_pointert make_top(const typet &type)
@@ -469,7 +503,7 @@ private:
 
   interval_abstract_value_pointert make_interval(const exprt &expr) const
   {
-    return std::make_shared<interval_abstract_valuet>(expr, environment, ns);
+    return interval_abstract_valuet::make_interval(expr, environment, ns);
   }
 
   const exprt &expression;
@@ -518,7 +552,7 @@ private:
 
     auto resulting_objects = evaluate_each_combination(ranges);
 
-    return resolve_values(resulting_objects);
+    return value_set_abstract_objectt::make_value_set(resulting_objects);
   }
 
   /// Evaluate expression for every combination of values in \p value_ranges.
@@ -594,64 +628,6 @@ private:
     return unwrapped;
   }
 
-  static abstract_object_sett
-  unwrap_and_extract_values(const abstract_object_sett &values)
-  {
-    abstract_object_sett unwrapped_values;
-    for(auto const &value : values)
-    {
-      unwrapped_values.insert(
-        maybe_extract_single_value(value->unwrap_context()));
-    }
-
-    return unwrapped_values;
-  }
-
-  static abstract_object_pointert
-  maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
-  {
-    auto const &value_as_set =
-      std::dynamic_pointer_cast<const value_set_tag>(maybe_singleton);
-    if(value_as_set)
-    {
-      PRECONDITION(value_as_set->get_values().size() == 1);
-      PRECONDITION(!std::dynamic_pointer_cast<const context_abstract_objectt>(
-        value_as_set->get_values().first()));
-
-      return value_as_set->get_values().first();
-    }
-    else
-      return maybe_singleton;
-  }
-
-  static abstract_object_pointert
-  resolve_values(const abstract_object_sett &new_values)
-  {
-    PRECONDITION(!new_values.empty());
-
-    auto unwrapped_values = unwrap_and_extract_values(new_values);
-
-    if(unwrapped_values.size() > value_set_abstract_objectt::max_value_set_size)
-      return make_interval(unwrapped_values);
-
-    return make_value_set(unwrapped_values);
-  }
-
-  static abstract_object_pointert
-  make_interval(const abstract_object_sett &values)
-  {
-    return std::make_shared<interval_abstract_valuet>(values.to_interval());
-  }
-
-  static abstract_object_pointert
-  make_value_set(const abstract_object_sett &values)
-  {
-    const auto &type = values.first()->type();
-    auto value_set = std::make_shared<value_set_abstract_objectt>(type);
-    value_set->set_values(values);
-    return value_set;
-  }
-
   static abstract_object_pointert
   evaluate_conditional(const std::vector<value_ranget> &ops)
   {
@@ -675,7 +651,7 @@ private:
       resulting_objects.insert(true_result);
     if(all_false || indeterminate)
       resulting_objects.insert(false_result);
-    return resolve_values(resulting_objects);
+    return value_set_abstract_objectt::make_value_set(resulting_objects);
   }
 
   const exprt &expression;

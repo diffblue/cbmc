@@ -127,7 +127,8 @@ protected:
   static bool merge_shared_maps(
     const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map1,
     const sharing_mapt<keyt, abstract_object_pointert, false, hash> &map2,
-    sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map)
+    sharing_mapt<keyt, abstract_object_pointert, false, hash> &out_map,
+    const widen_modet &widen_mode)
   {
     bool modified = false;
 
@@ -137,13 +138,12 @@ protected:
 
     for(auto &item : delta_view)
     {
-      bool changes = false;
-      abstract_object_pointert v_new =
-        abstract_objectt::merge(item.m, item.get_other_map_value(), changes);
-      if(changes)
+      auto v_new =
+        abstract_objectt::merge(item.m, item.get_other_map_value(), widen_mode);
+      if(v_new.modified)
       {
         modified = true;
-        out_map.replace(item.k, v_new);
+        out_map.replace(item.k, v_new.object);
       }
     }
 

@@ -25,11 +25,20 @@ public:
   interval_abstract_valuet(const typet &t, bool tp, bool bttm);
 
   explicit interval_abstract_valuet(const constant_interval_exprt &e);
+  interval_abstract_valuet(const exprt &lower, const exprt &upper);
 
   interval_abstract_valuet(
     const exprt &e,
     const abstract_environmentt &environment,
     const namespacet &ns);
+
+  template <typename... Args>
+  static std::shared_ptr<interval_abstract_valuet>
+  make_interval(Args &&... args)
+  {
+    return std::make_shared<interval_abstract_valuet>(
+      std::forward<Args>(args)...);
+  }
 
   ~interval_abstract_valuet() override = default;
 
@@ -63,20 +72,29 @@ public:
 
 protected:
   CLONE
+
+  /// Merge another interval abstract object with this one
+  /// \param other The abstract value object to merge with
+  /// \param widen_mode: Indicates if this is a widening merge
+  /// \return This if the other interval is subsumed by this,
+  ///          other if this is subsumed by other.
+  ///          Otherwise, a new interval abstract object
+  ///          with the smallest interval that subsumes both
+  ///          this and other
+  abstract_object_pointert merge_with_value(
+    const abstract_value_pointert &other,
+    const widen_modet &widen_mode) const override;
+
+  /// Meet another interval abstract object with this one
+  /// \param other The interval abstract object to meet with
+  /// \return This if the other interval subsumes this,
+  ///          other if this subsumes other.
+  ///          Otherwise, a new interval abstract object
+  ///          with the intersection interval (of this and other)
   abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
-  abstract_object_pointert
-  meet(const abstract_object_pointert &other) const override;
+  meet_with_value(const abstract_value_pointert &other) const override;
 
 private:
-  using interval_abstract_value_pointert =
-    sharing_ptrt<interval_abstract_valuet>;
-
-  abstract_object_pointert
-  merge_with_value(const abstract_value_pointert &other) const;
-  abstract_object_pointert
-  meet_with_value(const abstract_value_pointert &other) const;
-
   constant_interval_exprt interval;
 };
 

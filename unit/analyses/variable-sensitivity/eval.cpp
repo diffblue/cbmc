@@ -50,11 +50,9 @@ SCENARIO(
           std::dynamic_pointer_cast<const context_abstract_objectt>(result));
         REQUIRE_FALSE(result->is_top());
         REQUIRE_FALSE(result->is_bottom());
-        const auto unwrapped =
-          std::dynamic_pointer_cast<const context_abstract_objectt>(result)
-            ->unwrap_context();
         auto result_as_interval =
-          std::dynamic_pointer_cast<const interval_abstract_valuet>(unwrapped);
+          std::dynamic_pointer_cast<const interval_abstract_valuet>(
+            result->unwrap_context());
         REQUIRE(result_as_interval);
         REQUIRE(
           result_as_interval->to_interval().get_lower() ==

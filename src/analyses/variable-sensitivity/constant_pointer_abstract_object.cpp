@@ -57,43 +57,32 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
 }
 
 abstract_object_pointert constant_pointer_abstract_objectt::merge(
-  const abstract_object_pointert &other) const
+  const abstract_object_pointert &other,
+  const widen_modet &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
   if(cast_other)
-  {
-    return merge_constant_pointers(cast_other);
-  }
-  else
-  {
-    // TODO(tkiley): How do we set the result to be toppish?
-    return abstract_pointer_objectt::merge(other);
-  }
+    return merge_constant_pointers(cast_other, widen_mode);
+
+  return abstract_pointer_objectt::merge(other, widen_mode);
 }
 
 abstract_object_pointert
 constant_pointer_abstract_objectt::merge_constant_pointers(
-  const constant_pointer_abstract_pointert &other) const
+  const constant_pointer_abstract_pointert &other,
+  const widen_modet &widen_mode) const
 {
   if(is_bottom())
-  {
     return std::make_shared<constant_pointer_abstract_objectt>(*other);
-  }
-  else
-  {
-    bool matching_pointer =
-      value_stack.to_expression() == other->value_stack.to_expression();
 
-    if(matching_pointer)
-    {
-      return shared_from_this();
-    }
-    else
-    {
-      return abstract_pointer_objectt::merge(other);
-    }
-  }
+  bool matching_pointers =
+    value_stack.to_expression() == other->value_stack.to_expression();
+
+  if(matching_pointers)
+    return shared_from_this();
+
+  return abstract_pointer_objectt::merge(other, widen_mode);
 }
 
 exprt constant_pointer_abstract_objectt::to_constant() const
@@ -196,7 +185,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
       {
         abstract_object_pointert pointed_value = environment.eval(value, ns);
         abstract_object_pointert merged_value =
-          abstract_objectt::merge(pointed_value, new_value);
+          abstract_objectt::merge(pointed_value, new_value, widen_modet::no)
+            .object;
         environment.assign(value, merged_value, ns);
       }
       else

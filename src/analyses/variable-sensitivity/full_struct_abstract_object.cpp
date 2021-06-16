@@ -175,7 +175,10 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
         return result;
       }
 
-      result->map.replace(c, abstract_objectt::merge(old_value.value(), value));
+      result->map.replace(
+        c,
+        abstract_objectt::merge(old_value.value(), value, widen_modet::no)
+          .object);
     }
     else
     {
@@ -235,48 +238,41 @@ bool full_struct_abstract_objectt::verify() const
   return (is_top() || is_bottom()) == map.empty();
 }
 
-abstract_object_pointert
-full_struct_abstract_objectt::merge(const abstract_object_pointert &other) const
+abstract_object_pointert full_struct_abstract_objectt::merge(
+  const abstract_object_pointert &other,
+  const widen_modet &widen_mode) const
 {
   constant_struct_pointert cast_other =
     std::dynamic_pointer_cast<const full_struct_abstract_objectt>(other);
   if(cast_other)
-  {
-    return merge_constant_structs(cast_other);
-  }
-  else
-  {
-    // TODO(tkiley): How do we set the result to be toppish? Does it matter?
-    return abstract_aggregate_baset::merge(other);
-  }
+    return merge_constant_structs(cast_other, widen_mode);
+
+  return abstract_aggregate_baset::merge(other, widen_mode);
 }
 
 abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
-  constant_struct_pointert other) const
+  constant_struct_pointert other,
+  const widen_modet &widen_mode) const
 {
   if(is_bottom())
-  {
     return std::make_shared<full_struct_abstract_objectt>(*other);
+
+  const auto &result =
+    std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
+
+  bool modified = merge_shared_maps(map, other->map, result->map, widen_mode);
+
+  if(!modified)
+  {
+    DATA_INVARIANT(verify(), "Structural invariants maintained");
+    return shared_from_this();
   }
   else
   {
-    const auto &result =
-      std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
-
-    bool modified = merge_shared_maps(map, other->map, result->map);
-
-    if(!modified)
-    {
-      DATA_INVARIANT(verify(), "Structural invariants maintained");
-      return shared_from_this();
-    }
-    else
-    {
-      INVARIANT(!result->is_top(), "Merge of maps will not generate top");
-      INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
-      DATA_INVARIANT(result->verify(), "Structural invariants maintained");
-      return result;
-    }
+    INVARIANT(!result->is_top(), "Merge of maps will not generate top");
+    INVARIANT(!result->is_bottom(), "Merge of maps will not generate bottom");
+    DATA_INVARIANT(result->verify(), "Structural invariants maintained");
+    return result;
   }
 }
 

@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: Unit tests for intervalabstract_valuet::merge
+ Module: Unit tests for interval_abstract_valuet::merge
 
  Author: Jez Higgins.
 
@@ -16,10 +16,9 @@
 static merge_result<const interval_abstract_valuet>
 merge(abstract_object_pointert op1, abstract_object_pointert op2)
 {
-  bool modified;
-  auto result = abstract_objectt::merge(op1, op2, modified);
+  auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
-  return {modified, as_interval(result)};
+  return {result.modified, as_interval(result.object)};
 }
 
 SCENARIO(

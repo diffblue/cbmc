@@ -36,6 +36,7 @@
 class abstract_environmentt;
 class namespacet;
 struct abstract_object_statisticst;
+enum class widen_modet;
 
 #define CLONE                                                                  \
   internal_abstract_object_pointert mutable_clone() const override             \
@@ -244,28 +245,29 @@ public:
   /// \param op2: the second abstract object to merge
   /// \param out_modifications: reference to a flag indicating modification
   ///
-  /// \return The merged abstract object with the same sensitivity as the
-  ///         first parameter. out_modifications will be true if the resulting
-  ///         abstract object is different from op1
-  static abstract_object_pointert merge(
+  /// \return A pair containing the merged abstract object with the same
+  ///         sensitivity as op1, and a modified flag which
+  ///         will be true if the merged abstract object is different from op1
+  struct combine_result
+  {
+    abstract_object_pointert object;
+    bool modified;
+  };
+  static combine_result merge(
     const abstract_object_pointert &op1,
     const abstract_object_pointert &op2,
-    bool &out_modifications);
-  static abstract_object_pointert merge(
-    const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2);
+    const widen_modet &widen_mode);
 
   /// Interface method for the meet operation. Decides whether to use the base
   /// implementation or if a more precise abstraction is attainable.
   /// \param op1 lhs object for meet
   /// \param op2 rhs object for meet
-  /// \param out_modifications reference to a flag indicating modification
-  /// (result is not op1)
-  /// \return resulting object after meet
-  static abstract_object_pointert meet(
+  /// \return A pair containing the merged abstract object with the same
+  ///         sensitivity as op1, and a modified flag which
+  ///         will be true if the returned object is different from op1
+  static combine_result meet(
     const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2,
-    bool &out_modifications);
+    const abstract_object_pointert &op2);
 
   /// Base implementation of the meet operation: only used if no more precise
   /// abstraction can be used, can only result in {TOP, BOTTOM, one of the
@@ -422,10 +424,12 @@ protected:
   /// the object would be unchanged, then would return itself.
   ///
   /// \param other: The object to merge with this
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns the result of the merge.
-  virtual abstract_object_pointert
-  merge(const abstract_object_pointert &other) const;
+  virtual abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const widen_modet &widen_mode) const;
 
   /// Helper function for base meet. Two cases: return itself (if trivially
   /// contained in other); return BOTTOM otherwise.

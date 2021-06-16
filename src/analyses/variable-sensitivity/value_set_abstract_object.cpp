@@ -9,16 +9,17 @@
 /// \file
 /// Value Set Abstract Object
 
-#include "interval_abstract_value.h"
+#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
+#include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
+#include <util/arith_tools.h>
 #include <util/make_unique.h>
+#include <util/simplify_expr.h>
 
 #include <algorithm>
-
-#include "abstract_environment.h"
 
 static index_range_implementation_ptrt
 make_value_set_index_range(const std::set<exprt> &vals);
@@ -115,6 +116,12 @@ maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
 static bool are_any_top(const abstract_object_sett &set);
 
+static abstract_object_sett compact_values(const abstract_object_sett &values);
+static abstract_object_sett widen_value_set(
+  const abstract_object_sett &values,
+  const constant_interval_exprt &lhs,
+  const constant_interval_exprt &rhs);
+
 value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
   : abstract_value_objectt(type)
 {
@@ -141,6 +148,22 @@ value_set_abstract_objectt::value_set_abstract_objectt(
   values.insert(
     std::make_shared<constant_abstract_valuet>(expr, environment, ns));
   verify();
+}
+
+abstract_object_pointert value_set_abstract_objectt::make_value_set(
+  const abstract_object_sett &initial_values)
+{
+  PRECONDITION(!initial_values.empty());
+
+  auto values = unwrap_and_extract_values(initial_values);
+
+  values = compact_values(values);
+
+  const auto &type = values.first()->type();
+  auto value_set =
+    std::make_shared<value_set_abstract_objectt>(type, false, false);
+  value_set->set_values(values);
+  return value_set;
 }
 
 index_range_implementation_ptrt
@@ -186,25 +209,9 @@ constant_interval_exprt value_set_abstract_objectt::to_interval() const
   return values.to_interval();
 }
 
-abstract_object_pointert value_set_abstract_objectt::write(
-  abstract_environmentt &environment,
-  const namespacet &ns,
-  const std::stack<exprt> &stack,
-  const exprt &specifier,
-  const abstract_object_pointert &value,
-  bool merging_write) const
-{
-  abstract_object_sett new_values;
-  for(const auto &st_value : values)
-  {
-    new_values.insert(
-      st_value->write(environment, ns, stack, specifier, value, merging_write));
-  }
-  return resolve_new_values(new_values, environment);
-}
-
 abstract_object_pointert value_set_abstract_objectt::merge_with_value(
-  const abstract_value_pointert &other) const
+  const abstract_value_pointert &other,
+  const widen_modet &widen_mode) const
 {
   auto union_values = !is_bottom() ? values : abstract_object_sett{};
 
@@ -213,6 +220,18 @@ abstract_object_pointert value_set_abstract_objectt::merge_with_value(
     union_values.insert(other_value_set->get_values());
   else
     union_values.insert(other);
+
+  auto has_values = [](const abstract_object_pointert &v) {
+    return !v->is_top() && !v->is_bottom();
+  };
+
+  if(
+    widen_mode == widen_modet::could_widen && has_values(shared_from_this()) &&
+    has_values(other))
+  {
+    union_values =
+      widen_value_set(union_values, to_interval(), other->to_interval());
+  }
 
   return resolve_values(union_values);
 }
@@ -255,14 +274,6 @@ abstract_object_pointert value_set_abstract_objectt::meet_with_value(
   return resolve_values(meet_values);
 }
 
-abstract_object_pointert value_set_abstract_objectt::resolve_new_values(
-  const abstract_object_sett &new_values,
-  const abstract_environmentt &environment) const
-{
-  auto result = resolve_values(new_values);
-  return environment.add_object_context(result);
-}
-
 abstract_object_pointert value_set_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
 {
@@ -271,42 +282,7 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
   if(new_values == values)
     return shared_from_this();
 
-  auto unwrapped_values = unwrap_and_extract_values(new_values);
-
-  if(unwrapped_values.size() > max_value_set_size)
-  {
-    return std::make_shared<interval_abstract_valuet>(
-      unwrapped_values.to_interval());
-  }
-  //if(unwrapped_values.size() == 1)
-  //{
-  //  return (*unwrapped_values.begin());
-  //}
-
-  auto result =
-    std::dynamic_pointer_cast<value_set_abstract_objectt>(mutable_clone());
-  result->set_values(unwrapped_values);
-  return result;
-}
-
-abstract_object_pointert
-value_set_abstract_objectt::merge(const abstract_object_pointert &other) const
-{
-  auto other_value = as_value(other);
-  if(other_value)
-    return merge_with_value(other_value);
-
-  return abstract_objectt::merge(other);
-}
-
-abstract_object_pointert
-value_set_abstract_objectt::meet(const abstract_object_pointert &other) const
-{
-  auto other_value = as_value(other);
-  if(other_value)
-    return meet_with_value(other_value);
-
-  return abstract_objectt::meet(other);
+  return make_value_set(new_values);
 }
 
 void value_set_abstract_objectt::set_top_internal()
@@ -379,24 +355,12 @@ void value_set_abstract_objectt::output(
   }
 }
 
-static abstract_object_pointert
-maybe_unwrap_context(const abstract_object_pointert &maybe_wrapped)
-{
-  auto const &context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(maybe_wrapped);
-
-  return context_value ? context_value->unwrap_context() : maybe_wrapped;
-}
-
 static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values)
 {
   abstract_object_sett unwrapped_values;
   for(auto const &value : values)
-  {
-    unwrapped_values.insert(
-      maybe_extract_single_value(maybe_unwrap_context(value)));
-  }
+    unwrapped_values.insert(maybe_extract_single_value(value));
 
   return unwrapped_values;
 }
@@ -404,8 +368,8 @@ unwrap_and_extract_values(const abstract_object_sett &values)
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton)
 {
-  auto const &value_as_set =
-    std::dynamic_pointer_cast<const value_set_tag>(maybe_singleton);
+  auto const &value_as_set = std::dynamic_pointer_cast<const value_set_tag>(
+    maybe_singleton->unwrap_context());
   if(value_as_set)
   {
     PRECONDITION(value_as_set->get_values().size() == 1);
@@ -424,4 +388,229 @@ static bool are_any_top(const abstract_object_sett &set)
            set.begin(), set.end(), [](const abstract_object_pointert &value) {
              return value->is_top();
            }) != set.end();
+}
+
+/////////////////
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values);
+static abstract_object_sett
+destructive_compact(abstract_object_sett values, int slice = 3);
+static bool value_is_not_contained_in(
+  const abstract_object_pointert &object,
+  const std::vector<constant_interval_exprt> &intervals);
+
+static abstract_object_sett compact_values(const abstract_object_sett &values)
+{
+  if(values.size() <= value_set_abstract_objectt::max_value_set_size)
+    return values;
+
+  auto compacted = non_destructive_compact(values);
+  if(compacted.size() <= value_set_abstract_objectt::max_value_set_size)
+    return compacted;
+
+  compacted = destructive_compact(values);
+
+  return compacted;
+}
+
+static exprt eval_expr(const exprt &e);
+static bool is_le(const exprt &lhs, const exprt &rhs);
+static abstract_object_sett collapse_values_in_intervals(
+  const abstract_object_sett &values,
+  const std::vector<constant_interval_exprt> &intervals);
+static void
+collapse_overlapping_intervals(std::vector<constant_interval_exprt> &intervals);
+
+static std::vector<constant_interval_exprt>
+collect_intervals(const abstract_object_sett &values)
+{
+  auto intervals = std::vector<constant_interval_exprt>{};
+  for(auto const &object : values)
+  {
+    auto value =
+      std::dynamic_pointer_cast<const abstract_value_objectt>(object);
+    auto as_expr = value->to_interval();
+    if(!as_expr.is_single_value_interval())
+      intervals.push_back(as_expr);
+  }
+
+  collapse_overlapping_intervals(intervals);
+
+  return intervals;
+}
+
+void collapse_overlapping_intervals(
+  std::vector<constant_interval_exprt> &intervals)
+{
+  std::sort(
+    intervals.begin(),
+    intervals.end(),
+    [](constant_interval_exprt const &lhs, constant_interval_exprt const &rhs) {
+      return is_le(lhs.get_lower(), rhs.get_lower());
+    });
+
+  size_t index = 1;
+  while(index < intervals.size())
+  {
+    auto &lhs = intervals[index - 1];
+    auto &rhs = intervals[index];
+
+    bool overlap = is_le(rhs.get_lower(), lhs.get_upper());
+    if(overlap)
+    {
+      auto upper = is_le(lhs.get_upper(), rhs.get_upper()) ? rhs.get_upper()
+                                                           : lhs.get_upper();
+      auto expanded = constant_interval_exprt(lhs.get_lower(), upper);
+      lhs = expanded;
+      intervals.erase(intervals.begin() + index);
+    }
+    else
+      ++index;
+  }
+}
+
+static abstract_object_sett
+non_destructive_compact(const abstract_object_sett &values)
+{
+  auto intervals = collect_intervals(values);
+  if(intervals.empty())
+    return values;
+
+  return collapse_values_in_intervals(values, intervals);
+}
+
+static abstract_object_sett collapse_values_in_intervals(
+  const abstract_object_sett &values,
+  const std::vector<constant_interval_exprt> &intervals)
+{
+  auto collapsed = abstract_object_sett{};
+  // for each value, including the intervals
+  // keep it if it is not in any of the intervals
+  std::copy_if(
+    values.begin(),
+    values.end(),
+    std::back_inserter(collapsed),
+    [&intervals](const abstract_object_pointert &object) {
+      return value_is_not_contained_in(object, intervals);
+    });
+  std::transform(
+    intervals.begin(),
+    intervals.end(),
+    std::back_inserter(collapsed),
+    [](const constant_interval_exprt &interval) {
+      return interval_abstract_valuet::make_interval(interval);
+    });
+  return collapsed;
+}
+
+static abstract_object_sett
+destructive_compact(abstract_object_sett values, int slice)
+{
+  auto value_count = values.size();
+  auto width = values.to_interval();
+  auto slice_width = eval_expr(div_exprt(
+    minus_exprt(width.get_upper(), width.get_lower()),
+    from_integer(slice, width.type())));
+
+  auto lower_boundary = eval_expr(plus_exprt(width.get_lower(), slice_width));
+  auto upper_start = eval_expr(minus_exprt(width.get_upper(), slice_width));
+  if(
+    lower_boundary ==
+    upper_start) // adjust boundary so intervals aren't immediately combined
+    upper_start = eval_expr(
+      plus_exprt(upper_start, from_integer(1, lower_boundary.type())));
+
+  auto lower_slice = constant_interval_exprt(width.get_lower(), lower_boundary);
+  auto upper_slice = constant_interval_exprt(upper_start, width.get_upper());
+
+  values.insert(interval_abstract_valuet::make_interval(lower_slice));
+  values.insert(interval_abstract_valuet::make_interval(upper_slice));
+
+  auto compacted = non_destructive_compact(values);
+  if(compacted.size() == value_count)
+    return destructive_compact(compacted, --slice);
+
+  return compacted;
+} // destructive_compact
+
+static bool value_is_not_contained_in(
+  const abstract_object_pointert &object,
+  const std::vector<constant_interval_exprt> &intervals)
+{
+  auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(object);
+  auto as_expr = value->to_interval();
+
+  return std::none_of(
+    intervals.begin(),
+    intervals.end(),
+    [&as_expr](const constant_interval_exprt &interval) {
+      return interval.contains(as_expr);
+    });
+}
+
+static exprt eval_expr(const exprt &e)
+{
+  auto symbol_table = symbol_tablet{};
+  auto ns = namespacet{symbol_table};
+
+  return simplify_expr(e, ns);
+}
+
+static bool is_le(const exprt &lhs, const exprt &rhs)
+{
+  auto is_le_expr = binary_relation_exprt(lhs, ID_le, rhs);
+  return eval_expr(is_le_expr).is_true();
+}
+
+static abstract_object_sett widen_value_set(
+  const abstract_object_sett &values,
+  const constant_interval_exprt &lhs,
+  const constant_interval_exprt &rhs)
+{
+  if(lhs.contains(rhs))
+    return values;
+
+  auto widened_ends = std::vector<constant_interval_exprt>{};
+
+  auto lower_bound =
+    constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
+  auto upper_bound =
+    constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
+  auto range = plus_exprt(
+    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
+
+  auto symbol_table = symbol_tablet{};
+  auto ns = namespacet{symbol_table};
+
+  // should extend lower bound?
+  if(rhs.get_lower() < lhs.get_lower())
+  {
+    auto widened_lower_bound = constant_interval_exprt(
+      simplify_expr(minus_exprt(lower_bound, range), ns), lower_bound);
+    widened_ends.push_back(widened_lower_bound);
+    for(auto &obj : values)
+    {
+      auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+      auto as_expr = value->to_interval();
+      if(is_le(as_expr.get_lower(), lower_bound))
+        widened_ends.push_back(as_expr);
+    }
+  }
+  // should extend upper bound?
+  if(lhs.get_upper() < rhs.get_upper())
+  {
+    auto widened_upper_bound = constant_interval_exprt(
+      upper_bound, simplify_expr(plus_exprt(upper_bound, range), ns));
+    widened_ends.push_back(widened_upper_bound);
+    for(auto &obj : values)
+    {
+      auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+      auto as_expr = value->to_interval();
+      if(is_le(upper_bound, as_expr.get_upper()))
+        widened_ends.push_back(as_expr);
+    }
+  }
+
+  collapse_overlapping_intervals(widened_ends);
+  return collapse_values_in_intervals(values, widened_ends);
 }

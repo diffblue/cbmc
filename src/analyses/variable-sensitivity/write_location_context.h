@@ -99,8 +99,9 @@ public:
 protected:
   CLONE
 
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const widen_modet &widen_mode) const override;
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 
@@ -122,10 +123,9 @@ protected:
   virtual abstract_objectt::locationst get_last_written_locations() const;
 
 private:
-  using combine_fn = abstract_object_pointert (*)(
+  using combine_fn = std::function<abstract_objectt::combine_result(
     const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2,
-    bool &out_modifications);
+    const abstract_object_pointert &op2)>;
   using write_location_context_ptrt =
     std::shared_ptr<const write_location_contextt>;
 

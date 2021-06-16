@@ -71,20 +71,11 @@ protected:
   CLONE
 
   /// \copydoc abstract_object::merge
-  abstract_object_pointert
-  merge(const abstract_object_pointert &other) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &other,
+    const widen_modet &widen_mode) const override;
 
 private:
-  /// Update the set of stored values to \p new_values. Build a new abstract
-  ///   object of the right type if necessary.
-  /// \param new_values: potentially new set of values
-  /// \param environment: the abstract environment
-  /// \return the abstract object representing \p new_values (either 'this' or
-  ///   something new)
-  abstract_object_pointert resolve_new_values(
-    const abstract_object_sett &new_values,
-    const abstract_environmentt &environment) const;
-
   /// Update the set of stored values to \p new_values. Build a new abstract
   ///   object of the right type if necessary.
   /// \param new_values: potentially new set of values

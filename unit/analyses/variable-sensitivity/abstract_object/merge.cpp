@@ -27,12 +27,11 @@ SCENARIO(
       abstract_object_pointert op1 = make_top_object();
       abstract_object_pointert op2 = make_top_object();
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -41,12 +40,11 @@ SCENARIO(
       abstract_object_pointert op1 = make_top_object();
       abstract_object_pointert op2 = make_bottom_object();
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -55,12 +53,11 @@ SCENARIO(
       abstract_object_pointert op1 = make_bottom_object();
       abstract_object_pointert op2 = make_top_object();
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is modified TOP")
       {
-        EXPECT_MODIFIED(result, modified);
+        EXPECT_MODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -69,12 +66,11 @@ SCENARIO(
       abstract_object_pointert op1 = make_bottom_object();
       abstract_object_pointert op2 = make_bottom_object();
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("result is unmodified BOTTOM")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_BOTTOM(result);
       }
     }
@@ -101,12 +97,11 @@ SCENARIO(
       auto top1 = make_top_object();
       auto op2 = make_constant(val1, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(top1, op2, modified);
+      auto result = abstract_objectt::merge(top1, op2, widen_modet::no);
 
       THEN("the result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -115,12 +110,11 @@ SCENARIO(
       auto top1 = make_top_object();
       auto top2 = make_top_constant();
 
-      bool modified;
-      auto result = abstract_objectt::merge(top1, top2, modified);
+      auto result = abstract_objectt::merge(top1, top2, widen_modet::no);
 
       THEN("the result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -129,12 +123,11 @@ SCENARIO(
       auto top1 = make_top_object();
       auto bottom2 = make_bottom_constant();
 
-      bool modified;
-      auto result = abstract_objectt::merge(top1, bottom2, modified);
+      auto result = abstract_objectt::merge(top1, bottom2, widen_modet::no);
 
       THEN("the result is unmodified TOP")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -143,12 +136,11 @@ SCENARIO(
       auto op1 = make_bottom_object();
       auto op2 = make_constant(val1, environment, ns);
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("the result is modified TOP")
       {
-        EXPECT_MODIFIED(result, modified);
+        EXPECT_MODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -157,12 +149,11 @@ SCENARIO(
       auto op1 = make_bottom_object();
       auto top2 = make_top_constant();
 
-      bool modified;
-      auto result = abstract_objectt::merge(op1, top2, modified);
+      auto result = abstract_objectt::merge(op1, top2, widen_modet::no);
 
       THEN("the result is modified TOP")
       {
-        EXPECT_MODIFIED(result, modified);
+        EXPECT_MODIFIED(result);
         EXPECT_TOP(result);
       }
     }
@@ -171,12 +162,11 @@ SCENARIO(
       auto bottom1 = make_bottom_object();
       auto bottom2 = make_bottom_constant();
 
-      bool modified;
-      auto result = abstract_objectt::merge(bottom1, bottom2, modified);
+      auto result = abstract_objectt::merge(bottom1, bottom2, widen_modet::no);
 
       THEN("result is unmodified BOTTOM")
       {
-        EXPECT_UNMODIFIED(result, modified);
+        EXPECT_UNMODIFIED(result);
         EXPECT_BOTTOM(result);
       }
     }

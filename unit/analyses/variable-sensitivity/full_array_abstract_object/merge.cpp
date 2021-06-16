@@ -107,25 +107,23 @@ SCENARIO(
 
     array_utilt util(enviroment, ns);
 
-    abstract_object_pointert result;
-    bool modified = false;
-
     WHEN("Merging two constant array AOs with the same array")
     {
       auto op1 = util.build_array(val1);
       auto op2 = util.build_array(val1);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("The original constant array AO should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
@@ -133,7 +131,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN("Merging two constant array AOs with different value arrays")
@@ -141,10 +139,11 @@ SCENARIO(
       auto op1 = util.build_array(val1);
       auto op2 = util.build_array(val2);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
 
       THEN(
         "A new constant array AO whose first value is the same and "
@@ -154,7 +153,7 @@ SCENARIO(
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE(modified);
+        REQUIRE(result.modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
@@ -162,7 +161,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
         // Since it has modified, we definitely shouldn't be reusing the pointer
-        REQUIRE_FALSE(result == op1);
+        REQUIRE_FALSE(result.object == op1);
       }
     }
     WHEN(
@@ -172,17 +171,18 @@ SCENARIO(
       auto op1 = util.build_array(val1);
       auto op2 = util.build_top_array(array_type);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("A new constant array AO set to top should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE(modified);
+        REQUIRE(result.modified);
         REQUIRE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == nil_exprt());
@@ -190,7 +190,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
         // We can't reuse the abstract object as the value has changed
-        REQUIRE(result != op1);
+        REQUIRE(result.object != op1);
       }
     }
     WHEN(
@@ -200,17 +200,18 @@ SCENARIO(
       auto op1 = util.build_array(val1);
       auto op2 = util.build_bottom_array(array_type);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("The original const AO should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
@@ -218,7 +219,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN(
@@ -228,17 +229,18 @@ SCENARIO(
       auto op1 = util.build_top_array(array_type);
       auto op2 = util.build_array(val1);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("The original constant array AO should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == nil_exprt());
@@ -246,7 +248,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN(
@@ -256,17 +258,18 @@ SCENARIO(
       auto op1 = util.build_top_array(array_type);
       auto op2 = util.build_top_array(array_type);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("The original constant array AO should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == nil_exprt());
@@ -274,7 +277,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN(
@@ -284,17 +287,18 @@ SCENARIO(
       auto op1 = util.build_top_array(array_type);
       auto op2 = util.build_bottom_array(array_type);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("The original constant array AO should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == nil_exprt());
@@ -302,7 +306,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN(
@@ -312,17 +316,18 @@ SCENARIO(
       auto op1 = util.build_bottom_array(array_type);
       auto op2 = util.build_array(val1);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("A new AO should be returned with op2s valuee")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE(modified);
+        REQUIRE(result.modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
@@ -330,7 +335,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
-        REQUIRE(result != op1);
+        REQUIRE(result.object != op1);
       }
     }
     WHEN(
@@ -340,17 +345,18 @@ SCENARIO(
       auto op1 = util.build_bottom_array(array_type);
       auto op2 = util.build_top_array(array_type);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("A new constant array AO should be returned set to top ")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE(modified);
+        REQUIRE(result.modified);
         REQUIRE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == nil_exprt());
@@ -358,7 +364,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == nil_exprt());
 
         // Is optimal
-        REQUIRE(result != op1);
+        REQUIRE(result.object != op1);
       }
     }
     WHEN(
@@ -368,22 +374,23 @@ SCENARIO(
       auto op1 = util.build_bottom_array(array_type);
       auto op2 = util.build_bottom_array(array_type);
 
-      result = abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("The original bottom AO should be returned")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE(cast_result->is_bottom());
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN(
@@ -394,12 +401,11 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), true, false);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
 
       THEN("We should get a new AO of the same type but set to top")
       {
@@ -407,12 +413,12 @@ SCENARIO(
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE(modified);
+        REQUIRE(result.modified);
         REQUIRE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
 
         // Since it has modified, we definitely shouldn't be reusing the pointer
-        REQUIRE_FALSE(result == op1);
+        REQUIRE_FALSE(result.object == op1);
       }
     }
     WHEN(
@@ -423,19 +429,18 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), false, true);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       const auto &cast_result =
-        std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+        std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+          result.object);
       THEN("We should get the same constant array AO back")
       {
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
         // Correctness of merge
-        REQUIRE_FALSE(modified);
+        REQUIRE_FALSE(result.modified);
         REQUIRE_FALSE(cast_result->is_top());
         REQUIRE_FALSE(cast_result->is_bottom());
         REQUIRE(util.read_index(cast_result, i0) == val1.operands()[0]);
@@ -443,7 +448,7 @@ SCENARIO(
         REQUIRE(util.read_index(cast_result, i2) == val1.operands()[2]);
 
         // Is optimal
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN(
@@ -454,23 +459,22 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), true, false);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("We should get the same abstract object back")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // Is optimal
-        REQUIRE(op1 == result);
+        REQUIRE(result.object == op1);
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+            result.object);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
       }
@@ -483,22 +487,21 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), false, true);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("Should get the same abstract object back")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // Is optimal
-        REQUIRE(op1 == result);
+        REQUIRE(result.object == op1);
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+            result.object);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
       }
@@ -511,21 +514,20 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), true, false);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("Return a new top abstract object of the same type")
       {
         // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // We don't optimize for returning the second parameter if we can
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+            result.object);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
       }
@@ -536,22 +538,21 @@ SCENARIO(
       const auto &op2 =
         std::make_shared<abstract_objectt>(val1.type(), false, true);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("Return the original abstract object")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE_FALSE(result.object->is_top());
+        REQUIRE(result.object->is_bottom());
 
         // Optimization check
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
 
         // Is type still correct
         const auto &cast_result =
-          std::dynamic_pointer_cast<const full_array_abstract_objectt>(result);
+          std::dynamic_pointer_cast<const full_array_abstract_objectt>(
+            result.object);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
       }
@@ -562,19 +563,16 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), true, false);
       const auto &op2 = util.build_array(val1);
 
-      bool modified;
-
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // Is optimal
-        REQUIRE(op1 == result);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN("Merging AO set to top with a constant array AO set to top")
@@ -583,18 +581,16 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), true, false);
       const auto &op2 = util.build_top_array(array_type);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // Is optimal
-        REQUIRE(op1 == result);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN("Merging AO set to top with a constant array AO set to bottom")
@@ -603,18 +599,16 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), true, false);
       const auto &op2 = util.build_bottom_array(array_type);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // Is optimal
-        REQUIRE(op1 == result);
+        REQUIRE(result.object == op1);
       }
     }
     WHEN("Merging AO set to bottom with a constant array AO with a value")
@@ -623,17 +617,16 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), false, true);
       const auto &op2 = util.build_array(val1);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("The a new top AO should be returned")
       {
         // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(typeid(result.get()) == typeid(const abstract_objectt *));
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE(result.modified);
+        REQUIRE(
+          typeid(result.object.get()) == typeid(const abstract_objectt *));
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
       }
 
       // We don't optimize for returning the second parameter if we can
@@ -644,16 +637,14 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), false, true);
       const auto &op2 = util.build_top_array(array_type);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("The a new top AO should be returned")
       {
         // Simple correctness of merge
-        REQUIRE(modified);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
+        REQUIRE(result.modified);
+        REQUIRE(result.object->is_top());
+        REQUIRE_FALSE(result.object->is_bottom());
 
         // We don't optimize for returning the second parameter if we can
       }
@@ -664,18 +655,16 @@ SCENARIO(
         std::make_shared<abstract_objectt>(val1.type(), false, true);
       const auto &op2 = util.build_bottom_array(array_type);
 
-      bool modified;
-      abstract_object_pointert result =
-        abstract_objectt::merge(op1, op2, modified);
+      auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
       THEN("The original AO should be returned")
       {
         // Simple correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(result->is_top());
-        REQUIRE(result->is_bottom());
+        REQUIRE_FALSE(result.modified);
+        REQUIRE_FALSE(result.object->is_top());
+        REQUIRE(result.object->is_bottom());
 
-        REQUIRE(result == op1);
+        REQUIRE(result.object == op1);
       }
     }
   }

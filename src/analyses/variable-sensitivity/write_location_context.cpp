@@ -102,20 +102,37 @@ abstract_object_pointert write_location_contextt::write(
  * object with a given abstract_object
  *
  * \param other the abstract object to merge with
+ * \param widen_mode: Indicates if this is a widening merge
  *
  * \return the result of the merge, or 'this' if the merge would not change
  * the current abstract object
  */
-abstract_object_pointert
-write_location_contextt::merge(const abstract_object_pointert &other) const
+abstract_object_pointert write_location_contextt::merge(
+  const abstract_object_pointert &other,
+  const widen_modet &widen_mode) const
 {
   auto cast_other =
     std::dynamic_pointer_cast<const write_location_contextt>(other);
 
   if(cast_other)
-    return combine(cast_other, abstract_objectt::merge);
+  {
+    auto merge_fn = [&widen_mode](
+                      const abstract_object_pointert &op1,
+                      const abstract_object_pointert &op2) {
+      return abstract_objectt::merge(op1, op2, widen_mode);
+    };
+    return combine(cast_other, merge_fn);
+  }
 
-  return abstract_objectt::merge(other);
+  return abstract_objectt::merge(other, widen_mode);
+}
+
+// need wrapper function here to disambiguate meet overload
+abstract_objectt::combine_result object_meet(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2)
+{
+  return abstract_objectt::meet(op1, op2);
 }
 
 abstract_object_pointert
@@ -125,7 +142,7 @@ write_location_contextt::meet(const abstract_object_pointert &other) const
     std::dynamic_pointer_cast<const write_location_contextt>(other);
 
   if(cast_other)
-    return combine(cast_other, abstract_objectt::meet);
+    return combine(cast_other, object_meet);
 
   return abstract_objectt::meet(other);
 }
@@ -134,10 +151,7 @@ abstract_object_pointert write_location_contextt::combine(
   const write_location_context_ptrt &other,
   combine_fn fn) const
 {
-  bool child_modified = false;
-
-  auto merged_child =
-    fn(child_abstract_object, other->child_abstract_object, child_modified);
+  auto combined_child = fn(child_abstract_object, other->child_abstract_object);
 
   abstract_objectt::locationst location_union =
     get_location_union(other->get_last_written_locations());
@@ -145,13 +159,13 @@ abstract_object_pointert write_location_contextt::combine(
   bool merge_locations =
     location_union.size() > get_last_written_locations().size();
 
-  if(child_modified || merge_locations)
+  if(combined_child.modified || merge_locations)
   {
     const auto &result =
       std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
-    if(child_modified)
+    if(combined_child.modified)
     {
-      result->set_child(merged_child);
+      result->set_child(combined_child.object);
     }
     if(merge_locations)
     {

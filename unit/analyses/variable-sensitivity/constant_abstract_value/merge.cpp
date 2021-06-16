@@ -16,10 +16,9 @@
 static merge_result<const constant_abstract_valuet>
 merge(abstract_object_pointert op1, abstract_object_pointert op2)
 {
-  bool modified;
-  auto result = abstract_objectt::merge(op1, op2, modified);
+  auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 
-  return {modified, as_constant(result)};
+  return {result.modified, as_constant(result.object)};
 }
 
 SCENARIO(

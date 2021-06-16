@@ -44,6 +44,12 @@ public:
       insert(value);
   }
 
+  void push_back(const abstract_object_pointert &v)
+  {
+    // alias for insert so we can use back_inserter
+    values.insert(v);
+  }
+
   abstract_object_pointert first() const
   {
     return *begin();

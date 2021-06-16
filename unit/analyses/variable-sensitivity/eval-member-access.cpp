@@ -1,3 +1,10 @@
+/*******************************************************************\
+
+ Module: Array Access Unit Tests
+
+ Author: Jez Higgins
+
+\*******************************************************************/
 #include <testing-utils/use_catch.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
@@ -110,8 +117,8 @@ exprt fetch_element(
   if(object->is_top()) // oh!
     return object->to_constant();
 
-  const auto unwrapped = object->unwrap_context();
-  auto value = std::dynamic_pointer_cast<const abstract_objectt>(unwrapped);
+  auto value =
+    std::dynamic_pointer_cast<const abstract_objectt>(object->unwrap_context());
   REQUIRE(value);
   return value->to_constant();
 }

@@ -119,10 +119,12 @@ protected:
   /// constant pointer merge
   ///
   /// \param op1: the pointer being merged
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns the result of the merge.
-  abstract_object_pointert
-  merge(const abstract_object_pointert &op1) const override;
+  abstract_object_pointert merge(
+    const abstract_object_pointert &op1,
+    const widen_modet &widen_mode) const override;
 
   CLONE
 
@@ -131,12 +133,14 @@ private:
   /// value, we merge, otherwise we set to top.
   ///
   /// \param other: the pointer being merged
+  /// \param widen_mode: Indicates if this is a widening merge
   ///
   /// \return Returns a new abstract object that is the result of the merge
   ///         unless the merge is the same as this abstract object, in which
   ///         case it returns this.
   abstract_object_pointert merge_constant_pointers(
-    const constant_pointer_abstract_pointert &other) const;
+    const constant_pointer_abstract_pointert &other,
+    const widen_modet &widen_mode) const;
 
   write_stackt value_stack;
 };

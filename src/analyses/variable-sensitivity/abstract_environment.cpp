@@ -312,38 +312,33 @@ abstract_object_pointert abstract_environmentt::add_object_context(
   return object_factory->wrap_with_context(abstract_object);
 }
 
-bool abstract_environmentt::merge(const abstract_environmentt &env)
+bool abstract_environmentt::merge(
+  const abstract_environmentt &env,
+  widen_modet widen_mode)
 {
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present
-
   if(bottom)
   {
     *this = env;
     return !env.bottom;
   }
-  else if(env.bottom)
-  {
-    return false;
-  }
-  else
-  {
-    // For each element in the intersection of map and env.map merge
-    // If the result of the merge is top, remove from the map
-    bool modified = false;
-    decltype(env.map)::delta_viewt delta_view;
-    env.map.get_delta_view(map, delta_view);
-    for(const auto &entry : delta_view)
-    {
-      bool object_modified = false;
-      abstract_object_pointert new_object = abstract_objectt::merge(
-        entry.get_other_map_value(), entry.m, object_modified);
-      modified |= object_modified;
-      map.replace(entry.k, new_object);
-    }
 
-    return modified;
+  if(env.bottom)
+    return false;
+
+  // For each element in the intersection of map and env.map merge
+  // If the result of the merge is top, remove from the map
+  bool modified = false;
+  for(const auto &entry : env.map.get_delta_view(map))
+  {
+    auto merge_result =
+      abstract_objectt::merge(entry.get_other_map_value(), entry.m, widen_mode);
+    modified |= merge_result.modified;
+    map.replace(entry.k, merge_result.object);
   }
+
+  return modified;
 }
 
 void abstract_environmentt::havoc(const std::string &havoc_string)
@@ -508,12 +503,8 @@ std::vector<abstract_object_pointert> eval_operands(
 ///////////
 abstract_value_pointert as_value(const abstract_object_pointert &obj)
 {
-  auto context_value =
-    std::dynamic_pointer_cast<const context_abstract_objectt>(obj);
-
-  return context_value
-           ? as_value(context_value->unwrap_context())
-           : std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+  return std::dynamic_pointer_cast<const abstract_value_objectt>(
+    obj->unwrap_context());
 }
 
 bool is_value(const abstract_object_pointert &obj)

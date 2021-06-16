@@ -25,6 +25,12 @@ class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =
   std::shared_ptr<variable_sensitivity_object_factoryt>;
 
+enum class widen_modet
+{
+  no,
+  could_widen
+};
+
 class abstract_environmentt
 {
 public:
@@ -180,9 +186,10 @@ public:
   /// Computes the join between "this" and "b"
   ///
   /// \param env: the other environment
+  /// \param widen_mode: indicates if this is a widening merge
   ///
   /// \return A Boolean, true when the merge has changed something
-  virtual bool merge(const abstract_environmentt &env);
+  virtual bool merge(const abstract_environmentt &env, widen_modet widen_mode);
 
   /// This should be used as a default case / everything else has failed
   /// The string is so that I can easily find and diagnose cases where this
