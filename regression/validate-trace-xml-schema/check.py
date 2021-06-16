@@ -22,6 +22,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['xml-interface1', 'test.desc'],
     ['xml-interface1', 'test_wrong_flag.desc'],
     # these want --show-goto-functions instead of producing a trace
+    ['integer-assignments1', 'integer-typecheck.desc'],
     ['destructors', 'compound_literal.desc'],
     ['destructors', 'enter_lexical_block.desc'],
     ['reachability-slice-interproc2', 'test.desc'],
