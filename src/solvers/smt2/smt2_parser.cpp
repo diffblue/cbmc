@@ -208,16 +208,22 @@ exprt smt2_parsert::let_expression()
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error("expected ')' at end of bindings");
 
-  // save the renaming map
-  renaming_mapt old_renaming_map=renaming_map;
+  // we may hide identifiers in outer scopes
+  std::vector<std::pair<irep_idt, idt>> saved_ids;
 
-  // go forwards, add to id_map, renaming if need be
+  // add the bindings to the id_map
   for(auto &b : bindings)
   {
-    // get a fresh id for it
-    b.first = add_fresh_id(b.first, idt::BINDING, b.second);
+    auto insert_result = id_map.insert({b.first, idt{idt::BINDING, b.second}});
+    if(!insert_result.second) // already there
+    {
+      auto &id_entry = *insert_result.first;
+      saved_ids.emplace_back(id_entry.first, std::move(id_entry.second));
+      id_entry.second = idt{idt::BINDING, b.second};
+    }
   }
 
+  // now parse, with bindings in place
   exprt where = expression();
 
   if(next_token() != smt2_tokenizert::CLOSE)
@@ -232,11 +238,13 @@ exprt smt2_parsert::let_expression()
     values.push_back(b.second);
   }
 
-  // we keep these in the id_map in order to retain globally
-  // unique identifiers
+  // delete the bindings from the id_map
+  for(const auto &binding : bindings)
+    id_map.erase(binding.first);
 
-  // restore renamings
-  renaming_map=old_renaming_map;
+  // restore any previous ids
+  for(auto &saved_id : saved_ids)
+    id_map.insert(std::move(saved_id));
 
   return let_exprt(variables, values, where);
 }
