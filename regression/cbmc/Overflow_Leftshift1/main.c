@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 int main()
 {
   unsigned char x;
@@ -22,6 +24,10 @@ int main()
 
   // not an overflow in ANSI-C, but undefined in C99
   s = 1 << (sizeof(int) * 8 - 1);
+
+  // overflow in an expression where operand and distance types are different
+  uint32_t u32;
+  int64_t i64 = ((int64_t)u32) << 32;
 
   return 0;
 }

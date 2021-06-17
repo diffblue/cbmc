@@ -777,8 +777,10 @@ void goto_checkt::integer_overflow_check(
       if(distance_type.id() == ID_unsignedbv)
         neg_dist_shift = false_exprt();
       else
-        neg_dist_shift =
-          binary_relation_exprt(op, ID_lt, from_integer(0, distance_type));
+      {
+        neg_dist_shift = binary_relation_exprt(
+          distance, ID_lt, from_integer(0, distance_type));
+      }
 
       // shifting a non-zero value by more than its width is undefined;
       // yet this isn't an overflow
