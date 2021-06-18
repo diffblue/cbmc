@@ -552,6 +552,29 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   return false;
 }
 
+binding_exprt::variablest boolbvt::fresh_binding(const binding_exprt &binding)
+{
+  // to ensure freshness of the new identifiers
+  scope_counter++;
+
+  binding_exprt::variablest result;
+  result.reserve(binding.variables().size());
+
+  for(const auto &binding : binding.variables())
+  {
+    const auto &old_identifier = binding.get_identifier();
+
+    // produce a new identifier
+    const irep_idt new_identifier =
+      "boolbvt::scope::" + std::to_string(scope_counter) +
+      "::" + id2string(old_identifier);
+
+    result.emplace_back(new_identifier, binding.type());
+  }
+
+  return result;
+}
+
 void boolbvt::print_assignment(std::ostream &out) const
 {
   arrayst::print_assignment(out);

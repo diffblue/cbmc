@@ -274,6 +274,9 @@ protected:
 
   // scopes
   std::size_t scope_counter = 0;
+
+  /// create new, unique variables for the given binding
+  binding_exprt::variablest fresh_binding(const binding_exprt &);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BOOLBV_H
