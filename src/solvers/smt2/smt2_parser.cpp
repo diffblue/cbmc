@@ -254,7 +254,7 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::OPEN)
     throw error() << "expected bindings after " << id;
 
-  std::vector<symbol_exprt> bindings;
+  binding_exprt::variablest bindings;
 
   while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
   {
@@ -276,18 +276,23 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error("expected ')' at end of bindings");
 
-  // save the renaming map
-  renaming_mapt old_renaming_map = renaming_map;
+  // we may hide identifiers in outer scopes
+  std::vector<std::pair<irep_idt, idt>> saved_ids;
 
-  // go forwards, add to id_map, renaming if need be
+  // add the bindings to the id_map
   for(auto &b : bindings)
   {
-    const irep_idt id =
-      add_fresh_id(b.get_identifier(), idt::BINDING, exprt(ID_nil, b.type()));
-
-    b.set_identifier(id);
+    auto insert_result =
+      id_map.insert({b.get_identifier(), idt{idt::BINDING, b.type()}});
+    if(!insert_result.second) // already there
+    {
+      auto &id_entry = *insert_result.first;
+      saved_ids.emplace_back(id_entry.first, std::move(id_entry.second));
+      id_entry.second = idt{idt::BINDING, b.type()};
+    }
   }
 
+  // now parse, with bindings in place
   exprt expr=expression();
 
   if(next_token() != smt2_tokenizert::CLOSE)
@@ -299,8 +304,9 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   for(const auto &b : bindings)
     id_map.erase(b.get_identifier());
 
-  // restore renaming map
-  renaming_map = old_renaming_map;
+  // restore any previous ids
+  for(auto &saved_id : saved_ids)
+    id_map.insert(std::move(saved_id));
 
   // go backwards, build quantified expression
   for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)

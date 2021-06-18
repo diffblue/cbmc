@@ -42,6 +42,11 @@ public:
     {
     }
 
+    idt(kindt _kind, typet __type)
+      : kind(_kind), type(std::move(__type)), definition(nil_exprt())
+    {
+    }
+
     kindt kind;
     typet type;
     exprt definition;
@@ -88,7 +93,7 @@ protected:
   std::size_t parenthesis_level;
   smt2_tokenizert::tokent next_token();
 
-  // for let/quantifier bindings, function parameters
+  // for function parameters
   using renaming_mapt=std::map<irep_idt, irep_idt>;
   renaming_mapt renaming_map;
   using renaming_counterst=std::map<irep_idt, unsigned>;
