@@ -40,35 +40,30 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   for(auto &value : values)
     converted_values.push_back(convert_bv(value));
 
-  scope_counter++;
-
-  // for renaming the bound symbols
-  replace_symbolt replace_symbol;
+  // get fresh bound symbols
+  auto fresh_variables = fresh_binding(expr.binding());
 
   // Now assign
-  for(const auto &binding : make_range(variables).zip(converted_values))
+  for(const auto &binding : make_range(fresh_variables).zip(converted_values))
   {
     bool is_boolean = binding.first.type().id() == ID_bool;
-    const auto &old_identifier = binding.first.get_identifier();
-
-    // produce a new identifier
-    const irep_idt new_identifier =
-      "boolbvt::scope::" + std::to_string(scope_counter) +
-      "::" + id2string(old_identifier);
+    const auto &identifier = binding.first.get_identifier();
 
     // make the symbol visible
     if(is_boolean)
     {
       DATA_INVARIANT(binding.second.size() == 1, "boolean values have one bit");
-      symbols[new_identifier] = binding.second[0];
+      symbols[identifier] = binding.second[0];
     }
     else
-      map.set_literals(new_identifier, binding.first.type(), binding.second);
-
-    // remember the renaming
-    replace_symbol.insert(
-      binding.first, symbol_exprt(new_identifier, binding.first.type()));
+      map.set_literals(identifier, binding.first.type(), binding.second);
   }
+
+  // for renaming the bound symbols
+  replace_symbolt replace_symbol;
+
+  for(const auto &pair : make_range(variables).zip(fresh_variables))
+    replace_symbol.insert(pair.first, pair.second);
 
   // rename the bound symbols in 'where'
   exprt where_renamed = expr.where();
@@ -78,14 +73,13 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   bvt result_bv = convert_bv(where_renamed);
 
   // the mapping can now be deleted
-  for(const auto &entry : replace_symbol.get_expr_map())
+  for(const auto &entry : fresh_variables)
   {
-    const auto &new_symbol = to_symbol_expr(entry.second);
-    const auto &type = new_symbol.type();
+    const auto &type = entry.type();
     if(type.id() == ID_bool)
-      symbols.erase(new_symbol.get_identifier());
+      symbols.erase(entry.get_identifier());
     else
-      map.erase_literals(new_symbol.get_identifier(), type);
+      map.erase_literals(entry.get_identifier(), type);
   }
 
   return result_bv;
