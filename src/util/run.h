@@ -8,7 +8,6 @@ Date: August 2012
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_RUN_H
 #define CPROVER_UTIL_RUN_H
 
@@ -47,5 +46,10 @@ int run(
   const std::string &std_input,
   std::ostream &std_output,
   const std::string &std_error);
+
+/// This quotes Windows argument strings correctly
+/// \p src is the string to be quoted
+/// \return correctly quoted string
+std::wstring quote_windows_arg(const std::wstring &src);
 
 #endif // CPROVER_UTIL_RUN_H

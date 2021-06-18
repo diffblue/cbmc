@@ -27,16 +27,16 @@ Date: August 2012
 // clang-format on
 #else
 
-#include <cstring>
-#include <cerrno>
-#include <cstdio>
-#include <cstdlib>
+#  include <cstring>
+#  include <cerrno>
+#  include <cstdio>
+#  include <cstdlib>
 
-#include <fcntl.h>
-#include <signal.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#  include <fcntl.h>
+#  include <signal.h>
+#  include <sys/stat.h>
+#  include <sys/wait.h>
+#  include <unistd.h>
 
 #endif
 
@@ -51,9 +51,9 @@ int run(const std::string &what, const std::vector<std::string> &argv)
 }
 
 #ifdef _WIN32
-#define STDIN_FILENO 0
-#define STDOUT_FILENO 1
-#define STDERR_FILENO 2
+#  define STDIN_FILENO 0
+#  define STDOUT_FILENO 1
+#  define STDERR_FILENO 2
 using fdt = HANDLE;
 #else
 using fdt = int;
@@ -360,32 +360,32 @@ int run(
   /* now create new process */
   pid_t childpid = fork();
 
-  if(childpid>=0) /* fork succeeded */
+  if(childpid >= 0) /* fork succeeded */
   {
-    if(childpid==0) /* fork() returns 0 to the child process */
+    if(childpid == 0) /* fork() returns 0 to the child process */
     {
       // resume signals
       remove_signal_catcher();
       sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
-      std::vector<char *> _argv(argv.size()+1);
-      for(std::size_t i=0; i<argv.size(); i++)
-        _argv[i]=strdup(argv[i].c_str());
+      std::vector<char *> _argv(argv.size() + 1);
+      for(std::size_t i = 0; i < argv.size(); i++)
+        _argv[i] = strdup(argv[i].c_str());
 
-      _argv[argv.size()]=nullptr;
+      _argv[argv.size()] = nullptr;
 
-      if(stdin_fd!=STDIN_FILENO)
+      if(stdin_fd != STDIN_FILENO)
         dup2(stdin_fd, STDIN_FILENO);
-      if(stdout_fd!=STDOUT_FILENO)
+      if(stdout_fd != STDOUT_FILENO)
         dup2(stdout_fd, STDOUT_FILENO);
       if(stderr_fd != STDERR_FILENO)
         dup2(stderr_fd, STDERR_FILENO);
 
-      errno=0;
+      errno = 0;
       execvp(what.c_str(), _argv.data());
 
       /* usually no return */
-      perror(std::string("execvp "+what+" failed").c_str());
+      perror(std::string("execvp " + what + " failed").c_str());
       exit(1);
     }
     else /* fork() returns new pid to the parent process */
@@ -396,21 +396,21 @@ int run(
       // resume signals
       sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
-      int status;     /* parent process: child's exit status */
+      int status; /* parent process: child's exit status */
 
       /* wait for child to exit, and store its status */
-      while(waitpid(childpid, &status, 0)==-1)
+      while(waitpid(childpid, &status, 0) == -1)
       {
-        if(errno==EINTR)
+        if(errno == EINTR)
           continue; // try again
         else
         {
           unregister_child();
 
           perror("Waiting for child process failed");
-          if(stdin_fd!=STDIN_FILENO)
+          if(stdin_fd != STDIN_FILENO)
             close(stdin_fd);
-          if(stdout_fd!=STDOUT_FILENO)
+          if(stdout_fd != STDOUT_FILENO)
             close(stdout_fd);
           if(stderr_fd != STDERR_FILENO)
             close(stderr_fd);
@@ -420,9 +420,9 @@ int run(
 
       unregister_child();
 
-      if(stdin_fd!=STDIN_FILENO)
+      if(stdin_fd != STDIN_FILENO)
         close(stdin_fd);
-      if(stdout_fd!=STDOUT_FILENO)
+      if(stdout_fd != STDOUT_FILENO)
         close(stdout_fd);
       if(stderr_fd != STDERR_FILENO)
         close(stderr_fd);
@@ -435,9 +435,9 @@ int run(
     // resume signals
     sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
-    if(stdin_fd!=STDIN_FILENO)
+    if(stdin_fd != STDIN_FILENO)
       close(stdin_fd);
-    if(stdout_fd!=STDOUT_FILENO)
+    if(stdout_fd != STDOUT_FILENO)
       close(stdout_fd);
     if(stderr_fd != STDERR_FILENO)
       close(stderr_fd);
@@ -450,18 +450,15 @@ int run(
 /// quote a string for bash and CMD
 std::string shell_quote(const std::string &src)
 {
-  #ifdef _WIN32
+#ifdef _WIN32
   // first check if quoting is needed at all
 
-  if(src.find(' ')==std::string::npos &&
-     src.find('"')==std::string::npos &&
-     src.find('&')==std::string::npos &&
-     src.find('|')==std::string::npos &&
-     src.find('(')==std::string::npos &&
-     src.find(')')==std::string::npos &&
-     src.find('<')==std::string::npos &&
-     src.find('>')==std::string::npos &&
-     src.find('^')==std::string::npos)
+  if(
+    src.find(' ') == std::string::npos && src.find('"') == std::string::npos &&
+    src.find('&') == std::string::npos && src.find('|') == std::string::npos &&
+    src.find('(') == std::string::npos && src.find(')') == std::string::npos &&
+    src.find('<') == std::string::npos && src.find('>') == std::string::npos &&
+    src.find('^') == std::string::npos)
   {
     // seems fine -- return as is
     return src;
@@ -469,35 +466,30 @@ std::string shell_quote(const std::string &src)
 
   std::string result;
 
-  result+='"';
+  result += '"';
 
   for(const char ch : src)
   {
-    if(ch=='"')
-      result+='"'; // quotes are doubled
-    result+=ch;
+    if(ch == '"')
+      result += '"'; // quotes are doubled
+    result += ch;
   }
 
-  result+='"';
+  result += '"';
 
   return result;
 
-  #else
+#else
 
   // first check if quoting is needed at all
 
-  if(src.find(' ')==std::string::npos &&
-     src.find('"')==std::string::npos &&
-     src.find('*')==std::string::npos &&
-     src.find('$')==std::string::npos &&
-     src.find('\\')==std::string::npos &&
-     src.find('?')==std::string::npos &&
-     src.find('&')==std::string::npos &&
-     src.find('|')==std::string::npos &&
-     src.find('>')==std::string::npos &&
-     src.find('<')==std::string::npos &&
-     src.find('^')==std::string::npos &&
-     src.find('\'')==std::string::npos)
+  if(
+    src.find(' ') == std::string::npos && src.find('"') == std::string::npos &&
+    src.find('*') == std::string::npos && src.find('$') == std::string::npos &&
+    src.find('\\') == std::string::npos && src.find('?') == std::string::npos &&
+    src.find('&') == std::string::npos && src.find('|') == std::string::npos &&
+    src.find('>') == std::string::npos && src.find('<') == std::string::npos &&
+    src.find('^') == std::string::npos && src.find('\'') == std::string::npos)
   {
     // seems fine -- return as is
     return src;
@@ -506,19 +498,19 @@ std::string shell_quote(const std::string &src)
   std::string result;
 
   // the single quotes catch everything but themselves!
-  result+='\'';
+  result += '\'';
 
   for(const char ch : src)
   {
-    if(ch=='\'')
-      result+="'\\''";
-    result+=ch;
+    if(ch == '\'')
+      result += "'\\''";
+    result += ch;
   }
 
-  result+='\'';
+  result += '\'';
 
   return result;
-  #endif
+#endif
 }
 
 int run(
@@ -528,7 +520,7 @@ int run(
   std::ostream &std_output,
   const std::string &std_error)
 {
-  #ifdef _WIN32
+#ifdef _WIN32
   temporary_filet tmpi("tmp.stdout", "");
 
   int result = run(what, argv, std_input, tmpi(), std_error);
@@ -539,7 +531,7 @@ int run(
     std_output << instream.rdbuf(); // copy
 
   return result;
-  #else
+#else
   std::string command;
 
   bool first = true;
@@ -562,17 +554,17 @@ int run(
   if(!std_error.empty())
     command += " 2> " + shell_quote(std_error);
 
-  FILE *stream=popen(command.c_str(), "r");
+  FILE *stream = popen(command.c_str(), "r");
 
-  if(stream!=nullptr)
+  if(stream != nullptr)
   {
     int ch;
-    while((ch=fgetc(stream))!=EOF)
+    while((ch = fgetc(stream)) != EOF)
       std_output << (unsigned char)ch;
 
     return pclose(stream);
   }
   else
     return -1;
-  #endif
+#endif
 }
