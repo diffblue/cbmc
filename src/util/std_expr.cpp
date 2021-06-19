@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "range.h"
 
+#include <map>
+
 bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
@@ -133,4 +135,137 @@ void let_exprt::validate(const exprt &expr, const validation_modet vm)
       binding.first.type() == binding.second.type(),
       "let bindings must be type consistent");
   }
+}
+
+static optionalt<exprt> substitute_symbols_rec(
+  const std::map<irep_idt, exprt> &substitutions,
+  exprt src)
+{
+  if(src.id() == ID_symbol)
+  {
+    auto s_it = substitutions.find(to_symbol_expr(src).get_identifier());
+    if(s_it == substitutions.end())
+      return {};
+    else
+      return s_it->second;
+  }
+  else if(
+    src.id() == ID_forall || src.id() == ID_exists || src.id() == ID_lambda)
+  {
+    const auto &binding_expr = to_binding_expr(src);
+
+    // bindings may be nested,
+    // which may hide some of our substitutions
+    auto new_substitutions = substitutions;
+    for(const auto &variable : binding_expr.variables())
+      new_substitutions.erase(variable.get_identifier());
+
+    auto op_result =
+      substitute_symbols_rec(new_substitutions, binding_expr.where());
+    if(op_result.has_value())
+      return binding_exprt(
+        src.id(),
+        binding_expr.variables(),
+        op_result.value(),
+        binding_expr.type());
+    else
+      return {};
+  }
+  else if(src.id() == ID_let)
+  {
+    auto new_let_expr = to_let_expr(src); // copy
+    const auto &binding_expr = to_let_expr(src).binding();
+
+    // bindings may be nested,
+    // which may hide some of our substitutions
+    auto new_substitutions = substitutions;
+    for(const auto &variable : binding_expr.variables())
+      new_substitutions.erase(variable.get_identifier());
+
+    bool op_changed = false;
+
+    for(auto &op : new_let_expr.values())
+    {
+      auto op_result = substitute_symbols_rec(new_substitutions, op);
+
+      if(op_result.has_value())
+      {
+        op = op_result.value();
+        op_changed = true;
+      }
+    }
+
+    auto op_result =
+      substitute_symbols_rec(new_substitutions, binding_expr.where());
+    if(op_result.has_value())
+    {
+      new_let_expr.where() = op_result.value();
+      op_changed = true;
+    }
+
+    if(op_changed)
+      return std::move(new_let_expr);
+    else
+      return {};
+  }
+
+  if(!src.has_operands())
+    return {};
+
+  bool op_changed = false;
+
+  for(auto &op : src.operands())
+  {
+    auto op_result = substitute_symbols_rec(substitutions, op);
+
+    if(op_result.has_value())
+    {
+      op = op_result.value();
+      op_changed = true;
+    }
+  }
+
+  if(op_changed)
+    return src;
+  else
+    return {};
+}
+
+exprt binding_exprt::instantiate(const operandst &values) const
+{
+  // number of values must match the number of bound variables
+  auto &variables = this->variables();
+  PRECONDITION(variables.size() == values.size());
+
+  std::map<symbol_exprt, exprt> value_map;
+
+  for(std::size_t i = 0; i < variables.size(); i++)
+  {
+    // types must match
+    PRECONDITION(variables[i].type() == values[i].type());
+    value_map[variables[i]] = values[i];
+  }
+
+  // build a substitution map
+  std::map<irep_idt, exprt> substitutions;
+
+  for(std::size_t i = 0; i < variables.size(); i++)
+    substitutions[variables[i].get_identifier()] = values[i];
+
+  // now recurse downwards and substitute in 'where'
+  auto substitute_result = substitute_symbols_rec(substitutions, where());
+
+  if(substitute_result.has_value())
+    return substitute_result.value();
+  else
+    return where(); // trivial case, variables not used
+}
+
+exprt binding_exprt::instantiate(const variablest &new_variables) const
+{
+  std::vector<exprt> values;
+  values.reserve(new_variables.size());
+  for(const auto &new_variable : new_variables)
+    values.push_back(new_variable);
+  return instantiate(values);
 }

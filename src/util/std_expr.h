@@ -2797,7 +2797,36 @@ public:
   {
     return op1();
   }
+
+  /// substitute free occurrences of the variables in where()
+  /// by the given values
+  exprt instantiate(const exprt::operandst &) const;
+
+  /// substitute free occurrences of the variables in where()
+  /// by a set of different symbols
+  exprt instantiate(const variablest &) const;
 };
+
+inline void validate_expr(const binding_exprt &binding_expr)
+{
+  validate_operands(
+    binding_expr, 2, "Binding expressions must have two operands");
+}
+
+/// \brief Cast an exprt to a \ref binding_exprt
+///
+/// \a expr must be known to be \ref binding_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref binding_exprt
+inline const binding_exprt &to_binding_expr(const exprt &expr)
+{
+  PRECONDITION(
+    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda);
+  const binding_exprt &ret = static_cast<const binding_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
 
 /// \brief A let expression
 class let_exprt : public binary_exprt
