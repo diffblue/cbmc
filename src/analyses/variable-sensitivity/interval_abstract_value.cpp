@@ -17,6 +17,7 @@
 #include "abstract_environment.h"
 #include "abstract_object_statistics.h"
 #include "interval_abstract_value.h"
+#include "widened_range.h"
 
 static index_range_implementation_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
@@ -346,81 +347,16 @@ void interval_abstract_valuet::output(
   }
 }
 
-exprt extend_lower_bound(
-  const exprt &lower_bound,
-  const exprt &range,
-  const namespacet &ns);
-exprt extend_upper_bound(
-  const exprt &upper_bound,
-  const exprt &range,
-  const namespacet &ns);
-
 abstract_object_pointert widening_merge(
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs)
 {
-  auto lower_bound =
-    constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
-  auto upper_bound =
-    constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
-
-  auto dummy_symbol_table = symbol_tablet{};
-  auto dummy_namespace = namespacet{dummy_symbol_table};
-
-  auto range = plus_exprt(
-    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
-
-  // should extend lower bound?
-  if(constant_interval_exprt::less_than(rhs.get_lower(), lhs.get_lower()))
-    lower_bound = extend_lower_bound(lower_bound, range, dummy_namespace);
-  // should extend upper bound?
-  if(constant_interval_exprt::less_than(lhs.get_upper(), rhs.get_upper()))
-    upper_bound = extend_upper_bound(upper_bound, range, dummy_namespace);
+  auto widened = widened_ranget(lhs, rhs);
 
   // new interval ...
-  auto new_interval = constant_interval_exprt(lower_bound, upper_bound);
+  auto new_interval =
+    constant_interval_exprt(widened.lower_bound, widened.upper_bound);
   return interval_abstract_valuet::make_interval(new_interval);
-}
-
-bool has_underflowed(const exprt &value)
-{
-  return constant_interval_exprt::greater_than(
-    value, from_integer(0, value.type()));
-}
-bool has_overflowed(const exprt &value)
-{
-  return constant_interval_exprt::less_than(
-    value, from_integer(0, value.type()));
-}
-
-exprt extend_lower_bound(
-  const exprt &lower_bound,
-  const exprt &range,
-  const namespacet &ns)
-{
-  auto new_lower_bound = simplify_expr(minus_exprt(lower_bound, range), ns);
-
-  if(
-    constant_interval_exprt::contains_extreme(new_lower_bound) ||
-    has_underflowed(new_lower_bound))
-    return min_exprt(lower_bound.type());
-
-  return new_lower_bound;
-}
-
-exprt extend_upper_bound(
-  const exprt &upper_bound,
-  const exprt &range,
-  const namespacet &ns)
-{
-  auto new_upper_bound = simplify_expr(plus_exprt(upper_bound, range), ns);
-
-  if(
-    constant_interval_exprt::contains_extreme(new_upper_bound) ||
-    has_overflowed(new_upper_bound))
-    return max_exprt(upper_bound.type());
-
-  return new_upper_bound;
 }
 
 abstract_object_pointert interval_abstract_valuet::merge_with_value(
