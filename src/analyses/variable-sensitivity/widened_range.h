@@ -20,38 +20,39 @@ public:
   widened_ranget(
     const constant_interval_exprt &lhs,
     const constant_interval_exprt &rhs)
-    : lower_extended(
+    : is_lower_widened(
         constant_interval_exprt::less_than(rhs.get_lower(), lhs.get_lower())),
-      upper_extended(
+      is_upper_widened(
         constant_interval_exprt::less_than(lhs.get_upper(), rhs.get_upper())),
-      ns_(symbol_tablet{}),
-      lower_(
+      lower_bound(
         constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower())),
-      upper_(
+      upper_bound(
         constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper())),
-      range_(
-        plus_exprt(minus_exprt(upper_, lower_), from_integer(1, lhs.type()))),
-      lower_bound(make_lower_bound()),
-      upper_bound(make_upper_bound())
+      ns_(symbol_tablet{}),
+      range_(plus_exprt(
+        minus_exprt(upper_bound, lower_bound),
+        from_integer(1, lhs.type()))),
+      widened_lower_bound(widen_lower_bound()),
+      widened_upper_bound(widen_upper_bound())
   {
   }
 
-  const bool lower_extended;
-  const bool upper_extended;
-
-private:
-  namespacet ns_;
-  exprt lower_;
-  exprt upper_;
-  exprt range_;
-
-public:
+  const bool is_lower_widened;
+  const bool is_upper_widened;
   const exprt lower_bound;
   const exprt upper_bound;
 
 private:
-  exprt make_lower_bound() const;
-  exprt make_upper_bound() const;
+  namespacet ns_;
+  exprt range_;
+
+public:
+  const exprt widened_lower_bound;
+  const exprt widened_upper_bound;
+
+private:
+  exprt widen_lower_bound() const;
+  exprt widen_upper_bound() const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WIDENED_RANGE_H

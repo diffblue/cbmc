@@ -47,6 +47,10 @@ SCENARIO(
   auto val5minus = from_integer(-5, type);
   auto val8minus = from_integer(-8, type);
   auto val10minus = from_integer(-10, type);
+  auto valMax = max_exprt(type);
+  auto valMin = min_exprt(type);
+  auto veryLarge = from_integer(2 << 29, type);
+  auto veryLargeMinus = from_integer(-(2 << 29), type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;
@@ -380,6 +384,65 @@ SCENARIO(
           {constant_interval_exprt(val8minus, val4minus),
            interval31minus,
            val2minus});
+      }
+    }
+
+    WHEN("merging {0, very_large} with {-very_large, 0}")
+    {
+      auto op1 = make_value_set({val0, veryLarge}, environment, ns);
+      auto op2 = make_value_set({veryLargeMinus, val0}, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is {[MIN, -very_large], 0, very_large]")
+      {
+        EXPECT_MODIFIED(
+          merged,
+          {constant_interval_exprt(valMin, veryLargeMinus), val0, veryLarge});
+      }
+    }
+    WHEN("merging {-very_large, 0} with {0, very_large}")
+    {
+      auto op1 = make_value_set({veryLargeMinus, val0}, environment, ns);
+      auto op2 = make_value_set({val0, veryLarge}, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is {-very_large, 0, [very_large, MAX]}")
+      {
+        EXPECT_MODIFIED(
+          merged,
+          {veryLargeMinus, val0, constant_interval_exprt(veryLarge, valMax)});
+      }
+    }
+
+    WHEN("merging {-very_large, very_large } with {0, 1}")
+    {
+      auto op1 = make_value_set({veryLargeMinus, veryLarge}, environment, ns);
+      auto op2 = make_value_set({val0, val1}, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is {-very_large, val0, val1, very_large}")
+      {
+        EXPECT_MODIFIED(merged, {veryLargeMinus, val0, val1, veryLarge});
+      }
+    }
+    WHEN("merging {0, 1} with {-very_large, very_large}")
+    {
+      auto op1 = make_value_set({val0, val1}, environment, ns);
+      auto op2 = make_value_set({veryLargeMinus, veryLarge}, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is {[MIN, 0}, [1, MAX]}")
+      {
+        EXPECT_MODIFIED(
+          merged,
+          {constant_interval_exprt(valMin, veryLargeMinus),
+           val0,
+           val1,
+           constant_interval_exprt(veryLarge, valMax)});
       }
     }
   }

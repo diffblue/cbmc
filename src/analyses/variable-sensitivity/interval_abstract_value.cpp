@@ -354,8 +354,8 @@ abstract_object_pointert widening_merge(
   auto widened = widened_ranget(lhs, rhs);
 
   // new interval ...
-  auto new_interval =
-    constant_interval_exprt(widened.lower_bound, widened.upper_bound);
+  auto new_interval = constant_interval_exprt(
+    widened.widened_lower_bound, widened.widened_upper_bound);
   return interval_abstract_valuet::make_interval(new_interval);
 }
 

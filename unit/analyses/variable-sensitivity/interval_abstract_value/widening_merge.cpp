@@ -44,6 +44,8 @@ SCENARIO(
   const exprt val10minus = from_integer(-10, type);
   auto valMax = max_exprt(type);
   auto valMin = min_exprt(type);
+  auto veryLarge = from_integer(2 << 29, type);
+  auto veryLargeMinus = from_integer(-(2 << 29), type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;
@@ -320,7 +322,6 @@ SCENARIO(
     }
     WHEN("merging [0, 1] with [1, very_large]")
     {
-      auto veryLarge = from_integer(2 << 29, type);
       auto op1 = make_interval(val0, val1, environment, ns);
       auto op2 = make_interval(val1, veryLarge, environment, ns);
 
@@ -346,7 +347,6 @@ SCENARIO(
     }
     WHEN("merging [0, 1] with [-very_large, 1]")
     {
-      auto veryLargeMinus = from_integer(-(2 << 29), type);
       auto op1 = make_interval(val0, val1, environment, ns);
       auto op2 = make_interval(veryLargeMinus, val1, environment, ns);
 
@@ -384,8 +384,6 @@ SCENARIO(
     }
     WHEN("merging [0, very_large] with [-very_large, 0]")
     {
-      auto veryLarge = from_integer(2 << 29, type);
-      auto veryLargeMinus = from_integer(-(2 << 29), type);
       auto op1 = make_interval(val0, veryLarge, environment, ns);
       auto op2 = make_interval(veryLargeMinus, val0, environment, ns);
 
@@ -398,8 +396,6 @@ SCENARIO(
     }
     WHEN("merging [-very_large, 0] with [0, very_large]")
     {
-      auto veryLarge = from_integer(2 << 29, type);
-      auto veryLargeMinus = from_integer(-(2 << 29), type);
       auto op1 = make_interval(veryLargeMinus, val0, environment, ns);
       auto op2 = make_interval(val0, veryLarge, environment, ns);
 
@@ -413,8 +409,6 @@ SCENARIO(
 
     WHEN("merging [-very_large, very_large] with [0, 1]")
     {
-      auto veryLarge = from_integer(2 << 29, type);
-      auto veryLargeMinus = from_integer(-(2 << 29), type);
       auto op1 = make_interval(veryLargeMinus, veryLarge, environment, ns);
       auto op2 = make_interval(val0, val1, environment, ns);
 
@@ -427,8 +421,6 @@ SCENARIO(
     }
     WHEN("merging [0, 1] with [-very_large, very_large]")
     {
-      auto veryLarge = from_integer(2 << 29, type);
-      auto veryLargeMinus = from_integer(-(2 << 29), type);
       auto op1 = make_interval(val0, val1, environment, ns);
       auto op2 = make_interval(veryLargeMinus, veryLarge, environment, ns);
 
