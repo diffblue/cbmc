@@ -398,7 +398,10 @@ public:
   }
 
   // apply the function to the given arguments
-  exprt application(const operandst &) const;
+  exprt application(const operandst &arguments) const
+  {
+    return instantiate(arguments);
+  }
 };
 
 template <>
