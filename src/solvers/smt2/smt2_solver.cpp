@@ -105,17 +105,12 @@ void smt2_solvert::expand_function_applications(exprt &expr)
         // Does it have a definition? It's otherwise uninterpreted.
         if(!f.definition.is_nil())
         {
-          replace_symbolt replace_symbol;
-
-          for(std::size_t i = 0; i < domain.size(); i++)
-          {
-            replace_symbol.insert(
-              symbol_exprt(f.parameters[i], domain[i]), app.arguments()[i]);
-          }
-
           exprt body = f.definition;
-          replace_symbol(body);
-          expand_function_applications(body);
+
+          if(body.id() == ID_lambda)
+            body = to_lambda_expr(body).application(app.arguments());
+
+          expand_function_applications(body); // rec. call
           expr = body;
         }
       }

@@ -49,8 +49,9 @@ public:
 
     kindt kind;
     typet type;
+
+    // this is a lambda when the symbol is a function
     exprt definition;
-    std::vector<irep_idt> parameters;
   };
 
   using id_mapt=std::map<irep_idt, idt>;
@@ -95,7 +96,7 @@ protected:
 
   // add the given identifier to the id_map but
   // complain if that identifier is used already
-  void add_unique_id(const irep_idt &, const exprt &);
+  void add_unique_id(irep_idt, exprt);
 
   struct signature_with_parameter_idst
   {
@@ -132,6 +133,15 @@ protected:
           result.emplace_back(parameters[i], domain[i]);
         return result;
       }
+    }
+
+    // convenience helper for constructing a binding
+    binding_exprt::variablest binding_variables() const
+    {
+      binding_exprt::variablest result;
+      for(auto &pair : ids_and_types())
+        result.emplace_back(pair.first, pair.second);
+      return result;
     }
   };
 
