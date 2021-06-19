@@ -14,7 +14,7 @@
 #include <util/bitvector_types.h>
 
 static merge_result<const interval_abstract_valuet>
-widening_merge(abstract_object_pointert op1, abstract_object_pointert op2)
+widening_merge(const abstract_object_pointert &op1, const abstract_object_pointert &op2)
 {
   auto result = abstract_objectt::merge(op1, op2, widen_modet::could_widen);
 
@@ -41,6 +41,8 @@ SCENARIO(
   const exprt val5minus = from_integer(-5, type);
   const exprt val8minus = from_integer(-8, type);
   const exprt val10minus = from_integer(-10, type);
+  auto valMax = max_exprt(type);
+  auto valMin = min_exprt(type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;
@@ -300,6 +302,32 @@ SCENARIO(
       THEN("result is widen both bounds - [-10, 4]")
       {
         EXPECT_MODIFIED(merged, val10minus, val4);
+      }
+    }
+
+    WHEN("merging [1, 10] with [1, MAX]")
+    {
+      auto op1 = make_interval(val1, val10, environment, ns);
+      auto op2 = make_interval(val1, valMax, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [1, MAX]")
+      {
+        EXPECT_MODIFIED(merged, val1, valMax);
+      }
+    }
+    WHEN("merging [0, 1] with [1, very_large]")
+    {
+      auto veryLarge = from_integer(2<<29, type);
+      auto op1 = make_interval(val0, val1, environment, ns);
+      auto op2 = make_interval(val1, veryLarge, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [0, MAX]")
+      {
+        EXPECT_MODIFIED(merged, val0, valMax);
       }
     }
   }

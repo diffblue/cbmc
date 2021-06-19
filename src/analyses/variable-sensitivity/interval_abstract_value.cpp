@@ -346,6 +346,8 @@ void interval_abstract_valuet::output(
   }
 }
 
+exprt extend_upper_bound(const exprt &upper_bound, const exprt& range, const namespacet& ns);
+
 abstract_object_pointert widening_merge(
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs)
@@ -354,25 +356,41 @@ abstract_object_pointert widening_merge(
     constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
   auto upper_bound =
     constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
-  auto range = plus_exprt(
-    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
 
   auto dummy_symbol_table = symbol_tablet{};
   auto dummy_namespace = namespacet{dummy_symbol_table};
 
+  auto range = plus_exprt(
+      minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
+
   // should extend lower bound?
-  if(rhs.get_lower() < lhs.get_lower())
-    lower_bound =
-      simplify_expr(minus_exprt(lower_bound, range), dummy_namespace);
+  if(rhs.get_lower() < lhs.get_lower()) lower_bound =
+    simplify_expr(minus_exprt(lower_bound, range), dummy_namespace);
   // should extend upper bound?
   if(lhs.get_upper() < rhs.get_upper())
-    upper_bound =
-      simplify_expr(plus_exprt(upper_bound, range), dummy_namespace);
+    upper_bound = extend_upper_bound(upper_bound, range, dummy_namespace);
 
   // new interval ...
   auto new_interval = constant_interval_exprt(lower_bound, upper_bound);
   return interval_abstract_valuet::make_interval(new_interval);
 }
+
+bool has_overflowed(const exprt& value)
+{
+  return constant_interval_exprt::less_than(value, from_integer(0, value.type()));
+}
+
+exprt extend_upper_bound(const exprt &upper_bound, const exprt& range, const namespacet& ns)
+{
+  auto new_upper_bound = simplify_expr(plus_exprt(upper_bound, range), ns);
+
+  if (constant_interval_exprt::contains_extreme(new_upper_bound) ||
+     has_overflowed(new_upper_bound))
+    return max_exprt(upper_bound.type());
+
+  return new_upper_bound;
+}
+
 
 abstract_object_pointert interval_abstract_valuet::merge_with_value(
   const abstract_value_pointert &other,
