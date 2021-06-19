@@ -12,7 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/optional.h>
+#include <util/range.h>
 #include <util/replace_expr.h>
+#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 
 /// A method to detect equivalence between experts that can contain typecast
@@ -205,6 +207,22 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
 literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
 {
   PRECONDITION(src.id() == ID_forall || src.id() == ID_exists);
+
+  // We first worry about the scoping of the symbols bound by the quantifier.
+  auto fresh_symbols = fresh_binding(src);
+
+  // replace in where()
+  replace_symbolt replace_symbol;
+
+  for(const auto &pair : make_range(src.variables()).zip(fresh_symbols))
+    replace_symbol.insert(pair.first, pair.second);
+
+  exprt renamed_where = src.where();
+  replace_symbol(renamed_where);
+
+  // produce new quantifier expression
+  auto new_src =
+    quantifier_exprt(src.id(), std::move(fresh_symbols), renamed_where);
 
   const auto res = instantiate_quantifier(src, ns);
 

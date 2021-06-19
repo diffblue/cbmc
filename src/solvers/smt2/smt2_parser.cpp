@@ -131,30 +131,6 @@ exprt::operandst smt2_parsert::operands()
   return result;
 }
 
-irep_idt smt2_parsert::add_fresh_id(
-  const irep_idt &id,
-  idt::kindt kind,
-  const exprt &expr)
-{
-  auto &count=renaming_counters[id];
-  irep_idt new_id;
-  do
-  {
-    new_id=id2string(id)+'#'+std::to_string(count);
-    count++;
-  } while(!id_map
-             .emplace(
-               std::piecewise_construct,
-               std::forward_as_tuple(new_id),
-               std::forward_as_tuple(kind, expr))
-             .second);
-
-  // record renaming
-  renaming_map[id] = new_id;
-
-  return new_id;
-}
-
 void smt2_parsert::add_unique_id(const irep_idt &id, const exprt &expr)
 {
   if(!id_map
@@ -167,16 +143,6 @@ void smt2_parsert::add_unique_id(const irep_idt &id, const exprt &expr)
     // id already used
     throw error() << "identifier '" << id << "' defined twice";
   }
-}
-
-irep_idt smt2_parsert::rename_id(const irep_idt &id) const
-{
-  auto it=renaming_map.find(id);
-
-  if(it==renaming_map.end())
-    return id;
-  else
-    return it->second;
 }
 
 exprt smt2_parsert::let_expression()
@@ -254,7 +220,7 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::OPEN)
     throw error() << "expected bindings after " << id;
 
-  std::vector<symbol_exprt> bindings;
+  binding_exprt::variablest bindings;
 
   while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
   {
@@ -276,18 +242,23 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error("expected ')' at end of bindings");
 
-  // save the renaming map
-  renaming_mapt old_renaming_map = renaming_map;
+  // we may hide identifiers in outer scopes
+  std::vector<std::pair<irep_idt, idt>> saved_ids;
 
-  // go forwards, add to id_map, renaming if need be
+  // add the bindings to the id_map
   for(auto &b : bindings)
   {
-    const irep_idt id =
-      add_fresh_id(b.get_identifier(), idt::BINDING, exprt(ID_nil, b.type()));
-
-    b.set_identifier(id);
+    auto insert_result =
+      id_map.insert({b.get_identifier(), idt{idt::BINDING, b.type()}});
+    if(!insert_result.second) // already there
+    {
+      auto &id_entry = *insert_result.first;
+      saved_ids.emplace_back(id_entry.first, std::move(id_entry.second));
+      id_entry.second = idt{idt::BINDING, b.type()};
+    }
   }
 
+  // now parse, with bindings in place
   exprt expr=expression();
 
   if(next_token() != smt2_tokenizert::CLOSE)
@@ -299,8 +270,9 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   for(const auto &b : bindings)
     id_map.erase(b.get_identifier());
 
-  // restore renaming map
-  renaming_map = old_renaming_map;
+  // restore any previous ids
+  for(auto &saved_id : saved_ids)
+    id_map.insert(std::move(saved_id));
 
   // go backwards, build quantified expression
   for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
@@ -603,20 +575,18 @@ exprt smt2_parsert::function_application()
       auto op = operands();
 
       // rummage through id_map
-      const irep_idt final_id = rename_id(id);
-      auto id_it = id_map.find(final_id);
+      auto id_it = id_map.find(id);
       if(id_it != id_map.end())
       {
         if(id_it->second.type.id() == ID_mathematical_function)
         {
-          return function_application(
-            symbol_exprt(final_id, id_it->second.type), op);
+          return function_application(symbol_exprt(id, id_it->second.type), op);
         }
         else
-          return symbol_exprt(final_id, id_it->second.type);
+          return symbol_exprt(id, id_it->second.type);
       }
-
-      throw error() << "unknown function symbol '" << id << '\'';
+      else
+        throw error() << "unknown function symbol '" << id << '\'';
     }
     break;
 
@@ -916,11 +886,10 @@ exprt smt2_parsert::expression()
         return e_it->second();
 
       // rummage through id_map
-      const irep_idt final_id = rename_id(identifier);
-      auto id_it = id_map.find(final_id);
+      auto id_it = id_map.find(identifier);
       if(id_it != id_map.end())
       {
-        symbol_exprt symbol_expr(final_id, id_it->second.type);
+        symbol_exprt symbol_expr(identifier, id_it->second.type);
         if(smt2_tokenizer.token_is_quoted_symbol())
           symbol_expr.set(ID_C_quoted, true);
         return std::move(symbol_expr);
@@ -1393,9 +1362,7 @@ smt2_parsert::function_signature_definition()
 
     irep_idt id = smt2_tokenizer.get_buffer();
     domain.push_back(sort());
-
-    parameters.push_back(
-      add_fresh_id(id, idt::PARAMETER, exprt(ID_nil, domain.back())));
+    parameters.push_back(id);
 
     if(next_token() != smt2_tokenizert::CLOSE)
       throw error("expected ')' at end of parameter");
@@ -1497,16 +1464,35 @@ void smt2_parsert::setup_commands()
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-fun");
 
-    // save the renaming map
-    renaming_mapt old_renaming_map = renaming_map;
-
     const irep_idt id = smt2_tokenizer.get_buffer();
 
     const auto signature = function_signature_definition();
+
+    // put the parameters into the scope and take care of hiding
+    std::vector<std::pair<irep_idt, idt>> hidden_ids;
+
+    for(const auto &pair : signature.ids_and_types())
+    {
+      auto insert_result =
+        id_map.insert({pair.first, idt{idt::PARAMETER, pair.second}});
+      if(!insert_result.second) // already there
+      {
+        auto &id_entry = *insert_result.first;
+        hidden_ids.emplace_back(id_entry.first, std::move(id_entry.second));
+        id_entry.second = idt{idt::PARAMETER, pair.second};
+      }
+    }
+
+    // now parse body with parameter ids in place
     const auto body = expression();
 
-    // restore renamings
-    std::swap(renaming_map, old_renaming_map);
+    // remove the parameter ids
+    for(auto &id : signature.parameters)
+      id_map.erase(id);
+
+    // restore the hidden ids, if any
+    for(auto &hidden_id : hidden_ids)
+      id_map.insert(std::move(hidden_id));
 
     // check type of body
     if(signature.type.id() == ID_mathematical_function)
