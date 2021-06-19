@@ -93,14 +93,9 @@ protected:
   std::size_t parenthesis_level;
   smt2_tokenizert::tokent next_token();
 
-  // for function parameters
-  using renaming_mapt=std::map<irep_idt, irep_idt>;
-  renaming_mapt renaming_map;
-  using renaming_counterst=std::map<irep_idt, unsigned>;
-  renaming_counterst renaming_counters;
-  irep_idt add_fresh_id(const irep_idt &, idt::kindt, const exprt &);
+  // add the given identifier to the id_map but
+  // complain if that identifier is used already
   void add_unique_id(const irep_idt &, const exprt &);
-  irep_idt rename_id(const irep_idt &) const;
 
   struct signature_with_parameter_idst
   {
@@ -121,6 +116,22 @@ protected:
          to_mathematical_function_type(_type).domain().size() ==
            _parameters.size()) ||
         (_type.id() != ID_mathematical_function && _parameters.empty()));
+    }
+
+    // a convenience helper for iterating over identifiers and types
+    std::vector<std::pair<irep_idt, typet>> ids_and_types() const
+    {
+      if(parameters.empty())
+        return {};
+      else
+      {
+        std::vector<std::pair<irep_idt, typet>> result;
+        result.reserve(parameters.size());
+        const auto &domain = to_mathematical_function_type(type).domain();
+        for(std::size_t i = 0; i < parameters.size(); i++)
+          result.emplace_back(parameters[i], domain[i]);
+        return result;
+      }
     }
   };
 
