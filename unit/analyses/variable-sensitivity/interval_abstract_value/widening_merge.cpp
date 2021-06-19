@@ -13,8 +13,9 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
-static merge_result<const interval_abstract_valuet>
-widening_merge(const abstract_object_pointert &op1, const abstract_object_pointert &op2)
+static merge_result<const interval_abstract_valuet> widening_merge(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2)
 {
   auto result = abstract_objectt::merge(op1, op2, widen_modet::could_widen);
 
@@ -319,7 +320,7 @@ SCENARIO(
     }
     WHEN("merging [0, 1] with [1, very_large]")
     {
-      auto veryLarge = from_integer(2<<29, type);
+      auto veryLarge = from_integer(2 << 29, type);
       auto op1 = make_interval(val0, val1, environment, ns);
       auto op2 = make_interval(val1, veryLarge, environment, ns);
 
@@ -328,6 +329,114 @@ SCENARIO(
       THEN("result is [0, MAX]")
       {
         EXPECT_MODIFIED(merged, val0, valMax);
+      }
+    }
+
+    WHEN("merging [1, 10] with [MIN, 1]")
+    {
+      auto op1 = make_interval(val1, val10, environment, ns);
+      auto op2 = make_interval(valMin, val1, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [MIN, 10]")
+      {
+        EXPECT_MODIFIED(merged, valMin, val10);
+      }
+    }
+    WHEN("merging [0, 1] with [-very_large, 1]")
+    {
+      auto veryLargeMinus = from_integer(-(2 << 29), type);
+      auto op1 = make_interval(val0, val1, environment, ns);
+      auto op2 = make_interval(veryLargeMinus, val1, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [MIN, 1]")
+      {
+        EXPECT_MODIFIED(merged, valMin, val1);
+      }
+    }
+
+    WHEN("merging [1, MAX] with [MIN, 1]")
+    {
+      auto op1 = make_interval(val1, valMax, environment, ns);
+      auto op2 = make_interval(valMin, val1, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is TOP - ie [MIN, MAX]")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging [MIN, 1] with [1, MAX]")
+    {
+      auto op1 = make_interval(valMin, val1, environment, ns);
+      auto op2 = make_interval(val1, valMax, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is TOP - ie [MIN, MAX]")
+      {
+        EXPECT_MODIFIED_TOP(merged);
+      }
+    }
+    WHEN("merging [0, very_large] with [-very_large, 0]")
+    {
+      auto veryLarge = from_integer(2 << 29, type);
+      auto veryLargeMinus = from_integer(-(2 << 29), type);
+      auto op1 = make_interval(val0, veryLarge, environment, ns);
+      auto op2 = make_interval(veryLargeMinus, val0, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [MIN, very_large]")
+      {
+        EXPECT_MODIFIED(merged, valMin, veryLarge);
+      }
+    }
+    WHEN("merging [-very_large, 0] with [0, very_large]")
+    {
+      auto veryLarge = from_integer(2 << 29, type);
+      auto veryLargeMinus = from_integer(-(2 << 29), type);
+      auto op1 = make_interval(veryLargeMinus, val0, environment, ns);
+      auto op2 = make_interval(val0, veryLarge, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [-very_large, MAX]")
+      {
+        EXPECT_MODIFIED(merged, veryLargeMinus, valMax);
+      }
+    }
+
+    WHEN("merging [-very_large, very_large] with [0, 1]")
+    {
+      auto veryLarge = from_integer(2 << 29, type);
+      auto veryLargeMinus = from_integer(-(2 << 29), type);
+      auto op1 = make_interval(veryLargeMinus, veryLarge, environment, ns);
+      auto op2 = make_interval(val0, val1, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [-very_large, very_large]")
+      {
+        EXPECT_UNMODIFIED(merged, veryLargeMinus, veryLarge);
+      }
+    }
+    WHEN("merging [0, 1] with [-very_large, very_large]")
+    {
+      auto veryLarge = from_integer(2 << 29, type);
+      auto veryLargeMinus = from_integer(-(2 << 29), type);
+      auto op1 = make_interval(val0, val1, environment, ns);
+      auto op2 = make_interval(veryLargeMinus, veryLarge, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is TOP, ie [MIN, MAX]")
+      {
+        EXPECT_MODIFIED_TOP(merged);
       }
     }
   }
