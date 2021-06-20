@@ -332,6 +332,43 @@ SCENARIO(
         EXPECT_MODIFIED(merged, val0, valMax);
       }
     }
+    WHEN("merging [0, 1] with [1, unsigned_very_large]")
+    {
+      auto utype = unsignedbv_typet(32);
+      auto uval0 = from_integer(0, utype);
+      auto uval1 = from_integer(1, utype);
+      auto uVeryLarge = from_integer(2 << 30, utype);
+
+      auto op1 = make_interval(uval0, uval1, environment, ns);
+      auto op2 = make_interval(uval1, uVeryLarge, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [0, MAX]")
+      {
+        auto uvalMax = max_exprt(utype);
+        EXPECT_MODIFIED(merged, uval0, uvalMax);
+      }
+    }
+    WHEN("merging unsigned [7, 9] with [3, 6]")
+    {
+      auto utype = unsignedbv_typet(32);
+      auto uval0 = from_integer(0, utype);
+      auto uval3 = from_integer(3, utype);
+      auto uval6 = from_integer(6, utype);
+      auto uval7 = from_integer(7, utype);
+      auto uval9 = from_integer(9, utype);
+
+      auto op1 = make_interval(uval7, uval9, environment, ns);
+      auto op2 = make_interval(uval3, uval6, environment, ns);
+
+      auto merged = widening_merge(op1, op2);
+
+      THEN("result is [0, 9]")
+      {
+        EXPECT_MODIFIED(merged, uval0, uval9);
+      }
+    }
 
     WHEN("merging [1, 10] with [MIN, 1]")
     {

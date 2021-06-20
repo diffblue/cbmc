@@ -14,10 +14,9 @@ static bool has_underflowed(const exprt &value)
   return constant_interval_exprt::greater_than(
     value, from_integer(0, value.type()));
 }
-static bool has_overflowed(const exprt &value)
+static bool has_overflowed(const exprt &value, const exprt &initial_value)
 {
-  return constant_interval_exprt::less_than(
-    value, from_integer(0, value.type()));
+  return constant_interval_exprt::less_than(value, initial_value);
 }
 
 exprt widened_ranget::widen_lower_bound() const
@@ -44,7 +43,7 @@ exprt widened_ranget::widen_upper_bound() const
 
   if(
     constant_interval_exprt::contains_extreme(new_upper_bound) ||
-    has_overflowed(new_upper_bound))
+    has_overflowed(new_upper_bound, upper_bound))
     return max_exprt(upper_bound.type());
 
   return new_upper_bound;
