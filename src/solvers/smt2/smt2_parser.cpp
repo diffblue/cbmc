@@ -131,13 +131,13 @@ exprt::operandst smt2_parsert::operands()
   return result;
 }
 
-void smt2_parsert::add_unique_id(const irep_idt &id, const exprt &expr)
+void smt2_parsert::add_unique_id(irep_idt id, exprt expr)
 {
   if(!id_map
         .emplace(
           std::piecewise_construct,
           std::forward_as_tuple(id),
-          std::forward_as_tuple(idt::VARIABLE, expr))
+          std::forward_as_tuple(idt::VARIABLE, std::move(expr)))
         .second)
   {
     // id already used
@@ -1484,7 +1484,7 @@ void smt2_parsert::setup_commands()
     }
 
     // now parse body with parameter ids in place
-    const auto body = expression();
+    auto body = expression();
 
     // remove the parameter ids
     for(auto &id : signature.parameters)
@@ -1512,11 +1512,12 @@ void smt2_parsert::setup_commands()
                     << smt2_format(body.type()) << '\'';
     }
 
-    // create the entry
-    add_unique_id(id, body);
+    // if there are parameters, this is a lambda
+    if(!signature.parameters.empty())
+      body = lambda_exprt(signature.binding_variables(), body);
 
-    id_map.at(id).type = signature.type;
-    id_map.at(id).parameters = signature.parameters;
+    // create the entry
+    add_unique_id(id, std::move(body));
   };
 
   commands["exit"] = [this]() { exit = true; };
