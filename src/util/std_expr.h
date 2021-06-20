@@ -3009,16 +3009,16 @@ inline cond_exprt &to_cond_expr(exprt &expr)
 /// function, respectively. The range is given by the type of the expression,
 /// which has to be an \ref array_typet (which includes a value for
 /// `array_size`).
-class array_comprehension_exprt : public binary_exprt
+class array_comprehension_exprt : public binding_exprt
 {
 public:
   explicit array_comprehension_exprt(
     symbol_exprt arg,
     exprt body,
     array_typet _type)
-    : binary_exprt(
-        std::move(arg),
+    : binding_exprt(
         ID_array_comprehension,
+        {std::move(arg)},
         std::move(body),
         std::move(_type))
   {
@@ -3036,22 +3036,26 @@ public:
 
   const symbol_exprt &arg() const
   {
-    return static_cast<const symbol_exprt &>(op0());
+    auto &variables = this->variables();
+    PRECONDITION(variables.size() == 1);
+    return variables[0];
   }
 
   symbol_exprt &arg()
   {
-    return static_cast<symbol_exprt &>(op0());
+    auto &variables = this->variables();
+    PRECONDITION(variables.size() == 1);
+    return variables[0];
   }
 
   const exprt &body() const
   {
-    return op1();
+    return where();
   }
 
   exprt &body()
   {
-    return op1();
+    return where();
   }
 };
 
