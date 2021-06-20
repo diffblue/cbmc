@@ -17,6 +17,7 @@
 #include "abstract_environment.h"
 #include "abstract_object_statistics.h"
 #include "interval_abstract_value.h"
+#include "widened_range.h"
 
 static index_range_implementation_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
@@ -350,27 +351,11 @@ abstract_object_pointert widening_merge(
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs)
 {
-  auto lower_bound =
-    constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
-  auto upper_bound =
-    constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
-  auto range = plus_exprt(
-    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
-
-  auto dummy_symbol_table = symbol_tablet{};
-  auto dummy_namespace = namespacet{dummy_symbol_table};
-
-  // should extend lower bound?
-  if(rhs.get_lower() < lhs.get_lower())
-    lower_bound =
-      simplify_expr(minus_exprt(lower_bound, range), dummy_namespace);
-  // should extend upper bound?
-  if(lhs.get_upper() < rhs.get_upper())
-    upper_bound =
-      simplify_expr(plus_exprt(upper_bound, range), dummy_namespace);
+  auto widened = widened_ranget(lhs, rhs);
 
   // new interval ...
-  auto new_interval = constant_interval_exprt(lower_bound, upper_bound);
+  auto new_interval = constant_interval_exprt(
+    widened.widened_lower_bound, widened.widened_upper_bound);
   return interval_abstract_valuet::make_interval(new_interval);
 }
 

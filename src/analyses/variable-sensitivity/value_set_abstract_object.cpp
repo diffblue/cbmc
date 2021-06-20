@@ -14,6 +14,7 @@
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/widened_range.h>
 
 #include <util/arith_tools.h>
 #include <util/make_unique.h>
@@ -414,6 +415,7 @@ static abstract_object_sett compact_values(const abstract_object_sett &values)
 }
 
 static exprt eval_expr(const exprt &e);
+static bool is_eq(const exprt &lhs, const exprt &rhs);
 static bool is_le(const exprt &lhs, const exprt &rhs);
 static abstract_object_sett collapse_values_in_intervals(
   const abstract_object_sett &values,
@@ -446,6 +448,8 @@ void collapse_overlapping_intervals(
     intervals.begin(),
     intervals.end(),
     [](constant_interval_exprt const &lhs, constant_interval_exprt const &rhs) {
+      if(is_eq(lhs.get_lower(), rhs.get_lower()))
+        return is_le(lhs.get_upper(), rhs.get_upper());
       return is_le(lhs.get_lower(), rhs.get_lower());
     });
 
@@ -556,10 +560,14 @@ static exprt eval_expr(const exprt &e)
   return simplify_expr(e, ns);
 }
 
+static bool is_eq(const exprt &lhs, const exprt &rhs)
+{
+  return constant_interval_exprt::equal(lhs, rhs);
+}
+
 static bool is_le(const exprt &lhs, const exprt &rhs)
 {
-  auto is_le_expr = binary_relation_exprt(lhs, ID_le, rhs);
-  return eval_expr(is_le_expr).is_true();
+  return constant_interval_exprt::less_than_or_equal(lhs, rhs);
 }
 
 static abstract_object_sett widen_value_set(
@@ -572,41 +580,34 @@ static abstract_object_sett widen_value_set(
 
   auto widened_ends = std::vector<constant_interval_exprt>{};
 
-  auto lower_bound =
-    constant_interval_exprt::get_min(lhs.get_lower(), rhs.get_lower());
-  auto upper_bound =
-    constant_interval_exprt::get_max(lhs.get_upper(), rhs.get_upper());
-  auto range = plus_exprt(
-    minus_exprt(upper_bound, lower_bound), from_integer(1, lhs.type()));
-
-  auto symbol_table = symbol_tablet{};
-  auto ns = namespacet{symbol_table};
+  auto range = widened_ranget(lhs, rhs);
 
   // should extend lower bound?
-  if(rhs.get_lower() < lhs.get_lower())
+  if(range.is_lower_widened)
   {
-    auto widened_lower_bound = constant_interval_exprt(
-      simplify_expr(minus_exprt(lower_bound, range), ns), lower_bound);
-    widened_ends.push_back(widened_lower_bound);
+    auto extended_lower_bound =
+      constant_interval_exprt(range.widened_lower_bound, range.lower_bound);
+
+    widened_ends.push_back(extended_lower_bound);
     for(auto &obj : values)
     {
       auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
       auto as_expr = value->to_interval();
-      if(is_le(as_expr.get_lower(), lower_bound))
+      if(is_le(as_expr.get_lower(), range.lower_bound))
         widened_ends.push_back(as_expr);
     }
   }
   // should extend upper bound?
-  if(lhs.get_upper() < rhs.get_upper())
+  if(range.is_upper_widened)
   {
-    auto widened_upper_bound = constant_interval_exprt(
-      upper_bound, simplify_expr(plus_exprt(upper_bound, range), ns));
-    widened_ends.push_back(widened_upper_bound);
+    auto extended_upper_bound =
+      constant_interval_exprt(range.upper_bound, range.widened_upper_bound);
+    widened_ends.push_back(extended_upper_bound);
     for(auto &obj : values)
     {
       auto value = std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
       auto as_expr = value->to_interval();
-      if(is_le(upper_bound, as_expr.get_upper()))
+      if(is_le(range.upper_bound, as_expr.get_upper()))
         widened_ends.push_back(as_expr);
     }
   }
