@@ -1,4 +1,4 @@
-CORE
+CORE smt-backend broken-cprover-smt-backend
 main.c
 --enforce-all-contracts _ --z3
 ^EXIT=0$
@@ -14,9 +14,5 @@ This test case checks the handling of a universal quantifier, with a symbolic
 upper bound, within a loop invariant.
 
 TODO: This test should:
-- be tagged `smt-backend`:
-  because the SAT backend does not support (simply ignores) `forall` in negative (e.g. assume) contexts.
-- be tagged `broken-cprover-smt-backend`:
-  because the CPROVER SMT2 solver cannot handle (errors out on) `forall` in negative (e.g. assume) contexts.
 - not use the `_ --z3` parameters:
   once SMT-related tags are supported by the `Makefile`.
