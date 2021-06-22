@@ -1,0 +1,11 @@
+CORE
+test.c
+--pointer-overflow-check --pointer-check
+^EXIT=6$
+^SIGNAL=0$
+^array too large for flattening$
+--
+VERIFICATION
+--
+This test is to check that arrays that are too large are correctly
+error handled to prevent exceptions in other parts of the code.
