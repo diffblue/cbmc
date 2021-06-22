@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$

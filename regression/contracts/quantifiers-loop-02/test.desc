@@ -1,6 +1,6 @@
-CORE
+CORE smt-backend
 main.c
---enforce-all-contracts _ --z3
+--apply-loop-contracts _ --z3
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.\d+\] line .* Check loop invariant before entry: SUCCESS

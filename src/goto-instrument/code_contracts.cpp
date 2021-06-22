@@ -1186,6 +1186,12 @@ bool code_contractst::replace_calls(
   return false;
 }
 
+void code_contractst::apply_loop_contracts()
+{
+  for(auto &goto_function : goto_functions.function_map)
+    apply_loop_contract(goto_function.first, goto_function.second);
+}
+
 bool code_contractst::replace_calls()
 {
   std::set<std::string> funs_to_replace;
@@ -1204,8 +1210,6 @@ bool code_contractst::enforce_contracts()
   {
     if(has_contract(goto_function.first))
       funs_to_enforce.insert(id2string(goto_function.first));
-    else
-      apply_loop_contract(goto_function.first, goto_function.second);
   }
   return enforce_contracts(funs_to_enforce);
 }
@@ -1225,7 +1229,6 @@ bool code_contractst::enforce_contracts(
                   << messaget::eom;
       continue;
     }
-    apply_loop_contract(goto_function->first, goto_function->second);
 
     if(!has_contract(fun))
     {
