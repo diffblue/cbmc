@@ -3230,7 +3230,7 @@ parameter_abstract_declarator:
         | parameter_postfix_abstract_declarator
         ;
 
-cprover_contract:
+cprover_function_contract:
           TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
         {
           $$=$1;
@@ -3243,7 +3243,11 @@ cprover_contract:
           set($$, ID_C_spec_requires);
           mto($$, $3);
         }
-        | TOK_CPROVER_ASSIGNS '(' argument_expression_list ')'
+        | cprover_contract_assigns_opt
+        ;
+
+cprover_contract_assigns_opt:
+         TOK_CPROVER_ASSIGNS '(' argument_expression_list ')'
         {
           $$=$1;
           set($$, ID_C_spec_assigns);
@@ -3252,19 +3256,19 @@ cprover_contract:
         }
         ;
 
-cprover_contract_sequence:
-          cprover_contract
-        | cprover_contract_sequence cprover_contract
+cprover_function_contract_sequence:
+          cprover_function_contract
+        | cprover_function_contract_sequence cprover_function_contract
         {
           $$=$1;
           merge($$, $2);
         }
         ;
 
-cprover_contract_sequence_opt:
+cprover_function_contract_sequence_opt:
           /* nothing */
           { init($$); }
-        | cprover_contract_sequence
+        | cprover_function_contract_sequence
         ;
 
 postfixing_abstract_declarator:
@@ -3305,7 +3309,7 @@ postfixing_abstract_declarator:
 parameter_postfixing_abstract_declarator:
           array_abstract_declarator
         | '(' ')'
-          cprover_contract_sequence_opt
+          cprover_function_contract_sequence_opt
         {
           set($1, ID_code);
           stack_type($1).add(ID_parameters);
@@ -3322,7 +3326,7 @@ parameter_postfixing_abstract_declarator:
           parameter_type_list
           ')'
           KnR_parameter_header_opt
-          cprover_contract_sequence_opt
+          cprover_function_contract_sequence_opt
         {
           set($1, ID_code);
           stack_type($1).subtype()=typet(ID_abstract);
