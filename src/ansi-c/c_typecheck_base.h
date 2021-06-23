@@ -144,7 +144,8 @@ protected:
   virtual void typecheck_while(code_whilet &code);
   virtual void typecheck_dowhile(code_dowhilet &code);
   virtual void typecheck_start_thread(codet &code);
-  virtual void typecheck_spec_expr(codet &code, const irep_idt &spec);
+  virtual void typecheck_spec_loop_invariant(codet &code);
+  virtual void typecheck_spec_decreases(codet &code);
 
   bool break_is_allowed;
   bool continue_is_allowed;

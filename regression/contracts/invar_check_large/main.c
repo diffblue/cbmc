@@ -22,9 +22,9 @@ int main()
   int l = 0;
   int r = 1;
   while(h > l)
+    // clang-format off
     __CPROVER_loop_invariant(
       // Turn off `clang-format` because it breaks the `==>` operator.
-      /* clang-format off */
       h >= l &&
       0 <= l && l < 5 &&
       0 <= h && h < 5 &&
@@ -44,8 +44,9 @@ int main()
       (2 > h ==> arr2 >= pivot) &&
       (3 > h ==> arr3 >= pivot) &&
       (4 > h ==> arr4 >= pivot)
-      /* clang-format on */
     )
+    __CPROVER_decreases(h - l)
+    // clang-format on
     {
       if(*(arr[h]) <= pivot && *(arr[l]) >= pivot)
       {

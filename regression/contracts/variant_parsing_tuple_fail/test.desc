@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-all-contracts
+activate-multi-line-match
+^main.c.*error: syntax error before ','\n.*__CPROVER_decreases\(N - i, 42\)$
+^PARSING ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test fails because the loop variant has two arguments instead of just one.
+Currently, we only support loop variants of single arguments - we do not
+support loop variants of tuples (yet). 

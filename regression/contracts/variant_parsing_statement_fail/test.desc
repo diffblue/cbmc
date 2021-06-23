@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-all-contracts
+activate-multi-line-match
+^main.c.*error: syntax error before 'int'\n.*__CPROVER_decreases\(int x = 0\)$
+^PARSING ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test fails because the loop variant is a statement (more precisely, 
+an assignment) rather than an expression (more precisely, an ACSL binding
+expression).
