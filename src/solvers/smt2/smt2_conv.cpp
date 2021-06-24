@@ -319,6 +319,15 @@ exprt smt2_convt::get(const exprt &expr) const
   }
   else if(expr.is_constant())
     return expr;
+  else if(const auto &array = expr_try_dynamic_cast<array_exprt>(expr))
+  {
+    exprt array_copy = *array;
+    for(auto &element : array_copy.operands())
+    {
+      element = get(element);
+    }
+    return array_copy;
+  }
 
   return nil_exprt();
 }
