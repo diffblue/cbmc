@@ -857,25 +857,40 @@ void goto_convertt::convert_assume(
   dest.add(goto_programt::make_assumption(op, code.source_location()));
 }
 
-void goto_convertt::convert_loop_invariant(
+void goto_convertt::convert_loop_contracts(
   const codet &code,
   goto_programt::targett loop,
   const irep_idt &mode)
 {
-  exprt invariant=
-    static_cast<const exprt&>(code.find(ID_C_spec_loop_invariant));
+  exprt invariant =
+    static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
+  exprt decreases_clause =
+    static_cast<const exprt &>(code.find(ID_C_spec_decreases));
 
-  if(invariant.is_nil())
-    return;
-
-  if(has_subexpr(invariant, ID_side_effect))
+  if(!invariant.is_nil())
   {
-    throw incorrect_goto_program_exceptiont(
-      "Loop invariant is not side-effect free.", code.find_source_location());
+    if(has_subexpr(invariant, ID_side_effect))
+    {
+      throw incorrect_goto_program_exceptiont(
+        "Loop invariant is not side-effect free.", code.find_source_location());
+    }
+
+    PRECONDITION(loop->is_goto());
+    loop->guard.add(ID_C_spec_loop_invariant).swap(invariant);
   }
 
-  PRECONDITION(loop->is_goto());
-  loop->guard.add(ID_C_spec_loop_invariant).swap(invariant);
+  if(!decreases_clause.is_nil())
+  {
+    if(has_subexpr(decreases_clause, ID_side_effect))
+    {
+      throw incorrect_goto_program_exceptiont(
+        "Decreases clause is not side-effect free.",
+        code.find_source_location());
+    }
+
+    PRECONDITION(loop->is_goto());
+    loop->guard.add(ID_C_spec_decreases).swap(decreases_clause);
+  }
 }
 
 void goto_convertt::convert_for(
@@ -956,8 +971,8 @@ void goto_convertt::convert_for(
   goto_programt::targett y = tmp_y.add(
     goto_programt::make_goto(u, true_exprt(), code.source_location()));
 
-  // loop invariant
-  convert_loop_invariant(code, y, mode);
+  // loop invariant and decreases clause
+  convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(sideeffects);
   dest.destructive_append(tmp_v);
@@ -1014,8 +1029,8 @@ void goto_convertt::convert_while(
   goto_programt tmp_x;
   convert(code.body(), tmp_x, mode);
 
-  // loop invariant
-  convert_loop_invariant(code, y, mode);
+  // loop invariant and decreases clause
+  convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(tmp_branch);
   dest.destructive_append(tmp_x);
@@ -1083,8 +1098,8 @@ void goto_convertt::convert_dowhile(
   // y: if(c) goto w;
   y->complete_goto(w);
 
-  // loop invariant
-  convert_loop_invariant(code, y, mode);
+  // loop invariant and decreases clause
+  convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(tmp_w);
   dest.destructive_append(sideeffects);

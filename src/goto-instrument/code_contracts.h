@@ -98,12 +98,14 @@ public:
     const irep_idt &function_id,
     const irep_idt &mode);
 
-  void check_apply_invariants(
+  void check_apply_loop_contracts(
     goto_functionst::goto_functiont &goto_function,
+    const irep_idt &function_name,
     const local_may_aliast &local_may_alias,
     const goto_programt::targett loop_head,
     const loopt &loop,
     const irep_idt &mode);
+
   const namespacet &get_namespace() const;
 
   // for "helper" classes to update symbol table.

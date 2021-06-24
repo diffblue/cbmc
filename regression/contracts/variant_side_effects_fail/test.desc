@@ -1,0 +1,13 @@
+CORE
+main.c
+--apply-loop-contracts
+^Decreases clause is not side-effect free. \(at: file main.c line .* function main\)$
+^EXIT=70$
+^SIGNAL=0$
+--
+--
+This test fails because the decreases clause contains a side effect, namely
+incrementing variable N by zero. In this case, although the value of N
+remains unchanged after the increment operation, we read from and write to N. 
+So this constitues a side effect. Decreases clauses are banned from containing 
+side effects, since decreases clauses should not modify program states. 

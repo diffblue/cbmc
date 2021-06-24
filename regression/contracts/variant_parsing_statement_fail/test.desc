@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--apply-loop-contracts
 activate-multi-line-match
 ^main.c.*error: syntax error before 'int'\n.*__CPROVER_decreases\(int x = 0\)$
 ^PARSING ERROR$
@@ -8,6 +8,6 @@ activate-multi-line-match
 ^SIGNAL=0$
 --
 --
-This test fails because the loop variant is a statement (more precisely, 
+This test fails because the decreases clause is a statement (more precisely, 
 an assignment) rather than an expression (more precisely, an ACSL binding
 expression).

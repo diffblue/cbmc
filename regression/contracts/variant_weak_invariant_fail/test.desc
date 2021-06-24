@@ -1,0 +1,15 @@
+CORE
+main.c
+--apply-loop-contracts
+^main.c function main$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.3\] .* Check decreases clause on loop iteration: FAILURE$
+^.* 1 of 3 failed \(2 iterations\)$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test fails because the loop invariant is not strong enough for the
+termination proof. We must add 0 <= i to the loop invariant. 

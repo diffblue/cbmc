@@ -236,7 +236,7 @@ protected:
     goto_programt &dest,
     const irep_idt &mode);
   void convert_cpp_delete(const codet &code, goto_programt &dest);
-  void convert_loop_invariant(
+  void convert_loop_contracts(
     const codet &code,
     goto_programt::targett loop,
     const irep_idt &mode);

@@ -1,0 +1,16 @@
+CORE
+main.c
+--apply-loop-contracts
+^main.c function main$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.3\] .* Check decreases clause on loop iteration: SUCCESS$
+^.*0 of 3 failed \(1 iterations\)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test succeeds. The purpose of this test is to check whether a decreases
+clause can successfully prove the termination of a loop (i) whose exit condition
+is 1 == 1 (i.e. true) and (ii) that will eventually exit via a break statement. 

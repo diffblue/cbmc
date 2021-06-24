@@ -1,0 +1,14 @@
+CORE
+main.c
+--apply-loop-contracts
+^Decreases clause is not side-effect free. \(at: file main.c line .* function main\)$
+^EXIT=70$
+^SIGNAL=0$
+--
+--
+This test fails because the decreases clause contains a function call. Decreases
+clauses must not contain loops, since we want to ensure that the
+calculation of decreases clauses will terminate. To enforce this requirement, 
+for now, we simply ban decreases clauses from containing function calls. 
+In the future, we may allow function calls (but definitely not loops) to appear
+inside decreases clauses. 
