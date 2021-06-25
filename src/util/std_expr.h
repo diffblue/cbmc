@@ -1088,6 +1088,50 @@ inline mod_exprt &to_mod_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Boute's Euclidean definition of Modulo -- to match SMT-LIB2
+class euclidean_mod_exprt : public binary_exprt
+{
+public:
+  euclidean_mod_exprt(exprt _lhs, exprt _rhs)
+    : binary_exprt(std::move(_lhs), ID_euclidean_mod, std::move(_rhs))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<euclidean_mod_exprt>(const exprt &base)
+{
+  return base.id() == ID_euclidean_mod;
+}
+
+inline void validate_expr(const euclidean_mod_exprt &value)
+{
+  validate_operands(value, 2, "Modulo must have two operands");
+}
+
+/// \brief Cast an exprt to a \ref euclidean_mod_exprt
+///
+/// \a expr must be known to be \ref euclidean_mod_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref euclidean_mod_exprt
+inline const euclidean_mod_exprt &to_euclidean_mod_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_euclidean_mod);
+  const euclidean_mod_exprt &ret =
+    static_cast<const euclidean_mod_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_euclidean_mod_expr(const exprt &)
+inline euclidean_mod_exprt &to_euclidean_mod_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_euclidean_mod);
+  euclidean_mod_exprt &ret = static_cast<euclidean_mod_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
 
 /// \brief Remainder of division
 class rem_exprt:public binary_exprt

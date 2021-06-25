@@ -1285,6 +1285,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_mod(to_mod_expr(expr));
   }
+  else if(expr.id() == ID_euclidean_mod)
+  {
+    convert_euclidean_mod(to_euclidean_mod_expr(expr));
+  }
   else if(expr.id()==ID_mult)
   {
     convert_mult(to_mult_expr(expr));
@@ -2986,6 +2990,21 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
+}
+
+void smt2_convt::convert_euclidean_mod(const euclidean_mod_exprt &expr)
+{
+  if(expr.type().id() == ID_integer)
+  {
+    out << "(mod ";
+    convert_expr(expr.op0());
+    out << ' ';
+    convert_expr(expr.op1());
+    out << ')';
+  }
+  else
+    UNEXPECTEDCASE(
+      "unsupported type for euclidean_mod: " + expr.type().id_string());
 }
 
 void smt2_convt::convert_mod(const mod_exprt &expr)
