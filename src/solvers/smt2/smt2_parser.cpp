@@ -872,6 +872,64 @@ exprt smt2_parsert::function_application()
   UNREACHABLE;
 }
 
+exprt smt2_parsert::bv_division(
+  const exprt::operandst &operands,
+  bool is_signed)
+{
+  if(operands.size() != 2)
+    throw error() << "bitvector division expects two operands";
+
+  // SMT-LIB2 defines the result of division by 0 to be 1....1
+  auto divisor = symbol_exprt("divisor", operands[1].type());
+  auto divisor_is_zero = equal_exprt(divisor, from_integer(0, divisor.type()));
+  auto all_ones = to_unsignedbv_type(operands[0].type()).largest_expr();
+
+  exprt division_result;
+
+  if(is_signed)
+  {
+    auto signed_operands = cast_bv_to_signed({operands[0], divisor});
+    division_result =
+      cast_bv_to_unsigned(div_exprt(signed_operands[0], signed_operands[1]));
+  }
+  else
+    division_result = div_exprt(operands[0], divisor);
+
+  return let_exprt(
+    {divisor},
+    {operands[1]},
+    if_exprt(divisor_is_zero, all_ones, division_result));
+}
+
+exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
+{
+  if(operands.size() != 2)
+    throw error() << "bitvector modulo expects two operands";
+
+  // SMT-LIB2 defines the result of "lhs modulo 0" to be "lhs"
+  auto dividend = symbol_exprt("dividend", operands[0].type());
+  auto divisor = symbol_exprt("divisor", operands[1].type());
+  auto divisor_is_zero = equal_exprt(divisor, from_integer(0, divisor.type()));
+
+  exprt mod_result;
+
+  // bvurem and bvsrem match our mod_exprt.
+  // bvsmod doesn't.
+  if(is_signed)
+  {
+    auto signed_operands = cast_bv_to_signed({dividend, divisor});
+    mod_result =
+      cast_bv_to_unsigned(mod_exprt(signed_operands[0], signed_operands[1]));
+  }
+  else
+    mod_result = mod_exprt(dividend, divisor);
+
+  return let_exprt(
+    {dividend, divisor},
+    {operands[0], operands[1]},
+    if_exprt(divisor_is_zero, dividend, mod_result));
+}
+
 exprt smt2_parsert::expression()
 {
   switch(next_token())
@@ -1045,27 +1103,17 @@ void smt2_parsert::setup_expressions()
       return binary(ID_minus, op);
   };
 
-  expressions["bvsdiv"] = [this] {
-    return cast_bv_to_unsigned(binary(ID_div, cast_bv_to_signed(operands())));
-  };
-
-  expressions["bvudiv"] = [this] { return binary(ID_div, operands()); };
+  expressions["bvsdiv"] = [this] { return bv_division(operands(), true); };
+  expressions["bvudiv"] = [this] { return bv_division(operands(), false); };
   expressions["/"] = [this] { return binary(ID_div, operands()); };
   expressions["div"] = [this] { return binary(ID_div, operands()); };
 
-  expressions["bvsrem"] = [this] {
-    // 2's complement signed remainder (sign follows dividend)
-    // This matches our ID_mod, and what C does since C99.
-    return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(operands())));
-  };
+  expressions["bvsrem"] = [this] { return bv_mod(operands(), true); };
+  expressions["bvurem"] = [this] { return bv_mod(operands(), false); };
 
-  expressions["bvsmod"] = [this] {
-    // 2's complement signed remainder (sign follows divisor)
-    // We don't have that.
-    return cast_bv_to_unsigned(binary(ID_mod, cast_bv_to_signed(operands())));
-  };
-
-  expressions["bvurem"] = [this] { return binary(ID_mod, operands()); };
+  // 2's complement signed remainder (sign follows divisor)
+  // We don't have that.
+  expressions["bvsmod"] = [this] { return bv_mod(operands(), true); };
 
   expressions["%"] = [this] { return binary(ID_mod, operands()); };
 
