@@ -119,6 +119,7 @@ protected:
   void convert_floatbv_minus(const ieee_float_op_exprt &expr);
   void convert_floatbv_div(const ieee_float_op_exprt &expr);
   void convert_floatbv_mult(const ieee_float_op_exprt &expr);
+  void convert_floatbv_rem(const binary_exprt &expr);
   void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);

@@ -140,6 +140,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   }
   else if(expr.id() == ID_floatbv_mod)
     return convert_floatbv_mod_rem(to_binary_expr(expr));
+  else if(expr.id() == ID_floatbv_rem)
+    return convert_floatbv_mod_rem(to_binary_expr(expr));
   else if(expr.id()==ID_floatbv_typecast)
     return convert_floatbv_typecast(to_floatbv_typecast_expr(expr));
   else if(expr.id()==ID_concatenation)

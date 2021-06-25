@@ -90,6 +90,9 @@ float __CPROVER_fabsf(float x);
 double __CPROVER_fmod(double, double);
 float __CPROVER_fmodf(float, float);
 long double __CPROVER_fmodl(long double, long double);
+double __CPROVER_remainder(double, double);
+float __CPROVER_remainderf(float, float);
+long double __CPROVER_remainderl(long double, long double);
 
 // arrays
 __CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);

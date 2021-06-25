@@ -1217,6 +1217,27 @@ void smt2_parsert::setup_expressions()
     return function_application_ieee_float_op("fp.div", operands());
   };
 
+  expressions["fp.rem"] = [this] {
+    auto op = operands();
+
+    // Note that these do not have a rounding mode.
+    if(op.size() != 2)
+      throw error() << "fp.rem takes three operands";
+
+    if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+      throw error() << "fp.rem takes FloatingPoint operands";
+
+    if(op[0].type() != op[1].type())
+    {
+      throw error()
+        << "fp.rem takes FloatingPoint operands with matching sort, "
+        << "but got " << smt2_format(op[0].type()) << " vs "
+        << smt2_format(op[1].type());
+    }
+
+    return binary_exprt(op[0], ID_floatbv_rem, op[1]);
+  };
+
   expressions["fp.eq"] = [this] {
     return function_application_ieee_float_eq(operands());
   };

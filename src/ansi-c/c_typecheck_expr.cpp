@@ -2591,6 +2591,30 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(fmod_expr);
   }
+  else if(
+    identifier == CPROVER_PREFIX "remainder" ||
+    identifier == CPROVER_PREFIX "remainderf" ||
+    identifier == CPROVER_PREFIX "remainderl")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "remainder-functions expect two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    // The semantics of these functions is meant to match the
+    // "floating point remainder" operation as defined by IEEE.
+    // Note that these do not take a rounding mode.
+    binary_exprt floatbv_rem_expr(
+      expr.arguments()[0], ID_floatbv_rem, expr.arguments()[1]);
+
+    floatbv_rem_expr.add_source_location() = source_location;
+
+    return std::move(floatbv_rem_expr);
+  }
   else if(identifier==CPROVER_PREFIX "allocate")
   {
     if(expr.arguments().size()!=2)
