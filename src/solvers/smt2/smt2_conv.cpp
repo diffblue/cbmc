@@ -176,9 +176,9 @@ void smt2_convt::write_header()
     out << "(set-logic " << logic << ")" << "\n";
 }
 
-void smt2_convt::write_footer(std::ostream &os)
+void smt2_convt::write_footer()
 {
-  os << "\n";
+  out << "\n";
 
   // fix up the object sizes
   for(const auto &object : object_sizes)
@@ -186,45 +186,45 @@ void smt2_convt::write_footer(std::ostream &os)
 
   if(use_check_sat_assuming && !assumptions.empty())
   {
-    os << "(check-sat-assuming (";
+    out << "(check-sat-assuming (";
     for(const auto &assumption : assumptions)
       convert_literal(to_literal_expr(assumption).get_literal());
-    os << "))\n";
+    out << "))\n";
   }
   else
   {
     // add the assumptions, if any
     if(!assumptions.empty())
     {
-      os << "; assumptions\n";
+      out << "; assumptions\n";
 
       for(const auto &assumption : assumptions)
       {
-        os << "(assert ";
+        out << "(assert ";
         convert_literal(to_literal_expr(assumption).get_literal());
-        os << ")"
-           << "\n";
+        out << ")"
+            << "\n";
       }
     }
 
-    os << "(check-sat)\n";
+    out << "(check-sat)\n";
   }
 
-  os << "\n";
+  out << "\n";
 
   if(solver!=solvert::BOOLECTOR)
   {
     for(const auto &id : smt2_identifiers)
-      os << "(get-value (|" << id << "|))"
-         << "\n";
+      out << "(get-value (|" << id << "|))"
+          << "\n";
   }
 
-  os << "\n";
+  out << "\n";
 
-  os << "(exit)\n";
+  out << "(exit)\n";
 
-  os << "; end of SMT2 file"
-     << "\n";
+  out << "; end of SMT2 file"
+      << "\n";
 }
 
 void smt2_convt::define_object_size(
@@ -267,7 +267,7 @@ void smt2_convt::define_object_size(
 
 decision_proceduret::resultt smt2_convt::dec_solve()
 {
-  write_footer(out);
+  write_footer();
   out.flush();
   return decision_proceduret::resultt::D_ERROR;
 }

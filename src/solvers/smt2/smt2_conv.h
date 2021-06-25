@@ -96,7 +96,7 @@ protected:
   resultt dec_solve() override;
 
   void write_header();
-  void write_footer(std::ostream &);
+  void write_footer();
 
   // tweaks for arrays
   bool use_array_theory(const exprt &);

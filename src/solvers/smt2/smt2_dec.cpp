@@ -39,13 +39,15 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     temp_file_stdout("smt2_dec_stdout_", ""),
     temp_file_stderr("smt2_dec_stderr_", "");
 
-  {
-    // we write the problem into a file
-    std::ofstream problem_out(
-      temp_file_problem(), std::ios_base::out | std::ios_base::trunc);
-    problem_out << stringstream.str();
-    write_footer(problem_out);
-  }
+  const auto write_problem_to_file = [&](std::ofstream problem_out) {
+    cached_output << stringstream.str();
+    stringstream.str(std::string{});
+    write_footer();
+    problem_out << cached_output.str() << stringstream.str();
+    stringstream.str(std::string{});
+  };
+  write_problem_to_file(std::ofstream(
+    temp_file_problem(), std::ios_base::out | std::ios_base::trunc));
 
   std::vector<std::string> argv;
   std::string stdin_filename;
