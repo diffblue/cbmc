@@ -2567,6 +2567,30 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(abs_expr);
   }
+  else if(
+    identifier == CPROVER_PREFIX "fmod" ||
+    identifier == CPROVER_PREFIX "fmodf" ||
+    identifier == CPROVER_PREFIX "fmodl")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fmod-functions expect two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    // Note that the semantics differ from the
+    // "floating point remainder" operation as defined by IEEE.
+    // Note that these do not take a rounding mode.
+    binary_exprt fmod_expr(
+      expr.arguments()[0], ID_floatbv_mod, expr.arguments()[1]);
+
+    fmod_expr.add_source_location() = source_location;
+
+    return std::move(fmod_expr);
+  }
   else if(identifier==CPROVER_PREFIX "allocate")
   {
     if(expr.arguments().size()!=2)

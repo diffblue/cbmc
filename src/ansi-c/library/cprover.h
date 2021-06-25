@@ -117,6 +117,11 @@ double __CPROVER_fabs(double);
 long double __CPROVER_fabsl(long double);
 float __CPROVER_fabsf(float);
 
+// modulo and remainder
+double __CPROVER_fmod(double, double);
+float __CPROVER_fmodf(float, float);
+long double __CPROVER_fmodl(long double, long double);
+
 // arrays
 //__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);
 void __CPROVER_array_copy(const void *dest, const void *src);

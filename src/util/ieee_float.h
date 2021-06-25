@@ -128,6 +128,9 @@ public:
     UNKNOWN, NONDETERMINISTIC
   };
 
+  // A helper to turn a rounding mode into a constant bitvector expression
+  static constant_exprt rounding_mode_expr(rounding_modet);
+
   rounding_modet rounding_mode;
 
   ieee_float_spect spec;
