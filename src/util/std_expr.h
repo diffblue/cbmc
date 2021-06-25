@@ -1043,8 +1043,10 @@ inline div_exprt &to_div_expr(exprt &expr)
   return ret;
 }
 
-
-/// \brief Modulo
+/// \brief Modulo defined as lhs-(rhs * truncate(lhs/rhs)).
+/// The sign follows the lhs or dividend. This matches C99 and
+/// SMT-LIB's bvsrem but differs from the Euclidian definition
+/// and from SMT-LIB's bvsmod.
 class mod_exprt:public binary_exprt
 {
 public:
