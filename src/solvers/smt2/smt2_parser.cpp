@@ -275,6 +275,12 @@ std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
   return {std::move(bindings), std::move(expr)};
 }
 
+exprt smt2_parsert::lambda_expression()
+{
+  auto binding = this->binding(ID_lambda);
+  return lambda_exprt(binding.first, binding.second);
+}
+
 exprt smt2_parsert::quantifier_expression(irep_idt id)
 {
   auto binding = this->binding(id);
@@ -972,6 +978,7 @@ void smt2_parsert::setup_expressions()
     return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
   };
 
+  expressions["lambda"] = [this] { return lambda_expression(); };
   expressions["let"] = [this] { return let_expression(); };
   expressions["exists"] = [this] { return quantifier_expression(ID_exists); };
   expressions["forall"] = [this] { return quantifier_expression(ID_forall); };
