@@ -163,6 +163,7 @@ protected:
   exprt binary(irep_idt, const exprt::operandst &);
   exprt unary(irep_idt, const exprt::operandst &);
 
+  std::pair<binding_exprt::variablest, exprt> binding(irep_idt);
   exprt let_expression();
   exprt quantifier_expression(irep_idt);
   exprt function_application(

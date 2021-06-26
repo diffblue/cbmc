@@ -215,7 +215,7 @@ exprt smt2_parsert::let_expression()
   return let_exprt(variables, values, where);
 }
 
-exprt smt2_parsert::quantifier_expression(irep_idt id)
+std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
 {
   if(next_token() != smt2_tokenizert::OPEN)
     throw error() << "expected bindings after " << id;
@@ -264,8 +264,6 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error() << "expected ')' after " << id;
 
-  exprt result=expr;
-
   // remove bindings from id_map
   for(const auto &b : bindings)
     id_map.erase(b.get_identifier());
@@ -274,14 +272,17 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   for(auto &saved_id : saved_ids)
     id_map.insert(std::move(saved_id));
 
-  // go backwards, build quantified expression
-  for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
-  {
-    quantifier_exprt quantifier(id, *r_it, result);
-    result=quantifier;
-  }
+  return {std::move(bindings), std::move(expr)};
+}
 
-  return result;
+exprt smt2_parsert::quantifier_expression(irep_idt id)
+{
+  auto binding = this->binding(id);
+
+  if(binding.second.type().id() != ID_bool)
+    throw error() << id << " expects a boolean term";
+
+  return quantifier_exprt(id, binding.first, binding.second);
 }
 
 exprt smt2_parsert::function_application(
