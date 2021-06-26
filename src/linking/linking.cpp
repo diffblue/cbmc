@@ -36,8 +36,13 @@ bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 
   const exprt &e = it->second;
 
-  typet type = s.type();
-  static_cast<exprt &>(s) = typecast_exprt::conditional_cast(e, type);
+  if(e.type().id() != ID_array)
+  {
+    typet type = s.type();
+    static_cast<exprt &>(s) = typecast_exprt::conditional_cast(e, type);
+  }
+  else
+    static_cast<exprt &>(s) = e;
 
   return false;
 }
