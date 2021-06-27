@@ -162,6 +162,8 @@ protected:
   exprt binary_predicate(irep_idt, const exprt::operandst &);
   exprt binary(irep_idt, const exprt::operandst &);
   exprt unary(irep_idt, const exprt::operandst &);
+  exprt bv_division(const exprt::operandst &, bool is_signed);
+  exprt bv_mod(const exprt::operandst &, bool is_signed);
 
   std::pair<binding_exprt::variablest, exprt> binding(irep_idt);
   exprt lambda_expression();

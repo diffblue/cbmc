@@ -8,19 +8,24 @@
 (define-fun b03 () Bool (= (bvneg #x07) #xf9)) ; unary minus
 (define-fun b04 () Bool (= (bvmul #x07 #x03) #x15)) ; multiplication
 (define-fun b05 () Bool (= (bvurem #x07 #x03) #x01)) ; unsigned remainder
-(define-fun b06 () Bool (= (bvsrem #x07 #x03) #x01)) ; signed remainder
-(define-fun b07 () Bool (= (bvsmod #x07 #x03) #x01)) ; signed modulo
-(define-fun b08 () Bool (= (bvshl #x07 #x03) #x38)) ; shift left
-(define-fun b09 () Bool (= (bvlshr #xf0 #x03) #x1e)) ; unsigned (logical) shift right
-(define-fun b10 () Bool (= (bvashr #xf0 #x03) #xfe)) ; signed (arithmetical) shift right#x0a
+(define-fun b06 () Bool (= (bvurem #x07 #x00) #x07)) ; unsigned remainder (div. by zero)
+(define-fun b07 () Bool (= (bvudiv #x01 #x00) #xff)) ; unsigned division (div. by zero)
+(define-fun b08 () Bool (= (bvsrem #x07 #x03) #x01)) ; signed remainder
+(define-fun b09 () Bool (= (bvsrem #x07 #x00) #x07)) ; signed remainder (div. by zero)
+(define-fun b10 () Bool (= (bvsmod #x07 #x03) #x01)) ; signed modulo
+(define-fun b11 () Bool (= (bvsmod #x07 #x00) #x07)) ; signed modulo (div. by zero)
+(define-fun b12 () Bool (= (bvsdiv #x01 #x00) #xff)) ; signed division (div. by zero)
+(define-fun b13 () Bool (= (bvshl #x07 #x03) #x38)) ; shift left
+(define-fun b14 () Bool (= (bvlshr #xf0 #x03) #x1e)) ; unsigned (logical) shift right
+(define-fun b15 () Bool (= (bvashr #xf0 #x03) #xfe)) ; signed (arithmetical) shift right#x0a
 
 ; Multi-ary variants, where applicable
-(define-fun b11 () Bool (= (bvadd #x07 #x03 #x01) #x0b)) ; addition
-(define-fun b12 () Bool (= (bvmul #x07 #x03 #x01) #x15)) ; multiplication
+(define-fun b16 () Bool (= (bvadd #x07 #x03 #x01) #x0b)) ; addition
+(define-fun b17 () Bool (= (bvmul #x07 #x03 #x01) #x15)) ; multiplication
 
 ; rotation
-(define-fun b13 () Bool (= ((_ rotate_left 2) #xf7) #xdf)) ; rotation left
-(define-fun b14 () Bool (= ((_ rotate_right 2) #x07) #xc1)) ; rotation right
+(define-fun b18 () Bool (= ((_ rotate_left 2) #xf7) #xdf)) ; rotation left
+(define-fun b19 () Bool (= ((_ rotate_right 2) #x07) #xc1)) ; rotation right
 
 ; Bitwise Operations
 
@@ -67,7 +72,7 @@
 ; all must be true
 
 (assert (not (and
-  b01 b02 b03 b04 b05 b06 b07 b08 b09 b10 b11 b12 b13 b14
+  b01 b02 b03 b04 b05 b06 b07 b08 b09 b10 b11 b12 b13 b14 b15 b16 b17 b18 b19
   d01
   power-test
   p1 p2 p3 p4 p5 p6 p7 p8)))
