@@ -163,6 +163,8 @@ protected:
   exprt binary(irep_idt, const exprt::operandst &);
   exprt unary(irep_idt, const exprt::operandst &);
 
+  std::pair<binding_exprt::variablest, exprt> binding(irep_idt);
+  exprt lambda_expression();
   exprt let_expression();
   exprt quantifier_expression(irep_idt);
   exprt function_application(
@@ -177,6 +179,7 @@ protected:
 
   // sorts
   typet sort();
+  typet function_sort();
   std::unordered_map<std::string, std::function<typet()>> sorts;
   void setup_sorts();
 

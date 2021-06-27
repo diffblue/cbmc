@@ -215,7 +215,7 @@ exprt smt2_parsert::let_expression()
   return let_exprt(variables, values, where);
 }
 
-exprt smt2_parsert::quantifier_expression(irep_idt id)
+std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
 {
   if(next_token() != smt2_tokenizert::OPEN)
     throw error() << "expected bindings after " << id;
@@ -264,8 +264,6 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   if(next_token() != smt2_tokenizert::CLOSE)
     throw error() << "expected ')' after " << id;
 
-  exprt result=expr;
-
   // remove bindings from id_map
   for(const auto &b : bindings)
     id_map.erase(b.get_identifier());
@@ -274,14 +272,23 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   for(auto &saved_id : saved_ids)
     id_map.insert(std::move(saved_id));
 
-  // go backwards, build quantified expression
-  for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
-  {
-    quantifier_exprt quantifier(id, *r_it, result);
-    result=quantifier;
-  }
+  return {std::move(bindings), std::move(expr)};
+}
 
-  return result;
+exprt smt2_parsert::lambda_expression()
+{
+  auto binding = this->binding(ID_lambda);
+  return lambda_exprt(binding.first, binding.second);
+}
+
+exprt smt2_parsert::quantifier_expression(irep_idt id)
+{
+  auto binding = this->binding(id);
+
+  if(binding.second.type().id() != ID_bool)
+    throw error() << id << " expects a boolean term";
+
+  return quantifier_exprt(id, binding.first, binding.second);
 }
 
 exprt smt2_parsert::function_application(
@@ -971,6 +978,7 @@ void smt2_parsert::setup_expressions()
     return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
   };
 
+  expressions["lambda"] = [this] { return lambda_expression(); };
   expressions["let"] = [this] { return let_expression(); };
   expressions["exists"] = [this] { return quantifier_expression(ID_exists); };
   expressions["forall"] = [this] { return quantifier_expression(ID_forall); };
@@ -1236,6 +1244,32 @@ void smt2_parsert::setup_expressions()
   expressions["fp.neg"] = [this] { return unary(ID_unary_minus, operands()); };
 }
 
+typet smt2_parsert::function_sort()
+{
+  std::vector<typet> sorts;
+
+  //  (-> sort+ sort)
+  // The last sort is the co-domain.
+
+  while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE)
+  {
+    if(smt2_tokenizer.peek() == smt2_tokenizert::END_OF_FILE)
+      throw error() << "unexpected end-of-file in a function sort";
+
+    sorts.push_back(sort()); // recursive call
+  }
+
+  next_token(); // eat the ')'
+
+  if(sorts.size() < 2)
+    throw error() << "expected function sort to have at least 2 type arguments";
+
+  auto codomain = std::move(sorts.back());
+  sorts.pop_back();
+
+  return mathematical_function_typet(std::move(sorts), std::move(codomain));
+}
+
 typet smt2_parsert::sort()
 {
   // a sort is one of the following three cases:
@@ -1334,6 +1368,8 @@ void smt2_parsert::setup_sorts()
     else
       throw error("unsupported array sort");
   };
+
+  sorts["->"] = [this] { return function_sort(); };
 }
 
 smt2_parsert::signature_with_parameter_idst
