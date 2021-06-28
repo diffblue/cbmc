@@ -59,7 +59,6 @@ smt2_convt::smt2_convt(
   solvert _solver,
   std::ostream &_out)
   : use_FPA_theory(false),
-    use_array_of_bool(false),
     use_as_const(false),
     use_check_sat_assuming(false),
     use_datatypes(false),
@@ -88,7 +87,6 @@ smt2_convt::smt2_convt(
 
   case solvert::CPROVER_SMT2:
     use_FPA_theory = true;
-    use_array_of_bool = true;
     use_as_const = true;
     use_check_sat_assuming = true;
     emit_set_logic = false;
@@ -99,7 +97,6 @@ smt2_convt::smt2_convt(
 
   case solvert::CVC4:
     logic = "ALL";
-    use_array_of_bool = true;
     use_as_const = true;
     break;
 
@@ -110,7 +107,6 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::Z3:
-    use_array_of_bool = true;
     use_as_const = true;
     use_check_sat_assuming = true;
     use_lambda_for_array = true;
@@ -4070,24 +4066,11 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
     if(use_array_theory(expr.array()))
     {
-      if(expr.type().id() == ID_bool && !use_array_of_bool)
-      {
-        out << "(= ";
-        out << "(select ";
-        convert_expr(expr.array());
-        out << " ";
-        convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
-        out << ")";
-        out << " #b1)";
-      }
-      else
-      {
-        out << "(select ";
-        convert_expr(expr.array());
-        out << " ";
-        convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
-        out << ")";
-      }
+      out << "(select ";
+      convert_expr(expr.array());
+      out << " ";
+      convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+      out << ")";
     }
     else
     {
@@ -4644,16 +4627,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << "(assert (forall ((i ";
         convert_type(array_type.size().type());
         out << ")) (= (select " << id << " i) ";
-        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
-        {
-          out << "(ite ";
-          convert_expr(array_of.what());
-          out << " #b1 #b0)";
-        }
-        else
-        {
-          convert_expr(array_of.what());
-        }
+        convert_expr(array_of.what());
         out << ")))\n";
 
         defined_expressions[expr] = id;
@@ -4692,16 +4666,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << ")) (= (select " << id << " ";
         convert_expr(array_comprehension.arg());
         out << ") ";
-        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
-        {
-          out << "(ite ";
-          convert_expr(array_comprehension.body());
-          out << " #b1 #b0)";
-        }
-        else
-        {
-          convert_expr(array_comprehension.body());
-        }
+        convert_expr(array_comprehension.body());
         out << "))))\n";
 
         defined_expressions[expr] = id;
@@ -4725,16 +4690,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << "(assert (= (select " << id << " ";
         convert_expr(from_integer(i, array_type.size().type()));
         out << ") "; // select
-        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
-        {
-          out << "(ite ";
-          convert_expr(expr.operands()[i]);
-          out << " #b1 #b0)";
-        }
-        else
-        {
-          convert_expr(expr.operands()[i]);
-        }
+        convert_expr(expr.operands()[i]);
         out << "))" << "\n"; // =, assert
       }
 
@@ -4879,17 +4835,10 @@ void smt2_convt::convert_type(const typet &type)
     CHECK_RETURN(array_type.size().is_not_nil());
 
     // we always use array theory for top-level arrays
-    const typet &subtype = array_type.element_type();
-
     out << "(Array ";
     convert_type(array_type.size().type());
     out << " ";
-
-    if(subtype.id()==ID_bool && !use_array_of_bool)
-      out << "(_ BitVec 1)";
-    else
-      convert_type(array_type.element_type());
-
+    convert_type(array_type.element_type());
     out << ")";
   }
   else if(type.id()==ID_bool)
