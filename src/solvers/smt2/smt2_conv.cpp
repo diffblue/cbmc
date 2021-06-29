@@ -258,7 +258,7 @@ void smt2_convt::define_object_size(
         << "((_ extract " << h << " " << l << ") ";
     convert_expr(ptr);
     out << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
-        << "(= " << id << " (_ bv" << *object_size << " " << size_width
+        << "(= |" << id << "| (_ bv" << *object_size << " " << size_width
         << "))))\n";
 
     ++number;
@@ -1931,7 +1931,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_object_size)
   {
-    out << object_sizes[expr];
+    out << "|" << object_sizes[expr] << "|";
   }
   else if(expr.id()==ID_let)
   {
@@ -4589,7 +4589,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       {
         const irep_idt id =
           "object_size." + std::to_string(object_sizes.size());
-        out << "(declare-fun " << id << " () ";
+        out << "(declare-fun |" << id << "| () ";
         convert_type(expr.type());
         out << ")" << "\n";
 
