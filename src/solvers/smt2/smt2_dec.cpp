@@ -139,7 +139,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   boolean_assignment.resize(no_boolean_variables, false);
 
   typedef std::unordered_map<irep_idt, irept> valuest;
-  valuest values;
+  valuest parsed_values;
 
   while(in)
   {
@@ -167,7 +167,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       // ( (|some_integer| 0) )
       // ( (|some_integer| (- 10)) )
 
-      values[s0.id()]=s1;
+      parsed_values[s0.id()] = s1;
     }
     else if(
       parsed.id().empty() && parsed.get_sub().size() == 2 &&
@@ -207,16 +207,29 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   for(auto &assignment : identifier_map)
   {
-    std::string conv_id=convert_identifier(assignment.first);
-    const irept &value=values[conv_id];
-    assignment.second.value=parse_rec(value, assignment.second.type);
+    std::string conv_id = convert_identifier(assignment.first);
+    const irept &value = parsed_values[conv_id];
+    assignment.second.value = parse_rec(value, assignment.second.type);
   }
 
   // Booleans
   for(unsigned v=0; v<no_boolean_variables; v++)
   {
-    const irept &value=values["B"+std::to_string(v)];
-    boolean_assignment[v]=(value.id()==ID_true);
+    const std::string boolean_identifier = "B" + std::to_string(v);
+    boolean_assignment[v] = [&]() {
+      const auto found_parsed_value = parsed_values.find(boolean_identifier);
+      if(found_parsed_value != parsed_values.end())
+        return found_parsed_value->second.id() == ID_true;
+      // Work out the value based on what set_to was called with.
+      const auto found_set_value =
+        set_values.find('|' + boolean_identifier + '|');
+      if(found_set_value != set_values.end())
+        return found_set_value->second;
+      // Old code used the computation
+      // const irept &value=values["B"+std::to_string(v)];
+      // boolean_assignment[v]=(value.id()==ID_true);
+      return parsed_values[boolean_identifier].id() == ID_true;
+    }();
   }
 
   return res;
