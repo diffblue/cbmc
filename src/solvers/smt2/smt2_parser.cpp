@@ -1123,7 +1123,12 @@ void smt2_parsert::setup_expressions()
   // We don't have that.
   expressions["bvsmod"] = [this] { return bv_mod(operands(), true); };
 
-  expressions["%"] = [this] { return binary(ID_mod, operands()); };
+  expressions["mod"] = [this] {
+    // SMT-LIB2 uses Boute's Euclidean definition for mod,
+    // which is never negative and undefined when the second
+    // argument is zero.
+    return binary(ID_euclidean_mod, operands());
+  };
 
   expressions["concat"] = [this] {
     auto op = operands();
