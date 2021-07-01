@@ -96,7 +96,16 @@ protected:
   resultt dec_solve() override;
 
   void write_header();
-  void write_footer(std::ostream &);
+  /// Writes the end of the SMT file to the `smt_convt::out` stream. These parts
+  /// of the output may be changed when using multiple rounds of solving. They
+  /// include the following parts of the output file -
+  ///  * The object size definitions.
+  ///  * The assertions based on the `assumptions` member variable.
+  ///  * The `(check-sat)` or `check-sat-assuming` command.
+  ///  * A `(get-value |identifier|)` command for each of the identifiers in
+  ///    `smt2_convt::smt2_identifiers`.
+  ///  * An `(exit)` command.
+  void write_footer();
 
   // tweaks for arrays
   bool use_array_theory(const exprt &);

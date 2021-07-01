@@ -45,6 +45,10 @@ public:
 protected:
   message_handlert &message_handler;
 
+  /// Everything except the footer is cached, so that output files can be
+  /// rewritten with varying footers.
+  std::stringstream cached_output;
+
   resultt read_result(std::istream &in);
 };
 
