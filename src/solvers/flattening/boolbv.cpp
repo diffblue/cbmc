@@ -42,24 +42,29 @@ boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
   // check cache first
   std::pair<bv_cachet::iterator, bool> cache_result=
     bv_cache.insert(std::make_pair(expr, bvt()));
+
+  // get a reference to the cache entry
+  auto &cache_entry = cache_result.first->second;
+
   if(!cache_result.second)
   {
-    return cache_result.first->second;
+    // Found in cache
+    return cache_entry;
   }
 
-  // Iterators into hash_maps supposedly stay stable
-  // even though we are inserting more elements recursively.
-
-  cache_result.first->second = convert_bitvector(expr);
+  // Iterators into hash_maps do not remain valid when inserting
+  // more elements recursively. C++11 §23.2.5/13
+  // However, the _reference_ to the entry does!
+  cache_entry = convert_bitvector(expr);
 
   INVARIANT_WITH_DIAGNOSTICS(
-    !expected_width || cache_result.first->second.size() == *expected_width,
+    !expected_width || cache_entry.size() == *expected_width,
     "bitvector width shall match the indicated expected width",
     expr.find_source_location(),
     irep_pretty_diagnosticst(expr));
 
   // check
-  for(const auto &literal : cache_result.first->second)
+  for(const auto &literal : cache_entry)
   {
     if(freeze_all && !literal.is_constant())
       prop.set_frozen(literal);
@@ -71,7 +76,7 @@ boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
       irep_pretty_diagnosticst(expr));
   }
 
-  return cache_result.first->second;
+  return cache_entry;
 }
 
 /// Print that the expression of x has failed conversion,
