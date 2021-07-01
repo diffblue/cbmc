@@ -244,9 +244,25 @@ interval_abstract_valuet::interval_abstract_valuet(
 {
 }
 
+bool new_interval_is_top(const constant_interval_exprt &e)
+{
+  if(e.is_top())
+    return true;
+
+  if(e.get_lower().is_false() && e.get_upper().is_true())
+    return true;
+  if(
+    e.type().id() == ID_c_bool && e.get_lower().is_zero() &&
+    e.get_upper().is_one())
+    return true;
+
+  return false;
+}
+
 interval_abstract_valuet::interval_abstract_valuet(
   const constant_interval_exprt &e)
-  : abstract_value_objectt(e.type(), e.is_top(), e.is_bottom()), interval(e)
+  : abstract_value_objectt(e.type(), new_interval_is_top(e), e.is_bottom()),
+    interval(e)
 {
 }
 
@@ -288,6 +304,11 @@ exprt interval_abstract_valuet::to_constant() const
     return abstract_objectt::to_constant();
   }
 #endif
+}
+
+void interval_abstract_valuet::set_top_internal()
+{
+  interval = constant_interval_exprt(type());
 }
 
 size_t interval_abstract_valuet::internal_hash() const
