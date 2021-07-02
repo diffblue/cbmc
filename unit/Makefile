@@ -30,6 +30,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume_prune.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/expression_evaluation.cpp \
+       analyses/variable-sensitivity/value_set_abstract_object/extremes-go-top.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/compacting.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/meet.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/merge.cpp \
