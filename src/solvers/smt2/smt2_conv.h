@@ -159,8 +159,23 @@ protected:
   constant_exprt parse_literal(const irept &, const typet &type);
   struct_exprt parse_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
+  /// This function is for parsing array output from SMT solvers
+  /// when "(get-value |???|)" returns an array object.
+  /// \param s: is the irept parsed from the SMT output
+  /// \param type: is the expected type
+  /// \returns an exprt that represents the array
   exprt parse_array(const irept &s, const array_typet &type);
   exprt parse_rec(const irept &s, const typet &type);
+  /// This function walks the SMT output and populates a
+  /// map with index/value pairs for the array
+  /// \param operands_map: is a map of the operands to the array
+  ///    being constructed indexed by their index.
+  /// \param src: is the irept source for the SMT output
+  /// \param type: is the type of the array
+  void walk_array_tree(
+    std::unordered_map<int64_t, exprt> *operands_map,
+    const irept &src,
+    const array_typet &type);
 
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
