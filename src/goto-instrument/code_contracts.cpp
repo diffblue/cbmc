@@ -112,8 +112,9 @@ exprt get_size(const typet &type, const namespacet &ns, messaget &log)
   return result;
 }
 
-void code_contractst::check_apply_invariants(
+void code_contractst::check_apply_loop_contracts(
   goto_functionst::goto_functiont &goto_function,
+  const irep_idt &function_name,
   const local_may_aliast &local_may_alias,
   const goto_programt::targett loop_head,
   const loopt &loop,
@@ -129,11 +130,25 @@ void code_contractst::check_apply_invariants(
       t->location_number > loop_end->location_number)
       loop_end = t;
 
-  // see whether we have an invariant
+  // see whether we have an invariant and a decreases clause
   exprt invariant = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_loop_invariant));
+  exprt decreases_clause = static_cast<const exprt &>(
+    loop_end->get_condition().find(ID_C_spec_decreases));
   if(invariant.is_nil())
-    return;
+  {
+    if(decreases_clause.is_nil())
+      return;
+    else
+    {
+      invariant = true_exprt();
+      log.warning()
+        << "The loop at " << loop_head->source_location.as_string()
+        << " does not have a loop invariant, but has a decreases clause. "
+        << "Hence, a default loop invariant ('true') is being used."
+        << messaget::eom;
+    }
+  }
 
   // change
   //   H: loop;
@@ -142,9 +157,12 @@ void code_contractst::check_apply_invariants(
   //   H: assert(invariant);
   //   havoc;
   //   assume(invariant);
+  //   old_decreases_value = decreases_clause(current_environment);
   //   if(guard) goto E:
   //   loop;
+  //   new_decreases_value = decreases_clause(current_environment);
   //   assert(invariant);
+  //   assert(new_decreases_value < old_decreases_value);
   //   assume(false);
   //   E: ...
 
@@ -188,6 +206,32 @@ void code_contractst::check_apply_invariants(
     converter.goto_convert(assumption, havoc_code, mode);
   }
 
+  // Temporary variables that store the decreases clause's values before and
+  // after the loop
+  symbol_exprt old_decreases_symbol =
+    new_tmp_symbol(
+      decreases_clause.type(), loop_head->source_location, function_name, mode)
+      .symbol_expr();
+  symbol_exprt new_decreases_symbol =
+    new_tmp_symbol(
+      decreases_clause.type(), loop_head->source_location, function_name, mode)
+      .symbol_expr();
+
+  if(!decreases_clause.is_nil())
+  {
+    // Generate: a declaration of the temporary variable that stores the
+    // decreases clause's value before the loop
+    havoc_code.add(goto_programt::make_decl(
+      old_decreases_symbol, loop_head->source_location));
+
+    // Generate: an assignment to store the decreases clause's value before the
+    // loop
+    code_assignt old_decreases_assignment{old_decreases_symbol,
+                                          decreases_clause};
+    old_decreases_assignment.add_source_location() = loop_head->source_location;
+    converter.goto_convert(old_decreases_assignment, havoc_code, mode);
+  }
+
   // non-deterministically skip the loop if it is a do-while loop
   if(!loop_head->is_goto())
   {
@@ -209,14 +253,46 @@ void code_contractst::check_apply_invariants(
     converter.goto_convert(assertion, havoc_code, mode);
     havoc_code.instructions.back().source_location.set_comment(
       "Check that loop invariant is preserved");
-    auto offset = havoc_code.instructions.size();
-    goto_function.body.insert_before_swap(loop_end, havoc_code);
-    std::advance(loop_end, offset);
   }
+
+  if(!decreases_clause.is_nil())
+  {
+    // Generate: a declaration of a temporary variable that stores the decreases
+    // clause after one arbitrary iteration of the loop
+    havoc_code.add(goto_programt::make_decl(
+      new_decreases_symbol, loop_head->source_location));
+
+    // Generate: an assignment to store the decreases clause's value after one
+    // iteration of the loop
+    code_assignt new_decreases_assignment{new_decreases_symbol,
+                                          decreases_clause};
+    new_decreases_assignment.add_source_location() = loop_head->source_location;
+    converter.goto_convert(new_decreases_assignment, havoc_code, mode);
+
+    // Generate: assertion that the decreases clause's value after the loop is
+    // smaller than the value before the loop
+    code_assertt monotonic_decreasing_assertion{
+      binary_relation_exprt(new_decreases_symbol, ID_lt, old_decreases_symbol)};
+    monotonic_decreasing_assertion.add_source_location() =
+      loop_head->source_location;
+    converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
+    havoc_code.instructions.back().source_location.set_comment(
+      "Check decreases clause on loop iteration");
+
+    // Discard the temporary variables that store decreases clause's values
+    havoc_code.add(goto_programt::make_dead(
+      old_decreases_symbol, loop_head->source_location));
+    havoc_code.add(goto_programt::make_dead(
+      new_decreases_symbol, loop_head->source_location));
+  }
+
+  auto offset = havoc_code.instructions.size();
+  goto_function.body.insert_before_swap(loop_end, havoc_code);
+  std::advance(loop_end, offset);
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->targets.clear();
-  loop_end->type=ASSUME;
+  loop_end->type = ASSUME;
   if(loop_head->is_goto())
     loop_end->set_condition(false_exprt());
   else
@@ -559,12 +635,15 @@ void code_contractst::apply_loop_contract(
   // Iterate over the (natural) loops in the function,
   // and apply any invariant annotations that we find.
   for(const auto &loop : natural_loops.loop_map)
-    check_apply_invariants(
+  {
+    check_apply_loop_contracts(
       goto_function,
+      function_name,
       local_may_alias,
       loop.first,
       loop.second,
       symbol_table.lookup_ref(function_name).mode);
+  }
 }
 
 const symbolt &code_contractst::new_tmp_symbol(

@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--apply-loop-contracts
 activate-multi-line-match
 ^main.c.*error: syntax error before ','\n.*__CPROVER_decreases\(N - i, 42\)$
 ^PARSING ERROR$
@@ -8,6 +8,6 @@ activate-multi-line-match
 ^SIGNAL=0$
 --
 --
-This test fails because the loop variant has two arguments instead of just one.
-Currently, we only support loop variants of single arguments - we do not
-support loop variants of tuples (yet). 
+This test fails because the decreases clause has two arguments instead of just one.
+Currently, we only support decreases clauses of single arguments - we do not
+support decreases clauses of tuples (yet). 
