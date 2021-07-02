@@ -116,6 +116,7 @@ static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
 static bool are_any_top(const abstract_object_sett &set);
+static bool is_set_extreme(const typet &type, const abstract_object_sett &set);
 
 static abstract_object_sett compact_values(const abstract_object_sett &values);
 static abstract_object_sett widen_value_set(
@@ -296,7 +297,7 @@ void value_set_abstract_objectt::set_values(
   const abstract_object_sett &other_values)
 {
   PRECONDITION(!other_values.empty());
-  if(are_any_top(other_values))
+  if(are_any_top(other_values) || is_set_extreme(type(), other_values))
   {
     set_top();
   }
@@ -389,6 +390,65 @@ static bool are_any_top(const abstract_object_sett &set)
            set.begin(), set.end(), [](const abstract_object_pointert &value) {
              return value->is_top();
            }) != set.end();
+}
+
+using set_predicate_fn = std::function<bool(const abstract_value_objectt &)>;
+static bool set_contains(const abstract_object_sett &set, set_predicate_fn pred)
+{
+  return std::find_if(
+           set.begin(),
+           set.end(),
+           [&pred](const abstract_object_pointert &obj) {
+             const auto &value =
+               std::dynamic_pointer_cast<const abstract_value_objectt>(obj);
+             return pred(*value);
+           }) != set.end();
+}
+
+static bool set_has_extremes(
+  const abstract_object_sett &set,
+  set_predicate_fn lower_fn,
+  set_predicate_fn upper_fn)
+{
+  bool has_lower = set_contains(set, lower_fn);
+  if(!has_lower)
+    return false;
+
+  bool has_upper = set_contains(set, upper_fn);
+  return has_upper;
+}
+
+static bool is_set_extreme(const typet &type, const abstract_object_sett &set)
+{
+  if(type.id() == ID_bool)
+  {
+    return set_has_extremes(
+      set,
+      [](const abstract_value_objectt &value) {
+        auto c = value.to_constant();
+        return c.is_false() || (c.id() == ID_min);
+      },
+      [](const abstract_value_objectt &value) {
+        auto c = value.to_constant();
+        return c.is_true() || (c.id() == ID_max);
+      });
+  }
+
+  if(type.id() == ID_c_bool)
+  {
+    return set_has_extremes(
+      set,
+      [](const abstract_value_objectt &value) {
+        auto c = value.to_constant();
+        return c.is_zero() || (c.id() == ID_min);
+      },
+      [](const abstract_value_objectt &value) {
+        auto c = value.to_constant();
+        return c.is_one() || (c.id() == ID_max);
+      });
+  }
+
+  return false;
 }
 
 /////////////////

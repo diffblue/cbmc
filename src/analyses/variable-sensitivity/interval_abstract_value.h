@@ -96,6 +96,8 @@ protected:
 
 private:
   constant_interval_exprt interval;
+
+  void set_top_internal() override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_INTERVAL_ABSTRACT_VALUE_H

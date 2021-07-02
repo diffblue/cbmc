@@ -21,6 +21,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/full_array_abstract_object/merge.cpp \
        analyses/variable-sensitivity/eval.cpp \
        analyses/variable-sensitivity/eval-member-access.cpp \
+       analyses/variable-sensitivity/interval_abstract_value/extremes-go-top.cpp \
        analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
        analyses/variable-sensitivity/interval_abstract_value/merge.cpp \
        analyses/variable-sensitivity/interval_abstract_value/widening_merge.cpp \
@@ -29,6 +30,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume_prune.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/expression_evaluation.cpp \
+       analyses/variable-sensitivity/value_set_abstract_object/extremes-go-top.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/compacting.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/meet.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/merge.cpp \
