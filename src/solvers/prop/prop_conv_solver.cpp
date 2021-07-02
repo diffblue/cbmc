@@ -166,13 +166,18 @@ literalt prop_conv_solvert::convert(const exprt &expr)
   // check cache first
   auto result = cache.insert({expr, literalt()});
 
-  if(!result.second)
-    return result.first->second;
+  // get a reference to the cache entry
+  auto &cache_entry = result.first->second;
 
+  if(!result.second) // found in cache
+    return cache_entry;
+
+  // The following may invalidate the iterator result.first,
+  // but note that the _reference_ is guaranteed to remain valid.
   literalt literal = convert_bool(expr);
 
-  // insert into cache
-  result.first->second = literal;
+  // store the literal in the cache using the reference
+  cache_entry = literal;
 
   if(freeze_all && !literal.is_constant())
     prop.set_frozen(literal);
