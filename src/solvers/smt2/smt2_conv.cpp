@@ -283,6 +283,7 @@ exprt smt2_convt::get(const exprt &expr) const
 
     if(it!=identifier_map.end())
       return it->second.value;
+    return expr;
   }
   else if(expr.id()==ID_nondet_symbol)
   {
@@ -474,30 +475,84 @@ exprt smt2_convt::parse_array(
   const irept &src,
   const array_typet &type)
 {
+  std::unordered_map<int64_t, exprt> operands_map;
+  walk_array_tree(&operands_map, src, type);
+  exprt::operandst operands;
+  // Try to find the default value, if there is none then set it
+  auto maybe_default_op = operands_map.find(-1);
+  exprt default_op;
+  if(maybe_default_op == operands_map.end())
+    default_op = nil_exprt();
+  else
+    default_op = maybe_default_op->second;
+  int64_t i = 0;
+  auto maybe_size = numeric_cast<std::int64_t>(type.size());
+  if(maybe_size.has_value())
+  {
+    while(i < maybe_size.value())
+    {
+      auto found_op = operands_map.find(i);
+      if(found_op != operands_map.end())
+        operands.emplace_back(found_op->second);
+      else
+        operands.emplace_back(default_op);
+      i++;
+    }
+  }
+  else
+  {
+    // Array size is unknown, keep adding with known indexes in order
+    // until we fail to find one.
+    auto found_op = operands_map.find(i);
+    while(found_op != operands_map.end())
+    {
+      operands.emplace_back(found_op->second);
+      i++;
+      found_op = operands_map.find(i);
+    }
+    operands.emplace_back(default_op);
+  }
+  return array_exprt(operands, type);
+}
+
+void smt2_convt::walk_array_tree(
+  std::unordered_map<int64_t, exprt> *operands_map,
+  const irept &src,
+  const array_typet &type)
+{
   if(src.get_sub().size()==4 && src.get_sub()[0].id()=="store")
   {
+    // This is the SMT syntax being parsed here
     // (store array index value)
-    if(src.get_sub().size()!=4)
-      return nil_exprt();
-
-    exprt array=parse_array(src.get_sub()[1], type);
-    exprt index=parse_rec(src.get_sub()[2], type.size().type());
-    exprt value=parse_rec(src.get_sub()[3], type.subtype());
-
-    return with_exprt(array, index, value);
+    // Recurse
+    walk_array_tree(operands_map, src.get_sub()[1], type);
+    const auto index_expr = parse_rec(src.get_sub()[2], type.size().type());
+    const constant_exprt index_constant = to_constant_expr(index_expr);
+    mp_integer tempint;
+    bool failure = to_integer(index_constant, tempint);
+    if(failure)
+      return;
+    long index = tempint.to_long();
+    exprt value = parse_rec(src.get_sub()[3], type.subtype());
+    operands_map->emplace(index, value);
+  }
+  else if(src.get_sub().size() == 3 && src.get_sub()[0].id() == "let")
+  {
+    // This is produced by Z3
+    // (let (....) (....))
+    walk_array_tree(
+      operands_map, src.get_sub()[1].get_sub()[0].get_sub()[1], type);
+    walk_array_tree(operands_map, src.get_sub()[2], type);
   }
   else if(src.get_sub().size()==2 &&
           src.get_sub()[0].get_sub().size()==3 &&
           src.get_sub()[0].get_sub()[0].id()=="as" &&
           src.get_sub()[0].get_sub()[1].id()=="const")
   {
-    // This is produced by Z3.
-    // ((as const (Array (_ BitVec 64) (_ BitVec 8))) #x00)))
-    exprt value=parse_rec(src.get_sub()[1], type.subtype());
-    return array_of_exprt(value, type);
+    // (as const type_info default_value)
+    exprt default_value = parse_rec(src.get_sub()[1], type.subtype());
+    operands_map->emplace(-1, default_value);
   }
-  else
-    return nil_exprt();
 }
 
 exprt smt2_convt::parse_union(
