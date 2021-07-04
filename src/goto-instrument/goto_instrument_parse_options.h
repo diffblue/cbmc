@@ -72,6 +72,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(show-value-sets)" \
+  "(show-value-set-fi)" \
   "(show-global-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-escape-analysis)(escape-analysis)" \
