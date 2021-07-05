@@ -1,0 +1,12 @@
+KNOWNBUG broken-smt-backend
+original_repro.c
+--smt2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+\[main.assertion.\d\] line \d+ assertion validate\(data, allocated\): SUCCESS
+--
+\[main.assertion.\d\] line \d+ assertion validate\(data, allocated\): FAILURE
+--
+This is the original code that demonstrates the issue described in
+https://github.com/diffblue/cbmc/issues/5952
