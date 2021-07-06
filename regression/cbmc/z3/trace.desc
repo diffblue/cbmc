@@ -1,0 +1,13 @@
+CORE smt-backend broken-cprover-smt-backend
+trace.c
+--trace --smt2 --z3
+^EXIT=10$
+^SIGNAL=0$
+arr=\{ arr
+arr=\{ 0, 1, 2, 3, 4, 5, 6, 17 \}
+--
+arr=(assignment removed)
+error running SMT2 solver
+--
+Run cbmc with the --z3 and --trace options with arrays to confirm that
+int arrays are displayed in traces.
