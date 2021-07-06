@@ -491,11 +491,22 @@ quantifier_expression:
         }
         ;
 
-loop_invariant_opt:
+loop_invariant:
+          TOK_CPROVER_LOOP_INVARIANT '(' ACSL_binding_expression ')'
+        { $$=$3; }
+        ;
+
+loop_invariant_list:
+          loop_invariant
+        { init($$); mto($$, $1); }
+        | loop_invariant_list loop_invariant
+        { $$=$1; mto($$, $2); }
+        ;
+
+loop_invariant_list_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_LOOP_INVARIANT '(' ACSL_binding_expression ')'
-        { $$=$3; }
+        | loop_invariant_list
         ;
 
 cprover_decreases_opt:
@@ -2426,28 +2437,28 @@ declaration_or_expression_statement:
 
 iteration_statement:
         TOK_WHILE '(' comma_expression_opt ')'
-          loop_invariant_opt cprover_decreases_opt 
+          loop_invariant_list_opt cprover_decreases_opt
           statement
         {
           $$=$1;
           statement($$, ID_while);
           parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($7)));
 
-          if(parser_stack($5).is_not_nil())
-            parser_stack($$).add(ID_C_spec_loop_invariant).swap(parser_stack($5));
+          if(!parser_stack($5).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($5).operands());
 
           if(parser_stack($6).is_not_nil())
             parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($6));
         }
         | TOK_DO statement TOK_WHILE '(' comma_expression ')'
-          loop_invariant_opt cprover_decreases_opt ';'
+          loop_invariant_list_opt cprover_decreases_opt ';'
         {
           $$=$1;
           statement($$, ID_dowhile);
           parser_stack($$).add_to_operands(std::move(parser_stack($5)), std::move(parser_stack($2)));
 
-          if(parser_stack($7).is_not_nil())
-            parser_stack($$).add(ID_C_spec_loop_invariant).swap(parser_stack($7));
+          if(!parser_stack($7).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($7).operands());
 
           if(parser_stack($8).is_not_nil())
             parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($8));
@@ -2464,7 +2475,7 @@ iteration_statement:
           '(' declaration_or_expression_statement
               comma_expression_opt ';'
               comma_expression_opt ')'
-              loop_invariant_opt cprover_decreases_opt
+              loop_invariant_list_opt cprover_decreases_opt
           statement
         {
           $$=$1;
@@ -2475,8 +2486,8 @@ iteration_statement:
           mto($$, $7);
           mto($$, $11);
 
-          if(parser_stack($9).is_not_nil())
-            parser_stack($$).add(ID_C_spec_loop_invariant).swap(parser_stack($9));
+          if(!parser_stack($9).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($9).operands());
 
           if(parser_stack($10).is_not_nil())
             parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($10));

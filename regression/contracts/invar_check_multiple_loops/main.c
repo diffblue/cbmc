@@ -7,7 +7,8 @@ int main()
 
   for(r = 0; r < n; ++r)
     // clang-format off
-    __CPROVER_loop_invariant(0 <= r && r <= n && x == y + r)
+    __CPROVER_loop_invariant(0 <= r && r <= n)
+    __CPROVER_loop_invariant(x == y + r)
     __CPROVER_decreases(n - r)
     // clang-format on
     {
