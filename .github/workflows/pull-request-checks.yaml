@@ -119,6 +119,50 @@ jobs:
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=2
 
+  # This job has been copied from the one above it, and modified to only build CBMC
+  # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
+  # (unit/regression) have been stripped based on the rationale that they are going
+  # to be run by the job above, which is basically the same, but more comprehensive.
+  # The reason we opted for a new job is that adding a `test-z3` step to the current
+  # jobs increases the job runtime to unacceptable levels (over 2hrs).
+  check-ubuntu-20_04-make-clang-smt-z3:
+    runs-on: ubuntu-20.04
+    env:
+      CC: "ccache /usr/bin/clang"
+      CXX: "ccache /usr/bin/clang++"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          make -C src minisat2-download
+          cpanm Thread::Pool::Simple
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-make-clang-smt-z3-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-20.04-make-clang-smt-z3-${{ github.ref }}
+            ${{ runner.os }}-20.04-make-clang-smt-z3
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with make
+        run: make -C src -j2
+      - name: Run regression/cbmc tests with z3 as the backend
+        run: make -C regression/cbmc test-z3
+
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
     steps:
