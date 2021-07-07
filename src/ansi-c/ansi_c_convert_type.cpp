@@ -253,6 +253,18 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
     assigns = to_unary_expr(as_expr).op();
+
+    for(const exprt &operand : assigns.operands())
+    {
+      if(
+        operand.id() != ID_symbol && operand.id() != ID_ptrmember &&
+        operand.id() != ID_dereference)
+      {
+        error().source_location = source_location;
+        error() << "illegal target in assigns clause" << eom;
+        throw 0;
+      }
+    }
   }
   else if(type.id() == ID_C_spec_ensures)
   {

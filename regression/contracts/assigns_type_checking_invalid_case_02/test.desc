@@ -1,0 +1,10 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=(1|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+error: illegal target in assigns clause
+--
+--
+Checks whether parser fails for a single-index array assigns target.
