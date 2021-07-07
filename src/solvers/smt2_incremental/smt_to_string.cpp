@@ -3,10 +3,13 @@
 #include <solvers/smt2_incremental/smt_to_string.h>
 
 #include <solvers/smt2/smt2_conv.h>
+#include <solvers/smt2_incremental/smt_commands.h>
+#include <solvers/smt2_incremental/smt_logics.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 
 #include <util/range.h>
+#include <util/string_utils.h>
 
 #include <functional>
 #include <iostream>
@@ -227,5 +230,154 @@ std::string smt_to_string(const smt_termt &term)
 {
   std::stringstream ss;
   ss << term;
+  return ss.str();
+}
+
+class smt_option_to_string_convertert
+  : public smt_option_const_downcast_visitort
+{
+protected:
+  std::ostream &os;
+
+public:
+  explicit smt_option_to_string_convertert(std::ostream &os) : os(os)
+  {
+  }
+
+  void visit(const smt_option_produce_modelst &produce_models) override
+  {
+    os << ":produce-models " << (produce_models.setting() ? "true" : "false");
+  }
+};
+
+std::ostream &operator<<(std::ostream &os, const smt_optiont &option)
+{
+  option.accept(smt_option_to_string_convertert{os});
+  return os;
+}
+
+std::string smt_to_string(const smt_optiont &option)
+{
+  std::stringstream ss;
+  ss << option;
+  return ss.str();
+}
+
+class smt_logic_to_string_convertert : public smt_logic_const_downcast_visitort
+{
+protected:
+  std::ostream &os;
+
+public:
+  explicit smt_logic_to_string_convertert(std::ostream &os) : os(os)
+  {
+  }
+
+  void visit(const smt_logic_quantifier_free_bit_vectorst &) override
+  {
+    os << "QF_BV";
+  }
+};
+
+std::ostream &operator<<(std::ostream &os, const smt_logict &logic)
+{
+  logic.accept(smt_logic_to_string_convertert{os});
+  return os;
+}
+
+std::string smt_to_string(const smt_logict &logic)
+{
+  std::stringstream ss;
+  ss << logic;
+  return ss.str();
+}
+
+class smt_command_to_string_convertert
+  : public smt_command_const_downcast_visitort
+{
+protected:
+  std::ostream &os;
+
+public:
+  explicit smt_command_to_string_convertert(std::ostream &os) : os(os)
+  {
+  }
+
+  void visit(const smt_assert_commandt &assert) override
+  {
+    os << "(assert " << assert.condition() << ")";
+  }
+
+  void visit(const smt_check_sat_commandt &check_sat) override
+  {
+    os << "(check-sat)";
+  }
+
+  void visit(const smt_declare_function_commandt &declare_function) override
+  {
+    os << "(declare-fun " << declare_function.identifier() << " (";
+    const auto parameter_sorts = declare_function.parameter_sorts();
+    join_strings(os, parameter_sorts.begin(), parameter_sorts.end(), ' ');
+    os << ") " << declare_function.return_sort() << ")";
+  }
+
+  void visit(const smt_define_function_commandt &define_function) override
+  {
+    os << "(define-fun " << define_function.identifier() << " (";
+    const auto parameters = define_function.parameters();
+    join_strings(
+      os,
+      parameters.begin(),
+      parameters.end(),
+      " ",
+      [](const smt_identifier_termt &identifier) {
+        return "(" + smt_to_string(identifier) + " " +
+               smt_to_string(identifier.get_sort()) + ")";
+      });
+    os << ") " << define_function.return_sort() << " "
+       << define_function.definition() << ")";
+  }
+
+  void visit(const smt_exit_commandt &exit) override
+  {
+    os << "(exit)";
+  }
+
+  void visit(const smt_get_value_commandt &get_value) override
+  {
+    os << "(get-value " << get_value.descriptor() << ")";
+  }
+
+  void visit(const smt_pop_commandt &pop) override
+  {
+    os << "(pop " << pop.levels() << ")";
+  }
+
+  void visit(const smt_push_commandt &push) override
+  {
+    os << "(push " << push.levels() << ")";
+  }
+
+  void visit(const smt_set_logic_commandt &set_logic) override
+  {
+    os << "(set-logic " << set_logic.logic() << ")";
+  }
+
+  void visit(const smt_set_option_commandt &set_option) override
+  {
+    os << "(set-option " << set_option.option() << ")";
+  }
+};
+
+std::ostream &operator<<(std::ostream &os, const smt_commandt &command)
+{
+  command.accept(smt_command_to_string_convertert{os});
+  return os;
+}
+
+std::string smt_to_string(const smt_commandt &command)
+{
+  std::stringstream ss;
+  ss << command;
   return ss.str();
 }
