@@ -3,8 +3,9 @@ main.c
 --enforce-all-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-^\[bar.1\] line \d+ .*: FAILURE$
-^\[baz.1\] line \d+ .*: FAILURE$
+^\[bar\.1\] line \d+ .*: FAILURE$
+^\[baz\.1\] line \d+ .*: FAILURE$
+^\[qux\.1\] line \d+ .*: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

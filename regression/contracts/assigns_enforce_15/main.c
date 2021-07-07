@@ -20,10 +20,16 @@ int baz() __CPROVER_ensures(__CPROVER_return_value == global)
   return global;
 }
 
+void qux(void) __CPROVER_assigns()
+{
+  global = global + 1;
+}
+
 int main()
 {
   int n;
   n = foo(&n);
   n = baz();
+  qux();
   return 0;
 }
