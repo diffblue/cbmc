@@ -815,10 +815,12 @@ void c_typecheck_baset::typecheck_spec_loop_invariant(codet &code)
 {
   if(code.find(ID_C_spec_loop_invariant).is_not_nil())
   {
-    exprt &invariant = static_cast<exprt &>(code.add(ID_C_spec_loop_invariant));
-
-    typecheck_expr(invariant);
-    implicit_typecast_bool(invariant);
+    for(auto &invariant :
+        (static_cast<exprt &>(code.add(ID_C_spec_loop_invariant)).operands()))
+    {
+      typecheck_expr(invariant);
+      implicit_typecast_bool(invariant);
+    }
   }
 }
 

@@ -149,6 +149,11 @@ void code_contractst::check_apply_loop_contracts(
         << messaget::eom;
     }
   }
+  else
+  {
+    // form the conjunction
+    invariant = conjunction(invariant.operands());
+  }
 
   // change
   //   H: loop;
