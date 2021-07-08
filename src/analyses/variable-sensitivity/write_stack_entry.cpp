@@ -32,7 +32,9 @@ bool write_stack_entryt::try_squash_in(
 simple_entryt::simple_entryt(exprt expr) : simple_entry(expr)
 {
   // Invalid simple expression added to the stack
-  PRECONDITION(expr.id() == ID_member || expr.id() == ID_symbol);
+  PRECONDITION(
+    expr.id() == ID_member || expr.id() == ID_symbol ||
+    expr.id() == ID_dynamic_object);
 }
 
 /// Get the expression part needed to read this stack entry. For simple

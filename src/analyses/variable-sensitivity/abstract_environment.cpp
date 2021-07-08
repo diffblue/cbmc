@@ -84,6 +84,17 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
 
+  if(
+    simplified_id == ID_side_effect &&
+    (simplified_expr.get(ID_statement) == ID_allocate))
+  {
+    auto heap_symbol = unary_exprt(
+      ID_address_of, exprt(ID_dynamic_object), simplified_expr.type());
+    auto heap_pointer =
+      abstract_object_factory(simplified_expr.type(), heap_symbol, ns);
+    return heap_pointer;
+  }
+
   // No special handling required by the abstract environment
   // delegate to the abstract object
   if(!simplified_expr.operands().empty())

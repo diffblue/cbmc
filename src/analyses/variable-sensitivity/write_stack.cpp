@@ -138,7 +138,7 @@ void write_stackt::construct_stack_to_lvalue(
       construct_stack_to_lvalue(
         to_member_expr(expr).struct_op(), environment, ns);
     }
-    else if(expr.id() == ID_symbol)
+    else if(expr.id() == ID_symbol || expr.id() == ID_dynamic_object)
     {
       add_to_stack(std::make_shared<simple_entryt>(expr), environment, ns);
     }
