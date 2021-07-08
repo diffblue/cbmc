@@ -1370,6 +1370,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_mult(to_ieee_float_op_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_rem)
+  {
+    convert_floatbv_rem(to_binary_expr(expr));
+  }
   else if(expr.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr = to_address_of_expr(expr);
@@ -3721,6 +3725,29 @@ void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
   }
   else
     convert_floatbv(expr);
+}
+
+void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
+{
+  DATA_INVARIANT(
+    expr.type().id() == ID_floatbv,
+    "type of ieee floating point expression shall be floatbv");
+
+  if(use_FPA_theory)
+  {
+    // Note that these do not have a rounding mode
+    out << "(fp.rem ";
+    convert_expr(expr.lhs());
+    out << " ";
+    convert_expr(expr.rhs());
+    out << ")";
+  }
+  else
+  {
+    SMT2_TODO(
+      "smt2_convt::convert_floatbv_rem to be implemented when not using "
+      "FPA_theory");
+  }
 }
 
 void smt2_convt::convert_with(const with_exprt &expr)

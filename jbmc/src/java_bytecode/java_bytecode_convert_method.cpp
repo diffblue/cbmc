@@ -1558,8 +1558,10 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     else if(bytecode == patternt("?rem"))
     {
       PRECONDITION(op.size() == 2 && results.size() == 1);
+      // This is _not_ the remainder operation defined by IEEE 754,
+      // but similar to the fmod C library function.
       if(bytecode == BC_frem || bytecode == BC_drem)
-        results[0]=rem_exprt(op[0], op[1]);
+        results[0] = binary_exprt(op[0], ID_floatbv_mod, op[1]);
       else
         results[0]=mod_exprt(op[0], op[1]);
     }

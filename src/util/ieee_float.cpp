@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "bitvector_types.h"
+#include "c_types.h"
 #include "invariant.h"
 #include "std_expr.h"
 
@@ -53,6 +54,11 @@ void ieee_float_spect::from_type(const floatbv_typet &type)
   x86_extended=type.get_bool(ID_x86_extended);
   if(x86_extended)
     e=e-1; // no hidden bit
+}
+
+constant_exprt ieee_floatt::rounding_mode_expr(rounding_modet rm)
+{
+  return ::from_integer(static_cast<int>(rm), unsigned_int_type());
 }
 
 void ieee_floatt::print(std::ostream &out) const
