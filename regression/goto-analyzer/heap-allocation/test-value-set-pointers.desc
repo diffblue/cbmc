@@ -1,0 +1,7 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::i_was_malloced \(\) -> value-set-begin: ptr ->\(heap allocation\) :value-set-end
+--

@@ -12,6 +12,7 @@
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
+#include <util/pointer_expr.h>
 
 #include "abstract_environment.h"
 
@@ -66,6 +67,14 @@ value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
   : abstract_pointer_objectt(type)
 {
   values.insert(std::make_shared<constant_pointer_abstract_objectt>(type));
+}
+
+value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
+  const typet &new_type,
+  const value_set_pointer_abstract_objectt &old)
+  : abstract_pointer_objectt(new_type, old.is_top(), old.is_bottom()),
+    values(old.values)
+{
 }
 
 value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
@@ -131,6 +140,13 @@ abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
   }
 
   return shared_from_this();
+}
+
+abstract_object_pointert
+value_set_pointer_abstract_objectt::typecast(const typet &new_type) const
+{
+  INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
+  return std::make_shared<value_set_pointer_abstract_objectt>(new_type, *this);
 }
 
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(

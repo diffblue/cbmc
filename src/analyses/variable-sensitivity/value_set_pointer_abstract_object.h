@@ -22,6 +22,10 @@ public:
   /// \copydoc abstract_objectt::abstract_objectt(const typet&)
   explicit value_set_pointer_abstract_objectt(const typet &type);
 
+  value_set_pointer_abstract_objectt(
+    const typet &new_type,
+    const value_set_pointer_abstract_objectt &old);
+
   /// \copydoc abstract_objectt::abstract_objectt(const typet &, bool, bool)
   value_set_pointer_abstract_objectt(const typet &type, bool top, bool bottom);
 
@@ -63,6 +67,8 @@ public:
     const std::stack<exprt> &stack,
     const abstract_object_pointert &new_value,
     bool merging_write) const override;
+
+  abstract_object_pointert typecast(const typet &new_type) const override;
 
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;

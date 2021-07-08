@@ -33,8 +33,10 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
 }
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
+  const typet &new_type,
   const constant_pointer_abstract_objectt &old)
-  : abstract_pointer_objectt(old), value_stack(old.value_stack)
+  : abstract_pointer_objectt(new_type, old.is_top(), old.is_bottom()),
+    value_stack(old.value_stack)
 {
 }
 
@@ -120,6 +122,10 @@ void constant_pointer_abstract_objectt::output(
         const symbol_exprt &symbol_pointed_to(to_symbol_expr(addressee));
 
         out << symbol_pointed_to.get_identifier();
+      }
+      else if(addressee.id() == ID_dynamic_object)
+      {
+        out << "heap allocation";
       }
       else if(addressee.id() == ID_index)
       {
@@ -207,6 +213,13 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
     return std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
       shared_from_this());
   }
+}
+
+abstract_object_pointert
+constant_pointer_abstract_objectt::typecast(const typet &new_type) const
+{
+  INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
+  return std::make_shared<constant_pointer_abstract_objectt>(new_type, *this);
 }
 
 void constant_pointer_abstract_objectt::get_statistics(

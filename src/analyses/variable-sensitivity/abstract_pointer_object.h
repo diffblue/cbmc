@@ -95,6 +95,8 @@ public:
     const std::stack<exprt> &stack,
     const abstract_object_pointert &value,
     bool merging_write) const;
+
+  virtual abstract_object_pointert typecast(const typet &new_type) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_POINTER_OBJECT_H
