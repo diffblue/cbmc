@@ -145,7 +145,7 @@ public:
   }
 
 protected:
-  void register_languages();
+  void register_languages() override;
 
   void get_goto_program();
   void instrument_goto_program();

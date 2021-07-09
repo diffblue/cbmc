@@ -49,7 +49,7 @@ public:
   goto_diff_parse_optionst(int argc, const char **argv);
 
 protected:
-  void register_languages();
+  void register_languages() override;
 
   void get_command_line_options(optionst &options);
 

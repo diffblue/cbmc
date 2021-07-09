@@ -108,6 +108,9 @@ int goto_harness_parse_optionst::doit()
   // This just sets up the defaults (and would interpret options such as --32).
   config.set(cmdline);
 
+  // Normally we would register language front-ends here but as goto-harness
+  // only works on goto binaries, we don't need to
+
   // Read goto binary into goto-model
   auto read_goto_binary_result =
     read_goto_binary(got_harness_config.in_file, ui_message_handler);
