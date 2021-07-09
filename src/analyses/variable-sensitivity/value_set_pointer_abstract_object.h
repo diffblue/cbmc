@@ -24,7 +24,9 @@ public:
 
   value_set_pointer_abstract_objectt(
     const typet &new_type,
-    const value_set_pointer_abstract_objectt &old);
+    bool top,
+    bool bottom,
+    const abstract_object_sett &new_values);
 
   /// \copydoc abstract_objectt::abstract_objectt(const typet &, bool, bool)
   value_set_pointer_abstract_objectt(const typet &type, bool top, bool bottom);
