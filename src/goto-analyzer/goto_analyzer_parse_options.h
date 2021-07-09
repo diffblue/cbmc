@@ -183,7 +183,7 @@ public:
 protected:
   goto_modelt goto_model;
 
-  virtual void register_languages();
+  void register_languages() override;
 
   virtual void get_command_line_options(optionst &options);
 

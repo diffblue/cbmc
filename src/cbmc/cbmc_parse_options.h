@@ -114,7 +114,7 @@ public:
 protected:
   goto_modelt goto_model;
 
-  void register_languages();
+  void register_languages() override;
   void get_command_line_options(optionst &);
   void preprocessing(const optionst &);
   bool set_properties();
