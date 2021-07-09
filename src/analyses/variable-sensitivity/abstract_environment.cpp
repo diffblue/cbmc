@@ -88,13 +88,10 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     simplified_id == ID_side_effect &&
     (simplified_expr.get(ID_statement) == ID_allocate))
   {
-    auto dynamic_object = exprt(ID_dynamic_object);
-    dynamic_object.set(ID_identifier, "allocated-on-heap");
-    auto heap_symbol =
-      unary_exprt(ID_address_of, dynamic_object, simplified_expr.type());
-    auto heap_pointer =
-      abstract_object_factory(simplified_expr.type(), heap_symbol, ns);
-    return heap_pointer;
+    return abstract_object_factory(
+      typet(ID_dynamic_object),
+      exprt(ID_dynamic_object, simplified_expr.type()),
+      ns);
   }
 
   // No special handling required by the abstract environment

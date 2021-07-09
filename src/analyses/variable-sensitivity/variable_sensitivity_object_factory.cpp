@@ -114,6 +114,10 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(
   {
     return configuration.union_abstract_type;
   }
+  else if(type.id() == ID_dynamic_object)
+  {
+    return HEAP_ALLOCATION;
+  }
 
   return abstract_object_type;
 }
@@ -173,6 +177,16 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   case UNION_INSENSITIVE:
     return initialize_abstract_object<two_value_union_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns, configuration);
+
+  case HEAP_ALLOCATION:
+  {
+    auto dynamic_object = exprt(ID_dynamic_object);
+    dynamic_object.set(ID_identifier, "allocated-on-heap");
+    auto heap_symbol = unary_exprt(ID_address_of, dynamic_object, e.type());
+    auto heap_pointer =
+      get_abstract_object(e.type(), false, false, heap_symbol, environment, ns);
+    return heap_pointer;
+  }
 
   default:
     UNREACHABLE;
