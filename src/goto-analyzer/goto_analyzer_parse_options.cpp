@@ -24,7 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cpp_language.h>
 #include <cpp/cprover_library.h>
 
-#include <jsil/jsil_language.h>
+#ifdef HAVE_JSIL
+#  include <jsil/jsil_language.h>
+#endif
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -69,7 +71,10 @@ void goto_analyzer_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
+
+#ifdef HAVE_JSIL
   register_language(new_jsil_language);
+#endif
 }
 
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
