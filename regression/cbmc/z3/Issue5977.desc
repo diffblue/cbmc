@@ -1,0 +1,9 @@
+CORE smt-backend broken-cprover-smt-backend
+Issue5977.c
+--z3
+^EXIT=(6|10)$
+^SIGNAL=0$
+^SMT2 solver returned "unknown"$
+--
+--
+This tests that an "unknown" result from the SMT solver is reported.
