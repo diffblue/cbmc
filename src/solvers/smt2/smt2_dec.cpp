@@ -154,6 +154,12 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       res=resultt::D_SATISFIABLE;
     else if(parsed.id()=="unsat")
       res=resultt::D_UNSATISFIABLE;
+    else if(parsed.id() == "unknown")
+    {
+      messaget log{message_handler};
+      log.error() << "SMT2 solver returned \"unknown\"" << messaget::eom;
+      return decision_proceduret::resultt::D_ERROR;
+    }
     else if(
       parsed.id().empty() && parsed.get_sub().size() == 1 &&
       parsed.get_sub().front().get_sub().size() == 2)
