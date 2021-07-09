@@ -4415,6 +4415,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
     // This is a converted expression, we can just assert the literal name
     // since the expression is already defined
     out << found_literal->second;
+    set_values[found_literal->second] = value;
   }
   else
   {

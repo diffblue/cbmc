@@ -1,0 +1,12 @@
+CORE smt-backend broken-cprover-smt-backend
+Issue5970.c
+--z3
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line [0-9]+ assertion x\[0\] > 0: FAILURE$
+--
+invalid get-value term, term must be ground and must not contain quantifiers
+^\[main\.assertion\.1\] line [0-9]+ assertion x\[0\] > 0: ERROR$
+--
+This tests that attempts to "(get-value |XXX|)" from z3 sat results
+are handled and do not cause an error message or ERROR result.

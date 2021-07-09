@@ -250,6 +250,10 @@ protected:
 
   typedef std::map<exprt, irep_idt> defined_expressionst;
   defined_expressionst defined_expressions;
+  /// The values which boolean identifiers have been `smt2_convt::set_to` or
+  /// in other words those which are asserted as true / false in the output
+  /// smt2 formula.
+  std::unordered_map<irep_idt, bool> set_values;
 
   defined_expressionst object_sizes;
 
