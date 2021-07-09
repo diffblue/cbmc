@@ -181,7 +181,8 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   case HEAP_ALLOCATION:
   {
     auto dynamic_object = exprt(ID_dynamic_object);
-    dynamic_object.set(ID_identifier, "allocated-on-heap");
+    dynamic_object.set(
+      ID_identifier, "heap-allocation-" + std::to_string(heap_allocations++));
     auto heap_symbol = unary_exprt(ID_address_of, dynamic_object, e.type());
     auto heap_pointer =
       get_abstract_object(e.type(), false, false, heap_symbol, environment, ns);

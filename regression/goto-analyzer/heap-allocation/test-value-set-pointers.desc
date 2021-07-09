@@ -3,5 +3,6 @@ main.c
 --variable-sensitivity --vsd-pointers value-set --show
 ^EXIT=0$
 ^SIGNAL=0$
-main::1::i_was_malloced \(\) -> value-set-begin: ptr ->\(allocated-on-heap\) :value-set-end
+main::1::p \(\) -> value-set-begin: ptr ->\(heap-allocation-0\) :value-set-end
+main::1::q \(\) -> value-set-begin: ptr ->\(heap-allocation-1\) :value-set-end
 --

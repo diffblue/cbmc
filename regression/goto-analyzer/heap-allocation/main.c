@@ -1,7 +1,6 @@
 
 int main()
 {
-  int *i_was_malloced = malloc(sizeof(int) * 10);
-
-  // q[0] = 99;
+  int *p = malloc(sizeof(int) * 10);
+  int *q = malloc(sizeof(int) * 5);
 }
