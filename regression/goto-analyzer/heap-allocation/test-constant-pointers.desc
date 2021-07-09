@@ -3,5 +3,5 @@ main.c
 --variable-sensitivity --vsd-pointers constants --show
 ^EXIT=0$
 ^SIGNAL=0$
-main::1::i_was_malloced \(\) -> ptr ->\(heap allocation\)
+main::1::i_was_malloced \(\) -> ptr ->\(heap-object\[0\]\)
 --

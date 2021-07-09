@@ -106,7 +106,10 @@ public:
     const abstract_object_pointert &value,
     bool merging_write) const override;
 
-  abstract_object_pointert typecast(const typet &new_type) const override;
+  abstract_object_pointert typecast(
+    const typet &new_type,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
 
   void get_statistics(
     abstract_object_statisticst &statistics,

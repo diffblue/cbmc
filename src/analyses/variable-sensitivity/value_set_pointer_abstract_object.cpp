@@ -142,8 +142,10 @@ abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
   return shared_from_this();
 }
 
-abstract_object_pointert
-value_set_pointer_abstract_objectt::typecast(const typet &new_type) const
+abstract_object_pointert value_set_pointer_abstract_objectt::typecast(
+  const typet &new_type,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
 {
   INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
   return std::make_shared<value_set_pointer_abstract_objectt>(new_type, *this);

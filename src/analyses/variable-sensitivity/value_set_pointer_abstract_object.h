@@ -68,7 +68,10 @@ public:
     const abstract_object_pointert &new_value,
     bool merging_write) const override;
 
-  abstract_object_pointert typecast(const typet &new_type) const override;
+  abstract_object_pointert typecast(
+    const typet &new_type,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
 
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
