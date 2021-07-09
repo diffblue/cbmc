@@ -544,14 +544,12 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
-  const exprt &size=to_array_type(type).size();
-
-  const auto s = numeric_cast<mp_integer>(size);
-  if(!s.has_value())
+  const std::size_t size = boolbv_width(type);
+  if(size == 0)
     return true;
 
   if(unbounded_array==unbounded_arrayt::U_AUTO)
-    if(*s > MAX_FLATTENED_ARRAY_SIZE)
+    if(size > MAX_FLATTENED_ARRAY_SIZE)
       return true;
 
   return false;
