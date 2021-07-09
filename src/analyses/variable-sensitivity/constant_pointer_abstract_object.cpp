@@ -127,7 +127,7 @@ void constant_pointer_abstract_objectt::output(
       }
       else if(addressee.id() == ID_dynamic_object)
       {
-        out << "heap allocation";
+        out << addressee.get(ID_identifier);
       }
       else if(addressee.id() == ID_index)
       {
@@ -232,7 +232,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::typecast(
     auto heap_array_type = array_typet(new_type.subtype(), nil_exprt());
     auto array_object =
       environment.abstract_object_factory(heap_array_type, ns, true, false);
-    auto heap_symbol = symbol_exprt("heap-object", heap_array_type);
+    auto heap_symbol = symbol_exprt(value.get(ID_identifier), heap_array_type);
     env.assign(heap_symbol, array_object, ns);
     auto heap_address = address_of_exprt(
       index_exprt(heap_symbol, from_integer(0, signed_size_type())));
