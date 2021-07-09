@@ -84,6 +84,28 @@ set(sat_impl "minisat2" CACHE STRING
     'minisat2', 'glucose', 'cadical', 'ipasir-cadical' or 'ipasir-custom'"
 )
 
+option(enable_marchnative "Build with full native optimization support, -march=native")
+if(enable_marchnative)
+  if ((CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+      OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
+      OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "i586")
+      OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "i686")
+      OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "amd64") # freebsd
+      OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64") # windows
+      OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86")
+      AND (CMAKE_COMPILER_IS_GNUCC
+        OR (CMAKE_CXX_COMPILER_ID STREQUAL AppleClang)
+        OR (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        OR (CMAKE_CXX_COMPILER_ID STREQUAL Intel)))
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+    message(NOTICE "-- Compile option -march=native added")
+  else()
+    # FIXME /favor:AMD64 vs /favor:INTEL64 for MSVC
+    message(NOTICE "Invalid enable_marchnative ignored")
+  endif()
+endif()
+
 if(${enable_cbmc_tests})
     enable_testing()
 endif()
@@ -97,8 +119,9 @@ if(DEFINED CMAKE_USE_CUDD)
             )
 
     if(NOT EXISTS ${cudd_SOURCE_DIR}/Makefile)
-        message(STATUS "Configuring Cudd-3.0.0")
-        execute_process(COMMAND ./configure WORKING_DIRECTORY ${cudd_SOURCE_DIR})
+        message(STATUS "Configuring Cudd-3.0.0 with CFLAGS=\"${CMAKE_C_FLAGS} -g -O3\" CXXFLAGS=\"${CMAKE_CXX_FLAGS} -std=c++0x -g -O3\"")
+        execute_process(COMMAND "./configure CFLAGS=\"${CMAKE_C_FLAGS} -g -O3\" CXXFLAGS=\"${CMAKE_CXX_FLAGS} -std=c++0x -g -O3\""
+                        WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     endif()
     message(STATUS "Building Cudd-3.0.0")
     execute_process(COMMAND make WORKING_DIRECTORY ${cudd_SOURCE_DIR})
@@ -183,9 +206,9 @@ function(cprover_default_properties)
 endfunction()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-set(WITH_MEMORY_ANALYZER_DEFAULT ON)
+  set(WITH_MEMORY_ANALYZER_DEFAULT ON)
 else()
-set(WITH_MEMORY_ANALYZER_DEFAULT OFF)
+  set(WITH_MEMORY_ANALYZER_DEFAULT OFF)
 endif()
 
 option(WITH_MEMORY_ANALYZER
