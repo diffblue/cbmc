@@ -115,6 +115,9 @@ abstract_object_pointert value_set_pointer_abstract_objectt::typecast(
   abstract_object_sett new_values;
   for(auto value : values)
   {
+    if(value->is_top()) // multiple mallocs in the same scope can cause spurious
+      continue; // TOP values, which we can safely strip out during the cast
+
     auto pointer =
       std::dynamic_pointer_cast<const abstract_pointer_objectt>(value);
     new_values.insert(pointer->typecast(new_type, environment, ns));

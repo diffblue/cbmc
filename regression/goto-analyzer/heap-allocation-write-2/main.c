@@ -1,9 +1,10 @@
 
-int main() {
+int main()
+{
   int *p = malloc(sizeof(int) * 5);
-  int* q = malloc(sizeof(int) * 10);
+  int *q = malloc(sizeof(int) * 10);
 
-  int* pp = p;
+  int *pp = p;
 
   *p = 10;
   ++p;
