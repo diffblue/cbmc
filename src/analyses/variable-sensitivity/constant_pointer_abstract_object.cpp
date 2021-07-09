@@ -234,8 +234,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::typecast(
       environment.abstract_object_factory(heap_array_type, ns, true, false);
     auto heap_symbol = symbol_exprt("heap-object", heap_array_type);
     env.assign(heap_symbol, array_object, ns);
-    auto heap_address =
-      address_of_exprt(index_exprt(heap_symbol, from_integer(0, size_type())));
+    auto heap_address = address_of_exprt(
+      index_exprt(heap_symbol, from_integer(0, signed_size_type())));
     auto new_pointer = std::make_shared<constant_pointer_abstract_objectt>(
       heap_address, env, ns);
     return new_pointer;

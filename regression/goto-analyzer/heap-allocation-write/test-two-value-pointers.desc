@@ -5,5 +5,6 @@ main.c
 ^SIGNAL=0$
 \[main.assertion.1\] .*alias == 99: UNKNOWN
 \[main.assertion.2\] .*alias == 100: UNKNOWN
-\[main.assertion.3\] .*i_was_malloced.* == 101: UNKNOWN
+\[main.assertion.3\] .*i_was_malloced\[.*0\] == 101: UNKNOWN
+\[main.assertion.4\] .*alias\[.*1\] == 102: UNKNOWN
 --
