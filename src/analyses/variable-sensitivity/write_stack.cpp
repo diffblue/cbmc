@@ -39,10 +39,10 @@ write_stackt::write_stackt(
   if(expr.type().id() == ID_array)
   {
     // We are assigning an array to a pointer, which is equivalent to assigning
-    // the first element of that arary
+    // the first element of that array
     // &(expr)[0]
     construct_stack_to_pointer(
-      address_of_exprt(index_exprt(expr, from_integer(0, size_type()))),
+      address_of_exprt(index_exprt(expr, from_integer(0, signed_size_type()))),
       environment,
       ns);
   }
