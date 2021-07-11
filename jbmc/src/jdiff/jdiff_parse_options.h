@@ -42,13 +42,13 @@ class goto_modelt;
 class jdiff_parse_optionst : public parse_options_baset
 {
 public:
-  virtual int doit();
-  virtual void help();
+  int doit() override;
+  void help() override;
 
   jdiff_parse_optionst(int argc, const char **argv);
 
 protected:
-  void register_languages();
+  void register_languages() override;
 
   void get_command_line_options(optionst &options);
 
