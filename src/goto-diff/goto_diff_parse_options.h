@@ -43,8 +43,8 @@ class optionst;
 class goto_diff_parse_optionst : public parse_options_baset
 {
 public:
-  virtual int doit();
-  virtual void help();
+  int doit() override;
+  void help() override;
 
   goto_diff_parse_optionst(int argc, const char **argv);
 
