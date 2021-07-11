@@ -129,8 +129,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_instrument_parse_optionst : public parse_options_baset
 {
 public:
-  virtual int doit();
-  virtual void help();
+  int doit() override;
+  void help() override;
 
   goto_instrument_parse_optionst(int argc, const char **argv)
     : parse_options_baset(
