@@ -117,6 +117,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
 
   // Other default
   options.set_option("arrays-uf", "auto");
+  options.set_option("depth", UINT32_MAX);
 }
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)

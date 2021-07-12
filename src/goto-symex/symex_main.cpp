@@ -612,7 +612,7 @@ void goto_symext::execute_next_instruction(
     merge_gotos(state);
 
   // depth exceeded?
-  if(symex_config.max_depth != 0 && state.depth > symex_config.max_depth)
+  if(state.depth > symex_config.max_depth)
   {
     // Rule out this path:
     symex_assume_l2(state, false_exprt());
