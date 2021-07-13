@@ -24,3 +24,24 @@ std::size_t smt_bit_vector_sortt::bit_width() const
 {
   return get_size_t(ID_width);
 }
+
+template <typename visitort>
+void accept(const smt_sortt &sort, const irep_idt &id, visitort &&visitor)
+{
+#define SORT_ID(the_id)                                                        \
+  if(id == ID_smt_##the_id##_sort)                                             \
+    return visitor.visit(static_cast<const smt_##the_id##_sortt &>(sort));
+#include "smt_sorts.def"
+#undef SORT_ID
+  UNREACHABLE;
+}
+
+void smt_sortt::accept(smt_sort_const_downcast_visitort &visitor) const
+{
+  ::accept(*this, id(), visitor);
+}
+
+void smt_sortt::accept(smt_sort_const_downcast_visitort &&visitor) const
+{
+  ::accept(*this, id(), std::move(visitor));
+}

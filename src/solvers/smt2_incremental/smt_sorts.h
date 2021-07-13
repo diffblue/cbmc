@@ -9,6 +9,8 @@
 
 #include <util/irep.h>
 
+class smt_sort_const_downcast_visitort;
+
 class smt_sortt : protected irept
 {
 public:
@@ -17,6 +19,9 @@ public:
   smt_sortt() = delete;
 
   using irept::pretty;
+
+  void accept(smt_sort_const_downcast_visitort &) const;
+  void accept(smt_sort_const_downcast_visitort &&) const;
 
 protected:
   using irept::irept;
@@ -33,6 +38,14 @@ class smt_bit_vector_sortt final : public smt_sortt
 public:
   explicit smt_bit_vector_sortt(std::size_t bit_width);
   std::size_t bit_width() const;
+};
+
+class smt_sort_const_downcast_visitort
+{
+public:
+#define SORT_ID(the_id) virtual void visit(const smt_##the_id##_sortt &) = 0;
+#include "smt_sorts.def"
+#undef SORT_ID
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_SORTS_H
