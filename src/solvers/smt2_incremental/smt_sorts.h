@@ -9,6 +9,8 @@
 
 #include <util/irep.h>
 
+#include <type_traits>
+
 class smt_sort_const_downcast_visitort;
 
 class smt_sortt : protected irept
@@ -26,9 +28,44 @@ public:
   void accept(smt_sort_const_downcast_visitort &) const;
   void accept(smt_sort_const_downcast_visitort &&) const;
 
+  /// \brief Class for adding the ability to up and down cast smt_sortt to and
+  ///   from irept. These casts are required by other irept derived classes in
+  ///   order to store instances of smt_sortt inside them.
+  /// \tparam derivedt The type of class which derives from this class and from
+  ///   irept.
+  template <typename derivedt>
+  class storert
+  {
+  protected:
+    storert();
+    static irept upcast(smt_sortt sort);
+    static const smt_sortt &downcast(const irept &);
+  };
+
 protected:
   using irept::irept;
 };
+
+template <typename derivedt>
+smt_sortt::storert<derivedt>::storert()
+{
+  static_assert(
+    std::is_base_of<irept, derivedt>::value &&
+      std::is_base_of<storert<derivedt>, derivedt>::value,
+    "Only irept based classes need to upcast smt_sortt to store it.");
+}
+
+template <typename derivedt>
+irept smt_sortt::storert<derivedt>::upcast(smt_sortt sort)
+{
+  return static_cast<irept &&>(std::move(sort));
+}
+
+template <typename derivedt>
+const smt_sortt &smt_sortt::storert<derivedt>::downcast(const irept &irep)
+{
+  return static_cast<const smt_sortt &>(irep);
+}
 
 class smt_bool_sortt final : public smt_sortt
 {
