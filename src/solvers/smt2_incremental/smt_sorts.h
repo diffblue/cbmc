@@ -20,6 +20,9 @@ public:
 
   using irept::pretty;
 
+  bool operator==(const smt_sortt &) const;
+  bool operator!=(const smt_sortt &) const;
+
   void accept(smt_sort_const_downcast_visitort &) const;
   void accept(smt_sort_const_downcast_visitort &&) const;
 

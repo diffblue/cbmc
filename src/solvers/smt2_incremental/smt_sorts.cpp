@@ -10,6 +10,16 @@
 #include <solvers/smt2_incremental/smt_sorts.def>
 #undef SORT_ID
 
+bool smt_sortt::operator==(const smt_sortt &other) const
+{
+  return irept::operator==(other);
+}
+
+bool smt_sortt::operator!=(const smt_sortt &other) const
+{
+  return !(*this == other);
+}
+
 smt_bool_sortt::smt_bool_sortt() : smt_sortt{ID_smt_bool_sort}
 {
 }

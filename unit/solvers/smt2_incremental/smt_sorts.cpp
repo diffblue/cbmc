@@ -63,3 +63,16 @@ TEST_CASE("Visiting smt_bit_vec_sortt.", "[core][smt2_incremental]")
   REQUIRE_FALSE(visitor.bool_visited);
   REQUIRE(visitor.bit_vec_visited);
 }
+
+TEST_CASE("smt_sortt equality", "[core][smt2_incremental]")
+{
+  const smt_bool_sortt bool_sort1;
+  CHECK(bool_sort1 == bool_sort1);
+  const smt_bool_sortt bool_sort2;
+  CHECK(bool_sort1 == bool_sort2);
+  const smt_bit_vector_sortt bit_vector8{8};
+  CHECK(bit_vector8 == bit_vector8);
+  CHECK(bit_vector8 != bool_sort1);
+  const smt_bit_vector_sortt bit_vector16{16};
+  CHECK(bit_vector8 != bit_vector16);
+}
