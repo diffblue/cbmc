@@ -8,14 +8,39 @@ import os
 import sys
 
 
+class argument_separator_countert:
+    def __init__(self):
+        self.bracket_depth = 0
+        self.separators = 0
+
+    def read_text(self, text):
+        for character in text:
+            if character == '(' or character == '<':
+                self.bracket_depth += 1
+            elif character == ')' or character == '(':
+                self.bracket_depth -= 1
+            elif character == ',' and self.bracket_depth == 1:
+                self.separators += 1
+
+
 def tests_in_file(file_path):
     file_test_count = 0
+    template_counter = None
     with open(file_path, "rt") as file:
         for line in file:
-            if line.startswith("TEST_CASE"):
-                file_test_count += 1
-            if line.startswith("SCENARIO"):
-                file_test_count += 1
+            if template_counter is None:
+                if line.startswith("TEST_CASE"):
+                    file_test_count += 1
+                if line.startswith("SCENARIO"):
+                    file_test_count += 1
+                if line.startswith("TEMPLATE_TEST_CASE"):
+                    template_counter = argument_separator_countert()
+                    template_counter.read_text(line)
+            else:
+                template_counter.read_text(line)
+            if template_counter is not None and template_counter.bracket_depth == 0:
+                file_test_count += (template_counter.separators - 1)
+                template_counter = None
     return file_test_count
 
 
