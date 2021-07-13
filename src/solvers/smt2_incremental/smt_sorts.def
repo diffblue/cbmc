@@ -1,0 +1,8 @@
+/// \file
+/// This set of definitions is used as part of the
+/// [X-macro](https://en.wikipedia.org/wiki/X_Macro) pattern. These define the
+/// set of sorts which are implemented and it is used to automate repetitive
+/// parts of the implementation. These include -
+///  * The constant `irep_idt`s used to identify each of the sort classes.
+SORT_ID(bool)
+SORT_ID(bit_vector)
