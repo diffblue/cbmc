@@ -29,9 +29,44 @@ public:
   void accept(smt_term_const_downcast_visitort &) const;
   void accept(smt_term_const_downcast_visitort &&) const;
 
+  /// \brief Class for adding the ability to up and down cast smt_termt to and
+  ///   from irept. These casts are required by other irept derived classes in
+  ///   order to store instances of smt_termt inside them.
+  /// \tparam derivedt The type of class which derives from this class and from
+  ///   irept.
+  template <typename derivedt>
+  class storert
+  {
+  protected:
+    storert();
+    static irept upcast(smt_termt term);
+    static const smt_termt &downcast(const irept &);
+  };
+
 protected:
   smt_termt(irep_idt id, smt_sortt sort);
 };
+
+template <typename derivedt>
+smt_termt::storert<derivedt>::storert()
+{
+  static_assert(
+    std::is_base_of<irept, derivedt>::value &&
+      std::is_base_of<storert<derivedt>, derivedt>::value,
+    "Only irept based classes need to upcast smt_termt to store it.");
+}
+
+template <typename derivedt>
+irept smt_termt::storert<derivedt>::upcast(smt_termt term)
+{
+  return static_cast<irept &&>(std::move(term));
+}
+
+template <typename derivedt>
+const smt_termt &smt_termt::storert<derivedt>::downcast(const irept &irep)
+{
+  return static_cast<const smt_termt &>(irep);
+}
 
 class smt_bool_literal_termt : public smt_termt
 {
