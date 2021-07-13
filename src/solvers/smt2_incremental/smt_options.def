@@ -1,0 +1,9 @@
+/// \file
+/// This set of definitions is used as part of the
+/// [X-macro](https://en.wikipedia.org/wiki/X_Macro) pattern. These define the
+/// set of options which are implemented and it is used to automate repetitive
+/// parts of the implementation. These include -
+///  * The constant `irep_idt`s used to identify each of the option classes.
+///  * The member functions of the `smt_option_const_downcast_visitort` class.
+///  * The type of option checks required to implement `smt_optiont::accept`.
+OPTION_ID(produce_models)
