@@ -251,10 +251,7 @@ ifeq ($(CADICAL),)
 EXCLUDED_TESTS += satcheck_cadical.cpp
 endif
 
-N_CATCH_TESTS = $(shell \
-                  cat $$(find . -name "*.cpp" \
-                $$(printf ' -not -name %s ' $(EXCLUDED_TESTS))) | \
-                  grep -E "(SCENARIO|TEST_CASE)" | grep -c -v '\[\.\]')
+N_CATCH_TESTS = $(shell ./count_tests.py --exclude-files "$(EXCLUDED_TESTS)")
 
 memory-analyzer/input.inc: memory-analyzer/input.txt
 	../src/ansi-c/file_converter$(EXEEXT) $< > $@
