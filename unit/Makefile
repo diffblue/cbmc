@@ -86,6 +86,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
        solvers/smt2_incremental/smt_sorts.cpp \
+       solvers/smt2_incremental/smt_terms.cpp \
        solvers/strings/array_pool/array_pool.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \

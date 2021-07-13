@@ -1,0 +1,11 @@
+/// \file
+/// This set of definitions is used as part of the
+/// [X-macro](https://en.wikipedia.org/wiki/X_Macro) pattern. These define the
+/// set of terms which are implemented and it is used to automate repetitive
+/// parts of the implementation. These include -
+///  * The constant `irep_idt`s used to identify each of the term classes.
+TERM_ID(bool_literal)
+TERM_ID(not)
+TERM_ID(identifier)
+TERM_ID(bit_vector_constant)
+TERM_ID(function_application)
