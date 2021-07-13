@@ -172,3 +172,26 @@ const smt_optiont &smt_set_option_commandt::option() const
 {
   return downcast(find(ID_value));
 }
+
+template <typename visitort>
+void accept(const smt_commandt &command, const irep_idt &id, visitort &&visitor)
+{
+#define COMMAND_ID(the_id)                                                     \
+  if(id == ID_smt_##the_id##_command)                                          \
+    return visitor.visit(static_cast<const smt_##the_id##_commandt &>(command));
+// The include below is marked as nolint because including the same file
+// multiple times is required as part of the x macro pattern.
+#include <solvers/smt2_incremental/smt_commands.def> // NOLINT(build/include)
+#undef COMMAND_ID
+  UNREACHABLE;
+}
+
+void smt_commandt::accept(smt_command_const_downcast_visitort &visitor) const
+{
+  ::accept(*this, id(), visitor);
+}
+
+void smt_commandt::accept(smt_command_const_downcast_visitort &&visitor) const
+{
+  ::accept(*this, id(), std::move(visitor));
+}

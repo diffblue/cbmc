@@ -8,6 +8,8 @@
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <util/irep.h>
 
+class smt_command_const_downcast_visitort;
+
 class smt_commandt : protected irept
 {
 public:
@@ -19,6 +21,9 @@ public:
 
   bool operator==(const smt_commandt &) const;
   bool operator!=(const smt_commandt &) const;
+
+  void accept(smt_command_const_downcast_visitort &) const;
+  void accept(smt_command_const_downcast_visitort &&) const;
 
 protected:
   using irept::irept;
@@ -116,6 +121,15 @@ class smt_set_option_commandt
 public:
   explicit smt_set_option_commandt(smt_optiont option);
   const smt_optiont &option() const;
+};
+
+class smt_command_const_downcast_visitort
+{
+public:
+#define COMMAND_ID(the_id)                                                     \
+  virtual void visit(const smt_##the_id##_commandt &) = 0;
+#include "smt_commands.def"
+#undef COMMAND_ID
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_COMMANDS_H

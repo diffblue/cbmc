@@ -4,6 +4,8 @@
 /// set of commands which are implemented and it is used to automate repetitive
 /// parts of the implementation. These include -
 ///  * The constant `irep_idt`s used to identify each of the command classes.
+///  * The member functions of the `smt_command_const_downcast_visitort` class.
+///  * The type of command checks required to implement `smt_commandt::accept`.
 COMMAND_ID(assert)
 COMMAND_ID(check_sat)
 COMMAND_ID(declare_function)
