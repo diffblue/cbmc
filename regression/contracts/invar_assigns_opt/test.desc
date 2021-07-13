@@ -1,0 +1,20 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.3\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[main.assertion.1\] .* assertion r1 == 0: SUCCESS$
+^\[main.4\] .* Check loop invariant before entry: SUCCESS$
+^\[main.5\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.6\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[main.assertion.2\] .* assertion r2 == 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that adding assigns clause is optional
+and that if a proof does not require it, then adding an
+appropriate assigns clause does not lead to any 
+unexpected behavior. 
