@@ -16,15 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <ansi-c/ansi_c_language.h>
 #include <ansi-c/cprover_library.h>
 
 #include <assembler/remove_asm.h>
 
-#include <cpp/cpp_language.h>
 #include <cpp/cprover_library.h>
-
-#include <jsil/jsil_language.h>
 
 #include <goto-programs/add_malloc_may_fail_variable_initializations.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -36,9 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/ai.h>
 #include <analyses/local_may_alias.h>
-
-#include <langapi/mode.h>
-#include <langapi/language.h>
 
 #include <util/config.h>
 #include <util/exception_utils.h>
@@ -63,13 +56,6 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
       argv,
       std::string("GOTO-ANALYZER "))
 {
-}
-
-void goto_analyzer_parse_optionst::register_languages()
-{
-  register_language(new_ansi_c_language);
-  register_language(new_cpp_language);
-  register_language(new_jsil_language);
 }
 
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)

@@ -42,6 +42,13 @@ memory_analyzer_parse_optionst::memory_analyzer_parse_optionst(
 {
 }
 
+void memory_analyzer_parse_optionst::register_languages()
+{
+  // For now only C is supported due to the additional challenges of
+  // mapping source code to debugging symbols in other languages.
+  register_language(new_ansi_c_language);
+}
+
 int memory_analyzer_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
@@ -91,7 +98,7 @@ int memory_analyzer_parse_optionst::doit()
       "--symtab-snapshot");
   }
 
-  register_language(new_ansi_c_language);
+  register_languages();
 
   std::string binary = cmdline.args.front();
 

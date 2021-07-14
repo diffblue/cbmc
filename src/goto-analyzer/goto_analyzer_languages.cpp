@@ -2,14 +2,14 @@
 
 Module: Language Registration
 
-Author: CM Wintersteiger
+Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 \*******************************************************************/
 
 /// \file
 /// Language Registration
 
-#include "goto_cc_mode.h"
+#include "goto_analyzer_parse_options.h"
 
 #include <langapi/mode.h>
 
@@ -20,7 +20,7 @@ Author: CM Wintersteiger
 #  include <jsil/jsil_language.h>
 #endif
 
-void goto_cc_modet::register_languages()
+void goto_analyzer_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);

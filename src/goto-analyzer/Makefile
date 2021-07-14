@@ -1,4 +1,5 @@
-SRC = goto_analyzer_main.cpp \
+SRC = goto_analyzer_languages.cpp \
+      goto_analyzer_main.cpp \
       goto_analyzer_parse_options.cpp \
       taint_analysis.cpp \
       taint_parser.cpp \

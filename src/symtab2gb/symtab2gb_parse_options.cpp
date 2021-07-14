@@ -94,6 +94,13 @@ static void run_symtab2gb(
   }
 }
 
+void symtab2gb_parse_optionst::register_languages()
+{
+  // As this is a converter and linker it only really needs to support
+  // the JSON symtab front-end.
+  register_language(new_json_symtab_language);
+}
+
 int symtab2gb_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
@@ -112,7 +119,7 @@ int symtab2gb_parse_optionst::doit()
   {
     gb_filename = cmdline.get_value(SYMTAB2GB_OUT_FILE_OPT);
   }
-  register_language(new_json_symtab_language);
+  register_languages();
   config.set(cmdline);
   run_symtab2gb(symtab_filenames, gb_filename);
   return CPROVER_EXIT_SUCCESS;

@@ -154,8 +154,8 @@ class optionst;
 class janalyzer_parse_optionst : public parse_options_baset
 {
 public:
-  virtual int doit() override;
-  virtual void help() override;
+  int doit() override;
+  void help() override;
 
   janalyzer_parse_optionst(int argc, const char **argv);
 
@@ -177,7 +177,7 @@ public:
 protected:
   std::unique_ptr<class_hierarchyt> class_hierarchy;
 
-  void register_languages();
+  void register_languages() override;
 
   void get_command_line_options(optionst &options);
 
