@@ -4,6 +4,8 @@
 /// set of terms which are implemented and it is used to automate repetitive
 /// parts of the implementation. These include -
 ///  * The constant `irep_idt`s used to identify each of the term classes.
+///  * The member functions of the `smt_term_const_downcast_visitort` class.
+///  * The type of term checks required to implement `smt_termt::accept`.
 TERM_ID(bool_literal)
 TERM_ID(not)
 TERM_ID(identifier)

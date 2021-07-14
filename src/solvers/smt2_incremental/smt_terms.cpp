@@ -141,3 +141,26 @@ smt_function_application_termt::arguments() const
     return std::cref(static_cast<const smt_termt &>(argument));
   });
 }
+
+template <typename visitort>
+void accept(const smt_termt &term, const irep_idt &id, visitort &&visitor)
+{
+#define TERM_ID(the_id)                                                        \
+  if(id == ID_smt_##the_id##_term)                                             \
+    return visitor.visit(static_cast<const smt_##the_id##_termt &>(term));
+// The include below is marked as nolint because including the same file
+// multiple times is required as part of the x macro pattern.
+#include <solvers/smt2_incremental/smt_terms.def> // NOLINT(build/include)
+#undef TERM_ID
+  UNREACHABLE;
+}
+
+void smt_termt::accept(smt_term_const_downcast_visitort &visitor) const
+{
+  ::accept(*this, id(), visitor);
+}
+
+void smt_termt::accept(smt_term_const_downcast_visitort &&visitor) const
+{
+  ::accept(*this, id(), std::move(visitor));
+}

@@ -11,6 +11,7 @@
 class BigInt;
 using mp_integer = BigInt;
 
+class smt_term_const_downcast_visitort;
 class smt_termt : protected irept, private smt_sortt::storert<smt_termt>
 {
 public:
@@ -24,6 +25,9 @@ public:
   bool operator!=(const smt_termt &) const;
 
   const smt_sortt &get_sort() const;
+
+  void accept(smt_term_const_downcast_visitort &) const;
+  void accept(smt_term_const_downcast_visitort &&) const;
 
 protected:
   smt_termt(irep_idt id, smt_sortt sort);
@@ -87,6 +91,14 @@ public:
     std::vector<smt_termt> arguments);
   const smt_identifier_termt &function_identifier() const;
   std::vector<std::reference_wrapper<const smt_termt>> arguments() const;
+};
+
+class smt_term_const_downcast_visitort
+{
+public:
+#define TERM_ID(the_id) virtual void visit(const smt_##the_id##_termt &) = 0;
+#include "smt_terms.def"
+#undef TERM_ID
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_TERMS_H
