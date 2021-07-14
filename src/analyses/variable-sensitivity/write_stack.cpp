@@ -39,10 +39,10 @@ write_stackt::write_stackt(
   if(expr.type().id() == ID_array)
   {
     // We are assigning an array to a pointer, which is equivalent to assigning
-    // the first element of that arary
+    // the first element of that array
     // &(expr)[0]
     construct_stack_to_pointer(
-      address_of_exprt(index_exprt(expr, from_integer(0, size_type()))),
+      address_of_exprt(index_exprt(expr, from_integer(0, signed_size_type()))),
       environment,
       ns);
   }
@@ -138,7 +138,7 @@ void write_stackt::construct_stack_to_lvalue(
       construct_stack_to_lvalue(
         to_member_expr(expr).struct_op(), environment, ns);
     }
-    else if(expr.id() == ID_symbol)
+    else if(expr.id() == ID_symbol || expr.id() == ID_dynamic_object)
     {
       add_to_stack(std::make_shared<simple_entryt>(expr), environment, ns);
     }

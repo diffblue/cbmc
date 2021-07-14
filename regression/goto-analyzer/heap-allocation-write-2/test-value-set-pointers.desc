@@ -1,0 +1,10 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --vsd-arrays every-element --verify
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] .*p\[.*0\] == 10: SUCCESS
+\[main.assertion.2\] .*p\[.*1\] == 20: SUCCESS
+\[main.assertion.3\] .*q\[.*0\] == 100: SUCCESS
+\[main.assertion.4\] .*q\[.*99\] == 101: SUCCESS
+--

@@ -1,0 +1,10 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers top-bottom --vsd-arrays every-element --verify
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] .*p\[.*0\] == 10: UNKNOWN
+\[main.assertion.2\] .*p\[.*1\] == 20: UNKNOWN
+\[main.assertion.3\] .*q\[.*0\] == 100: UNKNOWN
+\[main.assertion.4\] .*q\[.*99\] == 101: UNKNOWN
+--

@@ -46,6 +46,19 @@ abstract_object_pointert abstract_pointer_objectt::expression_transform(
   if(expr.id() == ID_dereference)
     return read_dereference(environment, ns);
 
+  if(expr.id() == ID_typecast)
+  {
+    const typecast_exprt &tce = to_typecast_expr(expr);
+    if(tce.op().id() == ID_symbol && is_void_pointer(tce.op().type()))
+    {
+      auto obj = environment.eval(tce.op(), ns);
+      auto pointer = std::dynamic_pointer_cast<const abstract_pointer_objectt>(
+        obj->unwrap_context());
+      if(pointer)
+        return pointer->typecast(tce.type(), environment, ns);
+    }
+  }
+
   return abstract_objectt::expression_transform(
     expr, operands, environment, ns);
 }
@@ -85,6 +98,16 @@ abstract_object_pointert abstract_pointer_objectt::write_dereference(
   }
 
   return std::make_shared<abstract_pointer_objectt>(type(), true, false);
+}
+
+abstract_object_pointert abstract_pointer_objectt::typecast(
+  const typet &new_type,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
+  return std::make_shared<abstract_pointer_objectt>(
+    new_type, is_top(), is_bottom());
 }
 
 void abstract_pointer_objectt::get_statistics(

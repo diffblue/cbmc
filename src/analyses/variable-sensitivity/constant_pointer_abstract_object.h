@@ -34,8 +34,8 @@ public:
   /// Asserts if both top and bottom are true
   constant_pointer_abstract_objectt(const typet &type, bool top, bool bottom);
 
-  /// \param old: the abstract object to copy from
   constant_pointer_abstract_objectt(
+    const typet &type,
     const constant_pointer_abstract_objectt &old);
 
   /// \param expr: the expression to use as the starting pointer for
@@ -105,6 +105,11 @@ public:
     const std::stack<exprt> &stack,
     const abstract_object_pointert &value,
     bool merging_write) const override;
+
+  abstract_object_pointert typecast(
+    const typet &new_type,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
 
   void get_statistics(
     abstract_object_statisticst &statistics,

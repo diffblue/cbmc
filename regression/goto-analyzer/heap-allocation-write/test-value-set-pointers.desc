@@ -1,0 +1,10 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --vsd-arrays every-element --verify
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] .*alias == 99: SUCCESS
+\[main.assertion.2\] .*alias == 100: SUCCESS
+\[main.assertion.3\] .*i_was_malloced\[.*0\] == 101: SUCCESS
+\[main.assertion.4\] .*alias\[.*1\] == 102: SUCCESS
+--
