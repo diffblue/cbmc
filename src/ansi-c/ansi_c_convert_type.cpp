@@ -252,9 +252,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
-    assigns = to_unary_expr(as_expr).op();
 
-    for(const exprt &operand : assigns.operands())
+    for(const exprt &operand : to_unary_expr(as_expr).op().operands())
     {
       if(
         operand.id() != ID_symbol && operand.id() != ID_ptrmember &&
@@ -264,6 +263,14 @@ void ansi_c_convert_typet::read_rec(const typet &type)
         error() << "illegal target in assigns clause" << eom;
         throw 0;
       }
+    }
+
+    if(assigns.is_nil())
+      assigns = to_unary_expr(as_expr).op();
+    else
+    {
+      for(auto &assignment : to_unary_expr(as_expr).op().operands())
+        assigns.add_to_operands(std::move(assignment));
     }
   }
   else if(type.id() == ID_C_spec_ensures)
