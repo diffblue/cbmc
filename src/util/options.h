@@ -29,6 +29,9 @@ public:
   bool get_bool_option(const std::string &option) const;
   signed int get_signed_int_option(const std::string &option) const;
   unsigned int get_unsigned_int_option(const std::string &option) const;
+  unsigned int get_unsigned_int_option_default(
+    const std::string &option,
+    unsigned int default_val) const;
   const value_listt &get_list_option(const std::string &option) const;
 
   /// N.B. opts.is_set("foo") does not imply opts.get_bool_option("foo")

@@ -55,8 +55,15 @@ signed int optionst::get_signed_int_option(const std::string &option) const
 
 unsigned int optionst::get_unsigned_int_option(const std::string &option) const
 {
+  return get_unsigned_int_option_default(option, 0);
+}
+
+unsigned int optionst::get_unsigned_int_option_default(
+  const std::string &option,
+  unsigned int default_val) const
+{
   const std::string value=get_option(option);
-  return value.empty()?0:safe_string2unsigned(value);
+  return value.empty() ? default_val : safe_string2unsigned(value);
 }
 
 bool optionst::is_set(const std::string &option) const

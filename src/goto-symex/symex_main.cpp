@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 
 symex_configt::symex_configt(const optionst &options)
-  : max_depth(options.get_unsigned_int_option("depth")),
+  : max_depth(options.get_unsigned_int_option_default("depth", UINT32_MAX)),
     doing_path_exploration(options.is_set("paths")),
     allow_pointer_unsoundness(
       options.get_bool_option("allow-pointer-unsoundness")),
@@ -612,7 +612,7 @@ void goto_symext::execute_next_instruction(
     merge_gotos(state);
 
   // depth exceeded?
-  if(symex_config.max_depth != 0 && state.depth > symex_config.max_depth)
+  if(state.depth > symex_config.max_depth)
   {
     // Rule out this path:
     symex_assume_l2(state, false_exprt());
