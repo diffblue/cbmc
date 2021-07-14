@@ -82,6 +82,8 @@ public:
 
   std::size_t get_number_of_solver_calls() const override;
 
+  static std::string convert_identifier(const irep_idt &identifier);
+
 protected:
   const namespacet &ns;
   std::ostream &out;
@@ -135,8 +137,6 @@ protected:
 
   void convert_with(const with_exprt &expr);
   void convert_update(const exprt &expr);
-
-  std::string convert_identifier(const irep_idt &identifier);
 
   void convert_expr(const exprt &);
   void convert_type(const typet &);
