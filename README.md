@@ -3,8 +3,6 @@
 [![Build Status][coverity_img]][coverity]
 [![Build Status][codecov_img]][codecov]
 
-[CProver Wiki](http://www.cprover.org/wiki)
-
 [CProver Documentation](http://cprover.diffblue.com)
 
 About
