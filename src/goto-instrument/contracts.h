@@ -147,11 +147,14 @@ protected:
   std::unordered_set<irep_idt> summarized;
 
   /// \brief Enforce contract of a single function
-  bool enforce_contract(const std::string &);
+  bool enforce_contract(const irep_idt &function);
+
+  /// Instrument functions to check frame conditions.
+  bool check_frame_conditions_function(const irep_idt &function);
 
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
-  bool add_pointer_checks(const std::string &);
+  void check_frame_conditions(goto_programt &program, const symbolt &target);
 
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.

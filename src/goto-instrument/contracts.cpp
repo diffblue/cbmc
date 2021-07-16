@@ -825,13 +825,13 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
   return false;
 }
 
-bool code_contractst::add_pointer_checks(const std::string &function_name)
+bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
-  auto old_function = goto_functions.function_map.find(function_name);
+  auto old_function = goto_functions.function_map.find(function);
   if(old_function == goto_functions.function_map.end())
   {
-    log.error() << "Could not find function '" << function_name
+    log.error() << "Could not find function '" << function
                 << "' in goto-program; not enforcing contracts."
                 << messaget::eom;
     return true;
@@ -842,22 +842,25 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
     return false;
   }
 
-  const irep_idt function_id(function_name);
-  const symbolt &function_symbol = ns.lookup(function_id);
-  const auto &type = to_code_with_contract_type(function_symbol.type);
+  if(check_for_looped_mallocs(program))
+  {
+    return true;
+  }
 
+  // Insert aliasing assertions
+  check_frame_conditions(program, ns.lookup(function));
+
+  return false;
+}
+
+void code_contractst::check_frame_conditions(
+  goto_programt &program,
+  const symbolt &target)
+{
+  const auto &type = to_code_with_contract_type(target.type);
   exprt assigns_expr = type.assigns();
 
-  assigns_clauset assigns(assigns_expr, *this, function_id, log);
-
-  goto_programt::instructionst::iterator instruction_it =
-    program.instructions.begin();
-
-  // Create temporary variables to hold the assigns
-  // clause targets before they can be modified.
-  goto_programt standin_decls = assigns.init_block(function_symbol.location);
-  goto_programt mark_dead = assigns.dead_stmts(
-    function_symbol.location, function_name, function_symbol.mode);
+  assigns_clauset assigns(assigns_expr, *this, target.name, log);
 
   // Create a list of variables that are okay to assign.
   std::set<irep_idt> freely_assignable_symbols;
@@ -866,16 +869,19 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
     freely_assignable_symbols.insert(param.get_identifier());
   }
 
+  goto_programt::instructionst::iterator instruction_it =
+    program.instructions.begin();
+
+  // Create temporary variables to hold the assigns
+  // clause targets before they can be modified.
+  goto_programt standin_decls = assigns.init_block(target.location);
+  goto_programt mark_dead =
+    assigns.dead_stmts(target.location, target.name, target.mode);
+
   int lines_to_iterate = standin_decls.instructions.size();
   program.insert_before_swap(instruction_it, standin_decls);
   std::advance(instruction_it, lines_to_iterate);
 
-  if(check_for_looped_mallocs(program))
-  {
-    return true;
-  }
-
-  // Insert aliasing assertions
   for(; instruction_it != program.instructions.end(); ++instruction_it)
   {
     if(instruction_it->is_decl())
@@ -909,7 +915,7 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
         instruction_it,
         program,
         assigns_expr,
-        function_id,
+        target.name,
         freely_assignable_symbols,
         assigns);
     }
@@ -924,26 +930,24 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
   // Make sure the temporary symbols are marked dead
   lines_to_iterate = mark_dead.instructions.size();
   program.insert_before_swap(instruction_it, mark_dead);
-
-  return false;
 }
 
-bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
+bool code_contractst::enforce_contract(const irep_idt &function)
 {
   // Add statements to the source function
   // to ensure assigns clause is respected.
-  add_pointer_checks(fun_to_enforce);
+  check_frame_conditions_function(function);
 
   // Rename source function
   std::stringstream ss;
-  ss << CPROVER_PREFIX << "contracts_original_" << fun_to_enforce;
+  ss << CPROVER_PREFIX << "contracts_original_" << function;
   const irep_idt mangled(ss.str());
-  const irep_idt original(fun_to_enforce);
+  const irep_idt original(function);
 
   auto old_function = goto_functions.function_map.find(original);
   if(old_function == goto_functions.function_map.end())
   {
-    log.error() << "Could not find function '" << fun_to_enforce
+    log.error() << "Could not find function '" << function
                 << "' in goto-program; not enforcing contracts."
                 << messaget::eom;
     return true;
@@ -972,7 +976,7 @@ bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
   auto nexist_old_function = goto_functions.function_map.find(original);
   INVARIANT(
     nexist_old_function == goto_functions.function_map.end(),
-    "There should be no function called " + fun_to_enforce +
+    "There should be no function called " + id2string(function) +
       " in the function map because that function should have had its"
       " name mangled");
 
