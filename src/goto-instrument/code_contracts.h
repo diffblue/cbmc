@@ -247,124 +247,31 @@ protected:
 class assigns_clause_targett
 {
 public:
-  enum target_type
-  {
-    Scalar,
-    Struct,
-    Array
-  };
-
   assigns_clause_targett(
-    target_type type,
-    const exprt object_ptr,
-    const code_contractst &contract,
-    messaget &log_parameter)
-    : target_type(type),
-      pointer_object(object_ptr),
-      contract(contract),
-      init_block(),
-      log(log_parameter)
-  {
-    INVARIANT(
-      pointer_object.type().id() == ID_pointer,
-      "Assigns clause targets should be stored as pointer expressions.");
-  }
+    const exprt &object_ptr,
+    code_contractst &contract,
+    messaget &log_parameter,
+    const irep_idt &function_id);
+  ~assigns_clause_targett();
 
-  virtual ~assigns_clause_targett()
-  {
-  }
-
-  virtual std::vector<symbol_exprt> temporary_declarations() const = 0;
-  virtual exprt alias_expression(const exprt &lhs) = 0;
-  virtual exprt
-  compatible_expression(const assigns_clause_targett &called_target) = 0;
-  virtual goto_programt havoc_code(source_locationt location) const = 0;
-
-  const exprt &get_direct_pointer() const
-  {
-    return pointer_object;
-  }
-
-  goto_programt &get_init_block()
-  {
-    return init_block;
-  }
+  std::vector<symbol_exprt> temporary_declarations() const;
+  exprt alias_expression(const exprt &lhs);
+  exprt compatible_expression(const assigns_clause_targett &called_target);
+  goto_programt havoc_code(source_locationt location) const;
+  const exprt &get_direct_pointer() const;
+  goto_programt &get_init_block();
 
   static exprt pointer_for(const exprt &exp)
   {
     return address_of_exprt(exp);
   }
 
-  const target_type target_type;
-
 protected:
   const exprt pointer_object;
   const code_contractst &contract;
   goto_programt init_block;
   messaget &log;
-};
-
-class assigns_clause_scalar_targett : public assigns_clause_targett
-{
-public:
-  assigns_clause_scalar_targett(
-    const exprt &object_ptr,
-    code_contractst &contract,
-    messaget &log_parameter,
-    const irep_idt &function_id);
-
-  std::vector<symbol_exprt> temporary_declarations() const;
-  exprt alias_expression(const exprt &lhs);
-  exprt compatible_expression(const assigns_clause_targett &called_target);
-  goto_programt havoc_code(source_locationt location) const;
-
-protected:
-  symbol_exprt local_standin_variable;
-};
-
-class assigns_clause_struct_targett : public assigns_clause_targett
-{
-public:
-  assigns_clause_struct_targett(
-    const exprt &object_ptr,
-    code_contractst &contract,
-    messaget &log_parameter,
-    const irep_idt &function_id);
-
-  std::vector<symbol_exprt> temporary_declarations() const;
-  exprt alias_expression(const exprt &lhs);
-  exprt compatible_expression(const assigns_clause_targett &called_target);
-  goto_programt havoc_code(source_locationt location) const;
-
-protected:
-  symbol_exprt main_struct_standin;
-  std::vector<symbol_exprt> local_standin_variables;
-};
-
-class assigns_clause_array_targett : public assigns_clause_targett
-{
-public:
-  assigns_clause_array_targett(
-    const exprt &object_ptr,
-    code_contractst &contract,
-    messaget &log_parameter,
-    const irep_idt &function_id);
-
-  std::vector<symbol_exprt> temporary_declarations() const;
-  exprt alias_expression(const exprt &lhs);
-  exprt compatible_expression(const assigns_clause_targett &called_target);
-  goto_programt havoc_code(source_locationt location) const;
-
-protected:
-  mp_integer lower_bound;
-  mp_integer upper_bound;
-
-  exprt lower_offset_object;
-  exprt upper_offset_object;
-
-  symbol_exprt array_standin_variable;
-  symbol_exprt lower_offset_variable;
-  symbol_exprt upper_offset_variable;
+  symbol_exprt local_target;
 };
 
 class assigns_clauset

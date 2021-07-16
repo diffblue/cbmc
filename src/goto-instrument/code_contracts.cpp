@@ -1260,18 +1260,21 @@ bool code_contractst::enforce_contracts(
   return fail;
 }
 
-assigns_clause_scalar_targett::assigns_clause_scalar_targett(
+assigns_clause_targett::assigns_clause_targett(
   const exprt &object_ptr,
   code_contractst &contract,
   messaget &log_parameter,
   const irep_idt &function_id)
-  : assigns_clause_targett(
-      Scalar,
-      pointer_for(object_ptr),
-      contract,
-      log_parameter),
-    local_standin_variable(typet())
+  : pointer_object(pointer_for(object_ptr)),
+    contract(contract),
+    init_block(),
+    log(log_parameter),
+    local_target(typet())
 {
+  INVARIANT(
+    pointer_object.type().id() == ID_pointer,
+    "Assigns clause targets should be stored as pointer expressions.");
+
   const symbolt &function_symbol = contract.ns.lookup(function_id);
 
   // Declare a new symbol to stand in for the reference
@@ -1281,44 +1284,39 @@ assigns_clause_scalar_targett::assigns_clause_scalar_targett(
     function_id,
     function_symbol.mode);
 
-  local_standin_variable = standin_symbol.symbol_expr();
+  local_target = standin_symbol.symbol_expr();
 
   // Build standin variable initialization block
   init_block.add(
-    goto_programt::make_decl(local_standin_variable, function_symbol.location));
+    goto_programt::make_decl(local_target, function_symbol.location));
   init_block.add(goto_programt::make_assignment(
-    code_assignt(local_standin_variable, pointer_object),
-    function_symbol.location));
+    code_assignt(local_target, pointer_object), function_symbol.location));
 }
 
-std::vector<symbol_exprt>
-assigns_clause_scalar_targett::temporary_declarations() const
+assigns_clause_targett::~assigns_clause_targett()
+{
+}
+
+std::vector<symbol_exprt> assigns_clause_targett::temporary_declarations() const
 {
   std::vector<symbol_exprt> result;
-  result.push_back(local_standin_variable);
+  result.push_back(local_target);
   return result;
 }
 
-exprt assigns_clause_scalar_targett::alias_expression(const exprt &ptr)
+exprt assigns_clause_targett::alias_expression(const exprt &ptr)
 {
-  return same_object(ptr, local_standin_variable);
+  return same_object(ptr, local_target);
 }
 
-exprt assigns_clause_scalar_targett::compatible_expression(
+exprt assigns_clause_targett::compatible_expression(
   const assigns_clause_targett &called_target)
 {
-  if(called_target.target_type == Scalar)
-  {
     return alias_expression(called_target.get_direct_pointer());
-  }
-  else // Struct or Array
-  {
-    return false_exprt();
-  }
 }
 
 goto_programt
-assigns_clause_scalar_targett::havoc_code(source_locationt location) const
+assigns_clause_targett::havoc_code(source_locationt location) const
 {
   goto_programt assigns_havoc;
 
@@ -1333,341 +1331,14 @@ assigns_clause_scalar_targett::havoc_code(source_locationt location) const
   return assigns_havoc;
 }
 
-assigns_clause_struct_targett::assigns_clause_struct_targett(
-  const exprt &object_ptr,
-  code_contractst &contract,
-  messaget &log_parameter,
-  const irep_idt &function_id)
-  : assigns_clause_targett(
-      Struct,
-      pointer_for(object_ptr),
-      contract,
-      log_parameter),
-    main_struct_standin(typet())
+const exprt &assigns_clause_targett::get_direct_pointer() const
 {
-  const symbolt &struct_symbol =
-    contract.ns.lookup(to_tag_type(object_ptr.type()));
-  const symbolt &function_symbol = contract.ns.lookup(function_id);
-
-  // Declare a new symbol to stand in for the reference
-  symbolt struct_temp_symbol = contract.new_tmp_symbol(
-    pointer_object.type(),
-    function_symbol.location,
-    function_id,
-    function_symbol.mode);
-  main_struct_standin = struct_temp_symbol.symbol_expr();
-  local_standin_variables.push_back(main_struct_standin);
-
-  // Build standin variable initialization block
-  init_block.add(
-    goto_programt::make_decl(main_struct_standin, function_symbol.location));
-  init_block.add(goto_programt::make_assignment(
-    code_assignt(main_struct_standin, pointer_object),
-    function_symbol.location));
-
-  // Handle component members
-  std::vector<exprt> component_members;
-  const struct_typet &struct_type = to_struct_type(struct_symbol.type);
-  for(struct_union_typet::componentt component : struct_type.components())
-  {
-    exprt current_member = member_exprt(object_ptr, component);
-    component_members.push_back(current_member);
-  }
-
-  while(!component_members.empty())
-  {
-    exprt current_operation = component_members.front();
-    exprt operation_address = pointer_for(current_operation);
-
-    // Declare a new symbol to stand in for the reference
-    symbolt standin_symbol = contract.new_tmp_symbol(
-      operation_address.type(),
-      function_symbol.location,
-      function_id,
-      function_symbol.mode);
-
-    symbol_exprt current_standin = standin_symbol.symbol_expr();
-    local_standin_variables.push_back(current_standin);
-
-    // Add to standin variable initialization block
-    init_block.add(
-      goto_programt::make_decl(current_standin, function_symbol.location));
-    init_block.add(goto_programt::make_assignment(
-      code_assignt(current_standin, operation_address),
-      function_symbol.location));
-
-    if(current_operation.type().id() == ID_struct_tag)
-    {
-      const symbolt &current_struct_symbol =
-        contract.ns.lookup(to_tag_type(current_operation.type()));
-
-      const struct_typet &curr_struct_t =
-        to_struct_type(current_struct_symbol.type);
-      for(struct_union_typet::componentt component : curr_struct_t.components())
-      {
-        exprt current_member = member_exprt(current_operation, component);
-        component_members.push_back(current_member);
-      }
-    }
-    component_members.erase(component_members.begin());
-  }
+  return pointer_object;
 }
 
-std::vector<symbol_exprt>
-assigns_clause_struct_targett::temporary_declarations() const
+goto_programt &assigns_clause_targett::get_init_block()
 {
-  return local_standin_variables;
-}
-
-exprt assigns_clause_struct_targett::alias_expression(const exprt &ptr)
-{
-  exprt::operandst disjuncts;
-  disjuncts.reserve(local_standin_variables.size());
-  for(symbol_exprt symbol : local_standin_variables)
-  {
-    const typet &ptr_concrete_type = to_pointer_type(ptr.type()).subtype();
-    auto left_size = size_of_expr(ptr_concrete_type, contract.ns);
-    const typet &standin_concrete_type =
-      to_pointer_type(symbol.type()).subtype();
-    auto right_size = size_of_expr(standin_concrete_type, contract.ns);
-    INVARIANT(left_size.has_value(), "Unable to determine size of type (lhs).");
-    INVARIANT(
-      right_size.has_value(), "Unable to determine size of type (rhs).");
-    if(*left_size == *right_size)
-    {
-      exprt same_obj = same_object(ptr, symbol);
-      exprt same_offset =
-        equal_exprt(pointer_offset(ptr), pointer_offset(symbol));
-
-      disjuncts.push_back(and_exprt{same_obj, same_offset});
-    }
-  }
-
-  return disjunction(disjuncts);
-}
-
-exprt assigns_clause_struct_targett::compatible_expression(
-  const assigns_clause_targett &called_target)
-{
-  if(called_target.target_type == Scalar)
-  {
-    return alias_expression(called_target.get_direct_pointer());
-  }
-  else if(called_target.target_type == Struct)
-  {
-    const assigns_clause_struct_targett &struct_target =
-      static_cast<const assigns_clause_struct_targett &>(called_target);
-
-    exprt same_obj =
-      same_object(this->main_struct_standin, struct_target.pointer_object);
-    // the size of the called struct should be less than or
-    // equal to that of the assignable target struct.
-    exprt current_size =
-      get_size(this->pointer_object.type(), contract.ns, log);
-    exprt curr_upper_offset =
-      pointer_offset(plus_exprt(this->main_struct_standin, current_size));
-    exprt called_size =
-      get_size(struct_target.pointer_object.type(), contract.ns, log);
-    exprt called_upper_offset =
-      pointer_offset(plus_exprt(struct_target.pointer_object, called_size));
-
-    exprt in_range_lower = binary_predicate_exprt(
-      pointer_offset(struct_target.pointer_object),
-      ID_ge,
-      pointer_offset(this->main_struct_standin));
-    exprt in_range_upper =
-      binary_predicate_exprt(curr_upper_offset, ID_ge, called_upper_offset);
-
-    exprt in_range = and_exprt(in_range_lower, in_range_upper);
-    return and_exprt(same_obj, in_range);
-  }
-  else // Array
-  {
-    return false_exprt();
-  }
-}
-
-goto_programt
-assigns_clause_struct_targett::havoc_code(source_locationt location) const
-{
-  goto_programt assigns_havoc;
-
-  exprt lhs = dereference_exprt(pointer_object);
-  side_effect_expr_nondett rhs(lhs.type(), location);
-
-  goto_programt::targett target =
-    assigns_havoc.add(goto_programt::make_assignment(
-      code_assignt(std::move(lhs), std::move(rhs)), location));
-  target->code_nonconst().add_source_location() = location;
-
-  return assigns_havoc;
-}
-
-assigns_clause_array_targett::assigns_clause_array_targett(
-  const exprt &object_ptr,
-  code_contractst &contract,
-  messaget &log_parameter,
-  const irep_idt &function_id)
-  : assigns_clause_targett(Array, object_ptr, contract, log_parameter),
-    lower_offset_object(),
-    upper_offset_object(),
-    array_standin_variable(typet()),
-    lower_offset_variable(typet()),
-    upper_offset_variable(typet())
-{
-  const symbolt &function_symbol = contract.ns.lookup(function_id);
-
-  // Declare a new symbol to stand in for the reference
-  symbolt standin_symbol = contract.new_tmp_symbol(
-    pointer_object.type(),
-    function_symbol.location,
-    function_id,
-    function_symbol.mode);
-
-  array_standin_variable = standin_symbol.symbol_expr();
-
-  // Add array temp to variable initialization block
-  init_block.add(
-    goto_programt::make_decl(array_standin_variable, function_symbol.location));
-  init_block.add(goto_programt::make_assignment(
-    code_assignt(array_standin_variable, pointer_object),
-    function_symbol.location));
-
-  if(object_ptr.id() == ID_address_of)
-  {
-    exprt constant_size =
-      get_size(object_ptr.type().subtype(), contract.ns, log);
-    lower_offset_object = typecast_exprt(
-      mult_exprt(
-        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
-      signed_int_type());
-
-    // Declare a new symbol to stand in for the reference
-    symbolt lower_standin_symbol = contract.new_tmp_symbol(
-      lower_offset_object.type(),
-      function_symbol.location,
-      function_id,
-      function_symbol.mode);
-
-    lower_offset_variable = lower_standin_symbol.symbol_expr();
-
-    // Add array temp to variable initialization block
-    init_block.add(goto_programt::make_decl(
-      lower_offset_variable, function_symbol.location));
-    init_block.add(goto_programt::make_assignment(
-      code_assignt(lower_offset_variable, lower_offset_object),
-      function_symbol.location));
-
-    upper_offset_object = typecast_exprt(
-      mult_exprt(
-        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
-      signed_int_type());
-
-    // Declare a new symbol to stand in for the reference
-    symbolt upper_standin_symbol = contract.new_tmp_symbol(
-      upper_offset_object.type(),
-      function_symbol.location,
-      function_id,
-      function_symbol.mode);
-
-    upper_offset_variable = upper_standin_symbol.symbol_expr();
-
-    // Add array temp to variable initialization block
-    init_block.add(goto_programt::make_decl(
-      upper_offset_variable, function_symbol.location));
-    init_block.add(goto_programt::make_assignment(
-      code_assignt(upper_offset_variable, upper_offset_object),
-      function_symbol.location));
-  }
-}
-
-std::vector<symbol_exprt>
-assigns_clause_array_targett::temporary_declarations() const
-{
-  std::vector<symbol_exprt> result;
-  result.push_back(array_standin_variable);
-  result.push_back(lower_offset_variable);
-  result.push_back(upper_offset_variable);
-
-  return result;
-}
-
-goto_programt
-assigns_clause_array_targett::havoc_code(source_locationt location) const
-{
-  goto_programt assigns_havoc;
-
-  modifiest assigns_tgts;
-  typet lower_type = lower_offset_variable.type();
-  exprt array_type_size =
-    get_size(pointer_object.type().subtype(), contract.ns, log);
-
-  for(mp_integer i = lower_bound; i < upper_bound; ++i)
-  {
-    irep_idt offset_string(from_integer(i, integer_typet()).get_value());
-    irep_idt offset_irep(offset_string);
-    constant_exprt val_const(offset_irep, lower_type);
-    dereference_exprt array_deref(plus_exprt(
-      pointer_object, typecast_exprt(val_const, signed_long_int_type())));
-
-    assigns_tgts.insert(array_deref);
-  }
-
-  for(auto lhs : assigns_tgts)
-  {
-    side_effect_expr_nondett rhs(lhs.type(), location);
-
-    goto_programt::targett target =
-      assigns_havoc.add(goto_programt::make_assignment(
-        code_assignt(std::move(lhs), std::move(rhs)), location));
-    target->code_nonconst().add_source_location() = location;
-  }
-
-  return assigns_havoc;
-}
-
-exprt assigns_clause_array_targett::alias_expression(const exprt &ptr)
-{
-  exprt ptr_offset = pointer_offset(ptr);
-  exprt::operandst conjuncts;
-
-  conjuncts.push_back(same_object(ptr, array_standin_variable));
-  conjuncts.push_back(binary_predicate_exprt(
-    ptr_offset,
-    ID_ge,
-    typecast_exprt(lower_offset_variable, ptr_offset.type())));
-  conjuncts.push_back(binary_predicate_exprt(
-    typecast_exprt(upper_offset_variable, ptr_offset.type()),
-    ID_ge,
-    ptr_offset));
-
-  return conjunction(conjuncts);
-}
-
-exprt assigns_clause_array_targett::compatible_expression(
-  const assigns_clause_targett &called_target)
-{
-  if(called_target.target_type == Scalar)
-  {
-    return alias_expression(called_target.get_direct_pointer());
-  }
-  else if(called_target.target_type == Array)
-  {
-    const assigns_clause_array_targett &array_target =
-      static_cast<const assigns_clause_array_targett &>(called_target);
-    exprt same_obj =
-      same_object(this->array_standin_variable, array_target.pointer_object);
-    exprt in_range_lower = binary_predicate_exprt(
-      array_target.lower_offset_object, ID_ge, this->lower_offset_variable);
-    exprt in_range_upper = binary_predicate_exprt(
-      this->upper_offset_variable, ID_ge, array_target.upper_offset_object);
-    exprt in_range = and_exprt(in_range_lower, in_range_upper);
-    return and_exprt(same_obj, in_range);
-  }
-  else // Struct
-  {
-    return false_exprt();
-  }
+  return init_block;
 }
 
 assigns_clauset::assigns_clauset(
@@ -1685,6 +1356,7 @@ assigns_clauset::assigns_clauset(
     add_target(current_operation);
   }
 }
+
 assigns_clauset::~assigns_clauset()
 {
   for(assigns_clause_targett *target : targets)
@@ -1695,16 +1367,15 @@ assigns_clauset::~assigns_clauset()
 
 assigns_clause_targett *assigns_clauset::add_target(exprt current_operation)
 {
-  assigns_clause_scalar_targett *scalar_target =
-    new assigns_clause_scalar_targett(
-      (current_operation.id() == ID_address_of)
-        ? to_index_expr(to_address_of_expr(current_operation).object()).array()
-        : current_operation,
-      parent,
-      log,
-      function_id);
-  targets.push_back(scalar_target);
-  return scalar_target;
+  assigns_clause_targett *target = new assigns_clause_targett(
+    (current_operation.id() == ID_address_of)
+      ? to_index_expr(to_address_of_expr(current_operation).object()).array()
+      : current_operation,
+    parent,
+    log,
+    function_id);
+  targets.push_back(target);
+  return target;
 }
 
 assigns_clause_targett *
