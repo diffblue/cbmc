@@ -11,13 +11,15 @@ Date: February 2016
 /// \file
 /// Verify and use annotated invariants and pre/post-conditions
 
-#ifndef CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
-#define CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
+#ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H
+#define CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H
 
 #include <map>
 #include <set>
 #include <string>
 #include <unordered_set>
+
+#include <goto-instrument/loop_utils.h>
 
 #include <goto-programs/goto_convert_class.h>
 #include <goto-programs/goto_functions.h>
@@ -28,8 +30,6 @@ Date: February 2016
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-
-#include "loop_utils.h"
 
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
@@ -246,4 +246,4 @@ protected:
     const irep_idt &mode);
 };
 
-#endif // CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
+#endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H

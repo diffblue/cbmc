@@ -11,7 +11,7 @@ Date: July 2021
 /// \file
 /// Specify write set in function contracts
 
-#include "contracts_assigns.h"
+#include "assigns.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>

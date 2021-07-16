@@ -11,8 +11,10 @@ Date: February 2016
 /// \file
 /// Verify and use annotated invariants and pre/post-conditions
 
-#include "contracts_assigns.h"
-#include "contracts_memory_predicates.h"
+#include "contracts.h"
+
+#include "assigns.h"
+#include "memory_predicates.h"
 
 #include <algorithm>
 #include <map>
@@ -20,8 +22,6 @@ Date: February 2016
 #include <analyses/local_may_alias.h>
 
 #include <ansi-c/c_expr.h>
-
-#include <goto-instrument/contracts_memory_predicates.h>
 
 #include <goto-programs/remove_skip.h>
 
@@ -162,8 +162,8 @@ void code_contractst::check_apply_loop_contracts(
 
     // Generate: an assignment to store the decreases clause's value before the
     // loop
-    code_assignt old_decreases_assignment{
-      old_decreases_symbol, decreases_clause};
+    code_assignt old_decreases_assignment{old_decreases_symbol,
+                                          decreases_clause};
     old_decreases_assignment.add_source_location() = loop_head->source_location;
     converter.goto_convert(old_decreases_assignment, havoc_code, mode);
   }
@@ -200,8 +200,8 @@ void code_contractst::check_apply_loop_contracts(
 
     // Generate: an assignment to store the decreases clause's value after one
     // iteration of the loop
-    code_assignt new_decreases_assignment{
-      new_decreases_symbol, decreases_clause};
+    code_assignt new_decreases_assignment{new_decreases_symbol,
+                                          decreases_clause};
     new_decreases_assignment.add_source_location() = loop_head->source_location;
     converter.goto_convert(new_decreases_assignment, havoc_code, mode);
 

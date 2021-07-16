@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 
 #include "aggressive_slicer.h"
-#include "contracts.h"
+#include "contracts/contracts.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"

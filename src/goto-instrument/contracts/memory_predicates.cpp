@@ -11,7 +11,7 @@ Date: July 2021
 /// \file
 /// Predicates to specify memory footprint in function contracts
 
-#include "contracts_memory_predicates.h"
+#include "memory_predicates.h"
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/expr2c.h>
