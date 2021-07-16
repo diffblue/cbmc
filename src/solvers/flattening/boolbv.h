@@ -79,7 +79,7 @@ public:
     SUB::post_process();
   }
 
-  enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
+  enum class unbounded_arrayt { U_AUTO, U_ALL, U_AUTO };
   unbounded_arrayt unbounded_array;
 
   mp_integer get_value(const bvt &bv)
