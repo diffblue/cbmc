@@ -47,7 +47,7 @@ public:
     message_handlert &message_handler,
     bool get_array_constraints = false)
     : arrayst(_ns, _prop, message_handler, get_array_constraints),
-      unbounded_array(unbounded_arrayt::U_AUTO),
+      unbounded_array(unbounded_arrayt::U_NONE),
       bv_width(_ns),
       bv_utils(_prop),
       functions(*this),
@@ -79,7 +79,7 @@ public:
     SUB::post_process();
   }
 
-  enum class unbounded_arrayt { U_AUTO, U_ALL, U_AUTO };
+  enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
   unbounded_arrayt unbounded_array;
 
   mp_integer get_value(const bvt &bv)
