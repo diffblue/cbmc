@@ -257,7 +257,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     {
       if(
         operand.id() != ID_symbol && operand.id() != ID_ptrmember &&
-        operand.id() != ID_dereference)
+        operand.id() != ID_member && operand.id() != ID_dereference)
       {
         error().source_location = source_location;
         error() << "illegal target in assigns clause" << eom;
