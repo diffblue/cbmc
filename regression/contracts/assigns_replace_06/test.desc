@@ -1,9 +1,9 @@
 CORE
 main.c
 --replace-all-calls-with-contracts
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 --
 Checks whether the values outside the array range specified by the assigns
