@@ -1,0 +1,34 @@
+CORE
+main.c
+--apply-loop-contracts --replace-all-calls-with-contracts
+^\[precondition.1\] .* Check requires clause: SUCCESS$
+^\[precondition.2\] .* Check requires clause: SUCCESS$
+^\[ackermann.1\] .* Check loop invariant before entry: SUCCESS$
+^\[ackermann.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[ackermann.3\] .* Check decreases clause on loop iteration: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+It tests whether we can prove (only partially) the termination of the Ackermann
+function using a multidimensional decreases clause. 
+
+Note that this particular implementation of the Ackermann function contains
+both a while-loop and recursion. Therefore, to fully prove the termination of 
+the Ackermann function, we must prove both 
+(i) the termination of the while-loop and
+(ii) the termination of the recursion. 
+Because CBMC does not support termination proofs of recursions (yet), we cannot
+prove the latter, but the former. Hence, the termination proof in the code is
+only "partial."
+
+Furthermore, the Ackermann function has a function contract that the result
+is always non-negative. This post-condition is necessary for establishing
+the loop invariant. However, in this test, we do not enforce the function
+contract. Instead, we assume that the function contract is correct and use it
+(i.e. replace a recursive call of the Ackermann function with its contract). 
+
+We cannot verify/enforce the function contract of the Ackermann function, since
+CBMC does not support function contracts for recursively defined functions.
+As of now, CBMC only supports function contracts for non-recursive functions. 

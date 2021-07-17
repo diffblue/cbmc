@@ -828,9 +828,11 @@ void c_typecheck_baset::typecheck_spec_decreases(codet &code)
 {
   if(code.find(ID_C_spec_decreases).is_not_nil())
   {
-    exprt &variant = static_cast<exprt &>(code.add(ID_C_spec_decreases));
-
-    typecheck_expr(variant);
-    implicit_typecast_arithmetic(variant);
+    for(auto &decreases_clause_component :
+        (static_cast<exprt &>(code.add(ID_C_spec_decreases)).operands()))
+    {
+      typecheck_expr(decreases_clause_component);
+      implicit_typecast_arithmetic(decreases_clause_component);
+    }
   }
 }

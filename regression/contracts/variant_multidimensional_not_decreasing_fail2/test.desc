@@ -9,5 +9,6 @@ main.c
 ^SIGNAL=0$
 --
 --
-This test fails because the loop invariant is not strong enough for the
-termination proof. We must add 0 <= i to the loop invariant. 
+This test fails because the given multidimensional decreases clause does not 
+monotonically decrease. A mistake is in the first component of the
+decreases clause: i. It should instead be N - i. 
