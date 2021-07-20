@@ -1,0 +1,255 @@
+@startuml
+' This diagram is written using PlantUML. It can be visualised locally or using
+' the PlantUML website - http://www.plantuml.com/plantuml/uml/.
+' On Linux the visualisation tool can be installed using -
+'   `sudo apt-get install plantuml`
+' Running the `plantuml` binary from the directory where this file exists will
+' give the option to view the file.
+
+title SMT2 Internal Abstract Syntax Tree Data Structures
+legend bottom right
+  Specification references refer to "The SMT-LIB Standard" Version 2.6
+endlegend
+
+class irept {
+	--
+	Protected inheritance to be used to prevent direct data access from outside
+	of the classes inheriting from it.
+	__
+}
+
+class smt_commandt {
+	..
+	Note - Protected constructor, so as to only allow construction as part of a
+	sub-class. Public copy/upcast/assignment to this class still available.
+	__
+}
+irept <|-- smt_commandt
+
+class smt_set_option_commandt {
+	""(set-option :produce-models true)""
+	--
+	Section 4.1.7 page 55
+	__
+	option : smt_optiont
+}
+smt_commandt <|-- smt_set_option_commandt
+smt_set_option_commandt *-- smt_optiont
+
+class smt_set_logic_commandt {
+	(set-logic QF_AUFBV)
+	--
+	__
+	logic : smt_logict
+}
+smt_commandt <|-- smt_set_logic_commandt
+smt_set_logic_commandt *-- smt_logict
+
+class smt_declare_function_commandt {
+	""(declare-fun |main::1::x!0@1#1| () (_ BitVec 32))""
+	--
+	Declares the sort (rank?) of a function, introducing the new identifier
+	""|main::1::x!0@1#1|"" in the above example.
+	__
+	identifier
+	parameter_sorts : std::vector<smt_sortt>
+	return_sort : smt_sortt
+}
+smt_commandt <|-- smt_declare_function_commandt
+smt_declare_function_commandt *-- smt_sortt
+
+class smt_define_function_commandt {
+	""(define-fun |B0| () Bool (= |main::1::x!0@1#1| |main::1::x!0@1#1|))""
+	--
+	Defines the implementation of a function. Note that the return_sort could be
+	stored in the "definition" term because all terms have a sort for our
+	definition of term.
+	__
+	identifier
+	parameters : std::vector<smt_identifier_termt>
+	return_sort : smt_sortt
+	definition : smt_termt
+}
+smt_commandt <|-- smt_define_function_commandt
+smt_define_function_commandt *-- smt_identifier_termt
+smt_define_function_commandt *-- smt_sortt
+smt_define_function_commandt *-- smt_termt
+
+class smt_assert_commandt {
+	""(assert |B1|)""
+	--
+	Note condition should be of sort ""smt_bool_sortt""
+	__
+	condition : smt_termt
+}
+smt_commandt <|-- smt_assert_commandt
+smt_assert_commandt *-- smt_termt
+
+class smt_check_sat_commandt {
+	""(check-sat)""
+	..
+	Section 4.2.5 page 64
+	__
+}
+smt_commandt <|-- smt_check_sat_commandt
+
+class smt_get_value_commandt {
+	""(get-value (|foo|))""
+	..
+	Section 4.2.6 page 65
+	Note: Identifier would usually be a smt_identifier_termt for our use case, but
+	the syntax allows more flexability than that.
+	__
+	identifier : smt_termt
+}
+smt_commandt <|-- smt_get_value_commandt
+smt_get_value_commandt *-- smt_termt
+
+class smt_exit_commandt {
+	""(exit)""
+	..
+	Section 4.2.1 page 59
+	Instructs the solver process to exit.
+	__
+}
+smt_commandt <|-- smt_exit_commandt
+
+class smt_pop_commandt {
+	""(pop 1)""
+	..
+	__
+	levels : std::size_t
+}
+smt_commandt <|-- smt_pop_commandt
+
+class smt_push_commandt {
+	""(push 1)""
+	..
+	__
+	levels : std::size_t
+}
+smt_commandt <|-- smt_push_commandt
+
+class smt_termt {
+	..
+	Section 3.6 page 26
+	Analogous to `exprt`.
+	Note - Protected constructor, so as to only allow construction as part of a
+	sub-class. Public copy/upcast/assignment to this class still available.
+	__
+	sort : smt_sortt
+}
+irept <|-- smt_termt
+smt_termt *-- smt_sortt
+
+class smt_optiont {
+	..
+	Note - Protected constructor, so as to only allow construction as part of a
+	sub-class. Public copy/upcast/assignment to this class still available.
+	__
+}
+irept <|-- smt_optiont
+
+class smt_option_produce_modelst {
+	:produce-models true
+	..
+	Section 4.1.7 page 56
+	__
+	value : bool
+}
+smt_optiont <|-- smt_option_produce_modelst
+
+class smt_logict {
+	..
+	Note - Protected constructor, so as to only allow construction as part of a
+	sub-class. Public copy/upcast/assignment to this class still available.
+	__
+}
+irept <|-- smt_logict
+
+class smt_logic_qf_aufbvt {
+	""QF_AUFBV""
+	..
+	https://smtlib.cs.uiowa.edu/logics-all.shtml
+	__
+}
+smt_logict <|-- smt_logic_qf_aufbvt
+
+class smt_bool_literal_termt {
+	""true""
+	""false""
+	..
+	Sort is set to smt_bool_sortt in constructor. Idea - factory member functions
+	for true and false.
+	__
+	value : bool
+}
+smt_termt <-- smt_bool_literal_termt
+
+class smt_bit_vector_constant_termt {
+	""(_ bv0 32)""
+	..
+	http://smtlib.cs.uiowa.edu/logics-all.shtml#QF_BV - See bitvector constants
+	__
+	value : mp_integert
+	width : std::size_t
+}
+smt_termt <|-- smt_bit_vector_constant_termt
+
+class smt_identifier_termt {
+	""|main::1::x!0@1#1|""
+	..
+	__
+	value : irep_idt
+}
+smt_termt <|-- smt_identifier_termt
+
+class smt_not_termt {
+	(not false)
+	..
+	__
+	operand : smt_termt
+}
+smt_termt <|-- smt_not_termt
+smt_not_termt *-- smt_termt
+
+class smt_function_application_termt {
+	""(= x y)""
+	..
+	Section 3.6 page 27.
+	Sort checking should be carried out somewhere, to confirm that the sorts of
+	the term arguments match the sorts of the function definition.
+	__
+	function_identifier : irep_idt
+	arguments : std::vector<smt_termt>
+}
+smt_termt <|-- smt_function_application_termt
+
+class smt_sortt {
+	..
+	Section 3.5 page 26
+	Analogous to `typet`.
+	Note - Protected constructor, so as to only allow construction as part of a
+	sub-class. Public copy/upcast/assignment to this class still available.
+	__
+}
+irept <|-- smt_sortt
+
+class smt_bool_sortt {
+	""Bool""
+	..
+	Section 3.5 page 26
+	__
+}
+smt_sortt <|-- smt_bool_sortt
+
+class smt_bit_vector_sortt {
+	""(_ BitVec 32)""
+	..
+	http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
+	__
+	bit_width : std::size_t
+}
+smt_sortt <|-- smt_bit_vector_sortt
+
+@enduml
