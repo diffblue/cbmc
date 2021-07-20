@@ -166,6 +166,7 @@
       <xs:sequence>
         <xs:element ref="goto_trace" minOccurs="0"/>
       </xs:sequence>
+      <xs:attribute name="description" type="xs:string"/>
       <xs:attribute name="property" type="xs:string"/>
       <xs:attribute name="status" type="xs:string"/>
     </xs:complexType>
