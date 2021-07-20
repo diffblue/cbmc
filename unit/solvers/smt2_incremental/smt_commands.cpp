@@ -37,7 +37,9 @@ TEST_CASE("smt_define_function_commandt getters", "[core][smt2_incremental]")
     {smt_identifier_termt{"x", smt_bool_sortt{}},
      smt_identifier_termt{"y", smt_bool_sortt{}}},
     smt_not_termt{smt_identifier_termt{"x", smt_bool_sortt{}}}};
-  CHECK(function_definition.identifier() == "not first");
+  CHECK(
+    function_definition.identifier() ==
+    smt_identifier_termt{"not first", smt_bool_sortt{}});
   CHECK(
     function_definition.parameters()[0].get() ==
     smt_identifier_termt{"x", smt_bool_sortt{}});

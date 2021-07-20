@@ -70,7 +70,7 @@ public:
     irep_idt identifier,
     std::vector<smt_identifier_termt> parameters,
     smt_termt definition);
-  const irep_idt &identifier() const;
+  const smt_identifier_termt &identifier() const;
   std::vector<std::reference_wrapper<const smt_identifier_termt>>
   parameters() const;
   const smt_sortt &return_sort() const;

@@ -83,7 +83,9 @@ smt_define_function_commandt::smt_define_function_commandt(
   smt_termt definition)
   : smt_commandt{ID_smt_define_function_command}
 {
-  set(ID_identifier, identifier);
+  set(
+    ID_identifier,
+    upcast(smt_identifier_termt{std::move(identifier), definition.get_sort()}));
   std::transform(
     std::make_move_iterator(parameters.begin()),
     std::make_move_iterator(parameters.end()),
@@ -94,9 +96,10 @@ smt_define_function_commandt::smt_define_function_commandt(
   set(ID_code, upcast(std::move(definition)));
 }
 
-const irep_idt &smt_define_function_commandt::identifier() const
+const smt_identifier_termt &smt_define_function_commandt::identifier() const
 {
-  return get(ID_identifier);
+  return static_cast<const smt_identifier_termt &>(
+    downcast(find(ID_identifier)));
 }
 
 std::vector<std::reference_wrapper<const smt_identifier_termt>>
