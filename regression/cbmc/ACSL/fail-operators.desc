@@ -1,0 +1,12 @@
+KNOWNBUG
+fail-operators.c --trace
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION FAILURE$
+--
+^VERIFICATION SUCCESSFUL$
+--
+This is to test printing of special operator characters in traces.
+The verification should fail. Note that this is a bug for normal
+and XML output, but not JSON.
