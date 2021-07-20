@@ -16,7 +16,9 @@ SRC = accelerate/accelerate.cpp \
       alignment_checks.cpp \
       branch.cpp \
       call_sequences.cpp \
-      code_contracts.cpp \
+      contracts/assigns.cpp \
+      contracts/memory_predicates.cpp \
+      contracts/contracts.cpp \
       concurrency.cpp \
       count_eloc.cpp \
       cover.cpp \

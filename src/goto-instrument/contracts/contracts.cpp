@@ -11,97 +11,28 @@ Date: February 2016
 /// \file
 /// Verify and use annotated invariants and pre/post-conditions
 
-#include "code_contracts.h"
+#include "contracts.h"
+
+#include "assigns.h"
+#include "memory_predicates.h"
 
 #include <algorithm>
 #include <map>
 
 #include <analyses/local_may_alias.h>
 
-#include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_expr.h>
-#include <ansi-c/expr2c.h>
 
 #include <goto-programs/remove_skip.h>
 
-#include <linking/static_lifetime_init.h>
-
-#include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/replace_symbol.h>
-
-bool return_value_visitort::found_return_value()
-{
-  return found;
-}
-
-void return_value_visitort::operator()(const exprt &exp)
-{
-  if(exp.id() != ID_symbol)
-    return;
-  const symbol_exprt &sym = to_symbol_expr(exp);
-  found |= sym.get_identifier() == CPROVER_PREFIX "return_value";
-}
-
-std::set<irep_idt> &functions_in_scope_visitort::function_calls()
-{
-  return function_set;
-}
-
-void functions_in_scope_visitort::operator()(const goto_programt &prog)
-{
-  forall_goto_program_instructions(ins, prog)
-  {
-    if(ins->is_function_call())
-    {
-      const code_function_callt &call = ins->get_function_call();
-
-      if(call.function().id() != ID_symbol)
-      {
-        log.error().source_location = call.find_source_location();
-        log.error() << "Function pointer used in function invoked by "
-                       "function contract: "
-                    << messaget::eom;
-        throw 0;
-      }
-      else
-      {
-        const irep_idt &fun_name =
-          to_symbol_expr(call.function()).get_identifier();
-        if(function_set.find(fun_name) == function_set.end())
-        {
-          function_set.insert(fun_name);
-          auto called_fun = goto_functions.function_map.find(fun_name);
-          if(called_fun == goto_functions.function_map.end())
-          {
-            log.warning() << "Could not find function '" << fun_name
-                          << "' in goto-program." << messaget::eom;
-            throw 0;
-          }
-          if(called_fun->second.body_available())
-          {
-            const goto_programt &program = called_fun->second.body;
-            (*this)(program);
-          }
-          else
-          {
-            log.warning() << "No body for function: " << fun_name
-                          << "invoked from function contract." << messaget::eom;
-          }
-        }
-      }
-    }
-  }
-}
 
 exprt get_size(const typet &type, const namespacet &ns, messaget &log)
 {
@@ -894,13 +825,13 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
   return false;
 }
 
-bool code_contractst::add_pointer_checks(const std::string &function_name)
+bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
-  auto old_function = goto_functions.function_map.find(function_name);
+  auto old_function = goto_functions.function_map.find(function);
   if(old_function == goto_functions.function_map.end())
   {
-    log.error() << "Could not find function '" << function_name
+    log.error() << "Could not find function '" << function
                 << "' in goto-program; not enforcing contracts."
                 << messaget::eom;
     return true;
@@ -911,22 +842,25 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
     return false;
   }
 
-  const irep_idt function_id(function_name);
-  const symbolt &function_symbol = ns.lookup(function_id);
-  const auto &type = to_code_with_contract_type(function_symbol.type);
+  if(check_for_looped_mallocs(program))
+  {
+    return true;
+  }
 
+  // Insert aliasing assertions
+  check_frame_conditions(program, ns.lookup(function));
+
+  return false;
+}
+
+void code_contractst::check_frame_conditions(
+  goto_programt &program,
+  const symbolt &target)
+{
+  const auto &type = to_code_with_contract_type(target.type);
   exprt assigns_expr = type.assigns();
 
-  assigns_clauset assigns(assigns_expr, *this, function_id, log);
-
-  goto_programt::instructionst::iterator instruction_it =
-    program.instructions.begin();
-
-  // Create temporary variables to hold the assigns
-  // clause targets before they can be modified.
-  goto_programt standin_decls = assigns.init_block(function_symbol.location);
-  goto_programt mark_dead = assigns.dead_stmts(
-    function_symbol.location, function_name, function_symbol.mode);
+  assigns_clauset assigns(assigns_expr, *this, target.name, log);
 
   // Create a list of variables that are okay to assign.
   std::set<irep_idt> freely_assignable_symbols;
@@ -935,16 +869,19 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
     freely_assignable_symbols.insert(param.get_identifier());
   }
 
+  goto_programt::instructionst::iterator instruction_it =
+    program.instructions.begin();
+
+  // Create temporary variables to hold the assigns
+  // clause targets before they can be modified.
+  goto_programt standin_decls = assigns.init_block(target.location);
+  goto_programt mark_dead =
+    assigns.dead_stmts(target.location, target.name, target.mode);
+
   int lines_to_iterate = standin_decls.instructions.size();
   program.insert_before_swap(instruction_it, standin_decls);
   std::advance(instruction_it, lines_to_iterate);
 
-  if(check_for_looped_mallocs(program))
-  {
-    return true;
-  }
-
-  // Insert aliasing assertions
   for(; instruction_it != program.instructions.end(); ++instruction_it)
   {
     if(instruction_it->is_decl())
@@ -978,7 +915,7 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
         instruction_it,
         program,
         assigns_expr,
-        function_id,
+        target.name,
         freely_assignable_symbols,
         assigns);
     }
@@ -993,26 +930,24 @@ bool code_contractst::add_pointer_checks(const std::string &function_name)
   // Make sure the temporary symbols are marked dead
   lines_to_iterate = mark_dead.instructions.size();
   program.insert_before_swap(instruction_it, mark_dead);
-
-  return false;
 }
 
-bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
+bool code_contractst::enforce_contract(const irep_idt &function)
 {
   // Add statements to the source function
   // to ensure assigns clause is respected.
-  add_pointer_checks(fun_to_enforce);
+  check_frame_conditions_function(function);
 
   // Rename source function
   std::stringstream ss;
-  ss << CPROVER_PREFIX << "contracts_original_" << fun_to_enforce;
+  ss << CPROVER_PREFIX << "contracts_original_" << function;
   const irep_idt mangled(ss.str());
-  const irep_idt original(fun_to_enforce);
+  const irep_idt original(function);
 
   auto old_function = goto_functions.function_map.find(original);
   if(old_function == goto_functions.function_map.end())
   {
-    log.error() << "Could not find function '" << fun_to_enforce
+    log.error() << "Could not find function '" << function
                 << "' in goto-program; not enforcing contracts."
                 << messaget::eom;
     return true;
@@ -1041,7 +976,7 @@ bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
   auto nexist_old_function = goto_functions.function_map.find(original);
   INVARIANT(
     nexist_old_function == goto_functions.function_map.end(),
-    "There should be no function called " + fun_to_enforce +
+    "There should be no function called " + id2string(function) +
       " in the function map because that function should have had its"
       " name mangled");
 
@@ -1326,933 +1261,4 @@ bool code_contractst::enforce_contracts(
       fail = enforce_contract(fun);
   }
   return fail;
-}
-
-assigns_clause_scalar_targett::assigns_clause_scalar_targett(
-  const exprt &object_ptr,
-  code_contractst &contract,
-  messaget &log_parameter,
-  const irep_idt &function_id)
-  : assigns_clause_targett(
-      Scalar,
-      pointer_for(object_ptr),
-      contract,
-      log_parameter),
-    local_standin_variable(typet())
-{
-  const symbolt &function_symbol = contract.ns.lookup(function_id);
-
-  // Declare a new symbol to stand in for the reference
-  symbolt standin_symbol = contract.new_tmp_symbol(
-    pointer_object.type(),
-    function_symbol.location,
-    function_id,
-    function_symbol.mode);
-
-  local_standin_variable = standin_symbol.symbol_expr();
-
-  // Build standin variable initialization block
-  init_block.add(
-    goto_programt::make_decl(local_standin_variable, function_symbol.location));
-  init_block.add(goto_programt::make_assignment(
-    code_assignt(local_standin_variable, pointer_object),
-    function_symbol.location));
-}
-
-std::vector<symbol_exprt>
-assigns_clause_scalar_targett::temporary_declarations() const
-{
-  std::vector<symbol_exprt> result;
-  result.push_back(local_standin_variable);
-  return result;
-}
-
-exprt assigns_clause_scalar_targett::alias_expression(const exprt &ptr)
-{
-  return same_object(ptr, local_standin_variable);
-}
-
-exprt assigns_clause_scalar_targett::compatible_expression(
-  const assigns_clause_targett &called_target)
-{
-  if(called_target.target_type == Scalar)
-  {
-    return alias_expression(called_target.get_direct_pointer());
-  }
-  else // Struct or Array
-  {
-    return false_exprt();
-  }
-}
-
-goto_programt
-assigns_clause_scalar_targett::havoc_code(source_locationt location) const
-{
-  goto_programt assigns_havoc;
-
-  exprt lhs = dereference_exprt(pointer_object);
-  side_effect_expr_nondett rhs(lhs.type(), location);
-
-  goto_programt::targett target =
-    assigns_havoc.add(goto_programt::make_assignment(
-      code_assignt(std::move(lhs), std::move(rhs)), location));
-  target->code_nonconst().add_source_location() = location;
-
-  return assigns_havoc;
-}
-
-assigns_clause_struct_targett::assigns_clause_struct_targett(
-  const exprt &object_ptr,
-  code_contractst &contract,
-  messaget &log_parameter,
-  const irep_idt &function_id)
-  : assigns_clause_targett(
-      Struct,
-      pointer_for(object_ptr),
-      contract,
-      log_parameter),
-    main_struct_standin(typet())
-{
-  const symbolt &struct_symbol =
-    contract.ns.lookup(to_tag_type(object_ptr.type()));
-  const symbolt &function_symbol = contract.ns.lookup(function_id);
-
-  // Declare a new symbol to stand in for the reference
-  symbolt struct_temp_symbol = contract.new_tmp_symbol(
-    pointer_object.type(),
-    function_symbol.location,
-    function_id,
-    function_symbol.mode);
-  main_struct_standin = struct_temp_symbol.symbol_expr();
-  local_standin_variables.push_back(main_struct_standin);
-
-  // Build standin variable initialization block
-  init_block.add(
-    goto_programt::make_decl(main_struct_standin, function_symbol.location));
-  init_block.add(goto_programt::make_assignment(
-    code_assignt(main_struct_standin, pointer_object),
-    function_symbol.location));
-
-  // Handle component members
-  std::vector<exprt> component_members;
-  const struct_typet &struct_type = to_struct_type(struct_symbol.type);
-  for(struct_union_typet::componentt component : struct_type.components())
-  {
-    exprt current_member = member_exprt(object_ptr, component);
-    component_members.push_back(current_member);
-  }
-
-  while(!component_members.empty())
-  {
-    exprt current_operation = component_members.front();
-    exprt operation_address = pointer_for(current_operation);
-
-    // Declare a new symbol to stand in for the reference
-    symbolt standin_symbol = contract.new_tmp_symbol(
-      operation_address.type(),
-      function_symbol.location,
-      function_id,
-      function_symbol.mode);
-
-    symbol_exprt current_standin = standin_symbol.symbol_expr();
-    local_standin_variables.push_back(current_standin);
-
-    // Add to standin variable initialization block
-    init_block.add(
-      goto_programt::make_decl(current_standin, function_symbol.location));
-    init_block.add(goto_programt::make_assignment(
-      code_assignt(current_standin, operation_address),
-      function_symbol.location));
-
-    if(current_operation.type().id() == ID_struct_tag)
-    {
-      const symbolt &current_struct_symbol =
-        contract.ns.lookup(to_tag_type(current_operation.type()));
-
-      const struct_typet &curr_struct_t =
-        to_struct_type(current_struct_symbol.type);
-      for(struct_union_typet::componentt component : curr_struct_t.components())
-      {
-        exprt current_member = member_exprt(current_operation, component);
-        component_members.push_back(current_member);
-      }
-    }
-    component_members.erase(component_members.begin());
-  }
-}
-
-std::vector<symbol_exprt>
-assigns_clause_struct_targett::temporary_declarations() const
-{
-  return local_standin_variables;
-}
-
-exprt assigns_clause_struct_targett::alias_expression(const exprt &ptr)
-{
-  exprt::operandst disjuncts;
-  disjuncts.reserve(local_standin_variables.size());
-  for(symbol_exprt symbol : local_standin_variables)
-  {
-    const typet &ptr_concrete_type = to_pointer_type(ptr.type()).subtype();
-    auto left_size = size_of_expr(ptr_concrete_type, contract.ns);
-    const typet &standin_concrete_type =
-      to_pointer_type(symbol.type()).subtype();
-    auto right_size = size_of_expr(standin_concrete_type, contract.ns);
-    INVARIANT(left_size.has_value(), "Unable to determine size of type (lhs).");
-    INVARIANT(
-      right_size.has_value(), "Unable to determine size of type (rhs).");
-    if(*left_size == *right_size)
-    {
-      exprt same_obj = same_object(ptr, symbol);
-      exprt same_offset =
-        equal_exprt(pointer_offset(ptr), pointer_offset(symbol));
-
-      disjuncts.push_back(and_exprt{same_obj, same_offset});
-    }
-  }
-
-  return disjunction(disjuncts);
-}
-
-exprt assigns_clause_struct_targett::compatible_expression(
-  const assigns_clause_targett &called_target)
-{
-  if(called_target.target_type == Scalar)
-  {
-    return alias_expression(called_target.get_direct_pointer());
-  }
-  else if(called_target.target_type == Struct)
-  {
-    const assigns_clause_struct_targett &struct_target =
-      static_cast<const assigns_clause_struct_targett &>(called_target);
-
-    exprt same_obj =
-      same_object(this->main_struct_standin, struct_target.pointer_object);
-    // the size of the called struct should be less than or
-    // equal to that of the assignable target struct.
-    exprt current_size =
-      get_size(this->pointer_object.type(), contract.ns, log);
-    exprt curr_upper_offset =
-      pointer_offset(plus_exprt(this->main_struct_standin, current_size));
-    exprt called_size =
-      get_size(struct_target.pointer_object.type(), contract.ns, log);
-    exprt called_upper_offset =
-      pointer_offset(plus_exprt(struct_target.pointer_object, called_size));
-
-    exprt in_range_lower = binary_predicate_exprt(
-      pointer_offset(struct_target.pointer_object),
-      ID_ge,
-      pointer_offset(this->main_struct_standin));
-    exprt in_range_upper =
-      binary_predicate_exprt(curr_upper_offset, ID_ge, called_upper_offset);
-
-    exprt in_range = and_exprt(in_range_lower, in_range_upper);
-    return and_exprt(same_obj, in_range);
-  }
-  else // Array
-  {
-    return false_exprt();
-  }
-}
-
-goto_programt
-assigns_clause_struct_targett::havoc_code(source_locationt location) const
-{
-  goto_programt assigns_havoc;
-
-  exprt lhs = dereference_exprt(pointer_object);
-  side_effect_expr_nondett rhs(lhs.type(), location);
-
-  goto_programt::targett target =
-    assigns_havoc.add(goto_programt::make_assignment(
-      code_assignt(std::move(lhs), std::move(rhs)), location));
-  target->code_nonconst().add_source_location() = location;
-
-  return assigns_havoc;
-}
-
-assigns_clause_array_targett::assigns_clause_array_targett(
-  const exprt &object_ptr,
-  code_contractst &contract,
-  messaget &log_parameter,
-  const irep_idt &function_id)
-  : assigns_clause_targett(Array, object_ptr, contract, log_parameter),
-    lower_offset_object(),
-    upper_offset_object(),
-    array_standin_variable(typet()),
-    lower_offset_variable(typet()),
-    upper_offset_variable(typet())
-{
-  const symbolt &function_symbol = contract.ns.lookup(function_id);
-
-  // Declare a new symbol to stand in for the reference
-  symbolt standin_symbol = contract.new_tmp_symbol(
-    pointer_object.type(),
-    function_symbol.location,
-    function_id,
-    function_symbol.mode);
-
-  array_standin_variable = standin_symbol.symbol_expr();
-
-  // Add array temp to variable initialization block
-  init_block.add(
-    goto_programt::make_decl(array_standin_variable, function_symbol.location));
-  init_block.add(goto_programt::make_assignment(
-    code_assignt(array_standin_variable, pointer_object),
-    function_symbol.location));
-
-  if(object_ptr.id() == ID_address_of)
-  {
-    exprt constant_size =
-      get_size(object_ptr.type().subtype(), contract.ns, log);
-    lower_offset_object = typecast_exprt(
-      mult_exprt(
-        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
-      signed_int_type());
-
-    // Declare a new symbol to stand in for the reference
-    symbolt lower_standin_symbol = contract.new_tmp_symbol(
-      lower_offset_object.type(),
-      function_symbol.location,
-      function_id,
-      function_symbol.mode);
-
-    lower_offset_variable = lower_standin_symbol.symbol_expr();
-
-    // Add array temp to variable initialization block
-    init_block.add(goto_programt::make_decl(
-      lower_offset_variable, function_symbol.location));
-    init_block.add(goto_programt::make_assignment(
-      code_assignt(lower_offset_variable, lower_offset_object),
-      function_symbol.location));
-
-    upper_offset_object = typecast_exprt(
-      mult_exprt(
-        typecast_exprt(object_ptr, unsigned_long_int_type()), constant_size),
-      signed_int_type());
-
-    // Declare a new symbol to stand in for the reference
-    symbolt upper_standin_symbol = contract.new_tmp_symbol(
-      upper_offset_object.type(),
-      function_symbol.location,
-      function_id,
-      function_symbol.mode);
-
-    upper_offset_variable = upper_standin_symbol.symbol_expr();
-
-    // Add array temp to variable initialization block
-    init_block.add(goto_programt::make_decl(
-      upper_offset_variable, function_symbol.location));
-    init_block.add(goto_programt::make_assignment(
-      code_assignt(upper_offset_variable, upper_offset_object),
-      function_symbol.location));
-  }
-}
-
-std::vector<symbol_exprt>
-assigns_clause_array_targett::temporary_declarations() const
-{
-  std::vector<symbol_exprt> result;
-  result.push_back(array_standin_variable);
-  result.push_back(lower_offset_variable);
-  result.push_back(upper_offset_variable);
-
-  return result;
-}
-
-goto_programt
-assigns_clause_array_targett::havoc_code(source_locationt location) const
-{
-  goto_programt assigns_havoc;
-
-  modifiest assigns_tgts;
-  typet lower_type = lower_offset_variable.type();
-  exprt array_type_size =
-    get_size(pointer_object.type().subtype(), contract.ns, log);
-
-  for(mp_integer i = lower_bound; i < upper_bound; ++i)
-  {
-    irep_idt offset_string(from_integer(i, integer_typet()).get_value());
-    irep_idt offset_irep(offset_string);
-    constant_exprt val_const(offset_irep, lower_type);
-    dereference_exprt array_deref(plus_exprt(
-      pointer_object, typecast_exprt(val_const, signed_long_int_type())));
-
-    assigns_tgts.insert(array_deref);
-  }
-
-  for(auto lhs : assigns_tgts)
-  {
-    side_effect_expr_nondett rhs(lhs.type(), location);
-
-    goto_programt::targett target =
-      assigns_havoc.add(goto_programt::make_assignment(
-        code_assignt(std::move(lhs), std::move(rhs)), location));
-    target->code_nonconst().add_source_location() = location;
-  }
-
-  return assigns_havoc;
-}
-
-exprt assigns_clause_array_targett::alias_expression(const exprt &ptr)
-{
-  exprt ptr_offset = pointer_offset(ptr);
-  exprt::operandst conjuncts;
-
-  conjuncts.push_back(same_object(ptr, array_standin_variable));
-  conjuncts.push_back(binary_predicate_exprt(
-    ptr_offset,
-    ID_ge,
-    typecast_exprt(lower_offset_variable, ptr_offset.type())));
-  conjuncts.push_back(binary_predicate_exprt(
-    typecast_exprt(upper_offset_variable, ptr_offset.type()),
-    ID_ge,
-    ptr_offset));
-
-  return conjunction(conjuncts);
-}
-
-exprt assigns_clause_array_targett::compatible_expression(
-  const assigns_clause_targett &called_target)
-{
-  if(called_target.target_type == Scalar)
-  {
-    return alias_expression(called_target.get_direct_pointer());
-  }
-  else if(called_target.target_type == Array)
-  {
-    const assigns_clause_array_targett &array_target =
-      static_cast<const assigns_clause_array_targett &>(called_target);
-    exprt same_obj =
-      same_object(this->array_standin_variable, array_target.pointer_object);
-    exprt in_range_lower = binary_predicate_exprt(
-      array_target.lower_offset_object, ID_ge, this->lower_offset_variable);
-    exprt in_range_upper = binary_predicate_exprt(
-      this->upper_offset_variable, ID_ge, array_target.upper_offset_object);
-    exprt in_range = and_exprt(in_range_lower, in_range_upper);
-    return and_exprt(same_obj, in_range);
-  }
-  else // Struct
-  {
-    return false_exprt();
-  }
-}
-
-assigns_clauset::assigns_clauset(
-  const exprt &assigns,
-  code_contractst &contract,
-  const irep_idt function_id,
-  messaget log_parameter)
-  : assigns_expr(assigns),
-    parent(contract),
-    function_id(function_id),
-    log(log_parameter)
-{
-  for(exprt current_operation : assigns_expr.operands())
-  {
-    add_target(current_operation);
-  }
-}
-assigns_clauset::~assigns_clauset()
-{
-  for(assigns_clause_targett *target : targets)
-  {
-    delete target;
-  }
-}
-
-assigns_clause_targett *assigns_clauset::add_target(exprt current_operation)
-{
-  if(current_operation.id() == ID_address_of)
-  {
-    assigns_clause_array_targett *array_target =
-      new assigns_clause_array_targett(
-        current_operation, parent, log, function_id);
-    targets.push_back(array_target);
-    return array_target;
-  }
-  else if(current_operation.type().id() == ID_struct_tag)
-  {
-    assigns_clause_struct_targett *struct_target =
-      new assigns_clause_struct_targett(
-        current_operation, parent, log, function_id);
-    targets.push_back(struct_target);
-    return struct_target;
-  }
-  else
-  {
-    assigns_clause_scalar_targett *scalar_target =
-      new assigns_clause_scalar_targett(
-        current_operation, parent, log, function_id);
-    targets.push_back(scalar_target);
-    return scalar_target;
-  }
-}
-
-assigns_clause_targett *
-assigns_clauset::add_pointer_target(exprt current_operation)
-{
-  return add_target(dereference_exprt(current_operation));
-}
-
-goto_programt assigns_clauset::init_block(source_locationt location)
-{
-  goto_programt result;
-  for(assigns_clause_targett *target : targets)
-  {
-    for(goto_programt::instructiont inst :
-        target->get_init_block().instructions)
-    {
-      result.add(goto_programt::instructiont(inst));
-    }
-  }
-  return result;
-}
-
-goto_programt &assigns_clauset::temporary_declarations(
-  source_locationt location,
-  irep_idt function_name,
-  irep_idt language_mode)
-{
-  if(standin_declarations.empty())
-  {
-    for(assigns_clause_targett *target : targets)
-    {
-      for(symbol_exprt symbol : target->temporary_declarations())
-      {
-        standin_declarations.add(
-          goto_programt::make_decl(symbol, symbol.source_location()));
-      }
-    }
-  }
-  return standin_declarations;
-}
-
-goto_programt assigns_clauset::dead_stmts(
-  source_locationt location,
-  irep_idt function_name,
-  irep_idt language_mode)
-{
-  goto_programt dead_statements;
-  for(assigns_clause_targett *target : targets)
-  {
-    for(symbol_exprt symbol : target->temporary_declarations())
-    {
-      dead_statements.add(
-        goto_programt::make_dead(symbol, symbol.source_location()));
-    }
-  }
-  return dead_statements;
-}
-
-goto_programt assigns_clauset::havoc_code(
-  source_locationt location,
-  irep_idt function_name,
-  irep_idt language_mode)
-{
-  goto_programt havoc_statements;
-  for(assigns_clause_targett *target : targets)
-  {
-    // (1) If the assigned target is not a dereference,
-    // only include the havoc_statement
-
-    // (2) If the assigned target is a dereference, do the following:
-
-    // if(!__CPROVER_w_ok(target, 0)) goto z;
-    //      havoc_statements
-    // z: skip
-
-    // create the z label
-    goto_programt tmp_z;
-    goto_programt::targett z = tmp_z.add(goto_programt::make_skip(location));
-
-    const auto &target_ptr = target->get_direct_pointer();
-    if(to_address_of_expr(target_ptr).object().id() == ID_dereference)
-    {
-      // create the condition
-      exprt condition =
-        not_exprt(w_ok_exprt(target_ptr, from_integer(0, unsigned_int_type())));
-      havoc_statements.add(goto_programt::make_goto(z, condition, location));
-    }
-
-    // create havoc_statements
-    for(goto_programt::instructiont instruction :
-        target->havoc_code(location).instructions)
-    {
-      havoc_statements.add(std::move(instruction));
-    }
-
-    if(to_address_of_expr(target_ptr).object().id() == ID_dereference)
-    {
-      // add the z label instruction
-      havoc_statements.destructive_append(tmp_z);
-    }
-  }
-  return havoc_statements;
-}
-
-exprt assigns_clauset::alias_expression(const exprt &lhs)
-{
-  if(targets.empty())
-  {
-    return false_exprt();
-  }
-
-  exprt left_ptr = assigns_clause_targett::pointer_for(lhs);
-
-  bool first_iter = true;
-  exprt result = false_exprt();
-  for(assigns_clause_targett *target : targets)
-  {
-    if(first_iter)
-    {
-      result = target->alias_expression(left_ptr);
-      first_iter = false;
-    }
-    else
-    {
-      result = or_exprt(result, target->alias_expression(left_ptr));
-    }
-  }
-  return result;
-}
-
-exprt assigns_clauset::compatible_expression(
-  const assigns_clauset &called_assigns)
-{
-  if(called_assigns.targets.empty())
-  {
-    return true_exprt();
-  }
-
-  bool first_clause = true;
-  exprt result = true_exprt();
-  for(assigns_clause_targett *called_target : called_assigns.targets)
-  {
-    bool first_iter = true;
-    exprt current_target_compatible = false_exprt();
-    for(assigns_clause_targett *target : targets)
-    {
-      if(first_iter)
-      {
-        // TODO: Optimize the validation below and remove code duplication
-        // See GitHub issue #6105 for further details
-
-        // Validating the called target through __CPROVER_w_ok() is
-        // only useful when the called target is a dereference
-        const auto &called_target_ptr = called_target->get_direct_pointer();
-        if(
-          to_address_of_expr(called_target_ptr).object().id() == ID_dereference)
-        {
-          // or_exprt is short-circuited, therefore
-          // target->compatible_expression(*called_target) would not be
-          // checked on invalid called_targets.
-          current_target_compatible = or_exprt(
-            not_exprt(w_ok_exprt(
-              called_target_ptr, from_integer(0, unsigned_int_type()))),
-            target->compatible_expression(*called_target));
-        }
-        else
-        {
-          current_target_compatible =
-            target->compatible_expression(*called_target);
-        }
-        first_iter = false;
-      }
-      else
-      {
-        current_target_compatible = or_exprt(
-          current_target_compatible,
-          target->compatible_expression(*called_target));
-      }
-    }
-    if(first_clause)
-    {
-      result = current_target_compatible;
-      first_clause = false;
-    }
-    else
-    {
-      exprt::operandst conjuncts;
-      conjuncts.push_back(result);
-      conjuncts.push_back(current_target_compatible);
-      result = conjunction(conjuncts);
-    }
-  }
-
-  return result;
-}
-
-std::set<goto_programt::targett> &find_is_fresh_calls_visitort::is_fresh_calls()
-{
-  return function_set;
-}
-
-void find_is_fresh_calls_visitort::clear_set()
-{
-  function_set.clear();
-}
-
-void find_is_fresh_calls_visitort::operator()(goto_programt &prog)
-{
-  Forall_goto_program_instructions(ins, prog)
-  {
-    if(ins->is_function_call())
-    {
-      const code_function_callt &call = ins->get_function_call();
-
-      if(call.function().id() == ID_symbol)
-      {
-        const irep_idt &fun_name =
-          to_symbol_expr(call.function()).get_identifier();
-
-        if(fun_name == (CPROVER_PREFIX + std::string("is_fresh")))
-        {
-          function_set.insert(ins);
-        }
-      }
-    }
-  }
-}
-
-void is_fresh_baset::update_requires(goto_programt &requires)
-{
-  find_is_fresh_calls_visitort requires_visitor;
-  requires_visitor(requires);
-  for(auto it : requires_visitor.is_fresh_calls())
-  {
-    create_requires_fn_call(it);
-  }
-}
-
-void is_fresh_baset::update_ensures(goto_programt &ensures)
-{
-  find_is_fresh_calls_visitort ensures_visitor;
-  ensures_visitor(ensures);
-  for(auto it : ensures_visitor.is_fresh_calls())
-  {
-    create_ensures_fn_call(it);
-  }
-}
-
-//
-//
-// Code largely copied from model_argc_argv.cpp
-//
-//
-
-void is_fresh_baset::add_declarations(const std::string &decl_string)
-{
-  log.debug() << "Creating declarations: \n" << decl_string << "\n";
-
-  std::istringstream iss(decl_string);
-
-  ansi_c_languaget ansi_c_language;
-  ansi_c_language.set_message_handler(log.get_message_handler());
-  configt::ansi_ct::preprocessort pp = config.ansi_c.preprocessor;
-  config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::NONE;
-  ansi_c_language.parse(iss, "");
-  config.ansi_c.preprocessor = pp;
-
-  symbol_tablet tmp_symbol_table;
-  ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
-  exprt value = nil_exprt();
-
-  goto_functionst tmp_functions;
-
-  // Add the new functions into the goto functions table.
-  parent.get_goto_functions().function_map[ensures_fn_name].copy_from(
-    tmp_functions.function_map[ensures_fn_name]);
-
-  parent.get_goto_functions().function_map[requires_fn_name].copy_from(
-    tmp_functions.function_map[requires_fn_name]);
-
-  for(const auto &symbol_pair : tmp_symbol_table.symbols)
-  {
-    if(
-      symbol_pair.first == memmap_name ||
-      symbol_pair.first == ensures_fn_name ||
-      symbol_pair.first == requires_fn_name || symbol_pair.first == "malloc")
-    {
-      this->parent.get_symbol_table().insert(symbol_pair.second);
-    }
-    // Parameters are stored as scoped names in the symbol table.
-    else if(
-      (has_prefix(
-         id2string(symbol_pair.first), id2string(ensures_fn_name) + "::") ||
-       has_prefix(
-         id2string(symbol_pair.first), id2string(requires_fn_name) + "::")) &&
-      parent.get_symbol_table().add(symbol_pair.second))
-    {
-      UNREACHABLE;
-    }
-  }
-
-  // We have to set the global memory map array to
-  // all zeros for this to work properly
-  const array_typet ty =
-    to_array_type(tmp_symbol_table.lookup_ref(memmap_name).type);
-  constant_exprt initial_value(irep_idt(dstringt("0")), ty.subtype());
-  array_of_exprt memmap_init(initial_value, ty);
-  goto_programt::instructiont a =
-    goto_programt::make_assignment(symbol_exprt(memmap_name, ty), memmap_init);
-
-  // insert the assignment into the initialize function.
-  auto called_func =
-    parent.get_goto_functions().function_map.find(INITIALIZE_FUNCTION);
-  goto_programt &body = called_func->second.body;
-  auto target = body.get_end_function();
-  body.insert_before(target, a);
-}
-
-void is_fresh_baset::update_fn_call(
-  goto_programt::targett &ins,
-  const std::string &fn_name,
-  bool add_address_of)
-{
-  const code_function_callt &const_call = ins->get_function_call();
-  code_function_callt call(
-    exprt(const_call.lhs()),
-    exprt(const_call.function()),
-    code_function_callt::argumentst(const_call.arguments()));
-
-  // adjusting the expression for the first argument, if required
-  if(add_address_of)
-  {
-    INVARIANT(call.arguments().size() > 0, "Function must have arguments");
-    call.arguments()[0] = address_of_exprt(call.arguments()[0]);
-  }
-
-  // fixing the function name.
-  to_symbol_expr(call.function()).set_identifier(fn_name);
-  log.debug() << "printing updated call expression: "
-              << expr2c(call, parent.get_namespace()) << "\n";
-
-  ins->set_function_call(call);
-}
-
-/* Declarations for contract enforcement */
-
-is_fresh_enforcet::is_fresh_enforcet(
-  code_contractst &_parent,
-  messaget _log,
-  irep_idt _fun_id)
-  : is_fresh_baset(_parent, _log, _fun_id)
-{
-  std::stringstream ssreq, ssensure, ssmemmap;
-  ssreq << CPROVER_PREFIX << fun_id << "_requires_is_fresh";
-  this->requires_fn_name = ssreq.str();
-
-  ssensure << CPROVER_PREFIX << fun_id << "_ensures_is_fresh";
-  this->ensures_fn_name = ssensure.str();
-
-  ssmemmap << CPROVER_PREFIX << fun_id << "_memory_map";
-  this->memmap_name = ssmemmap.str();
-}
-
-void is_fresh_enforcet::create_declarations()
-{
-  std::ostringstream oss;
-  std::string cprover_prefix(CPROVER_PREFIX);
-  oss << "static _Bool " << memmap_name
-      << "[" + cprover_prefix + "constant_infinity_uint]; \n"
-      << "\n"
-      << "_Bool " << requires_fn_name
-      << "(void **elem, " + cprover_prefix + "size_t size) { \n"
-      << "   *elem = malloc(size); \n"
-      << "   if (!*elem || " << memmap_name
-      << "[" + cprover_prefix + "POINTER_OBJECT(*elem)]) return 0; \n"
-      << "   " << memmap_name << "[" + cprover_prefix
-      << "POINTER_OBJECT(*elem)] = 1; \n"
-      << "   return 1; \n"
-      << "} \n"
-      << "\n"
-      << "_Bool " << ensures_fn_name
-      << "(void *elem, " + cprover_prefix + "size_t size) { \n"
-      << "   _Bool ok = (!" << memmap_name
-      << "[" + cprover_prefix + "POINTER_OBJECT(elem)] && "
-      << cprover_prefix + "r_ok(elem, size)); \n"
-      << "   " << memmap_name << "[" + cprover_prefix
-      << "POINTER_OBJECT(elem)] = 1; \n"
-      << "   return ok; \n"
-      << "}";
-
-  add_declarations(oss.str());
-}
-
-void is_fresh_enforcet::create_requires_fn_call(goto_programt::targett &ins)
-{
-  update_fn_call(ins, requires_fn_name, true);
-}
-
-void is_fresh_enforcet::create_ensures_fn_call(goto_programt::targett &ins)
-{
-  update_fn_call(ins, ensures_fn_name, false);
-}
-
-/* Declarations for contract replacement: note that there may be several
-   instances of the same function called in a particular context, so care must be taken
-   that the 'call' functions and global data structure are unique for each instance.
-   This is why we check that the symbols are unique for each such declaration.  */
-
-std::string unique_symbol(const symbol_tablet &tbl, const std::string &original)
-{
-  auto size = tbl.next_unused_suffix(original);
-  return original + std::to_string(size);
-}
-
-is_fresh_replacet::is_fresh_replacet(
-  code_contractst &_parent,
-  messaget _log,
-  irep_idt _fun_id)
-  : is_fresh_baset(_parent, _log, _fun_id)
-{
-  std::stringstream ssreq, ssensure, ssmemmap;
-  ssreq /* << CPROVER_PREFIX */ << fun_id << "_call_requires_is_fresh";
-  this->requires_fn_name =
-    unique_symbol(parent.get_symbol_table(), ssreq.str());
-
-  ssensure /* << CPROVER_PREFIX */ << fun_id << "_call_ensures_is_fresh";
-  this->ensures_fn_name =
-    unique_symbol(parent.get_symbol_table(), ssensure.str());
-
-  ssmemmap /* << CPROVER_PREFIX */ << fun_id << "_memory_map";
-  this->memmap_name = unique_symbol(parent.get_symbol_table(), ssmemmap.str());
-}
-
-void is_fresh_replacet::create_declarations()
-{
-  std::ostringstream oss;
-  std::string cprover_prefix(CPROVER_PREFIX);
-  oss << "static _Bool " << memmap_name
-      << "[" + cprover_prefix + "constant_infinity_uint]; \n"
-      << "\n"
-      << "static _Bool " << requires_fn_name
-      << "(void *elem, " + cprover_prefix + "size_t size) { \n"
-      << "  _Bool r_ok = " + cprover_prefix + "r_ok(elem, size); \n"
-      << "  if (" << memmap_name
-      << "[" + cprover_prefix + "POINTER_OBJECT(elem)]"
-      << " != 0 || !r_ok)  return 0; \n"
-      << "  " << memmap_name << "["
-      << cprover_prefix + "POINTER_OBJECT(elem)] = 1; \n"
-      << "  return 1; \n"
-      << "} \n"
-      << " \n"
-      << "_Bool " << ensures_fn_name
-      << "(void **elem, " + cprover_prefix + "size_t size) { \n"
-      << "  *elem = malloc(size); \n"
-      << "  return (*elem != 0); \n"
-      << "} \n";
-
-  add_declarations(oss.str());
-}
-
-void is_fresh_replacet::create_requires_fn_call(goto_programt::targett &ins)
-{
-  update_fn_call(ins, requires_fn_name, false);
-}
-
-void is_fresh_replacet::create_ensures_fn_call(goto_programt::targett &ins)
-{
-  update_fn_call(ins, ensures_fn_name, true);
 }
