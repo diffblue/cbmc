@@ -109,6 +109,7 @@ xmlt xml(const irep_idt &property_id, const property_infot &property_info)
   xmlt xml_result("result");
   xml_result.set_attribute("property", id2string(property_id));
   xml_result.set_attribute("status", as_string(property_info.status));
+  xml_result.set_attribute("description", as_string(property_info.description));
   return xml_result;
 }
 
