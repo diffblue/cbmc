@@ -679,11 +679,6 @@ const symbolt &code_contractst::new_tmp_symbol(
     symbol_table);
 }
 
-const namespacet &code_contractst::get_namespace() const
-{
-  return ns;
-}
-
 symbol_tablet &code_contractst::get_symbol_table()
 {
   return symbol_table;

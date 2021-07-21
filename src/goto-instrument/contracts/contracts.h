@@ -129,8 +129,6 @@ public:
     const loopt &loop,
     const irep_idt &mode);
 
-  const namespacet &get_namespace() const;
-
   // for "helper" classes to update symbol table.
   symbol_tablet &get_symbol_table();
   goto_functionst &get_goto_functions();

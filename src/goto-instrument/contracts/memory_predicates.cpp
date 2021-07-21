@@ -227,8 +227,6 @@ void is_fresh_baset::update_fn_call(
 
   // fixing the function name.
   to_symbol_expr(call.function()).set_identifier(fn_name);
-  log.debug() << "printing updated call expression: "
-              << expr2c(call, parent.get_namespace()) << "\n";
 
   ins->set_function_call(call);
 }
