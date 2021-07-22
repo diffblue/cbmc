@@ -509,10 +509,17 @@ cprover_contract_loop_invariant_list_opt:
         | cprover_contract_loop_invariant_list
         ;
 
+ACSL_binding_expression_list:
+          ACSL_binding_expression
+        { init($$); mto($$, $1); }
+        | ACSL_binding_expression_list ',' ACSL_binding_expression
+        { $$=$1; mto($$, $3); }
+        ;
+
 cprover_contract_decreases_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_DECREASES '(' ACSL_binding_expression ')'
+        | TOK_CPROVER_DECREASES '(' ACSL_binding_expression_list ')'
         { $$=$3; }
         ;
 
@@ -2449,8 +2456,8 @@ iteration_statement:
           if(!parser_stack($6).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($6).operands());
 
-          if(parser_stack($7).is_not_nil())
-            parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($7));
+          if(!parser_stack($7).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($7).operands());
         }
         | TOK_DO statement TOK_WHILE '(' comma_expression ')'
           cprover_contract_assigns_opt
@@ -2464,8 +2471,8 @@ iteration_statement:
           if(!parser_stack($8).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($8).operands());
 
-          if(parser_stack($9).is_not_nil())
-            parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($9));
+          if(!parser_stack($9).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($9).operands());
         }
         | TOK_FOR
           {
@@ -2495,8 +2502,8 @@ iteration_statement:
           if(!parser_stack($10).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($10).operands());
 
-          if(parser_stack($11).is_not_nil())
-            parser_stack($$).add(ID_C_spec_decreases).swap(parser_stack($11));
+          if(!parser_stack($11).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($11).operands());
 
           if(PARSER.for_has_scope)
             PARSER.pop_scope(); // remove the C99 for-scope

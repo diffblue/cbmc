@@ -1,0 +1,16 @@
+CORE
+main.c
+--apply-loop-contracts
+activate-multi-line-match
+^main.c.*error: syntax error before '__CPROVER_decreases'\n.*__CPROVER_decreases\(42\)$
+^PARSING ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test fails because we have multiple decreases clauses. CBMC only admits
+one decreases clause for each loop. If one wants to write a multidimensional
+decreases clause, it should be placed inside a single __CPROVER_decreases(...),
+where each component of the multidimensional decreases clause is separated by a
+comma. Hence, in this test, the correct syntax is 
+__CPROVER_decreases(N - i, 42).

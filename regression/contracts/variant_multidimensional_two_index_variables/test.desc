@@ -9,6 +9,4 @@ main.c
 ^SIGNAL=0$
 --
 --
-The purpose of this test is to check whether a decreases clause can
-successfully prove the termination of a loop (i) whose exit condition is 
-1 == 1 (i.e. true) and (ii) that will eventually exit via a break statement. 
+It tests whether a multidimensional decreases clause works properly. 

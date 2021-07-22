@@ -5,7 +5,8 @@ int main()
   while(i != N)
     // clang-format off
     __CPROVER_loop_invariant(0 <= i && i <= N)
-    __CPROVER_decreases(N - i, 42)
+    __CPROVER_decreases(N - i) 
+    __CPROVER_decreases(42)
     // clang-format on
     {
       i++;
