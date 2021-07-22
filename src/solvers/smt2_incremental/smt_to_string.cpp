@@ -125,28 +125,20 @@ smt_term_to_string_convertert::make_output_function(const std::string &output)
 smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(const smt_sortt &output)
 {
-  // `output` can be safely captured by reference, because no sorts are copied
-  // or constructed as part of conversion to string.
-  return [&](std::ostream &os) { os << output; };
+  return [=](std::ostream &os) { os << output; };
 }
 
 smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(const smt_termt &output)
 {
-  // `output` can be safely captured by reference, because no terms are copied
-  // or constructed as part of conversion to string.
-  return [&](std::ostream &os) { output.accept(*this); };
+  return [=](std::ostream &os) { output.accept(*this); };
 }
 
 smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(
   const std::vector<std::reference_wrapper<const smt_termt>> &outputs)
 {
-  // `outputs` must be captured by value to avoid a dangling reference to the
-  // vector. The elements in the vector are not at risk of dangling as the
-  // lifetime of the terms to which they refer is at least as long as the
-  // execution of the overall printing algorithm.
-  return [&, outputs](std::ostream &os) {
+  return [=](std::ostream &os) {
     for(const auto &output : make_range(outputs.rbegin(), outputs.rend()))
     {
       push_outputs(" ", output.get());
