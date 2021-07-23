@@ -27,6 +27,10 @@ smt_bool_sortt::smt_bool_sortt() : smt_sortt{ID_smt_bool_sort}
 smt_bit_vector_sortt::smt_bit_vector_sortt(const std::size_t bit_width)
   : smt_sortt{ID_smt_bit_vector_sort}
 {
+  INVARIANT(
+    bit_width > 0,
+    "The definition of SMT2 bit vector theory requires the number of "
+    "bits to be greater than 0.");
   set_size_t(ID_width, bit_width);
 }
 

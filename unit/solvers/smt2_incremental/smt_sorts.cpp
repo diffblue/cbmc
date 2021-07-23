@@ -11,6 +11,14 @@ TEST_CASE("Test smt_sortt.pretty is accessible.", "[core][smt2_incremental]")
 }
 
 TEST_CASE(
+  "Test smt_bit_vec_sortt bit width invariant",
+  "[core][smt2_incremental]")
+{
+  const cbmc_invariants_should_throwt invariants_throw_during_test;
+  REQUIRE_THROWS(smt_bit_vector_sortt{0});
+}
+
+TEST_CASE(
   "Test smt_bit_vec_sortt bit_width getter.",
   "[core][smt2_incremental]")
 {
