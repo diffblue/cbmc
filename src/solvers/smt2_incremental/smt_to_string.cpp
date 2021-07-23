@@ -44,7 +44,7 @@ std::ostream &operator<<(std::ostream &os, const smt_sortt &sort)
   return os;
 }
 
-std::string smt_to_string(const smt_sortt &sort)
+std::string smt_to_smt2_string(const smt_sortt &sort)
 {
   std::stringstream ss;
   ss << sort;
@@ -218,7 +218,7 @@ std::ostream &operator<<(std::ostream &os, const smt_termt &term)
   return smt_term_to_string_convertert::convert(os, term);
 }
 
-std::string smt_to_string(const smt_termt &term)
+std::string smt_to_smt2_string(const smt_termt &term)
 {
   std::stringstream ss;
   ss << term;
@@ -248,7 +248,7 @@ std::ostream &operator<<(std::ostream &os, const smt_optiont &option)
   return os;
 }
 
-std::string smt_to_string(const smt_optiont &option)
+std::string smt_to_smt2_string(const smt_optiont &option)
 {
   std::stringstream ss;
   ss << option;
@@ -277,7 +277,7 @@ std::ostream &operator<<(std::ostream &os, const smt_logict &logic)
   return os;
 }
 
-std::string smt_to_string(const smt_logict &logic)
+std::string smt_to_smt2_string(const smt_logict &logic)
 {
   std::stringstream ss;
   ss << logic;
@@ -323,8 +323,8 @@ public:
       parameters.end(),
       " ",
       [](const smt_identifier_termt &identifier) {
-        return "(" + smt_to_string(identifier) + " " +
-               smt_to_string(identifier.get_sort()) + ")";
+        return "(" + smt_to_smt2_string(identifier) + " " +
+               smt_to_smt2_string(identifier.get_sort()) + ")";
       });
     os << ") " << define_function.return_sort() << " "
        << define_function.definition() << ")";
@@ -367,7 +367,7 @@ std::ostream &operator<<(std::ostream &os, const smt_commandt &command)
   return os;
 }
 
-std::string smt_to_string(const smt_commandt &command)
+std::string smt_to_smt2_string(const smt_commandt &command)
 {
   std::stringstream ss;
   ss << command;

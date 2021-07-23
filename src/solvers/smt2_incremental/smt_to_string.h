@@ -21,10 +21,10 @@ std::ostream &operator<<(std::ostream &os, const smt_optiont &option);
 std::ostream &operator<<(std::ostream &os, const smt_logict &logic);
 std::ostream &operator<<(std::ostream &os, const smt_commandt &command);
 
-std::string smt_to_string(const smt_sortt &sort);
-std::string smt_to_string(const smt_termt &term);
-std::string smt_to_string(const smt_optiont &option);
-std::string smt_to_string(const smt_logict &logic);
-std::string smt_to_string(const smt_commandt &command);
+std::string smt_to_smt2_string(const smt_sortt &sort);
+std::string smt_to_smt2_string(const smt_termt &term);
+std::string smt_to_smt2_string(const smt_optiont &option);
+std::string smt_to_smt2_string(const smt_logict &logic);
+std::string smt_to_smt2_string(const smt_commandt &command);
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_TO_STRING_H
