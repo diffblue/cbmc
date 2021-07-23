@@ -41,7 +41,10 @@ void smt_logict::accept(smt_logic_const_downcast_visitort &&visitor) const
   ::accept(*this, id(), std::move(visitor));
 }
 
-smt_logic_quantifier_free_bit_vectorst::smt_logic_quantifier_free_bit_vectorst()
-  : smt_logict{ID_smt_logic_quantifier_free_bit_vectors}
-{
-}
+#define LOGIC_ID(the_id)                                                       \
+  smt_logic_##the_id##t::smt_logic_##the_id##t()                               \
+    : smt_logict{ID_smt_logic_##the_id}                                        \
+  {                                                                            \
+  }
+#include "smt_logics.def"
+#undef LOGIC_ID

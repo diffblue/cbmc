@@ -61,11 +61,15 @@ const smt_logict &smt_logict::storert<derivedt>::downcast(const irept &irep)
   return static_cast<const smt_logict &>(irep);
 }
 
-class smt_logic_quantifier_free_bit_vectorst : public smt_logict
-{
-public:
-  smt_logic_quantifier_free_bit_vectorst();
-};
+#define LOGIC_ID(the_id)                                                       \
+  /* NOLINTNEXTLINE(readability/identifiers) cpplint does not match the ## */  \
+  class smt_logic_##the_id##t : public smt_logict                              \
+  {                                                                            \
+  public:                                                                      \
+    smt_logic_##the_id##t();                                                   \
+  };
+#include "smt_logics.def"
+#undef LOGIC_ID
 
 class smt_logic_const_downcast_visitort
 {
