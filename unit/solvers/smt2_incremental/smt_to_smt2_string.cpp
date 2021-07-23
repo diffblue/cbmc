@@ -6,7 +6,7 @@
 #include <solvers/smt2_incremental/smt_logics.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
-#include <solvers/smt2_incremental/smt_to_string.h>
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <util/mp_arith.h>
 

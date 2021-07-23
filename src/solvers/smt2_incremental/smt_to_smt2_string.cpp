@@ -1,6 +1,6 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_to_string.h>
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <solvers/smt2/smt2_conv.h>
 #include <solvers/smt2_incremental/smt_commands.h>
