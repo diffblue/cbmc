@@ -125,7 +125,7 @@ void function_exit(
 
     Forall_goto_program_instructions(i_it, body)
     {
-      if(i_it->is_return())
+      if(i_it->is_set_return_value())
       {
         goto_programt::instructiont call = goto_programt::make_function_call(
           function_to_call(goto_model.symbol_table, id, gf_entry.first));
@@ -142,17 +142,17 @@ void function_exit(
     assert(last->is_end_function());
 
     // is there already a return?
-    bool has_return=false;
+    bool has_set_return_value = false;
 
     if(last!=body.instructions.begin())
     {
       goto_programt::targett before_last=last;
       --before_last;
-      if(before_last->is_return())
-        has_return=true;
+      if(before_last->is_set_return_value())
+        has_set_return_value = true;
     }
 
-    if(!has_return)
+    if(!has_set_return_value)
     {
       goto_programt::instructiont call = goto_programt::make_function_call(
         function_to_call(goto_model.symbol_table, id, gf_entry.first));

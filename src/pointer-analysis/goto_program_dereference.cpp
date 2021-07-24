@@ -225,7 +225,7 @@ void goto_program_dereferencet::dereference_instruction(
 
     i.set_function_call(function_call);
   }
-  else if(i.is_return())
+  else if(i.is_set_return_value())
   {
     dereference_expr(i.return_value(), checks_only);
   }

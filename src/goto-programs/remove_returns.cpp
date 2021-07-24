@@ -115,7 +115,7 @@ void remove_returnst::replace_returns(
 
   for(auto &instruction : goto_program.instructions)
   {
-    if(instruction.is_return())
+    if(instruction.is_set_return_value())
     {
       INVARIANT(
         instruction.get_code().operands().size() == 1,

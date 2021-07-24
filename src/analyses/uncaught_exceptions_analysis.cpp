@@ -132,7 +132,7 @@ void uncaught_exceptions_domaint::transform(
   case DEAD:   // Safe to ignore in this context
   case ASSIGN: // Safe to ignore in this context
     break;
-  case RETURN:
+  case SET_RETURN_VALUE:
 #if 0
     DATA_INVARIANT(false, "Returns must be removed before analysis");
 #endif

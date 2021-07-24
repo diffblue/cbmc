@@ -660,7 +660,7 @@ void goto_symext::execute_next_instruction(
     symex_transition(state);
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     // This case should have been removed by return-value removal
     UNREACHABLE;
     break;

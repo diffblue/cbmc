@@ -291,10 +291,10 @@ void interpretert::step()
     trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
     if(call_stack.empty())
-      throw "RETURN without call"; // NOLINT(readability/throw)
+      throw "SET_RETURN_VALUE without call"; // NOLINT(readability/throw)
 
     if(call_stack.top().return_value_address != 0)
     {

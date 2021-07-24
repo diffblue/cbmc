@@ -570,10 +570,11 @@ void show_full_goto_trace(
       break;
 
     case goto_trace_stept::typet::ASSIGNMENT:
-      if(step.pc->is_assign() ||
-         step.pc->is_return() || // returns have a lhs!
-         step.pc->is_function_call() ||
-         (step.pc->is_other() && step.full_lhs.is_not_nil()))
+      if(
+        step.pc->is_assign() ||
+        step.pc->is_set_return_value() || // returns have a lhs!
+        step.pc->is_function_call() ||
+        (step.pc->is_other() && step.full_lhs.is_not_nil()))
       {
         if(prev_step_nr!=step.step_nr || first_step)
         {

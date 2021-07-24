@@ -138,7 +138,7 @@ void goto_functionst::validate(const namespacet &ns, const validation_modet vm)
       {
         DATA_CHECK(
           vm,
-          !instruction.is_return(),
+          !instruction.is_set_return_value(),
           "void function should not return a value");
       }
     }

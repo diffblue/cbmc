@@ -160,7 +160,7 @@ static bool is_return_with_variable(
   const goto_programt::instructiont &instr,
   const irep_idt &identifier)
 {
-  if(!instr.is_return())
+  if(!instr.is_set_return_value())
   {
     return false;
   }
@@ -271,7 +271,7 @@ static goto_programt::targett check_and_replace_target(
       instr.turn_into_skip();
     });
 
-  if(target_instruction->is_return())
+  if(target_instruction->is_set_return_value())
   {
     const auto &nondet_var = target_instruction->return_value();
 

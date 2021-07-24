@@ -140,8 +140,8 @@ void variable_sensitivity_domaint::transform(
     // Can ignore
     break;
 
-  case RETURN:
-    throw "return instructions should be removed first";
+  case SET_RETURN_VALUE:
+    throw "the SET_RETURN_VALUE instructions should be removed first";
 
   case START_THREAD:
   case END_THREAD:

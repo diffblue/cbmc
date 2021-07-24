@@ -112,10 +112,11 @@ std::ostream &goto_programt::output_instruction(
       }
       // fallthrough
     }
+
     out << "OTHER " << format(instruction.get_other());
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     out << "RETURN " << format(instruction.return_value()) << '\n';
     break;
 
@@ -323,7 +324,7 @@ std::list<exprt> expressions_read(
     dest.push_back(instruction.get_condition());
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     dest.push_back(instruction.return_value());
     break;
 
@@ -385,7 +386,7 @@ std::list<exprt> expressions_written(
   case CATCH:
   case THROW:
   case GOTO:
-  case RETURN:
+  case SET_RETURN_VALUE:
   case DEAD:
   case DECL:
   case ATOMIC_BEGIN:
@@ -501,7 +502,7 @@ std::string as_string(
     }
     return result;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
   case OTHER:
   case DECL:
   case DEAD:
@@ -883,11 +884,11 @@ void goto_programt::instructiont::validate(
     break;
   case ATOMIC_END:
     break;
-  case RETURN:
+  case SET_RETURN_VALUE:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       code.get_statement() == ID_return,
-      "return instruction should contain a return statement",
+      "SET_RETURN_VALUE instruction should contain a return statement",
       source_location);
     break;
   case ASSIGN:
@@ -961,7 +962,7 @@ void goto_programt::instructiont::transform(
     }
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
   {
     auto new_return_value = f(return_value());
     if(new_return_value.has_value())
@@ -1063,7 +1064,7 @@ void goto_programt::instructiont::apply(
       f(to_code_expression(get_other()).expression());
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     f(return_value());
     break;
 
@@ -1186,8 +1187,8 @@ std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
   case ATOMIC_END:
     out << "ATOMIC_END";
     break;
-  case RETURN:
-    out << "RETURN";
+  case SET_RETURN_VALUE:
+    out << "SET_RETURN_VALUE";
     break;
   case ASSIGN:
     out << "ASSIGN";

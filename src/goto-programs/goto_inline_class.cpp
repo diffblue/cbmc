@@ -155,7 +155,7 @@ void goto_inlinet::replace_return(
       it!=dest.instructions.end();
       it++)
   {
-    if(it->is_return())
+    if(it->is_set_return_value())
     {
       if(lhs.is_not_nil())
       {

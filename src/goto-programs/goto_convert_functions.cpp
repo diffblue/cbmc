@@ -119,7 +119,7 @@ void goto_convert_functionst::add_return(
       }
 
       // return?
-      if(last_instruction->is_return())
+      if(last_instruction->is_set_return_value())
         return;
 
       // advance if it's a 'dead' without branch target
