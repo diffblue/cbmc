@@ -4,9 +4,9 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\s*x;$
-^\s*c;$
-^\s*a;$
+^\s*.*::x$
+^\s*.*::c$
+^\s*.*::a$
 no body.*'f
 --
 f\(\)

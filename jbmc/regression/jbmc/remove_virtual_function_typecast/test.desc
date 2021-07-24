@@ -1,10 +1,10 @@
 CORE symex-driven-lazy-loading-expected-failure
 VirtualFunctions
 --java-max-vla-length 48 --unwind 8 --java-unwind-enum-static --trace --function VirtualFunctions.check --show-goto-functions
- \(struct VirtualFunctions\$B \*\)a \. VirtualFunctions\$B\.f:\(\)V\(\);$
- a \. VirtualFunctions\$A\.f:\(\)V\(\);$
- b \. VirtualFunctions\$B\.f:\(\)V\(\);$
- \(struct VirtualFunctions\$B \*\)c \. VirtualFunctions\$B\.f:\(\)V\(\);$
+CALL java::VirtualFunctions\$B\.f:\(\)V\(cast\(.*::a, struct java::VirtualFunctions\$B\*\)\)$
+CALL java::VirtualFunctions\$A\.f:\(\)V\(.*::a\)$
+CALL java::VirtualFunctions\$B\.f:\(\)V\(.*::b\)$
+CALL java::VirtualFunctions\$B\.f:\(\)V\(cast\(.*::c, struct java::VirtualFunctions\$B\*\)\)$
 ^EXIT=0$
 ^SIGNAL=0$
 --

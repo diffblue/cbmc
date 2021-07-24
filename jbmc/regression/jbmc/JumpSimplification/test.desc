@@ -4,7 +4,7 @@ Test
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-IF \w* <= 0 THEN GOTO 1\n\s*//.*\n\s*//.*\n\s*\w*::
+IF .* ≤ 0 THEN GOTO 1\n\s*//.*\n\s*//.*\n\s*ASSIGN
 --
-IF !\(\w* <= 0\) THEN GOTO 1\n\s*//.*\n.*GOTO 2\n\s*//.*\n\s*//.*\n\s*1: \w*::
+IF ¬\(.* ≤ 0\) THEN GOTO 1\n\s*//.*\n.*GOTO 2\n\s*//.*\n\s*//.*\n\s*1: \w*::
 ^warning: ignoring

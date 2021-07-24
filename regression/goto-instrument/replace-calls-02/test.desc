@@ -1,12 +1,12 @@
 CORE
 main.c
 --replace-calls f:g --replace-calls h:i
-g\(\);
-i\(\);
+g\(\)
+i\(\)
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-f\(\);
-h\(\);
+f\(\)
+h\(\)
 ^warning: ignoring

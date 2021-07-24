@@ -2,7 +2,7 @@ CORE
 DestructorStackTests
 --show-goto-functions --function DestructorStackTests.mainTest --unwind 10
 activate-multi-line-match
-[0-9]+: dead strings;[\s]*(?P<comment_block>(\/\/ [0-9]+ file DestructorStackTests\.java line 42 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 90)|(\/\/ [0-9]+ no location))[\s]*dead minor1;[\s]*(?P>comment_block)[\s]*dead anonlocal::[0-9a-zA-Z]+;[\s]*(?P>comment_block)[\s]*[0-9]+: END_FUNCTION
+[0-9]+: DEAD .*::strings[\s]*(?P<comment_block>(\/\/ [0-9]+ file DestructorStackTests\.java line 42 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 90)|(\/\/ [0-9]+ no location))[\s]*DEAD .*::minor1[\s]*(?P>comment_block)[\s]*DEAD .*::anonlocal::[0-9a-zA-Z]+[\s]*(?P>comment_block)[\s]*[0-9]+: END_FUNCTION
 ^EXIT=0$
 ^SIGNAL=0$
 --
@@ -10,11 +10,11 @@ activate-multi-line-match
 Checks for:
 
            // Labels: pc187
-       12: dead strings;
+       12: DEAD strings
            // 250 file DestructorStackTests.java line 42 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 90
-           dead minor1;
+           DEAD minor1
            // 251 file DestructorStackTests.java line 42 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 90
-           dead anonlocal::4a;
+           DEAD anonlocal::4a
            // 252 no location
        13: END_FUNCTION
 

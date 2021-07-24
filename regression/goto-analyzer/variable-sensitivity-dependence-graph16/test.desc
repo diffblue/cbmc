@@ -6,5 +6,5 @@ activate-multi-line-match
 ^SIGNAL=0$
 // Assignment from the result of a function call to a function with no body
 // should have a data dependency on the function
-^Data dependencies: 3 \[f2\]\n(.*\n).*\/\/ 4 file .*main.c line 15 function main\n.*t2 = NONDET\([^)]*\);
+^Data dependencies: 3 \[f2\]\n(.*\n).*\/\/ 4 file .*main.c line 15 function main\n.*t2 := .*nondet.*
 --

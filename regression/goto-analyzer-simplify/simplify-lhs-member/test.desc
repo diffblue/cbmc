@@ -1,10 +1,10 @@
 CORE
 main.c
 --vsd --vsd-arrays every-element --vsd-pointers value-set --vsd-structs every-field
-symbol = 5
-\*value\.pointer_component = 6
-value\.array\[1l?l?\] = 2
-value\.array\[\(signed (long (long )?)?int\)nondet\] = 3
+symbol := 5
+\*\(.*::value\.pointer_component\) := 6
+value\.array\[1\] := 2
+value\.array\[.*nondet.*\] := 3
 ^SIGNAL=0$
 ^EXIT=0$
 --

@@ -2,7 +2,7 @@ CORE
 main.c
 --show-goto-functions --pointer-check
 ^Removal of function pointers and virtual functions$
-^\s*f3\(\);$
+^\s*CALL f3\(\)$
 ^EXIT=0$
 ^SIGNAL=0$
 --

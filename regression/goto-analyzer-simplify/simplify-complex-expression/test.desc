@@ -1,7 +1,7 @@
 CORE
 main.c
 --vsd
-r == 2
+r = 2
 ^SIGNAL=0$
 ^EXIT=0$
 --

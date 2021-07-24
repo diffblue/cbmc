@@ -4,8 +4,8 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-ASSERT \*\(&n\) > 0
-ASSUME \*\(&n\) == tmp_cc[\$\d]? \+ 2
+ASSERT \*\(address_of.*n.*\) > 0
+ASSUME \*\(address_of.*n.*\) = .*::tmp_cc[\$\d]? \+ 2
 --
 --
 Verification:

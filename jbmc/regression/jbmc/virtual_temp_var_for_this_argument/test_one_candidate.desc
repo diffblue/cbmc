@@ -3,7 +3,7 @@ Main
 --show-goto-functions --function Main.oneCandidate
 ^EXIT=0$
 ^SIGNAL=0$
-B\.f:\(\)V\(\);$
+B\.f:\(\)V\(.*::b\)$
 --
 this_argument
 --

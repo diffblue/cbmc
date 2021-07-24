@@ -2,15 +2,15 @@ CORE
 main.c
 --show-goto-functions --pointer-check
 ^Removal of function pointers and virtual functions$
-^\s*IF pts->go == f1 THEN GOTO [0-9]$
-^\s*IF pts->go == f2 THEN GOTO [0-9]$
-^\s*IF pts->go == f3 THEN GOTO [0-9]$
-^\s*IF pts->go == f4 THEN GOTO [0-9]$
-^\s*IF pts->go == f5 THEN GOTO [0-9]$
-^\s*IF pts->go == f6 THEN GOTO [0-9]$
-^\s*IF pts->go == f7 THEN GOTO [0-9]$
-^\s*IF pts->go == f8 THEN GOTO [0-9]$
-^\s*IF pts->go == f9 THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f1\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f2\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f3\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f4\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f5\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f6\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f7\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f8\) THEN GOTO [0-9]$
+^\s*IF .*pts\.go = address_of\(f9\) THEN GOTO [0-9]$
 ^EXIT=0$
 ^SIGNAL=0$
 --

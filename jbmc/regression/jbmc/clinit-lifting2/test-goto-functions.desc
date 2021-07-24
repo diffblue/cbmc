@@ -4,7 +4,7 @@ Test
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-\s*// 0 no location\n\s*Other\.<clinit_wrapper>\(\);\s*// 1 no location\s*int total;
+\s*// 0 no location\n\s*CALL java::Other\.<clinit_wrapper>\(\)\s*// 1 no location\s*DECL .*::total
 --
 --
 This checks that the clinit-wrapper function is called once, even though there are two calls in the source

@@ -3,11 +3,11 @@ A
 --reachability-slice --function A.foo --show-goto-functions --property 'java::A.foo:(I)V.assertion.1'
 ^EXIT=0$
 ^SIGNAL=0$
-= \(int\)\(short\)1001
-= \(int\)\(short\)1002
-= \(int\)\(short\)1003
+:= .*1001
+:= .*1002
+:= .*1003
 --
-= \(int\)\(short\)1004
-= \(int\)\(short\)1005
+:= .*1004
+:= .*1005
 --
 Doesn't work with symex-driven lazy loading because the reachability slicer is a whole-program pass.

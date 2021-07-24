@@ -3,8 +3,8 @@ Test
 --function Test.main --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-this \. Test\.callee:\(LBase;\)V\(\(struct Base \*\)&return_tmp0->@Base\);
-this \. Test\.callee2:\(LBase;\)V\(&return_tmp1->@Base\);
+CALL java::Test\.callee:\(LBase;\)V\(.*::this, cast\(address_of\(\*java::Test\.main:\(Z\)V::return_tmp0\.@Base\), struct java::Base\*\)\)
+CALL java::Test\.callee2:\(LBase;\)V\(.*::this, address_of\(\*java::Test\.main:\(Z\)V::return_tmp1\.@Base\)\)
 --
 callee has a qualified Base type, and so requires a cast.
 callee2 has the unqualified type that Test<T> naturally inherits, so no cast is required.

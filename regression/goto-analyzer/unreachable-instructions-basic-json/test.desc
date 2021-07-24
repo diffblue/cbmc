@@ -6,7 +6,7 @@ CORE
 "sourceLocation":
 "function": "not_called",
 "line": "5",
-"statement": "not_called#return_value = x \+ x;"
+"statement": "ASSIGN not_called#return_value := .*x \+ .*x"
 "sourceLocation":
 "function": "not_called",
 "line": "5",
@@ -16,7 +16,7 @@ CORE
 "sourceLocation":
 "function": "dead_inside",
 "line": "12",
-"statement": "y = y \+ 1;"
+"statement": "ASSIGN .*::y := .*::y \+ 1"
 ^EXIT=0$
 ^SIGNAL=0$
 --

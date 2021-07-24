@@ -4,7 +4,7 @@ main.c
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-\/\/ ([0-9]+) file.*\n.*IF.*g_in1.*THEN GOTO(.*\n)*Control dependencies: \1\n\n.*\n.*g_out = 1
+\/\/ ([0-9]+) file.*\n.*IF.*g_in1.*THEN GOTO(.*\n)*Control dependencies: \1\n\n.*\n.*g_out := 1
 --
 ^warning: ignoring
 --

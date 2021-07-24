@@ -1,9 +1,9 @@
 CORE
 main.c
 --vsd --vsd-arrays every-element
-arr\[0l?l?\] =
-arr\[1l?l?\] =
-arr\[\(signed (long (long )?)?int\)nondet\] =
+arr\[0\] :=
+arr\[1\] :=
+arr\[.*nondet.*\] :=
 ^SIGNAL=0$
 ^EXIT=0$
 --

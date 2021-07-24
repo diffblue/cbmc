@@ -3,7 +3,7 @@ Test
 --function Test.test --validate-goto-model --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-Test\.test:\(\)LTest;#return_value = static_field;
+ASSIGN java::Test\.test:\(\)LTest;#return_value := java::Test\.static_field$
 --
 ^warning: ignoring
 --

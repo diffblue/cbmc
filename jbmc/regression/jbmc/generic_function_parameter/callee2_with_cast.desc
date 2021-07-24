@@ -3,7 +3,7 @@ Test
 --function Test.main2 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-this \. Test.callee2:\(LTest;\)V\(\(struct Test \*\)param\);
+java::Test.callee2:\(LTest;\)V\(.*::this, cast\(java::Test\.main2:\(LTest;\)V::param, struct java::Test\*\)\)
 --
 --
 Test and callee2 have differing parameter types, so there should be a cast at the callsite.

@@ -2,6 +2,6 @@ CORE
 main.c
 --splice-call main,moo
 activate-multi-line-match
-moo\(\);\n.*function main.*
+moo\(\)\n.*function main.*
 ^EXIT=0$
 ^SIGNAL=0$

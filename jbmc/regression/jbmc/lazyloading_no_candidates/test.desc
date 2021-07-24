@@ -4,7 +4,7 @@ Test
 ^EXIT=0$
 ^SIGNAL=0$
 ^CI lazy methods: elaborate java::Test\$intf\.f:\(\)V$
-Test\$intf\.f:\(\)V\(\);$
+Test\$intf\.f:\(\)V\(.*\)$
 --
 --
 This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)

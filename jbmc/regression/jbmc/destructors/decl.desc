@@ -2,20 +2,20 @@ CORE
 DestructorStackTests
 --show-goto-functions --function DestructorStackTests.mainTest --unwind 10
 activate-multi-line-match
-IF !\(\(int\)unknown == 0\) THEN GOTO [0-9]+[\s]*(?P<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 24 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 50)[\s]*dead new_tmp[0-9]+;[\s]*(?P>comment_block)[\s]*GOTO [0-9]+[\s]*\/\/ [0-9]+ no location[\s]*[0-9]+: dead new_tmp[0-9]+;[\s]*
+IF ¬\(.*unknown.* = 0\) THEN GOTO [0-9]+[\s]*(?P<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 24 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 50)[\s]*DEAD .*::new_tmp[0-9]+[\s]*(?P>comment_block)[\s]*GOTO [0-9]+[\s]*\/\/ [0-9]+ no location[\s]*[0-9]+: DEAD .*::new_tmp[0-9]+[\s]*
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
 Checks for:
 
-        IF !((int)unknown == 0) THEN GOTO 1
+        IF ¬(cast(java::DestructorStackTests.mainTest:(Z)V::unknown, signedbv[32]) = 0) THEN GOTO 1
         // 44 file DestructorStackTests.java line 24 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 50
-        dead new_tmp0;
+        DEAD java::DestructorStackTests.mainTest:(Z)V::new_tmp0
         // 45 file DestructorStackTests.java line 24 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 50
         GOTO 2
         // 46 no location
-     1: dead new_tmp0;
+     1: DEAD java::DestructorStackTests.mainTest:(Z)V::new_tmp0
 
 Tests to make sure a declaration kills its temp variable before continuing.
 Numbers vary between symex load / normal load.

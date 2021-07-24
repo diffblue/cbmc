@@ -5,11 +5,11 @@ activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
 // Second assignment has a control dependency on the outer if
-\/\/ ([0-9]+).*\n.*IF.*i < 10.*THEN(.*\n)*Control dependencies: \1\n(.*\n){2,3}.*a = 2
+\/\/ ([0-9]+).*\n.*IF.*i < 10.*THEN(.*\n)*Control dependencies: \1\n(.*\n){2,3}.*a := 2
 --
 ^warning: ignoring
 // Second assignment does not have a control dependency on the inner if
-\/\/ ([0-9]+).*\n.*IF.*i < 7.*THEN(.*\n)*Control dependencies: \1\n(.*\n){2,3}.*a = 2
+\/\/ ([0-9]+).*\n.*IF.*i < 7.*THEN(.*\n)*Control dependencies: \1\n(.*\n){2,3}.*a := 2
 --
 The first regex above matches output portions like shown below (with <N> being a
 location number). The intention is to check whether the assignment has a control

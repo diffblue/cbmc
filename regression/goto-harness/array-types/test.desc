@@ -4,7 +4,7 @@ example.c
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$
-type_constructor_ptr_int\(0, &arr, \(signed int \*\)\(void \*\)0\);
+CALL type_constructor_ptr_int\(0, address_of.*::arr\), .*0.*\)
 --
 incompatible pointer types
 --

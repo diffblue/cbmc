@@ -1,10 +1,10 @@
 CORE
 test
 --show-goto-functions --function test.main
-dead anonlocal::1i
-dead anonlocal::2i
-dead anonlocal::3a
-dead new_tmp[0-9]+
+DEAD .*::anonlocal::1i
+DEAD .*::anonlocal::2i
+DEAD .*::anonlocal::3a
+DEAD .*::new_tmp[0-9]+
 ^EXIT=0$
 ^SIGNAL=0$
 --

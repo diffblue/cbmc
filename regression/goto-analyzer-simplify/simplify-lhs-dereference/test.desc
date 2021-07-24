@@ -1,8 +1,8 @@
 CORE
 main.c
 --vsd --vsd-pointers value-set
-symbol = 5
-\*pointer = 6
+symbol := 5
+\*.*::pointer := 6
 ^SIGNAL=0$
 ^EXIT=0$
 --

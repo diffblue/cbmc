@@ -2,7 +2,7 @@ CORE
 DestructorStackTests
 --show-goto-functions --function DestructorStackTests.mainTest --unwind 10
 activate-multi-line-match
-(?P<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 34 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 84)[\s]*dead throwaway;[\s]*(?P>comment_block)[\s]*dead new_tmp[0-9]+;[\s]*(?P>comment_block)[\s]*dead val;[\s]*(?P>comment_block)[\s]*GOTO [0-9]+
+(?P<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 34 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 84)[\s]*DEAD .*::throwaway[\s]*(?P>comment_block)[\s]*DEAD .*::new_tmp[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*::val[\s]*(?P>comment_block)[\s]*GOTO [0-9]+
 ^EXIT=0$
 ^SIGNAL=0$
 --
@@ -10,11 +10,11 @@ activate-multi-line-match
 Checks for:
 
         // 228 file DestructorStackTests.java line 34 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 84
-        dead throwaway;
+        DEAD throwaway
         // 229 file DestructorStackTests.java line 34 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 84
-        dead new_tmp16;
+        DEAD new_tmp16
         // 230 file DestructorStackTests.java line 34 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 84
-        dead val;
+        DEAD val
         // 231 file DestructorStackTests.java line 34 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 84
         GOTO 12
 

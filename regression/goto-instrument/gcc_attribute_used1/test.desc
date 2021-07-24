@@ -3,7 +3,7 @@ main.c
 
 ^EXIT=0$
 ^SIGNAL=0$
-^[[:space:]]*foo = 42;$
+^[[:space:]]*ASSIGN foo := 42$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
