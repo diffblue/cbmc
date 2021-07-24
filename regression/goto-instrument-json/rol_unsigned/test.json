@@ -1,0 +1,591 @@
+{
+  "symbolTable": {
+    "VoidUnit": {
+      "baseName": "VoidUnit",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": true,
+      "isStaticLifetime": true,
+      "isThreadLocal": false,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "location": {
+        "id": "nil"
+      },
+      "mode": "C",
+      "module": "",
+      "name": "VoidUnit",
+      "prettyName": "",
+      "type": {
+        "id": "struct_tag",
+        "namedSub": {
+          "identifier": {
+            "id": "tag-Unit"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    },
+    "main": {
+      "baseName": "main",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": false,
+      "isStaticLifetime": false,
+      "isThreadLocal": false,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "location": {
+        "id": "",
+        "namedSub": {
+          "column": {
+            "id": "1"
+          },
+          "file": {
+            "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+          },
+          "function": {
+            "id": "main"
+          },
+          "line": {
+            "id": "6"
+          }
+        }
+      },
+      "mode": "C",
+      "module": "",
+      "name": "main",
+      "prettyName": "main",
+      "type": {
+        "id": "code",
+        "namedSub": {
+          "parameters": {
+            "id": ""
+          },
+          "return_type": {
+            "id": "struct_tag",
+            "namedSub": {
+              "identifier": {
+                "id": "tag-Unit"
+              }
+            }
+          }
+        }
+      },
+      "value": {
+        "id": "code",
+        "namedSub": {
+          "#source_location": {
+            "id": "",
+            "namedSub": {
+              "column": {
+                "id": "1"
+              },
+              "file": {
+                "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+              },
+              "function": {
+                "id": "main"
+              },
+              "line": {
+                "id": "6"
+              }
+            }
+          },
+          "statement": {
+            "id": "block"
+          }
+        },
+        "sub": [
+          {
+            "id": "code",
+            "namedSub": {
+              "#source_location": {
+                "id": "",
+                "namedSub": {
+                  "column": {
+                    "id": "11"
+                  },
+                  "file": {
+                    "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                  },
+                  "function": {
+                    "id": "main"
+                  },
+                  "line": {
+                    "id": "6"
+                  }
+                }
+              },
+              "statement": {
+                "id": "decl"
+              }
+            },
+            "sub": [
+              {
+                "id": "symbol",
+                "namedSub": {
+                  "identifier": {
+                    "id": "main::1::var_0"
+                  },
+                  "type": {
+                    "id": "struct_tag",
+                    "namedSub": {
+                      "identifier": {
+                        "id": "tag-Unit"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "code",
+            "namedSub": {
+              "#source_location": {
+                "id": "",
+                "namedSub": {
+                  "column": {
+                    "id": "9"
+                  },
+                  "file": {
+                    "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                  },
+                  "function": {
+                    "id": "main"
+                  },
+                  "line": {
+                    "id": "7"
+                  }
+                }
+              },
+              "statement": {
+                "id": "decl"
+              }
+            },
+            "sub": [
+              {
+                "id": "symbol",
+                "namedSub": {
+                  "identifier": {
+                    "id": "main::1::var_1::rol8"
+                  },
+                  "type": {
+                    "id": "unsignedbv",
+                    "namedSub": {
+                      "width": {
+                        "id": "8"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "code",
+            "namedSub": {
+              "#source_location": {
+                "id": "",
+                "namedSub": {
+                  "column": {
+                    "id": "16"
+                  },
+                  "file": {
+                    "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                  },
+                  "function": {
+                    "id": "main"
+                  },
+                  "line": {
+                    "id": "7"
+                  }
+                }
+              },
+              "label": {
+                "id": "bb0"
+              },
+              "statement": {
+                "id": "label"
+              }
+            },
+            "sub": [
+              {
+                "id": "code",
+                "namedSub": {
+                  "#source_location": {
+                    "id": "",
+                    "namedSub": {
+                      "column": {
+                        "id": "16"
+                      },
+                      "file": {
+                        "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                      },
+                      "function": {
+                        "id": "main"
+                      },
+                      "line": {
+                        "id": "7"
+                      }
+                    }
+                  },
+                  "statement": {
+                    "id": "block"
+                  }
+                },
+                "sub": [
+                  {
+                    "id": "code",
+                    "namedSub": {
+                      "statement": {
+                        "id": "assign"
+                      }
+                    },
+                    "sub": [
+                      {
+                        "id": "symbol",
+                        "namedSub": {
+                          "identifier": {
+                            "id": "main::1::var_1::rol8"
+                          },
+                          "type": {
+                            "id": "unsignedbv",
+                            "namedSub": {
+                              "width": {
+                                "id": "8"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "rol",
+                        "namedSub": {
+                          "type": {
+                            "id": "unsignedbv",
+                            "namedSub": {
+                              "width": {
+                                "id": "8"
+                              }
+                            }
+                          }
+                        },
+                        "sub": [
+                          {
+                            "id": "constant",
+                            "namedSub": {
+                              "type": {
+                                "id": "unsignedbv",
+                                "namedSub": {
+                                  "width": {
+                                    "id": "8"
+                                  }
+                                }
+                              },
+                              "value": {
+                                "id": "38"
+                              }
+                            }
+                          },
+                          {
+                            "id": "constant",
+                            "namedSub": {
+                              "type": {
+                                "id": "unsignedbv",
+                                "namedSub": {
+                                  "width": {
+                                    "id": "8"
+                                  }
+                                }
+                              },
+                              "value": {
+                                "id": "3"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "code",
+                    "namedSub": {
+                      "#source_location": {
+                        "id": "",
+                        "namedSub": {
+                          "column": {
+                            "id": "16"
+                          },
+                          "file": {
+                            "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                          },
+                          "function": {
+                            "id": "main"
+                          },
+                          "line": {
+                            "id": "7"
+                          }
+                        }
+                      },
+                      "destination": {
+                        "id": "bb1"
+                      },
+                      "statement": {
+                        "id": "goto"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "code",
+            "namedSub": {
+              "#source_location": {
+                "id": "",
+                "namedSub": {
+                  "column": {
+                    "id": "11"
+                  },
+                  "file": {
+                    "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                  },
+                  "function": {
+                    "id": "main"
+                  },
+                  "line": {
+                    "id": "6"
+                  }
+                }
+              },
+              "label": {
+                "id": "bb1"
+              },
+              "statement": {
+                "id": "label"
+              }
+            },
+            "sub": [
+              {
+                "id": "code",
+                "namedSub": {
+                  "#source_location": {
+                    "id": "",
+                    "namedSub": {
+                      "column": {
+                        "id": "11"
+                      },
+                      "file": {
+                        "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+                      },
+                      "function": {
+                        "id": "main"
+                      },
+                      "line": {
+                        "id": "6"
+                      }
+                    }
+                  },
+                  "statement": {
+                    "id": "skip"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "code",
+            "namedSub": {
+              "statement": {
+                "id": "return"
+              }
+            },
+            "sub": [
+              {
+                "id": "symbol",
+                "namedSub": {
+                  "identifier": {
+                    "id": "VoidUnit"
+                  },
+                  "type": {
+                    "id": "struct_tag",
+                    "namedSub": {
+                      "identifier": {
+                        "id": "tag-Unit"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "main::1::var_0": {
+      "baseName": "var_0",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": true,
+      "isStaticLifetime": false,
+      "isThreadLocal": true,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "location": {
+        "id": "",
+        "namedSub": {
+          "column": {
+            "id": "11"
+          },
+          "file": {
+            "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+          },
+          "function": {
+            "id": "main"
+          },
+          "line": {
+            "id": "6"
+          }
+        }
+      },
+      "mode": "C",
+      "module": "",
+      "name": "main::1::var_0",
+      "prettyName": "",
+      "type": {
+        "id": "struct_tag",
+        "namedSub": {
+          "identifier": {
+            "id": "tag-Unit"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    },
+    "main::1::var_1::rol8": {
+      "baseName": "rol8",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": true,
+      "isStaticLifetime": false,
+      "isThreadLocal": true,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "location": {
+        "id": "",
+        "namedSub": {
+          "column": {
+            "id": "9"
+          },
+          "file": {
+            "id": "/Users/vecchiot/Documents/rmc/src/test/cbmc/test.rs"
+          },
+          "function": {
+            "id": "main"
+          },
+          "line": {
+            "id": "7"
+          }
+        }
+      },
+      "mode": "C",
+      "module": "",
+      "name": "main::1::var_1::rol8",
+      "prettyName": "",
+      "type": {
+        "id": "unsignedbv",
+        "namedSub": {
+          "width": {
+            "id": "8"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    },
+    "tag-Unit": {
+      "baseName": "Unit",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": false,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": false,
+      "isStaticLifetime": false,
+      "isThreadLocal": false,
+      "isType": true,
+      "isVolatile": false,
+      "isWeak": false,
+      "location": {
+        "id": "nil"
+      },
+      "mode": "C",
+      "module": "",
+      "name": "tag-Unit",
+      "prettyName": "",
+      "type": {
+        "id": "struct",
+        "namedSub": {
+          "components": {
+            "id": ""
+          },
+          "tag": {
+            "id": "Unit"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    }
+  }
+}

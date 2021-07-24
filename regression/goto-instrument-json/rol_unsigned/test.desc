@@ -1,0 +1,12 @@
+CORE
+test.json
+--dump-c
+^EXIT=0$
+^SIGNAL=0$
+unsigned char rol8=56 << 3 % 8 \| 56 >> 8 - 3 % 8;
+--
+irep
+--
+This tests that the rol goto operation is converted into suitable bit
+twiddling operations in C representation. Also the negative check for
+"irep" checks that no irep is failing conversion.
