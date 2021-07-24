@@ -845,12 +845,6 @@ public:
     }
   }
 
-  static instructiont
-  make_return(const source_locationt &l = source_locationt::nil())
-  {
-    return instructiont(code_returnt(), l, SET_RETURN_VALUE, nil_exprt(), {});
-  }
-
   static instructiont make_return(
     code_returnt c,
     const source_locationt &l = source_locationt::nil())
