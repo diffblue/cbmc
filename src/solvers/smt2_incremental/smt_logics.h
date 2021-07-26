@@ -61,7 +61,7 @@ const smt_logict &smt_logict::storert<derivedt>::downcast(const irept &irep)
   return static_cast<const smt_logict &>(irep);
 }
 
-#define LOGIC_ID(the_id)                                                       \
+#define LOGIC_ID(the_id, the_name)                                             \
   /* NOLINTNEXTLINE(readability/identifiers) cpplint does not match the ## */  \
   class smt_logic_##the_id##t : public smt_logict                              \
   {                                                                            \
@@ -74,7 +74,8 @@ const smt_logict &smt_logict::storert<derivedt>::downcast(const irept &irep)
 class smt_logic_const_downcast_visitort
 {
 public:
-#define LOGIC_ID(the_id) virtual void visit(const smt_logic_##the_id##t &) = 0;
+#define LOGIC_ID(the_id, the_name)                                             \
+  virtual void visit(const smt_logic_##the_id##t &) = 0;
 #include "smt_logics.def"
 #undef LOGIC_ID
 };

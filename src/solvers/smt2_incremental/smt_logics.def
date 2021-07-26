@@ -6,4 +6,4 @@
 ///  * The constant `irep_idt`s used to identify each of the logic classes.
 ///  * The member functions of the `smt_logic_const_downcast_visitort` class.
 ///  * The type of option checks required to implement `smt_logict::accept`.
-LOGIC_ID(quantifier_free_bit_vectors)
+LOGIC_ID(quantifier_free_bit_vectors, QF_BV)

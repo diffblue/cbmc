@@ -265,10 +265,13 @@ public:
   {
   }
 
-  void visit(const smt_logic_quantifier_free_bit_vectorst &) override
-  {
-    os << "QF_BV";
+#define LOGIC_ID(the_id, the_name)                                             \
+  void visit(const smt_logic_##the_id##t &) override                           \
+  {                                                                            \
+    os << #the_name;                                                           \
   }
+#include "smt_logics.def"
+#undef LOGIC_ID
 };
 
 std::ostream &operator<<(std::ostream &os, const smt_logict &logic)
